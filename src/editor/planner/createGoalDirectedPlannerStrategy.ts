@@ -15,12 +15,12 @@ import { createConstructivePlannerStrategy } from "~/editor/planner/createConstr
 export const DefaultGoalDirectedBestFirstDepth = 6;
 export const DefaultGoalDirectedConstructiveDelegationDepth = 1;
 export const DefaultGoalDirectedConstructiveLinearRootDepth = 1;
-export const DefaultGoalDirectedConstructiveRootDepth = 8;
+export const DefaultGoalDirectedConstructiveMergeRootDepth = 8;
 
 export namespace createGoalDirectedPlannerStrategy {
 	export interface Props {
 		readonly constructiveBudget?: Partial<PlannerGoalSearchBudget>;
-		readonly delegatedBestFirstBudget?: Partial<PlannerSearchBudget>;
+		readonly bestFirstBudget?: Partial<PlannerSearchBudget>;
 		/** Maximum optimistic graph depth delegated as one local best-first subproblem. */
 		readonly maximumBestFirstDepth?: number;
 		/** Constructive decomposition may recursively own only this many nested subgoals. */
@@ -28,7 +28,7 @@ export namespace createGoalDirectedPlannerStrategy {
 		/** Single-route line goals no deeper than this may use constructive execution at root. */
 		readonly maximumConstructiveLinearRootDepth?: number;
 		/** Merge roots deeper than this optimistic graph depth go directly to best-first search. */
-		readonly maximumConstructiveRootDepth?: number;
+		readonly maximumConstructiveMergeRootDepth?: number;
 	}
 }
 
@@ -45,16 +45,21 @@ export const readGoalDirectedPlannerStrategySelection = ({
 	maximumBestFirstDepth,
 	maximumConstructiveDelegationDepth,
 	maximumConstructiveLinearRootDepth,
-	maximumConstructiveRootDepth,
+	maximumConstructiveMergeRootDepth,
 	problem,
 }: Pick<AdaptivePlannerStrategySituation, "currentStrategy" | "graph" | "problem"> & {
 	readonly maximumBestFirstDepth: number;
 	readonly maximumConstructiveDelegationDepth: number;
 	readonly maximumConstructiveLinearRootDepth: number;
-	readonly maximumConstructiveRootDepth: number;
+	readonly maximumConstructiveMergeRootDepth: number;
 }): AdaptivePlannerStrategySelection => {
 	const depth = graph.depthByItemId.get(problem.activeGoal.itemId);
 	const routes = graph.routesByOutputItemId.get(problem.activeGoal.itemId) ?? [];
+	if ((problem.activeGoal.minimumCharges ?? 0) > 0)
+		return {
+			reason: "construct-charge-goal",
+			strategyId: PlannerStrategyId.constructive,
+		};
 	if (routes.some(({ output }) => output.stochastic))
 		return {
 			reason: "solve-stochastic-goal",
@@ -67,7 +72,7 @@ export const readGoalDirectedPlannerStrategySelection = ({
 		if (
 			route?.kind === "merge-output" &&
 			depth !== undefined &&
-			depth <= maximumConstructiveRootDepth
+			depth <= maximumConstructiveMergeRootDepth
 		)
 			return {
 				reason: `construct-merge-root-goal:depth-${depth}`,
@@ -107,14 +112,10 @@ export const readGoalDirectedPlannerStrategySelection = ({
 			reason: `solve-bounded-resource-goal:delegation-depth-${constructiveDelegationDepth}`,
 			strategyId: PlannerStrategyId.bestFirst,
 		};
-	const parentGoal = problem.agenda.find(
-		(goal, index) => index > 0 && goal.itemId !== problem.activeGoal.itemId,
-	);
-	const parentDepth =
-		parentGoal === undefined ? undefined : graph.depthByItemId.get(parentGoal.itemId);
-	return parentDepth !== undefined && depth >= parentDepth
+	const rootDepth = graph.depthByItemId.get(problem.rootGoal.itemId);
+	return rootDepth !== undefined && depth >= rootDepth
 		? {
-				reason: `solve-non-descending-resource-goal:depth-${depth}-from-${parentDepth}`,
+				reason: `solve-non-descending-resource-goal:depth-${depth}-from-${rootDepth}`,
 				strategyId: PlannerStrategyId.bestFirst,
 			}
 		: {
@@ -134,11 +135,11 @@ export const readGoalDirectedPlannerStrategySelection = ({
  */
 export const createGoalDirectedPlannerStrategy = ({
 	constructiveBudget,
-	delegatedBestFirstBudget,
+	bestFirstBudget,
 	maximumBestFirstDepth = DefaultGoalDirectedBestFirstDepth,
 	maximumConstructiveDelegationDepth = DefaultGoalDirectedConstructiveDelegationDepth,
 	maximumConstructiveLinearRootDepth = DefaultGoalDirectedConstructiveLinearRootDepth,
-	maximumConstructiveRootDepth = DefaultGoalDirectedConstructiveRootDepth,
+	maximumConstructiveMergeRootDepth = DefaultGoalDirectedConstructiveMergeRootDepth,
 }: createGoalDirectedPlannerStrategy.Props = {}): AdaptivePlannerStrategy => {
 	if (!Number.isSafeInteger(maximumBestFirstDepth) || maximumBestFirstDepth < 0)
 		throw new RangeError("Goal-directed best-first depth must be a non-negative safe integer.");
@@ -156,9 +157,12 @@ export const createGoalDirectedPlannerStrategy = ({
 		throw new RangeError(
 			"Goal-directed constructive linear root depth must be a non-negative safe integer.",
 		);
-	if (!Number.isSafeInteger(maximumConstructiveRootDepth) || maximumConstructiveRootDepth < 0)
+	if (
+		!Number.isSafeInteger(maximumConstructiveMergeRootDepth) ||
+		maximumConstructiveMergeRootDepth < 0
+	)
 		throw new RangeError(
-			"Goal-directed constructive root depth must be a non-negative safe integer.",
+			"Goal-directed constructive merge root depth must be a non-negative safe integer.",
 		);
 	return createAdaptivePlannerStrategy({
 		selectFx: (situation) =>
@@ -169,7 +173,7 @@ export const createGoalDirectedPlannerStrategy = ({
 					maximumBestFirstDepth,
 					maximumConstructiveDelegationDepth,
 					maximumConstructiveLinearRootDepth,
-					maximumConstructiveRootDepth,
+					maximumConstructiveMergeRootDepth,
 					problem: situation.problem,
 				}),
 			),
@@ -178,7 +182,7 @@ export const createGoalDirectedPlannerStrategy = ({
 				budget: constructiveBudget,
 			}),
 			createBestFirstPlannerStrategy({
-				budget: delegatedBestFirstBudget,
+				budget: bestFirstBudget,
 			}),
 		],
 	});

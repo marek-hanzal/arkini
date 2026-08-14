@@ -65,7 +65,7 @@ export const createEngineBackedEditorItemSimulatorFx = Effect.fn(
 						...EditorItemPlannerGoalSearchBudget,
 						...budget.constructive,
 					},
-					delegatedBestFirstBudget: {
+					bestFirstBudget: {
 						...EditorItemPlannerSearchBudget,
 						...budget.bestFirst,
 					},

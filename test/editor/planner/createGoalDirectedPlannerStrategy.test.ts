@@ -38,7 +38,7 @@ describe("createGoalDirectedPlannerStrategy", () => {
 						maximumQueuedBranches: 512,
 						maximumTraceLength: 500,
 					},
-					delegatedBestFirstBudget: {
+					bestFirstBudget: {
 						maximumExpandedStates: 1_000,
 						maximumQueuedStates: 16,
 						maximumRoutePlans: 16,
@@ -108,6 +108,48 @@ describe("createGoalDirectedPlannerStrategy", () => {
 			result.execution.trace.length,
 		);
 	});
+	it("keeps broad official roots inside bounded best-first search", async () => {
+		const config = await readArkiniGameConfigSource();
+		const planner = Effect.runSync(
+			createPlannerFx({
+				config,
+				strategy: createGoalDirectedPlannerStrategy({
+					constructiveBudget: {
+						maximumExpandedBranches: 1_000,
+						maximumQueuedBranches: 512,
+						maximumTraceLength: 500,
+					},
+					bestFirstBudget: {
+						maximumExpandedStates: 1_000,
+						maximumQueuedStates: 16,
+						maximumRoutePlans: 16,
+						maximumTraceLength: 500,
+					},
+				}),
+			}),
+		);
+
+		for (const itemId of [
+			"item:blueprint-bio-waste-processor-t1",
+			"item:feast-plate",
+		] as const) {
+			const result = await Effect.runPromise(
+				planner.estimateFx({
+					itemId,
+				}),
+			);
+
+			expect(result.type).toBe("completed");
+			expect(
+				result.sessionDiagnostics.invocations.map(({ strategyId }) => strategyId),
+			).toEqual([
+				"adaptive",
+				"best-first",
+			]);
+			expect(result.sessionDiagnostics.invocations[1]?.reason).toMatch(/^solve-root-goal:/u);
+		}
+	});
+
 	it("routes by world depth, strategy context, and stochastic output semantics", async () => {
 		const config = await readArkiniGameConfigSource();
 		const graph = createPlannerAcquisitionGraph(config);
@@ -149,6 +191,21 @@ describe("createGoalDirectedPlannerStrategy", () => {
 			},
 			runtime,
 		});
+		const tree = createRootPlannerProblem({
+			goal: {
+				itemId: "item:tree",
+				quantity: 1,
+			},
+			runtime,
+		});
+		const chargedTree = createRootPlannerProblem({
+			goal: {
+				itemId: "item:tree",
+				minimumCharges: 60,
+				quantity: 1,
+			},
+			runtime,
+		});
 		const branchingBlueprint = createRootPlannerProblem({
 			goal: {
 				itemId: "item:blueprint-bio-waste-processor-t1",
@@ -185,6 +242,16 @@ describe("createGoalDirectedPlannerStrategy", () => {
 				"adaptive",
 			],
 		});
+		const nestedContext = currentStrategy({
+			depth: 4,
+			path: [
+				"adaptive",
+				"constructive",
+				"adaptive",
+				"constructive",
+				"adaptive",
+			],
+		});
 		const select = (problem: typeof root, strategyContext: PlannerCurrentStrategyFxService) =>
 			readGoalDirectedPlannerStrategySelection({
 				currentStrategy: strategyContext,
@@ -192,7 +259,7 @@ describe("createGoalDirectedPlannerStrategy", () => {
 				maximumBestFirstDepth: 6,
 				maximumConstructiveDelegationDepth: 1,
 				maximumConstructiveLinearRootDepth: 1,
-				maximumConstructiveRootDepth: 8,
+				maximumConstructiveMergeRootDepth: 8,
 				problem,
 			});
 
@@ -212,6 +279,14 @@ describe("createGoalDirectedPlannerStrategy", () => {
 			reason: "construct-merge-root-goal:depth-5",
 			strategyId: "constructive",
 		});
+		expect(select(tree, rootContext)).toEqual({
+			reason: "construct-linear-root-goal:depth-0",
+			strategyId: "constructive",
+		});
+		expect(select(chargedTree, rootContext)).toEqual({
+			reason: "construct-charge-goal",
+			strategyId: "constructive",
+		});
 		expect(select(bakery, delegatedContext)).toEqual({
 			reason: "decompose-resource-goal:depth-19",
 			strategyId: "constructive",
@@ -222,6 +297,10 @@ describe("createGoalDirectedPlannerStrategy", () => {
 		});
 		expect(select(library, delegatedContext)).toEqual({
 			reason: "solve-non-descending-resource-goal:depth-28-from-15",
+			strategyId: "best-first",
+		});
+		expect(select(bakery, nestedContext)).toEqual({
+			reason: "solve-bounded-resource-goal:delegation-depth-2",
 			strategyId: "best-first",
 		});
 	});

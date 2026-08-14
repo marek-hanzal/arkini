@@ -1,0 +1,77 @@
+import type { PlannerExpectedEconomics } from "~/editor/planner/PlannerExpectedEconomics";
+import type { PlannerSearchExecutionState } from "~/editor/planner/PlannerSearchExecution";
+import type { PlannerStructuralReachability } from "~/editor/planner/PlannerStructuralReachability";
+import type { IdSchema } from "~/engine/common/schema/IdSchema";
+
+export interface PlannerGoalSearchBudget {
+	readonly maximumAgendaDepth: number;
+	readonly maximumConcurrentBranches: number;
+	readonly maximumExpandedBranches: number;
+	readonly maximumQueuedBranches: number;
+	readonly maximumTraceLength: number;
+}
+
+export const DefaultPlannerGoalSearchBudget: PlannerGoalSearchBudget = {
+	maximumAgendaDepth: 256,
+	maximumConcurrentBranches: 4,
+	maximumExpandedBranches: 2_000,
+	maximumQueuedBranches: 512,
+	maximumTraceLength: 500,
+};
+
+export type PlannerGoalSearchBudgetLimit = Exclude<
+	keyof PlannerGoalSearchBudget,
+	"maximumConcurrentBranches"
+>;
+
+export interface PlannerGoalSearchDiagnostics {
+	readonly attemptedActions: number;
+	readonly backtracks: number;
+	readonly blockedBranches: number;
+	readonly createdBranches: number;
+	readonly deadEndBranches: number;
+	readonly duplicateBranches: number;
+	readonly expandedBranches: number;
+	readonly maximumAgendaDepth: number;
+	readonly maximumConcurrentBranches: number;
+	readonly maximumFrontierSize: number;
+	readonly unsupportedBranches: number;
+	readonly winningChoicePath?: ReadonlyArray<number>;
+}
+
+interface PlannerGoalSearchResultBase {
+	readonly diagnostics: PlannerGoalSearchDiagnostics;
+	readonly itemId: IdSchema.Type;
+	readonly quantity: number;
+}
+
+export type PlannerGoalSearchResult =
+	| (PlannerGoalSearchResultBase & {
+			readonly availableQuantity: number;
+			readonly economics: PlannerExpectedEconomics;
+			readonly execution: PlannerSearchExecutionState;
+			readonly type: "completed";
+	  })
+	| (PlannerGoalSearchResultBase & {
+			readonly proof: Exclude<
+				PlannerStructuralReachability,
+				{
+					readonly type: "reachable";
+				}
+			>;
+			readonly type: "no-finite-path";
+	  })
+	| (PlannerGoalSearchResultBase & {
+			readonly bestAvailableQuantity: number;
+			readonly bestExecution: PlannerSearchExecutionState;
+			readonly blockedActionIds: ReadonlyArray<string>;
+			readonly budgetLimit?: PlannerGoalSearchBudgetLimit;
+			readonly frontierSize: number;
+			readonly reason:
+				| "action-unsupported"
+				| "non-quiescent-runtime"
+				| "search-budget"
+				| "search-exhausted";
+			readonly type: "inconclusive";
+			readonly unsupportedActionIds: ReadonlyArray<string>;
+	  });

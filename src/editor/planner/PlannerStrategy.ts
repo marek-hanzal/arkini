@@ -1,7 +1,11 @@
 import type { Effect } from "effect";
 
+import type { PlannerBudgetExceeded } from "~/editor/planner/PlannerBudget";
+import type { PlannerCurrentStrategyFx } from "~/editor/planner/PlannerCurrentStrategyFx";
+import type { PlannerKernelFx } from "~/editor/planner/PlannerKernelFx";
 import type { PlannerProblem } from "~/editor/planner/PlannerProblem";
 import type { PlannerSearchExecutionState } from "~/editor/planner/PlannerSearchExecution";
+import type { PlannerSessionFx } from "~/editor/planner/PlannerSessionFx";
 import type { PlannerStructuralReachability } from "~/editor/planner/PlannerStructuralReachability";
 
 export const PlannerStrategyId = {
@@ -10,8 +14,7 @@ export const PlannerStrategyId = {
 	constructive: "constructive",
 } as const;
 
-export type BuiltInPlannerStrategyId =
-	(typeof PlannerStrategyId)[keyof typeof PlannerStrategyId];
+export type BuiltInPlannerStrategyId = (typeof PlannerStrategyId)[keyof typeof PlannerStrategyId];
 
 export type PlannerNoFinitePathProof = Exclude<
 	PlannerStructuralReachability,
@@ -25,6 +28,7 @@ export type PlannerStrategyInconclusiveReason =
 	| "non-quiescent-runtime"
 	| "search-budget"
 	| "search-exhausted"
+	| "session-budget"
 	| "unsupported-routes";
 
 export interface PlannerStrategyMetrics {
@@ -62,15 +66,22 @@ export type PlannerStrategyResult<StrategyId extends string, Diagnostics> =
 			readonly unsupportedActionIds: ReadonlyArray<string>;
 	  };
 
-/** One planning algorithm. It decides what to try; the engine remains the transition authority. */
-export interface PlannerStrategy<StrategyId extends string, Budget, Diagnostics> {
-	readonly defaultBudget: Budget;
+export type PlannerStrategyEnvironment =
+	| PlannerCurrentStrategyFx
+	| PlannerKernelFx
+	| PlannerSessionFx;
+
+/** One planning algorithm. It chooses what to try; the engine remains the transition authority. */
+export interface PlannerStrategy<StrategyId extends string, Diagnostics> {
 	readonly id: StrategyId;
-	readonly runFx: (
+	readonly solveFx: (
 		problem: PlannerProblem,
-		budget?: Partial<Budget>,
-	) => Effect.Effect<PlannerStrategyResult<StrategyId, Diagnostics>>;
+	) => Effect.Effect<
+		PlannerStrategyResult<StrategyId, Diagnostics>,
+		PlannerBudgetExceeded,
+		PlannerStrategyEnvironment
+	>;
 }
 
-export type AnyPlannerStrategy = PlannerStrategy<string, object, unknown>;
+export type AnyPlannerStrategy = PlannerStrategy<string, unknown>;
 export type AnyPlannerStrategyResult = PlannerStrategyResult<string, unknown>;

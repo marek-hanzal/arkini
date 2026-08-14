@@ -9,7 +9,7 @@ describe("searchPlannerRuntimeFx official Bakery", () => {
 		const config = await readArkiniGameConfigSource();
 		const planner = Effect.runSync(createPlannerSearchHarnessFx(config));
 		const result = await Effect.runPromise(
-			planner.searchFx("producer:bakery-t1", 1, {
+			planner.runBestFirstFx("producer:bakery-t1", 1, {
 				maximumExpandedStates: 1_000,
 				maximumQueuedStates: 1,
 				maximumTraceLength: 500,

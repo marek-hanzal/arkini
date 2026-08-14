@@ -10,6 +10,7 @@ import type { PlannerStructuralReachability } from "~/editor/planner/PlannerStru
 import type { PlannerSearchCandidateResult } from "~/editor/planner/runPlannerSearchCandidateFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 export interface PlannerKernelCandidateRequest {
 	readonly candidate: PlannerSearchAction;
@@ -30,6 +31,7 @@ export interface PlannerKernelEconomicsRequest {
  * future-snapshot viability and economics projection. It exposes no live gameplay store.
  */
 export interface PlannerKernel {
+	readonly config: GameConfigSchema.Type;
 	readonly graph: PlannerAcquisitionGraph;
 	readonly initialRuntime: RuntimeSchema.Type;
 	readonly readExpectedEconomicsFx: (

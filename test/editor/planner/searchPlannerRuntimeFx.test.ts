@@ -624,7 +624,7 @@ const makePlanner = () => Effect.runSync(createPlannerSearchHarnessFx(config));
 describe("searchPlannerRuntimeFx", () => {
 	it("includes produced retained infrastructure in selected-trace economics", () => {
 		const planner = Effect.runSync(createPlannerSearchHarnessFx(infrastructureConfig));
-		const result = Effect.runSync(planner.searchFx("built-target"));
+		const result = Effect.runSync(planner.runBestFirstFx("built-target"));
 
 		expect(result.type).toBe("completed");
 		if (result.type !== "completed") return;
@@ -706,7 +706,7 @@ describe("searchPlannerRuntimeFx", () => {
 	it("backtracks from a shorter destructive alternative through the real engine", () => {
 		const planner = makePlanner();
 		const initial = structuredClone(planner.initialRuntime);
-		const result = Effect.runSync(planner.searchFx("target"));
+		const result = Effect.runSync(planner.runBestFirstFx("target"));
 
 		expect(planner.initialRuntime).toEqual(initial);
 		expect(result.type).toBe("completed");
@@ -819,7 +819,7 @@ describe("searchPlannerRuntimeFx", () => {
 	});
 
 	it("repeats canonical production until the requested quantity exists", () => {
-		const result = Effect.runSync(makePlanner().searchFx("target", 2));
+		const result = Effect.runSync(makePlanner().runBestFirstFx("target", 2));
 
 		expect(result.type).toBe("completed");
 		if (result.type !== "completed") return;
@@ -852,7 +852,7 @@ describe("searchPlannerRuntimeFx", () => {
 	});
 
 	it("executes a deterministic merge through the canonical merge transition", () => {
-		const result = Effect.runSync(makePlanner().searchFx("merge-result"));
+		const result = Effect.runSync(makePlanner().runBestFirstFx("merge-result"));
 
 		expect(result.type).toBe("completed");
 		if (result.type !== "completed") return;
@@ -884,7 +884,7 @@ describe("searchPlannerRuntimeFx", () => {
 	});
 
 	it("collapses branches whose engine runtime differs only by generated identities", () => {
-		const result = Effect.runSync(makePlanner().searchFx("parallel-target"));
+		const result = Effect.runSync(makePlanner().runBestFirstFx("parallel-target"));
 
 		expect(result.type).toBe("completed");
 		if (result.type !== "completed") return;
@@ -905,7 +905,7 @@ describe("searchPlannerRuntimeFx", () => {
 	});
 
 	it("repeats a real spender line until stochastic charge depletion resolves", () => {
-		const result = Effect.runSync(makePlanner().searchFx("charge-target"));
+		const result = Effect.runSync(makePlanner().runBestFirstFx("charge-target"));
 
 		expect(result.type).toBe("completed");
 		if (result.type !== "completed") return;
@@ -974,7 +974,7 @@ describe("searchPlannerRuntimeFx", () => {
 	});
 
 	it("uses a temporary item before explicitly expiring it", () => {
-		const result = Effect.runSync(makePlanner().searchFx("temporary-target"));
+		const result = Effect.runSync(makePlanner().runBestFirstFx("temporary-target"));
 
 		expect(result.type).toBe("completed");
 		if (result.type !== "completed") return;
@@ -1015,7 +1015,7 @@ describe("searchPlannerRuntimeFx", () => {
 	});
 
 	it("resolves a stochastic temporary expiry as a possible witness", () => {
-		const result = Effect.runSync(makePlanner().searchFx("random-temporary-target"));
+		const result = Effect.runSync(makePlanner().runBestFirstFx("random-temporary-target"));
 
 		expect(result.type).toBe("completed");
 		if (result.type !== "completed") return;
@@ -1052,7 +1052,7 @@ describe("searchPlannerRuntimeFx", () => {
 	});
 
 	it("reports a non-terminal charge spend before the charged item is consumed", () => {
-		const result = Effect.runSync(makePlanner().searchFx("charged-side-output"));
+		const result = Effect.runSync(makePlanner().runBestFirstFx("charged-side-output"));
 
 		expect(result.type).toBe("completed");
 		if (result.type !== "completed") return;
@@ -1077,7 +1077,7 @@ describe("searchPlannerRuntimeFx", () => {
 	});
 
 	it("replenishes consumed fuel while progressing a charged owner toward depletion", () => {
-		const result = Effect.runSync(makePlanner().searchFx("depleted-target"));
+		const result = Effect.runSync(makePlanner().runBestFirstFx("depleted-target"));
 
 		expect(result.type).toBe("completed");
 		if (result.type !== "completed") return;
@@ -1172,7 +1172,7 @@ describe("searchPlannerRuntimeFx", () => {
 		});
 
 		const result = Effect.runSync(
-			planner.searchFx("renewal-part", 3, {
+			planner.runBestFirstFx("renewal-part", 3, {
 				maximumExpandedStates: 16,
 				maximumQueuedStates: 1,
 				maximumTraceLength: 8,
@@ -1213,7 +1213,7 @@ describe("searchPlannerRuntimeFx", () => {
 	});
 
 	it("returns an already-owned start target without running an action", () => {
-		const result = Effect.runSync(makePlanner().searchFx("start-target"));
+		const result = Effect.runSync(makePlanner().runBestFirstFx("start-target"));
 
 		expect(result).toMatchObject({
 			availableQuantity: 1,
@@ -1239,8 +1239,8 @@ describe("searchPlannerRuntimeFx", () => {
 	});
 
 	it("uses graph proof only for structurally unreachable targets", () => {
-		const orphan = Effect.runSync(makePlanner().searchFx("orphan"));
-		const missing = Effect.runSync(makePlanner().searchFx("missing-item"));
+		const orphan = Effect.runSync(makePlanner().runBestFirstFx("orphan"));
+		const missing = Effect.runSync(makePlanner().runBestFirstFx("missing-item"));
 
 		expect(orphan).toMatchObject({
 			itemId: "orphan",
@@ -1265,7 +1265,7 @@ describe("searchPlannerRuntimeFx", () => {
 	});
 
 	it("executes a stochastic output as an explicit possible witness", () => {
-		const result = Effect.runSync(makePlanner().searchFx("random-target"));
+		const result = Effect.runSync(makePlanner().runBestFirstFx("random-target"));
 
 		expect(result).toMatchObject({
 			availableQuantity: 1,
@@ -1296,7 +1296,7 @@ describe("searchPlannerRuntimeFx", () => {
 	});
 
 	it("keeps a guaranteed output canonical even when the same action has a chance sibling", () => {
-		const result = Effect.runSync(makePlanner().searchFx("mixed-target"));
+		const result = Effect.runSync(makePlanner().runBestFirstFx("mixed-target"));
 
 		expect(result).toMatchObject({
 			availableQuantity: 1,
@@ -1314,7 +1314,7 @@ describe("searchPlannerRuntimeFx", () => {
 	});
 
 	it("includes a guaranteed same-item baseline in stochastic replay economics", () => {
-		const result = Effect.runSync(makePlanner().searchFx("mixed-same-item-target", 2));
+		const result = Effect.runSync(makePlanner().runBestFirstFx("mixed-same-item-target", 2));
 
 		expect(result.type).toBe("completed");
 		if (result.type !== "completed") return;
@@ -1326,7 +1326,7 @@ describe("searchPlannerRuntimeFx", () => {
 	});
 
 	it("realizes a weighted alternative-set witness with correlated integer drops", () => {
-		const result = Effect.runSync(makePlanner().searchFx("weighted-target", 12));
+		const result = Effect.runSync(makePlanner().runBestFirstFx("weighted-target", 12));
 
 		expect(result).toMatchObject({
 			availableQuantity: 12,
@@ -1358,7 +1358,7 @@ describe("searchPlannerRuntimeFx", () => {
 	});
 
 	it("does not turn an insufficient root quantity into structural impossibility", () => {
-		const result = Effect.runSync(makePlanner().searchFx("start-target", 2));
+		const result = Effect.runSync(makePlanner().runBestFirstFx("start-target", 2));
 
 		expect(result).toMatchObject({
 			bestAvailableQuantity: 1,
@@ -1370,7 +1370,7 @@ describe("searchPlannerRuntimeFx", () => {
 
 	it("reports the expanded-state budget without forging impossibility", () => {
 		const result = Effect.runSync(
-			makePlanner().searchFx("target", 1, {
+			makePlanner().runBestFirstFx("target", 1, {
 				maximumExpandedStates: 1,
 			}),
 		);
@@ -1385,7 +1385,7 @@ describe("searchPlannerRuntimeFx", () => {
 
 	it("keeps searching inside a one-state bounded frontier", () => {
 		const result = Effect.runSync(
-			makePlanner().searchFx("target", 1, {
+			makePlanner().runBestFirstFx("target", 1, {
 				maximumQueuedStates: 1,
 			}),
 		);
@@ -1399,7 +1399,7 @@ describe("searchPlannerRuntimeFx", () => {
 
 	it("reports a bounded search as inconclusive without forging impossibility", () => {
 		const result = Effect.runSync(
-			makePlanner().searchFx("target", 1, {
+			makePlanner().runBestFirstFx("target", 1, {
 				maximumTraceLength: 1,
 			}),
 		);
@@ -1415,7 +1415,7 @@ describe("searchPlannerRuntimeFx", () => {
 	it("executes an official chance output as a possible engine witness", async () => {
 		const official = await readArkiniGameConfigSource();
 		const planner = Effect.runSync(createPlannerSearchHarnessFx(official));
-		const result = await Effect.runPromise(planner.searchFx("item:quest:road-repair"));
+		const result = await Effect.runPromise(planner.runBestFirstFx("item:quest:road-repair"));
 
 		expect(result).toMatchObject({
 			availableQuantity: 1,
@@ -1443,7 +1443,7 @@ describe("searchPlannerRuntimeFx", () => {
 		const official = await readArkiniGameConfigSource();
 		const planner = Effect.runSync(createPlannerSearchHarnessFx(official));
 		const result = await Effect.runPromise(
-			planner.searchFx("item:seed", 1, {
+			planner.runBestFirstFx("item:seed", 1, {
 				maximumExpandedStates: 32,
 				maximumQueuedStates: 64,
 				maximumTraceLength: 24,
@@ -1491,7 +1491,7 @@ describe("searchPlannerRuntimeFx", () => {
 		const official = await readArkiniGameConfigSource();
 		const planner = Effect.runSync(createPlannerSearchHarnessFx(official));
 		const result = await Effect.runPromise(
-			planner.searchFx("item:double-tree", 1, {
+			planner.runBestFirstFx("item:double-tree", 1, {
 				maximumExpandedStates: 64,
 				maximumQueuedStates: 128,
 				maximumTraceLength: 16,

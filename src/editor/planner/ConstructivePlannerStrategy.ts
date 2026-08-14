@@ -1,11 +1,5 @@
-import type {
-	PlannerGoalSearchBudget,
-	PlannerGoalSearchDiagnostics,
-} from "~/editor/planner/PlannerGoalSearch";
-import type {
-	PlannerStrategy,
-	PlannerStrategyResult,
-} from "~/editor/planner/PlannerStrategy";
+import type { PlannerGoalSearchDiagnostics } from "~/editor/planner/PlannerGoalSearch";
+import type { PlannerStrategy, PlannerStrategyResult } from "~/editor/planner/PlannerStrategy";
 
 export type ConstructivePlannerStrategyResult = PlannerStrategyResult<
 	"constructive",
@@ -14,10 +8,6 @@ export type ConstructivePlannerStrategyResult = PlannerStrategyResult<
 
 /** Constructive goal-stack search with branch-local snapshots and explicit backtracking. */
 export interface ConstructivePlannerStrategy
-	extends PlannerStrategy<
-		"constructive",
-		PlannerGoalSearchBudget,
-		PlannerGoalSearchDiagnostics
-	> {
+	extends PlannerStrategy<"constructive", PlannerGoalSearchDiagnostics> {
 	//
 }

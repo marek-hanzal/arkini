@@ -1,5 +1,6 @@
 import type { PlannerExpectedEconomics } from "~/editor/planner/PlannerExpectedEconomics";
 import type { PlannerSearchExecutionState } from "~/editor/planner/PlannerSearchExecution";
+import type { PlannerSessionDiagnostics } from "~/editor/planner/PlannerSessionFx";
 import type {
 	PlannerNoFinitePathProof,
 	PlannerStrategyInconclusiveReason,
@@ -10,7 +11,8 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 interface PlannerResultBase<StrategyId extends string, Diagnostics> {
 	readonly itemId: IdSchema.Type;
 	readonly quantity: number;
-	readonly strategyDiagnostics: Diagnostics;
+	readonly sessionDiagnostics: PlannerSessionDiagnostics;
+	readonly strategyDiagnostics: Diagnostics | null;
 	readonly strategyId: StrategyId;
 	readonly strategyMetrics: PlannerStrategyMetrics;
 }

@@ -4,7 +4,7 @@ import type {
 	BestFirstPlannerStrategy,
 	BestFirstPlannerStrategyResult,
 } from "~/editor/planner/BestFirstPlannerStrategy";
-import type { PlannerAcquisitionGraph } from "~/editor/planner/PlannerAcquisitionGraph";
+import { PlannerKernelFx } from "~/editor/planner/PlannerKernelFx";
 import {
 	DefaultPlannerSearchBudget,
 	type PlannerSearchBudget,
@@ -13,7 +13,6 @@ import {
 import { PlannerStrategyId } from "~/editor/planner/PlannerStrategy";
 import { searchPlannerRuntimeFx } from "~/editor/planner/searchPlannerRuntimeFx";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
-import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const projectBestFirstResult = (result: PlannerSearchResult): BestFirstPlannerStrategyResult => {
 	const metrics = {
@@ -73,29 +72,26 @@ const projectBestFirstResult = (result: PlannerSearchResult): BestFirstPlannerSt
 /** Adapts the established global runtime search to the common strategy contract. */
 export const createBestFirstPlannerStrategy = ({
 	budget: configuredBudget,
-	config,
-	graph,
 }: {
 	readonly budget?: Partial<PlannerSearchBudget>;
-	readonly config: GameConfigSchema.Type;
-	readonly graph: PlannerAcquisitionGraph;
-}): BestFirstPlannerStrategy => ({
-	defaultBudget: {
-		...DefaultPlannerSearchBudget,
-		...configuredBudget,
-	},
+} = {}): BestFirstPlannerStrategy => ({
 	id: PlannerStrategyId.bestFirst,
-	runFx: Effect.fn("BestFirstPlannerStrategy.runFx")((problem, budget) =>
-		searchPlannerRuntimeFx({
-			budget: {
-				...DefaultPlannerSearchBudget,
-				...configuredBudget,
-				...budget,
-			},
-			graph,
-			itemId: problem.activeGoal.itemId,
-			quantity: problem.activeGoal.quantity,
-			runtime: problem.runtime,
-		}).pipe(Effect.provideService(GameConfigFx, config), Effect.map(projectBestFirstResult)),
+	solveFx: Effect.fn("BestFirstPlannerStrategy.solveFx")((problem) =>
+		Effect.gen(function* () {
+			const kernel = yield* PlannerKernelFx;
+			return yield* searchPlannerRuntimeFx({
+				budget: {
+					...DefaultPlannerSearchBudget,
+					...configuredBudget,
+				},
+				graph: kernel.graph,
+				itemId: problem.activeGoal.itemId,
+				quantity: problem.activeGoal.quantity,
+				runtime: problem.runtime,
+			}).pipe(
+				Effect.provideService(GameConfigFx, kernel.config),
+				Effect.map(projectBestFirstResult),
+			);
+		}),
 	),
 });

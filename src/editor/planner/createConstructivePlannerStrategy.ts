@@ -4,16 +4,15 @@ import type {
 	ConstructivePlannerStrategy,
 	ConstructivePlannerStrategyResult,
 } from "~/editor/planner/ConstructivePlannerStrategy";
-import type { PlannerAcquisitionGraph } from "~/editor/planner/PlannerAcquisitionGraph";
 import {
 	DefaultPlannerGoalSearchBudget,
 	type PlannerGoalSearchBudget,
 	type PlannerGoalSearchResult,
 } from "~/editor/planner/PlannerGoalSearch";
+import { PlannerKernelFx } from "~/editor/planner/PlannerKernelFx";
 import { PlannerStrategyId } from "~/editor/planner/PlannerStrategy";
 import { searchPlannerGoalFx } from "~/editor/planner/searchPlannerGoalFx";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
-import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const projectConstructiveResult = (
 	result: PlannerGoalSearchResult,
@@ -72,29 +71,26 @@ const projectConstructiveResult = (
 /** Adapts constructive goal-stack search to the common strategy contract. */
 export const createConstructivePlannerStrategy = ({
 	budget: configuredBudget,
-	config,
-	graph,
 }: {
 	readonly budget?: Partial<PlannerGoalSearchBudget>;
-	readonly config: GameConfigSchema.Type;
-	readonly graph: PlannerAcquisitionGraph;
-}): ConstructivePlannerStrategy => ({
-	defaultBudget: {
-		...DefaultPlannerGoalSearchBudget,
-		...configuredBudget,
-	},
+} = {}): ConstructivePlannerStrategy => ({
 	id: PlannerStrategyId.constructive,
-	runFx: Effect.fn("ConstructivePlannerStrategy.runFx")((problem, budget) =>
-		searchPlannerGoalFx({
-			budget: {
-				...DefaultPlannerGoalSearchBudget,
-				...configuredBudget,
-				...budget,
-			},
-			graph,
-			itemId: problem.activeGoal.itemId,
-			quantity: problem.activeGoal.quantity,
-			runtime: problem.runtime,
-		}).pipe(Effect.provideService(GameConfigFx, config), Effect.map(projectConstructiveResult)),
+	solveFx: Effect.fn("ConstructivePlannerStrategy.solveFx")((problem) =>
+		Effect.gen(function* () {
+			const kernel = yield* PlannerKernelFx;
+			return yield* searchPlannerGoalFx({
+				budget: {
+					...DefaultPlannerGoalSearchBudget,
+					...configuredBudget,
+				},
+				graph: kernel.graph,
+				itemId: problem.activeGoal.itemId,
+				quantity: problem.activeGoal.quantity,
+				runtime: problem.runtime,
+			}).pipe(
+				Effect.provideService(GameConfigFx, kernel.config),
+				Effect.map(projectConstructiveResult),
+			);
+		}),
 	),
 });

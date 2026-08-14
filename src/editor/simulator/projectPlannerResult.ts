@@ -4,10 +4,7 @@ import type {
 } from "~/editor/planner/PlannerAcquisitionGraph";
 import type { PlannerAction } from "~/editor/planner/PlannerAction";
 import type { PlannerResult } from "~/editor/planner/PlannerResult";
-import type {
-	PlannerSearchBudgetLimit,
-	PlannerSearchDiagnostics,
-} from "~/editor/planner/PlannerSearch";
+import type { PlannerSearchDiagnostics } from "~/editor/planner/PlannerSearch";
 import type {
 	EditorItemSimulation,
 	EditorItemSimulationBlocker,
@@ -16,6 +13,14 @@ import type {
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 type BestFirstPlannerResult = PlannerResult<"best-first", PlannerSearchDiagnostics>;
+
+const EmptyPlannerSearchDiagnostics: PlannerSearchDiagnostics = {
+	attemptedRoutePlans: 0,
+	routePlans: [],
+};
+
+const readPlannerDiagnostics = (result: BestFirstPlannerResult) =>
+	result.strategyDiagnostics ?? EmptyPlannerSearchDiagnostics;
 
 const compareIds = (left: string, right: string) => left.localeCompare(right);
 
@@ -188,6 +193,8 @@ const readInconclusiveWarning = (
 				return `the search exhausted ${result.budgetLimit ?? "its configured budget"}`;
 			case "search-exhausted":
 				return "the bounded search exhausted its candidate frontier without a proof of impossibility";
+			case "session-budget":
+				return "the shared planner session exhausted its global orchestration budget";
 			case "unsupported-routes":
 				return "the target closure contains authored routes not represented by planner search";
 		}
@@ -221,7 +228,7 @@ export const projectPlannerResult = ({
 				),
 				planner: {
 					assumptions: result.economics.assumptions,
-					diagnostics: result.strategyDiagnostics,
+					diagnostics: readPlannerDiagnostics(result),
 					expectedActionRuns: result.economics.expectedActionRuns,
 					expectedSpentCharges: result.economics.expectedSpentCharges,
 					expandedStates: result.strategyMetrics.expandedNodes,
@@ -253,7 +260,7 @@ export const projectPlannerResult = ({
 				itemId: result.itemId,
 				operations: [],
 				planner: {
-					diagnostics: result.strategyDiagnostics,
+					diagnostics: readPlannerDiagnostics(result),
 					method: "engine-backed-search",
 					proofType: result.proof.type,
 					type: "no-finite-path",
@@ -275,10 +282,10 @@ export const projectPlannerResult = ({
 					...(result.budgetLimit === undefined
 						? {}
 						: {
-								budgetLimit: result.budgetLimit as PlannerSearchBudgetLimit,
+								budgetLimit: result.budgetLimit,
 							}),
 					expandedStates: result.strategyMetrics.expandedNodes,
-					diagnostics: result.strategyDiagnostics,
+					diagnostics: readPlannerDiagnostics(result),
 					method: "engine-backed-search",
 					reason: result.reason,
 					type: "inconclusive",

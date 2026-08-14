@@ -188,14 +188,6 @@ export const auditPlannerCoverageTiersFx = Effect.fn("auditPlannerCoverageTiersF
 				});
 		}
 	}
-	const planner = yield* createPlannerFx({
-		config,
-		createStrategy: ({ config: strategyConfig, graph }) =>
-			createBestFirstPlannerStrategy({
-				config: strategyConfig,
-				graph,
-			}),
-	});
 	const attemptsByItemId = new Map<IdSchema.Type, PlannerCoverageTierAuditAttempt[]>();
 	const finalByItemId = new Map<IdSchema.Type, PlannerCoverageAuditItem>();
 	for (const item of initialReport?.items ?? []) {
@@ -229,6 +221,12 @@ export const auditPlannerCoverageTiersFx = Effect.fn("auditPlannerCoverageTiersF
 			({ outcome }) => outcome === "no-finite-path",
 		).length;
 		const attemptedItemIds = unresolvedItemIds;
+		const planner = yield* createPlannerFx({
+			config,
+			strategy: createBestFirstPlannerStrategy({
+				budget: tier.budget,
+			}),
+		});
 		const attemptReport = yield* auditPlannerCoverageWithPlannerFx({
 			budget: tier.budget,
 			config,

@@ -17,6 +17,7 @@ export const createPlannerKernelFx = Effect.fn("createPlannerKernelFx")(
 			const graph = createPlannerAcquisitionGraph(config);
 			const initialRuntime = yield* createPlannerInitialRuntimeFx(config);
 			return {
+				config,
 				graph,
 				initialRuntime,
 				readExpectedEconomicsFx: Effect.fn("PlannerKernel.readExpectedEconomicsFx")(

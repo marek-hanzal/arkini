@@ -2,11 +2,7 @@ import { Clock, Effect } from "effect";
 
 import type { Planner } from "~/editor/planner/Planner";
 import type { PlannerResult } from "~/editor/planner/PlannerResult";
-import type {
-	PlannerSearchBudget,
-	PlannerSearchBudgetLimit,
-	PlannerSearchDiagnostics,
-} from "~/editor/planner/PlannerSearch";
+import type { PlannerSearchBudget, PlannerSearchDiagnostics } from "~/editor/planner/PlannerSearch";
 import type {
 	PlannerCoverageAuditFrequency,
 	PlannerCoverageAuditItem,
@@ -43,13 +39,21 @@ export namespace auditPlannerCoverageFx {
 
 export namespace auditPlannerCoverageWithPlannerFx {
 	export interface Props extends auditPlannerCoverageFx.Props {
-		readonly planner: Planner<"best-first", PlannerSearchBudget, PlannerSearchDiagnostics>;
+		readonly planner: Planner<"best-first", PlannerSearchDiagnostics>;
 	}
 }
 
 type BestFirstPlannerResult = PlannerResult<"best-first", PlannerSearchDiagnostics>;
 
 const compareIds = (left: string, right: string) => left.localeCompare(right);
+
+const EmptyPlannerSearchDiagnostics: PlannerSearchDiagnostics = {
+	attemptedRoutePlans: 0,
+	routePlans: [],
+};
+
+const readBestFirstDiagnostics = (result: BestFirstPlannerResult) =>
+	result.strategyDiagnostics ?? EmptyPlannerSearchDiagnostics;
 
 const readPositiveInteger = (value: number | undefined, fallback: number) =>
 	value === undefined || !Number.isFinite(value) ? fallback : Math.max(1, Math.floor(value));
@@ -61,7 +65,9 @@ const readUniqueDiagnosticActionIds = (
 	result: BestFirstPlannerResult,
 	key: "blockedActionIds" | "unsupportedActionIds",
 ) => {
-	const routePlanIds = result.strategyDiagnostics.routePlans.flatMap((routePlan) => routePlan[key]);
+	const routePlanIds = readBestFirstDiagnostics(result).routePlans.flatMap(
+		(routePlan) => routePlan[key],
+	);
 	const finalIds = result.type === "inconclusive" ? result[key] : [];
 	return [
 		...new Set([
@@ -83,23 +89,26 @@ const readCommonItem = ({
 	readonly result: BestFirstPlannerResult;
 	readonly searchDurationMs: number;
 	readonly title: string;
-}) => ({
-	blockedActionIds: readUniqueDiagnosticActionIds(result, "blockedActionIds"),
-	expandedStates: result.strategyMetrics.expandedNodes,
-	itemId,
-	itemType,
-	routePlanOutcomes: result.strategyDiagnostics.routePlans.map(({ outcome }) => outcome),
-	routePlans: result.strategyDiagnostics.attemptedRoutePlans,
-	searchDurationMs,
-	title,
-	unsupportedActionIds: readUniqueDiagnosticActionIds(result, "unsupportedActionIds"),
-	visitedStates: result.strategyMetrics.visitedNodes,
-	...(result.strategyDiagnostics.winningRoutePlanIndex === undefined
-		? {}
-		: {
-				winningRoutePlanIndex: result.strategyDiagnostics.winningRoutePlanIndex,
-			}),
-});
+}) => {
+	const diagnostics = readBestFirstDiagnostics(result);
+	return {
+		blockedActionIds: readUniqueDiagnosticActionIds(result, "blockedActionIds"),
+		expandedStates: result.strategyMetrics.expandedNodes,
+		itemId,
+		itemType,
+		routePlanOutcomes: diagnostics.routePlans.map(({ outcome }) => outcome),
+		routePlans: diagnostics.attemptedRoutePlans,
+		searchDurationMs,
+		title,
+		unsupportedActionIds: readUniqueDiagnosticActionIds(result, "unsupportedActionIds"),
+		visitedStates: result.strategyMetrics.visitedNodes,
+		...(diagnostics.winningRoutePlanIndex === undefined
+			? {}
+			: {
+					winningRoutePlanIndex: diagnostics.winningRoutePlanIndex,
+				}),
+	};
+};
 
 const readAuditItem = ({
 	itemId,
@@ -140,7 +149,7 @@ const readAuditItem = ({
 				...(result.budgetLimit === undefined
 					? {}
 					: {
-							budgetLimit: result.budgetLimit as PlannerSearchBudgetLimit,
+							budgetLimit: result.budgetLimit,
 						}),
 				frontierSize: result.strategyMetrics.frontierSize,
 				outcome: "inconclusive",
@@ -313,7 +322,6 @@ export const auditPlannerCoverageWithPlannerFx = Effect.fn("auditPlannerCoverage
 			if (item === undefined) continue;
 			const startedAt = yield* Clock.currentTimeNanos;
 			const result = yield* planner.estimateFx({
-				budget,
 				itemId,
 				quantity,
 			});
@@ -353,11 +361,9 @@ export const auditPlannerCoverageFx = Effect.fn("auditPlannerCoverageFx")(
 		Effect.gen(function* () {
 			const planner = yield* createPlannerFx({
 				config: props.config,
-				createStrategy: ({ config, graph }) =>
-					createBestFirstPlannerStrategy({
-						config,
-						graph,
-					}),
+				strategy: createBestFirstPlannerStrategy({
+					budget: props.budget,
+				}),
 			});
 			return yield* auditPlannerCoverageWithPlannerFx({
 				...props,

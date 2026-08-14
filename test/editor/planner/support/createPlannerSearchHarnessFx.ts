@@ -17,7 +17,7 @@ export const createPlannerSearchHarnessFx = Effect.fn("createPlannerSearchHarnes
 			const graph = createPlannerAcquisitionGraph(config);
 			const initialRuntime = yield* createPlannerInitialRuntimeFx(config);
 			return {
-				constructiveSearchFx: (
+				runConstructiveFx: (
 					itemId: IdSchema.Type,
 					quantity = 1,
 					budget?: Partial<PlannerGoalSearchBudget>,
@@ -31,7 +31,7 @@ export const createPlannerSearchHarnessFx = Effect.fn("createPlannerSearchHarnes
 					}).pipe(Effect.provideService(GameConfigFx, config)),
 				graph,
 				initialRuntime,
-				searchFx: (
+				runBestFirstFx: (
 					itemId: IdSchema.Type,
 					quantity = 1,
 					budget?: Partial<PlannerSearchBudget>,

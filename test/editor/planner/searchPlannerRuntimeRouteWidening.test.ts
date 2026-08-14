@@ -209,7 +209,7 @@ const makePlanner = () => Effect.runSync(createPlannerSearchHarnessFx(config));
 
 describe("engine planner route widening", () => {
 	it("restarts from the immutable root after a destructive shorter path", () => {
-		const result = Effect.runSync(makePlanner().searchFx("widened-target"));
+		const result = Effect.runSync(makePlanner().runBestFirstFx("widened-target"));
 
 		expect(result.type).toBe("completed");
 		if (result.type !== "completed") return;
@@ -293,7 +293,7 @@ describe("engine planner route widening", () => {
 
 	it("does not widen after the global expanded-state budget is exhausted", () => {
 		const result = Effect.runSync(
-			makePlanner().searchFx("widened-target", 1, {
+			makePlanner().runBestFirstFx("widened-target", 1, {
 				maximumExpandedStates: 2,
 			}),
 		);
@@ -338,7 +338,7 @@ describe("engine planner route widening", () => {
 
 	it("bounds progressive widening even when exhausted route plans consume few states", () => {
 		const result = Effect.runSync(
-			makePlanner().searchFx("widened-target", 1, {
+			makePlanner().runBestFirstFx("widened-target", 1, {
 				maximumExpandedStates: 64,
 				maximumRoutePlans: 1,
 			}),

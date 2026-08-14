@@ -1,12 +1,20 @@
 import type { PlannerItemGoal } from "~/editor/planner/PlannerGoalViability";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
-/** One strategy-sized planning problem over an immutable candidate world. */
+/** One independently solvable planning problem over an immutable candidate world. */
 export interface PlannerProblem {
 	readonly activeGoal: PlannerItemGoal;
 	readonly agenda: ReadonlyArray<PlannerItemGoal>;
 	readonly delegationDepth: number;
 	readonly rootGoal: PlannerItemGoal;
+	readonly runtime: RuntimeSchema.Type;
+}
+
+export interface PlannerSubgoalRequest {
+	readonly activeGoal: PlannerItemGoal;
+	readonly agenda?: ReadonlyArray<PlannerItemGoal>;
+	readonly parent: PlannerProblem;
+	readonly reason: string;
 	readonly runtime: RuntimeSchema.Type;
 }
 
@@ -31,12 +39,7 @@ export const createPlannerSubproblem = ({
 	agenda,
 	parent,
 	runtime,
-}: {
-	readonly activeGoal: PlannerItemGoal;
-	readonly agenda?: ReadonlyArray<PlannerItemGoal>;
-	readonly parent: PlannerProblem;
-	readonly runtime: RuntimeSchema.Type;
-}): PlannerProblem => ({
+}: Omit<PlannerSubgoalRequest, "reason">): PlannerProblem => ({
 	activeGoal,
 	agenda: agenda ?? [
 		activeGoal,

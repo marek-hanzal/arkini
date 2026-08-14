@@ -1,48 +1,37 @@
 import { Effect } from "effect";
 
+import type { PlannerBudgetLimits } from "~/editor/planner/PlannerBudget";
 import type { Planner } from "~/editor/planner/Planner";
-import type { PlannerAcquisitionGraph } from "~/editor/planner/PlannerAcquisitionGraph";
+import { PlannerKernelFx } from "~/editor/planner/PlannerKernelFx";
 import type { PlannerStrategy } from "~/editor/planner/PlannerStrategy";
-import { createPlannerAcquisitionGraph } from "~/editor/planner/createPlannerAcquisitionGraph";
-import { createPlannerInitialRuntimeFx } from "~/editor/planner/createPlannerInitialRuntimeFx";
-import { runPlannerStrategyFx } from "~/editor/planner/runPlannerStrategyFx";
+import { createPlannerKernelFx } from "~/editor/planner/createPlannerKernelFx";
+import { runPlannerFx } from "~/editor/planner/runPlannerFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 export namespace createPlannerFx {
-	export interface StrategyFactoryProps {
+	export interface Props<StrategyId extends string, Diagnostics> {
+		readonly budget?: Partial<PlannerBudgetLimits>;
 		readonly config: GameConfigSchema.Type;
-		readonly graph: PlannerAcquisitionGraph;
-	}
-
-	export interface Props<StrategyId extends string, Budget, Diagnostics> {
-		readonly config: GameConfigSchema.Type;
-		readonly createStrategy: (
-			props: StrategyFactoryProps,
-		) => PlannerStrategy<StrategyId, Budget, Diagnostics>;
+		readonly strategy: PlannerStrategy<StrategyId, Diagnostics>;
 	}
 }
 
-/** Creates one public planner orchestrator over a configured root strategy. */
-export const createPlannerFx = <StrategyId extends string, Budget, Diagnostics>({
+/** Creates one public planner orchestrator around exactly one root strategy. */
+export const createPlannerFx = <StrategyId extends string, Diagnostics>({
+	budget,
 	config,
-	createStrategy,
-}: createPlannerFx.Props<StrategyId, Budget, Diagnostics>) =>
+	strategy,
+}: createPlannerFx.Props<StrategyId, Diagnostics>) =>
 	Effect.gen(function* () {
-		const graph = createPlannerAcquisitionGraph(config);
-		const initialRuntime = yield* createPlannerInitialRuntimeFx(config);
-		const strategy = createStrategy({
-			config,
-			graph,
-		});
+		const kernel = yield* createPlannerKernelFx(config);
 		return {
 			estimateFx: Effect.fn("Planner.estimateFx")((request) =>
-				runPlannerStrategyFx({
-					graph,
-					initialRuntime,
+				runPlannerFx({
+					budget,
 					request,
 					strategy,
-				}),
+				}).pipe(Effect.provideService(PlannerKernelFx, kernel)),
 			),
 			strategyId: strategy.id,
-		} satisfies Planner<StrategyId, Budget, Diagnostics>;
+		} satisfies Planner<StrategyId, Diagnostics>;
 	});

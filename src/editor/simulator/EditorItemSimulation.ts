@@ -1,7 +1,4 @@
-import type {
-	PlannerSearchBudgetLimit,
-	PlannerSearchDiagnostics,
-} from "~/editor/planner/PlannerSearch";
+import type { PlannerSearchDiagnostics } from "~/editor/planner/PlannerSearch";
 
 export interface EditorItemSimulationOperation {
 	readonly id: string;
@@ -49,7 +46,7 @@ export type EditorItemSimulationPlanner =
 	  }
 	| {
 			readonly bestAvailableQuantity: number;
-			readonly budgetLimit?: PlannerSearchBudgetLimit;
+			readonly budgetLimit?: string;
 			readonly expandedStates: number;
 			readonly diagnostics: EditorItemSimulationSearchDiagnostics;
 			readonly method: "engine-backed-search";
@@ -58,6 +55,7 @@ export type EditorItemSimulationPlanner =
 				| "non-quiescent-runtime"
 				| "search-budget"
 				| "search-exhausted"
+				| "session-budget"
 				| "unsupported-routes";
 			readonly type: "inconclusive";
 			readonly visitedStates: number;

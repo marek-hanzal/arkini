@@ -31,33 +31,35 @@ export const createEngineBackedEditorItemSimulatorFx = Effect.fn(
 )((config: GameConfigSchema.Type) =>
 	Effect.gen(function* () {
 		const graph = createPlannerAcquisitionGraph(config);
-		const planner = yield* createPlannerFx({
-			config,
-			createStrategy: ({ config: strategyConfig, graph: strategyGraph }) =>
-				createBestFirstPlannerStrategy({
-					budget: EditorItemPlannerSearchBudget,
-					config: strategyConfig,
-					graph: strategyGraph,
+		const createPlannerForBudgetFx = (budget: Partial<PlannerSearchBudget>) =>
+			createPlannerFx({
+				config,
+				strategy: createBestFirstPlannerStrategy({
+					budget: {
+						...EditorItemPlannerSearchBudget,
+						...budget,
+					},
 				}),
-		});
+			});
+		const defaultPlanner = yield* createPlannerForBudgetFx({});
 		return {
 			simulateFx: Effect.fn("EngineBackedEditorItemSimulator.simulateFx")(
 				(itemId: string, quantity = 1, budget?: Partial<PlannerSearchBudget>) =>
-					planner
-						.estimateFx({
-							budget,
+					Effect.gen(function* () {
+						const planner =
+							budget === undefined
+								? defaultPlanner
+								: yield* createPlannerForBudgetFx(budget).pipe(Effect.orDie);
+						const result = yield* planner.estimateFx({
 							itemId,
 							quantity,
-						})
-						.pipe(
-							Effect.map((result) =>
-								projectPlannerResult({
-									config,
-									graph,
-									result,
-								}),
-							),
-						),
+						});
+						return projectPlannerResult({
+							config,
+							graph,
+							result,
+						});
+					}),
 			),
 		} satisfies createEngineBackedEditorItemSimulatorFx.Service;
 	}),

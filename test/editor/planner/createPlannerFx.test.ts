@@ -116,21 +116,13 @@ const config = GameConfigSchema.parse({
 const createBestFirstPlannerFx = () =>
 	createPlannerFx({
 		config,
-		createStrategy: ({ config: strategyConfig, graph }) =>
-			createBestFirstPlannerStrategy({
-				config: strategyConfig,
-				graph,
-			}),
+		strategy: createBestFirstPlannerStrategy(),
 	});
 
 const createConstructivePlannerFx = () =>
 	createPlannerFx({
 		config,
-		createStrategy: ({ config: strategyConfig, graph }) =>
-			createConstructivePlannerStrategy({
-				config: strategyConfig,
-				graph,
-			}),
+		strategy: createConstructivePlannerStrategy(),
 	});
 
 describe("createPlannerFx", () => {

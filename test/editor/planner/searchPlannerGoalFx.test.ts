@@ -216,7 +216,7 @@ const search = async ({
 	});
 	const planner = Effect.runSync(createPlannerSearchHarnessFx(config));
 	const result = await Effect.runPromise(
-		planner.constructiveSearchFx("final-target", 1, {
+		planner.runConstructiveFx("final-target", 1, {
 			maximumAgendaDepth: 32,
 			maximumConcurrentBranches,
 			maximumExpandedBranches,
@@ -341,7 +341,7 @@ describe("constructive engine planner", () => {
 		const config = await readArkiniGameConfigSource();
 		const planner = Effect.runSync(createPlannerSearchHarnessFx(config));
 		const result = await Effect.runPromise(
-			planner.constructiveSearchFx("item:double-tree", 1, {
+			planner.runConstructiveFx("item:double-tree", 1, {
 				maximumAgendaDepth: 256,
 				maximumConcurrentBranches: 4,
 				maximumExpandedBranches: 1_000,

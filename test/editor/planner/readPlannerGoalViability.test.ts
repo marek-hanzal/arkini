@@ -169,7 +169,7 @@ describe("readPlannerGoalViability", () => {
 
 	it("recognizes a goal already satisfied by a speculative runtime", () => {
 		const planner = makePlanner();
-		const result = Effect.runSync(planner.searchFx("target"));
+		const result = Effect.runSync(planner.runBestFirstFx("target"));
 		expect(result.type).toBe("completed");
 		if (result.type !== "completed") return;
 

@@ -1,6 +1,5 @@
 import type {
 	PlannerSearchBudget,
-	PlannerSearchBudgetLimit,
 	PlannerSearchOutputCertainty,
 	PlannerSearchRoutePlanOutcome,
 } from "~/editor/planner/PlannerSearch";
@@ -77,7 +76,7 @@ export type PlannerCoverageAuditItem =
 	  })
 	| (PlannerCoverageAuditItemBase & {
 			readonly bestAvailableQuantity: number;
-			readonly budgetLimit?: PlannerSearchBudgetLimit;
+			readonly budgetLimit?: string;
 			readonly frontierSize: number;
 			readonly outcome: "inconclusive";
 			readonly reason:
@@ -85,6 +84,7 @@ export type PlannerCoverageAuditItem =
 				| "non-quiescent-runtime"
 				| "search-budget"
 				| "search-exhausted"
+				| "session-budget"
 				| "unsupported-routes";
 			readonly traceLength: number;
 	  })

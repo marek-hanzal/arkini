@@ -60,6 +60,7 @@ interface PlannerGoalBranch {
 	readonly agenda: ReadonlyArray<PlannerGoalTask>;
 	readonly choicePath: ReadonlyArray<number>;
 	readonly execution: PlannerSearchExecutionState;
+	readonly fallback?: PlannerGoalBranch;
 }
 
 interface PlannerRequirementDemand {
@@ -228,10 +229,10 @@ const readAllOfRequirementChoices = (
 	});
 };
 
-const readAnyOfRequirementChoices = (
+const readAnyOfRequirementChoiceGroups = (
 	route: PlannerAcquisitionRoute,
 	runtime: RuntimeSchema.Type,
-): ReadonlyArray<PlannerRequirementChoice> =>
+): ReadonlyArray<ReadonlyArray<PlannerRequirementChoice>> =>
 	route.requirements.anyOf.flatMap((clause, clauseIndex) => {
 		if (
 			clause.some((requirement) =>
@@ -239,16 +240,18 @@ const readAnyOfRequirementChoices = (
 			)
 		)
 			return [];
-		return clause.map((requirement, alternativeIndex) => ({
-			goal: readRequirementGoal(requirement),
-			key: JSON.stringify([
-				"any-of",
-				route.id,
-				clauseIndex,
-				alternativeIndex,
-			]),
-			sourcePriority: readRequirementSourcePriority(requirement.source),
-		}));
+		return [
+			clause.map((requirement, alternativeIndex) => ({
+				goal: readRequirementGoal(requirement),
+				key: JSON.stringify([
+					"any-of",
+					route.id,
+					clauseIndex,
+					alternativeIndex,
+				]),
+				sourcePriority: readRequirementSourcePriority(requirement.source),
+			})),
+		];
 	});
 
 const compareRequirementChoices = (
@@ -264,6 +267,19 @@ const compareRequirementChoices = (
 	left.goal.minimumCharges - right.goal.minimumCharges ||
 	compareIds(left.key, right.key);
 
+const deduplicateRequirementChoices = (choices: ReadonlyArray<PlannerRequirementChoice>) => [
+	...new Map(
+		choices.map((choice) => [
+			JSON.stringify([
+				choice.goal.itemId,
+				choice.goal.minimumQuantity,
+				choice.goal.minimumCharges,
+			]),
+			choice,
+		]),
+	).values(),
+];
+
 const readUnmetRequirementChoices = ({
 	graph,
 	route,
@@ -273,22 +289,40 @@ const readUnmetRequirementChoices = ({
 	readonly route: PlannerAcquisitionRoute;
 	readonly runtime: RuntimeSchema.Type;
 }) => {
-	const choices = [
-		...readAllOfRequirementChoices(route, runtime),
-		...readAnyOfRequirementChoices(route, runtime),
-	].sort((left, right) => compareRequirementChoices(graph, left, right));
-	return [
-		...new Map(
-			choices.map((choice) => [
-				JSON.stringify([
-					choice.goal.itemId,
-					choice.goal.minimumQuantity,
-					choice.goal.minimumCharges,
-				]),
-				choice,
-			]),
-		).values(),
-	];
+	const mandatory = deduplicateRequirementChoices(
+		[
+			...readAllOfRequirementChoices(route, runtime),
+		].sort((left, right) => compareRequirementChoices(graph, left, right)),
+	);
+	if (mandatory.length > 0)
+		return {
+			choices: mandatory,
+			type: "mandatory" as const,
+		};
+
+	const alternativeGroups = readAnyOfRequirementChoiceGroups(route, runtime)
+		.map((choices) =>
+			deduplicateRequirementChoices(
+				[
+					...choices,
+				].sort((left, right) => compareRequirementChoices(graph, left, right)),
+			),
+		)
+		.filter((choices) => choices.length > 0)
+		.sort((left, right) => {
+			const leftChoice = left[0];
+			const rightChoice = right[0];
+			return leftChoice === undefined || rightChoice === undefined
+				? left.length - right.length
+				: compareRequirementChoices(graph, leftChoice, rightChoice);
+		});
+	const choices = alternativeGroups[0];
+	return choices === undefined
+		? undefined
+		: {
+				choices,
+				type: "alternatives" as const,
+			};
 };
 
 const compareRoutes = (
@@ -348,6 +382,11 @@ const readResourceRouteBranches = ({
 					]
 				: branch.choicePath,
 		execution: branch.execution,
+		...(branch.fallback === undefined
+			? {}
+			: {
+					fallback: branch.fallback,
+				}),
 	}));
 };
 
@@ -369,11 +408,28 @@ const readTaskSignature = (task: PlannerGoalTask) => {
 	}
 };
 
+const readBranchStateSignature = (branch: PlannerGoalBranch) => [
+	readPlannerRuntimeFingerprint(branch.execution.runtime),
+	branch.execution.outputCertainty,
+	branch.agenda.map(readTaskSignature),
+];
+
+const readFallbackStateSignatures = (branch: PlannerGoalBranch) => {
+	const signatures: Array<ReturnType<typeof readBranchStateSignature>> = [];
+	const seen = new Set<PlannerGoalBranch>();
+	let fallback = branch.fallback;
+	while (fallback !== undefined && !seen.has(fallback)) {
+		seen.add(fallback);
+		signatures.push(readBranchStateSignature(fallback));
+		fallback = fallback.fallback;
+	}
+	return signatures;
+};
+
 const readBranchKey = (branch: PlannerGoalBranch) =>
 	JSON.stringify([
-		readPlannerRuntimeFingerprint(branch.execution.runtime),
-		branch.execution.outputCertainty,
-		branch.agenda.map(readTaskSignature),
+		readBranchStateSignature(branch),
+		readFallbackStateSignatures(branch),
 	]);
 
 const compareChoicePaths = (left: ReadonlyArray<number>, right: ReadonlyArray<number>) => {
@@ -417,6 +473,39 @@ const appendChoice = (
 				index,
 			]
 		: branch.choicePath;
+
+const readLazyRequirementBranch = ({
+	branch,
+	choices,
+	rest,
+	task,
+}: {
+	readonly branch: PlannerGoalBranch;
+	readonly choices: ReadonlyArray<PlannerRequirementChoice>;
+	readonly rest: ReadonlyArray<PlannerGoalTask>;
+	readonly task: PlannerRouteTask;
+}) => {
+	let fallback = branch.fallback;
+	for (let index = choices.length - 1; index >= 0; index -= 1) {
+		const choice = choices[index];
+		if (choice === undefined) continue;
+		fallback = {
+			agenda: [
+				choice.goal,
+				task,
+				...rest,
+			],
+			choicePath: appendChoice(branch, index, choices.length),
+			execution: branch.execution,
+			...(fallback === undefined
+				? {}
+				: {
+						fallback,
+					}),
+		};
+	}
+	return fallback;
+};
 
 const expandPlannerGoalBranchFx = Effect.fn("expandPlannerGoalBranchFx")(function* ({
 	branch,
@@ -491,27 +580,53 @@ const expandPlannerGoalBranchFx = Effect.fn("expandPlannerGoalBranchFx")(functio
 				};
 	}
 
-	const requirementChoices = readUnmetRequirementChoices({
+	const requirementChoice = readUnmetRequirementChoices({
 		graph,
 		route: task.route,
 		runtime: branch.execution.runtime,
 	});
 	if (
 		!isPlannerAcquisitionRouteReady(task.route, branch.execution.runtime) &&
-		requirementChoices.length > 0
-	)
+		requirementChoice !== undefined
+	) {
+		if (requirementChoice.type === "mandatory") {
+			const child = readLazyRequirementBranch({
+				branch,
+				choices: requirementChoice.choices,
+				rest,
+				task,
+			});
+			return child === undefined
+				? {
+						reason: "dead-end",
+						type: "dead",
+					}
+				: {
+						children: [
+							child,
+						],
+						type: "expanded",
+					};
+		}
+
 		return {
-			children: requirementChoices.map((choice, index) => ({
+			children: requirementChoice.choices.map((choice, index) => ({
 				agenda: [
 					choice.goal,
 					task,
 					...rest,
 				],
-				choicePath: appendChoice(branch, index, requirementChoices.length),
+				choicePath: appendChoice(branch, index, requirementChoice.choices.length),
 				execution: branch.execution,
+				...(branch.fallback === undefined
+					? {}
+					: {
+							fallback: branch.fallback,
+						}),
 			})),
 			type: "expanded",
 		};
+	}
 
 	const transition = yield* runPlannerSearchCandidateFx({
 		candidate: task.candidate,
@@ -558,6 +673,11 @@ const expandPlannerGoalBranchFx = Effect.fn("expandPlannerGoalBranchFx")(functio
 				agenda: rest,
 				choicePath: branch.choicePath,
 				execution: transition.state,
+				...(branch.fallback === undefined
+					? {}
+					: {
+							fallback: branch.fallback,
+						}),
 			},
 		],
 		type: "expanded",
@@ -891,11 +1011,15 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 		);
 		counters.expandedBranches += batch.length;
 		const producedChildren: PlannerGoalBranch[] = [];
+		const addFallback = (branch: PlannerGoalBranch) => {
+			if (branch.fallback !== undefined) producedChildren.push(branch.fallback);
+		};
 
 		for (const result of expansions) {
 			if (result.type === "budget") {
 				budgetLimits.add(result.limit);
 				counters.backtracks += 1;
+				addFallback(result.branch);
 				continue;
 			}
 			const expansion = result.expansion;
@@ -930,10 +1054,16 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 					if (expansion.attemptedActionId !== undefined)
 						unsupportedActionIds.add(expansion.attemptedActionId);
 				}
+				addFallback(result.branch);
 				continue;
 			}
 
-			for (const child of expansion.children) {
+			const pendingChildren = [
+				...expansion.children,
+			];
+			for (let index = 0; index < pendingChildren.length; index += 1) {
+				const child = pendingChildren[index];
+				if (child === undefined) continue;
 				counters.createdBranches += 1;
 				counters.maximumAgendaDepth = Math.max(
 					counters.maximumAgendaDepth,
@@ -941,15 +1071,18 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 				);
 				if (child.agenda.length > budget.maximumAgendaDepth) {
 					budgetLimits.add("maximumAgendaDepth");
+					if (child.fallback !== undefined) pendingChildren.push(child.fallback);
 					continue;
 				}
 				if (child.execution.trace.length > budget.maximumTraceLength) {
 					budgetLimits.add("maximumTraceLength");
+					if (child.fallback !== undefined) pendingChildren.push(child.fallback);
 					continue;
 				}
 				const key = readBranchKey(child);
 				if (visited.has(key)) {
 					counters.duplicateBranches += 1;
+					if (child.fallback !== undefined) pendingChildren.push(child.fallback);
 					continue;
 				}
 				visited.add(key);

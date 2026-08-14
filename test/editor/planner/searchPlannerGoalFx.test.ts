@@ -200,6 +200,88 @@ const readConfig = ({
 		},
 	});
 
+const readMandatoryRequirementsConfig = () =>
+	GameConfigSchema.parse({
+		version: "1.0",
+		resources: {
+			hero: "hero",
+		},
+		meta: {
+			id: "game:constructive-planner-mandatory-requirements",
+			title: "Constructive planner mandatory requirements",
+			board: {
+				height: 1,
+				width: 4,
+			},
+			inventory: {
+				height: 1,
+				width: 1,
+			},
+		},
+		start: {
+			board: [
+				"producer-a",
+				"producer-b",
+				"producer-c",
+				"final-producer",
+			].map((itemId, x) => ({
+				itemId,
+				space: 0,
+				x,
+				y: 0,
+			})),
+			currentSpace: 0,
+		},
+		items: {
+			hero: simpleItem("hero"),
+			"producer-a": producerItem({
+				id: "producer-a",
+				lines: [
+					line({
+						id: "line:producer-a:material-a",
+						outputItemId: "material-a",
+					}),
+				],
+			}),
+			"producer-b": producerItem({
+				id: "producer-b",
+				lines: [
+					line({
+						id: "line:producer-b:material-b",
+						outputItemId: "material-b",
+					}),
+				],
+			}),
+			"producer-c": producerItem({
+				id: "producer-c",
+				lines: [
+					line({
+						id: "line:producer-c:material-c",
+						outputItemId: "material-c",
+					}),
+				],
+			}),
+			"final-producer": producerItem({
+				id: "final-producer",
+				lines: [
+					line({
+						id: "line:final-producer:target",
+						inputs: [
+							materialInput("material-a"),
+							materialInput("material-b"),
+							materialInput("material-c"),
+						],
+						outputItemId: "final-target",
+					}),
+				],
+			}),
+			"material-a": simpleItem("material-a"),
+			"material-b": simpleItem("material-b"),
+			"material-c": simpleItem("material-c"),
+			"final-target": simpleItem("final-target"),
+		},
+	});
+
 const search = async ({
 	advancedHallReplacesLegacyCapability,
 	maximumConcurrentBranches,
@@ -335,6 +417,30 @@ describe("constructive engine planner", () => {
 				0,
 			],
 		});
+	});
+
+	it("keeps mandatory prerequisites on one lazy branch instead of expanding their permutations", async () => {
+		const config = readMandatoryRequirementsConfig();
+		const planner = Effect.runSync(createPlannerSearchHarnessFx(config));
+		const result = await Effect.runPromise(
+			planner.runConstructiveFx("final-target", 1, {
+				maximumAgendaDepth: 32,
+				maximumConcurrentBranches: 4,
+				maximumExpandedBranches: 64,
+				maximumQueuedBranches: 1,
+				maximumTraceLength: 8,
+			}),
+		);
+
+		expect(result.type).toBe("completed");
+		if (result.type !== "completed") return;
+		expect(result.execution.trace.map(({ actionId }) => actionId)).toEqual([
+			'["line","producer-a","line:producer-a:material-a"]',
+			'["line","producer-b","line:producer-b:material-b"]',
+			'["line","producer-c","line:producer-c:material-c"]',
+			'["line","final-producer","line:final-producer:target"]',
+		]);
+		expect(result.diagnostics.maximumFrontierSize).toBe(1);
 	});
 
 	it("constructs an official multi-step target through the canonical engine", async () => {

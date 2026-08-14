@@ -7,6 +7,7 @@ import type {
 import type { PlannerAcquisitionGraph } from "~/editor/planner/PlannerAcquisitionGraph";
 import {
 	DefaultPlannerGoalSearchBudget,
+	type PlannerGoalSearchBudget,
 	type PlannerGoalSearchResult,
 } from "~/editor/planner/PlannerGoalSearch";
 import { PlannerStrategyId } from "~/editor/planner/PlannerStrategy";
@@ -17,18 +18,34 @@ import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 const projectConstructiveResult = (
 	result: PlannerGoalSearchResult,
 ): ConstructivePlannerStrategyResult => {
+	const metrics = {
+		expandedNodes: result.diagnostics.expandedBranches,
+		frontierSize:
+			result.type === "inconclusive"
+				? result.frontierSize
+				: result.diagnostics.maximumFrontierSize,
+		traceLength:
+			result.type === "completed"
+				? result.execution.trace.length
+				: result.type === "inconclusive"
+					? result.bestExecution.trace.length
+					: 0,
+		visitedNodes: result.diagnostics.createdBranches,
+	};
 	switch (result.type) {
 		case "completed":
 			return {
 				availableQuantity: result.availableQuantity,
 				diagnostics: result.diagnostics,
 				execution: result.execution,
+				metrics,
 				strategyId: PlannerStrategyId.constructive,
 				type: "completed",
 			};
 		case "no-finite-path":
 			return {
 				diagnostics: result.diagnostics,
+				metrics,
 				proof: result.proof,
 				strategyId: PlannerStrategyId.constructive,
 				type: "no-finite-path",
@@ -43,7 +60,7 @@ const projectConstructiveResult = (
 							budgetLimit: result.budgetLimit,
 						}),
 				diagnostics: result.diagnostics,
-				frontierSize: result.frontierSize,
+				metrics,
 				reason: result.reason,
 				strategyId: PlannerStrategyId.constructive,
 				type: "inconclusive",
@@ -52,31 +69,32 @@ const projectConstructiveResult = (
 	}
 };
 
-/** Adapts constructive goal-stack search to the common planner strategy contract. */
+/** Adapts constructive goal-stack search to the common strategy contract. */
 export const createConstructivePlannerStrategy = ({
+	budget: configuredBudget,
 	config,
 	graph,
 }: {
+	readonly budget?: Partial<PlannerGoalSearchBudget>;
 	readonly config: GameConfigSchema.Type;
 	readonly graph: PlannerAcquisitionGraph;
-}): ConstructivePlannerStrategy => {
-	const searchFx: ConstructivePlannerStrategy["searchFx"] = Effect.fn(
-		"ConstructivePlannerStrategy.searchFx",
-	)((request, budget) =>
+}): ConstructivePlannerStrategy => ({
+	defaultBudget: {
+		...DefaultPlannerGoalSearchBudget,
+		...configuredBudget,
+	},
+	id: PlannerStrategyId.constructive,
+	runFx: Effect.fn("ConstructivePlannerStrategy.runFx")((problem, budget) =>
 		searchPlannerGoalFx({
-			budget,
+			budget: {
+				...DefaultPlannerGoalSearchBudget,
+				...configuredBudget,
+				...budget,
+			},
 			graph,
-			itemId: request.goal.itemId,
-			quantity: request.goal.quantity,
-			runtime: request.runtime,
-		}).pipe(Effect.provideService(GameConfigFx, config)),
-	);
-	return {
-		defaultBudget: DefaultPlannerGoalSearchBudget,
-		id: PlannerStrategyId.constructive,
-		runFx: Effect.fn("ConstructivePlannerStrategy.runFx")((request, budget) =>
-			searchFx(request, budget).pipe(Effect.map(projectConstructiveResult)),
-		),
-		searchFx,
-	};
-};
+			itemId: problem.activeGoal.itemId,
+			quantity: problem.activeGoal.quantity,
+			runtime: problem.runtime,
+		}).pipe(Effect.provideService(GameConfigFx, config), Effect.map(projectConstructiveResult)),
+	),
+});

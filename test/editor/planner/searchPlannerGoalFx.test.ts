@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { createEnginePlannerFx } from "~/editor/planner/createEnginePlannerFx";
+import { createPlannerSearchHarnessFx } from "./support/createPlannerSearchHarnessFx";
 import { readPlannerRuntimeFingerprint } from "~/editor/planner/readPlannerRuntimeFingerprint";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
@@ -214,7 +214,7 @@ const search = async ({
 	const config = readConfig({
 		advancedHallReplacesLegacyCapability,
 	});
-	const planner = Effect.runSync(createEnginePlannerFx(config));
+	const planner = Effect.runSync(createPlannerSearchHarnessFx(config));
 	const result = await Effect.runPromise(
 		planner.constructiveSearchFx("final-target", 1, {
 			maximumAgendaDepth: 32,
@@ -339,7 +339,7 @@ describe("constructive engine planner", () => {
 
 	it("constructs an official multi-step target through the canonical engine", async () => {
 		const config = await readArkiniGameConfigSource();
-		const planner = Effect.runSync(createEnginePlannerFx(config));
+		const planner = Effect.runSync(createPlannerSearchHarnessFx(config));
 		const result = await Effect.runPromise(
 			planner.constructiveSearchFx("item:double-tree", 1, {
 				maximumAgendaDepth: 256,

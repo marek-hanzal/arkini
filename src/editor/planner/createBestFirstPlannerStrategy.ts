@@ -7,6 +7,7 @@ import type {
 import type { PlannerAcquisitionGraph } from "~/editor/planner/PlannerAcquisitionGraph";
 import {
 	DefaultPlannerSearchBudget,
+	type PlannerSearchBudget,
 	type PlannerSearchResult,
 } from "~/editor/planner/PlannerSearch";
 import { PlannerStrategyId } from "~/editor/planner/PlannerStrategy";
@@ -15,6 +16,17 @@ import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const projectBestFirstResult = (result: PlannerSearchResult): BestFirstPlannerStrategyResult => {
+	const metrics = {
+		expandedNodes: result.type === "no-finite-path" ? 0 : result.expandedStates,
+		frontierSize: result.type === "inconclusive" ? result.frontierSize : 0,
+		traceLength:
+			result.type === "completed"
+				? result.trace.length
+				: result.type === "inconclusive"
+					? result.trace.length
+					: 0,
+		visitedNodes: result.type === "no-finite-path" ? 0 : result.visitedStates,
+	};
 	switch (result.type) {
 		case "completed":
 			return {
@@ -27,12 +39,14 @@ const projectBestFirstResult = (result: PlannerSearchResult): BestFirstPlannerSt
 					selectedWitnessProbability: result.selectedWitnessProbability,
 					trace: result.trace,
 				},
+				metrics,
 				strategyId: PlannerStrategyId.bestFirst,
 				type: "completed",
 			};
 		case "no-finite-path":
 			return {
 				diagnostics: result.diagnostics,
+				metrics,
 				proof: result.proof,
 				strategyId: PlannerStrategyId.bestFirst,
 				type: "no-finite-path",
@@ -47,7 +61,7 @@ const projectBestFirstResult = (result: PlannerSearchResult): BestFirstPlannerSt
 							budgetLimit: result.budgetLimit,
 						}),
 				diagnostics: result.diagnostics,
-				frontierSize: result.frontierSize,
+				metrics,
 				reason: result.reason,
 				strategyId: PlannerStrategyId.bestFirst,
 				type: "inconclusive",
@@ -56,31 +70,32 @@ const projectBestFirstResult = (result: PlannerSearchResult): BestFirstPlannerSt
 	}
 };
 
-/** Adapts the established global runtime search to the common planner strategy contract. */
+/** Adapts the established global runtime search to the common strategy contract. */
 export const createBestFirstPlannerStrategy = ({
+	budget: configuredBudget,
 	config,
 	graph,
 }: {
+	readonly budget?: Partial<PlannerSearchBudget>;
 	readonly config: GameConfigSchema.Type;
 	readonly graph: PlannerAcquisitionGraph;
-}): BestFirstPlannerStrategy => {
-	const searchFx: BestFirstPlannerStrategy["searchFx"] = Effect.fn(
-		"BestFirstPlannerStrategy.searchFx",
-	)((request, budget) =>
+}): BestFirstPlannerStrategy => ({
+	defaultBudget: {
+		...DefaultPlannerSearchBudget,
+		...configuredBudget,
+	},
+	id: PlannerStrategyId.bestFirst,
+	runFx: Effect.fn("BestFirstPlannerStrategy.runFx")((problem, budget) =>
 		searchPlannerRuntimeFx({
-			budget,
+			budget: {
+				...DefaultPlannerSearchBudget,
+				...configuredBudget,
+				...budget,
+			},
 			graph,
-			itemId: request.goal.itemId,
-			quantity: request.goal.quantity,
-			runtime: request.runtime,
-		}).pipe(Effect.provideService(GameConfigFx, config)),
-	);
-	return {
-		defaultBudget: DefaultPlannerSearchBudget,
-		id: PlannerStrategyId.bestFirst,
-		runFx: Effect.fn("BestFirstPlannerStrategy.runFx")((request, budget) =>
-			searchFx(request, budget).pipe(Effect.map(projectBestFirstResult)),
-		),
-		searchFx,
-	};
-};
+			itemId: problem.activeGoal.itemId,
+			quantity: problem.activeGoal.quantity,
+			runtime: problem.runtime,
+		}).pipe(Effect.provideService(GameConfigFx, config), Effect.map(projectBestFirstResult)),
+	),
+});

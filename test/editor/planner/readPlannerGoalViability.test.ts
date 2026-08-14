@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { createEnginePlannerFx } from "~/editor/planner/createEnginePlannerFx";
+import { createPlannerSearchHarnessFx } from "./support/createPlannerSearchHarnessFx";
 import { readPlannerGoalViability } from "~/editor/planner/readPlannerGoalViability";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
@@ -119,7 +119,7 @@ const config = GameConfigSchema.parse({
 	},
 });
 
-const makePlanner = () => Effect.runSync(createEnginePlannerFx(config));
+const makePlanner = () => Effect.runSync(createPlannerSearchHarnessFx(config));
 
 describe("readPlannerGoalViability", () => {
 	it("re-roots structural reachability in the exact runtime snapshot", () => {

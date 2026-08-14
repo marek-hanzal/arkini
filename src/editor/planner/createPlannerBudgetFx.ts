@@ -83,27 +83,45 @@ export const createPlannerBudgetFx = Effect.fn("createPlannerBudgetFx")(function
 							"Planner budget consumption must be a positive safe integer.",
 						),
 					);
-				const outcome = yield* Ref.modify(state, (snapshot) => {
-					const attempted = readValue(snapshot, counter) + amount;
-					const limit = readLimit(limits, counter);
-					const next = writeValue(snapshot, counter, attempted);
-					return attempted > limit
-						? [
-								{
-									attempted,
-									limit,
-									type: "exceeded" as const,
-								},
-								snapshot,
-							]
-						: [
-								{
-									snapshot: next,
-									type: "consumed" as const,
-								},
-								next,
-							];
-				});
+				type ConsumeOutcome =
+					| {
+							readonly snapshot: PlannerBudgetSnapshot;
+							readonly type: "consumed";
+					  }
+					| {
+							readonly attempted: number;
+							readonly limit: number;
+							readonly type: "exceeded";
+					  };
+				const outcome = yield* Ref.modify<PlannerBudgetSnapshot, ConsumeOutcome>(
+					state,
+					(
+						snapshot,
+					): readonly [
+						ConsumeOutcome,
+						PlannerBudgetSnapshot,
+					] => {
+						const attempted = readValue(snapshot, counter) + amount;
+						const limit = readLimit(limits, counter);
+						const next = writeValue(snapshot, counter, attempted);
+						return attempted > limit
+							? [
+									{
+										attempted,
+										limit,
+										type: "exceeded" as const,
+									},
+									snapshot,
+								]
+							: [
+									{
+										snapshot: next,
+										type: "consumed" as const,
+									},
+									next,
+								];
+					},
+				);
 				if (outcome.type === "exceeded")
 					return yield* new PlannerBudgetExceeded({
 						attempted: outcome.attempted,

@@ -1,40 +1,48 @@
 import { Effect } from "effect";
 
 import type { Planner } from "~/editor/planner/Planner";
-import { createBestFirstPlannerStrategy } from "~/editor/planner/createBestFirstPlannerStrategy";
-import { createConstructivePlannerStrategy } from "~/editor/planner/createConstructivePlannerStrategy";
+import type { PlannerAcquisitionGraph } from "~/editor/planner/PlannerAcquisitionGraph";
+import type { PlannerStrategy } from "~/editor/planner/PlannerStrategy";
 import { createPlannerAcquisitionGraph } from "~/editor/planner/createPlannerAcquisitionGraph";
 import { createPlannerInitialRuntimeFx } from "~/editor/planner/createPlannerInitialRuntimeFx";
-import { runPlannerStrategyPlanFx } from "~/editor/planner/runPlannerStrategyPlanFx";
+import { runPlannerStrategyFx } from "~/editor/planner/runPlannerStrategyFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
-/** Creates the public planner orchestrator and its registered strategies over one config snapshot. */
-export const createPlannerFx = Effect.fn("createPlannerFx")((config: GameConfigSchema.Type) =>
+export namespace createPlannerFx {
+	export interface StrategyFactoryProps {
+		readonly config: GameConfigSchema.Type;
+		readonly graph: PlannerAcquisitionGraph;
+	}
+
+	export interface Props<StrategyId extends string, Budget, Diagnostics> {
+		readonly config: GameConfigSchema.Type;
+		readonly createStrategy: (
+			props: StrategyFactoryProps,
+		) => PlannerStrategy<StrategyId, Budget, Diagnostics>;
+	}
+}
+
+/** Creates one public planner orchestrator over a configured root strategy. */
+export const createPlannerFx = <StrategyId extends string, Budget, Diagnostics>({
+	config,
+	createStrategy,
+}: createPlannerFx.Props<StrategyId, Budget, Diagnostics>) =>
 	Effect.gen(function* () {
 		const graph = createPlannerAcquisitionGraph(config);
 		const initialRuntime = yield* createPlannerInitialRuntimeFx(config);
-		const strategies = {
-			bestFirst: createBestFirstPlannerStrategy({
-				config,
-				graph,
-			}),
-			constructive: createConstructivePlannerStrategy({
-				config,
-				graph,
-			}),
-		};
+		const strategy = createStrategy({
+			config,
+			graph,
+		});
 		return {
 			estimateFx: Effect.fn("Planner.estimateFx")((request) =>
-				runPlannerStrategyPlanFx({
+				runPlannerStrategyFx({
 					graph,
 					initialRuntime,
 					request,
-					strategies,
+					strategy,
 				}),
 			),
-			graph,
-			initialRuntime,
-			strategies,
-		} satisfies Planner;
-	}),
-);
+			strategyId: strategy.id,
+		} satisfies Planner<StrategyId, Budget, Diagnostics>;
+	});

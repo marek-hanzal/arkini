@@ -1,13 +1,13 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { createEnginePlannerFx } from "~/editor/planner/createEnginePlannerFx";
+import { createPlannerSearchHarnessFx } from "./support/createPlannerSearchHarnessFx";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
-describe("createEnginePlannerFx official Bakery", () => {
+describe("searchPlannerRuntimeFx official Bakery", () => {
 	it("constructs the Bakery through a one-state demand-driven frontier", async () => {
 		const config = await readArkiniGameConfigSource();
-		const planner = Effect.runSync(createEnginePlannerFx(config));
+		const planner = Effect.runSync(createPlannerSearchHarnessFx(config));
 		const result = await Effect.runPromise(
 			planner.searchFx("producer:bakery-t1", 1, {
 				maximumExpandedStates: 1_000,

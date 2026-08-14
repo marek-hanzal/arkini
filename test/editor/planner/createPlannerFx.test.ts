@@ -2,7 +2,8 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { PlannerStrategyId } from "~/editor/planner/PlannerStrategy";
-import { createEnginePlannerFx } from "~/editor/planner/createEnginePlannerFx";
+import { createBestFirstPlannerStrategy } from "~/editor/planner/createBestFirstPlannerStrategy";
+import { createConstructivePlannerStrategy } from "~/editor/planner/createConstructivePlannerStrategy";
 import { createPlannerFx } from "~/editor/planner/createPlannerFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
@@ -112,110 +113,84 @@ const config = GameConfigSchema.parse({
 	},
 });
 
-describe("createPlannerFx", () => {
-	it("exposes registered strategies behind one planner orchestration boundary", () => {
-		const planner = Effect.runSync(createPlannerFx(config));
-
-		expect(planner.strategies.bestFirst.id).toBe(PlannerStrategyId.bestFirst);
-		expect(planner.strategies.constructive.id).toBe(PlannerStrategyId.constructive);
-		expect(planner.strategies.bestFirst.defaultBudget.maximumExpandedStates).toBeGreaterThan(0);
-		expect(
-			planner.strategies.constructive.defaultBudget.maximumConcurrentBranches,
-		).toBeGreaterThan(0);
+const createBestFirstPlannerFx = () =>
+	createPlannerFx({
+		config,
+		createStrategy: ({ config: strategyConfig, graph }) =>
+			createBestFirstPlannerStrategy({
+				config: strategyConfig,
+				graph,
+			}),
 	});
 
-	it("falls back deterministically after an inconclusive strategy", async () => {
-		const planner = Effect.runSync(createPlannerFx(config));
+const createConstructivePlannerFx = () =>
+	createPlannerFx({
+		config,
+		createStrategy: ({ config: strategyConfig, graph }) =>
+			createConstructivePlannerStrategy({
+				config: strategyConfig,
+				graph,
+			}),
+	});
+
+describe("createPlannerFx", () => {
+	it("runs exactly one configured best-first root strategy", async () => {
+		const planner = Effect.runSync(createBestFirstPlannerFx());
 		const result = await Effect.runPromise(
 			planner.estimateFx({
 				itemId: "target",
-				strategyPlan: [
-					{
-						budget: {
-							maximumAgendaDepth: 16,
-							maximumConcurrentBranches: 1,
-							maximumExpandedBranches: 1,
-							maximumQueuedBranches: 8,
-							maximumTraceLength: 8,
-						},
-						strategyId: "constructive",
-					},
-					{
-						strategyId: "best-first",
-					},
-				],
 			}),
 		);
 
+		expect(planner.strategyId).toBe(PlannerStrategyId.bestFirst);
 		expect(result.type).toBe("completed");
 		if (result.type !== "completed") return;
-		expect(result.winningStrategyId).toBe("best-first");
-		expect(result.winningAttemptIndex).toBe(2);
-		expect(result.attempts.map(({ result: attempt }) => attempt.type)).toEqual([
-			"inconclusive",
-			"completed",
-		]);
+		expect(result.strategyId).toBe(PlannerStrategyId.bestFirst);
 		expect(result.execution.trace.map(({ actionId }) => actionId)).toEqual([
 			'["line","producer","line:producer:target"]',
 		]);
 		expect(result.economics.expectedElapsedMs).toBe(100);
 	});
 
-	it("keeps the production-compatible best-first strategy as the default", async () => {
-		const planner = Effect.runSync(createPlannerFx(config));
+	it("can configure constructive search behind the same public API", async () => {
+		const planner = Effect.runSync(createConstructivePlannerFx());
 		const result = await Effect.runPromise(
 			planner.estimateFx({
 				itemId: "target",
 			}),
 		);
 
+		expect(planner.strategyId).toBe(PlannerStrategyId.constructive);
 		expect(result.type).toBe("completed");
 		if (result.type !== "completed") return;
-		expect(result.winningStrategyId).toBe("best-first");
-		expect(result.attempts).toHaveLength(1);
+		expect(result.strategyId).toBe(PlannerStrategyId.constructive);
+		expect(result.economics.expectedElapsedMs).toBe(100);
 	});
 
-	it("stops fallback after a strategy returns a structural proof", async () => {
-		const planner = Effect.runSync(createPlannerFx(config));
+	it("returns the configured strategy's structural proof", async () => {
+		const planner = Effect.runSync(createConstructivePlannerFx());
 		const result = await Effect.runPromise(
 			planner.estimateFx({
 				itemId: "orphan",
-				strategyPlan: [
-					{
-						strategyId: "constructive",
-					},
-					{
-						strategyId: "best-first",
-					},
-				],
 			}),
 		);
 
 		expect(result.type).toBe("no-finite-path");
 		if (result.type !== "no-finite-path") return;
-		expect(result.provingStrategyId).toBe("constructive");
-		expect(result.attempts).toHaveLength(1);
+		expect(result.strategyId).toBe(PlannerStrategyId.constructive);
 		expect(result.proof.type).toBe("no-finite-path");
 	});
 
-	it("keeps the legacy engine planner entry points on the registered strategies", async () => {
-		const planner = Effect.runSync(createEnginePlannerFx(config));
-		const legacy = await Effect.runPromise(planner.searchFx("target"));
-		const strategy = await Effect.runPromise(
-			planner.strategies.bestFirst.searchFx({
-				goal: {
-					itemId: "target",
-					quantity: 1,
-				},
-				runtime: planner.initialRuntime,
-			}),
-		);
+	it("rejects invalid target quantities before invoking the strategy", () => {
+		const planner = Effect.runSync(createBestFirstPlannerFx());
 
-		expect(legacy.type).toBe("completed");
-		expect(strategy.type).toBe("completed");
-		if (legacy.type !== "completed" || strategy.type !== "completed") return;
-		expect(legacy.trace.map(({ actionId }) => actionId)).toEqual(
-			strategy.trace.map(({ actionId }) => actionId),
-		);
+		expect(() =>
+			Effect.runSync(
+				planner.estimateFx({
+					itemId: "target",
+					quantity: 0,
+				}),
+			),
+		).toThrow(/positive safe integer/);
 	});
 });

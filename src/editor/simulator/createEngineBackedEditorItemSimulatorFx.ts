@@ -1,9 +1,11 @@
 import { Effect } from "effect";
 
 import type { PlannerSearchBudget } from "~/editor/planner/PlannerSearch";
-import { createEnginePlannerFx } from "~/editor/planner/createEnginePlannerFx";
+import { createBestFirstPlannerStrategy } from "~/editor/planner/createBestFirstPlannerStrategy";
+import { createPlannerAcquisitionGraph } from "~/editor/planner/createPlannerAcquisitionGraph";
+import { createPlannerFx } from "~/editor/planner/createPlannerFx";
 import type { EditorItemSimulation } from "~/editor/simulator/EditorItemSimulation";
-import { projectPlannerSearchResult } from "~/editor/simulator/projectPlannerSearchResult";
+import { projectPlannerResult } from "~/editor/simulator/projectPlannerResult";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 export const EditorItemPlannerSearchBudget: PlannerSearchBudget = {
@@ -28,20 +30,30 @@ export const createEngineBackedEditorItemSimulatorFx = Effect.fn(
 	"createEngineBackedEditorItemSimulatorFx",
 )((config: GameConfigSchema.Type) =>
 	Effect.gen(function* () {
-		const planner = yield* createEnginePlannerFx(config);
+		const graph = createPlannerAcquisitionGraph(config);
+		const planner = yield* createPlannerFx({
+			config,
+			createStrategy: ({ config: strategyConfig, graph: strategyGraph }) =>
+				createBestFirstPlannerStrategy({
+					budget: EditorItemPlannerSearchBudget,
+					config: strategyConfig,
+					graph: strategyGraph,
+				}),
+		});
 		return {
 			simulateFx: Effect.fn("EngineBackedEditorItemSimulator.simulateFx")(
 				(itemId: string, quantity = 1, budget?: Partial<PlannerSearchBudget>) =>
 					planner
-						.searchFx(itemId, quantity, {
-							...EditorItemPlannerSearchBudget,
-							...budget,
+						.estimateFx({
+							budget,
+							itemId,
+							quantity,
 						})
 						.pipe(
 							Effect.map((result) =>
-								projectPlannerSearchResult({
+								projectPlannerResult({
 									config,
-									graph: planner.graph,
+									graph,
 									result,
 								}),
 							),

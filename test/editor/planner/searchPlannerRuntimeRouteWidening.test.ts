@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { createEnginePlannerFx } from "~/editor/planner/createEnginePlannerFx";
+import { createPlannerSearchHarnessFx } from "./support/createPlannerSearchHarnessFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const baseItem = (id: string) => ({
@@ -205,7 +205,7 @@ const configSource: unknown = {
 };
 
 const config = GameConfigSchema.parse(configSource);
-const makePlanner = () => Effect.runSync(createEnginePlannerFx(config));
+const makePlanner = () => Effect.runSync(createPlannerSearchHarnessFx(config));
 
 describe("engine planner route widening", () => {
 	it("restarts from the immutable root after a destructive shorter path", () => {

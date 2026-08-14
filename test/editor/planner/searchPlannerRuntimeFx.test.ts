@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { createEnginePlannerFx } from "~/editor/planner/createEnginePlannerFx";
+import { createPlannerSearchHarnessFx } from "./support/createPlannerSearchHarnessFx";
 import { readPlannerSearchScope } from "~/editor/planner/readPlannerSearchScope";
 import {
 	readPlannerActiveDemand,
@@ -619,11 +619,11 @@ const infrastructureConfig = GameConfigSchema.parse({
 	},
 });
 
-const makePlanner = () => Effect.runSync(createEnginePlannerFx(config));
+const makePlanner = () => Effect.runSync(createPlannerSearchHarnessFx(config));
 
-describe("createEnginePlannerFx", () => {
+describe("searchPlannerRuntimeFx", () => {
 	it("includes produced retained infrastructure in selected-trace economics", () => {
-		const planner = Effect.runSync(createEnginePlannerFx(infrastructureConfig));
+		const planner = Effect.runSync(createPlannerSearchHarnessFx(infrastructureConfig));
 		const result = Effect.runSync(planner.searchFx("built-target"));
 
 		expect(result.type).toBe("completed");
@@ -1414,7 +1414,7 @@ describe("createEnginePlannerFx", () => {
 
 	it("executes an official chance output as a possible engine witness", async () => {
 		const official = await readArkiniGameConfigSource();
-		const planner = Effect.runSync(createEnginePlannerFx(official));
+		const planner = Effect.runSync(createPlannerSearchHarnessFx(official));
 		const result = await Effect.runPromise(planner.searchFx("item:quest:road-repair"));
 
 		expect(result).toMatchObject({
@@ -1441,7 +1441,7 @@ describe("createEnginePlannerFx", () => {
 
 	it("depletes an official tree through eighteen real lumberjack jobs", async () => {
 		const official = await readArkiniGameConfigSource();
-		const planner = Effect.runSync(createEnginePlannerFx(official));
+		const planner = Effect.runSync(createPlannerSearchHarnessFx(official));
 		const result = await Effect.runPromise(
 			planner.searchFx("item:seed", 1, {
 				maximumExpandedStates: 32,
@@ -1489,7 +1489,7 @@ describe("createEnginePlannerFx", () => {
 
 	it("prioritizes active official demands through the well chain", async () => {
 		const official = await readArkiniGameConfigSource();
-		const planner = Effect.runSync(createEnginePlannerFx(official));
+		const planner = Effect.runSync(createPlannerSearchHarnessFx(official));
 		const result = await Effect.runPromise(
 			planner.searchFx("item:double-tree", 1, {
 				maximumExpandedStates: 64,

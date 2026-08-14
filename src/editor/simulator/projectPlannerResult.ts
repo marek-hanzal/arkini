@@ -3,13 +3,19 @@ import type {
 	PlannerAcquisitionRoute,
 } from "~/editor/planner/PlannerAcquisitionGraph";
 import type { PlannerAction } from "~/editor/planner/PlannerAction";
-import type { PlannerSearchResult } from "~/editor/planner/PlannerSearch";
+import type { PlannerResult } from "~/editor/planner/PlannerResult";
+import type {
+	PlannerSearchBudgetLimit,
+	PlannerSearchDiagnostics,
+} from "~/editor/planner/PlannerSearch";
 import type {
 	EditorItemSimulation,
 	EditorItemSimulationBlocker,
 	EditorItemSimulationOperation,
 } from "~/editor/simulator/EditorItemSimulation";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+
+type BestFirstPlannerResult = PlannerResult<"best-first", PlannerSearchDiagnostics>;
 
 const compareIds = (left: string, right: string) => left.localeCompare(right);
 
@@ -30,7 +36,7 @@ const readLineTitle = (
 const readOperationProjection = (
 	config: GameConfigSchema.Type,
 	operation: Extract<
-		PlannerSearchResult,
+		BestFirstPlannerResult,
 		{
 			readonly type: "completed";
 		}
@@ -76,7 +82,7 @@ const readOperationProjection = (
 const readInfrastructureItemIds = (
 	graph: PlannerAcquisitionGraph,
 	result: Extract<
-		PlannerSearchResult,
+		BestFirstPlannerResult,
 		{
 			readonly type: "completed";
 		}
@@ -95,7 +101,7 @@ const readInfrastructureItemIds = (
 		if (requirement.usage === "presence" || requirement.usage === "reserve")
 			itemIds.add(requirement.itemId);
 	};
-	for (const entry of result.trace) {
+	for (const entry of result.execution.trace) {
 		if (entry.action.kind === "line") itemIds.add(entry.action.ownerItemId);
 		for (const routeId of entry.routeIds) {
 			const route = routeById.get(routeId);
@@ -111,7 +117,7 @@ const readInfrastructureItemIds = (
 const readNoFinitePathBlockers = (
 	graph: PlannerAcquisitionGraph,
 	result: Extract<
-		PlannerSearchResult,
+		BestFirstPlannerResult,
 		{
 			readonly type: "no-finite-path";
 		}
@@ -166,7 +172,7 @@ const readNoFinitePathBlockers = (
 
 const readInconclusiveWarning = (
 	result: Extract<
-		PlannerSearchResult,
+		BestFirstPlannerResult,
 		{
 			readonly type: "inconclusive";
 		}
@@ -189,15 +195,15 @@ const readInconclusiveWarning = (
 	return `Feasibility is inconclusive because ${reason}.`;
 };
 
-/** Projects an engine-backed search result into the editor's stable estimate facade. */
-export const projectPlannerSearchResult = ({
+/** Projects a best-first planner result into the editor's stable estimate facade. */
+export const projectPlannerResult = ({
 	config,
 	graph,
 	result,
 }: {
 	readonly config: GameConfigSchema.Type;
 	readonly graph: PlannerAcquisitionGraph;
-	readonly result: PlannerSearchResult;
+	readonly result: BestFirstPlannerResult;
 }): EditorItemSimulation => {
 	switch (result.type) {
 		case "completed": {
@@ -215,24 +221,24 @@ export const projectPlannerSearchResult = ({
 				),
 				planner: {
 					assumptions: result.economics.assumptions,
-					diagnostics: result.diagnostics,
+					diagnostics: result.strategyDiagnostics,
 					expectedActionRuns: result.economics.expectedActionRuns,
 					expectedSpentCharges: result.economics.expectedSpentCharges,
-					expandedStates: result.expandedStates,
+					expandedStates: result.strategyMetrics.expandedNodes,
 					method: "engine-backed-search",
 					observedActionRuns: result.economics.observedActionRuns,
-					observedRuntimeMs: result.elapsedMs,
-					outputCertainty: result.outputCertainty,
-					selectedWitnessProbability: result.selectedWitnessProbability,
+					observedRuntimeMs: result.execution.elapsedMs,
+					outputCertainty: result.execution.outputCertainty,
+					selectedWitnessProbability: result.execution.selectedWitnessProbability,
 					type: "completed",
-					visitedStates: result.visitedStates,
+					visitedStates: result.strategyMetrics.visitedNodes,
 				},
 				quantity: result.quantity,
 				runtimeMs: result.economics.expectedElapsedMs,
 				status: "estimated",
 				totalCostQuantity: result.economics.totalExpectedConsumedQuantity,
 				warnings:
-					result.outputCertainty === "possible"
+					result.execution.outputCertainty === "possible"
 						? [
 								"Feasibility uses a positive-probability output witness; expected time and cost include repeated stochastic attempts.",
 							]
@@ -247,7 +253,7 @@ export const projectPlannerSearchResult = ({
 				itemId: result.itemId,
 				operations: [],
 				planner: {
-					diagnostics: result.diagnostics,
+					diagnostics: result.strategyDiagnostics,
 					method: "engine-backed-search",
 					proofType: result.proof.type,
 					type: "no-finite-path",
@@ -269,14 +275,14 @@ export const projectPlannerSearchResult = ({
 					...(result.budgetLimit === undefined
 						? {}
 						: {
-								budgetLimit: result.budgetLimit,
+								budgetLimit: result.budgetLimit as PlannerSearchBudgetLimit,
 							}),
-					expandedStates: result.expandedStates,
-					diagnostics: result.diagnostics,
+					expandedStates: result.strategyMetrics.expandedNodes,
+					diagnostics: result.strategyDiagnostics,
 					method: "engine-backed-search",
 					reason: result.reason,
 					type: "inconclusive",
-					visitedStates: result.visitedStates,
+					visitedStates: result.strategyMetrics.visitedNodes,
 				},
 				quantity: result.quantity,
 				status: "inconclusive",

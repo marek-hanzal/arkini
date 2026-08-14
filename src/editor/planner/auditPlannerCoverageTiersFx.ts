@@ -13,7 +13,8 @@ import {
 	type PlannerCoverageTierDefinition,
 } from "~/editor/planner/PlannerCoverageTierAudit";
 import { auditPlannerCoverageWithPlannerFx } from "~/editor/planner/auditPlannerCoverageFx";
-import { createEnginePlannerFx } from "~/editor/planner/createEnginePlannerFx";
+import { createBestFirstPlannerStrategy } from "~/editor/planner/createBestFirstPlannerStrategy";
+import { createPlannerFx } from "~/editor/planner/createPlannerFx";
 import { mergePlannerCoverageTierAuditReports } from "~/editor/planner/mergePlannerCoverageTierAuditReports";
 import { readPlannerCoverageAuditOutcomeCounts } from "~/editor/planner/readPlannerCoverageAuditOutcomeCounts";
 import { readPlannerSearchBudget } from "~/editor/planner/readPlannerSearchBudget";
@@ -187,7 +188,14 @@ export const auditPlannerCoverageTiersFx = Effect.fn("auditPlannerCoverageTiersF
 				});
 		}
 	}
-	const planner = yield* createEnginePlannerFx(config);
+	const planner = yield* createPlannerFx({
+		config,
+		createStrategy: ({ config: strategyConfig, graph }) =>
+			createBestFirstPlannerStrategy({
+				config: strategyConfig,
+				graph,
+			}),
+	});
 	const attemptsByItemId = new Map<IdSchema.Type, PlannerCoverageTierAuditAttempt[]>();
 	const finalByItemId = new Map<IdSchema.Type, PlannerCoverageAuditItem>();
 	for (const item of initialReport?.items ?? []) {

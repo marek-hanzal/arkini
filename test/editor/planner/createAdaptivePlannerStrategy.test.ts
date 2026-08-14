@@ -199,9 +199,17 @@ const createDelegatingStrategy = (): PlannerStrategy<
 
 describe("createAdaptivePlannerStrategy", () => {
 	it("dynamically reselects a child strategy for a delegated subgoal", async () => {
+		const selections: Array<{
+			readonly path: ReadonlyArray<string>;
+			readonly strategyInvocations: number;
+		}> = [];
 		const adaptive = createAdaptivePlannerStrategy({
-			selectFx: ({ problem }) =>
-				Effect.succeed(
+			selectFx: ({ budget, currentStrategy, problem }) => {
+				selections.push({
+					path: currentStrategy.path,
+					strategyInvocations: budget.snapshot.strategyInvocations,
+				});
+				return Effect.succeed(
 					problem.delegationDepth === 0
 						? {
 								reason: "exercise-subgoal-routing",
@@ -211,7 +219,8 @@ describe("createAdaptivePlannerStrategy", () => {
 								reason: "solve-concrete-subgoal",
 								strategyId: PlannerStrategyId.bestFirst,
 							},
-				),
+				);
+			},
 			strategies: [
 				createDelegatingStrategy(),
 				createBestFirstPlannerStrategy(),
@@ -274,6 +283,22 @@ describe("createAdaptivePlannerStrategy", () => {
 		expect(diagnostics.selection.strategyId).toBe("delegating");
 		expect(diagnostics.child.strategyId).toBe("delegating");
 		expect(result.execution.trace).toHaveLength(1);
+		expect(selections).toEqual([
+			{
+				path: [
+					"adaptive",
+				],
+				strategyInvocations: 1,
+			},
+			{
+				path: [
+					"adaptive",
+					"delegating",
+					"adaptive",
+				],
+				strategyInvocations: 3,
+			},
+		]);
 	});
 
 	it("selects a child from the current immutable world and active goal", async () => {

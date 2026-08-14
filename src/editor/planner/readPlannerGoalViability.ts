@@ -1,6 +1,6 @@
 import type { PlannerAcquisitionGraph } from "~/editor/planner/PlannerAcquisitionGraph";
 import type { PlannerGoalViability, PlannerItemGoal } from "~/editor/planner/PlannerGoalViability";
-import { readPlannerRuntimeQuantity } from "~/editor/planner/readPlannerRuntimeQuantity";
+import { readPlannerItemGoalStatus } from "~/editor/planner/readPlannerItemGoalStatus";
 import { readPlannerStructuralReachability } from "~/editor/planner/readPlannerStructuralReachability";
 import { resolvePlannerRouteReachability } from "~/editor/planner/resolvePlannerRouteReachability";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -61,15 +61,11 @@ export const readPlannerGoalViability = ({
 	readonly graph: PlannerAcquisitionGraph;
 	readonly runtime: RuntimeSchema.Type;
 }): PlannerGoalViability => {
-	if (!Number.isSafeInteger(goal.quantity) || goal.quantity < 1)
-		throw new RangeError(
-			`Planner goal quantity must be a positive safe integer, received ${goal.quantity}.`,
-		);
-
-	const availableQuantity = readPlannerRuntimeQuantity(runtime, goal.itemId);
-	if (availableQuantity >= goal.quantity)
+	const status = readPlannerItemGoalStatus(goal, runtime);
+	if (status.satisfied)
 		return {
-			availableQuantity,
+			availableCharges: status.availableCharges,
+			availableQuantity: status.availableQuantity,
 			goal,
 			type: "satisfied",
 		};
@@ -83,13 +79,15 @@ export const readPlannerGoalViability = ({
 	});
 	return reachability.type === "reachable"
 		? {
-				availableQuantity,
+				availableCharges: status.availableCharges,
+				availableQuantity: status.availableQuantity,
 				goal,
 				reachability,
 				type: "reachable",
 			}
 		: {
-				availableQuantity,
+				availableCharges: status.availableCharges,
+				availableQuantity: status.availableQuantity,
 				goal,
 				proof: reachability,
 				type: "dead-end",

@@ -24,15 +24,21 @@ export const createRootPlannerProblem = ({
 }: {
 	readonly goal: PlannerItemGoal;
 	readonly runtime: RuntimeSchema.Type;
-}): PlannerProblem => ({
-	activeGoal: goal,
-	agenda: [
-		goal,
-	],
-	delegationDepth: 0,
-	rootGoal: goal,
-	runtime,
-});
+}): PlannerProblem => {
+	const normalizedGoal = {
+		...goal,
+		minimumCharges: goal.minimumCharges ?? 0,
+	};
+	return {
+		activeGoal: normalizedGoal,
+		agenda: [
+			normalizedGoal,
+		],
+		delegationDepth: 0,
+		rootGoal: normalizedGoal,
+		runtime,
+	};
+};
 
 export const createPlannerSubproblem = ({
 	activeGoal,

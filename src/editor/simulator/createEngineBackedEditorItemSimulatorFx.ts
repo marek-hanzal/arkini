@@ -3,7 +3,11 @@ import { Effect } from "effect";
 import type { PlannerBudgetLimits } from "~/editor/planner/PlannerBudget";
 import type { PlannerGoalSearchBudget } from "~/editor/planner/PlannerGoalSearch";
 import type { PlannerSearchBudget } from "~/editor/planner/PlannerSearch";
-import { createGoalDirectedPlannerStrategy } from "~/editor/planner/createGoalDirectedPlannerStrategy";
+import {
+	DefaultEditorPlannerBestFirstBudget,
+	DefaultEditorPlannerConstructiveBudget,
+	createEditorPlannerStrategy,
+} from "~/editor/planner/createEditorPlannerStrategy";
 import { createPlannerAcquisitionGraph } from "~/editor/planner/createPlannerAcquisitionGraph";
 import { createPlannerFx } from "~/editor/planner/createPlannerFx";
 import type { EditorItemSimulation } from "~/editor/simulator/EditorItemSimulation";
@@ -11,18 +15,11 @@ import { projectPlannerResult } from "~/editor/simulator/projectPlannerResult";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 export const EditorItemPlannerSearchBudget: PlannerSearchBudget = {
-	maximumExpandedStates: 1_000,
-	maximumQueuedStates: 16,
-	maximumRoutePlans: 16,
-	maximumTraceLength: 500,
+	...DefaultEditorPlannerBestFirstBudget,
 };
 
 export const EditorItemPlannerGoalSearchBudget: PlannerGoalSearchBudget = {
-	maximumAgendaDepth: 256,
-	maximumConcurrentBranches: 4,
-	maximumExpandedBranches: 256,
-	maximumQueuedBranches: 256,
-	maximumTraceLength: 500,
+	...DefaultEditorPlannerConstructiveBudget,
 };
 
 export const EditorItemPlannerSessionBudget: PlannerBudgetLimits = {
@@ -47,7 +44,7 @@ export namespace createEngineBackedEditorItemSimulatorFx {
 	}
 }
 
-/** Creates the editor estimate facade over one reusable adaptive engine-backed planner. */
+/** Creates the editor estimate facade over one reusable resilient engine-backed planner. */
 export const createEngineBackedEditorItemSimulatorFx = Effect.fn(
 	"createEngineBackedEditorItemSimulatorFx",
 )((config: GameConfigSchema.Type) =>
@@ -60,7 +57,7 @@ export const createEngineBackedEditorItemSimulatorFx = Effect.fn(
 					...budget.session,
 				},
 				config,
-				strategy: createGoalDirectedPlannerStrategy({
+				strategy: createEditorPlannerStrategy({
 					constructiveBudget: {
 						...EditorItemPlannerGoalSearchBudget,
 						...budget.constructive,

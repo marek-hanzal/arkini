@@ -600,11 +600,11 @@ describe("createEditorMcpOwnershipFx", () => {
 				text: expect.stringContaining(
 					[
 						"Strategy session:",
-						"  Root strategy: adaptive",
+						"  Root strategy: editor",
 						"  Invocations: 2",
 						"  Engine transitions: 1/100000",
 						"  Strategy invocations: 2/10000",
-						"  Algorithms used: adaptive -> constructive",
+						"  Algorithms used: editor -> constructive",
 					].join("\n"),
 				),
 			},
@@ -685,11 +685,11 @@ describe("createEditorMcpOwnershipFx", () => {
 		expect(inconclusiveEstimate.content).toMatchObject([
 			{
 				text: expect.stringContaining(
-					"Strategy session:\n  Root strategy: adaptive\n  Invocations: 2",
+					"Strategy session:\n  Root strategy: editor\n  Invocations: 3",
 				),
 			},
 		]);
-		expect(JSON.stringify(inconclusiveEstimate.content)).not.toContain("Route-plan search:");
+		expect(JSON.stringify(inconclusiveEstimate.content)).toContain("Route-plan search:");
 		expect(JSON.stringify(inconclusiveEstimate.content)).not.toContain(
 			"Estimate: No finite path",
 		);

@@ -115,7 +115,7 @@ describe("createEngineBackedEditorItemSimulatorFx", () => {
 				observedRuntimeMs: 75,
 				outputCertainty: "deterministic",
 				selectedWitnessProbability: 1,
-				strategyId: "adaptive",
+				strategyId: "editor",
 				type: "completed",
 			},
 			quantity: 1,
@@ -126,7 +126,7 @@ describe("createEngineBackedEditorItemSimulatorFx", () => {
 		expect(
 			estimate.planner?.sessionDiagnostics.invocations.map(({ strategyId }) => strategyId),
 		).toEqual([
-			"adaptive",
+			"editor",
 			"constructive",
 		]);
 		expect(estimate.infrastructureItemIds).toEqual(
@@ -204,16 +204,18 @@ describe("createEngineBackedEditorItemSimulatorFx", () => {
 
 	it("preserves bounded search exhaustion as inconclusive", async () => {
 		const estimate = await simulate(createConfig(), "result", 2, {
+			bestFirst: {
+				maximumExpandedStates: 1,
+			},
 			constructive: {
 				maximumExpandedBranches: 1,
 			},
 		});
 		expect(estimate).toMatchObject({
 			planner: {
-				bestAvailableQuantity: 0,
-				budgetLimit: "maximumExpandedBranches",
-				diagnostics: null,
+				budgetLimit: "maximumExpandedStates",
 				reason: "search-budget",
+				strategyId: "editor",
 				type: "inconclusive",
 			},
 			status: "inconclusive",

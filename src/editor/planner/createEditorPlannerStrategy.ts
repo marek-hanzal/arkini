@@ -170,15 +170,19 @@ export const createEditorPlannerStrategy = ({
 					...policy,
 					problem,
 				});
-				const selectedStrategy =
-					selection.strategyId === PlannerStrategyId.constructive
-						? constructive
-						: bestFirst;
-				const selected = yield* session.runStrategyFx({
-					problem,
-					reason: selection.reason,
-					strategy: selectedStrategy,
-				});
+				let selected: AnyPlannerStrategyResult;
+				if (selection.strategyId === PlannerStrategyId.constructive)
+					selected = yield* session.runStrategyFx({
+						problem,
+						reason: selection.reason,
+						strategy: constructive,
+					});
+				else
+					selected = yield* session.runStrategyFx({
+						problem,
+						reason: selection.reason,
+						strategy: bestFirst,
+					});
 				if (
 					selection.strategyId !== PlannerStrategyId.constructive ||
 					selected.type !== "inconclusive"

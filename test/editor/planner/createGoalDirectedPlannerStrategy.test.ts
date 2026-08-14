@@ -137,6 +137,20 @@ describe("createGoalDirectedPlannerStrategy", () => {
 			},
 			runtime,
 		});
+		const doubleTree = createRootPlannerProblem({
+			goal: {
+				itemId: "item:double-tree",
+				quantity: 1,
+			},
+			runtime,
+		});
+		const bioWasteBlueprint = createRootPlannerProblem({
+			goal: {
+				itemId: "item:blueprint-bio-waste-processor-t1",
+				quantity: 1,
+			},
+			runtime,
+		});
 		const townHallRoot = createRootPlannerProblem({
 			goal: {
 				itemId: "producer:townhall-t3",
@@ -158,7 +172,7 @@ describe("createGoalDirectedPlannerStrategy", () => {
 				graph,
 				maximumBestFirstDepth: 6,
 				maximumConstructiveDelegationDepth: 1,
-				maximumConstructiveRootDepth: 8,
+				maximumConstructiveRootDepth: 5,
 				problem,
 			});
 		const rootContext = createAdaptiveContext([
@@ -183,6 +197,14 @@ describe("createGoalDirectedPlannerStrategy", () => {
 		});
 		expect(select(root, rootContext)).toEqual({
 			reason: "solve-deep-root-goal:depth-20",
+			strategyId: "best-first",
+		});
+		expect(select(doubleTree, rootContext)).toEqual({
+			reason: "construct-root-goal",
+			strategyId: "constructive",
+		});
+		expect(select(bioWasteBlueprint, rootContext)).toEqual({
+			reason: "solve-deep-root-goal:depth-6",
 			strategyId: "best-first",
 		});
 		expect(select(bakery, delegatedContext)).toEqual({

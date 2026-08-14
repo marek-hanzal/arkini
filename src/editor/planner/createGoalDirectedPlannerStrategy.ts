@@ -14,7 +14,7 @@ import { createConstructivePlannerStrategy } from "~/editor/planner/createConstr
 
 export const DefaultGoalDirectedBestFirstDepth = 6;
 export const DefaultGoalDirectedConstructiveDelegationDepth = 1;
-export const DefaultGoalDirectedConstructiveRootDepth = 8;
+export const DefaultGoalDirectedConstructiveRootDepth = 5;
 
 export namespace createGoalDirectedPlannerStrategy {
 	export interface Props {

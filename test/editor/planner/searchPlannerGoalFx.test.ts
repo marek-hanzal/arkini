@@ -213,8 +213,8 @@ const readConfig = ({
 		},
 	});
 
-const readMandatoryRequirementsConfig = () =>
-	GameConfigSchema.parse({
+const readMandatoryRequirementsConfig = (): GameConfigSchema.Type => {
+	const source: unknown = {
 		version: "1.0",
 		resources: {
 			hero: "hero",
@@ -293,7 +293,9 @@ const readMandatoryRequirementsConfig = () =>
 			"material-c": simpleItem("material-c"),
 			"final-target": simpleItem("final-target"),
 		},
-	});
+	};
+	return GameConfigSchema.parse(source);
+};
 
 const search = async ({
 	advancedHallReplacesLegacyCapability,

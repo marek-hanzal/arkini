@@ -2,6 +2,13 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { createPlannerSearchHarnessFx } from "./support/createPlannerSearchHarnessFx";
+import type { AdaptivePlannerStrategyDiagnostics } from "~/editor/planner/AdaptivePlannerStrategy";
+import type { PlannerGoalSearchDiagnostics } from "~/editor/planner/PlannerGoalSearch";
+import { PlannerStrategyId } from "~/editor/planner/PlannerStrategy";
+import { createAdaptivePlannerStrategy } from "~/editor/planner/createAdaptivePlannerStrategy";
+import { createBestFirstPlannerStrategy } from "~/editor/planner/createBestFirstPlannerStrategy";
+import { createConstructivePlannerStrategy } from "~/editor/planner/createConstructivePlannerStrategy";
+import { createPlannerFx } from "~/editor/planner/createPlannerFx";
 import { readPlannerRuntimeFingerprint } from "~/editor/planner/readPlannerRuntimeFingerprint";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
@@ -313,6 +320,70 @@ const search = async ({
 };
 
 describe("constructive engine planner", () => {
+	it("delegates destructive prerequisites through adaptive strategy routing and restores the parent branch", async () => {
+		const adaptive = createAdaptivePlannerStrategy({
+			selectFx: ({ problem }) =>
+				Effect.succeed(
+					problem.delegationDepth === 0
+						? {
+								reason: "construct-final-target",
+								strategyId: PlannerStrategyId.constructive,
+							}
+						: {
+								reason: `solve-${problem.activeGoal.itemId}`,
+								strategyId: PlannerStrategyId.bestFirst,
+							},
+				),
+			strategies: [
+				createBestFirstPlannerStrategy(),
+				createConstructivePlannerStrategy({
+					budget: {
+						maximumAgendaDepth: 32,
+						maximumConcurrentBranches: 2,
+						maximumExpandedBranches: 64,
+						maximumQueuedBranches: 32,
+						maximumTraceLength: 16,
+					},
+				}),
+			],
+		});
+		const planner = Effect.runSync(
+			createPlannerFx({
+				config: readConfig({
+					advancedHallReplacesLegacyCapability: false,
+				}),
+				strategy: adaptive,
+			}),
+		);
+		const result = await Effect.runPromise(
+			planner.estimateFx({
+				itemId: "final-target",
+			}),
+		);
+
+		expect(result.type).toBe("completed");
+		if (result.type !== "completed") return;
+		expect(result.execution.trace.map(({ actionId }) => actionId)).toEqual([
+			'["line","old-hall","line:old-hall:legacy-blueprint"]',
+			'["line","upgrade-blueprint","line:upgrade-hall"]',
+			'["line","final-producer","line:final-target"]',
+		]);
+		expect(
+			result.sessionDiagnostics.invocations.filter(
+				({ goal, strategyId }) =>
+					goal.itemId === "advanced-hall" && strategyId === PlannerStrategyId.bestFirst,
+			),
+		).toHaveLength(2);
+		const diagnostics = result.strategyDiagnostics as AdaptivePlannerStrategyDiagnostics;
+		const constructiveDiagnostics = diagnostics.child
+			.diagnostics as PlannerGoalSearchDiagnostics;
+		expect(constructiveDiagnostics).toMatchObject({
+			delegatedCompletedSubgoals: 3,
+			delegatedSubgoals: 3,
+			deadEndBranches: 1,
+		});
+	});
+
 	it("prunes a destructive upgrade future and backtracks through the untouched parent snapshot", async () => {
 		const { planner, result } = await search({
 			advancedHallReplacesLegacyCapability: false,

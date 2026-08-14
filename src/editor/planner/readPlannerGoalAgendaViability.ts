@@ -1,25 +1,38 @@
 import type { PlannerAcquisitionGraph } from "~/editor/planner/PlannerAcquisitionGraph";
 import type { PlannerGoalViability, PlannerItemGoal } from "~/editor/planner/PlannerGoalViability";
 import { readPlannerGoalViability } from "~/editor/planner/readPlannerGoalViability";
+import { readPlannerItemGoalMinimumCharges } from "~/editor/planner/readPlannerItemGoalStatus";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 const compareIds = (left: string, right: string) => left.localeCompare(right);
 
 const normalizeGoals = (goals: ReadonlyArray<PlannerItemGoal>) => {
-	const quantityByItemId = new Map<IdSchema.Type, number>();
-	for (const goal of goals)
-		quantityByItemId.set(
-			goal.itemId,
-			Math.max(quantityByItemId.get(goal.itemId) ?? 0, goal.quantity),
-		);
+	const demandByItemId = new Map<
+		IdSchema.Type,
+		{
+			readonly minimumCharges: number;
+			readonly quantity: number;
+		}
+	>();
+	for (const goal of goals) {
+		const current = demandByItemId.get(goal.itemId);
+		demandByItemId.set(goal.itemId, {
+			minimumCharges: Math.max(
+				current?.minimumCharges ?? 0,
+				readPlannerItemGoalMinimumCharges(goal),
+			),
+			quantity: Math.max(current?.quantity ?? 0, goal.quantity),
+		});
+	}
 	return [
-		...quantityByItemId,
+		...demandByItemId,
 	]
 		.sort(([left], [right]) => compareIds(left, right))
-		.map(([itemId, quantity]) => ({
+		.map(([itemId, demand]) => ({
 			itemId,
-			quantity,
+			minimumCharges: demand.minimumCharges,
+			quantity: demand.quantity,
 		}));
 };
 

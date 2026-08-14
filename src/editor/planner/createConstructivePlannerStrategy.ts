@@ -8,28 +8,82 @@ import {
 	DefaultPlannerGoalSearchBudget,
 	type PlannerGoalSearchBudget,
 	type PlannerGoalSearchResult,
+	type PlannerGoalSearchSubgoalSolver,
 } from "~/editor/planner/PlannerGoalSearch";
+import type { PlannerItemGoal } from "~/editor/planner/PlannerGoalViability";
 import { PlannerKernelFx } from "~/editor/planner/PlannerKernelFx";
+import { PlannerSessionFx } from "~/editor/planner/PlannerSessionFx";
 import { PlannerStrategyId } from "~/editor/planner/PlannerStrategy";
 import { searchPlannerGoalFx } from "~/editor/planner/searchPlannerGoalFx";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
+import type { IdSchema } from "~/engine/common/schema/IdSchema";
+
+const compareIds = (left: string, right: string) => left.localeCompare(right);
+
+const mergeSubgoalAgenda = (
+	activeGoal: PlannerItemGoal,
+	requestedAgenda: ReadonlyArray<PlannerItemGoal>,
+	parentAgenda: ReadonlyArray<PlannerItemGoal>,
+): ReadonlyArray<PlannerItemGoal> => {
+	const demandByItemId = new Map<
+		IdSchema.Type,
+		{
+			minimumCharges: number;
+			quantity: number;
+		}
+	>();
+	for (const goal of [
+		activeGoal,
+		...requestedAgenda,
+		...parentAgenda,
+	]) {
+		const current = demandByItemId.get(goal.itemId);
+		demandByItemId.set(goal.itemId, {
+			minimumCharges: Math.max(current?.minimumCharges ?? 0, goal.minimumCharges ?? 0),
+			quantity: Math.max(current?.quantity ?? 0, goal.quantity),
+		});
+	}
+	const activeDemand = demandByItemId.get(activeGoal.itemId);
+	if (activeDemand === undefined)
+		throw new Error(`Planner subgoal agenda lost active goal ${activeGoal.itemId}.`);
+	return [
+		{
+			itemId: activeGoal.itemId,
+			minimumCharges: activeDemand.minimumCharges,
+			quantity: activeDemand.quantity,
+		},
+		...[
+			...demandByItemId,
+		]
+			.filter(([itemId]) => itemId !== activeGoal.itemId)
+			.sort(([left], [right]) => compareIds(left, right))
+			.map(([itemId, demand]) => ({
+				itemId,
+				minimumCharges: demand.minimumCharges,
+				quantity: demand.quantity,
+			})),
+	];
+};
 
 const projectConstructiveResult = (
 	result: PlannerGoalSearchResult,
 ): ConstructivePlannerStrategyResult => {
 	const metrics = {
-		expandedNodes: result.diagnostics.expandedBranches,
-		frontierSize:
+		expandedNodes:
+			result.diagnostics.expandedBranches + result.diagnostics.delegatedExpandedNodes,
+		frontierSize: Math.max(
 			result.type === "inconclusive"
 				? result.frontierSize
 				: result.diagnostics.maximumFrontierSize,
+			result.diagnostics.delegatedMaximumFrontierSize,
+		),
 		traceLength:
 			result.type === "completed"
 				? result.execution.trace.length
 				: result.type === "inconclusive"
 					? result.bestExecution.trace.length
 					: 0,
-		visitedNodes: result.diagnostics.createdBranches,
+		visitedNodes: result.diagnostics.createdBranches + result.diagnostics.delegatedVisitedNodes,
 	};
 	switch (result.type) {
 		case "completed":
@@ -78,6 +132,20 @@ export const createConstructivePlannerStrategy = ({
 	solveFx: Effect.fn("ConstructivePlannerStrategy.solveFx")((problem) =>
 		Effect.gen(function* () {
 			const kernel = yield* PlannerKernelFx;
+			const session = yield* PlannerSessionFx;
+			const solveSubgoalFx: PlannerGoalSearchSubgoalSolver = (request) =>
+				session
+					.solveSubgoalFx({
+						activeGoal: request.goal,
+						agenda: mergeSubgoalAgenda(request.goal, request.agenda, problem.agenda),
+						parent: problem,
+						reason: request.reason,
+						runtime: request.runtime,
+					})
+					.pipe(
+						Effect.provideService(PlannerKernelFx, kernel),
+						Effect.provideService(PlannerSessionFx, session),
+					);
 			return yield* searchPlannerGoalFx({
 				budget: {
 					...DefaultPlannerGoalSearchBudget,
@@ -85,8 +153,10 @@ export const createConstructivePlannerStrategy = ({
 				},
 				graph: kernel.graph,
 				itemId: problem.activeGoal.itemId,
+				minimumCharges: problem.activeGoal.minimumCharges,
 				quantity: problem.activeGoal.quantity,
 				runtime: problem.runtime,
+				solveSubgoalFx,
 			}).pipe(
 				Effect.provideService(GameConfigFx, kernel.config),
 				Effect.map(projectConstructiveResult),

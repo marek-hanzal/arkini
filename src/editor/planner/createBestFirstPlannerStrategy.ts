@@ -11,8 +11,21 @@ import {
 	type PlannerSearchResult,
 } from "~/editor/planner/PlannerSearch";
 import { PlannerStrategyId } from "~/editor/planner/PlannerStrategy";
+import { readPlannerItemGoalStatus } from "~/editor/planner/readPlannerItemGoalStatus";
 import { searchPlannerRuntimeFx } from "~/editor/planner/searchPlannerRuntimeFx";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
+
+const EmptyBestFirstDiagnostics = {
+	attemptedRoutePlans: 0,
+	routePlans: [],
+} as const;
+
+const EmptyBestFirstMetrics = {
+	expandedNodes: 0,
+	frontierSize: 0,
+	traceLength: 0,
+	visitedNodes: 0,
+} as const;
 
 const projectBestFirstResult = (result: PlannerSearchResult): BestFirstPlannerStrategyResult => {
 	const metrics = {
@@ -79,6 +92,35 @@ export const createBestFirstPlannerStrategy = ({
 	solveFx: Effect.fn("BestFirstPlannerStrategy.solveFx")((problem) =>
 		Effect.gen(function* () {
 			const kernel = yield* PlannerKernelFx;
+			const minimumCharges = problem.activeGoal.minimumCharges ?? 0;
+			if (minimumCharges > 0) {
+				const status = readPlannerItemGoalStatus(problem.activeGoal, problem.runtime);
+				if (status.satisfied)
+					return {
+						availableQuantity: status.availableQuantity,
+						diagnostics: EmptyBestFirstDiagnostics,
+						execution: {
+							elapsedMs: 0,
+							outputCertainty: "deterministic" as const,
+							runtime: problem.runtime,
+							selectedWitnessProbability: 1,
+							trace: [],
+						},
+						metrics: EmptyBestFirstMetrics,
+						strategyId: PlannerStrategyId.bestFirst,
+						type: "completed" as const,
+					};
+				return {
+					bestAvailableQuantity: status.availableQuantity,
+					blockedActionIds: [],
+					diagnostics: EmptyBestFirstDiagnostics,
+					metrics: EmptyBestFirstMetrics,
+					reason: "unsupported-routes" as const,
+					strategyId: PlannerStrategyId.bestFirst,
+					type: "inconclusive" as const,
+					unsupportedActionIds: [],
+				};
+			}
 			return yield* searchPlannerRuntimeFx({
 				budget: {
 					...DefaultPlannerSearchBudget,

@@ -1,7 +1,13 @@
+import type { Effect } from "effect";
+
+import type { PlannerBudgetExceeded } from "~/editor/planner/PlannerBudget";
 import type { PlannerExpectedEconomics } from "~/editor/planner/PlannerExpectedEconomics";
+import type { PlannerItemGoal } from "~/editor/planner/PlannerGoalViability";
 import type { PlannerSearchExecutionState } from "~/editor/planner/PlannerSearchExecution";
+import type { AnyPlannerStrategyResult } from "~/editor/planner/PlannerStrategy";
 import type { PlannerStructuralReachability } from "~/editor/planner/PlannerStructuralReachability";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export interface PlannerGoalSearchBudget {
 	readonly maximumAgendaDepth: number;
@@ -30,6 +36,13 @@ export interface PlannerGoalSearchDiagnostics {
 	readonly blockedBranches: number;
 	readonly createdBranches: number;
 	readonly deadEndBranches: number;
+	readonly delegatedCompletedSubgoals: number;
+	readonly delegatedExpandedNodes: number;
+	readonly delegatedInconclusiveSubgoals: number;
+	readonly delegatedMaximumFrontierSize: number;
+	readonly delegatedNoFinitePathSubgoals: number;
+	readonly delegatedSubgoals: number;
+	readonly delegatedVisitedNodes: number;
 	readonly duplicateBranches: number;
 	readonly expandedBranches: number;
 	readonly maximumAgendaDepth: number;
@@ -38,6 +51,17 @@ export interface PlannerGoalSearchDiagnostics {
 	readonly unsupportedBranches: number;
 	readonly winningChoicePath?: ReadonlyArray<number>;
 }
+
+export interface PlannerGoalSearchSubgoalRequest {
+	readonly agenda: ReadonlyArray<PlannerItemGoal>;
+	readonly goal: PlannerItemGoal;
+	readonly reason: string;
+	readonly runtime: RuntimeSchema.Type;
+}
+
+export type PlannerGoalSearchSubgoalSolver = (
+	request: PlannerGoalSearchSubgoalRequest,
+) => Effect.Effect<AnyPlannerStrategyResult, PlannerBudgetExceeded>;
 
 interface PlannerGoalSearchResultBase {
 	readonly diagnostics: PlannerGoalSearchDiagnostics;
@@ -65,7 +89,7 @@ export type PlannerGoalSearchResult =
 			readonly bestAvailableQuantity: number;
 			readonly bestExecution: PlannerSearchExecutionState;
 			readonly blockedActionIds: ReadonlyArray<string>;
-			readonly budgetLimit?: PlannerGoalSearchBudgetLimit;
+			readonly budgetLimit?: string;
 			readonly frontierSize: number;
 			readonly reason:
 				| "action-unsupported"

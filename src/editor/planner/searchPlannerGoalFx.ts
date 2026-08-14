@@ -4,23 +4,26 @@ import type { PlannerBudgetExceeded } from "~/editor/planner/PlannerBudget";
 import type { PlannerBudgetFx } from "~/editor/planner/PlannerBudgetFx";
 import type {
 	PlannerGoalSearchBudget,
-	PlannerGoalSearchBudgetLimit,
 	PlannerGoalSearchDiagnostics,
 	PlannerGoalSearchResult,
+	PlannerGoalSearchSubgoalSolver,
 } from "~/editor/planner/PlannerGoalSearch";
 import type { PlannerItemGoal } from "~/editor/planner/PlannerGoalViability";
 import type { PlannerSearchExecutionState } from "~/editor/planner/PlannerSearchExecution";
 import type { PlannerSearchAction } from "~/editor/planner/PlannerSearchScope";
+import type { PlannerStrategyInconclusiveReason } from "~/editor/planner/PlannerStrategy";
 import {
 	type PlannerAcquisitionGraph,
 	type PlannerAcquisitionRequirement,
 	type PlannerAcquisitionRoute,
 } from "~/editor/planner/PlannerAcquisitionGraph";
+import { composePlannerSearchExecution } from "~/editor/planner/composePlannerSearchExecution";
 import { isPlannerRuntimeQuiescent } from "~/editor/planner/isPlannerRuntimeQuiescent";
 import { readPlannerExpectedEconomicsFx } from "~/editor/planner/readPlannerExpectedEconomicsFx";
 import { readPlannerGoalAgendaViability } from "~/editor/planner/readPlannerGoalAgendaViability";
 import { readPlannerGoalSearchBudget } from "~/editor/planner/readPlannerGoalSearchBudget";
 import { readPlannerGoalViability } from "~/editor/planner/readPlannerGoalViability";
+import { readPlannerItemGoalStatus } from "~/editor/planner/readPlannerItemGoalStatus";
 import { readPlannerRuntimeChargeCapacity } from "~/editor/planner/readPlannerRuntimeChargeCapacity";
 import { readPlannerRuntimeFingerprint } from "~/editor/planner/readPlannerRuntimeFingerprint";
 import { readPlannerRuntimeQuantity } from "~/editor/planner/readPlannerRuntimeQuantity";
@@ -37,8 +40,10 @@ export namespace searchPlannerGoalFx {
 		readonly budget?: Partial<PlannerGoalSearchBudget>;
 		readonly graph: PlannerAcquisitionGraph;
 		readonly itemId: IdSchema.Type;
+		readonly minimumCharges?: number;
 		readonly quantity?: number;
 		readonly runtime: RuntimeSchema.Type;
+		readonly solveSubgoalFx?: PlannerGoalSearchSubgoalSolver;
 	}
 }
 
@@ -46,6 +51,7 @@ interface PlannerResourceGoalTask {
 	readonly itemId: IdSchema.Type;
 	readonly minimumCharges: number;
 	readonly minimumQuantity: number;
+	readonly resolution: "local" | "subgoal";
 	readonly type: "resource";
 }
 
@@ -83,6 +89,13 @@ interface PlannerGoalSearchCounters {
 	blockedBranches: number;
 	createdBranches: number;
 	deadEndBranches: number;
+	delegatedCompletedSubgoals: number;
+	delegatedExpandedNodes: number;
+	delegatedInconclusiveSubgoals: number;
+	delegatedMaximumFrontierSize: number;
+	delegatedNoFinitePathSubgoals: number;
+	delegatedSubgoals: number;
+	delegatedVisitedNodes: number;
 	duplicateBranches: number;
 	expandedBranches: number;
 	maximumAgendaDepth: number;
@@ -90,8 +103,22 @@ interface PlannerGoalSearchCounters {
 	unsupportedBranches: number;
 }
 
+interface PlannerDelegatedSubgoalSummary {
+	readonly blockedActionIds: ReadonlyArray<string>;
+	readonly budgetLimit?: string;
+	readonly metrics: {
+		readonly expandedNodes: number;
+		readonly frontierSize: number;
+		readonly visitedNodes: number;
+	};
+	readonly outcome: "completed" | "inconclusive" | "no-finite-path";
+	readonly reason?: PlannerStrategyInconclusiveReason;
+	readonly unsupportedActionIds: ReadonlyArray<string>;
+}
+
 type PlannerBranchExpansion = {
 	readonly attemptedActionId?: string;
+	readonly delegatedSubgoal?: PlannerDelegatedSubgoalSummary;
 } & (
 	| {
 			readonly branch: PlannerGoalBranch;
@@ -109,6 +136,10 @@ type PlannerBranchExpansion = {
 	| {
 			readonly branch: PlannerGoalBranch;
 			readonly type: "non-quiescent";
+	  }
+	| {
+			readonly branch: PlannerGoalBranch;
+			readonly type: "unresolved";
 	  }
 );
 
@@ -137,10 +168,12 @@ const readInitialExecution = (runtime: RuntimeSchema.Type): PlannerSearchExecuti
 const readInitialResourceGoal = (
 	itemId: IdSchema.Type,
 	quantity: number,
+	minimumCharges: number,
 ): PlannerResourceGoalTask => ({
 	itemId,
-	minimumCharges: 0,
+	minimumCharges,
 	minimumQuantity: quantity,
+	resolution: "local",
 	type: "resource",
 });
 
@@ -149,7 +182,13 @@ const isResourceGoalSatisfied = (goal: PlannerResourceGoalTask, runtime: Runtime
 	readPlannerRuntimeChargeCapacity(runtime, goal.itemId) >= goal.minimumCharges;
 
 const isTargetGoalSatisfied = (goal: PlannerItemGoal, runtime: RuntimeSchema.Type) =>
-	readPlannerRuntimeQuantity(runtime, goal.itemId) >= goal.quantity;
+	readPlannerItemGoalStatus(goal, runtime).satisfied;
+
+const projectResourceGoal = (goal: PlannerResourceGoalTask): PlannerItemGoal => ({
+	itemId: goal.itemId,
+	minimumCharges: goal.minimumCharges,
+	quantity: Math.max(1, goal.minimumQuantity),
+});
 
 const readAgendaItemGoals = (
 	targetGoal: PlannerItemGoal,
@@ -159,10 +198,7 @@ const readAgendaItemGoals = (
 	...agenda.flatMap((task) =>
 		task.type === "resource"
 			? [
-					{
-						itemId: task.itemId,
-						quantity: Math.max(1, task.minimumQuantity),
-					},
+					projectResourceGoal(task),
 				]
 			: [],
 	),
@@ -212,6 +248,7 @@ const readRequirementGoal = (
 	itemId: requirement.itemId,
 	minimumCharges: requirement.usage === "charge" ? (requirement.chargeCost ?? 0) : 0,
 	minimumQuantity: requirement.minimumQuantity,
+	resolution: "subgoal",
 	type: "resource",
 });
 
@@ -229,6 +266,7 @@ const readAllOfRequirementChoices = (
 			itemId,
 			minimumCharges: demand.charges,
 			minimumQuantity: demand.consumed + demand.retained,
+			resolution: "subgoal",
 			type: "resource",
 		};
 		return isResourceGoalSatisfied(goal, runtime)
@@ -416,6 +454,7 @@ const readTaskSignature = (task: PlannerGoalTask) => {
 				task.itemId,
 				task.minimumQuantity,
 				task.minimumCharges,
+				task.resolution,
 			];
 		case "route":
 			return [
@@ -492,6 +531,145 @@ const appendChoice = (
 			]
 		: branch.choicePath;
 
+const readDelegatedSubgoalAgenda = ({
+	goal,
+	rest,
+	targetGoal,
+}: {
+	readonly goal: PlannerResourceGoalTask;
+	readonly rest: ReadonlyArray<PlannerGoalTask>;
+	readonly targetGoal: PlannerItemGoal;
+}): ReadonlyArray<PlannerItemGoal> => {
+	const goals = [
+		projectResourceGoal(goal),
+		...readAgendaItemGoals(targetGoal, rest),
+	];
+	const demandByItemId = new Map<
+		IdSchema.Type,
+		{
+			minimumCharges: number;
+			quantity: number;
+		}
+	>();
+	for (const itemGoal of goals) {
+		const current = demandByItemId.get(itemGoal.itemId);
+		demandByItemId.set(itemGoal.itemId, {
+			minimumCharges: Math.max(current?.minimumCharges ?? 0, itemGoal.minimumCharges ?? 0),
+			quantity: Math.max(current?.quantity ?? 0, itemGoal.quantity),
+		});
+	}
+	return [
+		projectResourceGoal(goal),
+		...[
+			...demandByItemId,
+		]
+			.filter(([itemId]) => itemId !== goal.itemId)
+			.sort(([left], [right]) => compareIds(left, right))
+			.map(([itemId, demand]) => ({
+				itemId,
+				minimumCharges: demand.minimumCharges,
+				quantity: demand.quantity,
+			})),
+	];
+};
+
+const resolveDelegatedResourceGoalFx = Effect.fn("resolveDelegatedResourceGoalFx")(function* ({
+	branch,
+	goal,
+	graph,
+	rest,
+	solveSubgoalFx,
+	targetGoal,
+}: {
+	readonly branch: PlannerGoalBranch;
+	readonly goal: PlannerResourceGoalTask;
+	readonly graph: PlannerAcquisitionGraph;
+	readonly rest: ReadonlyArray<PlannerGoalTask>;
+	readonly solveSubgoalFx: PlannerGoalSearchSubgoalSolver;
+	readonly targetGoal: PlannerItemGoal;
+}): Effect.fn.Return<PlannerBranchExpansion, PlannerBudgetExceeded> {
+	const result = yield* solveSubgoalFx({
+		agenda: readDelegatedSubgoalAgenda({
+			goal,
+			rest,
+			targetGoal,
+		}),
+		goal: projectResourceGoal(goal),
+		reason: `constructive-subgoal:${goal.itemId}`,
+		runtime: branch.execution.runtime,
+	});
+	const summary: PlannerDelegatedSubgoalSummary = {
+		blockedActionIds: result.type === "inconclusive" ? result.blockedActionIds : [],
+		...(result.type === "inconclusive" && result.budgetLimit !== undefined
+			? {
+					budgetLimit: result.budgetLimit,
+				}
+			: {}),
+		metrics: result.metrics,
+		outcome: result.type,
+		...(result.type === "inconclusive"
+			? {
+					reason: result.reason,
+				}
+			: {}),
+		unsupportedActionIds: result.type === "inconclusive" ? result.unsupportedActionIds : [],
+	};
+
+	if (result.type === "no-finite-path")
+		return {
+			delegatedSubgoal: summary,
+			reason: "dead-end",
+			type: "dead",
+		};
+	if (result.type === "inconclusive")
+		return {
+			branch,
+			delegatedSubgoal: summary,
+			type: "unresolved",
+		};
+
+	const status = readPlannerItemGoalStatus(projectResourceGoal(goal), result.execution.runtime);
+	if (!status.satisfied)
+		return yield* Effect.die(
+			new Error(
+				`Delegated planner subgoal ${goal.itemId} completed with ${status.availableQuantity}/${goal.minimumQuantity} items and ${status.availableCharges}/${goal.minimumCharges} charges.`,
+			),
+		);
+	if (!isPlannerRuntimeQuiescent(result.execution.runtime))
+		return yield* Effect.die(
+			new Error(`Delegated planner subgoal ${goal.itemId} returned a non-quiescent runtime.`),
+		);
+
+	const execution = composePlannerSearchExecution(branch.execution, result.execution);
+	const agendaViability = readPlannerGoalAgendaViability({
+		goals: readAgendaItemGoals(targetGoal, rest),
+		graph,
+		runtime: execution.runtime,
+	});
+	if (agendaViability.type === "dead-end")
+		return {
+			delegatedSubgoal: summary,
+			reason: "dead-end",
+			type: "dead",
+		};
+	return {
+		delegatedSubgoal: summary,
+		children: [
+			{
+				agenda: rest,
+				choicePath: branch.choicePath,
+				execution,
+				...(branch.fallback === undefined
+					? {}
+					: {
+							fallback: branch.fallback,
+						}),
+			},
+		],
+		type: "expanded",
+	};
+});
+
 const readLazyRequirementBranch = ({
 	branch,
 	choices,
@@ -528,10 +706,12 @@ const readLazyRequirementBranch = ({
 const expandPlannerGoalBranchFx = Effect.fn("expandPlannerGoalBranchFx")(function* ({
 	branch,
 	graph,
+	solveSubgoalFx,
 	targetGoal,
 }: {
 	readonly branch: PlannerGoalBranch;
 	readonly graph: PlannerAcquisitionGraph;
+	readonly solveSubgoalFx?: PlannerGoalSearchSubgoalSolver;
 	readonly targetGoal: PlannerItemGoal;
 }): Effect.fn.Return<
 	PlannerBranchExpansion,
@@ -562,10 +742,20 @@ const expandPlannerGoalBranchFx = Effect.fn("expandPlannerGoalBranchFx")(functio
 				],
 				type: "expanded",
 			};
+		if (task.resolution === "subgoal" && solveSubgoalFx !== undefined)
+			return yield* resolveDelegatedResourceGoalFx({
+				branch,
+				goal: task,
+				graph,
+				rest,
+				solveSubgoalFx,
+				targetGoal,
+			});
 
 		const viability = readPlannerGoalViability({
 			goal: {
 				itemId: task.itemId,
+				minimumCharges: task.minimumCharges,
 				quantity: Math.max(1, task.minimumQuantity),
 			},
 			graph,
@@ -707,11 +897,13 @@ const expandPlannerGoalBranchWithinBudgetFx = Effect.fn("expandPlannerGoalBranch
 		branch,
 		budget,
 		graph,
+		solveSubgoalFx,
 		targetGoal,
 	}: {
 		readonly branch: PlannerGoalBranch;
 		readonly budget: PlannerGoalSearchBudget;
 		readonly graph: PlannerAcquisitionGraph;
+		readonly solveSubgoalFx?: PlannerGoalSearchSubgoalSolver;
 		readonly targetGoal: PlannerItemGoal;
 	}): Effect.fn.Return<
 		PlannerBranchBatchResult,
@@ -745,6 +937,7 @@ const expandPlannerGoalBranchWithinBudgetFx = Effect.fn("expandPlannerGoalBranch
 			expansion: yield* expandPlannerGoalBranchFx({
 				branch,
 				graph,
+				solveSubgoalFx,
 				targetGoal,
 			}),
 			type: "expanded",
@@ -758,6 +951,13 @@ const readCounters = (): PlannerGoalSearchCounters => ({
 	blockedBranches: 0,
 	createdBranches: 1,
 	deadEndBranches: 0,
+	delegatedCompletedSubgoals: 0,
+	delegatedExpandedNodes: 0,
+	delegatedInconclusiveSubgoals: 0,
+	delegatedMaximumFrontierSize: 0,
+	delegatedNoFinitePathSubgoals: 0,
+	delegatedSubgoals: 0,
+	delegatedVisitedNodes: 0,
 	duplicateBranches: 0,
 	expandedBranches: 0,
 	maximumAgendaDepth: 1,
@@ -783,16 +983,25 @@ const readDiagnostics = ({
 			}),
 });
 
-const readBudgetLimit = (
-	limits: ReadonlySet<PlannerGoalSearchBudgetLimit>,
-): PlannerGoalSearchBudgetLimit | undefined => {
-	const order: ReadonlyArray<PlannerGoalSearchBudgetLimit> = [
+const readBudgetLimit = (limits: ReadonlySet<string>): string | undefined => {
+	const order: ReadonlyArray<string> = [
 		"maximumExpandedBranches",
 		"maximumQueuedBranches",
 		"maximumTraceLength",
 		"maximumAgendaDepth",
+		"maximumExpandedStates",
+		"maximumQueuedStates",
+		"maximumRoutePlans",
+		"engine-transitions",
+		"strategy-invocations",
+		"delegation-depth",
 	];
-	return order.find((limit) => limits.has(limit));
+	return (
+		order.find((limit) => limits.has(limit)) ??
+		[
+			...limits,
+		].sort(compareIds)[0]
+	);
 };
 
 const readInconclusive = ({
@@ -810,7 +1019,7 @@ const readInconclusive = ({
 	readonly best: PlannerGoalBranch;
 	readonly blockedActionIds: ReadonlySet<string>;
 	readonly budget: PlannerGoalSearchBudget;
-	readonly budgetLimits: ReadonlySet<PlannerGoalSearchBudgetLimit>;
+	readonly budgetLimits: ReadonlySet<string>;
 	readonly counters: PlannerGoalSearchCounters;
 	readonly frontierSize: number;
 	readonly itemId: IdSchema.Type;
@@ -861,8 +1070,10 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 	budget: budgetOverride,
 	graph,
 	itemId,
+	minimumCharges = 0,
 	quantity = 1,
 	runtime,
+	solveSubgoalFx,
 }: searchPlannerGoalFx.Props) {
 	if (!Number.isSafeInteger(quantity) || quantity < 1)
 		return yield* Effect.die(
@@ -870,16 +1081,23 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 				`Planner target quantity must be a positive safe integer, received ${quantity}.`,
 			),
 		);
+	if (!Number.isSafeInteger(minimumCharges) || minimumCharges < 0)
+		return yield* Effect.die(
+			new RangeError(
+				`Planner target minimum charges must be a non-negative safe integer, received ${minimumCharges}.`,
+			),
+		);
 
 	const budget = readPlannerGoalSearchBudget(budgetOverride);
 	const targetGoal: PlannerItemGoal = {
 		itemId,
+		minimumCharges,
 		quantity,
 	};
 	const initialExecution = readInitialExecution(runtime);
 	const initial: PlannerGoalBranch = {
 		agenda: [
-			readInitialResourceGoal(itemId, quantity),
+			readInitialResourceGoal(itemId, quantity, minimumCharges),
 		],
 		choicePath: [],
 		execution: initialExecution,
@@ -951,7 +1169,8 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 
 	const blockedActionIds = new Set<string>();
 	const unsupportedActionIds = new Set<string>();
-	const budgetLimits = new Set<PlannerGoalSearchBudgetLimit>();
+	const budgetLimits = new Set<string>();
+	const delegatedReasons = new Set<PlannerStrategyInconclusiveReason>();
 	const visited = new Set<string>([
 		readBranchKey(initial),
 	]);
@@ -1021,6 +1240,7 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 					branch,
 					budget,
 					graph,
+					solveSubgoalFx,
 					targetGoal,
 				}),
 			{
@@ -1042,6 +1262,26 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 			}
 			const expansion = result.expansion;
 			if (expansion.attemptedActionId !== undefined) counters.attemptedActions += 1;
+			if (expansion.delegatedSubgoal !== undefined) {
+				const delegated = expansion.delegatedSubgoal;
+				counters.delegatedSubgoals += 1;
+				counters.delegatedExpandedNodes += delegated.metrics.expandedNodes;
+				counters.delegatedVisitedNodes += delegated.metrics.visitedNodes;
+				counters.delegatedMaximumFrontierSize = Math.max(
+					counters.delegatedMaximumFrontierSize,
+					delegated.metrics.frontierSize,
+				);
+				if (delegated.outcome === "completed") counters.delegatedCompletedSubgoals += 1;
+				if (delegated.outcome === "no-finite-path")
+					counters.delegatedNoFinitePathSubgoals += 1;
+				if (delegated.outcome === "inconclusive")
+					counters.delegatedInconclusiveSubgoals += 1;
+				if (delegated.budgetLimit !== undefined) budgetLimits.add(delegated.budgetLimit);
+				if (delegated.reason !== undefined) delegatedReasons.add(delegated.reason);
+				for (const actionId of delegated.blockedActionIds) blockedActionIds.add(actionId);
+				for (const actionId of delegated.unsupportedActionIds)
+					unsupportedActionIds.add(actionId);
+			}
 			if (expansion.type === "completed") {
 				completions.push(expansion.branch);
 				continue;
@@ -1059,6 +1299,11 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 					reason: "non-quiescent-runtime",
 					unsupportedActionIds,
 				});
+			if (expansion.type === "unresolved") {
+				counters.backtracks += 1;
+				addFallback(result.branch);
+				continue;
+			}
 			if (expansion.type === "dead") {
 				counters.deadEndBranches += 1;
 				counters.backtracks += 1;
@@ -1156,9 +1401,13 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 		reason:
 			budgetLimits.size > 0
 				? "search-budget"
-				: unsupportedActionIds.size > 0
-					? "action-unsupported"
-					: "search-exhausted",
+				: delegatedReasons.has("non-quiescent-runtime")
+					? "non-quiescent-runtime"
+					: unsupportedActionIds.size > 0 ||
+							delegatedReasons.has("action-unsupported") ||
+							delegatedReasons.has("unsupported-routes")
+						? "action-unsupported"
+						: "search-exhausted",
 		unsupportedActionIds,
 	});
 });

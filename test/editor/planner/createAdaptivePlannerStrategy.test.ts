@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { AdaptivePlannerStrategyDiagnostics } from "~/editor/planner/AdaptivePlannerStrategy";
+import type { PlannerGoalSearchDiagnostics } from "~/editor/planner/PlannerGoalSearch";
 import { PlannerCurrentStrategyFx } from "~/editor/planner/PlannerCurrentStrategyFx";
 import { PlannerSessionFx } from "~/editor/planner/PlannerSessionFx";
 import type {
@@ -119,6 +120,138 @@ const config = GameConfigSchema.parse({
 			type: "producer",
 		},
 		target: simpleItem("target"),
+	},
+});
+
+const delegatedSubgoalConfig = GameConfigSchema.parse({
+	version: "1.0",
+	resources: {
+		hero: "hero",
+	},
+	meta: {
+		id: "game:adaptive-constructive-delegation",
+		title: "Adaptive constructive delegation",
+		board: {
+			height: 1,
+			width: 2,
+		},
+		inventory: {
+			height: 1,
+			width: 1,
+		},
+	},
+	start: {
+		board: [
+			"material-producer",
+			"target-producer",
+		].map((itemId, x) => ({
+			itemId,
+			space: 0,
+			x,
+			y: 0,
+		})),
+		currentSpace: 0,
+	},
+	items: {
+		hero: simpleItem("hero"),
+		"material-producer": {
+			...baseItem({
+				id: "material-producer",
+				scope: "board",
+			}),
+			lines: [
+				{
+					description: "Produce material",
+					id: "line:material-producer:material",
+					input: [
+						{
+							type: "simple",
+						},
+					],
+					output: {
+						set: [
+							{
+								roll: [
+									{
+										drop: [
+											{
+												itemId: "material",
+												quantity: {
+													max: 1,
+													min: 1,
+												},
+												rules: [],
+											},
+										],
+										type: "guaranteed",
+									},
+								],
+							},
+						],
+					},
+					rules: [],
+					runtimeMs: 100,
+					title: "Produce material",
+				},
+			],
+			maxQueueSize: 1,
+			type: "producer",
+		},
+		material: simpleItem("material"),
+		"target-producer": {
+			...baseItem({
+				id: "target-producer",
+				scope: "board",
+			}),
+			lines: [
+				{
+					description: "Produce delegated target",
+					id: "line:target-producer:target",
+					input: [
+						{
+							capacity: 1,
+							mode: "consume",
+							quantity: {
+								max: 1,
+								min: 1,
+							},
+							selector: {
+								itemId: "material",
+								type: "item",
+							},
+							type: "materials",
+						},
+					],
+					output: {
+						set: [
+							{
+								roll: [
+									{
+										drop: [
+											{
+												itemId: "delegated-target",
+												quantity: {
+													max: 1,
+													min: 1,
+												},
+												rules: [],
+											},
+										],
+										type: "guaranteed",
+									},
+								],
+							},
+						],
+					},
+					rules: [],
+					runtimeMs: 200,
+					title: "Produce delegated target",
+				},
+			],
+			maxQueueSize: 1,
+			type: "producer",
+		},
+		"delegated-target": simpleItem("delegated-target"),
 	},
 });
 
@@ -334,6 +467,96 @@ describe("createAdaptivePlannerStrategy", () => {
 		expect(diagnostics.selection).toEqual({
 			reason: "goal-reachable",
 			strategyId: PlannerStrategyId.bestFirst,
+		});
+	});
+
+	it("routes constructive prerequisites back through the adaptive root strategy", async () => {
+		const adaptive = createAdaptivePlannerStrategy({
+			selectFx: ({ problem }) =>
+				Effect.succeed(
+					problem.delegationDepth === 0
+						? {
+								reason: "construct-root-plan",
+								strategyId: PlannerStrategyId.constructive,
+							}
+						: {
+								reason: `solve-${problem.activeGoal.itemId}`,
+								strategyId: PlannerStrategyId.bestFirst,
+							},
+				),
+			strategies: [
+				createBestFirstPlannerStrategy(),
+				createConstructivePlannerStrategy(),
+			],
+		});
+		const planner = Effect.runSync(
+			createPlannerFx({
+				config: delegatedSubgoalConfig,
+				strategy: adaptive,
+			}),
+		);
+		const result = await Effect.runPromise(
+			planner.estimateFx({
+				itemId: "delegated-target",
+			}),
+		);
+
+		expect(result.type).toBe("completed");
+		if (result.type !== "completed") return;
+		expect(result.execution.trace.map(({ actionId }) => actionId)).toEqual([
+			'["line","material-producer","line:material-producer:material"]',
+			'["line","target-producer","line:target-producer:target"]',
+		]);
+		expect(
+			result.sessionDiagnostics.invocations.map(({ goal, path, strategyId }) => ({
+				goal: goal.itemId,
+				path,
+				strategyId,
+			})),
+		).toEqual([
+			{
+				goal: "delegated-target",
+				path: [
+					"adaptive",
+				],
+				strategyId: "adaptive",
+			},
+			{
+				goal: "delegated-target",
+				path: [
+					"adaptive",
+					"constructive",
+				],
+				strategyId: "constructive",
+			},
+			{
+				goal: "material",
+				path: [
+					"adaptive",
+					"constructive",
+					"adaptive",
+				],
+				strategyId: "adaptive",
+			},
+			{
+				goal: "material",
+				path: [
+					"adaptive",
+					"constructive",
+					"adaptive",
+					"best-first",
+				],
+				strategyId: "best-first",
+			},
+		]);
+		const diagnostics = result.strategyDiagnostics as AdaptivePlannerStrategyDiagnostics;
+		const constructiveDiagnostics = diagnostics.child
+			.diagnostics as PlannerGoalSearchDiagnostics;
+		expect(constructiveDiagnostics).toMatchObject({
+			delegatedCompletedSubgoals: 1,
+			delegatedInconclusiveSubgoals: 0,
+			delegatedNoFinitePathSubgoals: 0,
+			delegatedSubgoals: 1,
 		});
 	});
 

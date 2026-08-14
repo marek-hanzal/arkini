@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { createEnginePlannerFx } from "~/editor/planner/createEnginePlannerFx";
 import { readPlannerRuntimeFingerprint } from "~/editor/planner/readPlannerRuntimeFingerprint";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
 const baseItem = ({
 	id,
@@ -333,6 +334,36 @@ describe("constructive engine planner", () => {
 				0,
 				0,
 			],
+		});
+	});
+
+	it("constructs an official multi-step target through the canonical engine", async () => {
+		const config = await readArkiniGameConfigSource();
+		const planner = Effect.runSync(createEnginePlannerFx(config));
+		const result = await Effect.runPromise(
+			planner.constructiveSearchFx("item:double-tree", 1, {
+				maximumAgendaDepth: 256,
+				maximumConcurrentBranches: 4,
+				maximumExpandedBranches: 1_000,
+				maximumQueuedBranches: 512,
+				maximumTraceLength: 500,
+			}),
+		);
+
+		expect(result.type).toBe("completed");
+		if (result.type !== "completed") return;
+		expect(result.execution.runtime.items).toContainEqual(
+			expect.objectContaining({
+				item: expect.objectContaining({
+					id: "item:double-tree",
+				}),
+			}),
+		);
+		expect(result.execution.trace.at(-1)?.action).toEqual({
+			kind: "merge",
+			mergeIndex: 0,
+			sourceItemId: "item:water",
+			targetItemId: "item:tree",
 		});
 	});
 });

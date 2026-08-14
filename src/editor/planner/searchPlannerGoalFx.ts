@@ -19,7 +19,6 @@ import {
 } from "~/editor/planner/PlannerAcquisitionGraph";
 import { composePlannerSearchExecution } from "~/editor/planner/composePlannerSearchExecution";
 import { isPlannerRuntimeQuiescent } from "~/editor/planner/isPlannerRuntimeQuiescent";
-import { readPlannerExpectedEconomicsFx } from "~/editor/planner/readPlannerExpectedEconomicsFx";
 import { readPlannerGoalAgendaViability } from "~/editor/planner/readPlannerGoalAgendaViability";
 import { readPlannerGoalSearchBudget } from "~/editor/planner/readPlannerGoalSearchBudget";
 import { readPlannerGoalViability } from "~/editor/planner/readPlannerGoalViability";
@@ -1148,24 +1147,15 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 			quantity,
 			type: "no-finite-path",
 		} satisfies PlannerGoalSearchResult;
-	if (initialViability.type === "satisfied") {
-		const economics = yield* readPlannerExpectedEconomicsFx({
-			graph,
-			initialRuntime: runtime,
-			itemId,
-			quantity,
-			trace: [],
-		});
+	if (initialViability.type === "satisfied")
 		return {
 			availableQuantity: initialViability.availableQuantity,
 			diagnostics: emptyDiagnostics,
-			economics,
 			execution: initialExecution,
 			itemId,
 			quantity,
 			type: "completed",
 		} satisfies PlannerGoalSearchResult;
-	}
 
 	const blockedActionIds = new Set<string>();
 	const unsupportedActionIds = new Set<string>();
@@ -1194,14 +1184,7 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 
 	while (queue.length > 0) {
 		const readyCompletion = readDeterministicCompletion();
-		if (readyCompletion !== undefined) {
-			const economics = yield* readPlannerExpectedEconomicsFx({
-				graph,
-				initialRuntime: runtime,
-				itemId,
-				quantity,
-				trace: readyCompletion.execution.trace,
-			});
+		if (readyCompletion !== undefined)
 			return {
 				availableQuantity: readPlannerRuntimeQuantity(
 					readyCompletion.execution.runtime,
@@ -1212,13 +1195,11 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 					counters,
 					winningChoicePath: readyCompletion.choicePath,
 				}),
-				economics,
 				execution: readyCompletion.execution,
 				itemId,
 				quantity,
 				type: "completed",
 			} satisfies PlannerGoalSearchResult;
-		}
 
 		if (counters.expandedBranches >= budget.maximumExpandedBranches) {
 			budgetLimits.add("maximumExpandedBranches");
@@ -1366,14 +1347,7 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 	}
 
 	const completion = readDeterministicCompletion() ?? completions.sort(compareBranches)[0];
-	if (completion !== undefined) {
-		const economics = yield* readPlannerExpectedEconomicsFx({
-			graph,
-			initialRuntime: runtime,
-			itemId,
-			quantity,
-			trace: completion.execution.trace,
-		});
+	if (completion !== undefined)
 		return {
 			availableQuantity: readPlannerRuntimeQuantity(completion.execution.runtime, itemId),
 			diagnostics: readDiagnostics({
@@ -1381,13 +1355,11 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 				counters,
 				winningChoicePath: completion.choicePath,
 			}),
-			economics,
 			execution: completion.execution,
 			itemId,
 			quantity,
 			type: "completed",
 		} satisfies PlannerGoalSearchResult;
-	}
 
 	return readInconclusive({
 		best,

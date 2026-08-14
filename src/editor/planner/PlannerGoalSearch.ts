@@ -1,7 +1,6 @@
 import type { Effect } from "effect";
 
 import type { PlannerBudgetExceeded } from "~/editor/planner/PlannerBudget";
-import type { PlannerExpectedEconomics } from "~/editor/planner/PlannerExpectedEconomics";
 import type { PlannerItemGoal } from "~/editor/planner/PlannerGoalViability";
 import type { PlannerSearchExecutionState } from "~/editor/planner/PlannerSearchExecution";
 import type { AnyPlannerStrategyResult } from "~/editor/planner/PlannerStrategy";
@@ -72,7 +71,6 @@ interface PlannerGoalSearchResultBase {
 export type PlannerGoalSearchResult =
 	| (PlannerGoalSearchResultBase & {
 			readonly availableQuantity: number;
-			readonly economics: PlannerExpectedEconomics;
 			readonly execution: PlannerSearchExecutionState;
 			readonly type: "completed";
 	  })

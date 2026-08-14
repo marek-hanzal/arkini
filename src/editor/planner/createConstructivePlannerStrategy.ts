@@ -16,54 +16,6 @@ import { PlannerSessionFx } from "~/editor/planner/PlannerSessionFx";
 import { PlannerStrategyId } from "~/editor/planner/PlannerStrategy";
 import { searchPlannerGoalFx } from "~/editor/planner/searchPlannerGoalFx";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-
-const compareIds = (left: string, right: string) => left.localeCompare(right);
-
-const mergeSubgoalAgenda = (
-	activeGoal: PlannerItemGoal,
-	requestedAgenda: ReadonlyArray<PlannerItemGoal>,
-	parentAgenda: ReadonlyArray<PlannerItemGoal>,
-): ReadonlyArray<PlannerItemGoal> => {
-	const demandByItemId = new Map<
-		IdSchema.Type,
-		{
-			minimumCharges: number;
-			quantity: number;
-		}
-	>();
-	for (const goal of [
-		activeGoal,
-		...requestedAgenda,
-		...parentAgenda,
-	]) {
-		const current = demandByItemId.get(goal.itemId);
-		demandByItemId.set(goal.itemId, {
-			minimumCharges: Math.max(current?.minimumCharges ?? 0, goal.minimumCharges ?? 0),
-			quantity: Math.max(current?.quantity ?? 0, goal.quantity),
-		});
-	}
-	const activeDemand = demandByItemId.get(activeGoal.itemId);
-	if (activeDemand === undefined)
-		throw new Error(`Planner subgoal agenda lost active goal ${activeGoal.itemId}.`);
-	return [
-		{
-			itemId: activeGoal.itemId,
-			minimumCharges: activeDemand.minimumCharges,
-			quantity: activeDemand.quantity,
-		},
-		...[
-			...demandByItemId,
-		]
-			.filter(([itemId]) => itemId !== activeGoal.itemId)
-			.sort(([left], [right]) => compareIds(left, right))
-			.map(([itemId, demand]) => ({
-				itemId,
-				minimumCharges: demand.minimumCharges,
-				quantity: demand.quantity,
-			})),
-	];
-};
 
 const projectConstructiveResult = (
 	result: PlannerGoalSearchResult,
@@ -137,7 +89,7 @@ export const createConstructivePlannerStrategy = ({
 				session
 					.solveSubgoalFx({
 						activeGoal: request.goal,
-						agenda: mergeSubgoalAgenda(request.goal, request.agenda, problem.agenda),
+						agenda: request.agenda,
 						parent: problem,
 						reason: request.reason,
 						runtime: request.runtime,

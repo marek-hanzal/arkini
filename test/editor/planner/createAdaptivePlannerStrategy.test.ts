@@ -337,7 +337,7 @@ describe("createAdaptivePlannerStrategy", () => {
 			readonly strategyInvocations: number;
 		}> = [];
 		const adaptive = createAdaptivePlannerStrategy({
-			selectFx: ({ budget, currentStrategy, problem }) => {
+			selectFx: ({ budget, currentStrategy }) => {
 				selections.push({
 					path: currentStrategy.path,
 					strategyInvocations: budget.snapshot.strategyInvocations,
@@ -562,7 +562,7 @@ describe("createAdaptivePlannerStrategy", () => {
 
 	it("returns inconclusive when the shared session invocation budget is exhausted", async () => {
 		const adaptive = createAdaptivePlannerStrategy({
-			selectFx: ({ currentStrategy, problem }) =>
+			selectFx: ({ currentStrategy }) =>
 				Effect.succeed({
 					reason: "budget-test",
 					strategyId:

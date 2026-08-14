@@ -10,7 +10,6 @@ import {
 	type PlannerGoalSearchResult,
 	type PlannerGoalSearchSubgoalSolver,
 } from "~/editor/planner/PlannerGoalSearch";
-import type { PlannerItemGoal } from "~/editor/planner/PlannerGoalViability";
 import { PlannerKernelFx } from "~/editor/planner/PlannerKernelFx";
 import { PlannerSessionFx } from "~/editor/planner/PlannerSessionFx";
 import { PlannerStrategyId } from "~/editor/planner/PlannerStrategy";

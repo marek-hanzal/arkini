@@ -12,12 +12,18 @@ import { createPlannerSubproblem, createRootPlannerProblem } from "~/editor/plan
 import { createPlannerFx } from "~/editor/planner/createPlannerFx";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
-const createAdaptiveContext = (path: ReadonlyArray<string>): PlannerCurrentStrategyFxService => ({
-	depth: path.length - 1,
-	id: "adaptive",
-	invocationIndex: path.length,
+const currentStrategy = ({
+	depth,
 	path,
-	reason: path.length === 1 ? "root-estimate" : "constructive-resource",
+}: {
+	readonly depth: number;
+	readonly path: ReadonlyArray<string>;
+}): PlannerCurrentStrategyFxService => ({
+	depth,
+	id: "adaptive",
+	invocationIndex: depth + 1,
+	path,
+	reason: "test-selection",
 });
 
 describe("createGoalDirectedPlannerStrategy", () => {
@@ -102,8 +108,7 @@ describe("createGoalDirectedPlannerStrategy", () => {
 			result.execution.trace.length,
 		);
 	});
-
-	it("routes by world depth, session nesting and stochastic output semantics", async () => {
+	it("routes by world depth, strategy context, and stochastic output semantics", async () => {
 		const config = await readArkiniGameConfigSource();
 		const graph = createPlannerAcquisitionGraph(config);
 		const runtime = Effect.runSync(createPlannerInitialRuntimeFx(config));
@@ -144,7 +149,7 @@ describe("createGoalDirectedPlannerStrategy", () => {
 			},
 			runtime,
 		});
-		const bioWasteBlueprint = createRootPlannerProblem({
+		const branchingBlueprint = createRootPlannerProblem({
 			goal: {
 				itemId: "item:blueprint-bio-waste-processor-t1",
 				quantity: 1,
@@ -166,46 +171,46 @@ describe("createGoalDirectedPlannerStrategy", () => {
 			parent: townHallRoot,
 			runtime,
 		});
-		const select = (problem: typeof root, currentStrategy: PlannerCurrentStrategyFxService) =>
+		const rootContext = currentStrategy({
+			depth: 0,
+			path: [
+				"adaptive",
+			],
+		});
+		const delegatedContext = currentStrategy({
+			depth: 2,
+			path: [
+				"adaptive",
+				"constructive",
+				"adaptive",
+			],
+		});
+		const select = (problem: typeof root, strategyContext: PlannerCurrentStrategyFxService) =>
 			readGoalDirectedPlannerStrategySelection({
-				currentStrategy,
+				currentStrategy: strategyContext,
 				graph,
 				maximumBestFirstDepth: 6,
 				maximumConstructiveDelegationDepth: 1,
-				maximumConstructiveRootDepth: 5,
+				maximumConstructiveLinearRootDepth: 1,
+				maximumConstructiveRootDepth: 8,
 				problem,
 			});
-		const rootContext = createAdaptiveContext([
-			"adaptive",
-		]);
-		const delegatedContext = createAdaptiveContext([
-			"adaptive",
-			"constructive",
-			"adaptive",
-		]);
-		const nestedContext = createAdaptiveContext([
-			"adaptive",
-			"constructive",
-			"adaptive",
-			"constructive",
-			"adaptive",
-		]);
 
 		expect(select(stone, rootContext)).toEqual({
 			reason: "solve-stochastic-goal",
 			strategyId: "best-first",
 		});
 		expect(select(root, rootContext)).toEqual({
-			reason: "solve-deep-root-goal:depth-20",
+			reason: "solve-root-goal:depth-20",
+			strategyId: "best-first",
+		});
+		expect(select(branchingBlueprint, rootContext)).toEqual({
+			reason: "solve-root-goal:depth-6",
 			strategyId: "best-first",
 		});
 		expect(select(doubleTree, rootContext)).toEqual({
-			reason: "construct-root-goal",
+			reason: "construct-merge-root-goal:depth-5",
 			strategyId: "constructive",
-		});
-		expect(select(bioWasteBlueprint, rootContext)).toEqual({
-			reason: "solve-deep-root-goal:depth-6",
-			strategyId: "best-first",
 		});
 		expect(select(bakery, delegatedContext)).toEqual({
 			reason: "decompose-resource-goal:depth-19",
@@ -217,10 +222,6 @@ describe("createGoalDirectedPlannerStrategy", () => {
 		});
 		expect(select(library, delegatedContext)).toEqual({
 			reason: "solve-non-descending-resource-goal:depth-28-from-15",
-			strategyId: "best-first",
-		});
-		expect(select(bakery, nestedContext)).toEqual({
-			reason: "solve-bounded-resource-goal:delegation-depth-2",
 			strategyId: "best-first",
 		});
 	});

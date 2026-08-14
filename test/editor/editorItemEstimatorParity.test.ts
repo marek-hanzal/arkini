@@ -299,15 +299,15 @@ describe("legacy/editor engine planner parity boundaries", () => {
 
 	it("keeps a deliberately bounded valid path inconclusive instead of forging impossibility", async () => {
 		const { legacy, planner } = await readParity(parityConfig, "bounded-target", 1, {
-			constructive: {
-				maximumExpandedBranches: 1,
+			bestFirst: {
+				maximumExpandedStates: 1,
 			},
 		});
 
 		expect(legacy.status).toBe("estimated");
 		expect(planner).toMatchObject({
 			planner: {
-				budgetLimit: "maximumExpandedBranches",
+				budgetLimit: "maximumExpandedStates",
 				reason: "search-budget",
 				type: "inconclusive",
 			},

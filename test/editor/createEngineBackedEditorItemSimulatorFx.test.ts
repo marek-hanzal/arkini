@@ -185,7 +185,10 @@ describe("createEngineBackedEditorItemSimulatorFx", () => {
 		const estimate = await simulate(createConfig(), "orphan");
 		expect(estimate).toMatchObject({
 			planner: {
-				diagnostics: null,
+				diagnostics: {
+					attemptedRoutePlans: 0,
+					routePlans: [],
+				},
 				proofType: "no-finite-path",
 				type: "no-finite-path",
 			},

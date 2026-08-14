@@ -1,9 +1,4 @@
-import type { Effect } from "effect";
-
-import type {
-	PlannerAcquisitionGraph,
-	PlannerAcquisitionOutputStatistics,
-} from "~/editor/planner/PlannerAcquisitionGraph";
+import type { PlannerAcquisitionOutputStatistics } from "~/editor/planner/PlannerAcquisitionGraph";
 import type { PlannerAction } from "~/editor/planner/PlannerAction";
 import type { PlannerActionActor } from "~/editor/planner/PlannerActionResult";
 import type { PlannerExpectedEconomics } from "~/editor/planner/PlannerExpectedEconomics";
@@ -156,14 +151,3 @@ export type PlannerSearchResult =
 			readonly unsupportedRoutes: ReadonlyArray<PlannerSearchUnsupportedRoute>;
 			readonly visitedStates: number;
 	  };
-
-/** Reusable engine-backed planner rooted in one immutable authored start runtime. */
-export interface PlannerSearch {
-	readonly graph: PlannerAcquisitionGraph;
-	readonly initialRuntime: RuntimeSchema.Type;
-	readonly searchFx: (
-		itemId: IdSchema.Type,
-		quantity?: number,
-		budget?: Partial<PlannerSearchBudget>,
-	) => Effect.Effect<PlannerSearchResult>;
-}

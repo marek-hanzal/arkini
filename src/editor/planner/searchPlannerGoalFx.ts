@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 
 import type { PlannerBudgetExceeded } from "~/editor/planner/PlannerBudget";
+import type { PlannerBudgetFx } from "~/editor/planner/PlannerBudgetFx";
 import type {
 	PlannerGoalSearchBudget,
 	PlannerGoalSearchBudgetLimit,
@@ -425,7 +426,11 @@ const expandPlannerGoalBranchFx = Effect.fn("expandPlannerGoalBranchFx")(functio
 	readonly branch: PlannerGoalBranch;
 	readonly graph: PlannerAcquisitionGraph;
 	readonly targetGoal: PlannerItemGoal;
-}): Effect.fn.Return<PlannerBranchExpansion, PlannerBudgetExceeded, GameConfigFx> {
+}): Effect.fn.Return<
+	PlannerBranchExpansion,
+	PlannerBudgetExceeded,
+	GameConfigFx | PlannerBudgetFx
+> {
 	if (isTargetGoalSatisfied(targetGoal, branch.execution.runtime))
 		return {
 			branch,
@@ -570,7 +575,11 @@ const expandPlannerGoalBranchWithinBudgetFx = Effect.fn("expandPlannerGoalBranch
 		readonly budget: PlannerGoalSearchBudget;
 		readonly graph: PlannerAcquisitionGraph;
 		readonly targetGoal: PlannerItemGoal;
-	}): Effect.fn.Return<PlannerBranchBatchResult, PlannerBudgetExceeded, GameConfigFx> {
+	}): Effect.fn.Return<
+		PlannerBranchBatchResult,
+		PlannerBudgetExceeded,
+		GameConfigFx | PlannerBudgetFx
+	> {
 		if (isTargetGoalSatisfied(targetGoal, branch.execution.runtime))
 			return {
 				branch,

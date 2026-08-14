@@ -1,8 +1,10 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { PlannerSearchBudget } from "~/editor/planner/PlannerSearch";
-import { createEngineBackedEditorItemSimulatorFx } from "~/editor/simulator/createEngineBackedEditorItemSimulatorFx";
+import {
+	type EditorItemPlannerBudget,
+	createEngineBackedEditorItemSimulatorFx,
+} from "~/editor/simulator/createEngineBackedEditorItemSimulatorFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 
@@ -85,19 +87,19 @@ const createConfig = ({ chance }: { readonly chance?: number } = {}) => {
 	});
 };
 
-const simulate = (
+const simulate = async (
 	config: GameConfigSchema.Type,
 	itemId: string,
 	quantity = 1,
-	budget?: Partial<PlannerSearchBudget>,
+	budget?: EditorItemPlannerBudget,
 ) => {
 	const simulator = Effect.runSync(createEngineBackedEditorItemSimulatorFx(config));
-	return Effect.runSync(simulator.simulateFx(itemId, quantity, budget));
+	return Effect.runPromise(simulator.simulateFx(itemId, quantity, budget));
 };
 
 describe("createEngineBackedEditorItemSimulatorFx", () => {
-	it("projects one deterministic engine-valid trace into the editor facade", () => {
-		const estimate = simulate(createConfig(), "result");
+	it("projects one deterministic engine-valid trace into the editor facade", async () => {
+		const estimate = await simulate(createConfig(), "result");
 		expect(estimate).toMatchObject({
 			cost: [
 				{
@@ -107,15 +109,13 @@ describe("createEngineBackedEditorItemSimulatorFx", () => {
 			],
 			itemId: "result",
 			planner: {
-				diagnostics: {
-					attemptedRoutePlans: 1,
-					winningRoutePlanIndex: 1,
-				},
+				diagnostics: null,
 				expectedActionRuns: 1,
 				observedActionRuns: 1,
 				observedRuntimeMs: 75,
 				outputCertainty: "deterministic",
 				selectedWitnessProbability: 1,
+				strategyId: "adaptive",
 				type: "completed",
 			},
 			quantity: 1,
@@ -123,6 +123,12 @@ describe("createEngineBackedEditorItemSimulatorFx", () => {
 			status: "estimated",
 			totalCostQuantity: 3,
 		});
+		expect(
+			estimate.planner?.sessionDiagnostics.invocations.map(({ strategyId }) => strategyId),
+		).toEqual([
+			"adaptive",
+			"constructive",
+		]);
 		expect(estimate.infrastructureItemIds).toEqual(
 			new Set([
 				"forge",
@@ -140,8 +146,8 @@ describe("createEngineBackedEditorItemSimulatorFx", () => {
 		]);
 	});
 
-	it("keeps concrete stochastic feasibility separate from expected economics", () => {
-		const estimate = simulate(
+	it("keeps concrete stochastic feasibility separate from expected economics", async () => {
+		const estimate = await simulate(
 			createConfig({
 				chance: 0.5,
 			}),
@@ -175,14 +181,11 @@ describe("createEngineBackedEditorItemSimulatorFx", () => {
 		expect(estimate.warnings).toHaveLength(1);
 	});
 
-	it("projects only graph-certified impossibility as no-finite-path", () => {
-		const estimate = simulate(createConfig(), "orphan");
+	it("projects only graph-certified impossibility as no-finite-path", async () => {
+		const estimate = await simulate(createConfig(), "orphan");
 		expect(estimate).toMatchObject({
 			planner: {
-				diagnostics: {
-					attemptedRoutePlans: 0,
-					routePlans: [],
-				},
+				diagnostics: null,
 				proofType: "no-finite-path",
 				type: "no-finite-path",
 			},
@@ -196,17 +199,17 @@ describe("createEngineBackedEditorItemSimulatorFx", () => {
 		);
 	});
 
-	it("preserves bounded search exhaustion as inconclusive", () => {
-		const estimate = simulate(createConfig(), "result", 2, {
-			maximumExpandedStates: 1,
+	it("preserves bounded search exhaustion as inconclusive", async () => {
+		const estimate = await simulate(createConfig(), "result", 2, {
+			constructive: {
+				maximumExpandedBranches: 1,
+			},
 		});
 		expect(estimate).toMatchObject({
 			planner: {
-				bestAvailableQuantity: 1,
-				budgetLimit: "maximumExpandedStates",
-				diagnostics: {
-					attemptedRoutePlans: 1,
-				},
+				bestAvailableQuantity: 0,
+				budgetLimit: "maximumExpandedBranches",
+				diagnostics: null,
 				reason: "search-budget",
 				type: "inconclusive",
 			},

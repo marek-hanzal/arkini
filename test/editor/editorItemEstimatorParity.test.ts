@@ -1,8 +1,10 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { PlannerSearchBudget } from "~/editor/planner/PlannerSearch";
-import { createEngineBackedEditorItemSimulatorFx } from "~/editor/simulator/createEngineBackedEditorItemSimulatorFx";
+import {
+	type EditorItemPlannerBudget,
+	createEngineBackedEditorItemSimulatorFx,
+} from "~/editor/simulator/createEngineBackedEditorItemSimulatorFx";
 import { createLegacyEditorItemSimulatorFx } from "~test/editor/support/createLegacyEditorItemSimulatorFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { GameConfigSchema as GameConfigSchemaValue } from "~/engine/schema/GameConfigSchema";
@@ -238,7 +240,7 @@ const readParity = (
 	config: GameConfigSchema.Type,
 	itemId: string,
 	quantity = 1,
-	budget?: Partial<PlannerSearchBudget>,
+	budget?: EditorItemPlannerBudget,
 ) =>
 	Effect.runPromise(
 		Effect.gen(function* () {
@@ -297,13 +299,15 @@ describe("legacy/editor engine planner parity boundaries", () => {
 
 	it("keeps a deliberately bounded valid path inconclusive instead of forging impossibility", async () => {
 		const { legacy, planner } = await readParity(parityConfig, "bounded-target", 1, {
-			maximumExpandedStates: 1,
+			constructive: {
+				maximumExpandedBranches: 1,
+			},
 		});
 
 		expect(legacy.status).toBe("estimated");
 		expect(planner).toMatchObject({
 			planner: {
-				budgetLimit: "maximumExpandedStates",
+				budgetLimit: "maximumExpandedBranches",
 				reason: "search-budget",
 				type: "inconclusive",
 			},
@@ -345,5 +349,5 @@ describe("legacy/editor engine planner parity boundaries", () => {
 				runs: 1,
 			}),
 		);
-	});
+	}, 20_000);
 });

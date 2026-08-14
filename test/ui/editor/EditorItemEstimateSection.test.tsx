@@ -189,10 +189,9 @@ describe("EditorItemEstimateSection", () => {
 		);
 		expect(method?.textContent).toContain("Concrete witness: 1 actions, 1 s.");
 		expect(method?.textContent).toContain("Expected replay: 1 actions, 1 s.");
-		expect(method?.textContent).toContain("Route plans: 1 tried; plan 1 completed.");
-		expect(method?.textContent).toContain(
-			"Winning plan used the locally shortest authored route choices.",
-		);
+		expect(method?.textContent).toContain("Strategy root: adaptive.");
+		expect(method?.textContent).toContain("Algorithms used: adaptive → constructive.");
+		expect(method?.textContent).not.toContain("Route plans:");
 	});
 
 	it("explains failed shorter plans and the winning authored detour", async () => {

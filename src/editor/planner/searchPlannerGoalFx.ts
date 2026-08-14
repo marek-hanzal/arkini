@@ -18,6 +18,7 @@ import {
 } from "~/editor/planner/PlannerAcquisitionGraph";
 import { isPlannerRuntimeQuiescent } from "~/editor/planner/isPlannerRuntimeQuiescent";
 import { readPlannerExpectedEconomicsFx } from "~/editor/planner/readPlannerExpectedEconomicsFx";
+import { readPlannerGoalAgendaViability } from "~/editor/planner/readPlannerGoalAgendaViability";
 import { readPlannerGoalSearchBudget } from "~/editor/planner/readPlannerGoalSearchBudget";
 import { readPlannerGoalViability } from "~/editor/planner/readPlannerGoalViability";
 import { readPlannerRuntimeChargeCapacity } from "~/editor/planner/readPlannerRuntimeChargeCapacity";
@@ -149,6 +150,23 @@ const isResourceGoalSatisfied = (goal: PlannerResourceGoalTask, runtime: Runtime
 
 const isTargetGoalSatisfied = (goal: PlannerItemGoal, runtime: RuntimeSchema.Type) =>
 	readPlannerRuntimeQuantity(runtime, goal.itemId) >= goal.quantity;
+
+const readAgendaItemGoals = (
+	targetGoal: PlannerItemGoal,
+	agenda: ReadonlyArray<PlannerGoalTask>,
+): ReadonlyArray<PlannerItemGoal> => [
+	targetGoal,
+	...agenda.flatMap((task) =>
+		task.type === "resource"
+			? [
+					{
+						itemId: task.itemId,
+						quantity: Math.max(1, task.minimumQuantity),
+					},
+				]
+			: [],
+	),
+];
 
 const readRequirementSourcePriority = (source: PlannerAcquisitionRequirement["source"]) => {
 	switch (source) {
@@ -654,12 +672,12 @@ const expandPlannerGoalBranchFx = Effect.fn("expandPlannerGoalBranchFx")(functio
 			type: "non-quiescent",
 		};
 
-	const targetViability = readPlannerGoalViability({
-		goal: targetGoal,
+	const agendaViability = readPlannerGoalAgendaViability({
+		goals: readAgendaItemGoals(targetGoal, rest),
 		graph,
 		runtime: transition.state.runtime,
 	});
-	if (targetViability.type === "dead-end")
+	if (agendaViability.type === "dead-end")
 		return {
 			attemptedActionId: task.candidate.id,
 			reason: "dead-end",

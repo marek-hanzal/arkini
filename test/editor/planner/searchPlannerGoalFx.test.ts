@@ -2,7 +2,10 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { createPlannerSearchHarnessFx } from "./support/createPlannerSearchHarnessFx";
-import type { AdaptivePlannerStrategyDiagnostics } from "~/editor/planner/AdaptivePlannerStrategy";
+import type {
+	AdaptivePlannerStrategy,
+	AdaptivePlannerStrategyDiagnostics,
+} from "~/editor/planner/AdaptivePlannerStrategy";
 import type {
 	PlannerGoalSearchBudget,
 	PlannerGoalSearchDiagnostics,
@@ -322,7 +325,9 @@ const search = async ({
 	};
 };
 
-const createConstructiveAdaptiveStrategy = (budget: Partial<PlannerGoalSearchBudget> = {}) =>
+const createConstructiveAdaptiveStrategy = (
+	budget: Partial<PlannerGoalSearchBudget> = {},
+): AdaptivePlannerStrategy =>
 	createAdaptivePlannerStrategy({
 		selectFx: ({ problem }) =>
 			Effect.succeed(

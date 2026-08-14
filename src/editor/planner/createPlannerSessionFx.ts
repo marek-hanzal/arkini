@@ -5,6 +5,7 @@ import { PlannerBudgetFx } from "~/editor/planner/PlannerBudgetFx";
 import { PlannerCurrentStrategyFx } from "~/editor/planner/PlannerCurrentStrategyFx";
 import { createPlannerSubproblem } from "~/editor/planner/PlannerProblem";
 import type { AnyPlannerStrategy } from "~/editor/planner/PlannerStrategyEnvironment";
+import { readPlannerItemGoalStatus } from "~/editor/planner/readPlannerItemGoalStatus";
 import type {
 	PlannerSessionDiagnostics,
 	PlannerSessionFxService,
@@ -117,6 +118,20 @@ export const createPlannerSessionFx = Effect.fn("createPlannerSessionFx")(functi
 		return yield* strategy.solveFx(problem).pipe(
 			Effect.provideService(PlannerBudgetFx, budget),
 			Effect.provideService(PlannerCurrentStrategyFx, currentStrategy),
+			Effect.tap((result) =>
+				result.type !== "completed"
+					? Effect.void
+					: Effect.sync(() => {
+							const status = readPlannerItemGoalStatus(
+								problem.activeGoal,
+								result.execution.runtime,
+							);
+							if (!status.satisfied)
+								throw new Error(
+									`Planner strategy ${strategy.id} reported completion with ${status.availableQuantity}/${problem.activeGoal.quantity} ${problem.activeGoal.itemId} and ${status.availableCharges}/${status.minimumCharges} charges.`,
+								);
+						}),
+			),
 			Effect.tap((result) =>
 				Ref.update(stateRef, (state) =>
 					updateInvocationOutcome(state, claim.invocation.index, result.type),

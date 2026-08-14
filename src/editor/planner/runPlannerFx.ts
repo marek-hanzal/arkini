@@ -11,6 +11,7 @@ import type { PlannerStrategy, PlannerStrategyMetrics } from "~/editor/planner/P
 import type { PlannerStrategyEnvironment } from "~/editor/planner/PlannerStrategyEnvironment";
 import { createPlannerBudgetFx } from "~/editor/planner/createPlannerBudgetFx";
 import { createPlannerSessionFx } from "~/editor/planner/createPlannerSessionFx";
+import { readPlannerItemGoalStatus } from "~/editor/planner/readPlannerItemGoalStatus";
 import { readPlannerRuntimeQuantity } from "~/editor/planner/readPlannerRuntimeQuantity";
 
 export namespace runPlannerFx {
@@ -99,14 +100,11 @@ export const runPlannerFx = Effect.fn("runPlannerFx")(function* <
 
 	switch (result.type) {
 		case "completed": {
-			const availableQuantity = readPlannerRuntimeQuantity(
-				result.execution.runtime,
-				request.itemId,
-			);
-			if (availableQuantity < quantity)
+			const status = readPlannerItemGoalStatus(goal, result.execution.runtime);
+			if (!status.satisfied)
 				return yield* Effect.die(
 					new Error(
-						`Planner strategy ${result.strategyId} reported completion with ${availableQuantity}/${quantity} ${request.itemId}.`,
+						`Planner strategy ${result.strategyId} reported completion with ${status.availableQuantity}/${quantity} ${request.itemId}.`,
 					),
 				);
 			const economics = yield* kernel.readExpectedEconomicsFx({
@@ -117,7 +115,7 @@ export const runPlannerFx = Effect.fn("runPlannerFx")(function* <
 			});
 			return {
 				...common,
-				availableQuantity,
+				availableQuantity: status.availableQuantity,
 				economics,
 				execution: result.execution,
 				type: "completed",

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import type { AdaptivePlannerStrategyDiagnostics } from "~/editor/planner/AdaptivePlannerStrategy";
 import { PlannerCurrentStrategyFx } from "~/editor/planner/PlannerCurrentStrategyFx";
+import { PlannerKernelFx } from "~/editor/planner/PlannerKernelFx";
 import { PlannerSessionFx } from "~/editor/planner/PlannerSessionFx";
 import type {
 	AnyPlannerStrategyResult,
@@ -13,6 +14,7 @@ import type { PlannerStrategyEnvironment } from "~/editor/planner/PlannerStrateg
 import { PlannerStrategyId } from "~/editor/planner/PlannerStrategy";
 import { createAdaptivePlannerStrategy } from "~/editor/planner/createAdaptivePlannerStrategy";
 import { createBestFirstPlannerStrategy } from "~/editor/planner/createBestFirstPlannerStrategy";
+import { createConstructivePlannerStrategy } from "~/editor/planner/createConstructivePlannerStrategy";
 import { createPlannerFx } from "~/editor/planner/createPlannerFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
@@ -275,6 +277,49 @@ describe("createAdaptivePlannerStrategy", () => {
 		expect(result.execution.trace).toHaveLength(1);
 	});
 
+	it("selects a child from the current immutable world and active goal", async () => {
+		const adaptive = createAdaptivePlannerStrategy({
+			selectFx: (problem) =>
+				Effect.gen(function* () {
+					const kernel = yield* PlannerKernelFx;
+					const viability = kernel.readGoalViability({
+						goal: problem.activeGoal,
+						runtime: problem.runtime,
+					});
+					return {
+						reason: `goal-${viability.type}`,
+						strategyId:
+							viability.type === "dead-end"
+								? PlannerStrategyId.constructive
+								: PlannerStrategyId.bestFirst,
+					};
+				}),
+			strategies: [
+				createBestFirstPlannerStrategy(),
+				createConstructivePlannerStrategy(),
+			],
+		});
+		const planner = Effect.runSync(
+			createPlannerFx({
+				config,
+				strategy: adaptive,
+			}),
+		);
+		const result = await Effect.runPromise(
+			planner.estimateFx({
+				itemId: "target",
+			}),
+		);
+
+		expect(result.type).toBe("completed");
+		if (result.type !== "completed") return;
+		const diagnostics = result.strategyDiagnostics as AdaptivePlannerStrategyDiagnostics;
+		expect(diagnostics.selection).toEqual({
+			reason: "goal-reachable",
+			strategyId: PlannerStrategyId.bestFirst,
+		});
+	});
+
 	it("returns inconclusive when the shared session invocation budget is exhausted", async () => {
 		const adaptive = createAdaptivePlannerStrategy({
 			selectFx: (problem) =>
@@ -314,14 +359,24 @@ describe("createAdaptivePlannerStrategy", () => {
 		expect(result.sessionDiagnostics.invocations).toHaveLength(3);
 	});
 
-	it("shares the engine transition budget across strategy execution", async () => {
+	it("shares the engine transition budget across composite strategy execution", async () => {
+		const adaptive = createAdaptivePlannerStrategy({
+			selectFx: () =>
+				Effect.succeed({
+					reason: "exercise-global-transition-budget",
+					strategyId: PlannerStrategyId.bestFirst,
+				}),
+			strategies: [
+				createBestFirstPlannerStrategy(),
+			],
+		});
 		const planner = Effect.runSync(
 			createPlannerFx({
 				budget: {
 					maximumEngineTransitions: 1,
 				},
 				config,
-				strategy: createBestFirstPlannerStrategy(),
+				strategy: adaptive,
 			}),
 		);
 		const result = await Effect.runPromise(
@@ -334,12 +389,12 @@ describe("createAdaptivePlannerStrategy", () => {
 		expect(result).toMatchObject({
 			budgetLimit: "engine-transitions",
 			reason: "session-budget",
-			strategyId: PlannerStrategyId.bestFirst,
+			strategyId: PlannerStrategyId.adaptive,
 			type: "inconclusive",
 		});
 		expect(result.sessionDiagnostics.budget.snapshot).toMatchObject({
 			engineTransitions: 1,
-			strategyInvocations: 1,
+			strategyInvocations: 2,
 		});
 	});
 

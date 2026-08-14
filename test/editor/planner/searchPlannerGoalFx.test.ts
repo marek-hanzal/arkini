@@ -3,7 +3,10 @@ import { describe, expect, it } from "vitest";
 
 import { createPlannerSearchHarnessFx } from "./support/createPlannerSearchHarnessFx";
 import type { AdaptivePlannerStrategyDiagnostics } from "~/editor/planner/AdaptivePlannerStrategy";
-import type { PlannerGoalSearchDiagnostics } from "~/editor/planner/PlannerGoalSearch";
+import type {
+	PlannerGoalSearchBudget,
+	PlannerGoalSearchDiagnostics,
+} from "~/editor/planner/PlannerGoalSearch";
 import { PlannerStrategyId } from "~/editor/planner/PlannerStrategy";
 import { createAdaptivePlannerStrategy } from "~/editor/planner/createAdaptivePlannerStrategy";
 import { createBestFirstPlannerStrategy } from "~/editor/planner/createBestFirstPlannerStrategy";
@@ -319,33 +322,36 @@ const search = async ({
 	};
 };
 
+const createConstructiveAdaptiveStrategy = (budget: Partial<PlannerGoalSearchBudget> = {}) =>
+	createAdaptivePlannerStrategy({
+		selectFx: ({ problem }) =>
+			Effect.succeed(
+				problem.delegationDepth === 0
+					? {
+							reason: `construct-${problem.activeGoal.itemId}`,
+							strategyId: PlannerStrategyId.constructive,
+						}
+					: {
+							reason: `solve-${problem.activeGoal.itemId}`,
+							strategyId: PlannerStrategyId.bestFirst,
+						},
+			),
+		strategies: [
+			createBestFirstPlannerStrategy(),
+			createConstructivePlannerStrategy({
+				budget,
+			}),
+		],
+	});
+
 describe("constructive engine planner", () => {
 	it("delegates destructive prerequisites through adaptive strategy routing and restores the parent branch", async () => {
-		const adaptive = createAdaptivePlannerStrategy({
-			selectFx: ({ problem }) =>
-				Effect.succeed(
-					problem.delegationDepth === 0
-						? {
-								reason: "construct-final-target",
-								strategyId: PlannerStrategyId.constructive,
-							}
-						: {
-								reason: `solve-${problem.activeGoal.itemId}`,
-								strategyId: PlannerStrategyId.bestFirst,
-							},
-				),
-			strategies: [
-				createBestFirstPlannerStrategy(),
-				createConstructivePlannerStrategy({
-					budget: {
-						maximumAgendaDepth: 32,
-						maximumConcurrentBranches: 2,
-						maximumExpandedBranches: 64,
-						maximumQueuedBranches: 32,
-						maximumTraceLength: 16,
-					},
-				}),
-			],
+		const adaptive = createConstructiveAdaptiveStrategy({
+			maximumAgendaDepth: 32,
+			maximumConcurrentBranches: 2,
+			maximumExpandedBranches: 64,
+			maximumQueuedBranches: 32,
+			maximumTraceLength: 16,
 		});
 		const planner = Effect.runSync(
 			createPlannerFx({
@@ -542,5 +548,42 @@ describe("constructive engine planner", () => {
 			sourceItemId: "item:water",
 			targetItemId: "item:tree",
 		});
+	});
+
+	it("constructs an official target across adaptive strategy boundaries", async () => {
+		const config = await readArkiniGameConfigSource();
+		const planner = Effect.runSync(
+			createPlannerFx({
+				config,
+				strategy: createConstructiveAdaptiveStrategy({
+					maximumAgendaDepth: 256,
+					maximumConcurrentBranches: 4,
+					maximumExpandedBranches: 2_000,
+					maximumQueuedBranches: 512,
+					maximumTraceLength: 500,
+				}),
+			}),
+		);
+		const result = await Effect.runPromise(
+			planner.estimateFx({
+				itemId: "item:double-tree",
+			}),
+		);
+
+		expect(result.type).toBe("completed");
+		if (result.type !== "completed") return;
+		expect(result.execution.trace).toHaveLength(8);
+		expect(result.execution.trace.at(-1)?.action).toEqual({
+			kind: "merge",
+			mergeIndex: 0,
+			sourceItemId: "item:water",
+			targetItemId: "item:tree",
+		});
+		expect(result.sessionDiagnostics.invocations.map(({ strategyId }) => strategyId)).toEqual([
+			PlannerStrategyId.adaptive,
+			PlannerStrategyId.constructive,
+			PlannerStrategyId.adaptive,
+			PlannerStrategyId.bestFirst,
+		]);
 	});
 });

@@ -314,6 +314,35 @@ describe("createAdaptivePlannerStrategy", () => {
 		expect(result.sessionDiagnostics.invocations).toHaveLength(3);
 	});
 
+	it("shares the engine transition budget across strategy execution", async () => {
+		const planner = Effect.runSync(
+			createPlannerFx({
+				budget: {
+					maximumEngineTransitions: 1,
+				},
+				config,
+				strategy: createBestFirstPlannerStrategy(),
+			}),
+		);
+		const result = await Effect.runPromise(
+			planner.estimateFx({
+				itemId: "target",
+				quantity: 2,
+			}),
+		);
+
+		expect(result).toMatchObject({
+			budgetLimit: "engine-transitions",
+			reason: "session-budget",
+			strategyId: PlannerStrategyId.bestFirst,
+			type: "inconclusive",
+		});
+		expect(result.sessionDiagnostics.budget.snapshot).toMatchObject({
+			engineTransitions: 1,
+			strategyInvocations: 1,
+		});
+	});
+
 	it("rejects duplicate or unknown child strategy identities", async () => {
 		expect(() =>
 			createAdaptivePlannerStrategy({

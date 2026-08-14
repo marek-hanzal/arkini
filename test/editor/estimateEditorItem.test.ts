@@ -10,7 +10,7 @@ import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameC
 
 describe("estimateEditorItem", () => {
 	const estimateEditorItem = (config: GameConfigSchema.Type, itemId: string, quantity = 1) =>
-		Effect.runSync(simulateEditorItemFx(config, itemId, quantity));
+		Effect.runPromise(simulateEditorItemFx(config, itemId, quantity));
 	const estimateEditorItemIndex = (
 		config: GameConfigSchema.Type,
 		onProgress?: NonNullable<Parameters<typeof estimateEditorItemIndexFx>[1]>["onProgress"],
@@ -152,7 +152,7 @@ describe("estimateEditorItem", () => {
 		});
 	};
 
-	it("keeps an available producer ahead of a faster unavailable production path", () => {
+	it("keeps an available producer ahead of a faster unavailable production path", async () => {
 		const base = createJobTestConfig();
 		const forge = base.items.forge;
 		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
@@ -220,7 +220,7 @@ describe("estimateEditorItem", () => {
 			},
 		});
 
-		const estimate = estimateEditorItem(config, "result");
+		const estimate = await estimateEditorItem(config, "result");
 		expect(estimate.status).toBe("estimated");
 		expect(estimate.runtimeMs).toBe(1_000);
 		expect(estimate.operations).toEqual([
@@ -230,7 +230,7 @@ describe("estimateEditorItem", () => {
 		]);
 	});
 
-	it("requires authored enable-rule infrastructure and applies active runtime rules", () => {
+	it("requires authored enable-rule infrastructure and applies active runtime rules", async () => {
 		const rules = [
 			{
 				type: "enable",
@@ -264,7 +264,7 @@ describe("estimateEditorItem", () => {
 				],
 			},
 		];
-		const blockedEstimate = estimateEditorItem(
+		const blockedEstimate = await estimateEditorItem(
 			createSimulatorConfig({
 				rules,
 			}),
@@ -279,7 +279,7 @@ describe("estimateEditorItem", () => {
 				}),
 			]),
 		);
-		const estimate = estimateEditorItem(
+		const estimate = await estimateEditorItem(
 			createSimulatorConfig({
 				rules,
 				startWithTool: true,
@@ -291,7 +291,7 @@ describe("estimateEditorItem", () => {
 		expect(estimate.infrastructureItemIds).toContain("tool");
 	});
 
-	it("satisfies conditional drop rules before treating an output as producible", () => {
+	it("satisfies conditional drop rules before treating an output as producible", async () => {
 		const dropRules = [
 			{
 				type: "enable",
@@ -310,7 +310,7 @@ describe("estimateEditorItem", () => {
 			},
 		];
 		expect(
-			estimateEditorItem(
+			await estimateEditorItem(
 				createSimulatorConfig({
 					dropRules,
 				}),
@@ -319,7 +319,7 @@ describe("estimateEditorItem", () => {
 		).toMatchObject({
 			status: "no-finite-path",
 		});
-		const estimate = estimateEditorItem(
+		const estimate = await estimateEditorItem(
 			createSimulatorConfig({
 				dropRules,
 				startWithTool: true,
@@ -330,7 +330,7 @@ describe("estimateEditorItem", () => {
 		expect(estimate.infrastructureItemIds).toContain("tool");
 	});
 
-	it("rejects a line when an authored universe-wide disable rule cannot be falsified", () => {
+	it("rejects a line when an authored universe-wide disable rule cannot be falsified", async () => {
 		const rules = [
 			{
 				type: "disable",
@@ -349,15 +349,17 @@ describe("estimateEditorItem", () => {
 			},
 		];
 		expect(
-			estimateEditorItem(
-				createSimulatorConfig({
-					rules,
-				}),
-				"ingot",
+			(
+				await estimateEditorItem(
+					createSimulatorConfig({
+						rules,
+					}),
+					"ingot",
+				)
 			).status,
 		).toBe("estimated");
 		expect(
-			estimateEditorItem(
+			await estimateEditorItem(
 				createSimulatorConfig({
 					rules,
 					startWithTool: true,
@@ -373,10 +375,10 @@ describe("estimateEditorItem", () => {
 		});
 	});
 
-	it("exhausts finite deposits and follows authored deterministic renewal output", () => {
-		const finite = estimateEditorItem(createSimulatorConfig(), "ingot", 3);
+	it("exhausts finite deposits and follows authored deterministic renewal output", async () => {
+		const finite = await estimateEditorItem(createSimulatorConfig(), "ingot", 3);
 		expect(finite.status).toBe("inconclusive");
-		const renewable = estimateEditorItem(
+		const renewable = await estimateEditorItem(
 			createSimulatorConfig({
 				waterRenewal: true,
 			}),
@@ -393,7 +395,7 @@ describe("estimateEditorItem", () => {
 		);
 	});
 
-	it("aggregates every charge paid by the same owner before starting", () => {
+	it("aggregates every charge paid by the same owner before starting", async () => {
 		const base = createSimulatorConfig();
 		const forge = base.items.forge;
 		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
@@ -429,7 +431,7 @@ describe("estimateEditorItem", () => {
 			},
 		});
 
-		expect(estimateEditorItem(config, "ingot")).toMatchObject({
+		expect(await estimateEditorItem(config, "ingot")).toMatchObject({
 			planner: {
 				reason: "search-exhausted",
 				type: "inconclusive",
@@ -438,7 +440,7 @@ describe("estimateEditorItem", () => {
 		});
 	});
 
-	it("re-establishes live rules after the start spends their last deposit", () => {
+	it("re-establishes live rules after the start spends their last deposit", async () => {
 		const enableWhileWaterExists = [
 			{
 				type: "enable",
@@ -473,7 +475,7 @@ describe("estimateEditorItem", () => {
 				},
 			},
 		});
-		expect(estimateEditorItem(finite, "ingot").status).toBe("estimated");
+		expect((await estimateEditorItem(finite, "ingot")).status).toBe("estimated");
 
 		const renewable = createSimulatorConfig({
 			rules: enableWhileWaterExists,
@@ -493,10 +495,10 @@ describe("estimateEditorItem", () => {
 				},
 			},
 		});
-		expect(estimateEditorItem(oneChargeRenewable, "ingot").status).toBe("estimated");
+		expect((await estimateEditorItem(oneChargeRenewable, "ingot")).status).toBe("estimated");
 	});
 
-	it("ignores physical board capacity while preserving board-scope eligibility", () => {
+	it("ignores physical board capacity while preserving board-scope eligibility", async () => {
 		const base = createSimulatorConfig();
 		const forge = base.items.forge;
 		const ingot = base.items.ingot;
@@ -541,10 +543,10 @@ describe("estimateEditorItem", () => {
 			},
 		});
 
-		expect(estimateEditorItem(config, "ingot").status).toBe("estimated");
+		expect((await estimateEditorItem(config, "ingot")).status).toBe("estimated");
 	});
 
-	it("treats spatial rules optimistically and includes additional starting spaces", () => {
+	it("treats spatial rules optimistically and includes additional starting spaces", async () => {
 		const spatialRule = [
 			{
 				type: "enable",
@@ -590,7 +592,7 @@ describe("estimateEditorItem", () => {
 				inventory: [],
 			},
 		});
-		expect(estimateEditorItem(fullBoard, "ingot").status).toBe("estimated");
+		expect((await estimateEditorItem(fullBoard, "ingot")).status).toBe("estimated");
 
 		const universeRule = [
 			{
@@ -627,7 +629,7 @@ describe("estimateEditorItem", () => {
 				],
 			},
 		});
-		expect(estimateEditorItem(withOtherSpaceTool, "ingot").status).toBe("estimated");
+		expect((await estimateEditorItem(withOtherSpaceTool, "ingot")).status).toBe("estimated");
 	});
 
 	it("uses merge, charge-depletion, and temporary-expiry acquisition paths", async () => {
@@ -637,7 +639,7 @@ describe("estimateEditorItem", () => {
 			"item:micro-forest",
 			"item:seed",
 		])
-			expect(estimateEditorItem(official, itemId).status).toBe("estimated");
+			expect((await estimateEditorItem(official, itemId)).status).toBe("estimated");
 
 		const temporaryBase = createTemporaryLifetimeTestConfig();
 		const temporary = GameConfigSchema.parse({
@@ -654,7 +656,7 @@ describe("estimateEditorItem", () => {
 				],
 			},
 		});
-		const estimate = estimateEditorItem(temporary, "result");
+		const estimate = await estimateEditorItem(temporary, "result");
 		expect(estimate.status).toBe("estimated");
 		expect(estimate.runtimeMs).toBe(600);
 	});
@@ -690,7 +692,7 @@ describe("estimateEditorItem", () => {
 
 	it("expands the official Bakery construction through its complete line dependencies", async () => {
 		const config = await readArkiniGameConfigSource();
-		const estimate = estimateEditorItem(config, "producer:bakery-t1");
+		const estimate = await estimateEditorItem(config, "producer:bakery-t1");
 
 		expect(estimate.quantity).toBe(1);
 		expect(estimate.status).toBe("estimated");
@@ -710,7 +712,7 @@ describe("estimateEditorItem", () => {
 		expect(estimate.infrastructureItemIds).toContain("producer:windmill-t1");
 	});
 
-	it("uses expected yield for chance output", () => {
+	it("uses expected yield for chance output", async () => {
 		const base = createJobTestConfig();
 		const forge = base.items.forge;
 		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
@@ -776,7 +778,7 @@ describe("estimateEditorItem", () => {
 			},
 		});
 
-		const estimate = estimateEditorItem(config, "ingot");
+		const estimate = await estimateEditorItem(config, "ingot");
 		expect(estimate).toMatchObject({
 			runtimeMs: 2_000,
 			status: "estimated",

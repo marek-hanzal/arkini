@@ -55,6 +55,7 @@ interface PlannerProducerExpansionCandidate {
 	readonly action: PlannerSearchAction;
 	readonly available: boolean;
 	readonly demandPriority: number;
+	readonly preferredDemandWitness: boolean;
 	readonly purpose: "capability" | "demand" | "novelty";
 	readonly relevantOutputItemIds: ReadonlyArray<IdSchema.Type>;
 }
@@ -234,6 +235,7 @@ const compareCandidates = (
 	return (
 		purposeRank[left.purpose] - purposeRank[right.purpose] ||
 		right.demandPriority - left.demandPriority ||
+		Number(right.preferredDemandWitness) - Number(left.preferredDemandWitness) ||
 		Number(right.action.outputMode === "canonical") -
 			Number(left.action.outputMode === "canonical") ||
 		Number(right.available) - Number(left.available) ||
@@ -388,6 +390,26 @@ export const expandPlannerProducerWorldFx = Effect.fn("expandPlannerProducerWorl
 			route,
 		]),
 	);
+	const canonicalActionIdsByOutputItemId = new Map<IdSchema.Type, Set<string>>();
+	const canonicalQuantityByActionId = new Map<string, ReadonlyMap<IdSchema.Type, number>>();
+	for (const action of actions) {
+		if (action.outputMode !== "canonical") continue;
+		const quantityByItemId = new Map<IdSchema.Type, number>();
+		for (const routeId of action.routeIds) {
+			const route = routeById.get(routeId);
+			if (route === undefined || route.output.stochastic) continue;
+			quantityByItemId.set(
+				route.output.itemId,
+				(quantityByItemId.get(route.output.itemId) ?? 0) + route.output.maximumQuantity,
+			);
+		}
+		canonicalQuantityByActionId.set(action.actionId, quantityByItemId);
+		for (const itemId of quantityByItemId.keys()) {
+			const actionIds = canonicalActionIdsByOutputItemId.get(itemId) ?? new Set<string>();
+			actionIds.add(action.actionId);
+			canonicalActionIdsByOutputItemId.set(itemId, actionIds);
+		}
+	}
 	const ownerOutputItemIdsByItemId = readActionOwnerOutputs(actions);
 	const capabilityItemIds = new Set(ownerOutputItemIdsByItemId.keys());
 	const discoveredItemIds = readRuntimeItemIds(runtime);
@@ -501,6 +523,17 @@ export const expandPlannerProducerWorldFx = Effect.fn("expandPlannerProducerWorl
 		for (const action of actions) {
 			if (blockedFingerprintByCandidateId.get(action.id) === runtimeFingerprint) continue;
 			const demandedOutputs = action.outputItemIds.flatMap((itemId) => {
+				// Treat a stochastic output from another action as incidental while a direct
+				// deterministic producer route exists. A same-action witness remains useful
+				// when its bonus can satisfy demand beyond that action's guaranteed floor.
+				const sameActionCanonicalQuantity =
+					canonicalQuantityByActionId.get(action.actionId)?.get(itemId) ?? 0;
+				if (
+					action.outputMode === "existential" &&
+					sameActionCanonicalQuantity === 0 &&
+					(canonicalActionIdsByOutputItemId.get(itemId)?.size ?? 0) > 0
+				)
+					return [];
 				const demand = demandByItemId.get(itemId);
 				if (demand === undefined) return [];
 				const satisfied = isGoalSatisfied(
@@ -522,10 +555,25 @@ export const expandPlannerProducerWorldFx = Effect.fn("expandPlannerProducerWorl
 			});
 			const available = readCandidateAvailable(action, execution.runtime);
 			if (demandedOutputs.length > 0) {
+				const preferredDemandWitness =
+					action.outputMode === "existential" &&
+					demandedOutputs.some(({ itemId }) => {
+						const demand = demandByItemId.get(itemId);
+						const canonicalQuantity =
+							canonicalQuantityByActionId.get(action.actionId)?.get(itemId) ?? 0;
+						return (
+							demand !== undefined &&
+							canonicalQuantity > 0 &&
+							demand.quantity -
+								readPlannerRuntimeQuantity(execution.runtime, itemId) >
+								canonicalQuantity
+						);
+					});
 				candidates.push({
 					action,
 					available,
 					demandPriority: Math.max(...demandedOutputs.map(({ priority }) => priority)),
+					preferredDemandWitness,
 					purpose: "demand",
 					relevantOutputItemIds: demandedOutputs.map(({ itemId }) => itemId),
 				});
@@ -544,6 +592,7 @@ export const expandPlannerProducerWorldFx = Effect.fn("expandPlannerProducerWorl
 				action,
 				available,
 				demandPriority: -1,
+				preferredDemandWitness: false,
 				purpose: capabilityOutputItemIds.length > 0 ? "capability" : "novelty",
 				relevantOutputItemIds:
 					capabilityOutputItemIds.length > 0

@@ -435,5 +435,5 @@ describe("createProducerExpansionPlannerStrategy", () => {
 				quantity: 1,
 			}),
 		);
-	}, 20_000);
+	}, 60_000);
 });

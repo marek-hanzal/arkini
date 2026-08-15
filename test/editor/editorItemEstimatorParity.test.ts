@@ -302,6 +302,9 @@ describe("legacy/editor engine planner parity boundaries", () => {
 			bestFirst: {
 				maximumExpandedStates: 1,
 			},
+			producerExpansion: {
+				maximumExpandedActions: 1,
+			},
 		});
 
 		expect(legacy.status).toBe("estimated");

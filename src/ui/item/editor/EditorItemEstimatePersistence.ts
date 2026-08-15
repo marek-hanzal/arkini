@@ -11,6 +11,9 @@ export interface EditorItemEstimatePersistenceSnapshot {
 }
 
 export interface EditorItemEstimatePersistenceService {
+	readonly pruneProjectFx: (
+		snapshot: EditorItemEstimatePersistenceSnapshot,
+	) => Effect.Effect<void>;
 	readonly readSnapshotFx: (
 		snapshot: EditorItemEstimatePersistenceSnapshot,
 	) => Effect.Effect<ReadonlyArray<EditorItemSimulation>>;
@@ -21,7 +24,7 @@ export interface EditorItemEstimatePersistenceService {
 }
 
 const databaseName = "arkini-editor-estimates";
-const databaseVersion = 1;
+const databaseVersion = 2;
 const storeName = "estimates";
 
 interface StoredEstimate {
@@ -38,16 +41,18 @@ const openDatabase = () =>
 		const request = indexedDB.open(databaseName, databaseVersion);
 		request.addEventListener("upgradeneeded", () => {
 			const database = request.result;
-			if (!database.objectStoreNames.contains(storeName)) {
-				const store = database.createObjectStore(storeName, {
-					keyPath: [
-						"projectId",
-						"revision",
-						"plannerRevision",
-						"itemId",
-						"quantity",
-					],
-				});
+			const store = database.objectStoreNames.contains(storeName)
+				? request.transaction!.objectStore(storeName)
+				: database.createObjectStore(storeName, {
+						keyPath: [
+							"projectId",
+							"revision",
+							"plannerRevision",
+							"itemId",
+							"quantity",
+						],
+					});
+			if (!store.indexNames.contains("snapshot"))
 				store.createIndex(
 					"snapshot",
 					[
@@ -59,7 +64,10 @@ const openDatabase = () =>
 						unique: false,
 					},
 				);
-			}
+			if (!store.indexNames.contains("project"))
+				store.createIndex("project", "projectId", {
+					unique: false,
+				});
 		});
 		request.addEventListener("success", () => resolve(request.result), {
 			once: true,
@@ -125,6 +133,41 @@ const readSnapshot = async (
 	}
 };
 
+const pruneProject = async (snapshot: EditorItemEstimatePersistenceSnapshot) => {
+	const database = await openDatabase();
+	try {
+		const transaction = database.transaction(storeName, "readwrite");
+		const index = transaction.objectStore(storeName).index("project");
+		const request = index.openCursor(IDBKeyRange.only(snapshot.projectId));
+		await new Promise<void>((resolve, reject) => {
+			request.addEventListener("success", () => {
+				const cursor = request.result;
+				if (cursor === null) {
+					resolve();
+					return;
+				}
+				const value = cursor.value as StoredEstimate;
+				if (
+					value.revision !== snapshot.revision ||
+					value.plannerRevision !== snapshot.plannerRevision
+				)
+					cursor.delete();
+				cursor.continue();
+			});
+			request.addEventListener(
+				"error",
+				() => reject(request.error ?? new Error("Could not prune estimate cache.")),
+				{
+					once: true,
+				},
+			);
+		});
+		await waitForTransaction(transaction);
+	} finally {
+		database.close();
+	}
+};
+
 const writeEstimate = async (
 	snapshot: EditorItemEstimatePersistenceSnapshot,
 	estimate: EditorItemSimulation,
@@ -150,6 +193,10 @@ const available = () => typeof indexedDB !== "undefined";
 
 /** Best-effort persistent cache for derived editor estimates under the stable renderer origin. */
 export const EditorItemEstimatePersistence: EditorItemEstimatePersistenceService = {
+	pruneProjectFx: (snapshot) =>
+		available()
+			? Effect.tryPromise(() => pruneProject(snapshot)).pipe(Effect.catch(() => Effect.void))
+			: Effect.void,
 	readSnapshotFx: (snapshot) =>
 		available()
 			? Effect.tryPromise(() => readSnapshot(snapshot)).pipe(

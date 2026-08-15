@@ -45,6 +45,7 @@ const snapshot = (revision: number): EditorItemEstimateCacheAtom.Snapshot => ({
 const persistence = (
 	persisted: ReadonlyArray<EditorItemSimulation> = [],
 ): EditorItemEstimatePersistenceService => ({
+	pruneProjectFx: vi.fn(() => Effect.void),
 	readSnapshotFx: vi.fn(() => Effect.succeed(persisted)),
 	writeEstimateFx: vi.fn(() => Effect.void),
 });

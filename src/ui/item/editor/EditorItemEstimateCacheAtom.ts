@@ -304,7 +304,9 @@ export const makeEditorItemEstimateCacheAtom = (
 
 	const hydrateRunnerAtom = Atom.fn((snapshot: EditorItemEstimateCacheAtom.Snapshot, get) =>
 		Effect.gen(function* () {
-			const persisted = yield* persistence.readSnapshotFx(persistenceSnapshot(snapshot));
+			const persistedSnapshot = persistenceSnapshot(snapshot);
+			yield* persistence.pruneProjectFx(persistedSnapshot);
+			const persisted = yield* persistence.readSnapshotFx(persistedSnapshot);
 			yield* Atom.update(stateAtom, (current) => {
 				if (!sameSnapshot(current.snapshot, snapshot)) return current;
 				let next = current;

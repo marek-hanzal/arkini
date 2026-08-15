@@ -1,6 +1,5 @@
 import { Data, Effect } from "effect";
 
-import type { EditorItemEstimateIndexProgress } from "~/editor/EditorItemEstimateIndex";
 import EstimateWorker from "~/ui/item/editor/editorItemEstimate.worker.ts?worker";
 import type {
 	EditorItemEstimateWorkerRequest,
@@ -16,11 +15,9 @@ class EditorItemEstimateWorkerError extends Data.TaggedError("EditorItemEstimate
 type RunEstimate = (
 	request: EditorItemEstimateWorkerRequest,
 	worker: Worker,
-	onProgress?: (progress: EditorItemEstimateIndexProgress) => void,
 ) => Promise<EditorItemEstimateWorkerResult>;
 
 interface RunEditorItemEstimateInWorkerOptions {
-	readonly onProgress?: (progress: EditorItemEstimateIndexProgress) => void;
 	readonly runEstimate?: RunEstimate;
 	readonly spawn?: () => Worker;
 }
@@ -45,7 +42,7 @@ export const runEditorItemEstimateInWorkerFx = Effect.fn("runEditorItemEstimateI
 					try: () =>
 						(
 							options.runEstimate ??
-							((request, worker, onProgress) =>
+							((request, worker) =>
 								new Promise((resolve, reject) => {
 									const cleanUp = () => {
 										worker.removeEventListener("message", handleMessage);
@@ -54,10 +51,6 @@ export const runEditorItemEstimateInWorkerFx = Effect.fn("runEditorItemEstimateI
 									const handleMessage = ({
 										data,
 									}: MessageEvent<EditorItemEstimateWorkerResponse>) => {
-										if (data.status === "progress") {
-											onProgress?.(data.progress);
-											return;
-										}
 										cleanUp();
 										if (data.status === "success") resolve(data.result);
 										else reject(new Error(data.message));
@@ -75,7 +68,7 @@ export const runEditorItemEstimateInWorkerFx = Effect.fn("runEditorItemEstimateI
 									worker.addEventListener("error", handleError);
 									worker.postMessage(request);
 								}))
-						)(request, worker, options.onProgress),
+						)(request, worker),
 					catch: (cause) =>
 						new EditorItemEstimateWorkerError({
 							cause,

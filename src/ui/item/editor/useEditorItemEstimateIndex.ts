@@ -11,6 +11,7 @@ import {
 export type EditorItemEstimateIndexState =
 	| {
 			readonly completed: number;
+			readonly entries: ReadonlyArray<EditorItemEstimateIndexEntry>;
 			readonly status: "loading";
 			readonly total: number;
 	  }
@@ -19,6 +20,7 @@ export type EditorItemEstimateIndexState =
 			readonly status: "ready";
 	  }
 	| {
+			readonly entries: ReadonlyArray<EditorItemEstimateIndexEntry>;
 			readonly message: string;
 			readonly status: "error";
 	  };
@@ -28,7 +30,27 @@ const sameSnapshot = (
 	right: EditorItemEstimateCache.Snapshot,
 ) => left?.projectId === right.projectId && left.revision === right.revision;
 
-/** Reads the persistent all-item estimate projection for the current project snapshot. */
+const projectEntries = (
+	state: EditorItemEstimateCache.State,
+	project: EditorProject,
+): ReadonlyArray<EditorItemEstimateIndexEntry> =>
+	Object.keys(project.config.items)
+		.flatMap((itemId) => {
+			const estimate = state.estimates.get(itemId)?.get(1);
+			return estimate === undefined
+				? []
+				: [
+						{
+							itemId,
+							method: "engine-backed" as const,
+							runtimeMs: estimate.runtimeMs,
+							status: estimate.status,
+						},
+					];
+		})
+		.sort((left, right) => left.itemId.localeCompare(right.itemId));
+
+/** Reads authoritative cached results while the same process-lifetime queue fills missing items. */
 export const useEditorItemEstimateIndex = (
 	project: EditorProject,
 ): EditorItemEstimateIndexState => {
@@ -65,22 +87,36 @@ export const useEditorItemEstimateIndex = (
 	if (!sameSnapshot(state.snapshot, snapshot))
 		return {
 			completed: 0,
+			entries: [],
 			status: "loading",
 			total: Object.keys(project.config.items).length,
 		};
-	if (state.indexEntries !== undefined)
+	const entries = projectEntries(state, project);
+	const errors = Object.keys(project.config.items).flatMap((itemId) => {
+		const message = state.errors.get(itemId)?.get(1);
+		return message === undefined
+			? []
+			: [
+					message,
+				];
+	});
+	const total = Object.keys(project.config.items).length;
+	const completed = state.progress.completed;
+	if (completed < total || !state.hydrated)
 		return {
-			entries: state.indexEntries,
-			status: "ready",
+			completed,
+			entries,
+			status: "loading",
+			total,
 		};
-	if (state.indexError !== undefined)
+	if (errors.length > 0)
 		return {
-			message: state.indexError,
+			entries,
+			message: `${errors.length} item estimate${errors.length === 1 ? "" : "s"} failed.`,
 			status: "error",
 		};
 	return {
-		completed: state.progress.completed,
-		status: "loading",
-		total: state.progress.total,
+		entries,
+		status: "ready",
 	};
 };

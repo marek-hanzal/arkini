@@ -74,9 +74,10 @@ export const useEditorItemEstimate = (
 			estimate,
 			status: "ready",
 		};
-	if (state.itemError?.itemId === itemId && state.itemError.quantity === 1)
+	const message = state.errors.get(itemId)?.get(1);
+	if (message !== undefined)
 		return {
-			message: state.itemError.message,
+			message,
 			status: "error",
 		};
 	return {

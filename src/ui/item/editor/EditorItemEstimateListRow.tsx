@@ -9,10 +9,10 @@ const runtimeLabel = (estimate: EditorItemEstimateIndexEntry) => {
 	if (estimate.status === "no-finite-path") return "No path";
 	if (estimate.runtimeMs === undefined) return "—";
 	const duration = RendererRuntime.runSync(formatItemDurationFx(estimate.runtimeMs));
-	return estimate.method === "structural-heuristic" ? `≈ ${duration}` : duration;
+	return duration;
 };
 
-/** Presents one compact projection and links to the authoritative engine-backed detail. */
+/** Presents one compact projection of the authoritative engine-backed cached estimate. */
 export const EditorItemEstimateListRow = ({
 	estimate,
 	item,

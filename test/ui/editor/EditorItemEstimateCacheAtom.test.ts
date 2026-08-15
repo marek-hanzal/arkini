@@ -9,6 +9,7 @@ import {
 	type EditorItemEstimateCacheAtom,
 	makeEditorItemEstimateCacheAtom,
 } from "~/ui/item/editor/EditorItemEstimateCacheAtom";
+import type { EditorItemEstimatePersistenceService } from "~/ui/item/editor/EditorItemEstimatePersistence";
 
 const simulation = (itemId: string, quantity = 1): EditorItemSimulation => ({
 	blockers: [],
@@ -31,6 +32,7 @@ const config = {
 	items: {
 		alpha: {},
 		bravo: {},
+		charlie: {},
 	},
 } as unknown as GameConfigSchema.Type;
 
@@ -38,6 +40,13 @@ const snapshot = (revision: number): EditorItemEstimateCacheAtom.Snapshot => ({
 	config,
 	projectId: "project",
 	revision,
+});
+
+const persistence = (
+	persisted: ReadonlyArray<EditorItemSimulation> = [],
+): EditorItemEstimatePersistenceService => ({
+	readSnapshotFx: vi.fn(() => Effect.succeed(persisted)),
+	writeEstimateFx: vi.fn(() => Effect.void),
 });
 
 const registries: AtomRegistry.AtomRegistry[] = [];
@@ -65,79 +74,20 @@ const waitFor = async (
 };
 
 describe("EditorItemEstimateCacheAtom", () => {
-	it("keeps the structural index separate from authoritative item estimates", async () => {
-		const runIndexPoolFx = vi.fn(() =>
-			Effect.succeed([
-				{
-					itemId: "alpha",
-					method: "structural-heuristic" as const,
-					runtimeMs: 1,
-					status: "estimated" as const,
-				},
-			]),
-		);
-		const runInWorkerFx = vi.fn((request) =>
-			Effect.succeed({
-				estimate:
-					request.type === "item"
-						? simulation(request.itemId, request.quantity)
-						: simulation(""),
-				type: "item" as const,
-			}),
-		);
+	it("hydrates persistent engine estimates and only computes missing index items", async () => {
+		const stored = persistence([
+			simulation("alpha"),
+		]);
+		const computed: string[] = [];
 		const atom = makeEditorItemEstimateCacheAtom({
-			runIndexPoolFx,
-			runInWorkerFx,
-		});
-		const registry = mount(atom);
-		const request = {
-			snapshot: snapshot(1),
-			type: "index" as const,
-		};
-
-		registry.set(atom, request);
-		registry.set(atom, request);
-		await waitFor(registry, atom, (state) => state.indexEntries !== undefined);
-		registry.set(atom, request);
-		registry.set(atom, {
-			itemId: "alpha",
-			quantity: 1,
-			snapshot: snapshot(1),
-			type: "item",
-		});
-		await waitFor(registry, atom, (state) => state.estimates.get("alpha")?.has(1) === true);
-
-		expect(runIndexPoolFx).toHaveBeenCalledTimes(1);
-		expect(runInWorkerFx).toHaveBeenCalledTimes(1);
-		expect(registry.get(atom).estimates.get("alpha")?.get(1)).toEqual(simulation("alpha"));
-	});
-
-	it("keeps quantities distinct and rejects stale revision progress", async () => {
-		let staleOptions:
-			| {
-					onProgress?: (progress: {
-						readonly completed: number;
-						readonly itemId: string;
-						readonly total: number;
-					}) => void;
-			  }
-			| undefined;
-		const runIndexPoolFx = vi.fn((_config, options) => {
-			staleOptions = options;
-			return Effect.never;
-		});
-		const runInWorkerFx = vi.fn((request) =>
-			Effect.succeed({
-				estimate:
-					request.type === "item"
-						? simulation(request.itemId, request.quantity)
-						: simulation(""),
-				type: "item" as const,
-			}),
-		);
-		const atom = makeEditorItemEstimateCacheAtom({
-			runIndexPoolFx,
-			runInWorkerFx,
+			persistence: stored,
+			runInWorkerFx: (request) => {
+				computed.push(request.itemId);
+				return Effect.succeed({
+					estimate: simulation(request.itemId, request.quantity),
+					type: "item" as const,
+				});
+			},
 		});
 		const registry = mount(atom);
 
@@ -145,88 +95,104 @@ describe("EditorItemEstimateCacheAtom", () => {
 			snapshot: snapshot(1),
 			type: "index",
 		});
-		await vi.waitFor(() => expect(runIndexPoolFx).toHaveBeenCalledTimes(1));
+		const state = await waitFor(registry, atom, (current) => current.progress.completed === 3);
+
+		expect(state.estimates.get("alpha")?.has(1)).toBe(true);
+		expect(computed).toEqual([
+			"bravo",
+			"charlie",
+		]);
+		expect(stored.writeEstimateFx).toHaveBeenCalledTimes(2);
+	});
+
+	it("keeps the background queue alive and prioritizes a newly opened item", async () => {
+		const completions = new Map<string, () => void>();
+		const started: string[] = [];
+		const atom = makeEditorItemEstimateCacheAtom({
+			persistence: persistence(),
+			runInWorkerFx: (request) =>
+				Effect.callback((resume) => {
+					started.push(request.itemId);
+					completions.set(request.itemId, () =>
+						resume(
+							Effect.succeed({
+								estimate: simulation(request.itemId, request.quantity),
+								type: "item" as const,
+							}),
+						),
+					);
+				}),
+		});
+		const registry = mount(atom);
+		const current = snapshot(1);
+
+		registry.set(atom, {
+			snapshot: current,
+			type: "index",
+		});
+		await vi.waitFor(() =>
+			expect(started).toEqual([
+				"alpha",
+			]),
+		);
+		registry.set(atom, {
+			itemId: "charlie",
+			quantity: 1,
+			snapshot: current,
+			type: "item",
+		});
+		completions.get("alpha")?.();
+		await vi.waitFor(() =>
+			expect(started).toEqual([
+				"alpha",
+				"charlie",
+			]),
+		);
+		completions.get("charlie")?.();
+		await vi.waitFor(() =>
+			expect(started).toEqual([
+				"alpha",
+				"charlie",
+				"bravo",
+			]),
+		);
+		completions.get("bravo")?.();
+		await waitFor(registry, atom, (state) => state.progress.completed === 3);
+	});
+
+	it("keeps quantities distinct and resets the cache authority on project revision changes", async () => {
+		const stored = persistence();
+		const atom = makeEditorItemEstimateCacheAtom({
+			persistence: stored,
+			runInWorkerFx: (request) =>
+				Effect.succeed({
+					estimate: simulation(request.itemId, request.quantity),
+					type: "item" as const,
+				}),
+		});
+		const registry = mount(atom);
+
 		registry.set(atom, {
 			itemId: "alpha",
 			quantity: 2,
-			snapshot: snapshot(2),
+			snapshot: snapshot(1),
 			type: "item",
 		});
 		await waitFor(registry, atom, (state) => state.estimates.get("alpha")?.has(2) === true);
-		staleOptions?.onProgress?.({
-			completed: 2,
-			itemId: "bravo",
-			total: 2,
-		});
-
-		const state = registry.get(atom);
-		expect(state.snapshot?.revision).toBe(2);
-		expect(state.estimates.get("alpha")?.has(1)).toBe(false);
-		expect(state.estimates.get("alpha")?.has(2)).toBe(true);
-		expect(state.progress.completed).toBe(0);
-	});
-
-	it("releases a queued index after item failure", async () => {
-		const runIndexPoolFx = vi.fn(() => Effect.succeed([]));
-		const runInWorkerFx = vi.fn(() => Effect.fail(new Error("item failed")));
-		const atom = makeEditorItemEstimateCacheAtom({
-			runIndexPoolFx,
-			runInWorkerFx,
-		});
-		const registry = mount(atom);
-		const current = snapshot(1);
-
 		registry.set(atom, {
 			itemId: "alpha",
 			quantity: 1,
-			snapshot: current,
+			snapshot: snapshot(2),
 			type: "item",
 		});
-		registry.set(atom, {
-			snapshot: current,
-			type: "index",
-		});
-
-		await vi.waitFor(() => expect(runIndexPoolFx).toHaveBeenCalledTimes(1));
-	});
-
-	it("releases a deferred item after index failure", async () => {
-		let failIndex: (() => void) | undefined;
-		const runIndexPoolFx = vi.fn(() =>
-			Effect.callback<ReadonlyArray<never>, Error>((resume) => {
-				failIndex = () => resume(Effect.fail(new Error("index failed")));
-			}),
+		const state = await waitFor(
+			registry,
+			atom,
+			(current) =>
+				current.snapshot?.revision === 2 && current.estimates.get("alpha")?.has(1) === true,
 		);
-		const runInWorkerFx = vi.fn((request) =>
-			Effect.succeed({
-				estimate:
-					request.type === "item"
-						? simulation(request.itemId, request.quantity)
-						: simulation(""),
-				type: "item" as const,
-			}),
-		);
-		const atom = makeEditorItemEstimateCacheAtom({
-			runIndexPoolFx,
-			runInWorkerFx,
-		});
-		const registry = mount(atom);
-		const current = snapshot(1);
 
-		registry.set(atom, {
-			snapshot: current,
-			type: "index",
-		});
-		await vi.waitFor(() => expect(failIndex).toBeTypeOf("function"));
-		registry.set(atom, {
-			itemId: "alpha",
-			quantity: 1,
-			snapshot: current,
-			type: "item",
-		});
-		failIndex?.();
-
-		await waitFor(registry, atom, (state) => state.estimates.get("alpha")?.has(1) === true);
-		expect(runInWorkerFx).toHaveBeenCalledTimes(1);
+		expect(state.estimates.get("alpha")?.has(2)).toBe(false);
+		expect(stored.readSnapshotFx).toHaveBeenCalledTimes(2);
 	});
 });

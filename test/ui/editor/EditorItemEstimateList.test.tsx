@@ -76,7 +76,7 @@ beforeEach(() => {
 		entries: [
 			{
 				itemId: "bakery",
-				method: "structural-heuristic",
+				method: "engine-backed",
 				runtimeMs: 120_000,
 				status: "estimated",
 			},
@@ -88,7 +88,7 @@ beforeEach(() => {
 			},
 			{
 				itemId: "well",
-				method: "structural-heuristic",
+				method: "engine-backed",
 				runtimeMs: 60_000,
 				status: "estimated",
 			},
@@ -162,7 +162,7 @@ describe("EditorItemEstimateList", () => {
 		expect(container.textContent).not.toContain("Expected");
 		expect(container.textContent).not.toContain("Guaranteed");
 		expect(container.textContent).not.toContain("Best");
-		expect(container.textContent).toContain("≈ 2 min");
+		expect(container.textContent).toContain("2 min");
 		expect(container.querySelector('[data-ui="EditorItemThumbnail"]')).not.toBeNull();
 		expect(container.querySelector('[aria-label^="Filter items by"]')).toBeNull();
 
@@ -188,13 +188,30 @@ describe("EditorItemEstimateList", () => {
 	it("shows worker progress while the index is being calculated", async () => {
 		state.estimateState = {
 			completed: 2,
+			entries: [
+				{
+					itemId: "water",
+					method: "engine-backed",
+					runtimeMs: 0,
+					status: "estimated",
+				},
+				{
+					itemId: "well",
+					method: "engine-backed",
+					runtimeMs: 60_000,
+					status: "estimated",
+				},
+			],
 			status: "loading",
 			total: 3,
 		};
 		const container = await renderList();
 
 		expect(container.querySelector('[data-ui="EditorItemEstimatesLoading"]')).not.toBeNull();
-		expect(container.textContent).toContain("2 of 3 items calculated.");
-		expect(readVisibleItemIds(container)).toEqual([]);
+		expect(container.textContent).toContain("Calculating estimates: 2 of 3.");
+		expect(readVisibleItemIds(container)).toEqual([
+			"water",
+			"well",
+		]);
 	});
 });

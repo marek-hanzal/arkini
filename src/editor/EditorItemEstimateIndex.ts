@@ -1,7 +1,7 @@
-export type EditorItemEstimateIndexMethod = "engine-backed" | "structural-heuristic";
+export type EditorItemEstimateIndexMethod = "engine-backed";
 export type EditorItemEstimateIndexStatus = "estimated" | "inconclusive" | "no-finite-path";
 
-/** Compact list projection. Detailed item estimates remain engine-backed and authoritative. */
+/** Compact list projection of the same authoritative engine-backed item estimate used by detail. */
 export interface EditorItemEstimateIndexEntry {
 	readonly itemId: string;
 	readonly method: EditorItemEstimateIndexMethod;

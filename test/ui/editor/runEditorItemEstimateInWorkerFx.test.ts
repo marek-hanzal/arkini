@@ -1,6 +1,7 @@
 import { Cause, Effect, Exit, Fiber, Option } from "effect";
 import { describe, expect, it } from "vitest";
 
+import type { EditorItemSimulation } from "~/editor/simulator/EditorItemSimulation";
 import type { EditorItemEstimateWorkerRequest } from "~/ui/item/editor/editorItemEstimateWorkerProtocol";
 import { runEditorItemEstimateInWorkerFx } from "~/ui/item/editor/runEditorItemEstimateInWorkerFx";
 
@@ -18,9 +19,27 @@ const request = {
 	config: {
 		items: {},
 	} as EditorItemEstimateWorkerRequest["config"],
-	itemIds: [],
-	type: "index",
+	itemId: "alpha",
+	quantity: 1,
+	type: "item",
 } satisfies EditorItemEstimateWorkerRequest;
+
+const estimate: EditorItemSimulation = {
+	blockers: [],
+	chargeCost: [],
+	cost: [],
+	infrastructure: [],
+	infrastructureItemIds: new Set(),
+	itemId: "alpha",
+	operations: [],
+	quantity: 1,
+	requiredInfrastructure: [],
+	runtimeMs: 1,
+	status: "estimated",
+	totalChargeCost: 0,
+	totalCostQuantity: 0,
+	warnings: [],
+};
 
 describe("runEditorItemEstimateInWorkerFx", () => {
 	it("returns the worker result and terminates the worker", async () => {
@@ -28,16 +47,16 @@ describe("runEditorItemEstimateInWorkerFx", () => {
 		const result = await Effect.runPromise(
 			runEditorItemEstimateInWorkerFx(request, {
 				runEstimate: async () => ({
-					entries: [],
-					type: "index",
+					estimate,
+					type: "item",
 				}),
 				spawn: () => asWorker(worker),
 			}),
 		);
 
 		expect(result).toEqual({
-			entries: [],
-			type: "index",
+			estimate,
+			type: "item",
 		});
 		expect(worker.terminateCount).toBe(1);
 	});

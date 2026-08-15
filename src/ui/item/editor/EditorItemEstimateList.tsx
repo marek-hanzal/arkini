@@ -25,7 +25,6 @@ export const EditorItemEstimateList = () => {
 	const [query, setQuery] = useState("");
 	const [sort, setSort] = useState<EstimateSort>("fastest");
 	const rows = useMemo(() => {
-		if (state.status !== "ready") return [];
 		const estimates = new Map(
 			state.entries.map((entry) => [
 				entry.itemId,
@@ -88,12 +87,13 @@ export const EditorItemEstimateList = () => {
 			</header>
 			<div className="ak-list grid content-start gap-2 px-3 pt-3 pb-3">
 				{state.status === "loading" ? (
-					<Status
-						dataUi="EditorItemEstimatesLoading"
-						description={`${state.completed} of ${state.total} items calculated.`}
-						icon="icon-[lucide--loader-circle] animate-spin"
-						title="Calculating estimates"
-					/>
+					<p
+						className="px-1 py-2 text-xs text-subtle"
+						data-ui="EditorItemEstimatesLoading"
+					>
+						Calculating estimates: {state.completed} of {state.total}. Cached results
+						remain usable while the queue continues.
+					</p>
 				) : null}
 				{state.status === "error" ? (
 					<Status
@@ -103,7 +103,7 @@ export const EditorItemEstimateList = () => {
 						title="Estimate calculation failed"
 					/>
 				) : null}
-				{state.status === "ready" && rows.length === 0 ? (
+				{state.status !== "loading" && rows.length === 0 ? (
 					<p
 						className="rounded-xl border border-line bg-surface/80 p-4 text-sm text-muted"
 						data-ui="EditorItemEstimateSearchEmpty"

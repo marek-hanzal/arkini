@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { estimateEditorItemIndexFx } from "~/editor/estimateEditorItemIndexFx";
 import { simulateEditorItemFx } from "~/editor/simulator/simulateEditorItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
@@ -11,15 +10,6 @@ import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameC
 describe("estimateEditorItem", () => {
 	const estimateEditorItem = (config: GameConfigSchema.Type, itemId: string, quantity = 1) =>
 		Effect.runPromise(simulateEditorItemFx(config, itemId, quantity));
-	const estimateEditorItemIndex = (
-		config: GameConfigSchema.Type,
-		onProgress?: NonNullable<Parameters<typeof estimateEditorItemIndexFx>[1]>["onProgress"],
-	) =>
-		Effect.runSync(
-			estimateEditorItemIndexFx(config, {
-				onProgress,
-			}),
-		);
 	const createSimulatorConfig = ({
 		dropRules = [],
 		rules = [],
@@ -661,35 +651,6 @@ describe("estimateEditorItem", () => {
 		expect(estimate.runtimeMs).toBe(600);
 	});
 
-	it("indexes every item and reports incremental progress", () => {
-		const config = createJobTestConfig();
-		const progress: Array<{
-			readonly completed: number;
-			readonly itemId: string;
-			readonly total: number;
-		}> = [];
-
-		const entries = estimateEditorItemIndex(config, (update) => {
-			progress.push(update);
-		});
-
-		expect(entries.map(({ itemId }) => itemId)).toEqual(
-			Object.keys(config.items).sort((left, right) => left.localeCompare(right)),
-		);
-		expect(progress).toHaveLength(entries.length);
-		expect(progress.at(-1)).toEqual({
-			completed: entries.length,
-			itemId: entries.at(-1)?.itemId,
-			total: entries.length,
-		});
-		expect(entries.find(({ itemId }) => itemId === "water")).toEqual({
-			itemId: "water",
-			method: "structural-heuristic",
-			runtimeMs: undefined,
-			status: "no-finite-path",
-		});
-	});
-
 	it("expands the official Bakery construction through its complete line dependencies", async () => {
 		const config = await readArkiniGameConfigSource();
 		const estimate = await estimateEditorItem(config, "producer:bakery-t1");
@@ -770,10 +731,11 @@ describe("estimateEditorItem", () => {
 				}),
 			);
 		}
-		expect(estimate.planner?.observedActionRuns).toBeLessThan(
-			estimate.planner?.sessionDiagnostics.budget.snapshot.engineTransitions ??
-				Number.POSITIVE_INFINITY,
-		);
+		expect(estimate.planner?.type).toBe("completed");
+		if (estimate.planner?.type === "completed")
+			expect(estimate.planner.observedActionRuns).toBeLessThan(
+				estimate.planner.sessionDiagnostics.budget.snapshot.engineTransitions,
+			);
 	}, 60_000);
 
 	it("projects the official Lumberjack and Tree charge into the log estimate", async () => {

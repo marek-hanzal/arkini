@@ -243,11 +243,24 @@ export const projectPlannerResult = ({
 				itemId,
 				quantity,
 			}));
+			const chargeCost = result.economics.expectedSpentCharges.map(({ charges, itemId }) => ({
+				charges,
+				itemId,
+			}));
 			const infrastructure = result.economics.expectedAcquiredItems.filter(
 				({ itemId }) => infrastructureItemIds.has(itemId) && itemId !== result.itemId,
 			);
+			const constructedInfrastructureItemIds = new Set(
+				infrastructure.map(({ itemId }) => itemId),
+			);
+			const requiredInfrastructure = result.economics.requiredInitialActors.filter(
+				({ itemId }) =>
+					config.items[itemId]?.type === "producer" &&
+					!constructedInfrastructureItemIds.has(itemId),
+			);
 			return {
 				blockers: [],
+				chargeCost,
 				cost,
 				infrastructure,
 				infrastructureItemIds,
@@ -269,8 +282,10 @@ export const projectPlannerResult = ({
 					visitedStates: result.strategyMetrics.visitedNodes,
 				},
 				quantity: result.quantity,
+				requiredInfrastructure,
 				runtimeMs: result.economics.expectedElapsedMs,
 				status: "estimated",
+				totalChargeCost: result.economics.totalExpectedSpentCharges,
 				totalCostQuantity: result.economics.totalExpectedConsumedQuantity,
 				warnings:
 					result.execution.outputCertainty === "possible"
@@ -283,6 +298,7 @@ export const projectPlannerResult = ({
 		case "no-finite-path":
 			return {
 				blockers: readNoFinitePathBlockers(graph, result),
+				chargeCost: [],
 				cost: [],
 				infrastructure: [],
 				infrastructureItemIds: new Set(),
@@ -294,13 +310,16 @@ export const projectPlannerResult = ({
 					type: "no-finite-path",
 				},
 				quantity: result.quantity,
+				requiredInfrastructure: [],
 				status: "no-finite-path",
+				totalChargeCost: 0,
 				totalCostQuantity: 0,
 				warnings: [],
 			};
 		case "inconclusive":
 			return {
 				blockers: [],
+				chargeCost: [],
 				cost: [],
 				infrastructure: [],
 				infrastructureItemIds: new Set(),
@@ -320,7 +339,9 @@ export const projectPlannerResult = ({
 					visitedStates: result.strategyMetrics.visitedNodes,
 				},
 				quantity: result.quantity,
+				requiredInfrastructure: [],
 				status: "inconclusive",
+				totalChargeCost: 0,
 				totalCostQuantity: 0,
 				warnings: [
 					readInconclusiveWarning(result),

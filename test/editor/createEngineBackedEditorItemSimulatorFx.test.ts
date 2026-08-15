@@ -101,6 +101,7 @@ describe("createEngineBackedEditorItemSimulatorFx", () => {
 	it("projects one deterministic engine-valid trace into the editor facade", async () => {
 		const estimate = await simulate(createConfig(), "result");
 		expect(estimate).toMatchObject({
+			chargeCost: [],
 			cost: [
 				{
 					itemId: "water",
@@ -119,8 +120,15 @@ describe("createEngineBackedEditorItemSimulatorFx", () => {
 				type: "completed",
 			},
 			quantity: 1,
+			requiredInfrastructure: [
+				{
+					itemId: "forge",
+					quantity: 1,
+				},
+			],
 			runtimeMs: 75,
 			status: "estimated",
+			totalChargeCost: 0,
 			totalCostQuantity: 3,
 		});
 		expect(

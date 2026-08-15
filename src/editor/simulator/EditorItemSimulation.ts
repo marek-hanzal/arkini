@@ -22,6 +22,11 @@ export interface EditorItemSimulationInfrastructure {
 	readonly readyAtMs: number;
 }
 
+export interface EditorItemSimulationRequiredInfrastructure {
+	readonly itemId: string;
+	readonly quantity: number;
+}
+
 export interface EditorItemSimulationChargeCost {
 	readonly charges: number;
 	readonly itemId: string;
@@ -93,9 +98,14 @@ export interface EditorItemSimulation {
 	readonly status: "estimated" | "inconclusive" | "no-finite-path";
 	readonly runtimeMs?: number;
 	readonly cost: ReadonlyArray<EditorItemSimulationCost>;
+	/** Canonical charge units spent by the selected expected trace replay. */
+	readonly chargeCost: ReadonlyArray<EditorItemSimulationChargeCost>;
 	/** Infrastructure created by the selected witness, excluding infrastructure already in start. */
 	readonly infrastructure: ReadonlyArray<EditorItemSimulationInfrastructure>;
+	/** Initially available producers actually required by the selected witness. */
+	readonly requiredInfrastructure: ReadonlyArray<EditorItemSimulationRequiredInfrastructure>;
 	readonly totalCostQuantity: number;
+	readonly totalChargeCost: number;
 	readonly infrastructureItemIds: ReadonlySet<string>;
 	readonly operations: ReadonlyArray<EditorItemSimulationOperation>;
 	readonly blockers: ReadonlyArray<EditorItemSimulationBlocker>;

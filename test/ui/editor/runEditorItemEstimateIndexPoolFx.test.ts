@@ -8,14 +8,17 @@ import { runEditorItemEstimateIndexPoolFx } from "~/ui/item/editor/runEditorItem
 
 const simulation = (itemId: string, runtimeMs: number): EditorItemSimulation => ({
 	blockers: [],
+	chargeCost: [],
 	cost: [],
 	infrastructure: [],
 	infrastructureItemIds: new Set(),
 	itemId,
 	operations: [],
 	quantity: 1,
+	requiredInfrastructure: [],
 	runtimeMs,
 	status: "estimated",
+	totalChargeCost: 0,
 	totalCostQuantity: 0,
 	warnings: [],
 });

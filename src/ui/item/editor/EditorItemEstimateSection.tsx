@@ -17,6 +17,9 @@ const BlockerTitle = {
 const formatQuantity = (quantity: number) =>
 	Number.isInteger(quantity) ? String(quantity) : quantity.toFixed(2).replace(/\.00$/, "");
 
+const formatCountLabel = (quantity: number, singular: string, plural = `${singular}s`) =>
+	`${formatQuantity(quantity)} ${quantity === 1 ? singular : plural}`;
+
 const formatRuntime = (runtimeMs: number) =>
 	RendererRuntime.runSync(formatItemDurationFx(runtimeMs));
 
@@ -136,12 +139,14 @@ const EditorItemEstimateItemRow = ({
 	quantity,
 	readyAtMs,
 	config,
+	unit,
 }: {
 	readonly config: ReturnType<typeof useEditorProject>["config"];
 	readonly itemId: string;
 	readonly projectId: string;
 	readonly quantity: number;
 	readonly readyAtMs?: number;
+	readonly unit?: "charge";
 }) => {
 	const item = config.items[itemId];
 	return (
@@ -163,6 +168,7 @@ const EditorItemEstimateItemRow = ({
 			<div className="shrink-0 text-right">
 				<strong className="block tabular-nums text-foreground">
 					× {formatQuantity(quantity)}
+					{unit === "charge" ? ` ${quantity === 1 ? "charge" : "charges"}` : ""}
 				</strong>
 				{readyAtMs === undefined ? null : (
 					<span className="block text-[0.6875rem] tabular-nums text-muted">
@@ -185,12 +191,33 @@ const EditorItemEstimateResultCard = ({
 }) => {
 	const summary = (() => {
 		switch (estimate.status) {
-			case "estimated":
+			case "estimated": {
+				const detail = [
+					formatCountLabel(estimate.cost.length, "consumed item type"),
+					formatCountLabel(estimate.chargeCost.length, "spent charge type"),
+					formatCountLabel(
+						estimate.requiredInfrastructure.length,
+						"required infrastructure type",
+					),
+					formatCountLabel(estimate.infrastructure.length, "constructed item type"),
+				].join(" · ");
+				const value =
+					estimate.totalCostQuantity > 0 && estimate.totalChargeCost > 0
+						? `${formatCountLabel(estimate.totalCostQuantity, "item")} + ${formatCountLabel(estimate.totalChargeCost, "charge")}`
+						: estimate.totalCostQuantity > 0
+							? formatCountLabel(estimate.totalCostQuantity, "item")
+							: estimate.totalChargeCost > 0
+								? formatCountLabel(estimate.totalChargeCost, "charge")
+								: estimate.requiredInfrastructure.length > 0 ||
+										estimate.infrastructure.length > 0
+									? "No consumables"
+									: "0 items";
 				return {
-					detail: `${estimate.cost.length} consumed item types · ${estimate.infrastructure.length} constructed item types`,
+					detail,
 					title: "Expected",
-					value: `${formatQuantity(estimate.totalCostQuantity)} items`,
+					value,
 				};
+			}
 			case "no-finite-path":
 				return {
 					detail: `${estimate.blockers.length} production ${estimate.blockers.length === 1 ? "blocker" : "blockers"}`,
@@ -270,12 +297,33 @@ const EditorItemEstimateResultCard = ({
 						<p key={warning}>{warning}</p>
 					))}
 				</div>
-			) : estimate.cost.length === 0 && estimate.infrastructure.length === 0 ? (
+			) : estimate.cost.length === 0 &&
+				estimate.chargeCost.length === 0 &&
+				estimate.infrastructure.length === 0 &&
+				estimate.requiredInfrastructure.length === 0 ? (
 				<p className="py-4 text-sm text-muted">
-					No consumed items or constructed infrastructure.
+					No consumed items, spent charges, or required infrastructure.
 				</p>
 			) : (
 				<div className="min-h-0 flex-1 overflow-y-auto pr-1">
+					{estimate.requiredInfrastructure.length === 0 ? null : (
+						<section data-ui="EditorItemEstimateRequiredInfrastructure">
+							<h4 className="sticky top-0 z-10 border-b border-line/70 bg-surface-raised py-2 text-[0.6875rem] font-semibold uppercase tracking-wide text-muted">
+								Required existing infrastructure
+							</h4>
+							<ul className="divide-y divide-line/60">
+								{estimate.requiredInfrastructure.map(({ itemId, quantity }) => (
+									<EditorItemEstimateItemRow
+										config={config}
+										itemId={itemId}
+										key={itemId}
+										projectId={projectId}
+										quantity={quantity}
+									/>
+								))}
+							</ul>
+						</section>
+					)}
 					{estimate.infrastructure.length === 0 ? null : (
 						<section data-ui="EditorItemEstimateInfrastructure">
 							<h4 className="sticky top-0 z-10 border-b border-line/70 bg-surface-raised py-2 text-[0.6875rem] font-semibold uppercase tracking-wide text-muted">
@@ -308,6 +356,25 @@ const EditorItemEstimateResultCard = ({
 										key={itemId}
 										projectId={projectId}
 										quantity={quantity}
+									/>
+								))}
+							</ul>
+						</section>
+					)}
+					{estimate.chargeCost.length === 0 ? null : (
+						<section data-ui="EditorItemEstimateCharges">
+							<h4 className="sticky top-0 z-10 border-b border-line/70 bg-surface-raised py-2 text-[0.6875rem] font-semibold uppercase tracking-wide text-muted">
+								Spent charges
+							</h4>
+							<ul className="divide-y divide-line/60">
+								{estimate.chargeCost.map(({ charges, itemId }) => (
+									<EditorItemEstimateItemRow
+										config={config}
+										itemId={itemId}
+										key={itemId}
+										projectId={projectId}
+										quantity={charges}
+										unit="charge"
 									/>
 								))}
 							</ul>

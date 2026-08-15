@@ -524,6 +524,44 @@ const readExpectedChargeQuantities = (
 		}))
 		.sort((left, right) => compareIds(left.itemId, right.itemId));
 
+const readRequiredInitialActors = ({
+	initialRuntime,
+	trace,
+}: Pick<
+	readPlannerExpectedEconomicsFx.Props,
+	"initialRuntime" | "trace"
+>): PlannerExpectedEconomics["requiredInitialActors"] => {
+	const initialItemIdByRuntimeItemId = new Map(
+		initialRuntime.items.map((runtimeItem) => [
+			runtimeItem.id,
+			runtimeItem.item.id,
+		]),
+	);
+	const runtimeItemIdsByItemId = new Map<IdSchema.Type, Set<IdSchema.Type>>();
+
+	for (const step of trace) {
+		if (step.action.kind !== "line" || step.actor.kind !== "line") continue;
+		if (
+			initialItemIdByRuntimeItemId.get(step.actor.ownerRuntimeItemId) !==
+			step.action.ownerItemId
+		)
+			continue;
+		const runtimeItemIds =
+			runtimeItemIdsByItemId.get(step.action.ownerItemId) ?? new Set<IdSchema.Type>();
+		runtimeItemIds.add(step.actor.ownerRuntimeItemId);
+		runtimeItemIdsByItemId.set(step.action.ownerItemId, runtimeItemIds);
+	}
+
+	return [
+		...runtimeItemIdsByItemId,
+	]
+		.map(([itemId, runtimeItemIds]) => ({
+			itemId,
+			quantity: runtimeItemIds.size,
+		}))
+		.sort((left, right) => compareIds(left.itemId, right.itemId));
+};
+
 /** Estimates independent replay economics for one concrete engine-valid planner trace. */
 export const readPlannerExpectedEconomicsFx = Effect.fn("readPlannerExpectedEconomicsFx")(
 	(props: readPlannerExpectedEconomicsFx.Props) =>
@@ -589,6 +627,7 @@ export const readPlannerExpectedEconomicsFx = Effect.fn("readPlannerExpectedEcon
 			const expectedAcquiredItems = readExpectedAcquiredItems(expectedAcquiredByItemId);
 			const expectedConsumedItems = readExpectedItemQuantities(expectedConsumedByItemId);
 			const expectedSpentCharges = readExpectedChargeQuantities(expectedSpentChargesByItemId);
+			const requiredInitialActors = readRequiredInitialActors(props);
 			const initialTargetQuantity = props.initialRuntime.items.reduce(
 				(total, item) => total + (item.item.id === props.itemId ? item.quantity : 0),
 				0,
@@ -622,6 +661,7 @@ export const readPlannerExpectedEconomicsFx = Effect.fn("readPlannerExpectedEcon
 				expectedAcquiredItems,
 				expectedConsumedItems,
 				expectedElapsedMs,
+				requiredInitialActors,
 				expectedSpentCharges,
 				initialTargetQuantity,
 				method: "selected-trace-replay",

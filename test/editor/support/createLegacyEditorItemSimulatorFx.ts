@@ -1435,13 +1435,16 @@ const estimateEditorItem = (
 	const result = requireItem(initialState, itemId, quantity, false, new Set());
 	if (result === undefined)
 		return {
+			chargeCost: [],
 			itemId,
 			quantity,
 			status: "no-finite-path",
 			cost: [],
+			totalChargeCost: 0,
 			totalCostQuantity: 0,
 			infrastructure: [],
 			infrastructureItemIds: new Set(),
+			requiredInfrastructure: [],
 			operations: [],
 			blockers: [
 				...blockers.values(),
@@ -1460,14 +1463,17 @@ const estimateEditorItem = (
 			quantity: costQuantity,
 		}));
 	return {
+		chargeCost: [],
 		itemId,
 		quantity,
 		status: "estimated",
 		runtimeMs: result.runtimeMs,
 		cost,
+		totalChargeCost: 0,
 		totalCostQuantity: cost.reduce((total, costItem) => total + costItem.quantity, 0),
 		infrastructure: [],
 		infrastructureItemIds: result.infrastructureItemIds,
+		requiredInfrastructure: [],
 		operations: [
 			...result.operations.values(),
 		],

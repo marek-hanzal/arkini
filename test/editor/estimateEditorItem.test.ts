@@ -756,6 +756,39 @@ describe("estimateEditorItem", () => {
 		);
 	}, 60_000);
 
+	it("projects the official Lumberjack and Tree charge into the log estimate", async () => {
+		const config = await readArkiniGameConfigSource();
+		const estimate = await estimateEditorItem(config, "item:log");
+
+		expect(estimate).toMatchObject({
+			chargeCost: [
+				{
+					charges: 1,
+					itemId: "item:tree",
+				},
+			],
+			cost: [],
+			requiredInfrastructure: [
+				{
+					itemId: "producer:lumberjack-t1",
+					quantity: 1,
+				},
+			],
+			runtimeMs: 7_000,
+			status: "estimated",
+			totalChargeCost: 1,
+			totalCostQuantity: 0,
+		});
+		expect(estimate.operations).toContainEqual(
+			expect.objectContaining({
+				lineId: "line:lumberjack-t1:log",
+				ownerItemId: "producer:lumberjack-t1",
+				runs: 1,
+				runtimeMs: 7_000,
+			}),
+		);
+	});
+
 	it("uses expected yield for chance output", async () => {
 		const base = createJobTestConfig();
 		const forge = base.items.forge;

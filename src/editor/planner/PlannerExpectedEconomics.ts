@@ -19,6 +19,10 @@ export interface PlannerExpectedEconomicsItemQuantity {
 	readonly quantity: number;
 }
 
+/** One initially available line owner required by the selected witness. */
+export interface PlannerExpectedEconomicsRequiredActor
+	extends PlannerExpectedEconomicsItemQuantity {}
+
 /** One canonical item quantity produced by the selected expected trace replay. */
 export interface PlannerExpectedEconomicsAcquiredItem extends PlannerExpectedEconomicsItemQuantity {
 	/** Expected elapsed time when the complete aggregated quantity has become available. */
@@ -43,6 +47,8 @@ export interface PlannerExpectedEconomics {
 	/** Direct net canonical item removals across the expected selected-trace replay. */
 	readonly expectedConsumedItems: ReadonlyArray<PlannerExpectedEconomicsItemQuantity>;
 	readonly expectedElapsedMs: number;
+	/** Initially available line owners actually used by the selected concrete witness. */
+	readonly requiredInitialActors: ReadonlyArray<PlannerExpectedEconomicsRequiredActor>;
 	/** Canonical charge units spent, including non-terminal spends. */
 	readonly expectedSpentCharges: ReadonlyArray<PlannerExpectedEconomicsChargeQuantity>;
 	readonly initialTargetQuantity: number;

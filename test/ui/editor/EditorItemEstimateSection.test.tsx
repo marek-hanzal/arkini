@@ -176,6 +176,9 @@ describe("EditorItemEstimateSection", () => {
 		);
 		expect(estimate.textContent).not.toContain("Start items cost no time.");
 		expect(result?.textContent).toContain("3 items");
+		expect(result?.textContent).toContain("1 required infrastructure type");
+		expect(result?.textContent).toContain("Required existing infrastructure");
+		expect(result?.querySelector('a[data-item-id="forge"]')).not.toBeNull();
 		expect(result?.textContent).toContain("water");
 		expect(result?.textContent).toContain("× 3");
 		expect(result?.querySelector('a[data-item-id="water"]')).not.toBeNull();
@@ -194,6 +197,81 @@ describe("EditorItemEstimateSection", () => {
 		expect(method?.textContent).not.toContain("Route plans:");
 	});
 
+	it("shows charge-only cost and required existing infrastructure", async () => {
+		const config = createJobTestConfig();
+		const project: EditorProject = {
+			projectId: "estimate-test",
+			title: "Estimate test",
+			game: "1.0",
+			createdAtMs: 1,
+			updatedAtMs: 1,
+			revision: 0,
+			config,
+			resources: [],
+		};
+		state.estimateState = {
+			estimate: {
+				blockers: [],
+				chargeCost: [
+					{
+						charges: 1,
+						itemId: "water",
+					},
+				],
+				cost: [],
+				infrastructure: [],
+				infrastructureItemIds: new Set([
+					"forge",
+					"water",
+				]),
+				itemId: "tool",
+				operations: [],
+				quantity: 1,
+				requiredInfrastructure: [
+					{
+						itemId: "forge",
+						quantity: 1,
+					},
+				],
+				runtimeMs: 1_000,
+				status: "estimated",
+				totalChargeCost: 1,
+				totalCostQuantity: 0,
+				warnings: [],
+			},
+			status: "ready",
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				createElement(
+					EditorProjectContext.Provider,
+					{
+						value: project,
+					},
+					createElement(EditorItemEstimateSection, {
+						itemId: "tool",
+					}),
+				),
+			);
+		});
+
+		const result = container.querySelector('[data-ui="EditorItemEstimateResult"]');
+		expect(result?.textContent).toContain("1 charge");
+		expect(result?.textContent).toContain("1 spent charge type");
+		expect(result?.textContent).toContain("Required existing infrastructure");
+		expect(result?.querySelector('a[data-item-id="forge"]')).not.toBeNull();
+		expect(result?.textContent).toContain("Spent charges");
+		expect(result?.querySelector('a[data-item-id="water"]')).not.toBeNull();
+		expect(result?.textContent).toContain("× 1 charge");
+		expect(result?.textContent).not.toContain(
+			"No consumed items, spent charges, or required infrastructure.",
+		);
+	});
+
 	it("explains failed shorter plans and the winning authored detour", async () => {
 		const config = createJobTestConfig();
 		const project: EditorProject = {
@@ -209,6 +287,7 @@ describe("EditorItemEstimateSection", () => {
 		state.estimateState = {
 			estimate: {
 				blockers: [],
+				chargeCost: [],
 				cost: [],
 				infrastructure: [
 					{
@@ -294,8 +373,10 @@ describe("EditorItemEstimateSection", () => {
 					visitedStates: 5,
 				},
 				quantity: 1,
+				requiredInfrastructure: [],
 				runtimeMs: 300,
 				status: "estimated",
+				totalChargeCost: 0,
 				totalCostQuantity: 0,
 				warnings: [],
 			},
@@ -398,6 +479,7 @@ describe("EditorItemEstimateSection", () => {
 		state.estimateState = {
 			estimate: {
 				blockers: [],
+				chargeCost: [],
 				cost: [],
 				infrastructure: [],
 				infrastructureItemIds: new Set(),
@@ -436,7 +518,9 @@ describe("EditorItemEstimateSection", () => {
 					visitedStates: 1_084,
 				},
 				quantity: 1,
+				requiredInfrastructure: [],
 				status: "inconclusive",
+				totalChargeCost: 0,
 				totalCostQuantity: 0,
 				warnings: [
 					"Feasibility is inconclusive because the search exhausted maximumExpandedStates.",

@@ -13,6 +13,7 @@ import {
 const simulation = (itemId: string, quantity = 1): EditorItemSimulation => ({
 	blockers: [],
 	cost: [],
+	infrastructure: [],
 	infrastructureItemIds: new Set(),
 	itemId,
 	operations: [],

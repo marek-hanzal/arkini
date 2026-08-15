@@ -238,14 +238,19 @@ export const projectPlannerResult = ({
 	const plannerMetadata = readPlannerMetadata(result);
 	switch (result.type) {
 		case "completed": {
+			const infrastructureItemIds = readInfrastructureItemIds(graph, result);
 			const cost = result.economics.expectedConsumedItems.map(({ itemId, quantity }) => ({
 				itemId,
 				quantity,
 			}));
+			const infrastructure = result.economics.expectedAcquiredItems.filter(
+				({ itemId }) => infrastructureItemIds.has(itemId) && itemId !== result.itemId,
+			);
 			return {
 				blockers: [],
 				cost,
-				infrastructureItemIds: readInfrastructureItemIds(graph, result),
+				infrastructure,
+				infrastructureItemIds,
 				itemId: result.itemId,
 				operations: result.economics.operations.map((operation) =>
 					readOperationProjection(config, operation),
@@ -279,6 +284,7 @@ export const projectPlannerResult = ({
 			return {
 				blockers: readNoFinitePathBlockers(graph, result),
 				cost: [],
+				infrastructure: [],
 				infrastructureItemIds: new Set(),
 				itemId: result.itemId,
 				operations: [],
@@ -296,6 +302,7 @@ export const projectPlannerResult = ({
 			return {
 				blockers: [],
 				cost: [],
+				infrastructure: [],
 				infrastructureItemIds: new Set(),
 				itemId: result.itemId,
 				operations: [],

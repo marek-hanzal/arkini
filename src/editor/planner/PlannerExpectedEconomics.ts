@@ -19,6 +19,12 @@ export interface PlannerExpectedEconomicsItemQuantity {
 	readonly quantity: number;
 }
 
+/** One canonical item quantity produced by the selected expected trace replay. */
+export interface PlannerExpectedEconomicsAcquiredItem extends PlannerExpectedEconomicsItemQuantity {
+	/** Expected elapsed time when the complete aggregated quantity has become available. */
+	readonly readyAtMs: number;
+}
+
 export interface PlannerExpectedEconomicsOperation {
 	readonly action: PlannerAction;
 	readonly actionId: string;
@@ -32,6 +38,8 @@ export interface PlannerExpectedEconomicsOperation {
 export interface PlannerExpectedEconomics {
 	readonly assumptions: ReadonlyArray<PlannerExpectedEconomicsAssumption>;
 	readonly expectedActionRuns: number;
+	/** Canonical items created by the expected selected-trace replay, including infrastructure. */
+	readonly expectedAcquiredItems: ReadonlyArray<PlannerExpectedEconomicsAcquiredItem>;
 	/** Direct net canonical item removals across the expected selected-trace replay. */
 	readonly expectedConsumedItems: ReadonlyArray<PlannerExpectedEconomicsItemQuantity>;
 	readonly expectedElapsedMs: number;
@@ -45,6 +53,7 @@ export interface PlannerExpectedEconomics {
 	readonly requiredAdditionalTargetQuantity: number;
 	readonly targetItemId: IdSchema.Type;
 	readonly targetQuantity: number;
+	readonly totalExpectedAcquiredQuantity: number;
 	readonly totalExpectedConsumedQuantity: number;
 	readonly totalExpectedSpentCharges: number;
 }

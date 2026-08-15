@@ -1440,6 +1440,7 @@ const estimateEditorItem = (
 			status: "no-finite-path",
 			cost: [],
 			totalCostQuantity: 0,
+			infrastructure: [],
 			infrastructureItemIds: new Set(),
 			operations: [],
 			blockers: [
@@ -1465,6 +1466,7 @@ const estimateEditorItem = (
 		runtimeMs: result.runtimeMs,
 		cost,
 		totalCostQuantity: cost.reduce((total, costItem) => total + costItem.quantity, 0),
+		infrastructure: [],
 		infrastructureItemIds: result.infrastructureItemIds,
 		operations: [
 			...result.operations.values(),

@@ -8,6 +8,7 @@ import type {
 } from "~/editor/planner/PlannerAcquisitionGraph";
 import type {
 	PlannerExpectedEconomics,
+	PlannerExpectedEconomicsAcquiredItem,
 	PlannerExpectedEconomicsAssumption,
 	PlannerExpectedEconomicsChargeQuantity,
 	PlannerExpectedEconomicsItemQuantity,
@@ -490,6 +491,26 @@ const readExpectedItemQuantities = (
 		}))
 		.sort((left, right) => compareIds(left.itemId, right.itemId));
 
+const readExpectedAcquiredItems = (
+	quantities: ReadonlyMap<
+		IdSchema.Type,
+		{
+			readonly quantity: number;
+			readonly readyAtMs: number;
+		}
+	>,
+): PlannerExpectedEconomicsAcquiredItem[] =>
+	[
+		...quantities,
+	]
+		.filter(([, acquired]) => acquired.quantity > quantityEpsilon)
+		.map(([itemId, acquired]) => ({
+			itemId,
+			quantity: acquired.quantity,
+			readyAtMs: acquired.readyAtMs,
+		}))
+		.sort((left, right) => compareIds(left.itemId, right.itemId));
+
 const readExpectedChargeQuantities = (
 	quantities: ReadonlyMap<IdSchema.Type, number>,
 ): PlannerExpectedEconomicsChargeQuantity[] =>
@@ -508,6 +529,13 @@ export const readPlannerExpectedEconomicsFx = Effect.fn("readPlannerExpectedEcon
 	(props: readPlannerExpectedEconomicsFx.Props) =>
 		Effect.sync(() => {
 			const multiplierByStep = readExpectedMultipliers(props);
+			const expectedAcquiredByItemId = new Map<
+				IdSchema.Type,
+				{
+					quantity: number;
+					readyAtMs: number;
+				}
+			>();
 			const expectedConsumedByItemId = new Map<IdSchema.Type, number>();
 			const expectedSpentChargesByItemId = new Map<IdSchema.Type, number>();
 			const operationByActionId = new Map<string, MutablePlannerExpectedOperation>();
@@ -520,6 +548,15 @@ export const readPlannerExpectedEconomicsFx = Effect.fn("readPlannerExpectedEcon
 				expectedActionRuns += multiplier;
 				expectedElapsedMs += multiplier * step.elapsedMs;
 				observedElapsedMs += step.elapsedMs;
+				for (const produced of step.producedItemQuantities) {
+					const quantity = produced.quantity * multiplier;
+					if (quantity <= quantityEpsilon) continue;
+					const current = expectedAcquiredByItemId.get(produced.itemId);
+					expectedAcquiredByItemId.set(produced.itemId, {
+						quantity: (current?.quantity ?? 0) + quantity,
+						readyAtMs: Math.max(current?.readyAtMs ?? 0, expectedElapsedMs),
+					});
+				}
 				for (const consumed of step.consumedItemQuantities)
 					addQuantity(
 						expectedConsumedByItemId,
@@ -549,6 +586,7 @@ export const readPlannerExpectedEconomicsFx = Effect.fn("readPlannerExpectedEcon
 				operationByActionId.set(step.actionId, operation);
 			}
 
+			const expectedAcquiredItems = readExpectedAcquiredItems(expectedAcquiredByItemId);
 			const expectedConsumedItems = readExpectedItemQuantities(expectedConsumedByItemId);
 			const expectedSpentCharges = readExpectedChargeQuantities(expectedSpentChargesByItemId);
 			const initialTargetQuantity = props.initialRuntime.items.reduce(
@@ -581,6 +619,7 @@ export const readPlannerExpectedEconomicsFx = Effect.fn("readPlannerExpectedEcon
 			return {
 				assumptions,
 				expectedActionRuns,
+				expectedAcquiredItems,
 				expectedConsumedItems,
 				expectedElapsedMs,
 				expectedSpentCharges,
@@ -595,6 +634,10 @@ export const readPlannerExpectedEconomicsFx = Effect.fn("readPlannerExpectedEcon
 				),
 				targetItemId: props.itemId,
 				targetQuantity: props.quantity,
+				totalExpectedAcquiredQuantity: expectedAcquiredItems.reduce(
+					(total, item) => total + item.quantity,
+					0,
+				),
 				totalExpectedConsumedQuantity: expectedConsumedItems.reduce(
 					(total, item) => total + item.quantity,
 					0,

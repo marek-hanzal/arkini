@@ -130,6 +130,50 @@ const readPlannerStrategyDetails = (planner: EngineBackedPlanner): ReadonlyArray
 	];
 };
 
+const EditorItemEstimateItemRow = ({
+	itemId,
+	projectId,
+	quantity,
+	readyAtMs,
+	config,
+}: {
+	readonly config: ReturnType<typeof useEditorProject>["config"];
+	readonly itemId: string;
+	readonly projectId: string;
+	readonly quantity: number;
+	readonly readyAtMs?: number;
+}) => {
+	const item = config.items[itemId];
+	return (
+		<li className="flex min-h-14 items-center justify-between gap-3 py-1.5 text-sm">
+			{item === undefined ? (
+				<span
+					className="min-w-0 truncate text-muted"
+					title={itemId}
+				>
+					{itemId} [missing]
+				</span>
+			) : (
+				<EditorItemDetailReference
+					item={item}
+					projectId={projectId}
+					sectionId="estimate"
+				/>
+			)}
+			<div className="shrink-0 text-right">
+				<strong className="block tabular-nums text-foreground">
+					× {formatQuantity(quantity)}
+				</strong>
+				{readyAtMs === undefined ? null : (
+					<span className="block text-[0.6875rem] tabular-nums text-muted">
+						ready by {formatRuntime(readyAtMs)}
+					</span>
+				)}
+			</div>
+		</li>
+	);
+};
+
 const EditorItemEstimateResultCard = ({
 	config,
 	estimate,
@@ -143,7 +187,7 @@ const EditorItemEstimateResultCard = ({
 		switch (estimate.status) {
 			case "estimated":
 				return {
-					detail: `${estimate.cost.length} consumed item types`,
+					detail: `${estimate.cost.length} consumed item types · ${estimate.infrastructure.length} constructed item types`,
 					title: "Expected",
 					value: `${formatQuantity(estimate.totalCostQuantity)} items`,
 				};
@@ -226,38 +270,50 @@ const EditorItemEstimateResultCard = ({
 						<p key={warning}>{warning}</p>
 					))}
 				</div>
-			) : estimate.cost.length === 0 ? (
-				<p className="py-4 text-sm text-muted">No consumed items.</p>
+			) : estimate.cost.length === 0 && estimate.infrastructure.length === 0 ? (
+				<p className="py-4 text-sm text-muted">
+					No consumed items or constructed infrastructure.
+				</p>
 			) : (
-				<ul className="min-h-0 flex-1 divide-y divide-line/60 overflow-y-auto pr-1">
-					{estimate.cost.map(({ itemId, quantity }) => {
-						const item = config.items[itemId];
-						return (
-							<li
-								className="flex min-h-14 items-center justify-between gap-3 py-1.5 text-sm"
-								key={itemId}
-							>
-								{item === undefined ? (
-									<span
-										className="min-w-0 truncate text-muted"
-										title={itemId}
-									>
-										{itemId} [missing]
-									</span>
-								) : (
-									<EditorItemDetailReference
-										item={item}
+				<div className="min-h-0 flex-1 overflow-y-auto pr-1">
+					{estimate.infrastructure.length === 0 ? null : (
+						<section data-ui="EditorItemEstimateInfrastructure">
+							<h4 className="sticky top-0 z-10 border-b border-line/70 bg-surface-raised py-2 text-[0.6875rem] font-semibold uppercase tracking-wide text-muted">
+								Built / acquired infrastructure
+							</h4>
+							<ul className="divide-y divide-line/60">
+								{estimate.infrastructure.map(({ itemId, quantity, readyAtMs }) => (
+									<EditorItemEstimateItemRow
+										config={config}
+										itemId={itemId}
+										key={itemId}
 										projectId={projectId}
-										sectionId="estimate"
+										quantity={quantity}
+										readyAtMs={readyAtMs}
 									/>
-								)}
-								<strong className="shrink-0 tabular-nums text-foreground">
-									× {formatQuantity(quantity)}
-								</strong>
-							</li>
-						);
-					})}
-				</ul>
+								))}
+							</ul>
+						</section>
+					)}
+					{estimate.cost.length === 0 ? null : (
+						<section data-ui="EditorItemEstimateConsumed">
+							<h4 className="sticky top-0 z-10 border-b border-line/70 bg-surface-raised py-2 text-[0.6875rem] font-semibold uppercase tracking-wide text-muted">
+								Consumed
+							</h4>
+							<ul className="divide-y divide-line/60">
+								{estimate.cost.map(({ itemId, quantity }) => (
+									<EditorItemEstimateItemRow
+										config={config}
+										itemId={itemId}
+										key={itemId}
+										projectId={projectId}
+										quantity={quantity}
+									/>
+								))}
+							</ul>
+						</section>
+					)}
+				</div>
 			)}
 		</article>
 	);

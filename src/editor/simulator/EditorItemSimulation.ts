@@ -15,6 +15,13 @@ export interface EditorItemSimulationCost {
 	readonly quantity: number;
 }
 
+export interface EditorItemSimulationInfrastructure {
+	readonly itemId: string;
+	readonly quantity: number;
+	/** Expected elapsed time when this constructed or acquired infrastructure becomes available. */
+	readonly readyAtMs: number;
+}
+
 export interface EditorItemSimulationChargeCost {
 	readonly charges: number;
 	readonly itemId: string;
@@ -86,6 +93,8 @@ export interface EditorItemSimulation {
 	readonly status: "estimated" | "inconclusive" | "no-finite-path";
 	readonly runtimeMs?: number;
 	readonly cost: ReadonlyArray<EditorItemSimulationCost>;
+	/** Infrastructure created by the selected witness, excluding infrastructure already in start. */
+	readonly infrastructure: ReadonlyArray<EditorItemSimulationInfrastructure>;
 	readonly totalCostQuantity: number;
 	readonly infrastructureItemIds: ReadonlySet<string>;
 	readonly operations: ReadonlyArray<EditorItemSimulationOperation>;

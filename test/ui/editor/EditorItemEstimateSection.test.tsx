@@ -210,6 +210,13 @@ describe("EditorItemEstimateSection", () => {
 			estimate: {
 				blockers: [],
 				cost: [],
+				infrastructure: [
+					{
+						itemId: "tool",
+						quantity: 1,
+						readyAtMs: 2_000,
+					},
+				],
 				infrastructureItemIds: new Set(),
 				itemId: "tool",
 				operations: [],
@@ -313,6 +320,7 @@ describe("EditorItemEstimateSection", () => {
 		});
 
 		const method = container.querySelector('[data-ui="EditorItemEstimateMethod"]');
+		const result = container.querySelector('[data-ui="EditorItemEstimateResult"]');
 		expect(method?.textContent).toContain("Route plans: 2 tried; plan 2 completed.");
 		expect(method?.textContent).toContain(
 			"Plan 1: exhausted its candidate frontier after 2 expanded states; best target quantity 0; trace reached line:short-part.",
@@ -320,6 +328,8 @@ describe("EditorItemEstimateSection", () => {
 		expect(method?.textContent).toContain(
 			"Winning detour: acquire tool via alternative 2/2 (+1 depth).",
 		);
+		expect(result?.textContent).toContain("Built / acquired infrastructure");
+		expect(result?.textContent).toContain("ready by 2 s");
 	});
 
 	it("shows actionable blockers when no finite production path exists", async () => {
@@ -389,6 +399,7 @@ describe("EditorItemEstimateSection", () => {
 			estimate: {
 				blockers: [],
 				cost: [],
+				infrastructure: [],
 				infrastructureItemIds: new Set(),
 				itemId: "tool",
 				operations: [],

@@ -710,6 +710,13 @@ describe("estimateEditorItem", () => {
 		expect(estimate.totalCostQuantity).toBeGreaterThan(1);
 		expect(estimate.infrastructureItemIds).toContain("item:blueprint-bakery-t1");
 		expect(estimate.infrastructureItemIds).toContain("producer:windmill-t1");
+		expect(estimate.infrastructure).toContainEqual(
+			expect.objectContaining({
+				itemId: "producer:windmill-t1",
+				quantity: 1,
+				readyAtMs: expect.any(Number),
+			}),
+		);
 	});
 
 	it("uses expected yield for chance output", async () => {

@@ -6,7 +6,6 @@ import type { PlannerSearchExecutionState } from "~/editor/planner/PlannerSearch
 import type { PlannerStructuralReachability } from "~/editor/planner/PlannerStructuralReachability";
 
 export const PlannerStrategyId = {
-	adaptive: "adaptive",
 	bestFirst: "best-first",
 	constructive: "constructive",
 	editor: "editor",

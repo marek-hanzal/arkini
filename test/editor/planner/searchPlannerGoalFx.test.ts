@@ -2,19 +2,6 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { createPlannerSearchHarnessFx } from "./support/createPlannerSearchHarnessFx";
-import type {
-	AdaptivePlannerStrategy,
-	AdaptivePlannerStrategyDiagnostics,
-} from "~/editor/planner/AdaptivePlannerStrategy";
-import type {
-	PlannerGoalSearchBudget,
-	PlannerGoalSearchDiagnostics,
-} from "~/editor/planner/PlannerGoalSearch";
-import { PlannerStrategyId } from "~/editor/planner/PlannerStrategy";
-import { createAdaptivePlannerStrategy } from "~/editor/planner/createAdaptivePlannerStrategy";
-import { createBestFirstPlannerStrategy } from "~/editor/planner/createBestFirstPlannerStrategy";
-import { createConstructivePlannerStrategy } from "~/editor/planner/createConstructivePlannerStrategy";
-import { createPlannerFx } from "~/editor/planner/createPlannerFx";
 import { readPlannerRuntimeFingerprint } from "~/editor/planner/readPlannerRuntimeFingerprint";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
@@ -327,76 +314,7 @@ const search = async ({
 	};
 };
 
-const createConstructiveAdaptiveStrategy = (
-	budget: Partial<PlannerGoalSearchBudget> = {},
-): AdaptivePlannerStrategy =>
-	createAdaptivePlannerStrategy({
-		selectFx: ({ currentStrategy, problem }) =>
-			Effect.succeed(
-				currentStrategy.depth === 0
-					? {
-							reason: `construct-${problem.activeGoal.itemId}`,
-							strategyId: PlannerStrategyId.constructive,
-						}
-					: {
-							reason: `solve-${problem.activeGoal.itemId}`,
-							strategyId: PlannerStrategyId.bestFirst,
-						},
-			),
-		strategies: [
-			createBestFirstPlannerStrategy(),
-			createConstructivePlannerStrategy({
-				budget,
-			}),
-		],
-	});
-
 describe("constructive engine planner", () => {
-	it("delegates destructive prerequisites through adaptive strategy routing and restores the parent branch", async () => {
-		const adaptive = createConstructiveAdaptiveStrategy({
-			maximumAgendaDepth: 32,
-			maximumConcurrentBranches: 2,
-			maximumExpandedBranches: 64,
-			maximumQueuedBranches: 32,
-			maximumTraceLength: 16,
-		});
-		const planner = Effect.runSync(
-			createPlannerFx({
-				config: readConfig({
-					advancedHallReplacesLegacyCapability: false,
-				}),
-				strategy: adaptive,
-			}),
-		);
-		const result = await Effect.runPromise(
-			planner.estimateFx({
-				itemId: "final-target",
-			}),
-		);
-
-		expect(result.type).toBe("completed");
-		if (result.type !== "completed") return;
-		expect(result.execution.trace.map(({ actionId }) => actionId)).toEqual([
-			'["line","old-hall","line:old-hall:legacy-blueprint"]',
-			'["line","upgrade-blueprint","line:upgrade-hall"]',
-			'["line","final-producer","line:final-target"]',
-		]);
-		expect(
-			result.sessionDiagnostics.invocations.filter(
-				({ goal, strategyId }) =>
-					goal.itemId === "advanced-hall" && strategyId === PlannerStrategyId.bestFirst,
-			),
-		).toHaveLength(2);
-		const diagnostics = result.strategyDiagnostics as AdaptivePlannerStrategyDiagnostics;
-		const constructiveDiagnostics = diagnostics.child
-			.diagnostics as PlannerGoalSearchDiagnostics;
-		expect(constructiveDiagnostics).toMatchObject({
-			delegatedCompletedSubgoals: 3,
-			delegatedSubgoals: 3,
-			deadEndBranches: 1,
-		});
-	});
-
 	it("prunes a destructive upgrade future and backtracks through the untouched parent snapshot", async () => {
 		const { planner, result } = await search({
 			advancedHallReplacesLegacyCapability: false,
@@ -555,42 +473,5 @@ describe("constructive engine planner", () => {
 			sourceItemId: "item:water",
 			targetItemId: "item:tree",
 		});
-	});
-
-	it("constructs an official target across adaptive strategy boundaries", async () => {
-		const config = await readArkiniGameConfigSource();
-		const planner = Effect.runSync(
-			createPlannerFx({
-				config,
-				strategy: createConstructiveAdaptiveStrategy({
-					maximumAgendaDepth: 256,
-					maximumConcurrentBranches: 4,
-					maximumExpandedBranches: 2_000,
-					maximumQueuedBranches: 512,
-					maximumTraceLength: 500,
-				}),
-			}),
-		);
-		const result = await Effect.runPromise(
-			planner.estimateFx({
-				itemId: "item:double-tree",
-			}),
-		);
-
-		expect(result.type).toBe("completed");
-		if (result.type !== "completed") return;
-		expect(result.execution.trace).toHaveLength(8);
-		expect(result.execution.trace.at(-1)?.action).toEqual({
-			kind: "merge",
-			mergeIndex: 0,
-			sourceItemId: "item:water",
-			targetItemId: "item:tree",
-		});
-		expect(result.sessionDiagnostics.invocations.map(({ strategyId }) => strategyId)).toEqual([
-			PlannerStrategyId.adaptive,
-			PlannerStrategyId.constructive,
-			PlannerStrategyId.adaptive,
-			PlannerStrategyId.bestFirst,
-		]);
 	});
 });

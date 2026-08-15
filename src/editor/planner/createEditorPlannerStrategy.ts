@@ -8,10 +8,16 @@ import type {
 	EditorPlannerStrategyPolicy,
 	EditorPlannerStrategyProps,
 	EditorPlannerStrategyResult,
+	EditorPlannerStrategySelection,
 } from "~/editor/planner/EditorPlannerStrategy";
 import { DefaultPlannerGoalSearchBudget } from "~/editor/planner/PlannerGoalSearch";
+import type { PlannerAcquisitionGraph } from "~/editor/planner/PlannerAcquisitionGraph";
 import { DefaultPlannerProducerExpansionBudget } from "~/editor/planner/PlannerProducerExpansion";
-import { PlannerCurrentStrategyFx } from "~/editor/planner/PlannerCurrentStrategyFx";
+import type { PlannerProblem } from "~/editor/planner/PlannerProblem";
+import {
+	PlannerCurrentStrategyFx,
+	type PlannerCurrentStrategyFxService,
+} from "~/editor/planner/PlannerCurrentStrategyFx";
 import { PlannerKernelFx } from "~/editor/planner/PlannerKernelFx";
 import { DefaultPlannerSearchBudget } from "~/editor/planner/PlannerSearch";
 import { PlannerSessionFx } from "~/editor/planner/PlannerSessionFx";
@@ -23,20 +29,13 @@ import {
 import { createBestFirstPlannerStrategy } from "~/editor/planner/createBestFirstPlannerStrategy";
 import { createConstructivePlannerStrategy } from "~/editor/planner/createConstructivePlannerStrategy";
 import { createProducerExpansionPlannerStrategy } from "~/editor/planner/createProducerExpansionPlannerStrategy";
-import {
-	DefaultGoalDirectedBestFirstDepth,
-	DefaultGoalDirectedConstructiveDelegationDepth,
-	DefaultGoalDirectedConstructiveLinearRootDepth,
-	DefaultGoalDirectedConstructiveMergeRootDepth,
-	readGoalDirectedPlannerStrategySelection,
-} from "~/editor/planner/createGoalDirectedPlannerStrategy";
 
 export const DefaultEditorPlannerStrategyPolicy: EditorPlannerStrategyPolicy = {
-	maximumBestFirstDepth: DefaultGoalDirectedBestFirstDepth,
+	maximumBestFirstDepth: 6,
 	maximumProducerExpansionDepth: 12,
-	maximumConstructiveDelegationDepth: DefaultGoalDirectedConstructiveDelegationDepth,
-	maximumConstructiveLinearRootDepth: DefaultGoalDirectedConstructiveLinearRootDepth,
-	maximumConstructiveMergeRootDepth: DefaultGoalDirectedConstructiveMergeRootDepth,
+	maximumConstructiveDelegationDepth: 1,
+	maximumConstructiveLinearRootDepth: 1,
+	maximumConstructiveMergeRootDepth: 8,
 };
 
 export const DefaultEditorPlannerConstructiveBudget = {
@@ -57,6 +56,97 @@ export const DefaultEditorPlannerProducerExpansionBudget = {
 	...DefaultPlannerProducerExpansionBudget,
 	maximumExpandedActions: 1_024,
 	maximumTraceLength: 500,
+};
+
+const readConstructiveDelegationDepth = (path: ReadonlyArray<string>) =>
+	path.filter((strategyId) => strategyId === PlannerStrategyId.constructive).length;
+
+const readStrategySelection = ({
+	currentStrategy,
+	graph,
+	policy,
+	problem,
+}: {
+	readonly currentStrategy: PlannerCurrentStrategyFxService;
+	readonly graph: PlannerAcquisitionGraph;
+	readonly policy: EditorPlannerStrategyPolicy;
+	readonly problem: PlannerProblem;
+}): EditorPlannerStrategySelection => {
+	const depth = graph.depthByItemId.get(problem.activeGoal.itemId);
+	const routes = graph.routesByOutputItemId.get(problem.activeGoal.itemId) ?? [];
+	if ((problem.activeGoal.minimumCharges ?? 0) > 0)
+		return {
+			reason: "construct-charge-goal",
+			strategyId: PlannerStrategyId.constructive,
+		};
+	if (routes.some(({ output }) => output.stochastic))
+		return {
+			reason: "solve-stochastic-goal",
+			strategyId: PlannerStrategyId.bestFirst,
+		};
+
+	const constructiveDelegationDepth = readConstructiveDelegationDepth(currentStrategy.path);
+	if (currentStrategy.depth === 0) {
+		const route = routes.length === 1 ? routes[0] : undefined;
+		if (
+			route?.kind === "merge-output" &&
+			depth !== undefined &&
+			depth <= policy.maximumConstructiveMergeRootDepth
+		)
+			return {
+				reason: `construct-merge-root-goal:depth-${depth}`,
+				strategyId: PlannerStrategyId.constructive,
+			};
+		if (
+			route?.kind === "line-output" &&
+			depth !== undefined &&
+			depth <= policy.maximumConstructiveLinearRootDepth &&
+			route.requirements.anyOf.length === 0 &&
+			route.requirements.allOf.length <= 3
+		)
+			return {
+				reason: `construct-linear-root-goal:depth-${depth}`,
+				strategyId: PlannerStrategyId.constructive,
+			};
+		return {
+			reason:
+				depth === undefined
+					? "solve-root-goal:unknown-depth"
+					: `solve-root-goal:depth-${depth}`,
+			strategyId: PlannerStrategyId.bestFirst,
+		};
+	}
+	if (depth === undefined)
+		return {
+			reason: "solve-local-resource-goal:unknown-depth",
+			strategyId: PlannerStrategyId.bestFirst,
+		};
+	if (depth <= policy.maximumBestFirstDepth)
+		return {
+			reason: `solve-local-resource-goal:depth-${depth}`,
+			strategyId: PlannerStrategyId.bestFirst,
+		};
+	if (constructiveDelegationDepth > policy.maximumConstructiveDelegationDepth)
+		return {
+			reason: `solve-bounded-resource-goal:delegation-depth-${constructiveDelegationDepth}`,
+			strategyId: PlannerStrategyId.bestFirst,
+		};
+	const rootDepth = graph.depthByItemId.get(problem.rootGoal.itemId);
+	return rootDepth !== undefined && depth >= rootDepth
+		? {
+				reason: `solve-non-descending-resource-goal:depth-${depth}-from-${rootDepth}`,
+				strategyId: PlannerStrategyId.bestFirst,
+			}
+		: {
+				reason: `decompose-resource-goal:depth-${depth}`,
+				strategyId: PlannerStrategyId.constructive,
+			};
+};
+
+const validatePolicy = (policy: EditorPlannerStrategyPolicy) => {
+	for (const [name, value] of Object.entries(policy))
+		if (!Number.isSafeInteger(value) || value < 0)
+			throw new RangeError(`${name} must be a non-negative safe integer.`);
 };
 
 const readAttempt = (
@@ -155,6 +245,7 @@ export const createEditorPlannerStrategy = ({
 		...DefaultEditorPlannerStrategyPolicy,
 		...policyInput,
 	};
+	validatePolicy(policy);
 	const constructive = createConstructivePlannerStrategy({
 		budget: {
 			...DefaultEditorPlannerConstructiveBudget,
@@ -203,10 +294,10 @@ export const createEditorPlannerStrategy = ({
 						});
 				}
 
-				const selection = readGoalDirectedPlannerStrategySelection({
+				const selection = readStrategySelection({
 					currentStrategy,
 					graph: kernel.graph,
-					...policy,
+					policy,
 					problem,
 				});
 				let selected: AnyPlannerStrategyResult;

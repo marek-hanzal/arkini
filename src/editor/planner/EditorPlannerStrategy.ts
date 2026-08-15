@@ -1,4 +1,3 @@
-import type { AdaptivePlannerStrategySelection } from "~/editor/planner/AdaptivePlannerStrategy";
 import type { PlannerGoalSearchBudget } from "~/editor/planner/PlannerGoalSearch";
 import type { PlannerProducerExpansionBudget } from "~/editor/planner/PlannerProducerExpansion";
 import type { PlannerSearchBudget } from "~/editor/planner/PlannerSearch";
@@ -8,6 +7,11 @@ import type {
 	PlannerStrategyResult,
 } from "~/editor/planner/PlannerStrategy";
 import type { PlannerStrategyEnvironment } from "~/editor/planner/PlannerStrategyEnvironment";
+
+export interface EditorPlannerStrategySelection {
+	readonly reason: string;
+	readonly strategyId: "best-first" | "constructive";
+}
 
 export interface EditorPlannerStrategyPolicy {
 	readonly maximumBestFirstDepth: number;
@@ -38,7 +42,7 @@ export interface EditorPlannerStrategyDiagnostics {
 	readonly attempts: ReadonlyArray<EditorPlannerStrategyAttemptDiagnostic>;
 	readonly mode: EditorPlannerStrategyMode;
 	readonly selectedAttemptIndex: number;
-	readonly selection: AdaptivePlannerStrategySelection | null;
+	readonly selection: EditorPlannerStrategySelection | null;
 }
 
 export type EditorPlannerStrategyResult = PlannerStrategyResult<

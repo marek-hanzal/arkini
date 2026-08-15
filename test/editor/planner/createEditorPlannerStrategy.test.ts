@@ -240,5 +240,5 @@ describe("createEditorPlannerStrategy", () => {
 		expect(actionIds).toContain(
 			'["line","producer:chicken-coop-t1","line:chicken-coop-t1:egg"]',
 		);
-	}, 20_000);
+	}, 60_000);
 });

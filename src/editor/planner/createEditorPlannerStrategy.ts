@@ -55,7 +55,7 @@ export const DefaultEditorPlannerBestFirstBudget = {
 
 export const DefaultEditorPlannerProducerExpansionBudget = {
 	...DefaultPlannerProducerExpansionBudget,
-	maximumExpandedActions: 128,
+	maximumExpandedActions: 1_024,
 	maximumTraceLength: 500,
 };
 

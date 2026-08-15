@@ -754,7 +754,7 @@ describe("estimateEditorItem", () => {
 				lineId: "line:quest:water-carrier:complete",
 			}),
 		);
-	}, 20_000);
+	}, 60_000);
 
 	it("uses expected yield for chance output", async () => {
 		const base = createJobTestConfig();

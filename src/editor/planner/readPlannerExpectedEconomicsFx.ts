@@ -43,6 +43,8 @@ interface PlannerItemFlowDependency {
 	readonly targetStepIndex: number;
 }
 
+type PlannerRetainedFlowDependency = PlannerItemFlowDependency;
+
 interface PlannerRetainedRequirementDemand {
 	retained: number;
 	reserved: number;
@@ -217,16 +219,18 @@ const addRetainedDemand = (
 	demandByItemId.set(requirement.itemId, demand);
 };
 
-const peekRetainedItemLots = ({
+const readRetainedItemLotDependencies = ({
+	dependenciesByTargetStep,
 	itemId,
 	lotsByItemId,
-	minimumOutputByStep,
 	quantity,
+	targetStepIndex,
 }: {
+	readonly dependenciesByTargetStep: ReadonlyArray<PlannerRetainedFlowDependency[]>;
 	readonly itemId: IdSchema.Type;
 	readonly lotsByItemId: ReadonlyMap<IdSchema.Type, ReadonlyArray<PlannerItemLot>>;
-	readonly minimumOutputByStep: ReadonlyArray<Map<IdSchema.Type, number>>;
 	readonly quantity: number;
+	readonly targetStepIndex: number;
 }) => {
 	const lots = lotsByItemId.get(itemId) ?? [];
 	let remaining = quantity;
@@ -236,10 +240,12 @@ const peekRetainedItemLots = ({
 		const retained = Math.min(lot.quantity, remaining);
 		remaining -= retained;
 		if (lot.sourceStepIndex === undefined) continue;
-		const quantities = minimumOutputByStep[lot.sourceStepIndex];
-		if (quantities === undefined) continue;
-		const minimumSourceQuantity = lot.consumedQuantity + retained;
-		quantities.set(itemId, Math.max(quantities.get(itemId) ?? 0, minimumSourceQuantity));
+		dependenciesByTargetStep[targetStepIndex]?.push({
+			itemId,
+			quantity: lot.consumedQuantity + retained,
+			sourceStepIndex: lot.sourceStepIndex,
+			targetStepIndex,
+		});
 	}
 	if (remaining > quantityEpsilon)
 		throw new RangeError(
@@ -261,11 +267,11 @@ const readFlowDependencies = ({
 		},
 		() => [] as PlannerItemFlowDependency[],
 	);
-	const retainedMinimumOutputByStep = Array.from(
+	const retainedDependenciesByTargetStep = Array.from(
 		{
 			length: trace.length,
 		},
-		() => new Map<IdSchema.Type, number>(),
+		() => [] as PlannerRetainedFlowDependency[],
 	);
 
 	for (const [stepIndex, step] of trace.entries()) {
@@ -285,11 +291,12 @@ const readFlowDependencies = ({
 			if (selected !== undefined) addRetainedDemand(retainedDemandByItemId, selected);
 		}
 		for (const [retainedItemId, demand] of retainedDemandByItemId)
-			peekRetainedItemLots({
+			readRetainedItemLotDependencies({
+				dependenciesByTargetStep: retainedDependenciesByTargetStep,
 				itemId: retainedItemId,
 				lotsByItemId,
-				minimumOutputByStep: retainedMinimumOutputByStep,
 				quantity: demand.retained + demand.reserved,
+				targetStepIndex: stepIndex,
 			});
 		for (const consumed of step.consumedItemQuantities)
 			takeItemLots({
@@ -337,7 +344,7 @@ const readFlowDependencies = ({
 
 	return {
 		dependenciesByTargetStep,
-		retainedMinimumOutputByStep,
+		retainedDependenciesByTargetStep,
 		terminalQuantityByStep,
 	};
 };
@@ -401,7 +408,7 @@ const readExpectedMultipliers = ({
 	trace,
 	...props
 }: readPlannerExpectedEconomicsFx.Props) => {
-	const { dependenciesByTargetStep, retainedMinimumOutputByStep, terminalQuantityByStep } =
+	const { dependenciesByTargetStep, retainedDependenciesByTargetStep, terminalQuantityByStep } =
 		readFlowDependencies({
 			itemId,
 			quantity,
@@ -433,15 +440,9 @@ const readExpectedMultipliers = ({
 				entry.quantity,
 			]),
 		);
-		const requiredItemIds = new Set([
-			...(requiredOutputByStep[stepIndex]?.keys() ?? []),
-			...(retainedMinimumOutputByStep[stepIndex]?.keys() ?? []),
-		]);
+		const requiredItemIds = new Set(requiredOutputByStep[stepIndex]?.keys() ?? []);
 		for (const requiredItemId of requiredItemIds) {
-			const requiredQuantity = Math.max(
-				requiredOutputByStep[stepIndex]?.get(requiredItemId) ?? 0,
-				retainedMinimumOutputByStep[stepIndex]?.get(requiredItemId) ?? 0,
-			);
+			const requiredQuantity = requiredOutputByStep[stepIndex]?.get(requiredItemId) ?? 0;
 			const producedQuantity = producedQuantityByItemId.get(requiredItemId) ?? 0;
 			if (producedQuantity <= quantityEpsilon)
 				throw new RangeError(
@@ -472,6 +473,15 @@ const readExpectedMultipliers = ({
 			const quantities = requiredOutputByStep[dependency.sourceStepIndex];
 			if (quantities === undefined) continue;
 			addQuantity(quantities, dependency.itemId, dependency.quantity * multiplier);
+		}
+
+		for (const dependency of retainedDependenciesByTargetStep[stepIndex] ?? []) {
+			const quantities = requiredOutputByStep[dependency.sourceStepIndex];
+			if (quantities === undefined) continue;
+			quantities.set(
+				dependency.itemId,
+				Math.max(quantities.get(dependency.itemId) ?? 0, dependency.quantity),
+			);
 		}
 	}
 
@@ -579,13 +589,24 @@ export const readPlannerExpectedEconomicsFx = Effect.fn("readPlannerExpectedEcon
 			const operationByActionId = new Map<string, MutablePlannerExpectedOperation>();
 			let expectedActionRuns = 0;
 			let expectedElapsedMs = 0;
+			let observedActionRuns = 0;
 			let observedElapsedMs = 0;
+			let observedOutputCertainty: PlannerExpectedEconomics["observedOutputCertainty"] =
+				"deterministic";
+			let observedSelectedWitnessProbability = 1;
 
 			for (const [stepIndex, step] of props.trace.entries()) {
 				const multiplier = multiplierByStep[stepIndex] ?? 0;
+				if (multiplier <= quantityEpsilon) continue;
 				expectedActionRuns += multiplier;
 				expectedElapsedMs += multiplier * step.elapsedMs;
+				observedActionRuns += 1;
 				observedElapsedMs += step.elapsedMs;
+				if (step.outputResolution.type === "existential") {
+					observedOutputCertainty = "possible";
+					observedSelectedWitnessProbability *=
+						step.outputResolution.statistics.maximumQuantityProbability;
+				}
 				for (const produced of step.producedItemQuantities) {
 					const quantity = produced.quantity * multiplier;
 					if (quantity <= quantityEpsilon) continue;
@@ -624,10 +645,16 @@ export const readPlannerExpectedEconomicsFx = Effect.fn("readPlannerExpectedEcon
 				operationByActionId.set(step.actionId, operation);
 			}
 
+			const relevantTrace = props.trace.filter(
+				(_step, stepIndex) => (multiplierByStep[stepIndex] ?? 0) > quantityEpsilon,
+			);
 			const expectedAcquiredItems = readExpectedAcquiredItems(expectedAcquiredByItemId);
 			const expectedConsumedItems = readExpectedItemQuantities(expectedConsumedByItemId);
 			const expectedSpentCharges = readExpectedChargeQuantities(expectedSpentChargesByItemId);
-			const requiredInitialActors = readRequiredInitialActors(props);
+			const requiredInitialActors = readRequiredInitialActors({
+				initialRuntime: props.initialRuntime,
+				trace: relevantTrace,
+			});
 			const initialTargetQuantity = props.initialRuntime.items.reduce(
 				(total, item) => total + (item.item.id === props.itemId ? item.quantity : 0),
 				0,
@@ -635,19 +662,19 @@ export const readPlannerExpectedEconomicsFx = Effect.fn("readPlannerExpectedEcon
 			const assumptions: PlannerExpectedEconomicsAssumption[] = [
 				"optimistic-engine-policies",
 			];
-			if (props.trace.length > 0)
+			if (observedActionRuns > 0)
 				assumptions.push(
 					"same-step-canonical-flows-are-netted",
 					"selected-trace-actions-remain-repeatable",
 				);
-			if (props.trace.length > 1) assumptions.push("operations-run-sequentially");
+			if (observedActionRuns > 1) assumptions.push("operations-run-sequentially");
 			if (
 				multiplierByStep.some(
 					(multiplier) => Math.abs(multiplier - Math.round(multiplier)) > quantityEpsilon,
 				)
 			)
 				assumptions.push("fractional-demands-use-linear-interpolation");
-			if (props.trace.some((step) => step.outputResolution.type === "existential"))
+			if (observedOutputCertainty === "possible")
 				assumptions.push("independent-output-resolutions");
 			const operations: PlannerExpectedEconomicsOperation[] = [
 				...operationByActionId.values(),
@@ -665,8 +692,10 @@ export const readPlannerExpectedEconomicsFx = Effect.fn("readPlannerExpectedEcon
 				expectedSpentCharges,
 				initialTargetQuantity,
 				method: "selected-trace-replay",
-				observedActionRuns: props.trace.length,
+				observedActionRuns,
 				observedElapsedMs,
+				observedOutputCertainty,
+				observedSelectedWitnessProbability,
 				operations,
 				requiredAdditionalTargetQuantity: Math.max(
 					0,

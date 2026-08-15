@@ -754,6 +754,26 @@ describe("estimateEditorItem", () => {
 				lineId: "line:quest:water-carrier:complete",
 			}),
 		);
+		for (const unrelatedItemId of [
+			"item:blueprint-cattle-farm-t1",
+			"item:blueprint-cookhouse-t1",
+			"item:blueprint-pig-farm-t1",
+			"item:blueprint-vegetable-garden-t1",
+			"producer:cattle-farm-t1",
+			"producer:cookhouse-t1",
+			"producer:pig-farm-t1",
+			"producer:vegetable-garden-t1",
+		]) {
+			expect(estimate.infrastructure).not.toContainEqual(
+				expect.objectContaining({
+					itemId: unrelatedItemId,
+				}),
+			);
+		}
+		expect(estimate.planner?.observedActionRuns).toBeLessThan(
+			estimate.planner?.sessionDiagnostics.budget.snapshot.engineTransitions ??
+				Number.POSITIVE_INFINITY,
+		);
 	}, 60_000);
 
 	it("projects the official Lumberjack and Tree charge into the log estimate", async () => {

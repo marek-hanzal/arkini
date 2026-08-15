@@ -127,6 +127,7 @@ const readInfrastructureItemIds = (
 			route,
 		]),
 	);
+	const relevantActionIds = new Set(result.economics.operations.map(({ actionId }) => actionId));
 	const itemIds = new Set<string>();
 	const addRequirement = (
 		requirement: PlannerAcquisitionRoute["requirements"]["allOf"][number],
@@ -135,6 +136,7 @@ const readInfrastructureItemIds = (
 			itemIds.add(requirement.itemId);
 	};
 	for (const entry of result.execution.trace) {
+		if (!relevantActionIds.has(entry.actionId)) continue;
 		if (entry.action.kind === "line") itemIds.add(entry.action.ownerItemId);
 		for (const routeId of entry.routeIds) {
 			const route = routeById.get(routeId);
@@ -275,9 +277,9 @@ export const projectPlannerResult = ({
 					expectedSpentCharges: result.economics.expectedSpentCharges,
 					expandedStates: result.strategyMetrics.expandedNodes,
 					observedActionRuns: result.economics.observedActionRuns,
-					observedRuntimeMs: result.execution.elapsedMs,
-					outputCertainty: result.execution.outputCertainty,
-					selectedWitnessProbability: result.execution.selectedWitnessProbability,
+					observedRuntimeMs: result.economics.observedElapsedMs,
+					outputCertainty: result.economics.observedOutputCertainty,
+					selectedWitnessProbability: result.economics.observedSelectedWitnessProbability,
 					type: "completed",
 					visitedStates: result.strategyMetrics.visitedNodes,
 				},
@@ -288,7 +290,7 @@ export const projectPlannerResult = ({
 				totalChargeCost: result.economics.totalExpectedSpentCharges,
 				totalCostQuantity: result.economics.totalExpectedConsumedQuantity,
 				warnings:
-					result.execution.outputCertainty === "possible"
+					result.economics.observedOutputCertainty === "possible"
 						? [
 								"Feasibility uses a positive-probability output witness; expected time and cost include repeated stochastic attempts.",
 							]

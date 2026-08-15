@@ -53,8 +53,14 @@ export interface PlannerExpectedEconomics {
 	readonly expectedSpentCharges: ReadonlyArray<PlannerExpectedEconomicsChargeQuantity>;
 	readonly initialTargetQuantity: number;
 	readonly method: "selected-trace-replay";
+	/** Concrete target-witness actions after pruning unrelated exploration steps. */
 	readonly observedActionRuns: number;
+	/** Concrete sequential authored time of the pruned target witness. */
 	readonly observedElapsedMs: number;
+	/** Certainty of the pruned target witness, excluding unrelated exploration rolls. */
+	readonly observedOutputCertainty: "deterministic" | "possible";
+	/** Product of stochastic witness probabilities used by the pruned target witness. */
+	readonly observedSelectedWitnessProbability: number;
 	readonly operations: ReadonlyArray<PlannerExpectedEconomicsOperation>;
 	readonly requiredAdditionalTargetQuantity: number;
 	readonly targetItemId: IdSchema.Type;

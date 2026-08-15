@@ -231,9 +231,10 @@ const projectResult = ({
 /**
  * Production editor strategy.
  *
- * The shared goal-directed selector admits constructive search only for compact deterministic
- * roots and descending subgoals. Any inconclusive constructive attempt is retried through the
- * established bounded best-first search over the original immutable snapshot.
+ * Producer expansion gets the first bounded attempt for reachable shallow goals. The local
+ * deterministic selector then admits constructive search only for compact roots or descending
+ * subgoals; an inconclusive constructive attempt receives one bounded best-first fallback over
+ * the original immutable problem.
  */
 export const createEditorPlannerStrategyFx = Effect.fn("createEditorPlannerStrategyFx")(
 	({

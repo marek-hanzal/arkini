@@ -10,6 +10,7 @@ export const PlannerStrategyId = {
 	bestFirst: "best-first",
 	constructive: "constructive",
 	editor: "editor",
+	producerExpansion: "producer-expansion",
 } as const;
 
 export type BuiltInPlannerStrategyId = (typeof PlannerStrategyId)[keyof typeof PlannerStrategyId];

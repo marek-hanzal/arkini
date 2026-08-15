@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { createPlannerSearchHarnessFx } from "./support/createPlannerSearchHarnessFx";
-import { readPlannerRuntimeFingerprint } from "~/editor/planner/readPlannerRuntimeFingerprint";
+import { readPlannerRuntimeFingerprintFx } from "~/editor/planner/readPlannerRuntimeFingerprintFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
@@ -358,8 +358,8 @@ describe("constructive engine planner", () => {
 			reason: "search-budget",
 		});
 		expect(result.diagnostics.expandedBranches).toBe(1);
-		expect(readPlannerRuntimeFingerprint(result.bestExecution.runtime)).toBe(
-			readPlannerRuntimeFingerprint(planner.initialRuntime),
+		expect(Effect.runSync(readPlannerRuntimeFingerprintFx(result.bestExecution.runtime))).toBe(
+			Effect.runSync(readPlannerRuntimeFingerprintFx(planner.initialRuntime)),
 		);
 	});
 
@@ -379,9 +379,9 @@ describe("constructive engine planner", () => {
 		expect(concurrent.result.execution.trace.map(({ actionId }) => actionId)).toEqual(
 			serial.result.execution.trace.map(({ actionId }) => actionId),
 		);
-		expect(readPlannerRuntimeFingerprint(concurrent.result.execution.runtime)).toBe(
-			readPlannerRuntimeFingerprint(serial.result.execution.runtime),
-		);
+		expect(
+			Effect.runSync(readPlannerRuntimeFingerprintFx(concurrent.result.execution.runtime)),
+		).toBe(Effect.runSync(readPlannerRuntimeFingerprintFx(serial.result.execution.runtime)));
 		expect(concurrent.result.diagnostics.winningChoicePath).toEqual(
 			serial.result.diagnostics.winningChoicePath,
 		);

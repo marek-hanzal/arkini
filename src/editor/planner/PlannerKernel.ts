@@ -39,11 +39,13 @@ export interface PlannerKernel {
 	readonly readExpectedEconomicsFx: (
 		request: PlannerKernelEconomicsRequest,
 	) => Effect.Effect<PlannerExpectedEconomics>;
-	readonly readGoalViability: (request: {
+	readonly readGoalViabilityFx: (request: {
 		readonly goal: PlannerItemGoal;
 		readonly runtime: RuntimeSchema.Type;
-	}) => PlannerGoalViability;
-	readonly readStructuralReachability: (itemId: IdSchema.Type) => PlannerStructuralReachability;
+	}) => Effect.Effect<PlannerGoalViability>;
+	readonly readStructuralReachabilityFx: (
+		itemId: IdSchema.Type,
+	) => Effect.Effect<PlannerStructuralReachability>;
 	readonly runCandidateFx: (
 		request: PlannerKernelCandidateRequest,
 	) => Effect.Effect<PlannerSearchCandidateResult, PlannerBudgetExceeded, PlannerBudgetFx>;

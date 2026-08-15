@@ -1,10 +1,11 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import {
-	comparePlannerSearchPriority,
-	readPlannerSearchPriority,
+	comparePlannerSearchPriorityFx,
+	readPlannerSearchPriorityFx,
 	type PlannerSearchPriorityPlan,
-} from "~/editor/planner/readPlannerSearchPriority";
+} from "~/editor/planner/readPlannerSearchPriorityFx";
 import type { PlannerSearchScope } from "~/editor/planner/PlannerSearchScope";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -79,15 +80,17 @@ const makeRuntime = (quantity: number): RuntimeSchema.Type =>
 	}) as RuntimeSchema.Type;
 
 const readPriority = (quantity: number) =>
-	readPlannerSearchPriority({
-		itemId: water.id,
-		plan,
-		quantity: 2,
-		runtime: makeRuntime(quantity),
-		scope,
-	});
+	Effect.runSync(
+		readPlannerSearchPriorityFx({
+			itemId: water.id,
+			plan,
+			quantity: 2,
+			runtime: makeRuntime(quantity),
+			scope,
+		}),
+	);
 
-describe("readPlannerSearchPriority", () => {
+describe("readPlannerSearchPriorityFx", () => {
 	it("prefers one useful authored-output surplus without rewarding unbounded stockpiling", () => {
 		const exact = readPriority(2);
 		const oneActionMaximum = readPriority(3);
@@ -98,7 +101,9 @@ describe("readPlannerSearchPriority", () => {
 		expect(exact.preferredHeadroomByDepth[4] ?? 0).toBe(0);
 		expect(oneActionMaximum.preferredHeadroomByDepth[4]).toBe(1);
 		expect(stockpile.preferredHeadroomByDepth[4]).toBe(1);
-		expect(comparePlannerSearchPriority(oneActionMaximum, exact)).toBeLessThan(0);
-		expect(comparePlannerSearchPriority(stockpile, oneActionMaximum)).toBe(0);
+		expect(
+			Effect.runSync(comparePlannerSearchPriorityFx(oneActionMaximum, exact)),
+		).toBeLessThan(0);
+		expect(Effect.runSync(comparePlannerSearchPriorityFx(stockpile, oneActionMaximum))).toBe(0);
 	});
 });

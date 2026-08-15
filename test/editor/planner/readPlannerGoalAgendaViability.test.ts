@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { createPlannerSearchHarnessFx } from "./support/createPlannerSearchHarnessFx";
-import { readPlannerGoalAgendaViability } from "~/editor/planner/readPlannerGoalAgendaViability";
+import { readPlannerGoalAgendaViabilityFx } from "~/editor/planner/readPlannerGoalAgendaViabilityFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const item = (id: string, type: "producer" | "simple" = "simple") => ({
@@ -161,20 +161,22 @@ describe("planner goal agenda viability", () => {
 
 		expect(upgrade.type).toBe("completed");
 		if (upgrade.type !== "completed") return;
-		const viability = readPlannerGoalAgendaViability({
-			goals: [
-				{
-					itemId: "advanced-hall",
-					quantity: 1,
-				},
-				{
-					itemId: "legacy-blueprint",
-					quantity: 1,
-				},
-			],
-			graph: planner.graph,
-			runtime: upgrade.execution.runtime,
-		});
+		const viability = Effect.runSync(
+			readPlannerGoalAgendaViabilityFx({
+				goals: [
+					{
+						itemId: "advanced-hall",
+						quantity: 1,
+					},
+					{
+						itemId: "legacy-blueprint",
+						quantity: 1,
+					},
+				],
+				graph: planner.graph,
+				runtime: upgrade.execution.runtime,
+			}),
+		);
 
 		expect(viability.type).toBe("dead-end");
 		if (viability.type !== "dead-end") return;

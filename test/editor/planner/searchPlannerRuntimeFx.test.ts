@@ -2,11 +2,11 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { createPlannerSearchHarnessFx } from "./support/createPlannerSearchHarnessFx";
-import { readPlannerSearchScope } from "~/editor/planner/readPlannerSearchScope";
+import { readPlannerSearchScopeFx } from "~/editor/planner/readPlannerSearchScopeFx";
 import {
-	readPlannerActiveDemand,
-	readPlannerSearchPriorityPlan,
-} from "~/editor/planner/readPlannerSearchPriority";
+	readPlannerActiveDemandFx,
+	readPlannerSearchPriorityPlanFx,
+} from "~/editor/planner/readPlannerSearchPriorityFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
@@ -1143,19 +1143,26 @@ describe("searchPlannerRuntimeFx", () => {
 
 	it("prepares finite-resource renewal before the final charge spend", () => {
 		const planner = makePlanner();
-		const scope = readPlannerSearchScope({
-			graph: planner.graph,
-			targetItemId: "renewal-part",
-		});
-		const demand = readPlannerActiveDemand({
-			itemId: "renewal-part",
-			plan: readPlannerSearchPriorityPlan({
+		const scope = Effect.runSync(
+			readPlannerSearchScopeFx({
+				graph: planner.graph,
+				targetItemId: "renewal-part",
+			}),
+		);
+		const plan = Effect.runSync(
+			readPlannerSearchPriorityPlanFx({
 				graph: planner.graph,
 				scope,
 			}),
-			quantity: 3,
-			runtime: planner.initialRuntime,
-		});
+		);
+		const demand = Effect.runSync(
+			readPlannerActiveDemandFx({
+				itemId: "renewal-part",
+				plan,
+				quantity: 3,
+				runtime: planner.initialRuntime,
+			}),
+		);
 
 		expect(demand.get("renewal-source")).toMatchObject({
 			quantity: 1,

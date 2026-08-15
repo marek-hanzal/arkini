@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { createPlannerSearchHarnessFx } from "./support/createPlannerSearchHarnessFx";
-import { readPlannerGoalViability } from "~/editor/planner/readPlannerGoalViability";
+import { readPlannerGoalViabilityFx } from "~/editor/planner/readPlannerGoalViabilityFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const baseItem = (id: string, scope: "any" | "board" = "any") => ({
@@ -121,17 +121,19 @@ const config = GameConfigSchema.parse({
 
 const makePlanner = () => Effect.runSync(createPlannerSearchHarnessFx(config));
 
-describe("readPlannerGoalViability", () => {
+describe("readPlannerGoalViabilityFx", () => {
 	it("re-roots structural reachability in the exact runtime snapshot", () => {
 		const planner = makePlanner();
-		const viable = readPlannerGoalViability({
-			goal: {
-				itemId: "target",
-				quantity: 1,
-			},
-			graph: planner.graph,
-			runtime: planner.initialRuntime,
-		});
+		const viable = Effect.runSync(
+			readPlannerGoalViabilityFx({
+				goal: {
+					itemId: "target",
+					quantity: 1,
+				},
+				graph: planner.graph,
+				runtime: planner.initialRuntime,
+			}),
+		);
 
 		expect(viable).toMatchObject({
 			availableQuantity: 0,
@@ -146,14 +148,16 @@ describe("readPlannerGoalViability", () => {
 			...planner.initialRuntime,
 			items: planner.initialRuntime.items.filter(({ item }) => item.id !== "maker"),
 		};
-		const deadEnd = readPlannerGoalViability({
-			goal: {
-				itemId: "target",
-				quantity: 1,
-			},
-			graph: planner.graph,
-			runtime: withoutOwner,
-		});
+		const deadEnd = Effect.runSync(
+			readPlannerGoalViabilityFx({
+				goal: {
+					itemId: "target",
+					quantity: 1,
+				},
+				graph: planner.graph,
+				runtime: withoutOwner,
+			}),
+		);
 
 		expect(deadEnd).toMatchObject({
 			availableQuantity: 0,
@@ -174,14 +178,16 @@ describe("readPlannerGoalViability", () => {
 		if (result.type !== "completed") return;
 
 		expect(
-			readPlannerGoalViability({
-				goal: {
-					itemId: "target",
-					quantity: 1,
-				},
-				graph: planner.graph,
-				runtime: result.runtime,
-			}),
+			Effect.runSync(
+				readPlannerGoalViabilityFx({
+					goal: {
+						itemId: "target",
+						quantity: 1,
+					},
+					graph: planner.graph,
+					runtime: result.runtime,
+				}),
+			),
 		).toMatchObject({
 			availableQuantity: 1,
 			type: "satisfied",

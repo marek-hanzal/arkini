@@ -1,11 +1,15 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readPlannerExpectedIndependentRuns } from "~/editor/planner/readPlannerExpectedIndependentRuns";
+import { readPlannerExpectedIndependentRunsFx } from "~/editor/planner/readPlannerExpectedIndependentRunsFx";
 
-describe("readPlannerExpectedIndependentRuns", () => {
+const readExpectedRuns = (props: Parameters<typeof readPlannerExpectedIndependentRunsFx>[0]) =>
+	Effect.runSync(readPlannerExpectedIndependentRunsFx(props));
+
+describe("readPlannerExpectedIndependentRunsFx", () => {
 	it("counts deterministic runs including overshoot", () => {
 		expect(
-			readPlannerExpectedIndependentRuns({
+			readExpectedRuns({
 				distribution: [
 					{
 						probability: 1,
@@ -19,7 +23,7 @@ describe("readPlannerExpectedIndependentRuns", () => {
 
 	it("solves Bernoulli accumulation as a hitting time", () => {
 		expect(
-			readPlannerExpectedIndependentRuns({
+			readExpectedRuns({
 				distribution: [
 					{
 						probability: 0.5,
@@ -36,7 +40,7 @@ describe("readPlannerExpectedIndependentRuns", () => {
 	});
 
 	it("uses the complete integer distribution instead of mean-yield division", () => {
-		const result = readPlannerExpectedIndependentRuns({
+		const result = readExpectedRuns({
 			distribution: [
 				{
 					probability: 0.390625,
@@ -96,7 +100,7 @@ describe("readPlannerExpectedIndependentRuns", () => {
 
 	it("linearly interpolates fractional downstream demand", () => {
 		expect(
-			readPlannerExpectedIndependentRuns({
+			readExpectedRuns({
 				distribution: [
 					{
 						probability: 0.5,
@@ -114,7 +118,7 @@ describe("readPlannerExpectedIndependentRuns", () => {
 
 	it("reports an impossible zero-progress distribution", () => {
 		expect(
-			readPlannerExpectedIndependentRuns({
+			readExpectedRuns({
 				distribution: [
 					{
 						probability: 1,

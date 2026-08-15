@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { PlannerStrategyId } from "~/editor/planner/PlannerStrategy";
 import { createPlannerFx } from "~/editor/planner/createPlannerFx";
-import { createProducerExpansionPlannerStrategy } from "~/editor/planner/createProducerExpansionPlannerStrategy";
+import { createProducerExpansionPlannerStrategyFx } from "~/editor/planner/createProducerExpansionPlannerStrategyFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
@@ -118,7 +118,7 @@ const createPlanner = (config: GameConfigSchema.Type) =>
 	Effect.runSync(
 		createPlannerFx({
 			config,
-			strategy: createProducerExpansionPlannerStrategy(),
+			strategy: Effect.runSync(createProducerExpansionPlannerStrategyFx()),
 		}),
 	);
 
@@ -348,7 +348,7 @@ const readDestructiveUpgradeConfig = (): GameConfigSchema.Type =>
 		},
 	});
 
-describe("createProducerExpansionPlannerStrategy", () => {
+describe("createProducerExpansionPlannerStrategyFx", () => {
 	it("uses an already available producer before constructing another producer for the same target", async () => {
 		const result = await Effect.runPromise(
 			createPlanner(readExistingProducerConfig()).estimateFx({

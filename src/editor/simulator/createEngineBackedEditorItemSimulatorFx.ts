@@ -8,9 +8,9 @@ import {
 	DefaultEditorPlannerBestFirstBudget,
 	DefaultEditorPlannerConstructiveBudget,
 	DefaultEditorPlannerProducerExpansionBudget,
-	createEditorPlannerStrategy,
-} from "~/editor/planner/createEditorPlannerStrategy";
-import { createPlannerAcquisitionGraph } from "~/editor/planner/createPlannerAcquisitionGraph";
+	createEditorPlannerStrategyFx,
+} from "~/editor/planner/createEditorPlannerStrategyFx";
+import { createPlannerAcquisitionGraphFx } from "~/editor/planner/createPlannerAcquisitionGraphFx";
 import { createPlannerFx } from "~/editor/planner/createPlannerFx";
 import type { EditorItemSimulation } from "~/editor/simulator/EditorItemSimulation";
 import { projectPlannerResult } from "~/editor/simulator/projectPlannerResult";
@@ -56,29 +56,34 @@ export const createEngineBackedEditorItemSimulatorFx = Effect.fn(
 	"createEngineBackedEditorItemSimulatorFx",
 )((config: GameConfigSchema.Type) =>
 	Effect.gen(function* () {
-		const graph = createPlannerAcquisitionGraph(config);
-		const createPlannerForBudgetFx = (budget: EditorItemPlannerBudget) =>
-			createPlannerFx({
-				budget: {
-					...EditorItemPlannerSessionBudget,
-					...budget.session,
-				},
-				config,
-				strategy: createEditorPlannerStrategy({
-					constructiveBudget: {
-						...EditorItemPlannerGoalSearchBudget,
-						...budget.constructive,
-					},
-					bestFirstBudget: {
-						...EditorItemPlannerSearchBudget,
-						...budget.bestFirst,
-					},
-					producerExpansionBudget: {
-						...EditorItemPlannerProducerExpansionBudget,
-						...budget.producerExpansion,
-					},
+		const graph = yield* createPlannerAcquisitionGraphFx(config);
+		const createPlannerForBudgetFx = Effect.fn("createPlannerForBudgetFx")(
+			(budget: EditorItemPlannerBudget) =>
+				Effect.gen(function* () {
+					const strategy = yield* createEditorPlannerStrategyFx({
+						constructiveBudget: {
+							...EditorItemPlannerGoalSearchBudget,
+							...budget.constructive,
+						},
+						bestFirstBudget: {
+							...EditorItemPlannerSearchBudget,
+							...budget.bestFirst,
+						},
+						producerExpansionBudget: {
+							...EditorItemPlannerProducerExpansionBudget,
+							...budget.producerExpansion,
+						},
+					});
+					return yield* createPlannerFx({
+						budget: {
+							...EditorItemPlannerSessionBudget,
+							...budget.session,
+						},
+						config,
+						strategy,
+					});
 				}),
-			});
+		);
 		const defaultPlanner = yield* createPlannerForBudgetFx({});
 		return {
 			simulateFx: Effect.fn("EngineBackedEditorItemSimulator.simulateFx")(

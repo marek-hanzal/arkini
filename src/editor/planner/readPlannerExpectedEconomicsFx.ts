@@ -15,7 +15,7 @@ import type {
 	PlannerExpectedEconomicsOperation,
 } from "~/editor/planner/PlannerExpectedEconomics";
 import type { PlannerSearchTraceEntry } from "~/editor/planner/PlannerSearch";
-import { readPlannerExpectedIndependentRuns } from "~/editor/planner/readPlannerExpectedIndependentRuns";
+import { readPlannerExpectedIndependentRunsFx } from "~/editor/planner/readPlannerExpectedIndependentRunsFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -407,86 +407,88 @@ const readExpectedMultipliers = ({
 	quantity,
 	trace,
 	...props
-}: readPlannerExpectedEconomicsFx.Props) => {
-	const { dependenciesByTargetStep, retainedDependenciesByTargetStep, terminalQuantityByStep } =
-		readFlowDependencies({
+}: readPlannerExpectedEconomicsFx.Props) =>
+	Effect.gen(function* () {
+		const {
+			dependenciesByTargetStep,
+			retainedDependenciesByTargetStep,
+			terminalQuantityByStep,
+		} = readFlowDependencies({
 			itemId,
 			quantity,
 			trace,
 			...props,
 		});
-	const chargePredecessorsByStep = readChargePredecessorsByStep(trace);
-	const requiredOutputByStep = terminalQuantityByStep;
-	const forcedMultiplierByStep = Array.from(
-		{
-			length: trace.length,
-		},
-		() => 0,
-	);
-	const multiplierByStep = Array.from(
-		{
-			length: trace.length,
-		},
-		() => 0,
-	);
-
-	for (let stepIndex = trace.length - 1; stepIndex >= 0; stepIndex -= 1) {
-		const step = trace[stepIndex];
-		if (step === undefined) continue;
-		let multiplier = forcedMultiplierByStep[stepIndex] ?? 0;
-		const producedQuantityByItemId = new Map(
-			step.producedItemQuantities.map((entry) => [
-				entry.itemId,
-				entry.quantity,
-			]),
+		const chargePredecessorsByStep = readChargePredecessorsByStep(trace);
+		const requiredOutputByStep = terminalQuantityByStep;
+		const forcedMultiplierByStep = Array.from(
+			{
+				length: trace.length,
+			},
+			() => 0,
 		);
-		const requiredItemIds = new Set(requiredOutputByStep[stepIndex]?.keys() ?? []);
-		for (const requiredItemId of requiredItemIds) {
-			const requiredQuantity = requiredOutputByStep[stepIndex]?.get(requiredItemId) ?? 0;
-			const producedQuantity = producedQuantityByItemId.get(requiredItemId) ?? 0;
-			if (producedQuantity <= quantityEpsilon)
-				throw new RangeError(
-					`Planner trace step ${step.actionId} did not produce required ${requiredItemId}.`,
-				);
-			multiplier = Math.max(
-				multiplier,
-				readPlannerExpectedIndependentRuns({
+		const multiplierByStep = Array.from(
+			{
+				length: trace.length,
+			},
+			() => 0,
+		);
+
+		for (let stepIndex = trace.length - 1; stepIndex >= 0; stepIndex -= 1) {
+			const step = trace[stepIndex];
+			if (step === undefined) continue;
+			let multiplier = forcedMultiplierByStep[stepIndex] ?? 0;
+			const producedQuantityByItemId = new Map(
+				step.producedItemQuantities.map((entry) => [
+					entry.itemId,
+					entry.quantity,
+				]),
+			);
+			const requiredItemIds = new Set(requiredOutputByStep[stepIndex]?.keys() ?? []);
+			for (const requiredItemId of requiredItemIds) {
+				const requiredQuantity = requiredOutputByStep[stepIndex]?.get(requiredItemId) ?? 0;
+				const producedQuantity = producedQuantityByItemId.get(requiredItemId) ?? 0;
+				if (producedQuantity <= quantityEpsilon)
+					throw new RangeError(
+						`Planner trace step ${step.actionId} did not produce required ${requiredItemId}.`,
+					);
+				const expectedRuns = yield* readPlannerExpectedIndependentRunsFx({
 					distribution: readOutputDistribution({
 						itemId: requiredItemId,
 						producedQuantity,
 						step,
 					}),
 					quantity: requiredQuantity,
-				}),
-			);
+				});
+				multiplier = Math.max(multiplier, expectedRuns);
+			}
+			multiplierByStep[stepIndex] = multiplier;
+			if (multiplier <= quantityEpsilon) continue;
+
+			for (const predecessorStepIndex of chargePredecessorsByStep.get(stepIndex) ?? [])
+				forcedMultiplierByStep[predecessorStepIndex] = Math.max(
+					forcedMultiplierByStep[predecessorStepIndex] ?? 0,
+					multiplier,
+				);
+
+			for (const dependency of dependenciesByTargetStep[stepIndex] ?? []) {
+				const quantities = requiredOutputByStep[dependency.sourceStepIndex];
+				if (quantities === undefined) continue;
+				addQuantity(quantities, dependency.itemId, dependency.quantity * multiplier);
+			}
+
+			for (const dependency of retainedDependenciesByTargetStep[stepIndex] ?? []) {
+				const quantities = requiredOutputByStep[dependency.sourceStepIndex];
+				if (quantities === undefined) continue;
+				quantities.set(
+					dependency.itemId,
+					Math.max(quantities.get(dependency.itemId) ?? 0, dependency.quantity),
+				);
+			}
 		}
-		multiplierByStep[stepIndex] = multiplier;
-		if (multiplier <= quantityEpsilon) continue;
 
-		for (const predecessorStepIndex of chargePredecessorsByStep.get(stepIndex) ?? [])
-			forcedMultiplierByStep[predecessorStepIndex] = Math.max(
-				forcedMultiplierByStep[predecessorStepIndex] ?? 0,
-				multiplier,
-			);
-
-		for (const dependency of dependenciesByTargetStep[stepIndex] ?? []) {
-			const quantities = requiredOutputByStep[dependency.sourceStepIndex];
-			if (quantities === undefined) continue;
-			addQuantity(quantities, dependency.itemId, dependency.quantity * multiplier);
-		}
-
-		for (const dependency of retainedDependenciesByTargetStep[stepIndex] ?? []) {
-			const quantities = requiredOutputByStep[dependency.sourceStepIndex];
-			if (quantities === undefined) continue;
-			quantities.set(
-				dependency.itemId,
-				Math.max(quantities.get(dependency.itemId) ?? 0, dependency.quantity),
-			);
-		}
-	}
-
-	return multiplierByStep;
-};
+		return multiplierByStep;
+	});
 
 const readExpectedItemQuantities = (
 	quantities: ReadonlyMap<IdSchema.Type, number>,
@@ -575,8 +577,8 @@ const readRequiredInitialActors = ({
 /** Estimates independent replay economics for one concrete engine-valid planner trace. */
 export const readPlannerExpectedEconomicsFx = Effect.fn("readPlannerExpectedEconomicsFx")(
 	(props: readPlannerExpectedEconomicsFx.Props) =>
-		Effect.sync(() => {
-			const multiplierByStep = readExpectedMultipliers(props);
+		Effect.gen(function* () {
+			const multiplierByStep = yield* readExpectedMultipliers(props);
 			const expectedAcquiredByItemId = new Map<
 				IdSchema.Type,
 				{

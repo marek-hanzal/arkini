@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import type { PlannerAcquisitionRoute } from "~/editor/planner/PlannerAcquisitionGraph";
 import { createPlannerAcquisitionGraphFx } from "~/editor/planner/createPlannerAcquisitionGraphFx";
-import { readPlannerStructuralReachability } from "~/editor/planner/readPlannerStructuralReachability";
+import { readPlannerStructuralReachabilityFx } from "~/editor/planner/readPlannerStructuralReachabilityFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
@@ -500,18 +500,24 @@ describe("createPlannerAcquisitionGraphFx", () => {
 
 	it("returns finite witnesses and explains source-less and cyclic failures", () => {
 		const graph = Effect.runSync(createPlannerAcquisitionGraphFx(createConfig()));
-		const reachable = readPlannerStructuralReachability({
-			graph,
-			itemId: "ingot",
-		});
-		const sourceLess = readPlannerStructuralReachability({
-			graph,
-			itemId: "locked-target",
-		});
-		const cyclic = readPlannerStructuralReachability({
-			graph,
-			itemId: "cycle-a",
-		});
+		const reachable = Effect.runSync(
+			readPlannerStructuralReachabilityFx({
+				graph,
+				itemId: "ingot",
+			}),
+		);
+		const sourceLess = Effect.runSync(
+			readPlannerStructuralReachabilityFx({
+				graph,
+				itemId: "locked-target",
+			}),
+		);
+		const cyclic = Effect.runSync(
+			readPlannerStructuralReachabilityFx({
+				graph,
+				itemId: "cycle-a",
+			}),
+		);
 
 		expect(reachable).toMatchObject({
 			depth: 1,
@@ -554,10 +560,12 @@ describe("createPlannerAcquisitionGraphFx", () => {
 			],
 		});
 		expect(
-			readPlannerStructuralReachability({
-				graph,
-				itemId: "missing-item",
-			}),
+			Effect.runSync(
+				readPlannerStructuralReachabilityFx({
+					graph,
+					itemId: "missing-item",
+				}),
+			),
 		).toEqual({
 			itemId: "missing-item",
 			type: "target-missing",

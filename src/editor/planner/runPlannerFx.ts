@@ -4,15 +4,15 @@ import type { PlannerBudgetLimits } from "~/editor/planner/PlannerBudget";
 import { PlannerBudgetFx } from "~/editor/planner/PlannerBudgetFx";
 import type { PlannerEstimateRequest } from "~/editor/planner/Planner";
 import { PlannerKernelFx } from "~/editor/planner/PlannerKernelFx";
-import { createRootPlannerProblem } from "~/editor/planner/PlannerProblem";
+import { createRootPlannerProblemFx } from "~/editor/planner/createRootPlannerProblemFx";
 import type { PlannerResult } from "~/editor/planner/PlannerResult";
 import { PlannerSessionFx } from "~/editor/planner/PlannerSessionFx";
 import type { PlannerStrategy, PlannerStrategyMetrics } from "~/editor/planner/PlannerStrategy";
 import type { PlannerStrategyEnvironment } from "~/editor/planner/PlannerStrategyEnvironment";
 import { createPlannerBudgetFx } from "~/editor/planner/createPlannerBudgetFx";
 import { createPlannerSessionFx } from "~/editor/planner/createPlannerSessionFx";
-import { readPlannerItemGoalStatus } from "~/editor/planner/readPlannerItemGoalStatus";
-import { readPlannerRuntimeQuantity } from "~/editor/planner/readPlannerRuntimeQuantity";
+import { readPlannerItemGoalStatusFx } from "~/editor/planner/readPlannerItemGoalStatusFx";
+import { readPlannerRuntimeQuantityFx } from "~/editor/planner/readPlannerRuntimeQuantityFx";
 
 export namespace runPlannerFx {
 	export interface Props<StrategyId extends string, Diagnostics> {
@@ -56,7 +56,7 @@ export const runPlannerFx = Effect.fn("runPlannerFx")(function* <
 	}).pipe(Effect.provideService(PlannerBudgetFx, budget));
 	const outcome = yield* session
 		.runStrategyFx({
-			problem: createRootPlannerProblem({
+			problem: yield* createRootPlannerProblemFx({
 				goal,
 				runtime,
 			}),
@@ -68,7 +68,7 @@ export const runPlannerFx = Effect.fn("runPlannerFx")(function* <
 
 	if (Result.isFailure(outcome))
 		return {
-			bestAvailableQuantity: readPlannerRuntimeQuantity(runtime, request.itemId),
+			bestAvailableQuantity: yield* readPlannerRuntimeQuantityFx(runtime, request.itemId),
 			blockedActionIds: [],
 			budgetLimit: outcome.failure.counter,
 			itemId: request.itemId,
@@ -100,7 +100,7 @@ export const runPlannerFx = Effect.fn("runPlannerFx")(function* <
 
 	switch (result.type) {
 		case "completed": {
-			const status = readPlannerItemGoalStatus(goal, result.execution.runtime);
+			const status = yield* readPlannerItemGoalStatusFx(goal, result.execution.runtime);
 			if (!status.satisfied)
 				return yield* Effect.die(
 					new Error(

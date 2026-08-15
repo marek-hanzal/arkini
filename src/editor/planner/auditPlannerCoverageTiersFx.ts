@@ -13,11 +13,11 @@ import {
 	type PlannerCoverageTierDefinition,
 } from "~/editor/planner/PlannerCoverageTierAudit";
 import { auditPlannerCoverageWithPlannerFx } from "~/editor/planner/auditPlannerCoverageFx";
-import { createBestFirstPlannerStrategy } from "~/editor/planner/createBestFirstPlannerStrategy";
+import { createBestFirstPlannerStrategyFx } from "~/editor/planner/createBestFirstPlannerStrategyFx";
 import { createPlannerFx } from "~/editor/planner/createPlannerFx";
-import { mergePlannerCoverageTierAuditReports } from "~/editor/planner/mergePlannerCoverageTierAuditReports";
-import { readPlannerCoverageAuditOutcomeCounts } from "~/editor/planner/readPlannerCoverageAuditOutcomeCounts";
-import { readPlannerSearchBudget } from "~/editor/planner/readPlannerSearchBudget";
+import { mergePlannerCoverageTierAuditReportsFx } from "~/editor/planner/mergePlannerCoverageTierAuditReportsFx";
+import { readPlannerCoverageAuditOutcomeCountsFx } from "~/editor/planner/readPlannerCoverageAuditOutcomeCountsFx";
+import { readPlannerSearchBudgetFx } from "~/editor/planner/readPlannerSearchBudgetFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
@@ -74,7 +74,7 @@ const readTiers = (
 					message: `Planner coverage tier id is duplicated: ${id}.`,
 				});
 			ids.add(id);
-			const budget = readPlannerSearchBudget(definition.budget);
+			const budget = yield* readPlannerSearchBudgetFx(definition.budget);
 			const previous = tiers.at(-1);
 			if (previous !== undefined) {
 				for (const key of BudgetKeys) {
@@ -137,18 +137,9 @@ export const auditPlannerCoverageTiersFx = Effect.fn("auditPlannerCoverageTiersF
 	const initialReport =
 		sourceInitialReport === undefined
 			? undefined
-			: yield* Effect.try({
-					catch: (cause) =>
-						cause instanceof PlannerCoverageTierAuditInputError
-							? cause
-							: new PlannerCoverageTierAuditInputError({
-									message: String(cause),
-								}),
-					try: () =>
-						mergePlannerCoverageTierAuditReports([
-							sourceInitialReport,
-						]),
-				});
+			: yield* mergePlannerCoverageTierAuditReportsFx([
+					sourceInitialReport,
+				]);
 	const existingTierDefinitions =
 		initialReport?.tiers.map(({ budget, id }) => ({
 			budget,
@@ -221,11 +212,12 @@ export const auditPlannerCoverageTiersFx = Effect.fn("auditPlannerCoverageTiersF
 			({ outcome }) => outcome === "no-finite-path",
 		).length;
 		const attemptedItemIds = unresolvedItemIds;
+		const strategy = yield* createBestFirstPlannerStrategyFx({
+			budget: tier.budget,
+		});
 		const planner = yield* createPlannerFx({
 			config,
-			strategy: createBestFirstPlannerStrategy({
-				budget: tier.budget,
-			}),
+			strategy,
 		});
 		const attemptReport = yield* auditPlannerCoverageWithPlannerFx({
 			budget: tier.budget,
@@ -264,7 +256,7 @@ export const auditPlannerCoverageTiersFx = Effect.fn("auditPlannerCoverageTiersF
 						item,
 					];
 		});
-		const cumulativeOutcomes = readPlannerCoverageAuditOutcomeCounts(finalItems);
+		const cumulativeOutcomes = yield* readPlannerCoverageAuditOutcomeCountsFx(finalItems);
 		const newlyCompleted = attemptReport.summary.outcomes.completed;
 		const newlyNoFinitePath = attemptReport.summary.outcomes.noFinitePath;
 		const newlyResolved = newlyCompleted + newlyNoFinitePath;
@@ -310,7 +302,7 @@ export const auditPlannerCoverageTiersFx = Effect.fn("auditPlannerCoverageTiersF
 					item,
 				];
 	});
-	const finalOutcomes = readPlannerCoverageAuditOutcomeCounts(finalAuditItems);
+	const finalOutcomes = yield* readPlannerCoverageAuditOutcomeCountsFx(finalAuditItems);
 	const saturatedTier = tierReports.find(
 		({ remainingInconclusive }) => remainingInconclusive === 0,
 	);

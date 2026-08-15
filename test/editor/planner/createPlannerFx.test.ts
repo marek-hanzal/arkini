@@ -2,8 +2,8 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { PlannerStrategyId } from "~/editor/planner/PlannerStrategy";
-import { createBestFirstPlannerStrategy } from "~/editor/planner/createBestFirstPlannerStrategy";
-import { createConstructivePlannerStrategy } from "~/editor/planner/createConstructivePlannerStrategy";
+import { createBestFirstPlannerStrategyFx } from "~/editor/planner/createBestFirstPlannerStrategyFx";
+import { createConstructivePlannerStrategyFx } from "~/editor/planner/createConstructivePlannerStrategyFx";
 import { createPlannerFx } from "~/editor/planner/createPlannerFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
@@ -116,13 +116,13 @@ const config = GameConfigSchema.parse({
 const createBestFirstPlannerFx = () =>
 	createPlannerFx({
 		config,
-		strategy: createBestFirstPlannerStrategy(),
+		strategy: Effect.runSync(createBestFirstPlannerStrategyFx()),
 	});
 
 const createConstructivePlannerFx = () =>
 	createPlannerFx({
 		config,
-		strategy: createConstructivePlannerStrategy(),
+		strategy: Effect.runSync(createConstructivePlannerStrategyFx()),
 	});
 
 describe("createPlannerFx", () => {

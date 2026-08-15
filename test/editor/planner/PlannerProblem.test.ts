@@ -1,37 +1,40 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { mergePlannerGoalAgenda } from "~/editor/planner/PlannerProblem";
+import { mergePlannerGoalAgendaFx } from "~/editor/planner/mergePlannerGoalAgendaFx";
 
-describe("mergePlannerGoalAgenda", () => {
+describe("mergePlannerGoalAgendaFx", () => {
 	it("keeps the active goal first and preserves the strongest demand per item", () => {
 		expect(
-			mergePlannerGoalAgenda({
-				activeGoal: {
-					itemId: "item:water",
-					quantity: 1,
-				},
-				goals: [
-					{
-						itemId: "item:stone",
-						minimumCharges: 2,
-						quantity: 3,
-					},
-					{
+			Effect.runSync(
+				mergePlannerGoalAgendaFx({
+					activeGoal: {
 						itemId: "item:water",
-						minimumCharges: 4,
-						quantity: 2,
+						quantity: 1,
 					},
-					{
-						itemId: "item:log",
-						quantity: 5,
-					},
-					{
-						itemId: "item:stone",
-						minimumCharges: 1,
-						quantity: 7,
-					},
-				],
-			}),
+					goals: [
+						{
+							itemId: "item:stone",
+							minimumCharges: 2,
+							quantity: 3,
+						},
+						{
+							itemId: "item:water",
+							minimumCharges: 4,
+							quantity: 2,
+						},
+						{
+							itemId: "item:log",
+							quantity: 5,
+						},
+						{
+							itemId: "item:stone",
+							minimumCharges: 1,
+							quantity: 7,
+						},
+					],
+				}),
+			),
 		).toEqual([
 			{
 				itemId: "item:water",

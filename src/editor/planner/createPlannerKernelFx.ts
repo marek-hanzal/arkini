@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 
 import type { PlannerKernel } from "~/editor/planner/PlannerKernel";
-import { createPlannerAcquisitionGraph } from "~/editor/planner/createPlannerAcquisitionGraph";
+import { createPlannerAcquisitionGraphFx } from "~/editor/planner/createPlannerAcquisitionGraphFx";
 import { createPlannerInitialRuntimeFx } from "~/editor/planner/createPlannerInitialRuntimeFx";
 import { readPlannerExpectedEconomicsFx } from "~/editor/planner/readPlannerExpectedEconomicsFx";
-import { readPlannerGoalViability } from "~/editor/planner/readPlannerGoalViability";
-import { readPlannerStructuralReachability } from "~/editor/planner/readPlannerStructuralReachability";
+import { readPlannerGoalViabilityFx } from "~/editor/planner/readPlannerGoalViabilityFx";
+import { readPlannerStructuralReachabilityFx } from "~/editor/planner/readPlannerStructuralReachabilityFx";
 import { runPlannerSearchCandidateFx } from "~/editor/planner/runPlannerSearchCandidateFx";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -14,7 +14,7 @@ import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 export const createPlannerKernelFx = Effect.fn("createPlannerKernelFx")(
 	(config: GameConfigSchema.Type) =>
 		Effect.gen(function* () {
-			const graph = createPlannerAcquisitionGraph(config);
+			const graph = yield* createPlannerAcquisitionGraphFx(config);
 			const initialRuntime = yield* createPlannerInitialRuntimeFx(config);
 			return {
 				config,
@@ -27,14 +27,14 @@ export const createPlannerKernelFx = Effect.fn("createPlannerKernelFx")(
 							graph,
 						}),
 				),
-				readGoalViability: ({ goal, runtime }) =>
-					readPlannerGoalViability({
+				readGoalViabilityFx: ({ goal, runtime }) =>
+					readPlannerGoalViabilityFx({
 						goal,
 						graph,
 						runtime,
 					}),
-				readStructuralReachability: (itemId) =>
-					readPlannerStructuralReachability({
+				readStructuralReachabilityFx: (itemId) =>
+					readPlannerStructuralReachabilityFx({
 						graph,
 						itemId,
 					}),

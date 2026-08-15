@@ -18,21 +18,23 @@ export namespace createPlannerFx {
 }
 
 /** Creates one public planner orchestrator around exactly one root strategy. */
-export const createPlannerFx = <StrategyId extends string, Diagnostics>({
-	budget,
-	config,
-	strategy,
-}: createPlannerFx.Props<StrategyId, Diagnostics>) =>
-	Effect.gen(function* () {
-		const kernel = yield* createPlannerKernelFx(config);
-		return {
-			estimateFx: Effect.fn("Planner.estimateFx")((request) =>
-				runPlannerFx({
-					budget,
-					request,
-					strategy,
-				}).pipe(Effect.provideService(PlannerKernelFx, kernel)),
-			),
-			strategyId: strategy.id,
-		} satisfies Planner<StrategyId, Diagnostics>;
-	});
+export const createPlannerFx = Effect.fn("createPlannerFx")(
+	<StrategyId extends string, Diagnostics>({
+		budget,
+		config,
+		strategy,
+	}: createPlannerFx.Props<StrategyId, Diagnostics>) =>
+		Effect.gen(function* () {
+			const kernel = yield* createPlannerKernelFx(config);
+			return {
+				estimateFx: Effect.fn("Planner.estimateFx")((request) =>
+					runPlannerFx({
+						budget,
+						request,
+						strategy,
+					}).pipe(Effect.provideService(PlannerKernelFx, kernel)),
+				),
+				strategyId: strategy.id,
+			} satisfies Planner<StrategyId, Diagnostics>;
+		}),
+);

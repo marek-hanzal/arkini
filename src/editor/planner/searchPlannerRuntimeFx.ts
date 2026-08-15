@@ -9,26 +9,26 @@ import {
 	type PlannerSearchRoutePlanDiagnostic,
 } from "~/editor/planner/PlannerSearch";
 import type { PlannerSearchScope } from "~/editor/planner/PlannerSearchScope";
-import { createPlannerRuntimeDominanceIndex } from "~/editor/planner/createPlannerRuntimeDominanceIndex";
-import { isPlannerRuntimeQuiescent } from "~/editor/planner/isPlannerRuntimeQuiescent";
+import type { PlannerRuntimeDominanceIndex } from "~/editor/planner/PlannerRuntimeDominanceIndex";
+import { createPlannerRuntimeDominanceIndexFx } from "~/editor/planner/createPlannerRuntimeDominanceIndexFx";
+import { isPlannerRuntimeQuiescentFx } from "~/editor/planner/isPlannerRuntimeQuiescentFx";
 import type { PlannerSearchExecutionState } from "~/editor/planner/PlannerSearchExecution";
 import { readPlannerExpectedEconomicsFx } from "~/editor/planner/readPlannerExpectedEconomicsFx";
-import { readPlannerRuntimeQuantity } from "~/editor/planner/readPlannerRuntimeQuantity";
-import { readPlannerSearchBudget } from "~/editor/planner/readPlannerSearchBudget";
-import { readPlannerSearchCandidateGroups } from "~/editor/planner/readPlannerSearchCandidateGroups";
+import { readPlannerSearchBudgetFx } from "~/editor/planner/readPlannerSearchBudgetFx";
+import { readPlannerSearchCandidateGroupsFx } from "~/editor/planner/readPlannerSearchCandidateGroupsFx";
 import {
-	comparePlannerSearchPriority,
-	readPlannerActiveDemand,
-	readPlannerSearchPriority,
-	readPlannerSearchPriorityPlan,
+	readPlannerActiveDemandFx,
+	readPlannerSearchPriorityFx,
+	readPlannerSearchPriorityPlanFx,
 	type PlannerActiveItemDemand,
 	type PlannerSearchPriority,
-} from "~/editor/planner/readPlannerSearchPriority";
+	type PlannerSearchPriorityPlan,
+} from "~/editor/planner/readPlannerSearchPriorityFx";
 import {
-	iteratePlannerSearchScopes,
-	readPlannerSearchScope,
-} from "~/editor/planner/readPlannerSearchScope";
-import { readPlannerStructuralReachability } from "~/editor/planner/readPlannerStructuralReachability";
+	readPlannerSearchScopeFx,
+	readPlannerSearchScopesFx,
+} from "~/editor/planner/readPlannerSearchScopeFx";
+import { readPlannerStructuralReachabilityFx } from "~/editor/planner/readPlannerStructuralReachabilityFx";
 import { runPlannerSearchCandidateFx } from "~/editor/planner/runPlannerSearchCandidateFx";
 import type { PlannerAcquisitionGraph } from "~/editor/planner/PlannerAcquisitionGraph";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -54,6 +54,29 @@ interface SearchNode extends PlannerSearchExecutionState {
 
 const compareIds = (left: string, right: string) => left.localeCompare(right);
 
+const readRuntimeQuantity = (runtime: RuntimeSchema.Type, itemId: IdSchema.Type) =>
+	runtime.items.reduce((total, item) => total + (item.item.id === itemId ? item.quantity : 0), 0);
+
+const compareSearchPriority = (left: PlannerSearchPriority, right: PlannerSearchPriority) => {
+	const maximumDepth = Math.max(
+		left.preferredProgressByDepth.length,
+		right.preferredProgressByDepth.length,
+	);
+	for (let depth = maximumDepth - 1; depth >= 0; depth -= 1) {
+		const difference =
+			(right.preferredProgressByDepth[depth] ?? 0) -
+			(left.preferredProgressByDepth[depth] ?? 0);
+		if (difference !== 0) return difference;
+	}
+	for (let depth = maximumDepth - 1; depth >= 0; depth -= 1) {
+		const difference =
+			(right.preferredHeadroomByDepth[depth] ?? 0) -
+			(left.preferredHeadroomByDepth[depth] ?? 0);
+		if (difference !== 0) return difference;
+	}
+	return right.scopeProgress - left.scopeProgress;
+};
+
 const EmptyPlannerSearchDiagnostics: PlannerSearchDiagnostics = {
 	attemptedRoutePlans: 0,
 	routePlans: [],
@@ -73,7 +96,7 @@ const readPlannerSearchDiagnostics = (
 });
 
 const readAvailableQuantity = (node: SearchNode, itemId: IdSchema.Type) =>
-	readPlannerRuntimeQuantity(node.runtime, itemId);
+	readRuntimeQuantity(node.runtime, itemId);
 
 const canWidenPlannerSearchScope = (scope: PlannerSearchScope) =>
 	scope.choices.some(
@@ -84,7 +107,7 @@ const readOutputCertaintyRank = (certainty: PlannerSearchOutputCertainty) =>
 	certainty === "deterministic" ? 0 : 1;
 
 const compareSearchNodes = (left: SearchNode, right: SearchNode) =>
-	comparePlannerSearchPriority(left.priority, right.priority) ||
+	compareSearchPriority(left.priority, right.priority) ||
 	readOutputCertaintyRank(left.outputCertainty) -
 		readOutputCertaintyRank(right.outputCertainty) ||
 	left.trace.length - right.trace.length ||
@@ -92,7 +115,7 @@ const compareSearchNodes = (left: SearchNode, right: SearchNode) =>
 	right.selectedWitnessProbability - left.selectedWitnessProbability ||
 	left.order - right.order;
 
-const readInitialSearchNode = ({
+const readInitialSearchNodeFx = Effect.fn("readInitialSearchNodeFx")(function* ({
 	fingerprint = "initial-runtime",
 	itemId,
 	order = 0,
@@ -105,13 +128,13 @@ const readInitialSearchNode = ({
 	readonly fingerprint?: string;
 	readonly itemId: IdSchema.Type;
 	readonly order?: number;
-	readonly plan: ReturnType<typeof readPlannerSearchPriorityPlan>;
+	readonly plan: PlannerSearchPriorityPlan;
 	readonly quantity: number;
 	readonly runtime: RuntimeSchema.Type;
 	readonly scope: PlannerSearchScope;
 	readonly stateToken?: number;
-}): SearchNode => {
-	const activeDemand = readPlannerActiveDemand({
+}) {
+	const activeDemand = yield* readPlannerActiveDemandFx({
 		itemId,
 		plan,
 		quantity,
@@ -123,7 +146,7 @@ const readInitialSearchNode = ({
 		fingerprint,
 		order,
 		outputCertainty: "deterministic",
-		priority: readPlannerSearchPriority({
+		priority: yield* readPlannerSearchPriorityFx({
 			activeDemand,
 			itemId,
 			plan,
@@ -135,12 +158,11 @@ const readInitialSearchNode = ({
 		selectedWitnessProbability: 1,
 		stateToken,
 		trace: [],
-	};
-};
-
+	} satisfies SearchNode;
+});
 const readRelevantPresence = (node: SearchNode, scope: PlannerSearchScope) =>
 	scope.itemIds.reduce(
-		(total, itemId) => total + Number(readPlannerRuntimeQuantity(node.runtime, itemId) > 0),
+		(total, itemId) => total + Number(readRuntimeQuantity(node.runtime, itemId) > 0),
 		0,
 	);
 
@@ -158,7 +180,7 @@ const isBetterNode = ({
 	const candidateQuantity = readAvailableQuantity(candidate, itemId);
 	const currentQuantity = readAvailableQuantity(current, itemId);
 	if (candidateQuantity !== currentQuantity) return candidateQuantity > currentQuantity;
-	const priorityDifference = comparePlannerSearchPriority(candidate.priority, current.priority);
+	const priorityDifference = compareSearchPriority(candidate.priority, current.priority);
 	if (priorityDifference !== 0) return priorityDifference < 0;
 	const candidatePresence = readRelevantPresence(candidate, scope);
 	const currentPresence = readRelevantPresence(current, scope);
@@ -173,21 +195,26 @@ const isBetterNode = ({
 	return candidate.selectedWitnessProbability > current.selectedWitnessProbability;
 };
 
-const removeDominatedQueueNodes = (
-	queue: SearchNode[],
-	index: ReturnType<typeof createPlannerRuntimeDominanceIndex>,
-) => queue.filter((node) => index.isActive(node.fingerprint, node.stateToken));
+const removeDominatedQueueNodesFx = Effect.fn("removeDominatedQueueNodesFx")(function* (
+	queue: ReadonlyArray<SearchNode>,
+	index: PlannerRuntimeDominanceIndex,
+) {
+	const active: SearchNode[] = [];
+	for (const node of queue)
+		if (yield* index.isActiveFx(node.fingerprint, node.stateToken)) active.push(node);
+	return active;
+});
 
-const pruneQueueToBudget = ({
+const pruneQueueToBudgetFx = Effect.fn("pruneQueueToBudgetFx")(function* ({
 	index,
 	maximumQueuedStates,
 	queue,
 }: {
-	readonly index: ReturnType<typeof createPlannerRuntimeDominanceIndex>;
+	readonly index: PlannerRuntimeDominanceIndex;
 	readonly maximumQueuedStates: number;
-	readonly queue: SearchNode[];
-}) => {
-	const active = removeDominatedQueueNodes(queue, index).sort(compareSearchNodes);
+	readonly queue: ReadonlyArray<SearchNode>;
+}) {
+	const active = (yield* removeDominatedQueueNodesFx(queue, index)).sort(compareSearchNodes);
 	if (active.length <= maximumQueuedStates)
 		return {
 			pruned: false,
@@ -195,12 +222,12 @@ const pruneQueueToBudget = ({
 		};
 
 	for (const node of active.slice(maximumQueuedStates))
-		index.deactivate(node.fingerprint, node.stateToken);
+		yield* index.deactivateFx(node.fingerprint, node.stateToken);
 	return {
 		pruned: true,
 		queue: active.slice(0, maximumQueuedStates),
 	};
-};
+});
 
 const readInconclusive = ({
 	best,
@@ -339,12 +366,12 @@ const searchPlannerScopeFx = Effect.fn("searchPlannerScopeFx")(function* ({
 	readonly runtime: RuntimeSchema.Type;
 	readonly scope: PlannerSearchScope;
 }) {
-	const priorityPlan = readPlannerSearchPriorityPlan({
+	const priorityPlan = yield* readPlannerSearchPriorityPlanFx({
 		graph,
 		scope,
 	});
-	const dominanceIndex = createPlannerRuntimeDominanceIndex();
-	const initialRegistration = dominanceIndex.register({
+	const dominanceIndex = yield* createPlannerRuntimeDominanceIndexFx();
+	const initialRegistration = yield* dominanceIndex.registerFx({
 		label: {
 			elapsedMs: 0,
 			outputCertainty: "deterministic",
@@ -355,7 +382,7 @@ const searchPlannerScopeFx = Effect.fn("searchPlannerScopeFx")(function* ({
 	});
 	if (!initialRegistration.accepted)
 		return yield* Effect.die(new Error("Planner rejected its initial runtime state."));
-	const initial = readInitialSearchNode({
+	const initial = yield* readInitialSearchNodeFx({
 		fingerprint: initialRegistration.fingerprint,
 		itemId,
 		plan: priorityPlan,
@@ -370,13 +397,13 @@ const searchPlannerScopeFx = Effect.fn("searchPlannerScopeFx")(function* ({
 		initial,
 	];
 	let expandedStates = 0;
-	let best = initial;
+	let best: SearchNode = initial;
 	let nextOrder = 1;
 	let queueBudgetPruned = false;
 	let traceBudgetReached = false;
 
 	while (queue.length > 0) {
-		queue = removeDominatedQueueNodes(queue, dominanceIndex);
+		queue = yield* removeDominatedQueueNodesFx(queue, dominanceIndex);
 		if (queue.length === 0) break;
 		if (expandedStates >= budget.maximumExpandedStates)
 			return {
@@ -388,7 +415,7 @@ const searchPlannerScopeFx = Effect.fn("searchPlannerScopeFx")(function* ({
 				reason: "search-budget" as const,
 				type: "inconclusive" as const,
 				unsupportedActionIds,
-				visitedStates: dominanceIndex.readFingerprintCount(),
+				visitedStates: yield* dominanceIndex.readFingerprintCountFx,
 			};
 
 		queue.sort(compareSearchNodes);
@@ -400,7 +427,7 @@ const searchPlannerScopeFx = Effect.fn("searchPlannerScopeFx")(function* ({
 		}
 		expandedStates += 1;
 
-		const candidateGroups = readPlannerSearchCandidateGroups({
+		const candidateGroups = yield* readPlannerSearchCandidateGroupsFx({
 			activeDemand: node.activeDemand,
 			graph,
 			plan: priorityPlan,
@@ -428,7 +455,7 @@ const searchPlannerScopeFx = Effect.fn("searchPlannerScopeFx")(function* ({
 				const nextElapsedMs = transition.state.elapsedMs;
 				const nextOutputCertainty = transition.state.outputCertainty;
 				const nextSelectedWitnessProbability = transition.state.selectedWitnessProbability;
-				const registration = dominanceIndex.register({
+				const registration = yield* dominanceIndex.registerFx({
 					label: {
 						elapsedMs: nextElapsedMs,
 						outputCertainty: nextOutputCertainty,
@@ -438,7 +465,7 @@ const searchPlannerScopeFx = Effect.fn("searchPlannerScopeFx")(function* ({
 					runtime: transition.state.runtime,
 				});
 				if (!registration.accepted) continue;
-				const nextActiveDemand = readPlannerActiveDemand({
+				const nextActiveDemand = yield* readPlannerActiveDemandFx({
 					itemId,
 					plan: priorityPlan,
 					quantity,
@@ -450,7 +477,7 @@ const searchPlannerScopeFx = Effect.fn("searchPlannerScopeFx")(function* ({
 					fingerprint: registration.fingerprint,
 					order: nextOrder,
 					outputCertainty: nextOutputCertainty,
-					priority: readPlannerSearchPriority({
+					priority: yield* readPlannerSearchPriorityFx({
 						activeDemand: nextActiveDemand,
 						itemId,
 						plan: priorityPlan,
@@ -473,7 +500,7 @@ const searchPlannerScopeFx = Effect.fn("searchPlannerScopeFx")(function* ({
 					})
 				)
 					best = next;
-				if (!isPlannerRuntimeQuiescent(next.runtime))
+				if (!(yield* isPlannerRuntimeQuiescentFx(next.runtime)))
 					return {
 						best: next,
 						blockedActionIds,
@@ -482,7 +509,7 @@ const searchPlannerScopeFx = Effect.fn("searchPlannerScopeFx")(function* ({
 						reason: "non-quiescent-runtime" as const,
 						type: "inconclusive" as const,
 						unsupportedActionIds,
-						visitedStates: dominanceIndex.readFingerprintCount(),
+						visitedStates: yield* dominanceIndex.readFingerprintCountFx,
 					};
 
 				if (readAvailableQuantity(next, itemId) >= quantity)
@@ -494,14 +521,14 @@ const searchPlannerScopeFx = Effect.fn("searchPlannerScopeFx")(function* ({
 						node: next,
 						type: "completed" as const,
 						unsupportedActionIds,
-						visitedStates: dominanceIndex.readFingerprintCount(),
+						visitedStates: yield* dominanceIndex.readFingerprintCountFx,
 					};
 
 				if (next.trace.length >= budget.maximumTraceLength) {
 					traceBudgetReached = true;
 					continue;
 				}
-				const boundedQueue = pruneQueueToBudget({
+				const boundedQueue = yield* pruneQueueToBudgetFx({
 					index: dominanceIndex,
 					maximumQueuedStates: budget.maximumQueuedStates,
 					queue: [
@@ -534,7 +561,7 @@ const searchPlannerScopeFx = Effect.fn("searchPlannerScopeFx")(function* ({
 				: ("search-exhausted" as const),
 		type: "inconclusive" as const,
 		unsupportedActionIds,
-		visitedStates: dominanceIndex.readFingerprintCount(),
+		visitedStates: yield* dominanceIndex.readFingerprintCountFx,
 	} satisfies PlannerScopeSearchResult;
 });
 
@@ -558,22 +585,22 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 			),
 		);
 
-	const minimumScope = readPlannerSearchScope({
+	const minimumScope = yield* readPlannerSearchScopeFx({
 		graph,
 		targetItemId: itemId,
 	});
-	const minimumPriorityPlan = readPlannerSearchPriorityPlan({
+	const minimumPriorityPlan = yield* readPlannerSearchPriorityPlanFx({
 		graph,
 		scope: minimumScope,
 	});
-	const initial = readInitialSearchNode({
+	const initial = yield* readInitialSearchNodeFx({
 		itemId,
 		plan: minimumPriorityPlan,
 		quantity,
 		runtime,
 		scope: minimumScope,
 	});
-	if (!isPlannerRuntimeQuiescent(runtime))
+	if (!(yield* isPlannerRuntimeQuiescentFx(runtime)))
 		return readInconclusive({
 			best: initial,
 			blockedActionIds: new Set(),
@@ -613,7 +640,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 		} satisfies PlannerSearchResult;
 	}
 
-	const structural = readPlannerStructuralReachability({
+	const structural = yield* readPlannerStructuralReachabilityFx({
 		graph,
 		itemId,
 	});
@@ -640,27 +667,29 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 			visitedStates: 1,
 		});
 
-	const budget = readPlannerSearchBudget(budgetOverride);
+	const budget = yield* readPlannerSearchBudgetFx(budgetOverride);
 	const blockedActionIds = new Set<string>();
 	const unsupportedActionIds = new Set<string>();
 	let expandedStates = 0;
 	let visitedStates = 0;
-	let best = initial;
-	let finalScope = minimumScope;
+	let best: SearchNode = initial;
+	let finalScope: PlannerSearchScope = minimumScope;
 	const routePlanDiagnostics: PlannerSearchRoutePlanDiagnostic[] = [];
 	let scopeCount = 0;
 
-	for (const scope of iteratePlannerSearchScopes({
+	const scopes = yield* readPlannerSearchScopesFx({
 		graph,
+		maximumScopes: budget.maximumRoutePlans,
 		targetItemId: itemId,
-	})) {
+	});
+	for (const scope of scopes) {
 		scopeCount += 1;
 		finalScope = scope;
-		const priorityPlan = readPlannerSearchPriorityPlan({
+		const priorityPlan = yield* readPlannerSearchPriorityPlanFx({
 			graph,
 			scope,
 		});
-		const bestActiveDemand = readPlannerActiveDemand({
+		const bestActiveDemand = yield* readPlannerActiveDemandFx({
 			itemId,
 			plan: priorityPlan,
 			quantity,
@@ -669,7 +698,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 		best = {
 			...best,
 			activeDemand: bestActiveDemand,
-			priority: readPlannerSearchPriority({
+			priority: yield* readPlannerSearchPriorityFx({
 				activeDemand: bestActiveDemand,
 				itemId,
 				plan: priorityPlan,

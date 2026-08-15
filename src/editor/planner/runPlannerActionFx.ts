@@ -347,46 +347,48 @@ const readFailureTag = (failure: unknown) => {
 };
 
 /** Runs one authored action against an immutable runtime under optimistic planner policies. */
-export const runPlannerActionFx = (props: runPlannerActionFx.Props) =>
-	Effect.suspend(() => {
-		let outputWitnessResolved = false;
-		return runPlannerActionWithPoliciesFx(props).pipe(
-			Effect.provide(
-				makePlannerGamePolicyLayerFx(
-					props.outputWitness === undefined
-						? undefined
-						: {
-								onResolved: () => {
-									outputWitnessResolved = true;
+export const runPlannerActionFx = Effect.fn("runPlannerActionFx")(
+	(props: runPlannerActionFx.Props) =>
+		Effect.suspend(() => {
+			let outputWitnessResolved = false;
+			return runPlannerActionWithPoliciesFx(props).pipe(
+				Effect.provide(
+					makePlannerGamePolicyLayerFx(
+						props.outputWitness === undefined
+							? undefined
+							: {
+									onResolved: () => {
+										outputWitnessResolved = true;
+									},
+									source: props.outputWitness.source,
+									witness: props.outputWitness.witness,
 								},
-								source: props.outputWitness.source,
-								witness: props.outputWitness.witness,
-							},
+					),
 				),
-			),
-			Effect.map((result) =>
-				result.type === "completed"
-					? {
-							...result,
-							outputWitnessResolved,
-						}
-					: result,
-			),
-			Effect.catch((failure) =>
-				Effect.succeed({
-					action: props.action,
-					blocker: {
-						attempt: [
-							{
-								failureTag: readFailureTag(failure),
-								stage: readUnexpectedFailureStage(props.action),
-							},
-						],
-						code: "action-rejected",
-					},
-					runtime: props.runtime,
-					type: "blocked",
-				} satisfies PlannerActionResult),
-			),
-		);
-	});
+				Effect.map((result) =>
+					result.type === "completed"
+						? {
+								...result,
+								outputWitnessResolved,
+							}
+						: result,
+				),
+				Effect.catch((failure) =>
+					Effect.succeed({
+						action: props.action,
+						blocker: {
+							attempt: [
+								{
+									failureTag: readFailureTag(failure),
+									stage: readUnexpectedFailureStage(props.action),
+								},
+							],
+							code: "action-rejected",
+						},
+						runtime: props.runtime,
+						type: "blocked",
+					} satisfies PlannerActionResult),
+				),
+			);
+		}),
+);

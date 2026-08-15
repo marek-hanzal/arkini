@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { PlannerBudgetFx } from "~/editor/planner/PlannerBudgetFx";
 import type { PlannerGoalSearchBudget } from "~/editor/planner/PlannerGoalSearch";
 import type { PlannerSearchBudget } from "~/editor/planner/PlannerSearch";
-import { createPlannerAcquisitionGraph } from "~/editor/planner/createPlannerAcquisitionGraph";
+import { createPlannerAcquisitionGraphFx } from "~/editor/planner/createPlannerAcquisitionGraphFx";
 import { createPlannerBudgetFx } from "~/editor/planner/createPlannerBudgetFx";
 import { createPlannerInitialRuntimeFx } from "~/editor/planner/createPlannerInitialRuntimeFx";
 import { searchPlannerGoalFx } from "~/editor/planner/searchPlannerGoalFx";
@@ -16,7 +16,7 @@ import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 export const createPlannerSearchHarnessFx = Effect.fn("createPlannerSearchHarnessFx")(
 	(config: GameConfigSchema.Type) =>
 		Effect.gen(function* () {
-			const graph = createPlannerAcquisitionGraph(config);
+			const graph = yield* createPlannerAcquisitionGraphFx(config);
 			const initialRuntime = yield* createPlannerInitialRuntimeFx(config);
 			const provideHarnessServices = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
 				Effect.gen(function* () {

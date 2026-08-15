@@ -1,17 +1,23 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { createPlannerAcquisitionGraph } from "~/editor/planner/createPlannerAcquisitionGraph";
+import { createPlannerAcquisitionGraphFx } from "~/editor/planner/createPlannerAcquisitionGraphFx";
 import type {
 	PlannerAcquisitionGraph,
 	PlannerAcquisitionRequirement,
 	PlannerAcquisitionRoute,
 } from "~/editor/planner/PlannerAcquisitionGraph";
 import {
-	readPlannerSearchScope,
-	readPlannerSearchScopes,
-} from "~/editor/planner/readPlannerSearchScope";
-import { resolvePlannerRouteReachability } from "~/editor/planner/resolvePlannerRouteReachability";
+	readPlannerSearchScopeFx,
+	readPlannerSearchScopesFx,
+} from "~/editor/planner/readPlannerSearchScopeFx";
+import { resolvePlannerRouteReachabilityFx } from "~/editor/planner/resolvePlannerRouteReachabilityFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+
+const readScope = (props: Parameters<typeof readPlannerSearchScopeFx>[0]) =>
+	Effect.runSync(readPlannerSearchScopeFx(props));
+const readScopes = (props: Parameters<typeof readPlannerSearchScopesFx>[0]) =>
+	Effect.runSync(readPlannerSearchScopesFx(props));
 
 const baseItem = (id: string) => ({
 	asset: {
@@ -353,7 +359,7 @@ const config = GameConfigSchema.parse({
 	},
 });
 
-const graph = createPlannerAcquisitionGraph(config);
+const graph = Effect.runSync(createPlannerAcquisitionGraphFx(config));
 
 const wideningConfigSource: unknown = {
 	version: "1.0",
@@ -442,7 +448,7 @@ const wideningConfigSource: unknown = {
 };
 
 const wideningConfig = GameConfigSchema.parse(wideningConfigSource);
-const wideningGraph = createPlannerAcquisitionGraph(wideningConfig);
+const wideningGraph = Effect.runSync(createPlannerAcquisitionGraphFx(wideningConfig));
 
 const syntheticRequirement = (
 	itemId: string,
@@ -517,10 +523,12 @@ const createSyntheticGraph = ({
 	readonly routes: ReadonlyArray<PlannerAcquisitionRoute>;
 }): PlannerAcquisitionGraph => {
 	const roots = new Set(rootItemIds);
-	const reachability = resolvePlannerRouteReachability({
-		rootItemIds: roots,
-		routes,
-	});
+	const reachability = Effect.runSync(
+		resolvePlannerRouteReachabilityFx({
+			rootItemIds: roots,
+			routes,
+		}),
+	);
 	const itemIds = new Set([
 		...roots,
 		...routes.flatMap((route) => [
@@ -643,9 +651,9 @@ const renewalWideningGraph = createSyntheticGraph({
 	],
 });
 
-describe("readPlannerSearchScope", () => {
+describe("readPlannerSearchScopeFx", () => {
 	it("includes the shortest renewal route for consumed roots without rebuilding presence roots", () => {
-		const scope = readPlannerSearchScope({
+		const scope = readScope({
 			graph,
 			targetItemId: "target",
 		});
@@ -703,7 +711,7 @@ describe("readPlannerSearchScope", () => {
 	});
 
 	it("keeps a deterministic route when a sibling output is stochastic", () => {
-		const scope = readPlannerSearchScope({
+		const scope = readScope({
 			graph,
 			targetItemId: "mixed-target",
 		});
@@ -725,7 +733,7 @@ describe("readPlannerSearchScope", () => {
 	});
 
 	it("keeps deterministic merge transitions inside the supported slice", () => {
-		const scope = readPlannerSearchScope({
+		const scope = readScope({
 			graph,
 			targetItemId: "merge-result",
 		});
@@ -741,7 +749,7 @@ describe("readPlannerSearchScope", () => {
 	});
 
 	it("represents a stochastic output as an existential route witness", () => {
-		const scope = readPlannerSearchScope({
+		const scope = readScope({
 			graph,
 			targetItemId: "random-target",
 		});
@@ -774,7 +782,7 @@ describe("readPlannerSearchScope", () => {
 	});
 
 	it("deduplicates equivalent stochastic engine branches before search", () => {
-		const scope = readPlannerSearchScope({
+		const scope = readScope({
 			graph,
 			targetItemId: "duplicate-target",
 		});
@@ -799,7 +807,7 @@ describe("readPlannerSearchScope", () => {
 	});
 
 	it("keeps explicit temporary expiry inside the supported slice", () => {
-		const scope = readPlannerSearchScope({
+		const scope = readScope({
 			graph,
 			targetItemId: "temporary-target",
 		});
@@ -820,7 +828,7 @@ describe("readPlannerSearchScope", () => {
 	});
 
 	it("keeps charge depletion tied to its authored spender line", () => {
-		const scope = readPlannerSearchScope({
+		const scope = readScope({
 			graph,
 			targetItemId: "depleted-target",
 		});
@@ -841,7 +849,7 @@ describe("readPlannerSearchScope", () => {
 		expect(scope.unsupportedRoutes).toEqual([]);
 	});
 	it("opens target-relevant route detours as distinct cumulative scopes", () => {
-		const scopes = readPlannerSearchScopes({
+		const scopes = readScopes({
 			graph: wideningGraph,
 			targetItemId: "widened-target",
 		});
@@ -889,7 +897,7 @@ describe("readPlannerSearchScope", () => {
 	});
 
 	it("widens authored any-of requirements before declaring the route exhausted", () => {
-		const scopes = readPlannerSearchScopes({
+		const scopes = readScopes({
 			graph: anyOfWideningGraph,
 			targetItemId: "any-of-target",
 		});
@@ -923,7 +931,7 @@ describe("readPlannerSearchScope", () => {
 	});
 
 	it("widens reacquisition routes for consumed authored roots", () => {
-		const scopes = readPlannerSearchScopes({
+		const scopes = readScopes({
 			graph: renewalWideningGraph,
 			targetItemId: "renewal-target",
 		});

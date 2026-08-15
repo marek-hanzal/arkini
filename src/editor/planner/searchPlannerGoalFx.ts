@@ -9,11 +9,7 @@ import type {
 	PlannerGoalSearchSubgoalSolver,
 } from "~/editor/planner/PlannerGoalSearch";
 import type { PlannerItemGoal } from "~/editor/planner/PlannerGoalViability";
-import {
-	addPlannerRequirementDemand,
-	type PlannerRequirementDemand,
-	readPlannerRequirementSourcePriority,
-} from "~/editor/planner/PlannerRequirementDemand";
+import type { PlannerRequirementDemand } from "~/editor/planner/PlannerRequirementDemand";
 import type { PlannerSearchExecutionState } from "~/editor/planner/PlannerSearchExecution";
 import type { PlannerSearchAction } from "~/editor/planner/PlannerSearchScope";
 import type { PlannerStrategyInconclusiveReason } from "~/editor/planner/PlannerStrategy";
@@ -22,18 +18,15 @@ import {
 	type PlannerAcquisitionRequirement,
 	type PlannerAcquisitionRoute,
 } from "~/editor/planner/PlannerAcquisitionGraph";
-import { composePlannerSearchExecution } from "~/editor/planner/composePlannerSearchExecution";
-import { isPlannerRuntimeQuiescent } from "~/editor/planner/isPlannerRuntimeQuiescent";
-import { readPlannerGoalAgendaViability } from "~/editor/planner/readPlannerGoalAgendaViability";
-import { readPlannerGoalSearchBudget } from "~/editor/planner/readPlannerGoalSearchBudget";
-import { readPlannerGoalViability } from "~/editor/planner/readPlannerGoalViability";
-import { readPlannerItemGoalStatus } from "~/editor/planner/readPlannerItemGoalStatus";
-import { readPlannerRuntimeChargeCapacity } from "~/editor/planner/readPlannerRuntimeChargeCapacity";
-import { readPlannerRuntimeFingerprint } from "~/editor/planner/readPlannerRuntimeFingerprint";
-import { readPlannerRuntimeQuantity } from "~/editor/planner/readPlannerRuntimeQuantity";
-import { isPlannerAcquisitionRouteReady } from "~/editor/planner/readPlannerSearchCandidateGroups";
-import { readPlannerSearchActions } from "~/editor/planner/readPlannerSearchActions";
-import { readPlannerStructuralReachability } from "~/editor/planner/readPlannerStructuralReachability";
+import { composePlannerSearchExecutionFx } from "~/editor/planner/composePlannerSearchExecutionFx";
+import { isPlannerRuntimeQuiescentFx } from "~/editor/planner/isPlannerRuntimeQuiescentFx";
+import { readPlannerGoalAgendaViabilityFx } from "~/editor/planner/readPlannerGoalAgendaViabilityFx";
+import { readPlannerGoalSearchBudgetFx } from "~/editor/planner/readPlannerGoalSearchBudgetFx";
+import { readPlannerGoalViabilityFx } from "~/editor/planner/readPlannerGoalViabilityFx";
+import { readPlannerItemGoalStatusFx } from "~/editor/planner/readPlannerItemGoalStatusFx";
+import { readPlannerRuntimeFingerprintFx } from "~/editor/planner/readPlannerRuntimeFingerprintFx";
+import { readPlannerSearchActionsFx } from "~/editor/planner/readPlannerSearchActionsFx";
+import { readPlannerStructuralReachabilityFx } from "~/editor/planner/readPlannerStructuralReachabilityFx";
 import { runPlannerSearchCandidateFx } from "~/editor/planner/runPlannerSearchCandidateFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
@@ -154,6 +147,79 @@ type PlannerBranchBatchResult =
 
 const compareIds = (left: string, right: string) => left.localeCompare(right);
 
+const readRuntimeQuantity = (runtime: RuntimeSchema.Type, itemId: IdSchema.Type) =>
+	runtime.items.reduce((total, item) => total + (item.item.id === itemId ? item.quantity : 0), 0);
+
+const readRuntimeChargeCapacity = (runtime: RuntimeSchema.Type, itemId: IdSchema.Type) =>
+	runtime.items.reduce((total, item) => {
+		if (item.item.id !== itemId) return total;
+		const fullCapacity = item.item.charges?.amount;
+		if (fullCapacity === undefined) return total;
+		return total + (item.remainingCharges ?? fullCapacity) * item.quantity;
+	}, 0);
+
+const readRequirementSourcePriority = (source: PlannerAcquisitionRequirement["source"]) => {
+	switch (source) {
+		case "owner":
+		case "merge-source":
+		case "merge-target":
+			return 0;
+		case "charged-item":
+		case "temporary-item":
+			return 1;
+		case "deposit-input":
+		case "material-input":
+			return 2;
+		case "line-condition":
+		case "output-condition":
+			return 3;
+	}
+};
+
+const addRequirementDemand = (
+	demandByItemId: Map<IdSchema.Type, PlannerRequirementDemand>,
+	requirement: PlannerAcquisitionRequirement,
+) => {
+	const sourcePriority = readRequirementSourcePriority(requirement.source);
+	const demand = demandByItemId.get(requirement.itemId) ?? {
+		charges: 0,
+		consumed: 0,
+		retained: 0,
+		sourcePriority,
+	};
+	if (requirement.usage === "consume") demand.consumed += requirement.minimumQuantity;
+	else demand.retained = Math.max(demand.retained, requirement.minimumQuantity);
+	if (requirement.usage === "charge") demand.charges += requirement.chargeCost ?? 0;
+	demand.sourcePriority = Math.min(demand.sourcePriority, sourcePriority);
+	demandByItemId.set(requirement.itemId, demand);
+};
+
+const isRequirementReady = (
+	requirement: PlannerAcquisitionRequirement,
+	runtime: RuntimeSchema.Type,
+) =>
+	readRuntimeQuantity(runtime, requirement.itemId) >= requirement.minimumQuantity &&
+	(requirement.usage !== "charge" ||
+		readRuntimeChargeCapacity(runtime, requirement.itemId) >= (requirement.chargeCost ?? 0));
+
+const isPlannerAcquisitionRouteReady = (
+	route: PlannerAcquisitionRoute,
+	runtime: RuntimeSchema.Type,
+) => {
+	const demandByItemId = new Map<IdSchema.Type, PlannerRequirementDemand>();
+	for (const requirement of route.requirements.allOf)
+		addRequirementDemand(demandByItemId, requirement);
+	for (const [itemId, demand] of demandByItemId)
+		if (
+			readRuntimeQuantity(runtime, itemId) < demand.consumed + demand.retained ||
+			readRuntimeChargeCapacity(runtime, itemId) < demand.charges
+		)
+			return false;
+	return route.requirements.anyOf.every((clause) =>
+		clause.some((requirement) => isRequirementReady(requirement, runtime)),
+	);
+};
+
 const readInitialExecution = (runtime: RuntimeSchema.Type): PlannerSearchExecutionState => ({
 	elapsedMs: 0,
 	outputCertainty: "deterministic",
@@ -175,11 +241,12 @@ const readInitialResourceGoal = (
 });
 
 const isResourceGoalSatisfied = (goal: PlannerResourceGoalTask, runtime: RuntimeSchema.Type) =>
-	readPlannerRuntimeQuantity(runtime, goal.itemId) >= goal.minimumQuantity &&
-	readPlannerRuntimeChargeCapacity(runtime, goal.itemId) >= goal.minimumCharges;
+	readRuntimeQuantity(runtime, goal.itemId) >= goal.minimumQuantity &&
+	readRuntimeChargeCapacity(runtime, goal.itemId) >= goal.minimumCharges;
 
 const isTargetGoalSatisfied = (goal: PlannerItemGoal, runtime: RuntimeSchema.Type) =>
-	readPlannerItemGoalStatus(goal, runtime).satisfied;
+	readRuntimeQuantity(runtime, goal.itemId) >= goal.quantity &&
+	readRuntimeChargeCapacity(runtime, goal.itemId) >= (goal.minimumCharges ?? 0);
 
 const projectResourceGoal = (goal: PlannerResourceGoalTask): PlannerItemGoal => ({
 	itemId: goal.itemId,
@@ -217,7 +284,7 @@ const readAllOfRequirementChoices = (
 ): ReadonlyArray<PlannerRequirementChoice> => {
 	const demandByItemId = new Map<IdSchema.Type, PlannerRequirementDemand>();
 	for (const requirement of route.requirements.allOf)
-		addPlannerRequirementDemand(demandByItemId, requirement);
+		addRequirementDemand(demandByItemId, requirement);
 	return [
 		...demandByItemId,
 	].flatMap(([itemId, demand]) => {
@@ -264,7 +331,7 @@ const readAnyOfRequirementChoiceGroups = (
 					clauseIndex,
 					alternativeIndex,
 				]),
-				sourcePriority: readPlannerRequirementSourcePriority(requirement.source),
+				sourcePriority: readRequirementSourcePriority(requirement.source),
 			})),
 		];
 	});
@@ -352,7 +419,7 @@ const compareRoutes = (
 		(graph.routeDepthById.get(right.id) ?? Number.POSITIVE_INFINITY) ||
 	compareIds(left.id, right.id);
 
-const readResourceRouteBranches = ({
+const readResourceRouteBranchesFx = Effect.fn("readResourceRouteBranchesFx")(function* ({
 	branch,
 	goal,
 	graph,
@@ -362,23 +429,28 @@ const readResourceRouteBranches = ({
 	readonly goal: PlannerResourceGoalTask;
 	readonly graph: PlannerAcquisitionGraph;
 	readonly rest: ReadonlyArray<PlannerGoalTask>;
-}): ReadonlyArray<PlannerGoalBranch> => {
+}) {
 	const routes = [
 		...(graph.routesByOutputItemId.get(goal.itemId) ?? []),
 	]
 		.filter((route) => route.output.maximumQuantity > 0)
 		.sort((left, right) => compareRoutes(graph, branch.execution.runtime, left, right));
-	const options = routes.flatMap((route) =>
-		readPlannerSearchActions({
+	const optionGroups = yield* Effect.forEach(routes, (route) =>
+		readPlannerSearchActionsFx({
 			graph,
 			routes: [
 				route,
 			],
-		}).map((candidate) => ({
-			candidate,
-			route,
-		})),
+		}).pipe(
+			Effect.map((actions) =>
+				actions.map((candidate) => ({
+					candidate,
+					route,
+				})),
+			),
+		),
 	);
+	const options = optionGroups.flat();
 	return options.map(({ candidate, route }, index) => ({
 		agenda: [
 			{
@@ -403,8 +475,7 @@ const readResourceRouteBranches = ({
 					fallback: branch.fallback,
 				}),
 	}));
-};
-
+});
 const readTaskSignature = (task: PlannerGoalTask) => {
 	switch (task.type) {
 		case "resource":
@@ -424,30 +495,6 @@ const readTaskSignature = (task: PlannerGoalTask) => {
 	}
 };
 
-const readBranchStateSignature = (branch: PlannerGoalBranch) => [
-	readPlannerRuntimeFingerprint(branch.execution.runtime),
-	branch.execution.outputCertainty,
-	branch.agenda.map(readTaskSignature),
-];
-
-const readFallbackStateSignatures = (branch: PlannerGoalBranch) => {
-	const signatures: Array<ReturnType<typeof readBranchStateSignature>> = [];
-	const seen = new Set<PlannerGoalBranch>();
-	let fallback = branch.fallback;
-	while (fallback !== undefined && !seen.has(fallback)) {
-		seen.add(fallback);
-		signatures.push(readBranchStateSignature(fallback));
-		fallback = fallback.fallback;
-	}
-	return signatures;
-};
-
-const readBranchKey = (branch: PlannerGoalBranch) =>
-	JSON.stringify([
-		readBranchStateSignature(branch),
-		readFallbackStateSignatures(branch),
-	]);
-
 const compareChoicePaths = (left: ReadonlyArray<number>, right: ReadonlyArray<number>) => {
 	const length = Math.min(left.length, right.length);
 	for (let index = 0; index < length; index += 1) {
@@ -457,19 +504,13 @@ const compareChoicePaths = (left: ReadonlyArray<number>, right: ReadonlyArray<nu
 	return left.length - right.length;
 };
 
-const compareBranches = (left: PlannerGoalBranch, right: PlannerGoalBranch) =>
-	compareChoicePaths(left.choicePath, right.choicePath) ||
-	left.agenda.length - right.agenda.length ||
-	left.execution.trace.length - right.execution.trace.length ||
-	compareIds(readBranchKey(left), readBranchKey(right));
-
 const isBetterBranch = (
 	candidate: PlannerGoalBranch,
 	current: PlannerGoalBranch,
 	targetItemId: IdSchema.Type,
 ) => {
-	const candidateQuantity = readPlannerRuntimeQuantity(candidate.execution.runtime, targetItemId);
-	const currentQuantity = readPlannerRuntimeQuantity(current.execution.runtime, targetItemId);
+	const candidateQuantity = readRuntimeQuantity(candidate.execution.runtime, targetItemId);
+	const currentQuantity = readRuntimeQuantity(current.execution.runtime, targetItemId);
 	if (candidateQuantity !== currentQuantity) return candidateQuantity > currentQuantity;
 	if (candidate.agenda.length !== current.agenda.length)
 		return candidate.agenda.length < current.agenda.length;
@@ -587,20 +628,23 @@ const resolveDelegatedResourceGoalFx = Effect.fn("resolveDelegatedResourceGoalFx
 			type: "unresolved",
 		};
 
-	const status = readPlannerItemGoalStatus(projectResourceGoal(goal), result.execution.runtime);
+	const status = yield* readPlannerItemGoalStatusFx(
+		projectResourceGoal(goal),
+		result.execution.runtime,
+	);
 	if (!status.satisfied)
 		return yield* Effect.die(
 			new Error(
 				`Delegated planner subgoal ${goal.itemId} completed with ${status.availableQuantity}/${goal.minimumQuantity} items and ${status.availableCharges}/${goal.minimumCharges} charges.`,
 			),
 		);
-	if (!isPlannerRuntimeQuiescent(result.execution.runtime))
+	if (!(yield* isPlannerRuntimeQuiescentFx(result.execution.runtime)))
 		return yield* Effect.die(
 			new Error(`Delegated planner subgoal ${goal.itemId} returned a non-quiescent runtime.`),
 		);
 
-	const execution = composePlannerSearchExecution(branch.execution, result.execution);
-	const agendaViability = readPlannerGoalAgendaViability({
+	const execution = yield* composePlannerSearchExecutionFx(branch.execution, result.execution);
+	const agendaViability = yield* readPlannerGoalAgendaViabilityFx({
 		goals: readAgendaItemGoals(targetGoal, rest),
 		graph,
 		runtime: execution.runtime,
@@ -711,7 +755,7 @@ const expandPlannerGoalBranchFx = Effect.fn("expandPlannerGoalBranchFx")(functio
 				targetGoal,
 			});
 
-		const viability = readPlannerGoalViability({
+		const viability = yield* readPlannerGoalViabilityFx({
 			goal: {
 				itemId: task.itemId,
 				minimumCharges: task.minimumCharges,
@@ -730,7 +774,7 @@ const expandPlannerGoalBranchFx = Effect.fn("expandPlannerGoalBranchFx")(functio
 				type: "dead",
 			};
 
-		const children = readResourceRouteBranches({
+		const children = yield* readResourceRouteBranchesFx({
 			branch,
 			goal: task,
 			graph,
@@ -811,7 +855,7 @@ const expandPlannerGoalBranchFx = Effect.fn("expandPlannerGoalBranchFx")(functio
 			reason: "unsupported",
 			type: "dead",
 		};
-	if (!isPlannerRuntimeQuiescent(transition.state.runtime))
+	if (!(yield* isPlannerRuntimeQuiescentFx(transition.state.runtime)))
 		return {
 			attemptedActionId: task.candidate.id,
 			branch: {
@@ -821,7 +865,7 @@ const expandPlannerGoalBranchFx = Effect.fn("expandPlannerGoalBranchFx")(functio
 			type: "non-quiescent",
 		};
 
-	const agendaViability = readPlannerGoalAgendaViability({
+	const agendaViability = yield* readPlannerGoalAgendaViabilityFx({
 		goals: readAgendaItemGoals(targetGoal, rest),
 		graph,
 		runtime: transition.state.runtime,
@@ -993,7 +1037,7 @@ const readInconclusive = ({
 }): PlannerGoalSearchResult => {
 	const budgetLimit = readBudgetLimit(budgetLimits);
 	return {
-		bestAvailableQuantity: readPlannerRuntimeQuantity(best.execution.runtime, itemId),
+		bestAvailableQuantity: readRuntimeQuantity(best.execution.runtime, itemId),
 		bestExecution: best.execution,
 		blockedActionIds: [
 			...blockedActionIds,
@@ -1047,7 +1091,7 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 			),
 		);
 
-	const budget = readPlannerGoalSearchBudget(budgetOverride);
+	const budget = yield* readPlannerGoalSearchBudgetFx(budgetOverride);
 	const targetGoal: PlannerItemGoal = {
 		itemId,
 		minimumCharges,
@@ -1061,15 +1105,57 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 		choicePath: [],
 		execution: initialExecution,
 	};
+	const branchKeyByBranch = new WeakMap<PlannerGoalBranch, string>();
+	const readBranchKeyFx = Effect.fn("searchPlannerGoalFx.readBranchKeyFx")(function* (
+		branch: PlannerGoalBranch,
+	) {
+		const cached = branchKeyByBranch.get(branch);
+		if (cached !== undefined) return cached;
+		const stateSignature = [
+			yield* readPlannerRuntimeFingerprintFx(branch.execution.runtime),
+			branch.execution.outputCertainty,
+			branch.agenda.map(readTaskSignature),
+		];
+		const fallbackSignatures: unknown[] = [];
+		const seen = new Set<PlannerGoalBranch>();
+		let fallback = branch.fallback;
+		while (fallback !== undefined && !seen.has(fallback)) {
+			seen.add(fallback);
+			fallbackSignatures.push([
+				yield* readPlannerRuntimeFingerprintFx(fallback.execution.runtime),
+				fallback.execution.outputCertainty,
+				fallback.agenda.map(readTaskSignature),
+			]);
+			fallback = fallback.fallback;
+		}
+		const key = JSON.stringify([
+			stateSignature,
+			fallbackSignatures,
+		]);
+		branchKeyByBranch.set(branch, key);
+		return key;
+	});
+	const compareBranches = (left: PlannerGoalBranch, right: PlannerGoalBranch) => {
+		const leftKey = branchKeyByBranch.get(left);
+		const rightKey = branchKeyByBranch.get(right);
+		if (leftKey === undefined || rightKey === undefined)
+			throw new Error("Planner branch comparison requires a precomputed canonical key.");
+		return (
+			compareChoicePaths(left.choicePath, right.choicePath) ||
+			left.agenda.length - right.agenda.length ||
+			left.execution.trace.length - right.execution.trace.length ||
+			compareIds(leftKey, rightKey)
+		);
+	};
 	const counters = readCounters();
 	const emptyDiagnostics = readDiagnostics({
 		budget,
 		counters,
 	});
 
-	if (!isPlannerRuntimeQuiescent(runtime))
+	if (!(yield* isPlannerRuntimeQuiescentFx(runtime)))
 		return {
-			bestAvailableQuantity: readPlannerRuntimeQuantity(runtime, itemId),
+			bestAvailableQuantity: readRuntimeQuantity(runtime, itemId),
 			bestExecution: initialExecution,
 			blockedActionIds: [],
 			diagnostics: emptyDiagnostics,
@@ -1081,7 +1167,7 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 			unsupportedActionIds: [],
 		} satisfies PlannerGoalSearchResult;
 
-	const structural = readPlannerStructuralReachability({
+	const structural = yield* readPlannerStructuralReachabilityFx({
 		graph,
 		itemId,
 	});
@@ -1094,7 +1180,7 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 			type: "no-finite-path",
 		} satisfies PlannerGoalSearchResult;
 
-	const initialViability = readPlannerGoalViability({
+	const initialViability = yield* readPlannerGoalViabilityFx({
 		goal: targetGoal,
 		graph,
 		runtime,
@@ -1122,7 +1208,7 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 	const budgetLimits = new Set<string>();
 	const delegatedReasons = new Set<PlannerStrategyInconclusiveReason>();
 	const visited = new Set<string>([
-		readBranchKey(initial),
+		yield* readBranchKeyFx(initial),
 	]);
 	let queue: PlannerGoalBranch[] = [
 		initial,
@@ -1146,10 +1232,7 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 		const readyCompletion = readDeterministicCompletion();
 		if (readyCompletion !== undefined)
 			return {
-				availableQuantity: readPlannerRuntimeQuantity(
-					readyCompletion.execution.runtime,
-					itemId,
-				),
+				availableQuantity: readRuntimeQuantity(readyCompletion.execution.runtime, itemId),
 				diagnostics: readDiagnostics({
 					budget,
 					counters,
@@ -1224,6 +1307,7 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 					unsupportedActionIds.add(actionId);
 			}
 			if (expansion.type === "completed") {
+				yield* readBranchKeyFx(expansion.branch);
 				completions.push(expansion.branch);
 				continue;
 			}
@@ -1283,7 +1367,7 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 					if (child.fallback !== undefined) pendingChildren.push(child.fallback);
 					continue;
 				}
-				const key = readBranchKey(child);
+				const key = yield* readBranchKeyFx(child);
 				if (visited.has(key)) {
 					counters.duplicateBranches += 1;
 					if (child.fallback !== undefined) pendingChildren.push(child.fallback);
@@ -1295,6 +1379,7 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 			}
 		}
 
+		for (const branch of producedChildren) yield* readBranchKeyFx(branch);
 		queue = [
 			...queue,
 			...producedChildren,
@@ -1309,7 +1394,7 @@ export const searchPlannerGoalFx = Effect.fn("searchPlannerGoalFx")(function* ({
 	const completion = readDeterministicCompletion() ?? completions.sort(compareBranches)[0];
 	if (completion !== undefined)
 		return {
-			availableQuantity: readPlannerRuntimeQuantity(completion.execution.runtime, itemId),
+			availableQuantity: readRuntimeQuantity(completion.execution.runtime, itemId),
 			diagnostics: readDiagnostics({
 				budget,
 				counters,

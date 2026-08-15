@@ -6,7 +6,7 @@ import {
 	type PlannerCoverageAuditProgress,
 } from "~/editor/planner/auditPlannerCoverageFx";
 import { auditPlannerCoverageTiersFx } from "~/editor/planner/auditPlannerCoverageTiersFx";
-import { mergePlannerCoverageTierAuditReports } from "~/editor/planner/mergePlannerCoverageTierAuditReports";
+import { mergePlannerCoverageTierAuditReportsFx } from "~/editor/planner/mergePlannerCoverageTierAuditReportsFx";
 import type { PlannerCoverageTierAuditProgress } from "~/editor/planner/PlannerCoverageTierAudit";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
@@ -591,10 +591,12 @@ describe("auditPlannerCoverageFx", () => {
 				tiers,
 			}),
 		);
-		const merged = mergePlannerCoverageTierAuditReports([
-			first,
-			second,
-		]);
+		const merged = Effect.runSync(
+			mergePlannerCoverageTierAuditReportsFx([
+				first,
+				second,
+			]),
+		);
 
 		expect(merged.summary).toMatchObject({
 			finalOutcomes: full.summary.finalOutcomes,
@@ -672,10 +674,12 @@ describe("auditPlannerCoverageFx", () => {
 			})),
 		);
 		expect(() =>
-			mergePlannerCoverageTierAuditReports([
-				first,
-				first,
-			]),
+			Effect.runSync(
+				mergePlannerCoverageTierAuditReportsFx([
+					first,
+					first,
+				]),
+			),
 		).toThrow("item is duplicated: middle");
 	});
 });

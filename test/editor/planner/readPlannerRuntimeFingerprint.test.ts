@@ -1,6 +1,7 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readPlannerRuntimeFingerprint } from "~/editor/planner/readPlannerRuntimeFingerprint";
+import { readPlannerRuntimeFingerprintFx } from "~/editor/planner/readPlannerRuntimeFingerprintFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 
@@ -187,10 +188,13 @@ const makeRuntime = ({
 	} satisfies RuntimeSchema.Type;
 };
 
-describe("readPlannerRuntimeFingerprint", () => {
+const readFingerprint = (runtime: RuntimeSchema.Type) =>
+	Effect.runSync(readPlannerRuntimeFingerprintFx(runtime));
+
+describe("readPlannerRuntimeFingerprintFx", () => {
 	it("canonicalizes runtime identities, revisions and unordered collections", () => {
-		expect(readPlannerRuntimeFingerprint(makeRuntime())).toBe(
-			readPlannerRuntimeFingerprint(
+		expect(readFingerprint(makeRuntime())).toBe(
+			readFingerprint(
 				makeRuntime({
 					idPrefix: "renamed",
 					reverseCollections: true,
@@ -200,17 +204,17 @@ describe("readPlannerRuntimeFingerprint", () => {
 	});
 
 	it("preserves input and reservation relationships", () => {
-		const fingerprint = readPlannerRuntimeFingerprint(makeRuntime());
+		const fingerprint = readFingerprint(makeRuntime());
 
 		expect(
-			readPlannerRuntimeFingerprint(
+			readFingerprint(
 				makeRuntime({
 					swapInputOwner: true,
 				}),
 			),
 		).not.toBe(fingerprint);
 		expect(
-			readPlannerRuntimeFingerprint(
+			readFingerprint(
 				makeRuntime({
 					swapReservedJob: true,
 				}),
@@ -219,17 +223,17 @@ describe("readPlannerRuntimeFingerprint", () => {
 	});
 
 	it("preserves FIFO queue order and exact default-line ownership", () => {
-		const fingerprint = readPlannerRuntimeFingerprint(makeRuntime());
+		const fingerprint = readFingerprint(makeRuntime());
 
 		expect(
-			readPlannerRuntimeFingerprint(
+			readFingerprint(
 				makeRuntime({
 					reverseQueue: true,
 				}),
 			),
 		).not.toBe(fingerprint);
 		expect(
-			readPlannerRuntimeFingerprint(
+			readFingerprint(
 				makeRuntime({
 					swapDefaultLines: true,
 				}),

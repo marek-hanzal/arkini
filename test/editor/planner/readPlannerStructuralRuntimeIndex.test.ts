@@ -1,7 +1,8 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { createPlannerAcquisitionGraph } from "~/editor/planner/createPlannerAcquisitionGraph";
-import { readPlannerStructuralRuntimeIndex } from "~/editor/planner/readPlannerStructuralRuntimeIndex";
+import { createPlannerAcquisitionGraphFx } from "~/editor/planner/createPlannerAcquisitionGraphFx";
+import { readPlannerStructuralRuntimeIndexFx } from "~/editor/planner/readPlannerStructuralRuntimeIndexFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const baseItem = (id: string, scope: "any" | "board" = "any") => ({
@@ -188,14 +189,16 @@ const createConfig = () =>
 		version: "1.0",
 	});
 
-describe("readPlannerStructuralRuntimeIndex", () => {
+describe("readPlannerStructuralRuntimeIndexFx", () => {
 	it("projects retained infrastructure and exact independent output attempts", () => {
 		const config = createConfig();
-		const graph = createPlannerAcquisitionGraph(config);
-		const runtimes = readPlannerStructuralRuntimeIndex({
-			config,
-			graph,
-		});
+		const graph = Effect.runSync(createPlannerAcquisitionGraphFx(config));
+		const runtimes = Effect.runSync(
+			readPlannerStructuralRuntimeIndexFx({
+				config,
+				graph,
+			}),
+		);
 
 		expect(runtimes.get("builder")).toBe(0);
 		expect(runtimes.get("machine")).toBe(1_000);
@@ -205,11 +208,13 @@ describe("readPlannerStructuralRuntimeIndex", () => {
 
 	it("counts authored spender runs before a charge-depletion output", () => {
 		const config = createConfig();
-		const graph = createPlannerAcquisitionGraph(config);
-		const runtimes = readPlannerStructuralRuntimeIndex({
-			config,
-			graph,
-		});
+		const graph = Effect.runSync(createPlannerAcquisitionGraphFx(config));
+		const runtimes = Effect.runSync(
+			readPlannerStructuralRuntimeIndexFx({
+				config,
+				graph,
+			}),
+		);
 
 		expect(runtimes.get("seed")).toBe(300);
 	});

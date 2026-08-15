@@ -14,21 +14,15 @@ import {
 	type PlannerProducerExpansionResult,
 } from "~/editor/planner/PlannerProducerExpansion";
 import type { PlannerItemGoal } from "~/editor/planner/PlannerGoalViability";
-import {
-	addPlannerRequirementDemand,
-	type PlannerRequirementDemand,
-	readPlannerRequirementSourcePriority,
-} from "~/editor/planner/PlannerRequirementDemand";
+import type { PlannerRequirementDemand } from "~/editor/planner/PlannerRequirementDemand";
 import type { PlannerSearchExecutionState } from "~/editor/planner/PlannerSearchExecution";
 import type { PlannerSearchAction } from "~/editor/planner/PlannerSearchScope";
-import { isPlannerRuntimeQuiescent } from "~/editor/planner/isPlannerRuntimeQuiescent";
-import { readPlannerGoalAgendaViability } from "~/editor/planner/readPlannerGoalAgendaViability";
-import { readPlannerItemGoalStatus } from "~/editor/planner/readPlannerItemGoalStatus";
-import { readPlannerRuntimeChargeCapacity } from "~/editor/planner/readPlannerRuntimeChargeCapacity";
-import { readPlannerRuntimeFingerprint } from "~/editor/planner/readPlannerRuntimeFingerprint";
-import { readPlannerRuntimeQuantity } from "~/editor/planner/readPlannerRuntimeQuantity";
-import { readPlannerSearchActions } from "~/editor/planner/readPlannerSearchActions";
-import { readPlannerStructuralReachability } from "~/editor/planner/readPlannerStructuralReachability";
+import { isPlannerRuntimeQuiescentFx } from "~/editor/planner/isPlannerRuntimeQuiescentFx";
+import { readPlannerGoalAgendaViabilityFx } from "~/editor/planner/readPlannerGoalAgendaViabilityFx";
+import { readPlannerItemGoalStatusFx } from "~/editor/planner/readPlannerItemGoalStatusFx";
+import { readPlannerRuntimeFingerprintFx } from "~/editor/planner/readPlannerRuntimeFingerprintFx";
+import { readPlannerSearchActionsFx } from "~/editor/planner/readPlannerSearchActionsFx";
+import { readPlannerStructuralReachabilityFx } from "~/editor/planner/readPlannerStructuralReachabilityFx";
 import { runPlannerSearchCandidateFx } from "~/editor/planner/runPlannerSearchCandidateFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameConfigFx } from "~/engine/game/context/GameConfigFx";
@@ -60,6 +54,42 @@ interface PlannerProducerExpansionCandidate {
 
 const compareIds = (left: string, right: string) => left.localeCompare(right);
 
+const readRequirementSourcePriority = (source: PlannerAcquisitionRequirement["source"]) => {
+	switch (source) {
+		case "owner":
+		case "merge-source":
+		case "merge-target":
+			return 0;
+		case "charged-item":
+		case "temporary-item":
+			return 1;
+		case "deposit-input":
+		case "material-input":
+			return 2;
+		case "line-condition":
+		case "output-condition":
+			return 3;
+	}
+};
+
+const addRequirementDemand = (
+	demandByItemId: Map<IdSchema.Type, PlannerRequirementDemand>,
+	requirement: PlannerAcquisitionRequirement,
+) => {
+	const sourcePriority = readRequirementSourcePriority(requirement.source);
+	const demand = demandByItemId.get(requirement.itemId) ?? {
+		charges: 0,
+		consumed: 0,
+		retained: 0,
+		sourcePriority,
+	};
+	if (requirement.usage === "consume") demand.consumed += requirement.minimumQuantity;
+	else demand.retained = Math.max(demand.retained, requirement.minimumQuantity);
+	if (requirement.usage === "charge") demand.charges += requirement.chargeCost ?? 0;
+	demand.sourcePriority = Math.min(demand.sourcePriority, sourcePriority);
+	demandByItemId.set(requirement.itemId, demand);
+};
+
 const readInitialExecution = (runtime: RuntimeSchema.Type): PlannerSearchExecutionState => ({
 	elapsedMs: 0,
 	outputCertainty: "deterministic",
@@ -74,8 +104,24 @@ const readRequirementGoal = (requirement: PlannerAcquisitionRequirement): Planne
 	quantity: requirement.minimumQuantity,
 });
 
-const isGoalSatisfied = (goal: PlannerItemGoal, runtime: RuntimeSchema.Type) =>
-	readPlannerItemGoalStatus(goal, runtime).satisfied;
+const readRuntimeQuantity = (runtime: RuntimeSchema.Type, itemId: IdSchema.Type) =>
+	runtime.items.reduce((total, item) => total + (item.item.id === itemId ? item.quantity : 0), 0);
+
+const readRuntimeChargeCapacity = (runtime: RuntimeSchema.Type, itemId: IdSchema.Type) =>
+	runtime.items.reduce((total, item) => {
+		if (item.item.id !== itemId) return total;
+		const fullCapacity = item.item.charges?.amount;
+		if (fullCapacity === undefined) return total;
+		return total + (item.remainingCharges ?? fullCapacity) * item.quantity;
+	}, 0);
+
+const isGoalSatisfied = (goal: PlannerItemGoal, runtime: RuntimeSchema.Type) => {
+	const minimumCharges = goal.minimumCharges ?? 0;
+	return (
+		readRuntimeQuantity(runtime, goal.itemId) >= goal.quantity &&
+		readRuntimeChargeCapacity(runtime, goal.itemId) >= minimumCharges
+	);
+};
 
 const readRouteRequirementGoals = ({
 	graph,
@@ -88,7 +134,7 @@ const readRouteRequirementGoals = ({
 }) => {
 	const demandByItemId = new Map<IdSchema.Type, PlannerRequirementDemand>();
 	for (const requirement of route.requirements.allOf)
-		addPlannerRequirementDemand(demandByItemId, requirement);
+		addRequirementDemand(demandByItemId, requirement);
 	for (const clause of route.requirements.anyOf) {
 		if (
 			clause.some((requirement) => isGoalSatisfied(readRequirementGoal(requirement), runtime))
@@ -98,13 +144,13 @@ const readRouteRequirementGoals = ({
 			...clause,
 		].sort(
 			(left, right) =>
-				readPlannerRequirementSourcePriority(left.source) -
-					readPlannerRequirementSourcePriority(right.source) ||
+				readRequirementSourcePriority(left.source) -
+					readRequirementSourcePriority(right.source) ||
 				(graph.depthByItemId.get(left.itemId) ?? Number.POSITIVE_INFINITY) -
 					(graph.depthByItemId.get(right.itemId) ?? Number.POSITIVE_INFINITY) ||
 				compareIds(left.itemId, right.itemId),
 		)[0];
-		if (selected !== undefined) addPlannerRequirementDemand(demandByItemId, selected);
+		if (selected !== undefined) addRequirementDemand(demandByItemId, selected);
 	}
 	return [
 		...demandByItemId,
@@ -130,22 +176,16 @@ const readRouteRequirementGoals = ({
 const readCandidateAvailable = (candidate: PlannerSearchAction, runtime: RuntimeSchema.Type) => {
 	switch (candidate.action.kind) {
 		case "line":
-			return readPlannerRuntimeQuantity(runtime, candidate.action.ownerItemId) > 0;
+			return readRuntimeQuantity(runtime, candidate.action.ownerItemId) > 0;
 		case "merge": {
-			const sourceQuantity = readPlannerRuntimeQuantity(
-				runtime,
-				candidate.action.sourceItemId,
-			);
-			const targetQuantity = readPlannerRuntimeQuantity(
-				runtime,
-				candidate.action.targetItemId,
-			);
+			const sourceQuantity = readRuntimeQuantity(runtime, candidate.action.sourceItemId);
+			const targetQuantity = readRuntimeQuantity(runtime, candidate.action.targetItemId);
 			return candidate.action.sourceItemId === candidate.action.targetItemId
 				? sourceQuantity >= 2
 				: sourceQuantity > 0 && targetQuantity > 0;
 		}
 		case "temporary-expiry":
-			return readPlannerRuntimeQuantity(runtime, candidate.action.itemId) > 0;
+			return readRuntimeQuantity(runtime, candidate.action.itemId) > 0;
 	}
 };
 
@@ -314,7 +354,7 @@ export const expandPlannerProducerWorldFx = Effect.fn("expandPlannerProducerWorl
 			"Producer expansion maximumTraceLength must be a non-negative safe integer.",
 		);
 
-	const structuralReachability = readPlannerStructuralReachability({
+	const structuralReachability = yield* readPlannerStructuralReachabilityFx({
 		graph,
 		itemId: goal.itemId,
 	});
@@ -340,7 +380,7 @@ export const expandPlannerProducerWorldFx = Effect.fn("expandPlannerProducerWorl
 		};
 
 	let execution = readInitialExecution(runtime);
-	const actions = readPlannerSearchActions({
+	const actions = yield* readPlannerSearchActionsFx({
 		graph,
 		routes: graph.routes,
 	});
@@ -418,7 +458,7 @@ export const expandPlannerProducerWorldFx = Effect.fn("expandPlannerProducerWorl
 		});
 
 	while (true) {
-		const targetStatus = readPlannerItemGoalStatus(goal, execution.runtime);
+		const targetStatus = yield* readPlannerItemGoalStatusFx(goal, execution.runtime);
 		if (targetStatus.satisfied)
 			return {
 				availableQuantity: targetStatus.availableQuantity,
@@ -478,7 +518,7 @@ export const expandPlannerProducerWorldFx = Effect.fn("expandPlannerProducerWorl
 				visitedWorlds,
 			};
 
-		const runtimeFingerprint = readPlannerRuntimeFingerprint(execution.runtime);
+		const runtimeFingerprint = yield* readPlannerRuntimeFingerprintFx(execution.runtime);
 		const candidates: PlannerProducerExpansionCandidate[] = [];
 		for (const action of actions) {
 			if (blockedFingerprintByCandidateId.get(action.id) === runtimeFingerprint) continue;
@@ -524,8 +564,7 @@ export const expandPlannerProducerWorldFx = Effect.fn("expandPlannerProducerWorl
 						return (
 							demand !== undefined &&
 							canonicalQuantity > 0 &&
-							demand.quantity -
-								readPlannerRuntimeQuantity(execution.runtime, itemId) >
+							demand.quantity - readRuntimeQuantity(execution.runtime, itemId) >
 								canonicalQuantity
 						);
 					});
@@ -623,8 +662,8 @@ export const expandPlannerProducerWorldFx = Effect.fn("expandPlannerProducerWorl
 			].map(([itemId]) => [
 				itemId,
 				{
-					charges: readPlannerRuntimeChargeCapacity(beforeRuntime, itemId),
-					quantity: readPlannerRuntimeQuantity(beforeRuntime, itemId),
+					charges: readRuntimeChargeCapacity(beforeRuntime, itemId),
+					quantity: readRuntimeQuantity(beforeRuntime, itemId),
 				},
 			]),
 		);
@@ -652,7 +691,7 @@ export const expandPlannerProducerWorldFx = Effect.fn("expandPlannerProducerWorl
 			unsupportedActionIds.add(selected.action.actionId);
 			continue;
 		}
-		if (!isPlannerRuntimeQuiescent(transition.state.runtime))
+		if (!(yield* isPlannerRuntimeQuiescentFx(transition.state.runtime)))
 			return {
 				bestAvailableQuantity: targetStatus.availableQuantity,
 				bestExecution: transition.state,
@@ -696,7 +735,7 @@ export const expandPlannerProducerWorldFx = Effect.fn("expandPlannerProducerWorl
 			continue;
 		}
 
-		const agendaViability = readPlannerGoalAgendaViability({
+		const agendaViability = yield* readPlannerGoalAgendaViabilityFx({
 			goals: [
 				goal,
 				...[
@@ -727,8 +766,8 @@ export const expandPlannerProducerWorldFx = Effect.fn("expandPlannerProducerWorl
 				quantity: 0,
 			};
 			return (
-				readPlannerRuntimeQuantity(transition.state.runtime, itemId) > before.quantity ||
-				readPlannerRuntimeChargeCapacity(transition.state.runtime, itemId) > before.charges
+				readRuntimeQuantity(transition.state.runtime, itemId) > before.quantity ||
+				readRuntimeChargeCapacity(transition.state.runtime, itemId) > before.charges
 			);
 		});
 		const lastTrace = transition.state.trace.at(-1);

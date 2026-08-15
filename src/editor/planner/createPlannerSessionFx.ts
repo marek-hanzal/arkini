@@ -3,9 +3,9 @@ import { Effect, Option, Ref } from "effect";
 import { PlannerBudgetCounter } from "~/editor/planner/PlannerBudget";
 import { PlannerBudgetFx } from "~/editor/planner/PlannerBudgetFx";
 import { PlannerCurrentStrategyFx } from "~/editor/planner/PlannerCurrentStrategyFx";
-import { createPlannerSubproblem } from "~/editor/planner/PlannerProblem";
+import { createPlannerSubproblemFx } from "~/editor/planner/createPlannerSubproblemFx";
 import type { AnyPlannerStrategy } from "~/editor/planner/PlannerStrategyEnvironment";
-import { readPlannerItemGoalStatus } from "~/editor/planner/readPlannerItemGoalStatus";
+import { readPlannerItemGoalStatusFx } from "~/editor/planner/readPlannerItemGoalStatusFx";
 import type {
 	PlannerSessionDiagnostics,
 	PlannerSessionFxService,
@@ -121,16 +121,20 @@ export const createPlannerSessionFx = Effect.fn("createPlannerSessionFx")(functi
 			Effect.tap((result) =>
 				result.type !== "completed"
 					? Effect.void
-					: Effect.sync(() => {
-							const status = readPlannerItemGoalStatus(
-								problem.activeGoal,
-								result.execution.runtime,
-							);
-							if (!status.satisfied)
-								throw new Error(
-									`Planner strategy ${strategy.id} reported completion with ${status.availableQuantity}/${problem.activeGoal.quantity} ${problem.activeGoal.itemId} and ${status.availableCharges}/${status.minimumCharges} charges.`,
-								);
-						}),
+					: readPlannerItemGoalStatusFx(
+							problem.activeGoal,
+							result.execution.runtime,
+						).pipe(
+							Effect.flatMap((status) =>
+								status.satisfied
+									? Effect.void
+									: Effect.die(
+											new Error(
+												`Planner strategy ${strategy.id} reported completion with ${status.availableQuantity}/${problem.activeGoal.quantity} ${problem.activeGoal.itemId} and ${status.availableCharges}/${status.minimumCharges} charges.`,
+											),
+										),
+							),
+						),
 			),
 			Effect.tap((result) =>
 				Ref.update(stateRef, (state) =>
@@ -162,10 +166,13 @@ export const createPlannerSessionFx = Effect.fn("createPlannerSessionFx")(functi
 		),
 		runStrategyFx,
 		solveSubgoalFx: Effect.fn("PlannerSession.solveSubgoalFx")((request) =>
-			runStrategyFx({
-				problem: createPlannerSubproblem(request),
-				reason: request.reason,
-				strategy: rootStrategy,
+			Effect.gen(function* () {
+				const problem = yield* createPlannerSubproblemFx(request);
+				return yield* runStrategyFx({
+					problem,
+					reason: request.reason,
+					strategy: rootStrategy,
+				});
 			}),
 		),
 	};

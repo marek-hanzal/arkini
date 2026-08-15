@@ -43,13 +43,7 @@ export namespace EditorItemEstimateCacheAtom {
 		readonly estimates: ReadonlyMap<string, ReadonlyMap<number, EditorItemSimulation>>;
 		readonly errors: ReadonlyMap<string, ReadonlyMap<number, string>>;
 		readonly hydrated: boolean;
-		readonly hydrationPending: boolean;
-		readonly indexRequested: boolean;
 		readonly progress: EditorItemEstimateIndexProgress;
-		readonly queue: ReadonlyArray<Job>;
-		readonly requestedJobs: ReadonlyArray<Job>;
-		readonly runnerPending: boolean;
-		readonly runningJob?: Job;
 		readonly snapshot?: Snapshot;
 	}
 
@@ -61,20 +55,24 @@ export namespace EditorItemEstimateCacheAtom {
 	}
 }
 
-const initialState: EditorItemEstimateCacheAtom.State = {
+interface CacheState {
+	readonly estimates: ReadonlyMap<string, ReadonlyMap<number, EditorItemSimulation>>;
+	readonly errors: ReadonlyMap<string, ReadonlyMap<number, string>>;
+	readonly hydrated: boolean;
+	readonly indexRequested: boolean;
+	readonly queue: ReadonlyArray<EditorItemEstimateCacheAtom.Job>;
+	readonly requestedJobs: ReadonlyArray<EditorItemEstimateCacheAtom.Job>;
+	readonly runningJob?: EditorItemEstimateCacheAtom.Job;
+	readonly snapshot?: EditorItemEstimateCacheAtom.Snapshot;
+}
+
+const initialState: CacheState = {
 	errors: new Map(),
 	estimates: new Map(),
 	hydrated: false,
-	hydrationPending: false,
 	indexRequested: false,
-	progress: {
-		completed: 0,
-		itemId: "",
-		total: 0,
-	},
 	queue: [],
 	requestedJobs: [],
-	runnerPending: false,
 };
 
 const sameSnapshot = (
@@ -85,16 +83,13 @@ const sameSnapshot = (
 const sameJob = (left: EditorItemEstimateCacheAtom.Job, right: EditorItemEstimateCacheAtom.Job) =>
 	left.itemId === right.itemId && left.quantity === right.quantity;
 
-const readEstimate = (state: EditorItemEstimateCacheAtom.State, itemId: string, quantity: number) =>
+const readEstimate = (state: CacheState, itemId: string, quantity: number) =>
 	state.estimates.get(itemId)?.get(quantity);
 
-const readError = (state: EditorItemEstimateCacheAtom.State, itemId: string, quantity: number) =>
+const readError = (state: CacheState, itemId: string, quantity: number) =>
 	state.errors.get(itemId)?.get(quantity);
 
-const addEstimate = (
-	state: EditorItemEstimateCacheAtom.State,
-	estimate: EditorItemSimulation,
-): EditorItemEstimateCacheAtom.State => {
+const addEstimate = (state: CacheState, estimate: EditorItemSimulation): CacheState => {
 	const quantities = new Map(state.estimates.get(estimate.itemId));
 	quantities.set(estimate.quantity, estimate);
 	const estimates = new Map(state.estimates);
@@ -105,10 +100,7 @@ const addEstimate = (
 	};
 };
 
-const removeError = (
-	state: EditorItemEstimateCacheAtom.State,
-	job: EditorItemEstimateCacheAtom.Job,
-): EditorItemEstimateCacheAtom.State => {
+const removeError = (state: CacheState, job: EditorItemEstimateCacheAtom.Job): CacheState => {
 	const current = state.errors.get(job.itemId);
 	if (current === undefined || !current.has(job.quantity)) return state;
 	const quantities = new Map(current);
@@ -123,10 +115,10 @@ const removeError = (
 };
 
 const addError = (
-	state: EditorItemEstimateCacheAtom.State,
+	state: CacheState,
 	job: EditorItemEstimateCacheAtom.Job,
 	message: string,
-): EditorItemEstimateCacheAtom.State => {
+): CacheState => {
 	const quantities = new Map(state.errors.get(job.itemId));
 	quantities.set(job.quantity, message);
 	const errors = new Map(state.errors);
@@ -144,7 +136,7 @@ const dedupeJobs = (jobs: ReadonlyArray<EditorItemEstimateCacheAtom.Job>) => {
 	return result;
 };
 
-const countSettledIndexItems = (state: EditorItemEstimateCacheAtom.State) => {
+const countSettledIndexItems = (state: CacheState) => {
 	const itemIds = Object.keys(state.snapshot?.config.items ?? {});
 	return itemIds.filter(
 		(itemId) =>
@@ -153,16 +145,15 @@ const countSettledIndexItems = (state: EditorItemEstimateCacheAtom.State) => {
 	).length;
 };
 
-const updateProgress = (
-	state: EditorItemEstimateCacheAtom.State,
-	itemId = state.progress.itemId,
-): EditorItemEstimateCacheAtom.State => ({
-	...state,
+const readPublicState = (state: CacheState): EditorItemEstimateCacheAtom.State => ({
+	errors: state.errors,
+	estimates: state.estimates,
+	hydrated: state.hydrated,
 	progress: {
 		completed: countSettledIndexItems(state),
-		itemId,
 		total: Object.keys(state.snapshot?.config.items ?? {}).length,
 	},
+	snapshot: state.snapshot,
 });
 
 const persistenceSnapshot = (snapshot: EditorItemEstimateCacheAtom.Snapshot) => ({
@@ -178,7 +169,7 @@ const readCauseMessage = (cause: Cause.Cause<unknown>) => {
 		: String(Cause.squash(cause));
 };
 
-const requestedQueue = (state: EditorItemEstimateCacheAtom.State) => {
+const requestedQueue = (state: CacheState) => {
 	if (state.snapshot === undefined) return [];
 	const indexJobs = state.indexRequested
 		? Object.keys(state.snapshot.config.items)
@@ -223,18 +214,7 @@ export const makeEditorItemEstimateCacheAtom = (
 				const state = yield* Atom.get(stateAtom);
 				if (!sameSnapshot(state.snapshot, snapshot)) return;
 				const next = state.queue[0];
-				if (next === undefined) {
-					yield* Atom.update(stateAtom, (current) =>
-						sameSnapshot(current.snapshot, snapshot)
-							? {
-									...current,
-									runnerPending: false,
-									runningJob: undefined,
-								}
-							: current,
-					);
-					return;
-				}
+				if (next === undefined) return;
 				yield* Atom.update(stateAtom, (current) =>
 					sameSnapshot(current.snapshot, snapshot)
 						? {
@@ -264,24 +244,18 @@ export const makeEditorItemEstimateCacheAtom = (
 					yield* Atom.update(stateAtom, (current) => {
 						if (!sameSnapshot(current.snapshot, snapshot)) return current;
 						const withEstimate = removeError(addEstimate(current, estimate), next);
-						return updateProgress(
-							{
-								...withEstimate,
-								runningJob: undefined,
-							},
-							next.itemId,
-						);
+						return {
+							...withEstimate,
+							runningJob: undefined,
+						};
 					});
 				} else if (!Cause.hasInterruptsOnly(result.cause)) {
 					yield* Atom.update(stateAtom, (current) => {
 						if (!sameSnapshot(current.snapshot, snapshot)) return current;
-						return updateProgress(
-							{
-								...addError(current, next, readCauseMessage(result.cause)),
-								runningJob: undefined,
-							},
-							next.itemId,
-						);
+						return {
+							...addError(current, next, readCauseMessage(result.cause)),
+							runningJob: undefined,
+						};
 					});
 				} else return yield* Effect.failCause(result.cause);
 				const current = yield* Atom.get(stateAtom);
@@ -317,21 +291,14 @@ export const makeEditorItemEstimateCacheAtom = (
 				next = {
 					...next,
 					hydrated: true,
-					hydrationPending: false,
 				};
-				const queue = requestedQueue(next);
-				return updateProgress({
+				return {
 					...next,
-					queue,
-					runnerPending: queue.length > 0,
-				});
+					queue: requestedQueue(next),
+				};
 			});
 			const current = yield* Atom.get(stateAtom);
-			if (
-				sameSnapshot(current.snapshot, snapshot) &&
-				current.runnerPending &&
-				current.queue.length > 0
-			)
+			if (sameSnapshot(current.snapshot, snapshot) && current.queue.length > 0)
 				get.set(queueRunnerAtom, snapshot);
 		}),
 	).pipe(Atom.keepAlive);
@@ -339,18 +306,15 @@ export const makeEditorItemEstimateCacheAtom = (
 	const ensureRunner = (
 		context: Parameters<Parameters<typeof Atom.writable>[1]>[0],
 		snapshot: EditorItemEstimateCacheAtom.Snapshot,
-		state: EditorItemEstimateCacheAtom.State,
+		state: CacheState,
 	) => {
-		if (!state.hydrated || state.runnerPending || state.queue.length === 0) return;
-		context.set(stateAtom, {
-			...state,
-			runnerPending: true,
-		});
+		if (!state.hydrated || state.queue.length === 0 || context.get(queueRunnerAtom).waiting)
+			return;
 		context.set(queueRunnerAtom, snapshot);
 	};
 
 	return Atom.writable(
-		(get) => get(stateAtom),
+		(get) => readPublicState(get(stateAtom)),
 		(context, request: EditorItemEstimateCacheAtom.Request) => {
 			let state = context.get(stateAtom);
 			const needsHydration = !sameSnapshot(state.snapshot, request.snapshot);
@@ -359,12 +323,6 @@ export const makeEditorItemEstimateCacheAtom = (
 				context.set(hydrateRunnerAtom, Atom.Interrupt);
 				state = {
 					...initialState,
-					hydrationPending: true,
-					progress: {
-						completed: 0,
-						itemId: "",
-						total: Object.keys(request.snapshot.config.items).length,
-					},
 					snapshot: request.snapshot,
 				};
 			}

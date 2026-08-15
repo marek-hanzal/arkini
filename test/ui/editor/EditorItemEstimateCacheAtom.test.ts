@@ -161,6 +161,53 @@ describe("EditorItemEstimateCacheAtom", () => {
 		await waitFor(registry, atom, (state) => state.progress.completed === 3);
 	});
 
+	it("interrupts obsolete estimate work before publishing a replacement revision", async () => {
+		let calls = 0;
+		let interrupted = 0;
+		const atom = makeEditorItemEstimateCacheAtom({
+			persistence: persistence(),
+			runInWorkerFx: (request) => {
+				calls += 1;
+				if (calls === 1)
+					return Effect.callback(() =>
+						Effect.sync(() => {
+							interrupted += 1;
+						}),
+					);
+				return Effect.succeed({
+					estimate: simulation(request.itemId, request.quantity),
+					type: "item" as const,
+				});
+			},
+		});
+		const registry = mount(atom);
+
+		registry.set(atom, {
+			itemId: "alpha",
+			quantity: 1,
+			snapshot: snapshot(1),
+			type: "item",
+		});
+		await vi.waitFor(() => expect(calls).toBe(1));
+
+		registry.set(atom, {
+			itemId: "alpha",
+			quantity: 1,
+			snapshot: snapshot(2),
+			type: "item",
+		});
+		const state = await waitFor(
+			registry,
+			atom,
+			(current) =>
+				current.snapshot?.revision === 2 && current.estimates.get("alpha")?.has(1) === true,
+		);
+
+		expect(interrupted).toBe(1);
+		expect(calls).toBe(2);
+		expect(state.snapshot?.revision).toBe(2);
+	});
+
 	it("keeps quantities distinct and resets the cache authority on project revision changes", async () => {
 		const stored = persistence();
 		const atom = makeEditorItemEstimateCacheAtom({

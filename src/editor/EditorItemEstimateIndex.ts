@@ -11,6 +11,5 @@ export interface EditorItemEstimateIndexEntry {
 
 export interface EditorItemEstimateIndexProgress {
 	readonly completed: number;
-	readonly itemId: string;
 	readonly total: number;
 }

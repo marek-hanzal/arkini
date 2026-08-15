@@ -719,6 +719,43 @@ describe("estimateEditorItem", () => {
 		);
 	});
 
+	it("includes the official Chicken Coop construction in the egg estimate", async () => {
+		const config = await readArkiniGameConfigSource();
+		const estimate = await estimateEditorItem(config, "item:egg");
+
+		expect(estimate.status).toBe("estimated");
+		expect(estimate.infrastructure).toContainEqual(
+			expect.objectContaining({
+				itemId: "item:blueprint-chicken-coop-t1",
+				quantity: 1,
+				readyAtMs: expect.any(Number),
+			}),
+		);
+		expect(estimate.infrastructure).toContainEqual(
+			expect.objectContaining({
+				itemId: "producer:chicken-coop-t1",
+				quantity: 1,
+				readyAtMs: expect.any(Number),
+			}),
+		);
+		expect(estimate.operations).toContainEqual(
+			expect.objectContaining({
+				lineId: "line:blueprint:chicken-coop-t1:construct",
+				runs: 1,
+			}),
+		);
+		expect(estimate.operations).toContainEqual(
+			expect.objectContaining({
+				lineId: "line:chicken-coop-t1:egg",
+			}),
+		);
+		expect(estimate.operations).not.toContainEqual(
+			expect.objectContaining({
+				lineId: "line:quest:water-carrier:complete",
+			}),
+		);
+	}, 20_000);
+
 	it("uses expected yield for chance output", async () => {
 		const base = createJobTestConfig();
 		const forge = base.items.forge;

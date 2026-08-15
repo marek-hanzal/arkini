@@ -74,7 +74,7 @@ const createTwoRunConfig = () => {
 };
 
 describe("createEditorPlannerStrategy", () => {
-	it("uses constructive planning for a compact merge root and best-first for its subgoal", async () => {
+	it("uses producer expansion for a compact official merge root", async () => {
 		const config = await readArkiniGameConfigSource();
 		const planner = Effect.runSync(
 			createPlannerFx({
@@ -95,25 +95,20 @@ describe("createEditorPlannerStrategy", () => {
 				{
 					index: 1,
 					outcome: "completed",
-					strategyId: "constructive",
+					strategyId: "producer-expansion",
 				},
 			],
-			mode: "selected-constructive",
+			mode: "selected-producer-expansion",
 			selectedAttemptIndex: 1,
-			selection: {
-				reason: "construct-merge-root-goal:depth-5",
-				strategyId: "constructive",
-			},
+			selection: null,
 		});
 		expect(result.sessionDiagnostics.invocations.map(({ strategyId }) => strategyId)).toEqual([
 			"editor",
-			"constructive",
-			"editor",
-			"best-first",
+			"producer-expansion",
 		]);
 	});
 
-	it("routes a branching blueprint root directly to bounded best-first search", async () => {
+	it("falls back to bounded best-first search when producer expansion exhausts its budget", async () => {
 		const config = await readArkiniGameConfigSource();
 		const planner = Effect.runSync(
 			createPlannerFx({
@@ -121,6 +116,9 @@ describe("createEditorPlannerStrategy", () => {
 				strategy: createEditorPlannerStrategy({
 					bestFirstBudget: {
 						maximumExpandedStates: 1,
+					},
+					producerExpansionBudget: {
+						maximumExpandedActions: 1,
 					},
 				}),
 			}),
@@ -137,11 +135,16 @@ describe("createEditorPlannerStrategy", () => {
 				{
 					index: 1,
 					outcome: "inconclusive",
+					strategyId: "producer-expansion",
+				},
+				{
+					index: 2,
+					outcome: "inconclusive",
 					strategyId: "best-first",
 				},
 			],
-			mode: "selected-best-first",
-			selectedAttemptIndex: 1,
+			mode: "producer-expansion-fallback-best-first",
+			selectedAttemptIndex: 2,
 			selection: {
 				reason: "solve-root-goal:depth-2",
 				strategyId: "best-first",
@@ -149,17 +152,21 @@ describe("createEditorPlannerStrategy", () => {
 		});
 		expect(result.sessionDiagnostics.invocations.map(({ strategyId }) => strategyId)).toEqual([
 			"editor",
+			"producer-expansion",
 			"best-first",
 		]);
 	});
 
-	it("falls back to best-first over the original snapshot after constructive exhaustion", () => {
+	it("falls through producer expansion and constructive search before best-first", () => {
 		const planner = Effect.runSync(
 			createPlannerFx({
 				config: createTwoRunConfig(),
 				strategy: createEditorPlannerStrategy({
 					constructiveBudget: {
 						maximumExpandedBranches: 1,
+					},
+					producerExpansionBudget: {
+						maximumExpandedActions: 1,
 					},
 				}),
 			}),
@@ -177,21 +184,61 @@ describe("createEditorPlannerStrategy", () => {
 				{
 					index: 1,
 					outcome: "inconclusive",
-					strategyId: "constructive",
+					strategyId: "producer-expansion",
 				},
 				{
 					index: 2,
+					outcome: "inconclusive",
+					strategyId: "constructive",
+				},
+				{
+					index: 3,
 					outcome: "completed",
 					strategyId: "best-first",
 				},
 			],
-			mode: "constructive-fallback-best-first",
-			selectedAttemptIndex: 2,
+			mode: "producer-expansion-fallback-constructive-fallback-best-first",
+			selectedAttemptIndex: 3,
 		});
 		expect(result.sessionDiagnostics.invocations.map(({ strategyId }) => strategyId)).toEqual([
 			"editor",
+			"producer-expansion",
 			"constructive",
 			"best-first",
 		]);
 	});
+
+	it("uses the producer world to estimate the official Chicken Coop egg route", async () => {
+		const config = await readArkiniGameConfigSource();
+		const planner = Effect.runSync(
+			createPlannerFx({
+				config,
+				strategy: createEditorPlannerStrategy(),
+			}),
+		);
+		const result = await Effect.runPromise(
+			planner.estimateFx({
+				itemId: "item:egg",
+			}),
+		);
+
+		expect(result.type).toBe("completed");
+		if (result.type !== "completed") return;
+		expect(result.strategyDiagnostics).toMatchObject({
+			attempts: [
+				{
+					outcome: "completed",
+					strategyId: "producer-expansion",
+				},
+			],
+			mode: "selected-producer-expansion",
+		});
+		const actionIds = result.execution.trace.map(({ actionId }) => actionId);
+		expect(actionIds).toContain(
+			'["line","item:blueprint-chicken-coop-t1","line:blueprint:chicken-coop-t1:construct"]',
+		);
+		expect(actionIds).toContain(
+			'["line","producer:chicken-coop-t1","line:chicken-coop-t1:egg"]',
+		);
+	}, 20_000);
 });

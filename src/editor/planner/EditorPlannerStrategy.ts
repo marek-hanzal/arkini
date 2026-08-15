@@ -1,5 +1,6 @@
 import type { AdaptivePlannerStrategySelection } from "~/editor/planner/AdaptivePlannerStrategy";
 import type { PlannerGoalSearchBudget } from "~/editor/planner/PlannerGoalSearch";
+import type { PlannerProducerExpansionBudget } from "~/editor/planner/PlannerProducerExpansion";
 import type { PlannerSearchBudget } from "~/editor/planner/PlannerSearch";
 import type {
 	PlannerStrategy,
@@ -10,6 +11,7 @@ import type { PlannerStrategyEnvironment } from "~/editor/planner/PlannerStrateg
 
 export interface EditorPlannerStrategyPolicy {
 	readonly maximumBestFirstDepth: number;
+	readonly maximumProducerExpansionDepth: number;
 	readonly maximumConstructiveDelegationDepth: number;
 	readonly maximumConstructiveLinearRootDepth: number;
 	readonly maximumConstructiveMergeRootDepth: number;
@@ -24,15 +26,19 @@ export interface EditorPlannerStrategyAttemptDiagnostic {
 }
 
 export type EditorPlannerStrategyMode =
+	| "constructive-fallback-best-first"
 	| "selected-best-first"
 	| "selected-constructive"
-	| "constructive-fallback-best-first";
+	| "selected-producer-expansion"
+	| "producer-expansion-fallback-best-first"
+	| "producer-expansion-fallback-constructive"
+	| "producer-expansion-fallback-constructive-fallback-best-first";
 
 export interface EditorPlannerStrategyDiagnostics {
 	readonly attempts: ReadonlyArray<EditorPlannerStrategyAttemptDiagnostic>;
 	readonly mode: EditorPlannerStrategyMode;
 	readonly selectedAttemptIndex: number;
-	readonly selection: AdaptivePlannerStrategySelection;
+	readonly selection: AdaptivePlannerStrategySelection | null;
 }
 
 export type EditorPlannerStrategyResult = PlannerStrategyResult<
@@ -40,7 +46,7 @@ export type EditorPlannerStrategyResult = PlannerStrategyResult<
 	EditorPlannerStrategyDiagnostics
 >;
 
-/** Production editor orchestration over compact constructive search and bounded best-first search. */
+/** Production editor orchestration over producer expansion with constructive and best-first fallback. */
 export interface EditorPlannerStrategy
 	extends PlannerStrategy<
 		"editor",
@@ -54,4 +60,5 @@ export interface EditorPlannerStrategyProps {
 	readonly bestFirstBudget?: Partial<PlannerSearchBudget>;
 	readonly constructiveBudget?: Partial<PlannerGoalSearchBudget>;
 	readonly policy?: Partial<EditorPlannerStrategyPolicy>;
+	readonly producerExpansionBudget?: Partial<PlannerProducerExpansionBudget>;
 }

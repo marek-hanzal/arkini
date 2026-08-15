@@ -127,7 +127,7 @@ describe("createEngineBackedEditorItemSimulatorFx", () => {
 			estimate.planner?.sessionDiagnostics.invocations.map(({ strategyId }) => strategyId),
 		).toEqual([
 			"editor",
-			"constructive",
+			"producer-expansion",
 		]);
 		expect(estimate.infrastructureItemIds).toEqual(
 			new Set([
@@ -209,6 +209,9 @@ describe("createEngineBackedEditorItemSimulatorFx", () => {
 			},
 			constructive: {
 				maximumExpandedBranches: 1,
+			},
+			producerExpansion: {
+				maximumExpandedActions: 1,
 			},
 		});
 		expect(estimate).toMatchObject({

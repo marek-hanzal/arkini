@@ -190,7 +190,7 @@ describe("EditorItemEstimateSection", () => {
 		expect(method?.textContent).toContain("Concrete witness: 1 actions, 1 s.");
 		expect(method?.textContent).toContain("Expected replay: 1 actions, 1 s.");
 		expect(method?.textContent).toContain("Strategy root: editor.");
-		expect(method?.textContent).toContain("Algorithms used: editor → constructive.");
+		expect(method?.textContent).toContain("Algorithms used: editor → producer-expansion.");
 		expect(method?.textContent).not.toContain("Route plans:");
 	});
 

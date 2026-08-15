@@ -10,6 +10,7 @@ import type {
 	EditorPlannerStrategyResult,
 } from "~/editor/planner/EditorPlannerStrategy";
 import { DefaultPlannerGoalSearchBudget } from "~/editor/planner/PlannerGoalSearch";
+import { DefaultPlannerProducerExpansionBudget } from "~/editor/planner/PlannerProducerExpansion";
 import { PlannerCurrentStrategyFx } from "~/editor/planner/PlannerCurrentStrategyFx";
 import { PlannerKernelFx } from "~/editor/planner/PlannerKernelFx";
 import { DefaultPlannerSearchBudget } from "~/editor/planner/PlannerSearch";
@@ -21,6 +22,7 @@ import {
 } from "~/editor/planner/PlannerStrategy";
 import { createBestFirstPlannerStrategy } from "~/editor/planner/createBestFirstPlannerStrategy";
 import { createConstructivePlannerStrategy } from "~/editor/planner/createConstructivePlannerStrategy";
+import { createProducerExpansionPlannerStrategy } from "~/editor/planner/createProducerExpansionPlannerStrategy";
 import {
 	DefaultGoalDirectedBestFirstDepth,
 	DefaultGoalDirectedConstructiveDelegationDepth,
@@ -31,6 +33,7 @@ import {
 
 export const DefaultEditorPlannerStrategyPolicy: EditorPlannerStrategyPolicy = {
 	maximumBestFirstDepth: DefaultGoalDirectedBestFirstDepth,
+	maximumProducerExpansionDepth: 12,
 	maximumConstructiveDelegationDepth: DefaultGoalDirectedConstructiveDelegationDepth,
 	maximumConstructiveLinearRootDepth: DefaultGoalDirectedConstructiveLinearRootDepth,
 	maximumConstructiveMergeRootDepth: DefaultGoalDirectedConstructiveMergeRootDepth,
@@ -47,6 +50,12 @@ export const DefaultEditorPlannerBestFirstBudget = {
 	maximumExpandedStates: 1_000,
 	maximumQueuedStates: 16,
 	maximumRoutePlans: 16,
+	maximumTraceLength: 500,
+};
+
+export const DefaultEditorPlannerProducerExpansionBudget = {
+	...DefaultPlannerProducerExpansionBudget,
+	maximumExpandedActions: 128,
 	maximumTraceLength: 500,
 };
 
@@ -140,6 +149,7 @@ export const createEditorPlannerStrategy = ({
 	bestFirstBudget,
 	constructiveBudget,
 	policy: policyInput,
+	producerExpansionBudget,
 }: EditorPlannerStrategyProps = {}): EditorPlannerStrategy => {
 	const policy: EditorPlannerStrategyPolicy = {
 		...DefaultEditorPlannerStrategyPolicy,
@@ -157,6 +167,12 @@ export const createEditorPlannerStrategy = ({
 			...bestFirstBudget,
 		},
 	});
+	const producerExpansion = createProducerExpansionPlannerStrategy({
+		budget: {
+			...DefaultEditorPlannerProducerExpansionBudget,
+			...producerExpansionBudget,
+		},
+	});
 	return {
 		id: PlannerStrategyId.editor,
 		solveFx: Effect.fn("EditorPlannerStrategy.solveFx")((problem) =>
@@ -164,6 +180,29 @@ export const createEditorPlannerStrategy = ({
 				const currentStrategy = yield* PlannerCurrentStrategyFx;
 				const kernel = yield* PlannerKernelFx;
 				const session = yield* PlannerSessionFx;
+				const attempts: AnyPlannerStrategyResult[] = [];
+				const targetDepth =
+					kernel.graph.depthByItemId.get(problem.activeGoal.itemId) ??
+					Number.POSITIVE_INFINITY;
+				const producerExpansionEligible =
+					targetDepth <= policy.maximumProducerExpansionDepth;
+
+				if (producerExpansionEligible) {
+					const expansion = yield* session.runStrategyFx({
+						problem,
+						reason: `expand-current-producer-world:depth-${targetDepth}`,
+						strategy: producerExpansion,
+					});
+					attempts.push(expansion);
+					if (expansion.type !== "inconclusive")
+						return projectResult({
+							attempts,
+							mode: "selected-producer-expansion",
+							selected: expansion,
+							selection: null,
+						});
+				}
+
 				const selection = readGoalDirectedPlannerStrategySelection({
 					currentStrategy,
 					graph: kernel.graph,
@@ -174,43 +213,49 @@ export const createEditorPlannerStrategy = ({
 				if (selection.strategyId === PlannerStrategyId.constructive)
 					selected = yield* session.runStrategyFx({
 						problem,
-						reason: selection.reason,
+						reason: producerExpansionEligible
+							? `fallback-after-producer-expansion:${selection.reason}`
+							: selection.reason,
 						strategy: constructive,
 					});
 				else
 					selected = yield* session.runStrategyFx({
 						problem,
-						reason: selection.reason,
+						reason: producerExpansionEligible
+							? `fallback-after-producer-expansion:${selection.reason}`
+							: selection.reason,
 						strategy: bestFirst,
 					});
+				attempts.push(selected);
 				if (
 					selection.strategyId !== PlannerStrategyId.constructive ||
 					selected.type !== "inconclusive"
 				)
 					return projectResult({
-						attempts: [
-							selected,
-						],
-						mode:
-							selection.strategyId === PlannerStrategyId.constructive
+						attempts,
+						mode: producerExpansionEligible
+							? selection.strategyId === PlannerStrategyId.constructive
+								? "producer-expansion-fallback-constructive"
+								: "producer-expansion-fallback-best-first"
+							: selection.strategyId === PlannerStrategyId.constructive
 								? "selected-constructive"
 								: "selected-best-first",
 						selected,
 						selection,
 					});
 
-				const fallback = yield* session.runStrategyFx({
+				const bestFirstFallback = yield* session.runStrategyFx({
 					problem,
 					reason: "fallback-after-constructive-inconclusive",
 					strategy: bestFirst,
 				});
+				attempts.push(bestFirstFallback);
 				return projectResult({
-					attempts: [
-						selected,
-						fallback,
-					],
-					mode: "constructive-fallback-best-first",
-					selected: fallback,
+					attempts,
+					mode: producerExpansionEligible
+						? "producer-expansion-fallback-constructive-fallback-best-first"
+						: "constructive-fallback-best-first",
+					selected: bestFirstFallback,
 					selection,
 				});
 			}),

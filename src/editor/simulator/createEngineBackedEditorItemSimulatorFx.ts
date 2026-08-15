@@ -2,10 +2,12 @@ import { Effect } from "effect";
 
 import type { PlannerBudgetLimits } from "~/editor/planner/PlannerBudget";
 import type { PlannerGoalSearchBudget } from "~/editor/planner/PlannerGoalSearch";
+import type { PlannerProducerExpansionBudget } from "~/editor/planner/PlannerProducerExpansion";
 import type { PlannerSearchBudget } from "~/editor/planner/PlannerSearch";
 import {
 	DefaultEditorPlannerBestFirstBudget,
 	DefaultEditorPlannerConstructiveBudget,
+	DefaultEditorPlannerProducerExpansionBudget,
 	createEditorPlannerStrategy,
 } from "~/editor/planner/createEditorPlannerStrategy";
 import { createPlannerAcquisitionGraph } from "~/editor/planner/createPlannerAcquisitionGraph";
@@ -22,6 +24,10 @@ export const EditorItemPlannerGoalSearchBudget: PlannerGoalSearchBudget = {
 	...DefaultEditorPlannerConstructiveBudget,
 };
 
+export const EditorItemPlannerProducerExpansionBudget: PlannerProducerExpansionBudget = {
+	...DefaultEditorPlannerProducerExpansionBudget,
+};
+
 export const EditorItemPlannerSessionBudget: PlannerBudgetLimits = {
 	maximumDelegationDepth: 64,
 	maximumEngineTransitions: 100_000,
@@ -31,6 +37,7 @@ export const EditorItemPlannerSessionBudget: PlannerBudgetLimits = {
 export interface EditorItemPlannerBudget {
 	readonly bestFirst?: Partial<PlannerSearchBudget>;
 	readonly constructive?: Partial<PlannerGoalSearchBudget>;
+	readonly producerExpansion?: Partial<PlannerProducerExpansionBudget>;
 	readonly session?: Partial<PlannerBudgetLimits>;
 }
 
@@ -65,6 +72,10 @@ export const createEngineBackedEditorItemSimulatorFx = Effect.fn(
 					bestFirstBudget: {
 						...EditorItemPlannerSearchBudget,
 						...budget.bestFirst,
+					},
+					producerExpansionBudget: {
+						...EditorItemPlannerProducerExpansionBudget,
+						...budget.producerExpansion,
 					},
 				}),
 			});

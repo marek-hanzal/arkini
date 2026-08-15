@@ -604,7 +604,7 @@ describe("createEditorMcpOwnershipFx", () => {
 						"  Invocations: 2",
 						"  Engine transitions: 1/100000",
 						"  Strategy invocations: 2/10000",
-						"  Algorithms used: editor -> constructive",
+						"  Algorithms used: editor -> producer-expansion",
 					].join("\n"),
 				),
 			},
@@ -685,7 +685,7 @@ describe("createEditorMcpOwnershipFx", () => {
 		expect(inconclusiveEstimate.content).toMatchObject([
 			{
 				text: expect.stringContaining(
-					"Strategy session:\n  Root strategy: editor\n  Invocations: 3",
+					"Strategy session:\n  Root strategy: editor\n  Invocations: 4",
 				),
 			},
 		]);

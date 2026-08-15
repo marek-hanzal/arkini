@@ -9,6 +9,11 @@ import type {
 	PlannerGoalSearchSubgoalSolver,
 } from "~/editor/planner/PlannerGoalSearch";
 import type { PlannerItemGoal } from "~/editor/planner/PlannerGoalViability";
+import {
+	addPlannerRequirementDemand,
+	type PlannerRequirementDemand,
+	readPlannerRequirementSourcePriority,
+} from "~/editor/planner/PlannerRequirementDemand";
 import type { PlannerSearchExecutionState } from "~/editor/planner/PlannerSearchExecution";
 import type { PlannerSearchAction } from "~/editor/planner/PlannerSearchScope";
 import type { PlannerStrategyInconclusiveReason } from "~/editor/planner/PlannerStrategy";
@@ -67,13 +72,6 @@ interface PlannerGoalBranch {
 	readonly choicePath: ReadonlyArray<number>;
 	readonly execution: PlannerSearchExecutionState;
 	readonly fallback?: PlannerGoalBranch;
-}
-
-interface PlannerRequirementDemand {
-	charges: number;
-	consumed: number;
-	retained: number;
-	sourcePriority: number;
 }
 
 interface PlannerRequirementChoice {
@@ -203,44 +201,6 @@ const readAgendaItemGoals = (
 	),
 ];
 
-const readRequirementSourcePriority = (source: PlannerAcquisitionRequirement["source"]) => {
-	switch (source) {
-		case "owner":
-		case "merge-source":
-		case "merge-target":
-			return 0;
-		case "charged-item":
-		case "temporary-item":
-			return 1;
-		case "deposit-input":
-		case "material-input":
-			return 2;
-		case "line-condition":
-		case "output-condition":
-			return 3;
-	}
-};
-
-const addRequirementDemand = (
-	demandByItemId: Map<IdSchema.Type, PlannerRequirementDemand>,
-	requirement: PlannerAcquisitionRequirement,
-) => {
-	const demand = demandByItemId.get(requirement.itemId) ?? {
-		charges: 0,
-		consumed: 0,
-		retained: 0,
-		sourcePriority: readRequirementSourcePriority(requirement.source),
-	};
-	if (requirement.usage === "consume") demand.consumed += requirement.minimumQuantity;
-	else demand.retained = Math.max(demand.retained, requirement.minimumQuantity);
-	if (requirement.usage === "charge") demand.charges += requirement.chargeCost ?? 0;
-	demand.sourcePriority = Math.min(
-		demand.sourcePriority,
-		readRequirementSourcePriority(requirement.source),
-	);
-	demandByItemId.set(requirement.itemId, demand);
-};
-
 const readRequirementGoal = (
 	requirement: PlannerAcquisitionRequirement,
 ): PlannerResourceGoalTask => ({
@@ -257,7 +217,7 @@ const readAllOfRequirementChoices = (
 ): ReadonlyArray<PlannerRequirementChoice> => {
 	const demandByItemId = new Map<IdSchema.Type, PlannerRequirementDemand>();
 	for (const requirement of route.requirements.allOf)
-		addRequirementDemand(demandByItemId, requirement);
+		addPlannerRequirementDemand(demandByItemId, requirement);
 	return [
 		...demandByItemId,
 	].flatMap(([itemId, demand]) => {
@@ -304,7 +264,7 @@ const readAnyOfRequirementChoiceGroups = (
 					clauseIndex,
 					alternativeIndex,
 				]),
-				sourcePriority: readRequirementSourcePriority(requirement.source),
+				sourcePriority: readPlannerRequirementSourcePriority(requirement.source),
 			})),
 		];
 	});

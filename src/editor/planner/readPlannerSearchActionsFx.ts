@@ -5,32 +5,10 @@ import type {
 	PlannerAcquisitionRoute,
 } from "~/editor/planner/PlannerAcquisitionGraph";
 import type { PlannerSearchAction } from "~/editor/planner/PlannerSearchScope";
+import { readPlannerActionIdFx } from "~/editor/planner/readPlannerActionIdFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 
 const compareIds = (left: string, right: string) => left.localeCompare(right);
-
-const readActionId = (action: PlannerSearchAction["action"]) => {
-	switch (action.kind) {
-		case "line":
-			return JSON.stringify([
-				action.kind,
-				action.ownerItemId,
-				action.lineId,
-			]);
-		case "merge":
-			return JSON.stringify([
-				action.kind,
-				action.sourceItemId,
-				action.targetItemId,
-				action.mergeIndex,
-			]);
-		case "temporary-expiry":
-			return JSON.stringify([
-				action.kind,
-				action.itemId,
-			]);
-	}
-};
 
 const readActionOutputWitness = (
 	route: PlannerAcquisitionRoute,
@@ -92,7 +70,7 @@ export const readPlannerSearchActionsFx = Effect.fn("readPlannerSearchActionsFx"
 		readonly graph: PlannerAcquisitionGraph;
 		readonly routes: ReadonlyArray<PlannerAcquisitionRoute>;
 	}) =>
-		Effect.sync((): ReadonlyArray<PlannerSearchAction> => {
+		Effect.gen(function* () {
 			const canonicalByActionId = new Map<
 				string,
 				{
@@ -105,7 +83,7 @@ export const readPlannerSearchActionsFx = Effect.fn("readPlannerSearchActionsFx"
 			const existentialByResolutionId = new Map<string, PlannerSearchAction>();
 
 			for (const route of routes) {
-				const actionId = readActionId(route.action);
+				const actionId = yield* readPlannerActionIdFx(route.action);
 				const depth = graph.routeDepthById.get(route.id) ?? Number.POSITIVE_INFINITY;
 				if (!route.output.stochastic) {
 					const candidate = canonicalByActionId.get(actionId) ?? {

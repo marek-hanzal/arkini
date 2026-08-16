@@ -10,6 +10,9 @@ import type {
 } from "~/editor/planner/PlannerGoalSearch";
 import type { PlannerItemGoal } from "~/editor/planner/PlannerGoalViability";
 import type { PlannerRequirementDemand } from "~/editor/planner/PlannerRequirementDemand";
+import { addPlannerRequirementDemandFx } from "~/editor/planner/addPlannerRequirementDemandFx";
+import { isPlannerAcquisitionRouteReadyFx } from "~/editor/planner/isPlannerAcquisitionRouteReadyFx";
+import { readPlannerRequirementSourcePriorityFx } from "~/editor/planner/readPlannerRequirementSourcePriorityFx";
 import type { PlannerSearchExecutionState } from "~/editor/planner/PlannerSearchExecution";
 import type { PlannerSearchAction } from "~/editor/planner/PlannerSearchScope";
 import type { PlannerStrategyInconclusiveReason } from "~/editor/planner/PlannerStrategy";
@@ -147,78 +150,24 @@ type PlannerBranchBatchResult =
 
 const compareIds = (left: string, right: string) => left.localeCompare(right);
 
-const readRuntimeQuantity = (runtime: RuntimeSchema.Type, itemId: IdSchema.Type) =>
-	runtime.items.reduce((total, item) => total + (item.item.id === itemId ? item.quantity : 0), 0);
-
-const readRuntimeChargeCapacity = (runtime: RuntimeSchema.Type, itemId: IdSchema.Type) =>
-	runtime.items.reduce((total, item) => {
-		if (item.item.id !== itemId) return total;
+const readRuntimeItemFacts = (runtime: RuntimeSchema.Type, itemId: IdSchema.Type) => {
+	let chargeCapacity = 0;
+	let quantity = 0;
+	for (const item of runtime.items) {
+		if (item.item.id !== itemId) continue;
+		quantity += item.quantity;
 		const fullCapacity = item.item.charges?.amount;
-		if (fullCapacity === undefined) return total;
-		return total + (item.remainingCharges ?? fullCapacity) * item.quantity;
-	}, 0);
-
-const readRequirementSourcePriority = (source: PlannerAcquisitionRequirement["source"]) => {
-	switch (source) {
-		case "owner":
-		case "merge-source":
-		case "merge-target":
-			return 0;
-		case "charged-item":
-		case "temporary-item":
-			return 1;
-		case "deposit-input":
-		case "material-input":
-			return 2;
-		case "line-condition":
-		case "output-condition":
-			return 3;
+		if (fullCapacity !== undefined)
+			chargeCapacity += (item.remainingCharges ?? fullCapacity) * item.quantity;
 	}
-};
-
-const addRequirementDemand = (
-	demandByItemId: Map<IdSchema.Type, PlannerRequirementDemand>,
-	requirement: PlannerAcquisitionRequirement,
-) => {
-	const sourcePriority = readRequirementSourcePriority(requirement.source);
-	const demand = demandByItemId.get(requirement.itemId) ?? {
-		charges: 0,
-		consumed: 0,
-		retained: 0,
-		sourcePriority,
+	return {
+		chargeCapacity,
+		quantity,
 	};
-	if (requirement.usage === "consume") demand.consumed += requirement.minimumQuantity;
-	else demand.retained = Math.max(demand.retained, requirement.minimumQuantity);
-	if (requirement.usage === "charge") demand.charges += requirement.chargeCost ?? 0;
-	demand.sourcePriority = Math.min(demand.sourcePriority, sourcePriority);
-	demandByItemId.set(requirement.itemId, demand);
 };
 
-const isRequirementReady = (
-	requirement: PlannerAcquisitionRequirement,
-	runtime: RuntimeSchema.Type,
-) =>
-	readRuntimeQuantity(runtime, requirement.itemId) >= requirement.minimumQuantity &&
-	(requirement.usage !== "charge" ||
-		readRuntimeChargeCapacity(runtime, requirement.itemId) >= (requirement.chargeCost ?? 0));
-
-const isPlannerAcquisitionRouteReady = (
-	route: PlannerAcquisitionRoute,
-	runtime: RuntimeSchema.Type,
-) => {
-	const demandByItemId = new Map<IdSchema.Type, PlannerRequirementDemand>();
-	for (const requirement of route.requirements.allOf)
-		addRequirementDemand(demandByItemId, requirement);
-	for (const [itemId, demand] of demandByItemId)
-		if (
-			readRuntimeQuantity(runtime, itemId) < demand.consumed + demand.retained ||
-			readRuntimeChargeCapacity(runtime, itemId) < demand.charges
-		)
-			return false;
-	return route.requirements.anyOf.every((clause) =>
-		clause.some((requirement) => isRequirementReady(requirement, runtime)),
-	);
-};
+const readRuntimeQuantity = (runtime: RuntimeSchema.Type, itemId: IdSchema.Type) =>
+	readRuntimeItemFacts(runtime, itemId).quantity;
 
 const readInitialExecution = (runtime: RuntimeSchema.Type): PlannerSearchExecutionState => ({
 	elapsedMs: 0,
@@ -240,13 +189,15 @@ const readInitialResourceGoal = (
 	type: "resource",
 });
 
-const isResourceGoalSatisfied = (goal: PlannerResourceGoalTask, runtime: RuntimeSchema.Type) =>
-	readRuntimeQuantity(runtime, goal.itemId) >= goal.minimumQuantity &&
-	readRuntimeChargeCapacity(runtime, goal.itemId) >= goal.minimumCharges;
+const isResourceGoalSatisfied = (goal: PlannerResourceGoalTask, runtime: RuntimeSchema.Type) => {
+	const facts = readRuntimeItemFacts(runtime, goal.itemId);
+	return facts.quantity >= goal.minimumQuantity && facts.chargeCapacity >= goal.minimumCharges;
+};
 
-const isTargetGoalSatisfied = (goal: PlannerItemGoal, runtime: RuntimeSchema.Type) =>
-	readRuntimeQuantity(runtime, goal.itemId) >= goal.quantity &&
-	readRuntimeChargeCapacity(runtime, goal.itemId) >= (goal.minimumCharges ?? 0);
+const isTargetGoalSatisfied = (goal: PlannerItemGoal, runtime: RuntimeSchema.Type) => {
+	const facts = readRuntimeItemFacts(runtime, goal.itemId);
+	return facts.quantity >= goal.quantity && facts.chargeCapacity >= (goal.minimumCharges ?? 0);
+};
 
 const projectResourceGoal = (goal: PlannerResourceGoalTask): PlannerItemGoal => ({
 	itemId: goal.itemId,
@@ -278,63 +229,68 @@ const readRequirementGoal = (
 	type: "resource",
 });
 
-const readAllOfRequirementChoices = (
-	route: PlannerAcquisitionRoute,
-	runtime: RuntimeSchema.Type,
-): ReadonlyArray<PlannerRequirementChoice> => {
-	const demandByItemId = new Map<IdSchema.Type, PlannerRequirementDemand>();
-	for (const requirement of route.requirements.allOf)
-		addRequirementDemand(demandByItemId, requirement);
-	return [
-		...demandByItemId,
-	].flatMap(([itemId, demand]) => {
-		const goal: PlannerResourceGoalTask = {
-			itemId,
-			minimumCharges: demand.charges,
-			minimumQuantity: demand.consumed + demand.retained,
-			resolution: "subgoal",
-			type: "resource",
-		};
-		return isResourceGoalSatisfied(goal, runtime)
-			? []
-			: [
-					{
-						goal,
-						key: JSON.stringify([
-							"all-of",
-							route.id,
-							itemId,
-						]),
-						sourcePriority: demand.sourcePriority,
-					},
-				];
-	});
-};
+const readAllOfRequirementChoicesFx = Effect.fn("searchPlannerGoalFx.allOfRequirementChoices")(
+	function* (route: PlannerAcquisitionRoute, runtime: RuntimeSchema.Type) {
+		const demandByItemId = new Map<IdSchema.Type, PlannerRequirementDemand>();
+		for (const requirement of route.requirements.allOf)
+			yield* addPlannerRequirementDemandFx(demandByItemId, requirement);
+		return [
+			...demandByItemId,
+		].flatMap(([itemId, demand]) => {
+			const goal: PlannerResourceGoalTask = {
+				itemId,
+				minimumCharges: demand.charges,
+				minimumQuantity: demand.consumed + demand.retained,
+				resolution: "subgoal",
+				type: "resource",
+			};
+			return isResourceGoalSatisfied(goal, runtime)
+				? []
+				: [
+						{
+							goal,
+							key: JSON.stringify([
+								"all-of",
+								route.id,
+								itemId,
+							]),
+							sourcePriority: demand.sourcePriority,
+						},
+					];
+		});
+	},
+);
 
-const readAnyOfRequirementChoiceGroups = (
-	route: PlannerAcquisitionRoute,
-	runtime: RuntimeSchema.Type,
-): ReadonlyArray<ReadonlyArray<PlannerRequirementChoice>> =>
-	route.requirements.anyOf.flatMap((clause, clauseIndex) => {
+const readAnyOfRequirementChoiceGroupsFx = Effect.fn(
+	"searchPlannerGoalFx.anyOfRequirementChoiceGroups",
+)(function* (route: PlannerAcquisitionRoute, runtime: RuntimeSchema.Type) {
+	const groups: Array<ReadonlyArray<PlannerRequirementChoice>> = [];
+	for (const [clauseIndex, clause] of route.requirements.anyOf.entries()) {
 		if (
 			clause.some((requirement) =>
 				isResourceGoalSatisfied(readRequirementGoal(requirement), runtime),
 			)
 		)
-			return [];
-		return [
-			clause.map((requirement, alternativeIndex) => ({
-				goal: readRequirementGoal(requirement),
-				key: JSON.stringify([
-					"any-of",
-					route.id,
-					clauseIndex,
-					alternativeIndex,
-				]),
-				sourcePriority: readRequirementSourcePriority(requirement.source),
-			})),
-		];
-	});
+			continue;
+		groups.push(
+			yield* Effect.forEach(clause, (requirement, alternativeIndex) =>
+				readPlannerRequirementSourcePriorityFx(requirement.source).pipe(
+					Effect.map((sourcePriority) => ({
+						goal: readRequirementGoal(requirement),
+						key: JSON.stringify([
+							"any-of",
+							route.id,
+							clauseIndex,
+							alternativeIndex,
+						]),
+						sourcePriority,
+					})),
+				),
+			),
+		);
+	}
+	return groups;
+});
 
 const compareRequirementChoices = (
 	graph: PlannerAcquisitionGraph,
@@ -362,62 +318,68 @@ const deduplicateRequirementChoices = (choices: ReadonlyArray<PlannerRequirement
 	).values(),
 ];
 
-const readUnmetRequirementChoices = ({
-	graph,
-	route,
-	runtime,
-}: {
-	readonly graph: PlannerAcquisitionGraph;
-	readonly route: PlannerAcquisitionRoute;
-	readonly runtime: RuntimeSchema.Type;
-}) => {
-	const mandatory = deduplicateRequirementChoices(
-		[
-			...readAllOfRequirementChoices(route, runtime),
-		].sort((left, right) => compareRequirementChoices(graph, left, right)),
-	);
-	if (mandatory.length > 0)
-		return {
-			choices: mandatory,
-			type: "mandatory" as const,
-		};
-
-	const alternativeGroups = readAnyOfRequirementChoiceGroups(route, runtime)
-		.map((choices) =>
-			deduplicateRequirementChoices(
-				[
-					...choices,
-				].sort((left, right) => compareRequirementChoices(graph, left, right)),
-			),
-		)
-		.filter((choices) => choices.length > 0)
-		.sort((left, right) => {
-			const leftChoice = left[0];
-			const rightChoice = right[0];
-			return leftChoice === undefined || rightChoice === undefined
-				? left.length - right.length
-				: compareRequirementChoices(graph, leftChoice, rightChoice);
-		});
-	const choices = alternativeGroups[0];
-	return choices === undefined
-		? undefined
-		: {
-				choices,
-				type: "alternatives" as const,
+const readUnmetRequirementChoicesFx = Effect.fn("searchPlannerGoalFx.unmetRequirementChoices")(
+	function* ({
+		graph,
+		route,
+		runtime,
+	}: {
+		readonly graph: PlannerAcquisitionGraph;
+		readonly route: PlannerAcquisitionRoute;
+		readonly runtime: RuntimeSchema.Type;
+	}) {
+		const mandatory = deduplicateRequirementChoices(
+			[
+				...(yield* readAllOfRequirementChoicesFx(route, runtime)),
+			].sort((left, right) => compareRequirementChoices(graph, left, right)),
+		);
+		if (mandatory.length > 0)
+			return {
+				choices: mandatory,
+				type: "mandatory" as const,
 			};
-};
+
+		const alternativeGroups = (yield* readAnyOfRequirementChoiceGroupsFx(route, runtime))
+			.map((choices) =>
+				deduplicateRequirementChoices(
+					[
+						...choices,
+					].sort((left, right) => compareRequirementChoices(graph, left, right)),
+				),
+			)
+			.filter((choices) => choices.length > 0)
+			.sort((left, right) => {
+				const leftChoice = left[0];
+				const rightChoice = right[0];
+				return leftChoice === undefined || rightChoice === undefined
+					? left.length - right.length
+					: compareRequirementChoices(graph, leftChoice, rightChoice);
+			});
+		const choices = alternativeGroups[0];
+		return choices === undefined
+			? undefined
+			: {
+					choices,
+					type: "alternatives" as const,
+				};
+	},
+);
 
 const compareRoutes = (
 	graph: PlannerAcquisitionGraph,
-	runtime: RuntimeSchema.Type,
-	left: PlannerAcquisitionRoute,
-	right: PlannerAcquisitionRoute,
+	left: {
+		readonly ready: boolean;
+		readonly route: PlannerAcquisitionRoute;
+	},
+	right: {
+		readonly ready: boolean;
+		readonly route: PlannerAcquisitionRoute;
+	},
 ) =>
-	Number(isPlannerAcquisitionRouteReady(right, runtime)) -
-		Number(isPlannerAcquisitionRouteReady(left, runtime)) ||
-	(graph.routeDepthById.get(left.id) ?? Number.POSITIVE_INFINITY) -
-		(graph.routeDepthById.get(right.id) ?? Number.POSITIVE_INFINITY) ||
-	compareIds(left.id, right.id);
+	Number(right.ready) - Number(left.ready) ||
+	(graph.routeDepthById.get(left.route.id) ?? Number.POSITIVE_INFINITY) -
+		(graph.routeDepthById.get(right.route.id) ?? Number.POSITIVE_INFINITY) ||
+	compareIds(left.route.id, right.route.id);
 
 const readResourceRouteBranchesFx = Effect.fn("readResourceRouteBranchesFx")(function* ({
 	branch,
@@ -430,11 +392,21 @@ const readResourceRouteBranchesFx = Effect.fn("readResourceRouteBranchesFx")(fun
 	readonly graph: PlannerAcquisitionGraph;
 	readonly rest: ReadonlyArray<PlannerGoalTask>;
 }) {
-	const routes = [
-		...(graph.routesByOutputItemId.get(goal.itemId) ?? []),
-	]
-		.filter((route) => route.output.maximumQuantity > 0)
-		.sort((left, right) => compareRoutes(graph, branch.execution.runtime, left, right));
+	const routeCandidates = yield* Effect.forEach(
+		(graph.routesByOutputItemId.get(goal.itemId) ?? []).filter(
+			(route) => route.output.maximumQuantity > 0,
+		),
+		(route) =>
+			isPlannerAcquisitionRouteReadyFx(route, branch.execution.runtime).pipe(
+				Effect.map((ready) => ({
+					ready,
+					route,
+				})),
+			),
+	);
+	const routes = routeCandidates
+		.sort((left, right) => compareRoutes(graph, left, right))
+		.map(({ route }) => route);
 	const optionGroups = yield* Effect.forEach(routes, (route) =>
 		readPlannerSearchActionsFx({
 			graph,
@@ -791,13 +763,13 @@ const expandPlannerGoalBranchFx = Effect.fn("expandPlannerGoalBranchFx")(functio
 				};
 	}
 
-	const requirementChoice = readUnmetRequirementChoices({
+	const requirementChoice = yield* readUnmetRequirementChoicesFx({
 		graph,
 		route: task.route,
 		runtime: branch.execution.runtime,
 	});
 	if (
-		!isPlannerAcquisitionRouteReady(task.route, branch.execution.runtime) &&
+		!(yield* isPlannerAcquisitionRouteReadyFx(task.route, branch.execution.runtime)) &&
 		requirementChoice !== undefined
 	) {
 		if (requirementChoice.type === "mandatory") {

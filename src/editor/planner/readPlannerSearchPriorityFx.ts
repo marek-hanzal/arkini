@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import { readPlannerActionIdFx } from "~/editor/planner/readPlannerActionIdFx";
 import type {
 	PlannerAcquisitionGraph,
 	PlannerAcquisitionRequirement,
@@ -27,29 +28,6 @@ export interface PlannerSearchPriorityPlan {
 
 const compareIds = (left: string, right: string) => left.localeCompare(right);
 
-const readActionId = (action: PlannerAcquisitionRoute["action"]) => {
-	switch (action.kind) {
-		case "line":
-			return JSON.stringify([
-				action.kind,
-				action.ownerItemId,
-				action.lineId,
-			]);
-		case "merge":
-			return JSON.stringify([
-				action.kind,
-				action.sourceItemId,
-				action.targetItemId,
-				action.mergeIndex,
-			]);
-		case "temporary-expiry":
-			return JSON.stringify([
-				action.kind,
-				action.itemId,
-			]);
-	}
-};
-
 const readRequirementClauseId = (routeId: string, clauseIndex: number) =>
 	JSON.stringify([
 		"route-requirement-clause",
@@ -57,16 +35,40 @@ const readRequirementClauseId = (routeId: string, clauseIndex: number) =>
 		clauseIndex,
 	]);
 
-const readRuntimeQuantity = (runtime: RuntimeSchema.Type, itemId: IdSchema.Type) =>
-	runtime.items.reduce((total, item) => total + (item.item.id === itemId ? item.quantity : 0), 0);
+interface PlannerSearchPriorityRuntimeFacts {
+	readonly chargeCapacityByItemId: ReadonlyMap<IdSchema.Type, number>;
+	readonly quantityByItemId: ReadonlyMap<IdSchema.Type, number>;
+}
 
-const readRuntimeChargeCapacity = (runtime: RuntimeSchema.Type, itemId: IdSchema.Type) =>
-	runtime.items.reduce((total, item) => {
-		if (item.item.id !== itemId) return total;
+const indexRuntimeItemFacts = (runtime: RuntimeSchema.Type): PlannerSearchPriorityRuntimeFacts => {
+	const chargeCapacityByItemId = new Map<IdSchema.Type, number>();
+	const quantityByItemId = new Map<IdSchema.Type, number>();
+	for (const item of runtime.items) {
+		const itemId = item.item.id;
+		quantityByItemId.set(itemId, (quantityByItemId.get(itemId) ?? 0) + item.quantity);
 		const fullCapacity = item.item.charges?.amount;
-		if (fullCapacity === undefined) return total;
-		return total + (item.remainingCharges ?? fullCapacity) * item.quantity;
-	}, 0);
+		if (fullCapacity !== undefined)
+			chargeCapacityByItemId.set(
+				itemId,
+				(chargeCapacityByItemId.get(itemId) ?? 0) +
+					(item.remainingCharges ?? fullCapacity) * item.quantity,
+			);
+	}
+	return {
+		chargeCapacityByItemId,
+		quantityByItemId,
+	};
+};
+
+const readIndexedRuntimeQuantity = (
+	runtimeFacts: PlannerSearchPriorityRuntimeFacts,
+	itemId: IdSchema.Type,
+) => runtimeFacts.quantityByItemId.get(itemId) ?? 0;
+
+const readIndexedRuntimeChargeCapacity = (
+	runtimeFacts: PlannerSearchPriorityRuntimeFacts,
+	itemId: IdSchema.Type,
+) => runtimeFacts.chargeCapacityByItemId.get(itemId) ?? 0;
 
 export interface PlannerActiveItemDemand {
 	readonly bootstrapQuantity: number;
@@ -146,12 +148,12 @@ const readClauseRequirement = ({
 	clause,
 	depthByItemId,
 	preferred,
-	runtime,
+	runtimeFacts,
 }: {
 	readonly clause: ReadonlyArray<PlannerAcquisitionRequirement>;
 	readonly depthByItemId: ReadonlyMap<IdSchema.Type, number>;
 	readonly preferred?: PlannerAcquisitionRequirement;
-	readonly runtime: RuntimeSchema.Type;
+	readonly runtimeFacts: PlannerSearchPriorityRuntimeFacts;
 }) => {
 	const reachable = clause
 		.filter((requirement) => depthByItemId.has(requirement.itemId))
@@ -159,7 +161,8 @@ const readClauseRequirement = ({
 	return (
 		reachable.find(
 			(requirement) =>
-				readRuntimeQuantity(runtime, requirement.itemId) >= requirement.minimumQuantity,
+				readIndexedRuntimeQuantity(runtimeFacts, requirement.itemId) >=
+				requirement.minimumQuantity,
 		) ??
 		(preferred === undefined
 			? undefined
@@ -168,11 +171,9 @@ const readClauseRequirement = ({
 	);
 };
 
-const readMaximumSingleActionOutputByItemId = ({
-	routes,
-}: {
-	readonly routes: ReadonlyArray<PlannerAcquisitionRoute>;
-}) => {
+const readMaximumSingleActionOutputByItemIdFx = Effect.fn(
+	"readPlannerSearchPriorityPlanFx.maximumSingleActionOutputByItemId",
+)(function* ({ routes }: { readonly routes: ReadonlyArray<PlannerAcquisitionRoute> }) {
 	const statisticsByActionId = new Map<
 		string,
 		Map<
@@ -184,7 +185,7 @@ const readMaximumSingleActionOutputByItemId = ({
 		>
 	>();
 	for (const route of routes) {
-		const actionId = readActionId(route.action);
+		const actionId = yield* readPlannerActionIdFx(route.action);
 		const statisticsByItemId = statisticsByActionId.get(actionId) ?? new Map();
 		const statistics = statisticsByItemId.get(route.output.itemId) ?? {
 			deterministicQuantity: 0,
@@ -211,7 +212,7 @@ const readMaximumSingleActionOutputByItemId = ({
 				),
 			);
 	return maximumSingleActionOutputByItemId;
-};
+});
 
 /** Creates the deterministic preferred witness used only to order forward-search states. */
 export const readPlannerSearchPriorityPlanFx = Effect.fn("readPlannerSearchPriorityPlanFx")(
@@ -230,7 +231,7 @@ export const readPlannerSearchPriorityPlanFx = Effect.fn("readPlannerSearchPrior
 		return {
 			chargeCapacityByItemId: graph.chargeCapacityByItemId,
 			depthByItemId: scopeReachability.depthByItemId,
-			maximumSingleActionOutputByItemId: readMaximumSingleActionOutputByItemId({
+			maximumSingleActionOutputByItemId: yield* readMaximumSingleActionOutputByItemIdFx({
 				routes: graph.routes.filter((route) => scopeRouteIds.has(route.id)),
 			}),
 			preferredRequirementByClauseId: scope.preferredRequirementByClauseId,
@@ -258,12 +259,12 @@ const readRouteRequirementDemand = ({
 	plan,
 	route,
 	runCount,
-	runtime,
+	runtimeFacts,
 }: {
 	readonly plan: PlannerSearchPriorityPlan;
 	readonly route: PlannerAcquisitionRoute;
 	readonly runCount: number;
-	readonly runtime: RuntimeSchema.Type;
+	readonly runtimeFacts: PlannerSearchPriorityRuntimeFacts;
 }) => {
 	const demandByItemId = new Map<IdSchema.Type, RequirementDemand>();
 	if (runCount <= 0) return demandByItemId;
@@ -276,7 +277,7 @@ const readRouteRequirementDemand = ({
 			preferred: plan.preferredRequirementByClauseId.get(
 				readRequirementClauseId(route.id, clauseIndex),
 			),
-			runtime,
+			runtimeFacts,
 		});
 		if (requirement !== undefined) addRequirementDemand(demandByItemId, requirement, runCount);
 	}
@@ -317,12 +318,12 @@ const readPlannerActiveDemand = ({
 	itemId,
 	plan,
 	quantity,
-	runtime,
+	runtimeFacts,
 }: {
 	readonly itemId: IdSchema.Type;
 	readonly plan: PlannerSearchPriorityPlan;
 	readonly quantity: number;
-	readonly runtime: RuntimeSchema.Type;
+	readonly runtimeFacts: PlannerSearchPriorityRuntimeFacts;
 }): ReadonlyMap<IdSchema.Type, PlannerActiveItemDemand> => {
 	const demandByItemId = new Map<IdSchema.Type, MutablePlannerActiveItemDemand>();
 	const pendingItemIds: IdSchema.Type[] = [];
@@ -406,13 +407,13 @@ const readPlannerActiveDemand = ({
 			plan,
 			route,
 			runCount,
-			runtime,
+			runtimeFacts,
 		});
 		const bootstrapDemand = readRouteRequirementDemand({
 			plan,
 			route,
 			runCount: bootstrapRunCount,
-			runtime,
+			runtimeFacts,
 		});
 		const chargeDemandByItemId = new Map<IdSchema.Type, number>();
 		for (const [requirementItemId, demand] of totalDemand) {
@@ -459,7 +460,8 @@ const readPlannerActiveDemand = ({
 			const route = readAcquisitionRoute(plan, candidateItemId);
 			if (route === undefined || route.output.maximumQuantity <= 0) continue;
 			const availableQuantity =
-				readRuntimeQuantity(runtime, candidateItemId) + demand.projectedQuantity;
+				readIndexedRuntimeQuantity(runtimeFacts, candidateItemId) +
+				demand.projectedQuantity;
 			const missingQuantity = Math.max(0, demand.quantity - availableQuantity);
 			const missingBootstrapQuantity = Math.max(
 				0,
@@ -501,7 +503,7 @@ const readPlannerActiveDemand = ({
 			if (fullCapacity === undefined || fullCapacity <= 0) continue;
 			const route = readAcquisitionRoute(plan, chargedItemId);
 			if (route === undefined || route.output.maximumQuantity <= 0) continue;
-			const currentCapacity = readRuntimeChargeCapacity(runtime, chargedItemId);
+			const currentCapacity = readIndexedRuntimeChargeCapacity(runtimeFacts, chargedItemId);
 			const normalPlannedCapacity =
 				(normalPlannedQuantityByItemId.get(chargedItemId) ?? 0) * fullCapacity;
 			const projectedCapacity = (demand?.projectedQuantity ?? 0) * fullCapacity;
@@ -559,7 +561,13 @@ export const readPlannerActiveDemandFx = Effect.fn("readPlannerActiveDemandFx")(
 		readonly plan: PlannerSearchPriorityPlan;
 		readonly quantity: number;
 		readonly runtime: RuntimeSchema.Type;
-	}) => Effect.sync(() => readPlannerActiveDemand(args)),
+	}) =>
+		Effect.sync(() =>
+			readPlannerActiveDemand({
+				...args,
+				runtimeFacts: indexRuntimeItemFacts(args.runtime),
+			}),
+		),
 );
 
 /**
@@ -574,6 +582,7 @@ const readPlannerSearchPriority = ({
 	plan,
 	quantity,
 	runtime,
+	runtimeFacts,
 	scope,
 }: {
 	readonly activeDemand?: ReadonlyMap<IdSchema.Type, PlannerActiveItemDemand>;
@@ -581,6 +590,7 @@ const readPlannerSearchPriority = ({
 	readonly plan: PlannerSearchPriorityPlan;
 	readonly quantity: number;
 	readonly runtime: RuntimeSchema.Type;
+	readonly runtimeFacts: PlannerSearchPriorityRuntimeFacts;
 	readonly scope: PlannerSearchScope;
 }): PlannerSearchPriority => {
 	const preferredHeadroomByDepth: number[] = [];
@@ -591,12 +601,12 @@ const readPlannerSearchPriority = ({
 			itemId,
 			plan,
 			quantity,
-			runtime,
+			runtimeFacts,
 		});
 	for (const [candidateItemId, demand] of demandByItemId) {
 		if (demand.quantity <= 0) continue;
 		const availableQuantity = Math.min(
-			readRuntimeQuantity(runtime, candidateItemId) + demand.projectedQuantity,
+			readIndexedRuntimeQuantity(runtimeFacts, candidateItemId) + demand.projectedQuantity,
 			demand.quantity,
 		);
 		const witnessRoute = plan.witnessRouteByItemId.get(candidateItemId);
@@ -626,7 +636,10 @@ const readPlannerSearchPriority = ({
 			const headroom =
 				Math.min(
 					headroomCapacity,
-					Math.max(0, readRuntimeQuantity(runtime, candidateItemId) - demand.quantity),
+					Math.max(
+						0,
+						readIndexedRuntimeQuantity(runtimeFacts, candidateItemId) - demand.quantity,
+					),
 				) / headroomCapacity;
 			preferredHeadroomByDepth[depth] = (preferredHeadroomByDepth[depth] ?? 0) + headroom;
 		}
@@ -634,7 +647,7 @@ const readPlannerSearchPriority = ({
 
 	let scopeProgress = 0;
 	for (const candidateItemId of scope.itemIds) {
-		if (readRuntimeQuantity(runtime, candidateItemId) <= 0) continue;
+		if (readIndexedRuntimeQuantity(runtimeFacts, candidateItemId) <= 0) continue;
 		scopeProgress += plan.depthByItemId.get(candidateItemId) ?? 0;
 	}
 	return {
@@ -652,40 +665,11 @@ export const readPlannerSearchPriorityFx = Effect.fn("readPlannerSearchPriorityF
 		readonly quantity: number;
 		readonly runtime: RuntimeSchema.Type;
 		readonly scope: PlannerSearchScope;
-	}) => Effect.sync(() => readPlannerSearchPriority(args)),
-);
-
-/**
- * Sorts exact preferred progress first, then one-action surplus and broad target-scope progress.
- *
- * The surplus tier is deliberately capped at the largest authored result of one action. It helps
- * a width-one optimistic beam retain a useful stochastic companion without rewarding unbounded
- * stockpiling once the currently visible demand is already satisfied.
- */
-const comparePlannerSearchPriority = (
-	left: PlannerSearchPriority,
-	right: PlannerSearchPriority,
-) => {
-	const maximumDepth = Math.max(
-		left.preferredProgressByDepth.length,
-		right.preferredProgressByDepth.length,
-	);
-	for (let depth = maximumDepth - 1; depth >= 0; depth -= 1) {
-		const difference =
-			(right.preferredProgressByDepth[depth] ?? 0) -
-			(left.preferredProgressByDepth[depth] ?? 0);
-		if (difference !== 0) return difference;
-	}
-	for (let depth = maximumDepth - 1; depth >= 0; depth -= 1) {
-		const difference =
-			(right.preferredHeadroomByDepth[depth] ?? 0) -
-			(left.preferredHeadroomByDepth[depth] ?? 0);
-		if (difference !== 0) return difference;
-	}
-	return right.scopeProgress - left.scopeProgress;
-};
-
-export const comparePlannerSearchPriorityFx = Effect.fn("comparePlannerSearchPriorityFx")(
-	(left: PlannerSearchPriority, right: PlannerSearchPriority) =>
-		Effect.sync(() => comparePlannerSearchPriority(left, right)),
+	}) =>
+		Effect.sync(() =>
+			readPlannerSearchPriority({
+				...args,
+				runtimeFacts: indexRuntimeItemFacts(args.runtime),
+			}),
+		),
 );

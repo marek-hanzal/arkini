@@ -2,9 +2,10 @@ import { Effect } from "effect";
 
 import type {
 	PlannerAcquisitionGraph,
-	PlannerAcquisitionRequirement,
 	PlannerAcquisitionRoute,
 } from "~/editor/planner/PlannerAcquisitionGraph";
+import { isPlannerAcquisitionRouteReadyFx } from "~/editor/planner/isPlannerAcquisitionRouteReadyFx";
+import { readPlannerRuntimeQuantityFx } from "~/editor/planner/readPlannerRuntimeQuantityFx";
 import type {
 	PlannerActiveItemDemand,
 	PlannerSearchPriorityPlan,
@@ -17,63 +18,6 @@ export interface PlannerSearchCandidateGroup {
 	readonly actions: ReadonlyArray<PlannerSearchAction>;
 	readonly outputItemId: IdSchema.Type;
 }
-
-interface RequirementDemand {
-	charges: number;
-	consumed: number;
-	retained: number;
-}
-
-const readRuntimeQuantity = (runtime: RuntimeSchema.Type, itemId: IdSchema.Type) =>
-	runtime.items.reduce((total, item) => total + (item.item.id === itemId ? item.quantity : 0), 0);
-
-const readRuntimeChargeCapacity = (runtime: RuntimeSchema.Type, itemId: IdSchema.Type) =>
-	runtime.items.reduce((total, item) => {
-		if (item.item.id !== itemId) return total;
-		const fullCapacity = item.item.charges?.amount;
-		if (fullCapacity === undefined) return total;
-		return total + (item.remainingCharges ?? fullCapacity) * item.quantity;
-	}, 0);
-
-const addRequirement = (
-	demandByItemId: Map<IdSchema.Type, RequirementDemand>,
-	requirement: PlannerAcquisitionRequirement,
-) => {
-	const demand = demandByItemId.get(requirement.itemId) ?? {
-		charges: 0,
-		consumed: 0,
-		retained: 0,
-	};
-	if (requirement.usage === "consume") demand.consumed += requirement.minimumQuantity;
-	else demand.retained = Math.max(demand.retained, requirement.minimumQuantity);
-	if (requirement.usage === "charge") demand.charges += requirement.chargeCost ?? 0;
-	demandByItemId.set(requirement.itemId, demand);
-};
-
-const isRequirementReady = (
-	requirement: PlannerAcquisitionRequirement,
-	runtime: RuntimeSchema.Type,
-) =>
-	readRuntimeQuantity(runtime, requirement.itemId) >= requirement.minimumQuantity &&
-	(requirement.usage !== "charge" ||
-		readRuntimeChargeCapacity(runtime, requirement.itemId) >= (requirement.chargeCost ?? 0));
-
-const isPlannerAcquisitionRouteReady = (
-	route: PlannerAcquisitionRoute,
-	runtime: RuntimeSchema.Type,
-) => {
-	const demandByItemId = new Map<IdSchema.Type, RequirementDemand>();
-	for (const requirement of route.requirements.allOf) addRequirement(demandByItemId, requirement);
-	for (const [itemId, demand] of demandByItemId)
-		if (
-			readRuntimeQuantity(runtime, itemId) < demand.consumed + demand.retained ||
-			readRuntimeChargeCapacity(runtime, itemId) < demand.charges
-		)
-			return false;
-	return route.requirements.anyOf.every((clause) =>
-		clause.some((requirement) => isRequirementReady(requirement, runtime)),
-	);
-};
 
 const readActionRoutesForOutput = (
 	action: PlannerSearchAction,
@@ -111,7 +55,7 @@ export const readPlannerSearchCandidateGroupsFx = Effect.fn("readPlannerSearchCa
 		readonly runtime: RuntimeSchema.Type;
 		readonly scope: PlannerSearchScope;
 	}) =>
-		Effect.sync((): ReadonlyArray<PlannerSearchCandidateGroup> => {
+		Effect.gen(function* () {
 			const demandOrder = new Map(
 				[
 					...activeDemand.keys(),
@@ -138,7 +82,7 @@ export const readPlannerSearchCandidateGroupsFx = Effect.fn("readPlannerSearchCa
 				for (const outputItemId of action.outputItemIds) {
 					const demand = activeDemand.get(outputItemId);
 					const availableQuantity =
-						readRuntimeQuantity(runtime, outputItemId) +
+						(yield* readPlannerRuntimeQuantityFx(runtime, outputItemId)) +
 						(demand?.projectedQuantity ?? 0);
 					if (demand === undefined || availableQuantity >= demand.quantity) continue;
 					const routes = readActionRoutesForOutput(action, outputItemId, routeById);
@@ -148,25 +92,35 @@ export const readPlannerSearchCandidateGroupsFx = Effect.fn("readPlannerSearchCa
 						readyActions: [],
 					};
 					group.actions.push(action);
-					if (routes.some((route) => isPlannerAcquisitionRouteReady(route, runtime)))
-						group.readyActions.push(action);
+					let ready = false;
+					for (const route of routes)
+						if (yield* isPlannerAcquisitionRouteReadyFx(route, runtime)) {
+							ready = true;
+							break;
+						}
+					if (ready) group.readyActions.push(action);
 					candidatesByOutputItemId.set(outputItemId, group);
 				}
 			}
 
-			const groups = [
-				...candidatesByOutputItemId,
-			].map(([outputItemId, group]) => {
+			const groups: Array<{
+				readonly actions: ReadonlyArray<PlannerSearchAction>;
+				readonly bootstrap: boolean;
+				readonly outputItemId: IdSchema.Type;
+				readonly ready: boolean;
+			}> = [];
+			for (const [outputItemId, group] of candidatesByOutputItemId) {
 				const demand = activeDemand.get(outputItemId);
 				const availableQuantity =
-					readRuntimeQuantity(runtime, outputItemId) + (demand?.projectedQuantity ?? 0);
-				return {
+					(yield* readPlannerRuntimeQuantityFx(runtime, outputItemId)) +
+					(demand?.projectedQuantity ?? 0);
+				groups.push({
 					actions: group.readyActions.length > 0 ? group.readyActions : group.actions,
 					bootstrap: availableQuantity < (demand?.bootstrapQuantity ?? 0),
 					outputItemId,
 					ready: group.readyActions.length > 0,
-				};
-			});
+				});
+			}
 			const hasReadyGroup = groups.some(({ ready }) => ready);
 			return groups
 				.filter(({ ready }) => !hasReadyGroup || ready)

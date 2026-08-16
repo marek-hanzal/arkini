@@ -15,6 +15,8 @@ import {
 } from "~/editor/planner/PlannerProducerExpansion";
 import type { PlannerItemGoal } from "~/editor/planner/PlannerGoalViability";
 import type { PlannerRequirementDemand } from "~/editor/planner/PlannerRequirementDemand";
+import { addPlannerRequirementDemandFx } from "~/editor/planner/addPlannerRequirementDemandFx";
+import { readPlannerRequirementSourcePriorityFx } from "~/editor/planner/readPlannerRequirementSourcePriorityFx";
 import type { PlannerSearchExecutionState } from "~/editor/planner/PlannerSearchExecution";
 import type { PlannerSearchAction } from "~/editor/planner/PlannerSearchScope";
 import { isPlannerRuntimeQuiescentFx } from "~/editor/planner/isPlannerRuntimeQuiescentFx";
@@ -54,42 +56,6 @@ interface PlannerProducerExpansionCandidate {
 
 const compareIds = (left: string, right: string) => left.localeCompare(right);
 
-const readRequirementSourcePriority = (source: PlannerAcquisitionRequirement["source"]) => {
-	switch (source) {
-		case "owner":
-		case "merge-source":
-		case "merge-target":
-			return 0;
-		case "charged-item":
-		case "temporary-item":
-			return 1;
-		case "deposit-input":
-		case "material-input":
-			return 2;
-		case "line-condition":
-		case "output-condition":
-			return 3;
-	}
-};
-
-const addRequirementDemand = (
-	demandByItemId: Map<IdSchema.Type, PlannerRequirementDemand>,
-	requirement: PlannerAcquisitionRequirement,
-) => {
-	const sourcePriority = readRequirementSourcePriority(requirement.source);
-	const demand = demandByItemId.get(requirement.itemId) ?? {
-		charges: 0,
-		consumed: 0,
-		retained: 0,
-		sourcePriority,
-	};
-	if (requirement.usage === "consume") demand.consumed += requirement.minimumQuantity;
-	else demand.retained = Math.max(demand.retained, requirement.minimumQuantity);
-	if (requirement.usage === "charge") demand.charges += requirement.chargeCost ?? 0;
-	demand.sourcePriority = Math.min(demand.sourcePriority, sourcePriority);
-	demandByItemId.set(requirement.itemId, demand);
-};
-
 const readInitialExecution = (runtime: RuntimeSchema.Type): PlannerSearchExecutionState => ({
 	elapsedMs: 0,
 	outputCertainty: "deterministic",
@@ -123,55 +89,66 @@ const isGoalSatisfied = (goal: PlannerItemGoal, runtime: RuntimeSchema.Type) => 
 	);
 };
 
-const readRouteRequirementGoals = ({
-	graph,
-	route,
-	runtime,
-}: {
-	readonly graph: PlannerAcquisitionGraph;
-	readonly route: PlannerAcquisitionRoute;
-	readonly runtime: RuntimeSchema.Type;
-}) => {
-	const demandByItemId = new Map<IdSchema.Type, PlannerRequirementDemand>();
-	for (const requirement of route.requirements.allOf)
-		addRequirementDemand(demandByItemId, requirement);
-	for (const clause of route.requirements.anyOf) {
-		if (
-			clause.some((requirement) => isGoalSatisfied(readRequirementGoal(requirement), runtime))
-		)
-			continue;
-		const selected = [
-			...clause,
-		].sort(
-			(left, right) =>
-				readRequirementSourcePriority(left.source) -
-					readRequirementSourcePriority(right.source) ||
-				(graph.depthByItemId.get(left.itemId) ?? Number.POSITIVE_INFINITY) -
-					(graph.depthByItemId.get(right.itemId) ?? Number.POSITIVE_INFINITY) ||
-				compareIds(left.itemId, right.itemId),
-		)[0];
-		if (selected !== undefined) addRequirementDemand(demandByItemId, selected);
-	}
-	return [
-		...demandByItemId,
-	]
-		.map(([itemId, demand]) => ({
-			goal: {
-				itemId,
-				minimumCharges: demand.charges,
-				quantity: demand.consumed + demand.retained,
-			} satisfies PlannerItemGoal,
-			sourcePriority: demand.sourcePriority,
-		}))
-		.filter(({ goal }) => !isGoalSatisfied(goal, runtime))
-		.sort(
-			(left, right) =>
-				left.sourcePriority - right.sourcePriority ||
-				(graph.depthByItemId.get(right.goal.itemId) ?? 0) -
-					(graph.depthByItemId.get(left.goal.itemId) ?? 0) ||
-				compareIds(left.goal.itemId, right.goal.itemId),
-		);
-};
+const readRouteRequirementGoalsFx = Effect.fn("expandPlannerProducerWorldFx.routeRequirementGoals")(
+	function* ({
+		graph,
+		route,
+		runtime,
+	}: {
+		readonly graph: PlannerAcquisitionGraph;
+		readonly route: PlannerAcquisitionRoute;
+		readonly runtime: RuntimeSchema.Type;
+	}) {
+		const demandByItemId = new Map<IdSchema.Type, PlannerRequirementDemand>();
+		for (const requirement of route.requirements.allOf)
+			yield* addPlannerRequirementDemandFx(demandByItemId, requirement);
+		for (const clause of route.requirements.anyOf) {
+			if (
+				clause.some((requirement) =>
+					isGoalSatisfied(readRequirementGoal(requirement), runtime),
+				)
+			)
+				continue;
+			const prioritized = yield* Effect.forEach(clause, (requirement) =>
+				readPlannerRequirementSourcePriorityFx(requirement.source).pipe(
+					Effect.map((sourcePriority) => ({
+						requirement,
+						sourcePriority,
+					})),
+				),
+			);
+			const selected = prioritized.sort(
+				(left, right) =>
+					left.sourcePriority - right.sourcePriority ||
+					(graph.depthByItemId.get(left.requirement.itemId) ?? Number.POSITIVE_INFINITY) -
+						(graph.depthByItemId.get(right.requirement.itemId) ??
+							Number.POSITIVE_INFINITY) ||
+					compareIds(left.requirement.itemId, right.requirement.itemId),
+			)[0]?.requirement;
+			if (selected !== undefined)
+				yield* addPlannerRequirementDemandFx(demandByItemId, selected);
+		}
+		return [
+			...demandByItemId,
+		]
+			.map(([itemId, demand]) => ({
+				goal: {
+					itemId,
+					minimumCharges: demand.charges,
+					quantity: demand.consumed + demand.retained,
+				} satisfies PlannerItemGoal,
+				sourcePriority: demand.sourcePriority,
+			}))
+			.filter(({ goal }) => !isGoalSatisfied(goal, runtime))
+			.sort(
+				(left, right) =>
+					left.sourcePriority - right.sourcePriority ||
+					(graph.depthByItemId.get(right.goal.itemId) ?? 0) -
+						(graph.depthByItemId.get(left.goal.itemId) ?? 0) ||
+					compareIds(left.goal.itemId, right.goal.itemId),
+			);
+	},
+);
 
 const readCandidateAvailable = (candidate: PlannerSearchAction, runtime: RuntimeSchema.Type) => {
 	switch (candidate.action.kind) {
@@ -626,14 +603,14 @@ export const expandPlannerProducerWorldFx = Effect.fn("expandPlannerProducerWorl
 			relevantOutputItemIds: selected.relevantOutputItemIds,
 			routeById,
 		});
-		const requirementGoals = relevantRoutes
-			.flatMap((route) =>
-				readRouteRequirementGoals({
-					graph,
-					route,
-					runtime: execution.runtime,
-				}),
-			)
+		const requirementGoals = (yield* Effect.forEach(relevantRoutes, (route) =>
+			readRouteRequirementGoalsFx({
+				graph,
+				route,
+				runtime: execution.runtime,
+			}),
+		))
+			.flat()
 			.filter(
 				({ goal: requirementGoal }, index, goals) =>
 					goals.findIndex(
@@ -672,14 +649,15 @@ export const expandPlannerProducerWorldFx = Effect.fn("expandPlannerProducerWorl
 			state: execution,
 		});
 		if (transition.type === "blocked") {
+			const blockedRequirementGoals = (yield* Effect.forEach(relevantRoutes, (route) =>
+				readRouteRequirementGoalsFx({
+					graph,
+					route,
+					runtime: execution.runtime,
+				}),
+			)).flat();
 			for (const { goal: requirementGoal } of [
-				...relevantRoutes.flatMap((route) =>
-					readRouteRequirementGoals({
-						graph,
-						route,
-						runtime: execution.runtime,
-					}),
-				),
+				...blockedRequirementGoals,
 			].reverse())
 				addDemand(requirementGoal);
 			blockedFingerprintByCandidateId.set(selected.action.id, runtimeFingerprint);

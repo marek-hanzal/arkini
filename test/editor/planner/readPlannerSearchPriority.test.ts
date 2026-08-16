@@ -2,7 +2,6 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import {
-	comparePlannerSearchPriorityFx,
 	readPlannerSearchPriorityFx,
 	type PlannerSearchPriorityPlan,
 } from "~/editor/planner/readPlannerSearchPriorityFx";
@@ -101,9 +100,9 @@ describe("readPlannerSearchPriorityFx", () => {
 		expect(exact.preferredHeadroomByDepth[4] ?? 0).toBe(0);
 		expect(oneActionMaximum.preferredHeadroomByDepth[4]).toBe(1);
 		expect(stockpile.preferredHeadroomByDepth[4]).toBe(1);
-		expect(
-			Effect.runSync(comparePlannerSearchPriorityFx(oneActionMaximum, exact)),
-		).toBeLessThan(0);
-		expect(Effect.runSync(comparePlannerSearchPriorityFx(stockpile, oneActionMaximum))).toBe(0);
+		expect(oneActionMaximum.preferredHeadroomByDepth[4]).toBeGreaterThan(
+			exact.preferredHeadroomByDepth[4] ?? 0,
+		);
+		expect(stockpile).toEqual(oneActionMaximum);
 	});
 });

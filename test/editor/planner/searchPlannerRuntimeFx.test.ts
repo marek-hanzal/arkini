@@ -3,10 +3,8 @@ import { describe, expect, it } from "vitest";
 
 import { createPlannerSearchHarnessFx } from "./support/createPlannerSearchHarnessFx";
 import { readPlannerSearchScopeFx } from "~/editor/planner/readPlannerSearchScopeFx";
-import {
-	readPlannerActiveDemandFx,
-	readPlannerSearchPriorityPlanFx,
-} from "~/editor/planner/readPlannerSearchPriorityFx";
+import { readPlannerActiveDemandFx } from "~/editor/planner/readPlannerActiveDemandFx";
+import { readPlannerSearchPriorityPlanFx } from "~/editor/planner/readPlannerSearchPriorityPlanFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";

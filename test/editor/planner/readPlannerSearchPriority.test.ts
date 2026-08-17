@@ -1,10 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import {
-	readPlannerSearchPriorityFx,
-	type PlannerSearchPriorityPlan,
-} from "~/editor/planner/readPlannerSearchPriorityFx";
+import type { PlannerSearchPriorityPlan } from "~/editor/planner/PlannerSearchPriorityPlan";
+import { readPlannerSearchPriorityFx } from "~/editor/planner/readPlannerSearchPriorityFx";
 import type { PlannerSearchScope } from "~/editor/planner/PlannerSearchScope";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";

@@ -5,7 +5,7 @@ import type {
 	PlannerAcquisitionGraph,
 	PlannerAcquisitionRoute,
 } from "~/editor/planner/PlannerAcquisitionGraph";
-import type { PlannerSearchPriorityPlan } from "~/editor/planner/readPlannerSearchPriorityFx";
+import type { PlannerSearchPriorityPlan } from "~/editor/planner/PlannerSearchPriorityPlan";
 import { readPlannerSearchCandidateGroupsFx } from "~/editor/planner/readPlannerSearchCandidateGroupsFx";
 import type { PlannerSearchAction, PlannerSearchScope } from "~/editor/planner/PlannerSearchScope";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";

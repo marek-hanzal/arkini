@@ -6,10 +6,8 @@ import type {
 } from "~/editor/planner/PlannerAcquisitionGraph";
 import { isPlannerAcquisitionRouteReadyFx } from "~/editor/planner/isPlannerAcquisitionRouteReadyFx";
 import { readPlannerRuntimeQuantityFx } from "~/editor/planner/readPlannerRuntimeQuantityFx";
-import type {
-	PlannerActiveItemDemand,
-	PlannerSearchPriorityPlan,
-} from "~/editor/planner/readPlannerSearchPriorityFx";
+import type { PlannerActiveItemDemand } from "~/editor/planner/PlannerActiveItemDemand";
+import type { PlannerSearchPriorityPlan } from "~/editor/planner/PlannerSearchPriorityPlan";
 import type { PlannerSearchAction, PlannerSearchScope } from "~/editor/planner/PlannerSearchScope";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";

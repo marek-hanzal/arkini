@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { createEditorEstimateDependencyGraphFx } from "~/editor/estimator/createEditorEstimateDependencyGraphFx";
+import { createEditorAcquisitionGraphFx } from "~/editor/createEditorAcquisitionGraphFx";
 import { estimateEditorItemFx } from "~/editor/estimator/estimateEditorItemFx";
 import { EditorItemEstimateWorkerRuntime } from "~/ui/item/editor/EditorItemEstimateWorkerRuntime";
 import type {
@@ -11,7 +11,7 @@ import type {
 self.addEventListener("message", ({ data }: MessageEvent<EditorItemEstimateWorkerRequest>) => {
 	void EditorItemEstimateWorkerRuntime.runPromise(
 		Effect.gen(function* () {
-			const graph = yield* createEditorEstimateDependencyGraphFx(data.config);
+			const graph = yield* createEditorAcquisitionGraphFx(data.config);
 			return yield* Effect.forEach(Object.keys(data.config.items).sort(), (itemId) =>
 				estimateEditorItemFx({
 					factId: itemId,

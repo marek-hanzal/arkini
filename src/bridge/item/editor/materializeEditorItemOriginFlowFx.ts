@@ -7,6 +7,7 @@ import {
 	type EditorItemOriginFlow,
 	type EditorItemOriginItemNode,
 	type EditorItemOriginOperation,
+	type EditorItemOriginOperationRequirementContext,
 } from "~/bridge/item/editor/EditorItemOriginFlow";
 import type { EditorItemOriginSourceIndex } from "~/bridge/item/editor/indexEditorItemOriginSourcesFx";
 import type {
@@ -22,6 +23,37 @@ const unique = <Value>(values: ReadonlyArray<Value>): Value[] => [
 const readOperationPortLabel = (itemId: string, items: EditorItemOriginSourceIndex["items"]) =>
 	items.get(itemId)?.title || itemId;
 
+const readRequirementContexts = (
+	source: EditorItemOriginSource,
+	itemId: string,
+): ReadonlyArray<EditorItemOriginOperationRequirementContext> =>
+	source.outputs.flatMap((output) => [
+		...output.requirements.allOf
+			.filter((requirement) => requirement.itemId === itemId)
+			.map((requirement) => ({
+				clause: "all-of" as const,
+				outputRouteId: output.routeId,
+				requirement,
+			})),
+		...output.requirements.anyOf.flatMap((clause, clauseIndex) =>
+			clause
+				.filter((requirement) => requirement.itemId === itemId)
+				.map((requirement) => ({
+					clause: "any-of" as const,
+					clauseIndex,
+					outputRouteId: output.routeId,
+					requirement,
+				})),
+		),
+		...(output.requirements.unsupported ?? [])
+			.filter((requirement) => requirement.itemId === itemId)
+			.map((requirement) => ({
+				clause: "unsupported" as const,
+				outputRouteId: output.routeId,
+				requirement,
+			})),
+	]);
+
 const readOperation = (
 	source: EditorItemOriginSource,
 	items: EditorItemOriginSourceIndex["items"],
@@ -34,6 +66,7 @@ const readOperation = (
 			id: `${source.id}:input:${itemId}`,
 			itemId,
 			label: readOperationPortLabel(itemId, items),
+			requirementContexts: readRequirementContexts(source, itemId),
 		})),
 	kind: source.kind,
 	label: source.label,
@@ -92,6 +125,7 @@ const readEdgesFx = Effect.fn("materializeEditorItemOriginFlowFx.readEdgesFx")(f
 					id: targetPortId,
 					operationId: source.id,
 					role: "input",
+					requirementContexts: readRequirementContexts(source, relation.fromItemId),
 					source: `item:${relation.fromItemId}`,
 					sourcePortId: EditorItemOriginItemOutputPortId,
 					target: `item:${relation.toItemId}`,

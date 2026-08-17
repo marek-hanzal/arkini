@@ -4,11 +4,11 @@ import type {
 	EditorItemEstimate,
 	EditorItemEstimateAmount,
 	EditorItemEstimateDiagnostic,
-	EditorItemEstimateRouteStep,
 } from "~/editor/estimator/EditorItemEstimate";
-import type { EditorEstimateLimitation } from "~/editor/estimator/EditorEstimateDependencyGraph";
+import type { EditorAcquisitionLimitation } from "~/editor/EditorAcquisitionGraph";
 import { formatItemDurationFx } from "~/ui/item-detail/formatItemDurationFx";
 import { EditorItemDetailReference } from "~/ui/item/editor/EditorItemDetailReference";
+import { EditorItemEstimateRouteGraph } from "~/ui/item/editor/EditorItemEstimateRouteGraph";
 import { useEditorItemEstimate } from "~/ui/item/editor/useEditorItemEstimate";
 import { Status } from "~/ui/status/Status";
 
@@ -20,6 +20,18 @@ const formatRuntime = (runtimeMs: number) =>
 
 const diagnosticText = (diagnostic: EditorItemEstimateDiagnostic) => {
 	switch (diagnostic.kind) {
+		case "availability-condition-unsupported":
+			return `Availability condition for ${diagnostic.factId} is unsupported on route ${diagnostic.routeId} (${diagnostic.source}, ${diagnostic.reason}).`;
+		case "quantity-limit-exceeded":
+			return `${diagnostic.factId} × ${formatQuantity(diagnostic.quantity)} exceeds the static estimate limit of ${diagnostic.maximumQuantity} (${diagnostic.source}).`;
+		case "charge-accounting-unsupported":
+			return `Static charge accounting is unsupported on route ${diagnostic.routeId} (${diagnostic.reason}).`;
+		case "charge-renewal-unsupported":
+			return `Static analysis stops at charged-item renewal on route ${diagnostic.routeId}: ${diagnostic.factIds.join(" → ")}.`;
+		case "finite-root-interaction-unsupported":
+			return `Shared finite root ${diagnostic.factId} needs ${formatQuantity(diagnostic.quantity)}; global sibling-route replanning is intentionally unsupported.`;
+		case "joint-output-accounting-unsupported":
+			return `Correlated output demand on ${diagnostic.routeId} exceeds the bounded static state space.`;
 		case "cycle":
 			return `Cycle on route ${diagnostic.routeId}: ${diagnostic.factIds.join(" → ")}.`;
 		case "unreachable":
@@ -29,46 +41,16 @@ const diagnosticText = (diagnostic: EditorItemEstimateDiagnostic) => {
 	}
 };
 
-const limitationText = (limitation: EditorEstimateLimitation) => {
+const limitationText = (limitation: EditorAcquisitionLimitation) => {
 	switch (limitation) {
-		case "charge-renewal-approximated":
-			return "Charged payers are reusable capabilities; renewal timing beyond authored depletion routes is approximated.";
 		case "conditional-runtime-adjustments-ignored":
 			return "Conditional runtime adjustment and multiplier rules are not included.";
+		case "negative-availability-constraints-ignored":
+			return "Requirements that depend on another item remaining absent are not composed into the monotone estimate.";
 		case "spatial-requirements-approximated":
 			return "Board scope, distance, and concrete placement are approximated from authored item availability.";
 	}
 };
-
-const EditorItemEstimateRouteTree = ({
-	route,
-}: {
-	readonly route: EditorItemEstimateRouteStep;
-}) => (
-	<li className="grid gap-1">
-		<span>
-			<strong className="font-medium text-foreground">{route.factId}</strong> ×{" "}
-			{formatQuantity(route.quantity)} via {route.routeId} ({formatRuntime(route.durationMs)})
-		</span>
-		{route.requirements.length > 0 ? (
-			<ul className="ml-4 grid gap-1 border-l border-line/70 pl-3">
-				{route.requirements.map((requirement, index) => (
-					<li key={`${requirement.factId}:${requirement.usage}:${index}`}>
-						<span>
-							{requirement.usage}: {requirement.factId} ×{" "}
-							{formatQuantity(requirement.quantity)}
-						</span>
-						{requirement.acquisition === undefined ? null : (
-							<ul className="mt-1">
-								<EditorItemEstimateRouteTree route={requirement.acquisition} />
-							</ul>
-						)}
-					</li>
-				))}
-			</ul>
-		) : null}
-	</li>
-);
 
 const EditorItemEstimateAmountList = ({
 	amounts,
@@ -136,25 +118,31 @@ const EditorItemEstimateResultCard = ({
 		<header className="flex items-start justify-between gap-4 border-b border-line/70 pb-3">
 			<div>
 				<h3 className="font-semibold text-foreground">
-					{estimate.obtainable ? "Complete path found" : "No complete path"}
+					{estimate.status === "complete"
+						? "Complete path found"
+						: estimate.status === "partial"
+							? "Incomplete static path"
+							: "No complete path"}
 				</h3>
 				<p className="mt-1 text-xs text-muted">
 					Target × {formatQuantity(estimate.quantity)}
 				</p>
 			</div>
 			<p className="font-semibold tabular-nums text-foreground">
-				{estimate.obtainable ? formatRuntime(estimate.durationMs) : "Unreachable"}
+				{estimate.obtainable
+					? formatRuntime(estimate.durationMs)
+					: estimate.status === "partial"
+						? "Indeterminate"
+						: "Unreachable"}
 			</p>
 		</header>
 		{estimate.obtainable ? (
 			<div className="min-h-0 flex-1 overflow-y-auto pr-1">
 				<section className="py-3 text-xs leading-relaxed text-muted">
 					<h4 className="mb-2 font-semibold uppercase tracking-wide text-muted">
-						Selected route
+						Selected route graph
 					</h4>
-					<ul>
-						<EditorItemEstimateRouteTree route={estimate.route} />
-					</ul>
+					<EditorItemEstimateRouteGraph routeSteps={estimate.routeSteps} />
 				</section>
 				<EditorItemEstimateAmountList
 					amounts={estimate.consumables}
@@ -181,8 +169,9 @@ const EditorItemEstimateResultCard = ({
 		) : (
 			<div className="grid gap-3 py-4 text-sm leading-relaxed text-muted">
 				<p className="font-medium text-foreground">
-					The authored dependency graph contains no complete route from the configured
-					starting facts.
+					{estimate.status === "partial"
+						? "The authored path reaches mechanics that static analysis intentionally does not model completely, so totals are indeterminate."
+						: "The authored dependency graph contains no complete route from the configured starting facts."}
 				</p>
 				<ul className="grid gap-2">
 					{estimate.diagnostics.map((diagnostic, index) => (
@@ -207,9 +196,9 @@ const EditorItemEstimateMethodCard = ({ estimate }: { readonly estimate: EditorI
 			</div>
 		</header>
 		<p className="py-3 text-xs leading-relaxed text-muted">
-			Compares complete acquisition routes and selects the fastest deterministic result.
-			Random output occurrences independently use expected yield; all work is scheduled
-			sequentially.
+			Compares complete canonical acquisition routes without combinatorial sibling
+			optimization. Random output occurrences independently use expected yield; all work is
+			scheduled sequentially.
 		</p>
 		<ul className="grid gap-2 border-t border-line/70 pt-3 text-xs leading-relaxed text-muted">
 			{estimate.obtainable ? (
@@ -221,7 +210,11 @@ const EditorItemEstimateMethodCard = ({ estimate }: { readonly estimate: EditorI
 					</li>
 				</>
 			) : (
-				<li>No route satisfied every required dependency.</li>
+				<li>
+					{estimate.status === "partial"
+						? "No duration or material totals are claimed for this incomplete path."
+						: "No route satisfied every required dependency."}
+				</li>
 			)}
 			<li>Rejected alternatives: {formatQuantity(estimate.rejectedRoutes.length)}.</li>
 			<li>Starting authored items contribute no acquisition time.</li>

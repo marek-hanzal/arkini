@@ -10,18 +10,8 @@ import {
 	makeEditorItemEstimateCacheAtom,
 } from "~/ui/item/editor/EditorItemEstimateCacheAtom";
 
-const estimate = (factId: string): EditorItemEstimate => ({
-	consumables: [],
-	diagnostics: [],
-	durationMs: 1,
-	factId,
-	limitations: [],
-	obtainable: true,
-	oneTimeRequirements: [],
-	ongoingRequirements: [],
-	quantity: 1,
-	rejectedRoutes: [],
-	route: {
+const estimate = (factId: string): EditorItemEstimate => {
+	const route = {
 		actionRuns: 1,
 		durationMs: 1,
 		factId,
@@ -30,9 +20,26 @@ const estimate = (factId: string): EditorItemEstimate => ({
 		requirements: [],
 		rootQuantity: 0,
 		routeId: `route:${factId}`,
-		source: "route",
-	},
-});
+		source: "route" as const,
+	};
+	return {
+		consumables: [],
+		diagnostics: [],
+		durationMs: 1,
+		factId,
+		limitations: [],
+		obtainable: true,
+		status: "complete",
+		oneTimeRequirements: [],
+		ongoingRequirements: [],
+		quantity: 1,
+		rejectedRoutes: [],
+		route,
+		routeSteps: [
+			route,
+		],
+	};
+};
 
 const config = {
 	items: {

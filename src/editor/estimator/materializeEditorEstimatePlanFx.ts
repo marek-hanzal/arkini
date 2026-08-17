@@ -1,170 +1,131 @@
 import { Effect } from "effect";
 
-import type { EditorEstimateRoute } from "~/editor/estimator/EditorEstimateDependencyGraph";
-import type { EditorEstimateDemandClosureState } from "~/editor/estimator/createEditorEstimateDemandClosureStateFx";
-import { createEditorEstimateDemandClosureStateFx } from "~/editor/estimator/createEditorEstimateDemandClosureStateFx";
-import type { EditorEstimateFallbackChoices } from "~/editor/estimator/createEditorEstimateFallbackChoicesFx";
-import { createEditorEstimateFallbackChoicesFx } from "~/editor/estimator/createEditorEstimateFallbackChoicesFx";
+import type { EditorAcquisitionRoute } from "~/editor/EditorAcquisitionGraph";
 import type { EditorEstimatePolicy } from "~/editor/estimator/createEditorEstimatePolicyFx";
 import type {
 	EditorItemEstimateDiagnostic,
 	EditorItemEstimateRejectedRoute,
-	EditorItemEstimateRouteStep,
 } from "~/editor/estimator/EditorItemEstimate";
-import type { EditorEstimateSelectedRoute } from "~/editor/estimator/projectEditorEstimateRouteStepFx";
+import { editorItemEstimateMaximumQuantity } from "~/editor/estimator/EditorItemEstimateQuantitySchema";
+import type {
+	EditorEstimateRouteProjection,
+	EditorEstimateSelectedRoute,
+} from "~/editor/estimator/projectEditorEstimateRouteStepFx";
 import { projectEditorEstimateRouteStepFx } from "~/editor/estimator/projectEditorEstimateRouteStepFx";
+import { shareEditorEstimateOperationRunsFx } from "~/editor/estimator/shareEditorEstimateOperationRunsFx";
 
 export interface EditorEstimateCandidatePlan {
 	readonly consumables: Map<string, number>;
 	readonly durationMs: number;
-	readonly node: EditorItemEstimateRouteStep;
 	readonly ongoing: Map<string, number>;
 	readonly oneTime: Map<string, number>;
+	readonly projection: EditorEstimateRouteProjection;
 	readonly rejectedRoutes: ReadonlyArray<EditorItemEstimateRejectedRoute>;
 }
 
-export interface EditorEstimateCandidateFailure {
+interface EditorEstimateCandidateFailure {
 	readonly diagnostics: ReadonlyArray<EditorItemEstimateDiagnostic>;
 }
 
-const readNextRoute = ({
-	factId,
-	fallbacks,
-	id,
-	needed,
-	policy,
-	state,
-	topRoute,
-}: {
-	readonly factId: string;
-	readonly fallbacks: EditorEstimateFallbackChoices;
-	readonly id: string;
-	readonly needed: number;
-	readonly policy: EditorEstimatePolicy;
-	readonly state: EditorEstimateDemandClosureState;
-	readonly topRoute: EditorEstimateRoute;
-}): EditorEstimateCandidateFailure | EditorEstimateSelectedRoute => {
-	const candidates =
-		id === factId
-			? [
-					topRoute,
-				]
-			: [
-					...(policy.routesByFact.get(id) ?? []),
-				]
-					.filter((route) => !fallbacks.excludedRouteIds.has(route.id))
-					.sort(
-						(left, right) =>
-							policy.readRouteCost(left, needed) -
-								policy.readRouteCost(right, needed) ||
-							left.id.localeCompare(right.id),
-					);
-	let zeroYieldRouteId: string | undefined;
-	let cyclicRouteId: string | undefined;
-	let cyclicFactIds: ReadonlyArray<string> | undefined;
-	for (const route of candidates) {
-		routeAttempt: for (;;) {
-			const outputRuns = policy.readExpectedRuns(route.output.quantityDistribution, needed);
-			if (!Number.isFinite(outputRuns)) {
-				zeroYieldRouteId = route.id;
-				fallbacks.addRejectedRoute(route.id, {
-					factId: id,
-					kind: "zero-yield",
-					routeId: route.id,
-				});
-				break routeAttempt;
+interface DemandSnapshot {
+	readonly consumables: Map<string, number>;
+	readonly contributors: Map<string, Set<string>>;
+	readonly dependencies: Map<string, Set<string>>;
+	readonly ongoing: Map<string, number>;
+	readonly oneTime: Map<string, number>;
+	readonly required: Map<string, number>;
+	readonly selected: Map<string, EditorEstimateSelectedRoute>;
+	readonly sharedOperationIds: ReadonlySet<string>;
+}
+
+const add = (target: Map<string, number>, factId: string, quantity: number) =>
+	target.set(factId, (target.get(factId) ?? 0) + quantity);
+const maximize = (target: Map<string, number>, factId: string, quantity: number) =>
+	target.set(factId, Math.max(target.get(factId) ?? 0, quantity));
+
+const equalQuantities = (left: ReadonlyMap<string, number>, right: ReadonlyMap<string, number>) =>
+	left.size === right.size &&
+	[
+		...left,
+	].every(([factId, quantity]) => Math.abs(quantity - (right.get(factId) ?? -1)) <= 1e-9);
+
+const findCycle = (dependencies: ReadonlyMap<string, ReadonlySet<string>>) => {
+	const cycles: ReadonlyArray<string>[] = [];
+	for (const factId of [
+		...dependencies.keys(),
+	].sort()) {
+		const pending: ReadonlyArray<string>[] = [
+			[
+				factId,
+			],
+		];
+		const visited = new Set([
+			factId,
+		]);
+		while (pending.length > 0) {
+			const path = pending.shift();
+			const current = path?.at(-1);
+			if (path === undefined || current === undefined) continue;
+			for (const dependencyId of [
+				...(dependencies.get(current) ?? []),
+			].sort()) {
+				if (dependencyId === factId) {
+					cycles.push([
+						...path,
+						factId,
+					]);
+					pending.length = 0;
+					break;
+				}
+				if (!visited.has(dependencyId)) {
+					visited.add(dependencyId);
+					pending.push([
+						...path,
+						dependencyId,
+					]);
+				}
 			}
-			const actionRuns = outputRuns * route.runMultiplier;
-			const exclusionsByClause = fallbacks.readAnyOfExclusions(route.id);
-			const groups = policy.chooseRequirements(route, actionRuns, exclusionsByClause);
-			if (groups === undefined || groups.some((group) => !policy.unitCost.has(group.factId)))
-				break routeAttempt;
-			const recurrenceFactIds = new Set(
-				groups
-					.filter((group) => {
-						const root = policy.roots.get(group.factId);
-						return (
-							group.consumed <= 1e-9 &&
-							(root === "unbounded" ||
-								(root ?? 0) >= Math.max(group.oneTime, group.ongoing))
-						);
-					})
-					.map((group) => group.factId)
-					.filter(
-						(dependencyId) =>
-							state.readCyclePath(id, dependencyId) !== undefined &&
-							policy.seededComponentByFact.get(id) !== undefined &&
-							policy.seededComponentByFact.get(id) ===
-								policy.seededComponentByFact.get(dependencyId),
-					),
-			);
-			const cyclicGroup = groups.find(
-				(group) =>
-					!recurrenceFactIds.has(group.factId) &&
-					state.readCyclePath(id, group.factId) !== undefined,
-			);
-			if (cyclicGroup === undefined)
-				return {
-					actionRuns,
-					groups,
-					outputRuns,
-					producedQuantity: needed,
-					recurrenceFactIds,
-					route,
-				};
-			const fallbackClauseIndex = cyclicGroup.anyOfClauseIndexes.find((clauseIndex) => {
-				const excluded = exclusionsByClause.get(clauseIndex) ?? new Set();
-				return route.requirements.anyOf[clauseIndex]?.some(
-					({ factId }) =>
-						factId !== cyclicGroup.factId &&
-						!excluded.has(factId) &&
-						policy.unitCost.has(factId),
-				);
-			});
-			if (fallbackClauseIndex !== undefined) {
-				fallbacks.excludeAnyOf(route.id, fallbackClauseIndex, cyclicGroup.factId);
-				continue routeAttempt;
-			}
-			cyclicRouteId = route.id;
-			cyclicFactIds = state.readCyclePath(id, cyclicGroup.factId);
-			fallbacks.addRejectedRoute(route.id, {
-				factIds: cyclicFactIds ?? [
-					id,
-				],
-				kind: "cycle",
-				routeId: route.id,
-			});
-			break routeAttempt;
 		}
 	}
-	const diagnostic: EditorItemEstimateDiagnostic =
-		cyclicRouteId !== undefined
-			? {
-					factIds: cyclicFactIds ?? [
-						id,
-					],
-					kind: "cycle",
-					routeId: cyclicRouteId,
-				}
-			: zeroYieldRouteId !== undefined
-				? {
-						factId: id,
-						kind: "zero-yield",
-						routeId: zeroYieldRouteId,
-					}
-				: {
-						factId: id,
-						kind: "unreachable",
-						quantity: needed,
-					};
+	return cycles.sort(
+		(left, right) =>
+			left.length - right.length || left.join("\u0000").localeCompare(right.join("\u0000")),
+	)[0];
+};
+
+const cycleDiagnostic = (
+	cycle: ReadonlyArray<string>,
+	selected: ReadonlyMap<string, EditorEstimateSelectedRoute>,
+	topRouteId: string,
+): EditorItemEstimateDiagnostic => {
+	for (let index = 0; index < cycle.length - 1; index += 1) {
+		const parentId = cycle[index];
+		const dependencyId = cycle[index + 1];
+		if (
+			parentId !== undefined &&
+			dependencyId !== undefined &&
+			selected
+				.get(parentId)
+				?.groups.some((group) => group.factId === dependencyId && group.charged) === true
+		)
+			return {
+				factIds: [
+					...cycle.slice(index + 1, -1),
+					...cycle.slice(0, index + 1),
+					dependencyId,
+				],
+				kind: "charge-renewal-unsupported",
+				routeId: topRouteId,
+			};
+	}
 	return {
-		diagnostics: [
-			diagnostic,
-		],
+		factIds: cycle,
+		kind: "cycle",
+		routeId: topRouteId,
 	};
 };
 
-/** Materializes one candidate route through the deterministic nested policy and shared demands. */
+/** Materializes one forced top route through a bounded, deterministic demand fixed point. */
 export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstimatePlanFx")(
 	({
 		factId,
@@ -175,65 +136,326 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 		readonly factId: string;
 		readonly policy: EditorEstimatePolicy;
 		readonly quantity: number;
-		readonly topRoute: EditorEstimateRoute;
+		readonly topRoute: EditorAcquisitionRoute;
 	}) =>
 		Effect.gen(function* () {
-			const fallbacks = yield* createEditorEstimateFallbackChoicesFx({
-				factId,
-				policy,
-			});
-			let state: EditorEstimateDemandClosureState;
-			restart: for (;;) {
-				state = yield* createEditorEstimateDemandClosureStateFx({
+			let required = new Map([
+				[
+					factId,
+					quantity,
+				],
+			]);
+			let sharedFiniteRootFactId: string | undefined;
+			let snapshot: DemandSnapshot | undefined;
+			const maximumIterations = Math.max(2, policy.factIds.size * 2);
+
+			for (let iteration = 0; iteration < maximumIterations; iteration += 1) {
+				let selected = new Map<string, EditorEstimateSelectedRoute>();
+				for (const [id, requiredQuantity] of [
+					...required,
+				].sort(([left], [right]) => left.localeCompare(right))) {
+					if (requiredQuantity > editorItemEstimateMaximumQuantity)
+						return {
+							diagnostics: [
+								{
+									factId: id,
+									kind: "quantity-limit-exceeded",
+									maximumQuantity: editorItemEstimateMaximumQuantity,
+									quantity: requiredQuantity,
+									source: "authored-demand",
+								},
+							],
+						} satisfies EditorEstimateCandidateFailure;
+					const root = policy.roots.get(id);
+					const rootQuantity =
+						root === "unbounded"
+							? requiredQuantity
+							: Math.min(root ?? 0, requiredQuantity);
+					const missing = Math.max(0, requiredQuantity - rootQuantity);
+					if (missing <= 1e-9) continue;
+					const routes = policy.routesByFact.get(id) ?? [];
+					const route =
+						id === factId
+							? topRoute
+							: (policy.chooseRoute(
+									id,
+									requiredQuantity,
+									new Set([
+										factId,
+									]),
+								) ?? routes[0]);
+					if (route === undefined)
+						return {
+							diagnostics: [
+								sharedFiniteRootFactId === undefined
+									? {
+											factId: id,
+											kind: "unreachable",
+											quantity: missing,
+										}
+									: {
+											factId: sharedFiniteRootFactId,
+											kind: "finite-root-interaction-unsupported",
+											quantity: required.get(sharedFiniteRootFactId) ?? 0,
+										},
+							],
+						} satisfies EditorEstimateCandidateFailure;
+					if (route.operation?.outputCompilation === "state-space-unsupported")
+						return {
+							diagnostics: [
+								{
+									kind: "joint-output-accounting-unsupported",
+									reason: "state-space",
+									routeId: route.id,
+								},
+							],
+						} satisfies EditorEstimateCandidateFailure;
+					const unsupportedRequirement = route.requirements.unsupported?.[0];
+					if (unsupportedRequirement !== undefined)
+						return {
+							diagnostics: [
+								{
+									...unsupportedRequirement,
+									kind: "availability-condition-unsupported",
+									routeId: route.id,
+								},
+							],
+						} satisfies EditorEstimateCandidateFailure;
+					const outputDistribution = route.output.quantityDistribution;
+					const minimumOutput = Math.min(
+						...outputDistribution.map(({ quantity }) => quantity),
+					);
+					const unsupportedChargeReason = route.chargeUses?.some(
+						({ accounting, usableActionRuns }) =>
+							accounting === "multi-payer-unsupported" || usableActionRuns <= 0,
+					)
+						? ("multi-payer" as const)
+						: route.chargeUses?.length && minimumOutput <= 0
+							? ("stochastic-output" as const)
+							: undefined;
+					if (unsupportedChargeReason !== undefined)
+						return {
+							diagnostics: [
+								{
+									kind: "charge-accounting-unsupported",
+									reason: unsupportedChargeReason,
+									routeId: route.id,
+								},
+							],
+						} satisfies EditorEstimateCandidateFailure;
+					const outputRuns = policy.readExpectedRuns(outputDistribution, missing);
+					if (!Number.isFinite(outputRuns))
+						return {
+							diagnostics: [
+								{
+									factId: id,
+									kind: "zero-yield",
+									routeId: route.id,
+								},
+							],
+						} satisfies EditorEstimateCandidateFailure;
+					const actionRuns = outputRuns * route.runMultiplier;
+					const groups = policy.chooseRequirements(route, actionRuns, missing);
+					if (groups === undefined)
+						return {
+							diagnostics: [
+								{
+									factId: id,
+									kind: "unreachable",
+									quantity: missing,
+									routeId: route.id,
+								},
+							],
+						} satisfies EditorEstimateCandidateFailure;
+					selected.set(id, {
+						actionRuns,
+						groups,
+						outputRuns,
+						producedQuantity: missing,
+						recurrenceFactIds: new Set(),
+						route,
+					});
+				}
+
+				const shared = yield* shareEditorEstimateOperationRunsFx({
 					factId,
 					policy,
-					quantity,
+					selected,
+					topRouteId: topRoute.id,
 				});
-				for (let pendingIndex = 0; pendingIndex < state.pending.length; pendingIndex += 1) {
-					const id = state.dequeue(pendingIndex);
-					if (id === undefined) continue;
-					const needed = state.missingQuantity(id);
-					if (needed <= (state.selected.get(id)?.producedQuantity ?? 0) + 1e-9) continue;
-					const next = readNextRoute({
-						factId,
-						fallbacks,
-						id,
-						needed,
-						policy,
-						state,
-						topRoute,
-					});
-					if ("diagnostics" in next) {
-						const diagnostic = next.diagnostics[0];
-						if (
-							diagnostic !== undefined &&
-							fallbacks.rejectFallbackChoice(id, diagnostic, state.selected)
-						)
-							continue restart;
-						return next;
+				if (shared.status === "failure")
+					return {
+						diagnostics: shared.diagnostics,
+					} satisfies EditorEstimateCandidateFailure;
+				const { sharedOperationIds } = shared;
+				selected = shared.selected;
+
+				const consumables = new Map<string, number>();
+				const concurrent = new Map<string, number>();
+				const contributors = new Map<string, Set<string>>();
+				const oneTime = new Map<string, number>();
+				const ongoing = new Map<string, number>();
+				const accountedOperationIds = new Set<string>();
+				for (const [id, plan] of selected) {
+					const operationId = plan.route.operation?.id;
+					if (operationId !== undefined && accountedOperationIds.has(operationId))
+						continue;
+					if (operationId !== undefined && sharedOperationIds.has(operationId))
+						accountedOperationIds.add(operationId);
+					for (const group of plan.groups) {
+						add(consumables, group.factId, group.consumed);
+						maximize(
+							concurrent,
+							group.factId,
+							group.consumed + Math.max(group.oneTime, group.ongoing),
+						);
+						maximize(oneTime, group.factId, group.oneTime);
+						maximize(ongoing, group.factId, group.ongoing);
+						const factContributors = contributors.get(group.factId) ?? new Set();
+						factContributors.add(id);
+						contributors.set(group.factId, factContributors);
 					}
-					state.select(id, next);
 				}
-				break;
+				const nextRequired = new Map<string, number>([
+					[
+						factId,
+						quantity,
+					],
+				]);
+				for (const id of new Set([
+					...consumables.keys(),
+					...concurrent.keys(),
+				])) {
+					nextRequired.set(
+						id,
+						Math.max(
+							(nextRequired.get(id) ?? 0) + (consumables.get(id) ?? 0),
+							concurrent.get(id) ?? 0,
+						),
+					);
+				}
+				sharedFiniteRootFactId = [
+					...nextRequired,
+				]
+					.sort(([left], [right]) => left.localeCompare(right))
+					.find(([id, requiredQuantity]) => {
+						const root = policy.roots.get(id);
+						return (
+							typeof root === "number" &&
+							root > 0 &&
+							requiredQuantity > root + 1e-9 &&
+							(contributors.get(id)?.size ?? 0) > 1
+						);
+					})?.[0];
+
+				const recurrenceByFact = new Map<string, Set<string>>();
+				const dependencies = new Map<string, Set<string>>();
+				for (const [id, plan] of selected) {
+					const recurrenceFactIds = new Set(
+						plan.groups
+							.filter((group) => {
+								const root = policy.roots.get(group.factId);
+								return (
+									group.consumed <= 1e-9 &&
+									(root === "unbounded" ||
+										(root ?? 0) >= Math.max(group.oneTime, group.ongoing)) &&
+									policy.seededComponentByFact.get(id) !== undefined &&
+									policy.seededComponentByFact.get(id) ===
+										policy.seededComponentByFact.get(group.factId)
+								);
+							})
+							.map((group) => group.factId),
+					);
+					recurrenceByFact.set(id, recurrenceFactIds);
+					dependencies.set(
+						id,
+						new Set(
+							plan.groups
+								.map((group) => group.factId)
+								.filter((dependencyId) => !recurrenceFactIds.has(dependencyId)),
+						),
+					);
+				}
+				const selectedWithRecurrence = new Map(
+					[
+						...selected,
+					].map(
+						([id, plan]) =>
+							[
+								id,
+								{
+									...plan,
+									recurrenceFactIds:
+										recurrenceByFact.get(id) ?? new Set<string>(),
+								},
+							] as const,
+					),
+				);
+				const cycle = findCycle(dependencies);
+				if (cycle !== undefined)
+					return {
+						diagnostics: [
+							cycleDiagnostic(cycle, selectedWithRecurrence, topRoute.id),
+						],
+					} satisfies EditorEstimateCandidateFailure;
+				snapshot = {
+					consumables,
+					contributors,
+					dependencies,
+					ongoing,
+					oneTime,
+					required: nextRequired,
+					selected: selectedWithRecurrence,
+					sharedOperationIds,
+				};
+				if (equalQuantities(required, nextRequired)) break;
+				required = nextRequired;
 			}
-			const node = yield* projectEditorEstimateRouteStepFx({
-				dependencies: state.dependencies,
+
+			if (snapshot === undefined || !equalQuantities(required, snapshot.required))
+				return {
+					diagnostics: [
+						sharedFiniteRootFactId === undefined
+							? {
+									factId,
+									kind: "unreachable",
+									quantity,
+									routeId: topRoute.id,
+								}
+							: {
+									factId: sharedFiniteRootFactId,
+									kind: "finite-root-interaction-unsupported",
+									quantity: snapshot?.required.get(sharedFiniteRootFactId) ?? 0,
+								},
+					],
+				} satisfies EditorEstimateCandidateFailure;
+			const projection = yield* projectEditorEstimateRouteStepFx({
+				dependencies: snapshot.dependencies,
 				factId,
-				requiredQuantityByFact: state.readRequiredQuantities(),
-				selected: state.selected,
+				requiredQuantityByFact: snapshot.required,
+				selected: snapshot.selected,
 				topRouteId: topRoute.id,
 			});
-			if ("diagnostics" in node) return node;
-			const durationMs = [
-				...state.selected.values(),
-			].reduce((total, plan) => total + plan.route.durationMs * plan.actionRuns, 0);
+			if ("diagnostics" in projection) return projection;
 			return {
-				consumables: state.consumables,
-				durationMs,
-				node,
-				ongoing: state.ongoing,
-				oneTime: state.oneTime,
-				rejectedRoutes: fallbacks.rejectedRoutes,
+				consumables: snapshot.consumables,
+				durationMs: [
+					...new Map(
+						[
+							...snapshot.selected.entries(),
+						].map(([id, plan]) => [
+							plan.route.operation !== undefined &&
+							snapshot.sharedOperationIds.has(plan.route.operation.id)
+								? plan.route.operation.id
+								: id,
+							plan,
+						]),
+					).values(),
+				].reduce((total, plan) => total + plan.route.durationMs * plan.actionRuns, 0),
+				ongoing: snapshot.ongoing,
+				oneTime: snapshot.oneTime,
+				projection,
+				rejectedRoutes: [],
 			};
 		}),
 );

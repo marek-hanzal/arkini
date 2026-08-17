@@ -78,19 +78,18 @@ beforeEach(() => {
 				itemId: "bakery",
 				method: "static",
 				runtimeMs: 120_000,
-				status: "obtainable",
+				status: "complete",
 			},
 			{
 				itemId: "water",
 				method: "static",
 				runtimeMs: 0,
-				status: "obtainable",
+				status: "complete",
 			},
 			{
 				itemId: "well",
 				method: "static",
-				runtimeMs: 60_000,
-				status: "obtainable",
+				status: "partial",
 			},
 		],
 		status: "ready",
@@ -156,13 +155,14 @@ describe("EditorItemEstimateList", () => {
 
 		expect(readVisibleItemIds(container)).toEqual([
 			"water",
-			"well",
 			"bakery",
+			"well",
 		]);
 		expect(container.textContent).not.toContain("Expected");
 		expect(container.textContent).not.toContain("Guaranteed");
 		expect(container.textContent).not.toContain("Best");
 		expect(container.textContent).toContain("2 min");
+		expect(container.textContent).toContain("Partial");
 		expect(container.querySelector('[data-ui="EditorItemThumbnail"]')).not.toBeNull();
 		expect(container.querySelector('[aria-label^="Filter items by"]')).toBeNull();
 
@@ -175,8 +175,8 @@ describe("EditorItemEstimateList", () => {
 		await setSort(container, "slowest");
 		expect(readVisibleItemIds(container)).toEqual([
 			"bakery",
-			"well",
 			"water",
+			"well",
 		]);
 
 		await setSearch(container, "well");

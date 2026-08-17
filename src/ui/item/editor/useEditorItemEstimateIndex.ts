@@ -42,9 +42,7 @@ const projectEntries = (
 							itemId,
 							method: "static" as const,
 							runtimeMs: estimate.obtainable ? estimate.durationMs : undefined,
-							status: estimate.obtainable
-								? ("obtainable" as const)
-								: ("unreachable" as const),
+							status: estimate.status,
 						},
 					];
 		})

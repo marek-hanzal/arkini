@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { EditorEstimateRoute } from "~/editor/estimator/EditorEstimateDependencyGraph";
+import type { EditorAcquisitionRoute } from "~/editor/EditorAcquisitionGraph";
 import type { EditorEstimateRequirementGroup } from "~/editor/estimator/createEditorEstimatePolicyFx";
 import type {
 	EditorItemEstimateDiagnostic,
@@ -14,14 +14,19 @@ export interface EditorEstimateSelectedRoute {
 	readonly outputRuns: number;
 	readonly producedQuantity: number;
 	readonly recurrenceFactIds: ReadonlySet<string>;
-	readonly route: EditorEstimateRoute;
+	readonly route: EditorAcquisitionRoute;
 }
 
 interface ProjectionFailure {
 	readonly diagnostics: ReadonlyArray<EditorItemEstimateDiagnostic>;
 }
 
-/** Projects one completed demand closure into the recursive route explanation consumed by UI/MCP. */
+export interface EditorEstimateRouteProjection {
+	readonly route: EditorItemEstimateRouteStep;
+	readonly routeSteps: ReadonlyArray<EditorItemEstimateRouteStep>;
+}
+
+/** Projects one completed demand closure into a normalized, bounded route DAG. */
 export const projectEditorEstimateRouteStepFx = Effect.fn("projectEditorEstimateRouteStepFx")(
 	({
 		dependencies,
@@ -36,7 +41,7 @@ export const projectEditorEstimateRouteStepFx = Effect.fn("projectEditorEstimate
 		readonly selected: ReadonlyMap<string, EditorEstimateSelectedRoute>;
 		readonly topRouteId: string;
 	}) =>
-		Effect.sync((): EditorItemEstimateRouteStep | ProjectionFailure => {
+		Effect.sync((): EditorEstimateRouteProjection | ProjectionFailure => {
 			const unresolved = new Set(selected.keys());
 			const nodes = new Map<string, EditorItemEstimateRouteStep>();
 			while (unresolved.size > 0) {
@@ -74,12 +79,13 @@ export const projectEditorEstimateRouteStepFx = Effect.fn("projectEditorEstimate
 						] as const) {
 							if (quantity <= 0) continue;
 							requirements.push({
-								acquisition:
+								acquisitionFactId:
 									first && !plan.recurrenceFactIds.has(group.factId)
-										? nodes.get(group.factId)
+										? nodes.get(group.factId)?.factId
 										: undefined,
 								factId: group.factId,
 								quantity,
+								sources: group.sources,
 								usage,
 							});
 							first = false;
@@ -113,16 +119,27 @@ export const projectEditorEstimateRouteStepFx = Effect.fn("projectEditorEstimate
 						],
 					};
 			}
-			return (
-				nodes.get(factId) ?? {
-					diagnostics: [
-						{
-							factId,
-							kind: "unreachable",
-							quantity: requiredQuantityByFact.get(factId) ?? 0,
-						},
-					],
-				}
-			);
+			const route = nodes.get(factId);
+			return route === undefined
+				? {
+						diagnostics: [
+							{
+								factId,
+								kind: "unreachable",
+								quantity: requiredQuantityByFact.get(factId) ?? 0,
+							},
+						],
+					}
+				: {
+						route,
+						routeSteps: [
+							route,
+							...[
+								...nodes.values(),
+							]
+								.filter((step) => step.factId !== factId)
+								.sort((left, right) => left.factId.localeCompare(right.factId)),
+						],
+					};
 		}),
 );

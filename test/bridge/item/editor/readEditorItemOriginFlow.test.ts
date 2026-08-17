@@ -13,6 +13,7 @@ import type { EditorOutput } from "~/bridge/item/editor/EditorItemModel";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import { createMergeTestConfig } from "~test/merge/support/createMergeTestConfig";
+import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
 type EditorGuaranteedRoll = Extract<
 	EditorOutput["set"][number]["roll"][number],
@@ -139,7 +140,7 @@ describe("readEditorItemOriginFlow", () => {
 		);
 		expect(itemNode(flow, "ingot")).toEqual(
 			expect.objectContaining({
-				acquisitionSourceId: expect.stringContaining("source:forge:line:"),
+				acquisitionSourceId: "source:forge:line:line:forge:run",
 			}),
 		);
 		expect(flow.edges).toEqual(
@@ -205,6 +206,33 @@ describe("readEditorItemOriginFlow", () => {
 					}),
 				],
 			}),
+		);
+		const forgeOperation = itemNode(flow, "forge").operations[0];
+		expect(
+			forgeOperation?.inputs.find(({ itemId }) => itemId === "water")?.requirementContexts,
+		).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					clause: "all-of",
+					requirement: expect.objectContaining({
+						itemId: "water",
+						sources: [
+							"material-input",
+						],
+						usage: "consume",
+					}),
+				}),
+			]),
+		);
+		expect(
+			flow.edges.find((edge) => edge.role === "input" && edge.source === "item:water")
+				?.requirementContexts,
+		).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					clause: "all-of",
+				}),
+			]),
 		);
 		expect(progress[0]).toMatchObject({
 			label: "Indexing sources",
@@ -295,7 +323,7 @@ describe("readEditorItemOriginFlow", () => {
 		);
 	});
 
-	it("embeds chance and depletion outputs as operation ports", async () => {
+	it("embeds chance outputs and omits depletion without an authored charge spender", async () => {
 		const base = createReachabilityConfig(true);
 		const forge = base.items.forge;
 		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
@@ -362,16 +390,52 @@ describe("readEditorItemOriginFlow", () => {
 				targetItemId: "dust",
 			}),
 		);
-		expect(itemNode(depletionFlow, "ingot").operations).toEqual([
+		expect(depletionFlow.nodes).toEqual([
 			expect.objectContaining({
-				kind: "charges",
-				outputs: [
-					expect.objectContaining({
-						itemId: "dust",
-					}),
-				],
+				id: "item:dust",
+				operations: [],
 			}),
 		]);
+		expect(depletionFlow.edges).toEqual([]);
+	});
+
+	it("keeps one official charged line operation with every authored output", async () => {
+		const flow = await Effect.runPromise(
+			readEditorItemOriginFlowFx({
+				config: await readArkiniGameConfigSource(),
+			}),
+		);
+		const lumberjack = itemNode(flow, "producer:lumberjack-t1");
+		const operations = lumberjack.operations.filter(
+			({ id }) => id === "source:producer:lumberjack-t1:line:line:lumberjack-t1:log",
+		);
+
+		expect(operations).toHaveLength(1);
+		expect(operations[0]).toMatchObject({
+			inputs: [
+				expect.objectContaining({
+					itemId: "item:tree",
+				}),
+			],
+			outputs: [
+				expect.objectContaining({
+					itemId: "item:log",
+				}),
+				expect.objectContaining({
+					itemId: "item:quest:road-repair",
+				}),
+			],
+		});
+		expect(flow.edges).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					operationId: operations[0]?.id,
+					role: "input",
+					source: "item:item:tree",
+					target: "item:producer:lumberjack-t1",
+				}),
+			]),
+		);
 	});
 
 	it("embeds merge input and result ports in the source item", async () => {

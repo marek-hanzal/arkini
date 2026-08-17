@@ -6,6 +6,7 @@ import { formatItemDurationFx } from "~/ui/item-detail/formatItemDurationFx";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 
 const runtimeLabel = (estimate: EditorItemEstimateIndexEntry) => {
+	if (estimate.status === "partial") return "Partial";
 	if (estimate.status === "unreachable") return "No path";
 	if (estimate.runtimeMs === undefined) return "—";
 	const duration = RendererRuntime.runSync(formatItemDurationFx(estimate.runtimeMs));

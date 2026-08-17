@@ -1,9 +1,12 @@
 import { Effect } from "effect";
 
-import type { EditorEstimateRequirement } from "~/editor/estimator/EditorEstimateDependencyGraph";
+import type {
+	EditorAcquisitionRequirement,
+	EditorAcquisitionUnsupportedRequirement,
+} from "~/editor/EditorAcquisitionGraph";
 import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
 
-export namespace readEditorEstimateAvailabilityRequirementsFx {
+export namespace readEditorAcquisitionAvailabilityRequirementsFx {
 	export interface Props {
 		readonly rules: ReadonlyArray<{
 			readonly type: string;
@@ -18,9 +21,9 @@ const readSatisfyQuantity = (when: WhenSchema.Type) => {
 		case "exists":
 			return 1;
 		case "count":
-			return when.count;
+			return undefined;
 		case "range":
-			return when.min;
+			return undefined;
 	}
 };
 
@@ -39,7 +42,7 @@ const makeRequirement = (
 	when: WhenSchema.Type,
 	quantity: number,
 	source: "line-condition" | "output-condition",
-): EditorEstimateRequirement => ({
+): EditorAcquisitionRequirement => ({
 	factId: when.query.selector.itemId,
 	quantity,
 	source,
@@ -47,26 +50,40 @@ const makeRequirement = (
 });
 
 /** Projects authored enable/disable conditions into positive static facts. */
-export const readEditorEstimateAvailabilityRequirementsFx = Effect.fn(
-	"readEditorEstimateAvailabilityRequirementsFx",
-)(({ rules, source }: readEditorEstimateAvailabilityRequirementsFx.Props) =>
+export const readEditorAcquisitionAvailabilityRequirementsFx = Effect.fn(
+	"readEditorAcquisitionAvailabilityRequirementsFx",
+)(({ rules, source }: readEditorAcquisitionAvailabilityRequirementsFx.Props) =>
 	Effect.sync(() => {
-		const allOf: EditorEstimateRequirement[] = [];
-		const anyOf: EditorEstimateRequirement[][] = [];
+		const allOf: EditorAcquisitionRequirement[] = [];
+		const anyOf: EditorAcquisitionRequirement[][] = [];
+		const unsupported: EditorAcquisitionUnsupportedRequirement[] = [];
+		const markUnsupported = (
+			when: WhenSchema.Type,
+			reason: EditorAcquisitionUnsupportedRequirement["reason"],
+		) =>
+			unsupported.push({
+				factId: when.query.selector.itemId,
+				reason,
+				source,
+			});
 		for (const rule of rules) {
 			if (rule.type === "enable") {
 				for (const when of rule.when) {
 					const quantity = readSatisfyQuantity(when);
-					if (quantity > 0) allOf.push(makeRequirement(when, quantity, source));
+					if (quantity !== undefined && quantity > 0)
+						allOf.push(makeRequirement(when, quantity, source));
+					if (when.type === "count") markUnsupported(when, "exact-count");
+					if (when.type === "range") markUnsupported(when, "upper-bound");
 				}
 				continue;
 			}
 			if (rule.type !== "disable") continue;
-			const alternatives: EditorEstimateRequirement[] = [];
+			const alternatives: EditorAcquisitionRequirement[] = [];
 			let factFree = false;
 			for (const when of rule.when) {
 				const quantity = readFalsifyQuantity(when);
 				if (quantity === undefined) {
+					markUnsupported(when, "negative-condition");
 					factFree = true;
 					break;
 				}
@@ -74,11 +91,20 @@ export const readEditorEstimateAvailabilityRequirementsFx = Effect.fn(
 			}
 			if (!factFree && alternatives.length > 0) anyOf.push(alternatives);
 		}
-		const compare = (left: EditorEstimateRequirement, right: EditorEstimateRequirement) =>
+		const compare = (left: EditorAcquisitionRequirement, right: EditorAcquisitionRequirement) =>
 			left.factId.localeCompare(right.factId) || left.quantity - right.quantity;
 		return {
 			allOf: allOf.sort(compare),
 			anyOf: anyOf.map((clause) => clause.sort(compare)),
+			...(unsupported.length === 0
+				? {}
+				: {
+						unsupported: unsupported.sort(
+							(left, right) =>
+								left.factId.localeCompare(right.factId) ||
+								left.reason.localeCompare(right.reason),
+						),
+					}),
 		};
 	}),
 );

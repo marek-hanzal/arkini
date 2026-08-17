@@ -6,6 +6,8 @@ import type {
 } from "~/bridge/item/editor/EditorItemOriginFlow";
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import { type EditorItemOriginSource } from "~/bridge/item/editor/EditorItemOriginSource";
+import type { EditorAcquisitionGraph } from "~/editor/EditorAcquisitionGraph";
+import { createEditorAcquisitionGraphFx } from "~/editor/createEditorAcquisitionGraphFx";
 import { readEditorItemOriginSourcesFx } from "~/editor/readEditorItemOriginSourcesFx";
 import { reportEditorItemOriginFlowProgressFx } from "~/bridge/item/editor/reportEditorItemOriginFlowProgressFx";
 import { yieldEditorItemOriginFlowFx } from "~/bridge/item/editor/yieldEditorItemOriginFlowFx";
@@ -16,6 +18,7 @@ const unique = <Value>(values: ReadonlyArray<Value>): Value[] => [
 ];
 
 export interface EditorItemOriginSourceIndex {
+	readonly graph: EditorAcquisitionGraph;
 	readonly items: ReadonlyMap<string, EditorItem>;
 	readonly sources: ReadonlyArray<EditorItemOriginSource>;
 	readonly sourcesById: ReadonlyMap<string, EditorItemOriginSource>;
@@ -57,27 +60,25 @@ export const indexEditorItemOriginSourcesFx = Effect.fn("indexEditorItemOriginSo
 		for (const entry of config.start.inventory) addStarter(entry.itemId, "Inventory");
 		for (const entry of config.start.toolbar) addStarter(entry.itemId, "Toolbar");
 
-		const itemValues = Object.values(config.items);
-		const sources: EditorItemOriginSource[] = [];
-		for (const [index, item] of itemValues.entries()) {
-			sources.push(...(yield* readEditorItemOriginSourcesFx(item)));
-			if ((index + 1) % 8 === 0) {
-				yield* reportEditorItemOriginFlowProgressFx(
-					onProgress,
-					"indexing",
-					((index + 1) / itemValues.length) * 28,
-				);
-				yield* yieldEditorItemOriginFlowFx();
-			}
-		}
-		sources.sort((left, right) => left.id.localeCompare(right.id));
+		const graph = yield* createEditorAcquisitionGraphFx(config);
+		const sources = yield* readEditorItemOriginSourcesFx(graph);
+		yield* reportEditorItemOriginFlowProgressFx(onProgress, "indexing", 28);
+		yield* yieldEditorItemOriginFlowFx();
 		const sourcesByOutput = new Map<string, EditorItemOriginSource[]>();
 		const sourcesByOwner = new Map<string, EditorItemOriginSource[]>();
 		const sourcesById = new Map(
-			sources.map((source) => [
-				source.id,
-				source,
-			]),
+			sources.flatMap((source) =>
+				[
+					source.id,
+					...source.routeIds,
+				].map(
+					(id) =>
+						[
+							id,
+							source,
+						] as const,
+				),
+			),
 		);
 		for (const [index, source] of sources.entries()) {
 			const ownerSources = sourcesByOwner.get(source.ownerItemId) ?? [];
@@ -98,6 +99,7 @@ export const indexEditorItemOriginSourcesFx = Effect.fn("indexEditorItemOriginSo
 			}
 		}
 		return {
+			graph,
 			items,
 			sources,
 			sourcesById,

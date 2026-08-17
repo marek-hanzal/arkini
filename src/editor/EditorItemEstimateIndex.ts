@@ -1,5 +1,5 @@
 export type EditorItemEstimateIndexMethod = "static";
-export type EditorItemEstimateIndexStatus = "obtainable" | "unreachable";
+export type EditorItemEstimateIndexStatus = "complete" | "partial" | "unreachable";
 
 /** Compact list projection of the same static authored-data estimate used by detail. */
 export interface EditorItemEstimateIndexEntry {

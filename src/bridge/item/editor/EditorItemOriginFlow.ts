@@ -1,14 +1,32 @@
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
+import type {
+	EditorItemOriginRequirementOccurrence,
+	EditorItemOriginUnsupportedRequirementOccurrence,
+} from "~/editor/EditorItemOriginSource";
 
 export type EditorItemOriginOperationKind = "line" | "charges" | "merge" | "expiry";
 
 export const EditorItemOriginItemInputPortId = "item:self:input";
 export const EditorItemOriginItemOutputPortId = "item:self:output";
 
+export type EditorItemOriginOperationRequirementContext =
+	| {
+			readonly clause: "all-of" | "any-of";
+			readonly clauseIndex?: number;
+			readonly outputRouteId: string;
+			readonly requirement: EditorItemOriginRequirementOccurrence;
+	  }
+	| {
+			readonly clause: "unsupported";
+			readonly outputRouteId: string;
+			readonly requirement: EditorItemOriginUnsupportedRequirementOccurrence;
+	  };
+
 interface EditorItemOriginOperationPort {
 	readonly id: string;
 	readonly itemId: string;
 	readonly label: string;
+	readonly requirementContexts?: ReadonlyArray<EditorItemOriginOperationRequirementContext>;
 }
 
 export interface EditorItemOriginOperation {
@@ -34,6 +52,7 @@ export interface EditorItemOriginEdge {
 	readonly id: string;
 	readonly operationId: string;
 	readonly role: "input" | "output";
+	readonly requirementContexts?: ReadonlyArray<EditorItemOriginOperationRequirementContext>;
 	readonly source: string;
 	readonly sourcePortId?: string;
 	readonly target: string;

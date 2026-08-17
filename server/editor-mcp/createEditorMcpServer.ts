@@ -5,7 +5,7 @@ import { z } from "zod";
 import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
 import type { EditorProject } from "../../src/editor/EditorProject";
 import type { EditorProjectRepositoryService } from "../../src/editor/EditorProjectRepository";
-import { createEditorEstimateDependencyGraphFx } from "../../src/editor/estimator/createEditorEstimateDependencyGraphFx";
+import { createEditorAcquisitionGraphFx } from "../../src/editor/createEditorAcquisitionGraphFx";
 import type {
 	EditorItemEstimate,
 	EditorItemEstimateAmount,
@@ -13,6 +13,7 @@ import type {
 	EditorItemEstimateRouteStep,
 } from "../../src/editor/estimator/EditorItemEstimate";
 import { estimateEditorItemFx } from "../../src/editor/estimator/estimateEditorItemFx";
+import { EditorItemEstimateQuantitySchema } from "../../src/editor/estimator/EditorItemEstimateQuantitySchema";
 import type {
 	EditorItemOriginOutputOccurrence,
 	EditorItemOriginRelationRole,
@@ -201,6 +202,27 @@ const outputAnnotation = (output: EditorItemOriginOutputOccurrence) =>
 				]),
 	].join(", ");
 
+const outputRequirementLines = (
+	project: EditorProject,
+	output: EditorItemOriginOutputOccurrence,
+) => [
+	...output.requirements.allOf.map(
+		(requirement) =>
+			`      requires all: ${itemReference(project, requirement.itemId)} (quantity ${formatQuantity(requirement.quantity)}, ${requirement.usage}, ${requirement.sources.join(", ")}${requirement.identity === "distinct" ? ", distinct identity" : ""})`,
+	),
+	...output.requirements.anyOf.flatMap((clause, clauseIndex) => [
+		`      requires one of #${clauseIndex + 1}:`,
+		...clause.map(
+			(requirement) =>
+				`        - ${itemReference(project, requirement.itemId)} (quantity ${formatQuantity(requirement.quantity)}, ${requirement.usage}, ${requirement.sources.join(", ")}${requirement.identity === "distinct" ? ", distinct identity" : ""})`,
+		),
+	]),
+	...(output.requirements.unsupported ?? []).map(
+		(requirement) =>
+			`      unsupported requirement: ${itemReference(project, requirement.itemId)} (${requirement.reason}, ${requirement.source})`,
+	),
+];
+
 const formatQuantity = ({ max, min }: { readonly max: number; readonly min: number }) =>
 	min === max ? String(min) : `${min}–${max}`;
 
@@ -211,6 +233,18 @@ const formatEstimateNumber = (value: number) =>
 
 const estimateDiagnosticText = (diagnostic: EditorItemEstimateDiagnostic) => {
 	switch (diagnostic.kind) {
+		case "availability-condition-unsupported":
+			return `availability condition for ${diagnostic.factId} is unsupported on ${diagnostic.routeId} (${diagnostic.source}, ${diagnostic.reason})`;
+		case "quantity-limit-exceeded":
+			return `${diagnostic.factId} x ${formatEstimateNumber(diagnostic.quantity)} exceeds the static estimate limit of ${diagnostic.maximumQuantity} (${diagnostic.source})`;
+		case "charge-accounting-unsupported":
+			return `static charge accounting unsupported on ${diagnostic.routeId} (${diagnostic.reason})`;
+		case "charge-renewal-unsupported":
+			return `charged-item renewal unsupported on ${diagnostic.routeId}: ${diagnostic.factIds.join(" -> ")}`;
+		case "finite-root-interaction-unsupported":
+			return `shared finite root ${diagnostic.factId} needs ${formatEstimateNumber(diagnostic.quantity)}; global sibling-route replanning is unsupported`;
+		case "joint-output-accounting-unsupported":
+			return `correlated output demand on ${diagnostic.routeId} exceeds the bounded static state space`;
 		case "cycle":
 			return `cycle on ${diagnostic.routeId}: ${diagnostic.factIds.join(" -> ")}`;
 		case "unreachable":
@@ -235,10 +269,10 @@ const estimateAmountLines = (
 
 const estimateLimitationText = (limitation: EditorItemEstimate["limitations"][number]) => {
 	switch (limitation) {
-		case "charge-renewal-approximated":
-			return "charged payers are reusable capabilities; renewal timing beyond authored depletion routes is approximated";
 		case "conditional-runtime-adjustments-ignored":
 			return "conditional runtime adjustment and multiplier rules are not included";
+		case "negative-availability-constraints-ignored":
+			return "requirements that depend on another item remaining absent are not composed into the monotone estimate";
 		case "spatial-requirements-approximated":
 			return "board scope, distance, and concrete placement are approximated from authored item availability";
 	}
@@ -246,17 +280,30 @@ const estimateLimitationText = (limitation: EditorItemEstimate["limitations"][nu
 
 const estimateRouteLines = (
 	project: EditorProject,
-	route: EditorItemEstimateRouteStep,
-	indent = "  ",
-): ReadonlyArray<string> => [
-	`${indent}- ${itemReference(project, route.factId)} x ${formatEstimateNumber(route.quantity)} via ${route.routeId} (${formatRuntime(route.durationMs)})`,
-	...route.requirements.flatMap((requirement) => [
-		`${indent}  ${requirement.usage}: ${itemReference(project, requirement.factId)} x ${formatEstimateNumber(requirement.quantity)}`,
-		...(requirement.acquisition === undefined
-			? []
-			: estimateRouteLines(project, requirement.acquisition, `${indent}    `)),
-	]),
-];
+	routeSteps: ReadonlyArray<EditorItemEstimateRouteStep>,
+): ReadonlyArray<string> => {
+	const routeByFactId = new Map(
+		routeSteps.map((route) => [
+			route.factId,
+			route,
+		]),
+	);
+	return routeSteps.flatMap((route) => [
+		`  - ${itemReference(project, route.factId)} x ${formatEstimateNumber(route.quantity)} via ${route.routeId} (${formatRuntime(route.durationMs)})`,
+		...(route.rootQuantity > 0
+			? [
+					`    authored start contribution: ${formatEstimateNumber(route.rootQuantity)}`,
+				]
+			: []),
+		...route.requirements.map((requirement) => {
+			const acquisition =
+				requirement.acquisitionFactId === undefined
+					? undefined
+					: routeByFactId.get(requirement.acquisitionFactId);
+			return `    ${requirement.usage}: ${itemReference(project, requirement.factId)} x ${formatEstimateNumber(requirement.quantity)} [${requirement.sources.join(", ")}]${acquisition === undefined ? "" : ` -> ${acquisition.routeId}`}`;
+		}),
+	]);
+};
 
 const itemEstimateText = (project: EditorProject, estimate: EditorItemEstimate) => {
 	const target = project.config.items[estimate.factId];
@@ -283,8 +330,10 @@ const itemEstimateText = (project: EditorProject, estimate: EditorItemEstimate) 
 	if (!estimate.obtainable)
 		return [
 			...header,
-			"Status: unreachable",
-			"No complete acquisition route reaches the target from the authored start facts.",
+			`Status: ${estimate.status}`,
+			estimate.status === "partial"
+				? "Static analysis reaches authored mechanics it intentionally does not model completely; duration and material totals are indeterminate."
+				: "No complete acquisition route reaches the target from the authored start facts.",
 			"Diagnostics:",
 			...(estimate.diagnostics.length === 0
 				? [
@@ -298,13 +347,13 @@ const itemEstimateText = (project: EditorProject, estimate: EditorItemEstimate) 
 
 	return [
 		...header,
-		"Status: obtainable",
+		"Status: complete",
 		`Sequential duration: ${formatRuntime(estimate.durationMs)}`,
 		`Selected route: ${estimate.route.routeId}`,
 		`Expected action runs: ${formatEstimateNumber(estimate.route.actionRuns)}`,
 		`Expected output samples: ${formatEstimateNumber(estimate.route.outputRuns)}`,
-		"Selected route tree:",
-		...estimateRouteLines(project, estimate.route),
+		"Selected route graph:",
+		...estimateRouteLines(project, estimate.routeSteps),
 		"Consumables:",
 		...estimateAmountLines(project, estimate.consumables),
 		"One-time requirements:",
@@ -345,11 +394,8 @@ const readItemRelationViewFx = Effect.fn("createEditorMcpServer.readItemRelation
 ): Effect.fn.Return<ItemRelationView, Error> {
 	if (project.config.items[itemId] === undefined)
 		return yield* Effect.fail(new Error(`Item ${itemId} does not exist in the open project.`));
-	const sourceGroups = yield* Effect.forEach(
-		Object.values(project.config.items).sort((left, right) => left.id.localeCompare(right.id)),
-		readEditorItemOriginSourcesFx,
-	);
-	const sources = sourceGroups.flat().sort((left, right) => left.id.localeCompare(right.id));
+	const graph = yield* createEditorAcquisitionGraphFx(project.config);
+	const sources = yield* readEditorItemOriginSourcesFx(graph);
 	return {
 		itemId,
 		level,
@@ -460,10 +506,10 @@ const itemRelationText = ({ itemId, level, project, role, subgraph }: ItemRelati
 									),
 								]),
 						"  Outputs:",
-						...source.outputs.map(
-							(output) =>
-								`    - ${itemReference(project, output.itemId)} (${outputAnnotation(output)})`,
-						),
+						...source.outputs.flatMap((output) => [
+							`    - ${itemReference(project, output.itemId)} (${outputAnnotation(output)})`,
+							...outputRequirementLines(project, output),
+						]),
 					];
 				})),
 	].join("\n");
@@ -703,18 +749,13 @@ export const createEditorMcpServer = (
 		"item_estimate",
 		{
 			description:
-				"Analyze one item against the authored dependency graph. Returns the fastest complete static acquisition route from the authored start facts, including sequential duration, consumables, one-time requirements, ongoing requirements, and explicit unreachable diagnostics.",
+				"Analyze one item against the authored dependency graph. Returns the shortest canonical static acquisition route from the authored start facts without combinatorial sibling optimization, including sequential duration, consumables, one-time requirements, ongoing requirements, and explicit unreachable diagnostics.",
 			inputSchema: z
 				.object({
 					itemId: IdSchema.describe(
 						"The exact target item ID returned by item_collection.",
 					),
-					quantity: z
-						.number()
-						.int()
-						.positive()
-						.default(1)
-						.describe("Target quantity; defaults to 1."),
+					quantity: EditorItemEstimateQuantitySchema.default(1),
 				})
 				.strict(),
 		},
@@ -723,9 +764,7 @@ export const createEditorMcpServer = (
 				readCurrentProjectFx(repository, readProjectContext).pipe(
 					Effect.flatMap((project) =>
 						Effect.gen(function* () {
-							const graph = yield* createEditorEstimateDependencyGraphFx(
-								project.config,
-							);
+							const graph = yield* createEditorAcquisitionGraphFx(project.config);
 							const estimate = yield* estimateEditorItemFx({
 								factId: itemId,
 								graph,

@@ -51,8 +51,16 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-const render = async (estimateState: unknown) => {
-	const config = createJobTestConfig();
+const render = async (
+	estimateState: unknown,
+	{
+		config = createJobTestConfig(),
+		itemId = "tool",
+	}: {
+		readonly config?: EditorProject["config"];
+		readonly itemId?: string;
+	} = {},
+) => {
 	const project: EditorProject = {
 		config,
 		createdAtMs: 1,
@@ -76,7 +84,7 @@ const render = async (estimateState: unknown) => {
 					value: project,
 				},
 				createElement(EditorItemEstimateSection, {
-					itemId: "tool",
+					itemId,
 				}),
 			),
 		);
@@ -100,6 +108,7 @@ describe("EditorItemEstimateSection", () => {
 				"spatial-requirements-approximated",
 			],
 			obtainable: true,
+			status: "complete",
 			oneTimeRequirements: [
 				{
 					factId: "forge",
@@ -117,19 +126,12 @@ describe("EditorItemEstimateSection", () => {
 				quantity: 1,
 				requirements: [
 					{
-						acquisition: {
-							actionRuns: 1,
-							durationMs: 500,
-							factId: "water",
-							outputRuns: 1,
-							quantity: 3,
-							requirements: [],
-							rootQuantity: 0,
-							routeId: "line:well:water",
-							source: "route",
-						},
+						acquisitionFactId: "water",
 						factId: "water",
 						quantity: 3,
+						sources: [
+							"material-input",
+						],
 						usage: "consume",
 					},
 				],
@@ -137,6 +139,40 @@ describe("EditorItemEstimateSection", () => {
 				routeId: "line:forge:tool",
 				source: "route",
 			},
+			routeSteps: [
+				{
+					actionRuns: 1,
+					durationMs: 1_000,
+					factId: "tool",
+					outputRuns: 1,
+					quantity: 1,
+					requirements: [
+						{
+							acquisitionFactId: "water",
+							factId: "water",
+							quantity: 3,
+							sources: [
+								"material-input",
+							],
+							usage: "consume",
+						},
+					],
+					rootQuantity: 0,
+					routeId: "line:forge:tool",
+					source: "route",
+				},
+				{
+					actionRuns: 1,
+					durationMs: 500,
+					factId: "water",
+					outputRuns: 1,
+					quantity: 3,
+					requirements: [],
+					rootQuantity: 0,
+					routeId: "line:well:water",
+					source: "route",
+				},
+			],
 		};
 		const container = await render({
 			estimate,
@@ -167,6 +203,7 @@ describe("EditorItemEstimateSection", () => {
 			factId: "tool",
 			limitations: [],
 			obtainable: false,
+			status: "unreachable",
 			quantity: 1,
 			rejectedRoutes: [],
 		};
@@ -177,6 +214,67 @@ describe("EditorItemEstimateSection", () => {
 
 		expect(container.textContent).toContain("No complete path");
 		expect(container.textContent).toContain("tool × 1 has no complete acquisition route");
+	});
+
+	it("renders every unsupported availability-condition detail", async () => {
+		const estimate: EditorItemEstimate = {
+			diagnostics: [
+				{
+					factId: "water",
+					kind: "availability-condition-unsupported",
+					reason: "upper-bound",
+					routeId: "line:forge:run",
+					source: "output-condition",
+				},
+			],
+			factId: "tool",
+			limitations: [],
+			obtainable: false,
+			quantity: 1,
+			rejectedRoutes: [],
+			status: "partial",
+		};
+		const container = await render({
+			estimate,
+			status: "ready",
+		});
+
+		expect(container.textContent).toContain(
+			"Availability condition for water is unsupported on route line:forge:run (output-condition, upper-bound).",
+		);
+		expect(container.textContent).not.toContain("undefined");
+	});
+
+	it("renders charged renewal as incomplete without complete totals", async () => {
+		const estimate: EditorItemEstimate = {
+			diagnostics: [
+				{
+					factIds: [
+						"tree",
+						"water",
+						"tree",
+					],
+					kind: "charge-renewal-unsupported",
+					routeId: "line:seed:grow",
+				},
+			],
+			factId: "tool",
+			limitations: [],
+			obtainable: false,
+			quantity: 1,
+			rejectedRoutes: [],
+			status: "partial",
+		};
+		const container = await render({
+			estimate,
+			status: "ready",
+		});
+
+		expect(container.textContent).toContain("Incomplete static path");
+		expect(container.textContent).toContain("Indeterminate");
+		expect(container.textContent).toContain("tree → water → tree");
+		expect(container.textContent).not.toContain("Consumed");
+		expect(container.textContent).not.toContain("Sequential duration");
 	});
 
 	it("shows progress while the estimate worker is running", async () => {

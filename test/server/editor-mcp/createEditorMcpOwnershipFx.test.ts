@@ -11,6 +11,8 @@ import {
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
+import { editorItemEstimateMaximumQuantity } from "~/editor/estimator/EditorItemEstimateQuantitySchema";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
@@ -542,6 +544,13 @@ describe("createEditorMcpOwnershipFx", () => {
 				text: expect.not.stringContaining("source:forge:line:line:forge:run"),
 			},
 		]);
+		expect(itemOutcome.content).toMatchObject([
+			{
+				text: expect.stringContaining(
+					"requires all: water [water; simple] (quantity 3, consume, material-input)",
+				),
+			},
+		]);
 		expect(itemOutcome).not.toHaveProperty("structuredContent");
 		const itemIncome = await client.callTool({
 			name: "item_income",
@@ -584,7 +593,7 @@ describe("createEditorMcpOwnershipFx", () => {
 		]);
 		expect(itemEstimate.content).toMatchObject([
 			{
-				text: expect.stringContaining("\nStatus: obtainable\nSequential duration: 1 s"),
+				text: expect.stringContaining("\nStatus: complete\nSequential duration: 1 s"),
 			},
 		]);
 		expect(itemEstimate.content).toMatchObject([
@@ -596,7 +605,7 @@ describe("createEditorMcpOwnershipFx", () => {
 		]);
 		expect(itemEstimate.content).toMatchObject([
 			{
-				text: expect.stringContaining("Selected route tree:\n  - ingot [Ingot; simple]"),
+				text: expect.stringContaining("Selected route graph:\n  - ingot [Ingot; simple]"),
 			},
 		]);
 		expect(itemEstimate.content).toMatchObject([
@@ -611,6 +620,77 @@ describe("createEditorMcpOwnershipFx", () => {
 		]);
 		expect(JSON.stringify(itemEstimate.content)).not.toContain("Search:");
 		expect(itemEstimate).not.toHaveProperty("structuredContent");
+		const graphForge = graphConfig.items.forge;
+		if (graphForge.type !== "producer") throw new Error("Expected graph producer fixture.");
+		const availabilityProjectId = "project-availability-condition";
+		await Effect.runPromise(
+			repository.createProjectFx({
+				projectId: availabilityProjectId,
+				config: GameConfigSchema.parse({
+					...graphConfig,
+					items: {
+						...graphConfig.items,
+						forge: {
+							...graphForge,
+							lines: graphForge.lines.map((line) => ({
+								...line,
+								rules: [
+									{
+										type: "enable",
+										when: [
+											{
+												count: 3,
+												query: {
+													scope: "universe",
+													selector: {
+														itemId: "water",
+														type: "item",
+													},
+												},
+												type: "count",
+											},
+										],
+									},
+								],
+							})),
+						},
+					},
+				}),
+				resources: [],
+			}),
+		);
+		ownership.setProjectContext(availabilityProjectId);
+		const availabilityEstimate = await client.callTool({
+			name: "item_estimate",
+			arguments: {
+				itemId: "ingot",
+			},
+		});
+		const availabilityText = availabilityEstimate.content.flatMap((content) =>
+			content.type === "text"
+				? [
+						content.text,
+					]
+				: [],
+		)[0];
+		expect(availabilityText).toContain(
+			"availability condition for water is unsupported on line-output:forge:line:forge:run:set:0:roll:0:drop:0:ingot (line-condition, exact-count)",
+		);
+		expect(availabilityText).not.toContain("undefined");
+		ownership.setProjectContext(graphProjectId);
+		const oversizedEstimate = await client.callTool({
+			name: "item_estimate",
+			arguments: {
+				itemId: "ingot",
+				quantity: editorItemEstimateMaximumQuantity + 1,
+			},
+		});
+		expect(oversizedEstimate).toMatchObject({
+			isError: true,
+		});
+		expect(JSON.stringify(oversizedEstimate.content)).toContain(
+			String(editorItemEstimateMaximumQuantity),
+		);
 
 		const unreachableEstimate = await client.callTool({
 			name: "item_estimate",
@@ -625,6 +705,52 @@ describe("createEditorMcpOwnershipFx", () => {
 				),
 			},
 		]);
+
+		const officialConfig = await readArkiniGameConfigSource();
+		const highFanInProjectId = "official-high-fan-in";
+		await Effect.runPromise(
+			repository.createProjectFx({
+				config: officialConfig,
+				projectId: highFanInProjectId,
+				resources: [],
+			}),
+		);
+		ownership.setProjectContext(highFanInProjectId);
+		const highFanInEstimate = await client.callTool({
+			name: "item_estimate",
+			arguments: {
+				itemId: "item:pollution",
+			},
+		});
+		const highFanInText = highFanInEstimate.content.flatMap((content) =>
+			content.type === "text"
+				? [
+						content.text,
+					]
+				: [],
+		)[0];
+		expect(highFanInText).toContain("Selected route graph:");
+		expect(highFanInText).toContain(" -> ");
+		expect(highFanInText?.length).toBeLessThan(100_000);
+		const partialEstimate = await client.callTool({
+			name: "item_estimate",
+			arguments: {
+				itemId: "item:axe",
+			},
+		});
+		const partialText = partialEstimate.content.flatMap((content) =>
+			content.type === "text"
+				? [
+						content.text,
+					]
+				: [],
+		)[0];
+		expect(partialText).toContain("Status: partial");
+		expect(partialText).toContain("charged-item renewal unsupported");
+		expect(partialText).toContain("item:cracked-rock -> item:rock -> item:cracked-rock");
+		expect(partialText).not.toContain("Sequential duration:");
+		expect(partialText).not.toContain("Consumables:");
+		ownership.setProjectContext(projectId);
 		expect(unreachableEstimate.content).toMatchObject([
 			{
 				text: expect.stringContaining(

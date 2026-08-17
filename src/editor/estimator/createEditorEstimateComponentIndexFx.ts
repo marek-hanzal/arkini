@@ -1,17 +1,16 @@
 import { Effect } from "effect";
 
-import type { EditorEstimateDependencyGraph } from "~/editor/estimator/EditorEstimateDependencyGraph";
+import type { EditorAcquisitionGraph } from "~/editor/EditorAcquisitionGraph";
 
 export interface EditorEstimateComponentIndex {
 	readonly componentByFact: ReadonlyMap<string, string>;
 	readonly seededComponentByFact: ReadonlyMap<string, string>;
-	readonly seededComponentIds: ReadonlySet<string>;
 }
 
 /** Builds static strongly-connected-component membership and authored-seed evidence. */
 export const createEditorEstimateComponentIndexFx = Effect.fn(
 	"createEditorEstimateComponentIndexFx",
-)((graph: EditorEstimateDependencyGraph) =>
+)((graph: EditorAcquisitionGraph) =>
 	Effect.sync((): EditorEstimateComponentIndex => {
 		const rootFactIds = new Set(graph.roots.map(({ factId }) => factId));
 		const adjacency = new Map<string, Set<string>>(
@@ -20,12 +19,15 @@ export const createEditorEstimateComponentIndexFx = Effect.fn(
 				new Set<string>(),
 			]),
 		);
-		for (const route of graph.routes)
+		for (const route of graph.routes) {
 			for (const requirement of [
 				...route.requirements.allOf,
 				...route.requirements.anyOf.flat(),
 			])
 				adjacency.get(route.output.factId)?.add(requirement.factId);
+			for (const chargeUse of route.chargeUses ?? [])
+				adjacency.get(route.output.factId)?.add(chargeUse.payerFactId);
+		}
 		const reachableByFact = new Map<string, Set<string>>();
 		for (const id of graph.factIds) {
 			const reachable = new Set<string>();
@@ -62,7 +64,6 @@ export const createEditorEstimateComponentIndexFx = Effect.fn(
 					...componentByFact,
 				].filter(([, componentId]) => seededComponentIds.has(componentId)),
 			),
-			seededComponentIds,
 		};
 	}),
 );

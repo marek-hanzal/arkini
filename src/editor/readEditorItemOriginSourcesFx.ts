@@ -1,207 +1,216 @@
 import { Effect } from "effect";
 
 import type {
+	EditorAcquisitionGraph,
+	EditorAcquisitionRoute,
+} from "~/editor/EditorAcquisitionGraph";
+import type {
 	EditorItemOriginInputOccurrence,
-	EditorItemOriginOutputKind,
-	EditorItemOriginOutputOccurrence,
+	EditorItemOriginOutputRequirements,
+	EditorItemOriginRequirementOccurrence,
 	EditorItemOriginSource,
+	EditorItemOriginSourceReference,
 } from "~/editor/EditorItemOriginSource";
-import type { InputSchema } from "~/engine/input/schema/InputSchema";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import type { LineSchema } from "~/engine/line/schema/LineSchema";
-import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 
 const unique = <Value>(values: ReadonlyArray<Value>): Value[] => [
 	...new Set(values),
 ];
 
-const readOutputOccurrences = (
-	output: OutputSchema.Type | undefined,
-): EditorItemOriginOutputOccurrence[] => {
-	if (output === undefined) return [];
-	const weightedSet = output.set.length > 1;
-	return output.set.flatMap((set) =>
-		set.roll.flatMap((roll) => {
-			const selectionKind: EditorItemOriginOutputKind =
-				roll.type === "weight"
-					? "weighted"
-					: roll.type === "chance"
-						? "chance"
-						: "guaranteed";
-			const drops =
-				roll.type === "weight"
-					? roll.drop.flatMap((candidate) => candidate.drop)
-					: roll.drop;
-			return drops.map((drop) => ({
-				itemId: drop.itemId,
-				placement: drop.placement,
-				quantity: drop.quantity,
-				selectionKind,
-				weightedSet,
-			}));
-		}),
-	);
+const readOwnerItemId = (route: EditorAcquisitionRoute) => {
+	switch (route.metadata.kind) {
+		case "line-output":
+			return route.metadata.ownerItemId;
+		case "line-charge-depletion":
+			return route.metadata.chargedItemId;
+		case "merge-output":
+			return route.metadata.sourceItemId;
+		case "temporary-expiry":
+			return route.metadata.itemId;
+	}
 };
 
-const dedupeOccurrences = (occurrences: ReadonlyArray<EditorItemOriginOutputOccurrence>) => {
+const readReference = (route: EditorAcquisitionRoute): EditorItemOriginSourceReference => {
+	switch (route.metadata.kind) {
+		case "line-output":
+			return {
+				lineId: route.metadata.lineId,
+				type: "line",
+			};
+		case "line-charge-depletion":
+			return {
+				type: "charges",
+			};
+		case "merge-output":
+			return {
+				ruleNumber: route.metadata.mergeIndex + 1,
+				type: "merge",
+			};
+		case "temporary-expiry":
+			return {
+				type: "expiry",
+			};
+	}
+};
+
+const readInputOccurrences = (
+	routes: ReadonlyArray<EditorAcquisitionRoute>,
+): EditorItemOriginInputOccurrence[] => {
+	const inputs =
+		routes[0]?.operation?.inputs.map(({ factId, quantity }) => ({
+			itemId: factId,
+			quantity,
+		})) ?? [];
 	const seen = new Set<string>();
-	return occurrences.filter((occurrence) => {
-		const key = `${occurrence.itemId}:${occurrence.quantity.min}:${occurrence.quantity.max}:${occurrence.selectionKind}:${occurrence.placement ?? "none"}:${occurrence.weightedSet}`;
+	return inputs.filter(({ itemId, quantity }) => {
+		const key = `${itemId}:${quantity.min}:${quantity.max}`;
 		if (seen.has(key)) return false;
 		seen.add(key);
 		return true;
 	});
 };
 
-const readInputOccurrence = (
-	input: InputSchema.Type,
-): EditorItemOriginInputOccurrence | undefined => {
-	switch (input.type) {
-		case "simple":
-			return undefined;
-		case "materials":
-			return {
-				itemId: input.selector.itemId,
-				quantity: input.quantity,
-			};
-		case "deposit":
-			return {
-				itemId: input.query.selector.itemId,
-				quantity: {
-					min: 1,
-					max: 1,
-				},
-			};
+const readRequirementOccurrence = (
+	requirement: EditorAcquisitionRoute["requirements"]["allOf"][number],
+): EditorItemOriginRequirementOccurrence => ({
+	itemId: requirement.factId,
+	quantity: {
+		max: requirement.quantity,
+		min: requirement.quantity,
+	},
+	...(requirement.identity === undefined
+		? {}
+		: {
+				identity: requirement.identity,
+			}),
+	sources: [
+		requirement.source,
+	],
+	usage: requirement.usage,
+});
+
+const readOutputRequirements = (
+	route: EditorAcquisitionRoute,
+): EditorItemOriginOutputRequirements => ({
+	allOf: route.requirements.allOf.map(readRequirementOccurrence),
+	anyOf: route.requirements.anyOf.map((clause) => clause.map(readRequirementOccurrence)),
+	...(route.requirements.unsupported === undefined
+		? {}
+		: {
+				unsupported: route.requirements.unsupported.map(({ factId, reason, source }) => ({
+					itemId: factId,
+					reason,
+					source,
+				})),
+			}),
+});
+
+const readLabel = (route: EditorAcquisitionRoute) => {
+	switch (route.metadata.kind) {
+		case "line-output":
+			return route.metadata.lineTitle;
+		case "line-charge-depletion":
+			return "Depletion";
+		case "merge-output":
+			return "Merge";
+		case "temporary-expiry":
+			return "Expiry";
 	}
 };
 
-const readLineSources = (
-	item: ItemSchema.Type,
-	lines: ReadonlyArray<LineSchema.Type>,
-): EditorItemOriginSource[] =>
-	lines.flatMap((line, index) => {
-		const outputs = dedupeOccurrences(readOutputOccurrences(line.output));
-		if (outputs.length === 0) return [];
-		const inputs = line.input
-			.map(readInputOccurrence)
-			.filter((input): input is EditorItemOriginInputOccurrence => input !== undefined);
+const readKind = (route: EditorAcquisitionRoute): EditorItemOriginSource["kind"] => {
+	switch (route.metadata.kind) {
+		case "line-output":
+			return "line";
+		case "line-charge-depletion":
+			return "charges";
+		case "merge-output":
+			return "merge";
+		case "temporary-expiry":
+			return "expiry";
+	}
+};
+
+const readRuntimeMs = (route: EditorAcquisitionRoute) =>
+	route.metadata.kind === "merge-output" || route.metadata.kind === "line-charge-depletion"
+		? undefined
+		: route.durationMs;
+
+const readRequirementItemIds = (
+	ownerItemId: string,
+	routes: ReadonlyArray<EditorAcquisitionRoute>,
+) =>
+	unique([
+		ownerItemId,
+		...routes.flatMap((route) => route.operation?.inputs.map(({ factId }) => factId) ?? []),
+		...routes.flatMap((route) =>
+			(route.chargeUses ?? []).map(({ payerFactId }) => payerFactId),
+		),
+		...routes.flatMap((route) => route.requirements.allOf.map(({ factId }) => factId)),
+		...routes.flatMap((route) =>
+			route.requirements.anyOf.flatMap((clause) => clause.map(({ factId }) => factId)),
+		),
+		...routes.flatMap((route) =>
+			(route.requirements.unsupported ?? []).map(({ factId }) => factId),
+		),
+	]);
+
+const readOutputs = (routes: ReadonlyArray<EditorAcquisitionRoute>) => {
+	const seen = new Set<string>();
+	return routes.flatMap((route) => {
+		const output = {
+			itemId: route.output.factId,
+			placement: route.output.annotation.placement,
+			quantity: route.output.annotation.quantity,
+			routeId: route.id,
+			requirements: readOutputRequirements(route),
+			selectionKind: route.output.annotation.selectionKind,
+			weightedSet: route.output.annotation.alternativeSet,
+		};
+		const key = route.id;
+		if (seen.has(key)) return [];
+		seen.add(key);
 		return [
-			{
-				id: `source:${item.id}:line:${line.id || index}`,
-				inputs,
-				kind: "line",
-				label: line.title || "Production",
-				outputs,
-				ownerItemId: item.id,
-				reference: {
-					type: "line",
-					lineId: line.id || `line #${index + 1}`,
-				},
-				requirementItemIds: unique([
-					item.id,
-					...inputs.map(({ itemId }) => itemId),
-				]),
-				runtimeMs: line.runtimeMs,
-			},
+			output,
 		];
 	});
-
-const projectEditorItemOriginSources = (item: ItemSchema.Type): EditorItemOriginSource[] => {
-	const sources: EditorItemOriginSource[] = [];
-	switch (item.type) {
-		case "blueprint":
-		case "craft":
-		case "stash":
-			sources.push(
-				...readLineSources(item, [
-					item.line,
-				]),
-			);
-			break;
-		case "deposit":
-		case "producer":
-			sources.push(...readLineSources(item, item.lines ?? []));
-			break;
-	}
-	const depletedOutputs = dedupeOccurrences(readOutputOccurrences(item.charges?.output));
-	if (depletedOutputs.length > 0)
-		sources.push({
-			id: `source:${item.id}:charges`,
-			inputs: [],
-			kind: "charges",
-			label: "Depletion",
-			outputs: depletedOutputs,
-			ownerItemId: item.id,
-			reference: {
-				type: "charges",
-			},
-			requirementItemIds: [
-				item.id,
-			],
-		});
-	if (item.type === "temporary") {
-		const expiryOutputs = dedupeOccurrences(readOutputOccurrences(item.output));
-		if (expiryOutputs.length > 0)
-			sources.push({
-				id: `source:${item.id}:expiry`,
-				inputs: [],
-				kind: "expiry",
-				label: "Expiry",
-				outputs: expiryOutputs,
-				ownerItemId: item.id,
-				reference: {
-					type: "expiry",
-				},
-				requirementItemIds: [
-					item.id,
-				],
-				runtimeMs: item.durationMs,
-			});
-	}
-	for (const [index, merge] of (item.merge ?? []).entries()) {
-		const outputs = readOutputOccurrences(merge.output);
-		if (merge.effect === "replace")
-			outputs.push({
-				itemId: merge.result,
-				placement: undefined,
-				quantity: {
-					min: 1,
-					max: 1,
-				},
-				selectionKind: "replace",
-				weightedSet: false,
-			});
-		const deduped = dedupeOccurrences(outputs);
-		if (deduped.length === 0) continue;
-		sources.push({
-			id: `source:${item.id}:merge:${index}`,
-			inputs: [
-				{
-					itemId: merge.target.itemId,
-					quantity: {
-						min: 1,
-						max: 1,
-					},
-				},
-			],
-			kind: "merge",
-			label: "Merge",
-			outputs: deduped,
-			ownerItemId: item.id,
-			reference: {
-				type: "merge",
-				ruleNumber: index + 1,
-			},
-			requirementItemIds: unique([
-				item.id,
-				merge.target.itemId,
-			]),
-		});
-	}
-	return sources;
 };
 
-/** Reads every concrete acquisition relationship authored by one item definition. */
+const projectRoutes = (routes: ReadonlyArray<EditorAcquisitionRoute>): EditorItemOriginSource => {
+	const route = routes[0];
+	if (route === undefined) throw new Error("Cannot project an empty acquisition operation.");
+	const ownerItemId = readOwnerItemId(route);
+	const runtimeMs = readRuntimeMs(route);
+	return {
+		id: route.operation?.id ?? route.id,
+		inputs: readInputOccurrences(routes),
+		kind: readKind(route),
+		label: readLabel(route),
+		outputs: readOutputs(routes),
+		ownerItemId,
+		reference: readReference(route),
+		requirementItemIds: readRequirementItemIds(ownerItemId, routes),
+		routeIds: routes.map(({ id }) => id),
+		...(runtimeMs === undefined
+			? {}
+			: {
+					runtimeMs,
+				}),
+	};
+};
+
+/** Groups canonical output-occurrence routes into their authored item-origin operations. */
 export const readEditorItemOriginSourcesFx = Effect.fn("readEditorItemOriginSourcesFx")(
-	(item: ItemSchema.Type) => Effect.sync(() => projectEditorItemOriginSources(item)),
+	(graph: EditorAcquisitionGraph) =>
+		Effect.sync(() => {
+			const routesByOperationId = new Map<string, EditorAcquisitionRoute[]>();
+			for (const route of graph.routes) {
+				const operationId = route.operation?.id ?? route.id;
+				const routes = routesByOperationId.get(operationId) ?? [];
+				routes.push(route);
+				routesByOperationId.set(operationId, routes);
+			}
+			return [
+				...routesByOperationId.values(),
+			].map(projectRoutes);
+		}),
 );

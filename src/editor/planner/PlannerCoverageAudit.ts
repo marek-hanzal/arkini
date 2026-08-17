@@ -8,6 +8,15 @@ import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 
 export type PlannerCoverageAuditOutcome = "completed" | "inconclusive" | "no-finite-path";
 
+export interface PlannerCoverageAuditProgress {
+	readonly index: number;
+	readonly itemId: IdSchema.Type;
+	readonly outcome: PlannerCoverageAuditOutcome;
+	readonly searchDurationMs: number;
+	readonly title: string;
+	readonly total: number;
+}
+
 export interface PlannerCoverageAuditFrequency {
 	readonly count: number;
 	readonly key: string;

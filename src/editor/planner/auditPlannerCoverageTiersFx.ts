@@ -12,7 +12,7 @@ import {
 	type PlannerCoverageTierAuditTier,
 	type PlannerCoverageTierDefinition,
 } from "~/editor/planner/PlannerCoverageTierAudit";
-import { auditPlannerCoverageWithPlannerFx } from "~/editor/planner/auditPlannerCoverageFx";
+import { auditPlannerCoverageWithPlannerFx } from "~/editor/planner/auditPlannerCoverageWithPlannerFx";
 import { createBestFirstPlannerStrategyFx } from "~/editor/planner/createBestFirstPlannerStrategyFx";
 import { createPlannerFx } from "~/editor/planner/createPlannerFx";
 import { mergePlannerCoverageTierAuditReportsFx } from "~/editor/planner/mergePlannerCoverageTierAuditReportsFx";

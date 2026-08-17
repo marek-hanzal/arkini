@@ -1,10 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import {
-	auditPlannerCoverageFx,
-	type PlannerCoverageAuditProgress,
-} from "~/editor/planner/auditPlannerCoverageFx";
+import { auditPlannerCoverageFx } from "~/editor/planner/auditPlannerCoverageFx";
+import type { PlannerCoverageAuditProgress } from "~/editor/planner/PlannerCoverageAudit";
 import { auditPlannerCoverageTiersFx } from "~/editor/planner/auditPlannerCoverageTiersFx";
 import { mergePlannerCoverageTierAuditReportsFx } from "~/editor/planner/mergePlannerCoverageTierAuditReportsFx";
 import type { PlannerCoverageTierAuditProgress } from "~/editor/planner/PlannerCoverageTierAudit";

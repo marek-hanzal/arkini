@@ -8,7 +8,7 @@ import {
 	type PlannerCoverageTierAuditReport,
 	type PlannerCoverageTierAuditTier,
 } from "~/editor/planner/PlannerCoverageTierAudit";
-import { readPlannerCoverageAuditSummaryFx } from "~/editor/planner/auditPlannerCoverageFx";
+import { readPlannerCoverageAuditSummaryFx } from "~/editor/planner/readPlannerCoverageAuditSummaryFx";
 import { readPlannerCoverageAuditOutcomeCountsFx } from "~/editor/planner/readPlannerCoverageAuditOutcomeCountsFx";
 
 const BudgetKeys = [

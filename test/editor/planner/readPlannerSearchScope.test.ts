@@ -7,10 +7,8 @@ import type {
 	PlannerAcquisitionRequirement,
 	PlannerAcquisitionRoute,
 } from "~/editor/planner/PlannerAcquisitionGraph";
-import {
-	readPlannerSearchScopeFx,
-	readPlannerSearchScopesFx,
-} from "~/editor/planner/readPlannerSearchScopeFx";
+import { readPlannerSearchScopeFx } from "~/editor/planner/readPlannerSearchScopeFx";
+import { readPlannerSearchScopesFx } from "~/editor/planner/readPlannerSearchScopesFx";
 import { resolvePlannerRouteReachabilityFx } from "~/editor/planner/resolvePlannerRouteReachabilityFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 

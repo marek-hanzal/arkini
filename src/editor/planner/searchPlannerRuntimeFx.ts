@@ -22,10 +22,8 @@ import type { PlannerSearchPriorityPlan } from "~/editor/planner/PlannerSearchPr
 import { readPlannerActiveDemandFx } from "~/editor/planner/readPlannerActiveDemandFx";
 import { readPlannerSearchPriorityFx } from "~/editor/planner/readPlannerSearchPriorityFx";
 import { readPlannerSearchPriorityPlanFx } from "~/editor/planner/readPlannerSearchPriorityPlanFx";
-import {
-	readPlannerSearchScopeFx,
-	readPlannerSearchScopesFx,
-} from "~/editor/planner/readPlannerSearchScopeFx";
+import { readPlannerSearchScopeFx } from "~/editor/planner/readPlannerSearchScopeFx";
+import { readPlannerSearchScopesFx } from "~/editor/planner/readPlannerSearchScopesFx";
 import { readPlannerStructuralReachabilityFx } from "~/editor/planner/readPlannerStructuralReachabilityFx";
 import { runPlannerSearchCandidateFx } from "~/editor/planner/runPlannerSearchCandidateFx";
 import type { PlannerAcquisitionGraph } from "~/editor/planner/PlannerAcquisitionGraph";

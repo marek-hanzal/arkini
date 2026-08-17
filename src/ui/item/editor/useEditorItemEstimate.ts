@@ -2,7 +2,7 @@ import { useAtom } from "@effect/atom-react";
 import { useEffect, useMemo } from "react";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
-import type { EditorItemSimulation } from "~/editor/simulator/EditorItemSimulation";
+import type { EditorItemEstimate } from "~/editor/estimator/EditorItemEstimate";
 import {
 	EditorItemEstimateCacheAtom,
 	type EditorItemEstimateCacheAtom as EditorItemEstimateCache,
@@ -13,7 +13,7 @@ export type EditorItemEstimateState =
 			readonly status: "loading";
 	  }
 	| {
-			readonly estimate: EditorItemSimulation;
+			readonly estimate: EditorItemEstimate;
 			readonly status: "ready";
 	  }
 	| {
@@ -43,41 +43,33 @@ export const useEditorItemEstimate = (
 			project.revision,
 		],
 	);
-	const request = useMemo<EditorItemEstimateCache.Request>(
-		() => ({
-			itemId,
-			quantity: 1,
-			snapshot,
-			type: "item",
-		}),
-		[
-			itemId,
-			snapshot,
-		],
-	);
 	const [state, requestEstimate] = useAtom(EditorItemEstimateCacheAtom);
 
 	useEffect(() => {
-		requestEstimate(request);
+		requestEstimate(snapshot);
 	}, [
-		request,
 		requestEstimate,
+		snapshot,
 	]);
 
 	if (!sameSnapshot(state.snapshot, snapshot))
 		return {
 			status: "loading",
 		};
-	const estimate = state.estimates.get(itemId)?.get(1);
+	if (state.status === "error")
+		return {
+			message: state.message ?? "Estimate calculation failed.",
+			status: "error",
+		};
+	const estimate = state.estimates.get(itemId);
 	if (estimate !== undefined)
 		return {
 			estimate,
 			status: "ready",
 		};
-	const message = state.errors.get(itemId)?.get(1);
-	if (message !== undefined)
+	if (state.status === "ready")
 		return {
-			message,
+			message: `The estimate batch did not return ${itemId}.`,
 			status: "error",
 		};
 	return {

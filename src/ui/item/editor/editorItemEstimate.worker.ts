@@ -1,4 +1,7 @@
-import { simulateEditorItemFx } from "~/editor/simulator/simulateEditorItemFx";
+import { Effect } from "effect";
+
+import { createEditorEstimateDependencyGraphFx } from "~/editor/estimator/createEditorEstimateDependencyGraphFx";
+import { estimateEditorItemFx } from "~/editor/estimator/estimateEditorItemFx";
 import { EditorItemEstimateWorkerRuntime } from "~/ui/item/editor/EditorItemEstimateWorkerRuntime";
 import type {
 	EditorItemEstimateWorkerRequest,
@@ -7,13 +10,21 @@ import type {
 
 self.addEventListener("message", ({ data }: MessageEvent<EditorItemEstimateWorkerRequest>) => {
 	void EditorItemEstimateWorkerRuntime.runPromise(
-		simulateEditorItemFx(data.config, data.itemId, data.quantity),
+		Effect.gen(function* () {
+			const graph = yield* createEditorEstimateDependencyGraphFx(data.config);
+			return yield* Effect.forEach(Object.keys(data.config.items).sort(), (itemId) =>
+				estimateEditorItemFx({
+					factId: itemId,
+					graph,
+					quantity: 1,
+				}),
+			);
+		}),
 	).then(
-		(estimate) =>
+		(estimates) =>
 			self.postMessage({
 				result: {
-					estimate,
-					type: "item",
+					estimates,
 				},
 				status: "success",
 			} satisfies EditorItemEstimateWorkerResponse),

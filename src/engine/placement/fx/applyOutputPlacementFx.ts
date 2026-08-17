@@ -7,7 +7,7 @@ import type { DropPlacementResultSchema } from "~/engine/placement/schema/DropPl
 import type { OutputPlacementResultSchema } from "~/engine/placement/schema/OutputPlacementResultSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { applyPlacementPlanFx } from "./applyPlacementPlanFx";
-import { planPolicyDropPlacementFx } from "./planPolicyDropPlacementFx";
+import { planDropPlacementFx } from "./planDropPlacementFx";
 
 export namespace applyOutputPlacementFx {
 	export interface Props {
@@ -42,7 +42,7 @@ export const applyOutputPlacementFx = Effect.fn("applyOutputPlacementFx")(functi
 		}),
 		(state, drop) => {
 			return Effect.gen(function* () {
-				const plan = yield* planPolicyDropPlacementFx({
+				const plan = yield* planDropPlacementFx({
 					drop,
 					excludedLocations,
 					origin,

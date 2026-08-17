@@ -1,184 +1,124 @@
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { EditorItemSimulation } from "~/editor/simulator/EditorItemSimulation";
+import type {
+	EditorItemEstimate,
+	EditorItemEstimateAmount,
+	EditorItemEstimateDiagnostic,
+	EditorItemEstimateRouteStep,
+} from "~/editor/estimator/EditorItemEstimate";
+import type { EditorEstimateLimitation } from "~/editor/estimator/EditorEstimateDependencyGraph";
 import { formatItemDurationFx } from "~/ui/item-detail/formatItemDurationFx";
 import { EditorItemDetailReference } from "~/ui/item/editor/EditorItemDetailReference";
 import { useEditorItemEstimate } from "~/ui/item/editor/useEditorItemEstimate";
 import { Status } from "~/ui/status/Status";
 
-const BlockerTitle = {
-	"dependency-cycle": "Dependency cycle",
-	"missing-source": "Missing source",
-	"operation-blocked": "Blocked operation",
-	"production-stalled": "Production stalled",
-	"run-limit": "Run limit reached",
-} as const;
-
 const formatQuantity = (quantity: number) =>
 	Number.isInteger(quantity) ? String(quantity) : quantity.toFixed(2).replace(/\.00$/, "");
-
-const formatCountLabel = (quantity: number, singular: string, plural = `${singular}s`) =>
-	`${formatQuantity(quantity)} ${quantity === 1 ? singular : plural}`;
 
 const formatRuntime = (runtimeMs: number) =>
 	RendererRuntime.runSync(formatItemDurationFx(runtimeMs));
 
-const formatProbability = (probability: number) => {
-	const percentage = probability * 100;
-	if (percentage === 0 || percentage >= 0.01)
-		return `${formatQuantity(Number(percentage.toFixed(2)))}%`;
-	return `${percentage.toPrecision(2)}%`;
-};
-
-type EngineBackedPlanner = NonNullable<EditorItemSimulation["planner"]>;
-type PlannerSearchDiagnostics = NonNullable<EngineBackedPlanner["diagnostics"]>;
-
-const formatPlannerActionId = (actionId: string) => {
-	try {
-		const parsed: unknown = JSON.parse(actionId);
-		if (Array.isArray(parsed)) {
-			const label = parsed.at(-1);
-			if (typeof label === "string") return label;
-		}
-	} catch {
-		// Human-authored or future action IDs remain useful as-is.
-	}
-	return actionId;
-};
-
-const formatRoutePlanOutcome = (
-	outcome: PlannerSearchDiagnostics["routePlans"][number]["outcome"],
-) => {
-	switch (outcome) {
-		case "completed":
-			return "completed";
-		case "non-quiescent-runtime":
-			return "left a non-quiescent runtime";
-		case "search-budget":
-			return "hit its search budget";
-		case "search-exhausted":
-			return "exhausted its candidate frontier";
+const diagnosticText = (diagnostic: EditorItemEstimateDiagnostic) => {
+	switch (diagnostic.kind) {
+		case "cycle":
+			return `Cycle on route ${diagnostic.routeId}: ${diagnostic.factIds.join(" → ")}.`;
+		case "unreachable":
+			return `${diagnostic.factId} × ${formatQuantity(diagnostic.quantity)} has no complete acquisition route${diagnostic.routeId === undefined ? "" : ` through ${diagnostic.routeId}`}.`;
+		case "zero-yield":
+			return `Route ${diagnostic.routeId} can never yield ${diagnostic.factId}.`;
 	}
 };
 
-const formatRoutePlanDetour = (
-	detour: PlannerSearchDiagnostics["routePlans"][number]["detours"][number],
-) => {
-	const alternative = `${detour.alternativeIndex + 1}/${detour.alternativeCount}`;
-	const depth = detour.depthExcess === 0 ? "same depth" : `+${detour.depthExcess} depth`;
-	switch (detour.type) {
-		case "acquisition-route":
-			return `acquire ${detour.itemId} via alternative ${alternative} (${depth})`;
-		case "renewal-route":
-			return `renew ${detour.itemId} via alternative ${alternative} (${depth})`;
-		case "requirement":
-			return `satisfy an any-of rule with ${detour.itemId}, alternative ${alternative} (${depth})`;
+const limitationText = (limitation: EditorEstimateLimitation) => {
+	switch (limitation) {
+		case "charge-renewal-approximated":
+			return "Charged payers are reusable capabilities; renewal timing beyond authored depletion routes is approximated.";
+		case "conditional-runtime-adjustments-ignored":
+			return "Conditional runtime adjustment and multiplier rules are not included.";
+		case "spatial-requirements-approximated":
+			return "Board scope, distance, and concrete placement are approximated from authored item availability.";
 	}
 };
 
-const readRoutePlanDetails = (planner: EngineBackedPlanner): ReadonlyArray<string> => {
-	const diagnostics = planner.diagnostics;
-	if (diagnostics === null) return [];
-	if (diagnostics.attemptedRoutePlans === 0)
-		return [
-			planner.type === "no-finite-path"
-				? "Route plans: none executed; the acquisition graph resolved the target first."
-				: planner.type === "completed"
-					? "Route plans: no engine pass was required because the target was already available."
-					: "Route plans: no engine pass was executed before the search stopped.",
-		];
-
-	const winner = diagnostics.winningRoutePlanIndex;
-	const details: string[] = [
-		`Route plans: ${formatQuantity(diagnostics.attemptedRoutePlans)} tried${winner === undefined ? "; no plan completed" : `; plan ${winner} completed`}.`,
-	];
-	const failedPlans = diagnostics.routePlans.filter(({ index }) => index !== winner);
-	for (const attempt of failedPlans.slice(0, 2)) {
-		const furthestAction = attempt.bestTraceActionIds.at(-1);
-		details.push(
-			`Plan ${attempt.index}: ${formatRoutePlanOutcome(attempt.outcome)} after ${formatQuantity(attempt.expandedStates)} expanded states; best target quantity ${formatQuantity(attempt.bestAvailableQuantity)}${furthestAction === undefined ? "" : `; trace reached ${formatPlannerActionId(furthestAction)}`}.`,
-		);
-	}
-	if (failedPlans.length > 2)
-		details.push(`${formatQuantity(failedPlans.length - 2)} additional failed plans omitted.`);
-
-	const winningPlan = diagnostics.routePlans.find(({ index }) => index === winner);
-	if (winningPlan !== undefined)
-		if (winningPlan.detours.length === 0)
-			details.push("Winning plan used the locally shortest authored route choices.");
-		else {
-			const rendered = winningPlan.detours.slice(0, 2).map(formatRoutePlanDetour);
-			details.push(
-				`Winning detour: ${rendered.join("; ")}${winningPlan.detours.length > 2 ? `; ${winningPlan.detours.length - 2} more` : ""}.`,
-			);
-		}
-	return details;
-};
-
-const readPlannerStrategyDetails = (planner: EngineBackedPlanner): ReadonlyArray<string> => {
-	const session = planner.sessionDiagnostics;
-	if (session === undefined) return [];
-	const { budget, invocations } = session;
-	const strategyIds = [
-		...new Set(invocations.map(({ strategyId }) => strategyId)),
-	];
-	return [
-		`Strategy root: ${planner.strategyId}.`,
-		`Strategy session: ${formatQuantity(invocations.length)} invocations, ${formatQuantity(budget.snapshot.engineTransitions)} engine transitions.`,
-		...(strategyIds.length === 0
-			? []
-			: [
-					`Algorithms used: ${strategyIds.join(" → ")}.`,
-				]),
-	];
-};
-
-const EditorItemEstimateItemRow = ({
-	itemId,
-	projectId,
-	quantity,
-	readyAtMs,
-	config,
-	unit,
+const EditorItemEstimateRouteTree = ({
+	route,
 }: {
+	readonly route: EditorItemEstimateRouteStep;
+}) => (
+	<li className="grid gap-1">
+		<span>
+			<strong className="font-medium text-foreground">{route.factId}</strong> ×{" "}
+			{formatQuantity(route.quantity)} via {route.routeId} ({formatRuntime(route.durationMs)})
+		</span>
+		{route.requirements.length > 0 ? (
+			<ul className="ml-4 grid gap-1 border-l border-line/70 pl-3">
+				{route.requirements.map((requirement, index) => (
+					<li key={`${requirement.factId}:${requirement.usage}:${index}`}>
+						<span>
+							{requirement.usage}: {requirement.factId} ×{" "}
+							{formatQuantity(requirement.quantity)}
+						</span>
+						{requirement.acquisition === undefined ? null : (
+							<ul className="mt-1">
+								<EditorItemEstimateRouteTree route={requirement.acquisition} />
+							</ul>
+						)}
+					</li>
+				))}
+			</ul>
+		) : null}
+	</li>
+);
+
+const EditorItemEstimateAmountList = ({
+	amounts,
+	config,
+	empty,
+	projectId,
+	title,
+}: {
+	readonly amounts: ReadonlyArray<EditorItemEstimateAmount>;
 	readonly config: ReturnType<typeof useEditorProject>["config"];
-	readonly itemId: string;
+	readonly empty: string;
 	readonly projectId: string;
-	readonly quantity: number;
-	readonly readyAtMs?: number;
-	readonly unit?: "charge";
-}) => {
-	const item = config.items[itemId];
-	return (
-		<li className="flex min-h-14 items-center justify-between gap-3 py-1.5 text-sm">
-			{item === undefined ? (
-				<span
-					className="min-w-0 truncate text-muted"
-					title={itemId}
-				>
-					{itemId} [missing]
-				</span>
-			) : (
-				<EditorItemDetailReference
-					item={item}
-					projectId={projectId}
-					sectionId="estimate"
-				/>
-			)}
-			<div className="shrink-0 text-right">
-				<strong className="block tabular-nums text-foreground">
-					× {formatQuantity(quantity)}
-					{unit === "charge" ? ` ${quantity === 1 ? "charge" : "charges"}` : ""}
-				</strong>
-				{readyAtMs === undefined ? null : (
-					<span className="block text-[0.6875rem] tabular-nums text-muted">
-						ready by {formatRuntime(readyAtMs)}
-					</span>
-				)}
-			</div>
-		</li>
-	);
-};
+	readonly title: string;
+}) => (
+	<section>
+		<h4 className="sticky top-0 z-10 border-b border-line/70 bg-surface-raised py-2 text-[0.6875rem] font-semibold uppercase tracking-wide text-muted">
+			{title}
+		</h4>
+		{amounts.length === 0 ? (
+			<p className="py-3 text-sm text-muted">{empty}</p>
+		) : (
+			<ul className="divide-y divide-line/60">
+				{amounts.map(({ factId, quantity }) => {
+					const item = config.items[factId];
+					return (
+						<li
+							className="flex min-h-14 items-center justify-between gap-3 py-1.5 text-sm"
+							key={factId}
+						>
+							{item === undefined ? (
+								<span className="min-w-0 truncate text-muted">
+									{factId} [missing]
+								</span>
+							) : (
+								<EditorItemDetailReference
+									item={item}
+									projectId={projectId}
+									sectionId="estimate"
+								/>
+							)}
+							<strong className="shrink-0 tabular-nums text-foreground">
+								× {formatQuantity(quantity)}
+							</strong>
+						</li>
+					);
+				})}
+			</ul>
+		)}
+	</section>
+);
 
 const EditorItemEstimateResultCard = ({
 	config,
@@ -186,309 +126,114 @@ const EditorItemEstimateResultCard = ({
 	projectId,
 }: {
 	readonly config: ReturnType<typeof useEditorProject>["config"];
-	readonly estimate: EditorItemSimulation;
+	readonly estimate: EditorItemEstimate;
 	readonly projectId: string;
-}) => {
-	const summary = (() => {
-		switch (estimate.status) {
-			case "estimated": {
-				const detail = [
-					formatCountLabel(estimate.cost.length, "consumed item type"),
-					formatCountLabel(estimate.chargeCost.length, "spent charge type"),
-					formatCountLabel(
-						estimate.requiredInfrastructure.length,
-						"required infrastructure type",
-					),
-					formatCountLabel(estimate.infrastructure.length, "constructed item type"),
-				].join(" · ");
-				const value =
-					estimate.totalCostQuantity > 0 && estimate.totalChargeCost > 0
-						? `${formatCountLabel(estimate.totalCostQuantity, "item")} + ${formatCountLabel(estimate.totalChargeCost, "charge")}`
-						: estimate.totalCostQuantity > 0
-							? formatCountLabel(estimate.totalCostQuantity, "item")
-							: estimate.totalChargeCost > 0
-								? formatCountLabel(estimate.totalChargeCost, "charge")
-								: estimate.requiredInfrastructure.length > 0 ||
-										estimate.infrastructure.length > 0
-									? "No consumables"
-									: "0 items";
-				return {
-					detail,
-					title: "Expected",
-					value,
-				};
-			}
-			case "no-finite-path":
-				return {
-					detail: `${estimate.blockers.length} production ${estimate.blockers.length === 1 ? "blocker" : "blockers"}`,
-					title: "No finite production path found",
-					value: "Blocked",
-				};
-			case "inconclusive":
-				return {
-					detail: "Bounded search could not decide",
-					title: "Estimate inconclusive",
-					value: "Undecided",
-				};
-		}
-	})();
-	return (
-		<article
-			className="flex min-h-0 min-w-0 flex-col rounded-lg border border-l-2 border-violet-300 border-l-violet-600 bg-surface-raised p-4"
-			data-ui="EditorItemEstimateResult"
-		>
-			<header className="flex items-start justify-between gap-4 border-b border-line/70 pb-3">
-				<div>
-					<h3 className="font-semibold text-foreground">{summary.title}</h3>
-					<p className="mt-1 text-xs text-muted">{summary.detail}</p>
-				</div>
-				<div className="text-right">
-					<p className="font-semibold tabular-nums text-foreground">{summary.value}</p>
-					<p className="mt-1 text-xs tabular-nums text-muted">
-						{estimate.runtimeMs === undefined
-							? estimate.status === "inconclusive"
-								? "No reliable runtime estimate"
-								: "No runtime estimate"
-							: formatRuntime(estimate.runtimeMs)}
-					</p>
-				</div>
-			</header>
-			{estimate.status === "no-finite-path" ? (
-				<ul className="min-h-0 flex-1 divide-y divide-line/60 overflow-y-auto pr-1">
-					{estimate.blockers.map((blocker) => {
-						const item = config.items[blocker.itemId];
-						return (
-							<li
-								className="grid gap-1.5 py-3"
-								key={`${blocker.code}:${blocker.itemId}:${blocker.operationId ?? ""}`}
-							>
-								<p className="text-xs font-semibold uppercase tracking-wide text-amber-700">
-									{BlockerTitle[blocker.code]}
-								</p>
-								{item === undefined ? (
-									<span className="text-sm font-medium text-muted">
-										{blocker.itemId} [missing]
-									</span>
-								) : (
-									<EditorItemDetailReference
-										item={item}
-										projectId={projectId}
-										sectionId="estimate"
-									/>
-								)}
-								<p className="text-xs leading-relaxed text-muted">
-									{blocker.message}
-								</p>
-								{blocker.operationId === undefined ? null : (
-									<code className="text-[0.6875rem] text-muted">
-										{blocker.operationId}
-									</code>
-								)}
-							</li>
-						);
-					})}
-				</ul>
-			) : estimate.status === "inconclusive" ? (
-				<div className="grid gap-3 py-4 text-sm leading-relaxed text-muted">
-					<p className="font-medium text-foreground">
-						This is not proof that the item is impossible.
-					</p>
-					{estimate.warnings.map((warning) => (
-						<p key={warning}>{warning}</p>
-					))}
-				</div>
-			) : estimate.cost.length === 0 &&
-				estimate.chargeCost.length === 0 &&
-				estimate.infrastructure.length === 0 &&
-				estimate.requiredInfrastructure.length === 0 ? (
-				<p className="py-4 text-sm text-muted">
-					No consumed items, spent charges, or required infrastructure.
+}) => (
+	<article
+		className="flex min-h-0 min-w-0 flex-col rounded-lg border border-l-2 border-violet-300 border-l-violet-600 bg-surface-raised p-4"
+		data-ui="EditorItemEstimateResult"
+	>
+		<header className="flex items-start justify-between gap-4 border-b border-line/70 pb-3">
+			<div>
+				<h3 className="font-semibold text-foreground">
+					{estimate.obtainable ? "Complete path found" : "No complete path"}
+				</h3>
+				<p className="mt-1 text-xs text-muted">
+					Target × {formatQuantity(estimate.quantity)}
 				</p>
+			</div>
+			<p className="font-semibold tabular-nums text-foreground">
+				{estimate.obtainable ? formatRuntime(estimate.durationMs) : "Unreachable"}
+			</p>
+		</header>
+		{estimate.obtainable ? (
+			<div className="min-h-0 flex-1 overflow-y-auto pr-1">
+				<section className="py-3 text-xs leading-relaxed text-muted">
+					<h4 className="mb-2 font-semibold uppercase tracking-wide text-muted">
+						Selected route
+					</h4>
+					<ul>
+						<EditorItemEstimateRouteTree route={estimate.route} />
+					</ul>
+				</section>
+				<EditorItemEstimateAmountList
+					amounts={estimate.consumables}
+					config={config}
+					empty="No consumed requirements."
+					projectId={projectId}
+					title="Consumed"
+				/>
+				<EditorItemEstimateAmountList
+					amounts={estimate.oneTimeRequirements}
+					config={config}
+					empty="No one-time requirements."
+					projectId={projectId}
+					title="One-time requirements"
+				/>
+				<EditorItemEstimateAmountList
+					amounts={estimate.ongoingRequirements}
+					config={config}
+					empty="No ongoing requirements."
+					projectId={projectId}
+					title="Ongoing requirements"
+				/>
+			</div>
+		) : (
+			<div className="grid gap-3 py-4 text-sm leading-relaxed text-muted">
+				<p className="font-medium text-foreground">
+					The authored dependency graph contains no complete route from the configured
+					starting facts.
+				</p>
+				<ul className="grid gap-2">
+					{estimate.diagnostics.map((diagnostic, index) => (
+						<li key={`${diagnostic.kind}:${index}`}>{diagnosticText(diagnostic)}</li>
+					))}
+				</ul>
+			</div>
+		)}
+	</article>
+);
+
+const EditorItemEstimateMethodCard = ({ estimate }: { readonly estimate: EditorItemEstimate }) => (
+	<article
+		className="min-w-0 rounded-lg border border-l-2 border-line border-l-sky-600 bg-surface-raised p-4"
+		data-ui="EditorItemEstimateMethod"
+	>
+		<header className="flex items-start gap-3 border-b border-line/70 pb-3">
+			<span className="icon-[lucide--calculator] mt-0.5 size-5 shrink-0 text-sky-700" />
+			<div>
+				<h3 className="font-semibold text-foreground">Static dependency estimator</h3>
+				<p className="mt-1 text-xs text-muted">Deterministic authored-graph analysis</p>
+			</div>
+		</header>
+		<p className="py-3 text-xs leading-relaxed text-muted">
+			Compares complete acquisition routes and selects the fastest deterministic result.
+			Random output occurrences independently use expected yield; all work is scheduled
+			sequentially.
+		</p>
+		<ul className="grid gap-2 border-t border-line/70 pt-3 text-xs leading-relaxed text-muted">
+			{estimate.obtainable ? (
+				<>
+					<li>Selected route: {estimate.route.routeId}.</li>
+					<li>
+						Expected action runs: {formatQuantity(estimate.route.actionRuns)}; output
+						samples: {formatQuantity(estimate.route.outputRuns)}.
+					</li>
+				</>
 			) : (
-				<div className="min-h-0 flex-1 overflow-y-auto pr-1">
-					{estimate.requiredInfrastructure.length === 0 ? null : (
-						<section data-ui="EditorItemEstimateRequiredInfrastructure">
-							<h4 className="sticky top-0 z-10 border-b border-line/70 bg-surface-raised py-2 text-[0.6875rem] font-semibold uppercase tracking-wide text-muted">
-								Required existing infrastructure
-							</h4>
-							<ul className="divide-y divide-line/60">
-								{estimate.requiredInfrastructure.map(({ itemId, quantity }) => (
-									<EditorItemEstimateItemRow
-										config={config}
-										itemId={itemId}
-										key={itemId}
-										projectId={projectId}
-										quantity={quantity}
-									/>
-								))}
-							</ul>
-						</section>
-					)}
-					{estimate.infrastructure.length === 0 ? null : (
-						<section data-ui="EditorItemEstimateInfrastructure">
-							<h4 className="sticky top-0 z-10 border-b border-line/70 bg-surface-raised py-2 text-[0.6875rem] font-semibold uppercase tracking-wide text-muted">
-								Built / acquired infrastructure
-							</h4>
-							<ul className="divide-y divide-line/60">
-								{estimate.infrastructure.map(({ itemId, quantity, readyAtMs }) => (
-									<EditorItemEstimateItemRow
-										config={config}
-										itemId={itemId}
-										key={itemId}
-										projectId={projectId}
-										quantity={quantity}
-										readyAtMs={readyAtMs}
-									/>
-								))}
-							</ul>
-						</section>
-					)}
-					{estimate.cost.length === 0 ? null : (
-						<section data-ui="EditorItemEstimateConsumed">
-							<h4 className="sticky top-0 z-10 border-b border-line/70 bg-surface-raised py-2 text-[0.6875rem] font-semibold uppercase tracking-wide text-muted">
-								Consumed
-							</h4>
-							<ul className="divide-y divide-line/60">
-								{estimate.cost.map(({ itemId, quantity }) => (
-									<EditorItemEstimateItemRow
-										config={config}
-										itemId={itemId}
-										key={itemId}
-										projectId={projectId}
-										quantity={quantity}
-									/>
-								))}
-							</ul>
-						</section>
-					)}
-					{estimate.chargeCost.length === 0 ? null : (
-						<section data-ui="EditorItemEstimateCharges">
-							<h4 className="sticky top-0 z-10 border-b border-line/70 bg-surface-raised py-2 text-[0.6875rem] font-semibold uppercase tracking-wide text-muted">
-								Spent charges
-							</h4>
-							<ul className="divide-y divide-line/60">
-								{estimate.chargeCost.map(({ charges, itemId }) => (
-									<EditorItemEstimateItemRow
-										config={config}
-										itemId={itemId}
-										key={itemId}
-										projectId={projectId}
-										quantity={charges}
-										unit="charge"
-									/>
-								))}
-							</ul>
-						</section>
-					)}
-				</div>
+				<li>No route satisfied every required dependency.</li>
 			)}
-		</article>
-	);
-};
+			<li>Rejected alternatives: {formatQuantity(estimate.rejectedRoutes.length)}.</li>
+			<li>Starting authored items contribute no acquisition time.</li>
+			<li>One-time requirements are deduplicated across the selected route.</li>
+			{estimate.limitations.map((limitation) => (
+				<li key={limitation}>Limitation: {limitationText(limitation)}</li>
+			))}
+		</ul>
+	</article>
+);
 
-const EditorItemEstimateMethodCard = ({
-	estimate,
-}: {
-	readonly estimate: EditorItemSimulation;
-}) => {
-	const planner = estimate.planner;
-	const content = (() => {
-		if (planner?.type === "completed")
-			return {
-				description:
-					planner.outputCertainty === "deterministic"
-						? "The real engine completed a deterministic production witness."
-						: "The real engine completed one positive-probability production witness.",
-				details: [
-					`Concrete witness: ${formatQuantity(planner.observedActionRuns)} actions, ${formatRuntime(planner.observedRuntimeMs)}.`,
-					`Expected replay: ${formatQuantity(planner.expectedActionRuns)} actions${estimate.runtimeMs === undefined ? "" : `, ${formatRuntime(estimate.runtimeMs)}`}.`,
-					...(planner.outputCertainty === "possible"
-						? [
-								`Selected witness probability: ${formatProbability(planner.selectedWitnessProbability)}.`,
-							]
-						: []),
-					...(planner.expectedSpentCharges.length === 0
-						? []
-						: [
-								`Expected charge spend: ${formatQuantity(planner.expectedSpentCharges.reduce((total, entry) => total + entry.charges, 0))}.`,
-							]),
-					`Search: ${formatQuantity(planner.expandedStates)} expanded, ${formatQuantity(planner.visitedStates)} visited states.`,
-					...readPlannerStrategyDetails(planner),
-					...readRoutePlanDetails(planner),
-				],
-				subtitle:
-					planner.outputCertainty === "deterministic"
-						? "Deterministic witness"
-						: "Positive-probability witness",
-				title: "Engine-backed planner",
-			};
-		if (planner?.type === "no-finite-path")
-			return {
-				description:
-					"The optimistic acquisition graph still has no reachable authored route. This is a structural impossibility proof, not a search timeout.",
-				details: [
-					`Proof: ${planner.proofType === "target-missing" ? "target is missing from config" : "no finite authored path"}.`,
-					...readPlannerStrategyDetails(planner),
-					...readRoutePlanDetails(planner),
-				],
-				subtitle: "Graph-certified result",
-				title: "No finite path",
-			};
-		if (planner?.type === "inconclusive")
-			return {
-				description:
-					"The engine search stopped without a witness and without a structural impossibility proof. Treat this as undecided.",
-				details: [
-					`Best target quantity: ${formatQuantity(planner.bestAvailableQuantity)}.`,
-					`Search: ${formatQuantity(planner.expandedStates)} expanded, ${formatQuantity(planner.visitedStates)} visited states.`,
-					...(planner.budgetLimit === undefined
-						? []
-						: [
-								`Budget limit: ${planner.budgetLimit}.`,
-							]),
-					...readPlannerStrategyDetails(planner),
-					...readRoutePlanDetails(planner),
-				],
-				subtitle: "Undecided, not impossible",
-				title: "Bounded engine search",
-			};
-		return {
-			description:
-				"Random output uses its expected yield and required batches are rounded up to whole production runs. Time and cost are estimates, not guarantees.",
-			details: [
-				"Production, line rules, drop rules, runtime modifiers, and charges are simulated.",
-				"Finite deposits block the path unless gameplay output can recreate them.",
-				"All gameplay operations are scheduled sequentially.",
-				"Starting items on the configured current board cost no added runtime.",
-			],
-			subtitle: "Balanced expected-yield assumptions",
-			title: "How it is calculated",
-		};
-	})();
-	return (
-		<article
-			className="min-w-0 rounded-lg border border-l-2 border-line border-l-sky-600 bg-surface-raised p-4"
-			data-ui="EditorItemEstimateMethod"
-		>
-			<header className="flex items-start gap-3 border-b border-line/70 pb-3">
-				<span className="icon-[lucide--calculator] mt-0.5 size-5 shrink-0 text-sky-700" />
-				<div>
-					<h3 className="font-semibold text-foreground">{content.title}</h3>
-					<p className="mt-1 text-xs text-muted">{content.subtitle}</p>
-				</div>
-			</header>
-			<p className="py-3 text-xs leading-relaxed text-muted">{content.description}</p>
-			<ul className="grid gap-2 border-t border-line/70 pt-3 text-xs leading-relaxed text-muted">
-				{content.details.map((detail) => (
-					<li key={detail}>{detail}</li>
-				))}
-				<li>Spatial relations and physical capacity remain optimistic planner policies.</li>
-			</ul>
-		</article>
-	);
-};
-
-/** Shows the shared domain estimate in one item's read-only Estimate section. */
+/** Shows the shared static estimate in one item's read-only Estimate section. */
 export const EditorItemEstimateSection = ({ itemId }: { readonly itemId: string }) => {
 	const project = useEditorProject();
 	const state = useEditorItemEstimate(project, itemId);
@@ -498,12 +243,14 @@ export const EditorItemEstimateSection = ({ itemId }: { readonly itemId: string 
 			data-ui="EditorItemEstimateSection"
 		>
 			<header>
-				<h2 className="text-lg font-semibold text-foreground">Estimated total cost</h2>
+				<h2 className="text-lg font-semibold text-foreground">
+					Estimated acquisition path
+				</h2>
 			</header>
 			{state.status === "loading" ? (
 				<Status
 					dataUi="EditorItemEstimateLoading"
-					description="Simulating production, rules, charges, and finite sources."
+					description="Analyzing authored routes and their requirements."
 					icon="icon-[lucide--loader-circle] animate-spin"
 					title="Calculating estimate"
 				/>

@@ -151,7 +151,7 @@ describe("createEditorMcpOwnershipFx", () => {
 		expect(estimateProperties).toHaveProperty("itemId");
 		expect(estimateProperties).toHaveProperty("quantity");
 		expect(tools.tools.find(({ name }) => name === "item_estimate")?.description).toContain(
-			"graph-certified no-finite-path",
+			"authored dependency graph",
 		);
 		const missingContext = await client.callTool({
 			name: "project",
@@ -576,6 +576,7 @@ describe("createEditorMcpOwnershipFx", () => {
 						"Item ID: ingot",
 						"Title: Ingot",
 						"Quantity: 1",
+						"Method: static authored dependency graph",
 						"Scheduling: sequential",
 					].join("\n"),
 				),
@@ -583,117 +584,54 @@ describe("createEditorMcpOwnershipFx", () => {
 		]);
 		expect(itemEstimate.content).toMatchObject([
 			{
-				text: expect.stringContaining(
-					"\nEstimate: Completed\nStatus: estimated\nEngine-backed feasibility: deterministic",
-				),
+				text: expect.stringContaining("\nStatus: obtainable\nSequential duration: 1 s"),
 			},
 		]);
 		expect(itemEstimate.content).toMatchObject([
 			{
 				text: expect.stringContaining(
-					"Concrete witness: 1 actions; 1 s\nExpected replay: 1 actions; 1 s",
+					"Expected action runs: 1\nExpected output samples: 1",
 				),
 			},
 		]);
 		expect(itemEstimate.content).toMatchObject([
 			{
-				text: expect.stringContaining(
-					[
-						"Strategy session:",
-						"  Root strategy: editor",
-						"  Invocations: 2",
-						"  Engine transitions: 1/100000",
-						"  Strategy invocations: 2/10000",
-						"  Algorithms used: editor -> producer-expansion",
-					].join("\n"),
-				),
+				text: expect.stringContaining("Selected route tree:\n  - ingot [Ingot; simple]"),
 			},
 		]);
 		expect(itemEstimate.content).toMatchObject([
 			{
-				text: expect.stringContaining(
-					"Total item cost: 3\nItem cost breakdown:\n  - water [water; simple]: 3",
-				),
+				text: expect.stringContaining("Consumables:\n  - water [water; simple]: 3"),
 			},
 		]);
 		expect(itemEstimate.content).toMatchObject([
 			{
-				text: expect.stringContaining("\nStatus: estimated"),
+				text: expect.not.stringContaining("planner"),
 			},
 		]);
-		expect(JSON.stringify(itemEstimate.content)).not.toContain("Guaranteed:");
+		expect(JSON.stringify(itemEstimate.content)).not.toContain("Search:");
 		expect(itemEstimate).not.toHaveProperty("structuredContent");
 
-		const inconclusiveProjectId = "project-inconclusive-estimate";
-		const blockedForge = graphConfig.items.forge;
-		if (blockedForge.type !== "producer" || blockedForge.lines === undefined)
-			throw new Error("Expected producer fixture with lines.");
-		const blockedForgeLines = blockedForge.lines;
-		const inconclusiveConfig = GameConfigSchema.parse({
-			...graphConfig,
-			items: {
-				...graphConfig.items,
-				forge: {
-					...blockedForge,
-					lines: blockedForgeLines.map((line) => ({
-						...line,
-						rules: [
-							{
-								type: "disable",
-								when: [
-									{
-										query: {
-											scope: "universe",
-											selector: {
-												itemId: "tool",
-												type: "item",
-											},
-										},
-										type: "exists",
-									},
-								],
-							},
-						],
-					})),
-				},
-			},
-		});
-		await Effect.runPromise(
-			repository.createProjectFx({
-				projectId: inconclusiveProjectId,
-				config: inconclusiveConfig,
-				resources: [],
-			}),
-		);
-		ownership.setProjectContext(inconclusiveProjectId);
-		const inconclusiveEstimate = await client.callTool({
+		const unreachableEstimate = await client.callTool({
 			name: "item_estimate",
 			arguments: {
-				itemId: "ingot",
+				itemId: "unused",
 			},
 		});
-		expect(inconclusiveEstimate.content).toMatchObject([
+		expect(unreachableEstimate.content).toMatchObject([
 			{
 				text: expect.stringContaining(
-					"\nEstimate: Inconclusive\nStatus: inconclusive\nReason:",
+					"Item ID: unused\nTitle: Unused\nQuantity: 1\nMethod: static authored dependency graph",
 				),
 			},
 		]);
-		expect(JSON.stringify(inconclusiveEstimate.content)).toContain(
-			"This is not proof that the item cannot be produced.",
-		);
-		expect(inconclusiveEstimate.content).toMatchObject([
+		expect(unreachableEstimate.content).toMatchObject([
 			{
 				text: expect.stringContaining(
-					"Strategy session:\n  Root strategy: editor\n  Invocations: 4",
+					"\nStatus: unreachable\nNo complete acquisition route reaches the target",
 				),
 			},
 		]);
-		expect(JSON.stringify(inconclusiveEstimate.content)).toContain("Route-plan search:");
-		expect(JSON.stringify(inconclusiveEstimate.content)).not.toContain(
-			"Estimate: No finite path",
-		);
-		ownership.setProjectContext(graphProjectId);
 		const missingRelationItem = await client.callTool({
 			name: "item_income",
 			arguments: {

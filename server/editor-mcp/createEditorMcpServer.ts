@@ -5,8 +5,14 @@ import { z } from "zod";
 import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
 import type { EditorProject } from "../../src/editor/EditorProject";
 import type { EditorProjectRepositoryService } from "../../src/editor/EditorProjectRepository";
-import type { EditorItemSimulation } from "../../src/editor/simulator/EditorItemSimulation";
-import { simulateEditorItemFx } from "../../src/editor/simulator/simulateEditorItemFx";
+import { createEditorEstimateDependencyGraphFx } from "../../src/editor/estimator/createEditorEstimateDependencyGraphFx";
+import type {
+	EditorItemEstimate,
+	EditorItemEstimateAmount,
+	EditorItemEstimateDiagnostic,
+	EditorItemEstimateRouteStep,
+} from "../../src/editor/estimator/EditorItemEstimate";
+import { estimateEditorItemFx } from "../../src/editor/estimator/estimateEditorItemFx";
 import type {
 	EditorItemOriginOutputOccurrence,
 	EditorItemOriginRelationRole,
@@ -203,322 +209,117 @@ const formatRuntime = (runtimeMs: number) => `${runtimeMs / 1_000} s`;
 const formatEstimateNumber = (value: number) =>
 	Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.00$/, "");
 
-const formatEstimateProbability = (probability: number) => {
-	const percentage = probability * 100;
-	if (percentage === 0 || percentage >= 0.01)
-		return `${formatEstimateNumber(Number(percentage.toFixed(2)))}%`;
-	return `${percentage.toPrecision(2)}%`;
-};
-
-type EngineBackedEstimatePlanner = NonNullable<EditorItemSimulation["planner"]>;
-type PlannerSearchDiagnostics = NonNullable<EngineBackedEstimatePlanner["diagnostics"]>;
-
-const formatPlannerActionId = (actionId: string) => {
-	try {
-		const parsed: unknown = JSON.parse(actionId);
-		if (Array.isArray(parsed)) {
-			const label = parsed.at(-1);
-			if (typeof label === "string") return label;
-		}
-	} catch {
-		// Future or human-authored action IDs remain useful without parsing.
-	}
-	return actionId;
-};
-
-const formatPlannerActionIds = (actionIds: ReadonlyArray<string>, limit = 8) => {
-	const visible = actionIds.slice(0, limit).map(formatPlannerActionId);
-	return `${visible.join(", ")}${actionIds.length > visible.length ? `, +${actionIds.length - visible.length} more` : ""}`;
-};
-
-const plannerRoutePlanOutcomeText = (
-	outcome: PlannerSearchDiagnostics["routePlans"][number]["outcome"],
-) => {
-	switch (outcome) {
-		case "completed":
-			return "completed";
-		case "non-quiescent-runtime":
-			return "non-quiescent-runtime";
-		case "search-budget":
-			return "search-budget";
-		case "search-exhausted":
-			return "search-exhausted";
+const estimateDiagnosticText = (diagnostic: EditorItemEstimateDiagnostic) => {
+	switch (diagnostic.kind) {
+		case "cycle":
+			return `cycle on ${diagnostic.routeId}: ${diagnostic.factIds.join(" -> ")}`;
+		case "unreachable":
+			return `${diagnostic.factId} x ${formatEstimateNumber(diagnostic.quantity)} has no complete route${diagnostic.routeId === undefined ? "" : ` through ${diagnostic.routeId}`}`;
+		case "zero-yield":
+			return `${diagnostic.routeId} has zero yield for ${diagnostic.factId}`;
 	}
 };
 
-const plannerRoutePlanDetourText = (
-	detour: PlannerSearchDiagnostics["routePlans"][number]["detours"][number],
-) => {
-	const alternative = `${detour.alternativeIndex + 1}/${detour.alternativeCount}`;
-	const depth = `depth excess ${detour.depthExcess}`;
-	switch (detour.type) {
-		case "acquisition-route":
-			return `acquisition ${detour.itemId}; alternative ${alternative}; ${depth}; route ${detour.routeId}`;
-		case "renewal-route":
-			return `renewal ${detour.itemId}; alternative ${alternative}; ${depth}; route ${detour.routeId}`;
-		case "requirement":
-			return `any-of requirement ${detour.itemId}; alternative ${alternative}; ${depth}; ${detour.usage} ${detour.source}; clause ${detour.clauseId}`;
+const estimateAmountLines = (
+	project: EditorProject,
+	amounts: ReadonlyArray<EditorItemEstimateAmount>,
+) =>
+	amounts.length === 0
+		? [
+				"  - none",
+			]
+		: amounts.map(
+				({ factId, quantity }) =>
+					`  - ${itemReference(project, factId)}: ${formatEstimateNumber(quantity)}`,
+			);
+
+const estimateLimitationText = (limitation: EditorItemEstimate["limitations"][number]) => {
+	switch (limitation) {
+		case "charge-renewal-approximated":
+			return "charged payers are reusable capabilities; renewal timing beyond authored depletion routes is approximated";
+		case "conditional-runtime-adjustments-ignored":
+			return "conditional runtime adjustment and multiplier rules are not included";
+		case "spatial-requirements-approximated":
+			return "board scope, distance, and concrete placement are approximated from authored item availability";
 	}
 };
 
-const readVisibleRoutePlanAttempts = (
-	attempts: PlannerSearchDiagnostics["routePlans"],
-	winner: number | undefined,
-) => {
-	if (attempts.length <= 8) return attempts;
-	const selected = new Map<number, (typeof attempts)[number]>();
-	for (const attempt of attempts.slice(0, 3)) selected.set(attempt.index, attempt);
-	for (const attempt of attempts.slice(-3)) selected.set(attempt.index, attempt);
-	if (winner !== undefined) {
-		const winningAttempt = attempts.find(({ index }) => index === winner);
-		if (winningAttempt !== undefined) selected.set(winningAttempt.index, winningAttempt);
-	}
-	return [
-		...selected.values(),
-	].sort((left, right) => left.index - right.index);
-};
-
-const plannerRoutePlanLines = (planner: EditorItemSimulation["planner"]): ReadonlyArray<string> => {
-	if (planner === undefined || planner.diagnostics === null) return [];
-	const diagnostics = planner.diagnostics;
-	if (diagnostics.attemptedRoutePlans === 0)
-		return [
-			"Route-plan search:",
-			"  Plans tried: 0",
-			`  Resolution: ${
-				planner.type === "no-finite-path"
-					? "acquisition graph resolved the target before engine search"
-					: planner.type === "completed"
-						? "target already satisfied before engine search"
-						: "search stopped before an engine route-plan pass executed"
-			}`,
-		];
-
-	const visible = readVisibleRoutePlanAttempts(
-		diagnostics.routePlans,
-		diagnostics.winningRoutePlanIndex,
-	);
-	return [
-		"Route-plan search:",
-		`  Plans tried: ${diagnostics.attemptedRoutePlans}`,
-		`  Winning plan: ${diagnostics.winningRoutePlanIndex ?? "none"}`,
-		...visible.flatMap((attempt) => {
-			const furthestAction = attempt.bestTraceActionIds.at(-1);
-			const visibleDetours = attempt.detours.slice(0, 8);
-			return [
-				`  - Plan ${attempt.index}: ${plannerRoutePlanOutcomeText(attempt.outcome)}; ${attempt.expandedStates} expanded; ${attempt.visitedStates} visited; frontier ${attempt.frontierSize}; best target ${formatEstimateNumber(attempt.bestAvailableQuantity)}; ${attempt.actionCount} actions; ${attempt.routeCount} routes; depth discrepancy ${attempt.depthDiscrepancy}; route discrepancy ${attempt.routeDiscrepancy}; maximum detour ${attempt.maximumDetourDepth}`,
-				...(attempt.targetRouteId === undefined
-					? []
-					: [
-							`    Preferred target route: ${attempt.targetRouteId}`,
-						]),
-				...(furthestAction === undefined
-					? []
-					: [
-							`    Furthest trace action: ${formatPlannerActionId(furthestAction)}`,
-						]),
-				...(attempt.budgetLimit === undefined
-					? []
-					: [
-							`    Budget limit: ${attempt.budgetLimit}`,
-						]),
-				...(attempt.blockedActionIds.length === 0
-					? []
-					: [
-							`    Blocked actions: ${formatPlannerActionIds(attempt.blockedActionIds)}`,
-						]),
-				...(attempt.unsupportedActionIds.length === 0
-					? []
-					: [
-							`    Unsupported actions: ${formatPlannerActionIds(attempt.unsupportedActionIds)}`,
-						]),
-				...(attempt.detours.length === 0
-					? []
-					: [
-							"    Selected detours:",
-							...visibleDetours.map(
-								(detour) => `      - ${plannerRoutePlanDetourText(detour)}`,
-							),
-							...(visibleDetours.length === attempt.detours.length
-								? []
-								: [
-										`      - ${attempt.detours.length - visibleDetours.length} more detours omitted`,
-									]),
-						]),
-			];
-		}),
-		...(visible.length === diagnostics.routePlans.length
+const estimateRouteLines = (
+	project: EditorProject,
+	route: EditorItemEstimateRouteStep,
+	indent = "  ",
+): ReadonlyArray<string> => [
+	`${indent}- ${itemReference(project, route.factId)} x ${formatEstimateNumber(route.quantity)} via ${route.routeId} (${formatRuntime(route.durationMs)})`,
+	...route.requirements.flatMap((requirement) => [
+		`${indent}  ${requirement.usage}: ${itemReference(project, requirement.factId)} x ${formatEstimateNumber(requirement.quantity)}`,
+		...(requirement.acquisition === undefined
 			? []
-			: [
-					`  Omitted plans: ${diagnostics.routePlans.length - visible.length}`,
-				]),
-	];
-};
+			: estimateRouteLines(project, requirement.acquisition, `${indent}    `)),
+	]),
+];
 
-const plannerStrategyLines = (planner: EditorItemSimulation["planner"]): ReadonlyArray<string> => {
-	if (planner === undefined) return [];
-	const { budget, invocations } = planner.sessionDiagnostics;
-	const strategyIds = [
-		...new Set(invocations.map(({ strategyId }) => strategyId)),
-	];
-	return [
-		"Strategy session:",
-		`  Root strategy: ${planner.strategyId}`,
-		`  Invocations: ${invocations.length}`,
-		`  Engine transitions: ${budget.snapshot.engineTransitions}/${budget.limits.maximumEngineTransitions}`,
-		`  Strategy invocations: ${budget.snapshot.strategyInvocations}/${budget.limits.maximumStrategyInvocations}`,
-		...(strategyIds.length === 0
-			? []
-			: [
-					`  Algorithms used: ${strategyIds.join(" -> ")}`,
-				]),
-	];
-};
-
-const plannerReasonText = (
-	reason: Extract<
-		NonNullable<EditorItemSimulation["planner"]>,
-		{
-			readonly type: "inconclusive";
-		}
-	>["reason"],
-) => {
-	switch (reason) {
-		case "action-unsupported":
-			return "an engine transition in the selected closure is not supported by planner search";
-		case "non-quiescent-runtime":
-			return "an action left the candidate runtime in a non-quiescent state";
-		case "search-budget":
-			return "the bounded search exhausted its configured budget";
-		case "search-exhausted":
-			return "the bounded candidate frontier was exhausted without a witness";
-		case "session-budget":
-			return "the shared planner session exhausted its global budget";
-		case "unsupported-routes":
-			return "the target closure contains authored routes not represented by planner search";
-	}
-};
-
-const itemEstimateText = (project: EditorProject, estimate: EditorItemSimulation) => {
-	const target = project.config.items[estimate.itemId];
+const itemEstimateText = (project: EditorProject, estimate: EditorItemEstimate) => {
+	const target = project.config.items[estimate.factId];
 	if (target === undefined)
-		throw new Error(`Item ${estimate.itemId} does not exist in the open project.`);
-	const planner = estimate.planner;
+		throw new Error(`Item ${estimate.factId} does not exist in the open project.`);
 	const header = [
 		"Item estimate",
 		`Item ID: ${target.id}`,
 		`Title: ${target.title}`,
-		`Quantity: ${estimate.quantity}`,
+		`Quantity: ${formatEstimateNumber(estimate.quantity)}`,
+		"Method: static authored dependency graph",
 		"Scheduling: sequential",
-		"Start state: authored new-game runtime",
-		"Planner: real engine transitions under optimistic spatial and placement policies",
-		"Board model: coordinates and physical capacity are relaxed; item existence, scope, inputs, charges, lifecycle, and authored rules remain engine-backed",
+		"Start facts: authored board, inventory, and toolbar",
+		"Random output occurrences: independently evaluated by expected yield",
+		"Limitations:",
+		...(estimate.limitations.length === 0
+			? [
+					"  - none",
+				]
+			: estimate.limitations.map(
+					(limitation) => `  - ${estimateLimitationText(limitation)}`,
+				)),
 	];
-	if (estimate.status === "inconclusive") {
-		const diagnostic = planner?.type === "inconclusive" ? planner : undefined;
+	if (!estimate.obtainable)
 		return [
 			...header,
-			"Estimate: Inconclusive",
-			"Status: inconclusive",
-			...(diagnostic === undefined
-				? []
-				: [
-						`Reason: ${plannerReasonText(diagnostic.reason)}`,
-						`Best available target quantity: ${formatEstimateNumber(diagnostic.bestAvailableQuantity)}`,
-						`Search: ${diagnostic.expandedStates} expanded states; ${diagnostic.visitedStates} visited states${diagnostic.budgetLimit === undefined ? "" : `; budget limit ${diagnostic.budgetLimit}`}`,
-					]),
-			...plannerStrategyLines(planner),
-			...plannerRoutePlanLines(planner),
-			"This is not proof that the item cannot be produced.",
-			"Warnings:",
-			...(estimate.warnings.length === 0
+			"Status: unreachable",
+			"No complete acquisition route reaches the target from the authored start facts.",
+			"Diagnostics:",
+			...(estimate.diagnostics.length === 0
 				? [
-						"  - bounded search returned no final verdict",
+						"  - target has no acquisition route",
 					]
-				: estimate.warnings.map((warning) => `  - ${warning}`)),
+				: estimate.diagnostics.map(
+						(diagnostic) => `  - ${estimateDiagnosticText(diagnostic)}`,
+					)),
+			`Rejected routes: ${estimate.rejectedRoutes.length}`,
 		].join("\n");
-	}
 
-	const completedPlanner = planner?.type === "completed" ? planner : undefined;
 	return [
 		...header,
-		`Estimate: ${estimate.status === "estimated" ? "Completed" : "No finite path"}`,
-		`Status: ${estimate.status}`,
-		...(completedPlanner === undefined
-			? []
-			: [
-					`Engine-backed feasibility: ${completedPlanner.outputCertainty}`,
-					`Concrete witness: ${formatEstimateNumber(completedPlanner.observedActionRuns)} actions; ${formatRuntime(completedPlanner.observedRuntimeMs)}`,
-					`Expected replay: ${formatEstimateNumber(completedPlanner.expectedActionRuns)} actions${estimate.runtimeMs === undefined ? "" : `; ${formatRuntime(estimate.runtimeMs)}`}`,
-					...(completedPlanner.outputCertainty === "possible"
-						? [
-								`Selected witness probability: ${formatEstimateProbability(completedPlanner.selectedWitnessProbability)}`,
-							]
-						: []),
-					`Search: ${completedPlanner.expandedStates} expanded states; ${completedPlanner.visitedStates} visited states`,
-				]),
-		...plannerStrategyLines(planner),
-		...plannerRoutePlanLines(planner),
-		...(estimate.runtimeMs === undefined
-			? []
-			: [
-					`Sequential runtime: ${formatRuntime(estimate.runtimeMs)}`,
-				]),
-		"Production blockers:",
-		...(estimate.blockers.length === 0
+		"Status: obtainable",
+		`Sequential duration: ${formatRuntime(estimate.durationMs)}`,
+		`Selected route: ${estimate.route.routeId}`,
+		`Expected action runs: ${formatEstimateNumber(estimate.route.actionRuns)}`,
+		`Expected output samples: ${formatEstimateNumber(estimate.route.outputRuns)}`,
+		"Selected route tree:",
+		...estimateRouteLines(project, estimate.route),
+		"Consumables:",
+		...estimateAmountLines(project, estimate.consumables),
+		"One-time requirements:",
+		...estimateAmountLines(project, estimate.oneTimeRequirements),
+		"Ongoing requirements:",
+		...estimateAmountLines(project, estimate.ongoingRequirements),
+		`Rejected alternatives: ${estimate.rejectedRoutes.length}`,
+		"Diagnostics:",
+		...(estimate.diagnostics.length === 0
 			? [
 					"  - none",
 				]
-			: estimate.blockers.map(
-					(blocker) =>
-						`  - ${blocker.code}: ${itemReference(project, blocker.itemId)}; ${blocker.message}${blocker.operationId === undefined ? "" : `; operation ${blocker.operationId}`}`,
+			: estimate.diagnostics.map(
+					(diagnostic) => `  - ${estimateDiagnosticText(diagnostic)}`,
 				)),
-		`Total item cost: ${formatEstimateNumber(estimate.totalCostQuantity)}`,
-		"Item cost breakdown:",
-		...(estimate.cost.length === 0
-			? [
-					"  - none",
-				]
-			: estimate.cost.map(
-					({ itemId, quantity }) =>
-						`  - ${itemReference(project, itemId)}: ${formatEstimateNumber(quantity)}`,
-				)),
-		"Expected charge spend:",
-		...(completedPlanner === undefined || completedPlanner.expectedSpentCharges.length === 0
-			? [
-					"  - none",
-				]
-			: completedPlanner.expectedSpentCharges.map(
-					({ charges, itemId }) =>
-						`  - ${itemReference(project, itemId)}: ${formatEstimateNumber(charges)} charges`,
-				)),
-		"Infrastructure and reserved inputs:",
-		...(estimate.infrastructureItemIds.size === 0
-			? [
-					"  - none",
-				]
-			: [
-					...[
-						...estimate.infrastructureItemIds,
-					]
-						.sort((left, right) => left.localeCompare(right))
-						.map((itemId) => `  - ${itemReference(project, itemId)}`),
-				]),
-		"Operations:",
-		...(estimate.operations.length === 0
-			? [
-					"  - none",
-				]
-			: estimate.operations.map(
-					(operation) =>
-						`  - ${operation.label} [${operation.lineId}] × ${formatEstimateNumber(operation.runs)}; ${formatRuntime(operation.runtimeMs)}; owner ${itemReference(project, operation.ownerItemId)}`,
-				)),
-		"Warnings:",
-		...(estimate.warnings.length === 0
-			? [
-					"  - none",
-				]
-			: estimate.warnings.map((warning) => `  - ${warning}`)),
 	].join("\n");
 };
 
@@ -902,7 +703,7 @@ export const createEditorMcpServer = (
 		"item_estimate",
 		{
 			description:
-				"Run the real engine-backed planner for one item from the authored new-game state. Returns a concrete feasibility witness when found, a graph-certified no-finite-path result when proven, or inconclusive when bounded search cannot decide. Reported time and costs are expected values for the selected route; geometry and physical capacity are optimistic.",
+				"Analyze one item against the authored dependency graph. Returns the fastest complete static acquisition route from the authored start facts, including sequential duration, consumables, one-time requirements, ongoing requirements, and explicit unreachable diagnostics.",
 			inputSchema: z
 				.object({
 					itemId: IdSchema.describe(
@@ -921,12 +722,20 @@ export const createEditorMcpServer = (
 			runTool(
 				readCurrentProjectFx(repository, readProjectContext).pipe(
 					Effect.flatMap((project) =>
-						simulateEditorItemFx(project.config, itemId, quantity).pipe(
-							Effect.map((estimate) => ({
+						Effect.gen(function* () {
+							const graph = yield* createEditorEstimateDependencyGraphFx(
+								project.config,
+							);
+							const estimate = yield* estimateEditorItemFx({
+								factId: itemId,
+								graph,
+								quantity,
+							});
+							return {
 								estimate,
 								project,
-							})),
-						),
+							};
+						}),
 					),
 				),
 				({ estimate, project }) => itemEstimateText(project, estimate),

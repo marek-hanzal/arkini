@@ -12,7 +12,7 @@ import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatef
 import { readItemRemainingChargesFx } from "~/engine/item/fx/readItemRemainingChargesFx";
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
 import { makeChargeSpendRandomFx } from "~/engine/job/random/makeChargeSpendRandomFx";
-import { resolveOutputFx } from "~/engine/output/fx/resolveOutputFx";
+import { outputFx } from "~/engine/output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import type { OutputPlacementResultSchema } from "~/engine/placement/schema/OutputPlacementResultSchema";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
@@ -142,13 +142,9 @@ export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 			itemId: item.id,
 			lineId: job.lineId,
 			ownerItemId: job.ownerItemId,
-			program: resolveOutputFx({
+			program: outputFx({
 				origin: item.location,
 				output: item.item.charges.output,
-				source: {
-					itemId: item.item.id,
-					type: "charges",
-				},
 			}),
 			quantity: item.quantity,
 			remainingCharges,

@@ -23,7 +23,6 @@ export const dropRuleDisableFx = Effect.fn("dropRuleDisableFx")(function* ({
 	for (const when of rule.when) {
 		if (
 			!(yield* whenFx({
-				intent: "falsify",
 				origin,
 				when,
 			}))

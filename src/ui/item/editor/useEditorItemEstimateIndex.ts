@@ -10,10 +10,8 @@ import {
 
 export type EditorItemEstimateIndexState =
 	| {
-			readonly completed: number;
 			readonly entries: ReadonlyArray<EditorItemEstimateIndexEntry>;
 			readonly status: "loading";
-			readonly total: number;
 	  }
 	| {
 			readonly entries: ReadonlyArray<EditorItemEstimateIndexEntry>;
@@ -36,21 +34,23 @@ const projectEntries = (
 ): ReadonlyArray<EditorItemEstimateIndexEntry> =>
 	Object.keys(project.config.items)
 		.flatMap((itemId) => {
-			const estimate = state.estimates.get(itemId)?.get(1);
+			const estimate = state.estimates.get(itemId);
 			return estimate === undefined
 				? []
 				: [
 						{
 							itemId,
-							method: "engine-backed" as const,
-							runtimeMs: estimate.runtimeMs,
-							status: estimate.status,
+							method: "static" as const,
+							runtimeMs: estimate.obtainable ? estimate.durationMs : undefined,
+							status: estimate.obtainable
+								? ("obtainable" as const)
+								: ("unreachable" as const),
 						},
 					];
 		})
 		.sort((left, right) => left.itemId.localeCompare(right.itemId));
 
-/** Reads authoritative cached results while the same process-lifetime queue fills missing items. */
+/** Reads the shared result of one full-snapshot estimate batch. */
 export const useEditorItemEstimateIndex = (
 	project: EditorProject,
 ): EditorItemEstimateIndexState => {
@@ -66,53 +66,30 @@ export const useEditorItemEstimateIndex = (
 			project.revision,
 		],
 	);
-	const request = useMemo<EditorItemEstimateCache.Request>(
-		() => ({
-			snapshot,
-			type: "index",
-		}),
-		[
-			snapshot,
-		],
-	);
 	const [state, requestIndex] = useAtom(EditorItemEstimateCacheAtom);
 
 	useEffect(() => {
-		requestIndex(request);
+		requestIndex(snapshot);
 	}, [
-		request,
 		requestIndex,
+		snapshot,
 	]);
 
 	if (!sameSnapshot(state.snapshot, snapshot))
 		return {
-			completed: 0,
 			entries: [],
 			status: "loading",
-			total: Object.keys(project.config.items).length,
 		};
 	const entries = projectEntries(state, project);
-	const errors = Object.keys(project.config.items).flatMap((itemId) => {
-		const message = state.errors.get(itemId)?.get(1);
-		return message === undefined
-			? []
-			: [
-					message,
-				];
-	});
-	const total = Object.keys(project.config.items).length;
-	const completed = state.progress.completed;
-	if (completed < total || !state.hydrated)
+	if (state.status === "loading" || state.status === "idle")
 		return {
-			completed,
 			entries,
 			status: "loading",
-			total,
 		};
-	if (errors.length > 0)
+	if (state.status === "error")
 		return {
 			entries,
-			message: `${errors.length} item estimate${errors.length === 1 ? "" : "s"} failed.`,
+			message: state.message ?? "Estimate calculation failed.",
 			status: "error",
 		};
 	return {

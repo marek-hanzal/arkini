@@ -6,13 +6,13 @@ import { formatItemDurationFx } from "~/ui/item-detail/formatItemDurationFx";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 
 const runtimeLabel = (estimate: EditorItemEstimateIndexEntry) => {
-	if (estimate.status === "no-finite-path") return "No path";
+	if (estimate.status === "unreachable") return "No path";
 	if (estimate.runtimeMs === undefined) return "—";
 	const duration = RendererRuntime.runSync(formatItemDurationFx(estimate.runtimeMs));
 	return duration;
 };
 
-/** Presents one compact projection of the authoritative engine-backed cached estimate. */
+/** Presents one compact projection of the cached static estimate. */
 export const EditorItemEstimateListRow = ({
 	estimate,
 	item,

@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import type { DropResultSchema } from "~/engine/output/schema/DropResultSchema";
 import { applyPlacementPlanFx } from "~/engine/placement/fx/applyPlacementPlanFx";
-import { planPolicyDropPlacementFx } from "~/engine/placement/fx/planPolicyDropPlacementFx";
+import { planDropPlacementFx } from "~/engine/placement/fx/planDropPlacementFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace returnMergeSourceFx {
@@ -22,7 +22,7 @@ export const returnMergeSourceFx = Effect.fn("returnMergeSourceFx")(function* ({
 }: returnMergeSourceFx.Props) {
 	if (returnDrop === undefined) return runtime;
 
-	const plan = yield* planPolicyDropPlacementFx({
+	const plan = yield* planDropPlacementFx({
 		drop: returnDrop,
 		origin,
 		runtime,

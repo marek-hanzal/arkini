@@ -1,7 +1,7 @@
 import { Cause, Effect, Exit, Fiber, Option } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { EditorItemSimulation } from "~/editor/simulator/EditorItemSimulation";
+import type { EditorItemEstimate } from "~/editor/estimator/EditorItemEstimate";
 import type { EditorItemEstimateWorkerRequest } from "~/ui/item/editor/editorItemEstimateWorkerProtocol";
 import { runEditorItemEstimateInWorkerFx } from "~/ui/item/editor/runEditorItemEstimateInWorkerFx";
 
@@ -14,50 +14,37 @@ class TestWorker {
 }
 
 const asWorker = (worker: TestWorker) => worker as unknown as Worker;
-
 const request = {
 	config: {
 		items: {},
 	} as EditorItemEstimateWorkerRequest["config"],
-	itemId: "alpha",
-	quantity: 1,
-	type: "item",
 } satisfies EditorItemEstimateWorkerRequest;
-
-const estimate: EditorItemSimulation = {
-	blockers: [],
-	chargeCost: [],
-	cost: [],
-	infrastructure: [],
-	infrastructureItemIds: new Set(),
-	itemId: "alpha",
-	operations: [],
+const estimate: EditorItemEstimate = {
+	diagnostics: [],
+	factId: "alpha",
+	limitations: [],
+	obtainable: false,
 	quantity: 1,
-	requiredInfrastructure: [],
-	runtimeMs: 1,
-	status: "estimated",
-	totalChargeCost: 0,
-	totalCostQuantity: 0,
-	warnings: [],
+	rejectedRoutes: [],
 };
 
 describe("runEditorItemEstimateInWorkerFx", () => {
-	it("returns the worker result and terminates the worker", async () => {
+	it("returns the worker batch and terminates the worker", async () => {
 		const worker = new TestWorker();
 		const result = await Effect.runPromise(
 			runEditorItemEstimateInWorkerFx(request, {
 				runEstimate: async () => ({
-					estimate,
-					type: "item",
+					estimates: [
+						estimate,
+					],
 				}),
 				spawn: () => asWorker(worker),
 			}),
 		);
 
-		expect(result).toEqual({
+		expect(result.estimates).toEqual([
 			estimate,
-			type: "item",
-		});
+		]);
 		expect(worker.terminateCount).toBe(1);
 	});
 

@@ -76,21 +76,21 @@ beforeEach(() => {
 		entries: [
 			{
 				itemId: "bakery",
-				method: "engine-backed",
+				method: "static",
 				runtimeMs: 120_000,
-				status: "estimated",
+				status: "obtainable",
 			},
 			{
 				itemId: "water",
-				method: "engine-backed",
+				method: "static",
 				runtimeMs: 0,
-				status: "estimated",
+				status: "obtainable",
 			},
 			{
 				itemId: "well",
-				method: "engine-backed",
+				method: "static",
 				runtimeMs: 60_000,
-				status: "estimated",
+				status: "obtainable",
 			},
 		],
 		status: "ready",
@@ -185,33 +185,15 @@ describe("EditorItemEstimateList", () => {
 		]);
 	});
 
-	it("shows worker progress while the index is being calculated", async () => {
+	it("shows one loading state while the full-project batch is calculated", async () => {
 		state.estimateState = {
-			completed: 2,
-			entries: [
-				{
-					itemId: "water",
-					method: "engine-backed",
-					runtimeMs: 0,
-					status: "estimated",
-				},
-				{
-					itemId: "well",
-					method: "engine-backed",
-					runtimeMs: 60_000,
-					status: "estimated",
-				},
-			],
+			entries: [],
 			status: "loading",
-			total: 3,
 		};
 		const container = await renderList();
 
 		expect(container.querySelector('[data-ui="EditorItemEstimatesLoading"]')).not.toBeNull();
-		expect(container.textContent).toContain("Calculating estimates: 2 of 3.");
-		expect(readVisibleItemIds(container)).toEqual([
-			"water",
-			"well",
-		]);
+		expect(container.textContent).toContain("Calculating all item estimates…");
+		expect(readVisibleItemIds(container)).toEqual([]);
 	});
 });

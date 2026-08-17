@@ -3,36 +3,41 @@ import { Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import type { EditorItemEstimate } from "~/editor/estimator/EditorItemEstimate";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import type { EditorItemSimulation } from "~/editor/simulator/EditorItemSimulation";
 import {
 	type EditorItemEstimateCacheAtom,
 	makeEditorItemEstimateCacheAtom,
 } from "~/ui/item/editor/EditorItemEstimateCacheAtom";
-import type { EditorItemEstimatePersistenceService } from "~/ui/item/editor/EditorItemEstimatePersistence";
 
-const simulation = (itemId: string, quantity = 1): EditorItemSimulation => ({
-	blockers: [],
-	chargeCost: [],
-	cost: [],
-	infrastructure: [],
-	infrastructureItemIds: new Set(),
-	itemId,
-	operations: [],
-	quantity,
-	requiredInfrastructure: [],
-	runtimeMs: 1,
-	status: "estimated",
-	totalChargeCost: 0,
-	totalCostQuantity: 0,
-	warnings: [],
+const estimate = (factId: string): EditorItemEstimate => ({
+	consumables: [],
+	diagnostics: [],
+	durationMs: 1,
+	factId,
+	limitations: [],
+	obtainable: true,
+	oneTimeRequirements: [],
+	ongoingRequirements: [],
+	quantity: 1,
+	rejectedRoutes: [],
+	route: {
+		actionRuns: 1,
+		durationMs: 1,
+		factId,
+		outputRuns: 1,
+		quantity: 1,
+		requirements: [],
+		rootQuantity: 0,
+		routeId: `route:${factId}`,
+		source: "route",
+	},
 });
 
 const config = {
 	items: {
 		alpha: {},
 		bravo: {},
-		charlie: {},
 	},
 } as unknown as GameConfigSchema.Type;
 
@@ -40,14 +45,6 @@ const snapshot = (revision: number): EditorItemEstimateCacheAtom.Snapshot => ({
 	config,
 	projectId: "project",
 	revision,
-});
-
-const persistence = (
-	persisted: ReadonlyArray<EditorItemSimulation> = [],
-): EditorItemEstimatePersistenceService => ({
-	pruneProjectFx: vi.fn(() => Effect.void),
-	readSnapshotFx: vi.fn(() => Effect.succeed(persisted)),
-	writeEstimateFx: vi.fn(() => Effect.void),
 });
 
 const registries: AtomRegistry.AtomRegistry[] = [];
@@ -65,108 +62,40 @@ const mount = (atom: ReturnType<typeof makeEditorItemEstimateCacheAtom>) => {
 	return registry;
 };
 
-const waitFor = async (
-	registry: AtomRegistry.AtomRegistry,
-	atom: ReturnType<typeof makeEditorItemEstimateCacheAtom>,
-	predicate: (state: EditorItemEstimateCacheAtom.State) => boolean,
-) => {
-	await vi.waitFor(() => expect(predicate(registry.get(atom))).toBe(true));
-	return registry.get(atom);
-};
-
 describe("EditorItemEstimateCacheAtom", () => {
-	it("hydrates persistent engine estimates and only computes missing index items", async () => {
-		const stored = persistence([
-			simulation("alpha"),
-		]);
-		const computed: string[] = [];
+	it("computes one full-project batch for repeated requests of the same snapshot", async () => {
+		let calls = 0;
 		const atom = makeEditorItemEstimateCacheAtom({
-			persistence: stored,
-			runInWorkerFx: (request) => {
-				computed.push(request.itemId);
+			runInWorkerFx: () => {
+				calls += 1;
 				return Effect.succeed({
-					estimate: simulation(request.itemId, request.quantity),
-					type: "item" as const,
+					estimates: [
+						estimate("alpha"),
+						estimate("bravo"),
+					],
 				});
 			},
 		});
 		const registry = mount(atom);
 
-		registry.set(atom, {
-			snapshot: snapshot(1),
-			type: "index",
-		});
-		const state = await waitFor(registry, atom, (current) => current.progress.completed === 3);
+		registry.set(atom, snapshot(1));
+		registry.set(atom, snapshot(1));
+		await vi.waitFor(() => expect(registry.get(atom).status).toBe("ready"));
 
-		expect(state.estimates.get("alpha")?.has(1)).toBe(true);
-		expect(computed).toEqual([
+		expect(calls).toBe(1);
+		expect([
+			...registry.get(atom).estimates.keys(),
+		]).toEqual([
+			"alpha",
 			"bravo",
-			"charlie",
 		]);
-		expect(stored.writeEstimateFx).toHaveBeenCalledTimes(2);
 	});
 
-	it("keeps the background queue alive and prioritizes a newly opened item", async () => {
-		const completions = new Map<string, () => void>();
-		const started: string[] = [];
-		const atom = makeEditorItemEstimateCacheAtom({
-			persistence: persistence(),
-			runInWorkerFx: (request) =>
-				Effect.callback((resume) => {
-					started.push(request.itemId);
-					completions.set(request.itemId, () =>
-						resume(
-							Effect.succeed({
-								estimate: simulation(request.itemId, request.quantity),
-								type: "item" as const,
-							}),
-						),
-					);
-				}),
-		});
-		const registry = mount(atom);
-		const current = snapshot(1);
-
-		registry.set(atom, {
-			snapshot: current,
-			type: "index",
-		});
-		await vi.waitFor(() =>
-			expect(started).toEqual([
-				"alpha",
-			]),
-		);
-		registry.set(atom, {
-			itemId: "charlie",
-			quantity: 1,
-			snapshot: current,
-			type: "item",
-		});
-		completions.get("alpha")?.();
-		await vi.waitFor(() =>
-			expect(started).toEqual([
-				"alpha",
-				"charlie",
-			]),
-		);
-		completions.get("charlie")?.();
-		await vi.waitFor(() =>
-			expect(started).toEqual([
-				"alpha",
-				"charlie",
-				"bravo",
-			]),
-		);
-		completions.get("bravo")?.();
-		await waitFor(registry, atom, (state) => state.progress.completed === 3);
-	});
-
-	it("interrupts obsolete estimate work before publishing a replacement revision", async () => {
+	it("interrupts an obsolete batch before publishing the replacement snapshot", async () => {
 		let calls = 0;
 		let interrupted = 0;
 		const atom = makeEditorItemEstimateCacheAtom({
-			persistence: persistence(),
-			runInWorkerFx: (request) => {
+			runInWorkerFx: () => {
 				calls += 1;
 				if (calls === 1)
 					return Effect.callback(() =>
@@ -175,72 +104,52 @@ describe("EditorItemEstimateCacheAtom", () => {
 						}),
 					);
 				return Effect.succeed({
-					estimate: simulation(request.itemId, request.quantity),
-					type: "item" as const,
+					estimates: [
+						estimate("bravo"),
+					],
 				});
 			},
 		});
 		const registry = mount(atom);
 
-		registry.set(atom, {
-			itemId: "alpha",
-			quantity: 1,
-			snapshot: snapshot(1),
-			type: "item",
-		});
+		registry.set(atom, snapshot(1));
 		await vi.waitFor(() => expect(calls).toBe(1));
-
-		registry.set(atom, {
-			itemId: "alpha",
-			quantity: 1,
-			snapshot: snapshot(2),
-			type: "item",
-		});
-		const state = await waitFor(
-			registry,
-			atom,
-			(current) =>
-				current.snapshot?.revision === 2 && current.estimates.get("alpha")?.has(1) === true,
-		);
-
-		expect(interrupted).toBe(1);
-		expect(calls).toBe(2);
-		expect(state.snapshot?.revision).toBe(2);
+		registry.set(atom, snapshot(2));
+		await vi.waitFor(() => expect(registry.get(atom).status).toBe("ready"));
+		await vi.waitFor(() => expect(interrupted).toBe(1));
+		expect(registry.get(atom).snapshot?.revision).toBe(2);
+		expect([
+			...registry.get(atom).estimates.keys(),
+		]).toEqual([
+			"bravo",
+		]);
 	});
 
-	it("keeps quantities distinct and resets the cache authority on project revision changes", async () => {
-		const stored = persistence();
+	it("publishes a batch error and lets the same snapshot retry", async () => {
+		let calls = 0;
 		const atom = makeEditorItemEstimateCacheAtom({
-			persistence: stored,
-			runInWorkerFx: (request) =>
-				Effect.succeed({
-					estimate: simulation(request.itemId, request.quantity),
-					type: "item" as const,
-				}),
+			runInWorkerFx: () => {
+				calls += 1;
+				return calls === 1
+					? Effect.fail(new Error("estimate exploded"))
+					: Effect.succeed({
+							estimates: [
+								estimate("alpha"),
+							],
+						});
+			},
 		});
 		const registry = mount(atom);
 
-		registry.set(atom, {
-			itemId: "alpha",
-			quantity: 2,
-			snapshot: snapshot(1),
-			type: "item",
-		});
-		await waitFor(registry, atom, (state) => state.estimates.get("alpha")?.has(2) === true);
-		registry.set(atom, {
-			itemId: "alpha",
-			quantity: 1,
-			snapshot: snapshot(2),
-			type: "item",
-		});
-		const state = await waitFor(
-			registry,
-			atom,
-			(current) =>
-				current.snapshot?.revision === 2 && current.estimates.get("alpha")?.has(1) === true,
-		);
+		registry.set(atom, snapshot(1));
+		await vi.waitFor(() => expect(registry.get(atom).status).toBe("error"));
 
-		expect(state.estimates.get("alpha")?.has(2)).toBe(false);
-		expect(stored.readSnapshotFx).toHaveBeenCalledTimes(2);
+		expect(registry.get(atom).message).toBe("estimate exploded");
+		expect(registry.get(atom).estimates.size).toBe(0);
+
+		registry.set(atom, snapshot(1));
+		await vi.waitFor(() => expect(registry.get(atom).status).toBe("ready"));
+		expect(calls).toBe(2);
+		expect(registry.get(atom).estimates.has("alpha")).toBe(true);
 	});
 });

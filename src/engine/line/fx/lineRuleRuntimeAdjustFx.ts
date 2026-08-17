@@ -21,7 +21,6 @@ export const lineRuleRuntimeAdjustFx = Effect.fn("lineRuleRuntimeAdjustFx")(func
 	for (const when of rule.when) {
 		if (
 			!(yield* whenFx({
-				intent: rule.adjustMs < 0 ? "satisfy" : "falsify",
 				origin,
 				when,
 			}))

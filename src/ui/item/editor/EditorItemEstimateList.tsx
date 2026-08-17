@@ -18,7 +18,7 @@ const compareRuntime = (
 	return direction === "fastest" ? left - right : right - left;
 };
 
-/** Lists all item estimates without running recursive planning on the renderer thread. */
+/** Lists all static item estimates without analyzing the authored graph on the renderer thread. */
 export const EditorItemEstimateList = () => {
 	const project = useEditorProject();
 	const state = useEditorItemEstimateIndex(project);
@@ -91,8 +91,7 @@ export const EditorItemEstimateList = () => {
 						className="px-1 py-2 text-xs text-subtle"
 						data-ui="EditorItemEstimatesLoading"
 					>
-						Calculating estimates: {state.completed} of {state.total}. Cached results
-						remain usable while the queue continues.
+						Calculating all item estimates…
 					</p>
 				) : null}
 				{state.status === "error" ? (

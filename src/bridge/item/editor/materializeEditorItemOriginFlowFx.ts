@@ -8,10 +8,12 @@ import {
 	type EditorItemOriginItemNode,
 	type EditorItemOriginOperation,
 } from "~/bridge/item/editor/EditorItemOriginFlow";
-import type { EditorItemOriginSource } from "~/bridge/item/editor/EditorItemOriginSource";
 import type { EditorItemOriginSourceIndex } from "~/bridge/item/editor/indexEditorItemOriginSourcesFx";
-import type { EditorItemOriginIncomeSubgraph } from "~/bridge/item/editor/readEditorItemOriginIncomeSubgraphFx";
-import { readEditorItemOriginRelations } from "~/editor/EditorItemOriginSource";
+import type {
+	EditorItemOriginIncomeSubgraph,
+	EditorItemOriginSource,
+} from "~/editor/EditorItemOriginSource";
+import { readEditorItemOriginRelationsFx } from "~/editor/readEditorItemOriginRelationsFx";
 
 const unique = <Value>(values: ReadonlyArray<Value>): Value[] => [
 	...new Set(values),
@@ -71,14 +73,14 @@ const readItemNode = (
 	};
 };
 
-const readEdges = (
+const readEdgesFx = Effect.fn("materializeEditorItemOriginFlowFx.readEdgesFx")(function* (
 	sources: ReadonlyArray<EditorItemOriginSource>,
 	itemsInGraph?: ReadonlySet<string>,
-): EditorItemOriginEdge[] => {
+): Effect.fn.Return<EditorItemOriginEdge[]> {
 	const edges: EditorItemOriginEdge[] = [];
 	for (const source of sources) {
 		if (itemsInGraph !== undefined && !itemsInGraph.has(source.ownerItemId)) continue;
-		for (const relation of readEditorItemOriginRelations(source)) {
+		for (const relation of yield* readEditorItemOriginRelationsFx(source)) {
 			if (
 				itemsInGraph !== undefined &&
 				(!itemsInGraph.has(relation.fromItemId) || !itemsInGraph.has(relation.toItemId))
@@ -112,7 +114,7 @@ const readEdges = (
 		}
 	}
 	return edges;
-};
+});
 
 /** Materializes indexed acquisition truth into the editor's public node-and-edge contract. */
 export const materializeEditorItemOriginFlowFx = Effect.fn("materializeEditorItemOriginFlowFx")(
@@ -125,17 +127,17 @@ export const materializeEditorItemOriginFlowFx = Effect.fn("materializeEditorIte
 		readonly index: EditorItemOriginSourceIndex;
 		readonly originSubgraph?: EditorItemOriginIncomeSubgraph;
 	}) =>
-		Effect.sync((): EditorItemOriginFlow => {
+		Effect.gen(function* (): Effect.fn.Return<EditorItemOriginFlow> {
 			if (originSubgraph === undefined)
 				return {
-					edges: readEdges(index.sources),
+					edges: yield* readEdgesFx(index.sources),
 					nodes: [
 						...index.items.keys(),
 					].map((itemId) => readItemNode(itemId, index, acquisitionSourceByItem)),
 				};
 			const sourceIds = new Set(originSubgraph.sources.map(({ id }) => id));
 			return {
-				edges: readEdges(originSubgraph.sources, originSubgraph.itemIds),
+				edges: yield* readEdgesFx(originSubgraph.sources, originSubgraph.itemIds),
 				nodes: [
 					...originSubgraph.itemIds,
 				].map((itemId) => readItemNode(itemId, index, acquisitionSourceByItem, sourceIds)),

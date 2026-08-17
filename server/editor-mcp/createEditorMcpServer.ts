@@ -7,13 +7,14 @@ import type { EditorProject } from "../../src/editor/EditorProject";
 import type { EditorProjectRepositoryService } from "../../src/editor/EditorProjectRepository";
 import type { EditorItemSimulation } from "../../src/editor/simulator/EditorItemSimulation";
 import { simulateEditorItemFx } from "../../src/editor/simulator/simulateEditorItemFx";
-import {
-	readEditorItemOriginRelationSubgraph,
-	readEditorItemOriginSources,
-	type EditorItemOriginOutputOccurrence,
-	type EditorItemOriginRelationRole,
-	type EditorItemOriginSource,
+import type {
+	EditorItemOriginOutputOccurrence,
+	EditorItemOriginRelationRole,
+	EditorItemOriginRelationSubgraph,
+	EditorItemOriginSource,
 } from "../../src/editor/EditorItemOriginSource";
+import { readEditorItemOriginRelationSubgraphFx } from "../../src/editor/readEditorItemOriginRelationSubgraphFx";
+import { readEditorItemOriginSourcesFx } from "../../src/editor/readEditorItemOriginSourcesFx";
 import { searchEditorItems } from "../../src/editor/searchEditorItems";
 import { IdSchema } from "../../src/engine/common/schema/IdSchema";
 import { ItemEnumSchema } from "../../src/engine/item/schema/ItemEnumSchema";
@@ -521,7 +522,15 @@ const itemEstimateText = (project: EditorProject, estimate: EditorItemSimulation
 	].join("\n");
 };
 
-const readItemRelationView = (
+interface ItemRelationView {
+	readonly itemId: string;
+	readonly level: number;
+	readonly project: EditorProject;
+	readonly role: EditorItemOriginRelationRole;
+	readonly subgraph: EditorItemOriginRelationSubgraph;
+}
+
+const readItemRelationViewFx = Effect.fn("createEditorMcpServer.readItemRelationViewFx")(function* (
 	project: EditorProject,
 	{
 		itemId,
@@ -532,28 +541,27 @@ const readItemRelationView = (
 		readonly level: number;
 		readonly role: EditorItemOriginRelationRole;
 	},
-) => {
+): Effect.fn.Return<ItemRelationView, Error> {
 	if (project.config.items[itemId] === undefined)
-		throw new Error(`Item ${itemId} does not exist in the open project.`);
-	const sources = Object.values(project.config.items)
-		.sort((left, right) => left.id.localeCompare(right.id))
-		.flatMap(readEditorItemOriginSources)
-		.sort((left, right) => left.id.localeCompare(right.id));
+		return yield* Effect.fail(new Error(`Item ${itemId} does not exist in the open project.`));
+	const sourceGroups = yield* Effect.forEach(
+		Object.values(project.config.items).sort((left, right) => left.id.localeCompare(right.id)),
+		readEditorItemOriginSourcesFx,
+	);
+	const sources = sourceGroups.flat().sort((left, right) => left.id.localeCompare(right.id));
 	return {
 		itemId,
 		level,
 		project,
 		role,
-		subgraph: readEditorItemOriginRelationSubgraph({
+		subgraph: yield* readEditorItemOriginRelationSubgraphFx({
 			level,
 			role,
 			sources,
 			targetItemId: itemId,
 		}),
 	};
-};
-
-type ItemRelationView = ReturnType<typeof readItemRelationView>;
+});
 
 const sourceReferenceLines = (project: EditorProject, source: EditorItemOriginSource) => [
 	`  Source item: ${itemReference(project, source.ownerItemId)}`,
@@ -846,8 +854,8 @@ export const createEditorMcpServer = (
 		async ({ itemId, level }) =>
 			runTool(
 				readCurrentProjectFx(repository, readProjectContext).pipe(
-					Effect.map((project) =>
-						readItemRelationView(project, {
+					Effect.flatMap((project) =>
+						readItemRelationViewFx(project, {
 							itemId,
 							level,
 							role: "output",
@@ -879,8 +887,8 @@ export const createEditorMcpServer = (
 		async ({ itemId, level }) =>
 			runTool(
 				readCurrentProjectFx(repository, readProjectContext).pipe(
-					Effect.map((project) =>
-						readItemRelationView(project, {
+					Effect.flatMap((project) =>
+						readItemRelationViewFx(project, {
 							itemId,
 							level,
 							role: "input",

@@ -1,12 +1,22 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import {
-	readEditorItemOriginSources,
-	readEditorItemOriginRelations,
-	readEditorItemOriginRelationSubgraph,
-	type EditorItemOriginSource,
-} from "~/editor/EditorItemOriginSource";
+import type { EditorItemOriginSource } from "~/editor/EditorItemOriginSource";
+import { readEditorItemOriginRelationSubgraphFx } from "~/editor/readEditorItemOriginRelationSubgraphFx";
+import { readEditorItemOriginRelationsFx } from "~/editor/readEditorItemOriginRelationsFx";
+import { readEditorItemOriginSourcesFx } from "~/editor/readEditorItemOriginSourcesFx";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
+
+const readEditorItemOriginSources = (item: Parameters<typeof readEditorItemOriginSourcesFx>[0]) =>
+	Effect.runSync(readEditorItemOriginSourcesFx(item));
+
+const readEditorItemOriginRelations = (
+	source: Parameters<typeof readEditorItemOriginRelationsFx>[0],
+) => Effect.runSync(readEditorItemOriginRelationsFx(source));
+
+const readEditorItemOriginRelationSubgraph = (
+	props: Parameters<typeof readEditorItemOriginRelationSubgraphFx>[0],
+) => Effect.runSync(readEditorItemOriginRelationSubgraphFx(props));
 
 const source = ({
 	id,

@@ -6,7 +6,7 @@ import type {
 } from "~/bridge/item/editor/EditorItemOriginFlow";
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import { type EditorItemOriginSource } from "~/bridge/item/editor/EditorItemOriginSource";
-import { readEditorItemOriginSourcesFx } from "~/bridge/item/editor/readEditorItemOriginSourcesFx";
+import { readEditorItemOriginSourcesFx } from "~/editor/readEditorItemOriginSourcesFx";
 import { reportEditorItemOriginFlowProgressFx } from "~/bridge/item/editor/reportEditorItemOriginFlowProgressFx";
 import { yieldEditorItemOriginFlowFx } from "~/bridge/item/editor/yieldEditorItemOriginFlowFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";

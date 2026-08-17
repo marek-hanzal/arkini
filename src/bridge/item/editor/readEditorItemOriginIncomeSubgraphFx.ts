@@ -1,14 +1,16 @@
 import { Effect } from "effect";
 
 import type { EditorItemOriginSourceIndex } from "~/bridge/item/editor/indexEditorItemOriginSourcesFx";
-import {
-	readEditorItemOriginIncomeSubgraph,
-	type EditorItemOriginIncomeSubgraph,
+import type {
+	EditorItemOriginIncomeSubgraph,
+	EditorItemOriginSource,
 } from "~/editor/EditorItemOriginSource";
 
-export type { EditorItemOriginIncomeSubgraph } from "~/editor/EditorItemOriginSource";
+const unique = <Value>(values: ReadonlyArray<Value>): Value[] => [
+	...new Set(values),
+];
 
-/** Traces the shared one witnessed Income proof selected by reachability. */
+/** Traces the one witnessed Income proof selected by editor reachability. */
 export const readEditorItemOriginIncomeSubgraphFx = Effect.fn(
 	"readEditorItemOriginIncomeSubgraphFx",
 )(
@@ -23,16 +25,34 @@ export const readEditorItemOriginIncomeSubgraphFx = Effect.fn(
 		readonly targetItemId: string;
 	}) =>
 		Effect.sync((): EditorItemOriginIncomeSubgraph => {
-			const sources = [
-				...sourcesById.values(),
-			];
-			if (sources.length === 0)
-				for (const matches of sourcesByOutput.values()) sources.push(...matches);
-			return readEditorItemOriginIncomeSubgraph({
-				acquisitionSourceByItem,
-				sources,
-				starters: new Set(starters.keys()),
-				targetItemId,
-			});
+			const itemIds = new Set<string>();
+			const tracedItems = new Set<string>();
+			const includedSources = new Map<string, EditorItemOriginSource>();
+			const traceItem = (itemId: string) => {
+				itemIds.add(itemId);
+				if (tracedItems.has(itemId)) return;
+				tracedItems.add(itemId);
+				if (starters.has(itemId)) return;
+				const witnessedSourceId = acquisitionSourceByItem.get(itemId);
+				const witnessedSource =
+					witnessedSourceId === undefined
+						? undefined
+						: sourcesById.get(witnessedSourceId);
+				const directSources = [
+					...(sourcesByOutput.get(itemId) ?? []),
+				].sort((left, right) => left.id.localeCompare(right.id));
+				const source = witnessedSource ?? directSources[0];
+				if (source === undefined) return;
+				includedSources.set(source.id, source);
+				for (const requirement of unique(source.requirementItemIds).sort())
+					traceItem(requirement);
+			};
+			traceItem(targetItemId);
+			return {
+				itemIds,
+				sources: [
+					...includedSources.values(),
+				],
+			};
 		}),
 );

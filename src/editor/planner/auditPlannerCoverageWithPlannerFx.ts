@@ -2,25 +2,20 @@ import { Clock, Effect } from "effect";
 
 import type { Planner } from "~/editor/planner/Planner";
 import type { PlannerResult } from "~/editor/planner/PlannerResult";
-import type { PlannerSearchBudget, PlannerSearchDiagnostics } from "~/editor/planner/PlannerSearch";
+import type { PlannerSearchDiagnostics } from "~/editor/planner/PlannerSearch";
 import type {
 	PlannerCoverageAuditItem,
-	PlannerCoverageAuditProgress,
 	PlannerCoverageAuditReport,
 } from "~/editor/planner/PlannerCoverageAudit";
+import type { PlannerCoverageAuditRequest } from "~/editor/planner/PlannerCoverageAuditRequest";
 import { readPlannerCoverageAuditSummaryFx } from "~/editor/planner/readPlannerCoverageAuditSummaryFx";
 import { readPlannerSearchBudgetFx } from "~/editor/planner/readPlannerSearchBudgetFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 export namespace auditPlannerCoverageWithPlannerFx {
-	export interface Props {
-		readonly budget?: Partial<PlannerSearchBudget>;
-		readonly config: GameConfigSchema.Type;
-		readonly itemIds?: ReadonlyArray<IdSchema.Type>;
-		readonly onProgress?: (progress: PlannerCoverageAuditProgress) => Effect.Effect<void>;
+	export interface Props extends PlannerCoverageAuditRequest {
 		readonly planner: Planner<"best-first", PlannerSearchDiagnostics>;
-		readonly quantity?: number;
 	}
 }
 
@@ -153,7 +148,9 @@ const readAuditItem = ({
 };
 
 /** Audits bounded coverage with one reusable engine planner. */
-export const auditPlannerCoverageWithPlannerFx = Effect.fn("auditPlannerCoverageWithPlannerFx")(
+export const auditPlannerCoverageWithPlannerFx: (
+	props: auditPlannerCoverageWithPlannerFx.Props,
+) => Effect.Effect<PlannerCoverageAuditReport> = Effect.fn("auditPlannerCoverageWithPlannerFx")(
 	function* ({
 		budget: inputBudget,
 		config,
@@ -161,7 +158,7 @@ export const auditPlannerCoverageWithPlannerFx = Effect.fn("auditPlannerCoverage
 		onProgress,
 		planner,
 		quantity: inputQuantity,
-	}: auditPlannerCoverageWithPlannerFx.Props) {
+	}: auditPlannerCoverageWithPlannerFx.Props): Effect.fn.Return<PlannerCoverageAuditReport> {
 		const budget = yield* readPlannerSearchBudgetFx(inputBudget);
 		const quantity = readPositiveInteger(inputQuantity, 1);
 		const selectedItemIds = (itemIds ?? Object.keys(config.items))

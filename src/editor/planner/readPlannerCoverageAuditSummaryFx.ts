@@ -5,6 +5,7 @@ import type {
 	PlannerCoverageAuditItem,
 	PlannerCoverageAuditItemTypeSummary,
 	PlannerCoverageAuditRankedItem,
+	PlannerCoverageAuditSummary,
 } from "~/editor/planner/PlannerCoverageAudit";
 import { readPlannerCoverageAuditOutcomeCountsFx } from "~/editor/planner/readPlannerCoverageAuditOutcomeCountsFx";
 
@@ -31,7 +32,7 @@ const readFrequencies = (
 		.slice(0, limit);
 
 const readItemTypeSummary = (items: ReadonlyArray<PlannerCoverageAuditItem>) =>
-	Effect.gen(function* () {
+	Effect.gen(function* (): Effect.fn.Return<ReadonlyArray<PlannerCoverageAuditItemTypeSummary>> {
 		const types = [
 			...new Set(items.map(({ itemType }) => itemType)),
 		].sort(compareIds);
@@ -68,9 +69,11 @@ const readPercentile = (values: ReadonlyArray<number>, percentile: number) => {
 	return values[Math.min(index, values.length - 1)] ?? 0;
 };
 
-export const readPlannerCoverageAuditSummaryFx = Effect.fn("readPlannerCoverageAuditSummaryFx")(
+export const readPlannerCoverageAuditSummaryFx: (
+	items: ReadonlyArray<PlannerCoverageAuditItem>,
+) => Effect.Effect<PlannerCoverageAuditSummary> = Effect.fn("readPlannerCoverageAuditSummaryFx")(
 	(items: ReadonlyArray<PlannerCoverageAuditItem>) =>
-		Effect.gen(function* () {
+		Effect.gen(function* (): Effect.fn.Return<PlannerCoverageAuditSummary> {
 			const budgetLimits = new Map<string, number>();
 			const completedCertainties = new Map<string, number>();
 			const inconclusiveReasons = new Map<string, number>();

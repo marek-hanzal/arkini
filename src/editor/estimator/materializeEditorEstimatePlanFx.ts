@@ -113,7 +113,7 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 				],
 			]);
 			let snapshot: DemandSnapshot | undefined;
-			const maximumIterations = Math.max(2, policy.factIds.size * 2);
+			const maximumIterations = Math.max(2, policy.factCount * 2);
 
 			for (let iteration = 0; iteration < maximumIterations; iteration += 1) {
 				let selected = new Map<string, EditorEstimateSelectedRoute>();
@@ -132,18 +132,18 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 								},
 							],
 						} satisfies EditorEstimateCandidateFailure;
-					const root = policy.roots.get(id);
+					const root = yield* policy.readRootQuantityFx(id);
 					const rootQuantity =
 						root === "unbounded"
 							? requiredQuantity
 							: Math.min(root ?? 0, requiredQuantity);
 					const missing = Math.max(0, requiredQuantity - rootQuantity);
 					if (missing <= 1e-9) continue;
-					const routes = policy.routesByFact.get(id) ?? [];
+					const routes = yield* policy.readCandidateRoutesFx(id);
 					const route =
 						id === factId
 							? topRoute
-							: (policy.chooseRoute(id, requiredQuantity) ?? routes[0]);
+							: ((yield* policy.chooseRouteFx(id, requiredQuantity)) ?? routes[0]);
 					if (route === undefined)
 						return {
 							diagnostics: [
@@ -165,7 +165,10 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 							],
 						} satisfies EditorEstimateCandidateFailure;
 					const outputDistribution = route.output.quantityDistribution;
-					const outputRuns = policy.readExpectedRuns(outputDistribution, missing);
+					const outputRuns = yield* policy.readExpectedRunsFx(
+						outputDistribution,
+						missing,
+					);
 					if (!Number.isFinite(outputRuns))
 						return {
 							diagnostics: [
@@ -177,7 +180,7 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 							],
 						} satisfies EditorEstimateCandidateFailure;
 					const actionRuns = outputRuns * route.runMultiplier;
-					const groups = policy.chooseRequirements(route, actionRuns);
+					const groups = yield* policy.chooseRequirementsFx(route, actionRuns);
 					if (groups === undefined)
 						return {
 							diagnostics: [
@@ -251,21 +254,22 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 				const recurrenceByFact = new Map<string, Set<string>>();
 				const dependencies = new Map<string, Set<string>>();
 				for (const [id, plan] of selected) {
-					const recurrenceFactIds = new Set(
-						plan.groups
-							.filter((group) => {
-								const root = policy.roots.get(group.factId);
-								return (
-									group.consumed <= 1e-9 &&
-									(root === "unbounded" ||
-										(root ?? 0) >= Math.max(group.oneTime, group.ongoing)) &&
-									policy.seededComponentByFact.get(id) !== undefined &&
-									policy.seededComponentByFact.get(id) ===
-										policy.seededComponentByFact.get(group.factId)
-								);
-							})
-							.map((group) => group.factId),
-					);
+					const seededComponent = yield* policy.readSeededComponentFx(id);
+					const recurrenceFactIds = new Set<string>();
+					for (const group of plan.groups) {
+						const root = yield* policy.readRootQuantityFx(group.factId);
+						const groupSeededComponent = yield* policy.readSeededComponentFx(
+							group.factId,
+						);
+						if (
+							group.consumed <= 1e-9 &&
+							(root === "unbounded" ||
+								(root ?? 0) >= Math.max(group.oneTime, group.ongoing)) &&
+							seededComponent !== undefined &&
+							seededComponent === groupSeededComponent
+						)
+							recurrenceFactIds.add(group.factId);
+					}
 					recurrenceByFact.set(id, recurrenceFactIds);
 					dependencies.set(
 						id,

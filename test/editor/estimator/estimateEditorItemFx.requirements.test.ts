@@ -282,14 +282,21 @@ describe("estimateEditorItemFx", () => {
 
 		const policy = Effect.runSync(createEditorEstimatePolicyFx(dependencyGraph));
 
-		expect(
+		const seededComponents = new Map(
 			[
-				...policy.seededComponentByFact.keys(),
-			].sort(),
-		).toEqual([
-			"charge-root",
-			"condition-root",
-		]);
+				"condition-root",
+				"condition-dependent",
+				"charge-root",
+				"charge-dependent",
+			].map((factId) => [
+				factId,
+				Effect.runSync(policy.readSeededComponentFx(factId)),
+			]),
+		);
+		expect(seededComponents.get("condition-root")).toBeDefined();
+		expect(seededComponents.get("charge-root")).toBeDefined();
+		expect(seededComponents.get("condition-dependent")).toBeUndefined();
+		expect(seededComponents.get("charge-dependent")).toBeUndefined();
 	});
 
 	it("keeps charge-depletion output work while acquiring its payer once", () => {

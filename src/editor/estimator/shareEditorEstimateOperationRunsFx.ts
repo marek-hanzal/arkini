@@ -28,7 +28,7 @@ export const shareEditorEstimateOperationRunsFx = Effect.fn("shareEditorEstimate
 		readonly selected: ReadonlyMap<string, EditorEstimateSelectedRoute>;
 		readonly topRouteId: string;
 	}) =>
-		Effect.sync(() => {
+		Effect.gen(function* () {
 			const result = new Map(selected);
 			const selectedByOperationId = new Map<
 				string,
@@ -58,7 +58,7 @@ export const shareEditorEstimateOperationRunsFx = Effect.fn("shareEditorEstimate
 						demandByOutputGroupId.set(outputGroupId, plan.producedQuantity);
 				}
 				if (demandByOutputGroupId.size < 2) continue;
-				const expected = policy.expectedRuns.read({
+				const expected = yield* policy.readExpectedRunsJointFx({
 					demandByOutputGroupId,
 					distribution: operation.outputDistribution,
 				});
@@ -93,7 +93,7 @@ export const shareEditorEstimateOperationRunsFx = Effect.fn("shareEditorEstimate
 					EditorEstimateSelectedRoute["groups"][number]
 				>();
 				for (const [, plan] of entries) {
-					const groups = policy.chooseRequirements(plan.route, actionRuns);
+					const groups = yield* policy.chooseRequirementsFx(plan.route, actionRuns);
 					if (groups === undefined) continue;
 					for (const group of groups) {
 						const current = groupsByFactId.get(group.factId);

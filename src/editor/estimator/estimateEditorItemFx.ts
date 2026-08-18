@@ -143,7 +143,7 @@ export const estimateEditorItemFx = Effect.fn("estimateEditorItemFx")(
 				policy = yield* createEditorEstimatePolicyFx(graph);
 				policyByGraph.set(graph, policy);
 			}
-			if (!(quantity > 0) || !policy.factIds.has(factId))
+			if (!(quantity > 0) || !(yield* policy.hasFactFx(factId)))
 				return {
 					diagnostics: [
 						{
@@ -158,22 +158,12 @@ export const estimateEditorItemFx = Effect.fn("estimateEditorItemFx")(
 					status: "unreachable",
 					quantity,
 				} satisfies EditorItemEstimate;
-			const root = policy.roots.get(factId);
+			const root = yield* policy.readRootQuantityFx(factId);
 			if (root === "unbounded" || (root ?? 0) >= quantity)
 				return makeRootEstimate(factId, quantity, graph.limitations);
 
-			const selectedRoute = policy.chooseRoute(factId, quantity);
-			const selected =
-				selectedRoute === undefined
-					? undefined
-					: yield* materializeEditorEstimatePlanFx({
-							factId,
-							policy,
-							quantity,
-							topRoute: selectedRoute,
-						});
-			const remainingCandidates = yield* Effect.forEach(
-				(policy.routesByFact.get(factId) ?? []).filter((route) => route !== selectedRoute),
+			const candidates = yield* Effect.forEach(
+				yield* policy.readCandidateRoutesFx(factId),
 				(topRoute) =>
 					Effect.map(
 						materializeEditorEstimatePlanFx({
@@ -188,17 +178,6 @@ export const estimateEditorItemFx = Effect.fn("estimateEditorItemFx")(
 						}),
 					),
 			);
-			const candidates = [
-				...(selected === undefined || selectedRoute === undefined
-					? []
-					: [
-							{
-								candidate: selected,
-								routeId: selectedRoute.id,
-							},
-						]),
-				...remainingCandidates,
-			];
 			const bestPlan = candidates
 				.flatMap(({ candidate, routeId }) =>
 					"diagnostics" in candidate

@@ -6,7 +6,7 @@ import type {
 	EditorAcquisitionRequirement,
 	EditorAcquisitionRoute,
 } from "~/editor/EditorAcquisitionGraph";
-import { createEditorEstimateComponentIndexFx } from "~/editor/estimator/createEditorEstimateComponentIndexFx";
+import { createEditorEstimateIndexFx } from "~/editor/estimator/createEditorEstimateIndexFx";
 import {
 	createEditorEstimateExpectedRunsFx,
 	type EditorEstimateExpectedRuns,
@@ -24,53 +24,34 @@ export interface EditorEstimateRequirementGroup {
 }
 
 export interface EditorEstimatePolicy {
-	readonly expectedRuns: EditorEstimateExpectedRuns;
-	readonly factIds: ReadonlySet<string>;
-	readonly roots: ReadonlyMap<string, number | "unbounded">;
-	readonly routesByFact: ReadonlyMap<string, ReadonlyArray<EditorAcquisitionRoute>>;
-	readonly seededComponentByFact: ReadonlyMap<string, string>;
-	readonly chooseRequirements: (
+	readonly factCount: number;
+	readonly hasFactFx: (factId: string) => Effect.Effect<boolean>;
+	readonly readCandidateRoutesFx: (
+		factId: string,
+	) => Effect.Effect<ReadonlyArray<EditorAcquisitionRoute>>;
+	readonly chooseRequirementsFx: (
 		route: EditorAcquisitionRoute,
 		actionRuns: number,
-	) => ReadonlyArray<EditorEstimateRequirementGroup> | undefined;
-	readonly chooseRoute: (factId: string, quantity: number) => EditorAcquisitionRoute | undefined;
-	readonly readExpectedRuns: (
+	) => Effect.Effect<ReadonlyArray<EditorEstimateRequirementGroup> | undefined>;
+	readonly chooseRouteFx: (
+		factId: string,
+		quantity: number,
+	) => Effect.Effect<EditorAcquisitionRoute | undefined>;
+	readonly readExpectedRunsFx: (
 		distribution: ReadonlyArray<EditorAcquisitionQuantityProbability>,
 		quantity: number,
-	) => number;
+	) => Effect.Effect<number>;
+	readonly readExpectedRunsJointFx: (
+		input: Parameters<EditorEstimateExpectedRuns["read"]>[0],
+	) => Effect.Effect<ReturnType<EditorEstimateExpectedRuns["read"]>>;
+	readonly readRootQuantityFx: (
+		factId: string,
+	) => Effect.Effect<number | "unbounded" | undefined>;
+	readonly readSeededComponentFx: (factId: string) => Effect.Effect<string | undefined>;
 }
 
 const requirementQuantity = (requirement: EditorAcquisitionRequirement, actionRuns: number) =>
 	requirement.quantity * (requirement.usage === "consume" ? actionRuns : 1);
-
-const conditionRequirementSources = new Set<EditorAcquisitionRequirement["source"]>([
-	"line-condition",
-	"output-condition",
-]);
-
-const projectRequirement = (
-	requirement: EditorAcquisitionRequirement,
-): EditorAcquisitionRequirement =>
-	requirement.source === "charged-item"
-		? {
-				...requirement,
-				quantity: 1,
-				usage: "one-time",
-			}
-		: requirement;
-
-const projectEstimateRequirements = (route: EditorAcquisitionRoute) => ({
-	// Positive enable facts are hard acquisition prerequisites even though Estimate does not
-	// evaluate rule truth. Disable-rule alternatives remain outside the optimistic time model.
-	allOf: route.requirements.allOf.map(projectRequirement),
-	anyOf: route.requirements.anyOf
-		.map((clause) => clause.filter(({ source }) => !conditionRequirementSources.has(source)))
-		.map((clause) => clause.map(projectRequirement))
-		.filter((clause) => clause.length > 0),
-});
-
-const isRouteStaticallyUnsupported = (route: EditorAcquisitionRoute) =>
-	route.operation?.outputCompilation === "state-space-unsupported";
 
 /** Creates one deterministic complete-route selector over the canonical acquisition graph. */
 export const createEditorEstimatePolicyFx = Effect.fn("createEditorEstimatePolicyFx")(
@@ -114,55 +95,98 @@ export const createEditorEstimatePolicyFx = Effect.fn("createEditorEstimatePolic
 					scalarExpectedRunsByDistribution.set(distribution, byQuantity);
 				return runs;
 			};
-			const roots = new Map(
-				graph.roots.map(
-					({ factId, quantity }) =>
-						[
-							factId,
-							quantity,
-						] as const,
-				),
-			);
-			const estimateRequirementsByRoute = new Map(
-				graph.routes.map((route) => [
-					route,
-					projectEstimateRequirements(route),
-				]),
-			);
+			const index = yield* createEditorEstimateIndexFx(graph);
+			const factIds = index.factIds;
+			const roots = index.roots;
+			const routesByFact = index.routesByFact;
+			const componentByFact = index.componentByFact;
 			const readEstimateRequirements = (route: EditorAcquisitionRoute) =>
-				estimateRequirementsByRoute.get(route) ?? projectEstimateRequirements(route);
-			const routesByFact = new Map<string, EditorAcquisitionRoute[]>();
-			for (const route of graph.routes) {
-				const routes = routesByFact.get(route.output.factId) ?? [];
-				routes.push(route);
-				routesByFact.set(route.output.factId, routes);
-			}
-			for (const routes of routesByFact.values())
-				routes.sort((left, right) => left.id.localeCompare(right.id));
-			const { componentByFact, seededComponentByFact } =
-				yield* createEditorEstimateComponentIndexFx({
-					dependencyEdges: graph.routes
-						.filter((route) => !isRouteStaticallyUnsupported(route))
-						.flatMap((route) =>
-							[
-								...readEstimateRequirements(route).allOf,
-								...readEstimateRequirements(route).anyOf.flat(),
-							].map(
+				index.estimateRequirementsByRoute.get(route)!;
+			const readCompleteFacts = (blockedFactIds: ReadonlySet<string>) => {
+				const key = [
+					...blockedFactIds,
+				]
+					.sort()
+					.join("\u0000");
+				const cached = completeFactsByBlockedKey.get(key);
+				if (cached !== undefined) return cached;
+				const complete = new Set(graph.roots.map(({ factId }) => factId));
+				let pending = graph.routes.filter(
+					(route) =>
+						!blockedFactIds.has(route.output.factId) &&
+						!index.unsupportedRoutes.has(route),
+				);
+				for (let iteration = 0; iteration < graph.factIds.length; iteration += 1) {
+					let changed = false;
+					const nextPending: EditorAcquisitionRoute[] = [];
+					for (const route of pending) {
+						const requirements = readEstimateRequirements(route);
+						if (
+							requirements.allOf.some(
+								(requirement) => !complete.has(requirement.factId),
+							) ||
+							requirements.anyOf.some(
+								(clause) =>
+									!clause.some((requirement) => complete.has(requirement.factId)),
+							)
+						)
+							nextPending.push(route);
+						else if (!complete.has(route.output.factId)) {
+							complete.add(route.output.factId);
+							changed = true;
+						}
+					}
+					if (!changed) break;
+					pending = nextPending;
+				}
+				completeFactsByBlockedKey.set(key, complete);
+				return complete;
+			};
+			const completeFactsByBlockedKey = new Map<string, ReadonlySet<string>>();
+			const isCompleteRoute = (
+				route: EditorAcquisitionRoute,
+				blockedFactIds: ReadonlySet<string>,
+			) => {
+				if (index.unsupportedRoutes.has(route)) return false;
+				const requirements = readEstimateRequirements(route);
+				const satisfies = (complete: ReadonlySet<string>) =>
+					requirements.allOf.every((requirement) => complete.has(requirement.factId)) &&
+					requirements.anyOf.every((clause) =>
+						clause.some((requirement) => complete.has(requirement.factId)),
+					);
+				const complete = readCompleteFacts(blockedFactIds);
+				if (!satisfies(complete)) return false;
+				const outputComponent =
+					componentByFact.get(route.output.factId) ?? route.output.factId;
+				const mayReenterOutputComponent =
+					requirements.allOf.some(
+						({ factId }) => (componentByFact.get(factId) ?? factId) === outputComponent,
+					) ||
+					requirements.anyOf.some((clause) =>
+						clause
+							.filter(({ factId }) => complete.has(factId))
+							.every(
 								({ factId }) =>
-									[
-										route.output.factId,
-										factId,
-									] as const,
+									(componentByFact.get(factId) ?? factId) === outputComponent,
 							),
+					);
+				return (
+					!mayReenterOutputComponent ||
+					satisfies(
+						readCompleteFacts(
+							new Set([
+								...blockedFactIds,
+								route.output.factId,
+							]),
 						),
-					factIds: graph.factIds,
-					rootFactIds: new Set(graph.roots.map(({ factId }) => factId)),
-				});
-			// Quantity-aware recursion handles the condensation DAG. This scalar fixed point is
-			// only the bounded fallback for an edge that stays inside one strongly connected component.
+					)
+				);
+			};
+			const isRouteStaticallyUnsupported = (route: EditorAcquisitionRoute) =>
+				index.unsupportedRoutes.has(route);
 			const unitCost = new Map<string, number>();
-			for (const { factId } of graph.roots) unitCost.set(factId, 0);
-			for (let iteration = 0; iteration < graph.factIds.length; iteration += 1) {
+			for (const factId of graph.roots.map(({ factId }) => factId)) unitCost.set(factId, 0);
+			for (let iteration = 0; iteration < index.factCount; iteration += 1) {
 				let changed = false;
 				for (const route of graph.routes) {
 					if (isRouteStaticallyUnsupported(route)) continue;
@@ -205,88 +229,10 @@ export const createEditorEstimatePolicyFx = Effect.fn("createEditorEstimatePolic
 				if (!changed) break;
 			}
 			const quantityCostMemo = new Map<string, number>();
-			const completeFactsByBlockedKey = new Map<string, ReadonlySet<string>>();
 			const missingQuantity = (factId: string, quantity: number) => {
 				const root = roots.get(factId);
 				return root === "unbounded" ? 0 : Math.max(0, quantity - (root ?? 0));
 			};
-			const readCompleteFacts = (blockedFactIds: ReadonlySet<string>) => {
-				const key = [
-					...blockedFactIds,
-				]
-					.sort()
-					.join("\u0000");
-				const cached = completeFactsByBlockedKey.get(key);
-				if (cached !== undefined) return cached;
-				const complete = new Set(graph.roots.map(({ factId }) => factId));
-				let pending = graph.routes.filter(
-					(route) =>
-						!blockedFactIds.has(route.output.factId) &&
-						!isRouteStaticallyUnsupported(route),
-				);
-				for (let iteration = 0; iteration < graph.factIds.length; iteration += 1) {
-					let changed = false;
-					const nextPending: EditorAcquisitionRoute[] = [];
-					for (const route of pending) {
-						const requirements = readEstimateRequirements(route);
-						if (
-							requirements.allOf.some(
-								(requirement) => !complete.has(requirement.factId),
-							) ||
-							requirements.anyOf.some(
-								(clause) =>
-									!clause.some((requirement) => complete.has(requirement.factId)),
-							)
-						)
-							nextPending.push(route);
-						else if (!complete.has(route.output.factId)) {
-							complete.add(route.output.factId);
-							changed = true;
-						}
-					}
-					if (!changed) break;
-					pending = nextPending;
-				}
-				completeFactsByBlockedKey.set(key, complete);
-				return complete;
-			};
-			const isCompleteRoute = (
-				route: EditorAcquisitionRoute,
-				blockedFactIds: ReadonlySet<string>,
-			) => {
-				if (isRouteStaticallyUnsupported(route)) return false;
-				const requirements = readEstimateRequirements(route);
-				const satisfies = (complete: ReadonlySet<string>) =>
-					requirements.allOf.every((requirement) => complete.has(requirement.factId)) &&
-					requirements.anyOf.every((clause) =>
-						clause.some((requirement) => complete.has(requirement.factId)),
-					);
-				const complete = readCompleteFacts(blockedFactIds);
-				if (!satisfies(complete)) return false;
-				const readComponent = (factId: string) => componentByFact.get(factId) ?? factId;
-				const outputComponent = readComponent(route.output.factId);
-				const mayReenterOutputComponent =
-					requirements.allOf.some(
-						({ factId }) => readComponent(factId) === outputComponent,
-					) ||
-					requirements.anyOf.some((clause) =>
-						clause
-							.filter(({ factId }) => complete.has(factId))
-							.every(({ factId }) => readComponent(factId) === outputComponent),
-					);
-				return (
-					!mayReenterOutputComponent ||
-					satisfies(
-						readCompleteFacts(
-							new Set([
-								...blockedFactIds,
-								route.output.factId,
-							]),
-						),
-					)
-				);
-			};
-
 			function readFactCost(
 				factId: string,
 				quantity: number,
@@ -462,15 +408,24 @@ export const createEditorEstimatePolicyFx = Effect.fn("createEditorEstimatePolic
 					)[0]?.route;
 			};
 			return {
-				chooseRequirements: (route: EditorAcquisitionRoute, actionRuns: number) =>
-					chooseRequirements(route, actionRuns),
-				chooseRoute,
-				expectedRuns,
-				factIds: new Set(graph.factIds),
-				readExpectedRuns,
-				roots,
-				routesByFact,
-				seededComponentByFact,
+				hasFactFx: (factId: string) => Effect.sync(() => factIds.has(factId)),
+				factCount: index.factCount,
+				readCandidateRoutesFx: (factId: string) =>
+					Effect.sync(() => routesByFact.get(factId) ?? []),
+				chooseRequirementsFx: (route: EditorAcquisitionRoute, actionRuns: number) =>
+					Effect.sync(() => chooseRequirements(route, actionRuns)),
+				chooseRouteFx: (factId: string, quantity: number) =>
+					Effect.sync(() => chooseRoute(factId, quantity)),
+				readExpectedRunsFx: (
+					distribution: ReadonlyArray<EditorAcquisitionQuantityProbability>,
+					quantity: number,
+				) => Effect.sync(() => readExpectedRuns(distribution, quantity)),
+				readExpectedRunsJointFx: (
+					input: Parameters<EditorEstimateExpectedRuns["read"]>[0],
+				) => Effect.sync(() => expectedRuns.read(input)),
+				readRootQuantityFx: (factId: string) => Effect.sync(() => roots.get(factId)),
+				readSeededComponentFx: (factId: string) =>
+					Effect.sync(() => index.seededComponentByFact.get(factId)),
 			};
 		}),
 );

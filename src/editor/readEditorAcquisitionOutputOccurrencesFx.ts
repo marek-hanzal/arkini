@@ -1,5 +1,10 @@
 import { Effect } from "effect";
 
+import {
+	createEditorAcquisitionBoundedDistributionFx,
+	type EditorAcquisitionDistribution,
+} from "~/editor/createEditorAcquisitionBoundedDistributionFx";
+
 import type {
 	EditorAcquisitionOperationOutcome,
 	EditorAcquisitionOutputAnnotation,
@@ -10,12 +15,6 @@ import type {
 import { readEditorAcquisitionAvailabilityRequirementsFx } from "~/editor/readEditorAcquisitionAvailabilityRequirementsFx";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
-
-const maximumOutcomeStates = 4_096;
-type Distribution = ReadonlyArray<{
-	readonly probability: number;
-	readonly quantities: ReadonlyMap<string, number>;
-}>;
 
 interface OutputOccurrence {
 	readonly annotation: EditorAcquisitionOutputAnnotation;
@@ -37,142 +36,6 @@ interface EditorAcquisitionOutputModel {
 	readonly outputDistribution: ReadonlyArray<EditorAcquisitionOperationOutcome>;
 }
 
-const stateKey = (quantities: ReadonlyMap<string, number>) =>
-	[
-		...quantities,
-	]
-		.filter(([, quantity]) => quantity > 0)
-		.sort(([left], [right]) => left.localeCompare(right))
-		.map(([id, quantity]) => `${id}:${quantity}`)
-		.join("\u0000");
-
-const normalize = (distribution: Distribution): Distribution => {
-	const merged = new Map<
-		string,
-		{
-			probability: number;
-			quantities: ReadonlyMap<string, number>;
-		}
-	>();
-	for (const outcome of distribution) {
-		const key = stateKey(outcome.quantities);
-		const current = merged.get(key);
-		merged.set(key, {
-			probability: (current?.probability ?? 0) + outcome.probability,
-			quantities: current?.quantities ?? outcome.quantities,
-		});
-	}
-	const outcomes = [
-		...merged.values(),
-	].filter(({ probability }) => probability > 1e-12);
-	const total = outcomes.reduce((sum, { probability }) => sum + probability, 0);
-	return outcomes
-		.map((outcome) => ({
-			...outcome,
-			probability: outcome.probability / total,
-		}))
-		.sort((left, right) => stateKey(left.quantities).localeCompare(stateKey(right.quantities)));
-};
-
-const constant = (id?: string, quantity = 0): Distribution => [
-	{
-		probability: 1,
-		quantities:
-			id === undefined || quantity <= 0
-				? new Map()
-				: new Map([
-						[
-							id,
-							quantity,
-						],
-					]),
-	},
-];
-
-const mix = (
-	branches: ReadonlyArray<{
-		readonly distribution: Distribution;
-		readonly probability: number;
-	}>,
-): Distribution | undefined => {
-	if (
-		branches.reduce((sum, branch) => sum + branch.distribution.length, 0) > maximumOutcomeStates
-	)
-		return undefined;
-	return normalize(
-		branches.flatMap((branch) =>
-			branch.distribution.map((outcome) => ({
-				...outcome,
-				probability: outcome.probability * branch.probability,
-			})),
-		),
-	);
-};
-
-const convolve = (left: Distribution | undefined, right: Distribution | undefined) => {
-	if (
-		left === undefined ||
-		right === undefined ||
-		left.length * right.length > maximumOutcomeStates
-	)
-		return undefined;
-	return normalize(
-		left.flatMap((leftOutcome) =>
-			right.map((rightOutcome) => {
-				const quantities = new Map(leftOutcome.quantities);
-				for (const [id, quantity] of rightOutcome.quantities)
-					quantities.set(id, (quantities.get(id) ?? 0) + quantity);
-				return {
-					probability: leftOutcome.probability * rightOutcome.probability,
-					quantities,
-				};
-			}),
-		),
-	);
-};
-
-const repeat = (distribution: Distribution | undefined, count: number) => {
-	if (distribution === undefined || count > maximumOutcomeStates) return undefined;
-	let result: Distribution | undefined = constant();
-	for (let index = 0; index < count && result !== undefined; index += 1)
-		result = convolve(result, distribution);
-	return result;
-};
-
-const optional = (distribution: Distribution | undefined, probability: number) =>
-	distribution === undefined
-		? undefined
-		: mix([
-				{
-					distribution,
-					probability,
-				},
-				{
-					distribution: constant(),
-					probability: 1 - probability,
-				},
-			]);
-
-const marginal = (
-	distribution: Distribution,
-	readQuantity: (quantities: ReadonlyMap<string, number>) => number,
-) => {
-	const probabilities = new Map<number, number>();
-	for (const outcome of distribution) {
-		const quantity = readQuantity(outcome.quantities);
-		probabilities.set(quantity, (probabilities.get(quantity) ?? 0) + outcome.probability);
-	}
-	return [
-		...probabilities,
-	]
-		.filter(([, probability]) => probability > 1e-12)
-		.sort(([left], [right]) => left - right)
-		.map(([quantity, probability]) => ({
-			probability,
-			quantity,
-		}));
-};
-
 const requirementKey = (requirements: {
 	readonly allOf: ReadonlyArray<EditorAcquisitionRequirement>;
 	readonly anyOf: ReadonlyArray<ReadonlyArray<EditorAcquisitionRequirement>>;
@@ -188,7 +51,7 @@ const requirementKey = (requirements: {
 		),
 	});
 
-/** Compiles one bounded occurrence-keyed distribution, then derives every public marginal. */
+/** Translates authored output schema into occurrence and group distributions. */
 export const readEditorAcquisitionOutputOccurrencesFx = Effect.fn(
 	"readEditorAcquisitionOutputOccurrencesFx",
 )((output: OutputSchema.Type | undefined) =>
@@ -204,6 +67,7 @@ export const readEditorAcquisitionOutputOccurrencesFx = Effect.fn(
 					},
 				],
 			} satisfies EditorAcquisitionOutputModel;
+		const boundedDistribution = yield* createEditorAcquisitionBoundedDistributionFx();
 
 		const drafts: Array<
 			Omit<OutputOccurrence, "occurrenceQuantityDistribution" | "quantityDistribution">
@@ -233,7 +97,8 @@ export const readEditorAcquisitionOutputOccurrencesFx = Effect.fn(
 				requirements,
 			});
 			const count = drop.quantity.max - drop.quantity.min + 1;
-			if (!Number.isSafeInteger(count) || count > maximumOutcomeStates) return undefined;
+			if (!Number.isSafeInteger(count) || count > boundedDistribution.maximumOutcomeStates)
+				return undefined;
 			return Array.from(
 				{
 					length: count,
@@ -247,34 +112,36 @@ export const readEditorAcquisitionOutputOccurrencesFx = Effect.fn(
 						],
 					]),
 				}),
-			) satisfies Distribution;
+			) satisfies EditorAcquisitionDistribution;
 		});
 
 		const totalSetWeight = output.set.reduce((total, set) => total + set.weight, 0);
 		const setBranches: Array<{
-			distribution: Distribution;
+			distribution: EditorAcquisitionDistribution;
 			probability: number;
 		}> = [];
 		let unsupported = false;
 		for (const [setIndex, set] of output.set.entries()) {
-			let setDistribution: Distribution | undefined = constant();
+			let setDistribution: EditorAcquisitionDistribution | undefined =
+				yield* boundedDistribution.constantFx(undefined, 0);
 			for (const [rollIndex, roll] of set.roll.entries()) {
 				if (roll.type === "chance" && roll.chance === 0) continue;
-				let rollDistribution: Distribution | undefined;
+				let rollDistribution: EditorAcquisitionDistribution | undefined;
 				if (roll.type === "weight") {
 					const totalWeight = roll.drop.reduce(
 						(total, candidate) => total + candidate.weight,
 						0,
 					);
 					const candidates: Array<{
-						distribution: Distribution;
+						distribution: EditorAcquisitionDistribution;
 						probability: number;
 					}> = [];
 					for (const [candidateIndex, candidate] of roll.drop.entries()) {
-						let candidateDistribution: Distribution | undefined = constant();
+						let candidateDistribution: EditorAcquisitionDistribution | undefined =
+							yield* boundedDistribution.constantFx(undefined, 0);
 						for (const [dropIndex, drop] of candidate.drop.entries()) {
 							const id = `set:${setIndex}:roll:${rollIndex}:candidate:${candidateIndex}:drop:${dropIndex}`;
-							candidateDistribution = convolve(
+							candidateDistribution = yield* boundedDistribution.convolveFx(
 								candidateDistribution,
 								yield* readDropFx(drop, id, {
 									alternativeSet: output.set.length > 1,
@@ -291,17 +158,25 @@ export const readEditorAcquisitionOutputOccurrencesFx = Effect.fn(
 								probability: candidate.weight / totalWeight,
 							});
 					}
-					const selection = unsupported ? undefined : mix(candidates);
+					const selection = unsupported
+						? undefined
+						: yield* boundedDistribution.mixFx(candidates);
 					const count = roll.quantity.max - roll.quantity.min + 1;
 					const repetitions: Array<{
-						distribution: Distribution;
+						distribution: EditorAcquisitionDistribution;
 						probability: number;
 					}> = [];
-					if (!Number.isSafeInteger(count) || count > maximumOutcomeStates)
+					if (
+						!Number.isSafeInteger(count) ||
+						count > boundedDistribution.maximumOutcomeStates
+					)
 						rollDistribution = undefined;
 					else {
 						for (let index = 0; index < count; index += 1) {
-							const distribution = repeat(selection, roll.quantity.min + index);
+							const distribution = yield* boundedDistribution.repeatFx(
+								selection,
+								roll.quantity.min + index,
+							);
 							if (distribution === undefined) break;
 							repetitions.push({
 								distribution,
@@ -309,13 +184,16 @@ export const readEditorAcquisitionOutputOccurrencesFx = Effect.fn(
 							});
 						}
 						rollDistribution =
-							repetitions.length === count ? mix(repetitions) : undefined;
+							repetitions.length === count
+								? yield* boundedDistribution.mixFx(repetitions)
+								: undefined;
 					}
 				} else {
-					let drops: Distribution | undefined = constant();
+					let drops: EditorAcquisitionDistribution | undefined =
+						yield* boundedDistribution.constantFx(undefined, 0);
 					for (const [dropIndex, drop] of roll.drop.entries()) {
 						const id = `set:${setIndex}:roll:${rollIndex}:drop:${dropIndex}`;
-						drops = convolve(
+						drops = yield* boundedDistribution.convolveFx(
 							drops,
 							yield* readDropFx(drop, id, {
 								alternativeSet: output.set.length > 1,
@@ -326,9 +204,14 @@ export const readEditorAcquisitionOutputOccurrencesFx = Effect.fn(
 						);
 					}
 					rollDistribution =
-						roll.type === "chance" ? optional(drops, roll.chance) : drops;
+						roll.type === "chance"
+							? yield* boundedDistribution.optionalFx(drops, roll.chance)
+							: drops;
 				}
-				setDistribution = convolve(setDistribution, rollDistribution);
+				setDistribution = yield* boundedDistribution.convolveFx(
+					setDistribution,
+					rollDistribution,
+				);
 				if (setDistribution === undefined) unsupported = true;
 			}
 			if (setDistribution !== undefined)
@@ -338,7 +221,9 @@ export const readEditorAcquisitionOutputOccurrencesFx = Effect.fn(
 				});
 		}
 
-		const occurrenceDistribution = unsupported ? undefined : mix(setBranches);
+		const occurrenceDistribution = unsupported
+			? undefined
+			: yield* boundedDistribution.mixFx(setBranches);
 		if (occurrenceDistribution === undefined)
 			return {
 				compilation: "state-space-unsupported",
@@ -361,25 +246,40 @@ export const readEditorAcquisitionOutputOccurrencesFx = Effect.fn(
 				]),
 			),
 		}));
-		const groupMarginals = new Map(
-			[
-				...occurrenceIdsByGroup.keys(),
-			].map((groupId) => [
+		const groupMarginals = new Map<
+			string,
+			ReadonlyArray<EditorAcquisitionQuantityProbability>
+		>();
+		for (const groupId of occurrenceIdsByGroup.keys())
+			groupMarginals.set(
 				groupId,
-				marginal(groupDistribution, (quantities) => quantities.get(groupId) ?? 0),
-			]),
-		);
+				yield* boundedDistribution.marginalFx(
+					groupDistribution,
+					(quantities) => quantities.get(groupId) ?? 0,
+				),
+			);
+		const occurrenceMarginals = new Map<
+			string,
+			ReadonlyArray<EditorAcquisitionQuantityProbability>
+		>();
+		for (const draft of drafts)
+			occurrenceMarginals.set(
+				draft.id,
+				yield* boundedDistribution.marginalFx(
+					occurrenceDistribution,
+					(quantities) => quantities.get(draft.id) ?? 0,
+				),
+			);
+		const normalizedGroupDistribution =
+			yield* boundedDistribution.normalizeFx(groupDistribution);
 		return {
 			compilation: "complete",
 			occurrences: drafts.map((draft) => ({
 				...draft,
-				occurrenceQuantityDistribution: marginal(
-					occurrenceDistribution,
-					(quantities) => quantities.get(draft.id) ?? 0,
-				),
+				occurrenceQuantityDistribution: occurrenceMarginals.get(draft.id) ?? [],
 				quantityDistribution: groupMarginals.get(draft.operationOutputGroupId) ?? [],
 			})),
-			outputDistribution: normalize(groupDistribution).map(({ probability, quantities }) => ({
+			outputDistribution: normalizedGroupDistribution.map(({ probability, quantities }) => ({
 				probability,
 				quantities: [
 					...quantities,

@@ -39,6 +39,7 @@ export const useEditorOriginFlowCanvasPointer = ({
 	metroBackbones,
 	nodeMetrics,
 	onSelectionChange,
+	onItemOpen,
 	positions,
 	resetNavigation,
 	scheduleDraw,
@@ -53,6 +54,7 @@ export const useEditorOriginFlowCanvasPointer = ({
 	readonly metroBackbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
 	readonly nodeMetrics: ReadonlyMap<string, EditorOriginFlowNodeMetrics>;
 	readonly onSelectionChange: (selection: EditorOriginFlowSelection | undefined) => void;
+	readonly onItemOpen: (itemId: string) => void;
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
 	readonly resetNavigation: () => void;
 	readonly scheduleDraw: () => void;
@@ -61,21 +63,17 @@ export const useEditorOriginFlowCanvasPointer = ({
 	readonly visitHistoryRef: RefObject<ReadonlyArray<string>>;
 }) => {
 	const panRef = useRef<EditorOriginFlowCanvasPan | undefined>(undefined);
-
-	const finishPan = (event: ReactPointerEvent<HTMLCanvasElement>, cancelled: boolean) => {
-		const pan = panRef.current;
-		if (pan === undefined || pan.pointerId !== event.pointerId) return;
-		panRef.current = undefined;
-		event.currentTarget.style.cursor = "grab";
-		if (event.currentTarget.hasPointerCapture(event.pointerId))
-			event.currentTarget.releasePointerCapture(event.pointerId);
-		if (cancelled || pan.moved) return;
-
+	const readWorldPoint = (event: ReactPointerEvent<HTMLCanvasElement>) => {
 		const rect = event.currentTarget.getBoundingClientRect();
 		const viewport = viewportRef.current;
-		const worldX = (event.clientX - rect.left - viewport.x) / viewport.zoom;
-		const worldY = (event.clientY - rect.top - viewport.y) / viewport.zoom;
-		const hit = RendererRuntime.runSync(
+		return {
+			x: (event.clientX - rect.left - viewport.x) / viewport.zoom,
+			y: (event.clientY - rect.top - viewport.y) / viewport.zoom,
+		};
+	};
+	const readHit = (event: ReactPointerEvent<HTMLCanvasElement>) => {
+		const point = readWorldPoint(event);
+		return RendererRuntime.runSync(
 			readEditorOriginFlowHitFx({
 				backbones,
 				connectedPorts,
@@ -85,11 +83,42 @@ export const useEditorOriginFlowCanvasPointer = ({
 				nodeMetrics,
 				positions,
 				selection,
-				x: worldX,
-				y: worldY,
-				zoom: viewport.zoom,
+				x: point.x,
+				y: point.y,
+				zoom: viewportRef.current.zoom,
 			}),
 		);
+	};
+	const isOverNode = (event: ReactPointerEvent<HTMLCanvasElement>) => {
+		const point = readWorldPoint(event);
+		for (const [nodeId, position] of positions)
+			if (
+				(selection?.kind !== "node" || highlight?.nodeIds.has(nodeId) === true) &&
+				point.x >= position.x &&
+				point.x <= position.x + position.width &&
+				point.y >= position.y &&
+				point.y <= position.y + position.height
+			)
+				return true;
+		return false;
+	};
+
+	const finishPan = (event: ReactPointerEvent<HTMLCanvasElement>, cancelled: boolean) => {
+		const pan = panRef.current;
+		if (pan === undefined || pan.pointerId !== event.pointerId) return;
+		panRef.current = undefined;
+		event.currentTarget.style.cursor = isOverNode(event) ? "pointer" : "grab";
+		if (event.currentTarget.hasPointerCapture(event.pointerId))
+			event.currentTarget.releasePointerCapture(event.pointerId);
+		if (cancelled || pan.moved) return;
+
+		const rect = event.currentTarget.getBoundingClientRect();
+		const viewport = viewportRef.current;
+		const hit = readHit(event);
+		if (hit?.kind === "item-detail") {
+			onItemOpen(hit.itemId);
+			return;
+		}
 		if (hit?.kind === "port") {
 			const targetPosition = positions.get(hit.targetNodeId);
 			if (targetPosition === undefined) return;
@@ -150,7 +179,11 @@ export const useEditorOriginFlowCanvasPointer = ({
 
 	const handlePointerMove = (event: ReactPointerEvent<HTMLCanvasElement>) => {
 		const pan = panRef.current;
-		if (pan === undefined || pan.pointerId !== event.pointerId) return;
+		if (pan === undefined) {
+			event.currentTarget.style.cursor = isOverNode(event) ? "pointer" : "grab";
+			return;
+		}
+		if (pan.pointerId !== event.pointerId) return;
 		const deltaX = event.clientX - pan.startClientX;
 		const deltaY = event.clientY - pan.startClientY;
 		if (Math.abs(deltaX) + Math.abs(deltaY) >= ClickThreshold) pan.moved = true;

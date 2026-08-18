@@ -7,7 +7,6 @@ export const EditorItemSectionIds = [
 	"merges",
 	"production",
 	"estimate",
-	"flow",
 ] as const;
 
 export type EditorItemSectionId = (typeof EditorItemSectionIds)[number];

@@ -1,11 +1,10 @@
 import { Effect } from "effect";
 import type { EditorItemOriginFlowProgress } from "~/bridge/item/editor/EditorItemOriginFlow";
 
-export type EditorItemOriginFlowPhase = "indexing" | "tracing" | "resolving" | "finalizing";
+export type EditorItemOriginFlowPhase = "indexing" | "resolving" | "finalizing";
 
 const ProgressLabels: Record<EditorItemOriginFlowPhase, string> = {
 	indexing: "Indexing sources",
-	tracing: "Tracing flow",
 	resolving: "Resolving reachability",
 	finalizing: "Preparing flow",
 };

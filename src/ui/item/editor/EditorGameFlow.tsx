@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import {
@@ -6,21 +6,35 @@ import {
 	selectableInactiveClassName,
 } from "~/ui/form/SelectableStateClassName";
 import { EditorItemFlowSearch } from "~/ui/item/editor/EditorItemFlowSearch";
-import { EditorOriginFlowSection } from "~/ui/item/editor/EditorItemFlowSection";
+import { EditorOriginFlowSection } from "~/ui/item/editor/EditorOriginFlowSection";
 import { useEditorItemSearchOptions } from "~/ui/item/editor/useEditorItemSearchOptions";
 import type { EditorOriginFlowDirection } from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
 
 const readGraphFilterDescription = (direction: EditorOriginFlowDirection) =>
-	direction === "income"
-		? "Search selects an item; Income highlights everything required to obtain it."
-		: "Search selects an item; Outcome highlights everything that depends on it.";
+	direction === "input"
+		? "Search selects an item; Input highlights downstream operations that use it."
+		: "Search selects an item; Output highlights upstream operations that produce it.";
 
 /** Shows the complete authored game graph and lets search navigate to one selected item. */
-export const EditorGameFlow = () => {
-	const [itemId, setItemId] = useState("");
+export const EditorGameFlow = ({
+	direction: initialDirection = "input",
+	itemId: initialItemId = "",
+}: {
+	readonly direction?: EditorOriginFlowDirection;
+	readonly itemId?: string;
+}) => {
+	const [itemId, setItemId] = useState(initialItemId);
 	const [focusRequestKey, setFocusRequestKey] = useState(0);
-	const [direction, setDirection] = useState<EditorOriginFlowDirection>("income");
+	const [direction, setDirection] = useState<EditorOriginFlowDirection>(initialDirection);
 	const { items, options } = useEditorItemSearchOptions();
+	useEffect(() => {
+		setItemId(initialItemId);
+		setDirection(initialDirection);
+		setFocusRequestKey((current) => current + 1);
+	}, [
+		initialDirection,
+		initialItemId,
+	]);
 	return (
 		<section
 			className="grid h-full min-h-0 grid-rows-[auto_1fr] gap-3 p-3"
@@ -50,23 +64,23 @@ export const EditorGameFlow = () => {
 					</div>
 					<div
 						aria-label="Flow direction"
-						className="inline-flex min-h-[var(--ak-control-min-height)] shrink-0 rounded-lg border border-line bg-surface p-1"
+						className="inline-flex shrink-0 gap-1"
 						role="group"
 					>
 						{(
 							[
-								"income",
-								"outcome",
+								"input",
+								"output",
 							] as const
 						).map((value) => (
 							<button
 								aria-pressed={direction === value}
-								className={`cursor-pointer rounded-md border px-3 py-2 text-sm font-semibold ${direction === value ? selectableActiveClassName : selectableInactiveClassName}`}
+								className={`min-h-[var(--ak-control-min-height)] cursor-pointer rounded-lg border px-3 py-2 text-sm font-semibold ${direction === value ? selectableActiveClassName : selectableInactiveClassName}`}
 								key={value}
 								onClick={() => setDirection(value)}
 								type="button"
 							>
-								{value === "income" ? "Income" : "Outcome"}
+								{value === "input" ? "Input" : "Output"}
 							</button>
 						))}
 					</div>
@@ -76,7 +90,6 @@ export const EditorGameFlow = () => {
 				direction={direction}
 				focusItemId={itemId || undefined}
 				focusRequestKey={focusRequestKey}
-				mode="all"
 			/>
 		</section>
 	);

@@ -132,6 +132,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const editorMcpOwnership = yield* createEditorMcpOwnershipFx({
 		editor: editorProjectServiceOwnership,
 		readPortFx: editorMcpPreferences.readPortFx,
+		runPromise: ElectronMainRuntime.runPromise,
 	});
 	yield* Effect.sync(() => app.once("will-quit", editorMcpOwnership.closeSync));
 	const windowModeControllerOwnership = yield* createWindowModeControllerOwnershipFx();

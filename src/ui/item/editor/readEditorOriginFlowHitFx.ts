@@ -1,6 +1,10 @@
 import { Effect } from "effect";
 
-import type { EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
+import {
+	EditorItemOriginItemInputPortId,
+	EditorItemOriginItemOutputPortId,
+	type EditorItemOriginFlow,
+} from "~/bridge/item/editor/EditorItemOriginFlow";
 import type {
 	EditorItemOriginFlowLayoutNode,
 	EditorItemOriginFlowLayoutPoint,
@@ -17,6 +21,10 @@ export type EditorOriginFlowHit =
 	| {
 			readonly kind: "port";
 			readonly targetNodeId: string;
+	  }
+	| {
+			readonly itemId: string;
+			readonly kind: "item-detail";
 	  };
 
 const distanceToSegment = (
@@ -89,6 +97,44 @@ export const readEditorOriginFlowHitFx = Effect.fn("readEditorOriginFlowHitFx")(
 				const metrics = nodeMetrics.get(node.id);
 				if (position === undefined || metrics === undefined) continue;
 				const connectedPortIds = connectedPorts.get(node.id);
+				const readItemPortTarget = (portId: string) =>
+					flow.edges
+						.filter((edge) =>
+							portId === EditorItemOriginItemInputPortId
+								? edge.target === node.id && edge.targetPortId === portId
+								: edge.source === node.id && edge.sourcePortId === portId,
+						)
+						.sort((left, right) => left.id.localeCompare(right.id))
+						.map((edge) =>
+							portId === EditorItemOriginItemInputPortId ? edge.source : edge.target,
+						)
+						.find((targetNodeId) => positions.has(targetNodeId));
+				if (
+					connectedPortIds?.has(EditorItemOriginItemInputPortId) === true &&
+					Math.hypot(x - position.x, y - (position.y + metrics.itemPortY)) <=
+						portTolerance
+				) {
+					const targetNodeId = readItemPortTarget(EditorItemOriginItemInputPortId);
+					if (targetNodeId !== undefined)
+						return {
+							kind: "port",
+							targetNodeId,
+						};
+				}
+				if (
+					connectedPortIds?.has(EditorItemOriginItemOutputPortId) === true &&
+					Math.hypot(
+						x - (position.x + position.width),
+						y - (position.y + metrics.itemPortY),
+					) <= portTolerance
+				) {
+					const targetNodeId = readItemPortTarget(EditorItemOriginItemOutputPortId);
+					if (targetNodeId !== undefined)
+						return {
+							kind: "port",
+							targetNodeId,
+						};
+				}
 				for (const [operationIndex, operation] of node.operations.entries()) {
 					const operationMetrics = metrics.operations[operationIndex];
 					if (operationMetrics === undefined) continue;
@@ -123,6 +169,17 @@ export const readEditorOriginFlowHitFx = Effect.fn("readEditorOriginFlowHitFx")(
 							};
 					}
 				}
+				const itemTextBounds = metrics.itemTextBounds;
+				if (
+					x >= position.x + itemTextBounds.x &&
+					x <= position.x + itemTextBounds.x + itemTextBounds.width &&
+					y >= position.y + itemTextBounds.y &&
+					y <= position.y + itemTextBounds.y + itemTextBounds.height
+				)
+					return {
+						itemId: node.itemId,
+						kind: "item-detail",
+					};
 			}
 			for (let index = flow.nodes.length - 1; index >= 0; index -= 1) {
 				const node = flow.nodes[index]!;

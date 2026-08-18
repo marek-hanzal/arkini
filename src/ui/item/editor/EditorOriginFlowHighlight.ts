@@ -2,7 +2,8 @@ import { Order } from "effect";
 
 import type { EditorItemOriginEdge } from "~/bridge/item/editor/EditorItemOriginFlow";
 
-export type EditorOriginFlowDirection = "income" | "outcome";
+/** Input follows downstream consumers; Output follows upstream producers. */
+export type EditorOriginFlowDirection = "input" | "output";
 
 export const EditorOriginFlowEdgeOrder = Order.make<EditorItemOriginEdge>((left, right) => {
 	const operationOrder = left.operationId.localeCompare(right.operationId);

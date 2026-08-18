@@ -1,3 +1,4 @@
+import { Effect } from "effect";
 import { z } from "zod";
 
 import type { EditorProjectRepository } from "../../src/editor/EditorProjectRepository";
@@ -57,29 +58,24 @@ const parse = <Value>(
 	});
 };
 
-export const parseEditorProjectId = (candidate: unknown) =>
-	parse("read-project", IdSchema, candidate);
-
-export const parseCreateProjectRequest = (
-	candidate: unknown,
-): EditorProjectRepository.CreateProjectProps =>
-	parse("create-project", createProjectSchema, candidate);
-
-export const parseUpsertItemRequest = (
-	candidate: unknown,
-): EditorProjectRepository.UpsertItemProps => parse("upsert-item", upsertItemSchema, candidate);
-
-export const parseReplaceConfigRequest = (
-	candidate: unknown,
-): EditorProjectRepository.ReplaceConfigProps =>
-	parse("replace-config", replaceConfigSchema, candidate);
-
-export const parseReplaceResourceRequest = (
-	candidate: unknown,
-): EditorProjectRepository.ReplaceResourceProps =>
-	parse("replace-resource", replaceResourceSchema, candidate);
-
-export const parseUpsertResourcesRequest = (
-	candidate: unknown,
-): EditorProjectRepository.UpsertResourcesProps =>
-	parse("upsert-resource", upsertResourcesSchema, candidate);
+/** Creates the server-owned validator capability used by the Electron IPC adapter. */
+export const createEditorProjectRequestParserFx = Effect.fn("createEditorProjectRequestParserFx")(
+	() =>
+		Effect.succeed({
+			parseCreateProject: (candidate: unknown): EditorProjectRepository.CreateProjectProps =>
+				parse("create-project", createProjectSchema, candidate),
+			parseProjectId: (candidate: unknown) => parse("read-project", IdSchema, candidate),
+			parseReplaceConfig: (candidate: unknown): EditorProjectRepository.ReplaceConfigProps =>
+				parse("replace-config", replaceConfigSchema, candidate),
+			parseReplaceResource: (
+				candidate: unknown,
+			): EditorProjectRepository.ReplaceResourceProps =>
+				parse("replace-resource", replaceResourceSchema, candidate),
+			parseUpsertItem: (candidate: unknown): EditorProjectRepository.UpsertItemProps =>
+				parse("upsert-item", upsertItemSchema, candidate),
+			parseUpsertResources: (
+				candidate: unknown,
+			): EditorProjectRepository.UpsertResourcesProps =>
+				parse("upsert-resource", upsertResourcesSchema, candidate),
+		} as const),
+);

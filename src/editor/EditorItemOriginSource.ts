@@ -90,8 +90,3 @@ export interface EditorItemOriginRelationSubgraph {
 		}
 	>;
 }
-
-export interface EditorItemOriginIncomeSubgraph {
-	readonly itemIds: ReadonlySet<string>;
-	readonly sources: ReadonlyArray<EditorItemOriginSource>;
-}

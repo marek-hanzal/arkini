@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { searchEditorItems } from "~/editor/searchEditorItems";
+import { searchEditorItemsFx } from "~/editor/searchEditorItemsFx";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { PrimaryButtonLink } from "~/ui/button/Button";
 import { EditorItemListRow } from "~/ui/item/editor/EditorItemListRow";
 import { Status } from "~/ui/status/Status";
@@ -26,9 +27,11 @@ export const EditorItemList = () => {
 	const empty = items.length === 0;
 	const filteredItems = useMemo(
 		() =>
-			searchEditorItems(
-				items.filter((item) => itemType === undefined || item.type === itemType),
-				query,
+			RendererRuntime.runSync(
+				searchEditorItemsFx(
+					items.filter((item) => itemType === undefined || item.type === itemType),
+					query,
+				),
 			),
 		[
 			itemType,

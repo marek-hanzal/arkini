@@ -12,11 +12,11 @@ const readShortcutRows = (direction: EditorOriginFlowDirection) =>
 	[
 		[
 			"N",
-			`Next item in the selected ${direction === "income" ? "Income" : "Outcome"} graph.`,
+			`Next item in the selected ${direction === "output" ? "Output" : "Input"} graph.`,
 		],
 		[
 			"P",
-			`Previous item in the selected ${direction === "income" ? "Income" : "Outcome"} graph.`,
+			`Previous item in the selected ${direction === "output" ? "Output" : "Input"} graph.`,
 		],
 		[
 			"H",

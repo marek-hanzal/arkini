@@ -11,8 +11,8 @@ import {
 } from "~/ui/item/editor/EditorOriginFlowHighlight";
 
 /** Reads every direct producer branch and one deterministic acquisition proof below each branch. */
-export const readEditorOriginFlowIncomeHighlightFx = Effect.fn(
-	"readEditorOriginFlowIncomeHighlightFx",
+export const readEditorOriginFlowOutputHighlightFx = Effect.fn(
+	"readEditorOriginFlowOutputHighlightFx",
 )((flow: EditorItemOriginFlow, startNode: EditorItemOriginItemNode) =>
 	Effect.sync((): EditorOriginFlowHighlight => {
 		const nodeById = new Map(

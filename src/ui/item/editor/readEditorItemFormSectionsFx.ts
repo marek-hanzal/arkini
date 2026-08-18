@@ -10,6 +10,6 @@ export const readEditorItemFormSectionsFx = Effect.fn("readEditorItemFormSection
 		Effect.map(
 			readEditorItemSectionsFx(item),
 			(sections): ReadonlyArray<EditorItemSectionDescriptor> =>
-				sections.filter((section) => section.id !== "estimate" && section.id !== "flow"),
+				sections.filter((section) => section.id !== "estimate"),
 		),
 );

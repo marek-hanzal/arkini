@@ -45,6 +45,7 @@ interface EditorOriginFlowCanvasProps {
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
 	readonly selection: EditorOriginFlowSelection | undefined;
 	readonly onSelectionChange: (selection: EditorOriginFlowSelection | undefined) => void;
+	readonly onItemOpen: (itemId: string) => void;
 }
 
 interface RenderState {
@@ -70,12 +71,13 @@ const FlowPainter = RendererRuntime.runSync(createEditorOriginFlowCanvasPainterF
 /** Renders the passive item flow directly to Canvas with imperative pan and zoom. */
 export const EditorOriginFlowCanvas = ({
 	backbones,
-	direction = "income",
+	direction = "input",
 	fitContent,
 	flow,
 	focusNodeId,
 	focusRequestKey,
 	onSelectionChange,
+	onItemOpen,
 	positions,
 	selection,
 }: EditorOriginFlowCanvasProps) => {
@@ -454,6 +456,7 @@ export const EditorOriginFlowCanvas = ({
 			highlight,
 			metroBackbones,
 			nodeMetrics,
+			onItemOpen,
 			onSelectionChange,
 			positions,
 			resetNavigation,

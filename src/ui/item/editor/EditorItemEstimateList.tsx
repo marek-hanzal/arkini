@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { searchEditorItems } from "~/editor/searchEditorItems";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { searchEditorItemsFx } from "~/editor/searchEditorItemsFx";
 import { EditorSelect, type EditorSelectOption } from "~/ui/form/EditorSelect";
 import { EditorItemEstimateListRow } from "~/ui/item/editor/EditorItemEstimateListRow";
 import { useEditorItemEstimateIndex } from "~/ui/item/editor/useEditorItemEstimateIndex";
@@ -48,7 +49,9 @@ export const EditorItemEstimateList = () => {
 				entry,
 			]),
 		);
-		return searchEditorItems(Object.values(project.config.items), query)
+		return RendererRuntime.runSync(
+			searchEditorItemsFx(Object.values(project.config.items), query),
+		)
 			.flatMap((item) => {
 				const estimate = estimates.get(item.id);
 				return estimate === undefined

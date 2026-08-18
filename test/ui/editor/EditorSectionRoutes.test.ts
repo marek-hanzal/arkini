@@ -74,6 +74,24 @@ describe("editor section routes", () => {
 		});
 	});
 
+	it("redirects the removed local Flow section to item identity", () => {
+		const redirect = readRedirect(readBeforeLoad(ItemDetailSectionRoute), {
+			projectId: "project-test",
+			itemUid: "item-test",
+			sectionId: "flow",
+		});
+
+		expect(redirect.options).toMatchObject({
+			to: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId",
+			params: {
+				projectId: "project-test",
+				itemUid: "item-test",
+				sectionId: "identity",
+			},
+			replace: true,
+		});
+	});
+
 	it("redirects unknown item form sections while preserving route-owned search", () => {
 		const redirect = readRedirect(readBeforeLoad(ItemFormSectionRoute), {
 			projectId: "project-test",
@@ -102,18 +120,6 @@ describe("editor section routes", () => {
 				params: {
 					projectId: "project-test",
 					sectionId: "appearance",
-				},
-			}),
-		).not.toThrow();
-		expect(() =>
-			readBeforeLoad(ItemDetailSectionRoute)({
-				context: {
-					rendererRuntime: RendererRuntime,
-				},
-				params: {
-					projectId: "project-test",
-					itemUid: "item-test",
-					sectionId: "flow",
 				},
 			}),
 		).not.toThrow();

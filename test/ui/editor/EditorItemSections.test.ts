@@ -32,7 +32,6 @@ describe("EditorItemSections", () => {
 			"charges",
 			"merges",
 			"estimate",
-			"flow",
 		]);
 		expect(
 			Effect.runSync(readEditorItemSectionsFx(item("inventory"))).map(({ id }) => id),
@@ -42,7 +41,6 @@ describe("EditorItemSections", () => {
 			"charges",
 			"merges",
 			"estimate",
-			"flow",
 		]);
 		expect(
 			Effect.runSync(readEditorItemSectionsFx(item("producer"))).map(({ id }) => id),
@@ -53,7 +51,6 @@ describe("EditorItemSections", () => {
 			"merges",
 			"production",
 			"estimate",
-			"flow",
 		]);
 	});
 

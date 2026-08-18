@@ -4,10 +4,8 @@ import { useLayoutEffect, type PropsWithChildren } from "react";
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
 import { EditorProjectContext } from "~/bridge/editor/EditorProjectContext";
-import {
-	clearEditorMcpProjectContextFx,
-	setEditorMcpProjectContextFx,
-} from "~/bridge/editor-mcp/EditorMcpPort";
+import { clearEditorMcpProjectContextFx } from "~/bridge/editor-mcp/clearEditorMcpProjectContextFx";
+import { setEditorMcpProjectContextFx } from "~/bridge/editor-mcp/setEditorMcpProjectContextFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 
 /** Publishes one committed repository snapshot to the mounted editor tree. */

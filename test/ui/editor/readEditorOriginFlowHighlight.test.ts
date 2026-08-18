@@ -70,7 +70,7 @@ const item = (
 	type: "simple",
 });
 
-const incomeFlow: EditorItemOriginFlow = {
+const outputFlow: EditorItemOriginFlow = {
 	edges: [
 		{
 			id: "tool-forge",
@@ -141,7 +141,7 @@ const incomeFlow: EditorItemOriginFlow = {
 };
 
 const positions = new Map(
-	incomeFlow.nodes.map(
+	outputFlow.nodes.map(
 		(node, index) =>
 			[
 				node.id,
@@ -159,7 +159,7 @@ const positions = new Map(
 const runHighlight = (
 	flow: EditorItemOriginFlow,
 	selection: EditorOriginFlowSelection,
-	direction: EditorOriginFlowDirection = "income",
+	direction: EditorOriginFlowDirection = "output",
 ) => Effect.runSync(readEditorOriginFlowHighlightFx(flow, selection, direction));
 
 const runRelationNavigation = (
@@ -182,12 +182,12 @@ const runNavigation = (
 	allowedEdgeIds?: ReadonlySet<string>,
 ) =>
 	Effect.runSync(
-		readEditorOriginFlowNavigationFx(flow, positions, startNodeId, "income", allowedEdgeIds),
+		readEditorOriginFlowNavigationFx(flow, positions, startNodeId, "output", allowedEdgeIds),
 	);
 
 describe("readEditorOriginFlowHighlight", () => {
 	it("includes every producer branch with its mandatory prerequisites", () => {
-		const highlight = runHighlight(incomeFlow, {
+		const highlight = runHighlight(outputFlow, {
 			id: "item:target",
 			kind: "node",
 		});
@@ -255,12 +255,12 @@ describe("readEditorOriginFlowHighlight", () => {
 		);
 
 		const producerNodeIds = runRelationNavigation({
-			flow: incomeFlow,
+			flow: outputFlow,
 			selectedNodeId: "item:target",
 			selectedRole: "output",
 		});
 		const navigationNodeIds = runNavigation(
-			incomeFlow,
+			outputFlow,
 			positions,
 			"item:target",
 			highlight.edgeIds,
@@ -275,14 +275,14 @@ describe("readEditorOriginFlowHighlight", () => {
 		}
 	});
 
-	it("traces Outcome forward without pulling unrelated co-input branches", () => {
+	it("traces Input forward without pulling unrelated co-input branches", () => {
 		const highlight = runHighlight(
-			incomeFlow,
+			outputFlow,
 			{
 				id: "item:tool",
 				kind: "node",
 			},
-			"outcome",
+			"input",
 		);
 
 		expect(highlight.nodeIds).toEqual(
@@ -317,11 +317,11 @@ describe("readEditorOriginFlowHighlight", () => {
 	});
 
 	it("finds every terminal/root node in the selected proof, farthest first", () => {
-		const highlight = runHighlight(incomeFlow, {
+		const highlight = runHighlight(outputFlow, {
 			id: "item:target",
 			kind: "node",
 		});
-		const roots = Effect.runSync(readEditorOriginFlowRootNavigationFx(incomeFlow, highlight));
+		const roots = Effect.runSync(readEditorOriginFlowRootNavigationFx(outputFlow, highlight));
 
 		expect(roots).toEqual([
 			"item:tool",
@@ -448,7 +448,7 @@ describe("readEditorOriginFlowHighlight", () => {
 	});
 
 	it("stops tracing when the selected item is already a starter", () => {
-		const highlight = runHighlight(incomeFlow, {
+		const highlight = runHighlight(outputFlow, {
 			id: "item:tool",
 			kind: "node",
 		});
@@ -562,7 +562,7 @@ describe("readEditorOriginFlowHighlight", () => {
 	});
 
 	it("keeps an explicitly selected connection and traces from its source", () => {
-		const highlight = runHighlight(incomeFlow, {
+		const highlight = runHighlight(outputFlow, {
 			id: "tool-forge",
 			kind: "edge",
 		});
@@ -648,7 +648,7 @@ describe("readEditorOriginFlowHighlight", () => {
 		);
 	});
 
-	it("keeps every official Coin producer in the highlighted Income navigation", async () => {
+	it("keeps every official Coin producer in the highlighted Output navigation", async () => {
 		const config = await readArkiniGameConfigSource();
 		const flow = await Effect.runPromise(
 			readEditorItemOriginFlowFx({
@@ -705,7 +705,7 @@ describe("readEditorOriginFlowHighlight", () => {
 
 	it("returns an empty highlight for a stale selection", () => {
 		expect(
-			runHighlight(incomeFlow, {
+			runHighlight(outputFlow, {
 				id: "missing",
 				kind: "node",
 			}),

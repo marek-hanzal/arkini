@@ -28,10 +28,6 @@ const EditorItemSections = [
 		id: "estimate",
 		label: "Estimate",
 	},
-	{
-		id: "flow",
-		label: "Flow",
-	},
 ] as const satisfies ReadonlyArray<EditorItemSectionDescriptor>;
 
 const ProductionItemTypes = new Set<EditorItemType>([

@@ -12,7 +12,7 @@ import type {
 	EditorMcpStatus,
 } from "../../electron/contract/editor/EditorMcpPortSchema";
 import type { EditorProjectServiceOwnership } from "../editor/EditorProjectServiceOwnership";
-import { createEditorMcpServer } from "./createEditorMcpServer";
+import { createEditorMcpServerFx } from "./createEditorMcpServerFx";
 
 export interface EditorMcpOwnership {
 	readonly readStatus: () => EditorMcpStatus;
@@ -29,6 +29,7 @@ export namespace createEditorMcpOwnershipFx {
 	export interface Props {
 		readonly editor: EditorProjectServiceOwnership;
 		readonly readPortFx: Effect.Effect<EditorMcpPortSchema.Type, unknown>;
+		readonly runPromise: <Value, Error>(effect: Effect.Effect<Value, Error>) => Promise<Value>;
 	}
 }
 
@@ -36,6 +37,7 @@ export namespace createEditorMcpOwnershipFx {
 export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx")(function* ({
 	editor,
 	readPortFx,
+	runPromise,
 }: createEditorMcpOwnershipFx.Props) {
 	let status: EditorMcpStatus =
 		editor.type === "ready"
@@ -54,10 +56,13 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 	const activateFx = activationLock.withPermits(1)(
 		Effect.gen(function* () {
 			if (status.type !== "inactive" || editor.type === "unavailable") return status;
+			const mcpServerFactory = yield* createEditorMcpServerFx({
+				readProjectContext: () => projectContext,
+				repository: editor.repository,
+				runPromise,
+			});
 			const port = yield* readPortFx;
-			const handler = createMcpHandler(() =>
-				createEditorMcpServer(editor.repository, () => projectContext),
-			);
+			const handler = createMcpHandler(mcpServerFactory.create);
 			const nodeHandler = toNodeHandler(handler, {
 				onerror: (error) => console.error("Arkini editor MCP request failed.", error),
 			});

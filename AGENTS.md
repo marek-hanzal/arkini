@@ -47,12 +47,12 @@ Game itself is the way of play. You choose arkpack (or default one provided by g
 ## Editor
 
 This is complex piece used to author new games or edit existings ones. It has many tools suitable for analyzing current
-gameplay, like Flow (item graph) or Estimate (static dependency analysis) used to compute conservative time and item cost,
-so it's simple to see if the game is balanced.
+gameplay, like Flow (item graph) or Estimate (static dependency analysis) used to compute an optimistic parallel timing
+reference and dependency breakdown, so it's simple to see if the game is balanced.
 
 Some features are:
 - MCP server for managing editor by an agent
 - Flow - complex graph of all items, so relations could be simply seen by a human
-- Estimate - static authored dependency analysis for reachability, conservative serialized duration, consumables, and one-time prerequisites
+- Estimate - static authored dependency analysis for reachability, optimistic parallel critical-path duration, and selected acquisition dependencies
 - Item authoring - edit/create new items
 - Asset management

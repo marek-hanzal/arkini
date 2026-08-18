@@ -218,8 +218,8 @@ const createDrawItemNode =
 			palette,
 		);
 
-		const textX = artworkX + artworkSize + 18;
-		const maxTextWidth = position.x + position.width - 18 - textX;
+		const textX = position.x + metrics.itemTextBounds.x;
+		const maxTextWidth = metrics.itemTextBounds.width;
 		const titleLineHeight = 19;
 		const idLineHeight = 16;
 		const labelLineHeight = 12;

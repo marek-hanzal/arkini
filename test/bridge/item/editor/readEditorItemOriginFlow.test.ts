@@ -193,13 +193,12 @@ describe("readEditorItemOriginFlow", () => {
 		);
 	});
 
-	it("keeps one complete Income proof with every mandatory prerequisite", async () => {
+	it("keeps every authored item and mandatory requirement in the complete graph", async () => {
 		const progress: EditorItemOriginFlowProgress[] = [];
 		const flow = await Effect.runPromise(
 			readEditorItemOriginFlowFx({
 				config: createReachabilityConfig(true),
 				onProgress: (update) => progress.push(update),
-				targetItemId: "ingot",
 			}),
 		);
 
@@ -273,7 +272,7 @@ describe("readEditorItemOriginFlow", () => {
 		).toBe(true);
 	});
 
-	it("keeps raw line and output conditions in a selected Income source", async () => {
+	it("keeps raw line and output conditions in canonical graph sources", async () => {
 		const base = createReachabilityConfig(true);
 		const forge = base.items.forge;
 		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
@@ -329,87 +328,12 @@ describe("readEditorItemOriginFlow", () => {
 		const flow = await Effect.runPromise(
 			readEditorItemOriginFlowFx({
 				config,
-				targetItemId: "ingot",
 			}),
 		);
 
 		const nodeIds = new Set(flow.nodes.map(({ id }) => id));
 		expect(nodeIds.has("item:line-permit")).toBe(true);
 		expect(nodeIds.has("item:output-permit")).toBe(true);
-	});
-
-	it("stops Income immediately when the selected item already exists at game start", async () => {
-		const flow = await Effect.runPromise(
-			readEditorItemOriginFlowFx({
-				config: createReachabilityConfig(true),
-				targetItemId: "forge",
-			}),
-		);
-
-		expect(flow.nodes).toEqual([
-			expect.objectContaining({
-				id: "item:forge",
-				operations: [],
-			}),
-		]);
-		expect(flow.edges).toEqual([]);
-	});
-
-	it("chooses one deterministic reachable producer when a target has alternatives", async () => {
-		const base = createReachabilityConfig(true);
-		const forge = base.items.forge;
-		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
-		const config = GameConfigSchema.parse({
-			...base,
-			start: {
-				...base.start,
-				board: [
-					...base.start.board,
-					{
-						itemId: "kiln",
-						space: 0,
-						x: 1,
-						y: 0,
-					},
-				],
-			},
-			items: {
-				...base.items,
-				kiln: {
-					...forge,
-					uid: "kiln",
-					id: "kiln",
-					title: "Kiln",
-					lines: forge.lines.map((line) => ({
-						...line,
-						id: `kiln:${line.id}`,
-						output: outputOf("ingot"),
-					})),
-				},
-			},
-		});
-
-		const flow = await Effect.runPromise(
-			readEditorItemOriginFlowFx({
-				config,
-				targetItemId: "ingot",
-			}),
-		);
-		expect(flow.nodes.some(({ id }) => id === "item:forge")).toBe(true);
-		expect(flow.nodes.some(({ id }) => id === "item:kiln")).toBe(false);
-		expect(itemNode(flow, "forge")).toEqual(
-			expect.objectContaining({
-				operations: [
-					expect.objectContaining({
-						outputs: [
-							expect.objectContaining({
-								itemId: "ingot",
-							}),
-						],
-					}),
-				],
-			}),
-		);
 	});
 
 	it("embeds chance outputs and omits depletion without an authored charge spender", async () => {
@@ -462,30 +386,17 @@ describe("readEditorItemOriginFlow", () => {
 			},
 		});
 
-		const chanceFlow = await Effect.runPromise(
+		const flow = await Effect.runPromise(
 			readEditorItemOriginFlowFx({
 				config,
-				targetItemId: "ingot",
 			}),
 		);
-		const forgeOutput = itemNode(chanceFlow, "forge").operations[0]?.outputs[0];
+		const forgeOutput = itemNode(flow, "forge").operations[0]?.outputs[0];
 		expect(forgeOutput).toMatchObject({
 			itemId: "ingot",
 		});
-
-		const depletionFlow = await Effect.runPromise(
-			readEditorItemOriginFlowFx({
-				config,
-				targetItemId: "dust",
-			}),
-		);
-		expect(depletionFlow.nodes).toEqual([
-			expect.objectContaining({
-				id: "item:dust",
-				operations: [],
-			}),
-		]);
-		expect(depletionFlow.edges).toEqual([]);
+		expect(itemNode(flow, "dust").acquisitionSourceId).toBeUndefined();
+		expect(flow.edges.some(({ target }) => target === "item:dust")).toBe(false);
 	});
 
 	it("keeps one official charged line operation with every authored output", async () => {
@@ -576,82 +487,6 @@ describe("readEditorItemOriginFlow", () => {
 					target: "item:result",
 					sourcePortId: merge?.outputs[0]?.id,
 				}),
-			]),
-		);
-	});
-
-	it("keeps blocked Income prerequisites visible", async () => {
-		const flow = await Effect.runPromise(
-			readEditorItemOriginFlowFx({
-				config: createReachabilityConfig(false),
-				targetItemId: "ingot",
-			}),
-		);
-
-		expect(new Set(flow.nodes.map(({ id }) => id))).toEqual(
-			new Set([
-				"item:ingot",
-				"item:forge",
-				"item:tool",
-				"item:water",
-			]),
-		);
-	});
-
-	it("terminates cyclic acquisition paths and exposes the cycle", async () => {
-		const base = createJobTestConfig();
-		const forge = base.items.forge;
-		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
-		const line = forge.lines[0];
-		const producer = (id: string, output: EditorOutput) => ({
-			...forge,
-			uid: id,
-			id,
-			title: id,
-			lines: [
-				{
-					...line,
-					id: `line:${id}`,
-					input: [
-						{
-							type: "simple" as const,
-						},
-					],
-					output,
-				},
-			],
-		});
-		const config = GameConfigSchema.parse({
-			...base,
-			start: {
-				currentSpace: 0,
-				board: [],
-				inventory: [],
-				toolbar: [],
-			},
-			items: {
-				a: producer("a", outputOf("b", "target")),
-				b: producer("b", outputOf("a")),
-				target: {
-					...base.items.tool,
-					uid: "target",
-					id: "target",
-					title: "Target",
-				},
-			},
-		});
-
-		const flow = await Effect.runPromise(
-			readEditorItemOriginFlowFx({
-				config,
-				targetItemId: "target",
-			}),
-		);
-		expect(new Set(flow.nodes.map(({ id }) => id))).toEqual(
-			new Set([
-				"item:a",
-				"item:b",
-				"item:target",
 			]),
 		);
 	});

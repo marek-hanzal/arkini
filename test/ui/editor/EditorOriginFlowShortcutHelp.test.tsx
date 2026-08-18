@@ -8,7 +8,7 @@ describe("EditorOriginFlowShortcutHelp", () => {
 	it("documents graph-level visibility, direction and root navigation controls", () => {
 		const html = renderToStaticMarkup(
 			createElement(EditorOriginFlowShortcutHelp, {
-				direction: "income",
+				direction: "output",
 				onClose: vi.fn(),
 			}),
 		);
@@ -29,18 +29,18 @@ describe("EditorOriginFlowShortcutHelp", () => {
 		expect(html).toContain(
 			"Cycle terminal/root items of the selected graph to verify where the chain starts or ends.",
 		);
-		expect(html).toContain("Next item in the selected Income graph.");
+		expect(html).toContain("Next item in the selected Output graph.");
 	});
 
-	it("describes traversal using the active Outcome direction", () => {
+	it("describes traversal using the active Input direction", () => {
 		const html = renderToStaticMarkup(
 			createElement(EditorOriginFlowShortcutHelp, {
-				direction: "outcome",
+				direction: "input",
 				onClose: vi.fn(),
 			}),
 		);
 
-		expect(html).toContain("Next item in the selected Outcome graph.");
-		expect(html).toContain("Previous item in the selected Outcome graph.");
+		expect(html).toContain("Next item in the selected Input graph.");
+		expect(html).toContain("Previous item in the selected Input graph.");
 	});
 });

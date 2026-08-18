@@ -7,8 +7,8 @@ import type {
 	EditorOriginFlowSelection,
 } from "~/ui/item/editor/EditorOriginFlowHighlight";
 import { readEditorOriginFlowHighlightLevelsFx } from "~/ui/item/editor/readEditorOriginFlowHighlightLevelsFx";
-import { readEditorOriginFlowIncomeHighlightFx } from "~/ui/item/editor/readEditorOriginFlowIncomeHighlightFx";
-import { readEditorOriginFlowOutcomeHighlightFx } from "~/ui/item/editor/readEditorOriginFlowOutcomeHighlightFx";
+import { readEditorOriginFlowOutputHighlightFx } from "~/ui/item/editor/readEditorOriginFlowOutputHighlightFx";
+import { readEditorOriginFlowInputHighlightFx } from "~/ui/item/editor/readEditorOriginFlowInputHighlightFx";
 
 export type {
 	EditorOriginFlowDirection,
@@ -28,12 +28,12 @@ export const readEditorOriginFlowHighlightFx = Effect.fn("readEditorOriginFlowHi
 	function* (
 		flow: EditorItemOriginFlow,
 		selection: EditorOriginFlowSelection,
-		direction: EditorOriginFlowDirection = "income",
+		direction: EditorOriginFlowDirection = "input",
 	) {
 		const readNodeHighlightFx =
-			direction === "income"
-				? readEditorOriginFlowIncomeHighlightFx
-				: readEditorOriginFlowOutcomeHighlightFx;
+			direction === "output"
+				? readEditorOriginFlowOutputHighlightFx
+				: readEditorOriginFlowInputHighlightFx;
 		if (selection.kind === "node") {
 			const selectedNode = flow.nodes.find(({ id }) => id === selection.id);
 			if (selectedNode === undefined) return readEmptyHighlight();
@@ -43,7 +43,7 @@ export const readEditorOriginFlowHighlightFx = Effect.fn("readEditorOriginFlowHi
 
 		const selectedEdge = flow.edges.find(({ id }) => id === selection.id);
 		if (selectedEdge === undefined) return readEmptyHighlight();
-		const startNodeId = direction === "income" ? selectedEdge.source : selectedEdge.target;
+		const startNodeId = direction === "output" ? selectedEdge.source : selectedEdge.target;
 		const startNode = flow.nodes.find(({ id }) => id === startNodeId);
 		if (startNode === undefined)
 			return {

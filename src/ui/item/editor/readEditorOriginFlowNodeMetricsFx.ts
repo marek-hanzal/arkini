@@ -35,6 +35,12 @@ export interface EditorOriginFlowNodeMetrics {
 	readonly headerHeight: number;
 	readonly height: number;
 	readonly itemPortY: number;
+	readonly itemTextBounds: {
+		readonly height: number;
+		readonly width: number;
+		readonly x: number;
+		readonly y: number;
+	};
 	readonly operations: ReadonlyArray<EditorOriginFlowOperationMetrics>;
 	readonly portOffsets: ReadonlyMap<
 		string,
@@ -77,11 +83,21 @@ const readPortYs = (
 export const readEditorOriginFlowNodeMetricsFx = Effect.fn("readEditorOriginFlowNodeMetricsFx")(
 	(node: EditorItemOriginItemNode) =>
 		Effect.sync((): EditorOriginFlowNodeMetrics => {
+			const itemTextBounds = {
+				height:
+					node.operations.length === 0
+						? EditorOriginFlowNodeMinHeight
+						: EditorOriginFlowNodeHeaderHeight,
+				width: EditorOriginFlowNodeWidth - 120,
+				x: 102,
+				y: 0,
+			};
 			if (node.operations.length === 0) {
 				return {
 					headerHeight: EditorOriginFlowNodeMinHeight,
 					height: EditorOriginFlowNodeMinHeight,
 					itemPortY: readEditorOriginFlowItemPortY(EditorOriginFlowNodeMinHeight),
+					itemTextBounds,
 					operations: [],
 					portOffsets: new Map([
 						[
@@ -163,6 +179,7 @@ export const readEditorOriginFlowNodeMetricsFx = Effect.fn("readEditorOriginFlow
 				headerHeight: EditorOriginFlowNodeHeaderHeight,
 				height,
 				itemPortY: readEditorOriginFlowItemPortY(EditorOriginFlowNodeHeaderHeight),
+				itemTextBounds,
 				operations,
 				portOffsets,
 				width: EditorOriginFlowNodeWidth,

@@ -11,8 +11,8 @@ import {
 } from "~/ui/item/editor/EditorOriginFlowHighlight";
 
 /** Reads every operation that depends on the selected item and recursively follows its outputs. */
-export const readEditorOriginFlowOutcomeHighlightFx = Effect.fn(
-	"readEditorOriginFlowOutcomeHighlightFx",
+export const readEditorOriginFlowInputHighlightFx = Effect.fn(
+	"readEditorOriginFlowInputHighlightFx",
 )((flow: EditorItemOriginFlow, startNode: EditorItemOriginItemNode) =>
 	Effect.sync((): EditorOriginFlowHighlight => {
 		const nodeById = new Map(

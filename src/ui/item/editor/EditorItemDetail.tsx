@@ -34,8 +34,7 @@ export const EditorItemDetail = ({
 		projectId: project.projectId,
 		itemUid: item.uid,
 	};
-	const editableSectionId =
-		sectionId === "estimate" || sectionId === "flow" ? "identity" : sectionId;
+	const editableSectionId = sectionId === "estimate" ? "identity" : sectionId;
 	const sections = RendererRuntime.runSync(readEditorItemSectionsFx(item));
 	return (
 		<EditorSectionPage
@@ -80,6 +79,34 @@ export const EditorItemDetail = ({
 					}
 					action={
 						<div className="flex items-center gap-2">
+							<ButtonLink
+								className="h-10 min-h-10 gap-2 px-3 py-2 text-sm"
+								params={{
+									projectId: project.projectId,
+								}}
+								search={{
+									direction: "input",
+									itemId: item.id,
+								}}
+								to="/editor/$projectId/flow"
+							>
+								<span className="icon-[lucide--log-in] size-4" />
+								Inputs
+							</ButtonLink>
+							<ButtonLink
+								className="h-10 min-h-10 gap-2 px-3 py-2 text-sm"
+								params={{
+									projectId: project.projectId,
+								}}
+								search={{
+									direction: "output",
+									itemId: item.id,
+								}}
+								to="/editor/$projectId/flow"
+							>
+								<span className="icon-[lucide--log-out] size-4" />
+								Outputs
+							</ButtonLink>
 							<EditorItemConvertMenu
 								itemType={item.type}
 								itemUid={item.uid}
@@ -102,7 +129,7 @@ export const EditorItemDetail = ({
 				/>
 			}
 		>
-			{sectionId === "estimate" || sectionId === "production" || sectionId === "flow" ? (
+			{sectionId === "estimate" || sectionId === "production" ? (
 				children
 			) : (
 				<EditorRootCard dataUi="EditorItemDetailCard">{children}</EditorRootCard>

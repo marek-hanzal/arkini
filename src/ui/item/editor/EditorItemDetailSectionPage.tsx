@@ -4,7 +4,6 @@ import {
 	EditorItemChargesDetail,
 	EditorItemMergesDetail,
 } from "~/ui/item/editor/EditorItemCapabilityDetails";
-import { EditorItemFlowSection } from "~/ui/item/editor/EditorItemFlowSection";
 import { EditorItemEstimateSection } from "~/ui/item/editor/EditorItemEstimateSection";
 import { EditorItemIdentityDetail } from "~/ui/item/editor/EditorItemIdentityDetail";
 import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
@@ -51,7 +50,5 @@ export const EditorItemDetailSectionPage = ({
 			return <EditorItemProductionDetail item={item} />;
 		case "estimate":
 			return <EditorItemEstimateSection itemId={item.id} />;
-		case "flow":
-			return <EditorItemFlowSection itemId={item.id} />;
 	}
 };

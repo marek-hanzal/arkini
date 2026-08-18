@@ -59,14 +59,14 @@ export const readEditorOriginFlowNavigationFx = Effect.fn("readEditorOriginFlowN
 			const targetsBySource = new Map<string, Set<string>>();
 			for (const edge of flow.edges) {
 				if (allowedEdgeIds !== undefined && !allowedEdgeIds.has(edge.id)) continue;
-				const sourceId = direction === "income" ? edge.target : edge.source;
-				const targetId = direction === "income" ? edge.source : edge.target;
+				const sourceId = direction === "output" ? edge.target : edge.source;
+				const targetId = direction === "output" ? edge.source : edge.target;
 				const source = positions.get(sourceId);
 				const target = positions.get(targetId);
 				if (source === undefined || target === undefined) continue;
 				const movesWithDirection =
 					allowedEdgeIds !== undefined ||
-					(direction === "income"
+					(direction === "output"
 						? target.flowOrder < source.flowOrder
 						: target.flowOrder > source.flowOrder);
 				if (!movesWithDirection) continue;

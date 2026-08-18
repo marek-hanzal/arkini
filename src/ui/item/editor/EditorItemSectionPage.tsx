@@ -20,8 +20,6 @@ const renderSection = (section: EditorItemSectionId) => {
 			return <EditorItemMergesSection />;
 		case "production":
 			return <EditorItemProductionSection />;
-		case "flow":
-			return null;
 	}
 };
 

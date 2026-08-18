@@ -141,6 +141,23 @@ describe("editor item flow", () => {
 		expect(edit?.dataset.params).toContain(item.uid);
 		expect(edit?.dataset.params).toContain("identity");
 		expect(container.textContent).toContain("Convert");
+		const flowLinks = [
+			...container.querySelectorAll<HTMLAnchorElement>('[data-to="/editor/$projectId/flow"]'),
+		];
+		expect(flowLinks.map((link) => link.textContent)).toEqual([
+			"Inputs",
+			"Outputs",
+		]);
+		expect(flowLinks.map((link) => JSON.parse(link.dataset.search ?? "{}"))).toEqual([
+			{
+				direction: "input",
+				itemId: item.id,
+			},
+			{
+				direction: "output",
+				itemId: item.id,
+			},
+		]);
 	});
 
 	it("passes both new and persisted items through one form page", async () => {

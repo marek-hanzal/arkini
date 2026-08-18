@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
 import { readCurrentGameEngineResourceFx } from "~/bridge/game/readCurrentGameEngineResourceFx";
 import { refreshEditorServiceStatusFx } from "~/bridge/editor/refreshEditorServiceStatusFx";
-import { activateEditorMcpFx } from "~/bridge/editor-mcp/EditorMcpPort";
+import { activateEditorMcpFx } from "~/bridge/editor-mcp/activateEditorMcpFx";
 
 /** Editor routes never coexist with a live game resource; leave owns the final save first. */
 export const Route = createFileRoute("/editor")({

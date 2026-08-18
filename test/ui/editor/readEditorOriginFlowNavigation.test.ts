@@ -87,7 +87,7 @@ const runNavigation = (
 	flowInput: EditorItemOriginFlow,
 	positionInput: typeof positions,
 	startNodeId: string,
-	direction: EditorOriginFlowDirection = "income",
+	direction: EditorOriginFlowDirection = "output",
 	allowedEdgeIds?: ReadonlySet<string>,
 ) =>
 	Effect.runSync(
@@ -101,7 +101,7 @@ const runNavigation = (
 	);
 
 describe("readEditorOriginFlowNavigation", () => {
-	it("walks backward through Income prerequisites", () => {
+	it("walks backward through Output prerequisites", () => {
 		expect(runNavigation(flow, positions, "end")).toEqual([
 			"end",
 			"side",
@@ -110,8 +110,8 @@ describe("readEditorOriginFlowNavigation", () => {
 		]);
 	});
 
-	it("walks forward through Outcome products", () => {
-		expect(runNavigation(flow, positions, "root", "outcome")).toEqual([
+	it("walks forward through Input products", () => {
+		expect(runNavigation(flow, positions, "root", "input")).toEqual([
 			"root",
 			"a",
 			"straight",
@@ -120,7 +120,7 @@ describe("readEditorOriginFlowNavigation", () => {
 		]);
 	});
 
-	it("prefers the nearest upstream flow layer when Income branches equally", () => {
+	it("prefers the nearest upstream flow layer when Output branches equally", () => {
 		const branchedFlow = {
 			edges: [
 				{
@@ -245,13 +245,13 @@ describe("readEditorOriginFlowNavigation", () => {
 		);
 	});
 
-	it("stays inside the highlighted Income proof when allowed edges are supplied", () => {
+	it("stays inside the highlighted Output proof when allowed edges are supplied", () => {
 		expect(
 			runNavigation(
 				flow,
 				positions,
 				"end",
-				"income",
+				"output",
 				new Set([
 					"side-end",
 					"a-side",

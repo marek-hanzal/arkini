@@ -39,7 +39,6 @@ type EditorItemOriginFlowState =
 
 interface EditorItemOriginFlowCommandRequest {
 	readonly config: EditorItemOriginFlowRequest["config"];
-	readonly itemId?: string;
 }
 
 interface EditorItemOriginFlowProgressState {
@@ -69,11 +68,6 @@ const createEditorItemOriginFlowAtoms = () => {
 			});
 			const flow = yield* readEditorItemOriginFlowFx({
 				config: request.config,
-				...(request.itemId === undefined
-					? {}
-					: {
-							targetItemId: request.itemId,
-						}),
 				onProgress: (progress) => {
 					get.set(progressAtom, {
 						progress: {
@@ -113,24 +107,17 @@ const createEditorItemOriginFlowAtoms = () => {
 	};
 };
 
-/** Owns one subscription-scoped flow build for the currently routed item. */
+/** Owns one subscription-scoped build of the complete authored game flow. */
 export const useEditorItemOriginFlow = (
 	config: EditorItemOriginFlowRequest["config"],
-	itemId?: string,
 ): EditorItemOriginFlowState => {
 	const { commandAtom, progressAtom } = useMemo(createEditorItemOriginFlowAtoms, []);
 	const request = useMemo<EditorItemOriginFlowCommandRequest>(
 		() => ({
 			config,
-			...(itemId === undefined
-				? {}
-				: {
-						itemId,
-					}),
 		}),
 		[
 			config,
-			itemId,
 		],
 	);
 	const [result, runFlow] = useAtom(commandAtom);

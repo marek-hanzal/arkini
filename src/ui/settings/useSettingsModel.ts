@@ -5,11 +5,9 @@ import { useCallback, useEffect, useState } from "react";
 import { AppearanceAtom } from "~/bridge/appearance/AppearanceAtom";
 import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
 import { openDiagnosticDirectoryFx } from "~/bridge/diagnostics/Diagnostics";
-import {
-	checkEditorMcpPortFx,
-	readEditorMcpPortFx,
-	writeEditorMcpPortFx,
-} from "~/bridge/editor-mcp/EditorMcpPort";
+import { checkEditorMcpPortFx } from "~/bridge/editor-mcp/checkEditorMcpPortFx";
+import { readEditorMcpPortFx } from "~/bridge/editor-mcp/readEditorMcpPortFx";
+import { writeEditorMcpPortFx } from "~/bridge/editor-mcp/writeEditorMcpPortFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { openUserDataDirectoryFx } from "~/bridge/user-data/UserData";
 import type { WindowMode } from "~/bridge/window/WindowMode";

@@ -2,12 +2,8 @@ import { Effect } from "effect";
 import type { FederatedPointerEvent } from "pixi.js";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
-import { removeDraggedCheatItemFx } from "~/bridge/cheat/removeDraggedCheatItemFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { isSameTileActorLocation } from "~/bridge/tile/isSameTileActorLocation";
-import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
-import { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
 import { PointerDragThreshold } from "~/ui/drag/PointerDragThreshold";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
@@ -17,19 +13,19 @@ import { burstPixiTileActorAckParticlesFx } from "~/ui/pixi/animation/runPixiTil
 import type { PixiMainSceneActiveDrag } from "~/ui/pixi/drag/PixiMainSceneDragState";
 import type { PixiCursorGrabMotion } from "~/ui/pixi/drag/PixiCursorGrabMotion";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
+import { createPixiMainSceneDragPreviewFx } from "~/ui/pixi/drag/createPixiMainSceneDragPreviewFx";
+import { createPixiMainScenePointerSamplerFx } from "~/ui/pixi/drag/createPixiMainScenePointerSamplerFx";
 import { readPixiDragPointerOffset } from "~/ui/pixi/drag/readPixiDragPointerOffset";
+import { readPixiMainSceneInventoryShortcutFx } from "~/ui/pixi/drag/readPixiMainSceneInventoryShortcutFx";
+import { removePixiMainSceneDraggedCheatItemFx } from "~/ui/pixi/drag/removePixiMainSceneDraggedCheatItemFx";
 import { setPixiDraggedActorPoseFx } from "~/ui/pixi/drag/setPixiDraggedActorPoseFx";
 import { settlePixiMainSceneDraggedActorFx } from "~/ui/pixi/drag/settlePixiMainSceneDraggedActorFx";
 import { updatePixiMainSceneMagneticFieldFx } from "~/ui/pixi/drag/updatePixiMainSceneMagneticFieldFx";
 import type { PixiMainSceneDropSubmission } from "~/ui/pixi/drop/PixiMainSceneDropSubmission";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
-import { readPixiTileAttractionActorIdFx } from "~/ui/pixi/magnet/readPixiTileAttractionActorIdFx";
 import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRuntime";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
-import type {
-	PixiMainSceneSurface,
-	PixiMainSceneTargetFacts,
-} from "~/ui/pixi/scene/PixiMainSceneSurface";
+import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 import type { PixiMainSceneActivationIntent } from "~/ui/pixi/scene/PixiMainSceneActivationIntent";
 
 export namespace createPixiMainSceneDragControllerFx {
@@ -50,12 +46,6 @@ export namespace createPixiMainSceneDragControllerFx {
 		readonly readAckTint: () => number;
 		readonly surface: PixiMainSceneSurface;
 	}
-}
-
-interface PixiDragPointerSample {
-	readonly pointerId: number;
-	readonly x: number;
-	readonly y: number;
 }
 
 /**
@@ -83,186 +73,19 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 		surface,
 	}: createPixiMainSceneDragControllerFx.Props) {
 		let activeDrag: PixiMainSceneActiveDrag | null = null;
-		let cancelScheduledPointerMove: (() => void) | null = null;
 		let closed = false;
 		let interactionBlocked = false;
-		let pendingPointerSample: PixiDragPointerSample | null = null;
 		let thresholdCrossed = false;
 
-		const cancelPendingPointerMove = () => {
-			pendingPointerSample = null;
-			cancelScheduledPointerMove?.();
-			cancelScheduledPointerMove = null;
-		};
-
-		const readCurrentSourceItem = (drag: PixiMainSceneActiveDrag) => {
-			if (
-				drag.actor.container.destroyed ||
-				actorStore.actors.get(drag.sourceItem.id) !== drag.actor
-			) {
-				return null;
-			}
-			const canonical = actorStore.canonicalItems.get(drag.sourceItem.id);
-			if (
-				canonical === undefined ||
-				!isSameTileActorLocation(canonical.location, drag.sourceItem.location)
-			) {
-				return null;
-			}
-			return {
-				...drag.actor.item,
-				location: canonical.location,
-				revision: canonical.revision,
-			} satisfies TileActorItem;
-		};
-
-		const readPreviewKind = (
-			sourceItem: TileActorItem,
-			targetFacts: PixiMainSceneTargetFacts,
-		) =>
-			RendererRuntime.runSync(
-				readTileDropPreviewFx({
-					game,
-					sourceItemId: sourceItem.id,
-					sourceLocation: sourceItem.location,
-					sourceRevision: sourceItem.revision,
-					target: targetFacts.commandTarget,
-				}),
-			).kind;
-
-		const refreshEligibleAttractionActorIds = (
-			drag: PixiMainSceneActiveDrag,
-			sourceItem: TileActorItem,
-			candidateActorIds: ReadonlyArray<string>,
-			targetFacts: PixiMainSceneTargetFacts,
-		) => {
-			const activeCandidateActorIds = new Set(candidateActorIds);
-			for (const actorId of drag.attractionEligibilityByActorId.keys()) {
-				if (activeCandidateActorIds.has(actorId)) continue;
-				drag.attractionEligibilityByActorId.delete(actorId);
-			}
-			const eligibleActorIds = new Set<string>();
-			for (const actorId of candidateActorIds) {
-				if (actorId === sourceItem.id) continue;
-				const actor = actorStore.actors.get(actorId);
-				const canonical = actorStore.canonicalItems.get(actorId);
-				if (actor === undefined || actor.container.destroyed) {
-					drag.attractionEligibilityByActorId.delete(actorId);
-					continue;
-				}
-				const targetItem = {
-					...actor.item,
-					location: canonical?.location ?? actor.item.location,
-					revision: canonical?.revision ?? actor.item.revision,
-				} satisfies TileActorItem;
-				const cached = drag.attractionEligibilityByActorId.get(actorId);
-				if (
-					cached !== undefined &&
-					cached.source.id === sourceItem.id &&
-					cached.source.revision === sourceItem.revision &&
-					isSameTileActorLocation(cached.source.location, sourceItem.location) &&
-					cached.target.id === targetItem.id &&
-					cached.target.revision === targetItem.revision &&
-					isSameTileActorLocation(cached.target.location, targetItem.location)
-				) {
-					if (cached.eligible) eligibleActorIds.add(actorId);
-					continue;
-				}
-				const previewKind =
-					targetFacts.occupant?.id === targetItem.id &&
-					targetFacts.occupant.revision === targetItem.revision &&
-					isSameTileActorLocation(targetFacts.occupant.location, targetItem.location)
-						? drag.previewKind
-						: RendererRuntime.runSync(
-								readTileDropPreviewFx({
-									game,
-									sourceItemId: sourceItem.id,
-									sourceLocation: sourceItem.location,
-									sourceRevision: sourceItem.revision,
-									target: {
-										kind: "slot",
-										location: targetItem.location,
-										occupant: {
-											itemId: targetItem.id,
-											revision: targetItem.revision,
-										},
-									},
-								}),
-							).kind;
-				if (previewKind === null) continue;
-				const eligible =
-					RendererRuntime.runSync(
-						readPixiTileAttractionActorIdFx({
-							previewKind,
-							targetItem,
-						}),
-					) !== null;
-				drag.attractionEligibilityByActorId.set(actorId, {
-					eligible,
-					source: {
-						id: sourceItem.id,
-						location: sourceItem.location,
-						revision: sourceItem.revision,
-					},
-					target: {
-						id: targetItem.id,
-						location: targetItem.location,
-						revision: targetItem.revision,
-					},
-				});
-				if (eligible) eligibleActorIds.add(actorId);
-			}
-			drag.eligibleAttractionActorIds = eligibleActorIds;
-		};
-
-		const previewTarget = (
-			drag: PixiMainSceneActiveDrag,
-			targetFacts: PixiMainSceneTargetFacts,
-			force = false,
-			releaseSourceItem?: TileActorItem,
-		) => {
-			const sourceItem = releaseSourceItem ?? readCurrentSourceItem(drag);
-			if (sourceItem === null) {
-				drag.target = targetFacts.target;
-				drag.targetKey = targetFacts.stableKey;
-				drag.targetItem = null;
-				drag.previewKind = null;
-				drag.previewSource = null;
-				RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
-				return null;
-			}
-			if (
-				!force &&
-				drag.targetKey === targetFacts.stableKey &&
-				drag.previewSource !== null &&
-				drag.previewSource.id === sourceItem.id &&
-				drag.previewSource.revision === sourceItem.revision &&
-				isSameTileActorLocation(drag.previewSource.location, sourceItem.location)
-			) {
-				return sourceItem;
-			}
-			const kind = readPreviewKind(sourceItem, targetFacts);
-			drag.target = targetFacts.target;
-			drag.targetKey = targetFacts.stableKey;
-			drag.targetItem = targetFacts.occupant;
-			drag.previewKind = kind;
-			drag.previewSource = {
-				id: sourceItem.id,
-				location: sourceItem.location,
-				revision: sourceItem.revision,
-			};
-			drag.actor.container.cursor = RendererRuntime.runSync(
-				readPixiTileActorCursorFx({
-					dragPolicy: "main-target-presence",
-					hasDropTarget: targetFacts.target !== null,
-					phase: "dragging",
-					previewKind: kind,
-					running: sourceItem.running,
-				}),
-			);
-			RendererRuntime.runSync(surface.renderDropFeedbackFx(targetFacts.target, kind));
-			return sourceItem;
-		};
+		const dragPreview = yield* createPixiMainSceneDragPreviewFx({
+			actorStore,
+			game,
+			surface,
+		});
+		const pointerSampler = yield* createPixiMainScenePointerSamplerFx({
+			frames: application.frames,
+			onApply: (sample) => applyPointerMoveSafely(sample),
+		});
 
 		const settleActor = (actor: PixiTileActor) => {
 			RendererRuntime.runSync(
@@ -283,7 +106,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 		};
 
 		const cancelDrag = (drag: PixiMainSceneActiveDrag) => {
-			cancelPendingPointerMove();
+			RendererRuntime.runSync(pointerSampler.cancelFx);
 			activeDrag = null;
 			releaseDragPointer(drag.pointerId);
 			if (drag.mode !== "drag") return;
@@ -304,14 +127,10 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				actor.onPointerDown = null;
 			}
 			if (activeDrag?.actor !== actor) return;
-			cancelPendingPointerMove();
+			RendererRuntime.runSync(pointerSampler.cancelFx);
 			const drag = activeDrag;
 			activeDrag = null;
-			try {
-				application.app.canvas.releasePointerCapture(drag.pointerId);
-			} catch {
-				// Capture may already be released by the browser.
-			}
+			releaseDragPointer(drag.pointerId);
 			if (drag.mode !== "drag") {
 				actor.container.cursor = "default";
 				return;
@@ -323,7 +142,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			actor.container.cursor = "default";
 		};
 
-		const applyPointerMove = (sample: PixiDragPointerSample) => {
+		const applyPointerMove = (sample: createPixiMainScenePointerSamplerFx.Sample) => {
 			const event = {
 				global: {
 					x: sample.x,
@@ -342,11 +161,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			if (drag.phase === "pressed" && !thresholdCrossed) return;
 			if (drag.phase === "pressed" && drag.mode === "activation-only") {
 				activeDrag = null;
-				try {
-					application.app.canvas.releasePointerCapture(drag.pointerId);
-				} catch {
-					// Capture may already be released by the browser.
-				}
+				releaseDragPointer(drag.pointerId);
 				return;
 			}
 			if (drag.phase === "pressed" && drag.mode === "motion-handoff") {
@@ -356,11 +171,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 					!drag.actor.container.destroyed;
 				if (!actorStillCanonicalBeforeHandoff) {
 					activeDrag = null;
-					try {
-						application.app.canvas.releasePointerCapture(drag.pointerId);
-					} catch {
-						// Capture may already be released by the browser.
-					}
+					releaseDragPointer(drag.pointerId);
 					return;
 				}
 				const handedOff = RendererRuntime.runSync(
@@ -379,11 +190,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 					remainingClaim === "activation-only"
 				) {
 					activeDrag = null;
-					try {
-						application.app.canvas.releasePointerCapture(drag.pointerId);
-					} catch {
-						// Capture may already be released by the browser.
-					}
+					releaseDragPointer(drag.pointerId);
 					return;
 				}
 				drag = {
@@ -403,7 +210,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			}
 			if (drag.phase === "pressed") {
 				drag.phase = "dragging";
-				const sourceItem = readCurrentSourceItem(drag);
+				const sourceItem = RendererRuntime.runSync(dragPreview.readCurrentSourceFx(drag));
 				if (sourceItem === null) {
 					cancelDrag(drag);
 					return;
@@ -426,7 +233,12 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			const targetFacts = RendererRuntime.runSync(
 				surface.readTargetFactsFx(sample.x, sample.y),
 			);
-			const sourceItem = previewTarget(drag, targetFacts);
+			const sourceItem = RendererRuntime.runSync(
+				dragPreview.previewTargetFx({
+					drag,
+					targetFacts,
+				}),
+			);
 			if (sourceItem === null) {
 				cancelDrag(drag);
 				return;
@@ -465,7 +277,14 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 							]),
 				]),
 			).filter((actorId) => actorId !== sourceItem.id);
-			refreshEligibleAttractionActorIds(drag, sourceItem, candidateActorIds, targetFacts);
+			RendererRuntime.runSync(
+				dragPreview.refreshAttractionEligibilityFx({
+					candidateActorIds,
+					drag,
+					sourceItem,
+					targetFacts,
+				}),
+			);
 			RendererRuntime.runSync(
 				updatePixiMainSceneMagneticFieldFx({
 					actor: drag.actor,
@@ -489,7 +308,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			drag.lastPointerY = sample.y;
 		};
 
-		const recordThresholdCrossing = (sample: PixiDragPointerSample) => {
+		const recordThresholdCrossing = (sample: createPixiMainScenePointerSamplerFx.Sample) => {
 			const drag = activeDrag;
 			if (
 				thresholdCrossed ||
@@ -509,42 +328,23 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				try {
 					cancelDrag(drag);
 				} catch {
-					cancelPendingPointerMove();
+					RendererRuntime.runSync(pointerSampler.cancelFx);
 					activeDrag = null;
 					drag.actor.dragging = false;
 					drag.actor.container.cursor = "default";
 				}
 			} else {
-				cancelPendingPointerMove();
+				RendererRuntime.runSync(pointerSampler.cancelFx);
 			}
 			game.reportCriticalFailure("game-presentation", cause);
 		};
 
-		const applyPointerMoveSafely = (sample: PixiDragPointerSample) => {
+		const applyPointerMoveSafely = (sample: createPixiMainScenePointerSamplerFx.Sample) => {
 			try {
 				applyPointerMove(sample);
 			} catch (cause) {
 				recoverPointerFailure(cause);
 			}
-		};
-
-		const flushPointerMove = (sample?: PixiDragPointerSample) => {
-			const latest = sample ?? pendingPointerSample;
-			if (latest !== null) recordThresholdCrossing(latest);
-			cancelPendingPointerMove();
-			if (latest !== null) applyPointerMoveSafely(latest);
-		};
-
-		const requestPointerFrame = () => {
-			if (cancelScheduledPointerMove !== null) return;
-			cancelScheduledPointerMove = RendererRuntime.runSync(
-				application.frames.scheduleFx(() => {
-					cancelScheduledPointerMove = null;
-					const latest = pendingPointerSample;
-					pendingPointerSample = null;
-					if (latest !== null) applyPointerMoveSafely(latest);
-				}),
-			);
 		};
 
 		const onPointerMove = (event: FederatedPointerEvent) => {
@@ -556,8 +356,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				y: event.global.y,
 			};
 			recordThresholdCrossing(sample);
-			pendingPointerSample = sample;
-			requestPointerFrame();
+			RendererRuntime.runSync(pointerSampler.scheduleFx(sample));
 		};
 
 		const finishPointer = (event: FederatedPointerEvent) => {
@@ -565,18 +364,16 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			if (pendingDrag === null || event.pointerId !== pendingDrag.pointerId) {
 				return;
 			}
-			flushPointerMove({
+			const releaseSample = {
 				pointerId: event.pointerId,
 				x: event.global.x,
 				y: event.global.y,
-			});
+			};
+			recordThresholdCrossing(releaseSample);
+			RendererRuntime.runSync(pointerSampler.flushFx(releaseSample));
 			const drag = activeDrag;
 			if (drag === null || event.pointerId !== drag.pointerId) return;
-			try {
-				application.app.canvas.releasePointerCapture(event.pointerId);
-			} catch {
-				// Capture may already be released by the browser.
-			}
+			releaseDragPointer(event.pointerId);
 			if (drag.phase === "pressed") {
 				activeDrag = null;
 				const currentActor = actorStore.actors.get(drag.sourceItem.id);
@@ -615,7 +412,13 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				);
 				// Canonical state may have changed beneath a held pointer while the target
 				// coordinates stayed stable. Freeze fresh release-time preview facts.
-				const sourceItem = previewTarget(drag, targetFacts, true);
+				const sourceItem = RendererRuntime.runSync(
+					dragPreview.previewTargetFx({
+						drag,
+						force: true,
+						targetFacts,
+					}),
+				);
 				if (sourceItem === null) {
 					cancelDrag(drag);
 					return;
@@ -654,65 +457,32 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			) {
 				return;
 			}
-			flushPointerMove();
+			RendererRuntime.runSync(pointerSampler.flushFx());
 			const drag = activeDrag;
 			if (drag === null || drag.mode !== "drag" || drag.phase !== "dragging") {
 				return;
 			}
 			event.preventDefault();
 			event.stopImmediatePropagation();
-			const inventoryActor = Array.from(actorStore.actors.values()).find(
-				(actor) =>
-					actor !== drag.actor &&
-					!actor.container.destroyed &&
-					actor.item.itemType === "inventory",
-			);
-			if (inventoryActor === undefined) return;
-			const pose = RendererRuntime.runSync(surface.readActorPoseFx(inventoryActor.item));
-			if (pose === null) return;
-			const targetFacts = RendererRuntime.runSync(
-				surface.readTargetFactsFx(pose.x + pose.size / 2, pose.y + pose.size / 2),
-			);
-			if (targetFacts.target === null) return;
-			const sourceItem = readCurrentSourceItem(drag);
-			if (sourceItem === null) return;
-			let kind: readTileDropPreviewFx.Result["kind"];
+			let submission: readPixiMainSceneInventoryShortcutFx.Result;
 			try {
-				kind = readPreviewKind(sourceItem, targetFacts);
+				submission = RendererRuntime.runSync(
+					readPixiMainSceneInventoryShortcutFx({
+						actorStore,
+						drag,
+						preview: dragPreview,
+						surface,
+					}),
+				);
 			} catch (cause) {
 				recoverPointerFailure(cause);
 				return;
 			}
-			if (
-				kind !== DropItemResultKindEnumSchema.enum.StoreInventory ||
-				targetFacts.occupant?.id !== inventoryActor.item.id
-			) {
-				return;
-			}
-			try {
-				application.app.canvas.releasePointerCapture(drag.pointerId);
-			} catch {
-				// Capture may already be released by the browser.
-			}
-			drag.target = targetFacts.target;
-			drag.targetKey = targetFacts.stableKey;
-			drag.targetItem = targetFacts.occupant;
-			drag.previewKind = kind;
-			cancelPendingPointerMove();
+			if (submission === null) return;
+			releaseDragPointer(drag.pointerId);
+			RendererRuntime.runSync(pointerSampler.cancelFx);
 			activeDrag = null;
-			RendererRuntime.runSync(
-				dropSubmission.submitFx({
-					actor: drag.actor,
-					commandTarget: targetFacts.commandTarget,
-					previewKind: drag.previewKind,
-					sourceItem,
-					shortcutReceiver: {
-						actor: inventoryActor,
-						pose,
-					},
-					targetItem: drag.targetItem,
-				}),
-			);
+			RendererRuntime.runSync(dropSubmission.submitFx(submission));
 		};
 
 		const removeDraggedItem = (event: KeyboardEvent) => {
@@ -727,21 +497,20 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			) {
 				return;
 			}
-			flushPointerMove();
+			RendererRuntime.runSync(pointerSampler.flushFx());
 			const drag = activeDrag;
 			if (drag === null || drag.mode !== "drag" || drag.phase !== "dragging") {
 				return;
 			}
-			const sourceItem = readCurrentSourceItem(drag);
+			const sourceItem = RendererRuntime.runSync(dragPreview.readCurrentSourceFx(drag));
 			if (sourceItem === null) return;
 			event.preventDefault();
 			event.stopImmediatePropagation();
 			cancelDrag(drag);
 			void RendererRuntime.runPromise(
-				removeDraggedCheatItemFx({
+				removePixiMainSceneDraggedCheatItemFx({
 					game,
-					itemId: sourceItem.id,
-					revision: sourceItem.revision,
+					sourceItem,
 				}),
 			).catch((cause) => {
 				if (closed) return;
@@ -760,14 +529,13 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				) {
 					return;
 				}
-				if (pendingPointerSample === null) {
-					pendingPointerSample = {
+				RendererRuntime.runSync(
+					pointerSampler.scheduleFallbackFx({
 						pointerId: drag.pointerId,
 						x: drag.lastPointerX,
 						y: drag.lastPointerY,
-					};
-				}
-				requestPointerFrame();
+					}),
+				);
 			},
 		);
 
@@ -866,17 +634,14 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			detachActorFx: Effect.fn("PixiMainSceneDragController.detachActorFx")((actor) =>
 				Effect.sync(() => detachActor(actor)),
 			),
-			requestRefreshFx: Effect.sync(() => {
+			requestRefreshFx: Effect.gen(function* () {
 				const drag = activeDrag;
 				if (drag === null || drag.mode !== "drag" || drag.phase !== "dragging") return;
-				if (pendingPointerSample === null) {
-					pendingPointerSample = {
-						pointerId: drag.pointerId,
-						x: drag.lastPointerX,
-						y: drag.lastPointerY,
-					};
-				}
-				requestPointerFrame();
+				yield* pointerSampler.scheduleFallbackFx({
+					pointerId: drag.pointerId,
+					x: drag.lastPointerX,
+					y: drag.lastPointerY,
+				});
 			}),
 			setInteractionBlockedFx: Effect.fn(
 				"PixiMainSceneDragController.setInteractionBlockedFx",
@@ -891,6 +656,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				closed = true;
 				unsubscribeSourceMembership();
 				cancelInteraction();
+				yield* pointerSampler.cancelFx;
 				application.stage.off("globalpointermove", onPointerMove);
 				application.stage.off("pointerup", finishPointer);
 				application.stage.off("pointerupoutside", finishPointer);

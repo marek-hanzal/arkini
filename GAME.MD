@@ -159,7 +159,7 @@ remainingMs
 
 No wall-clock timestamps are part of a job.
 
-The engine advances jobs in canonical 200 ms fixed steps. A long elapsed interval must produce the same result as the equivalent sequence of fixed steps.
+The engine advances jobs in canonical 100 ms fixed steps. A long elapsed interval must produce the same result as the equivalent sequence of fixed steps.
 
 At the start of one fixed step, every owner observes the same step-start runtime facts for time progression.
 
@@ -174,7 +174,7 @@ durationMs             authored immutable lifetime
 remainingDurationMs    persisted runtime lifetime
 ```
 
-Every temporary identity present at the start of a fixed step loses one step, clamped at zero. Authored durations that are not exact multiples of 200 ms therefore expire on the first fixed boundary at or after their duration. Items created by work completed during the current step begin at the full authored duration and are first advanced by the next step.
+Every temporary identity present at the start of a fixed step loses one step, clamped at zero. Authored durations that are not exact multiples of 100 ms therefore expire on the first fixed boundary at or after their duration. Items created by work completed during the current step begin at the full authored duration and are first advanced by the next step.
 
 After job completion and queue dispatch, ready temporary items expire in stable runtime-ID order. Expiry removes the temporary item and resolves its optional output from the released board origin through the same deterministic output and placement pipeline used elsewhere. A blocked output rolls the whole expiry back, leaves the item at zero, and retries from the same deterministic random stream after later runtime changes create capacity.
 

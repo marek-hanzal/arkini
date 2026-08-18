@@ -69,16 +69,6 @@ const blockedPlacementTestConfig = GameConfigSchema.parse({
 		toolbarSize: 0,
 	},
 });
-const queuedInputTestConfig = GameConfigSchema.parse({
-	...inputRuntimeTestConfig,
-	items: {
-		...inputRuntimeTestConfig.items,
-		workshop: {
-			...inputTestWorkshop,
-			maxQueueSize: 3,
-		},
-	},
-});
 const rangeInputTestConfig = GameConfigSchema.parse({
 	...inputRuntimeTestConfig,
 	items: {
@@ -175,44 +165,6 @@ const spawnWaterFx = ({
 		location,
 		quantity,
 	});
-
-const prepareQueuedBufferedLineFx = Effect.fn("prepareQueuedBufferedLineFx")(function* () {
-	yield* spawnOwnerFx();
-	yield* spawnItemFx({
-		id: "runtime:other-workshop",
-		itemId: "workshop",
-		location: sourceLocation(3),
-		quantity: 1,
-	});
-	yield* spawnWaterFx({
-		id: "runtime:queued-water",
-		location: sourceLocation(1),
-		quantity: 3,
-	});
-	const water = yield* getItemFx({
-		itemId: "runtime:queued-water",
-	});
-	yield* storeInputMaterialFx({
-		ownerItemId,
-		lineId,
-		inputIndex: 0,
-		sourceItemId: water.id,
-		sourceItemRevision: water.revision,
-		quantity: 3,
-	});
-	yield* enqueueLineFx({
-		ownerItemId,
-		lineId,
-	});
-	yield* enqueueLineFx({
-		ownerItemId,
-		lineId,
-	});
-	yield* enqueueLineFx({
-		ownerItemId: "runtime:other-workshop",
-		lineId,
-	});
-});
 
 describe("Item Detail line input actions", () => {
 	it("autofills a range input toward the available maximum without filling its buffer", () => {
@@ -628,60 +580,6 @@ describe("Item Detail line input actions", () => {
 				},
 			],
 		});
-	});
-
-	it("cancels every queued request for the line when withdrawing all inputs", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* prepareQueuedBufferedLineFx();
-				const before = yield* readRuntimeFx();
-				yield* withdrawLineInputsFx({
-					ownerItemId,
-					lineId,
-				});
-				return {
-					after: yield* readRuntimeFx(),
-					before,
-				};
-			}).pipe(
-				useGameFx({
-					config: queuedInputTestConfig,
-				}),
-			),
-		);
-
-		expect(
-			result.before.jobQueue?.filter((request) => request.ownerItemId === ownerItemId),
-		).toHaveLength(2);
-		expect(result.after.jobQueue).toEqual([
-			expect.objectContaining({
-				ownerItemId: "runtime:other-workshop",
-			}),
-		]);
-	});
-
-	it("cancels every queued request for the line when withdrawing one input", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* prepareQueuedBufferedLineFx();
-				yield* withdrawLineInputFx({
-					ownerItemId,
-					lineId,
-					inputIndex: 0,
-				});
-				return yield* readRuntimeFx();
-			}).pipe(
-				useGameFx({
-					config: queuedInputTestConfig,
-				}),
-			),
-		);
-
-		expect(result.jobQueue).toEqual([
-			expect.objectContaining({
-				ownerItemId: "runtime:other-workshop",
-			}),
-		]);
 	});
 
 	it("withdraws one exact input completely while preserving its filled sibling", () => {

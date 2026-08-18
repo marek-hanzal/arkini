@@ -1,9 +1,8 @@
 import { AnimatePresence, motion } from "motion/react";
 
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { useClearItemDetailQueue } from "~/bridge/item-detail/useClearItemDetailQueue";
 import type { useItemDetailQueue } from "~/bridge/item-detail/useItemDetailQueue";
-import { useRemoveItemDetailQueueRequest } from "~/bridge/item-detail/useRemoveItemDetailQueueRequest";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { LinkButton } from "~/ui/button/LinkButton";
 import { ItemIdentity } from "~/ui/item/ItemIdentity";
 import {
@@ -186,99 +185,53 @@ const ActiveQueueSlot = ({
 };
 
 const QueueRequestRow = ({
-	disabled,
 	index,
-	itemId,
 	request,
 }: {
-	readonly disabled: boolean;
 	readonly index: number;
-	readonly itemId: QueueProjection["itemId"];
 	readonly request: QueueProjection["request"][number];
-}) => {
-	const itemDetail = useItemDetailControl();
-	const pendingKey = JSON.stringify([
-		"queue-request",
-		itemId,
-		request.requestId,
-	]);
-	const removeRequest = useRemoveItemDetailQueueRequest({
-		pendingKey,
-		pendingOwner: itemDetail,
-	});
-
-	return (
-		<article
-			className="ak-list-row rounded-xl border-b border-l-2 border-line border-l-line/55 px-4 py-5"
-			data-ui="ItemQueueRow"
-			data-state="queued"
-			data-queue-status={request.status}
-		>
-			<div className="flex items-start justify-between gap-4">
-				<div className="min-w-0">
-					<div className="flex flex-wrap items-center gap-2">
-						<QueueWorkIdentity
-							identity={request.identity}
-							title={request.title}
-						/>
-						<span className="rounded-full border border-line-strong bg-surface-raised/65 px-2.5 py-1 text-xs font-semibold text-muted">
-							Queued #{index + 1}
-						</span>
-					</div>
-					<AnimatePresence
-						initial={false}
-						mode="popLayout"
-					>
-						<motion.p
-							key={`${request.status}:${request.missingQuantity ?? "unknown"}`}
-							className="mt-2 text-sm text-muted"
-							{...itemDetailFadeMotion}
-						>
-							{request.status === "inputs-ready"
-								? "Inputs available"
-								: request.status === "waiting-inputs"
-									? `Waiting for inputs · ${request.missingQuantity ?? "some"} ${
-											request.missingQuantity === 1 ? "unit" : "units"
-										} missing`
-									: request.status === "blocked-earlier"
-										? "Blocked by earlier work"
-										: "Waiting for runtime conditions"}
-						</motion.p>
-					</AnimatePresence>
-					<AnimatePresence initial={false}>
-						{removeRequest.error === null ? null : (
-							<motion.p
-								key={removeRequest.error}
-								className="mt-2 text-sm text-danger"
-								role="status"
-								{...itemDetailFadeMotion}
-							>
-								{removeRequest.error}
-							</motion.p>
-						)}
-					</AnimatePresence>
-				</div>
-				<LinkButton
-					className="mt-1 shrink-0 text-sm"
-					cursorIntent={removeRequest.pending ? "progress" : undefined}
-					data-ui="ItemQueueDeleteButton"
-					data-request-id={request.requestId}
-					disabled={disabled || removeRequest.pending}
-					onClick={() =>
-						removeRequest.run({
-							ownerItemId: itemId,
-							requestId: request.requestId,
-						})
-					}
-				>
-					{removeRequest.pending ? "Deleting…" : "Delete"}
-				</LinkButton>
+}) => (
+	<article
+		className="ak-list-row rounded-xl border-b border-l-2 border-line border-l-line/55 px-4 py-5"
+		data-ui="ItemQueueRow"
+		data-state="queued"
+		data-queue-status={request.status}
+	>
+		<div className="min-w-0">
+			<div className="flex flex-wrap items-center gap-2">
+				<QueueWorkIdentity
+					identity={request.identity}
+					title={request.title}
+				/>
+				<span className="rounded-full border border-line-strong bg-surface-raised/65 px-2.5 py-1 text-xs font-semibold text-muted">
+					Queued #{index + 1}
+				</span>
 			</div>
-		</article>
-	);
-};
+			<AnimatePresence
+				initial={false}
+				mode="popLayout"
+			>
+				<motion.p
+					key={`${request.status}:${request.missingQuantity ?? "unknown"}`}
+					className="mt-2 text-sm text-muted"
+					{...itemDetailFadeMotion}
+				>
+					{request.status === "inputs-ready"
+						? "Inputs available"
+						: request.status === "waiting-inputs"
+							? `Waiting for inputs · ${request.missingQuantity ?? "some"} ${
+									request.missingQuantity === 1 ? "unit" : "units"
+								} missing`
+							: request.status === "blocked-earlier"
+								? "Blocked by earlier work"
+								: "Waiting for runtime conditions"}
+				</motion.p>
+			</AnimatePresence>
+		</div>
+	</article>
+);
 
-/** Renders authoritative active and queued work without treating the active job as cancellable. */
+/** Renders read-only work status with one explicit whole-owner pending queue clear. */
 export const ItemQueueTab = ({
 	disabled = false,
 	queue,
@@ -414,9 +367,7 @@ export const ItemQueueTab = ({
 									transition={itemDetailMotionTransition}
 								>
 									<QueueRequestRow
-										disabled={disabled}
 										index={index}
-										itemId={queue.itemId}
 										request={request}
 									/>
 								</motion.div>

@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { JobOwnerBusyError } from "~/engine/job/error/JobOwnerBusyError";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace discardRuntimeItemIdentityStateFx {
@@ -10,9 +11,23 @@ export namespace discardRuntimeItemIdentityStateFx {
 	}
 }
 
-/** Discards every passive runtime intent bound to identities that can no longer act as owners. */
+/** Discards default-line intent only after proving that no pending work owns the identities. */
 export const discardRuntimeItemIdentityStateFx = Effect.fn("discardRuntimeItemIdentityStateFx")(
 	function* ({ ownerItemIds, runtime }: discardRuntimeItemIdentityStateFx.Props) {
+		const queuedRequests = (runtime.jobQueue ?? []).filter((request) =>
+			ownerItemIds.has(request.ownerItemId),
+		);
+		const queuedOwnerItemId = queuedRequests[0]?.ownerItemId;
+		if (queuedOwnerItemId !== undefined) {
+			return yield* Effect.fail(
+				new JobOwnerBusyError({
+					ownerItemId: queuedOwnerItemId,
+					jobIds: [],
+					requestIds: queuedRequests.map((request) => request.id),
+				}),
+			);
+		}
+
 		const defaultLineByOwnerItemId = {
 			...(runtime.defaultLineByOwnerItemId ?? {}),
 		};
@@ -21,9 +36,6 @@ export const discardRuntimeItemIdentityStateFx = Effect.fn("discardRuntimeItemId
 		}
 		return {
 			...runtime,
-			jobQueue: (runtime.jobQueue ?? []).filter(
-				(request) => !ownerItemIds.has(request.ownerItemId),
-			),
 			...(Object.keys(defaultLineByOwnerItemId).length === 0
 				? {
 						defaultLineByOwnerItemId: undefined,

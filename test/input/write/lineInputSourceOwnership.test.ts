@@ -181,65 +181,61 @@ const queueRequest = (id: string, ownerItemId: string, lineId: string) => ({
 });
 
 describe("line input source ownership", () => {
-	it("clears queue-only source intent and returns its incoming material before delivery", () => {
-		const runtime = Effect.runSync(
+	it("rejects storing a queue-only source without changing runtime or global FIFO", () => {
+		const result = Effect.runSync(
 			Effect.gen(function* () {
-				yield* runTickRuntimeByFx({
-					elapsedMs: 100,
-				});
-				return yield* readRuntimeFx();
+				const before = yield* readRuntimeFx();
+				const source = before.items.find(({ id }) => id === workerOwnerItemId);
+				if (source === undefined) {
+					return yield* Effect.die(new Error("Expected the queued source item."));
+				}
+				const stored = yield* Effect.result(
+					storeInputMaterialFx({
+						ownerItemId: upgradeOwnerItemId,
+						lineId: upgradeLineId,
+						inputIndex: 0,
+						sourceItemId: source.id,
+						sourceItemRevision: source.revision,
+						quantity: 1,
+					}),
+				);
+				return {
+					after: yield* readRuntimeFx(),
+					before,
+					stored,
+				};
 			}).pipe(
 				useGameFx({
 					config,
-					state: {
-						...state({
-							jobQueue: [
-								queueRequest(
-									workerFuelRequestId,
-									workerOwnerItemId,
-									workerFuelLineId,
-								),
-								queueRequest(upgradeRequestId, upgradeOwnerItemId, upgradeLineId),
-							],
-							withFuel: true,
-						}),
-						defaultLineByOwnerItemId: {
-							[workerOwnerItemId]: workerFuelLineId,
-						},
-					},
-				}),
-			),
-		);
-		const issues = Effect.runSync(
-			checkRuntimeFx({
-				runtime,
-			}).pipe(
-				useGameFx({
-					config,
+					state: state({
+						jobQueue: [
+							queueRequest(workerFuelRequestId, workerOwnerItemId, workerFuelLineId),
+							queueRequest(upgradeRequestId, upgradeOwnerItemId, upgradeLineId),
+						],
+					}),
 				}),
 			),
 		);
 
-		expect(issues.issues).toEqual([]);
-		expect(runtime.jobs).toEqual([]);
-		expect(runtime.jobQueue).toEqual([
+		expect(Result.isFailure(result.stored)).toBe(true);
+		if (Result.isFailure(result.stored)) {
+			expect(result.stored.failure).toMatchObject({
+				_tag: "JobOwnerBusyError",
+				ownerItemId: workerOwnerItemId,
+				jobIds: [],
+				requestIds: [
+					workerFuelRequestId,
+				],
+			});
+		}
+		expect(result.after).toEqual(result.before);
+		expect(result.after.jobQueue).toEqual([
+			queueRequest(workerFuelRequestId, workerOwnerItemId, workerFuelLineId),
 			queueRequest(upgradeRequestId, upgradeOwnerItemId, upgradeLineId),
 		]);
-		expect(runtime.defaultLineByOwnerItemId).toBeUndefined();
-		expect(runtime.items.find(({ id }) => id === workerOwnerItemId)).toMatchObject({
+		expect(result.after.items.find(({ id }) => id === workerOwnerItemId)).toMatchObject({
 			location: {
-				scope: "delivery",
-				phase: "outbound",
-				target: {
-					ownerItemId: upgradeOwnerItemId,
-					lineId: upgradeLineId,
-				},
-			},
-		});
-		expect(runtime.items.find(({ id }) => id === fuelRuntimeItemId)).toMatchObject({
-			location: {
-				scope: "delivery",
-				phase: "returning",
+				scope: "board",
 			},
 		});
 	});

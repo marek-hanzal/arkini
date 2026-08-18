@@ -2048,8 +2048,8 @@ describe("blueprint job completion transition", () => {
 		expect(result.state.jobs).toHaveLength(1);
 	});
 
-	it("discards queued work bound to the depleted blueprint identity", () => {
-		const runtime = run(
+	it("rejects depleting a blueprint with queued work instead of canceling it", () => {
+		const result = run(
 			Effect.gen(function* () {
 				const owner = yield* spawnBlueprintFx({
 					id: "runtime:blueprint",
@@ -2064,29 +2064,50 @@ describe("blueprint job completion transition", () => {
 				});
 				const started = yield* readRuntimeFx();
 				const job = started.jobs[0];
-				return yield* completeJobRuntimeForTestFx({
-					jobId: job.id,
-					runtime: {
-						...started,
-						jobs: [
-							{
-								...job,
-								remainingMs: 0,
-							},
-						],
-						jobQueue: [
-							{
-								id: "request:stale",
-								ownerItemId: owner.id,
-								lineId: "line:blueprint:plain",
-							},
-						],
-					},
-				});
+				const ready = {
+					...started,
+					jobs: [
+						{
+							...job,
+							remainingMs: 0,
+						},
+					],
+					jobQueue: [
+						{
+							id: "request:stale",
+							ownerItemId: owner.id,
+							lineId: "line:blueprint:plain",
+						},
+					],
+				};
+				return {
+					completion: yield* Effect.result(
+						completeJobRuntimeForTestFx({
+							jobId: job.id,
+							runtime: ready,
+						}),
+					),
+					ready,
+				};
 			}),
 		);
 
-		expect(runtime.jobQueue).toEqual([]);
-		expect(runtime.items.some((item) => item.id === "runtime:blueprint")).toBe(false);
+		expect(Result.isFailure(result.completion)).toBe(true);
+		if (Result.isFailure(result.completion)) {
+			expect(result.completion.failure).toMatchObject({
+				_tag: "JobOwnerBusyError",
+				ownerItemId: "runtime:blueprint",
+				jobIds: [],
+				requestIds: [
+					"request:stale",
+				],
+			});
+		}
+		expect(result.ready.jobQueue).toEqual([
+			expect.objectContaining({
+				id: "request:stale",
+			}),
+		]);
+		expect(result.ready.items.some((item) => item.id === "runtime:blueprint")).toBe(true);
 	});
 });

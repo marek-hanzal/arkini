@@ -28,11 +28,11 @@ export namespace detachLineInputSourceFx {
 }
 
 /**
- * Detaches one idle material source while atomically discarding its passive intent.
+ * Detaches one idle material source while atomically discarding its default-line intent.
  *
- * Active work is the only legal refusal. Queue and default-line intent disappear with the
- * grid identity, buffered inputs return through canonical placement, and inbound deliveries
- * reconcile against the released origin before the caller commits the source elsewhere.
+ * Active or queued work refuses detachment. Buffered inputs return through canonical placement,
+ * and inbound deliveries reconcile against the released origin before the caller commits the
+ * source elsewhere.
  */
 export const detachLineInputSourceFx = Effect.fn("detachLineInputSourceFx")(function* ({
 	runtime,

@@ -969,16 +969,12 @@ describe("ItemDetailModal", () => {
 			queuedRow?.querySelector<HTMLImageElement>('[data-ui="ItemQueueWorkIdentity"] img')
 				?.src,
 		).toContain("resource:asset:water");
-		const deleteButton = queuedRow?.querySelector<HTMLButtonElement>(
-			'[data-ui="ItemQueueDeleteButton"]',
-		);
-		expect(deleteButton?.textContent).toBe("Delete");
-		expect(deleteButton?.className).toContain("underline");
-		expect(deleteButton?.dataset.requestId).toBe("request:workshop");
+		expect(queuedRow?.querySelector("button")).toBeNull();
 		const clearQueueButton = document.querySelector<HTMLButtonElement>(
 			'[data-ui="ItemQueueClearButton"]',
 		);
 		expect(clearQueueButton).not.toBeNull();
+		expect(document.querySelectorAll('[data-ui="ItemQueueClearButton"]')).toHaveLength(1);
 		expect(clearQueueButton?.className).toContain("underline");
 		expect(clearQueueButton?.className).toContain("border-0");
 		expect(document.querySelector('[data-ui="ItemQueueEmptyState"]')).toBeNull();

@@ -14,7 +14,7 @@ export namespace removeRuntimeItemIdentityFx {
 	}
 }
 
-/** Removes one idle item identity and discards queued work bound to that identity. */
+/** Removes one item identity only when it owns no active or queued work. */
 export const removeRuntimeItemIdentityFx = Effect.fn("removeRuntimeItemIdentityFx")(function* ({
 	item,
 	runtime,

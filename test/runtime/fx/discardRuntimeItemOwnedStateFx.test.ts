@@ -37,7 +37,7 @@ const passiveChild = {
 };
 
 describe("discardRuntimeItemOwnedStateFx", () => {
-	it("discards passive input descendants and queued intents while preserving the root", () => {
+	it("discards passive input descendants and default-line intent while preserving the root", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
@@ -50,23 +50,7 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 				passiveChild,
 			],
 			jobs: [],
-			jobQueue: [
-				{
-					id: "request:root",
-					ownerItemId: root.id,
-					lineId: "line:forge:run",
-				},
-				{
-					id: "request:child",
-					ownerItemId: passiveChild.id,
-					lineId: "line:missing",
-				},
-				{
-					id: "request:unrelated",
-					ownerItemId: "runtime:unrelated",
-					lineId: "line:unrelated",
-				},
-			],
+			jobQueue: [],
 			defaultLineByOwnerItemId: {
 				[root.id]: "line:forge:run",
 				[passiveChild.id]: "line:missing",
@@ -83,11 +67,7 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 		expect(result.items).toEqual([
 			root,
 		]);
-		expect(result.jobQueue).toEqual([
-			expect.objectContaining({
-				id: "request:unrelated",
-			}),
-		]);
+		expect(result.jobQueue).toEqual([]);
 		expect(result.defaultLineByOwnerItemId).toEqual({
 			"runtime:unrelated": "line:unrelated",
 		});

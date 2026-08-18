@@ -1,18 +1,14 @@
 import { useAtom, useAtomValue } from "@effect/atom-react";
 import type { Effect } from "effect";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 
 import { AppearanceAtom } from "~/bridge/appearance/AppearanceAtom";
 import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
-import { openDiagnosticDirectoryFx } from "~/bridge/diagnostics/Diagnostics";
-import { checkEditorMcpPortFx } from "~/bridge/editor-mcp/checkEditorMcpPortFx";
-import { readEditorMcpPortFx } from "~/bridge/editor-mcp/readEditorMcpPortFx";
-import { writeEditorMcpPortFx } from "~/bridge/editor-mcp/writeEditorMcpPortFx";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { openUserDataDirectoryFx } from "~/bridge/user-data/UserData";
 import type { WindowMode } from "~/bridge/window/WindowMode";
 import { WindowModeAtom } from "~/bridge/window/WindowModeAtom";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
+import { useSettingsDirectoriesModel } from "~/ui/settings/useSettingsDirectoriesModel";
+import { useSettingsMcpModel } from "~/ui/settings/useSettingsMcpModel";
 import { SettingsCommandAtom } from "~/ui/settings/SettingsCommandAtom";
 
 /** Owns application settings commands and the one Escape lifecycle for the settings surface. */
@@ -25,43 +21,8 @@ export const useSettingsModel = ({
 	const cheatAvailability = useCheatAvailability();
 	const windowMode = useAtomValue(WindowModeAtom);
 	const [commandState, runCommand] = useAtom(SettingsCommandAtom);
-	const [editorMcpPort, setEditorMcpPort] = useState("");
-	const [editorMcpPortStatus, setEditorMcpPortStatus] = useState<
-		| {
-				readonly kind: "loading" | "idle" | "checking" | "available" | "active";
-		  }
-		| {
-				readonly kind: "error";
-				readonly message: string;
-		  }
-	>({
-		kind: "loading",
-	});
-	const [diagnosticsStatus, setDiagnosticsStatus] = useState<
-		| {
-				readonly kind: "idle";
-		  }
-		| {
-				readonly kind: "pending";
-		  }
-		| {
-				readonly kind: "error";
-				readonly error: unknown;
-		  }
-	>({
-		kind: "idle",
-	});
-	const [userDataStatus, setUserDataStatus] = useState<
-		| {
-				readonly kind: "idle" | "pending";
-		  }
-		| {
-				readonly kind: "error";
-				readonly error: unknown;
-		  }
-	>({
-		kind: "idle",
-	});
+	const mcp = useSettingsMcpModel();
+	const directories = useSettingsDirectoriesModel();
 	const blocked = commandState.kind === "pending";
 	const exitPending = commandState.kind === "pending" && commandState.action === "exit";
 	const goBack = useCallback(() => {
@@ -73,107 +34,6 @@ export const useSettingsModel = ({
 		onBackFx,
 		runCommand,
 	]);
-	const openDiagnostics = useCallback(() => {
-		if (diagnosticsStatus.kind === "pending") return;
-		setDiagnosticsStatus({
-			kind: "pending",
-		});
-		void RendererRuntime.runPromise(openDiagnosticDirectoryFx())
-			.then(() => {
-				setDiagnosticsStatus({
-					kind: "idle",
-				});
-			})
-			.catch((error) => {
-				setDiagnosticsStatus({
-					kind: "error",
-					error,
-				});
-			});
-	}, [
-		diagnosticsStatus.kind,
-	]);
-	const openUserData = useCallback(() => {
-		if (userDataStatus.kind === "pending") return;
-		setUserDataStatus({
-			kind: "pending",
-		});
-		void RendererRuntime.runPromise(openUserDataDirectoryFx())
-			.then(() => {
-				setUserDataStatus({
-					kind: "idle",
-				});
-			})
-			.catch((error) => {
-				setUserDataStatus({
-					kind: "error",
-					error,
-				});
-			});
-	}, [
-		userDataStatus.kind,
-	]);
-	const checkEditorMcpPort = useCallback(() => {
-		if (editorMcpPortStatus.kind === "checking") return;
-		const port = Number(editorMcpPort.trim());
-		if (!Number.isInteger(port) || port < 1024 || port > 65_535) {
-			setEditorMcpPortStatus({
-				kind: "error",
-				message: "Use a port from 1024 to 65535.",
-			});
-			return;
-		}
-		setEditorMcpPortStatus({
-			kind: "checking",
-		});
-		void RendererRuntime.runPromise(checkEditorMcpPortFx(port))
-			.then((availability) => {
-				if (availability.type === "unavailable") {
-					setEditorMcpPortStatus({
-						kind: "error",
-						message: availability.message,
-					});
-					return;
-				}
-				return RendererRuntime.runPromise(writeEditorMcpPortFx(port)).then(() => {
-					setEditorMcpPortStatus({
-						kind: availability.type === "active" ? "active" : "available",
-					});
-				});
-			})
-			.catch((error) => {
-				setEditorMcpPortStatus({
-					kind: "error",
-					message: error instanceof Error ? error.message : String(error),
-				});
-			});
-	}, [
-		editorMcpPort,
-		editorMcpPortStatus.kind,
-	]);
-
-	useEffect(() => {
-		let active = true;
-		void RendererRuntime.runPromise(readEditorMcpPortFx())
-			.then((port) => {
-				if (!active) return;
-				setEditorMcpPort(String(port));
-				setEditorMcpPortStatus({
-					kind: "idle",
-				});
-			})
-			.catch((error) => {
-				if (!active) return;
-				setEditorMcpPortStatus({
-					kind: "error",
-					message: error instanceof Error ? error.message : String(error),
-				});
-			});
-		return () => {
-			active = false;
-		};
-	}, []);
-
 	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
 			if (event.key !== "Escape" || blocked) return;
@@ -190,24 +50,13 @@ export const useSettingsModel = ({
 	return {
 		blocked,
 		cheatToolsAvailable: cheatAvailability.available,
-		editorMcpPort,
-		editorMcpPortStatus,
+		...mcp,
 		exitPending,
-		diagnosticsStatus,
-		userDataStatus,
+		...directories,
 		status: commandState,
 		theme: appearance.theme,
 		windowMode,
 		goBack,
-		openDiagnostics,
-		openUserData,
-		checkEditorMcpPort,
-		setEditorMcpPort: (value: string) => {
-			setEditorMcpPort(value);
-			setEditorMcpPortStatus({
-				kind: "idle",
-			});
-		},
 		selectTheme: (theme: AppearanceTheme) => {
 			runCommand({
 				action: "theme",

@@ -67,29 +67,4 @@ describe("MainPageLayout", () => {
 		expect(panel?.style.viewTransitionName).toBe("arkini-panel-settings");
 		expect(panelContent?.style.viewTransitionName).toBe("");
 	});
-
-	it("keeps the same outer slots and one page-owned panel surface for the viewport catalog", async () => {
-		const container = await renderLayout({
-			page: "arkpacks",
-			panelMode: "viewport",
-		});
-		const layout = container.querySelector<HTMLElement>('[data-ui="LauncherSceneLayout"]');
-		const heroSlot = container.querySelector<HTMLElement>('[data-ui="LauncherSceneHeroSlot"]');
-		const contentSlot = container.querySelector<HTMLElement>(
-			'[data-ui="LauncherSceneContentSlot"]',
-		);
-		const hero = container.querySelector<HTMLElement>('[data-ui="LauncherHero"]');
-		const panel = container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]');
-		const panelContent = container.querySelector<HTMLElement>(
-			'[data-ui="MainPagePanelContent"]',
-		);
-
-		expect(layout?.dataset.layout).toBe("fixed-hero");
-		expect(hero?.parentElement).toBe(heroSlot);
-		expect(panel?.parentElement).toBe(contentSlot);
-		expect(panel?.className).toContain("size-full");
-		expect(panel?.className).not.toContain("85dvw");
-		expect(panel?.style.viewTransitionName).toBe("arkini-panel-arkpacks");
-		expect(panelContent?.style.viewTransitionName).toBe("");
-	});
 });

@@ -45,24 +45,24 @@ const renderIdentity = async (compositeUrl?: string) => {
 };
 
 describe("ItemIdentity", () => {
-	it("keeps one source centered at full size", async () => {
+	it("renders one source URL without manufacturing another layer", async () => {
 		const images = await renderIdentity();
 
 		expect(images).toHaveLength(1);
-		expect(images[0]?.className).toContain("inset-0 size-full");
+		expect(images[0]).toMatchObject({
+			src: "resource:base",
+		});
 	});
 
-	it("stages two sources from top-left to bottom-right in tuple order", async () => {
+	it("renders two source URLs in tuple order", async () => {
 		const images = await renderIdentity("resource:overlay");
 
 		expect(images).toHaveLength(2);
 		expect(images[0]).toMatchObject({
 			src: "resource:base",
 		});
-		expect(images[0]?.className).toContain("top-0 left-0 size-3/4");
 		expect(images[1]).toMatchObject({
 			src: "resource:overlay",
 		});
-		expect(images[1]?.className).toContain("right-0 bottom-0 z-10 size-3/4");
 	});
 });

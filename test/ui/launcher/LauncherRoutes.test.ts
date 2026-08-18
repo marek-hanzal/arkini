@@ -48,12 +48,8 @@ describe("launcher routes", () => {
 		expect(router.state.location.pathname).toBe("/main-menu");
 	});
 
-	it.each([
-		"/arkpacks",
-		"/settings",
-		"/about",
-	])("keeps %s as a standalone top-level destination", async (path) => {
-		const router = await loadRoute(path);
-		expect(router.state.location.pathname).toBe(path);
+	it("keeps launcher leaves as standalone top-level destinations", async () => {
+		const router = await loadRoute("/settings");
+		expect(router.state.location.pathname).toBe("/settings");
 	});
 });

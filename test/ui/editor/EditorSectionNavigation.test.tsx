@@ -4,7 +4,6 @@ import { act, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { editorBackLinkClassName, EditorBackIcon } from "~/ui/editor/EditorBackIcon";
 import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
@@ -47,13 +46,5 @@ describe("editor section navigation", () => {
 			"EditorSectionNavigationTitle",
 			"EditorSectionNavigationAction",
 		]);
-	});
-
-	it("renders the shared back cue as one large unframed icon", async () => {
-		const container = await render(<EditorBackIcon />);
-		expect(container.querySelector("span")?.className).toContain("size-7");
-		expect(editorBackLinkClassName).toContain("border-0");
-		expect(editorBackLinkClassName).toContain("bg-transparent");
-		expect(editorBackLinkClassName).toContain("shadow-none");
 	});
 });

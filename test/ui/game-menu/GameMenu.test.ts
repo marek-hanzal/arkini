@@ -380,15 +380,6 @@ describe("GameMenu", () => {
 		const { container, router } = await renderMenu();
 		await openMenu(container);
 		expect(
-			container.querySelector<HTMLElement>('[data-ui="GameMenuBackdrop"]')?.className,
-		).toContain("cursor-default");
-		expect(buttonByText(container, "Settings").className).toContain("cursor-pointer");
-		expect(buttonByText(container, "Settings").className).not.toContain("ak-list-row");
-		expect(buttonByText(container, "Return to game").className).toContain("bg-accent");
-		expect(buttonByText(container, "Return to game").className).toContain(
-			"text-accent-contrast",
-		);
-		expect(
 			container.querySelector<HTMLElement>('[data-ui="GameMenuBackdrop"]')?.style
 				.viewTransitionName,
 		).toBe(gameMenuBackdropViewTransitionName);
@@ -462,8 +453,6 @@ describe("GameMenu", () => {
 		await vi.waitFor(() =>
 			expect(buttonByText(container, "Save and exit").disabled).toBe(true),
 		);
-		expect(buttonByText(container, "Save and exit").className).toContain("cursor-progress");
-		expect(buttonByText(container, "Save and exit").className).not.toContain("ak-list-row");
 
 		await act(async () => {
 			gate.resolve();

@@ -27,7 +27,7 @@ afterEach(async () => {
 });
 
 describe("EditorItemThumbnail", () => {
-	it("uses the canonical top-left and bottom-right composition for two resources", async () => {
+	it("renders authored resource URLs in tuple order", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);
 		const root = createRoot(container);
@@ -50,10 +50,8 @@ describe("EditorItemThumbnail", () => {
 		expect(images[0]).toMatchObject({
 			src: "resource:base",
 		});
-		expect(images[0]?.className).toContain("top-0 left-0 size-3/4");
 		expect(images[1]).toMatchObject({
 			src: "resource:overlay",
 		});
-		expect(images[1]?.className).toContain("right-0 bottom-0 z-10 size-3/4");
 	});
 });

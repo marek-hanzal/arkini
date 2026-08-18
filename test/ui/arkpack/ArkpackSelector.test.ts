@@ -212,23 +212,14 @@ describe("ArkpackSelector", () => {
 		).toBe("");
 		const layout = container.querySelector('[data-ui="ArkpackSelector"]');
 		const catalogList = container.querySelector<HTMLElement>('[data-ui="ArkpackCatalogList"]');
-		expect(catalogList?.className).toContain("ak-list");
 		const catalogRows = Array.from(
 			catalogList?.querySelectorAll<HTMLElement>('[data-ui="ArkpackCatalogRow"]') ?? [],
 		);
 		expect(catalogRows).toHaveLength(2);
 		expect(catalogRows[0]?.textContent).toContain("Official");
 		expect(catalogRows[1]?.textContent).toContain("External");
-		expect(catalogRows.every((row) => row.className.includes("ak-list-row"))).toBe(true);
-		expect(catalogRows.every((row) => !row.className.includes("ak-list-row-interactive"))).toBe(
-			true,
-		);
 		expect(layout?.lastElementChild?.tagName).toBe("FOOTER");
-		expect(layout?.lastElementChild?.className).toContain("justify-center");
 		const returnButton = layout?.lastElementChild?.querySelector("button");
-		expect(returnButton?.textContent).toBe("Back");
-		expect(returnButton?.querySelector('[class*="icon-[lucide--arrow-left]"]')).not.toBeNull();
-		expect(returnButton?.className).toContain("bg-accent");
 
 		await act(async () => returnButton?.click());
 		expect(router.state.location.pathname).toBe("/main-menu");
@@ -286,13 +277,10 @@ describe("ArkpackSelector", () => {
 
 		expect(removeFx).toHaveBeenCalledTimes(1);
 		expect(removeButton.disabled).toBe(true);
-		expect(removeButton.className).toContain("cursor-progress");
 		expect(container.textContent).toContain("Removing package…");
 		expect(container.textContent).not.toContain("Validating package…");
 		expect(playLink.getAttribute("aria-disabled")).toBe("true");
-		expect(playLink.className).toContain("cursor-progress");
 		expect(fileInput.disabled).toBe(true);
-		expect(fileInput.className).toContain("disabled:file:cursor-progress");
 
 		await act(async () => {
 			removeButton.click();

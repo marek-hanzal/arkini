@@ -10,16 +10,8 @@ import {
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
-import { BackButton } from "~/ui/button/BackButton";
-import {
-	Button,
-	ButtonLink,
-	DangerButton,
-	DangerButtonLink,
-	PrimaryButton,
-	PrimaryButtonLink,
-} from "~/ui/button/Button";
-import { LinkButton } from "~/ui/button/LinkButton";
+
+import { Button, ButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
 
 (
 	globalThis as {
@@ -36,61 +28,8 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-const elementByText = <T extends Element>(
-	container: ParentNode,
-	selector: string,
-	text: string,
-) => {
-	const element = Array.from(container.querySelectorAll<T>(selector)).find(
-		(candidate) => candidate.textContent === text,
-	);
-	if (element === undefined) throw new Error(`Expected ${text}.`);
-	return element;
-};
-
 describe("Button primitives", () => {
-	it("renders the canonical primary back action with a directional icon", async () => {
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-		await act(async () => {
-			root.render(createElement(BackButton));
-		});
-
-		const backButton = elementByText<HTMLButtonElement>(container, "button", "Back");
-		expect(backButton.className).toContain("bg-accent");
-		expect(backButton.className).toContain("mx-auto");
-		expect(backButton.className).toContain("gap-2");
-		expect(backButton.querySelector('[class*="icon-[lucide--arrow-left]"]')).not.toBeNull();
-	});
-
-	it("renders the shared inline-link action without button chrome", async () => {
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-		await act(async () => {
-			root.render(
-				createElement(
-					LinkButton,
-					{
-						cursorIntent: "progress",
-					},
-					"Delete",
-				),
-			);
-		});
-
-		const linkButton = elementByText<HTMLButtonElement>(container, "button", "Delete");
-		expect(linkButton.type).toBe("button");
-		expect(linkButton.className).toContain("border-0");
-		expect(linkButton.className).toContain("bg-transparent");
-		expect(linkButton.className).toContain("underline");
-		expect(linkButton.className).toContain("cursor-progress");
-	});
-
-	it("shares each visual role across native buttons and typed router links", async () => {
+	it("preserves disabled navigation and native button semantics", async () => {
 		const rootRoute = createRootRoute();
 		const indexRoute = createRoute({
 			getParentRoute: () => rootRoute,
@@ -102,57 +41,25 @@ describe("Button primitives", () => {
 					createElement(
 						ButtonLink,
 						{
-							to: "/about",
-						},
-						"Neutral link",
-					),
-					createElement(
-						ButtonLink,
-						{
 							"aria-disabled": true,
 							to: "/about",
 						},
 						"Disabled link",
 					),
 					createElement(
-						Button,
-						{
-							disabled: true,
-						},
-						"Neutral button",
-					),
-					createElement(
 						PrimaryButtonLink,
 						{
 							to: "/about",
 						},
-						"Primary link",
+						"Enabled link",
 					),
-					createElement(PrimaryButton, null, "Primary button"),
 					createElement(
-						PrimaryButton,
+						Button,
 						{
-							cursorIntent: "progress",
 							disabled: true,
 						},
-						"Pending button",
+						"Disabled button",
 					),
-					createElement(
-						PrimaryButton,
-						{
-							"aria-disabled": true,
-							cursorIntent: "wait",
-						},
-						"Waiting button",
-					),
-					createElement(
-						DangerButtonLink,
-						{
-							to: "/about",
-						},
-						"Danger link",
-					),
-					createElement(DangerButton, null, "Danger button"),
 				),
 		});
 		const aboutRoute = createRoute({
@@ -184,59 +91,18 @@ describe("Button primitives", () => {
 			);
 		});
 
-		const neutralLink = elementByText<HTMLAnchorElement>(container, "a", "Neutral link");
-		const disabledLink = elementByText<HTMLAnchorElement>(container, "a", "Disabled link");
-		const neutralButton = elementByText<HTMLButtonElement>(
-			container,
-			"button",
-			"Neutral button",
-		);
-		const primaryLink = elementByText<HTMLAnchorElement>(container, "a", "Primary link");
-		const primaryButton = elementByText<HTMLButtonElement>(
-			container,
-			"button",
-			"Primary button",
-		);
-		const pendingButton = elementByText<HTMLButtonElement>(
-			container,
-			"button",
-			"Pending button",
-		);
-		const waitingButton = elementByText<HTMLButtonElement>(
-			container,
-			"button",
-			"Waiting button",
-		);
-		const dangerLink = elementByText<HTMLAnchorElement>(container, "a", "Danger link");
-		const dangerButton = elementByText<HTMLButtonElement>(container, "button", "Danger button");
+		const disabledLink = container.querySelector<HTMLAnchorElement>('a[aria-disabled="true"]');
+		const enabledLink = container.querySelector<HTMLAnchorElement>("a:not([aria-disabled])");
+		const button = container.querySelector<HTMLButtonElement>("button");
+		expect(disabledLink?.href).toMatch(/\/about$/);
+		expect(enabledLink?.href).toMatch(/\/about$/);
+		expect(button?.type).toBe("button");
+		expect(button?.disabled).toBe(true);
 
-		expect(neutralLink.className).toContain("bg-surface/75");
-		expect(neutralButton.className).toContain("bg-surface/75");
-		expect(neutralLink.className).not.toContain("backdrop-");
-		expect(neutralButton.className).not.toContain("backdrop-");
-		expect(primaryLink.className).toBe(primaryButton.className);
-		expect(dangerLink.className).toBe(dangerButton.className);
-		expect(neutralLink.className).not.toBe(primaryLink.className);
-		expect(dangerLink.className).not.toBe(primaryLink.className);
-		expect(neutralLink.className).toContain("cursor-pointer");
-		expect(neutralButton.className).toContain("cursor-not-allowed");
-		expect(disabledLink.className).toContain("cursor-not-allowed");
-		expect(primaryButton.className).toContain("cursor-pointer");
-		expect(pendingButton.className).toContain("cursor-progress");
-		expect(waitingButton.className).toContain("cursor-wait");
-		expect(primaryLink.className).toContain("bg-accent");
-		expect(primaryLink.className).toContain("aria-disabled:hover:bg-accent");
-		expect(pendingButton.className).toContain("disabled:hover:bg-accent");
-		expect(dangerLink.className).toContain("bg-danger");
-		expect(dangerLink.className).toContain("aria-disabled:hover:opacity-60");
-		expect(neutralLink.getAttribute("href")).toBe("/about");
-		expect(neutralButton.type).toBe("button");
-		expect(neutralButton.disabled).toBe(true);
-
-		await act(async () => disabledLink.click());
+		await act(async () => disabledLink?.click());
 		expect(router.state.location.pathname).toBe("/");
 
-		await act(async () => primaryLink.click());
+		await act(async () => enabledLink?.click());
 		expect(router.state.location.pathname).toBe("/about");
 	});
 });

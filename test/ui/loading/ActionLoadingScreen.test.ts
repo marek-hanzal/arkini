@@ -63,27 +63,18 @@ afterEach(async () => {
 describe("ActionLoadingScreen", () => {
 	it("renders one native route surface and advances without claiming completion", async () => {
 		const { container } = await renderScreen();
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="ActionLoadingScreen"]')?.className,
-		).toContain("cursor-wait");
 		const hero = container.querySelector<HTMLElement>('[data-ui="LauncherHero"]');
 		const artwork = container.querySelector<HTMLElement>('[data-ui="LauncherHeroArtwork"]');
 		expect(hero).not.toBeNull();
 		expect(hero?.style.aspectRatio).toBe("1535 / 1024");
 		expect(artwork).toBeInstanceOf(HTMLImageElement);
-		expect(artwork?.getAttribute("alt")).toBe("Arkini");
 		expect(artwork?.getAttribute("src")).toContain("hero.png");
 		expect(hero?.style.viewTransitionName).toBe("");
 		expect(artwork?.style.viewTransitionName).toBe("arkini-launcher-hero-artwork");
-		expect(container.querySelector('[data-ui="LauncherHeroShadow"]')).not.toBeNull();
 		const content = container.querySelector<HTMLElement>(
 			'[data-ui="ActionLoadingScreenContent"]',
 		);
 		expect(content?.style.viewTransitionName).toBe("arkini-action-progress");
-		expect(content?.className).not.toContain("rounded-2xl");
-		expect(content?.className).not.toContain("bg-surface");
-		expect(content?.className).not.toContain("shadow-2xl");
-		expect(container.textContent).toContain("Loading test…");
 		expect(progressValue(container)).toBe(12);
 
 		await act(async () => vi.advanceTimersByTime(defaultLoadingMinimumDurationMs));

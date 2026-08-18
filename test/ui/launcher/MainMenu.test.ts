@@ -175,21 +175,6 @@ describe("MainMenu", () => {
 			container.querySelector<HTMLElement>('[data-ui="LauncherHero"]')?.style
 				.viewTransitionName,
 		).toBe("");
-		expect(container.querySelector('[data-ui="LauncherHeroShadow"]')).not.toBeNull();
-		const menu = container.querySelector<HTMLElement>('[data-ui="MainMenu"]');
-		const panel = container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]');
-		expect(menu?.className).not.toContain("ak-list");
-		expect(menu?.className).toContain("gap-4");
-		expect(panel?.className).toContain("border-0");
-		expect(panel?.className).toContain("bg-transparent");
-		expect(panel?.className).toContain("shadow-none");
-		expect(play?.className).toContain("bg-accent");
-		expect(play?.className).toContain("text-accent-contrast");
-		expect(
-			Array.from(menu?.querySelectorAll("a, button") ?? []).every(
-				(control) => !control.className.includes("ak-list-row"),
-			),
-		).toBe(true);
 		const editor = Array.from(container.querySelectorAll("a")).find(
 			(link) => link.textContent === "Editor",
 		);

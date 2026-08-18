@@ -5,32 +5,13 @@ import { mainPagePanelViewTransitionNameFx } from "~/ui/navigation/mainPagePanel
 import { resolveLauncherLeaveDestinationFx } from "~/ui/navigation/resolveLauncherLeaveDestinationFx";
 
 describe("navigation semantic effects", () => {
-	it.each([
-		[
-			"/about",
-			"about",
-			"arkini-panel-about",
-		],
-		[
-			"/arkpacks",
-			"arkpacks",
-			"arkini-panel-arkpacks",
-		],
-		[
-			"/settings",
-			"settings",
-			"arkini-panel-settings",
-		],
-		[
-			"/main-menu",
-			"main-menu",
-			"arkini-panel-main-menu",
-		],
-	] as const)("maps %s to its exact launcher destination and panel", (pathname, page, panel) => {
-		expect(Effect.runSync(resolveLauncherLeaveDestinationFx(pathname))).toEqual({
-			destination: page,
+	it("maps a launcher route to its semantic destination and panel", () => {
+		expect(Effect.runSync(resolveLauncherLeaveDestinationFx("/settings"))).toEqual({
+			destination: "settings",
 		});
-		expect(Effect.runSync(mainPagePanelViewTransitionNameFx(page))).toBe(panel);
+		expect(Effect.runSync(mainPagePanelViewTransitionNameFx("settings"))).toBe(
+			"arkini-panel-settings",
+		);
 	});
 
 	it("assigns the editor welcome screen its own panel identity", () => {

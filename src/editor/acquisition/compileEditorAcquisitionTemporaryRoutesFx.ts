@@ -5,24 +5,6 @@ import { readEditorAcquisitionOutputOccurrencesFx } from "~/editor/readEditorAcq
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
-const combineRequirements = (
-	left: EditorAcquisitionRoute["requirements"],
-	right: EditorAcquisitionRoute["requirements"],
-): EditorAcquisitionRoute["requirements"] => ({
-	allOf: [
-		...left.allOf,
-		...right.allOf,
-	],
-	anyOf: [
-		...left.anyOf,
-		...right.anyOf,
-	],
-	unsupported: [
-		...(left.unsupported ?? []),
-		...(right.unsupported ?? []),
-	],
-});
-
 const readTemporaryRoutesFx = Effect.fn("compileEditorAcquisitionTemporaryRoutesFx.item")(
 	function* (item: ItemSchema.Type) {
 		if (item.type !== "temporary") return [];
@@ -51,20 +33,19 @@ const readTemporaryRoutesFx = Effect.fn("compileEditorAcquisitionTemporaryRoutes
 					operationOutputGroupId: output.operationOutputGroupId,
 					quantityDistribution: output.quantityDistribution,
 				},
-				requirements: combineRequirements(
-					{
-						allOf: [
-							{
-								factId: item.id,
-								quantity: 1,
-								source: "temporary-item",
-								usage: "consume",
-							},
-						],
-						anyOf: [],
-					},
-					output.requirements,
-				),
+				requirements: {
+					allOf: [
+						{
+							factId: item.id,
+							quantity: 1,
+							source: "temporary-item",
+							usage: "consume",
+						},
+						...output.requirements.allOf,
+					],
+					anyOf: output.requirements.anyOf,
+					unsupported: output.requirements.unsupported ?? [],
+				},
 				runMultiplier: 1,
 			}),
 		);

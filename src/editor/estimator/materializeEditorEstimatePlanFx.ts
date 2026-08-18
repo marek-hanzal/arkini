@@ -9,6 +9,7 @@ import type {
 	EditorEstimateSelectedRoute,
 } from "~/editor/estimator/projectEditorEstimateRouteStepFx";
 import { projectEditorEstimateRouteStepFx } from "~/editor/estimator/projectEditorEstimateRouteStepFx";
+import { readEditorEstimateParallelDurationFx } from "~/editor/estimator/readEditorEstimateParallelDurationFx";
 import { shareEditorEstimateOperationRunsFx } from "~/editor/estimator/shareEditorEstimateOperationRunsFx";
 
 export interface EditorEstimateCandidatePlan {
@@ -326,20 +327,14 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 				topRouteId: topRoute.id,
 			});
 			if ("diagnostics" in projection) return projection;
+			const durationMs = yield* readEditorEstimateParallelDurationFx({
+				dependencies: snapshot.dependencies,
+				factId,
+				selected: snapshot.selected,
+				sharedOperationIds: snapshot.sharedOperationIds,
+			});
 			return {
-				durationMs: [
-					...new Map(
-						[
-							...snapshot.selected.entries(),
-						].map(([id, plan]) => [
-							plan.route.operation !== undefined &&
-							snapshot.sharedOperationIds.has(plan.route.operation.id)
-								? plan.route.operation.id
-								: id,
-							plan,
-						]),
-					).values(),
-				].reduce((total, plan) => total + plan.route.durationMs * plan.actionRuns, 0),
+				durationMs,
 				projection,
 			};
 		}),

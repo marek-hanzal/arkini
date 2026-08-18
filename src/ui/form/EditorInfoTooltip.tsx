@@ -1,16 +1,28 @@
 import type { ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
+import type { Placement } from "@floating-ui/react";
 
 import { Tooltip } from "~/ui/overlay/Tooltip";
 
 export interface EditorInfoTooltipProps {
 	readonly className?: string;
 	readonly content: ReactNode;
+	readonly placement?: Placement;
+	readonly tooltipClassName?: string;
 }
 
 /** Renders the canonical contextual-help affordance used by editor forms. */
-export const EditorInfoTooltip = ({ className, content }: EditorInfoTooltipProps) => (
-	<Tooltip content={content}>
+export const EditorInfoTooltip = ({
+	className,
+	content,
+	placement,
+	tooltipClassName,
+}: EditorInfoTooltipProps) => (
+	<Tooltip
+		content={content}
+		contentClassName={tooltipClassName}
+		placement={placement}
+	>
 		<button
 			type="button"
 			data-ui="EditorInfoTooltip"

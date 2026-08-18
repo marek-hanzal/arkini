@@ -21,9 +21,9 @@ const readSatisfyQuantity = (when: WhenSchema.Type) => {
 		case "exists":
 			return 1;
 		case "count":
-			return undefined;
+			return when.count;
 		case "range":
-			return undefined;
+			return when.min;
 	}
 };
 

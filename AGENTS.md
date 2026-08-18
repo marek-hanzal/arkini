@@ -17,6 +17,7 @@ This is a complex economy game using game file as the source of the gameplay (ar
 - you may comment functions, codeblocks or a bit more complex setups in the code if you feel it's useful for you as LLM
 - questions are read-only regardless of complexity: answer the question, you may propose the solution, execute on explicit users' intent
 - you may spin up any agents you need for the task - see roles below
+- accessibility is explicitly out of scope: do not add accessibility-only code, ARIA attributes, focus presentation, keyboard-only behavior, accessibility tests, or accessibility review work; preserve existing incidental semantics unless a task explicitly requests otherwise
 
 ## Agents
 

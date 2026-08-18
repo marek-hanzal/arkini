@@ -1,0 +1,103 @@
+import {
+	autoUpdate,
+	flip,
+	FloatingPortal,
+	offset,
+	shift,
+	size,
+	useClick,
+	useDismiss,
+	useFloating,
+	useInteractions,
+} from "@floating-ui/react";
+import { useState } from "react";
+
+import { Button } from "~/ui/button/Button";
+
+export interface EditorSelectOption<Value extends string> {
+	readonly label: string;
+	readonly value: Value;
+}
+
+/** Replaces visually inconsistent native selects with the editor's Floating UI menu. */
+export const EditorSelect = <Value extends string>({
+	label,
+	onChange,
+	options,
+	value,
+}: {
+	readonly label: string;
+	readonly onChange: (value: Value) => void;
+	readonly options: ReadonlyArray<EditorSelectOption<Value>>;
+	readonly value: Value;
+}) => {
+	const [open, setOpen] = useState(false);
+	const selected = options.find((option) => option.value === value);
+	const { context, floatingStyles, refs } = useFloating({
+		middleware: [
+			offset(4),
+			flip(),
+			shift({
+				padding: 8,
+			}),
+			size({
+				padding: 8,
+				apply: ({ elements, rects }) => {
+					elements.floating.style.width = `${rects.reference.width}px`;
+				},
+			}),
+		],
+		onOpenChange: setOpen,
+		open,
+		placement: "bottom-end",
+		whileElementsMounted: autoUpdate,
+	});
+	const { getFloatingProps, getReferenceProps } = useInteractions([
+		useClick(context),
+		useDismiss(context),
+	]);
+
+	return (
+		<>
+			<Button
+				ref={refs.setReference}
+				className="h-12 min-h-12 min-w-56 justify-between gap-3 border-line-strong bg-surface px-4 text-sm shadow-none"
+				data-ui="EditorSelectTrigger"
+				title={label}
+				{...getReferenceProps()}
+			>
+				<span>{selected?.label ?? value}</span>
+				<span className="icon-[lucide--chevron-down] size-4 shrink-0 text-muted" />
+			</Button>
+			{open ? (
+				<FloatingPortal>
+					<div
+						ref={refs.setFloating}
+						className="z-50 grid gap-1 rounded-xl border border-line-strong bg-surface p-1.5 shadow-2xl"
+						data-ui="EditorSelectMenu"
+						style={floatingStyles}
+						{...getFloatingProps()}
+					>
+						{options.map((option) => (
+							<button
+								className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm font-semibold hover:bg-surface-raised ${option.value === value ? "bg-accent/10 text-accent" : "text-foreground"}`}
+								data-ui="EditorSelectOption"
+								key={option.value}
+								onClick={() => {
+									onChange(option.value);
+									setOpen(false);
+								}}
+								type="button"
+							>
+								{option.label}
+								{option.value === value ? (
+									<span className="icon-[lucide--check] size-4 shrink-0" />
+								) : null}
+							</button>
+						))}
+					</div>
+				</FloatingPortal>
+			) : null}
+		</>
+	);
+};

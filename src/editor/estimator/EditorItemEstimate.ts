@@ -17,6 +17,7 @@ export interface EditorItemEstimateRequirementStep {
 
 export interface EditorItemEstimateRouteStep {
 	readonly actionRuns: number;
+	/** Local authored work for this selected operation, excluding dependency wait time. */
 	readonly durationMs: number;
 	readonly factId: string;
 	readonly metadata?: EditorAcquisitionRouteMetadata;
@@ -66,6 +67,7 @@ interface EditorItemEstimateBase {
 }
 
 export interface ObtainableEditorItemEstimate extends EditorItemEstimateBase {
+	/** Stable optimistic critical path with independent dependency branches overlapped. */
 	readonly durationMs: number;
 	readonly obtainable: true;
 	readonly status: "complete";

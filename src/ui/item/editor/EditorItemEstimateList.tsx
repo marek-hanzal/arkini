@@ -2,11 +2,27 @@ import { useMemo, useState } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { searchEditorItems } from "~/editor/searchEditorItems";
+import { EditorSelect, type EditorSelectOption } from "~/ui/form/EditorSelect";
 import { EditorItemEstimateListRow } from "~/ui/item/editor/EditorItemEstimateListRow";
 import { useEditorItemEstimateIndex } from "~/ui/item/editor/useEditorItemEstimateIndex";
 import { Status } from "~/ui/status/Status";
 
-type EstimateSort = "fastest" | "slowest";
+type EstimateSort = "demand" | "fastest" | "slowest";
+
+const EstimateSortOptions: ReadonlyArray<EditorSelectOption<EstimateSort>> = [
+	{
+		label: "Fastest first",
+		value: "fastest",
+	},
+	{
+		label: "Slowest first",
+		value: "slowest",
+	},
+	{
+		label: "Highest demand first",
+		value: "demand",
+	},
+];
 
 const compareRuntime = (
 	left: number | undefined,
@@ -24,6 +40,7 @@ export const EditorItemEstimateList = () => {
 	const state = useEditorItemEstimateIndex(project);
 	const [query, setQuery] = useState("");
 	const [sort, setSort] = useState<EstimateSort>("fastest");
+	const maximumDemand = Math.max(0, ...state.entries.map(({ demand }) => demand));
 	const rows = useMemo(() => {
 		const estimates = new Map(
 			state.entries.map((entry) => [
@@ -45,8 +62,13 @@ export const EditorItemEstimateList = () => {
 			})
 			.sort(
 				(left, right) =>
-					compareRuntime(left.estimate.runtimeMs, right.estimate.runtimeMs, sort) ||
-					left.item.title.localeCompare(right.item.title),
+					(sort === "demand"
+						? right.estimate.demand - left.estimate.demand
+						: compareRuntime(
+								left.estimate.runtimeMs,
+								right.estimate.runtimeMs,
+								sort,
+							)) || left.item.title.localeCompare(right.item.title),
 			);
 	}, [
 		project.config.items,
@@ -69,21 +91,12 @@ export const EditorItemEstimateList = () => {
 					aria-label="Search item estimates"
 					onChange={(event) => setQuery(event.currentTarget.value)}
 				/>
-				<label
-					className="sr-only"
-					htmlFor="editor-item-estimate-sort"
-				>
-					Sort item estimates
-				</label>
-				<select
-					id="editor-item-estimate-sort"
-					className="h-12 shrink-0 cursor-pointer rounded-lg border border-line-strong bg-surface px-4 text-sm font-semibold text-foreground outline-none"
+				<EditorSelect
+					label="Sort item estimates"
+					onChange={setSort}
+					options={EstimateSortOptions}
 					value={sort}
-					onChange={(event) => setSort(event.currentTarget.value as EstimateSort)}
-				>
-					<option value="fastest">Fastest first</option>
-					<option value="slowest">Slowest first</option>
-				</select>
+				/>
 			</header>
 			<div className="ak-list grid content-start gap-2 px-3 pt-3 pb-3">
 				{state.status === "loading" ? (
@@ -115,6 +128,7 @@ export const EditorItemEstimateList = () => {
 						estimate={estimate}
 						item={item}
 						key={item.uid}
+						maximumDemand={maximumDemand}
 						projectId={project.projectId}
 					/>
 				))}

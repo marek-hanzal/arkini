@@ -586,14 +586,16 @@ describe("createEditorMcpOwnershipFx", () => {
 						"Title: Ingot",
 						"Quantity: 1",
 						"Method: static authored dependency graph",
-						"Timing: optimistic sequential",
+						"Timing: optimistic parallel critical path",
 					].join("\n"),
 				),
 			},
 		]);
 		expect(itemEstimate.content).toMatchObject([
 			{
-				text: expect.stringContaining("\nStatus: complete\nSequential duration: 1 s"),
+				text: expect.stringContaining(
+					"\nStatus: complete\nOptimistic parallel duration: 1 s",
+				),
 			},
 		]);
 		expect(itemEstimate.content).toMatchObject([
@@ -669,8 +671,9 @@ describe("createEditorMcpOwnershipFx", () => {
 					]
 				: [],
 		)[0];
-		expect(availabilityText).toContain("Status: complete");
-		expect(availabilityText).toContain("Ignored: rules and conditions");
+		expect(availabilityText).toContain("Status: unreachable");
+		expect(availabilityText).toContain("Enable prerequisites: acquired and included in time");
+		expect(availabilityText).toContain("water x 3 has no complete route");
 		ownership.setProjectContext(graphProjectId);
 		const oversizedEstimate = await client.callTool({
 			name: "item_estimate",
@@ -740,7 +743,7 @@ describe("createEditorMcpOwnershipFx", () => {
 				: [],
 		)[0];
 		expect(optimisticText).toContain("Status: complete");
-		expect(optimisticText).toContain("Sequential duration:");
+		expect(optimisticText).toContain("Optimistic parallel duration:");
 		expect(optimisticText).not.toContain("Consumables:");
 		ownership.setProjectContext(projectId);
 		expect(unreachableEstimate.content).toMatchObject([

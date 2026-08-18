@@ -165,14 +165,98 @@ describe("EditorItemEstimateSection", () => {
 			status: "ready",
 		});
 
-		expect(container.textContent).toContain("Complete path found");
+		expect(container.textContent).not.toContain("Complete path found");
+		expect(container.textContent).not.toContain("Target × 1");
 		expect(container.textContent).toContain("1 s");
-		expect(container.textContent).toContain("Static dependency estimator");
-		expect(container.textContent).toContain("line:well:water");
-		expect(container.textContent).toContain("Scope, distance, board capacity");
-		expect(container.textContent).toContain("Optimistic authored-graph analysis");
+		expect(container.textContent).not.toContain("Static dependency estimator");
+		expect(container.textContent).toContain("water");
+		expect(container.textContent).toContain("0.5 s");
+		expect(container.textContent).toContain("Quantity:");
+		expect(container.textContent).toContain("Time:");
+		expect(container.querySelector('[data-item-id="water"]')).not.toBeNull();
+		expect(container.textContent).not.toContain("line:well:water");
+		const header = container.querySelector('[data-ui="EditorItemEstimateHeader"]');
+		expect(header?.textContent).toContain("Estimated acquisition path");
+		expect(header?.textContent).toContain("1 s");
+		expect(header?.textContent).toContain("Time");
+		expect(header?.textContent).toContain("Quantity");
+		expect(header?.textContent).not.toContain("Estimated item breakdown");
+		expect(container.querySelector('[data-ui="EditorItemEstimateBreakdown"]')).not.toBeNull();
+		expect(
+			container.querySelector('[data-ui="EditorItemEstimateRouteStep"]')?.className,
+		).toContain("ak-list-row");
+		const info = container.querySelector<HTMLButtonElement>('[data-ui="EditorInfoTooltip"]');
+		expect(info).not.toBeNull();
+		await act(async () => info?.focus());
+		expect(document.body.textContent).toContain("Static dependency estimator");
+		expect(document.body.textContent).toContain("Scope, distance, board capacity");
+		expect(document.body.textContent).toContain("Optimistic authored-graph analysis");
 		expect(container.textContent).not.toContain("planner");
 		expect(container.textContent).not.toContain("search");
+	});
+
+	it("sorts the item breakdown by descending time or quantity", async () => {
+		const estimate: EditorItemEstimate = {
+			diagnostics: [],
+			durationMs: 1_500,
+			factId: "tool",
+			limitations: [],
+			obtainable: true,
+			status: "complete",
+			quantity: 1,
+			route: {
+				actionRuns: 1,
+				durationMs: 1_000,
+				factId: "tool",
+				outputRuns: 1,
+				quantity: 1,
+				requirements: [],
+				rootQuantity: 0,
+				routeId: "make-tool",
+				source: "route",
+			},
+			routeSteps: [
+				{
+					actionRuns: 1,
+					durationMs: 1_000,
+					factId: "tool",
+					outputRuns: 1,
+					quantity: 1,
+					requirements: [],
+					rootQuantity: 0,
+					routeId: "make-tool",
+					source: "route",
+				},
+				{
+					actionRuns: 1,
+					durationMs: 500,
+					factId: "water",
+					outputRuns: 1,
+					quantity: 3,
+					requirements: [],
+					rootQuantity: 0,
+					routeId: "make-water",
+					source: "route",
+				},
+			],
+		};
+		const container = await render({
+			estimate,
+			status: "ready",
+		});
+		const readFirstItemId = () =>
+			container
+				.querySelector('[data-ui="EditorItemEstimateRouteStep"] [data-item-id]')
+				?.getAttribute("data-item-id");
+
+		expect(readFirstItemId()).toBe("tool");
+		const quantityButton = Array.from(container.querySelectorAll("button")).find(
+			(button) => button.textContent === "Quantity",
+		);
+		if (quantityButton === undefined) throw new Error("Quantity sort button is missing.");
+		await act(async () => quantityButton.click());
+
+		expect(readFirstItemId()).toBe("water");
 	});
 
 	it("renders explicit unreachable diagnostics", async () => {
@@ -195,7 +279,7 @@ describe("EditorItemEstimateSection", () => {
 			status: "ready",
 		});
 
-		expect(container.textContent).toContain("No complete path");
+		expect(container.textContent).toContain("Unreachable");
 		expect(container.textContent).toContain("tool × 1 has no complete acquisition route");
 	});
 
@@ -219,7 +303,7 @@ describe("EditorItemEstimateSection", () => {
 			status: "ready",
 		});
 
-		expect(container.textContent).toContain("Incomplete static path");
+		expect(container.textContent).not.toContain("Incomplete static path");
 		expect(container.textContent).toContain("Indeterminate");
 		expect(container.textContent).toContain("exceeds the bounded static state space");
 		expect(container.textContent).not.toContain("Consumed");
@@ -231,6 +315,6 @@ describe("EditorItemEstimateSection", () => {
 		});
 
 		expect(container.querySelector('[data-ui="EditorItemEstimateLoading"]')).not.toBeNull();
-		expect(container.querySelector('[data-ui="EditorItemEstimateResult"]')).toBeNull();
+		expect(container.querySelector('[data-ui="EditorItemEstimateHeader"]')).not.toBeNull();
 	});
 });

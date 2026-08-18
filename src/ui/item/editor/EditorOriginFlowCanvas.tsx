@@ -41,6 +41,7 @@ interface EditorOriginFlowCanvasProps {
 	readonly fitContent: boolean;
 	readonly flow: EditorItemOriginFlow;
 	readonly focusNodeId?: string;
+	readonly focusRequestKey?: number;
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
 	readonly selection: EditorOriginFlowSelection | undefined;
 	readonly onSelectionChange: (selection: EditorOriginFlowSelection | undefined) => void;
@@ -73,6 +74,7 @@ export const EditorOriginFlowCanvas = ({
 	fitContent,
 	flow,
 	focusNodeId,
+	focusRequestKey,
 	onSelectionChange,
 	positions,
 	selection,
@@ -356,6 +358,7 @@ export const EditorOriginFlowCanvas = ({
 		scheduleDraw();
 	}, [
 		focusNodeId,
+		focusRequestKey,
 		positions,
 		resetNavigation,
 		scheduleDraw,

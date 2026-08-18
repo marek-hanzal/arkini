@@ -2,6 +2,8 @@ import { useAtom } from "@effect/atom-react";
 import { useEffect, useMemo } from "react";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { createEditorItemEstimateIndexFx } from "~/editor/createEditorItemEstimateIndexFx";
 import type { EditorItemEstimateIndexEntry } from "~/editor/EditorItemEstimateIndex";
 import {
 	EditorItemEstimateCacheAtom,
@@ -28,26 +30,6 @@ const sameSnapshot = (
 	right: EditorItemEstimateCache.Snapshot,
 ) => left?.projectId === right.projectId && left.revision === right.revision;
 
-const projectEntries = (
-	state: EditorItemEstimateCache.State,
-	project: EditorProject,
-): ReadonlyArray<EditorItemEstimateIndexEntry> =>
-	Object.keys(project.config.items)
-		.flatMap((itemId) => {
-			const estimate = state.estimates.get(itemId);
-			return estimate === undefined
-				? []
-				: [
-						{
-							itemId,
-							method: "static" as const,
-							runtimeMs: estimate.obtainable ? estimate.durationMs : undefined,
-							status: estimate.status,
-						},
-					];
-		})
-		.sort((left, right) => left.itemId.localeCompare(right.itemId));
-
 /** Reads the shared result of one full-snapshot estimate batch. */
 export const useEditorItemEstimateIndex = (
 	project: EditorProject,
@@ -72,13 +54,24 @@ export const useEditorItemEstimateIndex = (
 		requestIndex,
 		snapshot,
 	]);
-
+	const entries = useMemo(
+		() =>
+			RendererRuntime.runSync(
+				createEditorItemEstimateIndexFx({
+					estimates: state.estimates,
+					itemIds: Object.keys(project.config.items),
+				}),
+			),
+		[
+			project.config.items,
+			state.estimates,
+		],
+	);
 	if (!sameSnapshot(state.snapshot, snapshot))
 		return {
 			entries: [],
 			status: "loading",
 		};
-	const entries = projectEntries(state, project);
 	if (state.status === "loading" || state.status === "idle")
 		return {
 			entries,

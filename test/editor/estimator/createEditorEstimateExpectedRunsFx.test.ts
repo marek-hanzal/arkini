@@ -137,22 +137,14 @@ describe("createEditorEstimateExpectedRunsFx", () => {
 								outputGroupId: "a",
 								quantity: 1,
 							},
-							{
-								outputGroupId: "b",
-								quantity: 1,
-							},
 						],
 					},
 					{
 						probability: 0.5,
 						quantities: [
 							{
-								outputGroupId: "a",
-								quantity: 2,
-							},
-							{
 								outputGroupId: "b",
-								quantity: 2,
+								quantity: 1,
 							},
 						],
 					},
@@ -165,6 +157,105 @@ describe("createEditorEstimateExpectedRunsFx", () => {
 					[
 						"b",
 						100,
+					],
+				]),
+			}),
+		).toEqual({
+			status: "state-space-unsupported",
+		});
+	});
+
+	it("counts only reachable states for large correlated co-product demands", () => {
+		expect(
+			expectedRuns.read({
+				distribution: [
+					{
+						probability: 0.75,
+						quantities: [
+							{
+								outputGroupId: "hide",
+								quantity: 1,
+							},
+							{
+								outputGroupId: "sausage",
+								quantity: 2,
+							},
+						],
+					},
+					{
+						probability: 0.25,
+						quantities: [
+							{
+								outputGroupId: "hide",
+								quantity: 2,
+							},
+							{
+								outputGroupId: "sausage",
+								quantity: 2,
+							},
+						],
+					},
+				],
+				demandByOutputGroupId: new Map([
+					[
+						"hide",
+						84,
+					],
+					[
+						"sausage",
+						208,
+					],
+				]),
+			}),
+		).toEqual({
+			runs: 104,
+			status: "complete",
+		});
+	});
+
+	it("bounds a wide sparse frontier before enqueueing excess states", () => {
+		const distribution = Array.from(
+			{
+				length: 16 ** 3,
+			},
+			(_, index) => {
+				const a = index % 16;
+				const b = Math.floor(index / 16) % 16;
+				const c = Math.floor(index / 16 ** 2);
+				return {
+					probability: 1 / 16 ** 3,
+					quantities: [
+						{
+							outputGroupId: "a",
+							quantity: a,
+						},
+						{
+							outputGroupId: "b",
+							quantity: b,
+						},
+						{
+							outputGroupId: "c",
+							quantity: c,
+						},
+					],
+				};
+			},
+		);
+		expect(
+			expectedRuns.read({
+				distribution,
+				demandByOutputGroupId: new Map([
+					[
+						"a",
+						30,
+					],
+					[
+						"b",
+						30,
+					],
+					[
+						"c",
+						30,
 					],
 				]),
 			}),

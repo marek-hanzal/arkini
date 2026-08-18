@@ -248,9 +248,9 @@ const estimateDiagnosticText = (diagnostic: EditorItemEstimateDiagnostic) => {
 const estimateLimitationText = (limitation: EditorItemEstimate["limitations"][number]) => {
 	switch (limitation) {
 		case "conditional-runtime-adjustments-ignored":
-			return "rules and conditional runtime adjustments are ignored";
+			return "conditional runtime adjustments are ignored";
 		case "negative-availability-constraints-ignored":
-			return "enable, disable, and availability conditions are ignored";
+			return "positive enable prerequisites are acquired, but rule truth and disabling conditions are ignored";
 		case "spatial-requirements-approximated":
 			return "scope, distance, board capacity, and concrete placement are ignored";
 	}
@@ -293,10 +293,11 @@ const itemEstimateText = (project: EditorProject, estimate: EditorItemEstimate) 
 		`Title: ${target.title}`,
 		`Quantity: ${formatEstimateNumber(estimate.quantity)}`,
 		"Method: static authored dependency graph",
-		"Timing: optimistic sequential",
+		"Timing: optimistic parallel critical path",
 		"Start facts: authored board, inventory, and toolbar",
 		"Random output occurrences: expected-run economics",
-		"Ignored: rules and conditions, scope and placement, charge capacity and renewal, finite resource capacity",
+		"Enable prerequisites: acquired and included in time",
+		"Ignored: rule truth and disabling conditions, scope and placement, charge capacity and renewal, finite resource capacity",
 		"Limitations:",
 		...(estimate.limitations.length === 0
 			? [
@@ -326,7 +327,7 @@ const itemEstimateText = (project: EditorProject, estimate: EditorItemEstimate) 
 	return [
 		...header,
 		"Status: complete",
-		`Sequential duration: ${formatRuntime(estimate.durationMs)}`,
+		`Optimistic parallel duration: ${formatRuntime(estimate.durationMs)}`,
 		`Selected route: ${estimate.route.routeId}`,
 		`Expected action runs: ${formatEstimateNumber(estimate.route.actionRuns)}`,
 		`Expected output samples: ${formatEstimateNumber(estimate.route.outputRuns)}`,
@@ -720,7 +721,7 @@ export const createEditorMcpServer = (
 		"item_estimate",
 		{
 			description:
-				"Analyze one item against the authored dependency graph. Returns an optimistic sequential acquisition route with quantities, expected random-output economics, hard materials, owners, infrastructure, and deposit acquisition. Runtime rules, placement, charges, renewal, and finite capacity are ignored.",
+				"Analyze one item against the authored dependency graph. Returns an optimistic parallel critical-path acquisition route with quantities, expected random-output economics, hard materials, owners, infrastructure, deposits, and positive enable prerequisites. Independent dependency branches may overlap without simulating runtime capacity. Rule truth, runtime rule effects, placement, charges, renewal, and finite capacity are ignored.",
 			inputSchema: z
 				.object({
 					itemId: IdSchema.describe(

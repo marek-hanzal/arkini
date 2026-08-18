@@ -5,6 +5,7 @@ import type {
 	EditorItemEstimateDiagnostic,
 } from "~/editor/estimator/EditorItemEstimate";
 import type { EditorAcquisitionLimitation } from "~/editor/EditorAcquisitionGraph";
+import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import { formatItemDurationFx } from "~/ui/item-detail/formatItemDurationFx";
 import { EditorItemEstimateRouteGraph } from "~/ui/item/editor/EditorItemEstimateRouteGraph";
 import { useEditorItemEstimate } from "~/ui/item/editor/useEditorItemEstimate";
@@ -34,69 +35,21 @@ const diagnosticText = (diagnostic: EditorItemEstimateDiagnostic) => {
 const limitationText = (limitation: EditorAcquisitionLimitation) => {
 	switch (limitation) {
 		case "conditional-runtime-adjustments-ignored":
-			return "Rules and conditional runtime adjustments are ignored.";
+			return "Conditional runtime adjustments are ignored.";
 		case "negative-availability-constraints-ignored":
-			return "Enable, disable, and availability conditions are ignored.";
+			return "Positive enable prerequisites are acquired, but rule truth and disabling conditions are ignored.";
 		case "spatial-requirements-approximated":
 			return "Scope, distance, board capacity, and concrete placement are ignored.";
 	}
 };
 
-const EditorItemEstimateResultCard = ({ estimate }: { readonly estimate: EditorItemEstimate }) => (
-	<article
-		className="flex min-h-0 min-w-0 flex-col rounded-lg border border-l-2 border-violet-300 border-l-violet-600 bg-surface-raised p-4"
-		data-ui="EditorItemEstimateResult"
-	>
-		<header className="flex items-start justify-between gap-4 border-b border-line/70 pb-3">
-			<div>
-				<h3 className="font-semibold text-foreground">
-					{estimate.status === "complete"
-						? "Complete path found"
-						: estimate.status === "partial"
-							? "Incomplete static path"
-							: "No complete path"}
-				</h3>
-				<p className="mt-1 text-xs text-muted">
-					Target × {formatQuantity(estimate.quantity)}
-				</p>
-			</div>
-			<p className="font-semibold tabular-nums text-foreground">
-				{estimate.obtainable
-					? formatRuntime(estimate.durationMs)
-					: estimate.status === "partial"
-						? "Indeterminate"
-						: "Unreachable"}
-			</p>
-		</header>
-		{estimate.obtainable ? (
-			<div className="min-h-0 flex-1 overflow-y-auto pr-1">
-				<section className="py-3 text-xs leading-relaxed text-muted">
-					<h4 className="mb-2 font-semibold uppercase tracking-wide text-muted">
-						Selected route graph
-					</h4>
-					<EditorItemEstimateRouteGraph routeSteps={estimate.routeSteps} />
-				</section>
-			</div>
-		) : (
-			<div className="grid gap-3 py-4 text-sm leading-relaxed text-muted">
-				<p className="font-medium text-foreground">
-					{estimate.status === "partial"
-						? "The authored path exceeds a bounded static-analysis limit, so totals are indeterminate."
-						: "The authored dependency graph contains no complete route from the configured starting facts."}
-				</p>
-				<ul className="grid gap-2">
-					{estimate.diagnostics.map((diagnostic, index) => (
-						<li key={`${diagnostic.kind}:${index}`}>{diagnosticText(diagnostic)}</li>
-					))}
-				</ul>
-			</div>
-		)}
-	</article>
-);
-
-const EditorItemEstimateMethodCard = ({ estimate }: { readonly estimate: EditorItemEstimate }) => (
-	<article
-		className="min-w-0 rounded-lg border border-l-2 border-line border-l-sky-600 bg-surface-raised p-4"
+const EditorItemEstimateMethodDetails = ({
+	estimate,
+}: {
+	readonly estimate: EditorItemEstimate;
+}) => (
+	<div
+		className="min-w-0"
 		data-ui="EditorItemEstimateMethod"
 	>
 		<header className="flex items-start gap-3 border-b border-line/70 pb-3">
@@ -108,8 +61,9 @@ const EditorItemEstimateMethodCard = ({ estimate }: { readonly estimate: EditorI
 		</header>
 		<p className="py-3 text-xs leading-relaxed text-muted">
 			Compares complete canonical acquisition routes using expected random-output economics
-			and serial work. Runtime rules, placement, charge capacity, and finite resource capacity
-			are ignored.
+			and an optimistic parallel critical path. Independent dependency branches may overlap;
+			positive enable prerequisites still contribute acquisition time. Runtime rule effects,
+			placement, charge capacity, and finite resource capacity are ignored.
 		</p>
 		<ul className="grid gap-2 border-t border-line/70 pt-3 text-xs leading-relaxed text-muted">
 			{estimate.obtainable ? (
@@ -133,8 +87,72 @@ const EditorItemEstimateMethodCard = ({ estimate }: { readonly estimate: EditorI
 				<li key={limitation}>Limitation: {limitationText(limitation)}</li>
 			))}
 		</ul>
-	</article>
+	</div>
 );
+
+const EditorItemEstimateHeading = ({ estimate }: { readonly estimate?: EditorItemEstimate }) => (
+	<header className="flex items-center gap-1">
+		<h2 className="text-lg font-semibold text-foreground">Estimated acquisition path</h2>
+		{estimate === undefined ? null : (
+			<EditorInfoTooltip
+				className="size-7"
+				content={<EditorItemEstimateMethodDetails estimate={estimate} />}
+				placement="bottom-start"
+				tooltipClassName="w-[min(40rem,calc(100vw-2rem))] max-w-none p-4"
+			/>
+		)}
+	</header>
+);
+
+const EditorItemEstimateSummary = ({ estimate }: { readonly estimate: EditorItemEstimate }) => (
+	<div className="flex min-w-0 flex-1 items-center justify-between gap-4">
+		<EditorItemEstimateHeading estimate={estimate} />
+		<p className="shrink-0 font-semibold tabular-nums text-foreground">
+			{estimate.obtainable
+				? formatRuntime(estimate.durationMs)
+				: estimate.status === "partial"
+					? "Indeterminate"
+					: "Unreachable"}
+		</p>
+	</div>
+);
+
+const EditorItemEstimateResult = ({
+	config,
+	estimate,
+	projectId,
+}: {
+	readonly config: ReturnType<typeof useEditorProject>["config"];
+	readonly estimate: EditorItemEstimate;
+	readonly projectId: string;
+}) =>
+	estimate.obtainable ? (
+		<EditorItemEstimateRouteGraph
+			config={config}
+			header={<EditorItemEstimateSummary estimate={estimate} />}
+			projectId={projectId}
+			routeSteps={estimate.routeSteps}
+		/>
+	) : (
+		<article
+			className="rounded-xl border border-line bg-surface-raised p-4"
+			data-ui="EditorItemEstimateHeader"
+		>
+			<EditorItemEstimateSummary estimate={estimate} />
+			<div className="mt-4 grid gap-3 border-t border-line/70 pt-4 text-sm leading-relaxed text-muted">
+				<p className="font-medium text-foreground">
+					{estimate.status === "partial"
+						? "The authored path exceeds a bounded static-analysis limit, so totals are indeterminate."
+						: "The authored dependency graph contains no complete route from the configured starting facts."}
+				</p>
+				<ul className="grid gap-2">
+					{estimate.diagnostics.map((diagnostic, index) => (
+						<li key={`${diagnostic.kind}:${index}`}>{diagnosticText(diagnostic)}</li>
+					))}
+				</ul>
+			</div>
+		</article>
+	);
 
 /** Shows the shared static estimate in one item's read-only Estimate section. */
 export const EditorItemEstimateSection = ({ itemId }: { readonly itemId: string }) => {
@@ -145,11 +163,14 @@ export const EditorItemEstimateSection = ({ itemId }: { readonly itemId: string 
 			className="grid gap-4"
 			data-ui="EditorItemEstimateSection"
 		>
-			<header>
-				<h2 className="text-lg font-semibold text-foreground">
-					Estimated acquisition path
-				</h2>
-			</header>
+			{state.status === "ready" ? null : (
+				<div
+					className="rounded-xl border border-line bg-surface-raised p-4"
+					data-ui="EditorItemEstimateHeader"
+				>
+					<EditorItemEstimateHeading />
+				</div>
+			)}
 			{state.status === "loading" ? (
 				<Status
 					dataUi="EditorItemEstimateLoading"
@@ -167,10 +188,11 @@ export const EditorItemEstimateSection = ({ itemId }: { readonly itemId: string 
 				/>
 			) : null}
 			{state.status === "ready" ? (
-				<div className="grid grid-cols-2 gap-3 max-[64rem]:grid-cols-1">
-					<EditorItemEstimateResultCard estimate={state.estimate} />
-					<EditorItemEstimateMethodCard estimate={state.estimate} />
-				</div>
+				<EditorItemEstimateResult
+					config={project.config}
+					estimate={state.estimate}
+					projectId={project.projectId}
+				/>
 			) : null}
 		</section>
 	);

@@ -13,14 +13,27 @@ const runtimeLabel = (estimate: EditorItemEstimateIndexEntry) => {
 	return duration;
 };
 
+const formatDemand = (demand: number) =>
+	Number.isInteger(demand)
+		? String(demand)
+		: demand.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+
+const demandRatioLabel = (demand: number, maximumDemand: number) => {
+	const percentage = maximumDemand <= 0 ? 0 : (demand / maximumDemand) * 100;
+	if (percentage <= 0.1) return "negligible";
+	return `${Number.isInteger(percentage) ? percentage : percentage.toFixed(1)}%`;
+};
+
 /** Presents one compact projection of the cached static estimate. */
 export const EditorItemEstimateListRow = ({
 	estimate,
 	item,
+	maximumDemand,
 	projectId,
 }: {
 	readonly estimate: EditorItemEstimateIndexEntry;
 	readonly item: EditorItem;
+	readonly maximumDemand: number;
 	readonly projectId: string;
 }) => (
 	<article
@@ -45,9 +58,19 @@ export const EditorItemEstimateListRow = ({
 				<span className="block truncate text-base font-semibold">{item.title}</span>
 				<span className="mt-1 block truncate text-xs text-subtle">{item.id}</span>
 			</span>
-			<p className="shrink-0 text-sm font-semibold tabular-nums text-foreground">
-				{runtimeLabel(estimate)}
-			</p>
+			<dl className="grid shrink-0 gap-1 text-right text-sm tabular-nums">
+				<div className="flex items-baseline justify-end gap-1.5">
+					<dt className="text-muted">Estimate:</dt>
+					<dd className="font-semibold text-foreground">{runtimeLabel(estimate)}</dd>
+				</div>
+				<div className="flex items-baseline justify-end gap-1.5">
+					<dt className="text-muted">Demand:</dt>
+					<dd className="font-semibold text-foreground">
+						{formatDemand(estimate.demand)} (
+						{demandRatioLabel(estimate.demand, maximumDemand)})
+					</dd>
+				</div>
+			</dl>
 		</ButtonLink>
 	</article>
 );

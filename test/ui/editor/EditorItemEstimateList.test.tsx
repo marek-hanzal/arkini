@@ -33,6 +33,8 @@ vi.mock("~/ui/item/editor/EditorItemThumbnail", () => ({
 }));
 
 vi.mock("~/ui/button/Button", () => ({
+	Button: ({ children, ...props }: Record<string, unknown>) =>
+		createElement("button", props, children as ReactNode),
 	ButtonLink: ({ children, className, params, to }: Record<string, unknown>) =>
 		createElement(
 			"a",
@@ -75,18 +77,21 @@ beforeEach(() => {
 	state.estimateState = {
 		entries: [
 			{
+				demand: 0.05,
 				itemId: "bakery",
 				method: "static",
 				runtimeMs: 120_000,
 				status: "complete",
 			},
 			{
+				demand: 100,
 				itemId: "water",
 				method: "static",
 				runtimeMs: 0,
 				status: "complete",
 			},
 			{
+				demand: 50,
 				itemId: "well",
 				method: "static",
 				status: "partial",
@@ -134,19 +139,17 @@ const setSearch = async (container: HTMLElement, value: string) => {
 	});
 };
 
-const setSort = async (container: HTMLElement, value: "fastest" | "slowest") => {
-	const select = container.querySelector<HTMLSelectElement>("#editor-item-estimate-sort");
-	if (select === null) throw new Error("Missing item estimate sort.");
-	const setter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value")?.set;
-	if (setter === undefined) throw new Error("Missing native select value setter.");
+const setSort = async (container: HTMLElement, label: string) => {
+	const trigger = container.querySelector<HTMLButtonElement>('[data-ui="EditorSelectTrigger"]');
+	if (trigger === null) throw new Error("Missing item estimate sort.");
 	await act(async () => {
-		setter.call(select, value);
-		select.dispatchEvent(
-			new Event("change", {
-				bubbles: true,
-			}),
-		);
+		trigger.click();
 	});
+	const option = Array.from(
+		document.querySelectorAll<HTMLButtonElement>('[data-ui="EditorSelectOption"]'),
+	).find((candidate) => candidate.textContent?.includes(label));
+	if (option === undefined) throw new Error(`Missing ${label} sort option.`);
+	await act(async () => option.click());
 };
 
 describe("EditorItemEstimateList", () => {
@@ -163,8 +166,16 @@ describe("EditorItemEstimateList", () => {
 		expect(container.textContent).not.toContain("Best");
 		expect(container.textContent).toContain("2 min");
 		expect(container.textContent).toContain("Partial");
+		expect(container.textContent).toContain("Estimate:");
+		expect(container.textContent).toContain("Demand:");
+		expect(container.textContent).toContain("100 (100%)");
+		expect(container.textContent).toContain("0.05 (negligible)");
 		expect(container.querySelector('[data-ui="EditorItemThumbnail"]')).not.toBeNull();
 		expect(container.querySelector('[aria-label^="Filter items by"]')).toBeNull();
+		expect(container.querySelector("select")).toBeNull();
+		expect(container.querySelector('[data-ui="EditorSelectTrigger"]')?.textContent).toContain(
+			"Fastest first",
+		);
 
 		const bakeryLink = container.querySelector<HTMLAnchorElement>('[data-item-id="bakery"] a');
 		expect(bakeryLink?.dataset.to).toBe(
@@ -172,11 +183,18 @@ describe("EditorItemEstimateList", () => {
 		);
 		expect(bakeryLink?.dataset.params).toContain('"sectionId":"estimate"');
 
-		await setSort(container, "slowest");
+		await setSort(container, "Slowest first");
 		expect(readVisibleItemIds(container)).toEqual([
 			"bakery",
 			"water",
 			"well",
+		]);
+
+		await setSort(container, "Highest demand first");
+		expect(readVisibleItemIds(container)).toEqual([
+			"water",
+			"well",
+			"bakery",
 		]);
 
 		await setSearch(container, "well");

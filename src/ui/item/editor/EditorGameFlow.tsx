@@ -1,16 +1,14 @@
 import { useState } from "react";
 
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
-import { EditorSearchCombobox } from "~/ui/form/EditorSearchCombobox";
 import {
 	selectableActiveClassName,
 	selectableInactiveClassName,
 } from "~/ui/form/SelectableStateClassName";
+import { EditorItemFlowSearch } from "~/ui/item/editor/EditorItemFlowSearch";
 import { EditorOriginFlowSection } from "~/ui/item/editor/EditorItemFlowSection";
-import { EditorItemSearchThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { useEditorItemSearchOptions } from "~/ui/item/editor/useEditorItemSearchOptions";
 import type { EditorOriginFlowDirection } from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
-import { Tooltip } from "~/ui/overlay/Tooltip";
 
 const readGraphFilterDescription = (direction: EditorOriginFlowDirection) =>
 	direction === "income"
@@ -20,6 +18,7 @@ const readGraphFilterDescription = (direction: EditorOriginFlowDirection) =>
 /** Shows the complete authored game graph and lets search navigate to one selected item. */
 export const EditorGameFlow = () => {
 	const [itemId, setItemId] = useState("");
+	const [focusRequestKey, setFocusRequestKey] = useState(0);
 	const [direction, setDirection] = useState<EditorOriginFlowDirection>("income");
 	const { items, options } = useEditorItemSearchOptions();
 	return (
@@ -39,37 +38,16 @@ export const EditorGameFlow = () => {
 				</div>
 				<div className="flex min-w-0 items-end gap-2">
 					<div className="min-w-0 flex-1">
-						<EditorSearchCombobox
-							displaySelectedLabel
-							emptyLabel="No matches."
-							label="Search"
-							labelVisible={false}
+						<EditorItemFlowSearch
+							items={items}
+							onChange={(value) => {
+								setItemId(value);
+								setFocusRequestKey((current) => current + 1);
+							}}
 							options={options}
-							placeholder="Search"
 							value={itemId}
-							onChange={setItemId}
-							renderPreview={(option) => (
-								<EditorItemSearchThumbnail item={items[option.id]} />
-							)}
-							renderSelectedPreview={(option) => (
-								<EditorItemSearchThumbnail
-									item={items[option.id]}
-									selected
-								/>
-							)}
 						/>
 					</div>
-					{itemId.length === 0 ? null : (
-						<Tooltip content="Clear search">
-							<button
-								type="button"
-								className="grid min-h-[var(--ak-control-min-height)] min-w-[var(--ak-control-min-height)] cursor-pointer place-items-center rounded-lg border border-line-strong bg-surface-raised text-muted hover:text-foreground"
-								onClick={() => setItemId("")}
-							>
-								<span className="icon-[lucide--x] size-5" />
-							</button>
-						</Tooltip>
-					)}
 					<div
 						aria-label="Flow direction"
 						className="inline-flex min-h-[var(--ak-control-min-height)] shrink-0 rounded-lg border border-line bg-surface p-1"
@@ -97,6 +75,7 @@ export const EditorGameFlow = () => {
 			<EditorOriginFlowSection
 				direction={direction}
 				focusItemId={itemId || undefined}
+				focusRequestKey={focusRequestKey}
 				mode="all"
 			/>
 		</section>

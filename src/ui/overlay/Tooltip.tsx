@@ -13,15 +13,22 @@ import {
 	type Placement,
 } from "@floating-ui/react";
 import { cloneElement, type ReactElement, type ReactNode, useState } from "react";
+import { twMerge } from "tailwind-merge";
 
 export interface TooltipProps {
 	readonly children: ReactElement;
 	readonly content: ReactNode;
+	readonly contentClassName?: string;
 	readonly placement?: Placement;
 }
 
 /** Positions short contextual help without coupling callers to Floating UI. */
-export const Tooltip = ({ children, content, placement = "top" }: TooltipProps) => {
+export const Tooltip = ({
+	children,
+	content,
+	contentClassName,
+	placement = "top",
+}: TooltipProps) => {
 	const [open, setOpen] = useState(false);
 	const { context, floatingStyles, refs } = useFloating({
 		open,
@@ -69,7 +76,10 @@ export const Tooltip = ({ children, content, placement = "top" }: TooltipProps) 
 					<div
 						ref={refs.setFloating}
 						style={floatingStyles}
-						className="z-10 max-w-72 rounded-lg border border-line bg-surface-raised px-3 py-2 text-xs leading-5 text-foreground shadow-xl"
+						className={twMerge(
+							"z-10 max-w-72 rounded-lg border border-line bg-surface-raised px-3 py-2 text-xs leading-5 text-foreground shadow-xl",
+							contentClassName,
+						)}
 						{...getFloatingProps()}
 					>
 						{content}

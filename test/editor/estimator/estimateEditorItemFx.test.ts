@@ -268,7 +268,7 @@ describe("estimateEditorItemFx", () => {
 		});
 	});
 
-	it("requires every AND sibling and serializes their durations", () => {
+	it("requires every AND sibling and runs independent branches in parallel", () => {
 		const result = estimate(
 			graph({
 				facts: [
@@ -311,8 +311,74 @@ describe("estimateEditorItemFx", () => {
 		);
 
 		expect(result).toMatchObject({
-			durationMs: 250,
+			durationMs: 130,
 			obtainable: true,
+		});
+	});
+
+	it("selects a nested route by optimistic critical-path duration", () => {
+		const result = estimate(
+			graph({
+				facts: [
+					"root",
+					"a",
+					"b",
+					"x",
+					"target",
+				],
+				roots: [
+					"root",
+				],
+				routes: [
+					route({
+						allOf: [
+							requirement("root"),
+						],
+						durationMs: 100,
+						id: "make-a",
+						output: "a",
+					}),
+					route({
+						allOf: [
+							requirement("root"),
+						],
+						durationMs: 100,
+						id: "make-b",
+						output: "b",
+					}),
+					route({
+						allOf: [
+							requirement("a"),
+							requirement("b"),
+						],
+						durationMs: 0,
+						id: "parallel-x",
+						output: "x",
+					}),
+					route({
+						durationMs: 150,
+						id: "direct-x",
+						output: "x",
+					}),
+					route({
+						allOf: [
+							requirement("x"),
+						],
+						durationMs: 0,
+						id: "make-target",
+						output: "target",
+					}),
+				],
+			}),
+		);
+
+		expect(result).toMatchObject({
+			durationMs: 100,
+			obtainable: true,
+		});
+		if (!result.obtainable) throw new Error("Expected parallel nested route.");
+		expect(result.routeSteps.find(({ factId }) => factId === "x")).toMatchObject({
+			routeId: "parallel-x",
 		});
 	});
 
@@ -510,7 +576,7 @@ describe("estimateEditorItemFx", () => {
 		);
 
 		expect(result).toMatchObject({
-			durationMs: 121,
+			durationMs: 111,
 			obtainable: true,
 		});
 	});
@@ -569,7 +635,7 @@ describe("estimateEditorItemFx", () => {
 		});
 	});
 
-	it("ignores rule conditions but retains hard route requirements", () => {
+	it("acquires positive enable prerequisites without evaluating rule truth", () => {
 		const result = estimate(
 			graph({
 				facts: [
@@ -581,6 +647,14 @@ describe("estimateEditorItemFx", () => {
 					"owner",
 				],
 				routes: [
+					route({
+						allOf: [
+							requirement("owner"),
+						],
+						durationMs: 8,
+						id: "make-condition",
+						output: "condition",
+					}),
 					route({
 						allOf: [
 							{
@@ -605,16 +679,21 @@ describe("estimateEditorItemFx", () => {
 		);
 
 		expect(result).toMatchObject({
-			durationMs: 10,
+			durationMs: 18,
 			obtainable: true,
 		});
 		if (!result.obtainable) throw new Error("Expected optimistic conditioned route.");
 		expect(result.route.requirements.map(({ factId }) => factId)).toEqual([
+			"condition",
 			"owner",
 		]);
+		expect(result.routeSteps.find(({ factId }) => factId === "condition")).toMatchObject({
+			durationMs: 8,
+			routeId: "make-condition",
+		});
 	});
 
-	it("excludes ignored condition and charge edges from component membership", () => {
+	it("excludes ignored disable-condition and charge edges from component membership", () => {
 		const dependencyGraph = graph({
 			facts: [
 				"condition-root",
@@ -628,13 +707,15 @@ describe("estimateEditorItemFx", () => {
 			],
 			routes: [
 				route({
-					allOf: [
-						{
-							factId: "condition-dependent",
-							quantity: 1,
-							source: "line-condition",
-							usage: "ongoing",
-						},
+					anyOf: [
+						[
+							{
+								factId: "condition-dependent",
+								quantity: 1,
+								source: "line-condition",
+								usage: "ongoing",
+							},
+						],
 					],
 					durationMs: 1,
 					id: "condition-edge",
@@ -1376,7 +1457,7 @@ describe("estimateEditorItemFx", () => {
 		});
 	});
 
-	it("reuses a sibling prerequisite before a later serialized sibling consumes it", () => {
+	it("reuses a root prerequisite across parallel siblings", () => {
 		const dependencyGraph = graph({
 			facts: [
 				"tool",
@@ -1424,7 +1505,7 @@ describe("estimateEditorItemFx", () => {
 		});
 
 		expect(result).toMatchObject({
-			durationMs: 3,
+			durationMs: 2,
 			obtainable: true,
 		});
 	});

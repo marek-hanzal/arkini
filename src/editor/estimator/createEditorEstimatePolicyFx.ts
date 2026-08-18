@@ -43,7 +43,7 @@ export interface EditorEstimatePolicy {
 const requirementQuantity = (requirement: EditorAcquisitionRequirement, actionRuns: number) =>
 	requirement.quantity * (requirement.usage === "consume" ? actionRuns : 1);
 
-const ignoredRequirementSources = new Set<EditorAcquisitionRequirement["source"]>([
+const conditionRequirementSources = new Set<EditorAcquisitionRequirement["source"]>([
 	"line-condition",
 	"output-condition",
 ]);
@@ -60,11 +60,11 @@ const projectRequirement = (
 		: requirement;
 
 const projectEstimateRequirements = (route: EditorAcquisitionRoute) => ({
-	allOf: route.requirements.allOf
-		.filter(({ source }) => !ignoredRequirementSources.has(source))
-		.map(projectRequirement),
+	// Positive enable facts are hard acquisition prerequisites even though Estimate does not
+	// evaluate rule truth. Disable-rule alternatives remain outside the optimistic time model.
+	allOf: route.requirements.allOf.map(projectRequirement),
 	anyOf: route.requirements.anyOf
-		.map((clause) => clause.filter(({ source }) => !ignoredRequirementSources.has(source)))
+		.map((clause) => clause.filter(({ source }) => !conditionRequirementSources.has(source)))
 		.map((clause) => clause.map(projectRequirement))
 		.filter((clause) => clause.length > 0),
 });
@@ -77,12 +77,19 @@ export const createEditorEstimatePolicyFx = Effect.fn("createEditorEstimatePolic
 	(graph: EditorAcquisitionGraph) =>
 		Effect.gen(function* () {
 			const expectedRuns = yield* createEditorEstimateExpectedRunsFx();
+			const scalarExpectedRunsByDistribution = new WeakMap<
+				ReadonlyArray<EditorAcquisitionQuantityProbability>,
+				Map<number, number>
+			>();
 			const readExpectedRuns = (
 				distribution: ReadonlyArray<EditorAcquisitionQuantityProbability>,
 				quantity: number,
 			) => {
 				// Callers treat this sentinel as an unsupported route without allocating excess states.
 				if (quantity > editorItemEstimateMaximumQuantity) return Number.NaN;
+				const cachedByQuantity = scalarExpectedRunsByDistribution.get(distribution);
+				const cached = cachedByQuantity?.get(quantity);
+				if (cached !== undefined) return cached;
 				const result = expectedRuns.read({
 					demandByOutputGroupId: new Map([
 						[
@@ -100,7 +107,12 @@ export const createEditorEstimatePolicyFx = Effect.fn("createEditorEstimatePolic
 						],
 					})),
 				});
-				return result.status === "complete" ? result.runs : Number.NaN;
+				const runs = result.status === "complete" ? result.runs : Number.NaN;
+				const byQuantity = cachedByQuantity ?? new Map<number, number>();
+				byQuantity.set(quantity, runs);
+				if (cachedByQuantity === undefined)
+					scalarExpectedRunsByDistribution.set(distribution, byQuantity);
+				return runs;
 			};
 			const roots = new Map(
 				graph.roots.map(
@@ -157,25 +169,33 @@ export const createEditorEstimatePolicyFx = Effect.fn("createEditorEstimatePolic
 					const outputRuns = readExpectedRuns(route.output.quantityDistribution, 1);
 					if (!Number.isFinite(outputRuns)) continue;
 					const actionRuns = outputRuns * route.runMultiplier;
-					let cost = route.durationMs * actionRuns;
+					let dependencyCost = 0;
 					const requirements = readEstimateRequirements(route);
 					for (const requirement of requirements.allOf) {
-						const dependencyCost = unitCost.get(requirement.factId);
-						if (dependencyCost === undefined) {
-							cost = Number.POSITIVE_INFINITY;
+						const requirementCost = unitCost.get(requirement.factId);
+						if (requirementCost === undefined) {
+							dependencyCost = Number.POSITIVE_INFINITY;
 							break;
 						}
-						cost += dependencyCost * requirementQuantity(requirement, actionRuns);
+						dependencyCost = Math.max(
+							dependencyCost,
+							requirementCost * requirementQuantity(requirement, actionRuns),
+						);
 					}
 					for (const clause of requirements.anyOf)
-						cost += Math.min(
-							...clause.map((requirement) => {
-								const dependencyCost = unitCost.get(requirement.factId);
-								return dependencyCost === undefined
-									? Number.POSITIVE_INFINITY
-									: dependencyCost * requirementQuantity(requirement, actionRuns);
-							}),
+						dependencyCost = Math.max(
+							dependencyCost,
+							Math.min(
+								...clause.map((requirement) => {
+									const requirementCost = unitCost.get(requirement.factId);
+									return requirementCost === undefined
+										? Number.POSITIVE_INFINITY
+										: requirementCost *
+												requirementQuantity(requirement, actionRuns);
+								}),
+							),
 						);
+					const cost = route.durationMs * actionRuns + dependencyCost;
 					const current = unitCost.get(route.output.factId);
 					if (Number.isFinite(cost) && (current === undefined || cost < current - 1e-9)) {
 						unitCost.set(route.output.factId, cost);
@@ -405,19 +425,19 @@ export const createEditorEstimatePolicyFx = Effect.fn("createEditorEstimatePolic
 					costMemo,
 				);
 				if (groups === undefined) return Number.POSITIVE_INFINITY;
-				let cost = route.durationMs * actionRuns;
+				let dependencyCost = 0;
 				for (const group of groups) {
-					const dependencyCost = readFactCost(
+					const groupCost = readFactCost(
 						group.factId,
 						group.consumed + Math.max(group.oneTime, group.ongoing),
 						activeComponentId,
 						blockedFactIds,
 						costMemo,
 					);
-					if (!Number.isFinite(dependencyCost)) return dependencyCost;
-					cost += dependencyCost;
+					if (!Number.isFinite(groupCost)) return groupCost;
+					dependencyCost = Math.max(dependencyCost, groupCost);
 				}
-				return cost;
+				return route.durationMs * actionRuns + dependencyCost;
 			}
 
 			const chooseRoute = (factId: string, quantity: number) => {

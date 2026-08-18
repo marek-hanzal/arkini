@@ -159,9 +159,18 @@ describe("createEditorAcquisitionGraphFx", () => {
 				}),
 			]),
 		);
+		expect(route?.requirements.allOf).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					factId: "producer:library-t4",
+					quantity: 1,
+					source: "line-condition",
+				}),
+			]),
+		);
 	});
 
-	it("keeps exact and upper-bound universe conditions from becoming complete lower bounds", async () => {
+	it("keeps optimistic enable lower bounds while surfacing exact and upper semantics", async () => {
 		const config = structuredClone(await readArkiniGameConfigSource());
 		const lumberjack = config.items["producer:lumberjack-t1"];
 		if (lumberjack?.type !== "producer") throw new Error("Lumberjack fixture is missing.");
@@ -217,6 +226,20 @@ describe("createEditorAcquisitionGraphFx", () => {
 				source: "line-condition",
 			},
 		]);
+		expect(route?.requirements.allOf).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					factId: "item:coin",
+					quantity: 2,
+					source: "line-condition",
+				}),
+				expect.objectContaining({
+					factId: "item:water",
+					quantity: 1,
+					source: "line-condition",
+				}),
+			]),
+		);
 		expect(
 			Effect.runSync(
 				estimateEditorItemFx({
@@ -225,7 +248,7 @@ describe("createEditorAcquisitionGraphFx", () => {
 				}),
 			),
 		).toMatchObject({
-			status: "complete",
+			status: "unreachable",
 		});
 
 		line.rules = [
@@ -1027,9 +1050,17 @@ describe("createEditorAcquisitionGraphFx", () => {
 					}),
 				),
 			);
-		expect(estimates.filter(({ status }) => status === "complete")).toHaveLength(241);
-		expect(estimates.filter(({ status }) => status === "partial")).toHaveLength(3);
+		expect(estimates.filter(({ status }) => status === "complete")).toHaveLength(244);
+		expect(estimates.filter(({ status }) => status === "partial")).toHaveLength(0);
 		expect(estimates.filter(({ status }) => status === "unreachable")).toHaveLength(3);
+		for (const factId of [
+			"producer:cathedral",
+			"producer:house-of-engineers",
+			"producer:mage-lodge",
+		])
+			expect(estimates.find((estimate) => estimate.factId === factId)).toMatchObject({
+				status: "complete",
+			});
 		expect(estimates.find(({ factId }) => factId === "producer:chicken-coop-t1")).toMatchObject(
 			{
 				obtainable: true,

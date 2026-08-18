@@ -3,6 +3,7 @@ export type EditorItemEstimateIndexStatus = "complete" | "partial" | "unreachabl
 
 /** Compact list projection of the same static authored-data estimate used by detail. */
 export interface EditorItemEstimateIndexEntry {
+	readonly demand: number;
 	readonly itemId: string;
 	readonly method: EditorItemEstimateIndexMethod;
 	readonly runtimeMs?: number;

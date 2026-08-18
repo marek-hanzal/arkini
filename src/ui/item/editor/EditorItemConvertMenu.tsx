@@ -50,7 +50,7 @@ export const EditorItemConvertMenu = ({
 		<>
 			<Button
 				ref={refs.setReference}
-				className={`${editorSectionTabClassName} gap-2`}
+				className={`${editorSectionTabClassName} h-10 min-h-10 gap-2`}
 				{...getReferenceProps()}
 			>
 				<span className="icon-[lucide--replace] size-4" />

@@ -10,7 +10,7 @@ const unique = <Value>(values: ReadonlyArray<Value>): Value[] => [
 	...new Set(values),
 ];
 
-/** Traces one canonical selected-route proof, or one direct blocked route as a fallback. */
+/** Traces one selected source and all of its raw authored requirements. */
 export const readEditorItemOriginIncomeSubgraphFx = Effect.fn(
 	"readEditorItemOriginIncomeSubgraphFx",
 )(
@@ -20,10 +20,8 @@ export const readEditorItemOriginIncomeSubgraphFx = Effect.fn(
 		sourcesByOutput,
 		starters,
 		targetItemId,
-		selectedRequirementFactIdsBySourceId,
 	}: Pick<EditorItemOriginSourceIndex, "sourcesById" | "sourcesByOutput" | "starters"> & {
 		readonly acquisitionSourceByItem: ReadonlyMap<string, string>;
-		readonly selectedRequirementFactIdsBySourceId?: ReadonlyMap<string, ReadonlyArray<string>>;
 		readonly targetItemId: string;
 	}) =>
 		Effect.sync((): EditorItemOriginIncomeSubgraph => {
@@ -46,10 +44,8 @@ export const readEditorItemOriginIncomeSubgraphFx = Effect.fn(
 				const source = witnessedSource ?? directSources[0];
 				if (source === undefined) return;
 				includedSources.set(source.id, source);
-				const requirementItemIds =
-					selectedRequirementFactIdsBySourceId?.get(source.id) ??
-					source.requirementItemIds;
-				for (const requirement of unique(requirementItemIds).sort()) traceItem(requirement);
+				for (const requirement of unique(source.requirementItemIds).sort())
+					traceItem(requirement);
 			};
 			traceItem(targetItemId);
 			return {

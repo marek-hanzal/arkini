@@ -6,7 +6,6 @@ import type {
 } from "~/bridge/item/editor/EditorItemOriginFlow";
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import { type EditorItemOriginSource } from "~/bridge/item/editor/EditorItemOriginSource";
-import type { EditorAcquisitionGraph } from "~/editor/EditorAcquisitionGraph";
 import { createEditorAcquisitionGraphFx } from "~/editor/createEditorAcquisitionGraphFx";
 import { readEditorItemOriginSourcesFx } from "~/editor/readEditorItemOriginSourcesFx";
 import { reportEditorItemOriginFlowProgressFx } from "~/bridge/item/editor/reportEditorItemOriginFlowProgressFx";
@@ -18,7 +17,6 @@ const unique = <Value>(values: ReadonlyArray<Value>): Value[] => [
 ];
 
 export interface EditorItemOriginSourceIndex {
-	readonly graph: EditorAcquisitionGraph;
 	readonly items: ReadonlyMap<string, EditorItem>;
 	readonly sources: ReadonlyArray<EditorItemOriginSource>;
 	readonly sourcesById: ReadonlyMap<string, EditorItemOriginSource>;
@@ -99,7 +97,6 @@ export const indexEditorItemOriginSourcesFx = Effect.fn("indexEditorItemOriginSo
 			}
 		}
 		return {
-			graph,
 			items,
 			sources,
 			sourcesById,

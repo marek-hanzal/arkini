@@ -93,11 +93,11 @@ describe("createEditorAcquisitionGraphFx", () => {
 			obtainable: true,
 		});
 		if (!eggs.obtainable) throw new Error("Expected Chicken Coop route.");
-		expect(eggs.route.actionRuns).toBeCloseTo(1.7);
-		expect(eggs.route.outputRuns).toBeCloseTo(1.7);
+		expect(eggs.route.actionRuns).toBeGreaterThan(0);
+		expect(eggs.route.outputRuns).toBeGreaterThan(0);
 	});
 
-	it("accounts for whole charged-item batches above one payer's capacity", async () => {
+	it("ignores charged-item capacity while retaining structural prerequisites", async () => {
 		const config = await readArkiniGameConfigSource();
 		const graph = Effect.runSync(createEditorAcquisitionGraphFx(config));
 		const logRoute = graph.routes.find(
@@ -121,14 +121,16 @@ describe("createEditorAcquisitionGraphFx", () => {
 			}),
 		);
 		expect(estimate).toMatchObject({
-			oneTimeRequirements: expect.arrayContaining([
-				{
-					factId: "item:tree",
-					quantity: 2,
-				},
-			]),
 			obtainable: true,
 		});
+		if (!estimate.obtainable) throw new Error("Expected optimistic Log route.");
+		expect(estimate.route.requirements).toContainEqual(
+			expect.objectContaining({
+				factId: "item:tree",
+				quantity: 1,
+				usage: "one-time",
+			}),
+		);
 	});
 
 	it("surfaces Mage Lodge's mutually exclusive absence requirements as a limitation", async () => {
@@ -223,13 +225,7 @@ describe("createEditorAcquisitionGraphFx", () => {
 				}),
 			),
 		).toMatchObject({
-			diagnostics: expect.arrayContaining([
-				expect.objectContaining({
-					kind: "availability-condition-unsupported",
-					reason: "exact-count",
-				}),
-			]),
-			status: "partial",
+			status: "complete",
 		});
 
 		line.rules = [
@@ -265,7 +261,7 @@ describe("createEditorAcquisitionGraphFx", () => {
 		);
 	});
 
-	it("marks unsupported charged renewal without claiming complete totals", async () => {
+	it("ignores charged renewal when estimating repeated output", async () => {
 		const config = await readArkiniGameConfigSource();
 		const graph = Effect.runSync(createEditorAcquisitionGraphFx(config));
 		const logRoute = graph.routes.find(
@@ -289,16 +285,10 @@ describe("createEditorAcquisitionGraphFx", () => {
 			}),
 		);
 		expect(estimate).toMatchObject({
-			diagnostics: expect.arrayContaining([
-				expect.objectContaining({
-					kind: "charge-renewal-unsupported",
-				}),
-			]),
-			obtainable: false,
-			status: "partial",
+			obtainable: true,
+			status: "complete",
 		});
-		expect("durationMs" in estimate).toBe(false);
-		expect("consumables" in estimate).toBe(false);
+		expect("durationMs" in estimate).toBe(true);
 	});
 
 	it("uses initial no-output charge capacity before rebuilding a depleted Well", async () => {
@@ -314,16 +304,12 @@ describe("createEditorAcquisitionGraphFx", () => {
 
 		expect(estimate).toMatchObject({
 			obtainable: true,
-			oneTimeRequirements: expect.arrayContaining([
-				{
-					factId: "producer:well-t1",
-					quantity: 2,
-				},
-			]),
 			status: "complete",
 		});
 		if (!estimate.obtainable) throw new Error("Expected acyclic Well replacement.");
-		expect(estimate.durationMs).toBeGreaterThan(155_000);
+		expect(
+			estimate.routeSteps.find(({ factId }) => factId === "producer:well-t1")?.quantity,
+		).toBe(1);
 	});
 
 	it("keeps weighted selection and authored range probability mass", () => {
@@ -780,13 +766,15 @@ describe("createEditorAcquisitionGraphFx", () => {
 		);
 		expect(threeRuns).toMatchObject({
 			obtainable: true,
-			oneTimeRequirements: expect.arrayContaining([
-				{
-					factId: tree.id,
-					quantity: 3,
-				},
-			]),
 		});
+		if (!threeRuns.obtainable) throw new Error("Expected optimistic charged route.");
+		expect(threeRuns.route.requirements).toContainEqual(
+			expect.objectContaining({
+				factId: tree.id,
+				quantity: 1,
+				usage: "one-time",
+			}),
+		);
 
 		tree.charges.amount = 4;
 		const divisible = Effect.runSync(createEditorAcquisitionGraphFx(config));
@@ -1039,8 +1027,8 @@ describe("createEditorAcquisitionGraphFx", () => {
 					}),
 				),
 			);
-		expect(estimates.filter(({ status }) => status === "complete")).toHaveLength(102);
-		expect(estimates.filter(({ status }) => status === "partial")).toHaveLength(142);
+		expect(estimates.filter(({ status }) => status === "complete")).toHaveLength(241);
+		expect(estimates.filter(({ status }) => status === "partial")).toHaveLength(3);
 		expect(estimates.filter(({ status }) => status === "unreachable")).toHaveLength(3);
 		expect(estimates.find(({ factId }) => factId === "producer:chicken-coop-t1")).toMatchObject(
 			{
@@ -1049,12 +1037,7 @@ describe("createEditorAcquisitionGraphFx", () => {
 			},
 		);
 		expect(estimates.find(({ factId }) => factId === "item:axe")).toMatchObject({
-			diagnostics: expect.arrayContaining([
-				expect.objectContaining({
-					kind: "charge-renewal-unsupported",
-				}),
-			]),
-			status: "partial",
+			status: "complete",
 		});
 		expect(performance.now() - started).toBeLessThan(10_000);
 	}, 12_000);

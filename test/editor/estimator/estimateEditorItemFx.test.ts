@@ -6,6 +6,7 @@ import type {
 	EditorAcquisitionRequirement,
 	EditorAcquisitionRoute,
 } from "~/editor/EditorAcquisitionGraph";
+import { createEditorEstimatePolicyFx } from "~/editor/estimator/createEditorEstimatePolicyFx";
 import { estimateEditorItemFx } from "~/editor/estimator/estimateEditorItemFx";
 import { editorItemEstimateMaximumQuantity } from "~/editor/estimator/EditorItemEstimateQuantitySchema";
 
@@ -366,6 +367,58 @@ describe("estimateEditorItemFx", () => {
 		if (result.obtainable) expect(result.route.requirements[0]?.acquisitionFactId).toBe("fast");
 	});
 
+	it("rejects an OR alternative that can only recur through the active target", () => {
+		const result = estimate(
+			graph({
+				facts: [
+					"root",
+					"a",
+					"x",
+					"target",
+				],
+				roots: [
+					"root",
+				],
+				routes: [
+					route({
+						allOf: [
+							requirement("target"),
+						],
+						durationMs: 0,
+						id: "make-a",
+						output: "a",
+					}),
+					route({
+						allOf: [
+							requirement("root"),
+						],
+						durationMs: 10,
+						id: "make-x",
+						output: "x",
+					}),
+					route({
+						anyOf: [
+							[
+								requirement("a"),
+								requirement("x"),
+							],
+						],
+						durationMs: 0,
+						id: "make-target",
+						output: "target",
+					}),
+				],
+			}),
+		);
+
+		expect(result).toMatchObject({
+			durationMs: 10,
+			obtainable: true,
+		});
+		if (!result.obtainable) throw new Error("Expected external OR branch.");
+		expect(result.route.requirements[0]?.acquisitionFactId).toBe("x");
+	});
+
 	it("scales consumed inputs and production duration by deterministic batches", () => {
 		const result = estimate(
 			graph({
@@ -400,16 +453,6 @@ describe("estimateEditorItemFx", () => {
 		);
 
 		expect(result).toMatchObject({
-			consumables: [
-				{
-					factId: "ingot",
-					quantity: 5,
-				},
-				{
-					factId: "ore",
-					quantity: 9,
-				},
-			],
 			durationMs: 35,
 			obtainable: true,
 		});
@@ -469,13 +512,230 @@ describe("estimateEditorItemFx", () => {
 		expect(result).toMatchObject({
 			durationMs: 121,
 			obtainable: true,
-			oneTimeRequirements: [
-				{
-					factId: "lumberjack",
-					quantity: 1,
-				},
+		});
+	});
+
+	it("acquires a deposit once and reuses it across every output run", () => {
+		const depositRequirement: EditorAcquisitionRequirement = {
+			factId: "deposit",
+			quantity: 1,
+			source: "deposit-input",
+			usage: "one-time",
+		};
+		const dependencyGraph = graph({
+			facts: [
+				"deposit",
+				"target",
+			],
+			roots: [],
+			routes: [
+				route({
+					durationMs: 50,
+					id: "acquire-deposit",
+					output: "deposit",
+				}),
+				route({
+					allOf: [
+						depositRequirement,
+					],
+					durationMs: 2,
+					id: "use-deposit",
+					output: "target",
+				}),
 			],
 		});
+
+		const result = estimate(dependencyGraph, "target", 10);
+		expect(result).toMatchObject({
+			durationMs: 70,
+			obtainable: true,
+		});
+		if (!result.obtainable) throw new Error("Expected reusable deposit route.");
+		expect(result.routeSteps.find(({ factId }) => factId === "deposit")?.quantity).toBe(1);
+		expect(
+			estimate(
+				{
+					...dependencyGraph,
+					routes: dependencyGraph.routes.filter(
+						({ output }) => output.factId !== "deposit",
+					),
+				},
+				"target",
+				10,
+			),
+		).toMatchObject({
+			obtainable: false,
+			status: "unreachable",
+		});
+	});
+
+	it("ignores rule conditions but retains hard route requirements", () => {
+		const result = estimate(
+			graph({
+				facts: [
+					"condition",
+					"owner",
+					"target",
+				],
+				roots: [
+					"owner",
+				],
+				routes: [
+					route({
+						allOf: [
+							{
+								factId: "condition",
+								quantity: 1,
+								source: "line-condition",
+								usage: "ongoing",
+							},
+							{
+								factId: "owner",
+								quantity: 1,
+								source: "owner",
+								usage: "one-time",
+							},
+						],
+						durationMs: 10,
+						id: "conditioned-route",
+						output: "target",
+					}),
+				],
+			}),
+		);
+
+		expect(result).toMatchObject({
+			durationMs: 10,
+			obtainable: true,
+		});
+		if (!result.obtainable) throw new Error("Expected optimistic conditioned route.");
+		expect(result.route.requirements.map(({ factId }) => factId)).toEqual([
+			"owner",
+		]);
+	});
+
+	it("excludes ignored condition and charge edges from component membership", () => {
+		const dependencyGraph = graph({
+			facts: [
+				"condition-root",
+				"condition-dependent",
+				"charge-root",
+				"charge-dependent",
+			],
+			roots: [
+				"condition-root",
+				"charge-root",
+			],
+			routes: [
+				route({
+					allOf: [
+						{
+							factId: "condition-dependent",
+							quantity: 1,
+							source: "line-condition",
+							usage: "ongoing",
+						},
+					],
+					durationMs: 1,
+					id: "condition-edge",
+					output: "condition-root",
+				}),
+				route({
+					allOf: [
+						requirement("condition-root"),
+					],
+					durationMs: 1,
+					id: "condition-back-edge",
+					output: "condition-dependent",
+				}),
+				route({
+					chargeUses: [
+						{
+							accounting: "single-payer-exact",
+							payerFactId: "charge-dependent",
+							usableActionRuns: 1,
+						},
+					],
+					durationMs: 1,
+					id: "charge-edge",
+					output: "charge-root",
+				}),
+				route({
+					allOf: [
+						requirement("charge-root"),
+					],
+					durationMs: 1,
+					id: "charge-back-edge",
+					output: "charge-dependent",
+				}),
+			],
+		});
+
+		const policy = Effect.runSync(createEditorEstimatePolicyFx(dependencyGraph));
+
+		expect(
+			[
+				...policy.seededComponentByFact.keys(),
+			].sort(),
+		).toEqual([
+			"charge-root",
+			"condition-root",
+		]);
+	});
+
+	it("keeps charge-depletion output work while acquiring its payer once", () => {
+		const depletionRoute: EditorAcquisitionRoute = {
+			...route({
+				allOf: [
+					{
+						factId: "payer",
+						quantity: 1,
+						source: "charged-item",
+						usage: "consume",
+					},
+					requirement("material"),
+				],
+				durationMs: 10,
+				id: "deplete-payer",
+				output: "target",
+			}),
+			metadata: {
+				chargedItemId: "payer",
+				kind: "line-charge-depletion",
+				lineId: "line",
+				lineTitle: "Line",
+				ownerItemId: "owner",
+			},
+			runMultiplier: 3,
+		};
+		const result = estimate(
+			graph({
+				facts: [
+					"material",
+					"payer",
+					"target",
+				],
+				roots: [
+					"material",
+				],
+				routes: [
+					route({
+						durationMs: 5,
+						id: "acquire-payer",
+						output: "payer",
+					}),
+					depletionRoute,
+				],
+			}),
+		);
+
+		expect(result).toMatchObject({
+			durationMs: 35,
+			obtainable: true,
+		});
+		if (!result.obtainable) throw new Error("Expected depletion output route.");
+		expect(result.route.actionRuns).toBe(3);
+		expect(result.routeSteps.find(({ factId }) => factId === "payer")?.quantity).toBe(1);
 	});
 
 	it("requires two distinct identities for a self-merge without duplicating shared capabilities", () => {
@@ -535,16 +795,6 @@ describe("estimateEditorItemFx", () => {
 		});
 		expect(complete).toMatchObject({
 			obtainable: true,
-			oneTimeRequirements: [
-				{
-					factId: "token",
-					quantity: 2,
-				},
-				{
-					factId: "workbench",
-					quantity: 1,
-				},
-			],
 		});
 	});
 
@@ -595,11 +845,6 @@ describe("estimateEditorItemFx", () => {
 				routeId: "valid-target",
 			},
 		});
-		expect(
-			result.rejectedRoutes.some(({ diagnostics }) =>
-				diagnostics.some(({ kind }) => kind === "cycle"),
-			),
-		).toBe(true);
 	});
 
 	it("rejects a nested cyclic route without hiding its slower complete alternative", () => {
@@ -671,11 +916,6 @@ describe("estimateEditorItemFx", () => {
 			factId: "target",
 			obtainable: false,
 		});
-		expect(result.rejectedRoutes).toContainEqual(
-			expect.objectContaining({
-				routeId: "dead-end",
-			}),
-		);
 	});
 
 	it("uses stable route identity to break complete-duration ties", () => {
@@ -713,6 +953,67 @@ describe("estimateEditorItemFx", () => {
 			obtainable: true,
 			route: {
 				routeId: "a-route",
+			},
+		});
+	});
+
+	it("falls back when the cheapest route overcommits a shared finite root", () => {
+		const dependencyGraph = graph({
+			facts: [
+				"raw",
+				"a",
+				"b",
+				"target",
+			],
+			roots: [],
+			routes: [
+				route({
+					allOf: [
+						requirement("raw"),
+					],
+					durationMs: 0,
+					id: "make-a",
+					output: "a",
+				}),
+				route({
+					allOf: [
+						requirement("raw"),
+					],
+					durationMs: 0,
+					id: "make-b",
+					output: "b",
+				}),
+				route({
+					allOf: [
+						requirement("a"),
+						requirement("b"),
+					],
+					durationMs: 0,
+					id: "shared-root-route",
+					output: "target",
+				}),
+				route({
+					durationMs: 10,
+					id: "direct-route",
+					output: "target",
+				}),
+			],
+		});
+		const result = estimate({
+			...dependencyGraph,
+			roots: [
+				{
+					factId: "raw",
+					quantity: 1,
+				},
+			],
+		});
+
+		expect(result).toMatchObject({
+			durationMs: 10,
+			obtainable: true,
+			route: {
+				routeId: "direct-route",
 			},
 		});
 	});
@@ -821,7 +1122,7 @@ describe("estimateEditorItemFx", () => {
 		expect(unreachable).toMatchObject({
 			obtainable: false,
 		});
-		expect(unreachable.rejectedRoutes[0]?.diagnostics).toContainEqual(
+		expect(unreachable.diagnostics).toContainEqual(
 			expect.objectContaining({
 				kind: "zero-yield",
 				routeId: "zero-yield",
@@ -929,31 +1230,25 @@ describe("estimateEditorItemFx", () => {
 						id: "make-target",
 						output: "target",
 					}),
+					route({
+						durationMs: 15,
+						id: "direct-target",
+						output: "target",
+					}),
 				],
 			}),
 		);
 
 		expect(result).toMatchObject({
-			consumables: [
-				{
-					factId: "a",
-					quantity: 1,
-				},
-				{
-					factId: "b",
-					quantity: 1,
-				},
-				{
-					factId: "fuel",
-					quantity: 1,
-				},
-			],
 			durationMs: 10,
 			obtainable: true,
+			route: {
+				routeId: "make-target",
+			},
 		});
 	});
 
-	it("preserves the positive-minimum charged payer bound for shared co-products", () => {
+	it("ignores charge capacity while sharing co-product work", () => {
 		const operation = {
 			id: "charged-a-and-b",
 			inputs: [],
@@ -1045,28 +1340,8 @@ describe("estimateEditorItemFx", () => {
 		);
 
 		expect(result).toMatchObject({
-			consumables: [
-				{
-					factId: "a",
-					quantity: 5,
-				},
-				{
-					factId: "b",
-					quantity: 5,
-				},
-				{
-					factId: "fuel",
-					quantity: 2.9375,
-				},
-			],
 			durationMs: 29.375,
 			obtainable: true,
-			oneTimeRequirements: [
-				{
-					factId: "payer",
-					quantity: 3,
-				},
-			],
 		});
 	});
 
@@ -1097,20 +1372,7 @@ describe("estimateEditorItemFx", () => {
 		};
 		const result = estimate(dependencyGraph);
 		expect(result).toMatchObject({
-			consumables: [
-				{
-					factId: "tool",
-					quantity: 1,
-				},
-			],
 			obtainable: true,
-			ongoingRequirements: [
-				{
-					factId: "tool",
-					quantity: 1,
-				},
-			],
-			oneTimeRequirements: [],
 		});
 	});
 
@@ -1432,7 +1694,7 @@ describe("estimateEditorItemFx", () => {
 		}
 	});
 
-	it("rejects unsupported multi-payer charge accounting without hiding a complete route", () => {
+	it("ignores unsupported multi-payer charge accounting", () => {
 		const result = estimate(
 			graph({
 				facts: [
@@ -1467,22 +1729,12 @@ describe("estimateEditorItemFx", () => {
 		expect(result).toMatchObject({
 			obtainable: true,
 			route: {
-				routeId: "complete",
+				routeId: "unsupported",
 			},
-			rejectedRoutes: expect.arrayContaining([
-				expect.objectContaining({
-					diagnostics: expect.arrayContaining([
-						expect.objectContaining({
-							kind: "charge-accounting-unsupported",
-							reason: "multi-payer",
-						}),
-					]),
-				}),
-			]),
 		});
 	});
 
-	it("returns partial instead of ceiling stochastic finite-charge demand", () => {
+	it("uses expected stochastic output runs without charge capacity", () => {
 		const result = estimate(
 			graph({
 				facts: [
@@ -1520,17 +1772,12 @@ describe("estimateEditorItemFx", () => {
 		);
 
 		expect(result).toMatchObject({
-			diagnostics: expect.arrayContaining([
-				expect.objectContaining({
-					kind: "charge-accounting-unsupported",
-					reason: "stochastic-output",
-				}),
-			]),
-			status: "partial",
+			durationMs: 2,
+			status: "complete",
 		});
 	});
 
-	it("uses a conservative payer bound when stochastic charged output always progresses", () => {
+	it("does not add charged payer instances to stochastic output timing", () => {
 		const result = estimate(
 			graph({
 				facts: [
@@ -1572,17 +1819,11 @@ describe("estimateEditorItemFx", () => {
 		expect(result).toMatchObject({
 			durationMs: 17.5,
 			obtainable: true,
-			oneTimeRequirements: [
-				{
-					factId: "payer",
-					quantity: 2,
-				},
-			],
 			status: "complete",
 		});
 	});
 
-	it("rejects a nested stochastic charged route without hiding a complete alternative", () => {
+	it("uses a faster nested stochastic route regardless of charge lifetime", () => {
 		const result = estimate(
 			graph({
 				facts: [
@@ -1634,12 +1875,12 @@ describe("estimateEditorItemFx", () => {
 		);
 
 		expect(result).toMatchObject({
-			durationMs: 21,
+			durationMs: 3,
 			obtainable: true,
 		});
 		if (!result.obtainable) throw new Error("Expected nested complete route.");
 		expect(result.routeSteps.find(({ factId }) => factId === "x")?.routeId).toBe(
-			"z-complete-x",
+			"a-stochastic-x",
 		);
 	});
 
@@ -1696,7 +1937,7 @@ describe("estimateEditorItemFx", () => {
 		});
 	});
 
-	it("keeps partial status and its reason beyond the diagnostic display limit", () => {
+	it("ignores charged renewal cycles when choosing a route", () => {
 		const deadRoutes = Array.from(
 			{
 				length: 9,
@@ -1753,12 +1994,8 @@ describe("estimateEditorItemFx", () => {
 		);
 
 		expect(result).toMatchObject({
-			diagnostics: expect.arrayContaining([
-				expect.objectContaining({
-					kind: "charge-renewal-unsupported",
-				}),
-			]),
-			status: "partial",
+			durationMs: 2,
+			status: "complete",
 		});
 	});
 

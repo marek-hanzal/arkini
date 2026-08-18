@@ -93,23 +93,12 @@ export const shareEditorEstimateOperationRunsFx = Effect.fn("shareEditorEstimate
 					EditorEstimateSelectedRoute["groups"][number]
 				>();
 				for (const [, plan] of entries) {
-					const groups = policy.chooseRequirements(
-						plan.route,
-						actionRuns,
-						plan.producedQuantity,
-					);
+					const groups = policy.chooseRequirements(plan.route, actionRuns);
 					if (groups === undefined) continue;
 					for (const group of groups) {
 						const current = groupsByFactId.get(group.factId);
 						groupsByFactId.set(group.factId, {
 							...group,
-							anyOfClauseIndexes: [
-								...new Set([
-									...(current?.anyOfClauseIndexes ?? []),
-									...group.anyOfClauseIndexes,
-								]),
-							],
-							charged: (current?.charged ?? false) || group.charged,
 							consumed: Math.max(current?.consumed ?? 0, group.consumed),
 							distinctOneTime: Math.max(
 								current?.distinctOneTime ?? 0,

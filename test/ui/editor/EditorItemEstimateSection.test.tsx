@@ -95,12 +95,6 @@ const render = async (
 describe("EditorItemEstimateSection", () => {
 	it("renders static duration and requirement classes", async () => {
 		const estimate: EditorItemEstimate = {
-			consumables: [
-				{
-					factId: "water",
-					quantity: 3,
-				},
-			],
 			diagnostics: [],
 			durationMs: 1_000,
 			factId: "tool",
@@ -109,15 +103,7 @@ describe("EditorItemEstimateSection", () => {
 			],
 			obtainable: true,
 			status: "complete",
-			oneTimeRequirements: [
-				{
-					factId: "forge",
-					quantity: 1,
-				},
-			],
-			ongoingRequirements: [],
 			quantity: 1,
-			rejectedRoutes: [],
 			route: {
 				actionRuns: 1,
 				durationMs: 1_000,
@@ -181,12 +167,10 @@ describe("EditorItemEstimateSection", () => {
 
 		expect(container.textContent).toContain("Complete path found");
 		expect(container.textContent).toContain("1 s");
-		expect(container.textContent).toContain("Consumed");
-		expect(container.textContent).toContain("× 3");
-		expect(container.textContent).toContain("One-time requirements");
 		expect(container.textContent).toContain("Static dependency estimator");
 		expect(container.textContent).toContain("line:well:water");
-		expect(container.textContent).toContain("Board scope, distance");
+		expect(container.textContent).toContain("Scope, distance, board capacity");
+		expect(container.textContent).toContain("Optimistic authored-graph analysis");
 		expect(container.textContent).not.toContain("planner");
 		expect(container.textContent).not.toContain("search");
 	});
@@ -205,7 +189,6 @@ describe("EditorItemEstimateSection", () => {
 			obtainable: false,
 			status: "unreachable",
 			quantity: 1,
-			rejectedRoutes: [],
 		};
 		const container = await render({
 			estimate,
@@ -216,53 +199,19 @@ describe("EditorItemEstimateSection", () => {
 		expect(container.textContent).toContain("tool × 1 has no complete acquisition route");
 	});
 
-	it("renders every unsupported availability-condition detail", async () => {
+	it("renders bounded-analysis failures without claiming totals", async () => {
 		const estimate: EditorItemEstimate = {
 			diagnostics: [
 				{
-					factId: "water",
-					kind: "availability-condition-unsupported",
-					reason: "upper-bound",
+					kind: "joint-output-accounting-unsupported",
+					reason: "state-space",
 					routeId: "line:forge:run",
-					source: "output-condition",
 				},
 			],
 			factId: "tool",
 			limitations: [],
 			obtainable: false,
 			quantity: 1,
-			rejectedRoutes: [],
-			status: "partial",
-		};
-		const container = await render({
-			estimate,
-			status: "ready",
-		});
-
-		expect(container.textContent).toContain(
-			"Availability condition for water is unsupported on route line:forge:run (output-condition, upper-bound).",
-		);
-		expect(container.textContent).not.toContain("undefined");
-	});
-
-	it("renders charged renewal as incomplete without complete totals", async () => {
-		const estimate: EditorItemEstimate = {
-			diagnostics: [
-				{
-					factIds: [
-						"tree",
-						"water",
-						"tree",
-					],
-					kind: "charge-renewal-unsupported",
-					routeId: "line:seed:grow",
-				},
-			],
-			factId: "tool",
-			limitations: [],
-			obtainable: false,
-			quantity: 1,
-			rejectedRoutes: [],
 			status: "partial",
 		};
 		const container = await render({
@@ -272,9 +221,8 @@ describe("EditorItemEstimateSection", () => {
 
 		expect(container.textContent).toContain("Incomplete static path");
 		expect(container.textContent).toContain("Indeterminate");
-		expect(container.textContent).toContain("tree → water → tree");
+		expect(container.textContent).toContain("exceeds the bounded static state space");
 		expect(container.textContent).not.toContain("Consumed");
-		expect(container.textContent).not.toContain("Sequential duration");
 	});
 
 	it("shows progress while the estimate worker is running", async () => {

@@ -1,35 +1,37 @@
 import { Effect } from "effect";
 
-import type { EditorAcquisitionGraph } from "~/editor/EditorAcquisitionGraph";
-
 export interface EditorEstimateComponentIndex {
 	readonly componentByFact: ReadonlyMap<string, string>;
 	readonly seededComponentByFact: ReadonlyMap<string, string>;
 }
 
+export interface EditorEstimateComponentIndexInput {
+	readonly dependencyEdges: ReadonlyArray<
+		readonly [
+			fromFactId: string,
+			toFactId: string,
+		]
+	>;
+	readonly factIds: ReadonlyArray<string>;
+	readonly rootFactIds: ReadonlySet<string>;
+}
+
 /** Builds static strongly-connected-component membership and authored-seed evidence. */
 export const createEditorEstimateComponentIndexFx = Effect.fn(
 	"createEditorEstimateComponentIndexFx",
-)((graph: EditorAcquisitionGraph) =>
+)((input: EditorEstimateComponentIndexInput) =>
 	Effect.sync((): EditorEstimateComponentIndex => {
-		const rootFactIds = new Set(graph.roots.map(({ factId }) => factId));
+		const { dependencyEdges, factIds, rootFactIds } = input;
 		const adjacency = new Map<string, Set<string>>(
-			graph.factIds.map((factId) => [
+			factIds.map((factId) => [
 				factId,
 				new Set<string>(),
 			]),
 		);
-		for (const route of graph.routes) {
-			for (const requirement of [
-				...route.requirements.allOf,
-				...route.requirements.anyOf.flat(),
-			])
-				adjacency.get(route.output.factId)?.add(requirement.factId);
-			for (const chargeUse of route.chargeUses ?? [])
-				adjacency.get(route.output.factId)?.add(chargeUse.payerFactId);
-		}
+		for (const [fromFactId, toFactId] of dependencyEdges)
+			adjacency.get(fromFactId)?.add(toFactId);
 		const reachableByFact = new Map<string, Set<string>>();
-		for (const id of graph.factIds) {
+		for (const id of factIds) {
 			const reachable = new Set<string>();
 			const pending = [
 				id,
@@ -44,8 +46,8 @@ export const createEditorEstimateComponentIndexFx = Effect.fn(
 		}
 		const componentByFact = new Map<string, string>();
 		const seededComponentIds = new Set<string>();
-		for (const id of graph.factIds) {
-			const component = graph.factIds
+		for (const id of factIds) {
+			const component = factIds
 				.filter(
 					(candidate) =>
 						reachableByFact.get(id)?.has(candidate) === true &&

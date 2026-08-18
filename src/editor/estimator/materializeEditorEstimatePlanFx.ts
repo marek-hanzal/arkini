@@ -2,10 +2,7 @@ import { Effect } from "effect";
 
 import type { EditorAcquisitionRoute } from "~/editor/EditorAcquisitionGraph";
 import type { EditorEstimatePolicy } from "~/editor/estimator/createEditorEstimatePolicyFx";
-import type {
-	EditorItemEstimateDiagnostic,
-	EditorItemEstimateRejectedRoute,
-} from "~/editor/estimator/EditorItemEstimate";
+import type { EditorItemEstimateDiagnostic } from "~/editor/estimator/EditorItemEstimate";
 import { editorItemEstimateMaximumQuantity } from "~/editor/estimator/EditorItemEstimateQuantitySchema";
 import type {
 	EditorEstimateRouteProjection,
@@ -15,12 +12,8 @@ import { projectEditorEstimateRouteStepFx } from "~/editor/estimator/projectEdit
 import { shareEditorEstimateOperationRunsFx } from "~/editor/estimator/shareEditorEstimateOperationRunsFx";
 
 export interface EditorEstimateCandidatePlan {
-	readonly consumables: Map<string, number>;
 	readonly durationMs: number;
-	readonly ongoing: Map<string, number>;
-	readonly oneTime: Map<string, number>;
 	readonly projection: EditorEstimateRouteProjection;
-	readonly rejectedRoutes: ReadonlyArray<EditorItemEstimateRejectedRoute>;
 }
 
 interface EditorEstimateCandidateFailure {
@@ -28,11 +21,7 @@ interface EditorEstimateCandidateFailure {
 }
 
 interface DemandSnapshot {
-	readonly consumables: Map<string, number>;
-	readonly contributors: Map<string, Set<string>>;
 	readonly dependencies: Map<string, Set<string>>;
-	readonly ongoing: Map<string, number>;
-	readonly oneTime: Map<string, number>;
 	readonly required: Map<string, number>;
 	readonly selected: Map<string, EditorEstimateSelectedRoute>;
 	readonly sharedOperationIds: ReadonlySet<string>;
@@ -95,35 +84,12 @@ const findCycle = (dependencies: ReadonlyMap<string, ReadonlySet<string>>) => {
 
 const cycleDiagnostic = (
 	cycle: ReadonlyArray<string>,
-	selected: ReadonlyMap<string, EditorEstimateSelectedRoute>,
 	topRouteId: string,
-): EditorItemEstimateDiagnostic => {
-	for (let index = 0; index < cycle.length - 1; index += 1) {
-		const parentId = cycle[index];
-		const dependencyId = cycle[index + 1];
-		if (
-			parentId !== undefined &&
-			dependencyId !== undefined &&
-			selected
-				.get(parentId)
-				?.groups.some((group) => group.factId === dependencyId && group.charged) === true
-		)
-			return {
-				factIds: [
-					...cycle.slice(index + 1, -1),
-					...cycle.slice(0, index + 1),
-					dependencyId,
-				],
-				kind: "charge-renewal-unsupported",
-				routeId: topRouteId,
-			};
-	}
-	return {
-		factIds: cycle,
-		kind: "cycle",
-		routeId: topRouteId,
-	};
-};
+): EditorItemEstimateDiagnostic => ({
+	factIds: cycle,
+	kind: "cycle",
+	routeId: topRouteId,
+});
 
 /** Materializes one forced top route through a bounded, deterministic demand fixed point. */
 export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstimatePlanFx")(
@@ -145,7 +111,6 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 					quantity,
 				],
 			]);
-			let sharedFiniteRootFactId: string | undefined;
 			let snapshot: DemandSnapshot | undefined;
 			const maximumIterations = Math.max(2, policy.factIds.size * 2);
 
@@ -177,27 +142,15 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 					const route =
 						id === factId
 							? topRoute
-							: (policy.chooseRoute(
-									id,
-									requiredQuantity,
-									new Set([
-										factId,
-									]),
-								) ?? routes[0]);
+							: (policy.chooseRoute(id, requiredQuantity) ?? routes[0]);
 					if (route === undefined)
 						return {
 							diagnostics: [
-								sharedFiniteRootFactId === undefined
-									? {
-											factId: id,
-											kind: "unreachable",
-											quantity: missing,
-										}
-									: {
-											factId: sharedFiniteRootFactId,
-											kind: "finite-root-interaction-unsupported",
-											quantity: required.get(sharedFiniteRootFactId) ?? 0,
-										},
+								{
+									factId: id,
+									kind: "unreachable",
+									quantity: missing,
+								},
 							],
 						} satisfies EditorEstimateCandidateFailure;
 					if (route.operation?.outputCompilation === "state-space-unsupported")
@@ -210,39 +163,7 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 								},
 							],
 						} satisfies EditorEstimateCandidateFailure;
-					const unsupportedRequirement = route.requirements.unsupported?.[0];
-					if (unsupportedRequirement !== undefined)
-						return {
-							diagnostics: [
-								{
-									...unsupportedRequirement,
-									kind: "availability-condition-unsupported",
-									routeId: route.id,
-								},
-							],
-						} satisfies EditorEstimateCandidateFailure;
 					const outputDistribution = route.output.quantityDistribution;
-					const minimumOutput = Math.min(
-						...outputDistribution.map(({ quantity }) => quantity),
-					);
-					const unsupportedChargeReason = route.chargeUses?.some(
-						({ accounting, usableActionRuns }) =>
-							accounting === "multi-payer-unsupported" || usableActionRuns <= 0,
-					)
-						? ("multi-payer" as const)
-						: route.chargeUses?.length && minimumOutput <= 0
-							? ("stochastic-output" as const)
-							: undefined;
-					if (unsupportedChargeReason !== undefined)
-						return {
-							diagnostics: [
-								{
-									kind: "charge-accounting-unsupported",
-									reason: unsupportedChargeReason,
-									routeId: route.id,
-								},
-							],
-						} satisfies EditorEstimateCandidateFailure;
 					const outputRuns = policy.readExpectedRuns(outputDistribution, missing);
 					if (!Number.isFinite(outputRuns))
 						return {
@@ -255,7 +176,7 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 							],
 						} satisfies EditorEstimateCandidateFailure;
 					const actionRuns = outputRuns * route.runMultiplier;
-					const groups = policy.chooseRequirements(route, actionRuns, missing);
+					const groups = policy.chooseRequirements(route, actionRuns);
 					if (groups === undefined)
 						return {
 							diagnostics: [
@@ -292,11 +213,8 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 
 				const consumables = new Map<string, number>();
 				const concurrent = new Map<string, number>();
-				const contributors = new Map<string, Set<string>>();
-				const oneTime = new Map<string, number>();
-				const ongoing = new Map<string, number>();
 				const accountedOperationIds = new Set<string>();
-				for (const [id, plan] of selected) {
+				for (const plan of selected.values()) {
 					const operationId = plan.route.operation?.id;
 					if (operationId !== undefined && accountedOperationIds.has(operationId))
 						continue;
@@ -309,11 +227,6 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 							group.factId,
 							group.consumed + Math.max(group.oneTime, group.ongoing),
 						);
-						maximize(oneTime, group.factId, group.oneTime);
-						maximize(ongoing, group.factId, group.ongoing);
-						const factContributors = contributors.get(group.factId) ?? new Set();
-						factContributors.add(id);
-						contributors.set(group.factId, factContributors);
 					}
 				}
 				const nextRequired = new Map<string, number>([
@@ -334,20 +247,6 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 						),
 					);
 				}
-				sharedFiniteRootFactId = [
-					...nextRequired,
-				]
-					.sort(([left], [right]) => left.localeCompare(right))
-					.find(([id, requiredQuantity]) => {
-						const root = policy.roots.get(id);
-						return (
-							typeof root === "number" &&
-							root > 0 &&
-							requiredQuantity > root + 1e-9 &&
-							(contributors.get(id)?.size ?? 0) > 1
-						);
-					})?.[0];
-
 				const recurrenceByFact = new Map<string, Set<string>>();
 				const dependencies = new Map<string, Set<string>>();
 				for (const [id, plan] of selected) {
@@ -395,15 +294,11 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 				if (cycle !== undefined)
 					return {
 						diagnostics: [
-							cycleDiagnostic(cycle, selectedWithRecurrence, topRoute.id),
+							cycleDiagnostic(cycle, topRoute.id),
 						],
 					} satisfies EditorEstimateCandidateFailure;
 				snapshot = {
-					consumables,
-					contributors,
 					dependencies,
-					ongoing,
-					oneTime,
 					required: nextRequired,
 					selected: selectedWithRecurrence,
 					sharedOperationIds,
@@ -415,18 +310,12 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 			if (snapshot === undefined || !equalQuantities(required, snapshot.required))
 				return {
 					diagnostics: [
-						sharedFiniteRootFactId === undefined
-							? {
-									factId,
-									kind: "unreachable",
-									quantity,
-									routeId: topRoute.id,
-								}
-							: {
-									factId: sharedFiniteRootFactId,
-									kind: "finite-root-interaction-unsupported",
-									quantity: snapshot?.required.get(sharedFiniteRootFactId) ?? 0,
-								},
+						{
+							factId,
+							kind: "unreachable",
+							quantity,
+							routeId: topRoute.id,
+						},
 					],
 				} satisfies EditorEstimateCandidateFailure;
 			const projection = yield* projectEditorEstimateRouteStepFx({
@@ -438,7 +327,6 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 			});
 			if ("diagnostics" in projection) return projection;
 			return {
-				consumables: snapshot.consumables,
 				durationMs: [
 					...new Map(
 						[
@@ -452,10 +340,7 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 						]),
 					).values(),
 				].reduce((total, plan) => total + plan.route.durationMs * plan.actionRuns, 0),
-				ongoing: snapshot.ongoing,
-				oneTime: snapshot.oneTime,
 				projection,
-				rejectedRoutes: [],
 			};
 		}),
 );

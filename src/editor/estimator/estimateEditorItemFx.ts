@@ -3,11 +3,7 @@ import { Effect } from "effect";
 import type { EditorAcquisitionGraph } from "~/editor/EditorAcquisitionGraph";
 import type { EditorEstimatePolicy } from "~/editor/estimator/createEditorEstimatePolicyFx";
 import { createEditorEstimatePolicyFx } from "~/editor/estimator/createEditorEstimatePolicyFx";
-import type {
-	EditorItemEstimate,
-	EditorItemEstimateAmount,
-	EditorItemEstimateRejectedRoute,
-} from "~/editor/estimator/EditorItemEstimate";
+import type { EditorItemEstimate } from "~/editor/estimator/EditorItemEstimate";
 import type { EditorEstimateCandidatePlan } from "~/editor/estimator/materializeEditorEstimatePlanFx";
 import { materializeEditorEstimatePlanFx } from "~/editor/estimator/materializeEditorEstimatePlanFx";
 import { editorItemEstimateMaximumQuantity } from "~/editor/estimator/EditorItemEstimateQuantitySchema";
@@ -21,7 +17,6 @@ export namespace estimateEditorItemFx {
 }
 
 const maximumDiagnostics = 8;
-const maximumRejectedRoutes = 32;
 const policyByGraph = new WeakMap<EditorAcquisitionGraph, EditorEstimatePolicy>();
 
 const uniqueDiagnostics = (
@@ -35,21 +30,6 @@ const uniqueDiagnostics = (
 		return true;
 	});
 };
-
-const freezeAmounts = (
-	quantities: ReadonlyMap<string, number>,
-): ReadonlyArray<EditorItemEstimateAmount> =>
-	Object.freeze(
-		[
-			...quantities,
-		]
-			.filter(([, quantity]) => quantity > 1e-9)
-			.sort(([left], [right]) => left.localeCompare(right))
-			.map(([factId, quantity]) => ({
-				factId,
-				quantity,
-			})),
-	);
 
 const makeRootEstimate = (
 	factId: string,
@@ -68,21 +48,73 @@ const makeRootEstimate = (
 		source: "root" as const,
 	};
 	return {
-		consumables: [],
 		diagnostics: [],
 		durationMs: 0,
 		factId,
 		limitations,
 		obtainable: true,
 		status: "complete",
-		oneTimeRequirements: [],
-		ongoingRequirements: [],
 		quantity,
-		rejectedRoutes: [],
 		route,
 		routeSteps: [
 			route,
 		],
+	};
+};
+
+const makeCompleteEstimate = (
+	factId: string,
+	quantity: number,
+	limitations: EditorAcquisitionGraph["limitations"],
+	plan: EditorEstimateCandidatePlan,
+): EditorItemEstimate => ({
+	diagnostics: [],
+	durationMs: plan.durationMs,
+	factId,
+	limitations,
+	obtainable: true,
+	status: "complete",
+	quantity,
+	route: plan.projection.route,
+	routeSteps: plan.projection.routeSteps,
+});
+
+const makeUnavailableEstimate = (
+	factId: string,
+	quantity: number,
+	limitations: EditorAcquisitionGraph["limitations"],
+	candidateDiagnostics: ReadonlyArray<EditorItemEstimate["diagnostics"][number]>,
+): EditorItemEstimate => {
+	const diagnostics = uniqueDiagnostics(candidateDiagnostics)
+		.sort(
+			(left, right) =>
+				Number(right.kind.endsWith("-unsupported")) -
+				Number(left.kind.endsWith("-unsupported")),
+		)
+		.slice(0, maximumDiagnostics);
+	const resolvedDiagnostics =
+		diagnostics.length > 0
+			? diagnostics
+			: [
+					{
+						factId,
+						kind: "unreachable" as const,
+						quantity,
+					},
+				];
+	return {
+		diagnostics: resolvedDiagnostics,
+		factId,
+		limitations,
+		obtainable: false,
+		status: resolvedDiagnostics.some(
+			({ kind }) =>
+				kind === "joint-output-accounting-unsupported" ||
+				kind === "quantity-limit-exceeded",
+		)
+			? "partial"
+			: "unreachable",
+		quantity,
 	};
 };
 
@@ -105,7 +137,6 @@ export const estimateEditorItemFx = Effect.fn("estimateEditorItemFx")(
 					obtainable: false,
 					status: "partial",
 					quantity,
-					rejectedRoutes: [],
 				} satisfies EditorItemEstimate;
 			let policy = policyByGraph.get(graph);
 			if (policy === undefined) {
@@ -126,103 +157,73 @@ export const estimateEditorItemFx = Effect.fn("estimateEditorItemFx")(
 					obtainable: false,
 					status: "unreachable",
 					quantity,
-					rejectedRoutes: [],
 				} satisfies EditorItemEstimate;
 			const root = policy.roots.get(factId);
 			if (root === "unbounded" || (root ?? 0) >= quantity)
 				return makeRootEstimate(factId, quantity, graph.limitations);
 
-			const plans: Array<{
-				readonly plan: EditorEstimateCandidatePlan;
-				readonly routeId: string;
-			}> = [];
-			const rejectedRoutes: EditorItemEstimateRejectedRoute[] = [];
-			let hasPartialCandidate = false;
-			for (const route of policy.routesByFact.get(factId) ?? []) {
-				const candidate = yield* materializeEditorEstimatePlanFx({
-					factId,
-					policy,
-					quantity,
-					topRoute: route,
-				});
-				if ("diagnostics" in candidate) {
-					if (
-						candidate.diagnostics.some(
-							({ kind }) =>
-								kind === "availability-condition-unsupported" ||
-								kind === "charge-accounting-unsupported" ||
-								kind === "charge-renewal-unsupported" ||
-								kind === "finite-root-interaction-unsupported" ||
-								kind === "joint-output-accounting-unsupported" ||
-								kind === "quantity-limit-exceeded",
-						)
-					)
-						hasPartialCandidate = true;
-					if (rejectedRoutes.length < maximumRejectedRoutes)
-						rejectedRoutes.push({
-							diagnostics: candidate.diagnostics.slice(0, maximumDiagnostics),
-							routeId: route.id,
+			const selectedRoute = policy.chooseRoute(factId, quantity);
+			const selected =
+				selectedRoute === undefined
+					? undefined
+					: yield* materializeEditorEstimatePlanFx({
+							factId,
+							policy,
+							quantity,
+							topRoute: selectedRoute,
 						});
-				} else
-					plans.push({
-						plan: candidate,
-						routeId: route.id,
-					});
-			}
-			plans.sort(
-				(left, right) =>
-					left.plan.durationMs - right.plan.durationMs ||
-					left.routeId.localeCompare(right.routeId),
+			const remainingCandidates = yield* Effect.forEach(
+				(policy.routesByFact.get(factId) ?? []).filter((route) => route !== selectedRoute),
+				(topRoute) =>
+					Effect.map(
+						materializeEditorEstimatePlanFx({
+							factId,
+							policy,
+							quantity,
+							topRoute,
+						}),
+						(candidate) => ({
+							candidate,
+							routeId: topRoute.id,
+						}),
+					),
 			);
-			const selected = plans[0]?.plan;
-			if (selected === undefined) {
-				const diagnostics = uniqueDiagnostics(
-					rejectedRoutes.flatMap((route) => route.diagnostics),
+			const candidates = [
+				...(selected === undefined || selectedRoute === undefined
+					? []
+					: [
+							{
+								candidate: selected,
+								routeId: selectedRoute.id,
+							},
+						]),
+				...remainingCandidates,
+			];
+			const bestPlan = candidates
+				.flatMap(({ candidate, routeId }) =>
+					"diagnostics" in candidate
+						? []
+						: [
+								{
+									plan: candidate,
+									routeId,
+								},
+							],
 				)
-					.sort(
-						(left, right) =>
-							Number(right.kind === "charge-renewal-unsupported") -
-								Number(left.kind === "charge-renewal-unsupported") ||
-							Number(right.kind.endsWith("-unsupported")) -
-								Number(left.kind.endsWith("-unsupported")),
-					)
-					.slice(0, maximumDiagnostics);
-				return {
-					diagnostics:
-						diagnostics.length > 0
-							? diagnostics
-							: [
-									{
-										factId,
-										kind: "unreachable",
-										quantity,
-									},
-								],
-					factId,
-					limitations: graph.limitations,
-					obtainable: false,
-					status: hasPartialCandidate ? "partial" : "unreachable",
-					quantity,
-					rejectedRoutes,
-				} satisfies EditorItemEstimate;
-			}
-			return {
-				consumables: freezeAmounts(selected.consumables),
-				diagnostics: [],
-				durationMs: selected.durationMs,
+				.sort(
+					(left, right) =>
+						left.plan.durationMs - right.plan.durationMs ||
+						left.routeId.localeCompare(right.routeId),
+				)[0]?.plan;
+			if (bestPlan !== undefined)
+				return makeCompleteEstimate(factId, quantity, graph.limitations, bestPlan);
+			return makeUnavailableEstimate(
 				factId,
-				limitations: graph.limitations,
-				obtainable: true,
-				status: "complete",
-				oneTimeRequirements: freezeAmounts(selected.oneTime),
-				ongoingRequirements: freezeAmounts(selected.ongoing),
 				quantity,
-				rejectedRoutes: [
-					...rejectedRoutes,
-					...selected.rejectedRoutes,
-				].slice(0, maximumRejectedRoutes),
-				route: selected.projection.route,
-				routeSteps: selected.projection.routeSteps,
-			} satisfies EditorItemEstimate;
+				graph.limitations,
+				candidates.flatMap(({ candidate }) =>
+					"diagnostics" in candidate ? candidate.diagnostics : [],
+				),
+			);
 		}),
 );

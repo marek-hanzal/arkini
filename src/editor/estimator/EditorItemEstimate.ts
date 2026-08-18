@@ -5,11 +5,6 @@ import type {
 	EditorAcquisitionRouteMetadata,
 } from "~/editor/EditorAcquisitionGraph";
 
-export interface EditorItemEstimateAmount {
-	readonly factId: string;
-	readonly quantity: number;
-}
-
 export interface EditorItemEstimateRequirementStep {
 	/** Canonical fact whose route establishes this requirement, when acquisition is needed. */
 	readonly acquisitionFactId?: string;
@@ -42,28 +37,6 @@ export type EditorItemEstimateDiagnostic =
 			readonly source: "authored-demand" | "request";
 	  }
 	| {
-			readonly factId: string;
-			readonly kind: "availability-condition-unsupported";
-			readonly reason: "exact-count" | "negative-condition" | "upper-bound";
-			readonly routeId: string;
-			readonly source: "line-condition" | "output-condition";
-	  }
-	| {
-			readonly factIds: ReadonlyArray<string>;
-			readonly kind: "charge-renewal-unsupported";
-			readonly routeId: string;
-	  }
-	| {
-			readonly kind: "charge-accounting-unsupported";
-			readonly reason: "multi-payer" | "stochastic-output";
-			readonly routeId: string;
-	  }
-	| {
-			readonly factId: string;
-			readonly kind: "finite-root-interaction-unsupported";
-			readonly quantity: number;
-	  }
-	| {
 			readonly kind: "joint-output-accounting-unsupported";
 			readonly reason: "state-space";
 			readonly routeId: string;
@@ -85,26 +58,17 @@ export type EditorItemEstimateDiagnostic =
 			readonly routeId: string;
 	  };
 
-export interface EditorItemEstimateRejectedRoute {
-	readonly diagnostics: ReadonlyArray<EditorItemEstimateDiagnostic>;
-	readonly routeId: string;
-}
-
 interface EditorItemEstimateBase {
 	readonly diagnostics: ReadonlyArray<EditorItemEstimateDiagnostic>;
 	readonly factId: string;
 	readonly limitations: ReadonlyArray<EditorAcquisitionLimitation>;
 	readonly quantity: number;
-	readonly rejectedRoutes: ReadonlyArray<EditorItemEstimateRejectedRoute>;
 }
 
 export interface ObtainableEditorItemEstimate extends EditorItemEstimateBase {
-	readonly consumables: ReadonlyArray<EditorItemEstimateAmount>;
 	readonly durationMs: number;
 	readonly obtainable: true;
 	readonly status: "complete";
-	readonly oneTimeRequirements: ReadonlyArray<EditorItemEstimateAmount>;
-	readonly ongoingRequirements: ReadonlyArray<EditorItemEstimateAmount>;
 	readonly route: EditorItemEstimateRouteStep;
 	/** Normalized selected-route DAG. Every acquired fact occurs exactly once. */
 	readonly routeSteps: ReadonlyArray<EditorItemEstimateRouteStep>;

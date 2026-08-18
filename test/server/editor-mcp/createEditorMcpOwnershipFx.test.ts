@@ -586,7 +586,7 @@ describe("createEditorMcpOwnershipFx", () => {
 						"Title: Ingot",
 						"Quantity: 1",
 						"Method: static authored dependency graph",
-						"Scheduling: sequential",
+						"Timing: optimistic sequential",
 					].join("\n"),
 				),
 			},
@@ -608,11 +608,7 @@ describe("createEditorMcpOwnershipFx", () => {
 				text: expect.stringContaining("Selected route graph:\n  - ingot [Ingot; simple]"),
 			},
 		]);
-		expect(itemEstimate.content).toMatchObject([
-			{
-				text: expect.stringContaining("Consumables:\n  - water [water; simple]: 3"),
-			},
-		]);
+		expect(JSON.stringify(itemEstimate.content)).not.toContain("Consumables:");
 		expect(itemEstimate.content).toMatchObject([
 			{
 				text: expect.not.stringContaining("planner"),
@@ -673,10 +669,8 @@ describe("createEditorMcpOwnershipFx", () => {
 					]
 				: [],
 		)[0];
-		expect(availabilityText).toContain(
-			"availability condition for water is unsupported on line-output:forge:line:forge:run:set:0:roll:0:drop:0:ingot (line-condition, exact-count)",
-		);
-		expect(availabilityText).not.toContain("undefined");
+		expect(availabilityText).toContain("Status: complete");
+		expect(availabilityText).toContain("Ignored: rules and conditions");
 		ownership.setProjectContext(graphProjectId);
 		const oversizedEstimate = await client.callTool({
 			name: "item_estimate",
@@ -732,24 +726,22 @@ describe("createEditorMcpOwnershipFx", () => {
 		expect(highFanInText).toContain("Selected route graph:");
 		expect(highFanInText).toContain(" -> ");
 		expect(highFanInText?.length).toBeLessThan(100_000);
-		const partialEstimate = await client.callTool({
+		const optimisticEstimate = await client.callTool({
 			name: "item_estimate",
 			arguments: {
 				itemId: "item:axe",
 			},
 		});
-		const partialText = partialEstimate.content.flatMap((content) =>
+		const optimisticText = optimisticEstimate.content.flatMap((content) =>
 			content.type === "text"
 				? [
 						content.text,
 					]
 				: [],
 		)[0];
-		expect(partialText).toContain("Status: partial");
-		expect(partialText).toContain("charged-item renewal unsupported");
-		expect(partialText).toContain("item:cracked-rock -> item:rock -> item:cracked-rock");
-		expect(partialText).not.toContain("Sequential duration:");
-		expect(partialText).not.toContain("Consumables:");
+		expect(optimisticText).toContain("Status: complete");
+		expect(optimisticText).toContain("Sequential duration:");
+		expect(optimisticText).not.toContain("Consumables:");
 		ownership.setProjectContext(projectId);
 		expect(unreachableEstimate.content).toMatchObject([
 			{

@@ -8,7 +8,6 @@ import type { EditorProjectRepositoryService } from "../../src/editor/EditorProj
 import { createEditorAcquisitionGraphFx } from "../../src/editor/createEditorAcquisitionGraphFx";
 import type {
 	EditorItemEstimate,
-	EditorItemEstimateAmount,
 	EditorItemEstimateDiagnostic,
 	EditorItemEstimateRouteStep,
 } from "../../src/editor/estimator/EditorItemEstimate";
@@ -233,16 +232,8 @@ const formatEstimateNumber = (value: number) =>
 
 const estimateDiagnosticText = (diagnostic: EditorItemEstimateDiagnostic) => {
 	switch (diagnostic.kind) {
-		case "availability-condition-unsupported":
-			return `availability condition for ${diagnostic.factId} is unsupported on ${diagnostic.routeId} (${diagnostic.source}, ${diagnostic.reason})`;
 		case "quantity-limit-exceeded":
 			return `${diagnostic.factId} x ${formatEstimateNumber(diagnostic.quantity)} exceeds the static estimate limit of ${diagnostic.maximumQuantity} (${diagnostic.source})`;
-		case "charge-accounting-unsupported":
-			return `static charge accounting unsupported on ${diagnostic.routeId} (${diagnostic.reason})`;
-		case "charge-renewal-unsupported":
-			return `charged-item renewal unsupported on ${diagnostic.routeId}: ${diagnostic.factIds.join(" -> ")}`;
-		case "finite-root-interaction-unsupported":
-			return `shared finite root ${diagnostic.factId} needs ${formatEstimateNumber(diagnostic.quantity)}; global sibling-route replanning is unsupported`;
 		case "joint-output-accounting-unsupported":
 			return `correlated output demand on ${diagnostic.routeId} exceeds the bounded static state space`;
 		case "cycle":
@@ -254,27 +245,14 @@ const estimateDiagnosticText = (diagnostic: EditorItemEstimateDiagnostic) => {
 	}
 };
 
-const estimateAmountLines = (
-	project: EditorProject,
-	amounts: ReadonlyArray<EditorItemEstimateAmount>,
-) =>
-	amounts.length === 0
-		? [
-				"  - none",
-			]
-		: amounts.map(
-				({ factId, quantity }) =>
-					`  - ${itemReference(project, factId)}: ${formatEstimateNumber(quantity)}`,
-			);
-
 const estimateLimitationText = (limitation: EditorItemEstimate["limitations"][number]) => {
 	switch (limitation) {
 		case "conditional-runtime-adjustments-ignored":
-			return "conditional runtime adjustment and multiplier rules are not included";
+			return "rules and conditional runtime adjustments are ignored";
 		case "negative-availability-constraints-ignored":
-			return "requirements that depend on another item remaining absent are not composed into the monotone estimate";
+			return "enable, disable, and availability conditions are ignored";
 		case "spatial-requirements-approximated":
-			return "board scope, distance, and concrete placement are approximated from authored item availability";
+			return "scope, distance, board capacity, and concrete placement are ignored";
 	}
 };
 
@@ -315,9 +293,10 @@ const itemEstimateText = (project: EditorProject, estimate: EditorItemEstimate) 
 		`Title: ${target.title}`,
 		`Quantity: ${formatEstimateNumber(estimate.quantity)}`,
 		"Method: static authored dependency graph",
-		"Scheduling: sequential",
+		"Timing: optimistic sequential",
 		"Start facts: authored board, inventory, and toolbar",
-		"Random output occurrences: independently evaluated by expected yield",
+		"Random output occurrences: expected-run economics",
+		"Ignored: rules and conditions, scope and placement, charge capacity and renewal, finite resource capacity",
 		"Limitations:",
 		...(estimate.limitations.length === 0
 			? [
@@ -332,7 +311,7 @@ const itemEstimateText = (project: EditorProject, estimate: EditorItemEstimate) 
 			...header,
 			`Status: ${estimate.status}`,
 			estimate.status === "partial"
-				? "Static analysis reaches authored mechanics it intentionally does not model completely; duration and material totals are indeterminate."
+				? "The authored path exceeds a bounded static-analysis limit; duration is indeterminate."
 				: "No complete acquisition route reaches the target from the authored start facts.",
 			"Diagnostics:",
 			...(estimate.diagnostics.length === 0
@@ -342,7 +321,6 @@ const itemEstimateText = (project: EditorProject, estimate: EditorItemEstimate) 
 				: estimate.diagnostics.map(
 						(diagnostic) => `  - ${estimateDiagnosticText(diagnostic)}`,
 					)),
-			`Rejected routes: ${estimate.rejectedRoutes.length}`,
 		].join("\n");
 
 	return [
@@ -354,13 +332,6 @@ const itemEstimateText = (project: EditorProject, estimate: EditorItemEstimate) 
 		`Expected output samples: ${formatEstimateNumber(estimate.route.outputRuns)}`,
 		"Selected route graph:",
 		...estimateRouteLines(project, estimate.routeSteps),
-		"Consumables:",
-		...estimateAmountLines(project, estimate.consumables),
-		"One-time requirements:",
-		...estimateAmountLines(project, estimate.oneTimeRequirements),
-		"Ongoing requirements:",
-		...estimateAmountLines(project, estimate.ongoingRequirements),
-		`Rejected alternatives: ${estimate.rejectedRoutes.length}`,
 		"Diagnostics:",
 		...(estimate.diagnostics.length === 0
 			? [
@@ -749,7 +720,7 @@ export const createEditorMcpServer = (
 		"item_estimate",
 		{
 			description:
-				"Analyze one item against the authored dependency graph. Returns the shortest canonical static acquisition route from the authored start facts without combinatorial sibling optimization, including sequential duration, consumables, one-time requirements, ongoing requirements, and explicit unreachable diagnostics.",
+				"Analyze one item against the authored dependency graph. Returns an optimistic sequential acquisition route with quantities, expected random-output economics, hard materials, owners, infrastructure, and deposit acquisition. Runtime rules, placement, charges, renewal, and finite capacity are ignored.",
 			inputSchema: z
 				.object({
 					itemId: IdSchema.describe(

@@ -26,7 +26,6 @@ const estimate: EditorItemEstimate = {
 	obtainable: false,
 	status: "unreachable",
 	quantity: 1,
-	rejectedRoutes: [],
 };
 
 describe("runEditorItemEstimateInWorkerFx", () => {

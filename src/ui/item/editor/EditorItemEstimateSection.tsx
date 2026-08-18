@@ -2,12 +2,10 @@ import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type {
 	EditorItemEstimate,
-	EditorItemEstimateAmount,
 	EditorItemEstimateDiagnostic,
 } from "~/editor/estimator/EditorItemEstimate";
 import type { EditorAcquisitionLimitation } from "~/editor/EditorAcquisitionGraph";
 import { formatItemDurationFx } from "~/ui/item-detail/formatItemDurationFx";
-import { EditorItemDetailReference } from "~/ui/item/editor/EditorItemDetailReference";
 import { EditorItemEstimateRouteGraph } from "~/ui/item/editor/EditorItemEstimateRouteGraph";
 import { useEditorItemEstimate } from "~/ui/item/editor/useEditorItemEstimate";
 import { Status } from "~/ui/status/Status";
@@ -20,16 +18,8 @@ const formatRuntime = (runtimeMs: number) =>
 
 const diagnosticText = (diagnostic: EditorItemEstimateDiagnostic) => {
 	switch (diagnostic.kind) {
-		case "availability-condition-unsupported":
-			return `Availability condition for ${diagnostic.factId} is unsupported on route ${diagnostic.routeId} (${diagnostic.source}, ${diagnostic.reason}).`;
 		case "quantity-limit-exceeded":
 			return `${diagnostic.factId} × ${formatQuantity(diagnostic.quantity)} exceeds the static estimate limit of ${diagnostic.maximumQuantity} (${diagnostic.source}).`;
-		case "charge-accounting-unsupported":
-			return `Static charge accounting is unsupported on route ${diagnostic.routeId} (${diagnostic.reason}).`;
-		case "charge-renewal-unsupported":
-			return `Static analysis stops at charged-item renewal on route ${diagnostic.routeId}: ${diagnostic.factIds.join(" → ")}.`;
-		case "finite-root-interaction-unsupported":
-			return `Shared finite root ${diagnostic.factId} needs ${formatQuantity(diagnostic.quantity)}; global sibling-route replanning is intentionally unsupported.`;
 		case "joint-output-accounting-unsupported":
 			return `Correlated output demand on ${diagnostic.routeId} exceeds the bounded static state space.`;
 		case "cycle":
@@ -44,73 +34,15 @@ const diagnosticText = (diagnostic: EditorItemEstimateDiagnostic) => {
 const limitationText = (limitation: EditorAcquisitionLimitation) => {
 	switch (limitation) {
 		case "conditional-runtime-adjustments-ignored":
-			return "Conditional runtime adjustment and multiplier rules are not included.";
+			return "Rules and conditional runtime adjustments are ignored.";
 		case "negative-availability-constraints-ignored":
-			return "Requirements that depend on another item remaining absent are not composed into the monotone estimate.";
+			return "Enable, disable, and availability conditions are ignored.";
 		case "spatial-requirements-approximated":
-			return "Board scope, distance, and concrete placement are approximated from authored item availability.";
+			return "Scope, distance, board capacity, and concrete placement are ignored.";
 	}
 };
 
-const EditorItemEstimateAmountList = ({
-	amounts,
-	config,
-	empty,
-	projectId,
-	title,
-}: {
-	readonly amounts: ReadonlyArray<EditorItemEstimateAmount>;
-	readonly config: ReturnType<typeof useEditorProject>["config"];
-	readonly empty: string;
-	readonly projectId: string;
-	readonly title: string;
-}) => (
-	<section>
-		<h4 className="sticky top-0 z-10 border-b border-line/70 bg-surface-raised py-2 text-[0.6875rem] font-semibold uppercase tracking-wide text-muted">
-			{title}
-		</h4>
-		{amounts.length === 0 ? (
-			<p className="py-3 text-sm text-muted">{empty}</p>
-		) : (
-			<ul className="divide-y divide-line/60">
-				{amounts.map(({ factId, quantity }) => {
-					const item = config.items[factId];
-					return (
-						<li
-							className="flex min-h-14 items-center justify-between gap-3 py-1.5 text-sm"
-							key={factId}
-						>
-							{item === undefined ? (
-								<span className="min-w-0 truncate text-muted">
-									{factId} [missing]
-								</span>
-							) : (
-								<EditorItemDetailReference
-									item={item}
-									projectId={projectId}
-									sectionId="estimate"
-								/>
-							)}
-							<strong className="shrink-0 tabular-nums text-foreground">
-								× {formatQuantity(quantity)}
-							</strong>
-						</li>
-					);
-				})}
-			</ul>
-		)}
-	</section>
-);
-
-const EditorItemEstimateResultCard = ({
-	config,
-	estimate,
-	projectId,
-}: {
-	readonly config: ReturnType<typeof useEditorProject>["config"];
-	readonly estimate: EditorItemEstimate;
-	readonly projectId: string;
-}) => (
+const EditorItemEstimateResultCard = ({ estimate }: { readonly estimate: EditorItemEstimate }) => (
 	<article
 		className="flex min-h-0 min-w-0 flex-col rounded-lg border border-l-2 border-violet-300 border-l-violet-600 bg-surface-raised p-4"
 		data-ui="EditorItemEstimateResult"
@@ -144,33 +76,12 @@ const EditorItemEstimateResultCard = ({
 					</h4>
 					<EditorItemEstimateRouteGraph routeSteps={estimate.routeSteps} />
 				</section>
-				<EditorItemEstimateAmountList
-					amounts={estimate.consumables}
-					config={config}
-					empty="No consumed requirements."
-					projectId={projectId}
-					title="Consumed"
-				/>
-				<EditorItemEstimateAmountList
-					amounts={estimate.oneTimeRequirements}
-					config={config}
-					empty="No one-time requirements."
-					projectId={projectId}
-					title="One-time requirements"
-				/>
-				<EditorItemEstimateAmountList
-					amounts={estimate.ongoingRequirements}
-					config={config}
-					empty="No ongoing requirements."
-					projectId={projectId}
-					title="Ongoing requirements"
-				/>
 			</div>
 		) : (
 			<div className="grid gap-3 py-4 text-sm leading-relaxed text-muted">
 				<p className="font-medium text-foreground">
 					{estimate.status === "partial"
-						? "The authored path reaches mechanics that static analysis intentionally does not model completely, so totals are indeterminate."
+						? "The authored path exceeds a bounded static-analysis limit, so totals are indeterminate."
 						: "The authored dependency graph contains no complete route from the configured starting facts."}
 				</p>
 				<ul className="grid gap-2">
@@ -192,13 +103,13 @@ const EditorItemEstimateMethodCard = ({ estimate }: { readonly estimate: EditorI
 			<span className="icon-[lucide--calculator] mt-0.5 size-5 shrink-0 text-sky-700" />
 			<div>
 				<h3 className="font-semibold text-foreground">Static dependency estimator</h3>
-				<p className="mt-1 text-xs text-muted">Deterministic authored-graph analysis</p>
+				<p className="mt-1 text-xs text-muted">Optimistic authored-graph analysis</p>
 			</div>
 		</header>
 		<p className="py-3 text-xs leading-relaxed text-muted">
-			Compares complete canonical acquisition routes without combinatorial sibling
-			optimization. Random output occurrences independently use expected yield; all work is
-			scheduled sequentially.
+			Compares complete canonical acquisition routes using expected random-output economics
+			and serial work. Runtime rules, placement, charge capacity, and finite resource capacity
+			are ignored.
 		</p>
 		<ul className="grid gap-2 border-t border-line/70 pt-3 text-xs leading-relaxed text-muted">
 			{estimate.obtainable ? (
@@ -212,13 +123,12 @@ const EditorItemEstimateMethodCard = ({ estimate }: { readonly estimate: EditorI
 			) : (
 				<li>
 					{estimate.status === "partial"
-						? "No duration or material totals are claimed for this incomplete path."
+						? "No duration is claimed for this incomplete path."
 						: "No route satisfied every required dependency."}
 				</li>
 			)}
-			<li>Rejected alternatives: {formatQuantity(estimate.rejectedRoutes.length)}.</li>
 			<li>Starting authored items contribute no acquisition time.</li>
-			<li>One-time requirements are deduplicated across the selected route.</li>
+			<li>Route requirements provide the complete timing explanation.</li>
 			{estimate.limitations.map((limitation) => (
 				<li key={limitation}>Limitation: {limitationText(limitation)}</li>
 			))}
@@ -258,11 +168,7 @@ export const EditorItemEstimateSection = ({ itemId }: { readonly itemId: string 
 			) : null}
 			{state.status === "ready" ? (
 				<div className="grid grid-cols-2 gap-3 max-[64rem]:grid-cols-1">
-					<EditorItemEstimateResultCard
-						config={project.config}
-						estimate={state.estimate}
-						projectId={project.projectId}
-					/>
+					<EditorItemEstimateResultCard estimate={state.estimate} />
 					<EditorItemEstimateMethodCard estimate={state.estimate} />
 				</div>
 			) : null}

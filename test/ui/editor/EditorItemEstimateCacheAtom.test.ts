@@ -23,17 +23,13 @@ const estimate = (factId: string): EditorItemEstimate => {
 		source: "route" as const,
 	};
 	return {
-		consumables: [],
 		diagnostics: [],
 		durationMs: 1,
 		factId,
 		limitations: [],
 		obtainable: true,
 		status: "complete",
-		oneTimeRequirements: [],
-		ongoingRequirements: [],
 		quantity: 1,
-		rejectedRoutes: [],
 		route,
 		routeSteps: [
 			route,

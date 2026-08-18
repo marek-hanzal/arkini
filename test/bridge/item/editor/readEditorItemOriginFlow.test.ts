@@ -11,6 +11,7 @@ import {
 import { readEditorItemOriginFlowFx } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
 import type { EditorOutput } from "~/bridge/item/editor/EditorItemModel";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { RuleSchema as LineRuleSchema } from "~/engine/line/schema/rule/RuleSchema";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import { createMergeTestConfig } from "~test/merge/support/createMergeTestConfig";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
@@ -45,6 +46,29 @@ const outputOf = (itemId: string, ...additionalItemIds: ReadonlyArray<string>): 
 					] as EditorGuaranteedRoll["drop"],
 				},
 			],
+		},
+	],
+});
+
+const availabilityRule = (
+	itemId: string,
+): Extract<
+	LineRuleSchema.Type,
+	{
+		type: "enable";
+	}
+> => ({
+	type: "enable" as const,
+	when: [
+		{
+			query: {
+				scope: "universe" as const,
+				selector: {
+					itemId,
+					type: "item" as const,
+				},
+			},
+			type: "exists" as const,
 		},
 	],
 });
@@ -247,6 +271,71 @@ describe("readEditorItemOriginFlow", () => {
 				(update, index) => index === 0 || update.percent >= progress[index - 1]!.percent,
 			),
 		).toBe(true);
+	});
+
+	it("keeps raw line and output conditions in a selected Income source", async () => {
+		const base = createReachabilityConfig(true);
+		const forge = base.items.forge;
+		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
+		const conditionedOutput: EditorOutput = {
+			set: [
+				{
+					weight: 1,
+					roll: [
+						{
+							type: "guaranteed",
+							drop: [
+								{
+									...outputDrop("ingot"),
+									rules: [
+										availabilityRule("output-permit"),
+									],
+								},
+							],
+						},
+					],
+				},
+			],
+		};
+		const config = GameConfigSchema.parse({
+			...base,
+			items: {
+				...base.items,
+				forge: {
+					...forge,
+					lines: forge.lines.map((line) => ({
+						...line,
+						output: conditionedOutput,
+						rules: [
+							availabilityRule("line-permit"),
+						],
+					})),
+				},
+				"line-permit": {
+					...base.items.tool,
+					id: "line-permit",
+					title: "Line Permit",
+					uid: "line-permit",
+				},
+				"output-permit": {
+					...base.items.tool,
+					id: "output-permit",
+					title: "Output Permit",
+					uid: "output-permit",
+				},
+			},
+		});
+
+		const flow = await Effect.runPromise(
+			readEditorItemOriginFlowFx({
+				config,
+				targetItemId: "ingot",
+			}),
+		);
+
+		const nodeIds = new Set(flow.nodes.map(({ id }) => id));
+		expect(nodeIds.has("item:line-permit")).toBe(true);
+		expect(nodeIds.has("item:output-permit")).toBe(true);
 	});
 
 	it("stops Income immediately when the selected item already exists at game start", async () => {

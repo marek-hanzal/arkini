@@ -122,23 +122,6 @@ const combineRequirements = (
 	unsupported: groups.flatMap(({ unsupported }) => unsupported ?? []),
 });
 
-const makeOrdinaryLineRequirements = (
-	requirements: EditorAcquisitionRoute["requirements"],
-	chargedItemIds: ReadonlySet<string>,
-): EditorAcquisitionRoute["requirements"] => ({
-	...requirements,
-	allOf: requirements.allOf.filter(
-		(requirement) =>
-			!(
-				[
-					"deposit-input",
-					"owner",
-				] as const
-			).includes(requirement.source as "deposit-input" | "owner") ||
-			!chargedItemIds.has(requirement.factId),
-	),
-});
-
 const makeChargeDepletionRequirements = (
 	requirements: EditorAcquisitionRoute["requirements"],
 	chargedItemId: string,
@@ -208,7 +191,6 @@ const readLineOperationInputs = (line: LineSchema.Type) =>
 	});
 
 const readLineDescriptorFx = Effect.fn("createEditorAcquisitionGraphFx.line")(function* (
-	config: GameConfigSchema.Type,
 	owner: ItemSchema.Type,
 	line: LineSchema.Type,
 ) {
@@ -224,7 +206,6 @@ const readLineDescriptorFx = Effect.fn("createEditorAcquisitionGraphFx.line")(fu
 	};
 
 	for (const input of line.input) {
-		if (input.type === "deposit" && input.charges === undefined) return undefined;
 		if (input.type === "materials")
 			requirements.push(
 				makeRequirement(
@@ -249,23 +230,7 @@ const readLineDescriptorFx = Effect.fn("createEditorAcquisitionGraphFx.line")(fu
 				cost: input.charges.cost,
 				from: "target",
 			});
-		else return undefined;
-	}
-	for (const [itemId, costs] of chargeCostsByItemId) {
-		const payer = config.items[itemId];
-		const capacity = payer?.charges?.amount;
-		if (capacity === undefined || costs.some(({ cost }) => cost > capacity)) return undefined;
-		const selfSpend = costs.reduce(
-			(total, charge) => total + (charge.from === "self" ? charge.cost : 0),
-			0,
-		);
-		if (selfSpend > capacity) return undefined;
-		const targetSpend = costs.reduce(
-			(total, charge) => total + (charge.from === "target" ? charge.cost : 0),
-			0,
-		);
-		if (payer.maxCount !== undefined && targetSpend > capacity * payer.maxCount)
-			return undefined;
+		else continue;
 	}
 
 	const availability = yield* readEditorAcquisitionAvailabilityRequirementsFx({
@@ -314,7 +279,6 @@ const readLineRoutesFx = Effect.fn("createEditorAcquisitionGraphFx.lineRoutes")(
 				accounting === "single-payer-exact" ? Math.floor(charges.amount / spendPerRun) : 0,
 		});
 	}
-	const chargedItemIds = new Set(chargeUses.map(({ payerFactId }) => payerFactId));
 	const outputModel = yield* readEditorAcquisitionOutputOccurrencesFx(descriptor.line.output);
 	const operation = {
 		...descriptor.operation,
@@ -348,10 +312,7 @@ const readLineRoutesFx = Effect.fn("createEditorAcquisitionGraphFx.lineRoutes")(
 				operationOutputGroupId: occurrence.operationOutputGroupId,
 				quantityDistribution: occurrence.quantityDistribution,
 			},
-			requirements: combineRequirements(
-				makeOrdinaryLineRequirements(descriptor.requirements, chargedItemIds),
-				occurrence.requirements,
-			),
+			requirements: combineRequirements(descriptor.requirements, occurrence.requirements),
 			runMultiplier: 1,
 		});
 
@@ -573,7 +534,7 @@ export const createEditorAcquisitionGraphFx = Effect.fn("createEditorAcquisition
 		const descriptors: LineDescriptor[] = [];
 		for (const item of Object.values(config.items))
 			for (const line of readItemLines(item)) {
-				const descriptor = yield* readLineDescriptorFx(config, item, line);
+				const descriptor = yield* readLineDescriptorFx(item, line);
 				if (descriptor !== undefined) descriptors.push(descriptor);
 			}
 		const routes: EditorAcquisitionRoute[] = [];

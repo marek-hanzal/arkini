@@ -7,6 +7,7 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
+import { isSameTileActorLocation } from "~/bridge/tile/isSameTileActorLocation";
 import {
 	readTileDropPreviewFx,
 	type readTileDropPreviewFx as ReadTileDropPreviewFx,
@@ -257,17 +258,30 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 			drag: ActiveInventoryDrag,
 			target: PixiInventoryDropTarget | null,
 			force = false,
-		) => {
-			if (!force && drag.target?.x === target?.x && drag.target?.y === target?.y) return;
+		): TileActorItem | null => {
+			const current = RendererRuntime.runSync(actorStore.readActorFx(drag.sourceItem.id));
+			if (
+				current === null ||
+				current !== drag.actor ||
+				current.container.destroyed ||
+				!isSameTileActorLocation(current.item.location, drag.sourceItem.location)
+			) {
+				cancelInteraction();
+				return null;
+			}
+			const sourceItem = current.item;
+			if (!force && drag.target?.x === target?.x && drag.target?.y === target?.y) {
+				return sourceItem;
+			}
 			drag.target = target;
 			let kind: ReadTileDropPreviewFx.Result["kind"] | null = null;
 			try {
 				kind = RendererRuntime.runSync(
 					readTileDropPreviewFx({
 						game,
-						sourceItemId: drag.sourceItem.id,
-						sourceLocation: drag.sourceItem.location,
-						sourceRevision: drag.sourceItem.revision,
+						sourceItemId: sourceItem.id,
+						sourceLocation: sourceItem.location,
+						sourceRevision: sourceItem.revision,
 						target: readCommandTarget(target),
 					}),
 				).kind;
@@ -278,10 +292,11 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 				readPixiTileActorCursorFx({
 					phase: "dragging",
 					previewKind: kind,
-					running: drag.sourceItem.running,
+					running: sourceItem.running,
 				}),
 			);
 			RendererRuntime.runSync(surface.renderDropFeedbackFx(target, kind));
+			return sourceItem;
 		};
 
 		const settleActor = (actor: PixiTileActor) => {
@@ -369,20 +384,21 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 				surface.readDropTargetFx(event.global.x, event.global.y),
 			);
 			// The occupant may have changed while the pointer remained over this slot.
-			previewTarget(drag, target, true);
+			const sourceItem = previewTarget(drag, target, true);
+			if (sourceItem === null) return;
 			RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
 			drag.phase = "submitting";
 			drag.actor.container.cursor = RendererRuntime.runSync(
 				readPixiTileActorCursorFx({
 					phase: "pending",
 					previewKind: null,
-					running: drag.sourceItem.running,
+					running: sourceItem.running,
 				}),
 			);
 			const command = {
-				sourceItemId: drag.sourceItem.id,
-				sourceLocation: drag.sourceItem.location,
-				sourceRevision: drag.sourceItem.revision,
+				sourceItemId: sourceItem.id,
+				sourceLocation: sourceItem.location,
+				sourceRevision: sourceItem.revision,
 				target: readCommandTarget(target),
 			} satisfies runTileDropAtom.Command;
 			let submittedDrop: PromiseLike<runTileDropAtom.Result | null>;
@@ -399,7 +415,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 						const current = RendererRuntime.runSync(
 							actorStore.readActorFx(drag.sourceItem.id),
 						);
-						if (current !== null) {
+						if (current === drag.actor) {
 							current.dragging = false;
 							current.container.zIndex = 0;
 							current.container.cursor = RendererRuntime.runSync(
@@ -431,7 +447,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 					const current = RendererRuntime.runSync(
 						actorStore.readActorFx(drag.sourceItem.id),
 					);
-					if (current !== null) {
+					if (current === drag.actor) {
 						current.dragging = false;
 						settleActor(current);
 					}

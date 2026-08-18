@@ -1002,6 +1002,68 @@ describe("Pixi Inventory scene runtime", () => {
 		await Effect.runPromise(runtime.closeFx);
 	});
 
+	it("rebases Inventory preview and release to the latest actor revision", async () => {
+		const { actor, runtime, stage } = await mountScene();
+		const latest = {
+			...inventoryItem,
+			quantity: 3,
+			revision: "revision:water:latest",
+		};
+
+		(actor.container as unknown as FakeContainer).emit("pointerdown", slotPointer(0));
+		stage.emit("globalpointermove", slotPointer(1));
+		publishItems([
+			latest,
+		]);
+
+		expect(sceneState.preview).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				sourceItemId: latest.id,
+				sourceLocation: latest.location,
+				sourceRevision: latest.revision,
+			}),
+		);
+
+		stage.emit("pointerup", slotPointer(1));
+
+		expect(sceneState.drop).toHaveBeenCalledWith(
+			expect.objectContaining({
+				sourceItemId: latest.id,
+				sourceLocation: latest.location,
+				sourceRevision: latest.revision,
+			}),
+		);
+		await Effect.runPromise(runtime.closeFx);
+	});
+
+	it("cancels an Inventory release when the held actor moves", async () => {
+		const { actor, runtime, stage } = await mountScene();
+
+		(actor.container as unknown as FakeContainer).emit("pointerdown", slotPointer(0));
+		stage.emit("globalpointermove", slotPointer(1));
+		publishItems([
+			moveInventoryItem(1),
+		]);
+		stage.emit("pointerup", slotPointer(1));
+
+		expect(sceneState.drop).not.toHaveBeenCalled();
+		expect(actor.dragging).toBe(false);
+		await Effect.runPromise(runtime.closeFx);
+	});
+
+	it("cancels an Inventory release when the held actor disappears", async () => {
+		const { actor, runtime, stage } = await mountScene();
+
+		(actor.container as unknown as FakeContainer).emit("pointerdown", slotPointer(0));
+		stage.emit("globalpointermove", slotPointer(1));
+		publishItems([]);
+		stage.emit("pointerup", slotPointer(1));
+
+		expect(sceneState.drop).not.toHaveBeenCalled();
+		expect(actor.dragging).toBe(false);
+		await Effect.runPromise(runtime.closeFx);
+	});
+
 	it("submits the exact occupied Inventory slot so the engine can commit a swap", async () => {
 		sceneState.items = [
 			inventoryItem,

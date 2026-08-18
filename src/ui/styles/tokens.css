@@ -1,0 +1,191 @@
+@theme inline {
+	--color-canvas: var(--ak-canvas);
+	--color-surface: var(--ak-surface);
+	--color-surface-raised: var(--ak-surface-raised);
+	--color-foreground: var(--ak-foreground);
+	--color-muted: var(--ak-muted);
+	--color-subtle: var(--ak-subtle);
+	--color-line: var(--ak-line);
+	--color-line-strong: var(--ak-line-strong);
+	--color-accent: var(--ak-accent);
+	--color-accent-hover: var(--ak-accent-hover);
+	--color-accent-contrast: var(--ak-accent-contrast);
+	--color-info: var(--ak-info);
+	--color-info-contrast: var(--ak-info-contrast);
+	--color-secondary-subtle: var(--ak-secondary-subtle);
+	--color-secondary-hover: var(--ak-secondary-hover);
+	--color-secondary-selected: var(--ak-secondary-selected);
+	--color-secondary-border: var(--ak-secondary-border);
+	--color-secondary-foreground: var(--ak-secondary-foreground);
+	--color-success: var(--ak-success);
+	--color-warning: var(--ak-warning);
+	--color-danger: var(--ak-danger);
+	--color-danger-contrast: var(--ak-danger-contrast);
+	--color-overlay: var(--ak-overlay);
+	--color-overlay-foreground: var(--ak-overlay-foreground);
+	--radius-xs: var(--ak-radius-xs);
+	--radius-sm: var(--ak-radius-sm);
+	--radius-md: var(--ak-radius-md);
+	--radius-lg: var(--ak-radius-lg);
+	--radius-xl: var(--ak-radius-xl);
+	--radius-2xl: var(--ak-radius-2xl);
+	--radius-3xl: var(--ak-radius-3xl);
+	--radius-4xl: var(--ak-radius-4xl);
+}
+
+:root {
+	color-scheme: dark;
+	font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+
+	--ak-canvas: light-dark(#fbf8ff, #090711);
+	--ak-surface: light-dark(#fffaff, #151020);
+	--ak-surface-raised: light-dark(#f3eafd, #231730);
+	--ak-foreground: light-dark(#2a1532, #fcf6ff);
+	--ak-muted: light-dark(#705d79, #bdaecc);
+	--ak-subtle: light-dark(#917f9a, #877792);
+	--ak-line: light-dark(#e4d7eb, #382744);
+	--ak-line-strong: light-dark(#c9b4d5, #654c75);
+	--ak-accent: light-dark(#b9247d, #f05bb8);
+	--ak-accent-hover: light-dark(#9e1969, #ff7ccc);
+	--ak-accent-contrast: light-dark(#fff9fc, #2a0a1d);
+	--ak-info: light-dark(#4b4da8, #8e90f8);
+	--ak-info-contrast: light-dark(#fff, #0c1030);
+	--ak-success: light-dark(#75508c, #caa9df);
+	--ak-secondary-subtle: light-dark(#f6eef9, #241b2c);
+	--ak-secondary-hover: light-dark(#ead9f0, #392943);
+	--ak-secondary-selected: light-dark(#dcc0e6, #50365e);
+	--ak-secondary-border: light-dark(#ad82bd, #9d70b0);
+	--ak-secondary-foreground: light-dark(#60336f, #f0d7fa);
+	--ak-warning: light-dark(#985a12, #f1b45e);
+	--ak-danger: light-dark(#b72b63, #ff6c9f);
+	--ak-danger-contrast: light-dark(#fff9fc, #310914);
+	--ak-flow-item-blueprint-surface: light-dark(#f2e2ff, #342044);
+	--ak-flow-item-craft-surface: light-dark(#fff0cf, #3b2b17);
+	--ak-flow-item-deposit-surface: light-dark(#e1f3e7, #193326);
+	--ak-flow-item-inventory-surface: light-dark(#e4eaff, #202849);
+	--ak-flow-item-producer-surface: light-dark(#f9dfef, #412039);
+	--ak-flow-item-simple-surface: light-dark(#f1edf3, #29232d);
+	--ak-flow-item-stash-surface: light-dark(#dff4f2, #173635);
+	--ak-flow-item-temporary-surface: light-dark(#f9e1df, #422322);
+	--ak-flow-item-missing-surface: light-dark(#ffdce7, #481b2b);
+	--ak-flow-source-line-surface: light-dark(#e7e2ff, #292247);
+	--ak-flow-source-charges-surface: light-dark(#ffebce, #3c2916);
+	--ak-flow-source-merge-surface: light-dark(#dbf3e9, #17362b);
+	--ak-flow-source-expiry-surface: light-dark(#f9dfe8, #421e2d);
+	--ak-overlay: light-dark(#1a1124, #090611);
+	--ak-overlay-foreground: light-dark(#fff9ff, #fff9ff);
+
+	--ak-radius-xs: 0.0625rem;
+	--ak-radius-sm: 0.125rem;
+	--ak-radius-md: 0.1875rem;
+	--ak-radius-lg: 0.25rem;
+	--ak-radius-xl: 0.375rem;
+	--ak-radius-2xl: 0.5rem;
+	--ak-radius-3xl: 0.75rem;
+	--ak-radius-4xl: 1rem;
+
+	--ak-scrollbar-size: 0.625rem;
+	--ak-scrollbar-track: light-dark(
+		color-mix(in srgb, var(--ak-surface-raised) 72%, transparent),
+		color-mix(in srgb, var(--ak-canvas) 72%, transparent)
+	);
+	--ak-scrollbar-thumb: light-dark(
+		color-mix(in srgb, var(--ak-muted) 54%, var(--ak-surface)),
+		color-mix(in srgb, var(--ak-muted) 58%, var(--ak-surface))
+	);
+	--ak-scrollbar-thumb-hover: light-dark(
+		color-mix(in srgb, var(--ak-accent) 48%, var(--ak-muted)),
+		color-mix(in srgb, var(--ak-accent) 56%, var(--ak-muted))
+	);
+	--ak-scrollbar-thumb-active: light-dark(
+		color-mix(in srgb, var(--ak-accent) 72%, var(--ak-muted)),
+		color-mix(in srgb, var(--ak-accent) 76%, var(--ak-muted))
+	);
+	--ak-scrollbar-track-border: light-dark(
+		color-mix(in srgb, var(--ak-line) 72%, transparent),
+		color-mix(in srgb, var(--ak-line) 58%, transparent)
+	);
+	--ak-scrollbar-corner: var(--ak-scrollbar-track);
+
+	--ak-tile-grid-slot-surface-a: light-dark(
+		color-mix(in srgb, var(--ak-surface) 96%, var(--ak-surface-raised)),
+		color-mix(in srgb, var(--ak-surface) 96%, var(--ak-surface-raised))
+	);
+	--ak-tile-grid-slot-surface-b: light-dark(
+		color-mix(in srgb, var(--ak-surface-raised) 68%, var(--ak-surface)),
+		color-mix(in srgb, var(--ak-surface-raised) 68%, var(--ak-surface))
+	);
+
+	--ak-toolbar-grid-hue: color-mix(in srgb, var(--ak-info) 52%, var(--ak-accent));
+	--ak-toolbar-grid-slot-surface-a: color-mix(
+		in srgb,
+		var(--ak-toolbar-grid-hue) 6%,
+		var(--ak-surface)
+	);
+	--ak-toolbar-grid-slot-surface-b: color-mix(
+		in srgb,
+		var(--ak-toolbar-grid-hue) 13%,
+		var(--ak-surface)
+	);
+
+	--ak-list-row-surface: light-dark(
+		color-mix(in srgb, var(--ak-surface-raised) 72%, var(--ak-surface)),
+		color-mix(in srgb, var(--ak-surface-raised) 68%, var(--ak-surface))
+	);
+	--ak-list-row-interactive-surface: light-dark(
+		color-mix(in srgb, var(--ak-accent) 10%, var(--ak-surface-raised)),
+		color-mix(in srgb, var(--ak-accent) 13%, var(--ak-surface-raised))
+	);
+	--ak-list-row-active-surface: light-dark(
+		color-mix(in srgb, var(--ak-success) 14%, var(--ak-surface)),
+		color-mix(in srgb, var(--ak-success) 18%, var(--ak-surface))
+	);
+	--ak-list-row-active-progress-surface: light-dark(
+		color-mix(in srgb, var(--ak-success) 28%, var(--ak-surface)),
+		color-mix(in srgb, var(--ak-success) 34%, var(--ak-surface))
+	);
+	--ak-line-input-delivery-surface: light-dark(
+		color-mix(in srgb, var(--ak-warning) 10%, var(--ak-surface)),
+		color-mix(in srgb, var(--ak-warning) 14%, var(--ak-surface))
+	);
+	--ak-list-row-selected-surface: var(--ak-accent);
+	--ak-list-row-selected-foreground: var(--ak-accent-contrast);
+	--ak-list-row-pending-surface: light-dark(
+		color-mix(in srgb, var(--ak-info) 16%, var(--ak-surface)),
+		color-mix(in srgb, var(--ak-info) 20%, var(--ak-surface))
+	);
+	--ak-list-row-disabled-surface: light-dark(
+		color-mix(in srgb, var(--ak-surface) 86%, var(--ak-muted)),
+		color-mix(in srgb, var(--ak-surface) 88%, var(--ak-muted))
+	);
+	--ak-list-row-emphasis-border: light-dark(
+		color-mix(in srgb, var(--ak-accent) 44%, var(--ak-line)),
+		color-mix(in srgb, var(--ak-accent) 52%, var(--ak-line))
+	);
+	--ak-list-row-transition-duration: 200ms;
+	--ak-list-row-transition-easing: cubic-bezier(0.22, 1, 0.36, 1);
+
+	--ak-spotlight-option-surface: transparent;
+	--ak-spotlight-option-hover-surface: light-dark(
+		color-mix(in srgb, var(--ak-accent) 9%, var(--ak-surface-raised)),
+		color-mix(in srgb, var(--ak-accent) 13%, var(--ak-surface-raised))
+	);
+	--ak-spotlight-option-selected-surface: var(--ak-accent);
+	--ak-spotlight-option-selected-hover-surface: var(--ak-accent-hover);
+	--ak-spotlight-option-selected-foreground: var(--ak-accent-contrast);
+	--ak-spotlight-option-selected-secondary: color-mix(
+		in srgb,
+		var(--ak-accent-contrast) 78%,
+		transparent
+	);
+	--ak-spotlight-option-emphasis-border: light-dark(
+		color-mix(in srgb, var(--ak-accent) 62%, var(--ak-line-strong)),
+		color-mix(in srgb, var(--ak-accent) 72%, var(--ak-line-strong))
+	);
+
+	--ak-game-shell-background: light-dark(#e7d8ee, #24142f);
+	color: var(--ak-foreground);
+	background: var(--ak-canvas);
+}

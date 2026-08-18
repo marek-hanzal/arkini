@@ -1,28 +1,14 @@
-import type { EditorItem, EditorLine } from "~/bridge/item/editor/EditorItemModel";
+import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
+import { readEditorItemLinesFx } from "~/bridge/item/editor/readEditorItemLinesFx";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { DetailFact, DetailSection } from "~/ui/item/editor/EditorItemDetailDefinition";
 import { OutputDetail } from "~/ui/item/editor/EditorItemOutputDetail";
 import { EditorProductionLineDetail } from "~/ui/item/editor/EditorProductionLineDetail";
 import { Status } from "~/ui/status/Status";
 
-const readProductionLines = (item: EditorItem): ReadonlyArray<EditorLine> => {
-	switch (item.type) {
-		case "blueprint":
-		case "craft":
-		case "stash":
-			return [
-				item.line,
-			];
-		case "deposit":
-		case "producer":
-			return item.lines ?? [];
-		default:
-			return [];
-	}
-};
-
 /** Dispatches production-capable lines, temporary lifetime, or the disabled contract. */
 export const EditorItemProductionDetail = ({ item }: { readonly item: EditorItem }) => {
-	const lines = readProductionLines(item);
+	const lines = RendererRuntime.runSync(readEditorItemLinesFx(item));
 	if (lines.length > 0)
 		return (
 			<div className="ak-list grid gap-3">

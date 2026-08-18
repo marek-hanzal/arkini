@@ -1,25 +1,9 @@
 import { Effect } from "effect";
 
 import { createEditorItemDraftFx } from "~/bridge/item/editor/createEditorItemDraftFx";
-import type { EditorItem, EditorItemType, EditorLine } from "~/bridge/item/editor/EditorItemModel";
+import type { EditorItem, EditorItemType } from "~/bridge/item/editor/EditorItemModel";
+import { readEditorItemLinesFx } from "~/bridge/item/editor/readEditorItemLinesFx";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
-
-const readLines = (item: EditorItem): ReadonlyArray<EditorLine> => {
-	switch (item.type) {
-		case "blueprint":
-		case "craft":
-		case "stash":
-			return [
-				item.line,
-			];
-		case "deposit":
-			return item.lines ?? [];
-		case "producer":
-			return item.lines;
-		default:
-			return [];
-	}
-};
 
 /** Converts one canonical item while retaining every field understood by the target type. */
 export const convertEditorItemFx = Effect.fn("convertEditorItemFx")(
@@ -55,8 +39,8 @@ export const convertEditorItemFx = Effect.fn("convertEditorItemFx")(
 							merge: item.merge,
 						}),
 			};
-			const lines = readLines(item);
-			const fallbackLines = readLines(fallback);
+			const lines = yield* readEditorItemLinesFx(item);
+			const fallbackLines = yield* readEditorItemLinesFx(fallback);
 			const fallbackLine = fallbackLines[0];
 			const fallbackQueueSize =
 				fallback.type === "deposit" || fallback.type === "producer"

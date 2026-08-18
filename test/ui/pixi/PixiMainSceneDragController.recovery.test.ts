@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
@@ -7,7 +8,8 @@ import {
 	flushMicrotasks,
 	mountController,
 	pointer,
-	previewTestState as previewState,
+	releaseOrdinaryDrag,
+	setOrdinaryInventoryTarget,
 	samplePoseAnimation,
 } from "~test/ui/pixi/PixiMainSceneDragController.test/fixture";
 
@@ -19,22 +21,11 @@ describe("Pixi main-scene drag controller: recovery", () => {
 				inventory,
 			],
 		});
-		previewState.actorKinds.set(inventory.id, "store-inventory");
-		mounted.setOccupant(inventory);
-		mounted.setCommandTarget({
-			kind: "slot",
-			location: inventory.location,
-			occupant: {
-				itemId: inventory.id,
-				revision: inventory.revision,
-			},
-		});
+		setOrdinaryInventoryTarget(mounted, inventory);
 		const cause = new Error("drop failed");
 		mounted.onDrop.mockRejectedValueOnce(cause);
 
-		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-		mounted.stage.emit("globalpointermove", pointer(30, 20));
-		mounted.stage.emit("pointerup", pointer(30, 20));
+		releaseOrdinaryDrag(mounted);
 		await flushMicrotasks();
 
 		expect(mounted.reportCriticalFailure).toHaveBeenCalledWith("game-presentation", cause);
@@ -57,16 +48,7 @@ describe("Pixi main-scene drag controller: recovery", () => {
 	it("ignores a pending Inventory result after the scene owners close", async () => {
 		const inventory = createItem("runtime:inventory", 1);
 		const mounted = mountController();
-		previewState.actorKinds.set(inventory.id, "store-inventory");
-		mounted.setOccupant(inventory);
-		mounted.setCommandTarget({
-			kind: "slot",
-			location: inventory.location,
-			occupant: {
-				itemId: inventory.id,
-				revision: inventory.revision,
-			},
-		});
+		setOrdinaryInventoryTarget(mounted, inventory);
 		let resolveDrop!: (result: runTileDropAtom.Result) => void;
 		mounted.onDrop.mockReturnValueOnce(
 			new Promise<runTileDropAtom.Result>((resolve) => {
@@ -74,9 +56,7 @@ describe("Pixi main-scene drag controller: recovery", () => {
 			}) as never,
 		);
 
-		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-		mounted.stage.emit("globalpointermove", pointer(30, 20));
-		mounted.stage.emit("pointerup", pointer(30, 20));
+		releaseOrdinaryDrag(mounted);
 		await Promise.resolve();
 		expect(mounted.onDrop).toHaveBeenCalledOnce();
 		Effect.runSync(mounted.controller.closeFx);
@@ -100,9 +80,7 @@ describe("Pixi main-scene drag controller: recovery", () => {
 			kind: "unsupported" as const,
 		};
 		first.setCommandTarget(releaseTarget);
-		first.actorEvents.emit("pointerdown", pointer(10, 20));
-		first.stage.emit("globalpointermove", pointer(30, 20));
-		first.stage.emit("pointerup", pointer(30, 20));
+		releaseOrdinaryDrag(first);
 		first.setCommandTarget({
 			kind: "unsupported",
 		});
@@ -118,9 +96,7 @@ describe("Pixi main-scene drag controller: recovery", () => {
 		expect(first.actor.container.zIndex).toBe(0);
 
 		const second = mountController();
-		second.actorEvents.emit("pointerdown", pointer(10, 20));
-		second.stage.emit("globalpointermove", pointer(30, 20));
-		second.stage.emit("pointerup", pointer(30, 20));
+		releaseOrdinaryDrag(second);
 		Effect.runSync(second.controller.closeFx);
 		Effect.runSync(second.dropSubmission.closeFx);
 		await flushMicrotasks();
@@ -130,9 +106,8 @@ describe("Pixi main-scene drag controller: recovery", () => {
 
 	it("settles a rejected release from its exact pose", async () => {
 		const mounted = mountController();
-		const canonicalLayer = {
-			addChild: vi.fn(),
-		};
+		const canonicalLayer = new Container();
+		vi.spyOn(canonicalLayer, "addChild");
 		mounted.setActorPose({
 			layer: canonicalLayer,
 			size: 80,

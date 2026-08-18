@@ -1,10 +1,10 @@
 import { Effect } from "effect";
+import { Application, Container } from "pixi.js";
 import { vi } from "vitest";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type {
 	PixiActorAnimation,
 	PixiActorAnimator,
@@ -19,6 +19,14 @@ import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticFie
 import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRuntime";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
+import {
+	createActor,
+	createItem as createTestItem,
+	item as testItem,
+} from "~test/ui/pixi/PixiMainSceneDragController.test/actors";
+
+export const item: TileActorItem = testItem;
+export const createItem = (id: string, x: number) => createTestItem(id, x);
 
 const previewState = vi.hoisted(() => ({
 	actorKinds: new Map<
@@ -69,24 +77,6 @@ vi.mock("~/bridge/tile/readTileDropPreviewFx", () => ({
 		}),
 }));
 
-export class FakeEmitter {
-	private readonly listeners = new Map<string, Set<(event: FakePointerEvent) => void>>();
-
-	on(name: string, listener: (event: FakePointerEvent) => void) {
-		const listeners = this.listeners.get(name) ?? new Set();
-		listeners.add(listener);
-		this.listeners.set(name, listeners);
-	}
-
-	off(name: string, listener: (event: FakePointerEvent) => void) {
-		this.listeners.get(name)?.delete(listener);
-	}
-
-	emit(name: string, event: FakePointerEvent) {
-		for (const listener of this.listeners.get(name) ?? []) listener(event);
-	}
-}
-
 interface FakeKeyboardEvent {
 	altKey: boolean;
 	ctrlKey: boolean;
@@ -123,7 +113,7 @@ export const keyboard = (key: string): FakeKeyboardEvent => ({
 	stopImmediatePropagation: vi.fn(),
 });
 
-interface FakePointerEvent {
+export interface FakePointerEvent {
 	altKey: boolean;
 	button: number;
 	ctrlKey: boolean;
@@ -136,6 +126,17 @@ interface FakePointerEvent {
 	pointerId: number;
 	shiftKey: boolean;
 	stopPropagation: () => void;
+}
+
+export class FakeEmitter {
+	constructor(readonly container = new Container()) {}
+
+	emit(name: string, event: FakePointerEvent) {
+		Reflect.apply(this.container.emit, this.container, [
+			name,
+			event,
+		]);
+	}
 }
 
 export const pointer = (x: number, y: number, button = 0): FakePointerEvent => ({
@@ -153,73 +154,6 @@ export const pointer = (x: number, y: number, button = 0): FakePointerEvent => (
 	stopPropagation: vi.fn(),
 });
 
-export const item = {
-	id: "runtime:log",
-	itemId: "log",
-	location: {
-		scope: "board",
-		space: 0,
-		position: {
-			x: 0,
-			y: 0,
-		},
-	},
-	primaryAction: {
-		kind: "none",
-	},
-	quantity: 1,
-	revision: "revision:log",
-	running: false,
-	activityEffect: false,
-	sourceUrl: "resource:log",
-	title: "Log",
-} as TileActorItem;
-
-export const createItem = (id: string, x: number) =>
-	({
-		...item,
-		id,
-		itemId: id,
-		location: {
-			...item.location,
-			position: {
-				x,
-				y: 0,
-			},
-		},
-		revision: `revision:${id}`,
-		title: id,
-	}) as TileActorItem;
-
-export const createActivityParticles = () => ({
-	centerX: 40,
-	container: {
-		visible: false,
-	},
-	feedbackPhase: null,
-	lastProgress: 0,
-	lightSurface: false,
-	particles: [
-		{
-			alphaScale: 1,
-			particle: {
-				alpha: 0,
-				tint: 0,
-				x: 0,
-				y: 0,
-			},
-			phaseOffset: 0,
-			spreadOffset: 0,
-			speedCycles: 1,
-			waveOffset: 0,
-		},
-	],
-	startY: 68,
-	topHalfWidth: 24,
-	topY: -18,
-	workingTint: 0xf05bb8,
-});
-
 export const mountController = ({
 	cheatsEnabled = false,
 	interactionClaimByActorId = new Map(),
@@ -235,8 +169,8 @@ export const mountController = ({
 	previewState.reads = 0;
 	previewState.readsByActorId.clear();
 	removalState.remove.mockClear();
-	const actorEvents = new FakeEmitter();
-	const stage = new FakeEmitter();
+	const stageContainer = new Container();
+	const stage = new FakeEmitter(stageContainer);
 	const animateActor = vi.fn();
 	const cancelAnimation = vi.fn();
 	const cancelChannel = vi.fn();
@@ -263,67 +197,24 @@ export const mountController = ({
 		readonly x: number;
 		readonly y: number;
 	}> = [];
-	const transientActorLayer = {
-		addChild: vi.fn(),
-	};
-	const actorContainer = Object.assign(actorEvents, {
-		cursor: "grab",
-		destroyed: false,
-		pivot: {
-			x: 0,
-			y: 0,
-		},
-		position: {
-			set(x: number, y: number) {
-				actorContainer.x = x;
-				actorContainer.y = y;
-			},
-		},
-		scale: {
-			set(value: number) {
-				this.x = value;
-				this.y = value;
-			},
-			x: 1,
-			y: 1,
-		},
-		x: 10,
-		y: 20,
-		zIndex: 0,
-	});
-	const actor = {
-		activityParticles: createActivityParticles(),
-		container: actorContainer,
-		dragging: false,
-		instanceId: `test:${item.id}`,
-		item,
-		lifecycleFadeStarted: false,
-		lifecycleIntentGeneration: 0,
-		lifecycleTargetAlpha: 1,
-		onPointerDown: null,
-		size: 80,
-	} as unknown as PixiTileActor;
+	const transientActorLayer = new Container();
+	vi.spyOn(transientActorLayer, "addChild");
+	const actor = createActor(item);
+	const actorEvents = new FakeEmitter(actor.container);
 	const actors = new Map([
 		[
 			item.id,
 			actor,
 		],
 	]);
-	const canonicalItems = new Map([
+	const canonicalItems = new Map<string, TileActorItem>([
 		[
 			item.id,
 			item,
 		],
 	]);
 	for (const targetItem of targetItems) {
-		actors.set(targetItem.id, {
-			activityParticles: createActivityParticles(),
-			container: {
-				destroyed: false,
-			},
-			instanceId: `test:${targetItem.id}`,
-			item: targetItem,
-		} as unknown as PixiTileActor);
+		actors.set(targetItem.id, createActor(targetItem));
 		canonicalItems.set(targetItem.id, targetItem);
 	}
 	let currentCommandTarget: runTileDropAtom.Command["target"] = {
@@ -366,7 +257,41 @@ export const mountController = ({
 	const actorStore = {
 		actors,
 		canonicalItems,
-	} as unknown as PixiMainSceneActorStore;
+		closeFx: Effect.void,
+		deleteActorFx: (actorId) =>
+			Effect.sync(() => {
+				const deleted = actors.get(actorId) ?? null;
+				actors.delete(actorId);
+				return deleted;
+			}),
+		destroyExitingActorFx: (exitingActor) =>
+			Effect.sync(() => {
+				exitingActor.container.destroy({
+					children: true,
+				});
+			}),
+		readActorFx: (actorId) => Effect.sync(() => actors.get(actorId) ?? null),
+		readCanonicalItemFx: (actorId) => Effect.sync(() => canonicalItems.get(actorId) ?? null),
+		readCanonicalOccupantFx: () => Effect.succeed(null),
+		readCanonicalOccupantsFx: () => Effect.succeed([]),
+		releaseActorFx: (actorId) =>
+			Effect.sync(() => {
+				const released = actors.get(actorId) ?? null;
+				actors.delete(actorId);
+				return released;
+			}),
+		replaceCanonicalItemsFx: (items) =>
+			Effect.sync(() => {
+				canonicalItems.clear();
+				for (const canonicalItem of items) {
+					canonicalItems.set(canonicalItem.id, canonicalItem);
+				}
+			}),
+		setActorFx: (nextActor) =>
+			Effect.sync(() => {
+				actors.set(nextActor.item.id, nextActor);
+			}),
+	} satisfies PixiMainSceneActorStore;
 	const animator = {
 		animateFx: (animation) =>
 			Effect.sync(() => {
@@ -449,6 +374,7 @@ export const mountController = ({
 		syncPresentationFx: Effect.void,
 	} satisfies PixiTileMotionRuntime;
 	const surface = {
+		closeFx: Effect.void,
 		readActorPoseFx: (actorItem: TileActorItem) =>
 			Effect.succeed(actorPoses.get(actorItem.id) ?? currentActorPose),
 		readLocalActorIdsFx: (bounds: Parameters<PixiMainSceneSurface["readLocalActorIdsFx"]>[0]) =>
@@ -470,9 +396,14 @@ export const mountController = ({
 					target:
 						currentTargetKind !== null
 							? {
+									kind: "slot" as const,
 									layout: {
 										cellSize: 80,
+										columns: 10,
+										height: 80,
 										kind: currentTargetKind,
+										rows: 1,
+										width: 800,
 										x: 0,
 										y: 0,
 									},
@@ -482,9 +413,13 @@ export const mountController = ({
 							: null,
 				};
 			}),
+		readLocationPoseFx: () => Effect.succeed(currentActorPose),
+		redrawFx: Effect.void,
 		renderDropFeedbackFx: () => Effect.void,
+		setPaletteFx: () => Effect.void,
+		setTransitionFx: () => Effect.void,
 		transientActorLayer,
-	} as unknown as PixiMainSceneSurface;
+	} satisfies PixiMainSceneSurface;
 	const dropSubmission = Effect.runSync(
 		createPixiMainSceneDropSubmissionFx({
 			actorStore,
@@ -499,6 +434,14 @@ export const mountController = ({
 			surface,
 		}),
 	);
+	const pixiApplication: PixiApplicationOwner["app"] = Object.create(Application.prototype);
+	Object.defineProperty(pixiApplication, "canvas", {
+		configurable: true,
+		value: {
+			releasePointerCapture,
+			setPointerCapture: vi.fn(),
+		},
+	});
 	let controller: PixiMainSceneDragController;
 	try {
 		controller = Effect.runSync(
@@ -506,14 +449,13 @@ export const mountController = ({
 				actorStore,
 				animator,
 				application: {
-					app: {
-						canvas: {
-							releasePointerCapture,
-							setPointerCapture: vi.fn(),
-						},
-					},
+					addResizeListenerFx: () => Effect.succeed(() => {}),
+					app: pixiApplication,
+					closeFx: Effect.void,
 					frames: {
+						closeFx: Effect.void,
 						invalidateFx: Effect.void,
+						reportCriticalFailure: () => {},
 						scheduleFx: (work: () => void) =>
 							Effect.sync(() => {
 								scheduledFrameWork = work;
@@ -522,8 +464,8 @@ export const mountController = ({
 								};
 							}),
 					},
-					stage,
-				} as unknown as PixiApplicationOwner,
+					stage: stageContainer,
+				} satisfies PixiApplicationOwner,
 				cursorGrab,
 				dropSubmission,
 				game,
@@ -610,6 +552,28 @@ export const mountController = ({
 		targetRedirects,
 		transientActorLayer,
 	};
+};
+
+export const setOrdinaryInventoryTarget = (
+	mounted: ReturnType<typeof mountController>,
+	inventory: TileActorItem,
+) => {
+	previewState.actorKinds.set(inventory.id, "store-inventory");
+	mounted.setOccupant(inventory);
+	mounted.setCommandTarget({
+		kind: "slot",
+		location: inventory.location,
+		occupant: {
+			itemId: inventory.id,
+			revision: inventory.revision,
+		},
+	});
+};
+
+export const releaseOrdinaryDrag = (mounted: ReturnType<typeof mountController>) => {
+	mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+	mounted.stage.emit("globalpointermove", pointer(30, 20));
+	mounted.stage.emit("pointerup", pointer(30, 20));
 };
 
 export const flushMicrotasks = async () => {

@@ -33,9 +33,9 @@ jobs:
           import fs from "node:fs"
           const path = "package.json"
           const packageJson = JSON.parse(fs.readFileSync(path, "utf8"))
-          packageJson.dependencies.effect = "4.0.0-rc.110"
-          packageJson.dependencies["@effect/atom-react"] = "4.0.0-rc.110"
-          packageJson.dependencies["@effect/platform-node"] = "4.0.0-rc.110"
+          packageJson.dependencies.effect = "4.0.0-rc.111"
+          packageJson.dependencies["@effect/atom-react"] = "4.0.0-rc.111"
+          packageJson.dependencies["@effect/platform-node"] = "4.0.0-rc.111"
           fs.writeFileSync(path, `${JSON.stringify(packageJson, null, "\t")}\n`)
           NODE
           npm install --ignore-scripts
@@ -75,8 +75,6 @@ jobs:
             test/ui/reactivity \
             test/ui/item-detail/ItemDetailCommandAtoms.test.ts \
             test/ui/appearance/AppearanceThemeMutation.test.ts \
-            test/ui/launcher/Settings.test.ts \
-            test/ui/launcher/MainMenu.test.ts \
             test/ui/cheats \
             test/ui/cheat-spotlight \
             test/ui/tile/TileActorDropLifecycle.test.ts

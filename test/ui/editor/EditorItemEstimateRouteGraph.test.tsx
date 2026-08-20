@@ -63,6 +63,17 @@ describe("EditorItemEstimateRouteGraph", () => {
 						routeId: "make-tool",
 						source: "route",
 					},
+					{
+						actionRuns: 3,
+						durationMs: 1_000,
+						factId: "water",
+						outputRuns: 3,
+						quantity: 3,
+						requirements: [],
+						rootQuantity: 0,
+						routeId: "make-water",
+						source: "route",
+					},
 				],
 			}),
 		);
@@ -71,6 +82,7 @@ describe("EditorItemEstimateRouteGraph", () => {
 		expect(markup).toContain("×5");
 		expect(markup).toContain("3 s");
 		expect(markup).toContain("2 from authored start");
+		expect(markup).toContain("Required by: tool");
 		expect(markup).toContain("Quantity:");
 		expect(markup).toContain("Time:");
 		expect(markup).toContain("Estimate summary");

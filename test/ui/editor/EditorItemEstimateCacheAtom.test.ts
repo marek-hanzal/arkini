@@ -28,6 +28,11 @@ const estimate = (factId: string): EditorItemEstimate => {
 		factId,
 		limitations: [],
 		obtainable: true,
+		requirementSummary: {
+			consumed: [],
+			oneTime: [],
+			ongoing: [],
+		},
 		status: "complete",
 		quantity: 1,
 		route,

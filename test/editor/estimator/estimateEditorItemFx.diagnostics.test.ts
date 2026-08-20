@@ -52,6 +52,15 @@ describe("estimateEditorItemFx", () => {
 				routeId: "valid-target",
 			},
 		});
+		expect(result.diagnostics).toContainEqual({
+			factIds: [
+				"target",
+				"x",
+				"target",
+			],
+			kind: "cycle",
+			routeId: "cycle-target",
+		});
 	});
 
 	it("rejects a nested cyclic route without hiding its slower complete alternative", () => {

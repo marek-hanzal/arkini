@@ -211,6 +211,26 @@ describe("estimateEditorItemFx", () => {
 			obtainable: true,
 		});
 		if (!result.obtainable) throw new Error("Expected optimistic conditioned route.");
+		expect(result.requirementSummary).toEqual({
+			consumed: [
+				{
+					factId: "owner",
+					quantity: 1,
+				},
+			],
+			oneTime: [
+				{
+					factId: "owner",
+					quantity: 1,
+				},
+			],
+			ongoing: [
+				{
+					factId: "condition",
+					quantity: 1,
+				},
+			],
+		});
 		expect(result.route.requirements.map(({ factId }) => factId)).toEqual([
 			"condition",
 			"owner",

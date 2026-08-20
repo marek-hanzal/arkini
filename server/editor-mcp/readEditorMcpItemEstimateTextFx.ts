@@ -32,6 +32,24 @@ const diagnosticText = (diagnostic: EditorItemEstimateDiagnostic) => {
 	}
 };
 
+const amountLines = (
+	project: EditorProject,
+	title: string,
+	amounts: ReadonlyArray<{
+		readonly factId: string;
+		readonly quantity: number;
+	}>,
+): ReadonlyArray<string> =>
+	amounts.length === 0
+		? []
+		: [
+				`${title}:`,
+				...amounts.map(
+					({ factId, quantity }) =>
+						`  - ${itemReference(project, factId)} x ${formatNumber(quantity)}`,
+				),
+			];
+
 const limitationText = (limitation: EditorItemEstimate["limitations"][number]) => {
 	switch (limitation) {
 		case "conditional-runtime-adjustments-ignored":
@@ -113,9 +131,12 @@ const formatEstimate = (project: EditorProject, estimate: EditorItemEstimate) =>
 		`Selected route: ${estimate.route.routeId}`,
 		`Expected action runs: ${formatNumber(estimate.route.actionRuns)}`,
 		`Expected output samples: ${formatNumber(estimate.route.outputRuns)}`,
+		...amountLines(project, "Consumed requirements", estimate.requirementSummary.consumed),
+		...amountLines(project, "One-time requirements", estimate.requirementSummary.oneTime),
+		...amountLines(project, "Ongoing requirements", estimate.requirementSummary.ongoing),
 		"Selected route graph:",
 		...routeLines(project, estimate.routeSteps),
-		"Diagnostics:",
+		"Rejected alternative diagnostics:",
 		...(estimate.diagnostics.length === 0
 			? [
 					"  - none",

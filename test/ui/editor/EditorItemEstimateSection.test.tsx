@@ -102,6 +102,11 @@ describe("EditorItemEstimateSection", () => {
 				"spatial-requirements-approximated",
 			],
 			obtainable: true,
+			requirementSummary: {
+				consumed: [],
+				oneTime: [],
+				ongoing: [],
+			},
 			status: "complete",
 			quantity: 1,
 			route: {
@@ -202,6 +207,11 @@ describe("EditorItemEstimateSection", () => {
 			factId: "tool",
 			limitations: [],
 			obtainable: true,
+			requirementSummary: {
+				consumed: [],
+				oneTime: [],
+				ongoing: [],
+			},
 			status: "complete",
 			quantity: 1,
 			route: {

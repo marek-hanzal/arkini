@@ -3,7 +3,10 @@ import { Effect } from "effect";
 import type { EditorAcquisitionGraph } from "~/editor/EditorAcquisitionGraph";
 import type { EditorEstimatePolicy } from "~/editor/estimator/createEditorEstimatePolicyFx";
 import { createEditorEstimatePolicyFx } from "~/editor/estimator/createEditorEstimatePolicyFx";
-import type { EditorItemEstimate } from "~/editor/estimator/EditorItemEstimate";
+import type {
+	EditorItemEstimate,
+	EditorItemEstimateAmount,
+} from "~/editor/estimator/EditorItemEstimate";
 import type { EditorEstimateCandidatePlan } from "~/editor/estimator/materializeEditorEstimatePlanFx";
 import { materializeEditorEstimatePlanFx } from "~/editor/estimator/materializeEditorEstimatePlanFx";
 import { editorItemEstimateMaximumQuantity } from "~/editor/estimator/EditorItemEstimateQuantitySchema";
@@ -18,6 +21,19 @@ export namespace estimateEditorItemFx {
 
 const maximumDiagnostics = 8;
 const policyByGraph = new WeakMap<EditorAcquisitionGraph, EditorEstimatePolicy>();
+
+const freezeAmounts = (
+	quantities: ReadonlyMap<string, number>,
+): ReadonlyArray<EditorItemEstimateAmount> =>
+	[
+		...quantities,
+	]
+		.filter(([, quantity]) => quantity > 1e-9)
+		.sort(([left], [right]) => left.localeCompare(right))
+		.map(([factId, quantity]) => ({
+			factId,
+			quantity,
+		}));
 
 const uniqueDiagnostics = (
 	diagnostics: ReadonlyArray<EditorItemEstimate["diagnostics"][number]>,
@@ -53,6 +69,11 @@ const makeRootEstimate = (
 		factId,
 		limitations,
 		obtainable: true,
+		requirementSummary: {
+			consumed: [],
+			oneTime: [],
+			ongoing: [],
+		},
 		status: "complete",
 		quantity,
 		route,
@@ -67,12 +88,18 @@ const makeCompleteEstimate = (
 	quantity: number,
 	limitations: EditorAcquisitionGraph["limitations"],
 	plan: EditorEstimateCandidatePlan,
+	diagnostics: EditorItemEstimate["diagnostics"],
 ): EditorItemEstimate => ({
-	diagnostics: [],
+	diagnostics,
 	durationMs: plan.durationMs,
 	factId,
 	limitations,
 	obtainable: true,
+	requirementSummary: {
+		consumed: freezeAmounts(plan.consumed),
+		oneTime: freezeAmounts(plan.oneTime),
+		ongoing: freezeAmounts(plan.ongoing),
+	},
 	status: "complete",
 	quantity,
 	route: plan.projection.route,
@@ -194,8 +221,19 @@ export const estimateEditorItemFx = Effect.fn("estimateEditorItemFx")(
 						left.plan.durationMs - right.plan.durationMs ||
 						left.routeId.localeCompare(right.routeId),
 				)[0]?.plan;
+			const rejectedDiagnostics = uniqueDiagnostics(
+				candidates.flatMap(({ candidate }) =>
+					"diagnostics" in candidate ? candidate.diagnostics : [],
+				),
+			).slice(0, maximumDiagnostics);
 			if (bestPlan !== undefined)
-				return makeCompleteEstimate(factId, quantity, graph.limitations, bestPlan);
+				return makeCompleteEstimate(
+					factId,
+					quantity,
+					graph.limitations,
+					bestPlan,
+					rejectedDiagnostics,
+				);
 			return makeUnavailableEstimate(
 				factId,
 				quantity,

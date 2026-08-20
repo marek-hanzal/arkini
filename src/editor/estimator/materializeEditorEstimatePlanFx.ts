@@ -13,7 +13,10 @@ import { readEditorEstimateParallelDurationFx } from "~/editor/estimator/readEdi
 import { shareEditorEstimateOperationRunsFx } from "~/editor/estimator/shareEditorEstimateOperationRunsFx";
 
 export interface EditorEstimateCandidatePlan {
+	readonly consumed: ReadonlyMap<string, number>;
 	readonly durationMs: number;
+	readonly oneTime: ReadonlyMap<string, number>;
+	readonly ongoing: ReadonlyMap<string, number>;
 	readonly projection: EditorEstimateRouteProjection;
 }
 
@@ -22,7 +25,10 @@ interface EditorEstimateCandidateFailure {
 }
 
 interface DemandSnapshot {
+	readonly consumed: Map<string, number>;
 	readonly dependencies: Map<string, Set<string>>;
+	readonly oneTime: Map<string, number>;
+	readonly ongoing: Map<string, number>;
 	readonly required: Map<string, number>;
 	readonly selected: Map<string, EditorEstimateSelectedRoute>;
 	readonly sharedOperationIds: ReadonlySet<string>;
@@ -151,6 +157,7 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 									factId: id,
 									kind: "unreachable",
 									quantity: missing,
+									routeId: topRoute.id,
 								},
 							],
 						} satisfies EditorEstimateCandidateFailure;
@@ -215,8 +222,10 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 				const { sharedOperationIds } = shared;
 				selected = shared.selected;
 
-				const consumables = new Map<string, number>();
+				const consumed = new Map<string, number>();
 				const concurrent = new Map<string, number>();
+				const oneTime = new Map<string, number>();
+				const ongoing = new Map<string, number>();
 				const accountedOperationIds = new Set<string>();
 				for (const plan of selected.values()) {
 					const operationId = plan.route.operation?.id;
@@ -225,12 +234,14 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 					if (operationId !== undefined && sharedOperationIds.has(operationId))
 						accountedOperationIds.add(operationId);
 					for (const group of plan.groups) {
-						add(consumables, group.factId, group.consumed);
+						add(consumed, group.factId, group.consumed);
 						maximize(
 							concurrent,
 							group.factId,
 							group.consumed + Math.max(group.oneTime, group.ongoing),
 						);
+						maximize(oneTime, group.factId, group.oneTime);
+						maximize(ongoing, group.factId, group.ongoing);
 					}
 				}
 				const nextRequired = new Map<string, number>([
@@ -240,13 +251,13 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 					],
 				]);
 				for (const id of new Set([
-					...consumables.keys(),
+					...consumed.keys(),
 					...concurrent.keys(),
 				])) {
 					nextRequired.set(
 						id,
 						Math.max(
-							(nextRequired.get(id) ?? 0) + (consumables.get(id) ?? 0),
+							(nextRequired.get(id) ?? 0) + (consumed.get(id) ?? 0),
 							concurrent.get(id) ?? 0,
 						),
 					);
@@ -303,7 +314,10 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 						],
 					} satisfies EditorEstimateCandidateFailure;
 				snapshot = {
+					consumed,
 					dependencies,
+					oneTime,
+					ongoing,
 					required: nextRequired,
 					selected: selectedWithRecurrence,
 					sharedOperationIds,
@@ -338,7 +352,10 @@ export const materializeEditorEstimatePlanFx = Effect.fn("materializeEditorEstim
 				sharedOperationIds: snapshot.sharedOperationIds,
 			});
 			return {
+				consumed: snapshot.consumed,
 				durationMs,
+				oneTime: snapshot.oneTime,
+				ongoing: snapshot.ongoing,
 				projection,
 			};
 		}),

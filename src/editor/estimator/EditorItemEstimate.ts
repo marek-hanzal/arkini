@@ -5,6 +5,18 @@ import type {
 	EditorAcquisitionRouteMetadata,
 } from "~/editor/EditorAcquisitionGraph";
 
+export interface EditorItemEstimateAmount {
+	readonly factId: string;
+	readonly quantity: number;
+}
+
+/** Aggregate selected-route demand grouped by authored consumption semantics. */
+export interface EditorItemEstimateRequirementSummary {
+	readonly consumed: ReadonlyArray<EditorItemEstimateAmount>;
+	readonly oneTime: ReadonlyArray<EditorItemEstimateAmount>;
+	readonly ongoing: ReadonlyArray<EditorItemEstimateAmount>;
+}
+
 export interface EditorItemEstimateRequirementStep {
 	/** Canonical fact whose route establishes this requirement, when acquisition is needed. */
 	readonly acquisitionFactId?: string;
@@ -60,6 +72,7 @@ export type EditorItemEstimateDiagnostic =
 	  };
 
 interface EditorItemEstimateBase {
+	/** Failure evidence; complete estimates may retain bounded diagnostics from rejected alternatives. */
 	readonly diagnostics: ReadonlyArray<EditorItemEstimateDiagnostic>;
 	readonly factId: string;
 	readonly limitations: ReadonlyArray<EditorAcquisitionLimitation>;
@@ -67,6 +80,7 @@ interface EditorItemEstimateBase {
 }
 
 export interface ObtainableEditorItemEstimate extends EditorItemEstimateBase {
+	readonly requirementSummary: EditorItemEstimateRequirementSummary;
 	/** Stable optimistic critical path with independent dependency branches overlapped. */
 	readonly durationMs: number;
 	readonly obtainable: true;

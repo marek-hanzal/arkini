@@ -28,6 +28,11 @@ const complete = (
 	factId,
 	limitations: [],
 	obtainable: true,
+	requirementSummary: {
+		consumed: [],
+		oneTime: [],
+		ongoing: [],
+	},
 	quantity: 1,
 	route: routeSteps[0] ?? step(factId, 1),
 	routeSteps,

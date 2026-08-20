@@ -49,6 +49,11 @@ const estimate: EditorItemEstimate = {
 	factId: "item",
 	limitations: [],
 	obtainable: true,
+	requirementSummary: {
+		consumed: [],
+		oneTime: [],
+		ongoing: [],
+	},
 	quantity: 1,
 	route,
 	routeSteps: [

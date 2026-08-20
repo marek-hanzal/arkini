@@ -83,6 +83,12 @@ const EditorItemEstimateMethodDetails = ({
 			)}
 			<li>Starting authored items contribute no acquisition time.</li>
 			<li>Route requirements provide the complete timing explanation.</li>
+			{estimate.obtainable && estimate.diagnostics.length > 0 ? (
+				<li>
+					Rejected alternatives:{" "}
+					{estimate.diagnostics.map((diagnostic) => diagnosticText(diagnostic)).join(" ")}
+				</li>
+			) : null}
 			{estimate.limitations.map((limitation) => (
 				<li key={limitation}>Limitation: {limitationText(limitation)}</li>
 			))}

@@ -1,5 +1,5 @@
 import { FileSystem, Path } from "effect";
-import { NodeServices } from "@effect/platform-node";
+import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 

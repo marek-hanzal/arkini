@@ -64,6 +64,12 @@ Direct imports from Effect packages are intentional. Do not introduce a local `A
 or another facade just to hide unstable import paths; stable migration should update the
 external imports directly.
 
+`@effect/platform-node` is imported through the exact `NodeServices` / `NodeRuntime`
+subpaths rather than the package root. The root barrel re-exports `NodeRedis`, which makes
+its Redis peer load eagerly even though Arkini does not use Redis. LLM cache installs also
+use `--omit=peer` plus `--legacy-peer-deps`, so optional integration peers are neither
+fetched nor required by Arkini's Node service/runtime entrypoints.
+
 ## Prerelease-specific boundaries
 
 | Boundary | Current `rc.111` state | Stable target |

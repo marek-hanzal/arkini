@@ -1,5 +1,6 @@
 import { Command } from "effect/unstable/cli";
-import { NodeServices, NodeRuntime } from "@effect/platform-node";
+import * as NodeRuntime from "@effect/platform-node/NodeRuntime";
+import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect } from "effect";
 import { ArkiniAppVersion } from "../shared/ArkiniAppMetadata";
 import { ArkiniCommand } from "./ArkiniCommand";

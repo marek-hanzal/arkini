@@ -1,4 +1,4 @@
-import { NodeServices } from "@effect/platform-node";
+import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect, FileSystem } from "effect";
 import { createHash } from "node:crypto";
 import { access, mkdtemp, rm, unlink } from "node:fs/promises";

@@ -35,6 +35,7 @@ npm_ci_linux_x64() {
 		# Offline LLM installs use the same peer policy.
 		npm ci \
 			--legacy-peer-deps \
+			--omit=peer \
 			"$@" \
 			--registry="${REGISTRY}" \
 			--cache="${CACHE_DIR}" \

@@ -1,0 +1,83 @@
+name: Effect RC PoC
+
+on:
+  push:
+    branches:
+      - "chatgpt/effect-rc-poc-ci"
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22.19.0
+
+      - name: Pin npm
+        run: npm install --global npm@10.9.3
+
+      - name: Move Effect packages to RC
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from "node:fs"
+          const path = "package.json"
+          const packageJson = JSON.parse(fs.readFileSync(path, "utf8"))
+          packageJson.dependencies.effect = "4.0.0-rc.110"
+          packageJson.dependencies["@effect/atom-react"] = "4.0.0-rc.110"
+          packageJson.dependencies["@effect/platform-node"] = "4.0.0-rc.110"
+          fs.writeFileSync(path, `${JSON.stringify(packageJson, null, "\t")}\n`)
+          NODE
+          npm install --ignore-scripts
+
+      - name: Persist RC package lock for inspection
+        run: |
+          git config user.name "arkini-effect-rc-poc"
+          git config user.email "actions@users.noreply.github.com"
+          git add package.json package-lock.json
+          if ! git diff --cached --quiet; then
+            git commit -m "PoC Effect 4 RC dependency lock [skip ci]"
+            git push origin HEAD:chatgpt/effect-rc-poc-ci
+          fi
+
+      - name: Run migration probes
+        shell: bash
+        run: |
+          set +e
+          status=0
+          run_probe() {
+            local name="$1"
+            shift
+            echo "::group::$name"
+            "$@"
+            local code=$?
+            echo "exit=$code"
+            echo "::endgroup::"
+            if [ "$code" -ne 0 ]; then status=1; fi
+          }
+
+          run_probe "typecheck:src" npm run typecheck:src
+          run_probe "typecheck:electron" npm run typecheck:electron
+          run_probe "typecheck:test" npm run typecheck:test
+          run_probe "game:validate" npm run game:validate
+          run_probe "Atom and command regression tests" npx vitest run --no-color \
+            test/bridge/reactivity \
+            test/ui/reactivity \
+            test/ui/item-detail/ItemDetailCommandAtoms.test.ts \
+            test/ui/appearance/AppearanceThemeMutation.test.ts \
+            test/ui/launcher/Settings.test.ts \
+            test/ui/launcher/MainMenu.test.ts \
+            test/ui/cheats \
+            test/ui/cheat-spotlight \
+            test/ui/tile/TileActorDropLifecycle.test.ts
+
+          exit "$status"

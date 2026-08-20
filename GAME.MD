@@ -8,7 +8,7 @@ Configuration owns concrete content and balance. This document owns the interpre
 
 Arkini is a client-only, offline merge and production game played across multiple isolated Board spaces and two global passive-storage surfaces: Inventory and an optional Toolbar.
 
-The current engine lets callers create and move items, navigate persistent Board spaces, store line materials, start and queue product lines, advance deterministic jobs, execute directional merges, resolve configured outputs, and place resulting quantities through one shared policy. Utility controls cross the runtime, session, storage, and presentation boundaries described later in this document.
+The current engine lets callers create and move items, navigate persistent Board spaces, store line materials, enqueue product-line work, advance deterministic jobs, execute directional merges, resolve configured outputs, and place resulting quantities through one shared policy. Utility controls cross the runtime, session, storage, and presentation boundaries described later in this document.
 
 Every Board space uses the Board size from game metadata; Inventory uses its configured grid size and Toolbar uses its optional one-row slot count. They are not fixed engine constants.
 The bundled Arkini package currently authors a `13 × 9` Board, a `7 × 7` Inventory, and a 13-slot Toolbar.
@@ -73,7 +73,7 @@ The implemented write surface includes:
 - set an item stack quantity;
 - place a resolved drop or output;
 - store material into a line input;
-- start a line immediately or queue its request;
+- enqueue one explicit line request;
 - advance runtime time through the Tick service.
 
 Every write uses the canonical serialized mutation boundary. UI must not invent additional state transitions around these commands.
@@ -91,7 +91,7 @@ A line owns:
 
 Filling an input is passive. It never starts work automatically.
 
-Work starts only through the explicit line-start command.
+Enqueue is the sole player-facing line execution command. The fixed-step scheduler starts work only from the live FIFO head after its concrete inputs have physically settled.
 
 ## 7. Input buffering
 
@@ -105,38 +105,35 @@ Buffered material retains no historical stack, slot, or position. Pure roots may
 
 If any release cannot be placed, owner removal and all releases roll back.
 
-## 8. Starting work
+## 8. Queueing and starting work
 
-Starting resolves the live owner and live line from the pre-command serialized runtime. The command's own atomic consequences may change later runnability; the first Tick can therefore pause a job whose start created a new nearby item or otherwise changed line rules. Start does not re-resolve midway through its own candidate transformation.
+Enqueue resolves the live owner and line inside the serialized runtime mutation and validates every hard queue boundary while deliberately allowing missing concrete material to wait. It appends one exact request and does not fill, reserve, or start the line in that command transaction.
 
-A start validates:
+Queue admission validates:
 
-- owner existence and revision;
-- board location;
-- line existence;
-- live line rules;
-- required input readiness;
-- active job and queue state;
+- owner existence and board eligibility;
+- line existence and live line rules;
+- non-material input requirements and charge availability;
+- output and `maxCount` constraints;
 - queue capacity.
 
-An owner may have at most one active job.
-
-If the owner has no active job and no queued request, an eligible start begins immediately.
-
-Otherwise the request is appended to FIFO when capacity allows.
-
-A queued request:
+An owner may have at most one active job. A queued request:
 
 - is not a job;
 - owns no time;
 - consumes nothing;
 - reserves nothing;
-- stores only the stable information needed to retry the start;
+- stores only stable request, owner, and line identity;
+- may wait while concrete material is missing;
 - may be discarded only by explicitly clearing the whole pending queue of its owner.
+
+At each fixed-step boundary, the engine considers only the FIFO head of each idle owner in canonical global queue order. It first attempts the exact queued start against current runtime truth. If stored material is incomplete, canonical Autofill may schedule useful concrete material through physical delivery while retaining the same request. Only after those deliveries settle into input storage can a later step create the job and remove that queue row.
+
+Starting therefore remains an internal queue-playback transition rather than a separate player command. Its atomic candidate still revalidates current owner, line, rules, inputs, charges, output limits, placement, and other start invariants before committing.
 
 ## 9. FIFO behavior
 
-Queued work starts through the same internal pipeline as an immediate start.
+Queued work starts only through the canonical queued-start pipeline.
 
 The oldest request is always considered first.
 

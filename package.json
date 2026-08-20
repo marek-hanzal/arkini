@@ -54,8 +54,8 @@
 		"package:mac": "tsx cli/arkini.ts desktop package --arch arm64"
 	},
 	"dependencies": {
-		"@effect/atom-react": "4.0.0-beta.101",
-		"@effect/platform-node": "4.0.0-beta.101",
+		"@effect/atom-react": "4.0.0-rc.110",
+		"@effect/platform-node": "4.0.0-rc.110",
 		"@floating-ui/react": "^0.27.20",
 		"@logtape/file": "2.2.4",
 		"@logtape/logtape": "2.2.4",
@@ -68,7 +68,7 @@
 		"@tanstack/react-router": "1.170.15",
 		"cytoscape": "3.33.4",
 		"cytoscape-fcose": "2.2.0",
-		"effect": "4.0.0-beta.101",
+		"effect": "4.0.0-rc.110",
 		"fuse.js": "^7.4.2",
 		"motion": "^12.42.2",
 		"pixi.js": "^8.19.0",

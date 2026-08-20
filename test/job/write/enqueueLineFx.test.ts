@@ -146,6 +146,66 @@ describe("enqueueLineFx", () => {
 		);
 	});
 
+	it("preserves interleaved cross-owner acceptance order in the canonical queue", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				for (const [id, x] of [
+					[
+						"runtime:forge:a",
+						0,
+					],
+					[
+						"runtime:forge:b",
+						1,
+					],
+				] as const) {
+					yield* spawnItemFx({
+						id,
+						itemId: "forge",
+						location: {
+							scope: "board",
+							space: 0,
+							position: {
+								x,
+								y: 0,
+							},
+						},
+						quantity: 1,
+					});
+				}
+
+				const first = yield* enqueueLineFx({
+					ownerItemId: "runtime:forge:a",
+					lineId: props.lineId,
+				});
+				const second = yield* enqueueLineFx({
+					ownerItemId: "runtime:forge:b",
+					lineId: props.lineId,
+				});
+				const third = yield* enqueueLineFx({
+					ownerItemId: "runtime:forge:a",
+					lineId: props.lineId,
+				});
+
+				return {
+					requests: [
+						first,
+						second,
+						third,
+					],
+					runtime: yield* readRuntimeFx(),
+				};
+			}).pipe(
+				useGameFx({
+					config: createJobTestConfig(3),
+				}),
+			),
+		);
+
+		expect(new Set(result.requests.map(({ id }) => id))).toHaveProperty("size", 3);
+		expect(result.runtime.jobQueue).toEqual(result.requests);
+	});
+
 	it("appends an idle line while concrete material inputs are missing", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {

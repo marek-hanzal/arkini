@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { clearItemJobQueueFx } from "~/engine/job/write/clearItemJobQueueFx";
+import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import {
 	clearItemJobQueueConfig,
@@ -39,6 +40,42 @@ describe("clearItemJobQueueFx", () => {
 		expect(result.after.jobQueue?.map(({ id }) => id)).toEqual([
 			"job:queued:other:first",
 			"job:queued:other:second",
+		]);
+	});
+
+	it("re-enqueues cleared work with a fresh identity at the end of global accepted order", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const cleared = yield* clearItemJobQueueFx({
+					ownerItemId: "runtime:forge:primary",
+				});
+				const requeued = yield* enqueueLineFx({
+					ownerItemId: "runtime:forge:primary",
+					lineId: "line:forge:run",
+				});
+				return {
+					after: yield* readRuntimeFx(),
+					cleared,
+					requeued,
+				};
+			}).pipe(
+				useGameFx({
+					config: clearItemJobQueueConfig,
+					state: clearItemJobQueueState,
+				}),
+			),
+		);
+
+		const clearedIds = result.cleared.map(({ id }) => id);
+		expect(clearedIds).toEqual([
+			"job:queued:first",
+			"job:queued:second",
+		]);
+		expect(clearedIds).not.toContain(result.requeued.id);
+		expect(result.after.jobQueue?.map(({ id }) => id)).toEqual([
+			"job:queued:other:first",
+			"job:queued:other:second",
+			result.requeued.id,
 		]);
 	});
 

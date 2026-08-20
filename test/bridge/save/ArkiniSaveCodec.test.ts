@@ -27,6 +27,39 @@ describe("Arkini save codec", () => {
 		});
 	});
 
+	it("preserves interleaved multi-owner queue identity and global accepted order", async () => {
+		const queuedState: StateSchema.Type = {
+			...state,
+			jobQueue: [
+				{
+					id: "job:queue:first",
+					ownerItemId: "runtime:forge:b",
+					lineId: "line:forge:run",
+				},
+				{
+					id: "job:queue:second",
+					ownerItemId: "runtime:forge:a",
+					lineId: "line:forge:run",
+				},
+				{
+					id: "job:queue:third",
+					ownerItemId: "runtime:forge:b",
+					lineId: "line:forge:run",
+				},
+			],
+		};
+
+		const bytes = await Effect.runPromise(encodeArkiniSaveFx(queuedState));
+		const decoded = await Effect.runPromise(decodeArkiniSaveFx(bytes));
+
+		expect(decoded.state.jobQueue).toEqual(queuedState.jobQueue);
+		expect(decoded.state.jobQueue?.map(({ id }) => id)).toEqual([
+			"job:queue:first",
+			"job:queue:second",
+			"job:queue:third",
+		]);
+	});
+
 	it("keeps canonical-state encoder failures in the defect channel", () => {
 		const invalidCanonicalState = {
 			...state,

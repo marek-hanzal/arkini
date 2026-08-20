@@ -45,7 +45,7 @@ describe("Pixi tile motion stack contact", () => {
 		Effect.runSync(runtime.closeFx);
 	});
 
-	it("hard-snaps a stack merge inside the half-tile live-target field", async () => {
+	it("travels continuously to live stack contact before vanish", () => {
 		const { animations, cue, magneticReleases, runtime, target } = createStackHarness();
 		Effect.runSync(
 			runtime.enqueueFx([
@@ -60,15 +60,21 @@ describe("Pixi tile motion stack contact", () => {
 
 		target.container.x = 260;
 		samplePoseAnimation(travel, 0.8);
-		samplePoseAnimation(travel, 0.9);
 		target.container.x = 600;
-		await Promise.resolve();
-		expect(travel.actor.container.destroyed).toBe(false);
-
-		target.container.x = 260;
+		samplePoseAnimation(travel, 0.9);
 		samplePoseAnimation(travel, 0.95);
-		await Promise.resolve();
-		expect(travel.actor.container).toMatchObject({
+		expect(travel.actor.container.x).not.toBe(target.container.x);
+		expect(
+			animations.some(
+				(animation) =>
+					animation.actor === travel.actor &&
+					animation.channel === "lifecycle-opacity" &&
+					animation.toAlpha === 0,
+			),
+		).toBe(false);
+
+		const contact = samplePoseAnimation(travel, 1);
+		expect(contact).toMatchObject({
 			x: target.container.x,
 			y: target.container.y,
 		});
@@ -77,6 +83,8 @@ describe("Pixi tile motion stack contact", () => {
 			sourceActorId: travel.actor.item.id,
 			sourceKind: "motion",
 		});
+
+		travel.onComplete?.();
 		const vanish = advanceStackMergeVanish({
 			actor: travel.actor,
 			animations,

@@ -194,7 +194,6 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 		},
 		ownerKey: `motion:${cueKey}`,
 		readLiveTarget,
-		settleWithinTileRatio: 0.5,
 		surface,
 		targetLocation: cue.targetLocation,
 	});

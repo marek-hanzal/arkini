@@ -31,7 +31,10 @@ cp "${ROOT_DIR}/package.json" "${ROOT_DIR}/package-lock.json" "${WORK_DIR}/"
 npm_ci_linux_x64() {
 	(
 		cd "${WORK_DIR}"
+		# Do not auto-install optional integration peers (for example Redis from Effect platform-node).
+		# Offline LLM installs use the same peer policy.
 		npm ci \
+			--legacy-peer-deps \
 			"$@" \
 			--registry="${REGISTRY}" \
 			--cache="${CACHE_DIR}" \

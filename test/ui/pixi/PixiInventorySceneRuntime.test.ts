@@ -8,7 +8,7 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { pixiTileActorConsumedSourceFadeDurationMs } from "~/ui/pixi/animation/flashPixiTileActorConsumedSourceFx";
 import { pixiTileActorFeedbackParticlesDurationMs } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
-import { pixiInventoryActorRemovalFeedbackDurationMs } from "~/ui/pixi/drag/startPixiInventoryActorRemovalFeedbackFx";
+import { pixiTileActorLifecycleDurationMs } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
 import { readPixiInventorySceneLayoutFx } from "~/ui/pixi/layout/readPixiInventorySceneLayoutFx";
 import { readPixiMainSceneLayoutFx } from "~/ui/pixi/layout/readPixiMainSceneLayoutFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
@@ -412,6 +412,7 @@ vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
 						workingTint: 0x00ff00,
 					},
 					container: createContainer(),
+					lifecycleLayer: createContainer(),
 					crowdLayer: {
 						alpha: item.running ? 0.82 : 1,
 					},
@@ -421,7 +422,7 @@ vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
 					instanceId: `test-inventory:${item.id}`,
 					item,
 					lifecycleDurationMs: 0,
-					lifecycleFadeStarted: false,
+					lifecycleTransitionStarted: false,
 					lifecycleIntentGeneration: 0,
 					lifecycleNotBeforeMs: 0,
 					lifecycleTargetAlpha: 1,
@@ -833,7 +834,7 @@ describe("Pixi Inventory scene runtime", () => {
 	});
 
 	it("starts removal feedback on click and retains the removed actor until its fade completes", async () => {
-		sceneState.deferredTweenDurations.add(pixiInventoryActorRemovalFeedbackDurationMs);
+		sceneState.deferredTweenDurations.add(pixiTileActorLifecycleDurationMs);
 		const onActivate = vi.fn(() => new Promise<void>(() => undefined));
 		const { actor, runtime, stage } = await mountScene({
 			onActivate,
@@ -865,7 +866,7 @@ describe("Pixi Inventory scene runtime", () => {
 	});
 
 	it("reclaims the same physical actor when its item returns before exit completes", async () => {
-		sceneState.deferredTweenDurations.add(pixiInventoryActorRemovalFeedbackDurationMs);
+		sceneState.deferredTweenDurations.add(pixiTileActorLifecycleDurationMs);
 		const { actor, onActivate, runtime, stage } = await mountScene();
 
 		publishItems([]);

@@ -55,6 +55,10 @@ export const createActor = (actorItem: TileActorItem): PixiTileActor => {
 	const container = new Container();
 	container.cursor = "grab";
 	container.position.set(10, 20);
+	const lifecycleLayer = new Container();
+	const offsetLayer = new Container();
+	lifecycleLayer.addChild(offsetLayer);
+	container.addChild(lifecycleLayer);
 	const titleStyle = new TextStyle();
 	const visual = {
 		composite: new Sprite(Texture.EMPTY),
@@ -115,12 +119,13 @@ export const createActor = (actorItem: TileActorItem): PixiTileActor => {
 		dragOffsetY: 0,
 		instanceId: `test:${actorItem.id}`,
 		item: actorItem,
+		lifecycleLayer,
 		lifecycleDurationMs: 0,
-		lifecycleFadeStarted: false,
+		lifecycleTransitionStarted: false,
 		lifecycleIntentGeneration: 0,
 		lifecycleNotBeforeMs: 0,
 		lifecycleTargetAlpha: 1,
-		offsetLayer: new Container(),
+		offsetLayer,
 		onPointerDown: null,
 		pendingVisual: null,
 		progressBar: new Graphics(),

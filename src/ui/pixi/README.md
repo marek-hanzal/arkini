@@ -28,6 +28,7 @@ all scene-local owners.
 | `drop/createPixiMainSceneDropSubmissionFx.ts` | Frozen release command, optimistic feedback, and async drop settlement |
 | `animation/createPixiAnimationDriverFx.ts` | Motion controls and springs; the only interpolation clock |
 | `animation/createPixiActorAnimatorFx.ts` | Interruptible, keyed writes to actor presentation channels |
+| `animation/runPixiTileActorLifecycleFx.ts` | One semantic tile enter/exit/restore owner for shared alpha + centered lifecycle scale |
 
 Main-scene and Inventory actors are intentionally separate: Pixi display objects cannot move
 between canvases. Inventory placement starts from the retained main-scene Inventory opener when it
@@ -100,21 +101,29 @@ poses to motion, runs entry or exit effects, and finalizes presentation claims.
 - Teardown stops subscriptions and interactions before destroying actors, layers, or the
   application they reference.
 - Actor presentation is keyed by physical actor instance and typed channel. `pose`, `grab-offset`,
-  `lifecycle-opacity`, `crowd-opacity`, `activity-particles`, and `visual-mix` each have exactly one
-  writer; caller ownership keys may cancel work, but may never create a second writer for the same
-  channel.
-- The animator is the only production writer of root `x`, `y`, `scale`, `pivot`, and `alpha`. Layout
-  publishes canonical geometry through surfaces; motion owns normalized progress. Retargetable
-  placement samples current geometry without completion snaps. Stack and delivery travel sample a
-  receiver's live retained pose; stack payloads hard-snap at physical contact inside a half-tile
-  circular field instead of recursively chasing an already adjacent receiver.
+  `lifecycle-opacity`, `lifecycle-scale`, `crowd-opacity`, `activity-particles`, and `visual-mix` each
+  have exactly one animator writer; caller ownership keys may cancel work, but may never create a
+  second writer for the same channel.
+- The animator is the only production writer of root `x`, `y`, pose `scale`, `pivot`, and `alpha`,
+  plus the centered inner lifecycle scale. Layout publishes canonical geometry through surfaces;
+  motion owns normalized progress. Lifecycle scale never changes canonical pose geometry, so enter
+  and exit animation can overlap travel, drag handoff, or retargeting without two writers fighting
+  over the root transform.
+- Retargetable placement samples current geometry without completion snaps. Stack and delivery
+  travel chase the receiver's live retained contact pose continuously; destructive stack motion only
+  begins its lifecycle exit after that final live contact is reached.
 - Every texture-bearing visual revision uses one complete private slot. The current slot remains
   renderable until the pending slot has loaded all required textures, then the visual controller
   crossfades both from their live alpha. A superseding revision flattens the surviving composite;
   readiness, cancellation, promotion, and destruction are scoped to the physical visual generation.
-- Spawn lifecycle opacity is durable actor intent, independent from travel and from any particular
-  texture generation. Travel may start immediately; whichever complete visual survives texture
-  supersession resumes the same fade, while a later exit remains free to supersede it.
+- Semantic tile lifecycle is one durable actor intent, independent from travel and from any
+  particular texture generation. A genuine entrance starts at alpha `0` plus the shared reduced
+  centered lifecycle scale and converges to alpha/scale `1`; a genuine exit mirrors those endpoints.
+  Travel may start immediately; whichever complete visual survives texture supersession resumes the
+  same entrance, while a later exit supersedes it from the exact live alpha and lifecycle scale.
+  Main Scene and Inventory use the same lifecycle owner. Initial hydration, remount, and texture
+  replacement do not replay semantic entrance. Visual revision replacement remains a same-actor slot
+  crossfade rather than fake actor death/rebirth.
 - Engine-driven spawn, swap, stack, and direct drag share one magnetic field. Spawn and swap repel
   nearby board responders without attracting their own exchange counterpart; a stack payload
   attracts and chases its receiver's live physical pose through distance-aware nonlinear segments.

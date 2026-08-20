@@ -25,9 +25,9 @@ import type { PixiInventoryDragController } from "~/ui/pixi/drag/PixiInventoryDr
 import { readPixiDragPointerOffset } from "~/ui/pixi/drag/readPixiDragPointerOffset";
 import { setPixiDraggedActorPoseFx } from "~/ui/pixi/drag/setPixiDraggedActorPoseFx";
 import {
-	restorePixiInventoryActorRemovalFeedbackFx,
-	startPixiInventoryActorRemovalFeedbackFx,
-} from "~/ui/pixi/drag/startPixiInventoryActorRemovalFeedbackFx";
+	restorePixiTileActorExitFx,
+	startPixiTileActorExitFx,
+} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiInventoryDropTarget } from "~/ui/pixi/scene/PixiInventoryDropTarget";
 import type { PixiInventorySceneSurface } from "~/ui/pixi/scene/PixiInventorySceneSurface";
@@ -209,7 +209,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 					}),
 				);
 				RendererRuntime.runSync(
-					startPixiInventoryActorRemovalFeedbackFx({
+					startPixiTileActorExitFx({
 						actor,
 						animator,
 					}),
@@ -246,7 +246,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 						}),
 					);
 					RendererRuntime.runSync(
-						restorePixiInventoryActorRemovalFeedbackFx({
+						restorePixiTileActorExitFx({
 							actor,
 							animator,
 						}),

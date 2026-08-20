@@ -19,14 +19,18 @@ import {
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { animatePixiActorToRetargetablePoseFx } from "~/ui/pixi/animation/animatePixiActorToRetargetablePoseFx";
 import { flashPixiTileActorConsumedSourceFx } from "~/ui/pixi/animation/flashPixiTileActorConsumedSourceFx";
-import { readPixiActorAlphaAnimationKey } from "~/ui/pixi/animation/readPixiActorAlphaAnimationKey";
 import {
 	burstPixiTileActorFeedbackParticlesFx,
 	pixiTileActorFeedbackParticlesDurationMs,
 	startPixiTileActorActivityParticlesFx,
 	stopPixiTileActorActivityParticlesFx,
 } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
-import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
+import {
+	pixiTileActorLifecycleDurationMs,
+	preparePixiTileActorEnterFx,
+	startPixiTileActorEnterFx,
+	startPixiTileActorExitFx,
+} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
 import type { PixiDeliveryMotionRuntime } from "~/ui/pixi/delivery/PixiDeliveryMotionRuntime";
@@ -66,7 +70,6 @@ export namespace createPixiMainSceneReconcilerFx {
 
 const runningTransitionDurationMs = 180;
 const feedbackExitDurationMs = 420;
-const defaultExitDurationMs = 220;
 
 /**
  * Reconciles one canonical transition into retained actors while motion owns presentation lag.
@@ -185,7 +188,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 					adoptActiveLifecycleExit &&
 					retainedActor !== undefined &&
 					retainedActor.lifecycleTargetAlpha === 0 &&
-					retainedActor.lifecycleFadeStarted
+					retainedActor.lifecycleTransitionStarted
 						? Math.max(
 								0,
 								retainedActor.lifecycleNotBeforeMs +
@@ -212,24 +215,14 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 					return;
 				}
 				const exitDurationMs = adoptedDurationMs ?? durationMs;
-				yield* animator.animateFx({
+				yield* startPixiTileActorExitFx({
 					actor,
-					channel: "lifecycle-opacity",
+					animator,
 					durationMs: exitDurationMs,
-					ownerKey: readPixiActorAlphaAnimationKey(actor),
 					onComplete: () => {
 						RendererRuntime.runSync(animator.cancelActorFx(actor));
 						RendererRuntime.runSync(actorStore.destroyExitingActorFx(actor));
 					},
-					toAlpha: 0,
-				});
-				yield* animator.animateFx({
-					actor,
-					channel: "pose",
-					durationMs: exitDurationMs,
-					toScale: 0.76,
-					toX: actor.container.x,
-					toY: actor.container.y,
 				});
 			},
 		);
@@ -383,7 +376,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 								? pixiTileActorFeedbackParticlesDurationMs
 								: departure.style === "feedback"
 									? feedbackExitDurationMs
-									: defaultExitDurationMs,
+									: pixiTileActorLifecycleDurationMs,
 						feedbackCues: departure.feedbackCues,
 					});
 				}
@@ -418,15 +411,16 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 						yield* animator.setFx({
 							actor: created,
 							channel: "pose",
-							scale: presentCommittedEffects && spawnCue === undefined ? 0.82 : 1,
+							scale: 1,
 							x: spawnOrigin?.x ?? pose.x,
 							y: spawnOrigin?.y ?? pose.y,
 						});
-						yield* animator.setFx({
-							actor: created,
-							alpha: presentCommittedEffects ? 0 : 1,
-							channel: "lifecycle-opacity",
-						});
+						if (presentCommittedEffects) {
+							yield* preparePixiTileActorEnterFx({
+								actor: created,
+								animator,
+							});
+						}
 						yield* drag.attachActorFx(created);
 						yield* updatePixiTileActorFx({
 							actor: created,
@@ -444,17 +438,9 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 							});
 						}
 						if (presentCommittedEffects && spawnCue === undefined) {
-							yield* startPixiTileActorFadeInFx({
+							yield* startPixiTileActorEnterFx({
 								actor: created,
 								animator,
-							});
-							yield* animator.animateFx({
-								actor: created,
-								channel: "pose",
-								durationMs: 260,
-								toScale: 1,
-								toX: pose.x,
-								toY: pose.y,
 							});
 						}
 						continue;

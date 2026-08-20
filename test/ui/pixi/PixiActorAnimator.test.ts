@@ -91,6 +91,14 @@ const createActor = (id = "runtime:actor", instanceId = `instance:${id}`) =>
 		crowdLayer: {
 			alpha: 1,
 		},
+		lifecycleLayer: {
+			scale: {
+				set(value: number) {
+					this.x = value;
+				},
+				x: 1,
+			},
+		},
 		activityParticles: {
 			container: {
 				visible: true,
@@ -200,6 +208,37 @@ describe("Pixi actor animator", () => {
 		expect(actor.activityParticles.particles[0]?.particle.alpha).toBeCloseTo(0.5);
 		expect(actor.container.x).toBe(100);
 		expect(actor.container.y).toBe(200);
+	});
+
+	it("keeps lifecycle scale independent from canonical pose scale", () => {
+		const actor = createActor();
+		const { animator, tweens } = createAnimator();
+
+		Effect.runSync(
+			animator.animateFx({
+				actor,
+				channel: "pose",
+				durationMs: 300,
+				toScale: 1,
+				toX: 100,
+				toY: 200,
+			}),
+		);
+		Effect.runSync(
+			animator.animateFx({
+				actor,
+				channel: "lifecycle-scale",
+				durationMs: 300,
+				toScale: 0.8,
+			}),
+		);
+		tweens[0]?.update(0.5);
+		tweens[1]?.update(0.5);
+
+		expect(actor.container.scale.x).toBeCloseTo(0.875);
+		expect(actor.lifecycleLayer.scale.x).toBeCloseTo(0.9);
+		expect(actor.container.x).toBeCloseTo(55);
+		expect(actor.container.y).toBeCloseTo(110);
 	});
 
 	it("supersedes different owners on one actor channel while another channel keeps producing frames", () => {

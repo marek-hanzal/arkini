@@ -3,6 +3,10 @@
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
+import {
+	pixiTileActorLifecycleDurationMs,
+	pixiTileActorLifecycleReducedScale,
+} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
 import { finalizePixiTileMotionActorsFx } from "~/ui/pixi/motion/finalizePixiTileMotionActorsFx";
 
 import {
@@ -103,14 +107,19 @@ describe("Pixi spawn lifecycle", () => {
 		expect(animations).toEqual([
 			expect.objectContaining({
 				actor,
+				channel: "lifecycle-scale",
+				durationMs: pixiTileActorLifecycleDurationMs,
+				toScale: pixiTileActorLifecycleReducedScale,
+			}),
+			expect.objectContaining({
+				actor,
 				channel: "lifecycle-opacity",
-				durationMs: 220,
-				ownerKey: `actor-alpha:${actor.instanceId}`,
+				durationMs: pixiTileActorLifecycleDurationMs,
 				toAlpha: 0,
 			}),
 		]);
 		expect(actor.container.destroyed).toBe(false);
-		animations[0]?.onComplete?.();
+		animations.find((animation) => animation.channel === "lifecycle-opacity")?.onComplete?.();
 		expect(actor.container.destroyed).toBe(true);
 	});
 });

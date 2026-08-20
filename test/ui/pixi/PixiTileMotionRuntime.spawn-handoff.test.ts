@@ -3,6 +3,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { pixiTileActorLifecycleDurationMs } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+
 import {
 	readPoseAnimation,
 	samplePoseAnimation,
@@ -50,7 +52,15 @@ describe("Pixi spawn interaction handoff", () => {
 				sourceKind: "motion",
 			},
 		]);
-		expect(animations).toHaveLength(2);
+		expect(
+			animations
+				.filter((animation) => animation.actor === spawned)
+				.map((animation) => animation.channel),
+		).toEqual([
+			"lifecycle-scale",
+			"lifecycle-opacity",
+			"pose",
+		]);
 		expect(spawned.lifecycleIntentGeneration).toBe(fadeGeneration);
 		expect(spawned.container).toMatchObject({
 			x: livePose.x,
@@ -105,7 +115,7 @@ describe("Pixi spawn interaction handoff", () => {
 		);
 		Effect.runSync(runtime.startFx);
 
-		expect(animations).toHaveLength(2);
+		expect(animations.some((animation) => animation.actor === spawned)).toBe(false);
 		expect(Effect.runSync(runtime.readSnapshotFx).spawnCueByActorId.has(spawned.item.id)).toBe(
 			true,
 		);
@@ -115,15 +125,20 @@ describe("Pixi spawn interaction handoff", () => {
 		expect(spawned.container).toMatchObject(pendingPose);
 		expect(spawned.lifecycleIntentGeneration).toBe(1);
 		expect(spawned.lifecycleTargetAlpha).toBe(1);
-		expect(spawned.lifecycleFadeStarted).toBe(true);
-		expect(animations).toHaveLength(3);
-		expect(animations[2]).toMatchObject({
-			actor: spawned,
-			channel: "lifecycle-opacity",
-			durationMs: 520,
-			ownerKey: `actor-alpha:${spawned.instanceId}`,
-			toAlpha: 1,
-		});
+		expect(spawned.lifecycleTransitionStarted).toBe(true);
+		const spawnedLifecycle = animations.filter((animation) => animation.actor === spawned);
+		expect(spawnedLifecycle).toEqual([
+			expect.objectContaining({
+				channel: "lifecycle-scale",
+				durationMs: pixiTileActorLifecycleDurationMs,
+				toScale: 1,
+			}),
+			expect.objectContaining({
+				channel: "lifecycle-opacity",
+				durationMs: pixiTileActorLifecycleDurationMs,
+				toAlpha: 1,
+			}),
+		]);
 		const snapshot = Effect.runSync(runtime.readSnapshotFx);
 		expect(snapshot.spawnCueByActorId.has(spawned.item.id)).toBe(false);
 		expect(snapshot.interactionClaimByActorId.has(spawned.item.id)).toBe(false);

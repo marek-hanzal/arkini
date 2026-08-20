@@ -46,6 +46,10 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 					running: item.running,
 				}),
 			);
+			const lifecycleLayer = new Container({
+				eventMode: "none",
+				label: `TileActorLifecycle:${item.id}:${instanceId}`,
+			});
 			const offsetLayer = new Container({
 				eventMode: "none",
 				label: `TileActorOffset:${item.id}:${instanceId}`,
@@ -85,11 +89,13 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 			visualLayer.addChild(currentVisual.container);
 			crowdLayer.addChild(visualLayer);
 			offsetLayer.addChild(crowdLayer, activityParticles.container, progressBar);
-			container.addChild(offsetLayer);
+			lifecycleLayer.addChild(offsetLayer);
+			container.addChild(lifecycleLayer);
 
 			return {
 				instanceId,
 				container,
+				lifecycleLayer,
 				offsetLayer,
 				crowdLayer,
 				visualLayer,
@@ -102,7 +108,7 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 				size: 0,
 				visualTransitionGeneration: 0,
 				lifecycleIntentGeneration: 0,
-				lifecycleFadeStarted: false,
+				lifecycleTransitionStarted: false,
 				lifecycleTargetAlpha: 1,
 				lifecycleNotBeforeMs: 0,
 				lifecycleDurationMs: 0,

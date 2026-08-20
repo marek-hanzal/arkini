@@ -3,7 +3,11 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { startPixiTileActorRemovalFeedbackFx } from "~/ui/pixi/animation/startPixiTileActorRemovalFeedbackFx";
+import {
+	pixiTileActorLifecycleDurationMs,
+	pixiTileActorLifecycleReducedScale,
+	startPixiTileActorExitFx,
+} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
 
 import {
 	createActor,
@@ -89,9 +93,9 @@ describe("Pixi tile motion stack contact", () => {
 			actor: travel.actor,
 			animations,
 		});
-		expect(vanish.vanishPose.durationMs).toBe(260);
-		expect(vanish.vanishPose.toScale).toBeCloseTo(vanish.scaleBeforeVanish * 0.72);
-		expect(vanish.vanishOpacity.durationMs).toBe(260);
+		expect(vanish.vanishScale.durationMs).toBe(pixiTileActorLifecycleDurationMs);
+		expect(vanish.vanishScale.toScale).toBe(pixiTileActorLifecycleReducedScale);
+		expect(vanish.vanishOpacity.durationMs).toBe(pixiTileActorLifecycleDurationMs);
 		expect(travel.actor.container.destroyed).toBe(true);
 		expect(target.item.quantity).toBe(2);
 		expect(magneticReleases).toContainEqual({
@@ -116,7 +120,7 @@ describe("Pixi tile motion stack contact", () => {
 		actors.set(source.item.id, source);
 		canonicalItems.delete(source.item.id);
 		Effect.runSync(
-			startPixiTileActorRemovalFeedbackFx({
+			startPixiTileActorExitFx({
 				actor: source,
 				animator,
 			}),

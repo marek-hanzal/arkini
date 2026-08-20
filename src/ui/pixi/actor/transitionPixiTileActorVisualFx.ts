@@ -10,7 +10,7 @@ import { whenPixiTileActorVisualReadyFx } from "~/ui/pixi/actor/PixiTileActorVis
 import { createPixiTileActorVisualFx } from "~/ui/pixi/actor/createPixiTileActorVisualFx";
 import { destroyPixiTileActorVisualFx } from "~/ui/pixi/actor/destroyPixiTileActorVisualFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import { resumePixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
+import { resumePixiTileActorEnterFx } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 
@@ -95,7 +95,7 @@ export const transitionPixiTileActorVisualFx = Effect.fn("transitionPixiTileActo
 		actor.visuals.add(incoming);
 		actor.pendingVisual = incoming;
 		actor.visualLayer.addChild(incoming.container);
-		yield* resumePixiTileActorFadeInFx({
+		yield* resumePixiTileActorEnterFx({
 			actor,
 			animator,
 		});

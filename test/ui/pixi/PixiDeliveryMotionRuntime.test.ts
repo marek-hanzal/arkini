@@ -96,7 +96,7 @@ describe("PixiDeliveryMotionRuntime", () => {
 				instanceId: `actor:${deliveryItem.id}`,
 				item: deliveryItem,
 				lifecycleDurationMs: 0,
-				lifecycleFadeStarted: false,
+				lifecycleTransitionStarted: false,
 				lifecycleIntentGeneration: 0,
 				lifecycleNotBeforeMs: 0,
 				lifecycleTargetAlpha: 1,

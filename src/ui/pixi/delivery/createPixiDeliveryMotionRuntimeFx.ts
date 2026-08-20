@@ -10,7 +10,7 @@ import type { PixiTileActorParticleTextures } from "~/ui/pixi/actor/PixiTileActo
 import { createPixiTileActorFx } from "~/ui/pixi/actor/createPixiTileActorFx";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import { startPixiTileActorRemovalFeedbackFx } from "~/ui/pixi/animation/startPixiTileActorRemovalFeedbackFx";
+import { startPixiTileActorExitFx } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
 import { startPixiTileActorRemainderFeedbackFx } from "~/ui/pixi/animation/startPixiTileActorRemainderFeedbackFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiDeliveryMotionRuntime } from "~/ui/pixi/delivery/PixiDeliveryMotionRuntime";
@@ -289,7 +289,7 @@ export const createPixiDeliveryMotionRuntimeFx = Effect.fn("createPixiDeliveryMo
 							settled = true;
 							RendererRuntime.runSync(destroySettledActorFx(itemId, active));
 						};
-						yield* startPixiTileActorRemovalFeedbackFx({
+						yield* startPixiTileActorExitFx({
 							actor: active.actor,
 							animator,
 							onCancel: settle,

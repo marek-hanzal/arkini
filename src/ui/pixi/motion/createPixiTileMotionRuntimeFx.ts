@@ -11,7 +11,7 @@ import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActor
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
+import { startPixiTileActorEnterFx } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import type {
@@ -255,7 +255,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 			const sourceActor = actorStore.actors.get(cue.sourceActorId);
 			if (sourceActor !== undefined && !sourceActor.container.destroyed) {
 				RendererRuntime.runSync(
-					startPixiTileActorFadeInFx({
+					startPixiTileActorEnterFx({
 						actor: sourceActor,
 						animator,
 					}),
@@ -578,7 +578,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 						) {
 							continue;
 						}
-						yield* startPixiTileActorFadeInFx({
+						yield* startPixiTileActorEnterFx({
 							actor: pendingSpawnActor,
 							animator,
 						});

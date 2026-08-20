@@ -5,7 +5,10 @@ import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
 import "~test/ui/pixi/PixiTileMotionRuntime.test/fixture";
-import { pixiTileActorRemovalFeedbackDurationMs } from "~/ui/pixi/animation/startPixiTileActorRemovalFeedbackFx";
+import {
+	pixiTileActorLifecycleDurationMs,
+	pixiTileActorLifecycleReducedScale,
+} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
 import { runPixiInputMotionFx } from "~/ui/pixi/motion/runPixiInputMotionFx";
 
 import {
@@ -208,17 +211,15 @@ describe("Pixi Inventory input travel", () => {
 
 		expect(transient.container.destroyed).toBe(false);
 		const vanishAnimations = animations.slice(animationCountBeforeVanish);
-		const vanishPose = vanishAnimations.find(
-			(animation) => animation.actor === transient && animation.channel === "pose",
+		const vanishScale = vanishAnimations.find(
+			(animation) => animation.actor === transient && animation.channel === "lifecycle-scale",
 		);
-		if (vanishPose?.channel !== "pose") {
+		if (vanishScale?.channel !== "lifecycle-scale") {
 			throw new Error("Expected Inventory remainder scale-down.");
 		}
-		expect(vanishPose.durationMs).toBe(pixiTileActorRemovalFeedbackDurationMs);
-		expect(vanishPose).toMatchObject({
-			toScale: 0.72,
-			toX: opener.container.x + transient.size * 0.14,
-			toY: openerPose.y + transient.size * 0.14,
+		expect(vanishScale.durationMs).toBe(pixiTileActorLifecycleDurationMs);
+		expect(vanishScale).toMatchObject({
+			toScale: pixiTileActorLifecycleReducedScale,
 		});
 		const vanishOpacity = vanishAnimations.find(
 			(animation) =>
@@ -229,7 +230,7 @@ describe("Pixi Inventory input travel", () => {
 		if (vanishOpacity?.channel !== "lifecycle-opacity") {
 			throw new Error("Expected Inventory remainder fade-out.");
 		}
-		expect(vanishOpacity.durationMs).toBe(pixiTileActorRemovalFeedbackDurationMs);
+		expect(vanishOpacity.durationMs).toBe(pixiTileActorLifecycleDurationMs);
 		vanishOpacity.onCancel?.();
 
 		expect(transient.container.destroyed).toBe(true);

@@ -137,6 +137,8 @@ export const updatePixiTileActorFx = Effect.fn("updatePixiTileActorFx")(function
 		});
 	}
 	actor.size = size;
+	actor.lifecycleLayer.position.set(size / 2, size / 2);
+	actor.lifecycleLayer.pivot.set(size / 2, size / 2);
 	updateProgressBar({
 		actor,
 		palette,

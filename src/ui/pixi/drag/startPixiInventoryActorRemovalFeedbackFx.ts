@@ -1,5 +1,0 @@
-export {
-	pixiTileActorRemovalFeedbackDurationMs as pixiInventoryActorRemovalFeedbackDurationMs,
-	restorePixiTileActorRemovalFeedbackFx as restorePixiInventoryActorRemovalFeedbackFx,
-	startPixiTileActorRemovalFeedbackFx as startPixiInventoryActorRemovalFeedbackFx,
-} from "~/ui/pixi/animation/startPixiTileActorRemovalFeedbackFx";

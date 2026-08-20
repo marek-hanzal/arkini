@@ -10,9 +10,9 @@ import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCurs
 import { animatePixiActorToRetargetablePoseFx } from "~/ui/pixi/animation/animatePixiActorToRetargetablePoseFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import {
-	restorePixiTileActorRemovalFeedbackFx,
-	startPixiTileActorRemovalFeedbackFx,
-} from "~/ui/pixi/animation/startPixiTileActorRemovalFeedbackFx";
+	restorePixiTileActorExitFx,
+	startPixiTileActorExitFx,
+} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
 import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
 import { settlePixiMainSceneDraggedActorFx } from "~/ui/pixi/drag/settlePixiMainSceneDraggedActorFx";
 import type { PixiCursorGrabMotion } from "~/ui/pixi/drag/PixiCursorGrabMotion";
@@ -91,7 +91,7 @@ export const createPixiMainSceneDropSubmissionFx = Effect.fn("createPixiMainScen
 				return;
 			}
 			RendererRuntime.runSync(
-				restorePixiTileActorRemovalFeedbackFx({
+				restorePixiTileActorExitFx({
 					actor,
 					animator,
 				}),
@@ -152,7 +152,7 @@ export const createPixiMainSceneDropSubmissionFx = Effect.fn("createPixiMainScen
 							if (optimisticRemoval === null || removalStarted) return;
 							removalStarted = true;
 							RendererRuntime.runSync(
-								startPixiTileActorRemovalFeedbackFx({
+								startPixiTileActorExitFx({
 									actor: optimisticRemoval.actor,
 									animator,
 									onCancel: () => {

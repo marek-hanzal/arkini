@@ -45,6 +45,7 @@ vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
 				readonly id: string;
 			};
 		}) => {
+			const lifecycleLayer = new PixiContainer();
 			const visual = {
 				container: new PixiContainer(),
 				item,
@@ -88,8 +89,9 @@ vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
 				dragOffsetY: 0,
 				instanceId: `instance:${item.id}`,
 				item,
+				lifecycleLayer,
 				lifecycleDurationMs: 0,
-				lifecycleFadeStarted: false,
+				lifecycleTransitionStarted: false,
 				lifecycleIntentGeneration: 0,
 				lifecycleNotBeforeMs: 0,
 				lifecycleTargetAlpha: 0,
@@ -188,6 +190,10 @@ export const createActor = (id: string): PixiTileActor => {
 	const item = createItem(id);
 	const container = new Container();
 	container.alpha = 0;
+	const lifecycleLayer = new Container();
+	const offsetLayer = new Container();
+	lifecycleLayer.addChild(offsetLayer);
+	container.addChild(lifecycleLayer);
 	const titleStyle = new TextStyle();
 	const visual = {
 		container: new Container(),
@@ -247,12 +253,13 @@ export const createActor = (id: string): PixiTileActor => {
 		dragOffsetY: 0,
 		instanceId: `instance:${id}`,
 		item,
+		lifecycleLayer,
 		lifecycleDurationMs: 0,
-		lifecycleFadeStarted: false,
+		lifecycleTransitionStarted: false,
 		lifecycleIntentGeneration: 0,
 		lifecycleNotBeforeMs: 0,
 		lifecycleTargetAlpha: 0,
-		offsetLayer: new Container(),
+		offsetLayer,
 		onPointerDown: null,
 		pendingVisual: null,
 		progressBar: new Graphics(),
@@ -394,6 +401,9 @@ export const applyPresentationWrite = (write: PixiActorPresentationWrite) => {
 			return;
 		case "lifecycle-opacity":
 			write.actor.container.alpha = write.alpha;
+			return;
+		case "lifecycle-scale":
+			write.actor.lifecycleLayer.scale.set(write.scale);
 			return;
 		case "crowd-opacity":
 			write.actor.crowdLayer.alpha = write.alpha;
@@ -585,11 +595,12 @@ export const advanceStackMergeVanish = ({
 	readonly actor: PixiTileActor;
 	readonly animations: ReadonlyArray<PixiActorAnimation>;
 }) => {
-	const vanishPose = animations
-		.filter((animation) => animation.actor === actor && animation.channel === "pose")
+	const vanishScale = animations
+		.filter((animation) => animation.actor === actor && animation.channel === "lifecycle-scale")
 		.at(-1);
-	if (vanishPose?.channel !== "pose") throw new Error("Expected stack merge vanish pose.");
-	const scaleBeforeVanish = actor.container.scale.x;
+	if (vanishScale?.channel !== "lifecycle-scale") {
+		throw new Error("Expected stack merge lifecycle scale.");
+	}
 	const vanishOpacity = animations
 		.filter(
 			(animation) =>
@@ -603,9 +614,8 @@ export const advanceStackMergeVanish = ({
 	}
 	vanishOpacity.onComplete?.();
 	return {
-		scaleBeforeVanish,
 		vanishOpacity,
-		vanishPose,
+		vanishScale,
 	};
 };
 

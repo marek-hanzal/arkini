@@ -95,6 +95,9 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 					case "lifecycle-opacity":
 						write.actor.container.alpha = write.alpha;
 						break;
+					case "lifecycle-scale":
+						write.actor.lifecycleLayer.scale.set(write.scale);
+						break;
 					case "crowd-opacity":
 						write.actor.crowdLayer.alpha = write.alpha;
 						break;
@@ -123,6 +126,7 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 						const fromY = actor.container.y;
 						const fromScale = actor.container.scale.x;
 						const fromAlpha = actor.container.alpha;
+						const fromLifecycleScale = actor.lifecycleLayer.scale.x;
 						const fromCrowdAlpha = actor.crowdLayer.alpha;
 						const fromIncomingAlpha =
 							animation.channel === "visual-mix" ? animation.incoming.alpha : 0;
@@ -177,6 +181,13 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 												actor.container.alpha =
 													fromAlpha +
 													(animation.toAlpha - fromAlpha) * progress;
+												break;
+											case "lifecycle-scale":
+												actor.lifecycleLayer.scale.set(
+													fromLifecycleScale +
+														(animation.toScale - fromLifecycleScale) *
+															progress,
+												);
 												break;
 											case "crowd-opacity":
 												actor.crowdLayer.alpha =

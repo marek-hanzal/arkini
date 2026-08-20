@@ -23,10 +23,7 @@ const consumedSourceAlpha = 0.42;
 export const flashPixiTileActorConsumedSourceFx = Effect.fn("flashPixiTileActorConsumedSourceFx")(
 	function* ({ actor, animator }: flashPixiTileActorConsumedSourceFx.Props) {
 		if (actor.container.destroyed) return;
-		actor.lifecycleIntentGeneration += 1;
 		const intentGeneration = actor.lifecycleIntentGeneration;
-		actor.lifecycleTargetAlpha = 1;
-		actor.lifecycleFadeStarted = true;
 		yield* animator.animateFx({
 			actor,
 			channel: "lifecycle-opacity",

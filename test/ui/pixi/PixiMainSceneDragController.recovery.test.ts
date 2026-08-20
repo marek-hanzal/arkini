@@ -4,6 +4,10 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import {
+	pixiTileActorLifecycleDurationMs,
+	pixiTileActorLifecycleReducedScale,
+} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+import {
 	createItem,
 	flushMicrotasks,
 	mountController,
@@ -34,9 +38,20 @@ describe("Pixi main-scene drag controller: recovery", () => {
 			expect.objectContaining({
 				actor: mounted.actor,
 				channel: "lifecycle-opacity",
-				durationMs: 160,
+				durationMs: pixiTileActorLifecycleDurationMs,
 				toAlpha: 1,
 			}),
+		);
+		expect(mounted.animations).toContainEqual(
+			expect.objectContaining({
+				actor: mounted.actor,
+				channel: "lifecycle-scale",
+				durationMs: pixiTileActorLifecycleDurationMs,
+				toScale: 1,
+			}),
+		);
+		expect(mounted.actor.lifecycleLayer.scale.x).toBeGreaterThanOrEqual(
+			pixiTileActorLifecycleReducedScale,
 		);
 		expect(
 			mounted.animations.some(

@@ -9,6 +9,7 @@ export type PixiActorAnimationChannel =
 	| "crowd-opacity"
 	| "grab-offset"
 	| "lifecycle-opacity"
+	| "lifecycle-scale"
 	| "pose"
 	| "visual-mix";
 
@@ -42,6 +43,10 @@ export type PixiActorAnimation =
 			readonly toAlpha: number;
 	  })
 	| (PixiActorAnimationBase & {
+			readonly channel: "lifecycle-scale";
+			readonly toScale: number;
+	  })
+	| (PixiActorAnimationBase & {
 			readonly channel: "crowd-opacity";
 			readonly toCrowdAlpha: number;
 	  })
@@ -60,6 +65,11 @@ export type PixiActorPresentationWrite =
 			readonly actor: PixiTileActor;
 			readonly alpha: number;
 			readonly channel: "lifecycle-opacity";
+	  }
+	| {
+			readonly actor: PixiTileActor;
+			readonly channel: "lifecycle-scale";
+			readonly scale: number;
 	  }
 	| {
 			readonly actor: PixiTileActor;

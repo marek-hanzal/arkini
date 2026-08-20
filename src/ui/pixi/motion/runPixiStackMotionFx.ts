@@ -8,9 +8,11 @@ import { createPixiTileActorFx } from "~/ui/pixi/actor/createPixiTileActorFx";
 import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
-import { restorePixiTileActorRemovalFeedbackFx } from "~/ui/pixi/animation/startPixiTileActorRemovalFeedbackFx";
-import { startPixiTileActorVanishFeedbackFx } from "~/ui/pixi/animation/startPixiTileActorVanishFeedbackFx";
+import {
+	restorePixiTileActorExitFx,
+	startPixiTileActorEnterFx,
+	startPixiTileActorExitFx,
+} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { chasePixiTileMotionTargetFx } from "~/ui/pixi/motion/chasePixiTileMotionTargetFx";
@@ -96,7 +98,7 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 			textures,
 		}));
 	if (source !== null) {
-		yield* restorePixiTileActorRemovalFeedbackFx({
+		yield* restorePixiTileActorExitFx({
 			actor: source,
 			animator,
 		});
@@ -116,17 +118,12 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 	if (source === null) {
 		yield* animator.setFx({
 			actor: payload,
-			alpha: 0,
-			channel: "lifecycle-opacity",
-		});
-		yield* animator.setFx({
-			actor: payload,
 			channel: "pose",
 			scale: origin.size / Math.max(1, payload.size),
 			x: origin.x,
 			y: origin.y,
 		});
-		yield* startPixiTileActorFadeInFx({
+		yield* startPixiTileActorEnterFx({
 			actor: payload,
 			animator,
 			delayMs,
@@ -184,7 +181,7 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 				onComplete();
 			};
 			RendererRuntime.runSync(
-				startPixiTileActorVanishFeedbackFx({
+				startPixiTileActorExitFx({
 					actor: payload,
 					animator,
 					onCancel: settle,

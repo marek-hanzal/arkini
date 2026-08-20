@@ -19,6 +19,10 @@ import type {
 	PixiActorPresentationWrite,
 } from "~/ui/pixi/animation/PixiActorAnimator";
 import { burstPixiTileActorAckParticlesFx } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
+import {
+	pixiTileActorLifecycleDurationMs,
+	pixiTileActorLifecycleReducedScale,
+} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
 import { settlePixiMainSceneDraggedActorFx } from "~/ui/pixi/drag/settlePixiMainSceneDraggedActorFx";
 import { createPixiMainSceneDropPresentationFx } from "~/ui/pixi/drop/createPixiMainSceneDropPresentationFx";
@@ -184,6 +188,7 @@ const createActor = (item: TileActorItem): PixiTileActor => {
 	});
 	container.alpha = 1;
 	container.position.set(40, 60);
+	const lifecycleLayer = new Container();
 	const offsetLayer = new Container();
 	const crowdLayer = new Container();
 	const visualLayer = new Container();
@@ -200,10 +205,12 @@ const createActor = (item: TileActorItem): PixiTileActor => {
 	visualLayer.addChild(currentVisual.container);
 	crowdLayer.addChild(visualLayer);
 	offsetLayer.addChild(activityParticleContainer, crowdLayer);
-	container.addChild(offsetLayer);
+	lifecycleLayer.addChild(offsetLayer);
+	container.addChild(lifecycleLayer);
 	return {
 		instanceId: `test:${item.id}`,
 		container,
+		lifecycleLayer,
 		offsetLayer,
 		crowdLayer,
 		visualLayer,
@@ -238,7 +245,7 @@ const createActor = (item: TileActorItem): PixiTileActor => {
 		size: 80,
 		visualTransitionGeneration: 0,
 		lifecycleIntentGeneration: 0,
-		lifecycleFadeStarted: false,
+		lifecycleTransitionStarted: false,
 		lifecycleTargetAlpha: 1,
 		lifecycleNotBeforeMs: 0,
 		lifecycleDurationMs: 0,
@@ -775,8 +782,16 @@ describe("Pixi main-scene reconciliation", () => {
 			expect.objectContaining({
 				actor,
 				channel: "lifecycle-opacity",
-				durationMs: 220,
+				durationMs: pixiTileActorLifecycleDurationMs,
 				toAlpha: 0,
+			}),
+		);
+		expect(harness.animations).toContainEqual(
+			expect.objectContaining({
+				actor,
+				channel: "lifecycle-scale",
+				durationMs: pixiTileActorLifecycleDurationMs,
+				toScale: pixiTileActorLifecycleReducedScale,
 			}),
 		);
 	});
@@ -1062,10 +1077,12 @@ describe("Pixi main-scene reconciliation", () => {
 			inventory,
 		];
 		actor.container.alpha = 0.37;
-		actor.lifecycleDurationMs = 260;
-		actor.lifecycleFadeStarted = true;
+		actor.lifecycleDurationMs = pixiTileActorLifecycleDurationMs;
+		actor.lifecycleTransitionStarted = true;
 		actor.lifecycleNotBeforeMs = 900;
 		actor.lifecycleTargetAlpha = 0;
+		const remainingLifecycleDurationMs =
+			actor.lifecycleNotBeforeMs + actor.lifecycleDurationMs - performance.now();
 
 		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
 		expect(harness.actors.get(source.id)).toBe(actor);
@@ -1110,8 +1127,16 @@ describe("Pixi main-scene reconciliation", () => {
 			expect.objectContaining({
 				actor,
 				channel: "lifecycle-opacity",
-				durationMs: 160,
+				durationMs: remainingLifecycleDurationMs,
 				toAlpha: 0,
+			}),
+		);
+		expect(harness.animations).toContainEqual(
+			expect.objectContaining({
+				actor,
+				channel: "lifecycle-scale",
+				durationMs: remainingLifecycleDurationMs,
+				toScale: pixiTileActorLifecycleReducedScale,
 			}),
 		);
 		expect(harness.animations).toContainEqual(
@@ -1332,9 +1357,9 @@ describe("Pixi main-scene reconciliation", () => {
 		expect(harness.animations).toContainEqual(
 			expect.objectContaining({
 				actor,
-				channel: "pose",
+				channel: "lifecycle-scale",
 				durationMs: 720,
-				toScale: 0.76,
+				toScale: pixiTileActorLifecycleReducedScale,
 			}),
 		);
 		expect(actor.container.destroyed).toBe(false);

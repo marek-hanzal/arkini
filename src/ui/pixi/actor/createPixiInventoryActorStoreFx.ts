@@ -21,11 +21,11 @@ import {
 	startPixiTileActorActivityParticlesFx,
 	stopPixiTileActorActivityParticlesFx,
 } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
-import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
 import {
-	restorePixiInventoryActorRemovalFeedbackFx,
-	startPixiInventoryActorRemovalFeedbackFx,
-} from "~/ui/pixi/drag/startPixiInventoryActorRemovalFeedbackFx";
+	restorePixiTileActorExitFx,
+	startPixiTileActorEnterFx,
+	startPixiTileActorExitFx,
+} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiInventoryDropTarget } from "~/ui/pixi/scene/PixiInventoryDropTarget";
@@ -111,7 +111,7 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 								)
 									return;
 								exitingActors.set(actorId, actor);
-								yield* startPixiInventoryActorRemovalFeedbackFx({
+								yield* startPixiTileActorExitFx({
 									actor,
 									animator,
 									onComplete: () => {
@@ -188,7 +188,7 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 									created.push(actor);
 									changed = true;
 									RendererRuntime.runSync(
-										restorePixiInventoryActorRemovalFeedbackFx({
+										restorePixiTileActorExitFx({
 											actor,
 											animator,
 										}),
@@ -261,24 +261,9 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 								);
 								if (hydrated) {
 									RendererRuntime.runSync(
-										animator.setFx({
-											actor,
-											alpha: 0,
-											channel: "lifecycle-opacity",
-										}),
-									);
-									RendererRuntime.runSync(
-										startPixiTileActorFadeInFx({
+										startPixiTileActorEnterFx({
 											actor,
 											animator,
-										}),
-									);
-								} else {
-									RendererRuntime.runSync(
-										animator.setFx({
-											actor,
-											alpha: 1,
-											channel: "lifecycle-opacity",
 										}),
 									);
 								}

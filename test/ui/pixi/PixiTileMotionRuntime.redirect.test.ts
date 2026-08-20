@@ -3,7 +3,7 @@
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
-import { pixiTileActorRemovalFeedbackDurationMs } from "~/ui/pixi/animation/startPixiTileActorRemovalFeedbackFx";
+import { pixiTileActorLifecycleDurationMs } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
 
 import {
 	inventoryLocation,
@@ -104,7 +104,7 @@ describe("Pixi motion target redirection", () => {
 		if (vanishOpacity?.channel !== "lifecycle-opacity") {
 			throw new Error("Expected redirected payload fade-out.");
 		}
-		expect(vanishOpacity.durationMs).toBe(pixiTileActorRemovalFeedbackDurationMs);
+		expect(vanishOpacity.durationMs).toBe(pixiTileActorLifecycleDurationMs);
 		expect(Effect.runSync(runtime.readSnapshotFx).quantityPresentationByActorId.size).toBe(1);
 		vanishOpacity.onComplete?.();
 

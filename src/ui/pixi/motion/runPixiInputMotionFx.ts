@@ -9,9 +9,8 @@ import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
-import { startPixiTileActorRemovalFeedbackFx } from "~/ui/pixi/animation/startPixiTileActorRemovalFeedbackFx";
+import { startPixiTileActorExitFx } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
 import { startPixiTileActorRemainderFeedbackFx } from "~/ui/pixi/animation/startPixiTileActorRemainderFeedbackFx";
-import { startPixiTileActorVanishFeedbackFx } from "~/ui/pixi/animation/startPixiTileActorVanishFeedbackFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { chasePixiTileMotionTargetFx } from "~/ui/pixi/motion/chasePixiTileMotionTargetFx";
@@ -194,7 +193,7 @@ const returnPixiInputRemainderFx = Effect.fn("returnPixiInputRemainderFx")(funct
 								}),
 							);
 						};
-						yield* startPixiTileActorVanishFeedbackFx({
+						yield* startPixiTileActorExitFx({
 							actor: transient,
 							animator,
 							onCancel: settle,
@@ -420,7 +419,7 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 								}),
 							);
 						};
-						yield* startPixiTileActorRemovalFeedbackFx({
+						yield* startPixiTileActorExitFx({
 							actor: transient,
 							animator,
 							onCancel: settle,
@@ -446,7 +445,7 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 							}),
 						);
 					};
-					yield* startPixiTileActorRemovalFeedbackFx({
+					yield* startPixiTileActorExitFx({
 						actor: transient,
 						animator,
 						onCancel: settle,

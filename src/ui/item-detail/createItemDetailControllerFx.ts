@@ -84,7 +84,11 @@ const sameTarget = (left: ItemDetailTarget, right: ItemDetailTarget) =>
  * settlement; a late failure is published only while its exact admitting
  * target visit still owns the visible detail.
  */
-export const createItemDetailController = (): ItemDetailController => {
+export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Generator<
+	never,
+	ItemDetailController,
+	never
+> {
 	const listeners = new Set<() => void>();
 	let snapshot: ItemDetailController.Snapshot = initialSnapshot;
 	let nextGeneration = 0;
@@ -228,4 +232,4 @@ export const createItemDetailController = (): ItemDetailController => {
 			outcomeEpoch = 0;
 		}),
 	};
-};
+});

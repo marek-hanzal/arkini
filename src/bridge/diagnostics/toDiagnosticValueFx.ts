@@ -1,23 +1,8 @@
 import { Effect } from "effect";
 
-import type {
-	DiagnosticRecord,
-	DiagnosticValue,
-} from "../../../electron/contract/diagnostics/DiagnosticRecord";
+import type { DiagnosticValue } from "../../../electron/contract/diagnostics/DiagnosticRecord";
 
-let warnedAboutDiagnosticFailure = false;
-
-const reportDiagnosticFailure = (cause: unknown) => {
-	if (warnedAboutDiagnosticFailure) return;
-	warnedAboutDiagnosticFailure = true;
-	console.warn("Arkini diagnostics are unavailable.", cause);
-};
-
-/**
- * Converts unknown failures and Effect/Pixi objects into a bounded JSON-safe diagnostic value.
- * Diagnostic logging must never throw while handling the failure it is trying to preserve.
- */
-export const toDiagnosticValue = (
+const toDiagnosticValue = (
 	value: unknown,
 	depth = 0,
 	seen = new WeakSet<object>(),
@@ -95,25 +80,7 @@ export const toDiagnosticValue = (
 	return result;
 };
 
-/** Fire-and-forget renderer edge. Logger failures are deliberately isolated from gameplay. */
-export const writeDiagnosticRecord = (record: Omit<DiagnosticRecord, "schemaVersion">): void => {
-	try {
-		const diagnostics = window.arkini?.diagnostics;
-		if (diagnostics === undefined) return;
-		void diagnostics
-			.write({
-				schemaVersion: 1,
-				...record,
-			})
-			.catch(reportDiagnosticFailure);
-	} catch (cause) {
-		reportDiagnosticFailure(cause);
-	}
-};
-
-export const openDiagnosticDirectoryFx = Effect.fn("openDiagnosticDirectoryFx")(() =>
-	Effect.tryPromise({
-		try: () => window.arkini.diagnostics.openDirectory(),
-		catch: (cause) => cause,
-	}),
-);
+/** Converts unknown failures and Effect/Pixi objects into a bounded JSON-safe diagnostic value. */
+export const toDiagnosticValueFx = Effect.fnUntraced(function* (value: unknown) {
+	return toDiagnosticValue(value);
+});

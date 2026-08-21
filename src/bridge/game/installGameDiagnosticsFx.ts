@@ -1,8 +1,10 @@
 import { Effect } from "effect";
 
 import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
-import { toDiagnosticValue, writeDiagnosticRecord } from "~/bridge/diagnostics/Diagnostics";
+import { toDiagnosticValueFx } from "~/bridge/diagnostics/toDiagnosticValueFx";
+import { writeDiagnosticRecordFx } from "~/bridge/diagnostics/writeDiagnosticRecordFx";
 import type { GameSession, GameTransition } from "~/bridge/game/GameSession";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 const readDeliverySummary = (runtime: RuntimeSchema.Type) =>
@@ -52,7 +54,7 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 	let latestSequence = 0;
 	let previousSignature: string | undefined;
 
-	writeDiagnosticRecord({
+	yield* writeDiagnosticRecordFx({
 		category: [
 			"game",
 			"session",
@@ -75,68 +77,76 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 			if (signature === previousSignature && transition.events.length === 0) return;
 			previousSignature = signature;
 			const runtime = transition.runtime;
-			writeDiagnosticRecord({
-				category: [
-					"game",
-					"transition",
-				],
-				event: "runtime-committed",
-				level: "info",
-				sessionId,
-				data: {
-					sequence: transition.sequence,
-					eventTypes: transition.events.map((event) => event.type),
-					itemCount: runtime.items.length,
-					jobCount: runtime.jobs.length,
-					jobQueueCount: runtime.jobQueue.length ?? 0,
-					deliveries: readDeliverySummary(runtime),
-				},
-			});
+			RendererRuntime.runSync(
+				writeDiagnosticRecordFx({
+					category: [
+						"game",
+						"transition",
+					],
+					event: "runtime-committed",
+					level: "info",
+					sessionId,
+					data: {
+						sequence: transition.sequence,
+						eventTypes: transition.events.map((event) => event.type),
+						itemCount: runtime.items.length,
+						jobCount: runtime.jobs.length,
+						jobQueueCount: runtime.jobQueue.length ?? 0,
+						deliveries: readDeliverySummary(runtime),
+					},
+				}),
+			);
 		} catch (cause) {
-			writeDiagnosticRecord({
-				category: [
-					"renderer",
-					"diagnostics",
-				],
-				event: "transition-record-failed",
-				level: "error",
-				sessionId,
-				data: {
-					cause: toDiagnosticValue(cause),
-				},
-			});
+			RendererRuntime.runSync(
+				writeDiagnosticRecordFx({
+					category: [
+						"renderer",
+						"diagnostics",
+					],
+					event: "transition-record-failed",
+					level: "error",
+					sessionId,
+					data: {
+						cause: RendererRuntime.runSync(toDiagnosticValueFx(cause)),
+					},
+				}),
+			);
 		}
 	});
 	const unsubscribeFatal = session.subscribeFatalError(() => {
 		try {
 			const fatal = session.getFatalError();
-			writeDiagnosticRecord({
-				category: [
-					"game",
-					"fatal",
-				],
-				event: "session-failed",
-				level: "fatal",
-				sessionId,
-				data: {
-					source: fatal?.source ?? "unknown",
-					error: toDiagnosticValue(fatal),
-					sequence: latestSequence,
-				},
-			});
+			RendererRuntime.runSync(
+				writeDiagnosticRecordFx({
+					category: [
+						"game",
+						"fatal",
+					],
+					event: "session-failed",
+					level: "fatal",
+					sessionId,
+					data: {
+						source: fatal?.source ?? "unknown",
+						error: RendererRuntime.runSync(toDiagnosticValueFx(fatal)),
+						sequence: latestSequence,
+					},
+				}),
+			);
 		} catch (cause) {
-			writeDiagnosticRecord({
-				category: [
-					"renderer",
-					"diagnostics",
-				],
-				event: "fatal-record-failed",
-				level: "error",
-				sessionId,
-				data: {
-					cause: toDiagnosticValue(cause),
-				},
-			});
+			RendererRuntime.runSync(
+				writeDiagnosticRecordFx({
+					category: [
+						"renderer",
+						"diagnostics",
+					],
+					event: "fatal-record-failed",
+					level: "error",
+					sessionId,
+					data: {
+						cause: RendererRuntime.runSync(toDiagnosticValueFx(cause)),
+					},
+				}),
+			);
 		}
 	});
 
@@ -147,19 +157,21 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 			closed = true;
 			unsubscribeFatal();
 			unsubscribeTransitions();
-			writeDiagnosticRecord({
-				category: [
-					"game",
-					"session",
-				],
-				event: "session-ended",
-				level: "info",
-				sessionId,
-				data: {
-					reason,
-					sequence: latestSequence,
-				},
-			});
+			RendererRuntime.runSync(
+				writeDiagnosticRecordFx({
+					category: [
+						"game",
+						"session",
+					],
+					event: "session-ended",
+					level: "info",
+					sessionId,
+					data: {
+						reason,
+						sequence: latestSequence,
+					},
+				}),
+			);
 		},
 	};
 });

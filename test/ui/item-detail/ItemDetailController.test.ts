@@ -3,7 +3,7 @@
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
-import { createItemDetailController } from "~/ui/item-detail/createItemDetailController";
+import { createItemDetailControllerFx } from "~/ui/item-detail/createItemDetailControllerFx";
 import type { ItemDetailTarget } from "~/ui/item-detail/ItemDetailControl";
 
 const runtimeTarget = ({
@@ -27,7 +27,7 @@ const runtimeTarget = ({
 
 describe("ItemDetailController", () => {
 	it("allocates a fresh command outcome scope for A to B to A target visits", () => {
-		const controller = createItemDetailController();
+		const controller = Effect.runSync(createItemDetailControllerFx());
 		Effect.runSync(controller.openTargetFx(runtimeTarget()));
 		const firstScope = controller.readOutcomeScope();
 		Effect.runSync(
@@ -50,7 +50,7 @@ describe("ItemDetailController", () => {
 	});
 
 	it("treats a changed Lines search query as a fresh presentation intent", () => {
-		const controller = createItemDetailController();
+		const controller = Effect.runSync(createItemDetailControllerFx());
 		Effect.runSync(
 			controller.openTargetFx(
 				runtimeTarget({
@@ -80,7 +80,7 @@ describe("ItemDetailController", () => {
 	});
 
 	it("owns origin retention and generation-safe close settlement", async () => {
-		const controller = createItemDetailController();
+		const controller = Effect.runSync(createItemDetailControllerFx());
 		const listener = vi.fn();
 		const origin = document.createElement("button");
 		controller.subscribe(listener);
@@ -114,7 +114,7 @@ describe("ItemDetailController", () => {
 	});
 
 	it("resolves an outstanding close when reset tears down the presentation owner", async () => {
-		const controller = createItemDetailController();
+		const controller = Effect.runSync(createItemDetailControllerFx());
 		Effect.runSync(controller.openTargetFx(runtimeTarget()));
 		const entering = controller.getSnapshot().state;
 		if (entering.phase !== "entering") throw new Error("Expected entering state.");

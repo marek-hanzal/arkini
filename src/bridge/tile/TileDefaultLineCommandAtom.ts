@@ -3,7 +3,8 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { makeExactGameAtomFamilyFx } from "~/bridge/game/makeExactGameAtomFamilyFx";
 import { settleRendererCommandFailureFx } from "~/bridge/game/settleRendererCommandFailureFx";
-import { toDiagnosticValue, writeDiagnosticRecord } from "~/bridge/diagnostics/Diagnostics";
+import { toDiagnosticValueFx } from "~/bridge/diagnostics/toDiagnosticValueFx";
+import { writeDiagnosticRecordFx } from "~/bridge/diagnostics/writeDiagnosticRecordFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { enqueueDefaultLineFx } from "~/engine/job/write/enqueueDefaultLineFx";
 import { fillDefaultLineQueueFx } from "~/engine/job/write/fillDefaultLineQueueFx";
@@ -99,7 +100,7 @@ export const TileDefaultLineCommandAtom = RendererRuntime.runSync(
 						),
 					);
 					if (Exit.isFailure(exit)) {
-						writeDiagnosticRecord({
+						yield* writeDiagnosticRecordFx({
 							category: [
 								"game",
 								"command",
@@ -111,7 +112,7 @@ export const TileDefaultLineCommandAtom = RendererRuntime.runSync(
 								action: command.kind,
 								generation: command.generation,
 								ownerItemId: command.ownerItemId,
-								cause: toDiagnosticValue(exit.cause),
+								cause: yield* toDiagnosticValueFx(exit.cause),
 							},
 						});
 						return yield* settleRendererCommandFailureFx({
@@ -129,7 +130,7 @@ export const TileDefaultLineCommandAtom = RendererRuntime.runSync(
 						});
 					}
 					if (Exit.isFailure(exit.value.commandExit)) {
-						writeDiagnosticRecord({
+						yield* writeDiagnosticRecordFx({
 							category: [
 								"game",
 								"command",
@@ -141,7 +142,7 @@ export const TileDefaultLineCommandAtom = RendererRuntime.runSync(
 								action: command.kind,
 								generation: command.generation,
 								ownerItemId: command.ownerItemId,
-								cause: toDiagnosticValue(exit.value.commandExit.cause),
+								cause: yield* toDiagnosticValueFx(exit.value.commandExit.cause),
 							},
 						});
 						return yield* settleRendererCommandFailureFx({
@@ -158,7 +159,7 @@ export const TileDefaultLineCommandAtom = RendererRuntime.runSync(
 							setFatalCause: (cause) => Atom.set(fatalCauseAtom, cause),
 						});
 					}
-					writeDiagnosticRecord({
+					yield* writeDiagnosticRecordFx({
 						category: [
 							"game",
 							"command",
@@ -170,7 +171,7 @@ export const TileDefaultLineCommandAtom = RendererRuntime.runSync(
 							action: command.kind,
 							generation: command.generation,
 							ownerItemId: command.ownerItemId,
-							result: toDiagnosticValue(exit.value.commandExit.value),
+							result: yield* toDiagnosticValueFx(exit.value.commandExit.value),
 						},
 					});
 					if (command.generation !== latestCommandGeneration) return;
@@ -210,20 +211,22 @@ export const TileDefaultLineCommandAtom = RendererRuntime.runSync(
 				if (state.kind === "error" && state.ownerItemId === command.ownerItemId) return;
 				activeCommandKeys.add(key);
 				const generation = ++latestCommandGeneration;
-				writeDiagnosticRecord({
-					category: [
-						"game",
-						"command",
-					],
-					event: "default-line-queue-admitted",
-					level: "info",
-					sessionId: game.diagnosticSessionId,
-					data: {
-						action: command.kind,
-						generation,
-						ownerItemId: command.ownerItemId,
-					},
-				});
+				RendererRuntime.runSync(
+					writeDiagnosticRecordFx({
+						category: [
+							"game",
+							"command",
+						],
+						event: "default-line-queue-admitted",
+						level: "info",
+						sessionId: game.diagnosticSessionId,
+						data: {
+							action: command.kind,
+							generation,
+							ownerItemId: command.ownerItemId,
+						},
+					}),
+				);
 				context.set(stateAtom, {
 					kind: "pending",
 					ownerItemId: command.ownerItemId,

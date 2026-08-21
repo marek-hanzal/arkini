@@ -1,3 +1,5 @@
+import { Effect } from "effect";
+
 import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
 import { toDiagnosticValue, writeDiagnosticRecord } from "~/bridge/diagnostics/Diagnostics";
 import type { GameSession, GameTransition } from "~/bridge/game/GameSession";
@@ -36,7 +38,7 @@ const readTransitionSignature = (transition: GameTransition) =>
 		})),
 	});
 
-export const installGameDiagnostics = ({
+export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(function* ({
 	arkpack,
 	restored,
 	session,
@@ -44,7 +46,7 @@ export const installGameDiagnostics = ({
 	readonly arkpack: ArkpackDescriptor;
 	readonly restored: boolean;
 	readonly session: GameSession;
-}) => {
+}) {
 	const sessionId = crypto.randomUUID();
 	let closed = false;
 	let latestSequence = 0;
@@ -160,4 +162,4 @@ export const installGameDiagnostics = ({
 			});
 		},
 	};
-};
+});

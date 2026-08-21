@@ -1,4 +1,4 @@
-import { Cause } from "effect";
+import { Cause, Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { ArkiniElectronApi } from "../../../electron/contract/ArkiniElectronApi";
@@ -7,7 +7,7 @@ import {
 	DiagnosticRecordSchema,
 } from "../../../electron/contract/diagnostics/DiagnosticRecord";
 import type { GameSession, GameTransition } from "~/bridge/game/GameSession";
-import { installGameDiagnostics } from "~/bridge/game/installGameDiagnostics";
+import { installGameDiagnosticsFx } from "~/bridge/game/installGameDiagnosticsFx";
 import { GameSessionFatalError } from "~/bridge/game/GameSessionFatalError";
 import { RuntimeInvalidError } from "~/engine/runtime/error/RuntimeInvalidError";
 
@@ -70,22 +70,24 @@ describe("Game diagnostics", () => {
 			},
 			getFatalError: () => fatal,
 		} as unknown as GameSession;
-		const diagnostics = installGameDiagnostics({
-			arkpack: {
-				packageId: "package:test",
-				hash: "content:test",
-				gameId: "game:test",
-				title: "Test",
-				game: "1",
-				source: "built-in",
-				trust: {
-					type: "official",
-					keyId: "test",
+		const diagnostics = Effect.runSync(
+			installGameDiagnosticsFx({
+				arkpack: {
+					packageId: "package:test",
+					hash: "content:test",
+					gameId: "game:test",
+					title: "Test",
+					game: "1",
+					source: "built-in",
+					trust: {
+						type: "official",
+						keyId: "test",
+					},
 				},
-			},
-			restored: true,
-			session,
-		});
+				restored: true,
+				session,
+			}),
+		);
 
 		expect(write.mock.calls.map(([record]) => record.event)).toEqual([
 			"session-started",

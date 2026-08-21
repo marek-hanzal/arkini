@@ -5,7 +5,7 @@ import type { Game } from "~/bridge/game/Game";
 import type { GameSession } from "~/bridge/game/GameSession";
 import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
 import { createGameSessionFx } from "~/bridge/game/createGameSessionFx";
-import { installGameDiagnostics } from "~/bridge/game/installGameDiagnostics";
+import { installGameDiagnosticsFx } from "~/bridge/game/installGameDiagnosticsFx";
 import { createGameSaveStorageFx } from "~/bridge/save/createGameSaveStorageFx";
 import { decodeArkiniSaveFx } from "~/bridge/save/decodeArkiniSaveFx";
 import { encodeArkiniSaveFx } from "~/bridge/save/encodeArkiniSaveFx";
@@ -121,7 +121,7 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 		}
 
 		const liveSession = session;
-		const diagnostics = installGameDiagnostics({
+		const diagnostics = yield* installGameDiagnosticsFx({
 			arkpack: loaded.descriptor,
 			restored: state !== undefined,
 			session: liveSession,

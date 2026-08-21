@@ -4,7 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { makeDropRejectedResultFx } from "~/engine/runtime/drop/makeDropRejectedResultFx";
-import { projectDropTransferActor } from "~/engine/runtime/drop/projectDropTransferActor";
+import { projectDropTransferActorFx } from "~/engine/runtime/drop/projectDropTransferActorFx";
 import { readDropItemStackRejectedReasonFx } from "~/engine/runtime/read/readDropItemStackRejectedReasonFx";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
@@ -41,29 +41,33 @@ export const commitStackDropFx = Effect.fn("commitStackDropFx")(function* ({
 		targetRevision,
 		targetLocation,
 	}).pipe(
-		Effect.map(
-			(result): commitStackDropFx.Result => ({
-				kind: DropItemResultKindEnumSchema.enum.Stack,
-				transferredQuantity: result.transferredQuantity,
-				source: projectDropTransferActor({
-					after: result.sourceAfter,
-					before: result.sourceBefore,
-				}),
-				target: {
-					itemId: result.targetBefore.id,
-					canonicalItemId: result.targetBefore.item.id,
-					previousRevision: result.targetBefore.revision,
-					previousLocation: result.targetBefore.location,
-					previousQuantity: result.targetBefore.quantity,
-					current: {
-						itemId: result.targetAfter.id,
-						canonicalItemId: result.targetAfter.item.id,
-						revision: result.targetAfter.revision,
-						location: result.targetAfter.location,
-						quantity: result.targetAfter.quantity,
-					},
-				},
-			}),
+		Effect.flatMap((result) =>
+			projectDropTransferActorFx({
+				after: result.sourceAfter,
+				before: result.sourceBefore,
+			}).pipe(
+				Effect.map(
+					(source): commitStackDropFx.Result => ({
+						kind: DropItemResultKindEnumSchema.enum.Stack,
+						transferredQuantity: result.transferredQuantity,
+						source,
+						target: {
+							itemId: result.targetBefore.id,
+							canonicalItemId: result.targetBefore.item.id,
+							previousRevision: result.targetBefore.revision,
+							previousLocation: result.targetBefore.location,
+							previousQuantity: result.targetBefore.quantity,
+							current: {
+								itemId: result.targetAfter.id,
+								canonicalItemId: result.targetAfter.item.id,
+								revision: result.targetAfter.revision,
+								location: result.targetAfter.location,
+								quantity: result.targetAfter.quantity,
+							},
+						},
+					}),
+				),
+			),
 		),
 		Effect.catchTag("StackItemsUnavailableError", (error) =>
 			readDropItemStackRejectedReasonFx({

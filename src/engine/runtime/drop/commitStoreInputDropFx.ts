@@ -5,7 +5,7 @@ import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx"
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { makeDropRejectedResultFx } from "~/engine/runtime/drop/makeDropRejectedResultFx";
-import { projectDropTransferActor } from "~/engine/runtime/drop/projectDropTransferActor";
+import { projectDropTransferActorFx } from "~/engine/runtime/drop/projectDropTransferActorFx";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
@@ -56,16 +56,17 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 			expectedSourceLocation: sourceLocation,
 			quantity,
 		});
+		const source = yield* projectDropTransferActorFx({
+			after: stored.sourceItem,
+			before: stored.sourceBefore,
+		});
 
 		return {
 			kind: DropItemResultKindEnumSchema.enum.StoreInput,
 			storedQuantity: stored.storedItem.quantity,
 			lineId,
 			inputIndex,
-			source: projectDropTransferActor({
-				after: stored.sourceItem,
-				before: stored.sourceBefore,
-			}),
+			source,
 			owner: {
 				itemId: stored.ownerItem.id,
 				revision: stored.ownerItem.revision,

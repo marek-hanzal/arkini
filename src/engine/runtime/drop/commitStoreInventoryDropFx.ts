@@ -4,7 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { makeDropRejectedResultFx } from "~/engine/runtime/drop/makeDropRejectedResultFx";
-import { projectDropTransferActor } from "~/engine/runtime/drop/projectDropTransferActor";
+import { projectDropTransferActorFx } from "~/engine/runtime/drop/projectDropTransferActorFx";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
@@ -26,19 +26,23 @@ export const commitStoreInventoryDropFx = Effect.fn("commitStoreInventoryDropFx"
 	props: commitStoreInventoryDropFx.Props,
 ) {
 	return yield* storeItemInInventoryFx(props).pipe(
-		Effect.map(
-			(result): DropItemResultSchema.Type => ({
-				kind: DropItemResultKindEnumSchema.enum.StoreInventory,
-				source: projectDropTransferActor({
-					after: result.sourceAfter,
-					before: result.sourceBefore,
-				}),
-				inventory: {
-					itemId: result.inventoryItem.id,
-					revision: result.inventoryItem.revision,
-					location: result.inventoryItem.location,
-				},
-			}),
+		Effect.flatMap((result) =>
+			projectDropTransferActorFx({
+				after: result.sourceAfter,
+				before: result.sourceBefore,
+			}).pipe(
+				Effect.map(
+					(source): DropItemResultSchema.Type => ({
+						kind: DropItemResultKindEnumSchema.enum.StoreInventory,
+						source,
+						inventory: {
+							itemId: result.inventoryItem.id,
+							revision: result.inventoryItem.revision,
+							location: result.inventoryItem.location,
+						},
+					}),
+				),
+			),
 		),
 		Effect.catchTags({
 			ItemNotFoundError: (error) =>

@@ -4,10 +4,8 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { commitMergeItemsFx } from "~/engine/merge/internal/commitMergeItemsFx";
 import { makeDropRejectedResultFx } from "~/engine/runtime/drop/makeDropRejectedResultFx";
-import {
-	projectDropActorCurrent,
-	projectDropTransferActor,
-} from "~/engine/runtime/drop/projectDropTransferActor";
+import { projectDropActorCurrentFx } from "~/engine/runtime/drop/projectDropActorCurrentFx";
+import { projectDropTransferActorFx } from "~/engine/runtime/drop/projectDropTransferActorFx";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
@@ -42,23 +40,28 @@ export const commitMergeDropFx = Effect.fn("commitMergeDropFx")(function* ({
 		targetItemId,
 		targetRevision,
 	}).pipe(
-		Effect.map(
-			(result): commitMergeDropFx.Result => ({
-				kind: DropItemResultKindEnumSchema.enum.Merge,
-				action: result.event.action,
-				effect: result.event.effect,
-				resultCanonicalItemId: result.event.resultCanonicalItemId,
-				source: {
-					itemId: result.sourceBefore.id,
-					previousRevision: result.sourceBefore.revision,
-					previousLocation: result.sourceBefore.location,
-					previousQuantity: result.sourceBefore.quantity,
-					current: projectDropActorCurrent(result.sourceAfter),
-				},
-				target: projectDropTransferActor({
+		Effect.flatMap((result) =>
+			Effect.gen(function* () {
+				const sourceCurrent = yield* projectDropActorCurrentFx(result.sourceAfter);
+				const target = yield* projectDropTransferActorFx({
 					after: result.targetAfter,
 					before: result.targetBefore,
-				}),
+				});
+
+				return {
+					kind: DropItemResultKindEnumSchema.enum.Merge,
+					action: result.event.action,
+					effect: result.event.effect,
+					resultCanonicalItemId: result.event.resultCanonicalItemId,
+					source: {
+						itemId: result.sourceBefore.id,
+						previousRevision: result.sourceBefore.revision,
+						previousLocation: result.sourceBefore.location,
+						previousQuantity: result.sourceBefore.quantity,
+						current: sourceCurrent,
+					},
+					target,
+				} satisfies commitMergeDropFx.Result;
 			}),
 		),
 		Effect.catchTags({

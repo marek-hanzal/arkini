@@ -230,7 +230,7 @@ describe("dropItemFx default-line input storage", () => {
 			quantity: 1,
 		});
 		expect(result.outcome.kind).toBe(DropItemResultKindEnumSchema.enum.StoreInput);
-		expect(result.runtime.defaultLineByOwnerItemId).toBeUndefined();
+		expect(result.runtime.defaultLineByOwnerItemId).toEqual({});
 		expect(result.isolated).toMatchObject({
 			id: "runtime:workshop",
 			quantity: 1,

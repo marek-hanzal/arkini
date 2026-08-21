@@ -15,7 +15,7 @@ import type { PixiCursorGrabMotion } from "~/ui/pixi/drag/PixiCursorGrabMotion";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
 import { createPixiMainSceneDragPreviewFx } from "~/ui/pixi/drag/createPixiMainSceneDragPreviewFx";
 import { createPixiMainScenePointerSamplerFx } from "~/ui/pixi/drag/createPixiMainScenePointerSamplerFx";
-import { readPixiDragPointerOffset } from "~/ui/pixi/drag/readPixiDragPointerOffset";
+import { makePixiDragPointerOffsetReaderFx } from "~/ui/pixi/drag/makePixiDragPointerOffsetReaderFx";
 import { readPixiMainSceneInventoryShortcutFx } from "~/ui/pixi/drag/readPixiMainSceneInventoryShortcutFx";
 import { removePixiMainSceneDraggedCheatItemFx } from "~/ui/pixi/drag/removePixiMainSceneDraggedCheatItemFx";
 import { setPixiDraggedActorPoseFx } from "~/ui/pixi/drag/setPixiDraggedActorPoseFx";
@@ -76,6 +76,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 		let closed = false;
 		let interactionBlocked = false;
 		let thresholdCrossed = false;
+		const readPixiDragPointerOffset = yield* makePixiDragPointerOffsetReaderFx();
 
 		const dragPreview = yield* createPixiMainSceneDragPreviewFx({
 			actorStore,

@@ -17,7 +17,7 @@ import { chasePixiTileMotionTargetFx } from "~/ui/pixi/motion/chasePixiTileMotio
 import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
 import { flashPixiMotionTargetFx } from "~/ui/pixi/motion/flashPixiMotionTargetFx";
 import { projectPixiTileMotionItemFx } from "~/ui/pixi/motion/projectPixiTileMotionItem";
-import { readPixiLiveActorContactPose } from "~/ui/pixi/motion/readPixiLiveActorContactPose";
+import { makePixiLiveActorContactPoseReaderFx } from "~/ui/pixi/motion/makePixiLiveActorContactPoseReaderFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
@@ -149,6 +149,7 @@ const returnPixiInputRemainderFx = Effect.fn("returnPixiInputRemainderFx")(funct
 	readonly surface: PixiMainSceneSurface;
 	readonly transient: PixiTileActor;
 }) {
+	const readPixiLiveActorContactPose = yield* makePixiLiveActorContactPoseReaderFx();
 	const magneticProjector = yield* createPixiTileMotionMagneticProjectorFx({
 		actor: transient,
 		attractedActorId: null,
@@ -253,6 +254,7 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 	target,
 	textures,
 }: runPixiInputMotionFx.Props) {
+	const readPixiLiveActorContactPose = yield* makePixiLiveActorContactPoseReaderFx();
 	const candidateSource = actorStore.actors.get(cue.sourceActorId);
 	const source =
 		candidateSource === undefined || candidateSource.container.destroyed

@@ -22,7 +22,7 @@ import { animatePixiActorToRetargetablePoseFx } from "~/ui/pixi/animation/animat
 import { flashPixiTileActorConsumedSourceFx } from "~/ui/pixi/animation/flashPixiTileActorConsumedSourceFx";
 import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
 import type { PixiInventoryDragController } from "~/ui/pixi/drag/PixiInventoryDragController";
-import { readPixiDragPointerOffset } from "~/ui/pixi/drag/readPixiDragPointerOffset";
+import { makePixiDragPointerOffsetReaderFx } from "~/ui/pixi/drag/makePixiDragPointerOffsetReaderFx";
 import { setPixiDraggedActorPoseFx } from "~/ui/pixi/drag/setPixiDraggedActorPoseFx";
 import {
 	restorePixiTileActorExitFx,
@@ -97,6 +97,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 		surface,
 	}: createPixiInventoryDragControllerFx.Props) {
 		const removalFeedbackGenerationByActorId = new Map<string, number>();
+		const readPixiDragPointerOffset = yield* makePixiDragPointerOffsetReaderFx();
 		let activeDrag: ActiveInventoryDrag | null = null;
 		let closed = false;
 

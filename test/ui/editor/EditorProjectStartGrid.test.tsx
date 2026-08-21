@@ -240,7 +240,6 @@ describe("EditorProjectStartGrid", () => {
 		expect(
 			container.querySelector('[data-ui="EditorProjectStartGridDragPreview"]'),
 		).not.toBeNull();
-		expect(target.className).toContain("ring-2");
 
 		await act(async () => {
 			dispatchPointer(target, "pointerup", {

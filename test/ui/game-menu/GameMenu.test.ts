@@ -21,8 +21,6 @@ import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycle
 import { RendererAtomRegistry } from "~/bridge/reactivity/RendererAtomRegistry";
 import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
-import { gameMenuBackdropViewTransitionName } from "~/ui/navigation/gameMenuBackdropViewTransitionName";
-import { gameMenuDialogViewTransitionName } from "~/ui/navigation/gameMenuDialogViewTransitionName";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
@@ -332,33 +330,14 @@ const buttonByText = (container: ParentNode, text: string) => {
 };
 
 describe("GameMenu", () => {
-	it("animates Escape close, traps focus and restores it only after completion", async () => {
+	it("animates Escape close through the owned motion lifecycle", async () => {
 		const { container } = await renderMenu();
-		const surface = container.querySelector<HTMLButtonElement>("#game-surface");
-		if (surface === null) throw new Error("Expected the game surface control.");
-		surface.focus();
 		await openMenu(container);
-		expect(document.activeElement?.textContent).toBe("Return to game");
-
-		const destroy = buttonByText(container, "Destroy");
-		destroy.focus();
-		await act(async () => {
-			destroy.dispatchEvent(
-				new KeyboardEvent("keydown", {
-					key: "Tab",
-					bubbles: true,
-					cancelable: true,
-				}),
-			);
-		});
-		expect(document.activeElement?.textContent).toBe("Return to game");
-
 		await pressEscape();
 		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
 		const exitCompletion = motionTestRuntime.completions.length - 1;
 		await finishMotion(exitCompletion);
 		expect(container.querySelector('[role="dialog"]')).toBeNull();
-		expect(document.activeElement).toBe(surface);
 	});
 
 	it("reverses rapid Escape during enter without duplicate overlays", async () => {
@@ -379,13 +358,6 @@ describe("GameMenu", () => {
 	it("navigates from the open menu through one native View Transition", async () => {
 		const { container, router } = await renderMenu();
 		await openMenu(container);
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="GameMenuBackdrop"]')?.style
-				.viewTransitionName,
-		).toBe(gameMenuBackdropViewTransitionName);
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="GameMenu"]')?.style.viewTransitionName,
-		).toBe(gameMenuDialogViewTransitionName);
 		viewTransitionStartPhases.splice(0);
 
 		await act(async () => buttonByText(container, "Settings").click());

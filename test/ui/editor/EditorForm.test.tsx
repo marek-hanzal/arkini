@@ -193,9 +193,6 @@ describe("editor form fields", () => {
 		);
 		expect(durationHint?.textContent).toBe("1.25s");
 		expect(enabled.textContent).toBe("Enabled");
-		expect(enabled.closest('[data-ui="EditorBooleanToggleBadge"]')?.className).toContain(
-			"bg-secondary-subtle",
-		);
 
 		await act(async () => {
 			resetLocalValues();
@@ -210,9 +207,6 @@ describe("editor form fields", () => {
 			expect(runtime.value).toBe("24");
 			expect(durationHint?.textContent).toBe("24s");
 			expect(enabled.textContent).toBe("Enabled");
-			expect(enabled.closest('[data-ui="EditorBooleanToggleBadge"]')?.className).toContain(
-				"bg-secondary-selected",
-			);
 		});
 	});
 

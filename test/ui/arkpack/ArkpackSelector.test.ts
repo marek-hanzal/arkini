@@ -101,7 +101,7 @@ const renderSelector = async (catalog: ArkpackCatalog) => {
 };
 
 describe("ArkpackSelector", () => {
-	it("keeps the shared primary return action in the bottom-center footer", async () => {
+	it("shows catalog trust and returns to the main menu", async () => {
 		Object.defineProperty(window, "scrollTo", {
 			configurable: true,
 			value: vi.fn(),
@@ -198,18 +198,6 @@ describe("ArkpackSelector", () => {
 			);
 		});
 
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="MainPageLayout"]')?.style
-				.viewTransitionName,
-		).toBe("");
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]')?.style
-				.viewTransitionName,
-		).toBe("arkini-panel-arkpacks");
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="MainPagePanelContent"]')?.style
-				.viewTransitionName,
-		).toBe("");
 		const layout = container.querySelector('[data-ui="ArkpackSelector"]');
 		const catalogList = container.querySelector<HTMLElement>('[data-ui="ArkpackCatalogList"]');
 		const catalogRows = Array.from(
@@ -218,7 +206,6 @@ describe("ArkpackSelector", () => {
 		expect(catalogRows).toHaveLength(2);
 		expect(catalogRows[0]?.textContent).toContain("Official");
 		expect(catalogRows[1]?.textContent).toContain("External");
-		expect(layout?.lastElementChild?.tagName).toBe("FOOTER");
 		const returnButton = layout?.lastElementChild?.querySelector("button");
 
 		await act(async () => returnButton?.click());

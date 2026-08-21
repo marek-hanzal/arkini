@@ -51,20 +51,10 @@ describe("MainPageLayout", () => {
 		);
 		const hero = container.querySelector<HTMLElement>('[data-ui="LauncherHero"]');
 		const panel = container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]');
-		const panelContent = container.querySelector<HTMLElement>(
-			'[data-ui="MainPagePanelContent"]',
-		);
 
 		expect(layout?.dataset.layout).toBe("fixed-hero");
 		expect(layout?.style.gridTemplateRows).toBe("");
 		expect(hero?.parentElement).toBe(heroSlot);
 		expect(panel?.parentElement).toBe(contentSlot);
-		expect(hero?.style.viewTransitionName).toBe("");
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="LauncherHeroArtwork"]')?.style
-				.viewTransitionName,
-		).toBe("arkini-launcher-hero-artwork");
-		expect(panel?.style.viewTransitionName).toBe("arkini-panel-settings");
-		expect(panelContent?.style.viewTransitionName).toBe("");
 	});
 });

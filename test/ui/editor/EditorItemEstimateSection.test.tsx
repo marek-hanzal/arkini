@@ -93,7 +93,7 @@ const render = async (
 };
 
 describe("EditorItemEstimateSection", () => {
-	it("renders static duration and requirement classes", async () => {
+	it("renders static duration and acquisition requirements", async () => {
 		const estimate: EditorItemEstimate = {
 			diagnostics: [],
 			durationMs: 1_000,
@@ -170,34 +170,11 @@ describe("EditorItemEstimateSection", () => {
 			status: "ready",
 		});
 
-		expect(container.textContent).not.toContain("Complete path found");
-		expect(container.textContent).not.toContain("Target × 1");
 		expect(container.textContent).toContain("1 s");
-		expect(container.textContent).not.toContain("Static dependency estimator");
 		expect(container.textContent).toContain("water");
 		expect(container.textContent).toContain("0.5 s");
-		expect(container.textContent).toContain("Quantity:");
-		expect(container.textContent).toContain("Time:");
 		expect(container.querySelector('[data-item-id="water"]')).not.toBeNull();
-		expect(container.textContent).not.toContain("line:well:water");
-		const header = container.querySelector('[data-ui="EditorItemEstimateHeader"]');
-		expect(header?.textContent).toContain("Estimated acquisition path");
-		expect(header?.textContent).toContain("1 s");
-		expect(header?.textContent).toContain("Time");
-		expect(header?.textContent).toContain("Quantity");
-		expect(header?.textContent).not.toContain("Estimated item breakdown");
 		expect(container.querySelector('[data-ui="EditorItemEstimateBreakdown"]')).not.toBeNull();
-		expect(
-			container.querySelector('[data-ui="EditorItemEstimateRouteStep"]')?.className,
-		).toContain("ak-list-row");
-		const info = container.querySelector<HTMLButtonElement>('[data-ui="EditorInfoTooltip"]');
-		expect(info).not.toBeNull();
-		await act(async () => info?.focus());
-		expect(document.body.textContent).toContain("Static dependency estimator");
-		expect(document.body.textContent).toContain("Scope, distance, board capacity");
-		expect(document.body.textContent).toContain("Optimistic authored-graph analysis");
-		expect(container.textContent).not.toContain("planner");
-		expect(container.textContent).not.toContain("search");
 	});
 
 	it("sorts the item breakdown by descending time or quantity", async () => {

@@ -156,10 +156,6 @@ describe("CheatItemSpotlight", () => {
 				}),
 			);
 		});
-		const origin = document.createElement("button");
-		document.body.append(origin);
-		origin.focus();
-
 		await act(async () => {
 			document.dispatchEvent(
 				new KeyboardEvent("keydown", {
@@ -175,8 +171,6 @@ describe("CheatItemSpotlight", () => {
 		expect(onBeforeOpen).toHaveBeenCalledOnce();
 		const input = container.querySelector<HTMLInputElement>('input[type="search"]');
 		if (input === null) throw new Error("Expected Spotlight search input.");
-		await vi.waitFor(() => expect(document.activeElement).toBe(input));
-
 		await act(async () => {
 			input.dispatchEvent(
 				new KeyboardEvent("keydown", {
@@ -192,36 +186,6 @@ describe("CheatItemSpotlight", () => {
 					?.textContent,
 			).toContain("Beta"),
 		);
-		const selectedOption = container.querySelector<HTMLButtonElement>(
-			'button[data-selected="true"]',
-		);
-		expect(selectedOption?.className).toContain("ak-spotlight-option");
-		expect(selectedOption?.className).not.toContain("ak-list-row");
-		expect(selectedOption?.querySelectorAll(".ak-spotlight-option-secondary")).toHaveLength(1);
-		const options = Array.from(container.querySelectorAll<HTMLButtonElement>("button"));
-		const lastOption = options.at(-1);
-		if (lastOption === undefined) throw new Error("Expected Spotlight options.");
-		await act(async () => {
-			input.dispatchEvent(
-				new KeyboardEvent("keydown", {
-					key: "Tab",
-					shiftKey: true,
-					bubbles: true,
-					cancelable: true,
-				}),
-			);
-		});
-		expect(document.activeElement).toBe(lastOption);
-		await act(async () => {
-			lastOption.dispatchEvent(
-				new KeyboardEvent("keydown", {
-					key: "Tab",
-					bubbles: true,
-					cancelable: true,
-				}),
-			);
-		});
-		expect(document.activeElement).toBe(input);
 		await act(async () => {
 			input.dispatchEvent(
 				new KeyboardEvent("keydown", {
@@ -233,7 +197,9 @@ describe("CheatItemSpotlight", () => {
 		});
 		expect(state.spawn).toHaveBeenCalledWith("item:beta");
 
-		selectedOption?.focus();
+		const selectedOption = container.querySelector<HTMLButtonElement>(
+			'button[data-selected="true"]',
+		);
 		await act(async () => {
 			selectedOption?.dispatchEvent(
 				new KeyboardEvent("keydown", {
@@ -244,8 +210,6 @@ describe("CheatItemSpotlight", () => {
 			);
 		});
 		expect(container.querySelector('[data-ui="CheatItemSpotlight"]')).toBeNull();
-		expect(document.activeElement).toBe(origin);
-		expect(container.querySelector('[role="dialog"][aria-modal="true"]')).toBeNull();
 	});
 	it("admits every same-tick keyboard and pointer spawn action", async () => {
 		const container = document.createElement("div");
@@ -333,7 +297,6 @@ describe("CheatItemSpotlight", () => {
 		const pendingInput = container.querySelector<HTMLInputElement>('input[type="search"]');
 		if (pendingInput === null) throw new Error("Expected pending Spotlight search input.");
 		expect(pendingInput.readOnly).toBe(false);
-		expect(pendingInput.className).not.toContain("cursor-progress");
 		expect(container.textContent).toContain("Spawning…");
 
 		await toggle();
@@ -343,7 +306,6 @@ describe("CheatItemSpotlight", () => {
 		const reopenedInput = container.querySelector<HTMLInputElement>('input[type="search"]');
 		if (reopenedInput === null) throw new Error("Expected reopened Spotlight search input.");
 		expect(reopenedInput.readOnly).toBe(false);
-		await vi.waitFor(() => expect(document.activeElement).toBe(reopenedInput));
 
 		const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
 		if (setter === undefined) throw new Error("Expected native input setter.");

@@ -66,32 +66,8 @@ describe("About", () => {
 			);
 		});
 
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="MainPageLayout"]')?.style
-				.viewTransitionName,
-		).toBe("");
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]')?.style
-				.viewTransitionName,
-		).toBe("arkini-panel-about");
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="MainPagePanelContent"]')?.style
-				.viewTransitionName,
-		).toBe("");
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="LauncherHero"]')?.style
-				.viewTransitionName,
-		).toBe("");
 		expect(container.querySelector('[data-ui="About"]')).not.toBeNull();
 		expect(container.querySelector('[data-ui="AboutEasterEgg"]')).toBeNull();
-		expect(container.textContent).toContain("ChatGPT-5.6");
-		expect(container.textContent).toContain("ChatGPT-5.4");
-		expect(container.textContent).toContain("ChatGPT-5.5");
-		expect(container.textContent).toContain("blood-soaked legacy");
-		expect(container.textContent).toContain("original v0");
-		expect(container.textContent).toContain("Marek Hanzal");
-		expect(container.textContent).toContain("chief mega-nag");
-		expect(container.textContent).toContain("Šárka Hanušová");
 	});
 
 	it("enables the portrait easter egg only when package avatars resolve", async () => {

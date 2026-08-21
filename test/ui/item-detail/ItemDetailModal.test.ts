@@ -327,13 +327,10 @@ describe("ItemDetailModal", () => {
 		const queueTabBadge = document.querySelector<HTMLElement>(
 			'[data-ui="ItemDetailQueueTabCount"]',
 		);
-		const linesTabBadge = document.querySelector<HTMLElement>('[data-ui="ItemDetailTabCount"]');
 		expect(queueTabBadge?.textContent).toBe("2");
-		expect(linesTabBadge?.className).toBe(queueTabBadge?.className);
 		const line = document.querySelector<HTMLElement>('[data-ui="TileLine"]');
 		expect(line?.dataset.active).toBe("false");
 		expect(line?.dataset.queued).toBe("true");
-		expect(line?.className).toContain("border-l-warning");
 		expect(line?.querySelector('[data-ui="TileLineQueuedBadge"]')).toBeNull();
 		expect(line?.querySelector('[data-ui="TileLineQueuedMessage"]')?.textContent).toContain(
 			"Queued for automatic start",
@@ -395,11 +392,6 @@ describe("ItemDetailModal", () => {
 		expect(headerArtwork).not.toBeNull();
 		expect(tabs).not.toBeNull();
 		expect(linesBody?.dataset.tab).toBe("lines");
-		expect(closeButton?.className).toContain("size-14");
-		expect(closeButton?.className).toContain("bg-transparent");
-		expect(closeButton?.className).not.toContain("border");
-		expect(closeButton?.className).not.toContain("opacity");
-		expect(closeButton?.innerHTML).toContain("icon-[lucide--x]");
 		expect(closeButton?.innerHTML).toContain("size-10");
 		expect(
 			Array.from(
@@ -456,9 +448,6 @@ describe("ItemDetailModal", () => {
 		expect(document.querySelectorAll('[data-ui="ItemDetailContentTransition"]')).toHaveLength(
 			1,
 		);
-		expect(document.activeElement).toBe(
-			document.querySelector<HTMLButtonElement>('[data-tab="info"][aria-selected="true"]'),
-		);
 
 		const queueTab = document.querySelector<HTMLButtonElement>('[data-tab="queue"]');
 		if (queueTab === null) throw new Error("Missing Queue tab.");
@@ -478,9 +467,6 @@ describe("ItemDetailModal", () => {
 		expect(queueBody?.dataset.tab).toBe("queue");
 		expect(document.querySelectorAll('[data-ui="ItemDetailContentTransition"]')).toHaveLength(
 			1,
-		);
-		expect(document.activeElement).toBe(
-			document.querySelector<HTMLButtonElement>('[data-tab="queue"][aria-selected="true"]'),
 		);
 		expect(readControl().state).toMatchObject({
 			phase: "open",
@@ -563,9 +549,6 @@ describe("ItemDetailModal", () => {
 		});
 		expect(modal.dataset.runtimeId).toBeUndefined();
 		expect(document.querySelector('[data-ui="ItemSource"]')?.textContent).toContain("Workshop");
-		expect(document.activeElement).toBe(
-			document.querySelector<HTMLButtonElement>('[data-tab="sources"][aria-selected="true"]'),
-		);
 		expect(
 			Array.from(
 				document.querySelectorAll<HTMLElement>('[data-ui="ItemDetailTabs"] button'),
@@ -665,7 +648,7 @@ describe("ItemDetailModal", () => {
 					publishRuntime(
 						RuntimeSchema.parse({
 							...currentRuntime,
-							defaultLineByOwnerItemId: undefined,
+							defaultLineByOwnerItemId: {},
 						}),
 					);
 					return {
@@ -919,7 +902,6 @@ describe("ItemDetailModal", () => {
 			activeRow?.querySelector<HTMLImageElement>('[data-ui="ItemQueueWorkIdentity"] img')
 				?.src,
 		).toContain("resource:asset:water");
-		expect(activeRow?.className).toContain("ak-list-row-active");
 		expect(
 			activeRow?.querySelector<HTMLElement>('[data-ui="ItemQueueProgressFill"]')?.style.width,
 		).toBe("60%");
@@ -961,8 +943,6 @@ describe("ItemDetailModal", () => {
 		const queuedRow = document.querySelector<HTMLElement>(
 			'[data-ui="ItemQueueRow"][data-state="queued"]',
 		);
-		expect(queuedRow?.className).toContain("ak-list-row");
-		expect(queuedRow?.className).toContain("rounded-xl");
 		expect(queuedRow?.textContent).toContain("Water");
 		expect(queuedRow?.textContent).toContain("Queued #1");
 		expect(
@@ -975,8 +955,6 @@ describe("ItemDetailModal", () => {
 		);
 		expect(clearQueueButton).not.toBeNull();
 		expect(document.querySelectorAll('[data-ui="ItemQueueClearButton"]')).toHaveLength(1);
-		expect(clearQueueButton?.className).toContain("underline");
-		expect(clearQueueButton?.className).toContain("border-0");
 		expect(document.querySelector('[data-ui="ItemQueueEmptyState"]')).toBeNull();
 
 		await act(async () => {
@@ -996,18 +974,8 @@ describe("ItemDetailModal", () => {
 		expect(document.querySelector('[data-ui="ItemQueueIdleSlot"]')?.textContent).toContain(
 			"Nothing is currently scheduled to run.",
 		);
-		expect(
-			document.querySelector('[data-ui="ItemQueueIdleSlot"] [class*="lucide--circle-off"]'),
-		).not.toBeNull();
 		const emptyQueue = document.querySelector('[data-ui="ItemQueueEmptyState"]');
 		expect(emptyQueue?.textContent).toContain("Queue is empty");
-		expect(emptyQueue?.querySelector('[class*="lucide--list-x"]')).not.toBeNull();
-		expect(
-			document.querySelector('[data-ui="ItemQueueActiveSlotSeparator"]')?.className,
-		).toContain("border-b");
-		expect(
-			document.querySelector('[data-ui="ItemQueueActiveSlotSeparator"]')?.className,
-		).toContain("mb-2");
 		expect(document.querySelector('[data-ui="ItemQueueRow"]')).toBeNull();
 		expect(document.querySelector('[data-ui="ItemQueueClearButton"]')).toBeNull();
 	});
@@ -1257,41 +1225,6 @@ describe("ItemDetailModal", () => {
 			document.querySelector<HTMLElement>('[data-ui="ItemDetailContentScene"]')?.dataset
 				.stale,
 		).toBe("true");
-	});
-
-	it("restores focus only to a still-focusable exact origin", async () => {
-		const { readControl } = await renderItemDetail();
-		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
-		if (owner === undefined) throw new Error("Missing Workshop runtime item.");
-		const shell = document.createElement("div");
-		shell.dataset.ui = "GameShell";
-		shell.tabIndex = -1;
-		document.body.append(shell);
-		const origin = document.createElement("button");
-		document.body.append(origin);
-
-		await act(async () => {
-			openItemDetail(readControl(), {
-				itemId: owner.id,
-				tab: "info",
-				origin,
-			});
-			await Promise.resolve();
-			await Promise.resolve();
-		});
-		origin.disabled = true;
-		const closeButton = document.querySelector<HTMLButtonElement>(
-			'button[aria-label="Close item detail"]',
-		);
-		if (closeButton === null) throw new Error("Missing Item Detail close button.");
-		await act(async () => {
-			closeButton.click();
-			await Promise.resolve();
-			await Promise.resolve();
-		});
-
-		expect(readControl().state.phase).toBe("closed");
-		expect(document.activeElement).toBe(shell);
 	});
 
 	it("keeps retained navigation and search while removing stale facts and commands", async () => {

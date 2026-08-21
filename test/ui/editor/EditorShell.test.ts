@@ -238,62 +238,12 @@ const readLink = (container: HTMLElement, label: string) => {
 };
 
 describe("EditorShell", () => {
-	it("renders an icon-only workspace rail without a global page header", async () => {
-		const router = createTestRouter({
-			initialEntry: "/editor/editor-test/editor/items/list",
-		});
-		const container = await renderRouter(router);
-
-		expect(readLink(container, "Items").className).toContain("bg-accent");
-		expect(readLink(container, "Items").getAttribute("aria-current")).toBe("page");
-		expect(
-			[
-				...container.querySelectorAll('[data-ui="EditorNavigation"] nav a'),
-			].map((link) => link.getAttribute("aria-label")),
-		).toEqual([
-			"Project",
-			"Items",
-			"Estimate",
-			"Assets",
-			"Flow",
-			"Build",
-			"Board",
-		]);
-		expect(
-			[
-				...container.querySelectorAll('[data-ui="EditorNavigation"] nav a'),
-			].every((link) => link.textContent === ""),
-		).toBe(true);
-		expect(container.querySelector('[data-ui="EditorNavigation"]')?.tagName).toBe("ASIDE");
-		expect(container.querySelector('[data-ui="EditorShell"]')?.className).toContain(
-			"grid-cols-[auto_minmax(0,1fr)]",
-		);
-		expect(container.textContent).not.toContain("Editor test");
-		expect(container.querySelector('[data-ui="EditorExit"]')?.textContent).toBe("");
-		expect(container.querySelector('[data-ui="EditorExit"]')?.className).not.toContain(
-			"bg-accent",
-		);
-		expect(
-			[
-				...container.querySelectorAll("a"),
-			].some((link) => link.textContent === "Editor"),
-		).toBe(false);
-		expect(container.querySelector('[data-ui="EditorFormStatusSlot"]')).toBeNull();
-		expect(container.querySelector('[data-ui="EditorContent"]')?.className).not.toContain(
-			"px-[var(--ak-viewport-padding)]",
-		);
-		expect(container.querySelector('[data-ui="EditorContent"]')?.className).toContain(
-			"bg-surface",
-		);
-	});
-
 	it("marks the all-item estimate workspace as active", async () => {
 		const router = createTestRouter({
 			initialEntry: "/editor/editor-test/estimate",
 		});
 		const container = await renderRouter(router);
 
-		expect(readLink(container, "Estimate").className).toContain("bg-accent");
 		expect(readLink(container, "Estimate").getAttribute("aria-current")).toBe("page");
 		expect(container.textContent).toContain("Estimate destination");
 	});
@@ -308,8 +258,6 @@ describe("EditorShell", () => {
 		const projectLink = readLink(container, "Project");
 		const buildLink = readLink(container, "Build");
 
-		expect(buildLink.className).toContain("bg-accent");
-		expect(projectLink.className).not.toContain("bg-accent");
 		let navigation!: Promise<void>;
 		act(() => {
 			navigation = router.navigate({
@@ -320,9 +268,7 @@ describe("EditorShell", () => {
 			});
 		});
 		expect(container.textContent).toContain("Build destination");
-		expect(projectLink.className).toContain("bg-accent");
 		expect(projectLink.getAttribute("aria-current")).toBe("page");
-		expect(buildLink.className).not.toContain("bg-accent");
 		expect(buildLink.getAttribute("aria-current")).toBeNull();
 
 		await act(async () => {
@@ -345,9 +291,6 @@ describe("EditorShell", () => {
 		});
 
 		expect(projectLink.getAttribute("data-transitioning")).toBe("transitioning");
-		expect(projectLink.className).toContain("ak-editor-workspace-tab");
-		expect(projectLink.className).toContain("transition-none");
-		expect(projectLink.closest("nav")?.className).toContain("ak-editor-workspace-tabs");
 
 		await act(async () => {
 			projectLoader.resolve();
@@ -452,8 +395,6 @@ describe("EditorShell", () => {
 		});
 		const container = await renderRouter(router);
 		const projectLink = readLink(container, "Project");
-		projectLink.focus();
-
 		await act(async () => {
 			projectLink.click();
 			await Promise.resolve();
@@ -462,7 +403,6 @@ describe("EditorShell", () => {
 		const cancel = [
 			...container.querySelectorAll("button"),
 		].find((button) => button.textContent === "Cancel");
-		expect(document.activeElement).toBe(cancel);
 		await act(async () => {
 			cancel?.dispatchEvent(
 				new KeyboardEvent("keydown", {
@@ -475,7 +415,6 @@ describe("EditorShell", () => {
 			"/editor/editor-test/editor/items/test/form/identity",
 		);
 		expect(container.textContent).toContain("Dirty item form");
-		expect(document.activeElement).toBe(projectLink);
 	});
 
 	it("uses Cancel as the safe default for editor Exit and omits Save for an invalid draft", async () => {

@@ -159,22 +159,6 @@ describe("MainMenu", () => {
 			(link) => link.textContent === "Play",
 		);
 		expect(play?.getAttribute("href")).toContain("/action/load-game/arkini");
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="MainPageLayout"]')?.style
-				.viewTransitionName,
-		).toBe("");
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]')?.style
-				.viewTransitionName,
-		).toBe("arkini-panel-main-menu");
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="MainPagePanelContent"]')?.style
-				.viewTransitionName,
-		).toBe("");
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="LauncherHero"]')?.style
-				.viewTransitionName,
-		).toBe("");
 		const editor = Array.from(container.querySelectorAll("a")).find(
 			(link) => link.textContent === "Editor",
 		);

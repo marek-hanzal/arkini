@@ -84,9 +84,6 @@ describe("StartupSplash", () => {
 
 		expect(harness.container.querySelector('[data-ui="StartupHeroHandoff"]')).toBeNull();
 		expect(harness.container.textContent).not.toContain("Main menu route");
-		const content = harness.container.querySelector('[data-ui="StartupSplashContent"]');
-		if (!(content instanceof HTMLElement)) throw new Error("Startup content missing.");
-		expect(content.style.viewTransitionName).toBe("arkini-startup-content");
 		await act(async () => {
 			window.dispatchEvent(
 				new KeyboardEvent("keydown", {

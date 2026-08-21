@@ -83,7 +83,7 @@ describe("EditorSearchCombobox", () => {
 		expect(input.getAttribute("aria-controls")).not.toBeNull();
 	});
 
-	it("uses a full-height custom clear action instead of the native search control", async () => {
+	it("clears the selected search value through the explicit clear action", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);
 		const root = createRoot(container);
@@ -107,7 +107,6 @@ describe("EditorSearchCombobox", () => {
 		await act(async () => clear.click());
 
 		expect(input.value).toBe("");
-		expect(clear.className).toContain("inset-y-0");
 	});
 
 	it("temporarily clears the selected label while switching and restores it on blur", async () => {

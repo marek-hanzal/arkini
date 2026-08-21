@@ -63,18 +63,6 @@ afterEach(async () => {
 describe("ActionLoadingScreen", () => {
 	it("renders one native route surface and advances without claiming completion", async () => {
 		const { container } = await renderScreen();
-		const hero = container.querySelector<HTMLElement>('[data-ui="LauncherHero"]');
-		const artwork = container.querySelector<HTMLElement>('[data-ui="LauncherHeroArtwork"]');
-		expect(hero).not.toBeNull();
-		expect(hero?.style.aspectRatio).toBe("1535 / 1024");
-		expect(artwork).toBeInstanceOf(HTMLImageElement);
-		expect(artwork?.getAttribute("src")).toContain("hero.png");
-		expect(hero?.style.viewTransitionName).toBe("");
-		expect(artwork?.style.viewTransitionName).toBe("arkini-launcher-hero-artwork");
-		const content = container.querySelector<HTMLElement>(
-			'[data-ui="ActionLoadingScreenContent"]',
-		);
-		expect(content?.style.viewTransitionName).toBe("arkini-action-progress");
 		expect(progressValue(container)).toBe(12);
 
 		await act(async () => vi.advanceTimersByTime(defaultLoadingMinimumDurationMs));

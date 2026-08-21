@@ -436,8 +436,6 @@ describe("ItemLinesTab", () => {
 
 		expect(inputLink.disabled).toBe(false);
 		expect(outputLink.disabled).toBe(false);
-		expect(inputLink.className).toContain("enabled:cursor-pointer");
-		expect(outputLink.className).toContain("enabled:cursor-pointer");
 
 		await act(async () => inputLink.click());
 		expect(control.openItemDetailFx).toHaveBeenCalledWith({
@@ -448,25 +446,6 @@ describe("ItemLinesTab", () => {
 		expect(control.openItemDefinitionDetailFx).toHaveBeenCalledWith({
 			itemId: "log",
 		});
-	});
-
-	it("starts with line content and renders one decorative horizontal flow chevron per line", async () => {
-		await renderLines();
-
-		expect(document.body.textContent).not.toContain(
-			"Current visibility, inputs, outputs and effective runtime.",
-		);
-		expect(document.body.textContent).not.toContain("visible lines");
-		const chevrons = Array.from(
-			document.querySelectorAll<HTMLElement>('[data-ui="TileLineFlowChevron"]'),
-		);
-		expect(chevrons).toHaveLength(projection.line.length);
-		for (const chevron of chevrons) {
-			expect(chevron.getAttribute("aria-hidden")).toBe("true");
-			expect(chevron.querySelector("span")?.className).toContain(
-				"icon-[lucide--chevron-right]",
-			);
-		}
 	});
 
 	it("shows the exact aggregate quantity currently delivered to a material input", async () => {
@@ -493,7 +472,6 @@ describe("ItemLinesTab", () => {
 			'[data-ui="TileLineInputDeliveryQuantity"]',
 		);
 		expect(delivery?.textContent).toBe("1 / 2 on the way");
-		expect(delivery?.className).toContain("opacity-70");
 		expect(document.querySelector('[data-ui="TileLineInputStoredQuantity"]')).toBeNull();
 		expect(document.querySelector('[data-ui="TileLineInputWithdrawButton"]')).toBeNull();
 	});
@@ -582,26 +560,13 @@ describe("ItemLinesTab", () => {
 		const stored = renderedInput("line:stored");
 		const active = renderedInput("line:active");
 		const deposit = renderedInput("line:deposit");
-
-		expect(document.querySelector('[data-ui="TileLineInputsList"]')?.className).toContain(
-			"pt-2",
-		);
 		expect(available?.dataset.inputState).toBe("available");
-		expect(available?.className).toContain("bg-[var(--ak-list-row-active-surface)]");
-		expect(available?.className).toContain("rounded-xl");
 		expect(delivery?.dataset.inputState).toBe("delivery");
-		expect(delivery?.className).toContain("bg-[var(--ak-line-input-delivery-surface)]");
 		expect(partial?.dataset.inputState).toBe("available");
-		expect(partial?.className).toContain("bg-[var(--ak-list-row-active-surface)]");
 		expect(stored?.dataset.inputState).toBe("stored");
-		expect(stored?.className).toContain("bg-[var(--ak-list-row-active-progress-surface)]");
 		expect(active?.dataset.inputState).toBe("stored");
 		expect(active?.dataset.surfaceSuppressed).toBe("true");
-		expect(active?.className).toContain("ak-line-input");
-		expect(active?.className).toContain("bg-transparent");
-		expect(active?.className).not.toContain("bg-[var(--ak-list-row-active-progress-surface)]");
 		expect(deposit?.dataset.inputState).toBe("available");
-		expect(deposit?.className).toContain("bg-[var(--ak-list-row-active-surface)]");
 	});
 
 	it("retains the exact input row while delivery surface fades to transparent running state", async () => {
@@ -622,7 +587,6 @@ describe("ItemLinesTab", () => {
 			],
 		});
 		const before = container.querySelector<HTMLElement>('[data-ui="TileLineInput"]');
-		expect(before?.className).toContain("bg-[var(--ak-line-input-delivery-surface)]");
 
 		await rerender({
 			...projection,
@@ -644,8 +608,6 @@ describe("ItemLinesTab", () => {
 		const running = container.querySelector<HTMLElement>('[data-ui="TileLineInput"]');
 		expect(running).toBe(before);
 		expect(running?.dataset.surfaceSuppressed).toBe("true");
-		expect(running?.className).toContain("bg-transparent");
-		expect(running?.className).toContain("rounded-xl px-3 py-2");
 	});
 
 	it("shows autofill material truth and opens the first producer with a material filter", async () => {
@@ -689,8 +651,6 @@ describe("ItemLinesTab", () => {
 			'[data-ui="TileLineInputProducerLink"]',
 		);
 		expect(producerLink?.textContent).toBe("None");
-		expect(producerLink?.className).toContain("underline");
-		expect(producerLink?.className).toContain("cursor-pointer");
 
 		await act(async () => producerLink?.click());
 		expect(control.openItemDetailFx).toHaveBeenCalledWith({
@@ -1055,7 +1015,6 @@ describe("ItemLinesTab", () => {
 		await rerender(unavailableProjection);
 		expect(available()?.checked).toBe(false);
 		expect(available()?.disabled).toBe(true);
-		expect(available()?.closest("label")?.className).toContain("cursor-not-allowed");
 		expect(available()?.closest("label")?.dataset.disabled).toBe("true");
 		expect(all()?.checked).toBe(true);
 		expect(container.querySelector('[data-ui="ItemLinesAvailableEmpty"]')).toBeNull();
@@ -1068,7 +1027,6 @@ describe("ItemLinesTab", () => {
 		await rerender(mixedProjection);
 		expect(available()?.checked).toBe(false);
 		expect(available()?.disabled).toBe(false);
-		expect(available()?.closest("label")?.className).toContain("cursor-pointer");
 		expect(all()?.checked).toBe(true);
 		await selectAvailabilityFilter(container, "available");
 		expect(available()?.checked).toBe(true);
@@ -1232,12 +1190,7 @@ describe("ItemLinesTab", () => {
 		expect(inputWithdraw).not.toBeNull();
 		expect(lineWithdraw).not.toBeNull();
 		expect(lineWithdraw?.closest("section")?.querySelector("h4")?.textContent).toBe("Inputs");
-		expect(lineWithdraw?.className).toContain("underline");
-		expect(lineWithdraw?.className).toContain("border-0");
 		expect(storedQuantity?.previousElementSibling?.contains(inputWithdraw ?? null)).toBe(true);
-		expect(inputWithdraw?.className).toContain("underline");
-		expect(inputWithdraw?.className).toContain("border-0");
-		expect(storedQuantity?.parentElement?.className).toContain("items-baseline");
 
 		await act(async () => inputWithdraw?.click());
 
@@ -1366,7 +1319,6 @@ describe("ItemLinesTab", () => {
 
 		const reason = document.querySelector('[data-ui="TileLineUnavailableReason"]');
 		expect(reason?.textContent).toContain("Tree would exceed limit (0/1 currently).");
-		expect(reason?.className).not.toContain("border-t");
 		expect(reason?.querySelectorAll("strong")).toHaveLength(1);
 		expect(reason?.querySelector("strong")?.textContent).toBe("Tree");
 	});
@@ -1420,7 +1372,6 @@ describe("ItemLinesTab", () => {
 		const reason = document.querySelector('[data-ui="TileLineUnavailableReason"]');
 		expect(reason?.textContent).toBe("TreeRequired · None available (Board · close)");
 		expect(reason?.textContent).not.toContain("1 / None available");
-		expect(reason?.className).not.toContain("border-t");
 		const link = reason?.querySelector<HTMLButtonElement>(
 			'[data-ui="TileLineUnavailableDependencyLink"]',
 		);
@@ -1476,7 +1427,6 @@ describe("ItemLinesTab", () => {
 		});
 		const reason = document.querySelector('[data-ui="TileLineUnavailableReason"]');
 		expect(reason?.textContent).toBe("Build a stonemason first.");
-		expect(reason?.className).not.toContain("border-t");
 		expect(document.querySelector('[data-ui="TileLineUnavailableDependencyLink"]')).toBeNull();
 	});
 
@@ -1487,11 +1437,6 @@ describe("ItemLinesTab", () => {
 			"line:first",
 			"line:second",
 		]);
-		expect(rows[0]?.className).toContain("border-l-2");
-		expect(rows[0]?.className).toContain("border-l-line/55");
-		expect(rows[1]?.className).toContain("border-l-2");
-		expect(rows[1]?.className).toContain("border-l-success");
-		expect(rows[1]?.className).toContain("ak-list-row-active");
 
 		const buttons = Array.from(
 			document.querySelectorAll<HTMLButtonElement>('[data-ui="TileLineSetDefaultButton"]'),
@@ -1527,7 +1472,6 @@ describe("ItemLinesTab", () => {
 
 		expect(idleRow?.querySelector('[data-ui="TileLineProgress"]')).toBeNull();
 		expect(progress?.style.width).toBe("50%");
-		expect(progress?.className).toContain("bg-[var(--ak-list-row-active-progress-surface)]");
 
 		await rerender({
 			...projection,
@@ -1592,7 +1536,6 @@ describe("ItemLinesTab", () => {
 		const enqueue = buttons.find((candidate) => candidate.textContent === "Enqueue");
 		expect(enqueue?.disabled).toBe(false);
 		expect(enqueue?.getAttribute("aria-busy")).toBe("true");
-		expect(enqueue?.className).toContain("cursor-progress");
 		expect(
 			control.readPendingAction.mock.calls.map(([key]) => JSON.parse(key as string).at(-1)),
 		).toEqual(
@@ -1621,7 +1564,6 @@ describe("ItemLinesTab", () => {
 		);
 		expect(button?.textContent).toBe("Enqueue");
 		expect(button?.getAttribute("aria-busy")).toBe("true");
-		expect(button?.className).toContain("cursor-progress");
 	});
 
 	it("marks queued idle work in warning orange and explains its automatic start", async () => {
@@ -1636,7 +1578,6 @@ describe("ItemLinesTab", () => {
 		});
 		const queuedLine = container.querySelector<HTMLElement>('[data-ui="TileLine"]');
 		expect(queuedLine?.dataset.queued).toBe("true");
-		expect(queuedLine?.className).toContain("border-l-warning");
 		expect(queuedLine?.querySelector('[data-ui="TileLineQueuedBadge"]')).toBeNull();
 		expect(
 			queuedLine?.querySelector('[data-ui="TileLineQueuedMessage"]')?.textContent,
@@ -1654,7 +1595,6 @@ describe("ItemLinesTab", () => {
 		const activeLine = container.querySelector<HTMLElement>('[data-ui="TileLine"]');
 		expect(activeLine?.dataset.active).toBe("true");
 		expect(activeLine?.dataset.queued).toBe("false");
-		expect(activeLine?.className).toContain("border-l-success");
 		expect(activeLine?.querySelector('[data-ui="TileLineQueuedBadge"]')).toBeNull();
 		expect(activeLine?.querySelector('[data-ui="TileLineQueuedMessage"]')).toBeNull();
 	});

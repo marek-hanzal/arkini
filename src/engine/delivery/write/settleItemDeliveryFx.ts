@@ -14,7 +14,7 @@ import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatef
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
 import { readGridLocationClaimsFx } from "~/engine/location/read/readGridLocationClaimsFx";
-import { readGridLocationKey } from "~/engine/location/read/readGridLocationOccupantsFx";
+import { readGridLocationKeyFx } from "~/engine/location/read/readGridLocationKeyFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
@@ -93,12 +93,17 @@ export const settleItemDeliveryRuntimeFx = Effect.fn("settleItemDeliveryRuntimeF
 			const claims = yield* readGridLocationClaimsFx({
 				runtime,
 			});
-			const conflictingClaim = claims.find(
-				(claim) =>
+			const originKey = yield* readGridLocationKeyFx(current.location.origin);
+			let conflictingClaim: (typeof claims)[number] | undefined;
+			for (const claim of claims) {
+				if (
 					claim.itemId !== current.id &&
-					readGridLocationKey(claim.location) ===
-						readGridLocationKey(current.location.origin),
-			);
+					(yield* readGridLocationKeyFx(claim.location)) === originKey
+				) {
+					conflictingClaim = claim;
+					break;
+				}
+			}
 			if (conflictingClaim !== undefined) {
 				return yield* Effect.die(
 					new Error(

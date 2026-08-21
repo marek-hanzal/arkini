@@ -3,6 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import { makeDropActorRejectedResultFx } from "~/engine/runtime/drop/makeDropActorRejectedResultFx";
 import { makeDropRejectedResultFx } from "~/engine/runtime/drop/makeDropRejectedResultFx";
 import { DropItemIgnoredReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemIgnoredReasonEnumSchema";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
@@ -57,29 +58,23 @@ export const commitSwapDropFx = Effect.fn("commitSwapDropFx")(function* ({
 		),
 		Effect.catchTags({
 			ItemNotFoundError: (error) =>
-				makeDropRejectedResultFx({
-					reason:
-						error.itemId === targetItemId
-							? DropItemRejectedReasonEnumSchema.enum.StaleTarget
-							: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+				makeDropActorRejectedResultFx({
+					failedItemId: error.itemId,
+					failure: "stale",
 					sourceItemId,
 					targetItemId,
 				}),
 			RevisionConflictError: (error) =>
-				makeDropRejectedResultFx({
-					reason:
-						error.entityId === targetItemId
-							? DropItemRejectedReasonEnumSchema.enum.StaleTarget
-							: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+				makeDropActorRejectedResultFx({
+					failedItemId: error.entityId,
+					failure: "stale",
 					sourceItemId,
 					targetItemId,
 				}),
 			ItemNotOnGridError: (error) =>
-				makeDropRejectedResultFx({
-					reason:
-						error.itemId === targetItemId
-							? DropItemRejectedReasonEnumSchema.enum.InvalidTarget
-							: DropItemRejectedReasonEnumSchema.enum.InvalidSource,
+				makeDropActorRejectedResultFx({
+					failedItemId: error.itemId,
+					failure: "invalid-location",
 					sourceItemId,
 					targetItemId,
 				}),

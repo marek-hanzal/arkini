@@ -4,36 +4,8 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { isSameTileActorLocationFx } from "~/bridge/tile/isSameTileActorLocationFx";
 import { readPixiTileActorCrowdAlphaFx } from "~/ui/pixi/actor/readPixiTileActorCrowdAlphaFx";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
+import type { PixiMainSceneActorUpdatePlan } from "~/ui/pixi/scene/PixiMainSceneActorUpdatePlan";
 import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
-
-export interface PixiMainSceneActorUpdatePlan {
-	readonly activityEffect: "start" | "stop" | null;
-	readonly crowdAlpha: number | null;
-	readonly item:
-		| {
-				readonly kind: "assign";
-		  }
-		| {
-				readonly kind: "progress";
-		  }
-		| {
-				readonly kind: "visual";
-				readonly preserveVisual: boolean;
-				readonly size: number;
-		  };
-	readonly pose:
-		| {
-				readonly kind: "owned";
-		  }
-		| {
-				readonly kind: "place";
-		  }
-		| {
-				readonly directLanding: boolean;
-				readonly kind: "travel";
-				readonly scaleBeforeTravel: number | null;
-		  };
-}
 
 export namespace classifyPixiMainSceneActorUpdateFx {
 	export interface Props {

@@ -4,6 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import { makeDropActorRejectedResultFx } from "~/engine/runtime/drop/makeDropActorRejectedResultFx";
 import { makeDropRejectedResultFx } from "~/engine/runtime/drop/makeDropRejectedResultFx";
 import { projectDropTransferActorFx } from "~/engine/runtime/drop/projectDropTransferActorFx";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
@@ -76,38 +77,30 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 	}).pipe(
 		Effect.catchTags({
 			ItemNotFoundError: (error) =>
-				makeDropRejectedResultFx({
-					reason:
-						error.itemId === targetItemId
-							? DropItemRejectedReasonEnumSchema.enum.StaleTarget
-							: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+				makeDropActorRejectedResultFx({
+					failedItemId: error.itemId,
+					failure: "stale",
 					sourceItemId,
 					targetItemId,
 				}),
 			RevisionConflictError: (error) =>
-				makeDropRejectedResultFx({
-					reason:
-						error.entityId === targetItemId
-							? DropItemRejectedReasonEnumSchema.enum.StaleTarget
-							: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+				makeDropActorRejectedResultFx({
+					failedItemId: error.entityId,
+					failure: "stale",
 					sourceItemId,
 					targetItemId,
 				}),
 			ItemLocationConflictError: (error) =>
-				makeDropRejectedResultFx({
-					reason:
-						error.itemId === targetItemId
-							? DropItemRejectedReasonEnumSchema.enum.StaleTarget
-							: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+				makeDropActorRejectedResultFx({
+					failedItemId: error.itemId,
+					failure: "stale",
 					sourceItemId,
 					targetItemId,
 				}),
 			ItemNotOnGridError: (error) =>
-				makeDropRejectedResultFx({
-					reason:
-						error.itemId === targetItemId
-							? DropItemRejectedReasonEnumSchema.enum.InvalidTarget
-							: DropItemRejectedReasonEnumSchema.enum.InvalidSource,
+				makeDropActorRejectedResultFx({
+					failedItemId: error.itemId,
+					failure: "invalid-location",
 					sourceItemId,
 					targetItemId,
 				}),

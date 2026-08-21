@@ -1,10 +1,9 @@
-import { Effect } from "effect";
+import { Effect, Exit } from "effect";
 
 import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
 import { toDiagnosticValueFx } from "~/bridge/diagnostics/toDiagnosticValueFx";
 import { writeDiagnosticRecordFx } from "~/bridge/diagnostics/writeDiagnosticRecordFx";
 import type { GameSession, GameTransition } from "~/bridge/game/GameSession";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 const readDeliverySummary = (runtime: RuntimeSchema.Type) =>
@@ -54,6 +53,12 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 	let latestSequence = 0;
 	let previousSignature: string | undefined;
 
+	const runDiagnostic = <Value>(effect: Effect.Effect<Value>) => {
+		const exit = session.read(effect);
+		if (Exit.isFailure(exit)) throw exit.cause;
+		return exit.value;
+	};
+
 	yield* writeDiagnosticRecordFx({
 		category: [
 			"game",
@@ -77,7 +82,7 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 			if (signature === previousSignature && transition.events.length === 0) return;
 			previousSignature = signature;
 			const runtime = transition.runtime;
-			RendererRuntime.runSync(
+			runDiagnostic(
 				writeDiagnosticRecordFx({
 					category: [
 						"game",
@@ -97,7 +102,7 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 				}),
 			);
 		} catch (cause) {
-			RendererRuntime.runSync(
+			runDiagnostic(
 				writeDiagnosticRecordFx({
 					category: [
 						"renderer",
@@ -107,7 +112,7 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 					level: "error",
 					sessionId,
 					data: {
-						cause: RendererRuntime.runSync(toDiagnosticValueFx(cause)),
+						cause: runDiagnostic(toDiagnosticValueFx(cause)),
 					},
 				}),
 			);
@@ -116,7 +121,7 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 	const unsubscribeFatal = session.subscribeFatalError(() => {
 		try {
 			const fatal = session.getFatalError();
-			RendererRuntime.runSync(
+			runDiagnostic(
 				writeDiagnosticRecordFx({
 					category: [
 						"game",
@@ -127,13 +132,13 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 					sessionId,
 					data: {
 						source: fatal?.source ?? "unknown",
-						error: RendererRuntime.runSync(toDiagnosticValueFx(fatal)),
+						error: runDiagnostic(toDiagnosticValueFx(fatal)),
 						sequence: latestSequence,
 					},
 				}),
 			);
 		} catch (cause) {
-			RendererRuntime.runSync(
+			runDiagnostic(
 				writeDiagnosticRecordFx({
 					category: [
 						"renderer",
@@ -143,7 +148,7 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 					level: "error",
 					sessionId,
 					data: {
-						cause: RendererRuntime.runSync(toDiagnosticValueFx(cause)),
+						cause: runDiagnostic(toDiagnosticValueFx(cause)),
 					},
 				}),
 			);
@@ -157,7 +162,7 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 			closed = true;
 			unsubscribeFatal();
 			unsubscribeTransitions();
-			RendererRuntime.runSync(
+			runDiagnostic(
 				writeDiagnosticRecordFx({
 					category: [
 						"game",

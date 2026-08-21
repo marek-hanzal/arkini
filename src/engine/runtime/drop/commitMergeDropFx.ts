@@ -3,6 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { commitMergeItemsFx } from "~/engine/merge/internal/commitMergeItemsFx";
+import { makeDropActorRejectedResultFx } from "~/engine/runtime/drop/makeDropActorRejectedResultFx";
 import { makeDropRejectedResultFx } from "~/engine/runtime/drop/makeDropRejectedResultFx";
 import { projectDropActorCurrentFx } from "~/engine/runtime/drop/projectDropActorCurrentFx";
 import { projectDropTransferActorFx } from "~/engine/runtime/drop/projectDropTransferActorFx";
@@ -66,20 +67,16 @@ export const commitMergeDropFx = Effect.fn("commitMergeDropFx")(function* ({
 		),
 		Effect.catchTags({
 			ItemNotFoundError: (error) =>
-				makeDropRejectedResultFx({
-					reason:
-						error.itemId === targetItemId
-							? DropItemRejectedReasonEnumSchema.enum.StaleTarget
-							: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+				makeDropActorRejectedResultFx({
+					failedItemId: error.itemId,
+					failure: "stale",
 					sourceItemId,
 					targetItemId,
 				}),
 			RevisionConflictError: (error) =>
-				makeDropRejectedResultFx({
-					reason:
-						error.entityId === targetItemId
-							? DropItemRejectedReasonEnumSchema.enum.StaleTarget
-							: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+				makeDropActorRejectedResultFx({
+					failedItemId: error.entityId,
+					failure: "stale",
 					sourceItemId,
 					targetItemId,
 				}),

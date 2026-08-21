@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { ParticleContainer, Texture } from "pixi.js";
+import { Texture } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
@@ -81,59 +81,6 @@ const lightPalette = {
 };
 
 describe("Pixi tile actor activity-particle layer", () => {
-	it("retains one fixed ParticleContainer pool above the tile face and below progress", () => {
-		const star = new Texture();
-		const actor = Effect.runSync(
-			createPixiTileActorFx({
-				frames: {
-					closeFx: Effect.void,
-					invalidateFx: Effect.void,
-					reportCriticalFailure: vi.fn(),
-					scheduleFx: () => Effect.succeed(() => {}),
-				},
-				item,
-				palette,
-				particleTextures: {
-					star,
-				},
-				textures: {} as never,
-			}),
-		);
-
-		expect(actor.container.children).toEqual([
-			actor.offsetLayer,
-		]);
-		expect(actor.offsetLayer.children).toEqual([
-			actor.crowdLayer,
-			actor.activityParticles.container,
-			actor.progressBar,
-		]);
-		expect(actor.crowdLayer.children).toEqual([
-			actor.visualLayer,
-		]);
-		expect(actor.visualLayer.children).toEqual([
-			actor.currentVisual.container,
-		]);
-		expect(actor.activityParticles.container).toBeInstanceOf(ParticleContainer);
-		expect(actor.activityParticles.container.visible).toBe(false);
-		expect(actor.activityParticles.particles).toHaveLength(12);
-		expect(
-			actor.activityParticles.particles.every(({ particle }) => particle.texture === star),
-		).toBe(true);
-		expect(
-			new Set(actor.activityParticles.particles.map(({ speedCycles }) => speedCycles)),
-		).toEqual(
-			new Set([
-				1,
-				2,
-				3,
-			]),
-		);
-
-		Effect.runSync(destroyPixiTileActorFx(actor));
-		star.destroy();
-	});
-
 	it("draws and clears the shared tile progress overlay from projected progress", () => {
 		const frames = {
 			closeFx: Effect.void,

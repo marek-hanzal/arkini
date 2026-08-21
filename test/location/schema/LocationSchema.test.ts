@@ -37,6 +37,38 @@ describe("LocationSchema", () => {
 		).toBe(true);
 	});
 
+	it("normalizes legacy persisted deliveries without a travel countdown as immediately due", () => {
+		const location = LocationSchema.parse({
+			scope: LocationScopeEnumSchema.enum.Delivery,
+			phase: "outbound",
+			generation: 0,
+			origin: {
+				scope: LocationScopeEnumSchema.enum.Board,
+				space: 0,
+				position: {
+					x: 1,
+					y: 0,
+				},
+			},
+			target: {
+				kind: "line-input",
+				ownerItemId: "runtime:owner",
+				lineId: "line:owner:work",
+				input: [
+					{
+						inputIndex: 0,
+						quantity: 1,
+					},
+				],
+			},
+		});
+
+		expect(location).toMatchObject({
+			scope: LocationScopeEnumSchema.enum.Delivery,
+			remainingDurationMs: 0,
+		});
+	});
+
 	it("rejects abstract or incomplete locations", () => {
 		expect(
 			LocationSchema.safeParse({

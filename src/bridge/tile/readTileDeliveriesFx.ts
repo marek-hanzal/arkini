@@ -16,6 +16,7 @@ export interface TileDelivery {
 	readonly generation: number;
 	readonly item: TileActorItem;
 	readonly phase: "outbound" | "returning";
+	readonly remainingDurationMs: number;
 	readonly targetActorId?: string;
 	readonly to: GridLocationSchema.Type;
 }
@@ -125,6 +126,7 @@ export const readTileDeliveriesFx = Effect.fnUntraced(function* ({
 				},
 			},
 			phase: current.location.phase,
+			remainingDurationMs: current.location.remainingDurationMs,
 			...(current.location.phase === "outbound"
 				? {
 						targetActorId: current.location.target.ownerItemId,

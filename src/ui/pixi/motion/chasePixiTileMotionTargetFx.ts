@@ -19,6 +19,7 @@ export namespace chasePixiTileMotionTargetFx {
 		readonly animator: PixiActorAnimator;
 		readonly curve?: PixiAnimationCurve;
 		readonly delayMs?: number;
+		readonly durationMs?: number;
 		readonly fallbackTarget: PixiTileActorPose;
 		readonly onPose?: (pose: PixiActorPresentedPose) => void;
 		readonly onSettled: () => void;
@@ -44,6 +45,7 @@ export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetF
 	animator,
 	curve,
 	delayMs = 0,
+	durationMs,
 	fallbackTarget,
 	onPose,
 	onSettled,
@@ -105,13 +107,15 @@ export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetF
 		channel: "pose",
 		curve,
 		delayMs,
-		durationMs: yield* readPixiTileTravelDurationMsFx({
-			fromX: from.x,
-			fromY: from.y,
-			tileSize: Math.max(1, target.scale * actor.size),
-			toX: target.x,
-			toY: target.y,
-		}),
+		durationMs:
+			durationMs ??
+			(yield* readPixiTileTravelDurationMsFx({
+				fromX: from.x,
+				fromY: from.y,
+				tileSize: Math.max(1, target.scale * actor.size),
+				toX: target.x,
+				toY: target.y,
+			})),
 		ownerKey,
 		onCancel: () => {
 			if (!cancelingForProximitySettlement) settled = true;

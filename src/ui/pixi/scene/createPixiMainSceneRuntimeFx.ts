@@ -160,7 +160,6 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 			animator,
 			application,
 			drag,
-			game,
 			magneticField,
 			particleTextures,
 			readPalette: () => paletteState.current,

@@ -22,7 +22,7 @@ all scene-local owners.
 | `animation/createPixiActorAnimatorFx.ts` | Sole writer for root pose and typed presentation channels |
 | `scene/createPixiMainSceneReconcilerFx.ts` | Canonical actor reconciliation and presentation entry/exit |
 | `motion/createPixiTileMotionRuntimeFx.ts` | Ordered cue lanes, animation claims, transient payloads, and cue settlement |
-| `delivery/createPixiDeliveryMotionRuntimeFx.ts` | Canonical delivery travel, retargeting, and generation-guarded contact settlement |
+| `delivery/createPixiDeliveryMotionRuntimeFx.ts` | Presentation-only canonical delivery travel, retargeting, and contact choreography |
 | `drag/*DragController*` | One pointer gesture and its frozen source/release facts |
 | `drop/createPixiMainSceneDropPresentationFx.ts` | Accepted-drop presentation facts until canonical settlement |
 | `drop/createPixiMainSceneDropSubmissionFx.ts` | Frozen release command, optimistic feedback, and async drop settlement |
@@ -41,7 +41,7 @@ committed transition. The receiving scene still resolves identity and outcome fr
 | --- | --- |
 | Canonical presentation | A committed engine transition enters the scene runtime. The surface receives its exact snapshot, the reconciler projects bridge actors and motion cues, retained presentation mutates, then demand rendering is invalidated. |
 | Pointer release | The drag controller asks the bridge for a preview, freezes fresh release-time facts, submits the command, and hands its result plus the current committed transition to drop presentation and reconciliation. |
-| Canonical delivery | An engine delivery location projects persisted endpoints, phase, and generation. The delivery runtime adopts the retained actor, animates from its live pose, and submits generation-guarded settlement only at physical contact. The engine then commits input or return placement. |
+| Canonical delivery | An engine delivery location projects persisted endpoints, phase, generation, and remaining travel time. Fixed-step Tick owns the countdown and canonical settlement. The delivery runtime only adopts and animates the retained actor from those facts; visual contact never submits gameplay state. |
 
 The renderer may lag, retain, hide, or animate committed facts, but it must not manufacture a
 gameplay outcome. Missing visual identities degrade to ordinary reconciliation.
@@ -143,16 +143,17 @@ poses to motion, runs entry or exit effects, and finalizes presentation claims.
   `grabbing`, and only leaving both surfaces shows `not-allowed`. Engine preview and physical drop
   feedback remain authoritative and publish the actual outcome at drop.
 - Manual producer input remains committed by its drop command; autofill instead creates canonical
-  deliveries whose input is not available until physical contact settles the matching generation.
-  Queued work uses that delivery path for Producer, Craft, Blueprint, and every other line owner. No
-  job may start while any outbound delivery still targets that owner and line.
+  deliveries whose input is not available until the engine-owned travel countdown reaches its
+  settlement boundary. Queued work uses that delivery path for Producer, Craft, Blueprint, and every
+  other line owner. No job may start while any outbound delivery still targets that owner and line.
 - A delivery keeps its exact origin lease until its full quantity commits or returns. Player
   interaction may reduce or invalidate its soft target claim; reconciliation then returns the same
   actor, including any partial remainder, to the persisted origin.
-- Delivery travel may retarget from its current live pose when its generation or geometry changes.
-  If either endpoint has no geometry, presentation freezes without settlement. Save/hydration keeps
-  the delivery phase, generation, origin, and return endpoint, so a later visible main scene resumes
-  the physical trip instead of inventing an offscreen gameplay commit.
+- Delivery presentation may retarget from its current live pose when its generation or geometry
+  changes. If either endpoint has no geometry, only presentation freezes or hides; canonical Tick
+  continues decrementing persisted `remainingDurationMs` and settles independently. Save/hydration
+  keeps the delivery phase, generation, endpoints, and countdown so remounting can resume presentation
+  without becoming a gameplay authority.
 - Canonical engine items remain the only gameplay truth. Delivery quantity stays canonical on its
   runtime item; ordinary cue motion owns only its narrow, phase-aware presentation overlay. The
   reconciler and animation-triggered refreshes use the same projector, so quantity and badge can
@@ -183,7 +184,7 @@ poses to motion, runs entry or exit effects, and finalizes presentation claims.
 | Canonical actor appearance or identity | `actor/` and `scene/createPixiMainSceneReconcilerFx.ts` |
 | Drag, left click, right click, or drop release | `drag/` |
 | Move, swap, stack, spawn, or replacement choreography | `motion/` and `scene/runPixiMainSceneReplacementsFx.ts` |
-| Autofill delivery travel and settlement | `delivery/` and bridge `tile/readTileDeliveriesFx.ts` |
+| Autofill delivery presentation | `delivery/` and bridge `tile/readTileDeliveriesFx.ts`; canonical travel/settlement lives in `engine/delivery/` + Tick |
 | Cross-canvas Inventory release | `PixiInventorySurface.tsx` and the main-scene Inventory opener |
 | Hit testing, slot geometry, or masks | `scene/*Surface*`, `layout/`, and `grid/` |
 | Magnetic response | `magnet/`; eligibility must continue to come from the bridge |

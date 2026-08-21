@@ -382,6 +382,13 @@ concrete supply after commit; queued work never reasons about hypothetical futur
 FIFO head remains first and cannot be overtaken. It waits for fresh runtime facts to make it runnable
 or for the player to clear that owner's pending queue; the engine never drops it automatically.
 
+Delivery travel is canonical engine state, not renderer lifecycle. Every delivery persists a fixed-step
+`remainingDurationMs`; Tick decrements it independently of route, current Board space, mounted canvas,
+or available Pixi geometry and commits the due generation through the same immutable settlement
+transition used by the public serialized command wrapper. Presentation may animate the projected
+countdown and endpoints, but Motion contact can never admit input, return material, or gate production.
+Legacy persisted deliveries without a countdown normalize as immediately due and settle on a later Tick.
+
 The persisted `jobQueue` array is also the canonical cross-owner priority. One bounded Tick settle
 walks eligible owner heads in that exact array order, reusing the runtime produced by every accepted
 delivery admission or start before considering the next head. No owner-ID sort, wall clock, renderer

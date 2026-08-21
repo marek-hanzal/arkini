@@ -1,6 +1,7 @@
 import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { readDeliveryTravelDurationMsFx } from "~/engine/delivery/read/readDeliveryTravelDurationMsFx";
 import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
 import { isMaterialInputEligible } from "~/engine/input/read/readMaterialInputEligibilityFx";
 import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
@@ -118,6 +119,10 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 			});
 		if (unchanged) continue;
 
+		const returnFrom =
+			owner?.location.scope === LocationScopeEnumSchema.enum.Board
+				? owner.location
+				: (returnFromByOwnerItemId?.get(target.ownerItemId) ?? current.location.origin);
 		const revised = yield* reviseRuntimeItemFx({
 			item: {
 				...current,
@@ -128,11 +133,11 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 								phase: "returning" as const,
 								generation: current.location.generation + 1,
 								origin: current.location.origin,
-								returnFrom:
-									owner?.location.scope === LocationScopeEnumSchema.enum.Board
-										? owner.location
-										: (returnFromByOwnerItemId?.get(target.ownerItemId) ??
-											current.location.origin),
+								remainingDurationMs: yield* readDeliveryTravelDurationMsFx({
+									from: returnFrom,
+									to: current.location.origin,
+								}),
+								returnFrom,
 							}
 						: {
 								...current.location,

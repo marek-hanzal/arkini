@@ -1,6 +1,7 @@
 import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { readDeliveryTravelDurationMsFx } from "~/engine/delivery/read/readDeliveryTravelDurationMsFx";
 import { DeliveryPhaseEnumSchema } from "~/engine/delivery/schema/DeliveryPhaseEnumSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { detachLineInputSourceFx } from "~/engine/input/fx/detachLineInputSourceFx";
@@ -92,6 +93,12 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 		if (runtimeSource === undefined) continue;
 		const source = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeSource));
 		if (source === undefined) continue;
+		const runtimeOwner = deliveryRuntime.items.find((item) => item.id === ownerItemId);
+		const owner =
+			runtimeOwner === undefined
+				? undefined
+				: Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeOwner));
+		if (owner === undefined) continue;
 		const detached = yield* detachLineInputSourceFx({
 			runtime: deliveryRuntime,
 			source,
@@ -108,6 +115,10 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 					phase: DeliveryPhaseEnumSchema.enum.Outbound,
 					generation: 0,
 					origin: source.location,
+					remainingDurationMs: yield* readDeliveryTravelDurationMsFx({
+						from: source.location,
+						to: owner.location,
+					}),
 					target: {
 						kind: "line-input",
 						ownerItemId,

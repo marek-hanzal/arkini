@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { settleItemDeliveryFx } from "~/engine/delivery/write/settleItemDeliveryFx";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
@@ -162,7 +161,7 @@ const owners = {
 	},
 } as const;
 
-const runChain = (order: ReadonlyArray<keyof typeof owners>) =>
+const runChain = (order: ReadonlyArray<keyof typeof owners>, space = 0) =>
 	Effect.runSync(
 		Effect.gen(function* () {
 			for (const [index, key] of (
@@ -177,7 +176,7 @@ const runChain = (order: ReadonlyArray<keyof typeof owners>) =>
 					itemId: `producer${key}`,
 					location: {
 						scope: "board",
-						space: 0,
+						space,
 						position: {
 							x: index * 2,
 							y: 0,
@@ -197,14 +196,6 @@ const runChain = (order: ReadonlyArray<keyof typeof owners>) =>
 				yield* runTickRuntimeByFx({
 					elapsedMs: 100,
 				});
-				const runtime = yield* readRuntimeFx();
-				for (const item of runtime.items) {
-					if (item.location.scope !== "delivery") continue;
-					yield* settleItemDeliveryFx({
-						itemId: item.id,
-						generation: item.location.generation,
-					});
-				}
 				const settled = yield* readRuntimeFx();
 				if (
 					settled.jobs.length === 0 &&
@@ -267,5 +258,27 @@ describe("queued producer chain", () => {
 				(item) => item.location.scope === "job" || item.location.scope === "reserved",
 			),
 		).toBe(false);
+	});
+	it("finishes the chain in an off-screen board space without presentation settlement", () => {
+		const result = runChain(
+			[
+				"C",
+				"B",
+				"A",
+			],
+			1,
+		);
+
+		expect(result.settledSteps).toBeLessThan(100);
+		expect(result.completed.jobs).toEqual([]);
+		expect(result.completed.jobQueue).toEqual([]);
+		expect(result.completed.items.some((item) => item.location.scope === "delivery")).toBe(
+			false,
+		);
+		expect(
+			result.completed.items
+				.filter((item) => item.item.id === "final")
+				.reduce((quantity, item) => quantity + item.quantity, 0),
+		).toBe(1);
 	});
 });

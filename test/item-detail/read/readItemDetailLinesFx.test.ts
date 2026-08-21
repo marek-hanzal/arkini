@@ -229,6 +229,7 @@ describe("readItemDetailLinesFx", () => {
 				scope: "delivery" as const,
 				phase: "outbound" as const,
 				generation: 0,
+				remainingDurationMs: 500,
 				origin: {
 					scope: "board" as const,
 					space: 0,
@@ -264,6 +265,7 @@ describe("readItemDetailLinesFx", () => {
 						scope: "delivery",
 						phase: "returning",
 						generation: 1,
+						remainingDurationMs: 500,
 						origin: {
 							scope: "board",
 							space: 0,
@@ -308,6 +310,7 @@ describe("readItemDetailLinesFx", () => {
 				scope: "delivery" as const,
 				phase: "outbound" as const,
 				generation: 0,
+				remainingDurationMs: 500,
 				origin: {
 					scope: "board" as const,
 					space: 0,
@@ -338,6 +341,7 @@ describe("readItemDetailLinesFx", () => {
 				scope: "delivery" as const,
 				phase: "returning" as const,
 				generation: 1,
+				remainingDurationMs: 500,
 				origin: {
 					scope: "toolbar" as const,
 					position: {

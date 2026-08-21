@@ -1,9 +1,7 @@
 import { Effect } from "effect";
 
-import type { GameEngine } from "~/bridge/game/GameEngine";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileDelivery } from "~/bridge/tile/readTileDeliveriesFx";
-import { settleTileDeliveryFx } from "~/bridge/tile/settleTileDeliveryFx";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { PixiTileActorParticleTextures } from "~/ui/pixi/actor/PixiTileActorParticleTextures";
@@ -31,7 +29,6 @@ export namespace createPixiDeliveryMotionRuntimeFx {
 		readonly animator: PixiActorAnimator;
 		readonly application: PixiApplicationOwner;
 		readonly drag: PixiMainSceneDragController;
-		readonly game: GameEngine;
 		readonly magneticField: PixiTileMagneticField;
 		readonly particleTextures: PixiTileActorParticleTextures;
 		readonly readPalette: () => PixiScenePalette;
@@ -51,7 +48,7 @@ interface ActiveDelivery {
 		| "contact-fade-in"
 		| "contact-fade-out"
 		| "exiting"
-		| "settling"
+		| "contacted"
 		| "traveling";
 	target: PixiTileActorPose | null;
 }
@@ -66,12 +63,12 @@ const deliveryReturnCurve = {
 } as const;
 
 /**
- * Animates canonical delivery identities and submits only their guarded contact command.
+ * Animates canonical delivery identities without owning gameplay settlement.
  *
  * A live actor continuously chases an outbound owner's retained physical pose and turns from its
  * current frame when the engine increments generation. Hydration reconstructs the start from
- * persisted `origin` or `returnFrom`. Missing off-screen geometry freezes the delivery without
- * inventing an engine result.
+ * persisted `origin` or `returnFrom`. Missing off-screen geometry affects only presentation; the
+ * engine countdown and settlement continue independently.
  */
 export const createPixiDeliveryMotionRuntimeFx = Effect.fn("createPixiDeliveryMotionRuntimeFx")(
 	function* ({
@@ -79,7 +76,6 @@ export const createPixiDeliveryMotionRuntimeFx = Effect.fn("createPixiDeliveryMo
 		animator,
 		application,
 		drag,
-		game,
 		magneticField,
 		particleTextures,
 		readPalette,
@@ -89,23 +85,22 @@ export const createPixiDeliveryMotionRuntimeFx = Effect.fn("createPixiDeliveryMo
 		const activeByItemId = new Map<string, ActiveDelivery>();
 		let closed = false;
 
-		const destroySettledActorFx = Effect.fn("destroySettledDeliveryActorFx")(function* (
-			itemId: string,
-			active: ActiveDelivery,
-		) {
-			if (activeByItemId.get(itemId) !== active) return;
-			active.releaseMagnet();
-			activeByItemId.delete(itemId);
-			if (actorStore.actors.get(itemId) === active.actor) {
-				yield* actorStore.releaseActorFx(itemId);
-				yield* animator.cancelActorFx(active.actor);
-				if (!active.actor.container.destroyed) {
-					yield* actorStore.destroyExitingActorFx(active.actor);
+		const destroyCompletedDeliveryActorFx = Effect.fn("destroyCompletedDeliveryActorFx")(
+			function* (itemId: string, active: ActiveDelivery) {
+				if (activeByItemId.get(itemId) !== active) return;
+				active.releaseMagnet();
+				activeByItemId.delete(itemId);
+				if (actorStore.actors.get(itemId) === active.actor) {
+					yield* actorStore.releaseActorFx(itemId);
+					yield* animator.cancelActorFx(active.actor);
+					if (!active.actor.container.destroyed) {
+						yield* actorStore.destroyExitingActorFx(active.actor);
+					}
 				}
-			}
-		});
+			},
+		);
 
-		const submitSettlement = (itemId: string, generation: number) => {
+		const markContact = (itemId: string, generation: number) => {
 			const active = activeByItemId.get(itemId);
 			if (
 				closed ||
@@ -115,17 +110,7 @@ export const createPixiDeliveryMotionRuntimeFx = Effect.fn("createPixiDeliveryMo
 			) {
 				return;
 			}
-			active.stage = "settling";
-			void game
-				.run(
-					settleTileDeliveryFx({
-						itemId,
-						generation,
-					}),
-				)
-				.catch((cause) => {
-					game.reportCriticalFailure("game-presentation", cause);
-				});
+			active.stage = "contacted";
 		};
 
 		const startTravelFx = Effect.fn("startPixiDeliveryTravelFx")(function* ({
@@ -163,6 +148,7 @@ export const createPixiDeliveryMotionRuntimeFx = Effect.fn("createPixiDeliveryMo
 			yield* chasePixiTileMotionTargetFx({
 				actor: active.actor,
 				animator,
+				durationMs: Math.max(0, delivery.remainingDurationMs - 100),
 				curve: delivery.phase === "returning" ? deliveryReturnCurve : deliveryOutboundCurve,
 				fallbackTarget: to,
 				onPose: magneticProjector?.projectPose,
@@ -177,7 +163,7 @@ export const createPixiDeliveryMotionRuntimeFx = Effect.fn("createPixiDeliveryMo
 							}),
 						);
 					}
-					submitSettlement(delivery.item.id, delivery.generation);
+					markContact(delivery.item.id, delivery.generation);
 				},
 				ownerKey: `delivery:${delivery.item.id}:${delivery.generation}`,
 				readLiveTarget,
@@ -281,13 +267,15 @@ export const createPixiDeliveryMotionRuntimeFx = Effect.fn("createPixiDeliveryMo
 						continue;
 					}
 					if (active.stage === "exiting") continue;
-					if (active.stage === "settling") {
+					if (active.stage === "contacted") {
 						active.stage = "exiting";
 						let settled = false;
 						const settle = () => {
 							if (settled) return;
 							settled = true;
-							RendererRuntime.runSync(destroySettledActorFx(itemId, active));
+							RendererRuntime.runSync(
+								destroyCompletedDeliveryActorFx(itemId, active),
+							);
 						};
 						yield* startPixiTileActorExitFx({
 							actor: active.actor,
@@ -297,7 +285,7 @@ export const createPixiDeliveryMotionRuntimeFx = Effect.fn("createPixiDeliveryMo
 						});
 						continue;
 					}
-					yield* destroySettledActorFx(itemId, active);
+					yield* destroyCompletedDeliveryActorFx(itemId, active);
 				}
 
 				for (const delivery of deliveries) {
@@ -312,7 +300,7 @@ export const createPixiDeliveryMotionRuntimeFx = Effect.fn("createPixiDeliveryMo
 							const contactReturn =
 								generationChanged &&
 								active.delivery.phase === "outbound" &&
-								active.stage === "settling" &&
+								active.stage === "contacted" &&
 								delivery.phase === "returning";
 							if (generationChanged) {
 								if (
@@ -381,7 +369,7 @@ export const createPixiDeliveryMotionRuntimeFx = Effect.fn("createPixiDeliveryMo
 						if (
 							active.stage === "contact-fade-out" ||
 							active.stage === "contact-fade-in" ||
-							active.stage === "settling"
+							active.stage === "contacted"
 						) {
 							continue;
 						}
@@ -449,7 +437,7 @@ export const createPixiDeliveryMotionRuntimeFx = Effect.fn("createPixiDeliveryMo
 					surface.transientActorLayer.addChild(actor.container);
 					const contactReturn =
 						active?.delivery.phase === "outbound" &&
-						active.stage === "settling" &&
+						active.stage === "contacted" &&
 						delivery.phase === "returning";
 					if (!contactReturn) {
 						yield* updatePixiTileActorFx({

@@ -28,6 +28,7 @@ const createTransition = (sequence: number): GameTransition =>
 		runtime: {
 			items: [],
 			jobs: [],
+			jobQueue: [],
 		},
 	}) as unknown as GameTransition;
 
@@ -125,6 +126,7 @@ describe("Game diagnostics", () => {
 									scope: "delivery",
 									phase: "outbound",
 									generation: 0,
+									remainingDurationMs: 500,
 									origin: {
 										scope: "board",
 										space: 0,

@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+import { TimeSchema } from "~/engine/common/schema/TimeSchema";
 import { DeliveryPhaseEnumSchema } from "~/engine/delivery/schema/DeliveryPhaseEnumSchema";
 import { LineInputDeliveryTargetSchema } from "~/engine/delivery/schema/LineInputDeliveryTargetSchema";
 import { GridLocationSchema } from "./GridLocationSchema";
@@ -10,8 +11,8 @@ import { LocationScopeEnumSchema } from "./LocationScopeEnumSchema";
  * One live item physically travelling between a retained grid origin and a semantic target.
  *
  * The origin is a canonical return lease until the item either fully commits at its target or
- * returns home. `generation` invalidates stale presentation completions after redirects or
- * preemption without exporting renderer lifecycle into gameplay state.
+ * returns home. `generation` invalidates stale settlement requests after redirects or preemption without
+ * exporting renderer lifecycle into gameplay state.
  */
 const DeliveryLocationBaseSchema = z.object({
 	scope: LocationScopeEnumSchema.extract([
@@ -22,6 +23,9 @@ const DeliveryLocationBaseSchema = z.object({
 	),
 	origin: GridLocationSchema.describe(
 		"The exact grid cell leased until this delivery no longer needs to return.",
+	),
+	remainingDurationMs: TimeSchema.default(0).describe(
+		"The engine-owned fixed-step travel time remaining before canonical settlement; legacy persisted deliveries without this field are due on the next Tick.",
 	),
 });
 

@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { settleItemDeliveryFx } from "~/engine/delivery/write/settleItemDeliveryFx";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
@@ -153,7 +152,7 @@ const spawnScenarioFx = Effect.fn("spawnLineOwnerDeliveryBoundaryScenarioFx")(fu
 describe("line-owner delivery settlement boundary", () => {
 	it.each(
 		ownerKinds,
-	)("keeps queued %s work persisted until deliveries settle and a later Tick admits it", (ownerKind) => {
+	)("keeps queued %s work blocked by engine-owned delivery travel until the next Tick", (ownerKind) => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const ids = yield* spawnScenarioFx(ownerKind);
@@ -161,31 +160,21 @@ describe("line-owner delivery settlement boundary", () => {
 				yield* runTickRuntimeByFx({
 					elapsedMs: TickStepMs,
 				});
-				const admitted = yield* readRuntimeFx();
-				yield* settleItemDeliveryFx({
-					itemId: "runtime:material:a",
-					generation: 0,
-				});
+				const traveling = yield* readRuntimeFx();
 				yield* runTickRuntimeByFx({
-					elapsedMs: TickStepMs,
+					elapsedMs: TickStepMs * 2,
 				});
-				const afterFirstContact = yield* readRuntimeFx();
-				yield* settleItemDeliveryFx({
-					itemId: "runtime:material:b",
-					generation: 0,
-				});
-				const afterLastContact = yield* readRuntimeFx();
+				const settled = yield* readRuntimeFx();
 				yield* runTickRuntimeByFx({
 					elapsedMs: TickStepMs,
 				});
 				return {
-					admitted,
-					afterFirstContact,
-					afterLastContact,
 					finished: yield* readRuntimeFx(),
 					finishedTransition: yield* readCommittedTransitionFx(),
 					ids,
 					request,
+					settled,
+					traveling,
 				};
 			}).pipe(
 				useGameFx({
@@ -194,18 +183,27 @@ describe("line-owner delivery settlement boundary", () => {
 			),
 		);
 
-		expect(result.admitted.jobs).toEqual([]);
-		expect(result.admitted.jobQueue).toEqual([
+		expect(result.traveling.jobs).toEqual([]);
+		expect(result.traveling.jobQueue).toEqual([
 			result.request,
 		]);
-		expect(result.afterFirstContact.jobs).toEqual([]);
-		expect(result.afterFirstContact.jobQueue).toEqual([
+		expect(
+			result.traveling.items.flatMap((item) =>
+				item.location.scope === "delivery"
+					? [
+							item.location.remainingDurationMs,
+						]
+					: [],
+			),
+		).toEqual([
+			200,
+			200,
+		]);
+		expect(result.settled.jobs).toEqual([]);
+		expect(result.settled.jobQueue).toEqual([
 			result.request,
 		]);
-		expect(result.afterLastContact.jobs).toEqual([]);
-		expect(result.afterLastContact.jobQueue).toEqual([
-			result.request,
-		]);
+		expect(result.settled.items.some((item) => item.location.scope === "delivery")).toBe(false);
 		expect(result.finished.jobQueue).toEqual([]);
 		expect(result.finished.jobs).toEqual([
 			expect.objectContaining({

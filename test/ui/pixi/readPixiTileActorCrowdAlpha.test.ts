@@ -1,9 +1,12 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
-import { readPixiTileActorCrowdAlpha } from "~/ui/pixi/actor/readPixiTileActorCrowdAlpha";
+import { readPixiTileActorCrowdAlphaFx } from "~/ui/pixi/actor/readPixiTileActorCrowdAlpha";
+
+const readCrowdAlpha = (item: TileActorItem) => Effect.runSync(readPixiTileActorCrowdAlphaFx(item));
 
 const item = (overrides: Partial<TileActorItem> = {}): TileActorItem => ({
 	compositeUrl: undefined,
@@ -30,14 +33,14 @@ const item = (overrides: Partial<TileActorItem> = {}): TileActorItem => ({
 	...overrides,
 });
 
-describe("readPixiTileActorCrowdAlpha", () => {
+describe("readPixiTileActorCrowdAlphaFx", () => {
 	it.each([
 		JobStatusEnumSchema.enum.Paused,
 		JobStatusEnumSchema.enum.Running,
 		JobStatusEnumSchema.enum.AwaitingOutput,
 	])("dims an active craft in %s state", (jobStatus) => {
 		expect(
-			readPixiTileActorCrowdAlpha(
+			readCrowdAlpha(
 				item({
 					itemType: ItemEnumSchema.enum.Craft,
 					jobStatus,
@@ -49,7 +52,7 @@ describe("readPixiTileActorCrowdAlpha", () => {
 
 	it("keeps the existing running treatment for other line owners", () => {
 		expect(
-			readPixiTileActorCrowdAlpha(
+			readCrowdAlpha(
 				item({
 					itemType: ItemEnumSchema.enum.Producer,
 					jobStatus: JobStatusEnumSchema.enum.Running,
@@ -61,7 +64,7 @@ describe("readPixiTileActorCrowdAlpha", () => {
 
 	it("keeps an idle craft fully opaque", () => {
 		expect(
-			readPixiTileActorCrowdAlpha(
+			readCrowdAlpha(
 				item({
 					itemType: ItemEnumSchema.enum.Craft,
 				}),

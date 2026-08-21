@@ -7,7 +7,7 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
-import { isSameTileActorLocation } from "~/bridge/tile/isSameTileActorLocation";
+import { isSameTileActorLocationFx } from "~/bridge/tile/isSameTileActorLocation";
 import {
 	readTileDropPreviewFx,
 	type readTileDropPreviewFx as ReadTileDropPreviewFx,
@@ -264,7 +264,9 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 				current === null ||
 				current !== drag.actor ||
 				current.container.destroyed ||
-				!isSameTileActorLocation(current.item.location, drag.sourceItem.location)
+				!RendererRuntime.runSync(
+					isSameTileActorLocationFx(current.item.location, drag.sourceItem.location),
+				)
 			) {
 				cancelInteraction();
 				return null;

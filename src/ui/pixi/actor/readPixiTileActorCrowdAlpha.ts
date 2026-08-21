@@ -1,3 +1,4 @@
+import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
@@ -6,8 +7,8 @@ const activeCraftAlpha = 0.6;
 const runningLineOwnerAlpha = 0.82;
 
 /** Keeps active crafts visibly unavailable while preserving the lighter running treatment elsewhere. */
-export const readPixiTileActorCrowdAlpha = (item: TileActorItem) =>
-	match({
+export const readPixiTileActorCrowdAlphaFx = Effect.fnUntraced(function* (item: TileActorItem) {
+	return match({
 		active: item.jobStatus !== undefined,
 		itemType: item.itemType,
 		running: item.running,
@@ -26,3 +27,4 @@ export const readPixiTileActorCrowdAlpha = (item: TileActorItem) =>
 			() => runningLineOwnerAlpha,
 		)
 		.otherwise(() => 1);
+});

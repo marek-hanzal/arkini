@@ -13,7 +13,7 @@ import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { createPixiTileActorActivityParticlesFx } from "~/ui/pixi/actor/createPixiTileActorActivityParticlesFx";
 import { createPixiTileActorVisualFx } from "~/ui/pixi/actor/createPixiTileActorVisualFx";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";
-import { readPixiTileActorCrowdAlpha } from "~/ui/pixi/actor/readPixiTileActorCrowdAlpha";
+import { readPixiTileActorCrowdAlphaFx } from "~/ui/pixi/actor/readPixiTileActorCrowdAlpha";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 
@@ -58,7 +58,7 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 				eventMode: "none",
 				label: `TileActorCrowd:${item.id}:${instanceId}`,
 			});
-			crowdLayer.alpha = readPixiTileActorCrowdAlpha(item);
+			crowdLayer.alpha = yield* readPixiTileActorCrowdAlphaFx(item);
 			const visualLayer = new Container({
 				eventMode: "none",
 				label: `TileActorVisualLayer:${item.id}:${instanceId}`,

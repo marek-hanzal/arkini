@@ -1,12 +1,15 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { PixiMainSceneVisibleActor } from "~/ui/pixi/scene/classifyPixiMainSceneReconciliation";
+import { classifyPixiMainSceneActorUpdateFx } from "~/ui/pixi/scene/classifyPixiMainSceneActorUpdateFx";
 import {
-	classifyPixiMainSceneActorUpdate,
-	classifyPixiMainSceneReconciliation,
-} from "~/ui/pixi/scene/classifyPixiMainSceneReconciliation";
+	type PixiMainSceneVisibleActor,
+	classifyPixiMainSceneReconciliationFx,
+} from "~/ui/pixi/scene/classifyPixiMainSceneReconciliationFx";
+
+const runFx = <A>(effect: Effect.Effect<A>) => Effect.runSync(effect);
 
 const boardLocation = (x: number): TileActorItem["location"] => ({
 	scope: "board",
@@ -73,21 +76,23 @@ describe("Pixi main-scene reconciliation classification", () => {
 		} as PixiTileActor;
 
 		expect(
-			classifyPixiMainSceneActorUpdate({
-				actor,
-				deliveryRetained: false,
-				directLanding: true,
-				displayItem,
-				motionClaimed: false,
-				pose: {
-					layer: null as never,
-					size: 100,
-					x: 140,
-					y: 60,
-				},
-				poseChannelActive: false,
-				preserveVisual: true,
-			}),
+			runFx(
+				classifyPixiMainSceneActorUpdateFx({
+					actor,
+					deliveryRetained: false,
+					directLanding: true,
+					displayItem,
+					motionClaimed: false,
+					pose: {
+						layer: null as never,
+						size: 100,
+						x: 140,
+						y: 60,
+					},
+					poseChannelActive: false,
+					preserveVisual: true,
+				}),
+			),
 		).toEqual({
 			activityEffect: "start",
 			crowdAlpha: 0.82,
@@ -126,21 +131,23 @@ describe("Pixi main-scene reconciliation classification", () => {
 		} as PixiTileActor;
 
 		expect(
-			classifyPixiMainSceneActorUpdate({
-				actor,
-				deliveryRetained: true,
-				directLanding: false,
-				displayItem,
-				motionClaimed: false,
-				pose: {
-					layer: null as never,
-					size: 100,
-					x: 140,
-					y: 60,
-				},
-				poseChannelActive: false,
-				preserveVisual: false,
-			}),
+			runFx(
+				classifyPixiMainSceneActorUpdateFx({
+					actor,
+					deliveryRetained: true,
+					directLanding: false,
+					displayItem,
+					motionClaimed: false,
+					pose: {
+						layer: null as never,
+						size: 100,
+						x: 140,
+						y: 60,
+					},
+					poseChannelActive: false,
+					preserveVisual: false,
+				}),
+			),
 		).toEqual({
 			activityEffect: null,
 			crowdAlpha: null,
@@ -156,50 +163,52 @@ describe("Pixi main-scene reconciliation classification", () => {
 	});
 
 	it("classifies same-frame add, update, immediate removal, retained, and animated exit work", () => {
-		const plan = classifyPixiMainSceneReconciliation({
-			actorIds: [
-				"update",
-				"inventory",
-				"hidden",
-				"pending",
-				"delivery",
-				"motion",
-				"feedback",
-				"removed",
-			],
-			deliveryRetainedActorIds: new Set([
-				"delivery",
-			]),
-			feedbackCues: [
-				{
-					actorId: "feedback",
-					key: "feedback:consume",
-					kind: "consume",
-				},
-			],
-			hiddenActorIds: new Set([
-				"hidden",
-			]),
-			inventoryActorIds: new Set([
-				"inventory",
-			]),
-			motionRetainedActorIds: new Set([
-				"motion",
-			]),
-			pendingActorIds: new Set([
-				"pending",
-			]),
-			visibleActors: new Map([
-				[
+		const plan = runFx(
+			classifyPixiMainSceneReconciliationFx({
+				actorIds: [
 					"update",
-					visibleActor("update"),
+					"inventory",
+					"hidden",
+					"pending",
+					"delivery",
+					"motion",
+					"feedback",
+					"removed",
 				],
-				[
-					"add",
-					visibleActor("add"),
+				deliveryRetainedActorIds: new Set([
+					"delivery",
+				]),
+				feedbackCues: [
+					{
+						actorId: "feedback",
+						key: "feedback:consume",
+						kind: "consume",
+					},
 				],
-			]),
-		});
+				hiddenActorIds: new Set([
+					"hidden",
+				]),
+				inventoryActorIds: new Set([
+					"inventory",
+				]),
+				motionRetainedActorIds: new Set([
+					"motion",
+				]),
+				pendingActorIds: new Set([
+					"pending",
+				]),
+				visibleActors: new Map([
+					[
+						"update",
+						visibleActor("update"),
+					],
+					[
+						"add",
+						visibleActor("add"),
+					],
+				]),
+			}),
+		);
 
 		expect(
 			plan.arrivals.map(({ kind, visible }) => [
@@ -270,8 +279,8 @@ describe("Pixi main-scene reconciliation classification", () => {
 			]),
 		};
 
-		expect(classifyPixiMainSceneReconciliation(props)).toEqual(
-			classifyPixiMainSceneReconciliation(props),
+		expect(runFx(classifyPixiMainSceneReconciliationFx(props))).toEqual(
+			runFx(classifyPixiMainSceneReconciliationFx(props)),
 		);
 	});
 });

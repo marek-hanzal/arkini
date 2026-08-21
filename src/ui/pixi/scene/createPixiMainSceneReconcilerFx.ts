@@ -43,10 +43,8 @@ import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwne
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiMainSceneReconciler } from "~/ui/pixi/scene/PixiMainSceneReconciler";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
-import {
-	classifyPixiMainSceneActorUpdate,
-	classifyPixiMainSceneReconciliation,
-} from "~/ui/pixi/scene/classifyPixiMainSceneReconciliation";
+import { classifyPixiMainSceneActorUpdateFx } from "~/ui/pixi/scene/classifyPixiMainSceneActorUpdateFx";
+import { classifyPixiMainSceneReconciliationFx } from "~/ui/pixi/scene/classifyPixiMainSceneReconciliationFx";
 import { releasePixiMainSceneActorFx } from "~/ui/pixi/scene/releasePixiMainSceneActorFx";
 import { runPixiMainSceneReplacementsFx } from "~/ui/pixi/scene/runPixiMainSceneReplacementsFx";
 
@@ -345,7 +343,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 								];
 					}),
 				);
-				const reconciliationPlan = classifyPixiMainSceneReconciliation({
+				const reconciliationPlan = yield* classifyPixiMainSceneReconciliationFx({
 					actorIds: actorStore.actors.keys(),
 					deliveryRetainedActorIds: deliverySnapshot.retainedActorIds,
 					feedbackCues,
@@ -448,7 +446,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 
 					const actor = actorStore.actors.get(item.id);
 					if (actor === undefined) continue;
-					const updatePlan = classifyPixiMainSceneActorUpdate({
+					const updatePlan = yield* classifyPixiMainSceneActorUpdateFx({
 						actor,
 						deliveryRetained: deliverySnapshot.retainedActorIds.has(item.id),
 						directLanding: dropSnapshot.landingActorIds.has(item.id),

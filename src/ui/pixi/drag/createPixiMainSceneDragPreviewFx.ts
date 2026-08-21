@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { isSameTileActorLocation } from "~/bridge/tile/isSameTileActorLocation";
+import { isSameTileActorLocationFx } from "~/bridge/tile/isSameTileActorLocation";
 import { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";
@@ -23,28 +23,26 @@ export const createPixiMainSceneDragPreviewFx = Effect.fn("createPixiMainSceneDr
 	function* ({ actorStore, game, surface }: createPixiMainSceneDragPreviewFx.Props) {
 		const readCurrentSourceFx: PixiMainSceneDragPreview["readCurrentSourceFx"] = Effect.fn(
 			"PixiMainSceneDragPreview.readCurrentSourceFx",
-		)((drag) =>
-			Effect.sync(() => {
-				if (
-					drag.actor.container.destroyed ||
-					actorStore.actors.get(drag.sourceItem.id) !== drag.actor
-				) {
-					return null;
-				}
-				const canonical = actorStore.canonicalItems.get(drag.sourceItem.id);
-				if (
-					canonical === undefined ||
-					!isSameTileActorLocation(canonical.location, drag.sourceItem.location)
-				) {
-					return null;
-				}
-				return {
-					...drag.actor.item,
-					location: canonical.location,
-					revision: canonical.revision,
-				} satisfies TileActorItem;
-			}),
-		);
+		)(function* (drag) {
+			if (
+				drag.actor.container.destroyed ||
+				actorStore.actors.get(drag.sourceItem.id) !== drag.actor
+			) {
+				return null;
+			}
+			const canonical = actorStore.canonicalItems.get(drag.sourceItem.id);
+			if (
+				canonical === undefined ||
+				!(yield* isSameTileActorLocationFx(canonical.location, drag.sourceItem.location))
+			) {
+				return null;
+			}
+			return {
+				...drag.actor.item,
+				location: canonical.location,
+				revision: canonical.revision,
+			} satisfies TileActorItem;
+		});
 
 		const readPreviewKindFx: PixiMainSceneDragPreview["readPreviewKindFx"] = Effect.fn(
 			"PixiMainSceneDragPreview.readPreviewKindFx",
@@ -89,10 +87,16 @@ export const createPixiMainSceneDragPreviewFx = Effect.fn("createPixiMainSceneDr
 						cached !== undefined &&
 						cached.source.id === sourceItem.id &&
 						cached.source.revision === sourceItem.revision &&
-						isSameTileActorLocation(cached.source.location, sourceItem.location) &&
+						(yield* isSameTileActorLocationFx(
+							cached.source.location,
+							sourceItem.location,
+						)) &&
 						cached.target.id === targetItem.id &&
 						cached.target.revision === targetItem.revision &&
-						isSameTileActorLocation(cached.target.location, targetItem.location)
+						(yield* isSameTileActorLocationFx(
+							cached.target.location,
+							targetItem.location,
+						))
 					) {
 						if (cached.eligible) eligibleActorIds.add(actorId);
 						continue;
@@ -100,7 +104,10 @@ export const createPixiMainSceneDragPreviewFx = Effect.fn("createPixiMainSceneDr
 					const previewKind =
 						targetFacts.occupant?.id === targetItem.id &&
 						targetFacts.occupant.revision === targetItem.revision &&
-						isSameTileActorLocation(targetFacts.occupant.location, targetItem.location)
+						(yield* isSameTileActorLocationFx(
+							targetFacts.occupant.location,
+							targetItem.location,
+						))
 							? drag.previewKind
 							: (yield* readTileDropPreviewFx({
 									game,
@@ -159,7 +166,7 @@ export const createPixiMainSceneDragPreviewFx = Effect.fn("createPixiMainSceneDr
 				drag.previewSource !== null &&
 				drag.previewSource.id === sourceItem.id &&
 				drag.previewSource.revision === sourceItem.revision &&
-				isSameTileActorLocation(drag.previewSource.location, sourceItem.location)
+				(yield* isSameTileActorLocationFx(drag.previewSource.location, sourceItem.location))
 			) {
 				return sourceItem;
 			}

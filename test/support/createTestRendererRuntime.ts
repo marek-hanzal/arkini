@@ -11,10 +11,10 @@ import {
 	type EditorProjectRepositoryOperation,
 } from "~/bridge/editor/EditorProjectRepositoryError";
 import {
-	createEditorUnsavedChangesOwnerFx,
 	EditorUnsavedChanges,
 	EditorUnsavedChangesOwnerAtom,
 } from "~/bridge/editor/EditorUnsavedChanges";
+import { createEditorUnsavedChangesOwnerFx } from "~/bridge/editor/createEditorUnsavedChangesOwnerFx";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { acquireGameEngineLeaseFx } from "~/bridge/game/acquireGameEngineLeaseFx";
 import { adoptGameEngineLeaseFx } from "~/bridge/game/adoptGameEngineLeaseFx";

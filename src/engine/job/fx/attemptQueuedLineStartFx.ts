@@ -9,7 +9,7 @@ import { LineRunUnavailableError } from "~/engine/line/error/LineRunUnavailableE
 import type { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
-import { autofillLineInputsRuntimeFx } from "~/engine/input/write/autofillLineInputsFx";
+import { autofillLineInputsRuntimeFx } from "~/engine/input/write/autofillLineInputsRuntimeFx";
 import { startQueuedLineRuntimeFx } from "./startQueuedLineRuntimeFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 

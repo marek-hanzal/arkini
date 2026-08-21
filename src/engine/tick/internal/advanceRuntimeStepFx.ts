@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { isPassiveStorageLocationFx } from "~/engine/location/read/isPassiveStorageLocationFx";
 import { isInstantGameplayEnabledFx } from "~/engine/cheat/read/isInstantGameplayEnabledFx";
-import { settleItemDeliveryRuntimeFx } from "~/engine/delivery/write/settleItemDeliveryFx";
+import { settleItemDeliveryRuntimeFx } from "~/engine/delivery/write/settleItemDeliveryRuntimeFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";

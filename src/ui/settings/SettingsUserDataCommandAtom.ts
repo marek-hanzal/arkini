@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { openUserDataDirectoryFx } from "~/bridge/user-data/UserData";
+import { openUserDataDirectoryFx } from "~/bridge/user-data/openUserDataDirectoryFx";
 import {
 	createSettingsDirectoryCommandAtomFx,
 	type SettingsDirectoryCommandState,

@@ -4,10 +4,10 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { acquireGameEngineResourceFx } from "~/bridge/game/acquireGameEngineResourceFx";
 import { EditorProjectRepositoryLayer } from "~/bridge/editor/EditorProjectRepositoryLayer";
 import {
-	createEditorUnsavedChangesOwnerFx,
 	EditorUnsavedChanges,
 	EditorUnsavedChangesOwnerAtom,
 } from "~/bridge/editor/EditorUnsavedChanges";
+import { createEditorUnsavedChangesOwnerFx } from "~/bridge/editor/createEditorUnsavedChangesOwnerFx";
 import { GameEngineResourceLayer } from "~/bridge/game/GameEngineResourceLayer";
 import { RendererAtomRegistryLayer } from "~/bridge/reactivity/RendererAtomRegistry";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";

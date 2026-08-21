@@ -18,10 +18,8 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EditorShell } from "~/ui/editor/EditorShell";
-import {
-	createEditorUnsavedChangesOwnerFx,
-	EditorUnsavedChangesOwnerAtom,
-} from "~/bridge/editor/EditorUnsavedChanges";
+import { EditorUnsavedChangesOwnerAtom } from "~/bridge/editor/EditorUnsavedChanges";
+import { createEditorUnsavedChangesOwnerFx } from "~/bridge/editor/createEditorUnsavedChangesOwnerFx";
 import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
 
 vi.mock("~/bridge/editor/useEditorProject", () => ({

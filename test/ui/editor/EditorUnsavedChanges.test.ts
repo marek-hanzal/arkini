@@ -1,7 +1,7 @@
 import { Deferred, Effect, Exit } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
-import { createEditorUnsavedChangesOwnerFx } from "~/bridge/editor/EditorUnsavedChanges";
+import { createEditorUnsavedChangesOwnerFx } from "~/bridge/editor/createEditorUnsavedChangesOwnerFx";
 import { validateEditorAssetDraftFx } from "~/bridge/resource/editor/validateEditorAssetDraftFx";
 
 const createSession = ({ valid = true }: { readonly valid?: boolean } = {}) => ({

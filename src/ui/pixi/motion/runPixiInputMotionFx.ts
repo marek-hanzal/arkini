@@ -16,7 +16,7 @@ import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticFie
 import { chasePixiTileMotionTargetFx } from "~/ui/pixi/motion/chasePixiTileMotionTargetFx";
 import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
 import { flashPixiMotionTargetFx } from "~/ui/pixi/motion/flashPixiMotionTargetFx";
-import { projectPixiTileMotionItem } from "~/ui/pixi/motion/projectPixiTileMotionItem";
+import { projectPixiTileMotionItemFx } from "~/ui/pixi/motion/projectPixiTileMotionItem";
 import { readPixiLiveActorContactPose } from "~/ui/pixi/motion/readPixiLiveActorContactPose";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
@@ -271,7 +271,7 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 		return;
 	}
 
-	const deliveryItem = projectPixiTileMotionItem(
+	const deliveryItem = yield* projectPixiTileMotionItemFx(
 		{
 			...sourceItem,
 			id: source === null ? `motion:${cueKey}` : sourceItem.id,
@@ -381,10 +381,12 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 											actor: transient,
 											animator,
 											frames: application.frames,
-											item: projectPixiTileMotionItem(transient.item, {
-												kind: "exact",
-												quantity: cue.resultingQuantity,
-											}),
+											item: RendererRuntime.runSync(
+												projectPixiTileMotionItemFx(transient.item, {
+													kind: "exact",
+													quantity: cue.resultingQuantity,
+												}),
+											),
 											palette: readPalette(),
 											size: transient.size,
 											textures,

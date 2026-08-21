@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
-import { projectPixiTileMotionItem } from "~/ui/pixi/motion/projectPixiTileMotionItem";
+import { projectPixiTileMotionItemFx } from "~/ui/pixi/motion/projectPixiTileMotionItem";
 import { readPixiTileQuantityPresentationFx } from "~/ui/pixi/motion/readPixiTileQuantityPresentationFx";
 
 const item = (itemType: TileActorItem["itemType"]): TileActorItem => ({
@@ -32,10 +32,12 @@ const item = (itemType: TileActorItem["itemType"]): TileActorItem => ({
 describe("Pixi tile motion item projection", () => {
 	it("projects an ordinary stack quantity and badge atomically", () => {
 		expect(
-			projectPixiTileMotionItem(item("simple"), {
-				kind: "subtract",
-				quantity: 7,
-			}),
+			Effect.runSync(
+				projectPixiTileMotionItemFx(item("simple"), {
+					kind: "subtract",
+					quantity: 7,
+				}),
+			),
 		).toMatchObject({
 			badgeCount: undefined,
 			quantity: 1,
@@ -44,10 +46,12 @@ describe("Pixi tile motion item projection", () => {
 
 	it("keeps a deposit charge badge independent from its presented quantity", () => {
 		expect(
-			projectPixiTileMotionItem(item("deposit"), {
-				kind: "exact",
-				quantity: 3,
-			}),
+			Effect.runSync(
+				projectPixiTileMotionItemFx(item("deposit"), {
+					kind: "exact",
+					quantity: 3,
+				}),
+			),
 		).toMatchObject({
 			badgeCount: 8,
 			quantity: 3,

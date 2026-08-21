@@ -38,7 +38,7 @@ import { readPixiDragSettleDurationMsFx } from "~/ui/pixi/drag/readPixiDragSettl
 import type { PixiMainSceneDropPresentation } from "~/ui/pixi/drop/PixiMainSceneDropPresentation";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRuntime";
-import { projectPixiTileMotionItem } from "~/ui/pixi/motion/projectPixiTileMotionItem";
+import { projectPixiTileMotionItemFx } from "~/ui/pixi/motion/projectPixiTileMotionItem";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiMainSceneReconciler } from "~/ui/pixi/scene/PixiMainSceneReconciler";
@@ -385,7 +385,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 					const {
 						visible: { item, pose },
 					} = arrival;
-					const displayItem = projectPixiTileMotionItem(
+					const displayItem = yield* projectPixiTileMotionItemFx(
 						item,
 						motionSnapshot.quantityPresentationByActorId.get(item.id),
 					);

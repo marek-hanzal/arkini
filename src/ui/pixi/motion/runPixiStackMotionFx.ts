@@ -18,7 +18,7 @@ import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticFie
 import { chasePixiTileMotionTargetFx } from "~/ui/pixi/motion/chasePixiTileMotionTargetFx";
 import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
 import { flashPixiMotionTargetFx } from "~/ui/pixi/motion/flashPixiMotionTargetFx";
-import { projectPixiTileMotionItem } from "~/ui/pixi/motion/projectPixiTileMotionItem";
+import { projectPixiTileMotionItemFx } from "~/ui/pixi/motion/projectPixiTileMotionItem";
 import { readPixiLiveActorContactPose } from "~/ui/pixi/motion/readPixiLiveActorContactPose";
 import type { PixiTileMotionTargetRoute } from "~/ui/pixi/motion/PixiTileMotionTargetRoute";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
@@ -84,7 +84,7 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 		source ??
 		(yield* createPixiTileActorFx({
 			frames: application.frames,
-			item: projectPixiTileMotionItem(
+			item: yield* projectPixiTileMotionItemFx(
 				{
 					...canonical,
 					id: `motion:${cueKey}`,

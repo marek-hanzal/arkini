@@ -48,9 +48,7 @@ const readCauseMessage = (cause: Cause.Cause<unknown>) => {
 };
 
 /** Creates the renderer-owned, in-memory estimate batch for the current project snapshot. */
-export const makeEditorItemEstimateCacheAtom = (
-	options: EditorItemEstimateCacheAtom.Options = {},
-) => {
+const makeEditorItemEstimateCacheAtom = (options: EditorItemEstimateCacheAtom.Options = {}) => {
 	const runInWorkerFx = options.runInWorkerFx ?? runEditorItemEstimateInWorkerFx;
 	const stateAtom = Atom.make<EditorItemEstimateCacheAtom.State>(initialState).pipe(
 		Atom.keepAlive,
@@ -112,6 +110,13 @@ export const makeEditorItemEstimateCacheAtom = (
 		},
 	).pipe(Atom.keepAlive);
 };
+
+/** Creates an isolated renderer-owned estimate batch for tests or alternate owners. */
+export const makeEditorItemEstimateCacheAtomFx = Effect.fnUntraced(function* (
+	options: EditorItemEstimateCacheAtom.Options = {},
+) {
+	return makeEditorItemEstimateCacheAtom(options);
+});
 
 /** Process-lifetime estimate authority owned and disposed by RendererAtomRegistry. */
 export const EditorItemEstimateCacheAtom = makeEditorItemEstimateCacheAtom();

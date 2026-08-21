@@ -8,7 +8,7 @@ import type { EditorItemEstimateIndexEntry } from "~/editor/EditorItemEstimateIn
 import {
 	EditorItemEstimateCacheAtom,
 	type EditorItemEstimateCacheAtom as EditorItemEstimateCache,
-} from "~/ui/item/editor/EditorItemEstimateCacheAtom";
+} from "~/ui/item/editor/makeEditorItemEstimateCacheAtomFx";
 
 export type EditorItemEstimateIndexState =
 	| {

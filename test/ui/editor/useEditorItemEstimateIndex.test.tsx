@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import type { EditorItemEstimate } from "~/editor/estimator/EditorItemEstimate";
-import type { EditorItemEstimateCacheAtom } from "~/ui/item/editor/EditorItemEstimateCacheAtom";
+import type { EditorItemEstimateCacheAtom } from "~/ui/item/editor/makeEditorItemEstimateCacheAtomFx";
 
 const testState = vi.hoisted(() => ({
 	cache: {

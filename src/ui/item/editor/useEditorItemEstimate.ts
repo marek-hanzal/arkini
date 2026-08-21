@@ -6,7 +6,7 @@ import type { EditorItemEstimate } from "~/editor/estimator/EditorItemEstimate";
 import {
 	EditorItemEstimateCacheAtom,
 	type EditorItemEstimateCacheAtom as EditorItemEstimateCache,
-} from "~/ui/item/editor/EditorItemEstimateCacheAtom";
+} from "~/ui/item/editor/makeEditorItemEstimateCacheAtomFx";
 
 export type EditorItemEstimateState =
 	| {

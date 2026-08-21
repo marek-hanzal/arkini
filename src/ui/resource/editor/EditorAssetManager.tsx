@@ -1,3 +1,4 @@
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useRef } from "react";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
@@ -8,7 +9,7 @@ import {
 	selectableActiveClassName,
 	selectableInactiveClassName,
 } from "~/ui/form/SelectableStateClassName";
-import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
+import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultError";
 import { EditorAssetCard } from "~/ui/resource/editor/EditorAssetCard";
 import { useEditorAssetLibrary } from "~/ui/resource/editor/useEditorAssetLibrary";
 import { Status } from "~/ui/status/Status";
@@ -36,7 +37,7 @@ export const EditorAssetManager = ({
 	const inputRef = useRef<HTMLInputElement>(null);
 	const result = useAtomValue(saveEditorAssetsCommandAtom);
 	const saveAssets = useAtomSet(saveEditorAssetsCommandAtom);
-	const error = readSettledAsyncResultError(result);
+	const error = RendererRuntime.runSync(readSettledAsyncResultErrorFx(result));
 	const pending = result.waiting;
 	const importButton = (
 		<PrimaryButton

@@ -1,3 +1,4 @@
+import { Effect } from "effect";
 // @vitest-environment jsdom
 
 import { act, createElement, type ReactNode } from "react";
@@ -44,7 +45,7 @@ vi.mock("~/bridge/project/editor/saveEditorProjectConfigCommandAtom", () => ({
 }));
 
 vi.mock("~/ui/reactivity/readSettledAsyncResultError", () => ({
-	readSettledAsyncResultError: () => undefined,
+	readSettledAsyncResultErrorFx: () => Effect.succeed(undefined),
 }));
 
 vi.mock("~/ui/resource/editor/EditorAssetAutocompleteField", () => ({

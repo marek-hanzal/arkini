@@ -10,7 +10,7 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { EditorBuildDiagnostics } from "~/ui/arkpack/editor/EditorBuildDiagnostics";
 import { formatByteSizeFx } from "~/ui/arkpack/editor/formatByteSizeFx";
 import { Button, PrimaryButton } from "~/ui/button/Button";
-import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
+import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultError";
 
 /** Owns explicit heavy validation and independent output actions for one project snapshot. */
 export const EditorBuild = () => {
@@ -28,9 +28,9 @@ export const EditorBuild = () => {
 	const install = useAtomSet(installAtom);
 	const saveResult = useAtomValue(saveAtom);
 	const save = useAtomSet(saveAtom);
-	const buildError = readSettledAsyncResultError(buildResult);
-	const installError = readSettledAsyncResultError(installResult);
-	const saveError = readSettledAsyncResultError(saveResult);
+	const buildError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(buildResult));
+	const installError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(installResult));
+	const saveError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveResult));
 	const errorDiagnostics = RendererRuntime.runSync(readEditorBuildDiagnosticsFx(buildError));
 	const diagnostics = errorDiagnostics ?? artifact?.diagnostics ?? [];
 

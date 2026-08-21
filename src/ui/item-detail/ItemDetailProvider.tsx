@@ -23,7 +23,7 @@ import type {
 	OpenItemDetailProps,
 	SelectRetainedItemDetailTabProps,
 } from "~/ui/item-detail/ItemDetailControl";
-import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
+import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultError";
 
 /**
  * Game-shell owner for one exact Item Detail target, modal lifecycle and
@@ -65,7 +65,7 @@ export const ItemDetailProvider = ({
 		],
 	);
 	const [closeResult, close] = useAtom(controller.closeAtom);
-	readSettledAsyncResultError(closeResult);
+	RendererRuntime.runSync(readSettledAsyncResultErrorFx(closeResult));
 	const snapshot = useSyncExternalStore(
 		controller.subscribe,
 		controller.getSnapshot,

@@ -17,7 +17,7 @@ import type {
 } from "~/ui/item/editor/EditorItemSections";
 import { readEditorItemSectionForPathFx } from "~/ui/item/editor/readEditorItemSectionForPathFx";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
-import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
+import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultError";
 import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
 
 export namespace useEditorItemFormController {
@@ -174,7 +174,9 @@ export const useEditorItemFormController = ({
 	});
 	return {
 		canonicalItem,
-		error: readSettledAsyncResultError(saveItemResult) ?? validationError,
+		error:
+			RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveItemResult)) ??
+			validationError,
 		isDirty: dirty,
 		isSaving: submitting,
 		form,

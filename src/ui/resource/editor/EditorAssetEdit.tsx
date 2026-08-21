@@ -13,7 +13,7 @@ import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
 import { editorBackLinkClassName, EditorBackIcon } from "~/ui/editor/EditorBackIcon";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
 import { EditorFormContent } from "~/ui/form/EditorFormContent";
-import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
+import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultError";
 import { EditorAssetImageDropZone } from "~/ui/resource/editor/EditorAssetImageDropZone";
 import { useEditorAssetById } from "~/ui/resource/editor/useEditorAssetById";
 import { useEditorResourceUrl } from "~/ui/resource/editor/useEditorResourceUrl";
@@ -107,7 +107,7 @@ export const EditorAssetEdit = ({
 			pathname.startsWith(`/editor/${project.projectId}/assets/${resourceId}/edit`),
 		save: persist,
 	});
-	const error = readSettledAsyncResultError(result);
+	const error = RendererRuntime.runSync(readSettledAsyncResultErrorFx(result));
 	if (resource === undefined)
 		return (
 			<Status

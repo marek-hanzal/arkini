@@ -11,7 +11,7 @@ import { saveEditorProjectConfigCommandAtom } from "~/bridge/project/editor/save
 import { useAppForm } from "~/ui/form/EditorForm";
 import type { EditorProjectSectionId } from "~/ui/project/editor/EditorProjectSections";
 import { readEditorProjectSectionForPathFx } from "~/ui/project/editor/readEditorProjectSectionForPathFx";
-import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
+import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultError";
 import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
 
 export const useEditorProjectFormController = ({
@@ -103,7 +103,8 @@ export const useEditorProjectFormController = ({
 
 	return {
 		canonicalValues,
-		error: readSettledAsyncResultError(saveResult) ?? validationError,
+		error:
+			RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveResult)) ?? validationError,
 		form,
 		isDirty: dirty,
 		isSaving: submitting,

@@ -444,6 +444,9 @@ describe("queryFx", () => {
 					},
 				}),
 			],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 		const runQuery = (query: QuerySchema.Type) => {
 			return queryFx({

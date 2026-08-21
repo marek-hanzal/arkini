@@ -49,7 +49,7 @@ export const startQueuedLineRuntimeFx = Effect.fn("startQueuedLineRuntimeFx")(fu
 	queueRequestId,
 	runtime,
 }: startQueuedLineRuntimeFx.Props) {
-	const request = (runtime.jobQueue ?? []).find((candidate) => {
+	const request = runtime.jobQueue.find((candidate) => {
 		return candidate.id === queueRequestId;
 	});
 	if (request === undefined) {
@@ -66,7 +66,7 @@ export const startQueuedLineRuntimeFx = Effect.fn("startQueuedLineRuntimeFx")(fu
 			runtime,
 		} satisfies startQueuedLineRuntimeFx.Result;
 	}
-	const ownerHead = (runtime.jobQueue ?? []).find((candidate) => {
+	const ownerHead = runtime.jobQueue.find((candidate) => {
 		return candidate.ownerItemId === ownerItemId;
 	});
 	if (ownerHead?.id !== queueRequestId) {
@@ -79,7 +79,7 @@ export const startQueuedLineRuntimeFx = Effect.fn("startQueuedLineRuntimeFx")(fu
 	const jobIds = runtime.jobs
 		.filter((job) => job.ownerItemId === ownerItemId)
 		.map((job) => job.id);
-	const requestIds = (runtime.jobQueue ?? [])
+	const requestIds = runtime.jobQueue
 		.filter((request) => request.ownerItemId === ownerItemId)
 		.map((request) => request.id);
 	if (jobIds.length > 0) {
@@ -108,7 +108,7 @@ export const startQueuedLineRuntimeFx = Effect.fn("startQueuedLineRuntimeFx")(fu
 
 	const candidate = {
 		...runtime,
-		jobQueue: (runtime.jobQueue ?? []).filter((request) => {
+		jobQueue: runtime.jobQueue.filter((request) => {
 			return request.id !== queueRequestId;
 		}),
 	};

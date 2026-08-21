@@ -28,8 +28,8 @@ export const readEffectiveDefaultLineFx = Effect.fn("readEffectiveDefaultLineFx"
 	runtime,
 }: readEffectiveDefaultLineFx.Props) {
 	const lines = yield* readLineOwnerLinesFx(ownerItem);
-	if (Object.hasOwn(runtime.defaultLineByOwnerItemId ?? {}, ownerItemId)) {
-		const override = runtime.defaultLineByOwnerItemId?.[ownerItemId];
+	if (Object.hasOwn(runtime.defaultLineByOwnerItemId, ownerItemId)) {
+		const override = runtime.defaultLineByOwnerItemId[ownerItemId];
 		return override === null ? undefined : lines.find((line) => line.id === override);
 	}
 	return lines.find((line) => line.default);

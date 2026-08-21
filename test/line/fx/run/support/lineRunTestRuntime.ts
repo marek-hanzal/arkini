@@ -267,5 +267,8 @@ export const lineRunRuntime = ({
 		currentSpace: 0,
 		items,
 		jobs: [],
+
+		jobQueue: [],
+		defaultLineByOwnerItemId: {},
 	} satisfies RuntimeSchema.Type;
 };

@@ -65,7 +65,7 @@ const dispatchIdleQueueHeadsFx = Effect.fn("dispatchIdleQueueHeadsFx")(function*
 ) {
 	const activeOwnerItemIds = new Set(runtime.jobs.map((job) => job.ownerItemId));
 	const visitedOwnerItemIds = new Set<IdSchema.Type>();
-	const queueSnapshot = runtime.jobQueue ?? [];
+	const queueSnapshot = runtime.jobQueue;
 
 	let draft = runtime;
 	const events: GameEventSchema.Type[] = [];

@@ -70,6 +70,9 @@ describe("resolveInputRunFx", () => {
 						owner,
 					],
 					jobs: [],
+
+					jobQueue: [],
+					defaultLineByOwnerItemId: {},
 				},
 			}),
 		);
@@ -112,6 +115,9 @@ describe("resolveInputRunFx", () => {
 				}),
 			],
 			jobs: [],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 		const result = Effect.runSync(
 			resolveInputRunFx({
@@ -192,6 +198,9 @@ describe("resolveInputRunFx", () => {
 						target,
 					],
 					jobs: [],
+
+					jobQueue: [],
+					defaultLineByOwnerItemId: {},
 				},
 			}),
 		);

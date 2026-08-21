@@ -151,6 +151,9 @@ describe("checkRuntimeFx", () => {
 				},
 			],
 			jobs: [],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 		const result = Effect.runSync(
 			checkRuntimeFx({
@@ -215,6 +218,9 @@ describe("checkRuntimeFx", () => {
 				},
 			],
 			jobs: [],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 		const result = Effect.runSync(
 			checkRuntimeFx({
@@ -329,6 +335,9 @@ describe("checkRuntimeFx", () => {
 				},
 			],
 			jobs: [],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		});
 		const result = Effect.runSync(
 			Effect.result(

@@ -14,7 +14,7 @@ export namespace discardRuntimeItemIdentityStateFx {
 /** Discards default-line intent only after proving that no pending work owns the identities. */
 export const discardRuntimeItemIdentityStateFx = Effect.fn("discardRuntimeItemIdentityStateFx")(
 	function* ({ ownerItemIds, runtime }: discardRuntimeItemIdentityStateFx.Props) {
-		const queuedRequests = (runtime.jobQueue ?? []).filter((request) =>
+		const queuedRequests = runtime.jobQueue.filter((request) =>
 			ownerItemIds.has(request.ownerItemId),
 		);
 		const queuedOwnerItemId = queuedRequests[0]?.ownerItemId;
@@ -29,20 +29,14 @@ export const discardRuntimeItemIdentityStateFx = Effect.fn("discardRuntimeItemId
 		}
 
 		const defaultLineByOwnerItemId = {
-			...(runtime.defaultLineByOwnerItemId ?? {}),
+			...runtime.defaultLineByOwnerItemId,
 		};
 		for (const ownerItemId of ownerItemIds) {
 			delete defaultLineByOwnerItemId[ownerItemId];
 		}
 		return {
 			...runtime,
-			...(Object.keys(defaultLineByOwnerItemId).length === 0
-				? {
-						defaultLineByOwnerItemId: undefined,
-					}
-				: {
-						defaultLineByOwnerItemId,
-					}),
+			defaultLineByOwnerItemId,
 		} satisfies RuntimeSchema.Type;
 	},
 );

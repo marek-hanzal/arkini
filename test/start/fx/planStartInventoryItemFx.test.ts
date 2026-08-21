@@ -23,6 +23,9 @@ describe("planStartInventoryItemFx", () => {
 					currentSpace: 0,
 					items: [],
 					jobs: [],
+
+					jobQueue: [],
+					defaultLineByOwnerItemId: {},
 				},
 			}).pipe(
 				useGameFx({
@@ -87,6 +90,9 @@ describe("planStartInventoryItemFx", () => {
 						currentSpace: 0,
 						items: [],
 						jobs: [],
+
+						jobQueue: [],
+						defaultLineByOwnerItemId: {},
 					},
 				}),
 			).pipe(

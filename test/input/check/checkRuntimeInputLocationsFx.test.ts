@@ -95,6 +95,9 @@ describe("checkRuntimeInputLocationsFx", () => {
 					}),
 				],
 				jobs: [],
+
+				jobQueue: [],
+				defaultLineByOwnerItemId: {},
 			}),
 		);
 

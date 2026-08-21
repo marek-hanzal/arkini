@@ -22,7 +22,7 @@ export const clearItemJobQueueFx = Effect.fn("clearItemJobQueueFx")(function* ({
 				runtime,
 			});
 
-			const clearedRequests = (runtime.jobQueue ?? []).filter(
+			const clearedRequests = runtime.jobQueue.filter(
 				(request) => request.ownerItemId === ownerItemId,
 			);
 			if (clearedRequests.length === 0) {
@@ -34,9 +34,7 @@ export const clearItemJobQueueFx = Effect.fn("clearItemJobQueueFx")(function* ({
 
 			const nextRuntime = {
 				...runtime,
-				jobQueue: (runtime.jobQueue ?? []).filter(
-					(request) => request.ownerItemId !== ownerItemId,
-				),
+				jobQueue: runtime.jobQueue.filter((request) => request.ownerItemId !== ownerItemId),
 			} satisfies RuntimeSchema.Type;
 
 			return [

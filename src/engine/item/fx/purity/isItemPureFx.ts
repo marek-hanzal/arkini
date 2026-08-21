@@ -63,7 +63,7 @@ export const readItemPurityIndex = (runtime: RuntimeSchema.Type): ItemPurityInde
 	for (const job of runtime.jobs) {
 		addOwnedLine(jobLineIdsByOwnerId, job.ownerItemId, job.lineId);
 	}
-	for (const request of runtime.jobQueue ?? []) {
+	for (const request of runtime.jobQueue) {
 		addOwnedLine(queueLineIdsByOwnerId, request.ownerItemId, request.lineId);
 	}
 	return {
@@ -114,7 +114,7 @@ export const isItemPure = ({
 	if (
 		item.remainingCharges !== undefined ||
 		item.remainingDurationMs !== undefined ||
-		Object.hasOwn(runtime.defaultLineByOwnerItemId ?? {}, item.id)
+		Object.hasOwn(runtime.defaultLineByOwnerItemId, item.id)
 	) {
 		return false;
 	}

@@ -96,6 +96,9 @@ describe("readTileActorFeedbackCuesFx", () => {
 				currentSpace: 0,
 				items: [],
 				jobs: [],
+
+				jobQueue: [],
+				defaultLineByOwnerItemId: {},
 			},
 			sequence: 12,
 		} as GameTransition;

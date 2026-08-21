@@ -57,13 +57,13 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 	requestId,
 	runtime,
 }: attemptQueuedLineStartFx.Props) {
-	const request = (runtime.jobQueue ?? []).find((candidate) => candidate.id === requestId);
+	const request = runtime.jobQueue.find((candidate) => candidate.id === requestId);
 	if (request === undefined)
 		return {
 			type: "empty",
 			runtime,
 		} satisfies attemptQueuedLineStartFx.Result;
-	const ownerHead = (runtime.jobQueue ?? []).find(
+	const ownerHead = runtime.jobQueue.find(
 		(candidate) => candidate.ownerItemId === request.ownerItemId,
 	);
 	if (ownerHead?.id !== request.id) {

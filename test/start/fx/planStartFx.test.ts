@@ -19,6 +19,9 @@ describe("planStartFx", () => {
 					currentSpace: 0,
 					items: [],
 					jobs: [],
+
+					jobQueue: [],
+					defaultLineByOwnerItemId: {},
 				};
 				return yield* planStartFx({
 					runtime,
@@ -84,6 +87,9 @@ describe("planStartFx", () => {
 					currentSpace: 0,
 					items: [],
 					jobs: [],
+
+					jobQueue: [],
+					defaultLineByOwnerItemId: {},
 				},
 				start: {
 					currentSpace: 0,
@@ -128,6 +134,8 @@ describe("planStartFx", () => {
 					items: [],
 					jobs: [],
 					jobQueue: [],
+
+					defaultLineByOwnerItemId: {},
 				},
 				start: {
 					currentSpace: 0,
@@ -178,6 +186,8 @@ describe("planStartFx", () => {
 					items: [],
 					jobs: [],
 					jobQueue: [],
+
+					defaultLineByOwnerItemId: {},
 				},
 				start: {
 					currentSpace: 0,
@@ -269,6 +279,8 @@ describe("planStartFx", () => {
 						items: [],
 						jobs: [],
 						jobQueue: [],
+
+						defaultLineByOwnerItemId: {},
 					},
 					start: {
 						currentSpace: 0,
@@ -316,6 +328,9 @@ describe("planStartFx", () => {
 						currentSpace: 0,
 						items: [],
 						jobs: [],
+
+						jobQueue: [],
+						defaultLineByOwnerItemId: {},
 					},
 					start: {
 						currentSpace: 0,
@@ -373,6 +388,8 @@ describe("planStartFx", () => {
 						items: [],
 						jobs: [],
 						jobQueue: [],
+
+						defaultLineByOwnerItemId: {},
 					},
 					start: {
 						currentSpace: 0,

@@ -86,7 +86,7 @@ export const installGameDiagnostics = ({
 					eventTypes: transition.events.map((event) => event.type),
 					itemCount: runtime.items.length,
 					jobCount: runtime.jobs.length,
-					jobQueueCount: runtime.jobQueue?.length ?? 0,
+					jobQueueCount: runtime.jobQueue.length ?? 0,
 					deliveries: readDeliverySummary(runtime),
 				},
 			});

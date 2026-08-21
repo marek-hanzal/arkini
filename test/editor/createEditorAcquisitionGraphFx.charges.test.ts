@@ -243,6 +243,9 @@ describe("createEditorAcquisitionGraphFx", () => {
 						runtimePayer("runtime:payer:b", 2),
 					],
 					jobs: [],
+
+					jobQueue: [],
+					defaultLineByOwnerItemId: {},
 				},
 			}),
 		);

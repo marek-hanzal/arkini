@@ -1156,6 +1156,9 @@ describe("item charges", () => {
 					remainingMs: 200,
 				},
 			],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		});
 		const result = run(
 			Effect.result(
@@ -1214,6 +1217,8 @@ describe("item charges", () => {
 					lineId: "line:capped-shrine:work",
 				},
 			],
+
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 		const result = run(
 			checkRuntimeFx({
@@ -1392,6 +1397,9 @@ describe("item charges", () => {
 				},
 			],
 			jobs: [],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		};
 		const result = run(
 			checkRuntimeFx({

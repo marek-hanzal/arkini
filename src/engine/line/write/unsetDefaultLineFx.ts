@@ -32,8 +32,8 @@ export const unsetDefaultLineFx = Effect.fn("unsetDefaultLineFx")(function* ({
 				);
 			}
 			if (
-				Object.hasOwn(runtime.defaultLineByOwnerItemId ?? {}, ownerItemId) &&
-				runtime.defaultLineByOwnerItemId?.[ownerItemId] === null
+				Object.hasOwn(runtime.defaultLineByOwnerItemId, ownerItemId) &&
+				runtime.defaultLineByOwnerItemId[ownerItemId] === null
 			) {
 				return [
 					{
@@ -45,7 +45,7 @@ export const unsetDefaultLineFx = Effect.fn("unsetDefaultLineFx")(function* ({
 			const nextRuntime = {
 				...runtime,
 				defaultLineByOwnerItemId: {
-					...(runtime.defaultLineByOwnerItemId ?? {}),
+					...runtime.defaultLineByOwnerItemId,
 					[ownerItemId]: null,
 				},
 			} satisfies RuntimeSchema.Type;

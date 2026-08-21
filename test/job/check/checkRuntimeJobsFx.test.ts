@@ -79,6 +79,9 @@ describe("checkRuntimeJobsFx", () => {
 					remainingMs: 2_000,
 				}),
 			],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 		const result = Effect.runSync(
 			checkRuntimeFx({
@@ -123,6 +126,8 @@ describe("checkRuntimeJobsFx", () => {
 					lineId: "line:forge:run",
 				},
 			],
+
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 		const result = Effect.runSync(
 			checkRuntimeFx({
@@ -173,6 +178,9 @@ it("reports owned runtime state beneath one consumed job material root", () => {
 		jobs: [
 			job("job:outer"),
 		],
+
+		jobQueue: [],
+		defaultLineByOwnerItemId: {},
 	} satisfies RuntimeSchema.Type;
 	const result = Effect.runSync(
 		checkRuntimeFx({

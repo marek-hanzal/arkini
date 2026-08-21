@@ -70,7 +70,7 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 
 	const activeLineId = projected.find((line) => line.activeJob !== undefined)?.lineId;
 	const visibleLineIds = new Set(projected.map((line) => line.lineId));
-	const earliestQueuedLineId = (runtime.jobQueue ?? []).find(
+	const earliestQueuedLineId = runtime.jobQueue.find(
 		(request) => request.ownerItemId === owner.id,
 	)?.lineId;
 	const queuedLineId =

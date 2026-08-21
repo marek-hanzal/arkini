@@ -43,6 +43,9 @@ describe("isItemPureFx", () => {
 				producer,
 			],
 			jobs: [],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
 		expect(
@@ -68,6 +71,9 @@ describe("isItemPureFx", () => {
 							simple,
 						],
 						jobs: [],
+
+						jobQueue: [],
+						defaultLineByOwnerItemId: {},
 					},
 				}),
 			),
@@ -95,6 +101,9 @@ describe("isItemPureFx", () => {
 				},
 			],
 			jobs: [],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
 		expect(
@@ -127,6 +136,9 @@ describe("isItemPureFx", () => {
 					remainingMs: 1_000,
 				},
 			],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 		const queuedRuntime = {
 			cheats: {
@@ -146,6 +158,8 @@ describe("isItemPureFx", () => {
 					lineId: "line:producer:zero",
 				},
 			],
+
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
 		expect(

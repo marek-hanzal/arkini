@@ -27,7 +27,7 @@ export const resolveJobQueueFx = Effect.fn("resolveJobQueueFx")(function* ({
 		jobs: runtime.jobs,
 		ownerItemId: owner.id,
 	});
-	const requests = (runtime.jobQueue ?? []).filter((request) => request.ownerItemId === owner.id);
+	const requests = runtime.jobQueue.filter((request) => request.ownerItemId === owner.id);
 	const used = jobs.length + requests.length;
 	return {
 		jobs,

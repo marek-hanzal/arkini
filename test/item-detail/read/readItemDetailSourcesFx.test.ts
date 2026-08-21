@@ -315,6 +315,9 @@ const runtime = {
 		}),
 	],
 	jobs: [],
+
+	jobQueue: [],
+	defaultLineByOwnerItemId: {},
 } satisfies RuntimeSchema.Type;
 
 const readSources = (props: readItemDetailSourcesFx.Props) =>
@@ -535,6 +538,9 @@ describe("readItemDetailSourcesFx", () => {
 						ownedBlueprint,
 					],
 					jobs: [],
+
+					jobQueue: [],
+					defaultLineByOwnerItemId: {},
 				},
 			}).pipe(Effect.provideService(GameConfigFx, officialConfig)),
 		);
@@ -587,6 +593,9 @@ describe("readItemDetailSourcesFx", () => {
 						townHall,
 					],
 					jobs: [],
+
+					jobQueue: [],
+					defaultLineByOwnerItemId: {},
 				},
 			}).pipe(Effect.provideService(GameConfigFx, officialConfig)),
 		);
@@ -656,6 +665,9 @@ describe("readItemDetailSourcesFx", () => {
 						townHall,
 					],
 					jobs: [],
+
+					jobQueue: [],
+					defaultLineByOwnerItemId: {},
 				},
 			}).pipe(Effect.provideService(GameConfigFx, officialConfig)),
 		);

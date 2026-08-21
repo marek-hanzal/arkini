@@ -133,6 +133,8 @@ const runtime = {
 		},
 	],
 	jobs: [],
+
+	defaultLineByOwnerItemId: {},
 } satisfies RuntimeSchema.Type;
 
 const rule = config.items.source.merge?.[0];
@@ -155,6 +157,9 @@ const serviceState = {
 		},
 	],
 	jobs: [],
+
+	jobQueue: [],
+	defaultLineByOwnerItemId: {},
 } satisfies StateSchema.Type;
 
 export const queuedOwnedInputMergeFixture = {

@@ -30,8 +30,8 @@ export const fromRuntimeFx = Effect.fn("fromRuntimeFx")(function* ({
 		currentSpace: runtime.currentSpace,
 		items,
 		jobs: runtime.jobs,
-		jobQueue: runtime.jobQueue ?? [],
-		...(runtime.defaultLineByOwnerItemId === undefined
+		jobQueue: runtime.jobQueue,
+		...(Object.keys(runtime.defaultLineByOwnerItemId).length === 0
 			? {}
 			: {
 					defaultLineByOwnerItemId: {

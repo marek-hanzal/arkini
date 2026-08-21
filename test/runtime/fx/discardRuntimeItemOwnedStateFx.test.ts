@@ -105,6 +105,8 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 				},
 			],
 			jobQueue: [],
+
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 		const result = Effect.runSync(
 			Effect.result(

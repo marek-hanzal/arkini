@@ -907,6 +907,9 @@ describe("readItemDetailLinesFx", () => {
 							},
 						],
 						jobs: [],
+
+						jobQueue: [],
+						defaultLineByOwnerItemId: {},
 					},
 				}),
 			),
@@ -973,6 +976,9 @@ describe("readItemDetailLinesFx", () => {
 							},
 						],
 						jobs: [],
+
+						jobQueue: [],
+						defaultLineByOwnerItemId: {},
 					},
 				}),
 			),
@@ -1075,6 +1081,9 @@ describe("readItemDetailLinesFx", () => {
 									: []),
 							],
 							jobs: [],
+
+							jobQueue: [],
+							defaultLineByOwnerItemId: {},
 						},
 					}),
 				),

@@ -6,8 +6,8 @@ import { describe, expect, it } from "vitest";
 import {
 	pixiTileActorLifecycleDurationMs,
 	pixiTileActorLifecycleReducedScale,
-	startPixiTileActorExitFx,
 } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+import { startPixiTileActorExitFx } from "~/ui/pixi/animation/startPixiTileActorExitFx";
 
 import {
 	createActor,

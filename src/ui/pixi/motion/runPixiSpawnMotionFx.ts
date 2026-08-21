@@ -5,7 +5,7 @@ import type { TileSpawnMotionCue } from "~/bridge/tile/motion/TileMotionCue";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
-import { startPixiTileActorEnterFx } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+import { startPixiTileActorEnterFx } from "~/ui/pixi/animation/startPixiTileActorEnterFx";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
 import { createPixiTileMotionPoseSamplerFx } from "~/ui/pixi/motion/createPixiTileMotionPoseSamplerFx";

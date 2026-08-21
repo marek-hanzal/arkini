@@ -21,12 +21,10 @@ import { pixiTileActorFeedbackParticlesDurationMs } from "~/ui/pixi/animation/ru
 import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/burstPixiTileActorFeedbackParticlesFx";
 import { startPixiTileActorActivityParticlesFx } from "~/ui/pixi/animation/startPixiTileActorActivityParticlesFx";
 import { stopPixiTileActorActivityParticlesFx } from "~/ui/pixi/animation/stopPixiTileActorActivityParticlesFx";
-import {
-	pixiTileActorLifecycleDurationMs,
-	preparePixiTileActorEnterFx,
-	startPixiTileActorEnterFx,
-	startPixiTileActorExitFx,
-} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+import { pixiTileActorLifecycleDurationMs } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+import { preparePixiTileActorEnterFx } from "~/ui/pixi/animation/preparePixiTileActorEnterFx";
+import { startPixiTileActorEnterFx } from "~/ui/pixi/animation/startPixiTileActorEnterFx";
+import { startPixiTileActorExitFx } from "~/ui/pixi/animation/startPixiTileActorExitFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
 import type { PixiDeliveryMotionRuntime } from "~/ui/pixi/delivery/PixiDeliveryMotionRuntime";

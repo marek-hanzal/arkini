@@ -24,10 +24,8 @@ import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/burst
 import type { PixiInventoryDragController } from "~/ui/pixi/drag/PixiInventoryDragController";
 import { makePixiDragPointerOffsetReaderFx } from "~/ui/pixi/drag/makePixiDragPointerOffsetReaderFx";
 import { setPixiDraggedActorPoseFx } from "~/ui/pixi/drag/setPixiDraggedActorPoseFx";
-import {
-	restorePixiTileActorExitFx,
-	startPixiTileActorExitFx,
-} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+import { restorePixiTileActorExitFx } from "~/ui/pixi/animation/restorePixiTileActorExitFx";
+import { startPixiTileActorExitFx } from "~/ui/pixi/animation/startPixiTileActorExitFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiInventoryDropTarget } from "~/ui/pixi/scene/PixiInventoryDropTarget";
 import type { PixiInventorySceneSurface } from "~/ui/pixi/scene/PixiInventorySceneSurface";

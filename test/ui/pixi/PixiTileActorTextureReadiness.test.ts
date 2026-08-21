@@ -11,8 +11,8 @@ import type { PixiActorAnimation, PixiActorAnimator } from "~/ui/pixi/animation/
 import {
 	pixiTileActorLifecycleDurationMs,
 	pixiTileActorLifecycleReducedScale,
-	startPixiTileActorEnterFx,
 } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+import { startPixiTileActorEnterFx } from "~/ui/pixi/animation/startPixiTileActorEnterFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 

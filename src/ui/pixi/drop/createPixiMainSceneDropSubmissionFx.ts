@@ -9,10 +9,8 @@ import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";
 import { animatePixiActorToRetargetablePoseFx } from "~/ui/pixi/animation/animatePixiActorToRetargetablePoseFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import {
-	restorePixiTileActorExitFx,
-	startPixiTileActorExitFx,
-} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+import { restorePixiTileActorExitFx } from "~/ui/pixi/animation/restorePixiTileActorExitFx";
+import { startPixiTileActorExitFx } from "~/ui/pixi/animation/startPixiTileActorExitFx";
 import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/burstPixiTileActorFeedbackParticlesFx";
 import { settlePixiMainSceneDraggedActorFx } from "~/ui/pixi/drag/settlePixiMainSceneDraggedActorFx";
 import type { PixiCursorGrabMotion } from "~/ui/pixi/drag/PixiCursorGrabMotion";

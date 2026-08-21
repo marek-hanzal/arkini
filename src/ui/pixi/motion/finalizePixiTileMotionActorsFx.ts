@@ -4,7 +4,7 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import { startPixiTileActorExitFx } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+import { startPixiTileActorExitFx } from "~/ui/pixi/animation/startPixiTileActorExitFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";

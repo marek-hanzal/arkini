@@ -9,7 +9,7 @@ import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/burstPixiTileActorFeedbackParticlesFx";
-import { startPixiTileActorExitFx } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+import { startPixiTileActorExitFx } from "~/ui/pixi/animation/startPixiTileActorExitFx";
 import { startPixiTileActorRemainderFeedbackFx } from "~/ui/pixi/animation/startPixiTileActorRemainderFeedbackFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";

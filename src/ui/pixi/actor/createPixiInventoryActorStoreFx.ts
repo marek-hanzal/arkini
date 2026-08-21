@@ -19,11 +19,9 @@ import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { animatePixiActorToRetargetablePoseFx } from "~/ui/pixi/animation/animatePixiActorToRetargetablePoseFx";
 import { startPixiTileActorActivityParticlesFx } from "~/ui/pixi/animation/startPixiTileActorActivityParticlesFx";
 import { stopPixiTileActorActivityParticlesFx } from "~/ui/pixi/animation/stopPixiTileActorActivityParticlesFx";
-import {
-	restorePixiTileActorExitFx,
-	startPixiTileActorEnterFx,
-	startPixiTileActorExitFx,
-} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+import { restorePixiTileActorExitFx } from "~/ui/pixi/animation/restorePixiTileActorExitFx";
+import { startPixiTileActorEnterFx } from "~/ui/pixi/animation/startPixiTileActorEnterFx";
+import { startPixiTileActorExitFx } from "~/ui/pixi/animation/startPixiTileActorExitFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiInventoryDropTarget } from "~/ui/pixi/scene/PixiInventoryDropTarget";

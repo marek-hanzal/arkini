@@ -8,11 +8,9 @@ import { createPixiTileActorFx } from "~/ui/pixi/actor/createPixiTileActorFx";
 import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import {
-	restorePixiTileActorExitFx,
-	startPixiTileActorEnterFx,
-	startPixiTileActorExitFx,
-} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+import { restorePixiTileActorExitFx } from "~/ui/pixi/animation/restorePixiTileActorExitFx";
+import { startPixiTileActorEnterFx } from "~/ui/pixi/animation/startPixiTileActorEnterFx";
+import { startPixiTileActorExitFx } from "~/ui/pixi/animation/startPixiTileActorExitFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { chasePixiTileMotionTargetFx } from "~/ui/pixi/motion/chasePixiTileMotionTargetFx";

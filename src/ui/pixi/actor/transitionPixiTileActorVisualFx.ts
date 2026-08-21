@@ -10,7 +10,7 @@ import { whenPixiTileActorVisualReadyFx } from "~/ui/pixi/actor/whenPixiTileActo
 import { createPixiTileActorVisualFx } from "~/ui/pixi/actor/createPixiTileActorVisualFx";
 import { destroyPixiTileActorVisualFx } from "~/ui/pixi/actor/destroyPixiTileActorVisualFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import { resumePixiTileActorEnterFx } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+import { resumePixiTileActorEnterFx } from "~/ui/pixi/animation/resumePixiTileActorEnterFx";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 

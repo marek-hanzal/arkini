@@ -3,10 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
-import {
-	makeDropRejectedResult,
-	makeStaleDropRejectedResult,
-} from "~/engine/runtime/drop/makeDropRejectedResult";
+import { makeDropRejectedResultFx } from "~/engine/runtime/drop/makeDropRejectedResultFx";
 import { projectDropTransferActor } from "~/engine/runtime/drop/projectDropTransferActor";
 import { readDropItemStackRejectedReasonFx } from "~/engine/runtime/read/readDropItemStackRejectedReasonFx";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
@@ -72,32 +69,31 @@ export const commitStackDropFx = Effect.fn("commitStackDropFx")(function* ({
 			readDropItemStackRejectedReasonFx({
 				reason: error.reason,
 			}).pipe(
-				Effect.map((reason) => ({
-					...makeDropRejectedResult({
+				Effect.flatMap((reason) =>
+					makeDropRejectedResultFx({
 						reason,
 						sourceItemId,
 						targetItemId,
 					}),
-				})),
+				),
 			),
 		),
 		Effect.catchTags({
 			ItemNotFoundError: (error) =>
-				Effect.succeed(
-					makeStaleDropRejectedResult({
-						entityId: error.itemId,
-						sourceItemId,
-						targetItemId,
-					}),
-				),
+				makeDropRejectedResultFx({
+					reason:
+						error.itemId === targetItemId
+							? DropItemRejectedReasonEnumSchema.enum.StaleTarget
+							: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+					sourceItemId,
+					targetItemId,
+				}),
 			JobOwnerBusyError: () =>
-				Effect.succeed(
-					makeDropRejectedResult({
-						reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
-						sourceItemId,
-						targetItemId,
-					}),
-				),
+				makeDropRejectedResultFx({
+					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
+					sourceItemId,
+					targetItemId,
+				}),
 		}),
 	);
 });

@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
-import { makeDropRejectedResult } from "~/engine/runtime/drop/makeDropRejectedResult";
+import { makeDropRejectedResultFx } from "~/engine/runtime/drop/makeDropRejectedResultFx";
 import { projectDropTransferActor } from "~/engine/runtime/drop/projectDropTransferActor";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
@@ -42,75 +42,59 @@ export const commitStoreInventoryDropFx = Effect.fn("commitStoreInventoryDropFx"
 		),
 		Effect.catchTags({
 			ItemNotFoundError: (error) =>
-				Effect.succeed(
-					makeDropRejectedResult({
-						reason:
-							error.itemId === props.inventoryItemId
-								? DropItemRejectedReasonEnumSchema.enum.StaleTarget
-								: DropItemRejectedReasonEnumSchema.enum.StaleSource,
-						sourceItemId: props.sourceItemId,
-						targetItemId: props.inventoryItemId,
-					}),
-				),
+				makeDropRejectedResultFx({
+					reason:
+						error.itemId === props.inventoryItemId
+							? DropItemRejectedReasonEnumSchema.enum.StaleTarget
+							: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+					sourceItemId: props.sourceItemId,
+					targetItemId: props.inventoryItemId,
+				}),
 			RevisionConflictError: (error) =>
-				Effect.succeed(
-					makeDropRejectedResult({
-						reason:
-							error.entityId === props.inventoryItemId
-								? DropItemRejectedReasonEnumSchema.enum.StaleTarget
-								: DropItemRejectedReasonEnumSchema.enum.StaleSource,
-						sourceItemId: props.sourceItemId,
-						targetItemId: props.inventoryItemId,
-					}),
-				),
+				makeDropRejectedResultFx({
+					reason:
+						error.entityId === props.inventoryItemId
+							? DropItemRejectedReasonEnumSchema.enum.StaleTarget
+							: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+					sourceItemId: props.sourceItemId,
+					targetItemId: props.inventoryItemId,
+				}),
 			ItemLocationConflictError: () =>
-				Effect.succeed(
-					makeDropRejectedResult({
-						reason: DropItemRejectedReasonEnumSchema.enum.StaleSource,
-						sourceItemId: props.sourceItemId,
-						targetItemId: props.inventoryItemId,
-					}),
-				),
+				makeDropRejectedResultFx({
+					reason: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+					sourceItemId: props.sourceItemId,
+					targetItemId: props.inventoryItemId,
+				}),
 			ItemNotOnGridError: () =>
-				Effect.succeed(
-					makeDropRejectedResult({
-						reason: DropItemRejectedReasonEnumSchema.enum.InvalidSource,
-						sourceItemId: props.sourceItemId,
-						targetItemId: props.inventoryItemId,
-					}),
-				),
+				makeDropRejectedResultFx({
+					reason: DropItemRejectedReasonEnumSchema.enum.InvalidSource,
+					sourceItemId: props.sourceItemId,
+					targetItemId: props.inventoryItemId,
+				}),
 			ItemInventoryStorageUnavailableError: () =>
-				Effect.succeed(
-					makeDropRejectedResult({
-						reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
-						sourceItemId: props.sourceItemId,
-						targetItemId: props.inventoryItemId,
-					}),
-				),
+				makeDropRejectedResultFx({
+					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+					sourceItemId: props.sourceItemId,
+					targetItemId: props.inventoryItemId,
+				}),
 			ItemInventoryTargetInvalidError: () =>
-				Effect.succeed(
-					makeDropRejectedResult({
-						reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
-						sourceItemId: props.sourceItemId,
-						targetItemId: props.inventoryItemId,
-					}),
-				),
+				makeDropRejectedResultFx({
+					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+					sourceItemId: props.sourceItemId,
+					targetItemId: props.inventoryItemId,
+				}),
 			ItemStatefulError: () =>
-				Effect.succeed(
-					makeDropRejectedResult({
-						reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
-						sourceItemId: props.sourceItemId,
-						targetItemId: props.inventoryItemId,
-					}),
-				),
+				makeDropRejectedResultFx({
+					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
+					sourceItemId: props.sourceItemId,
+					targetItemId: props.inventoryItemId,
+				}),
 			PlacementUnavailableError: () =>
-				Effect.succeed(
-					makeDropRejectedResult({
-						reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
-						sourceItemId: props.sourceItemId,
-						targetItemId: props.inventoryItemId,
-					}),
-				),
+				makeDropRejectedResultFx({
+					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
+					sourceItemId: props.sourceItemId,
+					targetItemId: props.inventoryItemId,
+				}),
 		}),
 	);
 });

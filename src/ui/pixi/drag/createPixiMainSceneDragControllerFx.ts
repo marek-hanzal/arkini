@@ -9,7 +9,7 @@ import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActor
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import { burstPixiTileActorAckParticlesFx } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
+import { burstPixiTileActorAckParticlesFx } from "~/ui/pixi/animation/burstPixiTileActorAckParticlesFx";
 import type { PixiMainSceneActiveDrag } from "~/ui/pixi/drag/PixiMainSceneDragState";
 import type { PixiCursorGrabMotion } from "~/ui/pixi/drag/PixiCursorGrabMotion";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";

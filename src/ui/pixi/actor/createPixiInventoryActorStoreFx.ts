@@ -17,10 +17,8 @@ import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { animatePixiActorToRetargetablePoseFx } from "~/ui/pixi/animation/animatePixiActorToRetargetablePoseFx";
-import {
-	startPixiTileActorActivityParticlesFx,
-	stopPixiTileActorActivityParticlesFx,
-} from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
+import { startPixiTileActorActivityParticlesFx } from "~/ui/pixi/animation/startPixiTileActorActivityParticlesFx";
+import { stopPixiTileActorActivityParticlesFx } from "~/ui/pixi/animation/stopPixiTileActorActivityParticlesFx";
 import {
 	restorePixiTileActorExitFx,
 	startPixiTileActorEnterFx,

@@ -7,13 +7,11 @@ import type {
 	PixiActorAnimator,
 	PixiActorPresentationWrite,
 } from "~/ui/pixi/animation/PixiActorAnimator";
-import {
-	burstPixiTileActorAckParticlesFx,
-	burstPixiTileActorFeedbackParticlesFx,
-	pixiTileActorFeedbackParticlesDurationMs,
-	startPixiTileActorActivityParticlesFx,
-	stopPixiTileActorActivityParticlesFx,
-} from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
+import { pixiTileActorFeedbackParticlesDurationMs } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
+import { burstPixiTileActorAckParticlesFx } from "~/ui/pixi/animation/burstPixiTileActorAckParticlesFx";
+import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/burstPixiTileActorFeedbackParticlesFx";
+import { startPixiTileActorActivityParticlesFx } from "~/ui/pixi/animation/startPixiTileActorActivityParticlesFx";
+import { stopPixiTileActorActivityParticlesFx } from "~/ui/pixi/animation/stopPixiTileActorActivityParticlesFx";
 
 const createActor = () =>
 	({

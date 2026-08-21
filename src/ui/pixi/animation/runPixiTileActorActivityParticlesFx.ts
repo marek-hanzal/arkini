@@ -10,18 +10,6 @@ interface ActivityParticlesProps {
 	readonly rampIn?: boolean;
 }
 
-export namespace burstPixiTileActorFeedbackParticlesFx {
-	export interface Props extends ActivityParticlesProps {
-		readonly tint?: number;
-	}
-}
-
-export namespace burstPixiTileActorAckParticlesFx {
-	export interface Props extends ActivityParticlesProps {
-		readonly tint: number;
-	}
-}
-
 type ParticlePlaybackKind = "burst" | "running";
 
 const runningCycleDurationMs = 1_760;
@@ -154,197 +142,185 @@ const renderParticles = ({
 	}
 };
 
-const hideParticlesFx = (actor: PixiTileActor, animator: PixiActorAnimator) =>
-	animator.setFx({
-		actor,
-		channel: "activity-particles",
-		visible: false,
-	});
+export namespace runPixiTileActorActivityParticlesFx {
+	export type Action =
+		| (ActivityParticlesProps & {
+				readonly kind: "start";
+		  })
+		| (ActivityParticlesProps & {
+				readonly kind: "stop";
+		  })
+		| (ActivityParticlesProps & {
+				readonly kind: "feedback";
+				readonly tint?: number;
+		  });
+}
 
-const runContinuousPlaybackFx = ({
-	actor,
-	animator,
-	fromProgress,
-	rampIn,
-}: ActivityParticlesProps & {
-	readonly fromProgress: number;
-	readonly rampIn: boolean;
-}) => {
+/** Owns the actor-local particle playback channel for working state and semantic feedback. */
+export const runPixiTileActorActivityParticlesFx = Effect.fnUntraced(function* (
+	action: runPixiTileActorActivityParticlesFx.Action,
+) {
+	const { actor, animator } = action;
 	const effect = actor.activityParticles;
 	const animationKey = readPixiTileActorActivityParticlesAnimationKey(actor);
-	const rampProgress = runningRampDurationMs / runningCycleDurationMs;
-	let rampComplete = !rampIn;
-	let previousTweenProgress = 0;
-	return animator.animateFx({
-		actor,
-		channel: "activity-particles",
-		curve: {
-			kind: "linear",
-		},
-		durationMs: runningCycleDurationMs,
-		ownerKey: animationKey,
-		repeat: Number.POSITIVE_INFINITY,
-		render: (progress) => {
-			if (!rampComplete && (progress >= rampProgress || progress < previousTweenProgress)) {
-				rampComplete = true;
-			}
-			const cycleProgress = (fromProgress + progress) % 1;
-			renderParticles({
+
+	switch (action.kind) {
+		case "start": {
+			if (actor.container.destroyed || effect.feedbackPhase === "burst") return;
+			yield* animator.cancelFx(animationKey);
+			effect.feedbackPhase = null;
+			const wasVisible = effect.container.visible;
+			yield* animator.setFx({
 				actor,
-				intensity: rampComplete ? 1 : clampUnit(progress / rampProgress),
-				kind: "running",
-				progress: cycleProgress,
-				tint: effect.workingTint,
+				channel: "activity-particles",
+				reset: !wasVisible,
+				visible: true,
 			});
-			previousTweenProgress = progress;
-		},
-	});
-};
-
-/** Starts one widening inverted-fire plume on one seamless actor-owned playback channel. */
-export const startPixiTileActorActivityParticlesFx = Effect.fn(
-	"startPixiTileActorActivityParticlesFx",
-)(function* ({ actor, animator, rampIn }: ActivityParticlesProps) {
-	if (actor.container.destroyed) return;
-	const effect = actor.activityParticles;
-	if (effect.feedbackPhase === "burst") return;
-	const animationKey = readPixiTileActorActivityParticlesAnimationKey(actor);
-	yield* animator.cancelFx(animationKey);
-	effect.feedbackPhase = null;
-	const wasVisible = effect.container.visible;
-	yield* animator.setFx({
-		actor,
-		channel: "activity-particles",
-		reset: !wasVisible,
-		visible: true,
-	});
-	const fromProgress = wasVisible ? effect.lastProgress % 1 : 0;
-	yield* runContinuousPlaybackFx({
-		actor,
-		animator,
-		fromProgress,
-		rampIn: rampIn ?? !wasVisible,
-	});
-});
-
-/** Stops emission, lets the currently distributed pool rise out, then hides the container. */
-export const stopPixiTileActorActivityParticlesFx = Effect.fn(
-	"stopPixiTileActorActivityParticlesFx",
-)(function* ({ actor, animator }: ActivityParticlesProps) {
-	const effect = actor.activityParticles;
-	if (actor.container.destroyed || effect.feedbackPhase === "burst") return;
-	const animationKey = readPixiTileActorActivityParticlesAnimationKey(actor);
-	yield* animator.cancelFx(animationKey);
-	if (!effect.container.visible) {
-		effect.feedbackPhase = null;
-		return;
+			const fromProgress = wasVisible ? effect.lastProgress % 1 : 0;
+			const rampIn = action.rampIn ?? !wasVisible;
+			const rampProgress = runningRampDurationMs / runningCycleDurationMs;
+			let rampComplete = !rampIn;
+			let previousTweenProgress = 0;
+			yield* animator.animateFx({
+				actor,
+				channel: "activity-particles",
+				curve: {
+					kind: "linear",
+				},
+				durationMs: runningCycleDurationMs,
+				ownerKey: animationKey,
+				repeat: Number.POSITIVE_INFINITY,
+				render: (progress) => {
+					if (
+						!rampComplete &&
+						(progress >= rampProgress || progress < previousTweenProgress)
+					) {
+						rampComplete = true;
+					}
+					const cycleProgress = (fromProgress + progress) % 1;
+					renderParticles({
+						actor,
+						intensity: rampComplete ? 1 : clampUnit(progress / rampProgress),
+						kind: "running",
+						progress: cycleProgress,
+						tint: effect.workingTint,
+					});
+					previousTweenProgress = progress;
+				},
+			});
+			return;
+		}
+		case "stop": {
+			if (actor.container.destroyed || effect.feedbackPhase === "burst") return;
+			yield* animator.cancelFx(animationKey);
+			if (!effect.container.visible) {
+				effect.feedbackPhase = null;
+				return;
+			}
+			effect.feedbackPhase = "draining";
+			const fromProgress = effect.lastProgress;
+			yield* animator.animateFx({
+				actor,
+				channel: "activity-particles",
+				durationMs: drainDurationMs,
+				ownerKey: animationKey,
+				onComplete: () => {
+					if (actor.container.destroyed) return;
+					if (actor.item.activityEffect) {
+						RendererRuntime.runSync(
+							runPixiTileActorActivityParticlesFx({
+								actor,
+								animator,
+								kind: "start",
+								rampIn: true,
+							}),
+						);
+						return;
+					}
+					effect.feedbackPhase = null;
+					RendererRuntime.runSync(
+						animator.setFx({
+							actor,
+							channel: "activity-particles",
+							visible: false,
+						}),
+					);
+				},
+				render: (progress) => {
+					renderParticles({
+						actor,
+						intensity: 1 - progress,
+						kind: "running",
+						progress: (fromProgress + progress * 0.28) % 1,
+						tint: effect.workingTint,
+					});
+				},
+			});
+			return;
+		}
+		case "feedback": {
+			if (actor.container.destroyed) return;
+			yield* animator.cancelFx(animationKey);
+			effect.feedbackPhase = "burst";
+			yield* animator.setFx({
+				actor,
+				channel: "activity-particles",
+				reset: true,
+				visible: true,
+			});
+			let handoffStartProgress: number | null = null;
+			let handoffCompleted = false;
+			yield* animator.animateFx({
+				actor,
+				channel: "activity-particles",
+				durationMs: pixiTileActorFeedbackParticlesDurationMs,
+				ownerKey: animationKey,
+				onComplete: () => {
+					if (actor.container.destroyed) return;
+					effect.feedbackPhase = null;
+					if (actor.item.activityEffect) {
+						RendererRuntime.runSync(
+							runPixiTileActorActivityParticlesFx({
+								actor,
+								animator,
+								kind: "start",
+								rampIn: !handoffCompleted,
+							}),
+						);
+						return;
+					}
+					RendererRuntime.runSync(
+						animator.setFx({
+							actor,
+							channel: "activity-particles",
+							visible: false,
+						}),
+					);
+				},
+				render: (progress) => {
+					if (!actor.item.activityEffect) {
+						handoffStartProgress = null;
+						handoffCompleted = false;
+					} else if (handoffStartProgress === null) {
+						handoffStartProgress = Math.max(0.58, progress);
+					}
+					const handoffProgress =
+						handoffStartProgress === null || handoffStartProgress >= 1
+							? 0
+							: smoothStep(
+									(progress - handoffStartProgress) / (1 - handoffStartProgress),
+								);
+					if (handoffProgress >= 0.98) handoffCompleted = true;
+					renderParticles({
+						actor,
+						handoffProgress,
+						intensity: 1,
+						kind: "burst",
+						progress,
+						tint: action.tint ?? effect.workingTint,
+					});
+				},
+			});
+		}
 	}
-	effect.feedbackPhase = "draining";
-	const fromProgress = effect.lastProgress;
-	yield* animator.animateFx({
-		actor,
-		channel: "activity-particles",
-		durationMs: drainDurationMs,
-		ownerKey: animationKey,
-		onComplete: () => {
-			if (actor.container.destroyed) return;
-			if (actor.item.activityEffect) {
-				RendererRuntime.runSync(
-					startPixiTileActorActivityParticlesFx({
-						actor,
-						animator,
-						rampIn: true,
-					}),
-				);
-				return;
-			}
-			effect.feedbackPhase = null;
-			RendererRuntime.runSync(hideParticlesFx(actor, animator));
-		},
-		render: (progress) => {
-			renderParticles({
-				actor,
-				intensity: 1 - progress,
-				kind: "running",
-				progress: (fromProgress + progress * 0.28) % 1,
-				tint: effect.workingTint,
-			});
-		},
-	});
 });
-
-/**
- * Reuses the actor pool for one dense semantic-feedback burst.
- *
- * A running owner resumes its sparse accent plume after the burst. A neutral actor is hidden, so
- * feedback and working state can never leave competing particle writers behind.
- */
-export const burstPixiTileActorFeedbackParticlesFx = Effect.fn(
-	"burstPixiTileActorFeedbackParticlesFx",
-)(function* ({ actor, animator, tint }: burstPixiTileActorFeedbackParticlesFx.Props) {
-	if (actor.container.destroyed) return;
-	const effect = actor.activityParticles;
-	const animationKey = readPixiTileActorActivityParticlesAnimationKey(actor);
-	yield* animator.cancelFx(animationKey);
-	effect.feedbackPhase = "burst";
-	yield* animator.setFx({
-		actor,
-		channel: "activity-particles",
-		reset: true,
-		visible: true,
-	});
-	let handoffStartProgress: number | null = null;
-	let handoffCompleted = false;
-	yield* animator.animateFx({
-		actor,
-		channel: "activity-particles",
-		durationMs: pixiTileActorFeedbackParticlesDurationMs,
-		ownerKey: animationKey,
-		onComplete: () => {
-			if (actor.container.destroyed) return;
-			effect.feedbackPhase = null;
-			if (actor.item.activityEffect) {
-				RendererRuntime.runSync(
-					startPixiTileActorActivityParticlesFx({
-						actor,
-						animator,
-						rampIn: !handoffCompleted,
-					}),
-				);
-				return;
-			}
-			RendererRuntime.runSync(hideParticlesFx(actor, animator));
-		},
-		render: (progress) => {
-			if (!actor.item.activityEffect) {
-				handoffStartProgress = null;
-				handoffCompleted = false;
-			} else if (handoffStartProgress === null) {
-				handoffStartProgress = Math.max(0.58, progress);
-			}
-			const handoffProgress =
-				handoffStartProgress === null || handoffStartProgress >= 1
-					? 0
-					: smoothStep((progress - handoffStartProgress) / (1 - handoffStartProgress));
-			if (handoffProgress >= 0.98) handoffCompleted = true;
-			renderParticles({
-				actor,
-				handoffProgress,
-				intensity: 1,
-				kind: "burst",
-				progress,
-				tint: tint ?? effect.workingTint,
-			});
-		},
-	});
-});
-
-/** Uses the semantic success color while sharing feedback ownership with the working plume. */
-export const burstPixiTileActorAckParticlesFx = Effect.fn("burstPixiTileActorAckParticlesFx")(
-	({ actor, animator, tint }: burstPixiTileActorAckParticlesFx.Props) =>
-		burstPixiTileActorFeedbackParticlesFx({
-			actor,
-			animator,
-			tint,
-		}),
-);

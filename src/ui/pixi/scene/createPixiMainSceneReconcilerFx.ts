@@ -17,12 +17,10 @@ import { updatePixiTileActorProgressFx } from "~/ui/pixi/actor/updatePixiTileAct
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { animatePixiActorToRetargetablePoseFx } from "~/ui/pixi/animation/animatePixiActorToRetargetablePoseFx";
 import { flashPixiTileActorConsumedSourceFx } from "~/ui/pixi/animation/flashPixiTileActorConsumedSourceFx";
-import {
-	burstPixiTileActorFeedbackParticlesFx,
-	pixiTileActorFeedbackParticlesDurationMs,
-	startPixiTileActorActivityParticlesFx,
-	stopPixiTileActorActivityParticlesFx,
-} from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
+import { pixiTileActorFeedbackParticlesDurationMs } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
+import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/burstPixiTileActorFeedbackParticlesFx";
+import { startPixiTileActorActivityParticlesFx } from "~/ui/pixi/animation/startPixiTileActorActivityParticlesFx";
+import { stopPixiTileActorActivityParticlesFx } from "~/ui/pixi/animation/stopPixiTileActorActivityParticlesFx";
 import {
 	pixiTileActorLifecycleDurationMs,
 	preparePixiTileActorEnterFx,

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
+import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/burstPixiTileActorFeedbackParticlesFx";
 
 /** Bursts contact acknowledgement only while the canonical target actor still exists. */
 export const flashPixiMotionTargetFx = Effect.fn("flashPixiMotionTargetFx")(function* ({

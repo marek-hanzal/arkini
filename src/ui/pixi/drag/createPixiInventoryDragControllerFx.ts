@@ -20,7 +20,7 @@ import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCurs
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { animatePixiActorToRetargetablePoseFx } from "~/ui/pixi/animation/animatePixiActorToRetargetablePoseFx";
 import { flashPixiTileActorConsumedSourceFx } from "~/ui/pixi/animation/flashPixiTileActorConsumedSourceFx";
-import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
+import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/burstPixiTileActorFeedbackParticlesFx";
 import type { PixiInventoryDragController } from "~/ui/pixi/drag/PixiInventoryDragController";
 import { makePixiDragPointerOffsetReaderFx } from "~/ui/pixi/drag/makePixiDragPointerOffsetReaderFx";
 import { setPixiDraggedActorPoseFx } from "~/ui/pixi/drag/setPixiDraggedActorPoseFx";

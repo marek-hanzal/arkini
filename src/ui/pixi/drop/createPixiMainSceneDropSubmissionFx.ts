@@ -13,7 +13,7 @@ import {
 	restorePixiTileActorExitFx,
 	startPixiTileActorExitFx,
 } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
-import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
+import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/burstPixiTileActorFeedbackParticlesFx";
 import { settlePixiMainSceneDraggedActorFx } from "~/ui/pixi/drag/settlePixiMainSceneDraggedActorFx";
 import type { PixiCursorGrabMotion } from "~/ui/pixi/drag/PixiCursorGrabMotion";
 import { beginPixiMainSceneDropFx } from "~/ui/pixi/drop/beginPixiMainSceneDropFx";

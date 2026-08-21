@@ -6,7 +6,7 @@ import {
 } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { burstPixiTileActorAckParticlesFx } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
+import { burstPixiTileActorAckParticlesFx } from "~/ui/pixi/animation/burstPixiTileActorAckParticlesFx";
 
 import {
 	boardLocation,

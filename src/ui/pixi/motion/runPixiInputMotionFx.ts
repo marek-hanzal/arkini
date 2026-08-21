@@ -8,7 +8,7 @@ import { createPixiTileActorFx } from "~/ui/pixi/actor/createPixiTileActorFx";
 import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
+import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/burstPixiTileActorFeedbackParticlesFx";
 import { startPixiTileActorExitFx } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
 import { startPixiTileActorRemainderFeedbackFx } from "~/ui/pixi/animation/startPixiTileActorRemainderFeedbackFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";

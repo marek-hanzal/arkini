@@ -1,3 +1,5 @@
+import { Effect } from "effect";
+
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 
 const readLinearChannel = (color: number, shift: number) => {
@@ -11,9 +13,8 @@ const readRelativeLuminance = (color: number) =>
 	readLinearChannel(color, 0) * 0.0722;
 
 /** Comparing resolved colors covers the system theme without trusting DOM attributes. */
-export const readPixiParticleLightSurface = (
+export const readPixiParticleLightSurfaceFx = Effect.fnUntraced(function* (
 	palette: Pick<PixiScenePalette, "foreground" | "surface">,
-) => readRelativeLuminance(palette.surface) > readRelativeLuminance(palette.foreground);
-
-/** Foreground particles retain their chroma over both light and dark regions of tile artwork. */
-export const readPixiParticleBlendMode = () => "normal" as const;
+) {
+	return readRelativeLuminance(palette.surface) > readRelativeLuminance(palette.foreground);
+});

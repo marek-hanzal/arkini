@@ -4,7 +4,8 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiTileActorVisual } from "~/ui/pixi/actor/PixiTileActorVisual";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import { fitPixiSingleLineTextFx } from "~/ui/pixi/text/fitPixiSingleLineTextFx";
-import { formatTileBadgeLabel } from "~/ui/tile/formatTileBadgeCount";
+import { formatTileBadgeLabelFx } from "~/ui/tile/formatTileBadgeLabelFx";
+import { readPixiTileActorArtworkLayoutFx } from "~/ui/pixi/actor/readPixiTileActorArtworkLayoutFx";
 
 export namespace updatePixiTileActorVisualFx {
 	export interface Props {
@@ -16,32 +17,6 @@ export namespace updatePixiTileActorVisualFx {
 }
 
 const tileToSlotRatio = 0.8;
-const layeredArtworkToFaceRatio = 0.75;
-
-export const readPixiTileActorArtworkLayout = ({
-	faceSize,
-	inset,
-	layered,
-}: {
-	readonly faceSize: number;
-	readonly inset: number;
-	readonly layered: boolean;
-}) => {
-	const artworkSize = layered ? faceSize * layeredArtworkToFaceRatio : faceSize;
-	return {
-		primary: {
-			x: inset,
-			y: inset,
-			size: artworkSize,
-		},
-		secondary: {
-			x: inset + faceSize - artworkSize,
-			y: inset + faceSize - artworkSize,
-			size: artworkSize,
-		},
-	} as const;
-};
-
 /** Applies one complete logical face revision to one private visual slot. */
 export const updatePixiTileActorVisualFx = Effect.fn("updatePixiTileActorVisualFx")(function* ({
 	item,
@@ -58,7 +33,7 @@ export const updatePixiTileActorVisualFx = Effect.fn("updatePixiTileActorVisualF
 
 	visual.item = item;
 	visual.size = size;
-	const artwork = readPixiTileActorArtworkLayout({
+	const artwork = yield* readPixiTileActorArtworkLayoutFx({
 		faceSize,
 		inset,
 		layered: item.compositeUrl !== undefined,
@@ -98,7 +73,7 @@ export const updatePixiTileActorVisualFx = Effect.fn("updatePixiTileActorVisualF
 	visual.quantity.text =
 		item.badgeCount === undefined
 			? ""
-			: formatTileBadgeLabel({
+			: yield* formatTileBadgeLabelFx({
 					count: item.badgeCount,
 					kind: item.badgeKind,
 				});

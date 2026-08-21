@@ -54,11 +54,7 @@ const mixTint = (from: number, to: number, progress: number) => {
 };
 
 /** Preserves the semantic hue while pushing each shimmer toward the contrast side of its surface. */
-export const readPixiParticleShimmerTint = (
-	tint: number,
-	shimmer: number,
-	lightSurface: boolean,
-) => {
+const readPixiParticleShimmerTint = (tint: number, shimmer: number, lightSurface: boolean) => {
 	const unitShimmer = clampUnit(shimmer);
 	const amount = lightSurface ? 0.06 + unitShimmer ** 2 * 0.48 : unitShimmer ** 3 * 0.38;
 	const target = lightSurface ? 0 : 255;

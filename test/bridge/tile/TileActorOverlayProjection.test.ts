@@ -7,7 +7,7 @@ import { readTileActorQueueBadgeCountFx } from "~/bridge/tile/readTileActorQueue
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { formatTileBadgeCount, formatTileBadgeLabel } from "~/ui/tile/formatTileBadgeCount";
+import { formatTileBadgeLabelFx } from "~/ui/tile/formatTileBadgeLabelFx";
 
 const runtimeItem = (overrides: {
 	readonly item: {
@@ -28,28 +28,51 @@ const runtimeItem = (overrides: {
 	}) as unknown as RuntimeItemSchema.Type;
 
 describe("tile actor overlay projection", () => {
-	it("uses one compact formatter for stack and deposit badges", () => {
-		expect(formatTileBadgeCount(1)).toBe("1");
-		expect(formatTileBadgeCount(99)).toBe("99");
-		expect(formatTileBadgeCount(100)).toBe("99+");
-		expect(formatTileBadgeCount(450)).toBe("99+");
+	it("uses one compact formatter for stack, queue, and capped badges", () => {
 		expect(
-			formatTileBadgeLabel({
-				count: 3,
-				kind: "queue",
-			}),
+			Effect.runSync(
+				formatTileBadgeLabelFx({
+					count: 1,
+				}),
+			),
+		).toBe("1");
+		expect(
+			Effect.runSync(
+				formatTileBadgeLabelFx({
+					count: 99,
+				}),
+			),
+		).toBe("99");
+		expect(
+			Effect.runSync(
+				formatTileBadgeLabelFx({
+					count: 100,
+				}),
+			),
+		).toBe("99+");
+		expect(
+			Effect.runSync(
+				formatTileBadgeLabelFx({
+					count: 450,
+				}),
+			),
+		).toBe("99+");
+		expect(
+			Effect.runSync(
+				formatTileBadgeLabelFx({
+					count: 3,
+					kind: "queue",
+				}),
+			),
 		).toBe("x3");
 		expect(
-			formatTileBadgeLabel({
-				count: 1,
-				kind: "queue",
-			}),
+			Effect.runSync(
+				formatTileBadgeLabelFx({
+					count: 1,
+					kind: "queue",
+				}),
+			),
 		).toBe("x1");
-		expect(
-			formatTileBadgeLabel({
-				count: 3,
-			}),
-		).toBe("3");
 	});
 
 	it("counts active and planned queue work for one exact owner", () => {

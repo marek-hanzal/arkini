@@ -1,15 +1,18 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readPixiTileActorArtworkLayout } from "~/ui/pixi/actor/updatePixiTileActorVisualFx";
+import { readPixiTileActorArtworkLayoutFx } from "~/ui/pixi/actor/readPixiTileActorArtworkLayoutFx";
 
 describe("readPixiTileActorArtworkLayout", () => {
 	it("keeps one tile source at the complete face bounds", () => {
 		expect(
-			readPixiTileActorArtworkLayout({
-				faceSize: 80,
-				inset: 10,
-				layered: false,
-			}).primary,
+			Effect.runSync(
+				readPixiTileActorArtworkLayoutFx({
+					faceSize: 80,
+					inset: 10,
+					layered: false,
+				}),
+			).primary,
 		).toEqual({
 			x: 10,
 			y: 10,
@@ -19,11 +22,13 @@ describe("readPixiTileActorArtworkLayout", () => {
 
 	it("stages two tile sources from top-left to bottom-right", () => {
 		expect(
-			readPixiTileActorArtworkLayout({
-				faceSize: 80,
-				inset: 10,
-				layered: true,
-			}),
+			Effect.runSync(
+				readPixiTileActorArtworkLayoutFx({
+					faceSize: 80,
+					inset: 10,
+					layered: true,
+				}),
+			),
 		).toEqual({
 			primary: {
 				x: 10,

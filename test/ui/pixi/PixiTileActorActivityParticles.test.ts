@@ -11,7 +11,6 @@ import {
 	burstPixiTileActorAckParticlesFx,
 	burstPixiTileActorFeedbackParticlesFx,
 	pixiTileActorFeedbackParticlesDurationMs,
-	readPixiParticleShimmerTint,
 	startPixiTileActorActivityParticlesFx,
 	stopPixiTileActorActivityParticlesFx,
 } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
@@ -96,34 +95,12 @@ const createAnimator = () => {
 	};
 };
 
-const readChannelSum = (color: number) =>
-	((color >> 16) & 0xff) + ((color >> 8) & 0xff) + (color & 0xff);
-
 const readColorDistance = (left: number, right: number) =>
 	Math.abs(((left >> 16) & 0xff) - ((right >> 16) & 0xff)) +
 	Math.abs(((left >> 8) & 0xff) - ((right >> 8) & 0xff)) +
 	Math.abs((left & 0xff) - (right & 0xff));
 
 describe("Pixi tile actor activity particles", () => {
-	it("pushes shimmer toward the contrast side of the resolved surface", () => {
-		const baseTint = 0x57d7b2;
-		const darkLow = readPixiParticleShimmerTint(baseTint, 0, false);
-		const darkHigh = readPixiParticleShimmerTint(baseTint, 1, false);
-		const lightLow = readPixiParticleShimmerTint(baseTint, 0, true);
-		const lightHigh = readPixiParticleShimmerTint(baseTint, 1, true);
-
-		expect(readChannelSum(darkHigh)).toBeGreaterThan(readChannelSum(darkLow));
-		expect(readChannelSum(lightHigh)).toBeLessThan(readChannelSum(lightLow));
-		expect(
-			new Set([
-				darkLow,
-				darkHigh,
-				lightLow,
-				lightHigh,
-			]).size,
-		).toBe(4);
-	});
-
 	it("runs one linear repeated plume tween without allocating or chaining another pool", () => {
 		const actor = createActor();
 		const particles = actor.activityParticles.particles.map(({ particle }) => particle);

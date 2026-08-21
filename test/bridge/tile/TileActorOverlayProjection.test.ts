@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { readTileActorBadgeCountFx } from "~/bridge/tile/readTileActorBadgeCountFx";
 import { readTileActorProgressRatioFx } from "~/bridge/tile/readTileActorProgressRatioFx";
-import { readTileActorQueueBadgeCount } from "~/bridge/tile/readTileActorQueueBadgeCount";
+import { readTileActorQueueBadgeCountFx } from "~/bridge/tile/readTileActorQueueBadgeCount";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -76,25 +76,31 @@ describe("tile actor overlay projection", () => {
 		} as RuntimeSchema.Type;
 
 		expect(
-			readTileActorQueueBadgeCount({
-				ownerItemId: "runtime:owner",
-				runtime,
-			}),
+			Effect.runSync(
+				readTileActorQueueBadgeCountFx({
+					ownerItemId: "runtime:owner",
+					runtime,
+				}),
+			),
 		).toBe(3);
 		expect(
-			readTileActorQueueBadgeCount({
-				ownerItemId: "runtime:other",
-				runtime: {
-					...runtime,
-					jobs: [],
-				},
-			}),
+			Effect.runSync(
+				readTileActorQueueBadgeCountFx({
+					ownerItemId: "runtime:other",
+					runtime: {
+						...runtime,
+						jobs: [],
+					},
+				}),
+			),
 		).toBe(1);
 		expect(
-			readTileActorQueueBadgeCount({
-				ownerItemId: "runtime:missing",
-				runtime,
-			}),
+			Effect.runSync(
+				readTileActorQueueBadgeCountFx({
+					ownerItemId: "runtime:missing",
+					runtime,
+				}),
+			),
 		).toBeUndefined();
 	});
 

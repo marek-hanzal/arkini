@@ -5,7 +5,7 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { readTileActorBadgeCountFx } from "~/bridge/tile/readTileActorBadgeCountFx";
 import { readTileActorAssetSourceIdsFx } from "~/bridge/tile/readTileActorAssetSourceIdsFx";
 import { readTileActorProgressRatioFx } from "~/bridge/tile/readTileActorProgressRatioFx";
-import { readTileActorQueueBadgeCount } from "~/bridge/tile/readTileActorQueueBadgeCount";
+import { readTileActorQueueBadgeCountFx } from "~/bridge/tile/readTileActorQueueBadgeCount";
 import { readTileActorVisualFx } from "~/bridge/tile/readTileActorVisualFx";
 import { readTileActorActivityEffectFx } from "~/bridge/tile/readTileActorActivityEffectFx";
 import { readRuntimeItemPrimaryActionFx } from "~/engine/item-detail/read/readRuntimeItemPrimaryActionFx";
@@ -64,7 +64,7 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 				}),
 			});
 			const running = activeJobStatus === JobStatusEnumSchema.enum.Running;
-			const queueBadgeCount = readTileActorQueueBadgeCount({
+			const queueBadgeCount = yield* readTileActorQueueBadgeCountFx({
 				ownerItemId: item.id,
 				runtime,
 			});

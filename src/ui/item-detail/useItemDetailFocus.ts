@@ -1,12 +1,8 @@
-import {
-	type KeyboardEvent as ReactKeyboardEvent,
-	useEffect,
-	useLayoutEffect,
-	useRef,
-} from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
 import type { ItemDetailState } from "~/ui/item-detail/ItemDetailControl";
-import { dialogFocusableSelector, keepDialogFocusInside } from "~/ui/focus/keepDialogFocusInside";
+import { dialogFocusableSelector } from "~/ui/focus/dialogFocusableSelector";
+import { useDialogFocusContainment } from "~/ui/focus/useDialogFocusContainment";
 
 /** Owns Item Detail focus entry, containment, and exact actor restoration. */
 export const useItemDetailFocus = ({
@@ -70,12 +66,9 @@ export const useItemDetailFocus = ({
 		phase,
 	]);
 
-	const keepFocusInside = (event: ReactKeyboardEvent<HTMLDivElement>) => {
-		keepDialogFocusInside({
-			dialogRef,
-			event,
-		});
-	};
+	const keepFocusInside = useDialogFocusContainment({
+		dialogRef,
+	});
 
 	return {
 		dialogRef,

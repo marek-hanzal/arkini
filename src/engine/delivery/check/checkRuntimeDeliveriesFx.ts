@@ -3,7 +3,7 @@ import { Effect, Option } from "effect";
 import type { DeliveryTargetIssueSchema } from "~/engine/delivery/schema/check/DeliveryTargetIssueSchema";
 import { DeliveryTargetIssueReasonEnumSchema } from "~/engine/delivery/schema/check/DeliveryTargetIssueReasonEnumSchema";
 import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
-import { isMaterialInputEligible } from "~/engine/input/read/readMaterialInputEligibilityFx";
+import { isMaterialInputEligibleFx } from "~/engine/input/read/isMaterialInputEligibleFx";
 import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
@@ -12,7 +12,7 @@ import { isDeliveryRuntimeItemFx } from "~/engine/runtime/read/isDeliveryRuntime
 import type { DeliveryRuntimeItemSchema } from "~/engine/runtime/schema/DeliveryRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
-import { matchesItemSelector } from "~/engine/selector/fx/selectItemsFx";
+import { matchesItemSelectorFx } from "~/engine/selector/fx/matchesItemSelectorFx";
 
 export namespace checkRuntimeDeliveriesFx {
 	export interface Props {
@@ -87,11 +87,11 @@ export const checkRuntimeDeliveriesFx = Effect.fn("checkRuntimeDeliveriesFx")(fu
 				continue;
 			}
 			if (
-				!isMaterialInputEligible(current.item) ||
-				!matchesItemSelector({
+				!(yield* isMaterialInputEligibleFx(current.item)) ||
+				!(yield* matchesItemSelectorFx({
 					item: current.item,
 					selector: input.selector,
-				})
+				}))
 			) {
 				issues.push(issue(DeliveryTargetIssueReasonEnumSchema.enum.SelectorMismatch));
 				continue;

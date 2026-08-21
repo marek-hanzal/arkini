@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { readOutputMaximumQuantitiesFx } from "~/engine/output/fx/readOutputMaximumQuantitiesFx";
-import { adjustLineNetMaximumOutputQuantity } from "./lineNetMaximumOutputQuantities";
+import { adjustLineNetMaximumOutputQuantityFx } from "./adjustLineNetMaximumOutputQuantityFx";
 
 export namespace applyFinalChargePayerNetMaximumOutputFx {
 	export interface Props {
@@ -26,8 +26,8 @@ export const applyFinalChargePayerNetMaximumOutputFx = Effect.fn(
 			output: payer.charges.output,
 		});
 		for (const [itemId, quantity] of lifecycleOutput) {
-			adjustLineNetMaximumOutputQuantity(quantities, itemId, quantity);
+			yield* adjustLineNetMaximumOutputQuantityFx(quantities, itemId, quantity);
 		}
 	}
-	adjustLineNetMaximumOutputQuantity(quantities, payer.id, -1);
+	yield* adjustLineNetMaximumOutputQuantityFx(quantities, payer.id, -1);
 });

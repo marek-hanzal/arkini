@@ -5,7 +5,7 @@ import { readItemRemainingChargesFx } from "~/engine/item/fx/readItemRemainingCh
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import { applyFinalChargePayerNetMaximumOutputFx } from "./applyFinalChargePayerNetMaximumOutputFx";
-import { clampLineNetMaximumOutputQuantities } from "./lineNetMaximumOutputQuantities";
+import { clampLineNetMaximumOutputQuantitiesFx } from "./clampLineNetMaximumOutputQuantitiesFx";
 import { readLineNetMaximumOutputQuantitiesFx } from "./readLineNetMaximumOutputQuantitiesFx";
 
 export namespace readUnplannedLineNetMaximumOutputQuantitiesFx {
@@ -32,12 +32,12 @@ export const readUnplannedLineNetMaximumOutputQuantitiesFx = Effect.fn(
 	);
 	const remainingCharges = yield* readItemRemainingChargesFx(owner);
 	if (selfChargeCost <= 0 || remainingCharges !== selfChargeCost) {
-		return clampLineNetMaximumOutputQuantities(quantities);
+		return yield* clampLineNetMaximumOutputQuantitiesFx(quantities);
 	}
 
 	yield* applyFinalChargePayerNetMaximumOutputFx({
 		payer: owner.item,
 		quantities,
 	});
-	return clampLineNetMaximumOutputQuantities(quantities);
+	return yield* clampLineNetMaximumOutputQuantitiesFx(quantities);
 });

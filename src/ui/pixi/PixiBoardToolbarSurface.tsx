@@ -11,7 +11,7 @@ import { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import { runTileSplitAtom } from "~/bridge/tile/runTileSplitAtom";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
-import { isInventoryShortcutKey } from "~/ui/navigation/isInventoryShortcutKey";
+import { useInventoryShortcutKey } from "~/ui/navigation/useInventoryShortcutKey";
 import type { PixiMainSceneRuntime } from "~/ui/pixi/scene/PixiMainSceneRuntime";
 import type { PixiMainSceneActivationIntent } from "~/ui/pixi/scene/PixiMainSceneActivationIntent";
 import { createPixiMainSceneRuntimeFx } from "~/ui/pixi/scene/createPixiMainSceneRuntimeFx";
@@ -38,6 +38,7 @@ export const PixiBoardToolbarSurface = () => {
 		mode: "promise",
 	});
 	const hostRef = useRef<HTMLDivElement>(null);
+	const isInventoryShortcutKey = useInventoryShortcutKey();
 	const runtimeRef = useRef<PixiMainSceneRuntime | null>(null);
 	const interactionBlockedRef = useRef(false);
 	const interactionBlocked = gameMenu.isOpen || itemDetail.isOpen;

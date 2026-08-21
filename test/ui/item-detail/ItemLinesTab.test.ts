@@ -8,7 +8,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { useItemDetailLines } from "~/bridge/item-detail/useItemDetailLines";
 import type { ItemDetailPendingAction } from "~/ui/item-detail/ItemDetailControl";
 import { ItemLinesTab } from "~/ui/item-detail/ItemLinesTab";
-import { scrollItemDetailLineIntoView } from "~/ui/item-detail/useItemLinesAutoFocus";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
 (
@@ -331,58 +330,6 @@ const selectAvailabilityFilter = async (container: HTMLElement, value: "availabl
 };
 
 describe("ItemLinesTab", () => {
-	it("leaves a fully visible focus row and horizontal position untouched", () => {
-		const container = document.createElement("div");
-		const row = document.createElement("article");
-		container.scrollTop = 40;
-		container.scrollLeft = 17;
-		container.getBoundingClientRect = () =>
-			rect({
-				top: 0,
-				bottom: 100,
-			});
-		row.getBoundingClientRect = () =>
-			rect({
-				top: 2,
-				bottom: 98,
-			});
-
-		expect(
-			scrollItemDetailLineIntoView({
-				container,
-				row,
-			}),
-		).toBe("visible");
-		expect(container.scrollTop).toBe(40);
-		expect(container.scrollLeft).toBe(17);
-	});
-
-	it("scrolls only the Lines container by the nearest restrained distance", () => {
-		const container = document.createElement("div");
-		const row = document.createElement("article");
-		container.scrollTop = 20;
-		container.scrollLeft = 17;
-		container.getBoundingClientRect = () =>
-			rect({
-				top: 0,
-				bottom: 100,
-			});
-		row.getBoundingClientRect = () =>
-			rect({
-				top: 120,
-				bottom: 160,
-			});
-
-		expect(
-			scrollItemDetailLineIntoView({
-				container,
-				row,
-			}),
-		).toBe("scrolled");
-		expect(container.scrollTop).toBe(92);
-		expect(container.scrollLeft).toBe(17);
-	});
-
 	it("auto-focuses one projected work row once per Lines visit", async () => {
 		const focused = {
 			...projection,

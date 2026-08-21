@@ -4,7 +4,7 @@ import { useCallback, useEffect } from "react";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { Inventory } from "~/ui/inventory/Inventory";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
-import { isInventoryShortcutKey } from "~/ui/navigation/isInventoryShortcutKey";
+import { useInventoryShortcutKey } from "~/ui/navigation/useInventoryShortcutKey";
 
 /**
  * Owns only Inventory-to-Board navigation; the parent scene route keeps the
@@ -14,6 +14,7 @@ import { isInventoryShortcutKey } from "~/ui/navigation/isInventoryShortcutKey";
  * navigation key replaces this leaf with Board.
  */
 export const InventoryPage = ({ packageId }: { readonly packageId: string }) => {
+	const isInventoryShortcutKey = useInventoryShortcutKey();
 	const gameMenu = useGameMenuControl();
 	const itemDetail = useItemDetailControl();
 	const navigate = useNavigate();

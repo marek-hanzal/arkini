@@ -3,7 +3,7 @@ import { useCallback, useLayoutEffect, useRef } from "react";
 const autoFocusPadding = 12;
 const autoFocusLayoutAttempts = 24;
 
-export const scrollItemDetailLineIntoView = ({
+const scrollItemDetailLineIntoView = ({
 	container,
 	row,
 }: {

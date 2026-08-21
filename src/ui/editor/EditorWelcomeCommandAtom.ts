@@ -4,7 +4,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { importEditorArkpackFileAtom } from "~/bridge/arkpack/editor/importEditorArkpackFileAtom";
 import { createFreshEditorProjectAtom } from "~/bridge/editor/createFreshEditorProjectAtom";
 import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 
 export namespace EditorWelcomeCommandAtom {
 	export type Action = "create" | "exit" | "import";
@@ -88,7 +88,7 @@ const EditorWelcomeCommandRunnerAtom = Atom.fn(
 				if (Cause.hasInterruptsOnly(result.cause)) {
 					return yield* Effect.failCause(result.cause);
 				}
-				const failure = readExactCauseFailure(result.cause);
+				const failure = yield* readExactCauseFailureFx(result.cause);
 				yield* Atom.set(EditorWelcomeCommandStateAtom, {
 					kind: "error",
 					error: Option.isSome(failure) ? failure.value : result.cause,

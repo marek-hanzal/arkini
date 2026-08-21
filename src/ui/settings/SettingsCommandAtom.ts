@@ -5,7 +5,7 @@ import { match } from "ts-pattern";
 import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
 import { setAppearanceThemeAtom } from "~/bridge/appearance/setAppearanceThemeAtom";
 import { setCheatAvailabilityAtom } from "~/bridge/cheat/setCheatAvailabilityAtom";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 import type { WindowMode } from "~/bridge/window/WindowMode";
 import { setWindowModeAtom } from "~/bridge/window/setWindowModeAtom";
 
@@ -95,7 +95,7 @@ const SettingsCommandRunnerAtom = Atom.fn(
 				if (Cause.hasInterruptsOnly(result.cause)) {
 					return yield* Effect.failCause(result.cause);
 				}
-				const failure = readExactCauseFailure(result.cause);
+				const failure = yield* readExactCauseFailureFx(result.cause);
 				const error = Option.isSome(failure) ? failure.value : result.cause;
 				yield* Atom.set(
 					SettingsCommandStateAtom,

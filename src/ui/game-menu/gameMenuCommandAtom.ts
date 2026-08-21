@@ -4,7 +4,7 @@ import { match } from "ts-pattern";
 
 import type { Game } from "~/bridge/game/Game";
 import { makeExactGameAtomFamilyFx } from "~/bridge/game/makeExactGameAtomFamilyFx";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 import { requestApplicationCloseFx } from "~/bridge/lifecycle/requestApplicationCloseFx";
 import { RuntimeSaveFx } from "~/bridge/save/RuntimeSaveFx";
 
@@ -23,19 +23,24 @@ export const gameMenuCommandAtom = Effect.runSync(
 
 			return commandFx.pipe(
 				Effect.exit,
-				Effect.flatMap((exit) => {
-					if (Exit.isFailure(exit) && Cause.hasInterruptsOnly(exit.cause)) {
-						return Effect.failCause(exit.cause);
-					}
-					if (Exit.isFailure(exit) && Option.isNone(readExactCauseFailure(exit.cause))) {
-						game.failStop("ui", exit.cause);
-						return Effect.failCause(exit.cause);
-					}
-					return Effect.succeed({
-						command,
-						exit,
-					});
-				}),
+				Effect.flatMap((exit) =>
+					Effect.gen(function* () {
+						if (Exit.isFailure(exit) && Cause.hasInterruptsOnly(exit.cause)) {
+							return yield* Effect.failCause(exit.cause);
+						}
+						if (
+							Exit.isFailure(exit) &&
+							Option.isNone(yield* readExactCauseFailureFx(exit.cause))
+						) {
+							game.failStop("ui", exit.cause);
+							return yield* Effect.failCause(exit.cause);
+						}
+						return {
+							command,
+							exit,
+						};
+					}),
+				),
 			);
 		}).pipe(Atom.setIdleTTL(0)),
 	),

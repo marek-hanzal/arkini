@@ -3,7 +3,7 @@ import { createFileRoute, redirect, type ErrorComponentProps } from "@tanstack/r
 import { Cause, Effect, Exit, Option } from "effect";
 import { acquireGameEngineLeaseFx } from "~/bridge/game/acquireGameEngineLeaseFx";
 import { adoptGameEngineLeaseFx } from "~/bridge/game/adoptGameEngineLeaseFx";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 import { readCurrentGameEngineResourceFx } from "~/bridge/game/readCurrentGameEngineResourceFx";
 import { ActionPendingPage } from "~/page/action/ActionPendingPage";
 import { runActionRouteFx } from "~/page/action/runActionRouteFx";
@@ -51,7 +51,9 @@ export const Route = createFileRoute("/action/load-game/$packageId")({
 			},
 		);
 		if (Exit.isFailure(completed)) {
-			const failure = readExactCauseFailure(completed.cause);
+			const failure = context.rendererRuntime.runSync(
+				readExactCauseFailureFx(completed.cause),
+			);
 			if (Option.isSome(failure)) throw failure.value;
 			if (Cause.hasInterruptsOnly(completed.cause) && abortController.signal.aborted) {
 				throw (

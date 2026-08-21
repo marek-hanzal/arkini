@@ -1,7 +1,7 @@
 import { Cause, Effect, Option } from "effect";
 
 import type { Game } from "~/bridge/game/Game";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 
 /** Projects one renderer command failure while preserving interruption and fail-stop semantics. */
 export const settleRendererCommandFailureFx = Effect.fn("settleRendererCommandFailureFx")(
@@ -23,7 +23,7 @@ export const settleRendererCommandFailureFx = Effect.fn("settleRendererCommandFa
 		if (Cause.hasInterruptsOnly(cause)) {
 			return yield* Effect.failCause(cause);
 		}
-		const failure = readExactCauseFailure(cause);
+		const failure = yield* readExactCauseFailureFx(cause);
 		if (Option.isSome(failure)) {
 			return yield* onFailure(failure.value);
 		}

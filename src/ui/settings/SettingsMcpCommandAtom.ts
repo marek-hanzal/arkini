@@ -5,7 +5,7 @@ import { checkEditorMcpPortFx } from "~/bridge/editor-mcp/checkEditorMcpPortFx";
 import { parseEditorMcpPortFx } from "~/bridge/editor-mcp/parseEditorMcpPortFx";
 import { readEditorMcpPortFx } from "~/bridge/editor-mcp/readEditorMcpPortFx";
 import { writeEditorMcpPortFx } from "~/bridge/editor-mcp/writeEditorMcpPortFx";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 
 export namespace SettingsMcpCommandAtom {
@@ -50,12 +50,6 @@ const SettingsMcpCommandStateAtom = Atom.make<SettingsMcpCommandAtom.State>({
 	kind: "uninitialized",
 }).pipe(Atom.keepAlive);
 
-const failureMessage = (cause: Cause.Cause<unknown>) => {
-	const failure = readExactCauseFailure(cause);
-	const value = Option.isSome(failure) ? failure.value : cause;
-	return value instanceof Error ? value.message : String(value);
-};
-
 const SettingsMcpCommandRunnerAtom = Atom.fn(
 	(command: SettingsMcpRunnerCommand) =>
 		Effect.gen(function* () {
@@ -90,6 +84,12 @@ const SettingsMcpCommandRunnerAtom = Atom.fn(
 			);
 
 			if (Exit.isFailure(result)) {
+				const exactFailure = yield* readExactCauseFailureFx(result.cause);
+				const failureValue = Option.isSome(exactFailure)
+					? exactFailure.value
+					: result.cause;
+				const failureMessage =
+					failureValue instanceof Error ? failureValue.message : String(failureValue);
 				if (Cause.hasInterruptsOnly(result.cause)) {
 					yield* Effect.failCause(result.cause);
 				}
@@ -100,7 +100,7 @@ const SettingsMcpCommandRunnerAtom = Atom.fn(
 								port: command.rawPort,
 							}
 						: {}),
-					message: failureMessage(result.cause),
+					message: failureMessage,
 				});
 				return;
 			}

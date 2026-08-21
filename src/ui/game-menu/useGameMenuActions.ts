@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 
 import type { Game } from "~/bridge/game/Game";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { GameMenuAction, GameMenuPhase } from "~/ui/game-menu/GameMenuControl";
 import { gameMenuCommandAtom } from "~/ui/game-menu/gameMenuCommandAtom";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
@@ -48,7 +49,7 @@ export const useGameMenuActions = ({
 		if (Cause.hasInterruptsOnly(settledCommand.exit.cause)) {
 			throw settledCommand.exit.cause;
 		}
-		const failure = readExactCauseFailure(settledCommand.exit.cause);
+		const failure = RendererRuntime.runSync(readExactCauseFailureFx(settledCommand.exit.cause));
 		if (Option.isNone(failure)) {
 			game.failStop("ui", settledCommand.exit.cause);
 			throw settledCommand.exit.cause;

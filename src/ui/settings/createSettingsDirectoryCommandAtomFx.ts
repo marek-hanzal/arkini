@@ -1,7 +1,7 @@
 import { Cause, Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 
 export type SettingsDirectoryCommandState =
 	| {
@@ -27,7 +27,7 @@ export const createSettingsDirectoryCommandAtomFx = Effect.fn(
 					if (Exit.isFailure(result)) {
 						if (Cause.hasInterruptsOnly(result.cause))
 							yield* Effect.failCause(result.cause);
-						const failure = readExactCauseFailure(result.cause);
+						const failure = yield* readExactCauseFailureFx(result.cause);
 						yield* Atom.set(stateAtom, {
 							kind: "error",
 							error: Option.isSome(failure) ? failure.value : result.cause,

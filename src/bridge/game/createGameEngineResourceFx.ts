@@ -4,7 +4,7 @@ import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleE
 import type { Game } from "~/bridge/game/Game";
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 
 /** Wraps one concrete Game in the fail-stop guard owned by the renderer lifecycle service. */
 export const createGameEngineResourceFx = Effect.fn("createGameEngineResourceFx")((game: Game) =>
@@ -67,7 +67,8 @@ export const createGameEngineResourceFx = Effect.fn("createGameEngineResourceFx"
 				assertUsable();
 				const exit = game.read(effect);
 				if (Exit.isFailure(exit)) {
-					const failure = readExactCauseFailure(exit.cause);
+					const failureExit = game.read(readExactCauseFailureFx(exit.cause));
+					const failure = Exit.isSuccess(failureExit) ? failureExit.value : Option.none();
 					explicitFailurePublication = true;
 					let fatal: ReturnType<Game["failStop"]>;
 					try {

@@ -3,7 +3,7 @@ import { Cause, Deferred, Effect, Exit, Option, Ref, Scope, type Semaphore } fro
 import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import type { GameEngineResourceFxService } from "~/bridge/game/GameEngineResourceFx";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 import type {
 	AcquisitionOwner,
 	Finalization,
@@ -90,7 +90,7 @@ export const createGameEngineAcquisitionCapabilityFx = Effect.fn(
 								return;
 							}
 							if (Exit.isSuccess(exit)) return;
-							const failure = readExactCauseFailure(exit.cause);
+							const failure = yield* readExactCauseFailureFx(exit.cause);
 							yield* Ref.set(
 								stateRef,
 								Option.isSome(failure) &&
@@ -126,7 +126,7 @@ export const createGameEngineAcquisitionCapabilityFx = Effect.fn(
 							Effect.suspend(() => resource.game.disposeWithoutSaveFx),
 						);
 						const disposeFailure = Exit.isFailure(disposeExit)
-							? readExactCauseFailure(disposeExit.cause)
+							? yield* readExactCauseFailureFx(disposeExit.cause)
 							: Option.none();
 						return yield* Exit.isSuccess(disposeExit)
 							? Effect.fail(identityFailure)

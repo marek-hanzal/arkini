@@ -14,7 +14,7 @@ import type {
 	AcquisitionOwner,
 	GameEngineResourceServiceState,
 } from "~/bridge/game/internal/GameEngineResourceServiceState";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
 
 export namespace createGameEngineResourceServiceFx {
@@ -197,13 +197,17 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 												decision.token,
 											),
 										),
-										Effect.catchCause((cause) => {
-											const failure = readExactCauseFailure(cause);
-											return Option.isSome(failure) &&
-												failure.value instanceof CriticalGameLifecycleError
-												? Effect.fail(failure.value)
-												: Effect.succeed(null);
-										}),
+										Effect.catchCause((cause) =>
+											readExactCauseFailureFx(cause).pipe(
+												Effect.flatMap((failure) =>
+													Option.isSome(failure) &&
+													failure.value instanceof
+														CriticalGameLifecycleError
+														? Effect.fail(failure.value)
+														: Effect.succeed(null),
+												),
+											),
+										),
 									);
 							}
 						}),
@@ -308,17 +312,18 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 						true,
 					),
 				).pipe(
-					Effect.map((exit): GameEngineResourceFx.CloseResult => {
+					Effect.flatMap((exit): Effect.Effect<GameEngineResourceFx.CloseResult> => {
 						if (Exit.isSuccess(exit)) {
-							return {
+							return Effect.succeed({
 								type: "saved",
-							};
+							});
 						}
-						const failure = readExactCauseFailure(exit.cause);
-						return {
-							type: "finalization-failed",
-							cause: Option.isSome(failure) ? failure.value : exit.cause,
-						};
+						return readExactCauseFailureFx(exit.cause).pipe(
+							Effect.map((failure) => ({
+								type: "finalization-failed" as const,
+								cause: Option.isSome(failure) ? failure.value : exit.cause,
+							})),
+						);
 					}),
 				),
 			);

@@ -5,7 +5,7 @@ import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAto
 import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
 import { EditorUnsavedChanges } from "~/bridge/editor/EditorUnsavedChanges";
 import { claimGameEngineResourceForCloseFx } from "~/bridge/game/claimGameEngineResourceForCloseFx";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
 import { waitForActionLoadingCompletionFrameFx } from "~/ui/loading/waitForActionLoadingCompletionFrameFx";
 import type { RootContext } from "~/ui/root/RootContext";
@@ -49,7 +49,7 @@ export const installRendererControlledCloseFx = Effect.fn("installRendererContro
 					claimGameEngineResourceForCloseFx(),
 				);
 				if (Exit.isFailure(exit)) {
-					const failure = readExactCauseFailure(exit.cause);
+					const failure = rendererRuntime.runSync(readExactCauseFailureFx(exit.cause));
 					throw Option.isSome(failure) ? failure.value : exit.cause;
 				}
 				const resource = exit.value;

@@ -5,7 +5,7 @@ import type { Game } from "~/bridge/game/Game";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
 import { createGameFx as createGameFromPackageFx } from "~/bridge/game/createGameFx";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 import { writeLastPackageIdFx } from "~/bridge/launcher/writeLastPackageIdFx";
 
 export namespace acquireGameEngineResourceFx {
@@ -20,19 +20,22 @@ export namespace acquireGameEngineResourceFx {
 const discardFailedAcquisitionFx = Effect.fn("discardFailedAcquisitionFx")(
 	(game: Game, acquisitionCause: Cause.Cause<unknown>): Effect.Effect<never, unknown> =>
 		Effect.exit(game.disposeWithoutSaveFx).pipe(
-			Effect.flatMap((disposeExit) => {
-				if (Exit.isSuccess(disposeExit)) return Effect.failCause(acquisitionCause);
-				const failure = readExactCauseFailure(disposeExit.cause);
-				const cause = failure._tag === "Some" ? failure.value : disposeExit.cause;
-				return Effect.fail(
-					cause instanceof CriticalGameLifecycleError
-						? cause
-						: new CriticalGameLifecycleError({
-								operation: "engine-ownership",
-								cause,
-							}),
-				);
-			}),
+			Effect.flatMap((disposeExit) =>
+				Effect.gen(function* () {
+					if (Exit.isSuccess(disposeExit))
+						return yield* Effect.failCause(acquisitionCause);
+					const failure = yield* readExactCauseFailureFx(disposeExit.cause);
+					const cause = failure._tag === "Some" ? failure.value : disposeExit.cause;
+					return yield* Effect.fail(
+						cause instanceof CriticalGameLifecycleError
+							? cause
+							: new CriticalGameLifecycleError({
+									operation: "engine-ownership",
+									cause,
+								}),
+					);
+				}),
+			),
 		),
 );
 

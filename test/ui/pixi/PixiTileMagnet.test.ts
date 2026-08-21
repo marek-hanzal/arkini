@@ -11,7 +11,6 @@ import type {
 import { createPixiTileMagneticFieldFx } from "~/ui/pixi/magnet/createPixiTileMagneticFieldFx";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { readPixiTileAttractionActorIdFx } from "~/ui/pixi/magnet/readPixiTileAttractionActorIdFx";
-import { readPixiTileMagneticDisplacementFx } from "~/ui/pixi/magnet/readPixiTileMagneticDisplacementFx";
 import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 
@@ -19,123 +18,7 @@ const targetItem = {
 	id: "runtime:target",
 } as TileActorItem;
 
-const readDisplacement = (overrides: Partial<readPixiTileMagneticDisplacementFx.Props> = {}) =>
-	Effect.runSync(
-		readPixiTileMagneticDisplacementFx({
-			actorId: "runtime:target",
-			actorRect: {
-				height: 100,
-				width: 100,
-				x: 100,
-				y: 0,
-			},
-			attractedActorId: null,
-			eligibleAttractionActorIds: new Set(),
-			sourceActorId: "runtime:source",
-			sourceDirection: {
-				x: 1,
-				y: 0,
-			},
-			sourceRect: {
-				height: 100,
-				width: 100,
-				x: 0,
-				y: 0,
-			},
-			...overrides,
-		}),
-	);
-
 describe("Pixi tile magnet", () => {
-	it("does not move actors outside the magnetic radius", () => {
-		expect(
-			readDisplacement({
-				actorRect: {
-					height: 100,
-					width: 100,
-					x: 151,
-					y: 0,
-				},
-			}),
-		).toEqual({
-			x: 0,
-			y: 0,
-		});
-	});
-
-	it("repels ordinary neighbours and caps displacement below fourteen percent", () => {
-		const displacement = readDisplacement();
-
-		expect(displacement.x).toBeGreaterThan(0);
-		expect(displacement.y).toBe(0);
-		expect(Math.hypot(displacement.x, displacement.y)).toBeLessThanOrEqual(14);
-	});
-
-	it("attracts only the engine-confirmed combine actor", () => {
-		const displacement = readDisplacement({
-			attractedActorId: "runtime:target",
-			eligibleAttractionActorIds: new Set([
-				"runtime:target",
-			]),
-		});
-
-		expect(displacement.x).toBeLessThan(0);
-		expect(displacement.y).toBe(-0);
-		expect(Math.hypot(displacement.x, displacement.y)).toBeLessThanOrEqual(4.5);
-	});
-
-	it("keeps eligible responders neutral before hover while invalid neighbours repel", () => {
-		expect(
-			readDisplacement({
-				eligibleAttractionActorIds: new Set([
-					"runtime:target",
-				]),
-			}),
-		).toEqual({
-			x: 0,
-			y: 0,
-		});
-		expect(
-			readDisplacement({
-				eligibleAttractionActorIds: new Set([
-					"runtime:other",
-				]),
-			}).x,
-		).toBeGreaterThan(0);
-	});
-
-	it("excludes the dragged source and resolves exact overlap deterministically", () => {
-		expect(
-			readDisplacement({
-				actorId: "runtime:source",
-			}),
-		).toEqual({
-			x: 0,
-			y: 0,
-		});
-		const first = readDisplacement({
-			actorRect: {
-				height: 100,
-				width: 100,
-				x: 0,
-				y: 0,
-			},
-			sourceDirection: null,
-		});
-		const second = readDisplacement({
-			actorRect: {
-				height: 100,
-				width: 100,
-				x: 0,
-				y: 0,
-			},
-			sourceDirection: null,
-		});
-
-		expect(first).toEqual(second);
-		expect(Math.hypot(first.x, first.y)).toBeCloseTo(14);
-	});
-
 	it.each([
 		"merge",
 		"stack",

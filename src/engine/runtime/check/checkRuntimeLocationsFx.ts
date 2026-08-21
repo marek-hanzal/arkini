@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { isItemLocationScopeAllowed } from "~/engine/location/read/isItemLocationScopeAllowedFx";
+import { isItemLocationScopeAllowedFx } from "~/engine/location/read/isItemLocationScopeAllowedFx";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import {
 	indexGridLocationClaims,
@@ -61,7 +61,7 @@ export const checkRuntimeLocationsFx = Effect.fn("checkRuntimeLocationsFx")(func
 
 	for (const { item, location } of items) {
 		const configuredScope = item.item.scope;
-		const scopeAllowed = isItemLocationScopeAllowed({
+		const scopeAllowed = yield* isItemLocationScopeAllowedFx({
 			item: item.item,
 			locationScope: location.scope,
 		});

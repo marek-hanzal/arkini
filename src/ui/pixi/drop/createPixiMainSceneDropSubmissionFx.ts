@@ -21,7 +21,7 @@ import type { PixiMainSceneDropPresentation } from "~/ui/pixi/drop/PixiMainScene
 import type { PixiMainSceneDropSubmission } from "~/ui/pixi/drop/PixiMainSceneDropSubmission";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRuntime";
-import { readPixiTileMotionTargetRedirect } from "~/ui/pixi/motion/readPixiTileMotionTargetRedirect";
+import { readPixiTileMotionTargetRedirectFx } from "~/ui/pixi/motion/readPixiTileMotionTargetRedirect";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 
 export namespace createPixiMainSceneDropSubmissionFx {
@@ -181,7 +181,9 @@ export const createPixiMainSceneDropSubmissionFx = Effect.fn("createPixiMainScen
 							if (finalized || closed) return;
 							try {
 								if (!targetRedirected) {
-									const targetRedirect = readPixiTileMotionTargetRedirect(result);
+									const targetRedirect = RendererRuntime.runSync(
+										readPixiTileMotionTargetRedirectFx(result),
+									);
 									if (targetRedirect !== null) {
 										RendererRuntime.runSync(
 											motion.redirectTargetFx(targetRedirect),

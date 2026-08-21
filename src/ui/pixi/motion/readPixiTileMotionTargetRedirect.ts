@@ -1,3 +1,4 @@
+import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
@@ -10,10 +11,10 @@ import type { PixiTileMotionTargetRedirect } from "~/ui/pixi/motion/PixiTileMoti
  * A surviving source keeps its runtime identity and therefore needs no redirect. Only a source
  * consumed by an engine-confirmed receiver transfers trailing motion to that receiver.
  */
-export const readPixiTileMotionTargetRedirect = (
+export const readPixiTileMotionTargetRedirectFx = Effect.fnUntraced(function* (
 	result: runTileDropAtom.Result,
-): PixiTileMotionTargetRedirect | null =>
-	match(result)
+): Generator<never, PixiTileMotionTargetRedirect | null, never> {
+	return match(result)
 		.with(
 			{
 				kind: DropItemResultKindEnumSchema.enum.StoreInventory,
@@ -91,3 +92,4 @@ export const readPixiTileMotionTargetRedirect = (
 			() => null,
 		)
 		.exhaustive();
+});

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { readTileActorBadgeCountFx } from "~/bridge/tile/readTileActorBadgeCountFx";
 import { readTileActorProgressRatioFx } from "~/bridge/tile/readTileActorProgressRatioFx";
-import { readTileActorQueueBadgeCountFx } from "~/bridge/tile/readTileActorQueueBadgeCount";
+import { readTileActorQueueBadgeCountFx } from "~/bridge/tile/readTileActorQueueBadgeCountFx";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";

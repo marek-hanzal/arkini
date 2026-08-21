@@ -17,7 +17,7 @@ import type {
 } from "~/ui/item/editor/EditorItemSections";
 import { readEditorItemSectionForPathFx } from "~/ui/item/editor/readEditorItemSectionForPathFx";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
-import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultError";
+import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
 
 export namespace useEditorItemFormController {

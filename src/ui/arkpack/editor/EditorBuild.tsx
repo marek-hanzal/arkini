@@ -10,7 +10,7 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { EditorBuildDiagnostics } from "~/ui/arkpack/editor/EditorBuildDiagnostics";
 import { formatByteSizeFx } from "~/ui/arkpack/editor/formatByteSizeFx";
 import { Button, PrimaryButton } from "~/ui/button/Button";
-import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultError";
+import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 
 /** Owns explicit heavy validation and independent output actions for one project snapshot. */
 export const EditorBuild = () => {

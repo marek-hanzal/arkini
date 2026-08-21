@@ -16,7 +16,7 @@ import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticFie
 import { chasePixiTileMotionTargetFx } from "~/ui/pixi/motion/chasePixiTileMotionTargetFx";
 import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
 import { flashPixiMotionTargetFx } from "~/ui/pixi/motion/flashPixiMotionTargetFx";
-import { projectPixiTileMotionItemFx } from "~/ui/pixi/motion/projectPixiTileMotionItem";
+import { projectPixiTileMotionItemFx } from "~/ui/pixi/motion/projectPixiTileMotionItemFx";
 import { makePixiLiveActorContactPoseReaderFx } from "~/ui/pixi/motion/makePixiLiveActorContactPoseReaderFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";

@@ -21,7 +21,7 @@ import type { PixiMainSceneDropPresentation } from "~/ui/pixi/drop/PixiMainScene
 import type { PixiMainSceneDropSubmission } from "~/ui/pixi/drop/PixiMainSceneDropSubmission";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRuntime";
-import { readPixiTileMotionTargetRedirectFx } from "~/ui/pixi/motion/readPixiTileMotionTargetRedirect";
+import { readPixiTileMotionTargetRedirectFx } from "~/ui/pixi/motion/readPixiTileMotionTargetRedirectFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 
 export namespace createPixiMainSceneDropSubmissionFx {

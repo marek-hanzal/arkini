@@ -44,7 +44,7 @@ vi.mock("~/bridge/project/editor/saveEditorProjectConfigCommandAtom", () => ({
 	}),
 }));
 
-vi.mock("~/ui/reactivity/readSettledAsyncResultError", () => ({
+vi.mock("~/ui/reactivity/readSettledAsyncResultErrorFx", () => ({
 	readSettledAsyncResultErrorFx: () => Effect.succeed(undefined),
 }));
 

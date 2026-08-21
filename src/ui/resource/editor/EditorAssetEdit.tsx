@@ -13,7 +13,7 @@ import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
 import { editorBackLinkClassName, EditorBackIcon } from "~/ui/editor/EditorBackIcon";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
 import { EditorFormContent } from "~/ui/form/EditorFormContent";
-import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultError";
+import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { EditorAssetImageDropZone } from "~/ui/resource/editor/EditorAssetImageDropZone";
 import { useEditorAssetById } from "~/ui/resource/editor/useEditorAssetById";
 import { useEditorResourceUrl } from "~/ui/resource/editor/useEditorResourceUrl";

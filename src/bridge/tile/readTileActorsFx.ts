@@ -5,7 +5,7 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { readTileActorBadgeCountFx } from "~/bridge/tile/readTileActorBadgeCountFx";
 import { readTileActorAssetSourceIdsFx } from "~/bridge/tile/readTileActorAssetSourceIdsFx";
 import { readTileActorProgressRatioFx } from "~/bridge/tile/readTileActorProgressRatioFx";
-import { readTileActorQueueBadgeCountFx } from "~/bridge/tile/readTileActorQueueBadgeCount";
+import { readTileActorQueueBadgeCountFx } from "~/bridge/tile/readTileActorQueueBadgeCountFx";
 import { readTileActorVisualFx } from "~/bridge/tile/readTileActorVisualFx";
 import { readTileActorActivityEffectFx } from "~/bridge/tile/readTileActorActivityEffectFx";
 import { readRuntimeItemPrimaryActionFx } from "~/engine/item-detail/read/readRuntimeItemPrimaryActionFx";

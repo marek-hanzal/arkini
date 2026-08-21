@@ -2,7 +2,7 @@ import { Cause, Effect } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { describe, expect, it } from "vitest";
 
-import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultError";
+import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 
 describe("readSettledAsyncResultError", () => {
 	it("projects only settled typed failures", () => {

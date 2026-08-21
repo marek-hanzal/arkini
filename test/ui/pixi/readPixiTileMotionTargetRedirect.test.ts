@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
-import { readPixiTileMotionTargetRedirectFx } from "~/ui/pixi/motion/readPixiTileMotionTargetRedirect";
+import { readPixiTileMotionTargetRedirectFx } from "~/ui/pixi/motion/readPixiTileMotionTargetRedirectFx";
 
 const sourceLocation = {
 	scope: "board" as const,

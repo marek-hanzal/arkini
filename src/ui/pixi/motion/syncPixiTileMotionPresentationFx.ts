@@ -8,7 +8,7 @@ import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwne
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 import type { PixiTileQuantityPresentation } from "~/ui/pixi/motion/PixiTileQuantityPresentation";
-import { projectPixiTileMotionItemFx } from "~/ui/pixi/motion/projectPixiTileMotionItem";
+import { projectPixiTileMotionItemFx } from "~/ui/pixi/motion/projectPixiTileMotionItemFx";
 
 export namespace syncPixiTileMotionPresentationFx {
 	export interface Props {

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
-import { projectPixiTileMotionItemFx } from "~/ui/pixi/motion/projectPixiTileMotionItem";
+import { projectPixiTileMotionItemFx } from "~/ui/pixi/motion/projectPixiTileMotionItemFx";
 import { readPixiTileQuantityPresentationFx } from "~/ui/pixi/motion/readPixiTileQuantityPresentationFx";
 
 const item = (itemType: TileActorItem["itemType"]): TileActorItem => ({

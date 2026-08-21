@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
-import { readPixiTileActorCrowdAlphaFx } from "~/ui/pixi/actor/readPixiTileActorCrowdAlpha";
+import { readPixiTileActorCrowdAlphaFx } from "~/ui/pixi/actor/readPixiTileActorCrowdAlphaFx";
 
 const readCrowdAlpha = (item: TileActorItem) => Effect.runSync(readPixiTileActorCrowdAlphaFx(item));
 

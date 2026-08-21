@@ -7,7 +7,7 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
-import { isSameTileActorLocationFx } from "~/bridge/tile/isSameTileActorLocation";
+import { isSameTileActorLocationFx } from "~/bridge/tile/isSameTileActorLocationFx";
 import {
 	readTileDropPreviewFx,
 	type readTileDropPreviewFx as ReadTileDropPreviewFx,

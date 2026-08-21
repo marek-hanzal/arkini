@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { isSameTileActorLocationFx } from "~/bridge/tile/isSameTileActorLocation";
+import { isSameTileActorLocationFx } from "~/bridge/tile/isSameTileActorLocationFx";
 import { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";

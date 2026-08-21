@@ -12,7 +12,7 @@ import type {
 import type { PixiTileActorParticleTextures } from "~/ui/pixi/actor/PixiTileActorParticleTextures";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { createPixiTileActorFx } from "~/ui/pixi/actor/createPixiTileActorFx";
-import { readPixiTileActorCrowdAlphaFx } from "~/ui/pixi/actor/readPixiTileActorCrowdAlpha";
+import { readPixiTileActorCrowdAlphaFx } from "~/ui/pixi/actor/readPixiTileActorCrowdAlphaFx";
 import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";

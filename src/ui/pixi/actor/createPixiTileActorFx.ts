@@ -10,7 +10,7 @@ import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { createPixiTileActorActivityParticlesFx } from "~/ui/pixi/actor/createPixiTileActorActivityParticlesFx";
 import { createPixiTileActorVisualFx } from "~/ui/pixi/actor/createPixiTileActorVisualFx";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";
-import { readPixiTileActorCrowdAlphaFx } from "~/ui/pixi/actor/readPixiTileActorCrowdAlpha";
+import { readPixiTileActorCrowdAlphaFx } from "~/ui/pixi/actor/readPixiTileActorCrowdAlphaFx";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 

@@ -23,7 +23,7 @@ import type {
 	OpenItemDetailProps,
 	SelectRetainedItemDetailTabProps,
 } from "~/ui/item-detail/ItemDetailControl";
-import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultError";
+import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 
 /**
  * Game-shell owner for one exact Item Detail target, modal lifecycle and

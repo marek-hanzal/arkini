@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { isSameTileActorLocationFx } from "~/bridge/tile/isSameTileActorLocation";
-import { readPixiTileActorCrowdAlphaFx } from "~/ui/pixi/actor/readPixiTileActorCrowdAlpha";
+import { isSameTileActorLocationFx } from "~/bridge/tile/isSameTileActorLocationFx";
+import { readPixiTileActorCrowdAlphaFx } from "~/ui/pixi/actor/readPixiTileActorCrowdAlphaFx";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
 

@@ -11,7 +11,7 @@ import { saveEditorProjectConfigCommandAtom } from "~/bridge/project/editor/save
 import { useAppForm } from "~/ui/form/EditorForm";
 import type { EditorProjectSectionId } from "~/ui/project/editor/EditorProjectSections";
 import { readEditorProjectSectionForPathFx } from "~/ui/project/editor/readEditorProjectSectionForPathFx";
-import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultError";
+import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
 
 export const useEditorProjectFormController = ({

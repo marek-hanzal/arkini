@@ -15,7 +15,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import type { GameSession, GameSessionServices } from "~/bridge/game/GameSession";
 import type { GameSessionFatalSource } from "~/bridge/game/GameSessionFatalError";
 import { GameSessionNotRunningError } from "~/bridge/game/GameSessionNotRunningError";
-import { createGameSessionFatalSignal } from "~/bridge/game/internal/createGameSessionFatalSignal";
+import { createGameSessionFatalSignalFx } from "~/bridge/game/internal/createGameSessionFatalSignalFx";
 import {
 	type GameSessionTransitionSubscriptionCleanup,
 	createGameSessionTransitionSubscriptionsFx,
@@ -93,7 +93,7 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 				const lifecycle = MutableRef.make<SessionLifecycle>({
 					type: "running",
 				});
-				const fatalSignal = createGameSessionFatalSignal();
+				const fatalSignal = yield* createGameSessionFatalSignalFx();
 				let quiesceFatalSession = () => undefined;
 				let fatalQuiesceStarted = false;
 				const failStop = (source: GameSessionFatalSource, cause: unknown) => {

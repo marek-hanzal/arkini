@@ -7,7 +7,6 @@ import type {
 	PixiAnimationSpring,
 } from "~/ui/pixi/animation/PixiAnimationDriver";
 import { createPixiActorAnimatorFx } from "~/ui/pixi/animation/createPixiActorAnimatorFx";
-import { readPixiActorAlphaAnimationKey } from "~/ui/pixi/animation/readPixiActorAlphaAnimationKey";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 
 type TweenProps = Parameters<PixiAnimationDriver["startTweenFx"]>[0];
@@ -450,7 +449,7 @@ describe("Pixi actor animator", () => {
 				actor: exiting,
 				channel: "lifecycle-opacity",
 				durationMs: 220,
-				ownerKey: readPixiActorAlphaAnimationKey(exiting),
+				ownerKey: `actor-alpha:${exiting.instanceId}`,
 				toAlpha: 0,
 			}),
 		);
@@ -459,13 +458,13 @@ describe("Pixi actor animator", () => {
 				actor: replacement,
 				channel: "lifecycle-opacity",
 				durationMs: 520,
-				ownerKey: readPixiActorAlphaAnimationKey(replacement),
+				ownerKey: `actor-alpha:${replacement.instanceId}`,
 				toAlpha: 1,
 			}),
 		);
 
-		expect(readPixiActorAlphaAnimationKey(exiting)).not.toBe(
-			readPixiActorAlphaAnimationKey(replacement),
+		expect(`actor-alpha:${exiting.instanceId}`).not.toBe(
+			`actor-alpha:${replacement.instanceId}`,
 		);
 		expect(tweens[0]?.stop).not.toHaveBeenCalled();
 		expect(tweens[1]?.stop).not.toHaveBeenCalled();

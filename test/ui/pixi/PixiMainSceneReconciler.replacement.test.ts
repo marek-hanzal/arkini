@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
 import type { PixiTileActorVisual } from "~/ui/pixi/actor/PixiTileActorVisual";
-import { completePixiTileActorVisualTextureLoadFx } from "~/ui/pixi/actor/PixiTileActorVisualReadiness";
+import { completePixiTileActorVisualTextureLoadFx } from "~/ui/pixi/actor/completePixiTileActorVisualTextureLoadFx";
 import {
 	boardLocation,
 	createActor,

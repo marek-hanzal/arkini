@@ -6,7 +6,7 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { PixiTileActorVisual } from "~/ui/pixi/actor/PixiTileActorVisual";
-import { whenPixiTileActorVisualReadyFx } from "~/ui/pixi/actor/PixiTileActorVisualReadiness";
+import { whenPixiTileActorVisualReadyFx } from "~/ui/pixi/actor/whenPixiTileActorVisualReadyFx";
 import { createPixiTileActorVisualFx } from "~/ui/pixi/actor/createPixiTileActorVisualFx";
 import { destroyPixiTileActorVisualFx } from "~/ui/pixi/actor/destroyPixiTileActorVisualFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";

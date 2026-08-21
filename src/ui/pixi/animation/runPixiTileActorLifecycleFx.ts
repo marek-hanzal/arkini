@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import { whenPixiTileActorVisualReadyFx } from "~/ui/pixi/actor/PixiTileActorVisualReadiness";
+import { whenPixiTileActorVisualReadyFx } from "~/ui/pixi/actor/whenPixiTileActorVisualReadyFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 
 export const pixiTileActorLifecycleDurationMs = 260;

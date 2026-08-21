@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { PixiTileActorVisual } from "~/ui/pixi/actor/PixiTileActorVisual";
-import { cancelPixiTileActorVisualReadinessFx } from "~/ui/pixi/actor/PixiTileActorVisualReadiness";
+import { cancelPixiTileActorVisualReadinessFx } from "~/ui/pixi/actor/cancelPixiTileActorVisualReadinessFx";
 
 /** Cancels one physical visual revision before destroying its private display tree exactly once. */
 export const destroyPixiTileActorVisualFx = Effect.fn("destroyPixiTileActorVisualFx")(function* (

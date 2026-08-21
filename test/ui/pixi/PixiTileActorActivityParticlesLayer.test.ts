@@ -1,5 +1,4 @@
 import { Effect } from "effect";
-import { Texture } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";

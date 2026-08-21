@@ -514,12 +514,12 @@ For startup visuals ask:
 - can Escape interrupt without snap or duplicate navigation?;
 - is the splash once per renderer session rather than once per route visit?
 
-### 6.8 Interaction and accessibility
+### 6.8 Interaction boundaries
+
+Accessibility-only review is out of scope. Review focus or keyboard ownership only when the feature defines an explicit gameplay/navigation contract for them.
 
 Review:
 
-- one keyboard owner;
-- focus entry, trap, restoration, and disposal;
 - pointer blocking from enter through exit;
 - duplicate input during transitions;
 - pending and failure visibility;
@@ -636,7 +636,7 @@ A material defect involving:
 - incorrect but recoverable behavior;
 - broken product contract;
 - lifecycle/resource leak without immediate data loss;
-- significant animation/accessibility failure;
+- significant animation or explicit interaction-contract failure;
 - misleading documentation likely to misdirect implementation;
 - substantial mental-load regression with concrete maintenance impact.
 
@@ -715,7 +715,7 @@ orchestration behavior
 
 ### 9.6 Real-environment smoke tests
 
-For Electron, CSP, HMR, focus, animation, packaging, and native close behavior, component tests alone are insufficient. Require a boundary-level or generated-output proof where feasible.
+For Electron, CSP, HMR, animation, packaging, and native close behavior, component tests alone are insufficient. Require a boundary-level or generated-output proof where feasible.
 
 ---
 
@@ -917,7 +917,6 @@ Do not:
 
 - [ ] current route contract checked.
 - [ ] startup timing checked against visible Electron behavior.
-- [ ] focus and keyboard ownership checked.
 - [ ] animation enter/exit/interruption checked.
 - [ ] system reduced-motion branching is absent; Arkini owns one authoritative
       game-motion grammar and reintroducing `prefers-reduced-motion` or

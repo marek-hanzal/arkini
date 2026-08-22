@@ -19,6 +19,17 @@ const ownsRevision = (resource: GameEngineResource<EditorBoardGame>, project: Ed
 	resource.game.projectId === project.projectId &&
 	resource.game.projectRevision === project.revision;
 
+const ownsNewerRevision = (state: EditorBoardGameResource.State, project: EditorProject) => {
+	if (state.type === "idle") return false;
+	if (state.type === "ready") {
+		return (
+			state.resource.game.projectId === project.projectId &&
+			state.resource.game.projectRevision > project.revision
+		);
+	}
+	return state.projectId === project.projectId && state.projectRevision > project.revision;
+};
+
 /** Creates the sole serialized owner of ephemeral editor-game sessions. */
 export const createEditorBoardGameResourceFx = Effect.fn("createEditorBoardGameResourceFx")(
 	(dependencies: createEditorBoardGameResourceFx.Dependencies = {}) =>
@@ -28,6 +39,7 @@ export const createEditorBoardGameResourceFx = Effect.fn("createEditorBoardGameR
 				type: "idle",
 			});
 			let current: EditorBoardGameResource.Resource | undefined;
+			let routedProjectId: string | undefined;
 			const createResourceFx =
 				dependencies.createResourceFx ??
 				((project: EditorProject) =>
@@ -42,53 +54,65 @@ export const createEditorBoardGameResourceFx = Effect.fn("createEditorBoardGameR
 					error: Cause.squash(cause),
 				});
 
+			const syncOwnedProjectFx = (project: EditorProject) =>
+				Effect.gen(function* () {
+					const snapshot = yield* SubscriptionRef.get(state);
+					if (ownsNewerRevision(snapshot, project)) return;
+					if (
+						current !== undefined &&
+						ownsRevision(current, project) &&
+						snapshot.type === "ready"
+					)
+						return;
+					yield* SubscriptionRef.set(state, {
+						type: "loading",
+						projectId: project.projectId,
+						projectRevision: project.revision,
+					});
+					if (current !== undefined) {
+						const release = yield* Effect.exit(current.game.disposeWithoutSaveFx);
+						if (Exit.isFailure(release)) {
+							yield* publishFailureFx(project, release.cause);
+							return;
+						}
+						current = undefined;
+					}
+					const created = yield* Effect.exit(createResourceFx(project));
+					if (Exit.isFailure(created)) {
+						yield* publishFailureFx(project, created.cause);
+						return;
+					}
+					current = created.value;
+					yield* SubscriptionRef.set(state, {
+						type: "ready",
+						resource: created.value,
+					});
+				});
 			const syncFx: EditorBoardGameResource["syncFx"] = Effect.fn(
 				"EditorBoardGameResourceFx.syncFx",
 			)((project) =>
 				lifecycle.withPermits(1)(
 					Effect.gen(function* () {
-						const snapshot = yield* SubscriptionRef.get(state);
-						if (
-							current !== undefined &&
-							ownsRevision(current, project) &&
-							snapshot.type === "ready"
-						)
-							return;
-						yield* SubscriptionRef.set(state, {
-							type: "loading",
-							projectId: project.projectId,
-							projectRevision: project.revision,
-						});
-						if (current !== undefined) {
-							const release = yield* Effect.exit(current.game.disposeWithoutSaveFx);
-							if (Exit.isFailure(release)) {
-								yield* publishFailureFx(project, release.cause);
-								return;
-							}
-							current = undefined;
-						}
-						const created = yield* Effect.exit(createResourceFx(project));
-						if (Exit.isFailure(created)) {
-							yield* publishFailureFx(project, created.cause);
-							return;
-						}
-						current = created.value;
-						yield* SubscriptionRef.set(state, {
-							type: "ready",
-							resource: created.value,
-						});
+						routedProjectId = project.projectId;
+						yield* syncOwnedProjectFx(project);
 					}).pipe(Effect.uninterruptible),
 				),
 			);
-			const releaseOwnedFx = Effect.fn("EditorBoardGameResourceFx.releaseOwnedFx")(
-				(projectId?: string) =>
-					lifecycle.withPermits(1)(
-						Effect.gen(function* () {
-							if (
-								current === undefined ||
-								(projectId !== undefined && current.game.projectId !== projectId)
-							)
-								return;
+			const publishFx: EditorBoardGameResource["publishFx"] = Effect.fn(
+				"EditorBoardGameResourceFx.publishFx",
+			)((project) =>
+				lifecycle.withPermits(1)(
+					Effect.gen(function* () {
+						if (routedProjectId !== project.projectId) return;
+						yield* syncOwnedProjectFx(project);
+					}).pipe(Effect.uninterruptible),
+				),
+			);
+			const releaseCurrentFx: EditorBoardGameResource["releaseCurrentFx"] = lifecycle
+				.withPermits(1)(
+					Effect.gen(function* () {
+						routedProjectId = undefined;
+						if (current !== undefined) {
 							const owned = current;
 							const release = yield* Effect.exit(owned.game.disposeWithoutSaveFx);
 							if (Exit.isFailure(release)) {
@@ -101,20 +125,18 @@ export const createEditorBoardGameResourceFx = Effect.fn("createEditorBoardGameR
 								return yield* Effect.failCause(release.cause);
 							}
 							current = undefined;
-							yield* SubscriptionRef.set(state, {
-								type: "idle",
-							});
-						}).pipe(Effect.uninterruptible),
-					),
-			);
-			const releaseFx: EditorBoardGameResource["releaseFx"] = (projectId) =>
-				releaseOwnedFx(projectId);
-			const releaseCurrentFx: EditorBoardGameResource["releaseCurrentFx"] = releaseOwnedFx();
+						}
+						yield* SubscriptionRef.set(state, {
+							type: "idle",
+						});
+					}).pipe(Effect.uninterruptible),
+				)
+				.pipe(Effect.withSpan("EditorBoardGameResourceFx.releaseCurrentFx"));
 
 			return {
 				state,
 				syncFx,
-				releaseFx,
+				publishFx,
 				releaseCurrentFx,
 				shutdownFx: releaseCurrentFx.pipe(Effect.ignore),
 			} satisfies EditorBoardGameResource;

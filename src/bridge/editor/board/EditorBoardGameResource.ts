@@ -31,8 +31,10 @@ export namespace EditorBoardGameResource {
 /** Process-owned, serialized lifecycle for the revision-pinned editor game. */
 export interface EditorBoardGameResource {
 	readonly state: SubscriptionRef.SubscriptionRef<EditorBoardGameResource.State>;
+	/** Claims the routed project before synchronizing its latest loaded revision. */
 	readonly syncFx: (project: EditorProject) => Effect.Effect<void>;
-	readonly releaseFx: (projectId: string) => Effect.Effect<void, unknown>;
+	/** Synchronizes a committed revision only while its project still owns the route. */
+	readonly publishFx: (project: EditorProject) => Effect.Effect<void>;
 	readonly releaseCurrentFx: Effect.Effect<void, unknown>;
 	readonly shutdownFx: Effect.Effect<void>;
 }

@@ -12,6 +12,8 @@ import { GameEngineResourceFx, type GameEngineLease } from "~/bridge/game/GameEn
 
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
 
+import { prepareEditorGameHandoffFx } from "~/bridge/game/prepareEditorGameHandoffFx";
+
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
 
 import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
@@ -30,7 +32,7 @@ export const makeResource = ({
 	readonly packageId: string;
 }) =>
 	Effect.runSync(
-		createGameEngineResourceFx({
+		createGameEngineResourceFx<Game>({
 			arkpack: {
 				packageId,
 				hash: `content:${packageId}`,
@@ -105,6 +107,7 @@ export const createHarness = (
 	);
 
 	return {
+		prepareEditorHandoff: () => runtime.runPromise(prepareEditorGameHandoffFx),
 		claimForClose: () => runtime.runPromise(claimForCloseEffect),
 		close: (resource: GameEngineResource) =>
 			runtime.runPromise(

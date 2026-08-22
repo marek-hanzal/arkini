@@ -300,6 +300,50 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 				),
 			);
 
+			const prepareEditorHandoffFx: GameEngineResourceFxService["prepareEditorHandoffFx"] =
+				Effect.fn("GameEngineResourceFx.prepareEditorHandoffFx")(() =>
+					Effect.suspend(() => {
+						const retryAfterFx = (operationFx: Effect.Effect<void, unknown>) =>
+							Effect.exit(operationFx).pipe(Effect.andThen(prepareEditorHandoffFx));
+						return withLifecycleLockFx(
+							Ref.get(stateRef).pipe(
+								Effect.map(
+									(
+										state,
+									): GameEngineResourceFxService["prepareEditorHandoffFx"] => {
+										switch (state._tag) {
+											case "Idle":
+											case "BootstrapFailed":
+												return Effect.succeed(null);
+											case "OwnershipFailed":
+												return Effect.fail(state.error);
+											case "Active":
+												return Effect.succeed(state.resource);
+											case "Acquiring":
+											case "Provisional":
+												return cancellation
+													.beginCancellationFx(state.owner, true)
+													.pipe(Effect.andThen(prepareEditorHandoffFx));
+											case "Cancelling":
+												return retryAfterFx(
+													Deferred.await(state.cancellation.completion),
+												);
+											case "Finalizing":
+												return retryAfterFx(
+													Deferred.await(state.finalization.completion),
+												);
+											case "RecoveringFailedSave":
+												return retryAfterFx(
+													Deferred.await(state.recovery.completion),
+												);
+										}
+									},
+								),
+							),
+						).pipe(Effect.flatten);
+					}),
+				)();
+
 			const closeFx: GameEngineResourceFxService["closeFx"] = Effect.fn(
 				"GameEngineResourceFx.closeFx",
 			)((resource) =>
@@ -330,6 +374,7 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 
 			const service = {
 				currentFx: readCurrentFx(),
+				prepareEditorHandoffFx,
 				acquireLeaseFx: acquisition.acquireLeaseFx,
 				adoptLeaseFx: acquisition.adoptLeaseFx,
 				claimForCloseFx,

@@ -2,9 +2,9 @@ import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
-import { syncEditorBoardGameFx } from "~/bridge/editor/board/syncEditorBoardGameFx";
+import { publishEditorBoardGameFx } from "~/bridge/editor/board/publishEditorBoardGameFx";
 
-/** Publishes one canonical project update and serializes its editor-game replacement. */
+/** Publishes canonical data, then refreshes Board only for the still-routed project. */
 export const publishEditorProjectFx = Effect.fn("publishEditorProjectFx")(function* (
 	projectId: string,
 	command: EditorProjectAtom.Command,
@@ -12,5 +12,5 @@ export const publishEditorProjectFx = Effect.fn("publishEditorProjectFx")(functi
 	const projectAtom = EditorProjectAtom(projectId);
 	yield* Atom.set(projectAtom, command);
 	const project = yield* Atom.get(projectAtom);
-	if (project !== undefined) yield* syncEditorBoardGameFx(project);
+	if (project !== undefined) yield* publishEditorBoardGameFx(project);
 });

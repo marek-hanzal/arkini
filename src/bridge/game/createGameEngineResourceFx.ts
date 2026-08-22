@@ -4,7 +4,6 @@ import {
 	CriticalGameLifecycleError,
 	type CriticalGameLifecycleOperation,
 } from "~/bridge/game/CriticalGameLifecycleError";
-import type { Game } from "~/bridge/game/Game";
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import type { GameSessionServices } from "~/bridge/game/GameSession";
@@ -12,7 +11,7 @@ import type { PlayableGame } from "~/bridge/game/PlayableGame";
 import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 
 /** Wraps one exact playable session in a presentation fail-stop guard. */
-const makeGameEngineResourceFx = Effect.fn("createGameEngineResourceFx")(
+export const createGameEngineResourceFx = Effect.fn("createGameEngineResourceFx")(
 	<GameType extends PlayableGame>(game: GameType) =>
 		Effect.sync(() => {
 			let criticalFailure: CriticalGameLifecycleError | null = null;
@@ -111,13 +110,3 @@ const makeGameEngineResourceFx = Effect.fn("createGameEngineResourceFx")(
 			} satisfies GameEngineResource<GameType>;
 		}),
 );
-
-export function createGameEngineResourceFx(game: Game): Effect.Effect<GameEngineResource<Game>>;
-export function createGameEngineResourceFx<GameType extends PlayableGame>(
-	game: GameType,
-): Effect.Effect<GameEngineResource<GameType>>;
-export function createGameEngineResourceFx(
-	game: PlayableGame,
-): Effect.Effect<GameEngineResource<PlayableGame>> {
-	return makeGameEngineResourceFx(game);
-}

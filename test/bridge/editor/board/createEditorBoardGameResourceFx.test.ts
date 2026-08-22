@@ -96,8 +96,8 @@ describe("createEditorBoardGameResourceFx", () => {
 			"create-2",
 		]);
 
-		await Effect.runPromise(owner.releaseFx("editor-board"));
-		await Effect.runPromise(owner.releaseFx("editor-board"));
+		await Effect.runPromise(owner.releaseCurrentFx);
+		await Effect.runPromise(owner.releaseCurrentFx);
 		expect(events).toEqual([
 			"create-1",
 			"release-start-1",
@@ -155,6 +155,12 @@ describe("createEditorBoardGameResourceFx", () => {
 		]);
 		expect(revokeObjectUrl).not.toHaveBeenCalled();
 
+		await Effect.runPromise(owner.syncFx(createProject(1)));
+		expect(await Effect.runPromise(SubscriptionRef.get(owner.state))).toEqual(failed);
+		expect(created).toEqual([
+			1,
+		]);
+
 		await Effect.runPromise(owner.syncFx(createProject(2)));
 		const recovered = await Effect.runPromise(SubscriptionRef.get(owner.state));
 		expect(recovered.type).toBe("ready");
@@ -166,6 +172,63 @@ describe("createEditorBoardGameResourceFx", () => {
 		]);
 		expect(revokeObjectUrl).toHaveBeenCalledTimes(2);
 
-		await Effect.runPromise(owner.releaseFx("editor-board"));
+		await Effect.runPromise(owner.releaseCurrentFx);
+	});
+
+	it("keeps a failed newer creation visible when a stale revision arrives", async () => {
+		const creationError = new Error("revision creation failed");
+		const created: number[] = [];
+		let failRevisionTwo = true;
+		const createResourceFx = (project: EditorProject) =>
+			Effect.gen(function* () {
+				created.push(project.revision);
+				if (project.revision === 2 && failRevisionTwo) {
+					failRevisionTwo = false;
+					return yield* Effect.fail(creationError);
+				}
+				const game = yield* createEditorBoardGameFx({
+					project,
+				});
+				return yield* createGameEngineResourceFx(game);
+			});
+		const owner = await Effect.runPromise(
+			createEditorBoardGameResourceFx({
+				createResourceFx,
+			}),
+		);
+
+		await Effect.runPromise(owner.syncFx(createProject(1)));
+		await Effect.runPromise(owner.syncFx(createProject(2)));
+		const failed = await Effect.runPromise(SubscriptionRef.get(owner.state));
+		expect(failed).toEqual({
+			type: "failed",
+			projectId: "editor-board",
+			projectRevision: 2,
+			error: creationError,
+		});
+		expect(created).toEqual([
+			1,
+			2,
+		]);
+
+		await Effect.runPromise(owner.syncFx(createProject(1)));
+		expect(await Effect.runPromise(SubscriptionRef.get(owner.state))).toEqual(failed);
+		expect(created).toEqual([
+			1,
+			2,
+		]);
+
+		await Effect.runPromise(owner.syncFx(createProject(2)));
+		const recovered = await Effect.runPromise(SubscriptionRef.get(owner.state));
+		expect(recovered.type).toBe("ready");
+		if (recovered.type !== "ready") throw new Error("Revision 2 did not recover.");
+		expect(recovered.resource.game.projectRevision).toBe(2);
+		expect(created).toEqual([
+			1,
+			2,
+			2,
+		]);
+
+		await Effect.runPromise(owner.releaseCurrentFx);
 	});
 });

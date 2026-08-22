@@ -1,10 +1,17 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { Effect } from "effect";
 
-import { releaseEditorBoardGameFx } from "~/bridge/editor/board/releaseEditorBoardGameFx";
+import { releaseCurrentEditorBoardGameFx } from "~/bridge/editor/board/releaseCurrentEditorBoardGameFx";
 import { syncEditorBoardGameFx } from "~/bridge/editor/board/syncEditorBoardGameFx";
+import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { readEditorProjectFx } from "~/bridge/editor/readEditorProjectFx";
 import { EditorProjectErrorPage } from "~/page/editor/EditorProjectErrorPage";
 import { EditorProjectShellPage } from "~/page/editor/EditorProjectShellPage";
+
+const syncRoutedEditorBoardGameFx = Effect.fn("syncRoutedEditorBoardGameFx")(
+	(project: EditorProject | undefined) =>
+		project === undefined ? releaseCurrentEditorBoardGameFx : syncEditorBoardGameFx(project),
+);
 
 const EditorProjectRoute = () => {
 	const project = Route.useLoaderData();
@@ -39,16 +46,22 @@ export const Route = createFileRoute("/editor/$projectId")({
 		staleReloadMode: "blocking",
 	},
 	onEnter: ({ context, loaderData }) => {
-		if (loaderData === undefined) return;
 		void context.rendererRuntime
-			.runPromise(syncEditorBoardGameFx(loaderData))
+			.runPromise(syncRoutedEditorBoardGameFx(loaderData))
 			.catch((cause) =>
-				console.error("Arkini editor Board game could not be started.", cause),
+				console.error("Arkini editor Board game could not be synchronized.", cause),
 			);
 	},
-	onLeave: ({ context, params }) => {
+	onStay: ({ context, loaderData }) => {
 		void context.rendererRuntime
-			.runPromise(releaseEditorBoardGameFx(params.projectId))
+			.runPromise(syncRoutedEditorBoardGameFx(loaderData))
+			.catch((cause) =>
+				console.error("Arkini editor Board game could not be synchronized.", cause),
+			);
+	},
+	onLeave: ({ context }) => {
+		void context.rendererRuntime
+			.runPromise(releaseCurrentEditorBoardGameFx)
 			.catch((cause) =>
 				console.error("Arkini editor Board game could not be released.", cause),
 			);

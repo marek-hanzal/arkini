@@ -1,14 +1,20 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
 import { claimGameEngineResourceForCloseFx } from "~/bridge/game/claimGameEngineResourceForCloseFx";
+import { GameEngineProvider } from "~/bridge/game/GameEngineProvider";
 import { readCurrentGameEngineResourceFx } from "~/bridge/game/readCurrentGameEngineResourceFx";
 import { GameCriticalFailureBoundary } from "~/ui/game/GameCriticalFailureBoundary";
 
-const GameRoute = () => (
-	<GameCriticalFailureBoundary>
-		<Outlet />
-	</GameCriticalFailureBoundary>
-);
+const GameRoute = () => {
+	const { gameEngine } = Route.useRouteContext();
+	return (
+		<GameCriticalFailureBoundary>
+			<GameEngineProvider game={gameEngine}>
+				<Outlet />
+			</GameEngineProvider>
+		</GameCriticalFailureBoundary>
+	);
+};
 
 /**
  * Publishes one exact Game resource to all descendants and rejects stale package

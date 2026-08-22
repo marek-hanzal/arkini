@@ -1,6 +1,6 @@
 import { Cause, Effect, Option } from "effect";
 
-import type { Game } from "~/bridge/game/Game";
+import type { PlayableGame } from "~/bridge/game/PlayableGame";
 import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 
 /** Projects one renderer command failure while preserving interruption and fail-stop semantics. */
@@ -12,7 +12,7 @@ export const settleRendererCommandFailureFx = Effect.fn("settleRendererCommandFa
 		setFatalCause,
 	}: {
 		readonly cause: Cause.Cause<unknown>;
-		readonly game: Game;
+		readonly game: PlayableGame;
 		readonly onFailure: (
 			failure: unknown,
 		) => Effect.Effect<void, FailureError, FailureRequirements>;

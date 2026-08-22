@@ -1,5 +1,4 @@
 import { useAtom, useAtomSet } from "@effect/atom-react";
-import { useNavigate } from "@tanstack/react-router";
 import { match } from "ts-pattern";
 import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
@@ -24,11 +23,16 @@ import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";
  * Shift+left click splits a Board stack, and right click opens Item Detail. React forwards commands
  * and overlay cancellation only; the scene runtime owns pointer and display lifecycle.
  */
-export const PixiBoardToolbarSurface = () => {
+export namespace PixiBoardToolbarSurface {
+	export interface Props {
+		readonly onOpenInventory: () => void | PromiseLike<void>;
+	}
+}
+
+export const PixiBoardToolbarSurface = ({ onOpenInventory }: PixiBoardToolbarSurface.Props) => {
 	const game = useGameEngine();
 	const gameMenu = useGameMenuControl();
 	const itemDetail = useItemDetailControl();
-	const navigate = useNavigate();
 	const { interaction, textures } = usePixiGameRuntime();
 	const [enqueueLineState, enqueueLine] = useAtom(TileDefaultLineCommandAtom(game));
 	const runDrop = useAtomSet(runTileDropAtom(game), {
@@ -49,20 +53,6 @@ export const PixiBoardToolbarSurface = () => {
 	controlsRef.current = {
 		itemDetail,
 	};
-
-	const openInventory = useCallback(
-		() =>
-			navigate({
-				to: "/game/$packageId/inventory",
-				params: {
-					packageId: game.arkpack.packageId,
-				},
-			}).then(() => undefined),
-		[
-			game.arkpack.packageId,
-			navigate,
-		],
-	);
 
 	const activate = useCallback(
 		async (item: TileActorItem, intent: PixiMainSceneActivationIntent, origin: HTMLElement) => {
@@ -109,7 +99,7 @@ export const PixiBoardToolbarSurface = () => {
 					{
 						kind: "open-inventory",
 					},
-					() => openInventory(),
+					() => onOpenInventory(),
 				)
 				.with(
 					{
@@ -125,8 +115,8 @@ export const PixiBoardToolbarSurface = () => {
 				.exhaustive();
 		},
 		[
-			openInventory,
 			enqueueLine,
+			onOpenInventory,
 			runSplit,
 		],
 	);
@@ -148,7 +138,7 @@ export const PixiBoardToolbarSurface = () => {
 			}
 			event.preventDefault();
 			event.stopPropagation();
-			void openInventory().catch((cause) => {
+			void Promise.resolve(onOpenInventory()).catch((cause) => {
 				console.error("Inventory failed to open from the Board.", cause);
 			});
 		};
@@ -156,7 +146,7 @@ export const PixiBoardToolbarSurface = () => {
 		return () => window.removeEventListener("keydown", openInventoryFromKeyboard);
 	}, [
 		interactionBlocked,
-		openInventory,
+		onOpenInventory,
 	]);
 
 	useLayoutEffect(() => {

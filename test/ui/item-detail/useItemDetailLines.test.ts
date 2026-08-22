@@ -5,7 +5,7 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { GameEngine } from "~/bridge/game/GameEngine";
+import type { PackageGameEngine as GameEngine } from "~/bridge/game/GameEngine";
 import { useItemDetailLines } from "~/bridge/item-detail/useItemDetailLines";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { useGameFx } from "~/engine/game/fx/useGameFx";

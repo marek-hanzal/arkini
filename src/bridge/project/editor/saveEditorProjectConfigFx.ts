@@ -1,8 +1,7 @@
 import { Effect } from "effect";
-import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
 import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
+import { publishEditorProjectFx } from "~/bridge/editor/publishEditorProjectFx";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
@@ -38,7 +37,7 @@ export const saveEditorProjectConfigFx = Effect.fn("saveEditorProjectConfigFx")(
 				expectedRevision,
 				projectId,
 			});
-			yield* Atom.set(EditorProjectAtom(projectId), {
+			yield* publishEditorProjectFx(projectId, {
 				commit,
 			});
 			return config;

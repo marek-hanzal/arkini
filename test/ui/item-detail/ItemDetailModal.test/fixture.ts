@@ -4,7 +4,7 @@ import { Effect } from "effect";
 import { act, createElement, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, vi } from "vitest";
-import type { GameEngine } from "~/bridge/game/GameEngine";
+import type { PackageGameEngine as GameEngine } from "~/bridge/game/GameEngine";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";

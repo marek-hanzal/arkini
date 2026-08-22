@@ -1,7 +1,7 @@
 import { Cause, Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { Game } from "~/bridge/game/Game";
+import type { PlayableGame } from "~/bridge/game/PlayableGame";
 import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 import type {
 	ItemDetailPendingAction,
@@ -10,7 +10,7 @@ import type {
 
 export namespace createItemDetailCommandAtom {
 	export interface Dependencies {
-		readonly game: Game;
+		readonly game: PlayableGame;
 		readonly readOutcomeScope: () => string | undefined;
 	}
 

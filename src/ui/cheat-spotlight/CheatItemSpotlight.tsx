@@ -9,7 +9,7 @@ import {
 } from "react";
 import { match } from "ts-pattern";
 
-import type { Game } from "~/bridge/game/Game";
+import type { PlayableGame } from "~/bridge/game/PlayableGame";
 import { useCheatItemCatalog } from "~/bridge/cheat/useCheatItemCatalog";
 import { useGameCheats } from "~/bridge/cheat/useGameCheats";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
@@ -34,7 +34,7 @@ export const CheatItemSpotlight = ({
 	game,
 	onBeforeOpen,
 }: {
-	readonly game: Game;
+	readonly game: PlayableGame;
 	readonly onBeforeOpen?: () => void;
 }) => {
 	const errorMessage = (error: unknown) =>

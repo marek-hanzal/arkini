@@ -1,8 +1,7 @@
 import { Effect } from "effect";
-import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
 import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
+import { publishEditorProjectFx } from "~/bridge/editor/publishEditorProjectFx";
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
@@ -36,7 +35,7 @@ export const saveEditorItemFx = Effect.fn("saveEditorItemFx")(function* ({
 				projectId,
 				item,
 			});
-			yield* Atom.set(EditorProjectAtom(projectId), {
+			yield* publishEditorProjectFx(projectId, {
 				commit,
 			});
 			return item;

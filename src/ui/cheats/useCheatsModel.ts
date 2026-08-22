@@ -2,7 +2,7 @@ import { useAtom } from "@effect/atom-react";
 import type { Effect } from "effect";
 import { useCallback, useMemo } from "react";
 
-import type { Game } from "~/bridge/game/Game";
+import type { PlayableGame } from "~/bridge/game/PlayableGame";
 import { useGameCheats } from "~/bridge/cheat/useGameCheats";
 import { updateGameCheatsAtom } from "~/ui/cheats/updateGameCheatsAtom";
 
@@ -19,7 +19,7 @@ export namespace useCheatsModel {
 }
 
 /** Owns the one exact-Game Cheat command state shared by navigation and presentation. */
-export const useCheatsModel = (game: Game): useCheatsModel.Model => {
+export const useCheatsModel = (game: PlayableGame): useCheatsModel.Model => {
 	const cheats = useGameCheats(game);
 	const commandAtom = updateGameCheatsAtom(game);
 	const [commandState, runCommand] = useAtom(commandAtom);

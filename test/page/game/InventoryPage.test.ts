@@ -15,11 +15,7 @@ import { InventoryPage } from "~/page/game/InventoryPage";
 const pageState = vi.hoisted(() => ({
 	detailOpen: false,
 	menuOpen: false,
-	navigate: vi.fn(() => Promise.resolve()),
-}));
-
-vi.mock("@tanstack/react-router", () => ({
-	useNavigate: () => pageState.navigate,
+	onClose: vi.fn(),
 }));
 
 vi.mock("~/ui/game-menu/useGameMenuControl", () => ({
@@ -60,7 +56,7 @@ const renderPage = async () => {
 	await act(async () =>
 		root.render(
 			createElement(InventoryPage, {
-				packageId: "package-inventory",
+				onClose: pageState.onClose,
 			}),
 		),
 	);
@@ -73,7 +69,7 @@ afterEach(async () => {
 	});
 	pageState.detailOpen = false;
 	pageState.menuOpen = false;
-	pageState.navigate.mockClear();
+	pageState.onClose.mockClear();
 	document.body.replaceChildren();
 });
 
@@ -84,15 +80,9 @@ describe("InventoryPage", () => {
 		if (close === null) throw new Error("Inventory close control is missing.");
 
 		await act(async () => close.click());
-		expect(pageState.navigate).toHaveBeenCalledWith({
-			to: "/game/$packageId/board",
-			params: {
-				packageId: "package-inventory",
-			},
-			replace: true,
-		});
+		expect(pageState.onClose).toHaveBeenCalledOnce();
 
-		pageState.navigate.mockClear();
+		pageState.onClose.mockClear();
 		const escape = new KeyboardEvent("keydown", {
 			bubbles: true,
 			cancelable: true,
@@ -100,16 +90,16 @@ describe("InventoryPage", () => {
 		});
 		await act(async () => window.dispatchEvent(escape));
 		expect(escape.defaultPrevented).toBe(true);
-		expect(pageState.navigate).toHaveBeenCalledOnce();
+		expect(pageState.onClose).toHaveBeenCalledOnce();
 
-		pageState.navigate.mockClear();
+		pageState.onClose.mockClear();
 		const inventoryShortcut = new KeyboardEvent("keydown", {
 			cancelable: true,
 			key: "i",
 		});
 		await act(async () => window.dispatchEvent(inventoryShortcut));
 		expect(inventoryShortcut.defaultPrevented).toBe(true);
-		expect(pageState.navigate).toHaveBeenCalledOnce();
+		expect(pageState.onClose).toHaveBeenCalledOnce();
 	});
 
 	it("leaves navigation keys to higher-priority Game Menu and Item Detail owners", async () => {
@@ -127,7 +117,7 @@ describe("InventoryPage", () => {
 			}),
 		);
 		expect(detailEscape.defaultPrevented).toBe(false);
-		expect(pageState.navigate).not.toHaveBeenCalled();
+		expect(pageState.onClose).not.toHaveBeenCalled();
 
 		const root = roots.pop();
 		if (root === undefined) throw new Error("Inventory page root is missing.");
@@ -147,7 +137,7 @@ describe("InventoryPage", () => {
 			}),
 		);
 		expect(menuEscape.defaultPrevented).toBe(false);
-		expect(pageState.navigate).not.toHaveBeenCalled();
+		expect(pageState.onClose).not.toHaveBeenCalled();
 	});
 
 	it("does not hijack modified, repeated, or editable i key input", async () => {
@@ -174,6 +164,6 @@ describe("InventoryPage", () => {
 			}),
 		);
 
-		expect(pageState.navigate).not.toHaveBeenCalled();
+		expect(pageState.onClose).not.toHaveBeenCalled();
 	});
 });

@@ -2,14 +2,14 @@ import { useNavigate, useRouter } from "@tanstack/react-router";
 import { Effect } from "effect";
 import { useCallback, useEffect, useRef } from "react";
 
-import { useGameEngine } from "~/bridge/game/useGameEngine";
+import { usePackageGameEngine } from "~/bridge/game/usePackageGameEngine";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 import { Cheats } from "~/ui/cheats/Cheats";
 import { useCheatsModel } from "~/ui/cheats/useCheatsModel";
 
 /** Composes the save-scoped Cheats page and native history return to the active Board. */
 export const CheatsScreen = () => {
-	const game = useGameEngine();
+	const game = usePackageGameEngine();
 	const cheatAvailability = useCheatAvailability();
 	const router = useRouter();
 	const navigate = useNavigate();

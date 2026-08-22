@@ -6,6 +6,8 @@ import { acquireGameEngineResourceFx } from "~/bridge/game/acquireGameEngineReso
 import { createGameFx } from "~/bridge/game/createGameFx";
 import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
 import { EditorProjectRepositoryLayer } from "~/bridge/editor/EditorProjectRepositoryLayer";
+import { EditorBoardGameResourceOwnerAtom } from "~/bridge/editor/board/EditorBoardGameResource";
+import { createEditorBoardGameResourceFx } from "~/bridge/editor/board/createEditorBoardGameResourceFx";
 import {
 	EditorUnsavedChanges,
 	EditorUnsavedChangesOwnerAtom,
@@ -21,6 +23,18 @@ const EditorUnsavedChangesLayer = Layer.effect(
 	EditorUnsavedChanges,
 	createEditorUnsavedChangesOwnerFx().pipe(
 		Effect.tap((owner) => Atom.set(EditorUnsavedChangesOwnerAtom, owner)),
+	),
+).pipe(Layer.provide(RendererAtomRegistryLayer));
+
+const EditorBoardGameLayer = Layer.effectDiscard(
+	Effect.acquireRelease(
+		createEditorBoardGameResourceFx().pipe(
+			Effect.tap((owner) => Atom.set(EditorBoardGameResourceOwnerAtom, owner)),
+		),
+		(owner) =>
+			owner.shutdownFx.pipe(
+				Effect.ensuring(Atom.set(EditorBoardGameResourceOwnerAtom, undefined)),
+			),
 	),
 ).pipe(Layer.provide(RendererAtomRegistryLayer));
 
@@ -40,6 +54,7 @@ export const RendererRuntime: ManagedRuntime.ManagedRuntime<
 	Layer.mergeAll(
 		RendererAtomRegistryLayer,
 		EditorProjectRepositoryLayer(),
+		EditorBoardGameLayer,
 		EditorUnsavedChangesLayer,
 		GameEngineResourceLayer({
 			clearSaveFx: Effect.fn("RendererRuntime.clearSaveFx")((key: GameSaveStorage.Key) =>

@@ -39,6 +39,10 @@ vi.mock("~/bridge/game/useGameEngine", () => ({
 		arkpack: {
 			packageId: "package:cheats",
 		},
+		saveKey: {
+			packageId: "package:cheats",
+			contentHash: "test",
+		},
 	}),
 }));
 vi.mock("~/ui/cheat-availability/useCheatAvailability", async () => {

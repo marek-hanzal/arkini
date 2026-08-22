@@ -94,7 +94,7 @@ External and framework constructors remain valid where their API requires them. 
 
 ### Asynchronous UI and Game lifecycle boundaries
 
-React never owns canonical gameplay state, runtime reads, persistence truth, catalog truth, or domain lifecycle semantics. React-visible asynchronous commands use feature-owned Effect Atoms. A standalone operation may expose its `Atom.fn` `AsyncResult` directly. A surface that must synchronously exclude sibling commands or survive an allowed React remount exposes one domain-specific writable command Atom backed by a private `Atom.fn` runner and one tagged state; React must not reconstruct application-command ownership with refs, local booleans, result-identity effects, or a second pending/error map. Mounted presentation actions that contain no Effect work may use React state plus a ref for same-tick admission. The renderer-wide live Game is owned by one scoped Effect service in `RendererRuntime`:
+React never owns canonical gameplay state, runtime reads, persistence truth, catalog truth, or domain lifecycle semantics. React-visible asynchronous commands use feature-owned Effect Atoms. A standalone operation may expose its `Atom.fn` `AsyncResult` directly. A surface that must synchronously exclude sibling commands or survive an allowed React remount exposes one domain-specific writable command Atom backed by a private `Atom.fn` runner and one tagged state; React must not reconstruct application-command ownership with refs, local booleans, result-identity effects, or a second pending/error map. Mounted presentation actions that contain no Effect work may use React state plus a ref for same-tick admission. Live gameplay is owned by scoped Effect services in `RendererRuntime`; React providers only inject an already-owned exact facade:
 
 ```text
 GameEngineResourceFx
@@ -113,15 +113,21 @@ GameEngineResourceFx
 → expose the exact Game/resource through inherited route context
 
 useGameEngine
-→ typed inherited-route-context adapter
+→ typed non-owning GameEngine context adapter
 → never create or mirror gameplay state
+
+EditorBoardGameResource
+→ one explicit ephemeral editor-game state machine
+→ one lifecycle semaphore
+→ exact project-revision replacement only after destructive disposal
+→ no Arkpack identity, durable save identity or gameplay mirror
 
 PlayableGameRoute
 → mount GameAudio and CheatItemSpawnProvider only for Board/Cheats pages
 → never mount gameplay observers around leave/reset/exit action routes
 ```
 
-`GameEngineResourceFx` owns renderer-wide object identity and same-package single-flight only. `GameSession` remains the canonical runtime/save owner. Explicit named route operations release or reset the exact adopted resource, while native controlled close atomically claims pending acquisition and joins any terminal operation already finalizing that resource. Acquisition, destructive cleanup, save recovery, and service shutdown continue under the service Scope even if an individual route caller is interrupted. Application state is not handed off or preserved across HMR. Do not add React providers, component effects, cache entries, WeakMaps, module locals, or UI observers as competing Game lifecycle owners, and never allow UI components to create/reload the Game.
+`GameEngineResourceFx` owns renderer-wide installed-package identity and same-package single-flight only. `EditorBoardGameResource` separately owns at most one revision-pinned, discard-only editor game. `GameSession` remains the canonical runtime owner in both cases and the save owner only for installed games. Explicit named route operations release or reset the exact installed resource; the editor project route and canonical repository publications drive the editor owner. Acquisition, destructive cleanup, revision replacement, save recovery, and process shutdown continue under their owning Effect resource. Application state is not handed off or preserved across HMR. A React `GameEngineProvider` may inject an already-owned exact facade into shared gameplay UI, but React providers, component effects, Atoms, caches, WeakMaps, module locals, and UI observers must not create, replace, dispose, or mirror a Game.
 
 Ordinary asynchronous UI commands stay standalone in their owning UI domain:
 

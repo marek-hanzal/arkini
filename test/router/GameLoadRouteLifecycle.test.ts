@@ -1,13 +1,18 @@
 // @vitest-environment jsdom
 
 import { createMemoryHistory, createRouter, RouterProvider } from "@tanstack/react-router";
-import { Effect } from "effect";
+import { Deferred, Effect, SubscriptionRef } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { routeTree } from "~/_route";
 import type { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
+import {
+	EditorBoardGameResourceOwnerAtom,
+	type EditorBoardGameResource,
+} from "~/bridge/editor/board/EditorBoardGameResource";
 import type { Game } from "~/bridge/game/Game";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
 import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
@@ -69,7 +74,7 @@ const createHarness = (initialPath: string) => {
 			}),
 		createResourceFx: (selectedPackageId) =>
 			(createGameFxMock(selectedPackageId) as Effect.Effect<Game, unknown>).pipe(
-				Effect.flatMap(createGameEngineResourceFx),
+				Effect.flatMap((game) => createGameEngineResourceFx(game)),
 			),
 	});
 	runtimes.push(rendererRuntime);
@@ -89,6 +94,25 @@ const createHarness = (initialPath: string) => {
 		rendererRuntime,
 		router,
 	};
+};
+
+const installEditorBoardGameOwner = (
+	rendererRuntime: ReturnType<typeof createTestRendererRuntime>["rendererRuntime"],
+	releaseCurrentFx: EditorBoardGameResource["releaseCurrentFx"],
+) => {
+	const state = Effect.runSync(
+		SubscriptionRef.make<EditorBoardGameResource.State>({
+			type: "idle",
+		}),
+	);
+	const owner = {
+		state,
+		syncFx: () => Effect.void,
+		releaseFx: () => Effect.void,
+		releaseCurrentFx,
+		shutdownFx: Effect.void,
+	} satisfies EditorBoardGameResource;
+	rendererRuntime.runSync(Atom.set(EditorBoardGameResourceOwnerAtom, owner));
 };
 
 const loadRoute = async (router: ReturnType<typeof createHarness>["router"]) => {
@@ -172,6 +196,83 @@ afterEach(async () => {
 });
 
 describe("game load action lifecycle", () => {
+	it("waits for editor-game disposal before creating the installed Game", async () => {
+		const releaseStarted = Effect.runSync(Deferred.make<void>());
+		const releaseGate = Effect.runSync(Deferred.make<void>());
+		const game = createGame();
+		createGameFxMock.mockReturnValue(Effect.succeed(game));
+		const { rendererRuntime, router } = createHarness(`/action/load-game/${packageId}`);
+		installEditorBoardGameOwner(
+			rendererRuntime,
+			Deferred.succeed(releaseStarted, undefined).pipe(
+				Effect.andThen(Deferred.await(releaseGate)),
+			),
+		);
+
+		const loading = router.load();
+		await Effect.runPromise(Deferred.await(releaseStarted));
+
+		expect(createGameFxMock).not.toHaveBeenCalled();
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
+
+		Effect.runSync(Deferred.succeed(releaseGate, undefined));
+		await vi.waitFor(() => expect(createGameFxMock).toHaveBeenCalledOnce());
+		await vi.advanceTimersByTimeAsync(2_500);
+		await loading;
+
+		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack).toBe(
+			game.arkpack,
+		);
+	});
+
+	it("refuses package creation after failed editor disposal and permits a clean retry", async () => {
+		const releaseError = new Error("editor disposal failed");
+		const game = createGame();
+		let releaseAttempts = 0;
+		createGameFxMock.mockReturnValue(Effect.succeed(game));
+		const { rendererRuntime, router } = createHarness(`/action/load-game/${packageId}`);
+		installEditorBoardGameOwner(
+			rendererRuntime,
+			Effect.suspend(() => {
+				releaseAttempts += 1;
+				return releaseAttempts === 1 ? Effect.fail(releaseError) : Effect.void;
+			}),
+		);
+
+		const loading = router.load();
+		await vi.advanceTimersByTimeAsync(2_500);
+		await loading;
+		const container = await renderRouter(router);
+
+		expect(createGameFxMock).not.toHaveBeenCalled();
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
+		expect(container.querySelector('[data-ui="ActionErrorPage"]')).not.toBeNull();
+
+		await act(async () => {
+			await router.navigate({
+				to: "/main-menu",
+				replace: true,
+			});
+			const retry = router.navigate({
+				to: "/action/load-game/$packageId",
+				params: {
+					packageId,
+				},
+				replace: true,
+			});
+			await vi.waitFor(() => expect(createGameFxMock).toHaveBeenCalledOnce());
+			await vi.advanceTimersByTimeAsync(2_500);
+			await retry;
+		});
+
+		expect(releaseAttempts).toBe(2);
+		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack).toBe(
+			game.arkpack,
+		);
+	});
+
 	it("creates one stable Game before redirecting the explicit load action to Board", async () => {
 		const game = createGame();
 		createGameFxMock.mockReturnValue(Effect.succeed(game));

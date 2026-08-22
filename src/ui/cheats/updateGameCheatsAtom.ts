@@ -4,7 +4,7 @@ import { match } from "ts-pattern";
 
 import { setCheatEnabledAtom } from "~/bridge/cheat/setCheatEnabledAtom";
 import { setInstantGameplayAtom } from "~/bridge/cheat/setInstantGameplayAtom";
-import type { Game } from "~/bridge/game/Game";
+import type { PlayableGame } from "~/bridge/game/PlayableGame";
 import { makeExactGameAtomFamilyFx } from "~/bridge/game/makeExactGameAtomFamilyFx";
 import { settleRendererCommandFailureFx } from "~/bridge/game/settleRendererCommandFailureFx";
 
@@ -52,7 +52,7 @@ export namespace updateGameCheatsAtom {
  * the registry remains the sole pending/result truth.
  */
 export const updateGameCheatsAtom = Effect.runSync(
-	makeExactGameAtomFamilyFx((game: Game) => {
+	makeExactGameAtomFamilyFx((game: PlayableGame) => {
 		const stateAtom = Atom.make<updateGameCheatsAtom.State>({
 			kind: "idle",
 		}).pipe(Atom.setIdleTTL(0));

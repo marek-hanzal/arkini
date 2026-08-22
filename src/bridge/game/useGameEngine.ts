@@ -1,9 +1,10 @@
-import { getRouteApi } from "@tanstack/react-router";
+import { useContext } from "react";
 
-const gameRouteApi = getRouteApi("/game/$packageId");
+import { GameEngineContext } from "~/bridge/game/GameEngineContext";
 
-/** Reads the exact Game Engine pinned by the active parent route context. */
-export const useGameEngine = () =>
-	gameRouteApi.useRouteContext({
-		select: (context) => context.gameEngine,
-	});
+/** Reads the exact Game Engine published by the active gameplay owner. */
+export const useGameEngine = () => {
+	const game = useContext(GameEngineContext);
+	if (game === undefined) throw new Error("Game Engine provider is missing.");
+	return game;
+};

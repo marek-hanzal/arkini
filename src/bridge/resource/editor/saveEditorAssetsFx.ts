@@ -1,9 +1,8 @@
 import { Effect } from "effect";
-import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
 import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
+import { publishEditorProjectFx } from "~/bridge/editor/publishEditorProjectFx";
 import {
 	type EditorAssetFileInput,
 	validateEditorAssetFileFx,
@@ -52,7 +51,7 @@ export const saveEditorAssetsFx = Effect.fn("saveEditorAssetsFx")(function* ({
 				projectId,
 				resources,
 			});
-			yield* Atom.set(EditorProjectAtom(projectId), {
+			yield* publishEditorProjectFx(projectId, {
 				project,
 			});
 			return {

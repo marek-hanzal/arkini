@@ -1,11 +1,9 @@
-import { GameBoardLayout } from "~/ui/board/GameBoardLayout";
-import { GameCheatItemSpotlight } from "~/ui/cheat-spotlight/GameCheatItemSpotlight";
+import { PlayableBoard } from "~/ui/game/PlayableBoard";
 
-export function GamePage() {
-	return (
-		<>
-			<GameBoardLayout />
-			<GameCheatItemSpotlight />
-		</>
-	);
+export function GamePage({
+	onOpenInventory,
+}: {
+	readonly onOpenInventory: () => void | PromiseLike<void>;
+}) {
+	return <PlayableBoard onOpenInventory={onOpenInventory} />;
 }

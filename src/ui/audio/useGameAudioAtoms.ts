@@ -2,7 +2,7 @@ import { Cause, Effect, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { useMemo } from "react";
 
-import type { Game } from "~/bridge/game/Game";
+import type { PlayableGame } from "~/bridge/game/PlayableGame";
 import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 import type { useGameEvents } from "~/bridge/event/useGameEvents";
 import type { createGameAudioSynthFx } from "~/ui/audio/createGameAudioSynthFx";
@@ -13,7 +13,10 @@ export namespace useGameAudioAtoms {
 }
 
 /** Owns one exact Game/createSynth audio resource and its interruptible commands. */
-export const useGameAudioAtoms = (game: Game, createSynthFx: useGameAudioAtoms.CreateSynthFx) =>
+export const useGameAudioAtoms = (
+	game: PlayableGame,
+	createSynthFx: useGameAudioAtoms.CreateSynthFx,
+) =>
 	useMemo(() => {
 		const synthAtom = Atom.make(
 			Effect.acquireRelease(

@@ -1,5 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
+import { releaseEditorBoardGameFx } from "~/bridge/editor/board/releaseEditorBoardGameFx";
+import { syncEditorBoardGameFx } from "~/bridge/editor/board/syncEditorBoardGameFx";
 import { readEditorProjectFx } from "~/bridge/editor/readEditorProjectFx";
 import { EditorProjectErrorPage } from "~/page/editor/EditorProjectErrorPage";
 import { EditorProjectShellPage } from "~/page/editor/EditorProjectShellPage";
@@ -35,6 +37,21 @@ export const Route = createFileRoute("/editor/$projectId")({
 				},
 			),
 		staleReloadMode: "blocking",
+	},
+	onEnter: ({ context, loaderData }) => {
+		if (loaderData === undefined) return;
+		void context.rendererRuntime
+			.runPromise(syncEditorBoardGameFx(loaderData))
+			.catch((cause) =>
+				console.error("Arkini editor Board game could not be started.", cause),
+			);
+	},
+	onLeave: ({ context, params }) => {
+		void context.rendererRuntime
+			.runPromise(releaseEditorBoardGameFx(params.projectId))
+			.catch((cause) =>
+				console.error("Arkini editor Board game could not be released.", cause),
+			);
 	},
 	shouldReload: ({ cause }) => cause === "enter",
 	component: EditorProjectRoute,

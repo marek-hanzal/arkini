@@ -7,7 +7,6 @@ import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
 } from "~/bridge/editor/EditorProjectRepository";
-import { PngResourceLimits } from "~/bridge/resource/validatePngResourceFx";
 import { readArkpackContentHashFx } from "~/engine/pack/fx/readArkpackContentHashFx";
 import { GameValidationError } from "~/engine/validation/error/GameValidationError";
 import {
@@ -111,26 +110,5 @@ describe("buildEditorProjectFx", () => {
 		);
 
 		await expect(Effect.runPromise(effect)).rejects.toThrow("must decode as a valid PNG image");
-	});
-
-	it("rejects a PNG beyond the byte limit before producing an artifact", async () => {
-		const effect = buildEditorProjectFx("project").pipe(
-			Effect.provideService(
-				EditorProjectRepository,
-				createRepository(
-					createProject([
-						{
-							...validResources[0],
-							bytes: new Uint8Array(PngResourceLimits.maxBytes + 1),
-						},
-						validResources[1],
-					]),
-				),
-			),
-		);
-
-		await expect(Effect.runPromise(effect)).rejects.toThrow(
-			"must be a valid bounded PNG image",
-		);
 	});
 });

@@ -12,7 +12,7 @@ Arkini is a client-only, offline merge and production game built around a determ
 
 ## Current status
 
-The engine, compiler, validator, binary packer, deterministic Tick model, runtime session speed control, jobs, queueing, reservations, placement, persistence boundary, and live React bridge are implemented and covered by the repository check gate.
+The engine, compiler, validator, binary packer, deterministic Tick model, persisted Instant gameplay control, jobs, queueing, reservations, placement, persistence boundary, and live React bridge are implemented and covered by the repository check gate.
 
 The client uses [TanStack Router](https://tanstack.com/router/latest/docs/overview) file-based routing. `/` owns a one-renderer-session startup splash and authoritative launcher bootstrap; `/main-menu`, `/arkpacks`, `/settings`, and `/about` are explicit launcher leaves. `/game/$packageId` is a non-visual resource boundary and `/game/$packageId/board` is the explicit gameplay page; every blocking leave/reset/exit operation is its own `action/*` leaf with a loader-owned lifecycle and standalone Hero pending page; recoverable bootstrap errors stay local while critical leave/reset/ownership failures replace the renderer through one root fatal boundary. Official Arkini and validated imported packages share one root-owned catalog backed by Electron storage. One scoped Effect service owns the identity, acquisition, adoption, replacement, finalization, and recovery state of the renderer-wide `GameEngineResource`; canonical gameplay state remains inside `GameSession`, and UI reads the exact parent route loader value through `useGameEngine()` without a React-owned gameplay mirror.
 

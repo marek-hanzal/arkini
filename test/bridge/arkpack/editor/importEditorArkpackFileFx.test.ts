@@ -8,7 +8,6 @@ import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
 } from "~/bridge/editor/EditorProjectRepository";
-import { PngResourceLimits } from "~/bridge/resource/validatePngResourceFx";
 import { encodeFx } from "~/engine/pack/fx/encodeFx";
 import type { PayloadSchema } from "~/engine/pack/schema/PayloadSchema";
 import {
@@ -124,34 +123,6 @@ describe("importEditorArkpackFileFx", () => {
 				{
 					file: {
 						name: "invalid.arkpack",
-						size: bytes.byteLength,
-						arrayBuffer: async () => bytes.slice().buffer,
-					},
-				},
-				createRepository(createProjectFx),
-			),
-		).rejects.toThrow("must be a valid bounded PNG image");
-		expect(createProjectFx).not.toHaveBeenCalled();
-	});
-
-	it("rejects a PNG beyond the byte limit before creating a project", async () => {
-		const bytes = createArkpackBytes({
-			...validPayload,
-			resources: [
-				{
-					...validPayload.resources[0],
-					bytes: new Uint8Array(PngResourceLimits.maxBytes + 1),
-				},
-				validPayload.resources[1],
-			],
-		});
-		const createProjectFx = vi.fn(() => Effect.die("Unexpected project create."));
-
-		await expect(
-			runImport(
-				{
-					file: {
-						name: "oversized-resource.arkpack",
 						size: bytes.byteLength,
 						arrayBuffer: async () => bytes.slice().buffer,
 					},

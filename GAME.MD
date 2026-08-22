@@ -277,9 +277,9 @@ Temporary items are board-only, non-stackable identities with fixed-step `remain
 
 Cheat mode and Instant gameplay are persisted switches in `runtime.cheats`, not authored item kinds or session timing modes. `setInstantGameplayFx()` atomically changes the option. While both cheat behavior and Instant gameplay are enabled, valid jobs and temporary-item lifetimes settle through the authoritative engine without waiting for their authored wall-clock durations; Tick itself remains one unscaled 100 ms fixed-step system.
 
-Hard reset is renderer-owned lifecycle intent. It discards the exact live Game without a final save, clears only that package/content-hash save, and creates a fresh Game; no authored destructive item or gameplay mutation owns persisted-state deletion. The singleton Inventory opener remains an authored item with one canonical `open-inventory` primary action and opens the standard renderer modal with its isolated Pixi scene without inventing gameplay state.
+Hard reset is renderer-owned lifecycle intent. It discards the exact live Game without a final save, clears only that package/content-hash save, and creates a fresh Game; no authored destructive item or gameplay mutation owns persisted-state deletion. The singleton Inventory opener remains an authored item with one canonical `open-inventory` primary action and opens the routed Inventory leaf with its isolated Pixi scene without inventing gameplay state.
 
-Tile interaction has no double-click gesture. An unmodified click executes the canonical primary action immediately; `Shift+click` opens Item Detail without executing that primary action.
+Tile interaction has no double-click gesture. In the Board + Toolbar scene, left click executes the canonical primary action, `Ctrl+left click` fills a line owner's remaining default-line queue, `Shift+left click` splits a Board stack, and right click opens Item Detail without executing another action. In the routed Inventory scene, left click releases the selected item and right click opens Item Detail.
 
 A capability is runtime-backed only when it has an owned command or Tick path and behavioral tests. Schema presence alone is not implementation.
 

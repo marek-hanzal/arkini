@@ -306,7 +306,7 @@ UI passes only the selected source and target identities. It never chooses the r
 Validation covers more than Zod shape parsing. It includes, among other rules:
 
 - duplicate providers and records;
-- exact item/category/line references;
+- exact item and line references;
 - selector and condition references;
 - output references;
 - input charge payer and affordability constraints;

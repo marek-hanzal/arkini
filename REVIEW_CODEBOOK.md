@@ -528,9 +528,12 @@ Review:
 - menu/dialog interaction authority;
 - stale drag/drop and target replacement.
 
-Primary tile/item click is immediate. `Shift+click` opens Item Detail. Arkini
-does not use double-click gestures; do not reintroduce a delayed single-click
-timer or a competing double-click owner.
+Primary tile/item click is immediate. In the Board + Toolbar scene, `Ctrl+left
+click` fills a line owner's remaining default-line queue, `Shift+left click`
+splits a Board stack, and right click opens Item Detail. In the routed Inventory
+scene, left click releases the selected item and right click opens Item Detail.
+Arkini does not use double-click gestures; do not reintroduce a delayed
+single-click timer or a competing double-click owner.
 
 ### 6.9 Animation quality
 

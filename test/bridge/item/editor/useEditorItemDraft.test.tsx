@@ -46,39 +46,40 @@ afterEach(async () => {
 });
 
 describe("useEditorItemDraft", () => {
-	it.each(
-		EditorItemTypes,
-	)("creates one schema-valid %s local form seed after required copy is entered", async (type) => {
-		const uid = `draft-${type}`;
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-		await act(async () => {
-			root.render(
-				createElement(
-					EditorProjectContext.Provider,
-					{
-						value: project,
-					},
-					createElement(DraftProbe, {
-						type,
-						uid,
-					}),
-				),
-			);
-		});
-		const draft = JSON.parse(
-			container.querySelector("output")?.textContent ?? "null",
-		) as EditorItem;
-		const parsed = ItemSchema.safeParse({
-			...draft,
-			title: `New ${type}`,
-			description: `A new ${type} item.`,
-		});
+	it.each(EditorItemTypes)(
+		"creates one schema-valid %s local form seed after required copy is entered",
+		async (type) => {
+			const uid = `draft-${type}`;
+			const container = document.createElement("div");
+			document.body.append(container);
+			const root = createRoot(container);
+			roots.push(root);
+			await act(async () => {
+				root.render(
+					createElement(
+						EditorProjectContext.Provider,
+						{
+							value: project,
+						},
+						createElement(DraftProbe, {
+							type,
+							uid,
+						}),
+					),
+				);
+			});
+			const draft = JSON.parse(
+				container.querySelector("output")?.textContent ?? "null",
+			) as EditorItem;
+			const parsed = ItemSchema.safeParse({
+				...draft,
+				title: `New ${type}`,
+				description: `A new ${type} item.`,
+			});
 
-		expect(parsed.success).toBe(true);
-		expect(draft.uid).toBe(uid);
-		expect(draft.type).toBe(type);
-	});
+			expect(parsed.success).toBe(true);
+			expect(draft.uid).toBe(uid);
+			expect(draft.type).toBe(type);
+		},
+	);
 });

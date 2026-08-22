@@ -9,103 +9,73 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from "./@routes/__root"
-import { Route as EditorRouteImport } from "./@routes/editor"
-import { Route as LauncherRouteImport } from "./@routes/_launcher"
 import { Route as IndexRouteImport } from "./@routes/index"
-import { Route as GamePackageIdRouteImport } from "./@routes/game/$packageId"
-import { Route as EditorWelcomeRouteImport } from "./@routes/editor/welcome"
-import { Route as EditorProjectIdRouteImport } from "./@routes/editor/$projectId"
-import { Route as ActionRecoverGameSaveRouteImport } from "./@routes/action/recover-game-save"
-import { Route as ActionDiscardFailedGameRouteImport } from "./@routes/action/discard-failed-game"
-import { Route as LauncherSettingsRouteImport } from "./@routes/_launcher/settings"
-import { Route as LauncherMainMenuRouteImport } from "./@routes/_launcher/main-menu"
-import { Route as LauncherArkpacksRouteImport } from "./@routes/_launcher/arkpacks"
+import { Route as LauncherRouteImport } from "./@routes/_launcher"
+import { Route as EditorRouteImport } from "./@routes/editor"
 import { Route as LauncherAboutRouteImport } from "./@routes/_launcher/about"
-import { Route as GamePackageIdCheatsRouteImport } from "./@routes/game/$packageId/cheats"
-import { Route as GamePackageIdSceneRouteImport } from "./@routes/game/$packageId/_scene"
-import { Route as EditorProjectIdProjectRouteImport } from "./@routes/editor/$projectId/project"
-import { Route as EditorProjectIdFlowRouteImport } from "./@routes/editor/$projectId/flow"
-import { Route as EditorProjectIdEstimateRouteImport } from "./@routes/editor/$projectId/estimate"
-import { Route as EditorProjectIdEditorRouteImport } from "./@routes/editor/$projectId/editor"
-import { Route as EditorProjectIdBuildRouteImport } from "./@routes/editor/$projectId/build"
-import { Route as EditorProjectIdBoardRouteImport } from "./@routes/editor/$projectId/board"
-import { Route as EditorProjectIdAssetsRouteImport } from "./@routes/editor/$projectId/assets"
+import { Route as LauncherArkpacksRouteImport } from "./@routes/_launcher/arkpacks"
+import { Route as LauncherMainMenuRouteImport } from "./@routes/_launcher/main-menu"
+import { Route as LauncherSettingsRouteImport } from "./@routes/_launcher/settings"
+import { Route as ActionDiscardFailedGameRouteImport } from "./@routes/action/discard-failed-game"
+import { Route as ActionRecoverGameSaveRouteImport } from "./@routes/action/recover-game-save"
+import { Route as EditorProjectIdRouteImport } from "./@routes/editor/$projectId"
+import { Route as EditorWelcomeRouteImport } from "./@routes/editor/welcome"
+import { Route as GamePackageIdRouteImport } from "./@routes/game/$packageId"
 import { Route as ActionLoadGamePackageIdRouteImport } from "./@routes/action/load-game/$packageId"
-import { Route as EditorProjectIdProjectIndexRouteImport } from "./@routes/editor/$projectId/project/index"
-import { Route as EditorProjectIdEditorIndexRouteImport } from "./@routes/editor/$projectId/editor/index"
+import { Route as EditorProjectIdAssetsRouteImport } from "./@routes/editor/$projectId/assets"
+import { Route as EditorProjectIdBoardRouteImport } from "./@routes/editor/$projectId/board"
+import { Route as EditorProjectIdBuildRouteImport } from "./@routes/editor/$projectId/build"
+import { Route as EditorProjectIdEditorRouteImport } from "./@routes/editor/$projectId/editor"
+import { Route as EditorProjectIdEstimateRouteImport } from "./@routes/editor/$projectId/estimate"
+import { Route as EditorProjectIdFlowRouteImport } from "./@routes/editor/$projectId/flow"
+import { Route as EditorProjectIdProjectRouteImport } from "./@routes/editor/$projectId/project"
+import { Route as GamePackageIdSceneRouteImport } from "./@routes/game/$packageId/_scene"
+import { Route as GamePackageIdCheatsRouteImport } from "./@routes/game/$packageId/cheats"
 import { Route as EditorProjectIdAssetsIndexRouteImport } from "./@routes/editor/$projectId/assets/index"
-import { Route as GamePackageIdActionResetRouteImport } from "./@routes/game/$packageId/action/reset"
-import { Route as GamePackageIdActionLeaveRouteImport } from "./@routes/game/$packageId/action/leave"
-import { Route as GamePackageIdActionExitRouteImport } from "./@routes/game/$packageId/action/exit"
-import { Route as GamePackageIdSceneInventoryRouteImport } from "./@routes/game/$packageId/_scene/inventory"
-import { Route as GamePackageIdSceneBoardRouteImport } from "./@routes/game/$packageId/_scene/board"
-import { Route as EditorProjectIdProjectSectionIdRouteImport } from "./@routes/editor/$projectId/project/$sectionId"
-import { Route as EditorProjectIdEditorItemsRouteImport } from "./@routes/editor/$projectId/editor/items"
 import { Route as EditorProjectIdAssetsResourceIdRouteImport } from "./@routes/editor/$projectId/assets/$resourceId"
-import { Route as EditorProjectIdEditorItemsNewRouteImport } from "./@routes/editor/$projectId/editor/items/new"
-import { Route as EditorProjectIdEditorItemsListRouteImport } from "./@routes/editor/$projectId/editor/items/list"
-import { Route as EditorProjectIdEditorItemsItemUidRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid"
-import { Route as EditorProjectIdAssetsResourceIdEditRouteImport } from "./@routes/editor/$projectId/assets/$resourceId/edit"
+import { Route as EditorProjectIdEditorIndexRouteImport } from "./@routes/editor/$projectId/editor/index"
+import { Route as EditorProjectIdEditorItemsRouteImport } from "./@routes/editor/$projectId/editor/items"
+import { Route as EditorProjectIdProjectIndexRouteImport } from "./@routes/editor/$projectId/project/index"
+import { Route as EditorProjectIdProjectSectionIdRouteImport } from "./@routes/editor/$projectId/project/$sectionId"
+import { Route as GamePackageIdSceneBoardRouteImport } from "./@routes/game/$packageId/_scene/board"
+import { Route as GamePackageIdSceneInventoryRouteImport } from "./@routes/game/$packageId/_scene/inventory"
+import { Route as GamePackageIdActionExitRouteImport } from "./@routes/game/$packageId/action/exit"
+import { Route as GamePackageIdActionLeaveRouteImport } from "./@routes/game/$packageId/action/leave"
+import { Route as GamePackageIdActionResetRouteImport } from "./@routes/game/$packageId/action/reset"
 import { Route as EditorProjectIdAssetsResourceIdDetailRouteImport } from "./@routes/editor/$projectId/assets/$resourceId/detail"
+import { Route as EditorProjectIdAssetsResourceIdEditRouteImport } from "./@routes/editor/$projectId/assets/$resourceId/edit"
+import { Route as EditorProjectIdEditorItemsItemUidRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid"
+import { Route as EditorProjectIdEditorItemsListRouteImport } from "./@routes/editor/$projectId/editor/items/list"
+import { Route as EditorProjectIdEditorItemsNewRouteImport } from "./@routes/editor/$projectId/editor/items/new"
 import { Route as EditorProjectIdAssetsResourceIdDetailIndexRouteImport } from "./@routes/editor/$projectId/assets/$resourceId/detail/index"
-import { Route as EditorProjectIdEditorItemsNewSelectRouteImport } from "./@routes/editor/$projectId/editor/items/new/select"
-import { Route as EditorProjectIdEditorItemsItemUidViewRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/view"
-import { Route as EditorProjectIdEditorItemsItemUidFormRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/form"
-import { Route as EditorProjectIdEditorItemsItemUidDetailRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/detail"
-import { Route as EditorProjectIdAssetsResourceIdDetailUsageRouteImport } from "./@routes/editor/$projectId/assets/$resourceId/detail/usage"
-import { Route as EditorProjectIdAssetsResourceIdDetailTechnicalRouteImport } from "./@routes/editor/$projectId/assets/$resourceId/detail/technical"
 import { Route as EditorProjectIdAssetsResourceIdDetailOverviewRouteImport } from "./@routes/editor/$projectId/assets/$resourceId/detail/overview"
+import { Route as EditorProjectIdAssetsResourceIdDetailTechnicalRouteImport } from "./@routes/editor/$projectId/assets/$resourceId/detail/technical"
+import { Route as EditorProjectIdAssetsResourceIdDetailUsageRouteImport } from "./@routes/editor/$projectId/assets/$resourceId/detail/usage"
+import { Route as EditorProjectIdEditorItemsItemUidDetailRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/detail"
+import { Route as EditorProjectIdEditorItemsItemUidFormRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/form"
+import { Route as EditorProjectIdEditorItemsItemUidViewRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/view"
+import { Route as EditorProjectIdEditorItemsNewSelectRouteImport } from "./@routes/editor/$projectId/editor/items/new/select"
 import { Route as EditorProjectIdEditorItemsItemUidDetailIndexRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/detail/index"
-import { Route as EditorProjectIdEditorItemsItemUidFormSectionIdRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/form/$sectionId"
 import { Route as EditorProjectIdEditorItemsItemUidDetailSectionIdRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
+import { Route as EditorProjectIdEditorItemsItemUidFormSectionIdRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/form/$sectionId"
 
-const EditorRoute = EditorRouteImport.update({
-  id: "/editor",
-  path: "/editor",
+const IndexRoute = IndexRouteImport.update({
+  id: "/",
+  path: "/",
   getParentRoute: () => rootRouteImport,
 } as any)
 const LauncherRoute = LauncherRouteImport.update({
   id: "/_launcher",
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+const EditorRoute = EditorRouteImport.update({
+  id: "/editor",
+  path: "/editor",
   getParentRoute: () => rootRouteImport,
 } as any)
-const GamePackageIdRoute = GamePackageIdRouteImport.update({
-  id: "/game/$packageId",
-  path: "/game/$packageId",
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EditorWelcomeRoute = EditorWelcomeRouteImport.update({
-  id: "/welcome",
-  path: "/welcome",
-  getParentRoute: () => EditorRoute,
-} as any)
-const EditorProjectIdRoute = EditorProjectIdRouteImport.update({
-  id: "/$projectId",
-  path: "/$projectId",
-  getParentRoute: () => EditorRoute,
-} as any)
-const ActionRecoverGameSaveRoute = ActionRecoverGameSaveRouteImport.update({
-  id: "/action/recover-game-save",
-  path: "/action/recover-game-save",
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ActionDiscardFailedGameRoute = ActionDiscardFailedGameRouteImport.update({
-  id: "/action/discard-failed-game",
-  path: "/action/discard-failed-game",
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LauncherSettingsRoute = LauncherSettingsRouteImport.update({
-  id: "/settings",
-  path: "/settings",
-  getParentRoute: () => LauncherRoute,
-} as any)
-const LauncherMainMenuRoute = LauncherMainMenuRouteImport.update({
-  id: "/main-menu",
-  path: "/main-menu",
+const LauncherAboutRoute = LauncherAboutRouteImport.update({
+  id: "/about",
+  path: "/about",
   getParentRoute: () => LauncherRoute,
 } as any)
 const LauncherArkpacksRoute = LauncherArkpacksRouteImport.update({
@@ -113,43 +83,49 @@ const LauncherArkpacksRoute = LauncherArkpacksRouteImport.update({
   path: "/arkpacks",
   getParentRoute: () => LauncherRoute,
 } as any)
-const LauncherAboutRoute = LauncherAboutRouteImport.update({
-  id: "/about",
-  path: "/about",
+const LauncherMainMenuRoute = LauncherMainMenuRouteImport.update({
+  id: "/main-menu",
+  path: "/main-menu",
   getParentRoute: () => LauncherRoute,
 } as any)
-const GamePackageIdCheatsRoute = GamePackageIdCheatsRouteImport.update({
-  id: "/cheats",
-  path: "/cheats",
-  getParentRoute: () => GamePackageIdRoute,
+const LauncherSettingsRoute = LauncherSettingsRouteImport.update({
+  id: "/settings",
+  path: "/settings",
+  getParentRoute: () => LauncherRoute,
 } as any)
-const GamePackageIdSceneRoute = GamePackageIdSceneRouteImport.update({
-  id: "/_scene",
-  getParentRoute: () => GamePackageIdRoute,
+const ActionDiscardFailedGameRoute = ActionDiscardFailedGameRouteImport.update({
+  id: "/action/discard-failed-game",
+  path: "/action/discard-failed-game",
+  getParentRoute: () => rootRouteImport,
 } as any)
-const EditorProjectIdProjectRoute = EditorProjectIdProjectRouteImport.update({
-  id: "/project",
-  path: "/project",
-  getParentRoute: () => EditorProjectIdRoute,
+const ActionRecoverGameSaveRoute = ActionRecoverGameSaveRouteImport.update({
+  id: "/action/recover-game-save",
+  path: "/action/recover-game-save",
+  getParentRoute: () => rootRouteImport,
 } as any)
-const EditorProjectIdFlowRoute = EditorProjectIdFlowRouteImport.update({
-  id: "/flow",
-  path: "/flow",
-  getParentRoute: () => EditorProjectIdRoute,
+const EditorProjectIdRoute = EditorProjectIdRouteImport.update({
+  id: "/$projectId",
+  path: "/$projectId",
+  getParentRoute: () => EditorRoute,
 } as any)
-const EditorProjectIdEstimateRoute = EditorProjectIdEstimateRouteImport.update({
-  id: "/estimate",
-  path: "/estimate",
-  getParentRoute: () => EditorProjectIdRoute,
+const EditorWelcomeRoute = EditorWelcomeRouteImport.update({
+  id: "/welcome",
+  path: "/welcome",
+  getParentRoute: () => EditorRoute,
 } as any)
-const EditorProjectIdEditorRoute = EditorProjectIdEditorRouteImport.update({
-  id: "/editor",
-  path: "/editor",
-  getParentRoute: () => EditorProjectIdRoute,
+const GamePackageIdRoute = GamePackageIdRouteImport.update({
+  id: "/game/$packageId",
+  path: "/game/$packageId",
+  getParentRoute: () => rootRouteImport,
 } as any)
-const EditorProjectIdBuildRoute = EditorProjectIdBuildRouteImport.update({
-  id: "/build",
-  path: "/build",
+const ActionLoadGamePackageIdRoute = ActionLoadGamePackageIdRouteImport.update({
+  id: "/action/load-game/$packageId",
+  path: "/action/load-game/$packageId",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EditorProjectIdAssetsRoute = EditorProjectIdAssetsRouteImport.update({
+  id: "/assets",
+  path: "/assets",
   getParentRoute: () => EditorProjectIdRoute,
 } as any)
 const EditorProjectIdBoardRoute = EditorProjectIdBoardRouteImport.update({
@@ -157,73 +133,45 @@ const EditorProjectIdBoardRoute = EditorProjectIdBoardRouteImport.update({
   path: "/board",
   getParentRoute: () => EditorProjectIdRoute,
 } as any)
-const EditorProjectIdAssetsRoute = EditorProjectIdAssetsRouteImport.update({
-  id: "/assets",
-  path: "/assets",
+const EditorProjectIdBuildRoute = EditorProjectIdBuildRouteImport.update({
+  id: "/build",
+  path: "/build",
   getParentRoute: () => EditorProjectIdRoute,
 } as any)
-const ActionLoadGamePackageIdRoute = ActionLoadGamePackageIdRouteImport.update({
-  id: "/action/load-game/$packageId",
-  path: "/action/load-game/$packageId",
-  getParentRoute: () => rootRouteImport,
+const EditorProjectIdEditorRoute = EditorProjectIdEditorRouteImport.update({
+  id: "/editor",
+  path: "/editor",
+  getParentRoute: () => EditorProjectIdRoute,
 } as any)
-const EditorProjectIdProjectIndexRoute =
-  EditorProjectIdProjectIndexRouteImport.update({
-    id: "/",
-    path: "/",
-    getParentRoute: () => EditorProjectIdProjectRoute,
-  } as any)
-const EditorProjectIdEditorIndexRoute =
-  EditorProjectIdEditorIndexRouteImport.update({
-    id: "/",
-    path: "/",
-    getParentRoute: () => EditorProjectIdEditorRoute,
-  } as any)
+const EditorProjectIdEstimateRoute = EditorProjectIdEstimateRouteImport.update({
+  id: "/estimate",
+  path: "/estimate",
+  getParentRoute: () => EditorProjectIdRoute,
+} as any)
+const EditorProjectIdFlowRoute = EditorProjectIdFlowRouteImport.update({
+  id: "/flow",
+  path: "/flow",
+  getParentRoute: () => EditorProjectIdRoute,
+} as any)
+const EditorProjectIdProjectRoute = EditorProjectIdProjectRouteImport.update({
+  id: "/project",
+  path: "/project",
+  getParentRoute: () => EditorProjectIdRoute,
+} as any)
+const GamePackageIdSceneRoute = GamePackageIdSceneRouteImport.update({
+  id: "/_scene",
+  getParentRoute: () => GamePackageIdRoute,
+} as any)
+const GamePackageIdCheatsRoute = GamePackageIdCheatsRouteImport.update({
+  id: "/cheats",
+  path: "/cheats",
+  getParentRoute: () => GamePackageIdRoute,
+} as any)
 const EditorProjectIdAssetsIndexRoute =
   EditorProjectIdAssetsIndexRouteImport.update({
     id: "/",
     path: "/",
     getParentRoute: () => EditorProjectIdAssetsRoute,
-  } as any)
-const GamePackageIdActionResetRoute =
-  GamePackageIdActionResetRouteImport.update({
-    id: "/action/reset",
-    path: "/action/reset",
-    getParentRoute: () => GamePackageIdRoute,
-  } as any)
-const GamePackageIdActionLeaveRoute =
-  GamePackageIdActionLeaveRouteImport.update({
-    id: "/action/leave",
-    path: "/action/leave",
-    getParentRoute: () => GamePackageIdRoute,
-  } as any)
-const GamePackageIdActionExitRoute = GamePackageIdActionExitRouteImport.update({
-  id: "/action/exit",
-  path: "/action/exit",
-  getParentRoute: () => GamePackageIdRoute,
-} as any)
-const GamePackageIdSceneInventoryRoute =
-  GamePackageIdSceneInventoryRouteImport.update({
-    id: "/inventory",
-    path: "/inventory",
-    getParentRoute: () => GamePackageIdSceneRoute,
-  } as any)
-const GamePackageIdSceneBoardRoute = GamePackageIdSceneBoardRouteImport.update({
-  id: "/board",
-  path: "/board",
-  getParentRoute: () => GamePackageIdSceneRoute,
-} as any)
-const EditorProjectIdProjectSectionIdRoute =
-  EditorProjectIdProjectSectionIdRouteImport.update({
-    id: "/$sectionId",
-    path: "/$sectionId",
-    getParentRoute: () => EditorProjectIdProjectRoute,
-  } as any)
-const EditorProjectIdEditorItemsRoute =
-  EditorProjectIdEditorItemsRouteImport.update({
-    id: "/items",
-    path: "/items",
-    getParentRoute: () => EditorProjectIdEditorRoute,
   } as any)
 const EditorProjectIdAssetsResourceIdRoute =
   EditorProjectIdAssetsResourceIdRouteImport.update({
@@ -231,10 +179,74 @@ const EditorProjectIdAssetsResourceIdRoute =
     path: "/$resourceId",
     getParentRoute: () => EditorProjectIdAssetsRoute,
   } as any)
-const EditorProjectIdEditorItemsNewRoute =
-  EditorProjectIdEditorItemsNewRouteImport.update({
-    id: "/new",
-    path: "/new",
+const EditorProjectIdEditorIndexRoute =
+  EditorProjectIdEditorIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => EditorProjectIdEditorRoute,
+  } as any)
+const EditorProjectIdEditorItemsRoute =
+  EditorProjectIdEditorItemsRouteImport.update({
+    id: "/items",
+    path: "/items",
+    getParentRoute: () => EditorProjectIdEditorRoute,
+  } as any)
+const EditorProjectIdProjectIndexRoute =
+  EditorProjectIdProjectIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => EditorProjectIdProjectRoute,
+  } as any)
+const EditorProjectIdProjectSectionIdRoute =
+  EditorProjectIdProjectSectionIdRouteImport.update({
+    id: "/$sectionId",
+    path: "/$sectionId",
+    getParentRoute: () => EditorProjectIdProjectRoute,
+  } as any)
+const GamePackageIdSceneBoardRoute = GamePackageIdSceneBoardRouteImport.update({
+  id: "/board",
+  path: "/board",
+  getParentRoute: () => GamePackageIdSceneRoute,
+} as any)
+const GamePackageIdSceneInventoryRoute =
+  GamePackageIdSceneInventoryRouteImport.update({
+    id: "/inventory",
+    path: "/inventory",
+    getParentRoute: () => GamePackageIdSceneRoute,
+  } as any)
+const GamePackageIdActionExitRoute = GamePackageIdActionExitRouteImport.update({
+  id: "/action/exit",
+  path: "/action/exit",
+  getParentRoute: () => GamePackageIdRoute,
+} as any)
+const GamePackageIdActionLeaveRoute =
+  GamePackageIdActionLeaveRouteImport.update({
+    id: "/action/leave",
+    path: "/action/leave",
+    getParentRoute: () => GamePackageIdRoute,
+  } as any)
+const GamePackageIdActionResetRoute =
+  GamePackageIdActionResetRouteImport.update({
+    id: "/action/reset",
+    path: "/action/reset",
+    getParentRoute: () => GamePackageIdRoute,
+  } as any)
+const EditorProjectIdAssetsResourceIdDetailRoute =
+  EditorProjectIdAssetsResourceIdDetailRouteImport.update({
+    id: "/detail",
+    path: "/detail",
+    getParentRoute: () => EditorProjectIdAssetsResourceIdRoute,
+  } as any)
+const EditorProjectIdAssetsResourceIdEditRoute =
+  EditorProjectIdAssetsResourceIdEditRouteImport.update({
+    id: "/edit",
+    path: "/edit",
+    getParentRoute: () => EditorProjectIdAssetsResourceIdRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidRoute =
+  EditorProjectIdEditorItemsItemUidRouteImport.update({
+    id: "/$itemUid",
+    path: "/$itemUid",
     getParentRoute: () => EditorProjectIdEditorItemsRoute,
   } as any)
 const EditorProjectIdEditorItemsListRoute =
@@ -243,64 +255,16 @@ const EditorProjectIdEditorItemsListRoute =
     path: "/list",
     getParentRoute: () => EditorProjectIdEditorItemsRoute,
   } as any)
-const EditorProjectIdEditorItemsItemUidRoute =
-  EditorProjectIdEditorItemsItemUidRouteImport.update({
-    id: "/$itemUid",
-    path: "/$itemUid",
+const EditorProjectIdEditorItemsNewRoute =
+  EditorProjectIdEditorItemsNewRouteImport.update({
+    id: "/new",
+    path: "/new",
     getParentRoute: () => EditorProjectIdEditorItemsRoute,
-  } as any)
-const EditorProjectIdAssetsResourceIdEditRoute =
-  EditorProjectIdAssetsResourceIdEditRouteImport.update({
-    id: "/edit",
-    path: "/edit",
-    getParentRoute: () => EditorProjectIdAssetsResourceIdRoute,
-  } as any)
-const EditorProjectIdAssetsResourceIdDetailRoute =
-  EditorProjectIdAssetsResourceIdDetailRouteImport.update({
-    id: "/detail",
-    path: "/detail",
-    getParentRoute: () => EditorProjectIdAssetsResourceIdRoute,
   } as any)
 const EditorProjectIdAssetsResourceIdDetailIndexRoute =
   EditorProjectIdAssetsResourceIdDetailIndexRouteImport.update({
     id: "/",
     path: "/",
-    getParentRoute: () => EditorProjectIdAssetsResourceIdDetailRoute,
-  } as any)
-const EditorProjectIdEditorItemsNewSelectRoute =
-  EditorProjectIdEditorItemsNewSelectRouteImport.update({
-    id: "/select",
-    path: "/select",
-    getParentRoute: () => EditorProjectIdEditorItemsNewRoute,
-  } as any)
-const EditorProjectIdEditorItemsItemUidViewRoute =
-  EditorProjectIdEditorItemsItemUidViewRouteImport.update({
-    id: "/view",
-    path: "/view",
-    getParentRoute: () => EditorProjectIdEditorItemsItemUidRoute,
-  } as any)
-const EditorProjectIdEditorItemsItemUidFormRoute =
-  EditorProjectIdEditorItemsItemUidFormRouteImport.update({
-    id: "/form",
-    path: "/form",
-    getParentRoute: () => EditorProjectIdEditorItemsItemUidRoute,
-  } as any)
-const EditorProjectIdEditorItemsItemUidDetailRoute =
-  EditorProjectIdEditorItemsItemUidDetailRouteImport.update({
-    id: "/detail",
-    path: "/detail",
-    getParentRoute: () => EditorProjectIdEditorItemsItemUidRoute,
-  } as any)
-const EditorProjectIdAssetsResourceIdDetailUsageRoute =
-  EditorProjectIdAssetsResourceIdDetailUsageRouteImport.update({
-    id: "/usage",
-    path: "/usage",
-    getParentRoute: () => EditorProjectIdAssetsResourceIdDetailRoute,
-  } as any)
-const EditorProjectIdAssetsResourceIdDetailTechnicalRoute =
-  EditorProjectIdAssetsResourceIdDetailTechnicalRouteImport.update({
-    id: "/technical",
-    path: "/technical",
     getParentRoute: () => EditorProjectIdAssetsResourceIdDetailRoute,
   } as any)
 const EditorProjectIdAssetsResourceIdDetailOverviewRoute =
@@ -309,10 +273,52 @@ const EditorProjectIdAssetsResourceIdDetailOverviewRoute =
     path: "/overview",
     getParentRoute: () => EditorProjectIdAssetsResourceIdDetailRoute,
   } as any)
+const EditorProjectIdAssetsResourceIdDetailTechnicalRoute =
+  EditorProjectIdAssetsResourceIdDetailTechnicalRouteImport.update({
+    id: "/technical",
+    path: "/technical",
+    getParentRoute: () => EditorProjectIdAssetsResourceIdDetailRoute,
+  } as any)
+const EditorProjectIdAssetsResourceIdDetailUsageRoute =
+  EditorProjectIdAssetsResourceIdDetailUsageRouteImport.update({
+    id: "/usage",
+    path: "/usage",
+    getParentRoute: () => EditorProjectIdAssetsResourceIdDetailRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidDetailRoute =
+  EditorProjectIdEditorItemsItemUidDetailRouteImport.update({
+    id: "/detail",
+    path: "/detail",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidFormRoute =
+  EditorProjectIdEditorItemsItemUidFormRouteImport.update({
+    id: "/form",
+    path: "/form",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidViewRoute =
+  EditorProjectIdEditorItemsItemUidViewRouteImport.update({
+    id: "/view",
+    path: "/view",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidRoute,
+  } as any)
+const EditorProjectIdEditorItemsNewSelectRoute =
+  EditorProjectIdEditorItemsNewSelectRouteImport.update({
+    id: "/select",
+    path: "/select",
+    getParentRoute: () => EditorProjectIdEditorItemsNewRoute,
+  } as any)
 const EditorProjectIdEditorItemsItemUidDetailIndexRoute =
   EditorProjectIdEditorItemsItemUidDetailIndexRouteImport.update({
     id: "/",
     path: "/",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidDetailRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidDetailSectionIdRoute =
+  EditorProjectIdEditorItemsItemUidDetailSectionIdRouteImport.update({
+    id: "/$sectionId",
+    path: "/$sectionId",
     getParentRoute: () => EditorProjectIdEditorItemsItemUidDetailRoute,
   } as any)
 const EditorProjectIdEditorItemsItemUidFormSectionIdRoute =
@@ -320,12 +326,6 @@ const EditorProjectIdEditorItemsItemUidFormSectionIdRoute =
     id: "/$sectionId",
     path: "/$sectionId",
     getParentRoute: () => EditorProjectIdEditorItemsItemUidFormRoute,
-  } as any)
-const EditorProjectIdEditorItemsItemUidDetailSectionIdRoute =
-  EditorProjectIdEditorItemsItemUidDetailSectionIdRouteImport.update({
-    id: "/$sectionId",
-    path: "/$sectionId",
-    getParentRoute: () => EditorProjectIdEditorItemsItemUidDetailRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -632,11 +632,11 @@ export interface RootRouteChildren {
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    "/editor": {
-      id: "/editor"
-      path: "/editor"
-      fullPath: "/editor"
-      preLoaderRoute: typeof EditorRouteImport
+    "/": {
+      id: "/"
+      path: "/"
+      fullPath: "/"
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     "/_launcher": {
@@ -646,60 +646,18 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof LauncherRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/": {
-      id: "/"
-      path: "/"
-      fullPath: "/"
-      preLoaderRoute: typeof IndexRouteImport
+    "/editor": {
+      id: "/editor"
+      path: "/editor"
+      fullPath: "/editor"
+      preLoaderRoute: typeof EditorRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/game/$packageId": {
-      id: "/game/$packageId"
-      path: "/game/$packageId"
-      fullPath: "/game/$packageId"
-      preLoaderRoute: typeof GamePackageIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    "/editor/welcome": {
-      id: "/editor/welcome"
-      path: "/welcome"
-      fullPath: "/editor/welcome"
-      preLoaderRoute: typeof EditorWelcomeRouteImport
-      parentRoute: typeof EditorRoute
-    }
-    "/editor/$projectId": {
-      id: "/editor/$projectId"
-      path: "/$projectId"
-      fullPath: "/editor/$projectId"
-      preLoaderRoute: typeof EditorProjectIdRouteImport
-      parentRoute: typeof EditorRoute
-    }
-    "/action/recover-game-save": {
-      id: "/action/recover-game-save"
-      path: "/action/recover-game-save"
-      fullPath: "/action/recover-game-save"
-      preLoaderRoute: typeof ActionRecoverGameSaveRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    "/action/discard-failed-game": {
-      id: "/action/discard-failed-game"
-      path: "/action/discard-failed-game"
-      fullPath: "/action/discard-failed-game"
-      preLoaderRoute: typeof ActionDiscardFailedGameRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    "/_launcher/settings": {
-      id: "/_launcher/settings"
-      path: "/settings"
-      fullPath: "/settings"
-      preLoaderRoute: typeof LauncherSettingsRouteImport
-      parentRoute: typeof LauncherRoute
-    }
-    "/_launcher/main-menu": {
-      id: "/_launcher/main-menu"
-      path: "/main-menu"
-      fullPath: "/main-menu"
-      preLoaderRoute: typeof LauncherMainMenuRouteImport
+    "/_launcher/about": {
+      id: "/_launcher/about"
+      path: "/about"
+      fullPath: "/about"
+      preLoaderRoute: typeof LauncherAboutRouteImport
       parentRoute: typeof LauncherRoute
     }
     "/_launcher/arkpacks": {
@@ -709,60 +667,67 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof LauncherArkpacksRouteImport
       parentRoute: typeof LauncherRoute
     }
-    "/_launcher/about": {
-      id: "/_launcher/about"
-      path: "/about"
-      fullPath: "/about"
-      preLoaderRoute: typeof LauncherAboutRouteImport
+    "/_launcher/main-menu": {
+      id: "/_launcher/main-menu"
+      path: "/main-menu"
+      fullPath: "/main-menu"
+      preLoaderRoute: typeof LauncherMainMenuRouteImport
       parentRoute: typeof LauncherRoute
     }
-    "/game/$packageId/cheats": {
-      id: "/game/$packageId/cheats"
-      path: "/cheats"
-      fullPath: "/game/$packageId/cheats"
-      preLoaderRoute: typeof GamePackageIdCheatsRouteImport
-      parentRoute: typeof GamePackageIdRoute
+    "/_launcher/settings": {
+      id: "/_launcher/settings"
+      path: "/settings"
+      fullPath: "/settings"
+      preLoaderRoute: typeof LauncherSettingsRouteImport
+      parentRoute: typeof LauncherRoute
     }
-    "/game/$packageId/_scene": {
-      id: "/game/$packageId/_scene"
-      path: ""
+    "/action/discard-failed-game": {
+      id: "/action/discard-failed-game"
+      path: "/action/discard-failed-game"
+      fullPath: "/action/discard-failed-game"
+      preLoaderRoute: typeof ActionDiscardFailedGameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/action/recover-game-save": {
+      id: "/action/recover-game-save"
+      path: "/action/recover-game-save"
+      fullPath: "/action/recover-game-save"
+      preLoaderRoute: typeof ActionRecoverGameSaveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/editor/$projectId": {
+      id: "/editor/$projectId"
+      path: "/$projectId"
+      fullPath: "/editor/$projectId"
+      preLoaderRoute: typeof EditorProjectIdRouteImport
+      parentRoute: typeof EditorRoute
+    }
+    "/editor/welcome": {
+      id: "/editor/welcome"
+      path: "/welcome"
+      fullPath: "/editor/welcome"
+      preLoaderRoute: typeof EditorWelcomeRouteImport
+      parentRoute: typeof EditorRoute
+    }
+    "/game/$packageId": {
+      id: "/game/$packageId"
+      path: "/game/$packageId"
       fullPath: "/game/$packageId"
-      preLoaderRoute: typeof GamePackageIdSceneRouteImport
-      parentRoute: typeof GamePackageIdRoute
+      preLoaderRoute: typeof GamePackageIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    "/editor/$projectId/project": {
-      id: "/editor/$projectId/project"
-      path: "/project"
-      fullPath: "/editor/$projectId/project"
-      preLoaderRoute: typeof EditorProjectIdProjectRouteImport
-      parentRoute: typeof EditorProjectIdRoute
+    "/action/load-game/$packageId": {
+      id: "/action/load-game/$packageId"
+      path: "/action/load-game/$packageId"
+      fullPath: "/action/load-game/$packageId"
+      preLoaderRoute: typeof ActionLoadGamePackageIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    "/editor/$projectId/flow": {
-      id: "/editor/$projectId/flow"
-      path: "/flow"
-      fullPath: "/editor/$projectId/flow"
-      preLoaderRoute: typeof EditorProjectIdFlowRouteImport
-      parentRoute: typeof EditorProjectIdRoute
-    }
-    "/editor/$projectId/estimate": {
-      id: "/editor/$projectId/estimate"
-      path: "/estimate"
-      fullPath: "/editor/$projectId/estimate"
-      preLoaderRoute: typeof EditorProjectIdEstimateRouteImport
-      parentRoute: typeof EditorProjectIdRoute
-    }
-    "/editor/$projectId/editor": {
-      id: "/editor/$projectId/editor"
-      path: "/editor"
-      fullPath: "/editor/$projectId/editor"
-      preLoaderRoute: typeof EditorProjectIdEditorRouteImport
-      parentRoute: typeof EditorProjectIdRoute
-    }
-    "/editor/$projectId/build": {
-      id: "/editor/$projectId/build"
-      path: "/build"
-      fullPath: "/editor/$projectId/build"
-      preLoaderRoute: typeof EditorProjectIdBuildRouteImport
+    "/editor/$projectId/assets": {
+      id: "/editor/$projectId/assets"
+      path: "/assets"
+      fullPath: "/editor/$projectId/assets"
+      preLoaderRoute: typeof EditorProjectIdAssetsRouteImport
       parentRoute: typeof EditorProjectIdRoute
     }
     "/editor/$projectId/board": {
@@ -772,33 +737,54 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof EditorProjectIdBoardRouteImport
       parentRoute: typeof EditorProjectIdRoute
     }
-    "/editor/$projectId/assets": {
-      id: "/editor/$projectId/assets"
-      path: "/assets"
-      fullPath: "/editor/$projectId/assets"
-      preLoaderRoute: typeof EditorProjectIdAssetsRouteImport
+    "/editor/$projectId/build": {
+      id: "/editor/$projectId/build"
+      path: "/build"
+      fullPath: "/editor/$projectId/build"
+      preLoaderRoute: typeof EditorProjectIdBuildRouteImport
       parentRoute: typeof EditorProjectIdRoute
     }
-    "/action/load-game/$packageId": {
-      id: "/action/load-game/$packageId"
-      path: "/action/load-game/$packageId"
-      fullPath: "/action/load-game/$packageId"
-      preLoaderRoute: typeof ActionLoadGamePackageIdRouteImport
-      parentRoute: typeof rootRouteImport
+    "/editor/$projectId/editor": {
+      id: "/editor/$projectId/editor"
+      path: "/editor"
+      fullPath: "/editor/$projectId/editor"
+      preLoaderRoute: typeof EditorProjectIdEditorRouteImport
+      parentRoute: typeof EditorProjectIdRoute
     }
-    "/editor/$projectId/project/": {
-      id: "/editor/$projectId/project/"
-      path: "/"
-      fullPath: "/editor/$projectId/project/"
-      preLoaderRoute: typeof EditorProjectIdProjectIndexRouteImport
-      parentRoute: typeof EditorProjectIdProjectRoute
+    "/editor/$projectId/estimate": {
+      id: "/editor/$projectId/estimate"
+      path: "/estimate"
+      fullPath: "/editor/$projectId/estimate"
+      preLoaderRoute: typeof EditorProjectIdEstimateRouteImport
+      parentRoute: typeof EditorProjectIdRoute
     }
-    "/editor/$projectId/editor/": {
-      id: "/editor/$projectId/editor/"
-      path: "/"
-      fullPath: "/editor/$projectId/editor/"
-      preLoaderRoute: typeof EditorProjectIdEditorIndexRouteImport
-      parentRoute: typeof EditorProjectIdEditorRoute
+    "/editor/$projectId/flow": {
+      id: "/editor/$projectId/flow"
+      path: "/flow"
+      fullPath: "/editor/$projectId/flow"
+      preLoaderRoute: typeof EditorProjectIdFlowRouteImport
+      parentRoute: typeof EditorProjectIdRoute
+    }
+    "/editor/$projectId/project": {
+      id: "/editor/$projectId/project"
+      path: "/project"
+      fullPath: "/editor/$projectId/project"
+      preLoaderRoute: typeof EditorProjectIdProjectRouteImport
+      parentRoute: typeof EditorProjectIdRoute
+    }
+    "/game/$packageId/_scene": {
+      id: "/game/$packageId/_scene"
+      path: ""
+      fullPath: "/game/$packageId"
+      preLoaderRoute: typeof GamePackageIdSceneRouteImport
+      parentRoute: typeof GamePackageIdRoute
+    }
+    "/game/$packageId/cheats": {
+      id: "/game/$packageId/cheats"
+      path: "/cheats"
+      fullPath: "/game/$packageId/cheats"
+      preLoaderRoute: typeof GamePackageIdCheatsRouteImport
+      parentRoute: typeof GamePackageIdRoute
     }
     "/editor/$projectId/assets/": {
       id: "/editor/$projectId/assets/"
@@ -807,11 +793,60 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof EditorProjectIdAssetsIndexRouteImport
       parentRoute: typeof EditorProjectIdAssetsRoute
     }
-    "/game/$packageId/action/reset": {
-      id: "/game/$packageId/action/reset"
-      path: "/action/reset"
-      fullPath: "/game/$packageId/action/reset"
-      preLoaderRoute: typeof GamePackageIdActionResetRouteImport
+    "/editor/$projectId/assets/$resourceId": {
+      id: "/editor/$projectId/assets/$resourceId"
+      path: "/$resourceId"
+      fullPath: "/editor/$projectId/assets/$resourceId"
+      preLoaderRoute: typeof EditorProjectIdAssetsResourceIdRouteImport
+      parentRoute: typeof EditorProjectIdAssetsRoute
+    }
+    "/editor/$projectId/editor/": {
+      id: "/editor/$projectId/editor/"
+      path: "/"
+      fullPath: "/editor/$projectId/editor/"
+      preLoaderRoute: typeof EditorProjectIdEditorIndexRouteImport
+      parentRoute: typeof EditorProjectIdEditorRoute
+    }
+    "/editor/$projectId/editor/items": {
+      id: "/editor/$projectId/editor/items"
+      path: "/items"
+      fullPath: "/editor/$projectId/editor/items"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsRouteImport
+      parentRoute: typeof EditorProjectIdEditorRoute
+    }
+    "/editor/$projectId/project/": {
+      id: "/editor/$projectId/project/"
+      path: "/"
+      fullPath: "/editor/$projectId/project/"
+      preLoaderRoute: typeof EditorProjectIdProjectIndexRouteImport
+      parentRoute: typeof EditorProjectIdProjectRoute
+    }
+    "/editor/$projectId/project/$sectionId": {
+      id: "/editor/$projectId/project/$sectionId"
+      path: "/$sectionId"
+      fullPath: "/editor/$projectId/project/$sectionId"
+      preLoaderRoute: typeof EditorProjectIdProjectSectionIdRouteImport
+      parentRoute: typeof EditorProjectIdProjectRoute
+    }
+    "/game/$packageId/_scene/board": {
+      id: "/game/$packageId/_scene/board"
+      path: "/board"
+      fullPath: "/game/$packageId/board"
+      preLoaderRoute: typeof GamePackageIdSceneBoardRouteImport
+      parentRoute: typeof GamePackageIdSceneRoute
+    }
+    "/game/$packageId/_scene/inventory": {
+      id: "/game/$packageId/_scene/inventory"
+      path: "/inventory"
+      fullPath: "/game/$packageId/inventory"
+      preLoaderRoute: typeof GamePackageIdSceneInventoryRouteImport
+      parentRoute: typeof GamePackageIdSceneRoute
+    }
+    "/game/$packageId/action/exit": {
+      id: "/game/$packageId/action/exit"
+      path: "/action/exit"
+      fullPath: "/game/$packageId/action/exit"
+      preLoaderRoute: typeof GamePackageIdActionExitRouteImport
       parentRoute: typeof GamePackageIdRoute
     }
     "/game/$packageId/action/leave": {
@@ -821,53 +856,32 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof GamePackageIdActionLeaveRouteImport
       parentRoute: typeof GamePackageIdRoute
     }
-    "/game/$packageId/action/exit": {
-      id: "/game/$packageId/action/exit"
-      path: "/action/exit"
-      fullPath: "/game/$packageId/action/exit"
-      preLoaderRoute: typeof GamePackageIdActionExitRouteImport
+    "/game/$packageId/action/reset": {
+      id: "/game/$packageId/action/reset"
+      path: "/action/reset"
+      fullPath: "/game/$packageId/action/reset"
+      preLoaderRoute: typeof GamePackageIdActionResetRouteImport
       parentRoute: typeof GamePackageIdRoute
     }
-    "/game/$packageId/_scene/inventory": {
-      id: "/game/$packageId/_scene/inventory"
-      path: "/inventory"
-      fullPath: "/game/$packageId/inventory"
-      preLoaderRoute: typeof GamePackageIdSceneInventoryRouteImport
-      parentRoute: typeof GamePackageIdSceneRoute
+    "/editor/$projectId/assets/$resourceId/detail": {
+      id: "/editor/$projectId/assets/$resourceId/detail"
+      path: "/detail"
+      fullPath: "/editor/$projectId/assets/$resourceId/detail"
+      preLoaderRoute: typeof EditorProjectIdAssetsResourceIdDetailRouteImport
+      parentRoute: typeof EditorProjectIdAssetsResourceIdRoute
     }
-    "/game/$packageId/_scene/board": {
-      id: "/game/$packageId/_scene/board"
-      path: "/board"
-      fullPath: "/game/$packageId/board"
-      preLoaderRoute: typeof GamePackageIdSceneBoardRouteImport
-      parentRoute: typeof GamePackageIdSceneRoute
+    "/editor/$projectId/assets/$resourceId/edit": {
+      id: "/editor/$projectId/assets/$resourceId/edit"
+      path: "/edit"
+      fullPath: "/editor/$projectId/assets/$resourceId/edit"
+      preLoaderRoute: typeof EditorProjectIdAssetsResourceIdEditRouteImport
+      parentRoute: typeof EditorProjectIdAssetsResourceIdRoute
     }
-    "/editor/$projectId/project/$sectionId": {
-      id: "/editor/$projectId/project/$sectionId"
-      path: "/$sectionId"
-      fullPath: "/editor/$projectId/project/$sectionId"
-      preLoaderRoute: typeof EditorProjectIdProjectSectionIdRouteImport
-      parentRoute: typeof EditorProjectIdProjectRoute
-    }
-    "/editor/$projectId/editor/items": {
-      id: "/editor/$projectId/editor/items"
-      path: "/items"
-      fullPath: "/editor/$projectId/editor/items"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsRouteImport
-      parentRoute: typeof EditorProjectIdEditorRoute
-    }
-    "/editor/$projectId/assets/$resourceId": {
-      id: "/editor/$projectId/assets/$resourceId"
-      path: "/$resourceId"
-      fullPath: "/editor/$projectId/assets/$resourceId"
-      preLoaderRoute: typeof EditorProjectIdAssetsResourceIdRouteImport
-      parentRoute: typeof EditorProjectIdAssetsRoute
-    }
-    "/editor/$projectId/editor/items/new": {
-      id: "/editor/$projectId/editor/items/new"
-      path: "/new"
-      fullPath: "/editor/$projectId/editor/items/new"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsNewRouteImport
+    "/editor/$projectId/editor/items/$itemUid": {
+      id: "/editor/$projectId/editor/items/$itemUid"
+      path: "/$itemUid"
+      fullPath: "/editor/$projectId/editor/items/$itemUid"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidRouteImport
       parentRoute: typeof EditorProjectIdEditorItemsRoute
     }
     "/editor/$projectId/editor/items/list": {
@@ -877,74 +891,18 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof EditorProjectIdEditorItemsListRouteImport
       parentRoute: typeof EditorProjectIdEditorItemsRoute
     }
-    "/editor/$projectId/editor/items/$itemUid": {
-      id: "/editor/$projectId/editor/items/$itemUid"
-      path: "/$itemUid"
-      fullPath: "/editor/$projectId/editor/items/$itemUid"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidRouteImport
+    "/editor/$projectId/editor/items/new": {
+      id: "/editor/$projectId/editor/items/new"
+      path: "/new"
+      fullPath: "/editor/$projectId/editor/items/new"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsNewRouteImport
       parentRoute: typeof EditorProjectIdEditorItemsRoute
-    }
-    "/editor/$projectId/assets/$resourceId/edit": {
-      id: "/editor/$projectId/assets/$resourceId/edit"
-      path: "/edit"
-      fullPath: "/editor/$projectId/assets/$resourceId/edit"
-      preLoaderRoute: typeof EditorProjectIdAssetsResourceIdEditRouteImport
-      parentRoute: typeof EditorProjectIdAssetsResourceIdRoute
-    }
-    "/editor/$projectId/assets/$resourceId/detail": {
-      id: "/editor/$projectId/assets/$resourceId/detail"
-      path: "/detail"
-      fullPath: "/editor/$projectId/assets/$resourceId/detail"
-      preLoaderRoute: typeof EditorProjectIdAssetsResourceIdDetailRouteImport
-      parentRoute: typeof EditorProjectIdAssetsResourceIdRoute
     }
     "/editor/$projectId/assets/$resourceId/detail/": {
       id: "/editor/$projectId/assets/$resourceId/detail/"
       path: "/"
       fullPath: "/editor/$projectId/assets/$resourceId/detail/"
       preLoaderRoute: typeof EditorProjectIdAssetsResourceIdDetailIndexRouteImport
-      parentRoute: typeof EditorProjectIdAssetsResourceIdDetailRoute
-    }
-    "/editor/$projectId/editor/items/new/select": {
-      id: "/editor/$projectId/editor/items/new/select"
-      path: "/select"
-      fullPath: "/editor/$projectId/editor/items/new/select"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsNewSelectRouteImport
-      parentRoute: typeof EditorProjectIdEditorItemsNewRoute
-    }
-    "/editor/$projectId/editor/items/$itemUid/view": {
-      id: "/editor/$projectId/editor/items/$itemUid/view"
-      path: "/view"
-      fullPath: "/editor/$projectId/editor/items/$itemUid/view"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidViewRouteImport
-      parentRoute: typeof EditorProjectIdEditorItemsItemUidRoute
-    }
-    "/editor/$projectId/editor/items/$itemUid/form": {
-      id: "/editor/$projectId/editor/items/$itemUid/form"
-      path: "/form"
-      fullPath: "/editor/$projectId/editor/items/$itemUid/form"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidFormRouteImport
-      parentRoute: typeof EditorProjectIdEditorItemsItemUidRoute
-    }
-    "/editor/$projectId/editor/items/$itemUid/detail": {
-      id: "/editor/$projectId/editor/items/$itemUid/detail"
-      path: "/detail"
-      fullPath: "/editor/$projectId/editor/items/$itemUid/detail"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidDetailRouteImport
-      parentRoute: typeof EditorProjectIdEditorItemsItemUidRoute
-    }
-    "/editor/$projectId/assets/$resourceId/detail/usage": {
-      id: "/editor/$projectId/assets/$resourceId/detail/usage"
-      path: "/usage"
-      fullPath: "/editor/$projectId/assets/$resourceId/detail/usage"
-      preLoaderRoute: typeof EditorProjectIdAssetsResourceIdDetailUsageRouteImport
-      parentRoute: typeof EditorProjectIdAssetsResourceIdDetailRoute
-    }
-    "/editor/$projectId/assets/$resourceId/detail/technical": {
-      id: "/editor/$projectId/assets/$resourceId/detail/technical"
-      path: "/technical"
-      fullPath: "/editor/$projectId/assets/$resourceId/detail/technical"
-      preLoaderRoute: typeof EditorProjectIdAssetsResourceIdDetailTechnicalRouteImport
       parentRoute: typeof EditorProjectIdAssetsResourceIdDetailRoute
     }
     "/editor/$projectId/assets/$resourceId/detail/overview": {
@@ -954,11 +912,60 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof EditorProjectIdAssetsResourceIdDetailOverviewRouteImport
       parentRoute: typeof EditorProjectIdAssetsResourceIdDetailRoute
     }
+    "/editor/$projectId/assets/$resourceId/detail/technical": {
+      id: "/editor/$projectId/assets/$resourceId/detail/technical"
+      path: "/technical"
+      fullPath: "/editor/$projectId/assets/$resourceId/detail/technical"
+      preLoaderRoute: typeof EditorProjectIdAssetsResourceIdDetailTechnicalRouteImport
+      parentRoute: typeof EditorProjectIdAssetsResourceIdDetailRoute
+    }
+    "/editor/$projectId/assets/$resourceId/detail/usage": {
+      id: "/editor/$projectId/assets/$resourceId/detail/usage"
+      path: "/usage"
+      fullPath: "/editor/$projectId/assets/$resourceId/detail/usage"
+      preLoaderRoute: typeof EditorProjectIdAssetsResourceIdDetailUsageRouteImport
+      parentRoute: typeof EditorProjectIdAssetsResourceIdDetailRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/detail": {
+      id: "/editor/$projectId/editor/items/$itemUid/detail"
+      path: "/detail"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/detail"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidDetailRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/form": {
+      id: "/editor/$projectId/editor/items/$itemUid/form"
+      path: "/form"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/form"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidFormRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/view": {
+      id: "/editor/$projectId/editor/items/$itemUid/view"
+      path: "/view"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/view"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidViewRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidRoute
+    }
+    "/editor/$projectId/editor/items/new/select": {
+      id: "/editor/$projectId/editor/items/new/select"
+      path: "/select"
+      fullPath: "/editor/$projectId/editor/items/new/select"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsNewSelectRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsNewRoute
+    }
     "/editor/$projectId/editor/items/$itemUid/detail/": {
       id: "/editor/$projectId/editor/items/$itemUid/detail/"
       path: "/"
       fullPath: "/editor/$projectId/editor/items/$itemUid/detail/"
       preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidDetailIndexRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidDetailRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/detail/$sectionId": {
+      id: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
+      path: "/$sectionId"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidDetailSectionIdRouteImport
       parentRoute: typeof EditorProjectIdEditorItemsItemUidDetailRoute
     }
     "/editor/$projectId/editor/items/$itemUid/form/$sectionId": {
@@ -967,13 +974,6 @@ declare module "@tanstack/react-router" {
       fullPath: "/editor/$projectId/editor/items/$itemUid/form/$sectionId"
       preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidFormSectionIdRouteImport
       parentRoute: typeof EditorProjectIdEditorItemsItemUidFormRoute
-    }
-    "/editor/$projectId/editor/items/$itemUid/detail/$sectionId": {
-      id: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
-      path: "/$sectionId"
-      fullPath: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidDetailSectionIdRouteImport
-      parentRoute: typeof EditorProjectIdEditorItemsItemUidDetailRoute
     }
   }
 }

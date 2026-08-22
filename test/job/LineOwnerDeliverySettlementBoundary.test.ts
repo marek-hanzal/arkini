@@ -150,73 +150,76 @@ const spawnScenarioFx = Effect.fn("spawnLineOwnerDeliveryBoundaryScenarioFx")(fu
 });
 
 describe("line-owner delivery settlement boundary", () => {
-	it.each(
-		ownerKinds,
-	)("keeps queued %s work blocked by engine-owned delivery travel until the next Tick", (ownerKind) => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const ids = yield* spawnScenarioFx(ownerKind);
-				const request = yield* enqueueLineFx(ids);
-				yield* runTickRuntimeByFx({
-					elapsedMs: TickStepMs,
-				});
-				const traveling = yield* readRuntimeFx();
-				yield* runTickRuntimeByFx({
-					elapsedMs: TickStepMs * 2,
-				});
-				const settled = yield* readRuntimeFx();
-				yield* runTickRuntimeByFx({
-					elapsedMs: TickStepMs,
-				});
-				return {
-					finished: yield* readRuntimeFx(),
-					finishedTransition: yield* readCommittedTransitionFx(),
-					ids,
-					request,
-					settled,
-					traveling,
-				};
-			}).pipe(
-				useGameFx({
-					config,
-				}),
-			),
-		);
+	it.each(ownerKinds)(
+		"keeps queued %s work blocked by engine-owned delivery travel until the next Tick",
+		(ownerKind) => {
+			const result = Effect.runSync(
+				Effect.gen(function* () {
+					const ids = yield* spawnScenarioFx(ownerKind);
+					const request = yield* enqueueLineFx(ids);
+					yield* runTickRuntimeByFx({
+						elapsedMs: TickStepMs,
+					});
+					const traveling = yield* readRuntimeFx();
+					yield* runTickRuntimeByFx({
+						elapsedMs: TickStepMs * 2,
+					});
+					const settled = yield* readRuntimeFx();
+					yield* runTickRuntimeByFx({
+						elapsedMs: TickStepMs,
+					});
+					return {
+						finished: yield* readRuntimeFx(),
+						finishedTransition: yield* readCommittedTransitionFx(),
+						ids,
+						request,
+						settled,
+						traveling,
+					};
+				}).pipe(
+					useGameFx({
+						config,
+					}),
+				),
+			);
 
-		expect(result.traveling.jobs).toEqual([]);
-		expect(result.traveling.jobQueue).toEqual([
-			result.request,
-		]);
-		expect(
-			result.traveling.items.flatMap((item) =>
-				item.location.scope === "delivery"
-					? [
-							item.location.remainingDurationMs,
-						]
-					: [],
-			),
-		).toEqual([
-			200,
-			200,
-		]);
-		expect(result.settled.jobs).toEqual([]);
-		expect(result.settled.jobQueue).toEqual([
-			result.request,
-		]);
-		expect(result.settled.items.some((item) => item.location.scope === "delivery")).toBe(false);
-		expect(result.finished.jobQueue).toEqual([]);
-		expect(result.finished.jobs).toEqual([
-			expect.objectContaining({
-				lineId: result.ids.lineId,
-				ownerItemId: result.ids.ownerItemId,
-			}),
-		]);
-		expect(result.finishedTransition.events).toEqual(
-			expect.arrayContaining([
+			expect(result.traveling.jobs).toEqual([]);
+			expect(result.traveling.jobQueue).toEqual([
+				result.request,
+			]);
+			expect(
+				result.traveling.items.flatMap((item) =>
+					item.location.scope === "delivery"
+						? [
+								item.location.remainingDurationMs,
+							]
+						: [],
+				),
+			).toEqual([
+				200,
+				200,
+			]);
+			expect(result.settled.jobs).toEqual([]);
+			expect(result.settled.jobQueue).toEqual([
+				result.request,
+			]);
+			expect(result.settled.items.some((item) => item.location.scope === "delivery")).toBe(
+				false,
+			);
+			expect(result.finished.jobQueue).toEqual([]);
+			expect(result.finished.jobs).toEqual([
 				expect.objectContaining({
-					type: "job:started",
+					lineId: result.ids.lineId,
+					ownerItemId: result.ids.ownerItemId,
 				}),
-			]),
-		);
-	});
+			]);
+			expect(result.finishedTransition.events).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						type: "job:started",
+					}),
+				]),
+			);
+		},
+	);
 });

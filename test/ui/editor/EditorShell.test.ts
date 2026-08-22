@@ -384,6 +384,7 @@ describe("EditorShell", () => {
 		expect(projectLoader).not.toHaveBeenCalled();
 		expect(readLink(container, "Build").getAttribute("aria-current")).toBe("page");
 		expect(readLink(container, "Project").getAttribute("aria-current")).toBeNull();
+		expect(readLink(container, "Project").getAttribute("data-transitioning")).toBeNull();
 	});
 
 	it("keeps a dirty draft mounted when workspace navigation is canceled", async () => {
@@ -413,6 +414,7 @@ describe("EditorShell", () => {
 			"/editor/editor-test/editor/items/test/form/identity",
 		);
 		expect(container.textContent).toContain("Dirty item form");
+		expect(projectLink.getAttribute("data-transitioning")).toBeNull();
 	});
 
 	it("uses Cancel as the safe default for editor Exit and omits Save for an invalid draft", async () => {

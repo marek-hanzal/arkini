@@ -94,34 +94,37 @@ describe("Pixi main-scene drag controller: motion", () => {
 	it.each([
 		"spawn",
 		"swap",
-	] as const)("does not promote an exiting actor when %s completes between press and drag threshold", async () => {
-		const claims = new Map<string, "activation-only" | "handoff">([
-			[
-				item.id,
-				"handoff",
-			],
-		]);
-		const mounted = mountController({
-			interactionClaimByActorId: claims,
-		});
-		mounted.beginInteractionHandoff.mockReturnValueOnce(false);
+	] as const)(
+		"does not promote an exiting actor when %s completes between press and drag threshold",
+		async () => {
+			const claims = new Map<string, "activation-only" | "handoff">([
+				[
+					item.id,
+					"handoff",
+				],
+			]);
+			const mounted = mountController({
+				interactionClaimByActorId: claims,
+			});
+			mounted.beginInteractionHandoff.mockReturnValueOnce(false);
 
-		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-		claims.delete(item.id);
-		mounted.actors.delete(item.id);
-		mounted.canonicalItems.delete(item.id);
-		mounted.stage.emit("globalpointermove", pointer(30, 20));
-		mounted.stage.emit("pointerup", pointer(30, 20));
-		await flushMicrotasks();
+			mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+			claims.delete(item.id);
+			mounted.actors.delete(item.id);
+			mounted.canonicalItems.delete(item.id);
+			mounted.stage.emit("globalpointermove", pointer(30, 20));
+			mounted.stage.emit("pointerup", pointer(30, 20));
+			await flushMicrotasks();
 
-		expect(mounted.beginInteractionHandoff).not.toHaveBeenCalled();
-		expect(mounted.releasePointerCapture).toHaveBeenCalledWith(1);
-		expect(mounted.actor.dragging).toBe(false);
-		expect(mounted.transientActorLayer.addChild).not.toHaveBeenCalled();
-		expect(mounted.startCursorGrab).not.toHaveBeenCalled();
-		expect(mounted.onActivate).not.toHaveBeenCalled();
-		expect(mounted.onDrop).not.toHaveBeenCalled();
-	});
+			expect(mounted.beginInteractionHandoff).not.toHaveBeenCalled();
+			expect(mounted.releasePointerCapture).toHaveBeenCalledWith(1);
+			expect(mounted.actor.dragging).toBe(false);
+			expect(mounted.transientActorLayer.addChild).not.toHaveBeenCalled();
+			expect(mounted.startCursorGrab).not.toHaveBeenCalled();
+			expect(mounted.onActivate).not.toHaveBeenCalled();
+			expect(mounted.onDrop).not.toHaveBeenCalled();
+		},
+	);
 
 	it("leaves an active motion cue intact when its canonical actor disappears after press", async () => {
 		const claims = new Map<string, "activation-only" | "handoff">([

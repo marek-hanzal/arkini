@@ -10,12 +10,19 @@ import { RendererDevelopmentServer } from "./electron/security/RendererDevelopme
 import { createRendererDevelopmentContentSecurityPolicyFx } from "./electron/security/createRendererDevelopmentContentSecurityPolicyFx";
 import { ProjectOutputPaths } from "./shared/ProjectOutputPaths";
 
+const sourceAlias = {
+	"~": fileURLToPath(new URL("./src", import.meta.url)),
+};
+
 export default defineConfig(({ command }) => {
 	const developmentCspNonce =
 		command === "serve" ? randomBytes(18).toString("base64") : undefined;
 
 	return {
 		main: {
+			resolve: {
+				alias: sourceAlias,
+			},
 			build: {
 				externalizeDeps: false,
 				minify: true,
@@ -26,6 +33,9 @@ export default defineConfig(({ command }) => {
 			},
 		},
 		preload: {
+			resolve: {
+				alias: sourceAlias,
+			},
 			build: {
 				externalizeDeps: false,
 				minify: true,
@@ -67,9 +77,7 @@ export default defineConfig(({ command }) => {
 							cspNonce: developmentCspNonce,
 						},
 			resolve: {
-				alias: {
-					"~": fileURLToPath(new URL("./src", import.meta.url)),
-				},
+				alias: sourceAlias,
 			},
 			plugins: [
 				tanstackRouter({

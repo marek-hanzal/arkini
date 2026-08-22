@@ -403,34 +403,33 @@ describe("Pixi grid surface primitives", () => {
 				y: 0,
 			},
 		},
-	] as const)("rounds only the outer $kind slot corners that meet its surface outline", ({
-		expectedQuadratics,
-		kind,
-		slot,
-	}) => {
-		const graphics = new FakeGraphics();
-		const targetSurface = {
-			...surface,
-			height: kind === "toolbar" ? 30 : surface.height,
-			kind,
-			rows: kind === "toolbar" ? 1 : surface.rows,
-		} satisfies PixiGridSurfaceLayout;
+	] as const)(
+		"rounds only the outer $kind slot corners that meet its surface outline",
+		({ expectedQuadratics, kind, slot }) => {
+			const graphics = new FakeGraphics();
+			const targetSurface = {
+				...surface,
+				height: kind === "toolbar" ? 30 : surface.height,
+				kind,
+				rows: kind === "toolbar" ? 1 : surface.rows,
+			} satisfies PixiGridSurfaceLayout;
 
-		Effect.runSync(
-			drawPixiGridDropFeedbackFx({
-				color: 0xabcdef,
-				graphics: asGraphics(graphics),
-				slot,
-				surface: targetSurface,
-			}),
-		);
+			Effect.runSync(
+				drawPixiGridDropFeedbackFx({
+					color: 0xabcdef,
+					graphics: asGraphics(graphics),
+					slot,
+					surface: targetSurface,
+				}),
+			);
 
-		expect(graphics.calls.some(({ name }) => name === "rect")).toBe(false);
-		const roundedCorners = graphics.calls
-			.filter(({ name }) => name === "quadraticCurveTo")
-			.map(({ args }) => args)
-			.filter((args) => args[0] !== args[2] || args[1] !== args[3]);
-		expect(roundedCorners).toEqual(expectedQuadratics);
-		expect(graphics.calls.at(-3)?.name).toBe("closePath");
-	});
+			expect(graphics.calls.some(({ name }) => name === "rect")).toBe(false);
+			const roundedCorners = graphics.calls
+				.filter(({ name }) => name === "quadraticCurveTo")
+				.map(({ args }) => args)
+				.filter((args) => args[0] !== args[2] || args[1] !== args[3]);
+			expect(roundedCorners).toEqual(expectedQuadratics);
+			expect(graphics.calls.at(-3)?.name).toBe("closePath");
+		},
+	);
 });

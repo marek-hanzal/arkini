@@ -252,20 +252,20 @@ describe("readTileActorAssetSourceIdsFx", () => {
 			assetId: "asset:stage-3",
 			storedQuantity: 6,
 		},
-	])("selects $assetId for $storedQuantity of six required materials", ({
-		assetId,
-		storedQuantity,
-	}) => {
-		expect(
-			readAssetId(
-				runtime({
-					storedQuantity,
-				}),
-			),
-		).toEqual([
-			assetId,
-		]);
-	});
+	])(
+		"selects $assetId for $storedQuantity of six required materials",
+		({ assetId, storedQuantity }) => {
+			expect(
+				readAssetId(
+					runtime({
+						storedQuantity,
+					}),
+				),
+			).toEqual([
+				assetId,
+			]);
+		},
+	);
 
 	it("ignores buffered capacity above the required line quantity", () => {
 		expect(

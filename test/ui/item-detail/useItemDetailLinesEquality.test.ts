@@ -219,16 +219,15 @@ describe("useItemDetailLinesEquality", () => {
 			},
 			expected: '"intermediateItemTitle":"Advanced Blueprint"',
 		},
-	])("publishes a render-distinct projection when $name changes", async ({
-		expected,
-		next,
-		previous,
-	}) => {
-		const { output, rerender } = await renderProjection(makeProjection(previous));
+	])(
+		"publishes a render-distinct projection when $name changes",
+		async ({ expected, next, previous }) => {
+			const { output, rerender } = await renderProjection(makeProjection(previous));
 
-		await rerender(makeProjection(next));
+			await rerender(makeProjection(next));
 
-		expect(output?.dataset.selectionChanges).toBe("2");
-		expect(output?.dataset.reason).toContain(expected);
-	});
+			expect(output?.dataset.selectionChanges).toBe("2");
+			expect(output?.dataset.reason).toContain(expected);
+		},
+	);
 });

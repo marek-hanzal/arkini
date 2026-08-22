@@ -51,73 +51,74 @@ describe("splitBoardItemStackFx", () => {
 			retained: 3,
 			split: 2,
 		},
-	])("retains $retained of $quantity at the origin and places $split nearby", ({
-		quantity,
-		retained,
-		split,
-	}) => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const source = yield* spawnItemFx({
-					id: "runtime:source",
-					itemId: "material",
-					location: board(0),
-					quantity,
-				});
-				const command = yield* splitBoardItemStackFx({
-					itemId: source.id,
-					location: board(0),
-					revision: source.revision,
-				});
-				return {
-					command,
-					runtime: yield* readRuntimeFx(),
-					transition: yield* readCommittedTransitionFx(),
-				};
-			}).pipe(
-				useGameFx({
-					config: boardOnlyConfig,
-				}),
-			),
-		);
-
-		expect(result.command.sourceAfter).toMatchObject({
-			id: "runtime:source",
-			location: board(0),
-			quantity: retained,
-		});
-		expect(result.command.sourceAfter.revision).not.toBe(result.command.sourceBefore.revision);
-		expect(result.runtime.items).toHaveLength(2);
-		expect(result.runtime.items).toEqual(
-			expect.arrayContaining([
-				result.command.sourceAfter,
-				expect.objectContaining({
-					item: expect.objectContaining({
-						id: "material",
+	])(
+		"retains $retained of $quantity at the origin and places $split nearby",
+		({ quantity, retained, split }) => {
+			const result = Effect.runSync(
+				Effect.gen(function* () {
+					const source = yield* spawnItemFx({
+						id: "runtime:source",
+						itemId: "material",
+						location: board(0),
+						quantity,
+					});
+					const command = yield* splitBoardItemStackFx({
+						itemId: source.id,
+						location: board(0),
+						revision: source.revision,
+					});
+					return {
+						command,
+						runtime: yield* readRuntimeFx(),
+						transition: yield* readCommittedTransitionFx(),
+					};
+				}).pipe(
+					useGameFx({
+						config: boardOnlyConfig,
 					}),
+				),
+			);
+
+			expect(result.command.sourceAfter).toMatchObject({
+				id: "runtime:source",
+				location: board(0),
+				quantity: retained,
+			});
+			expect(result.command.sourceAfter.revision).not.toBe(
+				result.command.sourceBefore.revision,
+			);
+			expect(result.runtime.items).toHaveLength(2);
+			expect(result.runtime.items).toEqual(
+				expect.arrayContaining([
+					result.command.sourceAfter,
+					expect.objectContaining({
+						item: expect.objectContaining({
+							id: "material",
+						}),
+						location: board(1),
+						quantity: split,
+					}),
+				]),
+			);
+			expect(result.transition.events).toEqual([
+				{
+					type: GameEventEnumSchema.enum.ItemSplit,
+					itemId: "runtime:source",
+					canonicalItemId: "material",
+					location: board(0),
+					previousQuantity: quantity,
+					quantity: retained,
+				},
+				expect.objectContaining({
+					type: GameEventEnumSchema.enum.ItemSpawned,
+					canonicalItemId: "material",
+					originItemId: "runtime:source",
 					location: board(1),
 					quantity: split,
 				}),
-			]),
-		);
-		expect(result.transition.events).toEqual([
-			{
-				type: GameEventEnumSchema.enum.ItemSplit,
-				itemId: "runtime:source",
-				canonicalItemId: "material",
-				location: board(0),
-				previousQuantity: quantity,
-				quantity: retained,
-			},
-			expect.objectContaining({
-				type: GameEventEnumSchema.enum.ItemSpawned,
-				canonicalItemId: "material",
-				originItemId: "runtime:source",
-				location: board(1),
-				quantity: split,
-			}),
-		]);
-	});
+			]);
+		},
+	);
 
 	it("uses canonical stack-first placement without stacking the detached half back into itself", () => {
 		const result = Effect.runSync(

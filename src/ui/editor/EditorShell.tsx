@@ -7,6 +7,7 @@ import {
 	useSyncExternalStore,
 	type PropsWithChildren,
 } from "react";
+import { flushSync } from "react-dom";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { waitForEditorProjectWritesCommandAtom } from "~/bridge/editor/waitForEditorProjectWritesCommandAtom";
@@ -26,6 +27,15 @@ const activeTabProps = {
 	className: "border-accent bg-accent text-accent-contrast hover:bg-accent-hover",
 } as const;
 
+const readWorkspaceFromPathname = (
+	pathname: string,
+	projectId: string,
+): EditorWorkspaceId | undefined =>
+	EditorWorkspaceRoutes.find(({ matchTo }) => {
+		const workspacePath = matchTo.replace("$projectId", projectId);
+		return pathname === workspacePath || pathname.startsWith(`${workspacePath}/`);
+	})?.id;
+
 /** Keeps editor-wide navigation stable while child tools replace only the content surface. */
 export const EditorShell = ({ children }: PropsWithChildren) => {
 	const project = useEditorProject();
@@ -36,6 +46,7 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 	});
 	const activeWorkspace = useEditorActiveWorkspace(project.projectId);
 	const [exitPending, setExitPending] = useState(false);
+	const [transitioningWorkspace, setTransitioningWorkspace] = useState<EditorWorkspaceId>();
 	const params = {
 		projectId: project.projectId,
 	};
@@ -51,6 +62,25 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 	});
 
 	useEffect(() => window.arkini.lifecycle.onCloseFailed(() => setExitPending(false)), []);
+	useEffect(() => {
+		const unsubscribeBeforeNavigate = router.subscribe("onBeforeNavigate", ({ toLocation }) =>
+			flushSync(() =>
+				setTransitioningWorkspace(
+					readWorkspaceFromPathname(toLocation.pathname, project.projectId),
+				),
+			),
+		);
+		const unsubscribeResolved = router.subscribe("onResolved", () =>
+			setTransitioningWorkspace(undefined),
+		);
+		return () => {
+			unsubscribeBeforeNavigate();
+			unsubscribeResolved();
+		};
+	}, [
+		project.projectId,
+		router,
+	]);
 	const closeAndExit = useCallback(async () => {
 		if (exitPending) return;
 		setExitPending(true);
@@ -112,6 +142,9 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 								params={params}
 								aria-label={label}
 								data-workspace-id={id}
+								data-transitioning={
+									transitioningWorkspace === id ? "transitioning" : undefined
+								}
 								{...readTabProps(id)}
 							>
 								<span className={`${icon} size-5`} />

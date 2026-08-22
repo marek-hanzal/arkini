@@ -33,46 +33,53 @@ describe("Pixi spawn lifecycle", () => {
 			acquired: true,
 			label: "after",
 		},
-	])("closes a stack payload exactly once $label its first magnetic projection", ({
-		acquired,
-	}) => {
-		const { animations, canceledOwnerKeys, cue, magneticReleases, magneticUpdates, runtime } =
-			createStackHarness();
-		Effect.runSync(
-			runtime.enqueueFx([
+	])(
+		"closes a stack payload exactly once $label its first magnetic projection",
+		({ acquired }) => {
+			const {
+				animations,
+				canceledOwnerKeys,
 				cue,
-			]),
-		);
-		Effect.runSync(runtime.startFx);
-		const travel = animations.find(
-			(animation) => animation.channel === "pose" && animation.ownerKey === "motion:30:0",
-		);
-		if (travel?.channel !== "pose") throw new Error("Expected a stack payload travel.");
-		const transient = travel.actor;
-		const destroy = vi.spyOn(transient.container, "destroy");
-		if (acquired) samplePoseAnimation(travel, 0.2);
+				magneticReleases,
+				magneticUpdates,
+				runtime,
+			} = createStackHarness();
+			Effect.runSync(
+				runtime.enqueueFx([
+					cue,
+				]),
+			);
+			Effect.runSync(runtime.startFx);
+			const travel = animations.find(
+				(animation) => animation.channel === "pose" && animation.ownerKey === "motion:30:0",
+			);
+			if (travel?.channel !== "pose") throw new Error("Expected a stack payload travel.");
+			const transient = travel.actor;
+			const destroy = vi.spyOn(transient.container, "destroy");
+			if (acquired) samplePoseAnimation(travel, 0.2);
 
-		Effect.runSync(runtime.closeFx);
-		Effect.runSync(runtime.closeFx);
+			Effect.runSync(runtime.closeFx);
+			Effect.runSync(runtime.closeFx);
 
-		expect(canceledOwnerKeys).toContain("motion:30:0");
-		expect(transient.container.destroyed).toBe(true);
-		expect(destroy).toHaveBeenCalledOnce();
-		expect(magneticUpdates.length > 0).toBe(acquired);
-		expect(magneticReleases).toEqual(
-			acquired
-				? [
-						{
-							sourceActorId: transient.item.id,
-							sourceKind: "motion",
-						},
-					]
-				: [],
-		);
-		expect(Effect.runSync(runtime.readSnapshotFx).quantityPresentationByActorId).toEqual(
-			new Map(),
-		);
-	});
+			expect(canceledOwnerKeys).toContain("motion:30:0");
+			expect(transient.container.destroyed).toBe(true);
+			expect(destroy).toHaveBeenCalledOnce();
+			expect(magneticUpdates.length > 0).toBe(acquired);
+			expect(magneticReleases).toEqual(
+				acquired
+					? [
+							{
+								sourceActorId: transient.item.id,
+								sourceKind: "motion",
+							},
+						]
+					: [],
+			);
+			expect(Effect.runSync(runtime.readSnapshotFx).quantityPresentationByActorId).toEqual(
+				new Map(),
+			);
+		},
+	);
 
 	it("supersedes an unfinished spawn fade when the actor disappears at settlement", () => {
 		const actor = createActor("runtime:short-lived-spawn");

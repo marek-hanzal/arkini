@@ -16,6 +16,7 @@ export namespace createGameFx {
 	export interface Props {
 		packageId: string;
 		arkpackStorage?: ArkpackStorage;
+		runRendererEffect: installGameDiagnosticsFx.Props["runRendererEffect"];
 		saveStorage?: GameSaveStorage;
 	}
 }
@@ -29,6 +30,7 @@ export namespace createGameFx {
 export const createGameFx = Effect.fn("createGameFx")(function* ({
 	packageId,
 	arkpackStorage,
+	runRendererEffect,
 	saveStorage: providedSaveStorage,
 }: createGameFx.Props) {
 	const loaded = yield* loadArkpackFx({
@@ -124,27 +126,22 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 		const diagnostics = yield* installGameDiagnosticsFx({
 			arkpack: loaded.descriptor,
 			restored: state !== undefined,
+			runRendererEffect,
 			session: liveSession,
 		});
+		const closeDiagnosticsFx = (reason: "discarded" | "saved") =>
+			Effect.sync(() => diagnostics.close(reason)).pipe(Effect.catchCause(() => Effect.void));
 		return {
 			...liveSession,
 			arkpack: loaded.descriptor,
 			config: loaded.payload.config,
 			diagnosticSessionId: diagnostics.sessionId,
 			disposeFx: liveSession.disposeFx.pipe(
-				Effect.tap(() =>
-					Effect.sync(() => {
-						diagnostics.close("saved");
-					}),
-				),
+				Effect.tap(() => closeDiagnosticsFx("saved")),
 				Effect.andThen(releaseResourcesFx),
 			),
 			disposeWithoutSaveFx: liveSession.disposeWithoutSaveFx.pipe(
-				Effect.tap(() =>
-					Effect.sync(() => {
-						diagnostics.close("discarded");
-					}),
-				),
+				Effect.tap(() => closeDiagnosticsFx("discarded")),
 				Effect.andThen(releaseResourcesFx),
 			),
 			saveKey,

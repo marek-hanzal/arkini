@@ -273,11 +273,11 @@ Every line may omit output and every item type may be persistent or charged. Ite
 
 Temporary items are board-only, non-stackable identities with fixed-step `remainingDurationMs`. Creation initializes the full authored `durationMs`; save/restore preserves the remaining value. Tick owns progression and atomic expiry. Optional expiry output uses standard deterministic output plus scope-aware placement, and blocked output keeps the zero-duration item available for retry. Their board-bound lifetime makes them ineligible for material-input storage.
 
-### Utility item kinds
+### Cheats and utility controls
 
-Speed mode is runtime-backed as root session state. `toggleSpeedModeFx()` switches `runtime.session.speedMode` directly between `normal` and `accelerated`; it does not require, mutate, or derive truth from a speed-cheat item. Newly observed wall-clock time is fed into the same fixed-step engine at `1×` or `30×`. Explicit simulation advancement remains unscaled.
+Cheat mode and Instant gameplay are persisted switches in `runtime.cheats`, not authored item kinds or session timing modes. `setInstantGameplayFx()` atomically changes the option. While both cheat behavior and Instant gameplay are enabled, valid jobs and temporary-item lifetimes settle through the authoritative engine without waiting for their authored wall-clock durations; Tick itself remains one unscaled 100 ms fixed-step system.
 
-The authored speed-cheat item is only the player-facing control and asset projection for that global mode. Its first asset represents accelerated mode and its second asset represents normal mode. Cheat inventory is a Board sink backed by one atomic consume command and a committed removal-feedback event. Nuke activation emits an explicit confirmation request; confirmed deletion is performed by the renderer session and Electron storage boundary and never by deleting every live runtime item. The singleton Inventory opener has one canonical `open-inventory` primary action and opens the standard renderer modal with its isolated Pixi scene without inventing gameplay state.
+Hard reset is renderer-owned lifecycle intent. It discards the exact live Game without a final save, clears only that package/content-hash save, and creates a fresh Game; no authored destructive item or gameplay mutation owns persisted-state deletion. The singleton Inventory opener remains an authored item with one canonical `open-inventory` primary action and opens the standard renderer modal with its isolated Pixi scene without inventing gameplay state.
 
 Tile interaction has no double-click gesture. An unmodified click executes the canonical primary action immediately; `Shift+click` opens Item Detail without executing that primary action.
 
@@ -287,7 +287,7 @@ A capability is runtime-backed only when it has an owned command or Tick path an
 
 Serializable state contains live items, active jobs, and FIFO requests.
 
-Tick adapter timing and `runtime.session.speedMode` are session-only and are not persisted. Closing a session may discard a sub-step remainder smaller than one fixed step; loading or creating a session always starts speed mode at `normal`.
+Tick adapter observation state is session-only and is not persisted. Closing a session may discard a sub-step remainder smaller than one fixed step. Cheat switches, including Instant gameplay, are ordinary persisted runtime state.
 
 Restored jobs continue from persisted `remainingMs`. No due time is reconstructed from wall-clock history.
 

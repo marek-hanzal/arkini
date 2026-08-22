@@ -86,6 +86,8 @@ const runtime = (item: (typeof config.items)["stone"] | (typeof config.items)["m
 			},
 		],
 		jobs: [],
+		jobQueue: [],
+		defaultLineByOwnerItemId: {},
 	});
 
 const game = {

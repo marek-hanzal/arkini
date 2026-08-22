@@ -234,7 +234,7 @@ Import validates the compressed Arkpack through the normal size, trust, decode, 
 
 Item routes use immutable item UID leaves: `items/list`, explicit `items/$itemUid/detail/$sectionId` read-only leaves, and one `items/$itemUid/form/$sectionId` authoring flow for both new and persisted items; the legacy `view` entry only redirects into the current detail grammar. One canonical item-section taxonomy owns Identity, Artwork, Charges, Merges, Estimate, and type-owned Production. Flow has one global authored-graph surface rather than a second item-local subgraph model; item detail links open that graph focused on the item in either input or output direction. The form parent owns exactly one local TanStack Form session above its section outlet, so routed form leaves share values, dirty state, touched fields, and validation, while routed detail leaves read the canonical loaded item without creating another draft. Form Save validates the complete item schema and atomically upserts it into the canonical SQLite project by immutable UID; human-readable item IDs remain read-only after the first successful Save pending an explicit rename workflow. Project authoring likewise owns one local form session across General, Appearance, and Surfaces and one explicit form-native Project Save that atomically updates the canonical SQLite configuration. Asset Save validates bounded PNG bytes and atomically updates the project resource plus revision. There is no global staged project overlay, editor-wide Save-all operation, filesystem source-tree revision, source-file provenance index, or editor mutation-lane mirror.
 
-Ordinary editor navigation may discard an unsubmitted local form without interception. There is no global dirty-form guard or global Save/Exit panel. Editor Exit joins already-admitted repository/catalog writes before leaving, but it does not discover or block an unrelated local draft that has not entered the canonical write boundary; an already committed project needs no close-time flush. React-visible asynchronous editor commands execute through feature-owned `Atom.fn` commands or the narrowly allowed domain-specific writable command authority when synchronous sibling exclusion must survive remounts, while standalone renderer Effects use the one process `RendererRuntime`. Repository transactions remain the write-serialization and atomicity boundary; React does not add a private Promise scheduler, query cache, second pending/error truth, or copied project store.
+One process-owned unsaved-changes guard coordinates the currently mounted Project, Item, and Asset form sessions without turning their local drafts into canonical state. Navigation inside a session's own form route remains uninterrupted. Leaving that route, Editor Exit, and native close share one decision: a valid dirty draft offers Save, Discard, or Cancel, while an invalid draft offers only Discard or Cancel. Save is persistence-only; after the user permits departure, Exit and native close still join already-admitted repository/catalog writes before leaving. SQLite remains the sole canonical project authority, with no global staged project overlay, autosave, editor-wide Save-all operation, or second pending/persistence truth. React-visible asynchronous editor commands execute through feature-owned `Atom.fn` commands or the narrowly allowed domain-specific writable command authority when synchronous sibling exclusion must survive remounts, while standalone renderer Effects use the one process `RendererRuntime`. Repository transactions remain the write-serialization and atomicity boundary; React does not add a private Promise scheduler, query cache, or copied project store.
 
 Build is the explicit heavy validation and publication boundary. It captures one exact project revision, runs the canonical completed-config and resource validators, encodes and compresses one immutable Arkpack artifact, and records the source revision with its bytes and content hash. A failed build publishes diagnostics and no artifact. A successful artifact independently supports browser-style Save As and installation through the existing Arkpack catalog. Any later project mutation makes the previous artifact stale and requires another Build before distribution. The planned editor-only gameplay preview will consume these exact in-memory bytes without installing the package, creating an editor workspace, or reusing normal installed-game save identity.
 
@@ -321,15 +321,7 @@ UI may not own or reconstruct:
 
 Effect Clock is the only production wall-clock source.
 
-The loaded runtime owns engine-visible ephemeral session state:
-
-```text
-runtime.session.speedMode
-```
-
-It is canonical for the live session but intentionally absent from serialized gameplay state. Hydration always starts in `normal` mode.
-
-The Tick adapter separately owns transient observation state:
+The Tick adapter owns transient observation state:
 
 ```text
 observedAtMs
@@ -342,15 +334,14 @@ Simulation uses one canonical 100 ms fixed step.
 
 ```text
 observe new wall-clock delta
-→ scale only that delta by runtime.session.speedMode
-→ add simulation milliseconds to pending budget
+→ add elapsed milliseconds to pending budget
 → replay all complete fixed steps
 → keep sub-step remainder for the live session
 ```
 
-Normal mode uses `1×`; accelerated mode uses `30×`. Toggling first folds elapsed wall time under the old mode and only then changes the root runtime session state, so previously observed or pending normal time is never accelerated retroactively. Explicit Tick advancement already supplies simulation milliseconds and never applies the multiplier.
+Instant gameplay is a persisted cheat switch in `runtime.cheats`, not a Tick multiplier or session timing mode. While cheat behavior and Instant gameplay are enabled, the authoritative engine completes valid time-based jobs and temporary-item lifetimes without waiting for their authored wall-clock durations. Explicit and observed Tick advancement still use the same unscaled simulation milliseconds.
 
-A failed advancement retains its complete pending budget for retry in the same session. A successful advancement consumes each complete step at most once.
+Every attempted complete-step budget is acknowledged exactly once. A failed advancement propagates its Cause but still consumes the attempted budget; it is never replayed implicitly on the next observation.
 
 Long elapsed intervals are replayed immediately as consecutive fixed steps and must match the equivalent sequence of explicit 100 ms advancements.
 
@@ -533,7 +524,7 @@ reject new commands
 → dispose ManagedRuntime
 ```
 
-Concurrent callers share the same Effect-owned cleanup attempt. The root game owner awaits that attempt before any replacement bootstrap begins, so two sessions cannot write the same package save namespace concurrently. Confirmed persisted-save nuke uses the separate destructive path:
+Concurrent callers share the same Effect-owned cleanup attempt. The root game owner awaits that attempt before any replacement bootstrap begins, so two sessions cannot write the same package save namespace concurrently. Hard reset uses the separate destructive path:
 
 ```text
 reject new commands
@@ -545,7 +536,7 @@ reject new commands
 → create a fresh session
 ```
 
-The nuke request itself is only a transient presentation event. Cancellation never enters this path, and storage failure propagates without manufacturing a fresh-session success.
+The reset request is renderer-owned lifecycle intent rather than gameplay runtime mutation. Cancellation never enters this path, and storage failure propagates without manufacturing a fresh-session success.
 
 A long planner interrupted before `modifySomeEffect` accepts a new transition changes nothing. Once it accepts `Option.some`, the exact transition becomes both current state and the single replay publication from the same serialized operation.
 

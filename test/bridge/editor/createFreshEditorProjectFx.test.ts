@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { validateArkpackPayloadFx } from "~/bridge/arkpack/validateArkpackPayloadFx";
 import { createFreshEditorProjectFx } from "~/bridge/editor/createFreshEditorProjectFx";
@@ -8,6 +8,7 @@ import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
 } from "~/bridge/editor/EditorProjectRepository";
+import { installTestPngDecoder } from "~test/bridge/arkpack/support/createTestPngBytes";
 
 const createRepository = (
 	createProjectFx: EditorProjectRepositoryService["createProjectFx"],
@@ -20,6 +21,14 @@ const createRepository = (
 	replaceResourceFx: () => Effect.die("Unexpected resource replacement."),
 	upsertItemFx: () => Effect.die("Unexpected item save."),
 	upsertResourcesFx: () => Effect.die("Unexpected resource save."),
+});
+
+beforeEach(() => {
+	installTestPngDecoder();
+});
+
+afterEach(() => {
+	vi.unstubAllGlobals();
 });
 
 describe("createFreshEditorProjectFx", () => {

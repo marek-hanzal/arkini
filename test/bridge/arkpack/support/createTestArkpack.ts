@@ -3,6 +3,7 @@ import { Effect } from "effect";
 
 import { encodeFx } from "~/engine/pack/fx/encodeFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { createTestPngBytes } from "~test/bridge/arkpack/support/createTestPngBytes";
 
 export const testArkpackConfig = GameConfigSchema.parse({
 	version: "1.0",
@@ -58,16 +59,12 @@ export const createTestArkpack = (config = testArkpackConfig) => {
 				{
 					id: "hero",
 					mime: "image/png",
-					bytes: new Uint8Array([
-						1,
-					]),
+					bytes: createTestPngBytes(),
 				},
 				{
 					id: "asset:water",
 					mime: "image/png",
-					bytes: new Uint8Array([
-						2,
-					]),
+					bytes: createTestPngBytes(),
 				},
 			],
 		}),

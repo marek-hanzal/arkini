@@ -1,11 +1,16 @@
 import { readFile } from "node:fs/promises";
 import { Effect } from "effect";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ArkiniArkpack } from "~/bridge/arkpack/ArkiniArkpack";
 import { DemoArkpack } from "~/bridge/arkpack/DemoArkpack";
 import { loadArkpackFx } from "~/bridge/arkpack/loadArkpackFx";
 import { createTestArkpack } from "~test/bridge/arkpack/support/createTestArkpack";
+import { installTestPngDecoder } from "~test/bridge/arkpack/support/createTestPngBytes";
+
+beforeEach(() => {
+	installTestPngDecoder();
+});
 
 afterEach(() => {
 	vi.unstubAllGlobals();

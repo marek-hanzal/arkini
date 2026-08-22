@@ -6,12 +6,29 @@ import {
 	type DiagnosticRecord,
 	DiagnosticRecordSchema,
 } from "../../../electron/contract/diagnostics/DiagnosticRecord";
+import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
 import type { GameSession, GameTransition } from "~/bridge/game/GameSession";
 import { installGameDiagnosticsFx } from "~/bridge/game/installGameDiagnosticsFx";
 import { GameSessionFatalError } from "~/bridge/game/GameSessionFatalError";
 import { RuntimeInvalidError } from "~/engine/runtime/error/RuntimeInvalidError";
+import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
+import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 
 const originalWindow = globalThis.window;
+const runRendererEffect = <Value>(effect: Effect.Effect<Value>) => Effect.runSync(effect);
+
+const testArkpack = {
+	packageId: "package:test",
+	hash: "content:test",
+	gameId: "game:test",
+	title: "Test",
+	game: "1",
+	source: "built-in",
+	trust: {
+		type: "official",
+		keyId: "test",
+	},
+} satisfies ArkpackDescriptor;
 
 afterEach(() => {
 	Object.defineProperty(globalThis, "window", {
@@ -69,22 +86,15 @@ describe("Game diagnostics", () => {
 				};
 			},
 			getFatalError: () => fatal,
-		} as unknown as GameSession;
+		} satisfies Pick<
+			GameSession,
+			"getFatalError" | "subscribeFatalError" | "subscribeTransitions"
+		>;
 		const diagnostics = Effect.runSync(
 			installGameDiagnosticsFx({
-				arkpack: {
-					packageId: "package:test",
-					hash: "content:test",
-					gameId: "game:test",
-					title: "Test",
-					game: "1",
-					source: "built-in",
-					trust: {
-						type: "official",
-						keyId: "test",
-					},
-				},
+				arkpack: testArkpack,
 				restored: true,
+				runRendererEffect,
 				session,
 			}),
 		);
@@ -193,5 +203,62 @@ describe("Game diagnostics", () => {
 				sequence: 2,
 			},
 		});
+	});
+
+	it("records a real fail-stop and closes after the frozen session is disposed", async () => {
+		const write = vi.fn<(record: DiagnosticRecord) => Promise<void>>(() => Promise.resolve());
+		Object.defineProperty(globalThis, "window", {
+			configurable: true,
+			value: {
+				arkini: {
+					diagnostics: {
+						write,
+						openDirectory: () => Promise.resolve(),
+					},
+				} as Pick<ArkiniElectronApi.Api, "diagnostics">,
+			},
+		});
+		const session = await createTestGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+		});
+		const diagnostics = Effect.runSync(
+			installGameDiagnosticsFx({
+				arkpack: testArkpack,
+				restored: false,
+				runRendererEffect,
+				session,
+			}),
+		);
+
+		try {
+			const failure = new Error("tick exploded");
+			session.failStop("tick", failure);
+			expect(session.read(Effect.void)).toMatchObject({
+				_tag: "Failure",
+			});
+			expect(write.mock.calls.at(-1)?.[0]).toMatchObject({
+				event: "session-failed",
+				data: {
+					error: {
+						cause: {
+							message: failure.message,
+						},
+					},
+					source: "tick",
+				},
+			});
+
+			await Effect.runPromise(session.disposeWithoutSaveFx);
+			diagnostics.close("discarded");
+			expect(write.mock.calls.at(-1)?.[0]).toMatchObject({
+				event: "session-ended",
+				data: {
+					reason: "discarded",
+				},
+			});
+		} finally {
+			await Effect.runPromise(session.disposeWithoutSaveFx);
+		}
 	});
 });

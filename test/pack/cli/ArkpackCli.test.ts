@@ -40,6 +40,7 @@ describe("Arkpack signing CLI", () => {
 		);
 		expect(generated.stdout).not.toContain("BEGIN PRIVATE KEY");
 		expect((await stat(privateKeyPath)).mode & 0o777).toBe(0o600);
+		const privateKey = await readFile(privateKeyPath, "utf8");
 		const publicKey = await readFile(publicKeyPath, "utf8");
 		const registryPath = join(root, "keys.json");
 		await writeFile(
@@ -86,6 +87,18 @@ describe("Arkpack signing CLI", () => {
 		).rejects.toMatchObject({
 			code: 1,
 		});
+		expect(await readFile(privateKeyPath, "utf8")).toBe(privateKey);
+		expect(await readFile(publicKeyPath, "utf8")).toBe(publicKey);
+		await runCli(
+			"keygen",
+			"--force",
+			"--private-key-output",
+			privateKeyPath,
+			"--public-key-output",
+			publicKeyPath,
+		);
+		expect(await readFile(privateKeyPath, "utf8")).not.toBe(privateKey);
+		expect(await readFile(publicKeyPath, "utf8")).not.toBe(publicKey);
 	}, 15_000);
 
 	it("reports invalid signing metadata and trusted-key JSON without raw parser stacks", async () => {

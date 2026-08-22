@@ -196,6 +196,7 @@ describe("Pixi direct input remainder", () => {
 			x: 100,
 			y: 40,
 		});
+		expect(source.lifecycleLayer.scale.x).toBe(1);
 		expect({
 			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
 			y: source.container.y + source.offsetLayer.y * source.container.scale.y,

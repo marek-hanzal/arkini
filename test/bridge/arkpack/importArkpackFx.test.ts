@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { gzipSync } from "node:zlib";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { importArkpackFx } from "~/bridge/arkpack/importArkpackFx";
 import { loadArkpackFx } from "~/bridge/arkpack/loadArkpackFx";
 import { encodeFx } from "~/engine/pack/fx/encodeFx";
@@ -8,7 +8,19 @@ import {
 	createTestArkpack,
 	testArkpackConfig,
 } from "~test/bridge/arkpack/support/createTestArkpack";
+import {
+	createTestPngBytes,
+	installTestPngDecoder,
+} from "~test/bridge/arkpack/support/createTestPngBytes";
 import { createInMemoryArkpackStorageFx } from "~test/support/arkpack/createInMemoryArkpackStorageFx";
+
+beforeEach(() => {
+	installTestPngDecoder();
+});
+
+afterEach(() => {
+	vi.unstubAllGlobals();
+});
 
 describe("importArkpackFx", () => {
 	it("persists only a fully validated binary and exact load revalidates it", async () => {
@@ -50,16 +62,12 @@ describe("importArkpackFx", () => {
 					{
 						id: "hero",
 						mime: "image/png",
-						bytes: new Uint8Array([
-							1,
-						]),
+						bytes: createTestPngBytes(),
 					},
 					{
 						id: "asset:water",
 						mime: "image/png",
-						bytes: new Uint8Array([
-							2,
-						]),
+						bytes: createTestPngBytes(),
 					},
 				],
 			}),

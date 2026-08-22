@@ -1,7 +1,10 @@
 import { Effect, Layer, ManagedRuntime } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
+import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 
 import { acquireGameEngineResourceFx } from "~/bridge/game/acquireGameEngineResourceFx";
+import { createGameFx } from "~/bridge/game/createGameFx";
+import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
 import { EditorProjectRepositoryLayer } from "~/bridge/editor/EditorProjectRepositoryLayer";
 import {
 	EditorUnsavedChanges,
@@ -9,6 +12,7 @@ import {
 } from "~/bridge/editor/EditorUnsavedChanges";
 import { createEditorUnsavedChangesOwnerFx } from "~/bridge/editor/createEditorUnsavedChangesOwnerFx";
 import { GameEngineResourceLayer } from "~/bridge/game/GameEngineResourceLayer";
+import { GameEngineResourceFx } from "~/bridge/game/GameEngineResourceFx";
 import { RendererAtomRegistryLayer } from "~/bridge/reactivity/RendererAtomRegistry";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
 import { deleteGameSaveFx } from "~/bridge/save/deleteGameSaveFx";
@@ -26,7 +30,13 @@ const EditorUnsavedChangesLayer = Layer.effect(
  * TODO(#397): Move this process-owned root to stable runtime APIs without duplicating
  * the renderer registry or game-resource service authority.
  */
-export const RendererRuntime = ManagedRuntime.make(
+export const RendererRuntime: ManagedRuntime.ManagedRuntime<
+	| AtomRegistry.AtomRegistry
+	| EditorProjectRepository
+	| EditorUnsavedChanges
+	| GameEngineResourceFx,
+	never
+> = ManagedRuntime.make(
 	Layer.mergeAll(
 		RendererAtomRegistryLayer,
 		EditorProjectRepositoryLayer(),
@@ -39,6 +49,11 @@ export const RendererRuntime = ManagedRuntime.make(
 			),
 			createResourceFx: Effect.fn("RendererRuntime.createResourceFx")((packageId: string) =>
 				acquireGameEngineResourceFx({
+					createGameFx: (selectedPackageId) =>
+						createGameFx({
+							packageId: selectedPackageId,
+							runRendererEffect: (effect) => RendererRuntime.runSync(effect),
+						}),
 					packageId,
 				}),
 			),

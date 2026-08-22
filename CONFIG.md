@@ -48,14 +48,12 @@ meta
 resources
 start
 version
-categories
 items
 ```
 
 Provider rules:
 
 - `meta`, `resources`, `start`, and `version` each have exactly one provider across all fragments;
-- category IDs are unique across all fragments;
 - item IDs are unique across all fragments;
 - item UIDs are unique across the completed catalog;
 - later files never silently overwrite earlier providers;
@@ -72,7 +70,6 @@ The completed game config contains:
 meta        Game ID, title, Board size, Inventory size, optional Toolbar size.
 resources   Explicit non-item resource roles used by the shell.
 start       Initial Board coordinates, Inventory quantities, Toolbar slots, and current Board space.
-categories  UI-facing category records keyed by stable ID.
 version     Configuration schema version.
 items       Canonical item records keyed by stable ID.
 $schema     Optional authoring-tool reference.
@@ -95,15 +92,15 @@ Every item shares these core fields:
 ```text
 uid
 id
- type
- title
- description
- asset
- categoryId
- scope
- maxCount?
- maxStackSize
- merge?
+type
+title
+description
+asset
+scope
+maxCount?
+maxStackSize
+charges?
+merge?
 ```
 
 Schema-recognized item kinds include:
@@ -117,9 +114,6 @@ stash
 deposit
 temporary
 inventory
-cheat-speed
-nuke
-cheat-inventory
 ```
 
 Type-specific schemas own their additional behavior. Do not add one giant optional-field item object.
@@ -282,12 +276,10 @@ Schema support and runtime support are different facts.
 - Blueprint assets are explicit standard item assets; no target or visual is inferred from output.
 - Directional gameplay merge is an engine-owned atomic command over one revised source identity and one revised board target. Source-owned authored rules decide source action, target effect, and optional output.
 - Temporary items author `durationMs` and optional expiry `output`. Every committed runtime identity starts at the authored duration, remains board-only and non-stackable, persists `remainingDurationMs`, and expires through canonical Tick plus deterministic output placement.
-- `cheat:speed` authors two ordered assets for the user-facing accelerated and normal states. The item owns no local toggle state; `runtime.session.speedMode` is the global live-session truth, and `toggleSpeedModeFx()` switches it without requiring an item identity.
+- Cheat mode is persisted gameplay state rather than an item kind. `runtime.cheats.instantGameplay` makes valid time-based work settle without waiting while cheat behavior is enabled; `setInstantGameplayFx()` owns the atomic switch.
 
-### Utility capabilities
+### Utility capability
 
-- `cheat:inventory` is a board sink. `consumeItemIntoCheatInventoryFx` consumes one complete revised board identity through ordinary owner removal, preserves the sink, and emits committed feedback.
-- `nuke` is a presentation control. `requestNukeSaveFx()` requests explicit confirmation; confirmed deletion belongs to the renderer session and Electron storage boundary and never to gameplay runtime mutation.
 - `inventory` is the singleton Board/Toolbar opener. Its canonical primary action opens the shared non-modal Inventory surface, and its actor uses the same cross-surface drop contract as every other live tile.
 
 A capability becomes implemented only when it has a canonical command/path and focused behavioral tests. Schema presence alone is not behavior.

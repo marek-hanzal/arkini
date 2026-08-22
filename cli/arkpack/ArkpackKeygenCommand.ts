@@ -33,6 +33,7 @@ export const ArkpackKeygenCommand = Command.make(
 	"keygen",
 	{
 		force: Flag.boolean("force").pipe(
+			Flag.withDefault(false),
 			Flag.withDescription("Allow replacing the exact requested key outputs."),
 		),
 		privateKeyOutput: Flag.string("private-key-output").pipe(

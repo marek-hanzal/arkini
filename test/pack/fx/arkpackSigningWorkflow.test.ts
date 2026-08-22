@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 import { ArkpackSigningError } from "~/engine/pack/error/ArkpackSigningError";
@@ -12,15 +12,18 @@ import { packSignedDirectoryFx } from "~/engine/pack/fx/packSignedDirectoryFx";
 import { signArkpackFx } from "~/engine/pack/fx/signArkpackFx";
 import { verifyArkpackFileFx } from "~/engine/pack/fx/verifyArkpackFileFx";
 import { ArkpackTrustedKeysSchema } from "~/engine/pack/schema/ArkpackTrustedKeysSchema";
+import { installTestPngDecoder } from "~test/bridge/arkpack/support/createTestPngBytes";
 
 const keyId = "test-workflow-2026-01";
 let root = "";
 
 beforeEach(async () => {
+	installTestPngDecoder();
 	root = await mkdtemp(join(tmpdir(), "arkini-signing-workflow-"));
 });
 
 afterEach(async () => {
+	vi.unstubAllGlobals();
 	await rm(root, {
 		force: true,
 		recursive: true,

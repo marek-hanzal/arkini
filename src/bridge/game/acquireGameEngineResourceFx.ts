@@ -4,14 +4,13 @@ import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleE
 import type { Game } from "~/bridge/game/Game";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
-import { createGameFx as createGameFromPackageFx } from "~/bridge/game/createGameFx";
 import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 import { writeLastPackageIdFx } from "~/bridge/launcher/writeLastPackageIdFx";
 
 export namespace acquireGameEngineResourceFx {
 	export interface Props {
 		readonly beforeCreateFx?: Effect.Effect<void, unknown>;
-		readonly createGameFx?: (packageId: string) => Effect.Effect<Game, unknown>;
+		readonly createGameFx: (packageId: string) => Effect.Effect<Game, unknown>;
 		readonly packageId: string;
 		readonly rememberPackageFx?: (packageId: string) => Effect.Effect<void, unknown>;
 	}
@@ -46,10 +45,7 @@ const discardFailedAcquisitionFx = Effect.fn("discardFailedAcquisitionFx")(
 export const acquireGameEngineResourceFx = Effect.fn("acquireGameEngineResourceFx")(
 	({
 		beforeCreateFx = Effect.void,
-		createGameFx = (packageId) =>
-			createGameFromPackageFx({
-				packageId,
-			}),
+		createGameFx,
 		packageId,
 		rememberPackageFx = writeLastPackageIdFx,
 	}: acquireGameEngineResourceFx.Props) =>

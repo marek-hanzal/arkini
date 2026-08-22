@@ -64,6 +64,39 @@ const destroyPixiInputTransientFx = Effect.fn("destroyPixiInputTransientFx")(fun
 	yield* destroyPixiTileActorFx(transient);
 });
 
+const exitAndDestroyPixiInputTransientFx = Effect.fn("exitAndDestroyPixiInputTransientFx")(
+	function* ({
+		animator,
+		onComplete,
+		transient,
+	}: {
+		readonly animator: PixiActorAnimator;
+		readonly onComplete: () => void;
+		readonly transient: PixiTileActor;
+	}) {
+		let settled = false;
+		const settle = () => {
+			if (settled) return;
+			settled = true;
+			RendererRuntime.runSync(
+				Effect.gen(function* () {
+					yield* destroyPixiInputTransientFx({
+						animator,
+						transient,
+					});
+					onComplete();
+				}),
+			);
+		};
+		yield* startPixiTileActorExitFx({
+			actor: transient,
+			animator,
+			onCancel: settle,
+			onComplete: settle,
+		});
+	},
+);
+
 const finishPixiConsumedInputStackFx = Effect.fn("finishPixiConsumedInputStackFx")(function* ({
 	actorStore,
 	animator,
@@ -180,25 +213,10 @@ const returnPixiInputRemainderFx = Effect.fn("returnPixiInputRemainderFx")(funct
 					const latestHome =
 						(yield* surface.readLocationPoseFx(cue.originLocation)) ?? sourceHome;
 					if (source === null) {
-						let settled = false;
-						const settle = () => {
-							if (settled) return;
-							settled = true;
-							RendererRuntime.runSync(
-								Effect.gen(function* () {
-									yield* destroyPixiInputTransientFx({
-										animator,
-										transient,
-									});
-									onComplete();
-								}),
-							);
-						};
-						yield* startPixiTileActorExitFx({
-							actor: transient,
+						yield* exitAndDestroyPixiInputTransientFx({
 							animator,
-							onCancel: settle,
-							onComplete: settle,
+							onComplete,
+							transient,
 						});
 						return;
 					}
@@ -408,27 +426,10 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 					return;
 				}
 				RendererRuntime.runSync(
-					Effect.gen(function* () {
-						let settled = false;
-						const settle = () => {
-							if (settled) return;
-							settled = true;
-							RendererRuntime.runSync(
-								Effect.gen(function* () {
-									yield* destroyPixiInputTransientFx({
-										animator,
-										transient,
-									});
-									onComplete();
-								}),
-							);
-						};
-						yield* startPixiTileActorExitFx({
-							actor: transient,
-							animator,
-							onCancel: settle,
-							onComplete: settle,
-						});
+					exitAndDestroyPixiInputTransientFx({
+						animator,
+						onComplete,
+						transient,
 					}),
 				);
 				return;

@@ -13,7 +13,8 @@ const state = vi.hoisted(() => ({
 	}>,
 }));
 
-vi.mock("@effect/atom-react", () => ({
+vi.mock("@effect/atom-react", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@effect/atom-react")>()),
 	useAtomSet: () => vi.fn(),
 	useAtomValue: () => state.result,
 }));

@@ -165,7 +165,7 @@ describe("setDefaultLineFx", () => {
 			),
 		);
 
-		expect(result.runtime.defaultLineByOwnerItemId).toBeUndefined();
+		expect(result.runtime.defaultLineByOwnerItemId).toEqual({});
 		expect(result.pure).toBe(true);
 		expect(result.projection).toMatchObject({
 			kind: "available",
@@ -391,7 +391,7 @@ describe("setDefaultLineFx", () => {
 		);
 
 		expect(result.items).toEqual([]);
-		expect(result.defaultLineByOwnerItemId).toBeUndefined();
+		expect(result.defaultLineByOwnerItemId).toEqual({});
 	});
 	it("atomically isolates one exact stacked owner before selecting its default", () => {
 		const result = Effect.runSync(

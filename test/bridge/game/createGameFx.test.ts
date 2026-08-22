@@ -1,12 +1,13 @@
 import { encode } from "@msgpack/msgpack";
 import { Cause, Effect, Exit, Option } from "effect";
 import { readFile } from "node:fs/promises";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { DiagnosticRecord } from "../../../electron/contract/diagnostics/DiagnosticRecord";
 import { DemoArkpack } from "~/bridge/arkpack/DemoArkpack";
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
-import { createGameFx } from "~/bridge/game/createGameFx";
+import { createGameFx as createGameFromPackageFx } from "~/bridge/game/createGameFx";
 import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
 import { decodeArkiniSaveFx } from "~/bridge/save/decodeArkiniSaveFx";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
@@ -16,10 +17,17 @@ import {
 	createTestArkpack,
 	testArkpackConfig,
 } from "~test/bridge/arkpack/support/createTestArkpack";
+import { installTestPngDecoder } from "~test/bridge/arkpack/support/createTestPngBytes";
 
 const trustedKeys = {
 	keys: [],
 };
+
+const createGameFx = (props: Omit<createGameFromPackageFx.Props, "runRendererEffect">) =>
+	createGameFromPackageFx({
+		...props,
+		runRendererEffect: Effect.runSync,
+	});
 
 const createStorages = async () => {
 	const bytes = createTestArkpack();
@@ -75,6 +83,10 @@ const createStorages = async () => {
 };
 
 describe("createGameFx", () => {
+	beforeEach(() => {
+		installTestPngDecoder();
+	});
+
 	afterEach(() => {
 		vi.restoreAllMocks();
 		vi.unstubAllGlobals();
@@ -182,6 +194,17 @@ describe("createGameFx", () => {
 
 	it("retries failed public game disposal without releasing its retry resources", async () => {
 		const storages = await createStorages();
+		const diagnosticWrites: Array<DiagnosticRecord> = [];
+		vi.stubGlobal("window", {
+			arkini: {
+				diagnostics: {
+					write: (record: DiagnosticRecord) => {
+						diagnosticWrites.push(record);
+						return Promise.resolve();
+					},
+				},
+			},
+		});
 		const failure = new Error("disk full");
 		let writes = 0;
 		const saveStorage: GameSaveStorage = {
@@ -219,6 +242,7 @@ describe("createGameFx", () => {
 
 		await expect(Effect.runPromise(game.disposeFx)).rejects.toThrow("disk full");
 		expect(writes).toBe(1);
+		expect(diagnosticWrites.some(({ event }) => event === "session-ended")).toBe(false);
 		expect(game.getResourceUrl("asset:water")).toBe(resourceUrl);
 		expect(revokeObjectUrl).not.toHaveBeenCalled();
 		await expect(
@@ -240,6 +264,13 @@ describe("createGameFx", () => {
 
 		await expect(Effect.runPromise(game.disposeFx)).resolves.toBeUndefined();
 		expect(writes).toBe(2);
+		expect(diagnosticWrites.filter(({ event }) => event === "session-ended")).toEqual([
+			expect.objectContaining({
+				data: expect.objectContaining({
+					reason: "saved",
+				}),
+			}),
+		]);
 		expect(revokeObjectUrl.mock.calls.filter(([url]) => url === resourceUrl)).toHaveLength(1);
 		expect(() => game.getResourceUrl("asset:water")).toThrow(
 			"Game resource asset:water is unavailable.",
@@ -253,6 +284,16 @@ describe("createGameFx", () => {
 
 	it("releases public game resources after explicit discard of a failed save", async () => {
 		const storages = await createStorages();
+		vi.spyOn(console, "warn").mockImplementation(() => undefined);
+		vi.stubGlobal("window", {
+			arkini: {
+				diagnostics: {
+					write: () => {
+						throw new Error("logger unavailable");
+					},
+				},
+			},
+		});
 		const saveStorage: GameSaveStorage = {
 			...storages.saveStorage,
 			writeFx: () => Effect.fail(new Error("disk still full")),

@@ -4,6 +4,10 @@ import { Effect } from "effect";
 import { Container } from "pixi.js";
 import { describe, expect, it } from "vitest";
 
+import {
+	pixiTileActorLifecycleDurationMs,
+	pixiTileActorLifecycleReducedScale,
+} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
 import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
 
 import {
@@ -89,19 +93,24 @@ describe("Pixi motion delivery batch", () => {
 		expect(
 			Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.has(stacked.item.id),
 		).toBe(false);
-		expect(animations).toHaveLength(4);
-		expect(animations[0]).toMatchObject({
-			actor: spawned,
-			channel: "lifecycle-opacity",
-			durationMs: 520,
-			ownerKey: `actor-alpha:${spawned.instanceId}`,
-			toAlpha: 1,
-		});
-		expect(animations[1]).toMatchObject({
-			actor: spawned,
-			channel: "pose",
-			ownerKey: "motion:7:0",
-		});
+		expect(spawned.container.alpha).toBe(0);
+		expect(spawned.lifecycleLayer.scale.x).toBe(pixiTileActorLifecycleReducedScale);
+		expect(animations).toContainEqual(
+			expect.objectContaining({
+				actor: spawned,
+				channel: "lifecycle-scale",
+				durationMs: pixiTileActorLifecycleDurationMs,
+				toScale: 1,
+			}),
+		);
+		expect(animations).toContainEqual(
+			expect.objectContaining({
+				actor: spawned,
+				channel: "lifecycle-opacity",
+				durationMs: pixiTileActorLifecycleDurationMs,
+				toAlpha: 1,
+			}),
+		);
 		expect(spawned.container.x).toBe(150);
 		expect(spawned.container.y).toBe(170);
 

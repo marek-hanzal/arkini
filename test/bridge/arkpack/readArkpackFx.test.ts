@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ArkpackLimits } from "~/bridge/arkpack/ArkpackLimits";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
@@ -9,11 +9,23 @@ import {
 	createTestArkpack,
 	testArkpackConfig,
 } from "~test/bridge/arkpack/support/createTestArkpack";
+import {
+	createTestPngBytes,
+	installTestPngDecoder,
+} from "~test/bridge/arkpack/support/createTestPngBytes";
 import { gzipSync } from "node:zlib";
 
 const trustedKeys = {
 	keys: [],
 };
+
+beforeEach(() => {
+	installTestPngDecoder();
+});
+
+afterEach(() => {
+	vi.unstubAllGlobals();
+});
 
 describe("readArkpackFx", () => {
 	it("validates one compressed data-only package and derives exact identity", async () => {
@@ -85,6 +97,50 @@ describe("readArkpackFx", () => {
 		).rejects.toThrow("compressed limit");
 	});
 
+	it("rejects PNG resources whose actual bytes cannot decode", async () => {
+		vi.mocked(createImageBitmap).mockRejectedValueOnce(new Error("decode failed"));
+		const fakePng = new Uint8Array(24);
+		fakePng.set([
+			137,
+			80,
+			78,
+			71,
+			13,
+			10,
+			26,
+			10,
+		]);
+		const encoded = Effect.runSync(
+			encodeFx({
+				config: testArkpackConfig,
+				resources: [
+					{
+						id: "hero",
+						mime: "image/png",
+						bytes: fakePng,
+					},
+					{
+						id: "asset:water",
+						mime: "image/png",
+						bytes: createTestPngBytes(),
+					},
+				],
+			}),
+		);
+
+		await expect(
+			Effect.runPromise(
+				readArkpackFx({
+					bytes: new Uint8Array(gzipSync(encoded)),
+					signature: {
+						trustedKeys,
+					},
+					source: "imported",
+				}),
+			),
+		).rejects.toThrow("must decode as a valid PNG image");
+	});
+
 	it("rejects semantically invalid packages before persistence", async () => {
 		const invalid = {
 			...testArkpackConfig,
@@ -103,16 +159,12 @@ describe("readArkpackFx", () => {
 					{
 						id: "hero",
 						mime: "image/png",
-						bytes: new Uint8Array([
-							1,
-						]),
+						bytes: createTestPngBytes(),
 					},
 					{
 						id: "asset:water",
 						mime: "image/png",
-						bytes: new Uint8Array([
-							2,
-						]),
+						bytes: createTestPngBytes(),
 					},
 				],
 			}),

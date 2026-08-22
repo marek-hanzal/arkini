@@ -11,6 +11,7 @@ import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActor
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import { restorePixiTileActorExitFx } from "~/ui/pixi/animation/restorePixiTileActorExitFx";
 import { startPixiTileActorEnterFx } from "~/ui/pixi/animation/startPixiTileActorEnterFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
@@ -255,7 +256,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 			const sourceActor = actorStore.actors.get(cue.sourceActorId);
 			if (sourceActor !== undefined && !sourceActor.container.destroyed) {
 				RendererRuntime.runSync(
-					startPixiTileActorEnterFx({
+					restorePixiTileActorExitFx({
 						actor: sourceActor,
 						animator,
 					}),

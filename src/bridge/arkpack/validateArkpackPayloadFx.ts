@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import { validatePngResourceFx } from "~/bridge/resource/validatePngResourceFx";
 import type { PayloadSchema } from "~/engine/pack/schema/PayloadSchema";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import { validateGameConfigFx } from "~/engine/validation/fx/validateGameConfigFx";
@@ -36,6 +37,7 @@ export const validateArkpackPayloadFx = Effect.fn("validateArkpackPayloadFx")(fu
 				),
 			);
 		}
+		yield* validatePngResourceFx(resource.bytes, resource.id);
 	}
 	const provenance = createPackProvenance(payload.config.meta.id, payload.config.items);
 	return [

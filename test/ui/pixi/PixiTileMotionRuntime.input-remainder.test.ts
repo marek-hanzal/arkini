@@ -3,6 +3,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { pixiTileActorLifecycleDurationMs } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
 import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
 
 import {
@@ -217,7 +218,24 @@ describe("Pixi tile input remainder travel", () => {
 		expect(source.item.quantity).toBe(2);
 		expect(source.container.x).toBe(100);
 		expect(source.container.alpha).toBe(1);
+		expect(source.lifecycleLayer.scale.x).toBe(1);
 		expect(source.container.eventMode).toBe("static");
+		expect(animations).toContainEqual(
+			expect.objectContaining({
+				actor: source,
+				channel: "lifecycle-scale",
+				durationMs: pixiTileActorLifecycleDurationMs,
+				toScale: 1,
+			}),
+		);
+		expect(animations).toContainEqual(
+			expect.objectContaining({
+				actor: source,
+				channel: "lifecycle-opacity",
+				durationMs: pixiTileActorLifecycleDurationMs,
+				toAlpha: 1,
+			}),
+		);
 		expect({
 			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
 			y: source.container.y + source.offsetLayer.y * source.container.scale.y,

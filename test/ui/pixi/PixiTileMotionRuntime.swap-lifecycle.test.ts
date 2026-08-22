@@ -4,6 +4,11 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import {
+	pixiTileActorLifecycleDurationMs,
+	pixiTileActorLifecycleReducedScale,
+} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+
+import {
 	firstBoardLocation,
 	secondBoardLocation,
 	createItem,
@@ -81,7 +86,24 @@ describe("Pixi detached swap lifecycle", () => {
 			]),
 		);
 		Effect.runSync(runtime.startFx);
-		expect(animations).toHaveLength(4);
+		expect(independent.container.alpha).toBe(0);
+		expect(independent.lifecycleLayer.scale.x).toBe(pixiTileActorLifecycleReducedScale);
+		expect(animations).toContainEqual(
+			expect.objectContaining({
+				actor: independent,
+				channel: "lifecycle-scale",
+				durationMs: pixiTileActorLifecycleDurationMs,
+				toScale: 1,
+			}),
+		);
+		expect(animations).toContainEqual(
+			expect.objectContaining({
+				actor: independent,
+				channel: "lifecycle-opacity",
+				durationMs: pixiTileActorLifecycleDurationMs,
+				toAlpha: 1,
+			}),
+		);
 		const sourceTravel = readPoseAnimation(animations, source);
 		const independentTravel = readPoseAnimation(animations, independent);
 

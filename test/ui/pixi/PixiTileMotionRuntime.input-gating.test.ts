@@ -4,6 +4,11 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import {
+	pixiTileActorLifecycleDurationMs,
+	pixiTileActorLifecycleReducedScale,
+} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+
+import {
 	createMotionHarness,
 	firstBoardLocation,
 	secondBoardLocation,
@@ -166,19 +171,39 @@ describe("Pixi input-gated owner output", () => {
 		samplePoseAnimation(outputTravel, 1);
 		outputTravel.onComplete?.();
 
+		expect(actors.get(output.item.id)).toBe(output);
+		expect(output.container).toMatchObject({
+			x: 100,
+			y: 40,
+		});
 		expect(actors.has(owner.item.id)).toBe(false);
 		expect(Effect.runSync(runtime.readSnapshotFx)).toMatchObject({
 			interactionClaimByActorId: new Map(),
 			retainedActorIds: new Set(),
 		});
-		expect(animations).toContainEqual(
-			expect.objectContaining({
-				actor: owner,
-				channel: "lifecycle-opacity",
-				durationMs: 220,
-				toAlpha: 0,
-			}),
+		const ownerExitScale = animations.find(
+			(animation) => animation.actor === owner && animation.channel === "lifecycle-scale",
 		);
+		if (ownerExitScale?.channel !== "lifecycle-scale") {
+			throw new Error("Expected the released owner lifecycle scale-down.");
+		}
+		expect(ownerExitScale).toMatchObject({
+			durationMs: pixiTileActorLifecycleDurationMs,
+			toScale: pixiTileActorLifecycleReducedScale,
+		});
+		const ownerExitOpacity = animations.find(
+			(animation) =>
+				animation.actor === owner &&
+				animation.channel === "lifecycle-opacity" &&
+				animation.toAlpha === 0,
+		);
+		if (ownerExitOpacity?.channel !== "lifecycle-opacity") {
+			throw new Error("Expected the released owner lifecycle fade-out.");
+		}
+		expect(ownerExitOpacity.durationMs).toBe(pixiTileActorLifecycleDurationMs);
+		expect(owner.container.destroyed).toBe(false);
+		ownerExitOpacity.onComplete?.();
+		expect(owner.container.destroyed).toBe(true);
 		Effect.runSync(runtime.closeFx);
 	});
 });

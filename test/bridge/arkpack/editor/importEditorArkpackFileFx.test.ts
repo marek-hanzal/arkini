@@ -1,6 +1,6 @@
 import { gzipSync } from "node:zlib";
 import { Effect } from "effect";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { importEditorArkpackFileFx } from "~/bridge/arkpack/editor/importEditorArkpackFileFx";
 import type { EditorProject } from "~/bridge/editor/EditorProject";
@@ -8,11 +8,25 @@ import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
 } from "~/bridge/editor/EditorProjectRepository";
+import { PngResourceLimits } from "~/bridge/resource/validatePngResourceFx";
 import { encodeFx } from "~/engine/pack/fx/encodeFx";
+import type { PayloadSchema } from "~/engine/pack/schema/PayloadSchema";
+import {
+	createTestPngBytes,
+	installTestPngDecoder,
+} from "~test/bridge/arkpack/support/createTestPngBytes";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
-const createArkpackBytes = () =>
-	new Uint8Array(gzipSync(Effect.runSync(encodeFx(editorTestPayload))));
+const validPayload: PayloadSchema.Type = {
+	config: editorTestPayload.config,
+	resources: editorTestPayload.resources.map((resource) => ({
+		...resource,
+		bytes: createTestPngBytes(),
+	})),
+};
+
+const createArkpackBytes = (payload = validPayload) =>
+	new Uint8Array(gzipSync(Effect.runSync(encodeFx(payload))));
 
 const createRepository = (
 	createProjectFx: EditorProjectRepositoryService["createProjectFx"],
@@ -36,6 +50,14 @@ const runImport = (
 			Effect.provideService(EditorProjectRepository, repository),
 		),
 	);
+
+beforeEach(() => {
+	installTestPngDecoder();
+});
+
+afterEach(() => {
+	vi.unstubAllGlobals();
+});
 
 describe("importEditorArkpackFileFx", () => {
 	it("validates an arkpack and atomically delegates its canonical payload", async () => {
@@ -75,8 +97,69 @@ describe("importEditorArkpackFileFx", () => {
 		expect(createProjectFx).toHaveBeenCalledWith({
 			projectId: "editor-test",
 			config: editorTestPayload.config,
-			resources: editorTestPayload.resources,
+			resources: validPayload.resources,
 		});
+	});
+
+	it("rejects malformed PNG bytes before creating a project", async () => {
+		const bytes = createArkpackBytes({
+			...validPayload,
+			resources: [
+				{
+					...validPayload.resources[0],
+					bytes: new Uint8Array([
+						1,
+						2,
+						3,
+						4,
+					]),
+				},
+				validPayload.resources[1],
+			],
+		});
+		const createProjectFx = vi.fn(() => Effect.die("Unexpected project create."));
+
+		await expect(
+			runImport(
+				{
+					file: {
+						name: "invalid.arkpack",
+						size: bytes.byteLength,
+						arrayBuffer: async () => bytes.slice().buffer,
+					},
+				},
+				createRepository(createProjectFx),
+			),
+		).rejects.toThrow("must be a valid bounded PNG image");
+		expect(createProjectFx).not.toHaveBeenCalled();
+	});
+
+	it("rejects a PNG beyond the byte limit before creating a project", async () => {
+		const bytes = createArkpackBytes({
+			...validPayload,
+			resources: [
+				{
+					...validPayload.resources[0],
+					bytes: new Uint8Array(PngResourceLimits.maxBytes + 1),
+				},
+				validPayload.resources[1],
+			],
+		});
+		const createProjectFx = vi.fn(() => Effect.die("Unexpected project create."));
+
+		await expect(
+			runImport(
+				{
+					file: {
+						name: "oversized-resource.arkpack",
+						size: bytes.byteLength,
+						arrayBuffer: async () => bytes.slice().buffer,
+					},
+				},
+				createRepository(createProjectFx),
+			),
+		).rejects.toThrow("must be a valid bounded PNG image");
+		expect(createProjectFx).not.toHaveBeenCalled();
 	});
 
 	it("rejects dropped files without the arkpack extension before reading bytes", async () => {

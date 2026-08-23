@@ -10,15 +10,12 @@ import { createFilesystemGameSaveFilesFx } from "../../electron/main/save/create
 let root = "";
 const first = {
 	packageId: "arkini",
-	contentHash: "a".repeat(64),
 };
 const second = {
-	packageId: "arkini",
-	contentHash: "b".repeat(64),
+	packageId: "second",
 };
 const demo = {
 	packageId: "demo",
-	contentHash: "c".repeat(64),
 };
 
 const createRepository = (fileSystem?: FileSystem.FileSystem) =>
@@ -43,7 +40,7 @@ afterEach(async () => {
 });
 
 describe("createFilesystemGameSaveFilesFx", () => {
-	it("writes exact saves through pending/current replacement and isolates clear", async () => {
+	it("writes package saves through pending/current replacement and isolates clear", async () => {
 		const repository = await createRepository();
 		await Effect.runPromise(
 			repository.writeFx(
@@ -76,17 +73,7 @@ describe("createFilesystemGameSaveFilesFx", () => {
 			]),
 		);
 		await expect(
-			access(
-				join(
-					root,
-					"arkini",
-					"game",
-					"saves",
-					"arkini",
-					first.contentHash,
-					"pending.arksave",
-				),
-			),
+			access(join(root, "arkini", "game", "saves", "arkini", "pending.arksave")),
 		).rejects.toBeDefined();
 		await Effect.runPromise(repository.clearFx(first));
 		expect(await Effect.runPromise(repository.readFx(first))).toBeNull();
@@ -111,15 +98,7 @@ describe("createFilesystemGameSaveFilesFx", () => {
 		expect(
 			new Uint8Array(
 				await readFile(
-					join(
-						root,
-						"arkini",
-						"game",
-						"saves",
-						demo.packageId,
-						demo.contentHash,
-						"current.arksave",
-					),
+					join(root, "arkini", "game", "saves", demo.packageId, "current.arksave"),
 				),
 			),
 		).toEqual(bytes);
@@ -185,17 +164,7 @@ describe("createFilesystemGameSaveFilesFx", () => {
 			]),
 		);
 		await expect(
-			access(
-				join(
-					root,
-					"arkini",
-					"game",
-					"saves",
-					"arkini",
-					first.contentHash,
-					"pending.arksave",
-				),
-			),
+			access(join(root, "arkini", "game", "saves", "arkini", "pending.arksave")),
 		).rejects.toBeDefined();
 	});
 
@@ -204,14 +173,7 @@ describe("createFilesystemGameSaveFilesFx", () => {
 		const renameEntered = Effect.runSync(Deferred.make<void>());
 		const releaseRename = Effect.runSync(Deferred.make<void>());
 		const clearEntered = Effect.runSync(Deferred.make<void>());
-		const saveDirectory = join(
-			root,
-			"arkini",
-			"game",
-			"saves",
-			first.packageId,
-			first.contentHash,
-		);
+		const saveDirectory = join(root, "arkini", "game", "saves", first.packageId);
 		const gatedFileSystem: FileSystem.FileSystem = {
 			...fileSystem,
 			rename: (oldPath, newPath) =>
@@ -290,17 +252,7 @@ describe("createFilesystemGameSaveFilesFx", () => {
 			]),
 		);
 		await expect(
-			access(
-				join(
-					root,
-					"arkini",
-					"game",
-					"saves",
-					"arkini",
-					first.contentHash,
-					"pending.arksave",
-				),
-			),
+			access(join(root, "arkini", "game", "saves", "arkini", "pending.arksave")),
 		).rejects.toBeDefined();
 	});
 
@@ -365,15 +317,7 @@ describe("createFilesystemGameSaveFilesFx", () => {
 				]),
 			),
 		);
-		const path = join(
-			root,
-			"arkini",
-			"game",
-			"saves",
-			"arkini",
-			first.contentHash,
-			"current.arksave",
-		);
+		const path = join(root, "arkini", "game", "saves", "arkini", "current.arksave");
 		expect(new Uint8Array(await readFile(path))).toEqual(
 			new Uint8Array([
 				9,
@@ -384,7 +328,6 @@ describe("createFilesystemGameSaveFilesFx", () => {
 				repository.writeFx(
 					{
 						packageId: "../escape",
-						contentHash: first.contentHash,
 					},
 					new Uint8Array(),
 				),

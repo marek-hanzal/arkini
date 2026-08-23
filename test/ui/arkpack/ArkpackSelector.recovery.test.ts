@@ -32,6 +32,7 @@ describe("ArkpackSelector action recovery", () => {
 							contentHash: "b".repeat(64),
 							gameId: "local",
 							title: "Local package",
+							version: "1.0",
 							game: "1",
 							trust: {
 								type: "external",
@@ -83,6 +84,7 @@ describe("ArkpackSelector action recovery", () => {
 			contentHash: "c".repeat(64),
 			gameId: "imported",
 			title: "Imported package",
+			version: "1.0",
 			game: "1",
 			trust: {
 				type: "external",

@@ -48,7 +48,7 @@ export const tearDownEditorProjectRouteTest = async () => {
 const createProject = (projectId: string, revision = 1): EditorProject => ({
 	projectId,
 	title: editorTestPayload.config.meta.title,
-	game: editorTestPayload.config.version,
+	version: editorTestPayload.version,
 	createdAtMs: 1,
 	updatedAtMs: revision,
 	revision,

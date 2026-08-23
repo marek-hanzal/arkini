@@ -13,6 +13,7 @@ import type { EditorProjectSectionId } from "~/ui/project/editor/EditorProjectSe
 import { readEditorProjectSectionForPathFx } from "~/ui/project/editor/readEditorProjectSectionForPathFx";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
+import { analyzeEditorProjectCompatibilityFx } from "~/editor/version/analyzeEditorProjectCompatibilityFx";
 
 export const useEditorProjectFormController = ({
 	onInvalidSection,
@@ -59,6 +60,19 @@ export const useEditorProjectFormController = ({
 		},
 	});
 	const dirty = useStore(form.store, (state) => state.isDirty);
+	const values = useStore(form.store, (state) => state.values);
+	const compatibility = useMemo(() => {
+		if (!dirty) return undefined;
+		const parsed = schema.safeParse(values);
+		if (!parsed.success) return undefined;
+		const config = RendererRuntime.runSync(createEditorProjectConfigFx(project, parsed.data));
+		return RendererRuntime.runSync(analyzeEditorProjectCompatibilityFx(project.config, config));
+	}, [
+		dirty,
+		project,
+		schema,
+		values,
+	]);
 	const submitting = useStore(form.store, (state) => state.isSubmitting);
 	const validationError = useStore(form.store, (state) =>
 		state.submissionAttempts > 0 && !state.isValid
@@ -103,6 +117,7 @@ export const useEditorProjectFormController = ({
 
 	return {
 		canonicalValues,
+		compatibility,
 		error:
 			RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveResult)) ?? validationError,
 		form,

@@ -11,7 +11,6 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { outputFx } from "~/engine/output/fx/outputFx";
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},

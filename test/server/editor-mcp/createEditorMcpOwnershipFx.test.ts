@@ -188,6 +188,7 @@ describe("createEditorMcpOwnershipFx", () => {
 		await Effect.runPromise(
 			repository.createProjectFx({
 				projectId: "project-context",
+				version: "1.0",
 				config: editorTestPayload.config,
 				resources: editorTestPayload.resources,
 			}),
@@ -215,6 +216,7 @@ describe("createEditorMcpOwnershipFx", () => {
 		await Effect.runPromise(
 			repository.createProjectFx({
 				projectId: "legacy-project",
+				version: "1.0",
 				config: editorTestPayload.config,
 				resources: editorTestPayload.resources,
 			}),
@@ -243,6 +245,7 @@ describe("createEditorMcpOwnershipFx", () => {
 		await Effect.runPromise(
 			repository.createProjectFx({
 				projectId: "tool-project",
+				version: "1.0",
 				config: createJobTestConfig(),
 				resources: [],
 			}),

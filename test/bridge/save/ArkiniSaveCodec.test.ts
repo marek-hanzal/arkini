@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { decodeArkiniSaveFx } from "~/bridge/save/decodeArkiniSaveFx";
 import { encodeArkiniSaveFx } from "~/bridge/save/encodeArkiniSaveFx";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 
 const state: StateSchema.Type = {
 	cheats: {
@@ -18,11 +19,17 @@ const state: StateSchema.Type = {
 };
 
 describe("Arkini save codec", () => {
-	it("round-trips the minimal format-1 envelope", async () => {
-		const bytes = await Effect.runPromise(encodeArkiniSaveFx(state));
+	it("round-trips arkpack and writer compatibility with canonical state", async () => {
+		const bytes = await Effect.runPromise(
+			encodeArkiniSaveFx({
+				version: "1.2",
+				state,
+			}),
+		);
 		await expect(Effect.runPromise(decodeArkiniSaveFx(bytes))).resolves.toEqual({
 			namespace: "arkini",
-			format: 1,
+			version: "1.2",
+			game: ArkiniAppVersion,
 			state,
 		});
 	});
@@ -49,7 +56,12 @@ describe("Arkini save codec", () => {
 			],
 		};
 
-		const bytes = await Effect.runPromise(encodeArkiniSaveFx(queuedState));
+		const bytes = await Effect.runPromise(
+			encodeArkiniSaveFx({
+				version: "1.2",
+				state: queuedState,
+			}),
+		);
 		const decoded = await Effect.runPromise(decodeArkiniSaveFx(bytes));
 
 		expect(decoded.state.jobQueue).toEqual(queuedState.jobQueue);
@@ -67,24 +79,34 @@ describe("Arkini save codec", () => {
 		} as unknown as StateSchema.Type;
 
 		expect(() =>
-			Effect.runSync(Effect.result(encodeArkiniSaveFx(invalidCanonicalState))),
+			Effect.runSync(
+				Effect.result(
+					encodeArkiniSaveFx({
+						version: "1.2",
+						state: invalidCanonicalState,
+					}),
+				),
+			),
 		).toThrow();
 	});
 
 	it.each([
 		{
 			namespace: "other",
-			format: 1,
+			version: "1.2",
+			game: ArkiniAppVersion,
 			state,
 		},
 		{
 			namespace: "arkini",
-			format: 2,
+			version: "1.2.3",
+			game: ArkiniAppVersion,
 			state,
 		},
 		{
 			namespace: "arkini",
-			format: 1,
+			version: "1.2",
+			game: "0.5",
 			state: {
 				currentSpace: -1,
 			},

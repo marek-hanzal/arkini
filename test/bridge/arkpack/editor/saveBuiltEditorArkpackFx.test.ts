@@ -13,7 +13,9 @@ const artifact = {
 	contentHash: "a".repeat(64),
 	diagnostics: [],
 	filename: "project.arkpack",
+	game: "0.5.0",
 	revision: 1,
+	version: "1.0",
 };
 
 afterEach(() => {

@@ -2,7 +2,6 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { PayloadSchema } from "~/engine/pack/schema/PayloadSchema";
 
 export const editorTestConfig = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -49,6 +48,8 @@ export const editorTestConfig = GameConfigSchema.parse({
 
 export const editorTestPayload: PayloadSchema.Type = {
 	packageId: "project:test",
+	version: "1.0",
+	game: "0.5.0",
 	config: editorTestConfig,
 	resources: [
 		{

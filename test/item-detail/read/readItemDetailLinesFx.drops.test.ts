@@ -14,7 +14,6 @@ import {
 describe("readItemDetailLinesFx / drops and stale identities", () => {
 	it("groups duplicate drops without flattening guaranteed and chance rolls", () => {
 		const config = GameConfigSchema.parse({
-			version: "1.0",
 			resources: {
 				hero: "hero",
 			},

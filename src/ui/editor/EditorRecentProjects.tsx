@@ -49,7 +49,7 @@ export const EditorRecentProjects = ({ blocked, projects }: EditorRecentProjects
 								{project.title}
 							</span>
 							<span className="mt-1 block truncate text-xs text-subtle">
-								{project.projectId} · {project.game}
+								{project.projectId} · v{project.version}
 							</span>
 						</span>
 						<time

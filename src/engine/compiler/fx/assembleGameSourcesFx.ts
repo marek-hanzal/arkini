@@ -163,9 +163,6 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 				.with(DiagnosticProviderEnumSchema.enum.Start, () => {
 					value.start = source.value.start;
 				})
-				.with(DiagnosticProviderEnumSchema.enum.Version, () => {
-					value.version = source.value.version;
-				})
 				.exhaustive();
 		}
 

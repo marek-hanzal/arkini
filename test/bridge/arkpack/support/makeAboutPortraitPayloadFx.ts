@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import type { PayloadSchema } from "~/engine/pack/schema/PayloadSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 
 export namespace makeAboutPortraitPayloadFx {
 	export interface Props {
@@ -25,8 +26,9 @@ export const makeAboutPortraitPayloadFx = Effect.fn("makeAboutPortraitPayloadFx"
 		Effect.sync(
 			(): PayloadSchema.Type => ({
 				packageId: "package:avatars",
+				version: "1.0",
+				game: ArkiniAppVersion,
 				config: GameConfigSchema.parse({
-					version: "1.0",
 					resources: {
 						hero: "hero",
 						...roles,

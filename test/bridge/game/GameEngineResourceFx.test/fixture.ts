@@ -38,7 +38,8 @@ export const makeResource = ({
 				contentHash: `content:${packageId}`,
 				gameId: testArkpackConfig.meta.id,
 				title: testArkpackConfig.meta.title,
-				game: testArkpackConfig.version,
+				version: "1.0",
+				game: "0.5.0",
 				trust: {
 					type: "external",
 					reason: "unsigned",
@@ -57,7 +58,6 @@ export const makeResource = ({
 			run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 			saveKey: {
 				packageId,
-				contentHash: "0".repeat(64),
 			},
 			subscribe: () => () => undefined,
 			subscribeEvents: () => () => undefined,

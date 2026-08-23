@@ -27,7 +27,6 @@ describe("createGameSessionFx / fail-stop", () => {
 				getResourceUrl: () => "blob:test",
 				saveKey: {
 					packageId: "fail-stop-test",
-					contentHash: "0".repeat(64),
 				},
 			} as unknown as Game),
 		);
@@ -78,7 +77,6 @@ describe("createGameSessionFx / fail-stop", () => {
 				getResourceUrl: () => "blob:test",
 				saveKey: {
 					packageId: "failed-read-test",
-					contentHash: "0".repeat(64),
 				},
 			} as unknown as Game),
 		);

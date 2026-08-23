@@ -26,8 +26,8 @@ const createGameFx = (props: Omit<createGameFromPackageFx.Props, "runRendererEff
 		runRendererEffect: Effect.runSync,
 	});
 
-const createStorages = async () => {
-	const bytes = createTestArkpack();
+const createStorages = async (version = "1.0") => {
+	const bytes = createTestArkpack(testArkpackConfig, "package:bridge", version);
 	const loaded = await Effect.runPromise(
 		readArkpackFx({
 			bytes,
@@ -62,10 +62,12 @@ const createStorages = async () => {
 		openUserDirectoryFx: Effect.void,
 	};
 	let saved: Uint8Array | null = null;
+	let clears = 0;
 	const saveStorage: GameSaveStorage = {
 		readFx: () => Effect.sync(() => saved?.slice() ?? null),
 		clearFx: () =>
 			Effect.sync(() => {
+				clears += 1;
 				saved = null;
 			}),
 		writeFx: (_key, bytes) =>
@@ -79,9 +81,9 @@ const createStorages = async () => {
 		packageId: loaded.descriptor.packageId,
 		saveKey: {
 			packageId: loaded.descriptor.packageId,
-			contentHash: loaded.descriptor.contentHash,
 		} satisfies GameSaveStorage.Key,
 		readSaved: () => saved,
+		readClearCount: () => clears,
 		setSaved: (bytes: Uint8Array | null) => {
 			saved = bytes?.slice() ?? null;
 		},
@@ -141,6 +143,155 @@ describe("createGameFx", () => {
 		} finally {
 			await Effect.runPromise(restored.disposeFx);
 		}
+	});
+
+	it("restores an older compatible minor save and stamps the current arkpack version", async () => {
+		const storages = await createStorages("1.1");
+		const first = await Effect.runPromise(
+			createGameFx({
+				packageId: storages.packageId,
+				arkpackStorage: storages.arkpackStorage,
+				saveStorage: storages.saveStorage,
+			}),
+		);
+		await Effect.runPromise(first.disposeFx);
+		const bytes = storages.readSaved();
+		if (bytes === null) throw new Error("Expected a save.");
+		const saved = await Effect.runPromise(decodeArkiniSaveFx(bytes));
+		storages.setSaved(
+			encode({
+				...saved,
+				version: "1.0",
+			}),
+		);
+
+		const restored = await Effect.runPromise(
+			createGameFx({
+				packageId: storages.packageId,
+				arkpackStorage: storages.arkpackStorage,
+				saveStorage: storages.saveStorage,
+			}),
+		);
+		await Effect.runPromise(restored.disposeFx);
+		const upgradedBytes = storages.readSaved();
+		if (upgradedBytes === null) throw new Error("Expected an upgraded save.");
+		expect((await Effect.runPromise(decodeArkiniSaveFx(upgradedBytes))).version).toBe("1.1");
+	});
+
+	it("clears a different-major save before starting fresh gameplay", async () => {
+		const storages = await createStorages();
+		const first = await Effect.runPromise(
+			createGameFx({
+				packageId: storages.packageId,
+				arkpackStorage: storages.arkpackStorage,
+				saveStorage: storages.saveStorage,
+			}),
+		);
+		await first.run(
+			spawnItemFx({
+				id: "runtime:old-major",
+				itemId: "water",
+				location: {
+					scope: "inventory",
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+				quantity: 1,
+			}),
+		);
+		await Effect.runPromise(first.disposeFx);
+		const bytes = storages.readSaved();
+		if (bytes === null) throw new Error("Expected a save.");
+		const saved = await Effect.runPromise(decodeArkiniSaveFx(bytes));
+		storages.setSaved(
+			encode({
+				...saved,
+				version: "2.0",
+				game: "0.4.0",
+			}),
+		);
+
+		const fresh = await Effect.runPromise(
+			createGameFx({
+				packageId: storages.packageId,
+				arkpackStorage: storages.arkpackStorage,
+				saveStorage: storages.saveStorage,
+			}),
+		);
+		try {
+			expect(fresh.getSnapshot().items.map(({ id }) => id)).not.toContain(
+				"runtime:old-major",
+			);
+			expect(storages.readClearCount()).toBe(1);
+		} finally {
+			await Effect.runPromise(fresh.disposeWithoutSaveFx);
+		}
+	});
+
+	it("rejects an unsupported writer for a same-major save without clearing it", async () => {
+		const storages = await createStorages();
+		const first = await Effect.runPromise(
+			createGameFx({
+				packageId: storages.packageId,
+				arkpackStorage: storages.arkpackStorage,
+				saveStorage: storages.saveStorage,
+			}),
+		);
+		await Effect.runPromise(first.disposeFx);
+		const bytes = storages.readSaved();
+		if (bytes === null) throw new Error("Expected a save.");
+		const saved = await Effect.runPromise(decodeArkiniSaveFx(bytes));
+		const unsupportedBytes = encode({
+			...saved,
+			game: "0.4.0",
+		});
+		storages.setSaved(unsupportedBytes);
+
+		await expect(
+			Effect.runPromise(
+				createGameFx({
+					packageId: storages.packageId,
+					arkpackStorage: storages.arkpackStorage,
+					saveStorage: storages.saveStorage,
+				}),
+			),
+		).rejects.toBeInstanceOf(GameSaveBootstrapError);
+		expect(storages.readClearCount()).toBe(0);
+		expect(storages.readSaved()).toEqual(unsupportedBytes);
+	});
+
+	it("rejects a future minor save without clearing or overwriting it", async () => {
+		const storages = await createStorages();
+		const first = await Effect.runPromise(
+			createGameFx({
+				packageId: storages.packageId,
+				arkpackStorage: storages.arkpackStorage,
+				saveStorage: storages.saveStorage,
+			}),
+		);
+		await Effect.runPromise(first.disposeFx);
+		const bytes = storages.readSaved();
+		if (bytes === null) throw new Error("Expected a save.");
+		const saved = await Effect.runPromise(decodeArkiniSaveFx(bytes));
+		const futureBytes = encode({
+			...saved,
+			version: "1.1",
+		});
+		storages.setSaved(futureBytes);
+
+		await expect(
+			Effect.runPromise(
+				createGameFx({
+					packageId: storages.packageId,
+					arkpackStorage: storages.arkpackStorage,
+					saveStorage: storages.saveStorage,
+				}),
+			),
+		).rejects.toBeInstanceOf(GameSaveBootstrapError);
+		expect(storages.readClearCount()).toBe(0);
+		expect(storages.readSaved()).toEqual(futureBytes);
 	});
 
 	it("retries failed public game disposal without releasing its retry resources", async () => {
@@ -270,7 +421,8 @@ describe("createGameFx", () => {
 		storages.setSaved(
 			encode({
 				namespace: "arkini",
-				format: 999,
+				version: "not-a-version",
+				game: "0.5.0",
 				state: {},
 			}),
 		);

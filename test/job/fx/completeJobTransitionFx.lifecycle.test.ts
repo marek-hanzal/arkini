@@ -50,7 +50,6 @@ const base = (id: string) => ({
 });
 
 const lifecycleConfig = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},

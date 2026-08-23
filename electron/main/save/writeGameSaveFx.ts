@@ -19,7 +19,7 @@ export const writeGameSaveFx = Effect.fn("writeGameSaveFx")(
 	({ root, fileSystem, key, bytes }: writeGameSaveFx.Props) =>
 		Effect.gen(function* () {
 			const valid = yield* assertGameSaveKeyFx(key);
-			const directory = join(root, valid.packageId, valid.contentHash);
+			const directory = join(root, valid.packageId);
 			const pending = join(directory, "pending.arksave");
 			const current = join(directory, "current.arksave");
 			yield* fileSystem.makeDirectory(directory, {

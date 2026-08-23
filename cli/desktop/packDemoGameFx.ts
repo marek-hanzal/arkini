@@ -17,6 +17,7 @@ export const packDemoGameFx = Effect.fn("packDemoGameFx")(function* ({
 		input: gameDirectory,
 		output: "game/demo.game.arkpack",
 		packageId: "demo",
+		version: "1.0",
 	}).pipe(
 		Effect.catchTag("GameValidationError", (error) =>
 			printGameDiagnosticsForCliFx(error.diagnostics).pipe(

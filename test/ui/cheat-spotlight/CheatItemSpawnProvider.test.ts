@@ -55,6 +55,7 @@ const makeGame = (
 		contentHash: `content:spawn-${suffix}`,
 		gameId: `game:spawn-${suffix}`,
 		title: `Spawn ${suffix}`,
+		version: "1.0",
 		game: "1.0",
 		trust: {
 			type: "external",
@@ -65,7 +66,6 @@ const makeGame = (
 	config: createJobTestConfig(),
 	saveKey: {
 		packageId: `package:spawn-${suffix}`,
-		contentHash: suffix.repeat(64).slice(0, 64),
 	},
 	getResourceUrl: () => "blob:test",
 	runFx: ((_effect) => session.runFx(commandFx)) as Game["runFx"],

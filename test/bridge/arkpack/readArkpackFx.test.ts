@@ -14,6 +14,7 @@ import {
 	installTestPngDecoder,
 } from "~test/bridge/arkpack/support/createTestPngBytes";
 import { gzipSync } from "node:zlib";
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 
 const trustedKeys = {
 	keys: [],
@@ -55,7 +56,8 @@ describe("readArkpackFx", () => {
 			packageId: "package:bridge",
 			gameId: "game:bridge",
 			title: "Bridge game",
-			game: "1.0",
+			version: "1.0",
+			game: ArkiniAppVersion,
 			source: "user",
 		});
 		expect(first.descriptor.contentHash).toMatch(/^[a-f0-9]{64}$/);
@@ -113,6 +115,8 @@ describe("readArkpackFx", () => {
 		const encoded = Effect.runSync(
 			encodeFx({
 				packageId: "package:invalid-png",
+				version: "1.0",
+				game: ArkiniAppVersion,
 				config: testArkpackConfig,
 				resources: [
 					{
@@ -156,6 +160,8 @@ describe("readArkpackFx", () => {
 		const encoded = Effect.runSync(
 			encodeFx({
 				packageId: "package:invalid-config",
+				version: "1.0",
+				game: ArkiniAppVersion,
 				config: invalid,
 				resources: [
 					{

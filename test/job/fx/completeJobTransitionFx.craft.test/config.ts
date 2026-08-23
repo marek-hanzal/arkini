@@ -179,5 +179,4 @@ export const craftCompletionConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	version: "1.0",
 } satisfies z.input<typeof GameConfigSchema>);

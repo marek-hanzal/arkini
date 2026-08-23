@@ -143,7 +143,6 @@ const blueprintOutput = (
 	]);
 
 export const blueprintConfig = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},

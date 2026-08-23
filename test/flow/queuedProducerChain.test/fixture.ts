@@ -104,7 +104,6 @@ const producer = ({
 });
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},

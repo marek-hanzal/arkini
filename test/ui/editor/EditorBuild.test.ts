@@ -95,7 +95,9 @@ const createArtifact = (contentHash: string, revision: number) => ({
 	contentHash,
 	diagnostics: [],
 	filename: "editor-test.arkpack",
+	game: "0.5.0",
 	revision,
+	version: "1.0",
 });
 
 beforeEach(() => {
@@ -107,6 +109,7 @@ beforeEach(() => {
 		},
 		resources: [],
 		revision: 0,
+		version: "1.0",
 	};
 	state.buildResult = AsyncResult.initial();
 	state.installResults.clear();

@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { importArkpackFx } from "~/bridge/arkpack/importArkpackFx";
 import { loadArkpackFx } from "~/bridge/arkpack/loadArkpackFx";
 import { encodeFx } from "~/engine/pack/fx/encodeFx";
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 import {
 	createTestArkpack,
 	testArkpackConfig,
@@ -62,6 +63,8 @@ describe("importArkpackFx", () => {
 		const encoded = Effect.runSync(
 			encodeFx({
 				packageId: "package:invalid",
+				version: "1.0",
+				game: ArkiniAppVersion,
 				config: invalid,
 				resources: [
 					{

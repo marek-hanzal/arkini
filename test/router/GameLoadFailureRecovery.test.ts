@@ -55,7 +55,6 @@ describe("game load failure recovery", () => {
 	it("cleans only the verified failed save, exits, and permits a later fresh Play", async () => {
 		const saveKey = {
 			packageId,
-			contentHash: "a".repeat(64),
 		};
 		createGameFxMock.mockReturnValue(
 			Effect.fail(
@@ -119,7 +118,6 @@ describe("game load failure recovery", () => {
 	it("keeps exact cleanup failure visible and retries cleanup rather than Game loading", async () => {
 		const saveKey = {
 			packageId,
-			contentHash: "b".repeat(64),
 		};
 		createGameFxMock.mockReturnValue(
 			Effect.fail(

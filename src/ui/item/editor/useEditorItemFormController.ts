@@ -19,6 +19,7 @@ import { readEditorItemSectionForPathFx } from "~/ui/item/editor/readEditorItemS
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
+import { analyzeEditorProjectCompatibilityFx } from "~/editor/version/analyzeEditorProjectCompatibilityFx";
 
 export namespace useEditorItemFormController {
 	export interface Props {
@@ -109,6 +110,28 @@ export const useEditorItemFormController = ({
 	]);
 	const itemId = useStore(form.store, (state) => state.values.id);
 	const dirty = useStore(form.store, (state) => state.isDirty);
+	const values = useStore(form.store, (state) => state.values);
+	const compatibility = useMemo(() => {
+		if (!dirty) return undefined;
+		const parsed = EditorItemFormSchema.safeParse(values);
+		if (!parsed.success) return undefined;
+		const items = {
+			...project.config.items,
+		};
+		if (initialItem.id !== parsed.data.id) delete items[initialItem.id];
+		items[parsed.data.id] = parsed.data;
+		return RendererRuntime.runSync(
+			analyzeEditorProjectCompatibilityFx(project.config, {
+				...project.config,
+				items,
+			}),
+		);
+	}, [
+		dirty,
+		initialItem.id,
+		project,
+		values,
+	]);
 	const submitting = useStore(form.store, (state) => state.isSubmitting);
 	const validationError = useStore(form.store, (state) =>
 		state.submissionAttempts > 0 && !state.isValid
@@ -174,6 +197,7 @@ export const useEditorItemFormController = ({
 	});
 	return {
 		canonicalItem,
+		compatibility,
 		error:
 			RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveItemResult)) ??
 			validationError,

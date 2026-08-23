@@ -75,7 +75,6 @@ const line = (id: string, itemId: string, outputItemId?: string) => ({
 });
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},

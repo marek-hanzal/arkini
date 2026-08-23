@@ -25,7 +25,6 @@ const baseItem = ({
 };
 
 export const inputRuntimeTestConfig = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},

@@ -46,7 +46,6 @@ const guaranteedOutput = (itemId: string) => ({
 });
 
 export const multiSpaceTestConfig = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},

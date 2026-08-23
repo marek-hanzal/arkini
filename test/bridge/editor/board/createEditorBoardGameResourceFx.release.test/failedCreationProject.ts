@@ -4,7 +4,7 @@ import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 export const failedCreationProject: EditorProject = {
 	projectId: "failed-editor-board",
 	title: editorTestPayload.config.meta.title,
-	game: editorTestPayload.config.version,
+	version: editorTestPayload.version,
 	createdAtMs: 1,
 	updatedAtMs: 1,
 	revision: 1,

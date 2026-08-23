@@ -64,7 +64,6 @@ describe("GameEngineResourceFx / bootstrap failure", () => {
 			cause: new Error("invalid save"),
 			saveKey: {
 				packageId: "package:mixed",
-				contentHash: "c".repeat(64),
 			},
 		});
 		const mixedCause = Cause.combine(

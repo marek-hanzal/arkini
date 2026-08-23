@@ -13,7 +13,7 @@ export const readEditorMcpProjectTextFx = Effect.fn("readEditorMcpProjectTextFx"
 				`Title: ${project.title}`,
 				`Project ID: ${project.projectId}`,
 				`Game ID: ${project.config.meta.id}`,
-				`Config version: ${project.game}`,
+				`Arkpack version: ${project.version}`,
 				`Revision: ${project.revision}`,
 				`Board: ${project.config.meta.board.width} × ${project.config.meta.board.height}`,
 				`Toolbar: ${project.config.meta.toolbarSize === undefined || project.config.meta.toolbarSize === 0 ? "disabled" : `${project.config.meta.toolbarSize} slots`}`,

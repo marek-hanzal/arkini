@@ -3,14 +3,16 @@ import { describe, expect, it } from "vitest";
 
 import { decodeFx } from "~/engine/pack/fx/decodeFx";
 import { encodeFx } from "~/engine/pack/fx/encodeFx";
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 
 describe("encodeFx", () => {
 	it("round-trips MessagePack config and raw resource bytes", async () => {
 		const decoded = await Effect.runPromise(
 			encodeFx({
 				packageId: "package:test",
+				version: "1.2",
+				game: ArkiniAppVersion,
 				config: {
-					version: "1.0",
 					resources: {
 						hero: "hero",
 					},
@@ -50,8 +52,9 @@ describe("encodeFx", () => {
 
 		expect(decoded).toEqual({
 			packageId: "package:test",
+			version: "1.2",
+			game: ArkiniAppVersion,
 			config: {
-				version: "1.0",
 				resources: {
 					hero: "hero",
 				},

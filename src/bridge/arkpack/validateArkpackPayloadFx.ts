@@ -15,7 +15,6 @@ const createPackProvenance = (
 		meta: source,
 		resources: source,
 		start: source,
-		version: source,
 		items: Object.fromEntries(
 			Object.keys(items).map((id) => [
 				id,

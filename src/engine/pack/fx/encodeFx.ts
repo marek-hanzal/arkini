@@ -6,14 +6,18 @@ import type { PayloadSchema } from "~/engine/pack/schema/PayloadSchema";
 
 export const encodeFx = Effect.fn("encodeFx")(function* ({
 	packageId,
+	version,
+	game,
 	config,
 	resources,
 }: PayloadSchema.Type) {
 	return yield* Effect.sync(() => {
 		const configBytes = encode(config);
 		const manifestBytes = encode({
-			version: 2,
+			format: 3,
 			packageId,
+			version,
+			game,
 			length: configBytes.byteLength,
 			resources: resources.map((resource) => ({
 				id: resource.id,

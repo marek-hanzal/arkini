@@ -34,6 +34,7 @@ const createProject = (repository: SqliteEditorProjectRepository, projectId = "p
 	Effect.runPromise(
 		repository.createProjectFx({
 			projectId,
+			version: "1.0",
 			config: editorTestPayload.config,
 			resources: editorTestPayload.resources,
 		}),
@@ -53,6 +54,46 @@ afterEach(async () => {
 });
 
 describe("createSqliteEditorProjectRepositoryFx", () => {
+	it("migrates legacy config.version into the project-owned arkpack version", async () => {
+		databasePath = join(temporaryDirectory, "legacy.sqlite");
+		const database = new DatabaseSync(databasePath);
+		database.exec(`
+			CREATE TABLE projects (
+				project_id TEXT PRIMARY KEY NOT NULL,
+				config_json TEXT NOT NULL,
+				revision INTEGER NOT NULL,
+				created_at_ms INTEGER NOT NULL,
+				updated_at_ms INTEGER NOT NULL
+			) STRICT;
+			CREATE TABLE resources (
+				project_id TEXT NOT NULL,
+				id TEXT NOT NULL,
+				mime TEXT NOT NULL,
+				bytes BLOB NOT NULL,
+				PRIMARY KEY (project_id, id)
+			) STRICT;
+			PRAGMA user_version = 1;
+		`);
+		database
+			.prepare(
+				"INSERT INTO projects(project_id, config_json, revision, created_at_ms, updated_at_ms) VALUES (?, ?, 0, 1, 1)",
+			)
+			.run(
+				"legacy",
+				JSON.stringify({
+					...editorTestPayload.config,
+					version: "1.0",
+				}),
+			);
+		database.close();
+
+		const repository = await openRepository();
+		const project = await Effect.runPromise(repository.readProjectFx("legacy"));
+		expect(project?.version).toBe("1.0");
+		expect(project?.config).not.toHaveProperty("version");
+		await closeRepository(repository);
+	});
+
 	it("creates, reads, lists and reopens one canonical project", async () => {
 		const repository = await openRepository();
 		const created = await createProject(repository);
@@ -60,7 +101,7 @@ describe("createSqliteEditorProjectRepositoryFx", () => {
 		expect(created).toMatchObject({
 			projectId: "project-one",
 			title: "Editor test",
-			game: "1.0",
+			version: "1.0",
 			revision: 0,
 		});
 		expect(created.resources.map(({ id }) => id)).toEqual([
@@ -75,7 +116,7 @@ describe("createSqliteEditorProjectRepositoryFx", () => {
 			{
 				projectId: "project-one",
 				title: "Editor test",
-				game: "1.0",
+				version: "1.0",
 				createdAtMs: created.createdAtMs,
 				updatedAtMs: created.updatedAtMs,
 			},
@@ -117,12 +158,48 @@ describe("createSqliteEditorProjectRepositoryFx", () => {
 		await closeRepository(repository);
 	});
 
+	it("bumps the persisted compatibility version atomically with each classified write", async () => {
+		const repository = await openRepository();
+		const created = await createProject(repository);
+		const compatible = await Effect.runPromise(
+			repository.replaceConfigFx({
+				projectId: created.projectId,
+				expectedRevision: created.revision,
+				config: {
+					...created.config,
+					meta: {
+						...created.config.meta,
+						title: "Compatible title",
+					},
+				},
+			}),
+		);
+		expect(compatible.version).toBe("1.1");
+
+		const breaking = await Effect.runPromise(
+			repository.replaceConfigFx({
+				projectId: compatible.projectId,
+				expectedRevision: compatible.revision,
+				config: {
+					...compatible.config,
+					items: {},
+				},
+			}),
+		);
+		expect(breaking.version).toBe("2.0");
+		expect(
+			(await Effect.runPromise(repository.readProjectFx(created.projectId)))?.version,
+		).toBe("2.0");
+		await closeRepository(repository);
+	});
+
 	it("rolls back a duplicate-resource project import", async () => {
 		const repository = await openRepository();
 		await expect(
 			Effect.runPromise(
 				repository.createProjectFx({
 					projectId: "project-one",
+					version: "1.0",
 					config: editorTestPayload.config,
 					resources: [
 						editorTestPayload.resources[0],
@@ -294,6 +371,7 @@ describe("createSqliteEditorProjectRepositoryFx", () => {
 			}),
 		);
 		expect(renamed.revision).toBe(1);
+		expect(renamed.version).toBe("1.1");
 		expect(renamed.resources.map(({ id }) => id)).toEqual([
 			"item-water",
 			"new-hero",

@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 
 import { ArkpackLimits } from "../../../../shared/ArkpackLimits";
+import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 import { validateArkpackPayloadFx } from "~/bridge/arkpack/validateArkpackPayloadFx";
 import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
@@ -16,7 +17,9 @@ export namespace buildEditorProjectFx {
 		readonly contentHash: string;
 		readonly diagnostics: GameDiagnosticsSchema.Type;
 		readonly filename: string;
+		readonly game: string;
 		readonly revision: number;
+		readonly version: string;
 	}
 }
 
@@ -64,6 +67,8 @@ export const buildEditorProjectFx = Effect.fn("buildEditorProjectFx")(function* 
 	}
 	const payload = {
 		packageId: project.projectId,
+		version: project.version,
+		game: ArkiniAppVersion,
 		config: project.config,
 		resources: [
 			...project.resources,
@@ -87,6 +92,8 @@ export const buildEditorProjectFx = Effect.fn("buildEditorProjectFx")(function* 
 		contentHash,
 		diagnostics,
 		filename: `${encodeURIComponent(project.projectId)}.game.arkpack`,
+		game: ArkiniAppVersion,
 		revision: project.revision,
+		version: project.version,
 	} satisfies buildEditorProjectFx.Success;
 });

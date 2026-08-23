@@ -34,7 +34,6 @@ const line = (id: string, title: string, isDefault = false) => ({
 });
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -85,7 +84,6 @@ const config = GameConfigSchema.parse({
 });
 const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 	GameConfigSchema.parse({
-		version: "1.0",
 		resources: {
 			hero: "hero",
 		},

@@ -6,10 +6,12 @@ import type { EditorProjectRepositoryError } from "~/editor/EditorProjectReposit
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 
 export namespace EditorProjectRepository {
 	export interface CreateProjectProps {
 		readonly projectId: string;
+		readonly version: ArkpackVersionSchema.Type;
 		readonly config: GameConfigSchema.Type;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
 	}

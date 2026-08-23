@@ -18,7 +18,7 @@ export const readGameSaveFx = Effect.fn("readGameSaveFx")(
 	({ root, fileSystem, key }: readGameSaveFx.Props) =>
 		Effect.gen(function* () {
 			const valid = yield* assertGameSaveKeyFx(key);
-			const path = join(root, valid.packageId, valid.contentHash, "current.arksave");
+			const path = join(root, valid.packageId, "current.arksave");
 			if (!(yield* fileSystem.exists(path))) return null;
 			return Uint8Array.from(yield* fileSystem.readFile(path));
 		}).pipe(

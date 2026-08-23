@@ -12,7 +12,7 @@ import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 const project: EditorProject = {
 	projectId: "editor-test",
 	title: "Editor test",
-	game: "1.0",
+	version: "1.0",
 	createdAtMs: 123,
 	updatedAtMs: 124,
 	revision: 2,

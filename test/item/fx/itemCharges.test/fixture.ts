@@ -108,7 +108,6 @@ export const base = ({
 });
 
 export const chargesConfig = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},

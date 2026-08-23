@@ -120,7 +120,6 @@ const stashItem = ({
 });
 
 const stashConfig = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},

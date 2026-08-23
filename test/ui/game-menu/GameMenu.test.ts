@@ -80,6 +80,7 @@ const createGame = (
 		contentHash: "content:menu",
 		gameId: "game:menu",
 		title: "Menu game",
+		version: "1.0",
 		game: "1.0",
 		trust: {
 			type: "external",
@@ -90,7 +91,6 @@ const createGame = (
 	config: testArkpackConfig,
 	saveKey: {
 		packageId: "package:menu",
-		contentHash: "b".repeat(64),
 	},
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,

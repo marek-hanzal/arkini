@@ -8,7 +8,6 @@ import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSc
 import { whenFx } from "~/engine/when/fx/whenFx";
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},

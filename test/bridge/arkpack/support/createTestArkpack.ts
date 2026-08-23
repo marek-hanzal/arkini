@@ -3,10 +3,11 @@ import { Effect } from "effect";
 
 import { encodeFx } from "~/engine/pack/fx/encodeFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import { createTestPngBytes } from "~test/bridge/arkpack/support/createTestPngBytes";
+import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 
 export const testArkpackConfig = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -51,10 +52,16 @@ export const testArkpackConfig = GameConfigSchema.parse({
 	},
 });
 
-export const createTestArkpack = (config = testArkpackConfig, packageId = "package:bridge") => {
+export const createTestArkpack = (
+	config = testArkpackConfig,
+	packageId = "package:bridge",
+	version: ArkpackVersionSchema.Type = "1.0",
+) => {
 	const encoded = Effect.runSync(
 		encodeFx({
 			packageId,
+			version,
+			game: ArkiniAppVersion,
 			config,
 			resources: [
 				{

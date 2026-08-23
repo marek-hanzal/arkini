@@ -45,7 +45,7 @@ const event = {
 const descriptor = {
 	projectId: "project-one",
 	title: editorTestPayload.config.meta.title,
-	game: editorTestPayload.config.version,
+	version: editorTestPayload.version,
 	createdAtMs: 1,
 	updatedAtMs: 2,
 };
@@ -156,6 +156,7 @@ describe("registerEditorProjectIpcFx", () => {
 		});
 		const createRequest = {
 			projectId: "project-one",
+			version: editorTestPayload.version,
 			config: editorTestPayload.config,
 			resources: editorTestPayload.resources,
 		};

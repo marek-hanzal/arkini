@@ -75,7 +75,6 @@ export namespace ArkiniElectronApi {
 
 	export interface SaveKey {
 		readonly packageId: string;
-		readonly contentHash: string;
 	}
 
 	export interface Api {

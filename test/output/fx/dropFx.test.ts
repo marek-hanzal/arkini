@@ -8,7 +8,6 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { dropFx } from "~/engine/output/fx/dropFx";
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},

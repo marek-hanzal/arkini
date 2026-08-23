@@ -41,7 +41,6 @@ const workerFuelRequestId = "job:worker:fuel";
 const upgradeRequestId = "job:upgrade";
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},

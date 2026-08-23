@@ -24,7 +24,6 @@ const harness = vi.hoisted(() => ({
 
 const payload = {
 	config: GameConfigSchema.parse({
-		version: "1.0",
 		resources: {
 			hero: "hero",
 			"avatar-01": "avatar:one",

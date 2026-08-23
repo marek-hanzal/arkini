@@ -12,12 +12,13 @@ import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 
 const descriptorSchema = z
 	.object({
 		projectId: IdSchema,
 		title: z.string(),
-		game: z.string(),
+		version: ArkpackVersionSchema,
 		createdAtMs: z.number().int().nonnegative(),
 		updatedAtMs: z.number().int().nonnegative(),
 	})
@@ -35,17 +36,18 @@ const materializeCommit = (transport: z.infer<typeof commitTransportSchema>) => 
 	const record = EditorProjectRecordSchema.parse({
 		projectId: transport.projectId,
 		config: transport.config,
+		version: transport.version,
 		revision: transport.revision,
 		createdAtMs: transport.createdAtMs,
 		updatedAtMs: transport.updatedAtMs,
 	});
-	if (transport.title !== record.config.meta.title || transport.game !== record.config.version) {
+	if (transport.title !== record.config.meta.title || transport.version !== record.version) {
 		throw new Error("Editor IPC metadata does not match the canonical project config.");
 	}
 	return {
 		projectId: record.projectId,
 		title: record.config.meta.title,
-		game: record.config.version,
+		version: record.version,
 		createdAtMs: record.createdAtMs,
 		updatedAtMs: record.updatedAtMs,
 		revision: record.revision,
@@ -70,7 +72,7 @@ const parseProject = (candidate: unknown) => {
 		...materializeCommit({
 			projectId: project.projectId,
 			title: project.title,
-			game: project.game,
+			version: project.version,
 			createdAtMs: project.createdAtMs,
 			updatedAtMs: project.updatedAtMs,
 			revision: project.revision,
@@ -163,9 +165,10 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 			() => window.arkini.editor.awaitIdle(),
 			() => undefined,
 		),
-		createProjectFx: ({ projectId, config: candidateConfig, resources: candidates }) =>
+		createProjectFx: ({ projectId, version, config: candidateConfig, resources: candidates }) =>
 			validateFx("create-project", () => ({
 				projectId: IdSchema.parse(projectId),
+				version: ArkpackVersionSchema.parse(version),
 				config: GameConfigSchema.parse(candidateConfig),
 				resources: ResourceSchema.array().parse(candidates),
 			})).pipe(

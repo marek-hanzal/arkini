@@ -9,7 +9,6 @@ import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},

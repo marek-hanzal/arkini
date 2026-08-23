@@ -13,7 +13,6 @@ import { queryFx } from "~/engine/query/fx/queryFx";
 import type { QuerySchema } from "~/engine/query/schema/QuerySchema";
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},

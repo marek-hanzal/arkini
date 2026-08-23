@@ -6,6 +6,6 @@ import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
 export interface Game extends PlayableGame {
 	/** Exact package identity and launcher metadata for this live game. */
 	readonly arkpack: ArkpackDescriptor;
-	/** Exact filesystem save identity owned by this live game. */
+	/** Stable filesystem save identity owned by this live game. */
 	readonly saveKey: GameSaveStorage.Key;
 }

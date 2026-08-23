@@ -38,7 +38,7 @@ describe("createFreshEditorProjectFx", () => {
 				Effect.succeed<EditorProject>({
 					projectId,
 					title: config.meta.title,
-					game: config.version,
+					version: "1.0",
 					createdAtMs: 100,
 					updatedAtMs: 100,
 					revision: 0,
@@ -56,7 +56,7 @@ describe("createFreshEditorProjectFx", () => {
 		expect(project.projectId).toMatch(/^project-[A-Za-z0-9]+$/);
 		expect(project).toMatchObject({
 			title: "Untitled project",
-			game: "1.0",
+			version: "1.0",
 			revision: 0,
 			config: {
 				meta: {
@@ -84,6 +84,11 @@ describe("createFreshEditorProjectFx", () => {
 			},
 		});
 		expect(project.resources).toHaveLength(1);
+		expect(createProjectFx).toHaveBeenCalledWith(
+			expect.objectContaining({
+				version: "1.0",
+			}),
+		);
 		expect(project.resources[0]).toMatchObject({
 			id: "hero",
 			mime: "image/png",

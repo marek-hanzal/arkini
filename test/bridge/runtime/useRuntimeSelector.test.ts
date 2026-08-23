@@ -42,7 +42,8 @@ const makeTestGameFx = Effect.fn("makeRuntimeSelectorTestGameFx")(
 					contentHash: `content:${packageId}`,
 					gameId: testArkpackConfig.meta.id,
 					title: testArkpackConfig.meta.title,
-					game: testArkpackConfig.version,
+					version: "1.0",
+					game: "0.5.0",
 					trust: {
 						type: "external",
 						reason: "unsigned",
@@ -52,7 +53,6 @@ const makeTestGameFx = Effect.fn("makeRuntimeSelectorTestGameFx")(
 				config: testArkpackConfig,
 				saveKey: {
 					packageId,
-					contentHash: "0".repeat(64),
 				},
 				...transitions,
 				getResourceUrl: (resourceId: string) => `resource:${resourceId}`,

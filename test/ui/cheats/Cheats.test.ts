@@ -100,6 +100,7 @@ describe("Cheats", () => {
 				contentHash: "content:cheats",
 				gameId: "game:cheats",
 				title: "Cheats game",
+				version: "1.0",
 				game: "1.0",
 				trust: {
 					type: "external",
@@ -111,7 +112,6 @@ describe("Cheats", () => {
 			getResourceUrl: () => "blob:test",
 			saveKey: {
 				packageId: "package:cheats",
-				contentHash: "c".repeat(64),
 			},
 		};
 		sessions.push(game);
@@ -179,6 +179,7 @@ describe("Cheats", () => {
 				contentHash: "content:cheats-race",
 				gameId: "game:cheats-race",
 				title: "Cheats race game",
+				version: "1.0",
 				game: "1.0",
 				trust: {
 					type: "external",
@@ -190,7 +191,6 @@ describe("Cheats", () => {
 			getResourceUrl: () => "blob:test",
 			saveKey: {
 				packageId: "package:cheats-race",
-				contentHash: "d".repeat(64),
 			},
 		};
 		sessions.push(game);

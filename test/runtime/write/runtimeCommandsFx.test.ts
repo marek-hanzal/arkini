@@ -13,7 +13,6 @@ import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { swapItemsFx } from "~/engine/runtime/write/swapItemsFx";
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},

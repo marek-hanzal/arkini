@@ -5,7 +5,6 @@ import { MetaSchema } from "~/engine/meta/schema/MetaSchema";
 import { StartSchema } from "~/engine/start/schema/StartSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ResourceConfigSchema } from "~/engine/resource/schema/ResourceConfigSchema";
-import { VersionEnumSchema } from "./VersionEnumSchema";
 
 /**
  * The root schema for a game's configuration.
@@ -38,10 +37,6 @@ export const GameConfigSchema = z
 		start: StartSchema.describe(
 			"The initial board, inventory, and toolbar contents created for a new game.",
 		),
-		/**
-		 * Version of this game configuration's schema contract.
-		 */
-		version: VersionEnumSchema,
 		/**
 		 * Canonical game items keyed by their unique identifier.
 		 */

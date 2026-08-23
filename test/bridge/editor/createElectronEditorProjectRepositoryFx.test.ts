@@ -16,7 +16,7 @@ const success = <Value>(value: Value): EditorProjectTransport.Result<Value> => (
 const descriptor: EditorProjectTransport.Descriptor = {
 	projectId: "project-one",
 	title: editorTestPayload.config.meta.title,
-	game: editorTestPayload.config.version,
+	version: editorTestPayload.version,
 	createdAtMs: 10,
 	updatedAtMs: 11,
 };
@@ -96,6 +96,7 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 		const repository = Effect.runSync(createElectronEditorProjectRepositoryFx);
 		const createRequest = {
 			projectId: "project-one",
+			version: "1.0",
 			config: editorTestPayload.config,
 			resources: editorTestPayload.resources,
 		};

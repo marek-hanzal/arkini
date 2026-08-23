@@ -12,7 +12,6 @@ import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},

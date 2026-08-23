@@ -11,7 +11,6 @@ import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},

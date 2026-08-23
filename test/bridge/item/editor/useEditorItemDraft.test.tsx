@@ -25,7 +25,7 @@ const roots: Array<ReturnType<typeof createRoot>> = [];
 const project: EditorProject = {
 	projectId: "editor-test",
 	title: "Editor test",
-	game: "1.0",
+	version: "1.0",
 	createdAtMs: 1,
 	updatedAtMs: 1,
 	revision: 0,

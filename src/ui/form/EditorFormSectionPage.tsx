@@ -11,6 +11,7 @@ export const EditorFormSectionPage = ({
 	dirty,
 	error,
 	leading,
+	notice,
 	rootCard,
 	save,
 	saving,
@@ -20,6 +21,7 @@ export const EditorFormSectionPage = ({
 	readonly dirty: boolean;
 	readonly error: unknown;
 	readonly leading?: ReactNode;
+	readonly notice?: ReactNode;
 	readonly rootCard?: boolean;
 	readonly save: () => Promise<boolean>;
 	readonly saving: boolean;
@@ -43,6 +45,7 @@ export const EditorFormSectionPage = ({
 		}
 	>
 		<div className="grid gap-[var(--ak-viewport-gap)]">
+			{notice}
 			<EditorFormContent
 				error={error}
 				rootCard={rootCard}

@@ -10,7 +10,7 @@ import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 const createProject = (overrides?: Partial<EditorProject>): EditorProject => ({
 	projectId: "project",
 	title: editorTestPayload.config.meta.title,
-	game: editorTestPayload.config.version,
+	version: editorTestPayload.version,
 	createdAtMs: 1,
 	updatedAtMs: 2,
 	revision: 0,

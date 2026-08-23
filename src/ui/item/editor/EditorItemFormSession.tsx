@@ -15,6 +15,7 @@ import type {
 	EditorItemSectionId,
 } from "~/ui/item/editor/EditorItemSections";
 import { readEditorItemFormSectionsFx } from "~/ui/item/editor/readEditorItemFormSectionsFx";
+import { EditorCompatibilityNotice } from "~/ui/editor/EditorCompatibilityNotice";
 import { useEditorItemFormController } from "~/ui/item/editor/useEditorItemFormController";
 
 /** Owns navigation, controller state, tabs, and save presentation for one item form lifecycle. */
@@ -99,6 +100,12 @@ export const EditorItemFormSession = ({
 				<EditorFormSectionPage
 					dirty={controller.isDirty}
 					error={controller.error}
+					notice={
+						<EditorCompatibilityNotice
+							compatibility={controller.compatibility}
+							version={project.version}
+						/>
+					}
 					rootCard={
 						sectionId !== "artwork" &&
 						sectionId !== "charges" &&

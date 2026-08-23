@@ -11,6 +11,7 @@ import {
 	type EditorProjectSectionId,
 } from "~/ui/project/editor/EditorProjectSections";
 import { useEditorProjectFormController } from "~/ui/project/editor/useEditorProjectFormController";
+import { EditorCompatibilityNotice } from "~/ui/editor/EditorCompatibilityNotice";
 
 export const EditorProjectForm = ({ children }: PropsWithChildren) => {
 	const navigate = useNavigate();
@@ -41,6 +42,12 @@ export const EditorProjectForm = ({ children }: PropsWithChildren) => {
 				<EditorFormSectionPage
 					dirty={controller.isDirty}
 					error={controller.error}
+					notice={
+						<EditorCompatibilityNotice
+							compatibility={controller.compatibility}
+							version={project.version}
+						/>
+					}
 					save={controller.save}
 					saving={controller.isSaving}
 					tabs={

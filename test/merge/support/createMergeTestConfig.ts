@@ -73,7 +73,6 @@ export const createMergeTestConfig = ({
 	targetMaxStackSize?: number;
 }) =>
 	GameConfigSchema.parse({
-		version: "1.0",
 		resources: {
 			hero: "hero",
 		},

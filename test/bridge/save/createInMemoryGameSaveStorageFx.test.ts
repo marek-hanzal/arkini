@@ -4,15 +4,13 @@ import { createInMemoryGameSaveStorageFx } from "~test/support/save/createInMemo
 
 const first = {
 	packageId: "arkini",
-	contentHash: "a".repeat(64),
 };
 const second = {
-	packageId: "arkini",
-	contentHash: "b".repeat(64),
+	packageId: "demo",
 };
 
 describe("createInMemoryGameSaveStorageFx", () => {
-	it("isolates exact package/hash keys and clears only the selected save", async () => {
+	it("isolates package saves and clears only the selected save", async () => {
 		const storage = Effect.runSync(createInMemoryGameSaveStorageFx());
 		await Effect.runPromise(
 			storage.writeFx(

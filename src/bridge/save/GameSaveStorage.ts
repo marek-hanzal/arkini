@@ -3,7 +3,6 @@ import type { Effect } from "effect";
 export namespace GameSaveStorage {
 	export interface Key {
 		readonly packageId: string;
-		readonly contentHash: string;
 	}
 }
 

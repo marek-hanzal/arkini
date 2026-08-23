@@ -5,7 +5,6 @@ import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { MetaSchema } from "~/engine/meta/schema/MetaSchema";
 import { StartSchema } from "~/engine/start/schema/StartSchema";
 import { ResourceConfigSchema } from "~/engine/resource/schema/ResourceConfigSchema";
-import { VersionEnumSchema } from "./VersionEnumSchema";
 
 /**
  * One authoring fragment that contributes data to a complete game configuration.
@@ -41,12 +40,6 @@ export const GameSourceSchema = z
 		 */
 		start: StartSchema.optional().describe(
 			"The optional initial board, inventory, and toolbar state contributed by this source fragment.",
-		),
-		/**
-		 * Optional version contributed by this source fragment.
-		 */
-		version: VersionEnumSchema.optional().describe(
-			"The optional version contributed by this source fragment.",
 		),
 		/**
 		 * Optional canonical items contributed by this source fragment.

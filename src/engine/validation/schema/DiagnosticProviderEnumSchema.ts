@@ -6,7 +6,6 @@ export const DiagnosticProviderEnumSchema = z
 		Meta: "meta",
 		Resources: "resources",
 		Start: "start",
-		Version: "version",
 	})
 	.meta({
 		id: "DiagnosticProviderEnumSchema",

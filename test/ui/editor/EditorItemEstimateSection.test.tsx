@@ -64,7 +64,7 @@ const render = async (
 	const project: EditorProject = {
 		config,
 		createdAtMs: 1,
-		game: "1.0",
+		version: "1.0",
 		projectId: "estimate-test",
 		resources: [],
 		revision: 0,

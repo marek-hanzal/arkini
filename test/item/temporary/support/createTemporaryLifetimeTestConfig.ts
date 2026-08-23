@@ -59,7 +59,6 @@ const guaranteedOutput = ({
 
 export const createTemporaryLifetimeTestConfig = () =>
 	GameConfigSchema.parse({
-		version: "1.0",
 		resources: {
 			hero: "hero",
 		},

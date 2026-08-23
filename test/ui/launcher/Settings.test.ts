@@ -160,6 +160,7 @@ const renderSettings = async (
 				contentHash: "content:settings",
 				gameId: "game:settings",
 				title: "Settings game",
+				version: "1.0",
 				game: "1.0",
 				trust: {
 					type: "external",
@@ -171,7 +172,6 @@ const renderSettings = async (
 			getResourceUrl: () => "blob:test",
 			saveKey: {
 				packageId: "package:settings",
-				contentHash: "a".repeat(64),
 			},
 		};
 		const runtimeHarness = createTestRendererRuntime({

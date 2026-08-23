@@ -8,7 +8,6 @@ import { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "asset:hero",
 	},

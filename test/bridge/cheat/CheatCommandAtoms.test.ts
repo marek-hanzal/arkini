@@ -32,6 +32,7 @@ const createGame = (commandFx: Effect.Effect<unknown, unknown> = Effect.void): G
 		contentHash: "content:cheat-command",
 		gameId: "game:cheat-command",
 		title: "Cheat command game",
+		version: "1.0",
 		game: "1.0",
 		trust: {
 			type: "external",
@@ -42,7 +43,6 @@ const createGame = (commandFx: Effect.Effect<unknown, unknown> = Effect.void): G
 	config: testArkpackConfig,
 	saveKey: {
 		packageId: "package:cheat-command",
-		contentHash: "a".repeat(64),
 	},
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,

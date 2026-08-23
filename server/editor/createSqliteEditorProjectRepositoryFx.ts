@@ -20,8 +20,9 @@ import {
 import { ItemSchema } from "../../src/engine/item/schema/ItemSchema";
 import { ResourceSchema } from "../../src/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "../../src/engine/schema/GameConfigSchema";
+import { EditorProjectCompatibility } from "../../src/editor/version/EditorProjectCompatibility";
 
-const schemaVersion = 1;
+const schemaVersion = 2;
 
 const createRepositoryError = (
 	operation: EditorProjectRepositoryOperation,
@@ -50,6 +51,7 @@ const readProjectRow = (
 	if (
 		typeof candidate.project_id !== "string" ||
 		typeof candidate.config_json !== "string" ||
+		typeof candidate.arkpack_version !== "string" ||
 		typeof candidate.revision !== "number" ||
 		typeof candidate.created_at_ms !== "number" ||
 		typeof candidate.updated_at_ms !== "number"
@@ -59,6 +61,7 @@ const readProjectRow = (
 	const result = EditorProjectRecordSchema.safeParse({
 		projectId: candidate.project_id,
 		config: JSON.parse(candidate.config_json),
+		version: candidate.arkpack_version,
 		revision: candidate.revision,
 		createdAtMs: candidate.created_at_ms,
 		updatedAtMs: candidate.updated_at_ms,
@@ -110,7 +113,7 @@ const materializeProject = (
 ): EditorProject => ({
 	projectId: record.projectId,
 	title: record.config.meta.title,
-	game: record.config.version,
+	version: record.version,
 	createdAtMs: record.createdAtMs,
 	updatedAtMs: record.updatedAtMs,
 	revision: record.revision,
@@ -129,7 +132,7 @@ const materializeProjectCommit = (
 ): EditorProjectCommit => ({
 	projectId: record.projectId,
 	title: record.config.meta.title,
-	game: record.config.version,
+	version: record.version,
 	createdAtMs: record.createdAtMs,
 	updatedAtMs: record.updatedAtMs,
 	revision: record.revision,
@@ -145,6 +148,28 @@ const assertExpectedRevision = (
 	throw createRepositoryError(
 		operation,
 		`Editor project ${record.projectId} changed from revision ${expectedRevision} to ${record.revision} before this write could commit.`,
+	);
+};
+
+const readConfigVersion = (
+	record: EditorProjectRecordSchemaType.Type,
+	config: GameConfigSchema.Type,
+) => {
+	const compatibility = EditorProjectCompatibility.analyze(record.config, config);
+	return EditorProjectCompatibility.bumpVersion(record.version, compatibility.level);
+};
+
+const readResourceVersion = (record: EditorProjectRecordSchemaType.Type) =>
+	EditorProjectCompatibility.bumpVersion(record.version, "minor");
+
+const readConfigAndResourceVersion = (
+	record: EditorProjectRecordSchemaType.Type,
+	config: GameConfigSchema.Type,
+) => {
+	const compatibility = EditorProjectCompatibility.analyze(record.config, config);
+	return EditorProjectCompatibility.bumpVersion(
+		record.version,
+		compatibility.level === "major" ? "major" : "minor",
 	);
 };
 
@@ -170,14 +195,16 @@ const initializeSchema = (database: DatabaseSync) => {
 	const versionRow = database.prepare("PRAGMA user_version").get();
 	const version = versionRow?.user_version;
 	if (version === schemaVersion) return;
-	if (version !== 0) {
+	if (version !== 0 && version !== 1) {
 		throw new Error(`Unsupported editor database schema version ${String(version)}.`);
 	}
 	runTransaction(database, () => {
-		database.exec(`
+		if (version === 0) {
+			database.exec(`
 			CREATE TABLE projects (
 				project_id TEXT PRIMARY KEY NOT NULL,
 				config_json TEXT NOT NULL,
+				arkpack_version TEXT NOT NULL,
 				revision INTEGER NOT NULL CHECK (revision >= 0),
 				created_at_ms INTEGER NOT NULL CHECK (created_at_ms >= 0),
 				updated_at_ms INTEGER NOT NULL CHECK (updated_at_ms >= created_at_ms)
@@ -193,8 +220,25 @@ const initializeSchema = (database: DatabaseSync) => {
 				FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE
 			) STRICT;
 			CREATE INDEX resources_by_project ON resources(project_id, id);
-			PRAGMA user_version = 1;
+			PRAGMA user_version = 2;
 		`);
+			return;
+		}
+		database.exec(
+			"ALTER TABLE projects ADD COLUMN arkpack_version TEXT NOT NULL DEFAULT '1.0'",
+		);
+		const select = database.prepare("SELECT project_id, config_json FROM projects");
+		const update = database.prepare(
+			"UPDATE projects SET config_json = ?, arkpack_version = '1.0' WHERE project_id = ?",
+		);
+		for (const row of select.all()) {
+			if (typeof row.project_id !== "string" || typeof row.config_json !== "string")
+				throw new Error("SQLite contains an invalid legacy editor project row.");
+			const config = JSON.parse(row.config_json) as Record<string, unknown>;
+			delete config.version;
+			update.run(JSON.stringify(config), row.project_id);
+		}
+		database.exec("PRAGMA user_version = 2");
 	});
 };
 
@@ -240,7 +284,7 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 	const statements = yield* Effect.try({
 		try: () => ({
 			selectProject: database.prepare(`
-				SELECT project_id, config_json, revision, created_at_ms, updated_at_ms
+				SELECT project_id, config_json, arkpack_version, revision, created_at_ms, updated_at_ms
 				FROM projects
 				WHERE project_id = ?
 			`),
@@ -251,12 +295,12 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 				ORDER BY id ASC
 			`),
 			insertProject: database.prepare(`
-				INSERT INTO projects(project_id, config_json, revision, created_at_ms, updated_at_ms)
-				VALUES (?, ?, ?, ?, ?)
+				INSERT INTO projects(project_id, config_json, arkpack_version, revision, created_at_ms, updated_at_ms)
+				VALUES (?, ?, ?, ?, ?, ?)
 			`),
 			updateProject: database.prepare(`
 				UPDATE projects
-				SET config_json = ?, revision = ?, updated_at_ms = ?
+				SET config_json = ?, arkpack_version = ?, revision = ?, updated_at_ms = ?
 				WHERE project_id = ?
 			`),
 			upsertResource: database.prepare(`
@@ -304,7 +348,7 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 
 	const createProjectFx: EditorProjectRepositoryService["createProjectFx"] = Effect.fn(
 		"SqliteEditorProjectRepository.createProjectFx",
-	)(function* ({ projectId, config: candidateConfig, resources: candidateResources }) {
+	)(function* ({ projectId, version, config: candidateConfig, resources: candidateResources }) {
 		const config = yield* Effect.try({
 			try: () => GameConfigSchema.parse(candidateConfig),
 			catch: (cause) =>
@@ -337,6 +381,7 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 						const record = EditorProjectRecordSchema.parse({
 							projectId,
 							config,
+							version,
 							revision: 0,
 							createdAtMs: nowMs,
 							updatedAtMs: nowMs,
@@ -350,6 +395,7 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 						insertProject.run(
 							record.projectId,
 							JSON.stringify(record.config),
+							record.version,
 							record.revision,
 							record.createdAtMs,
 							record.updatedAtMs,
@@ -378,7 +424,7 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 		try: () =>
 			database
 				.prepare(`
-					SELECT project_id, config_json, revision, created_at_ms, updated_at_ms
+					SELECT project_id, config_json, arkpack_version, revision, created_at_ms, updated_at_ms
 					FROM projects
 					ORDER BY updated_at_ms DESC, project_id ASC
 				`)
@@ -399,7 +445,7 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 					return {
 						projectId: record.projectId,
 						title: record.config.meta.title,
-						game: record.config.version,
+						version: record.version,
 						createdAtMs: record.createdAtMs,
 						updatedAtMs: record.updatedAtMs,
 					};
@@ -458,20 +504,23 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 								`Saved item ${previous[0]} cannot be renamed without an explicit rename workflow.`,
 							);
 						}
+						const config = GameConfigSchema.parse({
+							...current.config,
+							items: {
+								...current.config.items,
+								[item.id]: item,
+							},
+						});
 						const record = EditorProjectRecordSchema.parse({
 							...current,
-							config: GameConfigSchema.parse({
-								...current.config,
-								items: {
-									...current.config.items,
-									[item.id]: item,
-								},
-							}),
+							config,
+							version: readConfigVersion(current, config),
 							revision: current.revision + 1,
 							updatedAtMs: Math.max(nowMs, current.updatedAtMs + 1),
 						});
 						updateProject.run(
 							JSON.stringify(record.config),
+							record.version,
 							record.revision,
 							record.updatedAtMs,
 							record.projectId,
@@ -516,11 +565,13 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 						const record = EditorProjectRecordSchema.parse({
 							...current,
 							config,
+							version: readConfigVersion(current, config),
 							revision: current.revision + 1,
 							updatedAtMs: Math.max(nowMs, current.updatedAtMs + 1),
 						});
 						updateProject.run(
 							JSON.stringify(record.config),
+							record.version,
 							record.revision,
 							record.updatedAtMs,
 							record.projectId,
@@ -583,11 +634,13 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 						}
 						const record = EditorProjectRecordSchema.parse({
 							...current,
+							version: readResourceVersion(current),
 							revision: current.revision + 1,
 							updatedAtMs: Math.max(nowMs, current.updatedAtMs + 1),
 						});
 						updateProject.run(
 							JSON.stringify(record.config),
+							record.version,
 							record.revision,
 							record.updatedAtMs,
 							record.projectId,
@@ -680,11 +733,13 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 						const record = EditorProjectRecordSchema.parse({
 							...current,
 							config,
+							version: readConfigAndResourceVersion(current, config),
 							revision: current.revision + 1,
 							updatedAtMs: Math.max(nowMs, current.updatedAtMs + 1),
 						});
 						updateProject.run(
 							JSON.stringify(record.config),
+							record.version,
 							record.revision,
 							record.updatedAtMs,
 							record.projectId,

@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 import { decodeFx } from "~/engine/pack/fx/decodeFx";
 import { packDirectoryFx } from "~/engine/pack/fx/packDirectoryFx";
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 
 const png = new Uint8Array([
 	0x89,
@@ -39,7 +40,6 @@ describe("packDirectoryFx", () => {
 				yield* fileSystem.writeFileString(
 					path.join(input, "game.json"),
 					JSON.stringify({
-						version: "1.0",
 						meta: {
 							id: "arkini",
 							title: "Arkini",
@@ -76,6 +76,7 @@ describe("packDirectoryFx", () => {
 				const result = yield* packDirectoryFx({
 					input,
 					packageId: "arkini",
+					version: "2.3",
 				});
 				const compressed = yield* fileSystem.readFile(result.output);
 				const payload = yield* decodeFx(new Uint8Array(gunzipSync(compressed)));
@@ -91,6 +92,10 @@ describe("packDirectoryFx", () => {
 		expect(packed.result).toMatchObject({
 			json: 2,
 			png: 2,
+		});
+		expect(packed.payload).toMatchObject({
+			version: "2.3",
+			game: ArkiniAppVersion,
 		});
 		expect(packed.staleSignatureExists).toBe(false);
 		expect(packed.payload.resources).toEqual(
@@ -123,7 +128,6 @@ describe("packDirectoryFx", () => {
 				yield* fileSystem.writeFileString(
 					path.join(input, "game.json"),
 					JSON.stringify({
-						version: "1.0",
 						meta: {
 							id: "invalid",
 							title: "Invalid",
@@ -147,6 +151,7 @@ describe("packDirectoryFx", () => {
 					packDirectoryFx({
 						input,
 						packageId: "invalid-game",
+						version: "1.0",
 					}),
 				);
 			}).pipe(Effect.provide(NodeServices.layer), Effect.scoped),
@@ -179,6 +184,7 @@ describe("packDirectoryFx", () => {
 					packDirectoryFx({
 						input,
 						packageId: "broken-game",
+						version: "1.0",
 					}),
 				);
 			}).pipe(Effect.provide(NodeServices.layer), Effect.scoped),

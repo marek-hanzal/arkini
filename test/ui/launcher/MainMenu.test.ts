@@ -58,6 +58,7 @@ describe("MainMenu", () => {
 					contentHash: "b".repeat(64),
 					gameId: "other-game",
 					title: "Other Game",
+					version: "1.0",
 					game: "1",
 					trust: {
 						type: "official",
@@ -70,6 +71,7 @@ describe("MainMenu", () => {
 					contentHash: "a".repeat(64),
 					gameId: "arkini",
 					title: "Arkini",
+					version: "1.0",
 					game: "1",
 					trust: {
 						type: "official",

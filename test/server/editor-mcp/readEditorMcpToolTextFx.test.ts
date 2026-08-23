@@ -17,7 +17,7 @@ import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameC
 const projectOf = (config: GameConfigSchema.Type): EditorProject => ({
 	config,
 	createdAtMs: 0,
-	game: config.version,
+	version: "1.0",
 	projectId: "mcp-tool-test",
 	resources: [],
 	revision: 0,

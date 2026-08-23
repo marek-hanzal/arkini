@@ -5,6 +5,7 @@ export const builtIn: ArkpackDescriptor = {
 	contentHash: "a".repeat(64),
 	gameId: "arkini",
 	title: "Arkini",
+	version: "1.0",
 	game: "1",
 	trust: {
 		type: "official",
@@ -18,6 +19,7 @@ export const imported: ArkpackDescriptor = {
 	contentHash: "b".repeat(64),
 	gameId: "imported",
 	title: "Imported",
+	version: "1.0",
 	game: "1",
 	trust: {
 		type: "external",

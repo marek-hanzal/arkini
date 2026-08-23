@@ -1,4 +1,6 @@
 import type { ArkpackTrustSchema } from "~/engine/pack/schema/ArkpackTrustSchema";
+import type { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
+import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 
 type ArkpackSource = "bundled" | "user";
 
@@ -8,7 +10,8 @@ export interface ArkpackDescriptor {
 	readonly contentHash: string;
 	readonly gameId: string;
 	readonly title: string;
-	readonly game: string;
+	readonly version: ArkpackVersionSchema.Type;
+	readonly game: ArkiniVersionSchema.Type;
 	readonly trust: ArkpackTrustSchema.Type;
 	readonly source: ArkpackSource;
 	readonly overridesBundled?: boolean;

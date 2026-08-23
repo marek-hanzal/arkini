@@ -24,6 +24,7 @@ describe("ArkpackSelector", () => {
 					contentHash: "a".repeat(64),
 					gameId: "arkini",
 					title: "Arkini",
+					version: "1.0",
 					game: "1",
 					trust: {
 						type: "official",
@@ -37,6 +38,7 @@ describe("ArkpackSelector", () => {
 					contentHash: "b".repeat(64),
 					gameId: "local",
 					title: "Local package",
+					version: "1.0",
 					game: "1",
 					trust: {
 						type: "external",

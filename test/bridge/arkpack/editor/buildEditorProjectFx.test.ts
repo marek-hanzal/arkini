@@ -25,7 +25,7 @@ const validResources = editorTestPayload.resources.map((resource) => ({
 const createProject = (resources = validResources): EditorProject => ({
 	projectId: "project",
 	title: editorTestPayload.config.meta.title,
-	game: editorTestPayload.config.version,
+	version: editorTestPayload.version,
 	createdAtMs: 1,
 	updatedAtMs: 2,
 	revision: 7,
@@ -63,9 +63,11 @@ describe("buildEditorProjectFx", () => {
 		expect(artifact.revision).toBe(7);
 		expect(artifact.filename).toBe("project.game.arkpack");
 		expect(artifact.bytes.byteLength).toBeGreaterThan(0);
-		expect(Effect.runSync(decodeFx(new Uint8Array(gunzipSync(artifact.bytes)))).packageId).toBe(
-			"project",
-		);
+		expect(Effect.runSync(decodeFx(new Uint8Array(gunzipSync(artifact.bytes))))).toMatchObject({
+			packageId: "project",
+			version: "1.0",
+			game: "0.5.0",
+		});
 		expect(artifact.contentHash).toBe(
 			await Effect.runPromise(readArkpackContentHashFx(artifact.bytes)),
 		);

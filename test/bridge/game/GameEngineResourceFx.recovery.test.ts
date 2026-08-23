@@ -33,7 +33,6 @@ describe("GameEngineResourceFx / failed-save recovery", () => {
 			cause: new Error("invalid save"),
 			saveKey: {
 				packageId: "package:save",
-				contentHash: "a".repeat(64),
 			},
 		});
 		const recoveredResource = makeResource({
@@ -74,7 +73,6 @@ describe("GameEngineResourceFx / failed-save recovery", () => {
 			cause: new Error("invalid save"),
 			saveKey: {
 				packageId: "package:save",
-				contentHash: "b".repeat(64),
 			},
 		});
 		const recoveredResource = makeResource({

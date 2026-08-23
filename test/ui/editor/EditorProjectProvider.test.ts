@@ -49,7 +49,7 @@ afterEach(async () => {
 const createProject = (revision: number): EditorProject => ({
 	projectId: "project",
 	title: `Project ${revision}`,
-	game: "1.0",
+	version: "1.0",
 	createdAtMs: 1,
 	updatedAtMs: 1,
 	revision,

@@ -24,7 +24,6 @@ export const createJobTestConfig = (
 	runtimeMs = 1_000,
 ) =>
 	GameConfigSchema.parse({
-		version: "1.0",
 		resources: {
 			hero: "hero",
 		},

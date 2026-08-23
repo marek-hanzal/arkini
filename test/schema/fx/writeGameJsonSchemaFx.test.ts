@@ -38,9 +38,6 @@ describe("writeGameJsonSchemaFx", () => {
 				start: {
 					$ref: expect.stringMatching(/^#\/\$defs\//),
 				},
-				version: {
-					$ref: expect.stringMatching(/^#\/\$defs\//),
-				},
 			},
 		});
 		expect(Object.keys(schema.$defs ?? {})).not.toContain(

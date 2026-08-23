@@ -31,6 +31,7 @@ vi.mock("~/bridge/editor/createFreshEditorProjectAtom", async () => {
 			Effect.succeed({
 				projectId: "project-created",
 				title: "Created",
+				version: "1.0",
 				game: "created",
 				createdAtMs: 1,
 				updatedAtMs: 1,
@@ -49,6 +50,7 @@ vi.mock("~/bridge/arkpack/editor/importEditorArkpackFileAtom", async () => {
 				: Effect.succeed({
 						projectId: "project-imported",
 						title: "Imported",
+						version: "1.0",
 						game: "imported",
 						createdAtMs: 2,
 						updatedAtMs: 2,

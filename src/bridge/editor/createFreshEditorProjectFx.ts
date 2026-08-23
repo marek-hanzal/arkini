@@ -17,7 +17,6 @@ const placeholderHeroBytes = Uint8Array.from(
 export const createFreshEditorProjectFx = Effect.fn("createFreshEditorProjectFx")(function* () {
 	const projectId = yield* Effect.sync(() => IdSchema.parse(`project-${createId()}`));
 	const config = GameConfigSchema.parse({
-		version: "1.0",
 		meta: {
 			id: projectId,
 			title: "Untitled project",
@@ -45,6 +44,7 @@ export const createFreshEditorProjectFx = Effect.fn("createFreshEditorProjectFx"
 	const repository = yield* EditorProjectRepository;
 	const project = yield* repository.createProjectFx({
 		projectId,
+		version: "1.0",
 		config,
 		resources: [
 			{

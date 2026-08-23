@@ -3,7 +3,6 @@ import { ArkiniElectronApi } from "../../../electron/contract/ArkiniElectronApi"
 const placeholderPackageId = "a".repeat(64);
 export const saveKey = {
 	packageId: "arkini",
-	contentHash: "b".repeat(64),
 } as const;
 
 export const invokeArguments = new Map<string, ReadonlyArray<unknown>>([

@@ -15,6 +15,7 @@ const testArkpack = {
 	contentHash: "content:test",
 	gameId: "game:test",
 	title: "Test",
+	version: "1.0",
 	game: "1",
 	source: "bundled",
 	trust: {

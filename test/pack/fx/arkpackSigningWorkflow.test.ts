@@ -58,6 +58,7 @@ describe("Arkpack signing workflow", () => {
 					input: "game/demo",
 					keyId,
 					packageId: "untrusted-workflow",
+					version: "1.0",
 					output: join(root, "untrusted.game.arkpack"),
 					privateKey: pair.privateKey,
 					trustedKeys: {
@@ -80,6 +81,7 @@ describe("Arkpack signing workflow", () => {
 				input: "game/demo",
 				keyId,
 				packageId: "test-workflow",
+				version: "1.0",
 				output: arkpackPath,
 				privateKey: pair.privateKey,
 				trustedKeys,

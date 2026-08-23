@@ -7,7 +7,6 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 
 export const configInput = {
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},

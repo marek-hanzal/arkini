@@ -36,7 +36,7 @@ export const GameEngineErrorView = ({ error, packageId }: GameEngineErrorView.Pr
 
 	return (
 		<ActionErrorPage
-			description="This save is incompatible or corrupted. Cleaning it will permanently delete progress for this exact package build and return to the Main Menu."
+			description="This package save is incompatible or corrupted. Cleaning it will permanently delete its progress and return to the Main Menu."
 			error={error.cause}
 			title="Saved game could not be restored"
 		>

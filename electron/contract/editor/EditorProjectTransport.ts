@@ -37,7 +37,7 @@ export namespace EditorProjectTransport {
 	export interface Descriptor {
 		readonly projectId: string;
 		readonly title: string;
-		readonly game: string;
+		readonly version: string;
 		readonly createdAtMs: number;
 		readonly updatedAtMs: number;
 	}
@@ -59,6 +59,7 @@ export namespace EditorProjectTransport {
 
 	export interface CreateProjectRequest {
 		readonly projectId: string;
+		readonly version: string;
 		readonly config: unknown;
 		readonly resources: ReadonlyArray<unknown>;
 	}

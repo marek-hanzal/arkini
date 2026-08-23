@@ -9,7 +9,6 @@ export const GameSourceProvenanceSchema = z
 		meta: z.string().min(1).optional(),
 		resources: z.string().min(1).optional(),
 		start: z.string().min(1).optional(),
-		version: z.string().min(1).optional(),
 		items: z.record(IdSchema, z.string().min(1)),
 	})
 	.strict()

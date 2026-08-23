@@ -22,7 +22,7 @@ const createPng = () =>
 const createProject = (revision = 0): EditorProject => ({
 	projectId: "project",
 	title: editorTestPayload.config.meta.title,
-	game: editorTestPayload.config.version,
+	version: editorTestPayload.version,
 	createdAtMs: 1,
 	updatedAtMs: revision + 1,
 	revision,

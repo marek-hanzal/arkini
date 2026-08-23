@@ -24,7 +24,6 @@ import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/comman
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
 const configInput = {
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},

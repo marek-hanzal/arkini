@@ -37,6 +37,7 @@ const createGame = (explicitSaveFx: Effect.Effect<void, unknown> = Effect.void):
 		contentHash: "content:menu",
 		gameId: "game:menu",
 		title: "Menu game",
+		version: "1.0",
 		game: "1.0",
 		trust: {
 			type: "external",
@@ -47,7 +48,6 @@ const createGame = (explicitSaveFx: Effect.Effect<void, unknown> = Effect.void):
 	config: testArkpackConfig,
 	saveKey: {
 		packageId: "package:menu",
-		contentHash: "a".repeat(64),
 	},
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,

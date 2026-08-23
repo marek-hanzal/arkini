@@ -7,10 +7,12 @@ import { IdSchema } from "../../src/engine/common/schema/IdSchema";
 import { ItemSchema } from "../../src/engine/item/schema/ItemSchema";
 import { ResourceSchema } from "../../src/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "../../src/engine/schema/GameConfigSchema";
+import { ArkpackVersionSchema } from "../../src/engine/version/schema/ArkpackVersionSchema";
 
 const createProjectSchema = z
 	.object({
 		projectId: IdSchema,
+		version: ArkpackVersionSchema,
 		config: GameConfigSchema,
 		resources: ResourceSchema.array(),
 	})

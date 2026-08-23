@@ -115,7 +115,6 @@ export const createRootSource = ({
 		path,
 		value: {
 			$schema: "../schema.json",
-			version: "1.0",
 			resources: {
 				hero: "hero",
 			},

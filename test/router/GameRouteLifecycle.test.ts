@@ -31,7 +31,8 @@ const createGame = (
 		contentHash: "content-route",
 		gameId: testArkpackConfig.meta.id,
 		title: testArkpackConfig.meta.title,
-		game: testArkpackConfig.version,
+		version: "1.0",
+		game: "0.5.0",
 		trust: {
 			type: "external",
 			reason: "unsigned",
@@ -48,7 +49,6 @@ const createGame = (
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 	saveKey: {
 		packageId: "package-route",
-		contentHash: "0".repeat(64),
 	},
 	subscribe: () => () => undefined,
 	subscribeEvents,

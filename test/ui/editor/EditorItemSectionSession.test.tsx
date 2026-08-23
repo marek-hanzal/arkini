@@ -94,7 +94,12 @@ vi.mock("~/bridge/editor/useEditorProject", () => ({
 	useEditorProject: () => ({
 		projectId: "editor-test",
 		revision: "revision-1",
-		config: {},
+		version: "1.0",
+		config: (
+			state.canonical as {
+				config: unknown;
+			}
+		).config,
 	}),
 }));
 
@@ -157,6 +162,27 @@ beforeEach(() => {
 	vi.clearAllMocks();
 	state.canonical = {
 		config: {
+			meta: {
+				id: "editor-test",
+				title: "Editor test",
+				board: {
+					width: 2,
+					height: 2,
+				},
+				inventory: {
+					width: 2,
+					height: 2,
+				},
+			},
+			resources: {
+				hero: "hero",
+			},
+			start: {
+				currentSpace: 0,
+				board: [],
+				inventory: [],
+				toolbar: [],
+			},
 			items: {
 				[item.id]: item,
 			},

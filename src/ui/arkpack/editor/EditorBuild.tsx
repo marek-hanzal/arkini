@@ -50,6 +50,10 @@ export const EditorBuild = () => {
 				<p className="mt-1 text-sm text-muted">
 					Validate one exact saved project snapshot and produce immutable Arkpack bytes.
 				</p>
+				<p className="mt-1 text-xs text-subtle">
+					Arkpack v{project.version}. Compatible edits keep saves; a major bump starts a
+					new game.
+				</p>
 			</header>
 			<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">
 				<div className="flex flex-wrap items-center justify-between gap-3">
@@ -100,8 +104,8 @@ export const EditorBuild = () => {
 					<h2 className="text-lg font-semibold">Build output</h2>
 					<p className="mt-2 break-all text-sm text-muted">
 						{artifact.filename} ·{" "}
-						{RendererRuntime.runSync(formatByteSizeFx(artifact.bytes.byteLength))} ·{" "}
-						{artifact.contentHash}
+						{RendererRuntime.runSync(formatByteSizeFx(artifact.bytes.byteLength))} · v
+						{artifact.version} · Arkini {artifact.game} · {artifact.contentHash}
 					</p>
 					<div className="mt-4 flex flex-wrap gap-3">
 						<Button

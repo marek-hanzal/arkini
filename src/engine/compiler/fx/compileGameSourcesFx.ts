@@ -29,9 +29,6 @@ const readSourcePath = (
 	if (root === "start") {
 		return provenance.start;
 	}
-	if (root === "version") {
-		return provenance.version;
-	}
 	if (root === "$schema") {
 		return provenance.schema?.path;
 	}

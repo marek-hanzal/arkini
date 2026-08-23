@@ -12,7 +12,7 @@ import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 const createProject = (revision: number): EditorProject => ({
 	projectId: "editor-board",
 	title: editorTestPayload.config.meta.title,
-	game: editorTestPayload.config.version,
+	version: editorTestPayload.version,
 	createdAtMs: 1,
 	updatedAtMs: revision + 1,
 	revision,

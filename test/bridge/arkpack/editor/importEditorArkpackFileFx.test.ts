@@ -18,6 +18,8 @@ import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 const validPayload: PayloadSchema.Type = {
 	packageId: "project:imported",
+	version: "4.2",
+	game: "0.5.0",
 	config: editorTestPayload.config,
 	resources: editorTestPayload.resources.map((resource) => ({
 		...resource,
@@ -63,11 +65,16 @@ describe("importEditorArkpackFileFx", () => {
 	it("validates an arkpack and atomically delegates its canonical payload", async () => {
 		const bytes = createArkpackBytes();
 		const createProjectFx = vi.fn(
-			({ projectId, config, resources }: EditorProjectRepository.CreateProjectProps) =>
+			({
+				projectId,
+				version,
+				config,
+				resources,
+			}: EditorProjectRepository.CreateProjectProps) =>
 				Effect.succeed<EditorProject>({
 					projectId,
 					title: config.meta.title,
-					game: config.version,
+					version,
 					createdAtMs: 100,
 					updatedAtMs: 100,
 					revision: 0,
@@ -90,12 +97,13 @@ describe("importEditorArkpackFileFx", () => {
 		expect(descriptor).toMatchObject({
 			projectId: "project:imported",
 			title: "Editor test",
-			game: "1.0",
+			version: "4.2",
 			revision: 0,
 		});
 		expect(createProjectFx).toHaveBeenCalledOnce();
 		expect(createProjectFx).toHaveBeenCalledWith({
 			projectId: "project:imported",
+			version: "4.2",
 			config: editorTestPayload.config,
 			resources: validPayload.resources,
 		});

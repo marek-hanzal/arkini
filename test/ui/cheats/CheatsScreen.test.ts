@@ -41,7 +41,6 @@ vi.mock("~/bridge/game/useGameEngine", () => ({
 		},
 		saveKey: {
 			packageId: "package:cheats",
-			contentHash: "test",
 		},
 	}),
 }));

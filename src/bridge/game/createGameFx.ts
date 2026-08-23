@@ -7,10 +7,15 @@ import { createGameSessionFx } from "~/bridge/game/createGameSessionFx";
 import { createGameResourceUrlsFx } from "~/bridge/game/createGameResourceUrlsFx";
 import { discardGameBootstrapFx } from "~/bridge/game/discardGameBootstrapFx";
 import { installGameDiagnosticsFx } from "~/bridge/game/installGameDiagnosticsFx";
+import {
+	assertSupportedGameVersionFx,
+	readArkpackVersionFx,
+} from "~/bridge/game/GameVersionCompatibility";
 import { createGameSaveStorageFx } from "~/bridge/save/createGameSaveStorageFx";
 import { decodeArkiniSaveFx } from "~/bridge/save/decodeArkiniSaveFx";
 import { encodeArkiniSaveFx } from "~/bridge/save/encodeArkiniSaveFx";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
+import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { startFx } from "~/engine/start/write/startFx";
 
 export namespace createGameFx {
@@ -42,24 +47,58 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 					storage: arkpackStorage,
 				}),
 	});
+	yield* assertSupportedGameVersionFx(loaded.payload.game);
 	const saveStorage = providedSaveStorage ?? (yield* createGameSaveStorageFx());
 	const saveKey: GameSaveStorage.Key = {
 		packageId: loaded.descriptor.packageId,
-		contentHash: loaded.descriptor.contentHash,
 	};
 	const savedBytes = yield* saveStorage.readFx(saveKey);
-	const state =
-		savedBytes === null
-			? undefined
-			: (yield* decodeArkiniSaveFx(savedBytes).pipe(
-					Effect.mapError(
-						(cause) =>
-							new GameSaveBootstrapError({
-								cause,
-								saveKey,
-							}),
-					),
-				)).state;
+	let state: StateSchema.Type | undefined;
+	if (savedBytes !== null) {
+		const saved = yield* decodeArkiniSaveFx(savedBytes).pipe(
+			Effect.mapError(
+				(cause) =>
+					new GameSaveBootstrapError({
+						cause,
+						saveKey,
+					}),
+			),
+		);
+		const arkpackVersion = yield* readArkpackVersionFx(loaded.payload.version);
+		const saveVersion = yield* readArkpackVersionFx(saved.version);
+		if (saveVersion.major !== arkpackVersion.major) {
+			yield* saveStorage.clearFx(saveKey).pipe(
+				Effect.mapError(
+					(cause) =>
+						new GameSaveBootstrapError({
+							cause,
+							saveKey,
+						}),
+				),
+			);
+		} else {
+			yield* assertSupportedGameVersionFx(saved.game).pipe(
+				Effect.mapError(
+					(cause) =>
+						new GameSaveBootstrapError({
+							cause,
+							saveKey,
+						}),
+				),
+			);
+			if (saveVersion.minor > arkpackVersion.minor) {
+				return yield* Effect.fail(
+					new GameSaveBootstrapError({
+						cause: new Error(
+							`Save version ${saved.version} is newer than arkpack version ${loaded.payload.version}.`,
+						),
+						saveKey,
+					}),
+				);
+			}
+			state = saved.state;
+		}
+	}
 	const session = yield* createGameSessionFx({
 		config: loaded.payload.config,
 		...(state === undefined
@@ -69,13 +108,14 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 				}),
 		save: {
 			write: (nextState) =>
-				encodeArkiniSaveFx(nextState).pipe(
-					Effect.flatMap((bytes) => saveStorage.writeFx(saveKey, bytes)),
-				),
+				encodeArkiniSaveFx({
+					version: loaded.payload.version,
+					state: nextState,
+				}).pipe(Effect.flatMap((bytes) => saveStorage.writeFx(saveKey, bytes))),
 		},
 	}).pipe(
 		Effect.mapError((cause) =>
-			savedBytes === null
+			state === undefined
 				? cause
 				: new GameSaveBootstrapError({
 						cause,

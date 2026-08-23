@@ -87,6 +87,7 @@ const builtIn = {
 	contentHash: "a".repeat(64),
 	gameId: "arkini",
 	title: "Arkini",
+	version: "1.0",
 	game: "1.0",
 	trust: {
 		type: "official" as const,

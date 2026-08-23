@@ -36,7 +36,6 @@ vi.mock("~/bridge/game/useGameEngine", () => ({
 }));
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -272,7 +271,8 @@ const game = {
 		contentHash: "test-hash",
 		gameId: config.meta.id,
 		title: config.meta.title,
-		game: config.version,
+		version: "1.0",
+		game: "0.5.0",
 		trust: {
 			type: "external",
 			reason: "unsigned",
@@ -282,7 +282,6 @@ const game = {
 	config,
 	saveKey: {
 		packageId: "test-package",
-		contentHash: "0".repeat(64),
 	},
 	...transitionFields,
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,

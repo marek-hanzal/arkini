@@ -124,7 +124,6 @@ describe("compileGameSourcesFx", () => {
 			GameSourceFileSchema.parse({
 				path: "/game/game.json",
 				value: {
-					version: "1.0",
 					meta: {
 						id: "game:test",
 						title: "Test",
@@ -270,7 +269,6 @@ describe("compileGameSourcesFx", () => {
 			GameSourceFileSchema.parse({
 				path: "/game/game.json",
 				value: {
-					version: "1.0",
 					meta: {
 						id: "game:test",
 						title: "Test",

@@ -50,7 +50,7 @@ const EditorBoardReady = ({ resource }: { readonly resource: EditorGameResource 
 	return (
 		<GameEngineProvider game={resource.game}>
 			<PlayableGameRoute>
-				<PlayableGameShell>
+				<PlayableGameShell routePresentation="embedded">
 					{leaf === "board" ? (
 						<PlayableBoard onOpenInventory={() => setLeaf("inventory")} />
 					) : (

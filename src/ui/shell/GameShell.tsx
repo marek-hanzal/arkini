@@ -11,13 +11,42 @@ import { gameBoardViewTransitionName } from "~/ui/navigation/gameBoardViewTransi
 import { RouteBackdrop } from "~/ui/navigation/RouteBackdrop";
 import { PixiGameProvider } from "~/ui/pixi/PixiGameProvider";
 
-const GameTileScene = ({ children }: PropsWithChildren) => (
+type GameShellRoutePresentation = "embedded" | "fullscreen";
+
+const GameSceneBackdrop = ({
+	routePresentation,
+}: {
+	readonly routePresentation: GameShellRoutePresentation;
+}) =>
+	routePresentation === "fullscreen" ? (
+		<RouteBackdrop
+			className="game-scene__backdrop pointer-events-none absolute inset-0 z-0"
+			dataUi="GameSceneBackdrop"
+		/>
+	) : (
+		<div
+			aria-hidden="true"
+			className="game-scene__backdrop pointer-events-none absolute inset-0 z-0"
+			data-ui="GameSceneBackdrop"
+		/>
+	);
+
+const GameTileScene = ({
+	children,
+	routePresentation,
+}: PropsWithChildren<{
+	readonly routePresentation: GameShellRoutePresentation;
+}>) => (
 	<div
 		className="relative isolate z-10 size-full min-h-0 min-w-0"
 		data-ui="TileScene"
-		style={{
-			viewTransitionName: gameBoardViewTransitionName,
-		}}
+		style={
+			routePresentation === "fullscreen"
+				? {
+						viewTransitionName: gameBoardViewTransitionName,
+					}
+				: undefined
+		}
 	>
 		<div
 			className="size-full min-h-0 min-w-0"
@@ -32,16 +61,18 @@ const GameShellLayers = ({
 	children,
 	game,
 	menu,
+	routePresentation,
 }: PropsWithChildren<{
 	readonly game: ReturnType<typeof useGameEngine>;
 	readonly menu?: ReactNode;
+	readonly routePresentation: GameShellRoutePresentation;
 }>) => {
 	return (
 		<>
 			<ItemDetailProvider game={game}>
 				<PixiGameProvider>
 					<ItemDetailHigherOwnerGuard />
-					<GameTileScene>{children}</GameTileScene>
+					<GameTileScene routePresentation={routePresentation}>{children}</GameTileScene>
 					<ItemDetailModal />
 				</PixiGameProvider>
 			</ItemDetailProvider>
@@ -65,8 +96,10 @@ const GameShellLayers = ({
 export const PlayableGameShell = ({
 	children,
 	menu,
+	routePresentation,
 }: PropsWithChildren<{
 	readonly menu?: ReactNode;
+	readonly routePresentation: GameShellRoutePresentation;
 }>) => {
 	const game = useGameEngine();
 	return (
@@ -75,14 +108,12 @@ export const PlayableGameShell = ({
 			data-ui="GameShell"
 			tabIndex={-1}
 		>
-			<RouteBackdrop
-				className="game-scene__backdrop pointer-events-none absolute inset-0 z-0"
-				dataUi="GameSceneBackdrop"
-			/>
+			<GameSceneBackdrop routePresentation={routePresentation} />
 			<GameMenuProvider keyboardEnabled={menu !== undefined}>
 				<GameShellLayers
 					game={game}
 					menu={menu}
+					routePresentation={routePresentation}
 				>
 					{children}
 				</GameShellLayers>
@@ -94,5 +125,12 @@ export const PlayableGameShell = ({
 /** Adds installed-package Game Menu actions to the shared gameplay shell. */
 export function GameShell({ children }: PropsWithChildren) {
 	const game = usePackageGameEngine();
-	return <PlayableGameShell menu={<GameMenu game={game} />}>{children}</PlayableGameShell>;
+	return (
+		<PlayableGameShell
+			menu={<GameMenu game={game} />}
+			routePresentation="fullscreen"
+		>
+			{children}
+		</PlayableGameShell>
+	);
 }

@@ -21,27 +21,47 @@ import { ArkpackTrustedKeysSchema } from "~/engine/pack/schema/ArkpackTrustedKey
 
 const execFileAsync = promisify(execFile);
 const npmExecutable = process.platform === "win32" ? "npm.cmd" : "npm";
+const bundledArkpackNames = [
+	"arkini.game.arkpack",
+	"arkini.game.arkpack.sig",
+	"demo.game.arkpack",
+] as const;
 
 const copyTrackedWorkspace = async (target: string) => {
-	const { stdout } = await execFileAsync(
-		"git",
-		[
-			"ls-files",
-			"--cached",
-			"--others",
-			"--exclude-standard",
-			"-z",
-		],
-		{
-			cwd: process.cwd(),
-			encoding: "buffer",
-			maxBuffer: 16 * 1024 * 1024,
-		},
-	);
+	const options = {
+		cwd: process.cwd(),
+		encoding: "buffer" as const,
+		maxBuffer: 16 * 1024 * 1024,
+	};
+	const [{ stdout }, { stdout: ignoredStdout }] = await Promise.all([
+		execFileAsync(
+			"git",
+			[
+				"ls-files",
+				"--cached",
+				"--others",
+				"--exclude-standard",
+				"-z",
+			],
+			options,
+		),
+		execFileAsync(
+			"git",
+			[
+				"ls-files",
+				"--cached",
+				"--ignored",
+				"--exclude-standard",
+				"-z",
+			],
+			options,
+		),
+	]);
+	const ignored = new Set(ignoredStdout.toString("utf8").split("\0"));
 	const workspaceFiles = stdout
 		.toString("utf8")
 		.split("\0")
-		.filter((path) => path.length > 0);
+		.filter((path) => path.length > 0 && !ignored.has(path));
 
 	for (const relativePath of workspaceFiles) {
 		try {
@@ -132,11 +152,16 @@ const runNpmScript = async (
 };
 
 describe("fresh checkout desktop delivery inputs", () => {
-	it("builds from a clean checkout before dependency analysis consumes generated inputs", async () => {
+	it("builds and packages bundled Arkpacks from a clean checkout", async () => {
 		const workspace = await mkdtemp(join(tmpdir(), "arkini-clean-delivery-"));
 		try {
 			await copyTrackedWorkspace(workspace);
 			await expect(stat(join(workspace, "game/arkini.game.arkpack"))).rejects.toMatchObject({
+				code: "ENOENT",
+			});
+			await expect(
+				stat(join(workspace, "game/arkini.game.arkpack.metadata.json")),
+			).rejects.toMatchObject({
 				code: "ENOENT",
 			});
 			await expect(stat(join(workspace, ProjectOutputPaths.root))).rejects.toMatchObject({
@@ -155,6 +180,16 @@ describe("fresh checkout desktop delivery inputs", () => {
 			expect(signature.isFile()).toBe(true);
 			const demo = await stat(join(workspace, "game/demo.game.arkpack"));
 			expect(demo.isFile()).toBe(true);
+			await expect(
+				stat(join(workspace, "game/arkini.game.arkpack.metadata.json")),
+			).rejects.toMatchObject({
+				code: "ENOENT",
+			});
+			await expect(
+				stat(join(workspace, "game/demo.game.arkpack.metadata.json")),
+			).rejects.toMatchObject({
+				code: "ENOENT",
+			});
 			await expect(stat(join(workspace, "game/demo.game.arkpack.sig"))).rejects.toMatchObject(
 				{
 					code: "ENOENT",
@@ -164,34 +199,41 @@ describe("fresh checkout desktop delivery inputs", () => {
 				join(workspace, ProjectOutputPaths.desktop.build, "renderer/index.html"),
 			);
 			expect(renderer.isFile()).toBe(true);
-			expect(await readFile(join(workspace, "public/hero.png"))).toEqual(
-				await readFile(join(workspace, "game/arkini/resources/hero.png")),
-			);
-			expect(
-				await readFile(
-					join(workspace, ProjectOutputPaths.desktop.build, "renderer/hero.png"),
-				),
-			).toEqual(await readFile(join(workspace, "public/hero.png")));
-			const rendererAssets = await readdir(
-				join(workspace, ProjectOutputPaths.desktop.build, "renderer/assets"),
+			await expect(
+				stat(join(workspace, ProjectOutputPaths.desktop.build, "renderer/arkpacks")),
+			).rejects.toMatchObject({
+				code: "ENOENT",
+			});
+
+			await runNpmScript(workspace, "package:stage", environment);
+			await execFileAsync(
+				join(workspace, "node_modules/.bin/electron-builder"),
+				[
+					"--config",
+					"electron-builder.yml",
+					"--mac",
+					"--arm64",
+					"--dir",
+					"--publish",
+					"never",
+				],
 				{
-					recursive: true,
+					cwd: workspace,
+					env: environment,
+					maxBuffer: 32 * 1024 * 1024,
 				},
 			);
-			expect(rendererAssets.filter((path) => /^hero-.+[.]png$/.test(path))).toEqual([]);
-			const emittedSignatures = rendererAssets.filter((path) => path.endsWith(".sig"));
-			expect(emittedSignatures).toHaveLength(1);
-			expect(
-				await readFile(
-					join(
-						workspace,
-						ProjectOutputPaths.desktop.build,
-						"renderer/assets",
-						emittedSignatures[0] ?? "",
-					),
-					"utf8",
-				),
-			).toBe(await readFile(join(workspace, "game/arkini.game.arkpack.sig"), "utf8"));
+			const packagedGame = join(
+				workspace,
+				ProjectOutputPaths.desktop.release,
+				"mac-arm64/Arkini.app/Contents/Resources/game",
+			);
+			expect((await readdir(packagedGame)).sort()).toEqual(bundledArkpackNames);
+			for (const name of bundledArkpackNames) {
+				expect(await readFile(join(packagedGame, name))).toEqual(
+					await readFile(join(workspace, "game", name)),
+				);
+			}
 			await runNpmScript(workspace, "dc");
 		} finally {
 			await rm(workspace, {
@@ -199,5 +241,5 @@ describe("fresh checkout desktop delivery inputs", () => {
 				force: true,
 			});
 		}
-	}, 120_000);
+	}, 180_000);
 });

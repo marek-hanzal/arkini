@@ -1,5 +1,6 @@
 import { app, BrowserWindow, nativeTheme } from "electron";
 import { fileURLToPath } from "node:url";
+import { join, resolve } from "node:path";
 import { Effect } from "effect";
 import { createMainWindowFx } from "./createMainWindowFx";
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
@@ -148,6 +149,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	});
 	yield* registerArkiniProtocolFx(rendererRoot);
 	yield* registerArkiniElectronIpcFx({
+		bundledArkpacksRoot: app.isPackaged ? join(process.resourcesPath, "game") : resolve("game"),
 		trustedRenderer,
 		appearancePreferences,
 		cheatPreferences,

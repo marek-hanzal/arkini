@@ -28,7 +28,7 @@ const readyResult = {
 		theme: "dark" as const,
 		accent: "rose" as const,
 	},
-	builtInPackageId: "canonical-built-in",
+	defaultPackageId: "canonical-built-in",
 	cheatsAvailable: false,
 	windowMode: "bordered" as const,
 };

@@ -50,6 +50,7 @@ export const decodeFx = Effect.fn("decodeFx")(function* (bytes: Uint8Array) {
 		}
 
 		return PayloadSchema.parse({
+			packageId: manifest.packageId,
 			config,
 			resources,
 		});

@@ -2,46 +2,35 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { createInMemoryArkpackStorageFx } from "~test/support/arkpack/createInMemoryArkpackStorageFx";
 
-const descriptor = {
-	packageId: "a".repeat(64),
-	hash: "a".repeat(64),
-	gameId: "game:test",
-	title: "Test",
-	game: "1.0" as const,
-	trust: {
-		type: "external",
-		reason: "unsigned",
-	} as const,
-	source: "imported" as const,
-	filename: "test.arkpack",
-	importedAtMs: 1,
-};
+const packageId = "package:test";
 
 describe("createInMemoryArkpackStorageFx", () => {
-	it("keeps metadata listing separate from exact copied payload reads", async () => {
+	it("returns isolated byte copies from both catalog and exact reads", async () => {
 		const storage = Effect.runSync(createInMemoryArkpackStorageFx());
 		const bytes = new Uint8Array([
 			1,
 			2,
 			3,
 		]).buffer;
-		await Effect.runPromise(storage.writeFx(descriptor, bytes));
+		await Effect.runPromise(storage.writeFx(packageId, bytes));
 		expect(await Effect.runPromise(storage.listFx)).toEqual([
-			descriptor,
+			expect.objectContaining({
+				packageId,
+				source: "user",
+			}),
 		]);
-		const loaded = await Effect.runPromise(storage.readFx(descriptor.packageId));
-		expect(new Uint8Array(loaded?.bytes ?? new ArrayBuffer())).toEqual(
+		const loaded = await Effect.runPromise(storage.readFx(packageId));
+		expect(new Uint8Array(loaded[0]?.bytes ?? new ArrayBuffer())).toEqual(
 			new Uint8Array([
 				1,
 				2,
 				3,
 			]),
 		);
-		new Uint8Array(loaded?.bytes ?? new ArrayBuffer())[0] = 9;
+		new Uint8Array(loaded[0]?.bytes ?? new ArrayBuffer())[0] = 9;
 		expect(
 			new Uint8Array(
-				(await Effect.runPromise(storage.readFx(descriptor.packageId)))?.bytes ??
-					new ArrayBuffer(),
+				(await Effect.runPromise(storage.readFx(packageId)))[0]?.bytes ?? new ArrayBuffer(),
 			)[0],
 		).toBe(1);
 	});

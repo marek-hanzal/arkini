@@ -17,7 +17,7 @@ const createGame = ({
 } = {}): Game => ({
 	arkpack: {
 		packageId,
-		hash: "content:acquire",
+		contentHash: "content:acquire",
 		gameId: testArkpackConfig.meta.id,
 		title: testArkpackConfig.meta.title,
 		game: testArkpackConfig.version,
@@ -25,7 +25,7 @@ const createGame = ({
 			type: "external",
 			reason: "unsigned",
 		} as const,
-		source: "imported",
+		source: "user",
 	},
 	config: testArkpackConfig,
 	disposeFx: Effect.void,

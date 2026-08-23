@@ -28,7 +28,7 @@ The signed payload is the exact byte concatenation:
 UTF-8("arkini:arkpack:v1\0") || exact final .arkpack bytes
 ```
 
-There is no JSON canonicalization and no decode/re-encode step. SHA-256 remains the independently derived package identity; the Ed25519 signature is the authorship proof.
+There is no JSON canonicalization and no decode/re-encode step. The stable `packageId` is embedded inside the signed Arkpack manifest, while SHA-256 is independently derived as `contentHash`; the Ed25519 signature is the authorship proof.
 
 ## Trust states
 
@@ -37,7 +37,7 @@ There is no JSON canonicalization and no decode/re-encode step. SHA-256 remains 
 - `external / unknown-key` means a well-formed signature names a key outside the official registry. It is not silently promoted to official.
 - `invalid` means the supplied sidecar is malformed or fails cryptographic verification. Invalid is never downgraded to unsigned.
 
-The generic byte loader accepts unsigned external content and returns this explicit trust union. A caller expecting bundled official content supplies the expected `keyId`; that path fails before package decompression when official verification is not established.
+The generic byte loader accepts unsigned external content and returns this explicit trust union. Trust is derived from the sidecar and exact bytes only: bundled location and package ID never promote content to official.
 
 The current file-picker import stores a selected `.arkpack` without discovering a neighboring sidecar, so it deliberately enters as unsigned external content. The loader contract already accepts optional detached signature metadata for callers that own both files.
 
@@ -102,7 +102,7 @@ The macOS prerelease workflow reads the production private PEM from the reposito
 gh secret set ARKINI_ARKPACK_PRIVATE_KEY < .arkini/arkpack-private.pem
 ```
 
-Only [`game/arkini.arkpack.keys.json`](game/arkini.arkpack.keys.json), containing public material, is committed. The workflow builds the final official package, signs it, post-verifies it, and bundles the `.arkpack` and `.sig` through Vite. It never writes the secret into the repository.
+Only [`game/arkini.arkpack.keys.json`](game/arkini.arkpack.keys.json), containing public material, is committed. The workflow compiles the application independently, builds the final official package, signs and post-verifies it, and lets `electron-builder` copy the generated package and signature from `game/` into packaged `Resources/game`. It never writes the secret into the repository.
 
 ## Rotation
 
@@ -110,12 +110,12 @@ Only [`game/arkini.arkpack.keys.json`](game/arkini.arkpack.keys.json), containin
 2. Add the new public key to the registry while retaining the old public key.
 3. Release an application version that trusts both identities.
 4. Change the single active `keyId` in
-   [`cli/arkpack/ArkiniOfficialArkpackSigning.ts`](cli/arkpack/ArkiniOfficialArkpackSigning.ts),
+   [`shared/ArkiniOfficialArkpackIdentity.ts`](shared/ArkiniOfficialArkpackIdentity.ts),
    replace the
    `ARKINI_ARKPACK_PRIVATE_KEY` CI secret, and run `npm run game:pack:official`.
-5. Verify the regenerated signature and commit the tracked metadata. The sidecar remains a
-   generated, ignored build input; runtime trust expectations are read from that exact generated
-   sidecar, so the build and loader cannot carry separate active-key constants.
+5. Verify the regenerated signature. Package binaries and signature sidecars remain ignored build
+   output; the active signing identity has one source-owned constant in
+   [`shared/ArkiniOfficialArkpackIdentity.ts`](shared/ArkiniOfficialArkpackIdentity.ts).
 6. Retain old public keys while older official packages or saves may still need verification.
 7. Remove or mark a compromised identity only through a deliberate application update.
 

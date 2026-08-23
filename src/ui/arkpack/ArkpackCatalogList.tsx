@@ -48,7 +48,7 @@ export const ArkpackCatalogList = ({
 							className="ak-list-row flex min-w-0 flex-col items-stretch justify-between gap-4 rounded-xl p-4 sm:flex-row sm:items-center"
 						>
 							<div className="min-w-0">
-								<div className="flex items-center gap-2">
+								<div className="flex flex-wrap items-center gap-2">
 									<h2 className="truncate text-lg font-semibold">
 										{arkpack.title}
 									</h2>
@@ -74,20 +74,25 @@ export const ArkpackCatalogList = ({
 											)
 											.exhaustive()}
 									</span>
+									{arkpack.overridesBundled ? (
+										<span className="rounded-full bg-accent/15 px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-accent">
+											User override
+										</span>
+									) : null}
 								</div>
 								<p className="mt-1 truncate text-xs text-subtle">
 									{arkpack.filename ?? `${arkpack.gameId} · ${arkpack.game}`}
 								</p>
 							</div>
 							<div className="flex min-w-0 flex-wrap items-center gap-2 sm:shrink-0">
-								{arkpack.source === "imported" ? (
+								{arkpack.source === "user" ? (
 									<DangerButton
 										className="min-h-0 px-3 py-2 text-xs shadow-none"
 										cursorIntent={blocked ? "progress" : undefined}
 										disabled={blocked}
 										onClick={() => onRemove(arkpack.packageId)}
 									>
-										Remove
+										{arkpack.overridesBundled ? "Remove override" : "Remove"}
 									</DangerButton>
 								) : null}
 								{match(arkpack.trust)

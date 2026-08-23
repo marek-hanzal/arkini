@@ -6,7 +6,6 @@ import { describe, expect, it } from "vitest";
 
 import { decodeFx } from "~/engine/pack/fx/decodeFx";
 import { packDirectoryFx } from "~/engine/pack/fx/packDirectoryFx";
-import { ArkpackMetadataSchema } from "~/engine/pack/schema/ArkpackMetadataSchema";
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 
 const png = new Uint8Array([
@@ -30,7 +29,6 @@ describe("packDirectoryFx", () => {
 				const input = path.join(directory, "arkini");
 				const items = path.join(input, "items");
 				const assets = path.join(input, "assets");
-				const metadataOutput = path.join(directory, "arkini.game.arkpack.metadata.json");
 
 				yield* fileSystem.makeDirectory(items, {
 					recursive: true,
@@ -77,21 +75,14 @@ describe("packDirectoryFx", () => {
 
 				const result = yield* packDirectoryFx({
 					input,
-					metadata: {
-						output: metadataOutput,
-						packageId: "arkini",
-					},
+					packageId: "arkini",
 				});
 				const compressed = yield* fileSystem.readFile(result.output);
 				const payload = yield* decodeFx(new Uint8Array(gunzipSync(compressed)));
-				const metadata = ArkpackMetadataSchema.parse(
-					JSON.parse(yield* fileSystem.readFileString(metadataOutput)),
-				);
 
 				return {
 					result,
 					payload,
-					metadata,
 					staleSignatureExists: yield* fileSystem.exists(staleSignature),
 				} as const;
 			}).pipe(Effect.provide(NodeServices.layer), Effect.scoped),
@@ -102,13 +93,6 @@ describe("packDirectoryFx", () => {
 			png: 2,
 		});
 		expect(packed.staleSignatureExists).toBe(false);
-		expect(packed.metadata).toEqual({
-			packageId: "arkini",
-			hash: packed.result.contentHash,
-			gameId: "arkini",
-			title: "Arkini",
-			game: "1.0",
-		});
 		expect(packed.payload.resources).toEqual(
 			expect.arrayContaining([
 				{
@@ -162,6 +146,7 @@ describe("packDirectoryFx", () => {
 				return yield* Effect.result(
 					packDirectoryFx({
 						input,
+						packageId: "invalid-game",
 					}),
 				);
 			}).pipe(Effect.provide(NodeServices.layer), Effect.scoped),
@@ -193,6 +178,7 @@ describe("packDirectoryFx", () => {
 				return yield* Effect.result(
 					packDirectoryFx({
 						input,
+						packageId: "broken-game",
 					}),
 				);
 			}).pipe(Effect.provide(NodeServices.layer), Effect.scoped),

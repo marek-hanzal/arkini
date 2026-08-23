@@ -16,6 +16,13 @@ files:
   - app/**/*
   - package.json
   - '!app/**/*.map'
+extraResources:
+  - from: game
+    to: game
+    filter:
+      - arkini.game.arkpack
+      - arkini.game.arkpack.sig
+      - demo.game.arkpack
 mac:
   category: public.app-category.games
   icon: icon.png

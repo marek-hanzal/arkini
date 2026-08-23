@@ -17,6 +17,7 @@ export namespace ArkiniElectronApi {
 		arkpackRead: "arkini:arkpack:read",
 		arkpackInstall: "arkini:arkpack:install",
 		arkpackRemove: "arkini:arkpack:remove",
+		arkpackOpenUserDirectory: "arkini:arkpack:open-user-directory",
 		saveRead: "arkini:save:read",
 		saveWrite: "arkini:save:write",
 		saveClear: "arkini:save:clear",
@@ -58,33 +59,17 @@ export namespace ArkiniElectronApi {
 		forceClose: "arkini:lifecycle:force-close",
 	} as const;
 
-	export interface ArkpackDescriptor {
+	export interface ArkpackFile {
 		readonly packageId: string;
-		readonly hash: string;
-		readonly gameId: string;
-		readonly title: string;
-		readonly game: string;
-		readonly trust:
-			| {
-					readonly type: "official";
-					readonly keyId: string;
-			  }
-			| {
-					readonly type: "external";
-					readonly reason: "unsigned" | "unknown-key";
-			  }
-			| {
-					readonly type: "invalid";
-					readonly reason: "malformed-signature" | "invalid-signature";
-					readonly keyId?: string;
-			  };
-		readonly source: "imported";
-		readonly filename?: string;
-		readonly importedAtMs?: number;
+		readonly filename: string;
+		readonly bytes: Uint8Array;
+		readonly signature?: unknown;
+		readonly source: "bundled" | "user";
+		readonly overridesBundled: boolean;
 	}
 
-	export interface ArkpackRecord {
-		readonly descriptor: ArkpackDescriptor;
+	export interface ArkpackInstall {
+		readonly packageId: string;
 		readonly bytes: Uint8Array;
 	}
 
@@ -95,10 +80,11 @@ export namespace ArkiniElectronApi {
 
 	export interface Api {
 		readonly arkpack: {
-			readonly list: () => Promise<ReadonlyArray<ArkpackDescriptor>>;
-			readonly read: (packageId: string) => Promise<ArkpackRecord | null>;
-			readonly install: (record: ArkpackRecord) => Promise<void>;
+			readonly list: () => Promise<ReadonlyArray<ArkpackFile>>;
+			readonly read: (packageId: string) => Promise<ReadonlyArray<ArkpackFile>>;
+			readonly install: (record: ArkpackInstall) => Promise<void>;
 			readonly remove: (packageId: string) => Promise<void>;
+			readonly openUserDirectory: () => Promise<void>;
 		};
 		readonly appearance: {
 			readonly read: () => Promise<AppearanceThemeSchema.Type>;

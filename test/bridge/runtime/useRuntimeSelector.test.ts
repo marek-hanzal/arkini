@@ -39,7 +39,7 @@ const makeTestGameFx = Effect.fn("makeRuntimeSelectorTestGameFx")(
 			const game = {
 				arkpack: {
 					packageId,
-					hash: `content:${packageId}`,
+					contentHash: `content:${packageId}`,
 					gameId: testArkpackConfig.meta.id,
 					title: testArkpackConfig.meta.title,
 					game: testArkpackConfig.version,
@@ -47,7 +47,7 @@ const makeTestGameFx = Effect.fn("makeRuntimeSelectorTestGameFx")(
 						type: "external",
 						reason: "unsigned",
 					} as const,
-					source: "imported" as const,
+					source: "user" as const,
 				},
 				config: testArkpackConfig,
 				saveKey: {

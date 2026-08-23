@@ -2,8 +2,7 @@ import { useAtom, useAtomValue } from "@effect/atom-react";
 import { Cause } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 
-import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
-import { ArkiniArkpack } from "~/bridge/arkpack/ArkiniArkpack";
+import { ArkiniAppVersion, ArkiniDefaultPackageId } from "../../../shared/ArkiniAppMetadata";
 import { useArkpacks } from "~/bridge/arkpack/useArkpacks";
 import { Button, ButtonLink, PrimaryButton, PrimaryButtonLink } from "~/ui/button/Button";
 import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";
@@ -17,18 +16,19 @@ export const MainMenu = () => {
 	const [exitState, requestExit] = useAtom(MainMenuExitCommandAtom);
 	const editorStatus = useAtomValue(EditorServiceStatusAtom);
 	const exitPending = exitState.kind === "pending";
-	const builtInAvailable =
+	const defaultPackageAvailable =
 		AsyncResult.isSuccess(startup) &&
 		!startup.waiting &&
-		startup.value.builtInPackageId === ArkiniArkpack.packageId &&
+		startup.value.defaultPackageId === ArkiniDefaultPackageId &&
 		catalogState.type === "ready" &&
 		catalogState.arkpacks.some(
 			(arkpack) =>
-				arkpack.source === "built-in" &&
-				arkpack.trust.type === "official" &&
-				arkpack.gameId === "arkini" &&
-				arkpack.packageId === ArkiniArkpack.packageId,
+				arkpack.packageId === ArkiniDefaultPackageId && arkpack.trust.type !== "invalid",
 		);
+	const playUnavailable =
+		catalogState.type === "failed" ||
+		(AsyncResult.isFailure(startup) && !startup.waiting) ||
+		(catalogState.type === "ready" && AsyncResult.isSuccess(startup) && !startup.waiting);
 
 	return (
 		<nav
@@ -36,12 +36,12 @@ export const MainMenu = () => {
 			aria-label="Main menu"
 			data-ui="MainMenu"
 		>
-			{builtInAvailable ? (
+			{defaultPackageAvailable ? (
 				<PrimaryButtonLink
 					to="/action/load-game/$packageId"
 					preload={false}
 					params={{
-						packageId: ArkiniArkpack.packageId,
+						packageId: ArkiniDefaultPackageId,
 					}}
 					className="rounded-xl"
 				>
@@ -50,18 +50,10 @@ export const MainMenu = () => {
 			) : (
 				<PrimaryButton
 					className="rounded-xl"
-					cursorIntent={
-						catalogState.type === "failed" ||
-						(AsyncResult.isFailure(startup) && !startup.waiting)
-							? "not-allowed"
-							: "progress"
-					}
+					cursorIntent={playUnavailable ? "not-allowed" : "progress"}
 					disabled
 				>
-					{catalogState.type === "failed" ||
-					(AsyncResult.isFailure(startup) && !startup.waiting)
-						? "Play unavailable"
-						: "Preparing Play…"}
+					{playUnavailable ? "Play unavailable" : "Preparing Play…"}
 				</PrimaryButton>
 			)}
 			{editorStatus.type === "ready" ? (

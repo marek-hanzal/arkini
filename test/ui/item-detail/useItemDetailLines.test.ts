@@ -269,7 +269,7 @@ const readOrThrowWithConfig = <Result, Error>(
 const game = {
 	arkpack: {
 		packageId: "test-package",
-		hash: "test-hash",
+		contentHash: "test-hash",
 		gameId: config.meta.id,
 		title: config.meta.title,
 		game: config.version,
@@ -277,7 +277,7 @@ const game = {
 			type: "external",
 			reason: "unsigned",
 		} as const,
-		source: "imported" as const,
+		source: "user" as const,
 	},
 	config,
 	saveKey: {

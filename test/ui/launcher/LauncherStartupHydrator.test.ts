@@ -65,7 +65,7 @@ describe("LauncherStartupHydrator", () => {
 						theme: "light" as const,
 						accent: "blue" as const,
 					},
-					builtInPackageId: "built-in",
+					defaultPackageId: "built-in",
 					cheatsAvailable: true,
 					windowMode: "bordered" as const,
 				};

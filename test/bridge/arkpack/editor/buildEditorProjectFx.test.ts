@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { gunzipSync } from "node:zlib";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { buildEditorProjectFx } from "~/bridge/arkpack/editor/buildEditorProjectFx";
@@ -8,6 +9,7 @@ import {
 	type EditorProjectRepositoryService,
 } from "~/bridge/editor/EditorProjectRepository";
 import { readArkpackContentHashFx } from "~/engine/pack/fx/readArkpackContentHashFx";
+import { decodeFx } from "~/engine/pack/fx/decodeFx";
 import { GameValidationError } from "~/engine/validation/error/GameValidationError";
 import {
 	createTestPngBytes,
@@ -59,8 +61,11 @@ describe("buildEditorProjectFx", () => {
 		);
 
 		expect(artifact.revision).toBe(7);
-		expect(artifact.filename).toBe("editor-test.arkpack");
+		expect(artifact.filename).toBe("project.game.arkpack");
 		expect(artifact.bytes.byteLength).toBeGreaterThan(0);
+		expect(Effect.runSync(decodeFx(new Uint8Array(gunzipSync(artifact.bytes)))).packageId).toBe(
+			"project",
+		);
 		expect(artifact.contentHash).toBe(
 			await Effect.runPromise(readArkpackContentHashFx(artifact.bytes)),
 		);

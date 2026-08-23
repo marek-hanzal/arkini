@@ -17,6 +17,7 @@ import {
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 const validPayload: PayloadSchema.Type = {
+	packageId: "project:imported",
 	config: editorTestPayload.config,
 	resources: editorTestPayload.resources.map((resource) => ({
 		...resource,
@@ -87,14 +88,14 @@ describe("importEditorArkpackFileFx", () => {
 		);
 
 		expect(descriptor).toMatchObject({
-			projectId: "editor-test",
+			projectId: "project:imported",
 			title: "Editor test",
 			game: "1.0",
 			revision: 0,
 		});
 		expect(createProjectFx).toHaveBeenCalledOnce();
 		expect(createProjectFx).toHaveBeenCalledWith({
-			projectId: "editor-test",
+			projectId: "project:imported",
 			config: editorTestPayload.config,
 			resources: validPayload.resources,
 		});

@@ -3,24 +3,32 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { importArkpackFileAtom } from "~/bridge/arkpack/importArkpackFileAtom";
+import { openUserArkpackDirectoryAtom } from "~/bridge/arkpack/openUserArkpackDirectoryAtom";
+import { refreshArkpackCatalogAtom } from "~/bridge/arkpack/refreshArkpackCatalogAtom";
 import { removeArkpackAtom } from "~/bridge/arkpack/removeArkpackAtom";
 import { useArkpacks } from "~/bridge/arkpack/useArkpacks";
 import { useExclusiveAction } from "~/ui/action/useExclusiveAction";
 
-type BusyAction = "import" | "remove";
+type BusyAction = "import" | "open-directory" | "refresh" | "remove";
 type ActiveAction = BusyAction | "exit";
 
-/** Owns Arkpack import, removal, exit navigation, mounted guards, and Escape lifecycle. */
+/** Owns selector actions, exit navigation, mounted guards, and Escape lifecycle. */
 export const useArkpackSelectorActions = () => {
 	const { state } = useArkpacks();
 	// TODO(#397): Revalidate stable promise-mode ownership, rejection, and interruption
 	// semantics; keep it only while this mounted selector owns the complete async action.
 	// Promise-mode command results are atom-wide, so the selector claims one exclusive action
-	// before invoking either setter and never overlaps awaited import/remove calls.
+	// before invoking a setter and never overlaps awaited catalog or storage calls.
 	const importFile = useAtomSet(importArkpackFileAtom, {
 		mode: "promise",
 	});
 	const remove = useAtomSet(removeArkpackAtom, {
+		mode: "promise",
+	});
+	const refresh = useAtomSet(refreshArkpackCatalogAtom, {
+		mode: "promise",
+	});
+	const openUserDirectory = useAtomSet(openUserArkpackDirectoryAtom, {
 		mode: "promise",
 	});
 	const navigate = useNavigate();
@@ -28,8 +36,7 @@ export const useArkpackSelectorActions = () => {
 	const mountedRef = useRef(false);
 	const [actionError, setActionError] = useState<unknown>();
 	const { active, claim, release } = useExclusiveAction<ActiveAction>();
-	const busyAction: BusyAction | null =
-		active === "import" || active === "remove" ? active : null;
+	const busyAction: BusyAction | null = active === "exit" ? null : active;
 	const exitPending = active === "exit";
 
 	useEffect(() => {
@@ -104,25 +111,44 @@ export const useArkpackSelectorActions = () => {
 		],
 	);
 
-	const removeArkpack = useCallback(
-		(packageId: string) => {
-			if (state.type === "loading" || !claim("remove")) return;
+	const runBusyAction = useCallback(
+		(action: Exclude<BusyAction, "import">, operation: () => Promise<unknown>) => {
+			if (state.type === "loading" || !claim(action)) return;
 			setActionError(undefined);
-			void (async () => {
-				try {
-					await remove(packageId);
-				} catch (error) {
+			void operation()
+				.catch((error: unknown) => {
 					if (mountedRef.current) setActionError(error);
-				} finally {
-					release("remove");
-				}
-			})();
+				})
+				.finally(() => release(action));
 		},
 		[
 			claim,
 			release,
-			remove,
 			state.type,
+		],
+	);
+
+	const removeArkpack = useCallback(
+		(packageId: string) => runBusyAction("remove", () => remove(packageId)),
+		[
+			remove,
+			runBusyAction,
+		],
+	);
+
+	const refreshArkpacks = useCallback(
+		() => runBusyAction("refresh", () => refresh()),
+		[
+			refresh,
+			runBusyAction,
+		],
+	);
+
+	const openArkpackDirectory = useCallback(
+		() => runBusyAction("open-directory", () => openUserDirectory()),
+		[
+			openUserDirectory,
+			runBusyAction,
 		],
 	);
 
@@ -135,6 +161,8 @@ export const useArkpackSelectorActions = () => {
 		actionError,
 		upload,
 		removeArkpack,
+		refreshArkpacks,
+		openArkpackDirectory,
 		requestMainMenu,
 	};
 };

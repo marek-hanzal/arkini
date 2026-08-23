@@ -1,11 +1,13 @@
 import { z } from "zod";
 
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ManifestResourceSchema } from "./ManifestResourceSchema";
 
 export const ManifestSchema = z
 	.object({
-		version: z.literal(1).describe("The binary pack format version."),
+		version: z.literal(2).describe("The binary pack format version."),
+		packageId: IdSchema.describe("The stable catalog identity of this package."),
 		length: NonNegativeIntegerSchema.describe("The encoded configuration size in bytes."),
 		resources: z
 			.array(ManifestResourceSchema)

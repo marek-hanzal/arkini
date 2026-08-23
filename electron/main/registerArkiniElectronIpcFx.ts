@@ -1,5 +1,6 @@
 import { app, BrowserWindow, ipcMain, nativeTheme, shell, type IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
+import { mkdir } from "node:fs/promises";
 import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
 import { createFilesystemArkpackCatalogFx } from "./arkpack/createFilesystemArkpackCatalogFx";
 import type { AppearancePreferences } from "./appearance/AppearancePreferences";
@@ -20,6 +21,7 @@ let registered = false;
 
 export namespace registerArkiniElectronIpcFx {
 	export interface Props {
+		readonly bundledArkpacksRoot: string;
 		readonly trustedRenderer: TrustedRenderer;
 		readonly appearancePreferences: AppearancePreferences;
 		readonly cheatPreferences: CheatPreferences;
@@ -34,6 +36,7 @@ export namespace registerArkiniElectronIpcFx {
 /** Registers the narrow Arkini Electron capabilities exposed through preload. */
 export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcFx")(
 	({
+		bundledArkpacksRoot,
 		trustedRenderer,
 		appearancePreferences,
 		cheatPreferences,
@@ -47,7 +50,8 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 			if (registered) return;
 			registered = true;
 			const arkpacks = yield* createFilesystemArkpackCatalogFx({
-				root: userDataPaths.game.arkpacks,
+				bundledRoot: bundledArkpacksRoot,
+				userRoot: userDataPaths.game.arkpacks,
 			});
 			const saves = yield* createFilesystemGameSaveFilesFx({
 				root: userDataPaths.game.saves,
@@ -168,13 +172,28 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.arkpackInstall,
-					(event, record: ArkiniElectronApi.ArkpackRecord) =>
+					(event, record: ArkiniElectronApi.ArkpackInstall) =>
 						runAuthorized(event, arkpacks.installFx(record)),
 				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.arkpackRemove,
 					(event, packageId: string) =>
 						runAuthorized(event, arkpacks.removeFx(packageId)),
+				);
+				ipcMain.handle(ArkiniElectronApi.channels.arkpackOpenUserDirectory, (event) =>
+					runAuthorized(
+						event,
+						Effect.tryPromise({
+							try: async () => {
+								await mkdir(userDataPaths.game.arkpacks, {
+									recursive: true,
+								});
+								const error = await shell.openPath(userDataPaths.game.arkpacks);
+								if (error !== "") throw new Error(error);
+							},
+							catch: (cause) => cause,
+						}),
+					),
 				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.saveRead,
@@ -207,6 +226,7 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 						ArkiniElectronApi.channels.arkpackRead,
 						ArkiniElectronApi.channels.arkpackInstall,
 						ArkiniElectronApi.channels.arkpackRemove,
+						ArkiniElectronApi.channels.arkpackOpenUserDirectory,
 						ArkiniElectronApi.channels.saveRead,
 						ArkiniElectronApi.channels.saveWrite,
 						ArkiniElectronApi.channels.saveClear,

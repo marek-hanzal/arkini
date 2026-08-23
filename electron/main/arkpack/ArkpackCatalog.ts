@@ -2,17 +2,14 @@ import type { Effect } from "effect";
 import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import type { ElectronMainError } from "../ElectronMainError";
 
-/** Effect-native main-process capability for installed external Arkpacks. */
+/** Thin main-process filesystem capability over bundled and user Arkpack roots. */
 export interface ArkpackCatalog {
-	readonly listFx: Effect.Effect<
-		ReadonlyArray<ArkiniElectronApi.ArkpackDescriptor>,
-		ElectronMainError
-	>;
+	readonly listFx: Effect.Effect<ReadonlyArray<ArkiniElectronApi.ArkpackFile>, ElectronMainError>;
 	readonly readFx: (
 		packageId: string,
-	) => Effect.Effect<ArkiniElectronApi.ArkpackRecord | null, ElectronMainError>;
+	) => Effect.Effect<ReadonlyArray<ArkiniElectronApi.ArkpackFile>, ElectronMainError>;
 	readonly installFx: (
-		record: ArkiniElectronApi.ArkpackRecord,
+		record: ArkiniElectronApi.ArkpackInstall,
 	) => Effect.Effect<void, ElectronMainError>;
 	readonly removeFx: (packageId: string) => Effect.Effect<void, ElectronMainError>;
 }

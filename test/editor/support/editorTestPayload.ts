@@ -48,6 +48,7 @@ export const editorTestConfig = GameConfigSchema.parse({
 });
 
 export const editorTestPayload: PayloadSchema.Type = {
+	packageId: "project:test",
 	config: editorTestConfig,
 	resources: [
 		{

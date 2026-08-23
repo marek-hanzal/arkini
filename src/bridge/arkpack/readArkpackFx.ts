@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 
-import { ArkpackLimits } from "~/bridge/arkpack/ArkpackLimits";
-import { assertExpectedArkpackTrustFx } from "~/bridge/arkpack/assertExpectedArkpackTrustFx";
+import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { validateArkpackPayloadFx } from "~/bridge/arkpack/validateArkpackPayloadFx";
 import { decodeFx } from "~/engine/pack/fx/decodeFx";
 import { verifyArkpackTrustFx } from "~/engine/pack/fx/verifyArkpackTrustFx";
@@ -13,15 +12,13 @@ export namespace readArkpackFx {
 	export interface Props {
 		bytes: Uint8Array;
 		filename?: string;
-		importedAtMs?: number;
 		packageId?: string;
 		signature: {
-			/** Official key identity required by trusted bundled content. */
-			readonly expectedKeyId?: string;
 			readonly metadata?: unknown;
 			readonly trustedKeys: ArkpackTrustedKeysSchema.Type;
 		};
-		source: "built-in" | "imported";
+		source: "bundled" | "user";
+		overridesBundled?: boolean;
 	}
 }
 
@@ -69,10 +66,10 @@ const decompressArkpackFx = Effect.fn("decompressArkpackFx")((bytes: Uint8Array)
 export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 	bytes,
 	filename,
-	importedAtMs,
 	packageId,
 	signature,
 	source,
+	overridesBundled = false,
 }: readArkpackFx.Props) {
 	if (bytes.byteLength > ArkpackLimits.maxCompressedBytes) {
 		return yield* Effect.fail(
@@ -85,10 +82,6 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 		bytes,
 		signature: signature.metadata,
 		trustedKeys: signature.trustedKeys,
-	});
-	yield* assertExpectedArkpackTrustFx({
-		expectedKeyId: signature.expectedKeyId,
-		trust: verification.trust,
 	});
 	const contentHash = verification.contentHash;
 	const payload = yield* decodeFx(yield* decompressArkpackFx(bytes));
@@ -103,25 +96,29 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 			}),
 		);
 	}
+	if (packageId !== undefined && packageId !== payload.packageId) {
+		return yield* Effect.fail(
+			new Error(
+				`Arkpack filename declares package ${packageId}, but its signed payload declares ${payload.packageId}.`,
+			),
+		);
+	}
+	const gameId = payload.config.meta.id;
 
 	return {
 		descriptor: {
-			packageId: packageId ?? contentHash,
-			hash: contentHash,
-			gameId: payload.config.meta.id,
+			packageId: payload.packageId,
+			contentHash,
+			gameId,
 			title: payload.config.meta.title,
 			game: payload.config.version,
 			trust: verification.trust,
 			source,
+			overridesBundled,
 			...(filename === undefined
 				? {}
 				: {
 						filename,
-					}),
-			...(importedAtMs === undefined
-				? {}
-				: {
-						importedAtMs,
 					}),
 		},
 		payload,

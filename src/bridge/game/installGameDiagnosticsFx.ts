@@ -74,7 +74,7 @@ export const installGameDiagnosticsFx = Effect.fn("installGameDiagnosticsFx")(fu
 		sessionId,
 		data: {
 			packageId: arkpack.packageId,
-			contentHash: arkpack.hash,
+			contentHash: arkpack.contentHash,
 			game: arkpack.game,
 			restored,
 		},

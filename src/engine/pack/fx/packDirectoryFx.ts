@@ -8,7 +8,6 @@ import { readArkpackContentHashFx } from "~/engine/pack/fx/readArkpackContentHas
 import { readArkpackSignaturePathFx } from "~/engine/pack/fx/readArkpackSignaturePathFx";
 import { assertGameConfigValidFx } from "~/engine/validation/fx/assertGameConfigValidFx";
 import { encodeFx } from "./encodeFx";
-import { ArkpackMetadataSchema } from "~/engine/pack/schema/ArkpackMetadataSchema";
 import { readPngAssetFx } from "./readPngAssetFx";
 
 const gzipAsync = promisify(gzip);
@@ -17,10 +16,7 @@ export namespace packDirectoryFx {
 	export interface Props {
 		input: string;
 		output?: string;
-		metadata?: {
-			readonly output: string;
-			readonly packageId: string;
-		};
+		packageId: string;
 	}
 }
 
@@ -35,7 +31,7 @@ export namespace packDirectoryFx {
 export const packDirectoryFx = Effect.fn("packDirectoryFx")(function* ({
 	input,
 	output,
-	metadata,
+	packageId,
 }: packDirectoryFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
@@ -49,6 +45,7 @@ export const packDirectoryFx = Effect.fn("packDirectoryFx")(function* ({
 	);
 	const config = yield* assertGameConfigValidFx(compilation);
 	const bytes = yield* encodeFx({
+		packageId,
 		config,
 		resources: pngAssets,
 	});
@@ -70,27 +67,6 @@ export const packDirectoryFx = Effect.fn("packDirectoryFx")(function* ({
 		force: true,
 	});
 
-	const metadataRecord =
-		metadata === undefined
-			? undefined
-			: ArkpackMetadataSchema.parse({
-					packageId: metadata.packageId,
-					hash: contentHash,
-					gameId: config.meta.id,
-					title: config.meta.title,
-					game: config.version,
-				});
-	const metadataOutput = metadata === undefined ? undefined : path.resolve(metadata.output);
-	if (metadataRecord !== undefined && metadataOutput !== undefined) {
-		yield* fileSystem.makeDirectory(path.dirname(metadataOutput), {
-			recursive: true,
-		});
-		yield* fileSystem.writeFileString(
-			metadataOutput,
-			`${JSON.stringify(metadataRecord, undefined, "\t")}\n`,
-		);
-	}
-
 	return {
 		input: path.resolve(input),
 		output: outputPath,
@@ -98,8 +74,6 @@ export const packDirectoryFx = Effect.fn("packDirectoryFx")(function* ({
 		png: pngAssets.length,
 		bytes: compressed.byteLength,
 		contentHash,
-		metadata: metadataRecord,
-		metadataOutput,
 		diagnostics: compilation.diagnostics,
 	} as const;
 });

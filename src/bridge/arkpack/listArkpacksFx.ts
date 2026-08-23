@@ -1,8 +1,7 @@
 import { Effect } from "effect";
-import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
-import { BuiltInArkpacks } from "~/bridge/arkpack/BuiltInArkpacks";
 import { createArkpackStorageFx } from "~/bridge/arkpack/createArkpackStorageFx";
+import { readArkpackCandidatesFx } from "~/bridge/arkpack/readArkpackCandidatesFx";
 
 export namespace listArkpacksFx {
 	export interface Props {
@@ -10,14 +9,24 @@ export namespace listArkpacksFx {
 	}
 }
 
-/** Lists bundled packages followed by imported metadata without reading package payload bytes. */
+/** Reads and validates the effective package set exposed by the two filesystem roots. */
 export const listArkpacksFx = Effect.fn("listArkpacksFx")(function* (
 	props: listArkpacksFx.Props = {},
 ) {
 	const storage = props.storage ?? (yield* createArkpackStorageFx());
-	const imported = yield* storage.listFx;
-	return [
-		...BuiltInArkpacks.map((arkpack) => arkpack.descriptor),
-		...imported,
-	] satisfies ReadonlyArray<ArkpackDescriptor>;
+	const files = yield* storage.listFx;
+	const candidates = new Map<string, ArkpackStorage.File[]>();
+	for (const file of files) {
+		const packageFiles = candidates.get(file.packageId) ?? [];
+		packageFiles.push(file);
+		candidates.set(file.packageId, packageFiles);
+	}
+	return yield* Effect.forEach(
+		candidates.values(),
+		(files) =>
+			readArkpackCandidatesFx(files).pipe(Effect.map((loaded) => loaded?.descriptor ?? null)),
+		{
+			concurrency: 4,
+		},
+	).pipe(Effect.map((descriptors) => descriptors.filter((descriptor) => descriptor !== null)));
 });

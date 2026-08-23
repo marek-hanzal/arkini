@@ -8,27 +8,24 @@ export namespace PackCommand {
 	export interface Props {
 		input: string;
 		name?: string;
-		metadata?: {
-			readonly output: string;
-			readonly packageId: string;
-		};
+		packageId: string;
 	}
 }
 
 namespace runPackCommandFx {
 	export interface Props {
 		readonly input: string;
-		readonly metadata?: PackCommand.Props["metadata"];
+		readonly packageId: string;
 	}
 }
 
 const runPackCommandFx = Effect.fn("runPackCommandFx")(function* ({
 	input,
-	metadata,
+	packageId,
 }: runPackCommandFx.Props) {
 	const result = yield* packDirectoryFx({
 		input,
-		metadata,
+		packageId,
 	}).pipe(
 		Effect.catchTag("GameValidationError", (error) =>
 			printGameDiagnosticsForCliFx(error.diagnostics).pipe(
@@ -40,15 +37,12 @@ const runPackCommandFx = Effect.fn("runPackCommandFx")(function* ({
 
 	yield* Console.log(`Packed ${result.json} JSON sources and ${result.png} PNG assets.`);
 	yield* Console.log(`Wrote ${result.output} (${result.bytes} bytes).`);
-	if (result.metadataOutput !== undefined) {
-		yield* Console.log(`Wrote ${result.metadataOutput}.`);
-	}
 });
 
 /**
  * CLI command that packs one game source directory into an Arkini binary package.
  */
-export const PackCommand = ({ input, name = "pack", metadata }: PackCommand.Props) =>
+export const PackCommand = ({ input, name = "pack", packageId }: PackCommand.Props) =>
 	Command.make(
 		name,
 		{
@@ -57,7 +51,7 @@ export const PackCommand = ({ input, name = "pack", metadata }: PackCommand.Prop
 		({ input }) =>
 			runPackCommandFx({
 				input,
-				metadata,
+				packageId,
 			}),
 	).pipe(
 		Command.withDescription(

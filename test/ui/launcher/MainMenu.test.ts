@@ -42,7 +42,7 @@ afterEach(async () => {
 });
 
 describe("MainMenu", () => {
-	it("plays the authoritative built-in package and requests native exit once", async () => {
+	it("plays the effective default package and requests native exit once", async () => {
 		let resolveClose: (() => void) | undefined;
 		const requestClose = vi.fn(
 			() =>
@@ -55,7 +55,7 @@ describe("MainMenu", () => {
 			arkpacks: [
 				{
 					packageId: "competing-official",
-					hash: "b".repeat(64),
+					contentHash: "b".repeat(64),
 					gameId: "other-game",
 					title: "Other Game",
 					game: "1",
@@ -63,11 +63,11 @@ describe("MainMenu", () => {
 						type: "official",
 						keyId: "other-official",
 					} as const,
-					source: "built-in" as const,
+					source: "bundled" as const,
 				},
 				{
 					packageId: "arkini",
-					hash: "a".repeat(64),
+					contentHash: "a".repeat(64),
 					gameId: "arkini",
 					title: "Arkini",
 					game: "1",
@@ -75,13 +75,16 @@ describe("MainMenu", () => {
 						type: "official",
 						keyId: "test-official",
 					} as const,
-					source: "built-in" as const,
+					source: "bundled" as const,
 				},
 			],
 		};
+		const catalogStateRef = Effect.runSync(
+			SubscriptionRef.make<ArkpackCatalog.State>(catalogState),
+		);
 		const catalog: ArkpackCatalog = {
 			awaitIdleFx: Effect.void,
-			state: Effect.runSync(SubscriptionRef.make<ArkpackCatalog.State>(catalogState)),
+			state: catalogStateRef,
 			refreshFx: Effect.void,
 			importFileFx: () => Effect.die("unused"),
 			installFx: () => Effect.die("unused"),
@@ -113,7 +116,7 @@ describe("MainMenu", () => {
 					theme: "dark" as const,
 					accent: "rose" as const,
 				},
-				builtInPackageId: "arkini",
+				defaultPackageId: "arkini",
 				cheatsAvailable: false,
 				windowMode: "bordered" as const,
 			}),
@@ -159,6 +162,23 @@ describe("MainMenu", () => {
 			(link) => link.textContent === "Play",
 		);
 		expect(play?.getAttribute("href")).toContain("/action/load-game/arkini");
+		await act(async () => {
+			await Effect.runPromise(
+				SubscriptionRef.set(catalogStateRef, {
+					type: "ready",
+					arkpacks: [
+						{
+							...catalogState.arkpacks[1]!,
+							trust: {
+								type: "invalid",
+								reason: "malformed-signature",
+							},
+						},
+					],
+				}),
+			);
+		});
+		await vi.waitFor(() => expect(container.textContent).toContain("Play unavailable"));
 		const editor = Array.from(container.querySelectorAll("a")).find(
 			(link) => link.textContent === "Editor",
 		);
@@ -183,7 +203,7 @@ describe("MainMenu", () => {
 		expect(container.textContent).toContain("SQLite unavailable.");
 		expect(
 			Array.from(container.querySelectorAll("a")).some((link) => link.textContent === "Play"),
-		).toBe(true);
+		).toBe(false);
 		expect(container.textContent).toContain("Arkpacks");
 		expect(container.textContent).toContain("Settings");
 		expect(container.textContent).toContain("About");

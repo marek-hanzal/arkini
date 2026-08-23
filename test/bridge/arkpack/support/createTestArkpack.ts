@@ -51,9 +51,10 @@ export const testArkpackConfig = GameConfigSchema.parse({
 	},
 });
 
-export const createTestArkpack = (config = testArkpackConfig) => {
+export const createTestArkpack = (config = testArkpackConfig, packageId = "package:bridge") => {
 	const encoded = Effect.runSync(
 		encodeFx({
+			packageId,
 			config,
 			resources: [
 				{

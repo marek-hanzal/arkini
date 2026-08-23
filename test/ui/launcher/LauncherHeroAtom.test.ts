@@ -41,13 +41,6 @@ vi.mock("~/bridge/window/readWindowModeFx", () => ({
 vi.mock("~/bridge/launcher/readLastPackageIdFx", () => ({
 	readLastPackageIdFx: () => Effect.succeed(harness.lastPackageId),
 }));
-vi.mock("~/bridge/arkpack/resolveBuiltInArkpackFx", () => ({
-	resolveBuiltInArkpackFx: (
-		arkpacks: ReadonlyArray<{
-			readonly packageId: string;
-		}>,
-	) => Effect.succeed(arkpacks[0]),
-}));
 vi.mock("~/bridge/arkpack/loadArkpackFx", () => ({
 	loadArkpackFx: ({ packageId }: { readonly packageId: string }) =>
 		Effect.suspend(() => {
@@ -91,7 +84,7 @@ vi.mock("~/ui/launcher/preloadLauncherHeroFx", () => ({
 
 const builtIn = {
 	packageId: "arkini",
-	hash: "a".repeat(64),
+	contentHash: "a".repeat(64),
 	gameId: "arkini",
 	title: "Arkini",
 	game: "1.0",
@@ -99,7 +92,7 @@ const builtIn = {
 		type: "official" as const,
 		keyId: "arkini-test",
 	},
-	source: "built-in" as const,
+	source: "bundled" as const,
 };
 const catalog: ArkpackCatalog = {
 	awaitIdleFx: Effect.void,

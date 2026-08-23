@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { ArkpackLimits } from "~/bridge/arkpack/ArkpackLimits";
+import { ArkpackLimits } from "../../../../shared/ArkpackLimits";
 import { validateArkpackPayloadFx } from "~/bridge/arkpack/validateArkpackPayloadFx";
 import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
@@ -63,6 +63,7 @@ export const buildEditorProjectFx = Effect.fn("buildEditorProjectFx")(function* 
 		);
 	}
 	const payload = {
+		packageId: project.projectId,
 		config: project.config,
 		resources: [
 			...project.resources,
@@ -85,7 +86,7 @@ export const buildEditorProjectFx = Effect.fn("buildEditorProjectFx")(function* 
 		bytes,
 		contentHash,
 		diagnostics,
-		filename: `${project.config.meta.id}.arkpack`,
+		filename: `${encodeURIComponent(project.projectId)}.game.arkpack`,
 		revision: project.revision,
 	} satisfies buildEditorProjectFx.Success;
 });

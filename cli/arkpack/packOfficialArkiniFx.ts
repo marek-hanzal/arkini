@@ -24,10 +24,8 @@ export const packOfficialArkiniFx = Effect.fn("packOfficialArkiniFx")(function* 
 	const result = yield* packSignedDirectoryFx({
 		input: gameDirectory,
 		keyId: ArkiniOfficialArkpackSigning.keyId,
-		metadata: {
-			output: ArkiniOfficialArkpackSigning.metadataOutput,
-			packageId: ArkiniOfficialArkpackSigning.packageId,
-		},
+		packageId: ArkiniOfficialArkpackSigning.packageId,
+		output: "game/arkini.game.arkpack",
 		privateKey,
 		trustedKeys,
 	});

@@ -104,6 +104,8 @@ const api: ArkiniElectronApi.Api = {
 		install: (record) => ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackInstall, record),
 		remove: (packageId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackRemove, packageId),
+		openUserDirectory: () =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackOpenUserDirectory),
 	},
 	save: {
 		read: (key) => ipcRenderer.invoke(ArkiniElectronApi.channels.saveRead, key),

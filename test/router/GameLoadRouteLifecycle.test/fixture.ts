@@ -35,7 +35,7 @@ export const createGame = ({
 } = {}): Game => ({
 	arkpack: {
 		packageId: createdPackageId,
-		hash: "content-route-load",
+		contentHash: "content-route-load",
 		gameId: testArkpackConfig.meta.id,
 		title: testArkpackConfig.meta.title,
 		game: testArkpackConfig.version,
@@ -43,7 +43,7 @@ export const createGame = ({
 			type: "external",
 			reason: "unsigned",
 		} as const,
-		source: "imported",
+		source: "user",
 	},
 	config: testArkpackConfig,
 	disposeFx: Effect.void,

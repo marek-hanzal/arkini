@@ -1,8 +1,9 @@
 import { ArkpackCatalogList } from "~/ui/arkpack/ArkpackCatalogList";
 import { useArkpackSelectorActions } from "~/ui/arkpack/useArkpackSelectorActions";
 import { BackButton } from "~/ui/button/BackButton";
+import { Button } from "~/ui/button/Button";
 
-/** Selects a bundled or locally imported game package without uploading it anywhere. */
+/** Selects a bundled or user-owned game package without uploading it anywhere. */
 export const ArkpackSelector = () => {
 	const actions = useArkpackSelectorActions();
 	const blocked = actions.blocked;
@@ -23,8 +24,7 @@ export const ArkpackSelector = () => {
 					Choose a game package
 				</h1>
 				<p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-					Imported arkpacks stay on this device. Every package is validated before it can
-					run.
+					User arkpacks stay on this device. Every package is validated before it can run.
 				</p>
 			</header>
 
@@ -37,10 +37,32 @@ export const ArkpackSelector = () => {
 					disabled={blocked}
 					onChange={(event) => void actions.upload(event.currentTarget.files?.[0])}
 				/>
+				<div className="mt-3 flex flex-wrap gap-2">
+					<Button
+						className="min-h-0 px-3 py-2 text-xs shadow-none"
+						cursorIntent={blocked ? "progress" : undefined}
+						disabled={blocked}
+						onClick={actions.openArkpackDirectory}
+					>
+						Open Arkpack folder
+					</Button>
+					<Button
+						className="min-h-0 px-3 py-2 text-xs shadow-none"
+						cursorIntent={blocked ? "progress" : undefined}
+						disabled={blocked}
+						onClick={actions.refreshArkpacks}
+					>
+						Refresh
+					</Button>
+				</div>
 				{actions.busyAction === "import" ? (
 					<p className="mt-3 text-sm text-accent">Validating package…</p>
 				) : actions.busyAction === "remove" ? (
 					<p className="mt-3 text-sm text-accent">Removing package…</p>
+				) : actions.busyAction === "refresh" ? (
+					<p className="mt-3 text-sm text-accent">Refreshing packages…</p>
+				) : actions.busyAction === "open-directory" ? (
+					<p className="mt-3 text-sm text-accent">Opening Arkpack folder…</p>
 				) : null}
 				{actions.actionError === undefined ? null : (
 					<p className="mt-3 text-sm text-danger">{String(actions.actionError)}</p>

@@ -27,7 +27,7 @@ const createPackProvenance = (
 
 /** Runs the canonical completed-game validation shared by Arkpack read and build boundaries. */
 export const validateArkpackPayloadFx = Effect.fn("validateArkpackPayloadFx")(function* (
-	payload: PayloadSchema.Type,
+	payload: Pick<PayloadSchema.Type, "config" | "resources">,
 ) {
 	for (const resource of payload.resources) {
 		if (resource.mime !== "image/png") {

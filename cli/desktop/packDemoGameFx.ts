@@ -15,10 +15,8 @@ export const packDemoGameFx = Effect.fn("packDemoGameFx")(function* ({
 }: packDemoGameFx.Props = {}) {
 	const packed = yield* packDirectoryFx({
 		input: gameDirectory,
-		metadata: {
-			output: "game/demo.game.arkpack.metadata.json",
-			packageId: "demo",
-		},
+		output: "game/demo.game.arkpack",
+		packageId: "demo",
 	}).pipe(
 		Effect.catchTag("GameValidationError", (error) =>
 			printGameDiagnosticsForCliFx(error.diagnostics).pipe(

@@ -57,10 +57,7 @@ describe("Arkpack signing workflow", () => {
 				packSignedDirectoryFx({
 					input: "game/demo",
 					keyId,
-					metadata: {
-						output: join(root, "untrusted.metadata.json"),
-						packageId: "untrusted-workflow",
-					},
+					packageId: "untrusted-workflow",
 					output: join(root, "untrusted.game.arkpack"),
 					privateKey: pair.privateKey,
 					trustedKeys: {
@@ -82,10 +79,7 @@ describe("Arkpack signing workflow", () => {
 			packSignedDirectoryFx({
 				input: "game/demo",
 				keyId,
-				metadata: {
-					output: join(root, "workflow.metadata.json"),
-					packageId: "test-workflow",
-				},
+				packageId: "test-workflow",
 				output: arkpackPath,
 				privateKey: pair.privateKey,
 				trustedKeys,
@@ -112,11 +106,10 @@ describe("Arkpack signing workflow", () => {
 				bytes,
 				packageId: "test-workflow",
 				signature: {
-					expectedKeyId: keyId,
 					metadata: signature,
 					trustedKeys,
 				},
-				source: "built-in",
+				source: "bundled",
 			}),
 		);
 		expect(loaded.descriptor.trust).toEqual({
@@ -125,40 +118,13 @@ describe("Arkpack signing workflow", () => {
 		});
 		expect(loaded.payload.config.meta.id).toBe("demo");
 
-		const mutated = bytes.slice();
-		mutated[mutated.byteLength - 1] = (mutated[mutated.byteLength - 1] ?? 0) ^ 1;
-		const mismatchedTrust = await Effect.runPromise(
-			Effect.result(
-				readArkpackFx({
-					bytes: mutated,
-					signature: {
-						expectedKeyId: keyId,
-						metadata: signature,
-						trustedKeys,
-					},
-					source: "built-in",
-				}),
-			),
-		);
-		expect(mismatchedTrust._tag).toBe("Failure");
-		if (mismatchedTrust._tag === "Failure") {
-			expect(mismatchedTrust.failure).toMatchObject({
-				_tag: "ArkpackTrustMismatchError",
-				expectedKeyId: keyId,
-				actualTrust: {
-					type: "invalid",
-					reason: "invalid-signature",
-				},
-			});
-		}
-
 		const unsigned = await Effect.runPromise(
 			readArkpackFx({
 				bytes,
 				signature: {
 					trustedKeys,
 				},
-				source: "imported",
+				source: "user",
 			}),
 		);
 		expect(unsigned.descriptor.trust).toEqual({
@@ -180,7 +146,7 @@ describe("Arkpack signing workflow", () => {
 					metadata: unknownSignature,
 					trustedKeys,
 				},
-				source: "imported",
+				source: "user",
 			}),
 		);
 		expect(unknown.descriptor.trust).toEqual({

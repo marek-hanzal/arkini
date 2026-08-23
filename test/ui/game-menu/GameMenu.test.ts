@@ -77,7 +77,7 @@ const createGame = (
 ): Game => ({
 	arkpack: {
 		packageId: "package:menu",
-		hash: "content:menu",
+		contentHash: "content:menu",
 		gameId: "game:menu",
 		title: "Menu game",
 		game: "1.0",
@@ -85,7 +85,7 @@ const createGame = (
 			type: "external",
 			reason: "unsigned",
 		} as const,
-		source: "imported",
+		source: "user",
 	},
 	config: testArkpackConfig,
 	saveKey: {

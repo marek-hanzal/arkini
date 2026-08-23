@@ -10,10 +10,7 @@ export namespace packSignedDirectoryFx {
 	export interface Props {
 		readonly input: string;
 		readonly keyId: string;
-		readonly metadata: {
-			readonly output: string;
-			readonly packageId: string;
-		};
+		readonly packageId: string;
 		readonly output?: string;
 		readonly privateKey: string;
 		readonly trustedKeys: ArkpackTrustedKeysSchema.Type;
@@ -24,7 +21,7 @@ export namespace packSignedDirectoryFx {
 export const packSignedDirectoryFx = Effect.fn("packSignedDirectoryFx")(function* ({
 	input,
 	keyId,
-	metadata,
+	packageId,
 	output,
 	privateKey,
 	trustedKeys,
@@ -40,7 +37,7 @@ export const packSignedDirectoryFx = Effect.fn("packSignedDirectoryFx")(function
 	}
 	const packed = yield* packDirectoryFx({
 		input,
-		metadata,
+		packageId,
 		...(output === undefined
 			? {}
 			: {

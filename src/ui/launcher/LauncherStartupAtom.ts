@@ -1,7 +1,7 @@
 import { Effect, SubscriptionRef } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
+import { ArkiniDefaultPackageId } from "../../../shared/ArkiniAppMetadata";
 import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
-import { resolveBuiltInArkpackFx } from "~/bridge/arkpack/resolveBuiltInArkpackFx";
 import { readAppearanceAccentFx } from "~/bridge/appearance/readAppearanceAccentFx";
 import { readAppearanceThemeFx } from "~/bridge/appearance/readAppearanceThemeFx";
 import { readCheatAvailabilityFx } from "~/bridge/cheat/readCheatAvailabilityFx";
@@ -48,7 +48,7 @@ export const LauncherStartupAtom = RendererAtomRuntime.atom((get) => {
 		Effect.andThen(SubscriptionRef.get(catalog.state)),
 		Effect.flatMap((state) =>
 			state.type === "ready"
-				? resolveBuiltInArkpackFx(state.arkpacks)
+				? Effect.void
 				: Effect.fail(new Error("Arkpack catalog did not publish a ready snapshot.")),
 		),
 	);
@@ -59,7 +59,7 @@ export const LauncherStartupAtom = RendererAtomRuntime.atom((get) => {
 	const defaultBootstrapFx = Effect.all(
 		{
 			appearance: appearanceFx,
-			builtIn: catalogFx,
+			catalog: catalogFx,
 			cheatsAvailable: cheatAvailabilityFx,
 			hero: Atom.getResult(LauncherHeroAtom, {
 				suspendOnWaiting: true,
@@ -71,9 +71,9 @@ export const LauncherStartupAtom = RendererAtomRuntime.atom((get) => {
 			concurrency: "unbounded",
 		},
 	).pipe(
-		Effect.map(({ appearance, builtIn, cheatsAvailable, windowMode }) => ({
+		Effect.map(({ appearance, cheatsAvailable, windowMode }) => ({
 			appearance,
-			builtInPackageId: builtIn.packageId,
+			defaultPackageId: ArkiniDefaultPackageId,
 			cheatsAvailable,
 			windowMode,
 		})),

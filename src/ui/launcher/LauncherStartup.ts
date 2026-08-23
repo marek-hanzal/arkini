@@ -11,7 +11,7 @@ export namespace LauncherStartup {
 
 	export interface Result {
 		readonly appearance: Appearance;
-		readonly builtInPackageId: string;
+		readonly defaultPackageId: string;
 		readonly cheatsAvailable: boolean;
 		readonly windowMode: WindowMode;
 	}

@@ -8,6 +8,7 @@ describe("encodeFx", () => {
 	it("round-trips MessagePack config and raw resource bytes", async () => {
 		const decoded = await Effect.runPromise(
 			encodeFx({
+				packageId: "package:test",
 				config: {
 					version: "1.0",
 					resources: {
@@ -48,6 +49,7 @@ describe("encodeFx", () => {
 		);
 
 		expect(decoded).toEqual({
+			packageId: "package:test",
 			config: {
 				version: "1.0",
 				resources: {

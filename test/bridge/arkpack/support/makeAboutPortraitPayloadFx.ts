@@ -24,6 +24,7 @@ export const makeAboutPortraitPayloadFx = Effect.fn("makeAboutPortraitPayloadFx"
 	({ roles }: makeAboutPortraitPayloadFx.Props) =>
 		Effect.sync(
 			(): PayloadSchema.Type => ({
+				packageId: "package:avatars",
 				config: GameConfigSchema.parse({
 					version: "1.0",
 					resources: {

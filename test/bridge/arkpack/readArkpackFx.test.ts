@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ArkpackLimits } from "~/bridge/arkpack/ArkpackLimits";
+import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 import { GameValidationError } from "~/engine/validation/error/GameValidationError";
 import { encodeFx } from "~/engine/pack/fx/encodeFx";
@@ -28,7 +28,7 @@ afterEach(() => {
 });
 
 describe("readArkpackFx", () => {
-	it("validates one compressed data-only package and derives exact identity", async () => {
+	it("keeps package identity separate from both content and game identity", async () => {
 		const bytes = createTestArkpack();
 		const first = await Effect.runPromise(
 			readArkpackFx({
@@ -37,7 +37,7 @@ describe("readArkpackFx", () => {
 				signature: {
 					trustedKeys,
 				},
-				source: "imported",
+				source: "user",
 			}),
 		);
 		const second = await Effect.runPromise(
@@ -47,18 +47,18 @@ describe("readArkpackFx", () => {
 				signature: {
 					trustedKeys,
 				},
-				source: "imported",
+				source: "user",
 			}),
 		);
 
 		expect(first.descriptor).toMatchObject({
-			packageId: first.descriptor.hash,
+			packageId: "package:bridge",
 			gameId: "game:bridge",
 			title: "Bridge game",
 			game: "1.0",
-			source: "imported",
+			source: "user",
 		});
-		expect(first.descriptor.packageId).toMatch(/^[a-f0-9]{64}$/);
+		expect(first.descriptor.contentHash).toMatch(/^[a-f0-9]{64}$/);
 		expect(second.descriptor.packageId).toBe(first.descriptor.packageId);
 		expect(first.payload.config).toEqual(testArkpackConfig);
 	});
@@ -73,7 +73,7 @@ describe("readArkpackFx", () => {
 					},
 					trustedKeys,
 				},
-				source: "imported",
+				source: "user",
 			}),
 		);
 
@@ -91,7 +91,7 @@ describe("readArkpackFx", () => {
 					signature: {
 						trustedKeys,
 					},
-					source: "imported",
+					source: "user",
 				}),
 			),
 		).rejects.toThrow("compressed limit");
@@ -112,6 +112,7 @@ describe("readArkpackFx", () => {
 		]);
 		const encoded = Effect.runSync(
 			encodeFx({
+				packageId: "package:invalid-png",
 				config: testArkpackConfig,
 				resources: [
 					{
@@ -135,7 +136,7 @@ describe("readArkpackFx", () => {
 					signature: {
 						trustedKeys,
 					},
-					source: "imported",
+					source: "user",
 				}),
 			),
 		).rejects.toThrow("must decode as a valid PNG image");
@@ -154,6 +155,7 @@ describe("readArkpackFx", () => {
 		};
 		const encoded = Effect.runSync(
 			encodeFx({
+				packageId: "package:invalid-config",
 				config: invalid,
 				resources: [
 					{
@@ -177,7 +179,7 @@ describe("readArkpackFx", () => {
 					signature: {
 						trustedKeys,
 					},
-					source: "imported",
+					source: "user",
 				}),
 			),
 		);

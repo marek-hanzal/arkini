@@ -1,17 +1,14 @@
 import { encode } from "@msgpack/msgpack";
 import { Cause, Effect, Exit, Option } from "effect";
-import { readFile } from "node:fs/promises";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DiagnosticRecord } from "../../../electron/contract/diagnostics/DiagnosticRecord";
-import { DemoArkpack } from "~/bridge/arkpack/DemoArkpack";
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 import { createGameFx as createGameFromPackageFx } from "~/bridge/game/createGameFx";
 import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
 import { decodeArkiniSaveFx } from "~/bridge/save/decodeArkiniSaveFx";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
-import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import {
 	createTestArkpack,
@@ -38,21 +35,31 @@ const createStorages = async () => {
 			signature: {
 				trustedKeys,
 			},
-			source: "imported",
+			source: "user",
 		}),
 	);
-	const record = {
-		descriptor: loaded.descriptor,
+	const file: ArkpackStorage.File = {
+		packageId: loaded.descriptor.packageId,
+		filename: "bridge.game.arkpack",
 		bytes: bytes.slice().buffer,
+		source: "user",
+		overridesBundled: false,
 	};
 	const arkpackStorage: ArkpackStorage = {
 		listFx: Effect.succeed([
-			record.descriptor,
+			file,
 		]),
 		readFx: (packageId) =>
-			Effect.succeed(packageId === record.descriptor.packageId ? record : undefined),
+			Effect.succeed(
+				packageId === file.packageId
+					? [
+							file,
+						]
+					: [],
+			),
 		removeFx: () => Effect.void,
 		writeFx: () => Effect.void,
+		openUserDirectoryFx: Effect.void,
 	};
 	let saved: Uint8Array | null = null;
 	const saveStorage: GameSaveStorage = {
@@ -68,11 +75,11 @@ const createStorages = async () => {
 	};
 	return {
 		arkpackStorage,
-		descriptor: record.descriptor,
-		packageId: record.descriptor.packageId,
+		descriptor: loaded.descriptor,
+		packageId: loaded.descriptor.packageId,
 		saveKey: {
-			packageId: record.descriptor.packageId,
-			contentHash: record.descriptor.hash,
+			packageId: loaded.descriptor.packageId,
+			contentHash: loaded.descriptor.contentHash,
 		} satisfies GameSaveStorage.Key,
 		readSaved: () => saved,
 		setSaved: (bytes: Uint8Array | null) => {
@@ -90,62 +97,6 @@ describe("createGameFx", () => {
 	afterEach(() => {
 		vi.restoreAllMocks();
 		vi.unstubAllGlobals();
-	});
-
-	it("starts the bundled unsigned demo and completes its authored merge", async () => {
-		const bytes = await readFile("game/demo.game.arkpack");
-		const fetch = vi.fn().mockResolvedValue(new Response(bytes));
-		vi.stubGlobal("fetch", fetch);
-		const saveStorage: GameSaveStorage = {
-			readFx: () => Effect.succeed(null),
-			clearFx: () => Effect.void,
-			writeFx: () => Effect.void,
-		};
-		const game = await Effect.runPromise(
-			createGameFx({
-				packageId: DemoArkpack.packageId,
-				saveStorage,
-			}),
-		);
-
-		try {
-			expect(fetch).toHaveBeenCalledOnce();
-			expect(fetch).toHaveBeenCalledWith(DemoArkpack.url);
-			expect(game.arkpack).toEqual(DemoArkpack.descriptor);
-			expect(game.arkpack.trust).toEqual({
-				type: "external",
-				reason: "unsigned",
-			});
-			expect(game.saveKey).toEqual({
-				packageId: "demo",
-				contentHash: DemoArkpack.descriptor.hash,
-			});
-
-			const initial = game.getSnapshot();
-			const water = initial.items.find((item) => item.item.id === "item:water");
-			const tree = initial.items.find((item) => item.item.id === "item:tree");
-			if (water === undefined || tree === undefined) {
-				throw new Error("Expected the authored demo merge participants.");
-			}
-			await game.run(
-				mergeItemsFx({
-					sourceItemId: water.id,
-					sourceRevision: water.revision,
-					targetItemId: tree.id,
-					targetRevision: tree.revision,
-				}),
-			);
-
-			expect(game.getSnapshot().items).toEqual([
-				expect.objectContaining({
-					item: expect.objectContaining({
-						id: "item:double-tree",
-					}),
-				}),
-			]);
-		} finally {
-			await Effect.runPromise(game.disposeWithoutSaveFx);
-		}
 	});
 
 	it("starts one selected package, persists its state and restores it without a second start", async () => {
@@ -351,10 +302,15 @@ describe("createGameFx", () => {
 		const corruptStorage: ArkpackStorage = {
 			...storages.arkpackStorage,
 			readFx: () =>
-				Effect.succeed({
-					descriptor: storages.descriptor,
-					bytes: Uint8Array.of(1, 2, 3).buffer,
-				}),
+				Effect.succeed([
+					{
+						packageId: storages.packageId,
+						filename: "bridge.game.arkpack",
+						bytes: Uint8Array.of(1, 2, 3).buffer,
+						source: "user",
+						overridesBundled: false,
+					},
+				]),
 		};
 		const exit = await Effect.runPromiseExit(
 			createGameFx({

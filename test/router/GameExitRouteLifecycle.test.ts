@@ -43,7 +43,7 @@ const deferred = () => {
 const createGame = (disposeFx: Game["disposeFx"]): Game => ({
 	arkpack: {
 		packageId,
-		hash: "content-exit",
+		contentHash: "content-exit",
 		gameId: testArkpackConfig.meta.id,
 		title: testArkpackConfig.meta.title,
 		game: testArkpackConfig.version,
@@ -51,7 +51,7 @@ const createGame = (disposeFx: Game["disposeFx"]): Game => ({
 			type: "external",
 			reason: "unsigned",
 		} as const,
-		source: "imported",
+		source: "user",
 	},
 	config: testArkpackConfig,
 	disposeFx,

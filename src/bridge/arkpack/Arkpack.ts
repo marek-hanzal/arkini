@@ -1,16 +1,16 @@
 import type { ArkpackTrustSchema } from "~/engine/pack/schema/ArkpackTrustSchema";
 
-type ArkpackSource = "built-in" | "imported";
+type ArkpackSource = "bundled" | "user";
 
-/** Stable metadata used by the package catalog without reading package payload bytes. */
+/** Descriptor derived from a validated package payload and its detached signature. */
 export interface ArkpackDescriptor {
 	readonly packageId: string;
-	readonly hash: string;
+	readonly contentHash: string;
 	readonly gameId: string;
 	readonly title: string;
 	readonly game: string;
 	readonly trust: ArkpackTrustSchema.Type;
 	readonly source: ArkpackSource;
+	readonly overridesBundled?: boolean;
 	readonly filename?: string;
-	readonly importedAtMs?: number;
 }

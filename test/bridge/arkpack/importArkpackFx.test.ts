@@ -39,7 +39,11 @@ describe("importArkpackFx", () => {
 				storage,
 			}),
 		);
-		expect(loaded.descriptor.hash).toBe(descriptor.packageId);
+		expect(loaded.descriptor).toMatchObject({
+			packageId: descriptor.packageId,
+			contentHash: descriptor.contentHash,
+		});
+		expect(descriptor.packageId).toBe("package:bridge");
 		expect(loaded.payload.config).toEqual(testArkpackConfig);
 	});
 
@@ -57,6 +61,7 @@ describe("importArkpackFx", () => {
 		};
 		const encoded = Effect.runSync(
 			encodeFx({
+				packageId: "package:invalid",
 				config: invalid,
 				resources: [
 					{

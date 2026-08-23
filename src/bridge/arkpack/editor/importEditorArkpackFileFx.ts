@@ -1,11 +1,10 @@
 import { Effect } from "effect";
 
 import { ArkiniTrustedKeys } from "~/bridge/arkpack/ArkiniTrustedKeys";
-import { ArkpackLimits } from "~/bridge/arkpack/ArkpackLimits";
+import { ArkpackLimits } from "../../../../shared/ArkpackLimits";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
 import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
-import { createEditorProjectIdFx } from "~/engine/editor/fx/createEditorProjectIdFx";
 
 interface EditorArkpackFileInput {
 	readonly name: string;
@@ -43,15 +42,11 @@ export const importEditorArkpackFileFx = Effect.fn("importEditorArkpackFileFx")(
 		signature: {
 			trustedKeys: ArkiniTrustedKeys,
 		},
-		source: "imported",
-	});
-	const projectId = yield* createEditorProjectIdFx({
-		gameId: loaded.payload.config.meta.id,
-		contentHash: loaded.descriptor.hash,
+		source: "user",
 	});
 	const repository = yield* EditorProjectRepository;
 	const project = yield* repository.createProjectFx({
-		projectId,
+		projectId: loaded.payload.packageId,
 		config: loaded.payload.config,
 		resources: loaded.payload.resources,
 	});

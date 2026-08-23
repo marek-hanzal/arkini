@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { ArkpackCryptoError } from "~/engine/pack/error/ArkpackCryptoError";
 
-/** Computes the lowercase SHA-256 identity of exact final Arkpack bytes. */
+/** Computes the lowercase SHA-256 content hash of exact final Arkpack bytes. */
 export const readArkpackContentHashFx = Effect.fn("readArkpackContentHashFx")((bytes: Uint8Array) =>
 	Effect.tryPromise({
 		try: async () =>

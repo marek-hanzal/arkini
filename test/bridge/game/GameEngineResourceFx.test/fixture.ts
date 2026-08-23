@@ -35,7 +35,7 @@ export const makeResource = ({
 		createGameEngineResourceFx<Game>({
 			arkpack: {
 				packageId,
-				hash: `content:${packageId}`,
+				contentHash: `content:${packageId}`,
 				gameId: testArkpackConfig.meta.id,
 				title: testArkpackConfig.meta.title,
 				game: testArkpackConfig.version,
@@ -43,7 +43,7 @@ export const makeResource = ({
 					type: "external",
 					reason: "unsigned",
 				},
-				source: "imported",
+				source: "user",
 			},
 			config: testArkpackConfig,
 			disposeFx,

@@ -14,11 +14,11 @@ export const buildDesktopFx = Effect.fn("buildDesktopFx")(function* ({
 	demoDirectory = "game/demo",
 	gameDirectory = "game/arkini",
 }: buildDesktopFx.Props = {}) {
+	yield* buildDesktopOutputFx();
 	yield* packOfficialArkiniFx({
 		gameDirectory,
 	});
 	yield* packDemoGameFx({
 		gameDirectory: demoDirectory,
 	});
-	yield* buildDesktopOutputFx();
 });

@@ -19,7 +19,7 @@ vi.mock("../../cli/desktop/buildDesktopOutputFx", () => ({
 import { buildDesktopFx } from "../../cli/desktop/buildDesktopFx";
 
 describe("buildDesktopFx", () => {
-	it("packs the signed official game and unsigned demo before building Electron output", async () => {
+	it("compiles Electron before building the independent game packages", async () => {
 		calls.length = 0;
 		await Effect.runPromise(
 			buildDesktopFx({
@@ -28,9 +28,9 @@ describe("buildDesktopFx", () => {
 		);
 
 		expect(calls).toEqual([
+			"build-output",
 			"pack:game/arkini",
 			"pack:game/demo",
-			"build-output",
 		]);
 	});
 });

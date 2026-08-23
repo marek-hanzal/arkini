@@ -52,7 +52,7 @@ const makeGame = (
 	...session,
 	arkpack: {
 		packageId: `package:spawn-${suffix}`,
-		hash: `content:spawn-${suffix}`,
+		contentHash: `content:spawn-${suffix}`,
 		gameId: `game:spawn-${suffix}`,
 		title: `Spawn ${suffix}`,
 		game: "1.0",
@@ -60,7 +60,7 @@ const makeGame = (
 			type: "external",
 			reason: "unsigned",
 		} as const,
-		source: "imported",
+		source: "user",
 	},
 	config: createJobTestConfig(),
 	saveKey: {

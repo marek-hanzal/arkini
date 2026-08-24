@@ -1,11 +1,10 @@
-import { useRef, useState, type DragEvent } from "react";
 import { twMerge } from "tailwind-merge";
 
+import { useController } from "~/ui/arkpack/editor/useController";
+
 export namespace EditorArkpackImportDropZone {
-	export interface Props {
-		readonly blocked: boolean;
+	export interface Props extends useController.Props {
 		readonly pending: boolean;
-		readonly onFile: (file: File | undefined) => void;
 	}
 }
 
@@ -15,55 +14,41 @@ export const EditorArkpackImportDropZone = ({
 	pending,
 	onFile,
 }: EditorArkpackImportDropZone.Props) => {
-	const inputRef = useRef<HTMLInputElement>(null);
-	const [dragDepth, setDragDepth] = useState(0);
-	const dragging = dragDepth > 0;
-	const resetInput = () => {
-		if (inputRef.current !== null) inputRef.current.value = "";
-	};
-	const selectFile = (file: File | undefined) => {
-		if (blocked) return;
-		onFile(file);
-		resetInput();
-	};
-	const onDragEnter = (event: DragEvent<HTMLButtonElement>) => {
-		event.preventDefault();
-		if (blocked) return;
-		setDragDepth((depth) => depth + 1);
-	};
-	const onDragLeave = (event: DragEvent<HTMLButtonElement>) => {
-		event.preventDefault();
-		if (blocked) return;
-		setDragDepth((depth) => Math.max(0, depth - 1));
-	};
-	const onDrop = (event: DragEvent<HTMLButtonElement>) => {
-		event.preventDefault();
-		setDragDepth(0);
-		selectFile(event.dataTransfer.files.item(0) ?? undefined);
-	};
+	const controller = useController({
+		blocked,
+		onFile,
+	});
 	return (
 		<>
 			<input
-				ref={inputRef}
+				ref={controller.inputRef}
 				type="file"
 				accept=".arkpack"
 				className="hidden"
 				disabled={blocked}
-				onChange={(event) => selectFile(event.currentTarget.files?.[0])}
+				onChange={(event) => controller.selectFile(event.currentTarget.files?.[0])}
 			/>
 			<button
 				type="button"
 				className={twMerge(
 					"group grid min-h-44 w-full place-items-center rounded-2xl border border-dashed border-line-strong bg-surface/60 p-6 text-center transition-[border-color,background-color,transform] hover:border-accent hover:bg-accent/10 active:scale-[0.995] disabled:cursor-progress disabled:opacity-60",
-					dragging && "border-accent bg-accent/15",
+					controller.dragging && "border-accent bg-accent/15",
 				)}
 				disabled={blocked}
-				onClick={() => inputRef.current?.click()}
-				onDragEnter={onDragEnter}
-				onDragLeave={onDragLeave}
+				onClick={controller.openPicker}
+				onDragEnter={(event) => {
+					event.preventDefault();
+					controller.enterDrag();
+				}}
+				onDragLeave={(event) => {
+					event.preventDefault();
+					controller.leaveDrag();
+				}}
 				onDragOver={(event) => event.preventDefault()}
-				onDrop={onDrop}
-				aria-busy={pending}
+				onDrop={(event) => {
+					event.preventDefault();
+					controller.dropFile(event.dataTransfer.files.item(0) ?? undefined);
+				}}
 				data-ui="EditorArkpackImportDropZone"
 			>
 				<span className="grid justify-items-center gap-3 pointer-events-none">

@@ -89,8 +89,9 @@ interface TestRouterOptions {
 }
 
 const DirtyDraft = ({ valid }: { readonly valid: boolean }) => {
-	useEditorUnsavedChangesRegistration("test-draft", {
+	useEditorUnsavedChangesRegistration({
 		discard: () => undefined,
+		id: "test-draft",
 		isDirty: () => true,
 		isValid: () => valid,
 		ownsPathname: (pathname) => pathname.includes("/editor/items/test/form/"),

@@ -111,8 +111,9 @@ export const useEditorProjectFormController = ({
 		schema,
 		submitting,
 	]);
-	useEditorUnsavedChangesRegistration(`project:${project.projectId}`, {
+	useEditorUnsavedChangesRegistration({
 		discard: () => form.reset(canonicalValues),
+		id: `project:${project.projectId}`,
 		isDirty: () => form.state.isDirty,
 		isValid: () => schema.safeParse(form.state.values).success,
 		ownsPathname: (pathname) => pathname.startsWith(`/editor/${project.projectId}/project`),

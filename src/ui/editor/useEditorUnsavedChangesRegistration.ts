@@ -12,17 +12,22 @@ export const useEditorUnsavedChangesOwner = () => {
 	return owner;
 };
 
+export namespace useEditorUnsavedChangesRegistration {
+	export interface Props extends EditorUnsavedChangesSession {
+		readonly id: string;
+	}
+}
+
 /** Registers one mounted editor form session with the process-owned leave contract. */
 export const useEditorUnsavedChangesRegistration = (
-	id: string,
-	session: EditorUnsavedChangesSession,
+	props: useEditorUnsavedChangesRegistration.Props,
 ) => {
 	const owner = useEditorUnsavedChangesOwner();
-	const sessionRef = useRef(session);
-	sessionRef.current = session;
+	const sessionRef = useRef(props);
+	sessionRef.current = props;
 	useLayoutEffect(
 		() =>
-			owner.register(id, {
+			owner.register(props.id, {
 				discard: () => sessionRef.current.discard(),
 				isDirty: () => sessionRef.current.isDirty(),
 				isValid: () => sessionRef.current.isValid(),
@@ -30,8 +35,8 @@ export const useEditorUnsavedChangesRegistration = (
 				save: () => sessionRef.current.save(),
 			}),
 		[
-			id,
 			owner,
+			props.id,
 		],
 	);
 	useLayoutEffect(() => owner.refresh());

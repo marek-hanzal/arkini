@@ -185,8 +185,9 @@ export const useEditorItemFormController = ({
 			runSave,
 		],
 	);
-	useEditorUnsavedChangesRegistration(`item:${project.projectId}:${initialItem.uid}`, {
+	useEditorUnsavedChangesRegistration({
 		discard: () => form.reset(canonicalItem),
+		id: `item:${project.projectId}:${initialItem.uid}`,
 		isDirty: () => form.state.isDirty,
 		isValid: () => EditorItemFormSchema.safeParse(form.state.values).success,
 		ownsPathname: (pathname) =>

@@ -9,7 +9,7 @@ import {
 	selectableInactiveClassName,
 } from "~/ui/form/SelectableStateClassName";
 
-const EditorValueLabel = ({
+export const EditorValueLabel = ({
 	description,
 	label,
 }: {

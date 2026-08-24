@@ -1,9 +1,11 @@
 import { Button } from "~/ui/button/Button";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
+import { editorCollectionActionClassName } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { useEditorItemFormSession } from "~/ui/item/editor/EditorItemFormContext";
 import { EditorOptionalOutputControl } from "~/ui/item/editor/EditorOptionalOutputControl";
+import { Tooltip } from "~/ui/overlay/Tooltip";
 
 export const EditorItemChargesSection = () => {
 	const { form } = useEditorItemFormSession();
@@ -34,8 +36,8 @@ export const EditorItemChargesSection = () => {
 									title="Charge settings"
 									variant="secondary"
 								/>
-								<div className="flex items-end gap-3">
-									<div className="min-w-0 flex-1">
+								<div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2">
+									<div className="min-w-0">
 										<form.AppField name="charges.amount">
 											{(field) => (
 												<field.NumberField
@@ -45,11 +47,15 @@ export const EditorItemChargesSection = () => {
 											)}
 										</form.AppField>
 									</div>
-									<Button
-										onClick={() => form.setFieldValue("charges", undefined)}
-									>
-										Disable
-									</Button>
+									<Tooltip content="Disable charges">
+										<Button
+											className={editorCollectionActionClassName}
+											data-ui="EditorItemChargesDisableButton"
+											onClick={() => form.setFieldValue("charges", undefined)}
+										>
+											<span className="icon-[lucide--trash-2] size-4" />
+										</Button>
+									</Tooltip>
 								</div>
 							</EditorFormCard>
 							<EditorFormSectionDivider

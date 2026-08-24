@@ -27,6 +27,9 @@ export const EditorWeightedRollControl = ({
 		<div className="grid gap-4">
 			<EditorQuantityControl
 				label="Selections"
+				description="How many independent weighted selections this roll performs. Each selection uses the candidates' relative weights, and the same candidate may be selected repeatedly."
+				minimumDescription="Lowest number of independent candidate selections this roll may perform when it resolves."
+				maximumDescription="Highest number of independent candidate selections this roll may perform. The actual integer count is chosen from Minimum through Maximum, inclusive."
 				value={roll.quantity}
 				onChange={(quantity) =>
 					onChange({

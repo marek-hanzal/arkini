@@ -14,6 +14,41 @@ type EditorWeightedRoll = Extract<
 	}
 >;
 
+const WeightedSelectionsHelp = () => (
+	<div className="grid gap-3">
+		<div className="grid gap-1">
+			<p className="font-semibold text-foreground">What Selections controls</p>
+			<p className="text-muted">
+				The game first chooses how many times to pick a weighted candidate, then performs
+				that many independent picks. Every pick emits all drops configured inside its
+				selected candidate.
+			</p>
+		</div>
+		<div className="grid gap-2 rounded-lg border border-line bg-surface/70 p-3">
+			<p className="text-xs font-semibold uppercase tracking-wide text-muted">Examples</p>
+			<div className="grid gap-1.5 text-foreground">
+				<p>
+					<span className="font-semibold">Minimum 1, Maximum 1:</span> pick exactly one
+					candidate. Use this for one weighted reward.
+				</p>
+				<p>
+					<span className="font-semibold">Minimum 3, Maximum 3:</span> make exactly three
+					picks. Use this for a fixed bundle of three weighted rewards.
+				</p>
+				<p>
+					<span className="font-semibold">Minimum 2, Maximum 4:</span> randomly make two,
+					three, or four picks. Use this for a variable-size reward bundle.
+				</p>
+			</div>
+		</div>
+		<p className="text-muted">
+			<span className="font-semibold text-foreground">Weights apply to every pick.</span>{" "}
+			Candidates weighted 70 and 30 have 70% and 30% odds per pick. Picks do not remove a
+			candidate, so the same candidate may win repeatedly.
+		</p>
+	</div>
+);
+
 /** Edits selections and the non-empty candidate collection of one weighted roll. */
 export const EditorWeightedRollControl = ({
 	onChange,
@@ -27,7 +62,8 @@ export const EditorWeightedRollControl = ({
 		<div className="grid gap-4">
 			<EditorQuantityControl
 				label="Selections"
-				description="How many independent weighted selections this roll performs. Each selection uses the candidates' relative weights, and the same candidate may be selected repeatedly."
+				description={<WeightedSelectionsHelp />}
+				descriptionTooltipClassName="max-w-lg p-4 text-sm leading-6"
 				minimumDescription="Lowest number of independent candidate selections this roll may perform when it resolves."
 				maximumDescription="Highest number of independent candidate selections this roll may perform. The actual integer count is chosen from Minimum through Maximum, inclusive."
 				value={roll.quantity}

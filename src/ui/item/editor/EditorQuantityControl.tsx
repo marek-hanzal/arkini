@@ -1,8 +1,11 @@
+import type { ReactNode } from "react";
+
 import type { EditorQuantity } from "~/bridge/item/editor/EditorItemModel";
 import { EditorNumberControl, EditorValueLabel } from "~/ui/form/EditorValueControls";
 
 export interface EditorQuantityControlProps {
-	readonly description?: string;
+	readonly description?: ReactNode;
+	readonly descriptionTooltipClassName?: string;
 	readonly label?: string;
 	readonly maximumDescription?: string;
 	readonly minimumDescription?: string;
@@ -16,7 +19,7 @@ export const EditorQuantityFields = ({
 	minimumDescription,
 	onChange,
 	value,
-}: Omit<EditorQuantityControlProps, "description" | "label">) => (
+}: Omit<EditorQuantityControlProps, "description" | "descriptionTooltipClassName" | "label">) => (
 	<>
 		<EditorNumberControl
 			description={minimumDescription}
@@ -48,6 +51,7 @@ export const EditorQuantityFields = ({
 /** Edits the required inclusive positive quantity bounds. */
 export const EditorQuantityControl = ({
 	description,
+	descriptionTooltipClassName,
 	label = "Quantity",
 	maximumDescription,
 	minimumDescription,
@@ -59,6 +63,7 @@ export const EditorQuantityControl = ({
 			<EditorValueLabel
 				description={description}
 				label={label}
+				tooltipClassName={descriptionTooltipClassName}
 			/>
 		</div>
 		<div className="grid gap-3 sm:grid-cols-2">

@@ -62,6 +62,17 @@ export const EditorMaterialLineInput = ({
 			}
 		/>
 		<div className="grid gap-3 sm:grid-cols-3">
+			<EditorQuantityFields
+				minimumDescription="Minimum matching material quantity required before this line can start. If this amount is available, the run becomes ready."
+				maximumDescription="Maximum matching material quantity one run consumes or reserves. A ready run uses what is currently stored, capped at this amount."
+				value={input.quantity}
+				onChange={(quantity) =>
+					onChange({
+						...input,
+						quantity,
+					})
+				}
+			/>
 			<EditorNumberControl
 				description="Additional quantity this input may hold above Maximum. The buffer does not increase how much one run consumes or reserves."
 				label="Buffer"
@@ -71,15 +82,6 @@ export const EditorMaterialLineInput = ({
 					onChange({
 						...input,
 						capacity,
-					})
-				}
-			/>
-			<EditorQuantityFields
-				value={input.quantity}
-				onChange={(quantity) =>
-					onChange({
-						...input,
-						quantity,
 					})
 				}
 			/>

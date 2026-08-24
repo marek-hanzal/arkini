@@ -12,13 +12,20 @@ import {
 export const EditorValueLabel = ({
 	description,
 	label,
+	tooltipClassName,
 }: {
-	readonly description?: string;
+	readonly description?: ReactNode;
 	readonly label: string;
+	readonly tooltipClassName?: string;
 }) => (
 	<span className="flex h-5 min-w-0 items-center gap-1 leading-5">
 		<span className="font-semibold text-foreground">{label}</span>
-		{description === undefined ? null : <EditorInfoTooltip content={description} />}
+		{description === undefined ? null : (
+			<EditorInfoTooltip
+				content={description}
+				tooltipClassName={tooltipClassName}
+			/>
+		)}
 	</span>
 );
 

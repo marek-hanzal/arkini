@@ -3,10 +3,8 @@
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-	ActionLoadingScreen,
-	defaultLoadingMinimumDurationMs,
-} from "~/ui/loading/ActionLoadingScreen";
+import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
+import { defaultLoadingMinimumDurationMs } from "~/ui/loading/defaultLoadingMinimumDurationMs";
 
 (
 	globalThis as {
@@ -44,8 +42,15 @@ const renderScreen = async (completed = false) => {
 	};
 };
 
-const progressValue = (container: ParentNode) =>
-	Number(container.querySelector('[role="progressbar"]')?.getAttribute("aria-valuenow"));
+const progressValue = (container: ParentNode) => {
+	const fill = container.querySelector<HTMLElement>(
+		'[data-ui="ActionLoadingScreenProgressFill"]',
+	);
+	if (fill === null) throw new Error("Missing Action loading progress fill.");
+	const match = /^scaleX\(([^)]+)\)$/.exec(fill.style.transform);
+	if (match === null) throw new Error("Missing Action loading progress transform.");
+	return Math.round(Number(match[1]) * 100);
+};
 
 beforeEach(() => {
 	vi.useFakeTimers();

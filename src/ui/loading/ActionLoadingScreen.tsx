@@ -1,68 +1,20 @@
-import { useEffect, useState } from "react";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
+import { useController } from "~/ui/loading/useController";
 import { actionProgressViewTransitionName } from "~/ui/navigation/actionProgressViewTransitionName";
 
-export const defaultLoadingMinimumDurationMs = 2_500;
-
-const initialProgress = 12;
 const pendingProgressTransitionMs = 220;
 
-const pendingStages = [
-	{
-		at: 0.08,
-		progress: 28,
-	},
-	{
-		at: 0.2,
-		progress: 46,
-	},
-	{
-		at: 0.38,
-		progress: 64,
-	},
-	{
-		at: 0.6,
-		progress: 78,
-	},
-	{
-		at: 0.82,
-		progress: 87,
-	},
-	{
-		at: 0.94,
-		progress: 94,
-	},
-] as const;
+export namespace ActionLoadingScreen {
+	export interface Props extends useController.Props {
+		readonly label: string;
+	}
+}
 
 /** Presents one route-owned progress curve and keeps its terminal frame full until navigation or shutdown. */
-export const ActionLoadingScreen = ({
-	completed = false,
-	label,
-}: {
-	readonly completed?: boolean;
-	readonly label: string;
-}) => {
-	const [progress, setProgress] = useState(completed ? 100 : initialProgress);
-
-	useEffect(() => {
-		if (completed) {
-			setProgress(100);
-			return;
-		}
-		setProgress(initialProgress);
-		const timers = pendingStages.map((stage) =>
-			window.setTimeout(
-				() => setProgress(stage.progress),
-				defaultLoadingMinimumDurationMs * stage.at,
-			),
-		);
-		return () => {
-			for (const timer of timers) window.clearTimeout(timer);
-		};
-	}, [
+export const ActionLoadingScreen = ({ completed, label }: ActionLoadingScreen.Props) => {
+	const controller = useController({
 		completed,
-	]);
-
+	});
 	return (
 		<LauncherScene
 			className="cursor-wait"
@@ -80,17 +32,12 @@ export const ActionLoadingScreen = ({
 				<div
 					className="h-[clamp(0.375rem,1.25cqh,0.5rem)] w-full overflow-hidden rounded-full border border-line bg-surface-raised/60 shadow-inner"
 					data-ui="ActionLoadingScreenProgress"
-					role="progressbar"
-					aria-label={label}
-					aria-valuemin={0}
-					aria-valuemax={100}
-					aria-valuenow={progress}
 				>
 					<div
 						className="size-full origin-left rounded-full bg-accent transition-transform ease-out"
 						data-ui="ActionLoadingScreenProgressFill"
 						style={{
-							transform: `scaleX(${progress / 100})`,
+							transform: `scaleX(${controller.progress / 100})`,
 							transitionDuration: `${pendingProgressTransitionMs}ms`,
 						}}
 					/>

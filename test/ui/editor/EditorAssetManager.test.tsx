@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({
 	project: undefined as unknown,
 	result: undefined as unknown,
+	saveAssets: vi.fn(),
 	usages: [] as ReadonlyArray<{
 		readonly resourceId: string;
 	}>,
@@ -15,7 +16,7 @@ const state = vi.hoisted(() => ({
 
 vi.mock("@effect/atom-react", async (importOriginal) => ({
 	...(await importOriginal<typeof import("@effect/atom-react")>()),
-	useAtomSet: () => vi.fn(),
+	useAtomSet: () => state.saveAssets,
 	useAtomValue: () => state.result,
 }));
 
@@ -63,6 +64,7 @@ const roots: Array<ReturnType<typeof createRoot>> = [];
 
 beforeEach(() => {
 	state.result = AsyncResult.initial();
+	state.saveAssets.mockReset();
 	state.usages = [
 		{
 			resourceId: "hero",
@@ -137,7 +139,7 @@ const click = async (element: Element | null) => {
 };
 
 const setSearch = async (container: HTMLElement, value: string) => {
-	const input = container.querySelector<HTMLInputElement>('[aria-label="Search assets"]');
+	const input = container.querySelector<HTMLInputElement>('[data-ui="EditorAssetSearch"]');
 	if (input === null) throw new Error("Missing asset search.");
 	const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
 	if (setter === undefined) throw new Error("Missing native input value setter.");
@@ -160,16 +162,18 @@ describe("EditorAssetManager", () => {
 			"unused-tree",
 		]);
 
-		await click(container.querySelector('button[aria-pressed="false"]'));
+		await click(container.querySelector('button[data-filter="unused"]'));
 		expect(readResources(container)).toEqual([
 			"unused-tree",
 		]);
 
 		await setSearch(container, "water");
 		expect(readResources(container)).toEqual([]);
-		expect(container.textContent).toContain("No matching assets");
+		expect(container.querySelector('[data-ui="EditorAssetsFilteredEmpty"]')).not.toBeNull();
 
-		const picker = container.querySelector<HTMLInputElement>('input[type="file"]');
+		const picker = container.querySelector<HTMLInputElement>(
+			'[data-ui="EditorAssetImportInput"]',
+		);
 		expect(picker?.multiple).toBe(true);
 		expect(picker?.accept).toContain("image/png");
 	});
@@ -183,11 +187,55 @@ describe("EditorAssetManager", () => {
 		const container = await renderManager();
 
 		expect(container.querySelector('[data-ui="EditorAssetsEmpty"]')).not.toBeNull();
-		expect(container.textContent).toContain("No assets yet");
-		expect(
-			[
-				...container.querySelectorAll("button"),
-			].filter((button) => button.textContent?.includes("Import assets")),
-		).toHaveLength(1);
+		expect(container.querySelectorAll('[data-ui="EditorAssetImport"]')).toHaveLength(1);
+	});
+
+	it("imports every selected PNG through the current project command", async () => {
+		const container = await renderManager();
+		const picker = container.querySelector<HTMLInputElement>(
+			'[data-ui="EditorAssetImportInput"]',
+		);
+		if (picker === null) throw new Error("Missing asset import input.");
+		const files = [
+			new File(
+				[
+					new Uint8Array([
+						1,
+					]),
+				],
+				"first.png",
+				{
+					type: "image/png",
+				},
+			),
+			new File(
+				[
+					new Uint8Array([
+						2,
+					]),
+				],
+				"second.png",
+				{
+					type: "image/png",
+				},
+			),
+		];
+		Object.defineProperty(picker, "files", {
+			configurable: true,
+			value: files,
+		});
+
+		await act(async () => {
+			picker.dispatchEvent(
+				new Event("change", {
+					bubbles: true,
+				}),
+			);
+		});
+
+		expect(state.saveAssets).toHaveBeenCalledWith({
+			files,
+			projectId: "editor-test",
+		});
 	});
 });

@@ -1,168 +1,147 @@
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { useAtomSet, useAtomValue } from "@effect/atom-react";
-import { useRef } from "react";
-import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
+import { memo } from "react";
 
-import { saveEditorAssetsCommandAtom } from "~/bridge/resource/editor/saveEditorAssetsCommandAtom";
 import { PrimaryButton } from "~/ui/button/Button";
 import {
 	selectableActiveClassName,
 	selectableInactiveClassName,
 } from "~/ui/form/SelectableStateClassName";
-import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { EditorAssetCard } from "~/ui/resource/editor/EditorAssetCard";
-import { useEditorAssetLibrary } from "~/ui/resource/editor/useEditorAssetLibrary";
+import { useEditorAssetManagerController } from "~/ui/resource/editor/useEditorAssetManagerController";
+import type { useEditorAssetLibrary } from "~/ui/resource/editor/useEditorAssetLibrary";
 import { Status } from "~/ui/status/Status";
 
 export namespace EditorAssetManager {
-	export interface Props {
-		readonly filter: "all" | "unused";
-		readonly onFilterChange: (filter: "all" | "unused") => void;
-		readonly onQueryChange: (query: string) => void;
-		readonly query: string;
-	}
+	export interface Props extends useEditorAssetManagerController.Props {}
 }
 
-/** Presents the canonical project resource catalog and owns its batch-import command. */
-export const EditorAssetManager = ({
-	filter,
-	onFilterChange,
-	onQueryChange,
-	query,
-}: EditorAssetManager.Props) => {
-	const { empty, project, resources } = useEditorAssetLibrary({
-		filter,
-		query,
-	});
-	const inputRef = useRef<HTMLInputElement>(null);
-	const result = useAtomValue(saveEditorAssetsCommandAtom);
-	const saveAssets = useAtomSet(saveEditorAssetsCommandAtom);
-	const error = RendererRuntime.runSync(readSettledAsyncResultErrorFx(result));
-	const pending = result.waiting;
-	const importButton = (
-		<PrimaryButton
-			disabled={pending}
-			cursorIntent={pending ? "progress" : undefined}
-			className="h-12 min-h-0 shrink-0 gap-2"
-			onClick={() => inputRef.current?.click()}
-		>
-			<span
-				className="icon-[lucide--upload] size-4"
-				aria-hidden="true"
+interface EditorAssetImportButtonProps {
+	readonly label: string;
+	readonly onClick: () => void;
+	readonly pending: boolean;
+}
+
+const EditorAssetImportButton = ({ label, onClick, pending }: EditorAssetImportButtonProps) => (
+	<PrimaryButton
+		className="h-12 min-h-0 shrink-0 gap-2"
+		cursorIntent={pending ? "progress" : undefined}
+		data-ui="EditorAssetImport"
+		disabled={pending}
+		onClick={onClick}
+	>
+		<span className="icon-[lucide--upload] size-4" />
+		{label}
+	</PrimaryButton>
+);
+
+interface EditorAssetGridProps {
+	readonly filter: useEditorAssetManagerController.Filter;
+	readonly query: string;
+	readonly resources: useEditorAssetLibrary.Output["resources"];
+}
+
+const EditorAssetGrid = memo(({ filter, query, resources }: EditorAssetGridProps) => (
+	<div className="grid grid-cols-[repeat(auto-fill,minmax(18rem,1fr))] gap-3">
+		{resources.map((resource) => (
+			<EditorAssetCard
+				key={resource.id}
+				filter={filter}
+				query={query}
+				resource={resource}
 			/>
-			{pending ? "Importing…" : "Import assets"}
-		</PrimaryButton>
+		))}
+	</div>
+));
+
+export const EditorAssetManager = (props: EditorAssetManager.Props) => {
+	const controller = useEditorAssetManagerController(props);
+	const importButton = (
+		<EditorAssetImportButton
+			label={controller.importButtonLabel}
+			onClick={controller.openImport}
+			pending={controller.importPending}
+		/>
 	);
+
 	return (
 		<section
 			className="h-full min-h-0 overflow-y-auto overscroll-contain"
-			aria-label="Assets"
 			data-ui="EditorAssetManager"
 		>
 			<header className="ak-editor-page-header flex min-w-0 flex-wrap items-center gap-2 p-3">
 				<input
-					ref={inputRef}
+					ref={controller.importInputRef}
 					type="file"
 					accept="image/png,.png"
 					multiple
 					className="sr-only"
-					disabled={pending}
-					onChange={(event) => {
-						const files = Array.from(event.currentTarget.files ?? []);
-						event.currentTarget.value = "";
-						if (files.length === 0) return;
-						saveAssets({
-							files,
-							projectId: project.projectId,
-						});
-					}}
+					data-ui="EditorAssetImportInput"
+					disabled={controller.importPending}
+					onChange={controller.onFilesChange}
 				/>
 				<input
 					type="search"
-					value={query}
+					value={controller.query}
 					className="h-12 min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
+					data-ui="EditorAssetSearch"
 					placeholder="Search assets…"
-					aria-label="Search assets"
-					onChange={(event) => onQueryChange(event.currentTarget.value)}
+					onChange={controller.onQueryChange}
 				/>
 				<div
 					className="inline-flex h-12 rounded-lg border border-line bg-surface p-1"
-					aria-label="Asset usage filter"
-					role="group"
+					data-ui="EditorAssetFilters"
 				>
-					{(
-						[
-							"all",
-							"unused",
-						] as const
-					).map((value) => (
+					{controller.filters.map((option) => (
 						<button
-							key={value}
+							key={option.value}
 							type="button"
-							className={`cursor-pointer rounded-md border px-3 py-2 text-sm font-semibold ${filter === value ? selectableActiveClassName : selectableInactiveClassName}`}
-							aria-pressed={filter === value}
-							onClick={() => onFilterChange(value)}
+							className={`cursor-pointer rounded-md border px-3 py-2 text-sm font-semibold ${option.selected ? selectableActiveClassName : selectableInactiveClassName}`}
+							data-filter={option.value}
+							data-selected={option.selected ? "true" : undefined}
+							onClick={() =>
+								controller.changeFilter({
+									filter: option.value,
+								})
+							}
 						>
-							{value === "all" ? "All" : "Unused assets"}
+							{option.label}
 						</button>
 					))}
 				</div>
-				{empty ? null : importButton}
+				{controller.showHeaderImport ? importButton : null}
 			</header>
 			<div className="px-3 pt-3 pb-3">
-				{error === undefined ? null : (
-					<p className="mb-3 rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger">
-						{error instanceof Error ? error.message : String(error)}
+				{controller.importError === undefined ? null : (
+					<p
+						className="mb-3 rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger"
+						data-ui="EditorAssetImportError"
+					>
+						{controller.importError}
 					</p>
 				)}
-				{AsyncResult.isSuccess(result) && !pending ? (
+				{controller.importSuccess === undefined ? null : (
 					<p
 						className="mb-3 text-sm text-success"
-						role="status"
+						data-ui="EditorAssetImportSuccess"
 					>
-						Imported {result.value.resourceIds.length} asset
-						{result.value.resourceIds.length === 1 ? "" : "s"}.
+						{controller.importSuccess}
 					</p>
-				) : null}
-				{empty ? (
+				)}
+				{controller.catalogStatus === undefined ? null : (
 					<Status
-						dataUi="EditorAssetsEmpty"
-						description="Import PNG files to start building this project's asset library."
-						icon="icon-[lucide--images]"
-						title="No assets yet"
-						action={importButton}
-					/>
-				) : null}
-				{!empty && resources.length === 0 ? (
-					<Status
-						dataUi="EditorAssetsFilteredEmpty"
-						description={
-							filter === "unused" && query.trim() === ""
-								? "Every asset is referenced by the current project."
-								: "No assets match the current search and usage filter."
-						}
-						icon={
-							filter === "unused"
-								? "icon-[lucide--badge-check]"
-								: "icon-[lucide--search-x]"
-						}
-						title={
-							filter === "unused" && query.trim() === ""
-								? "No unused assets"
-								: "No matching assets"
+						dataUi={controller.catalogStatus.dataUi}
+						description={controller.catalogStatus.description}
+						icon={controller.catalogStatus.icon}
+						title={controller.catalogStatus.title}
+						action={
+							controller.catalogStatus.action === "import" ? importButton : undefined
 						}
 					/>
-				) : null}
-				<div className="grid grid-cols-[repeat(auto-fill,minmax(18rem,1fr))] gap-3">
-					{resources.map((resource) => (
-						<EditorAssetCard
-							key={resource.id}
-							filter={filter}
-							query={query}
-							resource={resource}
-						/>
-					))}
-				</div>
+				)}
+				<EditorAssetGrid
+					filter={controller.filter}
+					query={controller.query}
+					resources={controller.resources}
+				/>
 			</div>
 		</section>
 	);

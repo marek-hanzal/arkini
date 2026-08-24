@@ -1,3 +1,4 @@
+import { DatabaseSync } from "node:sqlite";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -148,5 +149,37 @@ describe("SQLite editor-project resources", () => {
 		expect(renamed.resources.find(({ id }) => id === "new-hero")?.bytes).toEqual(
 			Uint8Array.of(9),
 		);
+	});
+
+	it("rolls back inserted resource bytes when the following project commit fails", async () => {
+		const repository = await harness.openRepository();
+		const created = await harness.createProject(repository);
+		await harness.closeRepository(repository);
+		const database = new DatabaseSync(harness.databasePath);
+		database.exec(`
+			CREATE TRIGGER reject_project_resource_commit
+			BEFORE UPDATE ON projects
+			BEGIN
+				SELECT RAISE(ABORT, 'project resource commit rejected');
+			END;
+		`);
+		database.close();
+
+		const reopened = await harness.openRepository();
+		await expect(
+			Effect.runPromise(
+				reopened.upsertResourcesFx({
+					projectId: created.projectId,
+					resources: [
+						{
+							id: "late-failure",
+							mime: "image/png",
+							bytes: Uint8Array.of(7),
+						},
+					],
+				}),
+			),
+		).rejects.toThrow("Resources could not be saved");
+		expect(await Effect.runPromise(reopened.readProjectFx(created.projectId))).toEqual(created);
 	});
 });

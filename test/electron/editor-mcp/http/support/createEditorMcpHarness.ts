@@ -9,7 +9,7 @@ import {
 import {
 	createSqliteEditorProjectRepositoryFx,
 	type SqliteEditorProjectRepository,
-} from "../../../../../electron/main/editor-project/sqlite/createSqliteEditorProjectRepositoryFx";
+} from "../../../../../electron/main/editor-project/sqlite/fx/createSqliteEditorProjectRepositoryFx";
 
 const cleanups: Array<() => Promise<void> | void> = [];
 

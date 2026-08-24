@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { vi } from "vitest";
 
-import type { SqliteEditorProjectRepository } from "../../../../../electron/main/editor-project/sqlite/createSqliteEditorProjectRepositoryFx";
+import type { SqliteEditorProjectRepository } from "../../../../../electron/main/editor-project/sqlite/fx/createSqliteEditorProjectRepositoryFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 export const editorProjectIpcDescriptor = {

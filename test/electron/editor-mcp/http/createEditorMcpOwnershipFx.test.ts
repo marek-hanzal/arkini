@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { createEditorMcpOwnershipFx } from "../../../../electron/main/editor-mcp/http/createEditorMcpOwnershipFx";
-import { createSqliteEditorProjectRepositoryFx } from "../../../../electron/main/editor-project/sqlite/createSqliteEditorProjectRepositoryFx";
+import { createSqliteEditorProjectRepositoryFx } from "../../../../electron/main/editor-project/sqlite/fx/createSqliteEditorProjectRepositoryFx";
 import {
 	cleanupEditorMcpHarnesses,
 	createEditorMcpHarness,

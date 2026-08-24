@@ -20,7 +20,7 @@ import { registerEditorMcpPreferencesIpcFx } from "./editor-mcp/ipc/registerEdit
 import { createEditorMcpOwnershipFx } from "./editor-mcp/http/createEditorMcpOwnershipFx";
 import { createFilesystemEditorMcpPreferencesFx } from "./editor-mcp/preference/createFilesystemEditorMcpPreferencesFx";
 import { registerEditorProjectIpcFx } from "./editor-project/ipc/registerEditorProjectIpcFx";
-import { createSqliteEditorProjectRepositoryFx } from "./editor-project/sqlite/createSqliteEditorProjectRepositoryFx";
+import { createSqliteEditorProjectRepositoryFx } from "./editor-project/sqlite/fx/createSqliteEditorProjectRepositoryFx";
 import { createFilesystemCliInstallationFx } from "./cli/createFilesystemCliInstallationFx";
 import { registerCliInstallationIpcFx } from "./cli/registerCliInstallationIpcFx";
 

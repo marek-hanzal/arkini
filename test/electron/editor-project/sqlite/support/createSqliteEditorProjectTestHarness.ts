@@ -6,7 +6,7 @@ import { Effect } from "effect";
 import {
 	createSqliteEditorProjectRepositoryFx,
 	type SqliteEditorProjectRepository,
-} from "../../../../../electron/main/editor-project/sqlite/createSqliteEditorProjectRepositoryFx";
+} from "../../../../../electron/main/editor-project/sqlite/fx/createSqliteEditorProjectRepositoryFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 /** Owns the temporary database and every repository opened by one SQLite test. */

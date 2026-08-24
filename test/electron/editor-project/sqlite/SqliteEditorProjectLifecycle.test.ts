@@ -3,7 +3,7 @@ import { DatabaseSync } from "node:sqlite";
 import { Cause, Effect, Exit } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createSqliteEditorProjectRepositoryFx } from "../../../../electron/main/editor-project/sqlite/createSqliteEditorProjectRepositoryFx";
+import { createSqliteEditorProjectRepositoryFx } from "../../../../electron/main/editor-project/sqlite/fx/createSqliteEditorProjectRepositoryFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import {
 	createSqliteEditorProjectTestHarness,
@@ -76,19 +76,21 @@ describe("SQLite editor-project lifecycle", () => {
 		expect(changed.updatedAtMs).toBeGreaterThan(first.updatedAtMs);
 		expect(await Effect.runPromise(repository.readProjectFx("missing"))).toBeNull();
 		await harness.closeRepository(repository);
+		const tiedUpdatedAtMs = Math.max(changed.updatedAtMs, second.updatedAtMs);
+		const database = new DatabaseSync(harness.databasePath);
+		database.prepare("UPDATE projects SET updated_at_ms = ?").run(tiedUpdatedAtMs);
+		database.close();
 
 		const reopened = await harness.openRepository();
 		const listed = await Effect.runPromise(reopened.listProjectsFx);
-		expect(listed).toEqual(
-			[
-				...listed,
-			].sort(
-				(left, right) =>
-					right.updatedAtMs - left.updatedAtMs ||
-					left.projectId.localeCompare(right.projectId),
-			),
-		);
-		expect(await Effect.runPromise(reopened.readProjectFx(second.projectId))).toEqual(second);
+		expect(listed.map(({ projectId }) => projectId)).toEqual([
+			"project-a",
+			"project-b",
+		]);
+		expect(await Effect.runPromise(reopened.readProjectFx(second.projectId))).toEqual({
+			...second,
+			updatedAtMs: tiedUpdatedAtMs,
+		});
 	});
 
 	it("rejects corrupt persisted config instead of publishing invalid state", async () => {

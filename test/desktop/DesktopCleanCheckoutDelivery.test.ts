@@ -1,7 +1,6 @@
 import { readFile, readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { ProjectOutputPaths } from "../../shared/ProjectOutputPaths";
 import { createCleanDeliveryWorkspace } from "./DesktopCleanCheckoutDelivery.test/createCleanDeliveryWorkspace";
 import { runPackagedCliVersion } from "./DesktopCleanCheckoutDelivery.test/runPackagedCliVersion";
 
@@ -9,6 +8,7 @@ const bundledArkpackNames = [
 	"arkini.game.arkpack",
 	"arkini.game.arkpack.sig",
 ] as const;
+const maxPackagedAsarBytes = 25 * 1024 * 1024;
 
 describe("fresh checkout desktop delivery inputs", () => {
 	it("builds and packages bundled Arkpacks from a clean checkout", async () => {
@@ -25,12 +25,10 @@ describe("fresh checkout desktop delivery inputs", () => {
 			).rejects.toMatchObject({
 				code: "ENOENT",
 			});
-			await expect(stat(join(workspace.root, ProjectOutputPaths.root))).rejects.toMatchObject(
-				{
-					code: "ENOENT",
-				},
-			);
-			await workspace.runNpmScript("package");
+			await expect(stat(join(workspace.root, ".out"))).rejects.toMatchObject({
+				code: "ENOENT",
+			});
+			await workspace.runRepositoryCommand("package-macos");
 			const packed = await stat(join(workspace.root, "game/arkini.game.arkpack"));
 			expect(packed.isFile()).toBe(true);
 			const signature = await stat(join(workspace.root, "game/arkini.game.arkpack.sig"));
@@ -41,18 +39,18 @@ describe("fresh checkout desktop delivery inputs", () => {
 				code: "ENOENT",
 			});
 			const renderer = await stat(
-				join(workspace.root, ProjectOutputPaths.desktop.build, "renderer/index.html"),
+				join(workspace.root, ".out/desktop/build/renderer/index.html"),
 			);
 			expect(renderer.isFile()).toBe(true);
 			await expect(
-				stat(join(workspace.root, ProjectOutputPaths.desktop.build, "renderer/arkpacks")),
+				stat(join(workspace.root, ".out/desktop/build/renderer/arkpacks")),
 			).rejects.toMatchObject({
 				code: "ENOENT",
 			});
 
 			const packagedGame = join(
 				workspace.root,
-				ProjectOutputPaths.desktop.release,
+				".out/desktop/release",
 				"mac-arm64/Arkini.app/Contents/Resources/game",
 			);
 			expect((await readdir(packagedGame)).sort()).toEqual(bundledArkpackNames);
@@ -61,9 +59,15 @@ describe("fresh checkout desktop delivery inputs", () => {
 					await readFile(join(workspace.root, "game", name)),
 				);
 			}
+			const packagedAsar = await stat(
+				join(
+					workspace.root,
+					".out/desktop/release/mac-arm64/Arkini.app/Contents/Resources/app.asar",
+				),
+			);
+			expect(packagedAsar.size).toBeLessThanOrEqual(maxPackagedAsarBytes);
 			const packagedCli = await runPackagedCliVersion(workspace.root);
 			expect(packagedCli.output).toContain(packagedCli.expectedVersion);
-			await workspace.runNpmScript("dc");
 			expect(await workspace.readStatus()).toBe("");
 		} finally {
 			await workspace.dispose();

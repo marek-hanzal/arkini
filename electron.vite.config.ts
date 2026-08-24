@@ -8,7 +8,6 @@ import { defineConfig } from "electron-vite";
 import { Effect } from "effect";
 import { RendererDevelopmentServer } from "./electron/security/RendererDevelopmentUrl";
 import { createRendererDevelopmentContentSecurityPolicyFx } from "./electron/security/createRendererDevelopmentContentSecurityPolicyFx";
-import { ProjectOutputPaths } from "./shared/ProjectOutputPaths";
 
 const sourceAlias = {
 	"~": fileURLToPath(new URL("./src", import.meta.url)),
@@ -26,7 +25,7 @@ export default defineConfig(({ command }) => {
 			build: {
 				externalizeDeps: false,
 				minify: true,
-				outDir: resolve(ProjectOutputPaths.desktop.build, "main"),
+				outDir: resolve(".out/desktop/build/main"),
 				rollupOptions: {
 					input: {
 						index: resolve("electron/main/index.ts"),
@@ -42,7 +41,7 @@ export default defineConfig(({ command }) => {
 			build: {
 				externalizeDeps: false,
 				minify: true,
-				outDir: resolve(ProjectOutputPaths.desktop.build, "preload"),
+				outDir: resolve(".out/desktop/build/preload"),
 				rollupOptions: {
 					input: resolve("electron/preload/index.ts"),
 					output: {
@@ -87,7 +86,7 @@ export default defineConfig(({ command }) => {
 					target: "react",
 					routesDirectory: "./src/@routes",
 					generatedRouteTree: "./src/_route.ts",
-					tmpDir: ProjectOutputPaths.cache.tanstack,
+					tmpDir: ".out/cache/tanstack",
 					autoCodeSplitting: false,
 					quoteStyle: "double",
 				}),
@@ -95,7 +94,7 @@ export default defineConfig(({ command }) => {
 				viteReact(),
 			],
 			build: {
-				outDir: resolve(ProjectOutputPaths.desktop.build, "renderer"),
+				outDir: resolve(".out/desktop/build/renderer"),
 				target: "esnext",
 				rollupOptions: {
 					input: resolve("index.html"),

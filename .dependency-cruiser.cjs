@@ -53,19 +53,6 @@ const boundaryRules = [
 		},
 	},
 	{
-		name: "cli-no-presentation-imports",
-		comment:
-			"CLI tooling may use the engine but never bridge, UI, page, route, or renderer entrypoint code.",
-		severity: "error",
-		from: {
-			path: "^cli(?:/|$)",
-		},
-		to: {
-			path: "^src/(?:bridge|ui|page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
-		},
-	},
-
-	{
 		name: "editor-domain-no-presentation-imports",
 		comment:
 			"The shared editor domain is platform-neutral and never depends on bridge, UI, pages, routes, renderer entrypoints, or Electron.",
@@ -213,22 +200,10 @@ const boundaryRules = [
 			"Application code consumes authored Game resources only through validated arkpacks, never through direct source-tree imports.",
 		severity: "error",
 		from: {
-			path: "^(?:src|electron|cli)(?:/|$)",
+			path: "^(?:src|electron)(?:/|$)",
 		},
 		to: {
 			path: "^game/[^/]+/(?:assets|resources)(?:/|$)",
-		},
-	},
-	{
-		name: "cli-no-electron-runtime-imports",
-		comment:
-			"CLI tooling may reuse explicit Electron build verification, but never Electron main/preload runtime adapters.",
-		severity: "error",
-		from: {
-			path: "^cli(?:/|$)",
-		},
-		to: {
-			path: "^electron/(?:main|preload)(?:/|$)|^node_modules/electron(?:/|$)",
 		},
 	},
 	{
@@ -246,10 +221,10 @@ const boundaryRules = [
 	{
 		name: "electron-contract-only-through-bridge-or-electron",
 		comment:
-			"The shared Electron contract is consumed only by renderer bridge domains and Electron platform adapters, never by engine, UI, pages, routes, renderer entrypoints, or CLI.",
+			"The shared Electron contract is consumed only by renderer bridge domains and Electron platform adapters, never by engine, UI, pages, or renderer entrypoints.",
 		severity: "error",
 		from: {
-			path: "^(?:src/(?:engine|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|cli)(?:/|$)",
+			path: "^(?:src/(?:engine|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?)(?:/|$)",
 		},
 		to: {
 			path: "^electron/contract(?:/|$)",
@@ -258,13 +233,13 @@ const boundaryRules = [
 	{
 		name: "electron-contract-is-pure",
 		comment:
-			"The shared Electron contract contains schemas, transport types, and channel names only; it never imports renderer, engine, Electron runtime, or CLI implementation code.",
+			"The shared Electron contract contains schemas, transport types, and channel names only; it never imports renderer, engine, or Electron runtime implementation code.",
 		severity: "error",
 		from: {
 			path: "^electron/contract(?:/|$)",
 		},
 		to: {
-			path: "^(?:src|electron|cli)(?:/|$)|^node_modules/electron(?:/|$)",
+			path: "^(?:src|electron)(?:/|$)|^node_modules/electron(?:/|$)",
 			pathNot: [
 				"^electron/contract(?:/|$)",
 			],
@@ -276,7 +251,7 @@ const boundaryRules = [
 			"Production and tooling code never import test support; tests may depend on active code, never the reverse.",
 		severity: "error",
 		from: {
-			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|cli)(?:/|$)",
+			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron)(?:/|$)",
 		},
 		to: {
 			path: "^test(?:/|$)",
@@ -285,10 +260,10 @@ const boundaryRules = [
 	{
 		name: "active-code-no-archive-imports",
 		comment:
-			"The historical tree is a read-only oracle outside every active source root and may never be imported by production, CLI, or tests.",
+			"The historical tree is a read-only oracle outside every active source root and may never be imported by production or tests.",
 		severity: "error",
 		from: {
-			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|cli|test)(?:/|$)",
+			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|test)(?:/|$)",
 		},
 		to: {
 			path: "^src/_archive(?:/|$)",
@@ -362,7 +337,7 @@ module.exports = {
 				"Production code must not import tests or fixtures. Tests may depend on production, never the reverse.",
 			severity: "error",
 			from: {
-				path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|cli)(?:/|$)",
+				path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron)(?:/|$)",
 				pathNot: [
 					"[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$",
 				],

@@ -1,21 +1,25 @@
 appId: dev.marekhanzal.arkini
 productName: Arkini
 asar: true
-npmRebuild: true
-beforeBuild: ./electron/builder/beforeBuild.mjs
+npmRebuild: false
 electronLanguages:
   - en-US
   - en-GB
   - en_GB
 artifactName: ${productName}-${version}-${os}-${arch}.${ext}
+extraMetadata:
+  main: app/main/index.js
 directories:
-  app: .out/desktop/stage
   output: .out/desktop/release
   buildResources: electron/resources
 files:
-  - app/**/*
+  - '!node_modules/**/*'
   - package.json
-  - '!app/**/*.map'
+  - from: .out/desktop/build
+    to: app
+    filter:
+      - '**/*'
+      - '!**/*.map'
 extraFiles:
   - from: electron/resources/arkini-cli
     to: MacOS/arkini-cli

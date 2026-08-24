@@ -26,7 +26,6 @@
 	},
 	"include": [
 		"electron/contract",
-		"cli",
 		"src/engine",
 		"src/bridge",
 		"src/ui",

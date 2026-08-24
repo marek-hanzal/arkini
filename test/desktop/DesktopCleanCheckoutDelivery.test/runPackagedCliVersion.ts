@@ -3,14 +3,13 @@ import { join } from "node:path";
 import { promisify } from "node:util";
 
 import packageJson from "../../../package.json" with { type: "json" };
-import { ProjectOutputPaths } from "../../../shared/ProjectOutputPaths";
 
 const execFileAsync = promisify(execFile);
 
 export const runPackagedCliVersion = async (workspace: string) => {
 	const executable = join(
 		workspace,
-		ProjectOutputPaths.desktop.release,
+		".out/desktop/release",
 		"mac-arm64/Arkini.app/Contents/MacOS/arkini-cli",
 	);
 	const result = await execFileAsync(executable, [

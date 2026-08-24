@@ -4,8 +4,7 @@
 	"minTokens": 80,
 	"mode": "mild",
 	"path": [
-		"src",
-		"cli"
+		"src"
 	],
 	"ignore": [
 		"**/*.test.ts",

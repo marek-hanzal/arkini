@@ -18,9 +18,7 @@ The RC jump from `4.0.0-beta.101` was proven on 2026-08-20 on a clean Ubuntu Git
 runner with Node `22.19.0` and npm `10.9.3`. It required no Arkini source changes.
 The probe passed:
 
-- `npm run typecheck:src`;
-- `npm run typecheck:electron`;
-- `npm run typecheck:test`;
+- the source, Electron, and test TypeScript configurations;
 - the then-current game validation command;
 - 37 focused Atom/command lifecycle tests across renderer registry/lifecycle, Item Detail,
   appearance, cheats, and Cheat Spotlight.
@@ -52,12 +50,12 @@ Run these searches before changing dependencies. The checked-in lists below are 
 snapshot, while these commands are the source of truth if the repository has moved:
 
 ```sh
-rg -l 'effect/unstable/reactivity' src electron cli test | sort
-rg -l 'effect/unstable/cli' src electron cli test | sort
-rg -l '@effect/atom-react' src electron cli test | sort
-rg -l '@effect/platform-node' src electron cli test | sort
-rg -n 'TODO\(#397\)' src electron cli test
-rg -n 'Effect\.yieldNow|Atom\.(writable|keepAlive|setIdleTTL)|mode: "promise"|cause\.reasons' src electron cli test
+rg -l 'effect/unstable/reactivity' src electron test | sort
+rg -l 'effect/unstable/cli' src electron test | sort
+rg -l '@effect/atom-react' src electron test | sort
+rg -l '@effect/platform-node' src electron test | sort
+rg -n 'TODO\(#397\)' src electron test
+rg -n 'Effect\.yieldNow|Atom\.(writable|keepAlive|setIdleTTL)|mode: "promise"|cause\.reasons' src electron test
 ```
 
 Direct imports from Effect packages are intentional. Do not introduce a local `Atom.ts`
@@ -81,7 +79,7 @@ its Redis peer load eagerly even though Arkini does not use Redis.
 | Cause projection | `readExactCauseFailure` and `readSettledAsyncResultError` inspect `cause.reasons` and accept exactly one `Fail` reason. Defects, interruption, and composite causes remain lifecycle failures. | Replace internal-looking Cause traversal with the final supported stable projection API if available. Preserve exact typed-failure-only behavior; never flatten defects or interruption into UI/domain errors. |
 | Game session runtime | A `ManagedRuntime`, owner `Scope`, forked session/command scopes, `FiberSet` command runtime, AbortSignal propagation, and exactly-once disposal jointly own Tick, save, subscriptions, and commands. | Translate to stable lifecycle APIs without weakening ownership. Bootstrap failure/interruption, overlapping disposal, frozen retry behavior, command admission, save ordering, and exactly-once cleanup are compatibility gates. |
 | Renderer and Electron roots | Renderer and Electron each own one process-lifetime `ManagedRuntime`; Electron supplies `NodeServices.layer`. | Use stable runtime/platform APIs and retain explicit process roots. Do not create per-callback runtimes or duplicate service authorities. |
-| CLI | All command declarations import `effect/unstable/cli`; `src/engine/cli/arkini.ts` owns the product runtime edge and `cli/arkini-repository.ts` owns the private desktop-delivery edge. | Move both roots to the supported stable CLI entrypoint in one pass. Preserve command names, options, help text, exit codes, typed failures, and packaging scripts. |
+| CLI | Product command declarations import `effect/unstable/cli`; `src/engine/cli/arkini.ts` owns the only CLI runtime edge. Repository automation is plain Bash in `Argcfile.sh`. | Move the product root to the supported stable CLI entrypoint. Preserve command names, options, help text, exit codes, and typed failures. |
 | Atom/React types | Feature atoms depend directly on unstable `Atom`, `AtomRegistry`, `AsyncResult`, and `AtomRuntime` types plus `@effect/atom-react` hooks. | Adopt final stable names and generics directly. Do not paper over type drift with casts or a repository-local compatibility facade. |
 
 HMR state preservation is explicitly out of scope. Arkini may restart renderer state during
@@ -313,16 +311,9 @@ test/ui/reactivity/readSettledAsyncResultError.test.ts
 
 ## Complete unstable CLI inventory
 
-Snapshot at `4.0.0-rc.111`: 18 production files.
+Snapshot at `4.0.0-rc.111`: 11 production files.
 
 ```text
-cli/ArkiniRepositoryCommand.ts
-cli/arkini-repository.ts
-cli/desktop/DesktopBuildCommand.ts
-cli/desktop/DesktopCommand.ts
-cli/desktop/DesktopPackageCommand.ts
-cli/desktop/DesktopPreviewMacosCommand.ts
-cli/desktop/DesktopVerifyCommand.ts
 src/engine/cli/ArkiniCommand.ts
 src/engine/cli/GameCommand.ts
 src/engine/cli/arkini.ts
@@ -432,17 +423,11 @@ test/ui/pixi/PixiBoardToolbarSurface.test.ts
 
 ## Complete platform-node inventory
 
-Snapshot at `4.0.0-rc.111`: 22 files — 3 production sources and 19 tests/support files.
+Snapshot at `4.0.0-rc.111`: 16 files — 2 production sources and 14 tests/support files.
 
 ```text
-cli/arkini-repository.ts
 electron/main/ElectronMainRuntime.ts
 src/engine/cli/arkini.ts
-test/desktop/DesktopPackaging.test.ts
-test/desktop/buildDesktopFx.test.ts
-test/desktop/createUnpackedMacAppFx.test.ts
-test/desktop/packageDesktopMacFx.test.ts
-test/desktop/previewDesktopMacFx.test.ts
 test/electron/createFilesystemAppearancePreferencesFx.test.ts
 test/electron/createFilesystemArkpackCatalogFx.test/fixture.ts
 test/electron/createFilesystemCheatPreferencesFx.test.ts
@@ -510,19 +495,15 @@ npx vitest run --no-color \
 
 Final repository checks:
 
-```sh
-npm run format:check
-npm run typecheck
-npm run build
-npm run dc
-npm test
+```bash
+./Argcfile.sh check
 git diff --check
 ```
 
 ## Done criteria
 
 - `package.json` ultimately pins mutually compatible stable Effect packages; until then every retained RC checkpoint resolves one coherent exact set.
-- `rg 'effect/unstable|4\.0\.0-(beta|rc)' package.json src electron cli test` has no unreviewed matches before #397 is closed.
+- `rg 'effect/unstable|4\.0\.0-(beta|rc)' package.json src electron test` has no unreviewed matches before #397 is closed.
 - Every `TODO(#397)` is removed or converted into a stable, intentionally documented
   invariant.
 - No local facade hides external Effect imports.

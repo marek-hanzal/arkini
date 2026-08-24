@@ -8,7 +8,6 @@ import { ArkiniOfficialArkpackSigning } from "~/engine/pack/cli/ArkiniOfficialAr
 import { ArkpackTrustedKeysSchema } from "~/engine/pack/schema/ArkpackTrustedKeysSchema";
 
 const execFileAsync = promisify(execFile);
-const npmExecutable = process.platform === "win32" ? "npm.cmd" : "npm";
 
 const copyCurrentSources = async (target: string) => {
 	const options = {
@@ -183,12 +182,12 @@ export const createCleanDeliveryWorkspace = async () => {
 			);
 			return stdout;
 		},
-		runNpmScript: (script: string) =>
+		runRepositoryCommand: (command: string) =>
 			execFileAsync(
-				npmExecutable,
+				"bash",
 				[
-					"run",
-					script,
+					"Argcfile.sh",
+					command,
 				],
 				{
 					cwd: root,

@@ -9,13 +9,11 @@ import {
 	type EditorProjectRepositoryOperation,
 } from "~/editor/EditorProjectRepositoryError";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import {
 	EditorBoardScenarioDescriptorSchema,
-	EditorBoardScenarioNameSchema,
 	EditorBoardScenarioSchema,
 } from "~/editor/board/EditorBoardScenarioSchema";
 
@@ -159,17 +157,6 @@ const callFx = <Value, Parsed>(
 		),
 	);
 
-const validateFx = <Value>(operation: EditorProjectRepositoryOperation, validate: () => Value) =>
-	Effect.try({
-		try: validate,
-		catch: (cause) =>
-			new EditorProjectRepositoryError({
-				operation,
-				message: "The editor project request is invalid.",
-				cause,
-			}),
-	});
-
 /** Creates an infallible renderer proxy; editor availability is queried separately. */
 export const createElectronEditorProjectRepositoryFx = Effect.sync(
 	(): EditorProjectRepositoryService => ({
@@ -178,20 +165,11 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 			() => window.arkini.editor.awaitIdle(),
 			() => undefined,
 		),
-		createProjectFx: ({ projectId, version, config: candidateConfig, resources: candidates }) =>
-			validateFx("create-project", () => ({
-				projectId: IdSchema.parse(projectId),
-				version: ArkpackVersionSchema.parse(version),
-				config: GameConfigSchema.parse(candidateConfig),
-				resources: ResourceSchema.array().parse(candidates),
-			})).pipe(
-				Effect.flatMap((request) =>
-					callFx(
-						"create-project",
-						() => window.arkini.editor.createProject(request),
-						parseProject,
-					),
-				),
+		createProjectFx: (request) =>
+			callFx(
+				"create-project",
+				() => window.arkini.editor.createProject(request),
+				parseProject,
 			),
 		listProjectsFx: callFx(
 			"list-projects",
@@ -199,127 +177,54 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 			(value) => descriptorSchema.array().parse(value),
 		),
 		listBoardScenariosFx: (projectId) =>
-			validateFx("list-board-scenarios", () => IdSchema.parse(projectId)).pipe(
-				Effect.flatMap((parsedProjectId) =>
-					callFx(
-						"list-board-scenarios",
-						() => window.arkini.editor.listBoardScenarios(parsedProjectId),
-						(value) => EditorBoardScenarioDescriptorSchema.array().parse(value),
-					),
-				),
+			callFx(
+				"list-board-scenarios",
+				() => window.arkini.editor.listBoardScenarios(projectId),
+				(value) => EditorBoardScenarioDescriptorSchema.array().parse(value),
 			),
-		readBoardScenarioFx: ({ projectId, name }) =>
-			validateFx("read-board-scenario", () => ({
-				projectId: IdSchema.parse(projectId),
-				name: EditorBoardScenarioNameSchema.parse(name),
-			})).pipe(
-				Effect.flatMap((request) =>
-					callFx(
-						"read-board-scenario",
-						() => window.arkini.editor.readBoardScenario(request),
-						(value) => (value === null ? null : parseBoardScenario(value)),
-					),
-				),
+		readBoardScenarioFx: (request) =>
+			callFx(
+				"read-board-scenario",
+				() => window.arkini.editor.readBoardScenario(request),
+				(value) => (value === null ? null : parseBoardScenario(value)),
 			),
 		readProjectFx: (projectId) =>
-			validateFx("read-project", () => IdSchema.parse(projectId)).pipe(
-				Effect.flatMap((parsedProjectId) =>
-					callFx(
-						"read-project",
-						() => window.arkini.editor.readProject(parsedProjectId),
-						(value) => (value === null ? null : parseProject(value)),
-					),
-				),
+			callFx(
+				"read-project",
+				() => window.arkini.editor.readProject(projectId),
+				(value) => (value === null ? null : parseProject(value)),
 			),
-		replaceConfigFx: ({ projectId, expectedRevision, config: candidateConfig }) =>
-			validateFx("replace-config", () => ({
-				projectId: IdSchema.parse(projectId),
-				expectedRevision: z.number().int().nonnegative().parse(expectedRevision),
-				config: GameConfigSchema.parse(candidateConfig),
-			})).pipe(
-				Effect.flatMap((request) =>
-					callFx(
-						"replace-config",
-						() => window.arkini.editor.replaceConfig(request),
-						parseCommit,
-					),
-				),
+		replaceConfigFx: (request) =>
+			callFx(
+				"replace-config",
+				() => window.arkini.editor.replaceConfig(request),
+				parseCommit,
 			),
-		replaceResourceFx: ({
-			config: candidateConfig,
-			currentId,
-			expectedRevision,
-			projectId,
-			resource: candidateResource,
-		}) =>
-			validateFx("replace-resource", () => ({
-				config: GameConfigSchema.parse(candidateConfig),
-				currentId: IdSchema.parse(currentId),
-				expectedRevision: z.number().int().nonnegative().parse(expectedRevision),
-				projectId: IdSchema.parse(projectId),
-				resource: ResourceSchema.parse(candidateResource),
-			})).pipe(
-				Effect.flatMap((request) =>
-					callFx(
-						"replace-resource",
-						() => window.arkini.editor.replaceResource(request),
-						parseProject,
-					),
-				),
+		replaceResourceFx: (request) =>
+			callFx(
+				"replace-resource",
+				() => window.arkini.editor.replaceResource(request),
+				parseProject,
 			),
-		upsertItemFx: ({ projectId, item: candidateItem }) =>
-			validateFx("upsert-item", () => ({
-				projectId: IdSchema.parse(projectId),
-				item: ItemSchema.parse(candidateItem),
-			})).pipe(
-				Effect.flatMap((request) =>
-					callFx(
-						"upsert-item",
-						() => window.arkini.editor.upsertItem(request),
-						parseCommit,
-					),
-				),
+		upsertItemFx: (request) =>
+			callFx("upsert-item", () => window.arkini.editor.upsertItem(request), parseCommit),
+		upsertResourcesFx: (request) =>
+			callFx(
+				"upsert-resource",
+				() => window.arkini.editor.upsertResources(request),
+				parseProject,
 			),
-		upsertResourcesFx: ({ projectId, resources: candidateResources }) =>
-			validateFx("upsert-resource", () => ({
-				projectId: IdSchema.parse(projectId),
-				resources: ResourceSchema.array().min(1).parse(candidateResources),
-			})).pipe(
-				Effect.flatMap((request) =>
-					callFx(
-						"upsert-resource",
-						() => window.arkini.editor.upsertResources(request),
-						parseProject,
-					),
-				),
+		writeBoardScenarioFx: (request) =>
+			callFx(
+				"write-board-scenario",
+				() => window.arkini.editor.writeBoardScenario(request),
+				parseBoardScenario,
 			),
-		writeBoardScenarioFx: ({ projectId, expectedRevision, name, bytes }) =>
-			validateFx("write-board-scenario", () => ({
-				projectId: IdSchema.parse(projectId),
-				expectedRevision: z.number().int().nonnegative().parse(expectedRevision),
-				name: EditorBoardScenarioNameSchema.parse(name),
-				bytes: new Uint8Array(bytes),
-			})).pipe(
-				Effect.flatMap((request) =>
-					callFx(
-						"write-board-scenario",
-						() => window.arkini.editor.writeBoardScenario(request),
-						parseBoardScenario,
-					),
-				),
-			),
-		deleteBoardScenarioFx: ({ projectId, name }) =>
-			validateFx("delete-board-scenario", () => ({
-				projectId: IdSchema.parse(projectId),
-				name: EditorBoardScenarioNameSchema.parse(name),
-			})).pipe(
-				Effect.flatMap((request) =>
-					callFx(
-						"delete-board-scenario",
-						() => window.arkini.editor.deleteBoardScenario(request),
-						() => undefined,
-					),
-				),
+		deleteBoardScenarioFx: (request) =>
+			callFx(
+				"delete-board-scenario",
+				() => window.arkini.editor.deleteBoardScenario(request),
+				() => undefined,
 			),
 	}),
 );

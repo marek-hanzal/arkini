@@ -197,7 +197,7 @@ describe("registerEditorProjectIpcFx", () => {
 			type: "failure",
 			error: {
 				operation: "create-project",
-				message: "The editor IPC request is invalid.",
+				message: "The editor project request is invalid.",
 			},
 		});
 		expect(repository.createProjectFx).toHaveBeenCalledOnce();
@@ -243,6 +243,15 @@ describe("registerEditorProjectIpcFx", () => {
 			type: "failure",
 			error: {
 				operation: "read-project",
+			},
+		});
+		await expect(
+			invoke(ArkiniElectronApi.channels.editorProjectRead, ""),
+		).resolves.toMatchObject({
+			type: "failure",
+			error: {
+				operation: "read-project",
+				message: "The editor project request is invalid.",
 			},
 		});
 	});

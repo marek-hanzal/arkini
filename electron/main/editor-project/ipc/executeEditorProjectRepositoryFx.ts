@@ -2,28 +2,31 @@ import { Effect } from "effect";
 
 import type { EditorProjectTransport } from "../../../contract/editor/EditorProjectTransport";
 import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
-import type { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
+import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 
 import type { EditorProjectServiceOwnership } from "../EditorProjectServiceOwnership";
 
-/** Runs one editor-project repository operation and exposes only its stable transport envelope. */
-export const executeEditorProjectRepositoryFx = <Value>(
+/** Admits and runs one editor-project operation, then exposes its stable transport envelope. */
+export const executeEditorProjectRepositoryFx = <Request, Value>(
 	operation: EditorProjectTransport.Operation,
 	ownership: EditorProjectServiceOwnership,
+	requestFx: Effect.Effect<Request, EditorProjectRepositoryError>,
 	run: (
 		repository: EditorProjectRepositoryService,
+		request: Request,
 	) => Effect.Effect<Value, EditorProjectRepositoryError>,
-): Effect.Effect<EditorProjectTransport.Result<Value>> => {
-	if (ownership.type === "unavailable") {
-		return Effect.succeed({
-			type: "failure",
-			error: {
-				operation,
-				message: ownership.message,
-			},
-		});
-	}
-	return run(ownership.repository).pipe(
+): Effect.Effect<EditorProjectTransport.Result<Value>> =>
+	requestFx.pipe(
+		Effect.flatMap((request) =>
+			ownership.type === "unavailable"
+				? Effect.fail(
+						new EditorProjectRepositoryError({
+							operation,
+							message: ownership.message,
+						}),
+					)
+				: run(ownership.repository, request),
+		),
 		Effect.match({
 			onFailure: (error) => ({
 				type: "failure" as const,
@@ -38,4 +41,3 @@ export const executeEditorProjectRepositoryFx = <Value>(
 			}),
 		}),
 	);
-};

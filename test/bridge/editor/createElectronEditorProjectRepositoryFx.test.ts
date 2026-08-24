@@ -273,15 +273,22 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 		);
 	});
 
-	it("rejects an invalid request as a typed failure before invoking Electron", async () => {
+	it("preserves a main-process invalid request as a typed repository failure", async () => {
 		const { editor } = installEditorApi();
+		vi.mocked(editor.readProject).mockResolvedValueOnce({
+			type: "failure",
+			error: {
+				operation: "read-project",
+				message: "The editor project request is invalid.",
+			},
+		});
 		const repository = Effect.runSync(createElectronEditorProjectRepositoryFx);
 
 		const failure = await readTypedFailure(repository.readProjectFx(""));
 
 		expect(failure.operation).toBe("read-project");
 		expect(failure.message).toBe("The editor project request is invalid.");
-		expect(editor.readProject).not.toHaveBeenCalled();
+		expect(editor.readProject).toHaveBeenCalledWith("");
 	});
 
 	it("rejects an invalid Electron response as a typed repository failure", async () => {

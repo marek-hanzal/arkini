@@ -38,40 +38,32 @@ export const registerEditorBoardScenarioIpcFx = Effect.fn("registerEditorBoardSc
 					executeEditorProjectRepositoryFx(
 						"list-board-scenarios",
 						ownership,
-						(repository) =>
-							requestParser
-								.parseProjectIdFx(candidate)
-								.pipe(Effect.flatMap(repository.listBoardScenariosFx)),
+						requestParser.parseProjectIdFx(candidate),
+						(repository, projectId) => repository.listBoardScenariosFx(projectId),
 					),
 				);
 				handle(ArkiniElectronApi.channels.editorBoardScenarioRead, (candidate) =>
 					executeEditorProjectRepositoryFx(
 						"read-board-scenario",
 						ownership,
-						(repository) =>
-							requestParser
-								.parseReadKeyFx(candidate)
-								.pipe(Effect.flatMap(repository.readBoardScenarioFx)),
+						requestParser.parseReadKeyFx(candidate),
+						(repository, request) => repository.readBoardScenarioFx(request),
 					),
 				);
 				handle(ArkiniElectronApi.channels.editorBoardScenarioWrite, (candidate) =>
 					executeEditorProjectRepositoryFx(
 						"write-board-scenario",
 						ownership,
-						(repository) =>
-							requestParser
-								.parseWriteFx(candidate)
-								.pipe(Effect.flatMap(repository.writeBoardScenarioFx)),
+						requestParser.parseWriteFx(candidate),
+						(repository, request) => repository.writeBoardScenarioFx(request),
 					),
 				);
 				handle(ArkiniElectronApi.channels.editorBoardScenarioDelete, (candidate) =>
 					executeEditorProjectRepositoryFx(
 						"delete-board-scenario",
 						ownership,
-						(repository) =>
-							requestParser
-								.parseDeleteKeyFx(candidate)
-								.pipe(Effect.flatMap(repository.deleteBoardScenarioFx)),
+						requestParser.parseDeleteKeyFx(candidate),
+						(repository, request) => repository.deleteBoardScenarioFx(request),
 					),
 				);
 

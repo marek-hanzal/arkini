@@ -154,4 +154,26 @@ describe("editor Board-scenario IPC", () => {
 		});
 		expect(repository.writeBoardScenarioFx).toHaveBeenCalledOnce();
 	});
+
+	it("rejects an invalid request before reporting unavailable ownership", async () => {
+		Effect.runSync(
+			registerEditorProjectIpcFx({
+				ownership: {
+					type: "unavailable",
+					message: "Editor database could not be opened.",
+				},
+				trustedRenderer: createTrustedRenderer(),
+			}),
+		);
+
+		await expect(
+			invoke(ArkiniElectronApi.channels.editorBoardScenarioList, ""),
+		).resolves.toMatchObject({
+			type: "failure",
+			error: {
+				operation: "list-board-scenarios",
+				message: "The editor project request is invalid.",
+			},
+		});
+	});
 });

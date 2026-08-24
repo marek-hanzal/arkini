@@ -15,7 +15,7 @@ export const parseEditorProjectIpcRequestFx = <Value>(
 			if (result.success) return result.data;
 			throw new EditorProjectRepositoryError({
 				operation,
-				message: "The editor IPC request is invalid.",
+				message: "The editor project request is invalid.",
 				cause: result.error,
 			});
 		},

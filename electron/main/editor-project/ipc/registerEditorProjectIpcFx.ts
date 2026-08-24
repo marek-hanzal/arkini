@@ -67,6 +67,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					executeEditorProjectRepositoryFx(
 						"await-idle",
 						ownership,
+						Effect.void,
 						(repository) => repository.awaitIdleFx,
 					),
 				);
@@ -74,28 +75,32 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					executeEditorProjectRepositoryFx(
 						"list-projects",
 						ownership,
+						Effect.void,
 						(repository) => repository.listProjectsFx,
 					),
 				);
 				handle(ArkiniElectronApi.channels.editorProjectRead, (_event, candidate) =>
-					executeEditorProjectRepositoryFx("read-project", ownership, (repository) =>
-						requestParser
-							.parseProjectIdFx(candidate)
-							.pipe(Effect.flatMap(repository.readProjectFx)),
+					executeEditorProjectRepositoryFx(
+						"read-project",
+						ownership,
+						requestParser.parseProjectIdFx(candidate),
+						(repository, projectId) => repository.readProjectFx(projectId),
 					),
 				);
 				handle(ArkiniElectronApi.channels.editorProjectCreate, (_event, candidate) =>
-					executeEditorProjectRepositoryFx("create-project", ownership, (repository) =>
-						requestParser
-							.parseCreateProjectFx(candidate)
-							.pipe(Effect.flatMap(repository.createProjectFx)),
+					executeEditorProjectRepositoryFx(
+						"create-project",
+						ownership,
+						requestParser.parseCreateProjectFx(candidate),
+						(repository, request) => repository.createProjectFx(request),
 					),
 				);
 				handle(ArkiniElectronApi.channels.editorProjectReplaceConfig, (_event, candidate) =>
-					executeEditorProjectRepositoryFx("replace-config", ownership, (repository) =>
-						requestParser
-							.parseReplaceConfigFx(candidate)
-							.pipe(Effect.flatMap(repository.replaceConfigFx)),
+					executeEditorProjectRepositoryFx(
+						"replace-config",
+						ownership,
+						requestParser.parseReplaceConfigFx(candidate),
+						(repository, request) => repository.replaceConfigFx(request),
 					),
 				);
 				handle(
@@ -104,17 +109,16 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						executeEditorProjectRepositoryFx(
 							"replace-resource",
 							ownership,
-							(repository) =>
-								requestParser
-									.parseReplaceResourceFx(candidate)
-									.pipe(Effect.flatMap(repository.replaceResourceFx)),
+							requestParser.parseReplaceResourceFx(candidate),
+							(repository, request) => repository.replaceResourceFx(request),
 						),
 				);
 				handle(ArkiniElectronApi.channels.editorProjectUpsertItem, (_event, candidate) =>
-					executeEditorProjectRepositoryFx("upsert-item", ownership, (repository) =>
-						requestParser
-							.parseUpsertItemFx(candidate)
-							.pipe(Effect.flatMap(repository.upsertItemFx)),
+					executeEditorProjectRepositoryFx(
+						"upsert-item",
+						ownership,
+						requestParser.parseUpsertItemFx(candidate),
+						(repository, request) => repository.upsertItemFx(request),
 					),
 				);
 				handle(
@@ -123,10 +127,8 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						executeEditorProjectRepositoryFx(
 							"upsert-resource",
 							ownership,
-							(repository) =>
-								requestParser
-									.parseUpsertResourcesFx(candidate)
-									.pipe(Effect.flatMap(repository.upsertResourcesFx)),
+							requestParser.parseUpsertResourcesFx(candidate),
+							(repository, request) => repository.upsertResourcesFx(request),
 						),
 				);
 				const channels = [

@@ -111,7 +111,6 @@ export const EditorProjectStartItemPicker = ({
 					Select initial item
 				</h2>
 				<SpotlightSearchInput
-					ariaLabel="Search initial items"
 					inputRef={inputRef}
 					onEnter={() => {
 						const selected = results[selectedIndex];

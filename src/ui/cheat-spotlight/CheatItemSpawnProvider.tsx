@@ -1,5 +1,5 @@
 import { useAtom } from "@effect/atom-react";
-import { type PropsWithChildren, useMemo } from "react";
+import { type PropsWithChildren, useCallback, useMemo } from "react";
 
 import type { PlayableGame } from "~/bridge/game/PlayableGame";
 import { CheatItemSpawnCommandAtom } from "~/ui/cheat-spotlight/CheatItemSpawnCommandAtom";
@@ -18,26 +18,36 @@ export const CheatItemSpawnProvider = ({
 	const commandAtom = CheatItemSpawnCommandAtom(game);
 	const [state, runCommand] = useAtom(commandAtom);
 	const pending = state.kind === "pending";
+	const request = useCallback(
+		(itemId: string) => {
+			runCommand({
+				kind: "spawn",
+				itemId,
+			});
+		},
+		[
+			runCommand,
+		],
+	);
+	const reset = useCallback(() => {
+		runCommand({
+			kind: "reset",
+		});
+	}, [
+		runCommand,
+	]);
 
 	const control = useMemo<CheatItemSpawnControl>(
 		() => ({
 			pending,
-			request: (itemId) => {
-				runCommand({
-					kind: "spawn",
-					itemId,
-				});
-			},
-			reset: () => {
-				runCommand({
-					kind: "reset",
-				});
-			},
+			request,
+			reset,
 			state,
 		}),
 		[
 			pending,
-			runCommand,
+			request,
+			reset,
 			state,
 		],
 	);

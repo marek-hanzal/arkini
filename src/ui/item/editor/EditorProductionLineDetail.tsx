@@ -35,34 +35,33 @@ export const EditorProductionLineDetail = ({
 			data-line-id={line.id}
 		>
 			<div className="relative z-[1] flex flex-wrap items-start justify-between gap-4">
-				<EditorProductionLineEditLink
-					className="group min-h-0 min-w-0 flex-1 justify-start gap-2 border-0 bg-transparent p-1 text-left shadow-none hover:bg-surface/70"
-					dataUi="EditorProductionLineDetailEditLink"
-					itemUid={itemUid}
-					lineId={line.id}
-				>
-					<div className="min-w-0 flex-1">
-						<div className="flex flex-wrap items-center gap-2">
-							<h3 className="text-lg font-semibold leading-tight text-foreground">
+				<div className="min-w-0 flex-1">
+					<div className="flex flex-wrap items-center gap-2">
+						<h3 className="text-lg font-semibold leading-tight text-foreground">
+							<EditorProductionLineEditLink
+								dataUi="EditorProductionLineDetailEditLink"
+								itemUid={itemUid}
+								lineId={line.id}
+							>
 								{line.title}
-							</h3>
-							{!line.enable ? (
-								<span className="rounded-full border border-danger/35 bg-danger/10 px-2.5 py-1 text-xs font-semibold text-foreground">
-									Disabled
-								</span>
-							) : null}
-							{line.default ? (
-								<span className="rounded-full border border-accent/35 bg-accent/10 px-2.5 py-1 text-xs font-semibold text-foreground">
-									Default
-								</span>
-							) : null}
-						</div>
-						<p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted">
-							{line.description}
-						</p>
+								<span className="icon-[lucide--arrow-up-right] size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />
+							</EditorProductionLineEditLink>
+						</h3>
+						{!line.enable ? (
+							<span className="rounded-full border border-danger/35 bg-danger/10 px-2.5 py-1 text-xs font-semibold text-foreground">
+								Disabled
+							</span>
+						) : null}
+						{line.default ? (
+							<span className="rounded-full border border-accent/35 bg-accent/10 px-2.5 py-1 text-xs font-semibold text-foreground">
+								Default
+							</span>
+						) : null}
 					</div>
-					<span className="icon-[lucide--arrow-up-right] size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />
-				</EditorProductionLineEditLink>
+					<p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted">
+						{line.description}
+					</p>
+				</div>
 				<EditorLineRuntime runtimeMs={line.runtimeMs} />
 			</div>
 			<div className="relative z-[1] mt-4 grid min-w-0 grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)] gap-x-4">

@@ -23,7 +23,6 @@ export const EditorBoardProductionLineLink = ({
 			disabled={disabled}
 			itemUid={item.uid}
 			lineId={lineId}
-			className="group min-h-0 min-w-0 flex-1 justify-start gap-2 border-0 bg-transparent p-1 text-left shadow-none hover:bg-surface/70"
 			dataUi="EditorBoardProductionLineLink"
 		>
 			{children}

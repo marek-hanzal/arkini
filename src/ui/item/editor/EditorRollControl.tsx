@@ -20,14 +20,20 @@ export const EditorRollControl = ({
 				value={value.type}
 				options={[
 					{
+						description:
+							"Emits every configured drop whenever this roll's rules allow it. No probability check is performed.",
 						label: "Guaranteed",
 						value: "guaranteed",
 					},
 					{
+						description:
+							"Performs one probability check from 0 to 1 and emits every configured drop only when that check succeeds.",
 						label: "Chance",
 						value: "chance",
 					},
 					{
+						description:
+							"Makes the configured number of independent selections. Each selection chooses one candidate by relative weight, and candidates may repeat.",
 						label: "Weighted",
 						value: "weight",
 					},

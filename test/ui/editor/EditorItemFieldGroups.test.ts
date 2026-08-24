@@ -19,8 +19,9 @@ vi.mock("~/ui/item/editor/useEditorItemOptionLabel", () => ({
 }));
 
 import { useAppForm } from "~/ui/form/EditorForm";
-import type { EditorLine, EditorMerge } from "~/bridge/item/editor/EditorItemModel";
+import type { EditorInput, EditorLine, EditorMerge } from "~/bridge/item/editor/EditorItemModel";
 import { EditorItemArtworkFields } from "~/ui/item/editor/EditorItemArtworkFields";
+import { EditorInputCharges } from "~/ui/item/editor/EditorInputCharges";
 import { EditorMergeFields } from "~/ui/item/editor/EditorMergeFields";
 import { EditorProductionFields } from "~/ui/item/editor/EditorProductionFields";
 
@@ -140,6 +141,25 @@ const ProductionHarness = () => {
 	);
 };
 
+const InputChargesHarness = () => {
+	const [input, setInput] = useState<EditorInput>({
+		charges: {
+			cost: 1,
+			from: "self",
+		},
+		type: "simple",
+	});
+	return createElement(
+		Fragment,
+		null,
+		createElement(EditorInputCharges, {
+			input,
+			onChange: setInput,
+		}),
+		createElement("output", null, JSON.stringify(input)),
+	);
+};
+
 describe("editor item field groups", () => {
 	it("adds a second registered artwork layer", async () => {
 		const container = await mount(createElement(ArtworkHarness));
@@ -190,5 +210,17 @@ describe("editor item field groups", () => {
 		expect(container.querySelector("output")?.textContent).toContain(
 			'"id":"line:renamed:default"',
 		);
+	});
+
+	it("disables an input charge from its compact trailing action", async () => {
+		const container = await mount(createElement(InputChargesHarness));
+		const disable = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorInputChargeDisableButton"]',
+		);
+		if (disable === null) throw new Error("Missing charge disable action.");
+		await act(async () => disable.click());
+
+		expect(container.querySelector("output")?.textContent).not.toContain("charges");
+		expect(container.textContent).toContain("Charge cost is disabled");
 	});
 });

@@ -48,8 +48,8 @@ describe("ItemDetailModal / line extension", () => {
 		);
 		expect(link?.dataset.itemId).toBe("workshop");
 		expect(link?.dataset.lineId).toBe("line:workshop:water");
-		expect(link?.textContent).toContain("Water");
-		expect(link?.textContent).toContain("Create water.");
+		expect(link?.textContent).toBe("Water");
+		expect(link?.parentElement?.tagName).toBe("H3");
 
 		motionTestRuntime.autoComplete = false;
 		const close = document.querySelector<HTMLButtonElement>(

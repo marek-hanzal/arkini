@@ -27,18 +27,22 @@ const queryScopeOptions = [
 
 const boardDistanceOptions = [
 	{
+		description: "Matches only the origin itself at board distance 0.",
 		label: "Self",
 		value: "self",
 	},
 	{
+		description: "Matches items exactly 1 cell away, including diagonals.",
 		label: "Close",
 		value: "close",
 	},
 	{
+		description: "Matches items exactly 2 cells away, including diagonals.",
 		label: "Near",
 		value: "near",
 	},
 	{
+		description: "Matches any positive board distance and excludes only Self.",
 		label: "Far",
 		value: "far",
 	},

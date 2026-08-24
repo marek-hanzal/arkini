@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { EditorDurationHint } from "~/ui/form/EditorDurationHint";
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
+import { Tooltip } from "~/ui/overlay/Tooltip";
 import {
 	selectableActiveClassName,
 	selectableInactiveClassName,
@@ -119,6 +120,7 @@ export const EditorChoiceControl = <Value extends string>({
 	readonly label: string;
 	readonly onChange: (value: Value) => void;
 	readonly options: ReadonlyArray<{
+		readonly description?: ReactNode;
 		readonly label: string;
 		readonly value: Value;
 	}>;
@@ -132,21 +134,36 @@ export const EditorChoiceControl = <Value extends string>({
 			</span>
 		</legend>
 		<div className="flex min-w-0 flex-wrap gap-2">
-			{options.map((option) => (
-				<button
-					key={option.value}
-					type="button"
-					aria-pressed={option.value === value}
-					className={`min-h-9 cursor-pointer rounded-lg border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
-						option.value === value
-							? selectableActiveClassName
-							: selectableInactiveClassName
-					}`}
-					onClick={() => onChange(option.value)}
-				>
-					{option.label}
-				</button>
-			))}
+			{options.map((option) => {
+				const button = (
+					<button
+						key={option.value}
+						type="button"
+						aria-pressed={option.value === value}
+						className={`inline-flex min-h-[var(--ak-control-min-height)] cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
+							option.value === value
+								? selectableActiveClassName
+								: selectableInactiveClassName
+						}`}
+						onClick={() => onChange(option.value)}
+					>
+						{option.label}
+						{option.description === undefined ? null : (
+							<span className="icon-[lucide--info] size-3.5 opacity-70" />
+						)}
+					</button>
+				);
+				return option.description === undefined ? (
+					button
+				) : (
+					<Tooltip
+						content={option.description}
+						key={option.value}
+					>
+						{button}
+					</Tooltip>
+				);
+			})}
 		</div>
 	</fieldset>
 );

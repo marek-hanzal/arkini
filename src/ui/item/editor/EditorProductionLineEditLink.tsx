@@ -1,4 +1,5 @@
 import type { PropsWithChildren } from "react";
+import { twMerge } from "tailwind-merge";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { ButtonLink } from "~/ui/button/Button";
@@ -31,10 +32,13 @@ export const EditorProductionLineEditLink = ({
 			search={{
 				lineId,
 			}}
-			className={className}
+			className={twMerge(
+				"group inline-flex min-h-0 w-fit max-w-full flex-none items-center justify-start rounded-none border-0 bg-transparent p-0 text-left text-[inherit] font-[inherit] decoration-accent/55 underline-offset-4 shadow-none hover:border-transparent hover:bg-transparent hover:text-accent hover:underline active:bg-transparent",
+				className,
+			)}
 			data-ui={dataUi}
 		>
-			{children}
+			<span className="inline-flex max-w-full min-w-0 items-center gap-1.5">{children}</span>
 		</ButtonLink>
 	);
 };

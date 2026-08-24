@@ -20,7 +20,7 @@ export const EditorBoardItemDetailLink = ({
 				itemUid: item.uid,
 				sectionId: "identity",
 			}}
-			className="group min-h-0 min-w-0 justify-start gap-2 border-0 bg-transparent p-1 text-left shadow-none hover:bg-surface/70"
+			className="group min-h-0 min-w-0 justify-start gap-2 rounded-none border-0 bg-transparent p-0 text-left font-normal shadow-none hover:border-transparent hover:bg-transparent active:bg-transparent [&_h2]:decoration-accent/55 [&_h2]:underline-offset-4 [&_h2]:transition-colors hover:[&_h2]:text-accent hover:[&_h2]:underline"
 			data-ui="EditorBoardItemDetailLink"
 		>
 			{children}

@@ -41,11 +41,22 @@ export const ItemLineSummary = ({
 					}
 				: undefined;
 
-	const identity = (
+	const IdentityRenderer = renderIdentity;
+	return (
 		<div className="min-w-0 flex-1">
 			<div className="flex flex-wrap items-center gap-2">
 				<h3 className="text-lg font-semibold leading-tight text-foreground">
-					{line.title}
+					{IdentityRenderer === undefined || itemId === undefined ? (
+						line.title
+					) : (
+						<IdentityRenderer
+							disabled={disabled}
+							itemId={itemId}
+							lineId={line.lineId}
+						>
+							{line.title}
+						</IdentityRenderer>
+					)}
 				</h3>
 				<AnimatePresence initial={false}>
 					{stale || status === undefined ? null : (
@@ -82,17 +93,5 @@ export const ItemLineSummary = ({
 				{line.description}
 			</motion.p>
 		</div>
-	);
-	const IdentityRenderer = renderIdentity;
-	return IdentityRenderer === undefined || itemId === undefined ? (
-		identity
-	) : (
-		<IdentityRenderer
-			disabled={disabled}
-			itemId={itemId}
-			lineId={line.lineId}
-		>
-			{identity}
-		</IdentityRenderer>
 	);
 };

@@ -22,7 +22,7 @@ export const EditorDropControl = ({
 				})
 			}
 		/>
-		<div className="grid gap-3 sm:grid-cols-2">
+		<div className="grid items-end gap-3 sm:grid-cols-2">
 			<EditorQuantityControl
 				value={value.quantity}
 				onChange={(quantity) =>
@@ -37,10 +37,14 @@ export const EditorDropControl = ({
 				value={value.placement}
 				options={[
 					{
+						description:
+							"Starts board placement at the production origin, then places stack-first into the nearest available cells.",
 						label: "Local drop",
 						value: "drop",
 					},
 					{
+						description:
+							"Chooses a random cell in the current board space as the placement origin, then places stack-first into the nearest available cells.",
 						label: "Random",
 						value: "random",
 					},

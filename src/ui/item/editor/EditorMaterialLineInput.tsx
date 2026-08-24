@@ -28,16 +28,20 @@ export const EditorMaterialLineInput = ({
 				})
 			}
 		/>
-		<div className="grid gap-3 sm:grid-cols-2">
+		<div className="grid items-end gap-3 sm:grid-cols-2">
 			<EditorChoiceControl
 				label="Material mode"
 				value={input.mode}
 				options={[
 					{
+						description:
+							"Uses the delivered material for this run. The committed item is removed when production completes.",
 						label: "Consume",
 						value: "consume",
 					},
 					{
+						description:
+							"Keeps the delivered material reserved during production and returns the same item when the run completes.",
 						label: "Reserve",
 						value: "reserve",
 					},

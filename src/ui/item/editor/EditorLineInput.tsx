@@ -21,14 +21,20 @@ export const EditorLineInput = ({
 			value={input.type}
 			options={[
 				{
+					description:
+						"Adds no item or deposit requirement. The line may start without delivering or targeting another item.",
 					label: "Simple",
 					value: "simple",
 				},
 				{
+					description:
+						"Requires matching items to be delivered into this line. They may be consumed or reserved and returned after completion.",
 					label: "Materials",
 					value: "materials",
 				},
 				{
+					description:
+						"Targets one matching board item in place. It is not delivered; its configured charge cost is paid when production starts.",
 					label: "Deposit",
 					value: "deposit",
 				},

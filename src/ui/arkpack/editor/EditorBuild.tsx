@@ -1,146 +1,93 @@
-import { useAtomSet, useAtomValue } from "@effect/atom-react";
-import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
-
-import { buildEditorProjectCommandAtom } from "~/bridge/arkpack/editor/buildEditorProjectCommandAtom";
-import { installBuiltEditorArkpackCommandAtom } from "~/bridge/arkpack/editor/installBuiltEditorArkpackCommandAtom";
-import { readEditorBuildDiagnosticsFx } from "~/bridge/arkpack/editor/readEditorBuildDiagnosticsFx";
-import { saveBuiltEditorArkpackCommandAtom } from "~/bridge/arkpack/editor/saveBuiltEditorArkpackCommandAtom";
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { EditorBuildDiagnostics } from "~/ui/arkpack/editor/EditorBuildDiagnostics";
-import { formatByteSizeFx } from "~/ui/arkpack/editor/formatByteSizeFx";
+import { useEditorBuildController } from "~/ui/arkpack/editor/useEditorBuildController";
 import { Button, PrimaryButton } from "~/ui/button/Button";
-import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 
-/** Owns explicit heavy validation and independent output actions for one project snapshot. */
 export const EditorBuild = () => {
-	const project = useEditorProject();
-	const buildAtom = buildEditorProjectCommandAtom(project.projectId);
-	const buildResult = useAtomValue(buildAtom);
-	const build = useAtomSet(buildAtom);
-	const builtArtifact =
-		AsyncResult.isSuccess(buildResult) && !buildResult.waiting ? buildResult.value : undefined;
-	const artifact = builtArtifact?.revision === project.revision ? builtArtifact : undefined;
-	const artifactStale = builtArtifact !== undefined && artifact === undefined;
-	const installAtom = installBuiltEditorArkpackCommandAtom(artifact?.contentHash ?? "unbuilt");
-	const saveAtom = saveBuiltEditorArkpackCommandAtom(artifact?.contentHash ?? "unbuilt");
-	const installResult = useAtomValue(installAtom);
-	const install = useAtomSet(installAtom);
-	const saveResult = useAtomValue(saveAtom);
-	const save = useAtomSet(saveAtom);
-	const buildError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(buildResult));
-	const installError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(installResult));
-	const saveError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveResult));
-	const errorDiagnostics = RendererRuntime.runSync(readEditorBuildDiagnosticsFx(buildError));
-	const diagnostics = errorDiagnostics ?? artifact?.diagnostics ?? [];
+	const controller = useEditorBuildController();
 
 	return (
 		<section
 			className="grid h-full min-h-0 content-start gap-3 overflow-y-auto overscroll-contain p-3"
-			aria-labelledby="editor-build-title"
 			data-ui="EditorBuild"
 		>
 			<header>
-				<h1
-					id="editor-build-title"
-					className="text-2xl font-semibold"
-				>
-					Build
-				</h1>
+				<h1 className="text-2xl font-semibold">Build</h1>
 				<p className="mt-1 text-sm text-muted">
 					Validate one exact saved project snapshot and produce immutable Arkpack bytes.
 				</p>
 				<p className="mt-1 text-xs text-subtle">
-					Arkpack v{project.version}. Compatible edits keep saves and Board scenarios; a
-					major project save permanently deletes its scenarios and published game saves
-					start fresh when loaded.
+					Arkpack v{controller.project.version}. Compatible edits keep saves and Board
+					scenarios; a major project save permanently deletes its scenarios and published
+					game saves start fresh when loaded.
 				</p>
 			</header>
 			<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">
 				<div className="flex flex-wrap items-center justify-between gap-3">
 					<div>
 						<h2 className="text-lg font-semibold">Project validation</h2>
-						<p className="mt-1 text-sm text-muted">
-							{artifact === undefined
-								? artifactStale
-									? "The project changed after the last build. Build the current revision again."
-									: "Run a build to execute the complete game and resource validation."
-								: `Revision ${artifact.revision} built with ${artifact.diagnostics.length} non-blocking diagnostic${artifact.diagnostics.length === 1 ? "" : "s"}.`}
-						</p>
+						<p className="mt-1 text-sm text-muted">{controller.buildSummary}</p>
 					</div>
 					<span
-						className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider ${artifact === undefined ? "bg-surface-raised text-muted" : "bg-success/15 text-success"}`}
+						className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider ${controller.buildStatus === "valid" ? "bg-success/15 text-success" : "bg-surface-raised text-muted"}`}
 					>
-						{buildResult.waiting
-							? "Building"
-							: artifact === undefined
-								? artifactStale
-									? "Stale"
-									: "Not built"
-								: "Valid"}
+						{controller.buildStatusLabel}
 					</span>
 				</div>
-				{buildError !== undefined && errorDiagnostics === undefined ? (
+				{controller.buildError === undefined ? null : (
 					<p className="mt-4 rounded-lg bg-danger/10 p-3 text-sm text-danger">
-						{buildError instanceof Error ? buildError.message : String(buildError)}
+						{controller.buildError}
 					</p>
-				) : null}
-				{diagnostics.length === 0 ? null : (
+				)}
+				{controller.diagnostics.length === 0 ? null : (
 					<EditorBuildDiagnostics
-						diagnostics={diagnostics}
-						project={project}
+						diagnostics={controller.diagnostics}
+						project={controller.project}
 					/>
 				)}
 				<PrimaryButton
 					className="mt-4"
-					disabled={buildResult.waiting}
-					cursorIntent={buildResult.waiting ? "progress" : undefined}
-					onClick={() => build(undefined)}
+					disabled={controller.buildPending}
+					cursorIntent={controller.buildPending ? "progress" : undefined}
+					onClick={controller.build}
 				>
-					{buildResult.waiting ? "Building…" : "Build arkpack"}
+					{controller.buildPending ? "Building…" : "Build arkpack"}
 				</PrimaryButton>
 			</article>
-			{artifact === undefined ? null : (
+			{controller.artifactSummary === undefined ? null : (
 				<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">
 					<h2 className="text-lg font-semibold">Build output</h2>
 					<p className="mt-2 break-all text-sm text-muted">
-						{artifact.filename} ·{" "}
-						{RendererRuntime.runSync(formatByteSizeFx(artifact.bytes.byteLength))} · v
-						{artifact.version} · Arkini {artifact.game} · {artifact.contentHash}
+						{controller.artifactSummary}
 					</p>
 					<div className="mt-4 flex flex-wrap gap-3">
 						<Button
-							disabled={saveResult.waiting}
-							cursorIntent={saveResult.waiting ? "progress" : undefined}
-							onClick={() => save(artifact)}
+							data-ui="EditorBuildSave"
+							disabled={controller.savePending}
+							cursorIntent={controller.savePending ? "progress" : undefined}
+							onClick={controller.saveArtifact}
 						>
-							{saveResult.waiting ? "Saving…" : "Save as…"}
+							{controller.savePending ? "Saving…" : "Save as…"}
 						</Button>
 						<PrimaryButton
-							disabled={installResult.waiting}
-							cursorIntent={installResult.waiting ? "progress" : undefined}
-							onClick={() => install(artifact)}
+							data-ui="EditorBuildInstall"
+							disabled={controller.installPending}
+							cursorIntent={controller.installPending ? "progress" : undefined}
+							onClick={controller.installArtifact}
 						>
-							{installResult.waiting ? "Installing…" : "Install"}
+							{controller.installPending ? "Installing…" : "Install"}
 						</PrimaryButton>
 					</div>
-					{saveError === undefined ? null : (
-						<p className="mt-3 text-sm text-danger">
-							{saveError instanceof Error ? saveError.message : String(saveError)}
-						</p>
+					{controller.saveError === undefined ? null : (
+						<p className="mt-3 text-sm text-danger">{controller.saveError}</p>
 					)}
-					{installError === undefined ? null : (
-						<p className="mt-3 text-sm text-danger">
-							{installError instanceof Error
-								? installError.message
-								: String(installError)}
-						</p>
+					{controller.installError === undefined ? null : (
+						<p className="mt-3 text-sm text-danger">{controller.installError}</p>
 					)}
-					{AsyncResult.isSuccess(installResult) && !installResult.waiting ? (
+					{controller.installedPackageId === undefined ? null : (
 						<p className="mt-3 text-sm text-success">
-							Installed as {installResult.value.packageId}.
+							Installed as {controller.installedPackageId}.
 						</p>
-					) : null}
+					)}
 				</article>
 			)}
 		</section>

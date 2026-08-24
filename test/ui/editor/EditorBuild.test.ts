@@ -6,18 +6,30 @@ import { act, createElement, type AnchorHTMLAttributes, type ButtonHTMLAttribute
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { capacityDiagnostic, createArtifact } from "./EditorBuild.test/fixtures";
+
 const state = vi.hoisted(() => ({
 	buildResult: undefined as unknown,
+	commandSetters: new Map<string, ReturnType<typeof vi.fn>>(),
 	installResults: new Map<string, unknown>(),
 	project: undefined as unknown,
 }));
 
 vi.mock("@effect/atom-react", () => ({
-	useAtomSet: () => vi.fn(),
-	useAtomValue: (atom: { readonly kind: "build" | "install"; readonly key: string }) =>
+	useAtomSet: (atom: { readonly kind: "build" | "install" | "save"; readonly key: string }) => {
+		const key = `${atom.kind}:${atom.key}`;
+		const current = state.commandSetters.get(key);
+		if (current !== undefined) return current;
+		const setter = vi.fn();
+		state.commandSetters.set(key, setter);
+		return setter;
+	},
+	useAtomValue: (atom: { readonly kind: "build" | "install" | "save"; readonly key: string }) =>
 		atom.kind === "build"
 			? state.buildResult
-			: (state.installResults.get(atom.key) ?? AsyncResult.initial()),
+			: atom.kind === "install"
+				? (state.installResults.get(atom.key) ?? AsyncResult.initial())
+				: AsyncResult.initial(),
 }));
 
 vi.mock("~/bridge/arkpack/editor/buildEditorProjectCommandAtom", () => ({
@@ -36,8 +48,8 @@ vi.mock("~/bridge/arkpack/editor/installBuiltEditorArkpackCommandAtom", () => ({
 
 vi.mock("~/bridge/arkpack/editor/saveBuiltEditorArkpackCommandAtom", () => ({
 	saveBuiltEditorArkpackCommandAtom: (contentHash: string) => ({
-		kind: "install",
-		key: `save:${contentHash}`,
+		kind: "save",
+		key: contentHash,
 	}),
 }));
 
@@ -87,19 +99,6 @@ import { EditorBuild } from "~/ui/arkpack/editor/EditorBuild";
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
-const createArtifact = (contentHash: string, revision: number) => ({
-	bytes: new Uint8Array([
-		1,
-		2,
-	]),
-	contentHash,
-	diagnostics: [],
-	filename: "editor-test.arkpack",
-	game: "0.5.0",
-	revision,
-	version: "1.0",
-});
-
 beforeEach(() => {
 	state.project = {
 		projectId: "editor-test",
@@ -112,6 +111,7 @@ beforeEach(() => {
 		version: "1.0",
 	};
 	state.buildResult = AsyncResult.initial();
+	state.commandSetters.clear();
 	state.installResults.clear();
 });
 
@@ -194,6 +194,24 @@ describe("EditorBuild", () => {
 		).toContain("Install");
 	});
 
+	it("sends the exact current artifact to both output actions", async () => {
+		const artifact = createArtifact("a".repeat(64), 0);
+		state.buildResult = AsyncResult.success(artifact);
+		const { container } = await renderBuild();
+
+		await act(async () => {
+			container.querySelector<HTMLElement>('[data-ui="EditorBuildSave"]')?.click();
+			container.querySelector<HTMLElement>('[data-ui="EditorBuildInstall"]')?.click();
+		});
+
+		expect(state.commandSetters.get(`save:${artifact.contentHash}`)).toHaveBeenCalledWith(
+			artifact,
+		);
+		expect(state.commandSetters.get(`install:${artifact.contentHash}`)).toHaveBeenCalledWith(
+			artifact,
+		);
+	});
+
 	it("renders actionable structured diagnostics instead of a code-only message", async () => {
 		state.project = {
 			...(state.project as Record<string, unknown>),
@@ -209,23 +227,7 @@ describe("EditorBuild", () => {
 		state.buildResult = AsyncResult.success({
 			...createArtifact("a".repeat(64), 0),
 			diagnostics: [
-				{
-					code: "input:capacity-unsupported",
-					severity: "error",
-					path: [
-						"items",
-						"producer:academy",
-						"lines",
-						0,
-						"inputs",
-						0,
-					],
-					message: "This input buffer is only supported by producer lines.",
-					ownerItemId: "producer:academy",
-					lineId: "line:academy:knowledge",
-					inputIndex: 0,
-					capacity: 2,
-				},
+				capacityDiagnostic,
 			],
 		});
 

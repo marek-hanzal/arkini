@@ -7,6 +7,7 @@ import {
 	itemDetailMotionTransition,
 } from "~/ui/item-detail/ItemDetailMotion";
 import { ItemLineRow } from "~/ui/item-detail/ItemLineRow";
+import type { ItemLineSummaryIdentityRenderer } from "~/ui/item-detail/ItemLineSummary";
 import {
 	type ItemLineAvailabilityFilter,
 	useItemLineSearch,
@@ -53,11 +54,14 @@ const ItemLinesEmptyState = ({
 
 /** Renders the authoritative visible product-line overview inside Item Detail. */
 export const ItemLinesTab = ({
+	definitionItemId,
 	disabled = false,
 	initialQuery,
 	lines,
+	renderIdentity,
 	stale = false,
 }: {
+	readonly definitionItemId?: string;
 	readonly disabled?: boolean;
 	readonly initialQuery?: string;
 	readonly lines: Extract<
@@ -66,6 +70,7 @@ export const ItemLinesTab = ({
 			readonly kind: "available";
 		}
 	>;
+	readonly renderIdentity?: ItemLineSummaryIdentityRenderer;
 	readonly stale?: boolean;
 }) => {
 	const {
@@ -215,9 +220,11 @@ export const ItemLinesTab = ({
 									<ItemLineRow
 										ref={(row) => registerRow(line.lineId, row)}
 										key={line.lineId}
+										definitionItemId={definitionItemId}
 										disabled={disabled}
 										line={line}
 										ownerItemId={lines.itemId}
+										renderIdentity={renderIdentity}
 										stale={stale}
 									/>
 								))}

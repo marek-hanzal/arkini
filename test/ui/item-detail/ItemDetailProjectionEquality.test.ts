@@ -63,6 +63,7 @@ const definition = {
 
 const identity = {
 	kind: "available",
+	definitionId: "target",
 	itemId: "runtime:target",
 	title: "Target",
 	sourceUrl: "resource:target",

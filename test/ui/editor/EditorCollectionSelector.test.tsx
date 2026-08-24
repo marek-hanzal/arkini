@@ -21,7 +21,7 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-const Harness = () => {
+const Harness = ({ initialSelectedIndex }: { readonly initialSelectedIndex?: number }) => {
 	const [items, setItems] = useState([
 		"First",
 		"Second",
@@ -31,6 +31,7 @@ const Harness = () => {
 		children: (index: number) => createElement("output", null, items[index]),
 		count: items.length,
 		itemLabel: (index) => items[index],
+		initialSelectedIndex,
 		label: "Entries",
 		onAdd: () =>
 			setItems((current) => [
@@ -43,12 +44,18 @@ const Harness = () => {
 	});
 };
 
-const mount = async () => {
+const mount = async (initialSelectedIndex?: number) => {
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
 	roots.push(root);
-	await act(async () => root.render(createElement(Harness)));
+	await act(async () =>
+		root.render(
+			createElement(Harness, {
+				initialSelectedIndex,
+			}),
+		),
+	);
 	return container;
 };
 
@@ -84,6 +91,14 @@ const select = async (container: HTMLElement, query: string) => {
 };
 
 describe("EditorCollectionSelector", () => {
+	it("opens on a requested collection item and still allows local selection", async () => {
+		const container = await mount(1);
+		expect(container.querySelector("output")?.textContent).toBe("Second");
+
+		await select(container, "First");
+		expect(container.querySelector("output")?.textContent).toBe("First");
+	});
+
 	it("selects one item while keeping sibling forms out of the DOM", async () => {
 		const container = await mount();
 		expect(container.querySelector("output")?.textContent).toBe("First");

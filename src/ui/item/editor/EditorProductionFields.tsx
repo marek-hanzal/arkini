@@ -22,8 +22,9 @@ export const EditorProductionFields = withFieldGroup({
 	props: {
 		kind: "producer" as "deposit" | "producer",
 		ownerId: "",
+		selectedLineId: undefined as string | undefined,
 	},
-	render: ({ group, kind, ownerId }) => (
+	render: ({ group, kind, ownerId, selectedLineId }) => (
 		<div className="grid gap-[var(--ak-viewport-gap)]">
 			<EditorFormCard>
 				<group.AppField name="maxQueueSize">
@@ -106,6 +107,10 @@ export const EditorProductionFields = withFieldGroup({
 									? line.id
 									: `${line.id} — ${line.title}`;
 							}}
+							initialSelectedIndex={Math.max(
+								0,
+								lines.findIndex((line) => line.id === selectedLineId),
+							)}
 							label={`${kind === "deposit" ? "Production" : "Product"} lines`}
 							navigationCard
 							onAdd={addLine}

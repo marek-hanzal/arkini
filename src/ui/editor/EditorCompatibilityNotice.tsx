@@ -10,27 +10,46 @@ export const EditorCompatibilityNotice = ({
 	readonly compatibility: EditorProjectCompatibility | undefined;
 	readonly version: EditorProjectDescriptor["version"];
 }) => {
-	if (compatibility === undefined || compatibility.level === "none") return null;
-	const next = RendererRuntime.runSync(bumpArkpackVersionFx(version, compatibility.level));
-	const breaking = compatibility.level === "major";
+	const level = compatibility?.level ?? "none";
+	const next = RendererRuntime.runSync(bumpArkpackVersionFx(version, level));
+	const presentation =
+		level === "major"
+			? {
+					className: "border-danger bg-danger/5",
+					description:
+						"Existing saves will start a new game after this change is published.",
+					title: "Breaking gameplay change",
+				}
+			: level === "minor"
+				? {
+						className: "border-success bg-success/5",
+						description: "Existing saves will continue without migration.",
+						title: "Save-compatible change",
+					}
+				: {
+						className: "border-line-strong bg-surface-raised/45",
+						description: "The current draft keeps the existing arkpack version.",
+						title: "No gameplay change",
+					};
 	return (
 		<aside
-			className={`rounded-xl border-l-2 p-4 text-sm ${breaking ? "border-danger bg-danger/5" : "border-success bg-success/5"}`}
+			className={`h-28 overflow-y-auto overscroll-contain rounded-xl border-l-2 p-4 text-sm ${presentation.className}`}
+			data-level={level}
 			data-ui="EditorCompatibilityNotice"
 		>
 			<p className="font-semibold">
-				{breaking ? "Breaking gameplay change" : "Save-compatible change"} · v{version} → v
-				{next}
+				{presentation.title} · v{version}
+				{level === "none" ? null : ` → v${next}`}
 			</p>
-			<p className="mt-1 text-muted">
-				{breaking
-					? "Existing saves will start a new game after this change is published."
-					: "Existing saves will continue without migration."}
-			</p>
+			<p className="mt-1 text-muted">{presentation.description}</p>
 			<ul className="mt-2 grid gap-1 text-xs text-muted">
-				{compatibility.reasons.map((item) => (
-					<li key={`${item.code}:${item.path.join(".")}`}>{item.message}</li>
-				))}
+				{level === "none" ? (
+					<li>Edit gameplay configuration to preview save compatibility.</li>
+				) : (
+					compatibility?.reasons.map((item) => (
+						<li key={`${item.code}:${item.path.join(".")}`}>{item.message}</li>
+					))
+				)}
 			</ul>
 		</aside>
 	);

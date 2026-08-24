@@ -61,6 +61,7 @@ vi.mock("~/ui/item/editor/EditorItemAutocompleteField", () => ({
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectForm } from "~/ui/project/editor/EditorProjectForm";
 import { EditorProjectGeneralSection } from "~/ui/project/editor/EditorProjectGeneralSection";
+import { EditorProjectInventorySection } from "~/ui/project/editor/EditorProjectInventorySection";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 (
@@ -115,9 +116,19 @@ describe("project section form session", () => {
 
 		await renderSection(<EditorProjectGeneralSection />);
 		const navigation = container.querySelector('[data-ui="EditorSectionNavigation"]');
+		const compatibility = container.querySelector<HTMLElement>(
+			'[data-ui="EditorCompatibilityNotice"]',
+		);
+		expect(compatibility?.dataset.level).toBe("none");
+		expect(compatibility?.className).toContain("h-28");
+		expect(compatibility?.className).toContain("overflow-y-auto");
 		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
 		if (title === null) throw new Error("Missing project title input.");
 		await changeInput(title, "Changed project");
+		expect(container.querySelector('[data-ui="EditorCompatibilityNotice"]')).toBe(
+			compatibility,
+		);
+		expect(compatibility?.dataset.level).toBe("minor");
 		await renderSection(<div data-ui="AppearanceSection">Appearance</div>);
 		await renderSection(<EditorProjectGeneralSection />);
 
@@ -125,5 +136,62 @@ describe("project section form session", () => {
 		expect(container.querySelector<HTMLInputElement>('input[name="title"]')?.value).toBe(
 			"Changed project",
 		);
+	});
+
+	it("reports an inventory shrink as a breaking draft change", async () => {
+		state.project = {
+			projectId: "project",
+			title: editorTestPayload.config.meta.title,
+			version: editorTestPayload.version,
+			createdAtMs: 1,
+			updatedAtMs: 2,
+			revision: 0,
+			config: {
+				...editorTestPayload.config,
+				meta: {
+					...editorTestPayload.config.meta,
+					inventory: {
+						width: 3,
+						height: 2,
+					},
+				},
+				start: {
+					...editorTestPayload.config.start,
+					inventory: [
+						{
+							itemId: "water",
+							position: {
+								x: 2,
+								y: 0,
+							},
+							quantity: 1,
+						},
+					],
+				},
+			},
+			resources: editorTestPayload.resources,
+		} satisfies EditorProject;
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				<EditorProjectForm>
+					<EditorProjectInventorySection />
+				</EditorProjectForm>,
+			);
+		});
+		const width = container.querySelector<HTMLInputElement>('input[name="inventory.width"]');
+		if (width === null) throw new Error("Missing inventory width input.");
+
+		await changeInput(width, "2");
+
+		const notice = container.querySelector<HTMLElement>(
+			'[data-ui="EditorCompatibilityNotice"]',
+		);
+		expect(notice?.textContent).toContain("Breaking gameplay change");
+		expect(notice?.dataset.level).toBe("major");
+		expect(notice?.textContent).toContain("inventory width shrank from 3 to 2");
 	});
 });

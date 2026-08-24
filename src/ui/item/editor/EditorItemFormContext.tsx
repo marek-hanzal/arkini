@@ -6,6 +6,7 @@ import type { EditorItemFormController } from "~/ui/item/editor/useEditorItemFor
 export type EditorItemFormSession = EditorItemFormController & {
 	readonly isNew: boolean;
 	readonly itemType?: EditorItemType;
+	readonly productionLineId?: string;
 };
 
 const EditorItemFormContext = createContext<EditorItemFormSession | undefined>(undefined);

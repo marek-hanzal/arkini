@@ -14,6 +14,7 @@ export const EditorItemProductionDetail = ({ item }: { readonly item: EditorItem
 			<div className="ak-list grid gap-3">
 				{lines.map((line) => (
 					<EditorProductionLineDetail
+						itemUid={item.uid}
 						key={line.id}
 						line={line}
 					/>

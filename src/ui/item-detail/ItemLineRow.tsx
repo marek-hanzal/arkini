@@ -12,7 +12,10 @@ import { itemDetailFadeMotion } from "~/ui/item-detail/ItemDetailMotion";
 import { ItemLineInputs, ItemLineUnavailableWithdrawals } from "~/ui/item-detail/ItemLineInputs";
 import { ItemLineOutputs } from "~/ui/item-detail/ItemLineOutputs";
 import { ItemLineRuntime } from "~/ui/item-detail/ItemLineRuntime";
-import { ItemLineSummary } from "~/ui/item-detail/ItemLineSummary";
+import {
+	ItemLineSummary,
+	type ItemLineSummaryIdentityRenderer,
+} from "~/ui/item-detail/ItemLineSummary";
 import { ItemReferenceButton } from "~/ui/item-detail/ItemReferenceButton";
 import type { ItemDetailPendingAction } from "~/ui/item-detail/ItemDetailControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
@@ -136,12 +139,17 @@ const ItemLineRuleHints = ({ hints }: { readonly hints: readonly string[] }) =>
 export const ItemLineRow = forwardRef<
 	HTMLElement,
 	{
+		readonly definitionItemId?: string;
 		readonly disabled: boolean;
 		readonly line: ItemDetailLines.Line;
 		readonly ownerItemId: string;
+		readonly renderIdentity?: ItemLineSummaryIdentityRenderer;
 		readonly stale?: boolean;
 	}
->(function ItemLineRow({ disabled, line, ownerItemId, stale = false }, ref) {
+>(function ItemLineRow(
+	{ definitionItemId, disabled, line, ownerItemId, renderIdentity, stale = false },
+	ref,
+) {
 	const itemDetail = useItemDetailControl();
 	const pendingKey = (action: ItemDetailPendingAction) =>
 		JSON.stringify([
@@ -281,7 +289,10 @@ export const ItemLineRow = forwardRef<
 			<div className="relative z-[1] flex flex-wrap items-start justify-between gap-4">
 				<div className="min-w-0 flex-1">
 					<ItemLineSummary
+						disabled={disabled}
+						itemId={definitionItemId}
 						line={line}
+						renderIdentity={renderIdentity}
 						stale={stale}
 					/>
 					{stale ? null : <ItemLineRuleHints hints={activeRuleHints} />}

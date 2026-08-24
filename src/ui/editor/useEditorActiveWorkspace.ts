@@ -37,18 +37,18 @@ export const EditorWorkspaceRoutes = [
 		to: "/editor/$projectId/flow",
 	},
 	{
-		id: "build",
-		icon: "icon-[lucide--package-check]",
-		label: "Build",
-		matchTo: "/editor/$projectId/build",
-		to: "/editor/$projectId/build",
-	},
-	{
 		id: "board",
 		icon: "icon-[lucide--layout-grid]",
 		label: "Board",
 		matchTo: "/editor/$projectId/board",
 		to: "/editor/$projectId/board",
+	},
+	{
+		id: "build",
+		icon: "icon-[lucide--package-check]",
+		label: "Build",
+		matchTo: "/editor/$projectId/build",
+		to: "/editor/$projectId/build",
 	},
 ] as const;
 

@@ -1,15 +1,31 @@
 import { AnimatePresence, motion } from "motion/react";
+import type { ComponentType, ReactNode } from "react";
 
 import { JobStatusEnumSchema } from "~/bridge/job/JobStatusEnumSchema";
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
 import { itemDetailBadgeMotion, itemDetailFadeMotion } from "~/ui/item-detail/ItemDetailMotion";
 
+export interface ItemLineSummaryIdentityRenderProps {
+	readonly children: ReactNode;
+	readonly disabled: boolean;
+	readonly itemId: string;
+	readonly lineId: string;
+}
+
+export type ItemLineSummaryIdentityRenderer = ComponentType<ItemLineSummaryIdentityRenderProps>;
+
 /** Renders one line's identity, default marker, and description. */
 export const ItemLineSummary = ({
+	disabled = false,
+	itemId,
 	line,
+	renderIdentity,
 	stale = false,
 }: {
+	readonly disabled?: boolean;
+	readonly itemId?: string;
 	readonly line: ItemDetailLines.Line;
+	readonly renderIdentity?: ItemLineSummaryIdentityRenderer;
 	readonly stale?: boolean;
 }) => {
 	const status =
@@ -25,7 +41,7 @@ export const ItemLineSummary = ({
 					}
 				: undefined;
 
-	return (
+	const identity = (
 		<div className="min-w-0 flex-1">
 			<div className="flex flex-wrap items-center gap-2">
 				<h3 className="text-lg font-semibold leading-tight text-foreground">
@@ -66,5 +82,17 @@ export const ItemLineSummary = ({
 				{line.description}
 			</motion.p>
 		</div>
+	);
+	const IdentityRenderer = renderIdentity;
+	return IdentityRenderer === undefined || itemId === undefined ? (
+		identity
+	) : (
+		<IdentityRenderer
+			disabled={disabled}
+			itemId={itemId}
+			lineId={line.lineId}
+		>
+			{identity}
+		</IdentityRenderer>
 	);
 };

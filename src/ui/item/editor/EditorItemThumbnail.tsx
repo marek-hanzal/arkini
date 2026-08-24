@@ -47,7 +47,10 @@ export const EditorItemSearchThumbnail = ({
 	item === undefined ? null : selected ? (
 		<EditorItemSelectedThumbnail resourceIds={item.asset.default} />
 	) : (
-		<EditorItemThumbnail resourceIds={item.asset.default} />
+		<EditorItemThumbnail
+			resourceIds={item.asset.default}
+			size="sm"
+		/>
 	);
 
 /** Renders the complete default item composition from back to front. */

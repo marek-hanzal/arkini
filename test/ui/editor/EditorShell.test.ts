@@ -236,6 +236,21 @@ const readLink = (container: HTMLElement, label: string) => {
 };
 
 describe("EditorShell", () => {
+	it("orders gameplay testing before the final build step", async () => {
+		const router = createTestRouter({
+			initialEntry: "/editor/editor-test/board",
+		});
+		const container = await renderRouter(router);
+		const workspaces = Array.from(
+			container.querySelectorAll<HTMLElement>("[data-workspace-id]"),
+		).map(({ dataset }) => dataset.workspaceId);
+
+		expect(workspaces.slice(-2)).toEqual([
+			"board",
+			"build",
+		]);
+	});
+
 	it("marks the all-item estimate workspace as active", async () => {
 		const router = createTestRouter({
 			initialEntry: "/editor/editor-test/estimate",

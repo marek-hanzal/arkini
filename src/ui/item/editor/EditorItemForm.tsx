@@ -16,6 +16,7 @@ export namespace EditorItemForm {
 	export interface Props extends PropsWithChildren {
 		readonly enableCapability?: EditorItemOptionalCapability;
 		readonly itemType?: EditorItemType;
+		readonly productionLineId?: string;
 		readonly sectionId?: EditorItemSectionId;
 		readonly uid: string;
 	}
@@ -26,6 +27,7 @@ export const EditorItemForm = ({
 	children,
 	enableCapability,
 	itemType,
+	productionLineId,
 	sectionId = "identity",
 	uid,
 }: EditorItemForm.Props) => {
@@ -47,6 +49,7 @@ export const EditorItemForm = ({
 			initialItem={initialItem}
 			isNew={isNew}
 			itemType={itemType}
+			productionLineId={productionLineId}
 			sectionId={sectionId}
 		>
 			{children}

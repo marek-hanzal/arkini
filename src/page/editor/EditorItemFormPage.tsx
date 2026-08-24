@@ -6,14 +6,19 @@ export const EditorItemFormPage = ({
 	children,
 	enableCapability,
 	itemType,
+	productionLineId,
 	sectionId,
 	uid,
 }: PropsWithChildren<
-	Pick<EditorItemForm.Props, "enableCapability" | "itemType" | "sectionId" | "uid">
+	Pick<
+		EditorItemForm.Props,
+		"enableCapability" | "itemType" | "productionLineId" | "sectionId" | "uid"
+	>
 >) => (
 	<EditorItemForm
 		enableCapability={enableCapability}
 		itemType={itemType}
+		productionLineId={productionLineId}
 		sectionId={sectionId}
 		uid={uid}
 	>

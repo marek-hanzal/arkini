@@ -5,6 +5,8 @@ import { usePackageGameEngine } from "~/bridge/game/usePackageGameEngine";
 import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
 import { ItemDetailHigherOwnerGuard } from "~/ui/item-detail/ItemDetailHigherOwnerGuard";
+import type { ItemDetailHeaderIdentityRenderer } from "~/ui/item-detail/ItemDetailHeader";
+import type { ItemLineSummaryIdentityRenderer } from "~/ui/item-detail/ItemLineSummary";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { gameBoardViewTransitionName } from "~/ui/navigation/gameBoardViewTransitionName";
@@ -60,10 +62,14 @@ const GameTileScene = ({
 const GameShellLayers = ({
 	children,
 	game,
+	itemDetailIdentityRenderer,
+	itemDetailLineIdentityRenderer,
 	menu,
 	routePresentation,
 }: PropsWithChildren<{
 	readonly game: ReturnType<typeof useGameEngine>;
+	readonly itemDetailIdentityRenderer?: ItemDetailHeaderIdentityRenderer;
+	readonly itemDetailLineIdentityRenderer?: ItemLineSummaryIdentityRenderer;
 	readonly menu?: ReactNode;
 	readonly routePresentation: GameShellRoutePresentation;
 }>) => {
@@ -73,7 +79,10 @@ const GameShellLayers = ({
 				<PixiGameProvider>
 					<ItemDetailHigherOwnerGuard />
 					<GameTileScene routePresentation={routePresentation}>{children}</GameTileScene>
-					<ItemDetailModal />
+					<ItemDetailModal
+						renderIdentity={itemDetailIdentityRenderer}
+						renderLineIdentity={itemDetailLineIdentityRenderer}
+					/>
 				</PixiGameProvider>
 			</ItemDetailProvider>
 			{menu}
@@ -95,10 +104,14 @@ const GameShellLayers = ({
  */
 export const PlayableGameShell = ({
 	children,
+	itemDetailIdentityRenderer,
+	itemDetailLineIdentityRenderer,
 	menu,
 	routePresentation,
 }: PropsWithChildren<{
 	readonly menu?: ReactNode;
+	readonly itemDetailIdentityRenderer?: ItemDetailHeaderIdentityRenderer;
+	readonly itemDetailLineIdentityRenderer?: ItemLineSummaryIdentityRenderer;
 	readonly routePresentation: GameShellRoutePresentation;
 }>) => {
 	const game = useGameEngine();
@@ -112,6 +125,8 @@ export const PlayableGameShell = ({
 			<GameMenuProvider keyboardEnabled={menu !== undefined}>
 				<GameShellLayers
 					game={game}
+					itemDetailIdentityRenderer={itemDetailIdentityRenderer}
+					itemDetailLineIdentityRenderer={itemDetailLineIdentityRenderer}
 					menu={menu}
 					routePresentation={routePresentation}
 				>

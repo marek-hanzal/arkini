@@ -13,10 +13,9 @@ const runtimeLabel = (estimate: EditorItemEstimateIndexEntry) => {
 	return duration;
 };
 
-const formatDemand = (demand: number) =>
-	Number.isInteger(demand)
-		? String(demand)
-		: demand.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+const demandFormatter = new Intl.NumberFormat("en-US", {
+	maximumFractionDigits: 2,
+});
 
 const demandRatioLabel = (demand: number, maximumDemand: number) => {
 	const percentage = maximumDemand <= 0 ? 0 : (demand / maximumDemand) * 100;
@@ -66,7 +65,7 @@ export const EditorItemEstimateListRow = ({
 				<div className="flex items-baseline justify-end gap-1.5">
 					<dt className="text-muted">Demand:</dt>
 					<dd className="font-semibold text-foreground">
-						{formatDemand(estimate.demand)} (
+						{demandFormatter.format(estimate.demand)} (
 						{demandRatioLabel(estimate.demand, maximumDemand)})
 					</dd>
 				</div>

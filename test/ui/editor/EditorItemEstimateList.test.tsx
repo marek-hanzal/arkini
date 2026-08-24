@@ -84,7 +84,7 @@ beforeEach(() => {
 				status: "complete",
 			},
 			{
-				demand: 100,
+				demand: 64_429.17,
 				itemId: "water",
 				method: "static",
 				runtimeMs: 0,
@@ -168,7 +168,7 @@ describe("EditorItemEstimateList", () => {
 		expect(container.textContent).toContain("Partial");
 		expect(container.textContent).toContain("Estimate:");
 		expect(container.textContent).toContain("Demand:");
-		expect(container.textContent).toContain("100 (100%)");
+		expect(container.textContent).toContain("64,429.17 (100%)");
 		expect(container.textContent).toContain("0.05 (negligible)");
 		expect(container.querySelector('[data-ui="EditorItemThumbnail"]')).not.toBeNull();
 		expect(container.querySelector('[aria-label^="Filter items by"]')).toBeNull();

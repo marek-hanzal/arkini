@@ -9,6 +9,8 @@ import { GameEngineProvider } from "~/bridge/game/GameEngineProvider";
 import { PlayableBoard } from "~/ui/game/PlayableBoard";
 import { PlayableGameRoute } from "~/ui/game/PlayableGameRoute";
 import { PlayableInventory } from "~/ui/game/PlayableInventory";
+import { EditorBoardItemDetailLink } from "~/ui/board/editor/EditorBoardItemDetailLink";
+import { EditorBoardProductionLineLink } from "~/ui/board/editor/EditorBoardProductionLineLink";
 import { PlayableGameShell } from "~/ui/shell/GameShell";
 
 type EditorGameResource = GameEngineResource<EditorBoardGame>;
@@ -50,7 +52,11 @@ const EditorBoardReady = ({ resource }: { readonly resource: EditorGameResource 
 	return (
 		<GameEngineProvider game={resource.game}>
 			<PlayableGameRoute>
-				<PlayableGameShell routePresentation="embedded">
+				<PlayableGameShell
+					itemDetailIdentityRenderer={EditorBoardItemDetailLink}
+					itemDetailLineIdentityRenderer={EditorBoardProductionLineLink}
+					routePresentation="embedded"
+				>
 					{leaf === "board" ? (
 						<PlayableBoard onOpenInventory={() => setLeaf("inventory")} />
 					) : (

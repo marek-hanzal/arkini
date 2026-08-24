@@ -9,6 +9,7 @@ type EditorItemOptionalCapability = "charges" | "merges";
 interface EditorItemFormSearch {
 	readonly enable?: EditorItemOptionalCapability;
 	readonly itemType?: EditorItemType;
+	readonly lineId?: string;
 }
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/form")({
@@ -23,13 +24,18 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 			: {
 					itemType: EditorItemTypeSchema.parse(search.itemType),
 				}),
+		...(typeof search.lineId === "string" && search.lineId.length > 0
+			? {
+					lineId: search.lineId,
+				}
+			: {}),
 	}),
 	component: EditorItemFormRoute,
 });
 
 function EditorItemFormRoute() {
 	const { itemUid } = Route.useParams();
-	const { enable, itemType } = Route.useSearch();
+	const { enable, itemType, lineId } = Route.useSearch();
 	const params = useParams({
 		strict: false,
 	});
@@ -40,6 +46,7 @@ function EditorItemFormRoute() {
 		<EditorItemFormPage
 			enableCapability={enable}
 			itemType={itemType}
+			productionLineId={lineId}
 			sectionId={sectionId}
 			uid={itemUid}
 		>

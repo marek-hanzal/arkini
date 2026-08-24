@@ -8,7 +8,7 @@ import { EditorOptionalOutputControl } from "~/ui/item/editor/EditorOptionalOutp
 import { EditorProductionFields } from "~/ui/item/editor/EditorProductionFields";
 
 export const EditorItemProductionSection = () => {
-	const { canonicalItem, form, itemId } = useEditorItemFormSession();
+	const { canonicalItem, form, itemId, productionLineId } = useEditorItemFormSession();
 	const content = match(canonicalItem)
 		.with(
 			{
@@ -23,6 +23,7 @@ export const EditorItemProductionSection = () => {
 					}}
 					kind="deposit"
 					ownerId={itemId}
+					selectedLineId={productionLineId}
 				/>
 			),
 		)
@@ -39,6 +40,7 @@ export const EditorItemProductionSection = () => {
 					}}
 					kind="producer"
 					ownerId={itemId}
+					selectedLineId={productionLineId}
 				/>
 			),
 		)

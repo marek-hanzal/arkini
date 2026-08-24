@@ -13,6 +13,7 @@ export namespace readItemDetailIdentityFx {
 	export type Result =
 		| {
 				readonly kind: "available";
+				readonly definitionId: IdSchema.Type;
 				readonly itemId: IdSchema.Type;
 				readonly title: string;
 				readonly sourceResourceIds: readonly [
@@ -38,6 +39,7 @@ export const readItemDetailIdentityFx = Effect.fn("readItemDetailIdentityFx")(fu
 	if (item === undefined) return unavailable;
 	return {
 		kind: "available" as const,
+		definitionId: item.item.id,
 		itemId: item.id,
 		title: item.item.title,
 		sourceResourceIds: yield* readRuntimeItemDefaultAssetIdsFx({

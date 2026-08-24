@@ -11,7 +11,9 @@ import { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
 import type { ItemDetailControl } from "~/ui/item-detail/ItemDetailControl";
+import type { ItemDetailHeaderIdentityRenderer } from "~/ui/item-detail/ItemDetailHeader";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
+import type { ItemLineSummaryIdentityRenderer } from "~/ui/item-detail/ItemLineSummary";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
@@ -263,7 +265,10 @@ afterEach(async () => {
 	vi.restoreAllMocks();
 });
 
-export const renderItemDetail = async () => {
+export const renderItemDetail = async (
+	renderIdentity?: ItemDetailHeaderIdentityRenderer,
+	renderLineIdentity?: ItemLineSummaryIdentityRenderer,
+) => {
 	let control: ItemDetailControl | undefined;
 	const container = document.createElement("div");
 	document.body.append(container);
@@ -281,7 +286,10 @@ export const renderItemDetail = async () => {
 						control = next;
 					},
 				}),
-				createElement(ItemDetailModal),
+				createElement(ItemDetailModal, {
+					renderIdentity,
+					renderLineIdentity,
+				}),
 			),
 		);
 	});

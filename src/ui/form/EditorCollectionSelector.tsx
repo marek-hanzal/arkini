@@ -15,6 +15,7 @@ export interface EditorCollectionSelectorProps {
 	readonly count: number;
 	readonly dataUi?: string;
 	readonly itemLabel: (index: number) => string;
+	readonly initialSelectedIndex?: number;
 	readonly label: string;
 	readonly navigationCard?: boolean;
 	readonly navigationHeader?: ReactNode;
@@ -33,6 +34,7 @@ export const EditorCollectionSelector = ({
 	count,
 	dataUi = "EditorCollectionSelector",
 	itemLabel,
+	initialSelectedIndex = 0,
 	label,
 	navigationCard = false,
 	navigationHeader,
@@ -42,7 +44,7 @@ export const EditorCollectionSelector = ({
 	removeLabel = "Remove item",
 	selectedIndex,
 }: EditorCollectionSelectorProps) => {
-	const [internalSelectedIndex, setInternalSelectedIndex] = useState(0);
+	const [internalSelectedIndex, setInternalSelectedIndex] = useState(initialSelectedIndex);
 	const requestedIndex = selectedIndex ?? internalSelectedIndex;
 	const selectIndex = (index: number) => {
 		setInternalSelectedIndex(index);

@@ -11,6 +11,7 @@ export namespace useItemDetailIdentity {
 	export type Projection =
 		| {
 				readonly kind: "available";
+				readonly definitionId: IdSchema.Type;
 				readonly itemId: IdSchema.Type;
 				readonly title: string;
 				readonly sourceUrl: string;
@@ -39,6 +40,7 @@ export const useItemDetailIdentity = (itemId: IdSchema.Type): useItemDetailIdent
 			if (identity.kind === "unavailable") return unavailable;
 			return {
 				kind: "available",
+				definitionId: identity.definitionId,
 				itemId: identity.itemId,
 				title: identity.title,
 				sourceUrl: game.getResourceUrl(identity.sourceResourceIds[0]),

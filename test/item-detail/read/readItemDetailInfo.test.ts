@@ -51,6 +51,7 @@ describe("tile identity and Info projections", () => {
 			),
 		).toMatchObject({
 			kind: "available",
+			definitionId: "workshop",
 			itemId: owner.id,
 			title: "workshop",
 			sourceResourceIds: [

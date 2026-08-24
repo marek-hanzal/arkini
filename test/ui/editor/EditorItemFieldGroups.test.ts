@@ -122,6 +122,7 @@ const ProductionHarness = () => {
 			},
 			kind: "deposit",
 			ownerId: values.id,
+			selectedLineId: undefined,
 		});
 	return createElement(
 		Fragment,

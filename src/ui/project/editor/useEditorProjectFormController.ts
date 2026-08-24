@@ -5,6 +5,7 @@ import { useCallback, useMemo, useRef } from "react";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { createEditorProjectConfigFx } from "~/bridge/project/editor/createEditorProjectConfigFx";
 import { createEditorProjectFormSchemaFx } from "~/bridge/project/editor/createEditorProjectFormSchemaFx";
+import { analyzeEditorProjectStructuralCompatibilityFx } from "~/bridge/project/editor/analyzeEditorProjectStructuralCompatibilityFx";
 import { readEditorProjectFormValuesFx } from "~/bridge/project/editor/readEditorProjectFormValuesFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { saveEditorProjectConfigCommandAtom } from "~/bridge/project/editor/saveEditorProjectConfigCommandAtom";
@@ -64,7 +65,10 @@ export const useEditorProjectFormController = ({
 	const compatibility = useMemo(() => {
 		if (!dirty) return undefined;
 		const parsed = schema.safeParse(values);
-		if (!parsed.success) return undefined;
+		if (!parsed.success)
+			return RendererRuntime.runSync(
+				analyzeEditorProjectStructuralCompatibilityFx(project, values),
+			);
 		const config = RendererRuntime.runSync(createEditorProjectConfigFx(project, parsed.data));
 		return RendererRuntime.runSync(analyzeEditorProjectCompatibilityFx(project.config, config));
 	}, [

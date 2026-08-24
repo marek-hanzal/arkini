@@ -25,12 +25,14 @@ export const EditorItemFormSession = ({
 	initialItem,
 	isNew,
 	itemType,
+	productionLineId,
 	sectionId,
 }: PropsWithChildren<{
 	readonly enableCapability?: EditorItemOptionalCapability;
 	readonly initialItem: EditorItem;
 	readonly isNew: boolean;
 	readonly itemType?: EditorItemType;
+	readonly productionLineId?: string;
 	readonly sectionId: EditorItemSectionId;
 }>) => {
 	const navigate = useNavigate();
@@ -78,11 +80,13 @@ export const EditorItemFormSession = ({
 			...controller,
 			isNew,
 			itemType,
+			productionLineId,
 		}),
 		[
 			controller,
 			isNew,
 			itemType,
+			productionLineId,
 		],
 	);
 	const sections = RendererRuntime.runSync(readEditorItemFormSectionsFx(initialItem));

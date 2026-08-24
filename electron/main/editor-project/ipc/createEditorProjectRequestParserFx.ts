@@ -9,6 +9,8 @@ import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 
+import { parseEditorProjectIpcRequestFx } from "./parseEditorProjectIpcRequestFx";
+
 const createProjectSchema = z
 	.object({
 		projectId: IdSchema,
@@ -46,20 +48,6 @@ const upsertResourcesSchema = z
 	})
 	.strict();
 
-const parse = <Value>(
-	operation: EditorProjectRepositoryError["operation"],
-	schema: z.ZodType<Value>,
-	candidate: unknown,
-): Value => {
-	const result = schema.safeParse(candidate);
-	if (result.success) return result.data;
-	throw new EditorProjectRepositoryError({
-		operation,
-		message: "The editor IPC request is invalid.",
-		cause: result.error,
-	});
-};
-
 /** Creates the feature-owned validator capability used by the Electron IPC adapter. */
 export const createEditorProjectRequestParserFx = Effect.fn("createEditorProjectRequestParserFx")(
 	() =>
@@ -69,55 +57,38 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 			): Effect.Effect<
 				EditorProjectRepository.CreateProjectProps,
 				EditorProjectRepositoryError
-			> =>
-				Effect.try({
-					try: () => parse("create-project", createProjectSchema, candidate),
-					catch: (error) => error as EditorProjectRepositoryError,
-				}),
+			> => parseEditorProjectIpcRequestFx("create-project", createProjectSchema, candidate),
 			parseProjectIdFx: (candidate: unknown) =>
-				Effect.try({
-					try: () => parse("read-project", IdSchema, candidate),
-					catch: (error) => error as EditorProjectRepositoryError,
-				}),
+				parseEditorProjectIpcRequestFx("read-project", IdSchema, candidate),
 			parseReplaceConfigFx: (
 				candidate: unknown,
 			): Effect.Effect<
 				EditorProjectRepository.ReplaceConfigProps,
 				EditorProjectRepositoryError
-			> =>
-				Effect.try({
-					try: () => parse("replace-config", replaceConfigSchema, candidate),
-					catch: (error) => error as EditorProjectRepositoryError,
-				}),
+			> => parseEditorProjectIpcRequestFx("replace-config", replaceConfigSchema, candidate),
 			parseReplaceResourceFx: (
 				candidate: unknown,
 			): Effect.Effect<
 				EditorProjectRepository.ReplaceResourceProps,
 				EditorProjectRepositoryError
 			> =>
-				Effect.try({
-					try: () => parse("replace-resource", replaceResourceSchema, candidate),
-					catch: (error) => error as EditorProjectRepositoryError,
-				}),
+				parseEditorProjectIpcRequestFx(
+					"replace-resource",
+					replaceResourceSchema,
+					candidate,
+				),
 			parseUpsertItemFx: (
 				candidate: unknown,
 			): Effect.Effect<
 				EditorProjectRepository.UpsertItemProps,
 				EditorProjectRepositoryError
-			> =>
-				Effect.try({
-					try: () => parse("upsert-item", upsertItemSchema, candidate),
-					catch: (error) => error as EditorProjectRepositoryError,
-				}),
+			> => parseEditorProjectIpcRequestFx("upsert-item", upsertItemSchema, candidate),
 			parseUpsertResourcesFx: (
 				candidate: unknown,
 			): Effect.Effect<
 				EditorProjectRepository.UpsertResourcesProps,
 				EditorProjectRepositoryError
 			> =>
-				Effect.try({
-					try: () => parse("upsert-resource", upsertResourcesSchema, candidate),
-					catch: (error) => error as EditorProjectRepositoryError,
-				}),
+				parseEditorProjectIpcRequestFx("upsert-resource", upsertResourcesSchema, candidate),
 		} as const),
 );

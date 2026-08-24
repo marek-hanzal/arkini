@@ -6,6 +6,8 @@ import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryEr
 import { EditorBoardScenarioNameSchema } from "~/editor/board/EditorBoardScenarioSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 
+import { parseEditorProjectIpcRequestFx } from "./parseEditorProjectIpcRequestFx";
+
 const boardScenarioKeySchema = z
 	.object({
 		projectId: IdSchema,
@@ -19,53 +21,39 @@ const writeBoardScenarioSchema = boardScenarioKeySchema
 	})
 	.strict();
 
-const parse = <Value>(
-	operation: EditorProjectRepositoryError["operation"],
-	schema: z.ZodType<Value>,
-	candidate: unknown,
-): Value => {
-	const result = schema.safeParse(candidate);
-	if (result.success) return result.data;
-	throw new EditorProjectRepositoryError({
-		operation,
-		message: "The editor IPC request is invalid.",
-		cause: result.error,
-	});
-};
-
 /** Creates the validator capability for Board-scenario IPC requests. */
 export const createEditorBoardScenarioRequestParserFx = Effect.fn(
 	"createEditorBoardScenarioRequestParserFx",
 )(() =>
 	Effect.succeed({
 		parseProjectIdFx: (candidate: unknown) =>
-			Effect.try({
-				try: () => parse("list-board-scenarios", IdSchema, candidate),
-				catch: (error) => error as EditorProjectRepositoryError,
-			}),
+			parseEditorProjectIpcRequestFx("list-board-scenarios", IdSchema, candidate),
 		parseReadKeyFx: (
 			candidate: unknown,
 		): Effect.Effect<EditorProjectRepository.BoardScenarioKey, EditorProjectRepositoryError> =>
-			Effect.try({
-				try: () => parse("read-board-scenario", boardScenarioKeySchema, candidate),
-				catch: (error) => error as EditorProjectRepositoryError,
-			}),
+			parseEditorProjectIpcRequestFx(
+				"read-board-scenario",
+				boardScenarioKeySchema,
+				candidate,
+			),
 		parseDeleteKeyFx: (
 			candidate: unknown,
 		): Effect.Effect<EditorProjectRepository.BoardScenarioKey, EditorProjectRepositoryError> =>
-			Effect.try({
-				try: () => parse("delete-board-scenario", boardScenarioKeySchema, candidate),
-				catch: (error) => error as EditorProjectRepositoryError,
-			}),
+			parseEditorProjectIpcRequestFx(
+				"delete-board-scenario",
+				boardScenarioKeySchema,
+				candidate,
+			),
 		parseWriteFx: (
 			candidate: unknown,
 		): Effect.Effect<
 			EditorProjectRepository.WriteBoardScenarioProps,
 			EditorProjectRepositoryError
 		> =>
-			Effect.try({
-				try: () => parse("write-board-scenario", writeBoardScenarioSchema, candidate),
-				catch: (error) => error as EditorProjectRepositoryError,
-			}),
+			parseEditorProjectIpcRequestFx(
+				"write-board-scenario",
+				writeBoardScenarioSchema,
+				candidate,
+			),
 	} as const),
 );

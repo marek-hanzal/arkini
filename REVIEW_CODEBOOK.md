@@ -119,7 +119,9 @@ src/@routes
 - Reusable presentation and transient interaction belong in `src/ui`.
 - `src/bridge` is the only React-to-engine boundary.
 - Renderer code does not import Electron.
-- `electron/` does not import renderer or engine roots.
+- `electron/main` may compose public editor and engine domains, but never imports renderer modules or engine internals.
+- Electron support modules outside main stay platform-owned; `electron/preload` reaches application types only through `electron/contract`.
+- editor and engine domains never import Electron; Node APIs stay confined to explicit physical capability, packing, and CLI modules.
 - `src/_archive` is historical reference only and may never be imported by active code or tests.
 
 ### 4.2 One authoritative game truth

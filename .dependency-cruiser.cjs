@@ -65,21 +65,6 @@ const boundaryRules = [
 		},
 	},
 	{
-		name: "server-no-presentation-or-electron-imports",
-		comment:
-			"The local server owns editor persistence and MCP capabilities without depending on renderer or Electron runtime adapters.",
-		severity: "error",
-		from: {
-			path: "^server(?:/|$)",
-		},
-		to: {
-			path: "^src/(?:bridge|ui|page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$|^electron(?:/|$)|^node_modules/electron(?:/|$)",
-			pathNot: [
-				"^electron/contract(?:/|$)",
-			],
-		},
-	},
-	{
 		name: "bridge-no-presentation-imports",
 		comment:
 			"Bridge domains connect UI to public engine contracts and never depend on reusable UI, pages, routes, or renderer entrypoints.",
@@ -188,7 +173,7 @@ const boundaryRules = [
 			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?)(?:/|$)",
 		},
 		to: {
-			path: "^(?:server(?:/|$)|electron(?:/|$)|node_modules/electron(?:/|$))",
+			path: "^(?:electron(?:/|$)|node_modules/electron(?:/|$))",
 			pathNot: [
 				"^electron/contract(?:/|$)",
 			],
@@ -207,15 +192,57 @@ const boundaryRules = [
 		},
 	},
 	{
-		name: "electron-platform-no-renderer-imports",
+		name: "electron-main-no-renderer-imports",
 		comment:
-			"Electron main/preload are thin platform adapters and never import engine, bridge, React UI, pages, routes, or renderer entrypoints.",
+			"Electron main is the application backend and composition root: it may consume public editor and engine modules, but never renderer bridges, presentation, pages, routes, or renderer entrypoints.",
+		severity: "error",
+		from: {
+			path: "^electron/main(?:/|$)",
+		},
+		to: {
+			path: "^src/(?:bridge|ui|page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
+		},
+	},
+	{
+		name: "electron-main-only-imports-public-engine-modules",
+		comment:
+			"Electron main may compose public engine capabilities but never reach through a domain's internal implementation boundary.",
+		severity: "error",
+		from: {
+			path: "^electron/main(?:/|$)",
+		},
+		to: {
+			path: "^src/engine/.+/internal(?:/|$)",
+		},
+	},
+	{
+		name: "electron-support-no-application-imports",
+		comment:
+			"Electron support modules outside main and the pure contract stay platform-owned and never reach into application domains.",
 		severity: "error",
 		from: {
 			path: "^electron(?:/|$)",
+			pathNot: [
+				"^electron/(?:contract|main)(?:/|$)",
+			],
 		},
 		to: {
-			path: "^src/(?:engine|bridge|ui|page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
+			path: "^src(?:/|$)|^electron/main(?:/|$)",
+		},
+	},
+	{
+		name: "electron-preload-is-transport-only",
+		comment:
+			"Electron preload exposes the pure transport contract and never reaches into application, backend, or renderer domains.",
+		severity: "error",
+		from: {
+			path: "^electron/preload(?:/|$)",
+		},
+		to: {
+			path: "^(?:src|electron)(?:/|$)",
+			pathNot: [
+				"^electron/(?:contract|preload)(?:/|$)",
+			],
 		},
 	},
 	{

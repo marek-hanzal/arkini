@@ -2,13 +2,13 @@
 
 This document is the canonical technical architecture. It describes the implemented engine, not an aspirational rewrite.
 
-Engine paths are relative to `src/engine` unless written explicitly. `src/bridge` is the only legal connection from React to public engine contracts and mirrors concrete domains as `bridge/<domain>/<operation>`. Reusable presentation and transient interaction code lives under `src/ui`; route-level visual composition lives under `src/page`; TanStack Router registration and route lifecycle orchestration live under `src/@routes`. Renderer dependencies form the DAG `@routes → {page, ui, bridge}`, `page → ui`, `ui → bridge`, and `bridge → engine`; routes may call public bridge Effects but never import the engine directly. `electron/` owns the complete Electron platform: its pure transport contract, security policy, main/preload adapters, protocol, and build verification. Renderer bridge domains may import `electron/contract`; no renderer code imports Electron runtime modules or the Electron package.
+Engine paths are relative to `src/engine` unless written explicitly. `src/bridge` is the only legal connection from React to public engine contracts and mirrors concrete domains as `bridge/<domain>/<operation>`. Reusable presentation and transient interaction code lives under `src/ui`; route-level visual composition lives under `src/page`; TanStack Router registration and route lifecycle orchestration live under `src/@routes`. Renderer dependencies form the DAG `@routes → {page, ui, bridge}`, `page → ui`, `ui → bridge`, and `bridge → engine`; routes may call public bridge Effects but never import the engine directly. `electron/main` is the physical backend process and composition root for feature-owned persistence, MCP, IPC, protocol, and public editor/engine capabilities. It never imports renderer modules or engine internals. `electron/preload` remains a transport-only adapter over `electron/contract`. Renderer bridge domains may import only that pure contract; editor and engine domains never import Electron runtime modules or the Electron package.
 
 Enforcement is deliberately split by contract: Dependency Cruiser owns stable import boundaries; focused tests own runtime, lifecycle, security, persistence, UI, compiler, CLI, and packaging behavior; generated-output tests inspect real renderer/release artifacts; TypeScript and Zod own type/schema validity. Project grammar such as same-name `*Fx`, object + factory composition, one `IdSchema`, and semantic token usage lives in `CODE_GUIDE.md` plus review. The repository does not maintain source-text recurrence tests or a custom AST style policy system.
 
 ## 0. Electron host boundary
 
-Electron is a thin sibling platform adapter, not another application or another game owner.
+Electron main is Arkini's backend process and composition root, not another application or another game owner. Its boundary code owns physical capabilities and delegates product decisions to public editor and engine domains.
 
 ## Effect runtime roots
 

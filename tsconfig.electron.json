@@ -24,7 +24,6 @@
 	},
 	"include": [
 		"electron",
-		"server",
 		"src/editor",
 		"electron.vite.config.ts"
 	]

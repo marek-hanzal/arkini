@@ -15,12 +15,12 @@ import { createDiagnosticLogFx } from "./diagnostics/createDiagnosticLogFx";
 import { createFilesystemWindowPreferencesFx } from "./window/createFilesystemWindowPreferencesFx";
 import { createWindowModeControllerOwnershipFx } from "./window/createWindowModeControllerOwnershipFx";
 import { createArkiniUserDataPathsFx } from "./user-data/createArkiniUserDataPathsFx";
-import { createSqliteEditorProjectRepositoryFx } from "../../server/editor/createSqliteEditorProjectRepositoryFx";
-import type { EditorProjectServiceOwnership } from "../../server/editor/EditorProjectServiceOwnership";
-import { registerEditorProjectIpcFx } from "./editor/registerEditorProjectIpcFx";
-import { createFilesystemEditorMcpPreferencesFx } from "./editor-mcp/createFilesystemEditorMcpPreferencesFx";
-import { registerEditorMcpPreferencesIpcFx } from "./editor/registerEditorMcpPreferencesIpcFx";
-import { createEditorMcpOwnershipFx } from "../../server/editor-mcp/createEditorMcpOwnershipFx";
+import type { EditorProjectServiceOwnership } from "./editor-project/EditorProjectServiceOwnership";
+import { registerEditorMcpPreferencesIpcFx } from "./editor-mcp/ipc/registerEditorMcpPreferencesIpcFx";
+import { createEditorMcpOwnershipFx } from "./editor-mcp/http/createEditorMcpOwnershipFx";
+import { createFilesystemEditorMcpPreferencesFx } from "./editor-mcp/preference/createFilesystemEditorMcpPreferencesFx";
+import { registerEditorProjectIpcFx } from "./editor-project/ipc/registerEditorProjectIpcFx";
+import { createSqliteEditorProjectRepositoryFx } from "./editor-project/sqlite/createSqliteEditorProjectRepositoryFx";
 import { createFilesystemCliInstallationFx } from "./cli/createFilesystemCliInstallationFx";
 import { registerCliInstallationIpcFx } from "./cli/registerCliInstallationIpcFx";
 
@@ -64,7 +64,9 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		);
 	if (editorProjectServiceOwnership.type === "ready") {
 		yield* Effect.sync(() => {
-			app.once("will-quit", editorProjectServiceOwnership.repository.closeSync);
+			app.once("will-quit", () => {
+				ElectronMainRuntime.runSync(editorProjectServiceOwnership.repository.closeFx);
+			});
 		});
 	}
 

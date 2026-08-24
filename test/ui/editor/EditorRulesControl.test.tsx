@@ -65,6 +65,7 @@ const Harness = () => {
 				"runtime:adjust",
 			],
 			description: "Runtime rules.",
+			target: "line",
 			onChange: (next) => setRules(next as EditorLineRule[]),
 			rules,
 		}),

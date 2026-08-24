@@ -59,6 +59,7 @@ export const EditorDropControl = ({
 		</div>
 		<EditorRulesControl
 			rules={value.rules}
+			target="drop"
 			description="These rules belong only to this item drop. Every condition inside a rule must pass. Enable rules gate this drop and any matching disable rule vetoes it when the roll resolves."
 			allowedTypes={[
 				"enable",

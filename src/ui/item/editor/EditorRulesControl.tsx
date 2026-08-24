@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
-import { EditorRuleControl } from "~/ui/item/editor/EditorRuleControl";
+import { EditorRuleControl, type EditorRuleTarget } from "~/ui/item/editor/EditorRuleControl";
 
 type EditorRule = EditorLineRule | EditorDropRule;
 type EditorRuleType = EditorLineRule["type"];
@@ -15,12 +15,14 @@ export const EditorRulesControl = ({
 	description,
 	onChange,
 	rules,
+	target,
 }: {
 	readonly allowedTypes: ReadonlyArray<EditorRuleType>;
 	readonly className?: string;
 	readonly description: string;
 	readonly onChange: (rules: EditorRule[]) => void;
 	readonly rules: ReadonlyArray<EditorRule>;
+	readonly target: EditorRuleTarget;
 }) => {
 	const createRule = (type: EditorRuleType): EditorLineRule =>
 		({
@@ -67,6 +69,8 @@ export const EditorRulesControl = ({
 						createRule={createRule}
 						rule={rules[ruleIndex]}
 						ruleIndex={ruleIndex}
+						ruleTarget={target}
+						ruleTypeDescription={description}
 						onChange={(next) =>
 							onChange(
 								rules.map((current, index) =>

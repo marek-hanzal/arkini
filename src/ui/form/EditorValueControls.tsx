@@ -9,6 +9,19 @@ import {
 	selectableInactiveClassName,
 } from "~/ui/form/SelectableStateClassName";
 
+const EditorValueLabel = ({
+	description,
+	label,
+}: {
+	readonly description?: string;
+	readonly label: string;
+}) => (
+	<span className="flex min-w-0 items-center gap-1">
+		<span className="font-semibold text-foreground">{label}</span>
+		{description === undefined ? null : <EditorInfoTooltip content={description} />}
+	</span>
+);
+
 const EditorValueField = ({
 	children,
 	description,
@@ -19,10 +32,10 @@ const EditorValueField = ({
 	readonly label: string;
 }) => (
 	<label className="grid min-w-0 content-start gap-1.5 text-sm">
-		<span className="flex min-w-0 items-center gap-1">
-			<span className="font-semibold text-foreground">{label}</span>
-			{description === undefined ? null : <EditorInfoTooltip content={description} />}
-		</span>
+		<EditorValueLabel
+			description={description}
+			label={label}
+		/>
 		{children}
 	</label>
 );
@@ -50,6 +63,7 @@ export const EditorTextControl = ({
 );
 
 export const EditorNumberControl = ({
+	description,
 	label,
 	max,
 	min,
@@ -57,6 +71,7 @@ export const EditorNumberControl = ({
 	step = 1,
 	value,
 }: {
+	readonly description?: string;
 	readonly label: string;
 	readonly max?: number;
 	readonly min?: number;
@@ -64,7 +79,10 @@ export const EditorNumberControl = ({
 	readonly step?: number;
 	readonly value: number;
 }) => (
-	<EditorValueField label={label}>
+	<EditorValueField
+		description={description}
+		label={label}
+	>
 		<input
 			type="number"
 			value={Number.isNaN(value) ? "" : value}
@@ -126,13 +144,11 @@ export const EditorChoiceControl = <Value extends string>({
 	}>;
 	readonly value: Value;
 }) => (
-	<fieldset className="grid min-w-0 content-start gap-1.5 text-sm">
-		<legend>
-			<span className="flex min-w-0 items-center gap-1">
-				<span className="font-semibold text-foreground">{label}</span>
-				{description === undefined ? null : <EditorInfoTooltip content={description} />}
-			</span>
-		</legend>
+	<div className="grid min-w-0 content-start gap-1.5 text-sm">
+		<EditorValueLabel
+			description={description}
+			label={label}
+		/>
 		<div className="flex min-w-0 flex-wrap gap-2">
 			{options.map((option) => {
 				const button = (
@@ -165,5 +181,5 @@ export const EditorChoiceControl = <Value extends string>({
 				);
 			})}
 		</div>
-	</fieldset>
+	</div>
 );

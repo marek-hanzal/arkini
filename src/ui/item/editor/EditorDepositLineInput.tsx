@@ -1,5 +1,5 @@
 import type { EditorInput } from "~/bridge/item/editor/EditorItemModel";
-import { EditorQueryControl } from "~/ui/item/editor/EditorQueryControl";
+import { EditorSelectorControl } from "~/ui/item/editor/EditorSelectorControl";
 
 type EditorDepositInput = Extract<
 	EditorInput,
@@ -8,7 +8,7 @@ type EditorDepositInput = Extract<
 	}
 >;
 
-/** Edits the board-locked query of one deposit input. */
+/** Edits the selector of one board-locked deposit input. */
 export const EditorDepositLineInput = ({
 	input,
 	onChange,
@@ -16,15 +16,16 @@ export const EditorDepositLineInput = ({
 	readonly input: EditorDepositInput;
 	readonly onChange: (input: EditorDepositInput) => void;
 }) => (
-	<EditorQueryControl
-		scopeLocked
-		value={input.query}
-		onChange={(query) => {
-			if (query.scope === "board")
-				onChange({
-					...input,
-					query,
-				});
-		}}
+	<EditorSelectorControl
+		value={input.query.selector}
+		onChange={(selector) =>
+			onChange({
+				...input,
+				query: {
+					...input.query,
+					selector,
+				},
+			})
+		}
 	/>
 );

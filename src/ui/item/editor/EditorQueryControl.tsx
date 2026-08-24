@@ -4,22 +4,29 @@ import { EditorSelectorControl } from "~/ui/item/editor/EditorSelectorControl";
 
 const queryScopeOptions = [
 	{
+		description:
+			"Searches matching items on the current board at the selected distance from the line owner.",
 		label: "Board",
 		value: "board",
 	},
 	{
+		description: "Searches matching items stored anywhere in the inventory.",
 		label: "Inventory",
 		value: "inventory",
 	},
 	{
+		description: "Searches matching items stored anywhere in the toolbar.",
 		label: "Toolbar",
 		value: "toolbar",
 	},
 	{
+		description:
+			"Searches the inventory, toolbar, and the current board space without a board-distance limit.",
 		label: "Any local",
 		value: "any",
 	},
 	{
+		description: "Searches the inventory, toolbar, and every board space in the current game.",
 		label: "Universe",
 		value: "universe",
 	},
@@ -54,7 +61,7 @@ interface EditorQueryControlProps {
 	readonly value: EditorQuery;
 }
 
-const EditorBoardDistanceControl = ({
+export const EditorBoardDistanceControl = ({
 	onChange,
 	value,
 }: {
@@ -79,6 +86,34 @@ const EditorBoardDistanceControl = ({
 	/>
 );
 
+export const EditorQueryScopeControl = ({
+	onChange,
+	value,
+}: {
+	readonly onChange: (query: EditorQuery) => void;
+	readonly value: EditorQuery;
+}) => (
+	<EditorChoiceControl
+		label="Query scope"
+		value={value.scope}
+		options={queryScopeOptions}
+		onChange={(scope) =>
+			onChange(
+				scope === "board"
+					? {
+							scope,
+							distance: "close",
+							selector: value.selector,
+						}
+					: {
+							scope,
+							selector: value.selector,
+						},
+			)
+		}
+	/>
+);
+
 /** Shared selector, scope and board-distance editor for every authored query. */
 export const EditorQueryControl = (props: EditorQueryControlProps) => (
 	<div className="grid gap-3">
@@ -93,24 +128,9 @@ export const EditorQueryControl = (props: EditorQueryControlProps) => (
 		/>
 		<div className="grid gap-3 sm:grid-cols-2">
 			{props.scopeLocked === true ? null : (
-				<EditorChoiceControl
-					label="Query scope"
-					value={props.value.scope}
-					options={queryScopeOptions}
-					onChange={(scope) =>
-						props.onChange(
-							scope === "board"
-								? {
-										scope,
-										distance: "close",
-										selector: props.value.selector,
-									}
-								: {
-										scope,
-										selector: props.value.selector,
-									},
-						)
-					}
+				<EditorQueryScopeControl
+					value={props.value}
+					onChange={props.onChange}
 				/>
 			)}
 			{props.value.scope !== "board" ? null : (

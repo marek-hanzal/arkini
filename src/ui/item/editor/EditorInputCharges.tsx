@@ -39,6 +39,33 @@ export const EditorInputCharges = ({
 				/>
 			) : (
 				<div className="grid items-end gap-3 sm:grid-cols-2">
+					<EditorChoiceControl
+						label="Paid by"
+						value={charges.from}
+						options={[
+							{
+								description:
+									"The item that owns and runs this production line pays the charge cost. It must define enough available charges.",
+								label: "Self",
+								value: "self",
+							},
+							{
+								description:
+									"The board item resolved by a Deposit input pays the charge cost in place. Only Deposit inputs may charge their target.",
+								label: "Target",
+								value: "target",
+							},
+						]}
+						onChange={(from) =>
+							onChange({
+								...input,
+								charges: {
+									...charges,
+									from,
+								},
+							})
+						}
+					/>
 					<div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2">
 						<EditorNumberControl
 							label="Cost"
@@ -69,33 +96,6 @@ export const EditorInputCharges = ({
 							</Button>
 						</Tooltip>
 					</div>
-					<EditorChoiceControl
-						label="Paid by"
-						value={charges.from}
-						options={[
-							{
-								description:
-									"The item that owns and runs this production line pays the charge cost. It must define enough available charges.",
-								label: "Self",
-								value: "self",
-							},
-							{
-								description:
-									"The board item resolved by a Deposit input pays the charge cost in place. Only Deposit inputs may charge their target.",
-								label: "Target",
-								value: "target",
-							},
-						]}
-						onChange={(from) =>
-							onChange({
-								...input,
-								charges: {
-									...charges,
-									from,
-								},
-							})
-						}
-					/>
 				</div>
 			)}
 		</div>

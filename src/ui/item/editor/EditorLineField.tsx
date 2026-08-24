@@ -103,6 +103,7 @@ export const EditorLineFields = withFieldGroup({
 					{(rules) => (
 						<EditorRulesControl
 							rules={rules}
+							target="line"
 							description="These rules belong only to this production line. Every condition inside a rule must pass. Show and hide rules resolve visibility; every enable rule must pass, any disable rule vetoes availability, and runtime rules alter duration. Sibling lines are unaffected."
 							allowedTypes={[
 								"show",

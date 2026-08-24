@@ -2,7 +2,11 @@ import { match } from "ts-pattern";
 
 import type { EditorWhen } from "~/bridge/item/editor/EditorItemModel";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
-import { EditorQueryControl } from "~/ui/item/editor/EditorQueryControl";
+import {
+	EditorBoardDistanceControl,
+	EditorQueryScopeControl,
+} from "~/ui/item/editor/EditorQueryControl";
+import { EditorSelectorControl } from "~/ui/item/editor/EditorSelectorControl";
 
 export const EditorWhenControl = ({
 	onChange,
@@ -11,58 +15,66 @@ export const EditorWhenControl = ({
 	readonly onChange: (when: EditorWhen) => void;
 	readonly value: EditorWhen;
 }) => (
-	<div className="grid grid-cols-2 gap-[var(--ak-panel-padding)]">
-		<div className="grid min-w-0 content-start gap-3">
-			<EditorChoiceControl
-				label="Condition type"
-				value={value.type}
-				options={[
-					{
-						label: "Exists",
-						value: "exists",
-					},
-					{
-						label: "Exact count",
-						value: "count",
-					},
-					{
-						label: "Count range",
-						value: "range",
-					},
-				]}
-				onChange={(type) =>
-					onChange(
-						type === "exists"
+	<div className="grid min-w-0 gap-3">
+		<EditorChoiceControl
+			label="Condition type"
+			value={value.type}
+			options={[
+				{
+					description: "Passes when the query finds any positive item quantity.",
+					label: "Exists",
+					value: "exists",
+				},
+				{
+					description:
+						"Passes only when the query finds exactly the configured total item quantity.",
+					label: "Exact count",
+					value: "count",
+				},
+				{
+					description:
+						"Passes when the query finds a total item quantity inside the configured inclusive range.",
+					label: "Count range",
+					value: "range",
+				},
+			]}
+			onChange={(type) =>
+				onChange(
+					type === "exists"
+						? {
+								type,
+								query: value.query,
+							}
+						: type === "count"
 							? {
 									type,
 									query: value.query,
+									count: 1,
 								}
-							: type === "count"
-								? {
-										type,
-										query: value.query,
-										count: 1,
-									}
-								: {
-										type,
-										query: value.query,
-										min: 1,
-										max: 1,
-									},
-					)
-				}
-			/>
-			<EditorQueryControl
-				value={value.query}
-				onChange={(query) =>
-					onChange({
-						...value,
-						query,
-					})
-				}
-			/>
-		</div>
-		<div className="grid min-w-0 content-start gap-3">
+							: {
+									type,
+									query: value.query,
+									min: 1,
+									max: 1,
+								},
+				)
+			}
+		/>
+		<div className="flex min-w-0 flex-wrap items-end gap-3">
+			<div className="min-w-64 flex-1">
+				<EditorSelectorControl
+					value={value.query.selector}
+					onChange={(selector) =>
+						onChange({
+							...value,
+							query: {
+								...value.query,
+								selector,
+							},
+						})
+					}
+				/>
+			</div>
 			{match(value)
 				.with(
 					{
@@ -75,17 +87,19 @@ export const EditorWhenControl = ({
 						type: "count",
 					},
 					(when) => (
-						<EditorNumberControl
-							label="Exact count"
-							value={when.count}
-							min={0}
-							onChange={(count) =>
-								onChange({
-									...when,
-									count,
-								})
-							}
-						/>
+						<div className="min-w-64">
+							<EditorNumberControl
+								label="Exact count"
+								value={when.count}
+								min={0}
+								onChange={(count) =>
+									onChange({
+										...when,
+										count,
+									})
+								}
+							/>
+						</div>
 					),
 				)
 				.with(
@@ -93,7 +107,7 @@ export const EditorWhenControl = ({
 						type: "range",
 					},
 					(when) => (
-						<div className="grid grid-cols-2 gap-3">
+						<div className="grid min-w-96 grid-cols-2 gap-3">
 							<EditorNumberControl
 								label="Minimum count"
 								value={when.min}
@@ -120,6 +134,28 @@ export const EditorWhenControl = ({
 					),
 				)
 				.exhaustive()}
+		</div>
+		<div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+			<EditorQueryScopeControl
+				value={value.query}
+				onChange={(query) =>
+					onChange({
+						...value,
+						query,
+					})
+				}
+			/>
+			{value.query.scope !== "board" ? null : (
+				<EditorBoardDistanceControl
+					value={value.query}
+					onChange={(query) =>
+						onChange({
+							...value,
+							query,
+						})
+					}
+				/>
+			)}
 		</div>
 	</div>
 );

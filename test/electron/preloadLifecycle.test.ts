@@ -151,6 +151,30 @@ describe("Electron preload lifecycle", () => {
 		);
 	});
 
+	it("routes CLI installation through its dedicated IPC channels", async () => {
+		electron.ipcRenderer.invoke.mockResolvedValue({
+			type: "not-installed",
+			commandPath: "/tmp/arkini-cli",
+		});
+		const api = await loadPreload();
+
+		await api.cli.status();
+		await api.cli.install();
+		await api.cli.uninstall();
+		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
+			1,
+			ArkiniElectronContract.channels.cliStatus,
+		);
+		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
+			2,
+			ArkiniElectronContract.channels.cliInstall,
+		);
+		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
+			3,
+			ArkiniElectronContract.channels.cliUninstall,
+		);
+	});
+
 	it("shares one pending native close request", async () => {
 		const api = await loadPreload();
 		const first = api.lifecycle.requestClose();

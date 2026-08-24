@@ -1,21 +1,15 @@
 import { Command } from "effect/unstable/cli";
 import { DesktopBuildCommand } from "./DesktopBuildCommand";
-import { DesktopChecksumsCommand } from "./DesktopChecksumsCommand";
-import { DesktopCleanCommand } from "./DesktopCleanCommand";
 import { DesktopPackageCommand } from "./DesktopPackageCommand";
 import { DesktopPreviewMacosCommand } from "./DesktopPreviewMacosCommand";
-import { DesktopStageCommand } from "./DesktopStageCommand";
 import { DesktopVerifyCommand } from "./DesktopVerifyCommand";
 
 export const DesktopCommand = Command.make("desktop")
 	.pipe(
 		Command.withSubcommands([
 			DesktopBuildCommand,
-			DesktopCleanCommand,
-			DesktopStageCommand,
 			DesktopPackageCommand,
 			DesktopPreviewMacosCommand,
-			DesktopChecksumsCommand,
 			DesktopVerifyCommand,
 		]),
 	)

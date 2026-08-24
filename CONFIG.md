@@ -23,9 +23,9 @@ The same compiler is used by tests, validation, and packing. Do not create an al
 ## 2. Commands
 
 ```bash
-npm run game:schema
-npm run game:validate
-npm run game:pack
+arkini-cli game schema
+arkini-cli game validate
+arkini-cli game pack
 ```
 
 Defaults:
@@ -36,7 +36,7 @@ JSON Schema output: game/schema.json
 binary pack output: game/arkini.game.arkpack
 ```
 
-Run `game:schema` after changing authoring schemas. Run `game:validate` after changing config or resources. Packing performs validation again and must refuse invalid content.
+Run `game schema` after changing authoring schemas. Run `game validate` after changing config or resources. Packing performs validation again and must refuse invalid content.
 
 ## 3. Source fragments
 

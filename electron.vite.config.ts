@@ -28,7 +28,10 @@ export default defineConfig(({ command }) => {
 				minify: true,
 				outDir: resolve(ProjectOutputPaths.desktop.build, "main"),
 				rollupOptions: {
-					input: resolve("electron/main/index.ts"),
+					input: {
+						index: resolve("electron/main/index.ts"),
+						"cli/arkini": resolve("src/engine/cli/arkini.ts"),
+					},
 				},
 			},
 		},

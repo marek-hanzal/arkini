@@ -60,6 +60,16 @@ export const verifyDesktopPackageStructureFx = Effect.fn("verifyDesktopPackageSt
 			) {
 				return yield* Effect.fail(new Error("Packaged app.asar contains node_modules."));
 			}
+			if (!packagedPaths.includes("/app/main/cli/arkini.js")) {
+				return yield* Effect.fail(new Error("Packaged app.asar is missing arkini-cli."));
+			}
+
+			const launcher = yield* fileSystem.stat(
+				join(directory, "mac-arm64", "Arkini.app", "Contents", "MacOS", "arkini-cli"),
+			);
+			if (launcher.type !== "File" || launcher.size === 0n) {
+				return yield* Effect.fail(new Error("Packaged arkini-cli launcher is empty."));
+			}
 		});
 
 		return yield* verification.pipe(

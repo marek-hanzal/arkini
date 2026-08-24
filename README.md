@@ -134,15 +134,18 @@ The repository uses npm with a committed [`package-lock.json`](package-lock.json
 npm install
 ```
 
-Project tooling has one canonical [Effect](https://effect.website/) [CLI entrypoint](cli/arkini.ts):
+The application ships one canonical [Effect](https://effect.website/) product CLI. A packaged
+app can install or remove the `arkini-cli` launcher from Settings:
 
 ```bash
-npm run arkini -- --help
-npm run arkini -- game --help
-npm run arkini -- desktop --help
+arkini-cli --help
+arkini-cli game --help
+arkini-cli arkpack --help
 ```
 
-Game authoring and desktop build/package workflows live in that command tree. npm scripts are thin convenience aliases; `npm-run-all2` is reserved for mechanical check and shard composition rather than domain orchestration.
+Game authoring and Arkpack operations live only in that production command tree. The private
+repository CLI owns only desktop build/package orchestration and invokes the freshly built
+product CLI for product work. npm scripts expose only common repository workflows.
 
 ## Required checks
 
@@ -157,10 +160,10 @@ It runs:
 ```text
 Biome format check
 → source, test, and Electron TypeScript checks
-→ game configuration validation
-→ production Electron build (signs official Arkini and packs the unsigned demo once)
+→ production Electron build and built-CLI official Arkpack signing
 → Dependency Cruiser architecture rules against generated build inputs
-→ all ten deterministic Vitest shards
+→ copy/paste detection
+→ the one-process Vitest suite
 ```
 
 Application commands:
@@ -170,15 +173,15 @@ npm run dev
 npm run dev:control
 npm run mcp:inspect
 npm run build
-npm run preview
 npm run preview:macos
+npm run package
 ```
 
-Arkini is an [Electron](https://www.electronjs.org/docs/latest/)-only product. `npm run dev` starts Electron with a [Vite](https://vite.dev/guide/)-powered renderer and the pinned MCP Inspector web UI preconfigured for `http://127.0.0.1:32310/editor/mcp`; the endpoint starts listening only after entering Editor, and a non-default global MCP port must also be changed in Inspector. MCP tools are dynamically scoped to the single project currently mounted in the editor, accept no project selector, and fail without touching persistence when no project is open. The initial read-only surface is deliberately small: `project`, `item_meta`, `item_collection`, `item_detail`, `item_input`, `item_output`, and `item_estimate`; `item_collection` accepts optional OR-combined `itemTypes`, a Fuse-powered `query`, and one-based `page`/`pageSize` pagination with a default page size of 25. `item_input` reads relations where the selected item serves as an operation input, while `item_output` reads relations where the selected item is produced as an operation output; higher relationship-hop levels repeat the same lookup from each reached operation owner, and `level` defaults to 1. `npm run mcp:inspect` starts that Inspector independently. Vite may replace modules during development, but Arkini treats application state as disposable and implements no HMR preservation, shutdown, or ownership handoff. `npm run build` first compiles the production Electron application, then packs, signs, and verifies official Arkini plus the deliberately unsigned demo, so a production private key must be available through ignored `.arkini/arkpack-private.pem` or `ARKINI_ARKPACK_PRIVATE_KEY`. `npm run preview` starts an existing production build without repacking or rebuilding it. `npm run preview:macos` is the packaged local preview: it cleans old desktop output, performs the same one-time build/pack flow, creates `.out/desktop/release/mac-arm64/Arkini.app` with `electron-builder --dir`, prints that exact path, and launches the resulting bundle. There is no standalone web target, web persistence fallback, or alternate renderer startup path.
+Arkini is an [Electron](https://www.electronjs.org/docs/latest/)-only product. `npm run dev` starts Electron with a [Vite](https://vite.dev/guide/)-powered renderer. The editor MCP endpoint starts listening only after entering Editor; `npm run mcp:inspect` starts the pinned Inspector independently for `http://127.0.0.1:32310/editor/mcp`. MCP tools are dynamically scoped to the single project currently mounted in the editor and fail without touching persistence when no project is open. Vite may replace modules during development, but Arkini treats application state as disposable and implements no HMR preservation, shutdown, or ownership handoff. `npm run build` compiles the production Electron application, then uses that exact built CLI to pack, sign, and verify official Arkini, so a private key must be available through ignored `.arkini/arkpack-private.pem` or `ARKINI_ARKPACK_PRIVATE_KEY`. `npm run preview:macos` rebuilds the same inputs, creates an unpacked arm64 application, prints its path, and launches it. There is no standalone web target, web persistence fallback, or alternate renderer startup path.
 
 All disposable repository-local generated output lives below `.out/`: Electron build files under `.out/desktop/build`, the dependency-free packaging stage under `.out/desktop/stage`, distributable artifacts under `.out/desktop/release`, and tool caches under `.out/cache`. The `game/` tree is the deliberate generated-output exception because authored games and their generated Arkpack/schema companions share one domain-owned location. Local build inputs such as signing keys remain config under `.arkini/` and must survive deleting `.out/`.
 
-`npm run dev:control` starts the same application and MCP Inspector pair with Chromium DevTools Protocol exposed at `http://127.0.0.1:9222` for local UI automation and profiling. The endpoint is fixed to loopback and is never enabled by packaged builds.
+`npm run dev:control` starts the same application with Chromium DevTools Protocol exposed at `http://127.0.0.1:9222` for local UI automation and profiling. The endpoint is fixed to loopback and is never enabled by packaged builds.
 
 Appearance is renderer-owned and exposed through semantic Tailwind color utilities backed by one CSS token palette. `/settings` is the only theme-control surface and offers `system`, `light`, and `dark`; `system` follows later operating-system appearance changes, while explicit light/dark selections override them. One `Atom.fn` command applies the selected theme immediately, serializes persistence through the authoritative Effect/Electron capability, rolls back only its own still-current optimistic value on failure, and treats the active value as a no-op. The accent remains a separately persisted semantic palette used by the launcher and game. Missing or malformed preferences resolve to dark and rose. Electron serializes and atomically persists both values under `<userData>/arkini/game/preferences`, applies the theme through `nativeTheme`, and exposes no browser-storage settings path.
 
@@ -207,7 +210,7 @@ This canonical [Effect CLI command](cli/desktop/DesktopPreviewMacosCommand.ts) b
 The production distribution target is unsigned macOS Apple Silicon only. Build both local artifacts through the one canonical path:
 
 ```bash
-npm run package:mac
+npm run package
 ```
 
 The [desktop package command](cli/desktop/DesktopPackageCommand.ts) cleans `.out/desktop`, builds Electron main/preload/renderer once, packs and stages the official Arkini game once, stages only `.out/desktop/build/**` as `app/**` with a dependency-free production manifest, and runs one concrete [`electron-builder`](https://www.electron.build/docs/) arm64 DMG/ZIP operation. SHA-256 values are streamed from the large artifacts once while `SHA256SUMS` is written; the combined package flow then verifies artifact presence and the unpacked `Arkini.app` seam without hashing the same files again. `npm run package:verify` remains the standalone full checksum verification path for downloaded or later-modified artifacts. Output lives under `.out/desktop/release/`:
@@ -221,7 +224,7 @@ mac-arm64/Arkini.app
 
 Verify downloads with `shasum -a 256 -c SHA256SUMS`. These development artifacts are intentionally unsigned and unnotarized. macOS may require opening the application through Finder's **Open** action or allowing it from **System Settings → Privacy & Security**. Do not add ad-hoc signing, fake certificates, or notarization placeholders to this milestone.
 
-The [macOS prerelease workflow](.github/workflows/macos-prerelease.yml) uses the same `npm run package:mac` command on the GitHub-hosted `macos-15` Apple Silicon runner. CI runs formatting, type, and source-validation gates first, packages exactly once, then runs Dependency Cruiser and permanent tests against those exact generated package inputs instead of relying on stale ignored output or running a second production build through `npm run check`. Manual dispatch uploads a normal workflow artifact only. Tags matching `v*-dev.*`, such as `v0.1.0-dev.1`, also create an immutable GitHub prerelease containing the DMG, ZIP, and `SHA256SUMS`. Normal source pushes do not spend macOS runner time.
+The [macOS prerelease workflow](.github/workflows/macos-prerelease.yml) uses the same `npm run package` command on the GitHub-hosted `macos-15` Apple Silicon runner. CI runs formatting and type gates first, packages exactly once, then runs Dependency Cruiser, copy/paste detection, and the one-process test suite against those generated package inputs. Manual dispatch uploads a normal workflow artifact only. Tags matching `v*-dev.*`, such as `v0.1.0-dev.1`, also create an immutable GitHub prerelease containing the DMG, ZIP, and `SHA256SUMS`. Normal source pushes do not spend macOS runner time.
 
 Useful focused commands:
 
@@ -231,15 +234,9 @@ npm run format:check
 npm run dc
 npm run typecheck
 npm run test
-npm run test:shards
-npm run test:shard:1
 ```
 
-`npm run test` remains the canonical one-process full-suite command. Use
-`npm run test:shards` or the ten individual `test:shard:N` commands when the
-execution environment has a short process timeout. Each shard contains a smaller
-deterministic file partition and still runs with one worker from [`vitest.config.ts`](vitest.config.ts).
-When a chained runner fails to exit cleanly, run the affected shard independently.
+`npm run test` is the canonical one-process full-suite command.
 
 
 ## Local packages and saves
@@ -250,7 +247,7 @@ The launcher treats `.arkpack` as the playable package boundary:
 - format v2 embeds a stable `packageId` in the signed package bytes independently from the authored `gameId`. The renderer derives `contentHash`, trust, title, and game metadata from the exact bytes instead of trusting generated catalog metadata;
 - a structurally valid user package legally overrides a bundled package with the same ID. The renderer selects from both raw candidates, so an unreadable user file falls back consistently while an invalidly signed package stays visible but unavailable. The catalog labels the effective user row `User override`; removing it touches only user data and reveals the bundled fallback;
 - the Arkpack screen can open only the user package folder and explicitly refresh after manual copies. The bundled root is never exposed through UI;
-- trust is derived only from the optional detached signature. Bundled location and package name confer no trust; the bundled demo remains deliberately unsigned while official Arkini carries a verifiable Ed25519 signature;
+- trust is derived only from the optional detached signature. Bundled location and package name confer no trust; official Arkini carries a verifiable Ed25519 signature;
 - exact package load verifies trust over raw bytes before decode, then revalidates filename identity, embedded package identity, config, resources, and SHA-256 content hash before a game starts;
 - renderer import rejects files above the compressed package limit before `File.arrayBuffer()` allocates them, while the binary reader keeps the same guard for non-File callers;
 - gameplay saves use the strict MessagePack envelope `{ namespace: "arkini", version, game, state }` and persist atomically under `<userData>/arkini/game/saves/<packageId>/current.arksave`;
@@ -268,19 +265,17 @@ The launcher treats `.arkpack` as the playable package boundary:
 The default game source directory is [`game/arkini`](game/arkini).
 
 ```bash
-npm run game:schema
-npm run game:validate
-npm run game:pack
-npm run game:pack:demo
-npm run game:pack:official
+arkini-cli game schema
+arkini-cli game validate
+arkini-cli game pack
+arkini-cli arkpack pack-official
 ```
 
-- `game:schema` writes the authoring JSON Schema to [`game/schema.json`](game/schema.json).
-- `game:validate` runs the canonical compiler and all diagnostics.
-- `game:pack`, implemented by the [pack command](src/engine/pack/cli/PackCommand.ts), remains an explicit unsigned authoring operation: it validates the completed config, reads PNG resources, embeds the package ID in MessagePack, compresses it with gzip, and writes the ignored binary.
-- `game:pack:demo` packs the merge-only demo without a signature.
-- `game:pack:official` packs final Arkini bytes, signs them with Ed25519, writes the detached `.sig`, and verifies the result against the committed public registry.
-- The canonical desktop build first compiles Electron/Vite with no generated game imports, then packs the signed official game and unsigned demo exactly once. Development reads ignored outputs directly from `game/`; `electron-builder` delivers only `.arkpack` and `.sig` files into packaged `Resources/game`. The local `check` order builds before Dependency Cruiser, and the macOS delivery workflow packages before Dependency Cruiser, so source compilation and typechecking never require stale generated game output.
+- `game schema` writes the authoring JSON Schema to [`game/schema.json`](game/schema.json).
+- `game validate` runs the canonical compiler and all diagnostics.
+- `game pack`, implemented by the [pack command](src/engine/pack/cli/PackCommand.ts), is an explicit unsigned authoring operation: it validates the completed config, reads PNG resources, embeds the package ID in MessagePack, compresses it with gzip, and writes the ignored binary.
+- `arkpack pack-official` packs final Arkini bytes, signs them with Ed25519, writes the detached `.sig`, and verifies the result against the committed public registry.
+- The canonical desktop build first compiles Electron/Vite with no generated game imports, then invokes its built `arkini-cli` to produce the signed official game exactly once. `electron-builder` delivers only `.arkpack` and `.sig` files into packaged `Resources/game`.
 
 [`ARKPACK_SIGNING.md`](ARKPACK_SIGNING.md) is the complete threat model, CLI, private-key, CI-secret, trust-state, and rotation contract.
 

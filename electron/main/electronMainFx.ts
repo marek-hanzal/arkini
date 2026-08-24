@@ -1,6 +1,6 @@
 import { app, BrowserWindow, nativeTheme } from "electron";
 import { fileURLToPath } from "node:url";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { Effect } from "effect";
 import { createMainWindowFx } from "./createMainWindowFx";
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
@@ -21,6 +21,8 @@ import { registerEditorProjectIpcFx } from "./editor/registerEditorProjectIpcFx"
 import { createFilesystemEditorMcpPreferencesFx } from "./editor-mcp/createFilesystemEditorMcpPreferencesFx";
 import { registerEditorMcpPreferencesIpcFx } from "./editor/registerEditorMcpPreferencesIpcFx";
 import { createEditorMcpOwnershipFx } from "../../server/editor-mcp/createEditorMcpOwnershipFx";
+import { createFilesystemCliInstallationFx } from "./cli/createFilesystemCliInstallationFx";
+import { registerCliInstallationIpcFx } from "./cli/registerCliInstallationIpcFx";
 
 export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const hasSingleInstanceLock = app.requestSingleInstanceLock();
@@ -147,6 +149,20 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		isPackaged: app.isPackaged,
 		developmentRendererUrl: process.env.ELECTRON_RENDERER_URL,
 	});
+	const packagedCliLauncherPath = join(dirname(process.execPath), "arkini-cli");
+	const transientMacAppPath =
+		process.execPath.startsWith("/Volumes/") || process.execPath.includes("/AppTranslocation/");
+	const cliInstallation = yield* createFilesystemCliInstallationFx({
+		commandPath: join(app.getPath("home"), ".local", "bin", "arkini-cli"),
+		launcherPath: packagedCliLauncherPath,
+		unavailableMessage: !app.isPackaged
+			? "arkini-cli can be installed from a packaged Arkini build."
+			: process.platform === "darwin"
+				? transientMacAppPath
+					? "Move Arkini.app from the disk image to Applications before installing arkini-cli."
+					: undefined
+				: `arkini-cli installation is not available on ${process.platform} yet.`,
+	});
 	yield* registerArkiniProtocolFx(rendererRoot);
 	yield* registerArkiniElectronIpcFx({
 		bundledArkpacksRoot: app.isPackaged ? join(process.resourcesPath, "game") : resolve("game"),
@@ -167,6 +183,10 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		trustedRenderer,
 		preferences: editorMcpPreferences,
 		ownership: editorMcpOwnership,
+	});
+	yield* registerCliInstallationIpcFx({
+		cliInstallation,
+		trustedRenderer,
 	});
 	const createWindowFx = windowPreferences.readModeFx.pipe(
 		Effect.flatMap((windowMode) =>

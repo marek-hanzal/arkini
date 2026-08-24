@@ -8,6 +8,7 @@ import type { WindowMode } from "~/bridge/window/WindowMode";
 import { WindowModeAtom } from "~/bridge/window/WindowModeAtom";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 import { useSettingsDirectoriesModel } from "~/ui/settings/useSettingsDirectoriesModel";
+import { useSettingsCliModel } from "~/ui/settings/useSettingsCliModel";
 import { useSettingsMcpModel } from "~/ui/settings/useSettingsMcpModel";
 import { SettingsCommandAtom } from "~/ui/settings/SettingsCommandAtom";
 
@@ -22,6 +23,7 @@ export const useSettingsModel = ({
 	const windowMode = useAtomValue(WindowModeAtom);
 	const [commandState, runCommand] = useAtom(SettingsCommandAtom);
 	const mcp = useSettingsMcpModel();
+	const cli = useSettingsCliModel();
 	const directories = useSettingsDirectoriesModel();
 	const blocked = commandState.kind === "pending";
 	const exitPending = commandState.kind === "pending" && commandState.action === "exit";
@@ -51,6 +53,7 @@ export const useSettingsModel = ({
 		blocked,
 		cheatToolsAvailable: cheatAvailability.available,
 		...mcp,
+		...cli,
 		exitPending,
 		...directories,
 		status: commandState,

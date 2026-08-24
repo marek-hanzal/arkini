@@ -124,6 +124,16 @@ const renderSettings = async (
 	Object.defineProperty(window, "arkini", {
 		configurable: true,
 		value: {
+			cli: {
+				status: () =>
+					Promise.resolve({
+						type: "unavailable",
+						commandPath: "/tmp/arkini-cli",
+						message: "Available in packaged builds.",
+					}),
+				install: vi.fn(),
+				uninstall: vi.fn(),
+			},
 			editorMcp: {
 				readPort: () => Promise.resolve(32_310),
 				checkPort: checkEditorMcpPort,

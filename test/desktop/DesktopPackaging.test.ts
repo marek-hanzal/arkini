@@ -27,9 +27,20 @@ const createReleaseFixture = async ({ includeNodeModules = false } = {}) => {
 	await mkdir(resources, {
 		recursive: true,
 	});
+	const macos = join(directory, "mac-arm64", "Arkini.app", "Contents", "MacOS");
+	await mkdir(macos, {
+		recursive: true,
+	});
+	await writeFile(join(macos, "arkini-cli"), "#!/bin/sh\n", {
+		mode: 0o755,
+	});
 	const asarSource = join(directory, "asar-source");
 	await mkdir(asarSource);
 	await writeFile(join(asarSource, "package.json"), "{}\n");
+	await mkdir(join(asarSource, "app", "main", "cli"), {
+		recursive: true,
+	});
+	await writeFile(join(asarSource, "app", "main", "cli", "arkini.js"), "export {};\n");
 	if (includeNodeModules) {
 		await mkdir(join(asarSource, "node_modules", "fixture"), {
 			recursive: true,

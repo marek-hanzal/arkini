@@ -16,13 +16,15 @@ files:
   - app/**/*
   - package.json
   - '!app/**/*.map'
+extraFiles:
+  - from: electron/resources/arkini-cli
+    to: MacOS/arkini-cli
 extraResources:
   - from: game
     to: game
     filter:
       - arkini.game.arkpack
       - arkini.game.arkpack.sig
-      - demo.game.arkpack
 mac:
   category: public.app-category.games
   icon: icon.png

@@ -1,4 +1,4 @@
-import { ArkiniOfficialArkpackIdentity } from "../../shared/ArkiniOfficialArkpackIdentity";
+import { ArkiniOfficialArkpackIdentity } from "../../../../shared/ArkiniOfficialArkpackIdentity";
 
 /** Canonical build inputs for the currently active official Arkini signing identity. */
 export const ArkiniOfficialArkpackSigning = {

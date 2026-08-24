@@ -11,12 +11,6 @@ export const GameCommand = Command.make("game")
 				packageId: "arkini",
 				version: "1.0",
 			}),
-			PackCommand({
-				input: "game/demo",
-				name: "pack-demo",
-				packageId: "demo",
-				version: "1.0",
-			}),
 			SchemaCommand({
 				output: "game/schema.json",
 			}),

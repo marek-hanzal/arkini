@@ -11,7 +11,7 @@ let root = "";
 
 const runCli = (...arguments_: ReadonlyArray<string>) =>
 	execFileAsync("node_modules/.bin/tsx", [
-		"cli/arkini.ts",
+		"src/engine/cli/arkini.ts",
 		"arkpack",
 		...arguments_,
 	]);

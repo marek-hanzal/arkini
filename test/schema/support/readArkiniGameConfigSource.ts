@@ -6,7 +6,6 @@ import { compileGameDirectoryFx } from "~/engine/compiler/fx/compileGameDirector
 import { assertGameConfigValidFx } from "~/engine/validation/fx/assertGameConfigValidFx";
 
 const ArkiniDirectory = fileURLToPath(new URL("../../../game/arkini/", import.meta.url));
-const DemoDirectory = fileURLToPath(new URL("../../../game/demo/", import.meta.url));
 
 const readGameConfigSource = (input: string) =>
 	Effect.runPromise(
@@ -21,6 +20,3 @@ const readGameConfigSource = (input: string) =>
 
 /** Reads the current Arkini authoring directory through the production completed-game compiler. */
 export const readArkiniGameConfigSource = () => readGameConfigSource(ArkiniDirectory);
-
-/** Reads the current demo authoring directory through the production completed-game compiler. */
-export const readDemoGameConfigSource = () => readGameConfigSource(DemoDirectory);

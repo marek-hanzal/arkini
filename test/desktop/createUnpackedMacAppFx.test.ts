@@ -5,7 +5,6 @@ import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
 import { createUnpackedMacAppFx } from "../../cli/desktop/createUnpackedMacAppFx";
-import { ProjectOutputPaths } from "../../shared/ProjectOutputPaths";
 
 const temporaryDirectories: string[] = [];
 const originalPath = process.env.PATH;
@@ -18,10 +17,6 @@ afterEach(async () => {
 	} else {
 		process.env.ARKINI_TEST_BUILDER_ARGS = originalArgsPath;
 	}
-	await rm(ProjectOutputPaths.desktop.root, {
-		recursive: true,
-		force: true,
-	});
 	await Promise.all(
 		temporaryDirectories.splice(0).map((directory) =>
 			rm(directory, {
@@ -38,6 +33,7 @@ describe("createUnpackedMacAppFx", () => {
 		async () => {
 			const directory = await mkdtemp(join(tmpdir(), "arkini-builder-bin-"));
 			temporaryDirectories.push(directory);
+			const outputDirectory = join(directory, "release");
 			const executable = join(directory, "electron-builder");
 			const argsPath = join(directory, "args.json");
 			await writeFile(
@@ -45,10 +41,12 @@ describe("createUnpackedMacAppFx", () => {
 				`#!/usr/bin/env node
 const fs = require("node:fs");
 const path = require("node:path");
-const resources = path.resolve(".out/desktop/release/mac-arm64/Arkini.app/Contents/Resources");
+const args = process.argv.slice(2);
+const outputIndex = args.indexOf("--config.directories.output");
+const resources = path.resolve(args[outputIndex + 1], "mac-arm64/Arkini.app/Contents/Resources");
 fs.mkdirSync(resources, { recursive: true });
 fs.writeFileSync(path.join(resources, "app.asar"), "fixture");
-fs.writeFileSync(process.env.ARKINI_TEST_BUILDER_ARGS, JSON.stringify(process.argv.slice(2)));
+fs.writeFileSync(process.env.ARKINI_TEST_BUILDER_ARGS, JSON.stringify(args));
 `,
 				"utf8",
 			);
@@ -59,18 +57,19 @@ fs.writeFileSync(process.env.ARKINI_TEST_BUILDER_ARGS, JSON.stringify(process.ar
 			const appPath = await Effect.runPromise(
 				createUnpackedMacAppFx({
 					arch: "arm64",
+					outputDirectory,
 				}).pipe(Effect.provide(NodeServices.layer)),
 			);
 
-			expect(appPath).toBe(
-				resolve(ProjectOutputPaths.desktop.release, "mac-arm64/Arkini.app"),
-			);
+			expect(appPath).toBe(resolve(outputDirectory, "mac-arm64/Arkini.app"));
 			expect(JSON.parse(await readFile(argsPath, "utf8"))).toEqual([
 				"--config",
 				"electron-builder.yml",
 				"--mac",
 				"--arm64",
 				"--dir",
+				"--config.directories.output",
+				outputDirectory,
 				"--publish",
 				"never",
 			]);

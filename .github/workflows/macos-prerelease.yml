@@ -50,17 +50,17 @@ jobs:
         run: |
           npm run format:check
           npm run typecheck
-          npm run game:validate
 
       - name: Package unsigned macOS arm64 application with signed official game content
         env:
           ARKINI_ARKPACK_PRIVATE_KEY: ${{ secrets.ARKINI_ARKPACK_PRIVATE_KEY }}
-        run: npm run package:mac
+        run: npm run package
 
       - name: Verify dependency graph and permanent tests against packaged build inputs
         run: |
           npm run dc
-          npm run test:shards
+          npm run jscpd
+          npm test
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v5

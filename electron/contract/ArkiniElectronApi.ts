@@ -1,6 +1,7 @@
 import type { AppearanceAccentSchema } from "./appearance/AppearanceAccentSchema";
 import type { AppearanceThemeSchema } from "./appearance/AppearanceThemeSchema";
 import type { CheatAvailabilitySchema } from "./cheat/CheatAvailabilitySchema";
+import type { CliInstallationStatus } from "./cli/CliInstallationStatus";
 import type { LastPackageIdSchema } from "./launcher/LastPackageIdSchema";
 import type { DiagnosticRecord } from "./diagnostics/DiagnosticRecord";
 import type { EditorProjectTransport } from "./editor/EditorProjectTransport";
@@ -27,6 +28,9 @@ export namespace ArkiniElectronApi {
 		appearanceAccentWrite: "arkini:appearance:accent:write",
 		cheatAvailabilityRead: "arkini:cheats:available:read",
 		cheatAvailabilityWrite: "arkini:cheats:available:write",
+		cliStatus: "arkini:cli:status",
+		cliInstall: "arkini:cli:install",
+		cliUninstall: "arkini:cli:uninstall",
 		launcherLastPackageIdRead: "arkini:launcher:last-package:read",
 		launcherLastPackageIdWrite: "arkini:launcher:last-package:write",
 		editorStatus: "arkini:editor:status",
@@ -98,6 +102,11 @@ export namespace ArkiniElectronApi {
 		readonly cheats: {
 			readonly readAvailable: () => Promise<CheatAvailabilitySchema.Type>;
 			readonly writeAvailable: (available: CheatAvailabilitySchema.Type) => Promise<void>;
+		};
+		readonly cli: {
+			readonly status: () => Promise<CliInstallationStatus>;
+			readonly install: () => Promise<CliInstallationStatus>;
+			readonly uninstall: () => Promise<CliInstallationStatus>;
 		};
 		readonly launcher: {
 			readonly readLastPackageId: () => Promise<LastPackageIdSchema.Type | null>;

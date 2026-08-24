@@ -10,7 +10,20 @@ const runCli = (...args: ReadonlyArray<string>) =>
 		process.execPath,
 		[
 			tsxCli,
-			"cli/arkini.ts",
+			"cli/arkini-repository.ts",
+			...args,
+		],
+		{
+			cwd: resolve("."),
+			encoding: "utf8",
+		},
+	);
+const runDistributionCli = (...args: ReadonlyArray<string>) =>
+	spawnSync(
+		process.execPath,
+		[
+			tsxCli,
+			"src/engine/cli/arkini.ts",
 			...args,
 		],
 		{
@@ -28,31 +41,30 @@ describe("Arkini Effect CLI", () => {
 		expect(output).toContain(ArkiniAppVersion);
 	});
 
-	it("exposes one discoverable game and desktop command tree", () => {
+	it("keeps desktop orchestration out of the distributed command tree", () => {
+		const result = runDistributionCli("--help");
+		const output = stripAnsi(`${result.stdout}${result.stderr}`);
+
+		expect(result.status).toBe(0);
+		expect(output).toContain("arkpack");
+		expect(output).toContain("game");
+		expect(output).not.toContain("desktop");
+	});
+
+	it("keeps repository orchestration limited to desktop delivery", () => {
 		const root = runCli("--help");
 		const rootOutput = stripAnsi(`${root.stdout}${root.stderr}`);
 		expect(root.status).toBe(0);
-		expect(rootOutput).toContain("arkpack");
-		expect(rootOutput).toContain("game");
 		expect(rootOutput).toContain("desktop");
-
-		const game = runCli("game", "--help");
-		const gameOutput = stripAnsi(`${game.stdout}${game.stderr}`);
-		expect(game.status).toBe(0);
-		expect(gameOutput).toContain("pack");
-		expect(gameOutput).toContain("pack-demo");
-		expect(gameOutput).toContain("schema");
-		expect(gameOutput).toContain("validate");
+		expect(rootOutput).not.toContain("arkpack");
+		expect(rootOutput).not.toContain("game");
 
 		const desktop = runCli("desktop", "--help");
 		const desktopOutput = stripAnsi(`${desktop.stdout}${desktop.stderr}`);
 		expect(desktop.status).toBe(0);
 		expect(desktopOutput).toContain("build");
-		expect(desktopOutput).toContain("clean");
-		expect(desktopOutput).toContain("stage");
 		expect(desktopOutput).toContain("package");
 		expect(desktopOutput).toContain("preview-macos");
-		expect(desktopOutput).toContain("checksums");
 		expect(desktopOutput).toContain("verify");
 		expect(desktopOutput).not.toContain("desktop desktop");
 
@@ -62,6 +74,16 @@ describe("Arkini Effect CLI", () => {
 		expect(desktopPackageOutput).toContain("--arch");
 		expect(desktopPackageOutput).toContain("choices: arm64");
 	}, 30_000);
+
+	it("exposes product game commands without the removed demo", () => {
+		const game = runDistributionCli("game", "--help");
+		const output = stripAnsi(`${game.stdout}${game.stderr}`);
+		expect(game.status).toBe(0);
+		expect(output).toContain("pack");
+		expect(output).toContain("schema");
+		expect(output).toContain("validate");
+		expect(output).not.toContain("pack-demo");
+	});
 
 	it("rejects unsupported package architecture with a deterministic non-zero exit", () => {
 		const result = runCli("desktop", "package", "--arch", "x64");

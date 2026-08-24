@@ -21,7 +21,7 @@ The probe passed:
 - `npm run typecheck:src`;
 - `npm run typecheck:electron`;
 - `npm run typecheck:test`;
-- `npm run game:validate`;
+- the then-current game validation command;
 - 37 focused Atom/command lifecycle tests across renderer registry/lifecycle, Item Detail,
   appearance, cheats, and Cheat Spotlight.
 
@@ -66,9 +66,7 @@ external imports directly.
 
 `@effect/platform-node` is imported through the exact `NodeServices` / `NodeRuntime`
 subpaths rather than the package root. The root barrel re-exports `NodeRedis`, which makes
-its Redis peer load eagerly even though Arkini does not use Redis. LLM cache installs also
-use `--omit=peer` plus `--legacy-peer-deps`, so optional integration peers are neither
-fetched nor required by Arkini's Node service/runtime entrypoints.
+its Redis peer load eagerly even though Arkini does not use Redis.
 
 ## Prerelease-specific boundaries
 
@@ -83,7 +81,7 @@ fetched nor required by Arkini's Node service/runtime entrypoints.
 | Cause projection | `readExactCauseFailure` and `readSettledAsyncResultError` inspect `cause.reasons` and accept exactly one `Fail` reason. Defects, interruption, and composite causes remain lifecycle failures. | Replace internal-looking Cause traversal with the final supported stable projection API if available. Preserve exact typed-failure-only behavior; never flatten defects or interruption into UI/domain errors. |
 | Game session runtime | A `ManagedRuntime`, owner `Scope`, forked session/command scopes, `FiberSet` command runtime, AbortSignal propagation, and exactly-once disposal jointly own Tick, save, subscriptions, and commands. | Translate to stable lifecycle APIs without weakening ownership. Bootstrap failure/interruption, overlapping disposal, frozen retry behavior, command admission, save ordering, and exactly-once cleanup are compatibility gates. |
 | Renderer and Electron roots | Renderer and Electron each own one process-lifetime `ManagedRuntime`; Electron supplies `NodeServices.layer`. | Use stable runtime/platform APIs and retain explicit process roots. Do not create per-callback runtimes or duplicate service authorities. |
-| CLI | All command declarations import `effect/unstable/cli`; `cli/arkini.ts` supplies `NodeServices.layer` and uses `NodeRuntime.runMain`. | Move the complete command tree to the supported stable CLI entrypoint in one pass. Preserve command names, options, help text, exit codes, typed failures, and packaging scripts. |
+| CLI | All command declarations import `effect/unstable/cli`; `src/engine/cli/arkini.ts` owns the product runtime edge and `cli/arkini-repository.ts` owns the private desktop-delivery edge. | Move both roots to the supported stable CLI entrypoint in one pass. Preserve command names, options, help text, exit codes, typed failures, and packaging scripts. |
 | Atom/React types | Feature atoms depend directly on unstable `Atom`, `AtomRegistry`, `AsyncResult`, and `AtomRuntime` types plus `@effect/atom-react` hooks. | Adopt final stable names and generics directly. Do not paper over type drift with casts or a repository-local compatibility facade. |
 
 HMR state preservation is explicitly out of scope. Arkini may restart renderer state during
@@ -315,25 +313,24 @@ test/ui/reactivity/readSettledAsyncResultError.test.ts
 
 ## Complete unstable CLI inventory
 
-Snapshot at `4.0.0-rc.111`: 19 production files.
+Snapshot at `4.0.0-rc.111`: 18 production files.
 
 ```text
-cli/ArkiniCommand.ts
-cli/arkini.ts
-cli/arkpack/ArkpackCommand.ts
-cli/arkpack/ArkpackKeygenCommand.ts
-cli/arkpack/ArkpackOfficialPackCommand.ts
-cli/arkpack/ArkpackSignCommand.ts
-cli/arkpack/ArkpackVerifyCommand.ts
+cli/ArkiniRepositoryCommand.ts
+cli/arkini-repository.ts
 cli/desktop/DesktopBuildCommand.ts
-cli/desktop/DesktopChecksumsCommand.ts
-cli/desktop/DesktopCleanCommand.ts
 cli/desktop/DesktopCommand.ts
 cli/desktop/DesktopPackageCommand.ts
 cli/desktop/DesktopPreviewMacosCommand.ts
-cli/desktop/DesktopStageCommand.ts
 cli/desktop/DesktopVerifyCommand.ts
+src/engine/cli/ArkiniCommand.ts
 src/engine/cli/GameCommand.ts
+src/engine/cli/arkini.ts
+src/engine/pack/cli/ArkpackCommand.ts
+src/engine/pack/cli/ArkpackKeygenCommand.ts
+src/engine/pack/cli/ArkpackOfficialPackCommand.ts
+src/engine/pack/cli/ArkpackSignCommand.ts
+src/engine/pack/cli/ArkpackVerifyCommand.ts
 src/engine/pack/cli/PackCommand.ts
 src/engine/schema/cli/SchemaCommand.ts
 src/engine/validation/cli/ValidateCommand.ts
@@ -435,24 +432,26 @@ test/ui/pixi/PixiBoardToolbarSurface.test.ts
 
 ## Complete platform-node inventory
 
-Snapshot at `4.0.0-rc.111`: 20 files — 2 production sources and 18 tests/support files.
+Snapshot at `4.0.0-rc.111`: 22 files — 3 production sources and 19 tests/support files.
 
 ```text
-cli/arkini.ts
+cli/arkini-repository.ts
 electron/main/ElectronMainRuntime.ts
+src/engine/cli/arkini.ts
 test/desktop/DesktopPackaging.test.ts
 test/desktop/buildDesktopFx.test.ts
 test/desktop/createUnpackedMacAppFx.test.ts
 test/desktop/packageDesktopMacFx.test.ts
 test/desktop/previewDesktopMacFx.test.ts
 test/electron/createFilesystemAppearancePreferencesFx.test.ts
-test/electron/createFilesystemArkpackCatalogFx.test.ts
+test/electron/createFilesystemArkpackCatalogFx.test/fixture.ts
 test/electron/createFilesystemCheatPreferencesFx.test.ts
 test/electron/createFilesystemEditorMcpPreferencesFx.test.ts
 test/electron/createFilesystemGameSaveFilesFx.test.ts
 test/electron/createFilesystemLauncherPreferencesFx.test.ts
 test/electron/createFilesystemWindowPreferencesFx.test.ts
-test/electron/registerArkiniElectronIpc.test.ts
+test/electron/listArkpackFilesFx.test.ts
+test/electron/registerArkiniElectronIpc.test/fixture.ts
 test/pack/fx/arkpackSigningWorkflow.test.ts
 test/pack/fx/packDirectoryFx.test.ts
 test/schema/fx/writeGameJsonSchemaFx.test.ts
@@ -514,8 +513,6 @@ Final repository checks:
 ```sh
 npm run format:check
 npm run typecheck
-npm run game:validate
-npm run game:schema
 npm run build
 npm run dc
 npm test

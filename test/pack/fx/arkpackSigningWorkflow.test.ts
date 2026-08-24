@@ -13,6 +13,7 @@ import { signArkpackFx } from "~/engine/pack/fx/signArkpackFx";
 import { verifyArkpackFileFx } from "~/engine/pack/fx/verifyArkpackFileFx";
 import { ArkpackTrustedKeysSchema } from "~/engine/pack/schema/ArkpackTrustedKeysSchema";
 import { installTestPngDecoder } from "~test/bridge/arkpack/support/createTestPngBytes";
+import { writeSigningGame } from "./arkpackSigningWorkflow.test/writeSigningGame";
 
 const keyId = "test-workflow-2026-01";
 let root = "";
@@ -32,6 +33,7 @@ afterEach(async () => {
 
 describe("Arkpack signing workflow", () => {
 	it("packs, signs, verifies, loads, and distinguishes every trust boundary", async () => {
+		const gameDirectory = await writeSigningGame(root);
 		const [pair, unknownPair] = await Effect.runPromise(
 			Effect.all(
 				[
@@ -55,7 +57,7 @@ describe("Arkpack signing workflow", () => {
 		const untrustedKey = await Effect.runPromise(
 			Effect.result(
 				packSignedDirectoryFx({
-					input: "game/demo",
+					input: gameDirectory,
 					keyId,
 					packageId: "untrusted-workflow",
 					version: "1.0",
@@ -78,7 +80,7 @@ describe("Arkpack signing workflow", () => {
 
 		const result = await Effect.runPromise(
 			packSignedDirectoryFx({
-				input: "game/demo",
+				input: gameDirectory,
 				keyId,
 				packageId: "test-workflow",
 				version: "1.0",
@@ -118,7 +120,7 @@ describe("Arkpack signing workflow", () => {
 			type: "official",
 			keyId,
 		});
-		expect(loaded.payload.config.meta.id).toBe("demo");
+		expect(loaded.payload.config.meta.id).toBe("game:signing-workflow");
 
 		const unsigned = await Effect.runPromise(
 			readArkpackFx({

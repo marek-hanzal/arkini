@@ -186,6 +186,16 @@ export const Settings = ({ onBackFx }: Settings.Props) => {
 					</p>
 				</label>
 				<SettingsOpenActionRow
+					dataUi="SettingsCli"
+					title="Command line"
+					description={model.cliDescription}
+					pending={model.cliPending}
+					disabled={model.cliDisabled}
+					pendingLabel={model.cliActionLabel}
+					idleLabel={model.cliActionLabel}
+					onClick={model.toggleCliInstallation}
+				/>
+				<SettingsOpenActionRow
 					dataUi="SettingsDiagnostics"
 					title="Diagnostics"
 					description="Open the bounded rotating logs used to investigate crashes and broken gameplay sessions."
@@ -218,6 +228,11 @@ export const Settings = ({ onBackFx }: Settings.Props) => {
 				{model.userDataStatus.kind === "error" ? (
 					<p className="text-danger">
 						Opening data folder failed: {errorMessage(model.userDataStatus.error)}
+					</p>
+				) : null}
+				{model.cliStatus.kind === "error" ? (
+					<p className="text-danger">
+						CLI installation failed: {model.cliStatus.message}
 					</p>
 				) : null}
 				{match(model.status)

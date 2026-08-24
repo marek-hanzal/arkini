@@ -4,13 +4,9 @@ import { describe, expect, it, vi } from "vitest";
 
 const calls = vi.hoisted(() => [] as string[]);
 
-vi.mock("../../cli/arkpack/packOfficialArkiniFx", () => ({
-	packOfficialArkiniFx: ({ gameDirectory }: { readonly gameDirectory: string }) =>
-		Effect.sync(() => calls.push(`pack:${gameDirectory}`)),
-}));
-vi.mock("../../cli/desktop/packDemoGameFx", () => ({
-	packDemoGameFx: ({ gameDirectory }: { readonly gameDirectory: string }) =>
-		Effect.sync(() => calls.push(`pack:${gameDirectory}`)),
+vi.mock("../../cli/desktop/runBuiltArkiniCliFx", () => ({
+	runBuiltArkiniCliFx: (args: ReadonlyArray<string>) =>
+		Effect.sync(() => calls.push(`cli:${args.join(" ")}`)),
 }));
 vi.mock("../../cli/desktop/buildDesktopOutputFx", () => ({
 	buildDesktopOutputFx: () => Effect.sync(() => calls.push("build-output")),
@@ -19,18 +15,13 @@ vi.mock("../../cli/desktop/buildDesktopOutputFx", () => ({
 import { buildDesktopFx } from "../../cli/desktop/buildDesktopFx";
 
 describe("buildDesktopFx", () => {
-	it("compiles Electron before building the independent game packages", async () => {
+	it("compiles Electron before invoking its production CLI", async () => {
 		calls.length = 0;
-		await Effect.runPromise(
-			buildDesktopFx({
-				gameDirectory: "game/arkini",
-			}).pipe(Effect.provide(NodeServices.layer)),
-		);
+		await Effect.runPromise(buildDesktopFx().pipe(Effect.provide(NodeServices.layer)));
 
 		expect(calls).toEqual([
 			"build-output",
-			"pack:game/arkini",
-			"pack:game/demo",
+			"cli:arkpack pack-official",
 		]);
 	});
 });

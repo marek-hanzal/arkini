@@ -46,7 +46,7 @@ The current file-picker import stores a selected `.arkpack` without discovering 
 Generate a local Ed25519 key pair:
 
 ```bash
-npm run arkpack:keygen
+arkini-cli arkpack keygen
 ```
 
 The command creates:
@@ -63,13 +63,13 @@ There is no `.env.local` signing path. Local commands read `.arkini/arkpack-priv
 Pack an ordinary unsigned authoring package:
 
 ```bash
-npm run game:pack
+arkini-cli game pack
 ```
 
 Sign an existing final package:
 
 ```bash
-npm run arkpack:sign -- \
+arkini-cli arkpack sign \
 	game/arkini.game.arkpack \
 	--key-id arkini-official-2026-01
 ```
@@ -77,7 +77,7 @@ npm run arkpack:sign -- \
 Verify a package and its canonical sidecar:
 
 ```bash
-npm run arkpack:verify -- \
+arkini-cli arkpack verify \
 	game/arkini.game.arkpack \
 	--trusted-keys game/arkini.arkpack.keys.json
 ```
@@ -87,12 +87,10 @@ Verification prints the content hash and explicit trust JSON. It exits non-zero 
 Build, sign, and post-verify the official package in one operation:
 
 ```bash
-npm run game:pack:official
+arkini-cli arkpack pack-official
 ```
 
 The command fails closed when the private key is absent, the selected `keyId` is absent from the committed registry, or post-sign verification does not establish official trust.
-
-The deliberately unsigned [`game/demo`](game/demo) package contains only one directional merge. `npm run game:pack:demo` includes it in application builds without a sidecar, proving that bundled location and official authorship are separate concepts.
 
 ## GitHub Actions
 
@@ -112,7 +110,7 @@ Only [`game/arkini.arkpack.keys.json`](game/arkini.arkpack.keys.json), containin
 4. Change the single active `keyId` in
    [`shared/ArkiniOfficialArkpackIdentity.ts`](shared/ArkiniOfficialArkpackIdentity.ts),
    replace the
-   `ARKINI_ARKPACK_PRIVATE_KEY` CI secret, and run `npm run game:pack:official`.
+   `ARKINI_ARKPACK_PRIVATE_KEY` CI secret, and run `arkini-cli arkpack pack-official`.
 5. Verify the regenerated signature. Package binaries and signature sidecars remain ignored build
    output; the active signing identity has one source-owned constant in
    [`shared/ArkiniOfficialArkpackIdentity.ts`](shared/ArkiniOfficialArkpackIdentity.ts).

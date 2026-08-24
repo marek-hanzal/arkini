@@ -9,10 +9,8 @@ import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreview
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import {
-	readArkiniGameConfigSource,
-	readDemoGameConfigSource,
-} from "~test/schema/support/readArkiniGameConfigSource";
+import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
+import { directionalMergeConfig } from "./mergeGameplayFlow.test/directionalMergeConfig";
 
 const mergeLiveItemsFx = (sourceItemId: string, targetItemId: string) =>
 	Effect.gen(function* () {
@@ -72,8 +70,7 @@ const dropLiveItemFx = (sourceItemId: string, targetItemId: string) =>
 	});
 
 describe("authored directional merge gameplay", () => {
-	it("isolates the stacked demo tree and consumes one water in place", async () => {
-		const config = await readDemoGameConfigSource();
+	it("isolates the stacked merge target and consumes one source in place", () => {
 		const sourceLocation = {
 			scope: "board" as const,
 			space: 0,
@@ -112,7 +109,7 @@ describe("authored directional merge gameplay", () => {
 				};
 			}).pipe(
 				useGameFx({
-					config,
+					config: directionalMergeConfig,
 					state: {
 						cheats: {
 							enabled: false,

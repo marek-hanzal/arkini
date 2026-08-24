@@ -26,6 +26,8 @@ export const createUnpackedMacAppFx = Effect.fn("createUnpackedMacAppFx")(functi
 					"--mac",
 					`--${arch}`,
 					"--dir",
+					"--config.directories.output",
+					outputDirectory,
 					"--publish",
 					"never",
 				],

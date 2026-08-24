@@ -6,6 +6,7 @@ export namespace SettingsOpenActionRow {
 		readonly title: string;
 		readonly description: string;
 		readonly pending: boolean;
+		readonly disabled?: boolean;
 		readonly pendingLabel: string;
 		readonly idleLabel: string;
 		readonly onClick: () => void;
@@ -18,6 +19,7 @@ export const SettingsOpenActionRow = ({
 	title,
 	description,
 	pending,
+	disabled = false,
 	pendingLabel,
 	idleLabel,
 	onClick,
@@ -33,7 +35,7 @@ export const SettingsOpenActionRow = ({
 		<Button
 			className="shrink-0"
 			cursorIntent={pending ? "progress" : undefined}
-			disabled={pending}
+			disabled={pending || disabled}
 			onClick={onClick}
 		>
 			{pending ? pendingLabel : idleLabel}

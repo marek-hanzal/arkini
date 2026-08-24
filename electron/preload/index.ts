@@ -62,6 +62,11 @@ const api: ArkiniElectronApi.Api = {
 		writeAvailable: (available) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.cheatAvailabilityWrite, available),
 	},
+	cli: {
+		status: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliStatus),
+		install: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliInstall),
+		uninstall: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliUninstall),
+	},
 	launcher: {
 		readLastPackageId: () =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.launcherLastPackageIdRead),

@@ -72,6 +72,20 @@ const createRepository = (): SqliteEditorProjectRepository => ({
 	replaceResourceFx: vi.fn(() => Effect.succeed(project)),
 	upsertItemFx: vi.fn(() => Effect.succeed(commit)),
 	upsertResourcesFx: vi.fn(() => Effect.succeed(project)),
+	listBoardScenariosFx: vi.fn(() => Effect.succeed([])),
+	readBoardScenarioFx: vi.fn(() => Effect.succeed(null)),
+	writeBoardScenarioFx: vi.fn(({ projectId, name, bytes }) =>
+		Effect.succeed({
+			projectId,
+			name,
+			projectRevision: project.revision,
+			version: project.version,
+			bytes,
+			createdAtMs: 3,
+			updatedAtMs: 3,
+		}),
+	),
+	deleteBoardScenarioFx: vi.fn(() => Effect.void),
 	closeFx: Effect.void,
 	closeSync: vi.fn(),
 });
@@ -118,6 +132,10 @@ const editorChannels = [
 	ArkiniElectronApi.channels.editorProjectReplaceResource,
 	ArkiniElectronApi.channels.editorProjectUpsertItem,
 	ArkiniElectronApi.channels.editorProjectUpsertResources,
+	ArkiniElectronApi.channels.editorBoardScenarioList,
+	ArkiniElectronApi.channels.editorBoardScenarioRead,
+	ArkiniElectronApi.channels.editorBoardScenarioWrite,
+	ArkiniElectronApi.channels.editorBoardScenarioDelete,
 ];
 
 afterEach(() => {
@@ -146,6 +164,10 @@ describe("registerEditorProjectIpcFx", () => {
 		expect(repository.replaceResourceFx).not.toHaveBeenCalled();
 		expect(repository.upsertItemFx).not.toHaveBeenCalled();
 		expect(repository.upsertResourcesFx).not.toHaveBeenCalled();
+		expect(repository.listBoardScenariosFx).not.toHaveBeenCalled();
+		expect(repository.readBoardScenarioFx).not.toHaveBeenCalled();
+		expect(repository.writeBoardScenarioFx).not.toHaveBeenCalled();
+		expect(repository.deleteBoardScenarioFx).not.toHaveBeenCalled();
 	});
 
 	it("validates and forwards every ready repository operation", async () => {
@@ -181,6 +203,17 @@ describe("registerEditorProjectIpcFx", () => {
 			resources: [
 				editorTestPayload.resources[0],
 			],
+		};
+		const scenarioKey = {
+			projectId: "project-one",
+			name: "Scenario 1",
+		};
+		const scenarioWrite = {
+			...scenarioKey,
+			expectedRevision: 1,
+			bytes: new Uint8Array([
+				1,
+			]),
 		};
 
 		await expect(invoke(ArkiniElectronApi.channels.editorStatus)).resolves.toEqual({
@@ -232,6 +265,35 @@ describe("registerEditorProjectIpcFx", () => {
 			type: "success",
 			value: project,
 		});
+		await expect(
+			invoke(ArkiniElectronApi.channels.editorBoardScenarioList, "project-one"),
+		).resolves.toEqual({
+			type: "success",
+			value: [],
+		});
+		await expect(
+			invoke(ArkiniElectronApi.channels.editorBoardScenarioRead, scenarioKey),
+		).resolves.toEqual({
+			type: "success",
+			value: null,
+		});
+		await expect(
+			invoke(ArkiniElectronApi.channels.editorBoardScenarioWrite, scenarioWrite),
+		).resolves.toMatchObject({
+			type: "success",
+			value: {
+				...scenarioKey,
+				bytes: new Uint8Array([
+					1,
+				]),
+			},
+		});
+		await expect(
+			invoke(ArkiniElectronApi.channels.editorBoardScenarioDelete, scenarioKey),
+		).resolves.toEqual({
+			type: "success",
+			value: undefined,
+		});
 
 		expect(repository.readProjectFx).toHaveBeenCalledWith("project-one");
 		expect(repository.createProjectFx).toHaveBeenCalledWith(createRequest);
@@ -239,6 +301,12 @@ describe("registerEditorProjectIpcFx", () => {
 		expect(repository.replaceResourceFx).toHaveBeenCalledWith(replaceResourceRequest);
 		expect(repository.upsertItemFx).toHaveBeenCalledWith(upsertItemRequest);
 		expect(repository.upsertResourcesFx).toHaveBeenCalledWith(upsertResourcesRequest);
+		expect(repository.listBoardScenariosFx).toHaveBeenCalledWith("project-one");
+		expect(repository.readBoardScenarioFx).toHaveBeenCalledWith(scenarioKey);
+		expect(vi.mocked(repository.writeBoardScenarioFx).mock.calls[0]?.[0]).toEqual(
+			scenarioWrite,
+		);
+		expect(repository.deleteBoardScenarioFx).toHaveBeenCalledWith(scenarioKey);
 
 		await expect(
 			invoke(ArkiniElectronApi.channels.editorProjectCreate, {

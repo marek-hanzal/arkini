@@ -20,6 +20,12 @@ const gameCheatsPattern = /^\/game\/[^/]+\/cheats\/?$/;
 const gameInventoryPattern = /^\/game\/[^/]+\/inventory\/?$/;
 const editorWelcomePattern = /^\/editor(?:\/welcome)?\/?$/;
 const editorProjectPattern = /^\/editor\/(?!welcome(?:\/|$))[^/]+(?:\/.*)?$/;
+const editorBoardPattern = /^\/editor\/[^/]+\/board\/?$/;
+const editorBoardInventoryPattern = /^\/editor\/[^/]+\/board\/inventory\/?$/;
+
+const isEditorBoardLeafTransition = (from: string, to: string) =>
+	(editorBoardPattern.test(from) && editorBoardInventoryPattern.test(to)) ||
+	(editorBoardInventoryPattern.test(from) && editorBoardPattern.test(to));
 
 const resolveVisualRouteId = (pathname: string): VisualRouteId => {
 	if (pathname === "/") return "startup";
@@ -91,15 +97,22 @@ export const resolveRouteViewTransitionTypesFx = Effect.fn("resolveRouteViewTran
 				)
 				.exhaustive();
 			const pair = `${from}-to-${to}`;
-			return pair === sceneRelationship
+			const types =
+				pair === sceneRelationship
+					? [
+							"arkini-route",
+							sceneRelationship,
+						]
+					: [
+							"arkini-route",
+							sceneRelationship,
+							pair,
+						];
+			return isEditorBoardLeafTransition(fromLocation.pathname, toLocation.pathname)
 				? [
-						"arkini-route",
-						sceneRelationship,
+						...types,
+						"editor-board-leaf",
 					]
-				: [
-						"arkini-route",
-						sceneRelationship,
-						pair,
-					];
+				: types;
 		}),
 );

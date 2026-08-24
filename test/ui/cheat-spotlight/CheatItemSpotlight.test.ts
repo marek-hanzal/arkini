@@ -98,9 +98,11 @@ const createGame = (): Game =>
 	}) as Game;
 
 const SpotlightUnderTest = ({
+	alwaysAvailable,
 	game,
 	onBeforeOpen,
 }: {
+	readonly alwaysAvailable?: boolean;
 	readonly game: Game;
 	readonly onBeforeOpen?: () => void;
 }) =>
@@ -115,6 +117,7 @@ const SpotlightUnderTest = ({
 				game,
 			},
 			createElement(CheatItemSpotlight, {
+				alwaysAvailable,
 				game,
 				onBeforeOpen,
 			}),
@@ -140,6 +143,35 @@ afterEach(async () => {
 });
 
 describe("CheatItemSpotlight", () => {
+	it("allows an editor-owned override of the global player preference", async () => {
+		registry.set(CheatAvailabilityAtom, false);
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				createElement(SpotlightUnderTest, {
+					alwaysAvailable: true,
+					game: createGame(),
+				}),
+			);
+		});
+		await act(async () => {
+			document.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "p",
+					code: "KeyP",
+					ctrlKey: true,
+					bubbles: true,
+					cancelable: true,
+				}),
+			);
+			await Promise.resolve();
+		});
+		expect(container.querySelector('[data-ui="CheatItemSpotlight"]')).not.toBeNull();
+	});
+
 	it("opens through TanStack Mod+P and spawns the keyboard-selected catalog item", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);

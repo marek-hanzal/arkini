@@ -84,6 +84,14 @@ const api: ArkiniElectronApi.Api = {
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectUpsertItem, request),
 		upsertResources: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectUpsertResources, request),
+		listBoardScenarios: (projectId) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorBoardScenarioList, projectId),
+		readBoardScenario: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorBoardScenarioRead, request),
+		writeBoardScenario: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorBoardScenarioWrite, request),
+		deleteBoardScenario: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorBoardScenarioDelete, request),
 	},
 	editorMcp: {
 		status: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpStatus),

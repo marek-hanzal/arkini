@@ -9,11 +9,14 @@ import type { ItemDetailHeaderIdentityRenderer } from "~/ui/item-detail/ItemDeta
 import type { ItemLineSummaryIdentityRenderer } from "~/ui/item-detail/ItemLineSummary";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
-import { gameBoardViewTransitionName } from "~/ui/navigation/gameBoardViewTransitionName";
+import {
+	editorGameBoardViewTransitionName,
+	gameBoardViewTransitionName,
+} from "~/ui/navigation/gameBoardViewTransitionName";
 import { RouteBackdrop } from "~/ui/navigation/RouteBackdrop";
 import { PixiGameProvider } from "~/ui/pixi/PixiGameProvider";
 
-type GameShellRoutePresentation = "embedded" | "fullscreen";
+type GameShellRoutePresentation = "embedded" | "embedded-transition" | "fullscreen";
 
 const GameSceneBackdrop = ({
 	routePresentation,
@@ -43,11 +46,15 @@ const GameTileScene = ({
 		className="relative isolate z-10 size-full min-h-0 min-w-0"
 		data-ui="TileScene"
 		style={
-			routePresentation === "fullscreen"
-				? {
-						viewTransitionName: gameBoardViewTransitionName,
-					}
-				: undefined
+			{
+				fullscreen: {
+					viewTransitionName: gameBoardViewTransitionName,
+				},
+				"embedded-transition": {
+					viewTransitionName: editorGameBoardViewTransitionName,
+				},
+				embedded: undefined,
+			}[routePresentation]
 		}
 	>
 		<div

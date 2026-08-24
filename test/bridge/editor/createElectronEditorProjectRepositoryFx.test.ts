@@ -59,6 +59,22 @@ const installEditorApi = () => {
 		replaceResource: vi.fn(async () => success(project)),
 		upsertItem: vi.fn(async () => success(commit)),
 		upsertResources: vi.fn(async () => success(project)),
+		listBoardScenarios: vi.fn(async () => success([])),
+		readBoardScenario: vi.fn(async () => success(null)),
+		writeBoardScenario: vi.fn(async () =>
+			success({
+				projectId: "project-one",
+				name: "Scenario 1",
+				projectRevision: 2,
+				version: editorTestPayload.version,
+				bytes: new Uint8Array([
+					1,
+				]),
+				createdAtMs: 12,
+				updatedAtMs: 12,
+			}),
+		),
+		deleteBoardScenario: vi.fn(async () => success(undefined)),
 	};
 	Object.defineProperty(window, "arkini", {
 		configurable: true,
@@ -139,6 +155,31 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 				],
 			}),
 		);
+		const listedScenarios = await Effect.runPromise(
+			repository.listBoardScenariosFx("project-one"),
+		);
+		const readScenario = await Effect.runPromise(
+			repository.readBoardScenarioFx({
+				projectId: "project-one",
+				name: "Scenario 1",
+			}),
+		);
+		const writtenScenario = await Effect.runPromise(
+			repository.writeBoardScenarioFx({
+				projectId: "project-one",
+				expectedRevision: 2,
+				name: "Scenario 1",
+				bytes: new Uint8Array([
+					1,
+				]),
+			}),
+		);
+		await Effect.runPromise(
+			repository.deleteBoardScenarioFx({
+				projectId: "project-one",
+				name: "Scenario 1",
+			}),
+		);
 
 		expect(editor.awaitIdle).toHaveBeenCalledOnce();
 		expect(editor.createProject).toHaveBeenCalledWith(createRequest);
@@ -166,6 +207,30 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 				replacementResource,
 			],
 		});
+		expect(editor.listBoardScenarios).toHaveBeenCalledWith("project-one");
+		expect(editor.readBoardScenario).toHaveBeenCalledWith({
+			projectId: "project-one",
+			name: "Scenario 1",
+		});
+		expect(editor.writeBoardScenario).toHaveBeenCalledWith({
+			projectId: "project-one",
+			expectedRevision: 2,
+			name: "Scenario 1",
+			bytes: new Uint8Array([
+				1,
+			]),
+		});
+		expect(editor.deleteBoardScenario).toHaveBeenCalledWith({
+			projectId: "project-one",
+			name: "Scenario 1",
+		});
+		expect(listedScenarios).toEqual([]);
+		expect(readScenario).toBeNull();
+		expect(writtenScenario.bytes).toEqual(
+			new Uint8Array([
+				1,
+			]),
+		);
 		expect(listed).toEqual([
 			descriptor,
 		]);

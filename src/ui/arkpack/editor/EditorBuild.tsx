@@ -51,8 +51,9 @@ export const EditorBuild = () => {
 					Validate one exact saved project snapshot and produce immutable Arkpack bytes.
 				</p>
 				<p className="mt-1 text-xs text-subtle">
-					Arkpack v{project.version}. Compatible edits keep saves; a major bump starts a
-					new game.
+					Arkpack v{project.version}. Compatible edits keep saves and Board scenarios; a
+					major project save permanently deletes its scenarios and published game saves
+					start fresh when loaded.
 				</p>
 			</header>
 			<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">

@@ -153,6 +153,26 @@ describe("createArkiniRouterFx", () => {
 				],
 			],
 			[
+				"/editor/arkini/board",
+				"/editor/arkini/board/inventory",
+				[
+					"arkini-route",
+					"board-to-board",
+					"editor-to-editor",
+					"editor-board-leaf",
+				],
+			],
+			[
+				"/editor/arkini/board/inventory",
+				"/editor/arkini/board",
+				[
+					"arkini-route",
+					"board-to-board",
+					"editor-to-editor",
+					"editor-board-leaf",
+				],
+			],
+			[
 				"/editor/arkini/project",
 				"/main-menu",
 				[

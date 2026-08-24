@@ -12,6 +12,7 @@ import {
 import { EditorProjectRepositoryError } from "~/bridge/editor/EditorProjectRepositoryError";
 import { editEditorAssetFx } from "~/bridge/resource/editor/editEditorAssetFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { UnusedEditorBoardScenarioRepository } from "~test/support/UnusedEditorBoardScenarioRepository";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
 
@@ -30,6 +31,7 @@ const createRepository = (
 	replaceResourceFx: EditorProjectRepositoryService["replaceResourceFx"],
 	project = createProject(),
 ): EditorProjectRepositoryService => ({
+	...UnusedEditorBoardScenarioRepository,
 	awaitIdleFx: Effect.void,
 	createProjectFx: () => Effect.die("Unexpected create."),
 	listProjectsFx: Effect.die("Unexpected list."),

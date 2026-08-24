@@ -6,19 +6,28 @@ import { createGameResourceUrlsFx } from "~/bridge/game/createGameResourceUrlsFx
 import { createGameSessionFx } from "~/bridge/game/createGameSessionFx";
 import { discardGameBootstrapFx } from "~/bridge/game/discardGameBootstrapFx";
 import { startFx } from "~/engine/start/write/startFx";
+import { setCheatEnabledFx } from "~/engine/cheat/write/setCheatEnabledFx";
+import type { StateSchema } from "~/engine/state/schema/StateSchema";
 
 export namespace createEditorBoardGameFx {
 	export interface Props {
 		readonly project: EditorProject;
+		readonly state?: StateSchema.Type;
 	}
 }
 
 /** Creates one fresh canonical game session without any durable save capability. */
 export const createEditorBoardGameFx = Effect.fn("createEditorBoardGameFx")(function* ({
 	project,
+	state,
 }: createEditorBoardGameFx.Props) {
 	const session = yield* createGameSessionFx({
 		config: project.config,
+		...(state === undefined
+			? {}
+			: {
+					state,
+				}),
 	});
 	let resourceUrls: Effect.Success<ReturnType<typeof createGameResourceUrlsFx>> | undefined;
 	const discardFailedBootstrapFx = discardGameBootstrapFx(
@@ -31,7 +40,12 @@ export const createEditorBoardGameFx = Effect.fn("createEditorBoardGameFx")(func
 			owner: "Editor game",
 			resources: project.resources,
 		});
-		yield* session.runFx(startFx());
+		if (state === undefined) yield* session.runFx(startFx());
+		yield* session.runFx(
+			setCheatEnabledFx({
+				enabled: true,
+			}),
+		);
 
 		const liveResourceUrls = resourceUrls;
 		const disposeFx = session.disposeWithoutSaveFx.pipe(

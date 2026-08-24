@@ -152,6 +152,38 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 							}).pipe(Effect.flatMap(repository.upsertResourcesFx)),
 						),
 				);
+				handle(ArkiniElectronApi.channels.editorBoardScenarioList, (_event, candidate) =>
+					execute("list-board-scenarios", ownership, (repository) =>
+						Effect.try({
+							try: () => requestParser.parseBoardScenarioProjectId(candidate),
+							catch: (error) => error as EditorProjectRepositoryError,
+						}).pipe(Effect.flatMap(repository.listBoardScenariosFx)),
+					),
+				);
+				handle(ArkiniElectronApi.channels.editorBoardScenarioRead, (_event, candidate) =>
+					execute("read-board-scenario", ownership, (repository) =>
+						Effect.try({
+							try: () => requestParser.parseBoardScenarioKey(candidate),
+							catch: (error) => error as EditorProjectRepositoryError,
+						}).pipe(Effect.flatMap(repository.readBoardScenarioFx)),
+					),
+				);
+				handle(ArkiniElectronApi.channels.editorBoardScenarioWrite, (_event, candidate) =>
+					execute("write-board-scenario", ownership, (repository) =>
+						Effect.try({
+							try: () => requestParser.parseWriteBoardScenario(candidate),
+							catch: (error) => error as EditorProjectRepositoryError,
+						}).pipe(Effect.flatMap(repository.writeBoardScenarioFx)),
+					),
+				);
+				handle(ArkiniElectronApi.channels.editorBoardScenarioDelete, (_event, candidate) =>
+					execute("delete-board-scenario", ownership, (repository) =>
+						Effect.try({
+							try: () => requestParser.parseDeleteBoardScenario(candidate),
+							catch: (error) => error as EditorProjectRepositoryError,
+						}).pipe(Effect.flatMap(repository.deleteBoardScenarioFx)),
+					),
+				);
 
 				const channels = [
 					ArkiniElectronApi.channels.editorStatus,
@@ -163,6 +195,10 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					ArkiniElectronApi.channels.editorProjectReplaceResource,
 					ArkiniElectronApi.channels.editorProjectUpsertItem,
 					ArkiniElectronApi.channels.editorProjectUpsertResources,
+					ArkiniElectronApi.channels.editorBoardScenarioList,
+					ArkiniElectronApi.channels.editorBoardScenarioRead,
+					ArkiniElectronApi.channels.editorBoardScenarioWrite,
+					ArkiniElectronApi.channels.editorBoardScenarioDelete,
 				];
 				app.once("will-quit", () => {
 					for (const channel of channels) ipcMain.removeHandler(channel);

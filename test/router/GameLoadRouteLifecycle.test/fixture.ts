@@ -105,6 +105,7 @@ export const installEditorBoardGameOwner = (
 		state,
 		syncFx: () => Effect.void,
 		publishFx: () => Effect.void,
+		replaceFx: () => Effect.void,
 		releaseCurrentFx,
 		shutdownFx: Effect.void,
 	} satisfies EditorBoardGameResource;

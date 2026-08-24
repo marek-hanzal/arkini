@@ -13,6 +13,11 @@ import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import {
+	EditorBoardScenarioDescriptorSchema,
+	EditorBoardScenarioNameSchema,
+	EditorBoardScenarioSchema,
+} from "~/editor/board/EditorBoardScenarioSchema";
 
 const descriptorSchema = z
 	.object({
@@ -84,6 +89,14 @@ const parseProject = (candidate: unknown) => {
 				bytes: new Uint8Array(resource.bytes),
 			}))
 			.sort((left, right) => left.id.localeCompare(right.id)),
+	};
+};
+
+const parseBoardScenario = (candidate: unknown) => {
+	const scenario = EditorBoardScenarioSchema.parse(candidate);
+	return {
+		...scenario,
+		bytes: new Uint8Array(scenario.bytes),
 	};
 };
 
@@ -185,6 +198,29 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 			() => window.arkini.editor.listProjects(),
 			(value) => descriptorSchema.array().parse(value),
 		),
+		listBoardScenariosFx: (projectId) =>
+			validateFx("list-board-scenarios", () => IdSchema.parse(projectId)).pipe(
+				Effect.flatMap((parsedProjectId) =>
+					callFx(
+						"list-board-scenarios",
+						() => window.arkini.editor.listBoardScenarios(parsedProjectId),
+						(value) => EditorBoardScenarioDescriptorSchema.array().parse(value),
+					),
+				),
+			),
+		readBoardScenarioFx: ({ projectId, name }) =>
+			validateFx("read-board-scenario", () => ({
+				projectId: IdSchema.parse(projectId),
+				name: EditorBoardScenarioNameSchema.parse(name),
+			})).pipe(
+				Effect.flatMap((request) =>
+					callFx(
+						"read-board-scenario",
+						() => window.arkini.editor.readBoardScenario(request),
+						(value) => (value === null ? null : parseBoardScenario(value)),
+					),
+				),
+			),
 		readProjectFx: (projectId) =>
 			validateFx("read-project", () => IdSchema.parse(projectId)).pipe(
 				Effect.flatMap((parsedProjectId) =>
@@ -254,6 +290,34 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 						"upsert-resource",
 						() => window.arkini.editor.upsertResources(request),
 						parseProject,
+					),
+				),
+			),
+		writeBoardScenarioFx: ({ projectId, expectedRevision, name, bytes }) =>
+			validateFx("write-board-scenario", () => ({
+				projectId: IdSchema.parse(projectId),
+				expectedRevision: z.number().int().nonnegative().parse(expectedRevision),
+				name: EditorBoardScenarioNameSchema.parse(name),
+				bytes: new Uint8Array(bytes),
+			})).pipe(
+				Effect.flatMap((request) =>
+					callFx(
+						"write-board-scenario",
+						() => window.arkini.editor.writeBoardScenario(request),
+						parseBoardScenario,
+					),
+				),
+			),
+		deleteBoardScenarioFx: ({ projectId, name }) =>
+			validateFx("delete-board-scenario", () => ({
+				projectId: IdSchema.parse(projectId),
+				name: EditorBoardScenarioNameSchema.parse(name),
+			})).pipe(
+				Effect.flatMap((request) =>
+					callFx(
+						"delete-board-scenario",
+						() => window.arkini.editor.deleteBoardScenario(request),
+						() => undefined,
 					),
 				),
 			),

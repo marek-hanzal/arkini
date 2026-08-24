@@ -12,6 +12,7 @@ import {
 } from "~/bridge/editor/EditorProjectRepository";
 import { saveEditorProjectConfigFx } from "~/bridge/project/editor/saveEditorProjectConfigFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { UnusedEditorBoardScenarioRepository } from "~test/support/UnusedEditorBoardScenarioRepository";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
 
@@ -59,6 +60,7 @@ describe("saveEditorProjectConfigFx", () => {
 			},
 		);
 		const repository: EditorProjectRepositoryService = {
+			...UnusedEditorBoardScenarioRepository,
 			awaitIdleFx: Effect.void,
 			createProjectFx: () => Effect.die("Unexpected create."),
 			listProjectsFx: Effect.die("Unexpected list."),
@@ -102,6 +104,7 @@ describe("saveEditorProjectConfigFx", () => {
 			project: createProject(1),
 		});
 		const repository: EditorProjectRepositoryService = {
+			...UnusedEditorBoardScenarioRepository,
 			awaitIdleFx: Effect.void,
 			createProjectFx: () => Effect.die("Unexpected create."),
 			listProjectsFx: Effect.die("Unexpected list."),

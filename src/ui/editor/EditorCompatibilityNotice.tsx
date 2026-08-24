@@ -17,13 +17,14 @@ export const EditorCompatibilityNotice = ({
 			? {
 					className: "border-danger bg-danger/5",
 					description:
-						"Existing saves will start a new game after this change is published.",
+						"Saving this change permanently deletes every saved Board scenario in this project. Published game saves are discarded when the new major version is loaded.",
 					title: "Breaking gameplay change",
 				}
 			: level === "minor"
 				? {
 						className: "border-success bg-success/5",
-						description: "Existing saves will continue without migration.",
+						description:
+							"Saved Board scenarios and published game saves remain compatible with this change.",
 						title: "Save-compatible change",
 					}
 				: {

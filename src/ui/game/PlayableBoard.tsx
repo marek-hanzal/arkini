@@ -3,12 +3,14 @@ import { GameCheatItemSpotlight } from "~/ui/cheat-spotlight/GameCheatItemSpotli
 
 /** Shared Board + Toolbar gameplay leaf with its exact cheat presentation. */
 export const PlayableBoard = ({
+	cheatAlwaysAvailable,
 	onOpenInventory,
 }: {
+	readonly cheatAlwaysAvailable?: boolean;
 	readonly onOpenInventory: () => void | PromiseLike<void>;
 }) => (
 	<>
 		<GameBoardLayout onOpenInventory={onOpenInventory} />
-		<GameCheatItemSpotlight />
+		<GameCheatItemSpotlight alwaysAvailable={cheatAlwaysAvailable} />
 	</>
 );

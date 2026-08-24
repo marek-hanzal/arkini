@@ -11,6 +11,7 @@ import {
 } from "~/bridge/editor/EditorProjectRepository";
 import { saveEditorItemFx } from "~/bridge/item/editor/saveEditorItemFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { UnusedEditorBoardScenarioRepository } from "~test/support/UnusedEditorBoardScenarioRepository";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
 
@@ -44,6 +45,7 @@ const createFixture = () => {
 		});
 	});
 	const repository: EditorProjectRepositoryService = {
+		...UnusedEditorBoardScenarioRepository,
 		awaitIdleFx: Effect.void,
 		createProjectFx: () => Effect.die("Unexpected create."),
 		listProjectsFx: Effect.die("Unexpected list."),

@@ -3,12 +3,16 @@ export namespace EditorProjectTransport {
 	export type Operation =
 		| "await-idle"
 		| "create-project"
+		| "delete-board-scenario"
+		| "list-board-scenarios"
 		| "list-projects"
 		| "read-project"
+		| "read-board-scenario"
 		| "replace-config"
 		| "replace-resource"
 		| "upsert-item"
-		| "upsert-resource";
+		| "upsert-resource"
+		| "write-board-scenario";
 
 	export type ServiceStatus =
 		| {
@@ -55,6 +59,29 @@ export namespace EditorProjectTransport {
 
 	export interface Project extends Commit {
 		readonly resources: ReadonlyArray<Resource>;
+	}
+
+	export interface BoardScenarioDescriptor {
+		readonly projectId: string;
+		readonly name: string;
+		readonly projectRevision: number;
+		readonly version: string;
+		readonly createdAtMs: number;
+		readonly updatedAtMs: number;
+	}
+
+	export interface BoardScenario extends BoardScenarioDescriptor {
+		readonly bytes: Uint8Array;
+	}
+
+	export interface BoardScenarioKeyRequest {
+		readonly projectId: string;
+		readonly name: string;
+	}
+
+	export interface WriteBoardScenarioRequest extends BoardScenarioKeyRequest {
+		readonly expectedRevision: number;
+		readonly bytes: Uint8Array;
 	}
 
 	export interface CreateProjectRequest {

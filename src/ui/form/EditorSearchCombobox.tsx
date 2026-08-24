@@ -32,6 +32,7 @@ export namespace EditorSearchCombobox {
 		readonly value: string;
 		readonly onBlur?: () => void;
 		readonly onChange: (value: string) => void;
+		readonly onInputChange?: (value: string) => void;
 		readonly renderPreview: (option: EditorSearchOption) => ReactNode;
 		readonly renderSelectedPreview?: (option: EditorSearchOption) => ReactNode;
 	}
@@ -47,6 +48,7 @@ export const EditorSearchCombobox = ({
 	labelVisible = true,
 	onBlur,
 	onChange,
+	onInputChange,
 	options,
 	placeholder,
 	renderPreview,
@@ -180,7 +182,9 @@ export const EditorSearchCombobox = ({
 							onBlur?.();
 						}}
 						onChange={(event) => {
-							setQuery(event.currentTarget.value);
+							const value = event.currentTarget.value;
+							setQuery(value);
+							onInputChange?.(value);
 							setOpen(true);
 						}}
 						onClick={beginSearch}
@@ -219,6 +223,7 @@ export const EditorSearchCombobox = ({
 							onMouseDown={(event) => event.preventDefault()}
 							onClick={() => {
 								setQuery("");
+								onInputChange?.("");
 								setOpen(true);
 							}}
 						>

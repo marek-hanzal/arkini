@@ -3,6 +3,10 @@ import { Context, type Effect } from "effect";
 import type { EditorProject, EditorProjectCommit } from "~/editor/EditorProject";
 import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
 import type { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
+import type {
+	EditorBoardScenarioDescriptorSchema,
+	EditorBoardScenarioSchema,
+} from "~/editor/board/EditorBoardScenarioSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -39,6 +43,16 @@ export namespace EditorProjectRepository {
 		readonly projectId: string;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
 	}
+
+	export interface BoardScenarioKey {
+		readonly projectId: string;
+		readonly name: string;
+	}
+
+	export interface WriteBoardScenarioProps extends BoardScenarioKey {
+		readonly expectedRevision: number;
+		readonly bytes: Uint8Array;
+	}
 }
 
 export interface EditorProjectRepositoryService {
@@ -51,6 +65,15 @@ export interface EditorProjectRepositoryService {
 		ReadonlyArray<EditorProjectDescriptor>,
 		EditorProjectRepositoryError
 	>;
+	readonly listBoardScenariosFx: (
+		projectId: string,
+	) => Effect.Effect<
+		ReadonlyArray<EditorBoardScenarioDescriptorSchema.Type>,
+		EditorProjectRepositoryError
+	>;
+	readonly readBoardScenarioFx: (
+		key: EditorProjectRepository.BoardScenarioKey,
+	) => Effect.Effect<EditorBoardScenarioSchema.Type | null, EditorProjectRepositoryError>;
 	readonly readProjectFx: (
 		projectId: string,
 	) => Effect.Effect<EditorProject | null, EditorProjectRepositoryError>;
@@ -66,6 +89,12 @@ export interface EditorProjectRepositoryService {
 	readonly upsertResourcesFx: (
 		props: EditorProjectRepository.UpsertResourcesProps,
 	) => Effect.Effect<EditorProject, EditorProjectRepositoryError>;
+	readonly writeBoardScenarioFx: (
+		props: EditorProjectRepository.WriteBoardScenarioProps,
+	) => Effect.Effect<EditorBoardScenarioSchema.Type, EditorProjectRepositoryError>;
+	readonly deleteBoardScenarioFx: (
+		key: EditorProjectRepository.BoardScenarioKey,
+	) => Effect.Effect<void, EditorProjectRepositoryError>;
 }
 
 /** Sole canonical persistence authority for editor projects. */

@@ -31,9 +31,11 @@ const focusableSelector = [
 
 /** Owns the Board-local Cheat item search, keyboard navigation and canonical spawn command. */
 export const CheatItemSpotlight = ({
+	alwaysAvailable = false,
 	game,
 	onBeforeOpen,
 }: {
+	readonly alwaysAvailable?: boolean;
 	readonly game: PlayableGame;
 	readonly onBeforeOpen?: () => void;
 }) => {
@@ -91,7 +93,8 @@ export const CheatItemSpotlight = ({
 		})
 		.slice(0, maxVisibleResults);
 	const blockedByHigherOwner = gameMenu.isOpen || itemDetail.isOpen;
-	const available = cheatAvailability.available && cheats.enabled && !blockedByHigherOwner;
+	const admitted = alwaysAvailable || cheatAvailability.available;
+	const available = admitted && cheats.enabled && !blockedByHigherOwner;
 	const closeSpotlight = useCallback(
 		(restoreFocus = true) => {
 			if (spawn.pending) preserveSpawnOutcomeRef.current = true;
@@ -147,7 +150,7 @@ export const CheatItemSpotlight = ({
 			setOpen(true);
 		},
 		{
-			enabled: cheatAvailability.available && cheats.enabled,
+			enabled: admitted && cheats.enabled,
 			preventDefault: true,
 		},
 	);
@@ -158,10 +161,10 @@ export const CheatItemSpotlight = ({
 			closeSpotlight(false);
 			return;
 		}
-		if (!cheatAvailability.available || !cheats.enabled) closeSpotlight();
+		if (!admitted || !cheats.enabled) closeSpotlight();
 	}, [
+		admitted,
 		blockedByHigherOwner,
-		cheatAvailability.available,
 		closeSpotlight,
 		cheats.enabled,
 		open,

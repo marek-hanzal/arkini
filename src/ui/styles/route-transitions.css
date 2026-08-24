@@ -121,6 +121,7 @@
 ::view-transition-group(arkini-action-progress),
 ::view-transition-group(arkini-startup-content),
 ::view-transition-group(arkini-game-board),
+::view-transition-group(arkini-editor-game-board),
 ::view-transition-group(arkini-editor-shell),
 ::view-transition-group(arkini-editor-navigation),
 ::view-transition-group(arkini-editor-section-navigation),
@@ -138,6 +139,10 @@
 ::view-transition-group(arkini-game-board),
 ::view-transition-group(arkini-editor-shell) {
 	z-index: 10;
+}
+
+::view-transition-group(arkini-editor-game-board) {
+	z-index: 21;
 }
 
 ::view-transition-group(arkini-launcher-hero-shadow) {
@@ -207,6 +212,8 @@
 ::view-transition-new(arkini-startup-content),
 ::view-transition-old(arkini-game-board),
 ::view-transition-new(arkini-game-board),
+::view-transition-old(arkini-editor-game-board),
+::view-transition-new(arkini-editor-game-board),
 ::view-transition-old(arkini-editor-shell),
 ::view-transition-new(arkini-editor-shell),
 ::view-transition-old(arkini-editor-navigation),
@@ -294,6 +301,15 @@
 	animation: arkini-vt-board-in 360ms 190ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Editor gameplay follows ordinary editor content unless its routed leaf changes. */
+::view-transition-old(arkini-editor-game-board) {
+	animation: arkini-vt-fade-out 150ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+::view-transition-new(arkini-editor-game-board) {
+	animation: arkini-vt-fade-in 260ms 150ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 ::view-transition-old(arkini-editor-shell) {
 	animation: arkini-vt-board-out 240ms cubic-bezier(0.4, 0, 1, 1) both;
 }
@@ -320,6 +336,29 @@
 
 :root:active-view-transition-type(editor-to-editor)::view-transition-new(arkini-editor-shell),
 :root:active-view-transition-type(editor-to-editor)::view-transition-new(arkini-editor-navigation) {
+	animation: none;
+	opacity: 0;
+}
+
+/* Board scenarios stay fixed while only the routed Board/Inventory gameplay leaf moves. */
+:root:active-view-transition-type(editor-board-leaf)::view-transition-old(
+	arkini-editor-game-board
+) {
+	animation: arkini-vt-board-out 240ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+:root:active-view-transition-type(editor-board-leaf)::view-transition-new(
+	arkini-editor-game-board
+) {
+	animation: arkini-vt-board-in 360ms 190ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+:root:active-view-transition-type(editor-board-leaf)::view-transition-old(arkini-editor-content) {
+	animation: none;
+	opacity: 1;
+}
+
+:root:active-view-transition-type(editor-board-leaf)::view-transition-new(arkini-editor-content) {
 	animation: none;
 	opacity: 0;
 }

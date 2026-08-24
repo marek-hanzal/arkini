@@ -20,6 +20,7 @@ import { acquireGameEngineLeaseFx } from "~/bridge/game/acquireGameEngineLeaseFx
 import { adoptGameEngineLeaseFx } from "~/bridge/game/adoptGameEngineLeaseFx";
 import { GameEngineResourceLayer } from "~/bridge/game/GameEngineResourceLayer";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
+import { UnusedEditorBoardScenarioRepository } from "~test/support/UnusedEditorBoardScenarioRepository";
 
 export interface TestRendererRuntimeProps {
 	readonly clearSaveFx?: Parameters<typeof GameEngineResourceLayer>[0]["clearSaveFx"];
@@ -37,6 +38,7 @@ const unavailableEditorProjectRepositoryFx = (operation: EditorProjectRepository
 
 /** Fail-fast default for tests which do not exercise editor persistence. */
 const UnavailableEditorProjectRepository: EditorProjectRepositoryService = {
+	...UnusedEditorBoardScenarioRepository,
 	awaitIdleFx: Effect.void,
 	createProjectFx: () => unavailableEditorProjectRepositoryFx("create-project"),
 	listProjectsFx: unavailableEditorProjectRepositoryFx("list-projects"),

@@ -14,6 +14,7 @@ import {
 	adoptTestGameEngineResourceFx,
 	createTestRendererRuntime,
 } from "~test/support/createTestRendererRuntime";
+import { UnusedEditorBoardScenarioRepository } from "~test/support/UnusedEditorBoardScenarioRepository";
 
 type CloseListener = () => Promise<void>;
 
@@ -208,6 +209,7 @@ describe("installRendererControlledClose", () => {
 	it("waits for admitted editor repository writes before native close", async () => {
 		const idle = Effect.runSync(Deferred.make<void>());
 		const repository: EditorProjectRepositoryService = {
+			...UnusedEditorBoardScenarioRepository,
 			awaitIdleFx: Deferred.await(idle),
 			createProjectFx: () => Effect.die("Unexpected create."),
 			listProjectsFx: Effect.die("Unexpected list."),

@@ -36,6 +36,11 @@ describe("createEditorBoardGameFx", () => {
 
 		expect(game.projectId).toBe(project.projectId);
 		expect(game.projectRevision).toBe(project.revision);
+		expect(game.getSnapshot().cheats).toEqual({
+			enabled: true,
+			everEnabled: true,
+			instantGameplay: false,
+		});
 		expect(game.getSnapshot().items).toEqual([
 			expect.objectContaining({
 				item: expect.objectContaining({

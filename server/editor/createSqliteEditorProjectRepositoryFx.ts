@@ -21,8 +21,28 @@ import { ItemSchema } from "../../src/engine/item/schema/ItemSchema";
 import { ResourceSchema } from "../../src/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "../../src/engine/schema/GameConfigSchema";
 import { EditorProjectCompatibility } from "../../src/editor/version/EditorProjectCompatibility";
+import {
+	EditorBoardScenarioDescriptorSchema,
+	EditorBoardScenarioNameSchema,
+	EditorBoardScenarioSchema,
+} from "../../src/editor/board/EditorBoardScenarioSchema";
 
-const schemaVersion = 2;
+const schemaVersion = 3;
+const createBoardScenariosSql = `
+	CREATE TABLE board_scenarios (
+		project_id TEXT NOT NULL,
+		name TEXT NOT NULL,
+		project_revision INTEGER NOT NULL CHECK (project_revision >= 0),
+		arkpack_version TEXT NOT NULL,
+		save_bytes BLOB NOT NULL CHECK (length(save_bytes) > 0),
+		created_at_ms INTEGER NOT NULL CHECK (created_at_ms >= 0),
+		updated_at_ms INTEGER NOT NULL CHECK (updated_at_ms >= created_at_ms),
+		PRIMARY KEY (project_id, name),
+		FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+	) STRICT;
+	CREATE INDEX board_scenarios_recent
+		ON board_scenarios(project_id, updated_at_ms DESC, name ASC);
+`;
 
 const createRepositoryError = (
 	operation: EditorProjectRepositoryOperation,
@@ -107,6 +127,51 @@ const readResourceRows = (
 	);
 };
 
+const readBoardScenarioRow = (
+	candidate: Record<string, unknown> | undefined,
+	operation: EditorProjectRepositoryOperation,
+) => {
+	if (candidate === undefined) return null;
+	const result = EditorBoardScenarioSchema.safeParse({
+		projectId: candidate.project_id,
+		name: candidate.name,
+		projectRevision: candidate.project_revision,
+		version: candidate.arkpack_version,
+		bytes:
+			candidate.save_bytes instanceof Uint8Array
+				? new Uint8Array(candidate.save_bytes)
+				: candidate.save_bytes,
+		createdAtMs: candidate.created_at_ms,
+		updatedAtMs: candidate.updated_at_ms,
+	});
+	if (result.success) return result.data;
+	throw createRepositoryError(
+		operation,
+		"SQLite contains an invalid editor Board scenario.",
+		result.error,
+	);
+};
+
+const readBoardScenarioDescriptor = (
+	candidate: Record<string, unknown>,
+	operation: EditorProjectRepositoryOperation,
+) => {
+	const result = EditorBoardScenarioDescriptorSchema.safeParse({
+		projectId: candidate.project_id,
+		name: candidate.name,
+		projectRevision: candidate.project_revision,
+		version: candidate.arkpack_version,
+		createdAtMs: candidate.created_at_ms,
+		updatedAtMs: candidate.updated_at_ms,
+	});
+	if (result.success) return result.data;
+	throw createRepositoryError(
+		operation,
+		"SQLite contains invalid editor Board scenario metadata.",
+		result.error,
+	);
+};
+
 const materializeProject = (
 	record: EditorProjectRecordSchemaType.Type,
 	resources: ReadonlyArray<EditorProjectResourceRecordSchemaType.Type>,
@@ -151,27 +216,8 @@ const assertExpectedRevision = (
 	);
 };
 
-const readConfigVersion = (
-	record: EditorProjectRecordSchemaType.Type,
-	config: GameConfigSchema.Type,
-) => {
-	const compatibility = EditorProjectCompatibility.analyze(record.config, config);
-	return EditorProjectCompatibility.bumpVersion(record.version, compatibility.level);
-};
-
 const readResourceVersion = (record: EditorProjectRecordSchemaType.Type) =>
 	EditorProjectCompatibility.bumpVersion(record.version, "minor");
-
-const readConfigAndResourceVersion = (
-	record: EditorProjectRecordSchemaType.Type,
-	config: GameConfigSchema.Type,
-) => {
-	const compatibility = EditorProjectCompatibility.analyze(record.config, config);
-	return EditorProjectCompatibility.bumpVersion(
-		record.version,
-		compatibility.level === "major" ? "major" : "minor",
-	);
-};
 
 const runTransaction = <Value>(database: DatabaseSync, run: () => Value): Value => {
 	database.exec("BEGIN IMMEDIATE");
@@ -195,7 +241,7 @@ const initializeSchema = (database: DatabaseSync) => {
 	const versionRow = database.prepare("PRAGMA user_version").get();
 	const version = versionRow?.user_version;
 	if (version === schemaVersion) return;
-	if (version !== 0 && version !== 1) {
+	if (version !== 0 && version !== 1 && version !== 2) {
 		throw new Error(`Unsupported editor database schema version ${String(version)}.`);
 	}
 	runTransaction(database, () => {
@@ -220,25 +266,25 @@ const initializeSchema = (database: DatabaseSync) => {
 				FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE
 			) STRICT;
 			CREATE INDEX resources_by_project ON resources(project_id, id);
-			PRAGMA user_version = 2;
 		`);
-			return;
+		} else if (version === 1) {
+			database.exec(
+				"ALTER TABLE projects ADD COLUMN arkpack_version TEXT NOT NULL DEFAULT '1.0'",
+			);
+			const select = database.prepare("SELECT project_id, config_json FROM projects");
+			const update = database.prepare(
+				"UPDATE projects SET config_json = ?, arkpack_version = '1.0' WHERE project_id = ?",
+			);
+			for (const row of select.all()) {
+				if (typeof row.project_id !== "string" || typeof row.config_json !== "string")
+					throw new Error("SQLite contains an invalid legacy editor project row.");
+				const config = JSON.parse(row.config_json) as Record<string, unknown>;
+				delete config.version;
+				update.run(JSON.stringify(config), row.project_id);
+			}
 		}
-		database.exec(
-			"ALTER TABLE projects ADD COLUMN arkpack_version TEXT NOT NULL DEFAULT '1.0'",
-		);
-		const select = database.prepare("SELECT project_id, config_json FROM projects");
-		const update = database.prepare(
-			"UPDATE projects SET config_json = ?, arkpack_version = '1.0' WHERE project_id = ?",
-		);
-		for (const row of select.all()) {
-			if (typeof row.project_id !== "string" || typeof row.config_json !== "string")
-				throw new Error("SQLite contains an invalid legacy editor project row.");
-			const config = JSON.parse(row.config_json) as Record<string, unknown>;
-			delete config.version;
-			update.run(JSON.stringify(config), row.project_id);
-		}
-		database.exec("PRAGMA user_version = 2");
+		database.exec(createBoardScenariosSql);
+		database.exec(`PRAGMA user_version = ${schemaVersion}`);
 	});
 };
 
@@ -315,6 +361,33 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 			deleteResource: database.prepare(`
 				DELETE FROM resources WHERE project_id = ? AND id = ?
 			`),
+			selectBoardScenarios: database.prepare(`
+				SELECT project_id, name, project_revision, arkpack_version, created_at_ms, updated_at_ms
+				FROM board_scenarios
+				WHERE project_id = ?
+				ORDER BY updated_at_ms DESC, name ASC
+			`),
+			selectBoardScenario: database.prepare(`
+				SELECT project_id, name, project_revision, arkpack_version, save_bytes, created_at_ms, updated_at_ms
+				FROM board_scenarios
+				WHERE project_id = ? AND name = ?
+			`),
+			upsertBoardScenario: database.prepare(`
+				INSERT INTO board_scenarios(
+					project_id, name, project_revision, arkpack_version, save_bytes, created_at_ms, updated_at_ms
+				) VALUES (?, ?, ?, ?, ?, ?, ?)
+				ON CONFLICT(project_id, name) DO UPDATE SET
+					project_revision = excluded.project_revision,
+					arkpack_version = excluded.arkpack_version,
+					save_bytes = excluded.save_bytes,
+					updated_at_ms = excluded.updated_at_ms
+			`),
+			deleteBoardScenario: database.prepare(`
+				DELETE FROM board_scenarios WHERE project_id = ? AND name = ?
+			`),
+			deleteBoardScenarios: database.prepare(`
+				DELETE FROM board_scenarios WHERE project_id = ?
+			`),
 		}),
 		catch: (cause) => {
 			database.close();
@@ -333,7 +406,25 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 		upsertResource,
 		insertResource,
 		deleteResource,
+		selectBoardScenarios,
+		selectBoardScenario,
+		upsertBoardScenario,
+		deleteBoardScenario,
+		deleteBoardScenarios,
 	} = statements;
+	const writeProjectRecord = (
+		record: EditorProjectRecordSchemaType.Type,
+		dropBoardScenarios = false,
+	) => {
+		updateProject.run(
+			JSON.stringify(record.config),
+			record.version,
+			record.revision,
+			record.updatedAtMs,
+			record.projectId,
+		);
+		if (dropBoardScenarios) deleteBoardScenarios.run(record.projectId);
+	};
 	const writeLock = yield* Semaphore.make(1);
 
 	const readMaterializedProject = (
@@ -468,6 +559,50 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 		}),
 	);
 
+	const listBoardScenariosFx: EditorProjectRepositoryService["listBoardScenariosFx"] = Effect.fn(
+		"SqliteEditorProjectRepository.listBoardScenariosFx",
+	)((projectId) =>
+		Effect.try({
+			try: () => {
+				if (readProjectRow(selectProject, projectId, "list-board-scenarios") === null) {
+					throw createRepositoryError(
+						"list-board-scenarios",
+						`Editor project ${projectId} does not exist.`,
+					);
+				}
+				return selectBoardScenarios
+					.all(projectId)
+					.map((candidate) =>
+						readBoardScenarioDescriptor(candidate, "list-board-scenarios"),
+					);
+			},
+			catch: (cause) =>
+				createRepositoryError(
+					"list-board-scenarios",
+					`Board scenarios for project ${projectId} could not be listed.`,
+					cause,
+				),
+		}),
+	);
+
+	const readBoardScenarioFx: EditorProjectRepositoryService["readBoardScenarioFx"] = Effect.fn(
+		"SqliteEditorProjectRepository.readBoardScenarioFx",
+	)(({ projectId, name }) =>
+		Effect.try({
+			try: () =>
+				readBoardScenarioRow(
+					selectBoardScenario.get(projectId, name),
+					"read-board-scenario",
+				),
+			catch: (cause) =>
+				createRepositoryError(
+					"read-board-scenario",
+					`Board scenario ${name} in project ${projectId} could not be read.`,
+					cause,
+				),
+		}),
+	);
+
 	const upsertItemFx: EditorProjectRepositoryService["upsertItemFx"] = Effect.fn(
 		"SqliteEditorProjectRepository.upsertItemFx",
 	)(function* ({ projectId, item: candidateItem }) {
@@ -511,20 +646,21 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 								[item.id]: item,
 							},
 						});
+						const compatibility = EditorProjectCompatibility.analyze(
+							current.config,
+							config,
+						);
 						const record = EditorProjectRecordSchema.parse({
 							...current,
 							config,
-							version: readConfigVersion(current, config),
+							version: EditorProjectCompatibility.bumpVersion(
+								current.version,
+								compatibility.level,
+							),
 							revision: current.revision + 1,
 							updatedAtMs: Math.max(nowMs, current.updatedAtMs + 1),
 						});
-						updateProject.run(
-							JSON.stringify(record.config),
-							record.version,
-							record.revision,
-							record.updatedAtMs,
-							record.projectId,
-						);
+						writeProjectRecord(record, compatibility.level === "major");
 						return materializeProjectCommit(record);
 					}),
 				catch: (cause) =>
@@ -562,20 +698,21 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 							);
 						}
 						assertExpectedRevision(current, expectedRevision, "replace-config");
+						const compatibility = EditorProjectCompatibility.analyze(
+							current.config,
+							config,
+						);
 						const record = EditorProjectRecordSchema.parse({
 							...current,
 							config,
-							version: readConfigVersion(current, config),
+							version: EditorProjectCompatibility.bumpVersion(
+								current.version,
+								compatibility.level,
+							),
 							revision: current.revision + 1,
 							updatedAtMs: Math.max(nowMs, current.updatedAtMs + 1),
 						});
-						updateProject.run(
-							JSON.stringify(record.config),
-							record.version,
-							record.revision,
-							record.updatedAtMs,
-							record.projectId,
-						);
+						writeProjectRecord(record, compatibility.level === "major");
 						return materializeProjectCommit(record);
 					}),
 				catch: (cause) =>
@@ -638,13 +775,7 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 							revision: current.revision + 1,
 							updatedAtMs: Math.max(nowMs, current.updatedAtMs + 1),
 						});
-						updateProject.run(
-							JSON.stringify(record.config),
-							record.version,
-							record.revision,
-							record.updatedAtMs,
-							record.projectId,
-						);
+						writeProjectRecord(record);
 						return materializeProject(
 							record,
 							readResourceRows(selectResources, projectId, "upsert-resource"),
@@ -730,20 +861,21 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 						}
 						upsertResource.run(projectId, resource.id, resource.mime, resource.bytes);
 						if (resource.id !== currentId) deleteResource.run(projectId, currentId);
+						const compatibility = EditorProjectCompatibility.analyze(
+							current.config,
+							config,
+						);
 						const record = EditorProjectRecordSchema.parse({
 							...current,
 							config,
-							version: readConfigAndResourceVersion(current, config),
+							version: EditorProjectCompatibility.bumpVersion(
+								current.version,
+								compatibility.level === "major" ? "major" : "minor",
+							),
 							revision: current.revision + 1,
 							updatedAtMs: Math.max(nowMs, current.updatedAtMs + 1),
 						});
-						updateProject.run(
-							JSON.stringify(record.config),
-							record.version,
-							record.revision,
-							record.updatedAtMs,
-							record.projectId,
-						);
+						writeProjectRecord(record, compatibility.level === "major");
 						return materializeProject(
 							record,
 							readResourceRows(selectResources, projectId, "replace-resource"),
@@ -759,6 +891,96 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 		);
 	});
 
+	const writeBoardScenarioFx: EditorProjectRepositoryService["writeBoardScenarioFx"] = Effect.fn(
+		"SqliteEditorProjectRepository.writeBoardScenarioFx",
+	)(function* ({ projectId, expectedRevision, name: candidateName, bytes: candidateBytes }) {
+		const { name, bytes } = yield* Effect.try({
+			try: () => ({
+				name: EditorBoardScenarioNameSchema.parse(candidateName),
+				bytes: new Uint8Array(candidateBytes),
+			}),
+			catch: (cause) =>
+				createRepositoryError(
+					"write-board-scenario",
+					"The editor Board scenario is invalid.",
+					cause,
+				),
+		});
+		if (bytes.byteLength === 0) {
+			return yield* Effect.fail(
+				createRepositoryError(
+					"write-board-scenario",
+					"The editor Board scenario is empty.",
+				),
+			);
+		}
+		const nowMs = yield* Clock.currentTimeMillis;
+		return yield* writeLock.withPermits(1)(
+			Effect.try({
+				try: () =>
+					runTransaction(database, () => {
+						const current = readProjectRow(
+							selectProject,
+							projectId,
+							"write-board-scenario",
+						);
+						if (current === null) {
+							throw createRepositoryError(
+								"write-board-scenario",
+								`Editor project ${projectId} does not exist.`,
+							);
+						}
+						assertExpectedRevision(current, expectedRevision, "write-board-scenario");
+						const previous = readBoardScenarioRow(
+							selectBoardScenario.get(projectId, name),
+							"write-board-scenario",
+						);
+						const createdAtMs = previous?.createdAtMs ?? nowMs;
+						const updatedAtMs = Math.max(
+							nowMs,
+							(previous?.updatedAtMs ?? nowMs - 1) + 1,
+						);
+						upsertBoardScenario.run(
+							projectId,
+							name,
+							current.revision,
+							current.version,
+							bytes,
+							createdAtMs,
+							updatedAtMs,
+						);
+						const written = readBoardScenarioRow(
+							selectBoardScenario.get(projectId, name),
+							"write-board-scenario",
+						);
+						if (written === null) throw new Error("The written scenario disappeared.");
+						return written;
+					}),
+				catch: (cause) =>
+					createRepositoryError(
+						"write-board-scenario",
+						`Board scenario ${name} could not be saved in project ${projectId}.`,
+						cause,
+					),
+			}).pipe(Effect.uninterruptible),
+		);
+	});
+
+	const deleteBoardScenarioFx: EditorProjectRepositoryService["deleteBoardScenarioFx"] =
+		Effect.fn("SqliteEditorProjectRepository.deleteBoardScenarioFx")(({ projectId, name }) =>
+			writeLock.withPermits(1)(
+				Effect.try({
+					try: () => deleteBoardScenario.run(projectId, name),
+					catch: (cause) =>
+						createRepositoryError(
+							"delete-board-scenario",
+							`Board scenario ${name} could not be deleted from project ${projectId}.`,
+							cause,
+						),
+				}).pipe(Effect.asVoid, Effect.uninterruptible),
+			),
+		);
+
 	let closed = false;
 	const closeSync = () => {
 		if (closed) return;
@@ -769,11 +991,15 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 		awaitIdleFx: writeLock.withPermits(1)(Effect.void),
 		createProjectFx,
 		listProjectsFx,
+		listBoardScenariosFx,
 		readProjectFx,
+		readBoardScenarioFx,
 		replaceConfigFx,
 		replaceResourceFx,
 		upsertItemFx,
 		upsertResourcesFx,
+		writeBoardScenarioFx,
+		deleteBoardScenarioFx,
 		closeFx: writeLock.withPermits(1)(Effect.sync(closeSync)),
 		closeSync,
 	} satisfies SqliteEditorProjectRepository;

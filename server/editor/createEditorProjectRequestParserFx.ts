@@ -8,6 +8,7 @@ import { ItemSchema } from "../../src/engine/item/schema/ItemSchema";
 import { ResourceSchema } from "../../src/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "../../src/engine/schema/GameConfigSchema";
 import { ArkpackVersionSchema } from "../../src/engine/version/schema/ArkpackVersionSchema";
+import { EditorBoardScenarioNameSchema } from "../../src/editor/board/EditorBoardScenarioSchema";
 
 const createProjectSchema = z
 	.object({
@@ -45,6 +46,18 @@ const upsertResourcesSchema = z
 		resources: ResourceSchema.array().min(1),
 	})
 	.strict();
+const boardScenarioKeySchema = z
+	.object({
+		projectId: IdSchema,
+		name: EditorBoardScenarioNameSchema,
+	})
+	.strict();
+const writeBoardScenarioSchema = boardScenarioKeySchema
+	.extend({
+		expectedRevision: z.number().int().nonnegative(),
+		bytes: z.instanceof(Uint8Array).refine((bytes) => bytes.byteLength > 0),
+	})
+	.strict();
 
 const parse = <Value>(
 	operation: EditorProjectRepositoryError["operation"],
@@ -79,5 +92,17 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 				candidate: unknown,
 			): EditorProjectRepository.UpsertResourcesProps =>
 				parse("upsert-resource", upsertResourcesSchema, candidate),
+			parseBoardScenarioProjectId: (candidate: unknown) =>
+				parse("list-board-scenarios", IdSchema, candidate),
+			parseBoardScenarioKey: (candidate: unknown): EditorProjectRepository.BoardScenarioKey =>
+				parse("read-board-scenario", boardScenarioKeySchema, candidate),
+			parseDeleteBoardScenario: (
+				candidate: unknown,
+			): EditorProjectRepository.BoardScenarioKey =>
+				parse("delete-board-scenario", boardScenarioKeySchema, candidate),
+			parseWriteBoardScenario: (
+				candidate: unknown,
+			): EditorProjectRepository.WriteBoardScenarioProps =>
+				parse("write-board-scenario", writeBoardScenarioSchema, candidate),
 		} as const),
 );

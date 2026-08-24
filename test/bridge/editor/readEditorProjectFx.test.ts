@@ -8,6 +8,7 @@ import {
 } from "~/bridge/editor/EditorProjectRepository";
 import { readEditorProjectFx } from "~/bridge/editor/readEditorProjectFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { UnusedEditorBoardScenarioRepository } from "~test/support/UnusedEditorBoardScenarioRepository";
 
 const project: EditorProject = {
 	projectId: "editor-test",
@@ -23,6 +24,7 @@ const project: EditorProject = {
 const createRepository = (
 	readProjectFx: EditorProjectRepositoryService["readProjectFx"],
 ): EditorProjectRepositoryService => ({
+	...UnusedEditorBoardScenarioRepository,
 	awaitIdleFx: Effect.void,
 	createProjectFx: () => Effect.die("Unexpected project create."),
 	listProjectsFx: Effect.die("Unexpected project list."),

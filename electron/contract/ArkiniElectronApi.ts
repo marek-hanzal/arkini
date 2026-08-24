@@ -38,6 +38,10 @@ export namespace ArkiniElectronApi {
 		editorProjectReplaceResource: "arkini:editor:project:replace-resource",
 		editorProjectUpsertItem: "arkini:editor:project:upsert-item",
 		editorProjectUpsertResources: "arkini:editor:project:upsert-resources",
+		editorBoardScenarioList: "arkini:editor:board-scenario:list",
+		editorBoardScenarioRead: "arkini:editor:board-scenario:read",
+		editorBoardScenarioWrite: "arkini:editor:board-scenario:write",
+		editorBoardScenarioDelete: "arkini:editor:board-scenario:delete",
 		editorMcpPortRead: "arkini:editor:mcp:port:read",
 		editorMcpPortWrite: "arkini:editor:mcp:port:write",
 		editorMcpPortCheck: "arkini:editor:mcp:port:check",
@@ -123,6 +127,24 @@ export namespace ArkiniElectronApi {
 			readonly upsertResources: (
 				request: EditorProjectTransport.UpsertResourcesRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project>>;
+			readonly listBoardScenarios: (
+				projectId: string,
+			) => Promise<
+				EditorProjectTransport.Result<
+					ReadonlyArray<EditorProjectTransport.BoardScenarioDescriptor>
+				>
+			>;
+			readonly readBoardScenario: (
+				request: EditorProjectTransport.BoardScenarioKeyRequest,
+			) => Promise<
+				EditorProjectTransport.Result<EditorProjectTransport.BoardScenario | null>
+			>;
+			readonly writeBoardScenario: (
+				request: EditorProjectTransport.WriteBoardScenarioRequest,
+			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.BoardScenario>>;
+			readonly deleteBoardScenario: (
+				request: EditorProjectTransport.BoardScenarioKeyRequest,
+			) => Promise<EditorProjectTransport.Result<void>>;
 		};
 		readonly editorMcp: {
 			readonly status: () => Promise<EditorMcpStatus>;

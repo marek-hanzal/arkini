@@ -15,6 +15,7 @@ import {
 	installTestPngDecoder,
 } from "~test/bridge/arkpack/support/createTestPngBytes";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { UnusedEditorBoardScenarioRepository } from "~test/support/UnusedEditorBoardScenarioRepository";
 
 const validPayload: PayloadSchema.Type = {
 	packageId: "project:imported",
@@ -33,6 +34,7 @@ const createArkpackBytes = (payload = validPayload) =>
 const createRepository = (
 	createProjectFx: EditorProjectRepositoryService["createProjectFx"],
 ): EditorProjectRepositoryService => ({
+	...UnusedEditorBoardScenarioRepository,
 	awaitIdleFx: Effect.void,
 	createProjectFx,
 	listProjectsFx: Effect.die("Unexpected project list."),

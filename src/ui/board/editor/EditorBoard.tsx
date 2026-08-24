@@ -1,20 +1,19 @@
 import { useAtomValue } from "@effect/atom-react";
-import { useState, useSyncExternalStore } from "react";
+import { Outlet } from "@tanstack/react-router";
+import { useSyncExternalStore } from "react";
 
 import type { EditorBoardGame } from "~/bridge/editor/board/EditorBoardGame";
 import { EditorBoardGameAtom } from "~/bridge/editor/board/EditorBoardGameAtom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import { GameEngineProvider } from "~/bridge/game/GameEngineProvider";
-import { PlayableBoard } from "~/ui/game/PlayableBoard";
 import { PlayableGameRoute } from "~/ui/game/PlayableGameRoute";
-import { PlayableInventory } from "~/ui/game/PlayableInventory";
 import { EditorBoardItemDetailLink } from "~/ui/board/editor/EditorBoardItemDetailLink";
 import { EditorBoardProductionLineLink } from "~/ui/board/editor/EditorBoardProductionLineLink";
+import { EditorBoardScenarioToolbar } from "~/ui/board/editor/EditorBoardScenarioToolbar";
 import { PlayableGameShell } from "~/ui/shell/GameShell";
 
 type EditorGameResource = GameEngineResource<EditorBoardGame>;
-type EditorGameLeaf = "board" | "inventory";
 
 const EditorBoardStatus = ({
 	detail,
@@ -40,7 +39,6 @@ const EditorBoardReady = ({ resource }: { readonly resource: EditorGameResource 
 		resource.getCriticalFailure,
 		resource.getCriticalFailure,
 	);
-	const [leaf, setLeaf] = useState<EditorGameLeaf>("board");
 	if (failure !== null) {
 		return (
 			<EditorBoardStatus
@@ -55,13 +53,9 @@ const EditorBoardReady = ({ resource }: { readonly resource: EditorGameResource 
 				<PlayableGameShell
 					itemDetailIdentityRenderer={EditorBoardItemDetailLink}
 					itemDetailLineIdentityRenderer={EditorBoardProductionLineLink}
-					routePresentation="embedded"
+					routePresentation="embedded-transition"
 				>
-					{leaf === "board" ? (
-						<PlayableBoard onOpenInventory={() => setLeaf("inventory")} />
-					) : (
-						<PlayableInventory onClose={() => setLeaf("board")} />
-					)}
+					<Outlet />
 				</PlayableGameShell>
 			</PlayableGameRoute>
 		</GameEngineProvider>
@@ -72,34 +66,31 @@ const EditorBoardReady = ({ resource }: { readonly resource: EditorGameResource 
 export const EditorBoard = () => {
 	const project = useEditorProject();
 	const state = useAtomValue(EditorBoardGameAtom);
-	if (
+	const ready =
 		state.type === "ready" &&
 		state.resource.game.projectId === project.projectId &&
-		state.resource.game.projectRevision === project.revision
-	) {
-		return (
-			<EditorBoardReady
-				key={project.revision}
-				resource={state.resource}
-			/>
-		);
-	}
-	if (
-		state.type === "failed" &&
-		state.projectId === project.projectId &&
-		state.projectRevision === project.revision
-	) {
-		return (
-			<EditorBoardStatus
-				detail={String(state.error)}
-				title="Editor game could not synchronize"
-			/>
-		);
-	}
+		state.resource.game.projectRevision === project.revision;
 	return (
-		<EditorBoardStatus
-			detail="Starting a fresh ephemeral game from the latest project revision."
-			title="Preparing editor game…"
-		/>
+		<section className="grid size-full min-h-0 grid-rows-[auto_minmax(0,1fr)]">
+			<EditorBoardScenarioToolbar
+				game={ready ? state.resource.game : undefined}
+				project={project}
+			/>
+			{ready ? (
+				<EditorBoardReady resource={state.resource} />
+			) : state.type === "failed" &&
+				state.projectId === project.projectId &&
+				state.projectRevision === project.revision ? (
+				<EditorBoardStatus
+					detail={String(state.error)}
+					title="Editor game could not synchronize"
+				/>
+			) : (
+				<EditorBoardStatus
+					detail="Starting a fresh game from the latest project revision."
+					title="Preparing editor game…"
+				/>
+			)}
+		</section>
 	);
 };

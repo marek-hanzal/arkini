@@ -27,7 +27,7 @@ export const EditorInfoTooltip = ({
 			type="button"
 			data-ui="EditorInfoTooltip"
 			className={twMerge(
-				"grid size-8 shrink-0 cursor-help place-items-center rounded-full text-muted hover:text-foreground",
+				"grid size-5 min-h-0 min-w-0 shrink-0 cursor-help place-items-center rounded-full border-0 bg-transparent p-0 text-muted hover:text-foreground",
 				className,
 			)}
 			onClick={(event) => {

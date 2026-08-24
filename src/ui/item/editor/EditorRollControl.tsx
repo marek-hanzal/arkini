@@ -6,6 +6,8 @@ import { EditorDropList } from "~/ui/item/editor/EditorDropList";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorWeightedRollControl } from "~/ui/item/editor/EditorWeightedRollControl";
 
+const readChancePercent = (chance: number) => Number((chance * 100).toFixed(6));
+
 export const EditorRollControl = ({
 	onChange,
 	value,
@@ -27,7 +29,7 @@ export const EditorRollControl = ({
 					},
 					{
 						description:
-							"Performs one probability check from 0 to 1 and emits every configured drop only when that check succeeds.",
+							"Performs one probability check from 0% to 100% and emits every configured drop only when that check succeeds.",
 						label: "Chance",
 						value: "chance",
 					},
@@ -66,15 +68,16 @@ export const EditorRollControl = ({
 					(roll) => (
 						<div className="grid gap-3">
 							<EditorNumberControl
-								label="Chance (0–1)"
-								value={roll.chance}
+								description="Probability that this roll emits its configured drops. The editor converts the percentage to the engine's internal 0–1 value."
+								label="Chance (%)"
+								value={readChancePercent(roll.chance)}
 								min={0}
-								max={1}
+								max={100}
 								step={0.01}
-								onChange={(chance) =>
+								onChange={(chancePercent) =>
 									onChange({
 										...roll,
-										chance,
+										chance: chancePercent / 100,
 									})
 								}
 							/>

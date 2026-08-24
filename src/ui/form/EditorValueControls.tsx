@@ -16,7 +16,7 @@ const EditorValueLabel = ({
 	readonly description?: string;
 	readonly label: string;
 }) => (
-	<span className="flex min-w-0 items-center gap-1">
+	<span className="flex h-5 min-w-0 items-center gap-1 leading-5">
 		<span className="font-semibold text-foreground">{label}</span>
 		{description === undefined ? null : <EditorInfoTooltip content={description} />}
 	</span>

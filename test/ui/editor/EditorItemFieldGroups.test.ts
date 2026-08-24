@@ -14,16 +14,26 @@ vi.mock("~/ui/item/editor/EditorSelectorControl", () => ({
 	EditorSelectorControl: () => createElement("span", null, "Selector"),
 }));
 
+vi.mock("~/ui/item/editor/EditorDropList", () => ({
+	EditorDropList: () => createElement("span", null, "Drops"),
+}));
+
 vi.mock("~/ui/item/editor/useEditorItemOptionLabel", () => ({
 	useEditorItemOptionLabel: () => (itemId: string, fallback: string) => itemId || fallback,
 }));
 
 import { useAppForm } from "~/ui/form/EditorForm";
-import type { EditorInput, EditorLine, EditorMerge } from "~/bridge/item/editor/EditorItemModel";
+import type {
+	EditorInput,
+	EditorLine,
+	EditorMerge,
+	EditorRoll,
+} from "~/bridge/item/editor/EditorItemModel";
 import { EditorItemArtworkFields } from "~/ui/item/editor/EditorItemArtworkFields";
 import { EditorInputCharges } from "~/ui/item/editor/EditorInputCharges";
 import { EditorMergeFields } from "~/ui/item/editor/EditorMergeFields";
 import { EditorProductionFields } from "~/ui/item/editor/EditorProductionFields";
+import { EditorRollControl } from "~/ui/item/editor/EditorRollControl";
 
 (
 	globalThis as {
@@ -160,6 +170,35 @@ const InputChargesHarness = () => {
 	);
 };
 
+const ChanceRollHarness = () => {
+	const [roll, setRoll] = useState<EditorRoll>({
+		chance: 0.4,
+		drop: [
+			{
+				itemId: "item:paper",
+				placement: "drop",
+				quantity: {
+					min: 1,
+					max: 1,
+				},
+				rules: [],
+			},
+		],
+		type: "chance",
+	});
+	return createElement(
+		Fragment,
+		null,
+		createElement(EditorRollControl, {
+			onChange: (next) => {
+				if (next !== undefined) setRoll(next);
+			},
+			value: roll,
+		}),
+		createElement("output", null, JSON.stringify(roll)),
+	);
+};
+
 describe("editor item field groups", () => {
 	it("adds a second registered artwork layer", async () => {
 		const container = await mount(createElement(ArtworkHarness));
@@ -222,5 +261,28 @@ describe("editor item field groups", () => {
 
 		expect(container.querySelector("output")?.textContent).not.toContain("charges");
 		expect(container.textContent).toContain("Charge cost is disabled");
+	});
+
+	it("edits chance as a percentage while preserving the engine ratio", async () => {
+		const container = await mount(createElement(ChanceRollHarness));
+		const input = container.querySelector<HTMLInputElement>('input[type="number"]');
+		if (input === null) throw new Error("Missing chance percentage input.");
+		expect(input.value).toBe("40");
+
+		const valueSetter = Object.getOwnPropertyDescriptor(
+			HTMLInputElement.prototype,
+			"value",
+		)?.set;
+		if (valueSetter === undefined) throw new Error("Expected native input value setter.");
+		await act(async () => {
+			valueSetter.call(input, "75");
+			input.dispatchEvent(
+				new Event("input", {
+					bubbles: true,
+				}),
+			);
+		});
+
+		expect(container.querySelector("output")?.textContent).toContain('"chance":0.75');
 	});
 });

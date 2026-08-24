@@ -16,86 +16,92 @@ export const EditorMergeField = ({
 }) => (
 	<div className="grid gap-[var(--ak-viewport-gap)]">
 		<EditorFormCard>
-			<article className="grid grid-cols-2 gap-[var(--ak-panel-padding)]">
-				<div className="grid content-start gap-4">
-					<EditorSelectorControl
-						value={merge.target}
-						onChange={(target) =>
+			<article className="grid grid-cols-2 items-end gap-[var(--ak-panel-padding)]">
+				<EditorChoiceControl
+					label="Source action"
+					value={merge.action}
+					options={[
+						{
+							description:
+								"Uses one source quantity for the merge and returns that same source item to the board afterward. The source must not own state such as charges or jobs.",
+							label: "Use",
+							value: "use",
+						},
+						{
+							description:
+								"Permanently consumes one source quantity when the merge resolves, including state owned by that consumed source.",
+							label: "Consume",
+							value: "consume",
+						},
+					]}
+					onChange={(action) =>
+						onChange({
+							...merge,
+							action,
+						})
+					}
+				/>
+				<EditorSelectorControl
+					value={merge.target}
+					onChange={(target) =>
+						onChange({
+							...merge,
+							target,
+						})
+					}
+				/>
+				<EditorChoiceControl
+					label="Target effect"
+					value={merge.effect}
+					options={[
+						{
+							description:
+								"Leaves the matched target item unchanged after the merge resolves.",
+							label: "Keep",
+							value: "keep",
+						},
+						{
+							description:
+								"Removes one quantity from the matched target. A larger target stack keeps its remaining quantity.",
+							label: "Remove",
+							value: "remove",
+						},
+						{
+							description:
+								"Replaces one quantity of the matched target with the selected replacement item. Any remaining target stack is placed back nearby.",
+							label: "Replace",
+							value: "replace",
+						},
+					]}
+					onChange={(effect) =>
+						onChange(
+							effect === "replace"
+								? {
+										...merge,
+										effect,
+										result: merge.effect === "replace" ? merge.result : "",
+									}
+								: {
+										action: merge.action,
+										effect,
+										output: merge.output,
+										target: merge.target,
+									},
+						)
+					}
+				/>
+				{merge.effect !== "replace" ? null : (
+					<EditorItemReferenceControl
+						label="Replacement item"
+						value={merge.result}
+						onChange={(result) =>
 							onChange({
 								...merge,
-								target,
+								result,
 							})
 						}
 					/>
-					<EditorChoiceControl
-						label="Source action"
-						value={merge.action}
-						options={[
-							{
-								label: "Use",
-								value: "use",
-							},
-							{
-								label: "Consume",
-								value: "consume",
-							},
-						]}
-						onChange={(action) =>
-							onChange({
-								...merge,
-								action,
-							})
-						}
-					/>
-				</div>
-				<div className="grid content-start gap-4">
-					<EditorChoiceControl
-						label="Target effect"
-						value={merge.effect}
-						options={[
-							{
-								label: "Keep",
-								value: "keep",
-							},
-							{
-								label: "Remove",
-								value: "remove",
-							},
-							{
-								label: "Replace",
-								value: "replace",
-							},
-						]}
-						onChange={(effect) =>
-							onChange(
-								effect === "replace"
-									? {
-											...merge,
-											effect,
-											result: merge.effect === "replace" ? merge.result : "",
-										}
-									: {
-											action: merge.action,
-											effect,
-											output: merge.output,
-											target: merge.target,
-										},
-							)
-						}
-					/>
-					{merge.effect !== "replace" ? null : (
-						<EditorItemReferenceControl
-							label="Replacement item"
-							value={merge.result}
-							onChange={(result) =>
-								onChange({
-									...merge,
-									result,
-								})
-							}
-						/>
-					)}
-				</div>
+				)}
 			</article>
 		</EditorFormCard>
 		<EditorFormSectionDivider

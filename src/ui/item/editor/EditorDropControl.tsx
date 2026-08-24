@@ -22,16 +22,18 @@ export const EditorDropControl = ({
 				})
 			}
 		/>
-		<div className="grid items-end gap-3 sm:grid-cols-2">
-			<EditorQuantityControl
-				value={value.quantity}
-				onChange={(quantity) =>
-					onChange({
-						...value,
-						quantity,
-					})
-				}
-			/>
+		<div className="flex flex-wrap items-end justify-between gap-3">
+			<div className="min-w-0 basis-full sm:basis-1/2">
+				<EditorQuantityControl
+					value={value.quantity}
+					onChange={(quantity) =>
+						onChange({
+							...value,
+							quantity,
+						})
+					}
+				/>
+			</div>
 			<EditorChoiceControl
 				label="Board placement"
 				value={value.placement}

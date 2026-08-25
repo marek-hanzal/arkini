@@ -3,6 +3,7 @@ import { Context, type Effect } from "effect";
 import type { EditorProject, EditorProjectCommit } from "~/editor/EditorProject";
 import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
 import type { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
+import type { EditorNoteSchema } from "~/editor/note/EditorNoteSchema";
 import type {
 	EditorBoardScenarioDescriptorSchema,
 	EditorBoardScenarioSchema,
@@ -75,6 +76,20 @@ export namespace EditorProjectRepository {
 		readonly expectedRevision: number;
 		readonly bytes: Uint8Array;
 	}
+
+	export interface NoteKey {
+		readonly projectId: string;
+		readonly noteId: string;
+	}
+
+	export interface CreateNoteProps {
+		readonly projectId: string;
+		readonly content: string;
+	}
+
+	export interface UpdateNoteProps extends NoteKey {
+		readonly content: string;
+	}
 }
 
 export interface EditorProjectRepositoryService extends EditorProjectVersionRepositoryService {
@@ -86,6 +101,12 @@ export interface EditorProjectRepositoryService extends EditorProjectVersionRepo
 	readonly deleteProjectFx: (
 		projectId: string,
 	) => Effect.Effect<void, EditorProjectRepositoryError>;
+	readonly createNoteFx: (
+		props: EditorProjectRepository.CreateNoteProps,
+	) => Effect.Effect<EditorNoteSchema.Type, EditorProjectRepositoryError>;
+	readonly deleteNoteFx: (
+		key: EditorProjectRepository.NoteKey,
+	) => Effect.Effect<void, EditorProjectRepositoryError>;
 	readonly deleteItemFx: (
 		props: EditorProjectRepository.DeleteItemProps,
 	) => Effect.Effect<EditorProjectCommit, EditorProjectRepositoryError>;
@@ -96,6 +117,9 @@ export interface EditorProjectRepositoryService extends EditorProjectVersionRepo
 		ReadonlyArray<EditorProjectDescriptor>,
 		EditorProjectRepositoryError
 	>;
+	readonly listNotesFx: (
+		projectId: string,
+	) => Effect.Effect<ReadonlyArray<EditorNoteSchema.Type>, EditorProjectRepositoryError>;
 	readonly listBoardScenariosFx: (
 		projectId: string,
 	) => Effect.Effect<
@@ -123,6 +147,9 @@ export interface EditorProjectRepositoryService extends EditorProjectVersionRepo
 	readonly upsertResourcesFx: (
 		props: EditorProjectRepository.UpsertResourcesProps,
 	) => Effect.Effect<EditorProject, EditorProjectRepositoryError>;
+	readonly updateNoteFx: (
+		props: EditorProjectRepository.UpdateNoteProps,
+	) => Effect.Effect<EditorNoteSchema.Type, EditorProjectRepositoryError>;
 	readonly writeBoardScenarioFx: (
 		props: EditorProjectRepository.WriteBoardScenarioProps,
 	) => Effect.Effect<EditorBoardScenarioSchema.Type, EditorProjectRepositoryError>;

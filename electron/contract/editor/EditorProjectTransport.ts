@@ -4,15 +4,18 @@ export namespace EditorProjectTransport {
 		| "await-idle"
 		| "checkout-version"
 		| "create-project"
+		| "create-note"
 		| "create-version"
 		| "delete-project"
 		| "delete-item"
 		| "delete-resource"
+		| "delete-note"
 		| "delete-board-scenario"
 		| "diff-versions"
 		| "export-json-directory"
 		| "import-json-directory"
 		| "list-board-scenarios"
+		| "list-notes"
 		| "list-projects"
 		| "list-versions"
 		| "open-export-directory"
@@ -25,6 +28,7 @@ export namespace EditorProjectTransport {
 		| "upsert-item"
 		| "upsert-resource"
 		| "update-version-tag"
+		| "update-note"
 		| "write-board-scenario";
 
 	export type ServiceStatus =
@@ -93,6 +97,28 @@ export namespace EditorProjectTransport {
 
 	export interface BoardScenario extends BoardScenarioDescriptor {
 		readonly bytes: Uint8Array;
+	}
+
+	export interface Note {
+		readonly noteId: string;
+		readonly projectId: string;
+		readonly content: string;
+		readonly createdAtMs: number;
+		readonly updatedAtMs: number;
+	}
+
+	export interface CreateNoteRequest {
+		readonly projectId: string;
+		readonly content: string;
+	}
+
+	export interface NoteKeyRequest {
+		readonly projectId: string;
+		readonly noteId: string;
+	}
+
+	export interface UpdateNoteRequest extends NoteKeyRequest {
+		readonly content: string;
 	}
 
 	export interface BoardScenarioKeyRequest {

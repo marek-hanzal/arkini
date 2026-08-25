@@ -455,7 +455,7 @@ describe("registerEditorProjectIpcFx", () => {
 				message: "SQLite read failed.",
 			},
 		});
-		expect(electron.handlers.size).toBe(26);
+		expect(electron.handlers.size).toBe(30);
 		electron.appListeners.get("will-quit")?.();
 		expect(electron.handlers.size).toBe(0);
 

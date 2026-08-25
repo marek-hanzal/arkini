@@ -9,6 +9,13 @@ export const EditorWorkspaceRoutes = [
 		to: "/editor/$projectId/project",
 	},
 	{
+		id: "notes",
+		icon: "icon-[lucide--notebook-pen]",
+		label: "Notes",
+		matchTo: "/editor/$projectId/notes",
+		to: "/editor/$projectId/notes",
+	},
+	{
 		id: "items",
 		icon: "icon-[lucide--boxes]",
 		label: "Items",

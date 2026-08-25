@@ -38,6 +38,14 @@ export const editorProjectIpcVersion = {
 	versionId: "version-one",
 };
 
+export const editorProjectIpcNote = {
+	noteId: "note-one",
+	projectId: editorProjectIpcProject.projectId,
+	content: "A project note",
+	createdAtMs: 4,
+	updatedAtMs: 4,
+};
+
 /** Creates one explicit repository spy for the editor-project IPC boundary. */
 export const createEditorProjectIpcRepository = (): SqliteEditorProjectRepository => ({
 	awaitIdleFx: Effect.void,
@@ -45,6 +53,14 @@ export const createEditorProjectIpcRepository = (): SqliteEditorProjectRepositor
 	createVersionFx: vi.fn(() => Effect.succeed(editorProjectIpcVersion)),
 	checkoutVersionFx: vi.fn(() => Effect.void),
 	deleteProjectFx: vi.fn(() => Effect.void),
+	createNoteFx: vi.fn(({ projectId, content }) =>
+		Effect.succeed({
+			...editorProjectIpcNote,
+			projectId,
+			content,
+		}),
+	),
+	deleteNoteFx: vi.fn(() => Effect.void),
 	deleteItemFx: vi.fn(() => Effect.succeed(editorProjectIpcCommit)),
 	deleteResourceFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	diffVersionsFx: vi.fn(({ from, to }) =>
@@ -61,6 +77,11 @@ export const createEditorProjectIpcRepository = (): SqliteEditorProjectRepositor
 	listProjectsFx: Effect.succeed([
 		editorProjectIpcDescriptor,
 	]),
+	listNotesFx: vi.fn(() =>
+		Effect.succeed([
+			editorProjectIpcNote,
+		]),
+	),
 	listVersionsFx: vi.fn(() =>
 		Effect.succeed([
 			editorProjectIpcVersion,
@@ -81,6 +102,15 @@ export const createEditorProjectIpcRepository = (): SqliteEditorProjectRepositor
 	upsertItemFx: vi.fn(() => Effect.succeed(editorProjectIpcCommit)),
 	upsertResourcesFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	updateVersionTagFx: vi.fn(() => Effect.succeed(editorProjectIpcVersion)),
+	updateNoteFx: vi.fn(({ projectId, noteId, content }) =>
+		Effect.succeed({
+			...editorProjectIpcNote,
+			projectId,
+			noteId,
+			content,
+			updatedAtMs: 5,
+		}),
+	),
 	listBoardScenariosFx: vi.fn(() => Effect.succeed([])),
 	readBoardScenarioFx: vi.fn(() => Effect.succeed(null)),
 	writeBoardScenarioFx: vi.fn(({ projectId, name, bytes }) =>

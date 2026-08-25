@@ -7,6 +7,7 @@ import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepos
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 import type { EditorProjectVersionRepositoryService } from "~/editor/version/EditorProjectVersion";
 import { createSqliteEditorBoardScenarioOperationsFx } from "./createSqliteEditorBoardScenarioOperationsFx";
+import { createSqliteEditorNoteOperationsFx } from "./createSqliteEditorNoteOperationsFx";
 import { createSqliteEditorProjectCommitOperationsFx } from "./createSqliteEditorProjectCommitOperationsFx";
 import { createSqliteEditorProjectOperationsFx } from "./createSqliteEditorProjectOperationsFx";
 import { createSqliteEditorProjectVersionOperationsFx } from "./createSqliteEditorProjectVersionOperationsFx";
@@ -69,6 +70,10 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 		database,
 		writeLock,
 	}).pipe(Effect.tapError(() => closeDatabaseFx));
+	const notes = yield* createSqliteEditorNoteOperationsFx({
+		database,
+		writeLock,
+	}).pipe(Effect.tapError(() => closeDatabaseFx));
 	const versions = yield* createSqliteEditorProjectVersionOperationsFx({
 		database,
 		writeLock,
@@ -83,6 +88,7 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 		...projects,
 		...commits,
 		...boardScenarios,
+		...notes,
 		...versions,
 		...versionDiffs,
 		closeFx: writeLock.withPermits(1)(closeDatabaseFx),

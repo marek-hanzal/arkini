@@ -58,6 +58,10 @@ export namespace ArkiniElectronApi {
 		editorProjectSaveResource: "arkini:editor:project:save-resource",
 		editorProjectUpsertItem: "arkini:editor:project:upsert-item",
 		editorProjectUpsertResources: "arkini:editor:project:upsert-resources",
+		editorNoteList: "arkini:editor:note:list",
+		editorNoteCreate: "arkini:editor:note:create",
+		editorNoteUpdate: "arkini:editor:note:update",
+		editorNoteDelete: "arkini:editor:note:delete",
 		editorVersionStatus: "arkini:editor:version:status",
 		editorVersionList: "arkini:editor:version:list",
 		editorVersionDiff: "arkini:editor:version:diff",
@@ -202,6 +206,18 @@ export namespace ArkiniElectronApi {
 			readonly upsertResources: (
 				request: EditorProjectTransport.UpsertResourcesRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project>>;
+			readonly listNotes: (
+				projectId: string,
+			) => Promise<EditorProjectTransport.Result<ReadonlyArray<EditorProjectTransport.Note>>>;
+			readonly createNote: (
+				request: EditorProjectTransport.CreateNoteRequest,
+			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Note>>;
+			readonly updateNote: (
+				request: EditorProjectTransport.UpdateNoteRequest,
+			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Note>>;
+			readonly deleteNote: (
+				request: EditorProjectTransport.NoteKeyRequest,
+			) => Promise<EditorProjectTransport.Result<void>>;
 			readonly listBoardScenarios: (
 				projectId: string,
 			) => Promise<

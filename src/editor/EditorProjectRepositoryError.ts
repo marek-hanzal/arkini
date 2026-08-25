@@ -5,14 +5,17 @@ export type EditorProjectRepositoryOperation =
 	| "checkout-version"
 	| "create-version"
 	| "create-project"
+	| "create-note"
 	| "delete-project"
 	| "delete-item"
 	| "delete-resource"
+	| "delete-note"
 	| "delete-board-scenario"
 	| "diff-versions"
 	| "export-json-directory"
 	| "import-json-directory"
 	| "list-board-scenarios"
+	| "list-notes"
 	| "list-projects"
 	| "list-versions"
 	| "open-export-directory"
@@ -25,6 +28,7 @@ export type EditorProjectRepositoryOperation =
 	| "upsert-item"
 	| "upsert-resource"
 	| "update-version-tag"
+	| "update-note"
 	| "write-board-scenario";
 
 /** One canonical editor-project repository operation failed. */

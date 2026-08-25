@@ -171,6 +171,14 @@ const api: ArkiniElectronApi.Api = {
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectUpsertItem, request),
 		upsertResources: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectUpsertResources, request),
+		listNotes: (projectId) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorNoteList, projectId),
+		createNote: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorNoteCreate, request),
+		updateNote: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorNoteUpdate, request),
+		deleteNote: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorNoteDelete, request),
 		listBoardScenarios: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorBoardScenarioList, projectId),
 		readBoardScenario: (request) =>

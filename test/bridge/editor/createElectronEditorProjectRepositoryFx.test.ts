@@ -56,7 +56,17 @@ const installEditorApi = () => {
 		})),
 		awaitIdle: vi.fn(async () => success(undefined)),
 		createProject: vi.fn(async () => success(project)),
+		createNote: vi.fn(async ({ projectId, content }) =>
+			success({
+				noteId: "note-one",
+				projectId,
+				content,
+				createdAtMs: 12,
+				updatedAtMs: 12,
+			}),
+		),
 		deleteProject: vi.fn(async () => success(undefined)),
+		deleteNote: vi.fn(async () => success(undefined)),
 		deleteItem: vi.fn(async () => success(commit)),
 		deleteResource: vi.fn(async () => success(project)),
 		exportJsonDirectory: vi.fn(async () => success(null)),
@@ -66,6 +76,7 @@ const installEditorApi = () => {
 				descriptor,
 			]),
 		),
+		listNotes: vi.fn(async () => success([])),
 		openExportDirectory: vi.fn(async () => success(undefined)),
 		readProject: vi.fn(async () => success(project)),
 		onProjectChanged: vi.fn(() => () => undefined),
@@ -118,6 +129,15 @@ const installEditorApi = () => {
 		createVersion: vi.fn(async () => success(version)),
 		checkoutVersion: vi.fn(async () => success(undefined)),
 		updateVersionTag: vi.fn(async () => success(version)),
+		updateNote: vi.fn(async ({ projectId, noteId, content }) =>
+			success({
+				noteId,
+				projectId,
+				content,
+				createdAtMs: 12,
+				updatedAtMs: 13,
+			}),
+		),
 	};
 	Object.defineProperty(window, "arkini", {
 		configurable: true,
@@ -210,6 +230,49 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 		expect(projectFailure.message).toBe("The editor IPC response is invalid.");
 		expect(versionFailure).toMatchObject({
 			operation: "list-versions",
+			message: "The editor IPC response is invalid.",
+		});
+	});
+
+	it("rejects note responses that escape the requested project or note identity", async () => {
+		const editor = installEditorApi();
+		vi.mocked(editor.listNotes).mockResolvedValueOnce(
+			success([
+				{
+					noteId: "foreign-note",
+					projectId: "another-project",
+					content: "Foreign",
+					createdAtMs: 1,
+					updatedAtMs: 1,
+				},
+			]),
+		);
+		vi.mocked(editor.updateNote).mockResolvedValueOnce(
+			success({
+				noteId: "another-note",
+				projectId: "project-one",
+				content: "Wrong identity",
+				createdAtMs: 1,
+				updatedAtMs: 2,
+			}),
+		);
+		const repository = Effect.runSync(createElectronEditorProjectRepositoryFx);
+
+		const listFailure = await readTypedFailure(repository.listNotesFx("project-one"));
+		const updateFailure = await readTypedFailure(
+			repository.updateNoteFx({
+				projectId: "project-one",
+				noteId: "note-one",
+				content: "Updated",
+			}),
+		);
+
+		expect(listFailure).toMatchObject({
+			operation: "list-notes",
+			message: "The editor IPC response is invalid.",
+		});
+		expect(updateFailure).toMatchObject({
+			operation: "update-note",
 			message: "The editor IPC response is invalid.",
 		});
 	});

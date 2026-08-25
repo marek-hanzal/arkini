@@ -18,6 +18,7 @@ import {
 import { admitEditorProjectWriteFx } from "~/bridge/editor/EditorProjectWriteAdmission";
 import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import { EditorNoteSchema } from "~/editor/note/EditorNoteSchema";
 
 const commitTransportSchema = z
 	.object({
@@ -270,6 +271,31 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 					() => undefined,
 				),
 			),
+		createNoteFx: (request) =>
+			writeFx(
+				"create-note",
+				callFx(
+					"create-note",
+					() => window.arkini.editor.createNote(request),
+					(value) => {
+						const note = EditorNoteSchema.parse(value);
+						if (note.projectId !== request.projectId)
+							throw new Error(
+								"Editor note project identity does not match the request.",
+							);
+						return note;
+					},
+				),
+			),
+		deleteNoteFx: (request) =>
+			writeFx(
+				"delete-note",
+				callFx(
+					"delete-note",
+					() => window.arkini.editor.deleteNote(request),
+					() => undefined,
+				),
+			),
 		createVersionFx: (request) =>
 			writeFx(
 				"create-version",
@@ -310,6 +336,17 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 			() => window.arkini.editor.listProjects(),
 			(value) => EditorProjectDescriptorSchema.array().parse(value),
 		),
+		listNotesFx: (projectId) =>
+			callFx(
+				"list-notes",
+				() => window.arkini.editor.listNotes(projectId),
+				(value) => {
+					const notes = EditorNoteSchema.array().parse(value);
+					if (notes.some((note) => note.projectId !== projectId))
+						throw new Error("Editor note stream identity does not match the request.");
+					return notes;
+				},
+			),
 		listVersionsFx: (projectId) =>
 			callFx(
 				"list-versions",
@@ -381,6 +418,20 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 					"update-version-tag",
 					() => window.arkini.editor.updateVersionTag(request),
 					(value) => versionDescriptorSchema.parse(value),
+				),
+			),
+		updateNoteFx: (request) =>
+			writeFx(
+				"update-note",
+				callFx(
+					"update-note",
+					() => window.arkini.editor.updateNote(request),
+					(value) => {
+						const note = EditorNoteSchema.parse(value);
+						if (note.projectId !== request.projectId || note.noteId !== request.noteId)
+							throw new Error("Editor note identity does not match the request.");
+						return note;
+					},
 				),
 			),
 		writeBoardScenarioFx: (request) =>

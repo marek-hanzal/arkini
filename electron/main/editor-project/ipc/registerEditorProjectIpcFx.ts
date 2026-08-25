@@ -12,6 +12,7 @@ import { openEditorExportDirectoryFx } from "../openEditorExportDirectoryFx";
 import { createEditorProjectRequestParserFx } from "./createEditorProjectRequestParserFx";
 import { executeEditorProjectRepositoryFx } from "./executeEditorProjectRepositoryFx";
 import { registerEditorBoardScenarioIpcFx } from "./registerEditorBoardScenarioIpcFx";
+import { registerEditorNoteIpcFx } from "./registerEditorNoteIpcFx";
 
 const readEditorWindowFx = (
 	event: IpcMainInvokeEvent,
@@ -50,6 +51,10 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 			});
 			if (!shouldRegister) return;
 			const boardScenarioChannels = yield* registerEditorBoardScenarioIpcFx({
+				ownership,
+				trustedRenderer,
+			});
+			const noteChannels = yield* registerEditorNoteIpcFx({
 				ownership,
 				trustedRenderer,
 			});
@@ -338,6 +343,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					ArkiniElectronApi.channels.editorVersionCheckout,
 					ArkiniElectronApi.channels.editorVersionTag,
 					...boardScenarioChannels,
+					...noteChannels,
 				];
 				app.once("will-quit", () => {
 					for (const channel of channels) ipcMain.removeHandler(channel);

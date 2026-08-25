@@ -5,8 +5,9 @@ import {
 	EditorProjectRepositoryError,
 	type EditorProjectRepositoryOperation,
 } from "~/editor/EditorProjectRepositoryError";
+import { EditorNoteContentMaxLength } from "~/editor/note/EditorNoteSchema";
 
-const schemaVersion = 4;
+const schemaVersion = 5;
 const createBoardScenariosSql = `
 	CREATE TABLE board_scenarios (
 		project_id TEXT NOT NULL,
@@ -88,6 +89,20 @@ const createProjectVersionsSql = `
 	) STRICT;
 `;
 
+const createProjectNotesSql = `
+	CREATE TABLE IF NOT EXISTS project_notes (
+		note_id TEXT NOT NULL,
+		project_id TEXT NOT NULL,
+		content TEXT NOT NULL CHECK (length(content) BETWEEN 1 AND ${EditorNoteContentMaxLength}),
+		created_at_ms INTEGER NOT NULL CHECK (created_at_ms >= 0),
+		updated_at_ms INTEGER NOT NULL CHECK (updated_at_ms >= created_at_ms),
+		PRIMARY KEY (project_id, note_id),
+		FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+	) STRICT;
+	CREATE INDEX IF NOT EXISTS project_notes_recent
+		ON project_notes(project_id, updated_at_ms DESC, note_id DESC);
+`;
+
 const createRepositoryError = (
 	operation: EditorProjectRepositoryOperation,
 	message: string,
@@ -127,7 +142,7 @@ export const initializeSqliteEditorProjectSchemaFx = Effect.fn(
 			database.exec("PRAGMA journal_mode = WAL");
 			const version = database.prepare("PRAGMA user_version").get()?.user_version;
 			if (version === schemaVersion) return;
-			if (version !== 0 && version !== 1 && version !== 2 && version !== 3)
+			if (version !== 0 && version !== 1 && version !== 2 && version !== 3 && version !== 4)
 				throw new Error(`Unsupported editor database schema version ${String(version)}.`);
 
 			runTransaction(database, () => {
@@ -174,8 +189,9 @@ export const initializeSqliteEditorProjectSchemaFx = Effect.fn(
 						update.run(JSON.stringify(config), row.project_id);
 					}
 				}
-				if (version !== 3) database.exec(createBoardScenariosSql);
+				if (version !== 3 && version !== 4) database.exec(createBoardScenariosSql);
 				database.exec(createProjectVersionsSql);
+				database.exec(createProjectNotesSql);
 				database.exec(`PRAGMA user_version = ${schemaVersion}`);
 			});
 		},

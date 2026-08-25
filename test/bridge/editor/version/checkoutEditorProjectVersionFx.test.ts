@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { EditorProjectRepositoryService } from "~/bridge/editor/EditorProjectRepository";
 import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
+import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
 import { EditorUnsavedChanges } from "~/bridge/editor/EditorUnsavedChanges";
 import type { EditorBoardGameResource } from "~/bridge/editor/board/EditorBoardGameResource";
 import { EditorBoardGameResourceOwnerAtom } from "~/bridge/editor/board/EditorBoardGameResource";
@@ -119,7 +120,6 @@ const runCheckout = async ({
 		const exit = await Effect.runPromiseExit(
 			checkoutEditorProjectVersionFx({
 				confirmDiscardCurrentChanges: confirm,
-				hardReload: () => events.push("hard-reload"),
 				projectId: project.projectId,
 				versionId: "version-one",
 			}).pipe(
@@ -131,6 +131,7 @@ const runCheckout = async ({
 		return {
 			events,
 			exit,
+			published: registry.get(EditorProjectAtom(project.projectId)),
 		};
 	} finally {
 		registry.dispose();
@@ -147,8 +148,10 @@ describe("checkoutEditorProjectVersionFx", () => {
 			"board-release",
 			`checkout-${"a".repeat(64)}`,
 			"discard",
-			"hard-reload",
+			"project-read",
+			"board-sync-7",
 		]);
+		expect(result.published?.revision).toBe(7);
 	});
 
 	it("requires fresh consent before discarding newly saved working-copy changes", async () => {

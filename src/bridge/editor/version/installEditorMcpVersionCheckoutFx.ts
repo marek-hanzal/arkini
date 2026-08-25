@@ -2,7 +2,6 @@ import { Effect } from "effect";
 import { z } from "zod";
 
 import { checkoutEditorProjectVersionFx } from "~/bridge/editor/version/checkoutEditorProjectVersionFx";
-import { hardReloadEditorProjectVersion } from "~/bridge/editor/version/hardReloadEditorProjectVersion";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -18,19 +17,13 @@ export namespace installEditorMcpVersionCheckoutFx {
 	export interface Props {
 		readonly editorMcp: Pick<Window["arkini"]["editorMcp"], "onVersionCheckoutRequested">;
 		readonly rendererRuntime: typeof RendererRuntime;
-		readonly hardReload?: (projectId: string) => void;
-		readonly router: Pick<ArkiniRouter, "state">;
+		readonly router: Pick<ArkiniRouter, "navigate" | "state">;
 	}
 }
 
-/** Installs the only MCP checkout path, reusing the renderer's hard-reset coordinator. */
+/** Installs the only MCP checkout path, reusing the renderer's in-place restore coordinator. */
 export const installEditorMcpVersionCheckoutFx = Effect.fn("installEditorMcpVersionCheckoutFx")(
-	({
-		editorMcp,
-		hardReload = hardReloadEditorProjectVersion,
-		rendererRuntime,
-		router,
-	}: installEditorMcpVersionCheckoutFx.Props) =>
+	({ editorMcp, rendererRuntime, router }: installEditorMcpVersionCheckoutFx.Props) =>
 		Effect.sync(() => {
 			let running = false;
 			return editorMcp.onVersionCheckoutRequested(async (candidate) => {
@@ -47,11 +40,17 @@ export const installEditorMcpVersionCheckoutFx = Effect.fn("installEditorMcpVers
 					await rendererRuntime.runPromise(
 						checkoutEditorProjectVersionFx({
 							confirmDiscardCurrentChanges: true,
-							hardReload,
 							projectId: request.projectId,
 							versionId: request.versionId,
 						}),
 					);
+					await router.navigate({
+						to: "/editor/$projectId/versions/history",
+						params: {
+							projectId: request.projectId,
+						},
+						replace: true,
+					});
 				} finally {
 					running = false;
 				}

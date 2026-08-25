@@ -2,6 +2,7 @@ import type { PropsWithChildren } from "react";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectProvider } from "~/bridge/editor/EditorProjectProvider";
+import { EditorProjectRevisionBoundary } from "~/ui/editor/EditorProjectRevisionBoundary";
 import { EditorShell } from "~/ui/editor/EditorShell";
 import { EditorProjectResourceUrlProvider } from "~/ui/resource/editor/EditorResourceUrlProvider";
 
@@ -13,8 +14,10 @@ export const EditorProjectWorkspace = ({
 	readonly project: EditorProject;
 }>) => (
 	<EditorProjectProvider loaded={project}>
-		<EditorProjectResourceUrlProvider>
-			<EditorShell>{children}</EditorShell>
-		</EditorProjectResourceUrlProvider>
+		<EditorProjectRevisionBoundary>
+			<EditorProjectResourceUrlProvider>
+				<EditorShell>{children}</EditorShell>
+			</EditorProjectResourceUrlProvider>
+		</EditorProjectRevisionBoundary>
 	</EditorProjectProvider>
 );

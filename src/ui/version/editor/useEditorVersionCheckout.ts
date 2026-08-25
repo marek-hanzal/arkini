@@ -4,7 +4,6 @@ import { useCallback, useState, useSyncExternalStore } from "react";
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectVersionCheckoutConfirmationRequired } from "~/bridge/editor/version/EditorProjectVersionCheckoutConfirmationRequired";
 import { checkoutEditorProjectVersionFx } from "~/bridge/editor/version/checkoutEditorProjectVersionFx";
-import { hardReloadEditorProjectVersion } from "~/bridge/editor/version/hardReloadEditorProjectVersion";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { EditorProjectVersionDescriptor } from "~/editor/version/EditorProjectVersion";
 import { useEditorUnsavedChangesOwner } from "~/ui/editor/useEditorUnsavedChangesRegistration";
@@ -52,7 +51,6 @@ export const useEditorVersionCheckout = ({
 			void RendererRuntime.runPromise(
 				checkoutEditorProjectVersionFx({
 					confirmDiscardCurrentChanges,
-					hardReload: hardReloadEditorProjectVersion,
 					projectId: project.projectId,
 					versionId: version.versionId,
 				}),

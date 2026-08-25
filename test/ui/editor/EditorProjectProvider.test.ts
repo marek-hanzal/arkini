@@ -2,7 +2,7 @@
 
 import { RegistryContext, scheduleTask } from "@effect/atom-react";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
-import { act, createElement } from "react";
+import { act, createElement, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -11,6 +11,7 @@ import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
 import { EditorProjectProvider } from "~/bridge/editor/EditorProjectProvider";
 import { RendererAtomRegistry } from "~/bridge/reactivity/RendererAtomRegistry";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { EditorProjectRevisionBoundary } from "~/ui/editor/EditorProjectRevisionBoundary";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 (
@@ -72,6 +73,52 @@ const createProject = (revision: number, projectId = "project"): EditorProject =
 });
 
 describe("EditorProjectProvider", () => {
+	it("remounts only the project revision subtree after canonical replacement", async () => {
+		const registry = AtomRegistry.make({
+			scheduleTask,
+		});
+		registries.push(registry);
+		let mount = 0;
+		const Probe = () => {
+			const [mountedAs] = useState(() => ++mount);
+			const project = useEditorProject();
+			return createElement("output", null, `${project.revision}:${mountedAs}`);
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+
+		await act(async () => {
+			root.render(
+				createElement(
+					RegistryContext.Provider,
+					{
+						value: registry,
+					},
+					createElement(
+						EditorProjectProvider,
+						{
+							loaded: createProject(1),
+						},
+						createElement(EditorProjectRevisionBoundary, null, createElement(Probe)),
+					),
+				),
+			);
+		});
+		expect(container.textContent).toBe("1:1");
+
+		await act(async () => {
+			registry.set(EditorProjectAtom("project"), {
+				project: createProject(2),
+			});
+		});
+
+		expect(container.textContent).toBe("2:2");
+		expect(setProjectContext).toHaveBeenCalledExactlyOnceWith("project");
+		expect(clearProjectContext).not.toHaveBeenCalled();
+	});
+
 	it("owns the MCP context only while its project workspace is mounted", async () => {
 		const registry = AtomRegistry.make({
 			scheduleTask,

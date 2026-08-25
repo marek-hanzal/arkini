@@ -3,9 +3,11 @@
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import type { EditorProject } from "~/bridge/editor/EditorProject";
 import type { EditorProjectRepositoryService } from "~/bridge/editor/EditorProjectRepository";
 import { installEditorMcpVersionCheckoutFx } from "~/bridge/editor/version/installEditorMcpVersionCheckoutFx";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
+import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import { createTestRendererRuntime } from "~test/support/createTestRendererRuntime";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
@@ -16,7 +18,17 @@ afterEach(async () => {
 });
 
 describe("installEditorMcpVersionCheckoutFx", () => {
-	it("uses the renderer checkout coordinator and reloads the exact open project", async () => {
+	it("uses the renderer checkout coordinator and returns to the refreshed history", async () => {
+		const project: EditorProject = {
+			projectId: "project-one",
+			title: editorTestPayload.config.meta.title,
+			version: editorTestPayload.version,
+			createdAtMs: 1,
+			updatedAtMs: 2,
+			revision: 2,
+			config: editorTestPayload.config,
+			resources: editorTestPayload.resources,
+		};
 		const checkoutVersionFx = vi.fn(() => Effect.void);
 		const repository: EditorProjectRepositoryService = {
 			...UnusedEditorProjectRepository,
@@ -25,7 +37,7 @@ describe("installEditorMcpVersionCheckoutFx", () => {
 			createProjectFx: () => Effect.die("Unexpected project create."),
 			deleteItemFx: () => Effect.die("Unexpected item delete."),
 			listProjectsFx: Effect.die("Unexpected project list."),
-			readProjectFx: () => Effect.die("Unexpected project read."),
+			readProjectFx: () => Effect.succeed(project),
 			readVersionStatusFx: () =>
 				Effect.succeed({
 					canCommit: true,
@@ -47,8 +59,9 @@ describe("installEditorMcpVersionCheckoutFx", () => {
 			| ((request: { projectId: string; versionId: string }) => Promise<void>)
 			| undefined;
 		const remove = vi.fn();
-		const hardReload = vi.fn();
+		const navigate = vi.fn(() => Promise.resolve());
 		const router = {
+			navigate,
 			state: {
 				matches: [
 					{
@@ -58,7 +71,7 @@ describe("installEditorMcpVersionCheckoutFx", () => {
 					},
 				],
 			},
-		} as unknown as Pick<ArkiniRouter, "state">;
+		} as unknown as Pick<ArkiniRouter, "navigate" | "state">;
 		const uninstall = rendererRuntime.runSync(
 			installEditorMcpVersionCheckoutFx({
 				editorMcp: {
@@ -67,7 +80,6 @@ describe("installEditorMcpVersionCheckoutFx", () => {
 						return remove;
 					},
 				},
-				hardReload,
 				rendererRuntime,
 				router,
 			}),
@@ -90,7 +102,13 @@ describe("installEditorMcpVersionCheckoutFx", () => {
 			versionId: "version-one",
 			expectedFingerprint: "a".repeat(64),
 		});
-		expect(hardReload).toHaveBeenCalledWith("project-one");
+		expect(navigate).toHaveBeenCalledWith({
+			to: "/editor/$projectId/versions/history",
+			params: {
+				projectId: "project-one",
+			},
+			replace: true,
+		});
 		uninstall();
 		expect(remove).toHaveBeenCalledOnce();
 	});

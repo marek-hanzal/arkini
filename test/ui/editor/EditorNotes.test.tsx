@@ -107,7 +107,7 @@ const click = async (element: Element | null) => {
 };
 
 describe("EditorNotes", () => {
-	it("creates, edits, and deletes notes directly in the stream", async () => {
+	it("creates, cancels, edits, and deletes notes directly in the stream", async () => {
 		const container = await renderNotes();
 		await act(async () =>
 			vi.waitFor(() => expect(container.textContent).toContain("Existing note")),
@@ -129,8 +129,16 @@ describe("EditorNotes", () => {
 		].find((note) => note.textContent?.includes("Existing note"));
 		if (existing === undefined) throw new Error("Missing existing note.");
 		await click(existing.querySelector('[data-tooltip="Edit"] button'));
-		const editor = existing.querySelector<HTMLTextAreaElement>("textarea");
+		let editor = existing.querySelector<HTMLTextAreaElement>("textarea");
 		if (editor === null) throw new Error("Missing inline editor.");
+		await changeTextarea(editor, "Discarded edit");
+		await click(existing.querySelector('[data-tooltip="Cancel edit"] button'));
+		expect(existing.textContent).toContain("Existing note");
+		expect(existing.querySelector("textarea")).toBeNull();
+
+		await click(existing.querySelector('[data-tooltip="Edit"] button'));
+		editor = existing.querySelector<HTMLTextAreaElement>("textarea");
+		if (editor === null) throw new Error("Missing inline editor after cancel.");
 		await changeTextarea(editor, "Edited note");
 		await click(existing.querySelector('[data-tooltip="Save"] button'));
 		await act(async () =>

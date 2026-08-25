@@ -10,6 +10,7 @@ import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncR
 
 export namespace useEditorNotesController {
 	export interface Output {
+		readonly cancelEdit: () => void;
 		readonly canCreate: boolean;
 		readonly canSaveEdit: boolean;
 		readonly create: () => void;
@@ -84,6 +85,13 @@ export const useEditorNotesController = (): useEditorNotesController.Output => {
 		setEditingNoteId(note.noteId);
 		setEditContent(note.content);
 	}, []);
+	const cancelEdit = useCallback(() => {
+		if (pending) return;
+		setEditingNoteId(undefined);
+		setEditContent("");
+	}, [
+		pending,
+	]);
 	const saveEdit = useCallback(() => {
 		if (!canSaveEdit || editingNoteId === undefined) return;
 		void run({
@@ -127,6 +135,7 @@ export const useEditorNotesController = (): useEditorNotesController.Output => {
 
 	return useMemo(
 		() => ({
+			cancelEdit,
 			canCreate,
 			canSaveEdit,
 			create,
@@ -154,6 +163,7 @@ export const useEditorNotesController = (): useEditorNotesController.Output => {
 			startEdit,
 		}),
 		[
+			cancelEdit,
 			canCreate,
 			canSaveEdit,
 			create,

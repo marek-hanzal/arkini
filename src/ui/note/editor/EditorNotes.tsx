@@ -124,23 +124,39 @@ export const EditorNotes = () => {
 												</time>
 												<div className="ml-auto flex items-center gap-2">
 													{editing ? (
-														<Tooltip
-															content="Save"
-															placement="top"
-														>
-															<Button
-																className={iconButtonClassName}
-																disabled={!controller.canSaveEdit}
-																cursorIntent={
-																	controller.pending
-																		? "progress"
-																		: undefined
-																}
-																onClick={controller.saveEdit}
+														<>
+															<Tooltip
+																content="Cancel edit"
+																placement="top"
 															>
-																<span className="icon-[lucide--save] size-4" />
-															</Button>
-														</Tooltip>
+																<Button
+																	className={iconButtonClassName}
+																	disabled={controller.pending}
+																	onClick={controller.cancelEdit}
+																>
+																	<span className="icon-[lucide--arrow-left] size-4" />
+																</Button>
+															</Tooltip>
+															<Tooltip
+																content="Save"
+																placement="top"
+															>
+																<Button
+																	className={iconButtonClassName}
+																	disabled={
+																		!controller.canSaveEdit
+																	}
+																	cursorIntent={
+																		controller.pending
+																			? "progress"
+																			: undefined
+																	}
+																	onClick={controller.saveEdit}
+																>
+																	<span className="icon-[lucide--save] size-4" />
+																</Button>
+															</Tooltip>
+														</>
 													) : (
 														<>
 															<Tooltip

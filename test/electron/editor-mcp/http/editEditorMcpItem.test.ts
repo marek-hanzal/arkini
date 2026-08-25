@@ -52,11 +52,36 @@ describe("editor MCP item editing", () => {
 		ownership.setProjectContext("edit-simple-project");
 		await Effect.runPromise(ownership.activateFx);
 		const client = await connectEditorMcpClient(port);
+		const readConfig = async (itemId: string) => {
+			const result = await client.callTool({
+				name: "item_config",
+				arguments: {
+					itemId,
+				},
+			});
+			const content = result.content[0];
+			if (content?.type !== "text")
+				throw new Error(`Missing item_config text for ${itemId}.`);
+			return JSON.parse(content.text) as unknown;
+		};
+		const waterConfig = {
+			revision: 0,
+			item: {
+				...water,
+				maxCount: 2,
+			},
+		};
+		expect(await readConfig("water")).toEqual(waterConfig);
+		expect(await readConfig(producer.id)).toEqual({
+			revision: 0,
+			item: producer,
+		});
 
 		const edited = await client.callTool({
 			name: "edit_simple_item",
 			arguments: {
 				itemId: "water",
+				revision: waterConfig.revision,
 				patch: {
 					maxCount: null,
 					title: "Fresh Water",
@@ -82,6 +107,26 @@ describe("editor MCP item editing", () => {
 			title: "Fresh Water",
 		});
 		expect(notifyProjectChanged).toHaveBeenCalledExactlyOnceWith("edit-simple-project");
+		const stale = await client.callTool({
+			name: "edit_simple_item",
+			arguments: {
+				itemId: "water",
+				revision: waterConfig.revision,
+				patch: {
+					title: "Stale title",
+				},
+			},
+		});
+		expect(stale).toMatchObject({
+			isError: true,
+			content: [
+				{
+					text: expect.stringContaining(
+						"Revision 0 is stale; the open project is at revision 1.",
+					),
+				},
+			],
+		});
 
 		for (const patch of [
 			{},

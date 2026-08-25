@@ -29,6 +29,12 @@ export const editEditorMcpItemFx = Effect.fn("editEditorMcpItemFx")(function* ({
 		return yield* Effect.fail(
 			new Error(`Item ${input.itemId} is ${current.type}, not ${type}.`),
 		);
+	if (input.revision !== undefined && input.revision !== project.revision)
+		return yield* Effect.fail(
+			new Error(
+				`Revision ${input.revision} is stale; the open project is at revision ${project.revision}. Read item_config again before replacing structured fields.`,
+			),
+		);
 	const candidate: Pick<ItemSchema.Type, "id" | "type"> & Record<string, unknown> = {
 		...current,
 	};
@@ -37,7 +43,7 @@ export const editEditorMcpItemFx = Effect.fn("editEditorMcpItemFx")(function* ({
 		else candidate[field] = value;
 	}
 	const { commit, item } = yield* saveEditorItemWithRepositoryFx({
-		expectedRevision: project.revision,
+		expectedRevision: input.revision ?? project.revision,
 		item: candidate,
 		projectId: project.projectId,
 		repository,

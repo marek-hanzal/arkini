@@ -20,6 +20,7 @@ import { createEditorMcpItemFx } from "./createEditorMcpItemFx";
 import { editEditorMcpItemFx } from "./editEditorMcpItemFx";
 import { readEditorMcpEstimateTextFx } from "./readEditorMcpEstimateTextFx";
 import { readEditorMcpItemCollectionTextFx } from "./readEditorMcpItemCollectionTextFx";
+import { readEditorMcpItemConfigTextFx } from "./readEditorMcpItemConfigTextFx";
 import { readEditorMcpItemDetailTextFx } from "./readEditorMcpItemDetailTextFx";
 import { readEditorMcpItemEstimateTextFx } from "./readEditorMcpItemEstimateTextFx";
 import { readEditorMcpItemMetaTextFx } from "./readEditorMcpItemMetaTextFx";
@@ -129,7 +130,7 @@ const createEditorMcpServer = (
 		server.registerTool(
 			`edit_${type}_item`,
 			{
-				description: `Patch one existing ${type} item. Supplied top-level fields replace their complete values, omitted fields remain unchanged, and null clears optional fields.`,
+				description: `Patch one existing ${type} item. Supplied top-level fields replace their complete values, omitted fields remain unchanged, and null clears optional fields. Before replacing a structured field such as asset, charges, merge, line, lines, output, or nested rolls, read item_config and copy its revision into this request.`,
 				inputSchema: EditorMcpEditItemInputSchemas[type],
 			},
 			async (input: EditorMcpEditItemInput) =>
@@ -206,6 +207,24 @@ const createEditorMcpServer = (
 			runTool(
 				readProjectFx().pipe(
 					Effect.flatMap((project) => readEditorMcpItemDetailTextFx(project, id)),
+				),
+			),
+	);
+	server.registerTool(
+		"item_config",
+		{
+			description:
+				"Read the complete canonical JSON configuration of one item and its project revision. Use this before replacing structured fields through edit_<type>_item, preserve every unchanged nested value, and copy revision into the edit request.",
+			inputSchema: z
+				.object({
+					itemId: IdSchema.describe("The exact item ID returned by item_collection."),
+				})
+				.strict(),
+		},
+		async ({ itemId }) =>
+			runTool(
+				readProjectFx().pipe(
+					Effect.flatMap((project) => readEditorMcpItemConfigTextFx(project, itemId)),
 				),
 			),
 	);

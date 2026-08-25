@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { readEditorMcpItemCollectionTextFx } from "../../../../electron/main/editor-mcp/tool/readEditorMcpItemCollectionTextFx";
+import { readEditorMcpItemConfigTextFx } from "../../../../electron/main/editor-mcp/tool/readEditorMcpItemConfigTextFx";
 import { readEditorMcpItemDetailTextFx } from "../../../../electron/main/editor-mcp/tool/readEditorMcpItemDetailTextFx";
 import { readEditorMcpItemMetaTextFx } from "../../../../electron/main/editor-mcp/tool/readEditorMcpItemMetaTextFx";
 import { readEditorMcpProjectTextFx } from "../../../../electron/main/editor-mcp/tool/readEditorMcpProjectTextFx";
@@ -34,6 +35,7 @@ describe("editor MCP item tool text", () => {
 			}),
 		);
 		const detailText = Effect.runSync(readEditorMcpItemDetailTextFx(project, "water"));
+		const configText = Effect.runSync(readEditorMcpItemConfigTextFx(project, "water"));
 
 		expect(projectText).toContain("Project ID: project-context");
 		expect(projectText).toContain("Resources: 2");
@@ -41,7 +43,14 @@ describe("editor MCP item tool text", () => {
 		expect(fuzzyText).toBe(collectionText);
 		expect(collectionText).toContain("- Water\n  ID: water\n  Type: simple");
 		expect(detailText).toContain("ID: water\nUID: water\nType: simple");
+		expect(JSON.parse(configText)).toEqual({
+			revision: project.revision,
+			item: project.config.items.water,
+		});
 		expect(() => Effect.runSync(readEditorMcpItemDetailTextFx(project, "missing"))).toThrow(
+			"Item missing does not exist",
+		);
+		expect(() => Effect.runSync(readEditorMcpItemConfigTextFx(project, "missing"))).toThrow(
 			"Item missing does not exist",
 		);
 	});

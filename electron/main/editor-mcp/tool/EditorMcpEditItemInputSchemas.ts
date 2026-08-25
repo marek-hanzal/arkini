@@ -91,6 +91,14 @@ const editItemInput = <Schema extends z.ZodType<Record<string, unknown>>>(patch:
 	z
 		.object({
 			itemId: IdSchema.describe("The immutable item ID returned by item_collection."),
+			revision: z
+				.number()
+				.int()
+				.nonnegative()
+				.optional()
+				.describe(
+					"Optional project revision returned by item_config. Supply it when replacing structured fields so a stale read is rejected instead of overwriting newer authoring changes.",
+				),
 			patch: patch.describe(
 				"Top-level replacements. Omitted fields remain unchanged; null clears an optional field.",
 			),

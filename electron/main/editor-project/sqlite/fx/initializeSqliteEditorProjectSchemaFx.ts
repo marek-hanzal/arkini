@@ -6,7 +6,7 @@ import {
 	type EditorProjectRepositoryOperation,
 } from "~/editor/EditorProjectRepositoryError";
 
-const schemaVersion = 3;
+const schemaVersion = 4;
 const createBoardScenariosSql = `
 	CREATE TABLE board_scenarios (
 		project_id TEXT NOT NULL,
@@ -21,6 +21,71 @@ const createBoardScenariosSql = `
 	) STRICT;
 	CREATE INDEX board_scenarios_recent
 		ON board_scenarios(project_id, updated_at_ms DESC, name ASC);
+`;
+
+const createProjectVersionsSql = `
+	CREATE TABLE IF NOT EXISTS project_version_blobs (
+		project_id TEXT NOT NULL,
+		content_hash TEXT NOT NULL,
+		bytes BLOB NOT NULL,
+		PRIMARY KEY (project_id, content_hash),
+		FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+	) STRICT;
+	CREATE TABLE IF NOT EXISTS project_versions (
+		project_id TEXT NOT NULL,
+		version_id TEXT NOT NULL,
+		parent_version_id TEXT,
+		subject TEXT NOT NULL CHECK (length(subject) > 0),
+		body TEXT,
+		tag TEXT,
+		arkini TEXT NOT NULL,
+		arkpack_version TEXT NOT NULL,
+		source_revision INTEGER NOT NULL CHECK (source_revision >= 0),
+		snapshot_format_version INTEGER NOT NULL CHECK (snapshot_format_version > 0),
+		config_json TEXT NOT NULL,
+		content_fingerprint TEXT NOT NULL,
+		created_at_ms INTEGER NOT NULL CHECK (created_at_ms >= 0),
+		PRIMARY KEY (project_id, version_id),
+		FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE,
+		FOREIGN KEY (project_id, parent_version_id)
+			REFERENCES project_versions(project_id, version_id)
+	) STRICT;
+	CREATE INDEX IF NOT EXISTS project_versions_recent
+		ON project_versions(project_id, created_at_ms DESC, version_id DESC);
+	CREATE TABLE IF NOT EXISTS project_version_resources (
+		project_id TEXT NOT NULL,
+		version_id TEXT NOT NULL,
+		resource_id TEXT NOT NULL,
+		mime TEXT NOT NULL,
+		blob_hash TEXT NOT NULL,
+		PRIMARY KEY (project_id, version_id, resource_id),
+		FOREIGN KEY (project_id, version_id)
+			REFERENCES project_versions(project_id, version_id) ON DELETE CASCADE,
+		FOREIGN KEY (project_id, blob_hash)
+			REFERENCES project_version_blobs(project_id, content_hash)
+	) STRICT;
+	CREATE TABLE IF NOT EXISTS project_version_scenarios (
+		project_id TEXT NOT NULL,
+		version_id TEXT NOT NULL,
+		name TEXT NOT NULL,
+		project_revision INTEGER NOT NULL CHECK (project_revision >= 0),
+		arkpack_version TEXT NOT NULL,
+		blob_hash TEXT NOT NULL,
+		created_at_ms INTEGER NOT NULL CHECK (created_at_ms >= 0),
+		updated_at_ms INTEGER NOT NULL CHECK (updated_at_ms >= created_at_ms),
+		PRIMARY KEY (project_id, version_id, name),
+		FOREIGN KEY (project_id, version_id)
+			REFERENCES project_versions(project_id, version_id) ON DELETE CASCADE,
+		FOREIGN KEY (project_id, blob_hash)
+			REFERENCES project_version_blobs(project_id, content_hash)
+	) STRICT;
+	CREATE TABLE IF NOT EXISTS project_version_bases (
+		project_id TEXT PRIMARY KEY NOT NULL,
+		version_id TEXT NOT NULL,
+		FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE,
+		FOREIGN KEY (project_id, version_id)
+			REFERENCES project_versions(project_id, version_id)
+	) STRICT;
 `;
 
 const createRepositoryError = (
@@ -62,7 +127,7 @@ export const initializeSqliteEditorProjectSchemaFx = Effect.fn(
 			database.exec("PRAGMA journal_mode = WAL");
 			const version = database.prepare("PRAGMA user_version").get()?.user_version;
 			if (version === schemaVersion) return;
-			if (version !== 0 && version !== 1 && version !== 2)
+			if (version !== 0 && version !== 1 && version !== 2 && version !== 3)
 				throw new Error(`Unsupported editor database schema version ${String(version)}.`);
 
 			runTransaction(database, () => {
@@ -109,7 +174,8 @@ export const initializeSqliteEditorProjectSchemaFx = Effect.fn(
 						update.run(JSON.stringify(config), row.project_id);
 					}
 				}
-				database.exec(createBoardScenariosSql);
+				if (version !== 3) database.exec(createBoardScenariosSql);
+				database.exec(createProjectVersionsSql);
 				database.exec(`PRAGMA user_version = ${schemaVersion}`);
 			});
 		},

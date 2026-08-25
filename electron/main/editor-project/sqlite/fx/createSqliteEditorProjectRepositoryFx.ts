@@ -5,12 +5,16 @@ import { Effect, Semaphore } from "effect";
 
 import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
+import type { EditorProjectVersionRepositoryService } from "~/editor/version/EditorProjectVersion";
 import { createSqliteEditorBoardScenarioOperationsFx } from "./createSqliteEditorBoardScenarioOperationsFx";
 import { createSqliteEditorProjectCommitOperationsFx } from "./createSqliteEditorProjectCommitOperationsFx";
 import { createSqliteEditorProjectOperationsFx } from "./createSqliteEditorProjectOperationsFx";
+import { createSqliteEditorProjectVersionOperationsFx } from "./createSqliteEditorProjectVersionOperationsFx";
 import { initializeSqliteEditorProjectSchemaFx } from "./initializeSqliteEditorProjectSchemaFx";
 
-export interface SqliteEditorProjectRepository extends EditorProjectRepositoryService {
+export interface SqliteEditorProjectRepository
+	extends EditorProjectRepositoryService,
+		EditorProjectVersionRepositoryService {
 	readonly closeFx: Effect.Effect<void>;
 }
 
@@ -64,12 +68,17 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 		database,
 		writeLock,
 	}).pipe(Effect.tapError(() => closeDatabaseFx));
+	const versions = yield* createSqliteEditorProjectVersionOperationsFx({
+		database,
+		writeLock,
+	}).pipe(Effect.tapError(() => closeDatabaseFx));
 
 	return {
 		awaitIdleFx: writeLock.withPermits(1)(Effect.void),
 		...projects,
 		...commits,
 		...boardScenarios,
+		...versions,
 		closeFx: writeLock.withPermits(1)(closeDatabaseFx),
 	} satisfies SqliteEditorProjectRepository;
 });

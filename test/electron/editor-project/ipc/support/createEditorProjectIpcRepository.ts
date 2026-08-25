@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { vi } from "vitest";
 
+import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
 import type { SqliteEditorProjectRepository } from "../../../../../electron/main/editor-project/sqlite/fx/createSqliteEditorProjectRepositoryFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
@@ -23,21 +24,50 @@ export const editorProjectIpcProject = {
 	resources: editorTestPayload.resources,
 };
 
+const editorProjectVersion = {
+	applicability: { type: "applicable" as const },
+	arkini: ArkiniAppVersion,
+	arkpackVersion: editorProjectIpcProject.version,
+	createdAtMs: 3,
+	projectId: editorProjectIpcProject.projectId,
+	snapshotFormatVersion: 1,
+	sourceRevision: editorProjectIpcProject.revision,
+	subject: "Initial version",
+	versionId: "version-one",
+};
+
 /** Creates one explicit repository spy for the editor-project IPC boundary. */
 export const createEditorProjectIpcRepository = (): SqliteEditorProjectRepository => ({
 	awaitIdleFx: Effect.void,
 	createProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
+	createVersionFx: vi.fn(() => Effect.succeed(editorProjectVersion)),
+	checkoutVersionFx: vi.fn(() =>
+		Effect.succeed({
+			project: editorProjectIpcProject,
+			version: editorProjectVersion,
+		}),
+	),
 	deleteProjectFx: vi.fn(() => Effect.void),
 	deleteItemFx: vi.fn(() => Effect.succeed(editorProjectIpcCommit)),
 	listProjectsFx: Effect.succeed([
 		editorProjectIpcDescriptor,
 	]),
+	listVersionsFx: vi.fn(() => Effect.succeed([editorProjectVersion])),
 	readProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
+	readVersionStatusFx: vi.fn(() =>
+		Effect.succeed({
+			canCommit: true,
+			currentFingerprint: "fingerprint",
+			dirty: true,
+			versionCount: 0,
+		}),
+	),
 	replaceConfigFx: vi.fn(() => Effect.succeed(editorProjectIpcCommit)),
 	replaceResourceFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	saveResourceFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	upsertItemFx: vi.fn(() => Effect.succeed(editorProjectIpcCommit)),
 	upsertResourcesFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
+	updateVersionTagFx: vi.fn(() => Effect.succeed(editorProjectVersion)),
 	listBoardScenariosFx: vi.fn(() => Effect.succeed([])),
 	readBoardScenarioFx: vi.fn(() => Effect.succeed(null)),
 	writeBoardScenarioFx: vi.fn(({ projectId, name, bytes }) =>

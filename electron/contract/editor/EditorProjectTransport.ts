@@ -2,7 +2,9 @@
 export namespace EditorProjectTransport {
 	export type Operation =
 		| "await-idle"
+		| "checkout-version"
 		| "create-project"
+		| "create-version"
 		| "delete-project"
 		| "delete-item"
 		| "delete-board-scenario"
@@ -10,14 +12,17 @@ export namespace EditorProjectTransport {
 		| "import-json-directory"
 		| "list-board-scenarios"
 		| "list-projects"
+		| "list-versions"
 		| "open-export-directory"
 		| "read-project"
+		| "read-version-status"
 		| "read-board-scenario"
 		| "replace-config"
 		| "replace-resource"
 		| "save-resource"
 		| "upsert-item"
 		| "upsert-resource"
+		| "update-version-tag"
 		| "write-board-scenario";
 
 	export type ServiceStatus =

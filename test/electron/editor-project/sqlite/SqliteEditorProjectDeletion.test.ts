@@ -13,7 +13,7 @@ beforeEach(async () => (harness = await createSqliteEditorProjectTestHarness("ar
 afterEach(async () => harness.close());
 
 describe("SQLite editor project deletion", () => {
-	it("atomically deletes the project, resources, and Board scenarios", async () => {
+	it("atomically deletes the project, resources, Board scenarios, and version history", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository);
 		await Effect.runPromise(
@@ -22,6 +22,12 @@ describe("SQLite editor project deletion", () => {
 				expectedRevision: project.revision,
 				name: "Opening",
 				bytes: Uint8Array.of(1),
+			}),
+		);
+		await Effect.runPromise(
+			repository.createVersionFx({
+				projectId: project.projectId,
+				subject: "Before deletion",
 			}),
 		);
 
@@ -41,6 +47,12 @@ describe("SQLite editor project deletion", () => {
 			count: 0,
 		});
 		expect(database.prepare("SELECT count(*) AS count FROM board_scenarios").get()).toEqual({
+			count: 0,
+		});
+		expect(database.prepare("SELECT count(*) AS count FROM project_versions").get()).toEqual({
+			count: 0,
+		});
+		expect(database.prepare("SELECT count(*) AS count FROM project_version_blobs").get()).toEqual({
 			count: 0,
 		});
 		database.close();

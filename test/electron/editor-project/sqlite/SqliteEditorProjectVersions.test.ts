@@ -92,8 +92,13 @@ describe("SQLite editor project versions", () => {
 		const workingDiff = await Effect.runPromise(
 			repository.diffVersionsFx({
 				projectId: project.projectId,
-				from: { type: "version", versionId: root.versionId },
-				to: { type: "current" },
+				from: {
+					type: "version",
+					versionId: root.versionId,
+				},
+				to: {
+					type: "current",
+				},
 			}),
 		);
 		expect(workingDiff).toMatchObject({
@@ -111,7 +116,12 @@ describe("SQLite editor project versions", () => {
 				},
 			],
 			items: [],
-			resources: [{ change: "changed", id: "hero" }],
+			resources: [
+				{
+					change: "changed",
+					id: "hero",
+				},
+			],
 			scenarios: [],
 		});
 		const experiment = await Effect.runPromise(
@@ -146,14 +156,14 @@ describe("SQLite editor project versions", () => {
 			...scenario,
 			projectRevision: restored.project.revision,
 		});
-		expect(await Effect.runPromise(repository.readVersionStatusFx(project.projectId))).toMatchObject(
-			{
-				canCommit: false,
-				currentBaseVersionId: root.versionId,
-				dirty: false,
-				versionCount: 2,
-			},
-		);
+		expect(
+			await Effect.runPromise(repository.readVersionStatusFx(project.projectId)),
+		).toMatchObject({
+			canCommit: false,
+			currentBaseVersionId: root.versionId,
+			dirty: false,
+			versionCount: 2,
+		});
 
 		const branchProject = await Effect.runPromise(
 			repository.replaceConfigFx({
@@ -180,7 +190,11 @@ describe("SQLite editor project versions", () => {
 			(await Effect.runPromise(repository.listVersionsFx(project.projectId))).map(
 				({ versionId }) => versionId,
 			),
-		).toEqual([branch.versionId, experiment.versionId, root.versionId]);
+		).toEqual([
+			branch.versionId,
+			experiment.versionId,
+			root.versionId,
+		]);
 
 		const tagged = await Effect.runPromise(
 			repository.updateVersionTagFx({
@@ -210,7 +224,10 @@ describe("SQLite editor project versions", () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository);
 		const root = await Effect.runPromise(
-			repository.createVersionFx({ projectId: project.projectId, subject: "Root" }),
+			repository.createVersionFx({
+				projectId: project.projectId,
+				subject: "Root",
+			}),
 		);
 		const changed = await Effect.runPromise(
 			repository.upsertResourcesFx({
@@ -243,15 +260,22 @@ describe("SQLite editor project versions", () => {
 				}),
 			),
 		).rejects.toThrow("could not be checked out");
-		expect(await Effect.runPromise(repository.readProjectFx(project.projectId))).toEqual(changed);
-		expect(await Effect.runPromise(repository.readVersionStatusFx(project.projectId))).toEqual(before);
+		expect(await Effect.runPromise(repository.readProjectFx(project.projectId))).toEqual(
+			changed,
+		);
+		expect(await Effect.runPromise(repository.readVersionStatusFx(project.projectId))).toEqual(
+			before,
+		);
 	});
 
 	it("keeps incompatible history visible but blocks mutation and checkout", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository);
 		const version = await Effect.runPromise(
-			repository.createVersionFx({ projectId: project.projectId, subject: "Old app" }),
+			repository.createVersionFx({
+				projectId: project.projectId,
+				subject: "Old app",
+			}),
 		);
 		const database = new DatabaseSync(harness.databasePath);
 		database
@@ -288,8 +312,13 @@ describe("SQLite editor project versions", () => {
 			Effect.runPromise(
 				repository.diffVersionsFx({
 					projectId: project.projectId,
-					from: { type: "version", versionId: version.versionId },
-					to: { type: "current" },
+					from: {
+						type: "version",
+						versionId: version.versionId,
+					},
+					to: {
+						type: "current",
+					},
 				}),
 			),
 		).rejects.toThrow("no compatible snapshot migrator");

@@ -26,8 +26,13 @@ describe("createEditorProjectVersionDiff", () => {
 				},
 			},
 		});
-		const from = { type: "version" as const, versionId: "before" };
-		const to = { type: "current" as const };
+		const from = {
+			type: "version" as const,
+			versionId: "before",
+		};
+		const to = {
+			type: "current" as const,
+		};
 		const diff = createEditorProjectVersionDiff(
 			from,
 			to,
@@ -35,21 +40,44 @@ describe("createEditorProjectVersionDiff", () => {
 				arkpackVersion: "1.0",
 				config: editorTestPayload.config,
 				resources: new Map([
-					["deleted", "deleted-hash"],
-					["hero", "old-hero-hash"],
+					[
+						"deleted",
+						"deleted-hash",
+					],
+					[
+						"hero",
+						"old-hero-hash",
+					],
 				]),
-				scenarios: new Map([["Opening", "same-save-hash"]]),
+				scenarios: new Map([
+					[
+						"Opening",
+						"same-save-hash",
+					],
+				]),
 			},
 			{
 				arkpackVersion: "1.1",
 				config: afterConfig,
 				resources: new Map([
-					["added", "added-hash"],
-					["hero", "new-hero-hash"],
+					[
+						"added",
+						"added-hash",
+					],
+					[
+						"hero",
+						"new-hero-hash",
+					],
 				]),
 				scenarios: new Map([
-					["Opening", "same-save-hash"],
-					["Variant", "new-save-hash"],
+					[
+						"Opening",
+						"same-save-hash",
+					],
+					[
+						"Variant",
+						"new-save-hash",
+					],
 				]),
 			},
 		);
@@ -58,7 +86,11 @@ describe("createEditorProjectVersionDiff", () => {
 		expect(diff.to).toEqual(to);
 		expect(diff.hasChanges).toBe(true);
 		expect(diff.project).toEqual([
-			{ path: "arkpackVersion", before: "1.0", after: "1.1" },
+			{
+				path: "arkpackVersion",
+				before: "1.0",
+				after: "1.1",
+			},
 			{
 				path: "config.meta.title",
 				before: editorTestPayload.config.meta.title,
@@ -69,7 +101,12 @@ describe("createEditorProjectVersionDiff", () => {
 			{
 				change: "added",
 				uid: "oil",
-				values: [{ path: "", after: oil }],
+				values: [
+					{
+						path: "",
+						after: oil,
+					},
+				],
 			},
 			{
 				change: "changed",
@@ -84,10 +121,24 @@ describe("createEditorProjectVersionDiff", () => {
 			},
 		]);
 		expect(diff.resources).toEqual([
-			{ change: "added", id: "added" },
-			{ change: "deleted", id: "deleted" },
-			{ change: "changed", id: "hero" },
+			{
+				change: "added",
+				id: "added",
+			},
+			{
+				change: "deleted",
+				id: "deleted",
+			},
+			{
+				change: "changed",
+				id: "hero",
+			},
 		]);
-		expect(diff.scenarios).toEqual([{ change: "added", id: "Variant" }]);
+		expect(diff.scenarios).toEqual([
+			{
+				change: "added",
+				id: "Variant",
+			},
+		]);
 	});
 });

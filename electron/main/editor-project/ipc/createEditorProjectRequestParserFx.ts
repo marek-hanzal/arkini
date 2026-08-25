@@ -77,8 +77,17 @@ const upsertResourcesSchema = z
 	.strict();
 const fingerprintSchema = z.string().regex(/^[a-f0-9]{64}$/);
 const versionReferenceSchema = z.discriminatedUnion("type", [
-	z.object({ type: z.literal("current") }).strict(),
-	z.object({ type: z.literal("version"), versionId: IdSchema }).strict(),
+	z
+		.object({
+			type: z.literal("current"),
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("version"),
+			versionId: IdSchema,
+		})
+		.strict(),
 ]);
 const versionCommitSchema = z
 	.object({
@@ -178,7 +187,11 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 			parseVersionCheckoutFx: (
 				candidate: unknown,
 			): Effect.Effect<EditorProjectVersionCheckoutInput, EditorProjectRepositoryError> =>
-				parseEditorProjectIpcRequestFx("checkout-version", versionCheckoutSchema, candidate),
+				parseEditorProjectIpcRequestFx(
+					"checkout-version",
+					versionCheckoutSchema,
+					candidate,
+				),
 			parseVersionTagFx: (
 				candidate: unknown,
 			): Effect.Effect<EditorProjectVersionTagInput, EditorProjectRepositoryError> =>

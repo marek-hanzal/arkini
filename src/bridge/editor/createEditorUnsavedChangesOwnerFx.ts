@@ -97,6 +97,11 @@ export const createEditorUnsavedChangesOwnerFx = Effect.fn("createEditorUnsavedC
 						});
 					}
 				},
+				discardAll: () => {
+					for (const session of dirtySessions()) session.discard();
+					if (prompt === undefined) publishIdle();
+					else settle(true);
+				},
 				getSnapshot: () => snapshot,
 				refresh,
 				register: (id, session) => {

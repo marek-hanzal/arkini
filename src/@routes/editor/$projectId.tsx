@@ -16,7 +16,10 @@ const syncRoutedEditorBoardGameFx = Effect.fn("syncRoutedEditorBoardGameFx")(
 const EditorProjectRoute = () => {
 	const project = Route.useLoaderData();
 	return (
-		<EditorProjectShellPage project={project}>
+		<EditorProjectShellPage
+			key={`${project.projectId}:${project.revision}`}
+			project={project}
+		>
 			<Outlet />
 		</EditorProjectShellPage>
 	);

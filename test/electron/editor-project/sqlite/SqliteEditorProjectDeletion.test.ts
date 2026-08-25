@@ -52,7 +52,9 @@ describe("SQLite editor project deletion", () => {
 		expect(database.prepare("SELECT count(*) AS count FROM project_versions").get()).toEqual({
 			count: 0,
 		});
-		expect(database.prepare("SELECT count(*) AS count FROM project_version_blobs").get()).toEqual({
+		expect(
+			database.prepare("SELECT count(*) AS count FROM project_version_blobs").get(),
+		).toEqual({
 			count: 0,
 		});
 		database.close();

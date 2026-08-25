@@ -7,13 +7,13 @@ export const readEditorProjectVersionApplicability = (
 	arkini: string,
 ): EditorProjectVersionApplicability =>
 	arkini === ArkiniAppVersion
-			? ({
-					type: "applicable",
-				})
-			: ({
-					type: "incompatible",
-					reason: `Version was created by Arkini ${arkini}; Arkini ${ArkiniAppVersion} has no compatible snapshot migrator.`,
-				});
+		? {
+				type: "applicable",
+			}
+		: {
+				type: "incompatible",
+				reason: `Version was created by Arkini ${arkini}; Arkini ${ArkiniAppVersion} has no compatible snapshot migrator.`,
+			};
 
 /** Conservatively gates checkout until a future explicit cross-version migrator exists. */
 export const readEditorProjectVersionApplicabilityFx = Effect.fn(

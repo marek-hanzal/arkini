@@ -146,6 +146,7 @@ export const createEditorProjectRouteHarness = async () => {
 		events,
 		owner: trackedOwner,
 		projectA,
+		setProject: (project: EditorProject) => projects.set(project.projectId, project),
 		releaseProjectA,
 		rendererRuntime,
 		router,

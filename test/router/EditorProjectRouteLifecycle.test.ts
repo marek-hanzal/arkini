@@ -165,4 +165,35 @@ describe("editor project route lifecycle", () => {
 				type: "idle",
 			});
 	});
+
+	it("reloads the project route after a terminal repository replacement", async () => {
+		const harness = await createEditorProjectRouteHarness();
+		Effect.runSync(Deferred.succeed(harness.releaseProjectA, undefined));
+		await harness.router.load();
+		await expect
+			.poll(() => harness.syncRequests)
+			.toEqual([
+				"project-a-r1",
+			]);
+		harness.setProject({
+			...harness.projectA,
+			revision: 2,
+			updatedAtMs: 2,
+		});
+
+		await harness.router.invalidate();
+
+		await expect
+			.poll(() => harness.syncRequests)
+			.toEqual([
+				"project-a-r1",
+				"project-a-r2",
+			]);
+		expect(harness.events).toEqual([
+			"create-project-a-r1",
+			"release-start-project-a-r1",
+			"release-end-project-a-r1",
+			"create-project-a-r2",
+		]);
+	});
 });

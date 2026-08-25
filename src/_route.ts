@@ -30,6 +30,7 @@ import { Route as EditorProjectIdEditorRouteImport } from "./@routes/editor/$pro
 import { Route as EditorProjectIdEstimateRouteImport } from "./@routes/editor/$projectId/estimate"
 import { Route as EditorProjectIdFlowRouteImport } from "./@routes/editor/$projectId/flow"
 import { Route as EditorProjectIdProjectRouteImport } from "./@routes/editor/$projectId/project"
+import { Route as EditorProjectIdVersionsRouteImport } from "./@routes/editor/$projectId/versions"
 import { Route as GamePackageIdSceneRouteImport } from "./@routes/game/$packageId/_scene"
 import { Route as GamePackageIdCheatsRouteImport } from "./@routes/game/$packageId/cheats"
 import { Route as EditorProjectIdAssetsIndexRouteImport } from "./@routes/editor/$projectId/assets/index"
@@ -40,6 +41,9 @@ import { Route as EditorProjectIdEditorIndexRouteImport } from "./@routes/editor
 import { Route as EditorProjectIdEditorItemsRouteImport } from "./@routes/editor/$projectId/editor/items"
 import { Route as EditorProjectIdProjectIndexRouteImport } from "./@routes/editor/$projectId/project/index"
 import { Route as EditorProjectIdProjectSectionIdRouteImport } from "./@routes/editor/$projectId/project/$sectionId"
+import { Route as EditorProjectIdVersionsIndexRouteImport } from "./@routes/editor/$projectId/versions/index"
+import { Route as EditorProjectIdVersionsCommitRouteImport } from "./@routes/editor/$projectId/versions/commit"
+import { Route as EditorProjectIdVersionsHistoryRouteImport } from "./@routes/editor/$projectId/versions/history"
 import { Route as GamePackageIdSceneBoardRouteImport } from "./@routes/game/$packageId/_scene/board"
 import { Route as GamePackageIdSceneInventoryRouteImport } from "./@routes/game/$packageId/_scene/inventory"
 import { Route as GamePackageIdActionExitRouteImport } from "./@routes/game/$packageId/action/exit"
@@ -166,6 +170,11 @@ const EditorProjectIdProjectRoute = EditorProjectIdProjectRouteImport.update({
   path: "/project",
   getParentRoute: () => EditorProjectIdRoute,
 } as any)
+const EditorProjectIdVersionsRoute = EditorProjectIdVersionsRouteImport.update({
+  id: "/versions",
+  path: "/versions",
+  getParentRoute: () => EditorProjectIdRoute,
+} as any)
 const GamePackageIdSceneRoute = GamePackageIdSceneRouteImport.update({
   id: "/_scene",
   getParentRoute: () => GamePackageIdRoute,
@@ -222,6 +231,24 @@ const EditorProjectIdProjectSectionIdRoute =
     id: "/$sectionId",
     path: "/$sectionId",
     getParentRoute: () => EditorProjectIdProjectRoute,
+  } as any)
+const EditorProjectIdVersionsIndexRoute =
+  EditorProjectIdVersionsIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => EditorProjectIdVersionsRoute,
+  } as any)
+const EditorProjectIdVersionsCommitRoute =
+  EditorProjectIdVersionsCommitRouteImport.update({
+    id: "/commit",
+    path: "/commit",
+    getParentRoute: () => EditorProjectIdVersionsRoute,
+  } as any)
+const EditorProjectIdVersionsHistoryRoute =
+  EditorProjectIdVersionsHistoryRouteImport.update({
+    id: "/history",
+    path: "/history",
+    getParentRoute: () => EditorProjectIdVersionsRoute,
   } as any)
 const GamePackageIdSceneBoardRoute = GamePackageIdSceneBoardRouteImport.update({
   id: "/board",
@@ -369,11 +396,14 @@ export interface FileRoutesByFullPath {
   "/editor/$projectId/estimate": typeof EditorProjectIdEstimateRoute
   "/editor/$projectId/flow": typeof EditorProjectIdFlowRoute
   "/editor/$projectId/project": typeof EditorProjectIdProjectRouteWithChildren
+  "/editor/$projectId/versions": typeof EditorProjectIdVersionsRouteWithChildren
   "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
   "/editor/$projectId/assets/$resourceId": typeof EditorProjectIdAssetsResourceIdRouteWithChildren
   "/editor/$projectId/board/inventory": typeof EditorProjectIdBoardInventoryRoute
   "/editor/$projectId/editor/items": typeof EditorProjectIdEditorItemsRouteWithChildren
   "/editor/$projectId/project/$sectionId": typeof EditorProjectIdProjectSectionIdRoute
+  "/editor/$projectId/versions/commit": typeof EditorProjectIdVersionsCommitRoute
+  "/editor/$projectId/versions/history": typeof EditorProjectIdVersionsHistoryRoute
   "/game/$packageId/board": typeof GamePackageIdSceneBoardRoute
   "/game/$packageId/inventory": typeof GamePackageIdSceneInventoryRoute
   "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
@@ -383,6 +413,7 @@ export interface FileRoutesByFullPath {
   "/editor/$projectId/board/": typeof EditorProjectIdBoardIndexRoute
   "/editor/$projectId/editor/": typeof EditorProjectIdEditorIndexRoute
   "/editor/$projectId/project/": typeof EditorProjectIdProjectIndexRoute
+  "/editor/$projectId/versions/": typeof EditorProjectIdVersionsIndexRoute
   "/editor/$projectId/assets/$resourceId/detail": typeof EditorProjectIdAssetsResourceIdDetailRouteWithChildren
   "/editor/$projectId/assets/$resourceId/edit": typeof EditorProjectIdAssetsResourceIdEditRoute
   "/editor/$projectId/editor/items/$itemUid": typeof EditorProjectIdEditorItemsItemUidRouteWithChildren
@@ -422,6 +453,8 @@ export interface FileRoutesByTo {
   "/editor/$projectId/board/inventory": typeof EditorProjectIdBoardInventoryRoute
   "/editor/$projectId/editor/items": typeof EditorProjectIdEditorItemsRouteWithChildren
   "/editor/$projectId/project/$sectionId": typeof EditorProjectIdProjectSectionIdRoute
+  "/editor/$projectId/versions/commit": typeof EditorProjectIdVersionsCommitRoute
+  "/editor/$projectId/versions/history": typeof EditorProjectIdVersionsHistoryRoute
   "/game/$packageId/board": typeof GamePackageIdSceneBoardRoute
   "/game/$packageId/inventory": typeof GamePackageIdSceneInventoryRoute
   "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
@@ -431,6 +464,7 @@ export interface FileRoutesByTo {
   "/editor/$projectId/board": typeof EditorProjectIdBoardIndexRoute
   "/editor/$projectId/editor": typeof EditorProjectIdEditorIndexRoute
   "/editor/$projectId/project": typeof EditorProjectIdProjectIndexRoute
+  "/editor/$projectId/versions": typeof EditorProjectIdVersionsIndexRoute
   "/editor/$projectId/assets/$resourceId/edit": typeof EditorProjectIdAssetsResourceIdEditRoute
   "/editor/$projectId/editor/items/$itemUid": typeof EditorProjectIdEditorItemsItemUidRouteWithChildren
   "/editor/$projectId/editor/items/list": typeof EditorProjectIdEditorItemsListRoute
@@ -469,12 +503,15 @@ export interface FileRoutesById {
   "/editor/$projectId/estimate": typeof EditorProjectIdEstimateRoute
   "/editor/$projectId/flow": typeof EditorProjectIdFlowRoute
   "/editor/$projectId/project": typeof EditorProjectIdProjectRouteWithChildren
+  "/editor/$projectId/versions": typeof EditorProjectIdVersionsRouteWithChildren
   "/game/$packageId/_scene": typeof GamePackageIdSceneRouteWithChildren
   "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
   "/editor/$projectId/assets/$resourceId": typeof EditorProjectIdAssetsResourceIdRouteWithChildren
   "/editor/$projectId/board/inventory": typeof EditorProjectIdBoardInventoryRoute
   "/editor/$projectId/editor/items": typeof EditorProjectIdEditorItemsRouteWithChildren
   "/editor/$projectId/project/$sectionId": typeof EditorProjectIdProjectSectionIdRoute
+  "/editor/$projectId/versions/commit": typeof EditorProjectIdVersionsCommitRoute
+  "/editor/$projectId/versions/history": typeof EditorProjectIdVersionsHistoryRoute
   "/game/$packageId/_scene/board": typeof GamePackageIdSceneBoardRoute
   "/game/$packageId/_scene/inventory": typeof GamePackageIdSceneInventoryRoute
   "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
@@ -484,6 +521,7 @@ export interface FileRoutesById {
   "/editor/$projectId/board/": typeof EditorProjectIdBoardIndexRoute
   "/editor/$projectId/editor/": typeof EditorProjectIdEditorIndexRoute
   "/editor/$projectId/project/": typeof EditorProjectIdProjectIndexRoute
+  "/editor/$projectId/versions/": typeof EditorProjectIdVersionsIndexRoute
   "/editor/$projectId/assets/$resourceId/detail": typeof EditorProjectIdAssetsResourceIdDetailRouteWithChildren
   "/editor/$projectId/assets/$resourceId/edit": typeof EditorProjectIdAssetsResourceIdEditRoute
   "/editor/$projectId/editor/items/$itemUid": typeof EditorProjectIdEditorItemsItemUidRouteWithChildren
@@ -524,11 +562,14 @@ export interface FileRouteTypes {
     | "/editor/$projectId/estimate"
     | "/editor/$projectId/flow"
     | "/editor/$projectId/project"
+    | "/editor/$projectId/versions"
     | "/game/$packageId/cheats"
     | "/editor/$projectId/assets/$resourceId"
     | "/editor/$projectId/board/inventory"
     | "/editor/$projectId/editor/items"
     | "/editor/$projectId/project/$sectionId"
+    | "/editor/$projectId/versions/commit"
+    | "/editor/$projectId/versions/history"
     | "/game/$packageId/board"
     | "/game/$packageId/inventory"
     | "/game/$packageId/action/exit"
@@ -538,6 +579,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/board/"
     | "/editor/$projectId/editor/"
     | "/editor/$projectId/project/"
+    | "/editor/$projectId/versions/"
     | "/editor/$projectId/assets/$resourceId/detail"
     | "/editor/$projectId/assets/$resourceId/edit"
     | "/editor/$projectId/editor/items/$itemUid"
@@ -577,6 +619,8 @@ export interface FileRouteTypes {
     | "/editor/$projectId/board/inventory"
     | "/editor/$projectId/editor/items"
     | "/editor/$projectId/project/$sectionId"
+    | "/editor/$projectId/versions/commit"
+    | "/editor/$projectId/versions/history"
     | "/game/$packageId/board"
     | "/game/$packageId/inventory"
     | "/game/$packageId/action/exit"
@@ -586,6 +630,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/board"
     | "/editor/$projectId/editor"
     | "/editor/$projectId/project"
+    | "/editor/$projectId/versions"
     | "/editor/$projectId/assets/$resourceId/edit"
     | "/editor/$projectId/editor/items/$itemUid"
     | "/editor/$projectId/editor/items/list"
@@ -623,12 +668,15 @@ export interface FileRouteTypes {
     | "/editor/$projectId/estimate"
     | "/editor/$projectId/flow"
     | "/editor/$projectId/project"
+    | "/editor/$projectId/versions"
     | "/game/$packageId/_scene"
     | "/game/$packageId/cheats"
     | "/editor/$projectId/assets/$resourceId"
     | "/editor/$projectId/board/inventory"
     | "/editor/$projectId/editor/items"
     | "/editor/$projectId/project/$sectionId"
+    | "/editor/$projectId/versions/commit"
+    | "/editor/$projectId/versions/history"
     | "/game/$packageId/_scene/board"
     | "/game/$packageId/_scene/inventory"
     | "/game/$packageId/action/exit"
@@ -638,6 +686,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/board/"
     | "/editor/$projectId/editor/"
     | "/editor/$projectId/project/"
+    | "/editor/$projectId/versions/"
     | "/editor/$projectId/assets/$resourceId/detail"
     | "/editor/$projectId/assets/$resourceId/edit"
     | "/editor/$projectId/editor/items/$itemUid"
@@ -815,6 +864,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof EditorProjectIdProjectRouteImport
       parentRoute: typeof EditorProjectIdRoute
     }
+    "/editor/$projectId/versions": {
+      id: "/editor/$projectId/versions"
+      path: "/versions"
+      fullPath: "/editor/$projectId/versions"
+      preLoaderRoute: typeof EditorProjectIdVersionsRouteImport
+      parentRoute: typeof EditorProjectIdRoute
+    }
     "/game/$packageId/_scene": {
       id: "/game/$packageId/_scene"
       path: ""
@@ -884,6 +940,27 @@ declare module "@tanstack/react-router" {
       fullPath: "/editor/$projectId/project/$sectionId"
       preLoaderRoute: typeof EditorProjectIdProjectSectionIdRouteImport
       parentRoute: typeof EditorProjectIdProjectRoute
+    }
+    "/editor/$projectId/versions/": {
+      id: "/editor/$projectId/versions/"
+      path: "/"
+      fullPath: "/editor/$projectId/versions/"
+      preLoaderRoute: typeof EditorProjectIdVersionsIndexRouteImport
+      parentRoute: typeof EditorProjectIdVersionsRoute
+    }
+    "/editor/$projectId/versions/commit": {
+      id: "/editor/$projectId/versions/commit"
+      path: "/commit"
+      fullPath: "/editor/$projectId/versions/commit"
+      preLoaderRoute: typeof EditorProjectIdVersionsCommitRouteImport
+      parentRoute: typeof EditorProjectIdVersionsRoute
+    }
+    "/editor/$projectId/versions/history": {
+      id: "/editor/$projectId/versions/history"
+      path: "/history"
+      fullPath: "/editor/$projectId/versions/history"
+      preLoaderRoute: typeof EditorProjectIdVersionsHistoryRouteImport
+      parentRoute: typeof EditorProjectIdVersionsRoute
     }
     "/game/$packageId/_scene/board": {
       id: "/game/$packageId/_scene/board"
@@ -1244,6 +1321,24 @@ const EditorProjectIdProjectRouteWithChildren =
     EditorProjectIdProjectRouteChildren,
   )
 
+interface EditorProjectIdVersionsRouteChildren {
+  EditorProjectIdVersionsCommitRoute: typeof EditorProjectIdVersionsCommitRoute
+  EditorProjectIdVersionsHistoryRoute: typeof EditorProjectIdVersionsHistoryRoute
+  EditorProjectIdVersionsIndexRoute: typeof EditorProjectIdVersionsIndexRoute
+}
+
+const EditorProjectIdVersionsRouteChildren: EditorProjectIdVersionsRouteChildren =
+  {
+    EditorProjectIdVersionsCommitRoute: EditorProjectIdVersionsCommitRoute,
+    EditorProjectIdVersionsHistoryRoute: EditorProjectIdVersionsHistoryRoute,
+    EditorProjectIdVersionsIndexRoute: EditorProjectIdVersionsIndexRoute,
+  }
+
+const EditorProjectIdVersionsRouteWithChildren =
+  EditorProjectIdVersionsRoute._addFileChildren(
+    EditorProjectIdVersionsRouteChildren,
+  )
+
 interface EditorProjectIdRouteChildren {
   EditorProjectIdAssetsRoute: typeof EditorProjectIdAssetsRouteWithChildren
   EditorProjectIdBoardRoute: typeof EditorProjectIdBoardRouteWithChildren
@@ -1253,6 +1348,7 @@ interface EditorProjectIdRouteChildren {
   EditorProjectIdEstimateRoute: typeof EditorProjectIdEstimateRoute
   EditorProjectIdFlowRoute: typeof EditorProjectIdFlowRoute
   EditorProjectIdProjectRoute: typeof EditorProjectIdProjectRouteWithChildren
+  EditorProjectIdVersionsRoute: typeof EditorProjectIdVersionsRouteWithChildren
 }
 
 const EditorProjectIdRouteChildren: EditorProjectIdRouteChildren = {
@@ -1264,6 +1360,7 @@ const EditorProjectIdRouteChildren: EditorProjectIdRouteChildren = {
   EditorProjectIdEstimateRoute: EditorProjectIdEstimateRoute,
   EditorProjectIdFlowRoute: EditorProjectIdFlowRoute,
   EditorProjectIdProjectRoute: EditorProjectIdProjectRouteWithChildren,
+  EditorProjectIdVersionsRoute: EditorProjectIdVersionsRouteWithChildren,
 }
 
 const EditorProjectIdRouteWithChildren = EditorProjectIdRoute._addFileChildren(

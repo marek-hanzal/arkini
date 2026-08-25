@@ -21,6 +21,7 @@ export interface EditorUnsavedChangesSnapshot {
 
 export interface EditorUnsavedChangesService {
 	readonly decide: (decision: EditorUnsavedChangesDecision) => Promise<void>;
+	readonly discardAll: () => void;
 	readonly getSnapshot: () => EditorUnsavedChangesSnapshot;
 	readonly refresh: () => void;
 	readonly register: (id: string, session: EditorUnsavedChangesSession) => () => void;

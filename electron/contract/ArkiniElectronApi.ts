@@ -207,7 +207,9 @@ export namespace ArkiniElectronApi {
 			readonly listVersions: (
 				projectId: string,
 			) => Promise<
-				EditorProjectTransport.Result<ReadonlyArray<EditorProjectTransport.VersionDescriptor>>
+				EditorProjectTransport.Result<
+					ReadonlyArray<EditorProjectTransport.VersionDescriptor>
+				>
 			>;
 			readonly diffVersions: (
 				request: EditorProjectTransport.VersionDiffRequest,

@@ -129,7 +129,11 @@ const readProjectRow = (
 	if (candidate === undefined) return null;
 	const result = SqliteEditorProjectRowSchema.safeParse(candidate);
 	if (result.success) return result.data;
-	throw createRepositoryError(operation, "SQLite contains an invalid editor project.", result.error);
+	throw createRepositoryError(
+		operation,
+		"SQLite contains an invalid editor project.",
+		result.error,
+	);
 };
 
 const readResourceRows = (
@@ -139,7 +143,11 @@ const readResourceRows = (
 ) => {
 	const result = SqliteEditorProjectResourceRowSchema.array().safeParse(statement.all(projectId));
 	if (result.success) return result.data;
-	throw createRepositoryError(operation, "SQLite contains invalid editor resources.", result.error);
+	throw createRepositoryError(
+		operation,
+		"SQLite contains invalid editor resources.",
+		result.error,
+	);
 };
 
 const readScenarioRows = (
@@ -149,7 +157,11 @@ const readScenarioRows = (
 ) => {
 	const result = SqliteEditorBoardScenarioRowSchema.array().safeParse(statement.all(projectId));
 	if (result.success) return result.data;
-	throw createRepositoryError(operation, "SQLite contains invalid Board scenarios.", result.error);
+	throw createRepositoryError(
+		operation,
+		"SQLite contains invalid Board scenarios.",
+		result.error,
+	);
 };
 
 const readVersionRow = (
@@ -162,21 +174,37 @@ const readVersionRow = (
 	if (candidate === undefined) return null;
 	const result = versionRowSchema.safeParse(candidate);
 	if (result.success) return result.data;
-	throw createRepositoryError(operation, "SQLite contains an invalid editor version.", result.error);
+	throw createRepositoryError(
+		operation,
+		"SQLite contains an invalid editor version.",
+		result.error,
+	);
 };
 
 const materializeDescriptor = (row: VersionRow): EditorProjectVersionDescriptor => ({
 	applicability: readEditorProjectVersionApplicability(row.arkini),
 	arkini: row.arkini,
 	arkpackVersion: row.arkpackVersion,
-	...(row.body === undefined ? {} : { body: row.body }),
+	...(row.body === undefined
+		? {}
+		: {
+				body: row.body,
+			}),
 	createdAtMs: row.createdAtMs,
-	...(row.parentVersionId === undefined ? {} : { parentVersionId: row.parentVersionId }),
+	...(row.parentVersionId === undefined
+		? {}
+		: {
+				parentVersionId: row.parentVersionId,
+			}),
 	projectId: row.projectId,
 	snapshotFormatVersion: row.snapshotFormatVersion,
 	sourceRevision: row.sourceRevision,
 	subject: row.subject,
-	...(row.tag === undefined ? {} : { tag: row.tag }),
+	...(row.tag === undefined
+		? {}
+		: {
+				tag: row.tag,
+			}),
 	versionId: row.versionId,
 });
 
@@ -215,7 +243,11 @@ const materializeProject = (
 	updatedAtMs: project.updatedAtMs,
 	revision: project.revision,
 	config: project.config,
-	resources: resources.map(({ id, mime, bytes }) => ({ id, mime, bytes })),
+	resources: resources.map(({ id, mime, bytes }) => ({
+		id,
+		mime,
+		bytes,
+	})),
 });
 
 export namespace createSqliteEditorProjectVersionOperationsFx {
@@ -315,9 +347,7 @@ export const createSqliteEditorProjectVersionOperationsFx = Effect.fn(
 			insertResource: database.prepare(
 				"INSERT INTO resources(project_id, id, mime, bytes) VALUES (?, ?, ?, ?)",
 			),
-			deleteScenarios: database.prepare(
-				"DELETE FROM board_scenarios WHERE project_id = ?",
-			),
+			deleteScenarios: database.prepare("DELETE FROM board_scenarios WHERE project_id = ?"),
 			insertScenario: database.prepare(`
 				INSERT INTO board_scenarios(
 					project_id, name, project_revision, arkpack_version, save_bytes,
@@ -329,7 +359,11 @@ export const createSqliteEditorProjectVersionOperationsFx = Effect.fn(
 			`),
 		}),
 		catch: (cause) =>
-			createRepositoryError("list-versions", "The editor version schema is incompatible.", cause),
+			createRepositoryError(
+				"list-versions",
+				"The editor version schema is incompatible.",
+				cause,
+			),
 	});
 
 	const readCurrent = (projectId: string, operation: EditorProjectRepositoryOperation) => {
@@ -372,7 +406,11 @@ export const createSqliteEditorProjectVersionOperationsFx = Effect.fn(
 		const count = statements.countVersions.get(projectId)?.count;
 		return {
 			canCommit: dirty,
-			...(currentBaseVersionId === undefined ? {} : { currentBaseVersionId }),
+			...(currentBaseVersionId === undefined
+				? {}
+				: {
+						currentBaseVersionId,
+					}),
 			currentFingerprint: current.fingerprint,
 			dirty,
 			versionCount: typeof count === "number" ? count : 0,
@@ -420,31 +458,49 @@ export const createSqliteEditorProjectVersionOperationsFx = Effect.fn(
 
 	const createVersionFx: VersionOperations["createVersionFx"] = Effect.fn(
 		"SqliteEditorProjectRepository.createVersionFx",
-	)(function* ({ body: bodyCandidate, expectedFingerprint, projectId, subject: subjectCandidate, tag: tagCandidate }) {
+	)(function* ({
+		body: bodyCandidate,
+		expectedFingerprint,
+		projectId,
+		subject: subjectCandidate,
+		tag: tagCandidate,
+	}) {
 		const subject = yield* Effect.try({
 			try: () => EditorProjectVersionSubjectSchema.parse(subjectCandidate),
-			catch: (cause) => createRepositoryError("create-version", "The version subject is invalid.", cause),
+			catch: (cause) =>
+				createRepositoryError("create-version", "The version subject is invalid.", cause),
 		});
 		const body =
 			bodyCandidate === undefined
 				? undefined
 				: yield* Effect.try({
 						try: () => EditorProjectVersionBodySchema.parse(bodyCandidate),
-						catch: (cause) => createRepositoryError("create-version", "The version body is invalid.", cause),
+						catch: (cause) =>
+							createRepositoryError(
+								"create-version",
+								"The version body is invalid.",
+								cause,
+							),
 					});
 		const tag =
 			tagCandidate === undefined
 				? undefined
 				: yield* Effect.try({
 						try: () => EditorProjectVersionTagSchema.parse(tagCandidate),
-						catch: (cause) => createRepositoryError("create-version", "The version tag is invalid.", cause),
+						catch: (cause) =>
+							createRepositoryError(
+								"create-version",
+								"The version tag is invalid.",
+								cause,
+							),
 					});
 		const clockMs = yield* Clock.currentTimeMillis;
 		const versionId = createId();
 		return yield* writeLock.withPermits(1)(
 			runSqliteEditorProjectTransactionFx(database, () => {
 				const current = readCurrent(projectId, "create-version");
-				const latestCreatedAt = statements.selectLatestCreatedAt.get(projectId)?.created_at_ms;
+				const latestCreatedAt =
+					statements.selectLatestCreatedAt.get(projectId)?.created_at_ms;
 				const createdAtMs =
 					typeof latestCreatedAt === "number"
 						? Math.max(clockMs, latestCreatedAt + 1)
@@ -468,7 +524,10 @@ export const createSqliteEditorProjectVersionOperationsFx = Effect.fn(
 								"create-version",
 							);
 				if (parentVersionId !== undefined && parent === null)
-					throw createRepositoryError("create-version", "The current version base is missing.");
+					throw createRepositoryError(
+						"create-version",
+						"The current version base is missing.",
+					);
 				if (parent?.contentFingerprint === current.fingerprint)
 					throw createRepositoryError(
 						"create-version",
@@ -522,7 +581,10 @@ export const createSqliteEditorProjectVersionOperationsFx = Effect.fn(
 					"create-version",
 				);
 				if (created === null)
-					throw createRepositoryError("create-version", "The committed version is missing.");
+					throw createRepositoryError(
+						"create-version",
+						"The committed version is missing.",
+					);
 				return materializeDescriptor(created);
 			}).pipe(
 				Effect.mapError((cause) =>
@@ -607,9 +669,16 @@ export const createSqliteEditorProjectVersionOperationsFx = Effect.fn(
 						scenario.updatedAtMs,
 					);
 				statements.upsertBase.run(projectId, versionId);
-				const restored = readProjectRow(statements.selectProject, projectId, "checkout-version");
+				const restored = readProjectRow(
+					statements.selectProject,
+					projectId,
+					"checkout-version",
+				);
 				if (restored === null)
-					throw createRepositoryError("checkout-version", "The restored project is missing.");
+					throw createRepositoryError(
+						"checkout-version",
+						"The restored project is missing.",
+					);
 				return {
 					project: materializeProject(
 						restored,
@@ -638,7 +707,12 @@ export const createSqliteEditorProjectVersionOperationsFx = Effect.fn(
 				? undefined
 				: yield* Effect.try({
 						try: () => EditorProjectVersionTagSchema.parse(tagCandidate),
-						catch: (cause) => createRepositoryError("update-version-tag", "The version tag is invalid.", cause),
+						catch: (cause) =>
+							createRepositoryError(
+								"update-version-tag",
+								"The version tag is invalid.",
+								cause,
+							),
 					});
 		return yield* writeLock.withPermits(1)(
 			runSqliteEditorProjectTransactionFx(database, () => {
@@ -649,7 +723,10 @@ export const createSqliteEditorProjectVersionOperationsFx = Effect.fn(
 					"update-version-tag",
 				);
 				if (version === null)
-					throw createRepositoryError("update-version-tag", `Version ${versionId} does not exist.`);
+					throw createRepositoryError(
+						"update-version-tag",
+						`Version ${versionId} does not exist.`,
+					);
 				const applicability = readEditorProjectVersionApplicability(version.arkini);
 				if (applicability.type === "incompatible")
 					throw createRepositoryError("update-version-tag", applicability.reason);
@@ -661,7 +738,10 @@ export const createSqliteEditorProjectVersionOperationsFx = Effect.fn(
 					"update-version-tag",
 				);
 				if (updated === null)
-					throw createRepositoryError("update-version-tag", "The updated version is missing.");
+					throw createRepositoryError(
+						"update-version-tag",
+						"The updated version is missing.",
+					);
 				return materializeDescriptor(updated);
 			}).pipe(
 				Effect.mapError((cause) =>

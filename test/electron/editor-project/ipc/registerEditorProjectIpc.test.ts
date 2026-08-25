@@ -281,7 +281,9 @@ describe("registerEditorProjectIpcFx", () => {
 		const versionDiffRequest = {
 			projectId: "project-one",
 			from: versionReference,
-			to: { type: "current" as const },
+			to: {
+				type: "current" as const,
+			},
 		};
 		const versionCommitRequest = {
 			projectId: "project-one",
@@ -297,25 +299,48 @@ describe("registerEditorProjectIpcFx", () => {
 		};
 		await expect(
 			invoke(ArkiniElectronApi.channels.editorVersionStatus, "project-one"),
-		).resolves.toMatchObject({ type: "success", value: { dirty: true } });
+		).resolves.toMatchObject({
+			type: "success",
+			value: {
+				dirty: true,
+			},
+		});
 		await expect(
 			invoke(ArkiniElectronApi.channels.editorVersionList, "project-one"),
-		).resolves.toEqual({ type: "success", value: [editorProjectIpcVersion] });
+		).resolves.toEqual({
+			type: "success",
+			value: [
+				editorProjectIpcVersion,
+			],
+		});
 		await expect(
 			invoke(ArkiniElectronApi.channels.editorVersionDiff, versionDiffRequest),
-		).resolves.toMatchObject({ type: "success", value: { hasChanges: false } });
+		).resolves.toMatchObject({
+			type: "success",
+			value: {
+				hasChanges: false,
+			},
+		});
 		await expect(
 			invoke(ArkiniElectronApi.channels.editorVersionCommit, versionCommitRequest),
-		).resolves.toEqual({ type: "success", value: editorProjectIpcVersion });
+		).resolves.toEqual({
+			type: "success",
+			value: editorProjectIpcVersion,
+		});
 		await expect(
 			invoke(ArkiniElectronApi.channels.editorVersionCheckout, versionCheckoutRequest),
 		).resolves.toMatchObject({
 			type: "success",
-			value: { version: editorProjectIpcVersion },
+			value: {
+				version: editorProjectIpcVersion,
+			},
 		});
 		await expect(
 			invoke(ArkiniElectronApi.channels.editorVersionTag, versionTagRequest),
-		).resolves.toEqual({ type: "success", value: editorProjectIpcVersion });
+		).resolves.toEqual({
+			type: "success",
+			value: editorProjectIpcVersion,
+		});
 
 		expect(repository.createProjectFx).toHaveBeenCalledWith(createRequest);
 		expect(repository.deleteProjectFx).toHaveBeenCalledWith("project-one");

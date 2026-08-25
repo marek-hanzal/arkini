@@ -63,10 +63,7 @@ export namespace createSqliteEditorProjectVersionDiffOperationsFx {
 /** Reads two consistent snapshots and exposes only their domain-aware structural changes. */
 export const createSqliteEditorProjectVersionDiffOperationsFx = Effect.fn(
 	"createSqliteEditorProjectVersionDiffOperationsFx",
-)(function* ({
-	database,
-	writeLock,
-}: createSqliteEditorProjectVersionDiffOperationsFx.Props) {
+)(function* ({ database, writeLock }: createSqliteEditorProjectVersionDiffOperationsFx.Props) {
 	const statements = yield* Effect.try({
 		try: () => ({
 			currentProject: database.prepare(
@@ -96,15 +93,30 @@ export const createSqliteEditorProjectVersionDiffOperationsFx = Effect.fn(
 
 	const readCurrent = (projectId: string): EditorProjectVersionDiffSnapshot => {
 		const candidate = statements.currentProject.get(projectId);
-		if (candidate === undefined) throw createError(`Editor project ${projectId} does not exist.`);
+		if (candidate === undefined)
+			throw createError(`Editor project ${projectId} does not exist.`);
 		const project = currentProjectSchema.parse(candidate);
-		const resources = currentBinarySchema.array().parse(statements.currentResources.all(projectId));
-		const scenarios = currentBinarySchema.array().parse(statements.currentScenarios.all(projectId));
+		const resources = currentBinarySchema
+			.array()
+			.parse(statements.currentResources.all(projectId));
+		const scenarios = currentBinarySchema
+			.array()
+			.parse(statements.currentScenarios.all(projectId));
 		return {
 			config: GameConfigSchema.parse(JSON.parse(project.config_json)),
 			arkpackVersion: project.arkpack_version,
-			resources: new Map(resources.map(({ id, bytes }) => [id, hashBytes(bytes)])),
-			scenarios: new Map(scenarios.map(({ id, bytes }) => [id, hashBytes(bytes)])),
+			resources: new Map(
+				resources.map(({ id, bytes }) => [
+					id,
+					hashBytes(bytes),
+				]),
+			),
+			scenarios: new Map(
+				scenarios.map(({ id, bytes }) => [
+					id,
+					hashBytes(bytes),
+				]),
+			),
 		};
 	};
 
@@ -131,8 +143,18 @@ export const createSqliteEditorProjectVersionDiffOperationsFx = Effect.fn(
 		return {
 			config: GameConfigSchema.parse(JSON.parse(project.config_json)),
 			arkpackVersion: project.arkpack_version,
-			resources: new Map(resources.map(({ id, blob_hash }) => [id, blob_hash])),
-			scenarios: new Map(scenarios.map(({ id, blob_hash }) => [id, blob_hash])),
+			resources: new Map(
+				resources.map(({ id, blob_hash }) => [
+					id,
+					blob_hash,
+				]),
+			),
+			scenarios: new Map(
+				scenarios.map(({ id, blob_hash }) => [
+					id,
+					blob_hash,
+				]),
+			),
 		};
 	};
 
@@ -158,5 +180,7 @@ export const createSqliteEditorProjectVersionDiffOperationsFx = Effect.fn(
 		),
 	);
 
-	return { diffVersionsFx } satisfies DiffOperation;
+	return {
+		diffVersionsFx,
+	} satisfies DiffOperation;
 });

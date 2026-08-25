@@ -25,7 +25,9 @@ export const editorProjectIpcProject = {
 };
 
 export const editorProjectIpcVersion = {
-	applicability: { type: "applicable" as const },
+	applicability: {
+		type: "applicable" as const,
+	},
 	arkini: ArkiniAppVersion,
 	arkpackVersion: editorProjectIpcProject.version,
 	createdAtMs: 3,
@@ -63,7 +65,11 @@ export const createEditorProjectIpcRepository = (): SqliteEditorProjectRepositor
 	listProjectsFx: Effect.succeed([
 		editorProjectIpcDescriptor,
 	]),
-	listVersionsFx: vi.fn(() => Effect.succeed([editorProjectIpcVersion])),
+	listVersionsFx: vi.fn(() =>
+		Effect.succeed([
+			editorProjectIpcVersion,
+		]),
+	),
 	readProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	readVersionStatusFx: vi.fn(() =>
 		Effect.succeed({

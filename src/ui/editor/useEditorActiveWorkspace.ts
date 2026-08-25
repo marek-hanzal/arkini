@@ -51,6 +51,13 @@ export const EditorWorkspaceRoutes = [
 		to: "/editor/$projectId/board",
 	},
 	{
+		id: "versions",
+		icon: "icon-[lucide--git-branch]",
+		label: "Versions",
+		matchTo: "/editor/$projectId/versions",
+		to: "/editor/$projectId/versions/commit",
+	},
+	{
 		id: "build",
 		icon: "icon-[lucide--package-check]",
 		label: "Build",

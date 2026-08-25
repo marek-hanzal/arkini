@@ -15,6 +15,7 @@ import {
 	EditorBoardScenarioDescriptorSchema,
 	EditorBoardScenarioSchema,
 } from "~/editor/board/EditorBoardScenarioSchema";
+import { admitEditorProjectWriteFx } from "~/bridge/editor/EditorProjectWriteAdmission";
 import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 
@@ -27,14 +28,32 @@ const commitTransportSchema = z
 	.strict();
 
 const versionReferenceSchema = z.discriminatedUnion("type", [
-	z.object({ type: z.literal("current") }).strict(),
-	z.object({ type: z.literal("version"), versionId: z.string().min(1) }).strict(),
+	z
+		.object({
+			type: z.literal("current"),
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("version"),
+			versionId: z.string().min(1),
+		})
+		.strict(),
 ]);
 const versionDescriptorSchema = z
 	.object({
 		applicability: z.discriminatedUnion("type", [
-			z.object({ type: z.literal("applicable") }).strict(),
-			z.object({ type: z.literal("incompatible"), reason: z.string() }).strict(),
+			z
+				.object({
+					type: z.literal("applicable"),
+				})
+				.strict(),
+			z
+				.object({
+					type: z.literal("incompatible"),
+					reason: z.string(),
+				})
+				.strict(),
 		]),
 		arkini: ArkiniVersionSchema,
 		arkpackVersion: ArkpackVersionSchema,
@@ -67,7 +86,11 @@ const versionValueChangeSchema = z
 	.strict();
 const versionBinaryDiffSchema = z
 	.object({
-		change: z.enum(["added", "changed", "deleted"]),
+		change: z.enum([
+			"added",
+			"changed",
+			"deleted",
+		]),
 		id: z.string(),
 	})
 	.strict();
@@ -79,7 +102,11 @@ const versionDiffSchema = z
 		project: versionValueChangeSchema.array(),
 		items: z
 			.object({
-				change: z.enum(["added", "changed", "deleted"]),
+				change: z.enum([
+					"added",
+					"changed",
+					"deleted",
+				]),
 				uid: z.string(),
 				values: versionValueChangeSchema.array(),
 			})
@@ -212,6 +239,11 @@ const callFx = <Value, Parsed>(
 		),
 	);
 
+const writeFx = <Value>(
+	operation: EditorProjectRepositoryOperation,
+	effect: Effect.Effect<Value, EditorProjectRepositoryError>,
+) => admitEditorProjectWriteFx(operation, effect);
+
 /** Creates an infallible renderer proxy; editor availability is queried separately. */
 export const createElectronEditorProjectRepositoryFx = Effect.sync(
 	(): EditorProjectRepositoryService => ({
@@ -221,22 +253,31 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 			() => undefined,
 		),
 		createProjectFx: (request) =>
-			callFx(
+			writeFx(
 				"create-project",
-				() => window.arkini.editor.createProject(request),
-				parseProject,
+				callFx(
+					"create-project",
+					() => window.arkini.editor.createProject(request),
+					parseProject,
+				),
 			),
 		deleteProjectFx: (projectId) =>
-			callFx(
+			writeFx(
 				"delete-project",
-				() => window.arkini.editor.deleteProject(projectId),
-				() => undefined,
+				callFx(
+					"delete-project",
+					() => window.arkini.editor.deleteProject(projectId),
+					() => undefined,
+				),
 			),
 		createVersionFx: (request) =>
-			callFx(
+			writeFx(
 				"create-version",
-				() => window.arkini.editor.createVersion(request),
-				(value) => versionDescriptorSchema.parse(value),
+				callFx(
+					"create-version",
+					() => window.arkini.editor.createVersion(request),
+					(value) => versionDescriptorSchema.parse(value),
+				),
 			),
 		checkoutVersionFx: (request) =>
 			callFx(
@@ -244,7 +285,10 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 				() => window.arkini.editor.checkoutVersion(request),
 				(value) => {
 					const checkout = z
-						.object({ project: z.unknown(), version: versionDescriptorSchema })
+						.object({
+							project: z.unknown(),
+							version: versionDescriptorSchema,
+						})
 						.strict()
 						.parse(value);
 					return {
@@ -254,7 +298,10 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 				},
 			),
 		deleteItemFx: (request) =>
-			callFx("delete-item", () => window.arkini.editor.deleteItem(request), parseCommit),
+			writeFx(
+				"delete-item",
+				callFx("delete-item", () => window.arkini.editor.deleteItem(request), parseCommit),
+			),
 		diffVersionsFx: (request) =>
 			callFx(
 				"diff-versions",
@@ -297,44 +344,65 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 				(value) => versionStatusSchema.parse(value),
 			),
 		replaceConfigFx: (request) =>
-			callFx(
+			writeFx(
 				"replace-config",
-				() => window.arkini.editor.replaceConfig(request),
-				parseCommit,
+				callFx(
+					"replace-config",
+					() => window.arkini.editor.replaceConfig(request),
+					parseCommit,
+				),
 			),
 		replaceResourceFx: (request) =>
-			callFx(
+			writeFx(
 				"replace-resource",
-				() => window.arkini.editor.replaceResource(request),
-				parseProject,
+				callFx(
+					"replace-resource",
+					() => window.arkini.editor.replaceResource(request),
+					parseProject,
+				),
 			),
 		saveResourceFx: (request) =>
 			callFx("save-resource", () => window.arkini.editor.saveResource(request), parseProject),
 		upsertItemFx: (request) =>
-			callFx("upsert-item", () => window.arkini.editor.upsertItem(request), parseCommit),
+			writeFx(
+				"upsert-item",
+				callFx("upsert-item", () => window.arkini.editor.upsertItem(request), parseCommit),
+			),
 		upsertResourcesFx: (request) =>
-			callFx(
+			writeFx(
 				"upsert-resource",
-				() => window.arkini.editor.upsertResources(request),
-				parseProject,
+				callFx(
+					"upsert-resource",
+					() => window.arkini.editor.upsertResources(request),
+					parseProject,
+				),
 			),
 		updateVersionTagFx: (request) =>
-			callFx(
+			writeFx(
 				"update-version-tag",
-				() => window.arkini.editor.updateVersionTag(request),
-				(value) => versionDescriptorSchema.parse(value),
+				callFx(
+					"update-version-tag",
+					() => window.arkini.editor.updateVersionTag(request),
+					(value) => versionDescriptorSchema.parse(value),
+				),
 			),
 		writeBoardScenarioFx: (request) =>
-			callFx(
+			writeFx(
 				"write-board-scenario",
-				() => window.arkini.editor.writeBoardScenario(request),
-				parseBoardScenario,
+				callFx(
+					"write-board-scenario",
+					() => window.arkini.editor.writeBoardScenario(request),
+					parseBoardScenario,
+				),
 			),
 		deleteBoardScenarioFx: (request) =>
-			callFx(
+			writeFx(
 				"delete-board-scenario",
-				() => window.arkini.editor.deleteBoardScenario(request),
-				() => undefined,
+				callFx(
+					"delete-board-scenario",
+					() => window.arkini.editor.deleteBoardScenario(request),
+					() => undefined,
+				),
 			),
 	}),
 );

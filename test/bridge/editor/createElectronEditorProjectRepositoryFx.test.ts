@@ -42,7 +42,9 @@ const createProjectTransport = (): EditorProjectTransport.Project => ({
 });
 
 const version: EditorProjectTransport.VersionDescriptor = {
-	applicability: { type: "applicable" },
+	applicability: {
+		type: "applicable",
+	},
 	arkini: "0.5.0",
 	arkpackVersion: "1.0",
 	createdAtMs: 12,
@@ -103,7 +105,11 @@ const installEditorApi = () => {
 				versionCount: 1,
 			}),
 		),
-		listVersions: vi.fn(async () => success([version])),
+		listVersions: vi.fn(async () =>
+			success([
+				version,
+			]),
+		),
 		diffVersions: vi.fn(async (request) =>
 			success({
 				from: request.from,
@@ -116,7 +122,12 @@ const installEditorApi = () => {
 			}),
 		),
 		createVersion: vi.fn(async () => success(version)),
-		checkoutVersion: vi.fn(async () => success({ project, version })),
+		checkoutVersion: vi.fn(async () =>
+			success({
+				project,
+				version,
+			}),
+		),
 		updateVersionTag: vi.fn(async () => success(version)),
 	};
 	Object.defineProperty(window, "arkini", {
@@ -242,12 +253,17 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 		);
 		const status = await Effect.runPromise(repository.readVersionStatusFx("project-one"));
 		const versions = await Effect.runPromise(repository.listVersionsFx("project-one"));
-		const reference = { type: "version" as const, versionId: version.versionId };
+		const reference = {
+			type: "version" as const,
+			versionId: version.versionId,
+		};
 		const diff = await Effect.runPromise(
 			repository.diffVersionsFx({
 				projectId: "project-one",
 				from: reference,
-				to: { type: "current" },
+				to: {
+					type: "current",
+				},
 			}),
 		);
 		const committedVersion = await Effect.runPromise(
@@ -326,9 +342,16 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 			projectId: "project-one",
 			name: "Scenario 1",
 		});
-		expect(status).toMatchObject({ dirty: false, versionCount: 1 });
-		expect(versions).toEqual([version]);
-		expect(diff).toMatchObject({ hasChanges: false });
+		expect(status).toMatchObject({
+			dirty: false,
+			versionCount: 1,
+		});
+		expect(versions).toEqual([
+			version,
+		]);
+		expect(diff).toMatchObject({
+			hasChanges: false,
+		});
 		expect(committedVersion).toEqual(version);
 		expect(checkout.version).toEqual(version);
 		expect(checkout.project.resources[0]?.bytes).toBeInstanceOf(Uint8Array);

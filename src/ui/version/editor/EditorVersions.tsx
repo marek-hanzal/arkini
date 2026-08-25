@@ -1,0 +1,66 @@
+import { ButtonLink } from "~/ui/button/Button";
+import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
+import {
+	editorSectionTabActiveClassName,
+	editorSectionTabClassName,
+	EditorSectionTabs,
+} from "~/ui/editor/EditorSectionTabs";
+import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import type { PropsWithChildren } from "react";
+
+export const EditorVersions = ({ children }: PropsWithChildren) => {
+	const project = useEditorProject();
+	const params = {
+		projectId: project.projectId,
+	};
+	return (
+		<section
+			className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] overflow-hidden"
+			data-ui="EditorVersions"
+		>
+			<div className="border-b border-line px-4 py-3">
+				<EditorSectionNavigation
+					title={
+						<div>
+							<h1 className="text-xl font-semibold">Versions</h1>
+							<p className="text-xs text-muted">
+								Explicit snapshots of the entire saved project.
+							</p>
+						</div>
+					}
+					tabs={
+						<EditorSectionTabs label="Version sections">
+							<ButtonLink
+								to="/editor/$projectId/versions/commit"
+								params={params}
+								activeOptions={{
+									exact: true,
+								}}
+								activeProps={{
+									className: editorSectionTabActiveClassName,
+								}}
+								className={editorSectionTabClassName}
+							>
+								Commit
+							</ButtonLink>
+							<ButtonLink
+								to="/editor/$projectId/versions/history"
+								params={params}
+								activeOptions={{
+									exact: true,
+								}}
+								activeProps={{
+									className: editorSectionTabActiveClassName,
+								}}
+								className={editorSectionTabClassName}
+							>
+								History
+							</ButtonLink>
+						</EditorSectionTabs>
+					}
+				/>
+			</div>
+			{children}
+		</section>
+	);
+};

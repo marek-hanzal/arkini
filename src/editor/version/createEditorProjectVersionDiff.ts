@@ -26,15 +26,28 @@ const readValueChanges = (
 ): ReadonlyArray<EditorProjectVersionValueChange> => {
 	if (isEqual(before, after)) return [];
 	if (isRecord(before) && isRecord(after)) {
-		const keys = Array.from(new Set([...Object.keys(before), ...Object.keys(after)])).sort();
+		const keys = Array.from(
+			new Set([
+				...Object.keys(before),
+				...Object.keys(after),
+			]),
+		).sort();
 		return keys.flatMap((key) =>
 			readValueChanges(before[key], after[key], path === "" ? key : `${path}.${key}`),
 		);
 	}
 	return [
 		{
-			...(before === undefined ? {} : { before }),
-			...(after === undefined ? {} : { after }),
+			...(before === undefined
+				? {}
+				: {
+						before,
+					}),
+			...(after === undefined
+				? {}
+				: {
+						after,
+					}),
 			path,
 		},
 	];
@@ -44,9 +57,24 @@ const readItemDiffs = (
 	before: GameConfigSchema.Type["items"],
 	after: GameConfigSchema.Type["items"],
 ): ReadonlyArray<EditorProjectVersionItemDiff> => {
-	const beforeByUid = new Map(Object.values(before).map((item) => [item.uid, item]));
-	const afterByUid = new Map(Object.values(after).map((item) => [item.uid, item]));
-	return Array.from(new Set([...beforeByUid.keys(), ...afterByUid.keys()]))
+	const beforeByUid = new Map(
+		Object.values(before).map((item) => [
+			item.uid,
+			item,
+		]),
+	);
+	const afterByUid = new Map(
+		Object.values(after).map((item) => [
+			item.uid,
+			item,
+		]),
+	);
+	return Array.from(
+		new Set([
+			...beforeByUid.keys(),
+			...afterByUid.keys(),
+		]),
+	)
 		.sort()
 		.flatMap<EditorProjectVersionItemDiff>((uid) => {
 			const beforeItem = beforeByUid.get(uid);
@@ -84,7 +112,12 @@ const readBinaryDiffs = (
 	before: ReadonlyMap<string, string>,
 	after: ReadonlyMap<string, string>,
 ): ReadonlyArray<EditorProjectVersionBinaryDiff> =>
-	Array.from(new Set([...before.keys(), ...after.keys()]))
+	Array.from(
+		new Set([
+			...before.keys(),
+			...after.keys(),
+		]),
+	)
 		.sort()
 		.flatMap((id) => {
 			const beforeHash = before.get(id);

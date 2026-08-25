@@ -258,7 +258,7 @@ describe("EditorShell", () => {
 		expect(container.textContent).toContain("ChatGPT destination");
 	});
 
-	it("orders gameplay testing before the final build step", async () => {
+	it("orders gameplay testing and explicit versions before the final build step", async () => {
 		const router = createTestRouter({
 			initialEntry: "/editor/editor-test/board",
 		});
@@ -267,8 +267,9 @@ describe("EditorShell", () => {
 			container.querySelectorAll<HTMLElement>("[data-workspace-id]"),
 		).map(({ dataset }) => dataset.workspaceId);
 
-		expect(workspaces.slice(-2)).toEqual([
+		expect(workspaces.slice(-3)).toEqual([
 			"board",
+			"versions",
 			"build",
 		]);
 	});

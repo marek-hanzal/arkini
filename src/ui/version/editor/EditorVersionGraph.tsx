@@ -89,11 +89,13 @@ const VersionRails = ({
 export const EditorVersionGraph = ({
 	layout,
 	onSelect,
+	onSelectWorkingCopy,
 	selectedVersionId,
 	status,
 }: {
 	readonly layout: EditorVersionGraphLayout;
 	readonly onSelect: (versionId: string) => void;
+	readonly onSelectWorkingCopy: () => void;
 	readonly selectedVersionId?: string;
 	readonly status: EditorProjectVersionStatus;
 }) => {
@@ -103,8 +105,11 @@ export const EditorVersionGraph = ({
 			className="grid content-start"
 			data-ui="EditorVersionGraph"
 		>
-			<div
-				className={`flex min-h-16 items-center border-b border-line/60 px-2 ${workingCopy.backgroundClassName}`}
+			<button
+				type="button"
+				className={`flex min-h-16 w-full cursor-pointer items-center border-b border-line/60 px-2 text-left hover:bg-surface-raised ${workingCopy.backgroundClassName}`}
+				data-ui="EditorVersionWorkingCopy"
+				onClick={onSelectWorkingCopy}
 			>
 				<div
 					className="relative h-16 shrink-0"
@@ -133,7 +138,7 @@ export const EditorVersionGraph = ({
 						{workingCopy.label}
 					</div>
 				</div>
-			</div>
+			</button>
 			{layout.rows.map((row) => (
 				<button
 					key={row.version.versionId}

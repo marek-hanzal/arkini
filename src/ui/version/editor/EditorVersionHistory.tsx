@@ -59,6 +59,7 @@ export const EditorVersionHistory = () => {
 					<EditorVersionGraph
 						layout={controller.graph}
 						onSelect={controller.selectVersion}
+						onSelectWorkingCopy={controller.selectWorkingCopy}
 						selectedVersionId={controller.selected?.versionId}
 						status={controller.history.status}
 					/>

@@ -40,6 +40,7 @@ export namespace useEditorVersionHistoryController {
 		readonly restoreSelected: () => void;
 		readonly saveTag: () => void;
 		readonly selectVersion: (versionId: string) => void;
+		readonly selectWorkingCopy: () => void;
 		readonly selected?: EditorProjectVersionDescriptor;
 		readonly setCompareFrom: (value: string) => void;
 		readonly setCompareTo: (value: string) => void;
@@ -133,6 +134,12 @@ export const useEditorVersionHistoryController = (): useEditorVersionHistoryCont
 			history,
 		],
 	);
+	const selectWorkingCopy = useCallback(() => {
+		comparison.resetToBase(history?.status.currentBaseVersionId);
+	}, [
+		comparison.resetToBase,
+		history?.status.currentBaseVersionId,
+	]);
 
 	return {
 		cancelCheckout: checkout.cancel,
@@ -171,6 +178,7 @@ export const useEditorVersionHistoryController = (): useEditorVersionHistoryCont
 		restoreSelected: checkout.restoreSelected,
 		saveTag: tag.save,
 		selectVersion,
+		selectWorkingCopy,
 		...(selected === undefined
 			? {}
 			: {

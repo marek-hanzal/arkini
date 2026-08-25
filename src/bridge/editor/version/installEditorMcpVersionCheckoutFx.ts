@@ -3,9 +3,9 @@ import { z } from "zod";
 
 import { readEditorProjectFx } from "~/bridge/editor/readEditorProjectFx";
 import { checkoutEditorProjectVersionFx } from "~/bridge/editor/version/checkoutEditorProjectVersionFx";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { RootContext } from "~/ui/root/RootContext";
 
 const requestSchema = z
 	.object({
@@ -17,7 +17,7 @@ const requestSchema = z
 export namespace installEditorMcpVersionCheckoutFx {
 	export interface Props {
 		readonly editorMcp: Pick<Window["arkini"]["editorMcp"], "onVersionCheckoutRequested">;
-		readonly rendererRuntime: RootContext["rendererRuntime"];
+		readonly rendererRuntime: typeof RendererRuntime;
 		readonly router: Pick<ArkiniRouter, "invalidate" | "navigate" | "state">;
 	}
 }

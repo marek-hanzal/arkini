@@ -1,9 +1,42 @@
+import type { EditorProjectVersionDescriptor } from "~/editor/version/EditorProjectVersion";
 import { Button, DangerButton } from "~/ui/button/Button";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
 import { EditorVersionCheckoutDialog } from "~/ui/version/editor/EditorVersionCheckoutDialog";
 import { EditorVersionDiff } from "~/ui/version/editor/EditorVersionDiff";
 import { EditorVersionGraph } from "~/ui/version/editor/EditorVersionGraph";
 import { useEditorVersionHistoryController } from "~/ui/version/editor/useEditorVersionHistoryController";
+
+const EditorVersionReferenceSelect = ({
+	label,
+	onChange,
+	value,
+	versions,
+}: {
+	readonly label: string;
+	readonly onChange: (value: string) => void;
+	readonly value: string;
+	readonly versions: ReadonlyArray<EditorProjectVersionDescriptor>;
+}) => (
+	<label className="grid gap-1 text-xs font-semibold">
+		{label}
+		<select
+			className={editorInputClassName}
+			value={value}
+			onChange={(event) => onChange(event.currentTarget.value)}
+		>
+			<option value="current">Working copy</option>
+			{versions.map((version) => (
+				<option
+					key={version.versionId}
+					disabled={version.applicability.type === "incompatible"}
+					value={version.versionId}
+				>
+					{version.subject}
+				</option>
+			))}
+		</select>
+	</label>
+);
 
 export const EditorVersionHistory = () => {
 	const controller = useEditorVersionHistoryController();
@@ -109,48 +142,18 @@ export const EditorVersionHistory = () => {
 							</p>
 						</div>
 						<div className="grid gap-3 sm:grid-cols-2">
-							<label className="grid gap-1 text-xs font-semibold">
-								Before
-								<select
-									className={editorInputClassName}
-									value={controller.compareFrom}
-									onChange={(event) =>
-										controller.setCompareFrom(event.currentTarget.value)
-									}
-								>
-									<option value="current">Working copy</option>
-									{versions.map((version) => (
-										<option
-											key={version.versionId}
-											disabled={version.applicability.type === "incompatible"}
-											value={version.versionId}
-										>
-											{version.subject}
-										</option>
-									))}
-								</select>
-							</label>
-							<label className="grid gap-1 text-xs font-semibold">
-								After
-								<select
-									className={editorInputClassName}
-									value={controller.compareTo}
-									onChange={(event) =>
-										controller.setCompareTo(event.currentTarget.value)
-									}
-								>
-									<option value="current">Working copy</option>
-									{versions.map((version) => (
-										<option
-											key={version.versionId}
-											disabled={version.applicability.type === "incompatible"}
-											value={version.versionId}
-										>
-											{version.subject}
-										</option>
-									))}
-								</select>
-							</label>
+							<EditorVersionReferenceSelect
+								label="Before"
+								onChange={controller.setCompareFrom}
+								value={controller.compareFrom}
+								versions={versions}
+							/>
+							<EditorVersionReferenceSelect
+								label="After"
+								onChange={controller.setCompareTo}
+								value={controller.compareTo}
+								versions={versions}
+							/>
 						</div>
 						{controller.diffPending ? (
 							<p className="text-sm text-muted">Comparing…</p>

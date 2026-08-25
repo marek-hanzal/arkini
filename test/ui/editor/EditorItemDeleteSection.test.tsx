@@ -169,8 +169,6 @@ describe("EditorItemDeleteSection", () => {
 		expect(container.textContent).toContain(
 			"No additional references or gameplay relationships",
 		);
-		expect(container.textContent).toContain("every saved Board scenario");
-		expect(container.textContent).toContain("published game saves are discarded");
 		const versionLink = container.querySelector<HTMLAnchorElement>(
 			'[data-ui="EditorItemDeleteCreateVersion"]',
 		);
@@ -202,8 +200,6 @@ describe("EditorItemDeleteSection", () => {
 
 		await act(async () => open?.click());
 		expect(container.textContent).toContain("Its asset files remain available in the project.");
-		expect(container.textContent).toContain("every saved Board scenario");
-		expect(container.textContent).toContain("published game saves are discarded");
 		expect(container.querySelector('[data-ui="EditorItemDeleteCreateVersion"]')).not.toBeNull();
 		const confirm = container.querySelector<HTMLButtonElement>(
 			'[data-ui="EditorItemDeleteConfirm"]',

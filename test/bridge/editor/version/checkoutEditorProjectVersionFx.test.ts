@@ -1,4 +1,4 @@
-import { Effect, Exit, SubscriptionRef } from "effect";
+import { Cause, Effect, Exit, Option, SubscriptionRef } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { describe, expect, it, vi } from "vitest";
@@ -8,6 +8,7 @@ import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository
 import { EditorUnsavedChanges } from "~/bridge/editor/EditorUnsavedChanges";
 import type { EditorBoardGameResource } from "~/bridge/editor/board/EditorBoardGameResource";
 import { EditorBoardGameResourceOwnerAtom } from "~/bridge/editor/board/EditorBoardGameResource";
+import { EditorProjectVersionCheckoutConfirmationRequired } from "~/bridge/editor/version/EditorProjectVersionCheckoutConfirmationRequired";
 import { checkoutEditorProjectVersionFx } from "~/bridge/editor/version/checkoutEditorProjectVersionFx";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
@@ -38,7 +39,15 @@ const version = {
 	versionId: "version-one",
 };
 
-const runCheckout = async ({ fail = false }: { readonly fail?: boolean } = {}) => {
+const runCheckout = async ({
+	confirm = true,
+	dirty = false,
+	fail = false,
+}: {
+	readonly confirm?: boolean;
+	readonly dirty?: boolean;
+	readonly fail?: boolean;
+} = {}) => {
 	const events: string[] = [];
 	const registry = AtomRegistry.make();
 	const state = Effect.runSync(
@@ -48,7 +57,8 @@ const runCheckout = async ({ fail = false }: { readonly fail?: boolean } = {}) =
 	);
 	const owner = {
 		state,
-		syncFx: () => Effect.sync(() => events.push("board-sync")),
+		syncFx: (nextProject) =>
+			Effect.sync(() => events.push(`board-sync-${nextProject.revision}`)),
 		publishFx: () => Effect.void,
 		replaceFx: () => Effect.void,
 		releaseCurrentFx: Effect.sync(() => events.push("board-release")),
@@ -87,14 +97,21 @@ const runCheckout = async ({ fail = false }: { readonly fail?: boolean } = {}) =
 		checkoutVersionFx,
 		createProjectFx: () => Effect.die("Unexpected project create."),
 		listProjectsFx: Effect.die("Unexpected project list."),
-		readProjectFx: () => Effect.die("Unexpected project read."),
+		readProjectFx: () =>
+			Effect.sync(() => {
+				events.push("project-read");
+				return {
+					...project,
+					revision: 7,
+				};
+			}),
 		readVersionStatusFx: () =>
 			Effect.sync(() => {
 				events.push("status");
 				return {
 					canCommit: true,
 					currentFingerprint: "a".repeat(64),
-					dirty: true,
+					dirty,
 					versionCount: 1,
 				};
 			}),
@@ -122,7 +139,9 @@ const runCheckout = async ({ fail = false }: { readonly fail?: boolean } = {}) =
 	try {
 		const exit = await Effect.runPromiseExit(
 			checkoutEditorProjectVersionFx({
+				confirmDiscardCurrentChanges: confirm,
 				currentProject: project,
+				hardReload: () => events.push("hard-reload"),
 				versionId: version.versionId,
 			}).pipe(
 				Effect.provideService(EditorProjectRepository, repository),
@@ -140,15 +159,36 @@ const runCheckout = async ({ fail = false }: { readonly fail?: boolean } = {}) =
 };
 
 describe("checkoutEditorProjectVersionFx", () => {
-	it("discards drafts and joins writes before releasing Board and replacing SQLite state", async () => {
+	it("discards drafts only after replacing SQLite state", async () => {
 		const result = await runCheckout();
 		expect(Exit.isSuccess(result.exit)).toBe(true);
 		expect(result.events).toEqual([
-			"discard",
 			"idle",
 			"status",
 			"board-release",
 			`checkout-${"a".repeat(64)}`,
+			"discard",
+			"hard-reload",
+		]);
+	});
+
+	it("requires fresh consent before discarding newly saved working-copy changes", async () => {
+		const result = await runCheckout({
+			confirm: false,
+			dirty: true,
+		});
+		expect(Exit.isFailure(result.exit)).toBe(true);
+		if (Exit.isFailure(result.exit)) {
+			const failure = Cause.findErrorOption(result.exit.cause);
+			expect(Option.isSome(failure)).toBe(true);
+			if (Option.isSome(failure))
+				expect(failure.value).toBeInstanceOf(
+					EditorProjectVersionCheckoutConfirmationRequired,
+				);
+		}
+		expect(result.events).toEqual([
+			"idle",
+			"status",
 		]);
 	});
 
@@ -158,12 +198,12 @@ describe("checkoutEditorProjectVersionFx", () => {
 		});
 		expect(Exit.isFailure(result.exit)).toBe(true);
 		expect(result.events).toEqual([
-			"discard",
 			"idle",
 			"status",
 			"board-release",
 			`checkout-${"a".repeat(64)}`,
-			"board-sync",
+			"project-read",
+			"board-sync-7",
 		]);
 	});
 });

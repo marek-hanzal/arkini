@@ -89,11 +89,9 @@ export const EditorItemDeleteDialog = ({
 				{force ? "Force delete item?" : "Delete item?"}
 			</h2>
 			<p className="mt-2 text-sm leading-6 text-muted">
-				{force ? "Permanently delete " : "Delete "}
-				<strong className="text-foreground">{item.title || item.id}</strong> from the game
-				{force
-					? " and remove every authored structure that directly references it."
-					: "? This action is permanent and cannot be undone."}
+				Delete <strong className="text-foreground">{item.title || item.id}</strong> from the
+				game
+				{force ? " and remove every authored structure that directly references it." : "."}
 			</p>
 			{force ? (
 				<EditorItemForceDeleteImpactList
@@ -106,9 +104,10 @@ export const EditorItemDeleteDialog = ({
 			</p>
 			<div className="mt-3 grid gap-2 rounded-lg border border-danger/40 bg-danger/10 p-3 text-sm leading-6 text-danger">
 				<p>
-					This action cannot be undone. Deleting an item is a breaking gameplay change:
-					every saved Board scenario in this project will be permanently deleted, and
-					published game saves are discarded when the new major version is loaded.
+					Deleting an item is a breaking gameplay change: every current Board scenario in
+					this project will be deleted, and published game saves are discarded when the
+					new major version is loaded. Restoring a full saved version is the only way to
+					undo it.
 				</p>
 				{force ? (
 					<p>

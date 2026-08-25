@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { readEditorProjectFx } from "~/bridge/editor/readEditorProjectFx";
 import { checkoutEditorProjectVersionFx } from "~/bridge/editor/version/checkoutEditorProjectVersionFx";
+import { hardReloadEditorProjectVersion } from "~/bridge/editor/version/hardReloadEditorProjectVersion";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -18,13 +19,19 @@ export namespace installEditorMcpVersionCheckoutFx {
 	export interface Props {
 		readonly editorMcp: Pick<Window["arkini"]["editorMcp"], "onVersionCheckoutRequested">;
 		readonly rendererRuntime: typeof RendererRuntime;
-		readonly router: Pick<ArkiniRouter, "invalidate" | "navigate" | "state">;
+		readonly hardReload?: (projectId: string) => void;
+		readonly router: Pick<ArkiniRouter, "state">;
 	}
 }
 
 /** Installs the only MCP checkout path, reusing the renderer's hard-reset coordinator. */
 export const installEditorMcpVersionCheckoutFx = Effect.fn("installEditorMcpVersionCheckoutFx")(
-	({ editorMcp, rendererRuntime, router }: installEditorMcpVersionCheckoutFx.Props) =>
+	({
+		editorMcp,
+		hardReload = hardReloadEditorProjectVersion,
+		rendererRuntime,
+		router,
+	}: installEditorMcpVersionCheckoutFx.Props) =>
 		Effect.sync(() => {
 			let running = false;
 			return editorMcp.onVersionCheckoutRequested(async (candidate) => {
@@ -44,20 +51,14 @@ export const installEditorMcpVersionCheckoutFx = Effect.fn("installEditorMcpVers
 						}).pipe(
 							Effect.flatMap((currentProject) =>
 								checkoutEditorProjectVersionFx({
+									confirmDiscardCurrentChanges: true,
 									currentProject,
+									hardReload,
 									versionId: request.versionId,
 								}),
 							),
 						),
 					);
-					await router.navigate({
-						to: "/editor/$projectId/versions/history",
-						params: {
-							projectId: request.projectId,
-						},
-						replace: true,
-					});
-					await router.invalidate();
 				} finally {
 					running = false;
 				}

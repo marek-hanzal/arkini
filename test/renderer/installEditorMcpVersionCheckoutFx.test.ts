@@ -81,8 +81,7 @@ describe("installEditorMcpVersionCheckoutFx", () => {
 			| ((request: { projectId: string; versionId: string }) => Promise<void>)
 			| undefined;
 		const remove = vi.fn();
-		const navigate = vi.fn(() => Promise.resolve());
-		const invalidate = vi.fn(() => Promise.resolve());
+		const hardReload = vi.fn();
 		const router = {
 			state: {
 				matches: [
@@ -93,9 +92,7 @@ describe("installEditorMcpVersionCheckoutFx", () => {
 					},
 				],
 			},
-			navigate,
-			invalidate,
-		} as unknown as Pick<ArkiniRouter, "invalidate" | "navigate" | "state">;
+		} as unknown as Pick<ArkiniRouter, "state">;
 		const uninstall = rendererRuntime.runSync(
 			installEditorMcpVersionCheckoutFx({
 				editorMcp: {
@@ -104,6 +101,7 @@ describe("installEditorMcpVersionCheckoutFx", () => {
 						return remove;
 					},
 				},
+				hardReload,
 				rendererRuntime,
 				router,
 			}),
@@ -126,14 +124,7 @@ describe("installEditorMcpVersionCheckoutFx", () => {
 			versionId: "version-one",
 			expectedFingerprint: "a".repeat(64),
 		});
-		expect(navigate).toHaveBeenCalledWith({
-			to: "/editor/$projectId/versions/history",
-			params: {
-				projectId: "project-one",
-			},
-			replace: true,
-		});
-		expect(invalidate).toHaveBeenCalledOnce();
+		expect(hardReload).toHaveBeenCalledWith("project-one");
 		uninstall();
 		expect(remove).toHaveBeenCalledOnce();
 	});

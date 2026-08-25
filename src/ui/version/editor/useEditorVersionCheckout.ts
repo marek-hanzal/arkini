@@ -2,7 +2,9 @@ import { useRouter } from "@tanstack/react-router";
 import { useCallback, useState, useSyncExternalStore } from "react";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
+import { EditorProjectVersionCheckoutConfirmationRequired } from "~/bridge/editor/version/EditorProjectVersionCheckoutConfirmationRequired";
 import { checkoutEditorProjectVersionFx } from "~/bridge/editor/version/checkoutEditorProjectVersionFx";
+import { hardReloadEditorProjectVersion } from "~/bridge/editor/version/hardReloadEditorProjectVersion";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { EditorProjectVersionDescriptor } from "~/editor/version/EditorProjectVersion";
 import { useEditorUnsavedChangesOwner } from "~/ui/editor/useEditorUnsavedChangesRegistration";
@@ -43,37 +45,32 @@ export const useEditorVersionCheckout = ({
 	const [pending, setPending] = useState(false);
 
 	const runCheckout = useCallback(
-		(version: EditorProjectVersionDescriptor) => {
+		(version: EditorProjectVersionDescriptor, confirmDiscardCurrentChanges: boolean) => {
 			if (pending) return;
 			setPending(true);
 			reportError();
 			void RendererRuntime.runPromise(
 				checkoutEditorProjectVersionFx({
+					confirmDiscardCurrentChanges,
 					currentProject: project,
+					hardReload: hardReloadEditorProjectVersion,
 					versionId: version.versionId,
 				}),
-			)
-				.then(async () => {
-					await router.navigate({
-						to: "/editor/$projectId/versions/history",
-						params: {
-							projectId: project.projectId,
-						},
-						replace: true,
-					});
-					await router.invalidate();
-				})
-				.catch((cause) => {
-					reportError(cause);
+			).catch((cause) => {
+				if (cause instanceof EditorProjectVersionCheckoutConfirmationRequired) {
+					setConfirmVersion(version);
 					setPending(false);
-					setConfirmVersion(undefined);
-				});
+					return;
+				}
+				reportError(cause);
+				setPending(false);
+				setConfirmVersion(undefined);
+			});
 		},
 		[
 			pending,
 			project,
 			reportError,
-			router,
 		],
 	);
 	const restoreSelected = useCallback(() => {
@@ -82,7 +79,7 @@ export const useEditorVersionCheckout = ({
 			setConfirmVersion(selected);
 			return;
 		}
-		runCheckout(selected);
+		runCheckout(selected, false);
 	}, [
 		projectDirty,
 		runCheckout,
@@ -90,7 +87,7 @@ export const useEditorVersionCheckout = ({
 		unsaved.hasDirtySession,
 	]);
 	const confirm = useCallback(() => {
-		if (confirmVersion !== undefined) runCheckout(confirmVersion);
+		if (confirmVersion !== undefined) runCheckout(confirmVersion, true);
 	}, [
 		confirmVersion,
 		runCheckout,

@@ -628,11 +628,6 @@ export const createSqliteEditorProjectVersionOperationsFx = Effect.fn(
 				const applicability = readEditorProjectVersionApplicability(version.arkini);
 				if (applicability.type === "incompatible")
 					throw createRepositoryError("checkout-version", applicability.reason);
-				if (version.snapshotFormatVersion !== EditorProjectSnapshotFormatVersion)
-					throw createRepositoryError(
-						"checkout-version",
-						`Snapshot format ${version.snapshotFormatVersion} has no current migrator.`,
-					);
 				const config = GameConfigSchema.parse(JSON.parse(version.configJson));
 				const resources = versionResourceRowSchema
 					.array()

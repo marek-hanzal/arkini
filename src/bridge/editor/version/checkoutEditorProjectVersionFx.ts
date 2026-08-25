@@ -6,28 +6,39 @@ import { EditorUnsavedChanges } from "~/bridge/editor/EditorUnsavedChanges";
 import { blockEditorProjectWrites } from "~/bridge/editor/EditorProjectWriteAdmission";
 import { releaseCurrentEditorBoardGameFx } from "~/bridge/editor/board/releaseCurrentEditorBoardGameFx";
 import { syncEditorBoardGameFx } from "~/bridge/editor/board/syncEditorBoardGameFx";
+import { EditorProjectVersionCheckoutConfirmationRequired } from "~/bridge/editor/version/EditorProjectVersionCheckoutConfirmationRequired";
 
 export namespace checkoutEditorProjectVersionFx {
 	export interface Props {
+		readonly confirmDiscardCurrentChanges: boolean;
 		readonly currentProject: EditorProject;
+		readonly hardReload: (projectId: string) => void;
 		readonly versionId: string;
 	}
 }
 
 /** Performs the terminal renderer handshake before one atomic SQLite project replacement. */
 export const checkoutEditorProjectVersionFx = Effect.fn("checkoutEditorProjectVersionFx")(
-	({ currentProject, versionId }: checkoutEditorProjectVersionFx.Props) =>
+	({
+		confirmDiscardCurrentChanges,
+		currentProject,
+		hardReload,
+		versionId,
+	}: checkoutEditorProjectVersionFx.Props) =>
 		Effect.acquireUseRelease(
 			Effect.sync(blockEditorProjectWrites),
 			() =>
 				Effect.gen(function* () {
 					const repository = yield* EditorProjectRepository;
 					const unsavedChanges = yield* EditorUnsavedChanges;
-					unsavedChanges.discardAll();
 					yield* repository.awaitIdleFx;
 					const status = yield* repository.readVersionStatusFx(currentProject.projectId);
+					if (status.dirty && !confirmDiscardCurrentChanges)
+						return yield* Effect.fail(
+							new EditorProjectVersionCheckoutConfirmationRequired(),
+						);
 					yield* releaseCurrentEditorBoardGameFx;
-					return yield* repository
+					const checkout = yield* repository
 						.checkoutVersionFx({
 							expectedFingerprint: status.currentFingerprint,
 							projectId: currentProject.projectId,
@@ -35,9 +46,19 @@ export const checkoutEditorProjectVersionFx = Effect.fn("checkoutEditorProjectVe
 						})
 						.pipe(
 							Effect.tapError(() =>
-								syncEditorBoardGameFx(currentProject).pipe(Effect.ignore),
+								repository.readProjectFx(currentProject.projectId).pipe(
+									Effect.flatMap((latest) =>
+										latest === null
+											? Effect.void
+											: syncEditorBoardGameFx(latest),
+									),
+									Effect.ignore,
+								),
 							),
 						);
+					unsavedChanges.discardAll();
+					hardReload(currentProject.projectId);
+					return checkout;
 				}),
 			(release) => Effect.sync(release),
 		),

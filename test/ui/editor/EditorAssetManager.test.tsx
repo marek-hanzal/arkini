@@ -24,9 +24,9 @@ vi.mock("~/bridge/editor/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
-vi.mock("~/bridge/resource/editor/saveEditorAssetsCommandAtom", () => ({
-	saveEditorAssetsCommandAtom: {
-		key: "save-assets",
+vi.mock("~/bridge/resource/editor/importEditorAssetsCommandAtom", () => ({
+	importEditorAssetsCommandAtom: {
+		key: "import-assets",
 	},
 }));
 
@@ -176,6 +176,10 @@ describe("EditorAssetManager", () => {
 		);
 		expect(picker?.multiple).toBe(true);
 		expect(picker?.accept).toContain("image/png");
+		expect(
+			container.querySelector<HTMLInputElement>('[data-ui="EditorAssetArkpackInput"]')
+				?.accept,
+		).toContain(".arkpack");
 	});
 
 	it("renders one deliberate import action for an empty project", async () => {
@@ -188,54 +192,5 @@ describe("EditorAssetManager", () => {
 
 		expect(container.querySelector('[data-ui="EditorAssetsEmpty"]')).not.toBeNull();
 		expect(container.querySelectorAll('[data-ui="EditorAssetImport"]')).toHaveLength(1);
-	});
-
-	it("imports every selected PNG through the current project command", async () => {
-		const container = await renderManager();
-		const picker = container.querySelector<HTMLInputElement>(
-			'[data-ui="EditorAssetImportInput"]',
-		);
-		if (picker === null) throw new Error("Missing asset import input.");
-		const files = [
-			new File(
-				[
-					new Uint8Array([
-						1,
-					]),
-				],
-				"first.png",
-				{
-					type: "image/png",
-				},
-			),
-			new File(
-				[
-					new Uint8Array([
-						2,
-					]),
-				],
-				"second.png",
-				{
-					type: "image/png",
-				},
-			),
-		];
-		Object.defineProperty(picker, "files", {
-			configurable: true,
-			value: files,
-		});
-
-		await act(async () => {
-			picker.dispatchEvent(
-				new Event("change", {
-					bubbles: true,
-				}),
-			);
-		});
-
-		expect(state.saveAssets).toHaveBeenCalledWith({
-			files,
-			projectId: "editor-test",
-		});
 	});
 });

@@ -1,18 +1,8 @@
-import {
-	autoUpdate,
-	flip,
-	FloatingPortal,
-	offset,
-	shift,
-	useClick,
-	useDismiss,
-	useFloating,
-	useInteractions,
-} from "@floating-ui/react";
-import { useState } from "react";
+import { FloatingPortal } from "@floating-ui/react";
 
 import { EditorItemTypes, type EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import { Button, ButtonLink } from "~/ui/button/Button";
+import { useEditorFloatingMenu } from "~/ui/editor/useEditorFloatingMenu";
 import { editorSectionTabClassName } from "~/ui/editor/EditorSectionTabs";
 import { EditorItemTypePresentation } from "~/ui/item/editor/EditorItemTypePresentation";
 
@@ -26,26 +16,8 @@ export const EditorItemConvertMenu = ({
 	readonly itemUid: string;
 	readonly projectId: string;
 }) => {
-	const [open, setOpen] = useState(false);
-	const { context, floatingStyles, refs } = useFloating({
-		open,
-		onOpenChange: setOpen,
-		placement: "bottom-end",
-		middleware: [
-			offset(6),
-			flip(),
-			shift({
-				padding: 8,
-			}),
-		],
-		whileElementsMounted: autoUpdate,
-	});
-	const click = useClick(context);
-	const dismiss = useDismiss(context);
-	const { getFloatingProps, getReferenceProps } = useInteractions([
-		click,
-		dismiss,
-	]);
+	const { floatingStyles, getFloatingProps, getReferenceProps, open, refs } =
+		useEditorFloatingMenu();
 	return (
 		<>
 			<Button

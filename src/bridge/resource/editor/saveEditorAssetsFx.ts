@@ -1,8 +1,7 @@
 import { Effect } from "effect";
 
-import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
-import { publishEditorProjectFx } from "~/bridge/editor/publishEditorProjectFx";
+import { upsertEditorResourcesFx } from "~/bridge/resource/editor/upsertEditorResourcesFx";
 import {
 	type EditorAssetFileInput,
 	validateEditorAssetFileFx,
@@ -43,21 +42,8 @@ export const saveEditorAssetsFx = Effect.fn("saveEditorAssetsFx")(function* ({
 		}
 		resourceIds.add(resource.id);
 	}
-	const repository = yield* EditorProjectRepository;
-	yield* Effect.yieldNow;
-	return yield* Effect.uninterruptible(
-		Effect.gen(function* () {
-			const project = yield* repository.upsertResourcesFx({
-				projectId,
-				resources,
-			});
-			yield* publishEditorProjectFx(projectId, {
-				project,
-			});
-			return {
-				project,
-				resourceIds: resources.map(({ id }) => id),
-			};
-		}),
-	);
+	return yield* upsertEditorResourcesFx({
+		projectId,
+		resources,
+	});
 });

@@ -92,6 +92,40 @@ describe("SQLite editor-project resources", () => {
 		]);
 	});
 
+	it("upserts new resources and replaces matching IDs in one minor commit", async () => {
+		const repository = await harness.openRepository();
+		const created = await harness.createProject(repository);
+		const updated = await Effect.runPromise(
+			repository.upsertResourcesFx({
+				projectId: created.projectId,
+				resources: [
+					{
+						id: "hero",
+						mime: "image/png",
+						bytes: Uint8Array.of(9),
+					},
+					{
+						id: "new-asset",
+						mime: "image/png",
+						bytes: Uint8Array.of(8),
+					},
+				],
+			}),
+		);
+
+		expect(updated).toMatchObject({
+			revision: 1,
+			version: "1.1",
+			config: created.config,
+		});
+		expect(updated.resources.map(({ id }) => id)).toEqual([
+			"hero",
+			"item-water",
+			"new-asset",
+		]);
+		expect(updated.resources.find(({ id }) => id === "hero")?.bytes).toEqual(Uint8Array.of(9));
+	});
+
 	it("renames a resource atomically and rolls back an occupied target", async () => {
 		const repository = await harness.openRepository();
 		const created = await harness.createProject(repository);

@@ -3,7 +3,7 @@ import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { type ChangeEventHandler, type RefObject, useCallback, useMemo, useRef } from "react";
 import { match, P } from "ts-pattern";
 
-import { saveEditorAssetsCommandAtom } from "~/bridge/resource/editor/saveEditorAssetsCommandAtom";
+import { importEditorAssetsCommandAtom } from "~/bridge/resource/editor/importEditorAssetsCommandAtom";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorAssetLibrary } from "~/ui/resource/editor/useEditorAssetLibrary";
@@ -22,7 +22,7 @@ const filters = [
 const emptyStatus = {
 	action: "import",
 	dataUi: "EditorAssetsEmpty",
-	description: "Import PNG files to start building this project's asset library.",
+	description: "Import assets from an arkpack or select PNG files to start the library.",
 	icon: "icon-[lucide--images]",
 	title: "No assets yet",
 } as const;
@@ -75,18 +75,20 @@ export namespace useEditorAssetManagerController {
 	}
 
 	export interface Output {
+		readonly arkpackInputRef: RefObject<HTMLInputElement | null>;
 		readonly catalogStatus?: CatalogStatus;
 		readonly changeFilter: (props: ChangeFilterProps) => void;
 		readonly filter: Filter;
 		readonly filters: ReadonlyArray<FilterOption>;
-		readonly importButtonLabel: string;
 		readonly importError?: string;
-		readonly importInputRef: RefObject<HTMLInputElement | null>;
+		readonly filesInputRef: RefObject<HTMLInputElement | null>;
 		readonly importPending: boolean;
 		readonly importSuccess?: string;
+		readonly onArkpackChange: ChangeEventHandler<HTMLInputElement>;
 		readonly onFilesChange: ChangeEventHandler<HTMLInputElement>;
 		readonly onQueryChange: ChangeEventHandler<HTMLInputElement>;
-		readonly openImport: () => void;
+		readonly openArkpackImport: () => void;
+		readonly openFilesImport: () => void;
 		readonly query: string;
 		readonly resources: useEditorAssetLibrary.Output["resources"];
 		readonly showHeaderImport: boolean;
@@ -103,9 +105,10 @@ export const useEditorAssetManagerController = ({
 		filter,
 		query,
 	});
-	const importInputRef = useRef<HTMLInputElement>(null);
-	const result = useAtomValue(saveEditorAssetsCommandAtom);
-	const saveAssets = useAtomSet(saveEditorAssetsCommandAtom);
+	const arkpackInputRef = useRef<HTMLInputElement>(null);
+	const filesInputRef = useRef<HTMLInputElement>(null);
+	const result = useAtomValue(importEditorAssetsCommandAtom);
+	const importAssets = useAtomSet(importEditorAssetsCommandAtom);
 	const importPending = result.waiting;
 	const error = RendererRuntime.runSync(readSettledAsyncResultErrorFx(result));
 	const importError = error === undefined ? undefined : errorMessage(error);
@@ -156,8 +159,11 @@ export const useEditorAssetManagerController = ({
 			() => noMatchesStatus,
 		)
 		.otherwise(() => undefined);
-	const openImport = useCallback(() => {
-		importInputRef.current?.click();
+	const openArkpackImport = useCallback(() => {
+		arkpackInputRef.current?.click();
+	}, []);
+	const openFilesImport = useCallback(() => {
+		filesInputRef.current?.click();
 	}, []);
 	const changeFilter = useCallback(
 		({ filter: nextFilter }: useEditorAssetManagerController.ChangeFilterProps) => {
@@ -175,36 +181,55 @@ export const useEditorAssetManagerController = ({
 			onQueryChange,
 		],
 	);
+	const onArkpackChange = useCallback<ChangeEventHandler<HTMLInputElement>>(
+		(event) => {
+			const file = event.currentTarget.files?.[0];
+			event.currentTarget.value = "";
+			if (file === undefined) return;
+			importAssets({
+				file,
+				projectId: library.projectId,
+				source: "arkpack",
+			});
+		},
+		[
+			importAssets,
+			library.projectId,
+		],
+	);
 	const onFilesChange = useCallback<ChangeEventHandler<HTMLInputElement>>(
 		(event) => {
 			const files = Array.from(event.currentTarget.files ?? []);
 			event.currentTarget.value = "";
 			if (files.length === 0) return;
-			saveAssets({
+			importAssets({
 				files,
 				projectId: library.projectId,
+				source: "files",
 			});
 		},
 		[
 			library.projectId,
-			saveAssets,
+			importAssets,
 		],
 	);
 
 	return useMemo(
 		() => ({
+			arkpackInputRef,
 			catalogStatus,
 			changeFilter,
 			filter,
 			filters: filterOptions,
-			importButtonLabel: importPending ? "Importing…" : "Import assets",
+			filesInputRef,
 			importError,
-			importInputRef,
 			importPending,
 			importSuccess,
+			onArkpackChange,
 			onFilesChange,
 			onQueryChange: handleQueryChange,
-			openImport,
+			openArkpackImport,
+			openFilesImport,
 			query,
 			resources: library.resources,
 			showHeaderImport: !library.empty,
@@ -220,8 +245,10 @@ export const useEditorAssetManagerController = ({
 			importSuccess,
 			library.empty,
 			library.resources,
+			onArkpackChange,
 			onFilesChange,
-			openImport,
+			openArkpackImport,
+			openFilesImport,
 			query,
 		],
 	);

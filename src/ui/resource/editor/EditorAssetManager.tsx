@@ -1,11 +1,11 @@
 import { memo } from "react";
 
-import { PrimaryButton } from "~/ui/button/Button";
 import {
 	selectableActiveClassName,
 	selectableInactiveClassName,
 } from "~/ui/form/SelectableStateClassName";
 import { EditorAssetCard } from "~/ui/resource/editor/EditorAssetCard";
+import { EditorAssetImportMenu } from "~/ui/resource/editor/EditorAssetImportMenu";
 import { useEditorAssetManagerController } from "~/ui/resource/editor/useEditorAssetManagerController";
 import type { useEditorAssetLibrary } from "~/ui/resource/editor/useEditorAssetLibrary";
 import { Status } from "~/ui/status/Status";
@@ -13,25 +13,6 @@ import { Status } from "~/ui/status/Status";
 export namespace EditorAssetManager {
 	export interface Props extends useEditorAssetManagerController.Props {}
 }
-
-interface EditorAssetImportButtonProps {
-	readonly label: string;
-	readonly onClick: () => void;
-	readonly pending: boolean;
-}
-
-const EditorAssetImportButton = ({ label, onClick, pending }: EditorAssetImportButtonProps) => (
-	<PrimaryButton
-		className="h-12 min-h-0 shrink-0 gap-2"
-		cursorIntent={pending ? "progress" : undefined}
-		data-ui="EditorAssetImport"
-		disabled={pending}
-		onClick={onClick}
-	>
-		<span className="icon-[lucide--upload] size-4" />
-		{label}
-	</PrimaryButton>
-);
 
 interface EditorAssetGridProps {
 	readonly filter: useEditorAssetManagerController.Filter;
@@ -55,9 +36,9 @@ const EditorAssetGrid = memo(({ filter, query, resources }: EditorAssetGridProps
 export const EditorAssetManager = (props: EditorAssetManager.Props) => {
 	const controller = useEditorAssetManagerController(props);
 	const importButton = (
-		<EditorAssetImportButton
-			label={controller.importButtonLabel}
-			onClick={controller.openImport}
+		<EditorAssetImportMenu
+			onImportArkpack={controller.openArkpackImport}
+			onImportFiles={controller.openFilesImport}
 			pending={controller.importPending}
 		/>
 	);
@@ -69,7 +50,16 @@ export const EditorAssetManager = (props: EditorAssetManager.Props) => {
 		>
 			<header className="ak-editor-page-header flex min-w-0 flex-wrap items-center gap-2 p-3">
 				<input
-					ref={controller.importInputRef}
+					ref={controller.arkpackInputRef}
+					type="file"
+					accept=".arkpack"
+					className="sr-only"
+					data-ui="EditorAssetArkpackInput"
+					disabled={controller.importPending}
+					onChange={controller.onArkpackChange}
+				/>
+				<input
+					ref={controller.filesInputRef}
 					type="file"
 					accept="image/png,.png"
 					multiple
@@ -81,20 +71,20 @@ export const EditorAssetManager = (props: EditorAssetManager.Props) => {
 				<input
 					type="search"
 					value={controller.query}
-					className="h-12 min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
+					className="h-12 min-h-12 min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
 					data-ui="EditorAssetSearch"
 					placeholder="Search assets…"
 					onChange={controller.onQueryChange}
 				/>
 				<div
-					className="inline-flex h-12 rounded-lg border border-line bg-surface p-1"
+					className="inline-flex h-12 min-h-12 rounded-lg border border-line bg-surface p-1"
 					data-ui="EditorAssetFilters"
 				>
 					{controller.filters.map((option) => (
 						<button
 							key={option.value}
 							type="button"
-							className={`cursor-pointer rounded-md border px-3 py-2 text-sm font-semibold ${option.selected ? selectableActiveClassName : selectableInactiveClassName}`}
+							className={`h-full min-h-0 cursor-pointer rounded-md border px-3 py-0 text-sm font-semibold ${option.selected ? selectableActiveClassName : selectableInactiveClassName}`}
 							data-filter={option.value}
 							data-selected={option.selected ? "true" : undefined}
 							onClick={() =>

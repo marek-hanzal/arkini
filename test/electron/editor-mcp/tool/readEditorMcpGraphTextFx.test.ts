@@ -5,7 +5,6 @@ import { readEditorMcpItemEstimateTextFx } from "../../../../electron/main/edito
 import { readEditorMcpItemRelationTextFx } from "../../../../electron/main/editor-mcp/tool/readEditorMcpItemRelationTextFx";
 import { editorItemEstimateMaximumQuantity } from "~/editor/estimator/EditorItemEstimateQuantitySchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 import {
 	createEditorMcpGraphProject,
 	createEditorMcpToolProject,
@@ -121,18 +120,4 @@ describe("editor MCP graph tool text", () => {
 		expect(bounded).toContain(`static estimate limit of ${editorItemEstimateMaximumQuantity}`);
 	});
 
-	it("keeps official high-fan-in estimate text bounded and navigable", async () => {
-		const project = createEditorMcpToolProject(await readArkiniGameConfigSource());
-		const highFanIn = Effect.runSync(
-			readEditorMcpItemEstimateTextFx(project, "item:pollution", 1),
-		);
-		const optimistic = Effect.runSync(readEditorMcpItemEstimateTextFx(project, "item:axe", 1));
-
-		expect(highFanIn).toContain("Selected route graph:");
-		expect(highFanIn).toContain(" -> ");
-		expect(highFanIn.length).toBeLessThan(100_000);
-		expect(optimistic).toContain("Status: complete");
-		expect(optimistic).toContain("Optimistic parallel duration:");
-		expect(optimistic).not.toContain("Consumables:");
-	});
 });

@@ -3,23 +3,12 @@ import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
 import { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
+import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
 import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {
-	const startedAt = performance.now();
-	while (!assertion()) {
-		if (performance.now() - startedAt > timeoutMs) {
-			throw new Error("Timed out while waiting for committed transition events.");
-		}
-		await sleep(5);
-	}
-};
 
 describe("committed transition events", () => {
 	it("replays the current transition and then every later commit", async () => {
@@ -82,9 +71,21 @@ describe("committed transition events", () => {
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
-		const batches: unknown[] = [];
+		const batchesBeforeBarrier: GameEventBatchSchema.Type[] = [];
+		let markBarrierDelivered: (() => void) | undefined;
+		const barrierDelivered = new Promise<void>((resolve) => {
+			markBarrierDelivered = resolve;
+		});
 		const unsubscribe = session.subscribeEvents((batch) => {
-			batches.push(batch);
+			if (
+				batch.events.some(
+					(event) => "jobId" in event && event.jobId === "job:event:validation-barrier",
+				)
+			) {
+				markBarrierDelivered?.();
+				return;
+			}
+			batchesBeforeBarrier.push(batch);
 		});
 
 		try {
@@ -126,8 +127,24 @@ describe("committed transition events", () => {
 					),
 				),
 			).rejects.toBeDefined();
-			await sleep(20);
-			expect(batches).toEqual([]);
+			await session.run(
+				modifyRuntimeFx((runtime) =>
+					Effect.succeed([
+						undefined,
+						runtime,
+						[
+							{
+								type: GameEventEnumSchema.enum.JobCompleted,
+								jobId: "job:event:validation-barrier",
+								ownerItemId: "owner:event:validation-barrier",
+								lineId: "line:event:validation-barrier",
+							},
+						],
+					] as const),
+				),
+			);
+			await barrierDelivered;
+			expect(batchesBeforeBarrier).toEqual([]);
 		} finally {
 			unsubscribe();
 			await Effect.runPromise(session.disposeFx);
@@ -140,6 +157,10 @@ describe("committed transition events", () => {
 			tickIntervalMs: 60_000,
 		});
 		const jobIds: string[] = [];
+		let markEventsDelivered: ((deliveredJobIds: ReadonlyArray<string>) => void) | undefined;
+		const eventsDelivered = new Promise<ReadonlyArray<string>>((resolve) => {
+			markEventsDelivered = resolve;
+		});
 		const unsubscribe = session.subscribeEvents((batch) => {
 			jobIds.push(
 				...batch.events.flatMap((event) =>
@@ -150,6 +171,7 @@ describe("committed transition events", () => {
 						: [],
 				),
 			);
+			if (jobIds.length === 2) markEventsDelivered?.([...jobIds]);
 		});
 		let markFirstEntered: (() => void) | undefined;
 		let releaseFirst: (() => void) | undefined;
@@ -203,9 +225,9 @@ describe("committed transition events", () => {
 				first,
 				second,
 			]);
-			await waitFor(() => jobIds.length === 2);
+			const deliveredJobIds = await eventsDelivered;
 
-			expect(jobIds).toEqual([
+			expect(deliveredJobIds).toEqual([
 				"job:event:first",
 				"job:event:second",
 			]);

@@ -1,232 +1,157 @@
 import { describe } from "vitest";
 import {
-	Effect,
 	GameConfigSchema,
 	expect,
 	it,
-	readArkiniGameConfigSource,
-	readItemDetailLinesFx,
-	readRuntimeFx,
-	useGameFx,
+	lineRunTestConfig,
+	readLines,
+	type RuntimeSchema,
 } from "./readItemDetailLinesFx.test/fixture";
 
-describe("readItemDetailLinesFx / deposits and configured sources", () => {
-	it("sums the real charges of every eligible nearby deposit", async () => {
-		const config = await readArkiniGameConfigSource();
-		const lines = Effect.runSync(
-			Effect.gen(function* () {
-				const runtime = yield* readRuntimeFx();
-				return yield* readItemDetailLinesFx({
-					itemId: "runtime:lumberjack",
-					runtime,
-				});
-			}).pipe(
-				useGameFx({
-					config,
-					state: {
-						cheats: {
-							enabled: false,
-							everEnabled: false,
-							instantGameplay: false,
-						},
-						currentSpace: 0,
-						items: [
-							{
-								id: "runtime:lumberjack",
-								itemId: "producer:lumberjack-t1",
-								location: {
-									scope: "board",
-									space: 0,
-									position: {
-										x: 1,
-										y: 1,
-									},
-								},
-								quantity: 1,
-							},
-							{
-								id: "runtime:tree:full",
-								itemId: "item:tree",
-								location: {
-									scope: "board",
-									space: 0,
-									position: {
-										x: 1,
-										y: 0,
-									},
-								},
-								quantity: 1,
-							},
-							{
-								id: "runtime:tree:five",
-								itemId: "item:tree",
-								location: {
-									scope: "board",
-									space: 0,
-									position: {
-										x: 0,
-										y: 1,
-									},
-								},
-								quantity: 1,
-								remainingCharges: 5,
-							},
-							{
-								id: "runtime:tree:ten",
-								itemId: "item:tree",
-								location: {
-									scope: "board",
-									space: 0,
-									position: {
-										x: 1,
-										y: 2,
-									},
-								},
-								quantity: 1,
-								remainingCharges: 10,
-							},
-							{
-								id: "runtime:tree:far",
-								itemId: "item:tree",
-								location: {
-									scope: "board",
-									space: 0,
-									position: {
-										x: 12,
-										y: 8,
-									},
-								},
-								quantity: 1,
-								remainingCharges: 7,
-							},
-						],
-						jobs: [],
+const workshop = lineRunTestConfig.items.workshop;
+if (workshop.type !== "producer") throw new Error("Expected a producer fixture.");
 
-						jobQueue: [],
-						defaultLineByOwnerItemId: {},
+const createDepositConfig = (inputCount: number) =>
+	GameConfigSchema.parse({
+		...lineRunTestConfig,
+		items: {
+			...lineRunTestConfig.items,
+			workshop: {
+				...workshop,
+				lines: [
+					{
+						...workshop.lines[0],
+						id: "line:deposit",
+						title: "Deposit",
+						description: "Consumes nearby charges.",
+						show: true,
+						enable: true,
+						input: Array.from({ length: inputCount }, () => ({
+							charges: {
+								cost: 1,
+								from: "target" as const,
+							},
+							query: {
+								distance: "close" as const,
+								scope: "board" as const,
+								selector: {
+									itemId: "tree",
+									type: "item" as const,
+								},
+							},
+							type: "deposit" as const,
+						})),
+						rules: [],
 					},
-				}),
-			),
+				],
+			},
+			tree: {
+				...lineRunTestConfig.items.water,
+				uid: "tree",
+				id: "tree",
+				title: "Tree",
+				description: "Charged deposit.",
+				charges: {
+					amount: 18,
+				},
+			},
+		},
+	});
+
+const createRuntime = (
+	config: GameConfigSchema.Type,
+	trees: ReadonlyArray<{
+		readonly id: string;
+		readonly x: number;
+		readonly y: number;
+		readonly remainingCharges?: number;
+	}>,
+): RuntimeSchema.Type => ({
+	cheats: {
+		enabled: false,
+		everEnabled: false,
+		instantGameplay: false,
+	},
+	currentSpace: 0,
+	items: [
+		{
+			id: "runtime:workshop",
+			item: config.items.workshop!,
+			location: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: 1,
+					y: 1,
+				},
+			},
+			quantity: 1,
+			revision: "revision:workshop",
+		},
+		...trees.map(({ id, remainingCharges, x, y }) => ({
+			id,
+			item: config.items.tree!,
+			location: {
+				scope: "board" as const,
+				space: 0,
+				position: {
+					x,
+					y,
+				},
+			},
+			quantity: 1,
+			...(remainingCharges === undefined ? {} : { remainingCharges }),
+			revision: `revision:${id}`,
+		})),
+	],
+	jobs: [],
+	jobQueue: [],
+	defaultLineByOwnerItemId: {},
+});
+
+describe("readItemDetailLinesFx / deposits", () => {
+	it("sums charges of eligible nearby deposits", () => {
+		const config = createDepositConfig(1);
+		const lines = readLines(
+			createRuntime(config, [
+				{ id: "runtime:tree:full", x: 1, y: 0 },
+				{ id: "runtime:tree:five", x: 0, y: 1, remainingCharges: 5 },
+				{ id: "runtime:tree:ten", x: 2, y: 1, remainingCharges: 10 },
+				{ id: "runtime:tree:far", x: 4, y: 0, remainingCharges: 7 },
+			]),
+			"runtime:workshop",
+			config,
 		);
 
 		expect(lines.kind).toBe("available");
 		if (lines.kind !== "available") throw new Error("Expected available lines.");
-		expect(
-			lines.line
-				.find((line) => line.lineId === "line:lumberjack-t1:log")
-				?.input.find((input) => input.kind === "deposit"),
-		).toMatchObject({
+		expect(lines.line[0]?.input[0]).toMatchObject({
 			kind: "deposit",
 			requiredCharges: 1,
 			availableCharges: 33,
 			ready: true,
 		});
 	});
-	it("distinguishes a missing deposit target from a present target with insufficient charges", async () => {
-		const config = await readArkiniGameConfigSource();
-		const lumberjack = config.items["producer:lumberjack-t1"];
-		if (lumberjack?.type !== "producer") throw new Error("Missing lumberjack definition.");
-		const testConfig = GameConfigSchema.parse({
-			...config,
-			items: {
-				...config.items,
-				[lumberjack.id]: {
-					...lumberjack,
-					lines: lumberjack.lines.map((line) =>
-						line.id === "line:lumberjack-t1:log-double-tree"
-							? {
-									...line,
-									input: [
-										...line.input,
-										...line.input,
-									],
-								}
-							: line,
-					),
-				},
-			},
-		});
-		const read = (includeDepletedTarget: boolean) =>
-			Effect.runSync(
-				Effect.gen(function* () {
-					const runtime = yield* readRuntimeFx();
-					return yield* readItemDetailLinesFx({
-						itemId: "runtime:lumberjack",
-						runtime,
-					});
-				}).pipe(
-					useGameFx({
-						config: testConfig,
-						state: {
-							cheats: {
-								enabled: false,
-								everEnabled: false,
-								instantGameplay: false,
-							},
-							currentSpace: 0,
-							items: [
-								{
-									id: "runtime:lumberjack",
-									itemId: "producer:lumberjack-t1",
-									location: {
-										scope: "board",
-										space: 0,
-										position: {
-											x: 1,
-											y: 1,
-										},
-									},
-									quantity: 1,
-								},
-								...(includeDepletedTarget
-									? [
-											{
-												id: "runtime:double-tree",
-												itemId: "item:double-tree",
-												location: {
-													scope: "board" as const,
-													space: 0,
-													position: {
-														x: 1,
-														y: 0,
-													},
-												},
-												quantity: 1,
-												remainingCharges: 1,
-											},
-										]
-									: []),
-							],
-							jobs: [],
 
-							jobQueue: [],
-							defaultLineByOwnerItemId: {},
-						},
-					}),
-				),
-			);
-		const missing = read(false);
-		const depleted = read(true);
+	it("distinguishes a missing target from insufficient charges", () => {
+		const config = createDepositConfig(2);
+		const missing = readLines(createRuntime(config, []), "runtime:workshop", config);
+		const depleted = readLines(
+			createRuntime(config, [
+				{ id: "runtime:tree", x: 1, y: 0, remainingCharges: 1 },
+			]),
+			"runtime:workshop",
+			config,
+		);
 		if (missing.kind !== "available" || depleted.kind !== "available") {
-			throw new Error("Expected lumberjack lines.");
+			throw new Error("Expected deposit lines.");
 		}
-		const missingLine = missing.line.find(
-			(line) => line.lineId === "line:lumberjack-t1:log-double-tree",
-		);
-		const depletedLine = depleted.line.find(
-			(line) => line.lineId === "line:lumberjack-t1:log-double-tree",
-		);
 
-		expect(missingLine).toMatchObject({
+		expect(missing.line[0]).toMatchObject({
 			availability: {
 				kind: "unavailable",
 				reason: {
 					kind: "deposit-target-missing",
-					distance: "close",
-					selector: {
-						type: "item",
-						itemId: "item:double-tree",
-					},
 				},
 			},
 			input: [
@@ -239,7 +164,7 @@ describe("readItemDetailLinesFx / deposits and configured sources", () => {
 				},
 			],
 		});
-		expect(depletedLine).toMatchObject({
+		expect(depleted.line[0]).toMatchObject({
 			availability: {
 				kind: "available",
 				readiness: "inputs",
@@ -250,7 +175,7 @@ describe("readItemDetailLinesFx / deposits and configured sources", () => {
 					availableCharges: 1,
 					requiredCharges: 2,
 					targetItemIds: [
-						"runtime:double-tree",
+						"runtime:tree",
 					],
 					ready: false,
 				},

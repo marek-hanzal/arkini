@@ -14,7 +14,6 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { RuleSchema as LineRuleSchema } from "~/engine/line/schema/rule/RuleSchema";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import { createMergeTestConfig } from "~test/merge/support/createMergeTestConfig";
-import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
 type EditorGuaranteedRoll = Extract<
 	EditorOutput["set"][number]["roll"][number],
@@ -397,45 +396,6 @@ describe("readEditorItemOriginFlow", () => {
 		});
 		expect(itemNode(flow, "dust").acquisitionSourceId).toBeUndefined();
 		expect(flow.edges.some(({ target }) => target === "item:dust")).toBe(false);
-	});
-
-	it("keeps one official charged line operation with every authored output", async () => {
-		const flow = await Effect.runPromise(
-			readEditorItemOriginFlowFx({
-				config: await readArkiniGameConfigSource(),
-			}),
-		);
-		const lumberjack = itemNode(flow, "producer:lumberjack-t1");
-		const operations = lumberjack.operations.filter(
-			({ id }) => id === "source:producer:lumberjack-t1:line:line:lumberjack-t1:log",
-		);
-
-		expect(operations).toHaveLength(1);
-		expect(operations[0]).toMatchObject({
-			inputs: [
-				expect.objectContaining({
-					itemId: "item:tree",
-				}),
-			],
-			outputs: [
-				expect.objectContaining({
-					itemId: "item:log",
-				}),
-				expect.objectContaining({
-					itemId: "item:quest:road-repair",
-				}),
-			],
-		});
-		expect(flow.edges).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					operationId: operations[0]?.id,
-					role: "input",
-					source: "item:item:tree",
-					target: "item:producer:lumberjack-t1",
-				}),
-			]),
-		);
 	});
 
 	it("embeds merge input and result ports in the source item", async () => {

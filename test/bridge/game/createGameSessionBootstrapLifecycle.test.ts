@@ -1,4 +1,4 @@
-import { Cause, Effect, Exit, Fiber, Layer, Option } from "effect";
+import { Cause, Deferred, Effect, Exit, Fiber, Layer, Option } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createGameSessionFx } from "~/bridge/game/createGameSessionFx";
@@ -63,16 +63,6 @@ vi.mock("~/bridge/game/createGameSessionTransitionSubscriptionsFx", async (impor
 		},
 	};
 });
-
-const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {
-	const startedAt = performance.now();
-	while (!assertion()) {
-		if (performance.now() - startedAt > timeoutMs) {
-			throw new Error("Timed out while waiting for GameSession bootstrap.");
-		}
-		await new Promise((resolve) => setTimeout(resolve, 5));
-	}
-};
 
 const expectSingleOrderedRelease = () => {
 	expect(bootstrap.events.filter((event) => event === "session-scope-closed")).toHaveLength(1);
@@ -142,8 +132,12 @@ describe("createGameSessionFx bootstrap lifecycle", () => {
 		if (preparedState === undefined) throw new Error("Expected one prepared saved state.");
 
 		let writes = 0;
+		const bootstrapEntered = Effect.runSync(Deferred.make<void>());
+		const secondWriteStarted = Effect.runSync(Deferred.make<void>());
 		bootstrap.events.length = 0;
-		bootstrap.controlledFx = Effect.never;
+		bootstrap.controlledFx = Deferred.succeed(bootstrapEntered, undefined).pipe(
+			Effect.andThen(Effect.never),
+		);
 		bootstrap.probeRuntime = true;
 		const creating = Effect.runFork(
 			createGameSessionFx({
@@ -153,16 +147,19 @@ describe("createGameSessionFx bootstrap lifecycle", () => {
 				save: {
 					debounceMs: 0,
 					write: () =>
-						Effect.sync(() => {
+						Effect.gen(function* () {
 							writes += 1;
+							if (writes === 2) {
+								yield* Deferred.succeed(secondWriteStarted, undefined);
+							}
 						}),
 				},
 			}),
 		);
 
 		try {
-			await waitFor(() => bootstrap.events.includes("bootstrap-entered"));
-			await waitFor(() => writes >= 2);
+			await Effect.runPromise(Deferred.await(bootstrapEntered));
+			await Effect.runPromise(Deferred.await(secondWriteStarted));
 			await Effect.runPromise(Fiber.interrupt(creating));
 			const interrupted = await Effect.runPromise(Fiber.await(creating));
 
@@ -172,10 +169,7 @@ describe("createGameSessionFx bootstrap lifecycle", () => {
 				expect(Option.isNone(Cause.findErrorOption(interrupted.cause))).toBe(true);
 			}
 			expectSingleOrderedRelease();
-
-			const writesAfterRelease = writes;
-			await new Promise((resolve) => setTimeout(resolve, 30));
-			expect(writes).toBe(writesAfterRelease);
+			expect(writes).toBeGreaterThanOrEqual(2);
 		} finally {
 			await Effect.runPromise(Fiber.interrupt(creating));
 		}

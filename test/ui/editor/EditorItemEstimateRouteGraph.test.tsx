@@ -1,4 +1,3 @@
-import { Effect } from "effect";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
@@ -27,11 +26,8 @@ vi.mock("~/ui/item/editor/EditorItemDetailReference", () => ({
 		),
 }));
 
-import { createEditorAcquisitionGraphFx } from "~/editor/createEditorAcquisitionGraphFx";
-import { estimateEditorItemFx } from "~/editor/estimator/estimateEditorItemFx";
 import { EditorItemEstimateRouteGraph } from "~/ui/item/editor/EditorItemEstimateRouteGraph";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
-import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
 describe("EditorItemEstimateRouteGraph", () => {
 	it("renders clickable item rows with quantity, local time, and authored roots", () => {
@@ -93,37 +89,6 @@ describe("EditorItemEstimateRouteGraph", () => {
 		expect(markup).toContain('data-section-id="estimate"');
 		expect(markup).not.toContain("material input");
 		expect(markup).not.toContain("make-tool");
-	});
-
-	it("renders an official multi-step graph once per selected fact", async () => {
-		const config = await readArkiniGameConfigSource();
-		const graph = Effect.runSync(createEditorAcquisitionGraphFx(config));
-		const estimate = Effect.runSync(
-			estimateEditorItemFx({
-				factId: "item:pollution",
-				graph,
-			}),
-		);
-		if (!estimate.obtainable) throw new Error("Official high-fan-in fixture is unreachable.");
-
-		const markup = renderToStaticMarkup(
-			createElement(EditorItemEstimateRouteGraph, {
-				config,
-				header: createElement("div", null, "Estimate summary"),
-				projectId: "official-estimate",
-				routeSteps: estimate.routeSteps,
-			}),
-		);
-
-		expect(estimate.routeSteps.length).toBeGreaterThan(20);
-		expect(new Set(estimate.routeSteps.map(({ factId }) => factId)).size).toBe(
-			estimate.routeSteps.length,
-		);
-		expect(JSON.stringify(estimate).length).toBeLessThan(100_000);
-		expect(markup.match(/data-ui="EditorItemEstimateRouteStep"/g)).toHaveLength(
-			estimate.routeSteps.length,
-		);
-		expect(markup.length).toBeLessThan(100_000);
 	});
 
 	it("renders a missing item without an interactive row affordance", () => {

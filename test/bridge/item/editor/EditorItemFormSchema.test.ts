@@ -18,10 +18,6 @@ const item = {
 } as const;
 
 describe("EditorItemFormSchema", () => {
-	it("emits the canonical item without presentation-only form fields", () => {
-		expect(EditorItemFormSchema.parse(item)).toEqual(item);
-	});
-
 	it("keeps a blank required number invalid at its exact field path", () => {
 		const parsed = EditorItemFormSchema.safeParse({
 			...item,

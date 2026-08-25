@@ -116,6 +116,9 @@ describe("EditorHistoryBackButton", () => {
 			"/editor/project-test/flow?direction=output&itemId=item%3Awater",
 			"/editor/project-test/editor/items/water/detail/identity",
 		]);
+		document.addEventListener("click", (event) => event.preventDefault(), {
+			once: true,
+		});
 		await act(async () =>
 			fromFlow.button?.dispatchEvent(
 				new MouseEvent("click", {

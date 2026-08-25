@@ -162,7 +162,7 @@ Biome format check
 → production Electron build and built-CLI official Arkpack signing
 → Dependency Cruiser architecture rules against generated build inputs
 → copy/paste detection
-→ the one-process Vitest suite
+→ the isolated parallel Vitest suite
 ```
 
 Application commands:
@@ -225,18 +225,19 @@ mac-arm64/Arkini.app
 
 Verify downloads with `shasum -a 256 -c SHA256SUMS`. These development artifacts are intentionally unsigned and unnotarized. macOS may require opening the application through Finder's **Open** action or allowing it from **System Settings → Privacy & Security**. Do not add ad-hoc signing, fake certificates, or notarization placeholders to this milestone.
 
-The [macOS prerelease workflow](.github/workflows/macos-prerelease.yml) installs the repository tools through `mise-action` and invokes the same `./Argcfile.sh ci-macos` entrypoint on the GitHub-hosted `macos-15` Apple Silicon runner. That recipe runs formatting and type gates, packages exactly once, then runs Dependency Cruiser, copy/paste detection, and the one-process test suite against those generated package inputs. Manual dispatch uploads a normal workflow artifact only. Tags matching `v*-dev.*`, such as `v0.1.0-dev.1`, also create an immutable GitHub prerelease containing the DMG, ZIP, and `SHA256SUMS`. Normal source pushes do not spend macOS runner time.
+The [macOS prerelease workflow](.github/workflows/macos-prerelease.yml) installs the repository tools through `mise-action` and invokes the same `./Argcfile.sh ci-macos` entrypoint on the GitHub-hosted `macos-15` Apple Silicon runner. That recipe runs formatting and type gates, packages exactly once, then runs Dependency Cruiser, copy/paste detection, and the isolated parallel test suite. Manual dispatch uploads a normal workflow artifact only. Tags matching `v*-dev.*`, such as `v0.1.0-dev.1`, also create an immutable GitHub prerelease containing the DMG, ZIP, and `SHA256SUMS`. Normal source pushes do not spend macOS runner time.
 
 Useful focused commands:
 
 ```bash
 ./Argcfile.sh format
 ./Argcfile.sh typecheck
-./Argcfile.sh test
+argc test
+argc test test/job
 ./Argcfile.sh llm:cache
 ```
 
-`./Argcfile.sh test` is the canonical one-process full-suite command. `llm:cache` builds and verifies a network-free Linux x64 npm cache, then archives it as `arkini-npm-cache-linux-x64-<lock-hash>.tgz`.
+`argc test` is the canonical full-suite command and uses isolated worker threads capped at half of the available CPUs. Additional arguments filter Vitest by file or directory for fast local feedback. `llm:cache` builds and verifies a network-free Linux x64 npm cache, then archives it as `arkini-npm-cache-linux-x64-<lock-hash>.tgz`.
 
 
 ## Local packages and saves

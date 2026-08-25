@@ -1,9 +1,13 @@
 import type { BrowserWindow } from "electron";
-import { fileURLToPath } from "node:url";
+import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { Effect } from "effect";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { importEditorJsonDirectoryFx } from "../../../electron/main/editor-project/importEditorJsonDirectoryFx";
+import { createTestPngBytes } from "~test/bridge/arkpack/support/createTestPngBytes";
+import { createRootSource } from "~test/validation/support/gameValidationTestSource";
 import { createEditorProjectIpcRepository } from "./ipc/support/createEditorProjectIpcRepository";
 
 const electron = vi.hoisted(() => ({
@@ -16,11 +20,25 @@ vi.mock("electron", () => ({
 	},
 }));
 
-const ArkiniDirectory = fileURLToPath(new URL("../../../game/arkini/", import.meta.url));
 const window = {} as BrowserWindow;
+let directory = "";
 
-beforeEach(() => {
+beforeEach(async () => {
 	electron.showOpenDialog.mockReset();
+	directory = await mkdtemp(join(tmpdir(), "arkini-json-import-"));
+	await mkdir(join(directory, "resources"));
+	await writeFile(
+		join(directory, "game.json"),
+		JSON.stringify(createRootSource({ path: "game.json" }).value),
+	);
+	await writeFile(join(directory, "resources", "hero.png"), createTestPngBytes());
+});
+
+afterEach(async () => {
+	await rm(directory, {
+		force: true,
+		recursive: true,
+	});
 });
 
 describe("importEditorJsonDirectoryFx", () => {
@@ -29,7 +47,7 @@ describe("importEditorJsonDirectoryFx", () => {
 		electron.showOpenDialog.mockResolvedValue({
 			canceled: false,
 			filePaths: [
-				ArkiniDirectory,
+				directory,
 			],
 		});
 
@@ -43,10 +61,14 @@ describe("importEditorJsonDirectoryFx", () => {
 		expect(project?.projectId).toBe("project-one");
 		expect(repository.createProjectFx).toHaveBeenCalledOnce();
 		const request = vi.mocked(repository.createProjectFx).mock.calls[0]?.[0];
-		expect(request?.projectId).toBe("arkini");
+		expect(request?.projectId).toBe("game:test");
 		expect(request?.version).toBe("1.0");
-		expect(request?.resources.some(({ id }) => id === "hero")).toBe(true);
-		expect(request?.resources.every(({ mime }) => mime === "image/png")).toBe(true);
+		expect(request?.resources).toEqual([
+			expect.objectContaining({
+				id: "hero",
+				mime: "image/png",
+			}),
+		]);
 	});
 
 	it("treats a canceled directory chooser as a no-op", async () => {

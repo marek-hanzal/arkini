@@ -8,7 +8,7 @@ import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 
-import { emitCompletedEventFx, waitFor } from "./createGameSession.test/fixture";
+import { emitCompletedEventFx } from "./createGameSession.test/fixture";
 
 describe("createGameSessionFx / callback ordering", () => {
 	it("updates the canonical runtime before delivering transition events", async () => {
@@ -16,15 +16,18 @@ describe("createGameSessionFx / callback ordering", () => {
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
-		let observedStartedJob = false;
+		let publishObservedStartedJob: ((observed: boolean) => void) | undefined;
+		const observedStartedJob = new Promise<boolean>((resolve) => {
+			publishObservedStartedJob = resolve;
+		});
 		const unsubscribe = session.subscribeEvents((batch) => {
 			const started = batch.events.find(
 				(event) => event.type === GameEventEnumSchema.enum.JobStarted,
 			);
 			if (started !== undefined) {
-				observedStartedJob = session
-					.getSnapshot()
-					.jobs.some((job) => job.id === started.jobId);
+				publishObservedStartedJob?.(
+					session.getSnapshot().jobs.some((job) => job.id === started.jobId),
+				);
 			}
 		});
 
@@ -37,8 +40,7 @@ describe("createGameSessionFx / callback ordering", () => {
 				}),
 			);
 
-			await waitFor(() => observedStartedJob);
-			expect(observedStartedJob).toBe(true);
+			expect(await observedStartedJob).toBe(true);
 		} finally {
 			unsubscribe();
 			await Effect.runPromise(session.disposeFx);
@@ -51,13 +53,23 @@ describe("createGameSessionFx / callback ordering", () => {
 		});
 		let runtimeNotifications = 0;
 		let eventNotifications = 0;
-		let observedSnapshot = session.getSnapshot();
+		let markRuntimeDelivered: (() => void) | undefined;
+		const runtimeDelivered = new Promise<void>((resolve) => {
+			markRuntimeDelivered = resolve;
+		});
+		let publishEventSnapshot:
+			| ((snapshot: ReturnType<typeof session.getSnapshot>) => void)
+			| undefined;
+		const eventSnapshot = new Promise<ReturnType<typeof session.getSnapshot>>((resolve) => {
+			publishEventSnapshot = resolve;
+		});
 		const unsubscribeRuntime = session.subscribe(() => {
 			runtimeNotifications += 1;
+			markRuntimeDelivered?.();
 		});
 		const unsubscribeEvents = session.subscribeEvents(() => {
 			eventNotifications += 1;
-			observedSnapshot = session.getSnapshot();
+			publishEventSnapshot?.(session.getSnapshot());
 		});
 
 		try {
@@ -82,7 +94,10 @@ describe("createGameSessionFx / callback ordering", () => {
 			);
 			const committed = session.getSnapshot();
 			expect(committed).not.toBe(before);
-			await waitFor(() => runtimeNotifications === 1 && eventNotifications === 1);
+			const observedSnapshot = await eventSnapshot;
+			await runtimeDelivered;
+			expect(runtimeNotifications).toBe(1);
+			expect(eventNotifications).toBe(1);
 			expect(observedSnapshot).toBe(committed);
 		} finally {
 			unsubscribeRuntime();
@@ -97,8 +112,17 @@ describe("createGameSessionFx / callback ordering", () => {
 		});
 		const nestedJobIds: string[] = [];
 		let nestedUnsubscribe: (() => void) | undefined;
+		let markNestedSubscribed: (() => void) | undefined;
+		const nestedSubscribed = new Promise<void>((resolve) => {
+			markNestedSubscribed = resolve;
+		});
+		let publishNestedJobIds: ((jobIds: ReadonlyArray<string>) => void) | undefined;
+		const nestedEventsDelivered = new Promise<ReadonlyArray<string>>((resolve) => {
+			publishNestedJobIds = resolve;
+		});
 		const unsubscribeRuntime = session.subscribe(() => {
-			nestedUnsubscribe ??= session.subscribeEvents((batch) => {
+			if (nestedUnsubscribe !== undefined) return;
+			nestedUnsubscribe = session.subscribeEvents((batch) => {
 				nestedJobIds.push(
 					...batch.events.flatMap((event) =>
 						"jobId" in event
@@ -108,7 +132,13 @@ describe("createGameSessionFx / callback ordering", () => {
 							: [],
 					),
 				);
+				if (nestedJobIds.includes("job:nested:next")) {
+					publishNestedJobIds?.([
+						...nestedJobIds,
+					]);
+				}
 			});
+			markNestedSubscribed?.();
 		});
 
 		try {
@@ -130,13 +160,9 @@ describe("createGameSessionFx / callback ordering", () => {
 					] as const),
 				),
 			);
-			await waitFor(() => nestedUnsubscribe !== undefined);
-			await new Promise((resolve) => setTimeout(resolve, 20));
-			expect(nestedJobIds).toEqual([]);
-
+			await nestedSubscribed;
 			await session.run(emitCompletedEventFx("job:nested:next"));
-			await waitFor(() => nestedJobIds.length === 1);
-			expect(nestedJobIds).toEqual([
+			expect(await nestedEventsDelivered).toEqual([
 				"job:nested:next",
 			]);
 		} finally {
@@ -151,6 +177,10 @@ describe("createGameSessionFx / callback ordering", () => {
 			tickIntervalMs: 60_000,
 		});
 		const batches: Array<ReadonlyArray<string>> = [];
+		let publishBatches: ((batches: ReadonlyArray<ReadonlyArray<string>>) => void) | undefined;
+		const batchesDelivered = new Promise<ReadonlyArray<ReadonlyArray<string>>>((resolve) => {
+			publishBatches = resolve;
+		});
 		const unsubscribe = session.subscribeEvents((batch) => {
 			const jobEvents = batch.events.flatMap((event) =>
 				event.type === GameEventEnumSchema.enum.JobStarted ||
@@ -160,7 +190,15 @@ describe("createGameSessionFx / callback ordering", () => {
 						]
 					: [],
 			);
-			if (jobEvents.length > 0) batches.push(jobEvents);
+			if (jobEvents.length > 0) {
+				batches.push(jobEvents);
+				if (batches.length === 2)
+					publishBatches?.(
+						batches.map((events) => [
+							...events,
+						]),
+					);
+			}
 		});
 
 		try {
@@ -184,8 +222,7 @@ describe("createGameSessionFx / callback ordering", () => {
 			);
 			expect(session.getSnapshot().jobs).toHaveLength(0);
 
-			await waitFor(() => batches.length === 2);
-			expect(batches).toEqual([
+			expect(await batchesDelivered).toEqual([
 				[
 					"job:started",
 				],

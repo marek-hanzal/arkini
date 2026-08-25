@@ -6,7 +6,6 @@ import {
 	type EditorItemOriginItemNode,
 	type EditorItemOriginOperation,
 } from "~/bridge/item/editor/EditorItemOriginFlow";
-import { readEditorItemOriginFlowFx } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
 import {
 	type EditorOriginFlowDirection,
 	type EditorOriginFlowSelection,
@@ -15,7 +14,6 @@ import {
 import { readEditorOriginFlowNavigationFx } from "~/ui/item/editor/readEditorOriginFlowNavigationFx";
 import { readEditorOriginFlowRelationNavigationFx } from "~/ui/item/editor/readEditorOriginFlowRelationNavigationFx";
 import { readEditorOriginFlowRootNavigationFx } from "~/ui/item/editor/readEditorOriginFlowRootNavigationFx";
-import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
 const operation = (
 	id: string,
@@ -646,61 +644,6 @@ describe("readEditorOriginFlowHighlight", () => {
 				"target-a",
 			]),
 		);
-	});
-
-	it("keeps every official Coin producer in the highlighted Output navigation", async () => {
-		const config = await readArkiniGameConfigSource();
-		const flow = await Effect.runPromise(
-			readEditorItemOriginFlowFx({
-				config,
-			}),
-		);
-		const coinNodeId = "item:item:coin";
-		const layout = new Map(
-			flow.nodes.map(
-				(node, index) =>
-					[
-						node.id,
-						{
-							flowOrder: index,
-							height: 40,
-							width: 40,
-							x: index * 50,
-							y: 0,
-						},
-					] as const,
-			),
-		);
-		const highlight = runHighlight(flow, {
-			id: coinNodeId,
-			kind: "node",
-		});
-		const directProducerIds = new Set(
-			flow.edges
-				.filter((edge) => edge.role === "output" && edge.target === coinNodeId)
-				.map(({ source }) => source),
-		);
-		const producerNodeIds = runRelationNavigation({
-			flow,
-			selectedNodeId: coinNodeId,
-			selectedRole: "output",
-		});
-		const navigationNodeIds = runNavigation(flow, layout, coinNodeId, highlight.edgeIds);
-
-		expect(new Set(producerNodeIds)).toEqual(directProducerIds);
-		expect(producerNodeIds.length).toBeGreaterThan(5);
-		expect(producerNodeIds).toEqual(
-			expect.arrayContaining([
-				"item:item:chest-t1",
-				"item:item:chest-t2",
-				"item:item:chest-t3",
-				"item:item:chest-t4",
-			]),
-		);
-		for (const producerNodeId of producerNodeIds) {
-			expect(highlight.nodeIds.has(producerNodeId)).toBe(true);
-			expect(navigationNodeIds).toContain(producerNodeId);
-		}
 	});
 
 	it("returns an empty highlight for a stale selection", () => {

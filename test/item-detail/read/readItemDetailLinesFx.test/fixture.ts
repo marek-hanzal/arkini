@@ -9,7 +9,6 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { lineRunRuntime, lineRunTestConfig } from "~test/line/fx/run/support/lineRunTestRuntime";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
 export {
 	Effect,
@@ -21,7 +20,6 @@ export {
 	it,
 	lineRunRuntime,
 	lineRunTestConfig,
-	readArkiniGameConfigSource,
 	readItemDetailLinesFx,
 	readRuntimeFx,
 	startFx,

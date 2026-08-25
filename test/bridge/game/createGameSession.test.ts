@@ -8,7 +8,7 @@ import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { createTickFailureTestConfig } from "~test/tick/support/createTickFailureTestConfig";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 
-import { emitCompletedEventFx, waitFor } from "./createGameSession.test/fixture";
+import { emitCompletedEventFx } from "./createGameSession.test/fixture";
 
 describe("createGameSessionFx / fail-stop", () => {
 	it("freezes the exact session before publishing a presentation failure", async () => {
@@ -120,11 +120,23 @@ describe("createGameSessionFx / fail-stop", () => {
 			tickIntervalMs: 60_000,
 		});
 		let runtimeNotifications = 0;
+		let markRuntimeDelivered: (() => void) | undefined;
+		const runtimeDelivered = new Promise<void>((resolve) => {
+			markRuntimeDelivered = resolve;
+		});
+		let markFatalDelivered: (() => void) | undefined;
+		const fatalDelivered = new Promise<void>((resolve) => {
+			markFatalDelivered = resolve;
+		});
 		const unsubscribeThrowingRuntime = session.subscribe(() => {
 			throw new Error("runtime listener exploded");
 		});
 		const unsubscribeHealthyRuntime = session.subscribe(() => {
 			runtimeNotifications += 1;
+			markRuntimeDelivered?.();
+		});
+		const unsubscribeFatal = session.subscribeFatalError(() => {
+			markFatalDelivered?.();
 		});
 
 		try {
@@ -142,8 +154,10 @@ describe("createGameSessionFx / fail-stop", () => {
 					quantity: 1,
 				}),
 			);
-			await waitFor(() => session.getFatalError() !== null);
-			await new Promise((resolve) => setTimeout(resolve, 20));
+			await Promise.all([
+				fatalDelivered,
+				runtimeDelivered,
+			]);
 
 			expect(runtimeNotifications).toBe(1);
 			expect(session.getFatalError()?.source).toBe("subscription");
@@ -156,6 +170,7 @@ describe("createGameSessionFx / fail-stop", () => {
 		} finally {
 			unsubscribeThrowingRuntime();
 			unsubscribeHealthyRuntime();
+			unsubscribeFatal();
 			await Effect.runPromise(session.disposeFx);
 		}
 	});
@@ -164,16 +179,24 @@ describe("createGameSessionFx / fail-stop", () => {
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
+		let markFatalDelivered: (() => void) | undefined;
+		const fatalDelivered = new Promise<void>((resolve) => {
+			markFatalDelivered = resolve;
+		});
+		const unsubscribeFatal = session.subscribeFatalError(() => {
+			markFatalDelivered?.();
+		});
 		const unsubscribe = session.subscribeEvents(async () => {
 			throw new Error("async event listener exploded");
 		});
 
 		try {
 			await session.run(emitCompletedEventFx("job:listener:rejected"));
-			await waitFor(() => session.getFatalError() !== null);
+			await fatalDelivered;
 			expect(session.getFatalError()?.source).toBe("subscription");
 		} finally {
 			unsubscribe();
+			unsubscribeFatal();
 			await Effect.runPromise(session.disposeFx);
 		}
 	});
@@ -184,8 +207,13 @@ describe("createGameSessionFx / fail-stop", () => {
 			tickIntervalMs: 5,
 		});
 		let notifications = 0;
+		let markFatalDelivered: (() => void) | undefined;
+		const fatalDelivered = new Promise<void>((resolve) => {
+			markFatalDelivered = resolve;
+		});
 		const unsubscribe = session.subscribeFatalError(() => {
 			notifications += 1;
+			markFatalDelivered?.();
 		});
 
 		try {
@@ -212,9 +240,11 @@ describe("createGameSessionFx / fail-stop", () => {
 			);
 			delete (config.items as Record<string, unknown>).inventoryOutput;
 
-			await waitFor(() => session.getFatalError() !== null, 2_000);
-			await new Promise((resolve) => setTimeout(resolve, 30));
-			expect(session.getFatalError()?.source).toBe("tick");
+			await fatalDelivered;
+			const fatal = session.getFatalError();
+			expect(fatal?.source).toBe("tick");
+			session.failStop("presentation", new Error("later failure"));
+			expect(session.getFatalError()).toBe(fatal);
 			expect(notifications).toBe(1);
 			await expect(session.run(Effect.void)).rejects.toMatchObject({
 				_tag: "GameSessionNotRunningError",

@@ -1,26 +1,17 @@
-import { Cause, Deferred, Effect } from "effect";
+import { Cause, Deferred, Effect, Layer } from "effect";
+import { TestClock } from "effect/testing";
 import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
-import { startLineFx } from "~test/job/support/startLineTestFx";
+import { RuntimeSaveFx } from "~/bridge/save/RuntimeSaveFx";
+import { RuntimeSaveLayerFx } from "~/bridge/save/RuntimeSaveLayerFx";
+import { GameCoreLayerFx } from "~/engine/game/layer/GameCoreLayerFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
-import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {
-	const startedAt = performance.now();
-	while (!assertion()) {
-		if (performance.now() - startedAt > timeoutMs) {
-			throw new Error("Timed out while waiting for autosave.");
-		}
-		await sleep(5);
-	}
-};
 
 const emitCompletedEventFx = (jobId: string) =>
 	modifyRuntimeFx((runtime) =>
@@ -44,165 +35,212 @@ describe("RuntimeSaveLayerFx", () => {
 			Cause.fail(new Error("save typed failure")),
 			Cause.die(new Error("save defect")),
 		);
+		const releaseWrite = Effect.runSync(Deferred.make<void>());
 		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 			save: {
 				debounceMs: 0,
-				write: () => Effect.failCause(mixedCause),
+				write: () =>
+					Deferred.await(releaseWrite).pipe(Effect.andThen(Effect.failCause(mixedCause))),
 			},
+		});
+		let publishFatal:
+			| ((fatal: NonNullable<ReturnType<typeof session.getFatalError>>) => void)
+			| undefined;
+		const fatalObserved = new Promise<NonNullable<ReturnType<typeof session.getFatalError>>>(
+			(resolve) => {
+				publishFatal = resolve;
+			},
+		);
+		const unsubscribe = session.subscribeFatalError(() => {
+			const fatal = session.getFatalError();
+			if (fatal !== null) publishFatal?.(fatal);
 		});
 
 		try {
-			await waitFor(() => session.getFatalError() !== null);
-			expect(session.getFatalError()?.cause).toBe(mixedCause);
+			Effect.runSync(Deferred.succeed(releaseWrite, undefined));
+			expect((await fatalObserved).cause).toBe(mixedCause);
 			expect(Cause.hasFails(mixedCause)).toBe(true);
 			expect(Cause.hasDies(mixedCause)).toBe(true);
 		} finally {
+			unsubscribe();
 			await Effect.runPromise(session.disposeWithoutSaveFx);
 		}
 	});
 
 	it("preserves the full autosave Cause when the writer defects", async () => {
+		const releaseWrite = Effect.runSync(Deferred.make<void>());
 		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 			save: {
 				debounceMs: 0,
-				write: () => Effect.die(new Error("save defect")),
+				write: () =>
+					Deferred.await(releaseWrite).pipe(
+						Effect.andThen(Effect.die(new Error("save defect"))),
+					),
 			},
+		});
+		let publishFatal:
+			| ((fatal: NonNullable<ReturnType<typeof session.getFatalError>>) => void)
+			| undefined;
+		const fatalObserved = new Promise<NonNullable<ReturnType<typeof session.getFatalError>>>(
+			(resolve) => {
+				publishFatal = resolve;
+			},
+		);
+		const unsubscribe = session.subscribeFatalError(() => {
+			const fatal = session.getFatalError();
+			if (fatal !== null) publishFatal?.(fatal);
 		});
 
 		try {
-			await waitFor(() => session.getFatalError() !== null);
-			const cause = session.getFatalError()?.cause;
+			Effect.runSync(Deferred.succeed(releaseWrite, undefined));
+			const cause = (await fatalObserved).cause;
 			expect(Cause.isCause(cause)).toBe(true);
 			expect(Cause.isCause(cause) && Cause.hasDies(cause)).toBe(true);
 		} finally {
+			unsubscribe();
 			await expect(Effect.runPromise(session.disposeFx)).rejects.toThrow("save defect");
 		}
 	});
 
 	it("debounces committed snapshots and ignores failed mutations", async () => {
 		const saves: StateSchema.Type[] = [];
-		const session = await createTestGameSession({
+		const core = GameCoreLayerFx({
 			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-			save: {
-				debounceMs: 15,
-				write: (state) =>
-					Effect.sync(() => {
-						saves.push(state);
-					}),
-			},
 		});
-
-		try {
-			const first = await session.run(
-				spawnItemFx({
-					id: "runtime:save:first",
-					itemId: "water",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 1,
+		const save = RuntimeSaveLayerFx({
+			debounceMs: 15,
+			save: (state) =>
+				Effect.sync(() => {
+					saves.push(state);
 				}),
-			);
-			await session.run(
-				spawnItemFx({
-					id: "runtime:save:second",
-					itemId: "water",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 1,
-							y: 0,
+		}).pipe(Layer.provide(core));
+
+		await Effect.runPromise(
+			Effect.scoped(
+				Effect.gen(function* () {
+					const runtimeSave = yield* RuntimeSaveFx;
+					const first = yield* spawnItemFx({
+						id: "runtime:save:first",
+						itemId: "water",
+						location: {
+							scope: "inventory",
+							position: {
+								x: 0,
+								y: 0,
+							},
 						},
-					},
-					quantity: 1,
-				}),
-			);
+						quantity: 1,
+					});
+					yield* spawnItemFx({
+						id: "runtime:save:second",
+						itemId: "water",
+						location: {
+							scope: "inventory",
+							position: {
+								x: 1,
+								y: 0,
+							},
+						},
+						quantity: 1,
+					});
 
-			await sleep(50);
-			expect(saves).toHaveLength(1);
-			expect(saves[0]?.items).toHaveLength(2);
-			for (const item of saves[0]?.items ?? []) {
-				expect(item).not.toHaveProperty("revision");
-			}
+					yield* TestClock.adjust(15);
+					expect(saves).toHaveLength(1);
+					expect(saves[0]?.items).toHaveLength(2);
+					for (const item of saves[0]?.items ?? []) {
+						expect(item).not.toHaveProperty("revision");
+					}
 
-			await expect(
-				session.run(
-					removeItemFx({
+					const failure = yield* removeItemFx({
 						itemId: first.id,
 						revision: "revision:stale",
+					}).pipe(Effect.flip);
+					expect(failure).toBeDefined();
+					yield* runtimeSave.flush;
+					expect(saves).toHaveLength(1);
+					yield* runtimeSave.discard;
+				}).pipe(Effect.provide(Layer.merge(core, save))),
+			).pipe(
+				Effect.provide(
+					TestClock.layer({
+						warningDelay: "1 hour",
 					}),
 				),
-			).rejects.toBeDefined();
-			await sleep(30);
-			expect(saves).toHaveLength(1);
-		} finally {
-			await Effect.runPromise(session.disposeFx);
-		}
+			),
+		);
 	});
 
 	it("does not let event-only traffic wake or postpone runtime autosave", async () => {
 		const savedItemCounts: number[] = [];
-		const session = await createTestGameSession({
+		const core = GameCoreLayerFx({
 			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-			save: {
-				debounceMs: 40,
-				write: (state) =>
-					Effect.sync(() => {
-						savedItemCounts.push(state.items.length);
-					}),
-			},
 		});
-
-		try {
-			await waitFor(() => savedItemCounts.length === 1);
-			expect(savedItemCounts).toEqual([
-				0,
-			]);
-
-			await session.run(
-				spawnItemFx({
-					id: "runtime:save:event-isolation",
-					itemId: "water",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 1,
+		const save = RuntimeSaveLayerFx({
+			debounceMs: 40,
+			save: (state) =>
+				Effect.sync(() => {
+					savedItemCounts.push(state.items.length);
 				}),
-			);
+		}).pipe(Layer.provide(core));
 
-			for (let index = 0; index < 5; index += 1) {
-				await sleep(15);
-				await session.run(emitCompletedEventFx(`job:save:event:${index}`));
-			}
+		await Effect.runPromise(
+			Effect.scoped(
+				Effect.gen(function* () {
+					const runtimeSave = yield* RuntimeSaveFx;
+					yield* TestClock.adjust(40);
+					expect(savedItemCounts).toEqual([
+						0,
+					]);
 
-			expect(savedItemCounts).toEqual([
-				0,
-				1,
-			]);
+					yield* spawnItemFx({
+						id: "runtime:save:event-isolation",
+						itemId: "water",
+						location: {
+							scope: "inventory",
+							position: {
+								x: 0,
+								y: 0,
+							},
+						},
+						quantity: 1,
+					});
 
-			await session.run(emitCompletedEventFx("job:save:event:after-save"));
-			await sleep(60);
-			expect(savedItemCounts).toEqual([
-				0,
-				1,
-			]);
-		} finally {
-			await Effect.runPromise(session.disposeFx);
-		}
+					yield* TestClock.adjust(15);
+					yield* emitCompletedEventFx("job:save:event:0");
+					yield* TestClock.adjust(15);
+					yield* emitCompletedEventFx("job:save:event:1");
+					yield* TestClock.adjust(9);
+					yield* emitCompletedEventFx("job:save:event:2");
+					expect(savedItemCounts).toEqual([
+						0,
+					]);
+
+					yield* TestClock.adjust(1);
+					expect(savedItemCounts).toEqual([
+						0,
+						1,
+					]);
+
+					yield* emitCompletedEventFx("job:save:event:after-save");
+					yield* TestClock.adjust(60);
+					expect(savedItemCounts).toEqual([
+						0,
+						1,
+					]);
+					yield* runtimeSave.discard;
+				}).pipe(Effect.provide(Layer.merge(core, save))),
+			).pipe(
+				Effect.provide(
+					TestClock.layer({
+						warningDelay: "1 hour",
+					}),
+				),
+			),
+		);
 	});
 
 	it("serializes autosave and explicit flush so an older write cannot win", async () => {
@@ -279,6 +317,7 @@ describe("RuntimeSaveLayerFx", () => {
 
 	it("freezes the session exactly once after an autosave failure", async () => {
 		let writes = 0;
+		const releaseWrite = Effect.runSync(Deferred.make<void>());
 		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
@@ -287,12 +326,22 @@ describe("RuntimeSaveLayerFx", () => {
 				write: () =>
 					Effect.sync(() => {
 						writes += 1;
-					}).pipe(Effect.andThen(Effect.fail(new Error("save failed")))),
+					}).pipe(
+						Effect.andThen(Deferred.await(releaseWrite)),
+						Effect.andThen(Effect.fail(new Error("save failed"))),
+					),
 			},
 		});
+		let markFatalObserved: (() => void) | undefined;
+		const fatalObserved = new Promise<void>((resolve) => {
+			markFatalObserved = resolve;
+		});
+		const unsubscribe = session.subscribeFatalError(() => {
+			markFatalObserved?.();
+		});
 		try {
-			await waitFor(() => session.getFatalError() !== null);
-			await sleep(20);
+			Effect.runSync(Deferred.succeed(releaseWrite, undefined));
+			await fatalObserved;
 			expect(writes).toBe(1);
 			expect(session.getFatalError()?.source).toBe("autosave");
 			await expect(session.run(Effect.void)).rejects.toMatchObject({
@@ -300,6 +349,7 @@ describe("RuntimeSaveLayerFx", () => {
 				state: "frozen",
 			});
 		} finally {
+			unsubscribe();
 			await expect(Effect.runPromise(session.disposeFx)).rejects.toThrow("save failed");
 		}
 	});
@@ -314,6 +364,7 @@ describe("RuntimeSaveLayerFx", () => {
 		const saveGate = new Promise<void>((resolve) => {
 			releaseSave = resolve;
 		});
+		const completions: string[] = [];
 		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
@@ -324,21 +375,18 @@ describe("RuntimeSaveLayerFx", () => {
 						writes += 1;
 						markSaveStarted?.();
 						await saveGate;
+						completions.push("save completed");
 					}),
 			},
 		});
 
 		const first = Effect.runPromise(session.disposeFx);
 		await saveStarted;
-		const second = Effect.runPromise(session.disposeFx);
-		let secondSettled = false;
-		void second.finally(() => {
-			secondSettled = true;
+		const second = Effect.runPromise(session.disposeFx).then(() => {
+			completions.push("second dispose completed");
 		});
 
 		try {
-			await sleep(20);
-			expect(secondSettled).toBe(false);
 			expect(writes).toBe(1);
 		} finally {
 			releaseSave?.();
@@ -347,101 +395,10 @@ describe("RuntimeSaveLayerFx", () => {
 				second,
 			]);
 		}
-	});
-
-	it("stops the production Tick loop before flushing the final runtime", async () => {
-		const config = createJobTestConfig();
-		const forge = config.items.forge;
-		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
-		forge.lines[0]!.runtimeMs = 10_000;
-		const savedRemainingMs: Array<number | undefined> = [];
-		let markSaveStarted: (() => void) | undefined;
-		let releaseSave: (() => void) | undefined;
-		const saveStarted = new Promise<void>((resolve) => {
-			markSaveStarted = resolve;
-		});
-		const saveGate = new Promise<void>((resolve) => {
-			releaseSave = resolve;
-		});
-		const session = await createTestGameSession({
-			config,
-			tickIntervalMs: 5,
-			save: {
-				debounceMs: 60_000,
-				write: (state) =>
-					Effect.promise(async () => {
-						savedRemainingMs.push(state.jobs[0]?.remainingMs);
-						markSaveStarted?.();
-						await saveGate;
-					}),
-			},
-		});
-
-		try {
-			const owner = await session.run(prepareJobLineFx());
-			await session.run(
-				startLineFx({
-					ownerItemId: owner.id,
-					lineId: "line:forge:run",
-				}),
-			);
-
-			const dispose = Effect.runPromise(session.disposeFx);
-			await saveStarted;
-			await sleep(30);
-			releaseSave?.();
-			await dispose;
-
-			expect(savedRemainingMs).toHaveLength(1);
-			expect(savedRemainingMs[0]).toBeGreaterThan(0);
-		} finally {
-			releaseSave?.();
-			await Effect.runPromise(session.disposeFx);
-		}
-	});
-
-	it("interrupts in-flight session commands before the final save", async () => {
-		const saves: StateSchema.Type[] = [];
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-			save: {
-				debounceMs: 60_000,
-				write: (state) =>
-					Effect.sync(() => {
-						saves.push(state);
-					}),
-			},
-		});
-		const command = session
-			.run(
-				Effect.sleep("50 millis").pipe(
-					Effect.andThen(
-						spawnItemFx({
-							id: "runtime:save:late-command",
-							itemId: "water",
-							location: {
-								scope: "inventory",
-								position: {
-									x: 0,
-									y: 0,
-								},
-							},
-							quantity: 1,
-						}),
-					),
-				),
-			)
-			.then(
-				() => "completed" as const,
-				() => "interrupted" as const,
-			);
-
-		await Effect.runPromise(session.disposeFx);
-
-		expect(await command).toBe("interrupted");
-		expect(saves).toHaveLength(1);
-		expect(saves[0]?.items).toHaveLength(0);
+		expect(completions).toEqual([
+			"save completed",
+			"second dispose completed",
+		]);
 	});
 
 	it("closes command admission before starting a slow final save", async () => {

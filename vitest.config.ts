@@ -11,13 +11,19 @@ export default defineConfig({
 	test: {
 		clearMocks: true,
 		environment: "node",
-		fileParallelism: false,
+		fileParallelism: true,
 		isolate: true,
 		include: [
 			"test/**/*.test.{ts,tsx}",
 		],
-		maxWorkers: 1,
+		maxWorkers: "50%",
 		pool: "threads",
+		restoreMocks: true,
+		setupFiles: [
+			"./test/setup.ts",
+		],
+		unstubEnvs: true,
+		unstubGlobals: true,
 		watch: false,
 	},
 });

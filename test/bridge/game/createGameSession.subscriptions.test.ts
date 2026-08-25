@@ -5,7 +5,7 @@ import { Deferred, Effect } from "effect";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 
-import { emitCompletedEventFx, waitFor } from "./createGameSession.test/fixture";
+import { emitCompletedEventFx } from "./createGameSession.test/fixture";
 
 describe("createGameSessionFx / subscription visibility", () => {
 	it("does not replay transitions committed before event subscription", async () => {
@@ -54,6 +54,10 @@ describe("createGameSessionFx / subscription visibility", () => {
 			tickIntervalMs: 60_000,
 		});
 		let notifications = 0;
+		let markAfterSubscribeDelivered: (() => void) | undefined;
+		const afterSubscribeDelivered = new Promise<void>((resolve) => {
+			markAfterSubscribeDelivered = resolve;
+		});
 
 		try {
 			await session.run(
@@ -72,10 +76,16 @@ describe("createGameSessionFx / subscription visibility", () => {
 			);
 			const unsubscribe = session.subscribe(() => {
 				notifications += 1;
+				if (
+					session
+						.getSnapshot()
+						.items.some((item) => item.id === "runtime:after-subscribe")
+				) {
+					markAfterSubscribeDelivered?.();
+				}
 			});
 
 			try {
-				await new Promise((resolve) => setTimeout(resolve, 20));
 				expect(notifications).toBe(0);
 
 				await session.run(
@@ -92,7 +102,8 @@ describe("createGameSessionFx / subscription visibility", () => {
 						quantity: 1,
 					}),
 				);
-				await waitFor(() => notifications === 1);
+				await afterSubscribeDelivered;
+				expect(notifications).toBe(1);
 			} finally {
 				unsubscribe();
 			}
@@ -107,18 +118,24 @@ describe("createGameSessionFx / subscription visibility", () => {
 		});
 		let runtimeNotifications = 0;
 		let eventNotifications = 0;
+		let markEventDelivered: (() => void) | undefined;
+		const eventDelivered = new Promise<void>((resolve) => {
+			markEventDelivered = resolve;
+		});
 		const unsubscribeRuntime = session.subscribe(() => {
 			runtimeNotifications += 1;
 		});
 		const unsubscribeEvents = session.subscribeEvents(() => {
 			eventNotifications += 1;
+			markEventDelivered?.();
 		});
 
 		try {
 			const before = session.getSnapshot();
 			await session.run(emitCompletedEventFx("job:event-only"));
 			expect(session.getSnapshot()).toBe(before);
-			await waitFor(() => eventNotifications === 1);
+			await eventDelivered;
+			expect(eventNotifications).toBe(1);
 			expect(runtimeNotifications).toBe(0);
 		} finally {
 			unsubscribeRuntime();
@@ -132,8 +149,17 @@ describe("createGameSessionFx / subscription visibility", () => {
 			tickIntervalMs: 60_000,
 		});
 		let notifications = 0;
+		let markMarkerDelivered: (() => void) | undefined;
+		const markerDelivered = new Promise<void>((resolve) => {
+			markMarkerDelivered = resolve;
+		});
 		const unsubscribe = session.subscribe(() => {
 			notifications += 1;
+			if (
+				session.getSnapshot().items.some((item) => item.id === "runtime:no-op-tick:marker")
+			) {
+				markMarkerDelivered?.();
+			}
 		});
 
 		try {
@@ -142,8 +168,22 @@ describe("createGameSessionFx / subscription visibility", () => {
 					elapsedMs: 100,
 				}),
 			);
-			await new Promise((resolve) => setTimeout(resolve, 20));
-			expect(notifications).toBe(0);
+			await session.run(
+				spawnItemFx({
+					id: "runtime:no-op-tick:marker",
+					itemId: "water",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				}),
+			);
+			await markerDelivered;
+			expect(notifications).toBe(1);
 		} finally {
 			unsubscribe();
 			await Effect.runPromise(session.disposeFx);

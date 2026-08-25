@@ -5,7 +5,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { Effect } from "effect";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 
-import { emitCompletedEventFx, waitFor } from "./createGameSession.test/fixture";
+import { emitCompletedEventFx } from "./createGameSession.test/fixture";
 
 describe("createGameSessionFx / transition replay", () => {
 	it("exposes its authoritative committed transition source as truly read-only", async () => {
@@ -25,12 +25,27 @@ describe("createGameSessionFx / transition replay", () => {
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
-		const transitions: Array<{
+		type ObservedTransition = {
 			readonly sequence: number;
 			readonly previousItems: number | null;
 			readonly currentItems: number;
 			readonly eventJobIds: ReadonlyArray<string>;
-		}> = [];
+		};
+		const transitions: ObservedTransition[] = [];
+		let publishReplay:
+			| ((transitions: ReadonlyArray<ObservedTransition>) => void)
+			| undefined;
+		const replayDelivered = new Promise<ReadonlyArray<ObservedTransition>>(
+			(resolve) => {
+				publishReplay = resolve;
+			},
+		);
+		let publishAll:
+			| ((transitions: ReadonlyArray<ObservedTransition>) => void)
+			| undefined;
+		const allDelivered = new Promise<ReadonlyArray<ObservedTransition>>((resolve) => {
+			publishAll = resolve;
+		});
 		const unsubscribe = session.subscribeTransitions((transition) => {
 			transitions.push({
 				sequence: transition.sequence,
@@ -44,11 +59,18 @@ describe("createGameSessionFx / transition replay", () => {
 						: [],
 				),
 			});
+			if (transitions.length === 1)
+				publishReplay?.([
+					...transitions,
+				]);
+			if (transitions.length === 3)
+				publishAll?.([
+					...transitions,
+				]);
 		});
 
 		try {
-			await waitFor(() => transitions.length === 1);
-			expect(transitions).toEqual([
+			expect(await replayDelivered).toEqual([
 				{
 					sequence: 0,
 					previousItems: null,
@@ -72,9 +94,8 @@ describe("createGameSessionFx / transition replay", () => {
 				}),
 			);
 			await session.run(emitCompletedEventFx("job:transition:ordered"));
-			await waitFor(() => transitions.length === 3);
 
-			expect(transitions).toEqual([
+			expect(await allDelivered).toEqual([
 				{
 					sequence: 0,
 					previousItems: null,
@@ -110,14 +131,34 @@ describe("createGameSessionFx / transition replay", () => {
 		});
 		const initial = session.getSnapshot();
 		let notifications = 0;
+		let markRuntimeDelivered: (() => void) | undefined;
+		const runtimeDelivered = new Promise<void>((resolve) => {
+			markRuntimeDelivered = resolve;
+		});
 		const unsubscribe = session.subscribe(() => {
 			notifications += 1;
+			markRuntimeDelivered?.();
 		});
 
 		try {
-			await new Promise((resolve) => setTimeout(resolve, 20));
 			expect(session.getSnapshot()).toBe(initial);
 			expect(notifications).toBe(0);
+			await session.run(
+				spawnItemFx({
+					id: "runtime:react-subscriber:marker",
+					itemId: "water",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				}),
+			);
+			await runtimeDelivered;
+			expect(notifications).toBe(1);
 		} finally {
 			unsubscribe();
 			await Effect.runPromise(session.disposeFx);

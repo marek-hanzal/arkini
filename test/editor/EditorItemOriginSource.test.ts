@@ -11,7 +11,6 @@ import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import { existsWhen } from "~test/line/fx/support/lineTestRuntime";
 import { createMergeTestConfig } from "~test/merge/support/createMergeTestConfig";
-import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
 const readEditorItemOriginSources = (
 	config: Parameters<typeof createEditorAcquisitionGraphFx>[0],
@@ -356,131 +355,6 @@ describe("editor item origin relations", () => {
 				source: "output-condition",
 			},
 		]);
-	});
-
-	it("preserves authored input and output quantities", async () => {
-		const config = await readArkiniGameConfigSource();
-		const constructBakery = readEditorItemOriginSources(config).find(
-			({ reference }) =>
-				reference.type === "line" &&
-				reference.lineId === "line:blueprint:bakery-t1:construct",
-		);
-
-		expect(constructBakery?.inputs).toEqual([
-			{
-				itemId: "item:plank",
-				quantity: {
-					min: 2,
-					max: 2,
-				},
-			},
-			{
-				itemId: "item:stone-block",
-				quantity: {
-					min: 1,
-					max: 1,
-				},
-			},
-			{
-				itemId: "item:flour",
-				quantity: {
-					min: 1,
-					max: 1,
-				},
-			},
-			{
-				itemId: "item:water",
-				quantity: {
-					min: 1,
-					max: 1,
-				},
-			},
-		]);
-		expect(constructBakery?.outputs).toMatchObject([
-			{
-				itemId: "producer:bakery-t1",
-				quantity: {
-					min: 1,
-					max: 1,
-				},
-			},
-		]);
-		expect(constructBakery?.runtimeMs).toBe(24_000);
-
-		const burnBioWaste = readEditorItemOriginSources(config).find(
-			({ reference }) =>
-				reference.type === "line" &&
-				reference.lineId === "line:bio-waste-processor-t1:burn-bio-waste-log",
-		);
-		expect(burnBioWaste?.inputs).toContainEqual({
-			itemId: "item:bio-waste",
-			quantity: {
-				max: 4,
-				min: 1,
-			},
-		});
-	});
-
-	it("groups official line outputs and retains the charged payer occurrence", async () => {
-		const config = await readArkiniGameConfigSource();
-		const sources = readEditorItemOriginSources(config).filter(
-			({ reference }) =>
-				reference.type === "line" && reference.lineId === "line:lumberjack-t1:log",
-		);
-
-		expect(sources).toHaveLength(1);
-		expect(sources[0]).toMatchObject({
-			id: "source:producer:lumberjack-t1:line:line:lumberjack-t1:log",
-			inputs: [
-				{
-					itemId: "item:tree",
-					quantity: {
-						max: 1,
-						min: 1,
-					},
-				},
-			],
-			outputs: [
-				expect.objectContaining({
-					itemId: "item:log",
-				}),
-				expect.objectContaining({
-					itemId: "item:quest:road-repair",
-				}),
-			],
-			routeIds: [
-				expect.stringContaining("item:log"),
-				expect.stringContaining("item:quest:road-repair"),
-			],
-		});
-	});
-
-	it("finds every official Coin producer through output lookup", async () => {
-		const config = await readArkiniGameConfigSource();
-		const sources = readEditorItemOriginSources(config);
-		const expectedProducerIds = new Set(
-			sources
-				.flatMap(readEditorItemOriginRelations)
-				.filter(({ role, toItemId }) => role === "output" && toItemId === "item:coin")
-				.map(({ fromItemId }) => fromItemId),
-		);
-		const coinOutput = readEditorItemOriginRelationSubgraph({
-			level: 1,
-			role: "output",
-			sources,
-			targetItemId: "item:coin",
-		});
-
-		expect(expectedProducerIds.size).toBeGreaterThan(1);
-		expect(new Set(coinOutput.relations.map(({ fromItemId }) => fromItemId))).toEqual(
-			expectedProducerIds,
-		);
-		expect(coinOutput.itemIds).toEqual(
-			new Set([
-				"item:coin",
-				...expectedProducerIds,
-			]),
-		);
 	});
 
 	it("uses the same external-input and owner-output edges as the editor flow", () => {

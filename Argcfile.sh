@@ -188,8 +188,13 @@ typecheck() {
 	tsc -p tsconfig.electron.json --noEmit --noUnusedLocals --noUnusedParameters
 }
 
-# @cmd Run the permanent test suite in one process
+# @cmd Run the permanent test suite, optionally filtered by paths
+# @arg filters~ Vitest file or directory filters
 test() {
+	if [[ -n "${argc_filters+x}" ]]; then
+		vitest run --no-color "${argc_filters[@]}"
+		return
+	fi
 	vitest run --no-color
 }
 

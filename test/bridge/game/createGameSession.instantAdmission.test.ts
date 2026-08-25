@@ -154,6 +154,7 @@ describe("GameSession Instant gameplay admission", () => {
 			tickIntervalMs: 1,
 		});
 		const ownerItemId = "runtime:forge:queue-race";
+		let unsubscribe: () => void = () => undefined;
 
 		try {
 			await session.run(
@@ -209,6 +210,17 @@ describe("GameSession Instant gameplay admission", () => {
 			);
 			expect(session.getSnapshot().jobs).toEqual([]);
 			expect(session.getSnapshot().jobQueue).toHaveLength(5);
+			let publishWokenRuntime:
+				| ((runtime: ReturnType<typeof session.getSnapshot>) => void)
+				| undefined;
+			const wokenRuntime = new Promise<ReturnType<typeof session.getSnapshot>>((resolve) => {
+				publishWokenRuntime = resolve;
+			});
+			unsubscribe = session.subscribeTransitions((transition) => {
+				if (transition.runtime.jobQueue.length === 4) {
+					publishWokenRuntime?.(transition.runtime);
+				}
+			});
 
 			await session.run(
 				Effect.gen(function* () {
@@ -241,20 +253,13 @@ describe("GameSession Instant gameplay admission", () => {
 				}),
 			);
 
-			const deadline = performance.now() + 1_000;
-			while (session.getSnapshot().jobQueue.length === 5) {
-				if (performance.now() >= deadline) {
-					throw new Error("Queued Instant job did not wake after its sources appeared.");
-				}
-				await new Promise((resolve) => setTimeout(resolve, 5));
-			}
-
-			const runtime = session.getSnapshot();
+			const runtime = await wokenRuntime;
 			expect(runtime.jobs).toEqual([]);
 			expect(runtime.jobQueue).toHaveLength(4);
 			expect(runtime.items.filter((item) => item.item.id === "water")).toEqual([]);
 			expect(session.getFatalError()).toBeNull();
 		} finally {
+			unsubscribe();
 			await Effect.runPromise(session.disposeWithoutSaveFx);
 		}
 	});

@@ -102,7 +102,11 @@ export const EditorVersionGraph = ({
 			<div className="min-w-0">
 				<div className="font-semibold">Working copy</div>
 				<div className={status.dirty ? "text-xs text-warning" : "text-xs text-muted"}>
-					{status.dirty ? "Dirty" : "Clean"}
+					{status.currentBaseVersionId === undefined
+						? "Unversioned"
+						: status.dirty
+							? "Dirty"
+							: "Clean"}
 				</div>
 			</div>
 		</div>

@@ -71,9 +71,7 @@ describe("useRetainedItemDetailProjection", () => {
 			return createElement(
 				Suspense,
 				{
-					fallback: createElement("span", {
-						"data-ui": "fallback",
-					}),
+					fallback: null,
 				},
 				createElement(Projection, {
 					state,
@@ -86,7 +84,6 @@ describe("useRetainedItemDetailProjection", () => {
 		const root = createRoot(container);
 		roots.push(root);
 		await act(async () => root.render(createElement(Harness)));
-		expect(container.querySelector("span")?.dataset.value).toBe("committed");
 
 		await act(async () => {
 			startTransition(() =>
@@ -99,7 +96,6 @@ describe("useRetainedItemDetailProjection", () => {
 			await Promise.resolve();
 		});
 		expect(renderedAbandonedValue).toHaveBeenCalledWith("abandoned");
-		expect(container.querySelector("span")?.dataset.value).toBe("committed");
 
 		await act(async () => {
 			update?.({

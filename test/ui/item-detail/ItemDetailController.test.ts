@@ -49,7 +49,7 @@ describe("ItemDetailController", () => {
 		expect(revisitedScope).not.toBe(secondScope);
 	});
 
-	it("treats a changed Lines search query as a fresh presentation intent", () => {
+	it("treats a changed Lines query as a distinct intent for the same target", () => {
 		const controller = Effect.runSync(createItemDetailControllerFx());
 		Effect.runSync(
 			controller.openTargetFx(
@@ -71,8 +71,8 @@ describe("ItemDetailController", () => {
 		);
 
 		expect(controller.getSnapshot().state).toMatchObject({
-			phase: "open",
 			generation: entering.generation,
+			phase: "open",
 			target: {
 				linesSearchQuery: "Stone",
 			},

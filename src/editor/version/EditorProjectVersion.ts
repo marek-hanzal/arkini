@@ -56,6 +56,48 @@ export interface EditorProjectVersionTagInput {
 	readonly versionId: string;
 }
 
+export type EditorProjectVersionReference =
+	| {
+			readonly type: "current";
+	  }
+	| {
+			readonly type: "version";
+			readonly versionId: string;
+	  };
+
+export interface EditorProjectVersionDiffInput {
+	readonly projectId: string;
+	readonly from: EditorProjectVersionReference;
+	readonly to: EditorProjectVersionReference;
+}
+
+export interface EditorProjectVersionValueChange {
+	readonly path: string;
+	readonly before?: unknown;
+	readonly after?: unknown;
+}
+
+export interface EditorProjectVersionItemDiff {
+	readonly change: "added" | "changed" | "deleted";
+	readonly uid: string;
+	readonly values: ReadonlyArray<EditorProjectVersionValueChange>;
+}
+
+export interface EditorProjectVersionBinaryDiff {
+	readonly change: "added" | "changed" | "deleted";
+	readonly id: string;
+}
+
+export interface EditorProjectVersionDiff {
+	readonly from: EditorProjectVersionReference;
+	readonly to: EditorProjectVersionReference;
+	readonly hasChanges: boolean;
+	readonly project: ReadonlyArray<EditorProjectVersionValueChange>;
+	readonly items: ReadonlyArray<EditorProjectVersionItemDiff>;
+	readonly resources: ReadonlyArray<EditorProjectVersionBinaryDiff>;
+	readonly scenarios: ReadonlyArray<EditorProjectVersionBinaryDiff>;
+}
+
 export interface EditorProjectVersionCheckout {
 	readonly project: EditorProject;
 	readonly version: EditorProjectVersionDescriptor;
@@ -69,6 +111,9 @@ export interface EditorProjectVersionRepositoryService {
 	readonly createVersionFx: (
 		props: EditorProjectVersionCommitInput,
 	) => Effect.Effect<EditorProjectVersionDescriptor, EditorProjectRepositoryError>;
+	readonly diffVersionsFx: (
+		props: EditorProjectVersionDiffInput,
+	) => Effect.Effect<EditorProjectVersionDiff, EditorProjectRepositoryError>;
 	readonly listVersionsFx: (
 		projectId: string,
 	) => Effect.Effect<ReadonlyArray<EditorProjectVersionDescriptor>, EditorProjectRepositoryError>;

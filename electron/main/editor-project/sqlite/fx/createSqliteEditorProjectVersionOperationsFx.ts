@@ -33,7 +33,7 @@ import { SqliteEditorBoardScenarioRowSchema } from "../schema/SqliteEditorBoardS
 import { SqliteEditorProjectResourceRowSchema } from "../schema/SqliteEditorProjectResourceRowSchema";
 import { SqliteEditorProjectRowSchema } from "../schema/SqliteEditorProjectRowSchema";
 
-type VersionOperations = EditorProjectVersionRepositoryService;
+type VersionOperations = Omit<EditorProjectVersionRepositoryService, "diffVersionsFx">;
 
 const versionRowSchema = z
 	.object({

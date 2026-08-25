@@ -41,6 +41,18 @@ const createProjectTransport = (): EditorProjectTransport.Project => ({
 	],
 });
 
+const version: EditorProjectTransport.VersionDescriptor = {
+	applicability: { type: "applicable" },
+	arkini: "0.5.0",
+	arkpackVersion: "1.0",
+	createdAtMs: 12,
+	projectId: "project-one",
+	snapshotFormatVersion: 1,
+	sourceRevision: 2,
+	subject: "Initial state",
+	versionId: "version-one",
+};
+
 const installEditorApi = () => {
 	const project = createProjectTransport();
 	const editor: Window["arkini"]["editor"] = {
@@ -82,6 +94,30 @@ const installEditorApi = () => {
 			}),
 		),
 		deleteBoardScenario: vi.fn(async () => success(undefined)),
+		readVersionStatus: vi.fn(async () =>
+			success({
+				canCommit: false,
+				currentBaseVersionId: version.versionId,
+				currentFingerprint: "a".repeat(64),
+				dirty: false,
+				versionCount: 1,
+			}),
+		),
+		listVersions: vi.fn(async () => success([version])),
+		diffVersions: vi.fn(async (request) =>
+			success({
+				from: request.from,
+				to: request.to,
+				hasChanges: false,
+				project: [],
+				items: [],
+				resources: [],
+				scenarios: [],
+			}),
+		),
+		createVersion: vi.fn(async () => success(version)),
+		checkoutVersion: vi.fn(async () => success({ project, version })),
+		updateVersionTag: vi.fn(async () => success(version)),
 	};
 	Object.defineProperty(window, "arkini", {
 		configurable: true,
@@ -204,6 +240,35 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 				name: "Scenario 1",
 			}),
 		);
+		const status = await Effect.runPromise(repository.readVersionStatusFx("project-one"));
+		const versions = await Effect.runPromise(repository.listVersionsFx("project-one"));
+		const reference = { type: "version" as const, versionId: version.versionId };
+		const diff = await Effect.runPromise(
+			repository.diffVersionsFx({
+				projectId: "project-one",
+				from: reference,
+				to: { type: "current" },
+			}),
+		);
+		const committedVersion = await Effect.runPromise(
+			repository.createVersionFx({
+				projectId: "project-one",
+				subject: "Initial state",
+			}),
+		);
+		const checkout = await Effect.runPromise(
+			repository.checkoutVersionFx({
+				projectId: "project-one",
+				versionId: version.versionId,
+			}),
+		);
+		const tagged = await Effect.runPromise(
+			repository.updateVersionTagFx({
+				projectId: "project-one",
+				tag: "safe",
+				versionId: version.versionId,
+			}),
+		);
 
 		expect(editor.awaitIdle).toHaveBeenCalledOnce();
 		expect(editor.createProject).toHaveBeenCalledWith(createRequest);
@@ -261,6 +326,13 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 			projectId: "project-one",
 			name: "Scenario 1",
 		});
+		expect(status).toMatchObject({ dirty: false, versionCount: 1 });
+		expect(versions).toEqual([version]);
+		expect(diff).toMatchObject({ hasChanges: false });
+		expect(committedVersion).toEqual(version);
+		expect(checkout.version).toEqual(version);
+		expect(checkout.project.resources[0]?.bytes).toBeInstanceOf(Uint8Array);
+		expect(tagged).toEqual(version);
 		expect(listedScenarios).toEqual([]);
 		expect(readScenario).toBeNull();
 		expect(writtenScenario.bytes).toEqual(

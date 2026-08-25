@@ -149,6 +149,18 @@ const api: ArkiniElectronApi.Api = {
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorBoardScenarioWrite, request),
 		deleteBoardScenario: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorBoardScenarioDelete, request),
+		readVersionStatus: (projectId) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionStatus, projectId),
+		listVersions: (projectId) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionList, projectId),
+		diffVersions: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionDiff, request),
+		createVersion: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionCommit, request),
+		checkoutVersion: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionCheckout, request),
+		updateVersionTag: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorVersionTag, request),
 	},
 	editorMcp: {
 		status: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpStatus),

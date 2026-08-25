@@ -24,7 +24,7 @@ export const editorProjectIpcProject = {
 	resources: editorTestPayload.resources,
 };
 
-const editorProjectVersion = {
+export const editorProjectIpcVersion = {
 	applicability: { type: "applicable" as const },
 	arkini: ArkiniAppVersion,
 	arkpackVersion: editorProjectIpcProject.version,
@@ -40,19 +40,30 @@ const editorProjectVersion = {
 export const createEditorProjectIpcRepository = (): SqliteEditorProjectRepository => ({
 	awaitIdleFx: Effect.void,
 	createProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
-	createVersionFx: vi.fn(() => Effect.succeed(editorProjectVersion)),
+	createVersionFx: vi.fn(() => Effect.succeed(editorProjectIpcVersion)),
 	checkoutVersionFx: vi.fn(() =>
 		Effect.succeed({
 			project: editorProjectIpcProject,
-			version: editorProjectVersion,
+			version: editorProjectIpcVersion,
 		}),
 	),
 	deleteProjectFx: vi.fn(() => Effect.void),
 	deleteItemFx: vi.fn(() => Effect.succeed(editorProjectIpcCommit)),
+	diffVersionsFx: vi.fn(({ from, to }) =>
+		Effect.succeed({
+			from,
+			to,
+			hasChanges: false,
+			project: [],
+			items: [],
+			resources: [],
+			scenarios: [],
+		}),
+	),
 	listProjectsFx: Effect.succeed([
 		editorProjectIpcDescriptor,
 	]),
-	listVersionsFx: vi.fn(() => Effect.succeed([editorProjectVersion])),
+	listVersionsFx: vi.fn(() => Effect.succeed([editorProjectIpcVersion])),
 	readProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	readVersionStatusFx: vi.fn(() =>
 		Effect.succeed({
@@ -67,7 +78,7 @@ export const createEditorProjectIpcRepository = (): SqliteEditorProjectRepositor
 	saveResourceFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	upsertItemFx: vi.fn(() => Effect.succeed(editorProjectIpcCommit)),
 	upsertResourcesFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
-	updateVersionTagFx: vi.fn(() => Effect.succeed(editorProjectVersion)),
+	updateVersionTagFx: vi.fn(() => Effect.succeed(editorProjectIpcVersion)),
 	listBoardScenariosFx: vi.fn(() => Effect.succeed([])),
 	readBoardScenarioFx: vi.fn(() => Effect.succeed(null)),
 	writeBoardScenarioFx: vi.fn(({ projectId, name, bytes }) =>

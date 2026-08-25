@@ -10,6 +10,7 @@ import { createSqliteEditorBoardScenarioOperationsFx } from "./createSqliteEdito
 import { createSqliteEditorProjectCommitOperationsFx } from "./createSqliteEditorProjectCommitOperationsFx";
 import { createSqliteEditorProjectOperationsFx } from "./createSqliteEditorProjectOperationsFx";
 import { createSqliteEditorProjectVersionOperationsFx } from "./createSqliteEditorProjectVersionOperationsFx";
+import { createSqliteEditorProjectVersionDiffOperationsFx } from "./createSqliteEditorProjectVersionDiffOperationsFx";
 import { initializeSqliteEditorProjectSchemaFx } from "./initializeSqliteEditorProjectSchemaFx";
 
 export interface SqliteEditorProjectRepository
@@ -72,6 +73,10 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 		database,
 		writeLock,
 	}).pipe(Effect.tapError(() => closeDatabaseFx));
+	const versionDiffs = yield* createSqliteEditorProjectVersionDiffOperationsFx({
+		database,
+		writeLock,
+	}).pipe(Effect.tapError(() => closeDatabaseFx));
 
 	return {
 		awaitIdleFx: writeLock.withPermits(1)(Effect.void),
@@ -79,6 +84,7 @@ export const createSqliteEditorProjectRepositoryFx = Effect.fn(
 		...commits,
 		...boardScenarios,
 		...versions,
+		...versionDiffs,
 		closeFx: writeLock.withPermits(1)(closeDatabaseFx),
 	} satisfies SqliteEditorProjectRepository;
 });

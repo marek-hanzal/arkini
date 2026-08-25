@@ -11,6 +11,7 @@ import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import type { EditorProjectVersionRepositoryService } from "~/editor/version/EditorProjectVersion";
 
 export namespace EditorProjectRepository {
 	export interface CreateProjectProps {
@@ -70,7 +71,7 @@ export namespace EditorProjectRepository {
 	}
 }
 
-export interface EditorProjectRepositoryService {
+export interface EditorProjectRepositoryService extends EditorProjectVersionRepositoryService {
 	/** Joins every repository write admitted before this Effect acquires the write boundary. */
 	readonly awaitIdleFx: Effect.Effect<void, EditorProjectRepositoryError>;
 	readonly createProjectFx: (

@@ -57,6 +57,12 @@ export namespace ArkiniElectronApi {
 		editorProjectSaveResource: "arkini:editor:project:save-resource",
 		editorProjectUpsertItem: "arkini:editor:project:upsert-item",
 		editorProjectUpsertResources: "arkini:editor:project:upsert-resources",
+		editorVersionStatus: "arkini:editor:version:status",
+		editorVersionList: "arkini:editor:version:list",
+		editorVersionDiff: "arkini:editor:version:diff",
+		editorVersionCommit: "arkini:editor:version:commit",
+		editorVersionCheckout: "arkini:editor:version:checkout",
+		editorVersionTag: "arkini:editor:version:tag",
 		editorBoardScenarioList: "arkini:editor:board-scenario:list",
 		editorBoardScenarioRead: "arkini:editor:board-scenario:read",
 		editorBoardScenarioWrite: "arkini:editor:board-scenario:write",
@@ -195,6 +201,26 @@ export namespace ArkiniElectronApi {
 			readonly deleteBoardScenario: (
 				request: EditorProjectTransport.BoardScenarioKeyRequest,
 			) => Promise<EditorProjectTransport.Result<void>>;
+			readonly readVersionStatus: (
+				projectId: string,
+			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.VersionStatus>>;
+			readonly listVersions: (
+				projectId: string,
+			) => Promise<
+				EditorProjectTransport.Result<ReadonlyArray<EditorProjectTransport.VersionDescriptor>>
+			>;
+			readonly diffVersions: (
+				request: EditorProjectTransport.VersionDiffRequest,
+			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.VersionDiff>>;
+			readonly createVersion: (
+				request: EditorProjectTransport.VersionCommitRequest,
+			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.VersionDescriptor>>;
+			readonly checkoutVersion: (
+				request: EditorProjectTransport.VersionCheckoutRequest,
+			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.VersionCheckout>>;
+			readonly updateVersionTag: (
+				request: EditorProjectTransport.VersionTagRequest,
+			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.VersionDescriptor>>;
 		};
 		readonly editorMcp: {
 			readonly status: () => Promise<EditorMcpStatus>;

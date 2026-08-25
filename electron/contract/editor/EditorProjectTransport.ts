@@ -8,6 +8,7 @@ export namespace EditorProjectTransport {
 		| "delete-project"
 		| "delete-item"
 		| "delete-board-scenario"
+		| "diff-versions"
 		| "export-json-directory"
 		| "import-json-directory"
 		| "list-board-scenarios"
@@ -147,5 +148,104 @@ export namespace EditorProjectTransport {
 	export interface UpsertResourcesRequest {
 		readonly projectId: string;
 		readonly resources: ReadonlyArray<unknown>;
+	}
+
+	export type VersionApplicability =
+		| {
+				readonly type: "applicable";
+		  }
+		| {
+				readonly type: "incompatible";
+				readonly reason: string;
+		  };
+
+	export interface VersionDescriptor {
+		readonly applicability: VersionApplicability;
+		readonly arkini: string;
+		readonly arkpackVersion: string;
+		readonly body?: string;
+		readonly createdAtMs: number;
+		readonly parentVersionId?: string;
+		readonly projectId: string;
+		readonly snapshotFormatVersion: number;
+		readonly sourceRevision: number;
+		readonly subject: string;
+		readonly tag?: string;
+		readonly versionId: string;
+	}
+
+	export interface VersionStatus {
+		readonly canCommit: boolean;
+		readonly currentBaseVersionId?: string;
+		readonly currentFingerprint: string;
+		readonly dirty: boolean;
+		readonly versionCount: number;
+	}
+
+	export type VersionReference =
+		| {
+				readonly type: "current";
+		  }
+		| {
+				readonly type: "version";
+				readonly versionId: string;
+		  };
+
+	export interface VersionCommitRequest {
+		readonly body?: string;
+		readonly expectedFingerprint?: string;
+		readonly projectId: string;
+		readonly subject: string;
+		readonly tag?: string;
+	}
+
+	export interface VersionCheckoutRequest {
+		readonly expectedFingerprint?: string;
+		readonly projectId: string;
+		readonly versionId: string;
+	}
+
+	export interface VersionTagRequest {
+		readonly projectId: string;
+		readonly tag?: string;
+		readonly versionId: string;
+	}
+
+	export interface VersionDiffRequest {
+		readonly projectId: string;
+		readonly from: VersionReference;
+		readonly to: VersionReference;
+	}
+
+	export interface VersionValueChange {
+		readonly path: string;
+		readonly before?: unknown;
+		readonly after?: unknown;
+	}
+
+	export interface VersionItemDiff {
+		readonly change: "added" | "changed" | "deleted";
+		readonly uid: string;
+		readonly values: ReadonlyArray<VersionValueChange>;
+	}
+
+	export interface VersionBinaryDiff {
+		readonly change: "added" | "changed" | "deleted";
+		readonly id: string;
+	}
+
+	export interface VersionDiff {
+		readonly from: VersionReference;
+		readonly to: VersionReference;
+		readonly hasChanges: boolean;
+		readonly project: ReadonlyArray<VersionValueChange>;
+		readonly items: ReadonlyArray<VersionItemDiff>;
+		readonly resources: ReadonlyArray<VersionBinaryDiff>;
+		readonly scenarios: ReadonlyArray<VersionBinaryDiff>;
+	}
+
+	export interface VersionCheckout {
+		readonly project: Project;
+		readonly version: VersionDescriptor;
 	}
 }

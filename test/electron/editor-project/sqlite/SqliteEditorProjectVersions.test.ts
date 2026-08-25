@@ -89,6 +89,31 @@ describe("SQLite editor project versions", () => {
 			}),
 		);
 		expect(changed.revision).toBe(renamed.revision + 1);
+		const workingDiff = await Effect.runPromise(
+			repository.diffVersionsFx({
+				projectId: project.projectId,
+				from: { type: "version", versionId: root.versionId },
+				to: { type: "current" },
+			}),
+		);
+		expect(workingDiff).toMatchObject({
+			hasChanges: true,
+			project: [
+				{
+					path: "arkpackVersion",
+					before: "1.0",
+					after: "1.2",
+				},
+				{
+					path: "config.meta.title",
+					before: project.title,
+					after: "Experiment",
+				},
+			],
+			items: [],
+			resources: [{ change: "changed", id: "hero" }],
+			scenarios: [],
+		});
 		const experiment = await Effect.runPromise(
 			repository.createVersionFx({
 				projectId: project.projectId,
@@ -256,6 +281,15 @@ describe("SQLite editor project versions", () => {
 					projectId: project.projectId,
 					tag: "blocked",
 					versionId: version.versionId,
+				}),
+			),
+		).rejects.toThrow("no compatible snapshot migrator");
+		await expect(
+			Effect.runPromise(
+				repository.diffVersionsFx({
+					projectId: project.projectId,
+					from: { type: "version", versionId: version.versionId },
+					to: { type: "current" },
 				}),
 			),
 		).rejects.toThrow("no compatible snapshot migrator");

@@ -8,6 +8,7 @@ export type EditorProjectRepositoryOperation =
 	| "delete-project"
 	| "delete-item"
 	| "delete-board-scenario"
+	| "diff-versions"
 	| "export-json-directory"
 	| "import-json-directory"
 	| "list-board-scenarios"

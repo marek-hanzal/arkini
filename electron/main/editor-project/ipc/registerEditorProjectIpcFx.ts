@@ -256,6 +256,54 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 							(repository, request) => repository.upsertResourcesFx(request),
 						),
 				);
+				handle(ArkiniElectronApi.channels.editorVersionStatus, (_event, candidate) =>
+					executeEditorProjectRepositoryFx(
+						"read-version-status",
+						ownership,
+						requestParser.parseVersionStatusProjectIdFx(candidate),
+						(repository, projectId) => repository.readVersionStatusFx(projectId),
+					),
+				);
+				handle(ArkiniElectronApi.channels.editorVersionList, (_event, candidate) =>
+					executeEditorProjectRepositoryFx(
+						"list-versions",
+						ownership,
+						requestParser.parseVersionListProjectIdFx(candidate),
+						(repository, projectId) => repository.listVersionsFx(projectId),
+					),
+				);
+				handle(ArkiniElectronApi.channels.editorVersionDiff, (_event, candidate) =>
+					executeEditorProjectRepositoryFx(
+						"diff-versions",
+						ownership,
+						requestParser.parseVersionDiffFx(candidate),
+						(repository, request) => repository.diffVersionsFx(request),
+					),
+				);
+				handle(ArkiniElectronApi.channels.editorVersionCommit, (_event, candidate) =>
+					executeEditorProjectRepositoryFx(
+						"create-version",
+						ownership,
+						requestParser.parseVersionCommitFx(candidate),
+						(repository, request) => repository.createVersionFx(request),
+					),
+				);
+				handle(ArkiniElectronApi.channels.editorVersionCheckout, (_event, candidate) =>
+					executeEditorProjectRepositoryFx(
+						"checkout-version",
+						ownership,
+						requestParser.parseVersionCheckoutFx(candidate),
+						(repository, request) => repository.checkoutVersionFx(request),
+					),
+				);
+				handle(ArkiniElectronApi.channels.editorVersionTag, (_event, candidate) =>
+					executeEditorProjectRepositoryFx(
+						"update-version-tag",
+						ownership,
+						requestParser.parseVersionTagFx(candidate),
+						(repository, request) => repository.updateVersionTagFx(request),
+					),
+				);
 				const channels = [
 					ArkiniElectronApi.channels.editorStatus,
 					ArkiniElectronApi.channels.editorAwaitIdle,
@@ -272,6 +320,12 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					ArkiniElectronApi.channels.editorProjectSaveResource,
 					ArkiniElectronApi.channels.editorProjectUpsertItem,
 					ArkiniElectronApi.channels.editorProjectUpsertResources,
+					ArkiniElectronApi.channels.editorVersionStatus,
+					ArkiniElectronApi.channels.editorVersionList,
+					ArkiniElectronApi.channels.editorVersionDiff,
+					ArkiniElectronApi.channels.editorVersionCommit,
+					ArkiniElectronApi.channels.editorVersionCheckout,
+					ArkiniElectronApi.channels.editorVersionTag,
 					...boardScenarioChannels,
 				];
 				app.once("will-quit", () => {

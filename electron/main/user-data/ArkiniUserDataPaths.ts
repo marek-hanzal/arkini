@@ -11,5 +11,6 @@ export interface ArkiniUserDataPaths {
 	readonly editor: {
 		readonly root: string;
 		readonly database: string;
+		readonly mcpAuthDatabase: string;
 	};
 }

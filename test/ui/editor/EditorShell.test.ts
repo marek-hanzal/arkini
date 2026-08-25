@@ -243,7 +243,7 @@ const readLink = (container: HTMLElement, label: string) => {
 };
 
 describe("EditorShell", () => {
-	it("places ChatGPT directly after Assets and marks its route active", async () => {
+	it("places ChatGPT and MCP directly after Assets and marks ChatGPT active", async () => {
 		const router = createTestRouter({
 			initialEntry: "/editor/editor-test/chatgpt",
 		});
@@ -254,6 +254,7 @@ describe("EditorShell", () => {
 		const assetsIndex = workspaces.indexOf("assets");
 
 		expect(workspaces[assetsIndex + 1]).toBe("chatgpt");
+		expect(workspaces[assetsIndex + 2]).toBe("mcp");
 		expect(readLink(container, "ChatGPT").getAttribute("aria-current")).toBe("page");
 		expect(container.textContent).toContain("ChatGPT destination");
 	});

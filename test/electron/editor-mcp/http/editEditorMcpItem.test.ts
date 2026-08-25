@@ -50,7 +50,7 @@ describe("editor MCP item editing", () => {
 			}),
 		);
 		ownership.setProjectContext("edit-simple-project");
-		await Effect.runPromise(ownership.activateFx);
+		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectEditorMcpClient(port);
 		const readConfig = async (itemId: string) => {
 			const result = await client.callTool({

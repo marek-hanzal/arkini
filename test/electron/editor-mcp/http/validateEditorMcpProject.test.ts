@@ -33,7 +33,7 @@ describe("editor MCP project validation", () => {
 			}),
 		);
 		ownership.setProjectContext("invalid-project");
-		await Effect.runPromise(ownership.activateFx);
+		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectEditorMcpClient(port);
 		const result = await client.callTool({
 			name: "validate_project",

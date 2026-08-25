@@ -2,7 +2,6 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
 import { prepareEditorGameHandoffFx } from "~/bridge/game/prepareEditorGameHandoffFx";
 import { refreshEditorServiceStatusFx } from "~/bridge/editor/refreshEditorServiceStatusFx";
-import { activateEditorMcpFx } from "~/bridge/editor-mcp/activateEditorMcpFx";
 
 /** Joins installed ownership; active Games still leave through their final-save route. */
 export const Route = createFileRoute("/editor")({
@@ -35,9 +34,6 @@ export const Route = createFileRoute("/editor")({
 				replace: true,
 			});
 		}
-		await context.rendererRuntime.runPromise(activateEditorMcpFx, {
-			signal: abortController.signal,
-		});
 		if (location.pathname === "/editor" || location.pathname === "/editor/") {
 			throw redirect({
 				to: "/editor/welcome",

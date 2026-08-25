@@ -1,6 +1,6 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect } from "effect";
-import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { access, mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -48,6 +48,23 @@ describe("createFilesystemEditorMcpPreferencesFx", () => {
 		expect(await readFile(currentPath(), "utf8")).toBe("45678");
 		expect(await Effect.runPromise(preferences.readPortFx)).toBe(45_678);
 		await expect(access(pendingPath())).rejects.toBeDefined();
+	});
+
+	it("persists the ngrok credential and clears only the discovered domain", async () => {
+		const preferences = await createPreferences();
+		await Effect.runPromise(preferences.writeNgrokAuthtokenFx("  ngrok-token  "));
+		await Effect.runPromise(preferences.writeNgrokDomainFx("stable.ngrok-free.app"));
+
+		expect(await Effect.runPromise(preferences.readNgrokAuthtokenFx)).toBe("ngrok-token");
+		expect(await Effect.runPromise(preferences.readNgrokDomainFx)).toBe(
+			"stable.ngrok-free.app",
+		);
+		expect(
+			(await stat(join(preferenceDirectory(), "editor-mcp.ngrok-authtoken"))).mode & 0o777,
+		).toBe(0o600);
+		await Effect.runPromise(preferences.clearNgrokDomainFx);
+		expect(await Effect.runPromise(preferences.readNgrokDomainFx)).toBeUndefined();
+		expect(await Effect.runPromise(preferences.readNgrokAuthtokenFx)).toBe("ngrok-token");
 	});
 
 	it("falls back from malformed or out-of-range persisted ports", async () => {

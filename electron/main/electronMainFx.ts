@@ -26,6 +26,8 @@ import { createFilesystemCliInstallationFx } from "./cli/createFilesystemCliInst
 import { registerCliInstallationIpcFx } from "./cli/registerCliInstallationIpcFx";
 import { createChatGptViewControllerOwnershipFx } from "./chatgpt/createChatGptViewControllerOwnershipFx";
 import { registerChatGptIpcFx } from "./chatgpt/registerChatGptIpcFx";
+import { createSqliteEditorMcpAuthOwnershipFx } from "./editor-mcp/auth/createSqliteEditorMcpAuthOwnershipFx";
+import { createNgrokEditorMcpTunnelFx } from "./editor-mcp/tunnel/createNgrokEditorMcpTunnelFx";
 
 export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const hasSingleInstanceLock = app.requestSingleInstanceLock();
@@ -137,16 +139,31 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const editorMcpPreferences = yield* createFilesystemEditorMcpPreferencesFx({
 		root: userDataPaths.game.preferences,
 	});
+	const editorMcpAuth = yield* createSqliteEditorMcpAuthOwnershipFx({
+		databasePath: userDataPaths.editor.mcpAuthDatabase,
+	});
+	const editorMcpTunnel = yield* createNgrokEditorMcpTunnelFx;
 	const editorMcpOwnership = yield* createEditorMcpOwnershipFx({
+		auth: editorMcpAuth,
 		editor: editorProjectServiceOwnership,
+		notifyOverviewChanged: (overview) => {
+			for (const window of BrowserWindow.getAllWindows()) {
+				if (window.isDestroyed()) continue;
+				window.webContents.send(
+					ArkiniElectronApi.channels.editorMcpOverviewChanged,
+					overview,
+				);
+			}
+		},
 		notifyProjectChanged: (projectId) => {
 			for (const window of BrowserWindow.getAllWindows()) {
 				if (window.isDestroyed()) continue;
 				window.webContents.send(ArkiniElectronApi.channels.editorProjectChanged, projectId);
 			}
 		},
-		readPortFx: editorMcpPreferences.readPortFx,
+		preferences: editorMcpPreferences,
 		runPromise: ElectronMainRuntime.runPromise,
+		tunnel: editorMcpTunnel,
 	});
 	yield* Effect.sync(() => app.once("will-quit", editorMcpOwnership.closeSync));
 	const windowModeControllerOwnership = yield* createWindowModeControllerOwnershipFx();
@@ -193,7 +210,6 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	});
 	yield* registerEditorMcpPreferencesIpcFx({
 		trustedRenderer,
-		preferences: editorMcpPreferences,
 		ownership: editorMcpOwnership,
 	});
 	yield* registerCliInstallationIpcFx({

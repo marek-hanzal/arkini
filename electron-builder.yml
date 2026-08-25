@@ -1,6 +1,8 @@
 appId: dev.marekhanzal.arkini
 productName: Arkini
 asar: true
+asarUnpack:
+  - node_modules/@ngrok/ngrok-darwin-arm64/**/*.node
 npmRebuild: false
 electronLanguages:
   - cs-CZ
@@ -16,6 +18,8 @@ directories:
 files:
   - '!node_modules/**/*'
   - package.json
+  - node_modules/@ngrok/ngrok/**/*
+  - node_modules/@ngrok/ngrok-darwin-arm64/**/*
   - from: .out/desktop/build
     to: app
     filter:

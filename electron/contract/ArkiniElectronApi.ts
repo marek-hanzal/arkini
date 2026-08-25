@@ -10,11 +10,10 @@ import type {
 import type { LastPackageIdSchema } from "./launcher/LastPackageIdSchema";
 import type { DiagnosticRecord } from "./diagnostics/DiagnosticRecord";
 import type { EditorProjectTransport } from "./editor/EditorProjectTransport";
-import type {
-	EditorMcpPortAvailability,
-	EditorMcpPortSchema,
-	EditorMcpStatus,
-} from "./editor/EditorMcpPortSchema";
+import type { EditorMcpCommandResultSchema } from "./editor/EditorMcpCommandResultSchema";
+import type { EditorMcpCommandSchema } from "./editor/EditorMcpCommandSchema";
+import type { EditorMcpConfigurationSchema } from "./editor/EditorMcpConfigurationSchema";
+import type { EditorMcpOverviewSchema } from "./editor/EditorMcpOverviewSchema";
 import type { WindowModeSchema } from "./window/WindowModeSchema";
 
 export namespace ArkiniElectronApi {
@@ -72,11 +71,10 @@ export namespace ArkiniElectronApi {
 		editorBoardScenarioRead: "arkini:editor:board-scenario:read",
 		editorBoardScenarioWrite: "arkini:editor:board-scenario:write",
 		editorBoardScenarioDelete: "arkini:editor:board-scenario:delete",
-		editorMcpPortRead: "arkini:editor:mcp:port:read",
-		editorMcpPortWrite: "arkini:editor:mcp:port:write",
-		editorMcpPortCheck: "arkini:editor:mcp:port:check",
-		editorMcpStatus: "arkini:editor:mcp:status",
-		editorMcpActivate: "arkini:editor:mcp:activate",
+		editorMcpOverviewRead: "arkini:editor:mcp:overview:read",
+		editorMcpConfigure: "arkini:editor:mcp:configure",
+		editorMcpCommand: "arkini:editor:mcp:command",
+		editorMcpOverviewChanged: "arkini:editor:mcp:overview:changed",
 		editorMcpProjectContextSet: "arkini:editor:mcp:project-context:set",
 		editorMcpProjectContextClear: "arkini:editor:mcp:project-context:clear",
 		editorMcpVersionCheckoutRequest: "arkini:editor:mcp:version-checkout:request",
@@ -260,18 +258,21 @@ export namespace ArkiniElectronApi {
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.VersionDescriptor>>;
 		};
 		readonly editorMcp: {
-			readonly status: () => Promise<EditorMcpStatus>;
-			readonly activate: () => Promise<EditorMcpStatus>;
+			readonly readOverview: () => Promise<EditorMcpOverviewSchema.Type>;
+			readonly configure: (
+				configuration: EditorMcpConfigurationSchema.Type,
+			) => Promise<EditorMcpOverviewSchema.Type>;
+			readonly command: (
+				command: EditorMcpCommandSchema.Type,
+			) => Promise<EditorMcpCommandResultSchema.Type>;
+			readonly onOverviewChanged: (
+				listener: (overview: EditorMcpOverviewSchema.Type) => void,
+			) => () => void;
 			readonly setProjectContext: (projectId: string) => Promise<void>;
 			readonly clearProjectContext: (projectId: string) => Promise<void>;
 			readonly onVersionCheckoutRequested: (
 				listener: (request: EditorMcpVersionCheckoutRequest) => Promise<void>,
 			) => () => void;
-			readonly readPort: () => Promise<EditorMcpPortSchema.Type>;
-			readonly writePort: (port: EditorMcpPortSchema.Type) => Promise<void>;
-			readonly checkPort: (
-				port: EditorMcpPortSchema.Type,
-			) => Promise<EditorMcpPortAvailability>;
 		};
 		readonly save: {
 			readonly read: (key: SaveKey) => Promise<Uint8Array | null>;

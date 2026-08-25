@@ -43,7 +43,7 @@ describe("editor MCP item lifecycle", () => {
 			}),
 		);
 		ownership.setProjectContext("item-lifecycle");
-		await Effect.runPromise(ownership.activateFx);
+		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectEditorMcpClient(port);
 
 		const renamed = await client.callTool({

@@ -26,7 +26,7 @@ describe("editor MCP item creation", () => {
 			}),
 		);
 		ownership.setProjectContext("create-item-project");
-		await Effect.runPromise(ownership.activateFx);
+		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectEditorMcpClient(port);
 
 		const created = await client.callTool({
@@ -101,7 +101,7 @@ describe("editor MCP item creation", () => {
 			}),
 		);
 		ownership.setProjectContext("all-item-types-project");
-		await Effect.runPromise(ownership.activateFx);
+		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectEditorMcpClient(port);
 		const types = [
 			"simple",
@@ -204,7 +204,7 @@ describe("editor MCP item creation", () => {
 			}),
 		);
 		ownership.setProjectContext("notification-project");
-		await Effect.runPromise(ownership.activateFx);
+		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectEditorMcpClient(port);
 
 		const created = await client.callTool({

@@ -26,7 +26,7 @@ describe("editor MCP typed item editing", () => {
 			}),
 		);
 		ownership.setProjectContext("edit-all-types-project");
-		await Effect.runPromise(ownership.activateFx);
+		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectEditorMcpClient(port);
 		const cases = [
 			[

@@ -26,7 +26,7 @@ describe("editor MCP project configuration", () => {
 			}),
 		);
 		ownership.setProjectContext("project-config");
-		await Effect.runPromise(ownership.activateFx);
+		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectEditorMcpClient(port);
 
 		const read = await client.callTool({

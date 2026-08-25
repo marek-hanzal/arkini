@@ -9,7 +9,6 @@ import { WindowModeAtom } from "~/bridge/window/WindowModeAtom";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 import { useSettingsDirectoriesModel } from "~/ui/settings/useSettingsDirectoriesModel";
 import { useSettingsCliModel } from "~/ui/settings/useSettingsCliModel";
-import { useSettingsMcpModel } from "~/ui/settings/useSettingsMcpModel";
 import { SettingsCommandAtom } from "~/ui/settings/SettingsCommandAtom";
 
 /** Owns application settings commands and the one Escape lifecycle for the settings surface. */
@@ -22,7 +21,6 @@ export const useSettingsModel = ({
 	const cheatAvailability = useCheatAvailability();
 	const windowMode = useAtomValue(WindowModeAtom);
 	const [commandState, runCommand] = useAtom(SettingsCommandAtom);
-	const mcp = useSettingsMcpModel();
 	const cli = useSettingsCliModel();
 	const directories = useSettingsDirectoriesModel();
 	const blocked = commandState.kind === "pending";
@@ -52,7 +50,6 @@ export const useSettingsModel = ({
 	return {
 		blocked,
 		cheatToolsAvailable: cheatAvailability.available,
-		...mcp,
 		...cli,
 		exitPending,
 		...directories,

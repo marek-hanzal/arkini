@@ -6,6 +6,7 @@ import {
 	createEditorMcpOwnershipFx,
 	type EditorMcpOwnership,
 } from "../../../../../electron/main/editor-mcp/http/createEditorMcpOwnershipFx";
+import { createSqliteEditorMcpAuthOwnershipFx } from "../../../../../electron/main/editor-mcp/auth/createSqliteEditorMcpAuthOwnershipFx";
 import {
 	createSqliteEditorProjectRepositoryFx,
 	type SqliteEditorProjectRepository,
@@ -71,15 +72,34 @@ export const createEditorMcpHarness = async (
 	);
 	registerEditorMcpCleanup(() => Effect.runPromise(repository.closeFx));
 	const port = await reserveReleasedEditorMcpPort();
+	const auth = Effect.runSync(
+		createSqliteEditorMcpAuthOwnershipFx({
+			databasePath: ":memory:",
+		}),
+	);
 	const ownership = Effect.runSync(
 		createEditorMcpOwnershipFx({
+			auth,
 			editor: {
 				type: "ready",
 				repository,
 			},
+			notifyOverviewChanged: () => undefined,
 			notifyProjectChanged,
-			readPortFx: Effect.succeed(port),
+			preferences: {
+				readPortFx: Effect.succeed(port),
+				writePortFx: () => Effect.void,
+				readNgrokAuthtokenFx: Effect.succeed(undefined),
+				writeNgrokAuthtokenFx: () => Effect.void,
+				readNgrokDomainFx: Effect.succeed(undefined),
+				writeNgrokDomainFx: () => Effect.void,
+				clearNgrokDomainFx: Effect.void,
+			},
 			runPromise,
+			tunnel: {
+				openFx: () =>
+					Effect.fail(new Error("Remote MCP is unavailable in the local harness.")),
+			},
 		}),
 	);
 	registerEditorMcpCleanup(() => Effect.runPromise(ownership.closeFx));

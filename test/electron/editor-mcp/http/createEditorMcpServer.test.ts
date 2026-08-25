@@ -17,7 +17,7 @@ afterEach(cleanupEditorMcpHarnesses);
 describe("editor MCP server", () => {
 	it("publishes the modern tool catalog and rejects calls without project context", async () => {
 		const { ownership, port } = await createEditorMcpHarness();
-		await Effect.runPromise(ownership.activateFx);
+		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectEditorMcpClient(port);
 		expect(client.getProtocolEra()).toBe("modern");
 		expect(client.getServerVersion()).toMatchObject({
@@ -141,7 +141,7 @@ describe("editor MCP server", () => {
 		);
 		ownership.setProjectContext("project-context");
 		ownership.clearProjectContext("another-project");
-		await Effect.runPromise(ownership.activateFx);
+		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectEditorMcpClient(port);
 		const project = await client.callTool({
 			name: "project",
@@ -168,7 +168,7 @@ describe("editor MCP server", () => {
 			}),
 		);
 		ownership.setProjectContext("legacy-project");
-		await Effect.runPromise(ownership.activateFx);
+		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectEditorMcpClient(port, "legacy");
 		expect(client.getProtocolEra()).toBe("legacy");
 		expect((await client.listTools()).tools.map(({ name }) => name)).toEqual([
@@ -235,7 +235,7 @@ describe("editor MCP server", () => {
 			}),
 		);
 		ownership.setProjectContext("tool-project");
-		await Effect.runPromise(ownership.activateFx);
+		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectEditorMcpClient(port);
 		const relation = await client.callTool({
 			name: "item_input",
@@ -315,7 +315,7 @@ describe("editor MCP server", () => {
 				});
 			}),
 		);
-		await Effect.runPromise(ownership.activateFx);
+		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectEditorMcpClient(port);
 
 		const initialStatus = await client.callTool({

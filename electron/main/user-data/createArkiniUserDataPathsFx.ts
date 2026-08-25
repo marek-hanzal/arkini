@@ -22,6 +22,7 @@ export const createArkiniUserDataPathsFx = Effect.fn("createArkiniUserDataPathsF
 				editor: {
 					root: editorRoot,
 					database: join(editorRoot, "projects.sqlite"),
+					mcpAuthDatabase: join(editorRoot, "mcp-auth.sqlite"),
 				},
 			};
 		}),

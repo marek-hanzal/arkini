@@ -29,6 +29,7 @@ import { Route as EditorProjectIdChatgptRouteImport } from "./@routes/editor/$pr
 import { Route as EditorProjectIdEditorRouteImport } from "./@routes/editor/$projectId/editor"
 import { Route as EditorProjectIdEstimateRouteImport } from "./@routes/editor/$projectId/estimate"
 import { Route as EditorProjectIdFlowRouteImport } from "./@routes/editor/$projectId/flow"
+import { Route as EditorProjectIdMcpRouteImport } from "./@routes/editor/$projectId/mcp"
 import { Route as EditorProjectIdNotesRouteImport } from "./@routes/editor/$projectId/notes"
 import { Route as EditorProjectIdProjectRouteImport } from "./@routes/editor/$projectId/project"
 import { Route as EditorProjectIdVersionsRouteImport } from "./@routes/editor/$projectId/versions"
@@ -40,6 +41,8 @@ import { Route as EditorProjectIdBoardIndexRouteImport } from "./@routes/editor/
 import { Route as EditorProjectIdBoardInventoryRouteImport } from "./@routes/editor/$projectId/board/inventory"
 import { Route as EditorProjectIdEditorIndexRouteImport } from "./@routes/editor/$projectId/editor/index"
 import { Route as EditorProjectIdEditorItemsRouteImport } from "./@routes/editor/$projectId/editor/items"
+import { Route as EditorProjectIdMcpIndexRouteImport } from "./@routes/editor/$projectId/mcp/index"
+import { Route as EditorProjectIdMcpSectionIdRouteImport } from "./@routes/editor/$projectId/mcp/$sectionId"
 import { Route as EditorProjectIdProjectIndexRouteImport } from "./@routes/editor/$projectId/project/index"
 import { Route as EditorProjectIdProjectSectionIdRouteImport } from "./@routes/editor/$projectId/project/$sectionId"
 import { Route as EditorProjectIdVersionsIndexRouteImport } from "./@routes/editor/$projectId/versions/index"
@@ -167,6 +170,11 @@ const EditorProjectIdFlowRoute = EditorProjectIdFlowRouteImport.update({
   path: "/flow",
   getParentRoute: () => EditorProjectIdRoute,
 } as any)
+const EditorProjectIdMcpRoute = EditorProjectIdMcpRouteImport.update({
+  id: "/mcp",
+  path: "/mcp",
+  getParentRoute: () => EditorProjectIdRoute,
+} as any)
 const EditorProjectIdNotesRoute = EditorProjectIdNotesRouteImport.update({
   id: "/notes",
   path: "/notes",
@@ -226,6 +234,17 @@ const EditorProjectIdEditorItemsRoute =
     id: "/items",
     path: "/items",
     getParentRoute: () => EditorProjectIdEditorRoute,
+  } as any)
+const EditorProjectIdMcpIndexRoute = EditorProjectIdMcpIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => EditorProjectIdMcpRoute,
+} as any)
+const EditorProjectIdMcpSectionIdRoute =
+  EditorProjectIdMcpSectionIdRouteImport.update({
+    id: "/$sectionId",
+    path: "/$sectionId",
+    getParentRoute: () => EditorProjectIdMcpRoute,
   } as any)
 const EditorProjectIdProjectIndexRoute =
   EditorProjectIdProjectIndexRouteImport.update({
@@ -408,6 +427,7 @@ export interface FileRoutesByFullPath {
   "/editor/$projectId/editor": typeof EditorProjectIdEditorRouteWithChildren
   "/editor/$projectId/estimate": typeof EditorProjectIdEstimateRoute
   "/editor/$projectId/flow": typeof EditorProjectIdFlowRoute
+  "/editor/$projectId/mcp": typeof EditorProjectIdMcpRouteWithChildren
   "/editor/$projectId/notes": typeof EditorProjectIdNotesRoute
   "/editor/$projectId/project": typeof EditorProjectIdProjectRouteWithChildren
   "/editor/$projectId/versions": typeof EditorProjectIdVersionsRouteWithChildren
@@ -415,6 +435,7 @@ export interface FileRoutesByFullPath {
   "/editor/$projectId/assets/$resourceId": typeof EditorProjectIdAssetsResourceIdRouteWithChildren
   "/editor/$projectId/board/inventory": typeof EditorProjectIdBoardInventoryRoute
   "/editor/$projectId/editor/items": typeof EditorProjectIdEditorItemsRouteWithChildren
+  "/editor/$projectId/mcp/$sectionId": typeof EditorProjectIdMcpSectionIdRoute
   "/editor/$projectId/project/$sectionId": typeof EditorProjectIdProjectSectionIdRoute
   "/editor/$projectId/versions/commit": typeof EditorProjectIdVersionsCommitRoute
   "/editor/$projectId/versions/history": typeof EditorProjectIdVersionsHistoryRoute
@@ -426,6 +447,7 @@ export interface FileRoutesByFullPath {
   "/editor/$projectId/assets/": typeof EditorProjectIdAssetsIndexRoute
   "/editor/$projectId/board/": typeof EditorProjectIdBoardIndexRoute
   "/editor/$projectId/editor/": typeof EditorProjectIdEditorIndexRoute
+  "/editor/$projectId/mcp/": typeof EditorProjectIdMcpIndexRoute
   "/editor/$projectId/project/": typeof EditorProjectIdProjectIndexRoute
   "/editor/$projectId/versions/": typeof EditorProjectIdVersionsIndexRoute
   "/editor/$projectId/assets/$resourceId/detail": typeof EditorProjectIdAssetsResourceIdDetailRouteWithChildren
@@ -468,6 +490,7 @@ export interface FileRoutesByTo {
   "/editor/$projectId/assets/$resourceId": typeof EditorProjectIdAssetsResourceIdRouteWithChildren
   "/editor/$projectId/board/inventory": typeof EditorProjectIdBoardInventoryRoute
   "/editor/$projectId/editor/items": typeof EditorProjectIdEditorItemsRouteWithChildren
+  "/editor/$projectId/mcp/$sectionId": typeof EditorProjectIdMcpSectionIdRoute
   "/editor/$projectId/project/$sectionId": typeof EditorProjectIdProjectSectionIdRoute
   "/editor/$projectId/versions/commit": typeof EditorProjectIdVersionsCommitRoute
   "/editor/$projectId/versions/history": typeof EditorProjectIdVersionsHistoryRoute
@@ -479,6 +502,7 @@ export interface FileRoutesByTo {
   "/editor/$projectId/assets": typeof EditorProjectIdAssetsIndexRoute
   "/editor/$projectId/board": typeof EditorProjectIdBoardIndexRoute
   "/editor/$projectId/editor": typeof EditorProjectIdEditorIndexRoute
+  "/editor/$projectId/mcp": typeof EditorProjectIdMcpIndexRoute
   "/editor/$projectId/project": typeof EditorProjectIdProjectIndexRoute
   "/editor/$projectId/versions": typeof EditorProjectIdVersionsIndexRoute
   "/editor/$projectId/assets/$resourceId/edit": typeof EditorProjectIdAssetsResourceIdEditRoute
@@ -519,6 +543,7 @@ export interface FileRoutesById {
   "/editor/$projectId/editor": typeof EditorProjectIdEditorRouteWithChildren
   "/editor/$projectId/estimate": typeof EditorProjectIdEstimateRoute
   "/editor/$projectId/flow": typeof EditorProjectIdFlowRoute
+  "/editor/$projectId/mcp": typeof EditorProjectIdMcpRouteWithChildren
   "/editor/$projectId/notes": typeof EditorProjectIdNotesRoute
   "/editor/$projectId/project": typeof EditorProjectIdProjectRouteWithChildren
   "/editor/$projectId/versions": typeof EditorProjectIdVersionsRouteWithChildren
@@ -527,6 +552,7 @@ export interface FileRoutesById {
   "/editor/$projectId/assets/$resourceId": typeof EditorProjectIdAssetsResourceIdRouteWithChildren
   "/editor/$projectId/board/inventory": typeof EditorProjectIdBoardInventoryRoute
   "/editor/$projectId/editor/items": typeof EditorProjectIdEditorItemsRouteWithChildren
+  "/editor/$projectId/mcp/$sectionId": typeof EditorProjectIdMcpSectionIdRoute
   "/editor/$projectId/project/$sectionId": typeof EditorProjectIdProjectSectionIdRoute
   "/editor/$projectId/versions/commit": typeof EditorProjectIdVersionsCommitRoute
   "/editor/$projectId/versions/history": typeof EditorProjectIdVersionsHistoryRoute
@@ -538,6 +564,7 @@ export interface FileRoutesById {
   "/editor/$projectId/assets/": typeof EditorProjectIdAssetsIndexRoute
   "/editor/$projectId/board/": typeof EditorProjectIdBoardIndexRoute
   "/editor/$projectId/editor/": typeof EditorProjectIdEditorIndexRoute
+  "/editor/$projectId/mcp/": typeof EditorProjectIdMcpIndexRoute
   "/editor/$projectId/project/": typeof EditorProjectIdProjectIndexRoute
   "/editor/$projectId/versions/": typeof EditorProjectIdVersionsIndexRoute
   "/editor/$projectId/assets/$resourceId/detail": typeof EditorProjectIdAssetsResourceIdDetailRouteWithChildren
@@ -580,6 +607,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/editor"
     | "/editor/$projectId/estimate"
     | "/editor/$projectId/flow"
+    | "/editor/$projectId/mcp"
     | "/editor/$projectId/notes"
     | "/editor/$projectId/project"
     | "/editor/$projectId/versions"
@@ -587,6 +615,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/assets/$resourceId"
     | "/editor/$projectId/board/inventory"
     | "/editor/$projectId/editor/items"
+    | "/editor/$projectId/mcp/$sectionId"
     | "/editor/$projectId/project/$sectionId"
     | "/editor/$projectId/versions/commit"
     | "/editor/$projectId/versions/history"
@@ -598,6 +627,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/assets/"
     | "/editor/$projectId/board/"
     | "/editor/$projectId/editor/"
+    | "/editor/$projectId/mcp/"
     | "/editor/$projectId/project/"
     | "/editor/$projectId/versions/"
     | "/editor/$projectId/assets/$resourceId/detail"
@@ -640,6 +670,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/assets/$resourceId"
     | "/editor/$projectId/board/inventory"
     | "/editor/$projectId/editor/items"
+    | "/editor/$projectId/mcp/$sectionId"
     | "/editor/$projectId/project/$sectionId"
     | "/editor/$projectId/versions/commit"
     | "/editor/$projectId/versions/history"
@@ -651,6 +682,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/assets"
     | "/editor/$projectId/board"
     | "/editor/$projectId/editor"
+    | "/editor/$projectId/mcp"
     | "/editor/$projectId/project"
     | "/editor/$projectId/versions"
     | "/editor/$projectId/assets/$resourceId/edit"
@@ -690,6 +722,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/editor"
     | "/editor/$projectId/estimate"
     | "/editor/$projectId/flow"
+    | "/editor/$projectId/mcp"
     | "/editor/$projectId/notes"
     | "/editor/$projectId/project"
     | "/editor/$projectId/versions"
@@ -698,6 +731,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/assets/$resourceId"
     | "/editor/$projectId/board/inventory"
     | "/editor/$projectId/editor/items"
+    | "/editor/$projectId/mcp/$sectionId"
     | "/editor/$projectId/project/$sectionId"
     | "/editor/$projectId/versions/commit"
     | "/editor/$projectId/versions/history"
@@ -709,6 +743,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/assets/"
     | "/editor/$projectId/board/"
     | "/editor/$projectId/editor/"
+    | "/editor/$projectId/mcp/"
     | "/editor/$projectId/project/"
     | "/editor/$projectId/versions/"
     | "/editor/$projectId/assets/$resourceId/detail"
@@ -882,6 +917,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof EditorProjectIdFlowRouteImport
       parentRoute: typeof EditorProjectIdRoute
     }
+    "/editor/$projectId/mcp": {
+      id: "/editor/$projectId/mcp"
+      path: "/mcp"
+      fullPath: "/editor/$projectId/mcp"
+      preLoaderRoute: typeof EditorProjectIdMcpRouteImport
+      parentRoute: typeof EditorProjectIdRoute
+    }
     "/editor/$projectId/notes": {
       id: "/editor/$projectId/notes"
       path: "/notes"
@@ -958,6 +1000,20 @@ declare module "@tanstack/react-router" {
       fullPath: "/editor/$projectId/editor/items"
       preLoaderRoute: typeof EditorProjectIdEditorItemsRouteImport
       parentRoute: typeof EditorProjectIdEditorRoute
+    }
+    "/editor/$projectId/mcp/": {
+      id: "/editor/$projectId/mcp/"
+      path: "/"
+      fullPath: "/editor/$projectId/mcp/"
+      preLoaderRoute: typeof EditorProjectIdMcpIndexRouteImport
+      parentRoute: typeof EditorProjectIdMcpRoute
+    }
+    "/editor/$projectId/mcp/$sectionId": {
+      id: "/editor/$projectId/mcp/$sectionId"
+      path: "/$sectionId"
+      fullPath: "/editor/$projectId/mcp/$sectionId"
+      preLoaderRoute: typeof EditorProjectIdMcpSectionIdRouteImport
+      parentRoute: typeof EditorProjectIdMcpRoute
     }
     "/editor/$projectId/project/": {
       id: "/editor/$projectId/project/"
@@ -1347,6 +1403,19 @@ const EditorProjectIdEditorRouteWithChildren =
     EditorProjectIdEditorRouteChildren,
   )
 
+interface EditorProjectIdMcpRouteChildren {
+  EditorProjectIdMcpSectionIdRoute: typeof EditorProjectIdMcpSectionIdRoute
+  EditorProjectIdMcpIndexRoute: typeof EditorProjectIdMcpIndexRoute
+}
+
+const EditorProjectIdMcpRouteChildren: EditorProjectIdMcpRouteChildren = {
+  EditorProjectIdMcpSectionIdRoute: EditorProjectIdMcpSectionIdRoute,
+  EditorProjectIdMcpIndexRoute: EditorProjectIdMcpIndexRoute,
+}
+
+const EditorProjectIdMcpRouteWithChildren =
+  EditorProjectIdMcpRoute._addFileChildren(EditorProjectIdMcpRouteChildren)
+
 interface EditorProjectIdProjectRouteChildren {
   EditorProjectIdProjectSectionIdRoute: typeof EditorProjectIdProjectSectionIdRoute
   EditorProjectIdProjectIndexRoute: typeof EditorProjectIdProjectIndexRoute
@@ -1389,6 +1458,7 @@ interface EditorProjectIdRouteChildren {
   EditorProjectIdEditorRoute: typeof EditorProjectIdEditorRouteWithChildren
   EditorProjectIdEstimateRoute: typeof EditorProjectIdEstimateRoute
   EditorProjectIdFlowRoute: typeof EditorProjectIdFlowRoute
+  EditorProjectIdMcpRoute: typeof EditorProjectIdMcpRouteWithChildren
   EditorProjectIdNotesRoute: typeof EditorProjectIdNotesRoute
   EditorProjectIdProjectRoute: typeof EditorProjectIdProjectRouteWithChildren
   EditorProjectIdVersionsRoute: typeof EditorProjectIdVersionsRouteWithChildren
@@ -1402,6 +1472,7 @@ const EditorProjectIdRouteChildren: EditorProjectIdRouteChildren = {
   EditorProjectIdEditorRoute: EditorProjectIdEditorRouteWithChildren,
   EditorProjectIdEstimateRoute: EditorProjectIdEstimateRoute,
   EditorProjectIdFlowRoute: EditorProjectIdFlowRoute,
+  EditorProjectIdMcpRoute: EditorProjectIdMcpRouteWithChildren,
   EditorProjectIdNotesRoute: EditorProjectIdNotesRoute,
   EditorProjectIdProjectRoute: EditorProjectIdProjectRouteWithChildren,
   EditorProjectIdVersionsRoute: EditorProjectIdVersionsRouteWithChildren,

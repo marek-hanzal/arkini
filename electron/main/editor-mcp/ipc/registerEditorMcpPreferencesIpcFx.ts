@@ -1,14 +1,14 @@
 import { app, ipcMain, type IpcMainInvokeEvent, type WebContents } from "electron";
 import { Effect } from "effect";
+import { match } from "ts-pattern";
 
 import { ArkiniElectronApi } from "../../../contract/ArkiniElectronApi";
-import { EditorMcpPortSchema } from "../../../contract/editor/EditorMcpPortSchema";
+import { EditorMcpCommandSchema } from "../../../contract/editor/EditorMcpCommandSchema";
+import { EditorMcpConfigurationSchema } from "../../../contract/editor/EditorMcpConfigurationSchema";
 import { EditorMcpProjectContextSchema } from "../../../contract/editor/EditorMcpProjectContextSchema";
 import { ElectronMainRuntime } from "../../ElectronMainRuntime";
 import type { TrustedRenderer } from "../../security/TrustedRenderer";
-import { checkEditorMcpPortAvailabilityFx } from "../http/checkEditorMcpPortAvailabilityFx";
 import type { EditorMcpOwnership } from "../http/createEditorMcpOwnershipFx";
-import type { EditorMcpPreferences } from "../preference/EditorMcpPreferences";
 import { requestEditorMcpVersionCheckoutFx } from "./requestEditorMcpVersionCheckoutFx";
 
 let registered = false;
@@ -18,14 +18,13 @@ const watchedProjectContextSenders = new WeakSet<WebContents>();
 export namespace registerEditorMcpPreferencesIpcFx {
 	export interface Props {
 		readonly trustedRenderer: TrustedRenderer;
-		readonly preferences: EditorMcpPreferences;
 		readonly ownership: EditorMcpOwnership;
 	}
 }
 
-/** Registers global MCP port settings independently from editor persistence. */
+/** Registers global MCP lifecycle/configuration independently from project persistence. */
 export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPreferencesIpcFx")(
-	({ trustedRenderer, preferences, ownership }: registerEditorMcpPreferencesIpcFx.Props) =>
+	({ trustedRenderer, ownership }: registerEditorMcpPreferencesIpcFx.Props) =>
 		Effect.sync(() => {
 			if (registered) return;
 			registered = true;
@@ -42,38 +41,36 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 				sender.on("did-start-loading", ownership.resetProjectContext);
 				sender.once("destroyed", ownership.resetProjectContext);
 			};
-			ipcMain.handle(ArkiniElectronApi.channels.editorMcpPortRead, (event) =>
-				runAuthorized(event, preferences.readPortFx),
+			ipcMain.handle(ArkiniElectronApi.channels.editorMcpOverviewRead, (event) =>
+				runAuthorized(event, ownership.readOverviewFx),
 			);
-			ipcMain.handle(ArkiniElectronApi.channels.editorMcpPortWrite, (event, candidate) =>
+			ipcMain.handle(ArkiniElectronApi.channels.editorMcpConfigure, (event, candidate) =>
 				runAuthorized(
 					event,
 					Effect.try({
-						try: () => EditorMcpPortSchema.parse(candidate),
+						try: () => EditorMcpConfigurationSchema.parse(candidate),
 						catch: (cause) => cause,
-					}).pipe(Effect.flatMap(preferences.writePortFx)),
+					}).pipe(Effect.flatMap(ownership.configureFx)),
 				),
 			);
-			ipcMain.handle(ArkiniElectronApi.channels.editorMcpPortCheck, (event, candidate) =>
+			ipcMain.handle(ArkiniElectronApi.channels.editorMcpCommand, (event, candidate) =>
 				runAuthorized(
 					event,
-					Effect.gen(function* () {
-						const port = EditorMcpPortSchema.safeParse(candidate);
-						const status = ownership.readStatus();
-						if (port.success && status.type === "ready" && status.port === port.data) {
-							return {
-								type: "active" as const,
-							};
-						}
-						return yield* checkEditorMcpPortAvailabilityFx(candidate);
-					}),
+					Effect.try({
+						try: () => EditorMcpCommandSchema.parse(candidate),
+						catch: (cause) => cause,
+					}).pipe(
+						Effect.flatMap((command) =>
+							match(command)
+								.with("start-local", () => ownership.startLocalFx)
+								.with("stop-local", () => ownership.stopLocalFx)
+								.with("start-remote", () => ownership.startRemoteFx)
+								.with("stop-remote", () => ownership.stopRemoteFx)
+								.with("reset-remote-auth", () => ownership.resetRemoteAuthFx)
+								.exhaustive(),
+						),
+					),
 				),
-			);
-			ipcMain.handle(ArkiniElectronApi.channels.editorMcpStatus, (event) =>
-				runAuthorized(event, Effect.sync(ownership.readStatus)),
-			);
-			ipcMain.handle(ArkiniElectronApi.channels.editorMcpActivate, (event) =>
-				runAuthorized(event, ownership.activateFx),
 			);
 			ipcMain.handle(
 				ArkiniElectronApi.channels.editorMcpProjectContextSet,
@@ -117,11 +114,9 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 			);
 			app.once("will-quit", () => {
 				for (const channel of [
-					ArkiniElectronApi.channels.editorMcpPortRead,
-					ArkiniElectronApi.channels.editorMcpPortWrite,
-					ArkiniElectronApi.channels.editorMcpPortCheck,
-					ArkiniElectronApi.channels.editorMcpStatus,
-					ArkiniElectronApi.channels.editorMcpActivate,
+					ArkiniElectronApi.channels.editorMcpOverviewRead,
+					ArkiniElectronApi.channels.editorMcpConfigure,
+					ArkiniElectronApi.channels.editorMcpCommand,
 					ArkiniElectronApi.channels.editorMcpProjectContextSet,
 					ArkiniElectronApi.channels.editorMcpProjectContextClear,
 				]) {

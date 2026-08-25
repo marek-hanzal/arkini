@@ -139,52 +139,6 @@ export const Settings = ({ onBackFx }: Settings.Props) => {
 						}
 					/>
 				</label>
-				<label
-					className="ak-list-row grid gap-2 rounded-lg border border-line px-4 py-3"
-					data-ui="SettingsEditorMcpPort"
-				>
-					<span className="grid gap-1">
-						<span className="text-sm font-semibold text-foreground">
-							Editor MCP port
-						</span>
-						<span className="text-sm leading-5 text-muted">
-							The local MCP server starts when you enter Editor. Port changes apply
-							after restarting Arkini.
-						</span>
-					</span>
-					<input
-						type="number"
-						min={1024}
-						max={65_535}
-						step={1}
-						value={model.editorMcpPort}
-						className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-foreground outline-none disabled:cursor-progress disabled:opacity-60"
-						disabled={
-							model.editorMcpPortStatus.kind === "loading" ||
-							model.editorMcpPortStatus.kind === "checking"
-						}
-						onChange={(event) => model.setEditorMcpPort(event.currentTarget.value)}
-						onBlur={model.checkEditorMcpPort}
-					/>
-					<p
-						className={`text-sm ${
-							model.editorMcpPortStatus.kind === "error"
-								? "text-danger"
-								: "text-muted"
-						}`}
-						aria-live="polite"
-					>
-						{model.editorMcpPortStatus.kind === "checking"
-							? "Checking port…"
-							: model.editorMcpPortStatus.kind === "available"
-								? "Port is available and saved."
-								: model.editorMcpPortStatus.kind === "active"
-									? "Port is used by the running Arkini MCP server."
-									: model.editorMcpPortStatus.kind === "error"
-										? model.editorMcpPortStatus.message
-										: "The availability check runs when this field loses focus."}
-					</p>
-				</label>
 				<SettingsOpenActionRow
 					dataUi="SettingsCli"
 					title="Command line"

@@ -16,13 +16,38 @@ export namespace createFilesystemEditorMcpPreferencesFx {
 	}
 }
 
-/** Owns the global MCP port independently from editor database readiness. */
+/** Owns global MCP transport preferences independently from editor database readiness. */
 export const createFilesystemEditorMcpPreferencesFx = Effect.fn(
 	"createFilesystemEditorMcpPreferencesFx",
 )(function* ({ root, fileSystem: provided }: createFilesystemEditorMcpPreferencesFx.Props) {
 	const fileSystem = provided ?? (yield* FileSystem.FileSystem);
 	const currentPath = join(root, "editor-mcp.port");
+	const ngrokAuthtokenPath = join(root, "editor-mcp.ngrok-authtoken");
+	const ngrokDomainPath = join(root, "editor-mcp.ngrok-domain");
 	const writeSemaphore = yield* Semaphore.make(1);
+	const readOptionalPreferenceFx = (path: string, operation: string) =>
+		readElectronPreferenceFx({
+			fileSystem,
+			path,
+			fallback: undefined as string | undefined,
+			operation,
+			parse: (stored) => stored.trim() || undefined,
+		});
+	const writeStringPreferenceFx = (
+		path: string,
+		pendingPath: string,
+		value: string,
+		operation: string,
+	) =>
+		writeElectronPreferenceFx({
+			root,
+			fileSystem,
+			pendingPath,
+			currentPath: path,
+			value,
+			operation,
+			serialize: (stored) => stored.trim(),
+		});
 	return {
 		readPortFx: readElectronPreferenceFx({
 			fileSystem,
@@ -43,5 +68,36 @@ export const createFilesystemEditorMcpPreferencesFx = Effect.fn(
 					serialize: (value) => String(EditorMcpPortSchema.parse(value)),
 				}),
 			),
+		readNgrokAuthtokenFx: readOptionalPreferenceFx(
+			ngrokAuthtokenPath,
+			"read the editor MCP ngrok authtoken",
+		),
+		writeNgrokAuthtokenFx: (authtoken) =>
+			writeSemaphore.withPermits(1)(
+				writeStringPreferenceFx(
+					ngrokAuthtokenPath,
+					join(root, "editor-mcp.ngrok-authtoken.pending"),
+					authtoken,
+					"persist the editor MCP ngrok authtoken",
+				).pipe(Effect.andThen(fileSystem.chmod(ngrokAuthtokenPath, 0o600))),
+			),
+		readNgrokDomainFx: readOptionalPreferenceFx(
+			ngrokDomainPath,
+			"read the editor MCP ngrok domain",
+		),
+		writeNgrokDomainFx: (domain) =>
+			writeSemaphore.withPermits(1)(
+				writeStringPreferenceFx(
+					ngrokDomainPath,
+					join(root, "editor-mcp.ngrok-domain.pending"),
+					domain,
+					"persist the editor MCP ngrok domain",
+				),
+			),
+		clearNgrokDomainFx: writeSemaphore.withPermits(1)(
+			fileSystem.remove(ngrokDomainPath, {
+				force: true,
+			}),
+		),
 	} satisfies EditorMcpPreferences;
 });

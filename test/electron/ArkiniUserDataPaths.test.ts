@@ -14,6 +14,7 @@ describe("Arkini user data", () => {
 			editor: {
 				root: join(userDataPath, "arkini", "editor"),
 				database: join(userDataPath, "arkini", "editor", "projects.sqlite"),
+				mcpAuthDatabase: join(userDataPath, "arkini", "editor", "mcp-auth.sqlite"),
 			},
 			game: {
 				root: join(userDataPath, "arkini", "game"),

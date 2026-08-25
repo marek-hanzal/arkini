@@ -1,14 +1,14 @@
-import { EventEmitter } from "node:events";
-import type { IpcMainInvokeEvent, WebContents } from "electron";
+import type { IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ArkiniElectronApi } from "../../../../electron/contract/ArkiniElectronApi";
-import { ElectronMainError } from "../../../../electron/main/ElectronMainError";
-import type { EditorMcpOwnership } from "../../../../electron/main/editor-mcp/http/createEditorMcpOwnershipFx";
 import { registerEditorMcpPreferencesIpcFx } from "../../../../electron/main/editor-mcp/ipc/registerEditorMcpPreferencesIpcFx";
-import type { EditorMcpPreferences } from "../../../../electron/main/editor-mcp/preference/EditorMcpPreferences";
-import type { TrustedRenderer } from "../../../../electron/main/security/TrustedRenderer";
+import {
+	createEvent,
+	createOwnership,
+	createTrustedRenderer,
+} from "./registerEditorMcpPreferencesIpc.test/fixture";
 
 const electron = vi.hoisted(() => {
 	const handlers = new Map<string, (event: unknown, candidate?: unknown) => unknown>();
@@ -63,64 +63,6 @@ const electron = vi.hoisted(() => {
 
 vi.mock("electron", () => electron.module);
 
-const createEvent = () => {
-	const sender = new EventEmitter() as WebContents;
-	Object.assign(sender, {
-		isDestroyed: vi.fn(() => false),
-		postMessage: vi.fn(),
-	});
-	return {
-		event: {
-			sender,
-		} as IpcMainInvokeEvent,
-		sender,
-	};
-};
-
-const createTrustedRenderer = (trusted = true): TrustedRenderer => ({
-	isTrustedUrl: () => trusted,
-	isTrustedIpcSender: () => trusted,
-	assertTrustedIpcSenderFx: () =>
-		trusted
-			? Effect.void
-			: Effect.fail(
-					new ElectronMainError({
-						operation: "authorize MCP context test renderer",
-						cause: "untrusted",
-					}),
-				),
-	registerWindowFx: () => Effect.void,
-});
-
-const createOwnership = (): EditorMcpOwnership => {
-	let projectContext: string | undefined;
-	return {
-		readStatus: () => ({
-			type: "inactive",
-		}),
-		readProjectContext: () => projectContext,
-		setProjectContext: vi.fn((projectId) => {
-			projectContext = projectId;
-		}),
-		clearProjectContext: vi.fn((projectId) => {
-			if (projectContext === projectId) projectContext = undefined;
-		}),
-		resetProjectContext: vi.fn(() => {
-			projectContext = undefined;
-		}),
-		activateFx: Effect.succeed({
-			type: "inactive",
-		}),
-		closeFx: Effect.void,
-		closeSync: vi.fn(),
-	};
-};
-
-const preferences: EditorMcpPreferences = {
-	readPortFx: Effect.succeed(32_310),
-	writePortFx: () => Effect.void,
-};
-
 const invoke = (event: IpcMainInvokeEvent, channel: string, candidate?: unknown) => {
 	const handler = electron.handlers.get(channel);
 	if (handler === undefined) throw new Error(`Missing IPC handler ${channel}.`);
@@ -130,13 +72,37 @@ const invoke = (event: IpcMainInvokeEvent, channel: string, candidate?: unknown)
 afterEach(() => electron.reset());
 
 describe("registerEditorMcpPreferencesIpcFx", () => {
+	it("validates commands and propagates configuration rejection", async () => {
+		const ownership = createOwnership(true);
+		const { event } = createEvent();
+		Effect.runSync(
+			registerEditorMcpPreferencesIpcFx({
+				trustedRenderer: createTrustedRenderer(),
+				ownership,
+			}),
+		);
+
+		await expect(
+			invoke(event, ArkiniElectronApi.channels.editorMcpConfigure, {
+				type: "port",
+				port: 32_311,
+			}),
+		).rejects.toThrow("Stop Local and Remote MCP");
+		expect(vi.mocked(ownership.configureFx).mock.calls[0]?.[0]).toEqual({
+			type: "port",
+			port: 32_311,
+		});
+		await expect(
+			invoke(event, ArkiniElectronApi.channels.editorMcpCommand, "start-everything"),
+		).rejects.toBeDefined();
+	});
+
 	it("validates and owns one trusted renderer project context", async () => {
 		const ownership = createOwnership();
 		const { event, sender } = createEvent();
 		Effect.runSync(
 			registerEditorMcpPreferencesIpcFx({
 				trustedRenderer: createTrustedRenderer(),
-				preferences,
 				ownership,
 			}),
 		);
@@ -197,7 +163,6 @@ describe("registerEditorMcpPreferencesIpcFx", () => {
 		Effect.runSync(
 			registerEditorMcpPreferencesIpcFx({
 				trustedRenderer: createTrustedRenderer(false),
-				preferences,
 				ownership,
 			}),
 		);

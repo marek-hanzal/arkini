@@ -27,6 +27,9 @@ export default defineConfig(({ command }) => {
 				minify: true,
 				outDir: resolve(".out/desktop/build/main"),
 				rollupOptions: {
+					external: [
+						/^@ngrok\/ngrok(?:$|-)/,
+					],
 					input: {
 						index: resolve("electron/main/index.ts"),
 						"cli/arkini": resolve("src/engine/cli/arkini.ts"),

@@ -4,9 +4,7 @@ import { useCallback, useMemo, type PropsWithChildren } from "react";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import type { EditorItem, EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { ButtonLink } from "~/ui/button/Button";
 import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
-import { editorBackLinkClassName, EditorBackIcon } from "~/ui/editor/EditorBackIcon";
 import { EditorFormSectionPage } from "~/ui/form/EditorFormSectionPage";
 import { EditorItemFormProvider } from "~/ui/item/editor/EditorItemFormContext";
 import { EditorItemSectionLink } from "~/ui/item/editor/EditorItemSectionLink";
@@ -16,6 +14,7 @@ import type {
 } from "~/ui/item/editor/EditorItemSections";
 import { readEditorItemFormSectionsFx } from "~/ui/item/editor/readEditorItemFormSectionsFx";
 import { EditorCompatibilityNotice } from "~/ui/editor/EditorCompatibilityNotice";
+import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import { useEditorItemFormController } from "~/ui/item/editor/useEditorItemFormController";
 
 /** Owns navigation, controller state, tabs, and save presentation for one item form lifecycle. */
@@ -120,26 +119,20 @@ export const EditorItemFormSession = ({
 					saving={controller.isSaving}
 					leading={
 						isNew ? (
-							<ButtonLink
+							<EditorHistoryBackButton
 								to="/editor/$projectId/editor/items/list"
 								params={{
 									projectId: params.projectId,
 								}}
-								className={editorBackLinkClassName}
-							>
-								<EditorBackIcon />
-							</ButtonLink>
+							/>
 						) : (
-							<ButtonLink
+							<EditorHistoryBackButton
 								to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
 								params={{
 									...params,
 									sectionId,
 								}}
-								className={editorBackLinkClassName}
-							>
-								<EditorBackIcon />
-							</ButtonLink>
+							/>
 						)
 					}
 					title={<h1 className="truncate text-xl font-semibold">{title}</h1>}

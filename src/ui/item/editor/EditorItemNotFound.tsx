@@ -1,5 +1,5 @@
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { ButtonLink } from "~/ui/button/Button";
+import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 
 /** Presents one missing canonical item route without duplicating navigation chrome. */
 export const EditorItemNotFound = ({ uid }: { readonly uid: string }) => {
@@ -12,15 +12,15 @@ export const EditorItemNotFound = ({ uid }: { readonly uid: string }) => {
 			<div className="max-w-lg rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-6 text-center">
 				<h1 className="text-xl font-semibold">Item not found</h1>
 				<p className="mt-2 text-sm text-muted">No saved item owns UID {uid}.</p>
-				<ButtonLink
+				<EditorHistoryBackButton
 					to="/editor/$projectId/editor/items/list"
 					params={{
 						projectId: project.projectId,
 					}}
 					className="mt-5"
 				>
-					Back to items
-				</ButtonLink>
+					Back
+				</EditorHistoryBackButton>
 			</div>
 		</section>
 	);

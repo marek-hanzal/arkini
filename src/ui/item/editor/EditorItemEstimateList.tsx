@@ -1,16 +1,15 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import type { EditorItemEstimateSort } from "~/ui/item/editor/EditorItemEstimateSort";
 import { searchEditorItemsFx } from "~/editor/searchEditorItemsFx";
 import { EditorSelect, type EditorSelectOption } from "~/ui/form/EditorSelect";
 import { EditorItemEstimateListRow } from "~/ui/item/editor/EditorItemEstimateListRow";
 import { useEditorItemEstimateIndex } from "~/ui/item/editor/useEditorItemEstimateIndex";
 import { Status } from "~/ui/status/Status";
 
-type EstimateSort = "demand" | "fastest" | "slowest";
-
-const EstimateSortOptions: ReadonlyArray<EditorSelectOption<EstimateSort>> = [
+const EstimateSortOptions: ReadonlyArray<EditorSelectOption<EditorItemEstimateSort>> = [
 	{
 		label: "Fastest first",
 		value: "fastest",
@@ -28,7 +27,7 @@ const EstimateSortOptions: ReadonlyArray<EditorSelectOption<EstimateSort>> = [
 const compareRuntime = (
 	left: number | undefined,
 	right: number | undefined,
-	direction: EstimateSort,
+	direction: EditorItemEstimateSort,
 ) => {
 	if (left === undefined) return right === undefined ? 0 : 1;
 	if (right === undefined) return -1;
@@ -36,11 +35,19 @@ const compareRuntime = (
 };
 
 /** Lists all static item estimates without analyzing the authored graph on the renderer thread. */
-export const EditorItemEstimateList = () => {
+export const EditorItemEstimateList = ({
+	onQueryChange,
+	onSortChange,
+	query,
+	sort,
+}: {
+	readonly onQueryChange: (query: string) => void;
+	readonly onSortChange: (sort: EditorItemEstimateSort) => void;
+	readonly query: string;
+	readonly sort: EditorItemEstimateSort;
+}) => {
 	const project = useEditorProject();
 	const state = useEditorItemEstimateIndex(project);
-	const [query, setQuery] = useState("");
-	const [sort, setSort] = useState<EstimateSort>("fastest");
 	const maximumDemand = Math.max(0, ...state.entries.map(({ demand }) => demand));
 	const rows = useMemo(() => {
 		const estimates = new Map(
@@ -82,6 +89,7 @@ export const EditorItemEstimateList = () => {
 	return (
 		<section
 			className="h-full min-h-0 overflow-y-auto overscroll-contain"
+			data-scroll-restoration-id="editor-estimate-list"
 			aria-label="Item estimates"
 			data-ui="EditorItemEstimateList"
 		>
@@ -92,11 +100,11 @@ export const EditorItemEstimateList = () => {
 					className="h-12 min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
 					placeholder="Search item title or ID…"
 					aria-label="Search item estimates"
-					onChange={(event) => setQuery(event.currentTarget.value)}
+					onChange={(event) => onQueryChange(event.currentTarget.value)}
 				/>
 				<EditorSelect
 					label="Sort item estimates"
-					onChange={setSort}
+					onChange={onSortChange}
 					options={EstimateSortOptions}
 					value={sort}
 				/>

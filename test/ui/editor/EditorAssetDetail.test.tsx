@@ -33,6 +33,11 @@ vi.mock("~/ui/button/Button", () => {
 	};
 });
 
+vi.mock("~/ui/editor/EditorHistoryBackButton", () => ({
+	EditorHistoryBackButton: ({ children }: { readonly children?: ReactNode }) =>
+		createElement("span", null, children),
+}));
+
 import { EditorAssetDetail } from "~/ui/resource/editor/EditorAssetDetail";
 import { EditorAssetTechnical } from "~/ui/resource/editor/EditorAssetTechnical";
 import { EditorAssetUsage } from "~/ui/resource/editor/EditorAssetUsage";

@@ -46,6 +46,7 @@ export const EditorAssetManager = (props: EditorAssetManager.Props) => {
 	return (
 		<section
 			className="h-full min-h-0 overflow-y-auto overscroll-contain"
+			data-scroll-restoration-id="editor-asset-list"
 			data-ui="EditorAssetManager"
 		>
 			<header className="ak-editor-page-header flex min-w-0 flex-wrap items-center gap-2 p-3">

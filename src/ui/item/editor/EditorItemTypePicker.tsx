@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { EditorItemTypes } from "~/bridge/item/editor/EditorItemModel";
 import { ButtonLink } from "~/ui/button/Button";
-import { editorBackLinkClassName, EditorBackIcon } from "~/ui/editor/EditorBackIcon";
+import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import { EditorItemTypePresentation } from "~/ui/item/editor/EditorItemTypePresentation";
 
 /** Starts item creation from the authoritative item discriminator enum. */
@@ -23,20 +23,18 @@ export const EditorItemTypePicker = () => {
 	return (
 		<section
 			className="h-full min-h-0 overflow-y-auto overscroll-contain"
+			data-scroll-restoration-id="editor-item-type-picker"
 			aria-labelledby="editor-new-item-title"
 			data-ui="EditorItemTypePicker"
 		>
 			<header className="ak-editor-page-header flex min-w-0 flex-wrap items-center gap-3 p-3">
-				<ButtonLink
+				<EditorHistoryBackButton
 					to="/editor/$projectId/editor/items/list"
 					params={{
 						projectId: project.projectId,
 					}}
-					className={editorBackLinkClassName}
 					aria-label="Back to items"
-				>
-					<EditorBackIcon />
-				</ButtonLink>
+				/>
 				<h1
 					id="editor-new-item-title"
 					className="text-xl font-semibold"

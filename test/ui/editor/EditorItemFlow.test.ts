@@ -59,6 +59,11 @@ vi.mock("~/ui/button/Button", () => {
 	};
 });
 
+vi.mock("~/ui/editor/EditorHistoryBackButton", () => ({
+	EditorHistoryBackButton: ({ children }: { readonly children?: ReactNode }) =>
+		createElement("span", null, children),
+}));
+
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const item = {
 	uid: "stable-item-uid",

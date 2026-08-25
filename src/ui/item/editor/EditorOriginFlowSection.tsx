@@ -23,6 +23,7 @@ interface EditorOriginFlowSectionProps {
 	readonly direction?: EditorOriginFlowDirection;
 	readonly focusItemId?: string;
 	readonly focusRequestKey?: number;
+	readonly onFocusItemChange?: (itemId: string) => Promise<void>;
 }
 
 /** Renders the complete authored game graph and focuses one existing item node. */
@@ -30,6 +31,7 @@ export const EditorOriginFlowSection = ({
 	direction = "input",
 	focusItemId,
 	focusRequestKey,
+	onFocusItemChange,
 }: EditorOriginFlowSectionProps) => {
 	const project = useEditorProject();
 	const navigate = useNavigate();
@@ -66,10 +68,11 @@ export const EditorOriginFlowSection = ({
 		focusRequestKey,
 	]);
 	const openItem = useCallback(
-		(itemId: string) => {
+		async (itemId: string) => {
 			const item = project.config.items[itemId];
 			if (item === undefined) return;
-			void navigate({
+			await onFocusItemChange?.(itemId);
+			await navigate({
 				to: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId",
 				params: {
 					itemUid: item.uid,
@@ -80,6 +83,7 @@ export const EditorOriginFlowSection = ({
 		},
 		[
 			navigate,
+			onFocusItemChange,
 			project.config.items,
 			project.projectId,
 		],

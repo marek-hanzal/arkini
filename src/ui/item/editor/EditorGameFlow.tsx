@@ -17,23 +17,22 @@ const readGraphFilterDescription = (direction: EditorOriginFlowDirection) =>
 
 /** Shows the complete authored game graph and lets search navigate to one selected item. */
 export const EditorGameFlow = ({
-	direction: initialDirection = "input",
-	itemId: initialItemId = "",
+	direction,
+	itemId = "",
+	onDirectionChange,
+	onItemIdChange,
 }: {
-	readonly direction?: EditorOriginFlowDirection;
+	readonly direction: EditorOriginFlowDirection;
 	readonly itemId?: string;
+	readonly onDirectionChange: (direction: EditorOriginFlowDirection) => void;
+	readonly onItemIdChange: (itemId: string) => Promise<void>;
 }) => {
-	const [itemId, setItemId] = useState(initialItemId);
 	const [focusRequestKey, setFocusRequestKey] = useState(0);
-	const [direction, setDirection] = useState<EditorOriginFlowDirection>(initialDirection);
 	const { items, options } = useEditorItemSearchOptions();
 	useEffect(() => {
-		setItemId(initialItemId);
-		setDirection(initialDirection);
 		setFocusRequestKey((current) => current + 1);
 	}, [
-		initialDirection,
-		initialItemId,
+		itemId,
 	]);
 	return (
 		<section
@@ -54,10 +53,7 @@ export const EditorGameFlow = ({
 					<div className="min-w-0 flex-1">
 						<EditorItemFlowSearch
 							items={items}
-							onChange={(value) => {
-								setItemId(value);
-								setFocusRequestKey((current) => current + 1);
-							}}
+							onChange={(value) => void onItemIdChange(value)}
 							options={options}
 							value={itemId}
 						/>
@@ -77,7 +73,7 @@ export const EditorGameFlow = ({
 								aria-pressed={direction === value}
 								className={`min-h-[var(--ak-control-min-height)] cursor-pointer rounded-lg border px-3 py-2 text-sm font-semibold ${direction === value ? selectableActiveClassName : selectableInactiveClassName}`}
 								key={value}
-								onClick={() => setDirection(value)}
+								onClick={() => onDirectionChange(value)}
 								type="button"
 							>
 								{value === "input" ? "Input" : "Output"}
@@ -90,6 +86,7 @@ export const EditorGameFlow = ({
 				direction={direction}
 				focusItemId={itemId || undefined}
 				focusRequestKey={focusRequestKey}
+				onFocusItemChange={onItemIdChange}
 			/>
 		</section>
 	);

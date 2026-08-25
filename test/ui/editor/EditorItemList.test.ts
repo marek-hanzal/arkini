@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
 
-import { act, createElement, type ReactNode } from "react";
+import { act, createElement, type ReactNode, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import { EditorItemList } from "~/ui/item/editor/EditorItemList";
 
 (
@@ -100,12 +101,22 @@ afterEach(async () => {
 });
 
 const renderItemList = async () => {
+	const Harness = () => {
+		const [itemType, setItemType] = useState<EditorItemType>();
+		const [query, setQuery] = useState("");
+		return createElement(EditorItemList, {
+			itemType,
+			onItemTypeChange: setItemType,
+			onQueryChange: setQuery,
+			query,
+		});
+	};
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
 	roots.push(root);
 	await act(async () => {
-		root.render(createElement(EditorItemList));
+		root.render(createElement(Harness));
 	});
 	return container;
 };

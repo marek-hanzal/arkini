@@ -3,7 +3,7 @@ import type { PropsWithChildren } from "react";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { ButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
-import { editorBackLinkClassName, EditorBackIcon } from "~/ui/editor/EditorBackIcon";
+import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
 import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
 import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
@@ -41,15 +41,12 @@ export const EditorItemDetail = ({
 			tabs={
 				<EditorSectionNavigation
 					leading={
-						<ButtonLink
+						<EditorHistoryBackButton
 							to="/editor/$projectId/editor/items/list"
 							params={{
 								projectId: project.projectId,
 							}}
-							className={editorBackLinkClassName}
-						>
-							<EditorBackIcon />
-						</ButtonLink>
+						/>
 					}
 					title={
 						<div className="grid min-w-0 gap-0.5">

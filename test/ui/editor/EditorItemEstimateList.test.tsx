@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
 
-import { act, createElement, type ReactNode } from "react";
+import { act, createElement, type ReactNode, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { EditorItemEstimateSort } from "~/ui/item/editor/EditorItemEstimateSort";
 import { EditorItemEstimateList } from "~/ui/item/editor/EditorItemEstimateList";
 
 (
@@ -109,12 +110,22 @@ afterEach(async () => {
 });
 
 const renderList = async () => {
+	const Harness = () => {
+		const [query, setQuery] = useState("");
+		const [sort, setSort] = useState<EditorItemEstimateSort>("fastest");
+		return createElement(EditorItemEstimateList, {
+			onQueryChange: setQuery,
+			onSortChange: setSort,
+			query,
+			sort,
+		});
+	};
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
 	roots.push(root);
 	await act(async () => {
-		root.render(createElement(EditorItemEstimateList));
+		root.render(createElement(Harness));
 	});
 	return container;
 };

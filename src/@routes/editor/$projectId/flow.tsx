@@ -8,18 +8,8 @@ interface EditorFlowRouteSearch {
 	readonly itemId?: string;
 }
 
-const EditorFlowRoute = () => {
-	const search = Route.useSearch();
-	return (
-		<EditorFlowPage
-			direction={search.direction}
-			itemId={search.itemId}
-		/>
-	);
-};
-
 export const Route = createFileRoute("/editor/$projectId/flow")({
-	component: EditorFlowRoute,
+	component: EditorFlowPage,
 	validateSearch: (search): EditorFlowRouteSearch => ({
 		direction: search.direction === "output" ? "output" : "input",
 		...(typeof search.itemId === "string" && search.itemId.length > 0

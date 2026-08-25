@@ -9,6 +9,7 @@ export const EditorSectionPage = ({
 }>) => (
 	<div
 		className="h-full min-h-0 overflow-y-auto overscroll-contain"
+		data-scroll-restoration-id="editor-section-page"
 		data-ui="EditorSectionPage"
 	>
 		<div

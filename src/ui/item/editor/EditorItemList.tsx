@@ -1,20 +1,26 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
-import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import type { EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import { searchEditorItemsFx } from "~/editor/searchEditorItemsFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { PrimaryButtonLink } from "~/ui/button/Button";
 import { EditorItemListRow } from "~/ui/item/editor/EditorItemListRow";
 import { Status } from "~/ui/status/Status";
 
-type EditorItemType = NonNullable<EditorProject["config"]>["items"][string]["type"];
-
 /** Lists the canonical saved item registry as the editor's default workspace. */
-export const EditorItemList = () => {
+export const EditorItemList = ({
+	itemType,
+	onItemTypeChange,
+	onQueryChange,
+	query,
+}: {
+	readonly itemType?: EditorItemType;
+	readonly onItemTypeChange: (itemType: EditorItemType | undefined) => void;
+	readonly onQueryChange: (query: string) => void;
+	readonly query: string;
+}) => {
 	const project = useEditorProject();
-	const [query, setQuery] = useState("");
-	const [itemType, setItemType] = useState<EditorItemType>();
 	const items = useMemo(
 		() =>
 			Object.values(project.config?.items ?? {}).sort((left, right) =>
@@ -42,6 +48,7 @@ export const EditorItemList = () => {
 	return (
 		<section
 			className="h-full min-h-0 overflow-y-auto overscroll-contain"
+			data-scroll-restoration-id="editor-item-list"
 			aria-label="Items"
 			data-ui="EditorItemList"
 		>
@@ -52,7 +59,7 @@ export const EditorItemList = () => {
 					className="h-12 min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
 					placeholder="Search item title, ID or type…"
 					aria-label="Search items"
-					onChange={(event) => setQuery(event.currentTarget.value)}
+					onChange={(event) => onQueryChange(event.currentTarget.value)}
 				/>
 				{itemType === undefined ? null : (
 					<button
@@ -61,7 +68,7 @@ export const EditorItemList = () => {
 						aria-label={`Clear ${itemType} item filter`}
 						data-ui="EditorItemTypeFilter"
 						aria-pressed="true"
-						onClick={() => setItemType(undefined)}
+						onClick={() => onItemTypeChange(undefined)}
 					>
 						{itemType}
 						<span aria-hidden="true">×</span>
@@ -114,7 +121,7 @@ export const EditorItemList = () => {
 						key={item.uid}
 						activeType={itemType}
 						item={item}
-						onSelectType={setItemType}
+						onSelectType={onItemTypeChange}
 						projectId={project.projectId}
 					/>
 				))}

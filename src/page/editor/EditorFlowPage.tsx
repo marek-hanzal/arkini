@@ -1,15 +1,36 @@
-import { EditorGameFlow } from "~/ui/item/editor/EditorGameFlow";
-import type { EditorOriginFlowDirection } from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
+import { getRouteApi, useNavigate } from "@tanstack/react-router";
 
-export const EditorFlowPage = ({
-	direction,
-	itemId,
-}: {
-	readonly direction: EditorOriginFlowDirection;
-	readonly itemId?: string;
-}) => (
-	<EditorGameFlow
-		direction={direction}
-		itemId={itemId}
-	/>
-);
+import { EditorGameFlow } from "~/ui/item/editor/EditorGameFlow";
+
+const flowRoute = getRouteApi("/editor/$projectId/flow");
+
+export const EditorFlowPage = () => {
+	const search = flowRoute.useSearch();
+	const navigate = useNavigate({
+		from: "/editor/$projectId/flow",
+	});
+	return (
+		<EditorGameFlow
+			direction={search.direction}
+			itemId={search.itemId}
+			onDirectionChange={(direction) =>
+				navigate({
+					replace: true,
+					search: (current) => ({
+						...current,
+						direction,
+					}),
+				})
+			}
+			onItemIdChange={(itemId) =>
+				navigate({
+					replace: true,
+					search: (current) => ({
+						...current,
+						itemId: itemId.length === 0 ? undefined : itemId,
+					}),
+				})
+			}
+		/>
+	);
+};

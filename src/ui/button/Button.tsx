@@ -1,4 +1,10 @@
-import { createLink, type LinkComponent } from "@tanstack/react-router";
+import {
+	type AnyRouter,
+	createLink,
+	type LinkComponent,
+	type LinkComponentProps,
+	type RegisteredRouter,
+} from "@tanstack/react-router";
 import {
 	forwardRef,
 	type AnchorHTMLAttributes,
@@ -122,6 +128,14 @@ const DangerButtonAnchor = createButtonAnchor("DangerButtonAnchor", "danger");
 const CreatedButtonLink = createLink(ButtonAnchor);
 const CreatedPrimaryButtonLink = createLink(PrimaryButtonAnchor);
 const CreatedDangerButtonLink = createLink(DangerButtonAnchor);
+
+export type ButtonLinkProps<
+	TRouter extends AnyRouter = RegisteredRouter,
+	TFrom extends string = string,
+	TTo extends string | undefined = undefined,
+	TMaskFrom extends string = TFrom,
+	TMaskTo extends string = "",
+> = LinkComponentProps<typeof ButtonAnchor, TRouter, TFrom, TTo, TMaskFrom, TMaskTo>;
 
 /** Renders the canonical neutral game action with TanStack Router Link semantics. */
 export const ButtonLink: LinkComponent<typeof ButtonAnchor> = (props) => (

@@ -1,7 +1,7 @@
-import { ButtonLink, PrimaryButton } from "~/ui/button/Button";
+import { PrimaryButton } from "~/ui/button/Button";
+import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
 import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
-import { editorBackLinkClassName, EditorBackIcon } from "~/ui/editor/EditorBackIcon";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
 import { EditorFormContent } from "~/ui/form/EditorFormContent";
 import { EditorAssetImageDropZone } from "~/ui/resource/editor/EditorAssetImageDropZone";
@@ -32,7 +32,7 @@ export const EditorAssetEdit = ({ filter, query, resourceId }: EditorAssetEdit.P
 			tabs={
 				<EditorSectionNavigation
 					leading={
-						<ButtonLink
+						<EditorHistoryBackButton
 							to="/editor/$projectId/assets/$resourceId/detail/overview"
 							params={{
 								projectId: controller.projectId,
@@ -42,10 +42,7 @@ export const EditorAssetEdit = ({ filter, query, resourceId }: EditorAssetEdit.P
 								filter,
 								query,
 							}}
-							className={editorBackLinkClassName}
-						>
-							<EditorBackIcon />
-						</ButtonLink>
+						/>
 					}
 					title={<h1 className="truncate text-xl font-semibold">Edit {resourceId}</h1>}
 					action={

@@ -1,12 +1,12 @@
 import type { PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { ButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
+import { PrimaryButtonLink } from "~/ui/button/Button";
+import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
 import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
 import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
 import { EditorRootCard } from "~/ui/editor/EditorRootCard";
-import { editorBackLinkClassName, EditorBackIcon } from "~/ui/editor/EditorBackIcon";
 import { useEditorEditShortcut } from "~/ui/editor/useEditorEditShortcut";
 import { EditorAssetDetailTab } from "~/ui/resource/editor/EditorAssetDetailTab";
 import { useEditorAssetById } from "~/ui/resource/editor/useEditorAssetById";
@@ -33,7 +33,7 @@ export const EditorAssetDetail = ({
 				icon="icon-[lucide--file-question]"
 				title="Asset not found"
 				action={
-					<ButtonLink
+					<EditorHistoryBackButton
 						to="/editor/$projectId/assets"
 						params={{
 							projectId: project.projectId,
@@ -42,10 +42,7 @@ export const EditorAssetDetail = ({
 							filter,
 							query,
 						}}
-						className={editorBackLinkClassName}
-					>
-						<EditorBackIcon />
-					</ButtonLink>
+					/>
 				}
 			/>
 		);
@@ -55,7 +52,7 @@ export const EditorAssetDetail = ({
 			tabs={
 				<EditorSectionNavigation
 					leading={
-						<ButtonLink
+						<EditorHistoryBackButton
 							to="/editor/$projectId/assets"
 							params={{
 								projectId: project.projectId,
@@ -64,10 +61,7 @@ export const EditorAssetDetail = ({
 								filter,
 								query,
 							}}
-							className={editorBackLinkClassName}
-						>
-							<EditorBackIcon />
-						</ButtonLink>
+						/>
 					}
 					title={<h1 className="truncate text-xl font-semibold">{resource.id}</h1>}
 					tabs={

@@ -94,7 +94,6 @@ const renderProbe = async () => {
 				createElement(Probe),
 			),
 		);
-		await new Promise((resolve) => setTimeout(resolve, 0));
 	});
 	return {
 		root,
@@ -116,6 +115,7 @@ describe("useEditorItemOriginFlow", () => {
 		mocks.layout.mockReturnValue(Effect.succeed(Layout));
 
 		const probe = await renderProbe();
+		await vi.waitFor(() => expect(probe.state.current?.status).toBe("ready"));
 
 		expect(mocks.read).toHaveBeenCalledWith(
 			expect.objectContaining({
@@ -139,6 +139,7 @@ describe("useEditorItemOriginFlow", () => {
 		mocks.layout.mockReturnValue(Effect.fail(new Error("layout failed")));
 
 		const probe = await renderProbe();
+		await vi.waitFor(() => expect(probe.state.current?.status).toBe("error"));
 
 		expect(probe.state.current).toEqual({
 			flow: undefined,
@@ -151,10 +152,14 @@ describe("useEditorItemOriginFlow", () => {
 	});
 
 	it("interrupts the subscription-scoped global flow when its consumer unmounts", async () => {
+		let started = false;
 		let interrupted = false;
 		mocks.read.mockReturnValue(Effect.succeed(Flow));
 		mocks.layout.mockReturnValue(
-			Effect.never.pipe(
+			Effect.sync(() => {
+				started = true;
+			}).pipe(
+				Effect.flatMap(() => Effect.never),
 				Effect.onInterrupt(() =>
 					Effect.sync(() => {
 						interrupted = true;
@@ -164,13 +169,12 @@ describe("useEditorItemOriginFlow", () => {
 		);
 
 		const probe = await renderProbe();
-		expect(probe.state.current?.status).toBe("loading");
+		await vi.waitFor(() => expect(started).toBe(true));
 		await act(async () => {
 			probe.root.unmount();
-			await new Promise((resolve) => setTimeout(resolve, 0));
 		});
 		roots.splice(roots.indexOf(probe.root), 1);
 
-		expect(interrupted).toBe(true);
+		await vi.waitFor(() => expect(interrupted).toBe(true));
 	});
 });

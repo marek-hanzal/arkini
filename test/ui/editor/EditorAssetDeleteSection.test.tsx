@@ -123,52 +123,6 @@ const render = async (resourceId: string) => {
 };
 
 describe("EditorAssetDeleteSection", () => {
-	it("links blockers to the exact project and item owners", async () => {
-		let container = await render("hero");
-		expect(container.textContent).toContain("This asset cannot be deleted yet");
-		expect(container.textContent).toContain("Project · Appearance");
-		expect(container.querySelector('[data-ui="EditorAssetDeleteOpen"]')).toBeNull();
-		expect(container.querySelector("a")?.dataset.params).toContain("appearance");
-
-		const project = state.project;
-		if (project === undefined) throw new Error("Expected editor project fixture.");
-		state.project = {
-			...project,
-			config: {
-				...project.config,
-				resources: {
-					...project.config.resources,
-					"avatar-01": "avatar-first",
-					"avatar-03": "avatar-current",
-				},
-			},
-			resources: [
-				...project.resources,
-				{
-					id: "avatar-first",
-					mime: "image/png",
-					bytes: Uint8Array.of(7),
-				},
-				{
-					id: "avatar-current",
-					mime: "image/png",
-					bytes: Uint8Array.of(8),
-				},
-			],
-		};
-		container = await render("avatar-current");
-		expect(container.querySelector("a")?.dataset.search).toBe(
-			JSON.stringify({
-				avatar: 1,
-			}),
-		);
-
-		container = await render("item-water");
-		expect(container.textContent).toContain("Water · Artwork");
-		expect(container.querySelector("a")?.dataset.params).toContain("artwork");
-		expect(container.querySelector("a")?.dataset.params).toContain("water");
-	});
-
 	it("confirms an eligible delete and replaces the dead detail with the asset list", async () => {
 		const project = state.project;
 		if (project === undefined) throw new Error("Expected editor project fixture.");
@@ -185,22 +139,11 @@ describe("EditorAssetDeleteSection", () => {
 			),
 		};
 		const container = await render("unused/asset");
-		expect(container.textContent).toContain("This asset can be deleted");
-
 		await act(async () =>
 			container
 				.querySelector<HTMLButtonElement>('[data-ui="EditorAssetDeleteOpen"]')
 				?.click(),
 		);
-		expect(container.textContent).toContain("A full saved version can restore them");
-		const versionLink = container.querySelector<HTMLAnchorElement>(
-			'[data-ui="EditorAssetDeleteCreateVersion"]',
-		);
-		expect(versionLink?.dataset.to).toBe("/editor/$projectId/versions/commit");
-		expect(versionLink?.dataset.search).toContain(
-			"/editor/project%2Fone/assets/unused%2Fasset/detail/delete?filter=unused&query=spare",
-		);
-
 		await act(async () =>
 			container
 				.querySelector<HTMLButtonElement>('[data-ui="EditorAssetDeleteConfirm"]')

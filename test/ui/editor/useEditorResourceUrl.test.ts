@@ -221,23 +221,17 @@ describe("EditorResourceUrlProvider", () => {
 							{
 								id: "hero",
 								mime: "image/png",
-								bytes: new Uint8Array([
-									1,
-								]),
+								bytes: Uint8Array.of(1),
 							},
 							{
 								id: "overlay",
 								mime: "image/png",
-								bytes: new Uint8Array([
-									2,
-								]),
+								bytes: Uint8Array.of(2),
 							},
 							{
 								id: "unused",
 								mime: "image/png",
-								bytes: new Uint8Array([
-									3,
-								]),
+								bytes: Uint8Array.of(3),
 							},
 						],
 					},
@@ -251,4 +245,5 @@ describe("EditorResourceUrlProvider", () => {
 		expect(createObjectUrl).toHaveBeenCalledTimes(2);
 		expect(container.textContent).toBe("hero:blob:hero|overlay:blob:overlay");
 	});
+
 });

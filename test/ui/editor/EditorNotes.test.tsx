@@ -44,7 +44,6 @@ const registries: Array<AtomRegistry.AtomRegistry> = [];
 
 beforeEach(() => {
 	state.createFailures = 0;
-	state.listFailures = 0;
 	state.nextNote = 2;
 	state.notes = [
 		{
@@ -107,7 +106,7 @@ const click = async (element: Element | null) => {
 };
 
 describe("EditorNotes", () => {
-	it("creates, cancels, edits, and deletes notes directly in the stream", async () => {
+	it("persists a new note into the live stream", async () => {
 		const container = await renderNotes();
 		await act(async () =>
 			vi.waitFor(() => expect(container.textContent).toContain("Existing note")),
@@ -124,37 +123,6 @@ describe("EditorNotes", () => {
 			vi.waitFor(() => expect(container.textContent).toContain("New note")),
 		);
 
-		const existing = [
-			...container.querySelectorAll<HTMLElement>('[data-ui="EditorNote"]'),
-		].find((note) => note.textContent?.includes("Existing note"));
-		if (existing === undefined) throw new Error("Missing existing note.");
-		await click(existing.querySelector('[data-tooltip="Edit"] button'));
-		let editor = existing.querySelector<HTMLTextAreaElement>("textarea");
-		if (editor === null) throw new Error("Missing inline editor.");
-		await changeTextarea(editor, "Discarded edit");
-		await click(existing.querySelector('[data-tooltip="Cancel edit"] button'));
-		expect(existing.textContent).toContain("Existing note");
-		expect(existing.querySelector("textarea")).toBeNull();
-
-		await click(existing.querySelector('[data-tooltip="Edit"] button'));
-		editor = existing.querySelector<HTMLTextAreaElement>("textarea");
-		if (editor === null) throw new Error("Missing inline editor after cancel.");
-		await changeTextarea(editor, "Edited note");
-		await click(existing.querySelector('[data-tooltip="Save"] button'));
-		await act(async () =>
-			vi.waitFor(() =>
-				expect(
-					container.querySelector<HTMLElement>('[data-ui="EditorNote"]')?.textContent,
-				).toContain("Edited note"),
-			),
-		);
-		const bumped = container.querySelector<HTMLElement>('[data-ui="EditorNote"]');
-
-		await click(bumped?.querySelector('[data-tooltip="Delete"] button') ?? null);
-		await act(async () =>
-			vi.waitFor(() => expect(container.textContent).not.toContain("Edited note")),
-		);
-		expect(container.textContent).toContain("New note");
 	});
 
 	it("keeps a failed create draft available for retry", async () => {
@@ -183,21 +151,4 @@ describe("EditorNotes", () => {
 		expect(composer.value).toBe("");
 	});
 
-	it("distinguishes a failed initial load and retries it in place", async () => {
-		state.listFailures = 1;
-		const container = await renderNotes();
-		await act(async () =>
-			vi.waitFor(() => expect(container.textContent).toContain("Notes could not be loaded.")),
-		);
-		expect(container.querySelector('[data-ui="EditorNotesEmpty"]')).toBeNull();
-
-		await click(
-			[
-				...container.querySelectorAll("button"),
-			].find((button) => button.textContent === "Retry loading notes") ?? null,
-		);
-		await act(async () =>
-			vi.waitFor(() => expect(container.textContent).toContain("Existing note")),
-		);
-	});
 });

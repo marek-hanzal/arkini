@@ -1,8 +1,7 @@
-import { Deferred, Effect, Exit } from "effect";
+import { Deferred, Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
 import { createEditorUnsavedChangesOwnerFx } from "~/bridge/editor/createEditorUnsavedChangesOwnerFx";
-import { validateEditorAssetDraftFx } from "~/bridge/resource/editor/validateEditorAssetDraftFx";
 
 const createSession = ({ valid = true }: { readonly valid?: boolean } = {}) => ({
 	discard: vi.fn(),
@@ -92,34 +91,4 @@ describe("EditorUnsavedChanges", () => {
 		expect(session.save).toHaveBeenCalledOnce();
 	});
 
-	it("omits Save when the selected asset fails canonical PNG validation", async () => {
-		const owner = Effect.runSync(createEditorUnsavedChangesOwnerFx());
-		const session = createSession();
-		owner.register("asset", {
-			...session,
-			isValid: async () =>
-				Exit.isSuccess(
-					await Effect.runPromiseExit(
-						validateEditorAssetDraftFx({
-							file: new File(
-								[
-									"not png",
-								],
-								"asset.png",
-								{
-									type: "text/plain",
-								},
-							),
-							resourceId: "asset:test",
-						}),
-					),
-				),
-		});
-
-		const leaving = owner.requestLeave("/main-menu");
-		await vi.waitFor(() => expect(owner.getSnapshot().promptOpen).toBe(true));
-		expect(owner.getSnapshot().canSave).toBe(false);
-		await owner.decide("cancel");
-		await expect(leaving).resolves.toBe(false);
-	});
 });

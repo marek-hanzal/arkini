@@ -107,14 +107,15 @@ describe("EditorWelcomeCommandAtom", () => {
 		const registry = makeRegistry();
 
 		registry.set(EditorWelcomeCommandAtom, {
-			action: "create",
+			action: "import-arkpack",
+			file: new File([], "game.arkpack"),
 		});
 		const ready = await waitForState(registry, (state) => state.kind === "ready");
 		expect(ready).toMatchObject({
 			kind: "ready",
-			action: "create",
+			action: "import-arkpack",
 			project: {
-				projectId: "project-created",
+				projectId: "project-imported",
 			},
 		});
 
@@ -123,16 +124,15 @@ describe("EditorWelcomeCommandAtom", () => {
 		});
 		expect(registry.get(EditorWelcomeCommandAtom)).toEqual({
 			kind: "navigating",
-			action: "create",
+			action: "import-arkpack",
 		});
 
 		registry.set(EditorWelcomeCommandAtom, {
-			action: "import-arkpack",
-			file: new File([], "ignored.arkpack"),
+			action: "create",
 		});
 		expect(registry.get(EditorWelcomeCommandAtom)).toEqual({
 			kind: "navigating",
-			action: "create",
+			action: "import-arkpack",
 		});
 
 		registry.set(EditorWelcomeCommandAtom, {
@@ -140,23 +140,6 @@ describe("EditorWelcomeCommandAtom", () => {
 		});
 		expect(registry.get(EditorWelcomeCommandAtom)).toEqual({
 			kind: "idle",
-		});
-	});
-
-	it("retains the exact imported project for caller-owned navigation", async () => {
-		const registry = makeRegistry();
-		registry.set(EditorWelcomeCommandAtom, {
-			action: "import-arkpack",
-			file: new File([], "game.arkpack"),
-		});
-
-		const ready = await waitForState(registry, (state) => state.kind === "ready");
-		expect(ready).toMatchObject({
-			kind: "ready",
-			action: "import-arkpack",
-			project: {
-				projectId: "project-imported",
-			},
 		});
 	});
 

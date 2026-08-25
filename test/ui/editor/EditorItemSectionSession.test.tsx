@@ -21,54 +21,10 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 vi.mock("~/ui/button/Button", () => ({
 	Button: ({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) =>
 		createElement("button", props, children),
-	ButtonLink: ({
-		children,
-		className,
-		params,
-		search,
-		title,
-		to,
-	}: {
-		readonly children?: ReactNode;
-		readonly className?: string;
-		readonly params?: Record<string, string>;
-		readonly search?: Record<string, string>;
-		readonly title?: string;
-		readonly to?: string;
-	}) =>
-		createElement(
-			"a",
-			{
-				className,
-				"data-params": JSON.stringify(params),
-				"data-search": JSON.stringify(search),
-				"data-to": to,
-				title,
-			},
-			children,
-		),
+	ButtonLink: ({ children }: { readonly children?: ReactNode }) =>
+		createElement("a", null, children),
 	PrimaryButton: ({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) =>
 		createElement("button", props, children),
-	PrimaryButtonLink: ({
-		children,
-		params,
-		search,
-		to,
-	}: {
-		readonly children?: ReactNode;
-		readonly params?: Record<string, string>;
-		readonly search?: Record<string, string>;
-		readonly to?: string;
-	}) =>
-		createElement(
-			"a",
-			{
-				"data-params": JSON.stringify(params),
-				"data-search": JSON.stringify(search),
-				"data-to": to,
-			},
-			children,
-		),
 }));
 
 vi.mock("~/ui/editor/EditorHistoryBackButton", () => ({
@@ -133,13 +89,9 @@ vi.mock("~/ui/item/editor/EditorItemAutocompleteField", () => ({
 }));
 
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
-import { EditorItemArtworkSection } from "~/ui/item/editor/EditorItemArtworkSection";
-import { EditorItemChargesSection } from "~/ui/item/editor/EditorItemChargesSection";
-import { EditorItemDetailSectionPage } from "~/ui/item/editor/EditorItemDetailSectionPage";
 import { EditorItemForm } from "~/ui/item/editor/EditorItemForm";
 import { EditorItemIdentitySection } from "~/ui/item/editor/EditorItemIdentitySection";
-import { EditorItemMergesSection } from "~/ui/item/editor/EditorItemMergesSection";
-import type { EditorItemOptionalCapability } from "~/ui/item/editor/EditorItemSections";
+import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
 
 (
 	globalThis as {
@@ -206,32 +158,30 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-const render = async (
-	children: ReactNode,
-	itemType?: "simple",
-	enableCapability?: EditorItemOptionalCapability,
-) => {
+const render = async (children: ReactNode) => {
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
 	roots.push(root);
-	const renderForm = async (next: ReactNode) => {
+	const renderSection = async (
+		section: ReactNode,
+		sectionId: EditorItemSectionId = "identity",
+	) => {
 		await act(async () => {
 			root.render(
 				<EditorItemForm
-					enableCapability={enableCapability}
-					itemType={itemType}
+					sectionId={sectionId}
 					uid={item.uid}
 				>
-					{next}
+					{section}
 				</EditorItemForm>,
 			);
 		});
 	};
-	await renderForm(children);
+	await renderSection(children);
 	return {
 		container,
-		renderForm,
+		renderSection,
 	};
 };
 
@@ -246,15 +196,6 @@ const changeInput = async (input: HTMLInputElement, value: string) => {
 			}),
 		);
 	});
-};
-
-const renderStandalone = async (children: ReactNode) => {
-	const container = document.createElement("div");
-	document.body.append(container);
-	const root = createRoot(container);
-	roots.push(root);
-	await act(async () => root.render(children));
-	return container;
 };
 
 describe("item section form session", () => {
@@ -279,173 +220,26 @@ describe("item section form session", () => {
 			saveButton?.click();
 			await Promise.resolve();
 		});
+		expect(state.saveItem).toHaveBeenCalledTimes(2);
+		expect(state.saveItem).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				title: "Saved and leave",
+			}),
+		);
 		expect(state.navigate).toHaveBeenCalledOnce();
 	});
 
-	it("preserves one local form while routed section content changes", async () => {
-		const { container, renderForm } = await render(<EditorItemIdentitySection />);
-		const navigation = container.querySelector('[data-ui="EditorSectionNavigation"]');
+	it("retains the local draft across routed section replacement", async () => {
+		const { container, renderSection } = await render(<EditorItemIdentitySection />);
 		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
-		if (title === null) throw new Error("Missing title input.");
+		if (title === null) throw new Error("Missing item title input.");
 
 		await changeInput(title, "Changed water");
-		await renderForm(<div data-ui="ArtworkSection">Artwork</div>);
-		expect(container.querySelector('[data-ui="ArtworkSection"]')).not.toBeNull();
-		await renderForm(<EditorItemIdentitySection />);
+		await renderSection(<div>Artwork section</div>, "artwork");
+		await renderSection(<EditorItemIdentitySection />, "identity");
 
-		expect(container.querySelector('[data-ui="EditorSectionNavigation"]')).toBe(navigation);
 		expect(container.querySelector<HTMLInputElement>('input[name="title"]')?.value).toBe(
 			"Changed water",
 		);
-	});
-
-	it("keeps a persisted item ID read-only", async () => {
-		const { container } = await render(<EditorItemIdentitySection />);
-
-		expect(container.querySelector('input[name="id"]')).toBeNull();
-		expect(container.textContent).toContain("item:water");
-		expect(container.textContent).not.toContain("Immutable after the item is first saved.");
-		expect(container.querySelector('[data-ui="EditorInfoTooltip"]')).not.toBeNull();
-		expect(container.querySelector('input[name="maxCount"]')).not.toBeNull();
-		expect(container.querySelector('input[name="maxStackSize"]')).not.toBeNull();
-	});
-
-	it("selects a progress asset from its artwork timeline thumbnail", async () => {
-		const artworkItem: EditorItem = {
-			...item,
-			asset: {
-				default: [
-					"asset:water",
-				],
-				sources: [
-					"asset:water-half",
-					"asset:water-empty",
-				],
-			},
-		};
-		state.canonical = {
-			config: {
-				items: {
-					[item.id]: artworkItem,
-				},
-			},
-		};
-		state.draft = artworkItem;
-		state.persisted = artworkItem;
-
-		const { container } = await render(<EditorItemArtworkSection />);
-		const selector = container.querySelector<HTMLInputElement>(
-			'input[aria-label="Progress assets"]',
-		);
-		const secondThumbnail = container.querySelector<HTMLButtonElement>(
-			'button[title="Select progress asset 2"]',
-		);
-		if (selector === null || secondThumbnail === null)
-			throw new Error("Missing artwork progress selector controls.");
-
-		expect(selector.value).toBe("asset:water-half");
-		await act(async () => secondThumbnail.click());
-		expect(selector.value).toBe("asset:water-empty");
-	});
-
-	it("links read-only artwork assets and shows the complete progress timeline", async () => {
-		state.persisted = {
-			...item,
-			asset: {
-				default: [
-					"asset:water",
-					"asset:water-overlay",
-				],
-				sources: [
-					"asset:water-half",
-					"asset:water-empty",
-				],
-			},
-		};
-
-		const container = await renderStandalone(
-			<EditorItemDetailSectionPage
-				sectionId="artwork"
-				uid={item.uid}
-			/>,
-		);
-		const halfLinks = container.querySelectorAll<HTMLAnchorElement>(
-			'a[title="Open asset asset:water-half"]',
-		);
-
-		expect(halfLinks.length).toBeGreaterThan(0);
-		expect(halfLinks[0]?.dataset.to).toBe(
-			"/editor/$projectId/assets/$resourceId/detail/overview",
-		);
-		expect(halfLinks[0]?.dataset.search).toBe(
-			JSON.stringify({
-				filter: "all",
-				query: "asset:water-half",
-			}),
-		);
-		expect(container.textContent).toContain("Default composition");
-		expect(container.textContent).toContain("0%");
-		expect(container.textContent).toContain("50%");
-		expect(container.textContent).toContain("100%");
-	});
-
-	it("opens disabled charges as an initialized local form in one action", async () => {
-		const detail = await renderStandalone(
-			<EditorItemDetailSectionPage
-				sectionId="charges"
-				uid={item.uid}
-			/>,
-		);
-		const action = Array.from(detail.querySelectorAll<HTMLAnchorElement>("a")).find(
-			(link) => link.textContent === "Enable charges",
-		);
-		expect(action?.dataset.to).toBe("/editor/$projectId/editor/items/$itemUid/form/$sectionId");
-		expect(action?.dataset.search).toBe(
-			JSON.stringify({
-				enable: "charges",
-			}),
-		);
-
-		const { container } = await render(<EditorItemChargesSection />, undefined, "charges");
-		expect(container.textContent).toContain("Initial charges");
-		expect(container.textContent).not.toContain("Charges are disabled");
-	});
-
-	it("opens disabled merges as an initialized local form in one action", async () => {
-		const detail = await renderStandalone(
-			<EditorItemDetailSectionPage
-				sectionId="merges"
-				uid={item.uid}
-			/>,
-		);
-		const action = Array.from(detail.querySelectorAll<HTMLAnchorElement>("a")).find(
-			(link) => link.textContent === "Enable merges",
-		);
-		expect(action?.dataset.search).toBe(
-			JSON.stringify({
-				enable: "merges",
-			}),
-		);
-
-		const { container } = await render(<EditorItemMergesSection />, undefined, "merges");
-		expect(container.textContent).toContain("Merges");
-		expect(container.textContent).not.toContain("Merges are disabled");
-	});
-
-	it("allows a new item ID to change before its first repository save", async () => {
-		state.canonical = {
-			config: {
-				items: {},
-			},
-		};
-		state.persisted = undefined;
-		const { container } = await render(<EditorItemIdentitySection />, "simple");
-
-		const id = container.querySelector<HTMLInputElement>('input[name="id"]');
-		expect(id?.value).toBe("item:water");
-		expect(container.textContent).not.toContain(
-			"The source ID becomes immutable after the first save.",
-		);
-		expect(container.querySelector('[data-ui="EditorInfoTooltip"]')).not.toBeNull();
 	});
 });

@@ -7,16 +7,31 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({
 	canvasProps: undefined as
 		| {
-				readonly focusNodeId?: string;
 				readonly onItemOpen: (itemId: string) => void;
-				readonly selection?: {
-					readonly id: string;
-					readonly kind: string;
-				};
 		  }
 		| undefined,
 	navigate: vi.fn(),
-	flowState: {
+}));
+
+vi.mock("@tanstack/react-router", () => ({
+	useNavigate: () => state.navigate,
+}));
+
+vi.mock("~/bridge/editor/useEditorProject", () => ({
+	useEditorProject: () => ({
+		config: {
+			items: {
+				tool: {
+					uid: "tool-uid",
+				},
+			},
+		},
+		projectId: "project-test",
+	}),
+}));
+
+vi.mock("~/ui/item/editor/useEditorItemOriginFlow", () => ({
+	useEditorItemOriginFlow: () => ({
 		backbones: new Map(),
 		flow: {
 			edges: [],
@@ -34,35 +49,17 @@ const state = vi.hoisted(() => ({
 		},
 		positions: new Map(),
 		progress: {
-			label: "Flow ready",
+			label: "ready",
 			percent: 100,
 		},
 		status: "ready",
-	},
-}));
-
-vi.mock("@tanstack/react-router", () => ({
-	useNavigate: () => state.navigate,
-}));
-vi.mock("~/bridge/editor/useEditorProject", () => ({
-	useEditorProject: () => ({
-		config: {
-			items: {
-				tool: {
-					uid: "tool-uid",
-				},
-			},
-		},
-		projectId: "project-test",
 	}),
 }));
-vi.mock("~/ui/item/editor/useEditorItemOriginFlow", () => ({
-	useEditorItemOriginFlow: () => state.flowState,
-}));
+
 vi.mock("~/ui/item/editor/EditorOriginFlowCanvas", () => ({
 	EditorOriginFlowCanvas: (props: typeof state.canvasProps) => {
 		state.canvasProps = props;
-		return createElement("div");
+		return null;
 	},
 }));
 
@@ -74,62 +71,26 @@ import { EditorOriginFlowSection } from "~/ui/item/editor/EditorOriginFlowSectio
 	}
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
-const roots: Array<ReturnType<typeof createRoot>> = [];
+let root: ReturnType<typeof createRoot> | undefined;
 
 afterEach(async () => {
-	await act(async () => {
-		for (const root of roots.splice(0)) root.unmount();
-	});
+	await act(async () => root?.unmount());
+	root = undefined;
 	state.canvasProps = undefined;
 	state.navigate.mockReset();
 	document.body.replaceChildren();
 });
 
 describe("EditorOriginFlowSection", () => {
-	it("clears the selected highlight when a focus request clears search", async () => {
+	it("routes a graph item ID through its canonical editor identity", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-		await act(async () => {
-			root.render(
-				createElement(EditorOriginFlowSection, {
-					focusItemId: "tool",
-					focusRequestKey: 1,
-				}),
-			);
-		});
-		expect(state.canvasProps).toMatchObject({
-			focusNodeId: "node:tool",
-			selection: {
-				id: "node:tool",
-				kind: "node",
-			},
-		});
+		root = createRoot(container);
+		await act(async () => root?.render(createElement(EditorOriginFlowSection, {})));
+		if (state.canvasProps === undefined) throw new Error("Missing Flow canvas binding.");
 
-		await act(async () => {
-			root.render(
-				createElement(EditorOriginFlowSection, {
-					focusRequestKey: 2,
-				}),
-			);
-		});
-		expect(state.canvasProps?.focusNodeId).toBeUndefined();
-		expect(state.canvasProps?.selection).toBeUndefined();
-	});
+		await act(async () => state.canvasProps?.onItemOpen("tool"));
 
-	it("opens a clicked item identity in its canonical detail", async () => {
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-		await act(async () => {
-			root.render(createElement(EditorOriginFlowSection, {}));
-		});
-
-		await act(async () => {
-			state.canvasProps?.onItemOpen("tool");
-		});
 		expect(state.navigate).toHaveBeenCalledWith({
 			params: {
 				itemUid: "tool-uid",

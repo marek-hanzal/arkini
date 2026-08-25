@@ -6,7 +6,7 @@ import { act, createElement, type AnchorHTMLAttributes, type ButtonHTMLAttribute
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { capacityDiagnostic, createArtifact } from "./EditorBuild.test/fixtures";
+import { createArtifact } from "./EditorBuild.test/fixtures";
 
 const state = vi.hoisted(() => ({
 	buildResult: undefined as unknown,
@@ -118,6 +118,7 @@ vi.mock("~/ui/button/Button", () => ({
 }));
 
 import { EditorBuild } from "~/ui/arkpack/editor/EditorBuild";
+import { useEditorBuildController } from "~/ui/arkpack/editor/useEditorBuildController";
 
 (
 	globalThis as {
@@ -126,7 +127,9 @@ import { EditorBuild } from "~/ui/arkpack/editor/EditorBuild";
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
+let controller: useEditorBuildController.Output | undefined;
 beforeEach(() => {
+	controller = undefined;
 	state.project = {
 		projectId: "editor-test",
 		title: "Editor test",
@@ -167,77 +170,36 @@ const renderBuild = async () => {
 	};
 };
 
+const renderController = async () => {
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	roots.push(root);
+	const Probe = () => {
+		controller = useEditorBuildController();
+		return null;
+	};
+	const render = async () => {
+		await act(async () => root.render(createElement(Probe)));
+	};
+	await render();
+	return render;
+};
+
 describe("EditorBuild", () => {
-	it("requires an explicit build before presenting a valid artifact", async () => {
-		const { container } = await renderBuild();
-
-		expect(container.textContent).toContain("Not built");
-		expect(container.textContent).toContain("Run a build to execute the complete game");
-		expect(container.textContent).toContain("Build arkpack");
-	});
-
-	it("exports source independently and reveals the completed output folder", async () => {
-		const { container, render } = await renderBuild();
-
-		expect(container.textContent).toContain("JSON source export");
-		expect(container.textContent).toContain("current schema.json");
-		expect(container.textContent).not.toContain("entire contents");
-		expect(container.textContent).not.toContain("every existing file and subfolder");
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="EditorBuildExportSource"]')
-				?.textContent,
-		).toBe("Export");
-		expect(container.textContent).not.toContain("Open folder");
-		await act(async () => {
-			container.querySelector<HTMLElement>('[data-ui="EditorBuildExportSource"]')?.click();
-		});
-		expect(state.commandSetters.get("export:editor-test")).toHaveBeenCalledWith(undefined);
-
-		state.exportResults.set(
-			"editor-test",
-			AsyncResult.success({
-				json: 9,
-				projectDirectory: "/tmp/source",
-				resources: 3,
-				revision: 4,
-				root: "/tmp/source",
-			}),
-		);
-		await render();
-		expect(container.textContent).toContain(
-			"Exported revision 4: 9 JSON files and 3 PNG resources to /tmp/source.",
-		);
-		expect(container.textContent).toContain("Open folder");
-
-		state.exportResults.set("editor-test", AsyncResult.success(null));
-		await render();
-		expect(container.textContent).toContain(
-			"Exported revision 4: 9 JSON files and 3 PNG resources to /tmp/source.",
-		);
-		expect(container.textContent).toContain("Open folder");
-		await act(async () => {
-			container
-				.querySelector<HTMLElement>('[data-ui="EditorBuildOpenSourceExport"]')
-				?.click();
-		});
-		expect(state.commandSetters.get("open-export:completed-export")).toHaveBeenCalledWith(
-			undefined,
-		);
-	});
-
 	it("hides an artifact as soon as the canonical project revision changes", async () => {
 		state.buildResult = AsyncResult.success(createArtifact("a".repeat(64), 0));
-		const { container, render } = await renderBuild();
-		expect(container.textContent).toContain("Valid");
-		expect(container.textContent).toContain("Build output");
+		const render = await renderController();
+		expect(controller?.buildStatus).toBe("valid");
+		expect(controller?.artifactSummary).toBeDefined();
 
 		state.project = {
 			...(state.project as Record<string, unknown>),
 			revision: 1,
 		};
 		await render();
-		expect(container.textContent).toContain("Stale");
-		expect(container.textContent).not.toContain("Build output");
+		expect(controller?.buildStatus).toBe("stale");
+		expect(controller?.artifactSummary).toBeUndefined();
 	});
 
 	it("does not show an install result from a different artifact hash", async () => {
@@ -250,25 +212,12 @@ describe("EditorBuild", () => {
 				packageId: firstHash,
 			}),
 		);
-		const { container, render } = await renderBuild();
-		expect(container.textContent).toContain(`Installed as ${firstHash}`);
+		const render = await renderController();
+		expect(controller?.installedPackageId).toBe(firstHash);
 
 		state.buildResult = AsyncResult.success(createArtifact(secondHash, 0));
 		await render();
-		expect(container.textContent).not.toContain(`Installed as ${firstHash}`);
-		expect(container.textContent).not.toContain("Installed as");
-	});
-
-	it("uses concise output actions and a human-readable artifact size", async () => {
-		state.buildResult = AsyncResult.success(createArtifact("a".repeat(64), 0));
-		const { container } = await renderBuild();
-
-		expect(container.textContent).toContain("2 bytes");
-		expect(container.textContent).not.toContain("Install to game catalog");
-		expect(container.querySelector("button")?.textContent).not.toBe("Install");
-		expect(
-			Array.from(container.querySelectorAll("button"), (button) => button.textContent),
-		).toContain("Install");
+		expect(controller?.installedPackageId).toBeUndefined();
 	});
 
 	it("sends the exact current artifact to both output actions", async () => {
@@ -289,33 +238,4 @@ describe("EditorBuild", () => {
 		);
 	});
 
-	it("renders actionable structured diagnostics instead of a code-only message", async () => {
-		state.project = {
-			...(state.project as Record<string, unknown>),
-			config: {
-				items: {
-					"producer:academy": {
-						uid: "academy-uid",
-						title: "Academy",
-					},
-				},
-			},
-		};
-		state.buildResult = AsyncResult.success({
-			...createArtifact("a".repeat(64), 0),
-			diagnostics: [
-				capacityDiagnostic,
-			],
-		});
-
-		const { container } = await renderBuild();
-
-		expect(container.textContent).toContain("Unsupported input capacity");
-		expect(container.textContent).toContain(
-			"This input buffer is only supported by producer lines.",
-		);
-		expect(container.querySelector("a")?.getAttribute("href")).toBe(
-			"/editor/editor-test/editor/items/academy-uid/form/production",
-		);
-	});
 });

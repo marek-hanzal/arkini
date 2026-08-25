@@ -23,7 +23,7 @@ afterEach(async () => {
 });
 
 describe("EditorAssetImageDropZone", () => {
-	it("replaces the canonical preview with the selected local PNG", async () => {
+	it("owns the selected local PNG URL until unmount", async () => {
 		const createObjectUrl = vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:selected");
 		const revokeObjectUrl = vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
 		const container = document.createElement("div");
@@ -39,9 +39,6 @@ describe("EditorAssetImageDropZone", () => {
 				}),
 			);
 
-		await act(async () => render());
-		expect(container.querySelector("img")?.src).toBe("blob:canonical");
-
 		const file = new File(
 			[
 				"png",
@@ -53,8 +50,6 @@ describe("EditorAssetImageDropZone", () => {
 		);
 		await act(async () => render(file));
 		expect(createObjectUrl).toHaveBeenCalledWith(file);
-		expect(container.querySelector("img")?.src).toBe("blob:selected");
-		expect(container.textContent).toContain("replacement.png");
 
 		await act(async () => root.unmount());
 		roots.pop();

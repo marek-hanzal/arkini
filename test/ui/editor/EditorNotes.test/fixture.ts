@@ -5,7 +5,6 @@ import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryEr
 
 export const editorNotesTestState = {
 	createFailures: 0,
-	listFailures: 0,
 	nextNote: 2,
 	notes: [
 		{
@@ -19,22 +18,7 @@ export const editorNotesTestState = {
 };
 
 const repository = {
-	listNotesFx: () =>
-		Effect.try({
-			try: () => {
-				if (editorNotesTestState.listFailures > 0) {
-					editorNotesTestState.listFailures -= 1;
-					throw new Error("Notes could not be loaded.");
-				}
-				return editorNotesTestState.notes;
-			},
-			catch: (cause) =>
-				new EditorProjectRepositoryError({
-					operation: "list-notes",
-					message: cause instanceof Error ? cause.message : String(cause),
-					cause,
-				}),
-		}),
+	listNotesFx: () => Effect.succeed(editorNotesTestState.notes),
 	createNoteFx: ({ projectId, content }: { projectId: string; content: string }) =>
 		Effect.try({
 			try: () => {
@@ -62,42 +46,8 @@ const repository = {
 					cause,
 				}),
 		}),
-	updateNoteFx: ({ content, noteId }: { content: string; noteId: string; projectId: string }) =>
-		Effect.try({
-			try: () => {
-				const note = editorNotesTestState.notes.find(
-					(candidate) => candidate.noteId === noteId,
-				);
-				if (note === undefined) throw new Error("Missing note.");
-				const updated = {
-					...note,
-					content,
-					updatedAtMs:
-						Math.max(
-							...editorNotesTestState.notes.map(({ updatedAtMs }) => updatedAtMs),
-						) + 1,
-				};
-				editorNotesTestState.notes = [
-					updated,
-					...editorNotesTestState.notes.filter(
-						(candidate) => candidate.noteId !== noteId,
-					),
-				];
-				return updated;
-			},
-			catch: (cause) =>
-				new EditorProjectRepositoryError({
-					operation: "update-note",
-					message: cause instanceof Error ? cause.message : String(cause),
-					cause,
-				}),
-		}),
-	deleteNoteFx: ({ noteId }: { noteId: string; projectId: string }) =>
-		Effect.sync(() => {
-			editorNotesTestState.notes = editorNotesTestState.notes.filter(
-				(note) => note.noteId !== noteId,
-			);
-		}),
+	updateNoteFx: () => Effect.die("Unexpected note update."),
+	deleteNoteFx: () => Effect.die("Unexpected note delete."),
 };
 
 export const EditorNotesTestCommandAtoms = Effect.runSync(

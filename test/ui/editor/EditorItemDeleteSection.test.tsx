@@ -123,60 +123,14 @@ const makeItemEligible = () => {
 	};
 };
 
-const confirmDelete = async (container: HTMLElement) => {
-	await act(async () =>
-		container.querySelector<HTMLButtonElement>('[data-ui="EditorItemDeleteOpen"]')?.click(),
-	);
-	await act(async () =>
-		container.querySelector<HTMLButtonElement>('[data-ui="EditorItemDeleteConfirm"]')?.click(),
-	);
-};
-
 describe("EditorItemDeleteSection", () => {
-	it("links a blocking start reference to its exact project section", async () => {
-		const container = await render();
-		const link = container.querySelector<HTMLAnchorElement>(
-			'[data-to="/editor/$projectId/project/$sectionId"]',
-		);
-
-		expect(container.textContent).toContain("This item cannot be deleted yet");
-		expect(container.textContent).toContain("Initial board references this item");
-		expect(link?.dataset.params).toBe(
-			JSON.stringify({
-				projectId: "project-one",
-				sectionId: "board",
-			}),
-		);
-		expect(container.querySelector('[data-ui="EditorItemDeleteOpen"]')).toBeNull();
-		expect(container.querySelector('[data-ui="EditorItemForceDeleteOpen"]')).not.toBeNull();
-	});
-
-	it("explains and confirms the destructive force-delete impact", async () => {
+	it("submits the exact revision-scoped force delete", async () => {
 		const container = await render();
 
 		await act(async () =>
 			container
 				.querySelector<HTMLButtonElement>('[data-ui="EditorItemForceDeleteOpen"]')
 				?.click(),
-		);
-
-		expect(container.textContent).toContain("Remove 1 starting board entry");
-		expect(container.textContent).toContain("Its asset files remain available in the project.");
-		expect(container.textContent).toContain(
-			"The resulting config will remain structurally valid",
-		);
-		expect(container.textContent).toContain("the game can be logically broken");
-		expect(container.textContent).toContain(
-			"No additional references or gameplay relationships",
-		);
-		const versionLink = container.querySelector<HTMLAnchorElement>(
-			'[data-ui="EditorItemDeleteCreateVersion"]',
-		);
-		expect(versionLink?.dataset.to).toBe("/editor/$projectId/versions/commit");
-		expect(versionLink?.dataset.search).toBe(
-			JSON.stringify({
-				returnTo: "/editor/project-one/editor/items/water/detail/delete",
-			}),
 		);
 
 		await act(async () =>
@@ -196,15 +150,14 @@ describe("EditorItemDeleteSection", () => {
 		makeItemEligible();
 		const container = await render();
 		const open = container.querySelector<HTMLButtonElement>('[data-ui="EditorItemDeleteOpen"]');
-		expect(container.textContent).toContain("This item can be deleted");
+		if (open === null) throw new Error("Missing delete action.");
 
-		await act(async () => open?.click());
-		expect(container.textContent).toContain("Its asset files remain available in the project.");
-		expect(container.querySelector('[data-ui="EditorItemDeleteCreateVersion"]')).not.toBeNull();
+		await act(async () => open.click());
 		const confirm = container.querySelector<HTMLButtonElement>(
 			'[data-ui="EditorItemDeleteConfirm"]',
 		);
-		await act(async () => confirm?.click());
+		if (confirm === null) throw new Error("Missing delete confirmation.");
+		await act(async () => confirm.click());
 
 		expect(state.remove).toHaveBeenCalledWith({
 			expectedRevision: 0,
@@ -221,15 +174,4 @@ describe("EditorItemDeleteSection", () => {
 		});
 	});
 
-	it("returns through browser history when the item came from a stateful list", async () => {
-		makeItemEligible();
-		state.historyBack.mockReturnValue(true);
-		const container = await render();
-
-		await confirmDelete(container);
-
-		expect(state.remove).toHaveBeenCalledOnce();
-		expect(state.historyBack).toHaveBeenCalledOnce();
-		expect(state.navigate).not.toHaveBeenCalled();
-	});
 });

@@ -1,36 +1,21 @@
-import { useRouter } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { checkoutEditorProjectVersionFx } from "~/bridge/editor/version/checkoutEditorProjectVersionFx";
-import { readEditorProjectVersionDiffFx } from "~/bridge/editor/version/readEditorProjectVersionDiffFx";
 import { readEditorProjectVersionHistoryFx } from "~/bridge/editor/version/readEditorProjectVersionHistoryFx";
-import { updateEditorProjectVersionTagFx } from "~/bridge/editor/version/updateEditorProjectVersionTagFx";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type {
 	EditorProjectVersionDescriptor,
-	EditorProjectVersionDiff,
-	EditorProjectVersionReference,
 	EditorProjectVersionStatus,
 } from "~/editor/version/EditorProjectVersion";
-import { useEditorUnsavedChangesOwner } from "~/ui/editor/useEditorUnsavedChangesRegistration";
 import {
 	layoutEditorVersionGraph,
 	type EditorVersionGraphLayout,
 } from "~/ui/version/editor/layoutEditorVersionGraph";
+import { useEditorVersionCheckout } from "~/ui/version/editor/useEditorVersionCheckout";
+import { useEditorVersionComparison } from "~/ui/version/editor/useEditorVersionComparison";
+import { useEditorVersionTag } from "~/ui/version/editor/useEditorVersionTag";
 
-const currentReference: EditorProjectVersionReference = {
-	type: "current",
-};
 const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
-
-const decodeReference = (value: string): EditorProjectVersionReference =>
-	value === "current"
-		? currentReference
-		: {
-				type: "version",
-				versionId: value,
-			};
 
 interface HistoryState {
 	readonly status: EditorProjectVersionStatus;
@@ -45,7 +30,7 @@ export namespace useEditorVersionHistoryController {
 		readonly compareTo: string;
 		readonly confirmCheckout: () => void;
 		readonly confirmVersion?: EditorProjectVersionDescriptor;
-		readonly diff?: EditorProjectVersionDiff;
+		readonly diff?: ReturnType<typeof useEditorVersionComparison>["diff"];
 		readonly diffPending: boolean;
 		readonly error?: string;
 		readonly goToCommit: () => void;
@@ -64,42 +49,35 @@ export namespace useEditorVersionHistoryController {
 	}
 }
 
+/** Owns history loading and selection while focused child hooks own each mutation surface. */
 export const useEditorVersionHistoryController = (): useEditorVersionHistoryController.Output => {
 	const project = useEditorProject();
-	const router = useRouter();
-	const unsavedOwner = useEditorUnsavedChangesOwner();
-	const unsaved = useSyncExternalStore(
-		unsavedOwner.subscribe,
-		unsavedOwner.getSnapshot,
-		unsavedOwner.getSnapshot,
-	);
-	const [checkoutPending, setCheckoutPending] = useState(false);
-	const [compareFrom, setCompareFrom] = useState("current");
-	const [compareTo, setCompareTo] = useState("current");
-	const [confirmVersionId, setConfirmVersionId] = useState<string>();
-	const [diff, setDiff] = useState<EditorProjectVersionDiff>();
-	const [diffPending, setDiffPending] = useState(false);
 	const [error, setError] = useState<string>();
 	const [history, setHistory] = useState<HistoryState>();
 	const [selectedVersionId, setSelectedVersionId] = useState<string>();
-	const [tagDraft, setTagDraft] = useState("");
-	const [tagPending, setTagPending] = useState(false);
-
+	const reportError = useCallback(
+		(cause?: unknown) => setError(cause === undefined ? undefined : message(cause)),
+		[],
+	);
+	const comparison = useEditorVersionComparison({
+		enabled: history !== undefined,
+		projectId: project.projectId,
+		reportError,
+	});
 	const loadHistory = useCallback(() => {
-		setError(undefined);
+		reportError();
 		void RendererRuntime.runPromise(readEditorProjectVersionHistoryFx(project.projectId))
 			.then((next) => {
 				setHistory(next);
 				const selectedId = next.status.currentBaseVersionId ?? next.versions[0]?.versionId;
 				setSelectedVersionId((current) => current ?? selectedId);
-				if (next.status.currentBaseVersionId !== undefined) {
-					setCompareFrom(next.status.currentBaseVersionId);
-					setCompareTo("current");
-				}
+				comparison.resetToBase(next.status.currentBaseVersionId);
 			})
-			.catch((cause) => setError(message(cause)));
+			.catch(reportError);
 	}, [
+		comparison.resetToBase,
 		project.projectId,
+		reportError,
 	]);
 
 	useEffect(() => {
@@ -112,9 +90,6 @@ export const useEditorVersionHistoryController = (): useEditorVersionHistoryCont
 		project.projectId,
 	]);
 	const selected = history?.versions.find((version) => version.versionId === selectedVersionId);
-	const confirmVersion = history?.versions.find(
-		(version) => version.versionId === confirmVersionId,
-	);
 	const graph = useMemo(
 		() =>
 			history === undefined
@@ -124,45 +99,26 @@ export const useEditorVersionHistoryController = (): useEditorVersionHistoryCont
 			history,
 		],
 	);
-
-	useEffect(
-		() => setTagDraft(selected?.tag ?? ""),
-		[
-			selected,
-		],
-	);
-	useEffect(() => {
-		if (history === undefined) return;
-		let mounted = true;
-		setDiffPending(true);
-		void RendererRuntime.runPromise(
-			readEditorProjectVersionDiffFx({
-				projectId: project.projectId,
-				from: decodeReference(compareFrom),
-				to: decodeReference(compareTo),
-			}),
-		)
-			.then((next) => {
-				if (!mounted) return;
-				setDiff(next);
-				setDiffPending(false);
-			})
-			.catch((cause) => {
-				if (!mounted) return;
-				setError(message(cause));
-				setDiff(undefined);
-				setDiffPending(false);
-			});
-		return () => {
-			mounted = false;
-		};
-	}, [
-		compareFrom,
-		compareTo,
-		history,
-		project.projectId,
-	]);
-
+	const checkout = useEditorVersionCheckout({
+		project,
+		projectDirty: history?.status.dirty === true,
+		reportError,
+		...(selected === undefined
+			? {}
+			: {
+					selected,
+				}),
+	});
+	const tag = useEditorVersionTag({
+		reload: loadHistory,
+		projectId: project.projectId,
+		reportError,
+		...(selected === undefined
+			? {}
+			: {
+					selected,
+				}),
+	});
 	const selectVersion = useCallback(
 		(versionId: string) => {
 			const version = history?.versions.find(
@@ -170,180 +126,60 @@ export const useEditorVersionHistoryController = (): useEditorVersionHistoryCont
 			);
 			if (version === undefined) return;
 			setSelectedVersionId(versionId);
-			setCompareFrom(version.parentVersionId ?? version.versionId);
-			setCompareTo(version.versionId);
+			comparison.compareVersion(version);
 		},
 		[
+			comparison.compareVersion,
 			history,
 		],
 	);
-	const runCheckout = useCallback(
-		(versionId: string) => {
-			if (checkoutPending) return;
-			setCheckoutPending(true);
-			setError(undefined);
-			void RendererRuntime.runPromise(
-				checkoutEditorProjectVersionFx({
-					currentProject: project,
-					versionId,
-				}),
-			)
-				.then(async () => {
-					await router.navigate({
-						to: "/editor/$projectId/versions/history",
-						params: {
-							projectId: project.projectId,
-						},
-						replace: true,
-					});
-					await router.invalidate();
-				})
-				.catch((cause) => {
-					setError(message(cause));
-					setCheckoutPending(false);
-					setConfirmVersionId(undefined);
-				});
-		},
-		[
-			checkoutPending,
-			project,
-			router,
-		],
-	);
-	const restoreSelected = useCallback(() => {
-		if (selected === undefined || selected.applicability.type === "incompatible") return;
-		if (history?.status.dirty === true || unsaved.hasDirtySession) {
-			setConfirmVersionId(selected.versionId);
-			return;
-		}
-		runCheckout(selected.versionId);
-	}, [
-		history?.status.dirty,
-		runCheckout,
-		selected,
-		unsaved.hasDirtySession,
-	]);
-	const confirmCheckout = useCallback(() => {
-		if (confirmVersion !== undefined) runCheckout(confirmVersion.versionId);
-	}, [
-		confirmVersion,
-		runCheckout,
-	]);
-	const goToCommit = useCallback(() => {
-		setConfirmVersionId(undefined);
-		void router.navigate({
-			to: "/editor/$projectId/versions/commit",
-			params: {
-				projectId: project.projectId,
-			},
-			search: {
-				returnTo: `/editor/${project.projectId}/versions/history`,
-			},
-		});
-	}, [
-		project.projectId,
-		router,
-	]);
-	const saveTag = useCallback(() => {
-		if (selected === undefined || selected.applicability.type === "incompatible" || tagPending)
-			return;
-		setTagPending(true);
-		setError(undefined);
-		void RendererRuntime.runPromise(
-			updateEditorProjectVersionTagFx({
-				projectId: project.projectId,
-				...(tagDraft.trim() === ""
-					? {}
-					: {
-							tag: tagDraft,
-						}),
-				versionId: selected.versionId,
-			}),
-		)
-			.then(() => {
-				setTagPending(false);
-				loadHistory();
-			})
-			.catch((cause) => {
-				setError(message(cause));
-				setTagPending(false);
-			});
-	}, [
-		loadHistory,
-		project.projectId,
-		selected,
-		tagDraft,
-		tagPending,
-	]);
 
-	return useMemo(
-		() => ({
-			cancelCheckout: () => setConfirmVersionId(undefined),
-			checkoutPending,
-			compareFrom,
-			compareTo,
-			confirmCheckout,
-			...(confirmVersion === undefined
-				? {}
-				: {
-						confirmVersion,
-					}),
-			...(diff === undefined
-				? {}
-				: {
-						diff,
-					}),
-			diffPending,
-			...(error === undefined
-				? {}
-				: {
-						error,
-					}),
-			goToCommit,
-			...(graph === undefined
-				? {}
-				: {
-						graph,
-					}),
-			...(history === undefined
-				? {}
-				: {
-						history,
-					}),
-			projectId: project.projectId,
-			restoreSelected,
-			saveTag,
-			selectVersion,
-			...(selected === undefined
-				? {}
-				: {
-						selected,
-					}),
-			setCompareFrom,
-			setCompareTo,
-			setTagDraft,
-			tagDraft,
-			tagPending,
-		}),
-		[
-			checkoutPending,
-			compareFrom,
-			compareTo,
-			confirmCheckout,
-			confirmVersion,
-			diff,
-			diffPending,
-			error,
-			goToCommit,
-			graph,
-			history,
-			project.projectId,
-			restoreSelected,
-			saveTag,
-			selectVersion,
-			selected,
-			tagDraft,
-			tagPending,
-		],
-	);
+	return {
+		cancelCheckout: checkout.cancel,
+		checkoutPending: checkout.pending,
+		compareFrom: comparison.compareFrom,
+		compareTo: comparison.compareTo,
+		confirmCheckout: checkout.confirm,
+		...(checkout.confirmVersion === undefined
+			? {}
+			: {
+					confirmVersion: checkout.confirmVersion,
+				}),
+		...(comparison.diff === undefined
+			? {}
+			: {
+					diff: comparison.diff,
+				}),
+		diffPending: comparison.pending,
+		...(error === undefined
+			? {}
+			: {
+					error,
+				}),
+		goToCommit: checkout.goToCommit,
+		...(graph === undefined
+			? {}
+			: {
+					graph,
+				}),
+		...(history === undefined
+			? {}
+			: {
+					history,
+				}),
+		projectId: project.projectId,
+		restoreSelected: checkout.restoreSelected,
+		saveTag: tag.save,
+		selectVersion,
+		...(selected === undefined
+			? {}
+			: {
+					selected,
+				}),
+		setCompareFrom: comparison.setCompareFrom,
+		setCompareTo: comparison.setCompareTo,
+		setTagDraft: tag.setDraft,
+		tagDraft: tag.draft,
+		tagPending: tag.pending,
+	};
 };

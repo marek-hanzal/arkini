@@ -26,6 +26,7 @@ import { readEditorMcpItemEstimateTextFx } from "./readEditorMcpItemEstimateText
 import { readEditorMcpItemMetaTextFx } from "./readEditorMcpItemMetaTextFx";
 import { readEditorMcpItemRelationTextFx } from "./readEditorMcpItemRelationTextFx";
 import { readEditorMcpProjectTextFx } from "./readEditorMcpProjectTextFx";
+import { registerEditorMcpGameplayDesignTools } from "./registerEditorMcpGameplayDesignTools";
 
 const editorMcpItemTypes = [
 	"simple",
@@ -99,7 +100,7 @@ const createEditorMcpServer = (
 		},
 		{
 			instructions:
-				"Every tool targets only the project currently open in the Arkini editor. Read results mirror the relevant editor UI as concise text and never dump the complete game config. Create and edit tools persist canonical editor items.",
+				"Every tool targets only the project currently open in the Arkini editor. Results are concise plain text unless a tool explicitly promises JSON config. No tool dumps the complete game config. Create and edit tools persist canonical editor authoring.",
 		},
 	);
 	const readProjectFx = () => readCurrentProjectFx(repository, readProjectContext);
@@ -149,6 +150,13 @@ const createEditorMcpServer = (
 				),
 		);
 	}
+	registerEditorMcpGameplayDesignTools({
+		notifyProjectChanged,
+		readProjectFx,
+		repository,
+		runTool,
+		server,
+	});
 	server.registerTool(
 		"project",
 		{

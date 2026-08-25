@@ -45,6 +45,13 @@ const deleteItemSchema = z
 		force: z.boolean(),
 	})
 	.strict();
+const deleteResourceSchema = z
+	.object({
+		expectedRevision: z.number().int().nonnegative(),
+		projectId: IdSchema,
+		resourceId: IdSchema,
+	})
+	.strict();
 const replaceConfigSchema = z
 	.object({
 		projectId: IdSchema,
@@ -140,6 +147,12 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 				EditorProjectRepository.DeleteItemProps,
 				EditorProjectRepositoryError
 			> => parseEditorProjectIpcRequestFx("delete-item", deleteItemSchema, candidate),
+			parseDeleteResourceFx: (
+				candidate: unknown,
+			): Effect.Effect<
+				EditorProjectRepository.DeleteResourceProps,
+				EditorProjectRepositoryError
+			> => parseEditorProjectIpcRequestFx("delete-resource", deleteResourceSchema, candidate),
 			parseReplaceConfigFx: (
 				candidate: unknown,
 			): Effect.Effect<

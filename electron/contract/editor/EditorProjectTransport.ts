@@ -7,6 +7,7 @@ export namespace EditorProjectTransport {
 		| "create-version"
 		| "delete-project"
 		| "delete-item"
+		| "delete-resource"
 		| "delete-board-scenario"
 		| "diff-versions"
 		| "export-json-directory"
@@ -122,6 +123,12 @@ export namespace EditorProjectTransport {
 		readonly itemUid: string;
 		readonly expectedRevision: number;
 		readonly force: boolean;
+	}
+
+	export interface DeleteResourceRequest {
+		readonly expectedRevision: number;
+		readonly projectId: string;
+		readonly resourceId: string;
 	}
 
 	export interface ReplaceConfigRequest {

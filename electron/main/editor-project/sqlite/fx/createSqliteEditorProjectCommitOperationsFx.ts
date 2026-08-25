@@ -13,6 +13,7 @@ import {
 } from "~/editor/EditorProjectRepositoryError";
 import type { EditorProjectResourceRecordSchema } from "~/editor/EditorProjectResourceRecordSchema";
 import { forceDeleteEditorItemFx } from "~/editor/forceDeleteEditorItemFx";
+import { readEditorAssetDeleteBlockersFx } from "~/editor/readEditorAssetDeleteBlockersFx";
 import { readEditorItemDeleteBlockersFx } from "~/editor/readEditorItemDeleteBlockersFx";
 import {
 	EditorProjectCompatibility,
@@ -29,6 +30,7 @@ import { SqliteEditorProjectRowSchema } from "../schema/SqliteEditorProjectRowSc
 type CommitOperations = Pick<
 	EditorProjectRepositoryService,
 	| "deleteItemFx"
+	| "deleteResourceFx"
 	| "replaceConfigFx"
 	| "replaceResourceFx"
 	| "saveResourceFx"
@@ -332,6 +334,55 @@ export const createSqliteEditorProjectCommitOperationsFx = Effect.fn(
 		);
 	});
 
+	const deleteResourceFx: CommitOperations["deleteResourceFx"] = Effect.fn(
+		"SqliteEditorProjectRepository.deleteResourceFx",
+	)(function* ({ expectedRevision, projectId, resourceId }) {
+		const nowMs = yield* Clock.currentTimeMillis;
+		return yield* writeLock.withPermits(1)(
+			runSqliteEditorProjectTransactionFx(database, () => {
+				const current = readProjectRow(selectProject, projectId, "delete-resource");
+				if (current === null)
+					throw createRepositoryError(
+						"delete-resource",
+						`Editor project ${projectId} does not exist.`,
+					);
+				assertExpectedRevision(current, expectedRevision, "delete-resource");
+				if (resourceExists.get(projectId, resourceId) === undefined)
+					throw createRepositoryError(
+						"delete-resource",
+						`Resource ${resourceId} does not exist.`,
+					);
+				const blockers = ElectronMainRuntime.runSync(
+					readEditorAssetDeleteBlockersFx({
+						config: current.config,
+						resourceId,
+					}),
+				);
+				if (blockers.length > 0)
+					throw createRepositoryError(
+						"delete-resource",
+						`Resource ${resourceId} is still referenced in ${blockers.length} ${blockers.length === 1 ? "place" : "places"}.`,
+					);
+				deleteResource.run(projectId, resourceId);
+				const revision = reviseProjectRecord(current, current.config, nowMs, "minor");
+				writeProjectRecord(revision.record, revision.dropBoardScenarios);
+				return materializeProject(
+					revision.record,
+					readResourceRows(selectResources, projectId, "delete-resource"),
+				);
+			}).pipe(
+				Effect.mapError((cause) =>
+					createRepositoryError(
+						"delete-resource",
+						`Resource ${resourceId} could not be deleted from project ${projectId}.`,
+						cause,
+					),
+				),
+				Effect.uninterruptible,
+			),
+		);
+	});
+
 	const replaceConfigFx: CommitOperations["replaceConfigFx"] = Effect.fn(
 		"SqliteEditorProjectRepository.replaceConfigFx",
 	)(function* ({ projectId, expectedRevision, config: candidateConfig }) {
@@ -539,6 +590,7 @@ export const createSqliteEditorProjectCommitOperationsFx = Effect.fn(
 
 	return {
 		deleteItemFx,
+		deleteResourceFx,
 		upsertItemFx,
 		replaceConfigFx,
 		upsertResourcesFx,

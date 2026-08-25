@@ -34,6 +34,12 @@ export namespace EditorProjectRepository {
 		readonly force: boolean;
 	}
 
+	export interface DeleteResourceProps {
+		readonly expectedRevision: number;
+		readonly projectId: string;
+		readonly resourceId: string;
+	}
+
 	export interface ReplaceConfigProps {
 		readonly projectId: string;
 		readonly expectedRevision: number;
@@ -83,6 +89,9 @@ export interface EditorProjectRepositoryService extends EditorProjectVersionRepo
 	readonly deleteItemFx: (
 		props: EditorProjectRepository.DeleteItemProps,
 	) => Effect.Effect<EditorProjectCommit, EditorProjectRepositoryError>;
+	readonly deleteResourceFx: (
+		props: EditorProjectRepository.DeleteResourceProps,
+	) => Effect.Effect<EditorProject, EditorProjectRepositoryError>;
 	readonly listProjectsFx: Effect.Effect<
 		ReadonlyArray<EditorProjectDescriptor>,
 		EditorProjectRepositoryError

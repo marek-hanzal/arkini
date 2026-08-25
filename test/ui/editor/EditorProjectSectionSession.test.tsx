@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 // @vitest-environment jsdom
 
-import { act, createElement, type ReactNode } from "react";
+import { act, createElement, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -28,6 +28,8 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 });
 
 vi.mock("~/ui/button/Button", () => ({
+	Button: ({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) =>
+		createElement("button", props, children),
 	ButtonLink: ({ children }: { readonly children?: ReactNode }) =>
 		createElement("a", null, children),
 	PrimaryButton: ({ children }: { readonly children?: ReactNode }) =>
@@ -64,6 +66,7 @@ vi.mock("~/ui/item/editor/EditorItemAutocompleteField", () => ({
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectForm } from "~/ui/project/editor/EditorProjectForm";
+import { EditorProjectAppearanceSection } from "~/ui/project/editor/EditorProjectAppearanceSection";
 import { EditorProjectGeneralSection } from "~/ui/project/editor/EditorProjectGeneralSection";
 import { EditorProjectInventorySection } from "~/ui/project/editor/EditorProjectInventorySection";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
@@ -97,6 +100,54 @@ const changeInput = async (input: HTMLInputElement, value: string) => {
 };
 
 describe("project section form session", () => {
+	it("opens Appearance on the avatar requested by an asset usage link", async () => {
+		state.project = {
+			projectId: "project",
+			title: editorTestPayload.config.meta.title,
+			version: editorTestPayload.version,
+			createdAtMs: 1,
+			updatedAtMs: 2,
+			revision: 0,
+			config: {
+				...editorTestPayload.config,
+				resources: {
+					...editorTestPayload.config.resources,
+					"avatar-01": "avatar-first",
+					"avatar-02": "avatar-current",
+				},
+			},
+			resources: [
+				...editorTestPayload.resources,
+				{
+					id: "avatar-first",
+					mime: "image/png",
+					bytes: Uint8Array.of(7),
+				},
+				{
+					id: "avatar-current",
+					mime: "image/png",
+					bytes: Uint8Array.of(8),
+				},
+			],
+		} satisfies EditorProject;
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+
+		await act(async () => {
+			root.render(
+				<EditorProjectForm>
+					<EditorProjectAppearanceSection initialAvatarIndex={1} />
+				</EditorProjectForm>,
+			);
+		});
+
+		expect(
+			container.querySelector<HTMLInputElement>('input[aria-label="About avatars"]')?.value,
+		).toBe("avatar-current");
+	});
+
 	it("preserves one local project draft while routed section content changes", async () => {
 		state.project = {
 			projectId: "project",

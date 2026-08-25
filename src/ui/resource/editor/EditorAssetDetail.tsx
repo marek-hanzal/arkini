@@ -90,6 +90,14 @@ export const EditorAssetDetail = ({
 								resourceId={resourceId}
 								to="/editor/$projectId/assets/$resourceId/detail/technical"
 							/>
+							<EditorAssetDetailTab
+								filter={filter}
+								label="Delete"
+								projectId={project.projectId}
+								query={query}
+								resourceId={resourceId}
+								to="/editor/$projectId/assets/$resourceId/detail/delete"
+							/>
 						</EditorSectionTabs>
 					}
 					action={

@@ -5,12 +5,12 @@ import { EditorProjectInventorySection } from "~/ui/project/editor/EditorProject
 import type { EditorProjectSectionId } from "~/ui/project/editor/EditorProjectSections";
 import { EditorProjectToolbarSection } from "~/ui/project/editor/EditorProjectToolbarSection";
 
-const renderSection = (section: EditorProjectSectionId) => {
+const renderSection = (section: EditorProjectSectionId, avatarIndex: number) => {
 	switch (section) {
 		case "general":
 			return <EditorProjectGeneralSection />;
 		case "appearance":
-			return <EditorProjectAppearanceSection />;
+			return <EditorProjectAppearanceSection initialAvatarIndex={avatarIndex} />;
 		case "board":
 			return <EditorProjectBoardSection />;
 		case "toolbar":
@@ -22,7 +22,9 @@ const renderSection = (section: EditorProjectSectionId) => {
 
 /** Renders one explicit Project section from the shared parent form session. */
 export const EditorProjectSectionPage = ({
+	avatarIndex,
 	section,
 }: {
+	readonly avatarIndex?: number;
 	readonly section: EditorProjectSectionId;
-}) => renderSection(section);
+}) => renderSection(section, avatarIndex ?? 0);

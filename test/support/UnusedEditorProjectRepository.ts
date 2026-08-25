@@ -7,6 +7,7 @@ export const UnusedEditorProjectRepository = {
 	checkoutVersionFx: () => Effect.die("Unexpected editor version checkout."),
 	createVersionFx: () => Effect.die("Unexpected editor version commit."),
 	deleteProjectFx: () => Effect.die("Unexpected editor project deletion."),
+	deleteResourceFx: () => Effect.die("Unexpected editor resource deletion."),
 	diffVersionsFx: () => Effect.die("Unexpected editor version diff."),
 	listVersionsFx: () => Effect.die("Unexpected editor version list."),
 	readVersionStatusFx: () => Effect.die("Unexpected editor version status."),
@@ -19,6 +20,7 @@ export const UnusedEditorProjectRepository = {
 } satisfies Pick<
 	EditorProjectRepositoryService,
 	| "deleteProjectFx"
+	| "deleteResourceFx"
 	| "checkoutVersionFx"
 	| "createVersionFx"
 	| "diffVersionsFx"

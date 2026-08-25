@@ -46,6 +46,7 @@ export const createEditorProjectIpcRepository = (): SqliteEditorProjectRepositor
 	checkoutVersionFx: vi.fn(() => Effect.void),
 	deleteProjectFx: vi.fn(() => Effect.void),
 	deleteItemFx: vi.fn(() => Effect.succeed(editorProjectIpcCommit)),
+	deleteResourceFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	diffVersionsFx: vi.fn(({ from, to }) =>
 		Effect.succeed({
 			from,

@@ -46,6 +46,7 @@ export namespace ArkiniElectronApi {
 		editorProjectCreate: "arkini:editor:project:create",
 		editorProjectDelete: "arkini:editor:project:delete",
 		editorProjectDeleteItem: "arkini:editor:project:delete-item",
+		editorProjectDeleteResource: "arkini:editor:project:delete-resource",
 		editorProjectExportJsonDirectory: "arkini:editor:project:export-json-directory",
 		editorProjectImportJsonDirectory: "arkini:editor:project:import-json-directory",
 		editorProjectList: "arkini:editor:project:list",
@@ -169,6 +170,9 @@ export namespace ArkiniElectronApi {
 			readonly deleteItem: (
 				request: EditorProjectTransport.DeleteItemRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Commit>>;
+			readonly deleteResource: (
+				request: EditorProjectTransport.DeleteResourceRequest,
+			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project>>;
 			readonly importJsonDirectory: () => Promise<
 				EditorProjectTransport.Result<EditorProjectTransport.Descriptor | null>
 			>;

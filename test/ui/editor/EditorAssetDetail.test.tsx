@@ -105,7 +105,7 @@ describe("editor asset detail", () => {
 		);
 	});
 
-	it("keeps Overview, Usage, and Technical as explicit asset detail leaves", async () => {
+	it("keeps Overview, Usage, Technical, and Delete as explicit asset detail leaves", async () => {
 		const container = await render(
 			createElement(
 				EditorAssetDetail,
@@ -123,6 +123,7 @@ describe("editor asset detail", () => {
 		expect(routes).toContain("/editor/$projectId/assets/$resourceId/detail/overview");
 		expect(routes).toContain("/editor/$projectId/assets/$resourceId/detail/usage");
 		expect(routes).toContain("/editor/$projectId/assets/$resourceId/detail/technical");
+		expect(routes).toContain("/editor/$projectId/assets/$resourceId/detail/delete");
 	});
 
 	it("renders immutable technical resource facts without raw implementation state", async () => {

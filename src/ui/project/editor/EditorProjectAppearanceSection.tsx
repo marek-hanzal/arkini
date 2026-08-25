@@ -4,7 +4,11 @@ import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSection } from "~/ui/form/EditorFormSection";
 import { useEditorProjectFormSession } from "~/ui/project/editor/EditorProjectFormContext";
 
-export const EditorProjectAppearanceSection = () => {
+export const EditorProjectAppearanceSection = ({
+	initialAvatarIndex = 0,
+}: {
+	readonly initialAvatarIndex?: number;
+}) => {
 	const { form } = useEditorProjectFormSession();
 	return (
 		<div className="grid gap-6">
@@ -30,7 +34,9 @@ export const EditorProjectAppearanceSection = () => {
 							<EditorCollectionSelector
 								addLabel="Add avatar"
 								count={avatars.length}
+								initialSelectedIndex={initialAvatarIndex}
 								itemLabel={(index) => avatars[index] || `Avatar ${index + 1}`}
+								key={initialAvatarIndex}
 								label="About avatars"
 								onAdd={
 									avatars.length >= EditorProjectAvatarKeys.length

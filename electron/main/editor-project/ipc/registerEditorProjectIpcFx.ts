@@ -247,6 +247,16 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					),
 				);
 				handle(
+					ArkiniElectronApi.channels.editorProjectDeleteResource,
+					(_event, candidate) =>
+						executeEditorProjectRepositoryFx(
+							"delete-resource",
+							ownership,
+							requestParser.parseDeleteResourceFx(candidate),
+							(repository, request) => repository.deleteResourceFx(request),
+						),
+				);
+				handle(
 					ArkiniElectronApi.channels.editorProjectUpsertResources,
 					(_event, candidate) =>
 						executeEditorProjectRepositoryFx(
@@ -310,6 +320,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					ArkiniElectronApi.channels.editorProjectCreate,
 					ArkiniElectronApi.channels.editorProjectDelete,
 					ArkiniElectronApi.channels.editorProjectDeleteItem,
+					ArkiniElectronApi.channels.editorProjectDeleteResource,
 					ArkiniElectronApi.channels.editorProjectExportJsonDirectory,
 					ArkiniElectronApi.channels.editorProjectImportJsonDirectory,
 					ArkiniElectronApi.channels.editorProjectList,

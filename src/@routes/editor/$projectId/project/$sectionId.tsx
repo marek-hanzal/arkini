@@ -7,7 +7,19 @@ import {
 	parseEditorProjectSectionIdFx,
 } from "~/page/editor/parseEditorProjectSectionIdFx";
 
+interface EditorProjectSectionSearch {
+	readonly avatar?: number;
+}
+
 export const Route = createFileRoute("/editor/$projectId/project/$sectionId")({
+	validateSearch: (search): EditorProjectSectionSearch => {
+		const avatar = typeof search.avatar === "number" ? search.avatar : Number.NaN;
+		return Number.isInteger(avatar) && avatar >= 0
+			? {
+					avatar,
+				}
+			: {};
+	},
 	beforeLoad: ({ context, params }) => {
 		const section = context.rendererRuntime.runSync(
 			parseEditorProjectSectionIdFx(params.sectionId).pipe(Effect.option),
@@ -27,5 +39,11 @@ export const Route = createFileRoute("/editor/$projectId/project/$sectionId")({
 
 function EditorProjectSectionRoute() {
 	const { sectionId } = Route.useParams();
-	return <EditorProjectSectionRoutePage section={sectionId as EditorProjectSectionId} />;
+	const { avatar } = Route.useSearch();
+	return (
+		<EditorProjectSectionRoutePage
+			avatarIndex={avatar}
+			section={sectionId as EditorProjectSectionId}
+		/>
+	);
 }

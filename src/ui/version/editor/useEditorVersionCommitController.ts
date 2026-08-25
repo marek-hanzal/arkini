@@ -96,7 +96,7 @@ export const useEditorVersionCommitController = (): useEditorVersionCommitContro
 			.then(async () => {
 				if (
 					returnTo !== undefined &&
-					returnTo.startsWith(`/editor/${project.projectId}/`)
+					returnTo.startsWith(`/editor/${encodeURIComponent(project.projectId)}/`)
 				) {
 					router.history.push(returnTo);
 					return;

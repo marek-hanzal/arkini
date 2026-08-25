@@ -2,7 +2,14 @@ import type { EditorProjectSectionId } from "~/ui/project/editor/EditorProjectSe
 import { EditorProjectSectionPage } from "~/ui/project/editor/EditorProjectSectionPage";
 
 export const EditorProjectSectionRoutePage = ({
+	avatarIndex,
 	section,
 }: {
+	readonly avatarIndex?: number;
 	readonly section: EditorProjectSectionId;
-}) => <EditorProjectSectionPage section={section} />;
+}) => (
+	<EditorProjectSectionPage
+		avatarIndex={avatarIndex}
+		section={section}
+	/>
+);

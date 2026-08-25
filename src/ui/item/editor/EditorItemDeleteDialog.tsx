@@ -128,7 +128,7 @@ export const EditorItemDeleteDialog = ({
 							projectId: project.projectId,
 						}}
 						search={{
-							returnTo: `/editor/${project.projectId}/editor/items/${item.uid}/detail/delete`,
+							returnTo: `/editor/${encodeURIComponent(project.projectId)}/editor/items/${encodeURIComponent(item.uid)}/detail/delete`,
 						}}
 					>
 						Create version first…

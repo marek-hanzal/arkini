@@ -58,6 +58,7 @@ const installEditorApi = () => {
 		createProject: vi.fn(async () => success(project)),
 		deleteProject: vi.fn(async () => success(undefined)),
 		deleteItem: vi.fn(async () => success(commit)),
+		deleteResource: vi.fn(async () => success(project)),
 		exportJsonDirectory: vi.fn(async () => success(null)),
 		importJsonDirectory: vi.fn(async () => success(descriptor)),
 		listProjects: vi.fn(async () =>

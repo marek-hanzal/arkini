@@ -1,0 +1,226 @@
+// @vitest-environment jsdom
+
+import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
+import { act, createElement, type ReactNode } from "react";
+import { createRoot } from "react-dom/client";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { EditorProject } from "~/bridge/editor/EditorProject";
+
+const state = vi.hoisted(() => ({
+	navigate: vi.fn().mockResolvedValue(undefined),
+	project: undefined as EditorProject | undefined,
+	remove: vi.fn().mockResolvedValue(undefined),
+	result: undefined as unknown,
+}));
+
+vi.mock("@effect/atom-react", () => ({
+	scheduleTask: vi.fn(),
+	useAtomSet: () => state.remove,
+	useAtomValue: () => state.result,
+}));
+
+vi.mock("@tanstack/react-router", async (importOriginal) => {
+	const original = await importOriginal<typeof import("@tanstack/react-router")>();
+	return {
+		...original,
+		useNavigate: () => state.navigate,
+	};
+});
+
+vi.mock("~/bridge/editor/useEditorProject", () => ({
+	useEditorProject: () => state.project,
+}));
+
+vi.mock("~/bridge/resource/editor/deleteEditorAssetCommandAtom", () => ({
+	deleteEditorAssetCommandAtom: () => ({
+		id: "delete-editor-asset",
+	}),
+}));
+
+vi.mock("~/ui/item/editor/EditorItemThumbnail", () => ({
+	EditorItemThumbnail: () =>
+		createElement("span", {
+			"data-ui": "EditorItemThumbnail",
+		}),
+}));
+
+vi.mock("~/ui/button/Button", () => {
+	const Button = ({ children, cursorIntent: _cursorIntent, ...props }: Record<string, unknown>) =>
+		createElement("button", props, children as ReactNode);
+	return {
+		Button,
+		DangerButton: Button,
+		ButtonLink: ({ children, params, search, to, ...props }: Record<string, unknown>) =>
+			createElement(
+				"a",
+				{
+					...props,
+					"data-params": JSON.stringify(params),
+					"data-search": JSON.stringify(search),
+					"data-to": to,
+				},
+				children as ReactNode,
+			),
+	};
+});
+
+import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { EditorAssetDeleteSection } from "~/ui/resource/editor/EditorAssetDeleteSection";
+
+(
+	globalThis as {
+		IS_REACT_ACT_ENVIRONMENT?: boolean;
+	}
+).IS_REACT_ACT_ENVIRONMENT = true;
+
+const roots: Array<ReturnType<typeof createRoot>> = [];
+
+beforeEach(() => {
+	vi.clearAllMocks();
+	state.result = AsyncResult.initial();
+	state.project = {
+		projectId: "project-one",
+		title: editorTestPayload.config.meta.title,
+		version: "1.0",
+		createdAtMs: 1,
+		updatedAtMs: 1,
+		revision: 0,
+		config: editorTestPayload.config,
+		resources: [
+			...editorTestPayload.resources,
+			{
+				id: "unused",
+				mime: "image/png",
+				bytes: Uint8Array.of(9),
+			},
+		],
+	};
+});
+
+afterEach(async () => {
+	await act(async () => {
+		for (const root of roots.splice(0)) root.unmount();
+	});
+	document.body.replaceChildren();
+});
+
+const render = async (resourceId: string) => {
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	roots.push(root);
+	await act(async () => {
+		root.render(
+			<EditorAssetDeleteSection
+				filter="unused"
+				query="spare"
+				resourceId={resourceId}
+			/>,
+		);
+	});
+	return container;
+};
+
+describe("EditorAssetDeleteSection", () => {
+	it("links blockers to the exact project and item owners", async () => {
+		let container = await render("hero");
+		expect(container.textContent).toContain("This asset cannot be deleted yet");
+		expect(container.textContent).toContain("Project · Appearance");
+		expect(container.querySelector('[data-ui="EditorAssetDeleteOpen"]')).toBeNull();
+		expect(container.querySelector("a")?.dataset.params).toContain("appearance");
+
+		const project = state.project;
+		if (project === undefined) throw new Error("Expected editor project fixture.");
+		state.project = {
+			...project,
+			config: {
+				...project.config,
+				resources: {
+					...project.config.resources,
+					"avatar-01": "avatar-first",
+					"avatar-03": "avatar-current",
+				},
+			},
+			resources: [
+				...project.resources,
+				{
+					id: "avatar-first",
+					mime: "image/png",
+					bytes: Uint8Array.of(7),
+				},
+				{
+					id: "avatar-current",
+					mime: "image/png",
+					bytes: Uint8Array.of(8),
+				},
+			],
+		};
+		container = await render("avatar-current");
+		expect(container.querySelector("a")?.dataset.search).toBe(
+			JSON.stringify({
+				avatar: 1,
+			}),
+		);
+
+		container = await render("item-water");
+		expect(container.textContent).toContain("Water · Artwork");
+		expect(container.querySelector("a")?.dataset.params).toContain("artwork");
+		expect(container.querySelector("a")?.dataset.params).toContain("water");
+	});
+
+	it("confirms an eligible delete and replaces the dead detail with the asset list", async () => {
+		const project = state.project;
+		if (project === undefined) throw new Error("Expected editor project fixture.");
+		state.project = {
+			...project,
+			projectId: "project/one",
+			resources: project.resources.map((resource) =>
+				resource.id === "unused"
+					? {
+							...resource,
+							id: "unused/asset",
+						}
+					: resource,
+			),
+		};
+		const container = await render("unused/asset");
+		expect(container.textContent).toContain("This asset can be deleted");
+
+		await act(async () =>
+			container
+				.querySelector<HTMLButtonElement>('[data-ui="EditorAssetDeleteOpen"]')
+				?.click(),
+		);
+		expect(container.textContent).toContain("A full saved version can restore them");
+		const versionLink = container.querySelector<HTMLAnchorElement>(
+			'[data-ui="EditorAssetDeleteCreateVersion"]',
+		);
+		expect(versionLink?.dataset.to).toBe("/editor/$projectId/versions/commit");
+		expect(versionLink?.dataset.search).toContain(
+			"/editor/project%2Fone/assets/unused%2Fasset/detail/delete?filter=unused&query=spare",
+		);
+
+		await act(async () =>
+			container
+				.querySelector<HTMLButtonElement>('[data-ui="EditorAssetDeleteConfirm"]')
+				?.click(),
+		);
+
+		expect(state.remove).toHaveBeenCalledWith({
+			expectedRevision: 0,
+			resourceId: "unused/asset",
+		});
+		expect(state.navigate).toHaveBeenCalledWith({
+			to: "/editor/$projectId/assets",
+			params: {
+				projectId: "project/one",
+			},
+			search: {
+				filter: "unused",
+				query: "spare",
+			},
+			replace: true,
+		});
+	});
+});

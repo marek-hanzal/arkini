@@ -20,7 +20,8 @@ export const EditorAssetDetailTab = ({
 	readonly to:
 		| "/editor/$projectId/assets/$resourceId/detail/overview"
 		| "/editor/$projectId/assets/$resourceId/detail/usage"
-		| "/editor/$projectId/assets/$resourceId/detail/technical";
+		| "/editor/$projectId/assets/$resourceId/detail/technical"
+		| "/editor/$projectId/assets/$resourceId/detail/delete";
 }) => (
 	<ButtonLink
 		to={to}

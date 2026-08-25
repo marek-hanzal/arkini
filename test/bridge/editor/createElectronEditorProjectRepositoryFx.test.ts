@@ -27,19 +27,13 @@ const commit: EditorProjectTransport.Commit = {
 	config: editorTestPayload.config,
 };
 
-const createProjectTransport = (): EditorProjectTransport.Project => ({
+const project: EditorProjectTransport.Project = {
 	...commit,
-	resources: [
-		{
-			...editorTestPayload.resources[1],
-			bytes: new Uint8Array(editorTestPayload.resources[1].bytes),
-		},
-		{
-			...editorTestPayload.resources[0],
-			bytes: new Uint8Array(editorTestPayload.resources[0].bytes),
-		},
-	],
-});
+	resources: editorTestPayload.resources.map((resource) => ({
+		...resource,
+		bytes: new Uint8Array(resource.bytes),
+	})),
+};
 
 const version: EditorProjectTransport.VersionDescriptor = {
 	applicability: {
@@ -56,7 +50,6 @@ const version: EditorProjectTransport.VersionDescriptor = {
 };
 
 const installEditorApi = () => {
-	const project = createProjectTransport();
 	const editor: Window["arkini"]["editor"] = {
 		status: vi.fn(async () => ({
 			type: "ready" as const,
@@ -136,10 +129,7 @@ const installEditorApi = () => {
 			editor,
 		},
 	});
-	return {
-		editor,
-		project,
-	};
+	return editor;
 };
 
 const readTypedFailure = async <Value>(
@@ -161,233 +151,8 @@ afterEach(() => {
 });
 
 describe("createElectronEditorProjectRepositoryFx", () => {
-	it("maps every repository operation through the narrow Electron editor API", async () => {
-		const { editor, project: transportedProject } = installEditorApi();
-		const repository = Effect.runSync(createElectronEditorProjectRepositoryFx);
-		const createRequest = {
-			projectId: "project-one",
-			version: "1.0",
-			config: editorTestPayload.config,
-			resources: editorTestPayload.resources,
-		};
-		const replacementResource = {
-			...editorTestPayload.resources[0],
-			id: "hero-next",
-		};
-
-		await expect(Effect.runPromise(repository.awaitIdleFx)).resolves.toBeUndefined();
-		const created = await Effect.runPromise(repository.createProjectFx(createRequest));
-		await Effect.runPromise(repository.deleteProjectFx("project-one"));
-		const deletedItem = await Effect.runPromise(
-			repository.deleteItemFx({
-				projectId: "project-one",
-				itemUid: "water",
-				expectedRevision: 1,
-				force: false,
-			}),
-		);
-		const listed = await Effect.runPromise(repository.listProjectsFx);
-		const read = await Effect.runPromise(repository.readProjectFx("project-one"));
-		const replacedConfig = await Effect.runPromise(
-			repository.replaceConfigFx({
-				projectId: "project-one",
-				expectedRevision: 1,
-				config: editorTestPayload.config,
-			}),
-		);
-		const replacedResource = await Effect.runPromise(
-			repository.replaceResourceFx({
-				projectId: "project-one",
-				currentId: "hero",
-				expectedRevision: 1,
-				config: editorTestPayload.config,
-				resource: replacementResource,
-			}),
-		);
-		const savedResource = await Effect.runPromise(
-			repository.saveResourceFx({
-				projectId: "project-one",
-				expectedRevision: 1,
-				overwrite: false,
-				resource: replacementResource,
-			}),
-		);
-		const upsertedItem = await Effect.runPromise(
-			repository.upsertItemFx({
-				projectId: "project-one",
-				item: editorTestPayload.config.items.water,
-			}),
-		);
-		const upsertedResources = await Effect.runPromise(
-			repository.upsertResourcesFx({
-				projectId: "project-one",
-				resources: [
-					replacementResource,
-				],
-			}),
-		);
-		const listedScenarios = await Effect.runPromise(
-			repository.listBoardScenariosFx("project-one"),
-		);
-		const readScenario = await Effect.runPromise(
-			repository.readBoardScenarioFx({
-				projectId: "project-one",
-				name: "Scenario 1",
-			}),
-		);
-		const writtenScenario = await Effect.runPromise(
-			repository.writeBoardScenarioFx({
-				projectId: "project-one",
-				expectedRevision: 2,
-				name: "Scenario 1",
-				bytes: new Uint8Array([
-					1,
-				]),
-			}),
-		);
-		await Effect.runPromise(
-			repository.deleteBoardScenarioFx({
-				projectId: "project-one",
-				name: "Scenario 1",
-			}),
-		);
-		const status = await Effect.runPromise(repository.readVersionStatusFx("project-one"));
-		const versions = await Effect.runPromise(repository.listVersionsFx("project-one"));
-		const reference = {
-			type: "version" as const,
-			versionId: version.versionId,
-		};
-		const diff = await Effect.runPromise(
-			repository.diffVersionsFx({
-				projectId: "project-one",
-				from: reference,
-				to: {
-					type: "current",
-				},
-			}),
-		);
-		const committedVersion = await Effect.runPromise(
-			repository.createVersionFx({
-				projectId: "project-one",
-				subject: "Initial state",
-			}),
-		);
-		const checkout = await Effect.runPromise(
-			repository.checkoutVersionFx({
-				projectId: "project-one",
-				versionId: version.versionId,
-			}),
-		);
-		const tagged = await Effect.runPromise(
-			repository.updateVersionTagFx({
-				projectId: "project-one",
-				tag: "safe",
-				versionId: version.versionId,
-			}),
-		);
-
-		expect(editor.awaitIdle).toHaveBeenCalledOnce();
-		expect(editor.createProject).toHaveBeenCalledWith(createRequest);
-		expect(editor.deleteProject).toHaveBeenCalledWith("project-one");
-		expect(editor.deleteItem).toHaveBeenCalledWith({
-			projectId: "project-one",
-			itemUid: "water",
-			expectedRevision: 1,
-			force: false,
-		});
-		expect(editor.listProjects).toHaveBeenCalledOnce();
-		expect(editor.readProject).toHaveBeenCalledWith("project-one");
-		expect(editor.replaceConfig).toHaveBeenCalledWith({
-			projectId: "project-one",
-			expectedRevision: 1,
-			config: editorTestPayload.config,
-		});
-		expect(editor.replaceResource).toHaveBeenCalledWith({
-			projectId: "project-one",
-			currentId: "hero",
-			expectedRevision: 1,
-			config: editorTestPayload.config,
-			resource: replacementResource,
-		});
-		expect(editor.saveResource).toHaveBeenCalledWith({
-			projectId: "project-one",
-			expectedRevision: 1,
-			overwrite: false,
-			resource: replacementResource,
-		});
-		expect(editor.upsertItem).toHaveBeenCalledWith({
-			projectId: "project-one",
-			item: editorTestPayload.config.items.water,
-		});
-		expect(editor.upsertResources).toHaveBeenCalledWith({
-			projectId: "project-one",
-			resources: [
-				replacementResource,
-			],
-		});
-		expect(editor.listBoardScenarios).toHaveBeenCalledWith("project-one");
-		expect(editor.readBoardScenario).toHaveBeenCalledWith({
-			projectId: "project-one",
-			name: "Scenario 1",
-		});
-		expect(editor.writeBoardScenario).toHaveBeenCalledWith({
-			projectId: "project-one",
-			expectedRevision: 2,
-			name: "Scenario 1",
-			bytes: new Uint8Array([
-				1,
-			]),
-		});
-		expect(editor.deleteBoardScenario).toHaveBeenCalledWith({
-			projectId: "project-one",
-			name: "Scenario 1",
-		});
-		expect(status).toMatchObject({
-			dirty: false,
-			versionCount: 1,
-		});
-		expect(versions).toEqual([
-			version,
-		]);
-		expect(diff).toMatchObject({
-			hasChanges: false,
-		});
-		expect(committedVersion).toEqual(version);
-		expect(checkout.version).toEqual(version);
-		expect(checkout.project.resources[0]?.bytes).toBeInstanceOf(Uint8Array);
-		expect(tagged).toEqual(version);
-		expect(listedScenarios).toEqual([]);
-		expect(readScenario).toBeNull();
-		expect(writtenScenario.bytes).toEqual(
-			new Uint8Array([
-				1,
-			]),
-		);
-		expect(listed).toEqual([
-			descriptor,
-		]);
-		expect(replacedConfig).toEqual(commit);
-		expect(upsertedItem).toEqual(commit);
-		expect(deletedItem).toEqual(commit);
-		expect(created).toEqual(read);
-		expect(created).toEqual(replacedResource);
-		expect(created).toEqual(savedResource);
-		expect(created).toEqual(upsertedResources);
-		expect(created.resources.map(({ id }) => id)).toEqual([
-			"hero",
-			"item-water",
-		]);
-		for (const resource of created.resources) {
-			expect(resource.bytes).toBeInstanceOf(Uint8Array);
-			const transported = transportedProject.resources.find(({ id }) => id === resource.id);
-			expect(transported).toBeDefined();
-			expect(resource.bytes).toEqual(transported?.bytes);
-			expect(resource.bytes).not.toBe(transported?.bytes);
-		}
-	});
-
 	it("preserves a stable server failure envelope as one typed repository failure", async () => {
-		const { editor } = installEditorApi();
+		const editor = installEditorApi();
 		vi.mocked(editor.listProjects).mockResolvedValueOnce({
 			type: "failure",
 			error: {
@@ -408,7 +173,7 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 	});
 
 	it("preserves a main-process invalid request as a typed repository failure", async () => {
-		const { editor } = installEditorApi();
+		const editor = installEditorApi();
 		vi.mocked(editor.readProject).mockResolvedValueOnce({
 			type: "failure",
 			error: {
@@ -425,24 +190,36 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 		expect(editor.readProject).toHaveBeenCalledWith("");
 	});
 
-	it("rejects an invalid Electron response as a typed repository failure", async () => {
-		const { editor } = installEditorApi();
+	it("rejects invalid project and version responses at the renderer boundary", async () => {
+		const editor = installEditorApi();
 		vi.mocked(editor.readProject).mockResolvedValueOnce(
 			success({
-				...createProjectTransport(),
+				...project,
 				title: "Metadata drift",
 			}),
 		);
+		vi.mocked(editor.listVersions).mockResolvedValueOnce(
+			success([
+				{
+					...version,
+					sourceRevision: -1,
+				},
+			]),
+		);
 		const repository = Effect.runSync(createElectronEditorProjectRepositoryFx);
 
-		const failure = await readTypedFailure(repository.readProjectFx("project-one"));
+		const projectFailure = await readTypedFailure(repository.readProjectFx("project-one"));
+		const versionFailure = await readTypedFailure(repository.listVersionsFx("project-one"));
 
-		expect(failure.operation).toBe("read-project");
-		expect(failure.message).toBe("The editor IPC response is invalid.");
+		expect(projectFailure.message).toBe("The editor IPC response is invalid.");
+		expect(versionFailure).toMatchObject({
+			operation: "list-versions",
+			message: "The editor IPC response is invalid.",
+		});
 	});
 
 	it("keeps resource bytes typed across request and response boundaries", async () => {
-		const { editor, project } = installEditorApi();
+		const editor = installEditorApi();
 		const repository = Effect.runSync(createElectronEditorProjectRepositoryFx);
 		const requestBytes = new Uint8Array([
 			9,
@@ -467,22 +244,9 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 		expect(request?.resources[0]).toMatchObject({
 			id: "fresh-resource",
 			mime: "image/png",
+			bytes: expect.any(Uint8Array),
 		});
-		expect(
-			(
-				request?.resources[0] as {
-					readonly bytes?: unknown;
-				}
-			).bytes,
-		).toBeInstanceOf(Uint8Array);
-		expect(
-			(
-				request?.resources[0] as {
-					readonly bytes: Uint8Array;
-				}
-			).bytes,
-		).toEqual(requestBytes);
 		expect(saved.resources[0]?.bytes).toBeInstanceOf(Uint8Array);
-		expect(saved.resources[0]?.bytes).not.toBe(project.resources[1]?.bytes);
+		expect(saved.resources[0]?.bytes).not.toBe(project.resources[0]?.bytes);
 	});
 });

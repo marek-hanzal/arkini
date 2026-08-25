@@ -22,11 +22,13 @@ const compareRuntime = (
 export const selectEditorItemEstimateIndexFx = Effect.fn("selectEditorItemEstimateIndexFx")(
 	({
 		entries,
+		incomplete,
 		items,
 		query,
 		sort,
 	}: {
 		readonly entries: ReadonlyArray<EditorItemEstimateIndexEntry>;
+		readonly incomplete: boolean;
 		readonly items: ReadonlyArray<ItemSchema.Type>;
 		readonly query: string;
 		readonly sort: EditorItemEstimateSortSchema.Type;
@@ -41,7 +43,7 @@ export const selectEditorItemEstimateIndexFx = Effect.fn("selectEditorItemEstima
 			return (yield* searchEditorItemsFx(items, query))
 				.flatMap((item): ReadonlyArray<EditorItemEstimateIndexRow> => {
 					const estimate = estimates.get(item.id);
-					return estimate === undefined
+					return estimate === undefined || (incomplete && estimate.status === "complete")
 						? []
 						: [
 								{

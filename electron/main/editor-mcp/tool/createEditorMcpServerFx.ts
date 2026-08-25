@@ -99,7 +99,7 @@ const createEditorMcpServer = (
 		"estimate",
 		{
 			description:
-				"Read one page of the global Estimate view for every item at quantity one. Supports the same fastest, slowest, and aggregate-demand ordering plus fuzzy search as the Editor UI. Use item_estimate for one item's selected route detail.",
+				"Read one page of the global Estimate view for every item at quantity one. Supports the same incomplete-only filter, fastest, slowest, and aggregate-demand ordering, and fuzzy search as the Editor UI. Use item_estimate for one item's selected route detail.",
 			inputSchema: EditorMcpEstimateInputSchema,
 		},
 		async (input) =>

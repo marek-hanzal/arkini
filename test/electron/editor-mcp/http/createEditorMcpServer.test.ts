@@ -49,6 +49,10 @@ describe("editor MCP server", () => {
 		expect(
 			tools.tools.find(({ name }) => name === "estimate")?.inputSchema.properties,
 		).toMatchObject({
+			incomplete: {
+				default: false,
+				type: "boolean",
+			},
 			page: expect.any(Object),
 			pageSize: expect.any(Object),
 			query: expect.any(Object),
@@ -185,6 +189,7 @@ describe("editor MCP server", () => {
 		const globalEstimate = await client.callTool({
 			name: "estimate",
 			arguments: {
+				incomplete: true,
 				pageSize: 2,
 				sort: "demand",
 			},
@@ -214,7 +219,7 @@ describe("editor MCP server", () => {
 		]);
 		expect(globalEstimate.content).toMatchObject([
 			{
-				text: expect.stringContaining("Sort: demand"),
+				text: expect.stringContaining("Incomplete only: true\nSort: demand"),
 			},
 		]);
 		expect(estimate.isError).not.toBe(true);

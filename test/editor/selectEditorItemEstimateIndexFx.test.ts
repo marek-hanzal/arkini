@@ -35,18 +35,26 @@ const entries: ReadonlyArray<EditorItemEstimateIndexEntry> = [
 		method: "static",
 		status: "partial",
 	},
+	{
+		demand: 10,
+		itemId: "unused",
+		method: "static",
+		status: "unreachable",
+	},
 ];
 
 const items = [
 	item("bakery", "Bakery"),
 	item("water", "Water"),
 	item("well", "Well"),
+	item("unused", "Unused"),
 ];
 
-const readItemIds = (sort: "demand" | "fastest" | "slowest", query = "") =>
+const readItemIds = (sort: "demand" | "fastest" | "slowest", query = "", incomplete = false) =>
 	Effect.runSync(
 		selectEditorItemEstimateIndexFx({
 			entries,
+			incomplete,
 			items,
 			query,
 			sort,
@@ -58,16 +66,19 @@ describe("selectEditorItemEstimateIndexFx", () => {
 		expect(readItemIds("fastest")).toEqual([
 			"water",
 			"bakery",
+			"unused",
 			"well",
 		]);
 		expect(readItemIds("slowest")).toEqual([
 			"bakery",
 			"water",
+			"unused",
 			"well",
 		]);
 		expect(readItemIds("demand")).toEqual([
 			"water",
 			"well",
+			"unused",
 			"bakery",
 		]);
 	});
@@ -75,6 +86,16 @@ describe("selectEditorItemEstimateIndexFx", () => {
 	it("applies the editor fuzzy query before ordering", () => {
 		expect(readItemIds("demand", "wel")).toEqual([
 			"well",
+		]);
+	});
+
+	it("returns only partial and unreachable estimates without changing query semantics", () => {
+		expect(readItemIds("fastest", "", true)).toEqual([
+			"unused",
+			"well",
+		]);
+		expect(readItemIds("demand", "unus", true)).toEqual([
+			"unused",
 		]);
 	});
 
@@ -88,12 +109,14 @@ describe("selectEditorItemEstimateIndexFx", () => {
 			item("bakery", "Zulu"),
 			item("water", "Alpha"),
 			item("well", "Middle"),
+			item("unused", "Beta"),
 		];
 
 		expect(
 			Effect.runSync(
 				selectEditorItemEstimateIndexFx({
 					entries: tiedEntries,
+					incomplete: false,
 					items: tiedItems,
 					query: "",
 					sort: "fastest",
@@ -101,6 +124,7 @@ describe("selectEditorItemEstimateIndexFx", () => {
 			).map(({ item }) => item.id),
 		).toEqual([
 			"water",
+			"unused",
 			"well",
 			"bakery",
 		]);

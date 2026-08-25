@@ -11,6 +11,16 @@ export const EditorEstimatePage = () => {
 	});
 	return (
 		<EditorItemEstimateList
+			incomplete={search.incomplete ?? false}
+			onIncompleteChange={(incomplete) =>
+				void navigate({
+					replace: true,
+					search: (current) => ({
+						...current,
+						incomplete: incomplete || undefined,
+					}),
+				})
+			}
 			onQueryChange={(query) =>
 				void navigate({
 					replace: true,

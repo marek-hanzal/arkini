@@ -4,6 +4,10 @@ import { EditorItemEstimateSortSchema } from "~/editor/EditorItemEstimateSortSch
 
 export const EditorMcpEstimateInputSchema = z
 	.object({
+		incomplete: z
+			.boolean()
+			.default(false)
+			.describe("Return only partial and unreachable item estimates."),
 		page: z.number().int().min(1).default(1).describe("One-based page number."),
 		pageSize: z
 			.number()

@@ -1,6 +1,10 @@
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import type { EditorItemEstimateSortSchema } from "~/editor/EditorItemEstimateSortSchema";
 import { EditorSelect, type EditorSelectOption } from "~/ui/form/EditorSelect";
+import {
+	selectableActiveClassName,
+	selectableInactiveClassName,
+} from "~/ui/form/SelectableStateClassName";
 import { EditorItemEstimateListRow } from "~/ui/item/editor/EditorItemEstimateListRow";
 import { useEditorItemEstimateIndex } from "~/ui/item/editor/useEditorItemEstimateIndex";
 import { Status } from "~/ui/status/Status";
@@ -22,11 +26,15 @@ const EstimateSortOptions: ReadonlyArray<EditorSelectOption<EditorItemEstimateSo
 
 /** Lists all static item estimates without analyzing the authored graph on the renderer thread. */
 export const EditorItemEstimateList = ({
+	incomplete,
+	onIncompleteChange,
 	onQueryChange,
 	onSortChange,
 	query,
 	sort,
 }: {
+	readonly incomplete: boolean;
+	readonly onIncompleteChange: (incomplete: boolean) => void;
 	readonly onQueryChange: (query: string) => void;
 	readonly onSortChange: (sort: EditorItemEstimateSortSchema.Type) => void;
 	readonly query: string;
@@ -34,6 +42,7 @@ export const EditorItemEstimateList = ({
 }) => {
 	const project = useEditorProject();
 	const state = useEditorItemEstimateIndex(project, {
+		incomplete,
 		query,
 		sort,
 	});
@@ -53,6 +62,15 @@ export const EditorItemEstimateList = ({
 					aria-label="Search item estimates"
 					onChange={(event) => onQueryChange(event.currentTarget.value)}
 				/>
+				<button
+					type="button"
+					className={`min-h-[var(--ak-control-min-height)] cursor-pointer rounded-lg border px-3 py-2 text-sm font-semibold ${incomplete ? selectableActiveClassName : selectableInactiveClassName}`}
+					data-selected={incomplete}
+					data-ui="EditorItemEstimateIncompleteFilter"
+					onClick={() => onIncompleteChange(!incomplete)}
+				>
+					Incomplete
+				</button>
 				<EditorSelect
 					label="Sort item estimates"
 					onChange={onSortChange}
@@ -82,7 +100,7 @@ export const EditorItemEstimateList = ({
 						className="rounded-xl border border-line bg-surface/80 p-4 text-sm text-muted"
 						data-ui="EditorItemEstimateSearchEmpty"
 					>
-						No items match the current search.
+						No item estimates match the current filters.
 					</p>
 				) : null}
 				{state.rows.map(({ estimate, item }) => (

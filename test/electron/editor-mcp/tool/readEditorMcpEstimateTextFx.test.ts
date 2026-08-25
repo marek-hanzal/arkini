@@ -7,6 +7,7 @@ import { createEditorMcpGraphProject } from "./support/createEditorMcpToolProjec
 const readEstimate = (
 	sort: "demand" | "fastest" | "slowest",
 	options: {
+		readonly incomplete?: boolean;
 		readonly page?: number;
 		readonly pageSize?: number;
 		readonly query?: string;
@@ -14,6 +15,7 @@ const readEstimate = (
 ) =>
 	Effect.runSync(
 		readEditorMcpEstimateTextFx(createEditorMcpGraphProject(), {
+			incomplete: options.incomplete ?? false,
 			page: options.page ?? 1,
 			pageSize: options.pageSize ?? 25,
 			query: options.query,
@@ -28,6 +30,7 @@ describe("readEditorMcpEstimateTextFx", () => {
 		});
 
 		expect(text).toContain("Global estimate\nMethod: static authored dependency graph");
+		expect(text).toContain("Incomplete only: false");
 		expect(text).toContain("Sort: slowest");
 		expect(text).toContain("Page: 1");
 		expect(text).toContain("Page size: 2");
@@ -35,11 +38,19 @@ describe("readEditorMcpEstimateTextFx", () => {
 		expect(text).toContain("Has next page: true");
 	});
 
-	it("applies the same fuzzy query as the Estimate UI", () => {
+	it("applies the same incomplete filter and fuzzy query as the Estimate UI", () => {
+		const incomplete = readEstimate("demand", {
+			incomplete: true,
+		});
 		const text = readEstimate("demand", {
+			incomplete: true,
 			query: "unused",
 		});
 
+		expect(incomplete).toContain("Incomplete only: true");
+		expect(incomplete).toContain("Status: unreachable");
+		expect(incomplete).not.toContain("Status: complete");
+		expect(text).toContain("Incomplete only: true");
 		expect(text).toContain("Query: unused");
 		expect(text).toContain("Matched items: 1");
 		expect(text).toContain("- Unused\n  ID: unused");

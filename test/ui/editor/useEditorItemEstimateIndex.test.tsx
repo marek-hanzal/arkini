@@ -88,6 +88,7 @@ afterEach(async () => {
 
 const StateProbe = () => {
 	const state = useEditorItemEstimateIndex(project, {
+		incomplete: false,
 		query: "",
 		sort: "fastest",
 	});

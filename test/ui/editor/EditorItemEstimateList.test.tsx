@@ -18,6 +18,7 @@ const state = vi.hoisted(() => ({
 	project: undefined as unknown,
 	selection: undefined as
 		| {
+				readonly incomplete: boolean;
 				readonly query: string;
 				readonly sort: "demand" | "fastest" | "slowest";
 		  }
@@ -32,6 +33,7 @@ vi.mock("~/ui/item/editor/useEditorItemEstimateIndex", () => ({
 	useEditorItemEstimateIndex: (
 		_project: unknown,
 		selection: {
+			readonly incomplete: boolean;
 			readonly query: string;
 			readonly sort: "demand" | "fastest" | "slowest";
 		},
@@ -137,9 +139,12 @@ afterEach(async () => {
 
 const renderList = async () => {
 	const Harness = () => {
+		const [incomplete, setIncomplete] = useState(false);
 		const [query, setQuery] = useState("");
 		const [sort, setSort] = useState<EditorItemEstimateSortSchema.Type>("fastest");
 		return createElement(EditorItemEstimateList, {
+			incomplete,
+			onIncompleteChange: setIncomplete,
 			onQueryChange: setQuery,
 			onSortChange: setSort,
 			query,
@@ -189,8 +194,16 @@ const setSort = async (container: HTMLElement, label: string) => {
 	await act(async () => option.click());
 };
 
+const toggleIncomplete = async (container: HTMLElement) => {
+	const filter = container.querySelector<HTMLButtonElement>(
+		'[data-ui="EditorItemEstimateIncompleteFilter"]',
+	);
+	if (filter === null) throw new Error("Missing incomplete estimate filter.");
+	await act(async () => filter.click());
+};
+
 describe("EditorItemEstimateList", () => {
-	it("binds query and sort to its data source and renders rows in source order", async () => {
+	it("binds query, incomplete filter, and sort to its data source", async () => {
 		const container = await renderList();
 
 		expect(readVisibleItemIds(container)).toEqual([
@@ -199,6 +212,7 @@ describe("EditorItemEstimateList", () => {
 			"well",
 		]);
 		expect(state.selection).toEqual({
+			incomplete: false,
 			query: "",
 			sort: "fastest",
 		});
@@ -214,6 +228,14 @@ describe("EditorItemEstimateList", () => {
 		expect(container.querySelector('[data-ui="EditorItemThumbnail"]')).not.toBeNull();
 		expect(container.querySelector('[aria-label^="Filter items by"]')).toBeNull();
 		expect(container.querySelector("select")).toBeNull();
+		expect(
+			container.querySelector('[data-ui="EditorItemEstimateIncompleteFilter"]')?.textContent,
+		).toContain("Incomplete");
+		expect(
+			container
+				.querySelector('[data-ui="EditorItemEstimateIncompleteFilter"]')
+				?.getAttribute("data-selected"),
+		).toBe("false");
 		expect(container.querySelector('[data-ui="EditorSelectTrigger"]')?.textContent).toContain(
 			"Fastest first",
 		);
@@ -226,21 +248,36 @@ describe("EditorItemEstimateList", () => {
 
 		await setSort(container, "Slowest first");
 		expect(state.selection).toEqual({
+			incomplete: false,
 			query: "",
 			sort: "slowest",
 		});
 
 		await setSort(container, "Highest demand first");
 		expect(state.selection).toEqual({
+			incomplete: false,
 			query: "",
 			sort: "demand",
 		});
 
 		await setSearch(container, "well");
 		expect(state.selection).toEqual({
+			incomplete: false,
 			query: "well",
 			sort: "demand",
 		});
+
+		await toggleIncomplete(container);
+		expect(state.selection).toEqual({
+			incomplete: true,
+			query: "well",
+			sort: "demand",
+		});
+		expect(
+			container
+				.querySelector('[data-ui="EditorItemEstimateIncompleteFilter"]')
+				?.getAttribute("data-selected"),
+		).toBe("true");
 	});
 
 	it("shows one loading state while the full-project batch is calculated", async () => {

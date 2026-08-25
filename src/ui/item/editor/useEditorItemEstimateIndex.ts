@@ -39,9 +39,11 @@ const sameSnapshot = (
 export const useEditorItemEstimateIndex = (
 	project: EditorProject,
 	{
+		incomplete,
 		query,
 		sort,
 	}: {
+		readonly incomplete: boolean;
 		readonly query: string;
 		readonly sort: EditorItemEstimateSortSchema.Type;
 	},
@@ -78,6 +80,7 @@ export const useEditorItemEstimateIndex = (
 			rows: RendererRuntime.runSync(
 				selectEditorItemEstimateIndexFx({
 					entries,
+					incomplete,
 					items: Object.values(project.config.items),
 					query,
 					sort,
@@ -86,6 +89,7 @@ export const useEditorItemEstimateIndex = (
 		};
 	}, [
 		project.config.items,
+		incomplete,
 		query,
 		sort,
 		state.estimates,

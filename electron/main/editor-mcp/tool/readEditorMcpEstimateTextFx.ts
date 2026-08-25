@@ -44,6 +44,7 @@ export const readEditorMcpEstimateTextFx = Effect.fn("readEditorMcpEstimateTextF
 	});
 	const rows = yield* selectEditorItemEstimateIndexFx({
 		entries,
+		incomplete: input.incomplete,
 		items: Object.values(project.config.items),
 		query: input.query ?? "",
 		sort: input.sort,
@@ -59,6 +60,7 @@ export const readEditorMcpEstimateTextFx = Effect.fn("readEditorMcpEstimateTextF
 		"Timing: optimistic parallel critical path",
 		"Quantity: 1 of every item",
 		"Demand: aggregate selected-route quantity across every obtainable item estimate",
+		`Incomplete only: ${input.incomplete}`,
 		`Sort: ${input.sort}`,
 		...(input.query === undefined
 			? []

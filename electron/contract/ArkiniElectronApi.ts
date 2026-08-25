@@ -74,6 +74,7 @@ export namespace ArkiniElectronApi {
 		editorMcpActivate: "arkini:editor:mcp:activate",
 		editorMcpProjectContextSet: "arkini:editor:mcp:project-context:set",
 		editorMcpProjectContextClear: "arkini:editor:mcp:project-context:clear",
+		editorMcpVersionCheckoutRequest: "arkini:editor:mcp:version-checkout:request",
 		diagnosticsWrite: "arkini:diagnostics:write",
 		diagnosticsOpenDirectory: "arkini:diagnostics:open-directory",
 		userDataOpenDirectory: "arkini:user-data:open-directory",
@@ -101,6 +102,20 @@ export namespace ArkiniElectronApi {
 		readonly packageId: string;
 		readonly bytes: Uint8Array;
 	}
+
+	export interface EditorMcpVersionCheckoutRequest {
+		readonly projectId: string;
+		readonly versionId: string;
+	}
+
+	export type EditorMcpVersionCheckoutResponse =
+		| {
+				readonly type: "success";
+		  }
+		| {
+				readonly type: "failure";
+				readonly message: string;
+		  };
 
 	export interface SaveKey {
 		readonly packageId: string;
@@ -229,6 +244,9 @@ export namespace ArkiniElectronApi {
 			readonly activate: () => Promise<EditorMcpStatus>;
 			readonly setProjectContext: (projectId: string) => Promise<void>;
 			readonly clearProjectContext: (projectId: string) => Promise<void>;
+			readonly onVersionCheckoutRequested: (
+				listener: (request: EditorMcpVersionCheckoutRequest) => Promise<void>,
+			) => () => void;
 			readonly readPort: () => Promise<EditorMcpPortSchema.Type>;
 			readonly writePort: (port: EditorMcpPortSchema.Type) => Promise<void>;
 			readonly checkPort: (

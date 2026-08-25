@@ -39,7 +39,7 @@ export const useEditorVersionCommitController = (): useEditorVersionCommitContro
 	const [subject, setSubject] = useState("");
 	const [tag, setTag] = useState("");
 
-	useEffect(() => {
+	const loadStatus = useCallback(() => {
 		let mounted = true;
 		void RendererRuntime.runPromise(readEditorProjectVersionHistoryFx(project.projectId))
 			.then((history) => {
@@ -52,6 +52,21 @@ export const useEditorVersionCommitController = (): useEditorVersionCommitContro
 			mounted = false;
 		};
 	}, [
+		project.projectId,
+	]);
+	useEffect(() => {
+		let disposeLoad = loadStatus();
+		const unsubscribe = window.arkini.editor.onProjectChanged((projectId) => {
+			if (projectId !== project.projectId) return;
+			disposeLoad();
+			disposeLoad = loadStatus();
+		});
+		return () => {
+			disposeLoad();
+			unsubscribe();
+		};
+	}, [
+		loadStatus,
 		project.projectId,
 	]);
 

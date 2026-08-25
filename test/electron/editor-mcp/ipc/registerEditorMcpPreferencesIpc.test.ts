@@ -13,9 +13,33 @@ import type { TrustedRenderer } from "../../../../electron/main/security/Trusted
 const electron = vi.hoisted(() => {
 	const handlers = new Map<string, (event: unknown, candidate?: unknown) => unknown>();
 	let willQuit: (() => void) | undefined;
+	class FakePort {
+		peer?: FakePort;
+		start = vi.fn();
+		close = vi.fn();
+		messageListener?: (event: { data: unknown }) => void;
+		once(event: string, listener: (event: { data: unknown }) => void) {
+			if (event === "message") this.messageListener = listener;
+			return this;
+		}
+		postMessage(data: unknown) {
+			this.peer?.messageListener?.({
+				data,
+			});
+		}
+	}
+	class MessageChannelMain {
+		readonly port1 = new FakePort();
+		readonly port2 = new FakePort();
+		constructor() {
+			this.port1.peer = this.port2;
+			this.port2.peer = this.port1;
+		}
+	}
 	return {
 		handlers,
 		module: {
+			MessageChannelMain,
 			app: {
 				once: (event: string, listener: () => void) => {
 					if (event === "will-quit") willQuit = listener;
@@ -41,6 +65,10 @@ vi.mock("electron", () => electron.module);
 
 const createEvent = () => {
 	const sender = new EventEmitter() as WebContents;
+	Object.assign(sender, {
+		isDestroyed: vi.fn(() => false),
+		postMessage: vi.fn(),
+	});
 	return {
 		event: {
 			sender,
@@ -117,6 +145,26 @@ describe("registerEditorMcpPreferencesIpcFx", () => {
 			invoke(event, ArkiniElectronApi.channels.editorMcpProjectContextSet, "project-one"),
 		).resolves.toBeUndefined();
 		expect(ownership.readProjectContext()).toBe("project-one");
+		const requestCheckout = vi.mocked(ownership.setProjectContext).mock.calls[0]?.[1];
+		if (requestCheckout === undefined) throw new Error("Expected renderer checkout binding.");
+		const checkout = Effect.runPromise(requestCheckout("version-one"));
+		const postMessage = vi.mocked(sender.postMessage);
+		expect(postMessage).toHaveBeenCalledWith(
+			ArkiniElectronApi.channels.editorMcpVersionCheckoutRequest,
+			{
+				projectId: "project-one",
+				versionId: "version-one",
+			},
+			[
+				expect.anything(),
+			],
+		);
+		const transferredPort = postMessage.mock.calls[0]?.[2]?.[0];
+		if (transferredPort === undefined) throw new Error("Expected transferred checkout port.");
+		transferredPort.postMessage({
+			type: "success",
+		});
+		await expect(checkout).resolves.toBeUndefined();
 		await expect(
 			invoke(
 				event,

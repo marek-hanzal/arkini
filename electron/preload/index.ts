@@ -13,6 +13,9 @@ const chatGptAssetCandidateListeners = new Set<
 const editorProjectChangedListeners = new Set<
 	Parameters<ArkiniElectronApi.Api["editor"]["onProjectChanged"]>[0]
 >();
+const editorMcpVersionCheckoutListeners = new Set<
+	Parameters<ArkiniElectronApi.Api["editorMcp"]["onVersionCheckoutRequested"]>[0]
+>();
 const windowModeListeners = new Set<
 	Parameters<ArkiniElectronApi.Api["window"]["onModeChanged"]>[0]
 >();
@@ -51,6 +54,31 @@ ipcRenderer.on(ArkiniElectronApi.channels.chatGptStateChanged, (_event, state) =
 ipcRenderer.on(ArkiniElectronApi.channels.chatGptAssetCandidate, (_event, candidate) => {
 	for (const listener of Array.from(chatGptAssetCandidateListeners)) listener(candidate);
 });
+
+ipcRenderer.on(
+	ArkiniElectronApi.channels.editorMcpVersionCheckoutRequest,
+	async (event, request) => {
+		const port = event.ports[0];
+		if (port === undefined) return;
+		let response: ArkiniElectronApi.EditorMcpVersionCheckoutResponse;
+		try {
+			const listeners = Array.from(editorMcpVersionCheckoutListeners);
+			if (listeners.length !== 1)
+				throw new Error("The editor version checkout handler is unavailable.");
+			await listeners[0](request);
+			response = {
+				type: "success",
+			};
+		} catch (cause) {
+			response = {
+				type: "failure",
+				message: cause instanceof Error ? cause.message : String(cause),
+			};
+		}
+		port.postMessage(response);
+		port.close();
+	},
+);
 
 ipcRenderer.on(ArkiniElectronApi.channels.beforeClose, async () => {
 	if (closing) return;
@@ -169,6 +197,10 @@ const api: ArkiniElectronApi.Api = {
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpProjectContextSet, projectId),
 		clearProjectContext: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpProjectContextClear, projectId),
+		onVersionCheckoutRequested: (listener) => {
+			editorMcpVersionCheckoutListeners.add(listener);
+			return () => editorMcpVersionCheckoutListeners.delete(listener);
+		},
 		readPort: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpPortRead),
 		writePort: (port) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpPortWrite, port),

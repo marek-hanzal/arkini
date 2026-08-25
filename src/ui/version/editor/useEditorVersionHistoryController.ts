@@ -102,8 +102,14 @@ export const useEditorVersionHistoryController = (): useEditorVersionHistoryCont
 		project.projectId,
 	]);
 
-	useEffect(loadHistory, [
+	useEffect(() => {
+		loadHistory();
+		return window.arkini.editor.onProjectChanged((projectId) => {
+			if (projectId === project.projectId) loadHistory();
+		});
+	}, [
 		loadHistory,
+		project.projectId,
 	]);
 	const selected = history?.versions.find((version) => version.versionId === selectedVersionId);
 	const confirmVersion = history?.versions.find(

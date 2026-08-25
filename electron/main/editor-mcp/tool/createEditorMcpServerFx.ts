@@ -27,6 +27,7 @@ import { readEditorMcpItemMetaTextFx } from "./readEditorMcpItemMetaTextFx";
 import { readEditorMcpItemRelationTextFx } from "./readEditorMcpItemRelationTextFx";
 import { readEditorMcpProjectTextFx } from "./readEditorMcpProjectTextFx";
 import { registerEditorMcpGameplayDesignTools } from "./registerEditorMcpGameplayDesignTools";
+import { registerEditorMcpVersionTools } from "./registerEditorMcpVersionTools";
 
 const editorMcpItemTypes = [
 	"simple",
@@ -69,6 +70,10 @@ const createEditorMcpServer = (
 	notifyProjectChanged: (projectId: string) => void,
 	repository: EditorProjectRepositoryService,
 	readProjectContext: () => string | undefined,
+	requestVersionCheckoutFx: (
+		projectId: string,
+		versionId: string,
+	) => Effect.Effect<void, unknown>,
 	runPromise: <Value, Error>(effect: Effect.Effect<Value, Error>) => Promise<Value>,
 ) => {
 	const runTool = async (effect: Effect.Effect<string, unknown>) => {
@@ -100,7 +105,7 @@ const createEditorMcpServer = (
 		},
 		{
 			instructions:
-				"Every tool targets only the project currently open in the Arkini editor. Results are concise plain text unless a tool explicitly promises JSON config. No tool dumps the complete game config. Create and edit tools persist canonical editor authoring.",
+				"Every tool targets only the project currently open in the Arkini editor. Results are concise plain text unless a tool explicitly promises JSON config; no tool dumps complete game configs or snapshot binaries. Create, edit, and version tools persist canonical saved editor state; version_checkout performs an explicit destructive hard reset.",
 		},
 	);
 	const readProjectFx = () => readCurrentProjectFx(repository, readProjectContext);
@@ -299,6 +304,14 @@ const createEditorMcpServer = (
 				),
 			),
 	);
+	registerEditorMcpVersionTools({
+		notifyProjectChanged,
+		readProjectFx,
+		repository,
+		requestVersionCheckoutFx,
+		runTool,
+		server,
+	});
 	return server;
 };
 
@@ -308,11 +321,16 @@ export const createEditorMcpServerFx = Effect.fn("createEditorMcpServerFx")(
 		notifyProjectChanged,
 		readProjectContext,
 		repository,
+		requestVersionCheckoutFx,
 		runPromise,
 	}: {
 		readonly notifyProjectChanged: (projectId: string) => void;
 		readonly readProjectContext: () => string | undefined;
 		readonly repository: EditorProjectRepositoryService;
+		readonly requestVersionCheckoutFx: (
+			projectId: string,
+			versionId: string,
+		) => Effect.Effect<void, unknown>;
 		readonly runPromise: <Value, Error>(effect: Effect.Effect<Value, Error>) => Promise<Value>;
 	}) =>
 		Effect.succeed({
@@ -321,6 +339,7 @@ export const createEditorMcpServerFx = Effect.fn("createEditorMcpServerFx")(
 					notifyProjectChanged,
 					repository,
 					readProjectContext,
+					requestVersionCheckoutFx,
 					runPromise,
 				),
 		} as const),

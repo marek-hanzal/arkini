@@ -9,6 +9,7 @@ import type { TrustedRenderer } from "../../security/TrustedRenderer";
 import { checkEditorMcpPortAvailabilityFx } from "../http/checkEditorMcpPortAvailabilityFx";
 import type { EditorMcpOwnership } from "../http/createEditorMcpOwnershipFx";
 import type { EditorMcpPreferences } from "../preference/EditorMcpPreferences";
+import { requestEditorMcpVersionCheckoutFx } from "./requestEditorMcpVersionCheckoutFx";
 
 let registered = false;
 
@@ -86,7 +87,12 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 							Effect.tap((projectId) =>
 								Effect.sync(() => {
 									watchProjectContextSender(event.sender);
-									ownership.setProjectContext(projectId);
+									ownership.setProjectContext(projectId, (versionId) =>
+										requestEditorMcpVersionCheckoutFx(event.sender, {
+											projectId,
+											versionId,
+										}),
+									);
 								}),
 							),
 							Effect.asVoid,

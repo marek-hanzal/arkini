@@ -57,6 +57,12 @@ describe("editor MCP server", () => {
 			"item_input",
 			"item_output",
 			"item_estimate",
+			"version_status",
+			"version_list",
+			"version_diff",
+			"version_commit",
+			"version_checkout",
+			"version_tag",
 		]);
 		const collectionProperties = tools.tools.find(({ name }) => name === "item_collection")
 			?.inputSchema.properties;
@@ -197,6 +203,12 @@ describe("editor MCP server", () => {
 			"item_input",
 			"item_output",
 			"item_estimate",
+			"version_status",
+			"version_list",
+			"version_diff",
+			"version_commit",
+			"version_checkout",
+			"version_tag",
 		]);
 		expect(
 			(
@@ -274,6 +286,131 @@ describe("editor MCP server", () => {
 			{
 				text: expect.stringContaining("Item estimate\nItem ID: tool"),
 			},
+		]);
+	});
+
+	it("commits, inspects, tags, and renderer-checks out full project versions", async () => {
+		const notifications: string[] = [];
+		const { ownership, port, repository } = await createEditorMcpHarness(
+			Effect.runPromise,
+			(projectId) => notifications.push(projectId),
+		);
+		await Effect.runPromise(
+			repository.createProjectFx({
+				projectId: "version-project",
+				version: "1.0",
+				config: editorTestPayload.config,
+				resources: editorTestPayload.resources,
+			}),
+		);
+		const checkoutRequests: string[] = [];
+		ownership.setProjectContext("version-project", (versionId) =>
+			Effect.gen(function* () {
+				checkoutRequests.push(versionId);
+				const status = yield* repository.readVersionStatusFx("version-project");
+				yield* repository.checkoutVersionFx({
+					projectId: "version-project",
+					versionId,
+					expectedFingerprint: status.currentFingerprint,
+				});
+			}),
+		);
+		await Effect.runPromise(ownership.activateFx);
+		const client = await connectEditorMcpClient(port);
+
+		const initialStatus = await client.callTool({
+			name: "version_status",
+			arguments: {},
+		});
+		expect(initialStatus.content).toMatchObject([
+			{
+				text: expect.stringContaining("Versions: 0\nWorking copy: dirty"),
+			},
+		]);
+		const committed = await client.callTool({
+			name: "version_commit",
+			arguments: {
+				message: "Initial snapshot",
+				tag: "baseline",
+			},
+		});
+		expect(committed.isError).not.toBe(true);
+		const [version] = await Effect.runPromise(repository.listVersionsFx("version-project"));
+		if (version === undefined) throw new Error("Expected MCP-created version.");
+		expect(committed.content).toMatchObject([
+			{
+				text: expect.stringContaining(version.versionId),
+			},
+		]);
+
+		await Effect.runPromise(
+			repository.replaceConfigFx({
+				projectId: "version-project",
+				expectedRevision: 0,
+				config: {
+					...editorTestPayload.config,
+					meta: {
+						...editorTestPayload.config.meta,
+						title: "Changed after snapshot",
+					},
+				},
+			}),
+		);
+		const diff = await client.callTool({
+			name: "version_diff",
+			arguments: {
+				from: version.versionId,
+				to: "current",
+			},
+		});
+		expect(diff.content).toMatchObject([
+			{
+				text: expect.stringContaining("config.meta.title"),
+			},
+		]);
+		const tagged = await client.callTool({
+			name: "version_tag",
+			arguments: {
+				versionId: version.versionId,
+				tag: "restore-point",
+			},
+		});
+		expect(tagged.content).toMatchObject([
+			{
+				text: expect.stringContaining("Tag: restore-point"),
+			},
+		]);
+		const list = await client.callTool({
+			name: "version_list",
+			arguments: {},
+		});
+		expect(list.content).toMatchObject([
+			{
+				text: expect.stringContaining("Total: 1"),
+			},
+		]);
+		const checkedOut = await client.callTool({
+			name: "version_checkout",
+			arguments: {
+				versionId: version.versionId,
+				confirmDiscardCurrentChanges: true,
+			},
+		});
+		expect(checkedOut.content).toMatchObject([
+			{
+				text: expect.stringContaining("The editor was hard-refreshed."),
+			},
+		]);
+		expect(checkoutRequests).toEqual([
+			version.versionId,
+		]);
+		expect(
+			(await Effect.runPromise(repository.readProjectFx("version-project")))?.config.meta
+				.title,
+		).toBe(editorTestPayload.config.meta.title);
+		expect(notifications).toEqual([
+			"version-project",
+			"version-project",
 		]);
 	});
 });

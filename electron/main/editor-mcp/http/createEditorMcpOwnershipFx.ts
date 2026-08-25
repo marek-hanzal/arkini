@@ -17,7 +17,10 @@ import { createEditorMcpServerFx } from "../tool/createEditorMcpServerFx";
 export interface EditorMcpOwnership {
 	readonly readStatus: () => EditorMcpStatus;
 	readonly readProjectContext: () => string | undefined;
-	readonly setProjectContext: (projectId: string) => void;
+	readonly setProjectContext: (
+		projectId: string,
+		requestVersionCheckoutFx?: (versionId: string) => Effect.Effect<void, unknown>,
+	) => void;
 	readonly clearProjectContext: (projectId: string) => void;
 	readonly resetProjectContext: () => void;
 	readonly activateFx: Effect.Effect<EditorMcpStatus>;
@@ -53,6 +56,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 	let httpServer: Server | undefined;
 	let mcpHandler: McpHttpHandler | undefined;
 	let projectContext: string | undefined;
+	let versionCheckoutRequestFx: ((versionId: string) => Effect.Effect<void, unknown>) | undefined;
 	const activationLock = yield* Semaphore.make(1);
 
 	const activateFx = activationLock.withPermits(1)(
@@ -62,6 +66,15 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 				notifyProjectChanged,
 				readProjectContext: () => projectContext,
 				repository: editor.repository,
+				requestVersionCheckoutFx: (projectId, versionId) => {
+					if (projectContext !== projectId || versionCheckoutRequestFx === undefined)
+						return Effect.fail(
+							new Error(
+								"The open editor renderer is unavailable for version checkout.",
+							),
+						);
+					return versionCheckoutRequestFx(versionId);
+				},
 				runPromise,
 			});
 			const port = yield* readPortFx;
@@ -152,14 +165,18 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 	return {
 		readStatus: () => status,
 		readProjectContext: () => projectContext,
-		setProjectContext: (projectId) => {
+		setProjectContext: (projectId, requestVersionCheckout) => {
 			projectContext = projectId;
+			versionCheckoutRequestFx = requestVersionCheckout;
 		},
 		clearProjectContext: (projectId) => {
-			if (projectContext === projectId) projectContext = undefined;
+			if (projectContext !== projectId) return;
+			projectContext = undefined;
+			versionCheckoutRequestFx = undefined;
 		},
 		resetProjectContext: () => {
 			projectContext = undefined;
+			versionCheckoutRequestFx = undefined;
 		},
 		activateFx,
 		closeFx,

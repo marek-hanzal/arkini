@@ -4,6 +4,9 @@ import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
 const beforeCloseListeners = new Set<() => Promise<void>>();
 const beforeCloseReadyListeners = new Set<() => Promise<void>>();
 const closeFailedListeners = new Set<(error: unknown) => void>();
+const editorProjectChangedListeners = new Set<
+	Parameters<ArkiniElectronApi.Api["editor"]["onProjectChanged"]>[0]
+>();
 const windowModeListeners = new Set<
 	Parameters<ArkiniElectronApi.Api["window"]["onModeChanged"]>[0]
 >();
@@ -29,6 +32,10 @@ ipcRenderer.on(ArkiniElectronApi.channels.windowVisible, () => {
 
 ipcRenderer.on(ArkiniElectronApi.channels.windowModeChanged, (_event, mode) => {
 	for (const listener of Array.from(windowModeListeners)) listener(mode);
+});
+
+ipcRenderer.on(ArkiniElectronApi.channels.editorProjectChanged, (_event, projectId) => {
+	for (const listener of Array.from(editorProjectChangedListeners)) listener(projectId);
 });
 
 ipcRenderer.on(ArkiniElectronApi.channels.beforeClose, async () => {
@@ -94,6 +101,10 @@ const api: ArkiniElectronApi.Api = {
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectOpenExportDirectory),
 		readProject: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectRead, projectId),
+		onProjectChanged: (listener) => {
+			editorProjectChangedListeners.add(listener);
+			return () => editorProjectChangedListeners.delete(listener);
+		},
 		replaceConfig: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectReplaceConfig, request),
 		replaceResource: (request) =>

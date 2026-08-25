@@ -2,6 +2,7 @@ import { app, BrowserWindow, nativeTheme } from "electron";
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
 import { Effect } from "effect";
+import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
 import { createMainWindowFx } from "./createMainWindowFx";
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
 import { registerArkiniElectronIpcFx } from "./registerArkiniElectronIpcFx";
@@ -136,6 +137,12 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	});
 	const editorMcpOwnership = yield* createEditorMcpOwnershipFx({
 		editor: editorProjectServiceOwnership,
+		notifyProjectChanged: (projectId) => {
+			for (const window of BrowserWindow.getAllWindows()) {
+				if (window.isDestroyed()) continue;
+				window.webContents.send(ArkiniElectronApi.channels.editorProjectChanged, projectId);
+			}
+		},
 		readPortFx: editorMcpPreferences.readPortFx,
 		runPromise: ElectronMainRuntime.runPromise,
 	});

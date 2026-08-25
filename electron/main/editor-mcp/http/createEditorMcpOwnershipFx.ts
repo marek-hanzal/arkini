@@ -28,6 +28,7 @@ export interface EditorMcpOwnership {
 export namespace createEditorMcpOwnershipFx {
 	export interface Props {
 		readonly editor: EditorProjectServiceOwnership;
+		readonly notifyProjectChanged: (projectId: string) => void;
 		readonly readPortFx: Effect.Effect<EditorMcpPortSchema.Type, unknown>;
 		readonly runPromise: <Value, Error>(effect: Effect.Effect<Value, Error>) => Promise<Value>;
 	}
@@ -36,6 +37,7 @@ export namespace createEditorMcpOwnershipFx {
 /** Owns one lazy loopback MCP listener for the process lifetime after first editor entry. */
 export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx")(function* ({
 	editor,
+	notifyProjectChanged,
 	readPortFx,
 	runPromise,
 }: createEditorMcpOwnershipFx.Props) {
@@ -57,6 +59,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 		Effect.gen(function* () {
 			if (status.type !== "inactive" || editor.type === "unavailable") return status;
 			const mcpServerFactory = yield* createEditorMcpServerFx({
+				notifyProjectChanged,
 				readProjectContext: () => projectContext,
 				repository: editor.repository,
 				runPromise,

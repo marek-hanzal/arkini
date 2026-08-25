@@ -7,7 +7,12 @@ import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepos
 import { EditorItemEstimateQuantitySchema } from "~/editor/estimator/EditorItemEstimateQuantitySchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { EditorMcpEstimateInputSchema } from "./EditorMcpEstimateInputSchema";
+import {
+	EditorMcpCreateItemInputSchemas,
+	type EditorMcpCreateItemInput,
+} from "./EditorMcpCreateItemInputSchemas";
 import { EditorMcpItemCollectionInputSchema } from "./EditorMcpItemCollectionInputSchema";
+import { createEditorMcpItemFx } from "./createEditorMcpItemFx";
 import { readEditorMcpEstimateTextFx } from "./readEditorMcpEstimateTextFx";
 import { readEditorMcpItemCollectionTextFx } from "./readEditorMcpItemCollectionTextFx";
 import { readEditorMcpItemDetailTextFx } from "./readEditorMcpItemDetailTextFx";
@@ -43,6 +48,7 @@ const readCurrentProjectFx = (
 	});
 
 const createEditorMcpServer = (
+	notifyProjectChanged: (projectId: string) => void,
 	repository: EditorProjectRepositoryService,
 	readProjectContext: () => string | undefined,
 	runPromise: <Value, Error>(effect: Effect.Effect<Value, Error>) => Promise<Value>,
@@ -76,10 +82,42 @@ const createEditorMcpServer = (
 		},
 		{
 			instructions:
-				"Every tool reads only the project currently open in the Arkini editor. Tool results mirror the relevant editor UI as concise text and never dump the complete game config.",
+				"Every tool targets only the project currently open in the Arkini editor. Read results mirror the relevant editor UI as concise text and never dump the complete game config. Create tools persist canonical editor items.",
 		},
 	);
 	const readProjectFx = () => readCurrentProjectFx(repository, readProjectContext);
+	for (const type of [
+		"simple",
+		"producer",
+		"craft",
+		"blueprint",
+		"deposit",
+		"stash",
+		"temporary",
+		"inventory",
+	] as const) {
+		server.registerTool(
+			`create_${type}_item`,
+			{
+				description: `Create and persist one ${type} item in the open project. Omitted fields use the same defaults as a new ${type}-item form in the Editor UI.`,
+				inputSchema: EditorMcpCreateItemInputSchemas[type],
+			},
+			async (input: EditorMcpCreateItemInput) =>
+				runTool(
+					readProjectFx().pipe(
+						Effect.flatMap((project) =>
+							createEditorMcpItemFx({
+								input,
+								notifyProjectChanged,
+								project,
+								repository,
+								type,
+							}),
+						),
+					),
+				),
+		);
+	}
 	server.registerTool(
 		"project",
 		{
@@ -210,15 +248,23 @@ const createEditorMcpServer = (
 /** Creates the synchronous server factory required by the MCP HTTP handler. */
 export const createEditorMcpServerFx = Effect.fn("createEditorMcpServerFx")(
 	({
+		notifyProjectChanged,
 		readProjectContext,
 		repository,
 		runPromise,
 	}: {
+		readonly notifyProjectChanged: (projectId: string) => void;
 		readonly readProjectContext: () => string | undefined;
 		readonly repository: EditorProjectRepositoryService;
 		readonly runPromise: <Value, Error>(effect: Effect.Effect<Value, Error>) => Promise<Value>;
 	}) =>
 		Effect.succeed({
-			create: () => createEditorMcpServer(repository, readProjectContext, runPromise),
+			create: () =>
+				createEditorMcpServer(
+					notifyProjectChanged,
+					repository,
+					readProjectContext,
+					runPromise,
+				),
 		} as const),
 );

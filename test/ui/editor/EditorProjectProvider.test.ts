@@ -9,6 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
 import { EditorProjectProvider } from "~/bridge/editor/EditorProjectProvider";
+import { RendererAtomRegistry } from "~/bridge/reactivity/RendererAtomRegistry";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
@@ -22,13 +23,26 @@ const roots: Array<ReturnType<typeof createRoot>> = [];
 const registries: AtomRegistry.AtomRegistry[] = [];
 const setProjectContext = vi.fn(() => Promise.resolve());
 const clearProjectContext = vi.fn(() => Promise.resolve());
+const readProject = vi.fn();
+let projectChangedListener: ((projectId: string) => void) | undefined;
 
 beforeEach(() => {
 	setProjectContext.mockClear();
 	clearProjectContext.mockClear();
+	readProject.mockReset();
+	projectChangedListener = undefined;
 	Object.defineProperty(window, "arkini", {
 		configurable: true,
 		value: {
+			editor: {
+				onProjectChanged: (listener: (projectId: string) => void) => {
+					projectChangedListener = listener;
+					return () => {
+						projectChangedListener = undefined;
+					};
+				},
+				readProject,
+			},
 			editorMcp: {
 				setProjectContext,
 				clearProjectContext,
@@ -46,8 +60,8 @@ afterEach(async () => {
 	Reflect.deleteProperty(window, "arkini");
 });
 
-const createProject = (revision: number): EditorProject => ({
-	projectId: "project",
+const createProject = (revision: number, projectId = "project"): EditorProject => ({
+	projectId,
 	title: `Project ${revision}`,
 	version: "1.0",
 	createdAtMs: 1,
@@ -127,6 +141,69 @@ describe("EditorProjectProvider", () => {
 
 		expect(container.textContent).toBe(String(revisionB));
 		expect(registry.get(EditorProjectAtom("project"))?.revision).toBe(revisionB);
+	});
+
+	it("keeps the newest canonical project when MCP reloads finish out of order", async () => {
+		const projectId = "mcp-refresh-project";
+		const pendingReads: Array<(result: unknown) => void> = [];
+		readProject.mockImplementation(
+			() =>
+				new Promise((resolve) => {
+					pendingReads.push(resolve);
+				}),
+		);
+		const Probe = () => createElement("output", null, useEditorProject().revision);
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+
+		await act(async () => {
+			root.render(
+				createElement(
+					RegistryContext.Provider,
+					{
+						value: RendererAtomRegistry,
+					},
+					createElement(
+						EditorProjectProvider,
+						{
+							loaded: createProject(1, projectId),
+						},
+						createElement(Probe),
+					),
+				),
+			);
+		});
+		await act(async () => {
+			projectChangedListener?.("another-project");
+			projectChangedListener?.(projectId);
+			projectChangedListener?.(projectId);
+			await vi.waitFor(() => expect(pendingReads).toHaveLength(2));
+		});
+		await act(async () => {
+			pendingReads[1]?.({
+				type: "success",
+				value: {
+					...createProject(3, projectId),
+					title: editorTestPayload.config.meta.title,
+				},
+			});
+			await vi.waitFor(() => expect(container.textContent).toBe("3"));
+		});
+		await act(async () => {
+			pendingReads[0]?.({
+				type: "success",
+				value: {
+					...createProject(2, projectId),
+					title: editorTestPayload.config.meta.title,
+				},
+			});
+			await Promise.resolve();
+		});
+
+		expect(readProject).toHaveBeenCalledTimes(2);
+		expect(container.textContent).toBe("3");
 	});
 
 	it("rejects a loader result when a newer project was published after loading began", async () => {

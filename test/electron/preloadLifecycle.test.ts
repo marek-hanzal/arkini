@@ -53,6 +53,12 @@ const reportWindowVisible = () => {
 	handler();
 };
 
+const reportEditorProjectChanged = (projectId: string) => {
+	const handler = electron.handlers.get(ArkiniElectronContract.channels.editorProjectChanged);
+	if (handler === undefined) throw new Error("Expected editor-project listener registration.");
+	handler(undefined, projectId);
+};
+
 describe("Electron preload lifecycle", () => {
 	beforeEach(() => {
 		electron.reset();
@@ -113,6 +119,18 @@ describe("Electron preload lifecycle", () => {
 			ArkiniElectronContract.channels.editorMcpProjectContextClear,
 			"project-one",
 		);
+	});
+
+	it("subscribes the renderer to main-process editor project mutations", async () => {
+		const api = await loadPreload();
+		const listener = vi.fn();
+		const unsubscribe = api.editor.onProjectChanged(listener);
+
+		reportEditorProjectChanged("project-one");
+		unsubscribe();
+		reportEditorProjectChanged("project-two");
+
+		expect(listener).toHaveBeenCalledExactlyOnceWith("project-one");
 	});
 
 	it("routes bounded diagnostics through dedicated IPC channels", async () => {

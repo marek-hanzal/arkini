@@ -26,6 +26,14 @@ describe("editor MCP server", () => {
 		});
 		const tools = await client.listTools();
 		expect(tools.tools.map(({ name }) => name)).toEqual([
+			"create_simple_item",
+			"create_producer_item",
+			"create_craft_item",
+			"create_blueprint_item",
+			"create_deposit_item",
+			"create_stash_item",
+			"create_temporary_item",
+			"create_inventory_item",
 			"project",
 			"item_meta",
 			"estimate",
@@ -143,6 +151,14 @@ describe("editor MCP server", () => {
 		const client = await connectEditorMcpClient(port, "legacy");
 		expect(client.getProtocolEra()).toBe("legacy");
 		expect((await client.listTools()).tools.map(({ name }) => name)).toEqual([
+			"create_simple_item",
+			"create_producer_item",
+			"create_craft_item",
+			"create_blueprint_item",
+			"create_deposit_item",
+			"create_stash_item",
+			"create_temporary_item",
+			"create_inventory_item",
 			"project",
 			"item_meta",
 			"estimate",

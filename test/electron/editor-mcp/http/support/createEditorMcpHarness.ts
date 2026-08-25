@@ -62,6 +62,7 @@ export interface EditorMcpHarness {
 
 export const createEditorMcpHarness = async (
 	runPromise: createEditorMcpOwnershipFx.Props["runPromise"] = Effect.runPromise,
+	notifyProjectChanged: (projectId: string) => void = () => undefined,
 ): Promise<EditorMcpHarness> => {
 	const repository = await Effect.runPromise(
 		createSqliteEditorProjectRepositoryFx({
@@ -76,6 +77,7 @@ export const createEditorMcpHarness = async (
 				type: "ready",
 				repository,
 			},
+			notifyProjectChanged,
 			readPortFx: Effect.succeed(port),
 			runPromise,
 		}),

@@ -60,6 +60,7 @@ const installEditorApi = () => {
 		),
 		openExportDirectory: vi.fn(async () => success(undefined)),
 		readProject: vi.fn(async () => success(project)),
+		onProjectChanged: vi.fn(() => () => undefined),
 		replaceConfig: vi.fn(async () => success(commit)),
 		replaceResource: vi.fn(async () => success(project)),
 		upsertItem: vi.fn(async () => success(commit)),

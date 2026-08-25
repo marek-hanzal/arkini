@@ -4,6 +4,8 @@ import { useLayoutEffect, type PropsWithChildren } from "react";
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
 import { EditorProjectContext } from "~/bridge/editor/EditorProjectContext";
+import { publishEditorProjectFx } from "~/bridge/editor/publishEditorProjectFx";
+import { readEditorProjectFx } from "~/bridge/editor/readEditorProjectFx";
 import { clearEditorMcpProjectContextFx } from "~/bridge/editor-mcp/clearEditorMcpProjectContextFx";
 import { setEditorMcpProjectContextFx } from "~/bridge/editor-mcp/setEditorMcpProjectContextFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
@@ -35,6 +37,38 @@ export const EditorProjectProvider = ({
 		});
 	}, [
 		loaded,
+		publish,
+	]);
+	useLayoutEffect(() => {
+		let mounted = true;
+		const unsubscribe = window.arkini.editor.onProjectChanged((projectId) => {
+			if (projectId !== loaded.projectId) return;
+			void RendererRuntime.runPromise(
+				readEditorProjectFx({
+					projectId,
+				}),
+			)
+				.then((fresh) => {
+					if (!mounted) return;
+					return RendererRuntime.runPromise(
+						publishEditorProjectFx(projectId, {
+							project: fresh,
+						}),
+					);
+				})
+				.catch((cause) =>
+					console.error(
+						"Arkini editor project could not refresh after an MCP write.",
+						cause,
+					),
+				);
+		});
+		return () => {
+			mounted = false;
+			unsubscribe();
+		};
+	}, [
+		loaded.projectId,
 		publish,
 	]);
 	return <EditorProjectContext value={project ?? loaded}>{children}</EditorProjectContext>;

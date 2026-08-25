@@ -209,7 +209,7 @@ export const createSqliteEditorProjectCommitOperationsFx = Effect.fn(
 
 	const upsertItemFx: CommitOperations["upsertItemFx"] = Effect.fn(
 		"SqliteEditorProjectRepository.upsertItemFx",
-	)(function* ({ projectId, item: candidateItem }) {
+	)(function* ({ expectedRevision, projectId, item: candidateItem }) {
 		const item = yield* Effect.try({
 			try: () => ItemSchema.parse(candidateItem),
 			catch: (cause) =>
@@ -224,6 +224,8 @@ export const createSqliteEditorProjectCommitOperationsFx = Effect.fn(
 						"upsert-item",
 						`Editor project ${projectId} does not exist.`,
 					);
+				if (expectedRevision !== undefined)
+					assertExpectedRevision(current, expectedRevision, "upsert-item");
 				const collision = current.config.items[item.id];
 				if (collision !== undefined && collision.uid !== item.uid)
 					throw createRepositoryError(

@@ -7,6 +7,7 @@ import { createEditorItemDraftFx } from "~/editor/createEditorItemDraftFx";
 import { saveEditorItemWithRepositoryFx } from "~/editor/saveEditorItemWithRepositoryFx";
 import type { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import type { EditorMcpCreateItemInput } from "./EditorMcpCreateItemInputSchemas";
+import { notifyEditorMcpProjectChangedFx } from "./notifyEditorMcpProjectChangedFx";
 
 /** Creates one type-owned item from the same draft and persistence path as the Editor UI. */
 export const createEditorMcpItemFx = Effect.fn("createEditorMcpItemFx")(function* ({
@@ -36,13 +37,7 @@ export const createEditorMcpItemFx = Effect.fn("createEditorMcpItemFx")(function
 		projectId: project.projectId,
 		repository,
 	});
-	yield* Effect.sync(() => notifyProjectChanged(project.projectId)).pipe(
-		Effect.catchCause((cause) =>
-			Effect.sync(() =>
-				console.error("Arkini editor could not announce an MCP project mutation.", cause),
-			),
-		),
-	);
+	yield* notifyEditorMcpProjectChangedFx(notifyProjectChanged, project.projectId);
 	return [
 		`Created ${item.type} item.`,
 		`ID: ${item.id}`,

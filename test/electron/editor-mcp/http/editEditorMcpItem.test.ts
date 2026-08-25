@@ -1,0 +1,129 @@
+import { Effect } from "effect";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { createEditorItemDraftFx } from "~/editor/createEditorItemDraftFx";
+import {
+	cleanupEditorMcpHarnesses,
+	connectEditorMcpClient,
+	createEditorMcpHarness,
+} from "./support/createEditorMcpHarness";
+
+afterEach(cleanupEditorMcpHarnesses);
+
+describe("editor MCP item editing", () => {
+	it("replaces supplied simple fields, clears null fields, and preserves the rest", async () => {
+		const notifyProjectChanged = vi.fn();
+		const { ownership, port, repository } = await createEditorMcpHarness(
+			Effect.runPromise,
+			notifyProjectChanged,
+		);
+		const water = editorTestPayload.config.items.water;
+		const producer = {
+			...Effect.runSync(
+				createEditorItemDraftFx({
+					resourceId: editorTestPayload.resources[0]?.id ?? "missing-asset",
+					type: "producer",
+					uid: "producer-uid",
+				}),
+			),
+			id: "producer:test",
+			title: "Test Producer",
+			description: "Existing non-simple item.",
+		};
+		await Effect.runPromise(
+			repository.createProjectFx({
+				projectId: "edit-simple-project",
+				version: "1.0",
+				config: {
+					...editorTestPayload.config,
+					items: {
+						...editorTestPayload.config.items,
+						[producer.id]: producer,
+						water: {
+							...water,
+							maxCount: 2,
+						},
+					},
+				},
+				resources: editorTestPayload.resources,
+			}),
+		);
+		ownership.setProjectContext("edit-simple-project");
+		await Effect.runPromise(ownership.activateFx);
+		const client = await connectEditorMcpClient(port);
+
+		const edited = await client.callTool({
+			name: "edit_simple_item",
+			arguments: {
+				itemId: "water",
+				patch: {
+					maxCount: null,
+					title: "Fresh Water",
+				},
+			},
+		});
+		expect(edited).toMatchObject({
+			content: [
+				{
+					text: [
+						"Edited simple item.",
+						"ID: water",
+						"UID: water",
+						"Revision: 1",
+						"Replaced: maxCount, title",
+					].join("\n"),
+				},
+			],
+		});
+		const project = await Effect.runPromise(repository.readProjectFx("edit-simple-project"));
+		expect(project?.config.items.water).toEqual({
+			...water,
+			title: "Fresh Water",
+		});
+		expect(notifyProjectChanged).toHaveBeenCalledExactlyOnceWith("edit-simple-project");
+
+		for (const patch of [
+			{},
+			{
+				id: "renamed-water",
+			},
+			{
+				type: "producer",
+			},
+			{
+				uid: "forced-water",
+			},
+		]) {
+			const rejected = await client.callTool({
+				name: "edit_simple_item",
+				arguments: {
+					itemId: "water",
+					patch,
+				},
+			});
+			expect(rejected.isError, JSON.stringify(patch)).toBe(true);
+		}
+		const wrongType = await client.callTool({
+			name: "edit_simple_item",
+			arguments: {
+				itemId: producer.id,
+				patch: {
+					title: "Must not change",
+				},
+			},
+		});
+		expect(wrongType).toMatchObject({
+			isError: true,
+			content: [
+				{
+					text: expect.stringContaining(`Item ${producer.id} is producer, not simple.`),
+				},
+			],
+		});
+		expect(notifyProjectChanged).toHaveBeenCalledOnce();
+		expect(
+			(await Effect.runPromise(repository.readProjectFx("edit-simple-project")))?.revision,
+		).toBe(1);
+	});
+});

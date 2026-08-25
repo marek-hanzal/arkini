@@ -21,6 +21,7 @@ export namespace EditorProjectRepository {
 	}
 
 	export interface UpsertItemProps {
+		readonly expectedRevision?: number;
 		readonly projectId: string;
 		readonly item: ItemSchema.Type;
 	}

@@ -174,6 +174,7 @@ describe("registerEditorProjectIpcFx", () => {
 			resource: editorTestPayload.resources[0],
 		};
 		const upsertItemRequest = {
+			expectedRevision: 0,
 			projectId: "project-one",
 			item: editorTestPayload.config.items.water,
 		};

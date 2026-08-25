@@ -11,8 +11,13 @@ import {
 	EditorMcpCreateItemInputSchemas,
 	type EditorMcpCreateItemInput,
 } from "./EditorMcpCreateItemInputSchemas";
+import {
+	EditorMcpEditItemInputSchemas,
+	type EditorMcpEditItemInput,
+} from "./EditorMcpEditItemInputSchemas";
 import { EditorMcpItemCollectionInputSchema } from "./EditorMcpItemCollectionInputSchema";
 import { createEditorMcpItemFx } from "./createEditorMcpItemFx";
+import { editEditorMcpItemFx } from "./editEditorMcpItemFx";
 import { readEditorMcpEstimateTextFx } from "./readEditorMcpEstimateTextFx";
 import { readEditorMcpItemCollectionTextFx } from "./readEditorMcpItemCollectionTextFx";
 import { readEditorMcpItemDetailTextFx } from "./readEditorMcpItemDetailTextFx";
@@ -20,6 +25,17 @@ import { readEditorMcpItemEstimateTextFx } from "./readEditorMcpItemEstimateText
 import { readEditorMcpItemMetaTextFx } from "./readEditorMcpItemMetaTextFx";
 import { readEditorMcpItemRelationTextFx } from "./readEditorMcpItemRelationTextFx";
 import { readEditorMcpProjectTextFx } from "./readEditorMcpProjectTextFx";
+
+const editorMcpItemTypes = [
+	"simple",
+	"producer",
+	"craft",
+	"blueprint",
+	"deposit",
+	"stash",
+	"temporary",
+	"inventory",
+] as const;
 
 const errorText = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
 
@@ -82,20 +98,11 @@ const createEditorMcpServer = (
 		},
 		{
 			instructions:
-				"Every tool targets only the project currently open in the Arkini editor. Read results mirror the relevant editor UI as concise text and never dump the complete game config. Create tools persist canonical editor items.",
+				"Every tool targets only the project currently open in the Arkini editor. Read results mirror the relevant editor UI as concise text and never dump the complete game config. Create and edit tools persist canonical editor items.",
 		},
 	);
 	const readProjectFx = () => readCurrentProjectFx(repository, readProjectContext);
-	for (const type of [
-		"simple",
-		"producer",
-		"craft",
-		"blueprint",
-		"deposit",
-		"stash",
-		"temporary",
-		"inventory",
-	] as const) {
+	for (const type of editorMcpItemTypes) {
 		server.registerTool(
 			`create_${type}_item`,
 			{
@@ -107,6 +114,29 @@ const createEditorMcpServer = (
 					readProjectFx().pipe(
 						Effect.flatMap((project) =>
 							createEditorMcpItemFx({
+								input,
+								notifyProjectChanged,
+								project,
+								repository,
+								type,
+							}),
+						),
+					),
+				),
+		);
+	}
+	for (const type of editorMcpItemTypes) {
+		server.registerTool(
+			`edit_${type}_item`,
+			{
+				description: `Patch one existing ${type} item. Supplied top-level fields replace their complete values, omitted fields remain unchanged, and null clears optional fields.`,
+				inputSchema: EditorMcpEditItemInputSchemas[type],
+			},
+			async (input: EditorMcpEditItemInput) =>
+				runTool(
+					readProjectFx().pipe(
+						Effect.flatMap((project) =>
+							editEditorMcpItemFx({
 								input,
 								notifyProjectChanged,
 								project,

@@ -90,6 +90,39 @@ describe("SQLite editor-project writes", () => {
 		expect(canonical?.config.items.oil?.uid).toBe("oil");
 	});
 
+	it("rejects a revision-pinned item upsert after another write commits", async () => {
+		const repository = await harness.openRepository();
+		const created = await harness.createProject(repository);
+		const water = editorTestPayload.config.items.water;
+		const updated = await Effect.runPromise(
+			repository.upsertItemFx({
+				expectedRevision: created.revision,
+				projectId: created.projectId,
+				item: {
+					...water,
+					title: "Fresh Water",
+				},
+			}),
+		);
+
+		await expect(
+			Effect.runPromise(
+				repository.upsertItemFx({
+					expectedRevision: created.revision,
+					projectId: created.projectId,
+					item: {
+						...water,
+						description: "Stale replacement",
+					},
+				}),
+			),
+		).rejects.toThrow("changed from revision 0 to 1");
+		expect(
+			(await Effect.runPromise(repository.readProjectFx(created.projectId)))?.config.items
+				.water,
+		).toEqual(updated.config.items.water);
+	});
+
 	it("serializes concurrent writes and awaitIdle observes every admitted write", async () => {
 		const repository = await harness.openRepository();
 		await harness.createProject(repository);

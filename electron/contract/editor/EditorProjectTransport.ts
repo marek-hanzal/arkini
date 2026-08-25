@@ -105,6 +105,7 @@ export namespace EditorProjectTransport {
 	}
 
 	export interface UpsertItemRequest {
+		readonly expectedRevision?: number;
 		readonly projectId: string;
 		readonly item: unknown;
 	}

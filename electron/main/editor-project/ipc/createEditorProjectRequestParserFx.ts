@@ -21,6 +21,7 @@ const createProjectSchema = z
 	.strict();
 const upsertItemSchema = z
 	.object({
+		expectedRevision: z.number().int().nonnegative().optional(),
 		projectId: IdSchema,
 		item: ItemSchema,
 	})

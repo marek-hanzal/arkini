@@ -8,10 +8,12 @@ import { ItemSchema as CanonicalItemSchema } from "~/engine/item/schema/ItemSche
 /** Validates and persists one item through the canonical editor repository. */
 export const saveEditorItemWithRepositoryFx = Effect.fn("saveEditorItemWithRepositoryFx")(
 	function* ({
+		expectedRevision,
 		item: candidate,
 		projectId,
 		repository,
 	}: {
+		readonly expectedRevision?: number;
 		readonly item: Pick<ItemSchema.Type, "id" | "type"> & Record<string, unknown>;
 		readonly projectId: string;
 		readonly repository: EditorProjectRepositoryService;
@@ -26,6 +28,7 @@ export const saveEditorItemWithRepositoryFx = Effect.fn("saveEditorItemWithRepos
 				}),
 		});
 		const commit = yield* repository.upsertItemFx({
+			expectedRevision,
 			projectId,
 			item,
 		});

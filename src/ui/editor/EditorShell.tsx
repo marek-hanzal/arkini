@@ -1,4 +1,5 @@
 import { useAtomSet } from "@effect/atom-react";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { useBlocker, useRouter } from "@tanstack/react-router";
 import {
 	useCallback,
@@ -12,6 +13,7 @@ import { flushSync } from "react-dom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { waitForEditorProjectWritesCommandAtom } from "~/bridge/editor/waitForEditorProjectWritesCommandAtom";
 import { Button, ButtonLink } from "~/ui/button/Button";
+import { readEditorWorkspaceShortcut } from "~/ui/editor/EditorWorkspaceShortcuts";
 import {
 	EditorWorkspaceRoutes,
 	type EditorWorkspaceId,
@@ -20,6 +22,7 @@ import {
 import { Tooltip } from "~/ui/overlay/Tooltip";
 import { EditorUnsavedChangesDialog } from "~/ui/editor/EditorUnsavedChangesDialog";
 import { useEditorUnsavedChangesOwner } from "~/ui/editor/useEditorUnsavedChangesRegistration";
+import { useEditorWorkspaceShortcuts } from "~/ui/editor/useEditorWorkspaceShortcuts";
 
 const tabClassName =
 	"ak-editor-workspace-tab size-11 min-h-0 shrink-0 border-transparent bg-transparent p-0 shadow-none transition-none hover:bg-surface-raised";
@@ -55,6 +58,10 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 		unsavedChangesOwner.getSnapshot,
 		unsavedChangesOwner.getSnapshot,
 	);
+	useEditorWorkspaceShortcuts({
+		enabled: !exitPending && !unsavedChanges.promptOpen,
+		projectId: project.projectId,
+	});
 	useBlocker({
 		disabled: !unsavedChanges.hasDirtySession,
 		enableBeforeUnload: false,
@@ -134,7 +141,7 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 					{EditorWorkspaceRoutes.map(({ icon, id, label, to }) => (
 						<Tooltip
 							key={id}
-							content={label}
+							content={`${label} · ${formatForDisplay(readEditorWorkspaceShortcut(id))}`}
 							placement="right"
 						>
 							<ButtonLink

@@ -4,7 +4,9 @@ import { useEffect, useMemo } from "react";
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { createEditorItemEstimateIndexFx } from "~/editor/createEditorItemEstimateIndexFx";
-import type { EditorItemEstimateIndexEntry } from "~/editor/EditorItemEstimateIndex";
+import type { EditorItemEstimateIndexRow } from "~/editor/EditorItemEstimateIndex";
+import type { EditorItemEstimateSortSchema } from "~/editor/EditorItemEstimateSortSchema";
+import { selectEditorItemEstimateIndexFx } from "~/editor/selectEditorItemEstimateIndexFx";
 import {
 	EditorItemEstimateCacheAtom,
 	type EditorItemEstimateCacheAtom as EditorItemEstimateCache,
@@ -12,16 +14,19 @@ import {
 
 export type EditorItemEstimateIndexState =
 	| {
-			readonly entries: ReadonlyArray<EditorItemEstimateIndexEntry>;
+			readonly maximumDemand: number;
+			readonly rows: ReadonlyArray<EditorItemEstimateIndexRow>;
 			readonly status: "loading";
 	  }
 	| {
-			readonly entries: ReadonlyArray<EditorItemEstimateIndexEntry>;
+			readonly maximumDemand: number;
+			readonly rows: ReadonlyArray<EditorItemEstimateIndexRow>;
 			readonly status: "ready";
 	  }
 	| {
-			readonly entries: ReadonlyArray<EditorItemEstimateIndexEntry>;
+			readonly maximumDemand: number;
 			readonly message: string;
+			readonly rows: ReadonlyArray<EditorItemEstimateIndexRow>;
 			readonly status: "error";
 	  };
 
@@ -33,6 +38,13 @@ const sameSnapshot = (
 /** Reads the shared result of one full-snapshot estimate batch. */
 export const useEditorItemEstimateIndex = (
 	project: EditorProject,
+	{
+		query,
+		sort,
+	}: {
+		readonly query: string;
+		readonly sort: EditorItemEstimateSortSchema.Type;
+	},
 ): EditorItemEstimateIndexState => {
 	const snapshot = useMemo<EditorItemEstimateCache.Snapshot>(
 		() => ({
@@ -54,37 +66,49 @@ export const useEditorItemEstimateIndex = (
 		requestIndex,
 		snapshot,
 	]);
-	const entries = useMemo(
-		() =>
-			RendererRuntime.runSync(
-				createEditorItemEstimateIndexFx({
-					estimates: state.estimates,
-					itemIds: Object.keys(project.config.items),
+	const selection = useMemo(() => {
+		const entries = RendererRuntime.runSync(
+			createEditorItemEstimateIndexFx({
+				estimates: state.estimates,
+				itemIds: Object.keys(project.config.items),
+			}),
+		);
+		return {
+			maximumDemand: Math.max(0, ...entries.map(({ demand }) => demand)),
+			rows: RendererRuntime.runSync(
+				selectEditorItemEstimateIndexFx({
+					entries,
+					items: Object.values(project.config.items),
+					query,
+					sort,
 				}),
 			),
-		[
-			project.config.items,
-			state.estimates,
-		],
-	);
+		};
+	}, [
+		project.config.items,
+		query,
+		sort,
+		state.estimates,
+	]);
 	if (!sameSnapshot(state.snapshot, snapshot))
 		return {
-			entries: [],
+			maximumDemand: 0,
+			rows: [],
 			status: "loading",
 		};
 	if (state.status === "loading" || state.status === "idle")
 		return {
-			entries,
+			...selection,
 			status: "loading",
 		};
 	if (state.status === "error")
 		return {
-			entries,
+			...selection,
 			message: state.message ?? "Estimate calculation failed.",
 			status: "error",
 		};
 	return {
-		entries,
+		...selection,
 		status: "ready",
 	};
 };

@@ -1,7 +1,4 @@
-import { Effect } from "effect";
-
-import { createEditorAcquisitionGraphFx } from "~/editor/createEditorAcquisitionGraphFx";
-import { estimateEditorItemFx } from "~/editor/estimator/estimateEditorItemFx";
+import { estimateEditorItemsFx } from "~/editor/estimateEditorItemsFx";
 import { EditorItemEstimateWorkerRuntime } from "~/ui/item/editor/EditorItemEstimateWorkerRuntime";
 import type {
 	EditorItemEstimateWorkerRequest,
@@ -9,18 +6,7 @@ import type {
 } from "~/ui/item/editor/editorItemEstimateWorkerProtocol";
 
 self.addEventListener("message", ({ data }: MessageEvent<EditorItemEstimateWorkerRequest>) => {
-	void EditorItemEstimateWorkerRuntime.runPromise(
-		Effect.gen(function* () {
-			const graph = yield* createEditorAcquisitionGraphFx(data.config);
-			return yield* Effect.forEach(Object.keys(data.config.items).sort(), (itemId) =>
-				estimateEditorItemFx({
-					factId: itemId,
-					graph,
-					quantity: 1,
-				}),
-			);
-		}),
-	).then(
+	void EditorItemEstimateWorkerRuntime.runPromise(estimateEditorItemsFx(data.config)).then(
 		(estimates) =>
 			self.postMessage({
 				result: {

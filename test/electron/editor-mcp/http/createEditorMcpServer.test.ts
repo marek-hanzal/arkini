@@ -28,6 +28,7 @@ describe("editor MCP server", () => {
 		expect(tools.tools.map(({ name }) => name)).toEqual([
 			"project",
 			"item_meta",
+			"estimate",
 			"item_collection",
 			"item_detail",
 			"item_input",
@@ -44,6 +45,21 @@ describe("editor MCP server", () => {
 				type: "string",
 			},
 			type: "array",
+		});
+		expect(
+			tools.tools.find(({ name }) => name === "estimate")?.inputSchema.properties,
+		).toMatchObject({
+			page: expect.any(Object),
+			pageSize: expect.any(Object),
+			query: expect.any(Object),
+			sort: {
+				default: "fastest",
+				enum: [
+					"fastest",
+					"slowest",
+					"demand",
+				],
+			},
 		});
 		for (const toolName of [
 			"item_input",
@@ -122,7 +138,16 @@ describe("editor MCP server", () => {
 		await Effect.runPromise(ownership.activateFx);
 		const client = await connectEditorMcpClient(port, "legacy");
 		expect(client.getProtocolEra()).toBe("legacy");
-		expect((await client.listTools()).tools.map(({ name }) => name)).toContain("item_estimate");
+		expect((await client.listTools()).tools.map(({ name }) => name)).toEqual([
+			"project",
+			"item_meta",
+			"estimate",
+			"item_collection",
+			"item_detail",
+			"item_input",
+			"item_output",
+			"item_estimate",
+		]);
 		expect(
 			(
 				await client.callTool({
@@ -157,6 +182,13 @@ describe("editor MCP server", () => {
 				level: 2,
 			},
 		});
+		const globalEstimate = await client.callTool({
+			name: "estimate",
+			arguments: {
+				pageSize: 2,
+				sort: "demand",
+			},
+		});
 		const estimate = await client.callTool({
 			name: "item_estimate",
 			arguments: {
@@ -169,6 +201,20 @@ describe("editor MCP server", () => {
 		expect(relation.content).toMatchObject([
 			{
 				text: expect.stringContaining("Item input\nItem ID: water"),
+			},
+		]);
+		expect(globalEstimate.isError).not.toBe(true);
+		expect(globalEstimate).not.toHaveProperty("structuredContent");
+		expect(globalEstimate.content).toMatchObject([
+			{
+				text: expect.stringContaining(
+					"Global estimate\nMethod: static authored dependency graph",
+				),
+			},
+		]);
+		expect(globalEstimate.content).toMatchObject([
+			{
+				text: expect.stringContaining("Sort: demand"),
 			},
 		]);
 		expect(estimate.isError).not.toBe(true);

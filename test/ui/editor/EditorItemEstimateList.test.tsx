@@ -4,7 +4,7 @@ import { act, createElement, type ReactNode, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorItemEstimateSort } from "~/ui/item/editor/EditorItemEstimateSort";
+import type { EditorItemEstimateSortSchema } from "~/editor/EditorItemEstimateSortSchema";
 import { EditorItemEstimateList } from "~/ui/item/editor/EditorItemEstimateList";
 
 (
@@ -16,6 +16,12 @@ import { EditorItemEstimateList } from "~/ui/item/editor/EditorItemEstimateList"
 const state = vi.hoisted(() => ({
 	estimateState: undefined as unknown,
 	project: undefined as unknown,
+	selection: undefined as
+		| {
+				readonly query: string;
+				readonly sort: "demand" | "fastest" | "slowest";
+		  }
+		| undefined,
 }));
 
 vi.mock("~/bridge/editor/useEditorProject", () => ({
@@ -23,7 +29,16 @@ vi.mock("~/bridge/editor/useEditorProject", () => ({
 }));
 
 vi.mock("~/ui/item/editor/useEditorItemEstimateIndex", () => ({
-	useEditorItemEstimateIndex: () => state.estimateState,
+	useEditorItemEstimateIndex: (
+		_project: unknown,
+		selection: {
+			readonly query: string;
+			readonly sort: "demand" | "fastest" | "slowest";
+		},
+	) => {
+		state.selection = selection;
+		return state.estimateState;
+	},
 }));
 
 vi.mock("~/ui/item/editor/EditorItemThumbnail", () => ({
@@ -64,38 +79,49 @@ const createItem = (id: string, title: string) => ({
 });
 
 beforeEach(() => {
+	const items = {
+		bakery: createItem("bakery", "Bakery"),
+		water: createItem("water", "Water"),
+		well: createItem("well", "Well"),
+	};
 	state.project = {
 		config: {
-			items: {
-				bakery: createItem("bakery", "Bakery"),
-				water: createItem("water", "Water"),
-				well: createItem("well", "Well"),
-			},
+			items,
 		},
 		projectId: "editor-test",
 		title: "Editor test",
 	};
 	state.estimateState = {
-		entries: [
+		maximumDemand: 64_429.17,
+		rows: [
 			{
-				demand: 0.05,
-				itemId: "bakery",
-				method: "static",
-				runtimeMs: 120_000,
-				status: "complete",
+				estimate: {
+					demand: 0.05,
+					itemId: "bakery",
+					method: "static",
+					runtimeMs: 120_000,
+					status: "complete",
+				},
+				item: items.bakery,
 			},
 			{
-				demand: 64_429.17,
-				itemId: "water",
-				method: "static",
-				runtimeMs: 0,
-				status: "complete",
+				estimate: {
+					demand: 64_429.17,
+					itemId: "water",
+					method: "static",
+					runtimeMs: 0,
+					status: "complete",
+				},
+				item: items.water,
 			},
 			{
-				demand: 50,
-				itemId: "well",
-				method: "static",
-				status: "partial",
+				estimate: {
+					demand: 50,
+					itemId: "well",
+					method: "static",
+					status: "partial",
+				},
+				item: items.well,
 			},
 		],
 		status: "ready",
@@ -112,7 +138,7 @@ afterEach(async () => {
 const renderList = async () => {
 	const Harness = () => {
 		const [query, setQuery] = useState("");
-		const [sort, setSort] = useState<EditorItemEstimateSort>("fastest");
+		const [sort, setSort] = useState<EditorItemEstimateSortSchema.Type>("fastest");
 		return createElement(EditorItemEstimateList, {
 			onQueryChange: setQuery,
 			onSortChange: setSort,
@@ -164,14 +190,18 @@ const setSort = async (container: HTMLElement, label: string) => {
 };
 
 describe("EditorItemEstimateList", () => {
-	it("searches, sorts by estimated runtime, and links each row to its Estimate detail", async () => {
+	it("binds query and sort to its data source and renders rows in source order", async () => {
 		const container = await renderList();
 
 		expect(readVisibleItemIds(container)).toEqual([
-			"water",
 			"bakery",
+			"water",
 			"well",
 		]);
+		expect(state.selection).toEqual({
+			query: "",
+			sort: "fastest",
+		});
 		expect(container.textContent).not.toContain("Expected");
 		expect(container.textContent).not.toContain("Guaranteed");
 		expect(container.textContent).not.toContain("Best");
@@ -195,28 +225,28 @@ describe("EditorItemEstimateList", () => {
 		expect(bakeryLink?.dataset.params).toContain('"sectionId":"estimate"');
 
 		await setSort(container, "Slowest first");
-		expect(readVisibleItemIds(container)).toEqual([
-			"bakery",
-			"water",
-			"well",
-		]);
+		expect(state.selection).toEqual({
+			query: "",
+			sort: "slowest",
+		});
 
 		await setSort(container, "Highest demand first");
-		expect(readVisibleItemIds(container)).toEqual([
-			"water",
-			"well",
-			"bakery",
-		]);
+		expect(state.selection).toEqual({
+			query: "",
+			sort: "demand",
+		});
 
 		await setSearch(container, "well");
-		expect(readVisibleItemIds(container)).toEqual([
-			"well",
-		]);
+		expect(state.selection).toEqual({
+			query: "well",
+			sort: "demand",
+		});
 	});
 
 	it("shows one loading state while the full-project batch is calculated", async () => {
 		state.estimateState = {
-			entries: [],
+			maximumDemand: 0,
+			rows: [],
 			status: "loading",
 		};
 		const container = await renderList();

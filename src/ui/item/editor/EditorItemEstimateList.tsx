@@ -1,15 +1,11 @@
-import { useMemo } from "react";
-
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { EditorItemEstimateSort } from "~/ui/item/editor/EditorItemEstimateSort";
-import { searchEditorItemsFx } from "~/editor/searchEditorItemsFx";
+import type { EditorItemEstimateSortSchema } from "~/editor/EditorItemEstimateSortSchema";
 import { EditorSelect, type EditorSelectOption } from "~/ui/form/EditorSelect";
 import { EditorItemEstimateListRow } from "~/ui/item/editor/EditorItemEstimateListRow";
 import { useEditorItemEstimateIndex } from "~/ui/item/editor/useEditorItemEstimateIndex";
 import { Status } from "~/ui/status/Status";
 
-const EstimateSortOptions: ReadonlyArray<EditorSelectOption<EditorItemEstimateSort>> = [
+const EstimateSortOptions: ReadonlyArray<EditorSelectOption<EditorItemEstimateSortSchema.Type>> = [
 	{
 		label: "Fastest first",
 		value: "fastest",
@@ -24,16 +20,6 @@ const EstimateSortOptions: ReadonlyArray<EditorSelectOption<EditorItemEstimateSo
 	},
 ];
 
-const compareRuntime = (
-	left: number | undefined,
-	right: number | undefined,
-	direction: EditorItemEstimateSort,
-) => {
-	if (left === undefined) return right === undefined ? 0 : 1;
-	if (right === undefined) return -1;
-	return direction === "fastest" ? left - right : right - left;
-};
-
 /** Lists all static item estimates without analyzing the authored graph on the renderer thread. */
 export const EditorItemEstimateList = ({
 	onQueryChange,
@@ -42,50 +28,15 @@ export const EditorItemEstimateList = ({
 	sort,
 }: {
 	readonly onQueryChange: (query: string) => void;
-	readonly onSortChange: (sort: EditorItemEstimateSort) => void;
+	readonly onSortChange: (sort: EditorItemEstimateSortSchema.Type) => void;
 	readonly query: string;
-	readonly sort: EditorItemEstimateSort;
+	readonly sort: EditorItemEstimateSortSchema.Type;
 }) => {
 	const project = useEditorProject();
-	const state = useEditorItemEstimateIndex(project);
-	const maximumDemand = Math.max(0, ...state.entries.map(({ demand }) => demand));
-	const rows = useMemo(() => {
-		const estimates = new Map(
-			state.entries.map((entry) => [
-				entry.itemId,
-				entry,
-			]),
-		);
-		return RendererRuntime.runSync(
-			searchEditorItemsFx(Object.values(project.config.items), query),
-		)
-			.flatMap((item) => {
-				const estimate = estimates.get(item.id);
-				return estimate === undefined
-					? []
-					: [
-							{
-								estimate,
-								item,
-							},
-						];
-			})
-			.sort(
-				(left, right) =>
-					(sort === "demand"
-						? right.estimate.demand - left.estimate.demand
-						: compareRuntime(
-								left.estimate.runtimeMs,
-								right.estimate.runtimeMs,
-								sort,
-							)) || left.item.title.localeCompare(right.item.title),
-			);
-	}, [
-		project.config.items,
+	const state = useEditorItemEstimateIndex(project, {
 		query,
 		sort,
-		state,
-	]);
+	});
 	return (
 		<section
 			className="h-full min-h-0 overflow-y-auto overscroll-contain"
@@ -126,7 +77,7 @@ export const EditorItemEstimateList = ({
 						title="Estimate calculation failed"
 					/>
 				) : null}
-				{state.status !== "loading" && rows.length === 0 ? (
+				{state.status !== "loading" && state.rows.length === 0 ? (
 					<p
 						className="rounded-xl border border-line bg-surface/80 p-4 text-sm text-muted"
 						data-ui="EditorItemEstimateSearchEmpty"
@@ -134,12 +85,12 @@ export const EditorItemEstimateList = ({
 						No items match the current search.
 					</p>
 				) : null}
-				{rows.map(({ estimate, item }) => (
+				{state.rows.map(({ estimate, item }) => (
 					<EditorItemEstimateListRow
 						estimate={estimate}
 						item={item}
 						key={item.uid}
-						maximumDemand={maximumDemand}
+						maximumDemand={state.maximumDemand}
 						projectId={project.projectId}
 					/>
 				))}

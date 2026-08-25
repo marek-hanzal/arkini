@@ -6,7 +6,9 @@ import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
 import { EditorItemEstimateQuantitySchema } from "~/editor/estimator/EditorItemEstimateQuantitySchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { EditorMcpEstimateInputSchema } from "./EditorMcpEstimateInputSchema";
 import { EditorMcpItemCollectionInputSchema } from "./EditorMcpItemCollectionInputSchema";
+import { readEditorMcpEstimateTextFx } from "./readEditorMcpEstimateTextFx";
 import { readEditorMcpItemCollectionTextFx } from "./readEditorMcpItemCollectionTextFx";
 import { readEditorMcpItemDetailTextFx } from "./readEditorMcpItemDetailTextFx";
 import { readEditorMcpItemEstimateTextFx } from "./readEditorMcpItemEstimateTextFx";
@@ -92,6 +94,20 @@ const createEditorMcpServer = (
 			description: "Count items in the open project by their canonical item type.",
 		},
 		async () => runTool(readProjectFx().pipe(Effect.flatMap(readEditorMcpItemMetaTextFx))),
+	);
+	server.registerTool(
+		"estimate",
+		{
+			description:
+				"Read one page of the global Estimate view for every item at quantity one. Supports the same fastest, slowest, and aggregate-demand ordering plus fuzzy search as the Editor UI. Use item_estimate for one item's selected route detail.",
+			inputSchema: EditorMcpEstimateInputSchema,
+		},
+		async (input) =>
+			runTool(
+				readProjectFx().pipe(
+					Effect.flatMap((project) => readEditorMcpEstimateTextFx(project, input)),
+				),
+			),
 	);
 	server.registerTool(
 		"item_collection",

@@ -66,7 +66,10 @@ const project = {
 	config: {
 		items: {
 			item: {
+				description: "Item description",
 				id: "item",
+				title: "Item",
+				type: "simple",
 			},
 		},
 	},
@@ -84,8 +87,11 @@ afterEach(async () => {
 });
 
 const StateProbe = () => {
-	const state = useEditorItemEstimateIndex(project);
-	return createElement("span", null, `${state.status}:${state.entries.length}`);
+	const state = useEditorItemEstimateIndex(project, {
+		query: "",
+		sort: "fastest",
+	});
+	return createElement("span", null, `${state.status}:${state.rows.length}`);
 };
 
 describe("useEditorItemEstimateIndex", () => {

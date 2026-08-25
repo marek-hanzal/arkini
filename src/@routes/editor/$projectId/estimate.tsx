@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import type { EditorItemEstimateSort } from "~/ui/item/editor/EditorItemEstimateSort";
+import type { EditorItemEstimateSortSchema } from "~/editor/EditorItemEstimateSortSchema";
 import { EditorEstimatePage } from "~/page/editor/EditorEstimatePage";
 
 interface EditorEstimateRouteSearch {
 	readonly query?: string;
-	readonly sort?: EditorItemEstimateSort;
+	readonly sort?: EditorItemEstimateSortSchema.Type;
 }
 
 export const Route = createFileRoute("/editor/$projectId/estimate")({

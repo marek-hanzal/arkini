@@ -1,3 +1,5 @@
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+
 export type EditorItemEstimateIndexMethod = "static";
 export type EditorItemEstimateIndexStatus = "complete" | "partial" | "unreachable";
 
@@ -8,4 +10,9 @@ export interface EditorItemEstimateIndexEntry {
 	readonly method: EditorItemEstimateIndexMethod;
 	readonly runtimeMs?: number;
 	readonly status: EditorItemEstimateIndexStatus;
+}
+
+export interface EditorItemEstimateIndexRow {
+	readonly estimate: EditorItemEstimateIndexEntry;
+	readonly item: ItemSchema.Type;
 }

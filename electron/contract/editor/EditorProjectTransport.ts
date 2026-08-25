@@ -4,6 +4,7 @@ export namespace EditorProjectTransport {
 		| "await-idle"
 		| "create-project"
 		| "delete-project"
+		| "delete-item"
 		| "delete-board-scenario"
 		| "export-json-directory"
 		| "import-json-directory"
@@ -106,6 +107,13 @@ export namespace EditorProjectTransport {
 	export interface UpsertItemRequest {
 		readonly projectId: string;
 		readonly item: unknown;
+	}
+
+	export interface DeleteItemRequest {
+		readonly projectId: string;
+		readonly itemUid: string;
+		readonly expectedRevision: number;
+		readonly force: boolean;
 	}
 
 	export interface ReplaceConfigRequest {

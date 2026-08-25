@@ -34,7 +34,8 @@ export const EditorItemDetail = ({
 		projectId: project.projectId,
 		itemUid: item.uid,
 	};
-	const editableSectionId = sectionId === "estimate" ? "identity" : sectionId;
+	const editableSectionId =
+		sectionId === "estimate" || sectionId === "delete" ? "identity" : sectionId;
 	const sections = RendererRuntime.runSync(readEditorItemSectionsFx(item));
 	return (
 		<EditorSectionPage

@@ -29,6 +29,10 @@ vi.mock("~/bridge/editor/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
+vi.mock("~/ui/editor/EditorHistoryBackButton", () => ({
+	EditorHistoryBackButton: () => createElement("span"),
+}));
+
 vi.mock("~/ui/item/editor/useEditorItemEstimateIndex", () => ({
 	useEditorItemEstimateIndex: (
 		_project: unknown,

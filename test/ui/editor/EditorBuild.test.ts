@@ -86,6 +86,10 @@ vi.mock("~/bridge/runtime/RendererRuntime", () => ({
 	},
 }));
 
+vi.mock("~/ui/editor/EditorHistoryBackButton", () => ({
+	EditorHistoryBackButton: () => createElement("span"),
+}));
+
 vi.mock("~/ui/button/Button", () => ({
 	Button: ({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) =>
 		createElement("button", props, children),

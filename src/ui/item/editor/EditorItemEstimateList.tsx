@@ -1,5 +1,6 @@
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import type { EditorItemEstimateSortSchema } from "~/editor/EditorItemEstimateSortSchema";
+import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import { EditorSelect, type EditorSelectOption } from "~/ui/form/EditorSelect";
 import {
 	selectableActiveClassName,
@@ -54,6 +55,12 @@ export const EditorItemEstimateList = ({
 			data-ui="EditorItemEstimateList"
 		>
 			<header className="ak-editor-page-header flex min-w-0 flex-wrap items-center gap-2 p-3">
+				<EditorHistoryBackButton
+					params={{
+						projectId: project.projectId,
+					}}
+					to="/editor/$projectId/editor/items/list"
+				/>
 				<input
 					type="search"
 					value={query}

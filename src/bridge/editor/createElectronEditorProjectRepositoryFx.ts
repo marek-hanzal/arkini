@@ -166,6 +166,8 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 				() => window.arkini.editor.deleteProject(projectId),
 				() => undefined,
 			),
+		deleteItemFx: (request) =>
+			callFx("delete-item", () => window.arkini.editor.deleteItem(request), parseCommit),
 		listProjectsFx: callFx(
 			"list-projects",
 			() => window.arkini.editor.listProjects(),

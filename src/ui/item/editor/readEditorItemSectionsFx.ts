@@ -28,6 +28,10 @@ const EditorItemSections = [
 		id: "estimate",
 		label: "Estimate",
 	},
+	{
+		id: "delete",
+		label: "Delete",
+	},
 ] as const satisfies ReadonlyArray<EditorItemSectionDescriptor>;
 
 const ProductionItemTypes = new Set<EditorItemType>([

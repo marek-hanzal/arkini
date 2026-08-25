@@ -80,6 +80,8 @@ const api: ArkiniElectronApi.Api = {
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectCreate, request),
 		deleteProject: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectDelete, projectId),
+		deleteItem: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectDeleteItem, request),
 		exportJsonDirectory: (projectId) =>
 			ipcRenderer.invoke(
 				ArkiniElectronApi.channels.editorProjectExportJsonDirectory,

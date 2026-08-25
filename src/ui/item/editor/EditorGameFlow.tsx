@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
+import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import {
 	selectableActiveClassName,
 	selectableInactiveClassName,
@@ -19,11 +20,13 @@ const readGraphFilterDescription = (direction: EditorOriginFlowDirection) =>
 export const EditorGameFlow = ({
 	direction,
 	itemId = "",
+	projectId,
 	onDirectionChange,
 	onItemIdChange,
 }: {
 	readonly direction: EditorOriginFlowDirection;
 	readonly itemId?: string;
+	readonly projectId: string;
 	readonly onDirectionChange: (direction: EditorOriginFlowDirection) => void;
 	readonly onItemIdChange: (itemId: string) => Promise<void>;
 }) => {
@@ -41,10 +44,18 @@ export const EditorGameFlow = ({
 		>
 			<div className="grid min-w-0 gap-1.5">
 				<div className="flex min-w-0 items-center justify-between gap-3">
-					<span className="flex min-w-0 items-center gap-1 text-sm">
-						<span className="font-semibold text-foreground">Flow</span>
-						<EditorInfoTooltip content={readGraphFilterDescription(direction)} />
-					</span>
+					<div className="flex min-w-0 items-center gap-2">
+						<EditorHistoryBackButton
+							params={{
+								projectId,
+							}}
+							to="/editor/$projectId/editor/items/list"
+						/>
+						<span className="flex min-w-0 items-center gap-1 text-sm">
+							<span className="font-semibold text-foreground">Flow</span>
+							<EditorInfoTooltip content={readGraphFilterDescription(direction)} />
+						</span>
+					</div>
 					<span className="shrink-0 rounded-full border border-line-strong bg-surface-raised px-3 py-1 text-xs font-semibold text-muted">
 						{options.length} items
 					</span>

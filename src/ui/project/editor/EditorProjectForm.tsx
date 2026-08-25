@@ -2,6 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCallback, type PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
 import { EditorFormSectionPage } from "~/ui/form/EditorFormSectionPage";
 import { EditorProjectFormProvider } from "~/ui/project/editor/EditorProjectFormContext";
@@ -42,6 +43,14 @@ export const EditorProjectForm = ({ children }: PropsWithChildren) => {
 				<EditorFormSectionPage
 					dirty={controller.isDirty}
 					error={controller.error}
+					leading={
+						<EditorHistoryBackButton
+							params={{
+								projectId: project.projectId,
+							}}
+							to="/editor/$projectId/editor/items/list"
+						/>
+					}
 					notice={
 						<EditorCompatibilityNotice
 							compatibility={controller.compatibility}

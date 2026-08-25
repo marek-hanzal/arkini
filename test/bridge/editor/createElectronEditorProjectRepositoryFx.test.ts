@@ -50,6 +50,7 @@ const installEditorApi = () => {
 		awaitIdle: vi.fn(async () => success(undefined)),
 		createProject: vi.fn(async () => success(project)),
 		deleteProject: vi.fn(async () => success(undefined)),
+		deleteItem: vi.fn(async () => success(commit)),
 		exportJsonDirectory: vi.fn(async () => success(null)),
 		importJsonDirectory: vi.fn(async () => success(descriptor)),
 		listProjects: vi.fn(async () =>
@@ -128,6 +129,14 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 		await expect(Effect.runPromise(repository.awaitIdleFx)).resolves.toBeUndefined();
 		const created = await Effect.runPromise(repository.createProjectFx(createRequest));
 		await Effect.runPromise(repository.deleteProjectFx("project-one"));
+		const deletedItem = await Effect.runPromise(
+			repository.deleteItemFx({
+				projectId: "project-one",
+				itemUid: "water",
+				expectedRevision: 1,
+				force: false,
+			}),
+		);
 		const listed = await Effect.runPromise(repository.listProjectsFx);
 		const read = await Effect.runPromise(repository.readProjectFx("project-one"));
 		const replacedConfig = await Effect.runPromise(
@@ -189,6 +198,12 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 		expect(editor.awaitIdle).toHaveBeenCalledOnce();
 		expect(editor.createProject).toHaveBeenCalledWith(createRequest);
 		expect(editor.deleteProject).toHaveBeenCalledWith("project-one");
+		expect(editor.deleteItem).toHaveBeenCalledWith({
+			projectId: "project-one",
+			itemUid: "water",
+			expectedRevision: 1,
+			force: false,
+		});
 		expect(editor.listProjects).toHaveBeenCalledOnce();
 		expect(editor.readProject).toHaveBeenCalledWith("project-one");
 		expect(editor.replaceConfig).toHaveBeenCalledWith({
@@ -242,6 +257,7 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 		]);
 		expect(replacedConfig).toEqual(commit);
 		expect(upsertedItem).toEqual(commit);
+		expect(deletedItem).toEqual(commit);
 		expect(created).toEqual(read);
 		expect(created).toEqual(replacedResource);
 		expect(created).toEqual(upsertedResources);

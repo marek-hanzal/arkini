@@ -5,6 +5,7 @@ import type { EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import { searchEditorItemsFx } from "~/editor/searchEditorItemsFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { PrimaryButtonLink } from "~/ui/button/Button";
+import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import { EditorItemListRow } from "~/ui/item/editor/EditorItemListRow";
 import { Status } from "~/ui/status/Status";
 
@@ -53,6 +54,7 @@ export const EditorItemList = ({
 			data-ui="EditorItemList"
 		>
 			<header className="ak-editor-page-header flex min-w-0 flex-wrap items-center gap-2 p-3">
+				<EditorHistoryBackButton to="/editor/welcome" />
 				<input
 					type="search"
 					value={query}

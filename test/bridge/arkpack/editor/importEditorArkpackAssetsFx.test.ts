@@ -55,6 +55,7 @@ describe("importEditorArkpackAssetsFx", () => {
 			readProjectFx: () => Effect.die("Unexpected project read."),
 			replaceConfigFx: () => Effect.die("Unexpected config save."),
 			replaceResourceFx: () => Effect.die("Unexpected resource replacement."),
+			deleteItemFx: () => Effect.die("Unexpected item delete."),
 			upsertItemFx: () => Effect.die("Unexpected item save."),
 			upsertResourcesFx,
 		};

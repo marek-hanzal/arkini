@@ -25,6 +25,18 @@ export const EditorAssetEdit = ({ filter, query, resourceId }: EditorAssetEdit.P
 				description={`Resource ${resourceId} is not present in this project.`}
 				icon="icon-[lucide--file-question]"
 				title="Asset not found"
+				action={
+					<EditorHistoryBackButton
+						params={{
+							projectId: controller.projectId,
+						}}
+						search={{
+							filter,
+							query,
+						}}
+						to="/editor/$projectId/assets"
+					/>
+				}
 			/>
 		);
 	return (

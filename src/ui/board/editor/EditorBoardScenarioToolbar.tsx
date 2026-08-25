@@ -2,6 +2,7 @@ import type { EditorProject } from "~/bridge/editor/EditorProject";
 import type { EditorBoardGame } from "~/bridge/editor/board/EditorBoardGame";
 import { useEditorBoardScenarioToolbar } from "~/ui/board/editor/useEditorBoardScenarioToolbar";
 import { Button } from "~/ui/button/Button";
+import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import { editorCollectionActionClassName } from "~/ui/form/EditorCollectionSelector";
 import { EditorSearchCombobox } from "~/ui/form/EditorSearchCombobox";
 
@@ -19,9 +20,15 @@ export const EditorBoardScenarioToolbar = ({
 	});
 	return (
 		<header
-			className="grid shrink-0 grid-cols-[minmax(16rem,32rem)_auto_minmax(0,1fr)] items-center gap-2 border-b border-line bg-surface px-3 py-2"
+			className="grid shrink-0 grid-cols-[auto_minmax(16rem,32rem)_auto_minmax(0,1fr)] items-center gap-2 border-b border-line bg-surface px-3 py-2"
 			data-ui="EditorBoardScenarioToolbar"
 		>
+			<EditorHistoryBackButton
+				params={{
+					projectId: project.projectId,
+				}}
+				to="/editor/$projectId/editor/items/list"
+			/>
 			<EditorSearchCombobox
 				displaySelectedLabel
 				emptyLabel="No scenarios match this search."

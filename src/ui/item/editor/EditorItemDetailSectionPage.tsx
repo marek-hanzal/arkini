@@ -5,6 +5,7 @@ import {
 	EditorItemMergesDetail,
 } from "~/ui/item/editor/EditorItemCapabilityDetails";
 import { EditorItemEstimateSection } from "~/ui/item/editor/EditorItemEstimateSection";
+import { EditorItemDeleteSection } from "~/ui/item/editor/EditorItemDeleteSection";
 import { EditorItemIdentityDetail } from "~/ui/item/editor/EditorItemIdentityDetail";
 import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
 import { EditorItemProductionDetail } from "~/ui/item/editor/EditorItemProductionDetail";
@@ -50,5 +51,7 @@ export const EditorItemDetailSectionPage = ({
 			return <EditorItemProductionDetail item={item} />;
 		case "estimate":
 			return <EditorItemEstimateSection itemId={item.id} />;
+		case "delete":
+			return <EditorItemDeleteSection item={item} />;
 	}
 };

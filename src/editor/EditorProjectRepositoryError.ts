@@ -4,6 +4,7 @@ export type EditorProjectRepositoryOperation =
 	| "await-idle"
 	| "create-project"
 	| "delete-project"
+	| "delete-item"
 	| "delete-board-scenario"
 	| "export-json-directory"
 	| "import-json-directory"

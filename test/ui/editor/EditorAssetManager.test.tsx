@@ -24,6 +24,10 @@ vi.mock("~/bridge/editor/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
+vi.mock("~/ui/editor/EditorHistoryBackButton", () => ({
+	EditorHistoryBackButton: () => createElement("span"),
+}));
+
 vi.mock("~/bridge/resource/editor/importEditorAssetsCommandAtom", () => ({
 	importEditorAssetsCommandAtom: {
 		key: "import-assets",

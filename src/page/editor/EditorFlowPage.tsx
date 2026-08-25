@@ -5,6 +5,7 @@ import { EditorGameFlow } from "~/ui/item/editor/EditorGameFlow";
 const flowRoute = getRouteApi("/editor/$projectId/flow");
 
 export const EditorFlowPage = () => {
+	const { projectId } = flowRoute.useParams();
 	const search = flowRoute.useSearch();
 	const navigate = useNavigate({
 		from: "/editor/$projectId/flow",
@@ -13,6 +14,7 @@ export const EditorFlowPage = () => {
 		<EditorGameFlow
 			direction={search.direction}
 			itemId={search.itemId}
+			projectId={projectId}
 			onDirectionChange={(direction) =>
 				navigate({
 					replace: true,

@@ -1,5 +1,7 @@
 import { memo } from "react";
 
+import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import {
 	selectableActiveClassName,
 	selectableInactiveClassName,
@@ -34,6 +36,7 @@ const EditorAssetGrid = memo(({ filter, query, resources }: EditorAssetGridProps
 ));
 
 export const EditorAssetManager = (props: EditorAssetManager.Props) => {
+	const project = useEditorProject();
 	const controller = useEditorAssetManagerController(props);
 	const importButton = (
 		<EditorAssetImportMenu
@@ -50,6 +53,12 @@ export const EditorAssetManager = (props: EditorAssetManager.Props) => {
 			data-ui="EditorAssetManager"
 		>
 			<header className="ak-editor-page-header flex min-w-0 flex-wrap items-center gap-2 p-3">
+				<EditorHistoryBackButton
+					params={{
+						projectId: project.projectId,
+					}}
+					to="/editor/$projectId/editor/items/list"
+				/>
 				<input
 					ref={controller.arkpackInputRef}
 					type="file"

@@ -42,6 +42,7 @@ const createRepository = (project: EditorProject | null): EditorProjectRepositor
 	readProjectFx: () => Effect.succeed(project),
 	replaceConfigFx: () => Effect.die("Unexpected config save."),
 	replaceResourceFx: () => Effect.die("Unexpected resource replacement."),
+	deleteItemFx: () => Effect.die("Unexpected item delete."),
 	upsertItemFx: () => Effect.die("Unexpected item save."),
 	upsertResourcesFx: () => Effect.die("Unexpected resource save."),
 });

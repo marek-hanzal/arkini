@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import { parseEditorItemSectionIdFx } from "~/page/editor/parseEditorItemSectionIdFx";
 import { readEditorItemSectionForPathFx } from "~/ui/item/editor/readEditorItemSectionForPathFx";
+import { readEditorItemFormSectionsFx } from "~/ui/item/editor/readEditorItemFormSectionsFx";
 import { readEditorItemSectionsFx } from "~/ui/item/editor/readEditorItemSectionsFx";
 
 const item = (type: EditorItem["type"]) =>
@@ -32,6 +33,7 @@ describe("EditorItemSections", () => {
 			"charges",
 			"merges",
 			"estimate",
+			"delete",
 		]);
 		expect(
 			Effect.runSync(readEditorItemSectionsFx(item("inventory"))).map(({ id }) => id),
@@ -41,6 +43,7 @@ describe("EditorItemSections", () => {
 			"charges",
 			"merges",
 			"estimate",
+			"delete",
 		]);
 		expect(
 			Effect.runSync(readEditorItemSectionsFx(item("producer"))).map(({ id }) => id),
@@ -51,7 +54,11 @@ describe("EditorItemSections", () => {
 			"merges",
 			"production",
 			"estimate",
+			"delete",
 		]);
+		expect(
+			Effect.runSync(readEditorItemFormSectionsFx(item("simple"))).map(({ id }) => id),
+		).not.toContain("delete");
 	});
 
 	it("routes schema issues to the section that owns their top-level field", () => {

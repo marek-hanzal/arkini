@@ -111,6 +111,7 @@ const projectChannels = [
 	ArkiniElectronApi.channels.editorAwaitIdle,
 	ArkiniElectronApi.channels.editorProjectCreate,
 	ArkiniElectronApi.channels.editorProjectDelete,
+	ArkiniElectronApi.channels.editorProjectDeleteItem,
 	ArkiniElectronApi.channels.editorProjectExportJsonDirectory,
 	ArkiniElectronApi.channels.editorProjectImportJsonDirectory,
 	ArkiniElectronApi.channels.editorProjectList,
@@ -175,6 +176,12 @@ describe("registerEditorProjectIpcFx", () => {
 		const upsertItemRequest = {
 			projectId: "project-one",
 			item: editorTestPayload.config.items.water,
+		};
+		const deleteItemRequest = {
+			projectId: "project-one",
+			itemUid: "water",
+			expectedRevision: 0,
+			force: false,
 		};
 		const upsertResourcesRequest = {
 			projectId: "project-one",
@@ -246,6 +253,7 @@ describe("registerEditorProjectIpcFx", () => {
 			replaceResourceRequest,
 		);
 		await invoke(ArkiniElectronApi.channels.editorProjectUpsertItem, upsertItemRequest);
+		await invoke(ArkiniElectronApi.channels.editorProjectDeleteItem, deleteItemRequest);
 		await invoke(
 			ArkiniElectronApi.channels.editorProjectUpsertResources,
 			upsertResourcesRequest,
@@ -257,6 +265,7 @@ describe("registerEditorProjectIpcFx", () => {
 		expect(repository.replaceConfigFx).toHaveBeenCalledWith(replaceConfigRequest);
 		expect(repository.replaceResourceFx).toHaveBeenCalledWith(replaceResourceRequest);
 		expect(repository.upsertItemFx).toHaveBeenCalledWith(upsertItemRequest);
+		expect(repository.deleteItemFx).toHaveBeenCalledWith(deleteItemRequest);
 		expect(repository.upsertResourcesFx).toHaveBeenCalledWith(upsertResourcesRequest);
 		await expect(
 			invoke(ArkiniElectronApi.channels.editorProjectCreate, {
@@ -350,7 +359,7 @@ describe("registerEditorProjectIpcFx", () => {
 				message: "SQLite read failed.",
 			},
 		});
-		expect(electron.handlers.size).toBe(17);
+		expect(electron.handlers.size).toBe(18);
 		electron.appListeners.get("will-quit")?.();
 		expect(electron.handlers.size).toBe(0);
 

@@ -67,6 +67,7 @@ const createRepository = (
 	readProjectFx: (projectId) => Effect.succeed(projects.get(projectId) ?? null),
 	replaceConfigFx: () => Effect.die("Unexpected replaceConfigFx call."),
 	replaceResourceFx: () => Effect.die("Unexpected replaceResourceFx call."),
+	deleteItemFx: () => Effect.die("Unexpected deleteItemFx call."),
 	upsertItemFx: () => Effect.die("Unexpected upsertItemFx call."),
 	upsertResourcesFx: () => Effect.die("Unexpected upsertResourcesFx call."),
 });

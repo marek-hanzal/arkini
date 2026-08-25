@@ -25,6 +25,14 @@ const upsertItemSchema = z
 		item: ItemSchema,
 	})
 	.strict();
+const deleteItemSchema = z
+	.object({
+		projectId: IdSchema,
+		itemUid: IdSchema,
+		expectedRevision: z.number().int().nonnegative(),
+		force: z.boolean(),
+	})
+	.strict();
 const replaceConfigSchema = z
 	.object({
 		projectId: IdSchema,
@@ -62,6 +70,12 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 				parseEditorProjectIpcRequestFx("read-project", IdSchema, candidate),
 			parseDeleteProjectIdFx: (candidate: unknown) =>
 				parseEditorProjectIpcRequestFx("delete-project", IdSchema, candidate),
+			parseDeleteItemFx: (
+				candidate: unknown,
+			): Effect.Effect<
+				EditorProjectRepository.DeleteItemProps,
+				EditorProjectRepositoryError
+			> => parseEditorProjectIpcRequestFx("delete-item", deleteItemSchema, candidate),
 			parseReplaceConfigFx: (
 				candidate: unknown,
 			): Effect.Effect<

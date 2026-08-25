@@ -1,6 +1,7 @@
 import { EditorBuildDiagnostics } from "~/ui/arkpack/editor/EditorBuildDiagnostics";
 import { useEditorBuildController } from "~/ui/arkpack/editor/useEditorBuildController";
 import { Button, PrimaryButton } from "~/ui/button/Button";
+import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 
 export const EditorBuild = () => {
 	const controller = useEditorBuildController();
@@ -10,16 +11,25 @@ export const EditorBuild = () => {
 			className="grid h-full min-h-0 content-start gap-3 overflow-y-auto overscroll-contain p-3"
 			data-ui="EditorBuild"
 		>
-			<header>
-				<h1 className="text-2xl font-semibold">Build</h1>
-				<p className="mt-1 text-sm text-muted">
-					Validate one exact saved project snapshot and produce immutable Arkpack bytes.
-				</p>
-				<p className="mt-1 text-xs text-subtle">
-					Arkpack v{controller.project.version}. Compatible edits keep saves and Board
-					scenarios; a major project save permanently deletes its scenarios and published
-					game saves start fresh when loaded.
-				</p>
+			<header className="flex items-start gap-2">
+				<EditorHistoryBackButton
+					params={{
+						projectId: controller.project.projectId,
+					}}
+					to="/editor/$projectId/editor/items/list"
+				/>
+				<div>
+					<h1 className="text-2xl font-semibold">Build</h1>
+					<p className="mt-1 text-sm text-muted">
+						Validate one exact saved project snapshot and produce immutable Arkpack
+						bytes.
+					</p>
+					<p className="mt-1 text-xs text-subtle">
+						Arkpack v{controller.project.version}. Compatible edits keep saves and Board
+						scenarios; a major project save permanently deletes its scenarios and
+						published game saves start fresh when loaded.
+					</p>
+				</div>
 			</header>
 			<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">
 				<div className="flex flex-wrap items-center justify-between gap-3">

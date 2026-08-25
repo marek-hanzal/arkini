@@ -25,6 +25,13 @@ export namespace EditorProjectRepository {
 		readonly item: ItemSchema.Type;
 	}
 
+	export interface DeleteItemProps {
+		readonly projectId: string;
+		readonly itemUid: string;
+		readonly expectedRevision: number;
+		readonly force: boolean;
+	}
+
 	export interface ReplaceConfigProps {
 		readonly projectId: string;
 		readonly expectedRevision: number;
@@ -64,6 +71,9 @@ export interface EditorProjectRepositoryService {
 	readonly deleteProjectFx: (
 		projectId: string,
 	) => Effect.Effect<void, EditorProjectRepositoryError>;
+	readonly deleteItemFx: (
+		props: EditorProjectRepository.DeleteItemProps,
+	) => Effect.Effect<EditorProjectCommit, EditorProjectRepositoryError>;
 	readonly listProjectsFx: Effect.Effect<
 		ReadonlyArray<EditorProjectDescriptor>,
 		EditorProjectRepositoryError

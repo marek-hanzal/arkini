@@ -12,6 +12,8 @@ import {
 	type EditorProjectRepositoryOperation,
 } from "~/editor/EditorProjectRepositoryError";
 import type { EditorProjectResourceRecordSchema } from "~/editor/EditorProjectResourceRecordSchema";
+import { forceDeleteEditorItemFx } from "~/editor/forceDeleteEditorItemFx";
+import { readEditorItemDeleteBlockersFx } from "~/editor/readEditorItemDeleteBlockersFx";
 import {
 	EditorProjectCompatibility,
 	type EditorProjectCompatibilityLevel,
@@ -19,13 +21,14 @@ import {
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { ElectronMainRuntime } from "../../../ElectronMainRuntime";
 import { runSqliteEditorProjectTransactionFx } from "./runSqliteEditorProjectTransactionFx";
 import { SqliteEditorProjectResourceRowSchema } from "../schema/SqliteEditorProjectResourceRowSchema";
 import { SqliteEditorProjectRowSchema } from "../schema/SqliteEditorProjectRowSchema";
 
 type CommitOperations = Pick<
 	EditorProjectRepositoryService,
-	"replaceConfigFx" | "replaceResourceFx" | "upsertItemFx" | "upsertResourcesFx"
+	"deleteItemFx" | "replaceConfigFx" | "replaceResourceFx" | "upsertItemFx" | "upsertResourcesFx"
 >;
 
 const createRepositoryError = (
@@ -258,6 +261,70 @@ export const createSqliteEditorProjectCommitOperationsFx = Effect.fn(
 		);
 	});
 
+	const deleteItemFx: CommitOperations["deleteItemFx"] = Effect.fn(
+		"SqliteEditorProjectRepository.deleteItemFx",
+	)(function* ({ expectedRevision, force, itemUid, projectId }) {
+		const nowMs = yield* Clock.currentTimeMillis;
+		return yield* writeLock.withPermits(1)(
+			runSqliteEditorProjectTransactionFx(database, () => {
+				const current = readProjectRow(selectProject, projectId, "delete-item");
+				if (current === null)
+					throw createRepositoryError(
+						"delete-item",
+						`Editor project ${projectId} does not exist.`,
+					);
+				assertExpectedRevision(current, expectedRevision, "delete-item");
+				const entry = Object.entries(current.config.items).find(
+					([, item]) => item.uid === itemUid,
+				);
+				if (entry === undefined)
+					throw createRepositoryError(
+						"delete-item",
+						`Item UID ${itemUid} does not exist.`,
+					);
+				const [itemId] = entry;
+				const blockers = ElectronMainRuntime.runSync(
+					readEditorItemDeleteBlockersFx({
+						config: current.config,
+						itemId,
+					}),
+				);
+				if (blockers.length > 0 && !force)
+					throw createRepositoryError(
+						"delete-item",
+						`Item ${itemId} is still referenced in ${blockers.length} ${blockers.length === 1 ? "place" : "places"}.`,
+					);
+				const config = force
+					? ElectronMainRuntime.runSync(
+							forceDeleteEditorItemFx({
+								config: current.config,
+								itemId,
+							}),
+						).config
+					: GameConfigSchema.parse({
+							...current.config,
+							items: Object.fromEntries(
+								Object.entries(current.config.items).filter(
+									([id]) => id !== itemId,
+								),
+							),
+						});
+				const revision = reviseProjectRecord(current, config, nowMs);
+				writeProjectRecord(revision.record, revision.dropBoardScenarios);
+				return materializeProjectCommit(revision.record);
+			}).pipe(
+				Effect.mapError((cause) =>
+					createRepositoryError(
+						"delete-item",
+						`Item UID ${itemUid} could not be deleted from project ${projectId}.`,
+						cause,
+					),
+				),
+				Effect.uninterruptible,
+			),
+		);
+	});
+
 	const replaceConfigFx: CommitOperations["replaceConfigFx"] = Effect.fn(
 		"SqliteEditorProjectRepository.replaceConfigFx",
 	)(function* ({ projectId, expectedRevision, config: candidateConfig }) {
@@ -421,6 +488,7 @@ export const createSqliteEditorProjectCommitOperationsFx = Effect.fn(
 	});
 
 	return {
+		deleteItemFx,
 		upsertItemFx,
 		replaceConfigFx,
 		upsertResourcesFx,

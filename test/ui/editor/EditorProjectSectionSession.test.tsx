@@ -15,6 +15,10 @@ vi.mock("~/ui/editor/useEditorUnsavedChangesRegistration", () => ({
 	useEditorUnsavedChangesRegistration: () => undefined,
 }));
 
+vi.mock("~/ui/editor/EditorHistoryBackButton", () => ({
+	EditorHistoryBackButton: () => createElement("span"),
+}));
+
 vi.mock("@tanstack/react-router", async (importOriginal) => {
 	const original = await importOriginal<typeof import("@tanstack/react-router")>();
 	return {

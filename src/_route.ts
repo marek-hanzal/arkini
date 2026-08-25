@@ -25,6 +25,7 @@ import { Route as ActionLoadGamePackageIdRouteImport } from "./@routes/action/lo
 import { Route as EditorProjectIdAssetsRouteImport } from "./@routes/editor/$projectId/assets"
 import { Route as EditorProjectIdBoardRouteImport } from "./@routes/editor/$projectId/board"
 import { Route as EditorProjectIdBuildRouteImport } from "./@routes/editor/$projectId/build"
+import { Route as EditorProjectIdChatgptRouteImport } from "./@routes/editor/$projectId/chatgpt"
 import { Route as EditorProjectIdEditorRouteImport } from "./@routes/editor/$projectId/editor"
 import { Route as EditorProjectIdEstimateRouteImport } from "./@routes/editor/$projectId/estimate"
 import { Route as EditorProjectIdFlowRouteImport } from "./@routes/editor/$projectId/flow"
@@ -138,6 +139,11 @@ const EditorProjectIdBoardRoute = EditorProjectIdBoardRouteImport.update({
 const EditorProjectIdBuildRoute = EditorProjectIdBuildRouteImport.update({
   id: "/build",
   path: "/build",
+  getParentRoute: () => EditorProjectIdRoute,
+} as any)
+const EditorProjectIdChatgptRoute = EditorProjectIdChatgptRouteImport.update({
+  id: "/chatgpt",
+  path: "/chatgpt",
   getParentRoute: () => EditorProjectIdRoute,
 } as any)
 const EditorProjectIdEditorRoute = EditorProjectIdEditorRouteImport.update({
@@ -358,6 +364,7 @@ export interface FileRoutesByFullPath {
   "/editor/$projectId/assets": typeof EditorProjectIdAssetsRouteWithChildren
   "/editor/$projectId/board": typeof EditorProjectIdBoardRouteWithChildren
   "/editor/$projectId/build": typeof EditorProjectIdBuildRoute
+  "/editor/$projectId/chatgpt": typeof EditorProjectIdChatgptRoute
   "/editor/$projectId/editor": typeof EditorProjectIdEditorRouteWithChildren
   "/editor/$projectId/estimate": typeof EditorProjectIdEstimateRoute
   "/editor/$projectId/flow": typeof EditorProjectIdFlowRoute
@@ -407,6 +414,7 @@ export interface FileRoutesByTo {
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
   "/editor/$projectId/build": typeof EditorProjectIdBuildRoute
+  "/editor/$projectId/chatgpt": typeof EditorProjectIdChatgptRoute
   "/editor/$projectId/estimate": typeof EditorProjectIdEstimateRoute
   "/editor/$projectId/flow": typeof EditorProjectIdFlowRoute
   "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
@@ -456,6 +464,7 @@ export interface FileRoutesById {
   "/editor/$projectId/assets": typeof EditorProjectIdAssetsRouteWithChildren
   "/editor/$projectId/board": typeof EditorProjectIdBoardRouteWithChildren
   "/editor/$projectId/build": typeof EditorProjectIdBuildRoute
+  "/editor/$projectId/chatgpt": typeof EditorProjectIdChatgptRoute
   "/editor/$projectId/editor": typeof EditorProjectIdEditorRouteWithChildren
   "/editor/$projectId/estimate": typeof EditorProjectIdEstimateRoute
   "/editor/$projectId/flow": typeof EditorProjectIdFlowRoute
@@ -510,6 +519,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/assets"
     | "/editor/$projectId/board"
     | "/editor/$projectId/build"
+    | "/editor/$projectId/chatgpt"
     | "/editor/$projectId/editor"
     | "/editor/$projectId/estimate"
     | "/editor/$projectId/flow"
@@ -559,6 +569,7 @@ export interface FileRouteTypes {
     | "/game/$packageId"
     | "/action/load-game/$packageId"
     | "/editor/$projectId/build"
+    | "/editor/$projectId/chatgpt"
     | "/editor/$projectId/estimate"
     | "/editor/$projectId/flow"
     | "/game/$packageId/cheats"
@@ -607,6 +618,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/assets"
     | "/editor/$projectId/board"
     | "/editor/$projectId/build"
+    | "/editor/$projectId/chatgpt"
     | "/editor/$projectId/editor"
     | "/editor/$projectId/estimate"
     | "/editor/$projectId/flow"
@@ -766,6 +778,13 @@ declare module "@tanstack/react-router" {
       path: "/build"
       fullPath: "/editor/$projectId/build"
       preLoaderRoute: typeof EditorProjectIdBuildRouteImport
+      parentRoute: typeof EditorProjectIdRoute
+    }
+    "/editor/$projectId/chatgpt": {
+      id: "/editor/$projectId/chatgpt"
+      path: "/chatgpt"
+      fullPath: "/editor/$projectId/chatgpt"
+      preLoaderRoute: typeof EditorProjectIdChatgptRouteImport
       parentRoute: typeof EditorProjectIdRoute
     }
     "/editor/$projectId/editor": {
@@ -1229,6 +1248,7 @@ interface EditorProjectIdRouteChildren {
   EditorProjectIdAssetsRoute: typeof EditorProjectIdAssetsRouteWithChildren
   EditorProjectIdBoardRoute: typeof EditorProjectIdBoardRouteWithChildren
   EditorProjectIdBuildRoute: typeof EditorProjectIdBuildRoute
+  EditorProjectIdChatgptRoute: typeof EditorProjectIdChatgptRoute
   EditorProjectIdEditorRoute: typeof EditorProjectIdEditorRouteWithChildren
   EditorProjectIdEstimateRoute: typeof EditorProjectIdEstimateRoute
   EditorProjectIdFlowRoute: typeof EditorProjectIdFlowRoute
@@ -1239,6 +1259,7 @@ const EditorProjectIdRouteChildren: EditorProjectIdRouteChildren = {
   EditorProjectIdAssetsRoute: EditorProjectIdAssetsRouteWithChildren,
   EditorProjectIdBoardRoute: EditorProjectIdBoardRouteWithChildren,
   EditorProjectIdBuildRoute: EditorProjectIdBuildRoute,
+  EditorProjectIdChatgptRoute: EditorProjectIdChatgptRoute,
   EditorProjectIdEditorRoute: EditorProjectIdEditorRouteWithChildren,
   EditorProjectIdEstimateRoute: EditorProjectIdEstimateRoute,
   EditorProjectIdFlowRoute: EditorProjectIdFlowRoute,

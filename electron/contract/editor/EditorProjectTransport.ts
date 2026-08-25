@@ -15,6 +15,7 @@ export namespace EditorProjectTransport {
 		| "read-board-scenario"
 		| "replace-config"
 		| "replace-resource"
+		| "save-resource"
 		| "upsert-item"
 		| "upsert-resource"
 		| "write-board-scenario";
@@ -127,6 +128,13 @@ export namespace EditorProjectTransport {
 		readonly config: unknown;
 		readonly currentId: string;
 		readonly expectedRevision: number;
+		readonly projectId: string;
+		readonly resource: unknown;
+	}
+
+	export interface SaveResourceRequest {
+		readonly expectedRevision: number;
+		readonly overwrite: boolean;
 		readonly projectId: string;
 		readonly resource: unknown;
 	}

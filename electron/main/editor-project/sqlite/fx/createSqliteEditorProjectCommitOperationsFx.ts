@@ -28,7 +28,12 @@ import { SqliteEditorProjectRowSchema } from "../schema/SqliteEditorProjectRowSc
 
 type CommitOperations = Pick<
 	EditorProjectRepositoryService,
-	"deleteItemFx" | "replaceConfigFx" | "replaceResourceFx" | "upsertItemFx" | "upsertResourcesFx"
+	| "deleteItemFx"
+	| "replaceConfigFx"
+	| "replaceResourceFx"
+	| "saveResourceFx"
+	| "upsertItemFx"
+	| "upsertResourcesFx"
 >;
 
 const createRepositoryError = (
@@ -418,6 +423,49 @@ export const createSqliteEditorProjectCommitOperationsFx = Effect.fn(
 		);
 	});
 
+	const saveResourceFx: CommitOperations["saveResourceFx"] = Effect.fn(
+		"SqliteEditorProjectRepository.saveResourceFx",
+	)(function* ({ expectedRevision, overwrite, projectId, resource: candidateResource }) {
+		const resource = yield* Effect.try({
+			try: () => ResourceSchema.parse(candidateResource),
+			catch: (cause) =>
+				createRepositoryError("save-resource", "The editor resource is invalid.", cause),
+		});
+		const nowMs = yield* Clock.currentTimeMillis;
+		return yield* writeLock.withPermits(1)(
+			runSqliteEditorProjectTransactionFx(database, () => {
+				const current = readProjectRow(selectProject, projectId, "save-resource");
+				if (current === null)
+					throw createRepositoryError(
+						"save-resource",
+						`Editor project ${projectId} does not exist.`,
+					);
+				assertExpectedRevision(current, expectedRevision, "save-resource");
+				if (!overwrite && resourceExists.get(projectId, resource.id) !== undefined)
+					throw createRepositoryError(
+						"save-resource",
+						`Resource ID ${resource.id} already exists.`,
+					);
+				upsertResource.run(projectId, resource.id, resource.mime, resource.bytes);
+				const revision = reviseProjectRecord(current, current.config, nowMs, "minor");
+				writeProjectRecord(revision.record, revision.dropBoardScenarios);
+				return materializeProject(
+					revision.record,
+					readResourceRows(selectResources, projectId, "save-resource"),
+				);
+			}).pipe(
+				Effect.mapError((cause) =>
+					createRepositoryError(
+						"save-resource",
+						`Resource ${resource.id} could not be saved in project ${projectId}.`,
+						cause,
+					),
+				),
+				Effect.uninterruptible,
+			),
+		);
+	});
+
 	const replaceResourceFx: CommitOperations["replaceResourceFx"] = Effect.fn(
 		"SqliteEditorProjectRepository.replaceResourceFx",
 	)(function* ({
@@ -494,6 +542,7 @@ export const createSqliteEditorProjectCommitOperationsFx = Effect.fn(
 		upsertItemFx,
 		replaceConfigFx,
 		upsertResourcesFx,
+		saveResourceFx,
 		replaceResourceFx,
 	} satisfies CommitOperations;
 });

@@ -2,6 +2,11 @@ import type { AppearanceAccentSchema } from "./appearance/AppearanceAccentSchema
 import type { AppearanceThemeSchema } from "./appearance/AppearanceThemeSchema";
 import type { CheatAvailabilitySchema } from "./cheat/CheatAvailabilitySchema";
 import type { CliInstallationStatus } from "./cli/CliInstallationStatus";
+import type {
+	ChatGptAssetCandidateSchema,
+	ChatGptSurfaceSchema,
+	ChatGptViewStateSchema,
+} from "./chatgpt/ChatGptSurfaceSchema";
 import type { LastPackageIdSchema } from "./launcher/LastPackageIdSchema";
 import type { DiagnosticRecord } from "./diagnostics/DiagnosticRecord";
 import type { EditorProjectTransport } from "./editor/EditorProjectTransport";
@@ -28,6 +33,9 @@ export namespace ArkiniElectronApi {
 		appearanceAccentWrite: "arkini:appearance:accent:write",
 		cheatAvailabilityRead: "arkini:cheats:available:read",
 		cheatAvailabilityWrite: "arkini:cheats:available:write",
+		chatGptSurfaceSet: "arkini:chatgpt:surface:set",
+		chatGptStateChanged: "arkini:chatgpt:state:changed",
+		chatGptAssetCandidate: "arkini:chatgpt:asset:candidate",
 		cliStatus: "arkini:cli:status",
 		cliInstall: "arkini:cli:install",
 		cliUninstall: "arkini:cli:uninstall",
@@ -46,6 +54,7 @@ export namespace ArkiniElectronApi {
 		editorProjectChanged: "arkini:editor:project:changed",
 		editorProjectReplaceConfig: "arkini:editor:project:replace-config",
 		editorProjectReplaceResource: "arkini:editor:project:replace-resource",
+		editorProjectSaveResource: "arkini:editor:project:save-resource",
 		editorProjectUpsertItem: "arkini:editor:project:upsert-item",
 		editorProjectUpsertResources: "arkini:editor:project:upsert-resources",
 		editorBoardScenarioList: "arkini:editor:board-scenario:list",
@@ -109,6 +118,15 @@ export namespace ArkiniElectronApi {
 			readonly readAvailable: () => Promise<CheatAvailabilitySchema.Type>;
 			readonly writeAvailable: (available: CheatAvailabilitySchema.Type) => Promise<void>;
 		};
+		readonly chatGpt: {
+			readonly setSurface: (surface: ChatGptSurfaceSchema.Type | null) => Promise<void>;
+			readonly onStateChanged: (
+				listener: (state: ChatGptViewStateSchema.Type) => void,
+			) => () => void;
+			readonly onAssetCandidate: (
+				listener: (candidate: ChatGptAssetCandidateSchema.Type) => void,
+			) => () => void;
+		};
 		readonly cli: {
 			readonly status: () => Promise<CliInstallationStatus>;
 			readonly install: () => Promise<CliInstallationStatus>;
@@ -149,6 +167,9 @@ export namespace ArkiniElectronApi {
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Commit>>;
 			readonly replaceResource: (
 				request: EditorProjectTransport.ReplaceResourceRequest,
+			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project>>;
+			readonly saveResource: (
+				request: EditorProjectTransport.SaveResourceRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project>>;
 			readonly upsertItem: (
 				request: EditorProjectTransport.UpsertItemRequest,

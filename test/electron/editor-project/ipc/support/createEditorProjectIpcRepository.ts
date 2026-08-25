@@ -35,6 +35,7 @@ export const createEditorProjectIpcRepository = (): SqliteEditorProjectRepositor
 	readProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	replaceConfigFx: vi.fn(() => Effect.succeed(editorProjectIpcCommit)),
 	replaceResourceFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
+	saveResourceFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	upsertItemFx: vi.fn(() => Effect.succeed(editorProjectIpcCommit)),
 	upsertResourcesFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	listBoardScenariosFx: vi.fn(() => Effect.succeed([])),

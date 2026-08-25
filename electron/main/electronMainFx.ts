@@ -24,6 +24,8 @@ import { registerEditorProjectIpcFx } from "./editor-project/ipc/registerEditorP
 import { createSqliteEditorProjectRepositoryFx } from "./editor-project/sqlite/fx/createSqliteEditorProjectRepositoryFx";
 import { createFilesystemCliInstallationFx } from "./cli/createFilesystemCliInstallationFx";
 import { registerCliInstallationIpcFx } from "./cli/registerCliInstallationIpcFx";
+import { createChatGptViewControllerOwnershipFx } from "./chatgpt/createChatGptViewControllerOwnershipFx";
+import { registerChatGptIpcFx } from "./chatgpt/registerChatGptIpcFx";
 
 export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const hasSingleInstanceLock = app.requestSingleInstanceLock();
@@ -148,6 +150,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	});
 	yield* Effect.sync(() => app.once("will-quit", editorMcpOwnership.closeSync));
 	const windowModeControllerOwnership = yield* createWindowModeControllerOwnershipFx();
+	const chatGptViewControllerOwnership = yield* createChatGptViewControllerOwnershipFx();
 	const appearanceTheme = yield* appearancePreferences.readThemeFx;
 	yield* Effect.sync(() => {
 		nativeTheme.themeSource = appearanceTheme;
@@ -197,9 +200,14 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		cliInstallation,
 		trustedRenderer,
 	});
+	yield* registerChatGptIpcFx({
+		ownership: chatGptViewControllerOwnership,
+		trustedRenderer,
+	});
 	const createWindowFx = windowPreferences.readModeFx.pipe(
 		Effect.flatMap((windowMode) =>
 			createMainWindowFx({
+				chatGptViewControllerOwnership,
 				trustedRenderer,
 				windowMode,
 				windowModeControllerOwnership,

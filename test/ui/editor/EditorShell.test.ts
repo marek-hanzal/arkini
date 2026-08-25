@@ -143,6 +143,11 @@ const createTestRouter = ({
 		path: "estimate",
 		component: () => createElement("p", null, "Estimate destination"),
 	});
+	const chatGptRoute = createRoute({
+		getParentRoute: () => editorRoute,
+		path: "chatgpt",
+		component: () => createElement("p", null, "ChatGPT destination"),
+	});
 	const flowRoute = createRoute({
 		getParentRoute: () => editorRoute,
 		path: "flow",
@@ -182,6 +187,7 @@ const createTestRouter = ({
 				itemEditRoute,
 				estimateRoute,
 				assetsRoute,
+				chatGptRoute,
 				flowRoute,
 				projectRoute,
 				buildRoute,
@@ -237,6 +243,21 @@ const readLink = (container: HTMLElement, label: string) => {
 };
 
 describe("EditorShell", () => {
+	it("places ChatGPT directly after Assets and marks its route active", async () => {
+		const router = createTestRouter({
+			initialEntry: "/editor/editor-test/chatgpt",
+		});
+		const container = await renderRouter(router);
+		const workspaces = Array.from(
+			container.querySelectorAll<HTMLElement>("[data-workspace-id]"),
+		).map(({ dataset }) => dataset.workspaceId);
+		const assetsIndex = workspaces.indexOf("assets");
+
+		expect(workspaces[assetsIndex + 1]).toBe("chatgpt");
+		expect(readLink(container, "ChatGPT").getAttribute("aria-current")).toBe("page");
+		expect(container.textContent).toContain("ChatGPT destination");
+	});
+
 	it("orders gameplay testing before the final build step", async () => {
 		const router = createTestRouter({
 			initialEntry: "/editor/editor-test/board",

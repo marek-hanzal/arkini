@@ -7,6 +7,7 @@ export const UnusedEditorProjectRepository = {
 	deleteProjectFx: () => Effect.die("Unexpected editor project deletion."),
 	listBoardScenariosFx: () => Effect.die("Unexpected Board scenario list."),
 	readBoardScenarioFx: () => Effect.die("Unexpected Board scenario read."),
+	saveResourceFx: () => Effect.die("Unexpected single resource save."),
 	writeBoardScenarioFx: () => Effect.die("Unexpected Board scenario write."),
 	deleteBoardScenarioFx: () => Effect.die("Unexpected Board scenario delete."),
 } satisfies Pick<
@@ -14,6 +15,7 @@ export const UnusedEditorProjectRepository = {
 	| "deleteProjectFx"
 	| "listBoardScenariosFx"
 	| "readBoardScenarioFx"
+	| "saveResourceFx"
 	| "writeBoardScenarioFx"
 	| "deleteBoardScenarioFx"
 >;

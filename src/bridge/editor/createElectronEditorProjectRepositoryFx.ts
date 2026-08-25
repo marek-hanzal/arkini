@@ -203,6 +203,8 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 				() => window.arkini.editor.replaceResource(request),
 				parseProject,
 			),
+		saveResourceFx: (request) =>
+			callFx("save-resource", () => window.arkini.editor.saveResource(request), parseProject),
 		upsertItemFx: (request) =>
 			callFx("upsert-item", () => window.arkini.editor.upsertItem(request), parseCommit),
 		upsertResourcesFx: (request) =>

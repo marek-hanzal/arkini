@@ -13,9 +13,13 @@ import { registerWindowModeControllerFx } from "./window/registerWindowModeContr
 import type { WindowModeControllerOwnership } from "./window/WindowModeControllerOwnership";
 import type { WindowPreferences } from "./window/WindowPreferences";
 import type { WindowModeSchema } from "../contract/window/WindowModeSchema";
+import { createChatGptViewControllerFx } from "./chatgpt/createChatGptViewControllerFx";
+import type { ChatGptViewControllerOwnership } from "./chatgpt/ChatGptViewControllerOwnership";
+import { registerChatGptViewControllerFx } from "./chatgpt/registerChatGptViewControllerFx";
 
 export namespace createMainWindowFx {
 	export interface Props {
+		readonly chatGptViewControllerOwnership: ChatGptViewControllerOwnership;
 		readonly trustedRenderer: TrustedRenderer;
 		readonly windowMode: WindowModeSchema.Type;
 		readonly windowModeControllerOwnership: WindowModeControllerOwnership;
@@ -25,6 +29,7 @@ export namespace createMainWindowFx {
 
 export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 	({
+		chatGptViewControllerOwnership,
 		trustedRenderer,
 		windowMode,
 		windowModeControllerOwnership,
@@ -55,6 +60,12 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 
 			return yield* Effect.gen(function* () {
 				yield* trustedRenderer.registerWindowFx(window);
+				const chatGptViewController = yield* createChatGptViewControllerFx(window);
+				yield* registerChatGptViewControllerFx({
+					controller: chatGptViewController,
+					ownership: chatGptViewControllerOwnership,
+					window,
+				});
 				if (windowMode === "bordered") {
 					yield* Effect.sync(() => window.maximize());
 				}

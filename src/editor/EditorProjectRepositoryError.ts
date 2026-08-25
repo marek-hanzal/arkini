@@ -15,6 +15,7 @@ export type EditorProjectRepositoryOperation =
 	| "read-board-scenario"
 	| "replace-config"
 	| "replace-resource"
+	| "save-resource"
 	| "upsert-item"
 	| "upsert-resource"
 	| "write-board-scenario";

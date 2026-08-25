@@ -123,6 +123,78 @@ describe("SQLite editor-project writes", () => {
 		).toEqual(updated.config.items.water);
 	});
 
+	it("requires an exact revision and explicit policy before replacing one resource", async () => {
+		const repository = await harness.openRepository();
+		const created = await harness.createProject(repository);
+		const existing = created.resources[0];
+		if (existing === undefined) throw new Error("Expected a fixture resource.");
+		const replacement = {
+			...existing,
+			bytes: Uint8Array.of(9, 8, 7),
+		};
+
+		await expect(
+			Effect.runPromise(
+				repository.saveResourceFx({
+					expectedRevision: created.revision,
+					overwrite: false,
+					projectId: created.projectId,
+					resource: replacement,
+				}),
+			),
+		).rejects.toThrow(`Resource ID ${existing.id} already exists`);
+		expect(
+			(await Effect.runPromise(repository.readProjectFx(created.projectId)))?.revision,
+		).toBe(created.revision);
+
+		const replaced = await Effect.runPromise(
+			repository.saveResourceFx({
+				expectedRevision: created.revision,
+				overwrite: true,
+				projectId: created.projectId,
+				resource: replacement,
+			}),
+		);
+		expect(replaced.resources.find(({ id }) => id === existing.id)?.bytes).toEqual(
+			replacement.bytes,
+		);
+		await expect(
+			Effect.runPromise(
+				repository.saveResourceFx({
+					expectedRevision: created.revision,
+					overwrite: true,
+					projectId: created.projectId,
+					resource: {
+						...replacement,
+						bytes: Uint8Array.of(1),
+					},
+				}),
+			),
+		).rejects.toThrow(`changed from revision ${created.revision} to ${replaced.revision}`);
+	});
+
+	it("inserts one new revision-pinned resource without overwrite permission", async () => {
+		const repository = await harness.openRepository();
+		const created = await harness.createProject(repository);
+		const resource = {
+			id: "chatgpt-image",
+			mime: "image/png",
+			bytes: Uint8Array.of(1, 2, 3),
+		};
+
+		const saved = await Effect.runPromise(
+			repository.saveResourceFx({
+				expectedRevision: created.revision,
+				overwrite: false,
+				projectId: created.projectId,
+				resource,
+			}),
+		);
+
+		expect(saved.revision).toBe(created.revision + 1);
+		expect(saved.resources.find(({ id }) => id === resource.id)).toEqual(resource);
+	});
+
 	it("serializes concurrent writes and awaitIdle observes every admitted write", async () => {
 		const repository = await harness.openRepository();
 		await harness.createProject(repository);

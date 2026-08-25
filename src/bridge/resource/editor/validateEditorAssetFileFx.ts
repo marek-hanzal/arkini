@@ -3,21 +3,13 @@ import { Effect } from "effect";
 import { PngResourceLimits, validatePngResourceFx } from "~/bridge/resource/validatePngResourceFx";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
+import { readEditorAssetResourceIdFx } from "~/bridge/resource/editor/readEditorAssetResourceIdFx";
 
 export interface EditorAssetFileInput {
 	readonly name: string;
 	readonly size: number;
 	readonly arrayBuffer: () => Promise<ArrayBuffer>;
 }
-
-const readResourceId = (filename: string) =>
-	filename
-		.replace(/\.png$/i, "")
-		.normalize("NFKD")
-		.replace(/[\u0300-\u036f]/g, "")
-		.replace(/[^A-Za-z0-9._-]+/g, "-")
-		.replace(/^[.-]+|[.-]+$/g, "")
-		.toLowerCase();
 
 export const validateEditorAssetFileFx = Effect.fn("validateEditorAssetFileFx")(function* (
 	inputFile: EditorAssetFileInput,
@@ -34,8 +26,10 @@ export const validateEditorAssetFileFx = Effect.fn("validateEditorAssetFileFx")(
 			}),
 		);
 	}
+	const projectedResourceId =
+		resourceIdOverride ?? (yield* readEditorAssetResourceIdFx(inputFile.name));
 	const resourceId = yield* Effect.try({
-		try: () => IdSchema.parse(resourceIdOverride ?? readResourceId(inputFile.name)),
+		try: () => IdSchema.parse(projectedResourceId),
 		catch: (cause) =>
 			new EditorProjectError({
 				reason: "invalid-resource-id",

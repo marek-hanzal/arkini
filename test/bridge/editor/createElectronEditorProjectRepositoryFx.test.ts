@@ -63,6 +63,7 @@ const installEditorApi = () => {
 		onProjectChanged: vi.fn(() => () => undefined),
 		replaceConfig: vi.fn(async () => success(commit)),
 		replaceResource: vi.fn(async () => success(project)),
+		saveResource: vi.fn(async () => success(project)),
 		upsertItem: vi.fn(async () => success(commit)),
 		upsertResources: vi.fn(async () => success(project)),
 		listBoardScenarios: vi.fn(async () => success([])),
@@ -156,6 +157,14 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 				resource: replacementResource,
 			}),
 		);
+		const savedResource = await Effect.runPromise(
+			repository.saveResourceFx({
+				projectId: "project-one",
+				expectedRevision: 1,
+				overwrite: false,
+				resource: replacementResource,
+			}),
+		);
 		const upsertedItem = await Effect.runPromise(
 			repository.upsertItemFx({
 				projectId: "project-one",
@@ -219,6 +228,12 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 			config: editorTestPayload.config,
 			resource: replacementResource,
 		});
+		expect(editor.saveResource).toHaveBeenCalledWith({
+			projectId: "project-one",
+			expectedRevision: 1,
+			overwrite: false,
+			resource: replacementResource,
+		});
 		expect(editor.upsertItem).toHaveBeenCalledWith({
 			projectId: "project-one",
 			item: editorTestPayload.config.items.water,
@@ -261,6 +276,7 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 		expect(deletedItem).toEqual(commit);
 		expect(created).toEqual(read);
 		expect(created).toEqual(replacedResource);
+		expect(created).toEqual(savedResource);
 		expect(created).toEqual(upsertedResources);
 		expect(created.resources.map(({ id }) => id)).toEqual([
 			"hero",

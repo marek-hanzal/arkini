@@ -30,6 +30,13 @@ export const EditorWorkspaceRoutes = [
 		to: "/editor/$projectId/assets",
 	},
 	{
+		id: "chatgpt",
+		icon: "icon-[lucide--message-circle-more]",
+		label: "ChatGPT",
+		matchTo: "/editor/$projectId/chatgpt",
+		to: "/editor/$projectId/chatgpt",
+	},
+	{
 		id: "flow",
 		icon: "icon-[lucide--git-fork]",
 		label: "Flow",

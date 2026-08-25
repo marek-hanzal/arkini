@@ -119,6 +119,7 @@ const projectChannels = [
 	ArkiniElectronApi.channels.editorProjectRead,
 	ArkiniElectronApi.channels.editorProjectReplaceConfig,
 	ArkiniElectronApi.channels.editorProjectReplaceResource,
+	ArkiniElectronApi.channels.editorProjectSaveResource,
 	ArkiniElectronApi.channels.editorProjectUpsertItem,
 	ArkiniElectronApi.channels.editorProjectUpsertResources,
 ];
@@ -177,6 +178,12 @@ describe("registerEditorProjectIpcFx", () => {
 			expectedRevision: 0,
 			projectId: "project-one",
 			item: editorTestPayload.config.items.water,
+		};
+		const saveResourceRequest = {
+			expectedRevision: 0,
+			overwrite: false,
+			projectId: "project-one",
+			resource: editorTestPayload.resources[0],
 		};
 		const deleteItemRequest = {
 			projectId: "project-one",
@@ -253,6 +260,7 @@ describe("registerEditorProjectIpcFx", () => {
 			ArkiniElectronApi.channels.editorProjectReplaceResource,
 			replaceResourceRequest,
 		);
+		await invoke(ArkiniElectronApi.channels.editorProjectSaveResource, saveResourceRequest);
 		await invoke(ArkiniElectronApi.channels.editorProjectUpsertItem, upsertItemRequest);
 		await invoke(ArkiniElectronApi.channels.editorProjectDeleteItem, deleteItemRequest);
 		await invoke(
@@ -265,6 +273,7 @@ describe("registerEditorProjectIpcFx", () => {
 		expect(repository.readProjectFx).toHaveBeenCalledWith("project-one");
 		expect(repository.replaceConfigFx).toHaveBeenCalledWith(replaceConfigRequest);
 		expect(repository.replaceResourceFx).toHaveBeenCalledWith(replaceResourceRequest);
+		expect(repository.saveResourceFx).toHaveBeenCalledWith(saveResourceRequest);
 		expect(repository.upsertItemFx).toHaveBeenCalledWith(upsertItemRequest);
 		expect(repository.deleteItemFx).toHaveBeenCalledWith(deleteItemRequest);
 		expect(repository.upsertResourcesFx).toHaveBeenCalledWith(upsertResourcesRequest);
@@ -360,7 +369,7 @@ describe("registerEditorProjectIpcFx", () => {
 				message: "SQLite read failed.",
 			},
 		});
-		expect(electron.handlers.size).toBe(18);
+		expect(electron.handlers.size).toBe(19);
 		electron.appListeners.get("will-quit")?.();
 		expect(electron.handlers.size).toBe(0);
 

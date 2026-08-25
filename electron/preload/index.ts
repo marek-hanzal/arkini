@@ -4,6 +4,12 @@ import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
 const beforeCloseListeners = new Set<() => Promise<void>>();
 const beforeCloseReadyListeners = new Set<() => Promise<void>>();
 const closeFailedListeners = new Set<(error: unknown) => void>();
+const chatGptStateListeners = new Set<
+	Parameters<ArkiniElectronApi.Api["chatGpt"]["onStateChanged"]>[0]
+>();
+const chatGptAssetCandidateListeners = new Set<
+	Parameters<ArkiniElectronApi.Api["chatGpt"]["onAssetCandidate"]>[0]
+>();
 const editorProjectChangedListeners = new Set<
 	Parameters<ArkiniElectronApi.Api["editor"]["onProjectChanged"]>[0]
 >();
@@ -38,6 +44,14 @@ ipcRenderer.on(ArkiniElectronApi.channels.editorProjectChanged, (_event, project
 	for (const listener of Array.from(editorProjectChangedListeners)) listener(projectId);
 });
 
+ipcRenderer.on(ArkiniElectronApi.channels.chatGptStateChanged, (_event, state) => {
+	for (const listener of Array.from(chatGptStateListeners)) listener(state);
+});
+
+ipcRenderer.on(ArkiniElectronApi.channels.chatGptAssetCandidate, (_event, candidate) => {
+	for (const listener of Array.from(chatGptAssetCandidateListeners)) listener(candidate);
+});
+
 ipcRenderer.on(ArkiniElectronApi.channels.beforeClose, async () => {
 	if (closing) return;
 	closing = true;
@@ -68,6 +82,18 @@ const api: ArkiniElectronApi.Api = {
 		readAvailable: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cheatAvailabilityRead),
 		writeAvailable: (available) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.cheatAvailabilityWrite, available),
+	},
+	chatGpt: {
+		setSurface: (surface) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.chatGptSurfaceSet, surface),
+		onStateChanged: (listener) => {
+			chatGptStateListeners.add(listener);
+			return () => chatGptStateListeners.delete(listener);
+		},
+		onAssetCandidate: (listener) => {
+			chatGptAssetCandidateListeners.add(listener);
+			return () => chatGptAssetCandidateListeners.delete(listener);
+		},
 	},
 	cli: {
 		status: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliStatus),
@@ -109,6 +135,8 @@ const api: ArkiniElectronApi.Api = {
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectReplaceConfig, request),
 		replaceResource: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectReplaceResource, request),
+		saveResource: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectSaveResource, request),
 		upsertItem: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectUpsertItem, request),
 		upsertResources: (request) =>

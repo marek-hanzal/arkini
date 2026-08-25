@@ -1,6 +1,7 @@
 import type { EditorProjectVersionDescriptor } from "~/editor/version/EditorProjectVersion";
 import { Button, DangerButton } from "~/ui/button/Button";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
+import { EditorSelect, type EditorSelectOption } from "~/ui/form/EditorSelect";
 import { EditorVersionCheckoutDialog } from "~/ui/version/editor/EditorVersionCheckoutDialog";
 import { EditorVersionDiff } from "~/ui/version/editor/EditorVersionDiff";
 import { EditorVersionGraph } from "~/ui/version/editor/EditorVersionGraph";
@@ -16,27 +17,30 @@ const EditorVersionReferenceSelect = ({
 	readonly onChange: (value: string) => void;
 	readonly value: string;
 	readonly versions: ReadonlyArray<EditorProjectVersionDescriptor>;
-}) => (
-	<label className="grid gap-1 text-xs font-semibold">
-		{label}
-		<select
-			className={editorInputClassName}
-			value={value}
-			onChange={(event) => onChange(event.currentTarget.value)}
-		>
-			<option value="current">Working copy</option>
-			{versions.map((version) => (
-				<option
-					key={version.versionId}
-					disabled={version.applicability.type === "incompatible"}
-					value={version.versionId}
-				>
-					{version.subject}
-				</option>
-			))}
-		</select>
-	</label>
-);
+}) => {
+	const options: ReadonlyArray<EditorSelectOption<string>> = [
+		{
+			label: "Working copy",
+			value: "current",
+		},
+		...versions.map((version) => ({
+			disabled: version.applicability.type === "incompatible",
+			label: version.subject,
+			value: version.versionId,
+		})),
+	];
+	return (
+		<div className="grid gap-1 text-xs font-semibold">
+			{label}
+			<EditorSelect
+				label={label}
+				onChange={onChange}
+				options={options}
+				value={value}
+			/>
+		</div>
+	);
+};
 
 export const EditorVersionHistory = () => {
 	const controller = useEditorVersionHistoryController();

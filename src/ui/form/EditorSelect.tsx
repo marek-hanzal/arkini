@@ -15,6 +15,7 @@ import { useState } from "react";
 import { Button } from "~/ui/button/Button";
 
 export interface EditorSelectOption<Value extends string> {
+	readonly disabled?: boolean;
 	readonly label: string;
 	readonly value: Value;
 }
@@ -80,8 +81,9 @@ export const EditorSelect = <Value extends string>({
 					>
 						{options.map((option) => (
 							<button
-								className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm font-semibold hover:bg-surface-raised ${option.value === value ? "bg-accent/10 text-accent" : "text-foreground"}`}
+								className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm font-semibold hover:bg-surface-raised disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent ${option.value === value ? "bg-accent/10 text-accent" : "text-foreground"}`}
 								data-ui="EditorSelectOption"
+								disabled={option.disabled}
 								key={option.value}
 								onClick={() => {
 									onChange(option.value);

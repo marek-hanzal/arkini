@@ -9,12 +9,12 @@ import {
 	type EditorProjectRepositoryService,
 } from "~/bridge/editor/EditorProjectRepository";
 import { installTestPngDecoder } from "~test/bridge/arkpack/support/createTestPngBytes";
-import { UnusedEditorBoardScenarioRepository } from "~test/support/UnusedEditorBoardScenarioRepository";
+import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 const createRepository = (
 	createProjectFx: EditorProjectRepositoryService["createProjectFx"],
 ): EditorProjectRepositoryService => ({
-	...UnusedEditorBoardScenarioRepository,
+	...UnusedEditorProjectRepository,
 	awaitIdleFx: Effect.void,
 	createProjectFx,
 	listProjectsFx: Effect.die("Unexpected project list."),

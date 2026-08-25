@@ -36,7 +36,11 @@ export namespace ArkiniElectronApi {
 		editorStatus: "arkini:editor:status",
 		editorAwaitIdle: "arkini:editor:await-idle",
 		editorProjectCreate: "arkini:editor:project:create",
+		editorProjectDelete: "arkini:editor:project:delete",
+		editorProjectExportJsonDirectory: "arkini:editor:project:export-json-directory",
+		editorProjectImportJsonDirectory: "arkini:editor:project:import-json-directory",
 		editorProjectList: "arkini:editor:project:list",
+		editorProjectOpenExportDirectory: "arkini:editor:project:open-export-directory",
 		editorProjectRead: "arkini:editor:project:read",
 		editorProjectReplaceConfig: "arkini:editor:project:replace-config",
 		editorProjectReplaceResource: "arkini:editor:project:replace-resource",
@@ -118,9 +122,19 @@ export namespace ArkiniElectronApi {
 			readonly createProject: (
 				request: EditorProjectTransport.CreateProjectRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project>>;
+			readonly deleteProject: (
+				projectId: string,
+			) => Promise<EditorProjectTransport.Result<void>>;
+			readonly importJsonDirectory: () => Promise<
+				EditorProjectTransport.Result<EditorProjectTransport.Descriptor | null>
+			>;
+			readonly exportJsonDirectory: (
+				projectId: string,
+			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.SourceExport | null>>;
 			readonly listProjects: () => Promise<
 				EditorProjectTransport.Result<ReadonlyArray<EditorProjectTransport.Descriptor>>
 			>;
+			readonly openExportDirectory: () => Promise<EditorProjectTransport.Result<void>>;
 			readonly readProject: (
 				projectId: string,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project | null>>;

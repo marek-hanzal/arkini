@@ -61,6 +61,9 @@ export interface EditorProjectRepositoryService {
 	readonly createProjectFx: (
 		props: EditorProjectRepository.CreateProjectProps,
 	) => Effect.Effect<EditorProject, EditorProjectRepositoryError>;
+	readonly deleteProjectFx: (
+		projectId: string,
+	) => Effect.Effect<void, EditorProjectRepositoryError>;
 	readonly listProjectsFx: Effect.Effect<
 		ReadonlyArray<EditorProjectDescriptor>,
 		EditorProjectRepositoryError

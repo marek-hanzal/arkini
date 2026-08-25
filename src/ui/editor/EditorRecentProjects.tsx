@@ -1,5 +1,5 @@
 import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
-import { ButtonLink } from "~/ui/button/Button";
+import { Button, ButtonLink } from "~/ui/button/Button";
 
 const formatter = new Intl.DateTimeFormat(undefined, {
 	dateStyle: "medium",
@@ -9,12 +9,17 @@ const formatter = new Intl.DateTimeFormat(undefined, {
 export namespace EditorRecentProjects {
 	export interface Props {
 		readonly blocked: boolean;
+		readonly onDeleteProject: (project: EditorProjectDescriptor) => void;
 		readonly projects: ReadonlyArray<EditorProjectDescriptor>;
 	}
 }
 
 /** Renders canonical projects in repository-supplied recent order. */
-export const EditorRecentProjects = ({ blocked, projects }: EditorRecentProjects.Props) => {
+export const EditorRecentProjects = ({
+	blocked,
+	onDeleteProject,
+	projects,
+}: EditorRecentProjects.Props) => {
 	if (projects.length === 0) return null;
 	return (
 		<section
@@ -33,33 +38,47 @@ export const EditorRecentProjects = ({ blocked, projects }: EditorRecentProjects
 			</header>
 			<div className="ak-list grid gap-2">
 				{projects.map((project) => (
-					<ButtonLink
+					<div
 						key={project.projectId}
-						to="/editor/$projectId/editor/items/list"
-						params={{
-							projectId: project.projectId,
-						}}
-						aria-disabled={blocked}
-						cursorIntent={blocked ? "progress" : undefined}
-						className="ak-list-row min-h-0 w-full justify-start gap-3 rounded-xl px-4 py-3 text-left"
+						className="flex min-w-0"
 					>
-						<span className="icon-[lucide--folder-kanban] size-5 shrink-0 text-accent" />
-						<span className="min-w-0 flex-1">
-							<span className="block truncate text-sm font-semibold">
-								{project.title}
-							</span>
-							<span className="mt-1 block truncate text-xs text-subtle">
-								{project.projectId} · v{project.version}
-							</span>
-						</span>
-						<time
-							dateTime={new Date(project.updatedAtMs).toISOString()}
-							className="shrink-0 text-xs text-muted"
+						<ButtonLink
+							to="/editor/$projectId/editor/items/list"
+							params={{
+								projectId: project.projectId,
+							}}
+							aria-disabled={blocked}
+							cursorIntent={blocked ? "progress" : undefined}
+							className="ak-list-row min-h-0 min-w-0 flex-1 justify-start gap-3 rounded-r-none px-4 py-3 text-left"
 						>
-							{formatter.format(project.updatedAtMs)}
-						</time>
-						<span className="icon-[lucide--chevron-right] size-4 shrink-0 text-subtle" />
-					</ButtonLink>
+							<span className="icon-[lucide--folder-kanban] size-5 shrink-0 text-accent" />
+							<span className="min-w-0 flex-1">
+								<span className="block truncate text-sm font-semibold">
+									{project.title}
+								</span>
+								<span className="mt-1 block truncate text-xs text-subtle">
+									{project.projectId} · v{project.version}
+								</span>
+							</span>
+							<time
+								dateTime={new Date(project.updatedAtMs).toISOString()}
+								className="shrink-0 text-xs text-muted"
+							>
+								{formatter.format(project.updatedAtMs)}
+							</time>
+							<span className="icon-[lucide--chevron-right] size-4 shrink-0 text-subtle" />
+						</ButtonLink>
+						<Button
+							disabled={blocked}
+							cursorIntent={blocked ? "progress" : undefined}
+							className="ak-list-row min-h-0 shrink-0 rounded-l-none border-l-0 px-4 text-danger"
+							data-ui="EditorRecentProjectDelete"
+							title={`Delete ${project.title}`}
+							onClick={() => onDeleteProject(project)}
+						>
+							<span className="icon-[lucide--trash-2] size-4" />
+						</Button>
+					</div>
 				))}
 			</div>
 		</section>

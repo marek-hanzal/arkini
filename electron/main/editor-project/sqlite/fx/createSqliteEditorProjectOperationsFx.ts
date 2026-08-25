@@ -23,7 +23,7 @@ import { SqliteEditorProjectRowSchema } from "../schema/SqliteEditorProjectRowSc
 
 type ProjectOperations = Pick<
 	EditorProjectRepositoryService,
-	"createProjectFx" | "listProjectsFx" | "readProjectFx"
+	"createProjectFx" | "deleteProjectFx" | "listProjectsFx" | "readProjectFx"
 >;
 
 const createRepositoryError = (
@@ -100,41 +100,51 @@ export namespace createSqliteEditorProjectOperationsFx {
 export const createSqliteEditorProjectOperationsFx = Effect.fn(
 	"createSqliteEditorProjectOperationsFx",
 )(function* ({ database, writeLock }: createSqliteEditorProjectOperationsFx.Props) {
-	const { selectProject, listProjects, selectResources, insertProject, insertResource } =
-		yield* Effect.try({
-			try: () => ({
-				selectProject: database.prepare(`
+	const {
+		selectProject,
+		listProjects,
+		selectResources,
+		insertProject,
+		insertResource,
+		deleteProject,
+	} = yield* Effect.try({
+		try: () => ({
+			selectProject: database.prepare(`
 					SELECT project_id, config_json, arkpack_version, revision, created_at_ms, updated_at_ms
 					FROM projects
 					WHERE project_id = ?
 				`),
-				listProjects: database.prepare(`
+			listProjects: database.prepare(`
 					SELECT project_id, config_json, arkpack_version, revision, created_at_ms, updated_at_ms
 					FROM projects
 					ORDER BY updated_at_ms DESC, project_id ASC
 				`),
-				selectResources: database.prepare(`
+			selectResources: database.prepare(`
 					SELECT project_id, id, mime, bytes
 					FROM resources
 					WHERE project_id = ?
 					ORDER BY id ASC
 				`),
-				insertProject: database.prepare(`
+			insertProject: database.prepare(`
 					INSERT INTO projects(project_id, config_json, arkpack_version, revision, created_at_ms, updated_at_ms)
 					VALUES (?, ?, ?, ?, ?, ?)
 				`),
-				insertResource: database.prepare(`
+			insertResource: database.prepare(`
 					INSERT INTO resources(project_id, id, mime, bytes)
 					VALUES (?, ?, ?, ?)
 				`),
-			}),
-			catch: (cause) =>
-				createRepositoryError(
-					"list-projects",
-					"The editor project catalog schema is incompatible.",
-					cause,
-				),
-		});
+			deleteProject: database.prepare(`
+					DELETE FROM projects
+					WHERE project_id = ?
+				`),
+		}),
+		catch: (cause) =>
+			createRepositoryError(
+				"list-projects",
+				"The editor project catalog schema is incompatible.",
+				cause,
+			),
+	});
 
 	const createProjectFx: ProjectOperations["createProjectFx"] = Effect.fn(
 		"SqliteEditorProjectRepository.createProjectFx",
@@ -231,6 +241,30 @@ export const createSqliteEditorProjectOperationsFx = Effect.fn(
 			createRepositoryError("list-projects", "Editor projects could not be listed.", cause),
 	});
 
+	const deleteProjectFx: ProjectOperations["deleteProjectFx"] = Effect.fn(
+		"SqliteEditorProjectRepository.deleteProjectFx",
+	)((projectId) =>
+		writeLock.withPermits(1)(
+			runSqliteEditorProjectTransactionFx(database, () => {
+				const result = deleteProject.run(projectId);
+				if (Number(result.changes) === 0)
+					throw createRepositoryError(
+						"delete-project",
+						`Editor project ${projectId} does not exist.`,
+					);
+			}).pipe(
+				Effect.mapError((cause) =>
+					createRepositoryError(
+						"delete-project",
+						`Editor project ${projectId} could not be deleted.`,
+						cause,
+					),
+				),
+				Effect.uninterruptible,
+			),
+		),
+	);
+
 	const readProjectFx: ProjectOperations["readProjectFx"] = Effect.fn(
 		"SqliteEditorProjectRepository.readProjectFx",
 	)((projectId) =>
@@ -255,6 +289,7 @@ export const createSqliteEditorProjectOperationsFx = Effect.fn(
 
 	return {
 		createProjectFx,
+		deleteProjectFx,
 		listProjectsFx,
 		readProjectFx,
 	} satisfies ProjectOperations;

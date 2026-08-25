@@ -3,22 +3,31 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { importEditorArkpackFileAtom } from "~/bridge/arkpack/editor/importEditorArkpackFileAtom";
 import { createFreshEditorProjectAtom } from "~/bridge/editor/createFreshEditorProjectAtom";
+import { deleteEditorProjectAtom } from "~/bridge/editor/deleteEditorProjectAtom";
+import { importEditorJsonDirectoryAtom } from "~/bridge/editor/importEditorJsonDirectoryAtom";
 import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
 import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 
 export namespace EditorWelcomeCommandAtom {
-	export type Action = "create" | "exit" | "import";
+	export type Action = "create" | "delete-project" | "exit" | "import-arkpack" | "import-json";
 
 	export type Command =
 		| {
 				readonly action: "create";
 		  }
 		| {
+				readonly action: "delete-project";
+				readonly projectId: string;
+		  }
+		| {
 				readonly action: "exit";
 		  }
 		| {
-				readonly action: "import";
+				readonly action: "import-arkpack";
 				readonly file: File;
+		  }
+		| {
+				readonly action: "import-json";
 		  };
 
 	export type NavigationEvent =
@@ -38,12 +47,17 @@ export namespace EditorWelcomeCommandAtom {
 	export type ReadyState =
 		| {
 				readonly kind: "ready";
-				readonly action: "create" | "import";
+				readonly action: "create" | "import-arkpack" | "import-json";
 				readonly project: EditorProjectDescriptor;
 		  }
 		| {
 				readonly kind: "ready";
 				readonly action: "exit";
+		  }
+		| {
+				readonly kind: "ready";
+				readonly action: "delete-project";
+				readonly projectId: string;
 		  };
 
 	export type State =
@@ -69,6 +83,18 @@ const EditorWelcomeCommandStateAtom = Atom.make<EditorWelcomeCommandAtom.State>(
 	kind: "idle",
 }).pipe(Atom.keepAlive);
 
+const publishCommandFailureFx = (cause: Cause.Cause<unknown>) =>
+	Cause.hasInterruptsOnly(cause)
+		? Effect.failCause(cause)
+		: readExactCauseFailureFx(cause).pipe(
+				Effect.flatMap((failure) =>
+					Atom.set(EditorWelcomeCommandStateAtom, {
+						kind: "error",
+						error: Option.isSome(failure) ? failure.value : cause,
+					}),
+				),
+			);
+
 const EditorWelcomeCommandRunnerAtom = Atom.fn(
 	(command: EditorWelcomeCommandAtom.Command, get) =>
 		Effect.gen(function* () {
@@ -79,19 +105,29 @@ const EditorWelcomeCommandRunnerAtom = Atom.fn(
 				});
 				return;
 			}
+			if (command.action === "delete-project") {
+				const result = yield* Effect.exit(
+					get.setResult(deleteEditorProjectAtom, command.projectId),
+				);
+				if (Exit.isFailure(result)) return yield* publishCommandFailureFx(result.cause);
+				yield* Atom.set(EditorWelcomeCommandStateAtom, {
+					kind: "ready",
+					action: "delete-project",
+					projectId: command.projectId,
+				});
+				return;
+			}
 			const operation =
 				command.action === "create"
 					? get.setResult(createFreshEditorProjectAtom, undefined)
-					: get.setResult(importEditorArkpackFileAtom, command.file);
+					: command.action === "import-arkpack"
+						? get.setResult(importEditorArkpackFileAtom, command.file)
+						: get.setResult(importEditorJsonDirectoryAtom, undefined);
 			const result = yield* Effect.exit(operation);
-			if (Exit.isFailure(result)) {
-				if (Cause.hasInterruptsOnly(result.cause)) {
-					return yield* Effect.failCause(result.cause);
-				}
-				const failure = yield* readExactCauseFailureFx(result.cause);
+			if (Exit.isFailure(result)) return yield* publishCommandFailureFx(result.cause);
+			if (result.value === null) {
 				yield* Atom.set(EditorWelcomeCommandStateAtom, {
-					kind: "error",
-					error: Option.isSome(failure) ? failure.value : result.cause,
+					kind: "idle",
 				});
 				return;
 			}

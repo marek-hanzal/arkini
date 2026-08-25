@@ -27,6 +27,7 @@ export const editorProjectIpcProject = {
 export const createEditorProjectIpcRepository = (): SqliteEditorProjectRepository => ({
 	awaitIdleFx: Effect.void,
 	createProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
+	deleteProjectFx: vi.fn(() => Effect.void),
 	listProjectsFx: Effect.succeed([
 		editorProjectIpcDescriptor,
 	]),

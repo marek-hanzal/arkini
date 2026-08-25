@@ -14,7 +14,7 @@ import {
 	adoptTestGameEngineResourceFx,
 	createTestRendererRuntime,
 } from "~test/support/createTestRendererRuntime";
-import { UnusedEditorBoardScenarioRepository } from "~test/support/UnusedEditorBoardScenarioRepository";
+import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 type CloseListener = () => Promise<void>;
 
@@ -206,10 +206,11 @@ describe("installRendererControlledClose", () => {
 		remove();
 	});
 
-	it("waits for admitted editor repository writes before native close", async () => {
+	it("waits for admitted editor operations before selecting an active Game exit route", async () => {
 		const idle = Effect.runSync(Deferred.make<void>());
+		const resource = createResource("package:editor-idle");
 		const repository: EditorProjectRepositoryService = {
-			...UnusedEditorBoardScenarioRepository,
+			...UnusedEditorProjectRepository,
 			awaitIdleFx: Deferred.await(idle),
 			createProjectFx: () => Effect.die("Unexpected create."),
 			listProjectsFx: Effect.die("Unexpected list."),
@@ -220,10 +221,13 @@ describe("installRendererControlledClose", () => {
 			upsertResourcesFx: () => Effect.die("Unexpected resource save."),
 		};
 		const { rendererRuntime } = createTestRendererRuntime({
-			createResourceFx: () => Effect.never,
+			createResourceFx: () => Effect.succeed(resource),
 			editorProjectRepository: repository,
 		});
 		runtimes.push(rendererRuntime);
+		vi.useRealTimers();
+		await rendererRuntime.runPromise(adoptTestGameEngineResourceFx("package:editor-idle"));
+		vi.useFakeTimers();
 		const lifecycle = createLifecycle();
 		const router = createRouter();
 		const remove = rendererRuntime.runSync(
@@ -246,7 +250,13 @@ describe("installRendererControlledClose", () => {
 		Effect.runSync(Deferred.succeed(idle, undefined));
 		await close;
 		expect(closed).toBe(true);
-		expect(router.navigate).not.toHaveBeenCalled();
+		expect(router.navigate).toHaveBeenCalledWith({
+			to: "/game/$packageId/action/exit",
+			params: {
+				packageId: "package:editor-idle",
+			},
+			replace: true,
+		});
 		remove();
 	});
 

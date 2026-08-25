@@ -11,7 +11,7 @@ import {
 } from "~/bridge/editor/EditorProjectRepository";
 import { saveEditorAssetsFx } from "~/bridge/resource/editor/saveEditorAssetsFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
-import { UnusedEditorBoardScenarioRepository } from "~test/support/UnusedEditorBoardScenarioRepository";
+import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 const createPng = () =>
 	Uint8Array.from(
@@ -49,7 +49,7 @@ const createFixture = () => {
 			}),
 	);
 	const repository: EditorProjectRepositoryService = {
-		...UnusedEditorBoardScenarioRepository,
+		...UnusedEditorProjectRepository,
 		awaitIdleFx: Effect.void,
 		createProjectFx: () => Effect.die("Unexpected create."),
 		listProjectsFx: Effect.die("Unexpected list."),

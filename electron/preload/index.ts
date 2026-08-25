@@ -78,7 +78,18 @@ const api: ArkiniElectronApi.Api = {
 		awaitIdle: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorAwaitIdle),
 		createProject: (request) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectCreate, request),
+		deleteProject: (projectId) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectDelete, projectId),
+		exportJsonDirectory: (projectId) =>
+			ipcRenderer.invoke(
+				ArkiniElectronApi.channels.editorProjectExportJsonDirectory,
+				projectId,
+			),
+		importJsonDirectory: () =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectImportJsonDirectory),
 		listProjects: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectList),
+		openExportDirectory: () =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectOpenExportDirectory),
 		readProject: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectRead, projectId),
 		replaceConfig: (request) =>

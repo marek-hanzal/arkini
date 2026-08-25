@@ -2,34 +2,23 @@ import { Effect } from "effect";
 import { z } from "zod";
 
 import type { EditorProjectTransport } from "../../../electron/contract/editor/EditorProjectTransport";
+import { EditorProjectDescriptorSchema } from "~/editor/EditorProjectDescriptor";
 import { EditorProjectRecordSchema } from "~/editor/EditorProjectRecordSchema";
 import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
 import {
 	EditorProjectRepositoryError,
 	type EditorProjectRepositoryOperation,
 } from "~/editor/EditorProjectRepositoryError";
-import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import {
 	EditorBoardScenarioDescriptorSchema,
 	EditorBoardScenarioSchema,
 } from "~/editor/board/EditorBoardScenarioSchema";
 
-const descriptorSchema = z
-	.object({
-		projectId: IdSchema,
-		title: z.string(),
-		version: ArkpackVersionSchema,
-		createdAtMs: z.number().int().nonnegative(),
-		updatedAtMs: z.number().int().nonnegative(),
-	})
-	.strict();
-
 const commitTransportSchema = z
 	.object({
-		...descriptorSchema.shape,
+		...EditorProjectDescriptorSchema.shape,
 		revision: z.number().int().nonnegative(),
 		config: GameConfigSchema,
 	})
@@ -64,7 +53,7 @@ const parseCommit = (candidate: unknown) =>
 const parseProject = (candidate: unknown) => {
 	const project = z
 		.object({
-			...descriptorSchema.shape,
+			...EditorProjectDescriptorSchema.shape,
 			revision: z.number().int().nonnegative(),
 			config: GameConfigSchema,
 			resources: ResourceSchema.array(),
@@ -171,10 +160,16 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 				() => window.arkini.editor.createProject(request),
 				parseProject,
 			),
+		deleteProjectFx: (projectId) =>
+			callFx(
+				"delete-project",
+				() => window.arkini.editor.deleteProject(projectId),
+				() => undefined,
+			),
 		listProjectsFx: callFx(
 			"list-projects",
 			() => window.arkini.editor.listProjects(),
-			(value) => descriptorSchema.array().parse(value),
+			(value) => EditorProjectDescriptorSchema.array().parse(value),
 		),
 		listBoardScenariosFx: (projectId) =>
 			callFx(

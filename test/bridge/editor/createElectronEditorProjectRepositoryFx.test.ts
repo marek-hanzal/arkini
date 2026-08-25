@@ -49,11 +49,15 @@ const installEditorApi = () => {
 		})),
 		awaitIdle: vi.fn(async () => success(undefined)),
 		createProject: vi.fn(async () => success(project)),
+		deleteProject: vi.fn(async () => success(undefined)),
+		exportJsonDirectory: vi.fn(async () => success(null)),
+		importJsonDirectory: vi.fn(async () => success(descriptor)),
 		listProjects: vi.fn(async () =>
 			success([
 				descriptor,
 			]),
 		),
+		openExportDirectory: vi.fn(async () => success(undefined)),
 		readProject: vi.fn(async () => success(project)),
 		replaceConfig: vi.fn(async () => success(commit)),
 		replaceResource: vi.fn(async () => success(project)),
@@ -123,6 +127,7 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 
 		await expect(Effect.runPromise(repository.awaitIdleFx)).resolves.toBeUndefined();
 		const created = await Effect.runPromise(repository.createProjectFx(createRequest));
+		await Effect.runPromise(repository.deleteProjectFx("project-one"));
 		const listed = await Effect.runPromise(repository.listProjectsFx);
 		const read = await Effect.runPromise(repository.readProjectFx("project-one"));
 		const replacedConfig = await Effect.runPromise(
@@ -183,6 +188,7 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 
 		expect(editor.awaitIdle).toHaveBeenCalledOnce();
 		expect(editor.createProject).toHaveBeenCalledWith(createRequest);
+		expect(editor.deleteProject).toHaveBeenCalledWith("project-one");
 		expect(editor.listProjects).toHaveBeenCalledOnce();
 		expect(editor.readProject).toHaveBeenCalledWith("project-one");
 		expect(editor.replaceConfig).toHaveBeenCalledWith({

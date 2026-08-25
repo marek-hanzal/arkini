@@ -1,6 +1,6 @@
 import type { IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ArkiniElectronApi } from "../../../../electron/contract/ArkiniElectronApi";
 import { ElectronMainError } from "../../../../electron/main/ElectronMainError";
@@ -16,6 +16,22 @@ import {
 	editorProjectIpcProject,
 } from "./support/createEditorProjectIpcRepository";
 
+const sourceExport = vi.hoisted(() => ({
+	effect: undefined as unknown,
+}));
+
+const completedSourceExport = {
+	json: 9,
+	projectDirectory: "/tmp/source",
+	resources: 3,
+	revision: 4,
+	root: "/tmp/source",
+};
+
+vi.mock("../../../../electron/main/editor-project/exportEditorJsonDirectoryFx", () => ({
+	exportEditorJsonDirectoryFx: () => sourceExport.effect,
+}));
+
 const electron = vi.hoisted(() => {
 	const handlers = new Map<string, (event: unknown, candidate?: unknown) => unknown>();
 	const appListeners = new Map<string, () => void>();
@@ -24,7 +40,12 @@ const electron = vi.hoisted(() => {
 		handlers,
 		module: {
 			app: {
+				getAppPath: () => "/protected/arkini",
+				getPath: (name: string) => `/protected/${name}`,
 				once: (event: string, listener: () => void) => appListeners.set(event, listener),
+			},
+			BrowserWindow: {
+				fromWebContents: () => ({}),
 			},
 			ipcMain: {
 				handle: (
@@ -33,6 +54,16 @@ const electron = vi.hoisted(() => {
 				) => handlers.set(channel, listener),
 				removeHandler: (channel: string) => handlers.delete(channel),
 			},
+			shell: {
+				openPath: vi.fn(async () => ""),
+			},
+			dialog: {
+				showMessageBox: vi.fn(),
+				showOpenDialog: vi.fn(async () => ({
+					canceled: true,
+					filePaths: [],
+				})),
+			},
 		},
 	};
 });
@@ -40,6 +71,7 @@ const electron = vi.hoisted(() => {
 vi.mock("electron", () => electron.module);
 
 const event = {
+	sender: {},
 	senderFrame: {
 		url: "arkini://app/editor/welcome",
 	},
@@ -78,13 +110,22 @@ const projectChannels = [
 	ArkiniElectronApi.channels.editorStatus,
 	ArkiniElectronApi.channels.editorAwaitIdle,
 	ArkiniElectronApi.channels.editorProjectCreate,
+	ArkiniElectronApi.channels.editorProjectDelete,
+	ArkiniElectronApi.channels.editorProjectExportJsonDirectory,
+	ArkiniElectronApi.channels.editorProjectImportJsonDirectory,
 	ArkiniElectronApi.channels.editorProjectList,
+	ArkiniElectronApi.channels.editorProjectOpenExportDirectory,
 	ArkiniElectronApi.channels.editorProjectRead,
 	ArkiniElectronApi.channels.editorProjectReplaceConfig,
 	ArkiniElectronApi.channels.editorProjectReplaceResource,
 	ArkiniElectronApi.channels.editorProjectUpsertItem,
 	ArkiniElectronApi.channels.editorProjectUpsertResources,
 ];
+
+beforeEach(() => {
+	sourceExport.effect = Effect.succeed(completedSourceExport);
+	electron.module.shell.openPath.mockClear();
+});
 
 afterEach(() => {
 	electron.appListeners.get("will-quit")?.();
@@ -167,6 +208,34 @@ describe("registerEditorProjectIpcFx", () => {
 			value: editorProjectIpcProject,
 		});
 		await expect(
+			invoke(ArkiniElectronApi.channels.editorProjectDelete, "project-one"),
+		).resolves.toEqual({
+			type: "success",
+			value: undefined,
+		});
+		await expect(
+			invoke(ArkiniElectronApi.channels.editorProjectOpenExportDirectory),
+		).resolves.toEqual({
+			type: "failure",
+			error: {
+				operation: "open-export-directory",
+				message: "No completed JSON source export is available.",
+			},
+		});
+		expect(electron.module.shell.openPath).not.toHaveBeenCalled();
+		await expect(
+			invoke(ArkiniElectronApi.channels.editorProjectExportJsonDirectory, "project-one"),
+		).resolves.toEqual({
+			type: "success",
+			value: completedSourceExport,
+		});
+		await expect(
+			invoke(ArkiniElectronApi.channels.editorProjectOpenExportDirectory, "/tmp/forged"),
+		).resolves.toEqual({
+			type: "success",
+			value: undefined,
+		});
+		await expect(
 			invoke(ArkiniElectronApi.channels.editorProjectReplaceConfig, replaceConfigRequest),
 		).resolves.toEqual({
 			type: "success",
@@ -183,6 +252,7 @@ describe("registerEditorProjectIpcFx", () => {
 		);
 
 		expect(repository.createProjectFx).toHaveBeenCalledWith(createRequest);
+		expect(repository.deleteProjectFx).toHaveBeenCalledWith("project-one");
 		expect(repository.readProjectFx).toHaveBeenCalledWith("project-one");
 		expect(repository.replaceConfigFx).toHaveBeenCalledWith(replaceConfigRequest);
 		expect(repository.replaceResourceFx).toHaveBeenCalledWith(replaceResourceRequest);
@@ -201,6 +271,61 @@ describe("registerEditorProjectIpcFx", () => {
 			},
 		});
 		expect(repository.createProjectFx).toHaveBeenCalledOnce();
+		await expect(
+			invoke(ArkiniElectronApi.channels.editorProjectDelete, ""),
+		).resolves.toMatchObject({
+			type: "failure",
+			error: {
+				operation: "delete-project",
+				message: "The editor project request is invalid.",
+			},
+		});
+		expect(repository.deleteProjectFx).toHaveBeenCalledOnce();
+		expect(electron.module.shell.openPath).toHaveBeenCalledWith("/tmp/source");
+		expect(electron.module.shell.openPath).toHaveBeenCalledOnce();
+	});
+
+	it("does not report the editor idle while an admitted source export is running", async () => {
+		const repository = createEditorProjectIpcRepository();
+		let releaseExport: (() => void) | undefined;
+		let markStarted: (() => void) | undefined;
+		const started = new Promise<void>((resolve) => {
+			markStarted = resolve;
+		});
+		sourceExport.effect = Effect.promise(
+			() =>
+				new Promise<null>((resolve) => {
+					markStarted?.();
+					releaseExport = () => resolve(null);
+				}),
+		);
+		register({
+			type: "ready",
+			repository,
+		});
+
+		const exporting = invoke(
+			ArkiniElectronApi.channels.editorProjectExportJsonDirectory,
+			"project-one",
+		);
+		await started;
+		let idleSettled = false;
+		const idle = Promise.resolve(invoke(ArkiniElectronApi.channels.editorAwaitIdle)).finally(
+			() => {
+				idleSettled = true;
+			},
+		);
+		await new Promise((resolve) => setTimeout(resolve, 0));
+		expect(idleSettled).toBe(false);
+
+		releaseExport?.();
+		await expect(exporting).resolves.toEqual({
+			type: "success",
+			value: null,
+		});
+		await expect(idle).resolves.toMatchObject({
+			type: "success",
+		});
 	});
 
 	it("publishes stable failures, unavailable status, and owns handler cleanup", async () => {
@@ -225,7 +350,7 @@ describe("registerEditorProjectIpcFx", () => {
 				message: "SQLite read failed.",
 			},
 		});
-		expect(electron.handlers.size).toBe(13);
+		expect(electron.handlers.size).toBe(17);
 		electron.appListeners.get("will-quit")?.();
 		expect(electron.handlers.size).toBe(0);
 
@@ -236,6 +361,10 @@ describe("registerEditorProjectIpcFx", () => {
 		await expect(invoke(ArkiniElectronApi.channels.editorStatus)).resolves.toEqual({
 			type: "unavailable",
 			message: "Editor database could not be opened.",
+		});
+		await expect(invoke(ArkiniElectronApi.channels.editorAwaitIdle)).resolves.toEqual({
+			type: "success",
+			value: undefined,
 		});
 		await expect(
 			invoke(ArkiniElectronApi.channels.editorProjectRead, "project-one"),

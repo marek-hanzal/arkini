@@ -17,7 +17,7 @@ import { restoreEditorBoardScenarioFx } from "~/bridge/editor/board/restoreEdito
 import { encodeArkiniSaveFx } from "~/bridge/save/encodeArkiniSaveFx";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
-import { UnusedEditorBoardScenarioRepository } from "~test/support/UnusedEditorBoardScenarioRepository";
+import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 const project: EditorProject = {
 	projectId: "editor-board",
@@ -71,7 +71,7 @@ const runRestore = async ({
 	);
 	const deleteBoardScenarioFx = vi.fn(() => Effect.void);
 	const repository: EditorProjectRepositoryService = {
-		...UnusedEditorBoardScenarioRepository,
+		...UnusedEditorProjectRepository,
 		awaitIdleFx: Effect.void,
 		createProjectFx: () => Effect.die("Unexpected create."),
 		listProjectsFx: Effect.die("Unexpected project list."),

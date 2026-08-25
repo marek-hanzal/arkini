@@ -11,12 +11,16 @@ import { capacityDiagnostic, createArtifact } from "./EditorBuild.test/fixtures"
 const state = vi.hoisted(() => ({
 	buildResult: undefined as unknown,
 	commandSetters: new Map<string, ReturnType<typeof vi.fn>>(),
+	exportResults: new Map<string, unknown>(),
 	installResults: new Map<string, unknown>(),
 	project: undefined as unknown,
 }));
 
 vi.mock("@effect/atom-react", () => ({
-	useAtomSet: (atom: { readonly kind: "build" | "install" | "save"; readonly key: string }) => {
+	useAtomSet: (atom: {
+		readonly kind: "build" | "export" | "install" | "open-export" | "save";
+		readonly key: string;
+	}) => {
 		const key = `${atom.kind}:${atom.key}`;
 		const current = state.commandSetters.get(key);
 		if (current !== undefined) return current;
@@ -24,12 +28,17 @@ vi.mock("@effect/atom-react", () => ({
 		state.commandSetters.set(key, setter);
 		return setter;
 	},
-	useAtomValue: (atom: { readonly kind: "build" | "install" | "save"; readonly key: string }) =>
+	useAtomValue: (atom: {
+		readonly kind: "build" | "export" | "install" | "open-export" | "save";
+		readonly key: string;
+	}) =>
 		atom.kind === "build"
 			? state.buildResult
 			: atom.kind === "install"
 				? (state.installResults.get(atom.key) ?? AsyncResult.initial())
-				: AsyncResult.initial(),
+				: atom.kind === "export"
+					? (state.exportResults.get(atom.key) ?? AsyncResult.initial())
+					: AsyncResult.initial(),
 }));
 
 vi.mock("~/bridge/arkpack/editor/buildEditorProjectCommandAtom", () => ({
@@ -51,6 +60,20 @@ vi.mock("~/bridge/arkpack/editor/saveBuiltEditorArkpackCommandAtom", () => ({
 		kind: "save",
 		key: contentHash,
 	}),
+}));
+
+vi.mock("~/bridge/editor/exportEditorJsonDirectoryCommandAtom", () => ({
+	exportEditorJsonDirectoryCommandAtom: (projectId: string) => ({
+		kind: "export",
+		key: projectId,
+	}),
+}));
+
+vi.mock("~/bridge/editor/openEditorExportDirectoryCommandAtom", () => ({
+	openEditorExportDirectoryCommandAtom: {
+		kind: "open-export",
+		key: "completed-export",
+	},
 }));
 
 vi.mock("~/bridge/editor/useEditorProject", () => ({
@@ -112,6 +135,7 @@ beforeEach(() => {
 	};
 	state.buildResult = AsyncResult.initial();
 	state.commandSetters.clear();
+	state.exportResults.clear();
 	state.installResults.clear();
 });
 
@@ -146,6 +170,55 @@ describe("EditorBuild", () => {
 		expect(container.textContent).toContain("Not built");
 		expect(container.textContent).toContain("Run a build to execute the complete game");
 		expect(container.textContent).toContain("Build arkpack");
+	});
+
+	it("exports source independently and reveals the completed output folder", async () => {
+		const { container, render } = await renderBuild();
+
+		expect(container.textContent).toContain("JSON source export");
+		expect(container.textContent).toContain("current schema.json");
+		expect(container.textContent).not.toContain("entire contents");
+		expect(container.textContent).not.toContain("every existing file and subfolder");
+		expect(
+			container.querySelector<HTMLElement>('[data-ui="EditorBuildExportSource"]')
+				?.textContent,
+		).toBe("Export");
+		expect(container.textContent).not.toContain("Open folder");
+		await act(async () => {
+			container.querySelector<HTMLElement>('[data-ui="EditorBuildExportSource"]')?.click();
+		});
+		expect(state.commandSetters.get("export:editor-test")).toHaveBeenCalledWith(undefined);
+
+		state.exportResults.set(
+			"editor-test",
+			AsyncResult.success({
+				json: 9,
+				projectDirectory: "/tmp/source",
+				resources: 3,
+				revision: 4,
+				root: "/tmp/source",
+			}),
+		);
+		await render();
+		expect(container.textContent).toContain(
+			"Exported revision 4: 9 JSON files and 3 PNG resources to /tmp/source.",
+		);
+		expect(container.textContent).toContain("Open folder");
+
+		state.exportResults.set("editor-test", AsyncResult.success(null));
+		await render();
+		expect(container.textContent).toContain(
+			"Exported revision 4: 9 JSON files and 3 PNG resources to /tmp/source.",
+		);
+		expect(container.textContent).toContain("Open folder");
+		await act(async () => {
+			container
+				.querySelector<HTMLElement>('[data-ui="EditorBuildOpenSourceExport"]')
+				?.click();
+		});
+		expect(state.commandSetters.get("open-export:completed-export")).toHaveBeenCalledWith(
+			undefined,
+		);
 	});
 
 	it("hides an artifact as soon as the canonical project revision changes", async () => {

@@ -1,1 +1,4 @@
-export type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
+export {
+	EditorProjectDescriptorSchema,
+	type EditorProjectDescriptor,
+} from "~/editor/EditorProjectDescriptor";

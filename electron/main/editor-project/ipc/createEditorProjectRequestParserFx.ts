@@ -60,6 +60,8 @@ export const createEditorProjectRequestParserFx = Effect.fn("createEditorProject
 			> => parseEditorProjectIpcRequestFx("create-project", createProjectSchema, candidate),
 			parseProjectIdFx: (candidate: unknown) =>
 				parseEditorProjectIpcRequestFx("read-project", IdSchema, candidate),
+			parseDeleteProjectIdFx: (candidate: unknown) =>
+				parseEditorProjectIpcRequestFx("delete-project", IdSchema, candidate),
 			parseReplaceConfigFx: (
 				candidate: unknown,
 			): Effect.Effect<

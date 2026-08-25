@@ -10,7 +10,7 @@ export const EditorWelcomePage = ({ recentProjects }: EditorWelcomePage.Props) =
 		labelledBy="editor-welcome-title"
 		page="editor-welcome"
 		panelMode="responsive"
-		panelClassName="max-w-3xl"
+		panelClassName="max-w-5xl"
 	>
 		<EditorWelcome recentProjects={recentProjects} />
 	</MainPageLayout>

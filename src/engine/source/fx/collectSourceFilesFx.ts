@@ -22,7 +22,9 @@ export const collectSourceFilesFx = Effect.fn("collectSourceFilesFx")(function* 
 
 	return {
 		root,
-		json: files.filter((file) => file.endsWith(".json")),
+		json: files.filter(
+			(file) => file.endsWith(".json") && file !== path.join(root, "schema.json"),
+		),
 		png: files.filter((file) => file.endsWith(".png")),
 	} as const;
 });

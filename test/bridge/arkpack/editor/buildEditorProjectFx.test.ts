@@ -16,7 +16,7 @@ import {
 	installTestPngDecoder,
 } from "~test/bridge/arkpack/support/createTestPngBytes";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
-import { UnusedEditorBoardScenarioRepository } from "~test/support/UnusedEditorBoardScenarioRepository";
+import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 const validResources = editorTestPayload.resources.map((resource) => ({
 	...resource,
@@ -35,7 +35,7 @@ const createProject = (resources = validResources): EditorProject => ({
 });
 
 const createRepository = (project: EditorProject | null): EditorProjectRepositoryService => ({
-	...UnusedEditorBoardScenarioRepository,
+	...UnusedEditorProjectRepository,
 	awaitIdleFx: Effect.void,
 	createProjectFx: () => Effect.die("Unexpected create."),
 	listProjectsFx: Effect.die("Unexpected list."),

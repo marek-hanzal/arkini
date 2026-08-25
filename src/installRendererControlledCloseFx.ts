@@ -42,6 +42,13 @@ export const installRendererControlledCloseFx = Effect.fn("installRendererContro
 	}: installRendererControlledCloseFx.Props) =>
 		Effect.sync(() => {
 			let exitPresentationRequired = false;
+			const awaitEditorOperations = async () => {
+				await rendererRuntime.runPromise(
+					Effect.flatMap(EditorProjectRepository, (repository) => repository.awaitIdleFx),
+				);
+				const catalog = await rendererRuntime.runPromise(Atom.get(ArkpackCatalogOwnerAtom));
+				if (catalog !== undefined) await rendererRuntime.runPromise(catalog.awaitIdleFx);
+			};
 
 			const removeBeforeClose = lifecycle.onBeforeClose(async () => {
 				exitPresentationRequired = false;
@@ -59,19 +66,10 @@ export const installRendererControlledCloseFx = Effect.fn("installRendererContro
 							"Native close was canceled because the editor has unsaved changes.",
 						);
 					}
-					await rendererRuntime.runPromise(
-						Effect.flatMap(
-							EditorProjectRepository,
-							(repository) => repository.awaitIdleFx,
-						),
-					);
-					const catalog = await rendererRuntime.runPromise(
-						Atom.get(ArkpackCatalogOwnerAtom),
-					);
-					if (catalog !== undefined)
-						await rendererRuntime.runPromise(catalog.awaitIdleFx);
+					await awaitEditorOperations();
 					return;
 				}
+				await awaitEditorOperations();
 				exitPresentationRequired = true;
 				// Route ownership keeps finalization identical for UI-requested and native close.
 				await router.navigate({

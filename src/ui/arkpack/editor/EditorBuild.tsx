@@ -90,6 +90,47 @@ export const EditorBuild = () => {
 					)}
 				</article>
 			)}
+			<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">
+				<h2 className="text-lg font-semibold">JSON source export</h2>
+				<p className="mt-1 text-sm text-muted">
+					Writes the current saved project as game.json, the current schema.json,
+					type-grouped item files, and every PNG resource. The exported root can be
+					selected directly by Import JSON.
+				</p>
+				<div className="mt-4 flex flex-wrap gap-3">
+					<PrimaryButton
+						data-ui="EditorBuildExportSource"
+						disabled={controller.exportSourcePending}
+						cursorIntent={controller.exportSourcePending ? "progress" : undefined}
+						onClick={controller.exportSource}
+					>
+						{controller.exportSourcePending ? "Exporting…" : "Export"}
+					</PrimaryButton>
+					{controller.openSourceExportAvailable ? (
+						<Button
+							data-ui="EditorBuildOpenSourceExport"
+							disabled={controller.openSourceExportPending}
+							cursorIntent={
+								controller.openSourceExportPending ? "progress" : undefined
+							}
+							onClick={controller.openSourceExport}
+						>
+							{controller.openSourceExportPending ? "Opening…" : "Open folder"}
+						</Button>
+					) : null}
+				</div>
+				{controller.exportSourceError === undefined ? null : (
+					<p className="mt-3 text-sm text-danger">{controller.exportSourceError}</p>
+				)}
+				{controller.exportSourceSummary === undefined ? null : (
+					<p className="mt-3 break-all text-sm text-success">
+						{controller.exportSourceSummary}
+					</p>
+				)}
+				{controller.openSourceExportError === undefined ? null : (
+					<p className="mt-3 text-sm text-danger">{controller.openSourceExportError}</p>
+				)}
+			</article>
 		</section>
 	);
 };

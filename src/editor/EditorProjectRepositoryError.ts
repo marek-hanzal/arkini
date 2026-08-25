@@ -3,9 +3,13 @@ import { Data } from "effect";
 export type EditorProjectRepositoryOperation =
 	| "await-idle"
 	| "create-project"
+	| "delete-project"
 	| "delete-board-scenario"
+	| "export-json-directory"
+	| "import-json-directory"
 	| "list-board-scenarios"
 	| "list-projects"
+	| "open-export-directory"
 	| "read-project"
 	| "read-board-scenario"
 	| "replace-config"

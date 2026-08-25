@@ -3,9 +3,13 @@ export namespace EditorProjectTransport {
 	export type Operation =
 		| "await-idle"
 		| "create-project"
+		| "delete-project"
 		| "delete-board-scenario"
+		| "export-json-directory"
+		| "import-json-directory"
 		| "list-board-scenarios"
 		| "list-projects"
+		| "open-export-directory"
 		| "read-project"
 		| "read-board-scenario"
 		| "replace-config"
@@ -59,6 +63,14 @@ export namespace EditorProjectTransport {
 
 	export interface Project extends Commit {
 		readonly resources: ReadonlyArray<Resource>;
+	}
+
+	export interface SourceExport {
+		readonly json: number;
+		readonly projectDirectory: string;
+		readonly resources: number;
+		readonly revision: number;
+		readonly root: string;
 	}
 
 	export interface BoardScenarioDescriptor {

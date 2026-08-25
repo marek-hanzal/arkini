@@ -1,5 +1,5 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { match, P } from "ts-pattern";
 
@@ -10,6 +10,9 @@ import {
 	readEditorBuildDiagnosticsFx,
 } from "~/bridge/arkpack/editor/readEditorBuildDiagnosticsFx";
 import { saveBuiltEditorArkpackCommandAtom } from "~/bridge/arkpack/editor/saveBuiltEditorArkpackCommandAtom";
+import { exportEditorJsonDirectoryCommandAtom } from "~/bridge/editor/exportEditorJsonDirectoryCommandAtom";
+import type { EditorSourceExport } from "~/bridge/editor/exportEditorJsonDirectoryFx";
+import { openEditorExportDirectoryCommandAtom } from "~/bridge/editor/openEditorExportDirectoryCommandAtom";
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
@@ -40,10 +43,18 @@ export namespace useEditorBuildController {
 		readonly buildStatusLabel: string;
 		readonly buildSummary: string;
 		readonly diagnostics: ReadonlyArray<EditorGameDiagnostic>;
+		readonly exportSource: () => void;
+		readonly exportSourceError?: string;
+		readonly exportSourcePending: boolean;
+		readonly exportSourceSummary?: string;
 		readonly installArtifact: () => void;
 		readonly installError?: string;
 		readonly installPending: boolean;
 		readonly installedPackageId?: string;
+		readonly openSourceExport: () => void;
+		readonly openSourceExportAvailable: boolean;
+		readonly openSourceExportError?: string;
+		readonly openSourceExportPending: boolean;
 		readonly project: EditorProject;
 		readonly saveArtifact: () => void;
 		readonly saveError?: string;
@@ -66,14 +77,52 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 	const runInstall = useAtomSet(installAtom);
 	const saveResult = useAtomValue(saveAtom);
 	const runSave = useAtomSet(saveAtom);
+	const exportSourceAtom = exportEditorJsonDirectoryCommandAtom(project.projectId);
+	const exportSourceResult = useAtomValue(exportSourceAtom);
+	const runSourceExport = useAtomSet(exportSourceAtom);
 	const buildError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(buildResult));
 	const installError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(installResult));
 	const saveError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveResult));
+	const exportSourceError = RendererRuntime.runSync(
+		readSettledAsyncResultErrorFx(exportSourceResult),
+	);
 	const errorDiagnostics = RendererRuntime.runSync(readEditorBuildDiagnosticsFx(buildError));
 	const diagnostics = errorDiagnostics ?? artifact?.diagnostics ?? emptyDiagnostics;
 	const buildErrorMessage = errorDiagnostics === undefined ? errorMessage(buildError) : undefined;
 	const installErrorMessage = errorMessage(installError);
 	const saveErrorMessage = errorMessage(saveError);
+	const exportSourceErrorMessage = errorMessage(exportSourceError);
+	const completedSourceExport =
+		AsyncResult.isSuccess(exportSourceResult) && !exportSourceResult.waiting
+			? exportSourceResult.value
+			: undefined;
+	const sourceExportRef = useRef<
+		| {
+				readonly projectId: string;
+				readonly value: EditorSourceExport;
+		  }
+		| undefined
+	>(undefined);
+	if (sourceExportRef.current?.projectId !== project.projectId) {
+		sourceExportRef.current = undefined;
+	}
+	if (completedSourceExport !== undefined && completedSourceExport !== null) {
+		sourceExportRef.current = {
+			projectId: project.projectId,
+			value: completedSourceExport,
+		};
+	}
+	const sourceExport = sourceExportRef.current?.value;
+	const openSourceExportResult = useAtomValue(openEditorExportDirectoryCommandAtom);
+	const runOpenSourceExport = useAtomSet(openEditorExportDirectoryCommandAtom);
+	const openSourceExportError = RendererRuntime.runSync(
+		readSettledAsyncResultErrorFx(openSourceExportResult),
+	);
+	const openSourceExportErrorMessage = errorMessage(openSourceExportError);
+	const exportSourceSummary =
+		sourceExport === undefined
+			? undefined
+			: `Exported revision ${sourceExport.revision}: ${sourceExport.json} JSON files and ${sourceExport.resources} PNG resources to ${sourceExport.root}.`;
 	const buildStatus = match({
 		artifact,
 		stale: artifactStale,
@@ -144,6 +193,17 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 		artifact,
 		runInstall,
 	]);
+	const exportSource = useCallback(() => {
+		runSourceExport(undefined);
+	}, [
+		runSourceExport,
+	]);
+	const openSourceExport = useCallback(() => {
+		if (sourceExport !== undefined) runOpenSourceExport(undefined);
+	}, [
+		runOpenSourceExport,
+		sourceExport,
+	]);
 
 	return useMemo(
 		() => ({
@@ -155,10 +215,18 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 			buildStatusLabel: buildStatusLabels[buildStatus],
 			buildSummary,
 			diagnostics,
+			exportSource,
+			exportSourceError: exportSourceErrorMessage,
+			exportSourcePending: exportSourceResult.waiting,
+			exportSourceSummary,
 			installArtifact,
 			installError: installErrorMessage,
 			installPending: installResult.waiting,
 			installedPackageId,
+			openSourceExport,
+			openSourceExportAvailable: sourceExport !== undefined,
+			openSourceExportError: openSourceExportErrorMessage,
+			openSourceExportPending: openSourceExportResult.waiting,
 			project,
 			saveArtifact,
 			saveError: saveErrorMessage,
@@ -172,11 +240,19 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 			buildStatus,
 			buildSummary,
 			diagnostics,
+			exportSource,
+			exportSourceErrorMessage,
+			exportSourceResult.waiting,
+			exportSourceSummary,
 			installArtifact,
 			installErrorMessage,
 			installResult.waiting,
 			installedPackageId,
+			openSourceExport,
+			openSourceExportErrorMessage,
+			openSourceExportResult.waiting,
 			project,
+			sourceExport,
 			saveArtifact,
 			saveErrorMessage,
 			saveResult.waiting,

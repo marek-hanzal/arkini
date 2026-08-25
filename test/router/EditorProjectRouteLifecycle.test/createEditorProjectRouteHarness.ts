@@ -16,7 +16,7 @@ import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import { createTestRendererRuntime } from "~test/support/createTestRendererRuntime";
-import { UnusedEditorBoardScenarioRepository } from "~test/support/UnusedEditorBoardScenarioRepository";
+import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 const runtimes: Array<ReturnType<typeof createTestRendererRuntime>["rendererRuntime"]> = [];
 
@@ -60,7 +60,7 @@ const createProject = (projectId: string, revision = 1): EditorProject => ({
 const createRepository = (
 	projects: ReadonlyMap<string, EditorProject>,
 ): EditorProjectRepositoryService => ({
-	...UnusedEditorBoardScenarioRepository,
+	...UnusedEditorProjectRepository,
 	awaitIdleFx: Effect.void,
 	createProjectFx: () => Effect.die("Unexpected createProjectFx call."),
 	listProjectsFx: Effect.succeed([]),

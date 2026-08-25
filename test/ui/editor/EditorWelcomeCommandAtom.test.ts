@@ -15,13 +15,25 @@ import { useEditorWelcomeActions } from "~/ui/editor/useEditorWelcomeActions";
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const navigation = vi.hoisted(() => ({
+	invalidate: vi.fn(async () => undefined),
 	navigate: vi.fn(),
 }));
 
 vi.mock("@tanstack/react-router", async (importOriginal) => ({
 	...(await importOriginal<typeof import("@tanstack/react-router")>()),
 	useNavigate: () => navigation.navigate,
+	useRouter: () => ({
+		invalidate: navigation.invalidate,
+	}),
 }));
+
+vi.mock("~/bridge/editor/deleteEditorProjectAtom", async () => {
+	const { Effect } = await import("effect");
+	const Atom = await import("effect/unstable/reactivity/Atom");
+	return {
+		deleteEditorProjectAtom: Atom.fn(() => Effect.void),
+	};
+});
 
 vi.mock("~/bridge/editor/createFreshEditorProjectAtom", async () => {
 	const { Effect } = await import("effect");
@@ -85,6 +97,7 @@ afterEach(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
 	for (const registry of registries.splice(0)) registry.dispose();
+	navigation.invalidate.mockClear();
 	navigation.navigate.mockReset();
 	document.body.replaceChildren();
 });
@@ -114,7 +127,7 @@ describe("EditorWelcomeCommandAtom", () => {
 		});
 
 		registry.set(EditorWelcomeCommandAtom, {
-			action: "import",
+			action: "import-arkpack",
 			file: new File([], "ignored.arkpack"),
 		});
 		expect(registry.get(EditorWelcomeCommandAtom)).toEqual({
@@ -133,14 +146,14 @@ describe("EditorWelcomeCommandAtom", () => {
 	it("retains the exact imported project for caller-owned navigation", async () => {
 		const registry = makeRegistry();
 		registry.set(EditorWelcomeCommandAtom, {
-			action: "import",
+			action: "import-arkpack",
 			file: new File([], "game.arkpack"),
 		});
 
 		const ready = await waitForState(registry, (state) => state.kind === "ready");
 		expect(ready).toMatchObject({
 			kind: "ready",
-			action: "import",
+			action: "import-arkpack",
 			project: {
 				projectId: "project-imported",
 			},
@@ -233,7 +246,7 @@ describe("EditorWelcomeCommandAtom", () => {
 	it("publishes domain failures without entering navigation", async () => {
 		const registry = makeRegistry();
 		registry.set(EditorWelcomeCommandAtom, {
-			action: "import",
+			action: "import-arkpack",
 			file: new File([], "broken.arkpack"),
 		});
 

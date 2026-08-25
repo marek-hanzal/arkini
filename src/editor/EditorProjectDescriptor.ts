@@ -1,10 +1,21 @@
-import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import { z } from "zod";
+
+import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 
 /** Stable repository-backed identity used by editor discovery and navigation. */
-export interface EditorProjectDescriptor {
-	readonly projectId: string;
-	readonly title: string;
-	readonly version: ArkpackVersionSchema.Type;
-	readonly createdAtMs: number;
-	readonly updatedAtMs: number;
-}
+export const EditorProjectDescriptorSchema = z
+	.object({
+		projectId: IdSchema,
+		title: z.string(),
+		version: ArkpackVersionSchema,
+		createdAtMs: z.number().int().nonnegative(),
+		updatedAtMs: z.number().int().nonnegative(),
+	})
+	.strict()
+	.meta({
+		id: "EditorProjectDescriptorSchema",
+		description: "Stable repository-backed identity used by editor discovery and navigation.",
+	});
+
+export type EditorProjectDescriptor = z.infer<typeof EditorProjectDescriptorSchema>;

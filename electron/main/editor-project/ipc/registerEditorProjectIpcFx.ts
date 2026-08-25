@@ -1,13 +1,34 @@
-import { app, ipcMain, type IpcMainInvokeEvent } from "electron";
-import { Effect } from "effect";
+import { app, BrowserWindow, ipcMain, type IpcMainInvokeEvent, type WebContents } from "electron";
+import { Effect, Semaphore } from "effect";
 
 import { ArkiniElectronApi } from "../../../contract/ArkiniElectronApi";
 import { ElectronMainRuntime } from "../../ElectronMainRuntime";
 import type { TrustedRenderer } from "../../security/TrustedRenderer";
+import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 import type { EditorProjectServiceOwnership } from "../EditorProjectServiceOwnership";
+import { exportEditorJsonDirectoryFx } from "../exportEditorJsonDirectoryFx";
+import { importEditorJsonDirectoryFx } from "../importEditorJsonDirectoryFx";
+import { openEditorExportDirectoryFx } from "../openEditorExportDirectoryFx";
 import { createEditorProjectRequestParserFx } from "./createEditorProjectRequestParserFx";
 import { executeEditorProjectRepositoryFx } from "./executeEditorProjectRepositoryFx";
 import { registerEditorBoardScenarioIpcFx } from "./registerEditorBoardScenarioIpcFx";
+
+const readEditorWindowFx = (
+	event: IpcMainInvokeEvent,
+	operation: "export-json-directory" | "import-json-directory",
+) =>
+	Effect.sync(() => BrowserWindow.fromWebContents(event.sender)).pipe(
+		Effect.flatMap((window) =>
+			window === null
+				? Effect.fail(
+						new EditorProjectRepositoryError({
+							operation,
+							message: "The editor window is unavailable.",
+						}),
+					)
+				: Effect.succeed(window),
+		),
+	);
 
 let registered = false;
 
@@ -33,6 +54,8 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 				trustedRenderer,
 			});
 			const requestParser = yield* createEditorProjectRequestParserFx();
+			const sourceExports = yield* Semaphore.make(1);
+			const sourceExportRoots = new WeakMap<WebContents, string>();
 			yield* Effect.sync(() => {
 				const runAuthorized = <Value>(
 					event: IpcMainInvokeEvent,
@@ -64,11 +87,24 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					),
 				);
 				handle(ArkiniElectronApi.channels.editorAwaitIdle, () =>
-					executeEditorProjectRepositoryFx(
-						"await-idle",
-						ownership,
-						Effect.void,
-						(repository) => repository.awaitIdleFx,
+					(ownership.type === "ready"
+						? ownership.repository.awaitIdleFx
+						: Effect.void
+					).pipe(
+						Effect.andThen(sourceExports.withPermits(1)(Effect.void)),
+						Effect.match({
+							onFailure: (error) => ({
+								type: "failure" as const,
+								error: {
+									operation: error.operation,
+									message: error.message,
+								},
+							}),
+							onSuccess: () => ({
+								type: "success" as const,
+								value: undefined,
+							}),
+						}),
 					),
 				);
 				handle(ArkiniElectronApi.channels.editorProjectList, () =>
@@ -93,6 +129,79 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						ownership,
 						requestParser.parseCreateProjectFx(candidate),
 						(repository, request) => repository.createProjectFx(request),
+					),
+				);
+				handle(ArkiniElectronApi.channels.editorProjectDelete, (_event, candidate) =>
+					executeEditorProjectRepositoryFx(
+						"delete-project",
+						ownership,
+						requestParser.parseDeleteProjectIdFx(candidate),
+						(repository, projectId) => repository.deleteProjectFx(projectId),
+					),
+				);
+				handle(
+					ArkiniElectronApi.channels.editorProjectExportJsonDirectory,
+					(event, candidate) =>
+						executeEditorProjectRepositoryFx(
+							"export-json-directory",
+							ownership,
+							Effect.all({
+								projectId: requestParser.parseProjectIdFx(candidate),
+								window: readEditorWindowFx(event, "export-json-directory"),
+							}),
+							(repository, { projectId, window }) =>
+								sourceExports
+									.withPermits(1)(
+										exportEditorJsonDirectoryFx({
+											projectId,
+											repository,
+											window,
+										}),
+									)
+									.pipe(
+										Effect.tap((sourceExport) =>
+											sourceExport === null
+												? Effect.void
+												: Effect.sync(() => {
+														sourceExportRoots.set(
+															event.sender,
+															sourceExport.root,
+														);
+													}),
+										),
+									),
+						),
+				);
+				handle(ArkiniElectronApi.channels.editorProjectImportJsonDirectory, (event) =>
+					executeEditorProjectRepositoryFx(
+						"import-json-directory",
+						ownership,
+						readEditorWindowFx(event, "import-json-directory"),
+						(repository, window) =>
+							importEditorJsonDirectoryFx({
+								repository,
+								window,
+							}),
+					),
+				);
+				handle(ArkiniElectronApi.channels.editorProjectOpenExportDirectory, (event) =>
+					executeEditorProjectRepositoryFx(
+						"open-export-directory",
+						ownership,
+						Effect.sync(() => sourceExportRoots.get(event.sender)).pipe(
+							Effect.flatMap((root) =>
+								root === undefined
+									? Effect.fail(
+											new EditorProjectRepositoryError({
+												operation: "open-export-directory",
+												message:
+													"No completed JSON source export is available.",
+											}),
+										)
+									: Effect.succeed(root),
+							),
+						),
+						(_repository, root) => openEditorExportDirectoryFx(root),
 					),
 				);
 				handle(ArkiniElectronApi.channels.editorProjectReplaceConfig, (_event, candidate) =>
@@ -135,7 +244,11 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					ArkiniElectronApi.channels.editorStatus,
 					ArkiniElectronApi.channels.editorAwaitIdle,
 					ArkiniElectronApi.channels.editorProjectCreate,
+					ArkiniElectronApi.channels.editorProjectDelete,
+					ArkiniElectronApi.channels.editorProjectExportJsonDirectory,
+					ArkiniElectronApi.channels.editorProjectImportJsonDirectory,
 					ArkiniElectronApi.channels.editorProjectList,
+					ArkiniElectronApi.channels.editorProjectOpenExportDirectory,
 					ArkiniElectronApi.channels.editorProjectRead,
 					ArkiniElectronApi.channels.editorProjectReplaceConfig,
 					ArkiniElectronApi.channels.editorProjectReplaceResource,

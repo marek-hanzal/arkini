@@ -14,7 +14,7 @@ import { defaultLoadingMinimumDurationMs } from "~/ui/loading/defaultLoadingMini
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
-const renderScreen = async (completed = false) => {
+const renderScreen = async (completed = false, durationMs?: number) => {
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
@@ -23,6 +23,7 @@ const renderScreen = async (completed = false) => {
 		root.render(
 			createElement(ActionLoadingScreen, {
 				completed,
+				durationMs,
 				label: "Loading test…",
 			}),
 		);
@@ -34,6 +35,7 @@ const renderScreen = async (completed = false) => {
 				root.render(
 					createElement(ActionLoadingScreen, {
 						completed: nextCompleted,
+						durationMs,
 						label: "Loading test…",
 					}),
 				);
@@ -85,5 +87,14 @@ describe("ActionLoadingScreen", () => {
 
 		await act(async () => vi.advanceTimersByTime(defaultLoadingMinimumDurationMs));
 		expect(progressValue(container)).toBe(100);
+	});
+
+	it("can compress the same progress curve for an in-place action", async () => {
+		const durationMs = 1_000;
+		const { container } = await renderScreen(false, durationMs);
+
+		await act(async () => vi.advanceTimersByTime(durationMs));
+
+		expect(progressValue(container)).toBe(94);
 	});
 });

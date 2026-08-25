@@ -224,7 +224,7 @@ export const registerEditorMcpVersionTools = ({
 		"version_checkout",
 		{
 			description:
-				"Hard-reset the entire open editor project to one applicable version through the renderer checkout handshake. This permanently discards the current saved state and every unsaved draft.",
+				"Replace the entire open editor project with one applicable version through the renderer checkout handshake. This permanently discards the current saved state and every unsaved draft.",
 			inputSchema: z
 				.object({
 					versionId: IdSchema,
@@ -249,7 +249,7 @@ export const registerEditorMcpVersionTools = ({
 					if (version.applicability.type === "incompatible")
 						return yield* Effect.fail(new Error(version.applicability.reason));
 					yield* requestVersionCheckoutFx(project.projectId, versionId);
-					return `Version checked out\n${describeVersion(version)}\nThe editor was hard-refreshed.`;
+					return `Version checked out\n${describeVersion(version)}\nThe mounted editor was refreshed in place.`;
 				}),
 			),
 	);

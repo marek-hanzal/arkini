@@ -34,6 +34,7 @@ const pendingStages = [
 export namespace useController {
 	export interface Props {
 		readonly completed?: boolean;
+		readonly durationMs?: number;
 	}
 
 	export interface Output {
@@ -41,7 +42,10 @@ export namespace useController {
 	}
 }
 
-export const useController = ({ completed = false }: useController.Props): useController.Output => {
+export const useController = ({
+	completed = false,
+	durationMs = defaultLoadingMinimumDurationMs,
+}: useController.Props): useController.Output => {
 	const [progress, setProgress] = useState(completed ? 100 : initialProgress);
 
 	useEffect(() => {
@@ -51,16 +55,14 @@ export const useController = ({ completed = false }: useController.Props): useCo
 		}
 		setProgress(initialProgress);
 		const timers = pendingStages.map((stage) =>
-			window.setTimeout(
-				() => setProgress(stage.progress),
-				defaultLoadingMinimumDurationMs * stage.at,
-			),
+			window.setTimeout(() => setProgress(stage.progress), durationMs * stage.at),
 		);
 		return () => {
 			for (const timer of timers) window.clearTimeout(timer);
 		};
 	}, [
 		completed,
+		durationMs,
 	]);
 
 	return useMemo(

@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { EditorProjectRepositoryService } from "~/bridge/editor/EditorProjectRepository";
 import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
 import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
+import { EditorProjectReplacementEpochAtom } from "~/bridge/editor/EditorProjectReplacementEpochAtom";
 import { EditorUnsavedChanges } from "~/bridge/editor/EditorUnsavedChanges";
 import type { EditorBoardGameResource } from "~/bridge/editor/board/EditorBoardGameResource";
 import { EditorBoardGameResourceOwnerAtom } from "~/bridge/editor/board/EditorBoardGameResource";
@@ -132,6 +133,9 @@ const runCheckout = async ({
 			events,
 			exit,
 			published: registry.get(EditorProjectAtom(project.projectId)),
+			replacementEpoch: registry.get(
+				EditorProjectReplacementEpochAtom(project.projectId),
+			),
 		};
 	} finally {
 		registry.dispose();
@@ -152,6 +156,7 @@ describe("checkoutEditorProjectVersionFx", () => {
 			"board-sync-7",
 		]);
 		expect(result.published?.revision).toBe(7);
+		expect(result.replacementEpoch).toBe(1);
 	});
 
 	it("requires fresh consent before discarding newly saved working-copy changes", async () => {
@@ -187,5 +192,6 @@ describe("checkoutEditorProjectVersionFx", () => {
 			"project-read",
 			"board-sync-7",
 		]);
+		expect(result.replacementEpoch).toBe(0);
 	});
 });

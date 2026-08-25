@@ -10,10 +10,15 @@ export namespace ActionLoadingScreen {
 	}
 }
 
-/** Presents one route-owned progress curve and keeps its terminal frame full until navigation or shutdown. */
-export const ActionLoadingScreen = ({ completed, label }: ActionLoadingScreen.Props) => {
+/** Presents one Action progress curve and keeps its terminal frame full until its owner settles. */
+export const ActionLoadingScreen = ({
+	completed,
+	durationMs,
+	label,
+}: ActionLoadingScreen.Props) => {
 	const controller = useController({
 		completed,
+		durationMs,
 	});
 	return (
 		<LauncherScene

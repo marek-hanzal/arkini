@@ -1,6 +1,8 @@
 import { Effect } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
+import { EditorProjectReplacementEpochAtom } from "~/bridge/editor/EditorProjectReplacementEpochAtom";
 import { EditorUnsavedChanges } from "~/bridge/editor/EditorUnsavedChanges";
 import { blockEditorProjectWrites } from "~/bridge/editor/EditorProjectWriteAdmission";
 import { releaseCurrentEditorBoardGameFx } from "~/bridge/editor/board/releaseCurrentEditorBoardGameFx";
@@ -67,6 +69,10 @@ export const checkoutEditorProjectVersionFx = Effect.fn("checkoutEditorProjectVe
 									project: fresh,
 								});
 								yield* syncEditorBoardGameFx(fresh);
+								yield* Atom.update(
+									EditorProjectReplacementEpochAtom(projectId),
+									(epoch) => epoch + 1,
+								);
 							}).pipe(
 								Effect.catchCause((cause) =>
 									reloadEditorProjectAfterVersionRefreshFailureFx({

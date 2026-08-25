@@ -2,9 +2,10 @@ import type { PropsWithChildren } from "react";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectProvider } from "~/bridge/editor/EditorProjectProvider";
-import { EditorProjectRevisionBoundary } from "~/ui/editor/EditorProjectRevisionBoundary";
+import { EditorProjectReplacementBoundary } from "~/ui/editor/EditorProjectReplacementBoundary";
 import { EditorShell } from "~/ui/editor/EditorShell";
 import { EditorProjectResourceUrlProvider } from "~/ui/resource/editor/EditorResourceUrlProvider";
+import { EditorVersionRestoreAction } from "~/ui/version/editor/EditorVersionRestoreAction";
 
 /** Owns the project-scoped editor providers and workspace shell. */
 export const EditorProjectWorkspace = ({
@@ -14,10 +15,11 @@ export const EditorProjectWorkspace = ({
 	readonly project: EditorProject;
 }>) => (
 	<EditorProjectProvider loaded={project}>
-		<EditorProjectRevisionBoundary>
+		<EditorVersionRestoreAction projectId={project.projectId} />
+		<EditorProjectReplacementBoundary>
 			<EditorProjectResourceUrlProvider>
 				<EditorShell>{children}</EditorShell>
 			</EditorProjectResourceUrlProvider>
-		</EditorProjectRevisionBoundary>
+		</EditorProjectReplacementBoundary>
 	</EditorProjectProvider>
 );

@@ -1,12 +1,12 @@
+import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useRouter } from "@tanstack/react-router";
 import { useCallback, useState, useSyncExternalStore } from "react";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectVersionCheckoutConfirmationRequired } from "~/bridge/editor/version/EditorProjectVersionCheckoutConfirmationRequired";
-import { checkoutEditorProjectVersionFx } from "~/bridge/editor/version/checkoutEditorProjectVersionFx";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { EditorProjectVersionDescriptor } from "~/editor/version/EditorProjectVersion";
 import { useEditorUnsavedChangesOwner } from "~/ui/editor/useEditorUnsavedChangesRegistration";
+import { EditorVersionRestoreCommandAtom } from "~/ui/version/editor/EditorVersionRestoreCommandAtom";
 
 export namespace useEditorVersionCheckout {
 	export interface Props {
@@ -26,7 +26,7 @@ export namespace useEditorVersionCheckout {
 	}
 }
 
-/** Owns destructive checkout admission, dirty-state confirmation, and terminal reload. */
+/** Owns destructive checkout admission and dirty-state confirmation. */
 export const useEditorVersionCheckout = ({
 	project,
 	projectDirty,
@@ -34,6 +34,9 @@ export const useEditorVersionCheckout = ({
 	selected,
 }: useEditorVersionCheckout.Props): useEditorVersionCheckout.Output => {
 	const router = useRouter();
+	const restoreAtom = EditorVersionRestoreCommandAtom(project.projectId);
+	const restoreState = useAtomValue(restoreAtom);
+	const restore = useAtomSet(restoreAtom);
 	const unsavedOwner = useEditorUnsavedChangesOwner();
 	const unsaved = useSyncExternalStore(
 		unsavedOwner.subscribe,
@@ -41,34 +44,29 @@ export const useEditorVersionCheckout = ({
 		unsavedOwner.getSnapshot,
 	);
 	const [confirmVersion, setConfirmVersion] = useState<EditorProjectVersionDescriptor>();
-	const [pending, setPending] = useState(false);
 
 	const runCheckout = useCallback(
 		(version: EditorProjectVersionDescriptor, confirmDiscardCurrentChanges: boolean) => {
-			if (pending) return;
-			setPending(true);
+			if (restoreState.kind === "restoring") return;
 			reportError();
-			void RendererRuntime.runPromise(
-				checkoutEditorProjectVersionFx({
-					confirmDiscardCurrentChanges,
-					projectId: project.projectId,
-					versionId: version.versionId,
-				}),
-			).catch((cause) => {
-				if (cause instanceof EditorProjectVersionCheckoutConfirmationRequired) {
-					setConfirmVersion(version);
-					setPending(false);
-					return;
-				}
-				reportError(cause);
-				setPending(false);
-				setConfirmVersion(undefined);
+			restore({
+				confirmDiscardCurrentChanges,
+				onFailure: (cause) => {
+					if (cause instanceof EditorProjectVersionCheckoutConfirmationRequired) {
+						setConfirmVersion(version);
+						return;
+					}
+					reportError(cause);
+					setConfirmVersion(undefined);
+				},
+				subject: version.subject,
+				versionId: version.versionId,
 			});
 		},
 		[
-			pending,
-			project,
 			reportError,
+			restore,
+			restoreState.kind,
 		],
 	);
 	const restoreSelected = useCallback(() => {
@@ -115,7 +113,7 @@ export const useEditorVersionCheckout = ({
 					confirmVersion,
 				}),
 		goToCommit,
-		pending,
+		pending: restoreState.kind === "restoring",
 		restoreSelected,
 	};
 };

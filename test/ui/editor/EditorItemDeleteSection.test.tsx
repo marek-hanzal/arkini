@@ -49,12 +49,13 @@ vi.mock("~/ui/button/Button", () => {
 	return {
 		Button,
 		DangerButton: Button,
-		ButtonLink: ({ children, params, to, ...props }: Record<string, unknown>) =>
+		ButtonLink: ({ children, params, search, to, ...props }: Record<string, unknown>) =>
 			createElement(
 				"a",
 				{
 					...props,
 					"data-params": JSON.stringify(params),
+					"data-search": JSON.stringify(search),
 					"data-to": to,
 				},
 				children as ReactNode,
@@ -170,6 +171,15 @@ describe("EditorItemDeleteSection", () => {
 		);
 		expect(container.textContent).toContain("every saved Board scenario");
 		expect(container.textContent).toContain("published game saves are discarded");
+		const versionLink = container.querySelector<HTMLAnchorElement>(
+			'[data-ui="EditorItemDeleteCreateVersion"]',
+		);
+		expect(versionLink?.dataset.to).toBe("/editor/$projectId/versions/commit");
+		expect(versionLink?.dataset.search).toBe(
+			JSON.stringify({
+				returnTo: "/editor/project-one/editor/items/water/detail/delete",
+			}),
+		);
 
 		await act(async () =>
 			container
@@ -194,6 +204,7 @@ describe("EditorItemDeleteSection", () => {
 		expect(container.textContent).toContain("Its asset files remain available in the project.");
 		expect(container.textContent).toContain("every saved Board scenario");
 		expect(container.textContent).toContain("published game saves are discarded");
+		expect(container.querySelector('[data-ui="EditorItemDeleteCreateVersion"]')).not.toBeNull();
 		const confirm = container.querySelector<HTMLButtonElement>(
 			'[data-ui="EditorItemDeleteConfirm"]',
 		);

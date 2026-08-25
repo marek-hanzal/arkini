@@ -1,7 +1,7 @@
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import type { EditorItemForceDeleteImpact } from "~/editor/forceDeleteEditorItemFx";
-import { Button, DangerButton } from "~/ui/button/Button";
+import { Button, ButtonLink, DangerButton } from "~/ui/button/Button";
 
 const EditorItemDeleteError = ({ error }: { readonly error: unknown }) =>
 	error === undefined ? null : (
@@ -120,7 +120,21 @@ export const EditorItemDeleteDialog = ({
 			</div>
 			<p className="mt-2 text-xs text-subtle">Item ID: {item.id}</p>
 			<EditorItemDeleteError error={error} />
-			<div className="mt-6 flex justify-end gap-2">
+			<div className="mt-6 flex flex-wrap justify-end gap-2">
+				{pending ? null : (
+					<ButtonLink
+						data-ui="EditorItemDeleteCreateVersion"
+						to="/editor/$projectId/versions/commit"
+						params={{
+							projectId: project.projectId,
+						}}
+						search={{
+							returnTo: `/editor/${project.projectId}/editor/items/${item.uid}/detail/delete`,
+						}}
+					>
+						Create version first…
+					</ButtonLink>
+				)}
 				<Button
 					disabled={pending}
 					onClick={onCancel}

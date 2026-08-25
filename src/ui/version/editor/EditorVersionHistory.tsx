@@ -2,8 +2,10 @@ import { twMerge } from "tailwind-merge";
 
 import type { EditorProjectVersionDescriptor } from "~/editor/version/EditorProjectVersion";
 import { Button, DangerButton } from "~/ui/button/Button";
+import { LinkButton } from "~/ui/button/LinkButton";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
 import { EditorSelect, type EditorSelectOption } from "~/ui/form/EditorSelect";
+import { Tooltip } from "~/ui/overlay/Tooltip";
 import { EditorVersionCheckoutDialog } from "~/ui/version/editor/EditorVersionCheckoutDialog";
 import { EditorVersionDiff } from "~/ui/version/editor/EditorVersionDiff";
 import { EditorVersionGraph } from "~/ui/version/editor/EditorVersionGraph";
@@ -44,9 +46,17 @@ const EditorVersionReferenceSelect = ({
 	);
 };
 
+const VersionCreatedAt = ({ createdAtMs }: { readonly createdAtMs: number }) => {
+	const createdAt = new Date(createdAtMs);
+	return <time dateTime={createdAt.toISOString()}>{createdAt.toLocaleString()}</time>;
+};
+
 export const EditorVersionHistory = () => {
 	const controller = useEditorVersionHistoryController();
 	const versions = controller.history?.versions ?? [];
+	const selectedParent = versions.find(
+		(version) => version.versionId === controller.selected?.parentVersionId,
+	);
 	return (
 		<div
 			className="grid h-full min-h-0 lg:grid-cols-[minmax(20rem,0.85fr)_minmax(24rem,1.15fr)]"
@@ -87,9 +97,47 @@ export const EditorVersionHistory = () => {
 									</h2>
 									<p className="mt-1 text-xs text-muted">
 										Arkini {controller.selected.arkini} · Arkpack{" "}
-										{controller.selected.arkpackVersion}· source revision{" "}
+										{controller.selected.arkpackVersion} · source revision{" "}
 										{controller.selected.sourceRevision}
 									</p>
+									<dl className="mt-3 grid min-w-0 gap-3 text-xs sm:grid-cols-2">
+										<div>
+											<dt className="font-semibold uppercase tracking-wider text-subtle">
+												Created
+											</dt>
+											<dd className="mt-1 text-muted">
+												<VersionCreatedAt
+													createdAtMs={controller.selected.createdAtMs}
+												/>
+											</dd>
+										</div>
+										<div className="min-w-0">
+											<dt className="font-semibold uppercase tracking-wider text-subtle">
+												Parent
+											</dt>
+											<dd className="mt-1 min-w-0 text-muted">
+												{controller.selected.parentVersionId === undefined ? (
+													"No parent"
+												) : selectedParent === undefined ? (
+													"Parent unavailable"
+												) : (
+													<Tooltip
+														content={selectedParent.subject}
+														placement="top-start"
+													>
+														<LinkButton
+															className="block max-w-full truncate text-left"
+															onClick={() =>
+																controller.selectVersion(selectedParent.versionId)
+															}
+														>
+															{selectedParent.subject}
+														</LinkButton>
+													</Tooltip>
+												)}
+											</dd>
+										</div>
+									</dl>
 								</div>
 								<DangerButton
 									disabled={

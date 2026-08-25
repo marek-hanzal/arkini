@@ -5,7 +5,6 @@ import { Clock, Effect, type Semaphore } from "effect";
 import { z } from "zod";
 
 import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
-import type { EditorProject } from "~/editor/EditorProject";
 import {
 	EditorProjectRepositoryError,
 	type EditorProjectRepositoryOperation,
@@ -231,24 +230,6 @@ const createFingerprint = (
 			})),
 		}),
 	);
-
-const materializeProject = (
-	project: z.infer<typeof SqliteEditorProjectRowSchema>,
-	resources: ReadonlyArray<EditorProjectResourceRecordSchema.Type>,
-): EditorProject => ({
-	projectId: project.projectId,
-	title: project.config.meta.title,
-	version: project.version,
-	createdAtMs: project.createdAtMs,
-	updatedAtMs: project.updatedAtMs,
-	revision: project.revision,
-	config: project.config,
-	resources: resources.map(({ id, mime, bytes }) => ({
-		id,
-		mime,
-		bytes,
-	})),
-});
 
 export namespace createSqliteEditorProjectVersionOperationsFx {
 	export interface Props {
@@ -664,23 +645,6 @@ export const createSqliteEditorProjectVersionOperationsFx = Effect.fn(
 						scenario.updatedAtMs,
 					);
 				statements.upsertBase.run(projectId, versionId);
-				const restored = readProjectRow(
-					statements.selectProject,
-					projectId,
-					"checkout-version",
-				);
-				if (restored === null)
-					throw createRepositoryError(
-						"checkout-version",
-						"The restored project is missing.",
-					);
-				return {
-					project: materializeProject(
-						restored,
-						readResourceRows(statements.selectResources, projectId, "checkout-version"),
-					),
-					version: materializeDescriptor(version),
-				};
 			}).pipe(
 				Effect.mapError((cause) =>
 					createRepositoryError(

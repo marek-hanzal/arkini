@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { z } from "zod";
 
-import { readEditorProjectFx } from "~/bridge/editor/readEditorProjectFx";
 import { checkoutEditorProjectVersionFx } from "~/bridge/editor/version/checkoutEditorProjectVersionFx";
 import { hardReloadEditorProjectVersion } from "~/bridge/editor/version/hardReloadEditorProjectVersion";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
@@ -46,18 +45,12 @@ export const installEditorMcpVersionCheckoutFx = Effect.fn("installEditorMcpVers
 				running = true;
 				try {
 					await rendererRuntime.runPromise(
-						readEditorProjectFx({
+						checkoutEditorProjectVersionFx({
+							confirmDiscardCurrentChanges: true,
+							hardReload,
 							projectId: request.projectId,
-						}).pipe(
-							Effect.flatMap((currentProject) =>
-								checkoutEditorProjectVersionFx({
-									confirmDiscardCurrentChanges: true,
-									currentProject,
-									hardReload,
-									versionId: request.versionId,
-								}),
-							),
-						),
+							versionId: request.versionId,
+						}),
 					);
 				} finally {
 					running = false;

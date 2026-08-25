@@ -53,17 +53,13 @@ describe("SQLite editor version compatibility", () => {
 		).toMatchObject({
 			hasChanges: false,
 		});
-		expect(
-			await Effect.runPromise(
+		await expect(
+			Effect.runPromise(
 				repository.checkoutVersionFx({
 					projectId: project.projectId,
 					versionId: version.versionId,
 				}),
 			),
-		).toMatchObject({
-			version: {
-				snapshotFormatVersion: 99,
-			},
-		});
+		).resolves.toBeUndefined();
 	});
 });

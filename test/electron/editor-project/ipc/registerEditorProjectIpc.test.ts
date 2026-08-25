@@ -329,11 +329,9 @@ describe("registerEditorProjectIpcFx", () => {
 		});
 		await expect(
 			invoke(ArkiniElectronApi.channels.editorVersionCheckout, versionCheckoutRequest),
-		).resolves.toMatchObject({
+		).resolves.toEqual({
 			type: "success",
-			value: {
-				version: editorProjectIpcVersion,
-			},
+			value: undefined,
 		});
 		await expect(
 			invoke(ArkiniElectronApi.channels.editorVersionTag, versionTagRequest),

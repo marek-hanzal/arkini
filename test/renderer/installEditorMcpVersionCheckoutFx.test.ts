@@ -6,34 +6,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { EditorProjectRepositoryService } from "~/bridge/editor/EditorProjectRepository";
 import { installEditorMcpVersionCheckoutFx } from "~/bridge/editor/version/installEditorMcpVersionCheckoutFx";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import { createTestRendererRuntime } from "~test/support/createTestRendererRuntime";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
-
-const project = {
-	projectId: "project-one",
-	title: editorTestPayload.config.meta.title,
-	version: editorTestPayload.version,
-	createdAtMs: 1,
-	updatedAtMs: 1,
-	revision: 0,
-	config: editorTestPayload.config,
-	resources: editorTestPayload.resources,
-};
-
-const version = {
-	applicability: {
-		type: "applicable" as const,
-	},
-	arkini: editorTestPayload.game,
-	arkpackVersion: project.version,
-	createdAtMs: 2,
-	projectId: project.projectId,
-	snapshotFormatVersion: 1,
-	sourceRevision: 0,
-	subject: "Snapshot",
-	versionId: "version-one",
-};
 
 const runtimes: Array<ReturnType<typeof createTestRendererRuntime>["rendererRuntime"]> = [];
 
@@ -43,15 +17,7 @@ afterEach(async () => {
 
 describe("installEditorMcpVersionCheckoutFx", () => {
 	it("uses the renderer checkout coordinator and reloads the exact open project", async () => {
-		const checkoutVersionFx = vi.fn(() =>
-			Effect.succeed({
-				project: {
-					...project,
-					revision: 1,
-				},
-				version,
-			}),
-		);
+		const checkoutVersionFx = vi.fn(() => Effect.void);
 		const repository: EditorProjectRepositoryService = {
 			...UnusedEditorProjectRepository,
 			awaitIdleFx: Effect.void,
@@ -59,7 +25,7 @@ describe("installEditorMcpVersionCheckoutFx", () => {
 			createProjectFx: () => Effect.die("Unexpected project create."),
 			deleteItemFx: () => Effect.die("Unexpected item delete."),
 			listProjectsFx: Effect.die("Unexpected project list."),
-			readProjectFx: () => Effect.succeed(project),
+			readProjectFx: () => Effect.die("Unexpected project read."),
 			readVersionStatusFx: () =>
 				Effect.succeed({
 					canCommit: true,

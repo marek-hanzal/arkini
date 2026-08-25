@@ -133,18 +133,20 @@ describe("SQLite editor project versions", () => {
 		expect(experiment.parentVersionId).toBe(root.versionId);
 		expect(experiment.createdAtMs).toBeGreaterThan(root.createdAtMs);
 
-		const restored = await Effect.runPromise(
+		await Effect.runPromise(
 			repository.checkoutVersionFx({
 				projectId: project.projectId,
 				versionId: root.versionId,
 			}),
 		);
-		expect(restored.project).toMatchObject({
+		const restored = await Effect.runPromise(repository.readProjectFx(project.projectId));
+		if (restored === null) throw new Error("Expected the restored editor project.");
+		expect(restored).toMatchObject({
 			config: project.config,
 			revision: changed.revision + 1,
 			version: "1.0",
 		});
-		expect(restored.project.resources).toEqual(project.resources);
+		expect(restored.resources).toEqual(project.resources);
 		expect(
 			await Effect.runPromise(
 				repository.readBoardScenarioFx({
@@ -154,7 +156,7 @@ describe("SQLite editor project versions", () => {
 			),
 		).toEqual({
 			...scenario,
-			projectRevision: restored.project.revision,
+			projectRevision: restored.revision,
 		});
 		expect(
 			await Effect.runPromise(repository.readVersionStatusFx(project.projectId)),
@@ -168,11 +170,11 @@ describe("SQLite editor project versions", () => {
 		const branchProject = await Effect.runPromise(
 			repository.replaceConfigFx({
 				projectId: project.projectId,
-				expectedRevision: restored.project.revision,
+				expectedRevision: restored.revision,
 				config: {
-					...restored.project.config,
+					...restored.config,
 					meta: {
-						...restored.project.config.meta,
+						...restored.config.meta,
 						title: "Alternative",
 					},
 				},

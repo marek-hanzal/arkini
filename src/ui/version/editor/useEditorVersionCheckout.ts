@@ -52,8 +52,8 @@ export const useEditorVersionCheckout = ({
 			void RendererRuntime.runPromise(
 				checkoutEditorProjectVersionFx({
 					confirmDiscardCurrentChanges,
-					currentProject: project,
 					hardReload: hardReloadEditorProjectVersion,
+					projectId: project.projectId,
 					versionId: version.versionId,
 				}),
 			).catch((cause) => {

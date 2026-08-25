@@ -25,20 +25,6 @@ const project = {
 	resources: editorTestPayload.resources,
 };
 
-const version = {
-	applicability: {
-		type: "applicable" as const,
-	},
-	arkini: editorTestPayload.game,
-	arkpackVersion: project.version,
-	createdAtMs: 2,
-	projectId: project.projectId,
-	snapshotFormatVersion: 1,
-	sourceRevision: project.revision,
-	subject: "Snapshot",
-	versionId: "version-one",
-};
-
 const runCheckout = async ({
 	confirm = true,
 	dirty = false,
@@ -80,14 +66,7 @@ const runCheckout = async ({
 									message: "Checkout rejected.",
 								}),
 							)
-						: Effect.succeed({
-								project: {
-									...project,
-									revision: 2,
-									updatedAtMs: 2,
-								},
-								version,
-							}),
+						: Effect.void,
 				),
 			),
 	);
@@ -140,9 +119,9 @@ const runCheckout = async ({
 		const exit = await Effect.runPromiseExit(
 			checkoutEditorProjectVersionFx({
 				confirmDiscardCurrentChanges: confirm,
-				currentProject: project,
 				hardReload: () => events.push("hard-reload"),
-				versionId: version.versionId,
+				projectId: project.projectId,
+				versionId: "version-one",
 			}).pipe(
 				Effect.provideService(EditorProjectRepository, repository),
 				Effect.provideService(EditorUnsavedChanges, unsaved),

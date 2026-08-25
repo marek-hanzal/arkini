@@ -283,19 +283,7 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 			callFx(
 				"checkout-version",
 				() => window.arkini.editor.checkoutVersion(request),
-				(value) => {
-					const checkout = z
-						.object({
-							project: z.unknown(),
-							version: versionDescriptorSchema,
-						})
-						.strict()
-						.parse(value);
-					return {
-						project: parseProject(checkout.project),
-						version: checkout.version,
-					};
-				},
+				() => undefined,
 			),
 		deleteItemFx: (request) =>
 			writeFx(

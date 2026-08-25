@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 
-import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
 import { EditorUnsavedChanges } from "~/bridge/editor/EditorUnsavedChanges";
 import { blockEditorProjectWrites } from "~/bridge/editor/EditorProjectWriteAdmission";
@@ -11,8 +10,8 @@ import { EditorProjectVersionCheckoutConfirmationRequired } from "~/bridge/edito
 export namespace checkoutEditorProjectVersionFx {
 	export interface Props {
 		readonly confirmDiscardCurrentChanges: boolean;
-		readonly currentProject: EditorProject;
 		readonly hardReload: (projectId: string) => void;
+		readonly projectId: string;
 		readonly versionId: string;
 	}
 }
@@ -21,8 +20,8 @@ export namespace checkoutEditorProjectVersionFx {
 export const checkoutEditorProjectVersionFx = Effect.fn("checkoutEditorProjectVersionFx")(
 	({
 		confirmDiscardCurrentChanges,
-		currentProject,
 		hardReload,
+		projectId,
 		versionId,
 	}: checkoutEditorProjectVersionFx.Props) =>
 		Effect.acquireUseRelease(
@@ -32,21 +31,21 @@ export const checkoutEditorProjectVersionFx = Effect.fn("checkoutEditorProjectVe
 					const repository = yield* EditorProjectRepository;
 					const unsavedChanges = yield* EditorUnsavedChanges;
 					yield* repository.awaitIdleFx;
-					const status = yield* repository.readVersionStatusFx(currentProject.projectId);
+					const status = yield* repository.readVersionStatusFx(projectId);
 					if (status.dirty && !confirmDiscardCurrentChanges)
 						return yield* Effect.fail(
 							new EditorProjectVersionCheckoutConfirmationRequired(),
 						);
 					yield* releaseCurrentEditorBoardGameFx;
-					const checkout = yield* repository
+					yield* repository
 						.checkoutVersionFx({
 							expectedFingerprint: status.currentFingerprint,
-							projectId: currentProject.projectId,
+							projectId,
 							versionId,
 						})
 						.pipe(
 							Effect.tapError(() =>
-								repository.readProjectFx(currentProject.projectId).pipe(
+								repository.readProjectFx(projectId).pipe(
 									Effect.flatMap((latest) =>
 										latest === null
 											? Effect.void
@@ -57,8 +56,7 @@ export const checkoutEditorProjectVersionFx = Effect.fn("checkoutEditorProjectVe
 							),
 						);
 					unsavedChanges.discardAll();
-					hardReload(currentProject.projectId);
-					return checkout;
+					hardReload(projectId);
 				}),
 			(release) => Effect.sync(release),
 		),

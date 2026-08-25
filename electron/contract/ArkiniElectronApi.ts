@@ -234,7 +234,7 @@ export namespace ArkiniElectronApi {
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.VersionDescriptor>>;
 			readonly checkoutVersion: (
 				request: EditorProjectTransport.VersionCheckoutRequest,
-			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.VersionCheckout>>;
+			) => Promise<EditorProjectTransport.Result<void>>;
 			readonly updateVersionTag: (
 				request: EditorProjectTransport.VersionTagRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.VersionDescriptor>>;

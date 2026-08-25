@@ -1,6 +1,5 @@
 import type { Effect } from "effect";
 
-import type { EditorProject } from "~/editor/EditorProject";
 import type { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 
 export type EditorProjectVersionApplicability =
@@ -98,16 +97,11 @@ export interface EditorProjectVersionDiff {
 	readonly scenarios: ReadonlyArray<EditorProjectVersionBinaryDiff>;
 }
 
-export interface EditorProjectVersionCheckout {
-	readonly project: EditorProject;
-	readonly version: EditorProjectVersionDescriptor;
-}
-
 /** Main-process version authority; renderer transport is composed in a later boundary. */
 export interface EditorProjectVersionRepositoryService {
 	readonly checkoutVersionFx: (
 		props: EditorProjectVersionCheckoutInput,
-	) => Effect.Effect<EditorProjectVersionCheckout, EditorProjectRepositoryError>;
+	) => Effect.Effect<void, EditorProjectRepositoryError>;
 	readonly createVersionFx: (
 		props: EditorProjectVersionCommitInput,
 	) => Effect.Effect<EditorProjectVersionDescriptor, EditorProjectRepositoryError>;

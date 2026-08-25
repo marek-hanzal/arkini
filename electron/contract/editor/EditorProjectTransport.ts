@@ -243,9 +243,4 @@ export namespace EditorProjectTransport {
 		readonly resources: ReadonlyArray<VersionBinaryDiff>;
 		readonly scenarios: ReadonlyArray<VersionBinaryDiff>;
 	}
-
-	export interface VersionCheckout {
-		readonly project: Project;
-		readonly version: VersionDescriptor;
-	}
 }

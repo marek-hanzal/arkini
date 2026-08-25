@@ -115,12 +115,7 @@ const installEditorApi = () => {
 			}),
 		),
 		createVersion: vi.fn(async () => success(version)),
-		checkoutVersion: vi.fn(async () =>
-			success({
-				project,
-				version,
-			}),
-		),
+		checkoutVersion: vi.fn(async () => success(undefined)),
 		updateVersionTag: vi.fn(async () => success(version)),
 	};
 	Object.defineProperty(window, "arkini", {

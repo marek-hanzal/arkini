@@ -66,6 +66,13 @@ describe("fresh checkout desktop delivery inputs", () => {
 				),
 			);
 			expect(packagedAsar.size).toBeLessThanOrEqual(maxPackagedAsarBytes);
+			const packagedCzechLocale = await stat(
+				join(
+					workspace.root,
+					".out/desktop/release/mac-arm64/Arkini.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/cs.lproj/locale.pak",
+				),
+			);
+			expect(packagedCzechLocale.isFile()).toBe(true);
 			const packagedCli = await runPackagedCliVersion(workspace.root);
 			expect(packagedCli.output).toContain(packagedCli.expectedVersion);
 			expect(await workspace.readStatus()).toBe("");

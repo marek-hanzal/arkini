@@ -3,6 +3,7 @@ productName: Arkini
 asar: true
 npmRebuild: false
 electronLanguages:
+  - cs-CZ
   - en-US
   - en-GB
   - en_GB

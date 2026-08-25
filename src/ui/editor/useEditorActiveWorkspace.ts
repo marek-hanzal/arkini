@@ -6,6 +6,7 @@ export const EditorWorkspaceRoutes = [
 		icon: "icon-[lucide--folder-cog]",
 		label: "Project",
 		matchTo: "/editor/$projectId/project",
+		shortcut: "Mod+Shift+P",
 		to: "/editor/$projectId/project",
 	},
 	{
@@ -13,6 +14,7 @@ export const EditorWorkspaceRoutes = [
 		icon: "icon-[lucide--notebook-pen]",
 		label: "Notes",
 		matchTo: "/editor/$projectId/notes",
+		shortcut: "Mod+Shift+N",
 		to: "/editor/$projectId/notes",
 	},
 	{
@@ -20,6 +22,7 @@ export const EditorWorkspaceRoutes = [
 		icon: "icon-[lucide--boxes]",
 		label: "Items",
 		matchTo: "/editor/$projectId/editor",
+		shortcut: "Mod+Shift+I",
 		to: "/editor/$projectId/editor/items/list",
 	},
 	{
@@ -27,6 +30,7 @@ export const EditorWorkspaceRoutes = [
 		icon: "icon-[lucide--calculator]",
 		label: "Estimate",
 		matchTo: "/editor/$projectId/estimate",
+		shortcut: "Mod+Shift+E",
 		to: "/editor/$projectId/estimate",
 	},
 	{
@@ -34,6 +38,7 @@ export const EditorWorkspaceRoutes = [
 		icon: "icon-[lucide--images]",
 		label: "Assets",
 		matchTo: "/editor/$projectId/assets",
+		shortcut: "Mod+Shift+A",
 		to: "/editor/$projectId/assets",
 	},
 	{
@@ -41,6 +46,7 @@ export const EditorWorkspaceRoutes = [
 		icon: "icon-[lucide--message-circle-more]",
 		label: "ChatGPT",
 		matchTo: "/editor/$projectId/chatgpt",
+		shortcut: "Mod+Shift+C",
 		to: "/editor/$projectId/chatgpt",
 	},
 	{
@@ -48,6 +54,7 @@ export const EditorWorkspaceRoutes = [
 		icon: "icon-[lucide--radio-tower]",
 		label: "MCP",
 		matchTo: "/editor/$projectId/mcp",
+		shortcut: "Mod+Shift+M",
 		to: "/editor/$projectId/mcp",
 	},
 	{
@@ -55,6 +62,7 @@ export const EditorWorkspaceRoutes = [
 		icon: "icon-[lucide--git-fork]",
 		label: "Flow",
 		matchTo: "/editor/$projectId/flow",
+		shortcut: "Mod+Shift+F",
 		to: "/editor/$projectId/flow",
 	},
 	{
@@ -62,6 +70,7 @@ export const EditorWorkspaceRoutes = [
 		icon: "icon-[lucide--layout-grid]",
 		label: "Board",
 		matchTo: "/editor/$projectId/board",
+		shortcut: "Mod+Shift+B",
 		to: "/editor/$projectId/board",
 	},
 	{
@@ -69,6 +78,7 @@ export const EditorWorkspaceRoutes = [
 		icon: "icon-[lucide--git-branch]",
 		label: "Versions",
 		matchTo: "/editor/$projectId/versions",
+		shortcut: "Mod+Shift+V",
 		to: "/editor/$projectId/versions/commit",
 	},
 	{
@@ -76,6 +86,7 @@ export const EditorWorkspaceRoutes = [
 		icon: "icon-[lucide--package-check]",
 		label: "Build",
 		matchTo: "/editor/$projectId/build",
+		shortcut: "Mod+Shift+U",
 		to: "/editor/$projectId/build",
 	},
 ] as const;

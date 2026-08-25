@@ -1,7 +1,6 @@
 import { useHotkeys } from "@tanstack/react-hotkeys";
 import { useRouter } from "@tanstack/react-router";
 
-import { readEditorWorkspaceShortcut } from "~/ui/editor/EditorWorkspaceShortcuts";
 import { EditorWorkspaceRoutes } from "~/ui/editor/useEditorActiveWorkspace";
 
 export namespace useEditorWorkspaceShortcuts {
@@ -19,8 +18,8 @@ export const useEditorWorkspaceShortcuts = ({
 	const router = useRouter();
 
 	useHotkeys(
-		EditorWorkspaceRoutes.map(({ id, to }) => ({
-			hotkey: readEditorWorkspaceShortcut(id),
+		EditorWorkspaceRoutes.map(({ shortcut, to }) => ({
+			hotkey: shortcut,
 			callback: (event) => {
 				if (event.repeat) return;
 				void router.navigate({

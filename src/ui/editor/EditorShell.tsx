@@ -13,7 +13,6 @@ import { flushSync } from "react-dom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { waitForEditorProjectWritesCommandAtom } from "~/bridge/editor/waitForEditorProjectWritesCommandAtom";
 import { Button, ButtonLink } from "~/ui/button/Button";
-import { readEditorWorkspaceShortcut } from "~/ui/editor/EditorWorkspaceShortcuts";
 import {
 	EditorWorkspaceRoutes,
 	type EditorWorkspaceId,
@@ -138,10 +137,10 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 					className="ak-editor-workspace-tabs flex min-h-0 flex-col items-center gap-1"
 					aria-label="Editor tools"
 				>
-					{EditorWorkspaceRoutes.map(({ icon, id, label, to }) => (
+					{EditorWorkspaceRoutes.map(({ icon, id, label, shortcut, to }) => (
 						<Tooltip
 							key={id}
-							content={`${label} · ${formatForDisplay(readEditorWorkspaceShortcut(id))}`}
+							content={`${label} · ${formatForDisplay(shortcut)}`}
 							placement="right"
 						>
 							<ButtonLink

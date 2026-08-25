@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { act } from "react";
+import { act, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -28,9 +28,9 @@ describe("EditorVersionGraph", () => {
 		const root = createRoot(container);
 		roots.push(root);
 		const onSelectWorkingCopy = vi.fn();
-
-		await act(async () =>
-			root.render(
+		const Harness = () => {
+			const [selectedReference, setSelectedReference] = useState("version-one");
+			return (
 				<EditorVersionGraph
 					layout={{
 						laneCount: 1,
@@ -38,7 +38,11 @@ describe("EditorVersionGraph", () => {
 						workingCopyLane: 0,
 					}}
 					onSelect={vi.fn()}
-					onSelectWorkingCopy={onSelectWorkingCopy}
+					onSelectWorkingCopy={() => {
+						setSelectedReference("current");
+						onSelectWorkingCopy();
+					}}
+					selectedReference={selectedReference}
 					status={{
 						canCommit: true,
 						currentBaseVersionId: "version-one",
@@ -46,16 +50,20 @@ describe("EditorVersionGraph", () => {
 						dirty: true,
 						versionCount: 1,
 					}}
-				/>,
-			),
-		);
+				/>
+			);
+		};
+
+		await act(async () => root.render(<Harness />));
 		const workingCopy = container.querySelector<HTMLButtonElement>(
 			'[data-ui="EditorVersionWorkingCopy"]',
 		);
 		expect(workingCopy).not.toBeNull();
+		expect(workingCopy?.dataset.selected).toBeUndefined();
 
 		await act(async () => workingCopy?.click());
 
 		expect(onSelectWorkingCopy).toHaveBeenCalledOnce();
+		expect(workingCopy?.dataset.selected).toBe("true");
 	});
 });

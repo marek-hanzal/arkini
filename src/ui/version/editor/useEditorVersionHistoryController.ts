@@ -55,7 +55,6 @@ export const useEditorVersionHistoryController = (): useEditorVersionHistoryCont
 	const project = useEditorProject();
 	const [error, setError] = useState<string>();
 	const [history, setHistory] = useState<HistoryState>();
-	const [selectedVersionId, setSelectedVersionId] = useState<string>();
 	const reportError = useCallback(
 		(cause?: unknown) => setError(cause === undefined ? undefined : message(cause)),
 		[],
@@ -70,8 +69,6 @@ export const useEditorVersionHistoryController = (): useEditorVersionHistoryCont
 		void RendererRuntime.runPromise(readEditorProjectVersionHistoryFx(project.projectId))
 			.then((next) => {
 				setHistory(next);
-				const selectedId = next.status.currentBaseVersionId ?? next.versions[0]?.versionId;
-				setSelectedVersionId((current) => current ?? selectedId);
 				comparison.resetToBase(next.status.currentBaseVersionId);
 			})
 			.catch(reportError);
@@ -90,7 +87,9 @@ export const useEditorVersionHistoryController = (): useEditorVersionHistoryCont
 		loadHistory,
 		project.projectId,
 	]);
-	const selected = history?.versions.find((version) => version.versionId === selectedVersionId);
+	const selected = history?.versions.find(
+		(version) => version.versionId === comparison.compareTo,
+	);
 	const graph = useMemo(
 		() =>
 			history === undefined
@@ -126,7 +125,6 @@ export const useEditorVersionHistoryController = (): useEditorVersionHistoryCont
 				(candidate) => candidate.versionId === versionId,
 			);
 			if (version === undefined) return;
-			setSelectedVersionId(versionId);
 			comparison.compareVersion(version);
 		},
 		[

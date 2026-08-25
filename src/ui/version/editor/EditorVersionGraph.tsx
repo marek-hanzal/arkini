@@ -1,3 +1,5 @@
+import { twMerge } from "tailwind-merge";
+
 import type { EditorProjectVersionStatus } from "~/editor/version/EditorProjectVersion";
 import type { EditorVersionGraphLayout } from "~/ui/version/editor/layoutEditorVersionGraph";
 
@@ -90,13 +92,13 @@ export const EditorVersionGraph = ({
 	layout,
 	onSelect,
 	onSelectWorkingCopy,
-	selectedVersionId,
+	selectedReference,
 	status,
 }: {
 	readonly layout: EditorVersionGraphLayout;
 	readonly onSelect: (versionId: string) => void;
 	readonly onSelectWorkingCopy: () => void;
-	readonly selectedVersionId?: string;
+	readonly selectedReference: string;
 	readonly status: EditorProjectVersionStatus;
 }) => {
 	const workingCopy = WorkingCopyPresentation[readWorkingCopyState(status)];
@@ -107,7 +109,12 @@ export const EditorVersionGraph = ({
 		>
 			<button
 				type="button"
-				className={`flex min-h-16 w-full cursor-pointer items-center border-b border-line/60 px-2 text-left hover:bg-surface-raised ${workingCopy.backgroundClassName}`}
+				className={twMerge(
+					"flex min-h-16 w-full cursor-pointer items-center border-b border-line/60 px-2 text-left hover:bg-surface-raised",
+					workingCopy.backgroundClassName,
+					selectedReference === "current" && "bg-accent/10",
+				)}
+				data-selected={selectedReference === "current" ? true : undefined}
 				data-ui="EditorVersionWorkingCopy"
 				onClick={onSelectWorkingCopy}
 			>
@@ -143,9 +150,13 @@ export const EditorVersionGraph = ({
 				<button
 					key={row.version.versionId}
 					type="button"
-					className={`flex min-h-16 w-full cursor-pointer items-center border-b border-line/60 px-2 text-left hover:bg-surface-raised ${
-						selectedVersionId === row.version.versionId ? "bg-accent/10" : ""
-					}`}
+					className={twMerge(
+						"flex min-h-16 w-full cursor-pointer items-center border-b border-line/60 px-2 text-left hover:bg-surface-raised",
+						selectedReference === row.version.versionId && "bg-accent/10",
+					)}
+					data-selected={
+						selectedReference === row.version.versionId ? true : undefined
+					}
 					onClick={() => onSelect(row.version.versionId)}
 				>
 					<VersionRails

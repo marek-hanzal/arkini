@@ -60,7 +60,7 @@ export const EditorVersionHistory = () => {
 						layout={controller.graph}
 						onSelect={controller.selectVersion}
 						onSelectWorkingCopy={controller.selectWorkingCopy}
-						selectedVersionId={controller.selected?.versionId}
+						selectedReference={controller.compareTo}
 						status={controller.history.status}
 					/>
 				)}
@@ -73,7 +73,11 @@ export const EditorVersionHistory = () => {
 						</p>
 					)}
 					{controller.selected === undefined ? (
-						<p className="text-sm text-muted">Create or select a saved version.</p>
+						<p className="text-sm text-muted">
+							{controller.compareTo === "current"
+								? "Working copy selected."
+								: "Create or select a saved version."}
+						</p>
 					) : (
 						<article className="grid gap-4 rounded-2xl border border-line bg-surface-raised/60 p-5">
 							<div className="flex flex-wrap items-start justify-between gap-3">

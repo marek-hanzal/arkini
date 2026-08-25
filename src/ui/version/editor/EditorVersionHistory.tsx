@@ -1,3 +1,5 @@
+import { twMerge } from "tailwind-merge";
+
 import type { EditorProjectVersionDescriptor } from "~/editor/version/EditorProjectVersion";
 import { Button, DangerButton } from "~/ui/button/Button";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
@@ -109,9 +111,12 @@ export const EditorVersionHistory = () => {
 							)}
 							<label className="grid gap-1.5 text-sm">
 								<span className="font-semibold">Tag</span>
-								<div className="flex gap-2">
+								<div className="flex items-center gap-2">
 									<input
-										className={editorInputClassName}
+										className={twMerge(
+											editorInputClassName,
+											"h-9 min-h-0 min-w-0 py-1.5",
+										)}
 										disabled={
 											controller.selected.applicability.type ===
 											"incompatible"
@@ -124,6 +129,10 @@ export const EditorVersionHistory = () => {
 										}
 									/>
 									<Button
+										className="h-9 min-h-0 shrink-0 gap-2 px-3 py-1.5 whitespace-nowrap"
+										cursorIntent={
+											controller.tagPending ? "progress" : undefined
+										}
 										disabled={
 											controller.tagPending ||
 											controller.selected.applicability.type ===
@@ -131,7 +140,10 @@ export const EditorVersionHistory = () => {
 										}
 										onClick={controller.saveTag}
 									>
-										{controller.tagPending ? "Saving…" : "Save tag"}
+										<span
+											className={`${controller.tagPending ? "icon-[lucide--loader-circle] animate-spin" : "icon-[lucide--save]"} size-4`}
+										/>
+										Save
 									</Button>
 								</div>
 							</label>

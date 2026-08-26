@@ -10,14 +10,18 @@ by another distribution are not official for the current build.
 
 ## Local development
 
-Mise loads the ignored `.env.local` file. Generate or replace the local key with:
+Mise loads the ignored `.env.local` file. After installing repository dependencies, bootstrap
+the first local key through the repository command surface:
 
 ```sh
-arkini-cli arkpack keygen --output .env.local --force
+./Argcfile.sh signing:keygen
+./Argcfile.sh signing:keygen --force # explicit rotation
 ```
 
 The file is written with mode `0600`; `--force` replaces only the `ARKINI_SIGN_KEY` assignment
-and preserves unrelated dotenv values. Commands never print private key material.
+and preserves unrelated dotenv values. The bootstrap runs the current source CLI because no
+packaged `arkini-cli` can exist before the first successful build. Commands never print private
+key material.
 
 `arkini-cli game pack <project>` compiles the current portable project and atomically publishes:
 

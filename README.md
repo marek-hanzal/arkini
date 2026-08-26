@@ -131,9 +131,10 @@ The repository uses [`mise`](https://mise.jdx.dev/) as its only toolchain manage
 ```bash
 mise install
 ./Argcfile.sh install
+./Argcfile.sh signing:keygen
 ```
 
-The install recipe runs `npm ci` against the committed [`package-lock.json`](package-lock.json). JavaScript dependencies remain package-local and `mise.toml` adds `node_modules/.bin` to `PATH`, so recipes call project binaries directly. `package.json` contains package metadata, dependency declarations, and only the required Electron `postinstall` lifecycle script; it is not a second task runner.
+The install recipe runs `npm ci` against the committed [`package-lock.json`](package-lock.json), then the explicit signing bootstrap generates the ignored `.env.local` input required by the first build. It refuses to replace an existing key unless called with `--force`. JavaScript dependencies remain package-local and `mise.toml` adds `node_modules/.bin` to `PATH`, so recipes call project binaries directly. `package.json` contains package metadata, dependency declarations, and only the required Electron `postinstall` lifecycle script; it is not a second task runner.
 
 The application ships one canonical [Effect](https://effect.website/) product CLI. A packaged
 app can install or remove the `arkini-cli` launcher from Settings:

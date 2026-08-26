@@ -435,6 +435,9 @@ Permanent tests should protect:
 
 Do not rely on timing roulette when a deterministic `Deferred`, Scope, or service seam can express the boundary.
 
+Use `@effect/vitest` for tests owned by an Effect Scope, fiber, finalizer, or `TestClock`.
+Keep ordinary Vitest for synchronous unit tests when its direct API is clearer.
+
 ## 14. Review gate
 
 Every significant review checks:

@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Graph } from "effect";
 
 export interface EditorEstimateComponentIndex {
 	readonly componentByFact: ReadonlyMap<string, string>;
@@ -22,50 +22,45 @@ export const createEditorEstimateComponentIndexFx = Effect.fn(
 )((input: EditorEstimateComponentIndexInput) =>
 	Effect.sync((): EditorEstimateComponentIndex => {
 		const { dependencyEdges, factIds, rootFactIds } = input;
-		const adjacency = new Map<string, Set<string>>(
-			factIds.map((factId) => [
-				factId,
-				new Set<string>(),
-			]),
-		);
-		for (const [fromFactId, toFactId] of dependencyEdges)
-			adjacency.get(fromFactId)?.add(toFactId);
-		const reachableByFact = new Map<string, Set<string>>();
-		for (const id of factIds) {
-			const reachable = new Set<string>();
-			const pending = [
-				id,
-			];
-			while (pending.length > 0) {
-				const current = pending.pop();
-				if (current === undefined || reachable.has(current)) continue;
-				reachable.add(current);
-				pending.push(...(adjacency.get(current) ?? []));
+		const nodeByFact = new Map<string, Graph.NodeIndex>();
+		const factByNode = new Map<Graph.NodeIndex, string>();
+		const graph = Graph.directed<string, void>((mutable) => {
+			for (const factId of [
+				...new Set(factIds),
+			].sort()) {
+				const node = Graph.addNode(mutable, factId);
+				nodeByFact.set(factId, node);
+				factByNode.set(node, factId);
 			}
-			reachableByFact.set(id, reachable);
-		}
+			for (const [fromFactId, toFactId] of dependencyEdges) {
+				const from = nodeByFact.get(fromFactId);
+				const to = nodeByFact.get(toFactId);
+				if (from !== undefined && to !== undefined)
+					Graph.addEdge(mutable, from, to, undefined);
+			}
+		});
+		const components = Graph.stronglyConnectedComponents(graph)
+			.map((nodes) =>
+				nodes
+					.map((node) => factByNode.get(node))
+					.filter((factId): factId is string => factId !== undefined)
+					.sort(),
+			)
+			.sort(([left = ""], [right = ""]) => left.localeCompare(right));
 		const componentByFact = new Map<string, string>();
-		const seededComponentIds = new Set<string>();
-		for (const id of factIds) {
-			const component = factIds
-				.filter(
-					(candidate) =>
-						reachableByFact.get(id)?.has(candidate) === true &&
-						reachableByFact.get(candidate)?.has(id) === true,
-				)
-				.sort();
-			const componentId = component[0] ?? id;
-			componentByFact.set(id, componentId);
-			if (component.some((factId) => rootFactIds.has(factId)))
-				seededComponentIds.add(componentId);
+		const seededComponentByFact = new Map<string, string>();
+		for (const component of components) {
+			const componentId = component[0];
+			if (componentId === undefined) continue;
+			const seeded = component.some((factId) => rootFactIds.has(factId));
+			for (const factId of component) {
+				componentByFact.set(factId, componentId);
+				if (seeded) seededComponentByFact.set(factId, componentId);
+			}
 		}
 		return {
 			componentByFact,
-			seededComponentByFact: new Map(
-				[
-					...componentByFact,
-				].filter(([, componentId]) => seededComponentIds.has(componentId)),
-			),
+			seededComponentByFact,
 		};
 	}),
 );

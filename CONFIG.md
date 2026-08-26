@@ -33,7 +33,7 @@ Defaults:
 ```text
 authoring directory: game/arkini
 JSON Schema output: game/schema.json
-binary pack output: game/arkini.game.arkpack
+project build output: game/arkini/build/arkini.arkpack
 ```
 
 Run `game schema` after changing authoring schemas. Run `game validate` after changing config or resources. Packing performs validation again and must refuse invalid content.

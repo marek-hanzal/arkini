@@ -1,120 +1,69 @@
 # Arkpack signing
 
-Arkpack signing proves that exact package bytes were signed by a key whose public half ships with Arkini. It is an authorship signal, not encryption, DRM, account identity, copy protection, or a claim that external content is unsafe.
+Arkini has one signing identity per application build. `ARKINI_SIGN_KEY` contains standard
+padded base64 of the complete Ed25519 PKCS8 PEM signing key. The build derives exactly one
+base64 SPKI public key from it and embeds that public key into the application and CLI.
+There is no key registry or key ID.
 
-## Contract
+Changing `ARKINI_SIGN_KEY` creates a different Arkini distribution identity. Arkpacks signed
+by another distribution are not official for the current build.
 
-Arkini uses Ed25519 because verification needs only a public key in the client. HMAC would put a shared signing secret into every installation and would therefore provide no meaningful official-author distinction.
+## Local development
 
-The signature is detached from the package:
+Mise loads the ignored `.env.local` file. Generate or replace the local key with:
+
+```sh
+arkini-cli arkpack keygen --output .env.local --force
+```
+
+The file is written with mode `0600`; `--force` replaces only the `ARKINI_SIGN_KEY` assignment
+and preserves unrelated dotenv values. Commands never print private key material.
+
+`arkini-cli game pack <project>` compiles the current portable project and atomically publishes:
 
 ```text
-example.game.arkpack
-example.game.arkpack.sig
+<project>/build/<encoded projectId>.arkpack
+<project>/build/<encoded projectId>.arksig  # only when signed
 ```
 
-The strict JSON sidecar is below. Ed25519 is the only supported signing algorithm, so repeating an algorithm or independent format marker in every sidecar would carry no information. Its contract ships with the game version that reads and writes the package.
+An unsigned rebuild removes the previous signature because the complete `build/` directory is
+replaced. Editor projects keep `/build/` in their `.gitignore`; exports and version snapshots do
+not include build output.
 
-```json
-{
-	"keyId": "arkini-official-2026-01",
-	"signature": "<standard padded base64 Ed25519 signature>"
-}
+The Editor Build page reports whether `ARKINI_SIGN_KEY` is configured, but never exposes its
+value to the renderer. Leaving the field empty uses that main-process default; a pasted base64
+key overrides it for one build and must match the public key embedded in that Arkini distribution.
+The Editor does not persist pasted keys. Build, install, and download re-read the exact current
+filesystem artifact and reject changed revisions, hashes, signing state, or invalid signatures.
+
+## CI and releases
+
+GitHub Actions stores the production value as the `ARKINI_SIGN_KEY` repository secret. The
+workflow passes it unchanged to the application build and the standard `game pack` command.
+Both therefore share one identity and signed builds fail when the key is missing or post-sign
+verification fails.
+
+Set or rotate the secret without printing it:
+
+```sh
+mise exec -- sh -c 'printf %s "$ARKINI_SIGN_KEY" | gh secret set ARKINI_SIGN_KEY'
 ```
 
-The signed payload is the exact byte concatenation:
+Rotation means rebuilding and redistributing both Arkini and its Arkpack; old
+signatures are intentionally not trusted by the new build.
 
-```text
-UTF-8("arkini:arkpack:v1\0") || exact final .arkpack bytes
-```
+## CLI
 
-There is no JSON canonicalization and no decode/re-encode step. The stable `packageId` is embedded inside the signed Arkpack manifest, while SHA-256 is independently derived as `contentHash`; the Ed25519 signature is the authorship proof.
-
-## Trust states
-
-- `official` means the signature is structurally valid, its `keyId` exists in the explicit registry, and Ed25519 verification succeeds.
-- `external / unsigned` means no sidecar was supplied. The package may still be decoded and played.
-- `external / unknown-key` means a well-formed signature names a key outside the official registry. It is not silently promoted to official.
-- `invalid` means the supplied sidecar is malformed or fails cryptographic verification. Invalid is never downgraded to unsigned.
-
-The generic byte loader accepts unsigned external content and returns this explicit trust union. Trust is derived from the sidecar and exact bytes only: bundled location and package ID never promote content to official.
-
-The current file-picker import stores a selected `.arkpack` without discovering a neighboring sidecar, so it deliberately enters as unsigned external content. The loader contract already accepts optional detached signature metadata for callers that own both files.
-
-## Maintainer workflow
-
-Generate a local Ed25519 key pair:
-
-```bash
+```sh
 arkini-cli arkpack keygen
+arkini-cli game pack game/arkini
+arkini-cli arkpack sign path/to/game.arkpack
+arkini-cli arkpack verify path/to/game.arkpack
 ```
 
-The command creates:
+`sign` uses `ARKINI_SIGN_KEY`. `verify` uses the public key embedded in the CLI build, with an
+explicit `--public-key` available for inspecting another distribution. Trust is one of:
 
-```text
-.arkini/arkpack-private.pem
-.arkini/arkpack-public.pem
-```
-
-`.arkini/` is the sole repository-local private-key convention and is ignored as a config directory. Signing keys are build inputs rather than generated build output, so deleting disposable `.out/` cannot remove them. The private file is written with mode `0600`. Key generation refuses to overwrite either requested output unless `--force` is explicit. Private key bytes are never printed.
-
-There is no `.env.local` signing path. Local commands read `.arkini/arkpack-private.pem`; CI supplies the PEM directly through `ARKINI_ARKPACK_PRIVATE_KEY`.
-
-Pack an ordinary unsigned authoring package:
-
-```bash
-arkini-cli game pack
-```
-
-Sign an existing final package:
-
-```bash
-arkini-cli arkpack sign \
-	game/arkini.game.arkpack \
-	--key-id arkini-official-2026-01
-```
-
-Verify a package and its canonical sidecar:
-
-```bash
-arkini-cli arkpack verify \
-	game/arkini.game.arkpack \
-	--trusted-keys game/arkini.arkpack.keys.json
-```
-
-Verification prints the content hash and explicit trust JSON. It exits non-zero for malformed or cryptographically invalid signatures. Unsigned and unknown-key packages remain successful explicit external results.
-
-Build, sign, and post-verify the official package in one operation:
-
-```bash
-arkini-cli arkpack pack-official
-```
-
-The command fails closed when the private key is absent, the selected `keyId` is absent from the committed registry, or post-sign verification does not establish official trust.
-
-## GitHub Actions
-
-The macOS prerelease workflow reads the production private PEM from the repository secret `ARKINI_ARKPACK_PRIVATE_KEY`. Set or rotate it without printing the value:
-
-```bash
-gh secret set ARKINI_ARKPACK_PRIVATE_KEY < .arkini/arkpack-private.pem
-```
-
-Only [`game/arkini.arkpack.keys.json`](game/arkini.arkpack.keys.json), containing public material, is committed. The workflow compiles the application independently, builds the final official package, signs and post-verifies it, and lets `electron-builder` copy the generated package and signature from `game/` into packaged `Resources/game`. It never writes the secret into the repository.
-
-## Rotation
-
-1. Generate a new key pair and choose a new rotation-specific `keyId`.
-2. Add the new public key to the registry while retaining the old public key.
-3. Release an application version that trusts both identities.
-4. Change the single active `keyId` in
-   [`shared/ArkiniOfficialArkpackIdentity.ts`](shared/ArkiniOfficialArkpackIdentity.ts),
-   replace the
-   `ARKINI_ARKPACK_PRIVATE_KEY` CI secret, and run `arkini-cli arkpack pack-official`.
-5. Verify the regenerated signature. Package binaries and signature sidecars remain ignored build
-   output; the active signing identity has one source-owned constant in
-   [`shared/ArkiniOfficialArkpackIdentity.ts`](shared/ArkiniOfficialArkpackIdentity.ts).
-6. Retain old public keys while older official packages or saves may still need verification.
-7. Remove or mark a compromised identity only through a deliberate application update.
-
-There is no network revocation, automatic expiry, remote PKI, Workshop identity, or third-party author certificate model in this milestone.
+- `official`: the detached signature matches the embedded public key and exact Arkpack bytes;
+- `external / unsigned`: no detached signature was provided;
+- `invalid`: signature metadata is malformed or its cryptographic verification fails.

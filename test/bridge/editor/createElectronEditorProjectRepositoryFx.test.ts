@@ -51,6 +51,13 @@ const version: EditorProjectTransport.VersionDescriptor = {
 
 const installEditorApi = () => {
 	const editor: Window["arkini"]["editor"] = {
+		buildProject: vi.fn(async () => {
+			throw new Error("Unexpected build.");
+		}),
+		readProjectBuild: vi.fn(async () => {
+			throw new Error("Unexpected build read.");
+		}),
+		isSignKeyConfigured: vi.fn(async () => false),
 		status: vi.fn(async () => ({
 			type: "ready" as const,
 		})),

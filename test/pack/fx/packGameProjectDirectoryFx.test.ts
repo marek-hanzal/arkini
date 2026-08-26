@@ -1,7 +1,7 @@
 import { gunzipSync } from "node:zlib";
 import { FileSystem, Path } from "effect";
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import { Effect } from "effect";
+import { Deferred, Effect, Fiber, Ref } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { decodeFx } from "~/engine/pack/fx/decodeFx";
@@ -20,7 +20,7 @@ describe("packDirectoryFx game-project contract", () => {
 				const result = yield* packDirectoryFx({
 					input,
 				});
-				const compressed = yield* fileSystem.readFile(result.output);
+				const compressed = yield* fileSystem.readFile(result.arkpack);
 				const payload = yield* decodeFx(new Uint8Array(gunzipSync(compressed)));
 				return {
 					payload,
@@ -30,6 +30,7 @@ describe("packDirectoryFx game-project contract", () => {
 		);
 
 		expect(packed.result).toMatchObject({
+			filename: "project-game.arkpack",
 			packageId: "project-game",
 			version: "2.3",
 			json: 2,
@@ -180,5 +181,44 @@ describe("packDirectoryFx game-project contract", () => {
 				]),
 			},
 		});
+	});
+
+	it("serializes concurrent project builds before either compilation enters", async () => {
+		const serialized = await Effect.runPromise(
+			Effect.gen(function* () {
+				const input = yield* writeGameProjectFixtureFx();
+				const firstEntered = yield* Deferred.make<void>();
+				const releaseFirst = yield* Deferred.make<void>();
+				const secondEntered = yield* Ref.make(false);
+				const first = yield* packDirectoryFx({
+					input,
+					assertCurrentFx: Deferred.succeed(firstEntered, undefined).pipe(
+						Effect.andThen(Deferred.await(releaseFirst)),
+					),
+				}).pipe(Effect.forkChild);
+				yield* Deferred.await(firstEntered);
+				const second = yield* packDirectoryFx({
+					input,
+					assertCurrentFx: Ref.set(secondEntered, true),
+				}).pipe(Effect.forkChild);
+				yield* Effect.sleep("100 millis");
+				const enteredWhileLocked = yield* Ref.get(secondEntered);
+				yield* Deferred.succeed(releaseFirst, undefined);
+				const results = yield* Effect.all([
+					Fiber.join(first),
+					Fiber.join(second),
+				]);
+				return {
+					enteredWhileLocked,
+					results,
+				};
+			}).pipe(Effect.provide(NodeServices.layer), Effect.scoped),
+		);
+
+		expect(serialized.enteredWhileLocked).toBe(false);
+		expect(serialized.results.map(({ filename }) => filename)).toEqual([
+			"project-game.arkpack",
+			"project-game.arkpack",
+		]);
 	});
 });

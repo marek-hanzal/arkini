@@ -1,7 +1,11 @@
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
+import { TestArkpackPublicKey } from "./test/support/arkpack/TestArkpackSigningIdentity.ts";
 
 export default defineConfig({
+	define: {
+		__ARKINI_PUBLIC_KEY__: JSON.stringify(TestArkpackPublicKey),
+	},
 	resolve: {
 		alias: {
 			"~": fileURLToPath(new URL("./src", import.meta.url)),

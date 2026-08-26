@@ -15,10 +15,9 @@ import {
 } from "~test/bridge/arkpack/support/createTestPngBytes";
 import { gzipSync } from "node:zlib";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+import { ArkiniPublicKey } from "~/bridge/arkpack/ArkiniPublicKey";
 
-const trustedKeys = {
-	keys: [],
-};
+const publicKey = ArkiniPublicKey;
 
 beforeEach(() => {
 	installTestPngDecoder();
@@ -36,7 +35,7 @@ describe("readArkpackFx", () => {
 				bytes,
 				filename: "bridge.arkpack",
 				signature: {
-					trustedKeys,
+					publicKey,
 				},
 				source: "user",
 			}),
@@ -46,7 +45,7 @@ describe("readArkpackFx", () => {
 				bytes,
 				filename: "renamed.arkpack",
 				signature: {
-					trustedKeys,
+					publicKey,
 				},
 				source: "user",
 			}),
@@ -73,7 +72,7 @@ describe("readArkpackFx", () => {
 					metadata: {
 						nope: true,
 					},
-					trustedKeys,
+					publicKey,
 				},
 				source: "user",
 			}),
@@ -91,7 +90,7 @@ describe("readArkpackFx", () => {
 				readArkpackFx({
 					bytes: new Uint8Array(ArkpackLimits.maxCompressedBytes + 1),
 					signature: {
-						trustedKeys,
+						publicKey,
 					},
 					source: "user",
 				}),
@@ -138,7 +137,7 @@ describe("readArkpackFx", () => {
 				readArkpackFx({
 					bytes: new Uint8Array(gzipSync(encoded)),
 					signature: {
-						trustedKeys,
+						publicKey,
 					},
 					source: "user",
 				}),
@@ -183,7 +182,7 @@ describe("readArkpackFx", () => {
 				readArkpackFx({
 					bytes: new Uint8Array(gzipSync(encoded)),
 					signature: {
-						trustedKeys,
+						publicKey,
 					},
 					source: "user",
 				}),

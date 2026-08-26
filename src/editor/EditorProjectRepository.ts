@@ -1,6 +1,10 @@
 import { Context, type Effect } from "effect";
 
 import type { EditorProject, EditorProjectCommit } from "~/editor/EditorProject";
+import type {
+	EditorProjectBuildContentSchema,
+	EditorProjectBuildSchema,
+} from "~/editor/EditorProjectBuildSchema";
 import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
 import type { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 import type { EditorNoteSchema } from "~/editor/note/EditorNoteSchema";
@@ -19,6 +23,19 @@ export namespace EditorProjectRepository {
 		readonly version: ArkpackVersionSchema.Type;
 		readonly config: GameConfigSchema.Type;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
+	}
+
+	export interface BuildProjectProps {
+		readonly expectedRevision: number;
+		readonly projectId: string;
+		readonly signKey?: string;
+	}
+
+	export interface ReadProjectBuildProps {
+		readonly contentHash: string;
+		readonly expectedRevision: number;
+		readonly projectId: string;
+		readonly signatureFilename?: string;
 	}
 
 	export interface OpenProjectProps {
@@ -98,6 +115,9 @@ export namespace EditorProjectRepository {
 export interface EditorProjectRepositoryService extends EditorProjectVersionRepositoryService {
 	/** Joins every repository write admitted before this Effect acquires the write boundary. */
 	readonly awaitIdleFx: Effect.Effect<void, EditorProjectRepositoryError>;
+	readonly buildProjectFx: (
+		props: EditorProjectRepository.BuildProjectProps,
+	) => Effect.Effect<EditorProjectBuildSchema.Type, EditorProjectRepositoryError>;
 	readonly createProjectFx: (
 		props: EditorProjectRepository.CreateProjectProps,
 	) => Effect.Effect<EditorProject, EditorProjectRepositoryError>;
@@ -135,6 +155,9 @@ export interface EditorProjectRepositoryService extends EditorProjectVersionRepo
 	readonly readProjectFx: (
 		projectId: string,
 	) => Effect.Effect<EditorProject | null, EditorProjectRepositoryError>;
+	readonly readProjectBuildFx: (
+		props: EditorProjectRepository.ReadProjectBuildProps,
+	) => Effect.Effect<EditorProjectBuildContentSchema.Type, EditorProjectRepositoryError>;
 	readonly replaceConfigFx: (
 		props: EditorProjectRepository.ReplaceConfigProps,
 	) => Effect.Effect<EditorProjectCommit, EditorProjectRepositoryError>;

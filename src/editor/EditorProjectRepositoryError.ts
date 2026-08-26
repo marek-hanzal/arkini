@@ -1,7 +1,10 @@
 import { Data } from "effect";
 
+import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
+
 export type EditorProjectRepositoryOperation =
 	| "await-idle"
+	| "build-project"
 	| "checkout-version"
 	| "create-version"
 	| "create-project"
@@ -20,6 +23,7 @@ export type EditorProjectRepositoryOperation =
 	| "list-versions"
 	| "open-export-directory"
 	| "read-project"
+	| "read-project-build"
 	| "read-version-status"
 	| "read-board-scenario"
 	| "replace-config"
@@ -36,5 +40,6 @@ export type EditorProjectRepositoryOperation =
 export class EditorProjectRepositoryError extends Data.TaggedError("EditorProjectRepositoryError")<{
 	readonly operation: EditorProjectRepositoryOperation;
 	readonly message: string;
+	readonly diagnostics?: GameDiagnosticsSchema.Type;
 	readonly cause?: unknown;
 }> {}

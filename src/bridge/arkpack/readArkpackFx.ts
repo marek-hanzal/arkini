@@ -4,7 +4,7 @@ import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { validateArkpackPayloadFx } from "~/bridge/arkpack/validateArkpackPayloadFx";
 import { decodeFx } from "~/engine/pack/fx/decodeFx";
 import { verifyArkpackTrustFx } from "~/engine/pack/fx/verifyArkpackTrustFx";
-import type { ArkpackTrustedKeysSchema } from "~/engine/pack/schema/ArkpackTrustedKeysSchema";
+import type { ArkpackPublicKeySchema } from "~/engine/pack/schema/ArkpackPublicKeySchema";
 import { GameValidationError } from "~/engine/validation/error/GameValidationError";
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 
@@ -15,7 +15,7 @@ export namespace readArkpackFx {
 		packageId?: string;
 		signature: {
 			readonly metadata?: unknown;
-			readonly trustedKeys: ArkpackTrustedKeysSchema.Type;
+			readonly publicKey: ArkpackPublicKeySchema.Type;
 		};
 		source: "bundled" | "user";
 		overridesBundled?: boolean;
@@ -80,8 +80,8 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 	}
 	const verification = yield* verifyArkpackTrustFx({
 		bytes,
+		publicKey: signature.publicKey,
 		signature: signature.metadata,
-		trustedKeys: signature.trustedKeys,
 	});
 	const contentHash = verification.contentHash;
 	const payload = yield* decodeFx(yield* decompressArkpackFx(bytes));

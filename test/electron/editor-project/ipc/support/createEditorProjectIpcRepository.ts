@@ -27,6 +27,17 @@ export const editorProjectIpcProject = {
 	resources: editorTestPayload.resources,
 };
 
+export const editorProjectIpcBuild = {
+	projectId: editorProjectIpcProject.projectId,
+	revision: editorProjectIpcProject.revision,
+	contentHash: "a".repeat(64),
+	filename: "project-one.arkpack",
+	version: editorProjectIpcProject.version,
+	game: ArkiniAppVersion,
+	bytes: 3,
+	diagnostics: [],
+};
+
 export const editorProjectIpcVersion = {
 	arkini: ArkiniAppVersion,
 	arkpackVersion: editorProjectIpcProject.version,
@@ -48,6 +59,7 @@ export const editorProjectIpcNote = {
 /** Creates one explicit repository spy for the editor-project IPC boundary. */
 export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository => ({
 	awaitIdleFx: Effect.void,
+	buildProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcBuild)),
 	createProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	createVersionFx: vi.fn(() => Effect.succeed(editorProjectIpcVersion)),
 	checkoutVersionFx: vi.fn(() => Effect.void),
@@ -88,6 +100,15 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 	),
 	openProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	readProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
+	readProjectBuildFx: vi.fn(() =>
+		Effect.succeed({
+			bytes: new Uint8Array([
+				1,
+				2,
+				3,
+			]),
+		}),
+	),
 	readProjectRootFx: vi.fn(() => Effect.succeed("/editor/project-one")),
 	refreshProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	readVersionStatusFx: vi.fn(() =>

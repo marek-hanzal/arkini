@@ -8,19 +8,20 @@ import { createArkpackSigningPayloadFx } from "./createArkpackSigningPayloadFx";
 export namespace signArkpackFx {
 	export interface Props {
 		readonly bytes: Uint8Array;
-		readonly keyId: string;
-		readonly privateKey: string;
+		readonly signKey: string;
 	}
 }
 
 /** Signs exact Arkpack bytes with one explicit Ed25519 PKCS8 private key. */
 export const signArkpackFx = Effect.fn("signArkpackFx")(function* ({
 	bytes,
-	keyId,
-	privateKey,
+	signKey,
 }: signArkpackFx.Props) {
 	const importedKey = yield* Effect.tryPromise({
 		try: async () => {
+			const privateKey = new TextDecoder("utf-8", {
+				fatal: true,
+			}).decode(Uint8Array.from(atob(signKey), (character) => character.charCodeAt(0)));
 			const encoded = privateKey
 				.replace("-----BEGIN PRIVATE KEY-----", "")
 				.replace("-----END PRIVATE KEY-----", "")
@@ -68,14 +69,12 @@ export const signArkpackFx = Effect.fn("signArkpackFx")(function* ({
 	return yield* Effect.try({
 		try: () =>
 			ArkpackSignatureSchema.parse({
-				keyId,
 				signature,
 			}),
 		catch: (cause) =>
 			new ArkpackInputError({
 				operation: "create-signature",
-				message:
-					"Invalid Arkpack signing metadata; keyId must use 1-64 lowercase letters, digits, dots, underscores, or hyphens.",
+				message: "Invalid Arkpack signing metadata.",
 				cause,
 			}),
 	});

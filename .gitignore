@@ -6,8 +6,6 @@
 .env.*
 bun.lock
 bun.lockb
-game/*.game.arkpack
-game/*.game.arkpack.sig
 game/schema.json
 node_modules
 .npm-cache/

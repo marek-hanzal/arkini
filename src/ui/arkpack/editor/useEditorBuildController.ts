@@ -1,5 +1,5 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { match, P } from "ts-pattern";
 
@@ -59,11 +59,31 @@ export namespace useEditorBuildController {
 		readonly saveArtifact: () => void;
 		readonly saveError?: string;
 		readonly savePending: boolean;
+		readonly signKeyConfigured: boolean;
+		readonly signKey: string;
+		readonly setSignKey: (value: string) => void;
 	}
 }
 
 export const useEditorBuildController = (): useEditorBuildController.Output => {
 	const project = useEditorProject();
+	const [signKey, setSignKeyState] = useState("");
+	const [signKeyConfigured, setSignKeyConfigured] = useState(false);
+	useEffect(() => {
+		let active = true;
+		void window.arkini.editor
+			.isSignKeyConfigured()
+			.then((value) => {
+				if (active) setSignKeyConfigured(value);
+			})
+			.catch(() => undefined);
+		return () => {
+			active = false;
+		};
+	}, []);
+	const setSignKey = useCallback((value: string) => {
+		setSignKeyState(value);
+	}, []);
 	const buildAtom = buildEditorProjectCommandAtom(project.projectId);
 	const buildResult = useAtomValue(buildAtom);
 	const runBuild = useAtomSet(buildAtom);
@@ -169,7 +189,7 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 		.with(
 			P.nonNullable,
 			(currentArtifact) =>
-				`${currentArtifact.filename} · ${RendererRuntime.runSync(formatByteSizeFx(currentArtifact.bytes.byteLength))} · v${currentArtifact.version} · Arkini ${currentArtifact.game} · ${currentArtifact.contentHash}`,
+				`${currentArtifact.filename} · ${RendererRuntime.runSync(formatByteSizeFx(currentArtifact.bytes))} · v${currentArtifact.version} · Arkini ${currentArtifact.game} · ${currentArtifact.signatureFilename === undefined ? "unsigned" : "signed"} · ${currentArtifact.contentHash}`,
 		)
 		.otherwise(() => undefined);
 	const installedPackageId =
@@ -177,9 +197,19 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 			? installResult.value.packageId
 			: undefined;
 	const build = useCallback(() => {
-		runBuild(undefined);
+		const candidate = signKey.trim();
+		runBuild({
+			expectedRevision: project.revision,
+			...(candidate.length === 0
+				? {}
+				: {
+						signKey: candidate,
+					}),
+		});
 	}, [
+		project.revision,
 		runBuild,
+		signKey,
 	]);
 	const saveArtifact = useCallback(() => {
 		if (artifact !== undefined) runSave(artifact);
@@ -231,6 +261,9 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 			saveArtifact,
 			saveError: saveErrorMessage,
 			savePending: saveResult.waiting,
+			signKeyConfigured,
+			signKey,
+			setSignKey,
 		}),
 		[
 			artifactSummary,
@@ -256,6 +289,9 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 			saveArtifact,
 			saveErrorMessage,
 			saveResult.waiting,
+			signKeyConfigured,
+			setSignKey,
+			signKey,
 		],
 	);
 };

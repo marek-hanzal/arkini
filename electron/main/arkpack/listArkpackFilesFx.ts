@@ -6,7 +6,7 @@ import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { ElectronMainError } from "../ElectronMainError";
 import { readArkpackFileFx } from "./readArkpackFileFx";
 
-const suffix = ".game.arkpack";
+const suffix = ".arkpack";
 
 export namespace listArkpackFilesFx {
 	export interface Props {
@@ -53,7 +53,7 @@ export const listArkpackFilesFx = Effect.fn("listArkpackFilesFx")(
 				inspectedCandidates += 1;
 				const file = yield* Effect.gen(function* () {
 					const path = join(root, entry);
-					const signaturePath = `${path}.sig`;
+					const signaturePath = join(root, `${entry.slice(0, -suffix.length)}.arksig`);
 					const size =
 						Number((yield* fileSystem.stat(path)).size) +
 						((yield* fileSystem.exists(signaturePath))

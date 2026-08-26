@@ -9,7 +9,6 @@ export const builtIn: ArkpackDescriptor = {
 	game: "1",
 	trust: {
 		type: "official",
-		keyId: "test-official",
 	},
 	source: "bundled",
 };

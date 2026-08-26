@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import { ArkpackCryptoError } from "~/engine/pack/error/ArkpackCryptoError";
+import type { ArkpackPublicKeySchema } from "~/engine/pack/schema/ArkpackPublicKeySchema";
 import { ArkpackSignatureSchema } from "~/engine/pack/schema/ArkpackSignatureSchema";
-import type { ArkpackTrustedKeysSchema } from "~/engine/pack/schema/ArkpackTrustedKeysSchema";
 import type { ArkpackTrustSchema } from "~/engine/pack/schema/ArkpackTrustSchema";
 import { createArkpackSigningPayloadFx } from "./createArkpackSigningPayloadFx";
 import { readArkpackContentHashFx } from "./readArkpackContentHashFx";
@@ -10,8 +10,8 @@ import { readArkpackContentHashFx } from "./readArkpackContentHashFx";
 export namespace verifyArkpackTrustFx {
 	export interface Props {
 		readonly bytes: Uint8Array;
+		readonly publicKey: ArkpackPublicKeySchema.Type;
 		readonly signature?: unknown;
-		readonly trustedKeys: ArkpackTrustedKeysSchema.Type;
 	}
 
 	export interface Result {
@@ -20,11 +20,11 @@ export namespace verifyArkpackTrustFx {
 	}
 }
 
-/** Classifies exact Arkpack bytes against optional detached metadata and explicit trusted keys. */
+/** Classifies exact Arkpack bytes against optional detached metadata and one public key. */
 export const verifyArkpackTrustFx = Effect.fn("verifyArkpackTrustFx")(function* ({
 	bytes,
+	publicKey,
 	signature,
-	trustedKeys,
 }: verifyArkpackTrustFx.Props) {
 	const contentHash = yield* readArkpackContentHashFx(bytes);
 	if (signature === undefined) {
@@ -46,23 +46,11 @@ export const verifyArkpackTrustFx = Effect.fn("verifyArkpackTrustFx")(function* 
 			},
 		} satisfies verifyArkpackTrustFx.Result;
 	}
-	const trustedKey = trustedKeys.keys.find((candidate) => candidate.keyId === parsed.data.keyId);
-	if (trustedKey === undefined) {
-		return {
-			contentHash,
-			trust: {
-				type: "external",
-				reason: "unknown-key",
-			},
-		} satisfies verifyArkpackTrustFx.Result;
-	}
 	const importedKey = yield* Effect.tryPromise({
 		try: async () => {
-			const encoded = trustedKey.publicKey
-				.replace("-----BEGIN PUBLIC KEY-----", "")
-				.replace("-----END PUBLIC KEY-----", "")
-				.replaceAll(/\s/g, "");
-			const decoded = Uint8Array.from(atob(encoded), (character) => character.charCodeAt(0));
+			const decoded = Uint8Array.from(atob(publicKey), (character) =>
+				character.charCodeAt(0),
+			);
 			return await crypto.subtle.importKey(
 				"spki",
 				decoded,
@@ -107,12 +95,10 @@ export const verifyArkpackTrustFx = Effect.fn("verifyArkpackTrustFx")(function* 
 		trust: verified
 			? {
 					type: "official",
-					keyId: parsed.data.keyId,
 				}
 			: {
 					type: "invalid",
 					reason: "invalid-signature",
-					keyId: parsed.data.keyId,
 				},
 	} satisfies verifyArkpackTrustFx.Result;
 });

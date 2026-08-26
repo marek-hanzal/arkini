@@ -14,6 +14,7 @@ import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSche
 import { createEditorProjectFilesystemPathsFx } from "../createEditorProjectFilesystemPathsFx";
 import type { EditorProjectFilesystemPaths } from "../EditorProjectFilesystemPaths";
 import type { FilesystemEditorProjectFiles } from "./FilesystemEditorProjectFiles";
+import { ensureFilesystemEditorProjectGitignoreFx } from "./ensureFilesystemEditorProjectGitignoreFx";
 import { replaceFilesystemEditorFileFx } from "./replaceFilesystemEditorFileFx";
 import { replaceFilesystemEditorJsonFx } from "./replaceFilesystemEditorJsonFx";
 
@@ -196,6 +197,7 @@ export const writeFilesystemEditorProjectFilesFx = Effect.fn("writeFilesystemEdi
 		const fileSystem = yield* FileSystem.FileSystem;
 		const path = yield* Path.Path;
 		const paths = yield* createEditorProjectFilesystemPathsFx(root);
+		yield* ensureFilesystemEditorProjectGitignoreFx(paths);
 		const nextSnapshot = yield* createSnapshotFx(paths, next);
 		const currentTreeDirectories = [
 			paths.root,

@@ -18,6 +18,10 @@ export interface ArkpackStorage {
 		packageId: string,
 	) => Effect.Effect<ReadonlyArray<ArkpackStorage.File>, unknown>;
 	readonly removeFx: (packageId: string) => Effect.Effect<void, unknown>;
-	readonly writeFx: (packageId: string, bytes: ArrayBuffer) => Effect.Effect<void, unknown>;
+	readonly writeFx: (
+		packageId: string,
+		bytes: ArrayBuffer,
+		signature?: unknown,
+	) => Effect.Effect<void, unknown>;
 	readonly openUserDirectoryFx: Effect.Effect<void, unknown>;
 }

@@ -1,20 +1,22 @@
 import { Effect } from "effect";
 
-import type { buildEditorProjectFx } from "~/bridge/arkpack/editor/buildEditorProjectFx";
+import type {
+	EditorProjectBuildContentSchema,
+	EditorProjectBuildSchema,
+} from "~/editor/EditorProjectBuildSchema";
 
-/** Requests browser-style Save As for one exact immutable editor build artifact. */
-export const saveBuiltEditorArkpackFx = Effect.fn("saveBuiltEditorArkpackFx")(
-	(artifact: buildEditorProjectFx.Success) =>
+const downloadFx = Effect.fn("saveBuiltEditorArkpackFx.downloadFx")(
+	(filename: string, bytes: Uint8Array, type: string) =>
 		Effect.acquireUseRelease(
 			Effect.try({
 				try: () =>
 					URL.createObjectURL(
 						new Blob(
 							[
-								artifact.bytes.slice().buffer,
+								bytes.slice().buffer,
 							],
 							{
-								type: "application/octet-stream",
+								type,
 							},
 						),
 					),
@@ -26,7 +28,7 @@ export const saveBuiltEditorArkpackFx = Effect.fn("saveBuiltEditorArkpackFx")(
 						try: () => {
 							const anchor = document.createElement("a");
 							anchor.href = url;
-							anchor.download = artifact.filename;
+							anchor.download = filename;
 							document.body.append(anchor);
 							return anchor;
 						},
@@ -42,3 +44,21 @@ export const saveBuiltEditorArkpackFx = Effect.fn("saveBuiltEditorArkpackFx")(
 			(url) => Effect.sync(() => URL.revokeObjectURL(url)),
 		),
 );
+
+/** Downloads the exact Arkpack plus its detached signature when the build is signed. */
+export const saveBuiltEditorArkpackFx = Effect.fn("saveBuiltEditorArkpackFx")(function* ({
+	artifact,
+	content,
+}: {
+	readonly artifact: EditorProjectBuildSchema.Type;
+	readonly content: EditorProjectBuildContentSchema.Type;
+}) {
+	yield* downloadFx(artifact.filename, content.bytes, "application/octet-stream");
+	if (content.signature !== undefined && artifact.signatureFilename !== undefined) {
+		yield* downloadFx(
+			artifact.signatureFilename,
+			new TextEncoder().encode(`${JSON.stringify(content.signature, undefined, "\t")}\n`),
+			"application/json",
+		);
+	}
+});

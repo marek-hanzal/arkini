@@ -8,10 +8,12 @@ import type { EditorProjectServiceOwnership } from "../../../../electron/main/ed
 import { registerEditorProjectIpcFx } from "../../../../electron/main/editor-project/ipc/registerEditorProjectIpcFx";
 import type { TrustedRenderer } from "../../../../electron/main/security/TrustedRenderer";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
+import { generateArkpackKeyPairFx } from "~/engine/pack/fx/generateArkpackKeyPairFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import {
 	createEditorProjectIpcRepository,
 	editorProjectIpcCommit,
+	editorProjectIpcBuild,
 	editorProjectIpcDescriptor,
 	editorProjectIpcProject,
 	editorProjectIpcVersion,
@@ -110,6 +112,9 @@ const register = (
 const projectChannels = [
 	ArkiniElectronApi.channels.editorStatus,
 	ArkiniElectronApi.channels.editorAwaitIdle,
+	ArkiniElectronApi.channels.editorProjectBuild,
+	ArkiniElectronApi.channels.editorProjectBuildRead,
+	ArkiniElectronApi.channels.editorSignKeyConfigured,
 	ArkiniElectronApi.channels.editorProjectCreate,
 	ArkiniElectronApi.channels.editorProjectDelete,
 	ArkiniElectronApi.channels.editorProjectDeleteItem,
@@ -133,12 +138,17 @@ const projectChannels = [
 	ArkiniElectronApi.channels.editorVersionTag,
 ];
 
-beforeEach(() => {
+let environmentSignKey = "";
+
+beforeEach(async () => {
+	environmentSignKey = (await Effect.runPromise(generateArkpackKeyPairFx())).signKey;
+	vi.stubEnv("ARKINI_SIGN_KEY", environmentSignKey);
 	sourceExport.effect = Effect.succeed(completedSourceExport);
 	electron.module.shell.openPath.mockClear();
 });
 
 afterEach(() => {
+	vi.unstubAllEnvs();
 	electron.appListeners.get("will-quit")?.();
 	electron.appListeners.clear();
 	electron.handlers.clear();
@@ -216,6 +226,39 @@ describe("registerEditorProjectIpcFx", () => {
 		});
 		await expect(invoke(ArkiniElectronApi.channels.editorAwaitIdle)).resolves.toMatchObject({
 			type: "success",
+		});
+		await expect(invoke(ArkiniElectronApi.channels.editorSignKeyConfigured)).resolves.toBe(
+			true,
+		);
+		await expect(
+			invoke(ArkiniElectronApi.channels.editorProjectBuild, {
+				projectId: "project-one",
+				expectedRevision: 1,
+			}),
+		).resolves.toEqual({
+			type: "success",
+			value: editorProjectIpcBuild,
+		});
+		expect(repository.buildProjectFx).toHaveBeenCalledWith({
+			projectId: "project-one",
+			expectedRevision: 1,
+			signKey: environmentSignKey,
+		});
+		await expect(
+			invoke(ArkiniElectronApi.channels.editorProjectBuildRead, {
+				projectId: "project-one",
+				expectedRevision: 1,
+				contentHash: "a".repeat(64),
+			}),
+		).resolves.toEqual({
+			type: "success",
+			value: {
+				bytes: new Uint8Array([
+					1,
+					2,
+					3,
+				]),
+			},
 		});
 		await expect(invoke(ArkiniElectronApi.channels.editorProjectList)).resolves.toEqual({
 			type: "success",
@@ -461,9 +504,9 @@ describe("registerEditorProjectIpcFx", () => {
 				message: "Editor storage read failed.",
 			},
 		});
-		expect(electron.handlers.size).toBe(31);
+		for (const channel of projectChannels) expect(electron.handlers.has(channel)).toBe(true);
 		electron.appListeners.get("will-quit")?.();
-		expect(electron.handlers.size).toBe(0);
+		for (const channel of projectChannels) expect(electron.handlers.has(channel)).toBe(false);
 
 		register({
 			type: "unavailable",

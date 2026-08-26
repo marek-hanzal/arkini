@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
-import { ArkiniTrustedKeys } from "~/bridge/arkpack/ArkiniTrustedKeys";
+import { ArkiniPublicKey } from "~/bridge/arkpack/ArkiniPublicKey";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 
 /** Selects the first valid user-first candidate while keeping decode authority in the renderer. */
@@ -19,7 +19,7 @@ export const readArkpackCandidatesFx = Effect.fn("readArkpackCandidatesFx")(func
 				packageId: file.packageId,
 				signature: {
 					metadata: file.signature,
-					trustedKeys: ArkiniTrustedKeys,
+					publicKey: ArkiniPublicKey,
 				},
 				source: file.source,
 				overridesBundled: file.overridesBundled,

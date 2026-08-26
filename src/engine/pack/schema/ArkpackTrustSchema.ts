@@ -1,22 +1,16 @@
 import { z } from "zod";
 
-const keyIdPattern = /^[a-z0-9][a-z0-9._-]{0,63}$/;
-
 export const ArkpackTrustSchema = z
 	.discriminatedUnion("type", [
 		z
 			.object({
 				type: z.literal("official"),
-				keyId: z.string().regex(keyIdPattern),
 			})
 			.strict(),
 		z
 			.object({
 				type: z.literal("external"),
-				reason: z.enum([
-					"unsigned",
-					"unknown-key",
-				]),
+				reason: z.literal("unsigned"),
 			})
 			.strict(),
 		z
@@ -26,7 +20,6 @@ export const ArkpackTrustSchema = z
 					"malformed-signature",
 					"invalid-signature",
 				]),
-				keyId: z.string().regex(keyIdPattern).optional(),
 			})
 			.strict(),
 	])

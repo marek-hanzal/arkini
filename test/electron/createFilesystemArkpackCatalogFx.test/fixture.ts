@@ -23,10 +23,13 @@ export const readRoots = (root: string) => ({
 });
 
 export const readPackageFilename = (packageId: string) =>
-	`${encodeURIComponent(packageId)}.game.arkpack`;
+	`${encodeURIComponent(packageId)}.arkpack`;
 
 export const readPackagePath = (root: string, packageId: string) =>
 	join(root, readPackageFilename(packageId));
+
+export const readSignaturePath = (root: string, packageId: string) =>
+	join(root, `${encodeURIComponent(packageId)}.arksig`);
 
 export const writePackage = async ({
 	bytes,
@@ -46,7 +49,7 @@ export const writePackage = async ({
 	await writeFile(path, bytes);
 	if (signature !== undefined) {
 		await writeFile(
-			`${path}.sig`,
+			readSignaturePath(root, packageId),
 			typeof signature === "string" ? signature : JSON.stringify(signature),
 		);
 	}

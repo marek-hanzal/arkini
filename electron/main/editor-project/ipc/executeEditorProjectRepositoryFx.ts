@@ -35,6 +35,11 @@ export const executeEditorProjectRepositoryFx = <Request, Value>(
 				error: {
 					operation: error.operation,
 					message: error.message,
+					...(error.diagnostics === undefined
+						? {}
+						: {
+								diagnostics: error.diagnostics,
+							}),
 				},
 			}),
 			onSuccess: (value) => ({

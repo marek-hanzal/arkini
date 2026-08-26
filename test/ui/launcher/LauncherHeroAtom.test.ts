@@ -91,7 +91,6 @@ const builtIn = {
 	game: "1.0",
 	trust: {
 		type: "official" as const,
-		keyId: "arkini-test",
 	},
 	source: "bundled" as const,
 };

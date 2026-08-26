@@ -82,6 +82,9 @@ describe("exportEditorJsonDirectoryFx", () => {
 			mkdir(join(source, "objects"), {
 				recursive: true,
 			}),
+			mkdir(join(source, "build"), {
+				recursive: true,
+			}),
 			mkdir(target),
 		]);
 		await Promise.all([
@@ -104,6 +107,13 @@ describe("exportEditorJsonDirectoryFx", () => {
 				]),
 			),
 			writeFile(join(source, "game.json.tmp"), "transient"),
+			writeFile(join(source, "build", "derived.json"), "{}"),
+			writeFile(
+				join(source, "build", "derived.png"),
+				new Uint8Array([
+					1,
+				]),
+			),
 			writeFile(join(target, "stale.txt"), "stale"),
 		]);
 
@@ -147,6 +157,7 @@ describe("exportEditorJsonDirectoryFx", () => {
 		await expect(access(join(target, "stale.txt"))).rejects.toThrow();
 		await expect(access(join(target, "editor.lock"))).rejects.toThrow();
 		await expect(access(join(target, "game.json.tmp"))).rejects.toThrow();
+		await expect(access(join(target, "build"))).rejects.toThrow();
 	});
 
 	it("leaves the selected folder untouched when replacement is canceled", async () => {

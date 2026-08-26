@@ -3,19 +3,15 @@ import { Effect } from "effect";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { realpath } from "node:fs/promises";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
-import { ArkpackSigningError } from "~/engine/pack/error/ArkpackSigningError";
 import { generateArkpackKeyPairFx } from "~/engine/pack/fx/generateArkpackKeyPairFx";
-import { packSignedDirectoryFx } from "~/engine/pack/fx/packSignedDirectoryFx";
-import { signArkpackFx } from "~/engine/pack/fx/signArkpackFx";
+import { packDirectoryFx } from "~/engine/pack/fx/packDirectoryFx";
 import { verifyArkpackFileFx } from "~/engine/pack/fx/verifyArkpackFileFx";
-import { ArkpackTrustedKeysSchema } from "~/engine/pack/schema/ArkpackTrustedKeysSchema";
 import { installTestPngDecoder } from "~test/bridge/arkpack/support/createTestPngBytes";
 import { writeSigningGame } from "./arkpackSigningWorkflow.test/writeSigningGame";
 
-const keyId = "test-workflow-2026-01";
 let root = "";
 
 beforeEach(async () => {
@@ -32,128 +28,60 @@ afterEach(async () => {
 });
 
 describe("Arkpack signing workflow", () => {
-	it("packs, signs, verifies, loads, and distinguishes every trust boundary", async () => {
+	it("publishes one signed canonical pair and verifies its exact bytes", async () => {
 		const gameDirectory = await writeSigningGame(root);
-		const [pair, unknownPair] = await Effect.runPromise(
-			Effect.all(
-				[
-					generateArkpackKeyPairFx(),
-					generateArkpackKeyPairFx(),
-				],
-				{
-					concurrency: "unbounded",
-				},
-			),
-		);
-		const trustedKeys = ArkpackTrustedKeysSchema.parse({
-			keys: [
-				{
-					keyId,
+		const pair = await Effect.runPromise(generateArkpackKeyPairFx());
+		const result = await Effect.runPromise(
+			packDirectoryFx({
+				input: gameDirectory,
+				signing: {
+					signKey: pair.signKey,
 					publicKey: pair.publicKey,
 				},
-			],
-		});
-		const arkpackPath = join(root, "workflow.game.arkpack");
-		const untrustedKey = await Effect.runPromise(
-			Effect.result(
-				packSignedDirectoryFx({
-					input: gameDirectory,
-					keyId,
-					output: join(root, "untrusted.game.arkpack"),
-					privateKey: pair.privateKey,
-					trustedKeys: {
-						keys: [],
-					},
-				}).pipe(Effect.provide(NodeServices.layer)),
-			),
-		);
-		expect(untrustedKey._tag).toBe("Failure");
-		if (untrustedKey._tag === "Failure") {
-			expect(untrustedKey.failure).toBeInstanceOf(ArkpackSigningError);
-			expect(untrustedKey.failure).toMatchObject({
-				reason: "untrusted-key-id",
-				keyId,
-			});
-		}
-
-		const result = await Effect.runPromise(
-			packSignedDirectoryFx({
-				input: gameDirectory,
-				keyId,
-				output: arkpackPath,
-				privateKey: pair.privateKey,
-				trustedKeys,
 			}).pipe(Effect.provide(NodeServices.layer)),
 		);
-		const bytes = new Uint8Array(await readFile(arkpackPath));
-		const signature = JSON.parse(await readFile(result.signaturePath, "utf8")) as unknown;
 
+		const canonicalGameDirectory = await realpath(gameDirectory);
+		expect(result.arkpack).toBe(join(canonicalGameDirectory, "build", result.filename));
+		expect(result.signaturePath).toBe(
+			join(canonicalGameDirectory, "build", result.signatureFilename!),
+		);
+		expect((await readFile(result.arkpack)).byteLength).toBe(result.bytes);
 		await expect(
 			Effect.runPromise(
 				verifyArkpackFileFx({
-					arkpackPath,
-					trustedKeys,
+					arkpackPath: result.arkpack,
+					publicKey: pair.publicKey,
 				}).pipe(Effect.provide(NodeServices.layer)),
 			),
 		).resolves.toMatchObject({
 			trust: {
 				type: "official",
-				keyId,
 			},
 		});
-		const loaded = await Effect.runPromise(
-			readArkpackFx({
-				bytes,
-				packageId: "game:signing-workflow",
-				signature: {
-					metadata: signature,
-					trustedKeys,
-				},
-				source: "bundled",
-			}),
-		);
-		expect(loaded.descriptor.trust).toEqual({
-			type: "official",
-			keyId,
-		});
-		expect(loaded.payload.config.meta.id).toBe("game:signing-workflow");
+	});
 
+	it("removes a stale signature when the same project is rebuilt unsigned", async () => {
+		const gameDirectory = await writeSigningGame(root);
+		const pair = await Effect.runPromise(generateArkpackKeyPairFx());
+		const signed = await Effect.runPromise(
+			packDirectoryFx({
+				input: gameDirectory,
+				signing: {
+					signKey: pair.signKey,
+					publicKey: pair.publicKey,
+				},
+			}).pipe(Effect.provide(NodeServices.layer)),
+		);
 		const unsigned = await Effect.runPromise(
-			readArkpackFx({
-				bytes,
-				signature: {
-					trustedKeys,
-				},
-				source: "user",
-			}),
+			packDirectoryFx({
+				input: gameDirectory,
+			}).pipe(Effect.provide(NodeServices.layer)),
 		);
-		expect(unsigned.descriptor.trust).toEqual({
-			type: "external",
-			reason: "unsigned",
-		});
 
-		const unknownSignature = await Effect.runPromise(
-			signArkpackFx({
-				bytes,
-				keyId: "unknown-test-key",
-				privateKey: unknownPair.privateKey,
-			}),
-		);
-		const unknown = await Effect.runPromise(
-			readArkpackFx({
-				bytes,
-				signature: {
-					metadata: unknownSignature,
-					trustedKeys,
-				},
-				source: "user",
-			}),
-		);
-		expect(unknown.descriptor.trust).toEqual({
-			type: "external",
-			reason: "unknown-key",
+		expect(unsigned.signaturePath).toBeUndefined();
+		await expect(readFile(signed.signaturePath!)).rejects.toMatchObject({
+			code: "ENOENT",
 		});
-		expect(bytes).toEqual(new Uint8Array(await readFile(arkpackPath)));
-		expect(trustedKeys.keys).toHaveLength(1);
 	});
 });

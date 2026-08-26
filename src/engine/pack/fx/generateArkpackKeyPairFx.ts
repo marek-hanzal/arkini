@@ -4,7 +4,7 @@ import { ArkpackCryptoError } from "~/engine/pack/error/ArkpackCryptoError";
 
 export namespace generateArkpackKeyPairFx {
 	export interface Result {
-		readonly privateKey: string;
+		readonly signKey: string;
 		readonly publicKey: string;
 	}
 }
@@ -26,20 +26,24 @@ export const generateArkpackKeyPairFx = Effect.fn("generateArkpackKeyPairFx")(()
 			const privateBytes = new Uint8Array(
 				await crypto.subtle.exportKey("pkcs8", pair.privateKey),
 			);
-			const publicBytes = new Uint8Array(
-				await crypto.subtle.exportKey("spki", pair.publicKey),
-			);
-			const pem = (label: "PRIVATE KEY" | "PUBLIC KEY", bytes: Uint8Array) => {
+			const publicKey = new Uint8Array(await crypto.subtle.exportKey("spki", pair.publicKey));
+			const privateKey = (() => {
 				const encoded = btoa(
-					Array.from(bytes, (byte) => String.fromCharCode(byte)).join(""),
+					Array.from(privateBytes, (byte) => String.fromCharCode(byte)).join(""),
 				);
 				const lines = encoded.match(/.{1,64}/g) ?? [];
-				return `-----BEGIN ${label}-----\n${lines.join("\n")}\n-----END ${label}-----\n`;
-			};
+				return `-----BEGIN PRIVATE KEY-----\n${lines.join("\n")}\n-----END PRIVATE KEY-----\n`;
+			})();
 
 			return {
-				privateKey: pem("PRIVATE KEY", privateBytes),
-				publicKey: pem("PUBLIC KEY", publicBytes),
+				signKey: btoa(
+					Array.from(new TextEncoder().encode(privateKey), (byte) =>
+						String.fromCharCode(byte),
+					).join(""),
+				),
+				publicKey: btoa(
+					Array.from(publicKey, (byte) => String.fromCharCode(byte)).join(""),
+				),
 			};
 		},
 		catch: (cause) =>

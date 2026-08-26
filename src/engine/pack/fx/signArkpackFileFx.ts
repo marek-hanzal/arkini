@@ -7,23 +7,20 @@ import { writeArkpackSignatureFx } from "./writeArkpackSignatureFx";
 export namespace signArkpackFileFx {
 	export interface Props {
 		readonly arkpackPath: string;
-		readonly keyId: string;
-		readonly privateKey: string;
+		readonly signKey: string;
 	}
 }
 
 /** Signs one exact Arkpack file and atomically publishes its detached sidecar. */
 export const signArkpackFileFx = Effect.fn("signArkpackFileFx")(function* ({
 	arkpackPath,
-	keyId,
-	privateKey,
+	signKey,
 }: signArkpackFileFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const bytes = yield* fileSystem.readFile(arkpackPath);
 	const signature = yield* signArkpackFx({
 		bytes,
-		keyId,
-		privateKey,
+		signKey,
 	});
 	const signaturePath = yield* writeArkpackSignatureFx({
 		arkpackPath,

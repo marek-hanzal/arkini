@@ -5,6 +5,7 @@ import {
 	EditorProjectRepositoryError,
 	type EditorProjectRepositoryOperation,
 } from "~/bridge/editor/EditorProjectRepositoryError";
+import { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
 
 export const invokeEditorProjectTransportFx = <Value, Output>({
 	call,
@@ -30,7 +31,19 @@ export const invokeEditorProjectTransportFx = <Value, Output>({
 	}).pipe(
 		Effect.flatMap((result) => {
 			if (result.type === "failure") {
-				return Effect.fail(new EditorProjectRepositoryError(result.error));
+				return Effect.fail(
+					new EditorProjectRepositoryError({
+						operation: result.error.operation,
+						message: result.error.message,
+						...(result.error.diagnostics === undefined
+							? {}
+							: {
+									diagnostics: GameDiagnosticsSchema.parse(
+										result.error.diagnostics,
+									),
+								}),
+					}),
+				);
 			}
 			return Effect.try({
 				try: () => parse(result.value),

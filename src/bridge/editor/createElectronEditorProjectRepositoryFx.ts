@@ -20,6 +20,11 @@ import {
 import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import { EditorNoteSchema } from "~/editor/note/EditorNoteSchema";
+import {
+	EditorProjectBuildContentSchema,
+	EditorProjectBuildSchema,
+} from "~/editor/EditorProjectBuildSchema";
+import { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
 
 const versionReferenceSchema = z.discriminatedUnion("type", [
 	z
@@ -152,7 +157,19 @@ const callFx = <Value, Parsed>(
 			}).pipe(
 				Effect.flatMap((envelope) =>
 					envelope.type === "failure"
-						? Effect.fail(new EditorProjectRepositoryError(envelope.error))
+						? Effect.fail(
+								new EditorProjectRepositoryError({
+									operation: envelope.error.operation,
+									message: envelope.error.message,
+									...(envelope.error.diagnostics === undefined
+										? {}
+										: {
+												diagnostics: GameDiagnosticsSchema.parse(
+													envelope.error.diagnostics,
+												),
+											}),
+								}),
+							)
 						: Effect.try({
 								try: () => parse(envelope.value),
 								catch: (cause) =>
@@ -180,6 +197,15 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 			() => window.arkini.editor.awaitIdle(),
 			() => undefined,
 		),
+		buildProjectFx: (request) =>
+			writeFx(
+				"build-project",
+				callFx(
+					"build-project",
+					() => window.arkini.editor.buildProject(request),
+					(value) => EditorProjectBuildSchema.parse(value),
+				),
+			),
 		createProjectFx: (request) =>
 			writeFx(
 				"create-project",
@@ -297,6 +323,12 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 				"read-project",
 				() => window.arkini.editor.readProject(projectId),
 				(value) => (value === null ? null : parseProject(value)),
+			),
+		readProjectBuildFx: (request) =>
+			callFx(
+				"read-project-build",
+				() => window.arkini.editor.readProjectBuild(request),
+				(value) => EditorProjectBuildContentSchema.parse(value),
 			),
 		readVersionStatusFx: (projectId) =>
 			callFx(

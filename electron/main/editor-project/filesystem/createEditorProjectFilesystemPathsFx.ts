@@ -44,6 +44,8 @@ export const createEditorProjectFilesystemPathsFx = Effect.fn(
 
 	return {
 		root,
+		build: path.join(root, "build"),
+		gitignoreFile: path.join(root, ".gitignore"),
 		projectFile: path.join(root, GameProjectManifestFileName),
 		lockFile: path.join(root, "editor.lock"),
 		schemaFile: path.join(root, GameProjectSchemaFileName),

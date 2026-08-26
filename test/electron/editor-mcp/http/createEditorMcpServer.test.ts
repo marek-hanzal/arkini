@@ -133,9 +133,14 @@ describe("editor MCP server", () => {
 		const { ownership, port, repository } = await createEditorMcpHarness(runPromise);
 		await Effect.runPromise(
 			repository.createProjectFx({
-				projectId: "project-context",
 				version: "1.0",
-				config: editorTestPayload.config,
+				config: {
+					...editorTestPayload.config,
+					meta: {
+						...editorTestPayload.config.meta,
+						id: "project-context",
+					},
+				},
 				resources: editorTestPayload.resources,
 			}),
 		);
@@ -161,9 +166,14 @@ describe("editor MCP server", () => {
 		const { ownership, port, repository } = await createEditorMcpHarness();
 		await Effect.runPromise(
 			repository.createProjectFx({
-				projectId: "legacy-project",
 				version: "1.0",
-				config: editorTestPayload.config,
+				config: {
+					...editorTestPayload.config,
+					meta: {
+						...editorTestPayload.config.meta,
+						id: "legacy-project",
+					},
+				},
 				resources: editorTestPayload.resources,
 			}),
 		);
@@ -228,9 +238,14 @@ describe("editor MCP server", () => {
 		const { ownership, port, repository } = await createEditorMcpHarness();
 		await Effect.runPromise(
 			repository.createProjectFx({
-				projectId: "tool-project",
 				version: "1.0",
-				config: createJobTestConfig(),
+				config: {
+					...createJobTestConfig(),
+					meta: {
+						...createJobTestConfig().meta,
+						id: "tool-project",
+					},
+				},
 				resources: [],
 			}),
 		);
@@ -297,9 +312,14 @@ describe("editor MCP server", () => {
 		);
 		const created = await Effect.runPromise(
 			repository.createProjectFx({
-				projectId: "version-project",
 				version: "1.0",
-				config: editorTestPayload.config,
+				config: {
+					...editorTestPayload.config,
+					meta: {
+						...editorTestPayload.config.meta,
+						id: "version-project",
+					},
+				},
 				resources: editorTestPayload.resources,
 			}),
 		);
@@ -348,9 +368,9 @@ describe("editor MCP server", () => {
 				projectId: "version-project",
 				expectedRevision: created.revision,
 				config: {
-					...editorTestPayload.config,
+					...created.config,
 					meta: {
-						...editorTestPayload.config.meta,
+						...created.config.meta,
 						title: "Changed after snapshot",
 					},
 				},

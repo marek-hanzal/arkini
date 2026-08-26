@@ -136,7 +136,6 @@ export namespace EditorProjectTransport {
 	}
 
 	export interface CreateProjectRequest {
-		readonly projectId: string;
 		readonly version: string;
 		readonly config: unknown;
 		readonly resources: ReadonlyArray<unknown>;

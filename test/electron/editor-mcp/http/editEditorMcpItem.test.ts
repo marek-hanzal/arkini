@@ -33,10 +33,13 @@ describe("editor MCP item editing", () => {
 		};
 		const created = await Effect.runPromise(
 			repository.createProjectFx({
-				projectId: "edit-simple-project",
 				version: "1.0",
 				config: {
 					...editorTestPayload.config,
+					meta: {
+						...editorTestPayload.config.meta,
+						id: "edit-simple-project",
+					},
 					items: {
 						...editorTestPayload.config.items,
 						[producer.id]: producer,

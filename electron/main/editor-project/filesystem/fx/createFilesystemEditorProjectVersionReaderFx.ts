@@ -79,6 +79,7 @@ export const createFilesystemEditorProjectVersionReaderFx = Effect.fn(
 			const snapshot = yield* Effect.try({
 				try: () =>
 					createFilesystemEditorVersionSnapshotPlan({
+						arkpack: state.project.version,
 						config: state.project.config,
 						resources: state.project.resources,
 						scenarios,
@@ -138,9 +139,15 @@ export const createFilesystemEditorProjectVersionReaderFx = Effect.fn(
 			return yield* Effect.fail(
 				new Error(`Version ${reference.versionId} content does not match its descriptor.`),
 			);
+		if (snapshot.arkpack !== version.descriptor.arkpackVersion)
+			return yield* Effect.fail(
+				new Error(
+					`Version ${reference.versionId} Arkpack version does not match its descriptor.`,
+				),
+			);
 		return {
 			config: snapshot.config,
-			arkpackVersion: version.descriptor.arkpackVersion,
+			arkpackVersion: snapshot.arkpack,
 			resources: new Map(
 				snapshot.resources.map((resource) => [
 					resource.id,

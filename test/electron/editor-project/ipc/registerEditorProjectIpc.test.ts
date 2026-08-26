@@ -168,7 +168,6 @@ describe("registerEditorProjectIpcFx", () => {
 			repository,
 		});
 		const createRequest = {
-			projectId: "project-one",
 			version: editorTestPayload.version,
 			config: editorTestPayload.config,
 			resources: editorTestPayload.resources,

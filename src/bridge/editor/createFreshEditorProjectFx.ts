@@ -43,7 +43,6 @@ export const createFreshEditorProjectFx = Effect.fn("createFreshEditorProjectFx"
 	});
 	const repository = yield* EditorProjectRepository;
 	const project = yield* repository.createProjectFx({
-		projectId,
 		version: "1.0",
 		config,
 		resources: [

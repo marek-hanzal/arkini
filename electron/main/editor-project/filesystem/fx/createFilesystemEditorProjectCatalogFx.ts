@@ -11,7 +11,7 @@ type Entry = EditorProjectCatalogEntrySchema.Type;
 export interface FilesystemEditorProjectCatalog {
 	readonly addFx: (entry: Entry) => Effect.Effect<void, EditorProjectRepositoryError>;
 	readonly list: () => ReadonlyArray<Entry>;
-	readonly removeFx: (projectId: string) => Effect.Effect<void, EditorProjectRepositoryError>;
+	readonly removeFx: (root: string) => Effect.Effect<void, EditorProjectRepositoryError>;
 }
 
 const createError = (message: string, cause?: unknown) =>
@@ -31,14 +31,11 @@ const parseCatalog = (candidate: unknown) => {
 		!Array.isArray(candidate.projects)
 	)
 		throw new Error("The Editor project catalog envelope is invalid.");
-	const projectIds = new Set<string>();
 	const roots = new Set<string>();
 	const projects: Array<Entry> = [];
 	for (const value of candidate.projects) {
 		const parsed = EditorProjectCatalogEntrySchema.safeParse(value);
-		if (!parsed.success || projectIds.has(parsed.data.projectId) || roots.has(parsed.data.root))
-			continue;
-		projectIds.add(parsed.data.projectId);
+		if (!parsed.success || roots.has(parsed.data.root)) continue;
 		roots.add(parsed.data.root);
 		projects.push(parsed.data);
 	}
@@ -105,17 +102,13 @@ export const createFilesystemEditorProjectCatalogFx = Effect.fn(
 
 	return {
 		addFx: (entry) => {
-			const projects = catalog.projects.filter(
-				(candidate) =>
-					candidate.projectId !== entry.projectId && candidate.root !== entry.root,
-			);
+			const projects = catalog.projects.filter((candidate) => candidate.root !== entry.root);
 			return writeFx([
 				...projects,
 				entry,
 			]);
 		},
 		list: () => catalog.projects,
-		removeFx: (projectId) =>
-			writeFx(catalog.projects.filter((entry) => entry.projectId !== projectId)),
+		removeFx: (root) => writeFx(catalog.projects.filter((entry) => entry.root !== root)),
 	} satisfies FilesystemEditorProjectCatalog;
 });

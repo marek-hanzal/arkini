@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { Effect, Path } from "effect";
 
+import { EditorProjectSchemaFileName } from "~/editor/filesystem/EditorProjectSchemaReference";
 import type { EditorProjectFilesystemPaths } from "./EditorProjectFilesystemPaths";
 
 const encodeFileStem = (value: string) => encodeURIComponent(value).replaceAll(".", "%2E");
@@ -42,6 +43,7 @@ export const createEditorProjectFilesystemPathsFx = Effect.fn(
 		root,
 		editorFile: path.join(root, "editor.json"),
 		lockFile: path.join(root, "editor.lock"),
+		schemaFile: path.join(root, EditorProjectSchemaFileName),
 		gameFile: path.join(root, "game.json"),
 		items,
 		assets,

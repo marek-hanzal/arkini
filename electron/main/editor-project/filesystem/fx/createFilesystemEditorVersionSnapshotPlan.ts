@@ -1,9 +1,11 @@
 import type { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
 import { EditorProjectGameFileSchema } from "~/editor/filesystem/EditorProjectGameFileSchema";
+import { EditorProjectGameSchemaReference } from "~/editor/filesystem/EditorProjectSchemaReference";
 import { EditorVersionManifestSchema } from "~/editor/filesystem/EditorVersionManifestSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import {
 	createFilesystemEditorVersionFingerprint,
 	hashFilesystemEditorVersionBytes,
@@ -26,6 +28,7 @@ const sortedRecord = (
 
 export namespace createFilesystemEditorVersionSnapshotPlan {
 	export interface Props {
+		readonly arkpack: ArkpackVersionSchema.Type;
 		readonly config: GameConfigSchema.Type;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
 		readonly scenarios: ReadonlyArray<EditorBoardScenarioFileSchema.Type>;
@@ -34,6 +37,7 @@ export namespace createFilesystemEditorVersionSnapshotPlan {
 
 /** Creates the one canonical manifest/fingerprint plan shared by preview and object writes. */
 export const createFilesystemEditorVersionSnapshotPlan = ({
+	arkpack,
 	config,
 	resources,
 	scenarios,
@@ -51,8 +55,12 @@ export const createFilesystemEditorVersionSnapshotPlan = ({
 		return hash;
 	};
 
-	const { items, ...gameCandidate } = config;
-	const game = EditorProjectGameFileSchema.parse(gameCandidate);
+	const { $schema: _schema, items, ...gameCandidate } = config;
+	const game = EditorProjectGameFileSchema.parse({
+		$schema: EditorProjectGameSchemaReference,
+		arkpack,
+		...gameCandidate,
+	});
 	const itemUids = new Set<string>();
 	const itemHashes: Array<
 		readonly [

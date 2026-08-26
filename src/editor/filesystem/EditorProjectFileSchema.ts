@@ -1,16 +1,11 @@
 import { z } from "zod";
 
-import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
-
-export const EditorProjectFormat = "arkini-editor";
-export const EditorProjectFormatVersion = 1;
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 
 /** Root marker required before a directory can be opened as an Editor project. */
 export const EditorProjectFileSchema = z
 	.object({
-		format: z.literal(EditorProjectFormat),
-		formatVersion: z.literal(EditorProjectFormatVersion),
-		arkpackVersion: ArkpackVersionSchema,
+		arkini: z.literal(ArkiniAppVersion),
 		updatedAtMs: z.number().int().nonnegative(),
 	})
 	.strict()

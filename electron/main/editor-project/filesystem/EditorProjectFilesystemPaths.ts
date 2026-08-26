@@ -8,6 +8,7 @@ export interface EditorProjectFilesystemPaths {
 	readonly root: string;
 	readonly editorFile: string;
 	readonly lockFile: string;
+	readonly schemaFile: string;
 	readonly gameFile: string;
 	readonly items: string;
 	readonly assets: string;

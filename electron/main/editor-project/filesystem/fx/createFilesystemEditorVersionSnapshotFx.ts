@@ -8,6 +8,7 @@ import { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardSc
 import type { EditorVersionManifestSchema } from "~/editor/filesystem/EditorVersionManifestSchema";
 import type { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import { hashFilesystemEditorVersionBytes } from "./FilesystemEditorVersionFingerprint";
 import { assertFilesystemEditorProjectDirectoryFx } from "./assertFilesystemEditorProjectDirectoryFx";
 import { createFilesystemEditorVersionSnapshotPlan } from "./createFilesystemEditorVersionSnapshotPlan";
@@ -16,6 +17,7 @@ import { replaceFilesystemEditorJsonFx } from "./replaceFilesystemEditorJsonFx";
 
 export namespace createFilesystemEditorVersionSnapshotFx {
 	export interface Props {
+		readonly arkpack: ArkpackVersionSchema.Type;
 		readonly config: GameConfigSchema.Type;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
 		readonly scenarios: ReadonlyArray<EditorBoardScenarioSchema.Type>;
@@ -32,6 +34,7 @@ export namespace createFilesystemEditorVersionSnapshotFx {
 export const createFilesystemEditorVersionSnapshotFx = Effect.fn(
 	"createFilesystemEditorVersionSnapshotFx",
 )(function* ({
+	arkpack,
 	config,
 	resources,
 	scenarios,
@@ -41,6 +44,7 @@ export const createFilesystemEditorVersionSnapshotFx = Effect.fn(
 	const plan = yield* Effect.try({
 		try: () =>
 			createFilesystemEditorVersionSnapshotPlan({
+				arkpack,
 				config,
 				resources,
 				scenarios: scenarios.map((scenario) => {

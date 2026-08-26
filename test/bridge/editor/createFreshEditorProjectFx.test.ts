@@ -37,9 +37,9 @@ afterEach(() => {
 describe("createFreshEditorProjectFx", () => {
 	it("atomically creates one schema-valid empty project with a replaceable hero", async () => {
 		const createProjectFx = vi.fn(
-			({ projectId, config, resources }: EditorProjectRepository.CreateProjectProps) =>
+			({ config, resources }: EditorProjectRepository.CreateProjectProps) =>
 				Effect.succeed<EditorProject>({
-					projectId,
+					projectId: config.meta.id,
 					title: config.meta.title,
 					version: "1.0",
 					createdAtMs: 100,

@@ -25,10 +25,7 @@ const requestRefreshFx = (projectId: string) =>
 		call: () => window.arkini.editor.refreshProject(projectId),
 		operation: "refresh-project",
 		parse: (candidate: EditorProjectTransport.Project) => {
-			const project = EditorProjectPayloadSchema.parse(candidate);
-			if (project.projectId !== projectId)
-				throw new Error("Editor refresh response identity does not match the request.");
-			return project;
+			return EditorProjectPayloadSchema.parse(candidate);
 		},
 		requestMessage: "The editor project refresh request failed.",
 		responseMessage: "The editor project refresh response is invalid.",
@@ -55,7 +52,7 @@ export const refreshEditorProjectFx = Effect.fn("refreshEditorProjectFx")(
 					const unsavedChanges = yield* EditorUnsavedChanges;
 					yield* repository.awaitIdleFx;
 					const current = yield* Atom.get(EditorProjectAtom(projectId));
-					yield* Effect.uninterruptible(
+					return yield* Effect.uninterruptible(
 						Effect.gen(function* () {
 							yield* releaseCurrentEditorBoardGameFx;
 							const fresh = yield* requestRefreshFx(projectId).pipe(
@@ -66,14 +63,17 @@ export const refreshEditorProjectFx = Effect.fn("refreshEditorProjectFx")(
 								),
 							);
 							yield* Effect.sync(() => unsavedChanges.discardAll());
-							yield* publishEditorProjectFx(projectId, {
-								replacement: fresh,
-							});
-							yield* syncEditorBoardGameFx(fresh);
-							yield* Atom.update(
-								EditorProjectReplacementEpochAtom(projectId),
-								(epoch) => epoch + 1,
-							);
+							if (fresh.projectId === projectId) {
+								yield* publishEditorProjectFx(projectId, {
+									replacement: fresh,
+								});
+								yield* syncEditorBoardGameFx(fresh);
+								yield* Atom.update(
+									EditorProjectReplacementEpochAtom(projectId),
+									(epoch) => epoch + 1,
+								);
+							}
+							return fresh;
 						}),
 					);
 				}),

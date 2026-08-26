@@ -27,7 +27,7 @@ const project = {
 	resources: editorTestPayload.resources,
 };
 
-const runRefresh = async (fail = false) => {
+const runRefresh = async (mode: "failure" | "renamed" | "same" = "same") => {
 	const events: string[] = [];
 	const registry = AtomRegistry.make();
 	const state = Effect.runSync(
@@ -60,11 +60,19 @@ const runRefresh = async (fail = false) => {
 					EditorProjectTransport.Result<EditorProjectTransport.Project>
 				> => {
 					events.push("refresh");
+					if (mode === "failure")
+						return {
+							type: "failure",
+							error: {
+								operation: "refresh-project",
+								message: "Refresh failed.",
+							},
+						};
 					return {
 						type: "success",
 						value: {
 							...project,
-							projectId: fail ? "project-two" : project.projectId,
+							projectId: mode === "renamed" ? "project-two" : project.projectId,
 							updatedAtMs: 7,
 							revision: 7,
 						},
@@ -141,8 +149,22 @@ describe("refreshEditorProjectFx", () => {
 		expect(result.replacementEpoch).toBe(1);
 	});
 
-	it("rejects a mismatched refresh without discarding or publishing", async () => {
-		const result = await runRefresh(true);
+	it("returns a renamed project for route replacement without publishing under the old ID", async () => {
+		const result = await runRefresh("renamed");
+		expect(Exit.isSuccess(result.exit)).toBe(true);
+		if (Exit.isSuccess(result.exit)) expect(result.exit.value.projectId).toBe("project-two");
+		expect(result.events).toEqual([
+			"idle",
+			"board-release",
+			"refresh",
+			"discard",
+		]);
+		expect(result.published?.revision).toBe(9);
+		expect(result.replacementEpoch).toBe(0);
+	});
+
+	it("restores the mounted Board when filesystem refresh fails", async () => {
+		const result = await runRefresh("failure");
 		expect(Exit.isFailure(result.exit)).toBe(true);
 		expect(result.events).toEqual([
 			"idle",

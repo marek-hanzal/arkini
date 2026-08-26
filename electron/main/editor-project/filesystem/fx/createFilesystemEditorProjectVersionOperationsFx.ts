@@ -333,6 +333,7 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 								yield* assertVersionDirectoryFx(current.state);
 								const snapshot = yield* providePlatform(
 									createFilesystemEditorVersionSnapshotFx({
+										arkpack: current.state.project.version,
 										config: current.state.project.config,
 										resources: current.state.project.resources,
 										scenarios: current.state.scenarios,
@@ -431,6 +432,20 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 									`Version ${versionId} content does not match its descriptor.`,
 								),
 							);
+						if (snapshot.arkpack !== version.descriptor.arkpackVersion)
+							return yield* Effect.fail(
+								error(
+									"checkout-version",
+									`Version ${versionId} Arkpack version does not match its descriptor.`,
+								),
+							);
+						if (snapshot.config.meta.id !== current.state.project.projectId)
+							return yield* Effect.fail(
+								error(
+									"checkout-version",
+									`Version ${versionId} belongs to Editor project ${snapshot.config.meta.id}, not ${current.state.project.projectId}.`,
+								),
+							);
 						const updatedAtMs = Math.max(nowMs, current.state.project.updatedAtMs + 1);
 						const restoredScenarioFiles = snapshot.scenarios.map((scenario) =>
 							EditorBoardScenarioFileSchema.parse({
@@ -442,15 +457,13 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 							toScenario(projectId, scenario),
 						);
 						const marker = EditorProjectFileSchema.parse({
-							format: "arkini-editor",
-							formatVersion: 1,
-							arkpackVersion: version.descriptor.arkpackVersion,
+							arkini: ArkiniAppVersion,
 							updatedAtMs,
 						});
 						const nextProject = cloneProject({
 							...current.state.project,
 							title: snapshot.config.meta.title,
-							version: version.descriptor.arkpackVersion,
+							version: snapshot.arkpack,
 							updatedAtMs,
 							revision: updatedAtMs,
 							config: snapshot.config,
@@ -498,16 +511,16 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 									writeFilesystemEditorProjectFilesFx({
 										root: current.state.paths.root,
 										previous: {
+											arkpack: current.state.project.version,
 											marker: EditorProjectFileSchema.parse({
-												format: "arkini-editor",
-												formatVersion: 1,
-												arkpackVersion: current.state.project.version,
+												arkini: ArkiniAppVersion,
 												updatedAtMs: current.state.project.updatedAtMs,
 											}),
 											config: current.state.project.config,
 											resources: current.state.project.resources,
 										},
 										next: {
+											arkpack: nextProject.version,
 											marker,
 											config: nextProject.config,
 											resources: nextProject.resources,

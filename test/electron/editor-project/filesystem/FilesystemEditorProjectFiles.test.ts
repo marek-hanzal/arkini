@@ -2,10 +2,11 @@ import { access, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promise
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 import {
-	EditorProjectFormat,
-	EditorProjectFormatVersion,
-} from "~/editor/filesystem/EditorProjectFileSchema";
+	EditorProjectGameSchemaReference,
+	EditorProjectItemSchemaReference,
+} from "~/editor/filesystem/EditorProjectSchemaReference";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import { createFilesystemEditorProjectFilesHarness } from "./FilesystemEditorProjectFiles.test/harness";
@@ -22,10 +23,9 @@ describe("filesystem Editor project current tree", () => {
 		const harness = await createFilesystemEditorProjectFilesHarness();
 		openHarnesses.push(harness);
 		const initial = {
+			arkpack: editorTestPayload.version,
 			marker: {
-				format: EditorProjectFormat,
-				formatVersion: EditorProjectFormatVersion,
-				arkpackVersion: editorTestPayload.version,
+				arkini: ArkiniAppVersion,
 				updatedAtMs: 1,
 			},
 			config: editorTestPayload.config,
@@ -33,16 +33,43 @@ describe("filesystem Editor project current tree", () => {
 		} as const;
 
 		await harness.write(initial);
-		expect(await harness.read()).toEqual(initial);
-		expect(
-			JSON.parse(await readFile(join(harness.root, "game.json"), "utf8")),
-		).not.toHaveProperty("items");
+		const canonicalInitial = {
+			...initial,
+			config: GameConfigSchema.parse({
+				...initial.config,
+				$schema: EditorProjectGameSchemaReference,
+			}),
+		};
+		expect(await harness.read()).toEqual(canonicalInitial);
+		expect(JSON.parse(await readFile(join(harness.root, "editor.json"), "utf8"))).toEqual({
+			arkini: ArkiniAppVersion,
+			updatedAtMs: initial.marker.updatedAtMs,
+		});
+		const schema = JSON.parse(await readFile(join(harness.root, "schema.json"), "utf8"));
+		expect(schema).toMatchObject({
+			properties: {
+				arkpack: {
+					$ref: "#/$defs/ArkpackVersionSchema",
+				},
+				items: {
+					type: "object",
+				},
+			},
+			type: "object",
+		});
+		const game = JSON.parse(await readFile(join(harness.root, "game.json"), "utf8"));
+		expect(game.$schema).toBe(EditorProjectGameSchemaReference);
+		expect(game.arkpack).toBe(editorTestPayload.version);
+		expect(game).not.toHaveProperty("items");
 		const waterPath = join(harness.root, "items", "simple", "water.json");
+		expect(JSON.parse(await readFile(waterPath, "utf8")).$schema).toBe(
+			EditorProjectItemSchemaReference,
+		);
 		const waterResourcePath = join(harness.root, "assets", "item-water.png");
 		await writeFile(waterPath, '{"items":{}}');
 		await rm(waterResourcePath);
 		const repaired = {
-			...initial,
+			...canonicalInitial,
 			marker: {
 				...initial.marker,
 				updatedAtMs: 2,
@@ -52,6 +79,7 @@ describe("filesystem Editor project current tree", () => {
 		expect(await harness.read()).toEqual(repaired);
 
 		const next = {
+			arkpack: repaired.arkpack,
 			marker: {
 				...repaired.marker,
 				updatedAtMs: 3,
@@ -88,11 +116,29 @@ describe("filesystem Editor project current tree", () => {
 				await readFile(join(harness.root, "items", "simple", "water%2Enext.json"), "utf8"),
 			),
 		).toEqual({
+			$schema: EditorProjectItemSchemaReference,
 			items: {
 				water: next.config.items.water,
 			},
 		});
 		expect(await harness.read()).toEqual(next);
+	});
+
+	it("rejects a stale root game schema", async () => {
+		const harness = await createFilesystemEditorProjectFilesHarness();
+		openHarnesses.push(harness);
+		await harness.write({
+			arkpack: editorTestPayload.version,
+			marker: {
+				arkini: ArkiniAppVersion,
+				updatedAtMs: 1,
+			},
+			config: editorTestPayload.config,
+			resources: editorTestPayload.resources,
+		});
+		await writeFile(join(harness.root, "schema.json"), "{}\n");
+
+		await expect(harness.read()).rejects.toThrow("does not match this Arkini version");
 	});
 
 	it("rejects a mutable project directory symlink instead of writing through it", async () => {
@@ -111,10 +157,9 @@ describe("filesystem Editor project current tree", () => {
 
 		await expect(
 			harness.write({
+				arkpack: editorTestPayload.version,
 				marker: {
-					format: EditorProjectFormat,
-					formatVersion: EditorProjectFormatVersion,
-					arkpackVersion: editorTestPayload.version,
+					arkini: ArkiniAppVersion,
 					updatedAtMs: 1,
 				},
 				config: editorTestPayload.config,

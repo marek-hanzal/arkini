@@ -19,9 +19,14 @@ describe("editor MCP project configuration", () => {
 		);
 		const created = await Effect.runPromise(
 			repository.createProjectFx({
-				projectId: "project-config",
 				version: "1.0",
-				config: editorTestPayload.config,
+				config: {
+					...editorTestPayload.config,
+					meta: {
+						...editorTestPayload.config.meta,
+						id: "project-config",
+					},
+				},
 				resources: editorTestPayload.resources,
 			}),
 		);
@@ -44,7 +49,10 @@ describe("editor MCP project configuration", () => {
 			revision: created.revision,
 			version: "1.0",
 			config: {
-				meta: editorTestPayload.config.meta,
+				meta: {
+					...editorTestPayload.config.meta,
+					id: "project-config",
+				},
 				resources: editorTestPayload.config.resources,
 				start: editorTestPayload.config.start,
 			},
@@ -80,6 +88,7 @@ describe("editor MCP project configuration", () => {
 		if (project === null) throw new Error("Expected the edited project.");
 		expect(project?.config.meta).toEqual({
 			...editorTestPayload.config.meta,
+			id: "project-config",
 			title: "Renamed game",
 			board: {
 				width: 3,

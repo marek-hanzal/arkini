@@ -1,13 +1,16 @@
+import { isDeepStrictEqual } from "node:util";
 import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
 import { EditorProjectFileSchema } from "~/editor/filesystem/EditorProjectFileSchema";
 import { EditorProjectGameFileSchema } from "~/editor/filesystem/EditorProjectGameFileSchema";
+import { EditorProjectItemSchemaReference } from "~/editor/filesystem/EditorProjectSchemaReference";
 import { compileGameSourcesFx } from "~/engine/compiler/fx/compileGameSourcesFx";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import { readPngAssetFx } from "~/engine/pack/fx/readPngAssetFx";
 import { readResourceDescriptorsFx } from "~/engine/resource/fx/readResourceDescriptorsFx";
 import { GameSourceSchema } from "~/engine/schema/GameSourceSchema";
+import { createEditorJsonSchema } from "~/engine/schema/fx/writeGameJsonSchemaFx";
 import type { GameSourceFileSchema } from "~/engine/source/schema/GameSourceFileSchema";
 import { createEditorProjectFilesystemPathsFx } from "../createEditorProjectFilesystemPathsFx";
 import type { FilesystemEditorProjectFiles } from "./FilesystemEditorProjectFiles";
@@ -46,6 +49,7 @@ export const readFilesystemEditorProjectFilesFx = Effect.fn("readFilesystemEdito
 			});
 		for (const required of [
 			paths.editorFile,
+			paths.schemaFile,
 			paths.gameFile,
 			paths.items,
 		])
@@ -65,11 +69,21 @@ export const readFilesystemEditorProjectFilesFx = Effect.fn("readFilesystemEdito
 			(candidate) => EditorProjectFileSchema.parse(candidate),
 			"Editor project marker",
 		);
-		const game = yield* parseJsonFx(
+		const gameSchema = yield* parseJsonFx(
+			paths.schemaFile,
+			(candidate) => candidate,
+			"Editor game schema",
+		);
+		if (!isDeepStrictEqual(gameSchema, createEditorJsonSchema()))
+			return yield* Effect.fail(
+				new Error("The Editor game schema does not match this Arkini version."),
+			);
+		const gameFile = yield* parseJsonFx(
 			paths.gameFile,
 			(candidate) => EditorProjectGameFileSchema.parse(candidate),
 			"Editor game file",
 		);
+		const { arkpack, ...game } = gameFile;
 		const itemFiles = (yield* fileSystem.readDirectory(paths.items, {
 			recursive: true,
 		}))
@@ -106,6 +120,12 @@ export const readFilesystemEditorProjectFilesFx = Effect.fn("readFilesystemEdito
 				(candidate) => GameSourceSchema.parse(candidate),
 				"Editor item file",
 			);
+			if (source.$schema !== EditorProjectItemSchemaReference) {
+				return yield* failInvalidItemFileFx(
+					sourcePath,
+					`expected $schema ${JSON.stringify(EditorProjectItemSchemaReference)}.`,
+				);
+			}
 			if (
 				source.meta !== undefined ||
 				source.resources !== undefined ||
@@ -219,6 +239,7 @@ export const readFilesystemEditorProjectFilesFx = Effect.fn("readFilesystemEdito
 		);
 
 		return {
+			arkpack,
 			marker,
 			config,
 			resources,

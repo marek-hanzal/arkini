@@ -16,7 +16,6 @@ import type { EditorProjectVersionRepositoryService } from "~/editor/version/Edi
 
 export namespace EditorProjectRepository {
 	export interface CreateProjectProps {
-		readonly projectId: string;
 		readonly version: ArkpackVersionSchema.Type;
 		readonly config: GameConfigSchema.Type;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;

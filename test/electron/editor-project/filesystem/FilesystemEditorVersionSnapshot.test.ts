@@ -9,6 +9,8 @@ import { createEditorProjectFilesystemPathsFx } from "../../../../electron/main/
 import { createFilesystemEditorVersionSnapshotFx } from "../../../../electron/main/editor-project/filesystem/fx/createFilesystemEditorVersionSnapshotFx";
 import { readFilesystemEditorVersionSnapshotFx } from "../../../../electron/main/editor-project/filesystem/fx/readFilesystemEditorVersionSnapshotFx";
 import { EditorBoardScenarioSchema } from "~/editor/board/EditorBoardScenarioSchema";
+import { EditorProjectGameSchemaReference } from "~/editor/filesystem/EditorProjectSchemaReference";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 let root: string;
@@ -39,6 +41,7 @@ describe("filesystem Editor version objects", () => {
 			Effect.gen(function* () {
 				const paths = yield* createEditorProjectFilesystemPathsFx(root);
 				const snapshot = yield* createFilesystemEditorVersionSnapshotFx({
+					arkpack: editorTestPayload.version,
 					config: editorTestPayload.config,
 					resources: editorTestPayload.resources,
 					scenarios: [
@@ -76,7 +79,11 @@ describe("filesystem Editor version objects", () => {
 			);
 		const restored = await readSnapshot();
 		expect(restored).toEqual({
-			config: editorTestPayload.config,
+			arkpack: editorTestPayload.version,
+			config: GameConfigSchema.parse({
+				...editorTestPayload.config,
+				$schema: EditorProjectGameSchemaReference,
+			}),
 			resources: editorTestPayload.resources,
 			scenarios: [
 				{
@@ -103,6 +110,7 @@ describe("filesystem Editor version objects", () => {
 		);
 		const duplicate = await Effect.runPromise(
 			createFilesystemEditorVersionSnapshotFx({
+				arkpack: editorTestPayload.version,
 				config: editorTestPayload.config,
 				resources: [
 					...editorTestPayload.resources,
@@ -127,6 +135,7 @@ describe("filesystem Editor version objects", () => {
 		await expect(readSnapshot()).rejects.toThrow("failed its content hash check");
 		await Effect.runPromise(
 			createFilesystemEditorVersionSnapshotFx({
+				arkpack: editorTestPayload.version,
 				config: editorTestPayload.config,
 				resources: editorTestPayload.resources,
 				scenarios: [
@@ -149,6 +158,7 @@ describe("filesystem Editor version objects", () => {
 		await expect(
 			Effect.runPromise(
 				createFilesystemEditorVersionSnapshotFx({
+					arkpack: editorTestPayload.version,
 					config: editorTestPayload.config,
 					resources: editorTestPayload.resources,
 					scenarios: [],

@@ -15,10 +15,13 @@ describe("editor MCP project validation", () => {
 		const { ownership, port, repository } = await createEditorMcpHarness();
 		await Effect.runPromise(
 			repository.createProjectFx({
-				projectId: "invalid-project",
 				version: "1.0",
 				config: {
 					...editorTestPayload.config,
+					meta: {
+						...editorTestPayload.config.meta,
+						id: "invalid-project",
+					},
 					start: {
 						...editorTestPayload.config.start,
 						board: [

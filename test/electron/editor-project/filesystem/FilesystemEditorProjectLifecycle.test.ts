@@ -3,6 +3,8 @@ import { join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
+import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
+import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import {
 	createFilesystemEditorProjectTestHarness,
 	type FilesystemEditorProjectTestHarness,
@@ -23,10 +25,22 @@ describe("filesystem Editor project lifecycle", () => {
 		const root = await Effect.runPromise(repository.readProjectRootFx(created.projectId));
 		expect(root).toContain(harness.projectsRoot);
 		expect(JSON.parse(await readFile(join(root ?? "", "editor.json"), "utf8"))).toMatchObject({
-			format: "arkini-editor",
-			formatVersion: 1,
-			arkpackVersion: "1.0",
+			arkini: ArkiniAppVersion,
+			updatedAtMs: expect.any(Number),
 		});
+		expect(JSON.parse(await readFile(join(root ?? "", "game.json"), "utf8"))).toMatchObject({
+			arkpack: "1.0",
+		});
+		expect(JSON.parse(await readFile(harness.catalogPath, "utf8"))).toMatchObject({
+			projects: [
+				{
+					root,
+					ownership: "managed",
+					createdAtMs: expect.any(Number),
+				},
+			],
+		});
+		expect(await readFile(harness.catalogPath, "utf8")).not.toContain("projectId");
 
 		await harness.closeRepository(repository);
 		const reopened = await harness.openRepository();
@@ -64,7 +78,6 @@ describe("filesystem Editor project lifecycle", () => {
 				formatVersion: 1,
 				projects: [
 					{
-						projectId: "unsafe-managed-project",
 						root: await realpath(root),
 						ownership: "managed",
 						createdAtMs: 1,
@@ -91,7 +104,6 @@ describe("filesystem Editor project lifecycle", () => {
 				formatVersion: 1,
 				projects: [
 					{
-						projectId: "unsafe-symlink-project",
 						root: linkedRoot,
 						ownership: "managed",
 						createdAtMs: 1,
@@ -116,10 +128,9 @@ describe("filesystem Editor project lifecycle", () => {
 				formatVersion: 1,
 				projects: [
 					{
-						projectId: "broken",
+						root: 42,
 					},
 					{
-						projectId: "valid-external",
 						root: await realpath(root),
 						ownership: "external",
 						createdAtMs: 1,
@@ -131,7 +142,7 @@ describe("filesystem Editor project lifecycle", () => {
 		const repository = await harness.openRepository();
 		expect(await Effect.runPromise(repository.listProjectsFx)).toEqual([
 			expect.objectContaining({
-				projectId: "valid-external",
+				projectId: editorTestPayload.config.meta.id,
 			}),
 		]);
 	});
@@ -149,13 +160,11 @@ describe("filesystem Editor project lifecycle", () => {
 				formatVersion: 1,
 				projects: [
 					{
-						projectId: "canonical",
 						root,
 						ownership: "external",
 						createdAtMs: 1,
 					},
 					{
-						projectId: "alias",
 						root: alias,
 						ownership: "external",
 						createdAtMs: 1,
@@ -168,7 +177,7 @@ describe("filesystem Editor project lifecycle", () => {
 		expect(
 			(await Effect.runPromise(repository.listProjectsFx)).map(({ projectId }) => projectId),
 		).toEqual([
-			"canonical",
+			editorTestPayload.config.meta.id,
 		]);
 		await harness.closeRepository(repository);
 
@@ -176,7 +185,7 @@ describe("filesystem Editor project lifecycle", () => {
 		expect(
 			(await Effect.runPromise(reopened.listProjectsFx)).map(({ projectId }) => projectId),
 		).toEqual([
-			"canonical",
+			editorTestPayload.config.meta.id,
 		]);
 	});
 
@@ -188,12 +197,20 @@ describe("filesystem Editor project lifecycle", () => {
 				root,
 			}),
 		);
+		const version = await Effect.runPromise(
+			repository.createVersionFx({
+				projectId: opened.projectId,
+				subject: "Before rename",
+			}),
+		);
 		const gamePath = join(root, "game.json");
 		const game = JSON.parse(await readFile(gamePath, "utf8")) as {
 			meta: {
+				id: string;
 				title: string;
 			};
 		};
+		game.meta.id = "renamed-project";
 		game.meta.title = "Changed outside the Editor";
 		await writeFile(gamePath, `${JSON.stringify(game, null, "\t")}\n`);
 
@@ -201,10 +218,47 @@ describe("filesystem Editor project lifecycle", () => {
 			opened.title,
 		);
 		const refreshed = await Effect.runPromise(repository.refreshProjectFx(opened.projectId));
+		expect(refreshed.projectId).toBe("renamed-project");
 		expect(refreshed.title).toBe("Changed outside the Editor");
-		expect((await Effect.runPromise(repository.readProjectFx(opened.projectId)))?.title).toBe(
-			"Changed outside the Editor",
+		expect(await Effect.runPromise(repository.readProjectFx(opened.projectId))).toBeNull();
+		expect(
+			(await Effect.runPromise(repository.readProjectFx(refreshed.projectId)))?.title,
+		).toBe("Changed outside the Editor");
+		expect(await Effect.runPromise(repository.readProjectRootFx(refreshed.projectId))).toBe(
+			await realpath(root),
 		);
+		await expect(
+			Effect.runPromise(
+				repository.checkoutVersionFx({
+					projectId: refreshed.projectId,
+					versionId: version.versionId,
+				}),
+			),
+		).rejects.toThrow(`belongs to Editor project ${opened.projectId}`);
+		expect(
+			(await Effect.runPromise(repository.readProjectFx(refreshed.projectId)))?.projectId,
+		).toBe(refreshed.projectId);
+	});
+
+	it("rejects a second root with the same authored project ID", async () => {
+		const firstRoot = await harness.createExternalProject("shared-project");
+		const secondRoot = await harness.createExternalProject("shared-project");
+		const repository = await harness.openRepository();
+		const first = await Effect.runPromise(
+			repository.openProjectFx({
+				root: firstRoot,
+			}),
+		);
+
+		await expect(
+			Effect.runPromise(
+				repository.openProjectFx({
+					root: secondRoot,
+				}),
+			),
+		).rejects.toThrow("already open from another folder");
+		expect(first.projectId).toBe("shared-project");
+		expect(await Effect.runPromise(repository.listProjectsFx)).toHaveLength(1);
 	});
 
 	it("keeps external version-head edits hidden until the explicit hard refresh", async () => {

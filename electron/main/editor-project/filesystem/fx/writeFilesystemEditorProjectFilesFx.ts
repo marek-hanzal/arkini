@@ -3,8 +3,14 @@ import { Effect } from "effect";
 
 import { EditorProjectFileSchema } from "~/editor/filesystem/EditorProjectFileSchema";
 import { EditorProjectGameFileSchema } from "~/editor/filesystem/EditorProjectGameFileSchema";
+import {
+	EditorProjectGameSchemaReference,
+	EditorProjectItemSchemaReference,
+} from "~/editor/filesystem/EditorProjectSchemaReference";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { createEditorJsonSchema } from "~/engine/schema/fx/writeGameJsonSchemaFx";
+import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import { createEditorProjectFilesystemPathsFx } from "../createEditorProjectFilesystemPathsFx";
 import type { EditorProjectFilesystemPaths } from "../EditorProjectFilesystemPaths";
 import type { FilesystemEditorProjectFiles } from "./FilesystemEditorProjectFiles";
@@ -64,6 +70,13 @@ const createSnapshotFx = Effect.fn("writeFilesystemEditorProjectFilesFx.createSn
 					cause,
 				}),
 		});
+		const arkpack = yield* Effect.try({
+			try: () => ArkpackVersionSchema.parse(files.arkpack),
+			catch: (cause) =>
+				new Error("The Editor Arkpack version is invalid.", {
+					cause,
+				}),
+		});
 		const resources = yield* Effect.try({
 			try: () => ResourceSchema.array().parse(files.resources),
 			catch: (cause) =>
@@ -71,9 +84,14 @@ const createSnapshotFx = Effect.fn("writeFilesystemEditorProjectFilesFx.createSn
 					cause,
 				}),
 		});
-		const { items, ...gameCandidate } = config;
+		const { $schema: _schema, items, ...gameCandidate } = config;
 		const game = yield* Effect.try({
-			try: () => EditorProjectGameFileSchema.parse(gameCandidate),
+			try: () =>
+				EditorProjectGameFileSchema.parse({
+					$schema: EditorProjectGameSchemaReference,
+					arkpack,
+					...gameCandidate,
+				}),
 			catch: (cause) =>
 				new Error("The Editor game file is invalid.", {
 					cause,
@@ -100,6 +118,7 @@ const createSnapshotFx = Effect.fn("writeFilesystemEditorProjectFilesFx.createSn
 				uid: item.uid,
 			});
 			const value = {
+				$schema: EditorProjectItemSchemaReference,
 				items: {
 					[itemId]: item,
 				},
@@ -203,6 +222,7 @@ export const writeFilesystemEditorProjectFilesFx = Effect.fn("writeFilesystemEdi
 				);
 		}
 
+		yield* replaceFilesystemEditorJsonFx(paths.schemaFile, createEditorJsonSchema());
 		yield* replaceFilesystemEditorJsonFx(nextSnapshot.game.target, nextSnapshot.game.value);
 		for (const write of [
 			...nextSnapshot.items.values(),

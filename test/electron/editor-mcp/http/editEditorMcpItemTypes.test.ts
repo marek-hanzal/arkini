@@ -19,9 +19,14 @@ describe("editor MCP typed item editing", () => {
 		);
 		const created = await Effect.runPromise(
 			repository.createProjectFx({
-				projectId: "edit-all-types-project",
 				version: "1.0",
-				config: editorTestPayload.config,
+				config: {
+					...editorTestPayload.config,
+					meta: {
+						...editorTestPayload.config.meta,
+						id: "edit-all-types-project",
+					},
+				},
 				resources: editorTestPayload.resources,
 			}),
 		);

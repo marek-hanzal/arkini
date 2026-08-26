@@ -1,12 +1,10 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { EditorProjectOwnershipSchema } from "./EditorProjectOwnershipSchema";
 
 /** Main-owned discovery record pointing at one canonical project root. */
 export const EditorProjectCatalogEntrySchema = z
 	.object({
-		projectId: IdSchema,
 		root: z.string().min(1),
 		ownership: EditorProjectOwnershipSchema,
 		createdAtMs: z.number().int().nonnegative(),

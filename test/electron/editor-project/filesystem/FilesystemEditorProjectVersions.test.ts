@@ -14,6 +14,7 @@ import { join } from "node:path";
 import { Effect, Semaphore } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
+import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 import type { FilesystemEditorProjectState } from "../../../../electron/main/editor-project/filesystem/FilesystemEditorProjectState";
 import { createEditorProjectFilesystemPathsFx } from "../../../../electron/main/editor-project/filesystem/createEditorProjectFilesystemPathsFx";
 import { createFilesystemEditorProjectVersionOperationsFx } from "../../../../electron/main/editor-project/filesystem/fx/createFilesystemEditorProjectVersionOperationsFx";
@@ -23,6 +24,8 @@ import { writeFilesystemEditorProjectFilesFx } from "../../../../electron/main/e
 import { EditorBoardScenarioSchema } from "~/editor/board/EditorBoardScenarioSchema";
 import { EditorProjectCatalogEntrySchema } from "~/editor/filesystem/EditorProjectCatalogEntrySchema";
 import { EditorProjectFileSchema } from "~/editor/filesystem/EditorProjectFileSchema";
+import { EditorProjectGameSchemaReference } from "~/editor/filesystem/EditorProjectSchemaReference";
+import { EditorVersionDescriptorFileSchema } from "~/editor/filesystem/EditorVersionDescriptorFileSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
@@ -42,6 +45,10 @@ afterEach(async () => {
 describe("filesystem Editor project versions", () => {
 	it("publishes retry-safe full snapshots, ignores orphans, and protects version paths", async () => {
 		const projectId = "editor-test";
+		const canonicalConfig = GameConfigSchema.parse({
+			...editorTestPayload.config,
+			$schema: EditorProjectGameSchemaReference,
+		});
 		const initialScenario = EditorBoardScenarioSchema.parse({
 			projectId,
 			name: "Opening",
@@ -55,16 +62,15 @@ describe("filesystem Editor project versions", () => {
 			Effect.gen(function* () {
 				const paths = yield* createEditorProjectFilesystemPathsFx(root);
 				const marker = EditorProjectFileSchema.parse({
-					format: "arkini-editor",
-					formatVersion: 1,
-					arkpackVersion: "1.0",
+					arkini: ArkiniAppVersion,
 					updatedAtMs: 1,
 				});
 				yield* writeFilesystemEditorProjectFilesFx({
 					root,
 					next: {
+						arkpack: "1.0",
 						marker,
-						config: editorTestPayload.config,
+						config: canonicalConfig,
 						resources: editorTestPayload.resources,
 					},
 				});
@@ -89,7 +95,6 @@ describe("filesystem Editor project versions", () => {
 
 				const state: FilesystemEditorProjectState = {
 					catalog: EditorProjectCatalogEntrySchema.parse({
-						projectId,
 						root,
 						ownership: "external",
 						createdAtMs: 1,
@@ -103,7 +108,7 @@ describe("filesystem Editor project versions", () => {
 						createdAtMs: 1,
 						updatedAtMs: 1,
 						revision: 1,
-						config: editorTestPayload.config,
+						config: canonicalConfig,
 						resources: editorTestPayload.resources,
 					},
 					scenarios: [
@@ -167,17 +172,18 @@ describe("filesystem Editor project versions", () => {
 				});
 				const changedMarker = EditorProjectFileSchema.parse({
 					...marker,
-					arkpackVersion: "1.1",
 					updatedAtMs: 2,
 				});
 				yield* writeFilesystemEditorProjectFilesFx({
 					root,
 					previous: {
+						arkpack: "1.0",
 						marker,
 						config: state.project.config,
 						resources: state.project.resources,
 					},
 					next: {
+						arkpack: "1.1",
 						marker: changedMarker,
 						config: changedConfig,
 						resources: changedResources,
@@ -215,6 +221,44 @@ describe("filesystem Editor project versions", () => {
 					projectId,
 					subject: "Changed",
 				});
+				const validVersionState = states.get(projectId);
+				if (validVersionState === undefined)
+					return yield* Effect.die("Missing version state.");
+				const secondVersion = validVersionState.versionHistory.versions.get(
+					second.versionId,
+				);
+				if (secondVersion === undefined)
+					return yield* Effect.die("Missing second version.");
+				states.set(projectId, {
+					...validVersionState,
+					versionHistory: {
+						...validVersionState.versionHistory,
+						versions: new Map(validVersionState.versionHistory.versions).set(
+							second.versionId,
+							{
+								...secondVersion,
+								descriptor: EditorVersionDescriptorFileSchema.parse({
+									...secondVersion.descriptor,
+									arkpackVersion: "9.9",
+								}),
+							},
+						),
+					},
+				});
+				const mismatchedDiffError = yield* Effect.flip(
+					versions.diffVersionsFx({
+						projectId,
+						from: {
+							type: "version",
+							versionId: first.versionId,
+						},
+						to: {
+							type: "version",
+							versionId: second.versionId,
+						},
+					}),
+				);
+				states.set(projectId, validVersionState);
 
 				const orphanDirectory = yield* paths.versionDirectoryFx("orphan");
 				yield* Effect.promise(() =>
@@ -277,6 +321,7 @@ describe("filesystem Editor project versions", () => {
 					first,
 					retry,
 					second,
+					mismatchedDiffError,
 					listed,
 					diff,
 					restoredFiles,
@@ -293,6 +338,9 @@ describe("filesystem Editor project versions", () => {
 
 		expect(result.retry).toEqual(result.first);
 		expect(result.second.parentVersionId).toBe(result.first.versionId);
+		expect(String(result.mismatchedDiffError.cause)).toContain(
+			"Arkpack version does not match its descriptor",
+		);
 		expect(result.listed.map(({ versionId }) => versionId)).toEqual([
 			result.second.versionId,
 			result.first.versionId,
@@ -314,7 +362,7 @@ describe("filesystem Editor project versions", () => {
 		});
 		const restoredRevision = result.restoredState?.project.revision;
 		expect(restoredRevision).toBeDefined();
-		expect(result.restoredFiles.config).toEqual(editorTestPayload.config);
+		expect(result.restoredFiles.config).toEqual(canonicalConfig);
 		expect(result.restoredFiles.resources).toEqual(editorTestPayload.resources);
 		expect(result.restoredScenario).toMatchObject({
 			name: "Opening",

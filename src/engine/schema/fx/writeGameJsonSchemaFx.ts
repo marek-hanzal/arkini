@@ -2,6 +2,24 @@ import { FileSystem } from "effect";
 import { Effect } from "effect";
 import { z } from "zod";
 import { GameSourceSchema } from "~/engine/schema/GameSourceSchema";
+import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+
+export const createGameJsonSchema = () =>
+	z.toJSONSchema(GameSourceSchema, {
+		reused: "inline",
+		target: "draft-2020-12",
+	});
+
+export const createEditorJsonSchema = () =>
+	z.toJSONSchema(
+		GameSourceSchema.extend({
+			arkpack: ArkpackVersionSchema.optional(),
+		}),
+		{
+			reused: "inline",
+			target: "draft-2020-12",
+		},
+	);
 
 export namespace writeGameJsonSchemaFx {
 	export interface Props {
@@ -19,10 +37,7 @@ export const writeGameJsonSchemaFx = Effect.fn("writeGameJsonSchemaFx")(function
 	output,
 }: writeGameJsonSchemaFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
-	const jsonSchema = z.toJSONSchema(GameSourceSchema, {
-		reused: "inline",
-		target: "draft-2020-12",
-	});
+	const jsonSchema = createGameJsonSchema();
 
 	yield* fileSystem.writeFileString(output, `${JSON.stringify(jsonSchema, undefined, "\t")}\n`);
 });

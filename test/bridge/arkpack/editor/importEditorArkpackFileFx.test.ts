@@ -68,14 +68,9 @@ describe("importEditorArkpackFileFx", () => {
 	it("validates an arkpack and atomically delegates its canonical payload", async () => {
 		const bytes = createArkpackBytes();
 		const createProjectFx = vi.fn(
-			({
-				projectId,
-				version,
-				config,
-				resources,
-			}: EditorProjectRepository.CreateProjectProps) =>
+			({ version, config, resources }: EditorProjectRepository.CreateProjectProps) =>
 				Effect.succeed<EditorProject>({
-					projectId,
+					projectId: config.meta.id,
 					title: config.meta.title,
 					version,
 					createdAtMs: 100,
@@ -98,14 +93,13 @@ describe("importEditorArkpackFileFx", () => {
 		);
 
 		expect(descriptor).toMatchObject({
-			projectId: "project:imported",
+			projectId: editorTestPayload.config.meta.id,
 			title: "Editor test",
 			version: "4.2",
 			revision: 0,
 		});
 		expect(createProjectFx).toHaveBeenCalledOnce();
 		expect(createProjectFx).toHaveBeenCalledWith({
-			projectId: "project:imported",
 			version: "4.2",
 			config: editorTestPayload.config,
 			resources: validPayload.resources,

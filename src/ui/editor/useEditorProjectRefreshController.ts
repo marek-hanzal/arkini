@@ -1,4 +1,5 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
+import { useRouter } from "@tanstack/react-router";
 import { useCallback, useMemo } from "react";
 
 import { refreshEditorProjectCommandAtom } from "~/bridge/editor/refreshEditorProjectCommandAtom";
@@ -27,6 +28,7 @@ export const useEditorProjectRefreshController = ({
 	blocked,
 	projectId,
 }: useEditorProjectRefreshController.Props): useEditorProjectRefreshController.Output => {
+	const router = useRouter();
 	const commandAtom = refreshEditorProjectCommandAtom(projectId);
 	const result = useAtomValue(commandAtom);
 	const run = useAtomSet(commandAtom, {
@@ -37,9 +39,24 @@ export const useEditorProjectRefreshController = ({
 	const error = RendererRuntime.runSync(readSettledAsyncResultErrorFx(result));
 	const refresh = useCallback(() => {
 		if (disabled) return;
-		void run(undefined).catch(() => undefined);
+		void run(undefined)
+			.then((fresh) => {
+				if (fresh.projectId === projectId) return;
+				const currentRoot = `/editor/${encodeURIComponent(projectId)}`;
+				const href = router.state.location.href;
+				if (!href.startsWith(currentRoot))
+					throw new Error("The refreshed Editor project is no longer routed.");
+				return router.navigate({
+					href: `/editor/${encodeURIComponent(fresh.projectId)}${href.slice(currentRoot.length)}`,
+					ignoreBlocker: true,
+					replace: true,
+				});
+			})
+			.catch(() => undefined);
 	}, [
 		disabled,
+		projectId,
+		router,
 		run,
 	]);
 

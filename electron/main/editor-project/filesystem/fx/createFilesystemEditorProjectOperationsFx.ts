@@ -2,6 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { Clock, FileSystem, Path } from "effect";
 import { Effect, type Semaphore } from "effect";
 
+import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
 import type { FilesystemEditorProjectState } from "../FilesystemEditorProjectState";
 import { createEditorProjectFilesystemPathsFx } from "../createEditorProjectFilesystemPathsFx";
 import type { FilesystemEditorProjectCatalog } from "./createFilesystemEditorProjectCatalogFx";
@@ -14,7 +15,6 @@ import { EditorProjectCatalogEntrySchema } from "~/editor/filesystem/EditorProje
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
-import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readFilesystemEditorProjectFilesFx } from "./readFilesystemEditorProjectFilesFx";
 import { readFilesystemEditorProjectSidecarsFx } from "./readFilesystemEditorProjectSidecarsFx";
 import { readFilesystemEditorProjectVersionHistoryFx } from "./readFilesystemEditorProjectVersionHistoryFx";
@@ -96,9 +96,10 @@ const materializeProjectFx = Effect.fn("materializeFilesystemEditorProjectFx")(f
 		Effect.gen(function* () {
 			const paths = yield* createEditorProjectFilesystemPathsFx(catalog.root);
 			const files = yield* readFilesystemEditorProjectFilesFx(paths.root);
+			const projectId = files.config.meta.id;
 			const sidecars = yield* readFilesystemEditorProjectSidecarsFx({
 				paths,
-				projectId: catalog.projectId,
+				projectId,
 			});
 			const versionHistory = yield* readFilesystemEditorProjectVersionHistoryFx(paths);
 			return {
@@ -107,9 +108,9 @@ const materializeProjectFx = Effect.fn("materializeFilesystemEditorProjectFx")(f
 				paths,
 				versionHistory,
 				project: {
-					projectId: catalog.projectId,
+					projectId,
 					title: files.config.meta.title,
-					version: files.marker.arkpackVersion,
+					version: files.arkpack,
 					createdAtMs: Math.min(catalog.createdAtMs, files.marker.updatedAtMs),
 					updatedAtMs: files.marker.updatedAtMs,
 					revision: files.marker.updatedAtMs,
@@ -153,7 +154,7 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 				if (relative === "" || relative.startsWith("..") || path.isAbsolute(relative))
 					return yield* Effect.fail(
 						new Error(
-							`Managed Editor project ${entry.projectId} is outside the managed projects directory.`,
+							`Managed Editor project root ${entry.root} is outside the managed projects directory.`,
 						),
 					);
 			}
@@ -182,28 +183,36 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 				const duplicateRoot = [
 					...states.values(),
 				].some(({ paths }) => paths.root === state.paths.root);
-				return duplicateRoot
-					? catalog.removeFx(entry.projectId).pipe(Effect.catch(() => Effect.void))
-					: Effect.sync(() => states.set(entry.projectId, state));
+				if (duplicateRoot)
+					return catalog.removeFx(entry.root).pipe(Effect.catch(() => Effect.void));
+				return states.has(state.project.projectId)
+					? Effect.fail(
+							new Error(
+								`Editor project ID ${state.project.projectId} is duplicated by ${entry.root}.`,
+							),
+						)
+					: Effect.sync(() => states.set(state.project.projectId, state));
 			}),
 			Effect.catch(() => Effect.void),
 		);
 	}
 
 	const createProjectFx: FilesystemEditorProjectOperations["createProjectFx"] = ({
-		projectId: candidateProjectId,
 		version: candidateVersion,
 		config: candidateConfig,
 		resources: candidateResources,
 	}) =>
 		Effect.gen(function* () {
 			const { projectId, version, config, resources } = yield* Effect.try({
-				try: () => ({
-					projectId: IdSchema.parse(candidateProjectId),
-					version: ArkpackVersionSchema.parse(candidateVersion),
-					config: GameConfigSchema.parse(candidateConfig),
-					resources: ResourceSchema.array().parse(candidateResources),
-				}),
+				try: () => {
+					const config = GameConfigSchema.parse(candidateConfig);
+					return {
+						projectId: config.meta.id,
+						version: ArkpackVersionSchema.parse(candidateVersion),
+						config,
+						resources: ResourceSchema.array().parse(candidateResources),
+					};
+				},
 				catch: (cause) => error("create-project", "The Editor project is invalid.", cause),
 			});
 			const nowMs = yield* Clock.currentTimeMillis;
@@ -221,9 +230,7 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 						recursive: true,
 					});
 					const marker = EditorProjectFileSchema.parse({
-						format: "arkini-editor",
-						formatVersion: 1,
-						arkpackVersion: version,
+						arkini: ArkiniAppVersion,
 						updatedAtMs: nowMs,
 					});
 					yield* withFilesystemEditorProjectLockFx(
@@ -231,6 +238,7 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 						writeProjectFx({
 							root,
 							next: {
+								arkpack: version,
 								marker,
 								config,
 								resources,
@@ -238,7 +246,6 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 						}),
 					);
 					const entry = EditorProjectCatalogEntrySchema.parse({
-						projectId,
 						root: yield* fileSystem.realPath(root),
 						ownership: "managed",
 						createdAtMs: nowMs,
@@ -251,11 +258,7 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 			);
 		}).pipe(
 			Effect.mapError((cause) =>
-				error(
-					"create-project",
-					`Editor project ${candidateProjectId} could not be created.`,
-					cause,
-				),
+				error("create-project", "The Editor project could not be created.", cause),
 			),
 		);
 
@@ -273,10 +276,15 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 					root,
 					providePlatform(readFilesystemEditorProjectFilesFx(root)),
 				);
-				let projectId = files.config.meta.id;
-				if (states.has(projectId)) projectId = `project-${createId()}`;
+				const projectId = files.config.meta.id;
+				if (states.has(projectId))
+					return yield* Effect.fail(
+						error(
+							"import-json-directory",
+							`Editor project ID ${projectId} is already open from another folder.`,
+						),
+					);
 				const entry = EditorProjectCatalogEntrySchema.parse({
-					projectId,
 					root,
 					ownership: "external",
 					createdAtMs: files.marker.updatedAtMs,
@@ -331,7 +339,18 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 						error("refresh-project", `Editor project ${projectId} does not exist.`),
 					);
 				const refreshed = yield* materializeFx(current.catalog);
-				states.set(projectId, refreshed);
+				if (
+					refreshed.project.projectId !== projectId &&
+					states.has(refreshed.project.projectId)
+				)
+					return yield* Effect.fail(
+						error(
+							"refresh-project",
+							`Editor project ID ${refreshed.project.projectId} is already open from another folder.`,
+						),
+					);
+				states.delete(projectId);
+				states.set(refreshed.project.projectId, refreshed);
 				return cloneProject(refreshed.project);
 			}).pipe(
 				Effect.mapError((cause) =>
@@ -364,7 +383,7 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 						),
 					);
 				if (state.catalog.ownership === "managed") states.delete(projectId);
-				yield* catalog.removeFx(projectId);
+				yield* catalog.removeFx(state.catalog.root);
 				states.delete(projectId);
 			}).pipe(
 				Effect.mapError((cause) =>

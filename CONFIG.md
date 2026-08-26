@@ -339,6 +339,7 @@ An Editor project is a directly versionable filesystem directory with this logic
 
 ```text
 editor.json
+schema.json
 game.json
 items/<type>/<uid>.json
 assets/*.png
@@ -350,12 +351,12 @@ versions/<versionId>/{version.json,manifest.json}
 objects/<sha256>.{json,png}
 ```
 
-`editor.json` is mandatory and identifies format `arkini-editor`, format version `1`, the Arkpack version, and the last published `updatedAtMs` revision. `game.json` owns the non-item completed root. Every item file owns exactly one item and is placed by canonical item type and immutable UID. `resources/` contains shell resources; `assets/` contains item artwork. When this marker exists, compilation reads only `game.json`, `items/<type>/*.json`, `assets/*.png`, and `resources/*.png`; notes, scenarios, versions, objects, locks, and temporary files are never game sources.
+`editor.json` is mandatory and contains only `arkini`, the Arkini version that last saved the project, and the last published `updatedAtMs` revision. `schema.json` is generated from Arkini's current Editor source schema directly into the project root. `game.json` owns the non-item completed root plus its `arkpack` version and references `./schema.json`; every item file owns exactly one item, is placed by canonical item type and immutable UID, and references `../../schema.json`. The marker, schema, and references must match the exact current contract. `resources/` contains shell resources; `assets/` contains item artwork. Compilation reads only `game.json`, `items/<type>/*.json`, `assets/*.png`, and `resources/*.png`; notes, scenarios, versions, objects, locks, and temporary files are never game sources.
 
 Notes are portable but deliberately excluded from authored-game revisioning, Build, Arkpack output, and version manifests. The live Editor Board is not persisted. Explicitly named Board scenarios are portable JSON envelopes and are included in version snapshots.
 
 Versions are full logical snapshots, not property-level diffs. A manifest maps the complete game, item, asset, resource, and scenario set to immutable content-addressed objects. Objects, the manifest, and the descriptor are written before `versions/head.json` publishes the version; orphaned objects and incomplete version directories are ignored.
 
-Electron main owns the separate `<userData>/arkini/editor/projects.json` catalog. New projects and Arkpack imports create managed project directories below user data. Opening an Editor folder validates `editor.json` and works directly in that external directory. JSON export copies the current portable folder, while game validation, Build, and Arkpack generation keep using the canonical compiler and packer.
+Electron main owns the separate `<userData>/arkini/editor/projects.json` root catalog. Its entries contain no project ID: each root is validated and derives the canonical identity from `game.json` `meta.id`. New projects and Arkpack imports create managed project directories below user data. Opening an Editor folder validates the complete project and works directly in that external directory. JSON export copies the current portable folder, while game validation, Build, and Arkpack generation keep using the canonical compiler and packer.
 
 Editor writes are intentionally simple. One short-lived `editor.lock` serializes processes. Each changed file is replaced through a fixed sibling `.tmp`, sync, and rename; multi-file mutations write additions and replacements before deletions and publish `editor.json` last. There is no project journal, rollback, startup recovery, or automatic filesystem watcher. Explicit Refresh from disk is a hard reset that discards local drafts and reloads the complete directory.

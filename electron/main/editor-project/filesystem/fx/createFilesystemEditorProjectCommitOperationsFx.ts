@@ -1,6 +1,7 @@
 import { Clock, FileSystem, Path } from "effect";
 import { Effect, type Semaphore } from "effect";
 
+import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
 import type { FilesystemEditorProjectState } from "../FilesystemEditorProjectState";
 import type { EditorProject, EditorProjectCommit } from "~/editor/EditorProject";
 import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
@@ -16,6 +17,7 @@ import {
 	type EditorProjectCompatibilityLevel,
 } from "~/editor/version/EditorProjectCompatibility";
 import { EditorProjectFileSchema } from "~/editor/filesystem/EditorProjectFileSchema";
+import { EditorProjectGameSchemaReference } from "~/editor/filesystem/EditorProjectSchemaReference";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -112,7 +114,18 @@ export const createFilesystemEditorProjectCommitOperationsFx = Effect.fn(
 		readonly nowMs: number;
 		readonly minimumLevel?: EditorProjectCompatibilityLevel;
 	}) {
-		const compatibility = EditorProjectCompatibility.analyze(state.project.config, config);
+		const canonicalConfig = GameConfigSchema.parse({
+			...config,
+			$schema: EditorProjectGameSchemaReference,
+		});
+		if (canonicalConfig.meta.id !== state.project.projectId)
+			return yield* Effect.fail(
+				new Error("The Editor project ID can only change through Refresh from disk."),
+			);
+		const compatibility = EditorProjectCompatibility.analyze(
+			state.project.config,
+			canonicalConfig,
+		);
 		const level =
 			minimumLevel === "minor" && compatibility.level === "none"
 				? "minor"
@@ -120,18 +133,16 @@ export const createFilesystemEditorProjectCommitOperationsFx = Effect.fn(
 		const updatedAtMs = Math.max(nowMs, state.project.updatedAtMs + 1);
 		const version = EditorProjectCompatibility.bumpVersion(state.project.version, level);
 		const marker = EditorProjectFileSchema.parse({
-			format: "arkini-editor",
-			formatVersion: 1,
-			arkpackVersion: version,
+			arkini: ArkiniAppVersion,
 			updatedAtMs,
 		});
 		const nextProject: EditorProject = {
 			...state.project,
-			title: config.meta.title,
+			title: canonicalConfig.meta.title,
 			version,
 			updatedAtMs,
 			revision: updatedAtMs,
-			config,
+			config: canonicalConfig,
 			resources: resources
 				.map((resource) => ({
 					...resource,
@@ -144,18 +155,18 @@ export const createFilesystemEditorProjectCommitOperationsFx = Effect.fn(
 			writeProjectFx({
 				root: state.paths.root,
 				previous: {
+					arkpack: state.project.version,
 					marker: EditorProjectFileSchema.parse({
-						format: "arkini-editor",
-						formatVersion: 1,
-						arkpackVersion: state.project.version,
+						arkini: ArkiniAppVersion,
 						updatedAtMs: state.project.updatedAtMs,
 					}),
 					config: state.project.config,
 					resources: state.project.resources,
 				},
 				next: {
+					arkpack: version,
 					marker,
-					config,
+					config: canonicalConfig,
 					resources,
 				},
 				clearScenarios: compatibility.level === "major",

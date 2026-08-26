@@ -19,9 +19,14 @@ describe("editor MCP item creation", () => {
 		);
 		await Effect.runPromise(
 			repository.createProjectFx({
-				projectId: "create-item-project",
 				version: "1.0",
-				config: editorTestPayload.config,
+				config: {
+					...editorTestPayload.config,
+					meta: {
+						...editorTestPayload.config.meta,
+						id: "create-item-project",
+					},
+				},
 				resources: editorTestPayload.resources,
 			}),
 		);
@@ -97,9 +102,14 @@ describe("editor MCP item creation", () => {
 		);
 		await Effect.runPromise(
 			repository.createProjectFx({
-				projectId: "all-item-types-project",
 				version: "1.0",
-				config: editorTestPayload.config,
+				config: {
+					...editorTestPayload.config,
+					meta: {
+						...editorTestPayload.config.meta,
+						id: "all-item-types-project",
+					},
+				},
 				resources: editorTestPayload.resources,
 			}),
 		);
@@ -200,9 +210,14 @@ describe("editor MCP item creation", () => {
 		);
 		await Effect.runPromise(
 			repository.createProjectFx({
-				projectId: "notification-project",
 				version: "1.0",
-				config: editorTestPayload.config,
+				config: {
+					...editorTestPayload.config,
+					meta: {
+						...editorTestPayload.config.meta,
+						id: "notification-project",
+					},
+				},
 				resources: editorTestPayload.resources,
 			}),
 		);

@@ -24,7 +24,6 @@ import { parseEditorProjectIpcRequestFx } from "./parseEditorProjectIpcRequestFx
 
 const createProjectSchema = z
 	.object({
-		projectId: IdSchema,
 		version: ArkpackVersionSchema,
 		config: GameConfigSchema,
 		resources: ResourceSchema.array(),

@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
 
+import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
 import {
 	createFilesystemEditorProjectRepositoryFx,
 	type FilesystemEditorProjectRepository,
@@ -44,26 +45,36 @@ export const createFilesystemEditorProjectTestHarness = async (temporaryPrefix: 
 		createProject: (repository: FilesystemEditorProjectRepository, projectId = "project-one") =>
 			Effect.runPromise(
 				repository.createProjectFx({
-					projectId,
 					version: editorTestPayload.version,
-					config: editorTestPayload.config,
+					config: {
+						...editorTestPayload.config,
+						meta: {
+							...editorTestPayload.config.meta,
+							id: projectId,
+						},
+					},
 					resources: editorTestPayload.resources,
 				}),
 			),
-		createExternalProject: async () => {
+		createExternalProject: async (projectId = editorTestPayload.config.meta.id) => {
 			externalSequence += 1;
 			const root = join(temporaryDirectory, `external-${externalSequence}`);
 			await Effect.runPromise(
 				writeFilesystemEditorProjectFilesFx({
 					root,
 					next: {
+						arkpack: editorTestPayload.version,
 						marker: EditorProjectFileSchema.parse({
-							format: "arkini-editor",
-							formatVersion: 1,
-							arkpackVersion: editorTestPayload.version,
+							arkini: ArkiniAppVersion,
 							updatedAtMs: 1,
 						}),
-						config: editorTestPayload.config,
+						config: {
+							...editorTestPayload.config,
+							meta: {
+								...editorTestPayload.config.meta,
+								id: projectId,
+							},
+						},
 						resources: editorTestPayload.resources,
 					},
 				}).pipe(Effect.provide(NodeServices.layer)),

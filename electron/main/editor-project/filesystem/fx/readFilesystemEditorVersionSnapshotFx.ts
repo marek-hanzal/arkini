@@ -8,6 +8,7 @@ import { EditorVersionManifestSchema } from "~/editor/filesystem/EditorVersionMa
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import {
 	createFilesystemEditorVersionFingerprint,
 	hashFilesystemEditorVersionBytes,
@@ -24,6 +25,7 @@ export namespace readFilesystemEditorVersionSnapshotFx {
 	}
 
 	export interface Success {
+		readonly arkpack: ArkpackVersionSchema.Type;
 		readonly config: GameConfigSchema.Type;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
 		readonly scenarios: ReadonlyArray<EditorBoardScenarioFileSchema.Type>;
@@ -73,7 +75,7 @@ export const readFilesystemEditorVersionSnapshotFx = Effect.fn(
 		});
 	});
 
-	const game = yield* readJsonObjectFx(manifest.game).pipe(
+	const gameFile = yield* readJsonObjectFx(manifest.game).pipe(
 		Effect.flatMap((candidate) =>
 			Effect.try({
 				try: () => EditorProjectGameFileSchema.parse(candidate),
@@ -84,6 +86,7 @@ export const readFilesystemEditorVersionSnapshotFx = Effect.fn(
 			}),
 		),
 	);
+	const { arkpack, ...game } = gameFile;
 	const items: Record<string, ItemSchema.Type> = {};
 	for (const [uid, hash] of Object.entries(manifest.items).sort(([left], [right]) =>
 		left.localeCompare(right),
@@ -185,6 +188,7 @@ export const readFilesystemEditorVersionSnapshotFx = Effect.fn(
 	}
 
 	return {
+		arkpack,
 		config,
 		resources,
 		scenarios,

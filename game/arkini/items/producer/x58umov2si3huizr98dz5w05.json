@@ -1,114 +1,112 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"producer:gold-mine-t1": {
-			"uid": "x58umov2si3huizr98dz5w05",
-			"id": "producer:gold-mine-t1",
-			"title": "Gold Mine I",
-			"description": "Mines gold ore carts from a nearby gold deposit using richer provisions.",
-			"asset": {
-				"default": [
-					"producer-gold-mine-t1"
-				]
-			},
-			"scope": "any",
-			"maxCount": 1,
-			"maxStackSize": 1,
-			"maxQueueSize": 1,
-			"type": "producer",
-			"lines": [
-				{
-					"id": "line:gold-mine-t1:gold-ore",
-					"title": "Gold Ore",
-					"description": "Runs gold ore for Gold Mine I.",
-					"default": false,
-					"show": true,
-					"enable": true,
-					"runtimeMs": 72000,
-					"input": [
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:bread"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 4
+	"item": {
+		"uid": "x58umov2si3huizr98dz5w05",
+		"id": "producer:gold-mine-t1",
+		"title": "Gold Mine I",
+		"description": "Mines gold ore carts from a nearby gold deposit using richer provisions.",
+		"asset": {
+			"default": [
+				"producer-gold-mine-t1"
+			]
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"type": "producer",
+		"lines": [
+			{
+				"id": "line:gold-mine-t1:gold-ore",
+				"title": "Gold Ore",
+				"description": "Runs gold ore for Gold Mine I.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 72000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:bread"
 						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:wine-glass"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 2,
-								"max": 2
-							},
-							"capacity": 4
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
 						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:luxury-clothing"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 4
-						}
-					],
-					"output": {
-						"set": [
-							{
-								"weight": 1,
-								"roll": [
-									{
-										"type": "guaranteed",
-										"drop": [
-											{
-												"itemId": "item:gold-ore",
-												"quantity": {
-													"min": 2,
-													"max": 2
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									}
-								]
-							}
-						]
+						"capacity": 4
 					},
-					"rules": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:wine-glass"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						},
+						"capacity": 4
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:luxury-clothing"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 4
+					}
+				],
+				"output": {
+					"set": [
 						{
-							"when": [
+							"weight": 1,
+							"roll": [
 								{
-									"query": {
-										"selector": {
-											"type": "item",
-											"itemId": "item:gold-deposit"
-										},
-										"scope": "board",
-										"distance": "close"
-									},
-									"type": "exists"
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:gold-ore",
+											"quantity": {
+												"min": 2,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
 								}
-							],
-							"type": "enable"
+							]
 						}
 					]
-				}
-			]
-		}
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "item:gold-deposit"
+									},
+									"scope": "board",
+									"distance": "close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			}
+		]
 	}
 }

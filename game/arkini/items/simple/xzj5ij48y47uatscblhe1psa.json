@@ -1,19 +1,17 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:iron-deposit": {
-			"uid": "xzj5ij48y47uatscblhe1psa",
-			"id": "item:iron-deposit",
-			"title": "Iron Deposit",
-			"description": "Movable iron source used by nearby iron mines.",
-			"asset": {
-				"default": [
-					"item-iron-deposit"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 1,
-			"type": "simple"
-		}
+	"item": {
+		"uid": "xzj5ij48y47uatscblhe1psa",
+		"id": "item:iron-deposit",
+		"title": "Iron Deposit",
+		"description": "Movable iron source used by nearby iron mines.",
+		"asset": {
+			"default": [
+				"item-iron-deposit"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
 	}
 }

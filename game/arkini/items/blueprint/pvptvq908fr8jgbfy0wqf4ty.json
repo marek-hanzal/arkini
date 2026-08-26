@@ -1,130 +1,128 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:blueprint-prospector-guild-t1": {
-			"uid": "pvptvq908fr8jgbfy0wqf4ty",
-			"id": "item:blueprint-prospector-guild-t1",
-			"title": "Prospector Guild Blueprint",
-			"description": "Build plan that can be filled with resources to construct Prospector Guild 1.",
-			"asset": {
-				"default": [
-					"blueprint",
-					"producer-prospector-guild-t1"
-				],
-				"sources": [
-					"producer-prospector-guild-t1"
+	"item": {
+		"uid": "pvptvq908fr8jgbfy0wqf4ty",
+		"id": "item:blueprint-prospector-guild-t1",
+		"title": "Prospector Guild Blueprint",
+		"description": "Build plan that can be filled with resources to construct Prospector Guild 1.",
+		"asset": {
+			"default": [
+				"blueprint",
+				"producer-prospector-guild-t1"
+			],
+			"sources": [
+				"producer-prospector-guild-t1"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 1
+		},
+		"type": "blueprint",
+		"line": {
+			"id": "line:blueprint:prospector-guild-t1:construct",
+			"title": "Construct Prospector Guild",
+			"description": "Consumes construction resources to build Prospector Guild.",
+			"default": true,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 38000,
+			"input": [
+				{
+					"charges": {
+						"cost": 1,
+						"from": "self"
+					},
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:plank"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 3,
+						"max": 3
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:stone-block"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:paper"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:building-permit"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:coin"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 0
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "producer:prospector-guild-t1",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
 				]
 			},
-			"scope": "any",
-			"maxStackSize": 1,
-			"charges": {
-				"amount": 1
-			},
-			"type": "blueprint",
-			"line": {
-				"id": "line:blueprint:prospector-guild-t1:construct",
-				"title": "Construct Prospector Guild",
-				"description": "Consumes construction resources to build Prospector Guild.",
-				"default": true,
-				"show": true,
-				"enable": true,
-				"runtimeMs": 38000,
-				"input": [
-					{
-						"charges": {
-							"cost": 1,
-							"from": "self"
-						},
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:plank"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 3,
-							"max": 3
-						},
-						"capacity": 0
-					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:stone-block"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 2,
-							"max": 2
-						},
-						"capacity": 0
-					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:paper"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 2,
-							"max": 2
-						},
-						"capacity": 0
-					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:building-permit"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						},
-						"capacity": 0
-					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:coin"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 2,
-							"max": 2
-						},
-						"capacity": 0
-					}
-				],
-				"output": {
-					"set": [
-						{
-							"weight": 1,
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:prospector-guild-t1",
-											"quantity": {
-												"min": 1,
-												"max": 1
-											},
-											"placement": "drop",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				},
-				"rules": []
-			}
+			"rules": []
 		}
 	}
 }

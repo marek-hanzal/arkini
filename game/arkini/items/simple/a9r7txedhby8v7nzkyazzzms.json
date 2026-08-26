@@ -1,19 +1,17 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:hops": {
-			"uid": "a9r7txedhby8v7nzkyazzzms",
-			"id": "item:hops",
-			"title": "Hops",
-			"description": "Harvested hops produced by breweries when supplied with water near a hop field.",
-			"asset": {
-				"default": [
-					"item-hops"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 50,
-			"type": "simple"
-		}
+	"item": {
+		"uid": "a9r7txedhby8v7nzkyazzzms",
+		"id": "item:hops",
+		"title": "Hops",
+		"description": "Harvested hops produced by breweries when supplied with water near a hop field.",
+		"asset": {
+			"default": [
+				"item-hops"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 50,
+		"type": "simple"
 	}
 }

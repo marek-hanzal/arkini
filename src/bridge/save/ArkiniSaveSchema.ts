@@ -5,9 +5,8 @@ import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSche
 
 export const ArkiniSaveSchema = z
 	.object({
-		namespace: z.literal("arkini"),
 		version: ArkpackVersionSchema,
-		game: ArkiniVersionSchema,
+		arkini: ArkiniVersionSchema,
 		state: StateSchema,
 	})
 	.strict()

@@ -9,6 +9,7 @@ import {
 	useEditorResourceUrls,
 } from "~/ui/resource/editor/useEditorResourceUrl";
 import { EditorResourceUrlProvider } from "~/ui/resource/editor/EditorResourceUrlProvider";
+import type { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 
 (
 	globalThis as {
@@ -66,7 +67,7 @@ describe("EditorResourceUrlProvider", () => {
 					2,
 				]),
 			},
-		];
+		] satisfies ReadonlyArray<ResourceSchema.Type>;
 		const container = document.createElement("div");
 		document.body.append(container);
 		const root = createRoot(container);
@@ -143,7 +144,7 @@ describe("EditorResourceUrlProvider", () => {
 					9,
 				]),
 			},
-		];
+		] satisfies ReadonlyArray<ResourceSchema.Type>;
 		const secondResources = [
 			{
 				id: "hero",
@@ -153,7 +154,7 @@ describe("EditorResourceUrlProvider", () => {
 				]),
 			},
 			firstResources[1]!,
-		];
+		] satisfies ReadonlyArray<ResourceSchema.Type>;
 		const container = document.createElement("div");
 		document.body.append(container);
 		const root = createRoot(container);

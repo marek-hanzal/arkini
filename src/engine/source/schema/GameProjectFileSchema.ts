@@ -10,7 +10,7 @@ export const GameProjectFileSchema = GameConfigSchema.omit({
 })
 	.extend({
 		$schema: z.literal(GameProjectGameSchemaReference),
-		arkpack: ArkpackVersionSchema,
+		version: ArkpackVersionSchema,
 	})
 	.meta({
 		id: "GameProjectFileSchema",

@@ -26,10 +26,10 @@ describe("filesystem Editor project lifecycle", () => {
 		expect(root).toContain(harness.projectsRoot);
 		expect(JSON.parse(await readFile(join(root ?? "", "project.json"), "utf8"))).toMatchObject({
 			arkini: ArkiniAppVersion,
-			updatedAtMs: expect.any(Number),
+			revision: expect.any(Number),
 		});
 		expect(JSON.parse(await readFile(join(root ?? "", "game.json"), "utf8"))).toMatchObject({
-			arkpack: "1.0",
+			version: "1.0",
 		});
 		expect(JSON.parse(await readFile(harness.catalogPath, "utf8"))).toMatchObject({
 			projects: [
@@ -265,8 +265,8 @@ describe("filesystem Editor project lifecycle", () => {
 		await writeFile(
 			join(root, "versions", "head.json"),
 			JSON.stringify({
-				versionId: first.versionId,
-				versionIds: [
+				current: first.versionId,
+				versions: [
 					first.versionId,
 				],
 			}),

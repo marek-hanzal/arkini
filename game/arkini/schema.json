@@ -31,7 +31,7 @@
 					"description": "The initial board, inventory, and toolbar contents created for a new game.",
 					"$ref": "urn:arkini:schema:game-project-source#/$defs/StartSchema"
 				},
-				"arkpack": {
+				"version": {
 					"$ref": "urn:arkini:schema:game-project-source#/$defs/ArkpackVersionSchema"
 				}
 			},
@@ -40,7 +40,7 @@
 				"meta",
 				"resources",
 				"start",
-				"arkpack"
+				"version"
 			],
 			"additionalProperties": false,
 			"$id": "urn:arkini:schema:game-project-file",
@@ -315,56 +315,19 @@
 					"type": "string",
 					"const": "../../schema.json"
 				},
-				"items": {
-					"type": "object",
-					"propertyNames": {
-						"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
-					},
-					"additionalProperties": {
-						"$ref": "urn:arkini:schema:game-project-source#/$defs/ItemSchema"
-					},
-					"description": "The single canonical item owned by this UID-named file.",
-					"minProperties": 1,
-					"maxProperties": 1
+				"item": {
+					"description": "The canonical item owned by this UID-named file.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ItemSchema"
 				}
 			},
 			"required": [
 				"$schema",
-				"items"
+				"item"
 			],
 			"additionalProperties": false,
 			"$id": "urn:arkini:schema:game-project-item-file",
 			"title": "Arkini game project item file",
-			"description": "One item fragment stored at items/<type>/<encoded uid>.json."
-		},
-		"ItemSchema": {
-			"oneOf": [
-				{
-					"$ref": "urn:arkini:schema:game-project-source#/$defs/BlueprintItemSchema"
-				},
-				{
-					"$ref": "urn:arkini:schema:game-project-source#/$defs/DepositItemSchema"
-				},
-				{
-					"$ref": "urn:arkini:schema:game-project-source#/$defs/SimpleItemSchema"
-				},
-				{
-					"$ref": "urn:arkini:schema:game-project-source#/$defs/ProducerItemSchema"
-				},
-				{
-					"$ref": "urn:arkini:schema:game-project-source#/$defs/CraftItemSchema"
-				},
-				{
-					"$ref": "urn:arkini:schema:game-project-source#/$defs/StashItemSchema"
-				},
-				{
-					"$ref": "urn:arkini:schema:game-project-source#/$defs/TemporaryItemSchema"
-				},
-				{
-					"$ref": "urn:arkini:schema:game-project-source#/$defs/InventoryItemSchema"
-				}
-			],
-			"description": "A game item selected by its type discriminator."
+			"description": "One item stored at items/<type>/<encoded uid>.json."
 		},
 		"BlueprintItemSchema": {
 			"type": "object",
@@ -2274,6 +2237,35 @@
 			],
 			"additionalProperties": false,
 			"description": "A singleton Board/Toolbar item that opens the shared inventory surface."
+		},
+		"ItemSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/BlueprintItemSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/DepositItemSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/SimpleItemSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ProducerItemSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/CraftItemSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/StashItemSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/TemporaryItemSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/InventoryItemSchema"
+				}
+			],
+			"description": "A game item selected by its type discriminator."
 		}
 	}
 }

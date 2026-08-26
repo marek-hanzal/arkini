@@ -119,7 +119,6 @@ export const createFilesystemEditorNoteOperationsFx = Effect.fn(
 						replaceJsonFx(
 							target,
 							EditorProjectNoteFileSchema.parse({
-								noteId: note.noteId,
 								content: note.content,
 								createdAtMs: note.createdAtMs,
 								updatedAtMs: note.updatedAtMs,
@@ -176,7 +175,6 @@ export const createFilesystemEditorNoteOperationsFx = Effect.fn(
 					yield* withFilesystemEditorProjectLockFx(
 						state.paths.root,
 						replaceJsonFx(target, {
-							noteId: note.noteId,
 							content: note.content,
 							createdAtMs: note.createdAtMs,
 							updatedAtMs: note.updatedAtMs,

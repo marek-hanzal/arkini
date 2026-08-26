@@ -2,7 +2,6 @@ import { isDeepStrictEqual } from "node:util";
 import { FileSystem, Path } from "effect";
 import { Effect, type Semaphore } from "effect";
 
-import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
 import { ArkpackLimits } from "../../../../../shared/ArkpackLimits";
 import type { FilesystemEditorProjectState } from "../FilesystemEditorProjectState";
 import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
@@ -18,7 +17,6 @@ import { ArkpackSignatureSchema } from "~/engine/pack/schema/ArkpackSignatureSch
 import { verifyArkpackTrustFx } from "~/engine/pack/fx/verifyArkpackTrustFx";
 import { GameValidationError } from "~/engine/validation/error/GameValidationError";
 import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
-import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
 import { withFilesystemEditorProjectLockFx } from "./withFilesystemEditorProjectLockFx";
 import { readFilesystemEditorProjectFilesFx } from "./readFilesystemEditorProjectFilesFx";
 
@@ -95,7 +93,7 @@ export const createFilesystemEditorProjectBuildOperationsFx = Effect.fn(
 				const assertCurrentFx = readFilesystemEditorProjectFilesFx(state.paths.root).pipe(
 					Effect.filterOrFail(
 						(files) =>
-							files.marker.updatedAtMs === state.project.revision &&
+							files.marker.revision === state.project.revision &&
 							files.arkpack === state.project.version &&
 							isDeepStrictEqual(files.config, state.project.config) &&
 							isDeepStrictEqual(files.resources, state.project.resources),
@@ -130,15 +128,8 @@ export const createFilesystemEditorProjectBuildOperationsFx = Effect.fn(
 					projectId,
 					revision: state.project.revision,
 					contentHash: build.contentHash,
-					filename: build.filename,
-					...(build.signatureFilename === undefined
-						? {}
-						: {
-								signatureFilename: build.signatureFilename,
-							}),
-					version: build.version,
-					game: ArkiniVersionSchema.parse(ArkiniAppVersion),
-					bytes: build.bytes,
+					signed: build.signature !== undefined,
+					size: build.bytes,
 					diagnostics: build.diagnostics,
 				});
 			}).pipe(
@@ -156,7 +147,7 @@ export const createFilesystemEditorProjectBuildOperationsFx = Effect.fn(
 		contentHash,
 		expectedRevision,
 		projectId,
-		signatureFilename: expectedSignatureFilename,
+		signed,
 	}) =>
 		operations.withPermits(1)(
 			Effect.gen(function* () {
@@ -195,16 +186,9 @@ export const createFilesystemEditorProjectBuildOperationsFx = Effect.fn(
 							);
 						const signaturePath = path.join(build, `${stem}.arksig`);
 						const signatureExists = yield* fileSystem.exists(signaturePath);
-						if (signatureExists !== (expectedSignatureFilename !== undefined))
+						if (signatureExists !== signed)
 							return yield* Effect.fail(
 								new Error("The current Editor build signing state has changed."),
-							);
-						if (
-							expectedSignatureFilename !== undefined &&
-							expectedSignatureFilename !== `${stem}.arksig`
-						)
-							return yield* Effect.fail(
-								new Error("The Editor build signature name is invalid."),
 							);
 						if (
 							signatureExists &&
@@ -229,7 +213,7 @@ export const createFilesystemEditorProjectBuildOperationsFx = Effect.fn(
 												fileSystem.readFileString(signaturePath),
 											),
 											Effect.map((source) =>
-												ArkpackSignatureSchema.parse(JSON.parse(source)),
+												ArkpackSignatureSchema.parse(source.trim()),
 											),
 										)
 									: Effect.succeed(undefined),

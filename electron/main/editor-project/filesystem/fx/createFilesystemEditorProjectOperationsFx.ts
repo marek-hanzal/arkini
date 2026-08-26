@@ -113,9 +113,9 @@ const materializeProjectFx = Effect.fn("materializeFilesystemEditorProjectFx")(f
 					projectId,
 					title: files.config.meta.title,
 					version: files.arkpack,
-					createdAtMs: Math.min(catalog.createdAtMs, files.marker.updatedAtMs),
-					updatedAtMs: files.marker.updatedAtMs,
-					revision: files.marker.updatedAtMs,
+					createdAtMs: Math.min(catalog.createdAtMs, files.marker.revision),
+					updatedAtMs: files.marker.revision,
+					revision: files.marker.revision,
 					config: files.config,
 					resources: files.resources,
 				},
@@ -233,7 +233,7 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 					});
 					const marker = GameProjectManifestSchema.parse({
 						arkini: ArkiniAppVersion,
-						updatedAtMs: nowMs,
+						revision: nowMs,
 					});
 					yield* withFilesystemEditorProjectLockFx(
 						root,
@@ -289,7 +289,7 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 				const entry = EditorProjectCatalogEntrySchema.parse({
 					root,
 					ownership: "external",
-					createdAtMs: files.marker.updatedAtMs,
+					createdAtMs: files.marker.revision,
 				});
 				const state = yield* materializeFx(entry);
 				yield* catalog.addFx(entry);

@@ -1,64 +1,23 @@
 import { Effect } from "effect";
+import { z } from "zod";
 
-import type {
-	EditorProjectBuildContentSchema,
-	EditorProjectBuildSchema,
-} from "~/editor/EditorProjectBuildSchema";
+import { invokeEditorProjectTransportFx } from "~/bridge/editor/invokeEditorProjectTransportFx";
+import type { EditorProjectBuildSchema } from "~/editor/EditorProjectBuildSchema";
 
-const downloadFx = Effect.fn("saveBuiltEditorArkpackFx.downloadFx")(
-	(filename: string, bytes: Uint8Array, type: string) =>
-		Effect.acquireUseRelease(
-			Effect.try({
-				try: () =>
-					URL.createObjectURL(
-						new Blob(
-							[
-								bytes.slice().buffer,
-							],
-							{
-								type,
-							},
-						),
-					),
-				catch: (cause) => cause,
-			}),
-			(url) =>
-				Effect.acquireUseRelease(
-					Effect.try({
-						try: () => {
-							const anchor = document.createElement("a");
-							anchor.href = url;
-							anchor.download = filename;
-							document.body.append(anchor);
-							return anchor;
-						},
-						catch: (cause) => cause,
-					}),
-					(anchor) =>
-						Effect.try({
-							try: () => anchor.click(),
-							catch: (cause) => cause,
-						}),
-					(anchor) => Effect.sync(() => anchor.remove()),
-				),
-			(url) => Effect.sync(() => URL.revokeObjectURL(url)),
-		),
+/** Saves the canonical Arkpack and optional signature through one native dialog. */
+export const saveBuiltEditorArkpackFx = Effect.fn("saveBuiltEditorArkpackFx")(
+	(artifact: EditorProjectBuildSchema.Type) =>
+		invokeEditorProjectTransportFx<boolean, boolean>({
+			call: () =>
+				window.arkini.editor.saveProjectBuild({
+					projectId: artifact.projectId,
+					expectedRevision: artifact.revision,
+					contentHash: artifact.contentHash,
+					signed: artifact.signed,
+				}),
+			operation: "save-project-build",
+			parse: (value) => z.boolean().parse(value),
+			requestMessage: "The Editor build save request failed.",
+			responseMessage: "The Editor build save response is invalid.",
+		}),
 );
-
-/** Downloads the exact Arkpack plus its detached signature when the build is signed. */
-export const saveBuiltEditorArkpackFx = Effect.fn("saveBuiltEditorArkpackFx")(function* ({
-	artifact,
-	content,
-}: {
-	readonly artifact: EditorProjectBuildSchema.Type;
-	readonly content: EditorProjectBuildContentSchema.Type;
-}) {
-	yield* downloadFx(artifact.filename, content.bytes, "application/octet-stream");
-	if (content.signature !== undefined && artifact.signatureFilename !== undefined) {
-		yield* downloadFx(
-			artifact.signatureFilename,
-			new TextEncoder().encode(`${JSON.stringify(content.signature, undefined, "\t")}\n`),
-			"application/json",
-		);
-	}
-});

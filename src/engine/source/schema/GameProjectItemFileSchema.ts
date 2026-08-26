@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { GameProjectItemSchemaReference } from "~/engine/source/GameProjectReference";
 
@@ -8,23 +7,14 @@ import { GameProjectItemSchemaReference } from "~/engine/source/GameProjectRefer
 export const GameProjectItemFileSchema = z
 	.object({
 		$schema: z.literal(GameProjectItemSchemaReference),
-		items: z
-			.record(IdSchema, ItemSchema)
-			.refine((items) => Object.keys(items).length === 1, {
-				message: "A game project item file must contain exactly one item.",
-			})
-			.meta({
-				description: "The single canonical item owned by this UID-named file.",
-				minProperties: 1,
-				maxProperties: 1,
-			}),
+		item: ItemSchema.describe("The canonical item owned by this UID-named file."),
 	})
 	.strict()
 	.meta({
 		id: "GameProjectItemFileSchema",
 		$id: "urn:arkini:schema:game-project-item-file",
 		title: "Arkini game project item file",
-		description: "One item fragment stored at items/<type>/<encoded uid>.json.",
+		description: "One item stored at items/<type>/<encoded uid>.json.",
 	});
 
 export type GameProjectItemFileSchema = typeof GameProjectItemFileSchema;

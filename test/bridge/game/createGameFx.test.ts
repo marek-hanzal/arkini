@@ -26,7 +26,7 @@ const createGameFx = (props: Omit<createGameFromPackageFx.Props, "runRendererEff
 	});
 
 const createStorages = async (version = "1.0") => {
-	const bytes = createTestArkpack(testArkpackConfig, "package:bridge", version);
+	const bytes = createTestArkpack(testArkpackConfig, testArkpackConfig.meta.id, version);
 	const loaded = await Effect.runPromise(
 		readArkpackFx({
 			bytes,
@@ -243,7 +243,7 @@ describe("createGameFx", () => {
 		const saved = await Effect.runPromise(decodeArkiniSaveFx(bytes));
 		const unsupportedBytes = encode({
 			...saved,
-			game: "0.4.0",
+			arkini: "0.4.0",
 		});
 		storages.setSaved(unsupportedBytes);
 
@@ -418,9 +418,8 @@ describe("createGameFx", () => {
 		const storages = await createStorages();
 		storages.setSaved(
 			encode({
-				namespace: "arkini",
 				version: "not-a-version",
-				game: "0.5.0",
+				arkini: "0.5.0",
 				state: {},
 			}),
 		);

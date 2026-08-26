@@ -44,7 +44,7 @@ describe("importArkpackFx", () => {
 			packageId: descriptor.packageId,
 			contentHash: descriptor.contentHash,
 		});
-		expect(descriptor.packageId).toBe("package:bridge");
+		expect(descriptor.packageId).toBe(testArkpackConfig.meta.id);
 		expect(loaded.payload.config).toEqual(testArkpackConfig);
 	});
 
@@ -62,9 +62,8 @@ describe("importArkpackFx", () => {
 		};
 		const encoded = Effect.runSync(
 			encodeFx({
-				packageId: "package:invalid",
 				version: "1.0",
-				game: ArkiniAppVersion,
+				arkini: ArkiniAppVersion,
 				config: invalid,
 				resources: [
 					{

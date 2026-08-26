@@ -6,7 +6,7 @@ import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 export const GameProjectManifestSchema = z
 	.object({
 		arkini: z.literal(ArkiniAppVersion),
-		updatedAtMs: z.number().int().nonnegative(),
+		revision: z.number().int().nonnegative(),
 	})
 	.strict()
 	.meta({

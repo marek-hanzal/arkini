@@ -1,19 +1,17 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:coin": {
-			"uid": "gdx2v2b9josshcyohg9rtlxy",
-			"id": "item:coin",
-			"title": "Coin",
-			"description": "Basic currency produced by markets from processed food and drink, and later by specialist economy buildings.",
-			"asset": {
-				"default": [
-					"item-coin"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 100,
-			"type": "simple"
-		}
+	"item": {
+		"uid": "gdx2v2b9josshcyohg9rtlxy",
+		"id": "item:coin",
+		"title": "Coin",
+		"description": "Basic currency produced by markets from processed food and drink, and later by specialist economy buildings.",
+		"asset": {
+			"default": [
+				"item-coin"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 100,
+		"type": "simple"
 	}
 }

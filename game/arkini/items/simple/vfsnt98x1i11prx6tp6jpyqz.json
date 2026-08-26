@@ -1,19 +1,17 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:vineyard": {
-			"uid": "vfsnt98x1i11prx6tp6jpyqz",
-			"id": "item:vineyard",
-			"title": "Vineyard",
-			"description": "Movable vineyard source used by nearby wineries.",
-			"asset": {
-				"default": [
-					"item-vineyard"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 1,
-			"type": "simple"
-		}
+	"item": {
+		"uid": "vfsnt98x1i11prx6tp6jpyqz",
+		"id": "item:vineyard",
+		"title": "Vineyard",
+		"description": "Movable vineyard source used by nearby wineries.",
+		"asset": {
+			"default": [
+				"item-vineyard"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
 	}
 }

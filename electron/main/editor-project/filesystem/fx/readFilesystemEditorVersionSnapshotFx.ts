@@ -86,7 +86,7 @@ export const readFilesystemEditorVersionSnapshotFx = Effect.fn(
 			}),
 		),
 	);
-	const { arkpack, ...game } = gameFile;
+	const { version, ...game } = gameFile;
 	const items: Record<string, ItemSchema.Type> = {};
 	for (const [uid, hash] of Object.entries(manifest.items).sort(([left], [right]) =>
 		left.localeCompare(right),
@@ -188,7 +188,7 @@ export const readFilesystemEditorVersionSnapshotFx = Effect.fn(
 	}
 
 	return {
-		arkpack,
+		arkpack: version,
 		config,
 		resources,
 		scenarios,

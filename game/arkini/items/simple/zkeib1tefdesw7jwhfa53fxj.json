@@ -1,19 +1,17 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:construction-bundle": {
-			"uid": "zkeib1tefdesw7jwhfa53fxj",
-			"id": "item:construction-bundle",
-			"title": "Construction Bundle",
-			"description": "Master package of fired bricks, glass, roof tiles, permits, and prestige materials used to unlock advanced civic and guild buildings.",
-			"asset": {
-				"default": [
-					"item-construction-bundle"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 20,
-			"type": "simple"
-		}
+	"item": {
+		"uid": "zkeib1tefdesw7jwhfa53fxj",
+		"id": "item:construction-bundle",
+		"title": "Construction Bundle",
+		"description": "Master package of fired bricks, glass, roof tiles, permits, and prestige materials used to unlock advanced civic and guild buildings.",
+		"asset": {
+			"default": [
+				"item-construction-bundle"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 20,
+		"type": "simple"
 	}
 }

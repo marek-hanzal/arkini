@@ -1,19 +1,17 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:egg": {
-			"uid": "r6q9nl6jf9fr2orpaak0eg6b",
-			"id": "item:egg",
-			"title": "Egg",
-			"description": "Fresh eggs produced by chicken coops for base food supply chains.",
-			"asset": {
-				"default": [
-					"item-egg"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 50,
-			"type": "simple"
-		}
+	"item": {
+		"uid": "r6q9nl6jf9fr2orpaak0eg6b",
+		"id": "item:egg",
+		"title": "Egg",
+		"description": "Fresh eggs produced by chicken coops for base food supply chains.",
+		"asset": {
+			"default": [
+				"item-egg"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 50,
+		"type": "simple"
 	}
 }

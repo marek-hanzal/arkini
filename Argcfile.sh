@@ -135,6 +135,11 @@ llm:cache() {
 	)
 }
 
+# @cmd Regenerate the portable game-project JSON Schema
+game:schema() {
+	tsx src/engine/cli/arkini.ts game schema --output game/arkini/schema.json
+}
+
 # @cmd Set the repository package version without creating a Git tag
 # @arg version! Version to write
 version() {

@@ -28,10 +28,9 @@ const createCatalog = ({
 				{
 					packageId: "arkini",
 					contentHash: "a".repeat(64),
-					gameId: "arkini",
 					title: "Custom Arkini",
 					version: "1.0",
-					game: "1",
+					arkini: "1",
 					trust: {
 						type: "external",
 						reason: "unsigned",

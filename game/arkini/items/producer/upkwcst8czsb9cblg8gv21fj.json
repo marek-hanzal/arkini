@@ -1,158 +1,156 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"producer:bakery-t1": {
-			"uid": "upkwcst8czsb9cblg8gv21fj",
-			"id": "producer:bakery-t1",
-			"title": "Bakery I",
-			"description": "Consumes flour and water to bake bread.",
-			"asset": {
-				"default": [
-					"producer-bakery-t1"
-				]
-			},
-			"scope": "any",
-			"maxCount": 1,
-			"maxStackSize": 1,
-			"maxQueueSize": 1,
-			"type": "producer",
-			"lines": [
-				{
-					"id": "line:bakery-t1:bread",
-					"title": "Bread",
-					"description": "Runs bread for Bakery I.",
-					"default": false,
-					"show": true,
-					"enable": true,
-					"runtimeMs": 15000,
-					"input": [
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:flour"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 2,
-								"max": 2
-							},
-							"capacity": 4
-						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:water"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 4
-						}
-					],
-					"output": {
-						"set": [
-							{
-								"weight": 1,
-								"roll": [
-									{
-										"type": "guaranteed",
-										"drop": [
-											{
-												"itemId": "item:bread",
-												"quantity": {
-													"min": 3,
-													"max": 3
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									}
-								]
-							}
-						]
-					},
-					"rules": []
-				},
-				{
-					"id": "line:bakery-t1:bread-morale-t1",
-					"title": "Bread (Inspired)",
-					"description": "Runs bread (inspired) for Bakery I.",
-					"default": false,
-					"show": true,
-					"enable": true,
-					"runtimeMs": 13000,
-					"input": [
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:flour"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 2,
-								"max": 2
-							},
-							"capacity": 4
-						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:water"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 4
-						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:morale-t1"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 4
-						}
-					],
-					"output": {
-						"set": [
-							{
-								"weight": 1,
-								"roll": [
-									{
-										"type": "guaranteed",
-										"drop": [
-											{
-												"itemId": "item:bread",
-												"quantity": {
-													"min": 5,
-													"max": 5
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									}
-								]
-							}
-						]
-					},
-					"rules": []
-				}
+	"item": {
+		"uid": "upkwcst8czsb9cblg8gv21fj",
+		"id": "producer:bakery-t1",
+		"title": "Bakery I",
+		"description": "Consumes flour and water to bake bread.",
+		"asset": {
+			"default": [
+				"producer-bakery-t1"
 			]
-		}
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"type": "producer",
+		"lines": [
+			{
+				"id": "line:bakery-t1:bread",
+				"title": "Bread",
+				"description": "Runs bread for Bakery I.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 15000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:flour"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						},
+						"capacity": 4
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:water"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 4
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:bread",
+											"quantity": {
+												"min": 3,
+												"max": 3
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "line:bakery-t1:bread-morale-t1",
+				"title": "Bread (Inspired)",
+				"description": "Runs bread (inspired) for Bakery I.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 13000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:flour"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						},
+						"capacity": 4
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:water"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 4
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:morale-t1"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 4
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:bread",
+											"quantity": {
+												"min": 5,
+												"max": 5
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
 	}
 }

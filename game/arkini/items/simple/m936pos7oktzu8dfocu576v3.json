@@ -1,19 +1,17 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:leather": {
-			"uid": "m936pos7oktzu8dfocu576v3",
-			"id": "item:leather",
-			"title": "Leather",
-			"description": "Processed leather prepared by tanneries from raw hide and used by clothing and equipment chains.",
-			"asset": {
-				"default": [
-					"item-leather"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 50,
-			"type": "simple"
-		}
+	"item": {
+		"uid": "m936pos7oktzu8dfocu576v3",
+		"id": "item:leather",
+		"title": "Leather",
+		"description": "Processed leather prepared by tanneries from raw hide and used by clothing and equipment chains.",
+		"asset": {
+			"default": [
+				"item-leather"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 50,
+		"type": "simple"
 	}
 }

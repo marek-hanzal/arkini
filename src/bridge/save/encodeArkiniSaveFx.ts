@@ -18,9 +18,8 @@ export const encodeArkiniSaveFx = Effect.fn("encodeArkiniSaveFx")(
 		Effect.sync(() =>
 			encode(
 				{
-					namespace: "arkini",
 					version,
-					game: ArkiniAppVersion,
+					arkini: ArkiniAppVersion,
 					state,
 				} satisfies ArkiniSaveSchema.Type,
 				{

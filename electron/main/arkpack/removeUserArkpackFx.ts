@@ -2,6 +2,7 @@ import { FileSystem } from "effect";
 import { Effect } from "effect";
 import { join } from "node:path";
 import { ElectronMainError } from "../ElectronMainError";
+import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
 
 export namespace removeUserArkpackFx {
 	export interface Props {
@@ -15,11 +16,12 @@ export namespace removeUserArkpackFx {
 export const removeUserArkpackFx = Effect.fn("removeUserArkpackFx")(
 	({ root, fileSystem, packageId }: removeUserArkpackFx.Props) =>
 		Effect.gen(function* () {
-			const path = join(root, `${encodeURIComponent(packageId)}.arkpack`);
+			const stem = encodeGameProjectFileStem(packageId);
+			const path = join(root, `${stem}.arkpack`);
 			yield* fileSystem.remove(path, {
 				force: true,
 			});
-			yield* fileSystem.remove(join(root, `${encodeURIComponent(packageId)}.arksig`), {
+			yield* fileSystem.remove(join(root, `${stem}.arksig`), {
 				force: true,
 			});
 		}).pipe(

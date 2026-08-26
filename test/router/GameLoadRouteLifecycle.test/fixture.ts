@@ -36,10 +36,9 @@ export const createGame = ({
 	arkpack: {
 		packageId: createdPackageId,
 		contentHash: "content-route-load",
-		gameId: testArkpackConfig.meta.id,
 		title: testArkpackConfig.meta.title,
 		version: "1.0",
-		game: "0.5.0",
+		arkini: "0.5.0",
 		trust: {
 			type: "external",
 			reason: "unsigned",

@@ -63,7 +63,7 @@ describe("filesystem Editor project versions", () => {
 				const paths = yield* createEditorProjectFilesystemPathsFx(root);
 				const marker = GameProjectManifestSchema.parse({
 					arkini: ArkiniAppVersion,
-					updatedAtMs: 1,
+					revision: 1,
 				});
 				yield* writeFilesystemEditorProjectFilesFx({
 					root,
@@ -78,16 +78,15 @@ describe("filesystem Editor project versions", () => {
 					yield* paths.scenarioFileFx(initialScenario.name),
 					{
 						name: initialScenario.name,
-						projectRevision: initialScenario.projectRevision,
-						arkpackVersion: initialScenario.version,
-						bytesBase64: "Bwg=",
+						revision: initialScenario.projectRevision,
+						version: initialScenario.version,
+						save: "Bwg=",
 						createdAtMs: initialScenario.createdAtMs,
 						updatedAtMs: initialScenario.updatedAtMs,
 					},
 				);
 				const noteFile = yield* paths.noteFileFx("keep-me");
 				yield* replaceFilesystemEditorJsonFx(noteFile, {
-					noteId: "keep-me",
 					content: "Not versioned",
 					createdAtMs: 1,
 					updatedAtMs: 1,
@@ -172,7 +171,7 @@ describe("filesystem Editor project versions", () => {
 				});
 				const changedMarker = GameProjectManifestSchema.parse({
 					...marker,
-					updatedAtMs: 2,
+					revision: 2,
 				});
 				yield* writeFilesystemEditorProjectFilesFx({
 					root,
@@ -193,9 +192,9 @@ describe("filesystem Editor project versions", () => {
 					yield* paths.scenarioFileFx(changedScenario.name),
 					{
 						name: changedScenario.name,
-						projectRevision: changedScenario.projectRevision,
-						arkpackVersion: changedScenario.version,
-						bytesBase64: "CQk=",
+						revision: changedScenario.projectRevision,
+						version: changedScenario.version,
+						save: "CQk=",
 						createdAtMs: changedScenario.createdAtMs,
 						updatedAtMs: changedScenario.updatedAtMs,
 					},
@@ -239,7 +238,7 @@ describe("filesystem Editor project versions", () => {
 								...secondVersion,
 								descriptor: EditorVersionDescriptorFileSchema.parse({
 									...secondVersion.descriptor,
-									arkpackVersion: "9.9",
+									version: "9.9",
 								}),
 							},
 						),
@@ -273,8 +272,8 @@ describe("filesystem Editor project versions", () => {
 					writeFile(
 						paths.versionHeadFile,
 						JSON.stringify({
-							versionId: first.versionId,
-							versionIds: [
+							current: first.versionId,
+							versions: [
 								first.versionId,
 							],
 						}),
@@ -301,8 +300,8 @@ describe("filesystem Editor project versions", () => {
 					yield* fileSystemRead(yield* paths.scenarioFileFx(initialScenario.name)),
 				) as unknown;
 				const head = JSON.parse(yield* fileSystemRead(paths.versionHeadFile)) as {
-					readonly versionId: string;
-					readonly versionIds: ReadonlyArray<string>;
+					readonly current: string;
+					readonly versions: ReadonlyArray<string>;
 				};
 				const status = yield* versions.readVersionStatusFx(projectId);
 				const realVersions = join(root, "versions-real");
@@ -366,9 +365,9 @@ describe("filesystem Editor project versions", () => {
 		expect(result.restoredFiles.resources).toEqual(editorTestPayload.resources);
 		expect(result.restoredScenario).toMatchObject({
 			name: "Opening",
-			projectRevision: restoredRevision,
-			arkpackVersion: "1.0",
-			bytesBase64: "Bwg=",
+			revision: restoredRevision,
+			version: "1.0",
+			save: "Bwg=",
 		});
 		expect(result.restoredState?.scenarios).toEqual([
 			{
@@ -382,8 +381,8 @@ describe("filesystem Editor project versions", () => {
 			versionCount: 2,
 		});
 		expect(result.head).toEqual({
-			versionId: result.first.versionId,
-			versionIds: [
+			current: result.first.versionId,
+			versions: [
 				result.first.versionId,
 				result.second.versionId,
 			],

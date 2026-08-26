@@ -3,19 +3,14 @@ import { z } from "zod";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ArkpackSignatureSchema } from "~/engine/pack/schema/ArkpackSignatureSchema";
 import { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
-import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
-import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 
 export const EditorProjectBuildSchema = z
 	.object({
 		projectId: IdSchema,
 		revision: z.number().int().nonnegative(),
 		contentHash: z.string().regex(/^[a-f0-9]{64}$/),
-		filename: z.string().min(1),
-		signatureFilename: z.string().min(1).optional(),
-		version: ArkpackVersionSchema,
-		game: ArkiniVersionSchema,
-		bytes: z.number().int().nonnegative(),
+		signed: z.boolean(),
+		size: z.number().int().nonnegative(),
 		diagnostics: GameDiagnosticsSchema,
 	})
 	.strict()

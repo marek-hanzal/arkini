@@ -26,7 +26,7 @@ describe("filesystem Editor project current tree", () => {
 			arkpack: editorTestPayload.version,
 			marker: {
 				arkini: ArkiniAppVersion,
-				updatedAtMs: 1,
+				revision: 1,
 			},
 			config: editorTestPayload.config,
 			resources: editorTestPayload.resources,
@@ -43,7 +43,7 @@ describe("filesystem Editor project current tree", () => {
 		expect(await harness.read()).toEqual(canonicalInitial);
 		expect(JSON.parse(await readFile(join(harness.root, "project.json"), "utf8"))).toEqual({
 			arkini: ArkiniAppVersion,
-			updatedAtMs: initial.marker.updatedAtMs,
+			revision: initial.marker.revision,
 		});
 		const schema = JSON.parse(await readFile(join(harness.root, "schema.json"), "utf8"));
 		expect(schema).toMatchObject({
@@ -58,7 +58,7 @@ describe("filesystem Editor project current tree", () => {
 			$defs: {
 				GameProjectFileSchema: {
 					properties: {
-						arkpack: {
+						version: {
 							$ref: "urn:arkini:schema:game-project-source#/$defs/ArkpackVersionSchema",
 						},
 					},
@@ -66,10 +66,8 @@ describe("filesystem Editor project current tree", () => {
 				},
 				GameProjectItemFileSchema: {
 					properties: {
-						items: {
-							minProperties: 1,
-							maxProperties: 1,
-							type: "object",
+						item: {
+							$ref: "urn:arkini:schema:game-project-source#/$defs/ItemSchema",
 						},
 					},
 					type: "object",
@@ -78,20 +76,20 @@ describe("filesystem Editor project current tree", () => {
 		});
 		const game = JSON.parse(await readFile(join(harness.root, "game.json"), "utf8"));
 		expect(game.$schema).toBe(GameProjectGameSchemaReference);
-		expect(game.arkpack).toBe(editorTestPayload.version);
+		expect(game.version).toBe(editorTestPayload.version);
 		expect(game).not.toHaveProperty("items");
 		const waterPath = join(harness.root, "items", "simple", "water.json");
 		expect(JSON.parse(await readFile(waterPath, "utf8")).$schema).toBe(
 			GameProjectItemSchemaReference,
 		);
 		const waterResourcePath = join(harness.root, "assets", "item-water.png");
-		await writeFile(waterPath, '{"items":{}}');
+		await writeFile(waterPath, '{"item":{}}');
 		await rm(waterResourcePath);
 		const repaired = {
 			...canonicalInitial,
 			marker: {
 				...initial.marker,
-				updatedAtMs: 2,
+				revision: 2,
 			},
 		};
 		await harness.write(repaired, initial);
@@ -101,7 +99,7 @@ describe("filesystem Editor project current tree", () => {
 			arkpack: repaired.arkpack,
 			marker: {
 				...repaired.marker,
-				updatedAtMs: 3,
+				revision: 3,
 			},
 			config: GameConfigSchema.parse({
 				...repaired.config,
@@ -136,9 +134,7 @@ describe("filesystem Editor project current tree", () => {
 			),
 		).toEqual({
 			$schema: GameProjectItemSchemaReference,
-			items: {
-				water: next.config.items.water,
-			},
+			item: next.config.items.water,
 		});
 		expect(await harness.read()).toEqual(next);
 	});
@@ -150,7 +146,7 @@ describe("filesystem Editor project current tree", () => {
 			arkpack: editorTestPayload.version,
 			marker: {
 				arkini: ArkiniAppVersion,
-				updatedAtMs: 1,
+				revision: 1,
 			},
 			config: editorTestPayload.config,
 			resources: editorTestPayload.resources,
@@ -179,7 +175,7 @@ describe("filesystem Editor project current tree", () => {
 				arkpack: editorTestPayload.version,
 				marker: {
 					arkini: ArkiniAppVersion,
-					updatedAtMs: 1,
+					revision: 1,
 				},
 				config: editorTestPayload.config,
 				resources: editorTestPayload.resources,

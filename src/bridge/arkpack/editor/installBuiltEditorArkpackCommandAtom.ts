@@ -5,6 +5,7 @@ import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAto
 import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { EditorProjectBuildSchema } from "~/editor/EditorProjectBuildSchema";
+import { readArkpackArtifactNames } from "~/bridge/arkpack/readArkpackArtifactNames";
 
 /** Reads and installs the exact current canonical build instead of caching artifact bytes. */
 export const installBuiltEditorArkpackCommandAtom = RendererRuntime.runSync(
@@ -21,17 +22,13 @@ export const installBuiltEditorArkpackCommandAtom = RendererRuntime.runSync(
 						projectId: artifact.projectId,
 						expectedRevision: artifact.revision,
 						contentHash: artifact.contentHash,
-						...(artifact.signatureFilename === undefined
-							? {}
-							: {
-									signatureFilename: artifact.signatureFilename,
-								}),
+						signed: artifact.signed,
 					})
 					.pipe(
 						Effect.flatMap((content) =>
 							catalog.installFx({
 								bytes: content.bytes,
-								filename: artifact.filename,
+								filename: readArkpackArtifactNames(artifact.projectId).arkpack,
 								...(content.signature === undefined
 									? {}
 									: {

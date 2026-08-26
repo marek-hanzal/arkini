@@ -32,7 +32,7 @@ Defaults:
 
 ```text
 authoring directory: game/arkini
-JSON Schema output: game/schema.json
+JSON Schema output: game/arkini/schema.json
 project build output: game/arkini/build/arkini.arkpack
 ```
 
@@ -351,7 +351,7 @@ versions/<versionId>/{version.json,manifest.json}
 objects/<sha256>.{json,png}
 ```
 
-`project.json` is mandatory and contains only `arkini`, the Arkini version that last saved the project, and the last published `updatedAtMs` revision. The engine owns this portable game-project format; the Editor and CLI both consume it. `schema.json` is generated from Arkini's current project source schema directly into the project root. `game.json` owns the non-item completed root, the package ID in `meta.id`, and its `arkpack` version, and references `./schema.json`; every item file owns exactly one item, is placed by canonical item type and immutable UID, and references `../../schema.json`. The marker, schema, and references must match the exact current contract. `resources/` contains shell resources; `assets/` contains item artwork. Compilation reads only `game.json`, `items/<type>/*.json`, `assets/*.png`, and `resources/*.png`; notes, scenarios, versions, objects, locks, and temporary files are never game sources.
+`project.json` is mandatory and contains only `arkini`, the Arkini version that last saved the project, and the last published `revision`. The engine owns this portable game-project format; the Editor and CLI both consume it. `schema.json` is generated from Arkini's current project source schema directly into the project root. `game.json` owns the non-item completed root, the package ID in `meta.id`, and its gameplay `version`, and references `./schema.json`; every item file owns one direct `item`, is placed by canonical item type and immutable UID, and references `../../schema.json`. The marker, schema, and references must match the exact current contract. `resources/` contains shell resources; `assets/` contains item artwork. Compilation reads only `game.json`, `items/<type>/*.json`, `assets/*.png`, and `resources/*.png`; notes, scenarios, versions, objects, locks, and temporary files are never game sources.
 
 Notes are portable but deliberately excluded from authored-game revisioning, Build, Arkpack output, and version manifests. The live Editor Board is not persisted. Explicitly named Board scenarios are portable JSON envelopes and are included in version snapshots.
 

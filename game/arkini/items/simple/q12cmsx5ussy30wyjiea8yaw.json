@@ -1,71 +1,69 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:water": {
-			"uid": "q12cmsx5ussy30wyjiea8yaw",
-			"id": "item:water",
-			"title": "Water",
-			"description": "Basic water resource produced by wells and consumed by farms.",
-			"asset": {
-				"default": [
-					"item-water"
-				]
+	"item": {
+		"uid": "q12cmsx5ussy30wyjiea8yaw",
+		"id": "item:water",
+		"title": "Water",
+		"description": "Basic water resource produced by wells and consumed by farms.",
+		"asset": {
+			"default": [
+				"item-water"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 8,
+		"merge": [
+			{
+				"target": {
+					"type": "item",
+					"itemId": "item:tree"
+				},
+				"action": "consume",
+				"effect": "replace",
+				"result": "item:double-tree"
 			},
-			"scope": "any",
-			"maxStackSize": 8,
-			"merge": [
-				{
-					"target": {
-						"type": "item",
-						"itemId": "item:tree"
-					},
-					"action": "consume",
-					"effect": "replace",
-					"result": "item:double-tree"
+			{
+				"target": {
+					"type": "item",
+					"itemId": "item:double-tree"
 				},
-				{
-					"target": {
-						"type": "item",
-						"itemId": "item:double-tree"
-					},
-					"action": "consume",
-					"effect": "replace",
-					"result": "item:micro-forest"
+				"action": "consume",
+				"effect": "replace",
+				"result": "item:micro-forest"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemId": "item:micro-forest"
 				},
-				{
-					"target": {
-						"type": "item",
-						"itemId": "item:micro-forest"
-					},
-					"action": "consume",
-					"output": {
-						"set": [
-							{
-								"weight": 1,
-								"roll": [
-									{
-										"type": "chance",
-										"chance": 0.35,
-										"drop": [
-											{
-												"itemId": "item:seed",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									}
-								]
-							}
-						]
-					},
-					"effect": "keep"
-				}
-			],
-			"type": "simple"
-		}
+				"action": "consume",
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "chance",
+									"chance": 0.35,
+									"drop": [
+										{
+											"itemId": "item:seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "keep"
+			}
+		],
+		"type": "simple"
 	}
 }

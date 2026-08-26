@@ -1,86 +1,84 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"producer:vegetable-garden-t1": {
-			"uid": "x0gaosb8xxm4nupoh6hjqs2l",
-			"id": "producer:vegetable-garden-t1",
-			"title": "Vegetable Garden I",
-			"description": "Consumes water to produce vegetables.",
-			"asset": {
-				"default": [
-					"producer-vegetable-garden-t1"
-				]
-			},
-			"scope": "any",
-			"maxCount": 1,
-			"maxStackSize": 1,
-			"maxQueueSize": 1,
-			"type": "producer",
-			"lines": [
-				{
-					"id": "line:vegetable-garden-t1:vegetables",
-					"title": "Vegetables",
-					"description": "Runs vegetables for Vegetable Garden I.",
-					"default": false,
-					"show": true,
-					"enable": true,
-					"runtimeMs": 20000,
-					"input": [
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:water"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 4
-						}
-					],
-					"output": {
-						"set": [
-							{
-								"weight": 1,
-								"roll": [
-									{
-										"type": "guaranteed",
-										"drop": [
-											{
-												"itemId": "item:vegetables",
-												"quantity": {
-													"min": 2,
-													"max": 2
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									},
-									{
-										"type": "chance",
-										"chance": 0.35,
-										"drop": [
-											{
-												"itemId": "item:vegetables",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									}
-								]
-							}
-						]
-					},
-					"rules": []
-				}
+	"item": {
+		"uid": "x0gaosb8xxm4nupoh6hjqs2l",
+		"id": "producer:vegetable-garden-t1",
+		"title": "Vegetable Garden I",
+		"description": "Consumes water to produce vegetables.",
+		"asset": {
+			"default": [
+				"producer-vegetable-garden-t1"
 			]
-		}
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"type": "producer",
+		"lines": [
+			{
+				"id": "line:vegetable-garden-t1:vegetables",
+				"title": "Vegetables",
+				"description": "Runs vegetables for Vegetable Garden I.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 20000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:water"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 4
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:vegetables",
+											"quantity": {
+												"min": 2,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.35,
+									"drop": [
+										{
+											"itemId": "item:vegetables",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
 	}
 }

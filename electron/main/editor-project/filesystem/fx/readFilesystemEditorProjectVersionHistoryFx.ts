@@ -50,7 +50,7 @@ export const readFilesystemEditorProjectVersionHistoryFx = Effect.fn(
 		"The Editor version head is invalid.",
 	);
 	const versions = new Map<string, FilesystemEditorPublishedVersion>();
-	for (const versionId of head.versionIds) {
+	for (const versionId of head.versions) {
 		const descriptorFile = yield* paths.versionDescriptorFileFx(versionId);
 		const manifestFile = yield* paths.versionManifestFileFx(versionId);
 		yield* assertCanonicalPathFx(descriptorFile);
@@ -60,10 +60,6 @@ export const readFilesystemEditorProjectVersionHistoryFx = Effect.fn(
 			(candidate) => EditorVersionDescriptorFileSchema.parse(candidate),
 			`Editor version ${versionId} descriptor is invalid.`,
 		);
-		if (descriptor.versionId !== versionId)
-			return yield* Effect.fail(
-				new Error(`Editor version descriptor does not match version ${versionId}.`),
-			);
 		const manifest = yield* readJsonFx(
 			manifestFile,
 			(candidate) => EditorVersionManifestSchema.parse(candidate),

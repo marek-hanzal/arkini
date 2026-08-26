@@ -70,4 +70,4 @@ explicit `--public-key` available for inspecting another distribution. Trust is 
 
 - `official`: the detached signature matches the embedded public key and exact Arkpack bytes;
 - `external / unsigned`: no detached signature was provided;
-- `invalid`: signature metadata is malformed or its cryptographic verification fails.
+- `invalid`: the raw base64 signature is malformed or its cryptographic verification fails.

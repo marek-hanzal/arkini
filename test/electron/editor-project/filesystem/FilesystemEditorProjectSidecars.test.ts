@@ -54,10 +54,10 @@ describe("filesystem Editor project sidecars", () => {
 		if (scenarioName === undefined) throw new Error("Expected a scenario file.");
 		const scenarioPath = join(root, "scenarios", scenarioName);
 		const scenarioFile = JSON.parse(await readFile(scenarioPath, "utf8")) as {
-			bytesBase64: string;
+			save: string;
 			updatedAtMs: number;
 		};
-		scenarioFile.bytesBase64 = Buffer.from(Uint8Array.of(9)).toString("base64");
+		scenarioFile.save = Buffer.from(Uint8Array.of(9)).toString("base64");
 		scenarioFile.updatedAtMs += 1;
 		await writeFile(scenarioPath, `${JSON.stringify(scenarioFile, null, "\t")}\n`);
 

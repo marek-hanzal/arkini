@@ -1,19 +1,17 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:grain": {
-			"uid": "ujchpeh2nppa2vx3rrh4p6bi",
-			"id": "item:grain",
-			"title": "Grain",
-			"description": "Harvested grain produced by farms and milled into flour or used as pig feed.",
-			"asset": {
-				"default": [
-					"item-grain"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 50,
-			"type": "simple"
-		}
+	"item": {
+		"uid": "ujchpeh2nppa2vx3rrh4p6bi",
+		"id": "item:grain",
+		"title": "Grain",
+		"description": "Harvested grain produced by farms and milled into flour or used as pig feed.",
+		"asset": {
+			"default": [
+				"item-grain"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 50,
+		"type": "simple"
 	}
 }

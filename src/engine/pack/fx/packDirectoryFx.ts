@@ -67,9 +67,8 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 		}),
 	);
 	const bytes = yield* encodeFx({
-		packageId: identity.packageId,
 		version: identity.version,
-		game: ArkiniVersionSchema.parse(ArkiniAppVersion),
+		arkini: ArkiniVersionSchema.parse(ArkiniAppVersion),
 		config,
 		resources: pngAssets,
 	});
@@ -123,7 +122,7 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 		if (signature !== undefined) {
 			yield* writeSyncedFileFx(
 				path.join(pending, signatureFilename),
-				new TextEncoder().encode(`${JSON.stringify(signature, undefined, "\t")}\n`),
+				new TextEncoder().encode(`${signature}\n`),
 			);
 		}
 

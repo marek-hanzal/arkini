@@ -3,6 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { match, P } from "ts-pattern";
 
+import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
+
 import { buildEditorProjectCommandAtom } from "~/bridge/arkpack/editor/buildEditorProjectCommandAtom";
 import { installBuiltEditorArkpackCommandAtom } from "~/bridge/arkpack/editor/installBuiltEditorArkpackCommandAtom";
 import {
@@ -10,6 +12,7 @@ import {
 	readEditorBuildDiagnosticsFx,
 } from "~/bridge/arkpack/editor/readEditorBuildDiagnosticsFx";
 import { saveBuiltEditorArkpackCommandAtom } from "~/bridge/arkpack/editor/saveBuiltEditorArkpackCommandAtom";
+import { readArkpackArtifactNames } from "~/bridge/arkpack/readArkpackArtifactNames";
 import { exportEditorJsonDirectoryCommandAtom } from "~/bridge/editor/exportEditorJsonDirectoryCommandAtom";
 import type { EditorSourceExport } from "~/bridge/editor/exportEditorJsonDirectoryFx";
 import { openEditorExportDirectoryCommandAtom } from "~/bridge/editor/openEditorExportDirectoryCommandAtom";
@@ -189,7 +192,7 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 		.with(
 			P.nonNullable,
 			(currentArtifact) =>
-				`${currentArtifact.filename} · ${RendererRuntime.runSync(formatByteSizeFx(currentArtifact.bytes))} · v${currentArtifact.version} · Arkini ${currentArtifact.game} · ${currentArtifact.signatureFilename === undefined ? "unsigned" : "signed"} · ${currentArtifact.contentHash}`,
+				`${readArkpackArtifactNames(currentArtifact.projectId).arkpack} · ${RendererRuntime.runSync(formatByteSizeFx(currentArtifact.size))} · v${project.version} · Arkini ${ArkiniAppVersion} · ${currentArtifact.signed ? "signed" : "unsigned"} · ${currentArtifact.contentHash}`,
 		)
 		.otherwise(() => undefined);
 	const installedPackageId =

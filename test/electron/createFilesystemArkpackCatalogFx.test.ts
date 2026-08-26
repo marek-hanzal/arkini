@@ -34,9 +34,7 @@ afterEach(async () => {
 describe("createFilesystemArkpackCatalogFx", () => {
 	it("discovers convention-named files and their optional signatures without descriptors", async () => {
 		const roots = readRoots(root);
-		const signature = {
-			signature: "detached-signature",
-		};
+		const signature = "detached-signature";
 		await writePackage({
 			root: roots.bundled,
 			packageId: "arkini",
@@ -45,7 +43,7 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		});
 		await writePackage({
 			root: roots.user,
-			packageId: "package:manual",
+			packageId: "package.manual",
 			bytes: userBytes,
 		});
 		await writeFile(join(roots.user, "descriptor.json"), "not catalog authority");
@@ -60,7 +58,7 @@ describe("createFilesystemArkpackCatalogFx", () => {
 				source: "bundled",
 			}),
 			readFileRecord({
-				packageId: "package:manual",
+				packageId: "package.manual",
 				bytes: userBytes,
 				source: "user",
 			}),
@@ -70,9 +68,7 @@ describe("createFilesystemArkpackCatalogFx", () => {
 	it("prefers the user copy and reveals the untouched bundled package after removal", async () => {
 		const roots = readRoots(root);
 		const packageId = "arkini";
-		const userSignature = {
-			signature: "user-signature",
-		};
+		const userSignature = "user-signature";
 		const bundledPath = await writePackage({
 			root: roots.bundled,
 			packageId,
@@ -245,12 +241,8 @@ describe("createFilesystemArkpackCatalogFx", () => {
 	])("rolls back the pair when $failure fails with previous=$previous", async (scenario) => {
 		const roots = readRoots(root);
 		const packageId = "atomic-pair";
-		const oldSignature = {
-			signature: btoa(String.fromCharCode(...new Uint8Array(64).fill(1))),
-		};
-		const nextSignature = {
-			signature: btoa(String.fromCharCode(...new Uint8Array(64).fill(2))),
-		};
+		const oldSignature = btoa(String.fromCharCode(...new Uint8Array(64).fill(1)));
+		const nextSignature = btoa(String.fromCharCode(...new Uint8Array(64).fill(2)));
 		const output = readPackagePath(roots.user, packageId);
 		if (scenario.previous)
 			await writePackage({
@@ -286,7 +278,7 @@ describe("createFilesystemArkpackCatalogFx", () => {
 
 		if (scenario.previous) {
 			expect(new Uint8Array(await readFile(output))).toEqual(bundledBytes);
-			expect(JSON.parse(await readFile(signatureOutput, "utf8"))).toEqual(oldSignature);
+			expect((await readFile(signatureOutput, "utf8")).trim()).toBe(oldSignature);
 		} else {
 			await expect(access(output)).rejects.toBeDefined();
 			await expect(access(signatureOutput)).rejects.toBeDefined();

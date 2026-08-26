@@ -1,137 +1,135 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"producer:house-t4": {
-			"uid": "bmokwx0i6umn5qoa96cb08j3",
-			"id": "producer:house-t4",
-			"title": "House",
-			"description": "Prestige housing that consumes luxury goods to produce the highest morale and all lower morale tiers.",
-			"asset": {
-				"default": [
-					"producer-house-t4"
-				]
-			},
-			"scope": "any",
-			"maxCount": 1,
-			"maxStackSize": 1,
-			"maxQueueSize": 1,
-			"type": "producer",
-			"lines": [
-				{
-					"id": "line:house-t4:morale-t4",
-					"title": "Morale T4",
-					"description": "Runs morale t4 for House.",
-					"default": false,
-					"show": true,
-					"enable": true,
-					"runtimeMs": 40000,
-					"input": [
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:luxury-clothing"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 3
-						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:feast"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 3
-						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:wine-glass"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 3
-						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:coin-stack"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 5
-						}
-					],
-					"output": {
-						"set": [
-							{
-								"weight": 1,
-								"roll": [
-									{
-										"type": "guaranteed",
-										"drop": [
-											{
-												"itemId": "item:morale-t4",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											},
-											{
-												"itemId": "item:morale-t3",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											},
-											{
-												"itemId": "item:morale-t2",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											},
-											{
-												"itemId": "item:morale-t1",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									}
-								]
-							}
-						]
-					},
-					"rules": []
-				}
+	"item": {
+		"uid": "bmokwx0i6umn5qoa96cb08j3",
+		"id": "producer:house-t4",
+		"title": "House",
+		"description": "Prestige housing that consumes luxury goods to produce the highest morale and all lower morale tiers.",
+		"asset": {
+			"default": [
+				"producer-house-t4"
 			]
-		}
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"type": "producer",
+		"lines": [
+			{
+				"id": "line:house-t4:morale-t4",
+				"title": "Morale T4",
+				"description": "Runs morale t4 for House.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 40000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:luxury-clothing"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 3
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:feast"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 3
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:wine-glass"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 3
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:coin-stack"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 5
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:morale-t4",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "item:morale-t3",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "item:morale-t2",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "item:morale-t1",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
 	}
 }

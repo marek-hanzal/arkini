@@ -57,6 +57,9 @@ const installEditorApi = () => {
 		readProjectBuild: vi.fn(async () => {
 			throw new Error("Unexpected build read.");
 		}),
+		saveProjectBuild: vi.fn(async () => {
+			throw new Error("Unexpected build save.");
+		}),
 		isSignKeyConfigured: vi.fn(async () => false),
 		status: vi.fn(async () => ({
 			type: "ready" as const,

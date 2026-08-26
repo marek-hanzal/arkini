@@ -16,7 +16,7 @@ export const writeSigningGame = async (root: string) => {
 		join(gameDirectory, "project.json"),
 		`${JSON.stringify({
 			arkini: ArkiniAppVersion,
-			updatedAtMs: 1,
+			revision: 1,
 		})}\n`,
 	);
 	await writeFile(
@@ -27,7 +27,7 @@ export const writeSigningGame = async (root: string) => {
 		join(gameDirectory, "game.json"),
 		`${JSON.stringify({
 			$schema: "./schema.json",
-			arkpack: "1.0",
+			version: "1.0",
 			meta: {
 				id: "game:signing-workflow",
 				title: "Signing workflow",
@@ -52,21 +52,19 @@ export const writeSigningGame = async (root: string) => {
 		join(gameDirectory, "items", "simple", "item.json"),
 		`${JSON.stringify({
 			$schema: "../../schema.json",
-			items: {
-				item: {
-					uid: "item",
-					id: "item",
-					type: "simple",
-					title: "Item",
-					description: "Signing fixture item.",
-					asset: {
-						default: [
-							"item",
-						],
-					},
-					scope: "any",
-					maxStackSize: 1,
+			item: {
+				uid: "item",
+				id: "item",
+				type: "simple",
+				title: "Item",
+				description: "Signing fixture item.",
+				asset: {
+					default: [
+						"item",
+					],
 				},
+				scope: "any",
+				maxStackSize: 1,
 			},
 		})}\n`,
 	);

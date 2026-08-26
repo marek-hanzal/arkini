@@ -1,158 +1,156 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"producer:shrine-t1": {
-			"uid": "gj2lgf3liprvpu390sbw7dhl",
-			"id": "producer:shrine-t1",
-			"title": "Wayside Shrine",
-			"description": "Turns simple offerings into temporary production blessings.",
-			"asset": {
-				"default": [
-					"producer-shrine-t1"
-				]
-			},
-			"scope": "any",
-			"maxCount": 1,
-			"maxStackSize": 1,
-			"maxQueueSize": 2,
-			"type": "producer",
-			"lines": [
-				{
-					"id": "line:shrine-t1:minor-haste",
-					"title": "Minor Haste",
-					"description": "Consumes a simple offering to produce a temporary Minor Haste blessing.",
-					"default": false,
-					"show": true,
-					"enable": true,
-					"runtimeMs": 60000,
-					"input": [
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:water"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 4
-						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:stone"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 4
-						}
-					],
-					"output": {
-						"set": [
-							{
-								"weight": 1,
-								"roll": [
-									{
-										"type": "guaranteed",
-										"drop": [
-											{
-												"itemId": "item:effect:minor-haste",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									}
-								]
-							}
-						]
-					},
-					"rules": []
-				},
-				{
-					"id": "line:shrine-t1:bountiful-offering",
-					"title": "Bountiful Offering",
-					"description": "Consumes a larger offering to produce a temporary Bountiful Offering blessing.",
-					"default": false,
-					"show": true,
-					"enable": true,
-					"runtimeMs": 60000,
-					"input": [
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:log"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 4
-						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:stone"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 4
-						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:water"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 4
-						}
-					],
-					"output": {
-						"set": [
-							{
-								"weight": 1,
-								"roll": [
-									{
-										"type": "guaranteed",
-										"drop": [
-											{
-												"itemId": "item:effect:bountiful-offering",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									}
-								]
-							}
-						]
-					},
-					"rules": []
-				}
+	"item": {
+		"uid": "gj2lgf3liprvpu390sbw7dhl",
+		"id": "producer:shrine-t1",
+		"title": "Wayside Shrine",
+		"description": "Turns simple offerings into temporary production blessings.",
+		"asset": {
+			"default": [
+				"producer-shrine-t1"
 			]
-		}
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"maxQueueSize": 2,
+		"type": "producer",
+		"lines": [
+			{
+				"id": "line:shrine-t1:minor-haste",
+				"title": "Minor Haste",
+				"description": "Consumes a simple offering to produce a temporary Minor Haste blessing.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 60000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:water"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 4
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stone"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 4
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:effect:minor-haste",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "line:shrine-t1:bountiful-offering",
+				"title": "Bountiful Offering",
+				"description": "Consumes a larger offering to produce a temporary Bountiful Offering blessing.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 60000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:log"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 4
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stone"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 4
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:water"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 4
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:effect:bountiful-offering",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
 	}
 }

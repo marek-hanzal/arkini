@@ -35,7 +35,7 @@ export namespace EditorProjectRepository {
 		readonly contentHash: string;
 		readonly expectedRevision: number;
 		readonly projectId: string;
-		readonly signatureFilename?: string;
+		readonly signed: boolean;
 	}
 
 	export interface OpenProjectProps {

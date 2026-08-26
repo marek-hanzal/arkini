@@ -56,10 +56,9 @@ describe("MainMenu", () => {
 				{
 					packageId: "competing-official",
 					contentHash: "b".repeat(64),
-					gameId: "other-game",
 					title: "Other Game",
 					version: "1.0",
-					game: "1",
+					arkini: "1",
 					trust: {
 						type: "official",
 					} as const,
@@ -68,10 +67,9 @@ describe("MainMenu", () => {
 				{
 					packageId: "arkini",
 					contentHash: "a".repeat(64),
-					gameId: "arkini",
 					title: "Arkini",
 					version: "1.0",
-					game: "1",
+					arkini: "1",
 					trust: {
 						type: "official",
 					} as const,

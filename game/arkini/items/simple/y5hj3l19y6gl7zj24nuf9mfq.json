@@ -1,19 +1,17 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:grapes": {
-			"uid": "y5hj3l19y6gl7zj24nuf9mfq",
-			"id": "item:grapes",
-			"title": "Grapes",
-			"description": "Harvested grapes produced by wineries when supplied with water near a vineyard.",
-			"asset": {
-				"default": [
-					"item-grapes"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 50,
-			"type": "simple"
-		}
+	"item": {
+		"uid": "y5hj3l19y6gl7zj24nuf9mfq",
+		"id": "item:grapes",
+		"title": "Grapes",
+		"description": "Harvested grapes produced by wineries when supplied with water near a vineyard.",
+		"asset": {
+			"default": [
+				"item-grapes"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 50,
+		"type": "simple"
 	}
 }

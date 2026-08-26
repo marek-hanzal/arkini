@@ -81,7 +81,7 @@ export const ArkpackCatalogList = ({
 									) : null}
 								</div>
 								<p className="mt-1 truncate text-xs text-subtle">
-									{arkpack.filename ?? `${arkpack.gameId} · ${arkpack.game}`}
+									{arkpack.filename ?? `${arkpack.packageId} · ${arkpack.arkini}`}
 								</p>
 							</div>
 							<div className="flex min-w-0 flex-wrap items-center gap-2 sm:shrink-0">

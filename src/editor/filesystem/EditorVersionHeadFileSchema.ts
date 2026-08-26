@@ -5,31 +5,31 @@ import { IdSchema } from "~/engine/common/schema/IdSchema";
 /** The single publication pointer to the currently checked-out version. */
 export const EditorVersionHeadFileSchema = z
 	.object({
-		versionId: IdSchema,
-		versionIds: z.array(IdSchema).min(1),
+		current: IdSchema,
+		versions: z.array(IdSchema).min(1),
 	})
 	.strict()
-	.superRefine(({ versionId, versionIds }, context) => {
+	.superRefine(({ current, versions }, context) => {
 		const seen = new Set<string>();
-		for (const [index, candidate] of versionIds.entries()) {
+		for (const [index, candidate] of versions.entries()) {
 			if (seen.has(candidate)) {
 				context.addIssue({
 					code: "custom",
 					message: `Duplicate published versionId ${candidate}.`,
 					path: [
-						"versionIds",
+						"versions",
 						index,
 					],
 				});
 			}
 			seen.add(candidate);
 		}
-		if (!seen.has(versionId)) {
+		if (!seen.has(current)) {
 			context.addIssue({
 				code: "custom",
-				message: "The current versionId must be present in versionIds.",
+				message: "The current version must be present in versions.",
 				path: [
-					"versionId",
+					"current",
 				],
 			});
 		}

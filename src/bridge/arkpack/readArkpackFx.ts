@@ -96,23 +96,21 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 			}),
 		);
 	}
-	if (packageId !== undefined && packageId !== payload.packageId) {
+	const payloadPackageId = payload.config.meta.id;
+	if (packageId !== undefined && packageId !== payloadPackageId) {
 		return yield* Effect.fail(
 			new Error(
-				`Arkpack filename declares package ${packageId}, but its signed payload declares ${payload.packageId}.`,
+				`Arkpack filename declares package ${packageId}, but its config declares ${payloadPackageId}.`,
 			),
 		);
 	}
-	const gameId = payload.config.meta.id;
-
 	return {
 		descriptor: {
-			packageId: payload.packageId,
+			packageId: payloadPackageId,
 			contentHash,
-			gameId,
 			title: payload.config.meta.title,
 			version: payload.version,
-			game: payload.game,
+			arkini: payload.arkini,
 			trust: verification.trust,
 			source,
 			overridesBundled,

@@ -78,10 +78,9 @@ const createGame = (
 	arkpack: {
 		packageId: "package:menu",
 		contentHash: "content:menu",
-		gameId: "game:menu",
 		title: "Menu game",
 		version: "1.0",
-		game: "1.0",
+		arkini: "1.0",
 		trust: {
 			type: "external",
 			reason: "unsigned",

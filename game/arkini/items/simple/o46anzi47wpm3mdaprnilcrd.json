@@ -1,19 +1,17 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:iron-armor": {
-			"uid": "o46anzi47wpm3mdaprnilcrd",
-			"id": "item:iron-armor",
-			"title": "Iron Armor",
-			"description": "Heavy iron armor upgraded by the Armory from leather armor, iron ingots, nails, and charcoal-fired fittings.",
-			"asset": {
-				"default": [
-					"item-iron-armor"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 1,
-			"type": "simple"
-		}
+	"item": {
+		"uid": "o46anzi47wpm3mdaprnilcrd",
+		"id": "item:iron-armor",
+		"title": "Iron Armor",
+		"description": "Heavy iron armor upgraded by the Armory from leather armor, iron ingots, nails, and charcoal-fired fittings.",
+		"asset": {
+			"default": [
+				"item-iron-armor"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
 	}
 }

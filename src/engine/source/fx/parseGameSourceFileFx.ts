@@ -59,7 +59,7 @@ export const parseGameSourceFileFx = Effect.fn("parseGameSourceFileFx")(
 			}
 
 			if (gameProjectRoot) {
-				const { arkpack, ...value } = parsed.data as GameProjectFileSchema.Type;
+				const { version, ...value } = parsed.data as GameProjectFileSchema.Type;
 				return {
 					source: {
 						path,
@@ -67,28 +67,24 @@ export const parseGameSourceFileFx = Effect.fn("parseGameSourceFileFx")(
 					},
 					projectIdentity: {
 						packageId: value.meta.id,
-						version: arkpack,
+						version,
 					},
 					diagnostics: [],
 				};
 			}
 			if (!gameProjectRoot) {
 				const value = parsed.data as GameProjectItemFileSchema.Type;
-				const entry = Object.entries(value.items)[0];
-				if (entry === undefined) throw new Error("Parsed item file contains no item.");
-				const [itemId, item] = entry;
+				const item = value.item;
 				const segments = relative.split("/");
 				const expectedFilename = `${encodeURIComponent(item.uid).replaceAll(".", "%2E")}.json`;
 				const formatError =
 					segments.length !== 3 || segments[0] !== "items"
 						? "Expected items/<type>/<encoded uid>.json."
-						: item.id !== itemId
-							? `Item record key ${JSON.stringify(itemId)} differs from item ID ${JSON.stringify(item.id)}.`
-							: item.type !== segments[1]
-								? `Item type ${JSON.stringify(item.type)} differs from directory ${JSON.stringify(segments[1])}.`
-								: segments[2] !== expectedFilename
-									? `Item UID ${JSON.stringify(item.uid)} requires filename ${JSON.stringify(expectedFilename)}.`
-									: undefined;
+						: item.type !== segments[1]
+							? `Item type ${JSON.stringify(item.type)} differs from directory ${JSON.stringify(segments[1])}.`
+							: segments[2] !== expectedFilename
+								? `Item UID ${JSON.stringify(item.uid)} requires filename ${JSON.stringify(expectedFilename)}.`
+								: undefined;
 				if (formatError !== undefined) {
 					return {
 						diagnostics: [
@@ -96,8 +92,7 @@ export const parseGameSourceFileFx = Effect.fn("parseGameSourceFileFx")(
 								code: DiagnosticCodeEnumSchema.enum.SourceSchemaInvalid,
 								severity: DiagnosticSeverityEnumSchema.enum.Error,
 								path: [
-									"items",
-									itemId,
+									"item",
 								],
 								source: path,
 								message: formatError,
@@ -108,10 +103,16 @@ export const parseGameSourceFileFx = Effect.fn("parseGameSourceFileFx")(
 				}
 			}
 
+			const itemFile = parsed.data as GameProjectItemFileSchema.Type;
 			return {
 				source: {
 					path,
-					value: parsed.data,
+					value: {
+						$schema: itemFile.$schema,
+						items: {
+							[itemFile.item.id]: itemFile.item,
+						},
+					},
 				},
 				diagnostics: [],
 			};

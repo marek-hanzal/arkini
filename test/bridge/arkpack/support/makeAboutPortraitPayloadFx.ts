@@ -25,9 +25,8 @@ export const makeAboutPortraitPayloadFx = Effect.fn("makeAboutPortraitPayloadFx"
 	({ roles }: makeAboutPortraitPayloadFx.Props) =>
 		Effect.sync(
 			(): PayloadSchema.Type => ({
-				packageId: "package:avatars",
 				version: "1.0",
-				game: ArkiniAppVersion,
+				arkini: ArkiniAppVersion,
 				config: GameConfigSchema.parse({
 					resources: {
 						hero: "hero",

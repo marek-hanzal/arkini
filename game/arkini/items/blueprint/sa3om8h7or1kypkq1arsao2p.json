@@ -1,179 +1,177 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:blueprint-blacksmith-t1": {
-			"uid": "sa3om8h7or1kypkq1arsao2p",
-			"id": "item:blueprint-blacksmith-t1",
-			"title": "Blacksmith I Blueprint",
-			"description": "Build plan that can be filled with metalworking resources to construct Blacksmith I.",
-			"asset": {
-				"default": [
-					"blueprint",
-					"producer-blacksmith-t1"
-				],
-				"sources": [
-					"producer-blacksmith-t1"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 1,
-			"charges": {
-				"amount": 1
-			},
-			"type": "blueprint",
-			"line": {
-				"id": "line:blueprint:blacksmith-t1:construct",
-				"title": "Construct Blacksmith I",
-				"description": "Consumes construction resources to build Blacksmith I.",
-				"default": true,
-				"show": true,
-				"enable": true,
-				"runtimeMs": 65000,
-				"input": [
-					{
-						"charges": {
-							"cost": 1,
-							"from": "self"
-						},
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:construction-bundle"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						},
-						"capacity": 0
+	"item": {
+		"uid": "sa3om8h7or1kypkq1arsao2p",
+		"id": "item:blueprint-blacksmith-t1",
+		"title": "Blacksmith I Blueprint",
+		"description": "Build plan that can be filled with metalworking resources to construct Blacksmith I.",
+		"asset": {
+			"default": [
+				"blueprint",
+				"producer-blacksmith-t1"
+			],
+			"sources": [
+				"producer-blacksmith-t1"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 1
+		},
+		"type": "blueprint",
+		"line": {
+			"id": "line:blueprint:blacksmith-t1:construct",
+			"title": "Construct Blacksmith I",
+			"description": "Consumes construction resources to build Blacksmith I.",
+			"default": true,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 65000,
+			"input": [
+				{
+					"charges": {
+						"cost": 1,
+						"from": "self"
 					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:guild-charter"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						},
-						"capacity": 0
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:construction-bundle"
 					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:bricks"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 2,
-							"max": 2
-						},
-						"capacity": 0
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
 					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:iron-ingot"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 2,
-							"max": 2
-						},
-						"capacity": 0
-					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:charcoal"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 2,
-							"max": 2
-						},
-						"capacity": 0
-					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:coin"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 8,
-							"max": 8
-						},
-						"capacity": 0
-					}
-				],
-				"output": {
-					"set": [
-						{
-							"weight": 1,
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:blacksmith-t1",
-											"quantity": {
-												"min": 1,
-												"max": 1
-											},
-											"placement": "drop",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
+					"capacity": 0
 				},
-				"rules": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:guild-charter"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:bricks"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:iron-ingot"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:charcoal"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:coin"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 8,
+						"max": 8
+					},
+					"capacity": 0
+				}
+			],
+			"output": {
+				"set": [
 					{
-						"when": [
+						"weight": 1,
+						"roll": [
 							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "producer:academy"
-									},
-									"scope": "universe"
-								},
-								"type": "exists"
-							},
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "producer:purifier-t1"
-									},
-									"scope": "universe"
-								},
-								"type": "exists"
-							},
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "producer:smelter-t1"
-									},
-									"scope": "universe"
-								},
-								"type": "exists"
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "producer:blacksmith-t1",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
 							}
-						],
-						"type": "enable"
+						]
 					}
 				]
-			}
+			},
+			"rules": [
+				{
+					"when": [
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:academy"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						},
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:purifier-t1"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						},
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:smelter-t1"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						}
+					],
+					"type": "enable"
+				}
+			]
 		}
 	}
 }

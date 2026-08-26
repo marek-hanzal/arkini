@@ -1,106 +1,104 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"producer:house-t2": {
-			"uid": "nka3wzetxpcmshbc4b92bqxz",
-			"id": "producer:house-t2",
-			"title": "House",
-			"description": "Improved housing that consumes processed food and coins to produce stronger morale while still creating lower morale.",
-			"asset": {
-				"default": [
-					"producer-house-t2"
-				]
-			},
-			"scope": "any",
-			"maxCount": 1,
-			"maxStackSize": 1,
-			"maxQueueSize": 1,
-			"type": "producer",
-			"lines": [
-				{
-					"id": "line:house-t2:morale-t2",
-					"title": "Morale T2",
-					"description": "Runs morale t2 for House.",
-					"default": false,
-					"show": true,
-					"enable": true,
-					"runtimeMs": 24000,
-					"input": [
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:bread"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 3
-						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:water"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 3
-						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:coin"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 7
-						}
-					],
-					"output": {
-						"set": [
-							{
-								"weight": 1,
-								"roll": [
-									{
-										"type": "guaranteed",
-										"drop": [
-											{
-												"itemId": "item:morale-t2",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											},
-											{
-												"itemId": "item:morale-t1",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									}
-								]
-							}
-						]
-					},
-					"rules": []
-				}
+	"item": {
+		"uid": "nka3wzetxpcmshbc4b92bqxz",
+		"id": "producer:house-t2",
+		"title": "House",
+		"description": "Improved housing that consumes processed food and coins to produce stronger morale while still creating lower morale.",
+		"asset": {
+			"default": [
+				"producer-house-t2"
 			]
-		}
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"type": "producer",
+		"lines": [
+			{
+				"id": "line:house-t2:morale-t2",
+				"title": "Morale T2",
+				"description": "Runs morale t2 for House.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 24000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:bread"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 3
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:water"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 3
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:coin"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 7
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:morale-t2",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"itemId": "item:morale-t1",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
 	}
 }

@@ -1,163 +1,161 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"producer:quarry-t2": {
-			"uid": "q30e8ts0nqqhlgvzhvog57ry",
-			"id": "producer:quarry-t2",
-			"title": "Quarry",
-			"description": "Upgraded quarry that keeps common stone extraction and adds marble extraction near marble deposits.",
-			"asset": {
-				"default": [
-					"producer-quarry-t2"
-				]
-			},
-			"scope": "any",
-			"maxCount": 1,
-			"maxStackSize": 1,
-			"maxQueueSize": 1,
-			"type": "producer",
-			"lines": [
-				{
-					"id": "line:quarry-t2:stone",
-					"title": "Stone",
-					"description": "Runs stone for Quarry.",
-					"default": false,
-					"show": true,
-					"enable": true,
-					"runtimeMs": 10000,
-					"input": [
+	"item": {
+		"uid": "q30e8ts0nqqhlgvzhvog57ry",
+		"id": "producer:quarry-t2",
+		"title": "Quarry",
+		"description": "Upgraded quarry that keeps common stone extraction and adds marble extraction near marble deposits.",
+		"asset": {
+			"default": [
+				"producer-quarry-t2"
+			]
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"type": "producer",
+		"lines": [
+			{
+				"id": "line:quarry-t2:stone",
+				"title": "Stone",
+				"description": "Runs stone for Quarry.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 10000,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
 						{
-							"type": "simple"
-						}
-					],
-					"output": {
-						"set": [
-							{
-								"weight": 1,
-								"roll": [
-									{
-										"type": "guaranteed",
-										"drop": [
-											{
-												"itemId": "item:stone",
-												"quantity": {
-													"min": 2,
-													"max": 2
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									},
-									{
-										"type": "chance",
-										"chance": 0.35,
-										"drop": [
-											{
-												"itemId": "item:stone",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									}
-								]
-							}
-						]
-					},
-					"rules": [
-						{
-							"when": [
+							"weight": 1,
+							"roll": [
 								{
-									"query": {
-										"selector": {
-											"type": "item",
-											"itemId": "item:marble-deposit"
-										},
-										"scope": "board",
-										"distance": "close"
-									},
-									"type": "exists"
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:stone",
+											"quantity": {
+												"min": 2,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.35,
+									"drop": [
+										{
+											"itemId": "item:stone",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
 								}
-							],
-							"type": "enable"
+							]
 						}
 					]
 				},
-				{
-					"id": "line:quarry-t2:marble",
-					"title": "Marble",
-					"description": "Runs marble for Quarry.",
-					"default": false,
-					"show": true,
-					"enable": true,
-					"runtimeMs": 22000,
-					"input": [
-						{
-							"type": "simple"
-						}
-					],
-					"output": {
-						"set": [
+				"rules": [
+					{
+						"when": [
 							{
-								"weight": 1,
-								"roll": [
-									{
-										"type": "guaranteed",
-										"drop": [
-											{
-												"itemId": "item:marble",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "item:marble-deposit"
 									},
-									{
-										"type": "chance",
-										"chance": 0.25,
-										"drop": [
-											{
-												"itemId": "item:marble",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									}
-								]
+									"scope": "board",
+									"distance": "close"
+								},
+								"type": "exists"
 							}
-						]
-					},
-					"rules": [
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "line:quarry-t2:marble",
+				"title": "Marble",
+				"description": "Runs marble for Quarry.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 22000,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"output": {
+					"set": [
 						{
-							"when": [
+							"weight": 1,
+							"roll": [
 								{
-									"query": {
-										"selector": {
-											"type": "item",
-											"itemId": "item:marble-deposit"
-										},
-										"scope": "board",
-										"distance": "close"
-									},
-									"type": "exists"
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:marble",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.25,
+									"drop": [
+										{
+											"itemId": "item:marble",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
 								}
-							],
-							"type": "enable"
+							]
 						}
 					]
-				}
-			]
-		}
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "item:marble-deposit"
+									},
+									"scope": "board",
+									"distance": "close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			}
+		]
 	}
 }

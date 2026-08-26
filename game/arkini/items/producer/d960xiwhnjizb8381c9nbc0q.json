@@ -1,114 +1,112 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"producer:coal-mine-t1": {
-			"uid": "d960xiwhnjizb8381c9nbc0q",
-			"id": "producer:coal-mine-t1",
-			"title": "Coal Mine I",
-			"description": "Mines coal carts from a nearby coal deposit using food and water for the crew.",
-			"asset": {
-				"default": [
-					"producer-coal-mine-t1"
-				]
-			},
-			"scope": "any",
-			"maxCount": 1,
-			"maxStackSize": 1,
-			"maxQueueSize": 1,
-			"type": "producer",
-			"lines": [
-				{
-					"id": "line:coal-mine-t1:coal",
-					"title": "Coal",
-					"description": "Runs coal for Coal Mine I.",
-					"default": false,
-					"show": true,
-					"enable": true,
-					"runtimeMs": 50000,
-					"input": [
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:bread"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 2,
-								"max": 2
-							},
-							"capacity": 4
+	"item": {
+		"uid": "d960xiwhnjizb8381c9nbc0q",
+		"id": "producer:coal-mine-t1",
+		"title": "Coal Mine I",
+		"description": "Mines coal carts from a nearby coal deposit using food and water for the crew.",
+		"asset": {
+			"default": [
+				"producer-coal-mine-t1"
+			]
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"type": "producer",
+		"lines": [
+			{
+				"id": "line:coal-mine-t1:coal",
+				"title": "Coal",
+				"description": "Runs coal for Coal Mine I.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 50000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:bread"
 						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:water"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 4
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
 						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:common-clothing"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 4
-						}
-					],
-					"output": {
-						"set": [
-							{
-								"weight": 1,
-								"roll": [
-									{
-										"type": "guaranteed",
-										"drop": [
-											{
-												"itemId": "item:coal",
-												"quantity": {
-													"min": 2,
-													"max": 2
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									}
-								]
-							}
-						]
+						"capacity": 4
 					},
-					"rules": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:water"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 4
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:common-clothing"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 4
+					}
+				],
+				"output": {
+					"set": [
 						{
-							"when": [
+							"weight": 1,
+							"roll": [
 								{
-									"query": {
-										"selector": {
-											"type": "item",
-											"itemId": "item:coal-deposit"
-										},
-										"scope": "board",
-										"distance": "close"
-									},
-									"type": "exists"
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:coal",
+											"quantity": {
+												"min": 2,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
 								}
-							],
-							"type": "enable"
+							]
 						}
 					]
-				}
-			]
-		}
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "item:coal-deposit"
+									},
+									"scope": "board",
+									"distance": "close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			}
+		]
 	}
 }

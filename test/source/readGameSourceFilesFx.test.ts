@@ -21,7 +21,7 @@ describe("readGameSourceFilesFx", () => {
 				path.join(input, "project.json"),
 				JSON.stringify({
 					arkini: ArkiniAppVersion,
-					updatedAtMs: 1,
+					revision: 1,
 				}),
 			);
 			yield* fileSystem.writeFileString(
@@ -35,7 +35,7 @@ describe("readGameSourceFilesFx", () => {
 			yield* fileSystem.writeFileString(
 				path.join(input, "items", "simple", "invalid.json"),
 				JSON.stringify({
-					items: [],
+					item: [],
 				}),
 			);
 			const result = yield* readGameSourceFilesFx({

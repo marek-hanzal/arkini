@@ -77,7 +77,7 @@ export const writeGameProjectFixtureFx = Effect.fn("writeGameProjectFixtureFx")(
 		path.join(input, "project.json"),
 		JSON.stringify({
 			arkini: ArkiniAppVersion,
-			updatedAtMs: 1,
+			revision: 1,
 		}),
 	);
 	yield* fileSystem.writeFileString(
@@ -88,7 +88,7 @@ export const writeGameProjectFixtureFx = Effect.fn("writeGameProjectFixtureFx")(
 		path.join(input, "game.json"),
 		JSON.stringify({
 			$schema: "./schema.json",
-			arkpack: "2.3",
+			version: "2.3",
 			...root,
 		}),
 	);
@@ -96,9 +96,7 @@ export const writeGameProjectFixtureFx = Effect.fn("writeGameProjectFixtureFx")(
 		path.join(items, "water.json"),
 		JSON.stringify({
 			$schema: "../../schema.json",
-			items: {
-				water: authoredItems.water,
-			},
+			item: authoredItems.water,
 		}),
 	);
 	yield* fileSystem.writeFile(path.join(resources, "hero.png"), png);

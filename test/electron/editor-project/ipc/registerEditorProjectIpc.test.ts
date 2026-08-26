@@ -66,6 +66,9 @@ const electron = vi.hoisted(() => {
 					canceled: true,
 					filePaths: [],
 				})),
+				showSaveDialog: vi.fn(async () => ({
+					canceled: true,
+				})),
 			},
 		},
 	};
@@ -114,6 +117,7 @@ const projectChannels = [
 	ArkiniElectronApi.channels.editorAwaitIdle,
 	ArkiniElectronApi.channels.editorProjectBuild,
 	ArkiniElectronApi.channels.editorProjectBuildRead,
+	ArkiniElectronApi.channels.editorProjectBuildSave,
 	ArkiniElectronApi.channels.editorSignKeyConfigured,
 	ArkiniElectronApi.channels.editorProjectCreate,
 	ArkiniElectronApi.channels.editorProjectDelete,
@@ -249,6 +253,7 @@ describe("registerEditorProjectIpcFx", () => {
 				projectId: "project-one",
 				expectedRevision: 1,
 				contentHash: "a".repeat(64),
+				signed: false,
 			}),
 		).resolves.toEqual({
 			type: "success",
@@ -259,6 +264,17 @@ describe("registerEditorProjectIpcFx", () => {
 					3,
 				]),
 			},
+		});
+		await expect(
+			invoke(ArkiniElectronApi.channels.editorProjectBuildSave, {
+				projectId: "project-one",
+				expectedRevision: 1,
+				contentHash: "a".repeat(64),
+				signed: false,
+			}),
+		).resolves.toEqual({
+			type: "success",
+			value: false,
 		});
 		await expect(invoke(ArkiniElectronApi.channels.editorProjectList)).resolves.toEqual({
 			type: "success",

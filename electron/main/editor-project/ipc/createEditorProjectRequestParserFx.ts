@@ -42,7 +42,7 @@ const readProjectBuildSchema = z
 		contentHash: z.string().regex(/^[a-f0-9]{64}$/),
 		expectedRevision: z.number().int().nonnegative(),
 		projectId: IdSchema,
-		signatureFilename: z.string().min(1).optional(),
+		signed: z.boolean(),
 	})
 	.strict();
 const upsertItemSchema = z

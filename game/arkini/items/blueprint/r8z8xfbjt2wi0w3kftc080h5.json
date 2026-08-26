@@ -1,169 +1,167 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:blueprint-house-t3": {
-			"uid": "r8z8xfbjt2wi0w3kftc080h5",
-			"id": "item:blueprint-house-t3",
-			"title": "House III Blueprint",
-			"description": "Build plan for House III, a housing producer that generates morale.",
-			"asset": {
-				"default": [
-					"blueprint",
-					"producer-house-t3"
-				],
-				"sources": [
-					"producer-house-t3"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 1,
-			"charges": {
-				"amount": 1
-			},
-			"type": "blueprint",
-			"line": {
-				"id": "line:blueprint:house-t3:construct",
-				"title": "Construct House III",
-				"description": "Consumes construction resources to build House III.",
-				"default": true,
-				"show": true,
-				"enable": true,
-				"runtimeMs": 36000,
-				"input": [
-					{
-						"charges": {
-							"cost": 1,
-							"from": "self"
-						},
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "producer:house-t2"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						},
-						"capacity": 0
+	"item": {
+		"uid": "r8z8xfbjt2wi0w3kftc080h5",
+		"id": "item:blueprint-house-t3",
+		"title": "House III Blueprint",
+		"description": "Build plan for House III, a housing producer that generates morale.",
+		"asset": {
+			"default": [
+				"blueprint",
+				"producer-house-t3"
+			],
+			"sources": [
+				"producer-house-t3"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 1
+		},
+		"type": "blueprint",
+		"line": {
+			"id": "line:blueprint:house-t3:construct",
+			"title": "Construct House III",
+			"description": "Consumes construction resources to build House III.",
+			"default": true,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 36000,
+			"input": [
+				{
+					"charges": {
+						"cost": 1,
+						"from": "self"
 					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:building-permit"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						},
-						"capacity": 0
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "producer:house-t2"
 					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:plank"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 2,
-							"max": 2
-						},
-						"capacity": 0
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
 					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:stone-block"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 4,
-							"max": 4
-						},
-						"capacity": 0
-					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:common-clothing"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						},
-						"capacity": 0
-					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:morale-t2"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						},
-						"capacity": 0
-					}
-				],
-				"output": {
-					"set": [
-						{
-							"weight": 1,
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:house-t3",
-											"quantity": {
-												"min": 1,
-												"max": 1
-											},
-											"placement": "drop",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
+					"capacity": 0
 				},
-				"rules": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:building-permit"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:plank"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:stone-block"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 4,
+						"max": 4
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:common-clothing"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:morale-t2"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				}
+			],
+			"output": {
+				"set": [
 					{
-						"when": [
+						"weight": 1,
+						"roll": [
 							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "producer:civic-office-t1"
-									},
-									"scope": "universe"
-								},
-								"type": "exists"
-							},
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "producer:tailor-workshop-t1"
-									},
-									"scope": "universe"
-								},
-								"type": "exists"
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "producer:house-t3",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
 							}
-						],
-						"type": "enable"
+						]
 					}
 				]
-			}
+			},
+			"rules": [
+				{
+					"when": [
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:civic-office-t1"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						},
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:tailor-workshop-t1"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						}
+					],
+					"type": "enable"
+				}
+			]
 		}
 	}
 }

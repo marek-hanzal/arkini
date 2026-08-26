@@ -8,10 +8,9 @@ type ArkpackSource = "bundled" | "user";
 export interface ArkpackDescriptor {
 	readonly packageId: string;
 	readonly contentHash: string;
-	readonly gameId: string;
 	readonly title: string;
 	readonly version: ArkpackVersionSchema.Type;
-	readonly game: ArkiniVersionSchema.Type;
+	readonly arkini: ArkiniVersionSchema.Type;
 	readonly trust: ArkpackTrustSchema.Type;
 	readonly source: ArkpackSource;
 	readonly overridesBundled?: boolean;

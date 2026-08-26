@@ -176,9 +176,9 @@ export const createFilesystemEditorBoardScenarioOperationsFx = Effect.fn(
 							target,
 							EditorBoardScenarioFileSchema.parse({
 								name: written.name,
-								projectRevision: written.projectRevision,
-								arkpackVersion: written.version,
-								bytesBase64: Buffer.from(written.bytes).toString("base64"),
+								revision: written.projectRevision,
+								version: written.version,
+								save: Buffer.from(written.bytes).toString("base64"),
 								createdAtMs: written.createdAtMs,
 								updatedAtMs: written.updatedAtMs,
 							}),

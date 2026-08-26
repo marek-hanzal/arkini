@@ -4,7 +4,7 @@ export const createArtifact = (contentHash: string, revision: number) => ({
 	contentHash,
 	diagnostics: [],
 	filename: "editor-test.arkpack",
-	game: "0.5.0",
+	arkini: "0.5.0",
 	revision,
 	version: "1.0",
 });

@@ -4,6 +4,7 @@ import { join } from "node:path";
 import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { ElectronMainError } from "../ElectronMainError";
+import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
 
 export namespace readArkpackFileFx {
 	export interface Props {
@@ -19,7 +20,8 @@ export const readArkpackFileFx = Effect.fn("readArkpackFileFx")(
 	({ root, fileSystem, packageId, source }: readArkpackFileFx.Props) =>
 		Effect.gen(function* () {
 			if (packageId.length === 0) return null;
-			const filename = `${encodeURIComponent(packageId)}.arkpack`;
+			const stem = encodeGameProjectFileStem(packageId);
+			const filename = `${stem}.arkpack`;
 			const path = join(root, filename);
 			if (!(yield* fileSystem.exists(path))) return null;
 			const info = yield* fileSystem.stat(path);
@@ -31,7 +33,7 @@ export const readArkpackFileFx = Effect.fn("readArkpackFileFx")(
 				);
 			}
 			const bytes = yield* fileSystem.readFile(path);
-			const signaturePath = join(root, `${encodeURIComponent(packageId)}.arksig`);
+			const signaturePath = join(root, `${stem}.arksig`);
 			const signature = yield* fileSystem.exists(signaturePath).pipe(
 				Effect.flatMap((exists) =>
 					exists
@@ -44,13 +46,7 @@ export const readArkpackFileFx = Effect.fn("readArkpackFileFx")(
 										),
 								),
 								Effect.andThen(fileSystem.readFileString(signaturePath)),
-								Effect.map((value) => {
-									try {
-										return JSON.parse(value) as unknown;
-									} catch {
-										return value;
-									}
-								}),
+								Effect.map((value) => value.trim()),
 							)
 						: Effect.succeed(undefined),
 				),

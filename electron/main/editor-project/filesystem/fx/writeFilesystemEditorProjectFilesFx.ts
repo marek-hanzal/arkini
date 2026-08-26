@@ -90,7 +90,7 @@ const createSnapshotFx = Effect.fn("writeFilesystemEditorProjectFilesFx.createSn
 			try: () =>
 				GameProjectFileSchema.parse({
 					$schema: GameProjectGameSchemaReference,
-					arkpack,
+					version: arkpack,
 					...gameCandidate,
 				}),
 			catch: (cause) =>
@@ -120,9 +120,7 @@ const createSnapshotFx = Effect.fn("writeFilesystemEditorProjectFilesFx.createSn
 			});
 			const value = {
 				$schema: GameProjectItemSchemaReference,
-				items: {
-					[itemId]: item,
-				},
+				item,
 			};
 			const collision = addUniqueTarget(itemWrites, {
 				target,

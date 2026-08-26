@@ -72,7 +72,6 @@ llm:cache() {
 		registry="https://registry.npmjs.org/"
 		npm_args=(
 			ci
-			--legacy-peer-deps
 			--omit=peer
 			--registry="$registry"
 			--cache="$cache_dir"

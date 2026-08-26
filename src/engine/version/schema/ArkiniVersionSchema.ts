@@ -1,16 +1,11 @@
 import { z } from "zod";
+import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 
 /** Arkini application version sourced from the root package manifest. */
-export const ArkiniVersionSchema = z
-	.string()
-	.regex(
-		/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/,
-		"Expected an Arkini semantic version like 0.5.0.",
-	)
-	.meta({
-		id: "ArkiniVersionSchema",
-		description: "The Arkini application version that wrote a persisted artifact.",
-	});
+export const ArkiniVersionSchema = z.literal(ArkiniAppVersion).meta({
+	id: "ArkiniVersionSchema",
+	description: "The exact Arkini application version accepted by this build.",
+});
 
 export type ArkiniVersionSchema = typeof ArkiniVersionSchema;
 

@@ -1,0 +1,19 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:stone": {
+			"uid": "ncasueyzu754nmujz90zrw9b",
+			"id": "item:stone",
+			"title": "Stone",
+			"description": "Basic stone material produced by quarries.",
+			"asset": {
+				"default": [
+					"item-stone"
+				]
+			},
+			"scope": "any",
+			"maxStackSize": 16,
+			"type": "simple"
+		}
+	}
+}

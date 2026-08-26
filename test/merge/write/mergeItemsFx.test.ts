@@ -57,6 +57,7 @@ const makeState = ({
 				quantity: targetQuantity,
 			},
 		],
+		jobQueue: [],
 		jobs: [],
 	}) satisfies StateSchema.Type;
 

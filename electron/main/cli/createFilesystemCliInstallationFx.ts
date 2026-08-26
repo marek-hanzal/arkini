@@ -9,7 +9,7 @@ import type { CliInstallation } from "./CliInstallation";
 
 const isMissing = (cause: unknown) =>
 	typeof cause === "object" && cause !== null && "code" in cause && cause.code === "ENOENT";
-const managedCommandMarker = "# arkini-cli managed launcher v1";
+const managedCommandMarker = "# arkini-cli managed launcher";
 const quoteShellArgument = (value: string) => `'${value.replaceAll("'", `'"'"'`)}'`;
 
 type CommandInspection =

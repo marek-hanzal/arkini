@@ -1,0 +1,207 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"producer:farm-t1": {
+			"uid": "fjjuce8efhff6sor2qhukdzl",
+			"id": "producer:farm-t1",
+			"title": "Farm I",
+			"description": "Consumes water and produces grain when placed near a wheat field.",
+			"asset": {
+				"default": [
+					"producer-farm-t1"
+				]
+			},
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 5,
+			"type": "producer",
+			"lines": [
+				{
+					"id": "line:farm-t1:grain",
+					"title": "Grain",
+					"description": "Runs grain for Farm I.",
+					"default": false,
+					"show": true,
+					"enable": true,
+					"runtimeMs": 18000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:water"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 2,
+								"max": 2
+							},
+							"capacity": 4
+						},
+						{
+							"charges": {
+								"cost": 1,
+								"from": "target"
+							},
+							"type": "deposit",
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "item:wheat-field"
+								},
+								"scope": "board",
+								"distance": "close"
+							}
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"weight": 1,
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:grain",
+												"quantity": {
+													"min": 2,
+													"max": 2
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.4,
+										"drop": [
+											{
+												"itemId": "item:grain",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.1,
+										"drop": [
+											{
+												"itemId": "item:quest:farmers-favor",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					"rules": []
+				},
+				{
+					"id": "line:farm-t1:grain-morale-t1",
+					"title": "Grain (Inspired)",
+					"description": "Runs grain (inspired) for Farm I.",
+					"default": false,
+					"show": true,
+					"enable": true,
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:water"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 2,
+								"max": 2
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:morale-t1"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 4
+						},
+						{
+							"charges": {
+								"cost": 1,
+								"from": "target"
+							},
+							"type": "deposit",
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "item:wheat-field"
+								},
+								"scope": "board",
+								"distance": "close"
+							}
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"weight": 1,
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:grain",
+												"quantity": {
+													"min": 4,
+													"max": 4
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.25,
+										"drop": [
+											{
+												"itemId": "item:grain",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					"rules": []
+				}
+			]
+		}
+	}
+}

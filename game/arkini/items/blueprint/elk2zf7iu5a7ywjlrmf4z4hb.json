@@ -1,0 +1,156 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:blueprint-stonemason-t2": {
+			"uid": "elk2zf7iu5a7ywjlrmf4z4hb",
+			"id": "item:blueprint-stonemason-t2",
+			"title": "Stonemason Blueprint",
+			"description": "Build plan that upgrades Stonemason 1 into Stonemason 2 for marble block finishing.",
+			"asset": {
+				"default": [
+					"blueprint",
+					"producer-stonemason-t2"
+				],
+				"sources": [
+					"producer-stonemason-t2"
+				]
+			},
+			"scope": "any",
+			"maxStackSize": 1,
+			"charges": {
+				"amount": 1
+			},
+			"type": "blueprint",
+			"line": {
+				"id": "line:blueprint:stonemason-t2:construct",
+				"title": "Construct Stonemason",
+				"description": "Consumes construction resources to build Stonemason.",
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 75000,
+				"input": [
+					{
+						"charges": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "producer:stonemason-t1"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:construction-bundle"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:guild-charter"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stained-glass"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:coin-stack"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:stonemason-t2",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "producer:quarry-t2"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							},
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "producer:university"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			}
+		}
+	}
+}

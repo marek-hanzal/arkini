@@ -1,0 +1,19 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:coal-deposit": {
+			"uid": "g4g8a0vgbdfk7yhed4a4xbrz",
+			"id": "item:coal-deposit",
+			"title": "Coal Deposit",
+			"description": "Movable coal source used by nearby coal mines.",
+			"asset": {
+				"default": [
+					"item-coal-deposit"
+				]
+			},
+			"scope": "any",
+			"maxStackSize": 1,
+			"type": "simple"
+		}
+	}
+}

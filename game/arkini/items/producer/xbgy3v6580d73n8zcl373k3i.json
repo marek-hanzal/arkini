@@ -1,0 +1,494 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"producer:blacksmith-t1": {
+			"uid": "xbgy3v6580d73n8zcl373k3i",
+			"id": "producer:blacksmith-t1",
+			"title": "Blacksmith I",
+			"description": "Guild-era iron sink that forges nails, axes, and swords from iron ingots and charcoal.",
+			"asset": {
+				"default": [
+					"producer-blacksmith-t1"
+				]
+			},
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"type": "producer",
+			"lines": [
+				{
+					"id": "line:blacksmith-t1:nails",
+					"title": "Nails",
+					"description": "Runs nails for Blacksmith I.",
+					"default": false,
+					"show": true,
+					"enable": true,
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:iron-ingot"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 6
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:charcoal"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 6
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"weight": 1,
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:nails",
+												"quantity": {
+													"min": 6,
+													"max": 6
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.35,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.06,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					"rules": [
+						{
+							"when": [
+								{
+									"query": {
+										"selector": {
+											"type": "item",
+											"itemId": "producer:purifier-t1"
+										},
+										"scope": "board",
+										"distance": "far"
+									},
+									"type": "exists"
+								}
+							],
+							"type": "enable"
+						}
+					]
+				},
+				{
+					"id": "line:blacksmith-t1:axe",
+					"title": "Axe",
+					"description": "Runs axe for Blacksmith I.",
+					"default": false,
+					"show": true,
+					"enable": true,
+					"runtimeMs": 20000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:iron-ingot"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 6
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:plank"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 6
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:charcoal"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 6
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"weight": 1,
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:axe",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.4,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.08,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					"rules": [
+						{
+							"when": [
+								{
+									"query": {
+										"selector": {
+											"type": "item",
+											"itemId": "producer:purifier-t1"
+										},
+										"scope": "board",
+										"distance": "far"
+									},
+									"type": "exists"
+								}
+							],
+							"type": "enable"
+						}
+					]
+				},
+				{
+					"id": "line:blacksmith-t1:pickaxe",
+					"title": "Pickaxe",
+					"description": "Runs pickaxe for Blacksmith I.",
+					"default": false,
+					"show": true,
+					"enable": true,
+					"runtimeMs": 20000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:iron-ingot"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 6
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:plank"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 6
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:charcoal"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 6
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"weight": 1,
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:pickaxe",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.4,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.08,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					"rules": [
+						{
+							"when": [
+								{
+									"query": {
+										"selector": {
+											"type": "item",
+											"itemId": "producer:purifier-t1"
+										},
+										"scope": "board",
+										"distance": "far"
+									},
+									"type": "exists"
+								}
+							],
+							"type": "enable"
+						}
+					]
+				},
+				{
+					"id": "line:blacksmith-t1:sword",
+					"title": "Sword",
+					"description": "Runs sword for Blacksmith I.",
+					"default": false,
+					"show": true,
+					"enable": true,
+					"runtimeMs": 26000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:iron-ingot"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 2,
+								"max": 2
+							},
+							"capacity": 6
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:leather"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 6
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:charcoal"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 6
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"weight": 1,
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:sword",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.45,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.1,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					"rules": [
+						{
+							"when": [
+								{
+									"query": {
+										"selector": {
+											"type": "item",
+											"itemId": "producer:purifier-t1"
+										},
+										"scope": "board",
+										"distance": "far"
+									},
+									"type": "exists"
+								}
+							],
+							"type": "enable"
+						}
+					]
+				}
+			]
+		}
+	}
+}

@@ -5,14 +5,13 @@ import { describe, expect, it } from "vitest";
 import { collectSourceFilesFx } from "~/engine/source/fx/collectSourceFilesFx";
 
 describe("collectSourceFilesFx", () => {
-	it("uses the Editor allowlist without changing recursive legacy discovery", async () => {
+	it("collects only the current portable project allowlist", async () => {
 		const result = await Effect.runPromise(
 			Effect.gen(function* () {
 				const fileSystem = yield* FileSystem.FileSystem;
 				const path = yield* Path.Path;
 				const root = yield* fileSystem.makeTempDirectoryScoped();
-				const editor = path.join(root, "editor");
-				const legacy = path.join(root, "legacy");
+				const project = path.join(root, "project");
 				const writeFiles = (directory: string, files: ReadonlyArray<string>) =>
 					Effect.forEach(files, (relative) => {
 						const destination = path.join(directory, relative);
@@ -23,8 +22,8 @@ describe("collectSourceFilesFx", () => {
 							.pipe(Effect.andThen(fileSystem.writeFileString(destination, "{}")));
 					});
 
-				yield* writeFiles(editor, [
-					"editor.json",
+				yield* writeFiles(project, [
+					"project.json",
 					"game.json",
 					"items/producer/kept.json",
 					"items/producer/nested/ignored.json",
@@ -38,12 +37,6 @@ describe("collectSourceFilesFx", () => {
 					"ignored.json",
 					"ignored.png",
 				]);
-				yield* writeFiles(legacy, [
-					"schema.json",
-					"notes/nested.json",
-					"objects/nested.png",
-				]);
-
 				const collectRelative = (directory: string) =>
 					collectSourceFilesFx({
 						input: directory,
@@ -54,28 +47,17 @@ describe("collectSourceFilesFx", () => {
 						})),
 					);
 
-				return {
-					editor: yield* collectRelative(editor),
-					legacy: yield* collectRelative(legacy),
-				};
+				return yield* collectRelative(project);
 			}).pipe(Effect.provide(NodeServices.layer), Effect.scoped),
 		);
 
-		expect(result.editor).toEqual({
+		expect(result).toEqual({
 			json: [
 				"game.json",
 				"items/producer/kept.json",
 			],
 			png: [
 				"assets/kept.png",
-			],
-		});
-		expect(result.legacy).toEqual({
-			json: [
-				"notes/nested.json",
-			],
-			png: [
-				"objects/nested.png",
 			],
 		});
 	});

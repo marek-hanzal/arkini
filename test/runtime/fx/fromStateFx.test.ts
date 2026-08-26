@@ -245,7 +245,7 @@ describe("fromStateFx", () => {
 					itemId: "missing",
 				};
 			}),
-
+			jobQueue: [],
 			jobs: [],
 		});
 		const result = Effect.runSync(

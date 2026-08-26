@@ -1,0 +1,19 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:luxury-clothing": {
+			"uid": "x7r0osuka2xlvgeuhdeb59ek",
+			"id": "item:luxury-clothing",
+			"title": "Luxury Clothing",
+			"description": "Prestige clothing sewn from luxury cloth, leather, and coins.",
+			"asset": {
+				"default": [
+					"item-luxury-clothing"
+				]
+			},
+			"scope": "any",
+			"maxStackSize": 20,
+			"type": "simple"
+		}
+	}
+}

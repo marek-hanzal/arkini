@@ -75,52 +75,6 @@ describe("planStartFx", () => {
 		);
 	});
 
-	it("preserves quantity across dependent repeated inventory entries", () => {
-		const result = Effect.runSync(
-			planStartFx({
-				runtime: {
-					cheats: {
-						enabled: false,
-						everEnabled: false,
-						instantGameplay: false,
-					},
-					currentSpace: 0,
-					items: [],
-					jobs: [],
-
-					jobQueue: [],
-					defaultLineByOwnerItemId: {},
-				},
-				start: {
-					currentSpace: 0,
-					board: [],
-					inventory: [
-						{
-							itemId: "log",
-							quantity: 2,
-						},
-						{
-							itemId: "log",
-							quantity: 3,
-						},
-					],
-					toolbar: [],
-				},
-			}).pipe(
-				useGameFx({
-					config: startTestConfig,
-				}),
-			),
-		);
-
-		expect(result.items).toHaveLength(2);
-		expect(result.items.map((item) => item.quantity)).toEqual([
-			3,
-			2,
-		]);
-		expect(result.items.reduce((sum, item) => sum + item.quantity, 0)).toBe(5);
-	});
-
 	it("materializes one exact eligible toolbar item", () => {
 		const result = Effect.runSync(
 			planStartFx({

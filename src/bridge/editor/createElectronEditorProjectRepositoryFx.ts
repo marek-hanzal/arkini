@@ -36,26 +36,12 @@ const versionReferenceSchema = z.discriminatedUnion("type", [
 ]);
 const versionDescriptorSchema = z
 	.object({
-		applicability: z.discriminatedUnion("type", [
-			z
-				.object({
-					type: z.literal("applicable"),
-				})
-				.strict(),
-			z
-				.object({
-					type: z.literal("incompatible"),
-					reason: z.string(),
-				})
-				.strict(),
-		]),
 		arkini: ArkiniVersionSchema,
 		arkpackVersion: ArkpackVersionSchema,
 		body: z.string().optional(),
 		createdAtMs: z.number().int().nonnegative(),
 		parentVersionId: z.string().min(1).optional(),
 		projectId: z.string().min(1),
-		snapshotFormatVersion: z.number().int().positive(),
 		sourceRevision: z.number().int().nonnegative(),
 		subject: z.string().min(1),
 		tag: z.string().optional(),

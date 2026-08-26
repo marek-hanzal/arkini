@@ -1,0 +1,19 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:cheese": {
+			"uid": "km2e6ghecnw36izu8c2apdvq",
+			"id": "item:cheese",
+			"title": "Cheese",
+			"description": "Processed dairy food produced from milk and used by cookhouses and markets.",
+			"asset": {
+				"default": [
+					"item-cheese"
+				]
+			},
+			"scope": "any",
+			"maxStackSize": 50,
+			"type": "simple"
+		}
+	}
+}

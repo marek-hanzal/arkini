@@ -1,0 +1,19 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:milk": {
+			"uid": "l9supm5zubu6wyq5yiqtoh8c",
+			"id": "item:milk",
+			"title": "Milk",
+			"description": "Fresh milk produced by cattle farms for base food supply chains.",
+			"asset": {
+				"default": [
+					"item-milk"
+				]
+			},
+			"scope": "any",
+			"maxStackSize": 50,
+			"type": "simple"
+		}
+	}
+}

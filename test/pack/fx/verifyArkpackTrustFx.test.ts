@@ -31,7 +31,7 @@ describe("Arkpack Ed25519 trust", () => {
 	it("constructs the exact version-one domain-separated payload", () => {
 		const payload = Effect.runSync(createArkpackSigningPayloadFx(bytes));
 		expect(new TextDecoder().decode(payload)).toBe(
-			`arkini:arkpack:v1\0${new TextDecoder().decode(bytes)}`,
+			`arkini:arkpack\0${new TextDecoder().decode(bytes)}`,
 		);
 		expect(payload.slice(-bytes.byteLength)).toEqual(bytes);
 	});

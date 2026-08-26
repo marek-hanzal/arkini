@@ -2,11 +2,11 @@ import { z } from "zod";
 
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 
-const EditorMcpItemTypeSchema = z
-	.enum(ItemEnumSchema.options)
-	.describe(
+const EditorMcpItemTypeSchema = z.enum(ItemEnumSchema.options).meta({
+	id: "EditorMcpItemTypeSchema",
+	description:
 		"A canonical Arkini item type: deposit, blueprint, simple, producer, craft, stash, temporary, or inventory.",
-	);
+});
 
 export const EditorMcpItemCollectionInputSchema = z
 	.object({
@@ -29,6 +29,12 @@ export const EditorMcpItemCollectionInputSchema = z
 			.optional()
 			.describe("Optional fuzzy search across item title, ID, description, and type."),
 	})
-	.strict();
+	.strict()
+	.meta({
+		id: "EditorMcpItemCollectionInputSchema",
+		$id: "urn:arkini:schema:mcp:item-collection-input",
+		title: "Item collection tool input",
+		description: "Pagination, filtering, and search for the item collection tool.",
+	});
 
 export type EditorMcpItemCollectionInput = z.output<typeof EditorMcpItemCollectionInputSchema>;

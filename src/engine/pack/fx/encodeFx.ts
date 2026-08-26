@@ -14,7 +14,6 @@ export const encodeFx = Effect.fn("encodeFx")(function* ({
 	return yield* Effect.sync(() => {
 		const configBytes = encode(config);
 		const manifestBytes = encode({
-			format: 3,
 			packageId,
 			version,
 			game,

@@ -1,15 +1,15 @@
 import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
-import { EditorProjectFileSchema } from "~/editor/filesystem/EditorProjectFileSchema";
-import { EditorProjectGameFileSchema } from "~/editor/filesystem/EditorProjectGameFileSchema";
 import {
-	EditorProjectGameSchemaReference,
-	EditorProjectItemSchemaReference,
-} from "~/editor/filesystem/EditorProjectSchemaReference";
+	GameProjectGameSchemaReference,
+	GameProjectItemSchemaReference,
+} from "~/engine/source/GameProjectReference";
+import { GameProjectFileSchema } from "~/engine/source/schema/GameProjectFileSchema";
+import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { createEditorJsonSchema } from "~/engine/schema/fx/writeGameJsonSchemaFx";
+import { createGameProjectJsonSchema } from "~/engine/schema/fx/writeGameProjectJsonSchemaFx";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import { createEditorProjectFilesystemPathsFx } from "../createEditorProjectFilesystemPathsFx";
 import type { EditorProjectFilesystemPaths } from "../EditorProjectFilesystemPaths";
@@ -29,7 +29,7 @@ interface BinaryWrite {
 }
 
 interface FilesystemSnapshot {
-	readonly marker: EditorProjectFileSchema.Type;
+	readonly marker: GameProjectManifestSchema.Type;
 	readonly game: JsonWrite;
 	readonly items: ReadonlyMap<string, JsonWrite>;
 	readonly resources: ReadonlyMap<string, BinaryWrite>;
@@ -64,7 +64,7 @@ const createSnapshotFx = Effect.fn("writeFilesystemEditorProjectFilesFx.createSn
 				}),
 		});
 		const marker = yield* Effect.try({
-			try: () => EditorProjectFileSchema.parse(files.marker),
+			try: () => GameProjectManifestSchema.parse(files.marker),
 			catch: (cause) =>
 				new Error("The Editor project marker is invalid.", {
 					cause,
@@ -87,8 +87,8 @@ const createSnapshotFx = Effect.fn("writeFilesystemEditorProjectFilesFx.createSn
 		const { $schema: _schema, items, ...gameCandidate } = config;
 		const game = yield* Effect.try({
 			try: () =>
-				EditorProjectGameFileSchema.parse({
-					$schema: EditorProjectGameSchemaReference,
+				GameProjectFileSchema.parse({
+					$schema: GameProjectGameSchemaReference,
 					arkpack,
 					...gameCandidate,
 				}),
@@ -118,7 +118,7 @@ const createSnapshotFx = Effect.fn("writeFilesystemEditorProjectFilesFx.createSn
 				uid: item.uid,
 			});
 			const value = {
-				$schema: EditorProjectItemSchemaReference,
+				$schema: GameProjectItemSchemaReference,
 				items: {
 					[itemId]: item,
 				},
@@ -222,7 +222,7 @@ export const writeFilesystemEditorProjectFilesFx = Effect.fn("writeFilesystemEdi
 				);
 		}
 
-		yield* replaceFilesystemEditorJsonFx(paths.schemaFile, createEditorJsonSchema());
+		yield* replaceFilesystemEditorJsonFx(paths.schemaFile, createGameProjectJsonSchema());
 		yield* replaceFilesystemEditorJsonFx(nextSnapshot.game.target, nextSnapshot.game.value);
 		for (const write of [
 			...nextSnapshot.items.values(),
@@ -288,6 +288,6 @@ export const writeFilesystemEditorProjectFilesFx = Effect.fn("writeFilesystemEdi
 		}
 
 		// The marker is the publication boundary and must only advertise the completed tree.
-		yield* replaceFilesystemEditorJsonFx(paths.editorFile, nextSnapshot.marker);
+		yield* replaceFilesystemEditorJsonFx(paths.projectFile, nextSnapshot.marker);
 	},
 );

@@ -40,7 +40,13 @@ export const EditorMcpCreateItemInputSchemas = {
 			scope: draftScope,
 			maxStackSize: draftMaxStackSize,
 		})
-		.strict(),
+		.strict()
+		.meta({
+			id: "EditorMcpCreateSimpleItemInputSchema",
+			$id: "urn:arkini:schema:mcp:create-simple-item-input",
+			title: "Create simple item tool input",
+			description: "Authoring fields accepted when creating one simple item.",
+		}),
 	producer: ProducerItemSchema.omit({
 		asset: true,
 		lines: true,
@@ -61,7 +67,13 @@ export const EditorMcpCreateItemInputSchemas = {
 					"Optional non-empty product lines; defaults to the Editor's initial producer line.",
 				),
 		})
-		.strict(),
+		.strict()
+		.meta({
+			id: "EditorMcpCreateProducerItemInputSchema",
+			$id: "urn:arkini:schema:mcp:create-producer-item-input",
+			title: "Create producer item tool input",
+			description: "Authoring fields accepted when creating one producer item.",
+		}),
 	craft: CraftItemSchema.omit({
 		asset: true,
 		line: true,
@@ -78,7 +90,13 @@ export const EditorMcpCreateItemInputSchemas = {
 				.optional()
 				.describe("Optional product line; defaults to the Editor's initial craft line."),
 		})
-		.strict(),
+		.strict()
+		.meta({
+			id: "EditorMcpCreateCraftItemInputSchema",
+			$id: "urn:arkini:schema:mcp:create-craft-item-input",
+			title: "Create craft item tool input",
+			description: "Authoring fields accepted when creating one craft item.",
+		}),
 	blueprint: BlueprintItemSchema.omit({
 		asset: true,
 		line: true,
@@ -97,7 +115,13 @@ export const EditorMcpCreateItemInputSchemas = {
 					"Optional product line; defaults to the Editor's initial blueprint line.",
 				),
 		})
-		.strict(),
+		.strict()
+		.meta({
+			id: "EditorMcpCreateBlueprintItemInputSchema",
+			$id: "urn:arkini:schema:mcp:create-blueprint-item-input",
+			title: "Create blueprint item tool input",
+			description: "Authoring fields accepted when creating one blueprint item.",
+		}),
 	deposit: DepositItemSchema.omit({
 		asset: true,
 		lines: true,
@@ -114,7 +138,13 @@ export const EditorMcpCreateItemInputSchemas = {
 			maxQueueSize: draftMaxQueueSize,
 			lines: DepositItemSchema.shape.lines.optional(),
 		})
-		.strict(),
+		.strict()
+		.meta({
+			id: "EditorMcpCreateDepositItemInputSchema",
+			$id: "urn:arkini:schema:mcp:create-deposit-item-input",
+			title: "Create deposit item tool input",
+			description: "Authoring fields accepted when creating one deposit item.",
+		}),
 	stash: StashItemSchema.omit({
 		asset: true,
 		line: true,
@@ -131,7 +161,13 @@ export const EditorMcpCreateItemInputSchemas = {
 				.optional()
 				.describe("Optional product line; defaults to the Editor's initial stash line."),
 		})
-		.strict(),
+		.strict()
+		.meta({
+			id: "EditorMcpCreateStashItemInputSchema",
+			$id: "urn:arkini:schema:mcp:create-stash-item-input",
+			title: "Create stash item tool input",
+			description: "Authoring fields accepted when creating one stash item.",
+		}),
 	temporary: TemporaryItemSchema.omit({
 		asset: true,
 		durationMs: true,
@@ -146,7 +182,13 @@ export const EditorMcpCreateItemInputSchemas = {
 				.optional()
 				.describe("Optional lifetime in milliseconds; defaults to 500."),
 		})
-		.strict(),
+		.strict()
+		.meta({
+			id: "EditorMcpCreateTemporaryItemInputSchema",
+			$id: "urn:arkini:schema:mcp:create-temporary-item-input",
+			title: "Create temporary item tool input",
+			description: "Authoring fields accepted when creating one temporary item.",
+		}),
 	inventory: InventoryItemSchema.omit({
 		asset: true,
 		maxCount: true,
@@ -158,7 +200,13 @@ export const EditorMcpCreateItemInputSchemas = {
 		.extend({
 			asset: draftAsset,
 		})
-		.strict(),
+		.strict()
+		.meta({
+			id: "EditorMcpCreateInventoryItemInputSchema",
+			$id: "urn:arkini:schema:mcp:create-inventory-item-input",
+			title: "Create inventory item tool input",
+			description: "Authoring fields accepted when creating one inventory item.",
+		}),
 } as const;
 
 export type EditorMcpCreateItemInput = z.output<

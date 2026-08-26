@@ -103,6 +103,7 @@ const state = {
 			quantity: 1,
 		},
 	],
+	jobQueue: [],
 	jobs: [],
 } satisfies StateSchema.Type;
 

@@ -1,0 +1,2279 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"anyOf": [
+		{
+			"$ref": "urn:arkini:schema:game-project-source#/$defs/GameProjectFileSchema"
+		},
+		{
+			"$ref": "urn:arkini:schema:game-project-source#/$defs/GameProjectItemFileSchema"
+		}
+	],
+	"$id": "urn:arkini:schema:game-project-source",
+	"title": "Arkini game project source schema",
+	"description": "A strict game.json root or one strict UID-owned item fragment.",
+	"$defs": {
+		"GameProjectFileSchema": {
+			"type": "object",
+			"properties": {
+				"$schema": {
+					"type": "string",
+					"const": "./schema.json"
+				},
+				"meta": {
+					"description": "Core metadata and player-available layouts for this game.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/MetaSchema"
+				},
+				"resources": {
+					"description": "Explicit non-item resource roles used by the game shell.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ResourceConfigSchema"
+				},
+				"start": {
+					"description": "The initial board, inventory, and toolbar contents created for a new game.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/StartSchema"
+				},
+				"arkpack": {
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ArkpackVersionSchema"
+				}
+			},
+			"required": [
+				"$schema",
+				"meta",
+				"resources",
+				"start",
+				"arkpack"
+			],
+			"additionalProperties": false,
+			"$id": "urn:arkini:schema:game-project-file",
+			"title": "Arkini game project root file",
+			"description": "The complete game.json contract excluding items owned by items/<type> files."
+		},
+		"IdSchema": {
+			"type": "string",
+			"minLength": 1,
+			"description": "A non-empty exact identity used across Arkini."
+		},
+		"TitleSchema": {
+			"type": "string",
+			"minLength": 1,
+			"description": "A required non-empty configuration title."
+		},
+		"PositiveIntegerSchema": {
+			"type": "integer",
+			"exclusiveMinimum": 0,
+			"maximum": 9007199254740991,
+			"description": "A whole number greater than zero."
+		},
+		"GridSizeSchema": {
+			"type": "object",
+			"properties": {
+				"width": {
+					"description": "The positive number of grid cells arranged horizontally.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"height": {
+					"description": "The positive number of grid cells arranged vertically.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				}
+			},
+			"required": [
+				"width",
+				"height"
+			],
+			"additionalProperties": false,
+			"description": "The explicit width and height of a two-dimensional game grid."
+		},
+		"ToolbarSizeSchema": {
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 64,
+			"description": "The optional toolbar slot count from zero through sixty-four."
+		},
+		"MetaSchema": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "The stable ID of this game configuration.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"title": {
+					"description": "The human-readable title of this game.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/TitleSchema"
+				},
+				"board": {
+					"description": "The size of the board on which items are placed.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/GridSizeSchema"
+				},
+				"inventory": {
+					"description": "The size of the inventory grid available to the player.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/GridSizeSchema"
+				},
+				"toolbarSize": {
+					"description": "The optional one-row toolbar slot count; zero or undefined disables it.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ToolbarSizeSchema"
+				}
+			},
+			"required": [
+				"id",
+				"title",
+				"board",
+				"inventory"
+			],
+			"additionalProperties": false,
+			"description": "Core metadata and player-available layouts for a game."
+		},
+		"ResourceConfigSchema": {
+			"type": "object",
+			"properties": {
+				"hero": {
+					"description": "The explicit resource ID used by the game splash hero.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"avatar-01": {
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"avatar-02": {
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"avatar-03": {
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"avatar-04": {
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"avatar-05": {
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"avatar-06": {
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"avatar-07": {
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				}
+			},
+			"required": [
+				"hero"
+			],
+			"additionalProperties": false,
+			"description": "Named non-item resource references required by the game."
+		},
+		"NonNegativeIntegerSchema": {
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 9007199254740991,
+			"description": "A whole number greater than or equal to zero."
+		},
+		"start.BoardItemSchema": {
+			"type": "object",
+			"properties": {
+				"x": {
+					"description": "The zero-based horizontal grid coordinate.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/NonNegativeIntegerSchema"
+				},
+				"y": {
+					"description": "The zero-based vertical grid coordinate.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/NonNegativeIntegerSchema"
+				},
+				"space": {
+					"description": "The explicit board space containing this initial item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/NonNegativeIntegerSchema"
+				},
+				"itemId": {
+					"description": "The canonical item ID placed on the initial board.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"quantity": {
+					"description": "The optional stack quantity placed in this exact initial board cell; omitted means one.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				}
+			},
+			"required": [
+				"x",
+				"y",
+				"space",
+				"itemId"
+			],
+			"additionalProperties": false,
+			"description": "One canonical item placed at an explicit initial board coordinate."
+		},
+		"start.InventoryItemSchema": {
+			"type": "object",
+			"properties": {
+				"itemId": {
+					"description": "The canonical item ID added to the initial inventory.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"position": {
+					"description": "The exact initial inventory slot occupied by this stack.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositionSchema"
+				},
+				"quantity": {
+					"default": 1,
+					"description": "The positive initial inventory quantity; defaults to one.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				}
+			},
+			"required": [
+				"itemId",
+				"position",
+				"quantity"
+			],
+			"additionalProperties": false,
+			"description": "A positive quantity of one canonical item in the initial inventory."
+		},
+		"PositionSchema": {
+			"type": "object",
+			"properties": {
+				"x": {
+					"description": "The zero-based horizontal grid coordinate.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/NonNegativeIntegerSchema"
+				},
+				"y": {
+					"description": "The zero-based vertical grid coordinate.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/NonNegativeIntegerSchema"
+				}
+			},
+			"required": [
+				"x",
+				"y"
+			],
+			"additionalProperties": false,
+			"description": "One zero-based position in a two-dimensional game grid."
+		},
+		"start.ToolbarItemSchema": {
+			"type": "object",
+			"properties": {
+				"itemId": {
+					"description": "The canonical item ID placed in the initial toolbar.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"quantity": {
+					"description": "The optional stack quantity placed in this exact initial toolbar slot; omitted means one.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"position": {
+					"description": "The exact zero-based initial toolbar slot.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositionSchema"
+				}
+			},
+			"required": [
+				"itemId",
+				"position"
+			],
+			"additionalProperties": false,
+			"description": "One canonical item placed at an explicit initial toolbar slot."
+		},
+		"StartSchema": {
+			"type": "object",
+			"properties": {
+				"currentSpace": {
+					"description": "The board space presented when a new game starts.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/NonNegativeIntegerSchema"
+				},
+				"board": {
+					"default": [],
+					"description": "The items placed at explicit coordinates when a new game starts.",
+					"type": "array",
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/start.BoardItemSchema"
+					}
+				},
+				"inventory": {
+					"default": [],
+					"description": "The item quantities added to inventory when a new game starts.",
+					"type": "array",
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/start.InventoryItemSchema"
+					}
+				},
+				"toolbar": {
+					"default": [],
+					"description": "The items placed at explicit slots when a new game starts.",
+					"type": "array",
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/start.ToolbarItemSchema"
+					}
+				}
+			},
+			"required": [
+				"currentSpace",
+				"board",
+				"inventory",
+				"toolbar"
+			],
+			"additionalProperties": false,
+			"description": "The initial board placements, inventory contents, and toolbar placements for a new game."
+		},
+		"ArkpackVersionSchema": {
+			"type": "string",
+			"pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+			"description": "The arkpack gameplay compatibility version."
+		},
+		"GameProjectItemFileSchema": {
+			"type": "object",
+			"properties": {
+				"$schema": {
+					"type": "string",
+					"const": "../../schema.json"
+				},
+				"items": {
+					"type": "object",
+					"propertyNames": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+					},
+					"additionalProperties": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/ItemSchema"
+					},
+					"description": "The single canonical item owned by this UID-named file.",
+					"minProperties": 1,
+					"maxProperties": 1
+				}
+			},
+			"required": [
+				"$schema",
+				"items"
+			],
+			"additionalProperties": false,
+			"$id": "urn:arkini:schema:game-project-item-file",
+			"title": "Arkini game project item file",
+			"description": "One item fragment stored at items/<type>/<encoded uid>.json."
+		},
+		"ItemSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/BlueprintItemSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/DepositItemSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/SimpleItemSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ProducerItemSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/CraftItemSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/StashItemSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/TemporaryItemSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/InventoryItemSchema"
+				}
+			],
+			"description": "A game item selected by its type discriminator."
+		},
+		"BlueprintItemSchema": {
+			"type": "object",
+			"properties": {
+				"uid": {
+					"description": "The immutable CUID2 identity of this canonical game item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"id": {
+					"description": "The stable authoring ID of this canonical game item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"title": {
+					"description": "The human-readable title of this item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/TitleSchema"
+				},
+				"description": {
+					"description": "The human-readable explanation of this item's purpose.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/DescriptionSchema"
+				},
+				"asset": {
+					"description": "The visual asset definition used to render this item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/AssetSchema"
+				},
+				"scope": {
+					"description": "The part of game state in which this item may be stored.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/StorageScopeEnumSchema"
+				},
+				"maxCount": {
+					"description": "The optional maximum number of this item allowed across the game state.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"maxStackSize": {
+					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"charges": {
+					"description": "The optional finite lifetime and depletion output of each item instance.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ChargeSchema"
+				},
+				"merge": {
+					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/MergeSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/MergeSchema"
+					}
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"blueprint"
+					]
+				},
+				"line": {
+					"description": "The one product line owned by this blueprint.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/LineSchema"
+				}
+			},
+			"required": [
+				"uid",
+				"id",
+				"title",
+				"description",
+				"asset",
+				"scope",
+				"maxStackSize",
+				"type",
+				"line"
+			],
+			"additionalProperties": false,
+			"description": "A construction-blueprint configuration with one product line."
+		},
+		"DescriptionSchema": {
+			"type": "string",
+			"minLength": 1,
+			"description": "A required non-empty configuration description."
+		},
+		"AssetCompositionSchema": {
+			"anyOf": [
+				{
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+						}
+					]
+				},
+				{
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+						},
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+						}
+					]
+				}
+			],
+			"description": "A one- or two-layer visual asset composition in back-to-front order."
+		},
+		"AssetSchema": {
+			"type": "object",
+			"properties": {
+				"default": {
+					"description": "The default one- or two-layer visual composition in back-to-front order.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/AssetCompositionSchema"
+				},
+				"sources": {
+					"description": "The optional ordered single-layer progress states after the default.",
+					"minItems": 1,
+					"type": "array",
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+					}
+				}
+			},
+			"required": [
+				"default"
+			],
+			"additionalProperties": false,
+			"description": "The visual asset definition for a game item."
+		},
+		"StorageScopeEnumSchema": {
+			"type": "string",
+			"enum": [
+				"board",
+				"inventory",
+				"toolbar",
+				"any"
+			],
+			"description": "Where one canonical item may physically exist in grid state."
+		},
+		"ChargeSchema": {
+			"type": "object",
+			"properties": {
+				"amount": {
+					"description": "The positive number of charges owned by every fresh item instance.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"output": {
+					"description": "The optional output emitted exactly once when one item instance is depleted.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/OutputSchema"
+				}
+			},
+			"required": [
+				"amount"
+			],
+			"additionalProperties": false,
+			"description": "A finite item lifetime and optional output emitted on depletion."
+		},
+		"OutputSchema": {
+			"type": "object",
+			"properties": {
+				"set": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/RollSetSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/RollSetSchema"
+					},
+					"description": "One or more alternative roll sets provided by this output."
+				}
+			},
+			"required": [
+				"set"
+			],
+			"additionalProperties": false,
+			"description": "A configured output produced by a gameplay source."
+		},
+		"RollSetSchema": {
+			"type": "object",
+			"properties": {
+				"weight": {
+					"default": 1,
+					"description": "The positive relative weight used to select this roll set.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"roll": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/RollSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/RollSchema"
+					},
+					"description": "One or more rolls evaluated after this set is selected."
+				}
+			},
+			"required": [
+				"weight",
+				"roll"
+			],
+			"additionalProperties": false,
+			"description": "An alternative non-empty collection of output rolls."
+		},
+		"RollSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/RollGuaranteedSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/RollChanceSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/RollWeightSchema"
+				}
+			],
+			"description": "A typed roll that an output may produce."
+		},
+		"RollGuaranteedSchema": {
+			"type": "object",
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": [
+						"guaranteed"
+					]
+				},
+				"drop": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/DropSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/DropSchema"
+					},
+					"description": "One or more items emitted when this roll succeeds."
+				}
+			},
+			"required": [
+				"type",
+				"drop"
+			],
+			"additionalProperties": false,
+			"description": "A roll that guarantees its output when its rules allow it."
+		},
+		"DropSchema": {
+			"type": "object",
+			"properties": {
+				"itemId": {
+					"description": "The ID of the canonical game item emitted by this drop.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"quantity": {
+					"description": "The quantity emitted by this drop.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/QuantitySchema"
+				},
+				"placement": {
+					"default": "drop",
+					"description": "The board-placement strategy for this drop; defaults to a local Manhattan-distance drop and does not control scope-based inventory fallback.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PlacementEnumSchema"
+				},
+				"rules": {
+					"type": "array",
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/DropRuleSchema"
+					},
+					"description": "Rules evaluated after this drop is selected by a successful roll."
+				}
+			},
+			"required": [
+				"itemId",
+				"quantity",
+				"placement",
+				"rules"
+			],
+			"additionalProperties": false,
+			"description": "A canonical game item, quantity, board-placement strategy, and rules for a successful roll's drop."
+		},
+		"QuantitySchema": {
+			"type": "object",
+			"properties": {
+				"min": {
+					"description": "The smallest quantity that may resolve.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"max": {
+					"description": "The largest quantity that may resolve.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				}
+			},
+			"required": [
+				"min",
+				"max"
+			],
+			"additionalProperties": false,
+			"description": "The inclusive positive bounds resolved by one quantity contract."
+		},
+		"PlacementEnumSchema": {
+			"type": "string",
+			"enum": [
+				"drop",
+				"random"
+			],
+			"description": "How a resolved item drop chooses its board origin before canonical nearest-first placement, independently from inventory fallback."
+		},
+		"DropRuleSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/DropRuleEnableSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/DropRuleDisableSchema"
+				}
+			],
+			"description": "An availability rule evaluated for a selected drop."
+		},
+		"DropRuleEnableSchema": {
+			"type": "object",
+			"properties": {
+				"hint": {
+					"description": "Player-facing explanation shown while this selected-drop rule applies.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/NonEmptyStringSchema"
+				},
+				"when": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/WhenSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/WhenSchema"
+					},
+					"description": "Conditions that must all pass for this selected-drop rule to apply."
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"enable"
+					],
+					"description": "Identifies this rule as an enable gate for the selected drop."
+				}
+			},
+			"required": [
+				"when",
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "A rule that enables a selected drop when its conditions pass."
+		},
+		"NonEmptyStringSchema": {
+			"type": "string",
+			"minLength": 1,
+			"description": "A trimmed non-empty string."
+		},
+		"WhenSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/WhenExistsSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/WhenCountSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/WhenRangeSchema"
+				}
+			],
+			"description": "A standalone condition that evaluates an item-query quantity."
+		},
+		"WhenExistsSchema": {
+			"type": "object",
+			"properties": {
+				"query": {
+					"description": "The query used to find the items evaluated by this condition.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/QuerySchema"
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"exists"
+					],
+					"description": "Identifies this condition as an item-query existence check."
+				}
+			},
+			"required": [
+				"query",
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "A condition that checks whether an item query returns any quantity."
+		},
+		"QueryBoardSchema": {
+			"type": "object",
+			"properties": {
+				"selector": {
+					"description": "The canonical item used to select query candidates.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/SelectorSchema"
+				},
+				"scope": {
+					"type": "string",
+					"enum": [
+						"board"
+					],
+					"description": "Identifies this query as a board-only query."
+				},
+				"distance": {
+					"description": "The origin itself, an exact close or near Chebyshev distance, or any positive far distance.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/DistanceEnumSchema"
+				}
+			},
+			"required": [
+				"selector",
+				"scope",
+				"distance"
+			],
+			"additionalProperties": false,
+			"description": "A board-only item query constrained by a required board distance."
+		},
+		"SelectorSchema": {
+			"type": "object",
+			"properties": {
+				"type": {
+					"type": "string",
+					"const": "item"
+				},
+				"itemId": {
+					"description": "The stable ID of the selected canonical item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				}
+			},
+			"required": [
+				"type",
+				"itemId"
+			],
+			"additionalProperties": false,
+			"description": "A selector that resolves one canonical game item by stable ID."
+		},
+		"DistanceEnumSchema": {
+			"type": "string",
+			"enum": [
+				"self",
+				"close",
+				"near",
+				"far"
+			],
+			"description": "The source cell itself, an exact close or near Chebyshev distance, or any positive far distance."
+		},
+		"QueryInventorySchema": {
+			"type": "object",
+			"properties": {
+				"selector": {
+					"description": "The canonical item used to select query candidates.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/SelectorSchema"
+				},
+				"scope": {
+					"type": "string",
+					"enum": [
+						"inventory"
+					],
+					"description": "Identifies this query as an inventory-only query."
+				}
+			},
+			"required": [
+				"selector",
+				"scope"
+			],
+			"additionalProperties": false,
+			"description": "An inventory-only item query without a board distance."
+		},
+		"QueryToolbarSchema": {
+			"type": "object",
+			"properties": {
+				"selector": {
+					"description": "The canonical item used to select query candidates.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/SelectorSchema"
+				},
+				"scope": {
+					"type": "string",
+					"enum": [
+						"toolbar"
+					],
+					"description": "Identifies this query as a toolbar-only query."
+				}
+			},
+			"required": [
+				"selector",
+				"scope"
+			],
+			"additionalProperties": false,
+			"description": "A toolbar-only item query without a board distance."
+		},
+		"QueryAnySchema": {
+			"type": "object",
+			"properties": {
+				"selector": {
+					"description": "The canonical item used to select query candidates.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/SelectorSchema"
+				},
+				"scope": {
+					"type": "string",
+					"enum": [
+						"any"
+					],
+					"description": "Identifies this query as one that searches the origin-space board, shared inventory, and toolbar."
+				}
+			},
+			"required": [
+				"selector",
+				"scope"
+			],
+			"additionalProperties": false,
+			"description": "An item query that searches the origin-space board, shared inventory, and toolbar without a distance."
+		},
+		"QueryUniverseSchema": {
+			"type": "object",
+			"properties": {
+				"selector": {
+					"description": "The canonical item used to select query candidates.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/SelectorSchema"
+				},
+				"scope": {
+					"type": "string",
+					"enum": [
+						"universe"
+					],
+					"description": "Searches every board space plus both passive storage surfaces."
+				}
+			},
+			"required": [
+				"selector",
+				"scope"
+			],
+			"additionalProperties": false,
+			"description": "A universe-wide item query across every board space and both passive storage surfaces without distance."
+		},
+		"QuerySchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/QueryBoardSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/QueryInventorySchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/QueryToolbarSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/QueryAnySchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/QueryUniverseSchema"
+				}
+			],
+			"description": "A board, exact passive-storage, local combined, or universe-wide item query selected by scope."
+		},
+		"WhenCountSchema": {
+			"type": "object",
+			"properties": {
+				"query": {
+					"description": "The query used to find the items evaluated by this condition.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/QuerySchema"
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"count"
+					],
+					"description": "Identifies this condition as an exact item-query quantity check."
+				},
+				"count": {
+					"description": "The exact item quantity that the query must return.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/NonNegativeIntegerSchema"
+				}
+			},
+			"required": [
+				"query",
+				"type",
+				"count"
+			],
+			"additionalProperties": false,
+			"description": "A condition that checks an item query against one exact quantity."
+		},
+		"WhenRangeSchema": {
+			"type": "object",
+			"properties": {
+				"query": {
+					"description": "The query used to find the items evaluated by this condition.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/QuerySchema"
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"range"
+					],
+					"description": "Identifies this condition as an inclusive item-query quantity range check."
+				},
+				"min": {
+					"description": "The smallest item quantity accepted by this condition.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/NonNegativeIntegerSchema"
+				},
+				"max": {
+					"description": "The largest item quantity accepted by this condition.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/NonNegativeIntegerSchema"
+				}
+			},
+			"required": [
+				"query",
+				"type",
+				"min",
+				"max"
+			],
+			"additionalProperties": false,
+			"description": "A condition that checks an item query against an inclusive quantity range."
+		},
+		"DropRuleDisableSchema": {
+			"type": "object",
+			"properties": {
+				"hint": {
+					"description": "Player-facing explanation shown while this selected-drop rule applies.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/NonEmptyStringSchema"
+				},
+				"when": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/WhenSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/WhenSchema"
+					},
+					"description": "Conditions that must all pass for this selected-drop rule to apply."
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"disable"
+					],
+					"description": "Identifies this rule as a disable veto for the selected drop."
+				}
+			},
+			"required": [
+				"when",
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "A rule that disables a selected drop when its conditions pass."
+		},
+		"RollChanceSchema": {
+			"type": "object",
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": [
+						"chance"
+					]
+				},
+				"chance": {
+					"description": "The probability that this roll provides its output, from 0 to 1 inclusive.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ChanceSchema"
+				},
+				"drop": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/DropSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/DropSchema"
+					},
+					"description": "One or more items emitted when this roll succeeds."
+				}
+			},
+			"required": [
+				"type",
+				"chance",
+				"drop"
+			],
+			"additionalProperties": false,
+			"description": "A roll that provides its output according to a probability."
+		},
+		"ChanceSchema": {
+			"type": "number",
+			"minimum": 0,
+			"maximum": 1,
+			"description": "A probability from zero to one inclusive."
+		},
+		"RollWeightSchema": {
+			"type": "object",
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": [
+						"weight"
+					]
+				},
+				"quantity": {
+					"description": "The number of independent weighted selections made by this roll.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/QuantitySchema"
+				},
+				"drop": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/DropWeightSchema"
+						},
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/DropWeightSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/DropWeightSchema"
+					},
+					"description": "At least two weighted drop candidates selected by this roll."
+				}
+			},
+			"required": [
+				"type",
+				"quantity",
+				"drop"
+			],
+			"additionalProperties": false,
+			"description": "A roll that selects its output according to relative item weights."
+		},
+		"DropWeightSchema": {
+			"type": "object",
+			"properties": {
+				"weight": {
+					"description": "The positive integer weight used to select this drop.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"drop": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/DropSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/DropSchema"
+					},
+					"description": "One or more items emitted when this weighted drop is selected."
+				}
+			},
+			"required": [
+				"weight",
+				"drop"
+			],
+			"additionalProperties": false,
+			"description": "Items and their relative weight in a weight-based output roll."
+		},
+		"MergeSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/MergeKeepSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/MergeRemoveSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/MergeReplaceSchema"
+				}
+			],
+			"description": "A discriminated target-specific directional item merge."
+		},
+		"MergeKeepSchema": {
+			"type": "object",
+			"properties": {
+				"target": {
+					"description": "The selector that must match the receiving item for this merge to apply.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/SelectorSchema"
+				},
+				"action": {
+					"description": "The action applied to the source item after this merge resolves.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ActionEnumSchema"
+				},
+				"output": {
+					"description": "The optional extra output evaluated after this merge resolves.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/OutputSchema"
+				},
+				"effect": {
+					"type": "string",
+					"enum": [
+						"keep"
+					],
+					"description": "Identifies this merge as one that keeps its selected target unchanged."
+				}
+			},
+			"required": [
+				"target",
+				"action",
+				"effect"
+			],
+			"additionalProperties": false,
+			"description": "A merge that leaves its selected receiving item unchanged."
+		},
+		"ActionEnumSchema": {
+			"type": "string",
+			"enum": [
+				"use",
+				"consume"
+			],
+			"description": "The action applied to a source item after it initiates a merge."
+		},
+		"MergeRemoveSchema": {
+			"type": "object",
+			"properties": {
+				"target": {
+					"description": "The selector that must match the receiving item for this merge to apply.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/SelectorSchema"
+				},
+				"action": {
+					"description": "The action applied to the source item after this merge resolves.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ActionEnumSchema"
+				},
+				"output": {
+					"description": "The optional extra output evaluated after this merge resolves.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/OutputSchema"
+				},
+				"effect": {
+					"type": "string",
+					"enum": [
+						"remove"
+					],
+					"description": "Identifies this merge as one that removes its selected target."
+				}
+			},
+			"required": [
+				"target",
+				"action",
+				"effect"
+			],
+			"additionalProperties": false,
+			"description": "A merge that removes its selected receiving item."
+		},
+		"MergeReplaceSchema": {
+			"type": "object",
+			"properties": {
+				"target": {
+					"description": "The selector that must match the receiving item for this merge to apply.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/SelectorSchema"
+				},
+				"action": {
+					"description": "The action applied to the source item after this merge resolves.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ActionEnumSchema"
+				},
+				"output": {
+					"description": "The optional extra output evaluated after this merge resolves.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/OutputSchema"
+				},
+				"effect": {
+					"type": "string",
+					"enum": [
+						"replace"
+					],
+					"description": "Identifies this merge as one that replaces its selected target."
+				},
+				"result": {
+					"description": "The canonical item that replaces the selected target.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				}
+			},
+			"required": [
+				"target",
+				"action",
+				"effect",
+				"result"
+			],
+			"additionalProperties": false,
+			"description": "A merge that replaces its selected receiving item with an explicit result."
+		},
+		"TimeSchema": {
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 9007199254740991,
+			"description": "A non-negative whole time value expressed in milliseconds."
+		},
+		"InputSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/InputSimpleSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/InputMaterialSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/InputDepositSchema"
+				}
+			],
+			"description": "A simple, material-item, or authored board-deposit input requirement for a product line."
+		},
+		"InputSimpleSchema": {
+			"type": "object",
+			"properties": {
+				"charges": {
+					"description": "The optional charge cost paid by the line owner or this input's resolved target.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/InputChargeSchema"
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"simple"
+					],
+					"description": "Identifies this input as having no consumable resource requirement."
+				}
+			},
+			"required": [
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "An explicit product-line input with no consumable resource requirement."
+		},
+		"InputChargeSchema": {
+			"type": "object",
+			"properties": {
+				"cost": {
+					"description": "The positive number of charges paid when this input starts one line job.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"from": {
+					"description": "Whether the cost is paid by the line owner or the input's resolved target.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/InputChargeFromEnumSchema"
+				}
+			},
+			"required": [
+				"cost",
+				"from"
+			],
+			"additionalProperties": false,
+			"description": "One line-input charge cost and the runtime item that pays it."
+		},
+		"InputChargeFromEnumSchema": {
+			"type": "string",
+			"enum": [
+				"self",
+				"target"
+			],
+			"description": "Whether one input charge cost is paid by the line owner or its resolved target."
+		},
+		"InputMaterialSchema": {
+			"type": "object",
+			"properties": {
+				"charges": {
+					"description": "The optional charge cost paid by the line owner or this input's resolved target.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/InputChargeSchema"
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"materials"
+					],
+					"description": "Identifies this input as a directly delivered material item."
+				},
+				"selector": {
+					"description": "The canonical item accepted by this input.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/SelectorSchema"
+				},
+				"mode": {
+					"default": "consume",
+					"description": "Whether this input is consumed or reserved; defaults to consume.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/InputModeEnumSchema"
+				},
+				"quantity": {
+					"description": "The exact or bounded total amount accepted across all matching materials.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/QuantitySchema"
+				},
+				"capacity": {
+					"default": 0,
+					"description": "The extra total quantity this input may buffer above its required quantity; defaults to zero, which allows no extra materials.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/NonNegativeIntegerSchema"
+				}
+			},
+			"required": [
+				"type",
+				"selector",
+				"mode",
+				"quantity",
+				"capacity"
+			],
+			"additionalProperties": false,
+			"description": "A directly delivered material item required by a product line."
+		},
+		"InputModeEnumSchema": {
+			"type": "string",
+			"enum": [
+				"consume",
+				"reserve"
+			],
+			"description": "How an input item participates in a product line."
+		},
+		"InputDepositSchema": {
+			"type": "object",
+			"properties": {
+				"charges": {
+					"description": "The optional charge cost paid by the line owner or this input's resolved target.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/InputChargeSchema"
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"deposit"
+					],
+					"description": "Identifies this input as one external charged-item target on the board."
+				},
+				"query": {
+					"description": "The board query used to select one charged target for this input.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/QueryBoardSchema"
+				}
+			},
+			"required": [
+				"type",
+				"query"
+			],
+			"additionalProperties": false,
+			"description": "A board query that resolves one external charged-item target."
+		},
+		"LineRuleSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/LineRuleShowSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/LineRuleHideSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/LineRuleEnableSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/LineRuleDisableSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/RuleRuntimeAdjustSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/RuleRuntimeMultiplierSchema"
+				}
+			],
+			"description": "A rule evaluated for a product line."
+		},
+		"LineRuleShowSchema": {
+			"type": "object",
+			"properties": {
+				"hint": {
+					"description": "Player-facing explanation shown while this product-line rule applies.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/NonEmptyStringSchema"
+				},
+				"when": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/WhenSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/WhenSchema"
+					},
+					"description": "Conditions that must all pass for this product-line rule to apply."
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"show"
+					],
+					"description": "Identifies this rule as a request to show the product line."
+				}
+			},
+			"required": [
+				"when",
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "A rule that conditionally makes a product line visible."
+		},
+		"LineRuleHideSchema": {
+			"type": "object",
+			"properties": {
+				"hint": {
+					"description": "Player-facing explanation shown while this product-line rule applies.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/NonEmptyStringSchema"
+				},
+				"when": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/WhenSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/WhenSchema"
+					},
+					"description": "Conditions that must all pass for this product-line rule to apply."
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"hide"
+					],
+					"description": "Identifies this rule as a request to hide the product line."
+				}
+			},
+			"required": [
+				"when",
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "A rule that hides a product line when its condition is satisfied."
+		},
+		"LineRuleEnableSchema": {
+			"type": "object",
+			"properties": {
+				"hint": {
+					"description": "Player-facing explanation shown while this product-line rule applies.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/NonEmptyStringSchema"
+				},
+				"when": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/WhenSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/WhenSchema"
+					},
+					"description": "Conditions that must all pass for this product-line rule to apply."
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"enable"
+					],
+					"description": "Identifies this rule as an enable gate for the product line."
+				}
+			},
+			"required": [
+				"when",
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "A rule that enables a product line when its conditions pass."
+		},
+		"LineRuleDisableSchema": {
+			"type": "object",
+			"properties": {
+				"hint": {
+					"description": "Player-facing explanation shown while this product-line rule applies.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/NonEmptyStringSchema"
+				},
+				"when": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/WhenSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/WhenSchema"
+					},
+					"description": "Conditions that must all pass for this product-line rule to apply."
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"disable"
+					],
+					"description": "Identifies this rule as a disable veto for the product line."
+				}
+			},
+			"required": [
+				"when",
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "A rule that disables a product line when its condition is satisfied."
+		},
+		"RuleRuntimeAdjustSchema": {
+			"type": "object",
+			"properties": {
+				"hint": {
+					"description": "Player-facing explanation shown while this product-line rule applies.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/NonEmptyStringSchema"
+				},
+				"when": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/WhenSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/WhenSchema"
+					},
+					"description": "Conditions that must all pass for this product-line rule to apply."
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"runtime:adjust"
+					],
+					"description": "Identifies this rule as a product-line runtime adjustment."
+				},
+				"adjustMs": {
+					"type": "integer",
+					"minimum": -9007199254740991,
+					"maximum": 9007199254740991,
+					"description": "The signed millisecond adjustment added to this product line's runtime."
+				}
+			},
+			"required": [
+				"when",
+				"type",
+				"adjustMs"
+			],
+			"additionalProperties": false,
+			"description": "A rule that adjusts a product line's runtime by a signed millisecond value."
+		},
+		"RuleRuntimeMultiplierSchema": {
+			"type": "object",
+			"properties": {
+				"hint": {
+					"description": "Player-facing explanation shown while this product-line rule applies.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/NonEmptyStringSchema"
+				},
+				"when": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/WhenSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/WhenSchema"
+					},
+					"description": "Conditions that must all pass for this product-line rule to apply."
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"runtime:multiplier"
+					],
+					"description": "Identifies this rule as a product-line runtime multiplier."
+				},
+				"multiplier": {
+					"description": "The positive factor multiplied into this product line's runtime.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveNumberSchema"
+				}
+			},
+			"required": [
+				"when",
+				"type",
+				"multiplier"
+			],
+			"additionalProperties": false,
+			"description": "A rule that multiplies a product line's runtime when its conditions pass."
+		},
+		"PositiveNumberSchema": {
+			"type": "number",
+			"exclusiveMinimum": 0,
+			"description": "A number greater than zero."
+		},
+		"LineSchema": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "The stable ID of this product line within its owning item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"title": {
+					"description": "The human-readable title of this product line.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/TitleSchema"
+				},
+				"description": {
+					"description": "The human-readable explanation of this product line's purpose.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/DescriptionSchema"
+				},
+				"default": {
+					"default": false,
+					"description": "Whether this line is the authored fallback default for its owning item.",
+					"type": "boolean"
+				},
+				"show": {
+					"default": true,
+					"description": "Whether this product line is visible before its rules are evaluated.",
+					"type": "boolean"
+				},
+				"enable": {
+					"default": true,
+					"description": "Whether this product line is enabled before its rules are evaluated.",
+					"type": "boolean"
+				},
+				"runtimeMs": {
+					"description": "The runtime of this product line in milliseconds; zero completes immediately.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/TimeSchema"
+				},
+				"input": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/InputSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/InputSchema"
+					},
+					"description": "One or more input requirements for this product line."
+				},
+				"output": {
+					"description": "The optional result produced when this product line completes.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/OutputSchema"
+				},
+				"rules": {
+					"type": "array",
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/LineRuleSchema"
+					},
+					"description": "Rules that can change this product line's visibility, availability, or behavior."
+				}
+			},
+			"required": [
+				"id",
+				"title",
+				"description",
+				"default",
+				"show",
+				"enable",
+				"runtimeMs",
+				"input",
+				"rules"
+			],
+			"additionalProperties": false,
+			"description": "A single product line with its accepted inputs and produced output."
+		},
+		"DepositItemSchema": {
+			"type": "object",
+			"properties": {
+				"uid": {
+					"description": "The immutable CUID2 identity of this canonical game item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"id": {
+					"description": "The stable authoring ID of this canonical game item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"title": {
+					"description": "The human-readable title of this item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/TitleSchema"
+				},
+				"description": {
+					"description": "The human-readable explanation of this item's purpose.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/DescriptionSchema"
+				},
+				"asset": {
+					"description": "The visual asset definition used to render this item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/AssetSchema"
+				},
+				"scope": {
+					"description": "The part of game state in which this item may be stored.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/StorageScopeEnumSchema"
+				},
+				"maxCount": {
+					"description": "The optional maximum number of this item allowed across the game state.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"maxStackSize": {
+					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"charges": {
+					"description": "The optional finite lifetime and depletion output of each item instance.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ChargeSchema"
+				},
+				"merge": {
+					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/MergeSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/MergeSchema"
+					}
+				},
+				"maxQueueSize": {
+					"default": 1,
+					"description": "The maximum number of this deposit's product lines that may run in parallel.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"deposit"
+					]
+				},
+				"lines": {
+					"description": "Optional product lines exposed by this deposit.",
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/LineSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/LineSchema"
+					}
+				}
+			},
+			"required": [
+				"uid",
+				"id",
+				"title",
+				"description",
+				"asset",
+				"scope",
+				"maxStackSize",
+				"maxQueueSize",
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "A board resource deposit that may expose finite self-consuming product lines."
+		},
+		"SimpleItemSchema": {
+			"type": "object",
+			"properties": {
+				"uid": {
+					"description": "The immutable CUID2 identity of this canonical game item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"id": {
+					"description": "The stable authoring ID of this canonical game item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"title": {
+					"description": "The human-readable title of this item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/TitleSchema"
+				},
+				"description": {
+					"description": "The human-readable explanation of this item's purpose.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/DescriptionSchema"
+				},
+				"asset": {
+					"description": "The visual asset definition used to render this item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/AssetSchema"
+				},
+				"scope": {
+					"description": "The part of game state in which this item may be stored.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/StorageScopeEnumSchema"
+				},
+				"maxCount": {
+					"description": "The optional maximum number of this item allowed across the game state.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"maxStackSize": {
+					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"charges": {
+					"description": "The optional finite lifetime and depletion output of each item instance.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ChargeSchema"
+				},
+				"merge": {
+					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/MergeSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/MergeSchema"
+					}
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"simple"
+					]
+				}
+			},
+			"required": [
+				"uid",
+				"id",
+				"title",
+				"description",
+				"asset",
+				"scope",
+				"maxStackSize",
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "An item without specialized gameplay behavior."
+		},
+		"ProducerItemSchema": {
+			"type": "object",
+			"properties": {
+				"uid": {
+					"description": "The immutable CUID2 identity of this canonical game item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"id": {
+					"description": "The stable authoring ID of this canonical game item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"title": {
+					"description": "The human-readable title of this item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/TitleSchema"
+				},
+				"description": {
+					"description": "The human-readable explanation of this item's purpose.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/DescriptionSchema"
+				},
+				"asset": {
+					"description": "The visual asset definition used to render this item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/AssetSchema"
+				},
+				"scope": {
+					"description": "The part of game state in which this item may be stored.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/StorageScopeEnumSchema"
+				},
+				"maxCount": {
+					"description": "The optional maximum number of this item allowed across the game state.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"maxStackSize": {
+					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"charges": {
+					"description": "The optional finite lifetime and depletion output of each item instance.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ChargeSchema"
+				},
+				"merge": {
+					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/MergeSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/MergeSchema"
+					}
+				},
+				"maxQueueSize": {
+					"default": 1,
+					"description": "The maximum number of this producer's product lines that may run in parallel; defaults to one.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"producer"
+					]
+				},
+				"lines": {
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/LineSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/LineSchema"
+					},
+					"description": "One or more product lines provided by this producer."
+				}
+			},
+			"required": [
+				"uid",
+				"id",
+				"title",
+				"description",
+				"asset",
+				"scope",
+				"maxStackSize",
+				"maxQueueSize",
+				"type",
+				"lines"
+			],
+			"additionalProperties": false,
+			"description": "An item that provides one or more selectable product lines."
+		},
+		"CraftItemSchema": {
+			"type": "object",
+			"properties": {
+				"uid": {
+					"description": "The immutable CUID2 identity of this canonical game item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"id": {
+					"description": "The stable authoring ID of this canonical game item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"title": {
+					"description": "The human-readable title of this item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/TitleSchema"
+				},
+				"description": {
+					"description": "The human-readable explanation of this item's purpose.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/DescriptionSchema"
+				},
+				"asset": {
+					"description": "The visual asset definition used to render this item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/AssetSchema"
+				},
+				"scope": {
+					"description": "The part of game state in which this item may be stored.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/StorageScopeEnumSchema"
+				},
+				"maxCount": {
+					"description": "The optional maximum number of this item allowed across the game state.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"maxStackSize": {
+					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"charges": {
+					"description": "The optional finite lifetime and depletion output of each item instance.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ChargeSchema"
+				},
+				"merge": {
+					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/MergeSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/MergeSchema"
+					}
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"craft"
+					]
+				},
+				"line": {
+					"description": "The one product line owned by this craft.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/LineSchema"
+				}
+			},
+			"required": [
+				"uid",
+				"id",
+				"title",
+				"description",
+				"asset",
+				"scope",
+				"maxStackSize",
+				"type",
+				"line"
+			],
+			"additionalProperties": false,
+			"description": "An item configuration that owns one craft product line."
+		},
+		"StashItemSchema": {
+			"type": "object",
+			"properties": {
+				"uid": {
+					"description": "The immutable CUID2 identity of this canonical game item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"id": {
+					"description": "The stable authoring ID of this canonical game item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"title": {
+					"description": "The human-readable title of this item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/TitleSchema"
+				},
+				"description": {
+					"description": "The human-readable explanation of this item's purpose.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/DescriptionSchema"
+				},
+				"asset": {
+					"description": "The visual asset definition used to render this item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/AssetSchema"
+				},
+				"scope": {
+					"description": "The part of game state in which this item may be stored.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/StorageScopeEnumSchema"
+				},
+				"maxCount": {
+					"description": "The optional maximum number of this item allowed across the game state.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"maxStackSize": {
+					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"charges": {
+					"description": "The optional finite lifetime and depletion output of each item instance.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ChargeSchema"
+				},
+				"merge": {
+					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/MergeSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/MergeSchema"
+					}
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"stash"
+					]
+				},
+				"line": {
+					"description": "The one product line owned by this stash.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/LineSchema"
+				}
+			},
+			"required": [
+				"uid",
+				"id",
+				"title",
+				"description",
+				"asset",
+				"scope",
+				"maxStackSize",
+				"type",
+				"line"
+			],
+			"additionalProperties": false,
+			"description": "An item configuration with one product line."
+		},
+		"TemporaryItemSchema": {
+			"type": "object",
+			"properties": {
+				"uid": {
+					"description": "The immutable CUID2 identity of this canonical game item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"id": {
+					"description": "The stable authoring ID of this canonical game item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"title": {
+					"description": "The human-readable title of this item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/TitleSchema"
+				},
+				"description": {
+					"description": "The human-readable explanation of this item's purpose.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/DescriptionSchema"
+				},
+				"asset": {
+					"description": "The visual asset definition used to render this item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/AssetSchema"
+				},
+				"scope": {
+					"default": "board",
+					"description": "Restricts temporary items to board storage.",
+					"type": "string",
+					"enum": [
+						"board"
+					]
+				},
+				"maxCount": {
+					"description": "The optional maximum number of this item allowed across the game state.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"maxStackSize": {
+					"default": 1,
+					"description": "Fixes temporary item stacks to one instance.",
+					"maximum": 1,
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"charges": {
+					"description": "The optional finite lifetime and depletion output of each item instance.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ChargeSchema"
+				},
+				"merge": {
+					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/MergeSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/MergeSchema"
+					}
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"temporary"
+					],
+					"description": "Identifies this item as a temporary board item."
+				},
+				"durationMs": {
+					"type": "integer",
+					"minimum": 500,
+					"maximum": 9007199254740991,
+					"description": "The authored lifetime in milliseconds; must be at least 500 ms.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/TimeSchema"
+				},
+				"output": {
+					"description": "The optional output intended for the released board cell after expiry.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/OutputSchema"
+				}
+			},
+			"required": [
+				"uid",
+				"id",
+				"title",
+				"description",
+				"asset",
+				"scope",
+				"maxStackSize",
+				"type",
+				"durationMs"
+			],
+			"additionalProperties": false,
+			"description": "A board-only, non-stackable item configuration with lifetime and optional expiry output."
+		},
+		"InventoryItemSchema": {
+			"type": "object",
+			"properties": {
+				"uid": {
+					"description": "The immutable CUID2 identity of this canonical game item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"id": {
+					"description": "The stable authoring ID of this canonical game item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"title": {
+					"description": "The human-readable title of this item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/TitleSchema"
+				},
+				"description": {
+					"description": "The human-readable explanation of this item's purpose.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/DescriptionSchema"
+				},
+				"asset": {
+					"description": "The visual asset definition used to render this item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/AssetSchema"
+				},
+				"scope": {
+					"default": "board",
+					"description": "Uses Board for automatic placement; the inventory item type also permits an exact Toolbar location.",
+					"type": "string",
+					"enum": [
+						"board"
+					]
+				},
+				"maxCount": {
+					"default": 1,
+					"description": "Allows exactly one inventory opener in game state.",
+					"maximum": 1,
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"maxStackSize": {
+					"default": 1,
+					"description": "Prevents the inventory opener from stacking.",
+					"maximum": 1,
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"charges": {
+					"description": "The optional finite lifetime and depletion output of each item instance.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ChargeSchema"
+				},
+				"merge": {
+					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/MergeSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/MergeSchema"
+					}
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"inventory"
+					],
+					"description": "Identifies this item as the shared inventory opener."
+				}
+			},
+			"required": [
+				"uid",
+				"id",
+				"title",
+				"description",
+				"asset",
+				"scope",
+				"maxCount",
+				"maxStackSize",
+				"type"
+			],
+			"additionalProperties": false,
+			"description": "A singleton Board/Toolbar item that opens the shared inventory surface."
+		}
+	}
+}

@@ -186,24 +186,13 @@ export namespace EditorProjectTransport {
 		readonly resources: ReadonlyArray<unknown>;
 	}
 
-	export type VersionApplicability =
-		| {
-				readonly type: "applicable";
-		  }
-		| {
-				readonly type: "incompatible";
-				readonly reason: string;
-		  };
-
 	export interface VersionDescriptor {
-		readonly applicability: VersionApplicability;
 		readonly arkini: string;
 		readonly arkpackVersion: string;
 		readonly body?: string;
 		readonly createdAtMs: number;
 		readonly parentVersionId?: string;
 		readonly projectId: string;
-		readonly snapshotFormatVersion: number;
 		readonly sourceRevision: number;
 		readonly subject: string;
 		readonly tag?: string;

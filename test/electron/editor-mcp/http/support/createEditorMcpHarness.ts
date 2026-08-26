@@ -84,15 +84,17 @@ export const createTestEditorMcpStorage = async (
 	return storage;
 };
 
-export const connectEditorMcpClient = async (port: number, mode: "auto" | "legacy" = "auto") => {
+export const connectEditorMcpClient = async (port: number) => {
 	const client = new Client(
 		{
-			name: `arkini-editor-${mode}-test`,
+			name: "arkini-editor-test",
 			version: "1.0.0",
 		},
 		{
 			versionNegotiation: {
-				mode,
+				mode: {
+					pin: "2026-07-28",
+				},
 			},
 		},
 	);

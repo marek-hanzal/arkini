@@ -1,5 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
+import { createGameProjectJsonSchema } from "~/engine/schema/fx/writeGameProjectJsonSchemaFx";
 import { createTestPngBytes } from "~test/bridge/arkpack/support/createTestPngBytes";
 
 export const writeSigningGame = async (root: string) => {
@@ -7,12 +9,25 @@ export const writeSigningGame = async (root: string) => {
 	await mkdir(join(gameDirectory, "assets"), {
 		recursive: true,
 	});
-	await mkdir(join(gameDirectory, "items"), {
+	await mkdir(join(gameDirectory, "items", "simple"), {
 		recursive: true,
 	});
 	await writeFile(
+		join(gameDirectory, "project.json"),
+		`${JSON.stringify({
+			arkini: ArkiniAppVersion,
+			updatedAtMs: 1,
+		})}\n`,
+	);
+	await writeFile(
+		join(gameDirectory, "schema.json"),
+		`${JSON.stringify(createGameProjectJsonSchema())}\n`,
+	);
+	await writeFile(
 		join(gameDirectory, "game.json"),
 		`${JSON.stringify({
+			$schema: "./schema.json",
+			arkpack: "1.0",
 			meta: {
 				id: "game:signing-workflow",
 				title: "Signing workflow",
@@ -34,8 +49,9 @@ export const writeSigningGame = async (root: string) => {
 		})}\n`,
 	);
 	await writeFile(
-		join(gameDirectory, "items", "items.json"),
+		join(gameDirectory, "items", "simple", "item.json"),
 		`${JSON.stringify({
+			$schema: "../../schema.json",
 			items: {
 				item: {
 					uid: "item",

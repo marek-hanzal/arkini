@@ -2,7 +2,6 @@ import { Effect } from "effect";
 
 import { ArkpackSigningError } from "~/engine/pack/error/ArkpackSigningError";
 import type { ArkpackTrustedKeysSchema } from "~/engine/pack/schema/ArkpackTrustedKeysSchema";
-import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import { packDirectoryFx } from "./packDirectoryFx";
 import { signArkpackFileFx } from "./signArkpackFileFx";
 import { verifyArkpackFileFx } from "./verifyArkpackFileFx";
@@ -11,8 +10,6 @@ export namespace packSignedDirectoryFx {
 	export interface Props {
 		readonly input: string;
 		readonly keyId: string;
-		readonly packageId: string;
-		readonly version: ArkpackVersionSchema.Type;
 		readonly output?: string;
 		readonly privateKey: string;
 		readonly trustedKeys: ArkpackTrustedKeysSchema.Type;
@@ -23,8 +20,6 @@ export namespace packSignedDirectoryFx {
 export const packSignedDirectoryFx = Effect.fn("packSignedDirectoryFx")(function* ({
 	input,
 	keyId,
-	packageId,
-	version,
 	output,
 	privateKey,
 	trustedKeys,
@@ -40,8 +35,6 @@ export const packSignedDirectoryFx = Effect.fn("packSignedDirectoryFx")(function
 	}
 	const packed = yield* packDirectoryFx({
 		input,
-		packageId,
-		version,
 		...(output === undefined
 			? {}
 			: {

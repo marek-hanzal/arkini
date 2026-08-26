@@ -1,0 +1,19 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:sword": {
+			"uid": "equfh9g6ts4ju4s8pwys7h9r",
+			"id": "item:sword",
+			"title": "Sword",
+			"description": "Expedition weapon forged from iron ingots, leather grip work, and charcoal heat.",
+			"asset": {
+				"default": [
+					"item-sword"
+				]
+			},
+			"scope": "any",
+			"maxStackSize": 20,
+			"type": "simple"
+		}
+	}
+}

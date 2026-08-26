@@ -44,7 +44,7 @@ export const InputMaterialSchema = z
 		 * Exact or bounded total amount accepted by this input.
 		 *
 		 * The amount aggregates every material item that matches this selector. A
-		 * range quantity replaces the legacy `upTo` input mode.
+		 * range quantity expresses the optional amount above the required minimum.
 		 */
 		quantity: QuantitySchema.describe(
 			"The exact or bounded total amount accepted across all matching materials.",

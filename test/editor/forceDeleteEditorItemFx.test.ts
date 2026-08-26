@@ -27,6 +27,10 @@ describe("forceDeleteEditorItemFx", () => {
 				inventory: [
 					{
 						itemId: "water",
+						position: {
+							x: 0,
+							y: 0,
+						},
 						quantity: 2,
 					},
 				],

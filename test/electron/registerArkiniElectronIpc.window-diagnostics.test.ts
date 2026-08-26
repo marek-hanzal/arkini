@@ -31,7 +31,6 @@ describe("registerArkiniElectronIpcFx native presentation", () => {
 		).rejects.toThrow();
 
 		const diagnosticRecord = {
-			schemaVersion: 1,
 			level: "info",
 			category: [
 				"game",

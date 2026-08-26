@@ -58,7 +58,6 @@ export const planStartFx = Effect.fn("planStartFx")(function* ({
 			return Effect.gen(function* () {
 				const plan = yield* planStartInventoryItemFx({
 					item,
-					runtime: state.draft,
 				});
 				const [, draft] = yield* applyPlacementPlanFx({
 					plan,

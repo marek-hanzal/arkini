@@ -38,6 +38,13 @@ export const EditorMcpEditProjectInputSchema = z
 		path: [
 			"patch",
 		],
+	})
+	.meta({
+		id: "EditorMcpEditProjectInputSchema",
+		$id: "urn:arkini:schema:mcp:edit-project-input",
+		title: "Edit project tool input",
+		description:
+			"A revision-guarded replacement patch for the editable non-item project configuration.",
 	});
 
 export type EditorMcpEditProjectInput = z.infer<typeof EditorMcpEditProjectInputSchema>;

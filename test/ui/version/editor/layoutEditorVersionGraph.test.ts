@@ -8,9 +8,6 @@ const version = (
 	createdAtMs: number,
 	parentVersionId?: string,
 ): EditorProjectVersionDescriptor => ({
-	applicability: {
-		type: "applicable",
-	},
 	arkini: "0.5.0",
 	arkpackVersion: "1.0",
 	createdAtMs,
@@ -20,7 +17,6 @@ const version = (
 				parentVersionId,
 			}),
 	projectId: "project-one",
-	snapshotFormatVersion: 1,
 	sourceRevision: createdAtMs,
 	subject: versionId,
 	versionId,

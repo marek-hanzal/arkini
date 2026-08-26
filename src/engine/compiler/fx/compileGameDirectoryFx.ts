@@ -37,6 +37,7 @@ export const compileGameDirectoryFx = Effect.fn("compileGameDirectoryFx")(functi
 		return {
 			...compilation,
 			diagnostics,
+			projectIdentity: sourceFiles.projectIdentity,
 			resources,
 			json: sourceFiles.sources.length,
 		};
@@ -49,6 +50,7 @@ export const compileGameDirectoryFx = Effect.fn("compileGameDirectoryFx")(functi
 
 	return {
 		...compilation,
+		projectIdentity: sourceFiles.projectIdentity,
 		diagnostics: [
 			...diagnostics,
 			...resourceDiagnostics,

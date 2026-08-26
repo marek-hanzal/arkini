@@ -24,7 +24,7 @@ describe("filesystem Editor project lifecycle", () => {
 		const created = await harness.createProject(repository);
 		const root = await Effect.runPromise(repository.readProjectRootFx(created.projectId));
 		expect(root).toContain(harness.projectsRoot);
-		expect(JSON.parse(await readFile(join(root ?? "", "editor.json"), "utf8"))).toMatchObject({
+		expect(JSON.parse(await readFile(join(root ?? "", "project.json"), "utf8"))).toMatchObject({
 			arkini: ArkiniAppVersion,
 			updatedAtMs: expect.any(Number),
 		});
@@ -60,7 +60,7 @@ describe("filesystem Editor project lifecycle", () => {
 		);
 
 		await Effect.runPromise(repository.deleteProjectFx(opened.projectId));
-		await expect(access(join(root, "editor.json"))).resolves.toBeUndefined();
+		await expect(access(join(root, "project.json"))).resolves.toBeUndefined();
 		await harness.closeRepository(repository);
 
 		const reopened = await harness.openRepository();
@@ -75,7 +75,6 @@ describe("filesystem Editor project lifecycle", () => {
 		await writeFile(
 			harness.catalogPath,
 			JSON.stringify({
-				formatVersion: 1,
 				projects: [
 					{
 						root: await realpath(root),
@@ -88,7 +87,7 @@ describe("filesystem Editor project lifecycle", () => {
 
 		const repository = await harness.openRepository();
 		expect(await Effect.runPromise(repository.listProjectsFx)).toEqual([]);
-		await expect(access(join(root, "editor.json"))).resolves.toBeUndefined();
+		await expect(access(join(root, "project.json"))).resolves.toBeUndefined();
 	});
 
 	it("ignores a managed symlink that escapes the owned projects directory", async () => {
@@ -101,7 +100,6 @@ describe("filesystem Editor project lifecycle", () => {
 		await writeFile(
 			harness.catalogPath,
 			JSON.stringify({
-				formatVersion: 1,
 				projects: [
 					{
 						root: linkedRoot,
@@ -114,7 +112,7 @@ describe("filesystem Editor project lifecycle", () => {
 
 		const repository = await harness.openRepository();
 		expect(await Effect.runPromise(repository.listProjectsFx)).toEqual([]);
-		await expect(access(join(root, "editor.json"))).resolves.toBeUndefined();
+		await expect(access(join(root, "project.json"))).resolves.toBeUndefined();
 	});
 
 	it("keeps valid catalog entries when a neighboring entry is malformed", async () => {
@@ -125,7 +123,6 @@ describe("filesystem Editor project lifecycle", () => {
 		await writeFile(
 			harness.catalogPath,
 			JSON.stringify({
-				formatVersion: 1,
 				projects: [
 					{
 						root: 42,
@@ -157,7 +154,6 @@ describe("filesystem Editor project lifecycle", () => {
 		await writeFile(
 			harness.catalogPath,
 			JSON.stringify({
-				formatVersion: 1,
 				projects: [
 					{
 						root,

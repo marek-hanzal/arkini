@@ -1,0 +1,117 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:blueprint-market-t1": {
+			"uid": "c75u9r23gd46zf97ujlotsxo",
+			"id": "item:blueprint-market-t1",
+			"title": "Market Blueprint",
+			"description": "Build plan that can be filled with resources to construct the Market.",
+			"asset": {
+				"default": [
+					"blueprint",
+					"producer-market-t1"
+				],
+				"sources": [
+					"producer-market-t1"
+				]
+			},
+			"scope": "any",
+			"maxStackSize": 1,
+			"charges": {
+				"amount": 1
+			},
+			"type": "blueprint",
+			"line": {
+				"id": "line:blueprint:market-t1:construct",
+				"title": "Construct Market",
+				"description": "Consumes construction resources to build Market.",
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 28000,
+				"input": [
+					{
+						"charges": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:plank"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 4,
+							"max": 4
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stone-block"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:bread"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:sausage"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:market-t1",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		}
+	}
+}

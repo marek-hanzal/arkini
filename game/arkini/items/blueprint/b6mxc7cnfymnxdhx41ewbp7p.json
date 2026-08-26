@@ -1,0 +1,143 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:blueprint-coal-mine-t1": {
+			"uid": "b6mxc7cnfymnxdhx41ewbp7p",
+			"id": "item:blueprint-coal-mine-t1",
+			"title": "Coal Mine I Blueprint",
+			"description": "Build plan that can be filled with resources to construct Coal Mine I.",
+			"asset": {
+				"default": [
+					"blueprint",
+					"producer-coal-mine-t1"
+				],
+				"sources": [
+					"producer-coal-mine-t1"
+				]
+			},
+			"scope": "any",
+			"maxStackSize": 1,
+			"charges": {
+				"amount": 1
+			},
+			"type": "blueprint",
+			"line": {
+				"id": "line:blueprint:coal-mine-t1:construct",
+				"title": "Construct Coal Mine I",
+				"description": "Consumes construction resources to build Coal Mine I.",
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 58000,
+				"input": [
+					{
+						"charges": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:plank"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 6,
+							"max": 6
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stone-block"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 4,
+							"max": 4
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:building-permit"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:coin"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						},
+						"capacity": 0
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:coal-mine-t1",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "item:coal-deposit"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							},
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "producer:academy"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			}
+		}
+	}
+}

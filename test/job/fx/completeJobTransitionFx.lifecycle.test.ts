@@ -338,6 +338,7 @@ describe("job completion charge lifecycle", () => {
 					quantity: 1,
 				},
 			],
+			jobQueue: [],
 			jobs: [
 				{
 					id: "job:trader",

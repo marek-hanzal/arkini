@@ -10,7 +10,7 @@ import type { EditorProject } from "~/editor/EditorProject";
 import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
 import type { EditorProjectRepository } from "~/editor/EditorProjectRepository";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
-import { EditorProjectFileSchema } from "~/editor/filesystem/EditorProjectFileSchema";
+import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
 import { EditorProjectCatalogEntrySchema } from "~/editor/filesystem/EditorProjectCatalogEntrySchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
@@ -229,7 +229,7 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 					yield* fileSystem.makeDirectory(root, {
 						recursive: true,
 					});
-					const marker = EditorProjectFileSchema.parse({
+					const marker = GameProjectManifestSchema.parse({
 						arkini: ArkiniAppVersion,
 						updatedAtMs: nowMs,
 					});

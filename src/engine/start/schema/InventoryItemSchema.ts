@@ -13,8 +13,8 @@ export const InventoryItemSchema = z
 		 * Canonical item added to the inventory.
 		 */
 		itemId: IdSchema.describe("The canonical item ID added to the initial inventory."),
-		position: PositionSchema.optional().describe(
-			"The optional exact initial inventory slot; omitted legacy entries use deterministic stack-first placement.",
+		position: PositionSchema.describe(
+			"The exact initial inventory slot occupied by this stack.",
 		),
 		/**
 		 * Number of item instances added to the inventory.

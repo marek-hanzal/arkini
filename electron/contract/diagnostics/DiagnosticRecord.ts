@@ -23,7 +23,6 @@ const DiagnosticValueSchema: z.ZodType<DiagnosticValue> = z.lazy(() =>
 
 export const DiagnosticRecordSchema = z
 	.object({
-		schemaVersion: z.literal(1),
 		level: z.enum([
 			"debug",
 			"info",

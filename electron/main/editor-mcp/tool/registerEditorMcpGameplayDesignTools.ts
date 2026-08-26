@@ -22,11 +22,67 @@ interface ToolResult {
 	isError?: boolean;
 }
 
-const RevisionSchema = z
-	.number()
-	.int()
-	.nonnegative()
-	.describe("The exact project revision returned by the preceding read tool.");
+const RevisionSchema = z.number().int().nonnegative().meta({
+	id: "EditorMcpRevisionSchema",
+	description: "The exact project revision returned by the preceding read tool.",
+});
+
+const EditorMcpProjectConfigInputSchema = z.object({}).strict().meta({
+	id: "EditorMcpProjectConfigInputSchema",
+	$id: "urn:arkini:schema:mcp:project-config-input",
+	title: "Project configuration tool input",
+	description: "The project configuration read tool accepts no arguments.",
+});
+
+const EditorMcpValidateProjectInputSchema = z.object({}).strict().meta({
+	id: "EditorMcpValidateProjectInputSchema",
+	$id: "urn:arkini:schema:mcp:validate-project-input",
+	title: "Validate project tool input",
+	description: "The project validation tool accepts no arguments.",
+});
+
+const EditorMcpRenameItemInputSchema = z
+	.object({
+		itemId: IdSchema.describe("The current exact item ID."),
+		newItemId: IdSchema.describe("The new globally unique item ID."),
+		revision: RevisionSchema.optional(),
+	})
+	.strict()
+	.meta({
+		id: "EditorMcpRenameItemInputSchema",
+		$id: "urn:arkini:schema:mcp:rename-item-input",
+		title: "Rename item tool input",
+		description: "The current and replacement item IDs with an optional revision guard.",
+	});
+
+const EditorMcpItemDeleteImpactInputSchema = z
+	.object({
+		itemId: IdSchema.describe("The exact item ID."),
+	})
+	.strict()
+	.meta({
+		id: "EditorMcpItemDeleteImpactInputSchema",
+		$id: "urn:arkini:schema:mcp:item-delete-impact-input",
+		title: "Item delete impact tool input",
+		description: "The item whose deletion impact should be inspected.",
+	});
+
+const EditorMcpDeleteItemInputSchema = z
+	.object({
+		itemId: IdSchema.describe("The exact item ID inspected by item_delete_impact."),
+		revision: RevisionSchema,
+		force: z
+			.boolean()
+			.default(false)
+			.describe("False performs a safe delete; true applies the previewed cleanup."),
+	})
+	.strict()
+	.meta({
+		id: "EditorMcpDeleteItemInputSchema",
+		$id: "urn:arkini:schema:mcp:delete-item-input",
+		title: "Delete item tool input",
+		description: "A revision-guarded safe or forced item deletion request.",
+	});
 
 /** Registers the project lifecycle and destructive gameplay-design tools as one coherent surface. */
 export const registerEditorMcpGameplayDesignTools = ({
@@ -47,6 +103,7 @@ export const registerEditorMcpGameplayDesignTools = ({
 		{
 			description:
 				"Read JSON containing the complete editable non-item project config and its revision. The config contains full meta, resources, and start sections but intentionally excludes items. Read item_config for one complete item.",
+			inputSchema: EditorMcpProjectConfigInputSchema,
 		},
 		async () => runTool(readProjectFx().pipe(Effect.flatMap(readEditorMcpProjectConfigTextFx))),
 	);
@@ -76,6 +133,7 @@ export const registerEditorMcpGameplayDesignTools = ({
 		{
 			description:
 				"Validate the canonical saved project with the same completed-game semantic and resource-reference rules used by the editor build path. Returns readable diagnostics; it does not re-decode stored PNG bytes.",
+			inputSchema: EditorMcpValidateProjectInputSchema,
 		},
 		async () =>
 			runTool(readProjectFx().pipe(Effect.flatMap(readEditorMcpProjectValidationTextFx))),
@@ -85,13 +143,7 @@ export const registerEditorMcpGameplayDesignTools = ({
 		{
 			description:
 				"Rename one canonical item ID and every exact item reference in one revision-guarded project write. The item UID, line IDs, asset IDs, type, and all other fields remain unchanged. An optional revision copied from item_config rejects stale edits.",
-			inputSchema: z
-				.object({
-					itemId: IdSchema.describe("The current exact item ID."),
-					newItemId: IdSchema.describe("The new globally unique item ID."),
-					revision: RevisionSchema.optional(),
-				})
-				.strict(),
+			inputSchema: EditorMcpRenameItemInputSchema,
 		},
 		async ({ itemId, newItemId, revision }) =>
 			runTool(
@@ -114,11 +166,7 @@ export const registerEditorMcpGameplayDesignTools = ({
 		{
 			description:
 				"Preview whether an item can be safely deleted and every canonical structure a force delete would remove. Read this immediately before delete_item and copy its revision into the destructive request.",
-			inputSchema: z
-				.object({
-					itemId: IdSchema.describe("The exact item ID."),
-				})
-				.strict(),
+			inputSchema: EditorMcpItemDeleteImpactInputSchema,
 		},
 		async ({ itemId }) =>
 			runTool(
@@ -134,18 +182,7 @@ export const registerEditorMcpGameplayDesignTools = ({
 		{
 			description:
 				"Delete one item at the exact revision returned by item_delete_impact. Safe mode rejects referenced items. Force mode removes the item and the referencing structures listed by that impact in one project write; it never guesses through stale state.",
-			inputSchema: z
-				.object({
-					itemId: IdSchema.describe("The exact item ID inspected by item_delete_impact."),
-					revision: RevisionSchema,
-					force: z
-						.boolean()
-						.default(false)
-						.describe(
-							"False performs a safe delete; true applies the previewed cleanup.",
-						),
-				})
-				.strict(),
+			inputSchema: EditorMcpDeleteItemInputSchema,
 		},
 		async ({ force, itemId, revision }) =>
 			runTool(

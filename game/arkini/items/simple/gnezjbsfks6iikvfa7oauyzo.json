@@ -1,0 +1,19 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:gold-ore": {
+			"uid": "gnezjbsfks6iikvfa7oauyzo",
+			"id": "item:gold-ore",
+			"title": "Gold Ore Cart",
+			"description": "A mining cart loaded with gold ore. This is the high-value mining output that proves the settlement can reach deep mineral resources.",
+			"asset": {
+				"default": [
+					"item-gold-ore"
+				]
+			},
+			"scope": "any",
+			"maxStackSize": 20,
+			"type": "simple"
+		}
+	}
+}

@@ -8,7 +8,6 @@ import { createFilesystemAppearancePreferencesFx } from "../../electron/main/app
 
 let root = "";
 const preferenceDirectory = () => join(root, "arkini", "game", "preferences");
-const legacyThemePath = () => join(preferenceDirectory(), "appearance.theme");
 const themePath = () => join(preferenceDirectory(), "appearance.theme.json");
 const themePendingPath = () => join(preferenceDirectory(), "appearance.pending");
 const accentPath = () => join(preferenceDirectory(), "appearance.accent.json");
@@ -33,7 +32,7 @@ afterEach(async () => {
 });
 
 describe("createFilesystemAppearancePreferencesFx", () => {
-	it("defaults missing, legacy, or malformed preferences to dark and rose", async () => {
+	it("defaults missing or malformed preferences to dark and rose", async () => {
 		const preferences = await createPreferences();
 		expect(await Effect.runPromise(preferences.readThemeFx)).toBe("dark");
 		expect(await Effect.runPromise(preferences.readAccentFx)).toBe("rose");
@@ -41,9 +40,6 @@ describe("createFilesystemAppearancePreferencesFx", () => {
 		await mkdir(preferenceDirectory(), {
 			recursive: true,
 		});
-		await writeFile(legacyThemePath(), "light", "utf8");
-		expect(await Effect.runPromise(preferences.readThemeFx)).toBe("dark");
-
 		await writeFile(themePath(), "sepia", "utf8");
 		await writeFile(accentPath(), "ultraviolet", "utf8");
 

@@ -35,6 +35,6 @@ export const ValidateCommand = ({ input }: ValidateCommand.Props) =>
 			}),
 	).pipe(
 		Command.withDescription(
-			"Compile and validate one fragmented game-authoring directory without packing it.",
+			"Compile and validate one portable game-project directory without packing it.",
 		),
 	);

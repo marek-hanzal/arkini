@@ -8,5 +8,3 @@ export const EditorProjectVersionTagSchema = z
 	.min(1)
 	.max(80)
 	.refine((value) => !/[\r\n]/.test(value), "Version tags must use one line.");
-
-export const EditorProjectSnapshotFormatVersion = 1;

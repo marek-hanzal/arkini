@@ -25,8 +25,6 @@ const parseCatalog = (candidate: unknown) => {
 	if (
 		typeof candidate !== "object" ||
 		candidate === null ||
-		!("formatVersion" in candidate) ||
-		candidate.formatVersion !== 1 ||
 		!("projects" in candidate) ||
 		!Array.isArray(candidate.projects)
 	)
@@ -40,7 +38,6 @@ const parseCatalog = (candidate: unknown) => {
 		projects.push(parsed.data);
 	}
 	return EditorProjectCatalogSchema.parse({
-		formatVersion: 1,
 		projects,
 	});
 };
@@ -73,7 +70,6 @@ export const createFilesystemEditorProjectCatalogFx = Effect.fn(
 					)
 				: Effect.succeed(
 						EditorProjectCatalogSchema.parse({
-							formatVersion: 1,
 							projects: [],
 						}),
 					),
@@ -89,7 +85,6 @@ export const createFilesystemEditorProjectCatalogFx = Effect.fn(
 	const writeFx = (projects: ReadonlyArray<Entry>) =>
 		Effect.gen(function* () {
 			const next = EditorProjectCatalogSchema.parse({
-				formatVersion: 1,
 				projects,
 			});
 			yield* replaceJsonFx(catalogPath, next);

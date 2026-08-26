@@ -1,6 +1,6 @@
 import { Command, Flag } from "effect/unstable/cli";
 import { Console, Effect } from "effect";
-import { writeGameJsonSchemaFx } from "~/engine/schema/fx/writeGameJsonSchemaFx";
+import { writeGameProjectJsonSchemaFx } from "~/engine/schema/fx/writeGameProjectJsonSchemaFx";
 
 export namespace SchemaCommand {
 	export interface Props {
@@ -14,14 +14,14 @@ export namespace SchemaCommand {
 const runSchemaCommandFx = Effect.fn("runSchemaCommandFx")(function* ({
 	output,
 }: SchemaCommand.Props) {
-	yield* writeGameJsonSchemaFx({
+	yield* writeGameProjectJsonSchemaFx({
 		output,
 	});
 	yield* Console.log(`Generated ${output}.`);
 });
 
 /**
- * CLI command that generates the JSON Schema for game-configuration authoring.
+ * CLI command that generates the JSON Schema for portable game-project authoring.
  */
 export const SchemaCommand = ({ output }: SchemaCommand.Props) =>
 	Command.make(
@@ -36,4 +36,4 @@ export const SchemaCommand = ({ output }: SchemaCommand.Props) =>
 			runSchemaCommandFx({
 				output,
 			}),
-	).pipe(Command.withDescription("Generate the current game configuration JSON Schema."));
+	).pipe(Command.withDescription("Generate the current game-project JSON Schema."));

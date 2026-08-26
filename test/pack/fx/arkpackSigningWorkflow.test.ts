@@ -59,8 +59,6 @@ describe("Arkpack signing workflow", () => {
 				packSignedDirectoryFx({
 					input: gameDirectory,
 					keyId,
-					packageId: "untrusted-workflow",
-					version: "1.0",
 					output: join(root, "untrusted.game.arkpack"),
 					privateKey: pair.privateKey,
 					trustedKeys: {
@@ -82,8 +80,6 @@ describe("Arkpack signing workflow", () => {
 			packSignedDirectoryFx({
 				input: gameDirectory,
 				keyId,
-				packageId: "test-workflow",
-				version: "1.0",
 				output: arkpackPath,
 				privateKey: pair.privateKey,
 				trustedKeys,
@@ -108,7 +104,7 @@ describe("Arkpack signing workflow", () => {
 		const loaded = await Effect.runPromise(
 			readArkpackFx({
 				bytes,
-				packageId: "test-workflow",
+				packageId: "game:signing-workflow",
 				signature: {
 					metadata: signature,
 					trustedKeys,

@@ -90,7 +90,6 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	);
 	yield* diagnostics
 		.writeFx({
-			schemaVersion: 1,
 			category: [
 				"main",
 				"lifecycle",
@@ -110,7 +109,6 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 			void ElectronMainRuntime.runPromise(
 				diagnostics
 					.writeFx({
-						schemaVersion: 1,
 						category: [
 							"main",
 							"lifecycle",

@@ -28,14 +28,10 @@ export const editorProjectIpcProject = {
 };
 
 export const editorProjectIpcVersion = {
-	applicability: {
-		type: "applicable" as const,
-	},
 	arkini: ArkiniAppVersion,
 	arkpackVersion: editorProjectIpcProject.version,
 	createdAtMs: 3,
 	projectId: editorProjectIpcProject.projectId,
-	snapshotFormatVersion: 1,
 	sourceRevision: editorProjectIpcProject.revision,
 	subject: "Initial version",
 	versionId: "version-one",

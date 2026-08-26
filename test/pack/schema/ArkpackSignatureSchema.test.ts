@@ -15,20 +15,6 @@ describe("Arkpack signing schemas", () => {
 		expect(
 			ArkpackSignatureSchema.safeParse({
 				...validSignature,
-				format: 1,
-			}).success,
-		).toBe(false);
-		expect(
-			ArkpackSignatureSchema.safeParse({
-				...validSignature,
-				formatVersion: 1,
-				algorithm: "ed25519",
-				contentHash: "a".repeat(64),
-			}).success,
-		).toBe(false);
-		expect(
-			ArkpackSignatureSchema.safeParse({
-				...validSignature,
 				signature: btoa("too short"),
 			}).success,
 		).toBe(false);
@@ -76,25 +62,6 @@ describe("Arkpack signing schemas", () => {
 				keys: [
 					key,
 					key,
-				],
-			}).success,
-		).toBe(false);
-		expect(
-			ArkpackTrustedKeysSchema.safeParse({
-				format: 1,
-				keys: [
-					key,
-				],
-			}).success,
-		).toBe(false);
-		expect(
-			ArkpackTrustedKeysSchema.safeParse({
-				formatVersion: 1,
-				keys: [
-					{
-						...key,
-						algorithm: "ed25519",
-					},
 				],
 			}).success,
 		).toBe(false);

@@ -217,7 +217,6 @@ describe("Electron preload lifecycle", () => {
 		electron.ipcRenderer.invoke.mockResolvedValue(undefined);
 		const api = await loadPreload();
 		const record: Parameters<typeof api.diagnostics.write>[0] = {
-			schemaVersion: 1,
 			level: "fatal",
 			category: [
 				"renderer",

@@ -1,0 +1,119 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:chest-t4": {
+			"uid": "ovdnt7bzfq7yiwomk9gofoqr",
+			"id": "item:chest-t4",
+			"title": "Chest IV",
+			"description": "Locked chest returned from the longest Heroes Guild expedition. Open it with a Key IV.",
+			"asset": {
+				"default": [
+					"item-chest-t4"
+				]
+			},
+			"scope": "any",
+			"maxStackSize": 1,
+			"charges": {
+				"amount": 1
+			},
+			"type": "stash",
+			"line": {
+				"id": "line:chest-t4:open",
+				"title": "Open Chest T4",
+				"description": "Runs open chest t4 for Chest IV.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 24000,
+				"input": [
+					{
+						"charges": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:key-t4"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:coin",
+											"quantity": {
+												"min": 10,
+												"max": 15
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.35,
+									"drop": [
+										{
+											"itemId": "item:sapphire",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.55,
+									"drop": [
+										{
+											"itemId": "item:topaz",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.35,
+									"drop": [
+										{
+											"itemId": "item:aquamarine",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		}
+	}
+}

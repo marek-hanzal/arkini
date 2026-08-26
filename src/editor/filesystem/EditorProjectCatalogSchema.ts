@@ -2,12 +2,9 @@ import { z } from "zod";
 
 import { EditorProjectCatalogEntrySchema } from "./EditorProjectCatalogEntrySchema";
 
-export const EditorProjectCatalogFormatVersion = 1;
-
 /** Global main-process catalog used only to discover project directories. */
 export const EditorProjectCatalogSchema = z
 	.object({
-		formatVersion: z.literal(EditorProjectCatalogFormatVersion),
 		projects: z.array(EditorProjectCatalogEntrySchema),
 	})
 	.strict()

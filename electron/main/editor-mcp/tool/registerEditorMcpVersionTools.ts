@@ -31,7 +31,87 @@ const referenceSchema = z
 		z.literal("current"),
 		IdSchema,
 	])
-	.describe('Use "current" for the saved working copy or an exact version ID.');
+	.meta({
+		id: "EditorMcpVersionReferenceSchema",
+		description: 'Use "current" for the saved working copy or an exact version ID.',
+	});
+
+const EditorMcpVersionStatusInputSchema = z.object({}).strict().meta({
+	id: "EditorMcpVersionStatusInputSchema",
+	$id: "urn:arkini:schema:mcp:version-status-input",
+	title: "Version status tool input",
+	description: "The version status tool accepts no arguments.",
+});
+
+const EditorMcpVersionListInputSchema = z
+	.object({
+		limit: z.number().int().min(1).max(100).default(50),
+		offset: z.number().int().min(0).default(0),
+	})
+	.strict()
+	.meta({
+		id: "EditorMcpVersionListInputSchema",
+		$id: "urn:arkini:schema:mcp:version-list-input",
+		title: "Version list tool input",
+		description: "Pagination for the saved project version list.",
+	});
+
+const EditorMcpVersionDiffInputSchema = z
+	.object({
+		from: referenceSchema,
+		to: referenceSchema,
+	})
+	.strict()
+	.meta({
+		id: "EditorMcpVersionDiffInputSchema",
+		$id: "urn:arkini:schema:mcp:version-diff-input",
+		title: "Version diff tool input",
+		description: "The two saved-state references compared by the version diff tool.",
+	});
+
+const EditorMcpVersionCommitInputSchema = z
+	.object({
+		message: EditorProjectVersionSubjectSchema,
+		body: EditorProjectVersionBodySchema.optional(),
+		tag: EditorProjectVersionTagSchema.optional(),
+	})
+	.strict()
+	.meta({
+		id: "EditorMcpVersionCommitInputSchema",
+		$id: "urn:arkini:schema:mcp:version-commit-input",
+		title: "Version commit tool input",
+		description: "Metadata for a new explicit snapshot of the saved editor project.",
+	});
+
+const EditorMcpVersionCheckoutInputSchema = z
+	.object({
+		versionId: IdSchema,
+		confirmDiscardCurrentChanges: z
+			.literal(true)
+			.describe(
+				"Must be true to acknowledge permanent loss of the current saved state and unsaved drafts.",
+			),
+	})
+	.strict()
+	.meta({
+		id: "EditorMcpVersionCheckoutInputSchema",
+		$id: "urn:arkini:schema:mcp:version-checkout-input",
+		title: "Version checkout tool input",
+		description: "The saved version to restore and the required destructive confirmation.",
+	});
+
+const EditorMcpVersionTagInputSchema = z
+	.object({
+		versionId: IdSchema,
+		tag: EditorProjectVersionTagSchema.optional(),
+	})
+	.strict()
+	.meta({
+		id: "EditorMcpVersionTagInputSchema",
+		$id: "urn:arkini:schema:mcp:version-tag-input",
+		title: "Version tag tool input",
+		description: "The saved version and optional replacement tag.",
+	});
 
 const decodeReference = (value: string): EditorProjectVersionReference =>
 	value === "current"
@@ -46,7 +126,7 @@ const decodeReference = (value: string): EditorProjectVersionReference =>
 const describeVersion = (version: EditorProjectVersionDescriptor) =>
 	[
 		`${version.versionId} · ${version.subject}`,
-		`  ${new Date(version.createdAtMs).toISOString()} · Arkini ${version.arkini} · ${version.applicability.type}`,
+		`  ${new Date(version.createdAtMs).toISOString()} · Arkini ${version.arkini}`,
 		...(version.parentVersionId === undefined
 			? []
 			: [
@@ -105,6 +185,7 @@ export const registerEditorMcpVersionTools = ({
 		{
 			description:
 				"Read whether the open project's saved working copy differs from its current version base.",
+			inputSchema: EditorMcpVersionStatusInputSchema,
 		},
 		async () =>
 			runTool(
@@ -127,12 +208,7 @@ export const registerEditorMcpVersionTools = ({
 		{
 			description:
 				"List version metadata newest first. Snapshot contents and binary assets are never dumped.",
-			inputSchema: z
-				.object({
-					limit: z.number().int().min(1).max(100).default(50),
-					offset: z.number().int().min(0).default(0),
-				})
-				.strict(),
+			inputSchema: EditorMcpVersionListInputSchema,
 		},
 		async ({ limit, offset }) =>
 			runTool(
@@ -155,12 +231,7 @@ export const registerEditorMcpVersionTools = ({
 		{
 			description:
 				"Compare any two saved versions or the saved working copy. Returns structural paths and identities, never complete values or binary data.",
-			inputSchema: z
-				.object({
-					from: referenceSchema,
-					to: referenceSchema,
-				})
-				.strict(),
+			inputSchema: EditorMcpVersionDiffInputSchema,
 		},
 		async ({ from, to }) =>
 			runTool(
@@ -181,13 +252,7 @@ export const registerEditorMcpVersionTools = ({
 		{
 			description:
 				"Create an explicit full snapshot of the open project's saved state, including assets and Board scenarios. Unsaved editor drafts are excluded.",
-			inputSchema: z
-				.object({
-					message: EditorProjectVersionSubjectSchema,
-					body: EditorProjectVersionBodySchema.optional(),
-					tag: EditorProjectVersionTagSchema.optional(),
-				})
-				.strict(),
+			inputSchema: EditorMcpVersionCommitInputSchema,
 		},
 		async ({ body, message, tag }) =>
 			runTool(
@@ -225,16 +290,7 @@ export const registerEditorMcpVersionTools = ({
 		{
 			description:
 				"Replace the entire open editor project with one applicable version through the renderer checkout handshake. This permanently discards the current saved state and every unsaved draft.",
-			inputSchema: z
-				.object({
-					versionId: IdSchema,
-					confirmDiscardCurrentChanges: z
-						.literal(true)
-						.describe(
-							"Must be true to acknowledge permanent loss of the current saved state and unsaved drafts.",
-						),
-				})
-				.strict(),
+			inputSchema: EditorMcpVersionCheckoutInputSchema,
 		},
 		async ({ versionId }) =>
 			runTool(
@@ -246,8 +302,6 @@ export const registerEditorMcpVersionTools = ({
 						return yield* Effect.fail(
 							new Error(`Version ${versionId} does not exist.`),
 						);
-					if (version.applicability.type === "incompatible")
-						return yield* Effect.fail(new Error(version.applicability.reason));
 					yield* requestVersionCheckoutFx(project.projectId, versionId);
 					return `Version checked out\n${describeVersion(version)}\nThe mounted editor was refreshed in place.`;
 				}),
@@ -258,12 +312,7 @@ export const registerEditorMcpVersionTools = ({
 		{
 			description:
 				"Set a one-line user label on an applicable version, or omit tag to clear it. Tags have no graph semantics.",
-			inputSchema: z
-				.object({
-					versionId: IdSchema,
-					tag: EditorProjectVersionTagSchema.optional(),
-				})
-				.strict(),
+			inputSchema: EditorMcpVersionTagInputSchema,
 		},
 		async ({ tag, versionId }) =>
 			runTool(

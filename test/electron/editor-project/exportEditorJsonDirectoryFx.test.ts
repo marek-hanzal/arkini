@@ -6,6 +6,7 @@ import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { exportEditorJsonDirectoryFx } from "../../../electron/main/editor-project/exportEditorJsonDirectoryFx";
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 import { createEditorProjectIpcRepository } from "./ipc/support/createEditorProjectIpcRepository";
 
 const electron = vi.hoisted(() => {
@@ -84,7 +85,13 @@ describe("exportEditorJsonDirectoryFx", () => {
 			mkdir(target),
 		]);
 		await Promise.all([
-			writeFile(join(source, "editor.json"), '{"format":"arkini-editor"}'),
+			writeFile(
+				join(source, "project.json"),
+				JSON.stringify({
+					arkini: ArkiniAppVersion,
+					updatedAtMs: 1,
+				}),
+			),
 			writeFile(join(source, "game.json"), '{"meta":{}}'),
 			writeFile(join(source, "items", "simple", "item.json"), '{"items":{}}'),
 			writeFile(join(source, "notes", "note.json"), '{"content":"kept"}'),

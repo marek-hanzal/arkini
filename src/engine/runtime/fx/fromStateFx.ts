@@ -30,7 +30,7 @@ export const fromStateFx = Effect.fn("fromStateFx")(function* ({ state }: fromSt
 			currentSpace: state.currentSpace,
 			items,
 			jobs: state.jobs,
-			jobQueue: state.jobQueue ?? [],
+			jobQueue: state.jobQueue,
 			defaultLineByOwnerItemId: {
 				...(state.defaultLineByOwnerItemId ?? {}),
 			},

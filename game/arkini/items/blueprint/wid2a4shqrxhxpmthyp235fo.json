@@ -1,0 +1,179 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:blueprint-armory-t1": {
+			"uid": "wid2a4shqrxhxpmthyp235fo",
+			"id": "item:blueprint-armory-t1",
+			"title": "Armory I Blueprint",
+			"description": "Build plan that can be filled with guild resources to construct Armory I.",
+			"asset": {
+				"default": [
+					"blueprint",
+					"producer-armory-t1"
+				],
+				"sources": [
+					"producer-armory-t1"
+				]
+			},
+			"scope": "any",
+			"maxStackSize": 1,
+			"charges": {
+				"amount": 1
+			},
+			"type": "blueprint",
+			"line": {
+				"id": "line:blueprint:armory-t1:construct",
+				"title": "Construct Armory I",
+				"description": "Consumes construction resources to build Armory I.",
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 70000,
+				"input": [
+					{
+						"charges": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:construction-bundle"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:guild-charter"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:nails"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:leather"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:common-clothing"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:iron-ingot"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:armory-t1",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "producer:blacksmith-t1"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							},
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "producer:tailor-workshop-t1"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							},
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "producer:tannery-t1"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			}
+		}
+	}
+}

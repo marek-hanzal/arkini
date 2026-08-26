@@ -1,5 +1,5 @@
 {
-	"$schema": "../schema.json",
+	"$schema": "./schema.json",
 	"meta": {
 		"id": "arkini",
 		"title": "Arkini",
@@ -24,53 +24,58 @@
 		"avatar-07": "avatar-07"
 	},
 	"start": {
+		"currentSpace": 0,
 		"board": [
 			{
-				"itemId": "item:tree",
 				"x": 1,
 				"y": 0,
-				"space": 0
+				"space": 0,
+				"itemId": "item:tree"
 			},
 			{
-				"itemId": "item:tree",
 				"x": 0,
 				"y": 1,
-				"space": 0
+				"space": 0,
+				"itemId": "item:tree"
 			},
 			{
-				"itemId": "item:tree",
 				"x": 1,
 				"y": 2,
-				"space": 0
+				"space": 0,
+				"itemId": "item:tree"
 			},
 			{
-				"itemId": "producer:lumberjack-t1",
 				"x": 1,
 				"y": 1,
-				"space": 0
+				"space": 0,
+				"itemId": "producer:lumberjack-t1"
 			},
 			{
-				"itemId": "producer:townhall-t1",
 				"x": 4,
 				"y": 3,
-				"space": 0
+				"space": 0,
+				"itemId": "producer:townhall-t1"
 			},
 			{
-				"itemId": "item:rock",
 				"x": 6,
 				"y": 0,
-				"space": 0
+				"space": 0,
+				"itemId": "item:rock"
 			},
 			{
-				"itemId": "producer:quarry-t1",
 				"x": 6,
 				"y": 1,
-				"space": 0
+				"space": 0,
+				"itemId": "producer:quarry-t1"
 			}
 		],
 		"inventory": [
 			{
 				"itemId": "item:magnifying-glass",
+				"position": {
+					"x": 0,
+					"y": 0
+				},
 				"quantity": 1
 			}
 		],
@@ -82,7 +87,7 @@
 					"y": 0
 				}
 			}
-		],
-		"currentSpace": 0
-	}
+		]
+	},
+	"arkpack": "2.0"
 }

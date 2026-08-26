@@ -2,15 +2,20 @@ import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 
-export const AssetCompositionSchema = z.union([
-	z.tuple([
-		IdSchema,
-	]),
-	z.tuple([
-		IdSchema,
-		IdSchema,
-	]),
-]);
+export const AssetCompositionSchema = z
+	.union([
+		z.tuple([
+			IdSchema,
+		]),
+		z.tuple([
+			IdSchema,
+			IdSchema,
+		]),
+	])
+	.meta({
+		id: "AssetCompositionSchema",
+		description: "A one- or two-layer visual asset composition in back-to-front order.",
+	});
 
 /**
  * Describes the visual representation of a game item.

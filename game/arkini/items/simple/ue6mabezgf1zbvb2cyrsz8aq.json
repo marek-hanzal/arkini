@@ -1,0 +1,114 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:axe": {
+			"uid": "ue6mabezgf1zbvb2cyrsz8aq",
+			"id": "item:axe",
+			"title": "Axe",
+			"description": "Single-use chopping tool. Drag onto tree sources to harvest logs; also still serves later expedition gear chains.",
+			"asset": {
+				"default": [
+					"item-axe"
+				]
+			},
+			"scope": "any",
+			"maxStackSize": 20,
+			"merge": [
+				{
+					"target": {
+						"type": "item",
+						"itemId": "item:tree"
+					},
+					"action": "consume",
+					"output": {
+						"set": [
+							{
+								"weight": 1,
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:log",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					"effect": "remove"
+				},
+				{
+					"target": {
+						"type": "item",
+						"itemId": "item:double-tree"
+					},
+					"action": "consume",
+					"output": {
+						"set": [
+							{
+								"weight": 1,
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:log",
+												"quantity": {
+													"min": 1,
+													"max": 2
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					"effect": "remove"
+				},
+				{
+					"target": {
+						"type": "item",
+						"itemId": "item:micro-forest"
+					},
+					"action": "consume",
+					"output": {
+						"set": [
+							{
+								"weight": 1,
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:log",
+												"quantity": {
+													"min": 1,
+													"max": 3
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					"effect": "remove"
+				}
+			],
+			"type": "simple"
+		}
+	}
+}

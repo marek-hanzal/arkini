@@ -16,8 +16,8 @@ import {
 	EditorProjectCompatibility,
 	type EditorProjectCompatibilityLevel,
 } from "~/editor/version/EditorProjectCompatibility";
-import { EditorProjectFileSchema } from "~/editor/filesystem/EditorProjectFileSchema";
-import { EditorProjectGameSchemaReference } from "~/editor/filesystem/EditorProjectSchemaReference";
+import { GameProjectGameSchemaReference } from "~/engine/source/GameProjectReference";
+import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -116,7 +116,7 @@ export const createFilesystemEditorProjectCommitOperationsFx = Effect.fn(
 	}) {
 		const canonicalConfig = GameConfigSchema.parse({
 			...config,
-			$schema: EditorProjectGameSchemaReference,
+			$schema: GameProjectGameSchemaReference,
 		});
 		if (canonicalConfig.meta.id !== state.project.projectId)
 			return yield* Effect.fail(
@@ -132,7 +132,7 @@ export const createFilesystemEditorProjectCommitOperationsFx = Effect.fn(
 				: compatibility.level;
 		const updatedAtMs = Math.max(nowMs, state.project.updatedAtMs + 1);
 		const version = EditorProjectCompatibility.bumpVersion(state.project.version, level);
-		const marker = EditorProjectFileSchema.parse({
+		const marker = GameProjectManifestSchema.parse({
 			arkini: ArkiniAppVersion,
 			updatedAtMs,
 		});
@@ -156,7 +156,7 @@ export const createFilesystemEditorProjectCommitOperationsFx = Effect.fn(
 				root: state.paths.root,
 				previous: {
 					arkpack: state.project.version,
-					marker: EditorProjectFileSchema.parse({
+					marker: GameProjectManifestSchema.parse({
 						arkini: ArkiniAppVersion,
 						updatedAtMs: state.project.updatedAtMs,
 					}),

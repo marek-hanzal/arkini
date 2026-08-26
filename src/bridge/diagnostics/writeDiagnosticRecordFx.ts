@@ -11,18 +11,11 @@ const reportDiagnosticFailure = (cause: unknown) => {
 };
 
 /** Fire-and-forget renderer edge. Logger failures are deliberately isolated from gameplay. */
-export const writeDiagnosticRecordFx = Effect.fnUntraced(function* (
-	record: Omit<DiagnosticRecord, "schemaVersion">,
-) {
+export const writeDiagnosticRecordFx = Effect.fnUntraced(function* (record: DiagnosticRecord) {
 	try {
 		const diagnostics = window.arkini?.diagnostics;
 		if (diagnostics === undefined) return;
-		void diagnostics
-			.write({
-				schemaVersion: 1,
-				...record,
-			})
-			.catch(reportDiagnosticFailure);
+		void diagnostics.write(record).catch(reportDiagnosticFailure);
 	} catch (cause) {
 		reportDiagnosticFailure(cause);
 	}

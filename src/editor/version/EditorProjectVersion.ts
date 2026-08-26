@@ -2,25 +2,14 @@ import type { Effect } from "effect";
 
 import type { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 
-export type EditorProjectVersionApplicability =
-	| {
-			readonly type: "applicable";
-	  }
-	| {
-			readonly type: "incompatible";
-			readonly reason: string;
-	  };
-
 /** Lightweight immutable node in one project's version tree. */
 export interface EditorProjectVersionDescriptor {
-	readonly applicability: EditorProjectVersionApplicability;
 	readonly arkini: string;
 	readonly arkpackVersion: string;
 	readonly body?: string;
 	readonly createdAtMs: number;
 	readonly parentVersionId?: string;
 	readonly projectId: string;
-	readonly snapshotFormatVersion: number;
 	readonly sourceRevision: number;
 	readonly subject: string;
 	readonly tag?: string;

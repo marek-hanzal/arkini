@@ -19,7 +19,6 @@ const MAX_FILES = 4;
 
 const writeRecord = (logger: Logger, record: DiagnosticRecord) => {
 	const properties = {
-		schemaVersion: record.schemaVersion,
 		event: record.event,
 		...(record.sessionId === undefined
 			? {}

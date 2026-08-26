@@ -43,7 +43,6 @@ describe("Diagnostic log", () => {
 		for (let index = 0; index < 90; index += 1) {
 			Effect.runSync(
 				diagnostics.writeFx({
-					schemaVersion: 1,
 					category: [
 						"test",
 						"rotation",
@@ -86,7 +85,6 @@ describe("Diagnostic log", () => {
 			properties: {
 				event: "large-record",
 				index: 89,
-				schemaVersion: 1,
 				sessionId: "session:test",
 			},
 		});

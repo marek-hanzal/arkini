@@ -8,8 +8,6 @@ export const GameCommand = Command.make("game")
 		Command.withSubcommands([
 			PackCommand({
 				input: "game/arkini",
-				packageId: "arkini",
-				version: "1.0",
 			}),
 			SchemaCommand({
 				output: "game/schema.json",

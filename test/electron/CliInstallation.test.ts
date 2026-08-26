@@ -55,7 +55,7 @@ describe("filesystem CLI installation", () => {
 			type: "installed",
 		});
 		expect(await readFile(fixture.commandPath, "utf8")).toContain(
-			"# arkini-cli managed launcher v1",
+			"# arkini-cli managed launcher",
 		);
 		await expect(
 			execFileAsync(fixture.commandPath, [
@@ -78,7 +78,7 @@ describe("filesystem CLI installation", () => {
 		});
 		await writeFile(
 			fixture.commandPath,
-			"#!/bin/sh\n# arkini-cli managed launcher v1\nexec '/Volumes/Arkini/Arkini.app/Contents/MacOS/arkini-cli' \"$@\"\n",
+			"#!/bin/sh\n# arkini-cli managed launcher\nexec '/Volumes/Arkini/Arkini.app/Contents/MacOS/arkini-cli' \"$@\"\n",
 		);
 
 		await expect(Effect.runPromise(fixture.installation.readStatusFx)).resolves.toMatchObject({

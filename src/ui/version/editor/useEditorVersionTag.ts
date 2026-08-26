@@ -37,8 +37,7 @@ export const useEditorVersionTag = ({
 		],
 	);
 	const save = useCallback(() => {
-		if (selected === undefined || selected.applicability.type === "incompatible" || pending)
-			return;
+		if (selected === undefined || pending) return;
 		setPending(true);
 		reportError();
 		void RendererRuntime.runPromise(

@@ -21,7 +21,6 @@ export const EditorVersionDescriptorFileSchema = z
 		arkini: ArkiniVersionSchema,
 		arkpackVersion: ArkpackVersionSchema,
 		sourceRevision: z.number().int().nonnegative(),
-		snapshotFormatVersion: z.number().int().positive(),
 		contentFingerprint: EditorObjectHashSchema,
 		createdAtMs: z.number().int().nonnegative(),
 	})

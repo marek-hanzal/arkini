@@ -266,6 +266,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 							: boardItem("target", 1),
 						boardItem("owner", 2),
 					],
+					jobQueue: [],
 					jobs:
 						scope === "job" || scope === "reserved"
 							? [
@@ -383,6 +384,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 					boardItem("source", 0),
 					boardItem("target", 1),
 				],
+				jobQueue: [],
 				jobs: [
 					{
 						id: "job:target",
@@ -449,6 +451,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 						quantity: 1,
 					},
 				],
+				jobQueue: [],
 				jobs: [],
 			} satisfies StateSchema.Type;
 			const result = Effect.runSync(
@@ -492,6 +495,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				boardItem("source", 0),
 				boardItem("target", 1),
 			],
+			jobQueue: [],
 			jobs: [],
 		} satisfies StateSchema.Type;
 		const result = Effect.runSync(
@@ -541,6 +545,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 					remainingCharges: 5,
 				},
 			],
+			jobQueue: [],
 			jobs: [],
 		} satisfies StateSchema.Type;
 		const result = Effect.runSync(
@@ -583,6 +588,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 					remainingCharges: 5,
 				},
 			],
+			jobQueue: [],
 			jobs: [],
 		} satisfies StateSchema.Type;
 		const result = Effect.runSync(
@@ -633,6 +639,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 						remainingCharges: 1,
 					},
 				],
+				jobQueue: [],
 				jobs: [],
 			} satisfies StateSchema.Type;
 			const result = Effect.runSync(

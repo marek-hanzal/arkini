@@ -28,7 +28,6 @@ const EditorVersionReferenceSelect = ({
 			value: "current",
 		},
 		...versions.map((version) => ({
-			disabled: version.applicability.type === "incompatible",
 			label: version.subject,
 			value: version.versionId,
 		})),
@@ -143,10 +142,7 @@ export const EditorVersionHistory = () => {
 									</dl>
 								</div>
 								<DangerButton
-									disabled={
-										controller.checkoutPending ||
-										controller.selected.applicability.type === "incompatible"
-									}
+									disabled={controller.checkoutPending}
 									cursorIntent={
 										controller.checkoutPending ? "progress" : undefined
 									}
@@ -155,11 +151,6 @@ export const EditorVersionHistory = () => {
 									{controller.checkoutPending ? "Restoring…" : "Restore version"}
 								</DangerButton>
 							</div>
-							{controller.selected.applicability.type === "incompatible" ? (
-								<p className="rounded-lg bg-warning/10 p-3 text-sm text-warning">
-									{controller.selected.applicability.reason}
-								</p>
-							) : null}
 							{controller.selected.body === undefined ? null : (
 								<p className="whitespace-pre-wrap text-sm leading-6 text-muted">
 									{controller.selected.body}
@@ -173,10 +164,6 @@ export const EditorVersionHistory = () => {
 											editorInputClassName,
 											"h-9 min-h-0 min-w-0 py-1.5",
 										)}
-										disabled={
-											controller.selected.applicability.type ===
-											"incompatible"
-										}
 										maxLength={80}
 										placeholder="No tag"
 										value={controller.tagDraft}
@@ -189,11 +176,7 @@ export const EditorVersionHistory = () => {
 										cursorIntent={
 											controller.tagPending ? "progress" : undefined
 										}
-										disabled={
-											controller.tagPending ||
-											controller.selected.applicability.type ===
-												"incompatible"
-										}
+										disabled={controller.tagPending}
 										onClick={controller.saveTag}
 									>
 										<span
@@ -209,8 +192,7 @@ export const EditorVersionHistory = () => {
 						<div>
 							<h3 className="font-semibold">Compare</h3>
 							<p className="mt-1 text-xs text-muted">
-								Select the working copy or any applicable saved version on either
-								side.
+								Select the working copy or any saved version on either side.
 							</p>
 						</div>
 						<div className="grid gap-3 sm:grid-cols-2">

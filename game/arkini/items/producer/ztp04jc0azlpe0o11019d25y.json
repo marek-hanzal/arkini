@@ -1,0 +1,667 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"producer:goldsmith-t1": {
+			"uid": "ztp04jc0azlpe0o11019d25y",
+			"id": "producer:goldsmith-t1",
+			"title": "Goldsmith I",
+			"description": "Guild-era gold sink that mints coin stacks and crafts gem-set keys for the expedition loop.",
+			"asset": {
+				"default": [
+					"producer-goldsmith-t1"
+				]
+			},
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"type": "producer",
+			"lines": [
+				{
+					"id": "line:goldsmith-t1:coin-stack",
+					"title": "Coin Stack",
+					"description": "Runs coin stack for Goldsmith I.",
+					"default": false,
+					"show": true,
+					"enable": true,
+					"runtimeMs": 25000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:gold-ingot"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 2,
+								"max": 2
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:charcoal"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 5
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"weight": 1,
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:coin-stack",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.35,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.06,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					"rules": [
+						{
+							"when": [
+								{
+									"query": {
+										"selector": {
+											"type": "item",
+											"itemId": "producer:purifier-t1"
+										},
+										"scope": "board",
+										"distance": "far"
+									},
+									"type": "exists"
+								}
+							],
+							"type": "enable"
+						}
+					]
+				},
+				{
+					"id": "line:goldsmith-t1:key-t1",
+					"title": "Key T1",
+					"description": "Runs key t1 for Goldsmith I.",
+					"default": false,
+					"show": true,
+					"enable": true,
+					"runtimeMs": 30000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:gold-ingot"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 5
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:iron-ingot"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 5
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:advanced-knowledge"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:charcoal"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 5
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"weight": 1,
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:key-t1",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.35,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.06,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					"rules": [
+						{
+							"when": [
+								{
+									"query": {
+										"selector": {
+											"type": "item",
+											"itemId": "producer:purifier-t1"
+										},
+										"scope": "board",
+										"distance": "far"
+									},
+									"type": "exists"
+								}
+							],
+							"type": "enable"
+						}
+					]
+				},
+				{
+					"id": "line:goldsmith-t1:key-t2",
+					"title": "Key T2",
+					"description": "Runs key t2 for Goldsmith I.",
+					"default": false,
+					"show": true,
+					"enable": true,
+					"runtimeMs": 34000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:key-t1"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:gold-ingot"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 5
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:ruby"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:charcoal"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 5
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"weight": 1,
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:key-t2",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.35,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.06,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					"rules": [
+						{
+							"when": [
+								{
+									"query": {
+										"selector": {
+											"type": "item",
+											"itemId": "producer:purifier-t1"
+										},
+										"scope": "board",
+										"distance": "far"
+									},
+									"type": "exists"
+								}
+							],
+							"type": "enable"
+						}
+					]
+				},
+				{
+					"id": "line:goldsmith-t1:key-t3",
+					"title": "Key T3",
+					"description": "Runs key t3 for Goldsmith I.",
+					"default": false,
+					"show": true,
+					"enable": true,
+					"runtimeMs": 38000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:key-t2"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:gold-ingot"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 5
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:emerald"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:charcoal"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 5
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"weight": 1,
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:key-t3",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.35,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.06,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					"rules": [
+						{
+							"when": [
+								{
+									"query": {
+										"selector": {
+											"type": "item",
+											"itemId": "producer:purifier-t1"
+										},
+										"scope": "board",
+										"distance": "far"
+									},
+									"type": "exists"
+								}
+							],
+							"type": "enable"
+						}
+					]
+				},
+				{
+					"id": "line:goldsmith-t1:key-t4",
+					"title": "Key T4",
+					"description": "Runs key t4 for Goldsmith I.",
+					"default": false,
+					"show": true,
+					"enable": true,
+					"runtimeMs": 45000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:key-t3"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:gold-ingot"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 5
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:sapphire"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:charcoal"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 5
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"weight": 1,
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:key-t4",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.35,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.06,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					"rules": [
+						{
+							"when": [
+								{
+									"query": {
+										"selector": {
+											"type": "item",
+											"itemId": "producer:purifier-t1"
+										},
+										"scope": "board",
+										"distance": "far"
+									},
+									"type": "exists"
+								}
+							],
+							"type": "enable"
+						}
+					]
+				}
+			]
+		}
+	}
+}

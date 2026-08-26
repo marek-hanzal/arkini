@@ -9,7 +9,7 @@ import { createEditorProjectFilesystemPathsFx } from "../../../../electron/main/
 import { createFilesystemEditorVersionSnapshotFx } from "../../../../electron/main/editor-project/filesystem/fx/createFilesystemEditorVersionSnapshotFx";
 import { readFilesystemEditorVersionSnapshotFx } from "../../../../electron/main/editor-project/filesystem/fx/readFilesystemEditorVersionSnapshotFx";
 import { EditorBoardScenarioSchema } from "~/editor/board/EditorBoardScenarioSchema";
-import { EditorProjectGameSchemaReference } from "~/editor/filesystem/EditorProjectSchemaReference";
+import { GameProjectGameSchemaReference } from "~/engine/source/GameProjectReference";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
@@ -82,7 +82,7 @@ describe("filesystem Editor version objects", () => {
 			arkpack: editorTestPayload.version,
 			config: GameConfigSchema.parse({
 				...editorTestPayload.config,
-				$schema: EditorProjectGameSchemaReference,
+				$schema: GameProjectGameSchemaReference,
 			}),
 			resources: editorTestPayload.resources,
 			scenarios: [

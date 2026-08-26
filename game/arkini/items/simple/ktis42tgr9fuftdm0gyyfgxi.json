@@ -1,0 +1,19 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:iron-ore": {
+			"uid": "ktis42tgr9fuftdm0gyyfgxi",
+			"id": "item:iron-ore",
+			"title": "Iron Ore Cart",
+			"description": "A mining cart loaded with iron ore. Smelters refine it into iron ingots.",
+			"asset": {
+				"default": [
+					"item-iron-ore"
+				]
+			},
+			"scope": "any",
+			"maxStackSize": 20,
+			"type": "simple"
+		}
+	}
+}

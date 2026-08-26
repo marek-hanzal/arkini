@@ -6,7 +6,6 @@ import type { FilesystemEditorProjectState } from "../FilesystemEditorProjectSta
 import type { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 import type { EditorProjectVersionReference } from "~/editor/version/EditorProjectVersion";
 import { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
-import { readEditorProjectVersionApplicability } from "~/editor/version/readEditorProjectVersionApplicabilityFx";
 import { hashFilesystemEditorVersionBytes } from "./FilesystemEditorVersionFingerprint";
 import { createFilesystemEditorVersionSnapshotPlan } from "./createFilesystemEditorVersionSnapshotPlan";
 import { readFilesystemEditorVersionSnapshotFx } from "./readFilesystemEditorVersionSnapshotFx";
@@ -125,9 +124,6 @@ export const createFilesystemEditorProjectVersionReaderFx = Effect.fn(
 				),
 			};
 		const version = yield* readPublishedVersionFx(state, reference.versionId);
-		const applicability = readEditorProjectVersionApplicability(version.descriptor.arkini);
-		if (applicability.type === "incompatible")
-			return yield* Effect.fail(new Error(applicability.reason));
 		const snapshot = yield* readFilesystemEditorVersionSnapshotFx({
 			manifest: version.manifest,
 			paths: state.paths,

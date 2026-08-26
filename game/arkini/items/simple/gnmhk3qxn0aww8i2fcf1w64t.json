@@ -1,0 +1,19 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:trash": {
+			"uid": "gnmhk3qxn0aww8i2fcf1w64t",
+			"id": "item:trash",
+			"title": "Trash",
+			"description": "Generic board waste byproduct from messy production lines.",
+			"asset": {
+				"default": [
+					"item-trash"
+				]
+			},
+			"scope": "board",
+			"maxStackSize": 1,
+			"type": "simple"
+		}
+	}
+}

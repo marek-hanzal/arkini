@@ -1,0 +1,20 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:effect:minor-haste": {
+			"uid": "ic9cvuxqozhilgpqqin6wduf",
+			"id": "item:effect:minor-haste",
+			"title": "Minor Haste",
+			"description": "A temporary shrine blessing that later rules can use to accelerate production while it occupies the board.",
+			"asset": {
+				"default": [
+					"producer-shrine-t1"
+				]
+			},
+			"scope": "board",
+			"maxStackSize": 1,
+			"type": "temporary",
+			"durationMs": 300000
+		}
+	}
+}

@@ -1,0 +1,146 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:blueprint-dye-workshop-t1": {
+			"uid": "g76lt5pu6cl4n28waovf5nsb",
+			"id": "item:blueprint-dye-workshop-t1",
+			"title": "Dye Workshop I Blueprint",
+			"description": "Build plan that can be filled with resources to construct Dye Workshop I.",
+			"asset": {
+				"default": [
+					"blueprint",
+					"producer-dye-workshop-t1"
+				],
+				"sources": [
+					"producer-dye-workshop-t1"
+				]
+			},
+			"scope": "any",
+			"maxStackSize": 1,
+			"charges": {
+				"amount": 1
+			},
+			"type": "blueprint",
+			"line": {
+				"id": "line:blueprint:dye-workshop-t1:construct",
+				"title": "Construct Dye Workshop I",
+				"description": "Consumes construction resources to build Dye Workshop I.",
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 40000,
+				"input": [
+					{
+						"charges": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:plank"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stone-block"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:vegetables"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:water"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:building-permit"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:dye-workshop-t1",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "producer:weaver-hut-t1"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			}
+		}
+	}
+}

@@ -1,0 +1,46 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:tree": {
+			"uid": "b4o95tfii7qk0tv2ht2roxbb",
+			"id": "item:tree",
+			"title": "Tree",
+			"description": "Movable tier-1 wood source. Nearby lumberjacks use it for log drop rolls. Harvesting it with a single-use axe removes the source and drops logs.",
+			"asset": {
+				"default": [
+					"item-tree"
+				]
+			},
+			"scope": "any",
+			"maxStackSize": 1,
+			"charges": {
+				"amount": 18,
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:seed",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			},
+			"maxQueueSize": 1,
+			"type": "deposit"
+		}
+	}
+}

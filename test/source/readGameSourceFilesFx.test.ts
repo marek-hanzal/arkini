@@ -5,6 +5,8 @@ import { describe, expect, it } from "vitest";
 
 import { readGameSourceFilesFx } from "~/engine/compiler/fx/readGameSourceFilesFx";
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { createGameProjectJsonSchema } from "~/engine/schema/fx/writeGameProjectJsonSchemaFx";
+import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
 
 describe("readGameSourceFilesFx", () => {
 	it("collects JSON syntax and fragment-schema diagnostics across files", async () => {
@@ -13,9 +15,26 @@ describe("readGameSourceFilesFx", () => {
 				const fileSystem = yield* FileSystem.FileSystem;
 				const path = yield* Path.Path;
 				const input = yield* fileSystem.makeTempDirectoryScoped();
-				yield* fileSystem.writeFileString(path.join(input, "broken.json"), "{ nope");
+				yield* fileSystem.makeDirectory(path.join(input, "items", "simple"), {
+					recursive: true,
+				});
 				yield* fileSystem.writeFileString(
-					path.join(input, "invalid.json"),
+					path.join(input, "project.json"),
+					JSON.stringify({
+						arkini: ArkiniAppVersion,
+						updatedAtMs: 1,
+					}),
+				);
+				yield* fileSystem.writeFileString(
+					path.join(input, "schema.json"),
+					JSON.stringify(createGameProjectJsonSchema()),
+				);
+				yield* fileSystem.writeFileString(
+					path.join(input, "items", "simple", "broken.json"),
+					"{ nope",
+				);
+				yield* fileSystem.writeFileString(
+					path.join(input, "items", "simple", "invalid.json"),
 					JSON.stringify({
 						items: [],
 					}),

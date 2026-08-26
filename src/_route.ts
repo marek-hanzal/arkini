@@ -65,7 +65,6 @@ import { Route as EditorProjectIdAssetsResourceIdDetailTechnicalRouteImport } fr
 import { Route as EditorProjectIdAssetsResourceIdDetailUsageRouteImport } from "./@routes/editor/$projectId/assets/$resourceId/detail/usage"
 import { Route as EditorProjectIdEditorItemsItemUidDetailRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/detail"
 import { Route as EditorProjectIdEditorItemsItemUidFormRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/form"
-import { Route as EditorProjectIdEditorItemsItemUidViewRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/view"
 import { Route as EditorProjectIdEditorItemsNewSelectRouteImport } from "./@routes/editor/$projectId/editor/items/new/select"
 import { Route as EditorProjectIdEditorItemsItemUidDetailIndexRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/detail/index"
 import { Route as EditorProjectIdEditorItemsItemUidDetailSectionIdRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
@@ -376,12 +375,6 @@ const EditorProjectIdEditorItemsItemUidFormRoute =
     path: "/form",
     getParentRoute: () => EditorProjectIdEditorItemsItemUidRoute,
   } as any)
-const EditorProjectIdEditorItemsItemUidViewRoute =
-  EditorProjectIdEditorItemsItemUidViewRouteImport.update({
-    id: "/view",
-    path: "/view",
-    getParentRoute: () => EditorProjectIdEditorItemsItemUidRoute,
-  } as any)
 const EditorProjectIdEditorItemsNewSelectRoute =
   EditorProjectIdEditorItemsNewSelectRouteImport.update({
     id: "/select",
@@ -461,7 +454,6 @@ export interface FileRoutesByFullPath {
   "/editor/$projectId/assets/$resourceId/detail/usage": typeof EditorProjectIdAssetsResourceIdDetailUsageRoute
   "/editor/$projectId/editor/items/$itemUid/detail": typeof EditorProjectIdEditorItemsItemUidDetailRouteWithChildren
   "/editor/$projectId/editor/items/$itemUid/form": typeof EditorProjectIdEditorItemsItemUidFormRouteWithChildren
-  "/editor/$projectId/editor/items/$itemUid/view": typeof EditorProjectIdEditorItemsItemUidViewRoute
   "/editor/$projectId/editor/items/new/select": typeof EditorProjectIdEditorItemsNewSelectRoute
   "/editor/$projectId/assets/$resourceId/detail/": typeof EditorProjectIdAssetsResourceIdDetailIndexRoute
   "/editor/$projectId/editor/items/$itemUid/detail/$sectionId": typeof EditorProjectIdEditorItemsItemUidDetailSectionIdRoute
@@ -514,7 +506,6 @@ export interface FileRoutesByTo {
   "/editor/$projectId/assets/$resourceId/detail/technical": typeof EditorProjectIdAssetsResourceIdDetailTechnicalRoute
   "/editor/$projectId/assets/$resourceId/detail/usage": typeof EditorProjectIdAssetsResourceIdDetailUsageRoute
   "/editor/$projectId/editor/items/$itemUid/form": typeof EditorProjectIdEditorItemsItemUidFormRouteWithChildren
-  "/editor/$projectId/editor/items/$itemUid/view": typeof EditorProjectIdEditorItemsItemUidViewRoute
   "/editor/$projectId/editor/items/new/select": typeof EditorProjectIdEditorItemsNewSelectRoute
   "/editor/$projectId/assets/$resourceId/detail": typeof EditorProjectIdAssetsResourceIdDetailIndexRoute
   "/editor/$projectId/editor/items/$itemUid/detail/$sectionId": typeof EditorProjectIdEditorItemsItemUidDetailSectionIdRoute
@@ -578,7 +569,6 @@ export interface FileRoutesById {
   "/editor/$projectId/assets/$resourceId/detail/usage": typeof EditorProjectIdAssetsResourceIdDetailUsageRoute
   "/editor/$projectId/editor/items/$itemUid/detail": typeof EditorProjectIdEditorItemsItemUidDetailRouteWithChildren
   "/editor/$projectId/editor/items/$itemUid/form": typeof EditorProjectIdEditorItemsItemUidFormRouteWithChildren
-  "/editor/$projectId/editor/items/$itemUid/view": typeof EditorProjectIdEditorItemsItemUidViewRoute
   "/editor/$projectId/editor/items/new/select": typeof EditorProjectIdEditorItemsNewSelectRoute
   "/editor/$projectId/assets/$resourceId/detail/": typeof EditorProjectIdAssetsResourceIdDetailIndexRoute
   "/editor/$projectId/editor/items/$itemUid/detail/$sectionId": typeof EditorProjectIdEditorItemsItemUidDetailSectionIdRoute
@@ -641,7 +631,6 @@ export interface FileRouteTypes {
     | "/editor/$projectId/assets/$resourceId/detail/usage"
     | "/editor/$projectId/editor/items/$itemUid/detail"
     | "/editor/$projectId/editor/items/$itemUid/form"
-    | "/editor/$projectId/editor/items/$itemUid/view"
     | "/editor/$projectId/editor/items/new/select"
     | "/editor/$projectId/assets/$resourceId/detail/"
     | "/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
@@ -694,7 +683,6 @@ export interface FileRouteTypes {
     | "/editor/$projectId/assets/$resourceId/detail/technical"
     | "/editor/$projectId/assets/$resourceId/detail/usage"
     | "/editor/$projectId/editor/items/$itemUid/form"
-    | "/editor/$projectId/editor/items/$itemUid/view"
     | "/editor/$projectId/editor/items/new/select"
     | "/editor/$projectId/assets/$resourceId/detail"
     | "/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
@@ -757,7 +745,6 @@ export interface FileRouteTypes {
     | "/editor/$projectId/assets/$resourceId/detail/usage"
     | "/editor/$projectId/editor/items/$itemUid/detail"
     | "/editor/$projectId/editor/items/$itemUid/form"
-    | "/editor/$projectId/editor/items/$itemUid/view"
     | "/editor/$projectId/editor/items/new/select"
     | "/editor/$projectId/assets/$resourceId/detail/"
     | "/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
@@ -1169,13 +1156,6 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidFormRouteImport
       parentRoute: typeof EditorProjectIdEditorItemsItemUidRoute
     }
-    "/editor/$projectId/editor/items/$itemUid/view": {
-      id: "/editor/$projectId/editor/items/$itemUid/view"
-      path: "/view"
-      fullPath: "/editor/$projectId/editor/items/$itemUid/view"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidViewRouteImport
-      parentRoute: typeof EditorProjectIdEditorItemsItemUidRoute
-    }
     "/editor/$projectId/editor/items/new/select": {
       id: "/editor/$projectId/editor/items/new/select"
       path: "/select"
@@ -1335,7 +1315,6 @@ const EditorProjectIdEditorItemsItemUidFormRouteWithChildren =
 interface EditorProjectIdEditorItemsItemUidRouteChildren {
   EditorProjectIdEditorItemsItemUidDetailRoute: typeof EditorProjectIdEditorItemsItemUidDetailRouteWithChildren
   EditorProjectIdEditorItemsItemUidFormRoute: typeof EditorProjectIdEditorItemsItemUidFormRouteWithChildren
-  EditorProjectIdEditorItemsItemUidViewRoute: typeof EditorProjectIdEditorItemsItemUidViewRoute
 }
 
 const EditorProjectIdEditorItemsItemUidRouteChildren: EditorProjectIdEditorItemsItemUidRouteChildren =
@@ -1344,8 +1323,6 @@ const EditorProjectIdEditorItemsItemUidRouteChildren: EditorProjectIdEditorItems
       EditorProjectIdEditorItemsItemUidDetailRouteWithChildren,
     EditorProjectIdEditorItemsItemUidFormRoute:
       EditorProjectIdEditorItemsItemUidFormRouteWithChildren,
-    EditorProjectIdEditorItemsItemUidViewRoute:
-      EditorProjectIdEditorItemsItemUidViewRoute,
   }
 
 const EditorProjectIdEditorItemsItemUidRouteWithChildren =

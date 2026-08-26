@@ -114,7 +114,6 @@ export const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 		ArkiniElectronApi.channels.diagnosticsWrite,
 		[
 			{
-				schemaVersion: 1,
 				level: "info",
 				category: [
 					"test",

@@ -21,9 +21,7 @@ export namespace createGameEngineResourceServiceFx {
 	export interface Dependencies {
 		readonly clearSaveFx: (key: GameSaveStorage.Key) => Effect.Effect<void, unknown>;
 		/**
-		 * Creates the resource only. This service is the sole lifecycle lock owner;
-		 * cutover must remove the legacy per-resource lifecycle lock instead of
-		 * composing both locks.
+		 * Creates the resource only. This service is the sole lifecycle lock owner.
 		 */
 		readonly createResourceFx: (
 			packageId: string,

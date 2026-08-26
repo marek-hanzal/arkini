@@ -2,15 +2,14 @@ import { isDeepStrictEqual } from "node:util";
 import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
-import { EditorProjectFileSchema } from "~/editor/filesystem/EditorProjectFileSchema";
-import { EditorProjectGameFileSchema } from "~/editor/filesystem/EditorProjectGameFileSchema";
-import { EditorProjectItemSchemaReference } from "~/editor/filesystem/EditorProjectSchemaReference";
 import { compileGameSourcesFx } from "~/engine/compiler/fx/compileGameSourcesFx";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import { readPngAssetFx } from "~/engine/pack/fx/readPngAssetFx";
 import { readResourceDescriptorsFx } from "~/engine/resource/fx/readResourceDescriptorsFx";
-import { GameSourceSchema } from "~/engine/schema/GameSourceSchema";
-import { createEditorJsonSchema } from "~/engine/schema/fx/writeGameJsonSchemaFx";
+import { createGameProjectJsonSchema } from "~/engine/schema/fx/writeGameProjectJsonSchemaFx";
+import { GameProjectFileSchema } from "~/engine/source/schema/GameProjectFileSchema";
+import { GameProjectItemFileSchema } from "~/engine/source/schema/GameProjectItemFileSchema";
+import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
 import type { GameSourceFileSchema } from "~/engine/source/schema/GameSourceFileSchema";
 import { createEditorProjectFilesystemPathsFx } from "../createEditorProjectFilesystemPathsFx";
 import type { FilesystemEditorProjectFiles } from "./FilesystemEditorProjectFiles";
@@ -48,7 +47,7 @@ export const readFilesystemEditorProjectFilesFx = Effect.fn("readFilesystemEdito
 					);
 			});
 		for (const required of [
-			paths.editorFile,
+			paths.projectFile,
 			paths.schemaFile,
 			paths.gameFile,
 			paths.items,
@@ -65,8 +64,8 @@ export const readFilesystemEditorProjectFilesFx = Effect.fn("readFilesystemEdito
 			if (yield* fileSystem.exists(optional)) yield* assertCanonicalPathFx(optional);
 		}
 		const marker = yield* parseJsonFx(
-			paths.editorFile,
-			(candidate) => EditorProjectFileSchema.parse(candidate),
+			paths.projectFile,
+			(candidate) => GameProjectManifestSchema.parse(candidate),
 			"Editor project marker",
 		);
 		const gameSchema = yield* parseJsonFx(
@@ -74,13 +73,13 @@ export const readFilesystemEditorProjectFilesFx = Effect.fn("readFilesystemEdito
 			(candidate) => candidate,
 			"Editor game schema",
 		);
-		if (!isDeepStrictEqual(gameSchema, createEditorJsonSchema()))
+		if (!isDeepStrictEqual(gameSchema, createGameProjectJsonSchema()))
 			return yield* Effect.fail(
 				new Error("The Editor game schema does not match this Arkini version."),
 			);
 		const gameFile = yield* parseJsonFx(
 			paths.gameFile,
-			(candidate) => EditorProjectGameFileSchema.parse(candidate),
+			(candidate) => GameProjectFileSchema.parse(candidate),
 			"Editor game file",
 		);
 		const { arkpack, ...game } = gameFile;
@@ -117,32 +116,10 @@ export const readFilesystemEditorProjectFilesFx = Effect.fn("readFilesystemEdito
 			}
 			const source = yield* parseJsonFx(
 				sourcePath,
-				(candidate) => GameSourceSchema.parse(candidate),
+				(candidate) => GameProjectItemFileSchema.parse(candidate),
 				"Editor item file",
 			);
-			if (source.$schema !== EditorProjectItemSchemaReference) {
-				return yield* failInvalidItemFileFx(
-					sourcePath,
-					`expected $schema ${JSON.stringify(EditorProjectItemSchemaReference)}.`,
-				);
-			}
-			if (
-				source.meta !== undefined ||
-				source.resources !== undefined ||
-				source.start !== undefined
-			) {
-				return yield* failInvalidItemFileFx(
-					sourcePath,
-					"an item fragment may contain only $schema and items.",
-				);
-			}
-			const entries = Object.entries(source.items ?? {});
-			if (entries.length !== 1) {
-				return yield* failInvalidItemFileFx(
-					sourcePath,
-					"the fragment must contain exactly one item.",
-				);
-			}
+			const entries = Object.entries(source.items);
 			const [itemId, item] = entries[0];
 			if (itemIds.has(itemId)) {
 				return yield* failInvalidItemFileFx(sourcePath, `item ID ${itemId} is duplicated.`);

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-const domain = new TextEncoder().encode("arkini:arkpack:v1\0");
+const domain = new TextEncoder().encode("arkini:arkpack\0");
 
 /** Prefixes exact final Arkpack bytes with the canonical version-1 signing domain. */
 export const createArkpackSigningPayloadFx = Effect.fn("createArkpackSigningPayloadFx")(

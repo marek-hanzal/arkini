@@ -220,6 +220,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 					ownerItemId: "runtime:worker",
 				}),
 			],
+			jobQueue: [],
 			jobs: [],
 		} satisfies StateSchema.Type;
 		const result = Effect.runSync(runRemoveFx(state));
@@ -307,6 +308,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 					quantity: 2,
 				},
 			],
+			jobQueue: [],
 			jobs: [],
 		} satisfies StateSchema.Type;
 		const result = Effect.runSync(runRemoveFx(state));
@@ -383,6 +385,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 					quantity: 1,
 				},
 			],
+			jobQueue: [],
 			jobs: [],
 		} satisfies StateSchema.Type;
 		const result = Effect.runSync(runRemoveFx(state));
@@ -459,6 +462,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 					quantity: 1,
 				},
 			],
+			jobQueue: [],
 			jobs: [],
 		} satisfies StateSchema.Type;
 		const result = Effect.runSync(runRemoveFx(state));

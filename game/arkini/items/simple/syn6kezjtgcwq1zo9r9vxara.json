@@ -1,0 +1,20 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"producer:house-of-engineers": {
+			"uid": "syn6kezjtgcwq1zo9r9vxara",
+			"id": "producer:house-of-engineers",
+			"title": "House of Engineers",
+			"description": "Choose The Path keystone for the Engineers branch. Owning it locks Faith and Mages and prepares later machinery, power, and industrial upgrade lines.",
+			"asset": {
+				"default": [
+					"producer-house-of-engineers"
+				]
+			},
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"type": "simple"
+		}
+	}
+}

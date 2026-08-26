@@ -33,10 +33,18 @@ export const createEditorMcpGraphProject = () => {
 				inventory: [
 					{
 						itemId: "water",
+						position: {
+							x: 0,
+							y: 0,
+						},
 						quantity: 3,
 					},
 					{
 						itemId: "tool",
+						position: {
+							x: 1,
+							y: 0,
+						},
 						quantity: 1,
 					},
 				],

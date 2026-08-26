@@ -10,7 +10,7 @@ import {
 	type FilesystemEditorProjectRepository,
 } from "../../../../../electron/main/editor-project/filesystem/fx/createFilesystemEditorProjectRepositoryFx";
 import { writeFilesystemEditorProjectFilesFx } from "../../../../../electron/main/editor-project/filesystem/fx/writeFilesystemEditorProjectFilesFx";
-import { EditorProjectFileSchema } from "~/editor/filesystem/EditorProjectFileSchema";
+import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 /** Owns one temporary user-data catalog, its managed roots, and external test folders. */
@@ -64,7 +64,7 @@ export const createFilesystemEditorProjectTestHarness = async (temporaryPrefix: 
 					root,
 					next: {
 						arkpack: editorTestPayload.version,
-						marker: EditorProjectFileSchema.parse({
+						marker: GameProjectManifestSchema.parse({
 							arkini: ArkiniAppVersion,
 							updatedAtMs: 1,
 						}),

@@ -70,7 +70,7 @@ export const useEditorVersionCheckout = ({
 		],
 	);
 	const restoreSelected = useCallback(() => {
-		if (selected === undefined || selected.applicability.type === "incompatible") return;
+		if (selected === undefined) return;
 		if (projectDirty || unsaved.hasDirtySession) {
 			setConfirmVersion(selected);
 			return;

@@ -4,10 +4,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
 import { EditorBoardGameResourceOwnerAtom } from "~/bridge/editor/board/EditorBoardGameResource";
-import {
-	assertSupportedGameVersionFx,
-	readArkpackVersionFx,
-} from "~/bridge/game/GameVersionCompatibility";
+import { readArkpackVersionFx } from "~/bridge/game/ArkpackVersionCompatibility";
 import { decodeArkiniSaveFx } from "~/bridge/save/decodeArkiniSaveFx";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
@@ -66,7 +63,6 @@ export const restoreEditorBoardScenarioFx = Effect.fn("restoreEditorBoardScenari
 					),
 				);
 			}
-			yield* assertSupportedGameVersionFx(saved.game);
 			if (saveVersion.minor > projectVersion.minor) {
 				return yield* Effect.fail(
 					new Error(

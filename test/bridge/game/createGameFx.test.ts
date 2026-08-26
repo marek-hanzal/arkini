@@ -209,7 +209,6 @@ describe("createGameFx", () => {
 			encode({
 				...saved,
 				version: "2.0",
-				game: "0.4.0",
 			}),
 		);
 

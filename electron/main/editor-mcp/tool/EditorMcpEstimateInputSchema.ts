@@ -24,6 +24,12 @@ export const EditorMcpEstimateInputSchema = z
 			"Global Estimate ordering: fastest, slowest, or highest aggregate demand first.",
 		),
 	})
-	.strict();
+	.strict()
+	.meta({
+		id: "EditorMcpEstimateInputSchema",
+		$id: "urn:arkini:schema:mcp:estimate-input",
+		title: "Estimate tool input",
+		description: "Pagination, filtering, search, and ordering for the global Estimate tool.",
+	});
 
 export type EditorMcpEstimateInput = z.output<typeof EditorMcpEstimateInputSchema>;

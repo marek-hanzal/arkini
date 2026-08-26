@@ -4,9 +4,9 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 import {
-	EditorProjectGameSchemaReference,
-	EditorProjectItemSchemaReference,
-} from "~/editor/filesystem/EditorProjectSchemaReference";
+	GameProjectGameSchemaReference,
+	GameProjectItemSchemaReference,
+} from "~/engine/source/GameProjectReference";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import { createFilesystemEditorProjectFilesHarness } from "./FilesystemEditorProjectFiles.test/harness";
@@ -37,33 +37,52 @@ describe("filesystem Editor project current tree", () => {
 			...initial,
 			config: GameConfigSchema.parse({
 				...initial.config,
-				$schema: EditorProjectGameSchemaReference,
+				$schema: GameProjectGameSchemaReference,
 			}),
 		};
 		expect(await harness.read()).toEqual(canonicalInitial);
-		expect(JSON.parse(await readFile(join(harness.root, "editor.json"), "utf8"))).toEqual({
+		expect(JSON.parse(await readFile(join(harness.root, "project.json"), "utf8"))).toEqual({
 			arkini: ArkiniAppVersion,
 			updatedAtMs: initial.marker.updatedAtMs,
 		});
 		const schema = JSON.parse(await readFile(join(harness.root, "schema.json"), "utf8"));
 		expect(schema).toMatchObject({
-			properties: {
-				arkpack: {
-					$ref: "#/$defs/ArkpackVersionSchema",
+			anyOf: [
+				{
+					$ref: "urn:arkini:schema:game-project-source#/$defs/GameProjectFileSchema",
 				},
-				items: {
+				{
+					$ref: "urn:arkini:schema:game-project-source#/$defs/GameProjectItemFileSchema",
+				},
+			],
+			$defs: {
+				GameProjectFileSchema: {
+					properties: {
+						arkpack: {
+							$ref: "urn:arkini:schema:game-project-source#/$defs/ArkpackVersionSchema",
+						},
+					},
+					type: "object",
+				},
+				GameProjectItemFileSchema: {
+					properties: {
+						items: {
+							minProperties: 1,
+							maxProperties: 1,
+							type: "object",
+						},
+					},
 					type: "object",
 				},
 			},
-			type: "object",
 		});
 		const game = JSON.parse(await readFile(join(harness.root, "game.json"), "utf8"));
-		expect(game.$schema).toBe(EditorProjectGameSchemaReference);
+		expect(game.$schema).toBe(GameProjectGameSchemaReference);
 		expect(game.arkpack).toBe(editorTestPayload.version);
 		expect(game).not.toHaveProperty("items");
 		const waterPath = join(harness.root, "items", "simple", "water.json");
 		expect(JSON.parse(await readFile(waterPath, "utf8")).$schema).toBe(
-			EditorProjectItemSchemaReference,
+			GameProjectItemSchemaReference,
 		);
 		const waterResourcePath = join(harness.root, "assets", "item-water.png");
 		await writeFile(waterPath, '{"items":{}}');
@@ -116,7 +135,7 @@ describe("filesystem Editor project current tree", () => {
 				await readFile(join(harness.root, "items", "simple", "water%2Enext.json"), "utf8"),
 			),
 		).toEqual({
-			$schema: EditorProjectItemSchemaReference,
+			$schema: GameProjectItemSchemaReference,
 			items: {
 				water: next.config.items.water,
 			},

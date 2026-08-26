@@ -24,8 +24,8 @@ const DeliveryLocationBaseSchema = z.object({
 	origin: GridLocationSchema.describe(
 		"The exact grid cell leased until this delivery no longer needs to return.",
 	),
-	remainingDurationMs: TimeSchema.default(0).describe(
-		"The engine-owned fixed-step travel time remaining before canonical settlement; legacy persisted deliveries without this field are due on the next Tick.",
+	remainingDurationMs: TimeSchema.describe(
+		"The engine-owned fixed-step travel time remaining before canonical settlement.",
 	),
 });
 

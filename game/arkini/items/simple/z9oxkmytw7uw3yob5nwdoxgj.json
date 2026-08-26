@@ -1,0 +1,20 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:grape-seed": {
+			"uid": "z9oxkmytw7uw3yob5nwdoxgj",
+			"id": "item:grape-seed",
+			"title": "Grape Seed",
+			"description": "Grape seed prepared for a future crop-growing lifecycle.",
+			"asset": {
+				"default": [
+					"item-seed",
+					"item-grapes"
+				]
+			},
+			"scope": "any",
+			"maxStackSize": 50,
+			"type": "simple"
+		}
+	}
+}

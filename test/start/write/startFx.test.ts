@@ -77,10 +77,18 @@ describe("startFx", () => {
 				inventory: [
 					{
 						itemId: "log",
+						position: {
+							x: 0,
+							y: 0,
+						},
 						quantity: 2,
 					},
 					{
 						itemId: "log",
+						position: {
+							x: 1,
+							y: 0,
+						},
 						quantity: 3,
 					},
 				],
@@ -96,8 +104,8 @@ describe("startFx", () => {
 
 		expect(runtime.items).toHaveLength(2);
 		expect(runtime.items.map((item) => item.quantity)).toEqual([
-			3,
 			2,
+			3,
 		]);
 		expect(runtime.items.reduce((sum, item) => sum + item.quantity, 0)).toBe(5);
 	});
@@ -191,7 +199,7 @@ describe("startFx", () => {
 		expect(result.runtime.items).toEqual([]);
 	});
 
-	it("rolls back the complete start when initial inventory cannot fit", () => {
+	it("rolls back the complete start when an exact inventory position is out of bounds", () => {
 		const config = GameConfigSchema.parse({
 			...startTestConfig,
 			meta: {
@@ -221,9 +229,7 @@ describe("startFx", () => {
 		expect(Result.isFailure(result.started)).toBe(true);
 		if (Result.isFailure(result.started)) {
 			expect(result.started.failure).toMatchObject({
-				_tag: "StartInventoryUnavailableError",
-				itemId: "log",
-				remainingQuantity: 1,
+				_tag: "RuntimeInvalidError",
 			});
 		}
 		expect(result.runtime.items).toEqual([]);

@@ -23,8 +23,8 @@ import { replaceFilesystemEditorJsonFx } from "../../../../electron/main/editor-
 import { writeFilesystemEditorProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/writeFilesystemEditorProjectFilesFx";
 import { EditorBoardScenarioSchema } from "~/editor/board/EditorBoardScenarioSchema";
 import { EditorProjectCatalogEntrySchema } from "~/editor/filesystem/EditorProjectCatalogEntrySchema";
-import { EditorProjectFileSchema } from "~/editor/filesystem/EditorProjectFileSchema";
-import { EditorProjectGameSchemaReference } from "~/editor/filesystem/EditorProjectSchemaReference";
+import { GameProjectGameSchemaReference } from "~/engine/source/GameProjectReference";
+import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
 import { EditorVersionDescriptorFileSchema } from "~/editor/filesystem/EditorVersionDescriptorFileSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
@@ -47,7 +47,7 @@ describe("filesystem Editor project versions", () => {
 		const projectId = "editor-test";
 		const canonicalConfig = GameConfigSchema.parse({
 			...editorTestPayload.config,
-			$schema: EditorProjectGameSchemaReference,
+			$schema: GameProjectGameSchemaReference,
 		});
 		const initialScenario = EditorBoardScenarioSchema.parse({
 			projectId,
@@ -61,7 +61,7 @@ describe("filesystem Editor project versions", () => {
 		const result = await Effect.runPromise(
 			Effect.gen(function* () {
 				const paths = yield* createEditorProjectFilesystemPathsFx(root);
-				const marker = EditorProjectFileSchema.parse({
+				const marker = GameProjectManifestSchema.parse({
 					arkini: ArkiniAppVersion,
 					updatedAtMs: 1,
 				});
@@ -170,7 +170,7 @@ describe("filesystem Editor project versions", () => {
 					bytes: Uint8Array.of(9, 9),
 					updatedAtMs: 2,
 				});
-				const changedMarker = EditorProjectFileSchema.parse({
+				const changedMarker = GameProjectManifestSchema.parse({
 					...marker,
 					updatedAtMs: 2,
 				});

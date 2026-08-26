@@ -1,0 +1,262 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"producer:construction-yard-t1": {
+			"uid": "hik4qejjk1tzi2vlspf6jnqd",
+			"id": "producer:construction-yard-t1",
+			"title": "Construction Yard I",
+			"description": "Advanced construction yard that bundles bricks, glass, roof tiles, permits, and civic goods into settlement expansion packages.",
+			"asset": {
+				"default": [
+					"producer-construction-yard-t1"
+				]
+			},
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"type": "producer",
+			"lines": [
+				{
+					"id": "line:construction-yard-t1:construction-bundle",
+					"title": "Construction Bundle",
+					"description": "Runs construction bundle for Construction Yard I.",
+					"default": false,
+					"show": true,
+					"enable": true,
+					"runtimeMs": 45000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:bricks"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 2,
+								"max": 2
+							},
+							"capacity": 8
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:glass"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 6
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:roof-tiles"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 2,
+								"max": 2
+							},
+							"capacity": 8
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:building-permit"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:luxury-clothing"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:coin"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 3,
+								"max": 3
+							},
+							"capacity": 12
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"weight": 1,
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:construction-bundle",
+												"quantity": {
+													"min": 1,
+													"max": 1
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					"rules": []
+				},
+				{
+					"id": "line:construction-yard-t1:construction-bundle-morale-t3",
+					"title": "Construction Bundle (Inspired)",
+					"description": "Runs construction bundle (inspired) for Construction Yard I.",
+					"default": false,
+					"show": true,
+					"enable": true,
+					"runtimeMs": 38000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:bricks"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 2,
+								"max": 2
+							},
+							"capacity": 8
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:glass"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 6
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:roof-tiles"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 2,
+								"max": 2
+							},
+							"capacity": 8
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:building-permit"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:luxury-clothing"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:coin"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 3,
+								"max": 3
+							},
+							"capacity": 12
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:morale-t3"
+							},
+							"mode": "consume",
+							"quantity": {
+								"min": 1,
+								"max": 1
+							},
+							"capacity": 4
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"weight": 1,
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:construction-bundle",
+												"quantity": {
+													"min": 2,
+													"max": 2
+												},
+												"placement": "drop",
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					"rules": []
+				}
+			]
+		}
+	}
+}

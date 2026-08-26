@@ -5,6 +5,10 @@ import type { createEditorMcpOwnershipFx } from "../../../../electron/main/edito
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import {
+	expectNamedJsonSchemaGraph,
+	isJsonSchemaRecord,
+} from "~test/schema/expectNamedJsonSchemaGraph";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import {
 	cleanupEditorMcpHarnesses,
@@ -70,11 +74,27 @@ describe("editor MCP server", () => {
 			throw new Error("item_collection schema is missing.");
 		expect(collectionProperties.itemTypes).toMatchObject({
 			items: {
-				enum: ItemEnumSchema.options,
-				type: "string",
+				$ref: "#/$defs/EditorMcpItemTypeSchema",
 			},
 			type: "array",
 		});
+		const collectionSchema = tools.tools.find(
+			({ name }) => name === "item_collection",
+		)?.inputSchema;
+		const collectionDefinitions = isJsonSchemaRecord(collectionSchema?.$defs)
+			? collectionSchema.$defs
+			: {};
+		expect(collectionDefinitions.EditorMcpItemTypeSchema).toMatchObject({
+			enum: ItemEnumSchema.options,
+			type: "string",
+		});
+		const schemaIds = tools.tools.map(({ inputSchema, name }) => {
+			expectNamedJsonSchemaGraph(inputSchema, {
+				id: `urn:arkini:schema:mcp:${name.replaceAll("_", "-")}-input`,
+			});
+			return inputSchema.$id;
+		});
+		expect(new Set(schemaIds).size).toBe(tools.tools.length);
 		expect(
 			tools.tools.find(({ name }) => name === "estimate")?.inputSchema.properties,
 		).toMatchObject({
@@ -160,78 +180,6 @@ describe("editor MCP server", () => {
 		expect(runtimeCalls).toBe(1);
 		ownership.clearProjectContext("project-context");
 		expect(ownership.readProjectContext()).toBeUndefined();
-	});
-
-	it("serves the same catalog through the legacy protocol era", async () => {
-		const { ownership, port, repository } = await createEditorMcpHarness();
-		await Effect.runPromise(
-			repository.createProjectFx({
-				version: "1.0",
-				config: {
-					...editorTestPayload.config,
-					meta: {
-						...editorTestPayload.config.meta,
-						id: "legacy-project",
-					},
-				},
-				resources: editorTestPayload.resources,
-			}),
-		);
-		ownership.setProjectContext("legacy-project");
-		await Effect.runPromise(ownership.startLocalFx);
-		const client = await connectEditorMcpClient(port, "legacy");
-		expect(client.getProtocolEra()).toBe("legacy");
-		expect((await client.listTools()).tools.map(({ name }) => name)).toEqual([
-			"create_simple_item",
-			"create_producer_item",
-			"create_craft_item",
-			"create_blueprint_item",
-			"create_deposit_item",
-			"create_stash_item",
-			"create_temporary_item",
-			"create_inventory_item",
-			"edit_simple_item",
-			"edit_producer_item",
-			"edit_craft_item",
-			"edit_blueprint_item",
-			"edit_deposit_item",
-			"edit_stash_item",
-			"edit_temporary_item",
-			"edit_inventory_item",
-			"project_config",
-			"edit_project",
-			"validate_project",
-			"rename_item",
-			"item_delete_impact",
-			"delete_item",
-			"project",
-			"item_meta",
-			"estimate",
-			"item_collection",
-			"item_detail",
-			"item_config",
-			"item_input",
-			"item_output",
-			"item_estimate",
-			"version_status",
-			"version_list",
-			"version_diff",
-			"version_commit",
-			"version_checkout",
-			"version_tag",
-		]);
-		expect(
-			(
-				await client.callTool({
-					name: "project",
-					arguments: {},
-				})
-			).content,
-		).toMatchObject([
-			{
-				text: expect.stringContaining("Project ID: legacy-project"),
-			},
-		]);
 	});
 
 	it("routes relation and estimate requests through the active project", async () => {

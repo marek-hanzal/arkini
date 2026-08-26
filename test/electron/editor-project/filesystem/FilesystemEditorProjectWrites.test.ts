@@ -1,7 +1,7 @@
 import { Cause, Effect, Exit } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { EditorProjectGameSchemaReference } from "~/editor/filesystem/EditorProjectSchemaReference";
+import { GameProjectGameSchemaReference } from "~/engine/source/GameProjectReference";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import {
 	createFilesystemEditorProjectTestHarness,
@@ -35,7 +35,7 @@ describe("filesystem Editor project writes", () => {
 			}),
 		);
 		expect(compatible.version).toBe("1.1");
-		expect(compatible.config.$schema).toBe(EditorProjectGameSchemaReference);
+		expect(compatible.config.$schema).toBe(GameProjectGameSchemaReference);
 
 		const water = editorTestPayload.config.items.water;
 		const itemCommit = await Effect.runPromise(

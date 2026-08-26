@@ -1,0 +1,117 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:blueprint-bio-waste-processor-t1": {
+			"uid": "c5g9y5ln58d22wf4nb2vlzw6",
+			"id": "item:blueprint-bio-waste-processor-t1",
+			"title": "Bio-Waste Processor I Blueprint",
+			"description": "Build plan that can be filled with early farm resources to construct Bio-Waste Processor I.",
+			"asset": {
+				"default": [
+					"blueprint",
+					"producer-bio-waste-processor-t1"
+				],
+				"sources": [
+					"producer-bio-waste-processor-t1"
+				]
+			},
+			"scope": "any",
+			"maxStackSize": 1,
+			"charges": {
+				"amount": 1
+			},
+			"type": "blueprint",
+			"line": {
+				"id": "line:blueprint:bio-waste-processor-t1:construct",
+				"title": "Construct Bio-Waste Processor I",
+				"description": "Consumes construction resources to build Bio-Waste Processor I.",
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 34000,
+				"input": [
+					{
+						"charges": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:plank"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stone"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:grain"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:water"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:bio-waste-processor-t1",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		}
+	}
+}

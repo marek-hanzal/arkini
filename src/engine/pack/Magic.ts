@@ -6,5 +6,4 @@ export const Magic = new Uint8Array([
 	0x41,
 	0x43,
 	0x4b,
-	0x31,
 ]);

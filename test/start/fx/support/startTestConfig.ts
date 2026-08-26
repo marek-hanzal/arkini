@@ -55,7 +55,19 @@ export const startTestConfig = GameConfigSchema.parse({
 		inventory: [
 			{
 				itemId: "log",
-				quantity: 4,
+				position: {
+					x: 0,
+					y: 0,
+				},
+				quantity: 3,
+			},
+			{
+				itemId: "log",
+				position: {
+					x: 1,
+					y: 0,
+				},
+				quantity: 1,
 			},
 		],
 		toolbar: [],

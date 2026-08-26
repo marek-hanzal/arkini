@@ -9,7 +9,7 @@ import type { EditorProject } from "~/editor/EditorProject";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 import type { EditorBoardScenarioSchema } from "~/editor/board/EditorBoardScenarioSchema";
 import { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
-import { EditorProjectFileSchema } from "~/editor/filesystem/EditorProjectFileSchema";
+import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
 import { EditorVersionDescriptorFileSchema } from "~/editor/filesystem/EditorVersionDescriptorFileSchema";
 import { EditorVersionHeadFileSchema } from "~/editor/filesystem/EditorVersionHeadFileSchema";
 import type {
@@ -18,12 +18,10 @@ import type {
 } from "~/editor/version/EditorProjectVersion";
 import { createEditorProjectVersionDiff } from "~/editor/version/createEditorProjectVersionDiff";
 import {
-	EditorProjectSnapshotFormatVersion,
 	EditorProjectVersionBodySchema,
 	EditorProjectVersionSubjectSchema,
 	EditorProjectVersionTagSchema,
 } from "~/editor/version/EditorProjectVersionMetadataSchema";
-import { readEditorProjectVersionApplicability } from "~/editor/version/readEditorProjectVersionApplicabilityFx";
 import { createFilesystemEditorProjectVersionReaderFx } from "./createFilesystemEditorProjectVersionReaderFx";
 import { createFilesystemEditorVersionSnapshotFx } from "./createFilesystemEditorVersionSnapshotFx";
 import { assertFilesystemEditorProjectDirectoryFx } from "./assertFilesystemEditorProjectDirectoryFx";
@@ -57,7 +55,6 @@ const materializeDescriptor = (
 	projectId: string,
 	file: DescriptorFile,
 ): EditorProjectVersionDescriptor => ({
-	applicability: readEditorProjectVersionApplicability(file.arkini),
 	arkini: file.arkini,
 	arkpackVersion: file.arkpackVersion,
 	...(file.body === undefined
@@ -72,7 +69,6 @@ const materializeDescriptor = (
 				parentVersionId: file.parentVersionId,
 			}),
 	projectId,
-	snapshotFormatVersion: file.snapshotFormatVersion,
 	sourceRevision: file.sourceRevision,
 	subject: file.subject,
 	...(file.tag === undefined
@@ -308,7 +304,6 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 							arkini: ArkiniAppVersion,
 							arkpackVersion: current.state.project.version,
 							sourceRevision: current.state.project.revision,
-							snapshotFormatVersion: EditorProjectSnapshotFormatVersion,
 							contentFingerprint: current.contentFingerprint,
 							createdAtMs:
 								latestCreatedAt === undefined
@@ -401,13 +396,6 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 					Effect.gen(function* () {
 						const current = yield* readCurrentSnapshotFx(projectId);
 						const version = yield* readPublishedVersionFx(current.state, versionId);
-						const applicability = readEditorProjectVersionApplicability(
-							version.descriptor.arkini,
-						);
-						if (applicability.type === "incompatible")
-							return yield* Effect.fail(
-								error("checkout-version", applicability.reason),
-							);
 						if (
 							expectedFingerprint !== undefined &&
 							expectedFingerprint !== current.contentFingerprint &&
@@ -456,7 +444,7 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 						const restoredScenarios = restoredScenarioFiles.map((scenario) =>
 							toScenario(projectId, scenario),
 						);
-						const marker = EditorProjectFileSchema.parse({
+						const marker = GameProjectManifestSchema.parse({
 							arkini: ArkiniAppVersion,
 							updatedAtMs,
 						});
@@ -512,7 +500,7 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 										root: current.state.paths.root,
 										previous: {
 											arkpack: current.state.project.version,
-											marker: EditorProjectFileSchema.parse({
+											marker: GameProjectManifestSchema.parse({
 												arkini: ArkiniAppVersion,
 												updatedAtMs: current.state.project.updatedAtMs,
 											}),
@@ -575,13 +563,6 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 					Effect.gen(function* () {
 						const state = yield* readState(projectId);
 						const version = yield* readPublishedVersionFx(state, versionId);
-						const applicability = readEditorProjectVersionApplicability(
-							version.descriptor.arkini,
-						);
-						if (applicability.type === "incompatible")
-							return yield* Effect.fail(
-								error("update-version-tag", applicability.reason),
-							);
 						const descriptor = EditorVersionDescriptorFileSchema.parse({
 							...version.descriptor,
 							...(tag === undefined

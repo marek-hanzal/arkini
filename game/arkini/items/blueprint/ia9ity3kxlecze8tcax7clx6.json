@@ -1,0 +1,189 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:blueprint-glazier-workshop-t1": {
+			"uid": "ia9ity3kxlecze8tcax7clx6",
+			"id": "item:blueprint-glazier-workshop-t1",
+			"title": "Glazier Workshop I Blueprint",
+			"description": "Build plan that can be filled with prestige materials to construct Glazier Workshop I.",
+			"asset": {
+				"default": [
+					"blueprint",
+					"producer-glazier-workshop-t1"
+				],
+				"sources": [
+					"producer-glazier-workshop-t1"
+				]
+			},
+			"scope": "any",
+			"maxStackSize": 1,
+			"charges": {
+				"amount": 1
+			},
+			"type": "blueprint",
+			"line": {
+				"id": "line:blueprint:glazier-workshop-t1:construct",
+				"title": "Construct Glazier Workshop I",
+				"description": "Consumes construction resources to build Glazier Workshop I.",
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 80000,
+				"input": [
+					{
+						"charges": {
+							"cost": 1,
+							"from": "self"
+						},
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:construction-bundle"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:guild-charter"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:glass"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:bricks"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:roof-tiles"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:coin-stack"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 0
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:glazier-workshop-t1",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "producer:dye-workshop-t1"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							},
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "producer:glassworks"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							},
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "producer:purifier-t1"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							},
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "producer:university"
+									},
+									"scope": "universe"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			}
+		}
+	}
+}

@@ -8,7 +8,6 @@ import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSche
 
 export const ManifestSchema = z
 	.object({
-		format: z.literal(3).describe("The binary pack format version."),
 		packageId: IdSchema.describe("The stable catalog identity of this package."),
 		version: ArkpackVersionSchema.describe("The gameplay compatibility version."),
 		game: ArkiniVersionSchema.describe("The Arkini version that built this package."),

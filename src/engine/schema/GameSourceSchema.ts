@@ -7,11 +7,8 @@ import { StartSchema } from "~/engine/start/schema/StartSchema";
 import { ResourceConfigSchema } from "~/engine/resource/schema/ResourceConfigSchema";
 
 /**
- * One authoring fragment that contributes data to a complete game configuration.
- *
- * Game source data is intentionally split across files such as `game.json` and
- * `era-I/simple/*.json`. Each fragment is valid independently; the source
- * packer merges all fragments, while the validator owns completed-game checks.
+ * Internal assembly value shared by the canonical `game.json` root and
+ * `items/<type>/<uid>.json` project files.
  */
 export const GameSourceSchema = z
 	.object({
@@ -52,8 +49,9 @@ export const GameSourceSchema = z
 	.strict()
 	.meta({
 		id: "GameSourceSchema",
-		description:
-			"One authoring fragment that contributes data to a complete game configuration.",
+		$id: "urn:arkini:schema:game-source",
+		title: "Arkini game source",
+		description: "The internal assembly value for one canonical game project.",
 	});
 
 export type GameSourceSchema = typeof GameSourceSchema;

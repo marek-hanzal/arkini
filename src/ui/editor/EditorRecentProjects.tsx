@@ -1,5 +1,5 @@
 import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
-import { Button, ButtonLink } from "~/ui/button/Button";
+import { ButtonLink } from "~/ui/button/Button";
 
 const formatter = new Intl.DateTimeFormat(undefined, {
 	dateStyle: "medium",
@@ -40,7 +40,7 @@ export const EditorRecentProjects = ({
 				{projects.map((project) => (
 					<div
 						key={project.projectId}
-						className="flex min-w-0"
+						className="ak-list-row flex min-w-0 items-center"
 					>
 						<ButtonLink
 							to="/editor/$projectId/editor/items/list"
@@ -49,7 +49,7 @@ export const EditorRecentProjects = ({
 							}}
 							aria-disabled={blocked}
 							cursorIntent={blocked ? "progress" : undefined}
-							className="ak-list-row min-h-0 min-w-0 flex-1 justify-start gap-3 rounded-r-none px-4 py-3 text-left"
+							className="min-h-0 min-w-0 flex-1 justify-start gap-3 rounded-none border-0 bg-transparent px-4 py-3 text-left shadow-none hover:border-transparent hover:bg-transparent active:bg-transparent"
 						>
 							<span className="icon-[lucide--folder-kanban] size-5 shrink-0 text-accent" />
 							<span className="min-w-0 flex-1">
@@ -60,6 +60,26 @@ export const EditorRecentProjects = ({
 									{project.projectId} · v{project.version}
 								</span>
 							</span>
+						</ButtonLink>
+						<button
+							type="button"
+							disabled={blocked}
+							className="grid size-8 shrink-0 cursor-pointer place-items-center border-0 bg-transparent p-0 text-subtle transition-colors hover:text-danger disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:text-subtle"
+							data-ui="EditorRecentProjectDelete"
+							title={`Delete ${project.title}`}
+							onClick={() => onDeleteProject(project)}
+						>
+							<span className="icon-[lucide--trash-2] size-4" />
+						</button>
+						<ButtonLink
+							to="/editor/$projectId/editor/items/list"
+							params={{
+								projectId: project.projectId,
+							}}
+							aria-disabled={blocked}
+							cursorIntent={blocked ? "progress" : undefined}
+							className="min-h-0 shrink-0 gap-3 rounded-none border-0 bg-transparent px-4 py-3 shadow-none hover:border-transparent hover:bg-transparent active:bg-transparent"
+						>
 							<time
 								dateTime={new Date(project.updatedAtMs).toISOString()}
 								className="shrink-0 text-xs text-muted"
@@ -68,16 +88,6 @@ export const EditorRecentProjects = ({
 							</time>
 							<span className="icon-[lucide--chevron-right] size-4 shrink-0 text-subtle" />
 						</ButtonLink>
-						<Button
-							disabled={blocked}
-							cursorIntent={blocked ? "progress" : undefined}
-							className="ak-list-row min-h-0 shrink-0 rounded-l-none border-l-0 px-4 text-danger"
-							data-ui="EditorRecentProjectDelete"
-							title={`Delete ${project.title}`}
-							onClick={() => onDeleteProject(project)}
-						>
-							<span className="icon-[lucide--trash-2] size-4" />
-						</Button>
 					</div>
 				))}
 			</div>

@@ -8,16 +8,16 @@ import {
 	EditorSectionTabs,
 } from "~/ui/editor/EditorSectionTabs";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { EditorMcpMcpSettings } from "./EditorMcpMcpSettings";
 import { EditorMcpSections, type EditorMcpSectionId } from "./EditorMcpSections";
 import { EditorMcpServerSettings } from "./EditorMcpServerSettings";
+import { EditorMcpSettings } from "./EditorMcpSettings";
 import { EditorMcpStatus } from "./EditorMcpStatus";
-import { EditorMcpTunnelSettings } from "./EditorMcpTunnelSettings";
 import { useEditorMcpController } from "./useEditorMcpController";
 
 export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId }) => {
 	const project = useEditorProject();
 	const controller = useEditorMcpController();
+	const title = section === "server" ? "MCP - Server" : "MCP - Settings";
 	return (
 		<section
 			className="h-full overflow-auto p-6"
@@ -25,7 +25,7 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 		>
 			<div className="mx-auto grid max-w-5xl gap-6">
 				<EditorSectionNavigation
-					title={<h1 className="text-xl font-semibold">MCP</h1>}
+					title={<h1 className="text-xl font-semibold">{title}</h1>}
 					tabs={
 						<EditorSectionTabs label="MCP sections">
 							{EditorMcpSections.map((candidate) => (
@@ -60,9 +60,8 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 					<EditorMcpStatus message="Loading MCP settings…" />
 				) : (
 					match(section)
-						.with("mcp", () => <EditorMcpMcpSettings controller={controller} />)
-						.with("tunnel", () => <EditorMcpTunnelSettings controller={controller} />)
 						.with("server", () => <EditorMcpServerSettings controller={controller} />)
+						.with("settings", () => <EditorMcpSettings controller={controller} />)
 						.exhaustive()
 				)}
 			</div>

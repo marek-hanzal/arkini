@@ -17,6 +17,25 @@ export const EditorMcpStatus = ({
 	readonly tone?: EditorMcpStatusTone;
 }) => <p className={statusClassNames[tone]}>{message}</p>;
 
+export const EditorMcpCopyButton = ({
+	copied,
+	onCopy,
+	title,
+}: {
+	readonly copied: boolean;
+	readonly onCopy: () => void;
+	readonly title: string;
+}) => (
+	<button
+		type="button"
+		className="grid size-6 shrink-0 cursor-pointer place-items-center border-0 bg-transparent p-0 text-current opacity-65 transition-opacity hover:opacity-100"
+		title={copied ? "Copied" : title}
+		onClick={onCopy}
+	>
+		<span className={`${copied ? "icon-[lucide--check]" : "icon-[lucide--copy]"} size-4`} />
+	</button>
+);
+
 export const EditorMcpCopyableUrl = ({
 	copied,
 	label,
@@ -32,13 +51,10 @@ export const EditorMcpCopyableUrl = ({
 		<span className="min-w-0 break-all">
 			{label}: {url}
 		</span>
-		<button
-			type="button"
-			className="grid size-6 shrink-0 cursor-pointer place-items-center border-0 bg-transparent p-0 text-current opacity-65 transition-opacity hover:opacity-100"
-			title={copied ? "Copied" : "Copy URL"}
-			onClick={onCopy}
-		>
-			<span className={`${copied ? "icon-[lucide--check]" : "icon-[lucide--copy]"} size-4`} />
-		</button>
+		<EditorMcpCopyButton
+			copied={copied}
+			onCopy={onCopy}
+			title="Copy URL"
+		/>
 	</div>
 );

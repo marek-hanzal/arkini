@@ -1,27 +1,28 @@
 import { Effect, SubscriptionRef } from "effect";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "@effect/vitest";
+import { vi } from "vitest";
 
 import { createEditorBoardGameResourceFx } from "~/bridge/editor/board/createEditorBoardGameResourceFx";
 import { failedCreationProject } from "~test/bridge/editor/board/createEditorBoardGameResourceFx.release.test/failedCreationProject";
 
 describe("createEditorBoardGameResourceFx release", () => {
-	it("clears a failed creation when routed ownership is released", async () => {
-		const creationError = new Error("editor game creation failed");
-		const createResourceFx = vi.fn(() => Effect.fail(creationError));
-		const owner = await Effect.runPromise(
-			createEditorBoardGameResourceFx({
+	it.effect("clears a failed creation when routed ownership is released", () =>
+		Effect.gen(function* () {
+			const creationError = new Error("editor game creation failed");
+			const createResourceFx = vi.fn(() => Effect.fail(creationError));
+			const owner = yield* createEditorBoardGameResourceFx({
 				createResourceFx,
-			}),
-		);
+			});
 
-		await Effect.runPromise(owner.syncFx(failedCreationProject));
-		expect((await Effect.runPromise(SubscriptionRef.get(owner.state))).type).toBe("failed");
+			yield* owner.syncFx(failedCreationProject);
+			expect((yield* SubscriptionRef.get(owner.state)).type).toBe("failed");
 
-		await Effect.runPromise(owner.releaseCurrentFx);
-		await Effect.runPromise(owner.releaseCurrentFx);
-		expect(await Effect.runPromise(SubscriptionRef.get(owner.state))).toEqual({
-			type: "idle",
-		});
-		expect(createResourceFx).toHaveBeenCalledOnce();
-	});
+			yield* owner.releaseCurrentFx;
+			yield* owner.releaseCurrentFx;
+			expect(yield* SubscriptionRef.get(owner.state)).toEqual({
+				type: "idle",
+			});
+			expect(createResourceFx).toHaveBeenCalledOnce();
+		}),
+	);
 });

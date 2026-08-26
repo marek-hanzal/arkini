@@ -198,7 +198,9 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	});
 	yield* registerArkiniProtocolFx(rendererRoot);
 	yield* registerArkiniElectronIpcFx({
-		bundledArkpacksRoot: app.isPackaged ? join(process.resourcesPath, "game") : resolve("game"),
+		bundledArkpacksRoot: app.isPackaged
+			? join(process.resourcesPath, "game")
+			: resolve("game/arkini/build"),
 		trustedRenderer,
 		appearancePreferences,
 		cheatPreferences,

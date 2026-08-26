@@ -8,17 +8,27 @@ import { defineConfig } from "electron-vite";
 import { Effect } from "effect";
 import { RendererDevelopmentServer } from "./electron/security/RendererDevelopmentUrl";
 import { createRendererDevelopmentContentSecurityPolicyFx } from "./electron/security/createRendererDevelopmentContentSecurityPolicyFx";
+import { deriveArkpackPublicKey } from "./src/engine/pack/cli/deriveArkpackPublicKey";
 
 const sourceAlias = {
 	"~": fileURLToPath(new URL("./src", import.meta.url)),
 };
 
 export default defineConfig(({ command }) => {
+	const signKey = process.env.ARKINI_SIGN_KEY;
+	if (signKey === undefined || signKey.trim().length === 0) {
+		throw new Error("ARKINI_SIGN_KEY is required to build Arkini.");
+	}
+	const publicKey = deriveArkpackPublicKey(signKey);
+	const signingDefine = {
+		__ARKINI_PUBLIC_KEY__: JSON.stringify(publicKey),
+	};
 	const developmentCspNonce =
 		command === "serve" ? randomBytes(18).toString("base64") : undefined;
 
 	return {
 		main: {
+			define: signingDefine,
 			resolve: {
 				alias: sourceAlias,
 			},
@@ -55,6 +65,7 @@ export default defineConfig(({ command }) => {
 			},
 		},
 		renderer: {
+			define: signingDefine,
 			root: ".",
 			publicDir: "public",
 			base: process.env.VITE_BASE ?? "/",

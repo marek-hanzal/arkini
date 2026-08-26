@@ -13,7 +13,7 @@ describe("loadArkpackFx", () => {
 		const bytes = createTestArkpack(undefined, "package:selected");
 		const file: ArkpackStorage.File = {
 			packageId: "package:selected",
-			filename: "package%3Aselected.game.arkpack",
+			filename: "package%3Aselected.arkpack",
 			bytes: bytes.buffer,
 			source: "user",
 			overridesBundled: true,
@@ -77,14 +77,14 @@ describe("loadArkpackFx", () => {
 				Effect.succeed([
 					{
 						packageId: "package:tampered",
-						filename: "package%3Atampered.game.arkpack",
+						filename: "package%3Atampered.arkpack",
 						bytes: bundledBytes.buffer,
 						source: "bundled",
 						overridesBundled: false,
 					},
 					{
 						packageId: "package:tampered",
-						filename: "package%3Atampered.game.arkpack",
+						filename: "package%3Atampered.arkpack",
 						bytes: userBytes.buffer,
 						signature: {
 							malformed: true,

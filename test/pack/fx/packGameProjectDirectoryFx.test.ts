@@ -1,7 +1,7 @@
 import { gunzipSync } from "node:zlib";
-import { FileSystem, Path } from "effect";
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import { Effect } from "effect";
+import { Deferred, Effect, Fiber, FileSystem, Path, Ref } from "effect";
+import { TestClock } from "effect/testing";
 import { describe, expect, it } from "@effect/vitest";
 
 import { decodeFx } from "~/engine/pack/fx/decodeFx";
@@ -19,20 +19,17 @@ describe("packDirectoryFx game-project contract", () => {
 			const result = yield* packDirectoryFx({
 				input,
 			});
-			const compressed = yield* fileSystem.readFile(result.output);
+			const compressed = yield* fileSystem.readFile(result.arkpack);
 			const payload = yield* decodeFx(new Uint8Array(gunzipSync(compressed)));
-			const packed = {
-				payload,
-				result,
-			} as const;
 
-			expect(packed.result).toMatchObject({
+			expect(result).toMatchObject({
+				filename: "project-game.arkpack",
 				packageId: "project-game",
 				version: "2.3",
 				json: 2,
 				png: 2,
 			});
-			expect(packed.payload).toMatchObject({
+			expect(payload).toMatchObject({
 				packageId: "project-game",
 				version: "2.3",
 				config: {
@@ -53,7 +50,7 @@ describe("packDirectoryFx game-project contract", () => {
 					},
 				]),
 			});
-			expect(packed.payload.config).not.toHaveProperty("arkpack");
+			expect(payload.config).not.toHaveProperty("arkpack");
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
 
@@ -169,6 +166,41 @@ describe("packDirectoryFx game-project contract", () => {
 					]),
 				},
 			});
+		}).pipe(Effect.provide(NodeServices.layer)),
+	);
+
+	it.effect("serializes concurrent project builds before the freshness assertion", () =>
+		Effect.gen(function* () {
+			const input = yield* writeGameProjectFixtureFx();
+			const firstEntered = yield* Deferred.make<void>();
+			const releaseFirst = yield* Deferred.make<void>();
+			const secondEntered = yield* Ref.make(false);
+			const first = yield* packDirectoryFx({
+				input,
+				assertCurrentFx: Deferred.succeed(firstEntered, undefined).pipe(
+					Effect.andThen(Deferred.await(releaseFirst)),
+				),
+			}).pipe(Effect.forkChild);
+			yield* Deferred.await(firstEntered);
+			const second = yield* packDirectoryFx({
+				input,
+				assertCurrentFx: Ref.set(secondEntered, true),
+			}).pipe(Effect.forkChild);
+			yield* TestClock.adjust("100 millis");
+			const enteredWhileLocked = yield* Ref.get(secondEntered);
+			yield* Deferred.succeed(releaseFirst, undefined);
+			const firstResult = yield* Fiber.join(first);
+			yield* TestClock.adjust("100 millis");
+			const secondResult = yield* Fiber.join(second);
+
+			expect(enteredWhileLocked).toBe(false);
+			expect([
+				firstResult.filename,
+				secondResult.filename,
+			]).toEqual([
+				"project-game.arkpack",
+				"project-game.arkpack",
+			]);
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
 });

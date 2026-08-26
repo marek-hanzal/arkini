@@ -146,6 +146,12 @@ const api: ArkiniElectronApi.Api = {
 			ipcRenderer.invoke(ArkiniElectronApi.channels.launcherLastPackageIdWrite, packageId),
 	},
 	editor: {
+		buildProject: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectBuild, request),
+		readProjectBuild: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectBuildRead, request),
+		isSignKeyConfigured: () =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorSignKeyConfigured),
 		status: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorStatus),
 		awaitIdle: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorAwaitIdle),
 		createProject: (request) =>

@@ -1,25 +1,32 @@
 import { Argument, Command, Flag } from "effect/unstable/cli";
-import { Console, Effect } from "effect";
+import { Console, Effect, Option } from "effect";
 
-import { readArkpackTrustedKeysFx } from "~/engine/pack/fx/readArkpackTrustedKeysFx";
+import { ArkiniBuiltPublicKey } from "~/engine/pack/ArkiniBuiltPublicKey";
 import { verifyArkpackFileFx } from "~/engine/pack/fx/verifyArkpackFileFx";
+import { ArkpackPublicKeySchema } from "~/engine/pack/schema/ArkpackPublicKeySchema";
 import { handleArkpackInputErrorFx } from "./handleArkpackInputErrorFx";
-
-namespace runArkpackVerifyFx {
-	export interface Props {
-		readonly arkpackPath: string;
-		readonly trustedKeysPath: string;
-	}
-}
 
 const runArkpackVerifyFx = Effect.fn("runArkpackVerifyFx")(function* ({
 	arkpackPath,
-	trustedKeysPath,
-}: runArkpackVerifyFx.Props) {
-	const registry = yield* readArkpackTrustedKeysFx(trustedKeysPath);
+	publicKey: candidatePublicKey,
+}: {
+	readonly arkpackPath: string;
+	readonly publicKey?: string;
+}) {
+	const publicKey =
+		candidatePublicKey !== undefined
+			? yield* Effect.try({
+					try: () => ArkpackPublicKeySchema.parse(candidatePublicKey),
+					catch: (cause) => cause,
+				})
+			: ArkiniBuiltPublicKey;
+	if (publicKey === undefined)
+		return yield* Effect.fail(
+			new Error("This Arkini CLI has no embedded public key; pass --public-key."),
+		);
 	const result = yield* verifyArkpackFileFx({
 		arkpackPath,
-		trustedKeys: registry,
+		publicKey,
 	});
 	yield* Console.log(JSON.stringify(result));
 	if (result.trust.type === "invalid") {
@@ -33,18 +40,17 @@ export const ArkpackVerifyCommand = Command.make(
 	"verify",
 	{
 		arkpack: Argument.file("arkpack"),
-		trustedKeys: Flag.string("trusted-keys").pipe(
-			Flag.withDefault("game/arkini.arkpack.keys.json"),
-			Flag.withDescription("Explicit trusted-public-key registry JSON path."),
+		publicKey: Flag.optional(
+			Flag.string("public-key").pipe(
+				Flag.withDescription(
+					"Explicit base64 SPKI key instead of this CLI build identity.",
+				),
+			),
 		),
 	},
-	({ arkpack, trustedKeys }) =>
+	({ arkpack, publicKey }) =>
 		runArkpackVerifyFx({
 			arkpackPath: arkpack,
-			trustedKeysPath: trustedKeys,
+			publicKey: Option.getOrUndefined(publicKey),
 		}).pipe(Effect.catch(handleArkpackInputErrorFx)),
-).pipe(
-	Command.withDescription(
-		"Verify one Arkpack and print its explicit official, external, or invalid trust.",
-	),
-);
+).pipe(Command.withDescription("Verify one Arkpack against exactly one public key."));

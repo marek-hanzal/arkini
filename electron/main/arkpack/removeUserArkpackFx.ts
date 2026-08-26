@@ -15,11 +15,11 @@ export namespace removeUserArkpackFx {
 export const removeUserArkpackFx = Effect.fn("removeUserArkpackFx")(
 	({ root, fileSystem, packageId }: removeUserArkpackFx.Props) =>
 		Effect.gen(function* () {
-			const path = join(root, `${encodeURIComponent(packageId)}.game.arkpack`);
+			const path = join(root, `${encodeURIComponent(packageId)}.arkpack`);
 			yield* fileSystem.remove(path, {
 				force: true,
 			});
-			yield* fileSystem.remove(`${path}.sig`, {
+			yield* fileSystem.remove(join(root, `${encodeURIComponent(packageId)}.arksig`), {
 				force: true,
 			});
 		}).pipe(

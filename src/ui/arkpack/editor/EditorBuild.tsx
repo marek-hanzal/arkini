@@ -21,8 +21,7 @@ export const EditorBuild = () => {
 				<div>
 					<h1 className="text-2xl font-semibold">Build</h1>
 					<p className="mt-1 text-sm text-muted">
-						Validate one exact saved project snapshot and produce immutable Arkpack
-						bytes.
+						Validate one exact saved project revision and publish its canonical Arkpack.
 					</p>
 					<p className="mt-1 text-xs text-subtle">
 						Arkpack v{controller.project.version}. Compatible edits keep saves and Board
@@ -54,6 +53,22 @@ export const EditorBuild = () => {
 						project={controller.project}
 					/>
 				)}
+				<label className="mt-4 block max-w-2xl text-sm font-medium">
+					Signing key
+					<input
+						className="mt-2 w-full rounded-lg border border-line bg-surface px-3 py-2 font-mono text-sm"
+						type="password"
+						value={controller.signKey}
+						onChange={(event) => controller.setSignKey(event.currentTarget.value)}
+						placeholder="Base64 PKCS8 key; leave empty to use the configured default"
+					/>
+				</label>
+				<p className="mt-2 text-xs text-subtle">
+					{controller.signKeyConfigured
+						? "ARKINI_SIGN_KEY is configured and will be used while this field is empty. "
+						: "No ARKINI_SIGN_KEY is configured; an empty field builds unsigned. "}
+					The Editor does not expose or persist keys.
+				</p>
 				<PrimaryButton
 					className="mt-4"
 					disabled={controller.buildPending}

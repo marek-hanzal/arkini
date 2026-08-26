@@ -7,6 +7,7 @@ import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryEr
 import { createFilesystemEditorBoardScenarioOperationsFx } from "./createFilesystemEditorBoardScenarioOperationsFx";
 import { createFilesystemEditorNoteOperationsFx } from "./createFilesystemEditorNoteOperationsFx";
 import { createFilesystemEditorProjectCatalogFx } from "./createFilesystemEditorProjectCatalogFx";
+import { createFilesystemEditorProjectBuildOperationsFx } from "./createFilesystemEditorProjectBuildOperationsFx";
 import { createFilesystemEditorProjectCommitOperationsFx } from "./createFilesystemEditorProjectCommitOperationsFx";
 import { createFilesystemEditorProjectOperationsFx } from "./createFilesystemEditorProjectOperationsFx";
 import { createFilesystemEditorProjectVersionOperationsFx } from "./createFilesystemEditorProjectVersionOperationsFx";
@@ -49,6 +50,10 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		readState,
 		states,
 	});
+	const builds = yield* createFilesystemEditorProjectBuildOperationsFx({
+		operations,
+		readState,
+	});
 	const boardScenarios = yield* createFilesystemEditorBoardScenarioOperationsFx({
 		operations,
 		readState,
@@ -67,6 +72,7 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 	const repository = {
 		awaitIdleFx: operations.withPermits(1)(Effect.void),
 		...projects,
+		...builds,
 		...commits,
 		...boardScenarios,
 		...notes,
@@ -78,10 +84,12 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 
 	return {
 		awaitIdleFx: provide(repository.awaitIdleFx),
+		buildProjectFx: (props) => provide(repository.buildProjectFx(props)),
 		createProjectFx: (props) => provide(repository.createProjectFx(props)),
 		deleteProjectFx: (projectId) => provide(repository.deleteProjectFx(projectId)),
 		openProjectFx: (props) => provide(repository.openProjectFx(props)),
 		readProjectFx: (projectId) => provide(repository.readProjectFx(projectId)),
+		readProjectBuildFx: (props) => provide(repository.readProjectBuildFx(props)),
 		readProjectRootFx: (projectId) => provide(repository.readProjectRootFx(projectId)),
 		refreshProjectFx: (projectId) => provide(repository.refreshProjectFx(projectId)),
 		listProjectsFx: provide(repository.listProjectsFx),

@@ -15,7 +15,7 @@ describe("listArkpacksFx", () => {
 			listFx: Effect.succeed([
 				{
 					packageId: "package:catalog",
-					filename: "package%3Acatalog.game.arkpack",
+					filename: "package%3Acatalog.arkpack",
 					bytes: bytes.buffer,
 					source: "user",
 					overridesBundled: true,
@@ -50,14 +50,14 @@ describe("listArkpacksFx", () => {
 			listFx: Effect.succeed([
 				{
 					packageId: "package:filename",
-					filename: "package%3Afilename.game.arkpack",
+					filename: "package%3Afilename.arkpack",
 					bytes: bundledBytes.buffer,
 					source: "bundled",
 					overridesBundled: false,
 				},
 				{
 					packageId: "package:filename",
-					filename: "package%3Afilename.game.arkpack",
+					filename: "package%3Afilename.arkpack",
 					bytes: userBytes.buffer,
 					source: "user",
 					overridesBundled: true,

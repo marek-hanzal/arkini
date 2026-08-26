@@ -32,7 +32,7 @@ export const createInMemoryArkpackStorageFx = Effect.fn("createInMemoryArkpackSt
 				Effect.sync(() => {
 					files.set(packageId, {
 						packageId,
-						filename: `${encodeURIComponent(packageId)}.game.arkpack`,
+						filename: `${encodeURIComponent(packageId)}.arkpack`,
 						bytes: bytes.slice(0),
 						source: "user",
 						overridesBundled: false,

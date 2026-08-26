@@ -8,6 +8,7 @@ import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import { ArkpackSignKeySchema } from "~/engine/pack/schema/ArkpackSignKeySchema";
 import type {
 	EditorProjectVersionCheckoutInput,
 	EditorProjectVersionCommitInput,
@@ -27,6 +28,21 @@ const createProjectSchema = z
 		version: ArkpackVersionSchema,
 		config: GameConfigSchema,
 		resources: ResourceSchema.array(),
+	})
+	.strict();
+const buildProjectSchema = z
+	.object({
+		expectedRevision: z.number().int().nonnegative(),
+		projectId: IdSchema,
+		signKey: ArkpackSignKeySchema.optional(),
+	})
+	.strict();
+const readProjectBuildSchema = z
+	.object({
+		contentHash: z.string().regex(/^[a-f0-9]{64}$/),
+		expectedRevision: z.number().int().nonnegative(),
+		projectId: IdSchema,
+		signatureFilename: z.string().min(1).optional(),
 	})
 	.strict();
 const upsertItemSchema = z
@@ -130,6 +146,14 @@ const versionDiffSchema = z
 export const createEditorProjectRequestParserFx = Effect.fn("createEditorProjectRequestParserFx")(
 	() =>
 		Effect.succeed({
+			parseBuildProjectFx: (candidate: unknown) =>
+				parseEditorProjectIpcRequestFx("build-project", buildProjectSchema, candidate),
+			parseReadProjectBuildFx: (candidate: unknown) =>
+				parseEditorProjectIpcRequestFx(
+					"read-project-build",
+					readProjectBuildSchema,
+					candidate,
+				),
 			parseCreateProjectFx: (
 				candidate: unknown,
 			): Effect.Effect<

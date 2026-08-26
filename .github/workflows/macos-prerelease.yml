@@ -19,6 +19,7 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 60
     env:
+      ARKINI_SIGN_KEY: ${{ secrets.ARKINI_SIGN_KEY }}
       CSC_IDENTITY_AUTO_DISCOVERY: "false"
     steps:
       - name: Check out repository
@@ -37,8 +38,6 @@ jobs:
         run: ./Argcfile.sh version "${GITHUB_REF_NAME#v}"
 
       - name: Check and package unsigned macOS arm64 application
-        env:
-          ARKINI_ARKPACK_PRIVATE_KEY: ${{ secrets.ARKINI_ARKPACK_PRIVATE_KEY }}
         run: ./Argcfile.sh ci-macos
 
       - name: Upload workflow artifact

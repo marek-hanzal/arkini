@@ -16,6 +16,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import { readFilesystemEditorProjectFilesFx } from "./readFilesystemEditorProjectFilesFx";
+import { ensureFilesystemEditorProjectGitignoreFx } from "./ensureFilesystemEditorProjectGitignoreFx";
 import { readFilesystemEditorProjectSidecarsFx } from "./readFilesystemEditorProjectSidecarsFx";
 import { readFilesystemEditorProjectVersionHistoryFx } from "./readFilesystemEditorProjectVersionHistoryFx";
 import { writeFilesystemEditorProjectFilesFx } from "./writeFilesystemEditorProjectFilesFx";
@@ -95,6 +96,7 @@ const materializeProjectFx = Effect.fn("materializeFilesystemEditorProjectFx")(f
 		catalog.root,
 		Effect.gen(function* () {
 			const paths = yield* createEditorProjectFilesystemPathsFx(catalog.root);
+			yield* ensureFilesystemEditorProjectGitignoreFx(paths);
 			const files = yield* readFilesystemEditorProjectFilesFx(paths.root);
 			const projectId = files.config.meta.id;
 			const sidecars = yield* readFilesystemEditorProjectSidecarsFx({

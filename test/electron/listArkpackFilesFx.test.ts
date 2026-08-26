@@ -27,7 +27,7 @@ describe("listArkpackFilesFx", () => {
 	it("bounds the total package bytes retained by one root scan", async () => {
 		await Promise.all([
 			writeFile(
-				join(root, "first.game.arkpack"),
+				join(root, "first.arkpack"),
 				new Uint8Array([
 					1,
 					2,
@@ -35,7 +35,7 @@ describe("listArkpackFilesFx", () => {
 				]),
 			),
 			writeFile(
-				join(root, "second.game.arkpack"),
+				join(root, "second.arkpack"),
 				new Uint8Array([
 					4,
 					5,
@@ -63,8 +63,8 @@ describe("listArkpackFilesFx", () => {
 
 	it("bounds zero-byte candidates independently from the byte budget", async () => {
 		await Promise.all([
-			writeFile(join(root, "first.game.arkpack"), new Uint8Array()),
-			writeFile(join(root, "second.game.arkpack"), new Uint8Array()),
+			writeFile(join(root, "first.arkpack"), new Uint8Array()),
+			writeFile(join(root, "second.arkpack"), new Uint8Array()),
 		]);
 		const fileSystem = await Effect.runPromise(
 			FileSystem.FileSystem.pipe(Effect.provide(NodeServices.layer)),
@@ -87,13 +87,13 @@ describe("listArkpackFilesFx", () => {
 	it("counts rejected canonical candidates against the scan limit", async () => {
 		await Promise.all([
 			writeFile(
-				join(root, "first.game.arkpack"),
+				join(root, "first.arkpack"),
 				new Uint8Array([
 					1,
 				]),
 			),
 			writeFile(
-				join(root, "second.game.arkpack"),
+				join(root, "second.arkpack"),
 				new Uint8Array([
 					2,
 				]),
@@ -117,7 +117,7 @@ describe("listArkpackFilesFx", () => {
 	});
 
 	it("charges detached signatures to the root byte budget", async () => {
-		const path = join(root, "signed.game.arkpack");
+		const path = join(root, "signed.arkpack");
 		await Promise.all([
 			writeFile(
 				path,
@@ -125,7 +125,7 @@ describe("listArkpackFilesFx", () => {
 					1,
 				]),
 			),
-			writeFile(`${path}.sig`, "sig"),
+			writeFile(join(root, "signed.arksig"), "sig"),
 		]);
 		const fileSystem = await Effect.runPromise(
 			FileSystem.FileSystem.pipe(Effect.provide(NodeServices.layer)),

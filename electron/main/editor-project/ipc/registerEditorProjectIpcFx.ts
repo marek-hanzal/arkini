@@ -11,6 +11,7 @@ import { importEditorJsonDirectoryFx } from "../importEditorJsonDirectoryFx";
 import { openEditorExportDirectoryFx } from "../openEditorExportDirectoryFx";
 import { createEditorProjectRequestParserFx } from "./createEditorProjectRequestParserFx";
 import { executeEditorProjectRepositoryFx } from "./executeEditorProjectRepositoryFx";
+import { readArkpackSignKeyFx } from "~/engine/pack/fx/readArkpackSignKeyFx";
 import { registerEditorBoardScenarioIpcFx } from "./registerEditorBoardScenarioIpcFx";
 import { registerEditorNoteIpcFx } from "./registerEditorNoteIpcFx";
 
@@ -110,6 +111,46 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 								value: undefined,
 							}),
 						}),
+					),
+				);
+				handle(ArkiniElectronApi.channels.editorSignKeyConfigured, () =>
+					Effect.succeed((process.env.ARKINI_SIGN_KEY?.trim().length ?? 0) > 0),
+				);
+				handle(ArkiniElectronApi.channels.editorProjectBuild, (_event, candidate) =>
+					executeEditorProjectRepositoryFx(
+						"build-project",
+						ownership,
+						requestParser.parseBuildProjectFx(candidate).pipe(
+							Effect.flatMap((request) => {
+								if (request.signKey !== undefined) return Effect.succeed(request);
+								const configured = process.env.ARKINI_SIGN_KEY?.trim();
+								return configured === undefined || configured.length === 0
+									? Effect.succeed(request)
+									: readArkpackSignKeyFx(configured).pipe(
+											Effect.map((signKey) => ({
+												...request,
+												signKey,
+											})),
+											Effect.mapError(
+												(cause) =>
+													new EditorProjectRepositoryError({
+														operation: "build-project",
+														message: cause.message,
+														cause,
+													}),
+											),
+										);
+							}),
+						),
+						(repository, request) => repository.buildProjectFx(request),
+					),
+				);
+				handle(ArkiniElectronApi.channels.editorProjectBuildRead, (_event, candidate) =>
+					executeEditorProjectRepositoryFx(
+						"read-project-build",
+						ownership,
+						requestParser.parseReadProjectBuildFx(candidate),
+						(repository, request) => repository.readProjectBuildFx(request),
 					),
 				);
 				handle(ArkiniElectronApi.channels.editorProjectList, () =>
@@ -330,6 +371,9 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 				const channels = [
 					ArkiniElectronApi.channels.editorStatus,
 					ArkiniElectronApi.channels.editorAwaitIdle,
+					ArkiniElectronApi.channels.editorProjectBuild,
+					ArkiniElectronApi.channels.editorProjectBuildRead,
+					ArkiniElectronApi.channels.editorSignKeyConfigured,
 					ArkiniElectronApi.channels.editorProjectCreate,
 					ArkiniElectronApi.channels.editorProjectDelete,
 					ArkiniElectronApi.channels.editorProjectDeleteItem,

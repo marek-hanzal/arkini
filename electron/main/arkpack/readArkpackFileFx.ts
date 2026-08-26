@@ -19,7 +19,7 @@ export const readArkpackFileFx = Effect.fn("readArkpackFileFx")(
 	({ root, fileSystem, packageId, source }: readArkpackFileFx.Props) =>
 		Effect.gen(function* () {
 			if (packageId.length === 0) return null;
-			const filename = `${encodeURIComponent(packageId)}.game.arkpack`;
+			const filename = `${encodeURIComponent(packageId)}.arkpack`;
 			const path = join(root, filename);
 			if (!(yield* fileSystem.exists(path))) return null;
 			const info = yield* fileSystem.stat(path);
@@ -31,7 +31,7 @@ export const readArkpackFileFx = Effect.fn("readArkpackFileFx")(
 				);
 			}
 			const bytes = yield* fileSystem.readFile(path);
-			const signaturePath = `${path}.sig`;
+			const signaturePath = join(root, `${encodeURIComponent(packageId)}.arksig`);
 			const signature = yield* fileSystem.exists(signaturePath).pipe(
 				Effect.flatMap((exists) =>
 					exists

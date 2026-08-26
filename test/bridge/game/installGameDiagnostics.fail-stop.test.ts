@@ -20,7 +20,6 @@ const testArkpack = {
 	source: "bundled",
 	trust: {
 		type: "official",
-		keyId: "test",
 	},
 } satisfies ArkpackDescriptor;
 

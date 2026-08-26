@@ -159,7 +159,7 @@ It runs:
 ```text
 Biome format check
 → source, test, and Electron TypeScript checks
-→ production Electron build and built-CLI official Arkpack signing
+→ production Electron build and built-CLI bundled-project packing
 → Dependency Cruiser architecture rules against generated build inputs
 → copy/paste detection
 → the isolated parallel Vitest suite
@@ -176,9 +176,9 @@ Application commands:
 ./Argcfile.sh package-macos
 ```
 
-Arkini is an [Electron](https://www.electronjs.org/docs/latest/)-only product. `dev` starts Electron with a [Vite](https://vite.dev/guide/)-powered renderer. The editor's MCP workspace explicitly starts either the open loopback endpoint at `http://127.0.0.1:32310/editor/mcp` or an OAuth-protected Remote MCP endpoint over ngrok; both modes share one lazy local listener and remain off until requested. `mcp-inspect` starts the pinned Inspector independently for the loopback endpoint. MCP tools are dynamically scoped to the single project currently mounted in the editor and fail without touching persistence when no project is open. Port, ngrok configuration, generated password, OAuth clients, codes, and tokens persist in `<userData>/arkini/editor/mcp.json`; only the ngrok `authtoken` value is encrypted with Electron `safeStorage`. Explicit Reset auth replaces the password and OAuth state while preserving transport configuration. Vite may replace modules during development, but Arkini treats application state as disposable and implements no HMR preservation, shutdown, or ownership handoff. `build` compiles the production Electron application, then uses that exact built CLI to pack, sign, and verify official Arkini, so a private key must be available through ignored `.arkini/arkpack-private.pem` or `ARKINI_ARKPACK_PRIVATE_KEY`. `preview-macos` rebuilds the same inputs, creates an unpacked arm64 application, and launches it. There is no standalone web target, web persistence fallback, or alternate renderer startup path.
+Arkini is an [Electron](https://www.electronjs.org/docs/latest/)-only product. `dev` starts Electron with a [Vite](https://vite.dev/guide/)-powered renderer. The editor's MCP workspace explicitly starts either the open loopback endpoint at `http://127.0.0.1:32310/editor/mcp` or an OAuth-protected Remote MCP endpoint over ngrok; both modes share one lazy local listener and remain off until requested. `mcp-inspect` starts the pinned Inspector independently for the loopback endpoint. MCP tools are dynamically scoped to the single project currently mounted in the editor and fail without touching persistence when no project is open. Port, ngrok configuration, generated password, OAuth clients, codes, and tokens persist in `<userData>/arkini/editor/mcp.json`; only the ngrok `authtoken` value is encrypted with Electron `safeStorage`. Explicit Reset auth replaces the password and OAuth state while preserving transport configuration. Vite may replace modules during development, but Arkini treats application state as disposable and implements no HMR preservation, shutdown, or ownership handoff. `build` compiles the production Electron application with the one public key derived from `ARKINI_SIGN_KEY`, then uses that exact built CLI to run the standard pack command against `./game/arkini`. Local mise tasks load the ignored `.env.local`; CI provides the same variable from GitHub Actions secrets. `preview-macos` rebuilds the same inputs, creates an unpacked arm64 application, and launches it. There is no standalone web target, web persistence fallback, or alternate renderer startup path.
 
-All disposable repository-local generated output lives below `.out/`: Electron build files under `.out/desktop/build`, distributable artifacts under `.out/desktop/release`, and tool caches under `.out/cache`. Electron Builder maps the build directory directly into the packaged ASAR through configuration; there is no repository staging pipeline. The `game/` tree is the deliberate generated-output exception because authored games and their generated Arkpack/schema companions share one domain-owned location. Local build inputs such as signing keys remain config under `.arkini/` and must survive deleting `.out/`.
+Disposable application output lives below `.out/`: Electron build files under `.out/desktop/build`, distributable artifacts under `.out/desktop/release`, and tool caches under `.out/cache`. Each authored game owns its ignored canonical artifact pair below `<project>/build/`; desktop packaging consumes that directory directly. Local signing input lives in ignored `.env.local` as `ARKINI_SIGN_KEY`.
 
 `dev-control` starts the same application with Chromium DevTools Protocol exposed at `http://127.0.0.1:9222` for local UI automation and profiling. The endpoint is fixed to loopback and is never enabled by packaged builds.
 
@@ -206,7 +206,7 @@ For a packaged local smoke test without release archives, run:
 ./Argcfile.sh preview-macos
 ```
 
-This recipe cleans desktop output, builds Electron and the official Arkpack once, asks Electron Builder for the unpacked arm64 `.out/desktop/release/mac-arm64/Arkini.app`, and launches that exact bundle with macOS `open`. It does not create DMG, ZIP, checksums, macOS code signing, notarization, or release assets.
+This recipe cleans desktop output, builds Electron, packs `./game/arkini` through the standard project command, asks Electron Builder for the unpacked arm64 `.out/desktop/release/mac-arm64/Arkini.app`, and launches that exact bundle with macOS `open`. It does not create DMG, ZIP, checksums, macOS code signing, notarization, or release assets.
 
 The production distribution target is unsigned macOS Apple Silicon only. Build both local artifacts through the one canonical path:
 
@@ -244,8 +244,8 @@ argc test test/job
 
 The launcher treats `.arkpack` as the playable package boundary:
 
-- Electron scans two flat roots for `<encoded-packageId>.game.arkpack` and optional `.sig` siblings: repository `game/` in development or packaged `Resources/game`, plus writable `<userData>/arkini/game/arkpacks`;
-- format v2 embeds a stable `packageId` in the signed package bytes independently from the authored `gameId`. The renderer derives `contentHash`, trust, title, and game metadata from the exact bytes instead of trusting generated catalog metadata;
+- Electron scans two flat roots for `<encoded-packageId>.arkpack` and optional `.arksig` siblings: `game/arkini/build` in development or packaged `Resources/game`, plus writable `<userData>/arkini/game/arkpacks`;
+- each Arkpack embeds its stable `packageId` in the signed package bytes. The renderer derives `contentHash`, trust, title, and game metadata from the exact bytes instead of trusting generated catalog metadata;
 - a structurally valid user package legally overrides a bundled package with the same ID. The renderer selects from both raw candidates, so an unreadable user file falls back consistently while an invalidly signed package stays visible but unavailable. The catalog labels the effective user row `User override`; removing it touches only user data and reveals the bundled fallback;
 - the Arkpack screen can open only the user package folder and explicitly refresh after manual copies. The bundled root is never exposed through UI;
 - trust is derived only from the optional detached signature. Bundled location and package name confer no trust; official Arkini carries a verifiable Ed25519 signature;
@@ -269,14 +269,12 @@ The default game source directory is [`game/arkini`](game/arkini).
 arkini-cli game schema
 arkini-cli game validate
 arkini-cli game pack
-arkini-cli arkpack pack-official
 ```
 
 - `game schema` writes the authoring JSON Schema to [`game/schema.json`](game/schema.json).
 - `game validate` runs the canonical compiler and all diagnostics.
-- `game pack`, implemented by the [pack command](src/engine/pack/cli/PackCommand.ts), is an explicit unsigned authoring operation: it validates the completed config, reads PNG resources, embeds the package ID in MessagePack, compresses it with gzip, and writes the ignored binary.
-- `arkpack pack-official` packs final Arkini bytes, signs them with Ed25519, writes the detached `.sig`, and verifies the result against the committed public registry.
-- The canonical desktop build first compiles Electron/Vite with no generated game imports, then invokes its built `arkini-cli` to produce the signed official game exactly once. `electron-builder` delivers only `.arkpack` and `.sig` files into packaged `Resources/game`.
+- `game pack`, implemented by the [pack command](src/engine/pack/cli/PackCommand.ts), validates the current project, reads PNG resources, embeds the package ID in MessagePack, compresses it with gzip, and atomically replaces `<project>/build/<encoded projectId>.arkpack`. When `ARKINI_SIGN_KEY` is present it also publishes the verified `.arksig`; an unsigned rebuild removes any stale signature.
+- The desktop build compiles Electron/Vite and then invokes that built `arkini-cli game pack ./game/arkini`. `electron-builder` copies the standard project artifact pair from `game/arkini/build` into packaged `Resources/game`.
 
 [`ARKPACK_SIGNING.md`](ARKPACK_SIGNING.md) is the complete threat model, CLI, private-key, CI-secret, trust-state, and rotation contract.
 

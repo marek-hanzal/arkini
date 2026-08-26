@@ -28,7 +28,6 @@ describe("ArkpackSelector", () => {
 					game: "1",
 					trust: {
 						type: "official",
-						keyId: "test-official",
 					} as const,
 					source: "bundled" as const,
 					overridesBundled: false,

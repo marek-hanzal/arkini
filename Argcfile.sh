@@ -149,10 +149,10 @@ mcp-inspect() {
 		--transport http
 }
 
-# @cmd Build Electron and the signed official Arkpack
+# @cmd Build Electron and the bundled game project
 build() {
 	electron-vite build
-	node .out/desktop/build/main/cli/arkini.js arkpack pack-official
+	node .out/desktop/build/main/cli/arkini.js game pack ./game/arkini
 }
 
 # @cmd Build and open the unpacked macOS arm64 application

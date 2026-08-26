@@ -1,8 +1,6 @@
 export const createArtifact = (contentHash: string, revision: number) => ({
-	bytes: new Uint8Array([
-		1,
-		2,
-	]),
+	projectId: "editor-test",
+	bytes: 2,
 	contentHash,
 	diagnostics: [],
 	filename: "editor-test.arkpack",

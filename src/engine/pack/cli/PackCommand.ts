@@ -1,8 +1,12 @@
 import { Argument, Command } from "effect/unstable/cli";
 import { Console, Effect } from "effect";
 
+import { ArkiniBuiltPublicKey } from "~/engine/pack/ArkiniBuiltPublicKey";
 import { packDirectoryFx } from "~/engine/pack/fx/packDirectoryFx";
+import { readArkpackSignKeyFx } from "~/engine/pack/fx/readArkpackSignKeyFx";
 import { printGameDiagnosticsForCliFx } from "~/engine/validation/printer/printGameDiagnosticsForCliFx";
+import { deriveArkpackPublicKey } from "./deriveArkpackPublicKey";
+import { GameValidationError } from "~/engine/validation/error/GameValidationError";
 
 export namespace PackCommand {
 	export interface Props {
@@ -20,19 +24,40 @@ namespace runPackCommandFx {
 const runPackCommandFx = Effect.fn("runPackCommandFx")(function* ({
 	input,
 }: runPackCommandFx.Props) {
+	const candidateSignKey = process.env.ARKINI_SIGN_KEY;
+	const signKey =
+		candidateSignKey === undefined || candidateSignKey.trim().length === 0
+			? undefined
+			: yield* readArkpackSignKeyFx(candidateSignKey);
+	const publicKey =
+		ArkiniBuiltPublicKey ??
+		(signKey === undefined ? undefined : deriveArkpackPublicKey(signKey));
 	const result = yield* packDirectoryFx({
 		input,
+		...(publicKey === undefined || signKey === undefined
+			? {}
+			: {
+					signing: {
+						publicKey,
+						signKey,
+					},
+				}),
 	}).pipe(
-		Effect.catchTag("GameValidationError", (error) =>
-			printGameDiagnosticsForCliFx(error.diagnostics).pipe(
-				Effect.andThen(Effect.fail(error)),
-			),
+		Effect.catch((error) =>
+			error instanceof GameValidationError
+				? printGameDiagnosticsForCliFx(error.diagnostics).pipe(
+						Effect.andThen(Effect.fail(error)),
+					)
+				: Effect.fail(error),
 		),
 	);
 	yield* printGameDiagnosticsForCliFx(result.diagnostics);
 
 	yield* Console.log(`Packed ${result.json} JSON sources and ${result.png} PNG assets.`);
-	yield* Console.log(`Wrote ${result.output} (${result.bytes} bytes).`);
+	yield* Console.log(`Wrote ${result.arkpack} (${result.bytes} bytes).`);
+	if (result.signaturePath !== undefined) {
+		yield* Console.log(`Wrote ${result.signaturePath}.`);
+	}
 });
 
 /**

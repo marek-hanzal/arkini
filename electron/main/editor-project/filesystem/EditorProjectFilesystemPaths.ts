@@ -6,6 +6,8 @@ import type { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 /** Complete path grammar below one portable Editor project root. */
 export interface EditorProjectFilesystemPaths {
 	readonly root: string;
+	readonly build: string;
+	readonly gitignoreFile: string;
 	readonly projectFile: string;
 	readonly lockFile: string;
 	readonly schemaFile: string;

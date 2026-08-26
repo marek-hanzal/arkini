@@ -102,17 +102,23 @@ const copyEditorProjectFx = Effect.fn("copyEditorProjectFx")(function* ({
 	const files = yield* fileSystem.readDirectory(target, {
 		recursive: true,
 	});
+	const excluded = (file: string) =>
+		file === "editor.lock" ||
+		file === "build" ||
+		file.startsWith("build/") ||
+		file.endsWith(".tmp");
 	for (const file of files) {
-		if (file === "editor.lock" || file.endsWith(".tmp"))
+		if (excluded(file))
 			yield* fileSystem.remove(path.join(target, file), {
 				force: true,
 				recursive: true,
 			});
 	}
+	const exportedFiles = files.filter((file) => !excluded(file));
 	return {
-		json: files.filter((file) => file.endsWith(".json")).length,
+		json: exportedFiles.filter((file) => file.endsWith(".json")).length,
 		projectDirectory: target,
-		resources: files.filter((file) => file.endsWith(".png")).length,
+		resources: exportedFiles.filter((file) => file.endsWith(".png")).length,
 		revision,
 		root: target,
 	} satisfies exportEditorJsonDirectoryFx.Success;

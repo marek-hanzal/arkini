@@ -1,10 +1,7 @@
 import { z } from "zod";
 
-const keyIdPattern = /^[a-z0-9][a-z0-9._-]{0,63}$/;
-
 export const ArkpackSignatureSchema = z
 	.object({
-		keyId: z.string().regex(keyIdPattern).describe("The trusted-public-key lookup identity."),
 		signature: z
 			.base64()
 			.refine(

@@ -2,6 +2,7 @@
 export namespace EditorProjectTransport {
 	export type Operation =
 		| "await-idle"
+		| "build-project"
 		| "checkout-version"
 		| "create-project"
 		| "create-note"
@@ -20,6 +21,7 @@ export namespace EditorProjectTransport {
 		| "list-versions"
 		| "open-export-directory"
 		| "read-project"
+		| "read-project-build"
 		| "refresh-project"
 		| "read-version-status"
 		| "read-board-scenario"
@@ -44,6 +46,7 @@ export namespace EditorProjectTransport {
 	export interface Failure {
 		readonly operation: Operation;
 		readonly message: string;
+		readonly diagnostics?: Array<unknown>;
 	}
 
 	export type Result<Value> =
@@ -80,6 +83,36 @@ export namespace EditorProjectTransport {
 		readonly revision: number;
 		readonly config: unknown;
 		readonly resources: ReadonlyArray<Resource>;
+	}
+
+	export interface Build {
+		readonly projectId: string;
+		readonly revision: number;
+		readonly contentHash: string;
+		readonly filename: string;
+		readonly signatureFilename?: string;
+		readonly version: string;
+		readonly game: string;
+		readonly bytes: number;
+		readonly diagnostics: ReadonlyArray<unknown>;
+	}
+
+	export interface BuildContent {
+		readonly bytes: Uint8Array;
+		readonly signature?: unknown;
+	}
+
+	export interface BuildRequest {
+		readonly expectedRevision: number;
+		readonly projectId: string;
+		readonly signKey?: string;
+	}
+
+	export interface ReadBuildRequest {
+		readonly contentHash: string;
+		readonly expectedRevision: number;
+		readonly projectId: string;
+		readonly signatureFilename?: string;
 	}
 
 	export interface SourceExport {

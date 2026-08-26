@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { ArkiniTrustedKeys } from "~/bridge/arkpack/ArkiniTrustedKeys";
+import { ArkiniPublicKey } from "~/bridge/arkpack/ArkiniPublicKey";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 import { ArkpackLimits } from "../../../../shared/ArkpackLimits";
 
@@ -32,7 +32,7 @@ export const readEditorArkpackFileFx = Effect.fn("readEditorArkpackFileFx")(func
 		bytes,
 		filename: file.name,
 		signature: {
-			trustedKeys: ArkiniTrustedKeys,
+			publicKey: ArkiniPublicKey,
 		},
 		source: "user",
 	});

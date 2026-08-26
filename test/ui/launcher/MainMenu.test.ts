@@ -62,7 +62,6 @@ describe("MainMenu", () => {
 					game: "1",
 					trust: {
 						type: "official",
-						keyId: "other-official",
 					} as const,
 					source: "bundled" as const,
 				},
@@ -75,7 +74,6 @@ describe("MainMenu", () => {
 					game: "1",
 					trust: {
 						type: "official",
-						keyId: "test-official",
 					} as const,
 					source: "bundled" as const,
 				},

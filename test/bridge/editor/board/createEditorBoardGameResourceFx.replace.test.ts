@@ -1,5 +1,6 @@
 import { Effect, SubscriptionRef } from "effect";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "@effect/vitest";
+import { vi } from "vitest";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import type { EditorBoardGame } from "~/bridge/editor/board/EditorBoardGame";
@@ -49,97 +50,100 @@ const createResource = (
 });
 
 describe("EditorBoardGameResource.replaceFx", () => {
-	it("disposes the live session before creating a same-revision scenario session", async () => {
-		const events: string[] = [];
-		const createResourceFx = vi.fn((ownedProject: EditorProject, restored?: StateSchema.Type) =>
-			Effect.sync(() => {
-				events.push(restored === undefined ? "create-fresh" : "create-restored");
-				return createResource(
-					ownedProject,
+	it.effect("disposes the live session before creating a same-revision scenario session", () =>
+		Effect.gen(function* () {
+			const events: string[] = [];
+			const createResourceFx = vi.fn(
+				(ownedProject: EditorProject, restored?: StateSchema.Type) =>
 					Effect.sync(() => {
-						events.push(restored === undefined ? "dispose-fresh" : "dispose-restored");
+						events.push(restored === undefined ? "create-fresh" : "create-restored");
+						return createResource(
+							ownedProject,
+							Effect.sync(() => {
+								events.push(
+									restored === undefined ? "dispose-fresh" : "dispose-restored",
+								);
+							}),
+						);
 					}),
-				);
-			}),
-		);
-		const owner = await Effect.runPromise(
-			createEditorBoardGameResourceFx({
+			);
+			const owner = yield* createEditorBoardGameResourceFx({
 				createResourceFx,
-			}),
-		);
+			});
 
-		await Effect.runPromise(owner.syncFx(project));
-		await Effect.runPromise(owner.replaceFx(project, state));
+			yield* owner.syncFx(project);
+			yield* owner.replaceFx(project, state);
 
-		expect(events).toEqual([
-			"create-fresh",
-			"dispose-fresh",
-			"create-restored",
-		]);
-		expect(createResourceFx).toHaveBeenLastCalledWith(project, state);
-		const current = await Effect.runPromise(SubscriptionRef.get(owner.state));
-		expect(current.type).toBe("ready");
-		await Effect.runPromise(owner.releaseCurrentFx);
-	});
+			expect(events).toEqual([
+				"create-fresh",
+				"dispose-fresh",
+				"create-restored",
+			]);
+			expect(createResourceFx).toHaveBeenLastCalledWith(project, state);
+			const current = yield* SubscriptionRef.get(owner.state);
+			expect(current.type).toBe("ready");
+			yield* owner.releaseCurrentFx;
+		}),
+	);
 
-	it("rejects a stale restore without replacing the newer routed revision", async () => {
-		const events: string[] = [];
-		const createResourceFx = vi.fn((ownedProject: EditorProject) =>
-			Effect.succeed(
-				createResource(
-					ownedProject,
-					Effect.sync(() => {
-						events.push(`dispose-${ownedProject.revision}`);
-					}),
+	it.effect("rejects a stale restore without replacing the newer routed revision", () =>
+		Effect.gen(function* () {
+			const events: string[] = [];
+			const createResourceFx = vi.fn((ownedProject: EditorProject) =>
+				Effect.succeed(
+					createResource(
+						ownedProject,
+						Effect.sync(() => {
+							events.push(`dispose-${ownedProject.revision}`);
+						}),
+					),
 				),
-			),
-		);
-		const owner = await Effect.runPromise(
-			createEditorBoardGameResourceFx({
+			);
+			const owner = yield* createEditorBoardGameResourceFx({
 				createResourceFx,
-			}),
-		);
-		const newerProject = {
-			...project,
-			revision: project.revision + 1,
-		};
+			});
+			const newerProject = {
+				...project,
+				revision: project.revision + 1,
+			};
 
-		await Effect.runPromise(owner.syncFx(project));
-		await Effect.runPromise(owner.publishFx(newerProject));
-		await expect(Effect.runPromise(owner.replaceFx(project, state))).rejects.toThrow(
-			"is no longer active",
-		);
+			yield* owner.syncFx(project);
+			yield* owner.publishFx(newerProject);
+			const failure = yield* Effect.flip(owner.replaceFx(project, state));
+			expect(failure).toBeInstanceOf(Error);
+			expect((failure as Error).message).toContain("is no longer active");
 
-		expect(createResourceFx).toHaveBeenCalledTimes(2);
-		expect(events).toEqual([
-			`dispose-${project.revision}`,
-		]);
-		const current = await Effect.runPromise(SubscriptionRef.get(owner.state));
-		expect(current.type).toBe("ready");
-		if (current.type !== "ready") throw new Error("Expected the newer editor game.");
-		expect(current.resource.game.projectRevision).toBe(newerProject.revision);
-		await Effect.runPromise(owner.releaseCurrentFx);
-	});
+			expect(createResourceFx).toHaveBeenCalledTimes(2);
+			expect(events).toEqual([
+				`dispose-${project.revision}`,
+			]);
+			const current = yield* SubscriptionRef.get(owner.state);
+			expect(current.type).toBe("ready");
+			if (current.type !== "ready") throw new Error("Expected the newer editor game.");
+			expect(current.resource.game.projectRevision).toBe(newerProject.revision);
+			yield* owner.releaseCurrentFx;
+		}),
+	);
 
-	it("rejects restore after route release without recreating the editor game", async () => {
-		const createResourceFx = vi.fn((ownedProject: EditorProject) =>
-			Effect.succeed(createResource(ownedProject, Effect.void)),
-		);
-		const owner = await Effect.runPromise(
-			createEditorBoardGameResourceFx({
+	it.effect("rejects restore after route release without recreating the editor game", () =>
+		Effect.gen(function* () {
+			const createResourceFx = vi.fn((ownedProject: EditorProject) =>
+				Effect.succeed(createResource(ownedProject, Effect.void)),
+			);
+			const owner = yield* createEditorBoardGameResourceFx({
 				createResourceFx,
-			}),
-		);
+			});
 
-		await Effect.runPromise(owner.syncFx(project));
-		await Effect.runPromise(owner.releaseCurrentFx);
-		await expect(Effect.runPromise(owner.replaceFx(project, state))).rejects.toThrow(
-			"is no longer active",
-		);
+			yield* owner.syncFx(project);
+			yield* owner.releaseCurrentFx;
+			const failure = yield* Effect.flip(owner.replaceFx(project, state));
+			expect(failure).toBeInstanceOf(Error);
+			expect((failure as Error).message).toContain("is no longer active");
 
-		expect(createResourceFx).toHaveBeenCalledTimes(1);
-		expect(await Effect.runPromise(SubscriptionRef.get(owner.state))).toEqual({
-			type: "idle",
-		});
-	});
+			expect(createResourceFx).toHaveBeenCalledTimes(1);
+			expect(yield* SubscriptionRef.get(owner.state)).toEqual({
+				type: "idle",
+			});
+		}),
+	);
 });

@@ -115,35 +115,6 @@ describe("filesystem Editor project lifecycle", () => {
 		await expect(access(join(root, "project.json"))).resolves.toBeUndefined();
 	});
 
-	it("keeps valid catalog entries when a neighboring entry is malformed", async () => {
-		const root = await harness.createExternalProject();
-		await mkdir(join(harness.temporaryDirectory, "user-data"), {
-			recursive: true,
-		});
-		await writeFile(
-			harness.catalogPath,
-			JSON.stringify({
-				projects: [
-					{
-						root: 42,
-					},
-					{
-						root: await realpath(root),
-						ownership: "external",
-						createdAtMs: 1,
-					},
-				],
-			}),
-		);
-
-		const repository = await harness.openRepository();
-		expect(await Effect.runPromise(repository.listProjectsFx)).toEqual([
-			expect.objectContaining({
-				projectId: editorTestPayload.config.meta.id,
-			}),
-		]);
-	});
-
 	it("removes a catalog alias for an already mounted canonical root", async () => {
 		const root = await harness.createExternalProject();
 		const alias = join(harness.temporaryDirectory, "external-alias");

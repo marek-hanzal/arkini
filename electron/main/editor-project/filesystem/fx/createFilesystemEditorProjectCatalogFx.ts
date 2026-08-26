@@ -21,26 +21,7 @@ const createError = (message: string, cause?: unknown) =>
 		cause,
 	});
 
-const parseCatalog = (candidate: unknown) => {
-	if (
-		typeof candidate !== "object" ||
-		candidate === null ||
-		!("projects" in candidate) ||
-		!Array.isArray(candidate.projects)
-	)
-		throw new Error("The Editor project catalog envelope is invalid.");
-	const roots = new Set<string>();
-	const projects: Array<Entry> = [];
-	for (const value of candidate.projects) {
-		const parsed = EditorProjectCatalogEntrySchema.safeParse(value);
-		if (!parsed.success || roots.has(parsed.data.root)) continue;
-		roots.add(parsed.data.root);
-		projects.push(parsed.data);
-	}
-	return EditorProjectCatalogSchema.parse({
-		projects,
-	});
-};
+const parseCatalog = (candidate: unknown) => EditorProjectCatalogSchema.parse(candidate);
 
 /** Opens the one main-owned path registry; project contents always remain authoritative. */
 export const createFilesystemEditorProjectCatalogFx = Effect.fn(

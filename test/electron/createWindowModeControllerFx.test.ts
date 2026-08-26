@@ -1,11 +1,8 @@
-import type { BrowserWindow } from "electron";
-import { Effect } from "effect";
-import { EventEmitter } from "node:events";
+import { Deferred, Effect, Fiber, Result } from "effect";
+import { TestClock } from "effect/testing";
 import { describe, expect, it, vi } from "vitest";
 import { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
-import type { WindowModeSchema } from "../../electron/contract/window/WindowModeSchema";
-import { createWindowModeControllerFx } from "../../electron/main/window/createWindowModeControllerFx";
-import type { WindowPreferences } from "../../electron/main/window/WindowPreferences";
+import { createHarness } from "./createWindowModeControllerFx.test/fixture";
 
 const electronState = vi.hoisted(() => ({
 	workArea: {
@@ -23,86 +20,6 @@ vi.mock("electron", () => ({
 		}),
 	},
 }));
-
-type BeforeInputListener = (
-	event: {
-		preventDefault(): void;
-	},
-	input: {
-		type: string;
-		key: string;
-		alt: boolean;
-		isAutoRepeat: boolean;
-	},
-) => void;
-
-const createHarness = (
-	initialMode: WindowModeSchema.Type,
-	{
-		fullscreen = initialMode === "fullscreen",
-	}: {
-		readonly fullscreen?: boolean;
-	} = {},
-) => {
-	const windowEvents = new EventEmitter();
-	const webContentsEvents = new EventEmitter();
-	let isFullscreen = fullscreen;
-	const maximize = vi.fn();
-	const unmaximize = vi.fn();
-	const setBounds = vi.fn();
-	const send = vi.fn();
-	const writes: WindowModeSchema.Type[] = [];
-	const windowPreferences: WindowPreferences = {
-		readModeFx: Effect.succeed(initialMode),
-		writeModeFx: (mode) =>
-			Effect.sync(() => {
-				writes.push(mode);
-			}),
-	};
-	const window = Object.assign(windowEvents, {
-		getBounds: () => ({
-			x: 0,
-			y: 0,
-			width: 800,
-			height: 600,
-		}),
-		isFullScreen: () => isFullscreen,
-		maximize,
-		setBounds,
-		setFullScreen: vi.fn((next: boolean) => {
-			isFullscreen = next;
-		}),
-		unmaximize,
-		webContents: Object.assign(webContentsEvents, {
-			isDestroyed: () => false,
-			send,
-		}),
-	}) as unknown as BrowserWindow;
-	const controller = Effect.runSync(
-		createWindowModeControllerFx({
-			initialMode,
-			window,
-			windowPreferences,
-		}),
-	);
-
-	return {
-		controller,
-		emit: (event: string) => windowEvents.emit(event),
-		getShortcutListener: () =>
-			webContentsEvents.listeners("before-input-event")[0] as BeforeInputListener | undefined,
-		maximize,
-		send,
-		setBounds,
-		setFullScreen: (
-			window as unknown as {
-				readonly setFullScreen: ReturnType<typeof vi.fn>;
-			}
-		).setFullScreen,
-		unmaximize,
-		writes,
-	};
-};
 
 describe("createWindowModeControllerFx", () => {
 	it("waits for Electron to confirm exclusive fullscreen before completing", async () => {
@@ -128,6 +45,31 @@ describe("createWindowModeControllerFx", () => {
 		);
 	});
 
+	it("completes only after the confirmed mode is persisted", async () => {
+		const persistenceRelease = Deferred.makeUnsafe<void>();
+		let persistenceStarted = false;
+		const harness = createHarness("default", {
+			writeModeFx: () =>
+				Effect.sync(() => {
+					persistenceStarted = true;
+				}).pipe(Effect.andThen(Deferred.await(persistenceRelease))),
+		});
+		let completed = false;
+		const request = Effect.runPromise(harness.controller.requestModeFx("fullscreen")).then(
+			() => {
+				completed = true;
+			},
+		);
+
+		harness.emit("enter-full-screen");
+		await vi.waitFor(() => expect(persistenceStarted).toBe(true));
+		expect(completed).toBe(false);
+		await Effect.runPromise(Deferred.succeed(persistenceRelease, undefined));
+		await request;
+
+		expect(completed).toBe(true);
+	});
+
 	it("restores canonical default bounds after leaving fullscreen", async () => {
 		const harness = createHarness("fullscreen");
 		const request = Effect.runPromise(harness.controller.requestModeFx("default"));
@@ -150,9 +92,15 @@ describe("createWindowModeControllerFx", () => {
 
 	it("maximizes bordered mode and records native maximize changes", async () => {
 		const harness = createHarness("default");
+		let completed = false;
+		const request = Effect.runPromise(harness.controller.requestModeFx("bordered")).then(() => {
+			completed = true;
+		});
 
-		await Effect.runPromise(harness.controller.requestModeFx("bordered"));
 		expect(harness.maximize).toHaveBeenCalledOnce();
+		expect(completed).toBe(false);
+		harness.emit("maximize");
+		await request;
 		expect(harness.writes).toEqual([
 			"bordered",
 		]);
@@ -200,5 +148,118 @@ describe("createWindowModeControllerFx", () => {
 		expect(harness.setFullScreen).toHaveBeenLastCalledWith(false);
 		harness.emit("leave-full-screen");
 		await vi.waitFor(() => expect(harness.writes.at(-1)).toBe("bordered"));
+	});
+
+	it("supersedes only the older request and ignores its stale native event", async () => {
+		const harness = createHarness("default", {
+			deferFullscreenStateUntilEvent: true,
+		});
+		const older = Effect.runPromise(
+			Effect.result(harness.controller.requestModeFx("fullscreen")),
+		);
+		const newer = Effect.runPromise(harness.controller.requestModeFx("default"));
+		let newerCompleted = false;
+		void newer.then(() => {
+			newerCompleted = true;
+		});
+
+		const olderResult = await older;
+		expect(Result.isFailure(olderResult)).toBe(true);
+		if (Result.isFailure(olderResult)) {
+			expect(olderResult.failure).toEqual(
+				new Error("Window mode request was superseded by default."),
+			);
+		}
+		harness.emit("enter-full-screen");
+		await vi.waitFor(() => expect(harness.setFullScreen).toHaveBeenLastCalledWith(false));
+		expect(newerCompleted).toBe(false);
+
+		harness.emit("leave-full-screen");
+		await newer;
+		expect(harness.writes).toEqual([
+			"default",
+		]);
+	});
+
+	it("uses the Effect clock for timeout and allows a fresh native retry", async () => {
+		const harness = createHarness("default", {
+			deferFullscreenStateUntilEvent: true,
+		});
+		const result = await Effect.runPromise(
+			Effect.gen(function* () {
+				const request = yield* harness.controller
+					.requestModeFx("fullscreen")
+					.pipe(Effect.result, Effect.forkChild);
+				yield* Effect.yieldNow;
+				yield* TestClock.adjust(5_000);
+				const timedOut = yield* Fiber.join(request);
+				const retry = yield* harness.controller
+					.requestModeFx("fullscreen")
+					.pipe(Effect.forkChild);
+				yield* Effect.yieldNow;
+				yield* Fiber.interrupt(retry);
+				return timedOut;
+			}).pipe(
+				Effect.provide(
+					TestClock.layer({
+						warningDelay: "1 hour",
+					}),
+				),
+			),
+		);
+
+		expect(Result.isFailure(result)).toBe(true);
+		if (Result.isFailure(result)) {
+			expect(result.failure).toEqual(
+				new Error("Electron did not confirm fullscreen mode in time."),
+			);
+		}
+		expect(harness.setFullScreen).toHaveBeenCalledTimes(2);
+	});
+
+	it("caller interruption removes only its own pending request", async () => {
+		const harness = createHarness("default");
+		await Effect.runPromise(
+			Effect.gen(function* () {
+				const request = yield* harness.controller
+					.requestModeFx("fullscreen")
+					.pipe(Effect.forkChild);
+				yield* Effect.yieldNow;
+				yield* Fiber.interrupt(request);
+			}),
+		);
+
+		let completed = false;
+		const next = Effect.runPromise(harness.controller.requestModeFx("default")).then(() => {
+			completed = true;
+		});
+		harness.emit("enter-full-screen");
+		await Promise.resolve();
+		expect(completed).toBe(false);
+		harness.emit("leave-full-screen");
+		await next;
+
+		expect(harness.writes).toEqual([
+			"default",
+		]);
+	});
+
+	it("fails a pending request exactly once when the window closes", async () => {
+		const harness = createHarness("default");
+		const request = Effect.runPromise(
+			Effect.result(harness.controller.requestModeFx("fullscreen")),
+		);
+
+		harness.emit("closed");
+		harness.emit("closed");
+		const result = await request;
+
+		expect(Result.isFailure(result)).toBe(true);
+		if (Result.isFailure(result)) {
+			expect(result.failure).toEqual(
+				new Error("The window closed before its mode transition completed."),
+			);
+		}
+		expect(harness.writes).toEqual([]);
 	});
 });

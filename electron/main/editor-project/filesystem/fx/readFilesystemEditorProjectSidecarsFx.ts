@@ -56,6 +56,13 @@ export const readFilesystemEditorProjectSidecarsFx = Effect.fn(
 	const path = yield* Path.Path;
 	const notes = yield* Effect.forEach(yield* readJsonFilesFx(paths.notes), ({ file, value }) =>
 		Effect.gen(function* () {
+			const noteId = yield* Effect.try({
+				try: () => decodeURIComponent(path.basename(file).slice(0, -".json".length)),
+				catch: (cause) =>
+					new Error(`Editor note ${file} has an invalid filename.`, {
+						cause,
+					}),
+			});
 			const note = yield* Effect.try({
 				try: () => EditorProjectNoteFileSchema.parse(value),
 				catch: (cause) =>
@@ -63,19 +70,20 @@ export const readFilesystemEditorProjectSidecarsFx = Effect.fn(
 						cause,
 					}),
 			});
-			const expected = yield* paths.noteFileFx(note.noteId);
+			const expected = yield* paths.noteFileFx(noteId);
 			if (path.resolve(file) !== expected)
 				return yield* Effect.fail(
-					new Error(`Editor note ${note.noteId} has an invalid filename.`),
+					new Error(`Editor note ${noteId} has an invalid filename.`),
 				);
 			return yield* Effect.try({
 				try: () =>
 					EditorNoteSchema.parse({
 						...note,
+						noteId,
 						projectId,
 					}),
 				catch: (cause) =>
-					new Error(`Editor note ${note.noteId} is invalid.`, {
+					new Error(`Editor note ${noteId} is invalid.`, {
 						cause,
 					}),
 			});
@@ -104,9 +112,9 @@ export const readFilesystemEditorProjectSidecarsFx = Effect.fn(
 						EditorBoardScenarioSchema.parse({
 							projectId,
 							name: scenario.name,
-							projectRevision: scenario.projectRevision,
-							version: scenario.arkpackVersion,
-							bytes: Uint8Array.from(Buffer.from(scenario.bytesBase64, "base64")),
+							projectRevision: scenario.revision,
+							version: scenario.version,
+							bytes: Uint8Array.from(Buffer.from(scenario.save, "base64")),
 							createdAtMs: scenario.createdAtMs,
 							updatedAtMs: scenario.updatedAtMs,
 						}),

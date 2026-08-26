@@ -67,10 +67,7 @@ export const signArkpackFx = Effect.fn("signArkpackFx")(function* ({
 		Array.from(signatureBytes, (byte) => String.fromCharCode(byte)).join(""),
 	);
 	return yield* Effect.try({
-		try: () =>
-			ArkpackSignatureSchema.parse({
-				signature,
-			}),
+		try: () => ArkpackSignatureSchema.parse(signature),
 		catch: (cause) =>
 			new ArkpackInputError({
 				operation: "create-signature",

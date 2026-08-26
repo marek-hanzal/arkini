@@ -18,9 +18,8 @@ import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 const validPayload: PayloadSchema.Type = {
-	packageId: "project:imported",
 	version: "4.2",
-	game: "0.5.0",
+	arkini: "0.5.0",
 	config: editorTestPayload.config,
 	resources: editorTestPayload.resources.map((resource) => ({
 		...resource,

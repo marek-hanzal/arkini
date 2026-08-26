@@ -98,10 +98,9 @@ describe("Cheats", () => {
 			arkpack: {
 				packageId: "package:cheats",
 				contentHash: "content:cheats",
-				gameId: "game:cheats",
 				title: "Cheats game",
 				version: "1.0",
-				game: "1.0",
+				arkini: "1.0",
 				trust: {
 					type: "external",
 					reason: "unsigned",
@@ -177,10 +176,9 @@ describe("Cheats", () => {
 			arkpack: {
 				packageId: "package:cheats-race",
 				contentHash: "content:cheats-race",
-				gameId: "game:cheats-race",
 				title: "Cheats race game",
 				version: "1.0",
-				game: "1.0",
+				arkini: "1.0",
 				trust: {
 					type: "external",
 					reason: "unsigned",

@@ -1,19 +1,17 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:iron-ingot": {
-			"uid": "kpepp9h7wsorwpjxxevr5opa",
-			"id": "item:iron-ingot",
-			"title": "Iron Ingot",
-			"description": "Refined iron produced by smelters from iron ore and coal.",
-			"asset": {
-				"default": [
-					"item-iron-ingot"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 50,
-			"type": "simple"
-		}
+	"item": {
+		"uid": "kpepp9h7wsorwpjxxevr5opa",
+		"id": "item:iron-ingot",
+		"title": "Iron Ingot",
+		"description": "Refined iron produced by smelters from iron ore and coal.",
+		"asset": {
+			"default": [
+				"item-iron-ingot"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 50,
+		"type": "simple"
 	}
 }

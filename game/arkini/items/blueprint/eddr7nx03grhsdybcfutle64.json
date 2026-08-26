@@ -1,117 +1,115 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:blueprint-civic-office-t1": {
-			"uid": "eddr7nx03grhsdybcfutle64",
-			"id": "item:blueprint-civic-office-t1",
-			"title": "Civic Office I Blueprint",
-			"description": "Build plan that can be filled with resources to construct Civic Office I.",
-			"asset": {
-				"default": [
-					"blueprint",
-					"producer-civic-office-t1"
-				],
-				"sources": [
-					"producer-civic-office-t1"
+	"item": {
+		"uid": "eddr7nx03grhsdybcfutle64",
+		"id": "item:blueprint-civic-office-t1",
+		"title": "Civic Office I Blueprint",
+		"description": "Build plan that can be filled with resources to construct Civic Office I.",
+		"asset": {
+			"default": [
+				"blueprint",
+				"producer-civic-office-t1"
+			],
+			"sources": [
+				"producer-civic-office-t1"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 1
+		},
+		"type": "blueprint",
+		"line": {
+			"id": "line:blueprint:civic-office-t1:construct",
+			"title": "Construct Civic Office I",
+			"description": "Consumes construction resources to build Civic Office I.",
+			"default": true,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 36000,
+			"input": [
+				{
+					"charges": {
+						"cost": 1,
+						"from": "self"
+					},
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:plank"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 3,
+						"max": 3
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:stone-block"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:paper"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:basic-knowledge"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "producer:civic-office-t1",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
 				]
 			},
-			"scope": "any",
-			"maxStackSize": 1,
-			"charges": {
-				"amount": 1
-			},
-			"type": "blueprint",
-			"line": {
-				"id": "line:blueprint:civic-office-t1:construct",
-				"title": "Construct Civic Office I",
-				"description": "Consumes construction resources to build Civic Office I.",
-				"default": true,
-				"show": true,
-				"enable": true,
-				"runtimeMs": 36000,
-				"input": [
-					{
-						"charges": {
-							"cost": 1,
-							"from": "self"
-						},
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:plank"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 3,
-							"max": 3
-						},
-						"capacity": 0
-					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:stone-block"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 2,
-							"max": 2
-						},
-						"capacity": 0
-					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:paper"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 2,
-							"max": 2
-						},
-						"capacity": 0
-					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:basic-knowledge"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						},
-						"capacity": 0
-					}
-				],
-				"output": {
-					"set": [
-						{
-							"weight": 1,
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:civic-office-t1",
-											"quantity": {
-												"min": 1,
-												"max": 1
-											},
-											"placement": "drop",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				},
-				"rules": []
-			}
+			"rules": []
 		}
 	}
 }

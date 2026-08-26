@@ -88,9 +88,9 @@ describe("filesystem Editor version objects", () => {
 			scenarios: [
 				{
 					name: scenario.name,
-					projectRevision: scenario.projectRevision,
-					arkpackVersion: scenario.version,
-					bytesBase64: "Bwg=",
+					revision: scenario.projectRevision,
+					version: scenario.version,
+					save: "Bwg=",
 					createdAtMs: scenario.createdAtMs,
 					updatedAtMs: scenario.updatedAtMs,
 				},

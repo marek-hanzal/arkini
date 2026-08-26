@@ -42,11 +42,10 @@ describe("loadArkpackFx", () => {
 
 		expect(loaded.descriptor).toMatchObject({
 			packageId: "package:selected",
-			gameId: "game:bridge",
 			source: "user",
 			overridesBundled: true,
 		});
-		expect(loaded.payload.packageId).toBe("package:selected");
+		expect(loaded.payload.config.meta.id).toBe("package:selected");
 	});
 
 	it("fails when the requested package is absent", async () => {

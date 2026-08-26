@@ -27,9 +27,8 @@ describe("Arkini save codec", () => {
 			}),
 		);
 		await expect(Effect.runPromise(decodeArkiniSaveFx(bytes))).resolves.toEqual({
-			namespace: "arkini",
 			version: "1.2",
-			game: ArkiniAppVersion,
+			arkini: ArkiniAppVersion,
 			state,
 		});
 	});
@@ -92,24 +91,20 @@ describe("Arkini save codec", () => {
 
 	it.each([
 		{
-			namespace: "other",
+			extra: true,
 			version: "1.2",
-			game: ArkiniAppVersion,
+			arkini: ArkiniAppVersion,
 			state,
 		},
 		{
-			namespace: "arkini",
 			version: "1.2.3",
-			game: ArkiniAppVersion,
+			arkini: ArkiniAppVersion,
 			state,
 		},
 		{
-			namespace: "arkini",
 			version: "1.2",
-			game: "0.5",
-			state: {
-				currentSpace: -1,
-			},
+			arkini: "invalid",
+			state,
 		},
 	])("rejects unsupported or malformed envelopes", async (value) => {
 		const result = await Effect.runPromise(

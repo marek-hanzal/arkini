@@ -82,7 +82,7 @@ export const readFilesystemEditorProjectFilesFx = Effect.fn("readFilesystemEdito
 			(candidate) => GameProjectFileSchema.parse(candidate),
 			"Editor game file",
 		);
-		const { arkpack, ...game } = gameFile;
+		const { version, ...game } = gameFile;
 		const itemFiles = (yield* fileSystem.readDirectory(paths.items, {
 			recursive: true,
 		}))
@@ -119,8 +119,8 @@ export const readFilesystemEditorProjectFilesFx = Effect.fn("readFilesystemEdito
 				(candidate) => GameProjectItemFileSchema.parse(candidate),
 				"Editor item file",
 			);
-			const entries = Object.entries(source.items);
-			const [itemId, item] = entries[0];
+			const item = source.item;
+			const itemId = item.id;
 			if (itemIds.has(itemId)) {
 				return yield* failInvalidItemFileFx(sourcePath, `item ID ${itemId} is duplicated.`);
 			}
@@ -132,12 +132,6 @@ export const readFilesystemEditorProjectFilesFx = Effect.fn("readFilesystemEdito
 			}
 			itemIds.add(itemId);
 			itemUids.add(item.uid);
-			if (item.id !== itemId) {
-				return yield* failInvalidItemFileFx(
-					sourcePath,
-					`record key ${JSON.stringify(itemId)} differs from item ID ${JSON.stringify(item.id)}.`,
-				);
-			}
 			if (item.type !== parsedType.data) {
 				return yield* failInvalidItemFileFx(
 					sourcePath,
@@ -156,7 +150,12 @@ export const readFilesystemEditorProjectFilesFx = Effect.fn("readFilesystemEdito
 			}
 			sources.push({
 				path: sourcePath,
-				value: source,
+				value: {
+					$schema: source.$schema,
+					items: {
+						[itemId]: item,
+					},
+				},
 			});
 		}
 
@@ -216,7 +215,7 @@ export const readFilesystemEditorProjectFilesFx = Effect.fn("readFilesystemEdito
 		);
 
 		return {
-			arkpack,
+			arkpack: version,
 			marker,
 			config,
 			resources,

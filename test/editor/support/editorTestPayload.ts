@@ -47,9 +47,8 @@ export const editorTestConfig = GameConfigSchema.parse({
 });
 
 export const editorTestPayload: PayloadSchema.Type = {
-	packageId: "project:test",
 	version: "1.0",
-	game: "0.5.0",
+	arkini: "0.5.0",
 	config: editorTestConfig,
 	resources: [
 		{

@@ -51,9 +51,9 @@ export const createFilesystemEditorVersionSnapshotFx = Effect.fn(
 					const parsed = EditorBoardScenarioSchema.parse(scenario);
 					return EditorBoardScenarioFileSchema.parse({
 						name: parsed.name,
-						projectRevision: parsed.projectRevision,
-						arkpackVersion: parsed.version,
-						bytesBase64: Buffer.from(parsed.bytes).toString("base64"),
+						revision: parsed.projectRevision,
+						version: parsed.version,
+						save: Buffer.from(parsed.bytes).toString("base64"),
 						createdAtMs: parsed.createdAtMs,
 						updatedAtMs: parsed.updatedAtMs,
 					});

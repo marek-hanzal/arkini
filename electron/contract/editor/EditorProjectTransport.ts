@@ -28,6 +28,7 @@ export namespace EditorProjectTransport {
 		| "replace-config"
 		| "replace-resource"
 		| "save-resource"
+		| "save-project-build"
 		| "upsert-item"
 		| "upsert-resource"
 		| "update-version-tag"
@@ -89,11 +90,8 @@ export namespace EditorProjectTransport {
 		readonly projectId: string;
 		readonly revision: number;
 		readonly contentHash: string;
-		readonly filename: string;
-		readonly signatureFilename?: string;
-		readonly version: string;
-		readonly game: string;
-		readonly bytes: number;
+		readonly signed: boolean;
+		readonly size: number;
 		readonly diagnostics: ReadonlyArray<unknown>;
 	}
 
@@ -112,7 +110,7 @@ export namespace EditorProjectTransport {
 		readonly contentHash: string;
 		readonly expectedRevision: number;
 		readonly projectId: string;
-		readonly signatureFilename?: string;
+		readonly signed: boolean;
 	}
 
 	export interface SourceExport {

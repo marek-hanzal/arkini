@@ -30,7 +30,6 @@ describe("packDirectoryFx game-project contract", () => {
 				png: 2,
 			});
 			expect(payload).toMatchObject({
-				packageId: "project-game",
 				version: "2.3",
 				config: {
 					meta: {

@@ -1,19 +1,17 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:key-t3": {
-			"uid": "aowehqwwnj0v55jvwjf80una",
-			"id": "item:key-t3",
-			"title": "Key III",
-			"description": "Advanced gem-set goldsmith key used to open Chest III and authorize grand expeditions.",
-			"asset": {
-				"default": [
-					"item-key-t3"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 20,
-			"type": "simple"
-		}
+	"item": {
+		"uid": "aowehqwwnj0v55jvwjf80una",
+		"id": "item:key-t3",
+		"title": "Key III",
+		"description": "Advanced gem-set goldsmith key used to open Chest III and authorize grand expeditions.",
+		"asset": {
+			"default": [
+				"item-key-t3"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 20,
+		"type": "simple"
 	}
 }

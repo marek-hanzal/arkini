@@ -66,7 +66,7 @@ export const createFilesystemEditorProjectTestHarness = async (temporaryPrefix: 
 						arkpack: editorTestPayload.version,
 						marker: GameProjectManifestSchema.parse({
 							arkini: ArkiniAppVersion,
-							updatedAtMs: 1,
+							revision: 1,
 						}),
 						config: {
 							...editorTestPayload.config,

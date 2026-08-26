@@ -9,6 +9,7 @@ import type { EditorProjectServiceOwnership } from "../EditorProjectServiceOwner
 import { exportEditorJsonDirectoryFx } from "../exportEditorJsonDirectoryFx";
 import { importEditorJsonDirectoryFx } from "../importEditorJsonDirectoryFx";
 import { openEditorExportDirectoryFx } from "../openEditorExportDirectoryFx";
+import { saveEditorProjectBuildFx } from "../saveEditorProjectBuildFx";
 import { createEditorProjectRequestParserFx } from "./createEditorProjectRequestParserFx";
 import { executeEditorProjectRepositoryFx } from "./executeEditorProjectRepositoryFx";
 import { readArkpackSignKeyFx } from "~/engine/pack/fx/readArkpackSignKeyFx";
@@ -17,7 +18,7 @@ import { registerEditorNoteIpcFx } from "./registerEditorNoteIpcFx";
 
 const readEditorWindowFx = (
 	event: IpcMainInvokeEvent,
-	operation: "export-json-directory" | "import-json-directory",
+	operation: "export-json-directory" | "import-json-directory" | "save-project-build",
 ) =>
 	Effect.sync(() => BrowserWindow.fromWebContents(event.sender)).pipe(
 		Effect.flatMap((window) =>
@@ -151,6 +152,22 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						ownership,
 						requestParser.parseReadProjectBuildFx(candidate),
 						(repository, request) => repository.readProjectBuildFx(request),
+					),
+				);
+				handle(ArkiniElectronApi.channels.editorProjectBuildSave, (event, candidate) =>
+					executeEditorProjectRepositoryFx(
+						"save-project-build",
+						ownership,
+						Effect.all({
+							request: requestParser.parseReadProjectBuildFx(candidate),
+							window: readEditorWindowFx(event, "save-project-build"),
+						}),
+						(repository, { request, window }) =>
+							saveEditorProjectBuildFx({
+								repository,
+								request,
+								window,
+							}),
 					),
 				);
 				handle(ArkiniElectronApi.channels.editorProjectList, () =>
@@ -373,6 +390,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					ArkiniElectronApi.channels.editorAwaitIdle,
 					ArkiniElectronApi.channels.editorProjectBuild,
 					ArkiniElectronApi.channels.editorProjectBuildRead,
+					ArkiniElectronApi.channels.editorProjectBuildSave,
 					ArkiniElectronApi.channels.editorSignKeyConfigured,
 					ArkiniElectronApi.channels.editorProjectCreate,
 					ArkiniElectronApi.channels.editorProjectDelete,

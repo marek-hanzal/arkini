@@ -7,9 +7,9 @@ import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSche
 export const EditorBoardScenarioFileSchema = z
 	.object({
 		name: EditorBoardScenarioNameSchema,
-		projectRevision: z.number().int().nonnegative(),
-		arkpackVersion: ArkpackVersionSchema,
-		bytesBase64: z.base64().min(1),
+		revision: z.number().int().nonnegative(),
+		version: ArkpackVersionSchema,
+		save: z.base64().min(1),
 		createdAtMs: z.number().int().nonnegative(),
 		updatedAtMs: z.number().int().nonnegative(),
 	})

@@ -70,7 +70,7 @@ export const verifyArkpackTrustFx = Effect.fn("verifyArkpackTrustFx")(function* 
 			}),
 	});
 	const payload = yield* createArkpackSigningPayloadFx(bytes);
-	const signatureBytes = Uint8Array.from(atob(parsed.data.signature), (character) =>
+	const signatureBytes = Uint8Array.from(atob(parsed.data), (character) =>
 		character.charCodeAt(0),
 	);
 	const verified = yield* Effect.tryPromise({

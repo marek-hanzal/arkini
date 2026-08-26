@@ -1,118 +1,116 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"producer:quarry-t1": {
-			"uid": "ndf2prv7bmc70zv8ulnuqlul",
-			"id": "producer:quarry-t1",
-			"title": "Quarry I",
-			"description": "Produces stone when placed near a rock.",
-			"asset": {
-				"default": [
-					"producer-quarry-t1"
-				]
-			},
-			"scope": "any",
-			"maxCount": 1,
-			"maxStackSize": 1,
-			"maxQueueSize": 3,
-			"type": "producer",
-			"lines": [
-				{
-					"id": "line:quarry-t1:stone",
-					"title": "Stone",
-					"description": "Runs stone for Quarry I.",
-					"default": false,
-					"show": true,
-					"enable": true,
-					"runtimeMs": 8000,
-					"input": [
-						{
-							"charges": {
-								"cost": 1,
-								"from": "target"
-							},
-							"type": "deposit",
-							"query": {
-								"selector": {
-									"type": "item",
-									"itemId": "item:rock"
-								},
-								"scope": "board",
-								"distance": "close"
-							}
-						}
-					],
-					"output": {
-						"set": [
-							{
-								"weight": 1,
-								"roll": [
-									{
-										"type": "guaranteed",
-										"drop": [
-											{
-												"itemId": "item:stone",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									},
-									{
-										"type": "chance",
-										"chance": 0.4,
-										"drop": [
-											{
-												"itemId": "item:stone",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									},
-									{
-										"type": "chance",
-										"chance": 0.15,
-										"drop": [
-											{
-												"itemId": "item:stone",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									},
-									{
-										"type": "chance",
-										"chance": 0.1,
-										"drop": [
-											{
-												"itemId": "item:quest:road-repair",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									}
-								]
-							}
-						]
-					},
-					"rules": []
-				}
+	"item": {
+		"uid": "ndf2prv7bmc70zv8ulnuqlul",
+		"id": "producer:quarry-t1",
+		"title": "Quarry I",
+		"description": "Produces stone when placed near a rock.",
+		"asset": {
+			"default": [
+				"producer-quarry-t1"
 			]
-		}
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"maxQueueSize": 3,
+		"type": "producer",
+		"lines": [
+			{
+				"id": "line:quarry-t1:stone",
+				"title": "Stone",
+				"description": "Runs stone for Quarry I.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 8000,
+				"input": [
+					{
+						"charges": {
+							"cost": 1,
+							"from": "target"
+						},
+						"type": "deposit",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemId": "item:rock"
+							},
+							"scope": "board",
+							"distance": "close"
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:stone",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.4,
+									"drop": [
+										{
+											"itemId": "item:stone",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.15,
+									"drop": [
+										{
+											"itemId": "item:stone",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.1,
+									"drop": [
+										{
+											"itemId": "item:quest:road-repair",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
 	}
 }

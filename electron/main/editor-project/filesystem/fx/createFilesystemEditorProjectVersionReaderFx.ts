@@ -46,7 +46,7 @@ export const createFilesystemEditorProjectVersionReaderFx = Effect.fn(
 		versionId: string,
 	) {
 		const head = yield* readHeadFx(state);
-		if (head === undefined || !head.versionIds.includes(versionId))
+		if (head === undefined || !head.versions.includes(versionId))
 			return yield* Effect.fail(
 				new Error(
 					`Version ${versionId} does not exist in project ${state.project.projectId}.`,
@@ -68,9 +68,9 @@ export const createFilesystemEditorProjectVersionReaderFx = Effect.fn(
 			const scenarios = state.scenarios.map((scenario) =>
 				EditorBoardScenarioFileSchema.parse({
 					name: scenario.name,
-					projectRevision: scenario.projectRevision,
-					arkpackVersion: scenario.version,
-					bytesBase64: Buffer.from(scenario.bytes).toString("base64"),
+					revision: scenario.projectRevision,
+					version: scenario.version,
+					save: Buffer.from(scenario.bytes).toString("base64"),
 					createdAtMs: scenario.createdAtMs,
 					updatedAtMs: scenario.updatedAtMs,
 				}),
@@ -135,7 +135,7 @@ export const createFilesystemEditorProjectVersionReaderFx = Effect.fn(
 			return yield* Effect.fail(
 				new Error(`Version ${reference.versionId} content does not match its descriptor.`),
 			);
-		if (snapshot.arkpack !== version.descriptor.arkpackVersion)
+		if (snapshot.arkpack !== version.descriptor.version)
 			return yield* Effect.fail(
 				new Error(
 					`Version ${reference.versionId} Arkpack version does not match its descriptor.`,
@@ -157,10 +157,8 @@ export const createFilesystemEditorProjectVersionReaderFx = Effect.fn(
 				snapshot.scenarios.map((scenario) => [
 					scenario.name,
 					JSON.stringify([
-						scenario.arkpackVersion,
-						hashFilesystemEditorVersionBytes(
-							Buffer.from(scenario.bytesBase64, "base64"),
-						),
+						scenario.version,
+						hashFilesystemEditorVersionBytes(Buffer.from(scenario.save, "base64")),
 					]),
 				]),
 			),

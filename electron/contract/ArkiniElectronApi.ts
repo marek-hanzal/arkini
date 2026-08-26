@@ -45,6 +45,7 @@ export namespace ArkiniElectronApi {
 		editorAwaitIdle: "arkini:editor:await-idle",
 		editorProjectBuild: "arkini:editor:project:build",
 		editorProjectBuildRead: "arkini:editor:project:build:read",
+		editorProjectBuildSave: "arkini:editor:project:build:save",
 		editorSignKeyConfigured: "arkini:editor:sign-key:configured",
 		editorProjectCreate: "arkini:editor:project:create",
 		editorProjectDelete: "arkini:editor:project:delete",
@@ -178,6 +179,9 @@ export namespace ArkiniElectronApi {
 			readonly readProjectBuild: (
 				request: EditorProjectTransport.ReadBuildRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.BuildContent>>;
+			readonly saveProjectBuild: (
+				request: EditorProjectTransport.ReadBuildRequest,
+			) => Promise<EditorProjectTransport.Result<boolean>>;
 			readonly isSignKeyConfigured: () => Promise<boolean>;
 			readonly createProject: (
 				request: EditorProjectTransport.CreateProjectRequest,

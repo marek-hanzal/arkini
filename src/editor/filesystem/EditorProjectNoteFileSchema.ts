@@ -1,12 +1,10 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { EditorNoteContentSchema } from "~/editor/note/EditorNoteSchema";
 
 /** Portable note body whose project identity is owned by its containing directory. */
 export const EditorProjectNoteFileSchema = z
 	.object({
-		noteId: IdSchema,
 		content: EditorNoteContentSchema,
 		createdAtMs: z.number().int().nonnegative(),
 		updatedAtMs: z.number().int().nonnegative(),
@@ -20,7 +18,7 @@ export const EditorProjectNoteFileSchema = z
 	})
 	.meta({
 		id: "EditorProjectNoteFileSchema",
-		description: "One notes/<noteId>.json file in a portable Editor project.",
+		description: "One note body stored below its ID-owned notes/<noteId>.json path.",
 	});
 
 export type EditorProjectNoteFileSchema = typeof EditorProjectNoteFileSchema;

@@ -28,7 +28,7 @@ afterEach(() => {
 });
 
 describe("readArkpackFx", () => {
-	it("keeps package identity separate from both content and game identity", async () => {
+	it("derives package identity from the game config independently of the filename", async () => {
 		const bytes = createTestArkpack();
 		const first = await Effect.runPromise(
 			readArkpackFx({
@@ -52,11 +52,10 @@ describe("readArkpackFx", () => {
 		);
 
 		expect(first.descriptor).toMatchObject({
-			packageId: "package:bridge",
-			gameId: "game:bridge",
+			packageId: "game:bridge",
 			title: "Bridge game",
 			version: "1.0",
-			game: ArkiniAppVersion,
+			arkini: ArkiniAppVersion,
 			source: "user",
 		});
 		expect(first.descriptor.contentHash).toMatch(/^[a-f0-9]{64}$/);
@@ -113,9 +112,8 @@ describe("readArkpackFx", () => {
 		]);
 		const encoded = Effect.runSync(
 			encodeFx({
-				packageId: "package:invalid-png",
 				version: "1.0",
-				game: ArkiniAppVersion,
+				arkini: ArkiniAppVersion,
 				config: testArkpackConfig,
 				resources: [
 					{
@@ -158,9 +156,8 @@ describe("readArkpackFx", () => {
 		};
 		const encoded = Effect.runSync(
 			encodeFx({
-				packageId: "package:invalid-config",
 				version: "1.0",
-				game: ArkiniAppVersion,
+				arkini: ArkiniAppVersion,
 				config: invalid,
 				resources: [
 					{

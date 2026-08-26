@@ -53,10 +53,11 @@ const cloneProject = (project: EditorProject): EditorProject => ({
 
 const materializeDescriptor = (
 	projectId: string,
+	versionId: string,
 	file: DescriptorFile,
 ): EditorProjectVersionDescriptor => ({
 	arkini: file.arkini,
-	arkpackVersion: file.arkpackVersion,
+	arkpackVersion: file.version,
 	...(file.body === undefined
 		? {}
 		: {
@@ -76,7 +77,7 @@ const materializeDescriptor = (
 		: {
 				tag: file.tag,
 			}),
-	versionId: file.versionId,
+	versionId,
 });
 
 const sameCommit = (
@@ -99,9 +100,9 @@ const toScenario = (
 ): EditorBoardScenarioSchema.Type => ({
 	projectId,
 	name: file.name,
-	projectRevision: file.projectRevision,
-	version: file.arkpackVersion,
-	bytes: Uint8Array.from(Buffer.from(file.bytesBase64, "base64")),
+	projectRevision: file.revision,
+	version: file.version,
+	bytes: Uint8Array.from(Buffer.from(file.save, "base64")),
 	createdAtMs: file.createdAtMs,
 	updatedAtMs: file.updatedAtMs,
 });
@@ -163,16 +164,23 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 				const state = yield* readState(projectId);
 				const head = yield* readHeadFx(state);
 				if (head === undefined) return [];
-				const descriptors = yield* Effect.forEach(head.versionIds, (versionId) =>
-					readDescriptorFx(state, versionId),
+				const descriptors = yield* Effect.forEach(head.versions, (versionId) =>
+					readDescriptorFx(state, versionId).pipe(
+						Effect.map((descriptor) => ({
+							descriptor,
+							versionId,
+						})),
+					),
 				);
 				return descriptors
 					.sort(
 						(left, right) =>
-							right.createdAtMs - left.createdAtMs ||
+							right.descriptor.createdAtMs - left.descriptor.createdAtMs ||
 							left.versionId.localeCompare(right.versionId),
 					)
-					.map((descriptor) => materializeDescriptor(projectId, descriptor));
+					.map(({ descriptor, versionId }) =>
+						materializeDescriptor(projectId, versionId, descriptor),
+					);
 			}).pipe(
 				Effect.mapError((cause) =>
 					error(
@@ -192,18 +200,18 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 				const base =
 					head === undefined
 						? undefined
-						: yield* readDescriptorFx(current.state, head.versionId);
+						: yield* readDescriptorFx(current.state, head.current);
 				const dirty = base?.contentFingerprint !== current.contentFingerprint;
 				return {
 					canCommit: dirty,
 					...(head === undefined
 						? {}
 						: {
-								currentBaseVersionId: head.versionId,
+								currentBaseVersionId: head.current,
 							}),
 					currentFingerprint: current.contentFingerprint,
 					dirty,
-					versionCount: head?.versionIds.length ?? 0,
+					versionCount: head?.versions.length ?? 0,
 				};
 			}).pipe(
 				Effect.mapError((cause) =>
@@ -260,12 +268,13 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 						const base =
 							head === undefined
 								? undefined
-								: yield* readDescriptorFx(current.state, head.versionId);
+								: yield* readDescriptorFx(current.state, head.current);
 						if (
+							head !== undefined &&
 							base !== undefined &&
 							sameCommit(base, metadata, current.contentFingerprint)
 						)
-							return materializeDescriptor(projectId, base);
+							return materializeDescriptor(projectId, head.current, base);
 						if (base?.contentFingerprint === current.contentFingerprint)
 							return yield* Effect.fail(
 								error(
@@ -277,7 +286,7 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 						const versionId = `v-${createHash("sha256")
 							.update(
 								JSON.stringify({
-									parentVersionId: head?.versionId,
+									parentVersionId: head?.current,
 									contentFingerprint: current.contentFingerprint,
 									...metadata,
 								}),
@@ -287,22 +296,21 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 							head === undefined
 								? undefined
 								: Math.max(
-										...(yield* Effect.forEach(head.versionIds, (id) =>
+										...(yield* Effect.forEach(head.versions, (id) =>
 											readDescriptorFx(current.state, id).pipe(
 												Effect.map((descriptor) => descriptor.createdAtMs),
 											),
 										)),
 									);
 						const descriptor = EditorVersionDescriptorFileSchema.parse({
-							versionId,
 							...(head === undefined
 								? {}
 								: {
-										parentVersionId: head.versionId,
+										parentVersionId: head.current,
 									}),
 							...metadata,
 							arkini: ArkiniAppVersion,
-							arkpackVersion: current.state.project.version,
+							version: current.state.project.version,
 							sourceRevision: current.state.project.revision,
 							contentFingerprint: current.contentFingerprint,
 							createdAtMs:
@@ -311,10 +319,10 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 									: Math.max(clockMs, latestCreatedAt + 1),
 						});
 						const nextHead = EditorVersionHeadFileSchema.parse({
-							versionId,
-							versionIds: [
-								...(head?.versionIds ?? []),
-								...(head?.versionIds.includes(versionId)
+							current: versionId,
+							versions: [
+								...(head?.versions ?? []),
+								...(head?.versions.includes(versionId)
 									? []
 									: [
 											versionId,
@@ -370,7 +378,7 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 								versions,
 							},
 						});
-						return materializeDescriptor(projectId, descriptor);
+						return materializeDescriptor(projectId, versionId, descriptor);
 					}),
 				)
 				.pipe(
@@ -420,7 +428,7 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 									`Version ${versionId} content does not match its descriptor.`,
 								),
 							);
-						if (snapshot.arkpack !== version.descriptor.arkpackVersion)
+						if (snapshot.arkpack !== version.descriptor.version)
 							return yield* Effect.fail(
 								error(
 									"checkout-version",
@@ -438,7 +446,7 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 						const restoredScenarioFiles = snapshot.scenarios.map((scenario) =>
 							EditorBoardScenarioFileSchema.parse({
 								...scenario,
-								projectRevision: updatedAtMs,
+								revision: updatedAtMs,
 							}),
 						);
 						const restoredScenarios = restoredScenarioFiles.map((scenario) =>
@@ -446,7 +454,7 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 						);
 						const marker = GameProjectManifestSchema.parse({
 							arkini: ArkiniAppVersion,
-							updatedAtMs,
+							revision: updatedAtMs,
 						});
 						const nextProject = cloneProject({
 							...current.state.project,
@@ -467,7 +475,7 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 							);
 						const nextHead = EditorVersionHeadFileSchema.parse({
 							...head,
-							versionId,
+							current: versionId,
 						});
 
 						yield* withFilesystemEditorProjectLockFx(
@@ -502,7 +510,7 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 											arkpack: current.state.project.version,
 											marker: GameProjectManifestSchema.parse({
 												arkini: ArkiniAppVersion,
-												updatedAtMs: current.state.project.updatedAtMs,
+												revision: current.state.project.revision,
 											}),
 											config: current.state.project.config,
 											resources: current.state.project.resources,
@@ -595,7 +603,7 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 								versions,
 							},
 						});
-						return materializeDescriptor(projectId, descriptor);
+						return materializeDescriptor(projectId, versionId, descriptor);
 					}),
 				)
 				.pipe(

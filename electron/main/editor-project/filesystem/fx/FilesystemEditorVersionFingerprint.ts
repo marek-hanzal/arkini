@@ -36,7 +36,7 @@ export const createFilesystemEditorVersionFingerprint = (
 				...manifest,
 				scenarios: sortedRecord(
 					scenarios.map(
-						({ projectRevision: _projectRevision, ...scenario }) =>
+						({ revision: _revision, ...scenario }) =>
 							[
 								scenario.name,
 								hashFilesystemEditorVersionJson(scenario),

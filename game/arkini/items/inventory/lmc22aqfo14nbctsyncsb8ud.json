@@ -1,20 +1,18 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:inventory": {
-			"uid": "lmc22aqfo14nbctsyncsb8ud",
-			"id": "item:inventory",
-			"title": "Backpack",
-			"description": "A trusty backpack that opens the shared inventory from the board.",
-			"asset": {
-				"default": [
-					"item-inventory"
-				]
-			},
-			"scope": "board",
-			"maxCount": 1,
-			"maxStackSize": 1,
-			"type": "inventory"
-		}
+	"item": {
+		"uid": "lmc22aqfo14nbctsyncsb8ud",
+		"id": "item:inventory",
+		"title": "Backpack",
+		"description": "A trusty backpack that opens the shared inventory from the board.",
+		"asset": {
+			"default": [
+				"item-inventory"
+			]
+		},
+		"scope": "board",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"type": "inventory"
 	}
 }

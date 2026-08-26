@@ -1,91 +1,89 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:blueprint-shrine-t1": {
-			"uid": "b9z1ucwann02xh8tw0ny6xwt",
-			"id": "item:blueprint-shrine-t1",
-			"title": "Wayside Shrine Blueprint",
-			"description": "Build plan that can be filled with resources to construct Wayside Shrine.",
-			"asset": {
-				"default": [
-					"blueprint",
-					"producer-shrine-t1"
-				],
-				"sources": [
-					"producer-shrine-t1"
+	"item": {
+		"uid": "b9z1ucwann02xh8tw0ny6xwt",
+		"id": "item:blueprint-shrine-t1",
+		"title": "Wayside Shrine Blueprint",
+		"description": "Build plan that can be filled with resources to construct Wayside Shrine.",
+		"asset": {
+			"default": [
+				"blueprint",
+				"producer-shrine-t1"
+			],
+			"sources": [
+				"producer-shrine-t1"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 1
+		},
+		"type": "blueprint",
+		"line": {
+			"id": "line:blueprint:shrine-t1:construct",
+			"title": "Construct Wayside Shrine",
+			"description": "Consumes construction resources to build Wayside Shrine.",
+			"default": true,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 9000,
+			"input": [
+				{
+					"charges": {
+						"cost": 1,
+						"from": "self"
+					},
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:log"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:stone"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "producer:shrine-t1",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
 				]
 			},
-			"scope": "any",
-			"maxStackSize": 1,
-			"charges": {
-				"amount": 1
-			},
-			"type": "blueprint",
-			"line": {
-				"id": "line:blueprint:shrine-t1:construct",
-				"title": "Construct Wayside Shrine",
-				"description": "Consumes construction resources to build Wayside Shrine.",
-				"default": true,
-				"show": true,
-				"enable": true,
-				"runtimeMs": 9000,
-				"input": [
-					{
-						"charges": {
-							"cost": 1,
-							"from": "self"
-						},
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:log"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						},
-						"capacity": 0
-					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:stone"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						},
-						"capacity": 0
-					}
-				],
-				"output": {
-					"set": [
-						{
-							"weight": 1,
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:shrine-t1",
-											"quantity": {
-												"min": 1,
-												"max": 1
-											},
-											"placement": "drop",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				},
-				"rules": []
-			}
+			"rules": []
 		}
 	}
 }

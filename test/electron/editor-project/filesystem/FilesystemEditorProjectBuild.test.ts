@@ -32,11 +32,11 @@ describe("filesystem Editor project build", () => {
 
 		expect(artifact).toMatchObject({
 			projectId: "project.build",
-			filename: "project%2Ebuild.arkpack",
 			revision: project.revision,
+			signed: false,
 		});
 		expect(await readdir(join(root, "build"))).toEqual([
-			artifact.filename,
+			"project%2Ebuild.arkpack",
 		]);
 		expect(await readFile(join(root, ".gitignore"), "utf8")).toContain("/build/\n");
 		const content = await Effect.runPromise(
@@ -44,9 +44,10 @@ describe("filesystem Editor project build", () => {
 				projectId: project.projectId,
 				expectedRevision: artifact.revision,
 				contentHash: artifact.contentHash,
+				signed: artifact.signed,
 			}),
 		);
-		expect(content.bytes.byteLength).toBe(artifact.bytes);
+		expect(content.bytes.byteLength).toBe(artifact.size);
 		expect(content.signature).toBeUndefined();
 	});
 
@@ -66,7 +67,7 @@ describe("filesystem Editor project build", () => {
 			}),
 		);
 		await writeFile(
-			join(root, "build", artifact.filename),
+			join(root, "build", "project-tamper.arkpack"),
 			new Uint8Array([
 				1,
 				2,
@@ -80,6 +81,7 @@ describe("filesystem Editor project build", () => {
 					projectId: project.projectId,
 					expectedRevision: artifact.revision,
 					contentHash: artifact.contentHash,
+					signed: artifact.signed,
 				}),
 			),
 		).rejects.toMatchObject({
@@ -104,19 +106,19 @@ describe("filesystem Editor project build", () => {
 			}),
 		);
 
-		expect(artifact.signatureFilename).toBe("project%2Esigned.arksig");
+		expect(artifact.signed).toBe(true);
 		const content = await Effect.runPromise(
 			repository.readProjectBuildFx({
 				projectId: project.projectId,
 				expectedRevision: artifact.revision,
 				contentHash: artifact.contentHash,
-				signatureFilename: artifact.signatureFilename,
+				signed: artifact.signed,
 			}),
 		);
 		expect(content.signature).toBeDefined();
 		expect(await readdir(join(root, "build"))).toEqual([
-			artifact.filename,
-			artifact.signatureFilename,
+			"project%2Esigned.arkpack",
+			"project%2Esigned.arksig",
 		]);
 	});
 

@@ -47,6 +47,7 @@ describe("Arkpack signing workflow", () => {
 			join(canonicalGameDirectory, "build", result.signatureFilename!),
 		);
 		expect((await readFile(result.arkpack)).byteLength).toBe(result.bytes);
+		expect(await readFile(result.signaturePath!, "utf8")).toBe(`${result.signature}\n`);
 		await expect(
 			Effect.runPromise(
 				verifyArkpackFileFx({

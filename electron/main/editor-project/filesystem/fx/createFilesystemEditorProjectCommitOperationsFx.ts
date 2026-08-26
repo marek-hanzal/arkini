@@ -134,7 +134,7 @@ export const createFilesystemEditorProjectCommitOperationsFx = Effect.fn(
 		const version = EditorProjectCompatibility.bumpVersion(state.project.version, level);
 		const marker = GameProjectManifestSchema.parse({
 			arkini: ArkiniAppVersion,
-			updatedAtMs,
+			revision: updatedAtMs,
 		});
 		const nextProject: EditorProject = {
 			...state.project,
@@ -158,7 +158,7 @@ export const createFilesystemEditorProjectCommitOperationsFx = Effect.fn(
 					arkpack: state.project.version,
 					marker: GameProjectManifestSchema.parse({
 						arkini: ArkiniAppVersion,
-						updatedAtMs: state.project.updatedAtMs,
+						revision: state.project.revision,
 					}),
 					config: state.project.config,
 					resources: state.project.resources,

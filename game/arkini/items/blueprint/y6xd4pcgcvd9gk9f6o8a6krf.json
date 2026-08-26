@@ -1,153 +1,151 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:blueprint-smelter-t1": {
-			"uid": "y6xd4pcgcvd9gk9f6o8a6krf",
-			"id": "item:blueprint-smelter-t1",
-			"title": "Smelter I Blueprint",
-			"description": "Build plan that can be filled with resources to construct Smelter I.",
-			"asset": {
-				"default": [
-					"blueprint",
-					"producer-smelter-t1"
-				],
-				"sources": [
-					"producer-smelter-t1"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 1,
-			"charges": {
-				"amount": 1
-			},
-			"type": "blueprint",
-			"line": {
-				"id": "line:blueprint:smelter-t1:construct",
-				"title": "Construct Smelter I",
-				"description": "Consumes construction resources to build Smelter I.",
-				"default": true,
-				"show": true,
-				"enable": true,
-				"runtimeMs": 65000,
-				"input": [
-					{
-						"charges": {
-							"cost": 1,
-							"from": "self"
-						},
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:stone-block"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 5,
-							"max": 5
-						},
-						"capacity": 0
+	"item": {
+		"uid": "y6xd4pcgcvd9gk9f6o8a6krf",
+		"id": "item:blueprint-smelter-t1",
+		"title": "Smelter I Blueprint",
+		"description": "Build plan that can be filled with resources to construct Smelter I.",
+		"asset": {
+			"default": [
+				"blueprint",
+				"producer-smelter-t1"
+			],
+			"sources": [
+				"producer-smelter-t1"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 1
+		},
+		"type": "blueprint",
+		"line": {
+			"id": "line:blueprint:smelter-t1:construct",
+			"title": "Construct Smelter I",
+			"description": "Consumes construction resources to build Smelter I.",
+			"default": true,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 65000,
+			"input": [
+				{
+					"charges": {
+						"cost": 1,
+						"from": "self"
 					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:bricks"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 4,
-							"max": 4
-						},
-						"capacity": 0
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:stone-block"
 					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:coal"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 3,
-							"max": 3
-						},
-						"capacity": 0
+					"mode": "consume",
+					"quantity": {
+						"min": 5,
+						"max": 5
 					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:building-permit"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						},
-						"capacity": 0
-					}
-				],
-				"output": {
-					"set": [
-						{
-							"weight": 1,
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:smelter-t1",
-											"quantity": {
-												"min": 1,
-												"max": 1
-											},
-											"placement": "drop",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
+					"capacity": 0
 				},
-				"rules": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:bricks"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 4,
+						"max": 4
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:coal"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 3,
+						"max": 3
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:building-permit"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				}
+			],
+			"output": {
+				"set": [
 					{
-						"when": [
+						"weight": 1,
+						"roll": [
 							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "producer:academy"
-									},
-									"scope": "universe"
-								},
-								"type": "exists"
-							},
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "producer:coal-mine-t1"
-									},
-									"scope": "universe"
-								},
-								"type": "exists"
-							},
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "producer:purifier-t1"
-									},
-									"scope": "universe"
-								},
-								"type": "exists"
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "producer:smelter-t1",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
 							}
-						],
-						"type": "enable"
+						]
 					}
 				]
-			}
+			},
+			"rules": [
+				{
+					"when": [
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:academy"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						},
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:coal-mine-t1"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						},
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:purifier-t1"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						}
+					],
+					"type": "enable"
+				}
+			]
 		}
 	}
 }

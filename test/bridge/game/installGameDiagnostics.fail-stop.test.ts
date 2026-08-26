@@ -13,10 +13,9 @@ const runRendererEffect = <Value>(effect: Effect.Effect<Value>) => Effect.runSyn
 const testArkpack = {
 	packageId: "package:test",
 	contentHash: "content:test",
-	gameId: "game:test",
 	title: "Test",
 	version: "1.0",
-	game: "1",
+	arkini: "1",
 	source: "bundled",
 	trust: {
 		type: "official",

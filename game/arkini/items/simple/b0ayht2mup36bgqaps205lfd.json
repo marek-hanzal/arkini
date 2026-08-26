@@ -1,19 +1,17 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:beer": {
-			"uid": "b0ayht2mup36bgqaps205lfd",
-			"id": "item:beer",
-			"title": "Beer",
-			"description": "A single mug of beer served by taverns.",
-			"asset": {
-				"default": [
-					"item-beer"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 50,
-			"type": "simple"
-		}
+	"item": {
+		"uid": "b0ayht2mup36bgqaps205lfd",
+		"id": "item:beer",
+		"title": "Beer",
+		"description": "A single mug of beer served by taverns.",
+		"asset": {
+			"default": [
+				"item-beer"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 50,
+		"type": "simple"
 	}
 }

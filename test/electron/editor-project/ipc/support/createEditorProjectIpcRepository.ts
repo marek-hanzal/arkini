@@ -31,10 +31,8 @@ export const editorProjectIpcBuild = {
 	projectId: editorProjectIpcProject.projectId,
 	revision: editorProjectIpcProject.revision,
 	contentHash: "a".repeat(64),
-	filename: "project-one.arkpack",
-	version: editorProjectIpcProject.version,
-	game: ArkiniAppVersion,
-	bytes: 3,
+	signed: false,
+	size: 3,
 	diagnostics: [],
 };
 

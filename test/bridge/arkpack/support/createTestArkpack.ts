@@ -54,15 +54,21 @@ export const testArkpackConfig = GameConfigSchema.parse({
 
 export const createTestArkpack = (
 	config = testArkpackConfig,
-	packageId = "package:bridge",
+	packageId = config.meta.id,
 	version: ArkpackVersionSchema.Type = "1.0",
 ) => {
+	const identifiedConfig = {
+		...config,
+		meta: {
+			...config.meta,
+			id: packageId,
+		},
+	};
 	const encoded = Effect.runSync(
 		encodeFx({
-			packageId,
 			version,
-			game: ArkiniAppVersion,
-			config,
+			arkini: ArkiniAppVersion,
+			config: identifiedConfig,
 			resources: [
 				{
 					id: "hero",

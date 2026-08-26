@@ -1,117 +1,115 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:blueprint-weaver-hut-t1": {
-			"uid": "hsyronnsn0hmu1yg04lmrk3d",
-			"id": "item:blueprint-weaver-hut-t1",
-			"title": "Weaver Hut I Blueprint",
-			"description": "Build plan that can be filled with resources to construct Weaver Hut I.",
-			"asset": {
-				"default": [
-					"blueprint",
-					"producer-weaver-hut-t1"
-				],
-				"sources": [
-					"producer-weaver-hut-t1"
+	"item": {
+		"uid": "hsyronnsn0hmu1yg04lmrk3d",
+		"id": "item:blueprint-weaver-hut-t1",
+		"title": "Weaver Hut I Blueprint",
+		"description": "Build plan that can be filled with resources to construct Weaver Hut I.",
+		"asset": {
+			"default": [
+				"blueprint",
+				"producer-weaver-hut-t1"
+			],
+			"sources": [
+				"producer-weaver-hut-t1"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 1
+		},
+		"type": "blueprint",
+		"line": {
+			"id": "line:blueprint:weaver-hut-t1:construct",
+			"title": "Construct Weaver Hut I",
+			"description": "Consumes construction resources to build Weaver Hut I.",
+			"default": true,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 36000,
+			"input": [
+				{
+					"charges": {
+						"cost": 1,
+						"from": "self"
+					},
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:plank"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 3,
+						"max": 3
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:wool"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:paper"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:coin"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "producer:weaver-hut-t1",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
 				]
 			},
-			"scope": "any",
-			"maxStackSize": 1,
-			"charges": {
-				"amount": 1
-			},
-			"type": "blueprint",
-			"line": {
-				"id": "line:blueprint:weaver-hut-t1:construct",
-				"title": "Construct Weaver Hut I",
-				"description": "Consumes construction resources to build Weaver Hut I.",
-				"default": true,
-				"show": true,
-				"enable": true,
-				"runtimeMs": 36000,
-				"input": [
-					{
-						"charges": {
-							"cost": 1,
-							"from": "self"
-						},
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:plank"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 3,
-							"max": 3
-						},
-						"capacity": 0
-					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:wool"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 2,
-							"max": 2
-						},
-						"capacity": 0
-					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:paper"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						},
-						"capacity": 0
-					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:coin"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						},
-						"capacity": 0
-					}
-				],
-				"output": {
-					"set": [
-						{
-							"weight": 1,
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:weaver-hut-t1",
-											"quantity": {
-												"min": 1,
-												"max": 1
-											},
-											"placement": "drop",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				},
-				"rules": []
-			}
+			"rules": []
 		}
 	}
 }

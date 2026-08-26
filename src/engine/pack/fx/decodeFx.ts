@@ -40,7 +40,7 @@ export const decodeFx = Effect.fn("decodeFx")(function* (bytes: Uint8Array) {
 
 			return {
 				id: resource.id,
-				mime: resource.mime,
+				mime: "image/png",
 				bytes: resourceBytes,
 			};
 		});
@@ -50,9 +50,8 @@ export const decodeFx = Effect.fn("decodeFx")(function* (bytes: Uint8Array) {
 		}
 
 		return PayloadSchema.parse({
-			packageId: manifest.packageId,
 			version: manifest.version,
-			game: manifest.game,
+			arkini: manifest.arkini,
 			config,
 			resources,
 		});

@@ -1,156 +1,154 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:blueprint-academy": {
-			"uid": "jsrlp0tia7r21hhksusqbama",
-			"id": "item:blueprint-academy",
-			"title": "Academy Blueprint",
-			"description": "Build plan that upgrades a School into an Academy.",
-			"asset": {
-				"default": [
-					"blueprint",
-					"producer-academy"
-				],
-				"sources": [
-					"producer-academy"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 1,
-			"charges": {
-				"amount": 1
-			},
-			"type": "blueprint",
-			"line": {
-				"id": "line:blueprint:academy:construct",
-				"title": "Construct Academy",
-				"description": "Consumes construction resources to build Academy.",
-				"default": true,
-				"show": true,
-				"enable": true,
-				"runtimeMs": 55000,
-				"input": [
-					{
-						"charges": {
-							"cost": 1,
-							"from": "self"
-						},
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "producer:school"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						},
-						"capacity": 0
+	"item": {
+		"uid": "jsrlp0tia7r21hhksusqbama",
+		"id": "item:blueprint-academy",
+		"title": "Academy Blueprint",
+		"description": "Build plan that upgrades a School into an Academy.",
+		"asset": {
+			"default": [
+				"blueprint",
+				"producer-academy"
+			],
+			"sources": [
+				"producer-academy"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 1
+		},
+		"type": "blueprint",
+		"line": {
+			"id": "line:blueprint:academy:construct",
+			"title": "Construct Academy",
+			"description": "Consumes construction resources to build Academy.",
+			"default": true,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 55000,
+			"input": [
+				{
+					"charges": {
+						"cost": 1,
+						"from": "self"
 					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:building-permit"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						},
-						"capacity": 0
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "producer:school"
 					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:luxury-clothing"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						},
-						"capacity": 0
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
 					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:coin"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 4,
-							"max": 4
-						},
-						"capacity": 0
-					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:morale-t2"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						},
-						"capacity": 0
-					}
-				],
-				"output": {
-					"set": [
-						{
-							"weight": 1,
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:academy",
-											"quantity": {
-												"min": 1,
-												"max": 1
-											},
-											"placement": "drop",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
+					"capacity": 0
 				},
-				"rules": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:building-permit"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:luxury-clothing"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:coin"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 4,
+						"max": 4
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:morale-t2"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				}
+			],
+			"output": {
+				"set": [
 					{
-						"when": [
+						"weight": 1,
+						"roll": [
 							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "producer:civic-office-t1"
-									},
-									"scope": "universe"
-								},
-								"type": "exists"
-							},
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "producer:library-t2"
-									},
-									"scope": "universe"
-								},
-								"type": "exists"
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "producer:academy",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
 							}
-						],
-						"type": "enable"
+						]
 					}
 				]
-			}
+			},
+			"rules": [
+				{
+					"when": [
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:civic-office-t1"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						},
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:library-t2"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						}
+					],
+					"type": "enable"
+				}
+			]
 		}
 	}
 }

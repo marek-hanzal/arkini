@@ -22,10 +22,9 @@ describe("ArkpackSelector", () => {
 				{
 					packageId: "package:built-in",
 					contentHash: "a".repeat(64),
-					gameId: "arkini",
 					title: "Arkini",
 					version: "1.0",
-					game: "1",
+					arkini: "1",
 					trust: {
 						type: "official",
 					} as const,
@@ -35,10 +34,9 @@ describe("ArkpackSelector", () => {
 				{
 					packageId: "package:local",
 					contentHash: "b".repeat(64),
-					gameId: "local",
 					title: "Local package",
 					version: "1.0",
-					game: "1",
+					arkini: "1",
 					trust: {
 						type: "external",
 						reason: "unsigned",

@@ -13,13 +13,12 @@ import { EditorObjectHashSchema } from "./EditorObjectHashSchema";
 /** User-authored metadata for one immutable version manifest. */
 export const EditorVersionDescriptorFileSchema = z
 	.object({
-		versionId: IdSchema,
 		parentVersionId: IdSchema.optional(),
 		subject: EditorProjectVersionSubjectSchema,
 		body: EditorProjectVersionBodySchema.optional(),
 		tag: EditorProjectVersionTagSchema.optional(),
 		arkini: ArkiniVersionSchema,
-		arkpackVersion: ArkpackVersionSchema,
+		version: ArkpackVersionSchema,
 		sourceRevision: z.number().int().nonnegative(),
 		contentFingerprint: EditorObjectHashSchema,
 		createdAtMs: z.number().int().nonnegative(),
@@ -27,7 +26,7 @@ export const EditorVersionDescriptorFileSchema = z
 	.strict()
 	.meta({
 		id: "EditorVersionDescriptorFileSchema",
-		description: "One versions/<versionId>/version.json metadata file.",
+		description: "Metadata stored below its ID-owned versions/<versionId>/version.json path.",
 	});
 
 export type EditorVersionDescriptorFileSchema = typeof EditorVersionDescriptorFileSchema;

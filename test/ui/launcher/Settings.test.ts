@@ -153,10 +153,9 @@ const renderSettings = async (
 			arkpack: {
 				packageId: "package:settings",
 				contentHash: "content:settings",
-				gameId: "game:settings",
 				title: "Settings game",
 				version: "1.0",
-				game: "1.0",
+				arkini: "1.0",
 				trust: {
 					type: "external",
 					reason: "unsigned",

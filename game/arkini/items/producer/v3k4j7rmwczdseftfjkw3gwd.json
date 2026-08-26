@@ -1,345 +1,343 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"producer:civic-office-t1": {
-			"uid": "v3k4j7rmwczdseftfjkw3gwd",
-			"id": "producer:civic-office-t1",
-			"title": "Civic Office I",
-			"description": "Administration producer that converts paper, knowledge, and coins into building permits.",
-			"asset": {
-				"default": [
-					"producer-civic-office-t1"
-				]
-			},
-			"scope": "any",
-			"maxCount": 1,
-			"maxStackSize": 1,
-			"maxQueueSize": 1,
-			"type": "producer",
-			"lines": [
-				{
-					"id": "line:civic-office-t1:building-permit",
-					"title": "Building Permit",
-					"description": "Runs building permit for Civic Office I.",
-					"default": false,
-					"show": true,
-					"enable": true,
-					"runtimeMs": 18000,
-					"input": [
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:paper"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 3
-						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:basic-knowledge"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 3
-						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:coin"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 7
-						}
-					],
-					"output": {
-						"set": [
-							{
-								"weight": 1,
-								"roll": [
-									{
-										"type": "guaranteed",
-										"drop": [
-											{
-												"itemId": "item:building-permit",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									}
-								]
-							}
-						]
-					},
-					"rules": []
-				},
-				{
-					"id": "line:civic-office-t1:building-permit-morale-t2",
-					"title": "Building Permit (Inspired)",
-					"description": "Runs building permit (inspired) for Civic Office I.",
-					"default": false,
-					"show": true,
-					"enable": true,
-					"runtimeMs": 15000,
-					"input": [
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:paper"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 3
-						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:basic-knowledge"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 3
-						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:coin"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 7
-						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:morale-t2"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 3
-						}
-					],
-					"output": {
-						"set": [
-							{
-								"weight": 1,
-								"roll": [
-									{
-										"type": "guaranteed",
-										"drop": [
-											{
-												"itemId": "item:building-permit",
-												"quantity": {
-													"min": 2,
-													"max": 2
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									}
-								]
-							}
-						]
-					},
-					"rules": []
-				},
-				{
-					"id": "line:civic-office-t1:blueprint-academy",
-					"title": "Blueprint: Academy",
-					"description": "Runs blueprint: academy for Civic Office I.",
-					"default": false,
-					"show": true,
-					"enable": true,
-					"runtimeMs": 18000,
-					"input": [
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:basic-knowledge"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 2,
-								"max": 2
-							},
-							"capacity": 2
-						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:paper"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 2,
-								"max": 2
-							},
-							"capacity": 2
-						}
-					],
-					"output": {
-						"set": [
-							{
-								"weight": 1,
-								"roll": [
-									{
-										"type": "guaranteed",
-										"drop": [
-											{
-												"itemId": "item:blueprint-academy",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									}
-								]
-							}
-						]
-					},
-					"rules": []
-				},
-				{
-					"id": "line:civic-office-t1:guild-charter",
-					"title": "Guild Charter",
-					"description": "Runs guild charter for Civic Office I.",
-					"default": false,
-					"show": true,
-					"enable": true,
-					"runtimeMs": 42000,
-					"input": [
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:construction-bundle"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 3
-						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:advanced-knowledge"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 3
-						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:building-permit"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 3
-						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:luxury-clothing"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 3
-						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:coin"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 8,
-								"max": 8
-							},
-							"capacity": 12
-						}
-					],
-					"output": {
-						"set": [
-							{
-								"weight": 1,
-								"roll": [
-									{
-										"type": "guaranteed",
-										"drop": [
-											{
-												"itemId": "item:guild-charter",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									}
-								]
-							}
-						]
-					},
-					"rules": []
-				}
+	"item": {
+		"uid": "v3k4j7rmwczdseftfjkw3gwd",
+		"id": "producer:civic-office-t1",
+		"title": "Civic Office I",
+		"description": "Administration producer that converts paper, knowledge, and coins into building permits.",
+		"asset": {
+			"default": [
+				"producer-civic-office-t1"
 			]
-		}
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"type": "producer",
+		"lines": [
+			{
+				"id": "line:civic-office-t1:building-permit",
+				"title": "Building Permit",
+				"description": "Runs building permit for Civic Office I.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 18000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:paper"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 3
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:basic-knowledge"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 3
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:coin"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 7
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:building-permit",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "line:civic-office-t1:building-permit-morale-t2",
+				"title": "Building Permit (Inspired)",
+				"description": "Runs building permit (inspired) for Civic Office I.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 15000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:paper"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 3
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:basic-knowledge"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 3
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:coin"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 7
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:morale-t2"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 3
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:building-permit",
+											"quantity": {
+												"min": 2,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "line:civic-office-t1:blueprint-academy",
+				"title": "Blueprint: Academy",
+				"description": "Runs blueprint: academy for Civic Office I.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 18000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:basic-knowledge"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						},
+						"capacity": 2
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:paper"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						},
+						"capacity": 2
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:blueprint-academy",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"id": "line:civic-office-t1:guild-charter",
+				"title": "Guild Charter",
+				"description": "Runs guild charter for Civic Office I.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 42000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:construction-bundle"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 3
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:advanced-knowledge"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 3
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:building-permit"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 3
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:luxury-clothing"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 3
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:coin"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 8,
+							"max": 8
+						},
+						"capacity": 12
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:guild-charter",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
 	}
 }

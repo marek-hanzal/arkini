@@ -30,6 +30,7 @@ export type EditorProjectRepositoryOperation =
 	| "replace-resource"
 	| "refresh-project"
 	| "save-resource"
+	| "save-project-build"
 	| "upsert-item"
 	| "upsert-resource"
 	| "update-version-tag"

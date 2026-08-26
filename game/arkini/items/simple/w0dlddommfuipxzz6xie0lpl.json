@@ -1,19 +1,17 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:marble": {
-			"uid": "w0dlddommfuipxzz6xie0lpl",
-			"id": "item:marble",
-			"title": "Marble",
-			"description": "Raw white marble extracted by Quarry II before being finished by Stonemason II.",
-			"asset": {
-				"default": [
-					"item-marble"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 40,
-			"type": "simple"
-		}
+	"item": {
+		"uid": "w0dlddommfuipxzz6xie0lpl",
+		"id": "item:marble",
+		"title": "Marble",
+		"description": "Raw white marble extracted by Quarry II before being finished by Stonemason II.",
+		"asset": {
+			"default": [
+				"item-marble"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 40,
+		"type": "simple"
 	}
 }

@@ -1,19 +1,17 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:wool": {
-			"uid": "lri9noxoiihg7xokehx4bttp",
-			"id": "item:wool",
-			"title": "Wool",
-			"description": "Raw wool produced by sheep pastures and used as early settlement material.",
-			"asset": {
-				"default": [
-					"item-wool"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 50,
-			"type": "simple"
-		}
+	"item": {
+		"uid": "lri9noxoiihg7xokehx4bttp",
+		"id": "item:wool",
+		"title": "Wool",
+		"description": "Raw wool produced by sheep pastures and used as early settlement material.",
+		"asset": {
+			"default": [
+				"item-wool"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 50,
+		"type": "simple"
 	}
 }

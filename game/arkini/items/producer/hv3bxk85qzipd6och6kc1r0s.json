@@ -1,246 +1,244 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"producer:winery-t1": {
-			"uid": "hv3bxk85qzipd6och6kc1r0s",
-			"id": "producer:winery-t1",
-			"title": "Winery I",
-			"description": "Produces grapes from water near a vineyard, then presses grapes and water into wine barrels.",
-			"asset": {
-				"default": [
-					"producer-winery-t1"
+	"item": {
+		"uid": "hv3bxk85qzipd6och6kc1r0s",
+		"id": "producer:winery-t1",
+		"title": "Winery I",
+		"description": "Produces grapes from water near a vineyard, then presses grapes and water into wine barrels.",
+		"asset": {
+			"default": [
+				"producer-winery-t1"
+			]
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"type": "producer",
+		"lines": [
+			{
+				"id": "line:winery-t1:grapes",
+				"title": "Grapes",
+				"description": "Runs grapes for Winery I.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 22000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:water"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 4
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:grapes",
+											"quantity": {
+												"min": 2,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.25,
+									"drop": [
+										{
+											"itemId": "item:grapes",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "item:vineyard"
+									},
+									"scope": "board",
+									"distance": "close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
 				]
 			},
-			"scope": "any",
-			"maxCount": 1,
-			"maxStackSize": 1,
-			"maxQueueSize": 1,
-			"type": "producer",
-			"lines": [
-				{
-					"id": "line:winery-t1:grapes",
-					"title": "Grapes",
-					"description": "Runs grapes for Winery I.",
-					"default": false,
-					"show": true,
-					"enable": true,
-					"runtimeMs": 22000,
-					"input": [
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:water"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 4
-						}
-					],
-					"output": {
-						"set": [
-							{
-								"weight": 1,
-								"roll": [
-									{
-										"type": "guaranteed",
-										"drop": [
-											{
-												"itemId": "item:grapes",
-												"quantity": {
-													"min": 2,
-													"max": 2
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									},
-									{
-										"type": "chance",
-										"chance": 0.25,
-										"drop": [
-											{
-												"itemId": "item:grapes",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									}
-								]
-							}
-						]
-					},
-					"rules": [
-						{
-							"when": [
-								{
-									"query": {
-										"selector": {
-											"type": "item",
-											"itemId": "item:vineyard"
-										},
-										"scope": "board",
-										"distance": "close"
-									},
-									"type": "exists"
-								}
-							],
-							"type": "enable"
-						}
-					]
-				},
-				{
-					"id": "line:winery-t1:wine-barrel",
-					"title": "Wine Barrel",
-					"description": "Runs wine barrel for Winery I.",
-					"default": false,
-					"show": true,
-					"enable": true,
-					"runtimeMs": 30000,
-					"input": [
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:grapes"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 3,
-								"max": 3
-							},
-							"capacity": 4
+			{
+				"id": "line:winery-t1:wine-barrel",
+				"title": "Wine Barrel",
+				"description": "Runs wine barrel for Winery I.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:grapes"
 						},
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:water"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 1,
-								"max": 1
-							},
-							"capacity": 4
-						}
-					],
-					"output": {
-						"set": [
-							{
-								"weight": 1,
-								"roll": [
-									{
-										"type": "guaranteed",
-										"drop": [
-											{
-												"itemId": "item:wine-barrel",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									}
-								]
-							}
-						]
+						"mode": "consume",
+						"quantity": {
+							"min": 3,
+							"max": 3
+						},
+						"capacity": 4
 					},
-					"rules": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:water"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 4
+					}
+				],
+				"output": {
+					"set": [
 						{
-							"when": [
+							"weight": 1,
+							"roll": [
 								{
-									"query": {
-										"selector": {
-											"type": "item",
-											"itemId": "item:vineyard"
-										},
-										"scope": "board",
-										"distance": "close"
-									},
-									"type": "exists"
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:wine-barrel",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
 								}
-							],
-							"type": "enable"
+							]
 						}
 					]
 				},
-				{
-					"id": "line:winery-t1:wine-barrel-from-wine-glasses",
-					"title": "Wine Barrel From Wine Glasses",
-					"description": "Runs wine barrel from wine glasses for Winery I.",
-					"default": false,
-					"show": true,
-					"enable": true,
-					"runtimeMs": 16000,
-					"input": [
-						{
-							"type": "materials",
-							"selector": {
-								"type": "item",
-								"itemId": "item:wine-glass"
-							},
-							"mode": "consume",
-							"quantity": {
-								"min": 4,
-								"max": 4
-							},
-							"capacity": 4
-						}
-					],
-					"output": {
-						"set": [
+				"rules": [
+					{
+						"when": [
 							{
-								"weight": 1,
-								"roll": [
-									{
-										"type": "guaranteed",
-										"drop": [
-											{
-												"itemId": "item:wine-barrel",
-												"quantity": {
-													"min": 1,
-													"max": 1
-												},
-												"placement": "drop",
-												"rules": []
-											}
-										]
-									}
-								]
-							}
-						]
-					},
-					"rules": [
-						{
-							"when": [
-								{
-									"query": {
-										"selector": {
-											"type": "item",
-											"itemId": "item:vineyard"
-										},
-										"scope": "board",
-										"distance": "close"
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "item:vineyard"
 									},
-									"type": "exists"
+									"scope": "board",
+									"distance": "close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			},
+			{
+				"id": "line:winery-t1:wine-barrel-from-wine-glasses",
+				"title": "Wine Barrel From Wine Glasses",
+				"description": "Runs wine barrel from wine glasses for Winery I.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 16000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:wine-glass"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 4,
+							"max": 4
+						},
+						"capacity": 4
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:wine-barrel",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
 								}
-							],
-							"type": "enable"
+							]
 						}
 					]
-				}
-			]
-		}
+				},
+				"rules": [
+					{
+						"when": [
+							{
+								"query": {
+									"selector": {
+										"type": "item",
+										"itemId": "item:vineyard"
+									},
+									"scope": "board",
+									"distance": "close"
+								},
+								"type": "exists"
+							}
+						],
+						"type": "enable"
+					}
+				]
+			}
+		]
 	}
 }

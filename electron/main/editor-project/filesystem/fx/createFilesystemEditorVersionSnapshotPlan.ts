@@ -58,7 +58,7 @@ export const createFilesystemEditorVersionSnapshotPlan = ({
 	const { $schema: _schema, items, ...gameCandidate } = config;
 	const game = GameProjectFileSchema.parse({
 		$schema: GameProjectGameSchemaReference,
-		arkpack,
+		version: arkpack,
 		...gameCandidate,
 	});
 	const itemUids = new Set<string>();

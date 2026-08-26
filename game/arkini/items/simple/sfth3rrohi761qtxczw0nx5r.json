@@ -1,19 +1,17 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:gold-deposit": {
-			"uid": "sfth3rrohi761qtxczw0nx5r",
-			"id": "item:gold-deposit",
-			"title": "Gold Deposit",
-			"description": "Movable gold source used by nearby gold mines.",
-			"asset": {
-				"default": [
-					"item-gold-deposit"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 1,
-			"type": "simple"
-		}
+	"item": {
+		"uid": "sfth3rrohi761qtxczw0nx5r",
+		"id": "item:gold-deposit",
+		"title": "Gold Deposit",
+		"description": "Movable gold source used by nearby gold mines.",
+		"asset": {
+			"default": [
+				"item-gold-deposit"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "simple"
 	}
 }

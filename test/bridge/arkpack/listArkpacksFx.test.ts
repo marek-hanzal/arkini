@@ -36,7 +36,6 @@ describe("listArkpacksFx", () => {
 		).resolves.toEqual([
 			expect.objectContaining({
 				packageId: "package:catalog",
-				gameId: "game:bridge",
 				source: "user",
 				overridesBundled: true,
 			}),

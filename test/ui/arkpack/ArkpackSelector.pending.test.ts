@@ -31,10 +31,9 @@ describe("ArkpackSelector pending actions", () => {
 				{
 					packageId: "package:local",
 					contentHash: "b".repeat(64),
-					gameId: "local",
 					title: "Local package",
 					version: "1.0",
-					game: "1",
+					arkini: "1",
 					trust: {
 						type: "external",
 						reason: "unsigned",
@@ -120,10 +119,9 @@ describe("ArkpackSelector pending actions", () => {
 		const imported: ArkpackDescriptor = {
 			packageId: "package:imported",
 			contentHash: "c".repeat(64),
-			gameId: "imported",
 			title: "Imported package",
 			version: "1.0",
-			game: "1",
+			arkini: "1",
 			trust: {
 				type: "external",
 				reason: "unsigned",

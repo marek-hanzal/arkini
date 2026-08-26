@@ -1,130 +1,128 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:blueprint-clay-pit": {
-			"uid": "dxvajxwjzx9q0iptl6zgdzea",
-			"id": "item:blueprint-clay-pit",
-			"title": "Clay Pit Blueprint",
-			"description": "Build plan that can be filled with resources to construct a Clay Pit.",
-			"asset": {
-				"default": [
-					"blueprint",
-					"producer-clay-pit"
-				],
-				"sources": [
-					"producer-clay-pit"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 1,
-			"charges": {
-				"amount": 1
-			},
-			"type": "blueprint",
-			"line": {
-				"id": "line:blueprint:clay-pit:construct",
-				"title": "Construct Clay Pit",
-				"description": "Consumes construction resources to build Clay Pit.",
-				"default": true,
-				"show": true,
-				"enable": true,
-				"runtimeMs": 42000,
-				"input": [
-					{
-						"charges": {
-							"cost": 1,
-							"from": "self"
-						},
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:plank"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 3,
-							"max": 3
-						},
-						"capacity": 0
+	"item": {
+		"uid": "dxvajxwjzx9q0iptl6zgdzea",
+		"id": "item:blueprint-clay-pit",
+		"title": "Clay Pit Blueprint",
+		"description": "Build plan that can be filled with resources to construct a Clay Pit.",
+		"asset": {
+			"default": [
+				"blueprint",
+				"producer-clay-pit"
+			],
+			"sources": [
+				"producer-clay-pit"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 1
+		},
+		"type": "blueprint",
+		"line": {
+			"id": "line:blueprint:clay-pit:construct",
+			"title": "Construct Clay Pit",
+			"description": "Consumes construction resources to build Clay Pit.",
+			"default": true,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 42000,
+			"input": [
+				{
+					"charges": {
+						"cost": 1,
+						"from": "self"
 					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:stone-block"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 2,
-							"max": 2
-						},
-						"capacity": 0
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:plank"
 					},
-					{
-						"type": "materials",
-						"selector": {
-							"type": "item",
-							"itemId": "item:building-permit"
-						},
-						"mode": "consume",
-						"quantity": {
-							"min": 1,
-							"max": 1
-						},
-						"capacity": 0
-					}
-				],
-				"output": {
-					"set": [
-						{
-							"weight": 1,
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:clay-pit",
-											"quantity": {
-												"min": 1,
-												"max": 1
-											},
-											"placement": "drop",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
+					"mode": "consume",
+					"quantity": {
+						"min": 3,
+						"max": 3
+					},
+					"capacity": 0
 				},
-				"rules": [
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:stone-block"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:building-permit"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				}
+			],
+			"output": {
+				"set": [
 					{
-						"when": [
+						"weight": 1,
+						"roll": [
 							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "item:clay-deposit"
-									},
-									"scope": "universe"
-								},
-								"type": "exists"
-							},
-							{
-								"query": {
-									"selector": {
-										"type": "item",
-										"itemId": "producer:academy"
-									},
-									"scope": "universe"
-								},
-								"type": "exists"
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "producer:clay-pit",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
 							}
-						],
-						"type": "enable"
+						]
 					}
 				]
-			}
+			},
+			"rules": [
+				{
+					"when": [
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "item:clay-deposit"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						},
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:academy"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						}
+					],
+					"type": "enable"
+				}
+			]
 		}
 	}
 }

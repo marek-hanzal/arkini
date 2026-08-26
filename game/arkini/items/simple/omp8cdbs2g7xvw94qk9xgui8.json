@@ -1,19 +1,17 @@
 {
 	"$schema": "../../schema.json",
-	"items": {
-		"item:wine-glass": {
-			"uid": "omp8cdbs2g7xvw94qk9xgui8",
-			"id": "item:wine-glass",
-			"title": "Wine Glass",
-			"description": "A single glass of wine served by taverns.",
-			"asset": {
-				"default": [
-					"item-wine-glass"
-				]
-			},
-			"scope": "any",
-			"maxStackSize": 50,
-			"type": "simple"
-		}
+	"item": {
+		"uid": "omp8cdbs2g7xvw94qk9xgui8",
+		"id": "item:wine-glass",
+		"title": "Wine Glass",
+		"description": "A single glass of wine served by taverns.",
+		"asset": {
+			"default": [
+				"item-wine-glass"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 50,
+		"type": "simple"
 	}
 }

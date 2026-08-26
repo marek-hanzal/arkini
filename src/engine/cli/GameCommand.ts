@@ -10,7 +10,7 @@ export const GameCommand = Command.make("game")
 				input: "game/arkini",
 			}),
 			SchemaCommand({
-				output: "game/schema.json",
+				output: "game/arkini/schema.json",
 			}),
 			ValidateCommand({
 				input: "game/arkini",

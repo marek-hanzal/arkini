@@ -5,6 +5,7 @@ import { join } from "node:path";
 
 import type { ArkiniElectronApi } from "../../../electron/contract/ArkiniElectronApi";
 import { createFilesystemArkpackCatalogFx } from "../../../electron/main/arkpack/createFilesystemArkpackCatalogFx";
+import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
 
 export const bundledBytes = new Uint8Array([
 	1,
@@ -23,13 +24,13 @@ export const readRoots = (root: string) => ({
 });
 
 export const readPackageFilename = (packageId: string) =>
-	`${encodeURIComponent(packageId)}.arkpack`;
+	`${encodeGameProjectFileStem(packageId)}.arkpack`;
 
 export const readPackagePath = (root: string, packageId: string) =>
 	join(root, readPackageFilename(packageId));
 
 export const readSignaturePath = (root: string, packageId: string) =>
-	join(root, `${encodeURIComponent(packageId)}.arksig`);
+	join(root, `${encodeGameProjectFileStem(packageId)}.arksig`);
 
 export const writePackage = async ({
 	bytes,

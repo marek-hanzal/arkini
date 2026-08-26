@@ -5,6 +5,7 @@ import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { ElectronMainError } from "../ElectronMainError";
 import { readArkpackFileFx } from "./readArkpackFileFx";
+import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
 
 const suffix = ".arkpack";
 
@@ -48,7 +49,7 @@ export const listArkpackFilesFx = Effect.fn("listArkpackFilesFx")(
 				} catch {
 					continue;
 				}
-				if (`${encodeURIComponent(packageId)}${suffix}` !== entry) continue;
+				if (`${encodeGameProjectFileStem(packageId)}${suffix}` !== entry) continue;
 				if (inspectedCandidates >= maxCandidates) break;
 				inspectedCandidates += 1;
 				const file = yield* Effect.gen(function* () {

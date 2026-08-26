@@ -29,10 +29,7 @@ export const writeArkpackSignatureFx = Effect.fn("writeArkpackSignatureFx")(func
 				prefix: `${path.basename(signaturePath)}.`,
 				suffix: ".pending",
 			});
-			yield* fileSystem.writeFileString(
-				pending,
-				`${JSON.stringify(signature, undefined, "\t")}\n`,
-			);
+			yield* fileSystem.writeFileString(pending, `${signature}\n`);
 			yield* fileSystem.rename(pending, signaturePath);
 		}),
 	);

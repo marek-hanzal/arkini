@@ -53,10 +53,9 @@ const makeGame = (
 	arkpack: {
 		packageId: `package:spawn-${suffix}`,
 		contentHash: `content:spawn-${suffix}`,
-		gameId: `game:spawn-${suffix}`,
 		title: `Spawn ${suffix}`,
 		version: "1.0",
-		game: "1.0",
+		arkini: "1.0",
 		trust: {
 			type: "external",
 			reason: "unsigned",

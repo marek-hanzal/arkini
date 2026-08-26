@@ -1,6 +1,6 @@
 import { Cause, Deferred, Effect, Layer } from "effect";
 import { TestClock } from "effect/testing";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "@effect/vitest";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
 import { RuntimeSaveFx } from "~/bridge/save/RuntimeSaveFx";
@@ -106,7 +106,7 @@ describe("RuntimeSaveLayerFx", () => {
 		}
 	});
 
-	it("debounces committed snapshots and ignores failed mutations", async () => {
+	it.effect("debounces committed snapshots and ignores failed mutations", () => {
 		const saves: StateSchema.Type[] = [];
 		const core = GameCoreLayerFx({
 			config: createJobTestConfig(),
@@ -119,62 +119,52 @@ describe("RuntimeSaveLayerFx", () => {
 				}),
 		}).pipe(Layer.provide(core));
 
-		await Effect.runPromise(
-			Effect.scoped(
-				Effect.gen(function* () {
-					const runtimeSave = yield* RuntimeSaveFx;
-					const first = yield* spawnItemFx({
-						id: "runtime:save:first",
-						itemId: "water",
-						location: {
-							scope: "inventory",
-							position: {
-								x: 0,
-								y: 0,
-							},
-						},
-						quantity: 1,
-					});
-					yield* spawnItemFx({
-						id: "runtime:save:second",
-						itemId: "water",
-						location: {
-							scope: "inventory",
-							position: {
-								x: 1,
-								y: 0,
-							},
-						},
-						quantity: 1,
-					});
+		return Effect.gen(function* () {
+			const runtimeSave = yield* RuntimeSaveFx;
+			const first = yield* spawnItemFx({
+				id: "runtime:save:first",
+				itemId: "water",
+				location: {
+					scope: "inventory",
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+				quantity: 1,
+			});
+			yield* spawnItemFx({
+				id: "runtime:save:second",
+				itemId: "water",
+				location: {
+					scope: "inventory",
+					position: {
+						x: 1,
+						y: 0,
+					},
+				},
+				quantity: 1,
+			});
 
-					yield* TestClock.adjust(15);
-					expect(saves).toHaveLength(1);
-					expect(saves[0]?.items).toHaveLength(2);
-					for (const item of saves[0]?.items ?? []) {
-						expect(item).not.toHaveProperty("revision");
-					}
+			yield* TestClock.adjust(15);
+			expect(saves).toHaveLength(1);
+			expect(saves[0]?.items).toHaveLength(2);
+			for (const item of saves[0]?.items ?? []) {
+				expect(item).not.toHaveProperty("revision");
+			}
 
-					const failure = yield* removeItemFx({
-						itemId: first.id,
-						revision: "revision:stale",
-					}).pipe(Effect.flip);
-					expect(failure).toBeDefined();
-					yield* runtimeSave.flush;
-					expect(saves).toHaveLength(1);
-					yield* runtimeSave.discard;
-				}).pipe(Effect.provide(Layer.merge(core, save))),
-			).pipe(
-				Effect.provide(
-					TestClock.layer({
-						warningDelay: "1 hour",
-					}),
-				),
-			),
-		);
+			const failure = yield* removeItemFx({
+				itemId: first.id,
+				revision: "revision:stale",
+			}).pipe(Effect.flip);
+			expect(failure).toBeDefined();
+			yield* runtimeSave.flush;
+			expect(saves).toHaveLength(1);
+			yield* runtimeSave.discard;
+		}).pipe(Effect.provide(Layer.merge(core, save)));
 	});
 
-	it("does not let event-only traffic wake or postpone runtime autosave", async () => {
+	it.effect("does not let event-only traffic wake or postpone runtime autosave", () => {
 		const savedItemCounts: number[] = [];
 		const core = GameCoreLayerFx({
 			config: createJobTestConfig(),
@@ -187,60 +177,50 @@ describe("RuntimeSaveLayerFx", () => {
 				}),
 		}).pipe(Layer.provide(core));
 
-		await Effect.runPromise(
-			Effect.scoped(
-				Effect.gen(function* () {
-					const runtimeSave = yield* RuntimeSaveFx;
-					yield* TestClock.adjust(40);
-					expect(savedItemCounts).toEqual([
-						0,
-					]);
+		return Effect.gen(function* () {
+			const runtimeSave = yield* RuntimeSaveFx;
+			yield* TestClock.adjust(40);
+			expect(savedItemCounts).toEqual([
+				0,
+			]);
 
-					yield* spawnItemFx({
-						id: "runtime:save:event-isolation",
-						itemId: "water",
-						location: {
-							scope: "inventory",
-							position: {
-								x: 0,
-								y: 0,
-							},
-						},
-						quantity: 1,
-					});
+			yield* spawnItemFx({
+				id: "runtime:save:event-isolation",
+				itemId: "water",
+				location: {
+					scope: "inventory",
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+				quantity: 1,
+			});
 
-					yield* TestClock.adjust(15);
-					yield* emitCompletedEventFx("job:save:event:0");
-					yield* TestClock.adjust(15);
-					yield* emitCompletedEventFx("job:save:event:1");
-					yield* TestClock.adjust(9);
-					yield* emitCompletedEventFx("job:save:event:2");
-					expect(savedItemCounts).toEqual([
-						0,
-					]);
+			yield* TestClock.adjust(15);
+			yield* emitCompletedEventFx("job:save:event:0");
+			yield* TestClock.adjust(15);
+			yield* emitCompletedEventFx("job:save:event:1");
+			yield* TestClock.adjust(9);
+			yield* emitCompletedEventFx("job:save:event:2");
+			expect(savedItemCounts).toEqual([
+				0,
+			]);
 
-					yield* TestClock.adjust(1);
-					expect(savedItemCounts).toEqual([
-						0,
-						1,
-					]);
+			yield* TestClock.adjust(1);
+			expect(savedItemCounts).toEqual([
+				0,
+				1,
+			]);
 
-					yield* emitCompletedEventFx("job:save:event:after-save");
-					yield* TestClock.adjust(60);
-					expect(savedItemCounts).toEqual([
-						0,
-						1,
-					]);
-					yield* runtimeSave.discard;
-				}).pipe(Effect.provide(Layer.merge(core, save))),
-			).pipe(
-				Effect.provide(
-					TestClock.layer({
-						warningDelay: "1 hour",
-					}),
-				),
-			),
-		);
+			yield* emitCompletedEventFx("job:save:event:after-save");
+			yield* TestClock.adjust(60);
+			expect(savedItemCounts).toEqual([
+				0,
+				1,
+			]);
+			yield* runtimeSave.discard;
+		}).pipe(Effect.provide(Layer.merge(core, save)));
 	});
 
 	it("serializes autosave and explicit flush so an older write cannot win", async () => {

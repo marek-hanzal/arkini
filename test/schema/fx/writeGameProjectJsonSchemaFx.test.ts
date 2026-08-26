@@ -1,7 +1,7 @@
 import { FileSystem, Path } from "effect";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect } from "effect";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "@effect/vitest";
 import { z } from "zod";
 
 import {
@@ -39,43 +39,41 @@ describe("writeGameProjectJsonSchemaFx", () => {
 		expect(createGameProjectJsonSchema().$defs).toHaveProperty("AssetCompositionSchema");
 	});
 
-	it("writes the portable game-project JSON Schema", async () => {
-		const jsonSchema = await Effect.runPromise(
-			Effect.gen(function* () {
-				const fileSystem = yield* FileSystem.FileSystem;
-				const path = yield* Path.Path;
-				const directory = yield* fileSystem.makeTempDirectoryScoped();
-				const output = path.join(directory, "schema.json");
+	it.effect("writes the portable game-project JSON Schema", () =>
+		Effect.gen(function* () {
+			const fileSystem = yield* FileSystem.FileSystem;
+			const path = yield* Path.Path;
+			const directory = yield* fileSystem.makeTempDirectoryScoped();
+			const output = path.join(directory, "schema.json");
 
-				yield* writeGameProjectJsonSchemaFx({
-					output,
-				});
+			yield* writeGameProjectJsonSchemaFx({
+				output,
+			});
 
-				return yield* fileSystem.readFileString(output);
-			}).pipe(Effect.provide(NodeServices.layer), Effect.scoped),
-		);
-		const schema = JSON.parse(jsonSchema);
+			const jsonSchema = yield* fileSystem.readFileString(output);
+			const schema = JSON.parse(jsonSchema);
 
-		expect(schema).toMatchObject({
-			$id: "urn:arkini:schema:game-project-source",
-			anyOf: expect.any(Array),
-		});
-		expect(Object.keys(schema.$defs ?? {})).not.toContain(
-			expect.stringMatching(/^__schema\d+$/),
-		);
-		expect(schema.$defs).toHaveProperty("ItemSchema");
-		expect(schema.$defs.StartSchema).toMatchObject({
-			required: expect.arrayContaining([
-				"currentSpace",
-			]),
-			properties: {
-				currentSpace: {
-					$ref: expect.stringMatching(
-						/^urn:arkini:schema:game-project-source#\/\$defs\//,
-					),
+			expect(schema).toMatchObject({
+				$id: "urn:arkini:schema:game-project-source",
+				anyOf: expect.any(Array),
+			});
+			expect(Object.keys(schema.$defs ?? {})).not.toContain(
+				expect.stringMatching(/^__schema\d+$/),
+			);
+			expect(schema.$defs).toHaveProperty("ItemSchema");
+			expect(schema.$defs.StartSchema).toMatchObject({
+				required: expect.arrayContaining([
+					"currentSpace",
+				]),
+				properties: {
+					currentSpace: {
+						$ref: expect.stringMatching(
+							/^urn:arkini:schema:game-project-source#\/\$defs\//,
+						),
+					},
 				},
-			},
-		});
-		expect(jsonSchema.length).toBeLessThan(1_000_000);
-	});
+			});
+			expect(jsonSchema.length).toBeLessThan(1_000_000);
+		}).pipe(Effect.provide(NodeServices.layer)),
+	);
 });

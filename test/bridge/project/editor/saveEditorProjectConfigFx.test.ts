@@ -54,6 +54,7 @@ describe("saveEditorProjectConfigFx", () => {
 				const { resources: _resources, ...commit } = createProject(1);
 				return Effect.succeed({
 					...commit,
+					previousRevision: 0,
 					title: committed.meta.title,
 					config: committed,
 				});

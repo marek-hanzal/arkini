@@ -17,7 +17,7 @@ export namespace createFilesystemCheatPreferencesFx {
 export const createFilesystemCheatPreferencesFx = Effect.fn("createFilesystemCheatPreferencesFx")(
 	function* ({ root, fileSystem: providedFileSystem }: createFilesystemCheatPreferencesFx.Props) {
 		const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
-		const currentPath = join(root, "cheats.available");
+		const currentPath = join(root, "cheats.available.json");
 		const writeSemaphore = yield* Semaphore.make(1);
 		const writeAvailableFx: CheatPreferences["writeAvailableFx"] = Effect.fn(
 			"FilesystemCheatPreferences.writeAvailableFx",
@@ -30,7 +30,7 @@ export const createFilesystemCheatPreferencesFx = Effect.fn("createFilesystemChe
 					currentPath,
 					value: available,
 					operation: "persist the cheat availability preference",
-					serialize: (value) => String(CheatAvailabilitySchema.parse(value)),
+					serialize: (value) => JSON.stringify(CheatAvailabilitySchema.parse(value)),
 				}),
 			),
 		);
@@ -41,10 +41,11 @@ export const createFilesystemCheatPreferencesFx = Effect.fn("createFilesystemChe
 				fallback: false,
 				operation: "read the cheat availability preference",
 				parse: (stored) => {
-					const value = stored.trim();
-					if (value === "true") return true;
-					if (value === "false") return false;
-					return undefined;
+					try {
+						return CheatAvailabilitySchema.safeParse(JSON.parse(stored)).data;
+					} catch {
+						return undefined;
+					}
 				},
 			}),
 			writeAvailableFx,

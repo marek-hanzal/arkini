@@ -8,7 +8,7 @@ import { createFilesystemLauncherPreferencesFx } from "../../electron/main/launc
 
 let root = "";
 const preferenceDirectory = () => join(root, "arkini", "game", "preferences");
-const currentPath = () => join(preferenceDirectory(), "launcher.last-package");
+const currentPath = () => join(preferenceDirectory(), "launcher.last-package.json");
 const pendingPath = () => join(preferenceDirectory(), "launcher-last-package.pending");
 
 const createPreferences = (fileSystem?: FileSystem.FileSystem) =>
@@ -47,7 +47,7 @@ describe("createFilesystemLauncherPreferencesFx", () => {
 	it("round-trips one normalized package identity atomically", async () => {
 		const preferences = await createPreferences();
 		await Effect.runPromise(preferences.writeLastPackageIdFx("  package:test  "));
-		expect(await readFile(currentPath(), "utf8")).toBe("package:test");
+		expect(await readFile(currentPath(), "utf8")).toBe('"package:test"');
 		expect(await Effect.runPromise(preferences.readLastPackageIdFx)).toBe("package:test");
 		await expect(access(pendingPath())).rejects.toBeDefined();
 	});
@@ -120,7 +120,7 @@ describe("createFilesystemLauncherPreferencesFx", () => {
 		await expect(
 			Effect.runPromise(failing.writeLastPackageIdFx("package:second")),
 		).rejects.toThrow("persist the last package preference");
-		expect(await readFile(currentPath(), "utf8")).toBe("package:first");
+		expect(await readFile(currentPath(), "utf8")).toBe('"package:first"');
 		await expect(access(pendingPath())).rejects.toBeDefined();
 	});
 

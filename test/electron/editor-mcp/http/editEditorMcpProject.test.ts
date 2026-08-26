@@ -17,7 +17,7 @@ describe("editor MCP project configuration", () => {
 			Effect.runPromise,
 			notifyProjectChanged,
 		);
-		await Effect.runPromise(
+		const created = await Effect.runPromise(
 			repository.createProjectFx({
 				projectId: "project-config",
 				version: "1.0",
@@ -41,7 +41,7 @@ describe("editor MCP project configuration", () => {
 		};
 		expect(config).toMatchObject({
 			projectId: "project-config",
-			revision: 0,
+			revision: created.revision,
 			version: "1.0",
 			config: {
 				meta: editorTestPayload.config.meta,
@@ -77,6 +77,7 @@ describe("editor MCP project configuration", () => {
 			},
 		]);
 		const project = await Effect.runPromise(repository.readProjectFx("project-config"));
+		if (project === null) throw new Error("Expected the edited project.");
 		expect(project?.config.meta).toEqual({
 			...editorTestPayload.config.meta,
 			title: "Renamed game",
@@ -93,7 +94,7 @@ describe("editor MCP project configuration", () => {
 		const stale = await client.callTool({
 			name: "edit_project",
 			arguments: {
-				revision: 0,
+				revision: created.revision,
 				patch: {
 					resources: editorTestPayload.config.resources,
 				},
@@ -115,6 +116,6 @@ describe("editor MCP project configuration", () => {
 		expect(notifyProjectChanged).toHaveBeenCalledOnce();
 		expect(
 			(await Effect.runPromise(repository.readProjectFx("project-config")))?.revision,
-		).toBe(1);
+		).toBe(project.revision);
 	});
 });

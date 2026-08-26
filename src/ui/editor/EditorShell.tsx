@@ -20,6 +20,7 @@ import {
 } from "~/ui/editor/useEditorActiveWorkspace";
 import { Tooltip } from "~/ui/overlay/Tooltip";
 import { EditorUnsavedChangesDialog } from "~/ui/editor/EditorUnsavedChangesDialog";
+import { useEditorProjectRefreshController } from "~/ui/editor/useEditorProjectRefreshController";
 import { useEditorUnsavedChangesOwner } from "~/ui/editor/useEditorUnsavedChangesRegistration";
 import { useEditorWorkspaceShortcuts } from "~/ui/editor/useEditorWorkspaceShortcuts";
 
@@ -48,6 +49,10 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 	});
 	const activeWorkspace = useEditorActiveWorkspace(project.projectId);
 	const [exitPending, setExitPending] = useState(false);
+	const refresh = useEditorProjectRefreshController({
+		blocked: exitPending,
+		projectId: project.projectId,
+	});
 	const [transitioningWorkspace, setTransitioningWorkspace] = useState<EditorWorkspaceId>();
 	const params = {
 		projectId: project.projectId,
@@ -58,7 +63,7 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 		unsavedChangesOwner.getSnapshot,
 	);
 	useEditorWorkspaceShortcuts({
-		enabled: !exitPending && !unsavedChanges.promptOpen,
+		enabled: !exitPending && !refresh.pending && !unsavedChanges.promptOpen,
 		projectId: project.projectId,
 	});
 	useBlocker({
@@ -88,7 +93,7 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 		router,
 	]);
 	const closeAndExit = useCallback(async () => {
-		if (exitPending) return;
+		if (exitPending || refresh.pending) return;
 		setExitPending(true);
 		try {
 			if (!(await unsavedChangesOwner.requestLeave("/main-menu"))) {
@@ -104,6 +109,7 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 		}
 	}, [
 		exitPending,
+		refresh.pending,
 		router,
 		unsavedChangesOwner,
 		waitForProjectWrites,
@@ -159,14 +165,28 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 					))}
 				</nav>
 				<Tooltip
-					content={exitPending ? "Exiting…" : "Exit"}
+					content={refresh.tooltip}
 					placement="right"
 				>
 					<Button
 						className="mt-auto size-11 min-h-0 shrink-0 border-transparent bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised"
+						data-ui="EditorProjectRefresh"
+						disabled={refresh.disabled}
+						cursorIntent={refresh.pending ? "progress" : undefined}
+						onClick={refresh.refresh}
+					>
+						<span className={`${refresh.icon} size-5`} />
+					</Button>
+				</Tooltip>
+				<Tooltip
+					content={exitPending ? "Exiting…" : "Exit"}
+					placement="right"
+				>
+					<Button
+						className="size-11 min-h-0 shrink-0 border-transparent bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised"
 						data-ui="EditorExit"
 						aria-label={exitPending ? "Exiting…" : "Exit"}
-						disabled={exitPending}
+						disabled={exitPending || refresh.pending}
 						cursorIntent={exitPending ? "progress" : undefined}
 						onClick={() => void closeAndExit()}
 					>

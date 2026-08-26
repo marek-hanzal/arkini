@@ -17,7 +17,7 @@ export namespace saveEditorAssetFx {
 	}
 }
 
-/** Validates and atomically inserts or explicitly replaces one editor PNG. */
+/** Validates and inserts or explicitly replaces one Editor PNG. */
 export const saveEditorAssetFx = Effect.fn("saveEditorAssetFx")(function* ({
 	expectedRevision,
 	file,

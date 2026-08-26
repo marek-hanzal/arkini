@@ -24,8 +24,8 @@ export const createFilesystemAppearancePreferencesFx = Effect.fn(
 	const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
 	const themeWriteSemaphore = yield* Semaphore.make(1);
 	const accentWriteSemaphore = yield* Semaphore.make(1);
-	const themePath = join(root, "appearance.theme");
-	const accentPath = join(root, "appearance.accent");
+	const themePath = join(root, "appearance.theme.json");
+	const accentPath = join(root, "appearance.accent.json");
 	const writeThemeFx: AppearancePreferences["writeThemeFx"] = Effect.fn(
 		"FilesystemAppearancePreferences.writeThemeFx",
 	)((theme) =>
@@ -37,7 +37,7 @@ export const createFilesystemAppearancePreferencesFx = Effect.fn(
 				currentPath: themePath,
 				value: theme,
 				operation: "persist the appearance preference",
-				serialize: (value) => AppearanceThemeSchema.parse(value),
+				serialize: (value) => JSON.stringify(AppearanceThemeSchema.parse(value)),
 			}),
 		),
 	);
@@ -52,7 +52,7 @@ export const createFilesystemAppearancePreferencesFx = Effect.fn(
 				currentPath: accentPath,
 				value: accent,
 				operation: "persist the appearance accent preference",
-				serialize: (value) => AppearanceAccentSchema.parse(value),
+				serialize: (value) => JSON.stringify(AppearanceAccentSchema.parse(value)),
 			}),
 		),
 	);
@@ -62,7 +62,13 @@ export const createFilesystemAppearancePreferencesFx = Effect.fn(
 			path: themePath,
 			fallback: "dark" as const,
 			operation: "read the appearance preference",
-			parse: (stored) => AppearanceThemeSchema.safeParse(stored.trim()).data,
+			parse: (stored) => {
+				try {
+					return AppearanceThemeSchema.safeParse(JSON.parse(stored)).data;
+				} catch {
+					return undefined;
+				}
+			},
 		}),
 		writeThemeFx,
 		readAccentFx: readElectronPreferenceFx({
@@ -70,7 +76,13 @@ export const createFilesystemAppearancePreferencesFx = Effect.fn(
 			path: accentPath,
 			fallback: "rose" as const,
 			operation: "read the appearance accent preference",
-			parse: (stored) => AppearanceAccentSchema.safeParse(stored.trim()).data,
+			parse: (stored) => {
+				try {
+					return AppearanceAccentSchema.safeParse(JSON.parse(stored)).data;
+				} catch {
+					return undefined;
+				}
+			},
 		}),
 		writeAccentFx,
 	} satisfies AppearancePreferences;

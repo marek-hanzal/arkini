@@ -12,7 +12,7 @@ import {
 
 let root = "";
 const preferenceDirectory = () => join(root, "arkini", "game", "preferences");
-const currentPath = () => join(preferenceDirectory(), "editor-mcp.port");
+const currentPath = () => join(preferenceDirectory(), "editor-mcp.port.json");
 const pendingPath = () => join(preferenceDirectory(), "editor-mcp.pending");
 
 const createPreferences = () =>

@@ -9,7 +9,7 @@ export interface EditorProjectDeleteDialogProps {
 	readonly onConfirm: () => void;
 }
 
-/** Makes permanent project deletion explicit before touching repository state. */
+/** Explains managed deletion and external-folder unregistration before repository mutation. */
 export const EditorProjectDeleteDialog = ({
 	error,
 	pending,
@@ -22,10 +22,10 @@ export const EditorProjectDeleteDialog = ({
 			className="w-full max-w-md rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
 			data-ui="EditorProjectDeleteDialog"
 		>
-			<h2 className="text-lg font-semibold">Delete project?</h2>
+			<h2 className="text-lg font-semibold">Remove project?</h2>
 			<p className="mt-2 text-sm leading-6 text-muted">
-				Delete <strong className="text-foreground">{project.title}</strong>, including all
-				of its resources and Board scenarios? This action is permanent and cannot be undone.
+				Remove <strong className="text-foreground">{project.title}</strong> from the Editor?
+				Managed projects are permanently deleted. Folders opened from disk remain untouched.
 			</p>
 			<p className="mt-2 text-xs text-subtle">Project ID: {project.projectId}</p>
 			{error === undefined ? null : (
@@ -46,7 +46,7 @@ export const EditorProjectDeleteDialog = ({
 					data-ui="EditorProjectDeleteConfirm"
 					onClick={onConfirm}
 				>
-					{pending ? "Deleting…" : "Delete project"}
+					{pending ? "Removing…" : "Remove project"}
 				</DangerButton>
 			</div>
 		</div>

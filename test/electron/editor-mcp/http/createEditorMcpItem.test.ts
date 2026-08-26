@@ -37,17 +37,20 @@ describe("editor MCP item creation", () => {
 				description: "Created through the editor MCP.",
 			},
 		});
+		const project = await Effect.runPromise(repository.readProjectFx("create-item-project"));
+		if (project === null) throw new Error("Expected the project with the created item.");
 		expect(created).toMatchObject({
 			content: [
 				{
 					text: expect.stringMatching(
-						/^Created simple item\.\nID: item:mcp-simple\nUID: .+\nRevision: 1$/,
+						new RegExp(
+							`^Created simple item\\.\\nID: item:mcp-simple\\nUID: .+\\nRevision: ${project.revision}$`,
+						),
 					),
 				},
 			],
 		});
-		const project = await Effect.runPromise(repository.readProjectFx("create-item-project"));
-		const item = project?.config.items["item:mcp-simple"];
+		const item = project.config.items["item:mcp-simple"];
 		expect(item).toMatchObject({
 			asset: {
 				default: [

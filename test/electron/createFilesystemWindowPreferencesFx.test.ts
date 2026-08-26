@@ -8,7 +8,7 @@ import { createFilesystemWindowPreferencesFx } from "../../electron/main/window/
 
 let root = "";
 const preferenceDirectory = () => join(root, "arkini", "game", "preferences");
-const modePath = () => join(preferenceDirectory(), "window.mode");
+const modePath = () => join(preferenceDirectory(), "window.mode.json");
 const pendingPath = () => join(preferenceDirectory(), "window.pending");
 
 const createPreferences = () =>
@@ -50,7 +50,7 @@ describe("createFilesystemWindowPreferencesFx", () => {
 			"fullscreen",
 		] as const) {
 			await Effect.runPromise(preferences.writeModeFx(mode));
-			expect(await readFile(modePath(), "utf8")).toBe(mode);
+			expect(await readFile(modePath(), "utf8")).toBe(JSON.stringify(mode));
 			expect(await Effect.runPromise(preferences.readModeFx)).toBe(mode);
 			await expect(access(pendingPath())).rejects.toBeDefined();
 		}
@@ -83,7 +83,7 @@ describe("createFilesystemWindowPreferencesFx", () => {
 		await expect(Effect.runPromise(failing.writeModeFx("fullscreen"))).rejects.toThrow(
 			"persist the window mode preference",
 		);
-		expect(await readFile(modePath(), "utf8")).toBe("bordered");
+		expect(await readFile(modePath(), "utf8")).toBe('"bordered"');
 		await expect(access(pendingPath())).rejects.toBeDefined();
 	});
 

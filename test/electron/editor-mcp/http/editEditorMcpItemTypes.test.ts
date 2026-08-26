@@ -17,7 +17,7 @@ describe("editor MCP typed item editing", () => {
 			Effect.runPromise,
 			notifyProjectChanged,
 		);
-		await Effect.runPromise(
+		const created = await Effect.runPromise(
 			repository.createProjectFx({
 				projectId: "edit-all-types-project",
 				version: "1.0",
@@ -132,7 +132,8 @@ describe("editor MCP typed item editing", () => {
 		expect(project?.config.items["item:edit-deposit"]).toMatchObject({
 			maxQueueSize: 4,
 		});
-		expect(project?.revision).toBe(cases.length * 2);
+		expect(project?.revision).toBeGreaterThan(created.revision);
+		const revisionAfterEdits = project?.revision;
 		expect(notifyProjectChanged).toHaveBeenCalledTimes(cases.length * 2);
 
 		for (const type of [
@@ -150,7 +151,7 @@ describe("editor MCP typed item editing", () => {
 		}
 		expect(
 			(await Effect.runPromise(repository.readProjectFx("edit-all-types-project")))?.revision,
-		).toBe(cases.length * 2);
+		).toBe(revisionAfterEdits);
 		expect(notifyProjectChanged).toHaveBeenCalledTimes(cases.length * 2);
 	});
 });

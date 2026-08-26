@@ -8,9 +8,10 @@ import { createFilesystemAppearancePreferencesFx } from "../../electron/main/app
 
 let root = "";
 const preferenceDirectory = () => join(root, "arkini", "game", "preferences");
-const themePath = () => join(preferenceDirectory(), "appearance.theme");
+const legacyThemePath = () => join(preferenceDirectory(), "appearance.theme");
+const themePath = () => join(preferenceDirectory(), "appearance.theme.json");
 const themePendingPath = () => join(preferenceDirectory(), "appearance.pending");
-const accentPath = () => join(preferenceDirectory(), "appearance.accent");
+const accentPath = () => join(preferenceDirectory(), "appearance.accent.json");
 const accentPendingPath = () => join(preferenceDirectory(), "appearance-accent.pending");
 
 const createPreferences = () =>
@@ -32,7 +33,7 @@ afterEach(async () => {
 });
 
 describe("createFilesystemAppearancePreferencesFx", () => {
-	it("defaults missing or malformed preferences to dark and rose", async () => {
+	it("defaults missing, legacy, or malformed preferences to dark and rose", async () => {
 		const preferences = await createPreferences();
 		expect(await Effect.runPromise(preferences.readThemeFx)).toBe("dark");
 		expect(await Effect.runPromise(preferences.readAccentFx)).toBe("rose");
@@ -40,6 +41,9 @@ describe("createFilesystemAppearancePreferencesFx", () => {
 		await mkdir(preferenceDirectory(), {
 			recursive: true,
 		});
+		await writeFile(legacyThemePath(), "light", "utf8");
+		expect(await Effect.runPromise(preferences.readThemeFx)).toBe("dark");
+
 		await writeFile(themePath(), "sepia", "utf8");
 		await writeFile(accentPath(), "ultraviolet", "utf8");
 
@@ -55,7 +59,7 @@ describe("createFilesystemAppearancePreferencesFx", () => {
 			"system",
 		] as const) {
 			await Effect.runPromise(preferences.writeThemeFx(theme));
-			expect(await readFile(themePath(), "utf8")).toBe(theme);
+			expect(await readFile(themePath(), "utf8")).toBe(JSON.stringify(theme));
 			expect(await Effect.runPromise(preferences.readThemeFx)).toBe(theme);
 			await expect(access(themePendingPath())).rejects.toBeDefined();
 		}
@@ -67,7 +71,7 @@ describe("createFilesystemAppearancePreferencesFx", () => {
 			"amber",
 		] as const) {
 			await Effect.runPromise(preferences.writeAccentFx(accent));
-			expect(await readFile(accentPath(), "utf8")).toBe(accent);
+			expect(await readFile(accentPath(), "utf8")).toBe(JSON.stringify(accent));
 			expect(await Effect.runPromise(preferences.readAccentFx)).toBe(accent);
 			await expect(access(accentPendingPath())).rejects.toBeDefined();
 		}
@@ -104,8 +108,8 @@ describe("createFilesystemAppearancePreferencesFx", () => {
 		await expect(Effect.runPromise(failing.writeAccentFx("blue"))).rejects.toThrow(
 			"persist the appearance accent preference",
 		);
-		expect(await readFile(themePath(), "utf8")).toBe("dark");
-		expect(await readFile(accentPath(), "utf8")).toBe("rose");
+		expect(await readFile(themePath(), "utf8")).toBe('"dark"');
+		expect(await readFile(accentPath(), "utf8")).toBe('"rose"');
 		await expect(access(themePendingPath())).rejects.toBeDefined();
 		await expect(access(accentPendingPath())).rejects.toBeDefined();
 	});

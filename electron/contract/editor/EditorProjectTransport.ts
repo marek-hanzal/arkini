@@ -20,6 +20,7 @@ export namespace EditorProjectTransport {
 		| "list-versions"
 		| "open-export-directory"
 		| "read-project"
+		| "refresh-project"
 		| "read-version-status"
 		| "read-board-scenario"
 		| "replace-config"
@@ -64,6 +65,7 @@ export namespace EditorProjectTransport {
 	}
 
 	export interface Commit extends Descriptor {
+		readonly previousRevision: number;
 		readonly revision: number;
 		readonly config: unknown;
 	}
@@ -74,7 +76,9 @@ export namespace EditorProjectTransport {
 		readonly bytes: Uint8Array;
 	}
 
-	export interface Project extends Commit {
+	export interface Project extends Descriptor {
+		readonly revision: number;
+		readonly config: unknown;
 		readonly resources: ReadonlyArray<Resource>;
 	}
 

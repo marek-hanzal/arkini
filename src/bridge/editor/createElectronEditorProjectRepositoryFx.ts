@@ -3,30 +3,23 @@ import { z } from "zod";
 
 import type { EditorProjectTransport } from "../../../electron/contract/editor/EditorProjectTransport";
 import { EditorProjectDescriptorSchema } from "~/editor/EditorProjectDescriptor";
-import { EditorProjectRecordSchema } from "~/editor/EditorProjectRecordSchema";
 import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
 import {
 	EditorProjectRepositoryError,
 	type EditorProjectRepositoryOperation,
 } from "~/editor/EditorProjectRepositoryError";
-import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import {
 	EditorBoardScenarioDescriptorSchema,
 	EditorBoardScenarioSchema,
 } from "~/editor/board/EditorBoardScenarioSchema";
 import { admitEditorProjectWriteFx } from "~/bridge/editor/EditorProjectWriteAdmission";
+import {
+	EditorProjectCommitPayloadSchema,
+	EditorProjectPayloadSchema,
+} from "~/bridge/editor/EditorProjectPayloadSchema";
 import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import { EditorNoteSchema } from "~/editor/note/EditorNoteSchema";
-
-const commitTransportSchema = z
-	.object({
-		...EditorProjectDescriptorSchema.shape,
-		revision: z.number().int().nonnegative(),
-		config: GameConfigSchema,
-	})
-	.strict();
 
 const versionReferenceSchema = z.discriminatedUnion("type", [
 	z
@@ -118,61 +111,6 @@ const versionDiffSchema = z
 	})
 	.strict();
 
-const materializeCommit = (transport: z.infer<typeof commitTransportSchema>) => {
-	const record = EditorProjectRecordSchema.parse({
-		projectId: transport.projectId,
-		config: transport.config,
-		version: transport.version,
-		revision: transport.revision,
-		createdAtMs: transport.createdAtMs,
-		updatedAtMs: transport.updatedAtMs,
-	});
-	if (transport.title !== record.config.meta.title || transport.version !== record.version) {
-		throw new Error("Editor IPC metadata does not match the canonical project config.");
-	}
-	return {
-		projectId: record.projectId,
-		title: record.config.meta.title,
-		version: record.version,
-		createdAtMs: record.createdAtMs,
-		updatedAtMs: record.updatedAtMs,
-		revision: record.revision,
-		config: record.config,
-	};
-};
-
-const parseCommit = (candidate: unknown) =>
-	materializeCommit(commitTransportSchema.parse(candidate));
-
-const parseProject = (candidate: unknown) => {
-	const project = z
-		.object({
-			...EditorProjectDescriptorSchema.shape,
-			revision: z.number().int().nonnegative(),
-			config: GameConfigSchema,
-			resources: ResourceSchema.array(),
-		})
-		.strict()
-		.parse(candidate);
-	return {
-		...materializeCommit({
-			projectId: project.projectId,
-			title: project.title,
-			version: project.version,
-			createdAtMs: project.createdAtMs,
-			updatedAtMs: project.updatedAtMs,
-			revision: project.revision,
-			config: project.config,
-		}),
-		resources: project.resources
-			.map((resource) => ({
-				...resource,
-				bytes: new Uint8Array(resource.bytes),
-			}))
-			.sort((left, right) => left.id.localeCompare(right.id)),
-	};
-};
-
 const parseBoardScenario = (candidate: unknown) => {
 	const scenario = EditorBoardScenarioSchema.parse(candidate);
 	return {
@@ -180,6 +118,9 @@ const parseBoardScenario = (candidate: unknown) => {
 		bytes: new Uint8Array(scenario.bytes),
 	};
 };
+
+const parseCommit = (candidate: unknown) => EditorProjectCommitPayloadSchema.parse(candidate);
+const parseProject = (candidate: unknown) => EditorProjectPayloadSchema.parse(candidate);
 
 const callFx = <Value, Parsed>(
 	operation: EditorProjectRepositoryOperation,
@@ -396,7 +337,14 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 				),
 			),
 		saveResourceFx: (request) =>
-			callFx("save-resource", () => window.arkini.editor.saveResource(request), parseProject),
+			writeFx(
+				"save-resource",
+				callFx(
+					"save-resource",
+					() => window.arkini.editor.saveResource(request),
+					parseProject,
+				),
+			),
 		upsertItemFx: (request) =>
 			writeFx(
 				"upsert-item",

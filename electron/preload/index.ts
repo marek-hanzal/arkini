@@ -168,6 +168,8 @@ const api: ArkiniElectronApi.Api = {
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectOpenExportDirectory),
 		readProject: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectRead, projectId),
+		refreshProject: (projectId) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectRefresh, projectId),
 		onProjectChanged: (listener) => {
 			editorProjectChangedListeners.add(listener);
 			return () => editorProjectChangedListeners.delete(listener);

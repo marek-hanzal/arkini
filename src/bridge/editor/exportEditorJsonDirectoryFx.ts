@@ -16,7 +16,7 @@ export const EditorSourceExportSchema = z
 
 export type EditorSourceExport = z.infer<typeof EditorSourceExportSchema>;
 
-/** Invokes the destructive main-process source exporter through the typed preload boundary. */
+/** Invokes the destructive main-process Editor-folder copy through the typed preload boundary. */
 export const exportEditorJsonDirectoryFx = Effect.fn("exportEditorJsonDirectoryFx")(
 	(projectId: string) =>
 		invokeEditorProjectTransportFx<

@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { EditorProjectTransport } from "../../../electron/contract/editor/EditorProjectTransport";
 import { createElectronEditorProjectRepositoryFx } from "~/bridge/editor/createElectronEditorProjectRepositoryFx";
+import { blockEditorProjectWrites } from "~/bridge/editor/EditorProjectWriteAdmission";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
@@ -23,12 +24,15 @@ const descriptor: EditorProjectTransport.Descriptor = {
 
 const commit: EditorProjectTransport.Commit = {
 	...descriptor,
+	previousRevision: 1,
 	revision: 2,
 	config: editorTestPayload.config,
 };
 
 const project: EditorProjectTransport.Project = {
-	...commit,
+	...descriptor,
+	revision: commit.revision,
+	config: commit.config,
 	resources: editorTestPayload.resources.map((resource) => ({
 		...resource,
 		bytes: new Uint8Array(resource.bytes),
@@ -79,6 +83,7 @@ const installEditorApi = () => {
 		listNotes: vi.fn(async () => success([])),
 		openExportDirectory: vi.fn(async () => success(undefined)),
 		readProject: vi.fn(async () => success(project)),
+		refreshProject: vi.fn(async () => success(project)),
 		onProjectChanged: vi.fn(() => () => undefined),
 		replaceConfig: vi.fn(async () => success(commit)),
 		replaceResource: vi.fn(async () => success(project)),
@@ -307,5 +312,25 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 		});
 		expect(saved.resources[0]?.bytes).toBeInstanceOf(Uint8Array);
 		expect(saved.resources[0]?.bytes).not.toBe(project.resources[0]?.bytes);
+	});
+
+	it("blocks save-resource IPC while a hard project replacement owns writes", async () => {
+		const editor = installEditorApi();
+		const repository = Effect.runSync(createElectronEditorProjectRepositoryFx);
+		const release = blockEditorProjectWrites();
+		try {
+			const failure = await readTypedFailure(
+				repository.saveResourceFx({
+					projectId: "project-one",
+					expectedRevision: project.revision,
+					overwrite: false,
+					resource: editorTestPayload.resources[0]!,
+				}),
+			);
+			expect(failure.operation).toBe("save-resource");
+			expect(editor.saveResource).not.toHaveBeenCalled();
+		} finally {
+			release();
+		}
 	});
 });

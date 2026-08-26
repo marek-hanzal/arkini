@@ -35,6 +35,7 @@ const createFixture = () => {
 		const { resources: _resources, ...commit } = createProject(1);
 		return Effect.succeed({
 			...commit,
+			previousRevision: 0,
 			config: {
 				...editorTestPayload.config,
 				items: {

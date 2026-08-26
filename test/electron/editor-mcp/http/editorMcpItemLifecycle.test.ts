@@ -17,7 +17,7 @@ describe("editor MCP item lifecycle", () => {
 			Effect.runPromise,
 			notifyProjectChanged,
 		);
-		await Effect.runPromise(
+		const created = await Effect.runPromise(
 			repository.createProjectFx({
 				projectId: "item-lifecycle",
 				version: "1.0",
@@ -51,7 +51,7 @@ describe("editor MCP item lifecycle", () => {
 			arguments: {
 				itemId: "water",
 				newItemId: "fresh-water",
-				revision: 0,
+				revision: created.revision,
 			},
 		});
 		expect(renamed.content).toMatchObject([
@@ -60,6 +60,7 @@ describe("editor MCP item lifecycle", () => {
 			},
 		]);
 		let project = await Effect.runPromise(repository.readProjectFx("item-lifecycle"));
+		if (project === null) throw new Error("Expected the renamed project.");
 		expect(project?.config.items.water).toBeUndefined();
 		expect(project?.config.items["fresh-water"]).toMatchObject({
 			id: "fresh-water",
@@ -75,7 +76,7 @@ describe("editor MCP item lifecycle", () => {
 		});
 		const impactContent = impact.content[0];
 		if (impactContent?.type !== "text") throw new Error("Missing delete impact text.");
-		expect(impactContent.text).toContain("Revision: 1");
+		expect(impactContent.text).toContain(`Revision: ${project.revision}`);
 		expect(impactContent.text).toContain("Safe delete: no");
 		expect(impactContent.text).toContain("start.board.0.itemId");
 		expect(() => JSON.parse(impactContent.text)).toThrow();
@@ -84,19 +85,21 @@ describe("editor MCP item lifecycle", () => {
 			name: "delete_item",
 			arguments: {
 				itemId: "fresh-water",
-				revision: 1,
+				revision: project.revision,
 			},
 		});
 		expect(safe.isError).toBe(true);
 		project = await Effect.runPromise(repository.readProjectFx("item-lifecycle"));
-		expect(project?.revision).toBe(1);
+		if (project === null) throw new Error("Expected the unchanged project.");
+		const renamedRevision = project.revision;
+		expect(renamedRevision).toBeGreaterThan(created.revision);
 		expect(notifyProjectChanged).toHaveBeenCalledOnce();
 
 		const deleted = await client.callTool({
 			name: "delete_item",
 			arguments: {
 				itemId: "fresh-water",
-				revision: 1,
+				revision: renamedRevision,
 				force: true,
 			},
 		});
@@ -106,7 +109,7 @@ describe("editor MCP item lifecycle", () => {
 			},
 		]);
 		project = await Effect.runPromise(repository.readProjectFx("item-lifecycle"));
-		expect(project?.revision).toBe(2);
+		expect(project?.revision).toBeGreaterThan(renamedRevision);
 		expect(project?.config.items["fresh-water"]).toBeUndefined();
 		expect(project?.config.start.board).toEqual([]);
 		expect(notifyProjectChanged).toHaveBeenCalledTimes(2);

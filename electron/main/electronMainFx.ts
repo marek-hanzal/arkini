@@ -21,7 +21,7 @@ import { registerEditorMcpPreferencesIpcFx } from "./editor-mcp/ipc/registerEdit
 import { createEditorMcpOwnershipFx } from "./editor-mcp/http/createEditorMcpOwnershipFx";
 import { createFilesystemEditorMcpPreferencesFx } from "./editor-mcp/preference/createFilesystemEditorMcpPreferencesFx";
 import { registerEditorProjectIpcFx } from "./editor-project/ipc/registerEditorProjectIpcFx";
-import { createSqliteEditorProjectRepositoryFx } from "./editor-project/sqlite/fx/createSqliteEditorProjectRepositoryFx";
+import { createFilesystemEditorProjectRepositoryFx } from "./editor-project/filesystem/fx/createFilesystemEditorProjectRepositoryFx";
 import { createFilesystemCliInstallationFx } from "./cli/createFilesystemCliInstallationFx";
 import { registerCliInstallationIpcFx } from "./cli/registerCliInstallationIpcFx";
 import { createChatGptViewControllerOwnershipFx } from "./chatgpt/createChatGptViewControllerOwnershipFx";
@@ -50,8 +50,9 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const userDataPath = app.getPath("userData");
 	const userDataPaths = yield* createArkiniUserDataPathsFx(userDataPath);
 	const editorProjectServiceOwnership: EditorProjectServiceOwnership =
-		yield* createSqliteEditorProjectRepositoryFx({
-			databasePath: userDataPaths.editor.database,
+		yield* createFilesystemEditorProjectRepositoryFx({
+			catalogPath: userDataPaths.editor.catalog,
+			projectsRoot: userDataPaths.editor.projects,
 		}).pipe(
 			Effect.map((repository) => ({
 				type: "ready" as const,
@@ -59,10 +60,10 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 			})),
 			Effect.catch((cause) =>
 				Effect.sync(() => {
-					console.error("Arkini editor database could not be initialized.", cause);
+					console.error("Arkini editor storage could not be initialized.", cause);
 					return {
 						type: "unavailable" as const,
-						message: "The editor database could not be initialized.",
+						message: "The editor storage could not be initialized.",
 					};
 				}),
 			),

@@ -12,9 +12,16 @@ export namespace EditorProjectAtom {
 		| {
 				readonly project: EditorProject;
 				readonly commit?: never;
+				readonly replacement?: never;
 		  }
 		| {
 				readonly commit: EditorProjectCommit;
+				readonly project?: never;
+				readonly replacement?: never;
+		  }
+		| {
+				readonly replacement: EditorProject;
+				readonly commit?: never;
 				readonly project?: never;
 		  };
 }
@@ -30,13 +37,13 @@ export const EditorProjectAtom = Atom.family((projectId: string) => {
 		pendingCommits: Map<number, EditorProjectCommit>,
 	) => {
 		let project = initial;
-		for (const revision of pendingCommits.keys()) {
-			if (revision <= project.revision) pendingCommits.delete(revision);
+		for (const [previousRevision, commit] of pendingCommits) {
+			if (commit.revision <= project.revision) pendingCommits.delete(previousRevision);
 		}
 		while (true) {
-			const commit = pendingCommits.get(project.revision + 1);
+			const commit = pendingCommits.get(project.revision);
 			if (commit === undefined) return project;
-			pendingCommits.delete(commit.revision);
+			pendingCommits.delete(commit.previousRevision);
 			project = {
 				...project,
 				...commit,
@@ -48,6 +55,14 @@ export const EditorProjectAtom = Atom.family((projectId: string) => {
 		(get) => get(stateAtom).project,
 		(context, command: EditorProjectAtom.Command) => {
 			const state = context.get(stateAtom);
+			if (command.replacement !== undefined) {
+				if (command.replacement.projectId !== projectId) return;
+				context.set(stateAtom, {
+					project: command.replacement,
+					pendingCommits: new Map(),
+				});
+				return;
+			}
 			const pendingCommits = new Map(state.pendingCommits);
 			if (command.project !== undefined) {
 				if (command.project.projectId !== projectId) return;
@@ -65,7 +80,7 @@ export const EditorProjectAtom = Atom.family((projectId: string) => {
 			if (command.commit.projectId !== projectId) return;
 			if (state.project !== undefined && command.commit.revision <= state.project.revision)
 				return;
-			pendingCommits.set(command.commit.revision, command.commit);
+			pendingCommits.set(command.commit.previousRevision, command.commit);
 			context.set(stateAtom, {
 				project:
 					state.project === undefined

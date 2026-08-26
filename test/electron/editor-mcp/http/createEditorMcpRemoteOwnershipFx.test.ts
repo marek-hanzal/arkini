@@ -6,8 +6,10 @@ import { createSqliteEditorMcpAuthOwnershipFx } from "../../../../electron/main/
 import { createEditorMcpOwnershipFx } from "../../../../electron/main/editor-mcp/http/createEditorMcpOwnershipFx";
 import type { EditorMcpTunnel } from "../../../../electron/main/editor-mcp/tunnel/EditorMcpTunnel";
 import { EditorMcpTunnelProvenanceHeader } from "../../../../electron/main/editor-mcp/tunnel/EditorMcpTunnelProvenanceHeader";
-import { createSqliteEditorProjectRepositoryFx } from "../../../../electron/main/editor-project/sqlite/fx/createSqliteEditorProjectRepositoryFx";
-import { reserveReleasedEditorMcpPort } from "./support/createEditorMcpHarness";
+import {
+	createEditorMcpProjectRepository,
+	reserveReleasedEditorMcpPort,
+} from "./support/createEditorMcpHarness";
 
 const cleanups: Array<() => Promise<void>> = [];
 
@@ -59,12 +61,7 @@ afterEach(async () => {
 const createRemoteOwnership = async (
 	checkRemoteFx: createEditorMcpOwnershipFx.Props["checkRemoteFx"] = () => Effect.void,
 ) => {
-	const repository = await Effect.runPromise(
-		createSqliteEditorProjectRepositoryFx({
-			databasePath: ":memory:",
-		}),
-	);
-	cleanups.push(() => Effect.runPromise(repository.closeFx));
+	const repository = await createEditorMcpProjectRepository((cleanup) => cleanups.push(cleanup));
 	const auth = Effect.runSync(
 		createSqliteEditorMcpAuthOwnershipFx({
 			databasePath: ":memory:",

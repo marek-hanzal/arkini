@@ -52,6 +52,7 @@ export namespace ArkiniElectronApi {
 		editorProjectList: "arkini:editor:project:list",
 		editorProjectOpenExportDirectory: "arkini:editor:project:open-export-directory",
 		editorProjectRead: "arkini:editor:project:read",
+		editorProjectRefresh: "arkini:editor:project:refresh",
 		editorProjectChanged: "arkini:editor:project:changed",
 		editorProjectReplaceConfig: "arkini:editor:project:replace-config",
 		editorProjectReplaceResource: "arkini:editor:project:replace-resource",
@@ -192,6 +193,9 @@ export namespace ArkiniElectronApi {
 			readonly readProject: (
 				projectId: string,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project | null>>;
+			readonly refreshProject: (
+				projectId: string,
+			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project>>;
 			readonly onProjectChanged: (listener: (projectId: string) => void) => () => void;
 			readonly replaceConfig: (
 				request: EditorProjectTransport.ReplaceConfigRequest,

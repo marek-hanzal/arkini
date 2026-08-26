@@ -7,7 +7,7 @@ export namespace reloadEditorProjectAfterVersionRefreshFailureFx {
 	}
 }
 
-/** Fails closed when SQLite was restored but the renderer could not publish its fresh truth. */
+/** Fails closed when the project was restored but the renderer could not publish its fresh truth. */
 export const reloadEditorProjectAfterVersionRefreshFailureFx = Effect.fn(
 	"reloadEditorProjectAfterVersionRefreshFailureFx",
 )(({ cause, projectId }: reloadEditorProjectAfterVersionRefreshFailureFx.Props) =>

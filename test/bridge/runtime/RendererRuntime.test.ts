@@ -10,7 +10,7 @@ afterAll(async () => {
 });
 
 describe("RendererRuntime", () => {
-	it("constructs synchronously before the lazy editor database is opened", () => {
+	it("constructs synchronously before the lazy Editor repository is opened", () => {
 		expect(RendererRuntime.runSync(Effect.succeed("ready"))).toBe("ready");
 		const editorBoardGame = RendererRuntime.runSync(Atom.get(EditorBoardGameResourceOwnerAtom));
 		expect(editorBoardGame).toBeDefined();

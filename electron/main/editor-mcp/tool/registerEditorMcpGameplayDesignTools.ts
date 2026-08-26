@@ -84,7 +84,7 @@ export const registerEditorMcpGameplayDesignTools = ({
 		"rename_item",
 		{
 			description:
-				"Rename one canonical item ID and every exact item reference atomically. The item UID, line IDs, asset IDs, type, and all other fields remain unchanged. An optional revision copied from item_config rejects stale edits.",
+				"Rename one canonical item ID and every exact item reference in one revision-guarded project write. The item UID, line IDs, asset IDs, type, and all other fields remain unchanged. An optional revision copied from item_config rejects stale edits.",
 			inputSchema: z
 				.object({
 					itemId: IdSchema.describe("The current exact item ID."),
@@ -133,7 +133,7 @@ export const registerEditorMcpGameplayDesignTools = ({
 		"delete_item",
 		{
 			description:
-				"Delete one item at the exact revision returned by item_delete_impact. Safe mode rejects referenced items. Force mode atomically removes the item and the referencing structures listed by that impact; it never guesses through stale state.",
+				"Delete one item at the exact revision returned by item_delete_impact. Safe mode rejects referenced items. Force mode removes the item and the referencing structures listed by that impact in one project write; it never guesses through stale state.",
 			inputSchema: z
 				.object({
 					itemId: IdSchema.describe("The exact item ID inspected by item_delete_impact."),

@@ -8,7 +8,7 @@ import { createFilesystemCheatPreferencesFx } from "../../electron/main/cheat/cr
 
 let root = "";
 const preferenceDirectory = () => join(root, "arkini", "game", "preferences");
-const currentPath = () => join(preferenceDirectory(), "cheats.available");
+const currentPath = () => join(preferenceDirectory(), "cheats.available.json");
 const pendingPath = () => join(preferenceDirectory(), "cheats-available.pending");
 
 const createPreferences = () =>

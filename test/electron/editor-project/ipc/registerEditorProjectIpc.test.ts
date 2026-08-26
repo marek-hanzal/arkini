@@ -119,6 +119,7 @@ const projectChannels = [
 	ArkiniElectronApi.channels.editorProjectList,
 	ArkiniElectronApi.channels.editorProjectOpenExportDirectory,
 	ArkiniElectronApi.channels.editorProjectRead,
+	ArkiniElectronApi.channels.editorProjectRefresh,
 	ArkiniElectronApi.channels.editorProjectReplaceConfig,
 	ArkiniElectronApi.channels.editorProjectReplaceResource,
 	ArkiniElectronApi.channels.editorProjectSaveResource,
@@ -230,6 +231,12 @@ describe("registerEditorProjectIpcFx", () => {
 			value: editorProjectIpcProject,
 		});
 		await expect(
+			invoke(ArkiniElectronApi.channels.editorProjectRefresh, "project-one"),
+		).resolves.toEqual({
+			type: "success",
+			value: editorProjectIpcProject,
+		});
+		await expect(
 			invoke(ArkiniElectronApi.channels.editorProjectCreate, createRequest),
 		).resolves.toEqual({
 			type: "success",
@@ -247,7 +254,7 @@ describe("registerEditorProjectIpcFx", () => {
 			type: "failure",
 			error: {
 				operation: "open-export-directory",
-				message: "No completed JSON source export is available.",
+				message: "No completed Editor project export is available.",
 			},
 		});
 		expect(electron.module.shell.openPath).not.toHaveBeenCalled();
@@ -439,8 +446,8 @@ describe("registerEditorProjectIpcFx", () => {
 			listProjectsFx: Effect.fail(
 				new EditorProjectRepositoryError({
 					operation: "list-projects",
-					message: "SQLite read failed.",
-					cause: new Error("private database detail"),
+					message: "Editor storage read failed.",
+					cause: new Error("private storage detail"),
 				}),
 			),
 		};
@@ -452,20 +459,20 @@ describe("registerEditorProjectIpcFx", () => {
 			type: "failure",
 			error: {
 				operation: "list-projects",
-				message: "SQLite read failed.",
+				message: "Editor storage read failed.",
 			},
 		});
-		expect(electron.handlers.size).toBe(30);
+		expect(electron.handlers.size).toBe(31);
 		electron.appListeners.get("will-quit")?.();
 		expect(electron.handlers.size).toBe(0);
 
 		register({
 			type: "unavailable",
-			message: "Editor database could not be opened.",
+			message: "Editor storage could not be opened.",
 		});
 		await expect(invoke(ArkiniElectronApi.channels.editorStatus)).resolves.toEqual({
 			type: "unavailable",
-			message: "Editor database could not be opened.",
+			message: "Editor storage could not be opened.",
 		});
 		await expect(invoke(ArkiniElectronApi.channels.editorAwaitIdle)).resolves.toEqual({
 			type: "success",

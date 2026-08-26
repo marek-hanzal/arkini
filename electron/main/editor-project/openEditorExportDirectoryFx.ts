@@ -14,7 +14,7 @@ export const openEditorExportDirectoryFx = Effect.fn("openEditorExportDirectoryF
 			catch: (cause) =>
 				new EditorProjectRepositoryError({
 					operation: "open-export-directory",
-					message: "The JSON source export folder could not be opened.",
+					message: "The Editor project export folder could not be opened.",
 					cause,
 				}),
 		}),

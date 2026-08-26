@@ -60,10 +60,10 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 					>
 						<span className="icon-[lucide--file-json-2] size-9 text-accent" />
 						<span className="text-lg">
-							{actions.active === "import-json" ? "Importing JSON…" : "Import JSON"}
+							{actions.active === "import-json" ? "Opening…" : "Open folder"}
 						</span>
 						<span className="text-xs font-medium opacity-75">
-							Choose a game source folder
+							Use an existing Editor project in place
 						</span>
 					</Button>
 					<Button

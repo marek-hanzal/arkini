@@ -22,6 +22,10 @@ export namespace EditorProjectRepository {
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
 	}
 
+	export interface OpenProjectProps {
+		readonly root: string;
+	}
+
 	export interface UpsertItemProps {
 		readonly expectedRevision?: number;
 		readonly projectId: string;

@@ -17,12 +17,12 @@ export namespace createFilesystemEditorMcpPreferencesFx {
 	}
 }
 
-/** Owns global MCP transport preferences independently from editor database readiness. */
+/** Owns global MCP transport preferences independently from Editor repository readiness. */
 export const createFilesystemEditorMcpPreferencesFx = Effect.fn(
 	"createFilesystemEditorMcpPreferencesFx",
 )(function* ({ root, fileSystem: provided }: createFilesystemEditorMcpPreferencesFx.Props) {
 	const fileSystem = provided ?? (yield* FileSystem.FileSystem);
-	const currentPath = join(root, "editor-mcp.port");
+	const currentPath = join(root, "editor-mcp.port.json");
 	const ngrokPath = join(root, "editor-mcp.ngrok.json");
 	const writeSemaphore = yield* Semaphore.make(1);
 	return {
@@ -31,7 +31,13 @@ export const createFilesystemEditorMcpPreferencesFx = Effect.fn(
 			path: currentPath,
 			fallback: DefaultEditorMcpPort,
 			operation: "read the editor MCP port preference",
-			parse: (stored) => EditorMcpPortSchema.safeParse(Number(stored.trim())).data,
+			parse: (stored) => {
+				try {
+					return EditorMcpPortSchema.safeParse(JSON.parse(stored)).data;
+				} catch {
+					return undefined;
+				}
+			},
 		}),
 		writePortFx: (candidate) =>
 			writeSemaphore.withPermits(1)(
@@ -42,7 +48,7 @@ export const createFilesystemEditorMcpPreferencesFx = Effect.fn(
 					currentPath,
 					value: candidate,
 					operation: "persist the editor MCP port preference",
-					serialize: (value) => String(EditorMcpPortSchema.parse(value)),
+					serialize: (value) => JSON.stringify(EditorMcpPortSchema.parse(value)),
 				}),
 			),
 		readNgrokFx: readElectronPreferenceFx({

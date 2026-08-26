@@ -133,9 +133,7 @@ const runCheckout = async ({
 			events,
 			exit,
 			published: registry.get(EditorProjectAtom(project.projectId)),
-			replacementEpoch: registry.get(
-				EditorProjectReplacementEpochAtom(project.projectId),
-			),
+			replacementEpoch: registry.get(EditorProjectReplacementEpochAtom(project.projectId)),
 		};
 	} finally {
 		registry.dispose();
@@ -143,7 +141,7 @@ const runCheckout = async ({
 };
 
 describe("checkoutEditorProjectVersionFx", () => {
-	it("discards drafts only after replacing SQLite state", async () => {
+	it("discards drafts only after replacing persisted state", async () => {
 		const result = await runCheckout();
 		expect(Exit.isSuccess(result.exit)).toBe(true);
 		expect(result.events).toEqual([

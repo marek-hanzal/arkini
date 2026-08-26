@@ -40,7 +40,7 @@ export namespace registerEditorProjectIpcFx {
 	}
 }
 
-/** Registers editor-only IPC even when SQLite is unavailable. */
+/** Registers editor-only IPC even when Editor persistence is unavailable. */
 export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx")(
 	({ trustedRenderer, ownership }: registerEditorProjectIpcFx.Props) =>
 		Effect.gen(function* () {
@@ -128,6 +128,14 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(repository, projectId) => repository.readProjectFx(projectId),
 					),
 				);
+				handle(ArkiniElectronApi.channels.editorProjectRefresh, (_event, candidate) =>
+					executeEditorProjectRepositoryFx(
+						"refresh-project",
+						ownership,
+						requestParser.parseProjectIdFx(candidate),
+						(repository, projectId) => repository.refreshProjectFx(projectId),
+					),
+				);
 				handle(ArkiniElectronApi.channels.editorProjectCreate, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"create-project",
@@ -200,7 +208,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 											new EditorProjectRepositoryError({
 												operation: "open-export-directory",
 												message:
-													"No completed JSON source export is available.",
+													"No completed Editor project export is available.",
 											}),
 										)
 									: Effect.succeed(root),
@@ -331,6 +339,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					ArkiniElectronApi.channels.editorProjectList,
 					ArkiniElectronApi.channels.editorProjectOpenExportDirectory,
 					ArkiniElectronApi.channels.editorProjectRead,
+					ArkiniElectronApi.channels.editorProjectRefresh,
 					ArkiniElectronApi.channels.editorProjectReplaceConfig,
 					ArkiniElectronApi.channels.editorProjectReplaceResource,
 					ArkiniElectronApi.channels.editorProjectSaveResource,

@@ -1,10 +1,12 @@
 import { Effect } from "effect";
 
 import type { EditorProjectTransport } from "../../../contract/editor/EditorProjectTransport";
-import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 
-import type { EditorProjectServiceOwnership } from "../EditorProjectServiceOwnership";
+import type {
+	EditorProjectServiceOwnership,
+	OwnedEditorProjectRepository,
+} from "../EditorProjectServiceOwnership";
 
 /** Admits and runs one editor-project operation, then exposes its stable transport envelope. */
 export const executeEditorProjectRepositoryFx = <Request, Value>(
@@ -12,7 +14,7 @@ export const executeEditorProjectRepositoryFx = <Request, Value>(
 	ownership: EditorProjectServiceOwnership,
 	requestFx: Effect.Effect<Request, EditorProjectRepositoryError>,
 	run: (
-		repository: EditorProjectRepositoryService,
+		repository: OwnedEditorProjectRepository,
 		request: Request,
 	) => Effect.Effect<Value, EditorProjectRepositoryError>,
 ): Effect.Effect<EditorProjectTransport.Result<Value>> =>

@@ -21,7 +21,7 @@ export const createFilesystemLauncherPreferencesFx = Effect.fn(
 	fileSystem: providedFileSystem,
 }: createFilesystemLauncherPreferencesFx.Props) {
 	const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
-	const currentPath = join(root, "launcher.last-package");
+	const currentPath = join(root, "launcher.last-package.json");
 	// The fixed pending path makes operation ordering part of this repository's contract.
 	const operations = yield* Semaphore.make(1);
 	const writeLastPackageIdFx: LauncherPreferences["writeLastPackageIdFx"] = Effect.fn(
@@ -35,7 +35,7 @@ export const createFilesystemLauncherPreferencesFx = Effect.fn(
 				currentPath,
 				value: packageId,
 				operation: "persist the last package preference",
-				serialize: (value) => LastPackageIdSchema.parse(value),
+				serialize: (value) => JSON.stringify(LastPackageIdSchema.parse(value)),
 			}),
 		),
 	);
@@ -46,7 +46,13 @@ export const createFilesystemLauncherPreferencesFx = Effect.fn(
 				path: currentPath,
 				fallback: null,
 				operation: "read the last package preference",
-				parse: (stored) => LastPackageIdSchema.safeParse(stored).data,
+				parse: (stored) => {
+					try {
+						return LastPackageIdSchema.safeParse(JSON.parse(stored)).data;
+					} catch {
+						return undefined;
+					}
+				},
 			}),
 		),
 		writeLastPackageIdFx,

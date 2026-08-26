@@ -13,7 +13,7 @@ export namespace importEditorArkpackFileFx {
 	}
 }
 
-/** Validates one arkpack and atomically creates one canonical editor project. */
+/** Validates one Arkpack and creates one managed filesystem Editor project. */
 export const importEditorArkpackFileFx = Effect.fn("importEditorArkpackFileFx")(function* ({
 	file,
 }: importEditorArkpackFileFx.Props) {

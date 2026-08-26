@@ -101,11 +101,10 @@ export const EditorBuild = () => {
 				</article>
 			)}
 			<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">
-				<h2 className="text-lg font-semibold">JSON source export</h2>
+				<h2 className="text-lg font-semibold">Editor project export</h2>
 				<p className="mt-1 text-sm text-muted">
-					Writes the current saved project as game.json, the current schema.json,
-					type-grouped item files, and every PNG resource. The exported root can be
-					selected directly by Import JSON.
+					Copies the complete saved Editor folder, including assets, notes, scenarios, and
+					version history. The exported folder can be opened directly by the Editor.
 				</p>
 				<div className="mt-4 flex flex-wrap gap-3">
 					<PrimaryButton

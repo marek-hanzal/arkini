@@ -69,7 +69,7 @@ const findButton = (container: ParentNode, label: string) => {
 };
 
 describe("EditorWelcome project deletion", () => {
-	it("requires an explicit irreversible confirmation before deleting the selected project", async () => {
+	it("explains managed deletion and external-folder removal before confirming", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);
 		const root = createRoot(container);
@@ -98,7 +98,8 @@ describe("EditorWelcome project deletion", () => {
 		const dialog = container.querySelector('[data-ui="EditorProjectDeleteDialog"]');
 		expect(dialog?.textContent).toContain("Arkini");
 		expect(dialog?.textContent).toContain("project-one");
-		expect(dialog?.textContent).toContain("permanent and cannot be undone");
+		expect(dialog?.textContent).toContain("Managed projects are permanently deleted");
+		expect(dialog?.textContent).toContain("Folders opened from disk remain untouched");
 		expect(actions.deleteProject).not.toHaveBeenCalled();
 
 		await act(async () => findButton(container, "Cancel").click());
@@ -106,7 +107,7 @@ describe("EditorWelcome project deletion", () => {
 		expect(actions.deleteProject).not.toHaveBeenCalled();
 
 		await act(async () => openDelete.click());
-		await act(async () => findButton(container, "Delete project").click());
+		await act(async () => findButton(container, "Remove project").click());
 		expect(actions.deleteProject).toHaveBeenCalledOnce();
 		expect(actions.deleteProject).toHaveBeenCalledWith("project-one");
 	});

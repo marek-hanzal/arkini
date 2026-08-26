@@ -5,10 +5,10 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { createSqliteEditorMcpAuthOwnershipFx } from "../../../../electron/main/editor-mcp/auth/createSqliteEditorMcpAuthOwnershipFx";
 import { createEditorMcpOwnershipFx } from "../../../../electron/main/editor-mcp/http/createEditorMcpOwnershipFx";
-import { createSqliteEditorProjectRepositoryFx } from "../../../../electron/main/editor-project/sqlite/fx/createSqliteEditorProjectRepositoryFx";
 import {
 	cleanupEditorMcpHarnesses,
 	createEditorMcpHarness,
+	createEditorMcpProjectRepository,
 	registerEditorMcpCleanup,
 	reserveReleasedEditorMcpPort,
 } from "./support/createEditorMcpHarness";
@@ -123,12 +123,7 @@ describe("createEditorMcpOwnershipFx", () => {
 					occupied.close((error) => (error === undefined ? resolve() : reject(error))),
 				),
 		);
-		const repository = await Effect.runPromise(
-			createSqliteEditorProjectRepositoryFx({
-				databasePath: ":memory:",
-			}),
-		);
-		registerEditorMcpCleanup(() => Effect.runPromise(repository.closeFx));
+		const repository = await createEditorMcpProjectRepository();
 		const ownership = createOwnership(port, {
 			type: "ready",
 			repository,
@@ -146,7 +141,7 @@ describe("createEditorMcpOwnershipFx", () => {
 	it("stays unavailable without binding when editor persistence failed", async () => {
 		const ownership = createOwnership(32_310, {
 			type: "unavailable",
-			message: "SQLite failed.",
+			message: "Editor storage failed.",
 		});
 
 		await expect(Effect.runPromise(ownership.startLocalFx)).resolves.toMatchObject({
@@ -163,12 +158,7 @@ describe("createEditorMcpOwnershipFx", () => {
 		let replacementPort = await reserveReleasedEditorMcpPort();
 		while (replacementPort === originalPort)
 			replacementPort = await reserveReleasedEditorMcpPort();
-		const repository = await Effect.runPromise(
-			createSqliteEditorProjectRepositoryFx({
-				databasePath: ":memory:",
-			}),
-		);
-		registerEditorMcpCleanup(() => Effect.runPromise(repository.closeFx));
+		const repository = await createEditorMcpProjectRepository();
 		const auth = Effect.runSync(
 			createSqliteEditorMcpAuthOwnershipFx({
 				databasePath: ":memory:",

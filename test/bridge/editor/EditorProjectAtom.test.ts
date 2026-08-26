@@ -104,14 +104,15 @@ describe("EditorProjectAtom", () => {
 					}
 				: resource,
 		);
-		const { resources: _resources, ...commit } = createProject(2);
+		const { resources: _resources, ...commit } = createProject(900);
 
 		registry.set(atom, {
-			project: createProject(0),
+			project: createProject(100),
 		});
 		registry.set(atom, {
 			commit: {
 				...commit,
+				previousRevision: 250,
 				config: {
 					...commit.config,
 					items: {
@@ -124,17 +125,17 @@ describe("EditorProjectAtom", () => {
 				},
 			},
 		});
-		expect(registry.get(atom)?.revision).toBe(0);
+		expect(registry.get(atom)?.revision).toBe(100);
 
 		registry.set(atom, {
 			project: {
-				...createProject(1),
+				...createProject(250),
 				resources: changedResources,
 			},
 		});
 
 		const projected = registry.get(atom);
-		expect(projected?.revision).toBe(2);
+		expect(projected?.revision).toBe(900);
 		expect(projected?.config.items.water?.title).toBe("Committed after asset");
 		expect(projected?.resources).toBe(changedResources);
 	});
@@ -143,17 +144,20 @@ describe("EditorProjectAtom", () => {
 		const registry = createRegistry();
 		const atom = EditorProjectAtom("project");
 		registry.mount(atom);
-		const { resources: _resources, ...commit } = createProject(1);
+		const { resources: _resources, ...commit } = createProject(500);
 
 		registry.set(atom, {
-			commit,
+			commit: {
+				...commit,
+				previousRevision: 100,
+			},
 		});
 		expect(registry.get(atom)).toBeUndefined();
 
 		registry.set(atom, {
-			project: createProject(0),
+			project: createProject(100),
 		});
-		expect(registry.get(atom)?.revision).toBe(1);
+		expect(registry.get(atom)?.revision).toBe(500);
 	});
 
 	it("keeps queued commits isolated to their Atom registry", () => {
@@ -162,16 +166,19 @@ describe("EditorProjectAtom", () => {
 		const atom = EditorProjectAtom("project");
 		first.mount(atom);
 		second.mount(atom);
-		const { resources: _resources, ...commit } = createProject(1);
+		const { resources: _resources, ...commit } = createProject(500);
 
 		first.set(atom, {
-			commit,
+			commit: {
+				...commit,
+				previousRevision: 100,
+			},
 		});
 		second.set(atom, {
-			project: createProject(0),
+			project: createProject(100),
 		});
 
 		expect(first.get(atom)).toBeUndefined();
-		expect(second.get(atom)?.revision).toBe(0);
+		expect(second.get(atom)?.revision).toBe(100);
 	});
 });

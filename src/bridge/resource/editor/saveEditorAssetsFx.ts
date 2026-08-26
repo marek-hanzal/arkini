@@ -14,7 +14,7 @@ export namespace saveEditorAssetsFx {
 	}
 }
 
-/** Validates one selected PNG batch and atomically saves it into the canonical project. */
+/** Validates one selected PNG batch and saves it into the canonical project. */
 export const saveEditorAssetsFx = Effect.fn("saveEditorAssetsFx")(function* ({
 	files,
 	projectId,

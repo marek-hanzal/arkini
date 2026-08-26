@@ -295,7 +295,7 @@ describe("editor MCP server", () => {
 			Effect.runPromise,
 			(projectId) => notifications.push(projectId),
 		);
-		await Effect.runPromise(
+		const created = await Effect.runPromise(
 			repository.createProjectFx({
 				projectId: "version-project",
 				version: "1.0",
@@ -346,7 +346,7 @@ describe("editor MCP server", () => {
 		await Effect.runPromise(
 			repository.replaceConfigFx({
 				projectId: "version-project",
-				expectedRevision: 0,
+				expectedRevision: created.revision,
 				config: {
 					...editorTestPayload.config,
 					meta: {

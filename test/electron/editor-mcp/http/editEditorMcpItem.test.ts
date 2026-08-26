@@ -31,7 +31,7 @@ describe("editor MCP item editing", () => {
 			title: "Test Producer",
 			description: "Existing non-simple item.",
 		};
-		await Effect.runPromise(
+		const created = await Effect.runPromise(
 			repository.createProjectFx({
 				projectId: "edit-simple-project",
 				version: "1.0",
@@ -65,7 +65,7 @@ describe("editor MCP item editing", () => {
 			return JSON.parse(content.text) as unknown;
 		};
 		const waterConfig = {
-			revision: 0,
+			revision: created.revision,
 			item: {
 				...water,
 				maxCount: 2,
@@ -73,7 +73,7 @@ describe("editor MCP item editing", () => {
 		};
 		expect(await readConfig("water")).toEqual(waterConfig);
 		expect(await readConfig(producer.id)).toEqual({
-			revision: 0,
+			revision: created.revision,
 			item: producer,
 		});
 
@@ -88,6 +88,8 @@ describe("editor MCP item editing", () => {
 				},
 			},
 		});
+		const project = await Effect.runPromise(repository.readProjectFx("edit-simple-project"));
+		if (project === null) throw new Error("Expected the edited project.");
 		expect(edited).toMatchObject({
 			content: [
 				{
@@ -95,14 +97,13 @@ describe("editor MCP item editing", () => {
 						"Edited simple item.",
 						"ID: water",
 						"UID: water",
-						"Revision: 1",
+						`Revision: ${project.revision}`,
 						"Replaced: maxCount, title",
 					].join("\n"),
 				},
 			],
 		});
-		const project = await Effect.runPromise(repository.readProjectFx("edit-simple-project"));
-		expect(project?.config.items.water).toEqual({
+		expect(project.config.items.water).toEqual({
 			...water,
 			title: "Fresh Water",
 		});
@@ -122,7 +123,7 @@ describe("editor MCP item editing", () => {
 			content: [
 				{
 					text: expect.stringContaining(
-						"Revision 0 is stale; the open project is at revision 1.",
+						`Revision ${created.revision} is stale; the open project is at revision ${project.revision}.`,
 					),
 				},
 			],
@@ -169,6 +170,6 @@ describe("editor MCP item editing", () => {
 		expect(notifyProjectChanged).toHaveBeenCalledOnce();
 		expect(
 			(await Effect.runPromise(repository.readProjectFx("edit-simple-project")))?.revision,
-		).toBe(1);
+		).toBe(project.revision);
 	});
 });

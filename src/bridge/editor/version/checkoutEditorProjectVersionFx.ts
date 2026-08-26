@@ -20,7 +20,7 @@ export namespace checkoutEditorProjectVersionFx {
 	}
 }
 
-/** Performs the terminal renderer handshake before one atomic SQLite project replacement. */
+/** Performs the terminal renderer handshake before one persisted project replacement. */
 export const checkoutEditorProjectVersionFx = Effect.fn("checkoutEditorProjectVersionFx")(
 	({
 		confirmDiscardCurrentChanges,

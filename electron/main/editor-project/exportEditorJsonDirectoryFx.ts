@@ -1,18 +1,16 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import { randomUUID } from "node:crypto";
 import { app, dialog, type BrowserWindow } from "electron";
 import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
-import type { EditorProject } from "~/editor/EditorProject";
-import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
-import { writeGameSourceDirectoryFx } from "~/engine/source/fx/writeGameSourceDirectoryFx";
+import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnership";
+import { withFilesystemEditorProjectLockFx } from "./filesystem/fx/withFilesystemEditorProjectLockFx";
 
 export namespace exportEditorJsonDirectoryFx {
 	export interface Props {
 		readonly projectId: string;
-		readonly repository: EditorProjectRepositoryService;
+		readonly repository: OwnedEditorProjectRepository;
 		readonly window: BrowserWindow;
 	}
 
@@ -33,21 +31,37 @@ const containsPath = (path: Path.Path, parent: string, candidate: string) => {
 const overlapsPath = (path: Path.Path, left: string, right: string) =>
 	containsPath(path, left, right) || containsPath(path, right, left);
 
-const assertSafeExportRootFx = Effect.fn("assertSafeExportRootFx")(function* (root: string) {
+const assertSafeExportRootFx = Effect.fn("assertSafeExportRootFx")(function* ({
+	source,
+	target,
+}: {
+	readonly source: string;
+	readonly target: string;
+}) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
-	const resolved = yield* fileSystem.realPath(path.resolve(root));
-	if (path.parse(resolved).root === resolved) {
-		return yield* Effect.fail(new Error("A filesystem root cannot be managed by the Editor."));
-	}
+	const resolved = yield* fileSystem.realPath(path.resolve(target));
+	if (path.parse(resolved).root === resolved)
+		return yield* Effect.fail(new Error("A filesystem root cannot be replaced by the Editor."));
+	if (overlapsPath(path, source, resolved))
+		return yield* Effect.fail(
+			new Error(
+				"The export folder cannot contain or be contained by the open Editor project.",
+			),
+		);
+
 	const home = yield* fileSystem.realPath(app.getPath("home"));
 	const protectedTrees = yield* Effect.forEach(
 		[
 			app.getPath("userData"),
-			app.getAppPath(),
-			...(typeof process.resourcesPath === "string"
+			...(app.isPackaged
 				? [
-						process.resourcesPath,
+						app.getAppPath(),
+						...(typeof process.resourcesPath === "string"
+							? [
+									process.resourcesPath,
+								]
+							: []),
 					]
 				: []),
 		],
@@ -59,88 +73,59 @@ const assertSafeExportRootFx = Effect.fn("assertSafeExportRootFx")(function* (ro
 	) {
 		return yield* Effect.fail(
 			new Error(
-				"Choose a dedicated export folder outside the home root, application bundle, source checkout, and Arkini data directory.",
+				"Choose a dedicated export folder outside the home root, application bundle, and Arkini data directory.",
 			),
 		);
 	}
 	return resolved;
 });
 
-const replaceExportRootFx = Effect.fn("replaceExportRootFx")(function* ({
-	project,
+const copyEditorProjectFx = Effect.fn("copyEditorProjectFx")(function* ({
+	revision,
+	source,
 	target,
 }: {
-	readonly project: EditorProject;
+	readonly revision: number;
+	readonly source: string;
 	readonly target: string;
 }) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
-	const parent = path.dirname(target);
-	const basename = path.basename(target);
-	const suffix = randomUUID();
-	const staging = path.join(parent, `.${basename}.${suffix}.pending`);
-	const previous = path.join(parent, `.${basename}.${suffix}.previous`);
-
-	const writeAndSwap = Effect.gen(function* () {
-		yield* fileSystem.makeDirectory(staging, {
-			recursive: true,
-		});
-		const written = yield* writeGameSourceDirectoryFx({
-			config: project.config,
-			output: staging,
-			resources: project.resources,
-		});
-		const swap = fileSystem.rename(target, previous).pipe(
-			Effect.andThen(
-				fileSystem
-					.rename(staging, target)
-					.pipe(
-						Effect.catch((cause) =>
-							fileSystem
-								.rename(previous, target)
-								.pipe(Effect.andThen(Effect.fail(cause))),
-						),
-					),
-			),
-			Effect.andThen(
-				fileSystem
-					.remove(previous, {
-						force: true,
-						recursive: true,
-					})
-					.pipe(Effect.ignore),
-			),
-		);
-		yield* Effect.uninterruptible(swap);
-		return {
-			json: written.json,
-			projectDirectory: target,
-			resources: written.resources,
-			revision: project.revision,
-			root: target,
-		} satisfies exportEditorJsonDirectoryFx.Success;
+	yield* fileSystem.remove(target, {
+		force: true,
+		recursive: true,
 	});
-
-	return yield* writeAndSwap.pipe(
-		Effect.ensuring(
-			fileSystem
-				.remove(staging, {
-					force: true,
-					recursive: true,
-				})
-				.pipe(Effect.ignore),
-		),
-	);
+	yield* fileSystem.copy(source, target, {
+		overwrite: true,
+		preserveTimestamps: true,
+	});
+	const files = yield* fileSystem.readDirectory(target, {
+		recursive: true,
+	});
+	for (const file of files) {
+		if (file === "editor.lock" || file.endsWith(".tmp"))
+			yield* fileSystem.remove(path.join(target, file), {
+				force: true,
+				recursive: true,
+			});
+	}
+	return {
+		json: files.filter((file) => file.endsWith(".json")).length,
+		projectDirectory: target,
+		resources: files.filter((file) => file.endsWith(".png")).length,
+		revision,
+		root: target,
+	} satisfies exportEditorJsonDirectoryFx.Success;
 });
 
-/** Replaces one explicitly selected Editor-managed folder with a fresh JSON source tree. */
+/** Replaces one explicitly selected folder with a direct copy of the open Editor project. */
 export const exportEditorJsonDirectoryFx = Effect.fn("exportEditorJsonDirectoryFx")(
 	({ projectId, repository, window }: exportEditorJsonDirectoryFx.Props) =>
 		Effect.gen(function* () {
 			const selection = yield* Effect.tryPromise({
 				try: () =>
 					dialog.showOpenDialog(window, {
-						title: "Choose Editor-managed JSON export folder",
+						title: "Choose Editor project export folder",
 						buttonLabel: "Choose folder",
 						properties: [
 							"openDirectory",
@@ -151,14 +136,30 @@ export const exportEditorJsonDirectoryFx = Effect.fn("exportEditorJsonDirectoryF
 			});
 			const selected = selection.filePaths[0];
 			if (selection.canceled || selected === undefined) return null;
-			const target = yield* assertSafeExportRootFx(selected);
+
+			yield* repository.awaitIdleFx;
+			const [project, source] = yield* Effect.all([
+				repository.readProjectFx(projectId),
+				repository.readProjectRootFx(projectId),
+			]);
+			if (project === null || source === null)
+				return yield* Effect.fail(
+					new EditorProjectRepositoryError({
+						operation: "export-json-directory",
+						message: `Editor project ${projectId} does not exist.`,
+					}),
+				);
+			const target = yield* assertSafeExportRootFx({
+				source,
+				target: selected,
+			});
 			const confirmation = yield* Effect.tryPromise({
 				try: () =>
 					dialog.showMessageBox(window, {
 						type: "warning",
-						title: "Replace Editor-managed export folder?",
+						title: "Replace Editor project export folder?",
 						message: "Replace the entire selected folder?",
-						detail: `${target}\n\nEvery existing file and subfolder will be permanently deleted and replaced by the current Editor source export.`,
+						detail: `${target}\n\nEvery existing file and subfolder will be permanently deleted and replaced by the open Editor project folder.`,
 						buttons: [
 							"Cancel",
 							"Replace and export",
@@ -171,20 +172,14 @@ export const exportEditorJsonDirectoryFx = Effect.fn("exportEditorJsonDirectoryF
 			});
 			if (confirmation.response !== 1) return null;
 
-			yield* repository.awaitIdleFx;
-			const project = yield* repository.readProjectFx(projectId);
-			if (project === null) {
-				return yield* Effect.fail(
-					new EditorProjectRepositoryError({
-						operation: "export-json-directory",
-						message: `Editor project ${projectId} does not exist.`,
-					}),
-				);
-			}
-			return yield* replaceExportRootFx({
-				project,
-				target,
-			});
+			return yield* withFilesystemEditorProjectLockFx(
+				source,
+				copyEditorProjectFx({
+					revision: project.revision,
+					source,
+					target,
+				}),
+			);
 		}).pipe(
 			Effect.provide(NodeServices.layer),
 			Effect.mapError((cause) =>
@@ -195,7 +190,7 @@ export const exportEditorJsonDirectoryFx = Effect.fn("exportEditorJsonDirectoryF
 							message:
 								cause instanceof Error
 									? cause.message
-									: "The JSON source directory could not be exported.",
+									: "The Editor project folder could not be exported.",
 							cause,
 						}),
 			),

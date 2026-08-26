@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { vi } from "vitest";
 
 import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
-import type { SqliteEditorProjectRepository } from "../../../../../electron/main/editor-project/sqlite/fx/createSqliteEditorProjectRepositoryFx";
+import type { OwnedEditorProjectRepository } from "../../../../../electron/main/editor-project/EditorProjectServiceOwnership";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 export const editorProjectIpcDescriptor = {
@@ -15,12 +15,15 @@ export const editorProjectIpcDescriptor = {
 
 export const editorProjectIpcCommit = {
 	...editorProjectIpcDescriptor,
+	previousRevision: 0,
 	revision: 1,
 	config: editorTestPayload.config,
 };
 
 export const editorProjectIpcProject = {
-	...editorProjectIpcCommit,
+	...editorProjectIpcDescriptor,
+	revision: editorProjectIpcCommit.revision,
+	config: editorProjectIpcCommit.config,
 	resources: editorTestPayload.resources,
 };
 
@@ -47,7 +50,7 @@ export const editorProjectIpcNote = {
 };
 
 /** Creates one explicit repository spy for the editor-project IPC boundary. */
-export const createEditorProjectIpcRepository = (): SqliteEditorProjectRepository => ({
+export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository => ({
 	awaitIdleFx: Effect.void,
 	createProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	createVersionFx: vi.fn(() => Effect.succeed(editorProjectIpcVersion)),
@@ -87,7 +90,10 @@ export const createEditorProjectIpcRepository = (): SqliteEditorProjectRepositor
 			editorProjectIpcVersion,
 		]),
 	),
+	openProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	readProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
+	readProjectRootFx: vi.fn(() => Effect.succeed("/editor/project-one")),
+	refreshProjectFx: vi.fn(() => Effect.succeed(editorProjectIpcProject)),
 	readVersionStatusFx: vi.fn(() =>
 		Effect.succeed({
 			canCommit: true,

@@ -1,5 +1,5 @@
 import { Deferred, Effect, Fiber, Stream } from "effect";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "@effect/vitest";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
 import { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
@@ -11,60 +11,48 @@ import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 
 describe("committed transition events", () => {
-	it("replays the current transition and then every later commit", async () => {
-		const [current, next, itemId] = await Effect.runPromise(
-			Effect.scoped(
-				Effect.gen(function* () {
-					const transitions = yield* CommittedTransitionsFx;
-					const replaySeen = yield* Deferred.make<void>();
-					const transitionsFiber = yield* transitions.changes.pipe(
-						Stream.tap(() => Deferred.succeed(replaySeen, undefined)),
-						Stream.take(2),
-						Stream.runCollect,
-						Effect.forkChild,
-					);
-					yield* Deferred.await(replaySeen);
-					const item = yield* spawnItemFx({
-						id: "runtime:subscription:first-tail",
-						itemId: "water",
-						location: {
-							scope: "inventory",
-							position: {
-								x: 0,
-								y: 0,
-							},
-						},
-						quantity: 1,
-					});
-					const [current, next] = Array.from(yield* Fiber.join(transitionsFiber));
-					if (current === undefined || next === undefined) {
-						return yield* Effect.die(
-							"Expected current replay and one committed transition.",
-						);
-					}
+	it.effect("replays the current transition and then every later commit", () =>
+		Effect.gen(function* () {
+			const transitions = yield* CommittedTransitionsFx;
+			const replaySeen = yield* Deferred.make<void>();
+			const transitionsFiber = yield* transitions.changes.pipe(
+				Stream.tap(() => Deferred.succeed(replaySeen, undefined)),
+				Stream.take(2),
+				Stream.runCollect,
+				Effect.forkChild,
+			);
+			yield* Deferred.await(replaySeen);
+			const item = yield* spawnItemFx({
+				id: "runtime:subscription:first-tail",
+				itemId: "water",
+				location: {
+					scope: "inventory",
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+				quantity: 1,
+			});
+			const [current, next] = Array.from(yield* Fiber.join(transitionsFiber));
+			if (current === undefined || next === undefined) {
+				return yield* Effect.die("Expected current replay and one committed transition.");
+			}
 
-					return [
-						current,
-						next,
-						item.id,
-					] as const;
+			expect(current.sequence).toBe(0);
+			expect(current.previousRuntime).toBeNull();
+			expect(current.runtime.items).toEqual([]);
+			expect(next.sequence).toBe(1);
+			expect(next.previousRuntime).toBe(current.runtime);
+			expect(next.runtime.items.some(({ id }) => id === item.id)).toBe(true);
+		}).pipe(
+			Effect.provide(
+				GameLayerFx({
+					config: createJobTestConfig(),
 				}),
-			).pipe(
-				Effect.provide(
-					GameLayerFx({
-						config: createJobTestConfig(),
-					}),
-				),
 			),
-		);
-
-		expect(current.sequence).toBe(0);
-		expect(current.previousRuntime).toBeNull();
-		expect(current.runtime.items).toEqual([]);
-		expect(next.sequence).toBe(1);
-		expect(next.previousRuntime).toBe(current.runtime);
-		expect(next.runtime.items.some((item) => item.id === itemId)).toBe(true);
-	});
+		),
+	);
 
 	it("does not publish events for a candidate runtime that fails validation", async () => {
 		const session = await createTestGameSession({

@@ -1,18 +1,18 @@
-import { Cause, Deferred, Effect, Exit, SubscriptionRef } from "effect";
-import { describe, expect, it } from "vitest";
+import { Cause, Deferred, Effect, Exit, Fiber, SubscriptionRef } from "effect";
+import { describe, expect, it } from "@effect/vitest";
 import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
 import { createArkpackCatalogFx } from "~/bridge/arkpack/createArkpackCatalogFx";
 import { builtIn, imported } from "~test/bridge/arkpack/createArkpackCatalogFx.test/fixture";
 
 describe("createArkpackCatalogFx lifecycle", () => {
-	it("settles a malformed import defect and permits an exact retry", async () => {
-		let descriptors: ReadonlyArray<ArkpackDescriptor> = [
-			builtIn,
-		];
-		let attempts = 0;
-		const malformed = new Error("Invalid pack: magic header mismatch.");
-		const catalog = Effect.runSync(
-			createArkpackCatalogFx({
+	it.effect("settles a malformed import defect and permits an exact retry", () =>
+		Effect.gen(function* () {
+			let descriptors: ReadonlyArray<ArkpackDescriptor> = [
+				builtIn,
+			];
+			let attempts = 0;
+			const malformed = new Error("Invalid pack: magic header mismatch.");
+			const catalog = yield* createArkpackCatalogFx({
 				listFx: Effect.sync(() => descriptors),
 				importFileFx: () =>
 					Effect.suspend(() => {
@@ -24,42 +24,40 @@ describe("createArkpackCatalogFx lifecycle", () => {
 						];
 						return Effect.succeed(imported);
 					}),
-			}),
-		);
+			});
 
-		const first = await Effect.runPromiseExit(catalog.importFileFx({} as File));
-		expect(Exit.isFailure(first)).toBe(true);
-		if (Exit.isFailure(first)) {
-			expect(Cause.hasDies(first.cause)).toBe(true);
-			expect(Cause.squash(first.cause)).toBe(malformed);
-		}
-		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
-			type: "failed",
-			error: malformed,
-		});
+			const first = yield* Effect.exit(catalog.importFileFx({} as File));
+			expect(Exit.isFailure(first)).toBe(true);
+			if (Exit.isFailure(first)) {
+				expect(Cause.hasDies(first.cause)).toBe(true);
+				expect(Cause.squash(first.cause)).toBe(malformed);
+			}
+			expect(yield* SubscriptionRef.get(catalog.state)).toEqual({
+				type: "failed",
+				error: malformed,
+			});
 
-		await expect(catalog.importFileFx({} as File).pipe(Effect.runPromise)).resolves.toBe(
-			imported,
-		);
-		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
-			type: "ready",
-			arkpacks: [
+			expect(yield* catalog.importFileFx({} as File)).toBe(imported);
+			expect(yield* SubscriptionRef.get(catalog.state)).toEqual({
+				type: "ready",
+				arkpacks: [
+					builtIn,
+					imported,
+				],
+			});
+		}),
+	);
+
+	it.effect("publishes loading before import and remove operations complete", () =>
+		Effect.gen(function* () {
+			let descriptors: ReadonlyArray<ArkpackDescriptor> = [
 				builtIn,
-				imported,
-			],
-		});
-	});
-
-	it("publishes loading before import and remove operations complete", async () => {
-		let descriptors: ReadonlyArray<ArkpackDescriptor> = [
-			builtIn,
-		];
-		const importStarted = Effect.runSync(Deferred.make<void>());
-		const finishImport = Effect.runSync(Deferred.make<void>());
-		const removeStarted = Effect.runSync(Deferred.make<void>());
-		const finishRemove = Effect.runSync(Deferred.make<void>());
-		const catalog = Effect.runSync(
-			createArkpackCatalogFx({
+			];
+			const importStarted = yield* Deferred.make<void>();
+			const finishImport = yield* Deferred.make<void>();
+			const removeStarted = yield* Deferred.make<void>();
+			const finishRemove = yield* Deferred.make<void>();
+			const catalog = yield* createArkpackCatalogFx({
 				listFx: Effect.sync(() => descriptors),
 				importFileFx: () =>
 					Deferred.succeed(importStarted, undefined).pipe(
@@ -85,45 +83,46 @@ describe("createArkpackCatalogFx lifecycle", () => {
 							}),
 						),
 					),
-			}),
-		);
-		await Effect.runPromise(catalog.refreshFx);
+			});
+			yield* catalog.refreshFx;
 
-		const importing = Effect.runPromise(catalog.importFileFx({} as File));
-		await Effect.runPromise(Deferred.await(importStarted));
-		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
-			type: "loading",
-		});
-		let idle = false;
-		const waitingForIdle = Effect.runPromise(catalog.awaitIdleFx).then(() => {
-			idle = true;
-		});
-		await Promise.resolve();
-		expect(idle).toBe(false);
-		Effect.runSync(Deferred.succeed(finishImport, undefined));
-		await expect(importing).resolves.toBe(imported);
-		await waitingForIdle;
-		expect(idle).toBe(true);
-		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
-			type: "ready",
-			arkpacks: [
-				builtIn,
-				imported,
-			],
-		});
+			const importing = yield* catalog.importFileFx({} as File).pipe(Effect.forkChild);
+			yield* Deferred.await(importStarted);
+			expect(yield* SubscriptionRef.get(catalog.state)).toEqual({
+				type: "loading",
+			});
+			const idleSettled = yield* Deferred.make<void>();
+			const waitingForIdle = yield* catalog.awaitIdleFx.pipe(
+				Effect.andThen(Deferred.succeed(idleSettled, undefined)),
+				Effect.forkChild,
+			);
+			yield* Effect.yieldNow;
+			expect(yield* Deferred.isDone(idleSettled)).toBe(false);
+			yield* Deferred.succeed(finishImport, undefined);
+			expect(yield* Fiber.join(importing)).toBe(imported);
+			yield* Fiber.join(waitingForIdle);
+			expect(yield* Deferred.isDone(idleSettled)).toBe(true);
+			expect(yield* SubscriptionRef.get(catalog.state)).toEqual({
+				type: "ready",
+				arkpacks: [
+					builtIn,
+					imported,
+				],
+			});
 
-		const removing = Effect.runPromise(catalog.removeFx(imported.packageId));
-		await Effect.runPromise(Deferred.await(removeStarted));
-		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
-			type: "loading",
-		});
-		Effect.runSync(Deferred.succeed(finishRemove, undefined));
-		await expect(removing).resolves.toBeUndefined();
-		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
-			type: "ready",
-			arkpacks: [
-				builtIn,
-			],
-		});
-	});
+			const removing = yield* catalog.removeFx(imported.packageId).pipe(Effect.forkChild);
+			yield* Deferred.await(removeStarted);
+			expect(yield* SubscriptionRef.get(catalog.state)).toEqual({
+				type: "loading",
+			});
+			yield* Deferred.succeed(finishRemove, undefined);
+			expect(yield* Fiber.join(removing)).toBeUndefined();
+			expect(yield* SubscriptionRef.get(catalog.state)).toEqual({
+				type: "ready",
+				arkpacks: [
+					builtIn,
+				],
+			});
+		}),
+	);
 });

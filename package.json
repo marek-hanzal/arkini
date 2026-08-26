@@ -44,6 +44,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.10",
+		"@effect/vitest": "4.0.0-rc.111",
 		"@iconify-json/lucide": "1.2.125",
 		"@iconify/tailwind4": "1.2.3",
 		"@modelcontextprotocol/client": "^2.0.0",

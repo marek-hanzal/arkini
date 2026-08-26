@@ -1,5 +1,5 @@
 import { Cause, Effect, Exit, Fiber, Option } from "effect";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "@effect/vitest";
 
 import type { EditorItemEstimate } from "~/editor/estimator/EditorItemEstimate";
 import type { EditorItemEstimateWorkerRequest } from "~/ui/item/editor/editorItemEstimateWorkerProtocol";
@@ -29,55 +29,58 @@ const estimate: EditorItemEstimate = {
 };
 
 describe("runEditorItemEstimateInWorkerFx", () => {
-	it("returns the worker batch and terminates the worker", async () => {
-		const worker = new TestWorker();
-		const result = await Effect.runPromise(
-			runEditorItemEstimateInWorkerFx(request, {
+	it.effect("returns the worker batch and terminates the worker", () =>
+		Effect.gen(function* () {
+			const worker = new TestWorker();
+			const result = yield* runEditorItemEstimateInWorkerFx(request, {
 				runEstimate: async () => ({
 					estimates: [
 						estimate,
 					],
 				}),
 				spawn: () => asWorker(worker),
-			}),
-		);
+			});
 
-		expect(result.estimates).toEqual([
-			estimate,
-		]);
-		expect(worker.terminateCount).toBe(1);
-	});
+			expect(result.estimates).toEqual([
+				estimate,
+			]);
+			expect(worker.terminateCount).toBe(1);
+		}),
+	);
 
-	it("terminates an active worker when interrupted", async () => {
-		const worker = new TestWorker();
-		const running = Effect.runFork(
-			runEditorItemEstimateInWorkerFx(request, {
+	it.effect("terminates an active worker when interrupted", () =>
+		Effect.gen(function* () {
+			const worker = new TestWorker();
+			const running = yield* runEditorItemEstimateInWorkerFx(request, {
 				runEstimate: () => new Promise(() => undefined),
 				spawn: () => asWorker(worker),
-			}),
-		);
+			}).pipe(Effect.forkChild);
 
-		await Effect.runPromise(Fiber.interrupt(running));
-		const exit = await Effect.runPromise(Fiber.await(running));
+			yield* Effect.yieldNow;
+			yield* Fiber.interrupt(running);
+			const exit = yield* Fiber.await(running);
 
-		expect(Exit.isFailure(exit) && Cause.hasInterruptsOnly(exit.cause)).toBe(true);
-		expect(worker.terminateCount).toBe(1);
-	});
+			expect(Exit.isFailure(exit) && Cause.hasInterruptsOnly(exit.cause)).toBe(true);
+			expect(worker.terminateCount).toBe(1);
+		}),
+	);
 
-	it("preserves a worker error and still terminates the worker", async () => {
-		const worker = new TestWorker();
-		const exit = await Effect.runPromiseExit(
-			runEditorItemEstimateInWorkerFx(request, {
-				runEstimate: () => Promise.reject(new Error("estimate exploded")),
-				spawn: () => asWorker(worker),
-			}),
-		);
+	it.effect("preserves a worker error and still terminates the worker", () =>
+		Effect.gen(function* () {
+			const worker = new TestWorker();
+			const exit = yield* Effect.exit(
+				runEditorItemEstimateInWorkerFx(request, {
+					runEstimate: () => Promise.reject(new Error("estimate exploded")),
+					spawn: () => asWorker(worker),
+				}),
+			);
 
-		expect(Exit.isFailure(exit)).toBe(true);
-		if (Exit.isFailure(exit)) {
-			const failure = Cause.findErrorOption(exit.cause);
-			expect(Option.isSome(failure) && failure.value.message).toBe("estimate exploded");
-		}
-		expect(worker.terminateCount).toBe(1);
-	});
+			expect(Exit.isFailure(exit)).toBe(true);
+			if (Exit.isFailure(exit)) {
+				const failure = Cause.findErrorOption(exit.cause);
+				expect(Option.isSome(failure) && failure.value.message).toBe("estimate exploded");
+			}
+			expect(worker.terminateCount).toBe(1);
+		}),
+	);
 });

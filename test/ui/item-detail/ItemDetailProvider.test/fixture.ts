@@ -33,10 +33,10 @@ vi.mock("~/bridge/item-detail/useResolveItemDetailTarget", () => ({
 		() =>
 		({ itemId, requestedTab }: { itemId: string; requestedTab?: string }) =>
 			itemId === "runtime:missing"
-				? ({
+				? {
 						kind: "unavailable",
-					})
-				: ({
+					}
+				: {
 						itemId,
 						kind: "available",
 						tab: requestedTab ?? "lines",
@@ -44,7 +44,7 @@ vi.mock("~/bridge/item-detail/useResolveItemDetailTarget", () => ({
 							"lines",
 							"info",
 						],
-					}),
+					},
 }));
 
 vi.mock("~/bridge/item-detail/useResolveItemDefinitionDetailTarget", () => ({

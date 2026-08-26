@@ -32,17 +32,11 @@ describe("createGameSessionFx / transition replay", () => {
 			readonly eventJobIds: ReadonlyArray<string>;
 		};
 		const transitions: ObservedTransition[] = [];
-		let publishReplay:
-			| ((transitions: ReadonlyArray<ObservedTransition>) => void)
-			| undefined;
-		const replayDelivered = new Promise<ReadonlyArray<ObservedTransition>>(
-			(resolve) => {
-				publishReplay = resolve;
-			},
-		);
-		let publishAll:
-			| ((transitions: ReadonlyArray<ObservedTransition>) => void)
-			| undefined;
+		let publishReplay: ((transitions: ReadonlyArray<ObservedTransition>) => void) | undefined;
+		const replayDelivered = new Promise<ReadonlyArray<ObservedTransition>>((resolve) => {
+			publishReplay = resolve;
+		});
+		let publishAll: ((transitions: ReadonlyArray<ObservedTransition>) => void) | undefined;
 		const allDelivered = new Promise<ReadonlyArray<ObservedTransition>>((resolve) => {
 			publishAll = resolve;
 		});

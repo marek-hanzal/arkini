@@ -44,8 +44,7 @@ export const EditorVersionRestoreCommandAtom = RendererRuntime.runSync(
 						const startedAtMs = yield* Clock.currentTimeMillis;
 						const exit = yield* Effect.exit(
 							checkoutEditorProjectVersionFx({
-								confirmDiscardCurrentChanges:
-									command.confirmDiscardCurrentChanges,
+								confirmDiscardCurrentChanges: command.confirmDiscardCurrentChanges,
 								projectId,
 								versionId: command.versionId,
 							}).pipe(
@@ -59,9 +58,7 @@ export const EditorVersionRestoreCommandAtom = RendererRuntime.runSync(
 							});
 							if (Cause.hasInterruptsOnly(exit.cause))
 								return yield* Effect.failCause(exit.cause);
-							yield* Effect.sync(() =>
-								command.onFailure(Cause.squash(exit.cause)),
-							);
+							yield* Effect.sync(() => command.onFailure(Cause.squash(exit.cause)));
 							return;
 						}
 						const completedAtMs = yield* Clock.currentTimeMillis;

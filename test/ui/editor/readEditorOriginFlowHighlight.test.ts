@@ -7,10 +7,7 @@ import {
 	type EditorOriginFlowSelection,
 	readEditorOriginFlowHighlightFx,
 } from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
-import {
-	cyclicFlow,
-	producerFlow,
-} from "./readEditorOriginFlowHighlight.test/fixture";
+import { cyclicFlow, producerFlow } from "./readEditorOriginFlowHighlight.test/fixture";
 
 const readHighlight = (
 	flow: EditorItemOriginFlow,

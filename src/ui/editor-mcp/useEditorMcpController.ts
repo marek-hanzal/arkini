@@ -1,8 +1,8 @@
 import { useAtom } from "@effect/atom-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { EditorMcpNgrokSettingsSchema } from "../../../electron/contract/editor/EditorMcpConfigurationSchema";
-import { EditorMcpOverviewSchema } from "../../../electron/contract/editor/EditorMcpOverviewSchema";
+import { parseEditorMcpConfiguration } from "~/bridge/editor-mcp/configureEditorMcpFx";
+import { parseEditorMcpOverview } from "~/bridge/editor-mcp/readEditorMcpOverviewFx";
 import { useClipboard } from "~/ui/clipboard/useClipboard";
 import { EditorMcpCommandAtom } from "~/ui/editor-mcp/EditorMcpCommandAtom";
 
@@ -20,7 +20,7 @@ export const useEditorMcpController = () => {
 			type: "read",
 		});
 		return window.arkini.editorMcp.onOverviewChanged((candidate) => {
-			const parsed = EditorMcpOverviewSchema.safeParse(candidate);
+			const parsed = parseEditorMcpOverview(candidate);
 			if (!parsed.success) return;
 			dispatch({
 				type: "synchronize",
@@ -96,7 +96,8 @@ export const useEditorMcpController = () => {
 					setLocalError("Enter the assigned ngrok domain first.");
 					return;
 				}
-				const ngrok = EditorMcpNgrokSettingsSchema.safeParse({
+				const ngrok = parseEditorMcpConfiguration({
+					type: "ngrok",
 					authtoken,
 					domain: ngrokDomain,
 				});
@@ -106,10 +107,7 @@ export const useEditorMcpController = () => {
 				}
 				dispatch({
 					type: "configure",
-					configuration: {
-						type: "ngrok",
-						...ngrok.data,
-					},
+					configuration: ngrok.data,
 				});
 				setAuthtoken("");
 				setNgrokDomainDraft(undefined);

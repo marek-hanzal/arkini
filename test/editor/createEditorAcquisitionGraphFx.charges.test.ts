@@ -49,31 +49,31 @@ describe("createEditorAcquisitionGraphFx", () => {
 		const config = await compileConfig(
 			{
 				payer: {
-				...createSimpleItem("payer"),
-				charges: {
-					amount: 3,
-					output: createOutput([
-						{
-							itemId: "depleted-output",
-						},
-					]),
-				},
-				},
-				producer: createProducerItem({
-				id: "producer",
-				lines: [
-					createLine({
-						id: "line:charged-output",
-						input: [
-							chargedDeposit("payer", 2),
-						],
+					...createSimpleItem("payer"),
+					charges: {
+						amount: 3,
 						output: createOutput([
 							{
-								itemId: "target",
+								itemId: "depleted-output",
 							},
 						]),
-					}),
-				],
+					},
+				},
+				producer: createProducerItem({
+					id: "producer",
+					lines: [
+						createLine({
+							id: "line:charged-output",
+							input: [
+								chargedDeposit("payer", 2),
+							],
+							output: createOutput([
+								{
+									itemId: "target",
+								},
+							]),
+						}),
+					],
 				}),
 				"depleted-output": createSimpleItem("depleted-output"),
 				target: createSimpleItem("target"),

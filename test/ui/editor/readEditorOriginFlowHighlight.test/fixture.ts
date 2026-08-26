@@ -75,19 +75,27 @@ export const producerFlow: EditorItemOriginFlow = {
 	nodes: [
 		item("target"),
 		item("forge", [
-			operation("op:forge", [
-				"tool",
-				"water",
-			], [
-				"target",
-			]),
+			operation(
+				"op:forge",
+				[
+					"tool",
+					"water",
+				],
+				[
+					"target",
+				],
+			),
 		]),
 		item("tool"),
 		item("water"),
 		item("loop", [
-			operation("op:loop", [], [
-				"target",
-			]),
+			operation(
+				"op:loop",
+				[],
+				[
+					"target",
+				],
+			),
 		]),
 	],
 };
@@ -112,11 +120,15 @@ export const cyclicFlow: EditorItemOriginFlow = {
 	nodes: [
 		item("target"),
 		item("a", [
-			operation("op:a", [
-				"target",
-			], [
-				"target",
-			]),
+			operation(
+				"op:a",
+				[
+					"target",
+				],
+				[
+					"target",
+				],
+			),
 		]),
 	],
 };

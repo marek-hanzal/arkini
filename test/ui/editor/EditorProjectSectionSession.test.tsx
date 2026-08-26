@@ -140,5 +140,4 @@ describe("project section form session", () => {
 			"Changed project",
 		);
 	});
-
 });

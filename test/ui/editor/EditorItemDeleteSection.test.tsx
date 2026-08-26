@@ -173,5 +173,4 @@ describe("EditorItemDeleteSection", () => {
 			replace: true,
 		});
 	});
-
 });

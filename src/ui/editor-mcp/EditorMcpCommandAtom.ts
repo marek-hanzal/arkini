@@ -2,16 +2,22 @@ import { Cause, Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { match } from "ts-pattern";
 
-import type { EditorMcpCommandSchema } from "../../../electron/contract/editor/EditorMcpCommandSchema";
-import type { EditorMcpConfigurationSchema } from "../../../electron/contract/editor/EditorMcpConfigurationSchema";
-import type { EditorMcpOverviewSchema } from "../../../electron/contract/editor/EditorMcpOverviewSchema";
-import { configureEditorMcpFx } from "~/bridge/editor-mcp/configureEditorMcpFx";
-import { executeEditorMcpCommandFx } from "~/bridge/editor-mcp/executeEditorMcpCommandFx";
-import { readEditorMcpOverviewFx } from "~/bridge/editor-mcp/readEditorMcpOverviewFx";
+import {
+	configureEditorMcpFx,
+	type EditorMcpConfiguration,
+} from "~/bridge/editor-mcp/configureEditorMcpFx";
+import {
+	executeEditorMcpCommandFx,
+	type EditorMcpCommand,
+} from "~/bridge/editor-mcp/executeEditorMcpCommandFx";
+import {
+	type EditorMcpOverview,
+	readEditorMcpOverviewFx,
+} from "~/bridge/editor-mcp/readEditorMcpOverviewFx";
 import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 
 export namespace EditorMcpCommandAtom {
-	export type Action = EditorMcpCommandSchema.Type | "configure" | "read";
+	export type Action = EditorMcpCommand | "configure" | "read";
 
 	export type Command =
 		| {
@@ -19,15 +25,15 @@ export namespace EditorMcpCommandAtom {
 		  }
 		| {
 				readonly type: "synchronize";
-				readonly overview: EditorMcpOverviewSchema.Type;
+				readonly overview: EditorMcpOverview;
 		  }
 		| {
 				readonly type: "configure";
-				readonly configuration: EditorMcpConfigurationSchema.Type;
+				readonly configuration: EditorMcpConfiguration;
 		  }
 		| {
 				readonly type: "execute";
-				readonly command: EditorMcpCommandSchema.Type;
+				readonly command: EditorMcpCommand;
 		  };
 
 	export type State =
@@ -36,17 +42,17 @@ export namespace EditorMcpCommandAtom {
 		  }
 		| {
 				readonly kind: "ready";
-				readonly overview: EditorMcpOverviewSchema.Type;
+				readonly overview: EditorMcpOverview;
 		  }
 		| {
 				readonly kind: "pending";
 				readonly action: Action;
-				readonly overview: EditorMcpOverviewSchema.Type;
+				readonly overview: EditorMcpOverview;
 		  }
 		| {
 				readonly kind: "error";
 				readonly message: string;
-				readonly overview?: EditorMcpOverviewSchema.Type;
+				readonly overview?: EditorMcpOverview;
 		  };
 }
 

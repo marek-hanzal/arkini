@@ -7,8 +7,6 @@ import { useEditorProject } from "~/bridge/editor/useEditorProject";
 /** Recreates project-bound renderer owners only after an explicit whole-project replacement. */
 export const EditorProjectReplacementBoundary = ({ children }: PropsWithChildren) => {
 	const project = useEditorProject();
-	const replacementEpoch = useAtomValue(
-		EditorProjectReplacementEpochAtom(project.projectId),
-	);
+	const replacementEpoch = useAtomValue(EditorProjectReplacementEpochAtom(project.projectId));
 	return <Fragment key={`${project.projectId}:${replacementEpoch}`}>{children}</Fragment>;
 };

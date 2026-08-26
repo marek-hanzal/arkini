@@ -119,5 +119,4 @@ describe("editor MCP graph tool text", () => {
 		expect(unreachable).toContain("Status: unreachable");
 		expect(bounded).toContain(`static estimate limit of ${editorItemEstimateMaximumQuantity}`);
 	});
-
 });

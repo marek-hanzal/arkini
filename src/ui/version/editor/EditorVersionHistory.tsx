@@ -116,7 +116,8 @@ export const EditorVersionHistory = () => {
 												Parent
 											</dt>
 											<dd className="mt-1 min-w-0 text-muted">
-												{controller.selected.parentVersionId === undefined ? (
+												{controller.selected.parentVersionId ===
+												undefined ? (
 													"No parent"
 												) : selectedParent === undefined ? (
 													"Parent unavailable"
@@ -128,7 +129,9 @@ export const EditorVersionHistory = () => {
 														<LinkButton
 															className="block max-w-full truncate text-left"
 															onClick={() =>
-																controller.selectVersion(selectedParent.versionId)
+																controller.selectVersion(
+																	selectedParent.versionId,
+																)
 															}
 														>
 															{selectedParent.subject}

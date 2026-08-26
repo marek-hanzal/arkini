@@ -42,12 +42,12 @@ describe("startLineRuntimeFx", () => {
 		expect(result.runtime.jobs).toEqual([
 			result.job,
 		]);
-		expect(result.runtime.items.find((item) => item.id === result.consumedSource.id)).toMatchObject(
-			{
-				location: result.consumedSource.location,
-				quantity: 3,
-			},
-		);
+		expect(
+			result.runtime.items.find((item) => item.id === result.consumedSource.id),
+		).toMatchObject({
+			location: result.consumedSource.location,
+			quantity: 3,
+		});
 		expect(
 			result.runtime.items.find(
 				(item) => item.item.id === "water" && item.location.scope === "job",

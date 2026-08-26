@@ -2,6 +2,11 @@ import { Effect } from "effect";
 import { EditorMcpConfigurationSchema } from "../../../electron/contract/editor/EditorMcpConfigurationSchema";
 import { EditorMcpOverviewSchema } from "../../../electron/contract/editor/EditorMcpOverviewSchema";
 
+export type EditorMcpConfiguration = EditorMcpConfigurationSchema.Type;
+
+export const parseEditorMcpConfiguration = (candidate: unknown) =>
+	EditorMcpConfigurationSchema.safeParse(candidate);
+
 export const configureEditorMcpFx = Effect.fn("configureEditorMcpFx")((candidate: unknown) =>
 	Effect.try({
 		try: () => EditorMcpConfigurationSchema.parse(candidate),

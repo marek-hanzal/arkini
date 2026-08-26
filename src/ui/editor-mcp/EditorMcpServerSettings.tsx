@@ -1,7 +1,6 @@
 import { match } from "ts-pattern";
 
-import type { EditorMcpRemoteStatusSchema } from "../../../electron/contract/editor/EditorMcpRemoteStatusSchema";
-import type { EditorMcpStatus } from "../../../electron/contract/editor/EditorMcpStatusSchema";
+import type { EditorMcpOverview } from "~/bridge/editor-mcp/readEditorMcpOverviewFx";
 import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
 import type { EditorMcpController } from "~/ui/editor-mcp/useEditorMcpController";
 import {
@@ -12,7 +11,7 @@ import {
 } from "./EditorMcpStatus";
 
 const readLocalStatus = (
-	status: EditorMcpStatus | undefined,
+	status: EditorMcpOverview["local"] | undefined,
 ): {
 	readonly message: string;
 	readonly tone: EditorMcpStatusTone;
@@ -42,7 +41,7 @@ const readLocalStatus = (
 		}));
 
 const readRemoteStatus = (
-	status: EditorMcpRemoteStatusSchema.Type | undefined,
+	status: EditorMcpOverview["remote"] | undefined,
 ): {
 	readonly message: string;
 	readonly tone: EditorMcpStatusTone;

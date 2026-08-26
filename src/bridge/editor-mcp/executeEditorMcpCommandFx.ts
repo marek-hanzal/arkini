@@ -2,6 +2,8 @@ import { Effect } from "effect";
 import { EditorMcpCommandResultSchema } from "../../../electron/contract/editor/EditorMcpCommandResultSchema";
 import { EditorMcpCommandSchema } from "../../../electron/contract/editor/EditorMcpCommandSchema";
 
+export type EditorMcpCommand = EditorMcpCommandSchema.Type;
+
 export const executeEditorMcpCommandFx = Effect.fn("executeEditorMcpCommandFx")(
 	(candidate: unknown) =>
 		Effect.try({

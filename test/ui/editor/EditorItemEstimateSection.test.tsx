@@ -76,7 +76,9 @@ describe("EditorItemEstimateSection", () => {
 				ongoing: [],
 			},
 			route,
-			routeSteps: [route],
+			routeSteps: [
+				route,
+			],
 			status: "complete",
 		};
 		const partial: EditorItemEstimate = {
@@ -103,7 +105,11 @@ describe("EditorItemEstimateSection", () => {
 			status: "ready",
 		};
 		await act(async () => {
-			root.render(createElement(EditorItemEstimateSection, { itemId: "tool" }));
+			root.render(
+				createElement(EditorItemEstimateSection, {
+					itemId: "tool",
+				}),
+			);
 		});
 		expect(container.querySelector('[data-ui="CompletedEstimateRouteGraph"]')).not.toBeNull();
 
@@ -112,7 +118,11 @@ describe("EditorItemEstimateSection", () => {
 			status: "ready",
 		};
 		await act(async () => {
-			root.render(createElement(EditorItemEstimateSection, { itemId: "tool" }));
+			root.render(
+				createElement(EditorItemEstimateSection, {
+					itemId: "tool",
+				}),
+			);
 		});
 		expect(container.querySelector('[data-ui="EditorItemEstimateHeader"]')).not.toBeNull();
 		expect(container.querySelector('[data-ui="CompletedEstimateRouteGraph"]')).toBeNull();

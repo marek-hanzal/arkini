@@ -171,7 +171,10 @@ describe("committed transition events", () => {
 						: [],
 				),
 			);
-			if (jobIds.length === 2) markEventsDelivered?.([...jobIds]);
+			if (jobIds.length === 2)
+				markEventsDelivered?.([
+					...jobIds,
+				]);
 		});
 		let markFirstEntered: (() => void) | undefined;
 		let releaseFirst: (() => void) | undefined;

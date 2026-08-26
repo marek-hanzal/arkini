@@ -122,7 +122,6 @@ describe("EditorNotes", () => {
 		await act(async () =>
 			vi.waitFor(() => expect(container.textContent).toContain("New note")),
 		);
-
 	});
 
 	it("keeps a failed create draft available for retry", async () => {
@@ -150,5 +149,4 @@ describe("EditorNotes", () => {
 		);
 		expect(composer.value).toBe("");
 	});
-
 });

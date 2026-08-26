@@ -15,14 +15,21 @@ const item = (id: string, title = id) => ({
 	type: "simple" as const,
 	title,
 	description: id,
-	asset: { default: [`asset:${id}`] },
+	asset: {
+		default: [
+			`asset:${id}`,
+		],
+	},
 	scope: "any" as const,
 	maxStackSize: 10,
 });
 
 const drop = (itemId: string, min = 1, max = min) => ({
 	itemId,
-	quantity: { min, max },
+	quantity: {
+		min,
+		max,
+	},
 	rules: [],
 });
 
@@ -32,7 +39,9 @@ const guaranteedOutput = (itemId: string) => ({
 			roll: [
 				{
 					type: "guaranteed" as const,
-					drop: [drop(itemId)],
+					drop: [
+						drop(itemId),
+					],
 				},
 			],
 		},
@@ -46,12 +55,16 @@ const targetOutput = {
 			roll: [
 				{
 					type: "guaranteed" as const,
-					drop: [drop("target", 2)],
+					drop: [
+						drop("target", 2),
+					],
 				},
 				{
 					type: "chance" as const,
 					chance: 0.65,
-					drop: [drop("target", 1, 4)],
+					drop: [
+						drop("target", 1, 4),
+					],
 				},
 			],
 		},
@@ -60,7 +73,9 @@ const targetOutput = {
 			roll: [
 				{
 					type: "guaranteed" as const,
-					drop: [drop("byproduct")],
+					drop: [
+						drop("byproduct"),
+					],
 				},
 			],
 		},
@@ -82,7 +97,11 @@ const targetLine = ({
 	show,
 	enable: false,
 	runtimeMs: 1_000,
-	input: [{ type: "simple" as const }],
+	input: [
+		{
+			type: "simple" as const,
+		},
+	],
 	output: targetOutput,
 	rules:
 		showWhen === undefined
@@ -120,45 +139,76 @@ const acquisitionLine = (id: string, outputItemId: string) => ({
 	title: id,
 	description: id,
 	runtimeMs: 1_000,
-	input: [{ type: "simple" as const }],
+	input: [
+		{
+			type: "simple" as const,
+		},
+	],
 	output: guaranteedOutput(outputItemId),
 	rules: [],
 });
 
 export const config = GameConfigSchema.parse({
-	resources: { hero: "hero" },
+	resources: {
+		hero: "hero",
+	},
 	meta: {
 		id: "game:sources",
 		title: "Sources",
-		board: { width: 5, height: 5 },
-		inventory: { width: 5, height: 1 },
+		board: {
+			width: 5,
+			height: 5,
+		},
+		inventory: {
+			width: 5,
+			height: 1,
+		},
 	},
-	start: { currentSpace: 0 },
+	start: {
+		currentSpace: 0,
+	},
 	items: {
 		target: item("target"),
 		byproduct: item("byproduct"),
 		permit: item("permit"),
 		product: item("product"),
 		alpha: producer("alpha", "Alpha", [
-			targetLine({ id: "line:hidden", show: false, showWhen: "permit" }),
-			targetLine({ id: "line:alpha:first" }),
-			targetLine({ id: "line:alpha:second" }),
+			targetLine({
+				id: "line:hidden",
+				show: false,
+				showWhen: "permit",
+			}),
+			targetLine({
+				id: "line:alpha:first",
+			}),
+			targetLine({
+				id: "line:alpha:second",
+			}),
 		]),
-		beta: producer("beta", "Beta", [targetLine({ id: "line:beta" })]),
+		beta: producer("beta", "Beta", [
+			targetLine({
+				id: "line:beta",
+			}),
+		]),
 		irrelevant: producer("irrelevant", "Irrelevant", [
 			acquisitionLine("line:irrelevant", "byproduct"),
 		]),
 		blueprint: {
 			...item("blueprint", "Blueprint"),
 			type: "blueprint",
-			charges: { amount: 1 },
+			charges: {
+				amount: 1,
+			},
 			maxStackSize: 1,
 			line: {
 				...acquisitionLine("line:blueprint", "product"),
 				input: [
 					{
 						type: "simple",
-						charges: { from: "self", cost: 1 },
+						charges: {
+							from: "self",
+							cost: 1,
+						},
 					},
 				],
 			},
@@ -186,38 +236,82 @@ export const runtimeItem = ({
 });
 
 export const runtime = {
-	cheats: { enabled: false, everEnabled: false, instantGameplay: false },
+	cheats: {
+		enabled: false,
+		everEnabled: false,
+		instantGameplay: false,
+	},
 	currentSpace: 2,
 	items: [
 		runtimeItem({
 			definition: "target",
 			id: "runtime:target",
-			location: { scope: "inventory", position: { x: 0, y: 0 } },
+			location: {
+				scope: "inventory",
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
 		}),
 		runtimeItem({
 			definition: "alpha",
 			id: "runtime:alpha:space-0",
-			location: { scope: "board", space: 0, position: { x: 0, y: 0 } },
+			location: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
 		}),
 		runtimeItem({
 			definition: "beta",
 			id: "runtime:beta:current",
-			location: { scope: "board", space: 2, position: { x: 1, y: 0 } },
+			location: {
+				scope: "board",
+				space: 2,
+				position: {
+					x: 1,
+					y: 0,
+				},
+			},
 		}),
 		runtimeItem({
 			definition: "alpha",
 			id: "runtime:alpha:space-3",
-			location: { scope: "board", space: 3, position: { x: 2, y: 0 } },
+			location: {
+				scope: "board",
+				space: 3,
+				position: {
+					x: 2,
+					y: 0,
+				},
+			},
 		}),
 		runtimeItem({
 			definition: "alpha",
 			id: "runtime:alpha:stored",
-			location: { scope: "toolbar", position: { x: 0, y: 0 } },
+			location: {
+				scope: "toolbar",
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
 		}),
 		runtimeItem({
 			definition: "irrelevant",
 			id: "runtime:irrelevant",
-			location: { scope: "board", space: 2, position: { x: 3, y: 0 } },
+			location: {
+				scope: "board",
+				space: 2,
+				position: {
+					x: 3,
+					y: 0,
+				},
+			},
 		}),
 	],
 	jobs: [],
@@ -230,7 +324,8 @@ export const readSources = (
 	currentRuntime: RuntimeSchema.Type = runtime,
 ) =>
 	Effect.runSync(
-		readItemDetailSourcesFx({ target, runtime: currentRuntime }).pipe(
-			Effect.provideService(GameConfigFx, config),
-		),
+		readItemDetailSourcesFx({
+			target,
+			runtime: currentRuntime,
+		}).pipe(Effect.provideService(GameConfigFx, config)),
 	);

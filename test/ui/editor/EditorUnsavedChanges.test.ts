@@ -90,5 +90,4 @@ describe("EditorUnsavedChanges", () => {
 		]);
 		expect(session.save).toHaveBeenCalledOnce();
 	});
-
 });

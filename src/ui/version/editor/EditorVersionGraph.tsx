@@ -154,9 +154,7 @@ export const EditorVersionGraph = ({
 						"flex min-h-16 w-full cursor-pointer items-center border-b border-line/60 px-2 text-left hover:bg-surface-raised",
 						selectedReference === row.version.versionId && "bg-accent/10",
 					)}
-					data-selected={
-						selectedReference === row.version.versionId ? true : undefined
-					}
+					data-selected={selectedReference === row.version.versionId ? true : undefined}
 					onClick={() => onSelect(row.version.versionId)}
 				>
 					<VersionRails

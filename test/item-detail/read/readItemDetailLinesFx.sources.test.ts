@@ -26,21 +26,26 @@ const createDepositConfig = (inputCount: number) =>
 						description: "Consumes nearby charges.",
 						show: true,
 						enable: true,
-						input: Array.from({ length: inputCount }, () => ({
-							charges: {
-								cost: 1,
-								from: "target" as const,
+						input: Array.from(
+							{
+								length: inputCount,
 							},
-							query: {
-								distance: "close" as const,
-								scope: "board" as const,
-								selector: {
-									itemId: "tree",
-									type: "item" as const,
+							() => ({
+								charges: {
+									cost: 1,
+									from: "target" as const,
 								},
-							},
-							type: "deposit" as const,
-						})),
+								query: {
+									distance: "close" as const,
+									scope: "board" as const,
+									selector: {
+										itemId: "tree",
+										type: "item" as const,
+									},
+								},
+								type: "deposit" as const,
+							}),
+						),
 						rules: [],
 					},
 				],
@@ -100,7 +105,11 @@ const createRuntime = (
 				},
 			},
 			quantity: 1,
-			...(remainingCharges === undefined ? {} : { remainingCharges }),
+			...(remainingCharges === undefined
+				? {}
+				: {
+						remainingCharges,
+					}),
 			revision: `revision:${id}`,
 		})),
 	],
@@ -114,10 +123,29 @@ describe("readItemDetailLinesFx / deposits", () => {
 		const config = createDepositConfig(1);
 		const lines = readLines(
 			createRuntime(config, [
-				{ id: "runtime:tree:full", x: 1, y: 0 },
-				{ id: "runtime:tree:five", x: 0, y: 1, remainingCharges: 5 },
-				{ id: "runtime:tree:ten", x: 2, y: 1, remainingCharges: 10 },
-				{ id: "runtime:tree:far", x: 4, y: 0, remainingCharges: 7 },
+				{
+					id: "runtime:tree:full",
+					x: 1,
+					y: 0,
+				},
+				{
+					id: "runtime:tree:five",
+					x: 0,
+					y: 1,
+					remainingCharges: 5,
+				},
+				{
+					id: "runtime:tree:ten",
+					x: 2,
+					y: 1,
+					remainingCharges: 10,
+				},
+				{
+					id: "runtime:tree:far",
+					x: 4,
+					y: 0,
+					remainingCharges: 7,
+				},
 			]),
 			"runtime:workshop",
 			config,
@@ -138,7 +166,12 @@ describe("readItemDetailLinesFx / deposits", () => {
 		const missing = readLines(createRuntime(config, []), "runtime:workshop", config);
 		const depleted = readLines(
 			createRuntime(config, [
-				{ id: "runtime:tree", x: 1, y: 0, remainingCharges: 1 },
+				{
+					id: "runtime:tree",
+					x: 1,
+					y: 0,
+					remainingCharges: 1,
+				},
 			]),
 			"runtime:workshop",
 			config,

@@ -2,19 +2,17 @@ import { describe, expect, it } from "vitest";
 
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import {
-	config,
-	readSources,
-	runtime,
-	runtimeItem,
-} from "./readItemDetailSourcesFx.test/fixture";
+import { config, readSources, runtime, runtimeItem } from "./readItemDetailSourcesFx.test/fixture";
 
 const available = (result: ReturnType<typeof readSources>) => {
 	if (result.kind !== "available") throw new Error("Expected available Sources.");
 	return result;
 };
 
-const target = { kind: "runtime", itemId: "runtime:target" } as const;
+const target = {
+	kind: "runtime",
+	itemId: "runtime:target",
+} as const;
 
 describe("readItemDetailSourcesFx", () => {
 	it("returns exact owned Sources in deterministic Board order with output facts", () => {
@@ -33,14 +31,20 @@ describe("readItemDetailSourcesFx", () => {
 		expect(result.source[1]?.line[0]?.output).toEqual([
 			{
 				kind: "guaranteed",
-				quantity: { min: 2, max: 2 },
+				quantity: {
+					min: 2,
+					max: 2,
+				},
 				setWeight: 3,
 				totalSetWeight: 4,
 			},
 			{
 				kind: "chance",
 				chance: 0.65,
-				quantity: { min: 1, max: 4 },
+				quantity: {
+					min: 1,
+					max: 4,
+				},
 				setWeight: 3,
 				totalSetWeight: 4,
 			},
@@ -55,7 +59,10 @@ describe("readItemDetailSourcesFx", () => {
 	it("resolves configured definition Sources without an equal runtime target", () => {
 		const result = available(
 			readSources(
-				{ kind: "definition", itemId: "target" },
+				{
+					kind: "definition",
+					itemId: "target",
+				},
 				{
 					...runtime,
 					items: runtime.items.filter(({ item }) => item.id !== "target"),
@@ -78,15 +85,29 @@ describe("readItemDetailSourcesFx", () => {
 	it("keeps off-Board owners exact and deterministically ordered", () => {
 		const stored = runtime.items.find(({ id }) => id === "runtime:alpha:stored");
 		const runtimeTarget = runtime.items.find(({ id }) => id === "runtime:target");
-		if (stored === undefined || runtimeTarget === undefined) throw new Error("Missing fixtures.");
+		if (stored === undefined || runtimeTarget === undefined)
+			throw new Error("Missing fixtures.");
 		const inventory = runtimeItem({
 			definition: "alpha",
 			id: "runtime:alpha:inventory",
-			location: { scope: "inventory", position: { x: 1, y: 0 } },
+			location: {
+				scope: "inventory",
+				position: {
+					x: 1,
+					y: 0,
+				},
+			},
 		});
 
 		const result = available(
-			readSources(target, { ...runtime, items: [runtimeTarget, inventory, stored] }),
+			readSources(target, {
+				...runtime,
+				items: [
+					runtimeTarget,
+					inventory,
+					stored,
+				],
+			}),
 		);
 
 		expect(result.source.map(({ ownerItemId }) => ownerItemId)).toEqual([
@@ -94,35 +115,77 @@ describe("readItemDetailSourcesFx", () => {
 			"runtime:alpha:stored",
 		]);
 		expect(result.source.map(({ line }) => line.map(({ lineId }) => lineId))).toEqual([
-			["line:hidden", "line:alpha:first", "line:alpha:second"],
-			["line:hidden", "line:alpha:first", "line:alpha:second"],
+			[
+				"line:hidden",
+				"line:alpha:first",
+				"line:alpha:second",
+			],
+			[
+				"line:hidden",
+				"line:alpha:first",
+				"line:alpha:second",
+			],
 		]);
 	});
 
 	it("applies show rules to hidden Board lines", () => {
 		const alpha = config.items.alpha;
 		const runtimeTarget = runtime.items.find(({ id }) => id === "runtime:target");
-		if (alpha.type !== "producer" || runtimeTarget === undefined) throw new Error("Missing fixtures.");
+		if (alpha.type !== "producer" || runtimeTarget === undefined)
+			throw new Error("Missing fixtures.");
 		const hiddenOwner = {
 			...runtimeItem({
 				definition: "alpha",
 				id: "runtime:alpha:hidden-only",
-				location: { scope: "board", space: 0, position: { x: 0, y: 0 } },
+				location: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
 			}),
-			item: { ...alpha, lines: [alpha.lines[0]] },
+			item: {
+				...alpha,
+				lines: [
+					alpha.lines[0],
+				],
+			},
 		} satisfies RuntimeItemSchema.Type;
-		const withoutPermit = { ...runtime, items: [runtimeTarget, hiddenOwner] };
+		const withoutPermit = {
+			...runtime,
+			items: [
+				runtimeTarget,
+				hiddenOwner,
+			],
+		};
 		const permit = runtimeItem({
 			definition: "permit",
 			id: "runtime:permit",
-			location: { scope: "inventory", position: { x: 1, y: 0 } },
+			location: {
+				scope: "inventory",
+				position: {
+					x: 1,
+					y: 0,
+				},
+			},
 		});
 
 		expect(available(readSources(target, withoutPermit)).source).toEqual([]);
 		expect(
-			available(readSources(target, { ...withoutPermit, items: [...withoutPermit.items, permit] }))
-				.source[0]?.line.map(({ lineId }) => lineId),
-		).toEqual(["line:hidden"]);
+			available(
+				readSources(target, {
+					...withoutPermit,
+					items: [
+						...withoutPermit.items,
+						permit,
+					],
+				}),
+			).source[0]?.line.map(({ lineId }) => lineId),
+		).toEqual([
+			"line:hidden",
+		]);
 	});
 
 	it("keeps an active hidden Board line visible", () => {
@@ -151,7 +214,10 @@ describe("readItemDetailSourcesFx", () => {
 	it("omits configured Sources the player does not own", () => {
 		const result = available(
 			readSources(
-				{ kind: "definition", itemId: "target" },
+				{
+					kind: "definition",
+					itemId: "target",
+				},
 				{
 					...runtime,
 					items: runtime.items.filter(({ item }) => item.id === "target"),
@@ -166,12 +232,26 @@ describe("readItemDetailSourcesFx", () => {
 		const blueprint = runtimeItem({
 			definition: "blueprint",
 			id: "runtime:blueprint",
-			location: { scope: "inventory", position: { x: 0, y: 0 } },
+			location: {
+				scope: "inventory",
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
 		});
 		const result = available(
 			readSources(
-				{ kind: "definition", itemId: "product" },
-				{ ...runtime, items: [blueprint] },
+				{
+					kind: "definition",
+					itemId: "product",
+				},
+				{
+					...runtime,
+					items: [
+						blueprint,
+					],
+				},
 			),
 		);
 
@@ -179,7 +259,11 @@ describe("readItemDetailSourcesFx", () => {
 			{
 				ownerItemId: blueprint.id,
 				ownerDefinitionItemId: "blueprint",
-				line: [{ lineId: "line:blueprint" }],
+				line: [
+					{
+						lineId: "line:blueprint",
+					},
+				],
 			},
 		]);
 	});
@@ -188,12 +272,28 @@ describe("readItemDetailSourcesFx", () => {
 		const townHall = runtimeItem({
 			definition: "town-hall",
 			id: "runtime:town-hall",
-			location: { scope: "board", space: 0, position: { x: 0, y: 0 } },
+			location: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
 		});
 		const result = available(
 			readSources(
-				{ kind: "definition", itemId: "product" },
-				{ ...runtime, currentSpace: 0, items: [townHall] },
+				{
+					kind: "definition",
+					itemId: "product",
+				},
+				{
+					...runtime,
+					currentSpace: 0,
+					items: [
+						townHall,
+					],
+				},
 			),
 		);
 
@@ -204,17 +304,31 @@ describe("readItemDetailSourcesFx", () => {
 				{
 					ownerItemId: "runtime:town-hall",
 					ownerDefinitionItemId: "town-hall",
-					line: [{ lineId: "line:town-hall:blueprint" }],
+					line: [
+						{
+							lineId: "line:town-hall:blueprint",
+						},
+					],
 				},
 			],
 		});
 	});
 
 	it("rejects missing definition and stale runtime targets", () => {
-		expect(readSources({ kind: "definition", itemId: "definition:missing" })).toEqual({
+		expect(
+			readSources({
+				kind: "definition",
+				itemId: "definition:missing",
+			}),
+		).toEqual({
 			kind: "unavailable",
 		});
-		expect(readSources({ kind: "runtime", itemId: "runtime:missing" })).toEqual({
+		expect(
+			readSources({
+				kind: "runtime",
+				itemId: "runtime:missing",
+			}),
+		).toEqual({
 			kind: "unavailable",
 		});
 	});

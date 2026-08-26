@@ -72,21 +72,32 @@ afterEach(async () => {
 
 describe("useEditorAssetManagerController", () => {
 	it("admits arkpack and PNG imports with their exact command payloads", () => {
-		const arkpack = new File([
-			Uint8Array.of(1),
-		], "source.arkpack");
-		const png = new File([
-			Uint8Array.of(2),
-		], "asset.png", {
-			type: "image/png",
-		});
+		const arkpack = new File(
+			[
+				Uint8Array.of(1),
+			],
+			"source.arkpack",
+		);
+		const png = new File(
+			[
+				Uint8Array.of(2),
+			],
+			"asset.png",
+			{
+				type: "image/png",
+			},
+		);
 
-		controller?.onArkpackChange(changeEvent([
-			arkpack,
-		]));
-		controller?.onFilesChange(changeEvent([
-			png,
-		]));
+		controller?.onArkpackChange(
+			changeEvent([
+				arkpack,
+			]),
+		);
+		controller?.onFilesChange(
+			changeEvent([
+				png,
+			]),
+		);
 
 		expect(state.importAssets).toHaveBeenNthCalledWith(1, {
 			file: arkpack,

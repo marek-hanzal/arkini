@@ -28,8 +28,11 @@ vi.mock("~/bridge/editor/useEditorProject", () => ({
 	}),
 }));
 
-(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT =
-	true;
+(
+	globalThis as {
+		IS_REACT_ACT_ENVIRONMENT?: boolean;
+	}
+).IS_REACT_ACT_ENVIRONMENT = true;
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const registries: Array<AtomRegistry.AtomRegistry> = [];
@@ -61,7 +64,10 @@ const gate = () => {
 	const promise = new Promise<void>((complete) => {
 		resolve = complete;
 	});
-	return { promise, resolve };
+	return {
+		promise,
+		resolve,
+	};
 };
 
 const DirtyDraft = () => {
@@ -73,7 +79,9 @@ const DirtyDraft = () => {
 		ownsPathname: (pathname) => pathname.includes("/editor/items/test/form/"),
 		save: async () => true,
 	});
-	return createElement("p", { "data-ui": "DirtyDraftProbe" });
+	return createElement("p", {
+		"data-ui": "DirtyDraftProbe",
+	});
 };
 
 const ActiveWorkspaceProbe = () =>
@@ -178,9 +186,7 @@ const renderRouter = async (router: ReturnType<typeof createTestRouter>) => {
 };
 
 const readLink = (container: HTMLElement, workspace: string) => {
-	const link = container.querySelector<HTMLAnchorElement>(
-		`[data-workspace-id="${workspace}"]`,
-	);
+	const link = container.querySelector<HTMLAnchorElement>(`[data-workspace-id="${workspace}"]`);
 	if (link === null) throw new Error(`Missing ${workspace} editor tab.`);
 	return link;
 };

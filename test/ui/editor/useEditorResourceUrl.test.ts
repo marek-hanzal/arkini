@@ -245,5 +245,4 @@ describe("EditorResourceUrlProvider", () => {
 		expect(createObjectUrl).toHaveBeenCalledTimes(2);
 		expect(container.textContent).toBe("hero:blob:hero|overlay:blob:overlay");
 	});
-
 });

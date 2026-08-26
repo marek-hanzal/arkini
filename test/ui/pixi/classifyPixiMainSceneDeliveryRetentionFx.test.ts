@@ -49,13 +49,19 @@ describe("Pixi main-scene delivery retention", () => {
 			preserveVisual: false,
 			size: 80,
 		});
-		expect(update.pose).toEqual({ kind: "owned" });
+		expect(update.pose).toEqual({
+			kind: "owned",
+		});
 
 		const retained = Effect.runSync(
 			classifyPixiMainSceneReconciliationFx({
 				...emptyReconciliationFacts,
-				actorIds: [current.id],
-				deliveryRetainedActorIds: new Set([current.id]),
+				actorIds: [
+					current.id,
+				],
+				deliveryRetainedActorIds: new Set([
+					current.id,
+				]),
 			}),
 		);
 		expect(retained.departures).toEqual([]);
@@ -63,7 +69,9 @@ describe("Pixi main-scene delivery retention", () => {
 		const released = Effect.runSync(
 			classifyPixiMainSceneReconciliationFx({
 				...emptyReconciliationFacts,
-				actorIds: [current.id],
+				actorIds: [
+					current.id,
+				],
 				deliveryRetainedActorIds: new Set(),
 			}),
 		);

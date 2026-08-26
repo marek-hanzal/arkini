@@ -25,16 +25,29 @@ describe("Pixi main-scene drop presentation", () => {
 			}),
 		);
 
-		Effect.runSync(presentation.completeFx({ generation: first, result: moveResult }));
+		Effect.runSync(
+			presentation.completeFx({
+				generation: first,
+				result: moveResult,
+			}),
+		);
 
 		const snapshot = Effect.runSync(presentation.readSnapshotFx);
-		expect(snapshot.pendingActorIds).toEqual(new Set(["runtime:second"]));
+		expect(snapshot.pendingActorIds).toEqual(
+			new Set([
+				"runtime:second",
+			]),
+		);
 		expect(snapshot.swaps).toEqual([
 			expect.objectContaining({
 				generation: second,
 			}),
 		]);
-		expect(snapshot.landingActorIds).toEqual(new Set([moveResult.itemId]));
+		expect(snapshot.landingActorIds).toEqual(
+			new Set([
+				moveResult.itemId,
+			]),
+		);
 	});
 
 	it("releases an accepted swap only through its exact generation", () => {
@@ -45,7 +58,12 @@ describe("Pixi main-scene drop presentation", () => {
 				swapCandidate,
 			}),
 		);
-		Effect.runSync(presentation.completeFx({ generation, result: swapResult }));
+		Effect.runSync(
+			presentation.completeFx({
+				generation,
+				result: swapResult,
+			}),
+		);
 
 		Effect.runSync(presentation.clearSwapFx(generation - 1));
 		expect(Effect.runSync(presentation.readSnapshotFx).swaps).toEqual([

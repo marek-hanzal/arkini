@@ -55,7 +55,10 @@ export const createSpringAnimationDriverProbe = () => {
 			Effect.sync(() => {
 				const close = vi.fn();
 				const setTarget = vi.fn();
-				springs.push({ close, setTarget });
+				springs.push({
+					close,
+					setTarget,
+				});
 				return {
 					closeFx: Effect.sync(close),
 					setTargetFx: (value) => Effect.sync(() => setTarget(value)),

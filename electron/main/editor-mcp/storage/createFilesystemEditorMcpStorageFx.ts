@@ -344,10 +344,7 @@ export const createFilesystemEditorMcpStorageFx = Effect.fn("createFilesystemEdi
 			}).pipe(
 				Effect.catch((cause) =>
 					Effect.sync(() =>
-						console.error(
-							"Remote MCP ngrok configuration could not be read.",
-							cause,
-						),
+						console.error("Remote MCP ngrok configuration could not be read.", cause),
 					).pipe(Effect.as(undefined)),
 				),
 			),

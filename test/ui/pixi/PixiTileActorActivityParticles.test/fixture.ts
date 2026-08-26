@@ -18,19 +18,24 @@ export const createActivityParticleActor = () =>
 			feedbackPhase: null,
 			lastProgress: 0,
 			lightSurface: false,
-			particles: Array.from({ length: 4 }, (_, index) => ({
-				alphaScale: 1,
-				particle: {
-					alpha: 0,
-					tint: 0,
-					x: 0,
-					y: 0,
+			particles: Array.from(
+				{
+					length: 4,
 				},
-				phaseOffset: index / 4,
-				spreadOffset: -1 + (index / 3) * 2,
-				speedCycles: index + 1,
-				waveOffset: index * 1.7,
-			})),
+				(_, index) => ({
+					alphaScale: 1,
+					particle: {
+						alpha: 0,
+						tint: 0,
+						x: 0,
+						y: 0,
+					},
+					phaseOffset: index / 4,
+					spreadOffset: -1 + (index / 3) * 2,
+					speedCycles: index + 1,
+					waveOffset: index * 1.7,
+				}),
+			),
 			startY: 68,
 			topHalfWidth: 30,
 			topY: -18,

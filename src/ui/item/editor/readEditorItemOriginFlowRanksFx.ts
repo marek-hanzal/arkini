@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Graph } from "effect";
 
 import type { EditorItemOriginFlowLayoutInput } from "~/ui/item/editor/editorItemOriginFlowLayout";
 import type { EditorItemOriginFlowDirectedPair } from "~/ui/item/editor/readEditorItemOriginFlowTopologyFx";
@@ -13,109 +13,83 @@ export const readEditorItemOriginFlowRanksFx = Effect.fn("readEditorItemOriginFl
 			const nodeIds = flow.nodes
 				.map(({ id }) => id)
 				.sort((left, right) => left.localeCompare(right));
-			const outgoing = new Map(
-				nodeIds.map(
-					(id) =>
-						[
-							id,
-							[] as string[],
-						] as const,
-				),
-			);
-			for (const pair of directedPairs) outgoing.get(pair.source)?.push(pair.target);
-			for (const targets of outgoing.values())
-				targets.sort((left, right) => left.localeCompare(right));
-
-			let nextIndex = 0;
-			const stack: string[] = [];
-			const onStack = new Set<string>();
-			const indexById = new Map<string, number>();
-			const lowById = new Map<string, number>();
-			const componentById = new Map<string, number>();
-			const components: string[][] = [];
-
-			const visit = (id: string) => {
-				indexById.set(id, nextIndex);
-				lowById.set(id, nextIndex);
-				nextIndex += 1;
-				stack.push(id);
-				onStack.add(id);
-				for (const target of outgoing.get(id) ?? []) {
-					if (!indexById.has(target)) {
-						visit(target);
-						lowById.set(id, Math.min(lowById.get(id)!, lowById.get(target)!));
-					} else if (onStack.has(target)) {
-						lowById.set(id, Math.min(lowById.get(id)!, indexById.get(target)!));
-					}
+			const graphNodeById = new Map<string, Graph.NodeIndex>();
+			const idByGraphNode = new Map<Graph.NodeIndex, string>();
+			const graph = Graph.directed<string, void>((mutable) => {
+				for (const id of nodeIds) {
+					const node = Graph.addNode(mutable, id);
+					graphNodeById.set(id, node);
+					idByGraphNode.set(node, id);
 				}
-				if (lowById.get(id) !== indexById.get(id)) return;
-				const members: string[] = [];
-				while (stack.length > 0) {
-					const member = stack.pop()!;
-					onStack.delete(member);
-					members.push(member);
-					componentById.set(member, components.length);
-					if (member === id) break;
+				for (const { source, target } of directedPairs) {
+					const sourceNode = graphNodeById.get(source);
+					const targetNode = graphNodeById.get(target);
+					if (sourceNode !== undefined && targetNode !== undefined)
+						Graph.addEdge(mutable, sourceNode, targetNode, undefined);
 				}
-				members.sort((left, right) => left.localeCompare(right));
-				components.push(members);
-			};
-			for (const id of nodeIds) if (!indexById.has(id)) visit(id);
-
-			const dag = new Map(
-				components.map(
-					(_, index) =>
-						[
-							index,
-							new Set<number>(),
-						] as const,
-				),
-			);
-			const inDegree = new Map<number, number>(
-				components.map(
-					(_, index) =>
-						[
-							index,
-							0,
-						] as const,
-				),
-			);
-			for (const pair of directedPairs) {
-				const source = componentById.get(pair.source)!;
-				const target = componentById.get(pair.target)!;
-				if (source === target || dag.get(source)!.has(target)) continue;
-				dag.get(source)!.add(target);
-				inDegree.set(target, inDegree.get(target)! + 1);
+			});
+			const components = Graph.stronglyConnectedComponents(graph)
+				.map((nodes) =>
+					nodes
+						.map((node) => idByGraphNode.get(node))
+						.filter((id): id is string => id !== undefined)
+						.sort((left, right) => left.localeCompare(right)),
+				)
+				.sort(([left = ""], [right = ""]) => left.localeCompare(right));
+			const componentById = new Map<string, string>();
+			for (const component of components) {
+				const componentId = component[0];
+				if (componentId === undefined) continue;
+				for (const id of component) componentById.set(id, componentId);
 			}
-			const queue = [
-				...inDegree,
-			]
-				.filter(([, value]) => value === 0)
-				.map(([component]) => component)
-				.sort((left, right) => left - right);
-			const rankByComponent = new Map<number, number>(
-				components.map(
-					(_, index) =>
-						[
-							index,
-							0,
-						] as const,
-				),
-			);
-			while (queue.length > 0) {
-				const component = queue.shift()!;
-				for (const target of [
-					...dag.get(component)!,
-				].sort((left, right) => left - right)) {
-					rankByComponent.set(
-						target,
-						Math.max(rankByComponent.get(target)!, rankByComponent.get(component)! + 1),
+
+			const componentNodeById = new Map<string, Graph.NodeIndex>();
+			const componentIdByNode = new Map<Graph.NodeIndex, string>();
+			const componentEdges = new Set<string>();
+			const componentGraph = Graph.directed<string, void>((mutable) => {
+				for (const [componentId] of components) {
+					if (componentId === undefined) continue;
+					const node = Graph.addNode(mutable, componentId);
+					componentNodeById.set(componentId, node);
+					componentIdByNode.set(node, componentId);
+				}
+				for (const { source, target } of directedPairs) {
+					const sourceComponentId = componentById.get(source);
+					const targetComponentId = componentById.get(target);
+					if (
+						sourceComponentId === undefined ||
+						targetComponentId === undefined ||
+						sourceComponentId === targetComponentId
+					)
+						continue;
+					const edgeId = `${sourceComponentId}\u0000${targetComponentId}`;
+					if (componentEdges.has(edgeId)) continue;
+					componentEdges.add(edgeId);
+					Graph.addEdge(
+						mutable,
+						componentNodeById.get(sourceComponentId)!,
+						componentNodeById.get(targetComponentId)!,
+						undefined,
 					);
-					inDegree.set(target, inDegree.get(target)! - 1);
-					if (inDegree.get(target) === 0) {
-						queue.push(target);
-						queue.sort((left, right) => left - right);
-					}
+				}
+			});
+			const rankByComponent = new Map(
+				components.map(([id = ""]) => [
+					id,
+					0,
+				]),
+			);
+			for (const [componentNode, componentId] of Graph.entries(Graph.topo(componentGraph))) {
+				for (const targetNode of Graph.successors(componentGraph, componentNode)) {
+					const targetId = componentIdByNode.get(targetNode);
+					if (targetId === undefined) continue;
+					rankByComponent.set(
+						targetId,
+						Math.max(
+							rankByComponent.get(targetId) ?? 0,
+							(rankByComponent.get(componentId) ?? 0) + 1,
+						),
+					);
 				}
 			}
 			return new Map(
@@ -123,7 +97,7 @@ export const readEditorItemOriginFlowRanksFx = Effect.fn("readEditorItemOriginFl
 					(id) =>
 						[
 							id,
-							rankByComponent.get(componentById.get(id)!) ?? 0,
+							rankByComponent.get(componentById.get(id) ?? "") ?? 0,
 						] as const,
 				),
 			);

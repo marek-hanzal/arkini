@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { EditorMcpNgrokDomainSchema } from "./EditorMcpNgrokDomainSchema";
 import { EditorMcpPortSchema } from "./EditorMcpPortSchema";
 import { EditorMcpRemoteStatusSchema } from "./EditorMcpRemoteStatusSchema";
 import { EditorMcpStatusSchema } from "./EditorMcpStatusSchema";
@@ -7,9 +8,8 @@ import { EditorMcpStatusSchema } from "./EditorMcpStatusSchema";
 export const EditorMcpOverviewSchema = z
 	.object({
 		port: EditorMcpPortSchema,
-		ngrokConfigured: z.boolean(),
-		ngrokDomain: z.string().min(1).optional(),
-		authConfigured: z.boolean(),
+		ngrokDomain: EditorMcpNgrokDomainSchema.optional(),
+		remotePassword: z.string().min(1).max(256),
 		local: EditorMcpStatusSchema,
 		remote: EditorMcpRemoteStatusSchema,
 	})

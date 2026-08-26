@@ -7,6 +7,7 @@ const electronHarness = vi.hoisted(() => {
 	const setBackgroundColor = vi.fn();
 	const requestWindowMode = vi.fn();
 	const openPath = vi.fn(() => Promise.resolve(""));
+	const writeClipboardText = vi.fn();
 	const browserWindow = {
 		once: vi.fn(),
 	};
@@ -33,6 +34,7 @@ const electronHarness = vi.hoisted(() => {
 		requestWindowMode,
 		setBackgroundColor,
 		userDataPath,
+		writeClipboardText,
 		module: {
 			app: {
 				getPath: () => userDataPath.value,
@@ -47,6 +49,9 @@ const electronHarness = vi.hoisted(() => {
 						setBackgroundColor,
 					},
 				],
+			},
+			clipboard: {
+				writeText: writeClipboardText,
 			},
 			ipcMain: {
 				handle: (

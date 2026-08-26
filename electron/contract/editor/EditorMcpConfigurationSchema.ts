@@ -1,6 +1,18 @@
 import { z } from "zod";
 
+import { EditorMcpNgrokDomainSchema } from "./EditorMcpNgrokDomainSchema";
 import { EditorMcpPortSchema } from "./EditorMcpPortSchema";
+
+export const EditorMcpNgrokSettingsSchema = z
+	.object({
+		authtoken: z.string().trim().min(1).max(2_048),
+		domain: EditorMcpNgrokDomainSchema,
+	})
+	.strict();
+
+export namespace EditorMcpNgrokSettingsSchema {
+	export type Type = z.infer<typeof EditorMcpNgrokSettingsSchema>;
+}
 
 export const EditorMcpConfigurationSchema = z.discriminatedUnion("type", [
 	z
@@ -9,12 +21,9 @@ export const EditorMcpConfigurationSchema = z.discriminatedUnion("type", [
 			port: EditorMcpPortSchema,
 		})
 		.strict(),
-	z
-		.object({
-			type: z.literal("ngrok-authtoken"),
-			authtoken: z.string().trim().min(1).max(2_048),
-		})
-		.strict(),
+	EditorMcpNgrokSettingsSchema.extend({
+		type: z.literal("ngrok"),
+	}).strict(),
 ]);
 
 export type EditorMcpConfigurationSchema = typeof EditorMcpConfigurationSchema;

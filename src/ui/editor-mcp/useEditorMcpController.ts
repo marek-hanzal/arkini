@@ -1,7 +1,9 @@
 import { useAtom } from "@effect/atom-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { EditorMcpNgrokSettingsSchema } from "../../../electron/contract/editor/EditorMcpConfigurationSchema";
 import { EditorMcpOverviewSchema } from "../../../electron/contract/editor/EditorMcpOverviewSchema";
+import { useClipboard } from "~/ui/clipboard/useClipboard";
 import { EditorMcpCommandAtom } from "~/ui/editor-mcp/EditorMcpCommandAtom";
 
 export const useEditorMcpController = () => {
@@ -9,8 +11,9 @@ export const useEditorMcpController = () => {
 	const overview = "overview" in state ? state.overview : undefined;
 	const [portDraft, setPortDraft] = useState<string>();
 	const [authtoken, setAuthtoken] = useState("");
+	const [ngrokDomainDraft, setNgrokDomainDraft] = useState<string>();
 	const [localError, setLocalError] = useState<string>();
-	const [copied, setCopied] = useState<string>();
+	const clipboard = useClipboard();
 
 	useEffect(() => {
 		dispatch({
@@ -41,15 +44,8 @@ export const useEditorMcpController = () => {
 			dispatch,
 		],
 	);
-	const copy = useCallback(async (label: string, value: string) => {
-		try {
-			await navigator.clipboard.writeText(value);
-			setCopied(label);
-		} catch (cause) {
-			setLocalError(cause instanceof Error ? cause.message : String(cause));
-		}
-	}, []);
 	const port = portDraft ?? (overview === undefined ? "" : String(overview.port));
+	const ngrokDomain = ngrokDomainDraft ?? overview?.ngrokDomain ?? "";
 	const pending = state.kind === "loading" || state.kind === "pending";
 
 	return useMemo(
@@ -60,9 +56,13 @@ export const useEditorMcpController = () => {
 			pendingAction: state.kind === "pending" ? state.action : undefined,
 			port,
 			authtoken,
-			secret: "secret" in state ? state.secret : undefined,
-			copied,
-			error: localError ?? (state.kind === "error" ? state.message : undefined),
+			ngrokDomain,
+			remotePassword: overview?.remotePassword,
+			copied: clipboard.copied,
+			error:
+				localError ??
+				clipboard.error ??
+				(state.kind === "error" ? state.message : undefined),
 			setPort: (value: string) => {
 				setLocalError(undefined);
 				setPortDraft(value);
@@ -83,19 +83,36 @@ export const useEditorMcpController = () => {
 				setPortDraft(undefined);
 			},
 			setAuthtoken,
-			saveAuthtoken: () => {
+			setNgrokDomain: (value: string) => {
+				setLocalError(undefined);
+				setNgrokDomainDraft(value);
+			},
+			saveNgrok: () => {
 				if (authtoken.trim() === "") {
 					setLocalError("Paste an ngrok authtoken first.");
+					return;
+				}
+				if (ngrokDomain.trim() === "") {
+					setLocalError("Enter the assigned ngrok domain first.");
+					return;
+				}
+				const ngrok = EditorMcpNgrokSettingsSchema.safeParse({
+					authtoken,
+					domain: ngrokDomain,
+				});
+				if (!ngrok.success) {
+					setLocalError("Enter the ngrok hostname without https:// or a path.");
 					return;
 				}
 				dispatch({
 					type: "configure",
 					configuration: {
-						type: "ngrok-authtoken",
-						authtoken,
+						type: "ngrok",
+						...ngrok.data,
 					},
 				});
 				setAuthtoken("");
+				setNgrokDomainDraft(undefined);
 			},
 			startLocal: () =>
 				execute({
@@ -122,11 +139,7 @@ export const useEditorMcpController = () => {
 					type: "execute",
 					command: "reset-remote-auth",
 				}),
-			dismissSecret: () =>
-				dispatch({
-					type: "dismiss-secret",
-				}),
-			copy,
+			copy: clipboard.copy,
 		}),
 		[
 			state,
@@ -134,11 +147,11 @@ export const useEditorMcpController = () => {
 			pending,
 			port,
 			authtoken,
-			copied,
+			ngrokDomain,
+			clipboard,
 			localError,
 			dispatch,
 			execute,
-			copy,
 		],
 	);
 };

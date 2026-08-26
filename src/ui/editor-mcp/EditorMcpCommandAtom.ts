@@ -28,9 +28,6 @@ export namespace EditorMcpCommandAtom {
 		| {
 				readonly type: "execute";
 				readonly command: EditorMcpCommandSchema.Type;
-		  }
-		| {
-				readonly type: "dismiss-secret";
 		  };
 
 	export type State =
@@ -40,26 +37,23 @@ export namespace EditorMcpCommandAtom {
 		| {
 				readonly kind: "ready";
 				readonly overview: EditorMcpOverviewSchema.Type;
-				readonly secret?: string;
 		  }
 		| {
 				readonly kind: "pending";
 				readonly action: Action;
 				readonly overview: EditorMcpOverviewSchema.Type;
-				readonly secret?: string;
 		  }
 		| {
 				readonly kind: "error";
 				readonly message: string;
 				readonly overview?: EditorMcpOverviewSchema.Type;
-				readonly secret?: string;
 		  };
 }
 
 type RunnerCommand = Exclude<
 	EditorMcpCommandAtom.Command,
 	{
-		readonly type: "synchronize" | "dismiss-secret";
+		readonly type: "synchronize";
 	}
 >;
 
@@ -102,21 +96,9 @@ const RunnerAtom = Atom.fn(
 				.exhaustive();
 			const result = yield* Effect.exit(operation);
 			if (Exit.isSuccess(result)) {
-				const current = yield* Atom.get(StateAtom);
-				const previousSecret = "secret" in current ? current.secret : undefined;
-				const returnedSecret =
-					"secret" in result.value && typeof result.value.secret === "string"
-						? result.value.secret
-						: undefined;
-				const nextSecret = returnedSecret ?? previousSecret;
 				yield* Atom.set(StateAtom, {
 					kind: "ready",
 					...result.value,
-					...(nextSecret === undefined
-						? {}
-						: {
-								secret: nextSecret,
-							}),
 				});
 				return;
 			}
@@ -131,11 +113,6 @@ const RunnerAtom = Atom.fn(
 				current.kind === "error"
 					? {
 							overview: current.overview,
-							...(current.secret === undefined
-								? {}
-								: {
-										secret: current.secret,
-									}),
 						}
 					: {}),
 				message: failure instanceof Error ? failure.message : String(failure),
@@ -162,22 +139,7 @@ export const EditorMcpCommandAtom = Atom.writable(
 			context.set(StateAtom, {
 				kind: "ready",
 				overview: command.overview,
-				...(state.kind === "ready" || state.kind === "error"
-					? state.secret === undefined
-						? {}
-						: {
-								secret: state.secret,
-							}
-					: {}),
 			});
-			return;
-		}
-		if (command.type === "dismiss-secret") {
-			if (state.kind === "ready")
-				context.set(StateAtom, {
-					kind: "ready",
-					overview: state.overview,
-				});
 			return;
 		}
 		if (state.kind === "loading" || state.kind === "pending") return;
@@ -193,11 +155,6 @@ export const EditorMcpCommandAtom = Atom.writable(
 							kind: "pending",
 							action: "read",
 							overview,
-							...("secret" in state && state.secret !== undefined
-								? {
-										secret: state.secret,
-									}
-								: {}),
 						},
 			);
 		} else {
@@ -208,11 +165,6 @@ export const EditorMcpCommandAtom = Atom.writable(
 				kind: "pending",
 				action: command.type === "configure" ? "configure" : command.command,
 				overview,
-				...("secret" in state && state.secret !== undefined
-					? {
-							secret: state.secret,
-						}
-					: {}),
 			});
 		}
 		context.set(RunnerAtom, command);

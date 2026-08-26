@@ -136,9 +136,11 @@ export const createEditorMcpRemoteHandlerFx = Effect.fn("createEditorMcpRemoteHa
 				response.status(404).type("text/plain").send("Not found");
 			});
 			app.use((_request, response, next) => {
+				// The fixed local form action finishes with the OAuth client's validated external redirect.
+				// A form-action CSP would make Chromium reject that redirect chain before POSTing.
 				response.setHeader(
 					"Content-Security-Policy",
-					"default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'",
+					"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'; base-uri 'none'",
 				);
 				next();
 			});

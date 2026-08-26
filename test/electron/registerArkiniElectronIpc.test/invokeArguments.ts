@@ -37,6 +37,12 @@ export const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 		],
 	],
 	[
+		ArkiniElectronApi.channels.clipboardWriteText,
+		[
+			"https://example.com/editor/mcp",
+		],
+	],
+	[
 		ArkiniElectronApi.channels.launcherLastPackageIdRead,
 		[],
 	],

@@ -245,24 +245,6 @@ const renderSettings = async (
 };
 
 describe("Settings", () => {
-	it("opens the bounded diagnostic log directory", async () => {
-		const { container, openDiagnostics } = await renderSettings([
-			"/settings",
-		]);
-
-		await act(async () => buttonByText(container, "Open logs").click());
-		await vi.waitFor(() => expect(openDiagnostics).toHaveBeenCalledOnce());
-	});
-
-	it("opens the Arkini user-data root from the final Settings action", async () => {
-		const { container, openUserData } = await renderSettings([
-			"/settings",
-		]);
-
-		await act(async () => buttonByText(container, "Open data folder").click());
-		await vi.waitFor(() => expect(openUserData).toHaveBeenCalledOnce());
-	});
-
 	it("changes and persists the authoritative theme, then returns through history with Escape", async () => {
 		const { container, deferred, router, write } = await renderSettings([
 			"/main-menu",

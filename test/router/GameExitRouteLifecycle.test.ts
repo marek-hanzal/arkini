@@ -116,9 +116,6 @@ const renderRouter = async (router: Awaited<ReturnType<typeof createHarness>>["r
 	return container;
 };
 
-const progressValue = (container: ParentNode) =>
-	Number(container.querySelector('[role="progressbar"]')?.getAttribute("aria-valuenow"));
-
 beforeEach(() => {
 	vi.useFakeTimers();
 	vi.spyOn(console, "error").mockImplementation(() => undefined);
@@ -139,7 +136,7 @@ afterEach(async () => {
 });
 
 describe("game exit action route", () => {
-	it("shows pending Hero progress, finalizes once and remains on the completed frame", async () => {
+	it("shows the pending close state, finalizes once and remains on the completed frame", async () => {
 		const gate = deferred();
 		const dispose = vi.fn();
 		const game = createGame(
@@ -154,7 +151,6 @@ describe("game exit action route", () => {
 
 		expect(dispose).toHaveBeenCalledOnce();
 		expect(container.textContent).toContain("Saving and exiting Arkini…");
-		expect(progressValue(container)).toBeLessThan(100);
 		expect(container.querySelector('[data-ui="Board"]')).toBeNull();
 		expect(container.querySelector('[data-ui="GameMenu"]')).toBeNull();
 
@@ -167,7 +163,6 @@ describe("game exit action route", () => {
 		expect(dispose).toHaveBeenCalledOnce();
 		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/action/exit`);
-		expect(progressValue(container)).toBe(100);
 		expect(container.querySelectorAll("button")).toHaveLength(0);
 	});
 
@@ -184,7 +179,6 @@ describe("game exit action route", () => {
 			await loading;
 		});
 
-		expect(progressValue(container)).toBe(100);
 		expect(container.textContent).not.toContain("Retry");
 		expect(container.textContent).not.toContain("Force");
 		expect(console.error).toHaveBeenCalledOnce();

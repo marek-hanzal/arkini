@@ -2,6 +2,7 @@ import { FileSystem } from "effect";
 import { Effect, Semaphore } from "effect";
 import { join } from "node:path";
 
+import { EditorMcpNgrokSettingsSchema } from "../../../contract/editor/EditorMcpConfigurationSchema";
 import { EditorMcpPortSchema } from "../../../contract/editor/EditorMcpPortSchema";
 import { readElectronPreferenceFx } from "../../preference/readElectronPreferenceFx";
 import { writeElectronPreferenceFx } from "../../preference/writeElectronPreferenceFx";
@@ -22,32 +23,8 @@ export const createFilesystemEditorMcpPreferencesFx = Effect.fn(
 )(function* ({ root, fileSystem: provided }: createFilesystemEditorMcpPreferencesFx.Props) {
 	const fileSystem = provided ?? (yield* FileSystem.FileSystem);
 	const currentPath = join(root, "editor-mcp.port");
-	const ngrokAuthtokenPath = join(root, "editor-mcp.ngrok-authtoken");
-	const ngrokDomainPath = join(root, "editor-mcp.ngrok-domain");
+	const ngrokPath = join(root, "editor-mcp.ngrok.json");
 	const writeSemaphore = yield* Semaphore.make(1);
-	const readOptionalPreferenceFx = (path: string, operation: string) =>
-		readElectronPreferenceFx({
-			fileSystem,
-			path,
-			fallback: undefined as string | undefined,
-			operation,
-			parse: (stored) => stored.trim() || undefined,
-		});
-	const writeStringPreferenceFx = (
-		path: string,
-		pendingPath: string,
-		value: string,
-		operation: string,
-	) =>
-		writeElectronPreferenceFx({
-			root,
-			fileSystem,
-			pendingPath,
-			currentPath: path,
-			value,
-			operation,
-			serialize: (stored) => stored.trim(),
-		});
 	return {
 		readPortFx: readElectronPreferenceFx({
 			fileSystem,
@@ -68,36 +45,31 @@ export const createFilesystemEditorMcpPreferencesFx = Effect.fn(
 					serialize: (value) => String(EditorMcpPortSchema.parse(value)),
 				}),
 			),
-		readNgrokAuthtokenFx: readOptionalPreferenceFx(
-			ngrokAuthtokenPath,
-			"read the editor MCP ngrok authtoken",
-		),
-		writeNgrokAuthtokenFx: (authtoken) =>
+		readNgrokFx: readElectronPreferenceFx({
+			fileSystem,
+			path: ngrokPath,
+			fallback: undefined as EditorMcpNgrokSettingsSchema.Type | undefined,
+			operation: "read the editor MCP ngrok configuration",
+			parse: (stored) => {
+				try {
+					return EditorMcpNgrokSettingsSchema.safeParse(JSON.parse(stored)).data;
+				} catch {
+					return undefined;
+				}
+			},
+		}),
+		writeNgrokFx: (configuration) =>
 			writeSemaphore.withPermits(1)(
-				writeStringPreferenceFx(
-					ngrokAuthtokenPath,
-					join(root, "editor-mcp.ngrok-authtoken.pending"),
-					authtoken,
-					"persist the editor MCP ngrok authtoken",
-				).pipe(Effect.andThen(fileSystem.chmod(ngrokAuthtokenPath, 0o600))),
+				writeElectronPreferenceFx({
+					root,
+					fileSystem,
+					pendingPath: join(root, "editor-mcp.ngrok.pending"),
+					currentPath: ngrokPath,
+					value: configuration,
+					operation: "persist the editor MCP ngrok configuration",
+					serialize: (stored) =>
+						JSON.stringify(EditorMcpNgrokSettingsSchema.parse(stored)),
+				}).pipe(Effect.andThen(fileSystem.chmod(ngrokPath, 0o600))),
 			),
-		readNgrokDomainFx: readOptionalPreferenceFx(
-			ngrokDomainPath,
-			"read the editor MCP ngrok domain",
-		),
-		writeNgrokDomainFx: (domain) =>
-			writeSemaphore.withPermits(1)(
-				writeStringPreferenceFx(
-					ngrokDomainPath,
-					join(root, "editor-mcp.ngrok-domain.pending"),
-					domain,
-					"persist the editor MCP ngrok domain",
-				),
-			),
-		clearNgrokDomainFx: writeSemaphore.withPermits(1)(
-			fileSystem.remove(ngrokDomainPath, {
-				force: true,
-			}),
-		),
 	} satisfies EditorMcpPreferences;
 });

@@ -20,6 +20,7 @@ interface PayloadRow {
 }
 
 interface SecretRecord {
+	readonly secret?: string;
 	readonly salt: string;
 	readonly hash: string;
 }
@@ -112,6 +113,7 @@ const initializeDatabase = (database: DatabaseSync) => {
 const createSecretRecord = (secret: string): SecretRecord => {
 	const salt = randomBytes(16);
 	return {
+		secret,
 		salt: salt.toString("base64url"),
 		hash: scryptSync(secret, salt, 32).toString("base64url"),
 	};
@@ -278,14 +280,11 @@ export const createSqliteEditorMcpAuthOwnershipFx = Effect.fn(
 	};
 	return {
 		model,
-		readConfiguredFx: Effect.try({
-			try: () => readSecretRecord() !== undefined,
-			catch: (cause) => cause,
-		}),
 		ensureSecretFx: lifecycleLock.withPermits(1)(
 			Effect.try({
 				try: () => {
-					if (readSecretRecord() !== undefined) return undefined;
+					const existing = readSecretRecord()?.secret;
+					if (typeof existing === "string" && existing !== "") return existing;
 					const secret = createSecret();
 					writeSecret(secret);
 					return secret;

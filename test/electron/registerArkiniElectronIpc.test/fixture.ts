@@ -51,6 +51,7 @@ export const createRegisteredIpcHarness = async () => {
 	electronHarness.nativeThemeListeners.clear();
 	electronHarness.nativeTheme.shouldUseDarkColors = true;
 	electronHarness.nativeTheme.themeSource = "dark";
+	electronHarness.writeClipboardText.mockReset();
 
 	const userDataPath = await mkdtemp(join(tmpdir(), "arkini-ipc-"));
 	electronHarness.userDataPath.value = userDataPath;
@@ -154,5 +155,6 @@ export const createRegisteredIpcHarness = async () => {
 		untrustedEvent: createInvokeEvent("https://example.com/"),
 		userDataPaths,
 		writeDiagnostic,
+		writeClipboardText: electronHarness.writeClipboardText,
 	};
 };

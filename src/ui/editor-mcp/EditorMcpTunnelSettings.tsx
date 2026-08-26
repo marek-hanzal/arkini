@@ -7,50 +7,60 @@ export const EditorMcpTunnelSettings = ({
 }: {
 	readonly controller: EditorMcpController;
 }) => {
-	const status = controller.overview?.ngrokDomain;
-	const message =
-		status !== undefined
-			? `Domain: ${status}`
-			: controller.overview?.ngrokConfigured
-				? "Authtoken configured. Domain will be discovered on first Remote MCP start."
-				: "ngrok is not configured.";
+	const configuredDomain = controller.overview?.ngrokDomain;
+	const remoteRunning =
+		controller.overview?.remote.type === "ready" ||
+		controller.overview?.remote.type === "starting";
+	const disabled = controller.pending || remoteRunning;
 	return (
 		<div className="grid gap-4">
 			<div className="ak-list-row grid gap-3 rounded-xl border border-line p-5">
 				<div>
 					<h2 className="font-semibold">ngrok</h2>
 					<p className="mt-1 text-sm text-muted">
-						Paste an ngrok authtoken once. Arkini stores it locally and discovers the
-						account's stable development domain on first start.
+						Paste your authtoken and assigned Development Domain. Arkini stores both
+						locally and reuses the same public HTTPS address whenever Remote MCP starts.
 					</p>
 				</div>
+				<label className="grid gap-2">
+					<span className="text-sm font-semibold">Development domain</span>
+					<input
+						value={controller.ngrokDomain}
+						className={editorMcpInputClassName}
+						disabled={disabled}
+						placeholder="your-assigned-name.ngrok-free.app"
+						onChange={(event) => controller.setNgrokDomain(event.currentTarget.value)}
+					/>
+				</label>
 				<label className="grid gap-2">
 					<span className="text-sm font-semibold">Authtoken</span>
 					<input
 						type="password"
 						value={controller.authtoken}
 						className={editorMcpInputClassName}
-						disabled={
-							controller.pending || controller.overview?.remote.type === "ready"
-						}
+						disabled={disabled}
 						placeholder={
-							controller.overview?.ngrokConfigured
-								? "Configured — paste to replace"
-								: "Paste ngrok authtoken"
+							configuredDomain === undefined
+								? "Paste ngrok authtoken"
+								: "Configured — paste to replace"
 						}
 						onChange={(event) => controller.setAuthtoken(event.currentTarget.value)}
 					/>
 				</label>
 				<PrimaryButton
 					className="justify-self-start"
-					disabled={controller.pending}
-					onClick={controller.saveAuthtoken}
+					disabled={disabled}
+					onClick={controller.saveNgrok}
 				>
-					Save authtoken
+					Save ngrok configuration
 				</PrimaryButton>
 				<EditorMcpStatus
-					message={message}
-					tone={controller.overview?.ngrokConfigured ? "success" : "muted"}
+					message={
+						configuredDomain === undefined
+							? "ngrok is not configured."
+							: `Configured for ${configuredDomain}.`
+					}
+					tone={configuredDomain === undefined ? "muted" : "success"}
 				/>
 			</div>
 		</div>

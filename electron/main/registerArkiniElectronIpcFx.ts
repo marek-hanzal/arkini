@@ -1,4 +1,12 @@
-import { app, BrowserWindow, ipcMain, nativeTheme, shell, type IpcMainInvokeEvent } from "electron";
+import {
+	app,
+	BrowserWindow,
+	clipboard,
+	ipcMain,
+	nativeTheme,
+	shell,
+	type IpcMainInvokeEvent,
+} from "electron";
 import { Effect } from "effect";
 import { mkdir } from "node:fs/promises";
 import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
@@ -18,6 +26,7 @@ import { readWindowModeControllerFx } from "./window/readWindowModeControllerFx"
 import type { WindowModeControllerOwnership } from "./window/WindowModeControllerOwnership";
 
 let registered = false;
+const maxClipboardTextLength = 65_536;
 
 export namespace registerArkiniElectronIpcFx {
 	export interface Props {
@@ -101,6 +110,23 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.cheatAvailabilityRead, (event) =>
 					runAuthorized(event, cheatPreferences.readAvailableFx),
+				);
+				ipcMain.handle(ArkiniElectronApi.channels.clipboardWriteText, (event, candidate) =>
+					runAuthorized(
+						event,
+						Effect.try({
+							try: () => {
+								if (
+									typeof candidate !== "string" ||
+									candidate.length > maxClipboardTextLength
+								) {
+									throw new Error("Clipboard text is invalid or too large.");
+								}
+								clipboard.writeText(candidate);
+							},
+							catch: (cause) => cause,
+						}),
+					),
 				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.cheatAvailabilityWrite,
@@ -220,6 +246,7 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 						ArkiniElectronApi.channels.appearanceAccentWrite,
 						ArkiniElectronApi.channels.cheatAvailabilityRead,
 						ArkiniElectronApi.channels.cheatAvailabilityWrite,
+						ArkiniElectronApi.channels.clipboardWriteText,
 						ArkiniElectronApi.channels.launcherLastPackageIdRead,
 						ArkiniElectronApi.channels.launcherLastPackageIdWrite,
 						ArkiniElectronApi.channels.arkpackList,

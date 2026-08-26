@@ -89,11 +89,8 @@ export const createEditorMcpHarness = async (
 			preferences: {
 				readPortFx: Effect.succeed(port),
 				writePortFx: () => Effect.void,
-				readNgrokAuthtokenFx: Effect.succeed(undefined),
-				writeNgrokAuthtokenFx: () => Effect.void,
-				readNgrokDomainFx: Effect.succeed(undefined),
-				writeNgrokDomainFx: () => Effect.void,
-				clearNgrokDomainFx: Effect.void,
+				readNgrokFx: Effect.succeed(undefined),
+				writeNgrokFx: () => Effect.void,
 			},
 			runPromise,
 			tunnel: {

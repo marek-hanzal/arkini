@@ -47,11 +47,8 @@ const createOwnership = (port: number, editor: createEditorMcpOwnershipFx.Props[
 			preferences: {
 				readPortFx: Effect.succeed(port),
 				writePortFx: () => Effect.void,
-				readNgrokAuthtokenFx: Effect.succeed(undefined),
-				writeNgrokAuthtokenFx: () => Effect.void,
-				readNgrokDomainFx: Effect.succeed(undefined),
-				writeNgrokDomainFx: () => Effect.void,
-				clearNgrokDomainFx: Effect.void,
+				readNgrokFx: Effect.succeed(undefined),
+				writeNgrokFx: () => Effect.void,
 			},
 			runPromise: Effect.runPromise,
 			tunnel: {
@@ -207,11 +204,8 @@ describe("createEditorMcpOwnershipFx", () => {
 							await writeMayFinish;
 							currentPort = port;
 						}),
-					readNgrokAuthtokenFx: Effect.succeed(undefined),
-					writeNgrokAuthtokenFx: () => Effect.void,
-					readNgrokDomainFx: Effect.succeed(undefined),
-					writeNgrokDomainFx: () => Effect.void,
-					clearNgrokDomainFx: Effect.void,
+					readNgrokFx: Effect.succeed(undefined),
+					writeNgrokFx: () => Effect.void,
 				},
 				runPromise: Effect.runPromise,
 				tunnel: {

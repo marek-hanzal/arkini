@@ -11,9 +11,8 @@ const bridge = vi.hoisted(
 	} => ({
 		overview: {
 			port: 32_310,
-			ngrokConfigured: true,
 			ngrokDomain: "stable-example.ngrok-free.app",
-			authConfigured: true,
+			remotePassword: "arkini_mcp_generated",
 			local: {
 				type: "inactive" as const,
 			},
@@ -45,7 +44,6 @@ vi.mock("~/bridge/editor-mcp/executeEditorMcpCommandFx", async () => {
 		executeEditorMcpCommandFx: () =>
 			Effect.sync(() => ({
 				overview: bridge.overview,
-				secret: "arkini_mcp_generated",
 			})),
 	};
 });
@@ -72,7 +70,7 @@ afterEach(() => {
 });
 
 describe("EditorMcpCommandAtom", () => {
-	it("refreshes a remounted workspace without discarding its undismissed password", async () => {
+	it("refreshes a remounted workspace from the canonical overview", async () => {
 		const registry = createRegistry();
 		registry.set(EditorMcpCommandAtom, {
 			type: "read",
@@ -85,7 +83,9 @@ describe("EditorMcpCommandAtom", () => {
 		await vi.waitFor(() =>
 			expect(registry.get(EditorMcpCommandAtom)).toMatchObject({
 				kind: "ready",
-				secret: "arkini_mcp_generated",
+				overview: {
+					remotePassword: "arkini_mcp_generated",
+				},
 			}),
 		);
 
@@ -102,8 +102,8 @@ describe("EditorMcpCommandAtom", () => {
 
 		expect(await waitForReady(registry)).toMatchObject({
 			kind: "ready",
-			secret: "arkini_mcp_generated",
 			overview: {
+				remotePassword: "arkini_mcp_generated",
 				remote: {
 					type: "unavailable",
 				},

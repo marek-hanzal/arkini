@@ -130,6 +130,10 @@ const api: ArkiniElectronApi.Api = {
 			return () => chatGptAssetCandidateListeners.delete(listener);
 		},
 	},
+	clipboard: {
+		writeText: (text) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.clipboardWriteText, text),
+	},
 	cli: {
 		status: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliStatus),
 		install: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliInstall),

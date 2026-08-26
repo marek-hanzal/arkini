@@ -38,7 +38,9 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 			const watchProjectContextSender = (sender: WebContents) => {
 				if (watchedProjectContextSenders.has(sender)) return;
 				watchedProjectContextSenders.add(sender);
-				sender.on("did-start-loading", ownership.resetProjectContext);
+				sender.on("did-start-navigation", (_event, _url, isInPlace, isMainFrame) => {
+					if (isMainFrame && !isInPlace) ownership.resetProjectContext();
+				});
 				sender.once("destroyed", ownership.resetProjectContext);
 			};
 			ipcMain.handle(ArkiniElectronApi.channels.editorMcpOverviewRead, (event) =>

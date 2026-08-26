@@ -50,21 +50,22 @@ describe("createFilesystemEditorMcpPreferencesFx", () => {
 		await expect(access(pendingPath())).rejects.toBeDefined();
 	});
 
-	it("persists the ngrok credential and clears only the discovered domain", async () => {
+	it("persists the ngrok credential with owner-only permissions", async () => {
 		const preferences = await createPreferences();
-		await Effect.runPromise(preferences.writeNgrokAuthtokenFx("  ngrok-token  "));
-		await Effect.runPromise(preferences.writeNgrokDomainFx("stable.ngrok-free.app"));
-
-		expect(await Effect.runPromise(preferences.readNgrokAuthtokenFx)).toBe("ngrok-token");
-		expect(await Effect.runPromise(preferences.readNgrokDomainFx)).toBe(
-			"stable.ngrok-free.app",
+		await Effect.runPromise(
+			preferences.writeNgrokFx({
+				authtoken: "  ngrok-token  ",
+				domain: "STABLE-EXAMPLE.NGROK-FREE.APP",
+			}),
 		);
+
+		expect(await Effect.runPromise(preferences.readNgrokFx)).toEqual({
+			authtoken: "ngrok-token",
+			domain: "stable-example.ngrok-free.app",
+		});
 		expect(
-			(await stat(join(preferenceDirectory(), "editor-mcp.ngrok-authtoken"))).mode & 0o777,
+			(await stat(join(preferenceDirectory(), "editor-mcp.ngrok.json"))).mode & 0o777,
 		).toBe(0o600);
-		await Effect.runPromise(preferences.clearNgrokDomainFx);
-		expect(await Effect.runPromise(preferences.readNgrokDomainFx)).toBeUndefined();
-		expect(await Effect.runPromise(preferences.readNgrokAuthtokenFx)).toBe("ngrok-token");
 	});
 
 	it("falls back from malformed or out-of-range persisted ports", async () => {

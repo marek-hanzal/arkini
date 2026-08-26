@@ -93,6 +93,26 @@ describe("registerEditorMcpPreferencesIpcFx", () => {
 			port: 32_311,
 		});
 		await expect(
+			invoke(event, ArkiniElectronApi.channels.editorMcpConfigure, {
+				type: "ngrok",
+				authtoken: " ngrok-token ",
+				domain: " STABLE-EXAMPLE.NGROK-FREE.APP ",
+			}),
+		).resolves.toBeDefined();
+		expect(vi.mocked(ownership.configureFx).mock.calls[1]?.[0]).toEqual({
+			type: "ngrok",
+			authtoken: "ngrok-token",
+			domain: "stable-example.ngrok-free.app",
+		});
+		await expect(
+			invoke(event, ArkiniElectronApi.channels.editorMcpConfigure, {
+				type: "ngrok",
+				authtoken: "ngrok-token",
+				domain: "https://stable-example.ngrok-free.app/path",
+			}),
+		).rejects.toBeDefined();
+		expect(ownership.configureFx).toHaveBeenCalledTimes(2);
+		await expect(
 			invoke(event, ArkiniElectronApi.channels.editorMcpCommand, "start-everything"),
 		).rejects.toBeDefined();
 	});
@@ -150,7 +170,17 @@ describe("registerEditorMcpPreferencesIpcFx", () => {
 		expect(ownership.readProjectContext()).toBeUndefined();
 
 		await invoke(event, ArkiniElectronApi.channels.editorMcpProjectContextSet, "project-one");
-		sender.emit("did-start-loading");
+		sender.emit(
+			"did-start-navigation",
+			{},
+			"arkini://app/editor/project-one/mcp/server",
+			true,
+			true,
+		);
+		expect(ownership.readProjectContext()).toBe("project-one");
+		sender.emit("did-start-navigation", {}, "arkini://app/frame", false, false);
+		expect(ownership.readProjectContext()).toBe("project-one");
+		sender.emit("did-start-navigation", {}, "arkini://app/main-menu", false, true);
 		expect(ownership.readProjectContext()).toBeUndefined();
 		await invoke(event, ArkiniElectronApi.channels.editorMcpProjectContextSet, "project-two");
 		sender.emit("destroyed");

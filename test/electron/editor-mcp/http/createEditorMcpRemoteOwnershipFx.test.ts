@@ -70,14 +70,14 @@ const createRemoteOwnership = async (
 			databasePath: ":memory:",
 		}),
 	);
-	let domain: string | undefined;
 	const port = await reserveReleasedEditorMcpPort();
 	const opened: Array<{
 		readonly authtoken: string;
-		readonly domain?: string;
+		readonly domain: string;
 		readonly provenance: string;
 	}> = [];
 	const closeTunnel = vi.fn();
+	let disconnectTunnel: () => void = () => undefined;
 	const tunnel: EditorMcpTunnel = {
 		openFx: (options) =>
 			Effect.sync(() => {
@@ -86,9 +86,10 @@ const createRemoteOwnership = async (
 				const joined = new Promise<void>((resolve) => {
 					finish = resolve;
 				});
+				disconnectTunnel = finish;
 				return {
-					url: new URL("https://stable-example.ngrok-free.app"),
-					joinFx: Effect.promise(() => joined),
+					url: new URL(`https://${options.domain}`),
+					closedFx: Effect.promise(() => joined),
 					closeFx: Effect.sync(() => {
 						closeTunnel();
 						finish();
@@ -109,11 +110,11 @@ const createRemoteOwnership = async (
 			preferences: {
 				readPortFx: Effect.succeed(port),
 				writePortFx: () => Effect.void,
-				readNgrokAuthtokenFx: Effect.succeed("ngrok-token"),
-				writeNgrokAuthtokenFx: () => Effect.void,
-				readNgrokDomainFx: Effect.sync(() => domain),
-				writeNgrokDomainFx: (value) => Effect.sync(() => void (domain = value)),
-				clearNgrokDomainFx: Effect.sync(() => void (domain = undefined)),
+				readNgrokFx: Effect.succeed({
+					authtoken: "ngrok-token",
+					domain: "stable-example.ngrok-free.app",
+				}),
+				writeNgrokFx: () => Effect.void,
 			},
 			runPromise: Effect.runPromise,
 			tunnel,
@@ -123,19 +124,31 @@ const createRemoteOwnership = async (
 	return {
 		auth,
 		closeTunnel,
+		disconnectTunnel: () => disconnectTunnel(),
 		opened,
 		ownership,
 		port,
-		readDomain: () => domain,
 	};
 };
 
 describe("Remote Editor MCP ownership", () => {
+	it("publishes an unexpected tunnel disconnect and releases its listener", async () => {
+		const { closeTunnel, disconnectTunnel, ownership, port } = await createRemoteOwnership();
+		await Effect.runPromise(ownership.startRemoteFx);
+
+		disconnectTunnel();
+
+		await expect
+			.poll(async () => (await Effect.runPromise(ownership.readOverviewFx)).remote.type)
+			.toBe("unavailable");
+		expect(closeTunnel).toHaveBeenCalledOnce();
+		await expect(fetch(`http://127.0.0.1:${port}/editor/mcp`)).rejects.toThrow();
+	});
+
 	it("shares one listener while keeping local and remote lifecycle independent", async () => {
-		const { auth, closeTunnel, opened, ownership, port, readDomain } =
-			await createRemoteOwnership();
+		const { auth, closeTunnel, opened, ownership, port } = await createRemoteOwnership();
 		const remote = await Effect.runPromise(ownership.startRemoteFx);
-		if (remote.secret === undefined) throw new Error("Expected the initial Remote password.");
+		const remotePassword = remote.overview.remotePassword;
 		expect(remote.overview).toMatchObject({
 			local: {
 				type: "inactive",
@@ -145,7 +158,6 @@ describe("Remote Editor MCP ownership", () => {
 				url: "https://stable-example.ngrok-free.app/remote/mcp",
 			},
 		});
-		expect(readDomain()).toBe("stable-example.ngrok-free.app");
 		expect(await fetch(`http://127.0.0.1:${port}/editor/mcp`)).toMatchObject({
 			status: 404,
 		});
@@ -161,15 +173,17 @@ describe("Remote Editor MCP ownership", () => {
 		expect(closeTunnel).toHaveBeenCalledOnce();
 		expect(await requestTunneledLocalEndpoint(port, opened[0]?.provenance ?? "")).toBe(404);
 		expect((await fetch(`http://127.0.0.1:${port}/editor/mcp`)).status).not.toBe(404);
-		await Effect.runPromise(ownership.startRemoteFx);
-		expect(opened.at(-1)).toMatchObject({
-			domain: "stable-example.ngrok-free.app",
+		const restarted = await Effect.runPromise(ownership.startRemoteFx);
+		expect(restarted.overview.remote).toEqual({
+			type: "ready",
+			url: "https://stable-example.ngrok-free.app/remote/mcp",
 		});
+		expect(opened).toHaveLength(2);
+		expect(opened.every(({ domain }) => domain === "stable-example.ngrok-free.app")).toBe(true);
 
 		const reset = await Effect.runPromise(ownership.resetRemoteAuthFx);
-		expect(reset.secret).not.toBe(remote.secret);
-		expect(await Effect.runPromise(auth.verifySecretFx(remote.secret))).toBe(false);
-		expect(readDomain()).toBeUndefined();
+		expect(reset.overview.remotePassword).not.toBe(remotePassword);
+		expect(await Effect.runPromise(auth.verifySecretFx(remotePassword))).toBe(false);
 	});
 
 	it("preserves generated auth after an ordinary tunnel health failure", async () => {
@@ -178,13 +192,13 @@ describe("Remote Editor MCP ownership", () => {
 			failHealthCheck ? Effect.fail(new Error("public endpoint unavailable")) : Effect.void,
 		);
 		const failed = await Effect.runPromise(ownership.startRemoteFx);
-		if (failed.secret === undefined) throw new Error("Expected the initial Remote password.");
+		const remotePassword = failed.overview.remotePassword;
 		expect(failed.overview.remote.type).toBe("unavailable");
-		expect(await Effect.runPromise(auth.verifySecretFx(failed.secret))).toBe(true);
+		expect(await Effect.runPromise(auth.verifySecretFx(remotePassword))).toBe(true);
 
 		failHealthCheck = false;
 		const recovered = await Effect.runPromise(ownership.startRemoteFx);
 		expect(recovered.overview.remote.type).toBe("ready");
-		expect(recovered.secret).toBeUndefined();
+		expect(recovered.overview.remotePassword).toBe(remotePassword);
 	});
 });

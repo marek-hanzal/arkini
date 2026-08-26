@@ -97,21 +97,15 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 	});
 
 	const readOverviewFx = Effect.gen(function* () {
-		const [port, authtoken, domain, authConfigured] = yield* Effect.all([
+		const [port, ngrok, remotePassword] = yield* Effect.all([
 			preferences.readPortFx,
-			preferences.readNgrokAuthtokenFx,
-			preferences.readNgrokDomainFx,
-			auth.readConfiguredFx.pipe(Effect.catch(() => Effect.succeed(false))),
+			preferences.readNgrokFx,
+			auth.ensureSecretFx,
 		]);
 		return {
 			port,
-			ngrokConfigured: authtoken !== undefined,
-			...(domain === undefined
-				? {}
-				: {
-						ngrokDomain: domain,
-					}),
-			authConfigured,
+			ngrokDomain: ngrok?.domain,
+			remotePassword,
 			local: localStatus,
 			remote: remoteStatus,
 		} satisfies EditorMcpOverviewSchema.Type;
@@ -137,7 +131,14 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 						return yield* Effect.fail(new Error(availability.message));
 					yield* preferences.writePortFx(configuration.port);
 				} else {
-					yield* preferences.writeNgrokAuthtokenFx(configuration.authtoken);
+					if (remoteStatus.type === "ready" || remoteStatus.type === "starting")
+						return yield* Effect.fail(
+							new Error("Stop Remote MCP before changing the ngrok configuration."),
+						);
+					yield* preferences.writeNgrokFx({
+						authtoken: configuration.authtoken,
+						domain: configuration.domain,
+					});
 				}
 				const overview = yield* readOverviewFx;
 				yield* Effect.sync(() => notifyOverviewChanged(overview));
@@ -152,6 +153,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 				if (tunnelSession !== session) return;
 				tunnelSession = undefined;
 				httpListener.setRemoteHandler(undefined);
+				yield* session.closeFx.pipe(Effect.ignore);
 				remoteStatus = {
 					type: "unavailable",
 					message:
@@ -233,38 +235,26 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 			};
 			yield* publishOverviewFx;
 			let openedSession: EditorMcpTunnelSession | undefined;
-			let generatedSecret: string | undefined;
 			const provenance = randomBytes(32).toString("base64url");
 			const started = yield* Effect.exit(
 				Effect.gen(function* () {
-					const authtoken = yield* preferences.readNgrokAuthtokenFx;
-					if (authtoken === undefined)
+					const ngrok = yield* preferences.readNgrokFx;
+					if (ngrok === undefined)
 						return yield* Effect.fail(
-							new Error("Save an ngrok authtoken in Tunnel settings first."),
+							new Error(
+								"Save an ngrok authtoken and domain in Tunnel settings first.",
+							),
 						);
-					generatedSecret = yield* auth.ensureSecretFx;
+					yield* auth.ensureSecretFx;
 					yield* ensureServerFx;
 					const port = yield* preferences.readPortFx;
-					const configuredDomain = yield* preferences.readNgrokDomainFx;
 					openedSession = yield* tunnel.openFx({
-						authtoken,
-						...(configuredDomain === undefined
-							? {}
-							: {
-									domain: configuredDomain,
-								}),
+						authtoken: ngrok.authtoken,
+						domain: ngrok.domain,
 						port,
 						provenance,
 					});
 					const origin = openedSession.url;
-					if (configuredDomain !== undefined && origin.hostname !== configuredDomain)
-						return yield* Effect.fail(
-							new Error(
-								`ngrok published ${origin.hostname} instead of the configured ${configuredDomain}. Reset Remote auth to discover the new domain.`,
-							),
-						);
-					if (configuredDomain === undefined)
-						yield* preferences.writeNgrokDomainFx(origin.hostname);
 					const mcpNodeHandler = httpListener.readMcpHandler();
 					if (mcpNodeHandler === undefined)
 						return yield* Effect.fail(new Error("The MCP handler is unavailable."));
@@ -299,7 +289,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 					type: "ready",
 					url: new URL("/remote/mcp", started.value.origin).href,
 				};
-				void runPromise(started.value.session.joinFx)
+				void runPromise(started.value.session.closedFx)
 					.then(
 						() => runPromise(finishTunnelFx(started.value.session)),
 						(cause) => runPromise(finishTunnelFx(started.value.session, cause)),
@@ -310,11 +300,6 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 			yield* Effect.sync(() => notifyOverviewChanged(overview));
 			return {
 				overview,
-				...(generatedSecret === undefined
-					? {}
-					: {
-							secret: generatedSecret,
-						}),
 			};
 		}),
 	);
@@ -330,13 +315,11 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 	const resetRemoteAuthFx = commandLock.withPermits(1)(
 		Effect.gen(function* () {
 			yield* stopRemoteUnlockedFx;
-			const secret = yield* auth.resetFx;
-			yield* preferences.clearNgrokDomainFx;
+			yield* auth.resetFx;
 			const overview = yield* readOverviewFx;
 			yield* Effect.sync(() => notifyOverviewChanged(overview));
 			return {
 				overview,
-				secret,
 			};
 		}),
 	);

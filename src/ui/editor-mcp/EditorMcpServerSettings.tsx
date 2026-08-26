@@ -5,6 +5,7 @@ import type { EditorMcpStatus } from "../../../electron/contract/editor/EditorMc
 import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
 import type { EditorMcpController } from "~/ui/editor-mcp/useEditorMcpController";
 import {
+	EditorMcpCopyableUrl,
 	EditorMcpStatus as Status,
 	type EditorMcpStatusTone,
 	editorMcpInputClassName,
@@ -88,8 +89,44 @@ export const EditorMcpServerSettings = ({
 	const remote = controller.overview?.remote;
 	const localStatus = readLocalStatus(local);
 	const remoteStatus = readRemoteStatus(remote);
+	const localUrl =
+		local?.type === "ready" ? `http://127.0.0.1:${local.port}/editor/mcp` : undefined;
+	const remotePasswordCopyKey = `remote-password:${controller.remotePassword ?? ""}`;
 	return (
 		<div className="grid gap-4 lg:grid-cols-2">
+			{controller.remotePassword === undefined ? null : (
+				<div
+					className="grid gap-3 rounded-xl border border-accent bg-accent/10 p-5 lg:col-span-2"
+					data-ui="EditorMcpRemotePassword"
+				>
+					<h2 className="font-semibold">Remote password</h2>
+					<p className="text-sm text-muted">
+						Enter this password on the Arkini authorization page when a Remote MCP
+						client connects. Generating a new password stops Remote MCP and disconnects
+						existing clients.
+					</p>
+					<input
+						readOnly
+						value={controller.remotePassword}
+						className={editorMcpInputClassName}
+					/>
+					<div>
+						<PrimaryButton
+							disabled={controller.pending}
+							onClick={() =>
+								void controller.copy(
+									remotePasswordCopyKey,
+									controller.remotePassword ?? "",
+								)
+							}
+						>
+							{controller.copied === remotePasswordCopyKey
+								? "Copied"
+								: "Copy password"}
+						</PrimaryButton>
+					</div>
+				</div>
+			)}
 			<div className="ak-list-row grid content-start gap-4 rounded-xl border border-line p-5">
 				<div>
 					<h2 className="font-semibold">Local MCP</h2>
@@ -97,10 +134,19 @@ export const EditorMcpServerSettings = ({
 						Open only on loopback for Codex and other local tools.
 					</p>
 				</div>
-				<Status
-					message={localStatus.message}
-					tone={localStatus.tone}
-				/>
+				{localUrl === undefined ? (
+					<Status
+						message={localStatus.message}
+						tone={localStatus.tone}
+					/>
+				) : (
+					<EditorMcpCopyableUrl
+						copied={controller.copied === "local-url"}
+						label="Running at"
+						onCopy={() => void controller.copy("local-url", localUrl)}
+						url={localUrl}
+					/>
+				)}
 				{local?.type === "ready" ? (
 					<Button
 						disabled={controller.pending}
@@ -124,25 +170,31 @@ export const EditorMcpServerSettings = ({
 						OAuth-protected public access through the configured ngrok tunnel.
 					</p>
 				</div>
-				<Status
-					message={remoteStatus.message}
-					tone={remoteStatus.tone}
-				/>
 				{remote?.type === "ready" ? (
-					<>
-						<Button onClick={() => void controller.copy("url", remote.url)}>
-							{controller.copied === "url" ? "Copied" : "Copy URL"}
-						</Button>
-						<Button
-							disabled={controller.pending}
-							onClick={controller.stopRemote}
-						>
-							Stop Remote MCP
-						</Button>
-					</>
+					<EditorMcpCopyableUrl
+						copied={controller.copied === "remote-url"}
+						label="Running at"
+						onCopy={() => void controller.copy("remote-url", remote.url)}
+						url={remote.url}
+					/>
+				) : (
+					<Status
+						message={remoteStatus.message}
+						tone={remoteStatus.tone}
+					/>
+				)}
+				{remote?.type === "ready" ? (
+					<Button
+						disabled={controller.pending}
+						onClick={controller.stopRemote}
+					>
+						Stop Remote MCP
+					</Button>
 				) : (
 					<PrimaryButton
-						disabled={controller.pending || !controller.overview?.ngrokConfigured}
+						disabled={
+							controller.pending || controller.overview?.ngrokDomain === undefined
+						}
 						onClick={controller.startRemote}
 					>
 						Start Remote MCP
@@ -152,34 +204,9 @@ export const EditorMcpServerSettings = ({
 					disabled={controller.pending}
 					onClick={controller.resetAuth}
 				>
-					Reset auth
+					Generate new password
 				</DangerButton>
 			</div>
-			{controller.secret === undefined ? null : (
-				<div
-					className="grid gap-3 rounded-xl border border-accent bg-accent/10 p-5 lg:col-span-2"
-					data-ui="EditorMcpGeneratedSecret"
-				>
-					<h2 className="font-semibold">New Remote password</h2>
-					<p className="text-sm text-muted">
-						Copy it now and enter it on the Arkini authorization page when a Remote MCP
-						client connects.
-					</p>
-					<input
-						readOnly
-						value={controller.secret}
-						className={editorMcpInputClassName}
-					/>
-					<div className="flex gap-2">
-						<PrimaryButton
-							onClick={() => void controller.copy("secret", controller.secret ?? "")}
-						>
-							{controller.copied === "secret" ? "Copied" : "Copy password"}
-						</PrimaryButton>
-						<Button onClick={controller.dismissSecret}>Done</Button>
-					</div>
-				</div>
-			)}
 		</div>
 	);
 };

@@ -40,8 +40,7 @@ export const createOwnership = (localReady = false): EditorMcpOwnership => {
 	let projectContext: string | undefined;
 	const overview = {
 		port: 32_310,
-		ngrokConfigured: false,
-		authConfigured: false,
+		remotePassword: "arkini_mcp_fixture",
 		local: localReady
 			? {
 					type: "ready" as const,
@@ -79,7 +78,6 @@ export const createOwnership = (localReady = false): EditorMcpOwnership => {
 		}),
 		resetRemoteAuthFx: Effect.succeed({
 			overview,
-			secret: "new-secret",
 		}),
 		readProjectContext: () => projectContext,
 		setProjectContext: vi.fn((projectId) => {

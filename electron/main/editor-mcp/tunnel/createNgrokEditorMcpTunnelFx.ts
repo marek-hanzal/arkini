@@ -4,6 +4,8 @@ import { Effect } from "effect";
 import type { EditorMcpTunnel } from "./EditorMcpTunnel";
 import { EditorMcpTunnelProvenanceHeader } from "./EditorMcpTunnelProvenanceHeader";
 
+const NgrokReconnectGraceMs = 10_000;
+
 const createSafeNgrokError = (message: string, cause: unknown) => {
 	const errorCode =
 		typeof cause === "object" &&
@@ -22,44 +24,65 @@ export const createNgrokEditorMcpTunnelFx = Effect.sync(
 		openFx: ({ authtoken, domain, port, provenance }) =>
 			Effect.tryPromise({
 				try: async () => {
+					let publishClosed: () => void = () => undefined;
+					let reconnectTimer: ReturnType<typeof setTimeout> | undefined;
+					let closing = false;
+					const closed = new Promise<void>((resolve) => {
+						publishClosed = resolve;
+					});
+					const clearReconnectTimer = () => {
+						if (reconnectTimer === undefined) return;
+						clearTimeout(reconnectTimer);
+						reconnectTimer = undefined;
+					};
 					const listener = await ngrok.forward({
 						addr: `127.0.0.1:${port}`,
 						authtoken,
+						domain,
+						onStatusChange: (status) => {
+							if (status === "connected") {
+								clearReconnectTimer();
+								return;
+							}
+							if (status !== "closed" || closing) return;
+							clearReconnectTimer();
+							reconnectTimer = setTimeout(() => {
+								reconnectTimer = undefined;
+								publishClosed();
+							}, NgrokReconnectGraceMs);
+						},
 						request_header_remove: [
 							EditorMcpTunnelProvenanceHeader,
 						],
 						request_header_add: [
 							`${EditorMcpTunnelProvenanceHeader}:${provenance}`,
 						],
-						...(domain === undefined
-							? {}
-							: {
-									domain,
-								}),
 						forwards_to: "arkini-editor-mcp",
 					});
+					const closeListener = async () => {
+						closing = true;
+						clearReconnectTimer();
+						await listener.close();
+					};
 					const candidate = listener.url();
 					if (candidate === null) {
-						await listener.close();
+						await closeListener();
 						throw new Error("ngrok started without publishing an endpoint URL.");
 					}
 					const url = new URL(candidate);
 					if (url.protocol !== "https:") {
-						await listener.close();
+						await closeListener();
 						throw new Error("ngrok did not publish an HTTPS endpoint.");
+					}
+					if (url.hostname !== domain) {
+						await closeListener();
+						throw new Error("ngrok published an unexpected endpoint domain.");
 					}
 					return {
 						url,
-						joinFx: Effect.tryPromise({
-							try: () => listener.join(),
-							catch: (cause) =>
-								createSafeNgrokError(
-									"ngrok Remote MCP tunnel stopped unexpectedly",
-									cause,
-								),
-						}),
+						closedFx: Effect.promise(() => closed),
 						closeFx: Effect.tryPromise({
-							try: () => listener.close(),
+							try: closeListener,
 							catch: (cause) =>
 								createSafeNgrokError(
 									"ngrok could not close the Remote MCP tunnel",

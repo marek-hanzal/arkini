@@ -35,6 +35,7 @@ export namespace ArkiniElectronApi {
 		chatGptSurfaceSet: "arkini:chatgpt:surface:set",
 		chatGptStateChanged: "arkini:chatgpt:state:changed",
 		chatGptAssetCandidate: "arkini:chatgpt:asset:candidate",
+		clipboardWriteText: "arkini:clipboard:write-text",
 		cliStatus: "arkini:cli:status",
 		cliInstall: "arkini:cli:install",
 		cliUninstall: "arkini:cli:uninstall",
@@ -150,6 +151,9 @@ export namespace ArkiniElectronApi {
 			readonly onAssetCandidate: (
 				listener: (candidate: ChatGptAssetCandidateSchema.Type) => void,
 			) => () => void;
+		};
+		readonly clipboard: {
+			readonly writeText: (text: string) => Promise<void>;
 		};
 		readonly cli: {
 			readonly status: () => Promise<CliInstallationStatus>;

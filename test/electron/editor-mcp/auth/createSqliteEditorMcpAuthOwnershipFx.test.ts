@@ -32,10 +32,9 @@ describe("createSqliteEditorMcpAuthOwnershipFx", () => {
 			}),
 		);
 		const original = await Effect.runPromise(first.ensureSecretFx);
-		if (original === undefined) throw new Error("Expected the initial Remote password.");
 		expect(original).toMatch(/^arkini_mcp_[a-z0-9]+$/);
 		expect(statSync(databasePath).mode & 0o777).toBe(0o600);
-		expect(await Effect.runPromise(first.ensureSecretFx)).toBeUndefined();
+		expect(await Effect.runPromise(first.ensureSecretFx)).toBe(original);
 		expect(await Effect.runPromise(first.verifySecretFx(original))).toBe(true);
 		await Effect.runPromise(first.closeFx);
 
@@ -44,7 +43,7 @@ describe("createSqliteEditorMcpAuthOwnershipFx", () => {
 				databasePath,
 			}),
 		);
-		expect(await Effect.runPromise(reopened.ensureSecretFx)).toBeUndefined();
+		expect(await Effect.runPromise(reopened.ensureSecretFx)).toBe(original);
 		expect(await Effect.runPromise(reopened.verifySecretFx(original))).toBe(true);
 		const replacement = await Effect.runPromise(reopened.resetFx);
 		expect(replacement).not.toBe(original);

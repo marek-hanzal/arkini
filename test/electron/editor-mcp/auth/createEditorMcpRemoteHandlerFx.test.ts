@@ -120,6 +120,7 @@ describe("createEditorMcpRemoteHandlerFx", () => {
 		if (consentUrl === null) throw new Error("Expected OAuth consent redirect.");
 		const consent = await fetch(consentUrl);
 		expect(consent.status).toBe(200);
+		expect(consent.headers.get("content-security-policy")).not.toContain("form-action");
 		expect(await consent.text()).toContain("Arkini test client");
 
 		const consentFields = new URL(consentUrl).searchParams;

@@ -1,5 +1,5 @@
 import { Cause, Deferred, Effect, Exit, Fiber, Option, Scope, Stream } from "effect";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "@effect/vitest";
 
 import { GameCoreLayerFx } from "~/engine/game/layer/GameCoreLayerFx";
 import { RuntimeStoreFx } from "~/engine/runtime/internal/RuntimeStoreFx";
@@ -24,379 +24,294 @@ const advanceTransitionFx = Effect.fn("advanceTransitionFx")(function* (
 });
 
 describe("makeRuntimeStoreFx", () => {
-	it("leaves current and publication unchanged when planning is interrupted", async () => {
-		const result = await Effect.runPromise(
-			Effect.scoped(
-				Effect.gen(function* () {
-					const store = yield* RuntimeStoreFx;
-					const before = yield* store.read;
-					const replaySeen = yield* Deferred.make<void>();
-					const publishedFiber = yield* store.changes.pipe(
-						Stream.tap(() => Deferred.succeed(replaySeen, undefined)),
-						Stream.drop(1),
-						Stream.runHead,
-						Effect.forkChild,
-					);
-					yield* Deferred.await(replaySeen);
+	it.effect("leaves current and publication unchanged when planning is interrupted", () =>
+		Effect.gen(function* () {
+			const store = yield* RuntimeStoreFx;
+			const before = yield* store.read;
+			const replaySeen = yield* Deferred.make<void>();
+			const publishedFiber = yield* store.changes.pipe(
+				Stream.tap(() => Deferred.succeed(replaySeen, undefined)),
+				Stream.drop(1),
+				Stream.runHead,
+				Effect.forkChild,
+			);
+			yield* Deferred.await(replaySeen);
 
-					const planningEntered = yield* Deferred.make<void>();
-					const mutationFiber = yield* store
-						.modifyEffect(() =>
-							Deferred.succeed(planningEntered, undefined).pipe(
-								Effect.andThen(Effect.never),
-							),
-						)
-						.pipe(Effect.forkChild);
+			const planningEntered = yield* Deferred.make<void>();
+			const mutationFiber = yield* store
+				.modifyEffect(() =>
+					Deferred.succeed(planningEntered, undefined).pipe(Effect.andThen(Effect.never)),
+				)
+				.pipe(Effect.forkChild);
 
-					yield* Deferred.await(planningEntered);
-					yield* Fiber.interrupt(mutationFiber);
-					const mutationExit = yield* Fiber.await(mutationFiber);
-					const afterInterruption = yield* store.read;
-					const marker = yield* advanceTransitionFx(afterInterruption);
-					yield* store.modifyEffect(() =>
-						Effect.succeed([
-							undefined,
-							marker,
-						] as const),
-					);
-					const publication = Option.getOrThrow(yield* Fiber.join(publishedFiber));
+			yield* Deferred.await(planningEntered);
+			yield* Fiber.interrupt(mutationFiber);
+			const mutationExit = yield* Fiber.await(mutationFiber);
+			const afterInterruption = yield* store.read;
+			const marker = yield* advanceTransitionFx(afterInterruption);
+			yield* store.modifyEffect(() =>
+				Effect.succeed([
+					undefined,
+					marker,
+				] as const),
+			);
+			const publication = Option.getOrThrow(yield* Fiber.join(publishedFiber));
 
-					return {
-						afterInterruption,
-						before,
+			expect(afterInterruption).toBe(before);
+			expect(Exit.isFailure(mutationExit)).toBe(true);
+			if (Exit.isFailure(mutationExit)) {
+				expect(Cause.hasInterruptsOnly(mutationExit.cause)).toBe(true);
+			}
+			expect(publication).toBe(marker);
+		}).pipe(Effect.provide(RuntimeStoreTestLayer)),
+	);
+
+	it.effect("returns, stores and publishes the exact successful transition once", () =>
+		Effect.gen(function* () {
+			const store = yield* RuntimeStoreFx;
+			const before = yield* store.read;
+			const next = yield* advanceTransitionFx(before);
+			const replaySeen = yield* Deferred.make<void>();
+			const publishedFiber = yield* store.changes.pipe(
+				Stream.tap(() => Deferred.succeed(replaySeen, undefined)),
+				Stream.take(2),
+				Stream.runCollect,
+				Effect.forkChild,
+			);
+			yield* Deferred.await(replaySeen);
+
+			const commandResult = yield* store.modifyEffect(() =>
+				Effect.succeed([
+					"committed",
+					next,
+				] as const),
+			);
+			const published = Array.from(yield* Fiber.join(publishedFiber));
+
+			const after = yield* store.read;
+
+			expect(commandResult).toBe("committed");
+			expect(after).toBe(next);
+			expect(published).toHaveLength(2);
+			expect(published[0]).toBe(before);
+			expect(published[1]).toBe(next);
+		}).pipe(Effect.provide(RuntimeStoreTestLayer)),
+	);
+
+	it.effect(
+		"returns a no-op result without changing or publishing the identical transition",
+		() =>
+			Effect.gen(function* () {
+				const store = yield* RuntimeStoreFx;
+				const before = yield* store.read;
+				const replaySeen = yield* Deferred.make<void>();
+				const publishedFiber = yield* store.changes.pipe(
+					Stream.tap(() => Deferred.succeed(replaySeen, undefined)),
+					Stream.drop(1),
+					Stream.runHead,
+					Effect.forkChild,
+				);
+				yield* Deferred.await(replaySeen);
+
+				const commandResult = yield* store.modifyEffect((transition) =>
+					Effect.succeed([
+						"unchanged",
+						transition,
+					] as const),
+				);
+				const afterNoOp = yield* store.read;
+				const marker = yield* advanceTransitionFx(afterNoOp);
+				yield* store.modifyEffect(() =>
+					Effect.succeed([
+						undefined,
 						marker,
-						mutationExit,
-						publication,
-					};
-				}),
-			).pipe(Effect.provide(RuntimeStoreTestLayer)),
-		);
+					] as const),
+				);
+				const publication = Option.getOrThrow(yield* Fiber.join(publishedFiber));
 
-		expect(result.afterInterruption).toBe(result.before);
-		expect(Exit.isFailure(result.mutationExit)).toBe(true);
-		if (Exit.isFailure(result.mutationExit)) {
-			expect(Cause.hasInterruptsOnly(result.mutationExit.cause)).toBe(true);
-		}
-		expect(result.publication).toBe(result.marker);
-	});
+				expect(commandResult).toBe("unchanged");
+				expect(afterNoOp).toBe(before);
+				expect(publication).toBe(marker);
+			}).pipe(Effect.provide(RuntimeStoreTestLayer)),
+	);
 
-	it("returns, stores and publishes the exact successful transition once", async () => {
-		const result = await Effect.runPromise(
-			Effect.scoped(
-				Effect.gen(function* () {
-					const store = yield* RuntimeStoreFx;
-					const before = yield* store.read;
-					const next = yield* advanceTransitionFx(before);
-					const replaySeen = yield* Deferred.make<void>();
-					const publishedFiber = yield* store.changes.pipe(
-						Stream.tap(() => Deferred.succeed(replaySeen, undefined)),
-						Stream.take(2),
-						Stream.runCollect,
-						Effect.forkChild,
-					);
-					yield* Deferred.await(replaySeen);
+	it.effect("releases mutation ownership after failed and defective planning", () =>
+		Effect.gen(function* () {
+			const store = yield* RuntimeStoreFx;
+			const before = yield* store.read;
+			const replaySeen = yield* Deferred.make<void>();
+			const publishedFiber = yield* store.changes.pipe(
+				Stream.tap(() => Deferred.succeed(replaySeen, undefined)),
+				Stream.drop(1),
+				Stream.runHead,
+				Effect.forkChild,
+			);
+			yield* Deferred.await(replaySeen);
 
-					const commandResult = yield* store.modifyEffect(() =>
-						Effect.succeed([
-							"committed",
-							next,
-						] as const),
-					);
-					const published = Array.from(yield* Fiber.join(publishedFiber));
+			const failedPlanning = yield* store
+				.modifyEffect(() => Effect.fail("planner-failed"))
+				.pipe(Effect.exit);
+			const afterFailureRead = yield* store.read;
+			const defectivePlanning = yield* store
+				.modifyEffect(() => Effect.die("planner-defect"))
+				.pipe(Effect.exit);
+			const afterDefectRead = yield* store.read;
+			const marker = yield* advanceTransitionFx(afterDefectRead);
+			const afterFailure = yield* store.modifyEffect(() =>
+				Effect.succeed([
+					"after-failure",
+					marker,
+				] as const),
+			);
+			const publication = Option.getOrThrow(yield* Fiber.join(publishedFiber));
 
-					return {
-						after: yield* store.read,
-						before,
-						commandResult,
-						next,
-						published,
-					};
-				}),
-			).pipe(Effect.provide(RuntimeStoreTestLayer)),
-		);
+			expect(failedPlanning).toEqual(Exit.fail("planner-failed"));
+			expect(afterFailureRead).toBe(before);
+			expect(afterDefectRead).toBe(before);
+			expect(Exit.isFailure(defectivePlanning)).toBe(true);
+			if (Exit.isFailure(defectivePlanning)) {
+				expect(Cause.hasDies(defectivePlanning.cause)).toBe(true);
+			}
+			expect(afterFailure).toBe("after-failure");
+			expect(publication).toBe(marker);
+		}).pipe(Effect.provide(RuntimeStoreTestLayer)),
+	);
 
-		expect(result.commandResult).toBe("committed");
-		expect(result.after).toBe(result.next);
-		expect(result.published).toHaveLength(2);
-		expect(result.published[0]).toBe(result.before);
-		expect(result.published[1]).toBe(result.next);
-	});
+	it.effect(
+		"serializes competing effectful planners against the latest committed transition",
+		() =>
+			Effect.gen(function* () {
+				const store = yield* RuntimeStoreFx;
+				const firstEntered = yield* Deferred.make<void>();
+				const releaseFirst = yield* Deferred.make<void>();
+				const secondEntered = yield* Deferred.make<void>();
 
-	it("returns a no-op result without changing or publishing the identical transition", async () => {
-		const result = await Effect.runPromise(
-			Effect.scoped(
-				Effect.gen(function* () {
-					const store = yield* RuntimeStoreFx;
-					const before = yield* store.read;
-					const replaySeen = yield* Deferred.make<void>();
-					const publishedFiber = yield* store.changes.pipe(
-						Stream.tap(() => Deferred.succeed(replaySeen, undefined)),
-						Stream.drop(1),
-						Stream.runHead,
-						Effect.forkChild,
-					);
-					yield* Deferred.await(replaySeen);
-
-					const commandResult = yield* store.modifyEffect((transition) =>
-						Effect.succeed([
-							"unchanged",
-							transition,
-						] as const),
-					);
-					const afterNoOp = yield* store.read;
-					const marker = yield* advanceTransitionFx(afterNoOp);
-					yield* store.modifyEffect(() =>
-						Effect.succeed([
-							undefined,
-							marker,
-						] as const),
-					);
-					const publication = Option.getOrThrow(yield* Fiber.join(publishedFiber));
-
-					return {
-						afterNoOp,
-						before,
-						commandResult,
-						marker,
-						publication,
-					};
-				}),
-			).pipe(Effect.provide(RuntimeStoreTestLayer)),
-		);
-
-		expect(result.commandResult).toBe("unchanged");
-		expect(result.afterNoOp).toBe(result.before);
-		expect(result.publication).toBe(result.marker);
-	});
-
-	it("releases mutation ownership after failed and defective planning", async () => {
-		const result = await Effect.runPromise(
-			Effect.scoped(
-				Effect.gen(function* () {
-					const store = yield* RuntimeStoreFx;
-					const before = yield* store.read;
-					const replaySeen = yield* Deferred.make<void>();
-					const publishedFiber = yield* store.changes.pipe(
-						Stream.tap(() => Deferred.succeed(replaySeen, undefined)),
-						Stream.drop(1),
-						Stream.runHead,
-						Effect.forkChild,
-					);
-					yield* Deferred.await(replaySeen);
-
-					const failedPlanning = yield* store
-						.modifyEffect(() => Effect.fail("planner-failed"))
-						.pipe(Effect.exit);
-					const afterFailureRead = yield* store.read;
-					const defectivePlanning = yield* store
-						.modifyEffect(() => Effect.die("planner-defect"))
-						.pipe(Effect.exit);
-					const afterDefectRead = yield* store.read;
-					const marker = yield* advanceTransitionFx(afterDefectRead);
-					const afterFailure = yield* store.modifyEffect(() =>
-						Effect.succeed([
-							"after-failure",
-							marker,
-						] as const),
-					);
-					const publication = Option.getOrThrow(yield* Fiber.join(publishedFiber));
-
-					return {
-						afterDefectRead,
-						afterFailure,
-						afterFailureRead,
-						before,
-						defectivePlanning,
-						failedPlanning,
-						marker,
-						publication,
-					};
-				}),
-			).pipe(Effect.provide(RuntimeStoreTestLayer)),
-		);
-
-		expect(result.failedPlanning).toEqual(Exit.fail("planner-failed"));
-		expect(result.afterFailureRead).toBe(result.before);
-		expect(result.afterDefectRead).toBe(result.before);
-		expect(Exit.isFailure(result.defectivePlanning)).toBe(true);
-		if (Exit.isFailure(result.defectivePlanning)) {
-			expect(Cause.hasDies(result.defectivePlanning.cause)).toBe(true);
-		}
-		expect(result.afterFailure).toBe("after-failure");
-		expect(result.publication).toBe(result.marker);
-	});
-
-	it("serializes competing effectful planners against the latest committed transition", async () => {
-		const result = await Effect.runPromise(
-			Effect.scoped(
-				Effect.gen(function* () {
-					const store = yield* RuntimeStoreFx;
-					const firstEntered = yield* Deferred.make<void>();
-					const releaseFirst = yield* Deferred.make<void>();
-					const secondEntered = yield* Deferred.make<void>();
-
-					const firstFiber = yield* store
-						.modifyEffect((transition) =>
-							Deferred.succeed(firstEntered, undefined).pipe(
-								Effect.andThen(Deferred.await(releaseFirst)),
-								Effect.andThen(
-									advanceTransitionFx(transition).pipe(
-										Effect.map(
-											(nextTransition) =>
-												[
-													transition,
-													nextTransition,
-												] as const,
-										),
-									),
-								),
-							),
-						)
-						.pipe(Effect.forkChild);
-					yield* Deferred.await(firstEntered);
-
-					const secondFiber = yield* store
-						.modifyEffect((transition) =>
-							Deferred.succeed(secondEntered, undefined).pipe(
-								Effect.andThen(
-									advanceTransitionFx(transition).pipe(
-										Effect.map(
-											(nextTransition) =>
-												[
-													transition,
-													nextTransition,
-												] as const,
-										),
-									),
-								),
-							),
-						)
-						.pipe(Effect.forkChild);
-					const secondBeforeRelease = yield* Deferred.poll(secondEntered);
-
-					yield* Deferred.succeed(releaseFirst, undefined);
-					const firstInput = yield* Fiber.join(firstFiber);
-					const secondInput = yield* Fiber.join(secondFiber);
-
-					return {
-						after: yield* store.read,
-						firstInput,
-						secondBeforeRelease,
-						secondInput,
-					};
-				}),
-			).pipe(Effect.provide(RuntimeStoreTestLayer)),
-		);
-
-		expect(Option.isNone(result.secondBeforeRelease)).toBe(true);
-		expect(result.secondInput.sequence).toBe(result.firstInput.sequence + 1);
-		expect(result.secondInput.previousRuntime).toBe(result.firstInput.runtime);
-		expect(result.after.sequence).toBe(result.secondInput.sequence + 1);
-	});
-
-	it("keeps a waiter interruptible without ever entering its planner", async () => {
-		const result = await Effect.runPromise(
-			Effect.scoped(
-				Effect.gen(function* () {
-					const store = yield* RuntimeStoreFx;
-					const firstEntered = yield* Deferred.make<void>();
-					const releaseFirst = yield* Deferred.make<void>();
-					const secondEntered = yield* Deferred.make<void>();
-
-					const firstFiber = yield* store
-						.modifyEffect((transition) =>
-							Deferred.succeed(firstEntered, undefined).pipe(
-								Effect.andThen(Deferred.await(releaseFirst)),
-								Effect.andThen(
-									advanceTransitionFx(transition).pipe(
-										Effect.map(
-											(nextTransition) =>
-												[
-													undefined,
-													nextTransition,
-												] as const,
-										),
-									),
-								),
-							),
-						)
-						.pipe(Effect.forkChild);
-					yield* Deferred.await(firstEntered);
-
-					const waitingFiber = yield* store
-						.modifyEffect((transition) =>
-							Deferred.succeed(secondEntered, undefined).pipe(
-								Effect.andThen(
-									advanceTransitionFx(transition).pipe(
-										Effect.map(
-											(nextTransition) =>
-												[
-													undefined,
-													nextTransition,
-												] as const,
-										),
-									),
-								),
-							),
-						)
-						.pipe(Effect.forkChild);
-					yield* Fiber.interrupt(waitingFiber);
-					const waitingExit = yield* Fiber.await(waitingFiber);
-					const plannerEntered = yield* Deferred.poll(secondEntered);
-					yield* Deferred.succeed(releaseFirst, undefined);
-					yield* Fiber.join(firstFiber);
-
-					return {
-						plannerEntered,
-						waitingExit,
-					};
-				}),
-			).pipe(Effect.provide(RuntimeStoreTestLayer)),
-		);
-
-		expect(Option.isNone(result.plannerEntered)).toBe(true);
-		expect(Exit.isFailure(result.waitingExit)).toBe(true);
-		if (Exit.isFailure(result.waitingExit)) {
-			expect(Cause.hasInterruptsOnly(result.waitingExit.cause)).toBe(true);
-		}
-	});
-
-	it("gives a racing subscriber a gap-free replay or replay-plus-commit sequence", async () => {
-		const sequences = await Effect.runPromise(
-			Effect.scoped(
-				Effect.gen(function* () {
-					const store = yield* RuntimeStoreFx;
-					const start = yield* Deferred.make<void>();
-					const firstSeen = yield* Deferred.make<void>();
-
-					const subscriber = yield* Stream.fromEffect(Deferred.await(start)).pipe(
-						Stream.flatMap(() => store.changes),
-						Stream.tap(() => Deferred.succeed(firstSeen, undefined)),
-						Stream.takeUntil((transition) => transition.sequence === 2),
-						Stream.runCollect,
-						Effect.forkChild,
-					);
-					const commit = yield* Deferred.await(start).pipe(
-						Effect.andThen(
-							store.modifyEffect((transition) =>
+				const firstFiber = yield* store
+					.modifyEffect((transition) =>
+						Deferred.succeed(firstEntered, undefined).pipe(
+							Effect.andThen(Deferred.await(releaseFirst)),
+							Effect.andThen(
 								advanceTransitionFx(transition).pipe(
 									Effect.map(
 										(nextTransition) =>
 											[
-												undefined,
+												transition,
 												nextTransition,
 											] as const,
 									),
 								),
 							),
 						),
-						Effect.forkChild,
-					);
+					)
+					.pipe(Effect.forkChild);
+				yield* Deferred.await(firstEntered);
 
-					yield* Deferred.succeed(start, undefined);
-					yield* Fiber.join(commit);
-					yield* Deferred.await(firstSeen);
-					yield* store.modifyEffect((transition) =>
+				const secondFiber = yield* store
+					.modifyEffect((transition) =>
+						Deferred.succeed(secondEntered, undefined).pipe(
+							Effect.andThen(
+								advanceTransitionFx(transition).pipe(
+									Effect.map(
+										(nextTransition) =>
+											[
+												transition,
+												nextTransition,
+											] as const,
+									),
+								),
+							),
+						),
+					)
+					.pipe(Effect.forkChild);
+				const secondBeforeRelease = yield* Deferred.poll(secondEntered);
+
+				yield* Deferred.succeed(releaseFirst, undefined);
+				const firstInput = yield* Fiber.join(firstFiber);
+				const secondInput = yield* Fiber.join(secondFiber);
+
+				const after = yield* store.read;
+
+				expect(Option.isNone(secondBeforeRelease)).toBe(true);
+				expect(secondInput.sequence).toBe(firstInput.sequence + 1);
+				expect(secondInput.previousRuntime).toBe(firstInput.runtime);
+				expect(after.sequence).toBe(secondInput.sequence + 1);
+			}).pipe(Effect.provide(RuntimeStoreTestLayer)),
+	);
+
+	it.effect("keeps a waiter interruptible without ever entering its planner", () =>
+		Effect.gen(function* () {
+			const store = yield* RuntimeStoreFx;
+			const firstEntered = yield* Deferred.make<void>();
+			const releaseFirst = yield* Deferred.make<void>();
+			const secondEntered = yield* Deferred.make<void>();
+
+			const firstFiber = yield* store
+				.modifyEffect((transition) =>
+					Deferred.succeed(firstEntered, undefined).pipe(
+						Effect.andThen(Deferred.await(releaseFirst)),
+						Effect.andThen(
+							advanceTransitionFx(transition).pipe(
+								Effect.map(
+									(nextTransition) =>
+										[
+											undefined,
+											nextTransition,
+										] as const,
+								),
+							),
+						),
+					),
+				)
+				.pipe(Effect.forkChild);
+			yield* Deferred.await(firstEntered);
+
+			const waitingFiber = yield* store
+				.modifyEffect((transition) =>
+					Deferred.succeed(secondEntered, undefined).pipe(
+						Effect.andThen(
+							advanceTransitionFx(transition).pipe(
+								Effect.map(
+									(nextTransition) =>
+										[
+											undefined,
+											nextTransition,
+										] as const,
+								),
+							),
+						),
+					),
+				)
+				.pipe(Effect.forkChild);
+			yield* Fiber.interrupt(waitingFiber);
+			const waitingExit = yield* Fiber.await(waitingFiber);
+			const plannerEntered = yield* Deferred.poll(secondEntered);
+			yield* Deferred.succeed(releaseFirst, undefined);
+			yield* Fiber.join(firstFiber);
+
+			expect(Option.isNone(plannerEntered)).toBe(true);
+			expect(Exit.isFailure(waitingExit)).toBe(true);
+			if (Exit.isFailure(waitingExit)) {
+				expect(Cause.hasInterruptsOnly(waitingExit.cause)).toBe(true);
+			}
+		}).pipe(Effect.provide(RuntimeStoreTestLayer)),
+	);
+
+	it.effect("gives a racing subscriber a gap-free replay or replay-plus-commit sequence", () =>
+		Effect.gen(function* () {
+			const store = yield* RuntimeStoreFx;
+			const start = yield* Deferred.make<void>();
+			const firstSeen = yield* Deferred.make<void>();
+
+			const subscriber = yield* Stream.fromEffect(Deferred.await(start)).pipe(
+				Stream.flatMap(() => store.changes),
+				Stream.tap(() => Deferred.succeed(firstSeen, undefined)),
+				Stream.takeUntil((transition) => transition.sequence === 2),
+				Stream.runCollect,
+				Effect.forkChild,
+			);
+			const commit = yield* Deferred.await(start).pipe(
+				Effect.andThen(
+					store.modifyEffect((transition) =>
 						advanceTransitionFx(transition).pipe(
 							Effect.map(
 								(nextTransition) =>
@@ -406,136 +321,139 @@ describe("makeRuntimeStoreFx", () => {
 									] as const,
 							),
 						),
-					);
+					),
+				),
+				Effect.forkChild,
+			);
 
-					return Array.from(yield* Fiber.join(subscriber)).map(
-						(transition) => transition.sequence,
-					);
-				}),
-			).pipe(Effect.provide(RuntimeStoreTestLayer)),
-		);
+			yield* Deferred.succeed(start, undefined);
+			yield* Fiber.join(commit);
+			yield* Deferred.await(firstSeen);
+			yield* store.modifyEffect((transition) =>
+				advanceTransitionFx(transition).pipe(
+					Effect.map(
+						(nextTransition) =>
+							[
+								undefined,
+								nextTransition,
+							] as const,
+					),
+				),
+			);
 
-		expect([
-			[
+			const sequences = Array.from(yield* Fiber.join(subscriber)).map(
+				(transition) => transition.sequence,
+			);
+
+			expect([
+				[
+					0,
+					1,
+					2,
+				],
+				[
+					1,
+					2,
+				],
+			]).toContainEqual(sequences);
+		}).pipe(Effect.provide(RuntimeStoreTestLayer)),
+	);
+
+	it.effect("delivers ordered commits independently to multiple subscribers", () =>
+		Effect.gen(function* () {
+			const store = yield* RuntimeStoreFx;
+			const firstReady = yield* Deferred.make<void>();
+			const secondReady = yield* Deferred.make<void>();
+			const collectTransitionsFx = Effect.fn("collectTransitionsFx")(
+				(ready: Deferred.Deferred<void>) =>
+					store.changes.pipe(
+						Stream.tap(() => Deferred.succeed(ready, undefined)),
+						Stream.take(3),
+						Stream.runCollect,
+						Effect.forkChild,
+					),
+			);
+			const first = yield* collectTransitionsFx(firstReady);
+			const second = yield* collectTransitionsFx(secondReady);
+			yield* Deferred.await(firstReady);
+			yield* Deferred.await(secondReady);
+
+			yield* store.modifyEffect((transition) =>
+				advanceTransitionFx(transition).pipe(
+					Effect.map(
+						(nextTransition) =>
+							[
+								undefined,
+								nextTransition,
+							] as const,
+					),
+				),
+			);
+			yield* store.modifyEffect((transition) =>
+				advanceTransitionFx(transition).pipe(
+					Effect.map(
+						(nextTransition) =>
+							[
+								undefined,
+								nextTransition,
+							] as const,
+					),
+				),
+			);
+
+			const firstTransitions = Array.from(yield* Fiber.join(first));
+			const secondTransitions = Array.from(yield* Fiber.join(second));
+
+			expect(firstTransitions.map((transition) => transition.sequence)).toEqual([
 				0,
 				1,
 				2,
-			],
-			[
+			]);
+			expect(secondTransitions.map((transition) => transition.sequence)).toEqual([
+				0,
 				1,
 				2,
-			],
-		]).toContainEqual(sequences);
-	});
+			]);
+			expect(secondTransitions[1]).toBe(firstTransitions[1]);
+			expect(secondTransitions[2]).toBe(firstTransitions[2]);
+		}).pipe(Effect.provide(RuntimeStoreTestLayer)),
+	);
 
-	it("delivers ordered commits independently to multiple subscribers", async () => {
-		const result = await Effect.runPromise(
-			Effect.scoped(
-				Effect.gen(function* () {
-					const store = yield* RuntimeStoreFx;
-					const firstReady = yield* Deferred.make<void>();
-					const secondReady = yield* Deferred.make<void>();
-					const collectTransitionsFx = Effect.fn("collectTransitionsFx")(
-						(ready: Deferred.Deferred<void>) =>
-							store.changes.pipe(
-								Stream.tap(() => Deferred.succeed(ready, undefined)),
-								Stream.take(3),
-								Stream.runCollect,
-								Effect.forkChild,
-							),
-					);
-					const first = yield* collectTransitionsFx(firstReady);
-					const second = yield* collectTransitionsFx(secondReady);
-					yield* Deferred.await(firstReady);
-					yield* Deferred.await(secondReady);
+	it.effect("stops delivery when the listener scope closes", () =>
+		Effect.gen(function* () {
+			const store = yield* RuntimeStoreFx;
+			const listenerScope = yield* Scope.make();
+			const replaySeen = yield* Deferred.make<void>();
+			const received: CommittedTransitionSchema.Type[] = [];
+			yield* store.changes.pipe(
+				Stream.runForEach((transition) =>
+					Effect.sync(() => {
+						received.push(transition);
+					}).pipe(Effect.andThen(Deferred.succeed(replaySeen, undefined))),
+				),
+				Effect.forkIn(listenerScope),
+			);
+			yield* Deferred.await(replaySeen);
 
-					yield* store.modifyEffect((transition) =>
-						advanceTransitionFx(transition).pipe(
-							Effect.map(
-								(nextTransition) =>
-									[
-										undefined,
-										nextTransition,
-									] as const,
-							),
-						),
-					);
-					yield* store.modifyEffect((transition) =>
-						advanceTransitionFx(transition).pipe(
-							Effect.map(
-								(nextTransition) =>
-									[
-										undefined,
-										nextTransition,
-									] as const,
-							),
-						),
-					);
+			yield* Scope.close(listenerScope, Exit.void);
+			yield* store.modifyEffect((transition) =>
+				advanceTransitionFx(transition).pipe(
+					Effect.map(
+						(nextTransition) =>
+							[
+								undefined,
+								nextTransition,
+							] as const,
+					),
+				),
+			);
 
-					return {
-						first: Array.from(yield* Fiber.join(first)),
-						second: Array.from(yield* Fiber.join(second)),
-					};
-				}),
-			).pipe(Effect.provide(RuntimeStoreTestLayer)),
-		);
+			const after = yield* store.read;
 
-		expect(result.first.map((transition) => transition.sequence)).toEqual([
-			0,
-			1,
-			2,
-		]);
-		expect(result.second.map((transition) => transition.sequence)).toEqual([
-			0,
-			1,
-			2,
-		]);
-		expect(result.second[1]).toBe(result.first[1]);
-		expect(result.second[2]).toBe(result.first[2]);
-	});
-
-	it("stops delivery when the listener scope closes", async () => {
-		const result = await Effect.runPromise(
-			Effect.scoped(
-				Effect.gen(function* () {
-					const store = yield* RuntimeStoreFx;
-					const listenerScope = yield* Scope.make();
-					const replaySeen = yield* Deferred.make<void>();
-					const received: CommittedTransitionSchema.Type[] = [];
-					yield* store.changes.pipe(
-						Stream.runForEach((transition) =>
-							Effect.sync(() => {
-								received.push(transition);
-							}).pipe(Effect.andThen(Deferred.succeed(replaySeen, undefined))),
-						),
-						Effect.forkIn(listenerScope),
-					);
-					yield* Deferred.await(replaySeen);
-
-					yield* Scope.close(listenerScope, Exit.void);
-					yield* store.modifyEffect((transition) =>
-						advanceTransitionFx(transition).pipe(
-							Effect.map(
-								(nextTransition) =>
-									[
-										undefined,
-										nextTransition,
-									] as const,
-							),
-						),
-					);
-
-					return {
-						after: yield* store.read,
-						received,
-					};
-				}),
-			).pipe(Effect.provide(RuntimeStoreTestLayer)),
-		);
-
-		expect(result.after.sequence).toBe(1);
-		expect(result.received.map((transition) => transition.sequence)).toEqual([
-			0,
-		]);
-	});
+			expect(after.sequence).toBe(1);
+			expect(received.map((transition) => transition.sequence)).toEqual([
+				0,
+			]);
+		}).pipe(Effect.provide(RuntimeStoreTestLayer)),
+	);
 });

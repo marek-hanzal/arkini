@@ -3,12 +3,12 @@ import { connect } from "node:net";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { createSqliteEditorMcpAuthOwnershipFx } from "../../../../electron/main/editor-mcp/auth/createSqliteEditorMcpAuthOwnershipFx";
 import { createEditorMcpOwnershipFx } from "../../../../electron/main/editor-mcp/http/createEditorMcpOwnershipFx";
 import {
 	cleanupEditorMcpHarnesses,
 	createEditorMcpHarness,
 	createEditorMcpProjectRepository,
+	createTestEditorMcpStorage,
 	registerEditorMcpCleanup,
 	reserveReleasedEditorMcpPort,
 } from "./support/createEditorMcpHarness";
@@ -32,24 +32,17 @@ const sendRawRequest = (port: number, target: string) =>
 		});
 	});
 
-const createOwnership = (port: number, editor: createEditorMcpOwnershipFx.Props["editor"]) => {
-	const auth = Effect.runSync(
-		createSqliteEditorMcpAuthOwnershipFx({
-			databasePath: ":memory:",
-		}),
-	);
+const createOwnership = async (
+	port: number,
+	editor: createEditorMcpOwnershipFx.Props["editor"],
+) => {
+	const storage = await createTestEditorMcpStorage(port);
 	const ownership = Effect.runSync(
 		createEditorMcpOwnershipFx({
-			auth,
 			editor,
 			notifyOverviewChanged: () => undefined,
 			notifyProjectChanged: () => undefined,
-			preferences: {
-				readPortFx: Effect.succeed(port),
-				writePortFx: () => Effect.void,
-				readNgrokFx: Effect.succeed(undefined),
-				writeNgrokFx: () => Effect.void,
-			},
+			storage,
 			runPromise: Effect.runPromise,
 			tunnel: {
 				openFx: () => Effect.fail(new Error("Unexpected Remote MCP tunnel start.")),
@@ -124,7 +117,7 @@ describe("createEditorMcpOwnershipFx", () => {
 				),
 		);
 		const repository = await createEditorMcpProjectRepository();
-		const ownership = createOwnership(port, {
+		const ownership = await createOwnership(port, {
 			type: "ready",
 			repository,
 		});
@@ -139,7 +132,7 @@ describe("createEditorMcpOwnershipFx", () => {
 	});
 
 	it("stays unavailable without binding when editor persistence failed", async () => {
-		const ownership = createOwnership(32_310, {
+		const ownership = await createOwnership(32_310, {
 			type: "unavailable",
 			message: "Editor storage failed.",
 		});
@@ -159,11 +152,7 @@ describe("createEditorMcpOwnershipFx", () => {
 		while (replacementPort === originalPort)
 			replacementPort = await reserveReleasedEditorMcpPort();
 		const repository = await createEditorMcpProjectRepository();
-		const auth = Effect.runSync(
-			createSqliteEditorMcpAuthOwnershipFx({
-				databasePath: ":memory:",
-			}),
-		);
+		const storage = await createTestEditorMcpStorage(originalPort);
 		let currentPort = originalPort;
 		let releaseWrite: () => void = () => undefined;
 		const writeMayFinish = new Promise<void>((resolve) => {
@@ -175,7 +164,6 @@ describe("createEditorMcpOwnershipFx", () => {
 		});
 		const ownership = Effect.runSync(
 			createEditorMcpOwnershipFx({
-				auth,
 				checkPortFx: () =>
 					Effect.succeed({
 						type: "available" as const,
@@ -186,7 +174,8 @@ describe("createEditorMcpOwnershipFx", () => {
 				},
 				notifyOverviewChanged: () => undefined,
 				notifyProjectChanged: () => undefined,
-				preferences: {
+				storage: {
+					...storage,
 					readPortFx: Effect.sync(() => currentPort),
 					writePortFx: (port) =>
 						Effect.promise(async () => {
@@ -194,8 +183,6 @@ describe("createEditorMcpOwnershipFx", () => {
 							await writeMayFinish;
 							currentPort = port;
 						}),
-					readNgrokFx: Effect.succeed(undefined),
-					writeNgrokFx: () => Effect.void,
 				},
 				runPromise: Effect.runPromise,
 				tunnel: {

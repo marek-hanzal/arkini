@@ -10,7 +10,7 @@ import {
 	createEditorMcpOwnershipFx,
 	type EditorMcpOwnership,
 } from "../../../../../electron/main/editor-mcp/http/createEditorMcpOwnershipFx";
-import { createSqliteEditorMcpAuthOwnershipFx } from "../../../../../electron/main/editor-mcp/auth/createSqliteEditorMcpAuthOwnershipFx";
+import { createFilesystemEditorMcpStorageFx } from "../../../../../electron/main/editor-mcp/storage/createFilesystemEditorMcpStorageFx";
 import { createFilesystemEditorProjectRepositoryFx } from "../../../../../electron/main/editor-project/filesystem/fx/createFilesystemEditorProjectRepositoryFx";
 import type { OwnedEditorProjectRepository } from "../../../../../electron/main/editor-project/EditorProjectServiceOwnership";
 
@@ -58,6 +58,32 @@ export const reserveReleasedEditorMcpPort = () =>
 		});
 	});
 
+export const createTestEditorMcpStorage = async (
+	port?: number,
+	ngrok?: {
+		readonly authtoken: string;
+		readonly domain: string;
+	},
+) => {
+	const directory = await mkdtemp(join(tmpdir(), "arkini-editor-mcp-storage-"));
+	registerEditorMcpCleanup(() =>
+		rm(directory, {
+			force: true,
+			recursive: true,
+		}),
+	);
+	const storage = await Effect.runPromise(
+		createFilesystemEditorMcpStorageFx({
+			root: join(directory, "editor"),
+			protectFx: (value) => Effect.succeed(Buffer.from(value)),
+			unprotectFx: (value) => Effect.succeed(Buffer.from(value).toString()),
+		}),
+	);
+	if (port !== undefined) await Effect.runPromise(storage.writePortFx(port));
+	if (ngrok !== undefined) await Effect.runPromise(storage.writeNgrokFx(ngrok));
+	return storage;
+};
+
 export const connectEditorMcpClient = async (port: number, mode: "auto" | "legacy" = "auto") => {
 	const client = new Client(
 		{
@@ -89,26 +115,16 @@ export const createEditorMcpHarness = async (
 ): Promise<EditorMcpHarness> => {
 	const repository = await createEditorMcpProjectRepository();
 	const port = await reserveReleasedEditorMcpPort();
-	const auth = Effect.runSync(
-		createSqliteEditorMcpAuthOwnershipFx({
-			databasePath: ":memory:",
-		}),
-	);
+	const storage = await createTestEditorMcpStorage(port);
 	const ownership = Effect.runSync(
 		createEditorMcpOwnershipFx({
-			auth,
 			editor: {
 				type: "ready",
 				repository,
 			},
 			notifyOverviewChanged: () => undefined,
 			notifyProjectChanged,
-			preferences: {
-				readPortFx: Effect.succeed(port),
-				writePortFx: () => Effect.void,
-				readNgrokFx: Effect.succeed(undefined),
-				writeNgrokFx: () => Effect.void,
-			},
+			storage,
 			runPromise,
 			tunnel: {
 				openFx: () =>

@@ -7,9 +7,8 @@ import type { EditorMcpOverviewSchema } from "../../../contract/editor/EditorMcp
 import type { EditorMcpRemoteStatusSchema } from "../../../contract/editor/EditorMcpRemoteStatusSchema";
 import type { EditorMcpStatus } from "../../../contract/editor/EditorMcpStatusSchema";
 import type { EditorProjectServiceOwnership } from "../../editor-project/EditorProjectServiceOwnership";
-import type { EditorMcpAuthOwnership } from "../auth/EditorMcpAuthOwnership";
 import { createEditorMcpRemoteHandlerFx } from "../auth/createEditorMcpRemoteHandlerFx";
-import type { EditorMcpPreferences } from "../preference/EditorMcpPreferences";
+import type { EditorMcpStorage } from "../storage/EditorMcpStorage";
 import type { EditorMcpTunnel, EditorMcpTunnelSession } from "../tunnel/EditorMcpTunnel";
 import { checkEditorMcpPortAvailabilityFx } from "./checkEditorMcpPortAvailabilityFx";
 import { checkEditorMcpRemoteEndpointFx } from "./checkEditorMcpRemoteEndpointFx";
@@ -40,13 +39,12 @@ export interface EditorMcpOwnership {
 
 export namespace createEditorMcpOwnershipFx {
 	export interface Props {
-		readonly auth: EditorMcpAuthOwnership;
 		readonly checkPortFx?: typeof checkEditorMcpPortAvailabilityFx;
 		readonly checkRemoteFx?: (origin: URL) => Effect.Effect<void, unknown>;
 		readonly editor: EditorProjectServiceOwnership;
 		readonly notifyOverviewChanged: (overview: EditorMcpOverviewSchema.Type) => void;
 		readonly notifyProjectChanged: (projectId: string) => void;
-		readonly preferences: EditorMcpPreferences;
+		readonly storage: EditorMcpStorage;
 		readonly runPromise: <Value, Error>(effect: Effect.Effect<Value, Error>) => Promise<Value>;
 		readonly tunnel: EditorMcpTunnel;
 	}
@@ -54,13 +52,12 @@ export namespace createEditorMcpOwnershipFx {
 
 /** Owns one optional listener shared by open local MCP and OAuth-protected Remote MCP. */
 export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx")(function* ({
-	auth,
 	checkPortFx = checkEditorMcpPortAvailabilityFx,
 	checkRemoteFx = checkEditorMcpRemoteEndpointFx,
 	editor,
 	notifyOverviewChanged,
 	notifyProjectChanged,
-	preferences,
+	storage,
 	runPromise,
 	tunnel,
 }: createEditorMcpOwnershipFx.Props) {
@@ -84,7 +81,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 	const httpListener = yield* createEditorMcpHttpListenerOwnershipFx({
 		editor,
 		notifyProjectChanged,
-		preferences,
+		storage,
 		readProjectContext: () => projectContext,
 		requestVersionCheckoutFx: (projectId, versionId) => {
 			if (projectContext !== projectId || versionCheckoutRequestFx === undefined)
@@ -98,9 +95,9 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 
 	const readOverviewFx = Effect.gen(function* () {
 		const [port, ngrok, remotePassword] = yield* Effect.all([
-			preferences.readPortFx,
-			preferences.readNgrokFx,
-			auth.ensureSecretFx,
+			storage.readPortFx,
+			storage.readNgrokFx,
+			storage.ensureSecretFx,
 		]);
 		return {
 			port,
@@ -129,13 +126,13 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 					const availability = yield* checkPortFx(configuration.port);
 					if (availability.type === "unavailable")
 						return yield* Effect.fail(new Error(availability.message));
-					yield* preferences.writePortFx(configuration.port);
+					yield* storage.writePortFx(configuration.port);
 				} else {
 					if (remoteStatus.type === "ready" || remoteStatus.type === "starting")
 						return yield* Effect.fail(
 							new Error("Stop Remote MCP before changing the ngrok configuration."),
 						);
-					yield* preferences.writeNgrokFx({
+					yield* storage.writeNgrokFx({
 						authtoken: configuration.authtoken,
 						domain: configuration.domain,
 					});
@@ -182,7 +179,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 				httpListener.setLocalEnabled(true);
 				localStatus = {
 					type: "ready",
-					port: yield* preferences.readPortFx,
+					port: yield* storage.readPortFx,
 				};
 			}
 			const overview = yield* readOverviewFx;
@@ -238,16 +235,16 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 			const provenance = randomBytes(32).toString("base64url");
 			const started = yield* Effect.exit(
 				Effect.gen(function* () {
-					const ngrok = yield* preferences.readNgrokFx;
+					const ngrok = yield* storage.readNgrokFx;
 					if (ngrok === undefined)
 						return yield* Effect.fail(
 							new Error(
 								"Save an ngrok authtoken and domain in Tunnel settings first.",
 							),
 						);
-					yield* auth.ensureSecretFx;
+					yield* storage.ensureSecretFx;
 					yield* ensureServerFx;
-					const port = yield* preferences.readPortFx;
+					const port = yield* storage.readPortFx;
 					openedSession = yield* tunnel.openFx({
 						authtoken: ngrok.authtoken,
 						domain: ngrok.domain,
@@ -259,7 +256,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 					if (mcpNodeHandler === undefined)
 						return yield* Effect.fail(new Error("The MCP handler is unavailable."));
 					const handler = yield* createEditorMcpRemoteHandlerFx({
-						auth,
+						storage,
 						mcpHandler: mcpNodeHandler,
 						origin,
 						runPromise,
@@ -315,7 +312,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 	const resetRemoteAuthFx = commandLock.withPermits(1)(
 		Effect.gen(function* () {
 			yield* stopRemoteUnlockedFx;
-			yield* auth.resetFx;
+			yield* storage.resetFx;
 			const overview = yield* readOverviewFx;
 			yield* Effect.sync(() => notifyOverviewChanged(overview));
 			return {
@@ -330,7 +327,6 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 			tunnelSession = undefined;
 			if (session !== undefined) yield* session.closeFx.pipe(Effect.ignore);
 			yield* closeServerFx.pipe(Effect.ignore);
-			yield* auth.closeFx.pipe(Effect.ignore);
 		}),
 	);
 	return {
@@ -367,9 +363,6 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 					console.error("Remote MCP tunnel could not close.", cause),
 				);
 			httpListener.closeSync();
-			void runPromise(auth.closeFx).catch((cause) =>
-				console.error("Remote MCP auth database could not close.", cause),
-			);
 		},
 	} satisfies EditorMcpOwnership;
 });

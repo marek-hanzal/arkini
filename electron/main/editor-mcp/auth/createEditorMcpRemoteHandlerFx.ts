@@ -10,7 +10,7 @@ import {
 	requireBearerAuth,
 } from "mcp-oauth-server";
 
-import type { EditorMcpAuthOwnership } from "./EditorMcpAuthOwnership";
+import type { EditorMcpStorage } from "../storage/EditorMcpStorage";
 
 export interface EditorMcpRemoteHandler {
 	readonly handle: (request: IncomingMessage, response: ServerResponse) => void;
@@ -92,7 +92,7 @@ ${hidden}
 
 export namespace createEditorMcpRemoteHandlerFx {
 	export interface Props {
-		readonly auth: EditorMcpAuthOwnership;
+		readonly storage: Pick<EditorMcpStorage, "model" | "verifySecretFx">;
 		readonly mcpHandler: (request: IncomingMessage, response: ServerResponse) => void;
 		readonly origin: URL;
 		readonly runPromise: <Value, Error>(effect: Effect.Effect<Value, Error>) => Promise<Value>;
@@ -101,11 +101,11 @@ export namespace createEditorMcpRemoteHandlerFx {
 
 /** Mounts OAuth and protected MCP routes over one existing Node HTTP listener. */
 export const createEditorMcpRemoteHandlerFx = Effect.fn("createEditorMcpRemoteHandlerFx")(
-	({ auth, mcpHandler, origin, runPromise }: createEditorMcpRemoteHandlerFx.Props) =>
+	({ storage, mcpHandler, origin, runPromise }: createEditorMcpRemoteHandlerFx.Props) =>
 		Effect.sync((): EditorMcpRemoteHandler => {
 			const resourceUrl = new URL("/remote/mcp", origin);
 			const provider = new OAuthServer({
-				model: auth.model,
+				model: storage.model,
 				issuerUrl: origin,
 				authorizationUrl: new URL("/consent", origin),
 				resourceServerUrl: resourceUrl,
@@ -166,7 +166,7 @@ export const createEditorMcpRemoteHandlerFx = Effect.fn("createEditorMcpRemoteHa
 					}
 					const secret = readFormValue(request.body, "secret") ?? "";
 					try {
-						if (await runPromise(auth.verifySecretFx(secret))) {
+						if (await runPromise(storage.verifySecretFx(secret))) {
 							Reflect.set(request, "arkiniEditorMcpUser", "arkini-owner");
 							next();
 							return;

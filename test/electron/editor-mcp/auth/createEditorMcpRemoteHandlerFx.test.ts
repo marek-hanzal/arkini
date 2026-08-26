@@ -1,11 +1,14 @@
 import { createHash } from "node:crypto";
+import { mkdtempSync, rmSync } from "node:fs";
 import { createServer } from "node:http";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { EditorMcpRemoteHandler } from "../../../../electron/main/editor-mcp/auth/createEditorMcpRemoteHandlerFx";
 import { createEditorMcpRemoteHandlerFx } from "../../../../electron/main/editor-mcp/auth/createEditorMcpRemoteHandlerFx";
-import { createSqliteEditorMcpAuthOwnershipFx } from "../../../../electron/main/editor-mcp/auth/createSqliteEditorMcpAuthOwnershipFx";
+import { createFilesystemEditorMcpStorageFx } from "../../../../electron/main/editor-mcp/storage/createFilesystemEditorMcpStorageFx";
 
 const cleanups: Array<() => Promise<void>> = [];
 
@@ -33,18 +36,26 @@ const startRemoteHandler = async () => {
 	if (address === null || typeof address === "string")
 		throw new Error("Expected an ephemeral HTTP port.");
 	const origin = new URL(`http://127.0.0.1:${address.port}`);
-	const auth = Effect.runSync(
-		createSqliteEditorMcpAuthOwnershipFx({
-			databasePath: ":memory:",
+	const storageRoot = mkdtempSync(join(tmpdir(), "arkini-editor-mcp-auth-"));
+	cleanups.push(async () =>
+		rmSync(storageRoot, {
+			recursive: true,
+			force: true,
 		}),
 	);
-	cleanups.push(() => Effect.runPromise(auth.closeFx));
-	const secret = await Effect.runPromise(auth.ensureSecretFx);
+	const storage = await Effect.runPromise(
+		createFilesystemEditorMcpStorageFx({
+			root: join(storageRoot, "editor"),
+			protectFx: (value) => Effect.succeed(Buffer.from(value)),
+			unprotectFx: (value) => Effect.succeed(Buffer.from(value).toString()),
+		}),
+	);
+	const secret = await Effect.runPromise(storage.ensureSecretFx);
 	if (secret === undefined) throw new Error("Expected the initial Remote password.");
 	const mcpHandler = vi.fn((_request, response) => (response.statusCode = 204));
 	handler = Effect.runSync(
 		createEditorMcpRemoteHandlerFx({
-			auth,
+			storage,
 			mcpHandler: (request, response) => {
 				mcpHandler(request, response);
 				response.end();

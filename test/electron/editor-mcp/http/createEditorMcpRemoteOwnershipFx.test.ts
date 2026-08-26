@@ -2,12 +2,12 @@ import { request as requestHttp } from "node:http";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { createSqliteEditorMcpAuthOwnershipFx } from "../../../../electron/main/editor-mcp/auth/createSqliteEditorMcpAuthOwnershipFx";
 import { createEditorMcpOwnershipFx } from "../../../../electron/main/editor-mcp/http/createEditorMcpOwnershipFx";
 import type { EditorMcpTunnel } from "../../../../electron/main/editor-mcp/tunnel/EditorMcpTunnel";
 import { EditorMcpTunnelProvenanceHeader } from "../../../../electron/main/editor-mcp/tunnel/EditorMcpTunnelProvenanceHeader";
 import {
 	createEditorMcpProjectRepository,
+	createTestEditorMcpStorage,
 	reserveReleasedEditorMcpPort,
 } from "./support/createEditorMcpHarness";
 
@@ -62,12 +62,11 @@ const createRemoteOwnership = async (
 	checkRemoteFx: createEditorMcpOwnershipFx.Props["checkRemoteFx"] = () => Effect.void,
 ) => {
 	const repository = await createEditorMcpProjectRepository((cleanup) => cleanups.push(cleanup));
-	const auth = Effect.runSync(
-		createSqliteEditorMcpAuthOwnershipFx({
-			databasePath: ":memory:",
-		}),
-	);
 	const port = await reserveReleasedEditorMcpPort();
+	const storage = await createTestEditorMcpStorage(port, {
+		authtoken: "ngrok-token",
+		domain: "stable-example.ngrok-free.app",
+	});
 	const opened: Array<{
 		readonly authtoken: string;
 		readonly domain: string;
@@ -96,7 +95,6 @@ const createRemoteOwnership = async (
 	};
 	const ownership = Effect.runSync(
 		createEditorMcpOwnershipFx({
-			auth,
 			checkRemoteFx,
 			editor: {
 				type: "ready",
@@ -104,22 +102,14 @@ const createRemoteOwnership = async (
 			},
 			notifyOverviewChanged: () => undefined,
 			notifyProjectChanged: () => undefined,
-			preferences: {
-				readPortFx: Effect.succeed(port),
-				writePortFx: () => Effect.void,
-				readNgrokFx: Effect.succeed({
-					authtoken: "ngrok-token",
-					domain: "stable-example.ngrok-free.app",
-				}),
-				writeNgrokFx: () => Effect.void,
-			},
+			storage,
 			runPromise: Effect.runPromise,
 			tunnel,
 		}),
 	);
 	cleanups.push(() => Effect.runPromise(ownership.closeFx));
 	return {
-		auth,
+		storage,
 		closeTunnel,
 		disconnectTunnel: () => disconnectTunnel(),
 		opened,
@@ -143,7 +133,7 @@ describe("Remote Editor MCP ownership", () => {
 	});
 
 	it("shares one listener while keeping local and remote lifecycle independent", async () => {
-		const { auth, closeTunnel, opened, ownership, port } = await createRemoteOwnership();
+		const { storage, closeTunnel, opened, ownership, port } = await createRemoteOwnership();
 		const remote = await Effect.runPromise(ownership.startRemoteFx);
 		const remotePassword = remote.overview.remotePassword;
 		expect(remote.overview).toMatchObject({
@@ -180,18 +170,18 @@ describe("Remote Editor MCP ownership", () => {
 
 		const reset = await Effect.runPromise(ownership.resetRemoteAuthFx);
 		expect(reset.overview.remotePassword).not.toBe(remotePassword);
-		expect(await Effect.runPromise(auth.verifySecretFx(remotePassword))).toBe(false);
+		expect(await Effect.runPromise(storage.verifySecretFx(remotePassword))).toBe(false);
 	});
 
 	it("preserves generated auth after an ordinary tunnel health failure", async () => {
 		let failHealthCheck = true;
-		const { auth, ownership } = await createRemoteOwnership(() =>
+		const { storage, ownership } = await createRemoteOwnership(() =>
 			failHealthCheck ? Effect.fail(new Error("public endpoint unavailable")) : Effect.void,
 		);
 		const failed = await Effect.runPromise(ownership.startRemoteFx);
 		const remotePassword = failed.overview.remotePassword;
 		expect(failed.overview.remote.type).toBe("unavailable");
-		expect(await Effect.runPromise(auth.verifySecretFx(remotePassword))).toBe(true);
+		expect(await Effect.runPromise(storage.verifySecretFx(remotePassword))).toBe(true);
 
 		failHealthCheck = false;
 		const recovered = await Effect.runPromise(ownership.startRemoteFx);

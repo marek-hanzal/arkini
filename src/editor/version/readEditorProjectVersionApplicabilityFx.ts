@@ -12,10 +12,10 @@ export const readEditorProjectVersionApplicability = (
 			}
 		: {
 				type: "incompatible",
-				reason: `Version was created by Arkini ${arkini}; Arkini ${ArkiniAppVersion} has no compatible snapshot migrator.`,
+				reason: `Version was created by Arkini ${arkini}; this build is Arkini ${ArkiniAppVersion}.`,
 			};
 
-/** Conservatively gates checkout until a future explicit cross-version migrator exists. */
+/** Keeps version checkout pinned to this exact Arkini build contract. */
 export const readEditorProjectVersionApplicabilityFx = Effect.fn(
 	"readEditorProjectVersionApplicabilityFx",
 )((arkini: string) => Effect.succeed(readEditorProjectVersionApplicability(arkini)));

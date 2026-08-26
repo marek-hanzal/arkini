@@ -9,7 +9,7 @@ import { Effect } from "effect";
 
 import type { EditorProjectServiceOwnership } from "../../editor-project/EditorProjectServiceOwnership";
 import type { EditorMcpRemoteHandler } from "../auth/createEditorMcpRemoteHandlerFx";
-import type { EditorMcpPreferences } from "../preference/EditorMcpPreferences";
+import type { EditorMcpStorage } from "../storage/EditorMcpStorage";
 import { EditorMcpTunnelProvenanceHeader } from "../tunnel/EditorMcpTunnelProvenanceHeader";
 import { createEditorMcpServerFx } from "../tool/createEditorMcpServerFx";
 
@@ -35,7 +35,7 @@ export namespace createEditorMcpHttpListenerOwnershipFx {
 	export interface Props {
 		readonly editor: EditorProjectServiceOwnership;
 		readonly notifyProjectChanged: (projectId: string) => void;
-		readonly preferences: EditorMcpPreferences;
+		readonly storage: Pick<EditorMcpStorage, "readPortFx">;
 		readonly readProjectContext: () => string | undefined;
 		readonly requestVersionCheckoutFx: (
 			projectId: string,
@@ -65,7 +65,7 @@ export const createEditorMcpHttpListenerOwnershipFx = Effect.fn(
 )(function* ({
 	editor,
 	notifyProjectChanged,
-	preferences,
+	storage,
 	readProjectContext,
 	requestVersionCheckoutFx,
 	runPromise,
@@ -146,7 +146,7 @@ export const createEditorMcpHttpListenerOwnershipFx = Effect.fn(
 			}
 			writeNotFound(response);
 		});
-		const port = yield* preferences.readPortFx;
+		const port = yield* storage.readPortFx;
 		yield* Effect.callback<void, Error>((resume) => {
 			const onError = (cause: Error) => resume(Effect.fail(cause));
 			listener.once("error", onError);

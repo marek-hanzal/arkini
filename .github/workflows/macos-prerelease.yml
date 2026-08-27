@@ -50,6 +50,8 @@ jobs:
           path: |
             .out/desktop/release/*.dmg
             .out/desktop/release/*.zip
+            .out/desktop/release/*.arkpack
+            .out/desktop/release/*.arksig
             .out/desktop/release/SHA256SUMS
           if-no-files-found: error
           retention-days: 14
@@ -62,8 +64,10 @@ jobs:
           gh release create "$GITHUB_REF_NAME" \
             .out/desktop/release/*.dmg \
             .out/desktop/release/*.zip \
+            .out/desktop/release/arkini.arkpack \
+            .out/desktop/release/arkini.arksig \
             .out/desktop/release/SHA256SUMS \
             --verify-tag \
             --prerelease \
             --title "Arkini $GITHUB_REF_NAME" \
-            --notes "Unsigned macOS Apple Silicon build. Its bundled game carries offline-verifiable release-channel provenance. Verify SHA256SUMS before opening and use the normal macOS Gatekeeper override."
+            --notes "Unsigned macOS Apple Silicon build plus its standalone official Arkpack and Sigstore bundle. Verify SHA256SUMS before opening and use the normal macOS Gatekeeper override."

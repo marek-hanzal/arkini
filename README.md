@@ -219,13 +219,15 @@ The recipe cleans `.out/desktop`, builds Electron main/preload/renderer once, pa
 ```text
 Arkini-<version>-mac-arm64.dmg
 Arkini-<version>-mac-arm64.zip
+arkini.arkpack
+arkini.arksig  # tagged release build only
 SHA256SUMS
 mac-arm64/Arkini.app
 ```
 
 Verify downloads with `shasum -a 256 -c SHA256SUMS`. These development artifacts are intentionally unsigned and unnotarized. macOS may require opening the application through Finder's **Open** action or allowing it from **System Settings → Privacy & Security**. Do not add ad-hoc signing, fake certificates, or notarization placeholders to this milestone.
 
-The [macOS prerelease workflow](.github/workflows/macos-prerelease.yml) installs the repository tools through `mise-action` and invokes the same `./Argcfile.sh ci-macos` entrypoint on the GitHub-hosted `macos-15` Apple Silicon runner. That recipe runs formatting and type gates, packages exactly once, then runs Dependency Cruiser, copy/paste detection, and the isolated parallel test suite. Manual dispatch uploads an External workflow artifact only. Tags matching `v*-dev.*`, such as `v0.1.0-dev.1`, use GitHub OIDC to keyless-sign the exact bundled Arkpack and create an immutable GitHub prerelease containing the DMG, ZIP, and `SHA256SUMS`. Normal source pushes do not spend macOS runner time.
+The [macOS prerelease workflow](.github/workflows/macos-prerelease.yml) installs the repository tools through `mise-action` and invokes the same `./Argcfile.sh ci-macos` entrypoint on the GitHub-hosted `macos-15` Apple Silicon runner. That recipe runs formatting and type gates, packages exactly once, then runs Dependency Cruiser, copy/paste detection, and the isolated parallel test suite. Manual dispatch uploads an External workflow artifact only. Tags matching `v*-dev.*`, such as `v0.1.0-dev.1`, use GitHub OIDC to keyless-sign the exact bundled Arkpack and create an immutable GitHub prerelease containing the DMG, ZIP, standalone Arkpack, its Sigstore bundle, and `SHA256SUMS`. Normal source pushes do not spend macOS runner time.
 
 Useful focused commands:
 

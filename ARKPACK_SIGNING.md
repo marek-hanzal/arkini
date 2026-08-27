@@ -27,6 +27,10 @@ generic `ARKINI_RELEASE_ISSUER` and `ARKINI_RELEASE_IDENTITY` build inputs, then
 5. verifies the final pair against Arkini's embedded trust root and workflow identity before
    packaging continues.
 
+The tagged GitHub prerelease publishes that same `arkini.arkpack` and `arkini.arksig` pair as
+standalone assets next to the application archives. Both files are also covered by `SHA256SUMS`,
+and the packaged Electron CLI must classify the pair as Trusted before publication.
+
 There is no stored signing key, repository signing secret, local key generation, or developer
 mode. Manual workflow runs do not set release signing and therefore produce External packs.
 Local `argc build`, Editor Build, Save as, and Install also produce External packs.

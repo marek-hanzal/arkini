@@ -1,6 +1,8 @@
 import { bundleFromJSON } from "@sigstore/bundle";
+import { crypto as sigstoreCrypto } from "@sigstore/core";
 import { TrustedRoot } from "@sigstore/protobuf-specs";
 import { toSignedEntity, toTrustMaterial, Verifier } from "@sigstore/verify";
+import { KeyObject, verify as verifyNodeSignature } from "node:crypto";
 import { Effect } from "effect";
 
 import { ArkiniReleaseIdentity } from "~/engine/pack/ArkiniReleaseIdentity";
@@ -28,6 +30,30 @@ export const createArkpackTrustVerifier = ({
 		ctlogThreshold: 1,
 		tlogThreshold: 1,
 	});
+	const verifySigstore = (entity: ReturnType<typeof toSignedEntity>) => {
+		const originalVerify = sigstoreCrypto.verify;
+		// Electron 43 requires the ECDSA digest explicitly, while Sigstore's Rekor checks omit it.
+		sigstoreCrypto.verify = (data, key, signature, algorithm) => {
+			const keyType = key instanceof KeyObject ? key.asymmetricKeyType : undefined;
+			const digest =
+				algorithm ?? (keyType === "ed25519" || keyType === "ed448" ? null : "sha256");
+			try {
+				return verifyNodeSignature(digest, data, key, signature);
+			} catch {
+				return false;
+			}
+		};
+		try {
+			return verifier.verify(entity, {
+				subjectAlternativeName: identity.subjectAlternativeName,
+				extensions: {
+					issuer: identity.issuer,
+				},
+			});
+		} finally {
+			sigstoreCrypto.verify = originalVerify;
+		}
+	};
 	return ({ bytes, signature }: verifyArkpackTrustFx.Props): ArkpackTrustSchema.Type => {
 		if (signature === undefined)
 			return {
@@ -36,12 +62,7 @@ export const createArkpackTrustVerifier = ({
 		try {
 			const serialized = typeof signature === "string" ? JSON.parse(signature) : signature;
 			const entity = toSignedEntity(bundleFromJSON(serialized), Buffer.from(bytes));
-			verifier.verify(entity, {
-				subjectAlternativeName: identity.subjectAlternativeName,
-				extensions: {
-					issuer: identity.issuer,
-				},
-			});
+			verifySigstore(entity);
 			return {
 				type: "trusted",
 			};

@@ -38,22 +38,35 @@ copy_paste_check() {
 }
 
 package_macos_artifacts() {
-	local version
+	local packaged_cli version
 	version=$(desktop_version)
+	packaged_cli=.out/desktop/release/mac-arm64/Arkini.app/Contents/MacOS/arkini-cli
 	electron-builder \
 		--config electron-builder.yml \
 		--mac \
 		--arm64 \
 		--publish never
+	cp game/arkini/build/arkini.arkpack .out/desktop/release/arkini.arkpack
+	if [[ -f game/arkini/build/arkini.arksig ]]; then
+		cp game/arkini/build/arkini.arksig .out/desktop/release/arkini.arksig
+	fi
 	(
+		local -a checksum_artifacts=(
+			"Arkini-$version-mac-arm64.dmg"
+			"Arkini-$version-mac-arm64.zip"
+			arkini.arkpack
+		)
 		cd .out/desktop/release
-		shasum -a 256 \
-			"Arkini-$version-mac-arm64.dmg" \
-			"Arkini-$version-mac-arm64.zip" \
-			>SHA256SUMS
+		if [[ -f arkini.arksig ]]; then
+			checksum_artifacts+=(arkini.arksig)
+		fi
+		shasum -a 256 "${checksum_artifacts[@]}" >SHA256SUMS
 	)
-	.out/desktop/release/mac-arm64/Arkini.app/Contents/MacOS/arkini-cli --version |
-		grep -F "$version"
+	"$packaged_cli" --version | grep -F "$version"
+	if [[ "${ARKINI_RELEASE_SIGN:-}" == "1" ]]; then
+		"$packaged_cli" arkpack verify .out/desktop/release/arkini.arkpack |
+			grep -Fx '{"type":"trusted"}'
+	fi
 }
 
 # @cmd Install exact JavaScript dependencies from the lockfile

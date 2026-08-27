@@ -7,7 +7,12 @@ import { createEditorProjectFilesystemPathsFx } from "./filesystem/createEditorP
 import { readFilesystemEditorProjectFilesFx } from "./filesystem/fx/readFilesystemEditorProjectFilesFx";
 import { readFilesystemEditorProjectSidecarsFx } from "./filesystem/fx/readFilesystemEditorProjectSidecarsFx";
 import { readFilesystemEditorProjectVersionHistoryFx } from "./filesystem/fx/readFilesystemEditorProjectVersionHistoryFx";
-import { EditorJsonExportOwnershipFile } from "./EditorJsonExportRecoveryRecord";
+import {
+	EditorJsonExportCleanupSuffix,
+	EditorJsonExportOwnershipFile,
+	isOwnedEditorJsonExportTargetFx,
+	readEditorJsonExportRecoveryPaths,
+} from "./EditorJsonExportRecoveryRecord";
 import { recoverOneEditorJsonExportFx } from "./recoverEditorJsonExportsFx";
 
 const writeSyncedTextFx = (target: string, source: string) =>
@@ -44,6 +49,64 @@ const syncExportTreeFx = Effect.fn("syncEditorJsonExportTreeFx")(function* (
 		yield* syncFilesystemPathFx(fileSystem, directory);
 });
 
+const readExportFx = Effect.fn("readEditorJsonExportFx")(function* (root: string) {
+	const fileSystem = yield* FileSystem.FileSystem;
+	const paths = yield* createEditorProjectFilesystemPathsFx(root);
+	const project = yield* readFilesystemEditorProjectFilesFx(root);
+	yield* readFilesystemEditorProjectSidecarsFx({
+		paths,
+		projectId: project.config.meta.id,
+	});
+	yield* readFilesystemEditorProjectVersionHistoryFx(paths);
+	return {
+		files: yield* fileSystem.readDirectory(root, {
+			recursive: true,
+		}),
+		project,
+	};
+});
+
+const findRecoveryPathFx = Effect.fn("findEditorJsonExportRecoveryPathFx")(function* ({
+	recovered,
+	recoveryDirectory,
+	record,
+}: {
+	readonly recovered: boolean;
+	readonly recoveryDirectory: string;
+	readonly record: {
+		readonly hadTarget: boolean;
+		readonly source: string;
+		readonly target: string;
+		readonly transaction: string;
+	};
+}) {
+	const fileSystem = yield* FileSystem.FileSystem;
+	const path = yield* Path.Path;
+	const paths = readEditorJsonExportRecoveryPaths(path, record);
+	const targetOwned =
+		(yield* fileSystem.exists(record.target)) &&
+		(yield* isOwnedEditorJsonExportTargetFx(paths.marker, record.transaction));
+	const candidates = [
+		...(recovered || targetOwned
+			? [
+					record.target,
+				]
+			: []),
+		paths.previous,
+		paths.restore,
+		paths.pending,
+	];
+	for (const candidate of new Set(candidates)) {
+		if (!(yield* fileSystem.exists(candidate))) continue;
+		if (Exit.isSuccess(yield* Effect.exit(readExportFx(candidate)))) return candidate;
+	}
+	return yield* Effect.fail(
+		new Error(
+			`Editor export recovery ${recoveryDirectory} has no complete re-importable project.`,
+		),
+	);
+});
+
 export namespace replaceEditorJsonExportDirectoryFx {
 	export interface Props {
 		readonly recoveryRoot: string;
@@ -69,6 +132,13 @@ export const replaceEditorJsonExportDirectoryFx = Effect.fn("replaceEditorJsonEx
 		const pending = path.join(parent, `.${name}.${transaction}.pending`);
 		const previous = path.join(parent, `.${name}.${transaction}.previous`);
 		const recoveryDirectory = path.join(recoveryRoot, transaction);
+		const record = {
+			hadTarget: false,
+			source,
+			target,
+			transaction,
+		};
+		let journaled = false;
 
 		return yield* Effect.gen(function* () {
 			yield* fileSystem.copy(source, pending, {
@@ -90,16 +160,7 @@ export const replaceEditorJsonExportDirectoryFx = Effect.fn("replaceEditorJsonEx
 						recursive: true,
 					});
 			}
-			const paths = yield* createEditorProjectFilesystemPathsFx(pending);
-			const project = yield* readFilesystemEditorProjectFilesFx(pending);
-			yield* readFilesystemEditorProjectSidecarsFx({
-				paths,
-				projectId: project.config.meta.id,
-			});
-			yield* readFilesystemEditorProjectVersionHistoryFx(paths);
-			const exportedFiles = yield* fileSystem.readDirectory(pending, {
-				recursive: true,
-			});
+			const { files: exportedFiles, project } = yield* readExportFx(pending);
 			yield* syncExportTreeFx(pending, exportedFiles);
 			yield* writeSyncedTextFx(
 				path.join(pending, EditorJsonExportOwnershipFile),
@@ -108,19 +169,16 @@ export const replaceEditorJsonExportDirectoryFx = Effect.fn("replaceEditorJsonEx
 			yield* syncFilesystemPathFx(fileSystem, parent);
 
 			const hadTarget = yield* fileSystem.exists(target);
+			record.hadTarget = hadTarget;
 			yield* fileSystem.makeDirectory(recoveryDirectory, {
 				recursive: true,
 			});
 			yield* syncFilesystemPathFx(fileSystem, recoveryRoot);
 			yield* writeSyncedTextFx(
 				path.join(recoveryDirectory, "record.json"),
-				`${JSON.stringify({
-					hadTarget,
-					source,
-					target,
-					transaction,
-				})}\n`,
+				`${JSON.stringify(record)}\n`,
 			);
+			journaled = true;
 
 			const swap = yield* Effect.exit(
 				Effect.uninterruptible(
@@ -138,11 +196,39 @@ export const replaceEditorJsonExportDirectoryFx = Effect.fn("replaceEditorJsonEx
 				),
 			);
 			if (Exit.isFailure(swap)) {
-				yield* recoverOneEditorJsonExportFx(recoveryDirectory);
-				return yield* Effect.failCause(swap.cause);
+				const firstRecovery = yield* Effect.exit(
+					recoverOneEditorJsonExportFx(recoveryDirectory),
+				);
+				let recovered = Exit.isSuccess(firstRecovery);
+				if (!recovered)
+					recovered = Exit.isSuccess(
+						yield* Effect.exit(recoverOneEditorJsonExportFx(recoveryDirectory)),
+					);
+				if (
+					!recovered &&
+					!(yield* fileSystem.exists(recoveryDirectory)) &&
+					(yield* fileSystem.exists(
+						`${recoveryDirectory}${EditorJsonExportCleanupSuffix}`,
+					))
+				)
+					recovered = true;
+				const recovery = yield* findRecoveryPathFx({
+					recovered,
+					recoveryDirectory,
+					record,
+				});
+				return yield* Effect.fail(
+					new Error(
+						`Editor export publication failed. A complete recovery copy was preserved at ${recovery}.`,
+						{
+							cause: swap.cause,
+						},
+					),
+				);
 			}
-			yield* fileSystem.remove(path.join(target, EditorJsonExportOwnershipFile));
-			yield* syncFilesystemPathFx(fileSystem, target);
+			yield* fileSystem
+				.remove(path.join(target, EditorJsonExportOwnershipFile))
+				.pipe(Effect.andThen(syncFilesystemPathFx(fileSystem, target)), Effect.ignore);
 			yield* recoverOneEditorJsonExportFx(recoveryDirectory).pipe(Effect.ignore);
 			return {
 				json: exportedFiles.filter((file) => file.endsWith(".json")).length,
@@ -151,12 +237,27 @@ export const replaceEditorJsonExportDirectoryFx = Effect.fn("replaceEditorJsonEx
 			} satisfies replaceEditorJsonExportDirectoryFx.Success;
 		}).pipe(
 			Effect.ensuring(
-				fileSystem
-					.remove(pending, {
-						force: true,
-						recursive: true,
-					})
-					.pipe(Effect.ignore),
+				Effect.suspend(() =>
+					journaled
+						? Effect.void
+						: Effect.all(
+								[
+									pending,
+									recoveryDirectory,
+								].map((artifact) =>
+									fileSystem
+										.remove(artifact, {
+											force: true,
+											recursive: true,
+										})
+										.pipe(Effect.ignore),
+								),
+								{
+									concurrency: 1,
+									discard: true,
+								},
+							),
+				),
 			),
 		);
 	},

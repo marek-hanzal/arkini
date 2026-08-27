@@ -115,7 +115,23 @@ const recoverActiveFx = Effect.fn("recoverActiveEditorJsonExportFx")(function* (
 		return yield* Effect.fail(
 			new Error(`Committed Editor export target ${record.target} is missing.`),
 		);
-	if (!committed && publishing) {
+	if (!committed && !record.hadTarget) {
+		if (yield* fileSystem.exists(record.target)) {
+			const owned = yield* isOwnedEditorJsonExportTargetFx(paths.marker, record.transaction);
+			if (!owned)
+				return yield* Effect.fail(
+					new Error(`Editor export recovery target ${record.target} is not owned.`),
+				);
+		} else if (yield* fileSystem.exists(paths.pending)) {
+			yield* fileSystem.rename(paths.pending, record.target);
+		} else {
+			return yield* Effect.fail(
+				new Error(`Editor export recovery artifact ${paths.pending} is missing.`),
+			);
+		}
+		yield* syncFilesystemPathFx(fileSystem, paths.parent);
+		yield* writeRecoveryMarkerFx(recoveryDirectory, "committed");
+	} else if (!committed && publishing) {
 		if (record.hadTarget) {
 			if (yield* fileSystem.exists(paths.previous)) {
 				const restoringMarker = path.join(recoveryDirectory, "restoring");
@@ -170,16 +186,6 @@ const recoverActiveFx = Effect.fn("recoverActiveEditorJsonExportFx")(function* (
 					new Error(`Editor export recovery target ${record.target} is missing.`),
 				);
 			}
-		} else if (yield* fileSystem.exists(record.target)) {
-			const owned = yield* isOwnedEditorJsonExportTargetFx(paths.marker, record.transaction);
-			if (!owned)
-				return yield* Effect.fail(
-					new Error(`Editor export recovery target ${record.target} is not owned.`),
-				);
-			yield* fileSystem.remove(record.target, {
-				recursive: true,
-			});
-			yield* syncFilesystemPathFx(fileSystem, paths.parent);
 		}
 	}
 	yield* finishActiveFx(recoveryDirectory, record);

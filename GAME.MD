@@ -71,7 +71,6 @@ The implemented write surface includes:
 - spawn an item;
 - move an item;
 - swap two grid items;
-- remove an eligible item;
 - set an item stack quantity;
 - place a resolved drop or output;
 - store material into a line input;
@@ -101,7 +100,7 @@ Delivered materials may be stored in a specific owner/line/input slot before sta
 
 An input accepts only matching material and only up to its required quantity plus configured extra capacity. During an active job, a zero-capacity input is closed and rejects new delivery; a positive-capacity input remains open as storage. A queued request does not close the input.
 
-Removing an idle board owner releases every direct buffered root through canonical existing-item placement in the same atomic mutation. The released owner position is the single board origin; normal scope policy may still place an allowed item into inventory when board capacity is exhausted. A loaded owner in passive inventory must return to the board before removal because inventory coordinates are never invented as a board origin.
+Item removal is not a generic player command. An authored gameplay mechanic may remove an idle board owner through the canonical engine transition, which releases every direct buffered root through canonical existing-item placement in the same atomic mutation. The released owner position is the single board origin; normal scope policy may still place an allowed item into inventory when board capacity is exhausted. A loaded owner in passive inventory must return to the board before removal because inventory coordinates are never invented as a board origin.
 
 Buffered material retains no historical stack, slot, or position. Pure roots may normalize into ordinary stacks and identities. Impure roots preserve their exact runtime identity, state, and passive owned subtree.
 

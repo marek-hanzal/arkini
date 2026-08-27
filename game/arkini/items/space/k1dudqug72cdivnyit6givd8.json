@@ -1,0 +1,21 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "k1dudqug72cdivnyit6givd8",
+		"id": "back-to-0",
+		"title": "Back to 0",
+		"description": "foo",
+		"asset": {
+			"default": [
+				"avatar-01"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"type": "space",
+		"space": 0,
+		"enable": true,
+		"input": [],
+		"rules": []
+	}
+}

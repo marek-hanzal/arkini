@@ -5,14 +5,6 @@ import { match, P } from "ts-pattern";
 import { syncFilesystemPathFx } from "../filesystem/syncFilesystemPathFx";
 import { readEditorJsonExportFx } from "./readEditorJsonExportFx";
 
-const containsPath = (path: Path.Path, parent: string, candidate: string) => {
-	const relative = path.relative(parent, candidate);
-	return (
-		relative === "" ||
-		(relative !== ".." && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative))
-	);
-};
-
 const isPortableEditorProjectFile = (path: Path.Path, relative: string) =>
 	match(relative.split(path.sep))
 		.with(
@@ -152,10 +144,11 @@ export const createEditorJsonExportDirectoryFx = Effect.fn("createEditorJsonExpo
 			}),
 			(target) =>
 				Effect.gen(function* () {
-					if (
-						containsPath(path, canonicalSource, target) ||
-						containsPath(path, target, canonicalSource)
-					)
+					const relativeToSource = path.relative(canonicalSource, target);
+					const targetInsideSource =
+						!path.isAbsolute(relativeToSource) &&
+						relativeToSource.split(path.sep)[0] !== "..";
+					if (targetInsideSource)
 						return yield* Effect.fail(
 							new Error("The export folder must be outside the open Editor project."),
 						);

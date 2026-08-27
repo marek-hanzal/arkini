@@ -18,7 +18,6 @@ export namespace exportEditorJsonDirectoryFx {
 
 	export interface Success {
 		readonly json: number;
-		readonly projectDirectory: string;
 		readonly resources: number;
 		readonly revision: number;
 		readonly root: string;
@@ -66,10 +65,7 @@ export const exportEditorJsonDirectoryFx = Effect.fn("exportEditorJsonDirectoryF
 					source,
 				}),
 			);
-			return {
-				...exported,
-				projectDirectory: exported.root,
-			} satisfies exportEditorJsonDirectoryFx.Success;
+			return exported satisfies exportEditorJsonDirectoryFx.Success;
 		}).pipe(
 			Effect.provide(NodeServices.layer),
 			Effect.mapError((cause) =>

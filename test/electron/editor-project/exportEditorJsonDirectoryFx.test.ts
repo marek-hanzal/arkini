@@ -50,7 +50,6 @@ describe("exportEditorJsonDirectoryFx", () => {
 
 			expect(exported).not.toBeNull();
 			if (exported === null) return;
-			expect(exported.projectDirectory).toBe(exported.root);
 			expect(exported.root).toMatch(/\/destination\/project-one-json-[^/]+$/u);
 			expect((yield* readReimportableProjectFx(exported.root)).marker.revision).toBe(1);
 			expect(yield* fileSystem.readFileString(`${destination}/keep.txt`)).toBe("keep");

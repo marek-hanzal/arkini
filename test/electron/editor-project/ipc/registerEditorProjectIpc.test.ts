@@ -24,7 +24,6 @@ const sourceExport = vi.hoisted(() => ({
 
 const completedSourceExport = {
 	json: 9,
-	projectDirectory: "/tmp/source",
 	resources: 3,
 	revision: 4,
 	root: "/tmp/source",

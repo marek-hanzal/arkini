@@ -7,7 +7,6 @@ import { invokeEditorProjectTransportFx } from "~/bridge/editor/invokeEditorProj
 export const EditorSourceExportSchema = z
 	.object({
 		json: z.number().int().positive(),
-		projectDirectory: z.string().min(1),
 		resources: z.number().int().nonnegative(),
 		revision: z.number().int().nonnegative(),
 		root: z.string().min(1),

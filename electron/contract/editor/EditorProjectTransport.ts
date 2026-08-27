@@ -111,7 +111,6 @@ export namespace EditorProjectTransport {
 
 	export interface SourceExport {
 		readonly json: number;
-		readonly projectDirectory: string;
 		readonly resources: number;
 		readonly revision: number;
 		readonly root: string;

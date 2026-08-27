@@ -10,9 +10,6 @@ Arkini is a client-only, offline merge and production game played across multipl
 
 The current engine lets callers create and move items, navigate persistent Board spaces, store line materials, enqueue product-line work, advance deterministic jobs, execute directional merges, resolve configured outputs, and place resulting quantities through one shared policy. Utility controls cross the runtime, session, storage, and presentation boundaries described later in this document.
 
-Every Board space uses the Board size from game metadata; Inventory uses its configured grid size and Toolbar uses its optional one-row slot count. They are not fixed engine constants.
-The bundled Arkini package currently authors a `13 × 9` Board, a `7 × 7` Inventory, and a 13-slot Toolbar.
-
 ## 2. Items and locations
 
 Every live item is a runtime instance of one canonical configured item.

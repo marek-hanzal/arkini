@@ -168,14 +168,14 @@ describe("project section form session", () => {
 		const compatibility = container.querySelector<HTMLElement>(
 			'[data-ui="EditorCompatibilityNotice"]',
 		);
-		expect(compatibility?.dataset.level).toBe("none");
+		expect(compatibility?.dataset.result).toBe("noop");
 		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
 		if (title === null) throw new Error("Missing project title input.");
 		await changeInput(title, "Changed project");
 		expect(container.querySelector('[data-ui="EditorCompatibilityNotice"]')).toBe(
 			compatibility,
 		);
-		expect(compatibility?.dataset.level).toBe("minor");
+		expect(compatibility?.dataset.result).toBe("minor");
 		await renderSection(<div data-ui="AppearanceSection">Appearance</div>);
 		await renderSection(<EditorProjectGeneralSection />);
 

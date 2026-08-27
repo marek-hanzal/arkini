@@ -12,10 +12,8 @@ import {
 import { forceDeleteEditorItemFx } from "~/editor/forceDeleteEditorItemFx";
 import { readEditorAssetDeleteBlockersFx } from "~/editor/readEditorAssetDeleteBlockersFx";
 import { readEditorItemDeleteBlockersFx } from "~/editor/readEditorItemDeleteBlockersFx";
-import {
-	EditorProjectCompatibility,
-	type EditorProjectCompatibilityLevel,
-} from "~/editor/version/EditorProjectCompatibility";
+import { analyzeEditorProjectCompatibilityFx } from "~/editor/version/analyzeEditorProjectCompatibilityFx";
+import { bumpArkpackVersionFx } from "~/editor/version/bumpArkpackVersionFx";
 import { GameProjectGameSchemaReference } from "~/engine/source/GameProjectReference";
 import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
@@ -106,13 +104,13 @@ export const createFilesystemEditorProjectCommitOperationsFx = Effect.fn(
 		config,
 		resources,
 		nowMs,
-		minimumLevel = "none",
+		minimumResult,
 	}: {
 		readonly state: FilesystemEditorProjectState;
 		readonly config: GameConfigSchema.Type;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
 		readonly nowMs: number;
-		readonly minimumLevel?: EditorProjectCompatibilityLevel;
+		readonly minimumResult?: "minor";
 	}) {
 		const canonicalConfig = GameConfigSchema.parse({
 			...config,
@@ -122,16 +120,16 @@ export const createFilesystemEditorProjectCommitOperationsFx = Effect.fn(
 			return yield* Effect.fail(
 				new Error("The Editor project ID can only change through Refresh from disk."),
 			);
-		const compatibility = EditorProjectCompatibility.analyze(
+		const compatibility = yield* analyzeEditorProjectCompatibilityFx(
 			state.project.config,
 			canonicalConfig,
 		);
-		const level =
-			minimumLevel === "minor" && compatibility.level === "none"
+		const result =
+			minimumResult === "minor" && compatibility.result === "noop"
 				? "minor"
-				: compatibility.level;
+				: compatibility.result;
 		const updatedAtMs = Math.max(nowMs, state.project.updatedAtMs + 1);
-		const version = EditorProjectCompatibility.bumpVersion(state.project.version, level);
+		const version = yield* bumpArkpackVersionFx(state.project.version, result);
 		const marker = GameProjectManifestSchema.parse({
 			arkini: ArkiniAppVersion,
 			revision: updatedAtMs,
@@ -168,7 +166,7 @@ export const createFilesystemEditorProjectCommitOperationsFx = Effect.fn(
 				resources,
 			},
 			previousScenarioNames: state.scenarios.map(({ name }) => name),
-			...(compatibility.level === "major"
+			...(compatibility.result === "major"
 				? {
 						scenarios: [],
 					}
@@ -177,7 +175,7 @@ export const createFilesystemEditorProjectCommitOperationsFx = Effect.fn(
 		states.set(state.project.projectId, {
 			...state,
 			project: nextProject,
-			...(compatibility.level === "major"
+			...(compatibility.result === "major"
 				? {
 						scenarios: [],
 					}
@@ -375,7 +373,7 @@ export const createFilesystemEditorProjectCommitOperationsFx = Effect.fn(
 						config: next.config,
 						resources: next.resources,
 						nowMs,
-						minimumLevel: "minor",
+						minimumResult: "minor",
 					});
 				}),
 			);

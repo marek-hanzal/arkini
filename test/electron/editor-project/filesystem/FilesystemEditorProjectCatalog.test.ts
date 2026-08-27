@@ -31,6 +31,46 @@ afterEach(async () => {
 });
 
 describe("filesystem Editor project catalog", () => {
+	it("retains concurrent updates from distinct catalog instances", async () => {
+		const catalogPath = await createCatalogPath();
+		const create = () =>
+			Effect.runPromise(
+				createFilesystemEditorProjectCatalogFx({
+					catalogPath,
+				}).pipe(Effect.provide(NodeServices.layer)),
+			);
+		const [left, right] = await Promise.all([
+			create(),
+			create(),
+		]);
+		await Promise.all([
+			Effect.runPromise(
+				left.addFx({
+					root: join(dirname(catalogPath), "left"),
+					ownership: "external",
+					createdAtMs: 1,
+				}),
+			),
+			Effect.runPromise(
+				right.addFx({
+					root: join(dirname(catalogPath), "right"),
+					ownership: "external",
+					createdAtMs: 2,
+				}),
+			),
+		]);
+
+		const stored = JSON.parse(await readFile(catalogPath, "utf8")) as {
+			readonly projects: ReadonlyArray<{
+				readonly root: string;
+			}>;
+		};
+		expect(stored.projects.map(({ root }) => root).sort()).toEqual([
+			join(dirname(catalogPath), "left"),
+			join(dirname(catalogPath), "right"),
+		]);
+	});
+
 	it("opens the exact current catalog envelope", async () => {
 		const catalogPath = await createCatalogPath();
 		const expected = {

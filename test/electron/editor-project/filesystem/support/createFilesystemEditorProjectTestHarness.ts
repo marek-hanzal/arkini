@@ -2,7 +2,7 @@ import * as NodeServices from "@effect/platform-node/NodeServices";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { Effect } from "effect";
+import { Effect, FileSystem } from "effect";
 
 import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
 import {
@@ -21,10 +21,15 @@ export const createFilesystemEditorProjectTestHarness = async (temporaryPrefix: 
 	const openRepositories = new Set<FilesystemEditorProjectRepository>();
 	let externalSequence = 0;
 
-	const openRepository = async () => {
+	const openRepository = async (fileSystem?: FileSystem.FileSystem) => {
 		const repository = await Effect.runPromise(
 			createFilesystemEditorProjectRepositoryFx({
 				catalogPath,
+				...(fileSystem === undefined
+					? {}
+					: {
+							fileSystem,
+						}),
 				projectsRoot,
 			}),
 		);

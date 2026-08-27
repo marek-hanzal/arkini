@@ -1,9 +1,10 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import { Effect, Semaphore } from "effect";
+import { Effect, FileSystem, Path, Semaphore } from "effect";
 
 import type { OwnedEditorProjectRepository } from "../../EditorProjectServiceOwnership";
 import type { FilesystemEditorProjectState } from "../FilesystemEditorProjectState";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
+import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 import { createFilesystemEditorBoardScenarioOperationsFx } from "./createFilesystemEditorBoardScenarioOperationsFx";
 import { createFilesystemEditorNoteOperationsFx } from "./createFilesystemEditorNoteOperationsFx";
 import { createFilesystemEditorProjectCatalogFx } from "./createFilesystemEditorProjectCatalogFx";
@@ -15,6 +16,7 @@ import { createFilesystemEditorProjectVersionOperationsFx } from "./createFilesy
 export namespace createFilesystemEditorProjectRepositoryFx {
 	export interface Props {
 		readonly catalogPath: string;
+		readonly fileSystem?: FileSystem.FileSystem;
 		readonly projectsRoot: string;
 	}
 }
@@ -23,13 +25,17 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 	catalogPath,
 	projectsRoot,
 }: createFilesystemEditorProjectRepositoryFx.Props) {
+	const fileSystem = yield* FileSystem.FileSystem;
+	const path = yield* Path.Path;
 	const operations = yield* Semaphore.make(1);
+	const filesystemWrite = yield* createFilesystemWriteFx();
 	const states = new Map<string, FilesystemEditorProjectState>();
 	const catalog = yield* createFilesystemEditorProjectCatalogFx({
 		catalogPath,
 	});
 	const projects = yield* createFilesystemEditorProjectOperationsFx({
 		catalog,
+		filesystemWrite,
 		operations,
 		projectsRoot,
 		states,
@@ -51,20 +57,24 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		states,
 	});
 	const builds = yield* createFilesystemEditorProjectBuildOperationsFx({
+		filesystemWrite,
 		operations,
 		readState,
 	});
 	const boardScenarios = yield* createFilesystemEditorBoardScenarioOperationsFx({
+		filesystemWrite,
 		operations,
 		readState,
 		states,
 	});
 	const notes = yield* createFilesystemEditorNoteOperationsFx({
+		filesystemWrite,
 		operations,
 		readState,
 		states,
 	});
 	const versions = yield* createFilesystemEditorProjectVersionOperationsFx({
+		filesystemWrite,
 		operations,
 		readState,
 		states,
@@ -80,7 +90,10 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 		closeFx: operations.withPermits(1)(Effect.void),
 	} satisfies OwnedEditorProjectRepository;
 	const provide = <Value, Failure>(effect: Effect.Effect<Value, Failure>) =>
-		effect.pipe(Effect.provide(NodeServices.layer));
+		effect.pipe(
+			Effect.provideService(FileSystem.FileSystem, fileSystem),
+			Effect.provideService(Path.Path, path),
+		);
 
 	return {
 		awaitIdleFx: provide(repository.awaitIdleFx),
@@ -123,4 +136,10 @@ export type FilesystemEditorProjectRepository = OwnedEditorProjectRepository;
 /** Composes one filesystem-backed Editor repository with its Node platform services. */
 export const createFilesystemEditorProjectRepositoryFx = (
 	props: createFilesystemEditorProjectRepositoryFx.Props,
-) => createRepositoryFx(props).pipe(Effect.provide(NodeServices.layer));
+) =>
+	Effect.gen(function* () {
+		const fileSystem = props.fileSystem ?? (yield* FileSystem.FileSystem);
+		return yield* createRepositoryFx(props).pipe(
+			Effect.provideService(FileSystem.FileSystem, fileSystem),
+		);
+	}).pipe(Effect.provide(NodeServices.layer));

@@ -10,6 +10,41 @@ import {
 
 afterEach(cleanupEditorMcpHarnesses);
 
+const typeGroups = [
+	{
+		name: "creates simple and producer item types through dedicated tools",
+		projectId: "simple-producer-types-project",
+		types: [
+			"simple",
+			"producer",
+		],
+	},
+	{
+		name: "creates craft and blueprint item types through dedicated tools",
+		projectId: "craft-blueprint-types-project",
+		types: [
+			"craft",
+			"blueprint",
+		],
+	},
+	{
+		name: "creates deposit and stash item types through dedicated tools",
+		projectId: "deposit-stash-types-project",
+		types: [
+			"deposit",
+			"stash",
+		],
+	},
+	{
+		name: "creates temporary and inventory item types through dedicated tools",
+		projectId: "temporary-inventory-types-project",
+		types: [
+			"temporary",
+			"inventory",
+		],
+	},
+] as const;
+
 describe("editor MCP item creation", () => {
 	it("creates a simple item from the Editor draft defaults and rejects an ID collision", async () => {
 		const notifyProjectChanged = vi.fn();
@@ -94,7 +129,7 @@ describe("editor MCP item creation", () => {
 		expect(notifyProjectChanged).toHaveBeenCalledOnce();
 	});
 
-	it("creates every canonical item type through its dedicated tool", async () => {
+	it.each(typeGroups)("$name", async ({ projectId, types }) => {
 		const notifyProjectChanged = vi.fn();
 		const { ownership, port, repository } = await createEditorMcpHarness(
 			Effect.runPromise,
@@ -107,25 +142,15 @@ describe("editor MCP item creation", () => {
 					...editorTestPayload.config,
 					meta: {
 						...editorTestPayload.config.meta,
-						id: "all-item-types-project",
+						id: projectId,
 					},
 				},
 				resources: editorTestPayload.resources,
 			}),
 		);
-		ownership.setProjectContext("all-item-types-project");
+		ownership.setProjectContext(projectId);
 		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectEditorMcpClient(port);
-		const types = [
-			"simple",
-			"producer",
-			"craft",
-			"blueprint",
-			"deposit",
-			"stash",
-			"temporary",
-			"inventory",
-		] as const;
 
 		for (const type of types) {
 			const id = `${type === "producer" ? "producer" : "item"}:mcp-${type}`;
@@ -145,9 +170,10 @@ describe("editor MCP item creation", () => {
 			]);
 		}
 
-		const project = await Effect.runPromise(repository.readProjectFx("all-item-types-project"));
+		const project = await Effect.runPromise(repository.readProjectFx(projectId));
 		const read = (type: (typeof types)[number]) =>
 			project?.config.items[`${type === "producer" ? "producer" : "item"}:mcp-${type}`];
+		const has = (type: string) => types.some((candidate) => candidate === type);
 		for (const type of types) {
 			expect(read(type), type).toMatchObject({
 				asset: {
@@ -158,45 +184,52 @@ describe("editor MCP item creation", () => {
 				type,
 			});
 		}
-		expect(read("producer")).toMatchObject({
-			maxQueueSize: 1,
-			lines: [
-				expect.any(Object),
-			],
-		});
-		expect(read("craft")).toHaveProperty("line");
-		expect(read("blueprint")).toHaveProperty("line");
-		expect(read("deposit")).toMatchObject({
-			maxQueueSize: 1,
-		});
-		expect(read("stash")).toHaveProperty("line");
-		expect(read("temporary")).toMatchObject({
-			durationMs: 500,
-			maxStackSize: 1,
-			scope: "board",
-		});
-		expect(read("inventory")).toMatchObject({
-			maxCount: 1,
-			maxStackSize: 1,
-			scope: "board",
-		});
+		if (has("producer"))
+			expect(read("producer")).toMatchObject({
+				maxQueueSize: 1,
+				lines: [
+					expect.any(Object),
+				],
+			});
+		if (has("craft")) expect(read("craft")).toHaveProperty("line");
+		if (has("blueprint")) expect(read("blueprint")).toHaveProperty("line");
+		if (has("deposit"))
+			expect(read("deposit")).toMatchObject({
+				maxQueueSize: 1,
+			});
+		if (has("stash")) expect(read("stash")).toHaveProperty("line");
+		if (has("temporary"))
+			expect(read("temporary")).toMatchObject({
+				durationMs: 500,
+				maxStackSize: 1,
+				scope: "board",
+			});
+		if (has("inventory"))
+			expect(read("inventory")).toMatchObject({
+				maxCount: 1,
+				maxStackSize: 1,
+				scope: "board",
+			});
 		expect(notifyProjectChanged).toHaveBeenCalledTimes(types.length);
 
-		const discriminatorOverride = await client.callTool({
-			name: "create_simple_item",
-			arguments: {
-				id: "item:invalid-override",
-				title: "Invalid override",
-				description: "Must remain a simple item.",
-				type: "producer",
-				uid: "forced-uid",
-			},
-		});
-		expect(discriminatorOverride.isError).toBe(true);
-		expect(
-			(await Effect.runPromise(repository.readProjectFx("all-item-types-project")))?.config
-				.items["item:invalid-override"],
-		).toBeUndefined();
+		if (has("simple")) {
+			const discriminatorOverride = await client.callTool({
+				name: "create_simple_item",
+				arguments: {
+					id: "item:invalid-override",
+					title: "Invalid override",
+					description: "Must remain a simple item.",
+					type: "producer",
+					uid: "forced-uid",
+				},
+			});
+			expect(discriminatorOverride.isError).toBe(true);
+			expect(
+				(await Effect.runPromise(repository.readProjectFx(projectId)))?.config.items[
+					"item:invalid-override"
+				],
+			).toBeUndefined();
+		}
 	});
 
 	it("acknowledges a committed item when renderer notification fails", async () => {

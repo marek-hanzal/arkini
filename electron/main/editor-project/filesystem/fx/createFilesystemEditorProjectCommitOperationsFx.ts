@@ -21,8 +21,8 @@ import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectMan
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
 import { writeFilesystemEditorProjectFilesFx } from "./writeFilesystemEditorProjectFilesFx";
-import { withFilesystemEditorProjectLockFx } from "./withFilesystemEditorProjectLockFx";
 
 type Operations = Pick<
 	EditorProjectRepositoryService,
@@ -40,7 +40,7 @@ const error = (operation: EditorProjectRepositoryOperation, message: string, cau
 		? cause
 		: new EditorProjectRepositoryError({
 				operation,
-				message,
+				message: withFilesystemWriteRecovery(message, cause),
 				cause,
 			});
 
@@ -150,28 +150,30 @@ export const createFilesystemEditorProjectCommitOperationsFx = Effect.fn(
 				}))
 				.sort((left, right) => left.id.localeCompare(right.id)),
 		};
-		yield* withFilesystemEditorProjectLockFx(
-			state.paths.root,
-			writeProjectFx({
-				root: state.paths.root,
-				previous: {
-					arkpack: state.project.version,
-					marker: GameProjectManifestSchema.parse({
-						arkini: ArkiniAppVersion,
-						revision: state.project.revision,
-					}),
-					config: state.project.config,
-					resources: state.project.resources,
-				},
-				next: {
-					arkpack: version,
-					marker,
-					config: canonicalConfig,
-					resources,
-				},
-				clearScenarios: compatibility.level === "major",
-			}),
-		);
+		yield* writeProjectFx({
+			root: state.paths.root,
+			previous: {
+				arkpack: state.project.version,
+				marker: GameProjectManifestSchema.parse({
+					arkini: ArkiniAppVersion,
+					revision: state.project.revision,
+				}),
+				config: state.project.config,
+				resources: state.project.resources,
+			},
+			next: {
+				arkpack: version,
+				marker,
+				config: canonicalConfig,
+				resources,
+			},
+			previousScenarioNames: state.scenarios.map(({ name }) => name),
+			...(compatibility.level === "major"
+				? {
+						scenarios: [],
+					}
+				: {}),
+		});
 		states.set(state.project.projectId, {
 			...state,
 			project: nextProject,

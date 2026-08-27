@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { Clock, FileSystem, Path } from "effect";
+import { Clock, FileSystem } from "effect";
 import { Effect, type Semaphore } from "effect";
 
 import type { FilesystemEditorProjectState } from "../FilesystemEditorProjectState";
@@ -8,8 +8,12 @@ import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryEr
 import { EditorProjectNoteFileSchema } from "~/editor/filesystem/EditorProjectNoteFileSchema";
 import { EditorNoteContentSchema, EditorNoteSchema } from "~/editor/note/EditorNoteSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { replaceFilesystemEditorJsonFx } from "./replaceFilesystemEditorJsonFx";
-import { withFilesystemEditorProjectLockFx } from "./withFilesystemEditorProjectLockFx";
+import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
+import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
+
+const encoder = new TextEncoder();
+const encodeJson = (value: unknown) =>
+	encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`);
 
 type Operations = Pick<
 	EditorProjectRepositoryService,
@@ -25,12 +29,13 @@ const error = (
 		? cause
 		: new EditorProjectRepositoryError({
 				operation,
-				message,
+				message: withFilesystemWriteRecovery(message, cause),
 				cause,
 			});
 
 export namespace createFilesystemEditorNoteOperationsFx {
 	export interface Props {
+		readonly filesystemWrite: FilesystemWrite;
 		readonly operations: Semaphore.Semaphore;
 		readonly readState: (
 			projectId: string,
@@ -42,14 +47,13 @@ export namespace createFilesystemEditorNoteOperationsFx {
 /** Stores each portable Editor note as one independent JSON file. */
 export const createFilesystemEditorNoteOperationsFx = Effect.fn(
 	"createFilesystemEditorNoteOperationsFx",
-)(function* ({ operations, readState, states }: createFilesystemEditorNoteOperationsFx.Props) {
+)(function* ({
+	filesystemWrite,
+	operations,
+	readState,
+	states,
+}: createFilesystemEditorNoteOperationsFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
-	const path = yield* Path.Path;
-	const replaceJsonFx = (target: string, value: unknown) =>
-		replaceFilesystemEditorJsonFx(target, value).pipe(
-			Effect.provideService(FileSystem.FileSystem, fileSystem),
-			Effect.provideService(Path.Path, path),
-		);
 
 	const readNotesFx = (projectId: string) =>
 		readState(projectId).pipe(
@@ -114,17 +118,17 @@ export const createFilesystemEditorNoteOperationsFx = Effect.fn(
 						updatedAtMs: createdAtMs,
 					});
 					const target = yield* state.paths.noteFileFx(note.noteId);
-					yield* withFilesystemEditorProjectLockFx(
-						state.paths.root,
-						replaceJsonFx(
-							target,
+					yield* filesystemWrite.writeFileFx({
+						lock: state.paths.lockFile,
+						target,
+						bytes: encodeJson(
 							EditorProjectNoteFileSchema.parse({
 								content: note.content,
 								createdAtMs: note.createdAtMs,
 								updatedAtMs: note.updatedAtMs,
 							}),
 						),
-					);
+					});
 					publishNotes(state, [
 						note,
 						...notes,
@@ -172,14 +176,15 @@ export const createFilesystemEditorNoteOperationsFx = Effect.fn(
 						updatedAtMs: Math.max(clockMs, latest + 1),
 					});
 					const target = yield* state.paths.noteFileFx(noteId);
-					yield* withFilesystemEditorProjectLockFx(
-						state.paths.root,
-						replaceJsonFx(target, {
+					yield* filesystemWrite.writeFileFx({
+						lock: state.paths.lockFile,
+						target,
+						bytes: encodeJson({
 							content: note.content,
 							createdAtMs: note.createdAtMs,
 							updatedAtMs: note.updatedAtMs,
 						}),
-					);
+					});
 					publishNotes(state, [
 						note,
 						...notes.filter((candidate) => candidate.noteId !== noteId),
@@ -214,10 +219,14 @@ export const createFilesystemEditorNoteOperationsFx = Effect.fn(
 								`Editor note ${noteId} does not exist in project ${projectId}.`,
 							),
 						);
-					yield* withFilesystemEditorProjectLockFx(
-						state.paths.root,
-						fileSystem.remove(target),
-					);
+					yield* filesystemWrite.writeFilesFx({
+						lock: state.paths.lockFile,
+						root: state.paths.root,
+						writes: [],
+						deletes: [
+							target,
+						],
+					});
 					publishNotes(
 						state,
 						state.notes.filter((note) => note.noteId !== noteId),

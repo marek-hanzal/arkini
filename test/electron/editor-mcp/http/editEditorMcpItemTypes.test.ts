@@ -10,40 +10,15 @@ import {
 
 afterEach(cleanupEditorMcpHarnesses);
 
-describe("editor MCP typed item editing", () => {
-	it("edits every canonical item type through its dedicated replace-patch tool", async () => {
-		const notifyProjectChanged = vi.fn();
-		const { ownership, port, repository } = await createEditorMcpHarness(
-			Effect.runPromise,
-			notifyProjectChanged,
-		);
-		const created = await Effect.runPromise(
-			repository.createProjectFx({
-				version: "1.0",
-				config: {
-					...editorTestPayload.config,
-					meta: {
-						...editorTestPayload.config.meta,
-						id: "edit-all-types-project",
-					},
-				},
-				resources: editorTestPayload.resources,
-			}),
-		);
-		ownership.setProjectContext("edit-all-types-project");
-		await Effect.runPromise(ownership.startLocalFx);
-		const client = await connectEditorMcpClient(port);
-		const cases = [
+const groups = [
+	{
+		name: "edits simple and craft items through their dedicated tools",
+		projectId: "edit-simple-craft-project",
+		cases: [
 			[
 				"simple",
 				{
 					maxStackSize: 3,
-				},
-			],
-			[
-				"producer",
-				{
-					title: "Edited producer",
 				},
 			],
 			[
@@ -52,10 +27,34 @@ describe("editor MCP typed item editing", () => {
 					title: "Edited craft",
 				},
 			],
+		],
+	},
+	{
+		name: "edits blueprint and inventory items through their dedicated tools",
+		projectId: "edit-blueprint-inventory-project",
+		cases: [
 			[
 				"blueprint",
 				{
 					title: "Edited blueprint",
+				},
+			],
+			[
+				"inventory",
+				{
+					title: "Edited inventory",
+				},
+			],
+		],
+	},
+	{
+		name: "edits producer and deposit items through their dedicated tools",
+		projectId: "edit-producer-deposit-project",
+		cases: [
+			[
+				"producer",
+				{
+					title: "Edited producer",
 				},
 			],
 			[
@@ -65,6 +64,12 @@ describe("editor MCP typed item editing", () => {
 					title: "Edited deposit",
 				},
 			],
+		],
+	},
+	{
+		name: "edits stash and temporary items through their dedicated tools",
+		projectId: "edit-stash-temporary-project",
+		cases: [
 			[
 				"stash",
 				{
@@ -78,13 +83,33 @@ describe("editor MCP typed item editing", () => {
 					output: null,
 				},
 			],
-			[
-				"inventory",
-				{
-					title: "Edited inventory",
+		],
+	},
+] as const;
+
+describe("editor MCP typed item editing", () => {
+	it.each(groups)("$name", async ({ projectId, cases }) => {
+		const notifyProjectChanged = vi.fn();
+		const { ownership, port, repository } = await createEditorMcpHarness(
+			Effect.runPromise,
+			notifyProjectChanged,
+		);
+		const created = await Effect.runPromise(
+			repository.createProjectFx({
+				version: "1.0",
+				config: {
+					...editorTestPayload.config,
+					meta: {
+						...editorTestPayload.config.meta,
+						id: projectId,
+					},
 				},
-			],
-		] as const;
+				resources: editorTestPayload.resources,
+			}),
+		);
+		ownership.setProjectContext(projectId);
+		await Effect.runPromise(ownership.startLocalFx);
+		const client = await connectEditorMcpClient(port);
 
 		for (const [type] of cases) {
 			const id = `${type === "producer" ? "producer" : "item"}:edit-${type}`;
@@ -121,7 +146,7 @@ describe("editor MCP typed item editing", () => {
 			]);
 		}
 
-		const project = await Effect.runPromise(repository.readProjectFx("edit-all-types-project"));
+		const project = await Effect.runPromise(repository.readProjectFx(projectId));
 		for (const [type, patch] of cases) {
 			const id = `${type === "producer" ? "producer" : "item"}:edit-${type}`;
 			expect(project?.config.items[id], type).toMatchObject({
@@ -131,20 +156,23 @@ describe("editor MCP typed item editing", () => {
 				uid: expect.any(String),
 			});
 		}
-		expect(project?.config.items["producer:edit-producer"]).toMatchObject({
-			maxQueueSize: 4,
-		});
-		expect(project?.config.items["item:edit-deposit"]).toMatchObject({
-			maxQueueSize: 4,
-		});
+		if (cases.some(([type]) => type === "producer"))
+			expect(project?.config.items["producer:edit-producer"]).toMatchObject({
+				maxQueueSize: 4,
+			});
+		if (cases.some(([type]) => type === "deposit"))
+			expect(project?.config.items["item:edit-deposit"]).toMatchObject({
+				maxQueueSize: 4,
+			});
 		expect(project?.revision).toBeGreaterThan(created.revision);
 		const revisionAfterEdits = project?.revision;
 		expect(notifyProjectChanged).toHaveBeenCalledTimes(cases.length * 2);
 
-		for (const type of [
-			"producer",
-			"deposit",
-		] as const) {
+		for (const type of cases
+			.map(([type]) => type)
+			.filter(
+				(type): type is "producer" | "deposit" => type === "producer" || type === "deposit",
+			)) {
 			const rejected = await client.callTool({
 				name: `edit_${type}_item`,
 				arguments: {
@@ -154,9 +182,9 @@ describe("editor MCP typed item editing", () => {
 			});
 			expect(rejected.isError, type).toBe(true);
 		}
-		expect(
-			(await Effect.runPromise(repository.readProjectFx("edit-all-types-project")))?.revision,
-		).toBe(revisionAfterEdits);
+		expect((await Effect.runPromise(repository.readProjectFx(projectId)))?.revision).toBe(
+			revisionAfterEdits,
+		);
 		expect(notifyProjectChanged).toHaveBeenCalledTimes(cases.length * 2);
 	});
 });

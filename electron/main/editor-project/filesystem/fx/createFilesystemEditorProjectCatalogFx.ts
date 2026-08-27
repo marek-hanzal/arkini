@@ -4,7 +4,10 @@ import { Effect } from "effect";
 import { EditorProjectCatalogEntrySchema } from "~/editor/filesystem/EditorProjectCatalogEntrySchema";
 import { EditorProjectCatalogSchema } from "~/editor/filesystem/EditorProjectCatalogSchema";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
-import { replaceFilesystemEditorJsonFx } from "./replaceFilesystemEditorJsonFx";
+import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
+import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
+
+const encoder = new TextEncoder();
 
 type Entry = EditorProjectCatalogEntrySchema.Type;
 
@@ -17,7 +20,7 @@ export interface FilesystemEditorProjectCatalog {
 const createError = (message: string, cause?: unknown) =>
 	new EditorProjectRepositoryError({
 		operation: "list-projects",
-		message,
+		message: withFilesystemWriteRecovery(message, cause),
 		cause,
 	});
 
@@ -29,62 +32,59 @@ export const createFilesystemEditorProjectCatalogFx = Effect.fn(
 )(function* ({ catalogPath }: { readonly catalogPath: string }) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
-	const replaceJsonFx = (target: string, value: unknown) =>
-		replaceFilesystemEditorJsonFx(target, value).pipe(
-			Effect.provideService(FileSystem.FileSystem, fileSystem),
-			Effect.provideService(Path.Path, path),
-		);
+	const filesystemWrite = yield* createFilesystemWriteFx();
+	const lock = `${catalogPath}.lock`;
+	const writeJsonFx = (value: unknown) =>
+		filesystemWrite.writeFileFx({
+			lock,
+			target: catalogPath,
+			bytes: encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`),
+		});
 	yield* fileSystem.makeDirectory(path.dirname(catalogPath), {
 		recursive: true,
 	});
-	let catalog = yield* fileSystem.exists(catalogPath).pipe(
-		Effect.flatMap((exists) =>
-			exists
-				? fileSystem.readFileString(catalogPath).pipe(
-						Effect.flatMap((source) =>
-							Effect.try({
-								try: () => parseCatalog(JSON.parse(source)),
-								catch: (cause) =>
-									createError("The Editor project catalog is invalid.", cause),
-							}),
-						),
-					)
-				: Effect.succeed(
-						EditorProjectCatalogSchema.parse({
-							projects: [],
-						}),
-					),
-		),
-		Effect.mapError((cause) =>
-			cause instanceof EditorProjectRepositoryError
-				? cause
-				: createError("The Editor project catalog could not be opened.", cause),
-		),
-	);
-	if (!(yield* fileSystem.exists(catalogPath))) yield* replaceJsonFx(catalogPath, catalog);
-
-	const writeFx = (projects: ReadonlyArray<Entry>) =>
-		Effect.gen(function* () {
-			const next = EditorProjectCatalogSchema.parse({
-				projects,
+	const readFx = Effect.gen(function* () {
+		if (yield* fileSystem.exists(catalogPath)) {
+			const source = yield* fileSystem.readFileString(catalogPath);
+			return yield* Effect.try({
+				try: () => parseCatalog(JSON.parse(source)),
+				catch: (cause) => createError("The Editor project catalog is invalid.", cause),
 			});
-			yield* replaceJsonFx(catalogPath, next);
-			catalog = next;
-		}).pipe(
-			Effect.mapError((cause) =>
-				createError("The Editor project catalog could not be saved.", cause),
-			),
-		);
+		}
+		const empty = EditorProjectCatalogSchema.parse({
+			projects: [],
+		});
+		yield* writeJsonFx(empty);
+		return empty;
+	});
+	let catalog = yield* filesystemWrite.withLockFx(lock, readFx);
+
+	const updateFx = (update: (current: ReadonlyArray<Entry>) => ReadonlyArray<Entry>) =>
+		filesystemWrite
+			.withLockFx(
+				lock,
+				Effect.gen(function* () {
+					const current = yield* readFx;
+					const next = EditorProjectCatalogSchema.parse({
+						projects: update(current.projects),
+					});
+					yield* writeJsonFx(next);
+					catalog = next;
+				}),
+			)
+			.pipe(
+				Effect.mapError((cause) =>
+					createError("The Editor project catalog could not be saved.", cause),
+				),
+			);
 
 	return {
-		addFx: (entry) => {
-			const projects = catalog.projects.filter((candidate) => candidate.root !== entry.root);
-			return writeFx([
-				...projects,
+		addFx: (entry) =>
+			updateFx((projects) => [
+				...projects.filter((candidate) => candidate.root !== entry.root),
 				entry,
-			]);
-		},
+			]),
 		list: () => catalog.projects,
-		removeFx: (root) => writeFx(catalog.projects.filter((entry) => entry.root !== root)),
+		removeFx: (root) => updateFx((projects) => projects.filter((entry) => entry.root !== root)),
 	} satisfies FilesystemEditorProjectCatalog;
 });

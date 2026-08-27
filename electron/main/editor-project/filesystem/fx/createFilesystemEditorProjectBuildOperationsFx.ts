@@ -20,6 +20,8 @@ import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFile
 import { withFilesystemEditorProjectLockFx } from "./withFilesystemEditorProjectLockFx";
 import { readFilesystemEditorProjectFilesFx } from "./readFilesystemEditorProjectFilesFx";
 import { ensureFilesystemEditorProjectGitignoreFx } from "./ensureFilesystemEditorProjectGitignoreFx";
+import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
+import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
 
 type Operations = Pick<EditorProjectRepositoryService, "buildProjectFx" | "readProjectBuildFx">;
 
@@ -32,7 +34,7 @@ const error = (
 		? cause
 		: new EditorProjectRepositoryError({
 				operation,
-				message,
+				message: withFilesystemWriteRecovery(message, cause),
 				...(cause instanceof GameValidationError
 					? {
 							diagnostics: cause.diagnostics,
@@ -57,6 +59,7 @@ const assertRevisionFx = (
 
 export namespace createFilesystemEditorProjectBuildOperationsFx {
 	export interface Props {
+		readonly filesystemWrite: FilesystemWrite;
 		readonly operations: Semaphore.Semaphore;
 		readonly readState: (
 			projectId: string,
@@ -67,7 +70,11 @@ export namespace createFilesystemEditorProjectBuildOperationsFx {
 /** Publishes and reads the one canonical artifact for an exact Editor project revision. */
 export const createFilesystemEditorProjectBuildOperationsFx = Effect.fn(
 	"createFilesystemEditorProjectBuildOperationsFx",
-)(function* ({ operations, readState }: createFilesystemEditorProjectBuildOperationsFx.Props) {
+)(function* ({
+	filesystemWrite,
+	operations,
+	readState,
+}: createFilesystemEditorProjectBuildOperationsFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
 	const providePlatform = <Value, Failure, Requirements>(
@@ -89,6 +96,7 @@ export const createFilesystemEditorProjectBuildOperationsFx = Effect.fn(
 				yield* assertRevisionFx(state, expectedRevision, "build-project");
 				yield* providePlatform(
 					withFilesystemEditorProjectLockFx(
+						filesystemWrite,
 						state.paths.root,
 						ensureFilesystemEditorProjectGitignoreFx(state.paths),
 					),
@@ -161,6 +169,7 @@ export const createFilesystemEditorProjectBuildOperationsFx = Effect.fn(
 				const state = yield* readState(projectId);
 				yield* assertRevisionFx(state, expectedRevision, "read-project-build");
 				return yield* withFilesystemEditorProjectLockFx(
+					filesystemWrite,
 					state.paths.root,
 					Effect.gen(function* () {
 						const build = state.paths.build;

@@ -90,7 +90,9 @@ describe("filesystem Editor project build", () => {
 				message: "The current Editor build does not match the requested artifact.",
 			}),
 		});
-		expect(await readFile(join(root, ".gitignore"), "utf8")).toBe("custom-output/\n/build/\n");
+		expect(await readFile(join(root, ".gitignore"), "utf8")).toBe(
+			"custom-output/\n/build/\n/editor.lock\n",
+		);
 	});
 
 	it("publishes and verifies a signed Editor build with this Arkini identity", async () => {

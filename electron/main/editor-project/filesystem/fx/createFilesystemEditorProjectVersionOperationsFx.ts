@@ -26,20 +26,22 @@ import { createFilesystemEditorProjectVersionReaderFx } from "./createFilesystem
 import { createFilesystemEditorVersionSnapshotFx } from "./createFilesystemEditorVersionSnapshotFx";
 import { assertFilesystemEditorProjectDirectoryFx } from "./assertFilesystemEditorProjectDirectoryFx";
 import { readFilesystemEditorVersionSnapshotFx } from "./readFilesystemEditorVersionSnapshotFx";
-import { replaceFilesystemEditorJsonFx } from "./replaceFilesystemEditorJsonFx";
 import { withFilesystemEditorProjectLockFx } from "./withFilesystemEditorProjectLockFx";
 import { writeFilesystemEditorProjectFilesFx } from "./writeFilesystemEditorProjectFilesFx";
+import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
+import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
 
 type Operations = EditorProjectVersionRepositoryService;
 type Operation = EditorProjectRepositoryError["operation"];
 type DescriptorFile = EditorVersionDescriptorFileSchema.Type;
+const encoder = new TextEncoder();
 
 const error = (operation: Operation, message: string, cause?: unknown) =>
 	cause instanceof EditorProjectRepositoryError && cause.operation === operation
 		? cause
 		: new EditorProjectRepositoryError({
 				operation,
-				message,
+				message: withFilesystemWriteRecovery(message, cause),
 				cause,
 			});
 
@@ -109,6 +111,7 @@ const toScenario = (
 
 export namespace createFilesystemEditorProjectVersionOperationsFx {
 	export interface Props {
+		readonly filesystemWrite: FilesystemWrite;
 		readonly operations: Semaphore.Semaphore;
 		readonly readState: (
 			projectId: string,
@@ -121,6 +124,7 @@ export namespace createFilesystemEditorProjectVersionOperationsFx {
 export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 	"createFilesystemEditorProjectVersionOperationsFx",
 )(function* ({
+	filesystemWrite,
 	operations,
 	readState,
 	states,
@@ -134,8 +138,12 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 			Effect.provideService(FileSystem.FileSystem, fileSystem),
 			Effect.provideService(Path.Path, pathService),
 		);
-	const replaceJsonFx = (target: string, value: unknown) =>
-		providePlatform(replaceFilesystemEditorJsonFx(target, value));
+	const writeJsonFx = (state: FilesystemEditorProjectState, target: string, value: unknown) =>
+		filesystemWrite.writeFileFx({
+			lock: pathService.join(state.paths.root, "editor.lock"),
+			target,
+			bytes: encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`),
+		});
 	const assertVersionDirectoryFx = (state: FilesystemEditorProjectState) =>
 		providePlatform(
 			Effect.gen(function* () {
@@ -331,6 +339,7 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 						});
 
 						const snapshot = yield* withFilesystemEditorProjectLockFx(
+							filesystemWrite,
 							current.state.paths.root,
 							Effect.gen(function* () {
 								yield* assertVersionDirectoryFx(current.state);
@@ -338,6 +347,7 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 									createFilesystemEditorVersionSnapshotFx({
 										arkpack: current.state.project.version,
 										config: current.state.project.config,
+										filesystemWrite,
 										resources: current.state.project.resources,
 										scenarios: current.state.scenarios,
 										paths: current.state.paths,
@@ -354,15 +364,21 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 								yield* fileSystem.makeDirectory(directory, {
 									recursive: true,
 								});
-								yield* replaceJsonFx(
+								yield* writeJsonFx(
+									current.state,
 									yield* current.state.paths.versionManifestFileFx(versionId),
 									snapshot.manifest,
 								);
-								yield* replaceJsonFx(
+								yield* writeJsonFx(
+									current.state,
 									yield* current.state.paths.versionDescriptorFileFx(versionId),
 									descriptor,
 								);
-								yield* replaceJsonFx(current.state.paths.versionHeadFile, nextHead);
+								yield* writeJsonFx(
+									current.state,
+									current.state.paths.versionHeadFile,
+									nextHead,
+								);
 								return snapshot;
 							}),
 						);
@@ -479,30 +495,10 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 						});
 
 						yield* withFilesystemEditorProjectLockFx(
+							filesystemWrite,
 							current.state.paths.root,
 							Effect.gen(function* () {
 								yield* assertVersionDirectoryFx(current.state);
-								yield* fileSystem.makeDirectory(current.state.paths.scenarios, {
-									recursive: true,
-								});
-								for (const scenario of restoredScenarioFiles) {
-									yield* replaceJsonFx(
-										yield* current.state.paths.scenarioFileFx(scenario.name),
-										scenario,
-									);
-								}
-								const restoredNames = new Set(
-									restoredScenarioFiles.map((scenario) => scenario.name),
-								);
-								for (const scenario of current.state.scenarios) {
-									if (restoredNames.has(scenario.name)) continue;
-									yield* fileSystem.remove(
-										yield* current.state.paths.scenarioFileFx(scenario.name),
-										{
-											force: true,
-										},
-									);
-								}
 								yield* providePlatform(
 									writeFilesystemEditorProjectFilesFx({
 										root: current.state.paths.root,
@@ -521,9 +517,13 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 											config: nextProject.config,
 											resources: nextProject.resources,
 										},
+										previousScenarioNames: current.state.scenarios.map(
+											({ name }) => name,
+										),
+										scenarios: restoredScenarioFiles,
+										versionHead: nextHead,
 									}),
 								);
-								yield* replaceJsonFx(current.state.paths.versionHeadFile, nextHead);
 							}),
 						);
 						states.set(projectId, {
@@ -582,10 +582,12 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 									}),
 						});
 						yield* withFilesystemEditorProjectLockFx(
+							filesystemWrite,
 							state.paths.root,
 							Effect.gen(function* () {
 								yield* assertVersionDirectoryFx(state);
-								yield* replaceJsonFx(
+								yield* writeJsonFx(
+									state,
 									yield* state.paths.versionDescriptorFileFx(versionId),
 									descriptor,
 								);

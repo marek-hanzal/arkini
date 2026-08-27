@@ -1,6 +1,7 @@
 import { access, mkdir, readFile, realpath, rm, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { Effect } from "effect";
+import * as NodeServices from "@effect/platform-node/NodeServices";
+import { Effect, FileSystem } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
@@ -45,6 +46,118 @@ describe("filesystem Editor project lifecycle", () => {
 		await harness.closeRepository(repository);
 		const reopened = await harness.openRepository();
 		expect(await Effect.runPromise(reopened.readProjectFx(created.projectId))).toEqual(created);
+	});
+
+	it("freshly reopens the old project after an injected commit failure", async () => {
+		const repository = await harness.openRepository();
+		const created = await harness.createProject(repository);
+		const root = await Effect.runPromise(repository.readProjectRootFx(created.projectId));
+		if (root === null) throw new Error("Managed project root missing.");
+		await harness.closeRepository(repository);
+		const nodeFileSystem = await Effect.runPromise(
+			FileSystem.FileSystem.pipe(Effect.provide(NodeServices.layer)),
+		);
+		let markerReplaced = false;
+		let syncFailed = false;
+		const fileSystem: FileSystem.FileSystem = {
+			...nodeFileSystem,
+			rename: (from, to) =>
+				nodeFileSystem
+					.rename(from, to)
+					.pipe(
+						Effect.tap(() =>
+							Effect.sync(
+								() =>
+									(markerReplaced ||= String(to) === join(root, "project.json")),
+							),
+						),
+					),
+			open: (target, options) => {
+				if (markerReplaced && !syncFailed && String(target) === root) {
+					syncFailed = true;
+					return nodeFileSystem.open(
+						join(harness.temporaryDirectory, "missing"),
+						options,
+					);
+				}
+				return nodeFileSystem.open(target, options);
+			},
+		};
+		const failing = await harness.openRepository(fileSystem);
+		await expect(
+			Effect.runPromise(
+				failing.replaceConfigFx({
+					projectId: created.projectId,
+					expectedRevision: created.revision,
+					config: {
+						...created.config,
+						meta: {
+							...created.config.meta,
+							title: "Must roll back",
+						},
+					},
+				}),
+			),
+		).rejects.toBeDefined();
+		await harness.closeRepository(failing);
+
+		const reopened = await harness.openRepository();
+		const restored = await Effect.runPromise(reopened.readProjectFx(created.projectId));
+		expect(restored?.title).toBe(created.title);
+		expect(restored?.revision).toBe(created.revision);
+	});
+
+	it("removes an unregistered managed directory left by interrupted creation", async () => {
+		await mkdir(harness.projectsRoot, {
+			recursive: true,
+		});
+		const orphan = join(harness.projectsRoot, "orphan");
+		await mkdir(orphan);
+		await writeFile(join(orphan, "project.json"), "partial");
+
+		const repository = await harness.openRepository();
+		expect(await Effect.runPromise(repository.listProjectsFx)).toEqual([]);
+		await expect(access(orphan)).rejects.toBeDefined();
+	});
+
+	it("drops a managed catalog entry whose interrupted deletion removed its root", async () => {
+		const repository = await harness.openRepository();
+		const created = await harness.createProject(repository);
+		const root = await Effect.runPromise(repository.readProjectRootFx(created.projectId));
+		if (root === null) throw new Error("Managed project root missing.");
+		await harness.closeRepository(repository);
+		await rm(root, {
+			recursive: true,
+		});
+
+		const reopened = await harness.openRepository();
+		expect(await Effect.runPromise(reopened.listProjectsFx)).toEqual([]);
+		expect(JSON.parse(await readFile(harness.catalogPath, "utf8"))).toEqual({
+			projects: [],
+		});
+	});
+
+	it("preserves a managed root when its write recovery cannot complete", async () => {
+		const repository = await harness.openRepository();
+		const created = await harness.createProject(repository);
+		const root = await Effect.runPromise(repository.readProjectRootFx(created.projectId));
+		if (root === null) throw new Error("Managed project root missing.");
+		await harness.closeRepository(repository);
+		const recovery = join(root, "editor.lock.write");
+		await mkdir(recovery);
+		await writeFile(join(recovery, "preserved"), "backup");
+
+		const reopened = await harness.openRepository();
+		expect(await Effect.runPromise(reopened.listProjectsFx)).toEqual([]);
+		await expect(readFile(join(recovery, "preserved"), "utf8")).resolves.toBe("backup");
+		expect(JSON.parse(await readFile(harness.catalogPath, "utf8"))).toMatchObject({
+			projects: [
+				{
+					root,
+					ownership: "managed",
+				},
+			],
+		});
 	});
 
 	it("opens an external folder in place and unregisters it without deleting its files", async () => {

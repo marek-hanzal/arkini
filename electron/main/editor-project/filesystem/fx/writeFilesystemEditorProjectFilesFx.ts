@@ -1,4 +1,4 @@
-import { FileSystem, Path } from "effect";
+import { FileSystem } from "effect";
 import { Effect } from "effect";
 
 import {
@@ -11,29 +11,30 @@ import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { createGameProjectJsonSchema } from "~/engine/schema/fx/writeGameProjectJsonSchemaFx";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
+import { EditorVersionHeadFileSchema } from "~/editor/filesystem/EditorVersionHeadFileSchema";
+import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 import { createEditorProjectFilesystemPathsFx } from "../createEditorProjectFilesystemPathsFx";
 import type { EditorProjectFilesystemPaths } from "../EditorProjectFilesystemPaths";
 import type { FilesystemEditorProjectFiles } from "./FilesystemEditorProjectFiles";
-import { ensureFilesystemEditorProjectGitignoreFx } from "./ensureFilesystemEditorProjectGitignoreFx";
-import { replaceFilesystemEditorFileFx } from "./replaceFilesystemEditorFileFx";
-import { replaceFilesystemEditorJsonFx } from "./replaceFilesystemEditorJsonFx";
+import {
+	addFilesystemEditorProjectGitignoreRules,
+	assertFilesystemEditorProjectFileFx,
+} from "./ensureFilesystemEditorProjectGitignoreFx";
 
-interface JsonWrite {
-	readonly target: string;
-	readonly value: unknown;
-	readonly serialized: string;
-}
-
-interface BinaryWrite {
+const encoder = new TextEncoder();
+const encodeJson = (value: unknown) =>
+	encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`);
+interface Write {
 	readonly target: string;
 	readonly bytes: Uint8Array;
 }
 
 interface FilesystemSnapshot {
 	readonly marker: GameProjectManifestSchema.Type;
-	readonly game: JsonWrite;
-	readonly items: ReadonlyMap<string, JsonWrite>;
-	readonly resources: ReadonlyMap<string, BinaryWrite>;
+	readonly game: Write;
+	readonly items: ReadonlyMap<string, Write>;
+	readonly resources: ReadonlyMap<string, Write>;
 }
 
 const addUniqueTarget = <
@@ -98,7 +99,7 @@ const createSnapshotFx = Effect.fn("writeFilesystemEditorProjectFilesFx.createSn
 					cause,
 				}),
 		});
-		const itemWrites = new Map<string, JsonWrite>();
+		const itemWrites = new Map<string, Write>();
 		const itemUids = new Set<string>();
 		for (const [itemId, item] of Object.entries(items).sort(([left], [right]) =>
 			left.localeCompare(right),
@@ -124,14 +125,13 @@ const createSnapshotFx = Effect.fn("writeFilesystemEditorProjectFilesFx.createSn
 			};
 			const collision = addUniqueTarget(itemWrites, {
 				target,
-				value,
-				serialized: JSON.stringify(value),
+				bytes: encodeJson(value),
 			});
 			if (collision !== undefined) return yield* Effect.fail(collision);
 		}
 
 		const shellResources = new Set(Object.values(config.resources));
-		const resourceWrites = new Map<string, BinaryWrite>();
+		const resourceWrites = new Map<string, Write>();
 		for (const resource of [
 			...resources,
 		].sort((left, right) => left.id.localeCompare(right.id))) {
@@ -149,8 +149,7 @@ const createSnapshotFx = Effect.fn("writeFilesystemEditorProjectFilesFx.createSn
 			marker,
 			game: {
 				target: paths.gameFile,
-				value: game,
-				serialized: JSON.stringify(game),
+				bytes: encodeJson(game),
 			},
 			items: new Map(
 				[
@@ -177,110 +176,118 @@ export namespace writeFilesystemEditorProjectFilesFx {
 		readonly root: string;
 		readonly previous?: FilesystemEditorProjectFiles;
 		readonly next: FilesystemEditorProjectFiles;
-		readonly clearScenarios?: boolean;
+		readonly previousScenarioNames?: ReadonlyArray<string>;
+		readonly scenarios?: ReadonlyArray<EditorBoardScenarioFileSchema.Type>;
+		readonly versionHead?: EditorVersionHeadFileSchema.Type;
 	}
 }
 
-/** Publishes the complete in-memory current tree; Editor state overwrites ignored disk edits. */
+/** Writes the complete owned current tree while preserving unrelated project files. */
 export const writeFilesystemEditorProjectFilesFx = Effect.fn("writeFilesystemEditorProjectFilesFx")(
 	function* (props: writeFilesystemEditorProjectFilesFx.Props) {
-		const { root, next, clearScenarios = false } = props;
+		const { root, next } = props;
 		const fileSystem = yield* FileSystem.FileSystem;
-		const path = yield* Path.Path;
 		const paths = yield* createEditorProjectFilesystemPathsFx(root);
-		yield* ensureFilesystemEditorProjectGitignoreFx(paths);
 		const nextSnapshot = yield* createSnapshotFx(paths, next);
-		const currentTreeDirectories = [
-			paths.root,
-			paths.items,
-			paths.assets,
-			paths.resources,
-		];
-		yield* Effect.forEach(
-			currentTreeDirectories,
-			(directory) =>
-				fileSystem.makeDirectory(directory, {
-					recursive: true,
-				}),
-			{
-				discard: true,
-			},
-		);
-		const canonicalRoot = yield* fileSystem.realPath(paths.root);
-		for (const directory of currentTreeDirectories) {
-			const expected = path.join(canonicalRoot, path.relative(paths.root, directory));
-			if ((yield* fileSystem.realPath(directory)) !== expected)
-				return yield* Effect.fail(
-					new Error(`Editor project directory ${directory} must not be a symbolic link.`),
+		const previousSnapshot =
+			props.previous === undefined
+				? undefined
+				: yield* createSnapshotFx(paths, props.previous);
+		const filesystemWrite = yield* createFilesystemWriteFx();
+		const scenarioFiles =
+			props.scenarios === undefined
+				? undefined
+				: yield* Effect.try({
+						try: () => EditorBoardScenarioFileSchema.array().parse(props.scenarios),
+						catch: (cause) =>
+							new Error("The Editor Board scenarios are invalid.", {
+								cause,
+							}),
+					});
+		const versionHead =
+			props.versionHead === undefined
+				? undefined
+				: yield* Effect.try({
+						try: () => EditorVersionHeadFileSchema.parse(props.versionHead),
+						catch: (cause) =>
+							new Error("The Editor version head is invalid.", {
+								cause,
+							}),
+					});
+		yield* filesystemWrite.withLockFx(
+			paths.lockFile,
+			Effect.gen(function* () {
+				const writes = [
+					{
+						target: paths.schemaFile,
+						bytes: encodeJson(createGameProjectJsonSchema()),
+					},
+					nextSnapshot.game,
+					...[
+						...nextSnapshot.items.values(),
+					].sort((left, right) => left.target.localeCompare(right.target)),
+					...[
+						...nextSnapshot.resources.values(),
+					].sort((left, right) => left.target.localeCompare(right.target)),
+				];
+				const gitignoreExists = yield* assertFilesystemEditorProjectFileFx(
+					fileSystem,
+					paths.gitignoreFile,
 				);
-		}
+				const gitignore = gitignoreExists
+					? yield* fileSystem.readFileString(paths.gitignoreFile)
+					: "";
+				const nextGitignore = addFilesystemEditorProjectGitignoreRules(gitignore);
+				if (nextGitignore !== gitignore)
+					writes.push({
+						target: paths.gitignoreFile,
+						bytes: encoder.encode(nextGitignore),
+					});
 
-		yield* replaceFilesystemEditorJsonFx(paths.schemaFile, createGameProjectJsonSchema());
-		yield* replaceFilesystemEditorJsonFx(nextSnapshot.game.target, nextSnapshot.game.value);
-		for (const write of [
-			...nextSnapshot.items.values(),
-		].sort((left, right) => left.target.localeCompare(right.target))) {
-			yield* replaceFilesystemEditorJsonFx(write.target, write.value);
-		}
-		for (const write of [
-			...nextSnapshot.resources.values(),
-		].sort((left, right) => left.target.localeCompare(right.target))) {
-			yield* replaceFilesystemEditorFileFx({
-				target: write.target,
-				bytes: write.bytes,
-			});
-		}
+				const keep = new Set([
+					...nextSnapshot.items.keys(),
+					...nextSnapshot.resources.keys(),
+				]);
+				const deletes = [
+					...(previousSnapshot?.items.keys() ?? []),
+					...(previousSnapshot?.resources.keys() ?? []),
+				].filter((target) => !keep.has(target));
 
-		const existingItems = (yield* fileSystem.readDirectory(paths.items, {
-			recursive: true,
-		}))
-			.filter((file) => file.endsWith(".json"))
-			.map((file) => path.join(paths.items, file));
-		const existingResources = yield* Effect.forEach(
-			[
-				paths.assets,
-				paths.resources,
-			],
-			(directory) =>
-				fileSystem
-					.readDirectory(directory)
-					.pipe(
-						Effect.map((files) =>
-							files
-								.filter((file) => file.endsWith(".png"))
-								.map((file) => path.join(directory, file)),
-						),
-					),
-		);
-		for (const target of [
-			...existingItems,
-			...existingResources.flat(),
-		].sort()) {
-			if (nextSnapshot.items.has(target) || nextSnapshot.resources.has(target)) continue;
-			yield* fileSystem.remove(target, {
-				force: true,
-			});
-		}
-		if (clearScenarios) {
-			if (yield* fileSystem.exists(paths.scenarios)) {
-				const expected = path.join(
-					canonicalRoot,
-					path.relative(paths.root, paths.scenarios),
-				);
-				if ((yield* fileSystem.realPath(paths.scenarios)) !== expected)
-					return yield* Effect.fail(
-						new Error(
-							`Editor project directory ${paths.scenarios} must not be a symbolic link.`,
-						),
-					);
-				yield* fileSystem.remove(paths.scenarios, {
-					force: true,
-					recursive: true,
+				if (scenarioFiles !== undefined) {
+					const scenarioTargets = new Set<string>();
+					for (const scenario of scenarioFiles) {
+						const target = yield* paths.scenarioFileFx(scenario.name);
+						if (scenarioTargets.has(target))
+							return yield* Effect.fail(
+								new Error(`Editor Board scenario ${scenario.name} is duplicated.`),
+							);
+						scenarioTargets.add(target);
+						writes.push({
+							target,
+							bytes: encodeJson(scenario),
+						});
+					}
+					for (const name of props.previousScenarioNames ?? []) {
+						const target = yield* paths.scenarioFileFx(name);
+						if (!scenarioTargets.has(target)) deletes.push(target);
+					}
+				}
+				if (versionHead !== undefined)
+					writes.push({
+						target: paths.versionHeadFile,
+						bytes: encodeJson(versionHead),
+					});
+				writes.push({
+					target: paths.projectFile,
+					bytes: encodeJson(nextSnapshot.marker),
 				});
-			}
-		}
-
-		// The marker is the publication boundary and must only advertise the completed tree.
-		yield* replaceFilesystemEditorJsonFx(paths.projectFile, nextSnapshot.marker);
+				yield* filesystemWrite.writeFilesFx({
+					lock: paths.lockFile,
+					root: paths.root,
+					writes,
+					deletes,
+				});
+			}),
+		);
 	},
 );

@@ -1,5 +1,5 @@
 import { Buffer } from "node:buffer";
-import { Clock, FileSystem, Path } from "effect";
+import { Clock } from "effect";
 import { Effect, type Semaphore } from "effect";
 
 import type { FilesystemEditorProjectState } from "../FilesystemEditorProjectState";
@@ -10,8 +10,12 @@ import {
 	EditorBoardScenarioNameSchema,
 	EditorBoardScenarioSchema,
 } from "~/editor/board/EditorBoardScenarioSchema";
-import { replaceFilesystemEditorJsonFx } from "./replaceFilesystemEditorJsonFx";
-import { withFilesystemEditorProjectLockFx } from "./withFilesystemEditorProjectLockFx";
+import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
+import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
+
+const encoder = new TextEncoder();
+const encodeJson = (value: unknown) =>
+	encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`);
 
 type Operations = Pick<
 	EditorProjectRepositoryService,
@@ -32,12 +36,13 @@ const error = (operation: Operation, message: string, cause?: unknown) =>
 		? cause
 		: new EditorProjectRepositoryError({
 				operation,
-				message,
+				message: withFilesystemWriteRecovery(message, cause),
 				cause,
 			});
 
 export namespace createFilesystemEditorBoardScenarioOperationsFx {
 	export interface Props {
+		readonly filesystemWrite: FilesystemWrite;
 		readonly operations: Semaphore.Semaphore;
 		readonly readState: (
 			projectId: string,
@@ -50,18 +55,11 @@ export namespace createFilesystemEditorBoardScenarioOperationsFx {
 export const createFilesystemEditorBoardScenarioOperationsFx = Effect.fn(
 	"createFilesystemEditorBoardScenarioOperationsFx",
 )(function* ({
+	filesystemWrite,
 	operations,
 	readState,
 	states,
 }: createFilesystemEditorBoardScenarioOperationsFx.Props) {
-	const fileSystem = yield* FileSystem.FileSystem;
-	const path = yield* Path.Path;
-	const replaceJsonFx = (target: string, value: unknown) =>
-		replaceFilesystemEditorJsonFx(target, value).pipe(
-			Effect.provideService(FileSystem.FileSystem, fileSystem),
-			Effect.provideService(Path.Path, path),
-		);
-
 	const readScenariosFx = (projectId: string) =>
 		readState(projectId).pipe(
 			Effect.map((state) =>
@@ -170,10 +168,10 @@ export const createFilesystemEditorBoardScenarioOperationsFx = Effect.fn(
 						updatedAtMs: Math.max(clockMs, (previous?.updatedAtMs ?? clockMs - 1) + 1),
 					});
 					const target = yield* state.paths.scenarioFileFx(name);
-					yield* withFilesystemEditorProjectLockFx(
-						state.paths.root,
-						replaceJsonFx(
-							target,
+					yield* filesystemWrite.writeFileFx({
+						lock: state.paths.lockFile,
+						target,
+						bytes: encodeJson(
 							EditorBoardScenarioFileSchema.parse({
 								name: written.name,
 								revision: written.projectRevision,
@@ -183,7 +181,7 @@ export const createFilesystemEditorBoardScenarioOperationsFx = Effect.fn(
 								updatedAtMs: written.updatedAtMs,
 							}),
 						),
-					);
+					});
 					publishScenarios(state, [
 						written,
 						...scenarios.filter((scenario) => scenario.name !== name),
@@ -206,12 +204,14 @@ export const createFilesystemEditorBoardScenarioOperationsFx = Effect.fn(
 			Effect.gen(function* () {
 				const state = yield* readState(projectId);
 				const target = yield* state.paths.scenarioFileFx(name);
-				yield* withFilesystemEditorProjectLockFx(
-					state.paths.root,
-					fileSystem.remove(target, {
-						force: true,
-					}),
-				);
+				yield* filesystemWrite.writeFilesFx({
+					lock: state.paths.lockFile,
+					root: state.paths.root,
+					writes: [],
+					deletes: [
+						target,
+					],
+				});
 				publishScenarios(
 					state,
 					state.scenarios.filter((scenario) => scenario.name !== name),

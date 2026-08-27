@@ -185,7 +185,7 @@ const recoverActiveFx = Effect.fn("recoverActiveEditorJsonExportFx")(function* (
 	yield* finishActiveFx(recoveryDirectory, record);
 });
 
-/** Resolves one known transaction after a failed publication attempt. */
+/** Resolves one known transaction after a failed directory swap. */
 export const recoverOneEditorJsonExportFx = recoverActiveFx;
 
 /** Restores or finishes every interrupted directory export before another Save as dialog opens. */

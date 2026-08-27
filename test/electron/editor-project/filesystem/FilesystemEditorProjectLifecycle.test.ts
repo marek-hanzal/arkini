@@ -1,4 +1,4 @@
-import { access, mkdir, readFile, realpath, rm, symlink, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect, FileSystem, PlatformError } from "effect";
@@ -12,6 +12,14 @@ import {
 } from "./support/createFilesystemEditorProjectTestHarness";
 
 let harness: FilesystemEditorProjectTestHarness;
+
+const realPath = (root: string) =>
+	Effect.runPromise(
+		FileSystem.FileSystem.pipe(
+			Effect.flatMap((fileSystem) => fileSystem.realPath(root)),
+			Effect.provide(NodeServices.layer),
+		),
+	);
 
 beforeEach(async () => {
 	harness = await createFilesystemEditorProjectTestHarness("arkini-fs-project-");
@@ -110,7 +118,7 @@ describe("filesystem Editor project lifecycle", () => {
 		const root = join(harness.projectsRoot, "incomplete-project");
 		await mkdir(root);
 		await writeFile(join(root, "project.json"), "partial");
-		const canonicalRoot = await realpath(root);
+		const canonicalRoot = await realPath(root);
 
 		const repository = await harness.openRepository();
 		expect(await Effect.runPromise(repository.listProjectsFx)).toEqual([
@@ -198,7 +206,7 @@ describe("filesystem Editor project lifecycle", () => {
 			}),
 		);
 		expect(await Effect.runPromise(repository.readProjectRootFx(opened.projectId))).toBe(
-			await realpath(root),
+			await realPath(root),
 		);
 		await expect(access(join(root, ".gitignore"))).rejects.toBeDefined();
 
@@ -220,7 +228,7 @@ describe("filesystem Editor project lifecycle", () => {
 			JSON.stringify({
 				projects: [
 					{
-						root: await realpath(root),
+						root: await realPath(root),
 						ownership: "managed",
 						createdAtMs: 1,
 					},
@@ -355,7 +363,7 @@ describe("filesystem Editor project lifecycle", () => {
 			(await Effect.runPromise(repository.readProjectFx(refreshed.projectId)))?.title,
 		).toBe("Changed outside the Editor");
 		expect(await Effect.runPromise(repository.readProjectRootFx(refreshed.projectId))).toBe(
-			await realpath(root),
+			await realPath(root),
 		);
 		await expect(
 			Effect.runPromise(

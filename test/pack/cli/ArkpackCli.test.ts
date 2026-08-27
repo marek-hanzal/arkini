@@ -25,8 +25,9 @@ describe("Arkpack trust CLI", () => {
 		await writeFile(arkpackPath, "local bytes");
 
 		const result = await execFileAsync(
-			"node_modules/.bin/tsx",
+			process.execPath,
 			[
+				"node_modules/tsx/dist/cli.mjs",
 				"src/engine/cli/arkini.ts",
 				"arkpack",
 				"verify",

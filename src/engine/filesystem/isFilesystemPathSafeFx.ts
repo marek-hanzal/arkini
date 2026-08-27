@@ -25,6 +25,7 @@ export const isFilesystemPathSafeFx = Effect.fn("isFilesystemPathSafeFx")(functi
 		.filter(Boolean))
 		candidates.push(path.join(candidates.at(-1) ?? resolvedRoot, segment));
 	for (const candidate of candidates) {
+		if (!(yield* fileSystem.exists(candidate))) break;
 		const canonicalCandidate = yield* fileSystem.realPath(candidate);
 		if (!isContained(path, canonicalRoot, canonicalCandidate)) return false;
 		if (

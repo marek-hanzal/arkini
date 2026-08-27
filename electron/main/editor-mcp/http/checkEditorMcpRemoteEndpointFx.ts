@@ -1,35 +1,48 @@
-import { Effect } from "effect";
+import { Effect, Schedule } from "effect";
+
+const fetchRemoteEndpointFx = (url: URL) =>
+	Effect.tryPromise({
+		try: (signal) =>
+			fetch(url, {
+				signal,
+			}),
+		catch: (cause) => cause,
+	});
 
 /** Proves the published OAuth metadata and bearer challenge before Remote MCP becomes ready. */
 export const checkEditorMcpRemoteEndpointFx = Effect.fn("checkEditorMcpRemoteEndpointFx")(
 	(origin: URL) =>
-		Effect.tryPromise({
-			try: async () => {
-				let failure: unknown;
-				for (let attempt = 0; attempt < 8; attempt += 1) {
-					try {
-						const [metadata, challenge] = await Promise.all([
-							fetch(new URL("/.well-known/oauth-authorization-server", origin), {
-								signal: AbortSignal.timeout(1_500),
-							}),
-							fetch(new URL("/remote/mcp", origin), {
-								signal: AbortSignal.timeout(1_500),
-							}),
-						]);
-						if (metadata.ok && challenge.status === 401) return;
-						failure = new Error(
-							`metadata returned ${metadata.status} and MCP returned ${challenge.status}`,
-						);
-					} catch (cause) {
-						failure = cause;
-					}
-					await new Promise((resolve) => setTimeout(resolve, 250));
-				}
-				throw failure ?? new Error("the public endpoint did not respond");
+		Effect.all(
+			[
+				fetchRemoteEndpointFx(new URL("/.well-known/oauth-authorization-server", origin)),
+				fetchRemoteEndpointFx(new URL("/remote/mcp", origin)),
+			],
+			{
+				concurrency: "unbounded",
 			},
-			catch: (cause) =>
-				new Error(
-					`Remote MCP public health check failed: ${cause instanceof Error ? cause.message : String(cause)}`,
-				),
-		}),
+		).pipe(
+			Effect.timeoutOrElse({
+				duration: 1_500,
+				orElse: () => Effect.fail(new Error("The operation was aborted due to timeout")),
+			}),
+			Effect.flatMap(([metadata, challenge]) =>
+				metadata.ok && challenge.status === 401
+					? Effect.void
+					: Effect.fail(
+							new Error(
+								`metadata returned ${metadata.status} and MCP returned ${challenge.status}`,
+							),
+						),
+			),
+			Effect.retry({
+				times: 7,
+				schedule: Schedule.spaced(250),
+			}),
+			Effect.mapError(
+				(cause) =>
+					new Error(
+						`Remote MCP public health check failed: ${cause instanceof Error ? cause.message : String(cause)}`,
+					),
+			),
+		),
 );

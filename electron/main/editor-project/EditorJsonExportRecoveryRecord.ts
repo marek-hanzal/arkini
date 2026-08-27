@@ -86,6 +86,7 @@ export const readEditorJsonExportRecoveryPaths = (
 		marker: path.join(record.target, EditorJsonExportOwnershipFile),
 		parent,
 		pending: path.join(parent, `.${name}.${record.transaction}.pending`),
+		preserved: path.join(parent, `.${name}.${record.transaction}.recovery`),
 		previous: path.join(parent, `.${name}.${record.transaction}.previous`),
 		restore: path.join(parent, `.${name}.${record.transaction}.restore`),
 	};

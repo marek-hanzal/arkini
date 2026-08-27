@@ -3,17 +3,14 @@ import { FileSystem, Path } from "effect";
 import { Effect, Exit } from "effect";
 
 import { syncFilesystemPathFx } from "../filesystem/syncFilesystemPathFx";
-import { createEditorProjectFilesystemPathsFx } from "./filesystem/createEditorProjectFilesystemPathsFx";
-import { readFilesystemEditorProjectFilesFx } from "./filesystem/fx/readFilesystemEditorProjectFilesFx";
-import { readFilesystemEditorProjectSidecarsFx } from "./filesystem/fx/readFilesystemEditorProjectSidecarsFx";
-import { readFilesystemEditorProjectVersionHistoryFx } from "./filesystem/fx/readFilesystemEditorProjectVersionHistoryFx";
 import {
 	EditorJsonExportCleanupSuffix,
 	EditorJsonExportOwnershipFile,
-	isOwnedEditorJsonExportTargetFx,
 	readEditorJsonExportRecoveryPaths,
 } from "./EditorJsonExportRecoveryRecord";
+import { preserveEditorJsonExportRecoveryFx } from "./preserveEditorJsonExportRecoveryFx";
 import { recoverOneEditorJsonExportFx } from "./recoverEditorJsonExportsFx";
+import { readEditorJsonExportFx } from "./readEditorJsonExportFx";
 
 const writeSyncedTextFx = (target: string, source: string) =>
 	Effect.gen(function* () {
@@ -49,23 +46,6 @@ const syncExportTreeFx = Effect.fn("syncEditorJsonExportTreeFx")(function* (
 		yield* syncFilesystemPathFx(fileSystem, directory);
 });
 
-const readExportFx = Effect.fn("readEditorJsonExportFx")(function* (root: string) {
-	const fileSystem = yield* FileSystem.FileSystem;
-	const paths = yield* createEditorProjectFilesystemPathsFx(root);
-	const project = yield* readFilesystemEditorProjectFilesFx(root);
-	yield* readFilesystemEditorProjectSidecarsFx({
-		paths,
-		projectId: project.config.meta.id,
-	});
-	yield* readFilesystemEditorProjectVersionHistoryFx(paths);
-	return {
-		files: yield* fileSystem.readDirectory(root, {
-			recursive: true,
-		}),
-		project,
-	};
-});
-
 const findRecoveryPathFx = Effect.fn("findEditorJsonExportRecoveryPathFx")(function* ({
 	recovered,
 	recoveryDirectory,
@@ -83,22 +63,17 @@ const findRecoveryPathFx = Effect.fn("findEditorJsonExportRecoveryPathFx")(funct
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
 	const paths = readEditorJsonExportRecoveryPaths(path, record);
-	const targetOwned =
-		(yield* fileSystem.exists(record.target)) &&
-		(yield* isOwnedEditorJsonExportTargetFx(paths.marker, record.transaction));
 	const candidates = [
-		...(recovered || targetOwned
+		...(recovered
 			? [
 					record.target,
 				]
 			: []),
-		paths.previous,
-		paths.restore,
-		paths.pending,
+		paths.preserved,
 	];
 	for (const candidate of new Set(candidates)) {
 		if (!(yield* fileSystem.exists(candidate))) continue;
-		if (Exit.isSuccess(yield* Effect.exit(readExportFx(candidate)))) return candidate;
+		if (Exit.isSuccess(yield* Effect.exit(readEditorJsonExportFx(candidate)))) return candidate;
 	}
 	return yield* Effect.fail(
 		new Error(
@@ -160,7 +135,7 @@ export const replaceEditorJsonExportDirectoryFx = Effect.fn("replaceEditorJsonEx
 						recursive: true,
 					});
 			}
-			const { files: exportedFiles, project } = yield* readExportFx(pending);
+			const { files: exportedFiles, project } = yield* readEditorJsonExportFx(pending);
 			yield* syncExportTreeFx(pending, exportedFiles);
 			yield* writeSyncedTextFx(
 				path.join(pending, EditorJsonExportOwnershipFile),
@@ -212,6 +187,22 @@ export const replaceEditorJsonExportDirectoryFx = Effect.fn("replaceEditorJsonEx
 					))
 				)
 					recovered = true;
+				const recoveryPaths = readEditorJsonExportRecoveryPaths(path, record);
+				const targetStable =
+					recovered &&
+					Exit.isSuccess(yield* Effect.exit(readEditorJsonExportFx(record.target)));
+				const preservedStable =
+					(yield* fileSystem.exists(recoveryPaths.preserved)) &&
+					Exit.isSuccess(
+						yield* Effect.exit(readEditorJsonExportFx(recoveryPaths.preserved)),
+					);
+				if (!targetStable && !preservedStable) {
+					const cleanupDirectory = `${recoveryDirectory}${EditorJsonExportCleanupSuffix}`;
+					const journal = (yield* fileSystem.exists(recoveryDirectory))
+						? recoveryDirectory
+						: cleanupDirectory;
+					yield* preserveEditorJsonExportRecoveryFx(journal);
+				}
 				const recovery = yield* findRecoveryPathFx({
 					recovered,
 					recoveryDirectory,

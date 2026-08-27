@@ -1,6 +1,6 @@
-import { mkdir, readdir } from "node:fs/promises";
+import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { Effect } from "effect";
+import { Effect, type FileSystem } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
@@ -57,6 +57,59 @@ describe("replaceEditorJsonExportDirectoryFx recovery", () => {
 		expect((await readReimportableProject(harness.target)).marker.revision).toBe(1);
 	});
 
+	it("preserves the staged project when rollback restores an ordinary folder", async () => {
+		await rm(harness.target, {
+			recursive: true,
+		});
+		await mkdir(harness.target);
+		await writeFile(join(harness.target, "notes.txt"), "keep exactly");
+		const fileSystem = await readNodeFileSystem();
+		let previousMoved = false;
+		const failing: FileSystem.FileSystem = {
+			...fileSystem,
+			rename: (from, to) => {
+				if (String(from) === harness.target && String(to).endsWith(".previous")) {
+					previousMoved = true;
+					return fileSystem.rename(from, to);
+				}
+				if (
+					previousMoved &&
+					String(from).endsWith(".pending") &&
+					String(to) === harness.target
+				)
+					return Effect.fail(filesystemFailure("rename"));
+				return fileSystem.rename(from, to);
+			},
+		};
+
+		let failure: unknown;
+		try {
+			await harness.replace(failing);
+		} catch (cause) {
+			failure = cause;
+		}
+		const recoveryName = (await readdir(harness.root)).find((entry) =>
+			entry.endsWith(".recovery"),
+		);
+		if (recoveryName === undefined) throw new Error("Staged recovery copy was not preserved.");
+		const recovery = join(harness.root, recoveryName);
+		expect(previousMoved).toBe(true);
+		expect(failure).toMatchObject({
+			message: expect.stringContaining(recovery),
+		});
+		expect(await readdir(harness.target)).toEqual([
+			"notes.txt",
+		]);
+		await expect(readFile(join(harness.target, "notes.txt"), "utf8")).resolves.toBe(
+			"keep exactly",
+		);
+		expect((await readReimportableProject(recovery)).marker.revision).toBe(2);
+
+		await harness.recover();
+		expect(await readdir(harness.recoveryRoot)).toEqual([]);
+		expect((await readReimportableProject(recovery)).marker.revision).toBe(2);
+	});
+
 	it("retries restoration after the first backup copy failure", async () => {
 		const fileSystem = await readNodeFileSystem();
 		let restoreCopies = 0;
@@ -75,7 +128,12 @@ describe("replaceEditorJsonExportDirectoryFx recovery", () => {
 		expect((await readReimportableProject(harness.target)).marker.revision).toBe(1);
 	});
 
-	it("preserves and reports the previous export when both restore attempts fail", async () => {
+	it("keeps a stable staged recovery after both restore attempts fail", async () => {
+		await rm(harness.target, {
+			recursive: true,
+		});
+		await mkdir(harness.target);
+		await writeFile(join(harness.target, "notes.txt"), "restore later");
 		const fileSystem = await readNodeFileSystem();
 		let restoreCopies = 0;
 		const failing = withEditorJsonExportPublishFailure(fileSystem, harness.target, {
@@ -94,16 +152,25 @@ describe("replaceEditorJsonExportDirectoryFx recovery", () => {
 		} catch (cause) {
 			failure = cause;
 		}
-		const previousName = (await readdir(harness.root)).find((entry) =>
-			entry.endsWith(".previous"),
+		const recoveryName = (await readdir(harness.root)).find((entry) =>
+			entry.endsWith(".recovery"),
 		);
-		if (previousName === undefined) throw new Error("Previous export was not preserved.");
-		const previous = join(harness.root, previousName);
+		if (recoveryName === undefined) throw new Error("Staged export was not preserved.");
+		const recovery = join(harness.root, recoveryName);
 		expect(restoreCopies).toBe(2);
 		expect(failure).toMatchObject({
-			message: expect.stringContaining(previous),
+			message: expect.stringContaining(recovery),
 		});
-		expect((await readReimportableProject(previous)).marker.revision).toBe(1);
+		expect((await readReimportableProject(recovery)).marker.revision).toBe(2);
+
+		await harness.recover();
+		expect(await readdir(harness.target)).toEqual([
+			"notes.txt",
+		]);
+		await expect(readFile(join(harness.target, "notes.txt"), "utf8")).resolves.toBe(
+			"restore later",
+		);
+		expect((await readReimportableProject(recovery)).marker.revision).toBe(2);
 	});
 
 	it("reports the restored target when only terminal journal cleanup fails", async () => {

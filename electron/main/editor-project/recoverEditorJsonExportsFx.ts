@@ -1,5 +1,5 @@
 import { FileSystem, Path } from "effect";
-import { Effect } from "effect";
+import { Effect, Exit } from "effect";
 
 import { syncFilesystemPathFx } from "../filesystem/syncFilesystemPathFx";
 import {
@@ -11,6 +11,8 @@ import {
 	readEditorJsonExportRecoveryRecordFx,
 	type EditorJsonExportRecoveryRecord,
 } from "./EditorJsonExportRecoveryRecord";
+import { preserveEditorJsonExportRecoveryFx } from "./preserveEditorJsonExportRecoveryFx";
+import { readEditorJsonExportFx } from "./readEditorJsonExportFx";
 
 const writeRecoveryMarkerFx = Effect.fn("writeEditorJsonExportRecoveryMarkerFx")(function* (
 	recoveryDirectory: string,
@@ -59,6 +61,12 @@ const cleanupTerminalFx = Effect.fn("cleanupTerminalEditorJsonExportFx")(functio
 	const path = yield* Path.Path;
 	const recoveryRoot = path.dirname(recoveryDirectory);
 	const paths = readEditorJsonExportRecoveryPaths(path, record);
+	const targetComplete = Exit.isSuccess(
+		yield* Effect.exit(readEditorJsonExportFx(record.target)),
+	);
+	const committed = yield* fileSystem.exists(path.join(recoveryDirectory, "committed"));
+	if (!targetComplete && !committed) yield* preserveEditorJsonExportRecoveryFx(recoveryDirectory);
+	if (yield* fileSystem.exists(paths.preserved)) yield* readEditorJsonExportFx(paths.preserved);
 	if (yield* isOwnedEditorJsonExportTargetFx(paths.marker, record.transaction)) {
 		yield* fileSystem.remove(paths.marker);
 		yield* syncFilesystemPathFx(fileSystem, record.target);
@@ -105,6 +113,7 @@ const recoverActiveFx = Effect.fn("recoverActiveEditorJsonExportFx")(function* (
 	const paths = readEditorJsonExportRecoveryPaths(path, record);
 	for (const artifact of [
 		paths.pending,
+		paths.preserved,
 		paths.previous,
 		paths.restore,
 	])
@@ -116,21 +125,27 @@ const recoverActiveFx = Effect.fn("recoverActiveEditorJsonExportFx")(function* (
 			new Error(`Committed Editor export target ${record.target} is missing.`),
 		);
 	if (!committed && !record.hadTarget) {
-		if (yield* fileSystem.exists(record.target)) {
-			const owned = yield* isOwnedEditorJsonExportTargetFx(paths.marker, record.transaction);
-			if (!owned)
-				return yield* Effect.fail(
-					new Error(`Editor export recovery target ${record.target} is not owned.`),
+		if (yield* fileSystem.exists(paths.preserved))
+			yield* readEditorJsonExportFx(paths.preserved);
+		else {
+			if (yield* fileSystem.exists(record.target)) {
+				const owned = yield* isOwnedEditorJsonExportTargetFx(
+					paths.marker,
+					record.transaction,
 				);
-		} else if (yield* fileSystem.exists(paths.pending)) {
-			yield* fileSystem.rename(paths.pending, record.target);
-		} else {
-			return yield* Effect.fail(
-				new Error(`Editor export recovery artifact ${paths.pending} is missing.`),
-			);
+				if (!owned)
+					return yield* Effect.fail(
+						new Error(`Editor export recovery target ${record.target} is not owned.`),
+					);
+			} else if (yield* fileSystem.exists(paths.pending))
+				yield* fileSystem.rename(paths.pending, record.target);
+			else
+				return yield* Effect.fail(
+					new Error(`Editor export recovery artifact ${paths.pending} is missing.`),
+				);
+			yield* syncFilesystemPathFx(fileSystem, paths.parent);
+			yield* writeRecoveryMarkerFx(recoveryDirectory, "committed");
 		}
-		yield* syncFilesystemPathFx(fileSystem, paths.parent);
-		yield* writeRecoveryMarkerFx(recoveryDirectory, "committed");
 	} else if (!committed && publishing) {
 		if (record.hadTarget) {
 			if (yield* fileSystem.exists(paths.previous)) {
@@ -145,6 +160,11 @@ const recoverActiveFx = Effect.fn("recoverActiveEditorJsonExportFx")(function* (
 								`Editor export recovery target ${record.target} is not owned.`,
 							),
 						);
+					const previousComplete = Exit.isSuccess(
+						yield* Effect.exit(readEditorJsonExportFx(paths.previous)),
+					);
+					if (!previousComplete)
+						yield* preserveEditorJsonExportRecoveryFx(recoveryDirectory);
 					yield* fileSystem.copy(paths.previous, paths.restore, {
 						overwrite: true,
 						preserveTimestamps: true,
@@ -167,7 +187,7 @@ const recoverActiveFx = Effect.fn("recoverActiveEditorJsonExportFx")(function* (
 					return yield* Effect.fail(
 						new Error(`Editor export recovery artifact ${paths.restore} is missing.`),
 					);
-				if (targetExists && restoreExists)
+				if (targetOwned && restoreExists)
 					yield* fileSystem.remove(record.target, {
 						recursive: true,
 					});

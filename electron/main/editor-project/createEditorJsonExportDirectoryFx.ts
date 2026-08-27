@@ -5,16 +5,6 @@ import { match, P } from "ts-pattern";
 import { syncFilesystemPathFx } from "../filesystem/syncFilesystemPathFx";
 import { readEditorJsonExportFx } from "./readEditorJsonExportFx";
 
-const portableDirectories = [
-	"items",
-	"assets",
-	"resources",
-	"notes",
-	"scenarios",
-	"versions",
-	"objects",
-] as const;
-
 const containsPath = (path: Path.Path, parent: string, candidate: string) => {
 	const relative = path.relative(parent, candidate);
 	return (
@@ -87,8 +77,7 @@ const copyPortableEditorProjectFx = Effect.fn("copyPortableEditorProjectFx")(fun
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
 	const canonicalSource = yield* fileSystem.realPath(source);
-	for (const directory of portableDirectories)
-		yield* fileSystem.makeDirectory(path.join(target, directory));
+	yield* fileSystem.makeDirectory(path.join(target, "items"));
 	const files = (yield* fileSystem.readDirectory(canonicalSource, {
 		recursive: true,
 	}))

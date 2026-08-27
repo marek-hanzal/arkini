@@ -1,7 +1,7 @@
 import * as NodePath from "@effect/platform-node/NodePath";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Deferred, Effect, Fiber, FileSystem, Option, PlatformError } from "effect";
-import { execFile } from "node:child_process";
+import { execFile, spawn } from "node:child_process";
 import { lstat, mkdtemp, readFile, realpath, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -36,6 +36,29 @@ const createWrite = (fileSystem?: FileSystem.FileSystem) =>
 
 const readNodeFileSystem = () =>
 	Effect.runPromise(FileSystem.FileSystem.pipe(Effect.provide(NodeServices.layer)));
+
+const expectFreshProcessStateAfterCrash = async (
+	mode: "committed" | "partial",
+	expected: ReadonlyArray<string>,
+) => {
+	await Promise.all([
+		writeFile(join(root, "first.json"), "old-first"),
+		writeFile(join(root, "second.json"), "old-second"),
+	]);
+	await expect(
+		runFile(tsx, [
+			helper,
+			mode,
+			root,
+		]),
+	).rejects.toBeDefined();
+	const reopened = await runFile(tsx, [
+		helper,
+		"read",
+		root,
+	]);
+	expect(JSON.parse(reopened.stdout)).toEqual(expected);
+};
 
 beforeEach(async () => {
 	root = await mkdtemp(join(tmpdir(), "arkini-filesystem-write-"));
@@ -111,6 +134,45 @@ describe("FilesystemWrite", () => {
 			firstWrite,
 			sameWrite,
 		]);
+	});
+
+	it("waits for a live CLI process using the same lock", async () => {
+		const child = spawn(tsx, [
+			helper,
+			"hold",
+			root,
+		]);
+		let stderr = "";
+		child.stderr.setEncoding("utf8");
+		child.stderr.on("data", (chunk: string) => (stderr += chunk));
+		const exited = new Promise<void>((resolve, reject) => {
+			child.once("error", reject);
+			child.once("exit", (code) =>
+				code === 0
+					? resolve()
+					: reject(new Error(stderr || `Lock holder exited with ${code}.`)),
+			);
+		});
+		await new Promise<void>((resolve, reject) => {
+			child.stdout.setEncoding("utf8");
+			child.stdout.once("data", (chunk: string) =>
+				chunk.includes("locked")
+					? resolve()
+					: reject(new Error(`Unexpected output: ${chunk}`)),
+			);
+			exited.catch(reject);
+		});
+		const filesystemWrite = await createWrite();
+		const contender = Effect.runPromise(
+			filesystemWrite.withLockFx(join(root, ".write.lock"), Effect.void),
+		);
+		const enteredBeforeRelease = await Promise.race([
+			contender.then(() => true),
+			new Promise<false>((resolve) => setTimeout(() => resolve(false), 100)),
+		]);
+		expect(enteredBeforeRelease).toBe(false);
+		await exited;
+		await expect(contender).resolves.toBeUndefined();
 	});
 
 	it("releases a lock after failure and interruption", async () => {
@@ -225,47 +287,19 @@ describe("FilesystemWrite", () => {
 		await expect(readFile(outside, "utf8")).resolves.toBe("outside");
 	});
 
-	it("recovers fresh processes to exactly the old or committed file set", async () => {
-		const first = join(root, "first.json");
-		const second = join(root, "second.json");
-		await Promise.all([
-			writeFile(first, "old-first"),
-			writeFile(second, "old-second"),
-		]);
-		await expect(
-			runFile(tsx, [
-				helper,
-				"partial",
-				root,
-			]),
-		).rejects.toBeDefined();
-		const old = await runFile(tsx, [
-			helper,
-			"read",
-			root,
-		]);
-		expect(JSON.parse(old.stdout)).toEqual([
+	it("reopens the old file set after a process crashes during replacement", async () => {
+		await expectFreshProcessStateAfterCrash("partial", [
 			"old-first",
 			"old-second",
 		]);
+	}, 12_000);
 
-		await expect(
-			runFile(tsx, [
-				helper,
-				"committed",
-				root,
-			]),
-		).rejects.toBeDefined();
-		const committed = await runFile(tsx, [
-			helper,
-			"read",
-			root,
-		]);
-		expect(JSON.parse(committed.stdout)).toEqual([
+	it("reopens the committed file set after a process crashes during cleanup", async () => {
+		await expectFreshProcessStateAfterCrash("committed", [
 			"new-first",
 			"new-second",
 		]);
-	});
+	}, 12_000);
 
 	it("preserves the backup and reports its exact location when recovery fails", async () => {
 		await Promise.all([
@@ -304,5 +338,5 @@ describe("FilesystemWrite", () => {
 			isDirectory: expect.any(Function),
 		});
 		await expect(readFile(join(recovery, "backup-0"), "utf8")).resolves.toBe("old-first");
-	});
+	}, 12_000);
 });

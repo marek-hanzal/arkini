@@ -1,100 +1,62 @@
-import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import { Effect } from "effect";
+import { lock as acquireLock } from "proper-lockfile";
 
 import { FilesystemWriteError } from "../FilesystemWriteError";
 
-const lockOwnerScript = `printf 'locked\\n'; read _`;
+interface FilesystemLock {
+	readonly release: () => Promise<void>;
+}
+
+const error = (lock: string, message: string, cause: unknown) =>
+	new FilesystemWriteError({
+		operation: "lock",
+		message: `Filesystem write lock ${lock} ${message}.`,
+		cause,
+	});
+
+const isAlreadyReleased = (cause: unknown) =>
+	typeof cause === "object" && cause !== null && "code" in cause && cause.code === "ERELEASED";
 
 const acquireFx = Effect.fn("acquireFilesystemWriteLockFx")((lock: string) =>
 	Effect.tryPromise({
-		try: (signal) =>
-			new Promise<ChildProcessWithoutNullStreams>((resolve, reject) => {
-				if (process.platform !== "darwin") {
-					reject(new Error("FilesystemWrite locks require macOS lockf."));
-					return;
-				}
-				const child = spawn(
-					"/usr/bin/lockf",
-					[
-						"-k",
-						"-t",
-						"5",
-						lock,
-						"/bin/sh",
-						"-c",
-						lockOwnerScript,
-					],
-					{
-						stdio: [
-							"pipe",
-							"pipe",
-							"pipe",
-						],
-					},
-				);
-				let settled = false;
-				let stderr = "";
-				let stdout = "";
-				const rejectAcquisition = (cause: unknown) => {
-					if (settled) return;
-					settled = true;
-					signal.removeEventListener("abort", abort);
-					child.stdin.end();
-					child.kill("SIGTERM");
-					reject(cause);
-				};
-				const abort = () => rejectAcquisition(signal.reason);
-				signal.addEventListener("abort", abort, {
-					once: true,
-				});
-				child.stderr.setEncoding("utf8");
-				child.stderr.on("data", (chunk: string) => (stderr += chunk));
-				child.once("error", rejectAcquisition);
-				child.once("exit", (code) =>
-					rejectAcquisition(
-						new Error(
-							stderr.trim() || `Filesystem write lock ${lock} exited with ${code}.`,
-						),
-					),
-				);
-				child.stdout.setEncoding("utf8");
-				child.stdout.on("data", (chunk: string) => {
-					if (settled) return;
-					stdout += chunk;
-					if (!stdout.includes("\n")) return;
-					if (stdout.trim() !== "locked")
-						return rejectAcquisition(
-							new Error(`Filesystem write lock ${lock} returned invalid readiness.`),
-						);
-					settled = true;
-					signal.removeEventListener("abort", abort);
-					resolve(child);
-				});
-			}),
-		catch: (cause) =>
-			new FilesystemWriteError({
-				operation: "lock",
-				message: `Filesystem write lock ${lock} could not be acquired.`,
-				cause,
-			}),
+		try: () =>
+			acquireLock(lock, {
+				lockfilePath: lock,
+				onCompromised: (cause) => {
+					throw error(lock, "was compromised", cause);
+				},
+				realpath: false,
+				retries: {
+					factor: 1,
+					maxTimeout: 500,
+					minTimeout: 500,
+					retries: 10,
+				},
+				stale: 3_000,
+				update: 1_000,
+			}).then((release) => ({
+				release,
+			})),
+		catch: (cause) => error(lock, "could not be acquired", cause),
 	}),
 );
 
-const releaseFx = (child: ChildProcessWithoutNullStreams) =>
-	Effect.promise(
-		() =>
-			new Promise<void>((resolve) => {
-				if (child.exitCode !== null || child.signalCode !== null) {
-					resolve();
-					return;
-				}
-				child.once("exit", () => resolve());
-				child.stdin.end();
+const releaseFx = (lock: string, owner: FilesystemLock) =>
+	Effect.tryPromise({
+		try: () =>
+			owner.release().catch((cause: unknown) => {
+				if (!isAlreadyReleased(cause)) throw cause;
 			}),
-	).pipe(Effect.ignore);
+		catch: (cause) => error(lock, "could not be released", cause),
+	});
 
-/** Holds one crash-released cross-process lock around the supplied Effect. */
+/** Holds one portable optimistic lock around the supplied Effect. */
 export const withFilesystemLockFx = <Value, Failure, Requirements>(
 	lock: string,
 	effect: Effect.Effect<Value, Failure, Requirements>,
-) => Effect.acquireUseRelease(acquireFx(lock), () => effect, releaseFx);
+) =>
+	Effect.acquireUseRelease(
+		acquireFx(lock),
+		() => effect,
+		(owner) => releaseFx(lock, owner),
+	);

@@ -27,6 +27,16 @@ await Effect.runPromise(
 			process.stdout.write(JSON.stringify(values));
 			return;
 		}
+		if (mode === "hold") {
+			const filesystemWrite = yield* createFilesystemWriteFx();
+			yield* filesystemWrite.withLockFx(
+				lock,
+				Effect.sync(() => process.stdout.write("locked\n")).pipe(
+					Effect.andThen(Effect.sleep("2 seconds")),
+				),
+			);
+			return;
+		}
 		const canonicalRoot = yield* nodeFileSystem.realPath(root);
 		const canonicalLock = join(canonicalRoot, ".write.lock");
 		const canonicalFirst = join(canonicalRoot, "first.json");

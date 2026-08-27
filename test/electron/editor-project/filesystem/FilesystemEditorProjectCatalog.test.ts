@@ -1,5 +1,5 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { Effect } from "effect";
@@ -37,6 +37,7 @@ describe("filesystem Editor project catalog", () => {
 			Effect.runPromise(
 				createFilesystemEditorProjectCatalogFx({
 					catalogPath,
+					projectsRoot: join(dirname(catalogPath), "projects"),
 				}).pipe(Effect.provide(NodeServices.layer)),
 			);
 		const [left, right] = await Promise.all([
@@ -87,60 +88,61 @@ describe("filesystem Editor project catalog", () => {
 		const catalog = await Effect.runPromise(
 			createFilesystemEditorProjectCatalogFx({
 				catalogPath,
+				projectsRoot: join(dirname(catalogPath), "projects"),
 			}).pipe(Effect.provide(NodeServices.layer)),
 		);
 
 		expect(catalog.list()).toEqual(expected.projects);
 	});
 
-	it("rejects an undeclared root property without rewriting the catalog", async () => {
+	it("rebuilds an invalid catalog from direct managed directories and forgets externals", async () => {
 		const catalogPath = await createCatalogPath();
-		const source = JSON.stringify({
-			projects: [],
-			unexpected: true,
-		});
-		await writeFile(catalogPath, source);
-
-		await expect(
-			Effect.runPromise(
-				createFilesystemEditorProjectCatalogFx({
-					catalogPath,
-				}).pipe(Effect.provide(NodeServices.layer)),
+		const projectsRoot = join(dirname(catalogPath), "projects");
+		const managedRoots = [
+			join(projectsRoot, "alpha"),
+			join(projectsRoot, "broken"),
+		];
+		await Promise.all(
+			managedRoots.map((root) =>
+				mkdir(root, {
+					recursive: true,
+				}),
 			),
-		).rejects.toMatchObject({
-			_tag: "EditorProjectRepositoryError",
-			operation: "list-projects",
-			message: "The Editor project catalog is invalid.",
-		});
-		expect(await readFile(catalogPath, "utf8")).toBe(source);
-	});
+		);
+		await writeFile(join(managedRoots[1]!, "preserved.txt"), "keep");
+		await writeFile(
+			catalogPath,
+			JSON.stringify({
+				projects: [
+					{
+						root: join(dirname(catalogPath), "external"),
+						ownership: "external",
+						createdAtMs: 1,
+					},
+				],
+				unexpected: true,
+			}),
+		);
 
-	it("rejects duplicate project roots without rewriting the catalog", async () => {
-		const catalogPath = await createCatalogPath();
-		const project = {
-			root: join(dirname(catalogPath), "external-project"),
-			ownership: "external",
-			createdAtMs: 1,
-		};
-		const source = JSON.stringify({
-			projects: [
-				project,
-				project,
-			],
-		});
-		await writeFile(catalogPath, source);
+		const catalog = await Effect.runPromise(
+			createFilesystemEditorProjectCatalogFx({
+				catalogPath,
+				projectsRoot,
+			}).pipe(Effect.provide(NodeServices.layer)),
+		);
 
-		await expect(
-			Effect.runPromise(
-				createFilesystemEditorProjectCatalogFx({
-					catalogPath,
-				}).pipe(Effect.provide(NodeServices.layer)),
-			),
-		).rejects.toMatchObject({
-			_tag: "EditorProjectRepositoryError",
-			operation: "list-projects",
-			message: "The Editor project catalog is invalid.",
+		expect(catalog.rebuilt).toBe(true);
+		const canonicalManagedRoots = await Promise.all(managedRoots.map((root) => realpath(root)));
+		expect(catalog.list()).toEqual(
+			canonicalManagedRoots.map((root) => ({
+				root,
+				ownership: "managed",
+				createdAtMs: 0,
+			})),
+		);
+		expect(JSON.parse(await readFile(catalogPath, "utf8"))).toEqual({
+			projects: catalog.list(),
 		});
-		expect(await readFile(catalogPath, "utf8")).toBe(source);
+		expect(await readFile(join(managedRoots[1]!, "preserved.txt"), "utf8")).toBe("keep");
 	});
 });

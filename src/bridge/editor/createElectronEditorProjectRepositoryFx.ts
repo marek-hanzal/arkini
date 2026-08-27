@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { z } from "zod";
 
 import type { EditorProjectTransport } from "../../../electron/contract/editor/EditorProjectTransport";
-import { EditorProjectDescriptorSchema } from "~/editor/EditorProjectDescriptor";
+import { EditorProjectCandidateSchema } from "~/editor/EditorProjectCandidate";
 import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
 import {
 	EditorProjectRepositoryError,
@@ -287,7 +287,7 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 		listProjectsFx: callFx(
 			"list-projects",
 			() => window.arkini.editor.listProjects(),
-			(value) => EditorProjectDescriptorSchema.array().parse(value),
+			(value) => EditorProjectCandidateSchema.array().parse(value),
 		),
 		listNotesFx: (projectId) =>
 			callFx(

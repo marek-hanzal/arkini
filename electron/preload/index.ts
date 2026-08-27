@@ -172,6 +172,8 @@ const api: ArkiniElectronApi.Api = {
 		listProjects: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectList),
 		openExportDirectory: () =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectOpenExportDirectory),
+		openProjectDirectory: (root) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectOpenDirectory, root),
 		readProject: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectRead, projectId),
 		refreshProject: (projectId) =>

@@ -13,6 +13,7 @@ type Entry = EditorProjectCatalogEntrySchema.Type;
 
 export interface FilesystemEditorProjectCatalog {
 	readonly addFx: (entry: Entry) => Effect.Effect<void, EditorProjectRepositoryError>;
+	readonly rebuilt: boolean;
 	readonly list: () => ReadonlyArray<Entry>;
 	readonly removeFx: (root: string) => Effect.Effect<void, EditorProjectRepositoryError>;
 }
@@ -29,7 +30,13 @@ const parseCatalog = (candidate: unknown) => EditorProjectCatalogSchema.parse(ca
 /** Opens the one main-owned path registry; project contents always remain authoritative. */
 export const createFilesystemEditorProjectCatalogFx = Effect.fn(
 	"createFilesystemEditorProjectCatalogFx",
-)(function* ({ catalogPath }: { readonly catalogPath: string }) {
+)(function* ({
+	catalogPath,
+	projectsRoot,
+}: {
+	readonly catalogPath: string;
+	readonly projectsRoot: string;
+}) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
 	const filesystemWrite = yield* createFilesystemWriteFx();
@@ -43,13 +50,40 @@ export const createFilesystemEditorProjectCatalogFx = Effect.fn(
 	yield* fileSystem.makeDirectory(path.dirname(catalogPath), {
 		recursive: true,
 	});
+	yield* fileSystem.makeDirectory(projectsRoot, {
+		recursive: true,
+	});
+	const managedProjectsRoot = yield* fileSystem.realPath(projectsRoot);
+	let rebuilt = false;
+	const rebuildFx = Effect.gen(function* () {
+		const projects: Array<Entry> = [];
+		for (const name of (yield* fileSystem.readDirectory(managedProjectsRoot)).sort()) {
+			if (name === ".projects.lock") continue;
+			const root = path.join(managedProjectsRoot, name);
+			if ((yield* fileSystem.stat(root)).type !== "Directory") continue;
+			if ((yield* fileSystem.realPath(root)) !== root) continue;
+			projects.push(
+				EditorProjectCatalogEntrySchema.parse({
+					root,
+					ownership: "managed",
+					createdAtMs: 0,
+				}),
+			);
+		}
+		const next = EditorProjectCatalogSchema.parse({
+			projects,
+		});
+		yield* writeJsonFx(next);
+		rebuilt = true;
+		return next;
+	});
 	const readFx = Effect.gen(function* () {
 		if (yield* fileSystem.exists(catalogPath)) {
 			const source = yield* fileSystem.readFileString(catalogPath);
 			return yield* Effect.try({
 				try: () => parseCatalog(JSON.parse(source)),
-				catch: (cause) => createError("The Editor project catalog is invalid.", cause),
-			});
+				catch: (cause) => cause,
+			}).pipe(Effect.catch(() => rebuildFx));
 		}
 		const empty = EditorProjectCatalogSchema.parse({
 			projects: [],
@@ -58,6 +92,7 @@ export const createFilesystemEditorProjectCatalogFx = Effect.fn(
 		return empty;
 	});
 	let catalog = yield* filesystemWrite.withLockFx(lock, readFx);
+	const rebuiltAtOpen = rebuilt;
 
 	const updateFx = (update: (current: ReadonlyArray<Entry>) => ReadonlyArray<Entry>) =>
 		filesystemWrite
@@ -84,6 +119,7 @@ export const createFilesystemEditorProjectCatalogFx = Effect.fn(
 				...projects.filter((candidate) => candidate.root !== entry.root),
 				entry,
 			]),
+		rebuilt: rebuiltAtOpen,
 		list: () => catalog.projects,
 		removeFx: (root) => updateFx((projects) => projects.filter((entry) => entry.root !== root)),
 	} satisfies FilesystemEditorProjectCatalog;

@@ -19,6 +19,7 @@ import { GameValidationError } from "~/engine/validation/error/GameValidationErr
 import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
 import { withFilesystemEditorProjectLockFx } from "./withFilesystemEditorProjectLockFx";
 import { readFilesystemEditorProjectFilesFx } from "./readFilesystemEditorProjectFilesFx";
+import { ensureFilesystemEditorProjectGitignoreFx } from "./ensureFilesystemEditorProjectGitignoreFx";
 
 type Operations = Pick<EditorProjectRepositoryService, "buildProjectFx" | "readProjectBuildFx">;
 
@@ -86,6 +87,12 @@ export const createFilesystemEditorProjectBuildOperationsFx = Effect.fn(
 			Effect.gen(function* () {
 				const state = yield* readState(projectId);
 				yield* assertRevisionFx(state, expectedRevision, "build-project");
+				yield* providePlatform(
+					withFilesystemEditorProjectLockFx(
+						state.paths.root,
+						ensureFilesystemEditorProjectGitignoreFx(state.paths),
+					),
+				);
 				if (signKey !== undefined && ArkiniBuiltPublicKey === undefined)
 					return yield* Effect.fail(
 						new Error("This Arkini build does not contain a public signing key."),

@@ -12,14 +12,65 @@ import {
 import { join } from "node:path";
 import { createId } from "@paralleldrive/cuid2";
 import { Effect } from "effect";
-import type {
-	AccessToken,
-	AuthorizationCode,
-	OAuthClientInformationFull,
-	OAuthClientMetadata,
-	OAuthServerModel,
-	RefreshToken,
+import {
+	OAuthClientInformationFullSchema,
+	type AccessToken,
+	type AuthorizationCode,
+	type OAuthClientInformationFull,
+	type OAuthClientMetadata,
+	type OAuthServerModel,
+	type RefreshToken,
 } from "mcp-oauth-server";
+import { z } from "zod";
+
+/*
+	OAuth records are library-owned protocol data, but the persisted collection and
+	its identities are Arkini-owned. Parse the complete records before indexing them.
+*/
+const StoredDateSchema = z.iso
+	.datetime()
+	.transform((value) => new Date(value))
+	.meta({
+		id: "EditorMcpStoredDateSchema",
+		description: "One persisted MCP OAuth timestamp decoded as a Date.",
+	});
+const StoredAuthorizationCodeSchema = z
+	.object({
+		authorizationCode: z.string().min(1),
+		clientId: z.string().min(1),
+		userId: z.string().min(1),
+		expiresAt: StoredDateSchema,
+		codeChallenge: z.string().min(1),
+		redirectUri: z.string().min(1),
+		state: z.string().optional(),
+		scopes: z.array(z.string()).optional(),
+		resource: z.string().optional(),
+		grantId: z.string().optional(),
+	})
+	.strict()
+	.meta({
+		id: "EditorMcpStoredAuthorizationCodeSchema",
+		description: "One complete persisted MCP OAuth authorization code.",
+	});
+const StoredAccessTokenSchema = z
+	.object({
+		token: z.string().min(1),
+		expiresAt: StoredDateSchema,
+		scopes: z.array(z.string()),
+		clientId: z.string().min(1),
+		userId: z.string().optional(),
+		resource: z.string().optional(),
+		grantId: z.string().optional(),
+	})
+	.strict()
+	.meta({
+		id: "EditorMcpStoredAccessTokenSchema",
+		description: "One complete persisted MCP OAuth access token.",
+	});
+const StoredRefreshTokenSchema = StoredAccessTokenSchema.meta({
+	id: "EditorMcpStoredRefreshTokenSchema",
+	description: "One complete persisted MCP OAuth refresh token.",
+});
 
 import { EditorMcpNgrokSettingsSchema } from "../../../contract/editor/EditorMcpConfigurationSchema";
 import { EditorMcpPortSchema } from "../../../contract/editor/EditorMcpPortSchema";
@@ -72,20 +123,21 @@ const createState = (port = DefaultEditorMcpPort, ngrok?: StoredNgrok): State =>
 const isRecord = (value: unknown): value is Record<string, unknown> =>
 	typeof value === "object" && value !== null && !Array.isArray(value);
 
-const parseDated = <
-	Value extends {
-		readonly expiresAt: Date;
-	},
->(
-	value: unknown,
-): Value => {
-	if (!isRecord(value) || typeof value.expiresAt !== "string") throw new Error("Invalid token.");
-	const expiresAt = new Date(value.expiresAt);
-	if (Number.isNaN(expiresAt.valueOf())) throw new Error("Invalid token expiry.");
-	return {
-		...value,
-		expiresAt,
-	} as Value;
+const indexedMap = <Value>(
+	values: ReadonlyArray<Value>,
+	readId: (value: Value) => string,
+	label: string,
+) => {
+	const entries = values.map(
+		(value) =>
+			[
+				readId(value),
+				value,
+			] as const,
+	);
+	if (new Set(entries.map(([id]) => id)).size !== entries.length)
+		throw new Error(`Duplicate persisted ${label} identity.`);
+	return new Map(entries);
 };
 
 const parseState = (stored: string): State => {
@@ -116,16 +168,12 @@ const parseState = (stored: string): State => {
 			domain: value.ngrok.domain,
 		};
 	}
-	const clients = value.clients.map((client) => {
-		if (!isRecord(client) || typeof client.client_id !== "string")
-			throw new Error("Invalid OAuth client.");
-		return client as OAuthClientInformationFull;
-	});
+	const clients = value.clients.map((client) => OAuthClientInformationFullSchema.parse(client));
 	const authorizationCodes = value.authorizationCodes.map((code) =>
-		parseDated<AuthorizationCode>(code),
+		StoredAuthorizationCodeSchema.parse(code),
 	);
-	const accessTokens = value.accessTokens.map((token) => parseDated<AccessToken>(token));
-	const refreshTokens = value.refreshTokens.map((token) => parseDated<RefreshToken>(token));
+	const accessTokens = value.accessTokens.map((token) => StoredAccessTokenSchema.parse(token));
+	const refreshTokens = value.refreshTokens.map((token) => StoredRefreshTokenSchema.parse(token));
 	return {
 		port,
 		...(ngrok === undefined
@@ -134,30 +182,14 @@ const parseState = (stored: string): State => {
 					ngrok,
 				}),
 		password: value.password,
-		clients: new Map(
-			clients.map((client) => [
-				client.client_id,
-				client,
-			]),
+		clients: indexedMap(clients, (client) => client.client_id, "OAuth client"),
+		authorizationCodes: indexedMap(
+			authorizationCodes,
+			(code) => code.authorizationCode,
+			"authorization code",
 		),
-		authorizationCodes: new Map(
-			authorizationCodes.map((code) => [
-				code.authorizationCode,
-				code,
-			]),
-		),
-		accessTokens: new Map(
-			accessTokens.map((token) => [
-				token.token,
-				token,
-			]),
-		),
-		refreshTokens: new Map(
-			refreshTokens.map((token) => [
-				token.token,
-				token,
-			]),
-		),
+		accessTokens: indexedMap(accessTokens, (token) => token.token, "access token"),
+		refreshTokens: indexedMap(refreshTokens, (token) => token.token, "refresh token"),
 	};
 };
 
@@ -252,7 +284,7 @@ export const createFilesystemEditorMcpStorageFx = Effect.fn("createFilesystemEdi
 				return readState().clients.get(clientId);
 			},
 			async registerClient(client: OAuthClientMetadata) {
-				const registered = client as OAuthClientInformationFull;
+				const registered = OAuthClientInformationFullSchema.parse(client);
 				const clients = readState().clients;
 				if (!clients.has(registered.client_id) && clients.size >= MaxEditorMcpClients)
 					throw new Error("Remote MCP client limit reached. Reset auth to clear it.");

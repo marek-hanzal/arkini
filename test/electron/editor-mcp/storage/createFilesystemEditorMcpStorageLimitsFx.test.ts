@@ -77,11 +77,17 @@ describe("filesystem MCP storage limits", () => {
 		for (let index = 0; index < 100; index += 1)
 			await register({
 				client_id: `client-${index}`,
+				redirect_uris: [
+					`https://client-${index}.example.com/callback`,
+				],
 			} as never);
 
 		await expect(
 			register({
 				client_id: "client-over-limit",
+				redirect_uris: [
+					"https://client-over-limit.example.com/callback",
+				],
 			} as never),
 		).rejects.toThrow("client limit reached");
 	});

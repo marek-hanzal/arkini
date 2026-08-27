@@ -7,6 +7,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { routeTree } from "~/_route";
+import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
 import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { Game } from "~/bridge/game/Game";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
@@ -46,7 +47,7 @@ const createGame = (disposeFx: Game["disposeFx"]): Game => ({
 		contentHash: "content-exit",
 		title: testArkpackConfig.meta.title,
 		version: "1.0",
-		arkini: "0.5.0",
+		arkini: ArkiniAppVersion,
 		trust: {
 			type: "external",
 			reason: "unsigned",

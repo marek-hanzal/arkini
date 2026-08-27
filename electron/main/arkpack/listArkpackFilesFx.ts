@@ -1,10 +1,14 @@
 import { FileSystem } from "effect";
 import { Effect } from "effect";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { ElectronMainError } from "../ElectronMainError";
 import { readArkpackFileFx } from "./readArkpackFileFx";
+import {
+	recoverArkpackArtifactPairFx,
+	withRecoveredArkpackArtifactPairFx,
+} from "./recoverArkpackArtifactPairFx";
 import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
 
 const suffix = ".arkpack";
@@ -36,6 +40,33 @@ export const listArkpackFilesFx = Effect.fn("listArkpackFilesFx")(
 			} else if (!(yield* fileSystem.exists(root))) {
 				return [];
 			}
+			if (source === "user") {
+				const transactionSuffix = `${suffix}.transaction`;
+				const cleanupSuffix = `${transactionSuffix}.cleanup`;
+				for (const entry of yield* fileSystem.readDirectory(root)) {
+					if (
+						!entry.startsWith(".") ||
+						(!entry.endsWith(transactionSuffix) && !entry.endsWith(cleanupSuffix))
+					)
+						continue;
+					const journalSuffix = entry.endsWith(cleanupSuffix)
+						? ".transaction.cleanup"
+						: ".transaction";
+					const arkpackEntry = entry.slice(1, -journalSuffix.length);
+					let packageId: string;
+					try {
+						packageId = decodeURIComponent(arkpackEntry.slice(0, -suffix.length));
+					} catch {
+						continue;
+					}
+					if (`${encodeGameProjectFileStem(packageId)}${suffix}` !== arkpackEntry)
+						continue;
+					yield* recoverArkpackArtifactPairFx({
+						arkpackPath: join(root, arkpackEntry),
+						fileSystem,
+					});
+				}
+			}
 			const entries = (yield* fileSystem.readDirectory(root))
 				.filter((entry) => entry.endsWith(suffix))
 				.sort();
@@ -52,28 +83,44 @@ export const listArkpackFilesFx = Effect.fn("listArkpackFilesFx")(
 				if (`${encodeGameProjectFileStem(packageId)}${suffix}` !== entry) continue;
 				if (inspectedCandidates >= maxCandidates) break;
 				inspectedCandidates += 1;
-				const file = yield* Effect.gen(function* () {
-					const path = join(root, entry);
-					const signaturePath = join(root, `${entry.slice(0, -suffix.length)}.arksig`);
-					const size =
-						Number((yield* fileSystem.stat(path)).size) +
-						((yield* fileSystem.exists(signaturePath))
-							? Number((yield* fileSystem.stat(signaturePath)).size)
-							: 0);
-					if (totalBytes + size > maxTotalBytes) return null;
-					const file = yield* readArkpackFileFx({
-						root,
-						fileSystem,
-						packageId,
-						source,
+				const readCandidateFx = (path: string) =>
+					Effect.gen(function* () {
+						const candidateRoot = dirname(path);
+						const signaturePath = join(
+							candidateRoot,
+							`${entry.slice(0, -suffix.length)}.arksig`,
+						);
+						const size =
+							Number((yield* fileSystem.stat(path)).size) +
+							((yield* fileSystem.exists(signaturePath))
+								? Number((yield* fileSystem.stat(signaturePath)).size)
+								: 0);
+						if (totalBytes + size > maxTotalBytes) return null;
+						const file = yield* readArkpackFileFx({
+							root: candidateRoot,
+							fileSystem,
+							packageId,
+							source,
+						});
+						return file === null
+							? null
+							: {
+									file,
+									size,
+								};
 					});
-					return file === null
-						? null
-						: {
-								file,
-								size,
-							};
-				}).pipe(
+				const requestedPath = join(root, entry);
+				const file = yield* (
+					source === "user"
+						? withRecoveredArkpackArtifactPairFx(
+								{
+									arkpackPath: requestedPath,
+									fileSystem,
+								},
+								readCandidateFx,
+							)
+						: readCandidateFx(requestedPath)
+				).pipe(
 					Effect.match({
 						onFailure: () => null,
 						onSuccess: (admitted) => admitted,

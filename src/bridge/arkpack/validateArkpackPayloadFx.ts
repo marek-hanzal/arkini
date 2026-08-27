@@ -29,13 +29,6 @@ export const validateArkpackPayloadFx = Effect.fn("validateArkpackPayloadFx")(fu
 	payload: Pick<PayloadSchema.Type, "config" | "resources">,
 ) {
 	for (const resource of payload.resources) {
-		if (resource.mime !== "image/png") {
-			return yield* Effect.fail(
-				new Error(
-					`Unsupported arkpack resource MIME ${resource.mime}; only image/png is allowed.`,
-				),
-			);
-		}
 		yield* validatePngResourceFx(resource.bytes, resource.id);
 	}
 	const provenance = createPackProvenance(payload.config.meta.id, payload.config.items);

@@ -1,10 +1,13 @@
 import { FileSystem } from "effect";
 import { Effect, Semaphore } from "effect";
+import { dirname, join } from "node:path";
 import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
+import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
 import type { ArkpackCatalog } from "./ArkpackCatalog";
 import { listArkpackFilesFx } from "./listArkpackFilesFx";
 import { readArkpackFileFx } from "./readArkpackFileFx";
+import { withRecoveredArkpackArtifactPairFx } from "./recoverArkpackArtifactPairFx";
 import { removeUserArkpackFx } from "./removeUserArkpackFx";
 import { writeUserArkpackFx } from "./writeUserArkpackFx";
 
@@ -88,18 +91,34 @@ export const createFilesystemArkpackCatalogFx = Effect.fn("createFilesystemArkpa
 				}),
 			),
 		);
-		const readCandidateFx = (root: string, packageId: string, source: "bundled" | "user") =>
-			readArkpackFileFx({
-				root,
-				fileSystem,
-				packageId,
-				source,
-			}).pipe(
+		const readCandidateFx = (root: string, packageId: string, source: "bundled" | "user") => {
+			const readFx = (candidateRoot: string) =>
+				readArkpackFileFx({
+					root: candidateRoot,
+					fileSystem,
+					packageId,
+					source,
+				});
+			const candidate =
+				source === "user"
+					? withRecoveredArkpackArtifactPairFx(
+							{
+								arkpackPath: join(
+									root,
+									`${encodeGameProjectFileStem(packageId)}.arkpack`,
+								),
+								fileSystem,
+							},
+							(path) => readFx(dirname(path)),
+						)
+					: readFx(root);
+			return candidate.pipe(
 				Effect.match({
 					onFailure: () => null,
 					onSuccess: (file) => file,
 				}),
 			);
+		};
 		const readFx: ArkpackCatalog["readFx"] = Effect.fn("FilesystemArkpackCatalog.readFx")(
 			(packageId) =>
 				operations.withPermits(1)(

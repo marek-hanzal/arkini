@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
@@ -11,6 +12,15 @@ export namespace writeArkpackSignKeyFx {
 	}
 }
 
+const refuseOverwrite = (output: string) =>
+	new ArkpackInputError({
+		operation: "write-sign-key",
+		message: `Refusing to overwrite existing signing environment ${output}.`,
+		cause: {
+			output,
+		},
+	});
+
 /** Generates one signing secret and writes it as a protected dotenv input. */
 export const writeArkpackSignKeyFx = Effect.fn("writeArkpackSignKeyFx")(function* ({
 	force,
@@ -19,15 +29,7 @@ export const writeArkpackSignKeyFx = Effect.fn("writeArkpackSignKeyFx")(function
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
 	if (!force && (yield* fileSystem.exists(output))) {
-		return yield* Effect.fail(
-			new ArkpackInputError({
-				operation: "write-sign-key",
-				message: `Refusing to overwrite existing signing environment ${output}.`,
-				cause: {
-					output,
-				},
-			}),
-		);
+		return yield* Effect.fail(refuseOverwrite(output));
 	}
 	const pair = yield* generateArkpackKeyPairFx();
 	const existing = (yield* fileSystem.exists(output))
@@ -39,10 +41,41 @@ export const writeArkpackSignKeyFx = Effect.fn("writeArkpackSignKeyFx")(function
 	yield* fileSystem.makeDirectory(path.dirname(path.resolve(output)), {
 		recursive: true,
 	});
-	yield* fileSystem.writeFileString(output, lines.join("\n"), {
-		mode: 0o600,
-	});
-	yield* fileSystem.chmod(output, 0o600);
+	const pending = `${output}.${randomUUID()}.pending`;
+	yield* Effect.gen(function* () {
+		yield* fileSystem.writeFileString(pending, lines.join("\n"), {
+			flag: "wx",
+			mode: 0o600,
+		});
+		yield* fileSystem.chmod(pending, 0o600);
+		yield* Effect.scoped(
+			Effect.gen(function* () {
+				const file = yield* fileSystem.open(pending, {
+					flag: "r+",
+				});
+				yield* file.sync;
+			}),
+		);
+		if (force) yield* fileSystem.rename(pending, output);
+		else
+			yield* fileSystem.link(pending, output).pipe(
+				Effect.catch((cause) =>
+					Effect.gen(function* () {
+						if (yield* fileSystem.exists(output))
+							return yield* Effect.fail(refuseOverwrite(output));
+						return yield* Effect.fail(cause);
+					}),
+				),
+			);
+	}).pipe(
+		Effect.ensuring(
+			fileSystem
+				.remove(pending, {
+					force: true,
+				})
+				.pipe(Effect.ignore),
+		),
+	);
 	return {
 		output,
 		publicKey: pair.publicKey,

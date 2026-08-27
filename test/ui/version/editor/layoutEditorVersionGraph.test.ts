@@ -2,13 +2,14 @@ import { describe, expect, it } from "vitest";
 
 import type { EditorProjectVersionDescriptor } from "~/editor/version/EditorProjectVersion";
 import { layoutEditorVersionGraph } from "~/ui/version/editor/layoutEditorVersionGraph";
+import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 
 const version = (
 	versionId: string,
 	createdAtMs: number,
 	parentVersionId?: string,
 ): EditorProjectVersionDescriptor => ({
-	arkini: "0.5.0",
+	arkini: ArkiniAppVersion,
 	arkpackVersion: "1.0",
 	createdAtMs,
 	...(parentVersionId === undefined

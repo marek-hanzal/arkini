@@ -9,6 +9,7 @@ import type {
 import { EditorVersionDescriptorFileSchema } from "~/editor/filesystem/EditorVersionDescriptorFileSchema";
 import { EditorVersionHeadFileSchema } from "~/editor/filesystem/EditorVersionHeadFileSchema";
 import { EditorVersionManifestSchema } from "~/editor/filesystem/EditorVersionManifestSchema";
+import { readFilesystemEditorVersionSnapshotFx } from "./readFilesystemEditorVersionSnapshotFx";
 
 const readJsonFx = <Value>(target: string, parse: (candidate: unknown) => Value, message: string) =>
 	Effect.gen(function* () {
@@ -69,6 +70,51 @@ export const readFilesystemEditorProjectVersionHistoryFx = Effect.fn(
 			descriptor,
 			manifest,
 		});
+	}
+	yield* Effect.try({
+		try: () => {
+			const states = new Map<string, "visiting" | "visited">();
+			const visit = (versionId: string): void => {
+				const state = states.get(versionId);
+				if (state === "visited") return;
+				if (state === "visiting")
+					throw new Error(
+						`Editor version history contains a parent cycle at ${versionId}.`,
+					);
+				states.set(versionId, "visiting");
+				const parent = versions.get(versionId)?.descriptor.parentVersionId;
+				if (parent !== undefined) {
+					if (!versions.has(parent))
+						throw new Error(
+							`Editor version ${versionId} references missing parent ${parent}.`,
+						);
+					visit(parent);
+				}
+				states.set(versionId, "visited");
+			};
+			for (const versionId of versions.keys()) visit(versionId);
+		},
+		catch: (cause) => cause,
+	});
+	const objectCache = new Map<string, Uint8Array>();
+	for (const [versionId, version] of versions) {
+		const snapshot = yield* readFilesystemEditorVersionSnapshotFx({
+			manifest: version.manifest,
+			objectCache,
+			paths,
+		});
+		if (snapshot.arkpack !== version.descriptor.version)
+			return yield* Effect.fail(
+				new Error(
+					`Editor version ${versionId} Arkpack version does not match its descriptor.`,
+				),
+			);
+		if (snapshot.contentFingerprint !== version.descriptor.contentFingerprint)
+			return yield* Effect.fail(
+				new Error(
+					`Editor version ${versionId} content fingerprint does not match its descriptor.`,
+				),
+			);
 	}
 	return {
 		head,

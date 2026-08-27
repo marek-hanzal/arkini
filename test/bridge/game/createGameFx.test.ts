@@ -16,6 +16,7 @@ import {
 } from "~test/bridge/arkpack/support/createTestArkpack";
 import { installTestPngDecoder } from "~test/bridge/arkpack/support/createTestPngBytes";
 import { ArkiniPublicKey } from "~/bridge/arkpack/ArkiniPublicKey";
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 
 const publicKey = ArkiniPublicKey;
 
@@ -419,7 +420,7 @@ describe("createGameFx", () => {
 		storages.setSaved(
 			encode({
 				version: "not-a-version",
-				arkini: "0.5.0",
+				arkini: ArkiniAppVersion,
 				state: {},
 			}),
 		);

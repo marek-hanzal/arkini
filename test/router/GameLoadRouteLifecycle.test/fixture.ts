@@ -6,6 +6,7 @@ import { createRoot } from "react-dom/client";
 import { expect, vi } from "vitest";
 
 import { routeTree } from "~/_route";
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 import type { ArkiniElectronApi } from "../../../electron/contract/ArkiniElectronApi";
 import {
 	EditorBoardGameResourceOwnerAtom,
@@ -38,7 +39,7 @@ export const createGame = ({
 		contentHash: "content-route-load",
 		title: testArkpackConfig.meta.title,
 		version: "1.0",
-		arkini: "0.5.0",
+		arkini: ArkiniAppVersion,
 		trust: {
 			type: "external",
 			reason: "unsigned",

@@ -1,5 +1,6 @@
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { PayloadSchema } from "~/engine/pack/schema/PayloadSchema";
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 
 export const editorTestConfig = GameConfigSchema.parse({
 	resources: {
@@ -48,7 +49,7 @@ export const editorTestConfig = GameConfigSchema.parse({
 
 export const editorTestPayload: PayloadSchema.Type = {
 	version: "1.0",
-	arkini: "0.5.0",
+	arkini: ArkiniAppVersion,
 	config: editorTestConfig,
 	resources: [
 		{

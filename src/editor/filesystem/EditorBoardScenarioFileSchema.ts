@@ -22,7 +22,7 @@ export const EditorBoardScenarioFileSchema = z
 	})
 	.meta({
 		id: "EditorBoardScenarioFileSchema",
-		description: "One scenarios/<name>.json file in a portable Editor project.",
+		description: "One hashed scenarios/<sha256>.json file in a portable Editor project.",
 	});
 
 export type EditorBoardScenarioFileSchema = typeof EditorBoardScenarioFileSchema;

@@ -1,10 +1,11 @@
 import { Effect, FileSystem } from "effect";
-import { access, mkdtemp, readFile, readdir, rm, truncate, writeFile } from "node:fs/promises";
+import { access, mkdtemp, realpath, rm, truncate, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { ArkpackLimits } from "../../shared/ArkpackLimits";
+import { writeArkpackArtifactPairFx } from "../../electron/main/arkpack/writeArkpackArtifactPairFx";
 import {
 	bundledBytes,
 	createCatalog,
@@ -21,7 +22,7 @@ import {
 let root = "";
 
 beforeEach(async () => {
-	root = await mkdtemp(join(tmpdir(), "arkini-arkpacks-"));
+	root = await realpath(await mkdtemp(join(tmpdir(), "arkini-arkpacks-")));
 });
 
 afterEach(async () => {
@@ -32,6 +33,8 @@ afterEach(async () => {
 });
 
 describe("createFilesystemArkpackCatalogFx", () => {
+	const signature = (byte: number) => btoa(String.fromCharCode(...new Uint8Array(64).fill(byte)));
+
 	it("discovers convention-named files and their optional signatures without descriptors", async () => {
 		const roots = readRoots(root);
 		const signature = "detached-signature";
@@ -196,95 +199,6 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		]);
 	});
 
-	it("cleans the pending file when install publication fails", async () => {
-		const roots = readRoots(root);
-		const packageId = "blocked-install";
-		const output = readPackagePath(roots.user, packageId);
-		const nodeFileSystem = await createNodeFileSystem();
-		const fileSystem = {
-			...nodeFileSystem,
-			rename: (oldPath, newPath) =>
-				oldPath.endsWith(".pending") && newPath === output
-					? nodeFileSystem.rename(join(root, "missing-arkpack"), newPath)
-					: nodeFileSystem.rename(oldPath, newPath),
-		} satisfies FileSystem.FileSystem;
-		const catalog = await createCatalog(root, fileSystem);
-
-		await expect(
-			Effect.runPromise(
-				catalog.installFx({
-					packageId,
-					bytes: userBytes,
-				}),
-			),
-		).rejects.toBeDefined();
-
-		expect((await readdir(roots.user)).filter((entry) => entry.endsWith(".pending"))).toEqual(
-			[],
-		);
-		await expect(access(output)).rejects.toBeDefined();
-	});
-
-	it.each([
-		{
-			failure: "backup" as const,
-			previous: true,
-		},
-		{
-			failure: "publication" as const,
-			previous: true,
-		},
-		{
-			failure: "publication" as const,
-			previous: false,
-		},
-	])("rolls back the pair when $failure fails with previous=$previous", async (scenario) => {
-		const roots = readRoots(root);
-		const packageId = "atomic-pair";
-		const oldSignature = btoa(String.fromCharCode(...new Uint8Array(64).fill(1)));
-		const nextSignature = btoa(String.fromCharCode(...new Uint8Array(64).fill(2)));
-		const output = readPackagePath(roots.user, packageId);
-		if (scenario.previous)
-			await writePackage({
-				root: roots.user,
-				packageId,
-				bytes: bundledBytes,
-				signature: oldSignature,
-			});
-		const signatureOutput = readSignaturePath(roots.user, packageId);
-		const nodeFileSystem = await createNodeFileSystem();
-		const fileSystem = {
-			...nodeFileSystem,
-			rename: (oldPath, newPath) =>
-				(
-					scenario.failure === "backup"
-						? oldPath === signatureOutput && newPath.endsWith(".previous")
-						: oldPath.endsWith(".pending") && newPath === signatureOutput
-				)
-					? nodeFileSystem.rename(join(root, "missing-signature"), newPath)
-					: nodeFileSystem.rename(oldPath, newPath),
-		} satisfies FileSystem.FileSystem;
-		const catalog = await createCatalog(root, fileSystem);
-
-		await expect(
-			Effect.runPromise(
-				catalog.installFx({
-					packageId,
-					bytes: userBytes,
-					signature: nextSignature,
-				}),
-			),
-		).rejects.toBeDefined();
-
-		if (scenario.previous) {
-			expect(new Uint8Array(await readFile(output))).toEqual(bundledBytes);
-			expect((await readFile(signatureOutput, "utf8")).trim()).toBe(oldSignature);
-		} else {
-			await expect(access(output)).rejects.toBeDefined();
-			await expect(access(signatureOutput)).rejects.toBeDefined();
-		}
-	});
-
 	it("serializes install before a concurrently admitted removal", async () => {
 		const roots = readRoots(root);
 		const packageId = "serialized";
@@ -301,7 +215,7 @@ describe("createFilesystemArkpackCatalogFx", () => {
 			},
 			rename: (oldPath, newPath) => {
 				const renameFx = nodeFileSystem.rename(oldPath, newPath);
-				if (!oldPath.endsWith(".pending")) return renameFx;
+				if (!oldPath.includes(".transaction/pending.")) return renameFx;
 				renameEntered.resolve();
 				return Effect.promise(() => releaseRename.promise).pipe(Effect.andThen(renameFx));
 			},
@@ -309,9 +223,10 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		const catalog = await createCatalog(root, fileSystem);
 
 		const installing = Effect.runPromise(
-			catalog.installFx({
-				packageId,
+			writeArkpackArtifactPairFx({
+				arkpackPath: output,
 				bytes: userBytes,
+				fileSystem,
 			}),
 		);
 		await renameEntered.promise;
@@ -326,5 +241,59 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		]);
 		expect(removeStarted).toBe(true);
 		expect(await Effect.runPromise(catalog.readFx(packageId))).toEqual([]);
+	});
+
+	it("reads a signed user pair under the same lock as an external writer", async () => {
+		const roots = readRoots(root);
+		const packageId = "locked-reader";
+		const output = await writePackage({
+			root: roots.user,
+			packageId,
+			bytes: bundledBytes,
+			signature: signature(1),
+		});
+		const nodeFileSystem = await createNodeFileSystem();
+		const publicationEntered = createPromiseGate();
+		const releasePublication = createPromiseGate();
+		let canonicalReadStarted = false;
+		const fileSystem = {
+			...nodeFileSystem,
+			readFile: (path) => {
+				if (path === output) canonicalReadStarted = true;
+				return nodeFileSystem.readFile(path);
+			},
+			rename: (oldPath, newPath) => {
+				const renameFx = nodeFileSystem.rename(oldPath, newPath);
+				if (!oldPath.endsWith("/pending.arkpack")) return renameFx;
+				publicationEntered.resolve();
+				return Effect.promise(() => releasePublication.promise).pipe(
+					Effect.andThen(renameFx),
+				);
+			},
+		} satisfies FileSystem.FileSystem;
+		const catalog = await createCatalog(root, fileSystem);
+		const writing = Effect.runPromise(
+			writeArkpackArtifactPairFx({
+				arkpackPath: output,
+				bytes: userBytes,
+				fileSystem,
+				signature: signature(2),
+			}),
+		);
+		await publicationEntered.promise;
+		const listing = Effect.runPromise(catalog.listFx);
+		await new Promise<void>((resolve) => setImmediate(resolve));
+		expect(canonicalReadStarted).toBe(false);
+
+		releasePublication.resolve();
+		await writing;
+		await expect(listing).resolves.toEqual([
+			readFileRecord({
+				packageId,
+				bytes: userBytes,
+				signature: signature(2),
+				source: "user",
+			}),
+		]);
 	});
 });

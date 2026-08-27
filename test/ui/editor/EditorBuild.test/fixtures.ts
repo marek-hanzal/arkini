@@ -1,10 +1,12 @@
+import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
+
 export const createArtifact = (contentHash: string, revision: number) => ({
 	projectId: "editor-test",
 	bytes: 2,
 	contentHash,
 	diagnostics: [],
 	filename: "editor-test.arkpack",
-	arkini: "0.5.0",
+	arkini: ArkiniAppVersion,
 	revision,
 	version: "1.0",
 });

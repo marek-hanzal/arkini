@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { join } from "node:path";
 import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ElectronMainError } from "../ElectronMainError";
-import { assertGameSaveKeyFx } from "./assertGameSaveKeyFx";
+import { readGameSaveDirectoryNameFx } from "./readGameSaveDirectoryNameFx";
 
 export namespace writeGameSaveFx {
 	export interface Props {
@@ -18,8 +18,7 @@ export namespace writeGameSaveFx {
 export const writeGameSaveFx = Effect.fn("writeGameSaveFx")(
 	({ root, fileSystem, key, bytes }: writeGameSaveFx.Props) =>
 		Effect.gen(function* () {
-			const valid = yield* assertGameSaveKeyFx(key);
-			const directory = join(root, valid.packageId);
+			const directory = join(root, yield* readGameSaveDirectoryNameFx(key));
 			const pending = join(directory, "pending.arksave");
 			const current = join(directory, "current.arksave");
 			yield* fileSystem.makeDirectory(directory, {

@@ -101,8 +101,6 @@ export const createFilesystemEditorVersionSnapshotPlan = ({
 	for (const resource of [
 		...resources,
 	].sort((left, right) => left.id.localeCompare(right.id))) {
-		if (resource.mime !== "image/png")
-			throw new Error(`Editor resource ${resource.id} must use image/png.`);
 		if (resourceIds.has(resource.id))
 			throw new Error(`Editor resource ${resource.id} is duplicated.`);
 		resourceIds.add(resource.id);

@@ -92,5 +92,10 @@ development snapshot. A release version tag identifies the exact `main` commit
 released under that version. If a release is bad, fix it on `main` and publish a
 new release; do not move the existing tag or downgrade user data.
 
+A stable Arkini release supports at least macOS and Windows. Each supported
+operating system keeps its own packaging and delivery gate so one platform is
+never treated as proof for another. Linux becomes a release target only after
+its own delivery gate is implemented and proven.
+
 [DATA_CONTRACTS.md](DATA_CONTRACTS.md) inventories the current external file
 shapes and field ownership. It does not override this release policy.

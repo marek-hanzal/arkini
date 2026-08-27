@@ -208,7 +208,7 @@ For a packaged local smoke test without release archives, run:
 
 This recipe cleans desktop output, builds Electron, packs `./game/arkini` through the standard project command, asks Electron Builder for the unpacked arm64 `.out/desktop/release/mac-arm64/Arkini.app`, and launches that exact bundle with macOS `open`. It does not create DMG, ZIP, checksums, macOS code signing, notarization, or release assets.
 
-The production distribution target is unsigned macOS Apple Silicon only. Build both local artifacts through the one canonical path:
+The current macOS development distribution target is unsigned Apple Silicon. Build both local artifacts through the one canonical path:
 
 ```bash
 ./Argcfile.sh package-macos
@@ -227,7 +227,7 @@ mac-arm64/Arkini.app
 
 Verify downloads with `shasum -a 256 -c SHA256SUMS`. These development artifacts are intentionally unsigned and unnotarized. macOS may require opening the application through Finder's **Open** action or allowing it from **System Settings → Privacy & Security**. Do not add ad-hoc signing, fake certificates, or notarization placeholders to this milestone.
 
-The [macOS prerelease workflow](.github/workflows/macos-prerelease.yml) installs the repository tools through `mise-action` and invokes the same `./Argcfile.sh package-macos` entrypoint on the GitHub-hosted `macos-15` Apple Silicon runner. It packages exactly once and does not run repository validation; validation belongs to the working-branch workflow. Manual dispatch uploads an External workflow artifact only. Tags matching `v*-dev.*`, such as `v0.1.0-dev.1`, use GitHub OIDC to keyless-sign the exact bundled Arkpack and create an immutable GitHub prerelease containing the DMG, ZIP, standalone Arkpack, its Sigstore bundle, and `SHA256SUMS`. Normal source pushes do not spend macOS runner time.
+The [macOS prerelease workflow](.github/workflows/macos-prerelease.yml) installs the repository tools through `mise-action` and invokes the same `./Argcfile.sh package-macos` entrypoint on the GitHub-hosted `macos-15` Apple Silicon runner. It packages exactly once and does not run repository validation; validation belongs to the working-branch workflow. Manual dispatch uploads an External workflow artifact only. Tags matching `v*-dev.*`, such as `v0.1.0-dev.1`, use GitHub OIDC to keyless-sign the exact bundled Arkpack and create an immutable GitHub prerelease containing the DMG, ZIP, standalone Arkpack, its Sigstore bundle, and `SHA256SUMS`. This workflow proves only the macOS delivery slice; the first stable release requires separate macOS and Windows delivery gates, while Linux remains optional until its own gate exists. Normal source pushes do not spend macOS runner time.
 
 Useful focused commands:
 

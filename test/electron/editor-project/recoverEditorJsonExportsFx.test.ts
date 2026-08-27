@@ -16,6 +16,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EditorJsonExportOwnershipFile } from "../../../electron/main/editor-project/EditorJsonExportRecoveryRecord";
 import { recoverEditorJsonExportsFx } from "../../../electron/main/editor-project/recoverEditorJsonExportsFx";
+import {
+	readReimportableProject,
+	writeReimportableProject,
+} from "./replaceEditorJsonExportDirectoryFx.test/harness";
 
 const electron = vi.hoisted(() => {
 	const paths = {
@@ -112,14 +116,10 @@ describe("recoverEditorJsonExportsFx", () => {
 		const target = join(root, "target");
 		const previous = join(root, `.target.${transaction}.previous`);
 		await Promise.all([
-			mkdir(target),
-			mkdir(previous),
+			writeReimportableProject(target, 2),
+			writeReimportableProject(previous, 1),
 		]);
-		await Promise.all([
-			writeFile(join(target, "sentinel.txt"), "new"),
-			writeFile(join(target, EditorJsonExportOwnershipFile), transaction),
-			writeFile(join(previous, "sentinel.txt"), "old"),
-		]);
+		await writeFile(join(target, EditorJsonExportOwnershipFile), transaction);
 		const recoveryDirectory = await writeRecovery({
 			hadTarget: true,
 			moved: true,
@@ -130,7 +130,7 @@ describe("recoverEditorJsonExportsFx", () => {
 
 		await recover();
 
-		await expect(readFile(join(target, "sentinel.txt"), "utf8")).resolves.toBe("old");
+		expect((await readReimportableProject(target)).marker.revision).toBe(1);
 		await expect(access(recoveryDirectory)).rejects.toBeDefined();
 	});
 
@@ -138,8 +138,12 @@ describe("recoverEditorJsonExportsFx", () => {
 		const transaction = "22222222-2222-4222-8222-222222222222";
 		const source = join(root, "source");
 		const target = join(root, "target");
+		const pending = join(root, `.target.${transaction}.pending`);
+		const preserved = join(root, `.target.${transaction}.recovery`);
 		await mkdir(target);
 		await writeFile(join(target, "sentinel.txt"), "healthy");
+		await writeReimportableProject(pending, 2);
+		await writeFile(join(pending, EditorJsonExportOwnershipFile), transaction);
 		await writeRecovery({
 			hadTarget: true,
 			source,
@@ -150,6 +154,7 @@ describe("recoverEditorJsonExportsFx", () => {
 		await recover();
 
 		await expect(readFile(join(target, "sentinel.txt"), "utf8")).resolves.toBe("healthy");
+		expect((await readReimportableProject(preserved)).marker.revision).toBe(2);
 	});
 
 	it("rejects a forged recovery target before any recursive removal", async () => {
@@ -211,9 +216,11 @@ describe("recoverEditorJsonExportsFx", () => {
 		const transaction = "55555555-5555-4555-8555-555555555555";
 		const target = join(root, "restored-target");
 		const previous = join(root, `.restored-target.${transaction}.previous`);
+		const preserved = join(root, `.restored-target.${transaction}.recovery`);
 		await Promise.all([
 			mkdir(target),
 			mkdir(previous),
+			writeReimportableProject(preserved, 2),
 		]);
 		await writeFile(join(target, "sentinel.txt"), "restored");
 		const recoveryDirectory = await writeRecovery({
@@ -229,6 +236,7 @@ describe("recoverEditorJsonExportsFx", () => {
 		await recover();
 
 		await expect(readFile(join(target, "sentinel.txt"), "utf8")).resolves.toBe("restored");
+		expect((await readReimportableProject(preserved)).marker.revision).toBe(2);
 		await expect(access(previous)).rejects.toBeDefined();
 		await expect(access(cleanupDirectory)).rejects.toBeDefined();
 	});
@@ -237,13 +245,17 @@ describe("recoverEditorJsonExportsFx", () => {
 		const transaction = "88888888-8888-4888-8888-888888888888";
 		const target = join(root, "already-restored-target");
 		const previous = join(root, `.already-restored-target.${transaction}.previous`);
+		const pending = join(root, `.already-restored-target.${transaction}.pending`);
+		const preserved = join(root, `.already-restored-target.${transaction}.recovery`);
 		await Promise.all([
 			mkdir(target),
 			mkdir(previous),
+			writeReimportableProject(pending, 2),
 		]);
 		await Promise.all([
 			writeFile(join(target, "sentinel.txt"), "restored"),
 			writeFile(join(previous, "sentinel.txt"), "backup"),
+			writeFile(join(pending, EditorJsonExportOwnershipFile), transaction),
 		]);
 		const recoveryDirectory = await writeRecovery({
 			hadTarget: true,
@@ -257,6 +269,7 @@ describe("recoverEditorJsonExportsFx", () => {
 		await recover();
 
 		await expect(readFile(join(target, "sentinel.txt"), "utf8")).resolves.toBe("restored");
+		expect((await readReimportableProject(preserved)).marker.revision).toBe(2);
 		await expect(access(previous)).rejects.toBeDefined();
 		await expect(access(recoveryDirectory)).rejects.toBeDefined();
 	});

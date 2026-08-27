@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { Effect, FileSystem, PlatformError } from "effect";
 
 import { replaceEditorJsonExportDirectoryFx } from "../../../../electron/main/editor-project/replaceEditorJsonExportDirectoryFx";
+import { recoverEditorJsonExportsFx } from "../../../../electron/main/editor-project/recoverEditorJsonExportsFx";
 import { createEditorProjectFilesystemPathsFx } from "../../../../electron/main/editor-project/filesystem/createEditorProjectFilesystemPathsFx";
 import { readFilesystemEditorProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/readFilesystemEditorProjectFilesFx";
 import { readFilesystemEditorProjectSidecarsFx } from "../../../../electron/main/editor-project/filesystem/fx/readFilesystemEditorProjectSidecarsFx";
@@ -75,6 +76,7 @@ export interface EditorJsonExportTestHarness {
 	readonly source: string;
 	readonly target: string;
 	readonly close: () => Promise<void>;
+	readonly recover: (fileSystem?: FileSystem.FileSystem) => Promise<void>;
 	readonly replace: (fileSystem?: FileSystem.FileSystem) => Promise<{
 		readonly json: number;
 		readonly resources: number;
@@ -102,6 +104,15 @@ export const createEditorJsonExportTestHarness = async () => {
 			),
 		);
 	};
+	const recover = async (fileSystem?: FileSystem.FileSystem) => {
+		const selected = fileSystem ?? (await readNodeFileSystem());
+		return Effect.runPromise(
+			recoverEditorJsonExportsFx(recoveryRoot).pipe(
+				Effect.provide(NodePath.layer),
+				Effect.provideService(FileSystem.FileSystem, selected),
+			),
+		);
+	};
 	return {
 		close: () =>
 			rm(root, {
@@ -109,6 +120,7 @@ export const createEditorJsonExportTestHarness = async () => {
 				recursive: true,
 			}),
 		recoveryRoot,
+		recover,
 		replace,
 		root,
 		source,

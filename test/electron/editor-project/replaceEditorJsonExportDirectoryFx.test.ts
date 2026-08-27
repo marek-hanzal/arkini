@@ -112,16 +112,19 @@ describe("replaceEditorJsonExportDirectoryFx", () => {
 		} catch (cause) {
 			failure = cause;
 		}
-		const pendingName = (await readdir(harness.root)).find((entry) =>
-			entry.endsWith(".pending"),
+		const recoveryName = (await readdir(harness.root)).find((entry) =>
+			entry.endsWith(".recovery"),
 		);
-		if (pendingName === undefined) throw new Error("Staged export was not preserved.");
-		const pending = join(harness.root, pendingName);
+		if (recoveryName === undefined) throw new Error("Staged export was not preserved.");
+		const recovery = join(harness.root, recoveryName);
 		expect(publishAttempts).toBe(3);
 		expect(failure).toMatchObject({
-			message: expect.stringContaining(pending),
+			message: expect.stringContaining(recovery),
 		});
-		expect((await readReimportableProject(pending)).marker.revision).toBe(2);
+		expect((await readReimportableProject(recovery)).marker.revision).toBe(2);
+
+		await harness.recover();
+		expect((await readReimportableProject(recovery)).marker.revision).toBe(2);
 	});
 
 	it("finishes a new export when the publishing marker write fails", async () => {

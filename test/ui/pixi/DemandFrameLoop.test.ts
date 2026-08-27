@@ -95,6 +95,31 @@ describe("DemandFrameLoop", () => {
 		expect(canceledWork).not.toHaveBeenCalled();
 	});
 
+	it("runs post-render work only after the projected frame", () => {
+		const fake = createFakeFrames();
+		const order: string[] = [];
+		const canceled = vi.fn();
+		const loop = Effect.runSync(
+			createDemandFrameLoopFx({
+				cancelFrame: fake.cancelFrame,
+				reportCriticalFailure: vi.fn(),
+				render: () => order.push("projected"),
+				requestFrame: fake.requestFrame,
+			}),
+		);
+
+		const cancel = Effect.runSync(loop.scheduleAfterRenderFx(canceled));
+		cancel();
+		Effect.runSync(loop.scheduleAfterRenderFx(() => order.push("space-switch")));
+		fake.runNext(10);
+
+		expect(order).toEqual([
+			"projected",
+			"space-switch",
+		]);
+		expect(canceled).not.toHaveBeenCalled();
+	});
+
 	it("stops later callbacks from the same frame when an earlier callback closes it", () => {
 		const fake = createFakeFrames();
 		const laterWork = vi.fn();

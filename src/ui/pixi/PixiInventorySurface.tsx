@@ -38,6 +38,7 @@ export const PixiInventorySurface = ({
 		mode: "promise",
 	});
 	const hostRef = useRef<HTMLDivElement>(null);
+	const runtimeRef = useRef<PixiInventorySceneRuntime | null>(null);
 	const controlsRef = useRef({
 		itemDetail,
 		onSpaceActivated,
@@ -70,13 +71,21 @@ export const PixiInventorySurface = ({
 			}
 			if (item.location.scope !== LocationScopeEnumSchema.enum.Inventory) return;
 			if (item.primaryAction.kind === "activate-space") {
+				const runtime = runtimeRef.current;
+				if (runtime === null) return;
 				return currentRunSpaceActivation({
 					currentSpace: item.primaryAction.currentSpace,
 					itemId: item.id,
 					location: item.location,
 					revision: item.revision,
-				}).then((activated) => {
-					if (activated) currentOnSpaceActivated();
+				}).then(async (result) => {
+					if (result === null || runtimeRef.current !== runtime) return;
+					if (result.transition !== null) {
+						await RendererRuntime.runPromise(
+							runtime.projectSpaceActivationFx(result.transition),
+						);
+					}
+					if (runtimeRef.current === runtime) currentOnSpaceActivated();
 				});
 			}
 			return currentReleaseInventoryItem({
@@ -108,6 +117,7 @@ export const PixiInventorySurface = ({
 					return RendererRuntime.runPromise(created.closeFx);
 				}
 				runtime = created;
+				runtimeRef.current = created;
 				unregisterInteraction = RendererRuntime.runSync(
 					interaction.registerFx(() =>
 						RendererRuntime.runSync(created.cancelInteractionFx),
@@ -122,6 +132,7 @@ export const PixiInventorySurface = ({
 			cancelled = true;
 			unregisterInteraction();
 			if (runtime !== null) {
+				if (runtimeRef.current === runtime) runtimeRef.current = null;
 				void RendererRuntime.runPromise(runtime.closeFx).catch((cause) => {
 					console.error("Pixi Inventory scene failed to close.", cause);
 				});

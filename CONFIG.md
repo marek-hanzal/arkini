@@ -123,9 +123,10 @@ Type-specific schemas own their additional behavior. Do not add one giant option
 
 A `space` item is an immediate action with a required non-negative `space` target. It keeps ordinary
 item `scope`, may author the shared `enable`, `rules`, and Simple/Deposit `input` requirements, and
-spends one of its own configured charges per successful activation. Requirement settlement,
-depletion output, and the current-space transition commit atomically. Authored navigation is
-directional; no reverse Space item is inferred or generated.
+spends charges only through costs authored on those Action inputs. Configuring item charges defines
+available lifetime and optional depletion output; it does not itself charge an activation.
+Requirement settlement, depletion output, and the current-space transition commit atomically.
+Authored navigation is directional; no reverse Space item is inferred or generated.
 
 `uid` is the immutable low-level identity generated once as CUID2 when an item is created. It survives authoring-ID renames, editor import/export, and Arkpack rebuilds unchanged. `id` remains the human-readable authoring identity used by configuration references. Completed-game validation rejects duplicate item UIDs.
 

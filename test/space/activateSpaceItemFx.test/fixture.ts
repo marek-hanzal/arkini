@@ -197,6 +197,23 @@ export const config = GameConfigSchema.parse({
 				amount: 2,
 			},
 		},
+		passiveChargedPortal: {
+			...baseItem("passiveChargedPortal"),
+			type: "space",
+			space: 4,
+			charges: {
+				amount: 2,
+			},
+			input: [
+				{
+					type: "simple",
+					charges: {
+						from: "self",
+						cost: 1,
+					},
+				},
+			],
+		},
 		cumulativePortal: {
 			...baseItem("cumulativePortal"),
 			type: "space",
@@ -209,7 +226,14 @@ export const config = GameConfigSchema.parse({
 					type: "simple",
 					charges: {
 						from: "self",
-						cost: 2,
+						cost: 1,
+					},
+				},
+				{
+					type: "simple",
+					charges: {
+						from: "self",
+						cost: 1,
 					},
 				},
 			],
@@ -222,6 +246,15 @@ export const config = GameConfigSchema.parse({
 				amount: 1,
 				output: depletionOutput("token"),
 			},
+			input: [
+				{
+					type: "simple",
+					charges: {
+						from: "self",
+						cost: 1,
+					},
+				},
+			],
 		},
 		passiveFailurePortal: {
 			...baseItem("passiveFailurePortal", "inventory"),
@@ -231,6 +264,15 @@ export const config = GameConfigSchema.parse({
 				amount: 1,
 				output: depletionOutput("boardToken"),
 			},
+			input: [
+				{
+					type: "simple",
+					charges: {
+						from: "self",
+						cost: 1,
+					},
+				},
+			],
 		},
 		payer: {
 			...baseItem("payer", "board"),

@@ -194,12 +194,16 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 
 		const activateActor = (actor: PixiTileActor, openDetail: boolean) => {
 			const item = actor.item;
+			const presentsOptimisticRemoval =
+				!openDetail && item.primaryAction.kind !== "activate-space";
 			if (!openDetail && removalFeedbackGenerationByActorId.has(item.id)) return;
 			const removalFeedbackGeneration = openDetail
 				? null
 				: (removalFeedbackGenerationByActorId.get(item.id) ?? 0) + 1;
 			if (removalFeedbackGeneration !== null) {
 				removalFeedbackGenerationByActorId.set(item.id, removalFeedbackGeneration);
+			}
+			if (presentsOptimisticRemoval) {
 				actor.container.cursor = RendererRuntime.runSync(
 					readPixiTileActorCursorFx({
 						phase: "pending",
@@ -234,6 +238,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 						return;
 					}
 					removalFeedbackGenerationByActorId.delete(item.id);
+					if (!presentsOptimisticRemoval) return;
 					if (closed) return;
 					const current = RendererRuntime.runSync(actorStore.readActorFx(item.id));
 					if (current !== actor || actor.container.destroyed) return;

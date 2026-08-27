@@ -33,7 +33,7 @@ const boundaryRules = [
 			path: "^src/engine(?:/|$)",
 			pathNot: [
 				"^src/engine/game/layer/GameCoreLayerFx[.]ts$",
-				"^src/engine/runtime/internal/(?:makeRuntimeStoreFx|modifyRuntimeFx)[.]ts$",
+				"^src/engine/runtime/internal/(?:makeRuntimeStoreFx|modifyRuntimeWithTransitionFx)[.]ts$",
 			],
 		},
 		to: {

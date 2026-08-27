@@ -418,7 +418,7 @@ Do not add due times, start timestamps, pause timestamps, persisted Tick cursors
 
 Inventory and Toolbar are hard pauses for active and ready jobs. Returning the same owner to the board resumes evaluation without a separate resume mutation.
 
-Inventory and Toolbar are passive storage. Commands may move an already stateful owner into either surface. Line input, job, and queue state cannot be attached there; an immediate Space action may spend item charges there and atomically isolate the charged identity from its real passive origin.
+Inventory and Toolbar are passive storage. Commands may move an already stateful owner into either surface. Line input, job, and queue state cannot be attached there; an immediate Space action whose Action input authors a self charge may spend item charges there and atomically isolate the charged identity from its real passive origin.
 
 Started jobs cannot be cancelled. Pending queue requests may be cleared only as the whole current queue of one owner; no command targets a previously observed request shape.
 

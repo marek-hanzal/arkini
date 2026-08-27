@@ -24,6 +24,7 @@ import type { PixiMainSceneActivationIntent } from "~/ui/pixi/scene/PixiMainScen
 import { createPixiMainSceneReconcilerFx } from "~/ui/pixi/scene/createPixiMainSceneReconcilerFx";
 import { createPixiMainSceneSubscriptionReplayGateFx } from "~/ui/pixi/scene/createPixiMainSceneSubscriptionReplayGateFx";
 import { createPixiMainSceneSurfaceFx } from "~/ui/pixi/scene/createPixiMainSceneSurfaceFx";
+import { createPixiSpaceActionTransitionPresenterFx } from "~/ui/pixi/scene/createPixiSpaceActionTransitionPresenterFx";
 
 export namespace createPixiMainSceneRuntimeFx {
 	export interface Props {
@@ -200,7 +201,16 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 					: reconciler.reconcileFx(transition),
 			);
 		};
-		replayCurrentTransition = () => applyTransition(game.getTransitionSnapshot(), "present");
+		const transitionPresenter = yield* createPixiSpaceActionTransitionPresenterFx({
+			applyTransition,
+			initialSequence: latestTransition.sequence,
+			scheduleAfterRender: (work) =>
+				RendererRuntime.runSync(application.frames.scheduleAfterRenderFx(work)),
+			setInteractionBlocked: (blocked) =>
+				RendererRuntime.runSync(drag.setInteractionBlockedFx(blocked)),
+		});
+		registerRollback(transitionPresenter.closeFx);
+		replayCurrentTransition = () => transitionPresenter.refresh(game.getTransitionSnapshot());
 
 		const redraw = () => {
 			if (closed) return;
@@ -234,7 +244,7 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 				const delivery = RendererRuntime.runSync(
 					subscriptionReplayGate.classifyFx(transition.sequence),
 				);
-				applyTransition(transition, delivery);
+				transitionPresenter.present(transition, delivery);
 			} catch (cause) {
 				reportCriticalFailure(cause);
 			}
@@ -244,7 +254,7 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 		return {
 			canvas: application.app.canvas,
 			cancelInteractionFx: drag.cancelInteractionFx,
-			setInteractionBlockedFx: drag.setInteractionBlockedFx,
+			setInteractionBlockedFx: transitionPresenter.setInteractionBlockedFx,
 			closeFx: Effect.gen(function* () {
 				if (closed) return;
 				closed = true;

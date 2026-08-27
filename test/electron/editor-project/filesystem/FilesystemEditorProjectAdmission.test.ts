@@ -1,6 +1,7 @@
-import { access, mkdir, readFile, realpath, rm, writeFile } from "node:fs/promises";
+import * as NodeServices from "@effect/platform-node/NodeServices";
+import { access, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { Effect } from "effect";
+import { Effect, FileSystem } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
 
 import {
@@ -9,6 +10,14 @@ import {
 } from "./support/createFilesystemEditorProjectTestHarness";
 
 let harness: FilesystemEditorProjectTestHarness | undefined;
+
+const realPath = (root: string) =>
+	Effect.runPromise(
+		FileSystem.FileSystem.pipe(
+			Effect.flatMap((fileSystem) => fileSystem.realPath(root)),
+			Effect.provide(NodeServices.layer),
+		),
+	);
 
 afterEach(async () => {
 	await harness?.close();
@@ -80,7 +89,7 @@ describe("filesystem Editor project admission", () => {
 		const unlisted = await harness.createProject(repository, "unlisted-project");
 		const broken = await harness.createProject(repository, "broken-unlisted-project");
 		const externalRoot = await harness.createExternalProject("external-project");
-		const canonicalExternalRoot = await realpath(externalRoot);
+		const canonicalExternalRoot = await realPath(externalRoot);
 		const external = await Effect.runPromise(
 			repository.openProjectFx({
 				root: externalRoot,

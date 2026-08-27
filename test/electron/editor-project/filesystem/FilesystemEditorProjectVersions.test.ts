@@ -10,6 +10,7 @@ import type { FilesystemEditorProjectState } from "../../../../electron/main/edi
 import { createEditorProjectFilesystemPathsFx } from "../../../../electron/main/editor-project/filesystem/createEditorProjectFilesystemPathsFx";
 import { createFilesystemEditorProjectVersionOperationsFx } from "../../../../electron/main/editor-project/filesystem/fx/createFilesystemEditorProjectVersionOperationsFx";
 import { readFilesystemEditorProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/readFilesystemEditorProjectFilesFx";
+import { readFilesystemEditorProjectVersionHistoryFx } from "../../../../electron/main/editor-project/filesystem/fx/readFilesystemEditorProjectVersionHistoryFx";
 import { writeFilesystemEditorProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/writeFilesystemEditorProjectFilesFx";
 import { EditorBoardScenarioSchema } from "~/editor/board/EditorBoardScenarioSchema";
 import { EditorProjectCatalogEntrySchema } from "~/editor/filesystem/EditorProjectCatalogEntrySchema";
@@ -18,6 +19,7 @@ import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectMan
 import { EditorVersionDescriptorFileSchema } from "~/editor/filesystem/EditorVersionDescriptorFileSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
+import { ArkiniVersionIncompatibleError } from "~/engine/version/ArkiniVersionAdmission";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 let root: string;
@@ -143,6 +145,45 @@ describe("filesystem Editor project versions", () => {
 					expectedFingerprint: preview.currentFingerprint,
 					subject: "Initial",
 				});
+				const firstState = states.get(projectId);
+				const firstVersion = firstState?.versionHistory.versions.get(first.versionId);
+				if (firstState === undefined || firstVersion === undefined)
+					return yield* Effect.die("Missing first version state.");
+				const firstDescriptorFile = yield* paths.versionDescriptorFileFx(first.versionId);
+				const writerMajor = ArkiniAppVersion.slice(0, ArkiniAppVersion.indexOf("."));
+				yield* writeJsonFx(firstDescriptorFile, {
+					...firstVersion.descriptor,
+					arkini: `${writerMajor}.999.999`,
+				});
+				const admittedHistory = yield* readFilesystemEditorProjectVersionHistoryFx(paths);
+				states.set(projectId, {
+					...firstState,
+					versionHistory: admittedHistory,
+				});
+				const tagged = yield* versions.updateVersionTagFx({
+					projectId,
+					versionId: first.versionId,
+					tag: "tested",
+				});
+				const taggedFile = JSON.parse(yield* fileSystemRead(firstDescriptorFile)) as {
+					readonly arkini: string;
+					readonly [key: string]: unknown;
+				};
+				const incompatibleWriter = `${Number(writerMajor) + 1}.0.0`;
+				const incompatibleSource = `${JSON.stringify(
+					{
+						...taggedFile,
+						arkini: incompatibleWriter,
+					},
+					undefined,
+					"\t",
+				)}\n`;
+				yield* writeJsonFx(firstDescriptorFile, JSON.parse(incompatibleSource));
+				const incompatibleError = yield* Effect.flip(
+					readFilesystemEditorProjectVersionHistoryFx(paths),
+				);
+				const preservedIncompatibleSource = yield* fileSystemRead(firstDescriptorFile);
+				yield* writeJsonFx(firstDescriptorFile, taggedFile);
 
 				const changedConfig = GameConfigSchema.parse({
 					...state.project.config,
@@ -299,7 +340,13 @@ describe("filesystem Editor project versions", () => {
 				};
 				const status = yield* versions.readVersionStatusFx(projectId);
 				return {
+					admittedWriter: admittedHistory.versions.get(first.versionId)?.descriptor
+						.arkini,
 					first,
+					incompatibleError,
+					incompatibleSource,
+					incompatibleWriter,
+					preservedIncompatibleSource,
 					retry,
 					second,
 					mismatchedDiffError,
@@ -309,6 +356,8 @@ describe("filesystem Editor project versions", () => {
 					restoredScenario,
 					restoredState: states.get(projectId),
 					status,
+					tagged,
+					taggedFile,
 					head,
 					noteFile,
 				};
@@ -316,6 +365,18 @@ describe("filesystem Editor project versions", () => {
 		);
 
 		expect(result.retry).toEqual(result.first);
+		expect(result.admittedWriter).toBe(
+			`${ArkiniAppVersion.slice(0, ArkiniAppVersion.indexOf("."))}.999.999`,
+		);
+		expect(result.tagged.arkini).toBe(ArkiniAppVersion);
+		expect(result.taggedFile.arkini).toBe(ArkiniAppVersion);
+		expect(result.incompatibleError).toBeInstanceOf(ArkiniVersionIncompatibleError);
+		expect(result.incompatibleError).toMatchObject({
+			artifact: "Editor version",
+			writerVersion: result.incompatibleWriter,
+			readerVersion: ArkiniAppVersion,
+		});
+		expect(result.preservedIncompatibleSource).toBe(result.incompatibleSource);
 		expect(result.second.parentVersionId).toBe(result.first.versionId);
 		expect(String(result.mismatchedDiffError.cause)).toContain(
 			"Arkpack version does not match its descriptor",

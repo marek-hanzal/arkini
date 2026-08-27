@@ -1,7 +1,8 @@
 import { match } from "ts-pattern";
 
 import type { useArkpacks } from "~/bridge/arkpack/useArkpacks";
-import { Button, DangerButton, PrimaryButtonLink } from "~/ui/button/Button";
+import { DangerButton, PrimaryButtonLink } from "~/ui/button/Button";
+import { LinkButton } from "~/ui/button/LinkButton";
 
 export namespace ArkpackCatalogList {
 	export interface Props {
@@ -92,15 +93,15 @@ export const ArkpackCatalogList = ({
 										{arkpack.overridesBundled ? "Remove override" : "Remove"}
 									</DangerButton>
 								) : null}
-								<Button
-									className="min-h-0 gap-1.5 px-3 py-2 text-xs shadow-none"
+								<LinkButton
+									className="inline-flex items-center gap-1.5 text-xs"
 									cursorIntent={blocked ? "progress" : undefined}
 									disabled={blocked}
 									onClick={() => onOpenEditor(arkpack.packageId)}
 								>
-									<span className="icon-[lucide--square-pen] size-4" />
+									<span className="icon-[lucide--sparkles] size-4" />
 									Editor
-								</Button>
+								</LinkButton>
 								<PrimaryButtonLink
 									to="/action/load-game/$packageId"
 									preload={false}

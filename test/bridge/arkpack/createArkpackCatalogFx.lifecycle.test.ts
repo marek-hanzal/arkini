@@ -5,6 +5,49 @@ import { createArkpackCatalogFx } from "~/bridge/arkpack/createArkpackCatalogFx"
 import { builtIn, imported } from "~test/bridge/arkpack/createArkpackCatalogFx.test/fixture";
 
 describe("createArkpackCatalogFx lifecycle", () => {
+	it.effect("keeps the ready catalog visible while a manual refresh is pending", () =>
+		Effect.gen(function* () {
+			let listAttempt = 0;
+			const refreshStarted = yield* Deferred.make<void>();
+			const finishRefresh = yield* Deferred.make<ReadonlyArray<ArkpackDescriptor>>();
+			const catalog = yield* createArkpackCatalogFx({
+				listFx: Effect.suspend(() => {
+					listAttempt += 1;
+					return listAttempt === 1
+						? Effect.succeed([
+								builtIn,
+							])
+						: Deferred.succeed(refreshStarted, undefined).pipe(
+								Effect.andThen(Deferred.await(finishRefresh)),
+							);
+				}),
+			});
+			yield* catalog.refreshFx;
+
+			const refreshing = yield* catalog.refreshFx.pipe(Effect.forkChild);
+			yield* Deferred.await(refreshStarted);
+			expect(yield* SubscriptionRef.get(catalog.state)).toEqual({
+				type: "ready",
+				arkpacks: [
+					builtIn,
+				],
+			});
+
+			yield* Deferred.succeed(finishRefresh, [
+				builtIn,
+				imported,
+			]);
+			yield* Fiber.join(refreshing);
+			expect(yield* SubscriptionRef.get(catalog.state)).toEqual({
+				type: "ready",
+				arkpacks: [
+					builtIn,
+					imported,
+				],
+			});
+		}),
+	);
+
 	it.effect("settles a malformed import defect and permits an exact retry", () =>
 		Effect.gen(function* () {
 			let descriptors: ReadonlyArray<ArkpackDescriptor> = [

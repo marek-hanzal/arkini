@@ -108,7 +108,8 @@ describe("ArkpackSelector catalog tools", () => {
 			refreshButton.click();
 			await Promise.resolve();
 		});
-		expect(container.textContent).toContain("Refreshing packages…");
+		expect(container.textContent).not.toContain("Refreshing packages…");
+		expect(container.textContent).toContain("Custom Arkini");
 		expect(refreshButton.disabled).toBe(true);
 		expect(folderButton.disabled).toBe(true);
 		folderButton.click();

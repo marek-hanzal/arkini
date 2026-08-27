@@ -70,14 +70,16 @@ export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
 			const runCatalogOperationFx = <Result>(
 				operationFx: Effect.Effect<Result, unknown>,
 				admissionFx: Effect.Effect<void, unknown> = Effect.void,
+				publishLoading = true,
 			) =>
 				lock.withPermits(1)(
 					admissionFx.pipe(
 						Effect.andThen(
 							Effect.gen(function* () {
-								yield* publishStateFx({
-									type: "loading",
-								});
+								if (publishLoading)
+									yield* publishStateFx({
+										type: "loading",
+									});
 								const operation = yield* Effect.exit(operationFx);
 								if (Exit.isFailure(operation)) {
 									yield* recoverCatalogFx(operation.cause);
@@ -135,7 +137,7 @@ export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
 			return {
 				awaitIdleFx: lock.withPermits(1)(Effect.void),
 				state,
-				refreshFx: runCatalogOperationFx(Effect.void),
+				refreshFx: runCatalogOperationFx(Effect.void, Effect.void, false),
 				importFileFx: Effect.fn("ArkpackCatalog.importFileFx")((file: File) =>
 					runCatalogOperationFx(importFileDependencyFx(file)),
 				),

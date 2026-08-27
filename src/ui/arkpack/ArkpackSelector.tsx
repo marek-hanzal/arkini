@@ -49,6 +49,17 @@ export const ArkpackSelector = () => {
 				<p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
 					User arkpacks stay on this device. Every package is validated before it can run.
 				</p>
+				{actions.busyAction === "remove" ? (
+					<p className="mt-3 text-sm text-accent">Removing package…</p>
+				) : actions.busyAction === "open-directory" ? (
+					<p className="mt-3 text-sm text-accent">Opening Arkpack folder…</p>
+				) : null}
+				{actions.actionError === undefined ? null : (
+					<p className="mt-3 text-sm text-danger">{String(actions.actionError)}</p>
+				)}
+			</header>
+
+			<section className="ak-list grid min-h-0 content-start gap-2 overflow-y-auto overscroll-contain">
 				<input
 					ref={actions.inputRef}
 					type="file"
@@ -58,31 +69,21 @@ export const ArkpackSelector = () => {
 					onChange={(event) => void actions.upload(event.currentTarget.files?.[0])}
 				/>
 				<Button
-					className="mt-4 gap-2 shadow-none"
+					className="ak-list-row ak-list-row-interactive min-h-0 min-w-0 justify-start gap-4 rounded-xl p-4 text-left shadow-none"
 					cursorIntent={blocked ? "progress" : undefined}
 					disabled={blocked}
 					onClick={() => actions.inputRef.current?.click()}
 				>
-					<span className="icon-[lucide--package-open] size-4" />
-					Import Arkpack
+					<span className="icon-[lucide--package-open] size-8 shrink-0 text-accent" />
+					<span className="min-w-0">
+						<span className="block text-lg font-semibold">
+							{actions.busyAction === "import" ? "Importing Arkpack…" : "Import Arkpack"}
+						</span>
+						<span className="mt-1 block text-xs font-normal text-subtle">
+							Choose an existing .arkpack file
+						</span>
+					</span>
 				</Button>
-				{actions.busyAction === "import" ? (
-					<p className="mt-3 text-sm text-accent">Validating package…</p>
-				) : actions.busyAction === "remove" ? (
-					<p className="mt-3 text-sm text-accent">Removing package…</p>
-				) : actions.busyAction === "editor" ? (
-					<p className="mt-3 text-sm text-accent">Opening Editor…</p>
-				) : actions.busyAction === "refresh" ? (
-					<p className="mt-3 text-sm text-accent">Refreshing packages…</p>
-				) : actions.busyAction === "open-directory" ? (
-					<p className="mt-3 text-sm text-accent">Opening Arkpack folder…</p>
-				) : null}
-				{actions.actionError === undefined ? null : (
-					<p className="mt-3 text-sm text-danger">{String(actions.actionError)}</p>
-				)}
-			</header>
-
-			<section className="grid min-h-0 content-start gap-3 overflow-y-auto overscroll-contain">
 				<ArkpackCatalogList
 					blocked={blocked}
 					state={actions.state}

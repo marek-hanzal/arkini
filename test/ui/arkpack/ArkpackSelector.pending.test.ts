@@ -73,7 +73,7 @@ describe("ArkpackSelector pending actions", () => {
 		expect(removeFx).toHaveBeenCalledTimes(1);
 		expect(removeButton.disabled).toBe(true);
 		expect(container.textContent).toContain("Removing package…");
-		expect(container.textContent).not.toContain("Validating package…");
+		expect(container.textContent).not.toContain("Importing Arkpack…");
 		expect(playLink.getAttribute("aria-disabled")).toBe("true");
 		expect(fileInput.disabled).toBe(true);
 
@@ -184,7 +184,7 @@ describe("ArkpackSelector pending actions", () => {
 		});
 		expect(importFileFx).toHaveBeenCalledTimes(1);
 		expect(removeButton.disabled).toBe(true);
-		expect(container.textContent).toContain("Validating package…");
+		expect(container.textContent).toContain("Importing Arkpack…");
 		expect(container.textContent).not.toContain("Removing package…");
 		expect(playLink.getAttribute("aria-disabled")).toBe("true");
 		expect(fileInput.disabled).toBe(true);

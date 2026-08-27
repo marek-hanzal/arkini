@@ -24,6 +24,21 @@ afterEach(() => {
 });
 
 describe("importArkpackFx", () => {
+	it("rejects bytes for a different canonical package before persistence", async () => {
+		const storage = Effect.runSync(createInMemoryArkpackStorageFx());
+		await expect(
+			Effect.runPromise(
+				importArkpackFx({
+					bytes: createTestArkpack(),
+					filename: "built.arkpack",
+					packageId: "package:other",
+					storage,
+				}),
+			),
+		).rejects.toThrow("config declares game:bridge");
+		expect(await Effect.runPromise(storage.listFx)).toEqual([]);
+	});
+
 	it("persists only a fully validated binary and exact load revalidates it", async () => {
 		const storage = Effect.runSync(createInMemoryArkpackStorageFx());
 		const bytes = createTestArkpack();

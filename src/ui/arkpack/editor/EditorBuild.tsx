@@ -1,4 +1,5 @@
 import { EditorBuildDiagnostics } from "~/ui/arkpack/editor/EditorBuildDiagnostics";
+import { EditorBuildMajorUpdateDialog } from "~/ui/arkpack/editor/EditorBuildMajorUpdateDialog";
 import { useEditorBuildController } from "~/ui/arkpack/editor/useEditorBuildController";
 import { Button, PrimaryButton } from "~/ui/button/Button";
 import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
@@ -85,22 +86,31 @@ export const EditorBuild = () => {
 						{controller.artifactSummary}
 					</p>
 					<div className="mt-4 flex flex-wrap gap-3">
+						<PrimaryButton
+							data-ui="EditorBuildInstall"
+							disabled={controller.installPending || !controller.installAvailable}
+							cursorIntent={controller.installPending ? "progress" : undefined}
+							onClick={controller.installArtifact}
+						>
+							<span
+								className={`${controller.installAction === "update" ? "icon-[lucide--package-check]" : "icon-[lucide--package-plus]"} mr-2 size-4`}
+							/>
+							{controller.installPending
+								? "Installing…"
+								: controller.installAction === "update"
+									? "Update"
+									: "Install"}
+						</PrimaryButton>
 						<Button
+							className="border-transparent bg-transparent shadow-none hover:border-transparent hover:bg-surface-raised disabled:hover:bg-transparent"
 							data-ui="EditorBuildSave"
 							disabled={controller.savePending}
 							cursorIntent={controller.savePending ? "progress" : undefined}
 							onClick={controller.saveArtifact}
 						>
+							<span className="icon-[lucide--download] mr-2 size-4" />
 							{controller.savePending ? "Saving…" : "Save as…"}
 						</Button>
-						<PrimaryButton
-							data-ui="EditorBuildInstall"
-							disabled={controller.installPending}
-							cursorIntent={controller.installPending ? "progress" : undefined}
-							onClick={controller.installArtifact}
-						>
-							{controller.installPending ? "Installing…" : "Install"}
-						</PrimaryButton>
 					</div>
 					{controller.saveError === undefined ? null : (
 						<p className="mt-3 text-sm text-danger">{controller.saveError}</p>
@@ -155,6 +165,15 @@ export const EditorBuild = () => {
 					<p className="mt-3 text-sm text-danger">{controller.openSourceExportError}</p>
 				)}
 			</article>
+			{controller.installConfirmation === undefined ? null : (
+				<EditorBuildMajorUpdateDialog
+					confirmation={controller.installConfirmation}
+					error={controller.installError}
+					pending={controller.installPending}
+					onCancel={controller.cancelInstall}
+					onConfirm={controller.confirmInstall}
+				/>
+			)}
 		</section>
 	);
 };

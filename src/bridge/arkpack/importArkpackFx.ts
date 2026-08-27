@@ -9,6 +9,7 @@ export namespace importArkpackFx {
 	export interface Props {
 		bytes: Uint8Array;
 		filename: string;
+		packageId?: string;
 		signature?: unknown;
 		storage?: ArkpackStorage;
 	}
@@ -18,6 +19,7 @@ export namespace importArkpackFx {
 export const importArkpackFx = Effect.fn("importArkpackFx")(function* ({
 	bytes,
 	filename,
+	packageId,
 	signature,
 	storage: providedStorage,
 }: importArkpackFx.Props) {
@@ -26,6 +28,7 @@ export const importArkpackFx = Effect.fn("importArkpackFx")(function* ({
 		const loaded = yield* readArkpackFx({
 			bytes,
 			filename,
+			packageId,
 			signature: {
 				metadata: signature,
 				publicKey: ArkiniPublicKey,

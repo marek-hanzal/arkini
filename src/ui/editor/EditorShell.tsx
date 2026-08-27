@@ -4,6 +4,7 @@ import { useBlocker, useRouter } from "@tanstack/react-router";
 import {
 	useCallback,
 	useEffect,
+	Fragment,
 	useState,
 	useSyncExternalStore,
 	type PropsWithChildren,
@@ -143,26 +144,36 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 					className="ak-editor-workspace-tabs flex min-h-0 flex-col items-center gap-1"
 					aria-label="Editor tools"
 				>
-					{EditorWorkspaceRoutes.map(({ icon, id, label, shortcut, to }) => (
-						<Tooltip
-							key={id}
-							content={`${label} · ${formatForDisplay(shortcut)}`}
-							placement="right"
-						>
-							<ButtonLink
-								to={to}
-								params={params}
-								aria-label={label}
-								data-workspace-id={id}
-								data-transitioning={
-									transitioningWorkspace === id ? "transitioning" : undefined
-								}
-								{...readTabProps(id)}
-							>
-								<span className={`${icon} size-5`} />
-							</ButtonLink>
-						</Tooltip>
-					))}
+					{EditorWorkspaceRoutes.map((workspace) => {
+						if ("hiddenFromNavigation" in workspace) return null;
+						const { icon, id, label, shortcut, to } = workspace;
+						return (
+							<Fragment key={id}>
+								<Tooltip
+									content={`${label} · ${formatForDisplay(shortcut)}`}
+									placement="right"
+								>
+									<ButtonLink
+										to={to}
+										params={params}
+										aria-label={label}
+										data-workspace-id={id}
+										data-transitioning={
+											transitioningWorkspace === id
+												? "transitioning"
+												: undefined
+										}
+										{...readTabProps(id)}
+									>
+										<span className={`${icon} size-5`} />
+									</ButtonLink>
+								</Tooltip>
+								{"separatorAfter" in workspace ? (
+									<div className="my-1 h-px w-8 shrink-0 bg-line" />
+								) : null}
+							</Fragment>
+						);
+					})}
 				</nav>
 				<Tooltip
 					content={refresh.tooltip}

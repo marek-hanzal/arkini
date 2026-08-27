@@ -65,7 +65,8 @@ export const EditorBuild = () => {
 					cursorIntent={controller.buildPending ? "progress" : undefined}
 					onClick={controller.build}
 				>
-					{controller.buildPending ? "Building…" : "Build arkpack"}
+					<span className="icon-[lucide--package-check] mr-2 size-4" />
+					{controller.buildPending ? "Building…" : "Build"}
 				</PrimaryButton>
 			</article>
 			{controller.artifactSummary === undefined ? null : (
@@ -127,6 +128,7 @@ export const EditorBuild = () => {
 						cursorIntent={controller.exportSourcePending ? "progress" : undefined}
 						onClick={controller.exportSource}
 					>
+						<span className="icon-[lucide--folder-output] mr-2 size-4" />
 						{controller.exportSourcePending ? "Exporting…" : "Export"}
 					</PrimaryButton>
 					{controller.openSourceExportAvailable ? (

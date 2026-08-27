@@ -45,7 +45,7 @@ const createFixture = async () => {
 	};
 };
 
-describe("filesystem CLI installation", () => {
+describe.skipIf(process.platform === "win32")("filesystem CLI installation", () => {
 	it("installs and removes its managed command shim", async () => {
 		const fixture = await createFixture();
 		await expect(Effect.runPromise(fixture.installation.readStatusFx)).resolves.toMatchObject({

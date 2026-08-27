@@ -1,5 +1,6 @@
 import { Exit, FileSystem, Path } from "effect";
 import { Effect } from "effect";
+import { match, P } from "ts-pattern";
 
 import { syncFilesystemPathFx } from "../filesystem/syncFilesystemPathFx";
 import { readEditorJsonExportFx } from "./readEditorJsonExportFx";
@@ -22,31 +23,59 @@ const containsPath = (path: Path.Path, parent: string, candidate: string) => {
 	);
 };
 
-const isPortableEditorProjectFile = (path: Path.Path, relative: string) => {
-	const segments = relative.split(path.sep);
-	if (segments.length === 1)
-		return [
-			"schema.json",
-			"project.json",
-			"game.json",
-		].includes(segments[0] ?? "");
-	if (segments.length === 2) {
-		const [directory, file] = segments;
-		return directory === "assets" || directory === "resources"
-			? file?.endsWith(".png") === true
-			: directory === "notes" || directory === "scenarios"
-				? file?.endsWith(".json") === true
-				: directory === "objects"
-					? file?.endsWith(".json") === true || file?.endsWith(".png") === true
-					: directory === "versions" && file === "head.json";
-	}
-	return (
-		segments.length === 3 &&
-		((segments[0] === "items" && segments[2]?.endsWith(".json") === true) ||
-			(segments[0] === "versions" &&
-				(segments[2] === "version.json" || segments[2] === "manifest.json")))
-	);
-};
+const isPortableEditorProjectFile = (path: Path.Path, relative: string) =>
+	match(relative.split(path.sep))
+		.with(
+			[
+				P.union("schema.json", "project.json", "game.json"),
+			],
+			() => true,
+		)
+		.with(
+			[
+				P.union("assets", "resources"),
+				P.string.endsWith(".png"),
+			],
+			() => true,
+		)
+		.with(
+			[
+				P.union("notes", "scenarios"),
+				P.string.endsWith(".json"),
+			],
+			() => true,
+		)
+		.with(
+			[
+				"objects",
+				P.union(P.string.endsWith(".json"), P.string.endsWith(".png")),
+			],
+			() => true,
+		)
+		.with(
+			[
+				"versions",
+				"head.json",
+			],
+			() => true,
+		)
+		.with(
+			[
+				"items",
+				P.string,
+				P.string.endsWith(".json"),
+			],
+			() => true,
+		)
+		.with(
+			[
+				"versions",
+				P.string,
+				P.union("version.json", "manifest.json"),
+			],
+			() => true,
+		)
+		.otherwise(() => false);
 
 const copyPortableEditorProjectFx = Effect.fn("copyPortableEditorProjectFx")(function* ({
 	source,

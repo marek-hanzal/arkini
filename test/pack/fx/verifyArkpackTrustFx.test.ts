@@ -79,8 +79,8 @@ describe("Arkpack release trust", () => {
 		});
 		const verifyFork = createArkpackTrustVerifier({
 			identity: createArkiniReleaseIdentity({
+				identity: "https://github.com/fork/arkini/.github/workflows/macos-prerelease.yml",
 				issuer: "https://token.actions.githubusercontent.com",
-				subject: "https://github.com/fork/arkini/.github/workflows/macos-prerelease.yml",
 			}),
 			trustedRoot: sigstore.trustedRoot,
 		});

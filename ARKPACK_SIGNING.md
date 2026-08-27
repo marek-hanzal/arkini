@@ -17,7 +17,7 @@ anti-tampering or content-admission system.
 
 There is exactly one release channel. A tagged `macos-prerelease.yml` run receives GitHub's
 short-lived OIDC identity through `id-token: write`. The workflow maps its vendor context into the
-generic `ARKINI_RELEASE_ISSUER` and `ARKINI_RELEASE_SUBJECT` build inputs, then sets
+generic `ARKINI_RELEASE_ISSUER` and `ARKINI_RELEASE_IDENTITY` build inputs, then sets
 `ARKINI_RELEASE_SIGN=1`. The built CLI:
 
 1. packs the official game normally;
@@ -64,10 +64,10 @@ That command obtains the current root through Sigstore TUF. Root rotation reache
 through an Arkini application update.
 
 A fork uses the same single-channel design without inheriting upstream authority: its GitHub
-workflow derives `ARKINI_RELEASE_SUBJECT` from its own repository context. The fork therefore
+workflow derives `ARKINI_RELEASE_IDENTITY` from its own repository context. The fork therefore
 trusts its own tagged workflow bundles, while upstream Arkini presents those same bundles as
-External. Another CI vendor can provide its own OIDC issuer and subject without changing Arkini's
-runtime trust model.
+External. Another CI vendor can reuse the issuer/SAN verifier, but still needs a release adapter
+for obtaining its identity token and describing its certificate subject shape.
 
 ## Artifact layout
 

@@ -14,9 +14,10 @@ const sourceAlias = {
 	"~": fileURLToPath(new URL("./src", import.meta.url)),
 };
 const releaseIssuer = process.env.ARKINI_RELEASE_ISSUER ?? ArkiniReleaseIdentityDefaults.issuer;
-const releaseSubject = process.env.ARKINI_RELEASE_SUBJECT ?? ArkiniReleaseIdentityDefaults.subject;
+const releaseIdentity =
+	process.env.ARKINI_RELEASE_IDENTITY ?? ArkiniReleaseIdentityDefaults.identity;
 new URL(releaseIssuer);
-new URL(releaseSubject);
+new URL(releaseIdentity);
 
 export default defineConfig(({ command }) => {
 	const developmentCspNonce =
@@ -26,7 +27,7 @@ export default defineConfig(({ command }) => {
 		main: {
 			define: {
 				__ARKINI_RELEASE_ISSUER__: JSON.stringify(releaseIssuer),
-				__ARKINI_RELEASE_SUBJECT__: JSON.stringify(releaseSubject),
+				__ARKINI_RELEASE_IDENTITY__: JSON.stringify(releaseIdentity),
 			},
 			resolve: {
 				alias: sourceAlias,

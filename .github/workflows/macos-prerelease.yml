@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 60
     env:
       ARKINI_RELEASE_ISSUER: https://token.actions.githubusercontent.com
-      ARKINI_RELEASE_SUBJECT: ${{ github.server_url }}/${{ github.repository }}/.github/workflows/macos-prerelease.yml
+      ARKINI_RELEASE_IDENTITY: ${{ github.server_url }}/${{ github.repository }}/.github/workflows/macos-prerelease.yml
       ARKINI_RELEASE_SIGN: ${{ startsWith(github.ref, 'refs/tags/') && '1' || '0' }}
       CSC_IDENTITY_AUTO_DISCOVERY: "false"
     steps:

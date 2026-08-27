@@ -20,7 +20,7 @@ export const createArkpackTrustVerifier = ({
 }: {
 	readonly identity: {
 		readonly issuer: string;
-		readonly workflow: RegExp;
+		readonly subjectAlternativeName: RegExp;
 	};
 	readonly trustedRoot: unknown;
 }) => {
@@ -37,7 +37,7 @@ export const createArkpackTrustVerifier = ({
 			const serialized = typeof signature === "string" ? JSON.parse(signature) : signature;
 			const entity = toSignedEntity(bundleFromJSON(serialized), Buffer.from(bytes));
 			verifier.verify(entity, {
-				subjectAlternativeName: identity.workflow,
+				subjectAlternativeName: identity.subjectAlternativeName,
 				extensions: {
 					issuer: identity.issuer,
 				},

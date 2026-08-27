@@ -5,6 +5,8 @@ export interface DemandFrameLoop {
 	readonly invalidateFx: Effect.Effect<void>;
 	/** Schedules scene-local work for the next owned demand frame and returns its cancellation. */
 	readonly scheduleFx: (work: () => void) => Effect.Effect<() => void>;
+	/** Schedules scene-local work only after the next owned render has completed. */
+	readonly scheduleAfterRenderFx: (work: () => void) => Effect.Effect<() => void>;
 	readonly closeFx: Effect.Effect<void>;
 	/** Publishes a fatal failure against the exact Game that owns this loop. */
 	readonly reportCriticalFailure: (cause: unknown) => void;

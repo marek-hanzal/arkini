@@ -358,6 +358,7 @@ export const createApplication = (
 		closeFx: Effect.void,
 		invalidateFx: Effect.void,
 		reportCriticalFailure: () => {},
+		scheduleAfterRenderFx: () => Effect.succeed(() => {}),
 		scheduleFx: () => Effect.succeed(() => {}),
 	},
 	stage: new Container(),

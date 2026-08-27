@@ -3,9 +3,10 @@
 import { Effect } from "effect";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
+import type { GameTransition } from "~/bridge/game/GameSession";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { PixiInventorySurface } from "~/ui/pixi/PixiInventorySurface";
 
@@ -16,6 +17,7 @@ import { PixiInventorySurface } from "~/ui/pixi/PixiInventorySurface";
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const surfaceState = vi.hoisted(() => ({
+	activationGate: Promise.resolve(),
 	activateSpace: vi.fn(),
 	createProps: null as {
 		readonly onActivate: (
@@ -28,10 +30,37 @@ const surfaceState = vi.hoisted(() => ({
 	interactionCancel: vi.fn(),
 	interactionRegister: vi.fn(),
 	interactionUnregister: vi.fn(),
+	projectSpaceActivation: vi.fn(),
+	projection: Promise.resolve(),
 	release: vi.fn(),
 	spaceActivated: vi.fn(),
 	spaceActivationSucceeds: true,
+	spaceActivationTransition: null as GameTransition | null,
+	textures: {} as object,
 }));
+
+const spaceTransition = {
+	events: [
+		{
+			type: "current-space:changed",
+			previousSpace: 0,
+			currentSpace: 1,
+		},
+	],
+	previousRuntime: {
+		currentSpace: 0,
+	} as never,
+	runtime: {
+		currentSpace: 1,
+	} as never,
+	sequence: 1,
+} as GameTransition;
+
+const unrelatedTransition = {
+	...spaceTransition,
+	events: [],
+	sequence: 2,
+} as GameTransition;
 
 const game = {
 	config: {
@@ -47,6 +76,7 @@ const game = {
 			toolbarSize: 8,
 		},
 	},
+	getTransitionSnapshot: () => unrelatedTransition,
 	runFx: <Result, Error>(effect: Effect.Effect<Result, Error>) => effect,
 } as GameEngine;
 
@@ -68,14 +98,23 @@ vi.mock("~/engine/runtime/write/releaseInventoryItemFx", () => ({
 		}),
 }));
 
-vi.mock("~/engine/space/write/activateSpaceItemFx", () => ({
-	activateSpaceItemFx: (props: unknown) =>
-		Effect.suspend(() => {
+vi.mock("~/engine/space/write/activateSpaceItemWithTransitionFx", () => ({
+	activateSpaceItemWithTransitionFx: (props: unknown) =>
+		Effect.sync(() => {
 			surfaceState.activateSpace(props);
-			return surfaceState.spaceActivationSucceeds
-				? Effect.succeed(1)
-				: Effect.fail("space-action-unavailable");
-		}),
+		}).pipe(
+			Effect.andThen(Effect.promise(() => surfaceState.activationGate)),
+			Effect.andThen(
+				Effect.suspend(() =>
+					surfaceState.spaceActivationSucceeds
+						? Effect.succeed({
+								result: 1,
+								transition: surfaceState.spaceActivationTransition,
+							})
+						: Effect.fail("space-action-unavailable"),
+				),
+			),
+		),
 }));
 
 vi.mock("~/ui/item-detail/useItemDetailControl", () => ({
@@ -96,7 +135,7 @@ vi.mock("~/ui/pixi/usePixiGameRuntime", () => ({
 					return surfaceState.interactionUnregister;
 				}),
 		},
-		textures: {},
+		textures: surfaceState.textures,
 	}),
 }));
 
@@ -107,6 +146,11 @@ vi.mock("~/ui/pixi/scene/createPixiInventorySceneRuntimeFx", () => ({
 			return {
 				canvas: document.createElement("canvas"),
 				cancelInteractionFx: Effect.sync(surfaceState.interactionCancel),
+				projectSpaceActivationFx: (transition: GameTransition) =>
+					Effect.promise(() => {
+						surfaceState.projectSpaceActivation(transition);
+						return surfaceState.projection;
+					}),
 				closeFx: Effect.void,
 			};
 		}),
@@ -136,6 +180,12 @@ const item = {
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
+beforeEach(() => {
+	surfaceState.activationGate = Promise.resolve();
+	surfaceState.spaceActivationTransition = spaceTransition;
+	surfaceState.textures = {};
+});
+
 const renderSurface = async () => {
 	const host = document.createElement("div");
 	document.body.append(host);
@@ -164,9 +214,13 @@ afterEach(async () => {
 	surfaceState.interactionCancel.mockClear();
 	surfaceState.interactionRegister.mockClear();
 	surfaceState.interactionUnregister.mockClear();
+	surfaceState.projectSpaceActivation.mockClear();
+	surfaceState.projection = Promise.resolve();
 	surfaceState.release.mockClear();
 	surfaceState.spaceActivated.mockClear();
 	surfaceState.spaceActivationSucceeds = true;
+	surfaceState.spaceActivationTransition = spaceTransition;
+	surfaceState.textures = {};
 	document.body.replaceChildren();
 });
 
@@ -230,12 +284,83 @@ describe("PixiInventorySurface", () => {
 			revision: space.revision,
 		});
 		expect(surfaceState.spaceActivated).not.toHaveBeenCalled();
+		expect(surfaceState.projectSpaceActivation).not.toHaveBeenCalled();
 		expect(surfaceState.release).not.toHaveBeenCalled();
 
 		surfaceState.spaceActivationSucceeds = true;
-		await props.onActivate(space, false, document.createElement("canvas"));
+		let releaseProjection: () => void = () => undefined;
+		let acknowledgeProjectionStart: () => void = () => undefined;
+		surfaceState.projection = new Promise<void>((resolve) => {
+			releaseProjection = resolve;
+		});
+		const projectionStarted = new Promise<void>((resolve) => {
+			acknowledgeProjectionStart = resolve;
+		});
+		surfaceState.projectSpaceActivation.mockImplementationOnce(acknowledgeProjectionStart);
+		const activation = props.onActivate(space, false, document.createElement("canvas"));
+		await projectionStarted;
 
+		expect(surfaceState.projectSpaceActivation).toHaveBeenCalledWith(spaceTransition);
+		expect(surfaceState.spaceActivated).not.toHaveBeenCalled();
+
+		releaseProjection();
+		await activation;
 		expect(surfaceState.spaceActivated).toHaveBeenCalledOnce();
 		expect(surfaceState.release).not.toHaveBeenCalled();
+	});
+
+	it("returns to the Board for an accepted no-op without replaying an older transition", async () => {
+		const props = await renderSurface();
+		const space = {
+			...item,
+			itemType: "space",
+			primaryAction: {
+				currentSpace: 0,
+				kind: "activate-space",
+			},
+		} satisfies TileActorItem;
+		surfaceState.spaceActivationTransition = null;
+
+		await props.onActivate(space, false, document.createElement("canvas"));
+
+		expect(surfaceState.projectSpaceActivation).not.toHaveBeenCalled();
+		expect(surfaceState.spaceActivated).toHaveBeenCalledOnce();
+	});
+
+	it("does not project a deferred activation into a replacement Inventory runtime", async () => {
+		const props = await renderSurface();
+		const root = roots[roots.length - 1];
+		if (root === undefined) throw new Error("Inventory surface root is missing.");
+		const space = {
+			...item,
+			itemType: "space",
+			primaryAction: {
+				currentSpace: 0,
+				kind: "activate-space",
+			},
+		} satisfies TileActorItem;
+		let releaseActivation: () => void = () => undefined;
+		surfaceState.activationGate = new Promise<void>((resolve) => {
+			releaseActivation = resolve;
+		});
+
+		const activation = props.onActivate(space, false, document.createElement("canvas"));
+		await vi.waitFor(() => expect(surfaceState.activateSpace).toHaveBeenCalledOnce());
+
+		surfaceState.textures = {};
+		await act(async () => {
+			root.render(
+				createElement(PixiInventorySurface, {
+					onSpaceActivated: surfaceState.spaceActivated,
+				}),
+			);
+			await Promise.resolve();
+		});
+
+		releaseActivation();
+		await activation;
+
+		expect(surfaceState.projectSpaceActivation).not.toHaveBeenCalled();
+		expect(surfaceState.spaceActivated).not.toHaveBeenCalled();
 	});
 });

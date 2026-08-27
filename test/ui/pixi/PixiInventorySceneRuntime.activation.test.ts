@@ -75,6 +75,42 @@ describe("Pixi Inventory scene runtime / activation lifecycle", () => {
 		expect(actor.container.destroyed).toBe(true);
 		await Effect.runPromise(runtime.closeFx);
 	});
+	it("keeps a Space actor committed while its authoritative activation is pending", async () => {
+		let resolveActivation: () => void = () => undefined;
+		const activation = new Promise<void>((resolve) => {
+			resolveActivation = resolve;
+		});
+		const onActivate = vi.fn(() => activation);
+		sceneState.items = [
+			{
+				...inventoryItem,
+				itemType: "space",
+				primaryAction: {
+					currentSpace: 0,
+					kind: "activate-space",
+				},
+			},
+		];
+		const { actor, runtime, stage } = await mountScene({
+			onActivate,
+		});
+		const actorContainer = actor.container as unknown as FakeContainer;
+
+		actorContainer.emit("pointerdown", slotPointer(0));
+		stage.emit("pointerup", slotPointer(0));
+		await Promise.resolve();
+		actorContainer.emit("pointerdown", slotPointer(0));
+		stage.emit("pointerup", slotPointer(0));
+		await Promise.resolve();
+
+		expect(onActivate).toHaveBeenCalledOnce();
+		expect(actor.container.alpha).toBe(1);
+		expect(actor.container.destroyed).toBe(false);
+
+		resolveActivation();
+		await flushMicrotasks();
+		await Effect.runPromise(runtime.closeFx);
+	});
 	it("reclaims the same physical actor when its item returns before exit completes", async () => {
 		sceneState.deferredTweenDurations.add(pixiTileActorLifecycleDurationMs);
 		const { actor, onActivate, runtime, stage } = await mountScene();

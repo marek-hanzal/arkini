@@ -236,7 +236,7 @@ describe("validateInputChargesFx", () => {
 		]);
 	});
 
-	it("includes a charged Space item's implicit activation spend in cumulative self cost", async () => {
+	it("counts only authored Space Action self costs", async () => {
 		const portal = {
 			...createSimpleItem("space:cumulative"),
 			type: "space" as const,
@@ -259,12 +259,7 @@ describe("validateInputChargesFx", () => {
 			await chargeDiagnostics({
 				[portal.id]: portal,
 			}),
-		).toEqual([
-			expect.objectContaining({
-				ownerItemId: portal.id,
-				reason: InvalidInputChargesReasonEnumSchema.enum.SelfInsufficientCharges,
-			}),
-		]);
+		).toEqual([]);
 	});
 
 	it("rejects target costs outside deposit inputs and Line deposit self costs", async () => {

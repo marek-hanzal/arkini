@@ -39,19 +39,16 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 		});
 		const actions: Array<{
 			id: IdSchema.Type;
-			implicitSelfCost: number;
 			input: ReadonlyArray<InputSchema.Type>;
 			path: DiagnosticPathSchema.Type;
 		}> = lines.map(({ line, path }) => ({
 			id: line.id,
-			implicitSelfCost: 0,
 			input: line.input,
 			path,
 		}));
 		if (item.type === ItemEnumSchema.enum.Space) {
 			actions.push({
 				id: item.id,
-				implicitSelfCost: item.charges === undefined ? 0 : 1,
 				input: item.input,
 				path: [
 					"items",
@@ -59,8 +56,8 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 				],
 			});
 		}
-		for (const { id: actionId, implicitSelfCost, input: inputs, path } of actions) {
-			let selfCost = implicitSelfCost;
+		for (const { id: actionId, input: inputs, path } of actions) {
+			let selfCost = 0;
 			const exactTargetCosts = new Map<
 				string,
 				{

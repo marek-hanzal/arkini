@@ -62,6 +62,11 @@ const createFrames = () => {
 		frames: {
 			closeFx: Effect.void,
 			invalidateFx: Effect.sync(invalidate),
+			scheduleAfterRenderFx: (work) =>
+				Effect.sync(() => {
+					work();
+					return () => {};
+				}),
 			scheduleFx: (work) =>
 				Effect.sync(() => {
 					work();

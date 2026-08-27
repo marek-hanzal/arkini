@@ -297,37 +297,7 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 		),
 	);
 
-	yield* filesystemWrite.withLockFx(
-		lifecycleLock,
-		Effect.gen(function* () {
-			const entries = catalog.list();
-			const managedRoots = new Set(
-				entries
-					.filter((entry) => entry.ownership === "managed")
-					.map((entry) => path.resolve(entry.root))
-					.filter((root) => {
-						const relative = path.relative(managedProjectsRoot, root);
-						return (
-							relative !== "" &&
-							!relative.startsWith("..") &&
-							!path.isAbsolute(relative)
-						);
-					}),
-			);
-			yield* readCandidatesFx;
-			if (!catalog.rebuilt)
-				for (const name of yield* fileSystem.readDirectory(managedProjectsRoot)) {
-					if (name === ".projects.lock") continue;
-					const candidate = path.join(managedProjectsRoot, name);
-					if (managedRoots.has(candidate)) continue;
-					if ((yield* fileSystem.realPath(candidate)) !== candidate) continue;
-					yield* fileSystem.remove(candidate, {
-						force: true,
-						recursive: true,
-					});
-				}
-		}),
-	);
+	yield* readCandidatesFx;
 
 	const createProjectFx: FilesystemEditorProjectOperations["createProjectFx"] = ({
 		version: candidateVersion,

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { readGameDiagnosticPresentationFx } from "~/engine/validation/printer/readGameDiagnosticPresentationFx";
 
-import type { EditorGameDiagnostic } from "./readEditorBuildDiagnosticsFx";
+import type { EditorGameDiagnostic } from "./readEditorBuildFailureFx";
 
 /** Exposes diagnostic copy to the editor without leaking engine modules into UI. */
 export const readEditorGameDiagnosticPresentationFx = Effect.fn(

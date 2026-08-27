@@ -12,7 +12,8 @@ release. This includes gameplay saves, Arkpacks, Editor projects, scenarios,
 version history, and every other persisted Arkini-owned format.
 
 Arkini may provide a migration, but a major release does not promise one. The
-application owns that decision for each major transition.
+application owns that decision for each major transition. A mismatching major
+is the only version-level reason for a reader to reject persisted data.
 
 ### Minor
 
@@ -22,7 +23,9 @@ history.
 
 A minor release may change a persisted format and may include a migration, but
 the application must prove that the upgrade is safe. A migration is optional;
-data compatibility is not.
+data compatibility is not. Readers must not reject data solely because its
+minor version is older or newer than the current application or selected
+Arkpack.
 
 ### Patch
 
@@ -30,20 +33,49 @@ A patch release contains fixes and other changes without material gameplay,
 architecture, or data-contract impact. It inherits the minor-release
 compatibility guarantee.
 
+## Reader admission
+
+Arkini release versions written into persisted data use
+`<major>.<minor>.<patch>`. The complete version is writer provenance, but only
+the major is a reader-compatibility gate:
+
+- a matching major is admitted regardless of minor or patch ordering;
+- a mismatching major is rejected as incompatible;
+- minor and patch must not select a parser, migration, fallback, or conditional
+  data path;
+- admission never bypasses strict validation of the actual persisted shape or
+  integrity checks.
+
+This applies consistently to Arkpacks, gameplay saves, Editor projects,
+scenarios, version history, and every other Arkini-owned persisted envelope.
+Writers always stamp the current complete Arkini release version; readers do
+not require that stamp to equal the running build.
+
+Project-owned gameplay versions remain a separate domain authority. A save and
+its Arkpack are version-compatible when their gameplay majors match. Gameplay
+minor ordering must not reject a save or scenario and must not choose a
+different reader implementation.
+
 ## Pre-stable development
 
 Until the product owner explicitly declares the stable compatibility baseline,
-Arkini moves forward without backward-compatibility or migration obligations.
-Pre-stable data may be rejected after any change, and no legacy reader,
-migration, compatibility fixture, or compatibility abstraction should be added
-unless explicitly requested.
+Arkini moves forward without migration, legacy-reader, or conditional-reader
+obligations. Pre-stable persisted shapes may still be replaced without a
+migration, compatibility fixture, or compatibility abstraction unless
+explicitly requested.
+
+This freedom does not weaken reader admission. Structurally current data with a
+matching major must not be rejected merely because it was stamped by a
+different minor or patch release. Unsupported obsolete shapes may fail current
+strict validation; their version number must not trigger a separate code path.
 
 Public communication and user expectations for discarded pre-stable data are a
 product-owner responsibility, not a reason to preserve obsolete code paths.
 
-The first explicitly declared stable release establishes the baseline. The
-major/minor/patch promises above apply to that release and the supported data it
-creates, not retroactively to earlier development snapshots.
+The first explicitly declared stable release establishes the durable shape
+baseline. The no-data-break promise applies to that release and the supported
+data it creates, not retroactively to obsolete development shapes. Major-only
+reader admission applies now and does not wait for that declaration.
 
 ## Version authorities
 

@@ -1,13 +1,21 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import { mkdir, mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { Effect } from "effect";
+import { Effect, FileSystem } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { createFilesystemEditorProjectCatalogFx } from "../../../../electron/main/editor-project/filesystem/fx/createFilesystemEditorProjectCatalogFx";
 
 const temporaryDirectories: Array<string> = [];
+
+const realPath = (root: string) =>
+	Effect.runPromise(
+		FileSystem.FileSystem.pipe(
+			Effect.flatMap((fileSystem) => fileSystem.realPath(root)),
+			Effect.provide(NodeServices.layer),
+		),
+	);
 
 const createCatalogPath = async () => {
 	const root = await mkdtemp(join(tmpdir(), "arkini-project-catalog-"));
@@ -99,7 +107,7 @@ describe("filesystem Editor project catalog", () => {
 
 		expect(catalog.list()).toEqual([
 			{
-				root: await realpath(managedRoot),
+				root: await realPath(managedRoot),
 				ownership: "managed",
 				createdAtMs: 0,
 			},
@@ -146,7 +154,7 @@ describe("filesystem Editor project catalog", () => {
 			}).pipe(Effect.provide(NodeServices.layer)),
 		);
 
-		const canonicalManagedRoots = await Promise.all(managedRoots.map((root) => realpath(root)));
+		const canonicalManagedRoots = await Promise.all(managedRoots.map(realPath));
 		expect(catalog.list()).toEqual(
 			canonicalManagedRoots.map((root) => ({
 				root,

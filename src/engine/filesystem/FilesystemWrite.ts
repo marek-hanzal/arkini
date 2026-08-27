@@ -23,7 +23,6 @@ export namespace FilesystemWrite {
 	export interface Write {
 		readonly target: string;
 		readonly bytes: Uint8Array;
-		readonly mode?: number;
 	}
 
 	export interface File extends Write {

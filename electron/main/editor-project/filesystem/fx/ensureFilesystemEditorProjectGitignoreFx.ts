@@ -1,7 +1,7 @@
 import { Effect, FileSystem } from "effect";
-import { basename, dirname, join } from "node:path";
 
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
+import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
 import type { EditorProjectFilesystemPaths } from "../EditorProjectFilesystemPaths";
 
 const encoder = new TextEncoder();
@@ -32,11 +32,10 @@ export const addFilesystemEditorProjectGitignoreRules = (source: string) => {
 };
 
 export const assertFilesystemEditorProjectFileFx = Effect.fn("assertFilesystemEditorProjectFileFx")(
-	function* (fileSystem: FileSystem.FileSystem, target: string) {
+	function* (fileSystem: FileSystem.FileSystem, root: string, target: string) {
 		if (!(yield* fileSystem.exists(target))) return false;
-		const canonical = join(yield* fileSystem.realPath(dirname(target)), basename(target));
 		if (
-			(yield* fileSystem.realPath(target)) !== canonical ||
+			!(yield* isFilesystemPathSafeFx(fileSystem, root, target)) ||
 			(yield* fileSystem.stat(target)).type !== "File"
 		)
 			return yield* Effect.fail(
@@ -57,6 +56,7 @@ export const ensureFilesystemEditorProjectGitignoreFx = Effect.fn(
 		Effect.gen(function* () {
 			const exists = yield* assertFilesystemEditorProjectFileFx(
 				fileSystem,
+				paths.root,
 				paths.gitignoreFile,
 			);
 			const source = exists ? yield* fileSystem.readFileString(paths.gitignoreFile) : "";

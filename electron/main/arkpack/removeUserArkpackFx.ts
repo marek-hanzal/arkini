@@ -1,10 +1,9 @@
 import { FileSystem } from "effect";
 import { Effect } from "effect";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { ElectronMainError } from "../ElectronMainError";
 import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
 import { readArkpackSignaturePathFx } from "~/engine/pack/fx/readArkpackSignaturePathFx";
-import { syncFilesystemPathFx } from "../filesystem/syncFilesystemPathFx";
 import { withRecoveredArkpackArtifactPairFx } from "./recoverArkpackArtifactPairFx";
 
 export namespace removeUserArkpackFx {
@@ -37,7 +36,6 @@ export const removeUserArkpackFx = Effect.fn("removeUserArkpackFx")(
 						yield* fileSystem.remove(yield* readArkpackSignaturePathFx(canonicalPath), {
 							force: true,
 						});
-						yield* syncFilesystemPathFx(fileSystem, dirname(canonicalPath));
 					}),
 			);
 		}).pipe(

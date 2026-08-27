@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { compileGameSourcesFx } from "~/engine/compiler/fx/compileGameSourcesFx";
 import type { StartSchema } from "~/engine/start/schema/StartSchema";
 import {
+	createLine,
 	createOutput,
 	createProducerItem,
 	createRootSource,
@@ -29,6 +30,22 @@ const compileItems = (
 			}),
 		]),
 	);
+
+const depositInput = (itemId: string) => ({
+	type: "deposit" as const,
+	query: {
+		scope: "board" as const,
+		distance: "close" as const,
+		selector: {
+			type: "item" as const,
+			itemId,
+		},
+	},
+	charges: {
+		from: "target" as const,
+		cost: 1,
+	},
+});
 
 describe("completed config reference validation", () => {
 	it("reports canonical record key and embedded ID mismatches", async () => {
@@ -111,6 +128,115 @@ describe("completed config reference validation", () => {
 					referenceId: "item:missing-output",
 				}),
 			]),
+		);
+	});
+
+	it("reports selectors authored by Space requirements and availability rules", async () => {
+		const portal = {
+			...createSimpleItem("item:portal"),
+			type: "space" as const,
+			space: 1,
+			input: [
+				depositInput("item:missing-deposit"),
+			],
+			rules: [
+				{
+					type: "enable" as const,
+					when: [
+						{
+							type: "exists" as const,
+							query: {
+								scope: "universe" as const,
+								selector: {
+									type: "item" as const,
+									itemId: "item:missing-rule",
+								},
+							},
+						},
+					],
+				},
+			],
+		};
+		const result = await compileItems({
+			[portal.id]: portal,
+		});
+		const missing = result.diagnostics.filter(
+			({ code }) => code === DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
+		);
+		expect(missing).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					referenceId: "item:missing-deposit",
+				}),
+				expect.objectContaining({
+					referenceId: "item:missing-rule",
+				}),
+			]),
+		);
+	});
+
+	it("preserves authored indices while validating every Line rule kind", async () => {
+		const producer = createProducerItem({
+			id: "item:producer",
+			lines: [
+				{
+					...createLine({}),
+					rules: [
+						{
+							type: "enable" as const,
+							when: [
+								{
+									type: "exists" as const,
+									query: {
+										scope: "universe" as const,
+										selector: {
+											type: "item" as const,
+											itemId: "item:producer",
+										},
+									},
+								},
+							],
+						},
+						{
+							type: "show" as const,
+							when: [
+								{
+									type: "exists" as const,
+									query: {
+										scope: "universe" as const,
+										selector: {
+											type: "item" as const,
+											itemId: "item:missing-rule",
+										},
+									},
+								},
+							],
+						},
+					],
+				},
+			],
+		});
+		const result = await compileItems({
+			[producer.id]: producer,
+		});
+
+		expect(result.diagnostics).toContainEqual(
+			expect.objectContaining({
+				path: [
+					"items",
+					producer.id,
+					"lines",
+					0,
+					"rules",
+					1,
+					"when",
+					0,
+					"query",
+					"selector",
+					"itemId",
+				],
+				referenceId: "item:missing-rule",
+			}),
 		);
 	});
 });

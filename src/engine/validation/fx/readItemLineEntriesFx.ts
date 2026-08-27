@@ -79,6 +79,7 @@ export const readItemLineEntriesFx = Effect.fn("readItemLineEntriesFx")(function
 			{
 				type: P.union(
 					ItemEnumSchema.enum.Simple,
+					ItemEnumSchema.enum.Space,
 					ItemEnumSchema.enum.Temporary,
 					ItemEnumSchema.enum.Inventory,
 				),

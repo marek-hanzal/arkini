@@ -3,20 +3,20 @@ import { z } from "zod";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { InputChargeFromEnumSchema } from "./InputChargeFromEnumSchema";
 
-/** Charge cost paid when one line input participates in an actual job start. */
+/** Charge cost paid when one requirement participates in a committed action. */
 export const InputChargeSchema = z
 	.object({
 		cost: PositiveIntegerSchema.describe(
-			"The positive number of charges paid when this input starts one line job.",
+			"The positive number of charges paid when the enclosing action commits.",
 		),
 		from: InputChargeFromEnumSchema.describe(
-			"Whether the cost is paid by the line owner or the input's resolved target.",
+			"Whether the cost is paid by the action owner or the requirement's resolved target.",
 		),
 	})
 	.strict()
 	.meta({
 		id: "InputChargeSchema",
-		description: "One line-input charge cost and the runtime item that pays it.",
+		description: "One action-requirement charge cost and the runtime item that pays it.",
 	});
 
 export type InputChargeSchema = typeof InputChargeSchema;

@@ -418,7 +418,7 @@ Do not add due times, start timestamps, pause timestamps, persisted Tick cursors
 
 Inventory and Toolbar are hard pauses for active and ready jobs. Returning the same owner to the board resumes evaluation without a separate resume mutation.
 
-Inventory and Toolbar are passive storage. Commands may move an already stateful owner into either surface, but no command may attach new identity-bound state to an owner while it is stored there.
+Inventory and Toolbar are passive storage. Commands may move an already stateful owner into either surface. Line input, job, and queue state cannot be attached there; an immediate Space action may spend item charges there and atomically isolate the charged identity from its real passive origin.
 
 Started jobs cannot be cancelled. Pending queue requests may be cleared only as the whole current queue of one owner; no command targets a previously observed request shape.
 
@@ -494,7 +494,7 @@ Purity is a runtime-derived boolean, not an item-config flag. A line is pure onl
 
 Generic stack and quantity mutations may target only pure items. A pure item uses its configured stack size; an impure item has an effective stack size of `1`. Purity is resolved inside the same immutable runtime draft as the mutation and is checked both while planning stack placement and again while applying the plan. Never cache or carry a purity result across a write boundary.
 
-Every operation whose candidate would attach identity-bound state to quantity greater than `1` must preserve the original board identity at quantity `1` and standard-place the pure remainder inside that same candidate. Input storage, line start, and partial charge spending share this isolation rule. Full idle depletion is consumption, not state attachment: it removes one quantity in place. Failure publishes no intermediate state or events. Do not add feature-specific split helpers, and do not invent an inventory placement origin for a stored owner.
+Every operation whose candidate would attach identity-bound state to quantity greater than `1` must preserve the original grid identity at quantity `1` and standard-place the pure remainder inside that same candidate. Input storage, line start, and partial charge spending share this isolation rule. Board-owned Line operations remain Board-only; immediate charge spending uses the concrete Board, Inventory, or Toolbar origin already owned by its item. Full idle depletion is consumption, not state attachment: it removes one quantity in place. Failure publishes no intermediate state or events. Do not add feature-specific split helpers or invent a Board coordinate for a passive owner.
 
 Placement is one shared policy used by commands, line output, charge-depletion output, reserved-instance return, and buffered-input release. `placeRuntimeItemFx` is the sole internal entry point for relocating an existing live item; lifecycle callsites must not invent specialized placement branches.
 

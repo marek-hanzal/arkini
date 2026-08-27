@@ -474,7 +474,7 @@
 					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
 				},
 				"output": {
-					"description": "The optional output emitted exactly once when one item instance is depleted.",
+					"description": "The optional output emitted exactly once from the depleted item's real grid origin.",
 					"$ref": "urn:arkini:schema:game-project-source#/$defs/OutputSchema"
 				}
 			},
@@ -1228,7 +1228,7 @@
 			"type": "object",
 			"properties": {
 				"charges": {
-					"description": "The optional charge cost paid by the line owner or this input's resolved target.",
+					"description": "The optional charge cost paid by the action owner or this requirement's resolved target.",
 					"$ref": "urn:arkini:schema:game-project-source#/$defs/InputChargeSchema"
 				},
 				"type": {
@@ -1243,17 +1243,17 @@
 				"type"
 			],
 			"additionalProperties": false,
-			"description": "An explicit product-line input with no consumable resource requirement."
+			"description": "An explicit action requirement with no consumable resource requirement."
 		},
 		"InputChargeSchema": {
 			"type": "object",
 			"properties": {
 				"cost": {
-					"description": "The positive number of charges paid when this input starts one line job.",
+					"description": "The positive number of charges paid when the enclosing action commits.",
 					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
 				},
 				"from": {
-					"description": "Whether the cost is paid by the line owner or the input's resolved target.",
+					"description": "Whether the cost is paid by the action owner or the requirement's resolved target.",
 					"$ref": "urn:arkini:schema:game-project-source#/$defs/InputChargeFromEnumSchema"
 				}
 			},
@@ -1262,7 +1262,7 @@
 				"from"
 			],
 			"additionalProperties": false,
-			"description": "One line-input charge cost and the runtime item that pays it."
+			"description": "One action-requirement charge cost and the runtime item that pays it."
 		},
 		"InputChargeFromEnumSchema": {
 			"type": "string",
@@ -1270,13 +1270,13 @@
 				"self",
 				"target"
 			],
-			"description": "Whether one input charge cost is paid by the line owner or its resolved target."
+			"description": "Whether one requirement cost is paid by the action owner or its resolved target."
 		},
 		"InputMaterialSchema": {
 			"type": "object",
 			"properties": {
 				"charges": {
-					"description": "The optional charge cost paid by the line owner or this input's resolved target.",
+					"description": "The optional charge cost paid by the action owner or this requirement's resolved target.",
 					"$ref": "urn:arkini:schema:game-project-source#/$defs/InputChargeSchema"
 				},
 				"type": {
@@ -1327,7 +1327,7 @@
 			"type": "object",
 			"properties": {
 				"charges": {
-					"description": "The optional charge cost paid by the line owner or this input's resolved target.",
+					"description": "The optional charge cost paid by the action owner or this requirement's resolved target.",
 					"$ref": "urn:arkini:schema:game-project-source#/$defs/InputChargeSchema"
 				},
 				"type": {
@@ -1358,10 +1358,10 @@
 					"$ref": "urn:arkini:schema:game-project-source#/$defs/LineRuleHideSchema"
 				},
 				{
-					"$ref": "urn:arkini:schema:game-project-source#/$defs/LineRuleEnableSchema"
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ActionRuleEnableSchema"
 				},
 				{
-					"$ref": "urn:arkini:schema:game-project-source#/$defs/LineRuleDisableSchema"
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ActionRuleDisableSchema"
 				},
 				{
 					"$ref": "urn:arkini:schema:game-project-source#/$defs/RuleRuntimeAdjustSchema"
@@ -1440,11 +1440,11 @@
 			"additionalProperties": false,
 			"description": "A rule that hides a product line when its condition is satisfied."
 		},
-		"LineRuleEnableSchema": {
+		"ActionRuleEnableSchema": {
 			"type": "object",
 			"properties": {
 				"hint": {
-					"description": "Player-facing explanation shown while this product-line rule applies.",
+					"description": "Player-facing explanation shown while this action rule applies.",
 					"$ref": "urn:arkini:schema:game-project-source#/$defs/NonEmptyStringSchema"
 				},
 				"when": {
@@ -1457,14 +1457,13 @@
 					"items": {
 						"$ref": "urn:arkini:schema:game-project-source#/$defs/WhenSchema"
 					},
-					"description": "Conditions that must all pass for this product-line rule to apply."
+					"description": "Conditions that must all pass for this action rule to apply."
 				},
 				"type": {
 					"type": "string",
 					"enum": [
 						"enable"
-					],
-					"description": "Identifies this rule as an enable gate for the product line."
+					]
 				}
 			},
 			"required": [
@@ -1472,13 +1471,13 @@
 				"type"
 			],
 			"additionalProperties": false,
-			"description": "A rule that enables a product line when its conditions pass."
+			"description": "A rule that enables an immediate item action when its conditions pass."
 		},
-		"LineRuleDisableSchema": {
+		"ActionRuleDisableSchema": {
 			"type": "object",
 			"properties": {
 				"hint": {
-					"description": "Player-facing explanation shown while this product-line rule applies.",
+					"description": "Player-facing explanation shown while this action rule applies.",
 					"$ref": "urn:arkini:schema:game-project-source#/$defs/NonEmptyStringSchema"
 				},
 				"when": {
@@ -1491,14 +1490,13 @@
 					"items": {
 						"$ref": "urn:arkini:schema:game-project-source#/$defs/WhenSchema"
 					},
-					"description": "Conditions that must all pass for this product-line rule to apply."
+					"description": "Conditions that must all pass for this action rule to apply."
 				},
 				"type": {
 					"type": "string",
 					"enum": [
 						"disable"
-					],
-					"description": "Identifies this rule as a disable veto for the product line."
+					]
 				}
 			},
 			"required": [
@@ -1506,7 +1504,7 @@
 				"type"
 			],
 			"additionalProperties": false,
-			"description": "A rule that disables a product line when its condition is satisfied."
+			"description": "A rule that disables an immediate item action when its conditions pass."
 		},
 		"RuleRuntimeAdjustSchema": {
 			"type": "object",
@@ -1824,6 +1822,125 @@
 			],
 			"additionalProperties": false,
 			"description": "An item without specialized gameplay behavior."
+		},
+		"SpaceItemSchema": {
+			"type": "object",
+			"properties": {
+				"uid": {
+					"description": "The immutable CUID2 identity of this canonical game item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"id": {
+					"description": "The stable authoring ID of this canonical game item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/IdSchema"
+				},
+				"title": {
+					"description": "The human-readable title of this item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/TitleSchema"
+				},
+				"description": {
+					"description": "The human-readable explanation of this item's purpose.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/DescriptionSchema"
+				},
+				"asset": {
+					"description": "The visual asset definition used to render this item.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/AssetSchema"
+				},
+				"scope": {
+					"description": "The part of game state in which this item may be stored.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/StorageScopeEnumSchema"
+				},
+				"maxCount": {
+					"description": "The optional maximum number of this item allowed across the game state.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"maxStackSize": {
+					"description": "The maximum number of this item that one stack can hold before it has mutable state.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/PositiveIntegerSchema"
+				},
+				"charges": {
+					"description": "The optional finite lifetime and depletion output of each item instance.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ChargeSchema"
+				},
+				"merge": {
+					"description": "The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
+					"type": "array",
+					"prefixItems": [
+						{
+							"$ref": "urn:arkini:schema:game-project-source#/$defs/MergeSchema"
+						}
+					],
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/MergeSchema"
+					}
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"space"
+					]
+				},
+				"space": {
+					"description": "The authored board space selected after successful activation.",
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/NonNegativeIntegerSchema"
+				},
+				"enable": {
+					"default": true,
+					"type": "boolean"
+				},
+				"input": {
+					"default": [],
+					"type": "array",
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/ActionInputSchema"
+					}
+				},
+				"rules": {
+					"default": [],
+					"type": "array",
+					"items": {
+						"$ref": "urn:arkini:schema:game-project-source#/$defs/ActionRuleSchema"
+					}
+				}
+			},
+			"required": [
+				"uid",
+				"id",
+				"title",
+				"description",
+				"asset",
+				"scope",
+				"maxStackSize",
+				"type",
+				"space",
+				"enable",
+				"input",
+				"rules"
+			],
+			"additionalProperties": false,
+			"description": "An item whose shared immediate action requirements settle atomically with navigation."
+		},
+		"ActionInputSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/InputSimpleSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/InputDepositSchema"
+				}
+			],
+			"description": "A simple or board-deposit requirement resolved by an immediate item action."
+		},
+		"ActionRuleSchema": {
+			"oneOf": [
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ActionRuleEnableSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/ActionRuleDisableSchema"
+				}
+			],
+			"description": "Enable gates and disable vetoes evaluated for an immediate item action."
 		},
 		"ProducerItemSchema": {
 			"type": "object",
@@ -2248,6 +2365,9 @@
 				},
 				{
 					"$ref": "urn:arkini:schema:game-project-source#/$defs/SimpleItemSchema"
+				},
+				{
+					"$ref": "urn:arkini:schema:game-project-source#/$defs/SpaceItemSchema"
 				},
 				{
 					"$ref": "urn:arkini:schema:game-project-source#/$defs/ProducerItemSchema"

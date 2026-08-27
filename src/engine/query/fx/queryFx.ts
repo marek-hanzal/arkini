@@ -2,8 +2,11 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { QuerySchema } from "~/engine/query/schema/QuerySchema";
-import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
+import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { BoardQueryOriginUnavailableError } from "~/engine/query/error/BoardQueryOriginUnavailableError";
 import { QueryScopeEnumSchema } from "~/engine/query/schema/QueryScopeEnumSchema";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 
 import { queryAnyFx } from "./queryAnyFx";
 import { queryBoardFx } from "./queryBoardFx";
@@ -13,7 +16,7 @@ import { queryUniverseFx } from "./queryUniverseFx";
 
 export namespace queryFx {
 	export interface Props {
-		origin: BoardLocationSchema.Type;
+		origin: GridLocationSchema.Type;
 		query: QuerySchema.Type;
 	}
 }
@@ -30,6 +33,13 @@ export const queryFx = Effect.fn("queryFx")(function* (props: queryFx.Props) {
 				},
 			},
 			({ origin, query }) => {
+				if (origin.scope !== LocationScopeEnumSchema.enum.Board) {
+					return Effect.fail(
+						new BoardQueryOriginUnavailableError({
+							origin,
+						}),
+					);
+				}
 				return queryBoardFx({
 					origin,
 					query,
@@ -67,9 +77,15 @@ export const queryFx = Effect.fn("queryFx")(function* (props: queryFx.Props) {
 				},
 			},
 			({ origin, query }) => {
-				return queryAnyFx({
-					origin,
-					query,
+				return Effect.gen(function* () {
+					const space =
+						origin.scope === LocationScopeEnumSchema.enum.Board
+							? origin.space
+							: (yield* readRuntimeFx()).currentSpace;
+					return yield* queryAnyFx({
+						query,
+						space,
+					});
 				});
 			},
 		)

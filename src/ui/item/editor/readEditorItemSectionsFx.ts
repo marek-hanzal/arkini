@@ -21,6 +21,10 @@ const EditorItemSections = [
 		label: "Merges",
 	},
 	{
+		id: "action",
+		label: "Action",
+	},
+	{
 		id: "production",
 		label: "Production",
 	},
@@ -52,6 +56,8 @@ export const readEditorItemSectionsFx = Effect.fn("readEditorItemSectionsFx")(
 					switch (section.id) {
 						case "production":
 							return ProductionItemTypes.has(item.type);
+						case "action":
+							return item.type === "space";
 						default:
 							return true;
 					}

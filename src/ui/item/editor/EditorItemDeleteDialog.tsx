@@ -35,6 +35,14 @@ const EditorItemForceDeleteImpactList = ({
 	}
 	for (const { ownerItemId, ruleNumber } of impact.removedMergeRules)
 		entries.push(`Remove merge rule ${ruleNumber} from ${readItemTitle(project, ownerItemId)}`);
+	for (const { ownerItemId, inputNumber } of impact.removedActionInputs)
+		entries.push(
+			`Remove action input ${inputNumber} from ${readItemTitle(project, ownerItemId)}`,
+		);
+	for (const { ownerItemId, ruleNumber } of impact.removedActionRules)
+		entries.push(
+			`Remove action rule ${ruleNumber} from ${readItemTitle(project, ownerItemId)}`,
+		);
 	for (const { ownerItemId, title } of impact.removedLines)
 		entries.push(
 			`Remove production line “${title}” from ${readItemTitle(project, ownerItemId)}`,

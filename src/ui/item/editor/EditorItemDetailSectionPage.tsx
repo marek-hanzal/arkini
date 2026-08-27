@@ -9,6 +9,7 @@ import { EditorItemDeleteSection } from "~/ui/item/editor/EditorItemDeleteSectio
 import { EditorItemIdentityDetail } from "~/ui/item/editor/EditorItemIdentityDetail";
 import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
 import { EditorItemProductionDetail } from "~/ui/item/editor/EditorItemProductionDetail";
+import { EditorSpaceActionDetail } from "~/ui/item/editor/EditorSpaceActionDetail";
 import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
 import { readEditorItemSectionsFx } from "~/ui/item/editor/readEditorItemSectionsFx";
 import { useEditorItemByUid } from "~/ui/item/editor/useEditorItemByUid";
@@ -47,6 +48,8 @@ export const EditorItemDetailSectionPage = ({
 			return <EditorItemChargesDetail item={item} />;
 		case "merges":
 			return <EditorItemMergesDetail item={item} />;
+		case "action":
+			return <EditorSpaceActionDetail item={item} />;
 		case "production":
 			return <EditorItemProductionDetail item={item} />;
 		case "estimate":

@@ -4,30 +4,25 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 
 /** Bump only when intentionally changing immediate charge-depletion random compatibility. */
-const ChargeSpendRandomVersion = 2;
+const ActionChargeSpendRandomVersion = 2;
 
-/**
- * Runs the owned program with deterministic random for depletion resolved during one line start.
- *
- * Failed retries over the same payer state replay the same result. A successful spend
- * changes remaining charges, quantity, or runtime identity before the next use.
- */
-export const makeChargeSpendRandomFx = Effect.fn("makeChargeSpendRandomFx")(function* <
+/** Runs charge-depletion work with deterministic random for one concrete action. */
+export const makeActionChargeSpendRandomFx = Effect.fn("makeActionChargeSpendRandomFx")(function* <
 	Result,
 	Error,
 	Requirements,
 >({
+	actionId,
 	cost,
 	itemId,
-	lineId,
 	ownerItemId,
 	program,
 	quantity,
 	remainingCharges,
 }: {
+	actionId: IdSchema.Type;
 	cost: PositiveIntegerSchema.Type;
 	itemId: IdSchema.Type;
-	lineId: IdSchema.Type;
 	ownerItemId: IdSchema.Type;
 	program: Effect.Effect<Result, Error, Requirements>;
 	quantity: PositiveIntegerSchema.Type;
@@ -35,7 +30,7 @@ export const makeChargeSpendRandomFx = Effect.fn("makeChargeSpendRandomFx")(func
 }) {
 	return yield* program.pipe(
 		Random.withSeed(
-			`arkini:charge-spend:v${ChargeSpendRandomVersion}:${ownerItemId}:${lineId}:${itemId}:${quantity}:${remainingCharges}:${cost}`,
+			`arkini:charge-spend:v${ActionChargeSpendRandomVersion}:${ownerItemId}:${actionId}:${itemId}:${quantity}:${remainingCharges}:${cost}`,
 		),
 	);
 });

@@ -7,6 +7,7 @@ export const ItemTypeLabel = {
 	inventory: "Inventory control",
 	producer: "Producer",
 	simple: "Simple item",
+	space: "Space item",
 	stash: "Stash",
 	temporary: "Temporary item",
 } as const;

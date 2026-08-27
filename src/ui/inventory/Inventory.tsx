@@ -39,7 +39,7 @@ export const Inventory = ({ onClose }: { readonly onClose: () => void }) => {
 				className="size-full min-h-0 min-w-0"
 				data-ui="InventoryViewport"
 			>
-				<PixiInventorySurface />
+				<PixiInventorySurface onSpaceActivated={onClose} />
 			</div>
 		</section>
 	);

@@ -126,7 +126,9 @@ export const EditorLineFields = withFieldGroup({
 						{(input) => (
 							<EditorLineInputsControl
 								value={input}
-								onChange={(next) => group.setFieldValue("input", next)}
+								onChange={(next) =>
+									group.setFieldValue("input", next as EditorLine["input"])
+								}
 							/>
 						)}
 					</group.Subscribe>

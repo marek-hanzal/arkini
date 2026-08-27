@@ -53,6 +53,15 @@ export const convertEditorItemFx = Effect.fn("convertEditorItemFx")(
 							...common,
 							type: targetType,
 						};
+					case "space":
+						return {
+							...common,
+							type: targetType,
+							space: item.type === "space" ? item.space : 0,
+							enable: item.type === "space" ? item.enable : true,
+							input: item.type === "space" ? item.input : [],
+							rules: item.type === "space" ? item.rules : [],
+						};
 					case "inventory":
 						return {
 							...common,

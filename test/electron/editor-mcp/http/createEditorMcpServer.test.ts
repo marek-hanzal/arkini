@@ -31,6 +31,7 @@ describe("editor MCP server", () => {
 		const tools = await client.listTools();
 		expect(tools.tools.map(({ name }) => name)).toEqual([
 			"create_simple_item",
+			"create_space_item",
 			"create_producer_item",
 			"create_craft_item",
 			"create_blueprint_item",
@@ -39,6 +40,7 @@ describe("editor MCP server", () => {
 			"create_temporary_item",
 			"create_inventory_item",
 			"edit_simple_item",
+			"edit_space_item",
 			"edit_producer_item",
 			"edit_craft_item",
 			"edit_blueprint_item",

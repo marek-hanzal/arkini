@@ -44,7 +44,9 @@ Inventory and Toolbar are passive storage:
 - active and ready jobs pause while their owner is on either surface;
 - queued work does not dispatch while the owner is on either surface;
 - Board-origin rules cannot use passive-storage coordinates;
-- new input, job, queue, or other identity-bound state cannot be attached there;
+- Line input, job, and queue state cannot be attached there;
+- an immediate Space action may spend item charges there, isolating a charged stack from its real
+  passive slot when necessary;
 - returning the same owner to the board resumes normal evaluation.
 
 Moving an item to Inventory or Toolbar is not item removal. Instance state, jobs, queue requests, buffered inputs, and remaining time stay attached to the same owner.

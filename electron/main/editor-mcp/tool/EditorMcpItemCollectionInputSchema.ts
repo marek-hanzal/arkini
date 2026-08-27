@@ -5,7 +5,7 @@ import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 const EditorMcpItemTypeSchema = z.enum(ItemEnumSchema.options).meta({
 	id: "EditorMcpItemTypeSchema",
 	description:
-		"A canonical Arkini item type: deposit, blueprint, simple, producer, craft, stash, temporary, or inventory.",
+		"A canonical Arkini item type: deposit, blueprint, simple, space, producer, craft, stash, temporary, or inventory.",
 });
 
 export const EditorMcpItemCollectionInputSchema = z

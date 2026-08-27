@@ -236,7 +236,38 @@ describe("validateInputChargesFx", () => {
 		]);
 	});
 
-	it("rejects target costs outside deposit inputs and deposit self costs", async () => {
+	it("includes a charged Space item's implicit activation spend in cumulative self cost", async () => {
+		const portal = {
+			...createSimpleItem("space:cumulative"),
+			type: "space" as const,
+			space: 1,
+			charges: {
+				amount: 2,
+			},
+			input: [
+				{
+					type: "simple" as const,
+					charges: {
+						from: "self" as const,
+						cost: 2,
+					},
+				},
+			],
+		};
+
+		expect(
+			await chargeDiagnostics({
+				[portal.id]: portal,
+			}),
+		).toEqual([
+			expect.objectContaining({
+				ownerItemId: portal.id,
+				reason: InvalidInputChargesReasonEnumSchema.enum.SelfInsufficientCharges,
+			}),
+		]);
+	});
+
+	it("rejects target costs outside deposit inputs and Line deposit self costs", async () => {
 		const materialTarget = createProducerItem({
 			id: "material-target",
 			input: [
@@ -289,6 +320,36 @@ describe("validateInputChargesFx", () => {
 				}),
 			]),
 		);
+	});
+
+	it("allows a Space deposit requirement to charge its action owner", async () => {
+		const portal = {
+			...createSimpleItem("space:owner-paid"),
+			type: "space" as const,
+			space: 1,
+			charges: {
+				amount: 2,
+			},
+			input: [
+				depositInput("payer", {
+					from: "self",
+				}),
+			],
+		};
+		const payer = {
+			...createSimpleItem("payer"),
+			scope: "board" as const,
+			charges: {
+				amount: 1,
+			},
+		};
+
+		expect(
+			await chargeDiagnostics({
+				[portal.id]: portal,
+				[payer.id]: payer,
+			}),
+		).toEqual([]);
 	});
 
 	it("rejects an exact inventory-only external payer", async () => {

@@ -26,6 +26,10 @@ export const EditorItemTypePresentation = {
 		description: "A regular stackable item without specialized behavior.",
 		icon: "icon-[lucide--box]",
 	},
+	space: {
+		description: "An immediately activated item that moves play to an authored space.",
+		icon: "icon-[lucide--map-pinned]",
+	},
 	stash: {
 		description: "A chest or reward container with one opening line.",
 		icon: "icon-[lucide--package-open]",

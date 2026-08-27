@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
+import { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { GameEventEnumSchema } from "./GameEventEnumSchema";
 
 /** One exact charged item committed a non-terminal charge spend. */
@@ -12,7 +12,7 @@ export const ItemChargeSpentGameEventSchema = z
 		]),
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
-		location: BoardLocationSchema,
+		location: GridLocationSchema,
 		previousCharges: z.number().int().positive(),
 		resultingCharges: z.number().int().positive(),
 	})

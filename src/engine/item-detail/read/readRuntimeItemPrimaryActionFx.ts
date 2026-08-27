@@ -13,6 +13,10 @@ export namespace readRuntimeItemPrimaryActionFx {
 				readonly kind: "none";
 		  }
 		| {
+				readonly currentSpace: number;
+				readonly kind: "activate-space";
+		  }
+		| {
 				readonly kind: "open-inventory";
 		  }
 		| {
@@ -34,6 +38,12 @@ export namespace readRuntimeItemPrimaryActionFx {
 /** Resolves the canonical single-click action of one exact live item. */
 export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryActionFx")(
 	function* ({ item, runtime }: readRuntimeItemPrimaryActionFx.Props) {
+		if (item.item.type === ItemEnumSchema.enum.Space) {
+			return {
+				currentSpace: runtime.currentSpace,
+				kind: "activate-space" as const,
+			} satisfies readRuntimeItemPrimaryActionFx.Result;
+		}
 		if (item.item.type === ItemEnumSchema.enum.Inventory) {
 			return {
 				kind: "open-inventory" as const,

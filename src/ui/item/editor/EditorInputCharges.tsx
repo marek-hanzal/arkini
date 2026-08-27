@@ -17,14 +17,14 @@ export const EditorInputCharges = ({
 	return (
 		<div className="grid gap-3">
 			<EditorFormSectionDivider
-				description="Optional charge payment when this input starts a job."
+				description="Optional charge payment when this input requirement settles."
 				title="Charge cost"
 				variant="secondary"
 			/>
 			{charges === undefined ? (
 				<EditorCapabilityStatus
 					actionLabel="Enable charge cost"
-					description="This input currently starts jobs without spending charges. Enable a cost to charge this item or its selected target when the job starts."
+					description="This input currently settles without spending charges. Enable a cost to charge its owner or selected target when the action starts."
 					icon="icon-[lucide--battery-medium]"
 					onEnable={() =>
 						onChange({
@@ -45,7 +45,7 @@ export const EditorInputCharges = ({
 						options={[
 							{
 								description:
-									"The item that owns and runs this production line pays the charge cost. It must define enough available charges.",
+									"The item that owns this action pays the charge cost. It must define enough available charges.",
 								label: "Self",
 								value: "self",
 							},

@@ -31,6 +31,7 @@ import { registerEditorMcpVersionTools } from "./registerEditorMcpVersionTools";
 
 const editorMcpItemTypes = [
 	"simple",
+	"space",
 	"producer",
 	"craft",
 	"blueprint",

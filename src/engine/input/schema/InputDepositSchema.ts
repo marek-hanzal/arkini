@@ -9,7 +9,7 @@ import { InputEnumSchema } from "./InputEnumSchema";
  * An external charged-item target selected from the board.
  *
  * The target is never delivered into an input buffer. Its charge cost is authored
- * through the shared input `charges` field and paid atomically when the line starts.
+ * through the shared `charges` field and paid atomically when the enclosing action commits.
  */
 export const InputDepositSchema = z
 	.object({

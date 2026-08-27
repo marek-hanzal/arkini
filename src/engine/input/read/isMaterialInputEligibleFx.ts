@@ -22,6 +22,7 @@ export const isMaterialInputEligibleFx = Effect.fnUntraced(function* (item: Item
 					ItemEnumSchema.enum.Inventory,
 					ItemEnumSchema.enum.Producer,
 					ItemEnumSchema.enum.Simple,
+					ItemEnumSchema.enum.Space,
 					ItemEnumSchema.enum.Stash,
 				),
 			},

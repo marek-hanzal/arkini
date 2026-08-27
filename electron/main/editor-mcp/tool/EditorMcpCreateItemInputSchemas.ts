@@ -9,6 +9,7 @@ import { DepositItemSchema } from "~/engine/item/schema/DepositItemSchema";
 import { InventoryItemSchema } from "~/engine/item/schema/InventoryItemSchema";
 import { ProducerItemSchema } from "~/engine/item/schema/ProducerItemSchema";
 import { SimpleItemSchema } from "~/engine/item/schema/SimpleItemSchema";
+import { SpaceItemSchema } from "~/engine/item/schema/SpaceItemSchema";
 import { StashItemSchema } from "~/engine/item/schema/StashItemSchema";
 import { TemporaryItemSchema } from "~/engine/item/schema/TemporaryItemSchema";
 import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
@@ -46,6 +47,31 @@ export const EditorMcpCreateItemInputSchemas = {
 			$id: "urn:arkini:schema:mcp:create-simple-item-input",
 			title: "Create simple item tool input",
 			description: "Authoring fields accepted when creating one simple item.",
+		}),
+	space: SpaceItemSchema.omit({
+		asset: true,
+		enable: true,
+		input: true,
+		maxStackSize: true,
+		rules: true,
+		scope: true,
+		type: true,
+		uid: true,
+	})
+		.extend({
+			asset: draftAsset,
+			enable: SpaceItemSchema.shape.enable.removeDefault().optional(),
+			input: SpaceItemSchema.shape.input.removeDefault().optional(),
+			rules: SpaceItemSchema.shape.rules.removeDefault().optional(),
+			scope: draftScope,
+			maxStackSize: draftMaxStackSize,
+		})
+		.strict()
+		.meta({
+			id: "EditorMcpCreateSpaceItemInputSchema",
+			$id: "urn:arkini:schema:mcp:create-space-item-input",
+			title: "Create space item tool input",
+			description: "Authoring fields accepted when creating one space item.",
 		}),
 	producer: ProducerItemSchema.omit({
 		asset: true,

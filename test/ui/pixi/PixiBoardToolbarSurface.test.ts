@@ -21,6 +21,7 @@ const boardState = vi.hoisted(() => ({
 	navigate: vi.fn(() => Promise.resolve()),
 	openItemDetail: vi.fn(),
 	runDrop: vi.fn(),
+	runSpaceActivation: vi.fn(() => Promise.resolve(true)),
 	splitStack: vi.fn(() => Promise.resolve(true)),
 	registerInteraction: vi.fn(),
 	enqueueLine: vi.fn(),
@@ -45,6 +46,9 @@ const tileAtoms = vi.hoisted(() => ({
 	split: {
 		kind: "split",
 	},
+	space: {
+		kind: "space",
+	},
 }));
 
 vi.mock("@effect/atom-react", () => ({
@@ -53,7 +57,11 @@ vi.mock("@effect/atom-react", () => ({
 		boardState.enqueueLine,
 	],
 	useAtomSet: (atom: unknown) =>
-		atom === tileAtoms.split ? boardState.splitStack : boardState.runDrop,
+		atom === tileAtoms.split
+			? boardState.splitStack
+			: atom === tileAtoms.space
+				? boardState.runSpaceActivation
+				: boardState.runDrop,
 }));
 
 vi.mock("~/bridge/game/useGameEngine", () => ({
@@ -77,6 +85,10 @@ vi.mock("~/bridge/tile/runTileDropAtom", () => ({
 
 vi.mock("~/bridge/tile/runTileSplitAtom", () => ({
 	runTileSplitAtom: () => tileAtoms.split,
+}));
+
+vi.mock("~/bridge/space/runSpaceActivationAtom", () => ({
+	runSpaceActivationAtom: () => tileAtoms.space,
 }));
 
 vi.mock("~/ui/game-menu/useGameMenuControl", () => ({
@@ -149,6 +161,7 @@ afterEach(async () => {
 	boardState.navigate.mockClear();
 	boardState.openItemDetail.mockClear();
 	boardState.runDrop.mockClear();
+	boardState.runSpaceActivation.mockClear();
 	boardState.splitStack.mockClear();
 	boardState.registerInteraction.mockClear();
 	boardState.enqueueLine.mockClear();

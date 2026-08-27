@@ -93,13 +93,17 @@ const EditorLineInput = ({
 
 /** Presents every visible material, board, and charge requirement for one production line. */
 export const EditorProductionLineInputs = ({
+	emptyLabel = "No material input required.",
 	input,
 	items,
 	projectId,
+	title = "Inputs",
 }: {
+	readonly emptyLabel?: string;
 	readonly input: readonly EditorInput[];
 	readonly items: EditorItemRegistry;
 	readonly projectId: string;
+	readonly title?: string;
 }) => {
 	const visibleInput = input.filter(
 		(entry) => entry.type !== "simple" || entry.charges !== undefined,
@@ -107,10 +111,10 @@ export const EditorProductionLineInputs = ({
 	return (
 		<section className="min-w-0">
 			<h4 className="border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
-				Inputs
+				{title}
 			</h4>
 			{visibleInput.length === 0 ? (
-				<p className="py-3 text-sm text-muted">No material input required.</p>
+				<p className="py-3 text-sm text-muted">{emptyLabel}</p>
 			) : (
 				<div className="space-y-1 pt-2">
 					{visibleInput.map((entry, index) => (

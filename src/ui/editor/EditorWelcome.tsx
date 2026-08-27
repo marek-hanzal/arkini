@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { EditorArkpackImportButton } from "~/ui/arkpack/editor/EditorArkpackImportButton";
 import { BackButton } from "~/ui/button/BackButton";
 import { Button } from "~/ui/button/Button";
+import { LinkButton } from "~/ui/button/LinkButton";
 import { EditorRecentProjects } from "~/ui/editor/EditorRecentProjects";
 import { EditorProjectDeleteDialog } from "~/ui/editor/EditorProjectDeleteDialog";
 import { useEditorWelcomeActions } from "~/ui/editor/useEditorWelcomeActions";
@@ -45,13 +46,15 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 					>
 						Editor
 					</h1>
-					<Button
+					<LinkButton
 						disabled={actions.blocked}
 						cursorIntent={actions.refreshingProjects ? "progress" : undefined}
+						className="inline-flex items-center gap-1.5"
 						onClick={() => void actions.refreshProjects()}
 					>
-						{actions.refreshingProjects ? "Refreshing…" : "Refresh projects"}
-					</Button>
+						<span className="icon-[lucide--refresh-cw] size-4" />
+						{actions.refreshingProjects ? "Refreshing…" : "Refresh"}
+					</LinkButton>
 				</header>
 
 				<section className="grid gap-3 sm:grid-cols-3">

@@ -146,7 +146,7 @@ describe("EditorWelcome project rows", () => {
 
 		await act(async () => findButton(invalidRow!, "Open folder").click());
 		expect(actions.openProjectFolder).toHaveBeenCalledWith("/projects/broken");
-		await act(async () => findButton(container, "Refresh projects").click());
+		await act(async () => findButton(container, "Refresh").click());
 		expect(actions.refreshProjects).toHaveBeenCalledOnce();
 	});
 });

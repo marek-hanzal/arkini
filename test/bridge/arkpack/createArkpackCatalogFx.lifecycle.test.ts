@@ -33,8 +33,10 @@ describe("createArkpackCatalogFx lifecycle", () => {
 				expect(Cause.squash(first.cause)).toBe(malformed);
 			}
 			expect(yield* SubscriptionRef.get(catalog.state)).toEqual({
-				type: "failed",
-				error: malformed,
+				type: "ready",
+				arkpacks: [
+					builtIn,
+				],
 			});
 
 			expect(yield* catalog.importFileFx({} as File)).toBe(imported);

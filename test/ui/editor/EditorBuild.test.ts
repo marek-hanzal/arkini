@@ -10,6 +10,7 @@ import { createArtifact } from "./EditorBuild.test/fixtures";
 
 const state = vi.hoisted(() => ({
 	buildResult: undefined as unknown,
+	catalogState: undefined as unknown,
 	commandSetters: new Map<string, ReturnType<typeof vi.fn>>(),
 	exportResults: new Map<string, unknown>(),
 	installResults: new Map<string, unknown>(),
@@ -19,7 +20,7 @@ const state = vi.hoisted(() => ({
 
 vi.mock("@effect/atom-react", () => ({
 	useAtomSet: (atom: {
-		readonly kind: "build" | "export" | "install" | "open-export" | "save";
+		readonly kind: "build" | "catalog" | "export" | "install" | "open-export" | "save";
 		readonly key: string;
 	}) => {
 		const key = `${atom.kind}:${atom.key}`;
@@ -30,16 +31,18 @@ vi.mock("@effect/atom-react", () => ({
 		return setter;
 	},
 	useAtomValue: (atom: {
-		readonly kind: "build" | "export" | "install" | "open-export" | "save";
+		readonly kind: "build" | "catalog" | "export" | "install" | "open-export" | "save";
 		readonly key: string;
 	}) =>
 		atom.kind === "build"
 			? state.buildResult
-			: atom.kind === "install"
-				? (state.installResults.get(atom.key) ?? AsyncResult.initial())
-				: atom.kind === "export"
-					? (state.exportResults.get(atom.key) ?? AsyncResult.initial())
-					: AsyncResult.initial(),
+			: atom.kind === "catalog"
+				? state.catalogState
+				: atom.kind === "install"
+					? (state.installResults.get(atom.key) ?? AsyncResult.initial())
+					: atom.kind === "export"
+						? (state.exportResults.get(atom.key) ?? AsyncResult.initial())
+						: AsyncResult.initial(),
 }));
 
 vi.mock("~/bridge/arkpack/editor/buildEditorProjectCommandAtom", () => ({
@@ -47,6 +50,13 @@ vi.mock("~/bridge/arkpack/editor/buildEditorProjectCommandAtom", () => ({
 		kind: "build",
 		key: projectId,
 	}),
+}));
+
+vi.mock("~/bridge/arkpack/ArkpackCatalogAtom", () => ({
+	ArkpackCatalogAtom: {
+		kind: "catalog",
+		key: "canonical",
+	},
 }));
 
 vi.mock("~/bridge/arkpack/editor/installBuiltEditorArkpackCommandAtom", () => ({
@@ -96,6 +106,8 @@ vi.mock("~/ui/button/Button", () => ({
 		createElement("button", props, children),
 	PrimaryButton: ({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) =>
 		createElement("button", props, children),
+	DangerButton: ({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) =>
+		createElement("button", props, children),
 	ButtonLink: ({
 		children,
 		to,
@@ -142,6 +154,10 @@ beforeEach(() => {
 		version: "1.0",
 	};
 	state.buildResult = AsyncResult.initial();
+	state.catalogState = {
+		type: "ready",
+		arkpacks: [],
+	};
 	state.commandSetters.clear();
 	state.exportResults.clear();
 	state.installResults.clear();
@@ -244,9 +260,45 @@ describe("EditorBuild", () => {
 		expect(state.commandSetters.get(`save:${artifact.contentHash}`)).toHaveBeenCalledWith(
 			artifact,
 		);
-		expect(state.commandSetters.get(`install:${artifact.contentHash}`)).toHaveBeenCalledWith(
+		expect(state.commandSetters.get(`install:${artifact.contentHash}`)).toHaveBeenCalledWith({
 			artifact,
+			targetVersion: "1.0",
+		});
+	});
+
+	it("shows a settled install failure inside an open major-update confirmation", async () => {
+		const artifact = createArtifact("a".repeat(64), 0);
+		state.buildResult = AsyncResult.success(artifact);
+		state.catalogState = {
+			type: "ready",
+			arkpacks: [
+				{
+					packageId: artifact.projectId,
+					contentHash: "b".repeat(64),
+					title: "Existing",
+					version: "2.0",
+					arkini: "0.5.0",
+					trust: {
+						type: "external",
+						reason: "unsigned",
+					},
+					source: "user",
+				},
+			],
+		};
+		state.installResults.set(
+			artifact.contentHash,
+			AsyncResult.fail(new Error("Install storage is unavailable.")),
 		);
+		const { container } = await renderBuild();
+
+		await act(async () => {
+			container.querySelector<HTMLElement>('[data-ui="EditorBuildInstall"]')?.click();
+		});
+
+		expect(
+			container.querySelector('[data-ui="EditorBuildMajorUpdateError"]')?.textContent,
+		).toContain("Install storage is unavailable.");
 	});
 
 	it("uses the main-process signing default or an explicit pasted replacement", async () => {

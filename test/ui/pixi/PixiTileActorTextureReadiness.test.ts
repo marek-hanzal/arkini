@@ -123,6 +123,7 @@ const createFrames = () => {
 			closeFx: Effect.void,
 			invalidateFx: Effect.sync(invalidate),
 			reportCriticalFailure,
+			scheduleAfterRenderFx: () => Effect.succeed(() => {}),
 			scheduleFx: () => Effect.succeed(() => {}),
 		},
 		invalidate,

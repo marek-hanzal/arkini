@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { readSpaceActionPresentationPhasesFx } from "~/bridge/space/readSpaceActionPresentationPhasesFx";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { readTileActorFeedbackCuesFx } from "~/bridge/tile/feedback/readTileActorFeedbackCuesFx";
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
@@ -75,12 +76,14 @@ export const createPixiInventorySceneRuntimeFx = Effect.fn("createPixiInventoryS
 		let appearanceObserver: MutationObserver | null = null;
 		let unsubscribeTransitions: (() => void) | null = null;
 		let closed = false;
+		const pendingProjectionResumes = new Set<() => void>();
 		const processedFeedbackKeys = new Set<string>();
 		const ignoreCleanupFailure = (cleanupFx: Effect.Effect<void>) =>
 			cleanupFx.pipe(Effect.catchCause(() => Effect.void));
 		const closeFx = Effect.gen(function* () {
 			if (closed) return;
 			closed = true;
+			for (const resume of Array.from(pendingProjectionResumes)) resume();
 			const releaseTransitions = unsubscribeTransitions;
 			unsubscribeTransitions = null;
 			if (releaseTransitions !== null) {
@@ -217,10 +220,43 @@ export const createPixiInventorySceneRuntimeFx = Effect.fn("createPixiInventoryS
 					reportCriticalFailure(cause);
 				}
 			});
+			const projectSpaceActivationFx = (transition: GameTransition) =>
+				Effect.gen(function* () {
+					if (closed) return;
+					const phases = yield* readSpaceActionPresentationPhasesFx(transition);
+					const accounting = phases[0];
+					if (accounting?.kind !== "accounting") return;
+					if (transition.sequence >= latestTransition.sequence) {
+						reconcile(accounting.transition, true);
+					}
+					yield* Effect.callback<void>((resumeEffect) => {
+						let settled = false;
+						let cancelFrame: () => void = () => undefined;
+						const resume = () => {
+							if (settled) return;
+							settled = true;
+							pendingProjectionResumes.delete(resume);
+							cancelFrame();
+							resumeEffect(Effect.void);
+						};
+						pendingProjectionResumes.add(resume);
+						cancelFrame = RendererRuntime.runSync(
+							application.frames.scheduleAfterRenderFx(resume),
+						);
+						if (closed) resume();
+						return Effect.sync(() => {
+							if (settled) return;
+							settled = true;
+							pendingProjectionResumes.delete(resume);
+							cancelFrame();
+						});
+					});
+				});
 
 			return {
 				canvas: application.app.canvas,
 				cancelInteractionFx: createdDrag.cancelInteractionFx,
+				projectSpaceActivationFx,
 				closeFx,
 			} satisfies PixiInventorySceneRuntime;
 		}).pipe(Effect.onError(() => closeFx));

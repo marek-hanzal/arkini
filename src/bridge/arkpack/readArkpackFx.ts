@@ -92,7 +92,7 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 	if (packageId !== undefined && packageId !== payloadPackageId) {
 		return yield* Effect.fail(
 			new Error(
-				`Arkpack filename declares package ${packageId}, but its config declares ${payloadPackageId}.`,
+				`Arkpack was addressed as package ${packageId}, but its config declares ${payloadPackageId}.`,
 			),
 		);
 	}

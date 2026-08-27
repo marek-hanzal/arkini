@@ -1,11 +1,9 @@
 import { Effect, Option } from "effect";
 
-import { resolveActionChargeFx } from "~/engine/action/fx/resolveActionChargeFx";
 import { resolveActionEnableFx } from "~/engine/action/fx/resolveActionEnableFx";
 import { resolveActionInputFx } from "~/engine/action/fx/resolveActionInputFx";
 import { resolveActionRulesFx } from "~/engine/action/fx/resolveActionRulesFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
 import type { InputChargeRunPlanSchema } from "~/engine/input/schema/run/InputChargeRunPlanSchema";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
@@ -62,27 +60,6 @@ export const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* 
 
 	const reservedCharges = new Map<IdSchema.Type, number>();
 	const charges: InputChargeRunPlanSchema.Type[] = [];
-	if (owner.item.charges !== undefined) {
-		const activationCharge = yield* resolveActionChargeFx({
-			charges: {
-				from: InputChargeFromEnumSchema.enum.Self,
-				cost: 1,
-			},
-			ownerItemId: owner.id,
-			reservedCharges,
-			runtime,
-		});
-		if (!activationCharge.ready || activationCharge.plan === undefined) {
-			return yield* Effect.fail(
-				new SpaceActionUnavailableError({
-					itemId,
-				}),
-			);
-		}
-		charges.push(activationCharge.plan);
-		reservedCharges.set(owner.id, activationCharge.plan.cost);
-	}
-
 	for (const input of owner.item.input) {
 		const resolution = yield* resolveActionInputFx({
 			input,

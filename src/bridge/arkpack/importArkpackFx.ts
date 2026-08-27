@@ -8,6 +8,7 @@ export namespace importArkpackFx {
 	export interface Props {
 		bytes: Uint8Array;
 		filename: string;
+		packageId?: string;
 		storage?: ArkpackStorage;
 	}
 }
@@ -16,6 +17,7 @@ export namespace importArkpackFx {
 export const importArkpackFx = Effect.fn("importArkpackFx")(function* ({
 	bytes,
 	filename,
+	packageId,
 	storage: providedStorage,
 }: importArkpackFx.Props) {
 	const storage = providedStorage ?? (yield* createArkpackStorageFx());
@@ -23,6 +25,7 @@ export const importArkpackFx = Effect.fn("importArkpackFx")(function* ({
 		const loaded = yield* readArkpackFx({
 			bytes,
 			filename,
+			packageId,
 			trust: {
 				type: "external",
 			},

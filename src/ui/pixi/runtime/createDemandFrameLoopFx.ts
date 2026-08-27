@@ -25,6 +25,7 @@ export const createDemandFrameLoopFx = Effect.fn("createDemandFrameLoopFx")(
 			let nextWorkId = 0;
 			let poisoned = false;
 			let queuedFrame: number | null = null;
+			const afterRenderWork = new Map<number, () => void>();
 			const scheduledWork = new Map<number, () => void>();
 
 			const schedule = () => {
@@ -46,6 +47,7 @@ export const createDemandFrameLoopFx = Effect.fn("createDemandFrameLoopFx")(
 					} catch (cause) {
 						poisoned = true;
 						dirty = false;
+						afterRenderWork.clear();
 						scheduledWork.clear();
 						queuedFrame = null;
 						reportCriticalFailure(cause);
@@ -62,11 +64,30 @@ export const createDemandFrameLoopFx = Effect.fn("createDemandFrameLoopFx")(
 					} catch (cause) {
 						poisoned = true;
 						dirty = false;
+						afterRenderWork.clear();
+						scheduledWork.clear();
 						reportCriticalFailure(cause);
 						return;
 					}
 				}
-				if (dirty || scheduledWork.size > 0) schedule();
+				const afterRenderWorkIds = Array.from(afterRenderWork.keys());
+				for (const workId of afterRenderWorkIds) {
+					if (closed || poisoned) return;
+					const run = afterRenderWork.get(workId);
+					if (run === undefined) continue;
+					afterRenderWork.delete(workId);
+					try {
+						run();
+					} catch (cause) {
+						poisoned = true;
+						dirty = false;
+						afterRenderWork.clear();
+						scheduledWork.clear();
+						reportCriticalFailure(cause);
+						return;
+					}
+				}
+				if (dirty || scheduledWork.size > 0 || afterRenderWork.size > 0) schedule();
 			};
 
 			const onVisibilityChange = () => {
@@ -99,10 +120,22 @@ export const createDemandFrameLoopFx = Effect.fn("createDemandFrameLoopFx")(
 							scheduledWork.delete(workId);
 						};
 					}),
+				scheduleAfterRenderFx: (work) =>
+					Effect.sync(() => {
+						if (closed || poisoned) return () => {};
+						const workId = ++nextWorkId;
+						afterRenderWork.set(workId, work);
+						dirty = true;
+						schedule();
+						return () => {
+							afterRenderWork.delete(workId);
+						};
+					}),
 				closeFx: Effect.sync(() => {
 					if (closed) return;
 					closed = true;
 					dirty = false;
+					afterRenderWork.clear();
 					scheduledWork.clear();
 					document.removeEventListener("visibilitychange", onVisibilityChange);
 					if (queuedFrame !== null) {

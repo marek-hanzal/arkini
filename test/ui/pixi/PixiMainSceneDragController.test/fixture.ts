@@ -456,6 +456,7 @@ export const mountController = ({
 						closeFx: Effect.void,
 						invalidateFx: Effect.void,
 						reportCriticalFailure: () => {},
+						scheduleAfterRenderFx: () => Effect.succeed(() => {}),
 						scheduleFx: (work: () => void) =>
 							Effect.sync(() => {
 								scheduledFrameWork = work;

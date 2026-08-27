@@ -4,6 +4,45 @@ import { createArkpackCatalogFx } from "~/bridge/arkpack/createArkpackCatalogFx"
 import { builtIn, imported } from "~test/bridge/arkpack/createArkpackCatalogFx.test/fixture";
 
 describe("createArkpackCatalogFx state", () => {
+	it("rejects a stale package snapshot before mutation without replacing ready truth", async () => {
+		const install = vi.fn(() => Effect.succeed(imported));
+		const catalog = Effect.runSync(
+			createArkpackCatalogFx({
+				listFx: Effect.succeed([
+					builtIn,
+				]),
+				installFx: install,
+			}),
+		);
+		await Effect.runPromise(catalog.refreshFx);
+
+		await expect(
+			Effect.runPromise(
+				catalog.installFx({
+					contentFx: Effect.succeed({
+						bytes: new Uint8Array([
+							1,
+						]),
+					}),
+					expectedCurrent: {
+						packageId: builtIn.packageId,
+						contentHash: "f".repeat(64),
+						version: builtIn.version,
+					},
+					filename: "built.arkpack",
+					packageId: builtIn.packageId,
+				}),
+			),
+		).rejects.toThrow("changed before this action");
+		expect(install).not.toHaveBeenCalled();
+		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
+			type: "ready",
+			arkpacks: [
+				builtIn,
+			],
+		});
+	});
+
 	it("owns one refreshable catalog snapshot shared across import and remove", async () => {
 		let descriptors = [
 			builtIn,
@@ -75,10 +114,14 @@ describe("createArkpackCatalogFx state", () => {
 		await expect(
 			Effect.runPromise(
 				catalog.installFx({
-					bytes: new Uint8Array([
-						1,
-					]),
+					contentFx: Effect.succeed({
+						bytes: new Uint8Array([
+							1,
+						]),
+					}),
+					expectedCurrent: null,
 					filename: "built.arkpack",
+					packageId: imported.packageId,
 				}),
 			),
 		).resolves.toBe(imported);
@@ -87,6 +130,7 @@ describe("createArkpackCatalogFx state", () => {
 				1,
 			]),
 			filename: "built.arkpack",
+			packageId: imported.packageId,
 		});
 		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
 			type: "ready",

@@ -1,5 +1,5 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { match, P } from "ts-pattern";
 
@@ -8,10 +8,15 @@ import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 import { buildEditorProjectCommandAtom } from "~/bridge/arkpack/editor/buildEditorProjectCommandAtom";
 import { installBuiltEditorArkpackCommandAtom } from "~/bridge/arkpack/editor/installBuiltEditorArkpackCommandAtom";
 import {
+	type EditorBuildMajorUpdateConfirmation,
+	readEditorBuildInstallPlanFx,
+} from "~/bridge/arkpack/editor/readEditorBuildInstallPlanFx";
+import {
 	type EditorGameDiagnostic,
 	readEditorBuildDiagnosticsFx,
 } from "~/bridge/arkpack/editor/readEditorBuildDiagnosticsFx";
 import { saveBuiltEditorArkpackCommandAtom } from "~/bridge/arkpack/editor/saveBuiltEditorArkpackCommandAtom";
+import { ArkpackCatalogAtom } from "~/bridge/arkpack/ArkpackCatalogAtom";
 import { readArkpackArtifactNames } from "~/bridge/arkpack/readArkpackArtifactNames";
 import { exportEditorJsonDirectoryCommandAtom } from "~/bridge/editor/exportEditorJsonDirectoryCommandAtom";
 import type { EditorSourceExport } from "~/bridge/editor/exportEditorJsonDirectoryFx";
@@ -51,6 +56,11 @@ export namespace useEditorBuildController {
 		readonly exportSourcePending: boolean;
 		readonly exportSourceSummary?: string;
 		readonly installArtifact: () => void;
+		readonly installAction: "install" | "update";
+		readonly installAvailable: boolean;
+		readonly installConfirmation?: EditorBuildMajorUpdateConfirmation;
+		readonly cancelInstall: () => void;
+		readonly confirmInstall: () => void;
 		readonly installError?: string;
 		readonly installPending: boolean;
 		readonly installedPackageId?: string;
@@ -74,10 +84,23 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 		AsyncResult.isSuccess(buildResult) && !buildResult.waiting ? buildResult.value : undefined;
 	const artifact = builtArtifact?.revision === project.revision ? builtArtifact : undefined;
 	const artifactStale = builtArtifact !== undefined && artifact === undefined;
+	const catalogState = useAtomValue(ArkpackCatalogAtom);
+	const installPlan =
+		artifact !== undefined && catalogState.type === "ready"
+			? RendererRuntime.runSync(
+					readEditorBuildInstallPlanFx({
+						arkpacks: catalogState.arkpacks,
+						artifact,
+						targetVersion: project.version,
+					}),
+				)
+			: undefined;
 	const installAtom = installBuiltEditorArkpackCommandAtom(artifact?.contentHash ?? "unbuilt");
 	const saveAtom = saveBuiltEditorArkpackCommandAtom(artifact?.contentHash ?? "unbuilt");
 	const installResult = useAtomValue(installAtom);
-	const runInstall = useAtomSet(installAtom);
+	const runInstall = useAtomSet(installAtom, {
+		mode: "promise",
+	});
 	const saveResult = useAtomValue(saveAtom);
 	const runSave = useAtomSet(saveAtom);
 	const exportSourceAtom = exportEditorJsonDirectoryCommandAtom(project.projectId);
@@ -179,6 +202,12 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 		AsyncResult.isSuccess(installResult) && !installResult.waiting
 			? installResult.value.packageId
 			: undefined;
+	const [requestedInstallConfirmation, setRequestedInstallConfirmation] =
+		useState<EditorBuildMajorUpdateConfirmation>();
+	const installConfirmation =
+		requestedInstallConfirmation?.targetContentHash === artifact?.contentHash
+			? requestedInstallConfirmation
+			: undefined;
 	const build = useCallback(() => {
 		runBuild({
 			expectedRevision: project.revision,
@@ -193,11 +222,61 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 		artifact,
 		runSave,
 	]);
+	const runArtifactInstall = useCallback(
+		async (confirmation?: EditorBuildMajorUpdateConfirmation) => {
+			if (artifact === undefined) return;
+			try {
+				await runInstall({
+					artifact,
+					...(confirmation === undefined
+						? {}
+						: {
+								confirmation,
+							}),
+					targetVersion: project.version,
+				});
+				if (confirmation !== undefined)
+					setRequestedInstallConfirmation((current) =>
+						current === confirmation ? undefined : current,
+					);
+			} catch {
+				// The settled command error remains visible in the Build output or confirmation.
+			}
+		},
+		[
+			artifact,
+			project.version,
+			runInstall,
+		],
+	);
 	const installArtifact = useCallback(() => {
-		if (artifact !== undefined) runInstall(artifact);
+		if (installResult.waiting || installPlan === undefined) return;
+		if (installPlan.confirmation !== undefined) {
+			setRequestedInstallConfirmation(installPlan.confirmation);
+			return;
+		}
+		void runArtifactInstall();
 	}, [
-		artifact,
-		runInstall,
+		installPlan,
+		installResult.waiting,
+		runArtifactInstall,
+	]);
+	const cancelInstall = useCallback(() => {
+		if (!installResult.waiting && installConfirmation !== undefined)
+			setRequestedInstallConfirmation((current) =>
+				current === installConfirmation ? undefined : current,
+			);
+	}, [
+		installConfirmation,
+		installResult.waiting,
+	]);
+	const confirmInstall = useCallback(() => {
+		if (!installResult.waiting && installConfirmation !== undefined)
+			void runArtifactInstall(installConfirmation);
+	}, [
+		installConfirmation,
+		installResult.waiting,
+		runArtifactInstall,
 	]);
 	const exportSource = useCallback(() => {
 		runSourceExport(undefined);
@@ -221,11 +300,20 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 			buildStatusLabel: buildStatusLabels[buildStatus],
 			buildSummary,
 			diagnostics,
+			cancelInstall,
+			confirmInstall,
 			exportSource,
 			exportSourceError: exportSourceErrorMessage,
 			exportSourcePending: exportSourceResult.waiting,
 			exportSourceSummary,
 			installArtifact,
+			installAction: installPlan?.action ?? "install",
+			installAvailable: installPlan !== undefined,
+			...(installConfirmation === undefined
+				? {}
+				: {
+						installConfirmation,
+					}),
 			installError: installErrorMessage,
 			installPending: installResult.waiting,
 			installedPackageId,
@@ -245,12 +333,16 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 			buildResult.waiting,
 			buildStatus,
 			buildSummary,
+			cancelInstall,
+			confirmInstall,
 			diagnostics,
 			exportSource,
 			exportSourceErrorMessage,
 			exportSourceResult.waiting,
 			exportSourceSummary,
 			installArtifact,
+			installConfirmation,
+			installPlan,
 			installErrorMessage,
 			installResult.waiting,
 			installedPackageId,

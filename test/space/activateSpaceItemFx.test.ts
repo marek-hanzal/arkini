@@ -164,7 +164,7 @@ describe("Space item activation", () => {
 				(item) => item.id === ownerPaid.activated.item.id,
 			),
 		).toMatchObject({
-			remainingCharges: 1,
+			remainingCharges: 2,
 		});
 		expect(
 			ownerPaid.activated.runtime.items.find((item) => item.id === ownerPaid.payer.id),

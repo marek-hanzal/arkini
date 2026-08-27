@@ -62,6 +62,7 @@ export type GameTransition = ReturnType<GameEngine["getTransitionSnapshot"]>;
 
 const sceneState = vi.hoisted(() => ({
 	actors: [] as PixiTileActor[],
+	afterRenderWork: [] as Array<() => void>,
 	close: vi.fn(),
 	createContainer: undefined as (() => FakeContainer) | undefined,
 	deferredTweenDurations: new Set<number>(),
@@ -235,6 +236,14 @@ vi.mock("~/ui/pixi/runtime/createPixiApplicationOwnerFx", async () => {
 					frames: {
 						closeFx: EffectModule.void,
 						invalidateFx: EffectModule.void,
+						scheduleAfterRenderFx: (work: () => void) =>
+							EffectModule.sync(() => {
+								sceneState.afterRenderWork.push(work);
+								return () => {
+									const index = sceneState.afterRenderWork.indexOf(work);
+									if (index >= 0) sceneState.afterRenderWork.splice(index, 1);
+								};
+							}),
 					},
 					addResizeListenerFx: (listener: () => void) =>
 						EffectModule.sync(() => {
@@ -550,6 +559,10 @@ export const flushMicrotasks = async () => {
 	for (let index = 0; index < 5; index += 1) await Promise.resolve();
 };
 
+export const flushAfterRender = () => {
+	for (const work of sceneState.afterRenderWork.splice(0)) work();
+};
+
 export const createGame = ({ subscribeError }: { readonly subscribeError?: Error } = {}) => {
 	return {
 		config: {
@@ -655,6 +668,7 @@ export const publishItems = (items: readonly TileActorItem[], notify = true) => 
 
 beforeEach(() => {
 	sceneState.actors.length = 0;
+	sceneState.afterRenderWork.length = 0;
 	sceneState.close.mockClear();
 	sceneState.deferredTweenDurations.clear();
 	sceneState.drop.mockClear();

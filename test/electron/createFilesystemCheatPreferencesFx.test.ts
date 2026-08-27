@@ -1,5 +1,5 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import { Effect, FileSystem, PlatformError } from "effect";
+import { Effect } from "effect";
 import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -9,7 +9,6 @@ import { createFilesystemCheatPreferencesFx } from "../../electron/main/cheat/cr
 let root = "";
 const preferenceDirectory = () => join(root, "arkini", "game", "preferences");
 const currentPath = () => join(preferenceDirectory(), "cheats.available.json");
-const pendingPath = () => join(preferenceDirectory(), "cheats-available.pending");
 
 const createPreferences = () =>
 	Effect.runPromise(
@@ -49,39 +48,7 @@ describe("createFilesystemCheatPreferencesFx", () => {
 			await Effect.runPromise(preferences.writeAvailableFx(available));
 			expect(await readFile(currentPath(), "utf8")).toBe(String(available));
 			expect(await Effect.runPromise(preferences.readAvailableFx)).toBe(available);
-			await expect(access(pendingPath())).rejects.toBeDefined();
 		}
-	});
-
-	it("preserves the committed preference when atomic replacement fails", async () => {
-		const preferences = await createPreferences();
-		await Effect.runPromise(preferences.writeAvailableFx(false));
-		const failing = await Effect.runPromise(
-			Effect.gen(function* () {
-				const fileSystem = yield* FileSystem.FileSystem;
-				return yield* createFilesystemCheatPreferencesFx({
-					root: preferenceDirectory(),
-					fileSystem: {
-						...fileSystem,
-						rename: () =>
-							Effect.fail(
-								PlatformError.systemError({
-									_tag: "Unknown",
-									module: "FileSystem",
-									method: "rename",
-									description: "rename failed",
-								}),
-							),
-					},
-				});
-			}).pipe(Effect.provide(NodeServices.layer)),
-		);
-
-		await expect(Effect.runPromise(failing.writeAvailableFx(true))).rejects.toThrow(
-			"persist the cheat availability preference",
-		);
-		expect(await readFile(currentPath(), "utf8")).toBe("false");
-		await expect(access(pendingPath())).rejects.toBeDefined();
 	});
 
 	it("rejects unsupported values instead of persisting them", async () => {

@@ -1,17 +1,8 @@
 import { timingSafeEqual } from "node:crypto";
-import {
-	chmodSync,
-	closeSync,
-	fsyncSync,
-	mkdirSync,
-	openSync,
-	readFileSync,
-	renameSync,
-	writeFileSync,
-} from "node:fs";
 import { join } from "node:path";
+import * as NodeServices from "@effect/platform-node/NodeServices";
 import { createId } from "@paralleldrive/cuid2";
-import { Effect } from "effect";
+import { Effect, FileSystem, Semaphore } from "effect";
 import {
 	OAuthClientInformationFullSchema,
 	type AccessToken,
@@ -75,6 +66,8 @@ const StoredRefreshTokenSchema = StoredAccessTokenSchema.meta({
 import { EditorMcpNgrokSettingsSchema } from "../../../contract/editor/EditorMcpConfigurationSchema";
 import { EditorMcpPortSchema } from "../../../contract/editor/EditorMcpPortSchema";
 import type { EditorMcpStorage } from "./EditorMcpStorage";
+import { ElectronMainRuntime } from "../../ElectronMainRuntime";
+import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 
 export const DefaultEditorMcpPort = 32_310;
 const MaxEditorMcpClients = 100;
@@ -223,206 +216,242 @@ const cloneState = (state: State): State => ({
 	refreshTokens: new Map(state.refreshTokens),
 });
 
-const isMissing = (cause: unknown) => isRecord(cause) && cause.code === "ENOENT";
-
 export namespace createFilesystemEditorMcpStorageFx {
 	export interface Props {
 		readonly root: string;
+		readonly fileSystem?: FileSystem.FileSystem;
 		readonly protectFx: (value: string) => Effect.Effect<Uint8Array, unknown>;
 		readonly unprotectFx: (value: Uint8Array) => Effect.Effect<string, unknown>;
 	}
 }
 
-/** Owns the installation-wide MCP configuration and recoverable OAuth state. */
-export const createFilesystemEditorMcpStorageFx = Effect.fn("createFilesystemEditorMcpStorageFx")(
-	function* ({ root, protectFx, unprotectFx }: createFilesystemEditorMcpStorageFx.Props) {
-		const path = join(root, "mcp.json");
-		const pendingPath = join(root, "mcp.pending");
-		const write = (next: State) => {
-			mkdirSync(root, {
-				recursive: true,
-			});
-			const descriptor = openSync(pendingPath, "w", 0o600);
-			try {
-				writeFileSync(descriptor, JSON.stringify(serializeState(next)));
-				fsyncSync(descriptor);
-			} finally {
-				closeSync(descriptor);
-			}
-			chmodSync(pendingPath, 0o600);
-			renameSync(pendingPath, path);
-		};
-		let state: State | undefined;
-		const readState = () => {
-			if (state !== undefined) return state;
-			let stored: string | undefined;
-			try {
-				stored = readFileSync(path, "utf8");
-			} catch (cause) {
-				if (!isMissing(cause)) throw cause;
-			}
-			let loaded: State;
-			try {
-				loaded = stored === undefined ? createState() : parseState(stored);
-			} catch {
-				loaded = createState();
-				stored = undefined;
-			}
-			if (stored === undefined) write(loaded);
-			else chmodSync(path, 0o600);
-			state = loaded;
-			return loaded;
-		};
-		const mutate = (change: (next: State) => void) => {
-			const next = cloneState(readState());
-			change(next);
-			write(next);
-			state = next;
-		};
-		const model: OAuthServerModel = {
-			async getClient(clientId) {
-				return readState().clients.get(clientId);
-			},
-			async registerClient(client: OAuthClientMetadata) {
-				const registered = OAuthClientInformationFullSchema.parse(client);
-				const clients = readState().clients;
-				if (!clients.has(registered.client_id) && clients.size >= MaxEditorMcpClients)
-					throw new Error("Remote MCP client limit reached. Reset auth to clear it.");
-				mutate((next) => next.clients.set(registered.client_id, registered));
-				return registered;
-			},
-			async saveAuthorizationCode(code) {
-				mutate((next) => next.authorizationCodes.set(code.authorizationCode, code));
-			},
-			async consumeAuthorizationCode(token, clientId) {
-				const code = readState().authorizationCodes.get(token);
-				if (code?.clientId !== clientId) return undefined;
-				mutate((next) => next.authorizationCodes.delete(token));
-				return code;
-			},
-			async revokeAuthorizationCode(token) {
-				if (!readState().authorizationCodes.has(token)) return;
-				mutate((next) => next.authorizationCodes.delete(token));
-			},
-			async saveAccessToken(token) {
-				mutate((next) => next.accessTokens.set(token.token, token));
-			},
-			async getAccessToken(token) {
-				return readState().accessTokens.get(token);
-			},
-			async revokeAccessToken(token, clientId) {
-				const accessToken = readState().accessTokens.get(token);
-				if (accessToken?.clientId !== clientId) return undefined;
-				mutate((next) => next.accessTokens.delete(token));
-				return accessToken;
-			},
-			async saveRefreshToken(token) {
-				mutate((next) => next.refreshTokens.set(token.token, token));
-			},
-			async consumeRefreshToken(token, clientId) {
-				const refreshToken = readState().refreshTokens.get(token);
-				if (refreshToken?.clientId !== clientId) return undefined;
-				mutate((next) => next.refreshTokens.delete(token));
-				return refreshToken;
-			},
-			async revokeRefreshToken(token, clientId) {
-				const refreshToken = readState().refreshTokens.get(token);
-				if (refreshToken?.clientId !== clientId) return undefined;
-				mutate((next) => next.refreshTokens.delete(token));
-				return refreshToken;
-			},
-			async revokeGrant(grantId) {
-				const accessTokens = [
-					...readState().accessTokens.values(),
-				].filter((token) => token.grantId === grantId);
-				const refreshTokens = [
-					...readState().refreshTokens.values(),
-				].filter((token) => token.grantId === grantId);
-				if (accessTokens.length === 0 && refreshTokens.length === 0) return;
-				mutate((next) => {
-					for (const token of accessTokens) next.accessTokens.delete(token.token);
-					for (const token of refreshTokens) next.refreshTokens.delete(token.token);
-				});
-			},
-		};
-		return {
-			model,
-			readPortFx: Effect.try({
-				try: () => readState().port,
-				catch: (cause) => cause,
-			}),
-			writePortFx: (port) =>
-				Effect.try({
-					try: () => {
-						const parsed = EditorMcpPortSchema.parse(port);
-						mutate((next) => {
-							next.port = parsed;
-						});
-					},
-					catch: (cause) => cause,
-				}),
-			readNgrokFx: Effect.gen(function* () {
-				const ngrok = readState().ngrok;
-				if (ngrok === undefined) return undefined;
-				const authtoken = yield* unprotectFx(Buffer.from(ngrok.authtoken, "base64"));
-				return yield* Effect.try({
-					try: () =>
-						EditorMcpNgrokSettingsSchema.parse({
-							authtoken,
-							domain: ngrok.domain,
-						}),
-					catch: (cause) => cause,
-				});
-			}).pipe(
-				Effect.catch((cause) =>
-					Effect.sync(() =>
-						console.error("Remote MCP ngrok configuration could not be read.", cause),
-					).pipe(Effect.as(undefined)),
-				),
-			),
-			writeNgrokFx: (configuration) =>
+const createStorageFx = Effect.fn("createFilesystemEditorMcpStorageFx")(function* ({
+	root,
+	fileSystem: providedFileSystem,
+	protectFx,
+	unprotectFx,
+}: createFilesystemEditorMcpStorageFx.Props) {
+	const path = join(root, "mcp.json");
+	const lock = join(root, ".mcp.lock");
+	const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
+	const filesystemWrite = yield* createFilesystemWriteFx().pipe(
+		Effect.provideService(FileSystem.FileSystem, fileSystem),
+	);
+	const operations = yield* Semaphore.make(1);
+	let state: State | undefined;
+	const writeStateFx = (next: State) =>
+		filesystemWrite.writeFileFx({
+			lock,
+			target: path,
+			bytes: new TextEncoder().encode(JSON.stringify(serializeState(next))),
+			mode: 0o600,
+		});
+	const readDiskFx = Effect.gen(function* () {
+		const stored = (yield* fileSystem.exists(path))
+			? yield* fileSystem.readFileString(path)
+			: undefined;
+		let rewrite = stored === undefined;
+		let loaded: State;
+		try {
+			loaded = stored === undefined ? createState() : parseState(stored);
+		} catch {
+			loaded = createState();
+			rewrite = true;
+		}
+		if (rewrite) yield* writeStateFx(loaded);
+		else yield* fileSystem.chmod(path, 0o600);
+		state = loaded;
+		return loaded;
+	});
+	const loadFx = Effect.suspend(() =>
+		state === undefined ? filesystemWrite.withLockFx(lock, readDiskFx) : Effect.succeed(state),
+	);
+	const readStateFx = operations.withPermits(1)(loadFx);
+	const mutateFx = (change: (next: State) => void) =>
+		operations.withPermits(1)(
+			filesystemWrite.withLockFx(
+				lock,
 				Effect.gen(function* () {
-					const parsed = yield* Effect.try({
-						try: () => EditorMcpNgrokSettingsSchema.parse(configuration),
-						catch: (cause) => cause,
-					});
-					const protectedToken = yield* protectFx(parsed.authtoken);
-					yield* Effect.try({
-						try: () =>
-							mutate((next) => {
-								next.ngrok = {
-									authtoken: Buffer.from(protectedToken).toString("base64"),
-									domain: parsed.domain,
-								};
-							}),
-						catch: (cause) => cause,
-					});
+					const next = cloneState(yield* readDiskFx);
+					yield* Effect.sync(() => change(next));
+					yield* writeStateFx(next);
+					state = next;
 				}),
-			ensureSecretFx: Effect.try({
-				try: () => readState().password,
-				catch: (cause) => cause,
+			),
+		);
+	const runPromise = <Value>(effect: Effect.Effect<Value, unknown>) =>
+		ElectronMainRuntime.runPromise(effect);
+	const model: OAuthServerModel = {
+		async getClient(clientId) {
+			return (await runPromise(readStateFx)).clients.get(clientId);
+		},
+		async registerClient(client: OAuthClientMetadata) {
+			const registered = OAuthClientInformationFullSchema.parse(client);
+			await runPromise(
+				mutateFx((next) => {
+					if (
+						!next.clients.has(registered.client_id) &&
+						next.clients.size >= MaxEditorMcpClients
+					)
+						throw new Error("Remote MCP client limit reached. Reset auth to clear it.");
+					next.clients.set(registered.client_id, registered);
+				}),
+			);
+			return registered;
+		},
+		async saveAuthorizationCode(code) {
+			await runPromise(
+				mutateFx((next) => next.authorizationCodes.set(code.authorizationCode, code)),
+			);
+		},
+		async consumeAuthorizationCode(token, clientId) {
+			let consumed: AuthorizationCode | undefined;
+			await runPromise(
+				mutateFx((next) => {
+					const code = next.authorizationCodes.get(token);
+					if (code?.clientId !== clientId) return;
+					consumed = code;
+					next.authorizationCodes.delete(token);
+				}),
+			);
+			return consumed;
+		},
+		async revokeAuthorizationCode(token) {
+			await runPromise(mutateFx((next) => next.authorizationCodes.delete(token)));
+		},
+		async saveAccessToken(token) {
+			await runPromise(mutateFx((next) => next.accessTokens.set(token.token, token)));
+		},
+		async getAccessToken(token) {
+			return (await runPromise(readStateFx)).accessTokens.get(token);
+		},
+		async revokeAccessToken(token, clientId) {
+			let revoked: AccessToken | undefined;
+			await runPromise(
+				mutateFx((next) => {
+					const accessToken = next.accessTokens.get(token);
+					if (accessToken?.clientId !== clientId) return;
+					revoked = accessToken;
+					next.accessTokens.delete(token);
+				}),
+			);
+			return revoked;
+		},
+		async saveRefreshToken(token) {
+			await runPromise(mutateFx((next) => next.refreshTokens.set(token.token, token)));
+		},
+		async consumeRefreshToken(token, clientId) {
+			let consumed: RefreshToken | undefined;
+			await runPromise(
+				mutateFx((next) => {
+					const refreshToken = next.refreshTokens.get(token);
+					if (refreshToken?.clientId !== clientId) return;
+					consumed = refreshToken;
+					next.refreshTokens.delete(token);
+				}),
+			);
+			return consumed;
+		},
+		async revokeRefreshToken(token, clientId) {
+			let revoked: RefreshToken | undefined;
+			await runPromise(
+				mutateFx((next) => {
+					const refreshToken = next.refreshTokens.get(token);
+					if (refreshToken?.clientId !== clientId) return;
+					revoked = refreshToken;
+					next.refreshTokens.delete(token);
+				}),
+			);
+			return revoked;
+		},
+		async revokeGrant(grantId) {
+			await runPromise(
+				mutateFx((next) => {
+					for (const token of next.accessTokens.values())
+						if (token.grantId === grantId) next.accessTokens.delete(token.token);
+					for (const token of next.refreshTokens.values())
+						if (token.grantId === grantId) next.refreshTokens.delete(token.token);
+				}),
+			);
+		},
+	};
+	return {
+		model,
+		readPortFx: readStateFx.pipe(Effect.map((current) => current.port)),
+		writePortFx: (port) =>
+			Effect.gen(function* () {
+				const parsed = yield* Effect.try({
+					try: () => EditorMcpPortSchema.parse(port),
+					catch: (cause) => cause,
+				});
+				yield* mutateFx((next) => {
+					next.port = parsed;
+				});
 			}),
-			verifySecretFx: (candidate) =>
-				Effect.try({
+		readNgrokFx: Effect.gen(function* () {
+			const ngrok = (yield* readStateFx).ngrok;
+			if (ngrok === undefined) return undefined;
+			const authtoken = yield* unprotectFx(Buffer.from(ngrok.authtoken, "base64"));
+			return yield* Effect.try({
+				try: () =>
+					EditorMcpNgrokSettingsSchema.parse({
+						authtoken,
+						domain: ngrok.domain,
+					}),
+				catch: (cause) => cause,
+			});
+		}).pipe(
+			Effect.catch((cause) =>
+				Effect.sync(() =>
+					console.error("Remote MCP ngrok configuration could not be read.", cause),
+				).pipe(Effect.as(undefined)),
+			),
+		),
+		writeNgrokFx: (configuration) =>
+			Effect.gen(function* () {
+				const parsed = yield* Effect.try({
+					try: () => EditorMcpNgrokSettingsSchema.parse(configuration),
+					catch: (cause) => cause,
+				});
+				const protectedToken = yield* protectFx(parsed.authtoken);
+				yield* mutateFx((next) => {
+					next.ngrok = {
+						authtoken: Buffer.from(protectedToken).toString("base64"),
+						domain: parsed.domain,
+					};
+				});
+			}),
+		ensureSecretFx: readStateFx.pipe(Effect.map((current) => current.password)),
+		verifySecretFx: (candidate) =>
+			Effect.gen(function* () {
+				const password = (yield* readStateFx).password;
+				return yield* Effect.try({
 					try: () => {
-						const expected = Buffer.from(readState().password);
+						const expected = Buffer.from(password);
 						const actual = Buffer.from(candidate);
 						return (
 							expected.length === actual.length && timingSafeEqual(expected, actual)
 						);
 					},
 					catch: (cause) => cause,
-				}),
-			resetFx: Effect.try({
-				try: () => {
-					const current = readState();
+				});
+			}),
+		resetFx: operations.withPermits(1)(
+			filesystemWrite.withLockFx(
+				lock,
+				Effect.gen(function* () {
+					const current = yield* readDiskFx;
 					const next = createState(current.port, current.ngrok);
-					write(next);
+					yield* writeStateFx(next);
 					state = next;
 					return next.password;
-				},
-				catch: (cause) => cause,
-			}),
-		} satisfies EditorMcpStorage;
-	},
-);
+				}),
+			),
+		),
+	} satisfies EditorMcpStorage;
+});
+
+/** Owns the installation-wide MCP configuration and recoverable OAuth state. */
+export const createFilesystemEditorMcpStorageFx = (
+	props: createFilesystemEditorMcpStorageFx.Props,
+) => createStorageFx(props).pipe(Effect.provide(NodeServices.layer));

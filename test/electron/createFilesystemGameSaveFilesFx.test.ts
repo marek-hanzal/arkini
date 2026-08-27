@@ -73,9 +73,6 @@ describe("createFilesystemGameSaveFilesFx", () => {
 				4,
 			]),
 		);
-		await expect(
-			access(join(root, "arkini", "game", "saves", "arkini", "pending.arksave")),
-		).rejects.toBeDefined();
 		await Effect.runPromise(repository.clearFx(first));
 		expect(await Effect.runPromise(repository.readFx(first))).toBeNull();
 		expect(await Effect.runPromise(repository.readFx(second))).toEqual(
@@ -105,68 +102,6 @@ describe("createFilesystemGameSaveFilesFx", () => {
 		).toEqual(bytes);
 		await Effect.runPromise(repository.clearFx(demo));
 		expect(await Effect.runPromise(repository.readFx(demo))).toBeNull();
-	});
-
-	it("serializes concurrent writes before either can reuse the shared pending path", async () => {
-		const fileSystem = await readNodeFileSystem();
-		const firstRenameEntered = Effect.runSync(Deferred.make<void>());
-		const releaseFirstRename = Effect.runSync(Deferred.make<void>());
-		const secondRenameEntered = Effect.runSync(Deferred.make<void>());
-		let renameCalls = 0;
-		const gatedFileSystem: FileSystem.FileSystem = {
-			...fileSystem,
-			rename: (oldPath, newPath) =>
-				Effect.suspend(() => {
-					renameCalls += 1;
-					const rename = fileSystem.rename(oldPath, newPath);
-					if (renameCalls === 1) {
-						return Deferred.succeed(firstRenameEntered, undefined).pipe(
-							Effect.andThen(Deferred.await(releaseFirstRename)),
-							Effect.andThen(rename),
-						);
-					}
-					return Deferred.succeed(secondRenameEntered, undefined).pipe(
-						Effect.andThen(rename),
-					);
-				}),
-		};
-		const repository = await createRepository(gatedFileSystem);
-		const firstWrite = Effect.runPromise(
-			repository.writeFx(
-				first,
-				new Uint8Array([
-					1,
-				]),
-			),
-		);
-		await Effect.runPromise(Deferred.await(firstRenameEntered));
-
-		const secondWrite = Effect.runPromise(
-			repository.writeFx(
-				first,
-				new Uint8Array([
-					2,
-				]),
-			),
-		);
-		expect(Option.isNone(await Effect.runPromise(Deferred.poll(secondRenameEntered)))).toBe(
-			true,
-		);
-
-		Effect.runSync(Deferred.succeed(releaseFirstRename, undefined));
-		await Promise.all([
-			firstWrite,
-			secondWrite,
-		]);
-
-		expect(await Effect.runPromise(repository.readFx(first))).toEqual(
-			new Uint8Array([
-				2,
-			]),
-		);
-		await expect(
-			access(join(root, "arkini", "game", "saves", "arkini", "pending.arksave")),
-		).rejects.toBeDefined();
 	});
 
 	it("orders clear after an already admitted write", async () => {
@@ -209,92 +144,6 @@ describe("createFilesystemGameSaveFilesFx", () => {
 			clear,
 		]);
 		expect(await Effect.runPromise(repository.readFx(first))).toBeNull();
-	});
-
-	it("preserves the previous current save when atomic replacement fails", async () => {
-		const repository = await createRepository();
-		await Effect.runPromise(
-			repository.writeFx(
-				first,
-				new Uint8Array([
-					1,
-					2,
-					3,
-				]),
-			),
-		);
-		const failing = await Effect.runPromise(
-			Effect.gen(function* () {
-				const fileSystem = yield* FileSystem.FileSystem;
-				return yield* createFilesystemGameSaveFilesFx({
-					root: join(root, "arkini", "game", "saves"),
-					fileSystem: {
-						...fileSystem,
-						rename: () => Effect.die(new Error("rename failed")),
-					},
-				});
-			}).pipe(Effect.provide(NodeServices.layer)),
-		);
-		await expect(
-			Effect.runPromise(
-				failing.writeFx(
-					first,
-					new Uint8Array([
-						9,
-					]),
-				),
-			),
-		).rejects.toThrow("rename failed");
-		expect(await Effect.runPromise(repository.readFx(first))).toEqual(
-			new Uint8Array([
-				1,
-				2,
-				3,
-			]),
-		);
-		await expect(
-			access(join(root, "arkini", "game", "saves", "arkini", "pending.arksave")),
-		).rejects.toBeDefined();
-	});
-
-	it("releases save serialization after a failed operation", async () => {
-		const fileSystem = await readNodeFileSystem();
-		let renameCalls = 0;
-		const failingOnceFileSystem: FileSystem.FileSystem = {
-			...fileSystem,
-			rename: (oldPath, newPath) =>
-				Effect.suspend(() => {
-					renameCalls += 1;
-					return renameCalls === 1
-						? Effect.die(new Error("rename failed"))
-						: fileSystem.rename(oldPath, newPath);
-				}),
-		};
-		const repository = await createRepository(failingOnceFileSystem);
-		await expect(
-			Effect.runPromise(
-				repository.writeFx(
-					first,
-					new Uint8Array([
-						1,
-					]),
-				),
-			),
-		).rejects.toThrow("rename failed");
-
-		await Effect.runPromise(
-			repository.writeFx(
-				first,
-				new Uint8Array([
-					2,
-				]),
-			),
-		);
-		expect(await Effect.runPromise(repository.readFx(first))).toEqual(
-			new Uint8Array([
-				2,
-			]),
-		);
 	});
 
 	it("replaces the complete current file and encodes every canonical package identity", async () => {

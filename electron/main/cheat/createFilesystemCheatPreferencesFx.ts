@@ -1,10 +1,11 @@
 import { FileSystem } from "effect";
-import { Effect, Semaphore } from "effect";
+import { Effect } from "effect";
 import { join } from "node:path";
 import { CheatAvailabilitySchema } from "../../contract/cheat/CheatAvailabilitySchema";
 import { readElectronPreferenceFx } from "../preference/readElectronPreferenceFx";
 import { writeElectronPreferenceFx } from "../preference/writeElectronPreferenceFx";
 import type { CheatPreferences } from "./CheatPreferences";
+import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 
 export namespace createFilesystemCheatPreferencesFx {
 	export interface Props {
@@ -18,21 +19,20 @@ export const createFilesystemCheatPreferencesFx = Effect.fn("createFilesystemChe
 	function* ({ root, fileSystem: providedFileSystem }: createFilesystemCheatPreferencesFx.Props) {
 		const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
 		const currentPath = join(root, "cheats.available.json");
-		const writeSemaphore = yield* Semaphore.make(1);
+		const filesystemWrite = yield* createFilesystemWriteFx().pipe(
+			Effect.provideService(FileSystem.FileSystem, fileSystem),
+		);
 		const writeAvailableFx: CheatPreferences["writeAvailableFx"] = Effect.fn(
 			"FilesystemCheatPreferences.writeAvailableFx",
 		)((available) =>
-			writeSemaphore.withPermits(1)(
-				writeElectronPreferenceFx({
-					root,
-					fileSystem,
-					pendingPath: join(root, "cheats-available.pending"),
-					currentPath,
-					value: available,
-					operation: "persist the cheat availability preference",
-					serialize: (value) => JSON.stringify(CheatAvailabilitySchema.parse(value)),
-				}),
-			),
+			writeElectronPreferenceFx({
+				filesystemWrite,
+				lock: join(root, ".cheats-available.lock"),
+				target: currentPath,
+				value: available,
+				operation: "persist the cheat availability preference",
+				serialize: (value) => JSON.stringify(CheatAvailabilitySchema.parse(value)),
+			}),
 		);
 		return {
 			readAvailableFx: readElectronPreferenceFx({

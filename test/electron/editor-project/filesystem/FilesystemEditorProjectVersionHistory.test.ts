@@ -10,6 +10,7 @@ import { createEditorProjectFilesystemPathsFx } from "../../../../electron/main/
 import { readFilesystemEditorProjectVersionHistoryFx } from "../../../../electron/main/editor-project/filesystem/fx/readFilesystemEditorProjectVersionHistoryFx";
 
 let root = "";
+const writerMajor = ArkiniAppVersion.slice(0, ArkiniAppVersion.indexOf("."));
 
 beforeEach(async () => {
 	root = await mkdtemp(join(tmpdir(), "arkini-version-history-"));
@@ -23,7 +24,7 @@ afterEach(async () => {
 });
 
 describe("readFilesystemEditorProjectVersionHistoryFx", () => {
-	it("rejects a published version whose parent is absent from the head", async () => {
+	it("admits same-major writer provenance before enforcing the history graph", async () => {
 		const paths = await Effect.runPromise(
 			createEditorProjectFilesystemPathsFx(root).pipe(Effect.provide(NodeServices.layer)),
 		);
@@ -54,7 +55,7 @@ describe("readFilesystemEditorProjectVersionHistoryFx", () => {
 				JSON.stringify({
 					parentVersionId: "missing-parent",
 					subject: "Child",
-					arkini: ArkiniAppVersion,
+					arkini: `${writerMajor}.999.999`,
 					version: "1.0",
 					sourceRevision: 1,
 					contentFingerprint: hash,

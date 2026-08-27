@@ -9,6 +9,7 @@ import type {
 import { EditorVersionDescriptorFileSchema } from "~/editor/filesystem/EditorVersionDescriptorFileSchema";
 import { EditorVersionHeadFileSchema } from "~/editor/filesystem/EditorVersionHeadFileSchema";
 import { EditorVersionManifestSchema } from "~/editor/filesystem/EditorVersionManifestSchema";
+import { admitArkiniVersionFx } from "~/engine/version/ArkiniVersionAdmission";
 import { readFilesystemEditorVersionSnapshotFx } from "./readFilesystemEditorVersionSnapshotFx";
 
 const readJsonFx = <Value>(target: string, parse: (candidate: unknown) => Value, message: string) =>
@@ -116,6 +117,8 @@ export const readFilesystemEditorProjectVersionHistoryFx = Effect.fn(
 				),
 			);
 	}
+	for (const { descriptor } of versions.values())
+		yield* admitArkiniVersionFx("Editor version", descriptor.arkini);
 	return {
 		head,
 		versions,

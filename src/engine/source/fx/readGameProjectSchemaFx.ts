@@ -24,7 +24,8 @@ export const readGameProjectSchemaFx = Effect.fn("readGameProjectSchemaFx")(func
 							severity: DiagnosticSeverityEnumSchema.enum.Error,
 							path: [],
 							source: path,
-							message: "The game project schema does not match this Arkini version.",
+							message:
+								"The game project schema does not match the current project schema.",
 							issueCode: "game-project-schema-mismatch",
 						},
 					] satisfies GameDiagnosticsSchema.Type),

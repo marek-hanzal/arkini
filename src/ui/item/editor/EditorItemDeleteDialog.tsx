@@ -113,9 +113,9 @@ export const EditorItemDeleteDialog = ({
 			<div className="mt-3 grid gap-2 rounded-lg border border-danger/40 bg-danger/10 p-3 text-sm leading-6 text-danger">
 				<p>
 					Deleting an item is a breaking gameplay change: every current Board scenario in
-					this project will be deleted, and published game saves are discarded when the
-					new major version is loaded. Restoring a full saved version is the only way to
-					undo it.
+					this project will be deleted, and existing published game saves cannot load the
+					new major version but remain stored. Restoring a full saved version is the only
+					way to undo it.
 				</p>
 				{force ? (
 					<p>

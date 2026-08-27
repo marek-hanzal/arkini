@@ -573,6 +573,7 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 						const version = yield* readPublishedVersionFx(state, versionId);
 						const descriptor = EditorVersionDescriptorFileSchema.parse({
 							...version.descriptor,
+							arkini: ArkiniAppVersion,
 							...(tag === undefined
 								? {
 										tag: undefined,

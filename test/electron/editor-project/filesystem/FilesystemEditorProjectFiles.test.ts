@@ -164,7 +164,47 @@ describe("filesystem Editor project current tree", () => {
 		});
 		await writeFile(join(harness.root, "schema.json"), "{}\n");
 
-		await expect(harness.read()).rejects.toThrow("does not match this Arkini version");
+		await expect(harness.read()).rejects.toThrow("does not match the current project schema");
+	});
+
+	it("admits only same-major Editor writer provenance without changing project bytes", async () => {
+		const harness = await createFilesystemEditorProjectFilesHarness();
+		openHarnesses.push(harness);
+		await harness.write({
+			arkpack: editorTestPayload.version,
+			marker: {
+				arkini: ArkiniAppVersion,
+				revision: 1,
+			},
+			config: editorTestPayload.config,
+			resources: editorTestPayload.resources,
+		});
+		const markerPath = join(harness.root, "project.json");
+		const major = ArkiniAppVersion.slice(0, ArkiniAppVersion.indexOf("."));
+		await writeFile(
+			markerPath,
+			`${JSON.stringify({
+				arkini: `${major}.999.999`,
+				revision: 1,
+			})}\n`,
+		);
+		await expect(harness.read()).resolves.toMatchObject({
+			marker: {
+				arkini: `${major}.999.999`,
+				revision: 1,
+			},
+		});
+
+		const incompatible = `${JSON.stringify({
+			arkini: `${Number(major) + 1}.0.0`,
+			revision: 1,
+		})}\n`;
+		await writeFile(markerPath, incompatible);
+		await expect(harness.read()).rejects.toMatchObject({
+			_tag: "ArkiniVersionIncompatibleError",
+			artifact: "Editor project",
+		});
+		await expect(readFile(markerPath, "utf8")).resolves.toBe(incompatible);
 	});
 
 	it("rejects a mutable project directory symlink instead of writing through it", async () => {

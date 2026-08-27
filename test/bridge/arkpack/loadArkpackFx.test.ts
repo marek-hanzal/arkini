@@ -5,10 +5,47 @@ import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { loadArkpackFx } from "~/bridge/arkpack/loadArkpackFx";
 import { createTestArkpack } from "~test/bridge/arkpack/support/createTestArkpack";
 import { installTestPngDecoder } from "~test/bridge/arkpack/support/createTestPngBytes";
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+import { ArkiniVersionIncompatibleError } from "~/engine/version/ArkiniVersionAdmission";
 
 beforeEach(installTestPngDecoder);
 
 describe("loadArkpackFx", () => {
+	it("surfaces an installed package's writer-major incompatibility", async () => {
+		const currentMajor = ArkiniAppVersion.slice(0, ArkiniAppVersion.indexOf("."));
+		const bytes = createTestArkpack(
+			undefined,
+			"package:future",
+			"1.0",
+			`${Number(currentMajor) + 1}.0.0`,
+		);
+		const storage: ArkpackStorage = {
+			listFx: Effect.die("Unexpected catalog list."),
+			readFx: () =>
+				Effect.succeed([
+					{
+						packageId: "package:future",
+						filename: "package%3Afuture.arkpack",
+						bytes: bytes.buffer,
+						source: "user",
+						overridesBundled: true,
+					},
+				]),
+			removeFx: () => Effect.void,
+			writeFx: () => Effect.void,
+			openUserDirectoryFx: Effect.void,
+		};
+
+		await expect(
+			Effect.runPromise(
+				loadArkpackFx({
+					packageId: "package:future",
+					storage,
+				}),
+			),
+		).rejects.toBeInstanceOf(ArkiniVersionIncompatibleError);
+	});
+
 	it("loads the exact effective file selected by package identity", async () => {
 		const bytes = createTestArkpack(undefined, "package:selected");
 		const file: ArkpackStorage.File = {

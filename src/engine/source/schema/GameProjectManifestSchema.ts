@@ -1,11 +1,11 @@
 import { z } from "zod";
 
-import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
+import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
 
 /** Root marker required before a directory can be opened as a game project. */
 export const GameProjectManifestSchema = z
 	.object({
-		arkini: z.literal(ArkiniAppVersion),
+		arkini: ArkiniVersionSchema,
 		revision: z.number().int().nonnegative(),
 	})
 	.strict()

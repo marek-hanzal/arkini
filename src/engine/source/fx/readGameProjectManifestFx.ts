@@ -1,6 +1,9 @@
 import { Effect } from "effect";
 
 import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
+import { ArkiniVersionAdmission } from "~/engine/version/ArkiniVersionAdmission";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 import {
 	gameSourceSchemaDiagnostics,
 	readRequiredGameProjectJsonFx,
@@ -16,7 +19,25 @@ export const readGameProjectManifestFx = Effect.fn("readGameProjectManifestFx")(
 		missingMessage: "The required game project manifest could not be read.",
 		validate: (json) => {
 			const parsed = GameProjectManifestSchema.safeParse(json);
-			return parsed.success ? [] : gameSourceSchemaDiagnostics(path, parsed.error);
+			if (!parsed.success) return gameSourceSchemaDiagnostics(path, parsed.error);
+			const incompatibility = ArkiniVersionAdmission.incompatibility(
+				"Editor project",
+				parsed.data.arkini,
+			);
+			return incompatibility === undefined
+				? []
+				: [
+						{
+							code: DiagnosticCodeEnumSchema.enum.SourceSchemaInvalid,
+							severity: DiagnosticSeverityEnumSchema.enum.Error,
+							path: [
+								"arkini",
+							],
+							source: path,
+							message: incompatibility.message,
+							issueCode: "arkini-version-incompatible",
+						},
+					];
 		},
 	});
 });

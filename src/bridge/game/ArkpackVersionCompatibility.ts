@@ -1,12 +1,12 @@
 import { Effect } from "effect";
+import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 
-/** Reads the major/minor gameplay compatibility axis from a validated Arkpack version. */
+/** Reads the sole gameplay admission axis from a validated Arkpack version. */
 export const readArkpackVersionFx = Effect.fn("readArkpackVersionFx")((version: string) =>
 	Effect.sync(() => {
-		const [major = "0", minor = "0"] = version.split(".");
+		const parsed = ArkpackVersionSchema.parse(version);
 		return {
-			major: Number(major),
-			minor: Number(minor),
+			major: parsed.slice(0, parsed.indexOf(".")),
 		};
 	}),
 );

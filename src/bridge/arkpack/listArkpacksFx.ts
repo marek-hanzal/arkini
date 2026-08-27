@@ -24,7 +24,10 @@ export const listArkpacksFx = Effect.fn("listArkpacksFx")(function* (
 	return yield* Effect.forEach(
 		candidates.values(),
 		(files) =>
-			readArkpackCandidatesFx(files).pipe(Effect.map((loaded) => loaded?.descriptor ?? null)),
+			readArkpackCandidatesFx(files).pipe(
+				Effect.map((loaded) => loaded?.descriptor ?? null),
+				Effect.catch(() => Effect.succeed(null)),
+			),
 		{
 			concurrency: 4,
 		},

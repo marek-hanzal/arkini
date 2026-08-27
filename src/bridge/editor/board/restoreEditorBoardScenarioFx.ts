@@ -15,7 +15,7 @@ export type RestoreEditorBoardScenarioResult =
 			readonly type: "restored";
 	  }
 	| {
-			readonly type: "discarded";
+			readonly type: "rejected";
 			readonly reason: string;
 	  };
 
@@ -63,13 +63,6 @@ export const restoreEditorBoardScenarioFx = Effect.fn("restoreEditorBoardScenari
 					),
 				);
 			}
-			if (saveVersion.minor > projectVersion.minor) {
-				return yield* Effect.fail(
-					new Error(
-						`Scenario version ${saved.version} is newer than project version ${project.version}.`,
-					),
-				);
-			}
 			yield* fromStateFx({
 				state: saved.state,
 			}).pipe(Effect.provideService(GameConfigFx, project.config));
@@ -83,13 +76,8 @@ export const restoreEditorBoardScenarioFx = Effect.fn("restoreEditorBoardScenari
 		} satisfies RestoreEditorBoardScenarioResult;
 	}
 	const reason = errorMessage(validated.failure);
-	yield* repository.deleteBoardScenarioFx({
-		projectId: project.projectId,
-		name,
-	});
-	yield* replaceGameFx(project);
 	return {
-		type: "discarded",
+		type: "rejected",
 		reason,
 	} satisfies RestoreEditorBoardScenarioResult;
 });

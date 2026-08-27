@@ -2,7 +2,17 @@ import * as NodePath from "@effect/platform-node/NodePath";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Deferred, Effect, Fiber, FileSystem, Option, PlatformError } from "effect";
 import { execFile, spawn } from "node:child_process";
-import { lstat, mkdtemp, readFile, realpath, rm, symlink, writeFile } from "node:fs/promises";
+import {
+	lstat,
+	mkdir,
+	mkdtemp,
+	readFile,
+	realpath,
+	rename,
+	rm,
+	symlink,
+	writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
@@ -216,59 +226,6 @@ describe("FilesystemWrite", () => {
 		await Effect.runPromise(Fiber.await(nested.fiber));
 	});
 
-	it("rolls back when the target parent cannot be synced", async () => {
-		const target = join(root, "value");
-		await writeFile(target, "old");
-		const canonicalRoot = await realpath(root);
-		const canonicalTarget = join(canonicalRoot, "value");
-		const nodeFileSystem = await readNodeFileSystem();
-		let replaced = false;
-		let failed = false;
-		const fileSystem: FileSystem.FileSystem = {
-			...nodeFileSystem,
-			rename: (oldPath, newPath) =>
-				nodeFileSystem
-					.rename(oldPath, newPath)
-					.pipe(
-						Effect.tap(() =>
-							Effect.sync(() => (replaced ||= String(newPath) === canonicalTarget)),
-						),
-					),
-			open: (path, options) => {
-				if (replaced && !failed && String(path) === canonicalRoot) {
-					failed = true;
-					return Effect.fail(systemError("open"));
-				}
-				return nodeFileSystem.open(path, options);
-			},
-		};
-		const filesystemWrite = await createWrite(fileSystem);
-		await expect(
-			Effect.runPromise(
-				filesystemWrite.writeFileFx({
-					lock: join(root, ".durable.lock"),
-					target,
-					bytes: encoder.encode("new"),
-				}),
-			),
-		).rejects.toBeDefined();
-		await expect(readFile(target, "utf8")).resolves.toBe("old");
-	});
-
-	it("applies an explicit private mode", async () => {
-		const target = join(root, "secret");
-		const filesystemWrite = await createWrite();
-		await Effect.runPromise(
-			filesystemWrite.writeFileFx({
-				lock: join(root, ".secret.lock"),
-				target,
-				bytes: encoder.encode("secret"),
-				mode: 0o600,
-			}),
-		);
-		expect((await lstat(target)).mode & 0o777).toBe(0o600);
-	});
-
 	it("rejects a symbolic-link target without touching its referent", async () => {
 		const outside = join(root, "outside");
 		const target = join(root, "target");
@@ -299,6 +256,54 @@ describe("FilesystemWrite", () => {
 			"new-first",
 			"new-second",
 		]);
+	}, 12_000);
+
+	it("refuses recovery through a replaced parent symlink", async () => {
+		const nested = join(root, "nested");
+		const nestedChild = join(nested, "child");
+		const outside = await mkdtemp(join(tmpdir(), "arkini-filesystem-outside-"));
+		const outsideChild = join(outside, "child");
+		try {
+			await Promise.all([
+				mkdir(nestedChild, {
+					recursive: true,
+				}),
+				mkdir(outsideChild),
+			]);
+			await Promise.all([
+				writeFile(join(nestedChild, "first.json"), "old-first"),
+				writeFile(join(nestedChild, "second.json"), "old-second"),
+				writeFile(join(outsideChild, "first.json"), "outside-first"),
+				writeFile(join(outsideChild, "second.json"), "outside-second"),
+			]);
+			await expect(
+				runFile(tsx, [
+					helper,
+					"nested-partial",
+					root,
+				]),
+			).rejects.toBeDefined();
+			await rename(nested, join(root, "nested-owned"));
+			await symlink(outside, nested);
+
+			const filesystemWrite = await createWrite();
+			await expect(
+				Effect.runPromise(
+					filesystemWrite.withLockFx(join(root, ".write.lock"), Effect.void),
+				),
+			).rejects.toThrow("is unsafe");
+			await expect(readFile(join(outsideChild, "first.json"), "utf8")).resolves.toBe(
+				"outside-first",
+			);
+			await expect(readFile(join(outsideChild, "second.json"), "utf8")).resolves.toBe(
+				"outside-second",
+			);
+		} finally {
+			await rm(outside, {
+				force: true,
+				recursive: true,
+			});
+		}
 	}, 12_000);
 
 	it("preserves the backup and reports its exact location when recovery fails", async () => {

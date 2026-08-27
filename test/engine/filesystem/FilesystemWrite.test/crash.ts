@@ -9,8 +9,9 @@ const [mode, root] = process.argv.slice(2);
 if (mode === undefined || root === undefined) throw new Error("Expected a mode and root.");
 
 const lock = join(root, ".write.lock");
-const first = join(root, "first.json");
-const second = join(root, "second.json");
+const targetRoot = mode === "nested-partial" ? join(root, "nested", "child") : root;
+const first = join(targetRoot, "first.json");
+const second = join(targetRoot, "second.json");
 
 await Effect.runPromise(
 	Effect.gen(function* () {
@@ -38,8 +39,9 @@ await Effect.runPromise(
 			return;
 		}
 		const canonicalRoot = yield* nodeFileSystem.realPath(root);
+		const canonicalTargetRoot = yield* nodeFileSystem.realPath(targetRoot);
 		const canonicalLock = join(canonicalRoot, ".write.lock");
-		const canonicalFirst = join(canonicalRoot, "first.json");
+		const canonicalFirst = join(canonicalTargetRoot, "first.json");
 
 		const fileSystem: FileSystem.FileSystem = {
 			...nodeFileSystem,
@@ -48,7 +50,8 @@ await Effect.runPromise(
 					.rename(oldPath, newPath)
 					.pipe(
 						Effect.tap(() =>
-							mode === "partial" && String(newPath) === canonicalFirst
+							(mode === "partial" || mode === "nested-partial") &&
+							String(newPath) === canonicalFirst
 								? Effect.sync(() => process.kill(process.pid, "SIGKILL"))
 								: Effect.void,
 						),

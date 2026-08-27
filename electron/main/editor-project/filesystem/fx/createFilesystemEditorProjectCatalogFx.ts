@@ -6,6 +6,7 @@ import { EditorProjectCatalogSchema } from "~/editor/filesystem/EditorProjectCat
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
+import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
 
 const encoder = new TextEncoder();
 
@@ -82,7 +83,7 @@ export const createFilesystemEditorProjectCatalogFx = Effect.fn(
 			if (name === ".projects.lock") continue;
 			const root = path.join(managedProjectsRoot, name);
 			if ((yield* fileSystem.stat(root)).type !== "Directory") continue;
-			if ((yield* fileSystem.realPath(root)) !== root) continue;
+			if (!(yield* isFilesystemPathSafeFx(fileSystem, managedProjectsRoot, root))) continue;
 			managed.push(
 				EditorProjectCatalogEntrySchema.parse({
 					root,

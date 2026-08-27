@@ -244,7 +244,6 @@ const createStorageFx = Effect.fn("createFilesystemEditorMcpStorageFx")(function
 			lock,
 			target: path,
 			bytes: new TextEncoder().encode(JSON.stringify(serializeState(next))),
-			mode: 0o600,
 		});
 	const readDiskFx = Effect.gen(function* () {
 		const stored = (yield* fileSystem.exists(path))
@@ -259,7 +258,6 @@ const createStorageFx = Effect.fn("createFilesystemEditorMcpStorageFx")(function
 			rewrite = true;
 		}
 		if (rewrite) yield* writeStateFx(loaded);
-		else yield* fileSystem.chmod(path, 0o600);
 		state = loaded;
 		return loaded;
 	});

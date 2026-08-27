@@ -83,7 +83,7 @@ export const createFilesystemWriteFx = Effect.fn("createFilesystemWriteFx")(func
 				),
 			),
 		);
-	const writeFile: FilesystemWrite["writeFileFx"] = ({ lock, target, bytes, mode }) =>
+	const writeFile: FilesystemWrite["writeFileFx"] = ({ lock, target, bytes }) =>
 		provide(
 			readFilesystemWritePathsFx(lock).pipe(
 				mapInternal("write-file"),
@@ -101,11 +101,6 @@ export const createFilesystemWriteFx = Effect.fn("createFilesystemWriteFx")(func
 									{
 										target,
 										bytes,
-										...(mode === undefined
-											? {}
-											: {
-													mode,
-												}),
 									},
 								],
 							},

@@ -1,7 +1,7 @@
 # Arkini versioning contract
 
 This document defines the product compatibility promise carried by an Arkini
-release version `<major>.<minor>.<patch>`.
+release version `<major>.<minor>.<patch>[-prerelease]`.
 
 ## Compatibility
 
@@ -36,8 +36,9 @@ compatibility guarantee.
 ## Reader admission
 
 Arkini release versions written into persisted data use
-`<major>.<minor>.<patch>`. The complete version is writer provenance, but only
-the major is a reader-compatibility gate:
+`<major>.<minor>.<patch>[-prerelease]`. The optional prerelease suffix is part
+of complete writer provenance, but only the major is a reader-compatibility
+gate:
 
 - a matching major is admitted regardless of minor or patch ordering;
 - a mismatching major is rejected as incompatible;

@@ -16,10 +16,11 @@ import {
 } from "~test/bridge/arkpack/support/createTestPngBytes";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
+import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 
 const validPayload: PayloadSchema.Type = {
 	version: "4.2",
-	arkini: "0.5.0",
+	arkini: ArkiniAppVersion,
 	config: editorTestPayload.config,
 	resources: editorTestPayload.resources.map((resource) => ({
 		...resource,

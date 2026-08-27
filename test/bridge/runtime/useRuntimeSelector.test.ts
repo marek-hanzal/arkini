@@ -15,6 +15,7 @@ import { useGameFx } from "~/engine/game/fx/useGameFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { startFx } from "~/engine/start/write/startFx";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 import {
 	type TestGameTransitionFields,
 	makeTestGameTransitionFieldsFx,
@@ -42,7 +43,7 @@ const makeTestGameFx = Effect.fn("makeRuntimeSelectorTestGameFx")(
 					contentHash: `content:${packageId}`,
 					title: testArkpackConfig.meta.title,
 					version: "1.0",
-					arkini: "0.5.0",
+					arkini: ArkiniAppVersion,
 					trust: {
 						type: "external",
 						reason: "unsigned",

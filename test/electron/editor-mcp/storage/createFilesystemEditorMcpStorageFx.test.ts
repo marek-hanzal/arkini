@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, readFileSync, rmSync, statSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
@@ -81,6 +81,9 @@ describe("createFilesystemEditorMcpStorageFx", () => {
 		const password = await Effect.runPromise(configured.ensureSecretFx);
 		await configured.model.registerClient?.({
 			client_id: "client-one",
+			redirect_uris: [
+				"http://127.0.0.1/callback",
+			],
 		} as never);
 		const accessToken: AccessToken = {
 			token: "access-token",
@@ -136,6 +139,9 @@ describe("createFilesystemEditorMcpStorageFx", () => {
 		const original = await Effect.runPromise(storage.ensureSecretFx);
 		await storage.model.registerClient?.({
 			client_id: "client-one",
+			redirect_uris: [
+				"http://127.0.0.1/callback",
+			],
 		} as never);
 		await storage.model.saveRefreshToken(refreshToken(), {} as never);
 
@@ -152,6 +158,35 @@ describe("createFilesystemEditorMcpStorageFx", () => {
 		expect(
 			await storage.model.consumeRefreshToken?.("refresh-token", "client-one"),
 		).toBeUndefined();
+	});
+
+	it("rejects incomplete persisted OAuth identities instead of indexing undefined keys", async () => {
+		const first = await createStorage();
+		await Effect.runPromise(first.storage.ensureSecretFx);
+		const path = join(first.root, "mcp.json");
+		const stored = JSON.parse(readFileSync(path, "utf8"));
+		stored.accessTokens = [
+			{
+				expiresAt: new Date(Date.now() + 60_000).toISOString(),
+				scopes: [
+					"editor:mcp",
+				],
+				clientId: "client-one",
+			},
+		];
+		writeFileSync(path, JSON.stringify(stored));
+
+		const reopened = await Effect.runPromise(
+			createFilesystemEditorMcpStorageFx({
+				root: first.root,
+				protectFx: (value) => Effect.succeed(encoder.encode(`sealed:${value}`)),
+				unprotectFx: (value) =>
+					Effect.succeed(decoder.decode(value).slice("sealed:".length)),
+			}),
+		);
+
+		expect(await reopened.model.getAccessToken("undefined")).toBeUndefined();
+		expect(JSON.parse(readFileSync(path, "utf8")).accessTokens).toEqual([]);
 	});
 
 	it("consumes authorization codes and refresh tokens once without cross-client invalidation", async () => {

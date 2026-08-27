@@ -38,6 +38,8 @@ project build output: game/arkini/build/arkini.arkpack
 
 Run `game schema` after changing authoring schemas. Run `game validate` after changing config or resources. Packing performs validation again and must refuse invalid content.
 
+The repository `version` command updates `package.json`, `package-lock.json`, and the official project's exact `project.json.arkini` writer identity together before any release build.
+
 ## 3. Source fragments
 
 Each JSON file may provide any subset of the completed root:

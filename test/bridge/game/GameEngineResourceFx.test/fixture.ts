@@ -3,6 +3,7 @@ import { Effect, Exit, Fiber, ManagedRuntime, Scope } from "effect";
 import { afterEach } from "vitest";
 
 import type { Game } from "~/bridge/game/Game";
+import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 
 import { GameEngineResourceLayer } from "~/bridge/game/GameEngineResourceLayer";
 
@@ -38,7 +39,7 @@ export const makeResource = ({
 				contentHash: `content:${packageId}`,
 				title: testArkpackConfig.meta.title,
 				version: "1.0",
-				arkini: "0.5.0",
+				arkini: ArkiniAppVersion,
 				trust: {
 					type: "external",
 					reason: "unsigned",

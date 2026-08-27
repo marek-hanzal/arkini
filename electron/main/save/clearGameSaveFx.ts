@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { join } from "node:path";
 import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ElectronMainError } from "../ElectronMainError";
-import { assertGameSaveKeyFx } from "./assertGameSaveKeyFx";
+import { readGameSaveDirectoryNameFx } from "./readGameSaveDirectoryNameFx";
 
 export namespace clearGameSaveFx {
 	export interface Props {
@@ -17,8 +17,7 @@ export namespace clearGameSaveFx {
 export const clearGameSaveFx = Effect.fn("clearGameSaveFx")(
 	({ root, fileSystem, key }: clearGameSaveFx.Props) =>
 		Effect.gen(function* () {
-			const valid = yield* assertGameSaveKeyFx(key);
-			yield* fileSystem.remove(join(root, valid.packageId), {
+			yield* fileSystem.remove(join(root, yield* readGameSaveDirectoryNameFx(key)), {
 				recursive: true,
 				force: true,
 			});

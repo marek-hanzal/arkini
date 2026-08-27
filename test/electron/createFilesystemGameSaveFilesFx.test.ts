@@ -6,6 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createFilesystemGameSaveFilesFx } from "../../electron/main/save/createFilesystemGameSaveFilesFx";
+import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
 
 let root = "";
 const first = {
@@ -296,7 +297,7 @@ describe("createFilesystemGameSaveFilesFx", () => {
 		);
 	});
 
-	it("replaces the complete current file and rejects unsafe keys", async () => {
+	it("replaces the complete current file and encodes every canonical package identity", async () => {
 		const repository = await createRepository();
 		await Effect.runPromise(
 			repository.writeFx(
@@ -323,15 +324,33 @@ describe("createFilesystemGameSaveFilesFx", () => {
 				9,
 			]),
 		);
+		const encoded = {
+			packageId: "studio:game/one",
+		};
+		await Effect.runPromise(
+			repository.writeFx(
+				encoded,
+				new Uint8Array([
+					5,
+				]),
+			),
+		);
+		expect(await Effect.runPromise(repository.readFx(encoded))).toEqual(
+			new Uint8Array([
+				5,
+			]),
+		);
 		await expect(
-			Effect.runPromise(
-				repository.writeFx(
-					{
-						packageId: "../escape",
-					},
-					new Uint8Array(),
+			access(
+				join(
+					root,
+					"arkini",
+					"game",
+					"saves",
+					encodeGameProjectFileStem(encoded.packageId),
+					"current.arksave",
 				),
 			),
-		).rejects.toThrow("Invalid Arkini save identity");
+		).resolves.toBeUndefined();
 	});
 });

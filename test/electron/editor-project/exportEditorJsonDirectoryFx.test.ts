@@ -1,4 +1,5 @@
 import type { BrowserWindow } from "electron";
+import * as NodeServices from "@effect/platform-node/NodeServices";
 import { access, mkdir, mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -6,7 +7,10 @@ import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { exportEditorJsonDirectoryFx } from "../../../electron/main/editor-project/exportEditorJsonDirectoryFx";
+import { writeFilesystemEditorProjectFilesFx } from "../../../electron/main/editor-project/filesystem/fx/writeFilesystemEditorProjectFilesFx";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
+import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import { createEditorProjectIpcRepository } from "./ipc/support/createEditorProjectIpcRepository";
 
 const electron = vi.hoisted(() => {
@@ -37,6 +41,22 @@ vi.mock("electron", () => ({
 
 const window = {} as BrowserWindow;
 const temporaryRoots: Array<string> = [];
+
+const writeValidProject = (root: string, revision = 1) =>
+	Effect.runPromise(
+		writeFilesystemEditorProjectFilesFx({
+			root,
+			next: {
+				arkpack: editorTestPayload.version,
+				marker: GameProjectManifestSchema.parse({
+					arkini: ArkiniAppVersion,
+					revision,
+				}),
+				config: editorTestPayload.config,
+				resources: editorTestPayload.resources,
+			},
+		}).pipe(Effect.provide(NodeServices.layer)),
+	);
 
 beforeEach(async () => {
 	electron.showMessageBox.mockReset();
@@ -72,14 +92,9 @@ describe("exportEditorJsonDirectoryFx", () => {
 		temporaryRoots.push(root);
 		const source = join(root, "source");
 		const target = join(root, "target");
+		await writeValidProject(source);
 		await Promise.all([
-			mkdir(join(source, "items", "simple"), {
-				recursive: true,
-			}),
 			mkdir(join(source, "notes"), {
-				recursive: true,
-			}),
-			mkdir(join(source, "objects"), {
 				recursive: true,
 			}),
 			mkdir(join(source, "build"), {
@@ -89,22 +104,8 @@ describe("exportEditorJsonDirectoryFx", () => {
 		]);
 		await Promise.all([
 			writeFile(
-				join(source, "project.json"),
-				JSON.stringify({
-					arkini: ArkiniAppVersion,
-					updatedAtMs: 1,
-				}),
-			),
-			writeFile(join(source, "game.json"), '{"meta":{}}'),
-			writeFile(join(source, "items", "simple", "item.json"), '{"items":{}}'),
-			writeFile(join(source, "notes", "note.json"), '{"content":"kept"}'),
-			writeFile(
-				join(source, "objects", "asset.png"),
-				new Uint8Array([
-					1,
-					2,
-					3,
-				]),
+				join(source, "notes", "note.json"),
+				'{"content":"kept","createdAtMs":1,"updatedAtMs":1}',
 			),
 			writeFile(join(source, "game.json.tmp"), "transient"),
 			writeFile(join(source, "build", "derived.json"), "{}"),
@@ -139,25 +140,55 @@ describe("exportEditorJsonDirectoryFx", () => {
 				}),
 			),
 		).resolves.toMatchObject({
-			json: 4,
-			resources: 1,
+			json: 5,
+			resources: 2,
 			revision: 1,
 			root: await realpath(target),
 		});
 		await expect(readFile(join(target, "notes", "note.json"), "utf8")).resolves.toBe(
-			'{"content":"kept"}',
-		);
-		await expect(readFile(join(target, "objects", "asset.png"))).resolves.toEqual(
-			Buffer.from([
-				1,
-				2,
-				3,
-			]),
+			'{"content":"kept","createdAtMs":1,"updatedAtMs":1}',
 		);
 		await expect(access(join(target, "stale.txt"))).rejects.toThrow();
 		await expect(access(join(target, "editor.lock"))).rejects.toThrow();
 		await expect(access(join(target, "game.json.tmp"))).rejects.toThrow();
 		await expect(access(join(target, "build"))).rejects.toThrow();
+		await expect(access(join(target, ".arkini-export-transaction"))).rejects.toThrow();
+	});
+
+	it("preserves the previous export when staging the replacement fails", async () => {
+		const root = await mkdtemp(join(tmpdir(), "arkini-editor-export-failure-"));
+		temporaryRoots.push(root);
+		const source = join(root, "source");
+		const target = join(root, "target");
+		await writeValidProject(source);
+		await mkdir(target);
+		await Promise.all([
+			writeFile(join(source, "game.json"), '{"meta":{}}'),
+			writeFile(join(target, "sentinel.txt"), "keep"),
+		]);
+		const repository = createEditorProjectIpcRepository();
+		vi.mocked(repository.readProjectRootFx).mockReturnValue(Effect.succeed(source));
+		electron.showOpenDialog.mockResolvedValue({
+			canceled: false,
+			filePaths: [
+				target,
+			],
+		});
+		electron.showMessageBox.mockResolvedValue({
+			checkboxChecked: false,
+			response: 1,
+		});
+
+		await expect(
+			Effect.runPromise(
+				exportEditorJsonDirectoryFx({
+					projectId: "project-one",
+					repository,
+					window,
+				}),
+			),
+		).rejects.toBeDefined();
+		await expect(readFile(join(target, "sentinel.txt"), "utf8")).resolves.toBe("keep");
 	});
 
 	it("leaves the selected folder untouched when replacement is canceled", async () => {

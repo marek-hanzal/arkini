@@ -7,6 +7,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { routeTree } from "~/_route";
+import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
 import type { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
 import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { Game } from "~/bridge/game/Game";
@@ -41,7 +42,7 @@ const createGame = ({
 		contentHash: "content-critical",
 		title: testArkpackConfig.meta.title,
 		version: "1.0",
-		arkini: "0.5.0",
+		arkini: ArkiniAppVersion,
 		trust: {
 			type: "external",
 			reason: "unsigned",

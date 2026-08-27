@@ -8,6 +8,7 @@ import { createElectronEditorProjectRepositoryFx } from "~/bridge/editor/createE
 import { blockEditorProjectWrites } from "~/bridge/editor/EditorProjectWriteAdmission";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 
 const success = <Value>(value: Value): EditorProjectTransport.Result<Value> => ({
 	type: "success",
@@ -40,7 +41,7 @@ const project: EditorProjectTransport.Project = {
 };
 
 const version: EditorProjectTransport.VersionDescriptor = {
-	arkini: "0.5.0",
+	arkini: ArkiniAppVersion,
 	arkpackVersion: "1.0",
 	createdAtMs: 12,
 	projectId: "project-one",

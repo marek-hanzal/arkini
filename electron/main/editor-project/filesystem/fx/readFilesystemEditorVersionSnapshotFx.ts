@@ -1,4 +1,4 @@
-import { FileSystem } from "effect";
+import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
 import type { EditorProjectFilesystemPaths } from "../EditorProjectFilesystemPaths";
@@ -21,6 +21,7 @@ const decoder = new TextDecoder("utf-8", {
 export namespace readFilesystemEditorVersionSnapshotFx {
 	export interface Props {
 		readonly manifest: EditorVersionManifestSchema.Type;
+		readonly objectCache?: Map<string, Uint8Array>;
 		readonly paths: EditorProjectFilesystemPaths;
 	}
 
@@ -36,8 +37,14 @@ export namespace readFilesystemEditorVersionSnapshotFx {
 /** Verifies and materializes every object referenced by one full version manifest. */
 export const readFilesystemEditorVersionSnapshotFx = Effect.fn(
 	"readFilesystemEditorVersionSnapshotFx",
-)(function* ({ manifest: candidateManifest, paths }: readFilesystemEditorVersionSnapshotFx.Props) {
+)(function* ({
+	manifest: candidateManifest,
+	objectCache,
+	paths,
+}: readFilesystemEditorVersionSnapshotFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
+	const path = yield* Path.Path;
+	const canonicalRoot = yield* fileSystem.realPath(paths.root);
 	const manifest = yield* Effect.try({
 		try: () => EditorVersionManifestSchema.parse(candidateManifest),
 		catch: (cause) =>
@@ -50,16 +57,25 @@ export const readFilesystemEditorVersionSnapshotFx = Effect.fn(
 		hash: string,
 		type: "json" | "png",
 	) {
+		const cacheKey = `${type}:${hash}`;
+		const cached = objectCache?.get(cacheKey);
+		if (cached !== undefined) return cached;
 		const target =
 			type === "json"
 				? yield* paths.jsonObjectFileFx(hash)
 				: yield* paths.pngObjectFileFx(hash);
+		const expected = path.join(canonicalRoot, path.relative(paths.root, target));
+		if ((yield* fileSystem.realPath(target)) !== expected)
+			return yield* Effect.fail(
+				new Error(`Editor version object ${hash} must not be a symbolic link.`),
+			);
 		const bytes = yield* fileSystem.readFile(target);
 		const actual = hashFilesystemEditorVersionBytes(bytes);
 		if (actual !== hash)
 			return yield* Effect.fail(
 				new Error(`Editor version object ${hash} failed its content hash check.`),
 			);
+		objectCache?.set(cacheKey, bytes);
 		return bytes;
 	});
 	const readJsonObjectFx = Effect.fn("readFilesystemEditorVersionJsonObjectFx")(function* (

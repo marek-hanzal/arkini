@@ -8,6 +8,7 @@ import type { Game } from "~/bridge/game/Game";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import { testGameRead } from "~test/support/game/testGameRead";
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 
 const createGame = ({
 	packageId = "package:acquire",
@@ -21,7 +22,7 @@ const createGame = ({
 		contentHash: "content:acquire",
 		title: testArkpackConfig.meta.title,
 		version: "1.0",
-		arkini: "0.5.0",
+		arkini: ArkiniAppVersion,
 		trust: {
 			type: "external",
 			reason: "unsigned",

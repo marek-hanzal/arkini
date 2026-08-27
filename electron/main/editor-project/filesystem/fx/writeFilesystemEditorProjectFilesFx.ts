@@ -135,13 +135,6 @@ const createSnapshotFx = Effect.fn("writeFilesystemEditorProjectFilesFx.createSn
 		for (const resource of [
 			...resources,
 		].sort((left, right) => left.id.localeCompare(right.id))) {
-			if (resource.mime !== "image/png") {
-				return yield* Effect.fail(
-					new Error(
-						`Resource ${resource.id} uses ${resource.mime}; Editor projects support image/png resources only.`,
-					),
-				);
-			}
 			const target = yield* shellResources.has(resource.id)
 				? paths.resourceFileFx(resource.id)
 				: paths.assetFileFx(resource.id);

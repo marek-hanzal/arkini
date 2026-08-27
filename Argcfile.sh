@@ -143,7 +143,42 @@ game:schema() {
 # @cmd Set the repository package version without creating a Git tag
 # @arg version! Version to write
 version() {
-	npm version --no-git-tag-version "$argc_version"
+	local version_backup
+	version_backup=$(mktemp -d)
+	cp -p package.json "$version_backup/package.json"
+	cp -p package-lock.json "$version_backup/package-lock.json"
+	cp -p game/arkini/project.json "$version_backup/project.json"
+	if ! npm version --no-git-tag-version "$argc_version"; then
+		cp -p "$version_backup/package.json" package.json
+		cp -p "$version_backup/package-lock.json" package-lock.json
+		cp -p "$version_backup/project.json" game/arkini/project.json
+		rm -f game/arkini/project.json.version.pending
+		rm -R "$version_backup"
+		return 1
+	fi
+	if ! node --input-type=module -e '
+		import { readFile, rename, writeFile } from "node:fs/promises";
+		const packageManifest = JSON.parse(await readFile("package.json", "utf8"));
+		const packageLock = JSON.parse(await readFile("package-lock.json", "utf8"));
+		if (
+			packageLock.version !== packageManifest.version ||
+			packageLock.packages?.[""]?.version !== packageManifest.version
+		) throw new Error("package-lock.json does not match package.json after versioning.");
+		const path = "game/arkini/project.json";
+		const pending = `${path}.version.pending`;
+		const project = JSON.parse(await readFile(path, "utf8"));
+		project.arkini = packageManifest.version;
+		await writeFile(pending, `${JSON.stringify(project, undefined, "\t")}\n`);
+		await rename(pending, path);
+	'; then
+		cp -p "$version_backup/package.json" package.json
+		cp -p "$version_backup/package-lock.json" package-lock.json
+		cp -p "$version_backup/project.json" game/arkini/project.json
+		rm -f game/arkini/project.json.version.pending
+		rm -R "$version_backup"
+		return 1
+	fi
+	rm -R "$version_backup"
 }
 
 # @cmd Start the Electron application in development mode

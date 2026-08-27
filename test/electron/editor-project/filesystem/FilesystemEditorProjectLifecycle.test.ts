@@ -1,4 +1,4 @@
-import { access, mkdir, readFile, realpath, symlink, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, realpath, rm, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -49,6 +49,7 @@ describe("filesystem Editor project lifecycle", () => {
 
 	it("opens an external folder in place and unregisters it without deleting its files", async () => {
 		const root = await harness.createExternalProject();
+		await rm(join(root, ".gitignore"));
 		const repository = await harness.openRepository();
 		const opened = await Effect.runPromise(
 			repository.openProjectFx({
@@ -58,6 +59,7 @@ describe("filesystem Editor project lifecycle", () => {
 		expect(await Effect.runPromise(repository.readProjectRootFx(opened.projectId))).toBe(
 			await realpath(root),
 		);
+		await expect(access(join(root, ".gitignore"))).rejects.toBeDefined();
 
 		await Effect.runPromise(repository.deleteProjectFx(opened.projectId));
 		await expect(access(join(root, "project.json"))).resolves.toBeUndefined();

@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
@@ -71,16 +71,33 @@ describe("filesystem MCP storage limits", () => {
 
 	it("bounds public OAuth client registration", async () => {
 		const { root } = createRoot();
+		mkdirSync(root, {
+			recursive: true,
+		});
+		writeFileSync(
+			join(root, "mcp.json"),
+			JSON.stringify({
+				port: 32_310,
+				password: "arkini_mcp_fixture",
+				clients: Array.from(
+					{
+						length: 100,
+					},
+					(_, index) => ({
+						client_id: `client-${index}`,
+						redirect_uris: [
+							`https://client-${index}.example.com/callback`,
+						],
+					}),
+				),
+				authorizationCodes: [],
+				accessTokens: [],
+				refreshTokens: [],
+			}),
+		);
 		const storage = await createStorage(root);
 		const register = storage.model.registerClient;
 		if (register === undefined) throw new Error("Expected dynamic client registration.");
-		for (let index = 0; index < 100; index += 1)
-			await register({
-				client_id: `client-${index}`,
-				redirect_uris: [
-					`https://client-${index}.example.com/callback`,
-				],
-			} as never);
 
 		await expect(
 			register({

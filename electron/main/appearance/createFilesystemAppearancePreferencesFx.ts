@@ -1,11 +1,12 @@
 import { FileSystem } from "effect";
-import { Effect, Semaphore } from "effect";
+import { Effect } from "effect";
 import { join } from "node:path";
 import { AppearanceAccentSchema } from "../../contract/appearance/AppearanceAccentSchema";
 import { AppearanceThemeSchema } from "../../contract/appearance/AppearanceThemeSchema";
 import { readElectronPreferenceFx } from "../preference/readElectronPreferenceFx";
 import { writeElectronPreferenceFx } from "../preference/writeElectronPreferenceFx";
 import type { AppearancePreferences } from "./AppearancePreferences";
+import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 
 export namespace createFilesystemAppearancePreferencesFx {
 	export interface Props {
@@ -22,39 +23,34 @@ export const createFilesystemAppearancePreferencesFx = Effect.fn(
 	fileSystem: providedFileSystem,
 }: createFilesystemAppearancePreferencesFx.Props) {
 	const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
-	const themeWriteSemaphore = yield* Semaphore.make(1);
-	const accentWriteSemaphore = yield* Semaphore.make(1);
+	const filesystemWrite = yield* createFilesystemWriteFx().pipe(
+		Effect.provideService(FileSystem.FileSystem, fileSystem),
+	);
 	const themePath = join(root, "appearance.theme.json");
 	const accentPath = join(root, "appearance.accent.json");
 	const writeThemeFx: AppearancePreferences["writeThemeFx"] = Effect.fn(
 		"FilesystemAppearancePreferences.writeThemeFx",
 	)((theme) =>
-		themeWriteSemaphore.withPermits(1)(
-			writeElectronPreferenceFx({
-				root,
-				fileSystem,
-				pendingPath: join(root, "appearance.pending"),
-				currentPath: themePath,
-				value: theme,
-				operation: "persist the appearance preference",
-				serialize: (value) => JSON.stringify(AppearanceThemeSchema.parse(value)),
-			}),
-		),
+		writeElectronPreferenceFx({
+			filesystemWrite,
+			lock: join(root, ".appearance-theme.lock"),
+			target: themePath,
+			value: theme,
+			operation: "persist the appearance preference",
+			serialize: (value) => JSON.stringify(AppearanceThemeSchema.parse(value)),
+		}),
 	);
 	const writeAccentFx: AppearancePreferences["writeAccentFx"] = Effect.fn(
 		"FilesystemAppearancePreferences.writeAccentFx",
 	)((accent) =>
-		accentWriteSemaphore.withPermits(1)(
-			writeElectronPreferenceFx({
-				root,
-				fileSystem,
-				pendingPath: join(root, "appearance-accent.pending"),
-				currentPath: accentPath,
-				value: accent,
-				operation: "persist the appearance accent preference",
-				serialize: (value) => JSON.stringify(AppearanceAccentSchema.parse(value)),
-			}),
-		),
+		writeElectronPreferenceFx({
+			filesystemWrite,
+			lock: join(root, ".appearance-accent.lock"),
+			target: accentPath,
+			value: accent,
+			operation: "persist the appearance accent preference",
+			serialize: (value) => JSON.stringify(AppearanceAccentSchema.parse(value)),
+		}),
 	);
 	return {
 		readThemeFx: readElectronPreferenceFx({

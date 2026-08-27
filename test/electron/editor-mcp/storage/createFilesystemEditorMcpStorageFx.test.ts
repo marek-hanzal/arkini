@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
@@ -67,6 +67,43 @@ const refreshToken = (): RefreshToken => ({
 });
 
 describe("createFilesystemEditorMcpStorageFx", () => {
+	it("retains concurrent OAuth updates from distinct storage instances", async () => {
+		const first = await createStorage();
+		await Effect.runPromise(first.storage.ensureSecretFx);
+		const second = await Effect.runPromise(
+			createFilesystemEditorMcpStorageFx({
+				root: first.root,
+				protectFx: (value) => Effect.succeed(encoder.encode(`sealed:${value}`)),
+				unprotectFx: (value) =>
+					Effect.succeed(decoder.decode(value).slice("sealed:".length)),
+			}),
+		);
+		await Promise.all([
+			first.storage.model.registerClient?.({
+				client_id: "client-left",
+				redirect_uris: [
+					"http://127.0.0.1/left",
+				],
+			} as never),
+			second.model.registerClient?.({
+				client_id: "client-right",
+				redirect_uris: [
+					"http://127.0.0.1/right",
+				],
+			} as never),
+		]);
+
+		const stored = JSON.parse(readFileSync(join(first.root, "mcp.json"), "utf8")) as {
+			readonly clients: ReadonlyArray<{
+				readonly client_id: string;
+			}>;
+		};
+		expect(stored.clients.map(({ client_id }) => client_id).sort()).toEqual([
+			"client-left",
+			"client-right",
+		]);
+	});
+
 	it("persists all MCP state in one protected file", async () => {
 		const first = await createStorage();
 		const configured = first.storage;
@@ -124,7 +161,6 @@ describe("createFilesystemEditorMcpStorageFx", () => {
 			},
 		});
 		expect(statSync(path).mode & 0o777).toBe(0o600);
-		expect(existsSync(join(first.root, "mcp.pending"))).toBe(false);
 	});
 
 	it("resets OAuth state and password while preserving transport configuration", async () => {

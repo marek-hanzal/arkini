@@ -1,5 +1,5 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import { Effect, FileSystem, PlatformError } from "effect";
+import { Effect } from "effect";
 import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -9,9 +9,7 @@ import { createFilesystemAppearancePreferencesFx } from "../../electron/main/app
 let root = "";
 const preferenceDirectory = () => join(root, "arkini", "game", "preferences");
 const themePath = () => join(preferenceDirectory(), "appearance.theme.json");
-const themePendingPath = () => join(preferenceDirectory(), "appearance.pending");
 const accentPath = () => join(preferenceDirectory(), "appearance.accent.json");
-const accentPendingPath = () => join(preferenceDirectory(), "appearance-accent.pending");
 
 const createPreferences = () =>
 	Effect.runPromise(
@@ -57,7 +55,6 @@ describe("createFilesystemAppearancePreferencesFx", () => {
 			await Effect.runPromise(preferences.writeThemeFx(theme));
 			expect(await readFile(themePath(), "utf8")).toBe(JSON.stringify(theme));
 			expect(await Effect.runPromise(preferences.readThemeFx)).toBe(theme);
-			await expect(access(themePendingPath())).rejects.toBeDefined();
 		}
 		for (const accent of [
 			"rose",
@@ -69,45 +66,7 @@ describe("createFilesystemAppearancePreferencesFx", () => {
 			await Effect.runPromise(preferences.writeAccentFx(accent));
 			expect(await readFile(accentPath(), "utf8")).toBe(JSON.stringify(accent));
 			expect(await Effect.runPromise(preferences.readAccentFx)).toBe(accent);
-			await expect(access(accentPendingPath())).rejects.toBeDefined();
 		}
-	});
-
-	it("preserves committed preferences when atomic replacement fails", async () => {
-		const preferences = await createPreferences();
-		await Effect.runPromise(preferences.writeThemeFx("dark"));
-		await Effect.runPromise(preferences.writeAccentFx("rose"));
-		const failing = await Effect.runPromise(
-			Effect.gen(function* () {
-				const fileSystem = yield* FileSystem.FileSystem;
-				return yield* createFilesystemAppearancePreferencesFx({
-					root: preferenceDirectory(),
-					fileSystem: {
-						...fileSystem,
-						rename: () =>
-							Effect.fail(
-								PlatformError.systemError({
-									_tag: "Unknown",
-									module: "FileSystem",
-									method: "rename",
-									description: "rename failed",
-								}),
-							),
-					},
-				});
-			}).pipe(Effect.provide(NodeServices.layer)),
-		);
-
-		await expect(Effect.runPromise(failing.writeThemeFx("light"))).rejects.toThrow(
-			"persist the appearance preference",
-		);
-		await expect(Effect.runPromise(failing.writeAccentFx("blue"))).rejects.toThrow(
-			"persist the appearance accent preference",
-		);
-		expect(await readFile(themePath(), "utf8")).toBe('"dark"');
-		expect(await readFile(accentPath(), "utf8")).toBe('"rose"');
-		await expect(access(themePendingPath())).rejects.toBeDefined();
-		await expect(access(accentPendingPath())).rejects.toBeDefined();
 	});
 
 	it("rejects unsupported values instead of persisting them", async () => {

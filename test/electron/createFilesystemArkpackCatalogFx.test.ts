@@ -215,7 +215,7 @@ describe("createFilesystemArkpackCatalogFx", () => {
 			},
 			rename: (oldPath, newPath) => {
 				const renameFx = nodeFileSystem.rename(oldPath, newPath);
-				if (!oldPath.includes(".transaction/pending.")) return renameFx;
+				if (newPath !== output) return renameFx;
 				renameEntered.resolve();
 				return Effect.promise(() => releaseRename.promise).pipe(Effect.andThen(renameFx));
 			},
@@ -264,7 +264,7 @@ describe("createFilesystemArkpackCatalogFx", () => {
 			},
 			rename: (oldPath, newPath) => {
 				const renameFx = nodeFileSystem.rename(oldPath, newPath);
-				if (!oldPath.endsWith("/pending.arkpack")) return renameFx;
+				if (newPath !== output) return renameFx;
 				publicationEntered.resolve();
 				return Effect.promise(() => releasePublication.promise).pipe(
 					Effect.andThen(renameFx),

@@ -1,7 +1,5 @@
 import { Effect, FileSystem, Path } from "effect";
 
-import { FilesystemWriteError } from "../FilesystemWriteError";
-
 export interface FilesystemWritePaths {
 	readonly lock: string;
 	readonly parent: string;
@@ -9,7 +7,7 @@ export interface FilesystemWritePaths {
 	readonly cleanup: string;
 }
 
-/** Canonicalizes one explicit lock and rejects a symbolic-link lock boundary. */
+/** Canonicalizes one explicit lock below its real parent directory. */
 export const readFilesystemWritePathsFx = Effect.fn("readFilesystemWritePathsFx")(function* (
 	requestedLock: string,
 ) {
@@ -21,16 +19,6 @@ export const readFilesystemWritePathsFx = Effect.fn("readFilesystemWritePathsFx"
 	});
 	const parent = yield* fileSystem.realPath(requestedParent);
 	const lock = path.join(parent, path.basename(requestedLock));
-	if (yield* fileSystem.exists(lock)) {
-		const info = yield* fileSystem.stat(lock);
-		if (info.type !== "File" || (yield* fileSystem.realPath(lock)) !== lock)
-			return yield* Effect.fail(
-				new FilesystemWriteError({
-					operation: "lock",
-					message: `Filesystem write lock ${lock} must be a canonical file.`,
-				}),
-			);
-	}
 	return {
 		lock,
 		parent,

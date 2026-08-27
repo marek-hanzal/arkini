@@ -28,8 +28,15 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 });
 
 vi.mock("~/ui/button/Button", () => ({
-	Button: ({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) =>
-		createElement("button", props, children),
+	Button: ({ children, type = "button", ...props }: ButtonHTMLAttributes<HTMLButtonElement>) =>
+		createElement(
+			"button",
+			{
+				...props,
+				type,
+			},
+			children,
+		),
 	ButtonLink: ({ children }: { readonly children?: ReactNode }) =>
 		createElement("a", null, children),
 	PrimaryButton: ({ children }: { readonly children?: ReactNode }) =>
@@ -39,6 +46,13 @@ vi.mock("~/ui/button/Button", () => ({
 const state = vi.hoisted(() => ({
 	project: undefined as unknown,
 }));
+
+interface TestStartGridCell {
+	readonly itemId: string;
+	readonly quantity: number;
+	readonly x: number;
+	readonly y: number;
+}
 
 vi.mock("~/bridge/editor/useEditorProject", () => ({
 	useEditorProject: () => state.project,
@@ -64,10 +78,40 @@ vi.mock("~/ui/item/editor/EditorItemAutocompleteField", () => ({
 		createElement("span", null, label),
 }));
 
+vi.mock("~/ui/project/editor/EditorProjectStartGrid", () => ({
+	EditorProjectStartGrid: ({
+		cells,
+		onCellsChange,
+	}: {
+		readonly cells: ReadonlyArray<TestStartGridCell>;
+		readonly onCellsChange: (cells: ReadonlyArray<TestStartGridCell>) => void;
+	}) =>
+		createElement(
+			"button",
+			{
+				"data-cells": cells
+					.map(({ itemId, quantity, x, y }) => `${itemId}:${quantity}:${x}:${y}`)
+					.join("|"),
+				"data-ui": "EditorProjectStartGrid",
+				onClick: () =>
+					onCellsChange(
+						cells.map((cell) => ({
+							...cell,
+							quantity: cell.quantity + 1,
+						})),
+					),
+				type: "button",
+			},
+			"Edit selected space",
+		),
+}));
+
 import type { EditorProject } from "~/bridge/editor/EditorProject";
+import { EditorProjectBoardSection } from "~/ui/project/editor/EditorProjectBoardSection";
 import { EditorProjectForm } from "~/ui/project/editor/EditorProjectForm";
 import { EditorProjectGeneralSection } from "~/ui/project/editor/EditorProjectGeneralSection";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { boardSpaceProject } from "~test/ui/editor/EditorProjectSectionSession.test/BoardSpaceProject";
 
 (
 	globalThis as {
@@ -139,5 +183,74 @@ describe("project section form session", () => {
 		expect(container.querySelector<HTMLInputElement>('input[name="title"]')?.value).toBe(
 			"Changed project",
 		);
+	});
+
+	it("edits initial Board cells in an explicitly selected zero-based space", async () => {
+		state.project = boardSpaceProject;
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+
+		await act(async () => {
+			root.render(
+				<EditorProjectForm>
+					<EditorProjectBoardSection />
+				</EditorProjectForm>,
+			);
+		});
+
+		const spaceInput = container.querySelector<HTMLInputElement>(
+			'input[type="number"][min="0"]',
+		);
+		const switchButton = Array.from(container.querySelectorAll("button")).find(
+			(button) => button.textContent === "Switch",
+		);
+		const readGridCells = () =>
+			container.querySelector<HTMLElement>('[data-ui="EditorProjectStartGrid"]')?.dataset
+				.cells;
+		if (spaceInput === null || switchButton === undefined)
+			throw new Error("Missing initial Board space selector.");
+
+		expect(spaceInput.value).toBe("0");
+		expect(readGridCells()).toBe("water:1:0:0");
+		await changeInput(spaceInput, "-1");
+		expect(switchButton.disabled).toBe(true);
+		await changeInput(spaceInput, "1");
+		expect(readGridCells()).toBe("water:1:0:0");
+		await act(async () => switchButton.click());
+		expect(readGridCells()).toBe("water:2:1:1");
+
+		const gridButton = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorProjectStartGrid"]',
+		);
+		if (gridButton === null) throw new Error("Missing test grid action.");
+		await act(async () => gridButton.click());
+		expect(readGridCells()).toBe("water:3:1:1");
+		await changeInput(spaceInput, "0");
+		await act(async () => switchButton.click());
+		expect(readGridCells()).toBe("water:1:0:0");
+		await changeInput(spaceInput, "1");
+		await act(async () => switchButton.click());
+		expect(readGridCells()).toBe("water:3:1:1");
+
+		await act(async () => {
+			root.render(
+				<EditorProjectForm>
+					<EditorProjectGeneralSection />
+				</EditorProjectForm>,
+			);
+		});
+		await act(async () => {
+			root.render(
+				<EditorProjectForm>
+					<EditorProjectBoardSection />
+				</EditorProjectForm>,
+			);
+		});
+		expect(
+			container.querySelector<HTMLInputElement>('input[type="number"][min="0"]')?.value,
+		).toBe("0");
+		expect(readGridCells()).toBe("water:1:0:0");
 	});
 });

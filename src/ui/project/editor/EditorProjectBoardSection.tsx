@@ -1,6 +1,9 @@
 import { useStore } from "@tanstack/react-form";
+import { useState } from "react";
 
+import { Button } from "~/ui/button/Button";
 import { EditorFormSection } from "~/ui/form/EditorFormSection";
+import { editorInputClassName } from "~/ui/form/EditorInputClassName";
 import { EditorProjectStartGrid } from "~/ui/project/editor/EditorProjectStartGrid";
 import { useEditorProjectFormSession } from "~/ui/project/editor/EditorProjectFormContext";
 
@@ -10,8 +13,13 @@ export const EditorProjectBoardSection = () => {
 	const height = useStore(form.store, (state) => state.values.board.height);
 	const currentSpace = useStore(form.store, (state) => state.values.start.currentSpace);
 	const startBoard = useStore(form.store, (state) => state.values.start.board);
+	const [selectedSpace, setSelectedSpace] = useState(currentSpace);
+	const [spaceInput, setSpaceInput] = useState(String(currentSpace));
+	const requestedSpace = Number(spaceInput);
+	const canSwitchSpace =
+		spaceInput !== "" && Number.isInteger(requestedSpace) && requestedSpace >= 0;
 	const cells = startBoard
-		.filter((entry) => entry.space === currentSpace)
+		.filter((entry) => entry.space === selectedSpace)
 		.map((entry) => ({
 			itemId: entry.itemId,
 			quantity: entry.quantity,
@@ -44,18 +52,37 @@ export const EditorProjectBoardSection = () => {
 				</div>
 			</EditorFormSection>
 			<EditorFormSection
-				description={`Starting stacks placed in board space ${currentSpace + 1}. Other spaces are preserved unchanged.`}
+				description={`Starting stacks placed in board space ${selectedSpace}. Other spaces are preserved unchanged.`}
 				title="Initial board"
 			>
+				<div className="flex flex-wrap items-end gap-3">
+					<label className="grid gap-1.5 text-sm">
+						<span className="font-semibold text-foreground">Space</span>
+						<input
+							type="number"
+							value={spaceInput}
+							className={`${editorInputClassName} w-28`}
+							min={0}
+							step={1}
+							onChange={(event) => setSpaceInput(event.currentTarget.value)}
+						/>
+					</label>
+					<Button
+						disabled={!canSwitchSpace}
+						onClick={() => setSelectedSpace(requestedSpace)}
+					>
+						Switch
+					</Button>
+				</div>
 				<EditorProjectStartGrid
 					cells={cells}
 					height={height}
 					onCellsChange={(nextCells) =>
 						form.setFieldValue("start.board", [
-							...startBoard.filter((entry) => entry.space !== currentSpace),
+							...startBoard.filter((entry) => entry.space !== selectedSpace),
 							...nextCells.map((cell) => ({
 								...cell,
-								space: currentSpace,
+								space: selectedSpace,
 							})),
 						])
 					}

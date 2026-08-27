@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/** Editor-owned gameplay compatibility version in `<major>.<minor>` form. */
+/** Project-owned gameplay compatibility version in `<major>.<minor>` form. */
 export const ArkpackVersionSchema = z
 	.string()
 	.regex(/^(0|[1-9]\d*)\.(0|[1-9]\d*)$/, "Expected an arkpack version like 1.0.")

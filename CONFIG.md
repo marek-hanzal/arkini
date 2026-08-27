@@ -72,7 +72,7 @@ The completed game config contains:
 meta        Game ID, title, Board size, Inventory size, optional Toolbar size.
 resources   Explicit non-item resource roles used by the shell.
 start       Initial Board coordinates, Inventory quantities, Toolbar slots, and current Board space.
-version     Configuration schema version.
+version     Project-owned gameplay and save compatibility version in `<major>.<minor>` form.
 items       Canonical item records keyed by stable ID.
 $schema     Optional authoring-tool reference.
 ```

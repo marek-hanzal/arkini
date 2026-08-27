@@ -94,11 +94,17 @@ export const renderArkpackSelector = async ({
 		path: "/action/load-game/$packageId",
 		component: () => createElement("p", null, "Load destination"),
 	});
+	const editorRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/editor/$projectId/editor/items/list",
+		component: () => createElement("p", null, "Editor destination"),
+	});
 	const router = createRouter({
 		routeTree: rootRoute.addChildren([
 			selectorRoute,
 			mainMenuRoute,
 			loadRoute,
+			editorRoute,
 		]),
 		history: createMemoryHistory({
 			initialEntries: [

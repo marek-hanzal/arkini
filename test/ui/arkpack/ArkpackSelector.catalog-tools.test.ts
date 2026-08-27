@@ -10,6 +10,18 @@ import {
 	renderArkpackSelector,
 } from "~test/ui/arkpack/ArkpackSelector.test/fixture";
 
+const openEditorArkpack = vi.hoisted(() => vi.fn());
+
+vi.mock("~/bridge/arkpack/editor/openEditorArkpackAtom", async () => {
+	const { Effect } = await import("effect");
+	const Atom = await import("effect/unstable/reactivity/Atom");
+	return {
+		openEditorArkpackAtom: Atom.fn((packageId: string) =>
+			Effect.sync(() => openEditorArkpack(packageId)),
+		),
+	};
+});
+
 afterEach(async () => {
 	await cleanupArkpackSelectorTests();
 	vi.restoreAllMocks();
@@ -110,5 +122,23 @@ describe("ArkpackSelector catalog tools", () => {
 		});
 		expect(refreshButton.disabled).toBe(false);
 		expect(folderButton.disabled).toBe(false);
+	});
+
+	it("opens the exact catalog package in Editor", async () => {
+		openEditorArkpack.mockReturnValue({
+			projectId: "arkini",
+		});
+		const { container, router } = await renderArkpackSelector({
+			catalog: createCatalog(),
+		});
+
+		await act(async () => {
+			buttonByText(container, "Editor").click();
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		expect(openEditorArkpack).toHaveBeenCalledWith("arkini");
+		expect(router.state.location.pathname).toBe("/editor/arkini/editor/items/list");
 	});
 });

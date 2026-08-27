@@ -70,6 +70,8 @@ export const ArkpackSelector = () => {
 					<p className="mt-3 text-sm text-accent">Validating package…</p>
 				) : actions.busyAction === "remove" ? (
 					<p className="mt-3 text-sm text-accent">Removing package…</p>
+				) : actions.busyAction === "editor" ? (
+					<p className="mt-3 text-sm text-accent">Opening Editor…</p>
 				) : actions.busyAction === "refresh" ? (
 					<p className="mt-3 text-sm text-accent">Refreshing packages…</p>
 				) : actions.busyAction === "open-directory" ? (
@@ -84,6 +86,7 @@ export const ArkpackSelector = () => {
 				<ArkpackCatalogList
 					blocked={blocked}
 					state={actions.state}
+					onOpenEditor={actions.openArkpackInEditor}
 					onRemove={actions.removeArkpack}
 				/>
 			</section>

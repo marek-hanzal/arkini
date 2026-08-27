@@ -1,12 +1,13 @@
 import { match } from "ts-pattern";
 
 import type { useArkpacks } from "~/bridge/arkpack/useArkpacks";
-import { DangerButton, PrimaryButtonLink } from "~/ui/button/Button";
+import { Button, DangerButton, PrimaryButtonLink } from "~/ui/button/Button";
 
 export namespace ArkpackCatalogList {
 	export interface Props {
 		readonly blocked?: boolean;
 		readonly state: useArkpacks.State;
+		readonly onOpenEditor: (packageId: string) => void;
 		readonly onRemove: (packageId: string) => void;
 	}
 }
@@ -15,6 +16,7 @@ export namespace ArkpackCatalogList {
 export const ArkpackCatalogList = ({
 	blocked = false,
 	state,
+	onOpenEditor,
 	onRemove,
 }: ArkpackCatalogList.Props) =>
 	match(state)
@@ -86,9 +88,19 @@ export const ArkpackCatalogList = ({
 										disabled={blocked}
 										onClick={() => onRemove(arkpack.packageId)}
 									>
+										<span className="icon-[lucide--trash-2] mr-1.5 size-4" />
 										{arkpack.overridesBundled ? "Remove override" : "Remove"}
 									</DangerButton>
 								) : null}
+								<Button
+									className="min-h-0 gap-1.5 px-3 py-2 text-xs shadow-none"
+									cursorIntent={blocked ? "progress" : undefined}
+									disabled={blocked}
+									onClick={() => onOpenEditor(arkpack.packageId)}
+								>
+									<span className="icon-[lucide--square-pen] size-4" />
+									Editor
+								</Button>
 								<PrimaryButtonLink
 									to="/action/load-game/$packageId"
 									preload={false}
@@ -96,9 +108,10 @@ export const ArkpackCatalogList = ({
 										packageId: arkpack.packageId,
 									}}
 									aria-disabled={blocked}
-									className="min-h-0 px-4 py-2 text-sm shadow-none"
+									className="min-h-0 gap-1.5 px-3 py-2 text-xs shadow-none"
 									cursorIntent={blocked ? "progress" : undefined}
 								>
+									<span className="icon-[lucide--play] size-4" />
 									Play
 								</PrimaryButtonLink>
 							</div>

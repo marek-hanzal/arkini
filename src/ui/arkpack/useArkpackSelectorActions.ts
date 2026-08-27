@@ -2,6 +2,7 @@ import { useAtomSet } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { openEditorArkpackAtom } from "~/bridge/arkpack/editor/openEditorArkpackAtom";
 import { importArkpackFileAtom } from "~/bridge/arkpack/importArkpackFileAtom";
 import { openUserArkpackDirectoryAtom } from "~/bridge/arkpack/openUserArkpackDirectoryAtom";
 import { refreshArkpackCatalogAtom } from "~/bridge/arkpack/refreshArkpackCatalogAtom";
@@ -9,7 +10,7 @@ import { removeArkpackAtom } from "~/bridge/arkpack/removeArkpackAtom";
 import { useArkpacks } from "~/bridge/arkpack/useArkpacks";
 import { useExclusiveAction } from "~/ui/action/useExclusiveAction";
 
-type BusyAction = "import" | "open-directory" | "refresh" | "remove";
+type BusyAction = "editor" | "import" | "open-directory" | "refresh" | "remove";
 type ActiveAction = BusyAction | "exit";
 
 /** Owns selector actions, exit navigation, mounted guards, and Escape lifecycle. */
@@ -20,6 +21,9 @@ export const useArkpackSelectorActions = () => {
 	// Promise-mode command results are atom-wide, so the selector claims one exclusive action
 	// before invoking a setter and never overlaps awaited catalog or storage calls.
 	const importFile = useAtomSet(importArkpackFileAtom, {
+		mode: "promise",
+	});
+	const openEditor = useAtomSet(openEditorArkpackAtom, {
 		mode: "promise",
 	});
 	const remove = useAtomSet(removeArkpackAtom, {
@@ -152,6 +156,24 @@ export const useArkpackSelectorActions = () => {
 		],
 	);
 
+	const openArkpackInEditor = useCallback(
+		(packageId: string) =>
+			runBusyAction("editor", async () => {
+				const project = await openEditor(packageId);
+				await navigate({
+					to: "/editor/$projectId/editor/items/list",
+					params: {
+						projectId: project.projectId,
+					},
+				});
+			}),
+		[
+			navigate,
+			openEditor,
+			runBusyAction,
+		],
+	);
+
 	return {
 		state,
 		inputRef,
@@ -161,6 +183,7 @@ export const useArkpackSelectorActions = () => {
 		actionError,
 		upload,
 		removeArkpack,
+		openArkpackInEditor,
 		refreshArkpacks,
 		openArkpackDirectory,
 		requestMainMenu,

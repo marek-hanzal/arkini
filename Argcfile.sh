@@ -265,16 +265,4 @@ check() {
 	test
 }
 
-# @cmd Run the complete GitHub macOS packaging gate
-ci-macos() {
-	format_check
-	typecheck
-	clean_desktop
-	build
-	package_macos_artifacts
-	dependency_check
-	copy_paste_check
-	test
-}
-
 eval "$(argc --argc-eval "$0" "$@")"

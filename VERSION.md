@@ -85,5 +85,12 @@ gameplay versions may provide more specific runtime provenance, but they cannot
 weaken it: a minor Arkini release must not ship a gameplay or format change that
 breaks data from the preceding supported release.
 
+## Release commits
+
+`main` is the only long-lived branch and always represents the current
+development snapshot. A release version tag identifies the exact `main` commit
+released under that version. If a release is bad, fix it on `main` and publish a
+new release; do not move the existing tag or downgrade user data.
+
 [DATA_CONTRACTS.md](DATA_CONTRACTS.md) inventories the current external file
 shapes and field ownership. It does not override this release policy.

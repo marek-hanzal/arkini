@@ -227,7 +227,7 @@ mac-arm64/Arkini.app
 
 Verify downloads with `shasum -a 256 -c SHA256SUMS`. These development artifacts are intentionally unsigned and unnotarized. macOS may require opening the application through Finder's **Open** action or allowing it from **System Settings → Privacy & Security**. Do not add ad-hoc signing, fake certificates, or notarization placeholders to this milestone.
 
-The [macOS prerelease workflow](.github/workflows/macos-prerelease.yml) installs the repository tools through `mise-action` and invokes the same `./Argcfile.sh ci-macos` entrypoint on the GitHub-hosted `macos-15` Apple Silicon runner. That recipe runs formatting and type gates, packages exactly once, then runs Dependency Cruiser, copy/paste detection, and the isolated parallel test suite. Manual dispatch uploads an External workflow artifact only. Tags matching `v*-dev.*`, such as `v0.1.0-dev.1`, use GitHub OIDC to keyless-sign the exact bundled Arkpack and create an immutable GitHub prerelease containing the DMG, ZIP, standalone Arkpack, its Sigstore bundle, and `SHA256SUMS`. Normal source pushes do not spend macOS runner time.
+The [macOS prerelease workflow](.github/workflows/macos-prerelease.yml) installs the repository tools through `mise-action` and invokes the same `./Argcfile.sh package-macos` entrypoint on the GitHub-hosted `macos-15` Apple Silicon runner. It packages exactly once and does not run repository validation; validation belongs to the working-branch workflow. Manual dispatch uploads an External workflow artifact only. Tags matching `v*-dev.*`, such as `v0.1.0-dev.1`, use GitHub OIDC to keyless-sign the exact bundled Arkpack and create an immutable GitHub prerelease containing the DMG, ZIP, standalone Arkpack, its Sigstore bundle, and `SHA256SUMS`. Normal source pushes do not spend macOS runner time.
 
 Useful focused commands:
 
@@ -240,6 +240,8 @@ argc test test/job
 ```
 
 `argc test` is the canonical full-suite command and uses isolated worker threads capped at half of the available CPUs. Additional arguments filter Vitest by file or directory for fast local feedback. `llm:cache` builds and verifies a network-free Linux x64 npm cache, then archives it as `arkini-npm-cache-linux-x64-<lock-hash>.tgz`.
+
+The [repository checks workflow](.github/workflows/repository-checks.yml) runs the complete `argc check` on Linux, macOS, and Windows for pushes to every working branch except `main`. `main` deliberately has no hosted check trigger, so an urgent fix can bypass a broken gate; version tags on its concrete commits feed only the separate release delivery path. Platform-specific packaging remains a separate delivery gate.
 
 
 ## Local packages and saves

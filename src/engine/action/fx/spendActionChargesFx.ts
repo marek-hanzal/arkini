@@ -1,32 +1,32 @@
 import { Effect, Option } from "effect";
 
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { releaseOwnerInputsFx } from "~/engine/input/fx/releaseOwnerInputsFx";
 import { ItemChargesUnavailableError } from "~/engine/item/error/ItemChargesUnavailableError";
-import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
-import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
+import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
+import { isolateGridStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateGridStatefulOwnerTransitionFx";
 import { readItemRemainingChargesFx } from "~/engine/item/fx/readItemRemainingChargesFx";
-import type { JobSchema } from "~/engine/job/schema/JobSchema";
-import { makeChargeSpendRandomFx } from "~/engine/job/random/makeChargeSpendRandomFx";
 import { outputFx } from "~/engine/output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import type { OutputPlacementResultSchema } from "~/engine/placement/schema/OutputPlacementResultSchema";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
+import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { makeActionChargeSpendRandomFx } from "../random/makeActionChargeSpendRandomFx";
 
-export namespace spendItemChargesFx {
+export namespace spendActionChargesFx {
 	export interface Props {
+		actionId: IdSchema.Type;
 		cost: PositiveIntegerSchema.Type;
 		itemId: IdSchema.Type;
-		job: JobSchema.Type;
+		ownerItemId: IdSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
 
@@ -36,21 +36,22 @@ export namespace spendItemChargesFx {
 	}
 }
 
-/** Pays one exact charge cost and returns the semantic facts of any split or depletion. */
-export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
+/** Pays one resolved action charge and applies split, depletion, output, and events. */
+export const spendActionChargesFx = Effect.fn("spendActionChargesFx")(function* ({
+	actionId,
 	cost,
 	itemId,
-	job,
+	ownerItemId,
 	runtime,
-}: spendItemChargesFx.Props) {
+}: spendActionChargesFx.Props) {
 	const runtimeItem = yield* readRuntimeItemByIdFx({
 		itemId,
 		runtime,
 	});
-	const item = Option.getOrUndefined(yield* isBoardRuntimeItemFx(runtimeItem));
+	const item = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeItem));
 	if (item === undefined) {
 		return yield* Effect.fail(
-			new ItemNotOnBoardError({
+			new ItemNotOnGridError({
 				itemId: runtimeItem.id,
 				location: runtimeItem.location,
 			}),
@@ -83,32 +84,28 @@ export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 				candidate.id === item.id ? chargedItem : candidate,
 			),
 		} satisfies RuntimeSchema.Type;
-		const isolation = yield* isolateStatefulOwnerTransitionFx({
+		const isolation = yield* isolateGridStatefulOwnerTransitionFx({
 			ownerItemId: item.id,
 			runtime: chargedRuntime,
 		});
-
-		const chargeSpentEvents =
-			nextRemainingCharges === 0
-				? []
-				: [
-						{
-							type: GameEventEnumSchema.enum.ItemChargeSpent,
-							itemId: item.id,
-							canonicalItemId: item.item.id,
-							location: item.location,
-							previousCharges: remainingCharges,
-							resultingCharges: nextRemainingCharges,
-						} satisfies GameEventSchema.Type,
-					];
-
 		return {
 			events: [
-				...chargeSpentEvents,
+				...(nextRemainingCharges === 0
+					? []
+					: [
+							{
+								type: GameEventEnumSchema.enum.ItemChargeSpent,
+								itemId: item.id,
+								canonicalItemId: item.item.id,
+								location: item.location,
+								previousCharges: remainingCharges,
+								resultingCharges: nextRemainingCharges,
+							} satisfies GameEventSchema.Type,
+						]),
 				...isolation.events,
 			],
 			runtime: isolation.runtime,
-		} satisfies spendItemChargesFx.Result;
+		} satisfies spendActionChargesFx.Result;
 	}
 
 	const resultingQuantity = item.quantity - 1;
@@ -137,11 +134,11 @@ export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 		drop: [],
 	};
 	if (item.item.charges?.output !== undefined) {
-		const output = yield* makeChargeSpendRandomFx({
+		const output = yield* makeActionChargeSpendRandomFx({
+			actionId,
 			cost,
 			itemId: item.id,
-			lineId: job.lineId,
-			ownerItemId: job.ownerItemId,
+			ownerItemId,
 			program: outputFx({
 				origin: item.location,
 				output: item.item.charges.output,
@@ -167,26 +164,23 @@ export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 		releasedInputEvents = releasedInputs.events;
 		draft = releasedInputs.runtime;
 	}
-
-	const depletedEvent = {
-		type: GameEventEnumSchema.enum.ItemDepleted,
-		itemId: item.id,
-		canonicalItemId: item.item.id,
-		location: item.location,
-		previousQuantity: item.quantity,
-		resultingQuantity,
-	} satisfies GameEventSchema.Type;
 	const placementEvents = yield* readOutputPlacementItemEventsFx({
 		originItemId: item.id,
 		placement,
 	});
-
 	return {
 		events: [
-			depletedEvent,
+			{
+				type: GameEventEnumSchema.enum.ItemDepleted,
+				itemId: item.id,
+				canonicalItemId: item.item.id,
+				location: item.location,
+				previousQuantity: item.quantity,
+				resultingQuantity,
+			} satisfies GameEventSchema.Type,
 			...placementEvents,
 			...releasedInputEvents,
 		],
 		runtime: draft,
-	} satisfies spendItemChargesFx.Result;
+	} satisfies spendActionChargesFx.Result;
 });

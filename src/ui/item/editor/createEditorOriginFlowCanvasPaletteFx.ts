@@ -25,6 +25,7 @@ const readPalette = (host: HTMLElement): EditorOriginFlowCanvasPalette => {
 				missing: read("--ak-flow-item-missing-surface"),
 				producer: read("--ak-flow-item-producer-surface"),
 				simple: read("--ak-flow-item-simple-surface"),
+				space: read("--ak-flow-item-simple-surface"),
 				stash: read("--ak-flow-item-stash-surface"),
 				temporary: read("--ak-flow-item-temporary-surface"),
 			},

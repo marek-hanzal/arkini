@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
+import { resolveActionEnableFx } from "~/engine/action/fx/resolveActionEnableFx";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { RulesResultSchema } from "~/engine/line/schema/rule/RulesResultSchema";
-import { RuleEnumSchema } from "~/engine/line/schema/rule/RuleEnumSchema";
 
 export namespace resolveLineEnableFx {
 	export interface Props {
@@ -18,11 +18,8 @@ export const resolveLineEnableFx = Effect.fn("resolveLineEnableFx")(function* ({
 	line,
 	rules,
 }: resolveLineEnableFx.Props) {
-	const enableRules = rules.filter((rule) => rule.type === RuleEnumSchema.enum.Enable);
-	const enabled = enableRules.length > 0 ? enableRules.every((rule) => rule.active) : line.enable;
-	const disabled = rules.some((rule) => {
-		return rule.type === RuleEnumSchema.enum.Disable && rule.active;
+	return yield* resolveActionEnableFx({
+		enable: line.enable,
+		rules: rules.filter((rule) => rule.type === "enable" || rule.type === "disable"),
 	});
-
-	return enabled && !disabled;
 });

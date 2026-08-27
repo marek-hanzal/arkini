@@ -26,7 +26,7 @@ describe("packDirectoryFx game-project contract", () => {
 				filename: "project-game.arkpack",
 				packageId: "project-game",
 				version: "2.3",
-				json: 2,
+				json: 3,
 				png: 2,
 			});
 			expect(payload).toMatchObject({
@@ -50,6 +50,10 @@ describe("packDirectoryFx game-project contract", () => {
 				]),
 			});
 			expect(payload.config).not.toHaveProperty("arkpack");
+			expect(payload.config.items.portal).toMatchObject({
+				type: "space",
+				space: 9,
+			});
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
 

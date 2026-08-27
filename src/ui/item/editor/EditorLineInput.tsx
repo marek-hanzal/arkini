@@ -11,10 +11,37 @@ import {
 } from "~/ui/item/editor/EditorMaterialLineInput";
 import { EditorBoardDistanceControl } from "~/ui/item/editor/EditorQueryControl";
 
+const inputTypeOptions = [
+	{
+		description:
+			"Adds no item or deposit requirement. The action may start without delivering or targeting another item.",
+		label: "Simple",
+		value: "simple",
+	},
+	{
+		description:
+			"Requires matching items to be delivered into this line. They may be consumed or reserved and returned after completion.",
+		label: "Materials",
+		value: "materials",
+	},
+	{
+		description:
+			"Targets one matching board item in place. It is not delivered; its configured charge cost is paid when the action starts.",
+		label: "Deposit",
+		value: "deposit",
+	},
+] as const satisfies ReadonlyArray<{
+	readonly description: string;
+	readonly label: string;
+	readonly value: EditorInput["type"];
+}>;
+
 export const EditorLineInput = ({
+	allowMaterials = true,
 	input,
 	onChange,
 }: {
+	readonly allowMaterials?: boolean;
 	readonly input: EditorInput;
 	readonly onChange: (input: EditorInput) => void;
 }) => (
@@ -22,28 +49,15 @@ export const EditorLineInput = ({
 		<div className="flex flex-wrap items-start justify-between gap-4">
 			<EditorChoiceControl
 				label="Input type"
-				description="Simple explicitly requires no consumable resource. Materials consume or reserve an item, while Deposit targets a matching board deposit."
+				description={
+					allowMaterials
+						? "Simple explicitly requires no consumable resource. Materials consume or reserve an item, while Deposit targets a matching board deposit."
+						: "Simple adds no external item requirement. Deposit targets a matching item on the current board."
+				}
 				value={input.type}
-				options={[
-					{
-						description:
-							"Adds no item or deposit requirement. The line may start without delivering or targeting another item.",
-						label: "Simple",
-						value: "simple",
-					},
-					{
-						description:
-							"Requires matching items to be delivered into this line. They may be consumed or reserved and returned after completion.",
-						label: "Materials",
-						value: "materials",
-					},
-					{
-						description:
-							"Targets one matching board item in place. It is not delivered; its configured charge cost is paid when production starts.",
-						label: "Deposit",
-						value: "deposit",
-					},
-				]}
+				options={inputTypeOptions.filter(
+					(option) => allowMaterials || option.value !== "materials",
+				)}
 				onChange={(type) => onChange(structuredClone(EditorItemDraftDefaults.inputs[type]))}
 			/>
 			{match(input)

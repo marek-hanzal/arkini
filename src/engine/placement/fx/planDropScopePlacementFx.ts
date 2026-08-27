@@ -14,6 +14,7 @@ import { assertPlacementPlanCompleteFx } from "./assertPlacementPlanCompleteFx";
 import { planBoardPlacementFx } from "./planBoardPlacementFx";
 import { planBoardThenStoragePlacementFx } from "./planBoardThenStoragePlacementFx";
 import { planInventoryPlacementFx } from "./planInventoryPlacementFx";
+import { planPassiveStoragePlacementFx } from "./planPassiveStoragePlacementFx";
 import { planToolbarPlacementFx } from "./planToolbarPlacementFx";
 
 export namespace planDropScopePlacementFx {
@@ -21,7 +22,7 @@ export namespace planDropScopePlacementFx {
 		drop: DropResultSchema.Type;
 		excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
 		item: ItemSchema.Type;
-		origin: BoardLocationSchema.Type;
+		origin: GridLocationSchema.Type;
 		quantity: PositiveIntegerSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
@@ -39,6 +40,18 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 	return yield* match(item.scope)
 		.with(StorageScopeEnumSchema.enum.Board, () => {
 			return Effect.gen(function* () {
+				if (origin.scope !== "board") {
+					return yield* assertPlacementPlanCompleteFx({
+						drop,
+						plan: {
+							remove: [],
+							spawn: [],
+							stack: [],
+						},
+						quantity,
+						reason: PlacementFailureReasonEnumSchema.enum.BoardOriginUnavailable,
+					});
+				}
 				const plan = yield* planBoardPlacementFx({
 					excludedLocations: excludedLocations?.filter(
 						(location): location is BoardLocationSchema.Type =>
@@ -64,6 +77,7 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 				const plan = yield* planInventoryPlacementFx({
 					excludedLocations,
 					item,
+					origin: origin.scope === "inventory" ? origin.position : undefined,
 					quantity,
 					runtime,
 				});
@@ -81,6 +95,7 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 				const plan = yield* planToolbarPlacementFx({
 					excludedLocations,
 					item,
+					origin: origin.scope === "toolbar" ? origin.position : undefined,
 					quantity,
 					runtime,
 				});
@@ -94,14 +109,23 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 			});
 		})
 		.with(StorageScopeEnumSchema.enum.Any, () => {
-			return planBoardThenStoragePlacementFx({
-				drop,
-				excludedLocations,
-				item,
-				origin,
-				quantity,
-				runtime,
-			});
+			return origin.scope === "board"
+				? planBoardThenStoragePlacementFx({
+						drop,
+						excludedLocations,
+						item,
+						origin,
+						quantity,
+						runtime,
+					})
+				: planPassiveStoragePlacementFx({
+						drop,
+						excludedLocations,
+						item,
+						origin,
+						quantity,
+						runtime,
+					});
 		})
 		.exhaustive();
 });

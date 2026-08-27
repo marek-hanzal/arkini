@@ -7,6 +7,8 @@ import { readEditorItemDeleteBlockersFx } from "~/editor/readEditorItemDeleteBlo
 type StartSurface = "board" | "inventory" | "toolbar";
 
 interface ItemCleanup {
+	readonly actionInputIndexes: Set<number>;
+	readonly actionRuleIndexes: Set<number>;
 	readonly mergeIndexes: Set<number>;
 	readonly lineIndexes: Set<number>;
 	removeChargesOutput: boolean;
@@ -16,6 +18,14 @@ interface ItemCleanup {
 
 export interface EditorItemForceDeleteImpact {
 	readonly deletedOwnerItemIds: ReadonlyArray<string>;
+	readonly removedActionInputs: ReadonlyArray<{
+		readonly ownerItemId: string;
+		readonly inputNumber: number;
+	}>;
+	readonly removedActionRules: ReadonlyArray<{
+		readonly ownerItemId: string;
+		readonly ruleNumber: number;
+	}>;
 	readonly removedChargeOutputOwnerIds: ReadonlyArray<string>;
 	readonly removedExpiryOutputOwnerIds: ReadonlyArray<string>;
 	readonly removedLines: ReadonlyArray<{
@@ -36,6 +46,8 @@ export interface EditorItemForceDeleteResult {
 }
 
 const createItemCleanup = (): ItemCleanup => ({
+	actionInputIndexes: new Set(),
+	actionRuleIndexes: new Set(),
 	mergeIndexes: new Set(),
 	lineIndexes: new Set(),
 	removeChargesOutput: false,
@@ -76,6 +88,16 @@ export const forceDeleteEditorItemFx = Effect.fn("forceDeleteEditorItemFx")(func
 		const cleanup = itemCleanups.get(second) ?? createItemCleanup();
 		itemCleanups.set(second, cleanup);
 		switch (third) {
+			case "input":
+				if (typeof fourth !== "number")
+					throw new Error(`Invalid action input path ${blocker.path.join(".")}.`);
+				cleanup.actionInputIndexes.add(fourth);
+				break;
+			case "rules":
+				if (typeof fourth !== "number")
+					throw new Error(`Invalid action rule path ${blocker.path.join(".")}.`);
+				cleanup.actionRuleIndexes.add(fourth);
+				break;
 			case "merge":
 				if (typeof fourth !== "number")
 					throw new Error(`Invalid merge reference path ${blocker.path.join(".")}.`);
@@ -103,6 +125,14 @@ export const forceDeleteEditorItemFx = Effect.fn("forceDeleteEditorItemFx")(func
 	}
 
 	const deletedOwnerItemIds: string[] = [];
+	const removedActionInputs: Array<{
+		ownerItemId: string;
+		inputNumber: number;
+	}> = [];
+	const removedActionRules: Array<{
+		ownerItemId: string;
+		ruleNumber: number;
+	}> = [];
 	const removedChargeOutputOwnerIds: string[] = [];
 	const removedExpiryOutputOwnerIds: string[] = [];
 	const removedLines: Array<{
@@ -134,6 +164,26 @@ export const forceDeleteEditorItemFx = Effect.fn("forceDeleteEditorItemFx")(func
 		const candidate: Record<string, unknown> = {
 			...owner,
 		};
+		if (owner.type === "space" && cleanup.actionInputIndexes.size > 0) {
+			candidate.input = owner.input.filter(
+				(_input, index) => !cleanup.actionInputIndexes.has(index),
+			);
+			for (const index of cleanup.actionInputIndexes)
+				removedActionInputs.push({
+					ownerItemId,
+					inputNumber: index + 1,
+				});
+		}
+		if (owner.type === "space" && cleanup.actionRuleIndexes.size > 0) {
+			candidate.rules = owner.rules.filter(
+				(_rule, index) => !cleanup.actionRuleIndexes.has(index),
+			);
+			for (const index of cleanup.actionRuleIndexes)
+				removedActionRules.push({
+					ownerItemId,
+					ruleNumber: index + 1,
+				});
+		}
 		if (cleanup.mergeIndexes.size > 0) {
 			const merge = (owner.merge ?? []).filter(
 				(_rule, index) => !cleanup.mergeIndexes.has(index),
@@ -191,6 +241,8 @@ export const forceDeleteEditorItemFx = Effect.fn("forceDeleteEditorItemFx")(func
 		}),
 		impact: {
 			deletedOwnerItemIds,
+			removedActionInputs,
+			removedActionRules,
 			removedChargeOutputOwnerIds,
 			removedExpiryOutputOwnerIds,
 			removedLines,

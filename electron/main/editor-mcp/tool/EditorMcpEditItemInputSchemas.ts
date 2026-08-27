@@ -8,6 +8,7 @@ import { DepositItemSchema } from "~/engine/item/schema/DepositItemSchema";
 import { InventoryItemSchema } from "~/engine/item/schema/InventoryItemSchema";
 import { ProducerItemSchema } from "~/engine/item/schema/ProducerItemSchema";
 import { SimpleItemSchema } from "~/engine/item/schema/SimpleItemSchema";
+import { SpaceItemSchema } from "~/engine/item/schema/SpaceItemSchema";
 import { StashItemSchema } from "~/engine/item/schema/StashItemSchema";
 import { TemporaryItemSchema } from "~/engine/item/schema/TemporaryItemSchema";
 
@@ -33,6 +34,12 @@ const simplePatch = requireReplacement(
 ).meta({
 	id: "EditorMcpSimpleItemPatchSchema",
 	description: "Top-level replacements accepted for an existing simple item.",
+});
+const spacePatch = requireReplacement(
+	SpaceItemSchema.omit(immutableItemFields).partial().extend(nullableBaseItemFields).strict(),
+).meta({
+	id: "EditorMcpSpaceItemPatchSchema",
+	description: "Top-level replacements accepted for an existing space item.",
 });
 const producerPatch = requireReplacement(
 	ProducerItemSchema.omit(immutableItemFields)
@@ -150,6 +157,12 @@ export const EditorMcpEditItemInputSchemas = {
 		schemaId: "urn:arkini:schema:mcp:edit-simple-item-input",
 		title: "Edit simple item tool input",
 		description: "Identity, revision, and replacement patch for one simple item.",
+	}),
+	space: editItemInput(spacePatch, {
+		id: "EditorMcpEditSpaceItemInputSchema",
+		schemaId: "urn:arkini:schema:mcp:edit-space-item-input",
+		title: "Edit space item tool input",
+		description: "Identity, revision, and replacement patch for one space item.",
 	}),
 	producer: editItemInput(producerPatch, {
 		id: "EditorMcpEditProducerItemInputSchema",

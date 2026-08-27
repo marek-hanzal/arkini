@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
+import { resolveActionChargeFx } from "~/engine/action/fx/resolveActionChargeFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { resolveInputChargeRunFx } from "~/engine/input/fx/run/resolveInputChargeRunFx";
 import { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
 import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
 import { assertLineOutputMaxCountFx } from "~/engine/job/fx/assertLineOutputMaxCountFx";
@@ -59,7 +59,7 @@ export const assertLineEnqueueConditionsFx = Effect.fn("assertLineEnqueueConditi
 			break;
 		}
 		if (configuredInput.charges?.from !== InputChargeFromEnumSchema.enum.Self) continue;
-		const charges = yield* resolveInputChargeRunFx({
+		const charges = yield* resolveActionChargeFx({
 			charges: configuredInput.charges,
 			ownerItemId: resolution.ownerItemId,
 			reservedCharges,

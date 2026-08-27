@@ -1,11 +1,15 @@
-import type { EditorDropRule, EditorLineRule } from "~/bridge/item/editor/EditorItemModel";
+import type {
+	EditorActionRule,
+	EditorDropRule,
+	EditorLineRule,
+} from "~/bridge/item/editor/EditorItemModel";
 import { twMerge } from "tailwind-merge";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorRuleControl, type EditorRuleTarget } from "~/ui/item/editor/EditorRuleControl";
 
-type EditorRule = EditorLineRule | EditorDropRule;
+type EditorRule = EditorActionRule | EditorLineRule | EditorDropRule;
 type EditorRuleType = EditorLineRule["type"];
 
 /** Assembles the shared conditional Rule collection used by lines and selected drops. */

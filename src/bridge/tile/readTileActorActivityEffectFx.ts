@@ -28,6 +28,7 @@ export const readTileActorActivityEffectFx = Effect.fn("readTileActorActivityEff
 					P.union(
 						ItemEnumSchema.enum.Inventory,
 						ItemEnumSchema.enum.Simple,
+						ItemEnumSchema.enum.Space,
 						ItemEnumSchema.enum.Stash,
 						ItemEnumSchema.enum.Temporary,
 					),

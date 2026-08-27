@@ -8,6 +8,7 @@ export const ItemEnumSchema = z
 		Deposit: "deposit",
 		Blueprint: "blueprint",
 		Simple: "simple",
+		Space: "space",
 		Producer: "producer",
 		Craft: "craft",
 		Stash: "stash",

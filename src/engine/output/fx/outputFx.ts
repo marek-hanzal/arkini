@@ -4,12 +4,12 @@ import type { OutputResultSchema } from "~/engine/output/schema/OutputResultSche
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import { rollSetFx } from "~/engine/roll/fx/rollSetFx";
 import { selectRollSetFx } from "~/engine/roll/fx/selectRollSetFx";
-import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
+import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { dropFx } from "./dropFx";
 
 export namespace outputFx {
 	export interface Props {
-		origin: BoardLocationSchema.Type;
+		origin: GridLocationSchema.Type;
 		output: OutputSchema.Type;
 	}
 }

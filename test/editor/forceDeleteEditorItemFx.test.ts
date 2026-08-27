@@ -100,6 +100,8 @@ describe("forceDeleteEditorItemFx", () => {
 		});
 		expect(result.impact).toEqual({
 			deletedOwnerItemIds: [],
+			removedActionInputs: [],
+			removedActionRules: [],
 			removedChargeOutputOwnerIds: [
 				"oil",
 			],
@@ -123,6 +125,82 @@ describe("forceDeleteEditorItemFx", () => {
 				toolbar: 0,
 			},
 		});
+	});
+
+	it("removes only Space action entries that reference the deleted item", () => {
+		const portal = {
+			...createSimpleItem("portal"),
+			type: "space" as const,
+			space: 1,
+			input: [
+				{
+					type: "deposit" as const,
+					query: {
+						scope: "board" as const,
+						distance: "close" as const,
+						selector: {
+							type: "item" as const,
+							itemId: "water",
+						},
+					},
+					charges: {
+						from: "target" as const,
+						cost: 1,
+					},
+				},
+			],
+			rules: [
+				{
+					type: "enable" as const,
+					when: [
+						{
+							type: "exists" as const,
+							query: {
+								scope: "universe" as const,
+								selector: {
+									type: "item" as const,
+									itemId: "water",
+								},
+							},
+						},
+					],
+				},
+			],
+		};
+		const config = GameConfigSchema.parse({
+			...editorTestConfig,
+			start: {
+				...editorTestConfig.start,
+				board: [],
+			},
+			items: {
+				water: editorTestConfig.items.water,
+				portal,
+			},
+		});
+		const result = Effect.runSync(
+			forceDeleteEditorItemFx({
+				config,
+				itemId: "water",
+			}),
+		);
+
+		expect(result.config.items.portal).toMatchObject({
+			input: [],
+			rules: [],
+		});
+		expect(result.impact.removedActionInputs).toEqual([
+			{
+				ownerItemId: "portal",
+				inputNumber: 1,
+			},
+		]);
+		expect(result.impact.removedActionRules).toEqual([
+			{
+				ownerItemId: "portal",
+				ruleNumber: 1,
+			},
+		]);
 	});
 
 	it("deletes an owner whose required production structure references the item", () => {

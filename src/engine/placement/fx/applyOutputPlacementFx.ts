@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 
-import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { OutputResultSchema } from "~/engine/output/schema/OutputResultSchema";
 import type { DropPlacementResultSchema } from "~/engine/placement/schema/DropPlacementResultSchema";
@@ -12,7 +11,7 @@ import { planDropPlacementFx } from "./planDropPlacementFx";
 export namespace applyOutputPlacementFx {
 	export interface Props {
 		excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
-		origin: BoardLocationSchema.Type;
+		origin: GridLocationSchema.Type;
 		output: OutputResultSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}

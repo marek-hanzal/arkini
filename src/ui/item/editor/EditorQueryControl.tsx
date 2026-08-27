@@ -5,7 +5,7 @@ import { EditorSelectorControl } from "~/ui/item/editor/EditorSelectorControl";
 const queryScopeOptions = [
 	{
 		description:
-			"Searches matching items on the current board at the selected distance from the line owner.",
+			"Searches matching items on the current board at the selected distance from the action owner.",
 		label: "Board",
 		value: "board",
 	},

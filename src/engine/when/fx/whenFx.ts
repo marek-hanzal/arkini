@@ -4,7 +4,7 @@ import { match } from "ts-pattern";
 import { WhenEnumSchema } from "~/engine/when/schema/WhenEnumSchema";
 import { queryFx } from "~/engine/query/fx/queryFx";
 import { queryQuantityFx } from "~/engine/query/fx/queryQuantityFx";
-import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
+import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
 
 import { whenCountFx } from "./whenCountFx";
@@ -13,7 +13,7 @@ import { whenRangeFx } from "./whenRangeFx";
 
 export namespace whenFx {
 	export interface Props {
-		origin: BoardLocationSchema.Type;
+		origin: GridLocationSchema.Type;
 		when: WhenSchema.Type;
 	}
 }

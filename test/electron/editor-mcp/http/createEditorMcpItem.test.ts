@@ -12,10 +12,11 @@ afterEach(cleanupEditorMcpHarnesses);
 
 const typeGroups = [
 	{
-		name: "creates simple and producer item types through dedicated tools",
-		projectId: "simple-producer-types-project",
+		name: "creates simple, space, and producer item types through dedicated tools",
+		projectId: "simple-space-producer-types-project",
 		types: [
 			"simple",
+			"space",
 			"producer",
 		],
 	},
@@ -160,6 +161,11 @@ describe("editor MCP item creation", () => {
 					id,
 					title: `MCP ${type}`,
 					description: `Created ${type} item.`,
+					...(type === "space"
+						? {
+								space: 4,
+							}
+						: {}),
 				},
 			});
 			expect(result.isError, type).not.toBe(true);
@@ -184,6 +190,13 @@ describe("editor MCP item creation", () => {
 				type,
 			});
 		}
+		if (has("space"))
+			expect(read("space")).toMatchObject({
+				enable: true,
+				input: [],
+				rules: [],
+				space: 4,
+			});
 		if (has("producer"))
 			expect(read("producer")).toMatchObject({
 				maxQueueSize: 1,

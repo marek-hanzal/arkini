@@ -16,6 +16,7 @@ import { PixiInventorySurface } from "~/ui/pixi/PixiInventorySurface";
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const surfaceState = vi.hoisted(() => ({
+	activateSpace: vi.fn(),
 	createProps: null as {
 		readonly onActivate: (
 			item: TileActorItem,
@@ -28,6 +29,8 @@ const surfaceState = vi.hoisted(() => ({
 	interactionRegister: vi.fn(),
 	interactionUnregister: vi.fn(),
 	release: vi.fn(),
+	spaceActivated: vi.fn(),
+	spaceActivationSucceeds: true,
 }));
 
 const game = {
@@ -62,6 +65,16 @@ vi.mock("~/engine/runtime/write/releaseInventoryItemFx", () => ({
 	releaseInventoryItemFx: (props: unknown) =>
 		Effect.sync(() => {
 			surfaceState.release(props);
+		}),
+}));
+
+vi.mock("~/engine/space/write/activateSpaceItemFx", () => ({
+	activateSpaceItemFx: (props: unknown) =>
+		Effect.suspend(() => {
+			surfaceState.activateSpace(props);
+			return surfaceState.spaceActivationSucceeds
+				? Effect.succeed(1)
+				: Effect.fail("space-action-unavailable");
 		}),
 }));
 
@@ -129,7 +142,11 @@ const renderSurface = async () => {
 	const root = createRoot(host);
 	roots.push(root);
 	await act(async () => {
-		root.render(createElement(PixiInventorySurface));
+		root.render(
+			createElement(PixiInventorySurface, {
+				onSpaceActivated: surfaceState.spaceActivated,
+			}),
+		);
 		await Promise.resolve();
 	});
 	const createProps = surfaceState.createProps;
@@ -142,11 +159,14 @@ afterEach(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
 	surfaceState.createProps = null;
+	surfaceState.activateSpace.mockClear();
 	surfaceState.detail.mockClear();
 	surfaceState.interactionCancel.mockClear();
 	surfaceState.interactionRegister.mockClear();
 	surfaceState.interactionUnregister.mockClear();
 	surfaceState.release.mockClear();
+	surfaceState.spaceActivated.mockClear();
+	surfaceState.spaceActivationSucceeds = true;
 	document.body.replaceChildren();
 });
 
@@ -186,6 +206,36 @@ describe("PixiInventorySurface", () => {
 			itemId: item.id,
 			origin: canvas,
 		});
+		expect(surfaceState.release).not.toHaveBeenCalled();
+	});
+
+	it("returns to the Board only after Inventory Space activation commits", async () => {
+		const props = await renderSurface();
+		const space = {
+			...item,
+			itemType: "space",
+			primaryAction: {
+				currentSpace: 0,
+				kind: "activate-space",
+			},
+		} satisfies TileActorItem;
+
+		surfaceState.spaceActivationSucceeds = false;
+		await props.onActivate(space, false, document.createElement("canvas"));
+
+		expect(surfaceState.activateSpace).toHaveBeenCalledWith({
+			currentSpace: 0,
+			itemId: space.id,
+			location: space.location,
+			revision: space.revision,
+		});
+		expect(surfaceState.spaceActivated).not.toHaveBeenCalled();
+		expect(surfaceState.release).not.toHaveBeenCalled();
+
+		surfaceState.spaceActivationSucceeds = true;
+		await props.onActivate(space, false, document.createElement("canvas"));
+
+		expect(surfaceState.spaceActivated).toHaveBeenCalledOnce();
 		expect(surfaceState.release).not.toHaveBeenCalled();
 	});
 });

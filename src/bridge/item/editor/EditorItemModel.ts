@@ -1,3 +1,5 @@
+import type { ActionInputSchema } from "~/engine/action/schema/ActionInputSchema";
+import type { ActionRuleSchema } from "~/engine/action/schema/ActionRuleSchema";
 import type { InputSchema } from "~/engine/input/schema/InputSchema";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
@@ -18,6 +20,8 @@ import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
 export type EditorItem = ItemSchema.Type;
 export type EditorItemType = ItemEnumSchema.Type;
 export type EditorInput = InputSchema.Type;
+export type EditorActionInput = ActionInputSchema.Type;
+export type EditorActionRule = ActionRuleSchema.Type;
 export type EditorLine = LineSchema.Type;
 export type EditorLineRule = LineRuleSchema.Type;
 export type EditorMerge = MergeSchema.Type;

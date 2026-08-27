@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import { RuleEnumSchema } from "~/engine/output/schema/drop/rule/RuleEnumSchema";
-import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
+import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { DropResolutionSchema } from "~/engine/output/schema/DropResolutionSchema";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
 import { rollQuantityFx } from "~/engine/quantity/fx/rollQuantityFx";
@@ -12,7 +12,7 @@ import { dropRuleFx } from "./dropRuleFx";
 export namespace dropFx {
 	export interface Props {
 		drop: DropSchema.Type;
-		origin: BoardLocationSchema.Type;
+		origin: GridLocationSchema.Type;
 	}
 }
 

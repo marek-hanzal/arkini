@@ -12,6 +12,9 @@ import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/Diagnos
 import { InvalidInputChargesReasonEnumSchema } from "~/engine/validation/schema/InvalidInputChargesReasonEnumSchema";
 import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
 import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import type { InputSchema } from "~/engine/input/schema/InputSchema";
+import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { DiagnosticPathSchema } from "~/engine/validation/schema/DiagnosticPathSchema";
 
 import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
 
@@ -22,7 +25,7 @@ export namespace validateInputChargesFx {
 	}
 }
 
-/** Validates who may pay each authored line-input charge cost. */
+/** Validates who may pay each authored Line or Space action charge cost. */
 export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(function* ({
 	config,
 	provenance,
@@ -34,8 +37,30 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 			itemId,
 			item,
 		});
-		for (const { line, path } of lines) {
-			let selfCost = 0;
+		const actions: Array<{
+			id: IdSchema.Type;
+			implicitSelfCost: number;
+			input: ReadonlyArray<InputSchema.Type>;
+			path: DiagnosticPathSchema.Type;
+		}> = lines.map(({ line, path }) => ({
+			id: line.id,
+			implicitSelfCost: 0,
+			input: line.input,
+			path,
+		}));
+		if (item.type === ItemEnumSchema.enum.Space) {
+			actions.push({
+				id: item.id,
+				implicitSelfCost: item.charges === undefined ? 0 : 1,
+				input: item.input,
+				path: [
+					"items",
+					itemId,
+				],
+			});
+		}
+		for (const { id: actionId, implicitSelfCost, input: inputs, path } of actions) {
+			let selfCost = implicitSelfCost;
 			const exactTargetCosts = new Map<
 				string,
 				{
@@ -43,7 +68,7 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 					inputIndex: number;
 				}
 			>();
-			for (const [inputIndex, input] of line.input.entries()) {
+			for (const [inputIndex, input] of inputs.entries()) {
 				const diagnosticPath = [
 					...path,
 					"input",
@@ -66,9 +91,9 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 							"distance",
 						],
 						source: provenance.items[itemId],
-						message: `Deposit input ${inputIndex} of line ${line.id} targets self, but owner ${itemId} is ${item.type}, not a deposit.`,
+						message: `Deposit input ${inputIndex} of action ${actionId} targets self, but owner ${itemId} is ${item.type}, not a deposit.`,
 						ownerItemId: itemId,
-						lineId: line.id,
+						lineId: actionId,
 						inputIndex,
 						reason: InvalidInputChargesReasonEnumSchema.enum
 							.DepositSelfRequiresDepositOwner,
@@ -81,9 +106,9 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 						severity: DiagnosticSeverityEnumSchema.enum.Error,
 						path: diagnosticPath,
 						source: provenance.items[itemId],
-						message: `Deposit input ${inputIndex} of line ${line.id} must author a target charge cost.`,
+						message: `Deposit input ${inputIndex} of action ${actionId} must author a target charge cost.`,
 						ownerItemId: itemId,
-						lineId: line.id,
+						lineId: actionId,
 						inputIndex,
 						reason: InvalidInputChargesReasonEnumSchema.enum.DepositMissingTargetCost,
 					});
@@ -92,15 +117,18 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 				if (input.charges === undefined) continue;
 
 				if (input.charges.from === InputChargeFromEnumSchema.enum.Self) {
-					if (input.type === InputEnumSchema.enum.Deposit) {
+					if (
+						input.type === InputEnumSchema.enum.Deposit &&
+						item.type !== ItemEnumSchema.enum.Space
+					) {
 						diagnostics.push({
 							code: DiagnosticCodeEnumSchema.enum.InputChargesInvalid,
 							severity: DiagnosticSeverityEnumSchema.enum.Error,
 							path: diagnosticPath,
 							source: provenance.items[itemId],
-							message: `Deposit input ${inputIndex} of line ${line.id} must charge its target, not its owner.`,
+							message: `Deposit input ${inputIndex} of action ${actionId} must charge its target, not its owner.`,
 							ownerItemId: itemId,
-							lineId: line.id,
+							lineId: actionId,
 							inputIndex,
 							reason: InvalidInputChargesReasonEnumSchema.enum.DepositMustTarget,
 						});
@@ -112,9 +140,9 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 							severity: DiagnosticSeverityEnumSchema.enum.Error,
 							path: diagnosticPath,
 							source: provenance.items[itemId],
-							message: `Line ${line.id} charges owner ${itemId}, but the item has no charges.`,
+							message: `Action ${actionId} charges owner ${itemId}, but the item has no charges.`,
 							ownerItemId: itemId,
-							lineId: line.id,
+							lineId: actionId,
 							inputIndex,
 							reason: InvalidInputChargesReasonEnumSchema.enum.SelfMissingCharges,
 						});
@@ -127,9 +155,9 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 							severity: DiagnosticSeverityEnumSchema.enum.Error,
 							path: diagnosticPath,
 							source: provenance.items[itemId],
-							message: `Line ${line.id} costs ${selfCost} total self charges, but ${itemId} has only ${item.charges.amount}.`,
+							message: `Action ${actionId} costs ${selfCost} total self charges, but ${itemId} has only ${item.charges.amount}.`,
 							ownerItemId: itemId,
-							lineId: line.id,
+							lineId: actionId,
 							inputIndex,
 							reason: InvalidInputChargesReasonEnumSchema.enum
 								.SelfInsufficientCharges,
@@ -144,9 +172,9 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 						severity: DiagnosticSeverityEnumSchema.enum.Error,
 						path: diagnosticPath,
 						source: provenance.items[itemId],
-						message: `Only deposit inputs may charge an external target; line ${line.id} input ${inputIndex} is ${input.type}.`,
+						message: `Only deposit inputs may charge an external target; action ${actionId} input ${inputIndex} is ${input.type}.`,
 						ownerItemId: itemId,
-						lineId: line.id,
+						lineId: actionId,
 						inputIndex,
 						reason: InvalidInputChargesReasonEnumSchema.enum.TargetRequiresDeposit,
 					});
@@ -184,9 +212,9 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 						severity: DiagnosticSeverityEnumSchema.enum.Error,
 						path: diagnosticPath,
 						source: provenance.items[itemId],
-						message: `Deposit input ${inputIndex} of line ${line.id} cannot match any board-capable item with at least ${input.charges.cost} charges.`,
+						message: `Deposit input ${inputIndex} of action ${actionId} cannot match any board-capable item with at least ${input.charges.cost} charges.`,
 						ownerItemId: itemId,
-						lineId: line.id,
+						lineId: actionId,
 						inputIndex,
 						reason: InvalidInputChargesReasonEnumSchema.enum.TargetUnavailable,
 					});
@@ -217,9 +245,9 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 						"charges",
 					],
 					source: provenance.items[itemId],
-					message: `Line ${line.id} requires ${total.cost} total charges from exact payer ${payerItemId}, but at most ${maximumSupply} can exist.`,
+					message: `Action ${actionId} requires ${total.cost} total charges from exact payer ${payerItemId}, but at most ${maximumSupply} can exist.`,
 					ownerItemId: itemId,
-					lineId: line.id,
+					lineId: actionId,
 					inputIndex: total.inputIndex,
 					reason: InvalidInputChargesReasonEnumSchema.enum.TargetInsufficientTotalCharges,
 				});

@@ -1,40 +1,40 @@
 import { Effect } from "effect";
 
-import { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
 import type { InputChargeSchema } from "~/engine/input/schema/InputChargeSchema";
 import type { InputChargeRunPlanSchema } from "~/engine/input/schema/run/InputChargeRunPlanSchema";
 import { readItemRemainingChargesFx } from "~/engine/item/fx/readItemRemainingChargesFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
-export namespace resolveInputChargeRunFx {
+export namespace resolveActionChargeFx {
 	export interface Props {
-		charges: InputChargeSchema.Type | undefined;
-		ownerItemId: IdSchema.Type;
-		reservedCharges: ReadonlyMap<IdSchema.Type, number>;
-		targetItemId?: IdSchema.Type;
-		runtime: RuntimeSchema.Type;
+		readonly charges: InputChargeSchema.Type | undefined;
+		readonly ownerItemId: IdSchema.Type;
+		readonly reservedCharges: ReadonlyMap<IdSchema.Type, number>;
+		readonly targetItemId?: IdSchema.Type;
+		readonly runtime: RuntimeSchema.Type;
 	}
 
 	export interface Result {
-		ready: boolean;
-		plan?: InputChargeRunPlanSchema.Type;
+		readonly ready: boolean;
+		readonly plan?: InputChargeRunPlanSchema.Type;
 	}
 }
 
-/** Resolves one optional input charge cost against costs already reserved by earlier inputs. */
-export const resolveInputChargeRunFx = Effect.fn("resolveInputChargeRunFx")(function* ({
+/** Reserves one optional action cost against the same immutable runtime snapshot. */
+export const resolveActionChargeFx = Effect.fn("resolveActionChargeFx")(function* ({
 	charges,
 	ownerItemId,
 	reservedCharges,
 	targetItemId,
 	runtime,
-}: resolveInputChargeRunFx.Props) {
+}: resolveActionChargeFx.Props) {
 	if (charges === undefined) {
 		return {
 			ready: true,
-		} satisfies resolveInputChargeRunFx.Result;
+		} satisfies resolveActionChargeFx.Result;
 	}
 
 	const itemId =
@@ -42,7 +42,7 @@ export const resolveInputChargeRunFx = Effect.fn("resolveInputChargeRunFx")(func
 	if (itemId === undefined) {
 		return {
 			ready: false,
-		} satisfies resolveInputChargeRunFx.Result;
+		} satisfies resolveActionChargeFx.Result;
 	}
 
 	const item = yield* readRuntimeItemByIdFx({
@@ -54,7 +54,7 @@ export const resolveInputChargeRunFx = Effect.fn("resolveInputChargeRunFx")(func
 	if (remainingCharges === undefined || remainingCharges - reservedCost < charges.cost) {
 		return {
 			ready: false,
-		} satisfies resolveInputChargeRunFx.Result;
+		} satisfies resolveActionChargeFx.Result;
 	}
 
 	return {
@@ -63,5 +63,5 @@ export const resolveInputChargeRunFx = Effect.fn("resolveInputChargeRunFx")(func
 			itemId,
 			cost: charges.cost,
 		},
-	} satisfies resolveInputChargeRunFx.Result;
+	} satisfies resolveActionChargeFx.Result;
 });

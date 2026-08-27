@@ -21,7 +21,7 @@ export const ChargeSchema = z
 		 * Optional output emitted exactly once when one instance is depleted.
 		 */
 		output: OutputSchema.optional().describe(
-			"The optional output emitted exactly once when one item instance is depleted.",
+			"The optional output emitted exactly once from the depleted item's real grid origin.",
 		),
 	})
 	.strict()

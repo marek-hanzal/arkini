@@ -11,7 +11,7 @@ import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchem
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
 
-import { orderBoardLocationsFx } from "./orderBoardLocationsFx";
+import { orderGridLocationsFx } from "./orderGridLocationsFx";
 import { readEmptyLocationsFx } from "./readEmptyLocationsFx";
 import { readBoardLocationsFx } from "./readBoardLocationsFx";
 import { readInventoryLocationsFx } from "./readInventoryLocationsFx";
@@ -36,7 +36,7 @@ export const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocat
 		size: config.meta.board,
 		space: origin.space,
 	});
-	const orderedBoard = yield* orderBoardLocationsFx({
+	const orderedBoard = yield* orderGridLocationsFx({
 		locations: yield* readEmptyLocationsFx({
 			locations: board,
 			runtime,

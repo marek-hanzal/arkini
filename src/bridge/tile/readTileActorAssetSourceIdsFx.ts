@@ -40,6 +40,7 @@ export const readTileActorAssetSourceIdsFx = Effect.fn("readTileActorAssetSource
 					ItemEnumSchema.enum.Inventory,
 					ItemEnumSchema.enum.Producer,
 					ItemEnumSchema.enum.Simple,
+					ItemEnumSchema.enum.Space,
 					ItemEnumSchema.enum.Stash,
 					ItemEnumSchema.enum.Temporary,
 				),

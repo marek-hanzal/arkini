@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { orderBoardLocationsFx } from "~/engine/placement/fx/orderBoardLocationsFx";
+import { orderGridLocationsFx } from "~/engine/placement/fx/orderGridLocationsFx";
 
 const location = (x: number, y = 0) => {
 	return {
@@ -14,10 +14,10 @@ const location = (x: number, y = 0) => {
 	};
 };
 
-describe("orderBoardLocationsFx", () => {
+describe("orderGridLocationsFx", () => {
 	it("orders locations by Manhattan distance and scan-order ties", () => {
 		const result = Effect.runSync(
-			orderBoardLocationsFx({
+			orderGridLocationsFx({
 				locations: [
 					location(3),
 					location(2),

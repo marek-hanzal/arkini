@@ -36,6 +36,7 @@ const readItemTypeColor = (
 		case "temporary":
 			return palette.danger;
 		case "simple":
+		case "space":
 			return palette.lineStrong;
 	}
 };

@@ -1,14 +1,9 @@
 import { Effect, Option } from "effect";
 
-import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
-import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
-import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
-import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
+import { isolateGridStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateGridStatefulOwnerTransitionFx";
 import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -25,15 +20,14 @@ export namespace isolateStatefulOwnerTransitionFx {
 	}
 }
 
-/** Keeps one state-owning board identity and reports the exact placement of its pure remainder. */
+/** Preserves the Line-owned Board admission before shared grid isolation. */
 export const isolateStatefulOwnerTransitionFx = Effect.fn("isolateStatefulOwnerTransitionFx")(
 	function* ({ ownerItemId, runtime }: isolateStatefulOwnerTransitionFx.Props) {
 		const runtimeOwner = yield* readRuntimeItemByIdFx({
 			itemId: ownerItemId,
 			runtime,
 		});
-		const owner = Option.getOrUndefined(yield* isBoardRuntimeItemFx(runtimeOwner));
-		if (owner === undefined) {
+		if (Option.isNone(yield* isBoardRuntimeItemFx(runtimeOwner))) {
 			return yield* Effect.fail(
 				new ItemNotOnBoardError({
 					itemId: runtimeOwner.id,
@@ -41,66 +35,9 @@ export const isolateStatefulOwnerTransitionFx = Effect.fn("isolateStatefulOwnerT
 				}),
 			);
 		}
-		if (owner.quantity === 1) {
-			return {
-				events: [],
-				runtime,
-			} satisfies isolateStatefulOwnerTransitionFx.Result;
-		}
-
-		const pure = yield* isItemPureFx({
-			item: owner,
+		return yield* isolateGridStatefulOwnerTransitionFx({
+			ownerItemId,
 			runtime,
 		});
-		if (pure) {
-			return yield* Effect.die(
-				new Error(
-					`Owner ${owner.id} must own identity-bound state before it can be isolated.`,
-				),
-			);
-		}
-
-		const statefulOwner = yield* reviseRuntimeItemFx({
-			item: {
-				...owner,
-				quantity: 1,
-			},
-		});
-		const ownerRuntime = {
-			...runtime,
-			items: runtime.items.map((item) => (item.id === owner.id ? statefulOwner : item)),
-		} satisfies RuntimeSchema.Type;
-		const [placement, nextRuntime] = yield* applyOutputPlacementFx({
-			origin: owner.location,
-			output: {
-				drop: [
-					{
-						itemId: owner.item.id,
-						quantity: owner.quantity - 1,
-						placement: PlacementEnumSchema.enum.Drop,
-					},
-				],
-			},
-			runtime: ownerRuntime,
-		});
-		const placementEvents = yield* readOutputPlacementItemEventsFx({
-			originItemId: ownerItemId,
-			placement,
-		});
-
-		return {
-			events: [
-				{
-					type: GameEventEnumSchema.enum.ItemSplit,
-					itemId: owner.id,
-					canonicalItemId: owner.item.id,
-					location: owner.location,
-					previousQuantity: owner.quantity,
-					quantity: 1,
-				},
-				...placementEvents,
-			],
-			runtime: nextRuntime,
-		} satisfies isolateStatefulOwnerTransitionFx.Result;
 	},
 );

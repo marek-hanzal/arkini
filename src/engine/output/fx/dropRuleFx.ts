@@ -3,14 +3,14 @@ import { match } from "ts-pattern";
 
 import { RuleEnumSchema } from "~/engine/output/schema/drop/rule/RuleEnumSchema";
 import type { RuleSchema } from "~/engine/output/schema/drop/rule/RuleSchema";
-import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
+import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 
 import { dropRuleDisableFx } from "./dropRuleDisableFx";
 import { dropRuleEnableFx } from "./dropRuleEnableFx";
 
 export namespace dropRuleFx {
 	export interface Props {
-		origin: BoardLocationSchema.Type;
+		origin: GridLocationSchema.Type;
 		rule: RuleSchema.Type;
 	}
 }

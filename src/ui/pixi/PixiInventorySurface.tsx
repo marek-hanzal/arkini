@@ -4,6 +4,7 @@ import { useCallback, useLayoutEffect, useRef } from "react";
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { runInventoryReleaseAtom } from "~/bridge/inventory/runInventoryReleaseAtom";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { runSpaceActivationAtom } from "~/bridge/space/runSpaceActivationAtom";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 import { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
@@ -16,13 +17,21 @@ import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";
  * Mounts the routed Inventory canvas while React retains page framing and navigation ownership.
  *
  * Ordinary activation releases the canonical Inventory item from the engine-owned physical
- * opener. Right click opens Item Detail and never initiates a release.
+ * opener. Space activation instead commits its action before returning to the Board. Right click
+ * opens Item Detail and never initiates either command.
  */
-export const PixiInventorySurface = () => {
+export const PixiInventorySurface = ({
+	onSpaceActivated,
+}: {
+	readonly onSpaceActivated: () => void;
+}) => {
 	const game = useGameEngine();
 	const itemDetail = useItemDetailControl();
 	const { interaction, textures } = usePixiGameRuntime();
 	const releaseInventoryItem = useAtomSet(runInventoryReleaseAtom(game), {
+		mode: "promise",
+	});
+	const runSpaceActivation = useAtomSet(runSpaceActivationAtom(game), {
 		mode: "promise",
 	});
 	const runDrop = useAtomSet(runTileDropAtom(game), {
@@ -31,18 +40,24 @@ export const PixiInventorySurface = () => {
 	const hostRef = useRef<HTMLDivElement>(null);
 	const controlsRef = useRef({
 		itemDetail,
+		onSpaceActivated,
 		releaseInventoryItem,
+		runSpaceActivation,
 	});
 	controlsRef.current = {
 		itemDetail,
+		onSpaceActivated,
 		releaseInventoryItem,
+		runSpaceActivation,
 	};
 
 	const activate = useCallback(
 		(item: TileActorItem, openDetail: boolean, origin: HTMLElement) => {
 			const {
 				itemDetail: currentItemDetail,
+				onSpaceActivated: currentOnSpaceActivated,
 				releaseInventoryItem: currentReleaseInventoryItem,
+				runSpaceActivation: currentRunSpaceActivation,
 			} = controlsRef.current;
 			if (openDetail) {
 				RendererRuntime.runSync(
@@ -54,6 +69,16 @@ export const PixiInventorySurface = () => {
 				return;
 			}
 			if (item.location.scope !== LocationScopeEnumSchema.enum.Inventory) return;
+			if (item.primaryAction.kind === "activate-space") {
+				return currentRunSpaceActivation({
+					currentSpace: item.primaryAction.currentSpace,
+					itemId: item.id,
+					location: item.location,
+					revision: item.revision,
+				}).then((activated) => {
+					if (activated) currentOnSpaceActivated();
+				});
+			}
 			return currentReleaseInventoryItem({
 				itemId: item.id,
 				location: item.location,

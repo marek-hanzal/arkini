@@ -4,6 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { runSpaceActivationAtom } from "~/bridge/space/runSpaceActivationAtom";
 import { TileDefaultLineCommandAtom } from "~/bridge/tile/TileDefaultLineCommandAtom";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
@@ -39,6 +40,9 @@ export const PixiBoardToolbarSurface = ({ onOpenInventory }: PixiBoardToolbarSur
 		mode: "promise",
 	});
 	const runSplit = useAtomSet(runTileSplitAtom(game), {
+		mode: "promise",
+	});
+	const runSpaceActivation = useAtomSet(runSpaceActivationAtom(game), {
 		mode: "promise",
 	});
 	const hostRef = useRef<HTMLDivElement>(null);
@@ -97,6 +101,18 @@ export const PixiBoardToolbarSurface = ({ onOpenInventory }: PixiBoardToolbarSur
 				)
 				.with(
 					{
+						kind: "activate-space",
+					},
+					(primaryAction) =>
+						runSpaceActivation({
+							currentSpace: primaryAction.currentSpace,
+							itemId: item.id,
+							location: item.location,
+							revision: item.revision,
+						}),
+				)
+				.with(
+					{
 						kind: "open-inventory",
 					},
 					() => onOpenInventory(),
@@ -117,6 +133,7 @@ export const PixiBoardToolbarSurface = ({ onOpenInventory }: PixiBoardToolbarSur
 		[
 			enqueueLine,
 			onOpenInventory,
+			runSpaceActivation,
 			runSplit,
 		],
 	);

@@ -1,4 +1,8 @@
-import type { EditorDropRule, EditorLineRule } from "~/bridge/item/editor/EditorItemModel";
+import type {
+	EditorActionRule,
+	EditorDropRule,
+	EditorLineRule,
+} from "~/bridge/item/editor/EditorItemModel";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import {
 	EditorChoiceControl,
@@ -9,15 +13,19 @@ import {
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorWhenControl } from "~/ui/item/editor/EditorWhenControl";
 
-type EditorRule = EditorLineRule | EditorDropRule;
+type EditorRule = EditorActionRule | EditorLineRule | EditorDropRule;
 type EditorRuleType = EditorLineRule["type"];
-export type EditorRuleTarget = "drop" | "line";
+export type EditorRuleTarget = "action" | "drop" | "line";
 
 const readRuleTypeDescription = (type: EditorRuleType, target: EditorRuleTarget) => {
 	if (target === "drop")
 		return type === "enable"
 			? "Allows this selected drop only while every condition passes. It does not enable or disable the production line itself."
 			: "Suppresses this selected drop while every condition passes. It does not disable the production line or other drops.";
+	if (target === "action")
+		return type === "enable"
+			? "Acts as a positive gate for this item action. Every Enable rule must pass, while a matching Disable rule still vetoes activation."
+			: "Disables this item action while every condition passes, regardless of its authored Enabled state or passing Enable rules.";
 	if (type === "show")
 		return "Shows this production line while every condition passes. A matching Hide rule still has veto power.";
 	if (type === "hide")

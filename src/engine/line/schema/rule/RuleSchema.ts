@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { RuleDisableSchema } from "./RuleDisableSchema";
-import { RuleEnableSchema } from "./RuleEnableSchema";
+import { ActionRuleDisableSchema } from "~/engine/action/schema/ActionRuleDisableSchema";
+import { ActionRuleEnableSchema } from "~/engine/action/schema/ActionRuleEnableSchema";
 import { RuleHideSchema } from "./RuleHideSchema";
 import { RuleRuntimeAdjustSchema } from "./RuleRuntimeAdjustSchema";
 import { RuleRuntimeMultiplierSchema } from "./RuleRuntimeMultiplierSchema";
@@ -17,8 +17,8 @@ export const RuleSchema = z
 	.discriminatedUnion("type", [
 		RuleShowSchema,
 		RuleHideSchema,
-		RuleEnableSchema,
-		RuleDisableSchema,
+		ActionRuleEnableSchema,
+		ActionRuleDisableSchema,
 		RuleRuntimeAdjustSchema,
 		RuleRuntimeMultiplierSchema,
 	])

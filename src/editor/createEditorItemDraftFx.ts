@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import type { ActionInputSchema } from "~/engine/action/schema/ActionInputSchema";
 import type { InputSchema } from "~/engine/input/schema/InputSchema";
 import type { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
@@ -51,6 +52,14 @@ export const createEditorItemDraftFx = Effect.fn("createEditorItemDraftFx")(
 				.with("simple", (matchedType) => ({
 					...base,
 					type: matchedType,
+				}))
+				.with("space", (matchedType) => ({
+					...base,
+					type: matchedType,
+					space: 0,
+					enable: true,
+					input: [] as ActionInputSchema.Type[],
+					rules: [],
 				}))
 				.with("inventory", (matchedType) => ({
 					...base,

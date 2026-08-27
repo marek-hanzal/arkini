@@ -110,6 +110,9 @@ export const EditorItemProductionSection = () => {
 			{
 				type: "simple",
 			},
+			{
+				type: "space",
+			},
 			() => null,
 		)
 		.exhaustive();

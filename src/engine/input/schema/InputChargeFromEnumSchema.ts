@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/** Selects the runtime item whose charges pay one input cost. */
+/** Selects the runtime item whose charges pay one action requirement. */
 export const InputChargeFromEnumSchema = z
 	.enum({
 		Self: "self",
@@ -9,7 +9,7 @@ export const InputChargeFromEnumSchema = z
 	.meta({
 		id: "InputChargeFromEnumSchema",
 		description:
-			"Whether one input charge cost is paid by the line owner or its resolved target.",
+			"Whether one requirement cost is paid by the action owner or its resolved target.",
 	});
 
 export type InputChargeFromEnumSchema = typeof InputChargeFromEnumSchema;

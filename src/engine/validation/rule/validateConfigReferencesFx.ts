@@ -12,6 +12,7 @@ import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
 import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
 import { readItemOutputEntriesFx } from "../fx/readItemOutputEntriesFx";
 import { validateLineReferencesFx } from "../fx/validateLineReferencesFx";
+import { validateActionReferencesFx } from "../fx/validateActionReferencesFx";
 import { validateOutputReferencesFx } from "../fx/validateOutputReferencesFx";
 import { validateSelectorReferenceFx } from "../fx/validateSelectorReferenceFx";
 
@@ -91,6 +92,26 @@ export const validateConfigReferencesFx = Effect.fn("validateConfigReferencesFx"
 
 	for (const [itemId, item] of Object.entries(config.items)) {
 		const source = provenance.items[itemId];
+		if (item.type === "space") {
+			diagnostics.push(
+				...(yield* validateActionReferencesFx({
+					config,
+					inputs: item.input.map((input, index) => ({
+						input,
+						index,
+					})),
+					path: [
+						"items",
+						itemId,
+					],
+					rules: item.rules.map((rule, index) => ({
+						index,
+						rule,
+					})),
+					source,
+				})),
+			);
+		}
 		for (const [mergeIndex, merge] of (item.merge ?? []).entries()) {
 			diagnostics.push(
 				...(yield* validateSelectorReferenceFx({

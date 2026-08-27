@@ -5,6 +5,7 @@ import { useEditorItemFormSession } from "~/ui/item/editor/EditorItemFormContext
 import { EditorItemIdentitySection } from "~/ui/item/editor/EditorItemIdentitySection";
 import { EditorItemMergesSection } from "~/ui/item/editor/EditorItemMergesSection";
 import { EditorItemProductionSection } from "~/ui/item/editor/EditorItemProductionSection";
+import { EditorSpaceActionSection } from "~/ui/item/editor/EditorSpaceActionSection";
 import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
 import { readEditorItemFormSectionsFx } from "~/ui/item/editor/readEditorItemFormSectionsFx";
 
@@ -18,6 +19,8 @@ const renderSection = (section: EditorItemSectionId) => {
 			return <EditorItemChargesSection />;
 		case "merges":
 			return <EditorItemMergesSection />;
+		case "action":
+			return <EditorSpaceActionSection />;
 		case "production":
 			return <EditorItemProductionSection />;
 	}

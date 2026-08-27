@@ -1,46 +1,36 @@
-import { Array, Effect } from "effect";
+import { Array, Effect, Option } from "effect";
 
+import { resolveActionChargeFx } from "~/engine/action/fx/resolveActionChargeFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { InputDepositSchema } from "~/engine/input/schema/InputDepositSchema";
+import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
 import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
 import { queryFx } from "~/engine/query/fx/queryFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
-import { readBoardRuntimeItemByIdFx } from "~/engine/runtime/read/readBoardRuntimeItemByIdFx";
+import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
-
-import { resolveInputChargeRunFx } from "./resolveInputChargeRunFx";
-
-export namespace resolveInputDepositRunFx {
-	export interface Props {
-		input: InputDepositSchema.Type;
-		ownerItemId: IdSchema.Type;
-		reservedCharges: ReadonlyMap<IdSchema.Type, number>;
-		runtime: RuntimeSchema.Type;
-	}
-}
 
 const compareTarget = (
 	origin: {
-		x: number;
-		y: number;
+		readonly x: number;
+		readonly y: number;
 	},
 	left: {
-		id: string;
-		location: {
-			position: {
-				x: number;
-				y: number;
+		readonly id: string;
+		readonly location: {
+			readonly position: {
+				readonly x: number;
+				readonly y: number;
 			};
 		};
 	},
 	right: {
-		id: string;
-		location: {
-			position: {
-				x: number;
-				y: number;
+		readonly id: string;
+		readonly location: {
+			readonly position: {
+				readonly x: number;
+				readonly y: number;
 			};
 		};
 	},
@@ -51,7 +41,6 @@ const compareTarget = (
 	const rightDistance =
 		Math.abs(right.location.position.x - origin.x) +
 		Math.abs(right.location.position.y - origin.y);
-
 	return (
 		leftDistance - rightDistance ||
 		left.location.position.y - right.location.position.y ||
@@ -60,17 +49,32 @@ const compareTarget = (
 	);
 };
 
-/** Selects one deterministic board target that can pay a deposit input charge cost. */
-export const resolveInputDepositRunFx = Effect.fn("resolveInputDepositRunFx")(function* ({
+/** Selects one deterministic Board payer, or stays unavailable without a real Board origin. */
+export const resolveActionDepositInputFx = Effect.fn("resolveActionDepositInputFx")(function* ({
 	input,
 	ownerItemId,
 	reservedCharges,
 	runtime,
-}: resolveInputDepositRunFx.Props) {
-	const owner = yield* readBoardRuntimeItemByIdFx({
+}: {
+	readonly input: InputDepositSchema.Type;
+	readonly ownerItemId: IdSchema.Type;
+	readonly reservedCharges: ReadonlyMap<IdSchema.Type, number>;
+	readonly runtime: RuntimeSchema.Type;
+}) {
+	const runtimeOwner = yield* readRuntimeItemByIdFx({
 		itemId: ownerItemId,
 		runtime,
 	});
+	const owner = Option.getOrUndefined(yield* isBoardRuntimeItemFx(runtimeOwner));
+	if (owner === undefined) {
+		return {
+			resolution: {
+				type: InputEnumSchema.enum.Deposit,
+				ready: false,
+			},
+			plan: undefined,
+		} satisfies InputRunResolutionSchema.Type;
+	}
 
 	const candidates = yield* queryFx({
 		origin: owner.location,
@@ -85,17 +89,14 @@ export const resolveInputDepositRunFx = Effect.fn("resolveInputDepositRunFx")(fu
 	).sort((left, right) => compareTarget(owner.location.position, left, right));
 
 	for (const target of boardCandidates) {
-		const charges = yield* resolveInputChargeRunFx({
+		const charges = yield* resolveActionChargeFx({
 			charges: input.charges,
 			ownerItemId,
 			reservedCharges,
 			targetItemId: target.id,
 			runtime,
 		});
-		if (!charges.ready || charges.plan === undefined) {
-			continue;
-		}
-
+		if (!charges.ready || charges.plan === undefined) continue;
 		return {
 			resolution: {
 				type: InputEnumSchema.enum.Deposit,

@@ -26,7 +26,7 @@ export const EditorBuild = () => {
 					<p className="mt-1 text-xs text-subtle">
 						Arkpack v{controller.project.version}. Compatible edits keep saves and Board
 						scenarios; a major project save permanently deletes its scenarios and
-						published game saves start fresh when loaded.
+						existing published game saves remain stored but cannot be restored.
 					</p>
 				</div>
 			</header>

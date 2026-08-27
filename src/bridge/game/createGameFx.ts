@@ -63,28 +63,16 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 		const arkpackVersion = yield* readArkpackVersionFx(loaded.payload.version);
 		const saveVersion = yield* readArkpackVersionFx(saved.version);
 		if (saveVersion.major !== arkpackVersion.major) {
-			yield* saveStorage.clearFx(saveKey).pipe(
-				Effect.mapError(
-					(cause) =>
-						new GameSaveBootstrapError({
-							cause,
-							saveKey,
-						}),
-				),
+			return yield* Effect.fail(
+				new GameSaveBootstrapError({
+					cause: new Error(
+						`Save version ${saved.version} is incompatible with arkpack version ${loaded.payload.version}.`,
+					),
+					saveKey,
+				}),
 			);
-		} else {
-			if (saveVersion.minor > arkpackVersion.minor) {
-				return yield* Effect.fail(
-					new GameSaveBootstrapError({
-						cause: new Error(
-							`Save version ${saved.version} is newer than arkpack version ${loaded.payload.version}.`,
-						),
-						saveKey,
-					}),
-				);
-			}
-			state = saved.state;
 		}
+		state = saved.state;
 	}
 	const session = yield* createGameSessionFx({
 		config: loaded.payload.config,

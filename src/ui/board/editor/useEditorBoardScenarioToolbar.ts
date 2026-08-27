@@ -133,11 +133,7 @@ export const useEditorBoardScenarioToolbar = ({
 				setMessage(`${value} restored.`);
 				return;
 			}
-			const remaining = scenarios.filter((scenario) => scenario.name !== value);
-			setScenarios(remaining);
-			setName(nextScenarioName(remaining));
-			setDraft(true);
-			setMessage(`${value} was invalid and has been deleted. ${result.reason}`);
+			setMessage(`${value} could not be restored. ${result.reason}`);
 		} catch (cause) {
 			setMessage(errorMessage(cause));
 		} finally {

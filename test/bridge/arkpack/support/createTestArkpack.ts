@@ -4,6 +4,7 @@ import { Effect } from "effect";
 import { encodeFx } from "~/engine/pack/fx/encodeFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import type { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
 import { createTestPngBytes } from "~test/bridge/arkpack/support/createTestPngBytes";
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 
@@ -56,6 +57,7 @@ export const createTestArkpack = (
 	config = testArkpackConfig,
 	packageId = config.meta.id,
 	version: ArkpackVersionSchema.Type = "1.0",
+	arkini: ArkiniVersionSchema.Type = ArkiniAppVersion,
 ) => {
 	const identifiedConfig = {
 		...config,
@@ -67,7 +69,7 @@ export const createTestArkpack = (
 	const encoded = Effect.runSync(
 		encodeFx({
 			version,
-			arkini: ArkiniAppVersion,
+			arkini,
 			config: identifiedConfig,
 			resources: [
 				{

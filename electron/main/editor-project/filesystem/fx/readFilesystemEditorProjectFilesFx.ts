@@ -10,6 +10,7 @@ import { createGameProjectJsonSchema } from "~/engine/schema/fx/writeGameProject
 import { GameProjectFileSchema } from "~/engine/source/schema/GameProjectFileSchema";
 import { GameProjectItemFileSchema } from "~/engine/source/schema/GameProjectItemFileSchema";
 import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
+import { admitArkiniVersionFx } from "~/engine/version/ArkiniVersionAdmission";
 import type { GameSourceFileSchema } from "~/engine/source/schema/GameSourceFileSchema";
 import { createEditorProjectFilesystemPathsFx } from "../createEditorProjectFilesystemPathsFx";
 import type { FilesystemEditorProjectFiles } from "./FilesystemEditorProjectFiles";
@@ -75,7 +76,7 @@ export const readFilesystemEditorProjectFilesFx = Effect.fn("readFilesystemEdito
 		);
 		if (!isDeepStrictEqual(gameSchema, createGameProjectJsonSchema()))
 			return yield* Effect.fail(
-				new Error("The Editor game schema does not match this Arkini version."),
+				new Error("The Editor game schema does not match the current project schema."),
 			);
 		const gameFile = yield* parseJsonFx(
 			paths.gameFile,
@@ -213,6 +214,7 @@ export const readFilesystemEditorProjectFilesFx = Effect.fn("readFilesystemEdito
 					})),
 				),
 		);
+		yield* admitArkiniVersionFx("Editor project", marker.arkini);
 
 		return {
 			arkpack: version,

@@ -1,3 +1,4 @@
+import { gzipSync } from "node:zlib";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -13,11 +14,12 @@ import {
 	createTestPngBytes,
 	installTestPngDecoder,
 } from "~test/bridge/arkpack/support/createTestPngBytes";
-import { gzipSync } from "node:zlib";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 import { ArkiniPublicKey } from "~/bridge/arkpack/ArkiniPublicKey";
+import { ArkiniVersionIncompatibleError } from "~/engine/version/ArkiniVersionAdmission";
 
 const publicKey = ArkiniPublicKey;
+const writerMajor = ArkiniAppVersion.slice(0, ArkiniAppVersion.indexOf("."));
 
 beforeEach(() => {
 	installTestPngDecoder();
@@ -28,6 +30,48 @@ afterEach(() => {
 });
 
 describe("readArkpackFx", () => {
+	it.each([
+		`${writerMajor}.0.0`,
+		`${writerMajor}.999.999`,
+	])("admits a structurally current same-major writer %s", async (arkini) => {
+		const loaded = await Effect.runPromise(
+			readArkpackFx({
+				bytes: createTestArkpack(
+					testArkpackConfig,
+					testArkpackConfig.meta.id,
+					"1.0",
+					arkini,
+				),
+				signature: {
+					publicKey,
+				},
+				source: "user",
+			}),
+		);
+
+		expect(loaded.descriptor.arkini).toBe(arkini);
+	});
+
+	it("rejects a different writer major with a typed incompatibility", async () => {
+		const arkini = `${Number(writerMajor) + 1}.0.0`;
+		await expect(
+			Effect.runPromise(
+				readArkpackFx({
+					bytes: createTestArkpack(
+						testArkpackConfig,
+						testArkpackConfig.meta.id,
+						"1.0",
+						arkini,
+					),
+					signature: {
+						publicKey,
+					},
+					source: "user",
+				}),
+			),
+		).rejects.toBeInstanceOf(ArkiniVersionIncompatibleError);
+	});
+
 	it("derives package identity from the game config independently of the filename", async () => {
 		const bytes = createTestArkpack();
 		const first = await Effect.runPromise(

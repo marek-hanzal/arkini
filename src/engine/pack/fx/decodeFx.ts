@@ -4,9 +4,10 @@ import { Effect } from "effect";
 import { Magic } from "~/engine/pack/Magic";
 import { ManifestSchema } from "~/engine/pack/schema/ManifestSchema";
 import { PayloadSchema } from "~/engine/pack/schema/PayloadSchema";
+import { admitArkiniVersionFx } from "~/engine/version/ArkiniVersionAdmission";
 
 export const decodeFx = Effect.fn("decodeFx")(function* (bytes: Uint8Array) {
-	return yield* Effect.sync(() => {
+	const payload = yield* Effect.sync(() => {
 		const headerLength = Magic.byteLength + 4;
 		if (bytes.byteLength < headerLength) {
 			throw new Error("Invalid pack: truncated header.");
@@ -56,4 +57,6 @@ export const decodeFx = Effect.fn("decodeFx")(function* (bytes: Uint8Array) {
 			resources,
 		});
 	});
+	yield* admitArkiniVersionFx("Arkpack", payload.arkini);
+	return payload;
 });

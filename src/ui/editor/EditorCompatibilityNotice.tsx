@@ -17,7 +17,7 @@ export const EditorCompatibilityNotice = ({
 			? {
 					className: "border-danger bg-danger/5",
 					description:
-						"Saving this change permanently deletes every saved Board scenario in this project. Published game saves are discarded when the new major version is loaded.",
+						"Saving this change permanently deletes every saved Board scenario in this project. Existing published game saves remain stored but cannot load this gameplay major.",
 					title: "Breaking gameplay change",
 				}
 			: level === "minor"

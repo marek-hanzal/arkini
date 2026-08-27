@@ -45,10 +45,18 @@ const state: StateSchema.Type = {
 const runRestore = async ({
 	bytes,
 	replaceFx,
+	version = project.version,
+	projectVersion = project.version,
 }: {
 	readonly bytes: Uint8Array;
 	readonly replaceFx: EditorBoardGameResource["replaceFx"];
+	readonly version?: string;
+	readonly projectVersion?: string;
 }) => {
+	const restoredProject = {
+		...project,
+		version: projectVersion,
+	};
 	const registry = AtomRegistry.make({
 		scheduleTask,
 	});
@@ -81,7 +89,7 @@ const runRestore = async ({
 				projectId: project.projectId,
 				name: "Scenario",
 				projectRevision: project.revision,
-				version: project.version,
+				version,
 				bytes: Uint8Array.from(bytes),
 				createdAtMs: 1,
 				updatedAtMs: 1,
@@ -96,7 +104,7 @@ const runRestore = async ({
 	try {
 		const result = await Effect.runPromiseExit(
 			restoreEditorBoardScenarioFx({
-				project,
+				project: restoredProject,
 				name: "Scenario",
 			}).pipe(
 				Effect.provideService(EditorProjectRepository, repository),
@@ -106,6 +114,7 @@ const runRestore = async ({
 		return {
 			result,
 			deleteBoardScenarioFx,
+			restoredProject,
 		};
 	} finally {
 		registry.dispose();
@@ -113,7 +122,7 @@ const runRestore = async ({
 };
 
 describe("restoreEditorBoardScenarioFx", () => {
-	it("deletes a proven-invalid scenario and replaces it with a fresh session", async () => {
+	it("rejects invalid scenario bytes without deleting or replacing them", async () => {
 		const replaceFx = vi.fn<EditorBoardGameResource["replaceFx"]>(() => Effect.void);
 		const { result, deleteBoardScenarioFx } = await runRestore({
 			bytes: new Uint8Array([
@@ -124,12 +133,63 @@ describe("restoreEditorBoardScenarioFx", () => {
 
 		expect(Exit.isSuccess(result)).toBe(true);
 		if (Exit.isFailure(result)) throw new Error("Expected invalid scenario recovery.");
-		expect(result.value.type).toBe("discarded");
-		expect(deleteBoardScenarioFx).toHaveBeenCalledWith({
-			projectId: project.projectId,
-			name: "Scenario",
+		expect(result.value.type).toBe("rejected");
+		expect(deleteBoardScenarioFx).not.toHaveBeenCalled();
+		expect(replaceFx).not.toHaveBeenCalled();
+	});
+
+	it.each([
+		{
+			version: "1.0",
+			projectVersion: "1.1",
+		},
+		{
+			version: "1.1",
+			projectVersion: "1.0",
+		},
+	])(
+		"restores gameplay $version against same-major project $projectVersion",
+		async (versions) => {
+			const bytes = await Effect.runPromise(
+				encodeArkiniSaveFx({
+					version: versions.version,
+					state,
+				}),
+			);
+			const replaceFx = vi.fn<EditorBoardGameResource["replaceFx"]>(() => Effect.void);
+			const { result, deleteBoardScenarioFx, restoredProject } = await runRestore({
+				bytes,
+				replaceFx,
+				...versions,
+			});
+
+			expect(Exit.isSuccess(result)).toBe(true);
+			if (Exit.isFailure(result)) throw new Error("Expected same-major scenario restore.");
+			expect(result.value.type).toBe("restored");
+			expect(deleteBoardScenarioFx).not.toHaveBeenCalled();
+			expect(replaceFx).toHaveBeenCalledWith(restoredProject, state);
+		},
+	);
+
+	it("rejects a different gameplay major without deleting it", async () => {
+		const bytes = await Effect.runPromise(
+			encodeArkiniSaveFx({
+				version: "2.0",
+				state,
+			}),
+		);
+		const replaceFx = vi.fn<EditorBoardGameResource["replaceFx"]>(() => Effect.void);
+		const { result, deleteBoardScenarioFx } = await runRestore({
+			bytes,
+			replaceFx,
+			version: "2.0",
 		});
-		expect(replaceFx).toHaveBeenCalledWith(project, undefined);
+
+		expect(Exit.isSuccess(result)).toBe(true);
+		if (Exit.isFailure(result)) throw new Error("Expected incompatible scenario rejection.");
+		expect(result.value.type).toBe("rejected");
+		expect(deleteBoardScenarioFx).not.toHaveBeenCalled();
+		expect(replaceFx).not.toHaveBeenCalled();
 	});
 
 	it("preserves a valid scenario when live session replacement fails", async () => {

@@ -3,6 +3,7 @@ import { Effect } from "effect";
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { ArkiniPublicKey } from "~/bridge/arkpack/ArkiniPublicKey";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
+import { ArkiniVersionIncompatibleError } from "~/engine/version/ArkiniVersionAdmission";
 
 /** Selects the first valid user-first candidate while keeping decode authority in the renderer. */
 export const readArkpackCandidatesFx = Effect.fn("readArkpackCandidatesFx")(function* (
@@ -11,6 +12,7 @@ export const readArkpackCandidatesFx = Effect.fn("readArkpackCandidatesFx")(func
 	const candidates = [
 		...files,
 	].sort((left, right) => (left.source === right.source ? 0 : left.source === "user" ? -1 : 1));
+	let incompatibility: ArkiniVersionIncompatibleError | undefined;
 	for (const file of candidates) {
 		const result = yield* Effect.result(
 			readArkpackFx({
@@ -26,6 +28,9 @@ export const readArkpackCandidatesFx = Effect.fn("readArkpackCandidatesFx")(func
 			}),
 		);
 		if (result._tag === "Success") return result.success;
+		if (result.failure instanceof ArkiniVersionIncompatibleError)
+			incompatibility ??= result.failure;
 	}
+	if (incompatibility !== undefined) return yield* Effect.fail(incompatibility);
 	return undefined;
 });

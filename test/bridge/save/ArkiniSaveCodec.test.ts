@@ -17,6 +17,7 @@ const state: StateSchema.Type = {
 	jobs: [],
 	jobQueue: [],
 };
+const writerMajor = ArkiniAppVersion.slice(0, ArkiniAppVersion.indexOf("."));
 
 describe("Arkini save codec", () => {
 	it("round-trips arkpack and writer compatibility with canonical state", async () => {
@@ -30,6 +31,45 @@ describe("Arkini save codec", () => {
 			version: "1.2",
 			arkini: ArkiniAppVersion,
 			state,
+		});
+	});
+
+	it.each([
+		`${writerMajor}.0.0`,
+		`${writerMajor}.999.999`,
+	])("admits structurally current same-major writer %s", async (arkini) => {
+		await expect(
+			Effect.runPromise(
+				decodeArkiniSaveFx(
+					encode({
+						version: "1.2",
+						arkini,
+						state,
+					}),
+				),
+			),
+		).resolves.toMatchObject({
+			arkini,
+			state,
+		});
+	});
+
+	it("rejects a different writer major with a typed incompatibility", async () => {
+		const arkini = `${Number(writerMajor) + 1}.0.0`;
+		await expect(
+			Effect.runPromise(
+				decodeArkiniSaveFx(
+					encode({
+						version: "1.2",
+						arkini,
+						state,
+					}),
+				),
+			),
+		).rejects.toMatchObject({
+			_tag: "ArkiniVersionIncompatibleError",
+			artifact: "save",
+			writerVersion: arkini,
 		});
 	});
 

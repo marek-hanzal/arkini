@@ -6,6 +6,8 @@ export const syncFilesystemPathFx = Effect.fn("syncFilesystemPathFx")(function* 
 	fileSystem: FileSystem.FileSystem,
 	target: string,
 ) {
+	if (process.platform === "win32" && (yield* fileSystem.stat(target)).type === "Directory")
+		return;
 	yield* Effect.scoped(
 		Effect.gen(function* () {
 			const file = yield* fileSystem.open(target, {

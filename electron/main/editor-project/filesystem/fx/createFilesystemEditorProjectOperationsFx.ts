@@ -7,6 +7,7 @@ import type { FilesystemEditorProjectState } from "../FilesystemEditorProjectSta
 import { createEditorProjectFilesystemPathsFx } from "../createEditorProjectFilesystemPathsFx";
 import type { FilesystemEditorProjectCatalog } from "./createFilesystemEditorProjectCatalogFx";
 import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProjectCandidate } from "~/editor/EditorProjectCandidate";
 import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
 import type { EditorProjectRepository } from "~/editor/EditorProjectRepository";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
@@ -31,7 +32,7 @@ export interface FilesystemEditorProjectOperations {
 		projectId: string,
 	) => Effect.Effect<void, EditorProjectRepositoryError>;
 	readonly listProjectsFx: Effect.Effect<
-		ReadonlyArray<EditorProjectDescriptor>,
+		ReadonlyArray<EditorProjectCandidate>,
 		EditorProjectRepositoryError
 	>;
 	readonly openProjectFx: (
@@ -70,6 +71,9 @@ const materializeDescriptor = ({
 	createdAtMs,
 	updatedAtMs,
 });
+
+const readValidationError = (cause: unknown) =>
+	cause instanceof Error ? cause.message : String(cause);
 
 const error = (
 	operation:
@@ -185,6 +189,113 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 		);
 	const writeProjectFx = (props: Parameters<typeof writeFilesystemEditorProjectFilesFx>[0]) =>
 		providePlatform(writeFilesystemEditorProjectFilesFx(props));
+	const readCandidatesFx = Effect.gen(function* () {
+		const candidates: Array<EditorProjectCandidate> = [];
+		const listedRoots = new Set<string>();
+		for (const entry of catalog.list()) {
+			const mounted = [
+				...states.values(),
+			].find(
+				(state) =>
+					state.catalog.root === entry.root &&
+					state.catalog.ownership === entry.ownership,
+			);
+			if (mounted !== undefined) {
+				if (listedRoots.has(mounted.paths.root)) {
+					yield* catalog.removeFx(entry.root).pipe(Effect.catch(() => Effect.void));
+					continue;
+				}
+				listedRoots.add(mounted.paths.root);
+				candidates.push({
+					type: "valid",
+					project: materializeDescriptor(mounted.project),
+				});
+				continue;
+			}
+			if (!(yield* fileSystem.exists(path.resolve(entry.root)))) {
+				yield* catalog.removeFx(entry.root).pipe(Effect.catch(() => Effect.void));
+				continue;
+			}
+			const canonicalRoot = yield* fileSystem.realPath(path.resolve(entry.root));
+			if (listedRoots.has(canonicalRoot)) {
+				yield* catalog.removeFx(entry.root).pipe(Effect.catch(() => Effect.void));
+				continue;
+			}
+			listedRoots.add(canonicalRoot);
+			const existing = [
+				...states.values(),
+			].find(
+				(state) =>
+					state.paths.root === canonicalRoot &&
+					state.catalog.ownership === entry.ownership,
+			);
+			if (existing !== undefined) {
+				candidates.push({
+					type: "valid",
+					project: materializeDescriptor(existing.project),
+				});
+				continue;
+			}
+			const materialized = yield* materializeFx(entry).pipe(
+				Effect.map((state) => ({
+					type: "success" as const,
+					state,
+				})),
+				Effect.catch((cause) =>
+					Effect.succeed({
+						type: "failure" as const,
+						cause,
+					}),
+				),
+			);
+			if (materialized.type === "failure") {
+				candidates.push({
+					type: "invalid",
+					root: entry.root,
+					title: path.basename(entry.root) || entry.root,
+					validationError: readValidationError(materialized.cause),
+				});
+				continue;
+			}
+			const state = materialized.state;
+			const duplicateRoot = [
+				...states.values(),
+			].some(({ paths }) => paths.root === state.paths.root);
+			if (duplicateRoot) {
+				yield* catalog.removeFx(entry.root).pipe(Effect.catch(() => Effect.void));
+				continue;
+			}
+			if (states.has(state.project.projectId)) {
+				candidates.push({
+					type: "invalid",
+					root: entry.root,
+					title: path.basename(entry.root) || entry.root,
+					validationError: `Editor project ID ${state.project.projectId} is duplicated by ${entry.root}.`,
+				});
+				continue;
+			}
+			states.set(state.project.projectId, state);
+			candidates.push({
+				type: "valid",
+				project: materializeDescriptor(state.project),
+			});
+		}
+		return candidates.sort((left, right) => {
+			if (left.type === "valid" && right.type === "valid")
+				return (
+					right.project.updatedAtMs - left.project.updatedAtMs ||
+					left.project.projectId.localeCompare(right.project.projectId)
+				);
+			if (left.type !== right.type) return left.type === "valid" ? -1 : 1;
+			return left.type === "invalid" && right.type === "invalid"
+				? left.root.localeCompare(right.root)
+				: 0;
+		});
+	}).pipe(
+		Effect.mapError((cause) =>
+			error("list-projects", "The Editor project catalog could not be refreshed.", cause),
+		),
+	);
 
 	yield* filesystemWrite.withLockFx(
 		lifecycleLock,
@@ -203,38 +314,18 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 						);
 					}),
 			);
-			for (const entry of entries) {
-				if (!(yield* fileSystem.exists(path.resolve(entry.root)))) {
-					yield* catalog.removeFx(entry.root).pipe(Effect.catch(() => Effect.void));
-					continue;
+			yield* readCandidatesFx;
+			if (!catalog.rebuilt)
+				for (const name of yield* fileSystem.readDirectory(managedProjectsRoot)) {
+					if (name === ".projects.lock") continue;
+					const candidate = path.join(managedProjectsRoot, name);
+					if (managedRoots.has(candidate)) continue;
+					if ((yield* fileSystem.realPath(candidate)) !== candidate) continue;
+					yield* fileSystem.remove(candidate, {
+						force: true,
+						recursive: true,
+					});
 				}
-				yield* materializeFx(entry).pipe(
-					Effect.flatMap((state) => {
-						const duplicateRoot = [
-							...states.values(),
-						].some(({ paths }) => paths.root === state.paths.root);
-						if (duplicateRoot) return Effect.void;
-						return states.has(state.project.projectId)
-							? Effect.fail(
-									new Error(
-										`Editor project ID ${state.project.projectId} is duplicated by ${entry.root}.`,
-									),
-								)
-							: Effect.sync(() => states.set(state.project.projectId, state));
-					}),
-					Effect.catch(() => Effect.void),
-				);
-			}
-			for (const name of yield* fileSystem.readDirectory(managedProjectsRoot)) {
-				if (name === ".projects.lock") continue;
-				const candidate = path.join(managedProjectsRoot, name);
-				if (managedRoots.has(candidate)) continue;
-				if ((yield* fileSystem.realPath(candidate)) !== candidate) continue;
-				yield* fileSystem.remove(candidate, {
-					force: true,
-					recursive: true,
-				});
-			}
 		}),
 	);
 
@@ -326,12 +417,13 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 					...states.values(),
 				].find((state) => state.catalog.root === root);
 				if (existing !== undefined) return cloneProject(existing.project);
-				const files = yield* withFilesystemEditorProjectLockFx(
-					filesystemWrite,
+				const provisionalEntry = EditorProjectCatalogEntrySchema.parse({
 					root,
-					providePlatform(readFilesystemEditorProjectFilesFx(root)),
-				);
-				const projectId = files.config.meta.id;
+					ownership: "external",
+					createdAtMs: 0,
+				});
+				const provisionalState = yield* materializeFx(provisionalEntry);
+				const projectId = provisionalState.project.projectId;
 				if (states.has(projectId))
 					return yield* Effect.fail(
 						error(
@@ -340,11 +432,17 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 						),
 					);
 				const entry = EditorProjectCatalogEntrySchema.parse({
-					root,
-					ownership: "external",
-					createdAtMs: files.marker.revision,
+					...provisionalEntry,
+					createdAtMs: provisionalState.project.updatedAtMs,
 				});
-				const state = yield* materializeFx(entry);
+				const state: FilesystemEditorProjectState = {
+					...provisionalState,
+					catalog: entry,
+					project: {
+						...provisionalState.project,
+						createdAtMs: entry.createdAtMs,
+					},
+				};
 				yield* catalog.addFx(entry);
 				states.set(projectId, state);
 				return cloneProject(state.project);
@@ -360,19 +458,7 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 		);
 
 	const listProjectsFx: FilesystemEditorProjectOperations["listProjectsFx"] =
-		operations.withPermits(1)(
-			Effect.sync(() =>
-				[
-					...states.values(),
-				]
-					.map(({ project }) => materializeDescriptor(project))
-					.sort(
-						(left, right) =>
-							right.updatedAtMs - left.updatedAtMs ||
-							left.projectId.localeCompare(right.projectId),
-					),
-			),
-		);
+		operations.withPermits(1)(readCandidatesFx);
 
 	const readProjectFx: FilesystemEditorProjectOperations["readProjectFx"] = (projectId) =>
 		operations.withPermits(1)(

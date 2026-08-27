@@ -32,6 +32,7 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 	const states = new Map<string, FilesystemEditorProjectState>();
 	const catalog = yield* createFilesystemEditorProjectCatalogFx({
 		catalogPath,
+		projectsRoot,
 	});
 	const projects = yield* createFilesystemEditorProjectOperationsFx({
 		catalog,

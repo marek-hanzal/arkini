@@ -20,6 +20,7 @@ export namespace EditorProjectTransport {
 		| "list-projects"
 		| "list-versions"
 		| "open-export-directory"
+		| "open-project-directory"
 		| "read-project"
 		| "read-project-build"
 		| "refresh-project"
@@ -67,6 +68,18 @@ export namespace EditorProjectTransport {
 		readonly createdAtMs: number;
 		readonly updatedAtMs: number;
 	}
+
+	export type ProjectCandidate =
+		| {
+				readonly type: "valid";
+				readonly project: Descriptor;
+		  }
+		| {
+				readonly type: "invalid";
+				readonly root: string;
+				readonly title: string;
+				readonly validationError: string;
+		  };
 
 	export interface Commit extends Descriptor {
 		readonly previousRevision: number;

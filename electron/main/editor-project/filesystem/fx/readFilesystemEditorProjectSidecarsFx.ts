@@ -23,7 +23,7 @@ const readJsonFilesFx = Effect.fn("readFilesystemEditorSidecarJsonFilesFx")(func
 		return Effect.gen(function* () {
 			if ((yield* fileSystem.realPath(target)) !== path.join(canonicalDirectory, file))
 				return yield* Effect.fail(
-					new Error(`Editor sidecar ${file} must not be a symbolic link.`),
+					new Error(`Editor sidecar ${target} must not be a symbolic link.`),
 				);
 			return yield* fileSystem.readFileString(target).pipe(
 				Effect.flatMap((source) =>
@@ -33,7 +33,7 @@ const readJsonFilesFx = Effect.fn("readFilesystemEditorSidecarJsonFilesFx")(func
 							value: JSON.parse(source) as unknown,
 						}),
 						catch: (cause) =>
-							new Error(`Editor sidecar ${file} is invalid.`, {
+							new Error(`Editor sidecar ${target} is invalid.`, {
 								cause,
 							}),
 					}),

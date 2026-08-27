@@ -83,7 +83,10 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 		}),
 	),
 	listProjectsFx: Effect.succeed([
-		editorProjectIpcDescriptor,
+		{
+			type: "valid" as const,
+			project: editorProjectIpcDescriptor,
+		},
 	]),
 	listNotesFx: vi.fn(() =>
 		Effect.succeed([

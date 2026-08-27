@@ -22,6 +22,7 @@ const actions = vi.hoisted(() => ({
 	exit: vi.fn(),
 	importArkpackFile: vi.fn(),
 	importJsonDirectory: vi.fn(),
+	openProjectFolder: vi.fn(),
 	projectRefreshError: undefined as unknown,
 	refreshingProjects: false,
 	refreshProjects: vi.fn(),
@@ -57,6 +58,8 @@ afterEach(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
 	actions.deleteProject.mockReset();
+	actions.openProjectFolder.mockReset();
+	actions.refreshProjects.mockReset();
 	document.body.replaceChildren();
 });
 
@@ -68,7 +71,7 @@ const findButton = (container: ParentNode, label: string) => {
 	return button;
 };
 
-describe("EditorWelcome project deletion", () => {
+describe("EditorWelcome project rows", () => {
 	it("explains managed deletion and external-folder removal before confirming", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);
@@ -79,11 +82,14 @@ describe("EditorWelcome project deletion", () => {
 				createElement(EditorWelcome, {
 					recentProjects: [
 						{
-							projectId: "project-one",
-							title: "Arkini",
-							version: "1.0",
-							createdAtMs: 1,
-							updatedAtMs: 2,
+							type: "valid",
+							project: {
+								projectId: "project-one",
+								title: "Arkini",
+								version: "1.0",
+								createdAtMs: 1,
+								updatedAtMs: 2,
+							},
 						},
 					],
 				}),
@@ -110,5 +116,37 @@ describe("EditorWelcome project deletion", () => {
 		await act(async () => findButton(container, "Remove project").click());
 		expect(actions.deleteProject).toHaveBeenCalledOnce();
 		expect(actions.deleteProject).toHaveBeenCalledWith("project-one");
+	});
+
+	it("blocks invalid project entry and exposes only its exact folder plus list refresh", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				createElement(EditorWelcome, {
+					recentProjects: [
+						{
+							type: "invalid",
+							root: "/projects/broken",
+							title: "broken",
+							validationError: "game.json is invalid",
+						},
+					],
+				}),
+			);
+		});
+
+		const invalidRow = container.querySelector('[data-ui="EditorInvalidProject"]');
+		expect(invalidRow?.textContent).toContain("/projects/broken");
+		expect(invalidRow?.textContent).toContain("game.json is invalid");
+		expect(invalidRow?.querySelector("a")).toBeNull();
+		expect(invalidRow?.querySelector('[data-ui="EditorRecentProjectDelete"]')).toBeNull();
+
+		await act(async () => findButton(invalidRow!, "Open folder").click());
+		expect(actions.openProjectFolder).toHaveBeenCalledWith("/projects/broken");
+		await act(async () => findButton(container, "Refresh projects").click());
+		expect(actions.refreshProjects).toHaveBeenCalledOnce();
 	});
 });

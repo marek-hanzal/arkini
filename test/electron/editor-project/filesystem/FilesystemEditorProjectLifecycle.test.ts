@@ -148,7 +148,13 @@ describe("filesystem Editor project lifecycle", () => {
 		await writeFile(join(recovery, "preserved"), "backup");
 
 		const reopened = await harness.openRepository();
-		expect(await Effect.runPromise(reopened.listProjectsFx)).toEqual([]);
+		expect(await Effect.runPromise(reopened.listProjectsFx)).toEqual([
+			expect.objectContaining({
+				type: "invalid",
+				root,
+				validationError: expect.stringContaining(recovery),
+			}),
+		]);
 		await expect(readFile(join(recovery, "preserved"), "utf8")).resolves.toBe("backup");
 		expect(JSON.parse(await readFile(harness.catalogPath, "utf8"))).toMatchObject({
 			projects: [
@@ -201,7 +207,13 @@ describe("filesystem Editor project lifecycle", () => {
 		);
 
 		const repository = await harness.openRepository();
-		expect(await Effect.runPromise(repository.listProjectsFx)).toEqual([]);
+		expect(await Effect.runPromise(repository.listProjectsFx)).toEqual([
+			expect.objectContaining({
+				type: "invalid",
+				root: await realpath(root),
+				validationError: expect.stringContaining("outside the managed projects directory"),
+			}),
+		]);
 		await expect(access(join(root, "project.json"))).resolves.toBeUndefined();
 	});
 
@@ -226,7 +238,13 @@ describe("filesystem Editor project lifecycle", () => {
 		);
 
 		const repository = await harness.openRepository();
-		expect(await Effect.runPromise(repository.listProjectsFx)).toEqual([]);
+		expect(await Effect.runPromise(repository.listProjectsFx)).toEqual([
+			expect.objectContaining({
+				type: "invalid",
+				root: linkedRoot,
+				validationError: expect.stringContaining("outside the managed projects directory"),
+			}),
+		]);
 		await expect(access(join(root, "project.json"))).resolves.toBeUndefined();
 	});
 
@@ -257,7 +275,9 @@ describe("filesystem Editor project lifecycle", () => {
 
 		const repository = await harness.openRepository();
 		expect(
-			(await Effect.runPromise(repository.listProjectsFx)).map(({ projectId }) => projectId),
+			(await Effect.runPromise(repository.listProjectsFx)).map((candidate) =>
+				candidate.type === "valid" ? candidate.project.projectId : candidate.root,
+			),
 		).toEqual([
 			editorTestPayload.config.meta.id,
 		]);
@@ -265,7 +285,9 @@ describe("filesystem Editor project lifecycle", () => {
 
 		const reopened = await harness.openRepository();
 		expect(
-			(await Effect.runPromise(reopened.listProjectsFx)).map(({ projectId }) => projectId),
+			(await Effect.runPromise(reopened.listProjectsFx)).map((candidate) =>
+				candidate.type === "valid" ? candidate.project.projectId : candidate.root,
+			),
 		).toEqual([
 			editorTestPayload.config.meta.id,
 		]);
@@ -299,6 +321,15 @@ describe("filesystem Editor project lifecycle", () => {
 		expect((await Effect.runPromise(repository.readProjectFx(opened.projectId)))?.title).toBe(
 			opened.title,
 		);
+		expect(await Effect.runPromise(repository.listProjectsFx)).toEqual([
+			{
+				type: "valid",
+				project: expect.objectContaining({
+					projectId: opened.projectId,
+					title: opened.title,
+				}),
+			},
+		]);
 		const refreshed = await Effect.runPromise(repository.refreshProjectFx(opened.projectId));
 		expect(refreshed.projectId).toBe("renamed-project");
 		expect(refreshed.title).toBe("Changed outside the Editor");

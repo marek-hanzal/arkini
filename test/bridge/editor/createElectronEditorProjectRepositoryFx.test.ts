@@ -83,11 +83,15 @@ const installEditorApi = () => {
 		importJsonDirectory: vi.fn(async () => success(descriptor)),
 		listProjects: vi.fn(async () =>
 			success([
-				descriptor,
+				{
+					type: "valid" as const,
+					project: descriptor,
+				},
 			]),
 		),
 		listNotes: vi.fn(async () => success([])),
 		openExportDirectory: vi.fn(async () => success(undefined)),
+		openProjectDirectory: vi.fn(async () => success(undefined)),
 		readProject: vi.fn(async () => success(project)),
 		refreshProject: vi.fn(async () => success(project)),
 		onProjectChanged: vi.fn(() => () => undefined),

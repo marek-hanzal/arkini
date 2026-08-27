@@ -134,6 +134,20 @@ export const useEditorWelcomeActions = ({ exitBlocked = false } = {}) => {
 		],
 	);
 
+	const openProjectFolder = useCallback(
+		(root: string) => {
+			if (blocked) return;
+			runCommand({
+				action: "open-project-folder",
+				root,
+			});
+		},
+		[
+			blocked,
+			runCommand,
+		],
+	);
+
 	const exit = useCallback(() => {
 		if (blocked) return;
 		runCommand({
@@ -168,6 +182,7 @@ export const useEditorWelcomeActions = ({ exitBlocked = false } = {}) => {
 		exit,
 		importArkpackFile,
 		importJsonDirectory,
+		openProjectFolder,
 		projectRefreshError,
 		refreshingProjects,
 		refreshProjects,

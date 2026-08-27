@@ -49,7 +49,7 @@ export const readFilesystemEditorProjectVersionHistoryFx = Effect.fn(
 	const head = yield* readJsonFx(
 		paths.versionHeadFile,
 		(candidate) => EditorVersionHeadFileSchema.parse(candidate),
-		"The Editor version head is invalid.",
+		`Editor version head ${paths.versionHeadFile} is invalid.`,
 	);
 	const versions = new Map<string, FilesystemEditorPublishedVersion>();
 	for (const versionId of head.versions) {
@@ -60,12 +60,12 @@ export const readFilesystemEditorProjectVersionHistoryFx = Effect.fn(
 		const descriptor = yield* readJsonFx(
 			descriptorFile,
 			(candidate) => EditorVersionDescriptorFileSchema.parse(candidate),
-			`Editor version ${versionId} descriptor is invalid.`,
+			`Editor version descriptor ${descriptorFile} is invalid.`,
 		);
 		const manifest = yield* readJsonFx(
 			manifestFile,
 			(candidate) => EditorVersionManifestSchema.parse(candidate),
-			`Editor version ${versionId} manifest is invalid.`,
+			`Editor version manifest ${manifestFile} is invalid.`,
 		);
 		versions.set(versionId, {
 			descriptor,

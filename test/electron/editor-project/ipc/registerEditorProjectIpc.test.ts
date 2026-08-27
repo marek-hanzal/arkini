@@ -124,6 +124,7 @@ const projectChannels = [
 	ArkiniElectronApi.channels.editorProjectImportJsonDirectory,
 	ArkiniElectronApi.channels.editorProjectList,
 	ArkiniElectronApi.channels.editorProjectOpenExportDirectory,
+	ArkiniElectronApi.channels.editorProjectOpenDirectory,
 	ArkiniElectronApi.channels.editorProjectRead,
 	ArkiniElectronApi.channels.editorProjectRefresh,
 	ArkiniElectronApi.channels.editorProjectReplaceConfig,
@@ -265,7 +266,10 @@ describe("registerEditorProjectIpcFx", () => {
 		await expect(invoke(ArkiniElectronApi.channels.editorProjectList)).resolves.toEqual({
 			type: "success",
 			value: [
-				editorProjectIpcDescriptor,
+				{
+					type: "valid",
+					project: editorProjectIpcDescriptor,
+				},
 			],
 		});
 		await expect(
@@ -439,6 +443,41 @@ describe("registerEditorProjectIpcFx", () => {
 		expect(repository.deleteProjectFx).toHaveBeenCalledOnce();
 		expect(electron.module.shell.openPath).toHaveBeenCalledWith("/tmp/source");
 		expect(electron.module.shell.openPath).toHaveBeenCalledOnce();
+	});
+
+	it("opens only an exact project root currently listed as invalid", async () => {
+		const repository = {
+			...createEditorProjectIpcRepository(),
+			listProjectsFx: Effect.succeed([
+				{
+					type: "invalid" as const,
+					root: "/projects/broken",
+					title: "broken",
+					validationError: "game.json is invalid",
+				},
+			]),
+		};
+		register({
+			type: "ready",
+			repository,
+		});
+
+		await expect(
+			invoke(ArkiniElectronApi.channels.editorProjectOpenDirectory, "/projects/forged"),
+		).resolves.toMatchObject({
+			type: "failure",
+			error: {
+				operation: "open-project-directory",
+			},
+		});
+		expect(electron.module.shell.openPath).not.toHaveBeenCalled();
+		await expect(
+			invoke(ArkiniElectronApi.channels.editorProjectOpenDirectory, "/projects/broken"),
+		).resolves.toEqual({
+			type: "success",
+			value: undefined,
+		});
+		expect(electron.module.shell.openPath).toHaveBeenCalledWith("/projects/broken");
 	});
 
 	it("does not report the editor idle while an admitted source export is running", async () => {

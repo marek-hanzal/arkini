@@ -1,3 +1,4 @@
+import type { EditorProjectCandidate } from "~/bridge/editor/EditorProjectCandidate";
 import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
 import { useEffect, useState } from "react";
 import { EditorArkpackImportButton } from "~/ui/arkpack/editor/EditorArkpackImportButton";
@@ -9,7 +10,7 @@ import { useEditorWelcomeActions } from "~/ui/editor/useEditorWelcomeActions";
 
 export namespace EditorWelcome {
 	export interface Props {
-		readonly recentProjects: ReadonlyArray<EditorProjectDescriptor>;
+		readonly recentProjects: ReadonlyArray<EditorProjectCandidate>;
 	}
 }
 
@@ -37,13 +38,20 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 				className="grid min-h-0 gap-5"
 				data-ui="EditorWelcome"
 			>
-				<header>
+				<header className="flex items-center justify-between gap-3">
 					<h1
 						id="editor-welcome-title"
 						className="text-2xl font-semibold"
 					>
 						Editor
 					</h1>
+					<Button
+						disabled={actions.blocked}
+						cursorIntent={actions.refreshingProjects ? "progress" : undefined}
+						onClick={() => void actions.refreshProjects()}
+					>
+						{actions.refreshingProjects ? "Refreshing…" : "Refresh projects"}
+					</Button>
 				</header>
 
 				<section className="grid gap-3 sm:grid-cols-3">
@@ -91,7 +99,7 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 				)}
 				{actions.projectRefreshError === undefined ? null : (
 					<div className="rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger">
-						<p>The project was deleted, but Recent projects could not be refreshed.</p>
+						<p>Recent projects could not be refreshed.</p>
 						<p className="mt-1 text-xs opacity-80">
 							{actions.projectRefreshError instanceof Error
 								? actions.projectRefreshError.message
@@ -114,8 +122,11 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 						setDeleteRequested(false);
 						setProjectToDelete(project);
 					}}
+					onOpenProjectFolder={actions.openProjectFolder}
 					projects={recentProjects.filter(
-						(project) => !actions.deletedProjectIds.has(project.projectId),
+						(candidate) =>
+							candidate.type === "invalid" ||
+							!actions.deletedProjectIds.has(candidate.project.projectId),
 					)}
 				/>
 

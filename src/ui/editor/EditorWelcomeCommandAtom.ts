@@ -5,11 +5,18 @@ import { importEditorArkpackFileAtom } from "~/bridge/arkpack/editor/importEdito
 import { createFreshEditorProjectAtom } from "~/bridge/editor/createFreshEditorProjectAtom";
 import { deleteEditorProjectAtom } from "~/bridge/editor/deleteEditorProjectAtom";
 import { importEditorJsonDirectoryAtom } from "~/bridge/editor/importEditorJsonDirectoryAtom";
+import { openInvalidEditorProjectDirectoryFx } from "~/bridge/editor/openInvalidEditorProjectDirectoryFx";
 import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
 import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 
 export namespace EditorWelcomeCommandAtom {
-	export type Action = "create" | "delete-project" | "exit" | "import-arkpack" | "import-json";
+	export type Action =
+		| "create"
+		| "delete-project"
+		| "exit"
+		| "import-arkpack"
+		| "import-json"
+		| "open-project-folder";
 
 	export type Command =
 		| {
@@ -28,6 +35,10 @@ export namespace EditorWelcomeCommandAtom {
 		  }
 		| {
 				readonly action: "import-json";
+		  }
+		| {
+				readonly action: "open-project-folder";
+				readonly root: string;
 		  };
 
 	export type NavigationEvent =
@@ -114,6 +125,16 @@ const EditorWelcomeCommandRunnerAtom = Atom.fn(
 					kind: "ready",
 					action: "delete-project",
 					projectId: command.projectId,
+				});
+				return;
+			}
+			if (command.action === "open-project-folder") {
+				const result = yield* Effect.exit(
+					openInvalidEditorProjectDirectoryFx(command.root),
+				);
+				if (Exit.isFailure(result)) return yield* publishCommandFailureFx(result.cause);
+				yield* Atom.set(EditorWelcomeCommandStateAtom, {
+					kind: "idle",
 				});
 				return;
 			}

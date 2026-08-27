@@ -5,7 +5,7 @@ import type {
 	EditorProjectBuildContentSchema,
 	EditorProjectBuildSchema,
 } from "~/editor/EditorProjectBuildSchema";
-import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
+import type { EditorProjectCandidate } from "~/editor/EditorProjectCandidate";
 import type { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 import type { EditorNoteSchema } from "~/editor/note/EditorNoteSchema";
 import type {
@@ -135,7 +135,7 @@ export interface EditorProjectRepositoryService extends EditorProjectVersionRepo
 		props: EditorProjectRepository.DeleteResourceProps,
 	) => Effect.Effect<EditorProject, EditorProjectRepositoryError>;
 	readonly listProjectsFx: Effect.Effect<
-		ReadonlyArray<EditorProjectDescriptor>,
+		ReadonlyArray<EditorProjectCandidate>,
 		EditorProjectRepositoryError
 	>;
 	readonly listNotesFx: (

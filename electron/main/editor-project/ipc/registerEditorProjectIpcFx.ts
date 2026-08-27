@@ -9,6 +9,7 @@ import type { EditorProjectServiceOwnership } from "../EditorProjectServiceOwner
 import { exportEditorJsonDirectoryFx } from "../exportEditorJsonDirectoryFx";
 import { importEditorJsonDirectoryFx } from "../importEditorJsonDirectoryFx";
 import { openEditorExportDirectoryFx } from "../openEditorExportDirectoryFx";
+import { openInvalidEditorProjectDirectoryFx } from "../openInvalidEditorProjectDirectoryFx";
 import { saveEditorProjectBuildFx } from "../saveEditorProjectBuildFx";
 import { createEditorProjectRequestParserFx } from "./createEditorProjectRequestParserFx";
 import { executeEditorProjectRepositoryFx } from "./executeEditorProjectRepositoryFx";
@@ -250,6 +251,18 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						(_repository, root) => openEditorExportDirectoryFx(root),
 					),
 				);
+				handle(ArkiniElectronApi.channels.editorProjectOpenDirectory, (_event, candidate) =>
+					executeEditorProjectRepositoryFx(
+						"open-project-directory",
+						ownership,
+						requestParser.parseProjectRootFx(candidate),
+						(repository, root) =>
+							openInvalidEditorProjectDirectoryFx({
+								repository,
+								root,
+							}),
+					),
+				);
 				handle(ArkiniElectronApi.channels.editorProjectReplaceConfig, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"replace-config",
@@ -374,6 +387,7 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					ArkiniElectronApi.channels.editorProjectImportJsonDirectory,
 					ArkiniElectronApi.channels.editorProjectList,
 					ArkiniElectronApi.channels.editorProjectOpenExportDirectory,
+					ArkiniElectronApi.channels.editorProjectOpenDirectory,
 					ArkiniElectronApi.channels.editorProjectRead,
 					ArkiniElectronApi.channels.editorProjectRefresh,
 					ArkiniElectronApi.channels.editorProjectReplaceConfig,

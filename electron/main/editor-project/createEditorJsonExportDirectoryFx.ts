@@ -2,7 +2,7 @@ import { Exit, FileSystem, Path } from "effect";
 import { Effect } from "effect";
 import { match, P } from "ts-pattern";
 
-import { syncFilesystemPathFx } from "../filesystem/syncFilesystemPathFx";
+import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
 import { readEditorJsonExportFx } from "./readEditorJsonExportFx";
 
 const isPortableEditorProjectFile = (path: Path.Path, relative: string) =>
@@ -79,7 +79,10 @@ const copyPortableEditorProjectFx = Effect.fn("copyPortableEditorProjectFx")(fun
 		const sourceFile = path.join(canonicalSource, relative);
 		const targetFile = path.join(target, relative);
 		const info = yield* fileSystem.stat(sourceFile);
-		if (info.type !== "File" || (yield* fileSystem.realPath(sourceFile)) !== sourceFile)
+		if (
+			info.type !== "File" ||
+			!(yield* isFilesystemPathSafeFx(fileSystem, canonicalSource, sourceFile))
+		)
 			return yield* Effect.fail(
 				new Error(`Editor export source ${relative} is not a canonical file.`),
 			);
@@ -90,26 +93,20 @@ const copyPortableEditorProjectFx = Effect.fn("copyPortableEditorProjectFx")(fun
 	}
 });
 
-const syncEditorJsonExportTreeFx = Effect.fn("syncEditorJsonExportTreeFx")(function* (
+const validateEditorJsonExportTreeFx = Effect.fn("validateEditorJsonExportTreeFx")(function* (
 	root: string,
 	files: ReadonlyArray<string>,
 ) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
-	const directories = [
-		root,
-	];
 	for (const file of files) {
 		const target = path.join(root, file);
 		const info = yield* fileSystem.stat(target);
-		if ((yield* fileSystem.realPath(target)) !== target)
+		if (!(yield* isFilesystemPathSafeFx(fileSystem, root, target)))
 			return yield* Effect.fail(new Error(`Editor export entry ${file} is not canonical.`));
-		if (info.type === "File") yield* syncFilesystemPathFx(fileSystem, target);
-		else if (info.type === "Directory") directories.push(target);
-		else return yield* Effect.fail(new Error(`Editor export entry ${file} is not portable.`));
+		if (info.type !== "File" && info.type !== "Directory")
+			return yield* Effect.fail(new Error(`Editor export entry ${file} is not portable.`));
 	}
-	for (const directory of directories.sort((left, right) => right.length - left.length))
-		yield* syncFilesystemPathFx(fileSystem, directory);
 });
 
 export namespace createEditorJsonExportDirectoryFx {
@@ -157,8 +154,7 @@ export const createEditorJsonExportDirectoryFx = Effect.fn("createEditorJsonExpo
 						target,
 					});
 					const { files, project } = yield* readEditorJsonExportFx(target);
-					yield* syncEditorJsonExportTreeFx(target, files);
-					yield* syncFilesystemPathFx(fileSystem, canonicalParent).pipe(Effect.ignore);
+					yield* validateEditorJsonExportTreeFx(target, files);
 					return {
 						json: files.filter((file) => file.endsWith(".json")).length,
 						resources: files.filter((file) => file.endsWith(".png")).length,

@@ -1,4 +1,4 @@
-import { FileSystem, Path } from "effect";
+import { FileSystem } from "effect";
 import { Effect } from "effect";
 
 import type { EditorProjectFilesystemPaths } from "../EditorProjectFilesystemPaths";
@@ -10,6 +10,7 @@ import { EditorVersionDescriptorFileSchema } from "~/editor/filesystem/EditorVer
 import { EditorVersionHeadFileSchema } from "~/editor/filesystem/EditorVersionHeadFileSchema";
 import { EditorVersionManifestSchema } from "~/editor/filesystem/EditorVersionManifestSchema";
 import { admitArkiniVersionFx } from "~/engine/version/ArkiniVersionAdmission";
+import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
 import { readFilesystemEditorVersionSnapshotFx } from "./readFilesystemEditorVersionSnapshotFx";
 
 const readJsonFx = <Value>(target: string, parse: (candidate: unknown) => Value, message: string) =>
@@ -30,17 +31,14 @@ export const readFilesystemEditorProjectVersionHistoryFx = Effect.fn(
 	"readFilesystemEditorProjectVersionHistoryFx",
 )(function* (paths: EditorProjectFilesystemPaths) {
 	const fileSystem = yield* FileSystem.FileSystem;
-	const path = yield* Path.Path;
 	if (!(yield* fileSystem.exists(paths.versionHeadFile)))
 		return {
 			versions: new Map(),
 		} satisfies FilesystemEditorProjectVersionHistory;
 
-	const canonicalRoot = yield* fileSystem.realPath(paths.root);
 	const assertCanonicalPathFx = (target: string) =>
 		Effect.gen(function* () {
-			const expected = path.join(canonicalRoot, path.relative(paths.root, target));
-			if ((yield* fileSystem.realPath(target)) !== expected)
+			if (!(yield* isFilesystemPathSafeFx(fileSystem, paths.root, target)))
 				return yield* Effect.fail(
 					new Error(`Editor version path ${target} must not be a symbolic link.`),
 				);

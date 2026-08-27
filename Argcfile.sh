@@ -69,6 +69,24 @@ package_macos_artifacts() {
 	fi
 }
 
+package_windows_artifacts() {
+	local version
+	version=$(desktop_version)
+	electron-builder \
+		--config electron-builder.yml \
+		--win \
+		--x64 \
+		--publish never
+	cp game/arkini/build/arkini.arkpack .out/desktop/release/arkini.arkpack
+	(
+		cd .out/desktop/release
+		sha256sum \
+			"Arkini-$version-win-x64.exe" \
+			"Arkini-$version-win-x64.zip" \
+			arkini.arkpack >SHA256SUMS
+	)
+}
+
 # @cmd Install exact JavaScript dependencies from the lockfile
 install() {
 	npm ci
@@ -231,6 +249,13 @@ package-macos() {
 	clean_desktop
 	build
 	package_macos_artifacts
+}
+
+# @cmd Build unsigned Windows x64 release artifacts
+package-windows() {
+	clean_desktop
+	build
+	package_windows_artifacts
 }
 
 # @cmd Format the repository

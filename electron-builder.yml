@@ -3,6 +3,7 @@ productName: Arkini
 asar: true
 asarUnpack:
   - node_modules/@ngrok/ngrok-darwin-arm64/**/*.node
+  - node_modules/@ngrok/ngrok-win32-x64-msvc/**/*.node
 npmRebuild: false
 electronLanguages:
   - cs-CZ
@@ -20,14 +21,12 @@ files:
   - package.json
   - node_modules/@ngrok/ngrok/**/*
   - node_modules/@ngrok/ngrok-darwin-arm64/**/*
+  - node_modules/@ngrok/ngrok-win32-x64-msvc/**/*
   - from: .out/desktop/build
     to: app
     filter:
       - '**/*'
       - '!**/*.map'
-extraFiles:
-  - from: electron/resources/arkini-cli
-    to: MacOS/arkini-cli
 extraResources:
   - from: game/arkini/build
     to: game
@@ -46,5 +45,17 @@ mac:
     - target: zip
       arch:
         - arm64
+  extraFiles:
+    - from: electron/resources/arkini-cli
+      to: MacOS/arkini-cli
 dmg:
   title: ${productName} ${version}
+win:
+  icon: icon.png
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - target: zip
+      arch:
+        - x64

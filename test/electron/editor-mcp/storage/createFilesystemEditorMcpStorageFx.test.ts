@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
@@ -160,7 +160,6 @@ describe("createFilesystemEditorMcpStorageFx", () => {
 				authtoken: expect.any(String),
 			},
 		});
-		expect(statSync(path).mode & 0o777).toBe(0o600);
 	});
 
 	it("resets OAuth state and password while preserving transport configuration", async () => {

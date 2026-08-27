@@ -1,6 +1,6 @@
 import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
 import { useEffect, useState } from "react";
-import { EditorArkpackImportDropZone } from "~/ui/arkpack/editor/EditorArkpackImportDropZone";
+import { EditorArkpackImportButton } from "~/ui/arkpack/editor/EditorArkpackImportButton";
 import { BackButton } from "~/ui/button/BackButton";
 import { Button } from "~/ui/button/Button";
 import { EditorRecentProjects } from "~/ui/editor/EditorRecentProjects";
@@ -47,7 +47,7 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 				</header>
 
 				<section className="grid gap-3 sm:grid-cols-3">
-					<EditorArkpackImportDropZone
+					<EditorArkpackImportButton
 						blocked={actions.blocked}
 						pending={actions.active === "import-arkpack"}
 						onFile={actions.importArkpackFile}

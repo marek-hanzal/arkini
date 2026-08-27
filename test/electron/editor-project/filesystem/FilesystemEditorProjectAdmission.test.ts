@@ -1,4 +1,4 @@
-import { access, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, realpath, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
@@ -70,6 +70,87 @@ describe("filesystem Editor project admission", () => {
 					createdAtMs: 0,
 				})),
 		});
+		await expect(access(brokenRoot)).resolves.toBeUndefined();
+	});
+
+	it("reconciles healthy and invalid managed roots missing from a valid catalog", async () => {
+		harness = await createFilesystemEditorProjectTestHarness("arkini-project-reconcile-");
+		const repository = await harness.openRepository();
+		const listed = await harness.createProject(repository, "listed-project");
+		const unlisted = await harness.createProject(repository, "unlisted-project");
+		const broken = await harness.createProject(repository, "broken-unlisted-project");
+		const externalRoot = await harness.createExternalProject("external-project");
+		const canonicalExternalRoot = await realpath(externalRoot);
+		const external = await Effect.runPromise(
+			repository.openProjectFx({
+				root: externalRoot,
+			}),
+		);
+		const roots = await Promise.all(
+			[
+				listed,
+				unlisted,
+				broken,
+			].map(({ projectId }) => Effect.runPromise(repository.readProjectRootFx(projectId))),
+		);
+		const [listedRoot, unlistedRoot, brokenRoot] = roots;
+		if (listedRoot === null || unlistedRoot === null || brokenRoot === null)
+			throw new Error("Managed root missing.");
+		const stored = JSON.parse(await readFile(harness.catalogPath, "utf8")) as {
+			readonly projects: ReadonlyArray<{
+				readonly root: string;
+				readonly ownership: "external" | "managed";
+				readonly createdAtMs: number;
+			}>;
+		};
+		await harness.closeRepository(repository);
+		const brokenFile = join(brokenRoot, "game.json");
+		await writeFile(brokenFile, "{broken");
+		await writeFile(
+			harness.catalogPath,
+			JSON.stringify({
+				projects: stored.projects.filter(
+					(entry) => entry.root === listedRoot || entry.root === canonicalExternalRoot,
+				),
+			}),
+		);
+
+		const reopened = await harness.openRepository();
+		const candidates = await Effect.runPromise(reopened.listProjectsFx);
+		expect(
+			candidates
+				.flatMap((candidate) =>
+					candidate.type === "valid"
+						? [
+								candidate.project.projectId,
+							]
+						: [],
+				)
+				.sort(),
+		).toEqual(
+			[
+				external.projectId,
+				listed.projectId,
+				unlisted.projectId,
+			].sort(),
+		);
+		expect(candidates.find((candidate) => candidate.type === "invalid")).toMatchObject({
+			type: "invalid",
+			root: brokenRoot,
+			validationError: expect.stringContaining(brokenFile),
+		});
+		expect(
+			(JSON.parse(await readFile(harness.catalogPath, "utf8")) as typeof stored).projects.map(
+				(entry) => entry.root,
+			),
+		).toEqual([
+			...[
+				listedRoot,
+				unlistedRoot,
+				brokenRoot,
+			].sort(),
+			canonicalExternalRoot,
+		]);
 		await expect(access(brokenRoot)).resolves.toBeUndefined();
 	});
 

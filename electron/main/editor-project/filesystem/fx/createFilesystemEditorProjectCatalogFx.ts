@@ -13,7 +13,6 @@ type Entry = EditorProjectCatalogEntrySchema.Type;
 
 export interface FilesystemEditorProjectCatalog {
 	readonly addFx: (entry: Entry) => Effect.Effect<void, EditorProjectRepositoryError>;
-	readonly rebuilt: boolean;
 	readonly list: () => ReadonlyArray<Entry>;
 	readonly removeFx: (root: string) => Effect.Effect<void, EditorProjectRepositoryError>;
 }
@@ -26,6 +25,13 @@ const createError = (message: string, cause?: unknown) =>
 	});
 
 const parseCatalog = (candidate: unknown) => EditorProjectCatalogSchema.parse(candidate);
+const parseStoredCatalog = (source: string) => {
+	try {
+		return parseCatalog(JSON.parse(source));
+	} catch {
+		return null;
+	}
+};
 
 /** Opens the one main-owned path registry; project contents always remain authoritative. */
 export const createFilesystemEditorProjectCatalogFx = Effect.fn(
@@ -54,52 +60,58 @@ export const createFilesystemEditorProjectCatalogFx = Effect.fn(
 		recursive: true,
 	});
 	const managedProjectsRoot = yield* fileSystem.realPath(projectsRoot);
-	let rebuilt = false;
-	const rebuildFx = Effect.gen(function* () {
-		const projects: Array<Entry> = [];
+	const readReconciledFx = Effect.gen(function* () {
+		const stored = yield* Effect.gen(function* () {
+			if (!(yield* fileSystem.exists(catalogPath))) return null;
+			const source = yield* fileSystem.readFileString(catalogPath);
+			return parseStoredCatalog(source);
+		});
+		const previousManaged = new Map(
+			(stored?.projects ?? [])
+				.filter((entry) => entry.ownership === "managed")
+				.map(
+					(entry) =>
+						[
+							entry.root,
+							entry.createdAtMs,
+						] as const,
+				),
+		);
+		const managed: Array<Entry> = [];
 		for (const name of (yield* fileSystem.readDirectory(managedProjectsRoot)).sort()) {
 			if (name === ".projects.lock") continue;
 			const root = path.join(managedProjectsRoot, name);
 			if ((yield* fileSystem.stat(root)).type !== "Directory") continue;
 			if ((yield* fileSystem.realPath(root)) !== root) continue;
-			projects.push(
+			managed.push(
 				EditorProjectCatalogEntrySchema.parse({
 					root,
 					ownership: "managed",
-					createdAtMs: 0,
+					createdAtMs: previousManaged.get(root) ?? 0,
 				}),
 			);
 		}
-		const next = EditorProjectCatalogSchema.parse({
-			projects,
+		const managedRoots = new Set(managed.map((entry) => entry.root));
+		return EditorProjectCatalogSchema.parse({
+			projects: [
+				...managed,
+				...(stored?.projects ?? []).filter(
+					(entry) => entry.ownership === "external" && !managedRoots.has(entry.root),
+				),
+			],
 		});
-		yield* writeJsonFx(next);
-		rebuilt = true;
-		return next;
 	});
-	const readFx = Effect.gen(function* () {
-		if (yield* fileSystem.exists(catalogPath)) {
-			const source = yield* fileSystem.readFileString(catalogPath);
-			return yield* Effect.try({
-				try: () => parseCatalog(JSON.parse(source)),
-				catch: (cause) => cause,
-			}).pipe(Effect.catch(() => rebuildFx));
-		}
-		const empty = EditorProjectCatalogSchema.parse({
-			projects: [],
-		});
-		yield* writeJsonFx(empty);
-		return empty;
-	});
-	let catalog = yield* filesystemWrite.withLockFx(lock, readFx);
-	const rebuiltAtOpen = rebuilt;
+	let catalog = yield* filesystemWrite.withLockFx(
+		lock,
+		readReconciledFx.pipe(Effect.tap(writeJsonFx)),
+	);
 
 	const updateFx = (update: (current: ReadonlyArray<Entry>) => ReadonlyArray<Entry>) =>
 		filesystemWrite
 			.withLockFx(
 				lock,
 				Effect.gen(function* () {
-					const current = yield* readFx;
+					const current = yield* readReconciledFx;
 					const next = EditorProjectCatalogSchema.parse({
 						projects: update(current.projects),
 					});
@@ -119,7 +131,6 @@ export const createFilesystemEditorProjectCatalogFx = Effect.fn(
 				...projects.filter((candidate) => candidate.root !== entry.root),
 				entry,
 			]),
-		rebuilt: rebuiltAtOpen,
 		list: () => catalog.projects,
 		removeFx: (root) => updateFx((projects) => projects.filter((entry) => entry.root !== root)),
 	} satisfies FilesystemEditorProjectCatalog;

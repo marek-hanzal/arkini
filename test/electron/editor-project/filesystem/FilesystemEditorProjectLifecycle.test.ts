@@ -107,17 +107,50 @@ describe("filesystem Editor project lifecycle", () => {
 		expect(restored?.revision).toBe(created.revision);
 	});
 
-	it("removes an unregistered managed directory left by interrupted creation", async () => {
+	it("reconciles healthy and incomplete managed directories when the catalog is missing", async () => {
+		const seedingRepository = await harness.openRepository();
+		const healthy = await harness.createProject(seedingRepository, "healthy-missing-catalog");
+		const healthyRoot = await Effect.runPromise(
+			seedingRepository.readProjectRootFx(healthy.projectId),
+		);
+		if (healthyRoot === null) throw new Error("Managed project root missing.");
+		await harness.closeRepository(seedingRepository);
+		await rm(harness.catalogPath);
 		await mkdir(harness.projectsRoot, {
 			recursive: true,
 		});
-		const orphan = join(harness.projectsRoot, "orphan");
-		await mkdir(orphan);
-		await writeFile(join(orphan, "project.json"), "partial");
+		const root = join(harness.projectsRoot, "incomplete-project");
+		await mkdir(root);
+		await writeFile(join(root, "project.json"), "partial");
+		const canonicalRoot = await realpath(root);
 
 		const repository = await harness.openRepository();
-		expect(await Effect.runPromise(repository.listProjectsFx)).toEqual([]);
-		await expect(access(orphan)).rejects.toBeDefined();
+		expect(await Effect.runPromise(repository.listProjectsFx)).toEqual([
+			{
+				type: "valid",
+				project: expect.objectContaining({
+					projectId: healthy.projectId,
+				}),
+			},
+			expect.objectContaining({
+				type: "invalid",
+				root: canonicalRoot,
+				validationError: expect.stringContaining(canonicalRoot),
+			}),
+		]);
+		await expect(access(root)).resolves.toBeUndefined();
+		expect(JSON.parse(await readFile(harness.catalogPath, "utf8"))).toEqual({
+			projects: [
+				healthyRoot,
+				canonicalRoot,
+			]
+				.sort()
+				.map((root) => ({
+					root,
+					ownership: "managed",
+					createdAtMs: 0,
+				})),
+		});
 	});
 
 	it("drops a managed catalog entry whose interrupted deletion removed its root", async () => {
@@ -207,14 +240,11 @@ describe("filesystem Editor project lifecycle", () => {
 		);
 
 		const repository = await harness.openRepository();
-		expect(await Effect.runPromise(repository.listProjectsFx)).toEqual([
-			expect.objectContaining({
-				type: "invalid",
-				root: await realpath(root),
-				validationError: expect.stringContaining("outside the managed projects directory"),
-			}),
-		]);
+		expect(await Effect.runPromise(repository.listProjectsFx)).toEqual([]);
 		await expect(access(join(root, "project.json"))).resolves.toBeUndefined();
+		expect(JSON.parse(await readFile(harness.catalogPath, "utf8"))).toEqual({
+			projects: [],
+		});
 	});
 
 	it("ignores a managed symlink that escapes the owned projects directory", async () => {
@@ -238,14 +268,11 @@ describe("filesystem Editor project lifecycle", () => {
 		);
 
 		const repository = await harness.openRepository();
-		expect(await Effect.runPromise(repository.listProjectsFx)).toEqual([
-			expect.objectContaining({
-				type: "invalid",
-				root: linkedRoot,
-				validationError: expect.stringContaining("outside the managed projects directory"),
-			}),
-		]);
+		expect(await Effect.runPromise(repository.listProjectsFx)).toEqual([]);
 		await expect(access(join(root, "project.json"))).resolves.toBeUndefined();
+		expect(JSON.parse(await readFile(harness.catalogPath, "utf8"))).toEqual({
+			projects: [],
+		});
 	});
 
 	it("removes a catalog alias for an already mounted canonical root", async () => {

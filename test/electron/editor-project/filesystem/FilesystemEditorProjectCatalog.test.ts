@@ -72,8 +72,13 @@ describe("filesystem Editor project catalog", () => {
 		]);
 	});
 
-	it("opens the exact current catalog envelope", async () => {
+	it("reconciles managed directories while retaining externals from a valid catalog", async () => {
 		const catalogPath = await createCatalogPath();
+		const projectsRoot = join(dirname(catalogPath), "projects");
+		const managedRoot = join(projectsRoot, "unlisted-managed");
+		await mkdir(managedRoot, {
+			recursive: true,
+		});
 		const expected = {
 			projects: [
 				{
@@ -88,11 +93,21 @@ describe("filesystem Editor project catalog", () => {
 		const catalog = await Effect.runPromise(
 			createFilesystemEditorProjectCatalogFx({
 				catalogPath,
-				projectsRoot: join(dirname(catalogPath), "projects"),
+				projectsRoot,
 			}).pipe(Effect.provide(NodeServices.layer)),
 		);
 
-		expect(catalog.list()).toEqual(expected.projects);
+		expect(catalog.list()).toEqual([
+			{
+				root: await realpath(managedRoot),
+				ownership: "managed",
+				createdAtMs: 0,
+			},
+			...expected.projects,
+		]);
+		expect(JSON.parse(await readFile(catalogPath, "utf8"))).toEqual({
+			projects: catalog.list(),
+		});
 	});
 
 	it("rebuilds an invalid catalog from direct managed directories and forgets externals", async () => {
@@ -131,7 +146,6 @@ describe("filesystem Editor project catalog", () => {
 			}).pipe(Effect.provide(NodeServices.layer)),
 		);
 
-		expect(catalog.rebuilt).toBe(true);
 		const canonicalManagedRoots = await Promise.all(managedRoots.map((root) => realpath(root)));
 		expect(catalog.list()).toEqual(
 			canonicalManagedRoots.map((root) => ({

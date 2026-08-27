@@ -83,6 +83,11 @@ describe("filesystem Editor project current tree", () => {
 			GameProjectItemSchemaReference,
 		);
 		const waterResourcePath = join(harness.root, "assets", "item-water.png");
+		await mkdir(join(harness.root, ".git"));
+		await Promise.all([
+			writeFile(join(harness.root, ".git", "config"), "keep-git"),
+			writeFile(join(harness.root, "unrelated.txt"), "keep-unrelated"),
+		]);
 		await writeFile(waterPath, '{"item":{}}');
 		await rm(waterResourcePath);
 		const repaired = {
@@ -125,6 +130,12 @@ describe("filesystem Editor project current tree", () => {
 		};
 
 		await harness.write(next, repaired);
+		await expect(readFile(join(harness.root, ".git", "config"), "utf8")).resolves.toBe(
+			"keep-git",
+		);
+		await expect(readFile(join(harness.root, "unrelated.txt"), "utf8")).resolves.toBe(
+			"keep-unrelated",
+		);
 		await expect(
 			access(join(harness.root, "items", "simple", "water.json")),
 		).rejects.toBeDefined();

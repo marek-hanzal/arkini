@@ -10,7 +10,7 @@ import { ArkpackSigningError } from "~/engine/pack/error/ArkpackSigningError";
 import type { ArkpackPublicKeySchema } from "~/engine/pack/schema/ArkpackPublicKeySchema";
 import type { ArkpackSignKeySchema } from "~/engine/pack/schema/ArkpackSignKeySchema";
 import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
-import { withGameProjectLockFx } from "~/engine/source/fx/withGameProjectLockFx";
+import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 import { assertGameConfigValidFx } from "~/engine/validation/fx/assertGameConfigValidFx";
 import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
 import { encodeFx } from "./encodeFx";
@@ -130,10 +130,10 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 			Effect.gen(function* () {
 				const hadPrevious = yield* fileSystem.exists(build);
 				if (hadPrevious) yield* fileSystem.rename(build, previous);
-				const publication = yield* Effect.exit(fileSystem.rename(pending, build));
-				if (Exit.isFailure(publication)) {
+				const swap = yield* Effect.exit(fileSystem.rename(pending, build));
+				if (Exit.isFailure(swap)) {
 					if (hadPrevious) yield* fileSystem.rename(previous, build);
-					return yield* Effect.failCause(publication.cause);
+					return yield* Effect.failCause(swap.cause);
 				}
 				if (hadPrevious) {
 					yield* fileSystem
@@ -184,9 +184,10 @@ export const packDirectoryFx = Effect.fn("packDirectoryFx")(function* (
 ) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
+	const filesystemWrite = yield* createFilesystemWriteFx();
 	const root = yield* fileSystem.realPath(path.resolve(props.input));
-	return yield* withGameProjectLockFx(
-		root,
+	return yield* filesystemWrite.withLockFx(
+		path.join(root, "editor.lock"),
 		packDirectoryUnlockedFx({
 			...props,
 			input: root,

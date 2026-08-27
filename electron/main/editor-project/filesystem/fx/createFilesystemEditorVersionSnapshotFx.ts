@@ -9,16 +9,18 @@ import type { EditorVersionManifestSchema } from "~/editor/filesystem/EditorVers
 import type { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
 import { hashFilesystemEditorVersionBytes } from "./FilesystemEditorVersionFingerprint";
 import { assertFilesystemEditorProjectDirectoryFx } from "./assertFilesystemEditorProjectDirectoryFx";
 import { createFilesystemEditorVersionSnapshotPlan } from "./createFilesystemEditorVersionSnapshotPlan";
-import { replaceFilesystemEditorFileFx } from "./replaceFilesystemEditorFileFx";
-import { replaceFilesystemEditorJsonFx } from "./replaceFilesystemEditorJsonFx";
+
+const encoder = new TextEncoder();
 
 export namespace createFilesystemEditorVersionSnapshotFx {
 	export interface Props {
 		readonly arkpack: ArkpackVersionSchema.Type;
 		readonly config: GameConfigSchema.Type;
+		readonly filesystemWrite: FilesystemWrite;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
 		readonly scenarios: ReadonlyArray<EditorBoardScenarioSchema.Type>;
 		readonly paths: EditorProjectFilesystemPaths;
@@ -36,11 +38,13 @@ export const createFilesystemEditorVersionSnapshotFx = Effect.fn(
 )(function* ({
 	arkpack,
 	config,
+	filesystemWrite,
 	resources,
 	scenarios,
 	paths,
 }: createFilesystemEditorVersionSnapshotFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
+	const lock = `${paths.root}/editor.lock`;
 	const plan = yield* Effect.try({
 		try: () =>
 			createFilesystemEditorVersionSnapshotPlan({
@@ -79,7 +83,11 @@ export const createFilesystemEditorVersionSnapshotFx = Effect.fn(
 			const current = yield* fileSystem.readFile(target);
 			if (hashFilesystemEditorVersionBytes(current) === hash) continue;
 		}
-		yield* replaceFilesystemEditorJsonFx(target, value);
+		yield* filesystemWrite.writeFileFx({
+			lock,
+			target,
+			bytes: encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`),
+		});
 	}
 	for (const [hash, bytes] of [
 		...plan.pngObjects,
@@ -89,7 +97,8 @@ export const createFilesystemEditorVersionSnapshotFx = Effect.fn(
 			const current = yield* fileSystem.readFile(target);
 			if (hashFilesystemEditorVersionBytes(current) === hash) continue;
 		}
-		yield* replaceFilesystemEditorFileFx({
+		yield* filesystemWrite.writeFileFx({
+			lock,
 			target,
 			bytes,
 		});

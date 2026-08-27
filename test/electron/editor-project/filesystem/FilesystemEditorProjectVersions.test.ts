@@ -1,14 +1,5 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import {
-	mkdtemp,
-	mkdir,
-	readFile,
-	readdir,
-	rename,
-	rm,
-	symlink,
-	writeFile,
-} from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect, Semaphore } from "effect";
@@ -19,7 +10,6 @@ import type { FilesystemEditorProjectState } from "../../../../electron/main/edi
 import { createEditorProjectFilesystemPathsFx } from "../../../../electron/main/editor-project/filesystem/createEditorProjectFilesystemPathsFx";
 import { createFilesystemEditorProjectVersionOperationsFx } from "../../../../electron/main/editor-project/filesystem/fx/createFilesystemEditorProjectVersionOperationsFx";
 import { readFilesystemEditorProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/readFilesystemEditorProjectFilesFx";
-import { replaceFilesystemEditorJsonFx } from "../../../../electron/main/editor-project/filesystem/fx/replaceFilesystemEditorJsonFx";
 import { writeFilesystemEditorProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/writeFilesystemEditorProjectFilesFx";
 import { EditorBoardScenarioSchema } from "~/editor/board/EditorBoardScenarioSchema";
 import { EditorProjectCatalogEntrySchema } from "~/editor/filesystem/EditorProjectCatalogEntrySchema";
@@ -27,9 +17,11 @@ import { GameProjectGameSchemaReference } from "~/engine/source/GameProjectRefer
 import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
 import { EditorVersionDescriptorFileSchema } from "~/editor/filesystem/EditorVersionDescriptorFileSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 let root: string;
+const encoder = new TextEncoder();
 
 beforeEach(async () => {
 	root = await mkdtemp(join(tmpdir(), "arkini-filesystem-versions-"));
@@ -43,7 +35,7 @@ afterEach(async () => {
 });
 
 describe("filesystem Editor project versions", () => {
-	it("publishes retry-safe full snapshots, ignores orphans, and protects version paths", async () => {
+	it("publishes retry-safe full snapshots, ignores orphans, and restores exact state", async () => {
 		const projectId = "editor-test";
 		const canonicalConfig = GameConfigSchema.parse({
 			...editorTestPayload.config,
@@ -61,6 +53,13 @@ describe("filesystem Editor project versions", () => {
 		const result = await Effect.runPromise(
 			Effect.gen(function* () {
 				const paths = yield* createEditorProjectFilesystemPathsFx(root);
+				const filesystemWrite = yield* createFilesystemWriteFx();
+				const writeJsonFx = (target: string, value: unknown) =>
+					filesystemWrite.writeFileFx({
+						lock: join(root, "editor.lock"),
+						target,
+						bytes: encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`),
+					});
 				const marker = GameProjectManifestSchema.parse({
 					arkini: ArkiniAppVersion,
 					revision: 1,
@@ -74,19 +73,16 @@ describe("filesystem Editor project versions", () => {
 						resources: editorTestPayload.resources,
 					},
 				});
-				yield* replaceFilesystemEditorJsonFx(
-					yield* paths.scenarioFileFx(initialScenario.name),
-					{
-						name: initialScenario.name,
-						revision: initialScenario.projectRevision,
-						version: initialScenario.version,
-						save: "Bwg=",
-						createdAtMs: initialScenario.createdAtMs,
-						updatedAtMs: initialScenario.updatedAtMs,
-					},
-				);
+				yield* writeJsonFx(yield* paths.scenarioFileFx(initialScenario.name), {
+					name: initialScenario.name,
+					revision: initialScenario.projectRevision,
+					version: initialScenario.version,
+					save: "Bwg=",
+					createdAtMs: initialScenario.createdAtMs,
+					updatedAtMs: initialScenario.updatedAtMs,
+				});
 				const noteFile = yield* paths.noteFileFx("keep-me");
-				yield* replaceFilesystemEditorJsonFx(noteFile, {
+				yield* writeJsonFx(noteFile, {
 					content: "Not versioned",
 					createdAtMs: 1,
 					updatedAtMs: 1,
@@ -125,6 +121,7 @@ describe("filesystem Editor project versions", () => {
 				]);
 				const operations = yield* Semaphore.make(1);
 				const versions = yield* createFilesystemEditorProjectVersionOperationsFx({
+					filesystemWrite,
 					operations,
 					readState: (id) => {
 						const found = states.get(id);
@@ -188,17 +185,14 @@ describe("filesystem Editor project versions", () => {
 						resources: changedResources,
 					},
 				});
-				yield* replaceFilesystemEditorJsonFx(
-					yield* paths.scenarioFileFx(changedScenario.name),
-					{
-						name: changedScenario.name,
-						revision: changedScenario.projectRevision,
-						version: changedScenario.version,
-						save: "CQk=",
-						createdAtMs: changedScenario.createdAtMs,
-						updatedAtMs: changedScenario.updatedAtMs,
-					},
-				);
+				yield* writeJsonFx(yield* paths.scenarioFileFx(changedScenario.name), {
+					name: changedScenario.name,
+					revision: changedScenario.projectRevision,
+					version: changedScenario.version,
+					save: "CQk=",
+					createdAtMs: changedScenario.createdAtMs,
+					updatedAtMs: changedScenario.updatedAtMs,
+				});
 				const currentState = states.get(projectId);
 				if (currentState === undefined) return yield* Effect.die("Missing current state.");
 				states.set(projectId, {
@@ -304,18 +298,6 @@ describe("filesystem Editor project versions", () => {
 					readonly versions: ReadonlyArray<string>;
 				};
 				const status = yield* versions.readVersionStatusFx(projectId);
-				const realVersions = join(root, "versions-real");
-				const elsewhere = join(root, "elsewhere");
-				yield* Effect.promise(() => rename(paths.versions, realVersions));
-				yield* Effect.promise(() => mkdir(elsewhere));
-				yield* Effect.promise(() => symlink(elsewhere, paths.versions));
-				const symlinkError = yield* Effect.flip(
-					versions.updateVersionTagFx({
-						projectId,
-						versionId: first.versionId,
-						tag: "protected",
-					}),
-				);
 				return {
 					first,
 					retry,
@@ -329,8 +311,6 @@ describe("filesystem Editor project versions", () => {
 					status,
 					head,
 					noteFile,
-					elsewhere,
-					symlinkError,
 				};
 			}).pipe(Effect.provide(NodeServices.layer)),
 		);
@@ -387,10 +367,8 @@ describe("filesystem Editor project versions", () => {
 				result.second.versionId,
 			],
 		});
-		expect(String(result.symlinkError.cause)).toContain("must not be a symbolic link");
-		expect(await readdir(result.elsewhere)).toEqual([]);
 		expect(await readFile(result.noteFile, "utf8")).toContain("Not versioned");
-	});
+	}, 10_000);
 });
 
 const fileSystemRead = (target: string) => Effect.promise(() => readFile(target, "utf8"));

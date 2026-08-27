@@ -4,12 +4,12 @@ import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
-import { withFilesystemLockFx } from "../filesystem/withFilesystemLockFx";
 import { assertSafeEditorJsonExportRootFx } from "./assertSafeEditorJsonExportRootFx";
 import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnership";
 import { withFilesystemEditorProjectLockFx } from "./filesystem/fx/withFilesystemEditorProjectLockFx";
 import { recoverEditorJsonExportsFx } from "./recoverEditorJsonExportsFx";
 import { replaceEditorJsonExportDirectoryFx } from "./replaceEditorJsonExportDirectoryFx";
+import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 
 export namespace exportEditorJsonDirectoryFx {
 	export interface Props {
@@ -33,11 +33,12 @@ export const exportEditorJsonDirectoryFx = Effect.fn("exportEditorJsonDirectoryF
 		Effect.gen(function* () {
 			const fileSystem = yield* FileSystem.FileSystem;
 			const path = yield* Path.Path;
+			const filesystemWrite = yield* createFilesystemWriteFx();
 			const recoveryRoot = path.join(app.getPath("userData"), "editor-export-transactions");
 			yield* fileSystem.makeDirectory(recoveryRoot, {
 				recursive: true,
 			});
-			yield* withFilesystemLockFx(
+			yield* filesystemWrite.withLockFx(
 				path.join(recoveryRoot, "recovery.lock"),
 				recoverEditorJsonExportsFx(recoveryRoot),
 			);
@@ -92,8 +93,9 @@ export const exportEditorJsonDirectoryFx = Effect.fn("exportEditorJsonDirectoryF
 			if (confirmation.response !== 1) return null;
 
 			const exported = yield* withFilesystemEditorProjectLockFx(
+				filesystemWrite,
 				source,
-				withFilesystemLockFx(
+				filesystemWrite.withLockFx(
 					path.join(recoveryRoot, "recovery.lock"),
 					replaceEditorJsonExportDirectoryFx({
 						recoveryRoot,

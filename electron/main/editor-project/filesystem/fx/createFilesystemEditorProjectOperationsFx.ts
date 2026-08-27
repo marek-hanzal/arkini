@@ -15,6 +15,8 @@ import { EditorProjectCatalogEntrySchema } from "~/editor/filesystem/EditorProje
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
+import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
 import { readFilesystemEditorProjectFilesFx } from "./readFilesystemEditorProjectFilesFx";
 import { readFilesystemEditorProjectSidecarsFx } from "./readFilesystemEditorProjectSidecarsFx";
 import { readFilesystemEditorProjectVersionHistoryFx } from "./readFilesystemEditorProjectVersionHistoryFx";
@@ -84,14 +86,16 @@ const error = (
 		? cause
 		: new EditorProjectRepositoryError({
 				operation,
-				message,
+				message: withFilesystemWriteRecovery(message, cause),
 				cause,
 			});
 
 const materializeProjectFx = Effect.fn("materializeFilesystemEditorProjectFx")(function* (
 	catalog: EditorProjectCatalogEntrySchema.Type,
+	filesystemWrite: FilesystemWrite,
 ) {
 	return yield* withFilesystemEditorProjectLockFx(
+		filesystemWrite,
 		catalog.root,
 		Effect.gen(function* () {
 			const paths = yield* createEditorProjectFilesystemPathsFx(catalog.root);
@@ -125,6 +129,7 @@ const materializeProjectFx = Effect.fn("materializeFilesystemEditorProjectFx")(f
 export namespace createFilesystemEditorProjectOperationsFx {
 	export interface Props {
 		readonly catalog: FilesystemEditorProjectCatalog;
+		readonly filesystemWrite: FilesystemWrite;
 		readonly operations: Semaphore.Semaphore;
 		readonly projectsRoot: string;
 		readonly states: Map<string, FilesystemEditorProjectState>;
@@ -136,6 +141,7 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 	"createFilesystemEditorProjectOperationsFx",
 )(function* ({
 	catalog,
+	filesystemWrite,
 	operations,
 	projectsRoot,
 	states,
@@ -146,6 +152,7 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 		recursive: true,
 	});
 	const managedProjectsRoot = yield* fileSystem.realPath(projectsRoot);
+	const lifecycleLock = path.join(managedProjectsRoot, ".projects.lock");
 	const assertSafeCatalogEntryFx = (entry: EditorProjectCatalogEntrySchema.Type) =>
 		Effect.gen(function* () {
 			const root = yield* fileSystem.realPath(path.resolve(entry.root));
@@ -172,30 +179,64 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 		);
 	const materializeFx = (entry: EditorProjectCatalogEntrySchema.Type) =>
 		assertSafeCatalogEntryFx(entry).pipe(
-			Effect.flatMap((safeEntry) => providePlatform(materializeProjectFx(safeEntry))),
+			Effect.flatMap((safeEntry) =>
+				providePlatform(materializeProjectFx(safeEntry, filesystemWrite)),
+			),
 		);
 	const writeProjectFx = (props: Parameters<typeof writeFilesystemEditorProjectFilesFx>[0]) =>
 		providePlatform(writeFilesystemEditorProjectFilesFx(props));
 
-	for (const entry of catalog.list()) {
-		yield* materializeFx(entry).pipe(
-			Effect.flatMap((state) => {
-				const duplicateRoot = [
-					...states.values(),
-				].some(({ paths }) => paths.root === state.paths.root);
-				if (duplicateRoot)
-					return catalog.removeFx(entry.root).pipe(Effect.catch(() => Effect.void));
-				return states.has(state.project.projectId)
-					? Effect.fail(
-							new Error(
-								`Editor project ID ${state.project.projectId} is duplicated by ${entry.root}.`,
-							),
-						)
-					: Effect.sync(() => states.set(state.project.projectId, state));
-			}),
-			Effect.catch(() => Effect.void),
-		);
-	}
+	yield* filesystemWrite.withLockFx(
+		lifecycleLock,
+		Effect.gen(function* () {
+			const entries = catalog.list();
+			const managedRoots = new Set(
+				entries
+					.filter((entry) => entry.ownership === "managed")
+					.map((entry) => path.resolve(entry.root))
+					.filter((root) => {
+						const relative = path.relative(managedProjectsRoot, root);
+						return (
+							relative !== "" &&
+							!relative.startsWith("..") &&
+							!path.isAbsolute(relative)
+						);
+					}),
+			);
+			for (const entry of entries) {
+				if (!(yield* fileSystem.exists(path.resolve(entry.root)))) {
+					yield* catalog.removeFx(entry.root).pipe(Effect.catch(() => Effect.void));
+					continue;
+				}
+				yield* materializeFx(entry).pipe(
+					Effect.flatMap((state) => {
+						const duplicateRoot = [
+							...states.values(),
+						].some(({ paths }) => paths.root === state.paths.root);
+						if (duplicateRoot) return Effect.void;
+						return states.has(state.project.projectId)
+							? Effect.fail(
+									new Error(
+										`Editor project ID ${state.project.projectId} is duplicated by ${entry.root}.`,
+									),
+								)
+							: Effect.sync(() => states.set(state.project.projectId, state));
+					}),
+					Effect.catch(() => Effect.void),
+				);
+			}
+			for (const name of yield* fileSystem.readDirectory(managedProjectsRoot)) {
+				if (name === ".projects.lock") continue;
+				const candidate = path.join(managedProjectsRoot, name);
+				if (managedRoots.has(candidate)) continue;
+				if ((yield* fileSystem.realPath(candidate)) !== candidate) continue;
+				yield* fileSystem.remove(candidate, {
+					force: true,
+					recursive: true,
+				});
+			}
+		}),
+	);
 
 	const createProjectFx: FilesystemEditorProjectOperations["createProjectFx"] = ({
 		version: candidateVersion,
@@ -222,38 +263,51 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 						return yield* Effect.fail(
 							error("create-project", `Editor project ${projectId} already exists.`),
 						);
-					const root = path.join(
-						projectsRoot,
-						`${encodeURIComponent(projectId)}-${createId()}`,
-					);
-					yield* fileSystem.makeDirectory(root, {
-						recursive: true,
-					});
-					const marker = GameProjectManifestSchema.parse({
-						arkini: ArkiniAppVersion,
-						revision: nowMs,
-					});
-					yield* withFilesystemEditorProjectLockFx(
-						root,
-						writeProjectFx({
-							root,
-							next: {
-								arkpack: version,
-								marker,
-								config,
-								resources,
-							},
+					return yield* filesystemWrite.withLockFx(
+						lifecycleLock,
+						Effect.gen(function* () {
+							const root = path.join(
+								projectsRoot,
+								`${encodeURIComponent(projectId)}-${createId()}`,
+							);
+							return yield* Effect.gen(function* () {
+								yield* fileSystem.makeDirectory(root, {
+									recursive: true,
+								});
+								const marker = GameProjectManifestSchema.parse({
+									arkini: ArkiniAppVersion,
+									revision: nowMs,
+								});
+								yield* writeProjectFx({
+									root,
+									next: {
+										arkpack: version,
+										marker,
+										config,
+										resources,
+									},
+								});
+								const entry = EditorProjectCatalogEntrySchema.parse({
+									root: yield* fileSystem.realPath(root),
+									ownership: "managed",
+									createdAtMs: nowMs,
+								});
+								const state = yield* materializeFx(entry);
+								yield* catalog.addFx(entry);
+								states.set(projectId, state);
+								return cloneProject(state.project);
+							}).pipe(
+								Effect.onError(() =>
+									fileSystem
+										.remove(root, {
+											force: true,
+											recursive: true,
+										})
+										.pipe(Effect.ignore),
+								),
+							);
 						}),
 					);
-					const entry = EditorProjectCatalogEntrySchema.parse({
-						root: yield* fileSystem.realPath(root),
-						ownership: "managed",
-						createdAtMs: nowMs,
-					});
-					const state = yield* materializeFx(entry);
-					yield* catalog.addFx(entry);
-					states.set(projectId, state);
-					return cloneProject(state.project);
 				}),
 			);
 		}).pipe(
@@ -273,6 +327,7 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 				].find((state) => state.catalog.root === root);
 				if (existing !== undefined) return cloneProject(existing.project);
 				const files = yield* withFilesystemEditorProjectLockFx(
+					filesystemWrite,
 					root,
 					providePlatform(readFilesystemEditorProjectFilesFx(root)),
 				);
@@ -372,19 +427,31 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 						error("delete-project", `Editor project ${projectId} does not exist.`),
 					);
 				if (state.catalog.ownership === "managed")
-					yield* withFilesystemEditorProjectLockFx(
-						state.paths.root,
-						assertSafeCatalogEntryFx(state.catalog).pipe(
-							Effect.andThen(
-								fileSystem.remove(state.paths.root, {
-									recursive: true,
-								}),
+					yield* filesystemWrite.withLockFx(
+						lifecycleLock,
+						withFilesystemEditorProjectLockFx(
+							filesystemWrite,
+							state.paths.root,
+							Effect.uninterruptible(
+								assertSafeCatalogEntryFx(state.catalog).pipe(
+									Effect.andThen(catalog.removeFx(state.catalog.root)),
+									Effect.andThen(Effect.sync(() => states.delete(projectId))),
+									Effect.andThen(
+										fileSystem
+											.remove(state.paths.root, {
+												force: true,
+												recursive: true,
+											})
+											.pipe(Effect.ignore),
+									),
+								),
 							),
 						),
 					);
-				if (state.catalog.ownership === "managed") states.delete(projectId);
-				yield* catalog.removeFx(state.catalog.root);
-				states.delete(projectId);
+				else {
+					yield* catalog.removeFx(state.catalog.root);
+					states.delete(projectId);
+				}
 			}).pipe(
 				Effect.mapError((cause) =>
 					error(

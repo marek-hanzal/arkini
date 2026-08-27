@@ -17,7 +17,7 @@ const schema = z
 	.strict()
 	.meta({
 		id: "EditorJsonExportRecoveryRecordSchema",
-		description: "One interrupted Editor JSON directory publication recovery record.",
+		description: "One interrupted Editor JSON directory swap recovery record.",
 	});
 
 export type EditorJsonExportRecoveryRecord = z.infer<typeof schema>;

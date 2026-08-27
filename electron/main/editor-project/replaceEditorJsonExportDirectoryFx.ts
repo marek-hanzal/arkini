@@ -122,7 +122,7 @@ export const replaceEditorJsonExportDirectoryFx = Effect.fn("replaceEditorJsonEx
 				})}\n`,
 			);
 
-			const publication = yield* Effect.exit(
+			const swap = yield* Effect.exit(
 				Effect.uninterruptible(
 					Effect.gen(function* () {
 						yield* writeSyncedTextFx(path.join(recoveryDirectory, "publishing"), "1");
@@ -137,9 +137,9 @@ export const replaceEditorJsonExportDirectoryFx = Effect.fn("replaceEditorJsonEx
 					}),
 				),
 			);
-			if (Exit.isFailure(publication)) {
+			if (Exit.isFailure(swap)) {
 				yield* recoverOneEditorJsonExportFx(recoveryDirectory);
-				return yield* Effect.failCause(publication.cause);
+				return yield* Effect.failCause(swap.cause);
 			}
 			yield* fileSystem.remove(path.join(target, EditorJsonExportOwnershipFile));
 			yield* syncFilesystemPathFx(fileSystem, target);

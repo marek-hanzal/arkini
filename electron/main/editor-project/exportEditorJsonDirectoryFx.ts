@@ -1,14 +1,12 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import { app, dialog, type BrowserWindow } from "electron";
-import { FileSystem, Path } from "effect";
+import { dialog, type BrowserWindow } from "electron";
 import { Effect } from "effect";
 
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
-import { assertSafeEditorJsonExportRootFx } from "./assertSafeEditorJsonExportRootFx";
+import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
+import { createEditorJsonExportDirectoryFx } from "./createEditorJsonExportDirectoryFx";
 import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnership";
 import { withFilesystemEditorProjectLockFx } from "./filesystem/fx/withFilesystemEditorProjectLockFx";
-import { recoverEditorJsonExportsFx } from "./recoverEditorJsonExportsFx";
-import { replaceEditorJsonExportDirectoryFx } from "./replaceEditorJsonExportDirectoryFx";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 
 export namespace exportEditorJsonDirectoryFx {
@@ -27,26 +25,16 @@ export namespace exportEditorJsonDirectoryFx {
 	}
 }
 
-/** Replaces one explicitly selected folder with a direct copy of the open Editor project. */
+/** Creates one directly re-openable JSON export without replacing an existing path. */
 export const exportEditorJsonDirectoryFx = Effect.fn("exportEditorJsonDirectoryFx")(
 	({ projectId, repository, window }: exportEditorJsonDirectoryFx.Props) =>
 		Effect.gen(function* () {
-			const fileSystem = yield* FileSystem.FileSystem;
-			const path = yield* Path.Path;
 			const filesystemWrite = yield* createFilesystemWriteFx();
-			const recoveryRoot = path.join(app.getPath("userData"), "editor-export-transactions");
-			yield* fileSystem.makeDirectory(recoveryRoot, {
-				recursive: true,
-			});
-			yield* filesystemWrite.withLockFx(
-				path.join(recoveryRoot, "recovery.lock"),
-				recoverEditorJsonExportsFx(recoveryRoot),
-			);
 			const selection = yield* Effect.tryPromise({
 				try: () =>
 					dialog.showOpenDialog(window, {
-						title: "Choose Editor project export folder",
-						buttonLabel: "Choose folder",
+						title: "Choose where to create the Editor project export",
+						buttonLabel: "Choose destination",
 						properties: [
 							"openDirectory",
 							"createDirectory",
@@ -69,45 +57,18 @@ export const exportEditorJsonDirectoryFx = Effect.fn("exportEditorJsonDirectoryF
 						message: `Editor project ${projectId} does not exist.`,
 					}),
 				);
-			const target = yield* assertSafeEditorJsonExportRootFx({
-				source,
-				target: selected,
-			});
-			const confirmation = yield* Effect.tryPromise({
-				try: () =>
-					dialog.showMessageBox(window, {
-						type: "warning",
-						title: "Replace Editor project export folder?",
-						message: "Replace the entire selected folder?",
-						detail: `${target}\n\nEvery existing file and subfolder will be permanently deleted and replaced by the open Editor project folder.`,
-						buttons: [
-							"Cancel",
-							"Replace and export",
-						],
-						cancelId: 0,
-						defaultId: 0,
-						noLink: true,
-					}),
-				catch: (cause) => cause,
-			});
-			if (confirmation.response !== 1) return null;
-
 			const exported = yield* withFilesystemEditorProjectLockFx(
 				filesystemWrite,
 				source,
-				filesystemWrite.withLockFx(
-					path.join(recoveryRoot, "recovery.lock"),
-					replaceEditorJsonExportDirectoryFx({
-						recoveryRoot,
-						source,
-						target,
-					}),
-				),
+				createEditorJsonExportDirectoryFx({
+					directoryName: encodeGameProjectFileStem(projectId),
+					parent: selected,
+					source,
+				}),
 			);
 			return {
 				...exported,
-				projectDirectory: target,
-				root: target,
+				projectDirectory: exported.root,
 			} satisfies exportEditorJsonDirectoryFx.Success;
 		}).pipe(
 			Effect.provide(NodeServices.layer),

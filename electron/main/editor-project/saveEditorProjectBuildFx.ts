@@ -9,7 +9,7 @@ import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnersh
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
 
-/** Saves the exact current build and detached signature through one native file choice. */
+/** Saves the exact current local Editor build through one native file choice. */
 export const saveEditorProjectBuildFx = Effect.fn("saveEditorProjectBuildFx")(
 	({
 		repository,
@@ -25,7 +25,7 @@ export const saveEditorProjectBuildFx = Effect.fn("saveEditorProjectBuildFx")(
 				try: () =>
 					dialog.showSaveDialog(window, {
 						title: "Save Arkpack",
-						buttonLabel: request.signed ? "Save Arkpack and signature" : "Save Arkpack",
+						buttonLabel: "Save Arkpack",
 						defaultPath: `${encodeGameProjectFileStem(request.projectId)}.arkpack`,
 						filters: [
 							{
@@ -49,7 +49,6 @@ export const saveEditorProjectBuildFx = Effect.fn("saveEditorProjectBuildFx")(
 				arkpackPath,
 				bytes: content.bytes,
 				fileSystem,
-				signature: content.signature,
 			});
 			return true;
 		}).pipe(

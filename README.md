@@ -131,10 +131,9 @@ The repository uses [`mise`](https://mise.jdx.dev/) as its only toolchain manage
 ```bash
 mise install
 ./Argcfile.sh install
-./Argcfile.sh signing:keygen
 ```
 
-The install recipe runs `npm ci` against the committed [`package-lock.json`](package-lock.json), then the explicit signing bootstrap generates the ignored `.env.local` input required by the first build. It refuses to replace an existing key unless called with `--force`. JavaScript dependencies remain package-local and `mise.toml` adds `node_modules/.bin` to `PATH`, so recipes call project binaries directly. `package.json` contains package metadata, dependency declarations, and only the required Electron `postinstall` lifecycle script; it is not a second task runner.
+The install recipe runs `npm ci` against the committed [`package-lock.json`](package-lock.json). JavaScript dependencies remain package-local and `mise.toml` adds `node_modules/.bin` to `PATH`, so recipes call project binaries directly. `package.json` contains package metadata, dependency declarations, and only the required Electron `postinstall` lifecycle script; it is not a second task runner.
 
 The application ships one canonical [Effect](https://effect.website/) product CLI. A packaged
 app can install or remove the `arkini-cli` launcher from Settings:
@@ -177,9 +176,9 @@ Application commands:
 ./Argcfile.sh package-macos
 ```
 
-Arkini is an [Electron](https://www.electronjs.org/docs/latest/)-only product. `dev` starts Electron with a [Vite](https://vite.dev/guide/)-powered renderer. The editor's MCP workspace explicitly starts either the open loopback endpoint at `http://127.0.0.1:32310/editor/mcp` or an OAuth-protected Remote MCP endpoint over ngrok; both modes share one lazy local listener and remain off until requested. `mcp-inspect` starts the pinned Inspector independently for the loopback endpoint. MCP tools are dynamically scoped to the single project currently mounted in the editor and fail without touching persistence when no project is open. Port, ngrok configuration, generated password, OAuth clients, codes, and tokens persist in `<userData>/arkini/editor/mcp.json`; only the ngrok `authtoken` value is encrypted with Electron `safeStorage`. Explicit Reset auth replaces the password and OAuth state while preserving transport configuration. Vite may replace modules during development, but Arkini treats application state as disposable and implements no HMR preservation, shutdown, or ownership handoff. `build` compiles the production Electron application with the one public key derived from `ARKINI_SIGN_KEY`, then uses that exact built CLI to run the standard pack command against `./game/arkini`. Local mise tasks load the ignored `.env.local`; CI provides the same variable from GitHub Actions secrets. `preview-macos` rebuilds the same inputs, creates an unpacked arm64 application, and launches it. There is no standalone web target, web persistence fallback, or alternate renderer startup path.
+Arkini is an [Electron](https://www.electronjs.org/docs/latest/)-only product. `dev` starts Electron with a [Vite](https://vite.dev/guide/)-powered renderer. The editor's MCP workspace explicitly starts either the open loopback endpoint at `http://127.0.0.1:32310/editor/mcp` or an OAuth-protected Remote MCP endpoint over ngrok; both modes share one lazy local listener and remain off until requested. `mcp-inspect` starts the pinned Inspector independently for the loopback endpoint. MCP tools are dynamically scoped to the single project currently mounted in the editor and fail without touching persistence when no project is open. Port, ngrok configuration, generated password, OAuth clients, codes, and tokens persist in `<userData>/arkini/editor/mcp.json`; only the ngrok `authtoken` value is encrypted with Electron `safeStorage`. Explicit Reset auth replaces the password and OAuth state while preserving transport configuration. Vite may replace modules during development, but Arkini treats application state as disposable and implements no HMR preservation, shutdown, or ownership handoff. `build` compiles the production Electron application, then uses that exact built CLI to run the standard pack command against `./game/arkini`. Local and Editor builds are External; only the tagged GitHub release workflow keyless-signs the official game. `preview-macos` rebuilds the same inputs, creates an unpacked arm64 application, and launches it. There is no standalone web target, web persistence fallback, or alternate renderer startup path.
 
-Disposable application output lives below `.out/`: Electron build files under `.out/desktop/build`, distributable artifacts under `.out/desktop/release`, and tool caches under `.out/cache`. Each authored game owns its ignored canonical artifact pair below `<project>/build/`; desktop packaging consumes that directory directly. Local signing input lives in ignored `.env.local` as `ARKINI_SIGN_KEY`.
+Disposable application output lives below `.out/`: Electron build files under `.out/desktop/build`, distributable artifacts under `.out/desktop/release`, and tool caches under `.out/cache`. Each authored game owns its ignored canonical artifact below `<project>/build/`; tagged release packaging additionally creates its Sigstore bundle there.
 
 `dev-control` starts the same application with Chromium DevTools Protocol exposed at `http://127.0.0.1:9222` for local UI automation and profiling. The endpoint is fixed to loopback and is never enabled by packaged builds.
 
@@ -226,7 +225,7 @@ mac-arm64/Arkini.app
 
 Verify downloads with `shasum -a 256 -c SHA256SUMS`. These development artifacts are intentionally unsigned and unnotarized. macOS may require opening the application through Finder's **Open** action or allowing it from **System Settings → Privacy & Security**. Do not add ad-hoc signing, fake certificates, or notarization placeholders to this milestone.
 
-The [macOS prerelease workflow](.github/workflows/macos-prerelease.yml) installs the repository tools through `mise-action` and invokes the same `./Argcfile.sh ci-macos` entrypoint on the GitHub-hosted `macos-15` Apple Silicon runner. That recipe runs formatting and type gates, packages exactly once, then runs Dependency Cruiser, copy/paste detection, and the isolated parallel test suite. Manual dispatch uploads a normal workflow artifact only. Tags matching `v*-dev.*`, such as `v0.1.0-dev.1`, also create an immutable GitHub prerelease containing the DMG, ZIP, and `SHA256SUMS`. Normal source pushes do not spend macOS runner time.
+The [macOS prerelease workflow](.github/workflows/macos-prerelease.yml) installs the repository tools through `mise-action` and invokes the same `./Argcfile.sh ci-macos` entrypoint on the GitHub-hosted `macos-15` Apple Silicon runner. That recipe runs formatting and type gates, packages exactly once, then runs Dependency Cruiser, copy/paste detection, and the isolated parallel test suite. Manual dispatch uploads an External workflow artifact only. Tags matching `v*-dev.*`, such as `v0.1.0-dev.1`, use GitHub OIDC to keyless-sign the exact bundled Arkpack and create an immutable GitHub prerelease containing the DMG, ZIP, and `SHA256SUMS`. Normal source pushes do not spend macOS runner time.
 
 Useful focused commands:
 
@@ -246,11 +245,11 @@ argc test test/job
 The launcher treats `.arkpack` as the playable package boundary:
 
 - Electron scans two flat roots for `<encoded-packageId>.arkpack` and optional `.arksig` siblings: `game/arkini/build` in development or packaged `Resources/game`, plus writable `<userData>/arkini/game/arkpacks`;
-- each Arkpack derives its stable package ID from signed `config.meta.id`. The renderer derives `contentHash`, trust, title, and game metadata from the exact bytes instead of trusting generated catalog metadata;
-- a structurally valid user package legally overrides a bundled package with the same ID. The renderer selects from both raw candidates, so an unreadable user file falls back consistently while an invalidly signed package stays visible but unavailable. The catalog labels the effective user row `User override`; removing it touches only user data and reveals the bundled fallback;
+- each Arkpack derives its stable package ID from validated `config.meta.id`. The renderer derives `contentHash`, title, and game metadata from the exact bytes instead of trusting generated catalog metadata;
+- a structurally valid user package legally overrides a bundled package with the same ID. The renderer selects from both raw candidates, so an unreadable user file falls back consistently. Trusted and External packages are both playable. The catalog labels the effective user row `User override`; removing it touches only user data and reveals the bundled fallback;
 - the Arkpack screen can open only the user package folder and explicitly refresh after manual copies. The bundled root is never exposed through UI;
-- trust is derived only from the optional detached signature. Bundled location and package name confer no trust; official Arkini carries a verifiable Ed25519 signature;
-- exact package load verifies trust over raw bytes before decode, then revalidates filename identity, embedded package identity, config, resources, and SHA-256 content hash before a game starts;
+- Electron main classifies trust from the optional Sigstore bundle and exact Arkpack bytes without network access. Bundled location and package name confer no trust; only the tagged Arkini release workflow produces Trusted provenance, and every failed proof becomes External;
+- exact package load receives that soft trust verdict, then independently revalidates filename identity, embedded package identity, compatibility, config, resources, and SHA-256 content hash before a game starts;
 - renderer import rejects files above the compressed package limit before `File.arrayBuffer()` allocates them, while the binary reader keeps the same guard for non-File callers;
 - gameplay saves use the strict MessagePack envelope `{ version, arkini, state }` and persist atomically under `<userData>/arkini/game/saves/<encoded-packageId>/current.arksave`;
 - save writes use the shared recoverable file primitive. A failed or interrupted replacement restores the previous successful `current.arksave` before the same save lock admits another operation;
@@ -274,10 +273,10 @@ arkini-cli game pack
 
 - `game schema` writes the authoring JSON Schema to [`game/arkini/schema.json`](game/arkini/schema.json).
 - `game validate` runs the canonical compiler and all diagnostics.
-- `game pack`, implemented by the [pack command](src/engine/pack/cli/PackCommand.ts), validates the current project, reads PNG resources, derives the package ID from `config.meta.id`, compresses it with gzip, and atomically replaces `<project>/build/<encoded projectId>.arkpack`. When `ARKINI_SIGN_KEY` is present it also publishes the verified raw-base64 `.arksig`; an unsigned rebuild removes any stale signature.
-- The desktop build compiles Electron/Vite and then invokes that built `arkini-cli game pack ./game/arkini`. `electron-builder` copies the standard project artifact pair from `game/arkini/build` into packaged `Resources/game`.
+- `game pack`, implemented by the [pack command](src/engine/pack/cli/PackCommand.ts), validates the current project, reads PNG resources, derives the package ID from `config.meta.id`, compresses it with gzip, and atomically replaces `<project>/build/<encoded projectId>.arkpack`. Ordinary local builds remove any stale `.arksig` and are External.
+- The desktop build compiles Electron/Vite and then invokes that built `arkini-cli game pack ./game/arkini`. A tagged GitHub release sets `ARKINI_RELEASE_SIGN=1`, allowing the built CLI to obtain keyless Sigstore provenance and publish `arkini.arksig` before `electron-builder` copies the release pair into packaged `Resources/game`.
 
-[`ARKPACK_SIGNING.md`](ARKPACK_SIGNING.md) is the complete threat model, CLI, private-key, CI-secret, trust-state, and rotation contract.
+[`ARKPACK_SIGNING.md`](ARKPACK_SIGNING.md) is the complete release identity, offline verification, trust-state, and root-update contract.
 
 The compiler, validator, tests, and packer must never assemble different versions of the game configuration.
 

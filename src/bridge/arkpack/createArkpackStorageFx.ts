@@ -33,15 +33,13 @@ export const createArkpackStorageFx = Effect.fn("createArkpackStorageFx")(
 			removeFx: Effect.fn("ArkpackStorage.removeFx")((packageId: string) =>
 				invokeArkpackTransportFx("remove", () => api.remove(packageId)),
 			),
-			writeFx: Effect.fn("ArkpackStorage.writeFx")(
-				(packageId: string, bytes: ArrayBuffer, signature?: unknown) =>
-					invokeArkpackTransportFx("install", () =>
-						api.install({
-							packageId,
-							bytes: new Uint8Array(bytes.slice(0)),
-							signature,
-						}),
-					),
+			writeFx: Effect.fn("ArkpackStorage.writeFx")((packageId: string, bytes: ArrayBuffer) =>
+				invokeArkpackTransportFx("install", () =>
+					api.install({
+						packageId,
+						bytes: new Uint8Array(bytes.slice(0)),
+					}),
+				),
 			),
 			openUserDirectoryFx: invokeArkpackTransportFx("open-user-directory", () =>
 				api.openUserDirectory(),

@@ -8,7 +8,7 @@ import { saveBuiltEditorArkpackFx } from "~/bridge/arkpack/editor/saveBuiltEdito
 afterEach(() => vi.restoreAllMocks());
 
 describe("saveBuiltEditorArkpackFx", () => {
-	it("asks main to save the exact signed build identity", async () => {
+	it("asks main to save the exact local build identity", async () => {
 		const saveProjectBuild = vi.fn(async () => ({
 			type: "success" as const,
 			value: true,
@@ -29,7 +29,6 @@ describe("saveBuiltEditorArkpackFx", () => {
 				contentHash: "a".repeat(64),
 				diagnostics: [],
 				revision: 1,
-				signed: true,
 			}),
 		);
 
@@ -37,7 +36,6 @@ describe("saveBuiltEditorArkpackFx", () => {
 			projectId: "project",
 			expectedRevision: 1,
 			contentHash: "a".repeat(64),
-			signed: true,
 		});
 	});
 });

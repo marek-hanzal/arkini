@@ -4,10 +4,9 @@ import { Effect, FileSystem } from "effect";
 
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 import { readArkpackSignaturePathFx } from "~/engine/pack/fx/readArkpackSignaturePathFx";
-import type { ArkpackSignatureSchema } from "~/engine/pack/schema/ArkpackSignatureSchema";
 import { readCanonicalArkpackPathFx } from "./recoverArkpackArtifactPairFx";
 
-/** Writes an Arkpack and its optional detached signature as one recoverable pair. */
+/** Writes an Arkpack and optional release bundle as one recoverable pair. */
 export const writeArkpackArtifactPairFx = Effect.fn("writeArkpackArtifactPairFx")(
 	({
 		arkpackPath,
@@ -18,7 +17,7 @@ export const writeArkpackArtifactPairFx = Effect.fn("writeArkpackArtifactPairFx"
 		readonly arkpackPath: string;
 		readonly bytes: Uint8Array;
 		readonly fileSystem: FileSystem.FileSystem;
-		readonly signature?: ArkpackSignatureSchema.Type;
+		readonly signature?: unknown;
 	}) =>
 		Effect.gen(function* () {
 			const root = dirname(arkpackPath);
@@ -41,7 +40,9 @@ export const writeArkpackArtifactPairFx = Effect.fn("writeArkpackArtifactPairFx"
 						: [
 								{
 									target: signatureTarget,
-									bytes: new TextEncoder().encode(`${signature}\n`),
+									bytes: new TextEncoder().encode(
+										`${JSON.stringify(signature, null, 2)}\n`,
+									),
 								},
 							]),
 					{

@@ -158,7 +158,6 @@ const renderSettings = async (
 				arkini: "1.0",
 				trust: {
 					type: "external",
-					reason: "unsigned",
 				} as const,
 				source: "user",
 			},

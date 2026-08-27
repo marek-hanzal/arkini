@@ -46,7 +46,6 @@ const makeTestGameFx = Effect.fn("makeRuntimeSelectorTestGameFx")(
 					arkini: ArkiniAppVersion,
 					trust: {
 						type: "external",
-						reason: "unsigned",
 					} as const,
 					source: "user" as const,
 				},

@@ -3,8 +3,8 @@ import { Effect } from "effect";
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { validateArkpackPayloadFx } from "~/bridge/arkpack/validateArkpackPayloadFx";
 import { decodeFx } from "~/engine/pack/fx/decodeFx";
-import { verifyArkpackTrustFx } from "~/engine/pack/fx/verifyArkpackTrustFx";
-import type { ArkpackPublicKeySchema } from "~/engine/pack/schema/ArkpackPublicKeySchema";
+import { readArkpackContentHashFx } from "~/engine/pack/fx/readArkpackContentHashFx";
+import type { ArkpackTrustSchema } from "~/engine/pack/schema/ArkpackTrustSchema";
 import { GameValidationError } from "~/engine/validation/error/GameValidationError";
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 
@@ -13,10 +13,7 @@ export namespace readArkpackFx {
 		bytes: Uint8Array;
 		filename?: string;
 		packageId?: string;
-		signature: {
-			readonly metadata?: unknown;
-			readonly publicKey: ArkpackPublicKeySchema.Type;
-		};
+		trust: ArkpackTrustSchema.Type;
 		source: "bundled" | "user";
 		overridesBundled?: boolean;
 	}
@@ -67,7 +64,7 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 	bytes,
 	filename,
 	packageId,
-	signature,
+	trust,
 	source,
 	overridesBundled = false,
 }: readArkpackFx.Props) {
@@ -78,12 +75,7 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 			),
 		);
 	}
-	const verification = yield* verifyArkpackTrustFx({
-		bytes,
-		publicKey: signature.publicKey,
-		signature: signature.metadata,
-	});
-	const contentHash = verification.contentHash;
+	const contentHash = yield* readArkpackContentHashFx(bytes);
 	const payload = yield* decodeFx(yield* decompressArkpackFx(bytes));
 	const diagnostics = yield* validateArkpackPayloadFx(payload);
 	const errors = diagnostics.filter(
@@ -111,7 +103,7 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 			title: payload.config.meta.title,
 			version: payload.version,
 			arkini: payload.arkini,
-			trust: verification.trust,
+			trust,
 			source,
 			overridesBundled,
 			...(filename === undefined

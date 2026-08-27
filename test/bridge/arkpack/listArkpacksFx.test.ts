@@ -17,6 +17,9 @@ describe("listArkpacksFx", () => {
 					packageId: "package:catalog",
 					filename: "package%3Acatalog.arkpack",
 					bytes: bytes.buffer,
+					trust: {
+						type: "external",
+					},
 					source: "user",
 					overridesBundled: true,
 				},
@@ -51,6 +54,9 @@ describe("listArkpacksFx", () => {
 					packageId: "package:filename",
 					filename: "package%3Afilename.arkpack",
 					bytes: bundledBytes.buffer,
+					trust: {
+						type: "trusted",
+					},
 					source: "bundled",
 					overridesBundled: false,
 				},
@@ -58,6 +64,9 @@ describe("listArkpacksFx", () => {
 					packageId: "package:filename",
 					filename: "package%3Afilename.arkpack",
 					bytes: userBytes.buffer,
+					trust: {
+						type: "external",
+					},
 					source: "user",
 					overridesBundled: true,
 				},

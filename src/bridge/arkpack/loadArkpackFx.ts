@@ -23,11 +23,6 @@ export const loadArkpackFx = Effect.fn("loadArkpackFx")(function* ({
 		if (loaded === undefined) {
 			return yield* Effect.fail(new Error(`Arkpack ${packageId} is not installed.`));
 		}
-		if (loaded.descriptor.trust.type === "invalid") {
-			return yield* Effect.fail(
-				new Error(`Arkpack ${packageId} has an invalid detached signature.`),
-			);
-		}
 		return loaded;
 	});
 });

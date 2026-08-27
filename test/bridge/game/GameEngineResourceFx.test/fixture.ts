@@ -42,7 +42,6 @@ export const makeResource = ({
 				arkini: ArkiniAppVersion,
 				trust: {
 					type: "external",
-					reason: "unsigned",
 				},
 				source: "user",
 			},

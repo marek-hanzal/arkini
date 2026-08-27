@@ -28,14 +28,12 @@ export namespace EditorProjectRepository {
 	export interface BuildProjectProps {
 		readonly expectedRevision: number;
 		readonly projectId: string;
-		readonly signKey?: string;
 	}
 
 	export interface ReadProjectBuildProps {
 		readonly contentHash: string;
 		readonly expectedRevision: number;
 		readonly projectId: string;
-		readonly signed: boolean;
 	}
 
 	export interface OpenProjectProps {

@@ -35,7 +35,6 @@ const createGame = (commandFx: Effect.Effect<unknown, unknown> = Effect.void): G
 		arkini: "1.0",
 		trust: {
 			type: "external",
-			reason: "unsigned",
 		} as const,
 		source: "user",
 	},

@@ -61,14 +61,9 @@ install() {
 	npm ci
 }
 
-# @cmd Generate the protected local Arkpack signing key
-# @flag --force Replace the existing ARKINI_SIGN_KEY assignment
-signing:keygen() {
-	local -a arguments=(arkpack keygen --output .env.local)
-	if [[ "${argc_force:-0}" == "1" ]]; then
-		arguments+=(--force)
-	fi
-	tsx src/engine/cli/arkini.ts "${arguments[@]}"
+# @cmd Refresh the offline Sigstore trusted-root snapshot through TUF
+signing:update-trusted-root() {
+	tsx scripts/updateArkpackTrustedRoot.ts
 }
 
 # @cmd Build and verify the offline Linux x64 npm cache for LLM environments

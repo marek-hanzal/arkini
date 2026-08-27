@@ -15,10 +15,8 @@ import {
 	testArkpackConfig,
 } from "~test/bridge/arkpack/support/createTestArkpack";
 import { installTestPngDecoder } from "~test/bridge/arkpack/support/createTestPngBytes";
-import { ArkiniPublicKey } from "~/bridge/arkpack/ArkiniPublicKey";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 
-const publicKey = ArkiniPublicKey;
 const writerMajor = ArkiniAppVersion.slice(0, ArkiniAppVersion.indexOf("."));
 
 const createGameFx = (props: Omit<createGameFromPackageFx.Props, "runRendererEffect">) =>
@@ -33,8 +31,8 @@ const createStorages = async (version = "1.0") => {
 		readArkpackFx({
 			bytes,
 			filename: "bridge.arkpack",
-			signature: {
-				publicKey,
+			trust: {
+				type: "external",
 			},
 			source: "user",
 		}),
@@ -43,6 +41,9 @@ const createStorages = async (version = "1.0") => {
 		packageId: loaded.descriptor.packageId,
 		filename: "bridge.arkpack",
 		bytes: bytes.slice().buffer,
+		trust: {
+			type: "external",
+		},
 		source: "user",
 		overridesBundled: false,
 	};
@@ -450,6 +451,9 @@ describe("createGameFx", () => {
 						packageId: storages.packageId,
 						filename: "bridge.arkpack",
 						bytes: Uint8Array.of(1, 2, 3).buffer,
+						trust: {
+							type: "external",
+						},
 						source: "user",
 						overridesBundled: false,
 					},

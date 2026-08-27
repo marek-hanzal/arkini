@@ -1,107 +1,105 @@
-import { Effect } from "effect";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import { createArkpackSigningPayloadFx } from "~/engine/pack/fx/createArkpackSigningPayloadFx";
-import { generateArkpackKeyPairFx } from "~/engine/pack/fx/generateArkpackKeyPairFx";
-import { signArkpackFx } from "~/engine/pack/fx/signArkpackFx";
-import { verifyArkpackTrustFx } from "~/engine/pack/fx/verifyArkpackTrustFx";
+import {
+	ArkiniReleaseIdentity,
+	createArkiniReleaseIdentity,
+} from "~/engine/pack/ArkiniReleaseIdentity";
+import { createArkpackTrustVerifier } from "~/engine/pack/fx/verifyArkpackTrustFx";
+import { createTestSigstore } from "./verifyArkpackTrustFx.test/createTestSigstore";
 
 const bytes = new TextEncoder().encode("exact arkpack fixture bytes");
-let pair: generateArkpackKeyPairFx.Result;
-let otherPair: generateArkpackKeyPairFx.Result;
+const releaseWorkflow =
+	"https://github.com/marek-hanzal/arkini/.github/workflows/macos-prerelease.yml@refs/tags/v0.5.0";
 
-beforeAll(async () => {
-	[pair, otherPair] = await Effect.runPromise(
-		Effect.all(
-			[
-				generateArkpackKeyPairFx(),
-				generateArkpackKeyPairFx(),
-			],
-			{
-				concurrency: "unbounded",
-			},
-		),
-	);
-});
-
-describe("Arkpack Ed25519 trust", () => {
-	it("uses one stable domain-separated signing payload", () => {
-		const payload = Effect.runSync(createArkpackSigningPayloadFx(bytes));
-		expect(new TextDecoder().decode(payload)).toBe(
-			`arkini:arkpack\0${new TextDecoder().decode(bytes)}`,
-		);
-	});
-
-	it("accepts only a signature made by the one matching key", async () => {
-		const signature = await Effect.runPromise(
-			signArkpackFx({
-				bytes,
-				signKey: pair.signKey,
-			}),
-		);
-		const official = await Effect.runPromise(
-			verifyArkpackTrustFx({
-				bytes,
-				publicKey: pair.publicKey,
-				signature,
-			}),
-		);
-		const wrongKey = await Effect.runPromise(
-			verifyArkpackTrustFx({
-				bytes,
-				publicKey: otherPair.publicKey,
-				signature,
-			}),
-		);
-
-		expect(official.trust).toEqual({
-			type: "official",
+describe("Arkpack release trust", () => {
+	it("proves exact release bytes and collapses every failed proof to External", async () => {
+		const sigstore = await createTestSigstore();
+		const verify = createArkpackTrustVerifier({
+			identity: ArkiniReleaseIdentity,
+			trustedRoot: sigstore.trustedRoot,
 		});
-		expect(wrongKey.trust).toEqual({
-			type: "invalid",
-			reason: "invalid-signature",
-		});
-	});
-
-	it("distinguishes unsigned, malformed, and mutated artifacts", async () => {
-		const signature = await Effect.runPromise(
-			signArkpackFx({
-				bytes,
-				signKey: pair.signKey,
-			}),
+		const bundle = await sigstore.sign(bytes, releaseWorkflow);
+		const forkBundle = await sigstore.sign(
+			bytes,
+			"https://github.com/fork/arkini/.github/workflows/macos-prerelease.yml@refs/tags/v0.5.0",
 		);
 		const changed = bytes.slice();
 		changed[0] = (changed[0] ?? 0) ^ 1;
-		const [unsigned, malformed, mutated] = await Effect.runPromise(
-			Effect.all([
-				verifyArkpackTrustFx({
-					bytes,
-					publicKey: pair.publicKey,
-				}),
-				verifyArkpackTrustFx({
-					bytes,
-					publicKey: pair.publicKey,
-					signature: {},
-				}),
-				verifyArkpackTrustFx({
-					bytes: changed,
-					publicKey: pair.publicKey,
-					signature,
-				}),
-			]),
-		);
 
-		expect(unsigned.trust).toEqual({
+		expect(
+			verify({
+				bytes,
+				signature: bundle,
+			}),
+		).toEqual({
+			type: "trusted",
+		});
+		expect(
+			verify({
+				bytes: changed,
+				signature: bundle,
+			}),
+		).toEqual({
 			type: "external",
-			reason: "unsigned",
 		});
-		expect(malformed.trust).toEqual({
-			type: "invalid",
-			reason: "malformed-signature",
+		expect(
+			verify({
+				bytes,
+				signature: forkBundle,
+			}),
+		).toEqual({
+			type: "external",
 		});
-		expect(mutated.trust).toEqual({
-			type: "invalid",
-			reason: "invalid-signature",
+		expect(
+			verify({
+				bytes,
+				signature: {},
+			}),
+		).toEqual({
+			type: "external",
+		});
+		expect(
+			verify({
+				bytes,
+			}),
+		).toEqual({
+			type: "external",
+		});
+	});
+
+	it("lets a forked build trust only its own release workflow", async () => {
+		const sigstore = await createTestSigstore();
+		const forkBundle = await sigstore.sign(
+			bytes,
+			"https://github.com/fork/arkini/.github/workflows/macos-prerelease.yml@refs/tags/v0.5.0",
+		);
+		const verifyUpstream = createArkpackTrustVerifier({
+			identity: ArkiniReleaseIdentity,
+			trustedRoot: sigstore.trustedRoot,
+		});
+		const verifyFork = createArkpackTrustVerifier({
+			identity: createArkiniReleaseIdentity({
+				issuer: "https://token.actions.githubusercontent.com",
+				subject: "https://github.com/fork/arkini/.github/workflows/macos-prerelease.yml",
+			}),
+			trustedRoot: sigstore.trustedRoot,
+		});
+
+		expect(
+			verifyUpstream({
+				bytes,
+				signature: forkBundle,
+			}),
+		).toEqual({
+			type: "external",
+		});
+		expect(
+			verifyFork({
+				bytes,
+				signature: forkBundle,
+			}),
+		).toEqual({
+			type: "trusted",
 		});
 	});
 });

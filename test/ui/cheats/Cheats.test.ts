@@ -103,7 +103,6 @@ describe("Cheats", () => {
 				arkini: "1.0",
 				trust: {
 					type: "external",
-					reason: "unsigned",
 				} as const,
 				source: "user",
 			},
@@ -181,7 +180,6 @@ describe("Cheats", () => {
 				arkini: "1.0",
 				trust: {
 					type: "external",
-					reason: "unsigned",
 				} as const,
 				source: "user",
 			},

@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { ArkpackSignatureSchema } from "~/engine/pack/schema/ArkpackSignatureSchema";
 import { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
 
 export const EditorProjectBuildSchema = z
@@ -9,7 +8,6 @@ export const EditorProjectBuildSchema = z
 		projectId: IdSchema,
 		revision: z.number().int().nonnegative(),
 		contentHash: z.string().regex(/^[a-f0-9]{64}$/),
-		signed: z.boolean(),
 		size: z.number().int().nonnegative(),
 		diagnostics: GameDiagnosticsSchema,
 	})
@@ -28,7 +26,6 @@ export namespace EditorProjectBuildSchema {
 export const EditorProjectBuildContentSchema = z
 	.object({
 		bytes: z.instanceof(Uint8Array),
-		signature: ArkpackSignatureSchema.optional(),
 	})
 	.strict()
 	.meta({

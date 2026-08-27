@@ -56,21 +56,15 @@ export const ArkpackCatalogList = ({
 										{match(arkpack.trust)
 											.with(
 												{
-													type: "official",
+													type: "trusted",
 												},
-												() => "Official",
+												() => "Trusted",
 											)
 											.with(
 												{
 													type: "external",
 												},
 												() => "External",
-											)
-											.with(
-												{
-													type: "invalid",
-												},
-												() => "Invalid",
 											)
 											.exhaustive()}
 									</span>
@@ -95,56 +89,18 @@ export const ArkpackCatalogList = ({
 										{arkpack.overridesBundled ? "Remove override" : "Remove"}
 									</DangerButton>
 								) : null}
-								{match(arkpack.trust)
-									.with(
-										{
-											type: "official",
-										},
-										() => (
-											<PrimaryButtonLink
-												to="/action/load-game/$packageId"
-												preload={false}
-												params={{
-													packageId: arkpack.packageId,
-												}}
-												aria-disabled={blocked}
-												className="min-h-0 px-4 py-2 text-sm shadow-none"
-												cursorIntent={blocked ? "progress" : undefined}
-											>
-												Play
-											</PrimaryButtonLink>
-										),
-									)
-									.with(
-										{
-											type: "external",
-										},
-										() => (
-											<PrimaryButtonLink
-												to="/action/load-game/$packageId"
-												preload={false}
-												params={{
-													packageId: arkpack.packageId,
-												}}
-												aria-disabled={blocked}
-												className="min-h-0 px-4 py-2 text-sm shadow-none"
-												cursorIntent={blocked ? "progress" : undefined}
-											>
-												Play
-											</PrimaryButtonLink>
-										),
-									)
-									.with(
-										{
-											type: "invalid",
-										},
-										() => (
-											<span className="px-4 py-2 text-sm font-semibold text-danger">
-												Unavailable
-											</span>
-										),
-									)
-									.exhaustive()}
+								<PrimaryButtonLink
+									to="/action/load-game/$packageId"
+									preload={false}
+									params={{
+										packageId: arkpack.packageId,
+									}}
+									aria-disabled={blocked}
+									className="min-h-0 px-4 py-2 text-sm shadow-none"
+									cursorIntent={blocked ? "progress" : undefined}
+								>
+									Play
+								</PrimaryButtonLink>
 							</div>
 						</article>
 					))}

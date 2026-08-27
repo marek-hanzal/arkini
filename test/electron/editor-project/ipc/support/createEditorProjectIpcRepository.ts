@@ -31,7 +31,6 @@ export const editorProjectIpcBuild = {
 	projectId: editorProjectIpcProject.projectId,
 	revision: editorProjectIpcProject.revision,
 	contentHash: "a".repeat(64),
-	signed: false,
 	size: 3,
 	diagnostics: [],
 };

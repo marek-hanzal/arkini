@@ -20,6 +20,7 @@ export namespace listArkpackFilesFx {
 		readonly maxCandidates?: number;
 		readonly maxTotalBytes?: number;
 		readonly source: ArkiniElectronApi.ArkpackFile["source"];
+		readonly verifyTrustFx?: readArkpackFileFx.Props["verifyTrustFx"];
 	}
 }
 
@@ -31,6 +32,7 @@ export const listArkpackFilesFx = Effect.fn("listArkpackFilesFx")(
 		maxCandidates = ArkpackLimits.maxCatalogCandidates / 2,
 		maxTotalBytes = ArkpackLimits.maxCatalogBytes / 2,
 		source,
+		verifyTrustFx,
 	}: listArkpackFilesFx.Props) =>
 		Effect.gen(function* () {
 			if (source === "user") {
@@ -90,17 +92,30 @@ export const listArkpackFilesFx = Effect.fn("listArkpackFilesFx")(
 							candidateRoot,
 							`${entry.slice(0, -suffix.length)}.arksig`,
 						);
-						const size =
-							Number((yield* fileSystem.stat(path)).size) +
-							((yield* fileSystem.exists(signaturePath))
-								? Number((yield* fileSystem.stat(signaturePath)).size)
-								: 0);
+						const signatureSize = yield* fileSystem.exists(signaturePath).pipe(
+							Effect.flatMap((exists) =>
+								exists
+									? fileSystem
+											.stat(signaturePath)
+											.pipe(
+												Effect.map((info) =>
+													info.size <= ArkpackLimits.maxSignatureBytes
+														? Number(info.size)
+														: 0,
+												),
+											)
+									: Effect.succeed(0),
+							),
+							Effect.catch(() => Effect.succeed(0)),
+						);
+						const size = Number((yield* fileSystem.stat(path)).size) + signatureSize;
 						if (totalBytes + size > maxTotalBytes) return null;
 						const file = yield* readArkpackFileFx({
 							root: candidateRoot,
 							fileSystem,
 							packageId,
 							source,
+							verifyTrustFx,
 						});
 						return file === null
 							? null

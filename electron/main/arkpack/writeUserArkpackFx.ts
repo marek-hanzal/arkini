@@ -4,7 +4,6 @@ import { join } from "node:path";
 import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { ElectronMainError } from "../ElectronMainError";
-import { ArkpackSignatureSchema } from "~/engine/pack/schema/ArkpackSignatureSchema";
 import { writeArkpackArtifactPairFx } from "./writeArkpackArtifactPairFx";
 import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
 
@@ -20,16 +19,6 @@ export namespace writeUserArkpackFx {
 export const writeUserArkpackFx = Effect.fn("writeUserArkpackFx")(
 	({ root, fileSystem, record }: writeUserArkpackFx.Props) =>
 		Effect.gen(function* () {
-			const signature = yield* Effect.try({
-				try: () =>
-					record.signature === undefined
-						? undefined
-						: ArkpackSignatureSchema.parse(record.signature),
-				catch: (cause) =>
-					new Error("The Arkpack signature is invalid.", {
-						cause,
-					}),
-			});
 			if (record.packageId.length === 0) {
 				return yield* Effect.fail(new Error("Arkpack package identity is empty."));
 			}
@@ -45,7 +34,6 @@ export const writeUserArkpackFx = Effect.fn("writeUserArkpackFx")(
 				arkpackPath: join(root, `${stem}.arkpack`),
 				bytes: record.bytes,
 				fileSystem,
-				signature,
 			});
 		}).pipe(
 			Effect.mapError(

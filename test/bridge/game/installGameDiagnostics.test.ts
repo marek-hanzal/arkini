@@ -23,7 +23,7 @@ const testArkpack = {
 	arkini: "1",
 	source: "bundled",
 	trust: {
-		type: "official",
+		type: "trusted",
 	},
 } satisfies ArkpackDescriptor;
 

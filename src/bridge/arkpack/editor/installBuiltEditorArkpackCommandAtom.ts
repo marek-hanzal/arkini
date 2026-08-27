@@ -22,18 +22,12 @@ export const installBuiltEditorArkpackCommandAtom = RendererRuntime.runSync(
 						projectId: artifact.projectId,
 						expectedRevision: artifact.revision,
 						contentHash: artifact.contentHash,
-						signed: artifact.signed,
 					})
 					.pipe(
 						Effect.flatMap((content) =>
 							catalog.installFx({
 								bytes: content.bytes,
 								filename: readArkpackArtifactNames(artifact.projectId).arkpack,
-								...(content.signature === undefined
-									? {}
-									: {
-											signature: content.signature,
-										}),
 							}),
 						),
 					);

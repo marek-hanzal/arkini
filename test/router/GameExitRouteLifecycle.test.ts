@@ -50,7 +50,6 @@ const createGame = (disposeFx: Game["disposeFx"]): Game => ({
 		arkini: ArkiniAppVersion,
 		trust: {
 			type: "external",
-			reason: "unsigned",
 		} as const,
 		source: "user",
 	},

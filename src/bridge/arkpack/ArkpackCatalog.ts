@@ -21,7 +21,6 @@ export namespace ArkpackCatalog {
 		readonly installFx?: (props: {
 			readonly bytes: Uint8Array;
 			readonly filename: string;
-			readonly signature?: unknown;
 		}) => Effect.Effect<ArkpackDescriptor, unknown>;
 		readonly removeFx?: (packageId: string) => Effect.Effect<void, unknown>;
 	}
@@ -37,7 +36,6 @@ export interface ArkpackCatalog {
 	readonly installFx: (props: {
 		readonly bytes: Uint8Array;
 		readonly filename: string;
-		readonly signature?: unknown;
 	}) => Effect.Effect<ArkpackDescriptor, unknown>;
 	readonly removeFx: (packageId: string) => Effect.Effect<void, unknown>;
 }

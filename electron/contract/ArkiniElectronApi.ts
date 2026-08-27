@@ -46,7 +46,6 @@ export namespace ArkiniElectronApi {
 		editorProjectBuild: "arkini:editor:project:build",
 		editorProjectBuildRead: "arkini:editor:project:build:read",
 		editorProjectBuildSave: "arkini:editor:project:build:save",
-		editorSignKeyConfigured: "arkini:editor:sign-key:configured",
 		editorProjectCreate: "arkini:editor:project:create",
 		editorProjectDelete: "arkini:editor:project:delete",
 		editorProjectDeleteItem: "arkini:editor:project:delete-item",
@@ -102,7 +101,13 @@ export namespace ArkiniElectronApi {
 		readonly packageId: string;
 		readonly filename: string;
 		readonly bytes: Uint8Array;
-		readonly signature?: unknown;
+		readonly trust:
+			| {
+					readonly type: "trusted";
+			  }
+			| {
+					readonly type: "external";
+			  };
 		readonly source: "bundled" | "user";
 		readonly overridesBundled: boolean;
 	}
@@ -110,7 +115,6 @@ export namespace ArkiniElectronApi {
 	export interface ArkpackInstall {
 		readonly packageId: string;
 		readonly bytes: Uint8Array;
-		readonly signature?: unknown;
 	}
 
 	export interface EditorMcpVersionCheckoutRequest {
@@ -182,7 +186,6 @@ export namespace ArkiniElectronApi {
 			readonly saveProjectBuild: (
 				request: EditorProjectTransport.ReadBuildRequest,
 			) => Promise<EditorProjectTransport.Result<boolean>>;
-			readonly isSignKeyConfigured: () => Promise<boolean>;
 			readonly createProject: (
 				request: EditorProjectTransport.CreateProjectRequest,
 			) => Promise<EditorProjectTransport.Result<EditorProjectTransport.Project>>;

@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
-import { ArkiniPublicKey } from "~/bridge/arkpack/ArkiniPublicKey";
 import { createArkpackStorageFx } from "~/bridge/arkpack/createArkpackStorageFx";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 
@@ -9,7 +8,6 @@ export namespace importArkpackFx {
 	export interface Props {
 		bytes: Uint8Array;
 		filename: string;
-		signature?: unknown;
 		storage?: ArkpackStorage;
 	}
 }
@@ -18,7 +16,6 @@ export namespace importArkpackFx {
 export const importArkpackFx = Effect.fn("importArkpackFx")(function* ({
 	bytes,
 	filename,
-	signature,
 	storage: providedStorage,
 }: importArkpackFx.Props) {
 	const storage = providedStorage ?? (yield* createArkpackStorageFx());
@@ -26,18 +23,12 @@ export const importArkpackFx = Effect.fn("importArkpackFx")(function* ({
 		const loaded = yield* readArkpackFx({
 			bytes,
 			filename,
-			signature: {
-				metadata: signature,
-				publicKey: ArkiniPublicKey,
+			trust: {
+				type: "external",
 			},
 			source: "user",
 		});
-		if (loaded.descriptor.trust.type === "invalid") {
-			return yield* Effect.fail(
-				new Error("The Arkpack signature does not match this build."),
-			);
-		}
-		yield* storage.writeFx(loaded.descriptor.packageId, bytes.slice().buffer, signature);
+		yield* storage.writeFx(loaded.descriptor.packageId, bytes.slice().buffer);
 		return loaded.descriptor;
 	});
 });

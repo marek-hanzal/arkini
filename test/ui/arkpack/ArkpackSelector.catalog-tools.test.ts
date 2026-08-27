@@ -33,7 +33,6 @@ const createCatalog = ({
 					arkini: "1",
 					trust: {
 						type: "external",
-						reason: "unsigned",
 					},
 					source: "user",
 					overridesBundled: true,

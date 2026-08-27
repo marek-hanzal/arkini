@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { listArkpackFilesFx } from "../../electron/main/arkpack/listArkpackFilesFx";
+import { ArkpackLimits } from "../../shared/ArkpackLimits";
 
 let root = "";
 
@@ -141,5 +142,36 @@ describe("listArkpackFilesFx", () => {
 				}),
 			),
 		).resolves.toEqual([]);
+	});
+
+	it("ignores an oversized bundle instead of hiding its playable Arkpack", async () => {
+		await Promise.all([
+			writeFile(join(root, "external.arkpack"), Uint8Array.of(1)),
+			writeFile(
+				join(root, "external.arksig"),
+				new Uint8Array(ArkpackLimits.maxSignatureBytes + 1),
+			),
+		]);
+		const fileSystem = await Effect.runPromise(
+			FileSystem.FileSystem.pipe(Effect.provide(NodeServices.layer)),
+		);
+
+		await expect(
+			Effect.runPromise(
+				listArkpackFilesFx({
+					root,
+					fileSystem,
+					maxTotalBytes: 1,
+					source: "user",
+				}),
+			),
+		).resolves.toEqual([
+			expect.objectContaining({
+				packageId: "external",
+				trust: {
+					type: "external",
+				},
+			}),
+		]);
 	});
 });

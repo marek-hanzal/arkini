@@ -8,7 +8,6 @@ import type { EditorProjectServiceOwnership } from "../../../../electron/main/ed
 import { registerEditorProjectIpcFx } from "../../../../electron/main/editor-project/ipc/registerEditorProjectIpcFx";
 import type { TrustedRenderer } from "../../../../electron/main/security/TrustedRenderer";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
-import { generateArkpackKeyPairFx } from "~/engine/pack/fx/generateArkpackKeyPairFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import {
 	createEditorProjectIpcRepository,
@@ -118,7 +117,6 @@ const projectChannels = [
 	ArkiniElectronApi.channels.editorProjectBuild,
 	ArkiniElectronApi.channels.editorProjectBuildRead,
 	ArkiniElectronApi.channels.editorProjectBuildSave,
-	ArkiniElectronApi.channels.editorSignKeyConfigured,
 	ArkiniElectronApi.channels.editorProjectCreate,
 	ArkiniElectronApi.channels.editorProjectDelete,
 	ArkiniElectronApi.channels.editorProjectDeleteItem,
@@ -142,17 +140,12 @@ const projectChannels = [
 	ArkiniElectronApi.channels.editorVersionTag,
 ];
 
-let environmentSignKey = "";
-
 beforeEach(async () => {
-	environmentSignKey = (await Effect.runPromise(generateArkpackKeyPairFx())).signKey;
-	vi.stubEnv("ARKINI_SIGN_KEY", environmentSignKey);
 	sourceExport.effect = Effect.succeed(completedSourceExport);
 	electron.module.shell.openPath.mockClear();
 });
 
 afterEach(() => {
-	vi.unstubAllEnvs();
 	electron.appListeners.get("will-quit")?.();
 	electron.appListeners.clear();
 	electron.handlers.clear();
@@ -231,9 +224,6 @@ describe("registerEditorProjectIpcFx", () => {
 		await expect(invoke(ArkiniElectronApi.channels.editorAwaitIdle)).resolves.toMatchObject({
 			type: "success",
 		});
-		await expect(invoke(ArkiniElectronApi.channels.editorSignKeyConfigured)).resolves.toBe(
-			true,
-		);
 		await expect(
 			invoke(ArkiniElectronApi.channels.editorProjectBuild, {
 				projectId: "project-one",
@@ -246,14 +236,12 @@ describe("registerEditorProjectIpcFx", () => {
 		expect(repository.buildProjectFx).toHaveBeenCalledWith({
 			projectId: "project-one",
 			expectedRevision: 1,
-			signKey: environmentSignKey,
 		});
 		await expect(
 			invoke(ArkiniElectronApi.channels.editorProjectBuildRead, {
 				projectId: "project-one",
 				expectedRevision: 1,
 				contentHash: "a".repeat(64),
-				signed: false,
 			}),
 		).resolves.toEqual({
 			type: "success",
@@ -270,7 +258,6 @@ describe("registerEditorProjectIpcFx", () => {
 				projectId: "project-one",
 				expectedRevision: 1,
 				contentHash: "a".repeat(64),
-				signed: false,
 			}),
 		).resolves.toEqual({
 			type: "success",

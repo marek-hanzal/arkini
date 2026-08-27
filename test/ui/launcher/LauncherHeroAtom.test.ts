@@ -89,7 +89,7 @@ const builtIn = {
 	version: "1.0",
 	arkini: "1.0",
 	trust: {
-		type: "official" as const,
+		type: "trusted" as const,
 	},
 	source: "bundled" as const,
 };

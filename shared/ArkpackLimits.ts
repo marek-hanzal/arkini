@@ -4,5 +4,5 @@ export const ArkpackLimits = {
 	maxCatalogBytes: 512 * 1024 * 1024,
 	maxCatalogCandidates: 512,
 	maxDecodedBytes: 256 * 1024 * 1024,
-	maxSignatureBytes: 16 * 1024,
+	maxSignatureBytes: 64 * 1024,
 } as const;

@@ -2,365 +2,206 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { analyzeEditorProjectCompatibilityFx } from "~/editor/version/analyzeEditorProjectCompatibilityFx";
+import type { EditorProjectCompatibility } from "~/editor/version/EditorProjectCompatibility";
+import { TemporaryItemSchema } from "~/engine/item/schema/TemporaryItemSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { editorTestConfig } from "~test/editor/support/editorTestPayload";
 import {
 	createLine,
-	createOutput,
 	createProducerItem,
 	createSimpleItem,
 } from "~test/validation/support/gameValidationTestSource";
 
-const analyze = (next: typeof editorTestConfig) =>
-	Effect.runSync(analyzeEditorProjectCompatibilityFx(editorTestConfig, next));
+const analyze = (
+	previous: GameConfigSchema.Type,
+	next: GameConfigSchema.Type,
+): EditorProjectCompatibility =>
+	Effect.runSync(analyzeEditorProjectCompatibilityFx(previous, next));
+
+const withProducer = () => {
+	const producer = createProducerItem({
+		id: "producer",
+		lines: [
+			createLine({
+				id: "line:first",
+			}),
+			createLine({
+				id: "line:second",
+			}),
+		],
+	});
+	return GameConfigSchema.parse({
+		...editorTestConfig,
+		items: {
+			...editorTestConfig.items,
+			producer,
+		},
+	});
+};
 
 describe("analyzeEditorProjectCompatibilityFx", () => {
-	it("keeps copy edits and added content save-compatible", () => {
-		const result = analyze({
-			...editorTestConfig,
+	it("reports every explicitly whitelisted copy and timing change as minor", () => {
+		const previous = withProducer();
+		const producer = previous.items.producer;
+		if (producer?.type !== "producer") throw new Error("Missing producer fixture.");
+		const next = GameConfigSchema.parse({
+			...previous,
 			meta: {
-				...editorTestConfig.meta,
+				...previous.meta,
 				title: "Renamed game",
 			},
-			items: {
-				...editorTestConfig.items,
-				stone: {
-					...editorTestConfig.items.water,
-					uid: "stone",
-					id: "stone",
-					title: "Stone",
-				},
-			},
-		});
-
-		expect(result.level).toBe("minor");
-	});
-
-	it("marks removed persisted item identities as breaking with a concrete reason", () => {
-		const result = analyze({
-			...editorTestConfig,
-			items: {},
-		});
-
-		expect(result).toMatchObject({
-			level: "major",
-			reasons: [
-				{
-					code: "item-removed",
-					path: [
-						"items",
-						"water",
-					],
-				},
-			],
-		});
-	});
-
-	it("marks storage shrink as breaking because old locations may not fit", () => {
-		const result = analyze({
-			...editorTestConfig,
-			meta: {
-				...editorTestConfig.meta,
-				board: {
-					...editorTestConfig.meta.board,
-					width: 1,
-				},
-			},
-		});
-
-		expect(result.level).toBe("major");
-		expect(result.reasons[0]?.code).toBe("storage-shrunk");
-
-		const removedToolbar = Effect.runSync(
-			analyzeEditorProjectCompatibilityFx(
-				{
-					...editorTestConfig,
-					meta: {
-						...editorTestConfig.meta,
-						toolbarSize: 1,
-					},
-				},
-				editorTestConfig,
-			),
-		);
-		expect(removedToolbar.level).toBe("major");
-	});
-
-	it("keeps append-only line inputs save-compatible", () => {
-		const producer = createProducerItem({
-			id: "producer",
-			lines: [
-				createLine({
-					id: "line:producer",
-				}),
-			],
-		});
-		const previous = GameConfigSchema.parse({
-			...editorTestConfig,
-			items: {
-				producer,
-			},
-		});
-		const next = GameConfigSchema.parse({
-			...previous,
-			items: {
-				producer: {
-					...producer,
-					lines: [
-						{
-							...producer.lines[0],
-							input: [
-								...producer.lines[0].input,
-								{
-									type: "simple",
-								},
-							],
-						},
-					],
-				},
-			},
-		});
-
-		const result = Effect.runSync(analyzeEditorProjectCompatibilityFx(previous, next));
-
-		expect(result.level).toBe("minor");
-	});
-
-	it("compares the effective persisted material capacity", () => {
-		const materialInput = {
-			type: "materials" as const,
-			selector: {
-				type: "item" as const,
-				itemId: "water",
-			},
-			mode: "consume" as const,
-			quantity: {
-				min: 1,
-				max: 3,
-			},
-			capacity: 2,
-		};
-		const producer = createProducerItem({
-			id: "producer",
-			input: [
-				materialInput,
-			],
-		});
-		const previous = GameConfigSchema.parse({
-			...editorTestConfig,
-			items: {
-				...editorTestConfig.items,
-				producer,
-			},
-		});
-		const next = GameConfigSchema.parse({
-			...previous,
 			items: {
 				...previous.items,
 				producer: {
 					...producer,
-					lines: [
-						{
-							...producer.lines[0],
-							input: [
-								{
-									...materialInput,
-									quantity: {
-										min: 1,
-										max: 1,
-									},
-								},
-							],
-						},
-					],
+					title: "Renamed producer",
+					description: "Rewritten producer",
+					lines: producer.lines.map((line, index) =>
+						index === 0
+							? {
+									...line,
+									title: "Renamed line",
+									description: "Rewritten line",
+									runtimeMs: 500,
+								}
+							: line,
+					),
 				},
 			},
 		});
 
-		const result = Effect.runSync(analyzeEditorProjectCompatibilityFx(previous, next));
+		const compatibility = analyze(previous, next);
 
-		expect(result.level).toBe("major");
-		expect(result.reasons.map(({ code }) => code)).toContain("line-input-invalidated");
-
-		const offsetCapacity = GameConfigSchema.parse({
-			...next,
-			items: {
-				...next.items,
-				producer: {
-					...producer,
-					lines: [
-						{
-							...producer.lines[0],
-							input: [
-								{
-									...materialInput,
-									quantity: {
-										min: 1,
-										max: 4,
-									},
-									capacity: 1,
-								},
-							],
-						},
-					],
-				},
-			},
-		});
-		expect(
-			Effect.runSync(analyzeEditorProjectCompatibilityFx(previous, offsetCapacity)).level,
-		).toBe("minor");
-
-		const reducedDeliveryLimit = GameConfigSchema.parse({
-			...next,
-			items: {
-				...next.items,
-				producer: {
-					...producer,
-					lines: [
-						{
-							...producer.lines[0],
-							input: [
-								{
-									...materialInput,
-									quantity: {
-										min: 1,
-										max: 1,
-									},
-									capacity: 4,
-								},
-							],
-						},
-					],
-				},
-			},
-		});
-		expect(
-			Effect.runSync(analyzeEditorProjectCompatibilityFx(previous, reducedDeliveryLimit))
-				.level,
-		).toBe("major");
-
-		const closedActiveJobSlot = GameConfigSchema.parse({
-			...next,
-			items: {
-				...next.items,
-				producer: {
-					...producer,
-					lines: [
-						{
-							...producer.lines[0],
-							input: [
-								{
-									...materialInput,
-									quantity: {
-										min: 1,
-										max: 5,
-									},
-									capacity: 0,
-								},
-							],
-						},
-					],
-				},
-			},
-		});
-		expect(
-			Effect.runSync(analyzeEditorProjectCompatibilityFx(previous, closedActiveJobSlot))
-				.level,
-		).toBe("major");
+		expect(compatibility.result).toBe("minor");
+		expect(compatibility.context.map(({ rule }) => rule)).toEqual([
+			"game-title",
+			"item-description",
+			"item-title",
+			"line-description",
+			"line-runtime",
+			"line-title",
+		]);
+		expect(compatibility.context.at(3)?.path).toEqual([
+			"items",
+			"producer",
+			"lines",
+			"line:first",
+			"description",
+		]);
 	});
 
-	it("marks temporary-lifetime reductions as breaking", () => {
-		const producer = createProducerItem({
-			id: "producer",
-			lines: [
-				createLine({
-					id: "line:producer",
-				}),
-			],
-		});
-		const temporary = {
+	it("keeps Temporary lifetime changes minor in either direction", () => {
+		const temporary = TemporaryItemSchema.parse({
 			...createSimpleItem("temporary"),
-			type: "temporary" as const,
-			scope: "board" as const,
+			type: "temporary",
+			scope: "board",
 			maxStackSize: 1,
 			durationMs: 2_000,
-		};
+		});
 		const previous = GameConfigSchema.parse({
 			...editorTestConfig,
 			items: {
-				producer,
 				temporary,
 			},
 		});
 		const next = GameConfigSchema.parse({
 			...previous,
 			items: {
-				producer,
 				temporary: {
 					...temporary,
 					durationMs: 1_000,
 				},
 			},
 		});
-		const result = Effect.runSync(analyzeEditorProjectCompatibilityFx(previous, next));
 
-		expect(result.level).toBe("major");
-		expect(result.reasons.map(({ code }) => code)).toContain("temporary-duration-reduced");
+		expect(analyze(previous, next)).toMatchObject({
+			result: "minor",
+			context: [
+				{
+					path: [
+						"items",
+						"temporary",
+						"durationMs",
+					],
+					result: "minor",
+					rule: "temporary-duration",
+				},
+			],
+		});
 	});
 
-	it("marks outputs reserved by active jobs as breaking", () => {
-		const output = createOutput([
-			{
-				itemId: "water",
-			},
-		]);
-		const producer = createProducerItem({
-			id: "producer",
-		});
-		const charged = {
-			...createSimpleItem("charged"),
-			charges: {
-				amount: 1,
-			},
-		};
-		const previous = GameConfigSchema.parse({
+	it("allows surfaces to grow but marks shrinking persisted locations major", () => {
+		const grown = GameConfigSchema.parse({
 			...editorTestConfig,
-			items: {
-				...editorTestConfig.items,
-				producer,
-				charged,
+			meta: {
+				...editorTestConfig.meta,
+				board: {
+					width: 3,
+					height: 2,
+				},
+				inventory: {
+					width: 1,
+					height: 2,
+				},
+				toolbarSize: 1,
 			},
 		});
-		const next = GameConfigSchema.parse({
-			...previous,
+
+		expect(analyze(editorTestConfig, grown).context).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					result: "minor",
+					rule: "surface-grown",
+				}),
+			]),
+		);
+		const shrunk = analyze(grown, editorTestConfig);
+		expect(shrunk.result).toBe("major");
+		expect(shrunk.context).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					result: "major",
+					rule: "surface-shrunk",
+				}),
+			]),
+		);
+	});
+
+	it("defaults unlisted gameplay changes to major and retains mixed context", () => {
+		const charged = GameConfigSchema.parse({
+			...editorTestConfig,
+			meta: {
+				...editorTestConfig.meta,
+				title: "Renamed game",
+			},
 			items: {
-				...previous.items,
-				producer: {
-					...producer,
-					lines: [
-						{
-							...producer.lines[0],
-							output,
-						},
-					],
-				},
-				charged: {
-					...charged,
+				water: {
+					...editorTestConfig.items.water,
 					charges: {
-						...charged.charges,
-						output,
+						amount: 3,
 					},
 				},
 			},
 		});
 
-		const result = Effect.runSync(analyzeEditorProjectCompatibilityFx(previous, next));
+		const compatibility = analyze(editorTestConfig, charged);
 
-		expect(result.level).toBe("major");
-		expect(result.reasons.map(({ code }) => code)).toEqual(
+		expect(compatibility.result).toBe("major");
+		expect(compatibility.context).toEqual(
 			expect.arrayContaining([
-				"line-output-changed",
-				"item-charge-output-changed",
+				expect.objectContaining({
+					result: "minor",
+					rule: "game-title",
+				}),
+				expect.objectContaining({
+					path: [
+						"items",
+						"water",
+						"charges",
+					],
+					result: "major",
+					rule: "unclassified-change",
+				}),
 			]),
 		);
 	});

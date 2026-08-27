@@ -8,7 +8,6 @@ import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
-import { ArkpackSignKeySchema } from "~/engine/pack/schema/ArkpackSignKeySchema";
 import type {
 	EditorProjectVersionCheckoutInput,
 	EditorProjectVersionCommitInput,
@@ -34,7 +33,6 @@ const buildProjectSchema = z
 	.object({
 		expectedRevision: z.number().int().nonnegative(),
 		projectId: IdSchema,
-		signKey: ArkpackSignKeySchema.optional(),
 	})
 	.strict();
 const readProjectBuildSchema = z
@@ -42,7 +40,6 @@ const readProjectBuildSchema = z
 		contentHash: z.string().regex(/^[a-f0-9]{64}$/),
 		expectedRevision: z.number().int().nonnegative(),
 		projectId: IdSchema,
-		signed: z.boolean(),
 	})
 	.strict();
 const upsertItemSchema = z

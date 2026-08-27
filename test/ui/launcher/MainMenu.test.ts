@@ -60,7 +60,7 @@ describe("MainMenu", () => {
 					version: "1.0",
 					arkini: "1",
 					trust: {
-						type: "official",
+						type: "trusted",
 					} as const,
 					source: "bundled" as const,
 				},
@@ -71,7 +71,7 @@ describe("MainMenu", () => {
 					version: "1.0",
 					arkini: "1",
 					trust: {
-						type: "official",
+						type: "trusted",
 					} as const,
 					source: "bundled" as const,
 				},
@@ -168,15 +168,14 @@ describe("MainMenu", () => {
 						{
 							...catalogState.arkpacks[1]!,
 							trust: {
-								type: "invalid",
-								reason: "malformed-signature",
+								type: "external",
 							},
 						},
 					],
 				}),
 			);
 		});
-		await vi.waitFor(() => expect(container.textContent).toContain("Play unavailable"));
+		await vi.waitFor(() => expect(container.textContent).toContain("Play"));
 		const editor = Array.from(container.querySelectorAll("a")).find(
 			(link) => link.textContent === "Editor",
 		);
@@ -201,7 +200,7 @@ describe("MainMenu", () => {
 		expect(container.textContent).toContain("SQLite unavailable.");
 		expect(
 			Array.from(container.querySelectorAll("a")).some((link) => link.textContent === "Play"),
-		).toBe(false);
+		).toBe(true);
 		expect(container.textContent).toContain("Arkpacks");
 		expect(container.textContent).toContain("Settings");
 		expect(container.textContent).toContain("About");

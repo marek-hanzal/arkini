@@ -90,27 +90,23 @@ export namespace EditorProjectTransport {
 		readonly projectId: string;
 		readonly revision: number;
 		readonly contentHash: string;
-		readonly signed: boolean;
 		readonly size: number;
 		readonly diagnostics: ReadonlyArray<unknown>;
 	}
 
 	export interface BuildContent {
 		readonly bytes: Uint8Array;
-		readonly signature?: unknown;
 	}
 
 	export interface BuildRequest {
 		readonly expectedRevision: number;
 		readonly projectId: string;
-		readonly signKey?: string;
 	}
 
 	export interface ReadBuildRequest {
 		readonly contentHash: string;
 		readonly expectedRevision: number;
 		readonly projectId: string;
-		readonly signed: boolean;
 	}
 
 	export interface SourceExport {

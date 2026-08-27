@@ -35,7 +35,6 @@ describe("ArkpackSelector action recovery", () => {
 							arkini: "1",
 							trust: {
 								type: "external",
-								reason: "unsigned",
 							} as const,
 							source: "user" as const,
 							overridesBundled: false,
@@ -86,7 +85,6 @@ describe("ArkpackSelector action recovery", () => {
 			arkini: "1",
 			trust: {
 				type: "external",
-				reason: "unsigned",
 			},
 			source: "user",
 			overridesBundled: false,

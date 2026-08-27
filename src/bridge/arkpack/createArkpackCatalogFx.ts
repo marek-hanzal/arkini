@@ -24,12 +24,11 @@ export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
 			);
 			const installDependencyFx = Effect.fn("ArkpackCatalog.installDependencyFx")(
 				props.installFx ??
-					(({ bytes, filename, packageId, signature }) =>
+					(({ bytes, filename, packageId }) =>
 						importArkpackFx({
 							bytes,
 							filename,
 							packageId,
-							signature,
 						})),
 			);
 			const removeDependencyFx = Effect.fn("ArkpackCatalog.removeDependencyFx")(
@@ -148,11 +147,6 @@ export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
 									bytes: content.bytes,
 									filename: install.filename,
 									packageId: install.packageId,
-									...(content.signature === undefined
-										? {}
-										: {
-												signature: content.signature,
-											}),
 								}),
 							),
 						),

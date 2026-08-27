@@ -3,6 +3,5 @@ export const createArtifact = (contentHash: string, revision: number) => ({
 	contentHash,
 	diagnostics: [],
 	revision,
-	signed: false,
 	size: 2,
 });

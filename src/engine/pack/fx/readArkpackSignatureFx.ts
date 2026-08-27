@@ -3,7 +3,7 @@ import { Effect } from "effect";
 
 import { readArkpackSignaturePathFx } from "./readArkpackSignaturePathFx";
 
-/** Reads an optional detached signature without hiding malformed content as unsigned. */
+/** Reads an optional detached Sigstore bundle as untrusted source text. */
 export const readArkpackSignatureFx = Effect.fn("readArkpackSignatureFx")(function* (
 	arkpackPath: string,
 ) {

@@ -5,6 +5,8 @@ import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { ElectronMainError } from "../ElectronMainError";
 import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
+import { verifyArkpackTrustFx } from "~/engine/pack/fx/verifyArkpackTrustFx";
+import type { ArkpackTrustSchema } from "~/engine/pack/schema/ArkpackTrustSchema";
 
 export namespace readArkpackFileFx {
 	export interface Props {
@@ -12,12 +14,22 @@ export namespace readArkpackFileFx {
 		readonly fileSystem: FileSystem.FileSystem;
 		readonly packageId: string;
 		readonly source: ArkiniElectronApi.ArkpackFile["source"];
+		readonly verifyTrustFx?: (props: {
+			readonly bytes: Uint8Array;
+			readonly signature?: unknown;
+		}) => Effect.Effect<ArkpackTrustSchema.Type>;
 	}
 }
 
-/** Reads one convention-named package and its optional detached signature. */
+/** Reads exact package bytes and offline-classifies its optional Sigstore bundle. */
 export const readArkpackFileFx = Effect.fn("readArkpackFileFx")(
-	({ root, fileSystem, packageId, source }: readArkpackFileFx.Props) =>
+	({
+		root,
+		fileSystem,
+		packageId,
+		source,
+		verifyTrustFx = verifyArkpackTrustFx,
+	}: readArkpackFileFx.Props) =>
 		Effect.gen(function* () {
 			if (packageId.length === 0) return null;
 			const stem = encodeGameProjectFileStem(packageId);
@@ -37,29 +49,28 @@ export const readArkpackFileFx = Effect.fn("readArkpackFileFx")(
 			const signature = yield* fileSystem.exists(signaturePath).pipe(
 				Effect.flatMap((exists) =>
 					exists
-						? fileSystem.stat(signaturePath).pipe(
-								Effect.filterOrFail(
-									(info) => info.size <= ArkpackLimits.maxSignatureBytes,
-									() =>
-										new Error(
-											`Arkpack signature exceeds the ${ArkpackLimits.maxSignatureBytes} byte limit.`,
-										),
-								),
-								Effect.andThen(fileSystem.readFileString(signaturePath)),
-								Effect.map((value) => value.trim()),
-							)
+						? fileSystem
+								.stat(signaturePath)
+								.pipe(
+									Effect.flatMap((info) =>
+										info.size <= ArkpackLimits.maxSignatureBytes
+											? fileSystem.readFileString(signaturePath)
+											: Effect.succeed(undefined),
+									),
+								)
 						: Effect.succeed(undefined),
 				),
+				Effect.map((value) => value?.trim()),
+				Effect.catch(() => Effect.succeed(undefined)),
 			);
 			const file: ArkiniElectronApi.ArkpackFile = {
 				packageId,
 				filename,
 				bytes: Uint8Array.from(bytes),
-				...(signature === undefined
-					? {}
-					: {
-							signature,
-						}),
+				trust: yield* verifyTrustFx({
+					bytes,
+					signature,
+				}),
 				source,
 				overridesBundled: false,
 			};

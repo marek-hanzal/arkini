@@ -18,6 +18,7 @@ export namespace createFilesystemArkpackCatalogFx {
 		readonly maxCatalogCandidates?: number;
 		readonly userRoot: string;
 		readonly fileSystem?: FileSystem.FileSystem;
+		readonly verifyTrustFx?: readArkpackFileFx.Props["verifyTrustFx"];
 	}
 }
 
@@ -29,6 +30,7 @@ export const createFilesystemArkpackCatalogFx = Effect.fn("createFilesystemArkpa
 		maxCatalogCandidates = ArkpackLimits.maxCatalogCandidates,
 		userRoot,
 		fileSystem: providedFileSystem,
+		verifyTrustFx,
 	}: createFilesystemArkpackCatalogFx.Props) {
 		const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
 		const operations = yield* Semaphore.make(1);
@@ -42,6 +44,7 @@ export const createFilesystemArkpackCatalogFx = Effect.fn("createFilesystemArkpa
 					maxCandidates: rootCandidateLimit,
 					maxTotalBytes: rootBudget,
 					source: "bundled",
+					verifyTrustFx,
 				}),
 				user: listArkpackFilesFx({
 					root: userRoot,
@@ -49,6 +52,7 @@ export const createFilesystemArkpackCatalogFx = Effect.fn("createFilesystemArkpa
 					maxCandidates: rootCandidateLimit,
 					maxTotalBytes: rootBudget,
 					source: "user",
+					verifyTrustFx,
 				}),
 			},
 			{
@@ -98,6 +102,7 @@ export const createFilesystemArkpackCatalogFx = Effect.fn("createFilesystemArkpa
 					fileSystem,
 					packageId,
 					source,
+					verifyTrustFx,
 				});
 			const candidate =
 				source === "user"

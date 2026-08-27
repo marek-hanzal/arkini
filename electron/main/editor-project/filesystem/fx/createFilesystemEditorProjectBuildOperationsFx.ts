@@ -10,11 +10,8 @@ import {
 	EditorProjectBuildSchema,
 } from "~/editor/EditorProjectBuildSchema";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
-import { ArkiniBuiltPublicKey } from "~/engine/pack/ArkiniBuiltPublicKey";
 import { packDirectoryFx } from "~/engine/pack/fx/packDirectoryFx";
 import { readArkpackContentHashFx } from "~/engine/pack/fx/readArkpackContentHashFx";
-import { ArkpackSignatureSchema } from "~/engine/pack/schema/ArkpackSignatureSchema";
-import { verifyArkpackTrustFx } from "~/engine/pack/fx/verifyArkpackTrustFx";
 import { GameValidationError } from "~/engine/validation/error/GameValidationError";
 import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
 import { withFilesystemEditorProjectLockFx } from "./withFilesystemEditorProjectLockFx";
@@ -85,11 +82,7 @@ export const createFilesystemEditorProjectBuildOperationsFx = Effect.fn(
 			Effect.provideService(Path.Path, path),
 		);
 
-	const buildProjectFx: Operations["buildProjectFx"] = ({
-		expectedRevision,
-		projectId,
-		signKey,
-	}) =>
+	const buildProjectFx: Operations["buildProjectFx"] = ({ expectedRevision, projectId }) =>
 		operations.withPermits(1)(
 			Effect.gen(function* () {
 				const state = yield* readState(projectId);
@@ -101,10 +94,6 @@ export const createFilesystemEditorProjectBuildOperationsFx = Effect.fn(
 						ensureFilesystemEditorProjectGitignoreFx(state.paths),
 					),
 				);
-				if (signKey !== undefined && ArkiniBuiltPublicKey === undefined)
-					return yield* Effect.fail(
-						new Error("This Arkini build does not contain a public signing key."),
-					);
 				const assertCurrentFx = readFilesystemEditorProjectFilesFx(state.paths.root).pipe(
 					Effect.filterOrFail(
 						(files) =>
@@ -123,14 +112,6 @@ export const createFilesystemEditorProjectBuildOperationsFx = Effect.fn(
 					packDirectoryFx({
 						input: state.paths.root,
 						assertCurrentFx,
-						...(signKey === undefined || ArkiniBuiltPublicKey === undefined
-							? {}
-							: {
-									signing: {
-										publicKey: ArkiniBuiltPublicKey,
-										signKey,
-									},
-								}),
 					}),
 				);
 				if (build.packageId !== projectId)
@@ -143,7 +124,6 @@ export const createFilesystemEditorProjectBuildOperationsFx = Effect.fn(
 					projectId,
 					revision: state.project.revision,
 					contentHash: build.contentHash,
-					signed: build.signature !== undefined,
 					size: build.bytes,
 					diagnostics: build.diagnostics,
 				});
@@ -162,7 +142,6 @@ export const createFilesystemEditorProjectBuildOperationsFx = Effect.fn(
 		contentHash,
 		expectedRevision,
 		projectId,
-		signed,
 	}) =>
 		operations.withPermits(1)(
 			Effect.gen(function* () {
@@ -200,65 +179,8 @@ export const createFilesystemEditorProjectBuildOperationsFx = Effect.fn(
 									"The current Editor build does not match the requested artifact.",
 								),
 							);
-						const signaturePath = path.join(build, `${stem}.arksig`);
-						const signatureExists = yield* fileSystem.exists(signaturePath);
-						if (signatureExists !== signed)
-							return yield* Effect.fail(
-								new Error("The current Editor build signing state has changed."),
-							);
-						if (
-							signatureExists &&
-							(yield* fileSystem.realPath(signaturePath)) !== signaturePath
-						)
-							return yield* Effect.fail(
-								new Error("The Editor build signature is a symbolic link."),
-							);
-						const signature = yield* Effect.succeed(signatureExists).pipe(
-							Effect.flatMap((exists) =>
-								exists
-									? fileSystem.stat(signaturePath).pipe(
-											Effect.filterOrFail(
-												(info) =>
-													info.size <= ArkpackLimits.maxSignatureBytes,
-												() =>
-													new Error(
-														"The Editor build signature is too large.",
-													),
-											),
-											Effect.andThen(
-												fileSystem.readFileString(signaturePath),
-											),
-											Effect.map((source) =>
-												ArkpackSignatureSchema.parse(source.trim()),
-											),
-										)
-									: Effect.succeed(undefined),
-							),
-						);
-						if (signature !== undefined) {
-							if (ArkiniBuiltPublicKey === undefined)
-								return yield* Effect.fail(
-									new Error(
-										"This Arkini build does not contain a public signing key.",
-									),
-								);
-							const verification = yield* verifyArkpackTrustFx({
-								bytes,
-								publicKey: ArkiniBuiltPublicKey,
-								signature,
-							});
-							if (verification.trust.type !== "official")
-								return yield* Effect.fail(
-									new Error("The current Editor build signature is invalid."),
-								);
-						}
 						return EditorProjectBuildContentSchema.parse({
 							bytes,
-							...(signature === undefined
-								? {}
-								: {
-										signature,
-									}),
 						});
 					}),
 				);

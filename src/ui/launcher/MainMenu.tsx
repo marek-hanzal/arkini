@@ -21,10 +21,7 @@ export const MainMenu = () => {
 		!startup.waiting &&
 		startup.value.defaultPackageId === ArkiniDefaultPackageId &&
 		catalogState.type === "ready" &&
-		catalogState.arkpacks.some(
-			(arkpack) =>
-				arkpack.packageId === ArkiniDefaultPackageId && arkpack.trust.type !== "invalid",
-		);
+		catalogState.arkpacks.some((arkpack) => arkpack.packageId === ArkiniDefaultPackageId);
 	const playUnavailable =
 		catalogState.type === "failed" ||
 		(AsyncResult.isFailure(startup) && !startup.waiting) ||

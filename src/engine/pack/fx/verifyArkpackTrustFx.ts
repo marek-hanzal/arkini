@@ -1,104 +1,85 @@
+import { bundleFromJSON } from "@sigstore/bundle";
+import { crypto as sigstoreCrypto } from "@sigstore/core";
+import { TrustedRoot } from "@sigstore/protobuf-specs";
+import { toSignedEntity, toTrustMaterial, Verifier } from "@sigstore/verify";
+import { KeyObject, verify as verifyNodeSignature } from "node:crypto";
 import { Effect } from "effect";
 
-import { ArkpackCryptoError } from "~/engine/pack/error/ArkpackCryptoError";
-import type { ArkpackPublicKeySchema } from "~/engine/pack/schema/ArkpackPublicKeySchema";
-import { ArkpackSignatureSchema } from "~/engine/pack/schema/ArkpackSignatureSchema";
+import { ArkiniReleaseIdentity } from "~/engine/pack/ArkiniReleaseIdentity";
 import type { ArkpackTrustSchema } from "~/engine/pack/schema/ArkpackTrustSchema";
-import { createArkpackSigningPayloadFx } from "./createArkpackSigningPayloadFx";
-import { readArkpackContentHashFx } from "./readArkpackContentHashFx";
+import trustedRootJson from "~/engine/pack/trusted-root.json";
 
 export namespace verifyArkpackTrustFx {
 	export interface Props {
 		readonly bytes: Uint8Array;
-		readonly publicKey: ArkpackPublicKeySchema.Type;
 		readonly signature?: unknown;
-	}
-
-	export interface Result {
-		readonly contentHash: string;
-		readonly trust: ArkpackTrustSchema.Type;
 	}
 }
 
-/** Classifies exact Arkpack bytes against optional detached metadata and one public key. */
-export const verifyArkpackTrustFx = Effect.fn("verifyArkpackTrustFx")(function* ({
-	bytes,
-	publicKey,
-	signature,
-}: verifyArkpackTrustFx.Props) {
-	const contentHash = yield* readArkpackContentHashFx(bytes);
-	if (signature === undefined) {
-		return {
-			contentHash,
-			trust: {
+export const createArkpackTrustVerifier = ({
+	identity,
+	trustedRoot,
+}: {
+	readonly identity: {
+		readonly issuer: string;
+		readonly subjectAlternativeName: RegExp;
+	};
+	readonly trustedRoot: unknown;
+}) => {
+	const verifier = new Verifier(toTrustMaterial(TrustedRoot.fromJSON(trustedRoot)), {
+		ctlogThreshold: 1,
+		tlogThreshold: 1,
+	});
+	const verifySigstore = (entity: ReturnType<typeof toSignedEntity>) => {
+		const originalVerify = sigstoreCrypto.verify;
+		// Electron 43 requires the ECDSA digest explicitly, while Sigstore's Rekor checks omit it.
+		sigstoreCrypto.verify = (data, key, signature, algorithm) => {
+			const keyType = key instanceof KeyObject ? key.asymmetricKeyType : undefined;
+			const digest =
+				algorithm ?? (keyType === "ed25519" || keyType === "ed448" ? null : "sha256");
+			try {
+				return verifyNodeSignature(digest, data, key, signature);
+			} catch {
+				return false;
+			}
+		};
+		try {
+			return verifier.verify(entity, {
+				subjectAlternativeName: identity.subjectAlternativeName,
+				extensions: {
+					issuer: identity.issuer,
+				},
+			});
+		} finally {
+			sigstoreCrypto.verify = originalVerify;
+		}
+	};
+	return ({ bytes, signature }: verifyArkpackTrustFx.Props): ArkpackTrustSchema.Type => {
+		if (signature === undefined)
+			return {
 				type: "external",
-				reason: "unsigned",
-			},
-		} satisfies verifyArkpackTrustFx.Result;
-	}
-	const parsed = ArkpackSignatureSchema.safeParse(signature);
-	if (!parsed.success) {
-		return {
-			contentHash,
-			trust: {
-				type: "invalid",
-				reason: "malformed-signature",
-			},
-		} satisfies verifyArkpackTrustFx.Result;
-	}
-	const importedKey = yield* Effect.tryPromise({
-		try: async () => {
-			const decoded = Uint8Array.from(atob(publicKey), (character) =>
-				character.charCodeAt(0),
-			);
-			return await crypto.subtle.importKey(
-				"spki",
-				decoded,
-				{
-					name: "Ed25519",
-				},
-				false,
-				[
-					"verify",
-				],
-			);
-		},
-		catch: (cause) =>
-			new ArkpackCryptoError({
-				operation: "import-public-key",
-				cause,
-			}),
-	});
-	const payload = yield* createArkpackSigningPayloadFx(bytes);
-	const signatureBytes = Uint8Array.from(atob(parsed.data), (character) =>
-		character.charCodeAt(0),
-	);
-	const verified = yield* Effect.tryPromise({
-		try: () =>
-			crypto.subtle.verify(
-				{
-					name: "Ed25519",
-				},
-				importedKey,
-				signatureBytes,
-				payload,
-			),
-		catch: (cause) =>
-			new ArkpackCryptoError({
-				operation: "verify",
-				cause,
-			}),
-	});
+			};
+		try {
+			const serialized = typeof signature === "string" ? JSON.parse(signature) : signature;
+			const entity = toSignedEntity(bundleFromJSON(serialized), Buffer.from(bytes));
+			verifySigstore(entity);
+			return {
+				type: "trusted",
+			};
+		} catch {
+			return {
+				type: "external",
+			};
+		}
+	};
+};
 
-	return {
-		contentHash,
-		trust: verified
-			? {
-					type: "official",
-				}
-			: {
-					type: "invalid",
-					reason: "invalid-signature",
-				},
-	} satisfies verifyArkpackTrustFx.Result;
+const verifyReleaseTrust = createArkpackTrustVerifier({
+	identity: ArkiniReleaseIdentity,
+	trustedRoot: trustedRootJson,
 });
+
+/** Offline soft classification of exact bytes and an optional Sigstore bundle. */
+export const verifyArkpackTrustFx = Effect.fn("verifyArkpackTrustFx")(
+	(props: verifyArkpackTrustFx.Props) => Effect.sync(() => verifyReleaseTrust(props)),
+);

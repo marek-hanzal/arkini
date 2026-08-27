@@ -98,14 +98,6 @@ beforeEach(() => {
 		version: "1.0",
 	};
 	state.buildResult = AsyncResult.success(createArtifact("b".repeat(64), 0));
-	Object.defineProperty(window, "arkini", {
-		configurable: true,
-		value: {
-			editor: {
-				isSignKeyConfigured: () => Promise.resolve(false),
-			},
-		},
-	});
 });
 
 afterEach(async () => {
@@ -135,7 +127,6 @@ const installedDescriptor = (version: string, source: "bundled" | "user") => ({
 	arkini: "1.0.0",
 	trust: {
 		type: "external" as const,
-		reason: "unsigned" as const,
 	},
 	source,
 });

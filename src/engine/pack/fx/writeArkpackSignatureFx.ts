@@ -1,17 +1,16 @@
 import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
-import type { ArkpackSignatureSchema } from "~/engine/pack/schema/ArkpackSignatureSchema";
 import { readArkpackSignaturePathFx } from "./readArkpackSignaturePathFx";
 
 export namespace writeArkpackSignatureFx {
 	export interface Props {
 		readonly arkpackPath: string;
-		readonly signature: ArkpackSignatureSchema.Type;
+		readonly signature: unknown;
 	}
 }
 
-/** Atomically writes one canonical detached Arkpack signature sidecar. */
+/** Atomically writes one detached Sigstore bundle sidecar. */
 export const writeArkpackSignatureFx = Effect.fn("writeArkpackSignatureFx")(function* ({
 	arkpackPath,
 	signature,
@@ -29,7 +28,7 @@ export const writeArkpackSignatureFx = Effect.fn("writeArkpackSignatureFx")(func
 				prefix: `${path.basename(signaturePath)}.`,
 				suffix: ".pending",
 			});
-			yield* fileSystem.writeFileString(pending, `${signature}\n`);
+			yield* fileSystem.writeFileString(pending, `${JSON.stringify(signature, null, 2)}\n`);
 			yield* fileSystem.rename(pending, signaturePath);
 		}),
 	);

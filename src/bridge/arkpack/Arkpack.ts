@@ -4,7 +4,7 @@ import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersio
 
 type ArkpackSource = "bundled" | "user";
 
-/** Descriptor derived from a validated package payload and its detached signature. */
+/** Descriptor derived from a validated package payload and its soft release provenance. */
 export interface ArkpackDescriptor {
 	readonly packageId: string;
 	readonly contentHash: string;

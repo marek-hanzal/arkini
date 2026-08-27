@@ -61,7 +61,7 @@ export const readFileRecord = ({
 	bytes,
 	overridesBundled = false,
 	packageId,
-	signature,
+	signature: _signature,
 	source,
 }: {
 	readonly bytes: Uint8Array;
@@ -73,11 +73,9 @@ export const readFileRecord = ({
 	packageId,
 	filename: readPackageFilename(packageId),
 	bytes,
-	...(signature === undefined
-		? {}
-		: {
-				signature,
-			}),
+	trust: {
+		type: "external",
+	},
 	source,
 	overridesBundled,
 });

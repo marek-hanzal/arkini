@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
-import { ArkiniPublicKey } from "~/bridge/arkpack/ArkiniPublicKey";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 import { ArkiniVersionIncompatibleError } from "~/engine/version/ArkiniVersionAdmission";
 
@@ -19,10 +18,7 @@ export const readArkpackCandidatesFx = Effect.fn("readArkpackCandidatesFx")(func
 				bytes: new Uint8Array(file.bytes),
 				filename: file.filename,
 				packageId: file.packageId,
-				signature: {
-					metadata: file.signature,
-					publicKey: ArkiniPublicKey,
-				},
+				trust: file.trust,
 				source: file.source,
 				overridesBundled: file.overridesBundled,
 			}),

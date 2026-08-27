@@ -15,7 +15,6 @@ const state = vi.hoisted(() => ({
 	exportResults: new Map<string, unknown>(),
 	installResults: new Map<string, unknown>(),
 	project: undefined as unknown,
-	isSignKeyConfigured: vi.fn<() => Promise<boolean>>(),
 }));
 
 vi.mock("@effect/atom-react", () => ({
@@ -161,16 +160,6 @@ beforeEach(() => {
 	state.commandSetters.clear();
 	state.exportResults.clear();
 	state.installResults.clear();
-	state.isSignKeyConfigured.mockReset();
-	state.isSignKeyConfigured.mockResolvedValue(false);
-	Object.defineProperty(window, "arkini", {
-		configurable: true,
-		value: {
-			editor: {
-				isSignKeyConfigured: state.isSignKeyConfigured,
-			},
-		},
-	});
 });
 
 afterEach(async () => {
@@ -280,7 +269,6 @@ describe("EditorBuild", () => {
 					arkini: "0.5.0",
 					trust: {
 						type: "external",
-						reason: "unsigned",
 					},
 					source: "user",
 				},
@@ -301,25 +289,11 @@ describe("EditorBuild", () => {
 		).toContain("Install storage is unavailable.");
 	});
 
-	it("uses the main-process signing default or an explicit pasted replacement", async () => {
-		state.isSignKeyConfigured.mockResolvedValue(true);
-		const render = await renderController();
-		await act(async () => Promise.resolve());
-		expect(controller?.signKeyConfigured).toBe(true);
-		expect(controller?.signKey).toBe("");
-
+	it("builds the current local revision without signing input", async () => {
+		await renderController();
 		controller?.build();
 		expect(state.commandSetters.get("build:editor-test")).toHaveBeenCalledWith({
 			expectedRevision: 0,
-		});
-
-		await act(async () => controller?.setSignKey("pasted-key"));
-		await render();
-		controller?.build();
-
-		expect(state.commandSetters.get("build:editor-test")).toHaveBeenCalledWith({
-			expectedRevision: 0,
-			signKey: "pasted-key",
 		});
 	});
 });

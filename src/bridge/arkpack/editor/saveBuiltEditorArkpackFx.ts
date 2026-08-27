@@ -4,7 +4,7 @@ import { z } from "zod";
 import { invokeEditorProjectTransportFx } from "~/bridge/editor/invokeEditorProjectTransportFx";
 import type { EditorProjectBuildSchema } from "~/editor/EditorProjectBuildSchema";
 
-/** Saves the canonical Arkpack and optional signature through one native dialog. */
+/** Saves the canonical local Editor Arkpack through one native dialog. */
 export const saveBuiltEditorArkpackFx = Effect.fn("saveBuiltEditorArkpackFx")(
 	(artifact: EditorProjectBuildSchema.Type) =>
 		invokeEditorProjectTransportFx<boolean, boolean>({
@@ -13,7 +13,6 @@ export const saveBuiltEditorArkpackFx = Effect.fn("saveBuiltEditorArkpackFx")(
 					projectId: artifact.projectId,
 					expectedRevision: artifact.revision,
 					contentHash: artifact.contentHash,
-					signed: artifact.signed,
 				}),
 			operation: "save-project-build",
 			parse: (value) => z.boolean().parse(value),

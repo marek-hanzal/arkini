@@ -1,12 +1,16 @@
 import { z } from "zod";
 
-/** Complete Arkini writer provenance in canonical `<major>.<minor>.<patch>` form. */
+/** Complete Arkini writer provenance with an optional SemVer prerelease suffix. */
 export const ArkiniVersionSchema = z
 	.string()
-	.regex(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/, "Expected an Arkini version like 1.0.0.")
+	.regex(
+		/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/,
+		"Expected an Arkini version like 1.0.0 or 1.0.0-dev.1.",
+	)
 	.meta({
 		id: "ArkiniVersionSchema",
-		description: "The complete Arkini version that wrote persisted data.",
+		description:
+			"The complete Arkini version, including an optional prerelease suffix, that wrote persisted data.",
 	});
 
 export type ArkiniVersionSchema = typeof ArkiniVersionSchema;

@@ -35,7 +35,6 @@ const createGame = (
 		arkini: ArkiniAppVersion,
 		trust: {
 			type: "external",
-			reason: "unsigned",
 		} as const,
 		source: "user",
 	},

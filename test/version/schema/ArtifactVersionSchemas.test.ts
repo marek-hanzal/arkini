@@ -12,7 +12,9 @@ describe("artifact version schemas", () => {
 
 	it("keeps Arkini writer provenance on a strict complete version", () => {
 		expect(ArkiniVersionSchema.safeParse("1.0.0").success).toBe(true);
+		expect(ArkiniVersionSchema.safeParse("1.0.0-dev.550.1").success).toBe(true);
 		expect(ArkiniVersionSchema.safeParse("1.0").success).toBe(false);
+		expect(ArkiniVersionSchema.safeParse("1.0.0-").success).toBe(false);
 		expect(ArkiniVersionSchema.safeParse("01.0.0").success).toBe(false);
 	});
 });

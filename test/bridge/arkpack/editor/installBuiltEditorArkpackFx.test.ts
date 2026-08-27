@@ -12,7 +12,6 @@ const artifact: EditorProjectBuildSchema.Type = {
 	projectId: "project:build",
 	revision: 7,
 	contentHash: "b".repeat(64),
-	signed: true,
 	size: 1,
 	diagnostics: [],
 };
@@ -29,7 +28,6 @@ const descriptor = (
 	arkini: ArkiniAppVersion,
 	trust: {
 		type: "external",
-		reason: "unsigned",
 	},
 	source,
 });

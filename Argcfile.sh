@@ -38,22 +38,35 @@ copy_paste_check() {
 }
 
 package_macos_artifacts() {
-	local version
+	local packaged_cli version
 	version=$(desktop_version)
+	packaged_cli=.out/desktop/release/mac-arm64/Arkini.app/Contents/MacOS/arkini-cli
 	electron-builder \
 		--config electron-builder.yml \
 		--mac \
 		--arm64 \
 		--publish never
+	cp game/arkini/build/arkini.arkpack .out/desktop/release/arkini.arkpack
+	if [[ -f game/arkini/build/arkini.arksig ]]; then
+		cp game/arkini/build/arkini.arksig .out/desktop/release/arkini.arksig
+	fi
 	(
+		local -a checksum_artifacts=(
+			"Arkini-$version-mac-arm64.dmg"
+			"Arkini-$version-mac-arm64.zip"
+			arkini.arkpack
+		)
 		cd .out/desktop/release
-		shasum -a 256 \
-			"Arkini-$version-mac-arm64.dmg" \
-			"Arkini-$version-mac-arm64.zip" \
-			>SHA256SUMS
+		if [[ -f arkini.arksig ]]; then
+			checksum_artifacts+=(arkini.arksig)
+		fi
+		shasum -a 256 "${checksum_artifacts[@]}" >SHA256SUMS
 	)
-	.out/desktop/release/mac-arm64/Arkini.app/Contents/MacOS/arkini-cli --version |
-		grep -F "$version"
+	"$packaged_cli" --version | grep -F "$version"
+	if [[ "${ARKINI_RELEASE_SIGN:-}" == "1" ]]; then
+		"$packaged_cli" arkpack verify .out/desktop/release/arkini.arkpack |
+			grep -Fx '{"type":"trusted"}'
+	fi
 }
 
 # @cmd Install exact JavaScript dependencies from the lockfile
@@ -61,14 +74,9 @@ install() {
 	npm ci
 }
 
-# @cmd Generate the protected local Arkpack signing key
-# @flag --force Replace the existing ARKINI_SIGN_KEY assignment
-signing:keygen() {
-	local -a arguments=(arkpack keygen --output .env.local)
-	if [[ "${argc_force:-0}" == "1" ]]; then
-		arguments+=(--force)
-	fi
-	tsx src/engine/cli/arkini.ts "${arguments[@]}"
+# @cmd Refresh the offline Sigstore trusted-root snapshot through TUF
+signing:update-trusted-root() {
+	tsx scripts/updateArkpackTrustedRoot.ts
 }
 
 # @cmd Build and verify the offline Linux x64 npm cache for LLM environments

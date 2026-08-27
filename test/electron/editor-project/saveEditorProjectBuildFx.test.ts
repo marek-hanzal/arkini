@@ -33,11 +33,10 @@ afterEach(async () => {
 });
 
 describe("saveEditorProjectBuildFx", () => {
-	it("publishes a signed build as one Arkpack and signature pair", async () => {
+	it("publishes one local Editor Arkpack without release provenance", async () => {
 		const root = await mkdtemp(join(tmpdir(), "arkini-editor-build-save-"));
 		temporaryRoots.push(root);
 		const repository = createEditorProjectIpcRepository();
-		const signature = btoa(String.fromCharCode(...new Uint8Array(64)));
 		vi.mocked(repository.readProjectBuildFx).mockReturnValue(
 			Effect.succeed({
 				bytes: new Uint8Array([
@@ -45,7 +44,6 @@ describe("saveEditorProjectBuildFx", () => {
 					2,
 					3,
 				]),
-				signature,
 			}),
 		);
 		electron.showSaveDialog.mockResolvedValue({
@@ -53,10 +51,9 @@ describe("saveEditorProjectBuildFx", () => {
 			filePath: join(root, "custom-name"),
 		});
 		const request = {
-			projectId: "project.signed",
+			projectId: "project.local",
 			expectedRevision: 1,
 			contentHash: "a".repeat(64),
-			signed: true,
 		};
 
 		await expect(
@@ -75,9 +72,6 @@ describe("saveEditorProjectBuildFx", () => {
 				2,
 				3,
 			]),
-		);
-		await expect(readFile(join(root, "custom-name.arksig"), "utf8")).resolves.toBe(
-			`${signature}\n`,
 		);
 	});
 });

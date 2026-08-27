@@ -7,7 +7,6 @@ import {
 	createFilesystemEditorProjectTestHarness,
 	type FilesystemEditorProjectTestHarness,
 } from "./support/createFilesystemEditorProjectTestHarness";
-import { TestArkpackSignKey } from "~test/support/arkpack/TestArkpackSigningIdentity";
 
 let harness: FilesystemEditorProjectTestHarness;
 
@@ -33,7 +32,6 @@ describe("filesystem Editor project build", () => {
 		expect(artifact).toMatchObject({
 			projectId: "project.build",
 			revision: project.revision,
-			signed: false,
 		});
 		expect(await readdir(join(root, "build"))).toEqual([
 			"project%2Ebuild.arkpack",
@@ -44,11 +42,9 @@ describe("filesystem Editor project build", () => {
 				projectId: project.projectId,
 				expectedRevision: artifact.revision,
 				contentHash: artifact.contentHash,
-				signed: artifact.signed,
 			}),
 		);
 		expect(content.bytes.byteLength).toBe(artifact.size);
-		expect(content.signature).toBeUndefined();
 	});
 
 	it("rejects changed bytes and preserves a user's existing gitignore content", async () => {
@@ -81,7 +77,6 @@ describe("filesystem Editor project build", () => {
 					projectId: project.projectId,
 					expectedRevision: artifact.revision,
 					contentHash: artifact.contentHash,
-					signed: artifact.signed,
 				}),
 			),
 		).rejects.toMatchObject({
@@ -93,35 +88,6 @@ describe("filesystem Editor project build", () => {
 		expect(await readFile(join(root, ".gitignore"), "utf8")).toBe(
 			"custom-output/\n/build/\n/editor.lock\n",
 		);
-	});
-
-	it("publishes and verifies a signed Editor build with this Arkini identity", async () => {
-		const repository = await harness.openRepository();
-		const project = await harness.createProject(repository, "project.signed");
-		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
-		if (root === null) throw new Error("Project root is missing.");
-		const artifact = await Effect.runPromise(
-			repository.buildProjectFx({
-				projectId: project.projectId,
-				expectedRevision: project.revision,
-				signKey: TestArkpackSignKey,
-			}),
-		);
-
-		expect(artifact.signed).toBe(true);
-		const content = await Effect.runPromise(
-			repository.readProjectBuildFx({
-				projectId: project.projectId,
-				expectedRevision: artifact.revision,
-				contentHash: artifact.contentHash,
-				signed: artifact.signed,
-			}),
-		);
-		expect(content.signature).toBeDefined();
-		expect(await readdir(join(root, "build"))).toEqual([
-			"project%2Esigned.arkpack",
-			"project%2Esigned.arksig",
-		]);
 	});
 
 	it("rejects unrefreshed external source changes before publishing", async () => {

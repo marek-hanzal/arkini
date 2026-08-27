@@ -12,7 +12,6 @@ import { openEditorExportDirectoryFx } from "../openEditorExportDirectoryFx";
 import { saveEditorProjectBuildFx } from "../saveEditorProjectBuildFx";
 import { createEditorProjectRequestParserFx } from "./createEditorProjectRequestParserFx";
 import { executeEditorProjectRepositoryFx } from "./executeEditorProjectRepositoryFx";
-import { readArkpackSignKeyFx } from "~/engine/pack/fx/readArkpackSignKeyFx";
 import { registerEditorBoardScenarioIpcFx } from "./registerEditorBoardScenarioIpcFx";
 import { registerEditorNoteIpcFx } from "./registerEditorNoteIpcFx";
 
@@ -114,35 +113,11 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 						}),
 					),
 				);
-				handle(ArkiniElectronApi.channels.editorSignKeyConfigured, () =>
-					Effect.succeed((process.env.ARKINI_SIGN_KEY?.trim().length ?? 0) > 0),
-				);
 				handle(ArkiniElectronApi.channels.editorProjectBuild, (_event, candidate) =>
 					executeEditorProjectRepositoryFx(
 						"build-project",
 						ownership,
-						requestParser.parseBuildProjectFx(candidate).pipe(
-							Effect.flatMap((request) => {
-								if (request.signKey !== undefined) return Effect.succeed(request);
-								const configured = process.env.ARKINI_SIGN_KEY?.trim();
-								return configured === undefined || configured.length === 0
-									? Effect.succeed(request)
-									: readArkpackSignKeyFx(configured).pipe(
-											Effect.map((signKey) => ({
-												...request,
-												signKey,
-											})),
-											Effect.mapError(
-												(cause) =>
-													new EditorProjectRepositoryError({
-														operation: "build-project",
-														message: cause.message,
-														cause,
-													}),
-											),
-										);
-							}),
-						),
+						requestParser.parseBuildProjectFx(candidate),
 						(repository, request) => repository.buildProjectFx(request),
 					),
 				);
@@ -391,7 +366,6 @@ export const registerEditorProjectIpcFx = Effect.fn("registerEditorProjectIpcFx"
 					ArkiniElectronApi.channels.editorProjectBuild,
 					ArkiniElectronApi.channels.editorProjectBuildRead,
 					ArkiniElectronApi.channels.editorProjectBuildSave,
-					ArkiniElectronApi.channels.editorSignKeyConfigured,
 					ArkiniElectronApi.channels.editorProjectCreate,
 					ArkiniElectronApi.channels.editorProjectDelete,
 					ArkiniElectronApi.channels.editorProjectDeleteItem,

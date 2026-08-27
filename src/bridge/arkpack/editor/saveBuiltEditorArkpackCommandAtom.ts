@@ -5,7 +5,7 @@ import { saveBuiltEditorArkpackFx } from "~/bridge/arkpack/editor/saveBuiltEdito
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { EditorProjectBuildSchema } from "~/editor/EditorProjectBuildSchema";
 
-/** Saves the exact current canonical build and optional signature through Electron main. */
+/** Saves the exact current local build through Electron main. */
 export const saveBuiltEditorArkpackCommandAtom = RendererRuntime.runSync(
 	Effect.succeed(
 		Atom.family((contentHash: string) =>

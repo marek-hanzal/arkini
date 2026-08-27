@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write
 
 concurrency:
   group: macos-prerelease-${{ github.ref }}
@@ -15,11 +16,13 @@ concurrency:
 
 jobs:
   package:
-    name: Build unsigned macOS arm64 artifacts
+    name: Build release-channel macOS arm64 artifacts
     runs-on: macos-15
     timeout-minutes: 60
     env:
-      ARKINI_SIGN_KEY: ${{ secrets.ARKINI_SIGN_KEY }}
+      ARKINI_RELEASE_ISSUER: https://token.actions.githubusercontent.com
+      ARKINI_RELEASE_IDENTITY: ${{ github.server_url }}/${{ github.repository }}/.github/workflows/macos-prerelease.yml
+      ARKINI_RELEASE_SIGN: ${{ startsWith(github.ref, 'refs/tags/') && '1' || '0' }}
       CSC_IDENTITY_AUTO_DISCOVERY: "false"
     steps:
       - name: Check out repository
@@ -37,16 +40,18 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         run: ./Argcfile.sh version "${GITHUB_REF_NAME#v}"
 
-      - name: Check and package unsigned macOS arm64 application
+      - name: Check and package macOS arm64 application
         run: ./Argcfile.sh ci-macos
 
       - name: Upload workflow artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: arkini-macos-arm64-${{ github.run_number }}
           path: |
             .out/desktop/release/*.dmg
             .out/desktop/release/*.zip
+            .out/desktop/release/*.arkpack
+            .out/desktop/release/*.arksig
             .out/desktop/release/SHA256SUMS
           if-no-files-found: error
           retention-days: 14
@@ -59,8 +64,10 @@ jobs:
           gh release create "$GITHUB_REF_NAME" \
             .out/desktop/release/*.dmg \
             .out/desktop/release/*.zip \
+            .out/desktop/release/arkini.arkpack \
+            .out/desktop/release/arkini.arksig \
             .out/desktop/release/SHA256SUMS \
             --verify-tag \
             --prerelease \
             --title "Arkini $GITHUB_REF_NAME" \
-            --notes "Unsigned macOS Apple Silicon development build. Verify SHA256SUMS before opening and use the normal macOS Gatekeeper override for unsigned local testing."
+            --notes "Unsigned macOS Apple Silicon build plus its standalone official Arkpack and Sigstore bundle. Verify SHA256SUMS before opening and use the normal macOS Gatekeeper override."

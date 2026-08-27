@@ -51,7 +51,6 @@ export const installBuiltEditorArkpackFx = Effect.fn("installBuiltEditorArkpackF
 			projectId: artifact.projectId,
 			expectedRevision: artifact.revision,
 			contentHash: artifact.contentHash,
-			signed: artifact.signed,
 		}),
 		expectedCurrent: plan.expectedCurrent,
 		filename: readArkpackArtifactNames(artifact.projectId).arkpack,

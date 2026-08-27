@@ -27,6 +27,9 @@ describe("loadArkpackFx", () => {
 						packageId: "package:future",
 						filename: "package%3Afuture.arkpack",
 						bytes: bytes.buffer,
+						trust: {
+							type: "external",
+						},
 						source: "user",
 						overridesBundled: true,
 					},
@@ -52,6 +55,9 @@ describe("loadArkpackFx", () => {
 			packageId: "package:selected",
 			filename: "package%3Aselected.arkpack",
 			bytes: bytes.buffer,
+			trust: {
+				type: "external",
+			},
 			source: "user",
 			overridesBundled: true,
 		};
@@ -104,7 +110,7 @@ describe("loadArkpackFx", () => {
 		).rejects.toThrow("Arkpack missing is not installed");
 	});
 
-	it("refuses to start a package with an invalid detached signature", async () => {
+	it("plays an External user override without treating trust as admission", async () => {
 		const bundledBytes = createTestArkpack(undefined, "package:tampered");
 		const userBytes = createTestArkpack(undefined, "package:tampered");
 		const storage: ArkpackStorage = {
@@ -115,6 +121,9 @@ describe("loadArkpackFx", () => {
 						packageId: "package:tampered",
 						filename: "package%3Atampered.arkpack",
 						bytes: bundledBytes.buffer,
+						trust: {
+							type: "trusted",
+						},
 						source: "bundled",
 						overridesBundled: false,
 					},
@@ -122,8 +131,8 @@ describe("loadArkpackFx", () => {
 						packageId: "package:tampered",
 						filename: "package%3Atampered.arkpack",
 						bytes: userBytes.buffer,
-						signature: {
-							malformed: true,
+						trust: {
+							type: "external",
 						},
 						source: "user",
 						overridesBundled: true,
@@ -134,13 +143,17 @@ describe("loadArkpackFx", () => {
 			openUserDirectoryFx: Effect.void,
 		};
 
-		await expect(
-			Effect.runPromise(
-				loadArkpackFx({
-					packageId: "package:tampered",
-					storage,
-				}),
-			),
-		).rejects.toThrow("invalid detached signature");
+		const loaded = await Effect.runPromise(
+			loadArkpackFx({
+				packageId: "package:tampered",
+				storage,
+			}),
+		);
+		expect(loaded.descriptor).toMatchObject({
+			source: "user",
+			trust: {
+				type: "external",
+			},
+		});
 	});
 });

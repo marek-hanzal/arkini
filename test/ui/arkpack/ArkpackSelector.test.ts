@@ -26,7 +26,7 @@ describe("ArkpackSelector", () => {
 					version: "1.0",
 					arkini: "1",
 					trust: {
-						type: "official",
+						type: "trusted",
 					} as const,
 					source: "bundled" as const,
 					overridesBundled: false,
@@ -39,7 +39,6 @@ describe("ArkpackSelector", () => {
 					arkini: "1",
 					trust: {
 						type: "external",
-						reason: "unsigned",
 					} as const,
 					source: "user" as const,
 					overridesBundled: false,
@@ -65,7 +64,7 @@ describe("ArkpackSelector", () => {
 			catalogList?.querySelectorAll<HTMLElement>('[data-ui="ArkpackCatalogRow"]') ?? [],
 		);
 		expect(catalogRows).toHaveLength(2);
-		expect(catalogRows[0]?.textContent).toContain("Official");
+		expect(catalogRows[0]?.textContent).toContain("Trusted");
 		expect(catalogRows[1]?.textContent).toContain("External");
 		const returnButton = layout?.lastElementChild?.querySelector("button");
 

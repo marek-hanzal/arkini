@@ -37,7 +37,7 @@ describe("writeArkpackArtifactPairFx", () => {
 			}),
 		);
 		expect(new Uint8Array(await readFile(arkpackPath))).toEqual(Uint8Array.of(1, 2, 3));
-		expect((await readFile(signaturePath, "utf8")).trim()).toBe(signature(1));
+		expect(JSON.parse(await readFile(signaturePath, "utf8"))).toBe(signature(1));
 
 		await Effect.runPromise(
 			writeArkpackArtifactPairFx({

@@ -15,10 +15,8 @@ import {
 	installTestPngDecoder,
 } from "~test/bridge/arkpack/support/createTestPngBytes";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
-import { ArkiniPublicKey } from "~/bridge/arkpack/ArkiniPublicKey";
 import { ArkiniVersionIncompatibleError } from "~/engine/version/ArkiniVersionAdmission";
 
-const publicKey = ArkiniPublicKey;
 const writerMajor = ArkiniAppVersion.slice(0, ArkiniAppVersion.indexOf("."));
 
 beforeEach(() => {
@@ -42,8 +40,8 @@ describe("readArkpackFx", () => {
 					"1.0",
 					arkini,
 				),
-				signature: {
-					publicKey,
+				trust: {
+					type: "external",
 				},
 				source: "user",
 			}),
@@ -63,8 +61,8 @@ describe("readArkpackFx", () => {
 						"1.0",
 						arkini,
 					),
-					signature: {
-						publicKey,
+					trust: {
+						type: "external",
 					},
 					source: "user",
 				}),
@@ -78,8 +76,8 @@ describe("readArkpackFx", () => {
 			readArkpackFx({
 				bytes,
 				filename: "bridge.arkpack",
-				signature: {
-					publicKey,
+				trust: {
+					type: "external",
 				},
 				source: "user",
 			}),
@@ -88,8 +86,8 @@ describe("readArkpackFx", () => {
 			readArkpackFx({
 				bytes,
 				filename: "renamed.arkpack",
-				signature: {
-					publicKey,
+				trust: {
+					type: "external",
 				},
 				source: "user",
 			}),
@@ -107,23 +105,19 @@ describe("readArkpackFx", () => {
 		expect(first.payload.config).toEqual(testArkpackConfig);
 	});
 
-	it("surfaces malformed signature metadata without downgrading it to unsigned", async () => {
+	it("preserves the trust classification independently of payload validation", async () => {
 		const loaded = await Effect.runPromise(
 			readArkpackFx({
 				bytes: createTestArkpack(),
-				signature: {
-					metadata: {
-						nope: true,
-					},
-					publicKey,
+				trust: {
+					type: "trusted",
 				},
 				source: "user",
 			}),
 		);
 
 		expect(loaded.descriptor.trust).toEqual({
-			type: "invalid",
-			reason: "malformed-signature",
+			type: "trusted",
 		});
 	});
 
@@ -132,8 +126,8 @@ describe("readArkpackFx", () => {
 			Effect.runPromise(
 				readArkpackFx({
 					bytes: new Uint8Array(ArkpackLimits.maxCompressedBytes + 1),
-					signature: {
-						publicKey,
+					trust: {
+						type: "external",
 					},
 					source: "user",
 				}),
@@ -178,8 +172,8 @@ describe("readArkpackFx", () => {
 			Effect.runPromise(
 				readArkpackFx({
 					bytes: new Uint8Array(gzipSync(encoded)),
-					signature: {
-						publicKey,
+					trust: {
+						type: "external",
 					},
 					source: "user",
 				}),
@@ -222,8 +216,8 @@ describe("readArkpackFx", () => {
 			Effect.result(
 				readArkpackFx({
 					bytes: new Uint8Array(gzipSync(encoded)),
-					signature: {
-						publicKey,
+					trust: {
+						type: "external",
 					},
 					source: "user",
 				}),

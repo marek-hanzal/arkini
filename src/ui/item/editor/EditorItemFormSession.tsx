@@ -110,6 +110,7 @@ export const EditorItemFormSession = ({
 						/>
 					}
 					rootCard={
+						sectionId !== "action" &&
 						sectionId !== "artwork" &&
 						sectionId !== "charges" &&
 						sectionId !== "merges" &&

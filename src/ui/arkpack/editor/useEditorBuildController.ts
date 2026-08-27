@@ -12,9 +12,10 @@ import {
 	readEditorBuildInstallPlanFx,
 } from "~/bridge/arkpack/editor/readEditorBuildInstallPlanFx";
 import {
+	type EditorBuildFailure,
 	type EditorGameDiagnostic,
-	readEditorBuildDiagnosticsFx,
-} from "~/bridge/arkpack/editor/readEditorBuildDiagnosticsFx";
+	readEditorBuildFailureFx,
+} from "~/bridge/arkpack/editor/readEditorBuildFailureFx";
 import { saveBuiltEditorArkpackCommandAtom } from "~/bridge/arkpack/editor/saveBuiltEditorArkpackCommandAtom";
 import { ArkpackCatalogAtom } from "~/bridge/arkpack/ArkpackCatalogAtom";
 import { readArkpackArtifactNames } from "~/bridge/arkpack/readArkpackArtifactNames";
@@ -45,7 +46,7 @@ export namespace useEditorBuildController {
 	export interface Output {
 		readonly artifactSummary?: string;
 		readonly build: () => void;
-		readonly buildError?: string;
+		readonly buildFailure?: EditorBuildFailure;
 		readonly buildPending: boolean;
 		readonly buildStatus: Status;
 		readonly buildStatusLabel: string;
@@ -112,9 +113,11 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 	const exportSourceError = RendererRuntime.runSync(
 		readSettledAsyncResultErrorFx(exportSourceResult),
 	);
-	const errorDiagnostics = RendererRuntime.runSync(readEditorBuildDiagnosticsFx(buildError));
-	const diagnostics = errorDiagnostics ?? artifact?.diagnostics ?? emptyDiagnostics;
-	const buildErrorMessage = errorDiagnostics === undefined ? errorMessage(buildError) : undefined;
+	const buildFailure = RendererRuntime.runSync(readEditorBuildFailureFx(buildError));
+	const diagnostics =
+		buildFailure?.type === "validation"
+			? buildFailure.diagnostics
+			: (artifact?.diagnostics ?? emptyDiagnostics);
 	const installErrorMessage = errorMessage(installError);
 	const saveErrorMessage = errorMessage(saveError);
 	const exportSourceErrorMessage = errorMessage(exportSourceError);
@@ -294,7 +297,7 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 		() => ({
 			artifactSummary,
 			build,
-			buildError: buildErrorMessage,
+			buildFailure,
 			buildPending: buildResult.waiting,
 			buildStatus,
 			buildStatusLabel: buildStatusLabels[buildStatus],
@@ -329,7 +332,7 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 		[
 			artifactSummary,
 			build,
-			buildErrorMessage,
+			buildFailure,
 			buildResult.waiting,
 			buildStatus,
 			buildSummary,

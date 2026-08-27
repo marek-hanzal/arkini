@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { readFile, readdir, writeFile } from "node:fs/promises";
+import { readFile, readdir, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -7,6 +7,7 @@ import {
 	createFilesystemEditorProjectTestHarness,
 	type FilesystemEditorProjectTestHarness,
 } from "./support/createFilesystemEditorProjectTestHarness";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 
 let harness: FilesystemEditorProjectTestHarness;
 
@@ -90,6 +91,65 @@ describe("filesystem Editor project build", () => {
 		);
 	});
 
+	it("preserves blocking diagnostics with project-relative provenance", async () => {
+		const root = await harness.createExternalProject("project-invalid-resource");
+		await unlink(join(root, "assets", "item-water.png"));
+		const repository = await harness.openRepository();
+		const project = await Effect.runPromise(
+			repository.openProjectFx({
+				root,
+			}),
+		);
+
+		await expect(
+			Effect.runPromise(
+				repository.buildProjectFx({
+					projectId: project.projectId,
+					expectedRevision: project.revision,
+				}),
+			),
+		).rejects.toMatchObject({
+			operation: "build-project",
+			diagnostics: [
+				expect.objectContaining({
+					code: DiagnosticCodeEnumSchema.enum.ResourceMissing,
+					source: "items/simple/water.json",
+				}),
+			],
+		});
+	});
+
+	it("keeps successful Build warnings project-relative", async () => {
+		const root = await harness.createExternalProject("project-warning");
+		await writeFile(
+			join(root, "assets", "unused.png"),
+			new Uint8Array([
+				1,
+				2,
+			]),
+		);
+		const repository = await harness.openRepository();
+		const project = await Effect.runPromise(
+			repository.openProjectFx({
+				root,
+			}),
+		);
+
+		const artifact = await Effect.runPromise(
+			repository.buildProjectFx({
+				projectId: project.projectId,
+				expectedRevision: project.revision,
+			}),
+		);
+
+		expect(artifact.diagnostics).toContainEqual(
+			expect.objectContaining({
+				code: DiagnosticCodeEnumSchema.enum.ResourceUnused,
+				source: "assets/unused.png",
+			}),
+		);
+	});
+
 	it("rejects unrefreshed external source changes before publishing", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository, "project.external-change");
@@ -109,10 +169,30 @@ describe("filesystem Editor project build", () => {
 			),
 		).rejects.toMatchObject({
 			operation: "build-project",
-			cause: expect.objectContaining({
-				message:
-					"Editor project files changed outside the Editor. Refresh before building.",
-			}),
+			message:
+				"The saved project changed before the build snapshot could be published. Refresh the project and build again.",
+		});
+		await expect(readdir(join(root, "build"))).rejects.toBeDefined();
+	});
+
+	it("classifies structurally invalid external edits as requiring Refresh", async () => {
+		const repository = await harness.openRepository();
+		const project = await harness.createProject(repository, "project.invalid-external-change");
+		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
+		if (root === null) throw new Error("Project root is missing.");
+		await writeFile(join(root, "game.json"), "{ invalid json");
+
+		await expect(
+			Effect.runPromise(
+				repository.buildProjectFx({
+					projectId: project.projectId,
+					expectedRevision: project.revision,
+				}),
+			),
+		).rejects.toMatchObject({
+			operation: "build-project",
+			message:
+				"The saved project changed before the build snapshot could be published. Refresh the project and build again.",
 		});
 		await expect(readdir(join(root, "build"))).rejects.toBeDefined();
 	});

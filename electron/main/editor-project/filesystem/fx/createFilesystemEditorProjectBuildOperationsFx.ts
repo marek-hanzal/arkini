@@ -1,6 +1,7 @@
+import { basename, isAbsolute, relative } from "node:path";
 import { isDeepStrictEqual } from "node:util";
 import { FileSystem, Path } from "effect";
-import { Effect, type Semaphore } from "effect";
+import { Data, Effect, type Semaphore } from "effect";
 
 import { ArkpackLimits } from "../../../../../shared/ArkpackLimits";
 import type { FilesystemEditorProjectState } from "../FilesystemEditorProjectState";
@@ -13,14 +14,68 @@ import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryEr
 import { packDirectoryFx } from "~/engine/pack/fx/packDirectoryFx";
 import { readArkpackContentHashFx } from "~/engine/pack/fx/readArkpackContentHashFx";
 import { GameValidationError } from "~/engine/validation/error/GameValidationError";
+import { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
 import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
 import { withFilesystemEditorProjectLockFx } from "./withFilesystemEditorProjectLockFx";
 import { readFilesystemEditorProjectFilesFx } from "./readFilesystemEditorProjectFilesFx";
 import { ensureFilesystemEditorProjectGitignoreFx } from "./ensureFilesystemEditorProjectGitignoreFx";
 import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
-import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
+import { FilesystemWriteError } from "~/engine/filesystem/FilesystemWriteError";
 
 type Operations = Pick<EditorProjectRepositoryService, "buildProjectFx" | "readProjectBuildFx">;
+
+class EditorProjectBuildOperationError extends Data.TaggedError(
+	"EditorProjectBuildOperationError",
+)<{
+	readonly message: string;
+}> {}
+
+const projectChangedBeforeBuild = () =>
+	new EditorProjectBuildOperationError({
+		message:
+			"The saved project changed before the build snapshot could be published. Refresh the project and build again.",
+	});
+
+const relativeDiagnosticSource = (projectRoot: string, source: string) => {
+	if (!isAbsolute(source)) return source;
+	const projectRelative = relative(projectRoot, source);
+	return projectRelative.startsWith("..") || isAbsolute(projectRelative)
+		? basename(source)
+		: projectRelative.replaceAll("\\", "/");
+};
+
+const relativeDiagnosticProvenance = (
+	projectRoot: string,
+	candidate: unknown,
+	key?: string,
+): unknown => {
+	if (typeof candidate === "string" && (key === "source" || key === "sources"))
+		return relativeDiagnosticSource(projectRoot, candidate);
+	if (Array.isArray(candidate))
+		return candidate.map((value) => relativeDiagnosticProvenance(projectRoot, value, key));
+	if (typeof candidate !== "object" || candidate === null) return candidate;
+	return Object.fromEntries(
+		Object.entries(candidate).map(([entryKey, value]) => [
+			entryKey,
+			relativeDiagnosticProvenance(projectRoot, value, entryKey),
+		]),
+	);
+};
+
+const safeBuildDiagnostics = (projectRoot: string, diagnostics: GameDiagnosticsSchema.Type) =>
+	GameDiagnosticsSchema.parse(
+		diagnostics.map((diagnostic) => relativeDiagnosticProvenance(projectRoot, diagnostic)),
+	);
+
+const filesystemFailureMessage = (
+	operation: "build-project" | "read-project-build",
+	cause: FilesystemWriteError,
+) => {
+	const action = operation === "build-project" ? "published" : "read";
+	return cause.recovery === undefined
+		? `The Editor build could not be ${action} safely. Retry the operation.`
+		: `The Editor build could not be ${action} safely. Recovery data was preserved; restart the Editor before retrying.`;
+};
 
 const error = (
 	operation: "build-project" | "read-project-build",
@@ -31,7 +86,12 @@ const error = (
 		? cause
 		: new EditorProjectRepositoryError({
 				operation,
-				message: withFilesystemWriteRecovery(message, cause),
+				message:
+					cause instanceof EditorProjectBuildOperationError
+						? cause.message
+						: cause instanceof FilesystemWriteError
+							? filesystemFailureMessage(operation, cause)
+							: message,
 				...(cause instanceof GameValidationError
 					? {
 							diagnostics: cause.diagnostics,
@@ -95,37 +155,47 @@ export const createFilesystemEditorProjectBuildOperationsFx = Effect.fn(
 					),
 				);
 				const assertCurrentFx = readFilesystemEditorProjectFilesFx(state.paths.root).pipe(
+					Effect.mapError(projectChangedBeforeBuild),
 					Effect.filterOrFail(
 						(files) =>
 							files.marker.revision === state.project.revision &&
 							files.arkpack === state.project.version &&
 							isDeepStrictEqual(files.config, state.project.config) &&
 							isDeepStrictEqual(files.resources, state.project.resources),
-						() =>
-							new Error(
-								"Editor project files changed outside the Editor. Refresh before building.",
-							),
+						projectChangedBeforeBuild,
 					),
 					Effect.asVoid,
 				);
+				yield* providePlatform(assertCurrentFx);
 				const build = yield* providePlatform(
 					packDirectoryFx({
 						input: state.paths.root,
 						assertCurrentFx,
-					}),
+					}).pipe(
+						Effect.mapError((cause) =>
+							cause instanceof GameValidationError
+								? new GameValidationError({
+										diagnostics: safeBuildDiagnostics(
+											state.paths.root,
+											cause.diagnostics,
+										),
+									})
+								: cause,
+						),
+					),
 				);
 				if (build.packageId !== projectId)
 					return yield* Effect.fail(
-						new Error(
-							`Built package ${build.packageId} does not match Editor project ${projectId}.`,
-						),
+						new EditorProjectBuildOperationError({
+							message: `The built package identity ${build.packageId} does not match Editor project ${projectId}.`,
+						}),
 					);
 				return EditorProjectBuildSchema.parse({
 					projectId,
 					revision: state.project.revision,
 					contentHash: build.contentHash,
 					size: build.bytes,
-					diagnostics: build.diagnostics,
+					diagnostics: safeBuildDiagnostics(state.paths.root, build.diagnostics),
 				});
 			}).pipe(
 				Effect.mapError((cause) =>

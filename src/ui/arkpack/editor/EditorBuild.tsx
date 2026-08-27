@@ -43,11 +43,16 @@ export const EditorBuild = () => {
 						{controller.buildStatusLabel}
 					</span>
 				</div>
-				{controller.buildError === undefined ? null : (
-					<p className="mt-4 rounded-lg bg-danger/10 p-3 text-sm text-danger">
-						{controller.buildError}
+				{controller.buildFailure?.type === "operational" ? (
+					<div className="mt-4 rounded-lg bg-danger/10 p-3 text-danger">
+						<h3 className="text-sm font-semibold">Build operation failed</h3>
+						<p className="mt-1 text-sm">{controller.buildFailure.detail}</p>
+					</div>
+				) : controller.buildFailure?.type === "validation" ? (
+					<p className="mt-4 text-sm font-medium text-danger">
+						Project validation blocked the Arkpack build.
 					</p>
-				)}
+				) : null}
 				{controller.diagnostics.length === 0 ? null : (
 					<EditorBuildDiagnostics
 						diagnostics={controller.diagnostics}

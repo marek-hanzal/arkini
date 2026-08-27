@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { EditorGameDiagnostic } from "~/bridge/arkpack/editor/readEditorBuildDiagnosticsFx";
+import type { EditorGameDiagnostic } from "~/bridge/arkpack/editor/readEditorBuildFailureFx";
 import { readEditorGameDiagnosticPresentationFx } from "~/bridge/arkpack/editor/readEditorGameDiagnosticPresentationFx";
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import type { EditorDiagnosticTarget } from "~/ui/arkpack/editor/EditorDiagnosticTarget";

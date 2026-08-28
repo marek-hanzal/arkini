@@ -65,12 +65,12 @@ const StoredRefreshTokenSchema = StoredAccessTokenSchema.meta({
 
 import { EditorMcpNgrokSettingsSchema } from "../../../contract/editor/EditorMcpConfigurationSchema";
 import { EditorMcpPortSchema } from "../../../contract/editor/EditorMcpPortSchema";
-import type { EditorMcpStorage } from "./EditorMcpStorage";
+import type { McpStorage } from "./McpStorage";
 import { ElectronMainRuntime } from "../../ElectronMainRuntime";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 
-export const DefaultEditorMcpPort = 32_310;
-const MaxEditorMcpClients = 100;
+export const DefaultPort = 32_310;
+const MaxClients = 100;
 
 interface StoredNgrok {
 	readonly authtoken: string;
@@ -99,7 +99,7 @@ interface State {
 
 const createPassword = () => `arkini_mcp_${createId()}`;
 
-const createState = (port = DefaultEditorMcpPort, ngrok?: StoredNgrok): State => ({
+const createState = (port = DefaultPort, ngrok?: StoredNgrok): State => ({
 	port,
 	...(ngrok === undefined
 		? {}
@@ -287,10 +287,7 @@ const createStorageFx = Effect.fn("createFilesystemEditorMcpStorageFx")(function
 			const registered = OAuthClientInformationFullSchema.parse(client);
 			await runPromise(
 				mutateFx((next) => {
-					if (
-						!next.clients.has(registered.client_id) &&
-						next.clients.size >= MaxEditorMcpClients
-					)
+					if (!next.clients.has(registered.client_id) && next.clients.size >= MaxClients)
 						throw new Error("Remote MCP client limit reached. Reset auth to clear it.");
 					next.clients.set(registered.client_id, registered);
 				}),
@@ -446,7 +443,7 @@ const createStorageFx = Effect.fn("createFilesystemEditorMcpStorageFx")(function
 				}),
 			),
 		),
-	} satisfies EditorMcpStorage;
+	} satisfies McpStorage;
 });
 
 /** Owns the installation-wide MCP configuration and recoverable OAuth state. */

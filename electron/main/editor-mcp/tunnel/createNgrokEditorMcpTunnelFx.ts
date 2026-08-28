@@ -1,8 +1,8 @@
 import ngrok from "@ngrok/ngrok";
 import { Deferred, Effect, Exit, FiberHandle, Scope } from "effect";
 
-import type { EditorMcpTunnel } from "./EditorMcpTunnel";
-import { EditorMcpTunnelProvenanceHeader } from "./EditorMcpTunnelProvenanceHeader";
+import type { McpTunnel } from "./McpTunnel";
+import { TunnelProvenanceHeader } from "./TunnelProvenanceHeader";
 
 const NgrokReconnectGraceMs = 10_000;
 
@@ -20,7 +20,7 @@ const createSafeNgrokError = (message: string, cause: unknown) => {
 
 /** Creates the optional ngrok transport without opening a public endpoint. */
 export const createNgrokEditorMcpTunnelFx = Effect.sync(
-	(): EditorMcpTunnel => ({
+	(): McpTunnel => ({
 		openFx: ({ authtoken, domain, port, provenance }) =>
 			Effect.gen(function* () {
 				const reconnectScope = yield* Scope.make();
@@ -47,10 +47,10 @@ export const createNgrokEditorMcpTunnelFx = Effect.sync(
 								);
 							},
 							request_header_remove: [
-								EditorMcpTunnelProvenanceHeader,
+								TunnelProvenanceHeader,
 							],
 							request_header_add: [
-								`${EditorMcpTunnelProvenanceHeader}:${provenance}`,
+								`${TunnelProvenanceHeader}:${provenance}`,
 							],
 							forwards_to: "arkini-editor-mcp",
 						});

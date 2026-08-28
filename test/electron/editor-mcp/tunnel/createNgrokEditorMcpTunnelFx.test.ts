@@ -5,7 +5,7 @@ import { describe, expect, it } from "@effect/vitest";
 import { vi } from "vitest";
 
 import { createNgrokEditorMcpTunnelFx } from "../../../../electron/main/editor-mcp/tunnel/createNgrokEditorMcpTunnelFx";
-import { EditorMcpTunnelProvenanceHeader } from "../../../../electron/main/editor-mcp/tunnel/EditorMcpTunnelProvenanceHeader";
+import { TunnelProvenanceHeader } from "../../../../electron/main/editor-mcp/tunnel/TunnelProvenanceHeader";
 
 const ReconnectGraceMs = 10_000;
 
@@ -36,10 +36,10 @@ describe("createNgrokEditorMcpTunnelFx", () => {
 		expect(ngrok.forward).toHaveBeenCalledWith(
 			expect.objectContaining({
 				request_header_remove: [
-					EditorMcpTunnelProvenanceHeader,
+					TunnelProvenanceHeader,
 				],
 				request_header_add: [
-					`${EditorMcpTunnelProvenanceHeader}:server-generated-marker`,
+					`${TunnelProvenanceHeader}:server-generated-marker`,
 				],
 				domain: "stable-example.ngrok-free.app",
 			}),

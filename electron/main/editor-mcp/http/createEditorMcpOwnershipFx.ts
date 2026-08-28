@@ -7,14 +7,14 @@ import type { EditorMcpOverviewSchema } from "../../../contract/editor/EditorMcp
 import type { EditorMcpRemoteStatusSchema } from "../../../contract/editor/EditorMcpRemoteStatusSchema";
 import type { EditorMcpStatus } from "../../../contract/editor/EditorMcpStatusSchema";
 import type { EditorProjectServiceOwnership } from "../../editor-project/EditorProjectServiceOwnership";
-import { createEditorMcpRemoteHandlerFx } from "../auth/createEditorMcpRemoteHandlerFx";
-import type { EditorMcpStorage } from "../storage/EditorMcpStorage";
-import type { EditorMcpTunnel, EditorMcpTunnelSession } from "../tunnel/EditorMcpTunnel";
-import { checkEditorMcpPortAvailabilityFx } from "./checkEditorMcpPortAvailabilityFx";
-import { checkEditorMcpRemoteEndpointFx } from "./checkEditorMcpRemoteEndpointFx";
-import { createEditorMcpHttpListenerOwnershipFx } from "./createEditorMcpHttpListenerOwnershipFx";
+import { createRemoteHandlerFx } from "../auth/createRemoteHandlerFx";
+import type { McpStorage } from "../storage/McpStorage";
+import type { McpTunnel, McpTunnelSession } from "../tunnel/McpTunnel";
+import { checkPortAvailabilityFx } from "./checkPortAvailabilityFx";
+import { checkRemoteEndpointFx } from "./checkRemoteEndpointFx";
+import { createHttpListenerOwnershipFx } from "./createHttpListenerOwnershipFx";
 
-export interface EditorMcpOwnership {
+export interface ServerOwnership {
 	readonly readLocalStatus: () => EditorMcpStatus;
 	readonly readOverviewFx: Effect.Effect<EditorMcpOverviewSchema.Type, unknown>;
 	readonly publishOverviewFx: Effect.Effect<void, unknown>;
@@ -39,21 +39,21 @@ export interface EditorMcpOwnership {
 
 export namespace createEditorMcpOwnershipFx {
 	export interface Props {
-		readonly checkPortFx?: typeof checkEditorMcpPortAvailabilityFx;
+		readonly checkPortFx?: typeof checkPortAvailabilityFx;
 		readonly checkRemoteFx?: (origin: URL) => Effect.Effect<void, unknown>;
 		readonly editor: EditorProjectServiceOwnership;
 		readonly notifyOverviewChanged: (overview: EditorMcpOverviewSchema.Type) => void;
 		readonly notifyProjectChanged: (projectId: string) => void;
-		readonly storage: EditorMcpStorage;
+		readonly storage: McpStorage;
 		readonly runPromise: <Value, Error>(effect: Effect.Effect<Value, Error>) => Promise<Value>;
-		readonly tunnel: EditorMcpTunnel;
+		readonly tunnel: McpTunnel;
 	}
 }
 
 /** Owns one optional listener shared by open local MCP and OAuth-protected Remote MCP. */
 export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx")(function* ({
-	checkPortFx = checkEditorMcpPortAvailabilityFx,
-	checkRemoteFx = checkEditorMcpRemoteEndpointFx,
+	checkPortFx = checkPortAvailabilityFx,
+	checkRemoteFx = checkRemoteEndpointFx,
 	editor,
 	notifyOverviewChanged,
 	notifyProjectChanged,
@@ -74,11 +74,11 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 	let remoteStatus: EditorMcpRemoteStatusSchema.Type = {
 		type: "inactive",
 	};
-	let tunnelSession: EditorMcpTunnelSession | undefined;
+	let tunnelSession: McpTunnelSession | undefined;
 	let projectContext: string | undefined;
 	let versionCheckoutRequestFx: ((versionId: string) => Effect.Effect<void, unknown>) | undefined;
 	const commandLock = yield* Semaphore.make(1);
-	const httpListener = yield* createEditorMcpHttpListenerOwnershipFx({
+	const httpListener = yield* createHttpListenerOwnershipFx({
 		editor,
 		notifyProjectChanged,
 		storage,
@@ -144,7 +144,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 		);
 	const closeServerFx = httpListener.closeFx;
 	const ensureServerFx = httpListener.ensureStartedFx;
-	const finishTunnelFx = (session: EditorMcpTunnelSession, cause?: unknown) =>
+	const finishTunnelFx = (session: McpTunnelSession, cause?: unknown) =>
 		commandLock.withPermits(1)(
 			Effect.gen(function* () {
 				if (tunnelSession !== session) return;
@@ -231,7 +231,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 				type: "starting",
 			};
 			yield* publishOverviewFx;
-			let openedSession: EditorMcpTunnelSession | undefined;
+			let openedSession: McpTunnelSession | undefined;
 			const provenance = randomBytes(32).toString("base64url");
 			const started = yield* Effect.exit(
 				Effect.gen(function* () {
@@ -255,7 +255,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 					const mcpNodeHandler = httpListener.readMcpHandler();
 					if (mcpNodeHandler === undefined)
 						return yield* Effect.fail(new Error("The MCP handler is unavailable."));
-					const handler = yield* createEditorMcpRemoteHandlerFx({
+					const handler = yield* createRemoteHandlerFx({
 						storage,
 						mcpHandler: mcpNodeHandler,
 						origin,
@@ -364,5 +364,5 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 				);
 			httpListener.closeSync();
 		},
-	} satisfies EditorMcpOwnership;
+	} satisfies ServerOwnership;
 });

@@ -4,7 +4,7 @@ import { Effect } from "effect";
 import { vi } from "vitest";
 
 import { ElectronMainError } from "../../../../../electron/main/ElectronMainError";
-import type { EditorMcpOwnership } from "../../../../../electron/main/editor-mcp/http/createEditorMcpOwnershipFx";
+import type { ServerOwnership } from "../../../../../electron/main/editor-mcp/http/createEditorMcpOwnershipFx";
 import type { TrustedRenderer } from "../../../../../electron/main/security/TrustedRenderer";
 
 export const createEvent = () => {
@@ -36,7 +36,7 @@ export const createTrustedRenderer = (trusted = true): TrustedRenderer => ({
 	registerWindowFx: () => Effect.void,
 });
 
-export const createOwnership = (localReady = false): EditorMcpOwnership => {
+export const createOwnership = (localReady = false): ServerOwnership => {
 	let projectContext: string | undefined;
 	const overview = {
 		port: 32_310,

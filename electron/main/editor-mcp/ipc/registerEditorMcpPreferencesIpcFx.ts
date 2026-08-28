@@ -8,8 +8,8 @@ import { EditorMcpConfigurationSchema } from "../../../contract/editor/EditorMcp
 import { EditorMcpProjectContextSchema } from "../../../contract/editor/EditorMcpProjectContextSchema";
 import { ElectronMainRuntime } from "../../ElectronMainRuntime";
 import type { TrustedRenderer } from "../../security/TrustedRenderer";
-import type { EditorMcpOwnership } from "../http/createEditorMcpOwnershipFx";
-import { requestEditorMcpVersionCheckoutFx } from "./requestEditorMcpVersionCheckoutFx";
+import type { ServerOwnership } from "../http/createEditorMcpOwnershipFx";
+import { requestVersionCheckoutFx } from "./requestVersionCheckoutFx";
 
 let registered = false;
 
@@ -18,7 +18,7 @@ const watchedProjectContextSenders = new WeakSet<WebContents>();
 export namespace registerEditorMcpPreferencesIpcFx {
 	export interface Props {
 		readonly trustedRenderer: TrustedRenderer;
-		readonly ownership: EditorMcpOwnership;
+		readonly ownership: ServerOwnership;
 	}
 }
 
@@ -87,7 +87,7 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 								Effect.sync(() => {
 									watchProjectContextSender(event.sender);
 									ownership.setProjectContext(projectId, (versionId) =>
-										requestEditorMcpVersionCheckoutFx(event.sender, {
+										requestVersionCheckoutFx(event.sender, {
 											projectId,
 											versionId,
 										}),

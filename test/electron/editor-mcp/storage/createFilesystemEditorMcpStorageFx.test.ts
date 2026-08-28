@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import {
 	createFilesystemEditorMcpStorageFx,
-	DefaultEditorMcpPort,
+	DefaultPort,
 } from "../../../../electron/main/editor-mcp/storage/createFilesystemEditorMcpStorageFx";
 
 const directories: string[] = [];
@@ -107,7 +107,7 @@ describe("createFilesystemEditorMcpStorageFx", () => {
 	it("persists all MCP state in one protected file", async () => {
 		const first = await createStorage();
 		const configured = first.storage;
-		expect(await Effect.runPromise(configured.readPortFx)).toBe(DefaultEditorMcpPort);
+		expect(await Effect.runPromise(configured.readPortFx)).toBe(DefaultPort);
 		await Effect.runPromise(configured.writePortFx(45_678));
 		await Effect.runPromise(
 			configured.writeNgrokFx({

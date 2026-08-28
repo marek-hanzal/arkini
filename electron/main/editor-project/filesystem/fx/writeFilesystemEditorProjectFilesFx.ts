@@ -17,10 +17,8 @@ import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWri
 import { createEditorProjectFilesystemPathsFx } from "../createEditorProjectFilesystemPathsFx";
 import type { EditorProjectFilesystemPaths } from "../EditorProjectFilesystemPaths";
 import type { FilesystemEditorProjectFiles } from "./FilesystemEditorProjectFiles";
-import {
-	addFilesystemEditorProjectGitignoreRules,
-	assertFilesystemEditorProjectFileFx,
-} from "./ensureFilesystemEditorProjectGitignoreFx";
+import { addGitignoreRulesFx } from "./addGitignoreRulesFx";
+import { assertProjectFileFx } from "./assertProjectFileFx";
 
 const encoder = new TextEncoder();
 const encodeJson = (value: unknown) =>
@@ -230,7 +228,7 @@ export const writeFilesystemEditorProjectFilesFx = Effect.fn("writeFilesystemEdi
 						...nextSnapshot.resources.values(),
 					].sort((left, right) => left.target.localeCompare(right.target)),
 				];
-				const gitignoreExists = yield* assertFilesystemEditorProjectFileFx(
+				const gitignoreExists = yield* assertProjectFileFx(
 					fileSystem,
 					paths.root,
 					paths.gitignoreFile,
@@ -238,7 +236,7 @@ export const writeFilesystemEditorProjectFilesFx = Effect.fn("writeFilesystemEdi
 				const gitignore = gitignoreExists
 					? yield* fileSystem.readFileString(paths.gitignoreFile)
 					: "";
-				const nextGitignore = addFilesystemEditorProjectGitignoreRules(gitignore);
+				const nextGitignore = yield* addGitignoreRulesFx(gitignore);
 				if (nextGitignore !== gitignore)
 					writes.push({
 						target: paths.gitignoreFile,

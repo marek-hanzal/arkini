@@ -2,16 +2,16 @@ import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect, FileSystem, Path, Semaphore } from "effect";
 
 import type { OwnedEditorProjectRepository } from "../../EditorProjectServiceOwnership";
-import type { FilesystemEditorProjectState } from "../FilesystemEditorProjectState";
+import type { ProjectState } from "../ProjectState";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
-import { createFilesystemEditorBoardScenarioOperationsFx } from "./createFilesystemEditorBoardScenarioOperationsFx";
-import { createFilesystemEditorNoteOperationsFx } from "./createFilesystemEditorNoteOperationsFx";
-import { createFilesystemEditorProjectCatalogFx } from "./createFilesystemEditorProjectCatalogFx";
-import { createFilesystemEditorProjectBuildOperationsFx } from "./createFilesystemEditorProjectBuildOperationsFx";
-import { createFilesystemEditorProjectCommitOperationsFx } from "./createFilesystemEditorProjectCommitOperationsFx";
-import { createFilesystemEditorProjectOperationsFx } from "./createFilesystemEditorProjectOperationsFx";
-import { createFilesystemEditorProjectVersionOperationsFx } from "./createFilesystemEditorProjectVersionOperationsFx";
+import { createBoardScenarioOperationsFx } from "./createBoardScenarioOperationsFx";
+import { createNoteOperationsFx } from "./createNoteOperationsFx";
+import { createProjectCatalogFx } from "./createProjectCatalogFx";
+import { createBuildOperationsFx } from "./createBuildOperationsFx";
+import { createCommitOperationsFx } from "./createCommitOperationsFx";
+import { createLifecycleOperationsFx } from "./createLifecycleOperationsFx";
+import { createVersionOperationsFx } from "./createVersionOperationsFx";
 
 export namespace createFilesystemEditorProjectRepositoryFx {
 	export interface Props {
@@ -29,12 +29,12 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 	const path = yield* Path.Path;
 	const operations = yield* Semaphore.make(1);
 	const filesystemWrite = yield* createFilesystemWriteFx();
-	const states = new Map<string, FilesystemEditorProjectState>();
-	const catalog = yield* createFilesystemEditorProjectCatalogFx({
+	const states = new Map<string, ProjectState>();
+	const catalog = yield* createProjectCatalogFx({
 		catalogPath,
 		projectsRoot,
 	});
-	const projects = yield* createFilesystemEditorProjectOperationsFx({
+	const projects = yield* createLifecycleOperationsFx({
 		catalog,
 		filesystemWrite,
 		operations,
@@ -52,29 +52,29 @@ const createRepositoryFx = Effect.fn("createFilesystemEditorProjectRepositoryFx"
 				)
 			: Effect.succeed(state);
 	};
-	const commits = yield* createFilesystemEditorProjectCommitOperationsFx({
+	const commits = yield* createCommitOperationsFx({
 		operations,
 		readState,
 		states,
 	});
-	const builds = yield* createFilesystemEditorProjectBuildOperationsFx({
+	const builds = yield* createBuildOperationsFx({
 		filesystemWrite,
 		operations,
 		readState,
 	});
-	const boardScenarios = yield* createFilesystemEditorBoardScenarioOperationsFx({
-		filesystemWrite,
-		operations,
-		readState,
-		states,
-	});
-	const notes = yield* createFilesystemEditorNoteOperationsFx({
+	const boardScenarios = yield* createBoardScenarioOperationsFx({
 		filesystemWrite,
 		operations,
 		readState,
 		states,
 	});
-	const versions = yield* createFilesystemEditorProjectVersionOperationsFx({
+	const notes = yield* createNoteOperationsFx({
+		filesystemWrite,
+		operations,
+		readState,
+		states,
+	});
+	const versions = yield* createVersionOperationsFx({
 		filesystemWrite,
 		operations,
 		readState,

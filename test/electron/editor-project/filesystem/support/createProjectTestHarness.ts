@@ -14,7 +14,7 @@ import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectMan
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 /** Owns one temporary user-data catalog, its managed roots, and external test folders. */
-export const createFilesystemEditorProjectTestHarness = async (temporaryPrefix: string) => {
+export const createProjectTestHarness = async (temporaryPrefix: string) => {
 	const temporaryDirectory = await mkdtemp(join(tmpdir(), temporaryPrefix));
 	const catalogPath = join(temporaryDirectory, "user-data", "projects.json");
 	const projectsRoot = join(temporaryDirectory, "user-data", "projects");
@@ -96,6 +96,6 @@ export const createFilesystemEditorProjectTestHarness = async (temporaryPrefix: 
 	};
 };
 
-export type FilesystemEditorProjectTestHarness = Awaited<
-	ReturnType<typeof createFilesystemEditorProjectTestHarness>
+export type ProjectTestHarness = Awaited<
+	ReturnType<typeof createProjectTestHarness>
 >;

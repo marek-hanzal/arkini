@@ -2,7 +2,7 @@ import { Buffer } from "node:buffer";
 import { Clock } from "effect";
 import { Effect, type Semaphore } from "effect";
 
-import type { FilesystemEditorProjectState } from "../FilesystemEditorProjectState";
+import type { ProjectState } from "../ProjectState";
 import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 import { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
@@ -40,26 +40,26 @@ const error = (operation: Operation, message: string, cause?: unknown) =>
 				cause,
 			});
 
-export namespace createFilesystemEditorBoardScenarioOperationsFx {
+export namespace createBoardScenarioOperationsFx {
 	export interface Props {
 		readonly filesystemWrite: FilesystemWrite;
 		readonly operations: Semaphore.Semaphore;
 		readonly readState: (
 			projectId: string,
-		) => Effect.Effect<FilesystemEditorProjectState, EditorProjectRepositoryError>;
-		readonly states: Map<string, FilesystemEditorProjectState>;
+		) => Effect.Effect<ProjectState, EditorProjectRepositoryError>;
+		readonly states: Map<string, ProjectState>;
 	}
 }
 
 /** Stores each named authored Board scenario as one portable JSON envelope. */
-export const createFilesystemEditorBoardScenarioOperationsFx = Effect.fn(
-	"createFilesystemEditorBoardScenarioOperationsFx",
+export const createBoardScenarioOperationsFx = Effect.fn(
+	"createBoardScenarioOperationsFx",
 )(function* ({
 	filesystemWrite,
 	operations,
 	readState,
 	states,
-}: createFilesystemEditorBoardScenarioOperationsFx.Props) {
+}: createBoardScenarioOperationsFx.Props) {
 	const readScenariosFx = (projectId: string) =>
 		readState(projectId).pipe(
 			Effect.map((state) =>
@@ -70,7 +70,7 @@ export const createFilesystemEditorBoardScenarioOperationsFx = Effect.fn(
 			),
 		);
 	const publishScenarios = (
-		state: FilesystemEditorProjectState,
+		state: ProjectState,
 		scenarios: ReadonlyArray<EditorBoardScenarioSchema.Type>,
 	) =>
 		states.set(state.project.projectId, {

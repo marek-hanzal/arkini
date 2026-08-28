@@ -3,9 +3,9 @@ import { Clock, FileSystem, Path } from "effect";
 import { Effect, type Semaphore } from "effect";
 
 import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
-import type { FilesystemEditorProjectState } from "../FilesystemEditorProjectState";
+import type { ProjectState } from "../ProjectState";
 import { createEditorProjectFilesystemPathsFx } from "../createEditorProjectFilesystemPathsFx";
-import type { FilesystemEditorProjectCatalog } from "./createFilesystemEditorProjectCatalogFx";
+import type { ProjectCatalog } from "./createProjectCatalogFx";
 import type { EditorProject } from "~/editor/EditorProject";
 import type { EditorProjectCandidate } from "~/editor/EditorProjectCandidate";
 import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
@@ -24,7 +24,7 @@ import { readFilesystemEditorProjectVersionHistoryFx } from "./readFilesystemEdi
 import { writeFilesystemEditorProjectFilesFx } from "./writeFilesystemEditorProjectFilesFx";
 import { withFilesystemEditorProjectLockFx } from "./withFilesystemEditorProjectLockFx";
 
-export interface FilesystemEditorProjectOperations {
+export interface LifecycleOperations {
 	readonly createProjectFx: (
 		props: EditorProjectRepository.CreateProjectProps,
 	) => Effect.Effect<EditorProject, EditorProjectRepositoryError>;
@@ -94,7 +94,7 @@ const error = (
 				cause,
 			});
 
-const materializeProjectFx = Effect.fn("materializeFilesystemEditorProjectFx")(function* (
+const materializeProjectFx = Effect.fn("materializeProjectFx")(function* (
 	catalog: EditorProjectCatalogEntrySchema.Type,
 	filesystemWrite: FilesystemWrite,
 ) {
@@ -125,31 +125,31 @@ const materializeProjectFx = Effect.fn("materializeFilesystemEditorProjectFx")(f
 					config: files.config,
 					resources: files.resources,
 				},
-			} satisfies FilesystemEditorProjectState;
+			} satisfies ProjectState;
 		}),
 	);
 });
 
-export namespace createFilesystemEditorProjectOperationsFx {
+export namespace createLifecycleOperationsFx {
 	export interface Props {
-		readonly catalog: FilesystemEditorProjectCatalog;
+		readonly catalog: ProjectCatalog;
 		readonly filesystemWrite: FilesystemWrite;
 		readonly operations: Semaphore.Semaphore;
 		readonly projectsRoot: string;
-		readonly states: Map<string, FilesystemEditorProjectState>;
+		readonly states: Map<string, ProjectState>;
 	}
 }
 
 /** Owns project discovery, managed creation, direct-folder open, hard refresh, and deletion. */
-export const createFilesystemEditorProjectOperationsFx = Effect.fn(
-	"createFilesystemEditorProjectOperationsFx",
+export const createLifecycleOperationsFx = Effect.fn(
+	"createLifecycleOperationsFx",
 )(function* ({
 	catalog,
 	filesystemWrite,
 	operations,
 	projectsRoot,
 	states,
-}: createFilesystemEditorProjectOperationsFx.Props) {
+}: createLifecycleOperationsFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
 	yield* fileSystem.makeDirectory(projectsRoot, {
@@ -302,7 +302,7 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 
 	yield* readCandidatesFx;
 
-	const createProjectFx: FilesystemEditorProjectOperations["createProjectFx"] = ({
+	const createProjectFx: LifecycleOperations["createProjectFx"] = ({
 		version: candidateVersion,
 		config: candidateConfig,
 		resources: candidateResources,
@@ -380,7 +380,7 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 			),
 		);
 
-	const openProjectFx: FilesystemEditorProjectOperations["openProjectFx"] = ({
+	const openProjectFx: LifecycleOperations["openProjectFx"] = ({
 		root: candidateRoot,
 	}) =>
 		operations.withPermits(1)(
@@ -408,7 +408,7 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 					...provisionalEntry,
 					createdAtMs: provisionalState.project.updatedAtMs,
 				});
-				const state: FilesystemEditorProjectState = {
+				const state: ProjectState = {
 					...provisionalState,
 					catalog: entry,
 					project: {
@@ -430,10 +430,10 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 			),
 		);
 
-	const listProjectsFx: FilesystemEditorProjectOperations["listProjectsFx"] =
+	const listProjectsFx: LifecycleOperations["listProjectsFx"] =
 		operations.withPermits(1)(readCandidatesFx);
 
-	const readProjectFx: FilesystemEditorProjectOperations["readProjectFx"] = (projectId) =>
+	const readProjectFx: LifecycleOperations["readProjectFx"] = (projectId) =>
 		operations.withPermits(1)(
 			Effect.sync(() => {
 				const state = states.get(projectId);
@@ -441,10 +441,10 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 			}),
 		);
 
-	const readProjectRootFx: FilesystemEditorProjectOperations["readProjectRootFx"] = (projectId) =>
+	const readProjectRootFx: LifecycleOperations["readProjectRootFx"] = (projectId) =>
 		operations.withPermits(1)(Effect.sync(() => states.get(projectId)?.paths.root ?? null));
 
-	const refreshProjectFx: FilesystemEditorProjectOperations["refreshProjectFx"] = (projectId) =>
+	const refreshProjectFx: LifecycleOperations["refreshProjectFx"] = (projectId) =>
 		operations.withPermits(1)(
 			Effect.gen(function* () {
 				const current = states.get(projectId);
@@ -477,7 +477,7 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 			),
 		);
 
-	const deleteProjectFx: FilesystemEditorProjectOperations["deleteProjectFx"] = (projectId) =>
+	const deleteProjectFx: LifecycleOperations["deleteProjectFx"] = (projectId) =>
 		operations.withPermits(1)(
 			Effect.gen(function* () {
 				const state = states.get(projectId);
@@ -526,5 +526,5 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 		readProjectFx,
 		readProjectRootFx,
 		refreshProjectFx,
-	} satisfies FilesystemEditorProjectOperations;
+	} satisfies LifecycleOperations;
 });

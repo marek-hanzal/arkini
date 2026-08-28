@@ -5,11 +5,11 @@ import { Effect, FileSystem } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
 
 import {
-	createFilesystemEditorProjectTestHarness,
-	type FilesystemEditorProjectTestHarness,
-} from "./support/createFilesystemEditorProjectTestHarness";
+	createProjectTestHarness,
+	type ProjectTestHarness,
+} from "./support/createProjectTestHarness";
 
-let harness: FilesystemEditorProjectTestHarness | undefined;
+let harness: ProjectTestHarness | undefined;
 
 const realPath = (root: string) =>
 	Effect.runPromise(
@@ -26,7 +26,7 @@ afterEach(async () => {
 
 describe("filesystem Editor project admission", () => {
 	it("keeps healthy projects available while a malformed catalog rebuild preserves an invalid root", async () => {
-		harness = await createFilesystemEditorProjectTestHarness("arkini-project-admission-");
+		harness = await createProjectTestHarness("arkini-project-admission-");
 		const repository = await harness.openRepository();
 		const healthy = await harness.createProject(repository, "healthy-project");
 		const broken = await harness.createProject(repository, "broken-project");
@@ -83,7 +83,7 @@ describe("filesystem Editor project admission", () => {
 	});
 
 	it("reconciles healthy and invalid managed roots missing from a valid catalog", async () => {
-		harness = await createFilesystemEditorProjectTestHarness("arkini-project-reconcile-");
+		harness = await createProjectTestHarness("arkini-project-reconcile-");
 		const repository = await harness.openRepository();
 		const listed = await harness.createProject(repository, "listed-project");
 		const unlisted = await harness.createProject(repository, "unlisted-project");
@@ -164,7 +164,7 @@ describe("filesystem Editor project admission", () => {
 	});
 
 	it("admits a repaired invalid sidecar on the next project-list refresh", async () => {
-		harness = await createFilesystemEditorProjectTestHarness("arkini-project-refresh-");
+		harness = await createProjectTestHarness("arkini-project-refresh-");
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository, "repairable-project");
 		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
@@ -199,7 +199,7 @@ describe("filesystem Editor project admission", () => {
 	});
 
 	it("rejects an external project whose sidecars fail complete validation", async () => {
-		harness = await createFilesystemEditorProjectTestHarness("arkini-project-external-");
+		harness = await createProjectTestHarness("arkini-project-external-");
 		const root = await harness.createExternalProject("invalid-external");
 		const note = join(root, "notes", "broken.json");
 		await mkdir(join(root, "notes"), {

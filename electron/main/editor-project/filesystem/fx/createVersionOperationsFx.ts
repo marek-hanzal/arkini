@@ -4,7 +4,7 @@ import { Clock, FileSystem, Path } from "effect";
 import { Effect, type Semaphore } from "effect";
 
 import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
-import type { FilesystemEditorProjectState } from "../FilesystemEditorProjectState";
+import type { ProjectState } from "../ProjectState";
 import type { EditorProject } from "~/editor/EditorProject";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 import type { EditorBoardScenarioSchema } from "~/editor/board/EditorBoardScenarioSchema";
@@ -22,10 +22,10 @@ import {
 	EditorProjectVersionSubjectSchema,
 	EditorProjectVersionTagSchema,
 } from "~/editor/version/EditorProjectVersionMetadataSchema";
-import { createFilesystemEditorProjectVersionReaderFx } from "./createFilesystemEditorProjectVersionReaderFx";
-import { createFilesystemEditorVersionSnapshotFx } from "./createFilesystemEditorVersionSnapshotFx";
-import { assertFilesystemEditorProjectDirectoryFx } from "./assertFilesystemEditorProjectDirectoryFx";
-import { readFilesystemEditorVersionSnapshotFx } from "./readFilesystemEditorVersionSnapshotFx";
+import { createVersionReaderFx } from "./createVersionReaderFx";
+import { createVersionSnapshotFx } from "./createVersionSnapshotFx";
+import { assertProjectDirectoryFx } from "./assertProjectDirectoryFx";
+import { readVersionSnapshotFx } from "./readVersionSnapshotFx";
 import { withFilesystemEditorProjectLockFx } from "./withFilesystemEditorProjectLockFx";
 import { writeFilesystemEditorProjectFilesFx } from "./writeFilesystemEditorProjectFilesFx";
 import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
@@ -109,26 +109,26 @@ const toScenario = (
 	updatedAtMs: file.updatedAtMs,
 });
 
-export namespace createFilesystemEditorProjectVersionOperationsFx {
+export namespace createVersionOperationsFx {
 	export interface Props {
 		readonly filesystemWrite: FilesystemWrite;
 		readonly operations: Semaphore.Semaphore;
 		readonly readState: (
 			projectId: string,
-		) => Effect.Effect<FilesystemEditorProjectState, EditorProjectRepositoryError>;
-		readonly states: Map<string, FilesystemEditorProjectState>;
+		) => Effect.Effect<ProjectState, EditorProjectRepositoryError>;
+		readonly states: Map<string, ProjectState>;
 	}
 }
 
 /** Owns published full-snapshot history for filesystem Editor projects. */
-export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
-	"createFilesystemEditorProjectVersionOperationsFx",
+export const createVersionOperationsFx = Effect.fn(
+	"createVersionOperationsFx",
 )(function* ({
 	filesystemWrite,
 	operations,
 	readState,
 	states,
-}: createFilesystemEditorProjectVersionOperationsFx.Props) {
+}: createVersionOperationsFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const pathService = yield* Path.Path;
 	const providePlatform = <Value, Failure, Requirements>(
@@ -138,19 +138,19 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 			Effect.provideService(FileSystem.FileSystem, fileSystem),
 			Effect.provideService(Path.Path, pathService),
 		);
-	const writeJsonFx = (state: FilesystemEditorProjectState, target: string, value: unknown) =>
+	const writeJsonFx = (state: ProjectState, target: string, value: unknown) =>
 		filesystemWrite.writeFileFx({
 			lock: pathService.join(state.paths.root, "editor.lock"),
 			target,
 			bytes: encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`),
 		});
-	const assertVersionDirectoryFx = (state: FilesystemEditorProjectState) =>
+	const assertVersionDirectoryFx = (state: ProjectState) =>
 		providePlatform(
 			Effect.gen(function* () {
 				yield* fileSystem.makeDirectory(state.paths.versions, {
 					recursive: true,
 				});
-				yield* assertFilesystemEditorProjectDirectoryFx({
+				yield* assertProjectDirectoryFx({
 					root: state.paths.root,
 					directory: state.paths.versions,
 				});
@@ -162,7 +162,7 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 		readDiffSnapshotFx,
 		readHeadFx,
 		readPublishedVersionFx,
-	} = yield* createFilesystemEditorProjectVersionReaderFx({
+	} = yield* createVersionReaderFx({
 		readState,
 	});
 
@@ -344,7 +344,7 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 							Effect.gen(function* () {
 								yield* assertVersionDirectoryFx(current.state);
 								const snapshot = yield* providePlatform(
-									createFilesystemEditorVersionSnapshotFx({
+									createVersionSnapshotFx({
 										arkpack: current.state.project.version,
 										config: current.state.project.config,
 										filesystemWrite,
@@ -432,7 +432,7 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 								),
 							);
 						const snapshot = yield* providePlatform(
-							readFilesystemEditorVersionSnapshotFx({
+							readVersionSnapshotFx({
 								manifest: version.manifest,
 								paths: current.state.paths,
 							}),

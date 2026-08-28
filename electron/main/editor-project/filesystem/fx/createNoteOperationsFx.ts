@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { Clock, FileSystem } from "effect";
 import { Effect, type Semaphore } from "effect";
 
-import type { FilesystemEditorProjectState } from "../FilesystemEditorProjectState";
+import type { ProjectState } from "../ProjectState";
 import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 import { EditorProjectNoteFileSchema } from "~/editor/filesystem/EditorProjectNoteFileSchema";
@@ -33,26 +33,26 @@ const error = (
 				cause,
 			});
 
-export namespace createFilesystemEditorNoteOperationsFx {
+export namespace createNoteOperationsFx {
 	export interface Props {
 		readonly filesystemWrite: FilesystemWrite;
 		readonly operations: Semaphore.Semaphore;
 		readonly readState: (
 			projectId: string,
-		) => Effect.Effect<FilesystemEditorProjectState, EditorProjectRepositoryError>;
-		readonly states: Map<string, FilesystemEditorProjectState>;
+		) => Effect.Effect<ProjectState, EditorProjectRepositoryError>;
+		readonly states: Map<string, ProjectState>;
 	}
 }
 
 /** Stores each portable Editor note as one independent JSON file. */
-export const createFilesystemEditorNoteOperationsFx = Effect.fn(
-	"createFilesystemEditorNoteOperationsFx",
+export const createNoteOperationsFx = Effect.fn(
+	"createNoteOperationsFx",
 )(function* ({
 	filesystemWrite,
 	operations,
 	readState,
 	states,
-}: createFilesystemEditorNoteOperationsFx.Props) {
+}: createNoteOperationsFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 
 	const readNotesFx = (projectId: string) =>
@@ -62,7 +62,7 @@ export const createFilesystemEditorNoteOperationsFx = Effect.fn(
 			]),
 		);
 	const publishNotes = (
-		state: FilesystemEditorProjectState,
+		state: ProjectState,
 		notes: ReadonlyArray<EditorNoteSchema.Type>,
 	) =>
 		states.set(state.project.projectId, {

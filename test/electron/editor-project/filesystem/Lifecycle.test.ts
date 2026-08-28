@@ -7,11 +7,11 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import {
-	createFilesystemEditorProjectTestHarness,
-	type FilesystemEditorProjectTestHarness,
-} from "./support/createFilesystemEditorProjectTestHarness";
+	createProjectTestHarness,
+	type ProjectTestHarness,
+} from "./support/createProjectTestHarness";
 
-let harness: FilesystemEditorProjectTestHarness;
+let harness: ProjectTestHarness;
 
 const realPath = (root: string) =>
 	Effect.runPromise(
@@ -22,7 +22,7 @@ const realPath = (root: string) =>
 	);
 
 beforeEach(async () => {
-	harness = await createFilesystemEditorProjectTestHarness("arkini-fs-project-");
+	harness = await createProjectTestHarness("arkini-fs-project-");
 });
 
 afterEach(async () => harness.close());

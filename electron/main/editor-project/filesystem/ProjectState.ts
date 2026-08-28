@@ -3,14 +3,14 @@ import type { EditorBoardScenarioSchema } from "~/editor/board/EditorBoardScenar
 import type { EditorProjectCatalogEntrySchema } from "~/editor/filesystem/EditorProjectCatalogEntrySchema";
 import type { EditorNoteSchema } from "~/editor/note/EditorNoteSchema";
 import type { EditorProjectFilesystemPaths } from "./EditorProjectFilesystemPaths";
-import type { FilesystemEditorProjectVersionHistory } from "./FilesystemEditorProjectVersionHistory";
+import type { VersionHistory } from "./VersionHistory";
 
 /** One loaded canonical workspace; disk is consulted again only by explicit Refresh. */
-export interface FilesystemEditorProjectState {
+export interface ProjectState {
 	readonly catalog: EditorProjectCatalogEntrySchema.Type;
 	readonly notes: ReadonlyArray<EditorNoteSchema.Type>;
 	readonly paths: EditorProjectFilesystemPaths;
 	readonly project: EditorProject;
 	readonly scenarios: ReadonlyArray<EditorBoardScenarioSchema.Type>;
-	readonly versionHistory: FilesystemEditorProjectVersionHistory;
+	readonly versionHistory: VersionHistory;
 }

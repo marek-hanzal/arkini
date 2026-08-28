@@ -4,14 +4,14 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { GameProjectGameSchemaReference } from "~/engine/source/GameProjectReference";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import {
-	createFilesystemEditorProjectTestHarness,
-	type FilesystemEditorProjectTestHarness,
-} from "./support/createFilesystemEditorProjectTestHarness";
+	createProjectTestHarness,
+	type ProjectTestHarness,
+} from "./support/createProjectTestHarness";
 
-let harness: FilesystemEditorProjectTestHarness;
+let harness: ProjectTestHarness;
 
 beforeEach(async () => {
-	harness = await createFilesystemEditorProjectTestHarness("arkini-fs-writes-");
+	harness = await createProjectTestHarness("arkini-fs-writes-");
 });
 
 afterEach(async () => harness.close());

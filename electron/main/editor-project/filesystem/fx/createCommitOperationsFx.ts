@@ -2,7 +2,7 @@ import { Clock, FileSystem, Path } from "effect";
 import { Effect, type Semaphore } from "effect";
 
 import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
-import type { FilesystemEditorProjectState } from "../FilesystemEditorProjectState";
+import type { ProjectState } from "../ProjectState";
 import type { EditorProject, EditorProjectCommit } from "~/editor/EditorProject";
 import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
 import {
@@ -59,7 +59,7 @@ const asCommit = (
 });
 
 const assertExpectedRevision = (
-	state: FilesystemEditorProjectState,
+	state: ProjectState,
 	expectedRevision: number,
 	operation: EditorProjectRepositoryOperation,
 ) => {
@@ -73,24 +73,24 @@ const assertExpectedRevision = (
 			);
 };
 
-export namespace createFilesystemEditorProjectCommitOperationsFx {
+export namespace createCommitOperationsFx {
 	export interface Props {
 		readonly operations: Semaphore.Semaphore;
 		readonly readState: (
 			projectId: string,
-		) => Effect.Effect<FilesystemEditorProjectState, EditorProjectRepositoryError>;
-		readonly states: Map<string, FilesystemEditorProjectState>;
+		) => Effect.Effect<ProjectState, EditorProjectRepositoryError>;
+		readonly states: Map<string, ProjectState>;
 	}
 }
 
 /** Applies validated config/item/resource changes as ordered filesystem writes. */
-export const createFilesystemEditorProjectCommitOperationsFx = Effect.fn(
-	"createFilesystemEditorProjectCommitOperationsFx",
+export const createCommitOperationsFx = Effect.fn(
+	"createCommitOperationsFx",
 )(function* ({
 	operations,
 	readState,
 	states,
-}: createFilesystemEditorProjectCommitOperationsFx.Props) {
+}: createCommitOperationsFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
 	const writeProjectFx = (props: Parameters<typeof writeFilesystemEditorProjectFilesFx>[0]) =>
@@ -99,14 +99,14 @@ export const createFilesystemEditorProjectCommitOperationsFx = Effect.fn(
 			Effect.provideService(Path.Path, path),
 		);
 
-	const commitFx = Effect.fn("commitFilesystemEditorProjectFx")(function* ({
+	const commitFx = Effect.fn("commitProjectFx")(function* ({
 		state,
 		config,
 		resources,
 		nowMs,
 		minimumResult,
 	}: {
-		readonly state: FilesystemEditorProjectState;
+		readonly state: ProjectState;
 		readonly config: GameConfigSchema.Type;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
 		readonly nowMs: number;
@@ -352,7 +352,7 @@ export const createFilesystemEditorProjectCommitOperationsFx = Effect.fn(
 		operation: EditorProjectRepositoryOperation,
 		projectId: string,
 		expectedRevision: number | undefined,
-		change: (state: FilesystemEditorProjectState) => Effect.Effect<
+		change: (state: ProjectState) => Effect.Effect<
 			{
 				readonly config: GameConfigSchema.Type;
 				readonly resources: ReadonlyArray<ResourceSchema.Type>;

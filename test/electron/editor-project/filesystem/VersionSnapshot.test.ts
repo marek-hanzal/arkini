@@ -6,8 +6,8 @@ import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createEditorProjectFilesystemPathsFx } from "../../../../electron/main/editor-project/filesystem/createEditorProjectFilesystemPathsFx";
-import { createFilesystemEditorVersionSnapshotFx } from "../../../../electron/main/editor-project/filesystem/fx/createFilesystemEditorVersionSnapshotFx";
-import { readFilesystemEditorVersionSnapshotFx } from "../../../../electron/main/editor-project/filesystem/fx/readFilesystemEditorVersionSnapshotFx";
+import { createVersionSnapshotFx } from "../../../../electron/main/editor-project/filesystem/fx/createVersionSnapshotFx";
+import { readVersionSnapshotFx } from "../../../../electron/main/editor-project/filesystem/fx/readVersionSnapshotFx";
 import { EditorBoardScenarioSchema } from "~/editor/board/EditorBoardScenarioSchema";
 import { GameProjectGameSchemaReference } from "~/engine/source/GameProjectReference";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -15,11 +15,11 @@ import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWri
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 const writeSnapshotFx = (
-	props: Omit<createFilesystemEditorVersionSnapshotFx.Props, "filesystemWrite">,
+	props: Omit<createVersionSnapshotFx.Props, "filesystemWrite">,
 ) =>
 	Effect.gen(function* () {
 		const filesystemWrite = yield* createFilesystemWriteFx();
-		return yield* createFilesystemEditorVersionSnapshotFx({
+		return yield* createVersionSnapshotFx({
 			...props,
 			filesystemWrite,
 		});
@@ -84,7 +84,7 @@ describe("filesystem Editor version objects", () => {
 		});
 		const readSnapshot = () =>
 			Effect.runPromise(
-				readFilesystemEditorVersionSnapshotFx({
+				readVersionSnapshotFx({
 					manifest: snapshot.manifest,
 					paths,
 				}).pipe(Effect.provide(NodeServices.layer)),

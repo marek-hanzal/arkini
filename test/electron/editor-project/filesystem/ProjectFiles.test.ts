@@ -9,9 +9,9 @@ import {
 } from "~/engine/source/GameProjectReference";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
-import { createFilesystemEditorProjectFilesHarness } from "./FilesystemEditorProjectFiles.test/harness";
+import { createProjectFilesHarness } from "./ProjectFiles.test/harness";
 
-const openHarnesses: Array<Awaited<ReturnType<typeof createFilesystemEditorProjectFilesHarness>>> =
+const openHarnesses: Array<Awaited<ReturnType<typeof createProjectFilesHarness>>> =
 	[];
 
 afterEach(async () => {
@@ -20,7 +20,7 @@ afterEach(async () => {
 
 describe("filesystem Editor project current tree", () => {
 	it("round-trips and republishes the complete authoritative current tree", async () => {
-		const harness = await createFilesystemEditorProjectFilesHarness();
+		const harness = await createProjectFilesHarness();
 		openHarnesses.push(harness);
 		const initial = {
 			arkpack: editorTestPayload.version,
@@ -151,7 +151,7 @@ describe("filesystem Editor project current tree", () => {
 	});
 
 	it("rejects a stale root game schema", async () => {
-		const harness = await createFilesystemEditorProjectFilesHarness();
+		const harness = await createProjectFilesHarness();
 		openHarnesses.push(harness);
 		await harness.write({
 			arkpack: editorTestPayload.version,
@@ -168,7 +168,7 @@ describe("filesystem Editor project current tree", () => {
 	});
 
 	it("admits only same-major Editor writer provenance without changing project bytes", async () => {
-		const harness = await createFilesystemEditorProjectFilesHarness();
+		const harness = await createProjectFilesHarness();
 		openHarnesses.push(harness);
 		await harness.write({
 			arkpack: editorTestPayload.version,
@@ -208,7 +208,7 @@ describe("filesystem Editor project current tree", () => {
 	});
 
 	it("rejects a mutable project directory symlink instead of writing through it", async () => {
-		const harness = await createFilesystemEditorProjectFilesHarness();
+		const harness = await createProjectFilesHarness();
 		openHarnesses.push(harness);
 		const outside = join(harness.root, "..", "outside-items");
 		await Promise.all([

@@ -6,9 +6,9 @@ import { Effect, Semaphore } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
-import type { FilesystemEditorProjectState } from "../../../../electron/main/editor-project/filesystem/FilesystemEditorProjectState";
+import type { ProjectState } from "../../../../electron/main/editor-project/filesystem/ProjectState";
 import { createEditorProjectFilesystemPathsFx } from "../../../../electron/main/editor-project/filesystem/createEditorProjectFilesystemPathsFx";
-import { createFilesystemEditorProjectVersionOperationsFx } from "../../../../electron/main/editor-project/filesystem/fx/createFilesystemEditorProjectVersionOperationsFx";
+import { createVersionOperationsFx } from "../../../../electron/main/editor-project/filesystem/fx/createVersionOperationsFx";
 import { readFilesystemEditorProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/readFilesystemEditorProjectFilesFx";
 import { readFilesystemEditorProjectVersionHistoryFx } from "../../../../electron/main/editor-project/filesystem/fx/readFilesystemEditorProjectVersionHistoryFx";
 import { writeFilesystemEditorProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/writeFilesystemEditorProjectFilesFx";
@@ -90,7 +90,7 @@ describe("filesystem Editor project versions", () => {
 					updatedAtMs: 1,
 				});
 
-				const state: FilesystemEditorProjectState = {
+				const state: ProjectState = {
 					catalog: EditorProjectCatalogEntrySchema.parse({
 						root,
 						ownership: "external",
@@ -122,7 +122,7 @@ describe("filesystem Editor project versions", () => {
 					],
 				]);
 				const operations = yield* Semaphore.make(1);
-				const versions = yield* createFilesystemEditorProjectVersionOperationsFx({
+				const versions = yield* createVersionOperationsFx({
 					filesystemWrite,
 					operations,
 					readState: (id) => {

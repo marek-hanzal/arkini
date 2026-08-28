@@ -4,7 +4,7 @@ import { FileSystem, Path } from "effect";
 import { Data, Effect, type Semaphore } from "effect";
 
 import { ArkpackLimits } from "../../../../../shared/ArkpackLimits";
-import type { FilesystemEditorProjectState } from "../FilesystemEditorProjectState";
+import type { ProjectState } from "../ProjectState";
 import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
 import {
 	EditorProjectBuildContentSchema,
@@ -18,7 +18,7 @@ import { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnostic
 import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
 import { withFilesystemEditorProjectLockFx } from "./withFilesystemEditorProjectLockFx";
 import { readFilesystemEditorProjectFilesFx } from "./readFilesystemEditorProjectFilesFx";
-import { ensureFilesystemEditorProjectGitignoreFx } from "./ensureFilesystemEditorProjectGitignoreFx";
+import { ensureProjectGitignoreFx } from "./ensureProjectGitignoreFx";
 import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
 import { FilesystemWriteError } from "~/engine/filesystem/FilesystemWriteError";
 import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
@@ -102,7 +102,7 @@ const error = (
 			});
 
 const assertRevisionFx = (
-	state: FilesystemEditorProjectState,
+	state: ProjectState,
 	expectedRevision: number,
 	operation: "build-project" | "read-project-build",
 ) =>
@@ -115,24 +115,24 @@ const assertRevisionFx = (
 				),
 			);
 
-export namespace createFilesystemEditorProjectBuildOperationsFx {
+export namespace createBuildOperationsFx {
 	export interface Props {
 		readonly filesystemWrite: FilesystemWrite;
 		readonly operations: Semaphore.Semaphore;
 		readonly readState: (
 			projectId: string,
-		) => Effect.Effect<FilesystemEditorProjectState, EditorProjectRepositoryError>;
+		) => Effect.Effect<ProjectState, EditorProjectRepositoryError>;
 	}
 }
 
 /** Publishes and reads the one canonical artifact for an exact Editor project revision. */
-export const createFilesystemEditorProjectBuildOperationsFx = Effect.fn(
-	"createFilesystemEditorProjectBuildOperationsFx",
+export const createBuildOperationsFx = Effect.fn(
+	"createBuildOperationsFx",
 )(function* ({
 	filesystemWrite,
 	operations,
 	readState,
-}: createFilesystemEditorProjectBuildOperationsFx.Props) {
+}: createBuildOperationsFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
 	const providePlatform = <Value, Failure, Requirements>(
@@ -152,7 +152,7 @@ export const createFilesystemEditorProjectBuildOperationsFx = Effect.fn(
 					withFilesystemEditorProjectLockFx(
 						filesystemWrite,
 						state.paths.root,
-						ensureFilesystemEditorProjectGitignoreFx(state.paths),
+						ensureProjectGitignoreFx(state.paths),
 					),
 				);
 				const assertCurrentFx = readFilesystemEditorProjectFilesFx(state.paths.root).pipe(

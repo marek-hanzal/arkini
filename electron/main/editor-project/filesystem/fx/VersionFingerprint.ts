@@ -5,11 +5,11 @@ import type { EditorVersionManifestSchema } from "~/editor/filesystem/EditorVers
 
 const encoder = new TextEncoder();
 
-export const hashFilesystemEditorVersionBytes = (bytes: Uint8Array) =>
+export const hashVersionBytes = (bytes: Uint8Array) =>
 	createHash("sha256").update(bytes).digest("hex");
 
-export const hashFilesystemEditorVersionJson = (value: unknown) =>
-	hashFilesystemEditorVersionBytes(encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`));
+export const hashVersionJson = (value: unknown) =>
+	hashVersionBytes(encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`));
 
 const sortedRecord = (
 	entries: ReadonlyArray<
@@ -26,11 +26,11 @@ const sortedRecord = (
 	);
 
 /** Hashes authored content while excluding checkout-specific scenario provenance. */
-export const createFilesystemEditorVersionFingerprint = (
+export const createVersionFingerprint = (
 	manifest: EditorVersionManifestSchema.Type,
 	scenarios: ReadonlyArray<EditorBoardScenarioFileSchema.Type>,
 ) =>
-	hashFilesystemEditorVersionBytes(
+	hashVersionBytes(
 		encoder.encode(
 			JSON.stringify({
 				...manifest,
@@ -39,7 +39,7 @@ export const createFilesystemEditorVersionFingerprint = (
 						({ revision: _revision, ...scenario }) =>
 							[
 								scenario.name,
-								hashFilesystemEditorVersionJson(scenario),
+								hashVersionJson(scenario),
 							] as const,
 					),
 				),

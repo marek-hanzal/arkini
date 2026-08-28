@@ -11,15 +11,15 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
 import {
-	createFilesystemEditorVersionFingerprint,
-	hashFilesystemEditorVersionBytes,
-} from "./FilesystemEditorVersionFingerprint";
+	createVersionFingerprint,
+	hashVersionBytes,
+} from "./VersionFingerprint";
 
 const decoder = new TextDecoder("utf-8", {
 	fatal: true,
 });
 
-export namespace readFilesystemEditorVersionSnapshotFx {
+export namespace readVersionSnapshotFx {
 	export interface Props {
 		readonly manifest: EditorVersionManifestSchema.Type;
 		readonly objectCache?: Map<string, Uint8Array>;
@@ -36,13 +36,13 @@ export namespace readFilesystemEditorVersionSnapshotFx {
 }
 
 /** Verifies and materializes every object referenced by one full version manifest. */
-export const readFilesystemEditorVersionSnapshotFx = Effect.fn(
-	"readFilesystemEditorVersionSnapshotFx",
+export const readVersionSnapshotFx = Effect.fn(
+	"readVersionSnapshotFx",
 )(function* ({
 	manifest: candidateManifest,
 	objectCache,
 	paths,
-}: readFilesystemEditorVersionSnapshotFx.Props) {
+}: readVersionSnapshotFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const manifest = yield* Effect.try({
 		try: () => EditorVersionManifestSchema.parse(candidateManifest),
@@ -52,7 +52,7 @@ export const readFilesystemEditorVersionSnapshotFx = Effect.fn(
 			}),
 	});
 
-	const readObjectFx = Effect.fn("readFilesystemEditorVersionObjectFx")(function* (
+	const readObjectFx = Effect.fn("readVersionObjectFx")(function* (
 		hash: string,
 		type: "json" | "png",
 	) {
@@ -68,7 +68,7 @@ export const readFilesystemEditorVersionSnapshotFx = Effect.fn(
 				new Error(`Editor version object ${hash} must not be a symbolic link.`),
 			);
 		const bytes = yield* fileSystem.readFile(target);
-		const actual = hashFilesystemEditorVersionBytes(bytes);
+		const actual = hashVersionBytes(bytes);
 		if (actual !== hash)
 			return yield* Effect.fail(
 				new Error(`Editor version object ${hash} failed its content hash check.`),
@@ -76,7 +76,7 @@ export const readFilesystemEditorVersionSnapshotFx = Effect.fn(
 		objectCache?.set(cacheKey, bytes);
 		return bytes;
 	});
-	const readJsonObjectFx = Effect.fn("readFilesystemEditorVersionJsonObjectFx")(function* (
+	const readJsonObjectFx = Effect.fn("readVersionJsonObjectFx")(function* (
 		hash: string,
 	) {
 		const bytes = yield* readObjectFx(hash, "json");
@@ -206,6 +206,6 @@ export const readFilesystemEditorVersionSnapshotFx = Effect.fn(
 		config,
 		resources,
 		scenarios,
-		contentFingerprint: createFilesystemEditorVersionFingerprint(manifest, scenarios),
-	} satisfies readFilesystemEditorVersionSnapshotFx.Success;
+		contentFingerprint: createVersionFingerprint(manifest, scenarios),
+	} satisfies readVersionSnapshotFx.Success;
 });

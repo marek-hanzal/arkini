@@ -1,6 +1,7 @@
+import { BatteryCharging, PackagePlus, Trash2 } from "lucide-react";
+
 import { Button } from "~/ui/button/Button";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
-import { editorCollectionActionClassName } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { useEditorItemFormSession } from "~/ui/item/editor/EditorItemFormContext";
@@ -19,7 +20,7 @@ export const EditorItemChargesSection = () => {
 								actionLabel="Enable charges"
 								dataUi="EditorChargesDisabled"
 								description="Charges give this item a finite number of uses. Configured interactions spend them; reaching zero depletes the item and may emit an output."
-								icon="icon-[lucide--battery-charging]"
+								icon={BatteryCharging}
 								onEnable={() =>
 									form.setFieldValue("charges", {
 										amount: 1,
@@ -49,11 +50,11 @@ export const EditorItemChargesSection = () => {
 									</div>
 									<Tooltip content="Disable charges">
 										<Button
-											className={editorCollectionActionClassName}
+											className="size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised"
 											data-ui="EditorItemChargesDisableButton"
 											onClick={() => form.setFieldValue("charges", undefined)}
 										>
-											<span className="icon-[lucide--trash-2] size-4" />
+											<Trash2 className="size-4" />
 										</Button>
 									</Tooltip>
 								</div>
@@ -66,7 +67,7 @@ export const EditorItemChargesSection = () => {
 								<EditorOptionalOutputControl
 									addLabel="Enable depletion output"
 									emptyDescription="Without an output, the item simply disappears when its last charge is spent. Enable one to emit configured items at depletion."
-									emptyIcon="icon-[lucide--package-plus]"
+									emptyIcon={PackagePlus}
 									emptyTitle="No depletion output"
 									value={charges.output}
 									onChange={(output) =>

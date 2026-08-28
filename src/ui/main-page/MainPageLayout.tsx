@@ -1,34 +1,44 @@
 import { Effect } from "effect";
 import type { PropsWithChildren, ReactNode } from "react";
-import { twMerge } from "tailwind-merge";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
 import { mainPagePanelViewTransitionNameFx } from "~/ui/navigation/mainPagePanelViewTransitionNameFx";
 
-const panelModeClassNames = {
-	compact: "max-h-full w-full max-w-sm",
-	responsive: "max-h-full w-full max-w-xl",
-	viewport: "size-full max-w-5xl",
+const MainPagePresentation = {
+	about: {
+		content: "max-h-full overflow-y-auto p-[var(--ak-panel-padding)]",
+		layout: "fixed-hero",
+		panel: "max-h-full w-full max-w-xl overflow-hidden border border-line bg-surface shadow-2xl",
+	},
+	arkpacks: {
+		content: "size-full overflow-hidden p-[var(--ak-panel-padding)]",
+		layout: "fixed-hero",
+		panel: "size-full max-w-5xl overflow-hidden border border-line bg-surface shadow-2xl",
+	},
+	"editor-welcome": {
+		content: "max-h-full overflow-y-auto p-[var(--ak-panel-padding)]",
+		layout: "fixed-hero",
+		panel: "max-h-full w-full max-w-5xl overflow-hidden border border-line bg-surface shadow-2xl",
+	},
+	"main-menu": {
+		content: "max-h-full overflow-y-auto p-[var(--ak-panel-padding)]",
+		layout: "fixed-hero",
+		panel: "max-h-full w-full max-w-sm overflow-visible border-0 border-line bg-transparent shadow-none",
+	},
+	settings: {
+		content: "h-full max-h-full overflow-y-auto p-[var(--ak-panel-padding)]",
+		layout: "overlaid-hero",
+		panel: "h-full max-h-full w-full max-w-xl overflow-hidden border border-line bg-surface shadow-2xl",
+	},
 } as const;
 
-const panelContentModeClassNames = {
-	compact: "max-h-full overflow-y-auto p-[var(--ak-panel-padding)]",
-	responsive: "max-h-full overflow-y-auto p-[var(--ak-panel-padding)]",
-	viewport: "size-full overflow-hidden p-[var(--ak-panel-padding)]",
-} as const;
-
-type MainPage = "about" | "arkpacks" | "editor-welcome" | "main-menu" | "settings";
-type MainPagePanelMode = keyof typeof panelModeClassNames;
+type MainPage = keyof typeof MainPagePresentation;
 
 export namespace MainPageLayout {
 	export interface Props extends PropsWithChildren {
 		readonly foregroundOverlay?: ReactNode;
-		readonly heroPlacement?: "above-panel" | "behind-panel";
 		readonly labelledBy?: string;
 		readonly overlay?: ReactNode;
 		readonly page: MainPage;
-		readonly panelClassName?: string;
-		readonly panelContentClassName?: string;
-		readonly panelMode?: MainPagePanelMode;
 	}
 }
 
@@ -36,45 +46,36 @@ export namespace MainPageLayout {
 export const MainPageLayout = ({
 	children,
 	foregroundOverlay,
-	heroPlacement = "above-panel",
 	labelledBy,
 	overlay,
 	page,
-	panelClassName,
-	panelContentClassName,
-	panelMode = "responsive",
-}: MainPageLayout.Props) => (
-	<LauncherScene
-		compactHero
-		dataUi="MainPageLayout"
-		foregroundOverlay={foregroundOverlay}
-		layout={heroPlacement === "above-panel" ? "fixed-hero" : "overlaid-hero"}
-		overlay={overlay}
-	>
-		<section
-			aria-labelledby={labelledBy}
-			className={twMerge(
-				"relative min-h-0 min-w-0 overflow-hidden rounded-2xl border border-line bg-surface text-foreground shadow-2xl outline-none",
-				panelModeClassNames[panelMode],
-				panelClassName,
-			)}
-			data-page={page}
-			data-ui="MainPagePanel"
-			tabIndex={-1}
-			style={{
-				viewTransitionName: Effect.runSync(mainPagePanelViewTransitionNameFx(page)),
-			}}
+}: MainPageLayout.Props) => {
+	const presentation = MainPagePresentation[page];
+	return (
+		<LauncherScene
+			compactHero
+			dataUi="MainPageLayout"
+			foregroundOverlay={foregroundOverlay}
+			layout={presentation.layout}
+			overlay={overlay}
 		>
-			<div
-				className={twMerge(
-					"relative z-10 min-h-0 min-w-0",
-					panelContentModeClassNames[panelMode],
-					panelContentClassName,
-				)}
-				data-ui="MainPagePanelContent"
+			<section
+				aria-labelledby={labelledBy}
+				className={`relative min-h-0 min-w-0 rounded-2xl text-foreground outline-none ${presentation.panel}`}
+				data-page={page}
+				data-ui="MainPagePanel"
+				tabIndex={-1}
+				style={{
+					viewTransitionName: Effect.runSync(mainPagePanelViewTransitionNameFx(page)),
+				}}
 			>
-				{children}
-			</div>
-		</section>
-	</LauncherScene>
-);
+				<div
+					className={`relative z-10 min-h-0 min-w-0 ${presentation.content}`}
+					data-ui="MainPagePanelContent"
+				>
+					{children}
+				</div>
+			</section>
+		</LauncherScene>
+	);
+};

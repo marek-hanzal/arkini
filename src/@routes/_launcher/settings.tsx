@@ -64,11 +64,8 @@ export const Route = createFileRoute("/_launcher/settings")({
 
 		return (
 			<MainPageLayout
-				heroPlacement="behind-panel"
 				labelledBy="settings-title"
 				page="settings"
-				panelClassName="h-full"
-				panelContentClassName="h-full"
 			>
 				<ModelProvider model={model}>
 					<section

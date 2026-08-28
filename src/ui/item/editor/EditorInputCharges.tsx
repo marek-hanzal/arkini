@@ -1,7 +1,8 @@
+import { BatteryMedium, Trash2 } from "lucide-react";
+
 import type { EditorInput } from "~/bridge/item/editor/EditorItemModel";
 import { Button } from "~/ui/button/Button";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
-import { editorCollectionActionClassName } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { Tooltip } from "~/ui/overlay/Tooltip";
@@ -25,7 +26,7 @@ export const EditorInputCharges = ({
 				<EditorCapabilityStatus
 					actionLabel="Enable charge cost"
 					description="This input currently settles without spending charges. Enable a cost to charge its owner or selected target when the action starts."
-					icon="icon-[lucide--battery-medium]"
+					icon={BatteryMedium}
 					onEnable={() =>
 						onChange({
 							...input,
@@ -83,7 +84,7 @@ export const EditorInputCharges = ({
 						/>
 						<Tooltip content="Disable charge cost">
 							<Button
-								className={editorCollectionActionClassName}
+								className="size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised"
 								data-ui="EditorInputChargeDisableButton"
 								onClick={() =>
 									onChange({
@@ -92,7 +93,7 @@ export const EditorInputCharges = ({
 									})
 								}
 							>
-								<span className="icon-[lucide--trash-2] size-4" />
+								<Trash2 className="size-4" />
 							</Button>
 						</Tooltip>
 					</div>

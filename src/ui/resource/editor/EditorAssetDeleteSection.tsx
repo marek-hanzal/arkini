@@ -1,3 +1,5 @@
+import { ArrowRight, ShieldAlert, ShieldCheck } from "lucide-react";
+
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectAvatarKeys } from "~/bridge/project/editor/EditorProjectFormSchema";
 import type { EditorAssetDeleteBlocker } from "~/editor/readEditorAssetDeleteBlockersFx";
@@ -38,7 +40,7 @@ const EditorAssetDeleteBlockerLink = ({
 							{blocker.roleLabel}
 						</span>
 					</span>
-					<span className="icon-[lucide--arrow-right] size-4 text-muted" />
+					<ArrowRight className="size-4 text-muted" />
 				</ButtonLink>
 			);
 	}
@@ -73,7 +75,7 @@ const EditorAssetDeleteBlockerLink = ({
 					{blocker.roleLabel}
 				</span>
 			</span>
-			<span className="icon-[lucide--arrow-right] size-4 text-muted" />
+			<ArrowRight className="size-4 text-muted" />
 		</ButtonLink>
 	);
 };
@@ -94,6 +96,7 @@ export const EditorAssetDeleteSection = ({
 		resourceId,
 	});
 	const blocked = controller.blockers.length > 0;
+	const StateIcon = blocked ? ShieldAlert : ShieldCheck;
 	return (
 		<>
 			<section
@@ -101,12 +104,8 @@ export const EditorAssetDeleteSection = ({
 				data-ui="EditorAssetDeleteSection"
 			>
 				<div className="flex items-start gap-3">
-					<span
-						className={
-							blocked
-								? "icon-[lucide--shield-alert] mt-0.5 size-6 shrink-0 text-warning"
-								: "icon-[lucide--shield-check] mt-0.5 size-6 shrink-0 text-success"
-						}
+					<StateIcon
+						className={`mt-0.5 size-6 shrink-0 ${blocked ? "text-warning" : "text-success"}`}
 					/>
 					<div>
 						<h2 className="text-lg font-semibold">

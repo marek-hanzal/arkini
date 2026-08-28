@@ -1,3 +1,5 @@
+import type { LucideIcon } from "lucide-react";
+
 import { PrimaryButton } from "~/ui/button/Button";
 import { Status } from "~/ui/status/Status";
 
@@ -5,7 +7,7 @@ export interface EditorCapabilityStatusProps {
 	readonly actionLabel: string;
 	readonly dataUi?: string;
 	readonly description: string;
-	readonly icon: string;
+	readonly icon: LucideIcon;
 	readonly onEnable: () => void;
 	readonly title: string;
 }

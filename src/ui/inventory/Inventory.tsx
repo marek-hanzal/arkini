@@ -1,3 +1,4 @@
+import { ArrowLeft } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 import { PixiInventorySurface } from "~/ui/pixi/PixiInventorySurface";
@@ -30,8 +31,8 @@ export const Inventory = ({ onClose }: { readonly onClose: () => void }) => {
 				data-ui="InventoryBackButton"
 				onClick={onClose}
 			>
-				<span
-					className="icon-[lucide--arrow-left] size-9"
+				<ArrowLeft
+					className="size-9"
 					aria-hidden="true"
 				/>
 			</button>

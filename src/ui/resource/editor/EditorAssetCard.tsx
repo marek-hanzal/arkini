@@ -1,3 +1,5 @@
+import { Image as ImageIcon } from "lucide-react";
+
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { ButtonLink } from "~/ui/button/Button";
@@ -30,8 +32,8 @@ export const EditorAssetCard = ({
 		>
 			<span className="grid min-h-32 place-items-center overflow-hidden p-4">
 				{url === undefined ? (
-					<span
-						className="icon-[lucide--image] size-8 text-subtle"
+					<ImageIcon
+						className="size-8 text-subtle"
 						aria-hidden="true"
 					/>
 				) : (

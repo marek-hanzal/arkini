@@ -46,6 +46,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/new/select
 				<div className="ak-list grid content-start gap-2 px-3 pt-3 pb-3 sm:grid-cols-2 xl:grid-cols-3">
 					{EditorItemTypes.map((type) => {
 						const presentation = EditorItemTypePresentation[type];
+						const Icon = presentation.icon;
 						return (
 							<ButtonLink
 								key={type}
@@ -61,8 +62,8 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/new/select
 								className="ak-list-row min-h-32 justify-start gap-4 rounded-xl p-4 text-left"
 								data-item-type={type}
 							>
-								<span
-									className={`${presentation.icon} size-8 shrink-0 text-accent`}
+								<Icon
+									className="size-8 shrink-0 text-accent"
 									aria-hidden="true"
 								/>
 								<span className="min-w-0">

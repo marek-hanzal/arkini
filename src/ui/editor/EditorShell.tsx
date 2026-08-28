@@ -1,6 +1,7 @@
 import { useAtomSet } from "@effect/atom-react";
 import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { useBlocker, useRouter } from "@tanstack/react-router";
+import { LogOut, RefreshCw } from "lucide-react";
 import {
 	useCallback,
 	useEffect,
@@ -146,7 +147,7 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 				>
 					{EditorWorkspaceRoutes.map((workspace) => {
 						if ("hiddenFromNavigation" in workspace) return null;
-						const { icon, id, label, shortcut, to } = workspace;
+						const { icon: Icon, id, label, shortcut, to } = workspace;
 						return (
 							<Fragment key={id}>
 								<Tooltip
@@ -165,7 +166,7 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 										}
 										{...readTabProps(id)}
 									>
-										<span className={`${icon} size-5`} />
+										<Icon className="size-5" />
 									</ButtonLink>
 								</Tooltip>
 								{"separatorAfter" in workspace ? (
@@ -186,7 +187,7 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 						cursorIntent={refresh.pending ? "progress" : undefined}
 						onClick={refresh.refresh}
 					>
-						<span className={`${refresh.icon} size-5`} />
+						<RefreshCw className="size-5" />
 					</Button>
 				</Tooltip>
 				<Tooltip
@@ -201,7 +202,7 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 						cursorIntent={exitPending ? "progress" : undefined}
 						onClick={() => void closeAndExit()}
 					>
-						<span className="icon-[lucide--log-out] size-5" />
+						<LogOut className="size-5" />
 					</Button>
 				</Tooltip>
 			</aside>

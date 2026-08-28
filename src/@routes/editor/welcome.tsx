@@ -13,8 +13,6 @@ export const Route = createFileRoute("/editor/welcome")({
 		<MainPageLayout
 			labelledBy="editor-welcome-title"
 			page="editor-welcome"
-			panelMode="responsive"
-			panelClassName="max-w-5xl"
 		>
 			<EditorWelcome recentProjects={Route.useLoaderData()} />
 		</MainPageLayout>

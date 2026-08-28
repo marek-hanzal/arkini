@@ -1,4 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
+import { LoaderCircle, TriangleAlert } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
@@ -79,6 +80,7 @@ export const OriginFlow = ({
 			project.projectId,
 		],
 	);
+	const FlowStateIcon = flowState.status === "error" ? TriangleAlert : LoaderCircle;
 
 	return (
 		<section
@@ -103,12 +105,8 @@ export const OriginFlow = ({
 			) : (
 				<div className="grid h-full place-items-center p-8">
 					<div className="flex max-w-md flex-col items-center gap-3 text-center">
-						<span
-							className={`${
-								flowState.status === "error"
-									? "icon-[lucide--triangle-alert] text-rose-600"
-									: "icon-[lucide--loader-circle] animate-spin text-violet-700"
-							} size-9`}
+						<FlowStateIcon
+							className={`size-9 ${flowState.status === "error" ? "text-rose-600" : "animate-spin text-violet-700"}`}
 						/>
 						<strong>
 							{flowState.status === "error" ? "Flow failed" : "Building flow"}

@@ -1,6 +1,6 @@
 import { createFormHook } from "@tanstack/react-form";
+import type { LucideIcon } from "lucide-react";
 import type { PropsWithChildren } from "react";
-import { twMerge } from "tailwind-merge";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { EditorBooleanToggleBadge } from "~/ui/form/EditorBooleanToggleBadge";
@@ -18,17 +18,19 @@ import { EditorAssetAutocompleteField } from "~/ui/resource/editor/EditorAssetAu
 
 const EditorField = ({
 	children,
-	className,
 	description,
 	error,
+	fill = false,
 	label,
 }: PropsWithChildren<{
 	readonly description?: string;
 	readonly error?: string;
+	readonly fill?: boolean;
 	readonly label: string;
-	readonly className?: string;
 }>) => (
-	<label className={twMerge("grid min-w-0 content-start gap-1.5 text-sm", className)}>
+	<label
+		className={`grid min-w-0 gap-1.5 text-sm ${fill ? "h-full grid-rows-[auto_minmax(0,1fr)] content-stretch" : "content-start"}`}
+	>
 		<span className="flex min-w-0 items-center gap-1">
 			<span className="font-semibold text-foreground">{label}</span>
 			{description === undefined ? null : <EditorInfoTooltip content={description} />}
@@ -98,10 +100,10 @@ const EditorTextAreaField = ({
 	const error = RendererRuntime.runSync(readEditorFieldErrorFx(field.state.meta.errors));
 	return (
 		<EditorField
-			className={fill ? "h-full grid-rows-[auto_minmax(0,1fr)] content-stretch" : undefined}
 			label={label}
 			description={description}
 			error={error}
+			fill={fill}
 		>
 			<textarea
 				name={field.name}
@@ -245,10 +247,10 @@ const EditorChoiceField = ({ description, label, options }: EditorChoiceFieldPro
 };
 
 export interface EditorBoolToggleProps {
-	readonly checkedIcon: string;
+	readonly checkedIcon: LucideIcon;
 	readonly description: string;
 	readonly label: string;
-	readonly uncheckedIcon: string;
+	readonly uncheckedIcon: LucideIcon;
 }
 
 const EditorBoolToggle = ({

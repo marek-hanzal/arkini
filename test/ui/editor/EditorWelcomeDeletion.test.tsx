@@ -72,7 +72,7 @@ const findButton = (container: ParentNode, label: string) => {
 };
 
 describe("EditorWelcome project rows", () => {
-	it("explains managed deletion and external-folder removal before confirming", async () => {
+	it("confirms the exact selected project deletion command", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);
 		const root = createRoot(container);
@@ -83,6 +83,7 @@ describe("EditorWelcome project rows", () => {
 					recentProjects: [
 						{
 							type: "valid",
+							ownership: "managed",
 							project: {
 								projectId: "project-one",
 								title: "Arkini",
@@ -91,28 +92,53 @@ describe("EditorWelcome project rows", () => {
 								updatedAtMs: 2,
 							},
 						},
+						{
+							type: "valid",
+							ownership: "external",
+							project: {
+								projectId: "project-two",
+								title: "Custom folder",
+								version: "1.0",
+								createdAtMs: 1,
+								updatedAtMs: 1,
+							},
+						},
 					],
 				}),
 			);
 		});
 
-		const openDelete = container.querySelector('[data-ui="EditorRecentProjectDelete"]');
-		if (!(openDelete instanceof HTMLButtonElement))
-			throw new Error("Recent project delete action missing.");
-		await act(async () => openDelete.click());
+		const managedDelete = container.querySelector(
+			'[data-project-ownership="managed"] [data-ui="EditorRecentProjectDelete"]',
+		);
+		const externalDelete = container.querySelector(
+			'[data-project-ownership="external"] [data-ui="EditorRecentProjectDelete"]',
+		);
+		if (!(managedDelete instanceof HTMLButtonElement))
+			throw new Error("Managed project delete action missing.");
+		if (!(externalDelete instanceof HTMLButtonElement))
+			throw new Error("Folder project delete action missing.");
+		await act(async () => managedDelete.click());
 
 		const dialog = container.querySelector('[data-ui="EditorProjectDeleteDialog"]');
 		expect(dialog?.textContent).toContain("Arkini");
 		expect(dialog?.textContent).toContain("project-one");
-		expect(dialog?.textContent).toContain("Managed projects are permanently deleted");
-		expect(dialog?.textContent).toContain("Folders opened from disk remain untouched");
+		expect(dialog?.getAttribute("data-project-ownership")).toBe("managed");
 		expect(actions.deleteProject).not.toHaveBeenCalled();
 
 		await act(async () => findButton(container, "Cancel").click());
 		expect(container.querySelector('[data-ui="EditorProjectDeleteDialog"]')).toBeNull();
 		expect(actions.deleteProject).not.toHaveBeenCalled();
 
-		await act(async () => openDelete.click());
+		await act(async () => externalDelete.click());
+		expect(
+			container
+				.querySelector('[data-ui="EditorProjectDeleteDialog"]')
+				?.getAttribute("data-project-ownership"),
+		).toBe("external");
+		await act(async () => findButton(container, "Cancel").click());
+
+		await act(async () => managedDelete.click());
 		await act(async () => findButton(container, "Remove project").click());
 		expect(actions.deleteProject).toHaveBeenCalledOnce();
 		expect(actions.deleteProject).toHaveBeenCalledWith("project-one");

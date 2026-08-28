@@ -86,6 +86,7 @@ const installEditorApi = () => {
 			success([
 				{
 					type: "valid" as const,
+					ownership: "external" as const,
 					project: descriptor,
 				},
 			]),

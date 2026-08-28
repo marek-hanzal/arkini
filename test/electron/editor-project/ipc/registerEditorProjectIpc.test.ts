@@ -268,6 +268,7 @@ describe("registerEditorProjectIpcFx", () => {
 			value: [
 				{
 					type: "valid",
+					ownership: "managed",
 					project: editorProjectIpcDescriptor,
 				},
 			],

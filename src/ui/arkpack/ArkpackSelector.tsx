@@ -47,7 +47,8 @@ export const ArkpackSelector = () => {
 					Choose a game package
 				</h1>
 				<p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-					User arkpacks stay on this device. Every package is validated before it can run.
+					Editor imports an Arkpack into a separate project. Changes aren’t live—build and
+					install the project to update the Arkpack.
 				</p>
 				{actions.busyAction === "remove" ? (
 					<p className="mt-3 text-sm text-accent">Removing package…</p>
@@ -77,7 +78,9 @@ export const ArkpackSelector = () => {
 					<span className="icon-[lucide--package-open] size-8 shrink-0 text-accent" />
 					<span className="min-w-0">
 						<span className="block text-lg font-semibold">
-							{actions.busyAction === "import" ? "Importing Arkpack…" : "Import Arkpack"}
+							{actions.busyAction === "import"
+								? "Importing Arkpack…"
+								: "Import Arkpack"}
 						</span>
 						<span className="mt-1 block text-xs font-normal text-subtle">
 							Choose an existing .arkpack file

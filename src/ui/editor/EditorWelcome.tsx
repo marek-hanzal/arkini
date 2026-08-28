@@ -1,4 +1,7 @@
-import type { EditorProjectCandidate } from "~/bridge/editor/EditorProjectCandidate";
+import type {
+	EditorProjectCandidate,
+	EditorProjectOwnership,
+} from "~/bridge/editor/EditorProjectCandidate";
 import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
 import { useEffect, useState } from "react";
 import { EditorArkpackImportButton } from "~/ui/arkpack/editor/EditorArkpackImportButton";
@@ -15,16 +18,24 @@ export namespace EditorWelcome {
 	}
 }
 
+interface ProjectToDelete {
+	readonly ownership: EditorProjectOwnership;
+	readonly project: EditorProjectDescriptor;
+}
+
 /** Starts or reopens one local editor project. */
 export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
-	const [projectToDelete, setProjectToDelete] = useState<EditorProjectDescriptor | null>(null);
+	const [projectToDelete, setProjectToDelete] = useState<ProjectToDelete | null>(null);
 	const [deleteRequested, setDeleteRequested] = useState(false);
 	const actions = useEditorWelcomeActions({
 		exitBlocked: projectToDelete !== null,
 	});
 
 	useEffect(() => {
-		if (projectToDelete === null || !actions.deletedProjectIds.has(projectToDelete.projectId))
+		if (
+			projectToDelete === null ||
+			!actions.deletedProjectIds.has(projectToDelete.project.projectId)
+		)
 			return;
 		setProjectToDelete(null);
 		setDeleteRequested(false);
@@ -121,9 +132,12 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 
 				<EditorRecentProjects
 					blocked={actions.blocked}
-					onDeleteProject={(project) => {
+					onDeleteProject={(project, ownership) => {
 						setDeleteRequested(false);
-						setProjectToDelete(project);
+						setProjectToDelete({
+							ownership,
+							project,
+						});
 					}}
 					onOpenProjectFolder={actions.openProjectFolder}
 					projects={recentProjects.filter(
@@ -146,15 +160,16 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 			{projectToDelete === null ? null : (
 				<EditorProjectDeleteDialog
 					error={deleteRequested ? actions.error : undefined}
+					ownership={projectToDelete.ownership}
 					pending={actions.active === "delete-project"}
-					project={projectToDelete}
+					project={projectToDelete.project}
 					onCancel={() => {
 						setDeleteRequested(false);
 						setProjectToDelete(null);
 					}}
 					onConfirm={() => {
 						setDeleteRequested(true);
-						actions.deleteProject(projectToDelete.projectId);
+						actions.deleteProject(projectToDelete.project.projectId);
 					}}
 				/>
 			)}

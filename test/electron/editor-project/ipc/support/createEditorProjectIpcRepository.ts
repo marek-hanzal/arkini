@@ -85,6 +85,7 @@ export const createEditorProjectIpcRepository = (): OwnedEditorProjectRepository
 	listProjectsFx: Effect.succeed([
 		{
 			type: "valid" as const,
+			ownership: "managed" as const,
 			project: editorProjectIpcDescriptor,
 		},
 	]),

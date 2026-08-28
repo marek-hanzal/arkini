@@ -72,6 +72,7 @@ export namespace EditorProjectTransport {
 	export type ProjectCandidate =
 		| {
 				readonly type: "valid";
+				readonly ownership: "external" | "managed";
 				readonly project: Descriptor;
 		  }
 		| {

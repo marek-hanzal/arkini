@@ -208,6 +208,7 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 				listedRoots.add(mounted.paths.root);
 				candidates.push({
 					type: "valid",
+					ownership: mounted.catalog.ownership,
 					project: materializeDescriptor(mounted.project),
 				});
 				continue;
@@ -232,6 +233,7 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 			if (existing !== undefined) {
 				candidates.push({
 					type: "valid",
+					ownership: existing.catalog.ownership,
 					project: materializeDescriptor(existing.project),
 				});
 				continue;
@@ -277,6 +279,7 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 			states.set(state.project.projectId, state);
 			candidates.push({
 				type: "valid",
+				ownership: state.catalog.ownership,
 				project: materializeDescriptor(state.project),
 			});
 		}
@@ -485,21 +488,17 @@ export const createFilesystemEditorProjectOperationsFx = Effect.fn(
 				if (state.catalog.ownership === "managed")
 					yield* filesystemWrite.withLockFx(
 						lifecycleLock,
-						withFilesystemEditorProjectLockFx(
-							filesystemWrite,
-							state.paths.root,
-							Effect.uninterruptible(
-								assertSafeCatalogEntryFx(state.catalog).pipe(
-									Effect.andThen(catalog.removeFx(state.catalog.root)),
-									Effect.andThen(Effect.sync(() => states.delete(projectId))),
-									Effect.andThen(
-										fileSystem
-											.remove(state.paths.root, {
-												force: true,
-												recursive: true,
-											})
-											.pipe(Effect.ignore),
-									),
+						Effect.uninterruptible(
+							assertSafeCatalogEntryFx(state.catalog).pipe(
+								Effect.andThen(
+									fileSystem.remove(state.paths.root, {
+										force: true,
+										recursive: true,
+									}),
+								),
+								Effect.andThen(Effect.sync(() => states.delete(projectId))),
+								Effect.andThen(
+									catalog.removeFx(state.catalog.root).pipe(Effect.ignore),
 								),
 							),
 						),

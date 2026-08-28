@@ -128,6 +128,7 @@ describe("filesystem Editor project lifecycle", () => {
 		expect(await Effect.runPromise(repository.listProjectsFx)).toEqual([
 			{
 				type: "valid",
+				ownership: "managed",
 				project: expect.objectContaining({
 					projectId: healthy.projectId,
 				}),
@@ -351,6 +352,7 @@ describe("filesystem Editor project lifecycle", () => {
 		expect(await Effect.runPromise(repository.listProjectsFx)).toEqual([
 			{
 				type: "valid",
+				ownership: "external",
 				project: expect.objectContaining({
 					projectId: opened.projectId,
 					title: opened.title,

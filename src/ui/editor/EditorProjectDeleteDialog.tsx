@@ -1,8 +1,10 @@
+import type { EditorProjectOwnership } from "~/bridge/editor/EditorProjectCandidate";
 import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
 import { Button, DangerButton } from "~/ui/button/Button";
 
 export interface EditorProjectDeleteDialogProps {
 	readonly error?: unknown;
+	readonly ownership: EditorProjectOwnership;
 	readonly pending: boolean;
 	readonly project: EditorProjectDescriptor;
 	readonly onCancel: () => void;
@@ -12,6 +14,7 @@ export interface EditorProjectDeleteDialogProps {
 /** Explains managed deletion and external-folder unregistration before repository mutation. */
 export const EditorProjectDeleteDialog = ({
 	error,
+	ownership,
 	pending,
 	project,
 	onCancel,
@@ -20,12 +23,15 @@ export const EditorProjectDeleteDialog = ({
 	<div className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]">
 		<div
 			className="w-full max-w-md rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
+			data-project-ownership={ownership}
 			data-ui="EditorProjectDeleteDialog"
 		>
 			<h2 className="text-lg font-semibold">Remove project?</h2>
 			<p className="mt-2 text-sm leading-6 text-muted">
-				Remove <strong className="text-foreground">{project.title}</strong> from the Editor?
-				Managed projects are permanently deleted. Folders opened from disk remain untouched.
+				Remove <strong className="text-foreground">{project.title}</strong> from the Editor?{" "}
+				{ownership === "managed"
+					? "This managed project and all its files will be permanently deleted."
+					: "This folder project will be removed from Editor. Files on disk remain untouched."}
 			</p>
 			<p className="mt-2 text-xs text-subtle">Project ID: {project.projectId}</p>
 			{error === undefined ? null : (

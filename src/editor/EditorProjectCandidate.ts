@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { EditorProjectOwnershipSchema } from "./filesystem/EditorProjectOwnershipSchema";
 import { EditorProjectDescriptorSchema } from "./EditorProjectDescriptor";
 
 /** One fully admitted project or one cataloged directory blocked by complete validation. */
@@ -8,6 +9,7 @@ export const EditorProjectCandidateSchema = z
 		z
 			.object({
 				type: z.literal("valid"),
+				ownership: EditorProjectOwnershipSchema,
 				project: EditorProjectDescriptorSchema,
 			})
 			.strict(),
@@ -26,3 +28,4 @@ export const EditorProjectCandidateSchema = z
 	});
 
 export type EditorProjectCandidate = z.infer<typeof EditorProjectCandidateSchema>;
+export type EditorProjectOwnership = EditorProjectOwnershipSchema.Type;

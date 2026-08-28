@@ -1,4 +1,7 @@
-import type { EditorProjectCandidate } from "~/bridge/editor/EditorProjectCandidate";
+import type {
+	EditorProjectCandidate,
+	EditorProjectOwnership,
+} from "~/bridge/editor/EditorProjectCandidate";
 import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
 import { Button, ButtonLink } from "~/ui/button/Button";
 
@@ -10,7 +13,10 @@ const formatter = new Intl.DateTimeFormat(undefined, {
 export namespace EditorRecentProjects {
 	export interface Props {
 		readonly blocked: boolean;
-		readonly onDeleteProject: (project: EditorProjectDescriptor) => void;
+		readonly onDeleteProject: (
+			project: EditorProjectDescriptor,
+			ownership: EditorProjectOwnership,
+		) => void;
 		readonly onOpenProjectFolder: (root: string) => void;
 		readonly projects: ReadonlyArray<EditorProjectCandidate>;
 	}
@@ -71,6 +77,8 @@ export const EditorRecentProjects = ({
 						<div
 							key={candidate.project.projectId}
 							className="ak-list-row flex min-w-0 items-center"
+							data-project-ownership={candidate.ownership}
+							data-ui="EditorRecentProject"
 						>
 							<ButtonLink
 								to="/editor/$projectId/editor/items/list"
@@ -83,8 +91,15 @@ export const EditorRecentProjects = ({
 							>
 								<span className="icon-[lucide--folder-kanban] size-5 shrink-0 text-accent" />
 								<span className="min-w-0 flex-1">
-									<span className="block truncate text-sm font-semibold">
-										{candidate.project.title}
+									<span className="flex min-w-0 items-center gap-2">
+										<span className="truncate text-sm font-semibold">
+											{candidate.project.title}
+										</span>
+										<span className="shrink-0 rounded-full bg-surface-raised px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-muted">
+											{candidate.ownership === "managed"
+												? "Managed"
+												: "Custom"}
+										</span>
 									</span>
 									<span className="mt-1 block truncate text-xs text-subtle">
 										{candidate.project.projectId} · v{candidate.project.version}
@@ -97,7 +112,9 @@ export const EditorRecentProjects = ({
 								className="grid size-8 shrink-0 cursor-pointer place-items-center border-0 bg-transparent p-0 text-subtle transition-colors hover:text-danger disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:text-subtle"
 								data-ui="EditorRecentProjectDelete"
 								title={`Delete ${candidate.project.title}`}
-								onClick={() => onDeleteProject(candidate.project)}
+								onClick={() =>
+									onDeleteProject(candidate.project, candidate.ownership)
+								}
 							>
 								<span className="icon-[lucide--trash-2] size-4" />
 							</button>

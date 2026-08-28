@@ -84,7 +84,7 @@ Both states are playable. Provenance is a label, not an anti-tampering or conten
 
 The one `.arkpack` is the complete distributable artifact. Its proof is optional and signs only the immutable inner payload, avoiding circular self-signing. Proof nondeterminism therefore cannot change gameplay identity or save association.
 
-Tagged development and stable workflows receive a short-lived OIDC identity, use Sigstore Fulcio/Rekor transparency proofs, build and sign the canonical Arkpack once, and verify it as Official before packaging. Every platform receives and embeds those exact final bytes. There is no stored signing key, signing secret, local key generation, developer mode, or standalone signing command. Manual workflow, local `argc build`, and every Editor build remain Community.
+The one tag workflow receives a short-lived OIDC identity, uses Sigstore Fulcio/Rekor transparency proofs, builds and signs the canonical Arkpack once, and verifies it as Official before packaging. Prerelease tags first repeat the complete hosted branch gate; stable tags deliberately skip checks. Every platform receives and embeds the same final Arkpack bytes. There is no stored signing key, signing secret, local key generation, developer mode, or standalone signing command. Local `argc build` and every Editor build remain Community.
 
 Load and `arkini-cli arkpack verify <file>` classify the single file offline. Verification checks payload digest/signature, Fulcio chain and certificate-transparency proof, Rekor proof, issuer, exact repository workflow identity, and `refs/tags/v<full current version>` against the embedded [`src/engine/pack/trusted-root.json`](src/engine/pack/trusted-root.json). Failure becomes Community, never a load rejection.
 

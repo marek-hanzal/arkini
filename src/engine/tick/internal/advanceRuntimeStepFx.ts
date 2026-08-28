@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { isPassiveStorageLocationFx } from "~/engine/location/read/isPassiveStorageLocationFx";
+import { isPassiveStorageLocationFn } from "~/engine/location/fn/isPassiveStorageLocationFn";
 import { isInstantGameplayEnabledFx } from "~/engine/cheat/read/isInstantGameplayEnabledFx";
 import { settleItemDeliveryRuntimeFx } from "~/engine/delivery/write/settleItemDeliveryRuntimeFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
@@ -201,7 +201,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		const liveJob = draft.jobs.find((candidate) => candidate.id === job.id);
 		if (liveJob === undefined || liveJob.remainingMs !== 0) continue;
 		const owner = draft.items.find((item) => item.id === liveJob.ownerItemId);
-		if (owner !== undefined && (yield* isPassiveStorageLocationFx(owner.location))) continue;
+		if (owner !== undefined && isPassiveStorageLocationFn(owner.location)) continue;
 		const completion = yield* attemptJobCompletionFx({
 			jobId: liveJob.id,
 			runtime: draft,

@@ -6,7 +6,7 @@ import type { GameTransition } from "~/bridge/game/GameSession";
 import type { TileActorVisual } from "~/bridge/tile/TileActorVisual";
 import { readTileActorVisualFx } from "~/bridge/tile/readTileActorVisualFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
+import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 
@@ -60,10 +60,10 @@ export const readCommittedTileReplacementsFx = Effect.fn("readCommittedTileRepla
 								previous.item.id !== merged.targetCanonicalItemId ||
 								current.item.id !== merged.resultCanonicalItemId ||
 								previous.item.id === current.item.id ||
-								!(yield* isSameGridLocationFx({
+								!isSameGridLocationFn({
 									left: previous.location,
 									right: current.location,
-								}))
+								})
 							) {
 								return null;
 							}

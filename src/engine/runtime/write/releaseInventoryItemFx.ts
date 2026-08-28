@@ -3,8 +3,8 @@ import { Effect, Option } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
-import { isItemLocationScopeAllowedFx } from "~/engine/location/read/isItemLocationScopeAllowedFx";
-import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
+import { isItemLocationScopeAllowedFn } from "~/engine/location/fn/isItemLocationScopeAllowedFn";
+import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import type { InventoryLocationSchema } from "~/engine/location/schema/InventoryLocationSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
@@ -55,10 +55,10 @@ export const releaseInventoryItemFx = Effect.fn("releaseInventoryItemFx")(functi
 			}
 			if (
 				item.location.scope !== LocationScopeEnumSchema.enum.Inventory ||
-				!(yield* isSameGridLocationFx({
+				!isSameGridLocationFn({
 					left: item.location,
 					right: location,
-				}))
+				})
 			) {
 				return yield* Effect.fail(
 					new ItemLocationConflictError({
@@ -72,7 +72,7 @@ export const releaseInventoryItemFx = Effect.fn("releaseInventoryItemFx")(functi
 				itemId,
 				runtime,
 			});
-			const canOwnBoardLocation = yield* isItemLocationScopeAllowedFx({
+			const canOwnBoardLocation = isItemLocationScopeAllowedFn({
 				item: item.item,
 				locationScope: LocationScopeEnumSchema.enum.Board,
 			});

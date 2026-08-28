@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { EditorProjectStartScope } from "~/bridge/project/editor/EditorProjectStartScope";
-import { isItemLocationScopeAllowedFx } from "~/engine/location/read/isItemLocationScopeAllowedFx";
+import { isItemLocationScopeAllowedFn } from "~/engine/location/fn/isItemLocationScopeAllowedFn";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 export namespace readEditorProjectStartItemIdsFx {
@@ -19,7 +19,7 @@ export const readEditorProjectStartItemIdsFx = Effect.fnUntraced(function* ({
 	const itemIds = new Set<string>();
 	for (const item of Object.values(items)) {
 		if (
-			yield* isItemLocationScopeAllowedFx({
+			isItemLocationScopeAllowedFn({
 				item,
 				locationScope: scope,
 			})

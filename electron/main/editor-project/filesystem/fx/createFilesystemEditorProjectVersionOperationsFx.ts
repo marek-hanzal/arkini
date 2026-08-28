@@ -16,7 +16,7 @@ import type {
 	EditorProjectVersionDescriptor,
 	EditorProjectVersionRepositoryService,
 } from "~/editor/version/EditorProjectVersion";
-import { createEditorProjectVersionDiff } from "~/editor/version/createEditorProjectVersionDiff";
+import { createEditorProjectVersionDiffFx } from "~/editor/version/createEditorProjectVersionDiffFx";
 import {
 	EditorProjectVersionBodySchema,
 	EditorProjectVersionSubjectSchema,
@@ -624,7 +624,7 @@ export const createFilesystemEditorProjectVersionOperationsFx = Effect.fn(
 		operations.withPermits(1)(
 			Effect.gen(function* () {
 				const state = yield* readState(projectId);
-				return createEditorProjectVersionDiff(
+				return yield* createEditorProjectVersionDiffFx(
 					from,
 					to,
 					yield* readDiffSnapshotFx(state, from),

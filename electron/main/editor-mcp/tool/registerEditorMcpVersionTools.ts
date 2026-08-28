@@ -140,17 +140,20 @@ const describeVersion = (version: EditorProjectVersionDescriptor) =>
 	].join("\n");
 
 const formatDiff = (diff: EditorProjectVersionDiff) => {
+	const formatBump = (bump: "major" | "minor" | undefined) =>
+		bump === undefined ? "" : ` · ${bump} bump`;
 	const lines = [
 		"Version diff",
 		`Changed: ${diff.hasChanges ? "yes" : "no"}`,
 		`Project fields: ${diff.project.length}`,
-		...diff.project.map(({ path }) => `  ${path}`),
+		...diff.project.map(({ bump, path }) => `  ${path}${formatBump(bump)}`),
 		`Items: ${diff.items.length}`,
-		...diff.items.map(
-			({ change, uid, values }) => `  ${change} ${uid} · ${values.length} field changes`,
-		),
+		...diff.items.flatMap(({ change, uid, values }) => [
+			`  ${change} ${uid} · ${values.length} field changes`,
+			...values.map(({ bump, path }) => `    ${path || "Entire item"}${formatBump(bump)}`),
+		]),
 		`Resources: ${diff.resources.length}`,
-		...diff.resources.map(({ change, id }) => `  ${change} ${id}`),
+		...diff.resources.map(({ bump, change, id }) => `  ${change} ${id}${formatBump(bump)}`),
 		`Board scenarios: ${diff.scenarios.length}`,
 		...diff.scenarios.map(({ change, id }) => `  ${change} ${id}`),
 	];

@@ -67,6 +67,12 @@ const versionValueChangeSchema = z
 		path: z.string(),
 		before: z.unknown().optional(),
 		after: z.unknown().optional(),
+		bump: z
+			.enum([
+				"minor",
+				"major",
+			])
+			.optional(),
 	})
 	.strict();
 const versionBinaryDiffSchema = z
@@ -76,6 +82,12 @@ const versionBinaryDiffSchema = z
 			"changed",
 			"deleted",
 		]),
+		bump: z
+			.enum([
+				"minor",
+				"major",
+			])
+			.optional(),
 		id: z.string(),
 	})
 	.strict();

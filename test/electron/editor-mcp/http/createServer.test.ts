@@ -91,8 +91,12 @@ describe("editor MCP server", () => {
 			type: "string",
 		});
 		const schemaIds = tools.tools.map(({ inputSchema, name }) => {
+			const expectedId =
+				name === "item_input" || name === "item_output"
+					? `urn:arkini:schema:mcp:${name.replaceAll("_", "-")}-relation`
+					: `urn:arkini:schema:mcp:${name.replaceAll("_", "-")}-input`;
 			expectNamedJsonSchemaGraph(inputSchema, {
-				id: `urn:arkini:schema:mcp:${name.replaceAll("_", "-")}-input`,
+				id: expectedId,
 			});
 			return inputSchema.$id;
 		});

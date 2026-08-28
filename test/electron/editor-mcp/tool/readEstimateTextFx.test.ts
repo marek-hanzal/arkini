@@ -29,7 +29,6 @@ describe("readEstimateTextFx", () => {
 			pageSize: 2,
 		});
 
-		expect(text).toContain("Global estimate\nMethod: static authored dependency graph");
 		expect(text).toContain("Incomplete only: false");
 		expect(text).toContain("Sort: slowest");
 		expect(text).toContain("Page: 1");

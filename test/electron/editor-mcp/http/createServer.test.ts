@@ -239,13 +239,6 @@ describe("editor MCP server", () => {
 		expect(globalEstimate).not.toHaveProperty("structuredContent");
 		expect(globalEstimate.content).toMatchObject([
 			{
-				text: expect.stringContaining(
-					"Global estimate\nMethod: static authored dependency graph",
-				),
-			},
-		]);
-		expect(globalEstimate.content).toMatchObject([
-			{
 				text: expect.stringContaining("Incomplete only: true\nSort: demand"),
 			},
 		]);

@@ -11,6 +11,8 @@ const step = (factId: string, quantity: number): EditorItemEstimateRouteStep => 
 	actionRuns: quantity,
 	durationMs: quantity * 1_000,
 	factId,
+	occurrenceCount: 1,
+	occurrenceId: `occurrence:${factId}:${quantity}`,
 	outputRuns: quantity,
 	quantity,
 	requirements: [],
@@ -97,5 +99,41 @@ describe("createEditorItemEstimateIndexFx", () => {
 				itemId: "wood",
 			},
 		]);
+	});
+
+	it("counts compressed equivalent route occurrences in global demand", () => {
+		const repeatedWater = {
+			...step("water", 3),
+			occurrenceCount: 4,
+		};
+		const entries = Effect.runSync(
+			createEditorItemEstimateIndexFx({
+				estimates: new Map([
+					[
+						"target",
+						complete("target", [
+							step("target", 1),
+							repeatedWater,
+						]),
+					],
+					[
+						"water",
+						{
+							diagnostics: [],
+							factId: "water",
+							limitations: [],
+							obtainable: false,
+							quantity: 1,
+							status: "partial",
+						} satisfies EditorItemEstimate,
+					],
+				]),
+				itemIds: [
+					"water",
+				],
+			}),
+		);
+
+		expect(entries[0]?.demand).toBe(12);
 	});
 });

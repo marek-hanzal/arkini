@@ -56,6 +56,8 @@ describe("EditorItemEstimateSection", () => {
 			actionRuns: 1,
 			durationMs: 1,
 			factId: "tool",
+			occurrenceCount: 1,
+			occurrenceId: "target",
 			outputRuns: 1,
 			quantity: 1,
 			requirements: [],
@@ -84,9 +86,11 @@ describe("EditorItemEstimateSection", () => {
 		const partial: EditorItemEstimate = {
 			diagnostics: [
 				{
-					kind: "joint-output-accounting-unsupported",
-					reason: "state-space",
-					routeId: "line:forge:run",
+					factId: "tool",
+					kind: "quantity-limit-exceeded",
+					maximumQuantity: 10_000,
+					quantity: 20_000,
+					source: "authored-demand",
 				},
 			],
 			factId: "tool",

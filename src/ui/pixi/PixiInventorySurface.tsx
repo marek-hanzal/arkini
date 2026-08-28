@@ -9,7 +9,7 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 import { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
-import type { PixiInventorySceneRuntime } from "~/ui/pixi/scene/PixiInventorySceneRuntime";
+import type { InventoryRuntime } from "~/ui/pixi/scene/InventoryRuntime";
 import { createInventoryRuntimeFx } from "~/ui/pixi/scene/createInventoryRuntimeFx";
 import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";
 
@@ -38,7 +38,7 @@ export const PixiInventorySurface = ({
 		mode: "promise",
 	});
 	const hostRef = useRef<HTMLDivElement>(null);
-	const runtimeRef = useRef<PixiInventorySceneRuntime | null>(null);
+	const runtimeRef = useRef<InventoryRuntime | null>(null);
 	const controlsRef = useRef({
 		itemDetail,
 		onSpaceActivated,
@@ -101,7 +101,7 @@ export const PixiInventorySurface = ({
 		const host = hostRef.current;
 		if (host === null) return;
 		let cancelled = false;
-		let runtime: PixiInventorySceneRuntime | null = null;
+		let runtime: InventoryRuntime | null = null;
 		let unregisterInteraction: () => void = () => undefined;
 		void RendererRuntime.runPromise(
 			createInventoryRuntimeFx({

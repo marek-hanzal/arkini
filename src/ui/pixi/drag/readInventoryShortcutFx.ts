@@ -1,21 +1,21 @@
 import { Effect } from "effect";
 
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
-import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
-import type { PixiMainSceneDragPreview } from "~/ui/pixi/drag/PixiMainSceneDragPreview";
-import type { PixiMainSceneActiveDrag } from "~/ui/pixi/drag/PixiMainSceneDragState";
-import type { PixiMainSceneDropSubmission } from "~/ui/pixi/drop/PixiMainSceneDropSubmission";
-import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
+import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
+import type { DragPreview } from "~/ui/pixi/drag/DragPreview";
+import type { ActiveDrag } from "~/ui/pixi/drag/ActiveDrag";
+import type { DropSubmission } from "~/ui/pixi/drop/DropSubmission";
+import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 
 export namespace readInventoryShortcutFx {
 	export interface Props {
-		readonly actorStore: PixiMainSceneActorStore;
-		readonly drag: PixiMainSceneActiveDrag;
-		readonly preview: PixiMainSceneDragPreview;
-		readonly surface: PixiMainSceneSurface;
+		readonly actorStore: MainActorStore;
+		readonly drag: ActiveDrag;
+		readonly preview: DragPreview;
+		readonly surface: MainSurface;
 	}
 
-	export type Result = Parameters<PixiMainSceneDropSubmission["submitFx"]>[0] | null;
+	export type Result = Parameters<DropSubmission["submitFx"]>[0] | null;
 }
 
 /** Resolves an Inventory shortcut into exact engine submission facts without taking gesture state. */

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { readSlotFx } from "~/ui/pixi/grid/readSlotFx";
-import type { PixiGridSurfaceLayout } from "~/ui/pixi/layout/PixiSceneLayout";
+import type { SurfaceLayout } from "~/ui/pixi/layout/SceneLayout";
 
 const surface = {
 	cellSize: 30,
@@ -13,7 +13,7 @@ const surface = {
 	width: 60,
 	x: 10,
 	y: 20,
-} satisfies PixiGridSurfaceLayout;
+} satisfies SurfaceLayout;
 
 const readSlot = (x: number, y: number) =>
 	Effect.runSync(

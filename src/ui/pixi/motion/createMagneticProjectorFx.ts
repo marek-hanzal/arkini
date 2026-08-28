@@ -2,17 +2,17 @@ import { Effect } from "effect";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { PixiActorPresentedPose } from "~/ui/pixi/animation/PixiActorAnimator";
-import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
-import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
+import type { PresentedPose } from "~/ui/pixi/animation/ActorAnimator";
+import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
+import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 
 export namespace createMagneticProjectorFx {
 	export interface Props {
 		readonly actor: PixiTileActor;
 		readonly attractedActorId: string | null;
 		readonly eligibleAttractionActorIds: ReadonlySet<string>;
-		readonly magneticField: PixiTileMagneticField;
-		readonly surface: PixiMainSceneSurface;
+		readonly magneticField: MagneticField;
+		readonly surface: MainSurface;
 		readonly readAttraction?: () => {
 			readonly attractedActorId: string | null;
 			readonly eligibleAttractionActorIds: ReadonlySet<string>;
@@ -20,7 +20,7 @@ export namespace createMagneticProjectorFx {
 	}
 
 	export interface Result {
-		readonly projectPose: (pose: PixiActorPresentedPose) => void;
+		readonly projectPose: (pose: PresentedPose) => void;
 		readonly release: () => void;
 	}
 }

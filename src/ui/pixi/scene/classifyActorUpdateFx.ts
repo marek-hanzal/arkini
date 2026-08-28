@@ -4,8 +4,8 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { isSameTileActorLocationFx } from "~/bridge/tile/isSameTileActorLocationFx";
 import { readCrowdAlphaFx } from "~/ui/pixi/actor/readCrowdAlphaFx";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { PixiMainSceneActorUpdatePlan } from "~/ui/pixi/scene/PixiMainSceneActorUpdatePlan";
-import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
+import type { ActorUpdatePlan } from "~/ui/pixi/scene/ActorUpdatePlan";
+import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
 
 export namespace classifyActorUpdateFx {
 	export interface Props {
@@ -14,7 +14,7 @@ export namespace classifyActorUpdateFx {
 		readonly directLanding: boolean;
 		readonly displayItem: TileActorItem;
 		readonly motionClaimed: boolean;
-		readonly pose: PixiTileActorPose;
+		readonly pose: ActorPose;
 		readonly poseChannelActive: boolean;
 		readonly preserveVisual: boolean;
 	}
@@ -69,7 +69,7 @@ export const classifyActorUpdateFx = Effect.fnUntraced(function* ({
 				? "start"
 				: "stop";
 	const previousDisplayedSize = actor.size * actor.container.scale.x;
-	const item: PixiMainSceneActorUpdatePlan["item"] =
+	const item: ActorUpdatePlan["item"] =
 		visualChanged || sizeChanged
 			? {
 					kind: "visual",

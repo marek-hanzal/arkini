@@ -2,38 +2,38 @@ import { Effect } from "effect";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileSwapMotionCue } from "~/bridge/tile/motion/TileMotionCue";
-import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
+import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import { readSettleDurationMsFx } from "~/ui/pixi/drag/readSettleDurationMsFx";
-import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
+import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
 import { createMagneticProjectorFx } from "~/ui/pixi/motion/createMagneticProjectorFx";
 import { createMotionPoseSamplerFx } from "~/ui/pixi/motion/createMotionPoseSamplerFx";
 import { chaseTargetFx } from "~/ui/pixi/motion/chaseTargetFx";
-import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
-import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
+import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
+import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
 
-interface PixiSwapMotionLeg {
+interface SwapLeg {
 	readonly actor: PixiTileActor;
-	readonly forceOrigin: PixiTileActorPose | null;
-	readonly target: PixiTileActorPose;
+	readonly forceOrigin: ActorPose | null;
+	readonly target: ActorPose;
 	readonly targetLocation: TileSwapMotionCue["targetLocation"];
 }
 
 export namespace runSwapMotionFx {
 	export interface Props {
-		readonly actorStore: PixiMainSceneActorStore;
-		readonly animator: PixiActorAnimator;
+		readonly actorStore: MainActorStore;
+		readonly animator: ActorAnimator;
 		readonly cue: TileSwapMotionCue;
 		readonly cueKey: string;
 		readonly delayMs: number;
-		readonly magneticField: PixiTileMagneticField;
+		readonly magneticField: MagneticField;
 		readonly onComplete: () => void;
 		readonly onSwapLegSettled: (actorId: string) => void;
 		readonly onSwapLegStarted: (actorId: string) => void;
-		readonly origin: PixiTileActorPose;
-		readonly surface: PixiMainSceneSurface;
-		readonly target: PixiTileActorPose;
+		readonly origin: ActorPose;
+		readonly surface: MainSurface;
+		readonly target: ActorPose;
 	}
 }
 
@@ -54,7 +54,7 @@ export const runSwapMotionFx = Effect.fn("runSwapMotionFx")(function* ({
 }: runSwapMotionFx.Props) {
 	const exchanged = actorStore.actors.get(cue.actorId);
 	const counterpart = actorStore.actors.get(cue.counterpartActorId);
-	const legs: ReadonlyArray<PixiSwapMotionLeg> = [
+	const legs: ReadonlyArray<SwapLeg> = [
 		...(exchanged === undefined
 			? []
 			: [

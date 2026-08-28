@@ -2,31 +2,28 @@ import { Effect } from "effect";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
+import type { AnimationControl, AnimationDriver } from "~/ui/pixi/animation/AnimationDriver";
 import type {
-	PixiAnimationControl,
-	PixiAnimationDriver,
-} from "~/ui/pixi/animation/PixiAnimationDriver";
-import type {
-	PixiActorAnimation,
-	PixiActorAnimationChannel,
-	PixiActorAnimator,
-	PixiActorPresentationWrite,
-} from "~/ui/pixi/animation/PixiActorAnimator";
+	ActorAnimation,
+	AnimationChannel,
+	ActorAnimator,
+	PresentationWrite,
+} from "~/ui/pixi/animation/ActorAnimator";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 
 export namespace createActorAnimatorFx {
 	export interface Props {
-		readonly animationDriver: PixiAnimationDriver;
+		readonly animationDriver: AnimationDriver;
 		readonly frames: DemandFrameLoop;
 	}
 }
 
 interface ActiveAnimation {
 	readonly actor: PixiTileActor;
-	readonly channel: PixiActorAnimationChannel;
+	readonly channel: AnimationChannel;
 	readonly onCancel?: () => void;
 	readonly ownerKey: string;
-	control: PixiAnimationControl | null;
+	control: AnimationControl | null;
 }
 
 /**
@@ -37,19 +34,19 @@ interface ActiveAnimation {
  */
 export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 	({ animationDriver, frames }: createActorAnimatorFx.Props) =>
-		Effect.sync((): PixiActorAnimator => {
+		Effect.sync((): ActorAnimator => {
 			const activeAnimations = new Set<ActiveAnimation>();
 			const animationsByOwner = new Map<string, ActiveAnimation>();
 			const channelsByActor = new WeakMap<
 				PixiTileActor,
-				Map<PixiActorAnimationChannel, ActiveAnimation>
+				Map<AnimationChannel, ActiveAnimation>
 			>();
 			let closed = false;
 
 			const readActorChannels = (actor: PixiTileActor) => {
 				const existing = channelsByActor.get(actor);
 				if (existing !== undefined) return existing;
-				const created = new Map<PixiActorAnimationChannel, ActiveAnimation>();
+				const created = new Map<AnimationChannel, ActiveAnimation>();
 				channelsByActor.set(actor, created);
 				return created;
 			};
@@ -72,11 +69,11 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 				animation.onCancel?.();
 			};
 
-			const cancelChannel = (actor: PixiTileActor, channel: PixiActorAnimationChannel) => {
+			const cancelChannel = (actor: PixiTileActor, channel: AnimationChannel) => {
 				cancel(channelsByActor.get(actor)?.get(channel));
 			};
 
-			const applyWrite = (write: PixiActorPresentationWrite) => {
+			const applyWrite = (write: PresentationWrite) => {
 				if (write.actor.container.destroyed) return;
 				switch (write.channel) {
 					case "activity-particles":
@@ -107,127 +104,123 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 				}
 			};
 
-			const animateFx = Effect.fn("PixiActorAnimator.animateFx")(
-				(animation: PixiActorAnimation) =>
-					Effect.sync(() => {
-						if (closed) return;
-						const { actor, channel } = animation;
-						if (actor.container.destroyed) return;
-						const ownerKey =
-							animation.ownerKey ?? `${actor.instanceId ?? actor.item.id}:${channel}`;
-						cancelChannel(actor, channel);
-						cancel(animationsByOwner.get(ownerKey));
-						// Cancellation callbacks are allowed to retire the actor synchronously. Pixi
-						// destroys its transform internals at that point, so even reading the old pose
-						// would be a use-after-destroy.
-						if (closed || actor.container.destroyed) return;
+			const animateFx = Effect.fn("ActorAnimator.animateFx")((animation: ActorAnimation) =>
+				Effect.sync(() => {
+					if (closed) return;
+					const { actor, channel } = animation;
+					if (actor.container.destroyed) return;
+					const ownerKey =
+						animation.ownerKey ?? `${actor.instanceId ?? actor.item.id}:${channel}`;
+					cancelChannel(actor, channel);
+					cancel(animationsByOwner.get(ownerKey));
+					// Cancellation callbacks are allowed to retire the actor synchronously. Pixi
+					// destroys its transform internals at that point, so even reading the old pose
+					// would be a use-after-destroy.
+					if (closed || actor.container.destroyed) return;
 
-						const fromX = actor.container.x;
-						const fromY = actor.container.y;
-						const fromScale = actor.container.scale.x;
-						const fromAlpha = actor.container.alpha;
-						const fromLifecycleScale = actor.lifecycleLayer.scale.x;
-						const fromCrowdAlpha = actor.crowdLayer.alpha;
-						const fromIncomingAlpha =
-							animation.channel === "visual-mix" ? animation.incoming.alpha : 0;
-						const fromOutgoingAlpha =
-							animation.channel === "visual-mix" ? animation.outgoing.alpha : 0;
-						const active: ActiveAnimation = {
-							actor,
-							channel,
-							onCancel: animation.onCancel,
-							ownerKey,
-							control: null,
-						};
-						activeAnimations.add(active);
-						animationsByOwner.set(ownerKey, active);
-						readActorChannels(actor).set(channel, active);
+					const fromX = actor.container.x;
+					const fromY = actor.container.y;
+					const fromScale = actor.container.scale.x;
+					const fromAlpha = actor.container.alpha;
+					const fromLifecycleScale = actor.lifecycleLayer.scale.x;
+					const fromCrowdAlpha = actor.crowdLayer.alpha;
+					const fromIncomingAlpha =
+						animation.channel === "visual-mix" ? animation.incoming.alpha : 0;
+					const fromOutgoingAlpha =
+						animation.channel === "visual-mix" ? animation.outgoing.alpha : 0;
+					const active: ActiveAnimation = {
+						actor,
+						channel,
+						onCancel: animation.onCancel,
+						ownerKey,
+						control: null,
+					};
+					activeAnimations.add(active);
+					animationsByOwner.set(ownerKey, active);
+					readActorChannels(actor).set(channel, active);
 
-						try {
-							active.control = RendererRuntime.runSync(
-								animationDriver.startTweenFx({
-									curve: animation.curve,
-									delayMs: animation.delayMs,
-									durationMs: animation.durationMs,
-									from: 0,
-									onUpdate: (progress) => {
-										if (closed || actor.container.destroyed) return;
-										switch (animation.channel) {
-											case "activity-particles":
-												animation.render(progress);
-												break;
-											case "pose": {
-												const pose = animation.readPose?.(progress);
-												actor.container.x =
-													pose?.x ??
-													fromX +
-														((animation.toX ?? fromX) - fromX) *
-															progress;
-												actor.container.y =
-													pose?.y ??
-													fromY +
-														((animation.toY ?? fromY) - fromY) *
-															progress;
-												const scale =
-													pose?.scale ??
-													fromScale +
-														((animation.toScale ?? fromScale) -
-															fromScale) *
-															progress;
-												actor.container.scale.set(scale);
-												break;
-											}
-											case "lifecycle-opacity":
-												actor.container.alpha =
-													fromAlpha +
-													(animation.toAlpha - fromAlpha) * progress;
-												break;
-											case "lifecycle-scale":
-												actor.lifecycleLayer.scale.set(
-													fromLifecycleScale +
-														(animation.toScale - fromLifecycleScale) *
-															progress,
-												);
-												break;
-											case "crowd-opacity":
-												actor.crowdLayer.alpha =
-													fromCrowdAlpha +
-													(animation.toCrowdAlpha - fromCrowdAlpha) *
+					try {
+						active.control = RendererRuntime.runSync(
+							animationDriver.startTweenFx({
+								curve: animation.curve,
+								delayMs: animation.delayMs,
+								durationMs: animation.durationMs,
+								from: 0,
+								onUpdate: (progress) => {
+									if (closed || actor.container.destroyed) return;
+									switch (animation.channel) {
+										case "activity-particles":
+											animation.render(progress);
+											break;
+										case "pose": {
+											const pose = animation.readPose?.(progress);
+											actor.container.x =
+												pose?.x ??
+												fromX +
+													((animation.toX ?? fromX) - fromX) * progress;
+											actor.container.y =
+												pose?.y ??
+												fromY +
+													((animation.toY ?? fromY) - fromY) * progress;
+											const scale =
+												pose?.scale ??
+												fromScale +
+													((animation.toScale ?? fromScale) - fromScale) *
 														progress;
-												break;
-											case "visual-mix":
-												animation.incoming.alpha =
-													fromIncomingAlpha +
-													(1 - fromIncomingAlpha) * progress;
-												animation.outgoing.alpha =
-													fromOutgoingAlpha * (1 - progress);
-												break;
+											actor.container.scale.set(scale);
+											break;
 										}
-									},
-									onComplete: () => {
-										if (
-											channelsByActor.get(actor)?.get(channel) !== active ||
-											animationsByOwner.get(ownerKey) !== active
-										) {
-											return;
-										}
-										release(active);
-										animation.onComplete?.();
-									},
-									repeat: animation.repeat,
-									to: 1,
-								}),
-							);
-						} catch (cause) {
-							release(active);
-							throw cause;
-						}
-					}),
+										case "lifecycle-opacity":
+											actor.container.alpha =
+												fromAlpha +
+												(animation.toAlpha - fromAlpha) * progress;
+											break;
+										case "lifecycle-scale":
+											actor.lifecycleLayer.scale.set(
+												fromLifecycleScale +
+													(animation.toScale - fromLifecycleScale) *
+														progress,
+											);
+											break;
+										case "crowd-opacity":
+											actor.crowdLayer.alpha =
+												fromCrowdAlpha +
+												(animation.toCrowdAlpha - fromCrowdAlpha) *
+													progress;
+											break;
+										case "visual-mix":
+											animation.incoming.alpha =
+												fromIncomingAlpha +
+												(1 - fromIncomingAlpha) * progress;
+											animation.outgoing.alpha =
+												fromOutgoingAlpha * (1 - progress);
+											break;
+									}
+								},
+								onComplete: () => {
+									if (
+										channelsByActor.get(actor)?.get(channel) !== active ||
+										animationsByOwner.get(ownerKey) !== active
+									) {
+										return;
+									}
+									release(active);
+									animation.onComplete?.();
+								},
+								repeat: animation.repeat,
+								to: 1,
+							}),
+						);
+					} catch (cause) {
+						release(active);
+						throw cause;
+					}
+				}),
 			);
 
 			return {
 				animateFx,
-				cancelActorFx: Effect.fn("PixiActorAnimator.cancelActorFx")((actor) =>
+				cancelActorFx: Effect.fn("ActorAnimator.cancelActorFx")((actor) =>
 					Effect.sync(() => {
 						for (const animation of [
 							...(channelsByActor.get(actor)?.values() ?? []),
@@ -236,17 +229,16 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 						}
 					}),
 				),
-				cancelChannelFx: Effect.fn("PixiActorAnimator.cancelChannelFx")((actor, channel) =>
+				cancelChannelFx: Effect.fn("ActorAnimator.cancelChannelFx")((actor, channel) =>
 					Effect.sync(() => cancelChannel(actor, channel)),
 				),
-				cancelFx: Effect.fn("PixiActorAnimator.cancelFx")((ownerKey) =>
+				cancelFx: Effect.fn("ActorAnimator.cancelFx")((ownerKey) =>
 					Effect.sync(() => cancel(animationsByOwner.get(ownerKey))),
 				),
-				isChannelActiveFx: Effect.fn("PixiActorAnimator.isChannelActiveFx")(
-					(actor, channel) =>
-						Effect.sync(() => channelsByActor.get(actor)?.has(channel) === true),
+				isChannelActiveFx: Effect.fn("ActorAnimator.isChannelActiveFx")((actor, channel) =>
+					Effect.sync(() => channelsByActor.get(actor)?.has(channel) === true),
 				),
-				setFx: Effect.fn("PixiActorAnimator.setFx")((write) =>
+				setFx: Effect.fn("ActorAnimator.setFx")((write) =>
 					Effect.gen(function* () {
 						cancelChannel(write.actor, write.channel);
 						applyWrite(write);

@@ -4,12 +4,12 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
-import type { PixiMainSceneDropPresentation } from "~/ui/pixi/drop/PixiMainSceneDropPresentation";
+import type { DropPresentation } from "~/ui/pixi/drop/DropPresentation";
 
 export namespace beginDropFx {
 	export interface Props {
 		readonly commandTarget: runTileDropAtom.Command["target"];
-		readonly dropPresentation: PixiMainSceneDropPresentation;
+		readonly dropPresentation: DropPresentation;
 		readonly previewKind: readTileDropPreviewFx.Result["kind"] | null;
 		readonly sourceItem: TileActorItem;
 		readonly targetItem: TileActorItem | null;

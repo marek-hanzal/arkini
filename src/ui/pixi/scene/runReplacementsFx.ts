@@ -1,27 +1,27 @@
 import { Effect } from "effect";
 
 import type { TileReplacement } from "~/bridge/tile/motion/readCommittedTileReplacementsFx";
-import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
+import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import {
-	pixiTileActorVisualCrossfadeDurationMs,
+	visualCrossfadeDurationMs,
 	transitionActorVisualFx,
 } from "~/ui/pixi/actor/transitionActorVisualFx";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
-import type { PixiTextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
-import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
+import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
+import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 
 export namespace runReplacementsFx {
 	export interface Props {
-		readonly actorStore: PixiMainSceneActorStore;
-		readonly animator: PixiActorAnimator;
+		readonly actorStore: MainActorStore;
+		readonly animator: ActorAnimator;
 		readonly application: PixiApplicationOwner;
 		readonly processedKeys: Set<string>;
 		readonly readPalette: () => PixiScenePalette;
 		readonly replacements: ReadonlyArray<TileReplacement>;
-		readonly surface: PixiMainSceneSurface;
-		readonly textures: PixiTextureStore;
+		readonly surface: MainSurface;
+		readonly textures: TextureStore;
 	}
 }
 
@@ -33,7 +33,7 @@ const retainNewestKeys = (keys: Set<string>, maximumSize = 256) => {
 	}
 };
 
-export const replacementCrossfadeDurationMs = pixiTileActorVisualCrossfadeDurationMs;
+export const replacementCrossfadeDurationMs = visualCrossfadeDurationMs;
 
 /**
  * Blends complete visual slots inside one canonical actor.

@@ -8,24 +8,21 @@ import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEn
 import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
 import { readScenePaletteFx } from "~/ui/pixi/appearance/readScenePaletteFx";
-import type { PixiGridDropFeedback } from "~/ui/pixi/grid/PixiGridDropFeedback";
+import type { DropFeedback } from "~/ui/pixi/grid/DropFeedback";
 import { drawMaskFx } from "~/ui/pixi/grid/drawMaskFx";
 import { drawSurfaceFx } from "~/ui/pixi/grid/drawSurfaceFx";
 import { readSlotFx } from "~/ui/pixi/grid/readSlotFx";
-import type { PixiInventorySceneLayout } from "~/ui/pixi/layout/PixiSceneLayout";
+import type { InventoryLayout } from "~/ui/pixi/layout/SceneLayout";
 import { readInventoryLayoutFx } from "~/ui/pixi/layout/readInventoryLayoutFx";
 import { readMainLayoutFx } from "~/ui/pixi/layout/readMainLayoutFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
-import type { PixiInventoryDropTarget } from "~/ui/pixi/scene/PixiInventoryDropTarget";
-import type {
-	PixiInventoryActorPose,
-	PixiInventorySceneSurface,
-} from "~/ui/pixi/scene/PixiInventorySceneSurface";
+import type { InventoryDropTarget } from "~/ui/pixi/scene/InventoryDropTarget";
+import type { InventoryActorPose, InventorySurface } from "~/ui/pixi/scene/InventorySurface";
 
 export namespace createInventorySurfaceFx {
 	export interface Props {
 		readonly application: PixiApplicationOwner;
-		readonly dropFeedback: PixiGridDropFeedback;
+		readonly dropFeedback: DropFeedback;
 		readonly game: GameEngine;
 		readonly host: HTMLElement;
 	}
@@ -80,40 +77,30 @@ export const createInventorySurfaceFx = Effect.fn("createInventorySurfaceFx")(fu
 		);
 	};
 
-	let layout: PixiInventorySceneLayout = createLayout();
+	let layout: InventoryLayout = createLayout();
 
-	const readActorPoseFx = Effect.fn("PixiInventorySceneSurface.readActorPoseFx")(
-		(item: TileActorItem) =>
-			Effect.sync((): PixiInventoryActorPose | null => {
-				if (item.location.scope !== LocationScopeEnumSchema.enum.Inventory) return null;
-				const inset = (layout.surface.cellSize - layout.actorSize) / 2;
-				return {
-					x:
-						layout.surface.x +
-						item.location.position.x * layout.surface.cellSize +
-						inset,
-					y:
-						layout.surface.y +
-						item.location.position.y * layout.surface.cellSize +
-						inset,
-				};
-			}),
+	const readActorPoseFx = Effect.fn("InventorySurface.readActorPoseFx")((item: TileActorItem) =>
+		Effect.sync((): InventoryActorPose | null => {
+			if (item.location.scope !== LocationScopeEnumSchema.enum.Inventory) return null;
+			const inset = (layout.surface.cellSize - layout.actorSize) / 2;
+			return {
+				x: layout.surface.x + item.location.position.x * layout.surface.cellSize + inset,
+				y: layout.surface.y + item.location.position.y * layout.surface.cellSize + inset,
+			};
+		}),
 	);
 
-	const readDropTargetFx = Effect.fn("PixiInventorySceneSurface.readDropTargetFx")(
+	const readDropTargetFx = Effect.fn("InventorySurface.readDropTargetFx")(
 		(x: number, y: number) =>
 			readSlotFx({
 				surface: layout.surface,
 				x,
 				y,
-			}) satisfies Effect.Effect<PixiInventoryDropTarget | null>,
+			}) satisfies Effect.Effect<InventoryDropTarget | null>,
 	);
 
-	const renderDropFeedbackFx = Effect.fn("PixiInventorySceneSurface.renderDropFeedbackFx")(
-		(
-			target: PixiInventoryDropTarget | null,
-			kind: readTileDropPreviewFx.Result["kind"] | null,
-		) =>
+	const renderDropFeedbackFx = Effect.fn("InventorySurface.renderDropFeedbackFx")(
+		(target: InventoryDropTarget | null, kind: readTileDropPreviewFx.Result["kind"] | null) =>
 			Effect.gen(function* () {
 				const accepted =
 					kind !== null &&
@@ -179,5 +166,5 @@ export const createInventorySurfaceFx = Effect.fn("createInventorySurfaceFx")(fu
 			yield* redrawFx;
 		}),
 		renderDropFeedbackFx,
-	} satisfies PixiInventorySceneSurface;
+	} satisfies InventorySurface;
 });

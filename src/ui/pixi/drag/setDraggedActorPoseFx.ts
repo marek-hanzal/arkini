@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 
 /** Writes one pointer-owned actor pose through the canonical animator channel. */
 export const setDraggedActorPoseFx = Effect.fn("setDraggedActorPoseFx")(
@@ -12,7 +12,7 @@ export const setDraggedActorPoseFx = Effect.fn("setDraggedActorPoseFx")(
 		y,
 	}: {
 		readonly actor: PixiTileActor;
-		readonly animator: PixiActorAnimator;
+		readonly animator: ActorAnimator;
 		readonly x: number;
 		readonly y: number;
 	}) =>

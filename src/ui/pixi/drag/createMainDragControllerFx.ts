@@ -5,14 +5,14 @@ import type { GameEngine } from "~/bridge/game/GameEngine";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { PointerDragThreshold } from "~/ui/drag/PointerDragThreshold";
-import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
+import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readActorCursorFx } from "~/ui/pixi/actor/readActorCursorFx";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import { burstAckParticlesFx } from "~/ui/pixi/animation/burstAckParticlesFx";
-import type { PixiMainSceneActiveDrag } from "~/ui/pixi/drag/PixiMainSceneDragState";
-import type { PixiCursorGrabMotion } from "~/ui/pixi/drag/PixiCursorGrabMotion";
-import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
+import type { ActiveDrag } from "~/ui/pixi/drag/ActiveDrag";
+import type { CursorGrabMotion } from "~/ui/pixi/drag/CursorGrabMotion";
+import type { MainDragController } from "~/ui/pixi/drag/MainDragController";
 import { createDragPreviewFx } from "~/ui/pixi/drag/createDragPreviewFx";
 import { createPointerSamplerFx } from "~/ui/pixi/drag/createPointerSamplerFx";
 import { makePointerOffsetReaderFx } from "~/ui/pixi/drag/makePointerOffsetReaderFx";
@@ -21,30 +21,30 @@ import { removeCheatItemFx } from "~/ui/pixi/drag/removeCheatItemFx";
 import { setDraggedActorPoseFx } from "~/ui/pixi/drag/setDraggedActorPoseFx";
 import { settleDraggedActorFx } from "~/ui/pixi/drag/settleDraggedActorFx";
 import { updateMagneticFieldFx } from "~/ui/pixi/drag/updateMagneticFieldFx";
-import type { PixiMainSceneDropSubmission } from "~/ui/pixi/drop/PixiMainSceneDropSubmission";
-import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
-import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRuntime";
+import type { DropSubmission } from "~/ui/pixi/drop/DropSubmission";
+import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
+import type { MotionRuntime } from "~/ui/pixi/motion/MotionRuntime";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
-import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
-import type { PixiMainSceneActivationIntent } from "~/ui/pixi/scene/PixiMainSceneActivationIntent";
+import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
+import type { MainActivationIntent } from "~/ui/pixi/scene/MainActivationIntent";
 
 export namespace createMainDragControllerFx {
 	export interface Props {
-		readonly actorStore: PixiMainSceneActorStore;
-		readonly animator: PixiActorAnimator;
+		readonly actorStore: MainActorStore;
+		readonly animator: ActorAnimator;
 		readonly application: PixiApplicationOwner;
-		readonly cursorGrab: PixiCursorGrabMotion;
-		readonly dropSubmission: PixiMainSceneDropSubmission;
+		readonly cursorGrab: CursorGrabMotion;
+		readonly dropSubmission: DropSubmission;
 		readonly game: GameEngine;
-		readonly magneticField: PixiTileMagneticField;
-		readonly motion: PixiTileMotionRuntime;
+		readonly magneticField: MagneticField;
+		readonly motion: MotionRuntime;
 		readonly onActivate: (
 			item: TileActorItem,
-			intent: PixiMainSceneActivationIntent,
+			intent: MainActivationIntent,
 			origin: HTMLElement,
 		) => void | PromiseLike<void>;
 		readonly readAckTint: () => number;
-		readonly surface: PixiMainSceneSurface;
+		readonly surface: MainSurface;
 	}
 }
 
@@ -71,7 +71,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	readAckTint,
 	surface,
 }: createMainDragControllerFx.Props) {
-	let activeDrag: PixiMainSceneActiveDrag | null = null;
+	let activeDrag: ActiveDrag | null = null;
 	let closed = false;
 	let interactionBlocked = false;
 	let thresholdCrossed = false;
@@ -105,7 +105,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		}
 	};
 
-	const cancelDrag = (drag: PixiMainSceneActiveDrag) => {
+	const cancelDrag = (drag: ActiveDrag) => {
 		RendererRuntime.runSync(pointerSampler.cancelFx);
 		activeDrag = null;
 		releaseDragPointer(drag.pointerId);
@@ -318,7 +318,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			Math.hypot(sample.x - drag.pressX, sample.y - drag.pressY) >= PointerDragThreshold;
 	};
 
-	const recoverPointerFailure = (cause: unknown, fallbackDrag?: PixiMainSceneActiveDrag) => {
+	const recoverPointerFailure = (cause: unknown, fallbackDrag?: ActiveDrag) => {
 		const drag = activeDrag ?? fallbackDrag ?? null;
 		if (drag !== null) {
 			try {
@@ -544,7 +544,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	});
 
 	return {
-		attachActorFx: Effect.fn("PixiMainSceneDragController.attachActorFx")((actor) =>
+		attachActorFx: Effect.fn("MainDragController.attachActorFx")((actor) =>
 			Effect.gen(function* () {
 				if (actor.onPointerDown !== null) {
 					actor.container.off("pointerdown", actor.onPointerDown);
@@ -619,7 +619,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			}),
 		),
 		cancelInteractionFx: Effect.sync(() => cancelInteraction()),
-		detachActorFx: Effect.fn("PixiMainSceneDragController.detachActorFx")((actor) =>
+		detachActorFx: Effect.fn("MainDragController.detachActorFx")((actor) =>
 			Effect.sync(() => detachActor(actor)),
 		),
 		requestRefreshFx: Effect.gen(function* () {
@@ -631,7 +631,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				y: drag.lastPointerY,
 			});
 		}),
-		setInteractionBlockedFx: Effect.fn("PixiMainSceneDragController.setInteractionBlockedFx")(
+		setInteractionBlockedFx: Effect.fn("MainDragController.setInteractionBlockedFx")(
 			(blocked) =>
 				Effect.sync(() => {
 					interactionBlocked = blocked;
@@ -658,5 +658,5 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				detachActor(actor);
 			}
 		}),
-	} satisfies PixiMainSceneDragController;
+	} satisfies MainDragController;
 });

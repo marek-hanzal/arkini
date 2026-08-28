@@ -2,17 +2,17 @@ import { Effect } from "effect";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
-import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
+import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
+import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
 
 export namespace readMotionOriginFx {
 	export interface Props {
 		readonly originActor: PixiTileActor | null;
 		readonly originLocation: TileActorItem["location"];
-		readonly surface: PixiMainSceneSurface;
+		readonly surface: MainSurface;
 	}
 
-	export type Result = PixiTileActorPose | null;
+	export type Result = ActorPose | null;
 }
 
 /** Resolves one cue origin from its live actor or the scene's semantic location. */

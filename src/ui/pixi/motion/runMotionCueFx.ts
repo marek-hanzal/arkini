@@ -3,31 +3,31 @@ import { match, P } from "ts-pattern";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
-import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
+import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import { startActorEnterFx } from "~/ui/pixi/animation/startActorEnterFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
-import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
+import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
 import { readMotionOriginFx } from "~/ui/pixi/motion/readMotionOriginFx";
 import { runInputMotionFx } from "~/ui/pixi/motion/runInputMotionFx";
 import { runSpawnMotionFx } from "~/ui/pixi/motion/runSpawnMotionFx";
 import { runStackMotionFx } from "~/ui/pixi/motion/runStackMotionFx";
 import { runSwapMotionFx } from "~/ui/pixi/motion/runSwapMotionFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
-import type { PixiTextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
-import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
+import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
+import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 import { readTileMotionStaggerDelaySecondsFx } from "~/ui/tile/motion/readTileMotionStaggerDelaySecondsFx";
-import type { PixiTileMotionTargetRoute } from "~/ui/pixi/motion/PixiTileMotionTargetRoute";
+import type { TargetRoute } from "~/ui/pixi/motion/MotionTarget";
 
 export namespace runMotionCueFx {
 	export interface Props {
-		readonly actorStore: PixiMainSceneActorStore;
-		readonly animator: PixiActorAnimator;
+		readonly actorStore: MainActorStore;
+		readonly animator: ActorAnimator;
 		readonly application: PixiApplicationOwner;
 		readonly cue: TileMotionCue;
 		readonly cueKey: string;
-		readonly magneticField: PixiTileMagneticField;
+		readonly magneticField: MagneticField;
 		readonly onComplete: () => void;
 		readonly onSwapLegSettled: (actorId: string) => void;
 		readonly onSwapLegStarted: (actorId: string) => void;
@@ -37,10 +37,10 @@ export namespace runMotionCueFx {
 		readonly readSourceSurvives: () => boolean;
 		readonly readTargetRoute: (
 			actorId: string,
-			location: PixiTileMotionTargetRoute["location"],
-		) => PixiTileMotionTargetRoute;
-		readonly surface: PixiMainSceneSurface;
-		readonly textures: PixiTextureStore;
+			location: TargetRoute["location"],
+		) => TargetRoute;
+		readonly surface: MainSurface;
+		readonly textures: TextureStore;
 	}
 }
 

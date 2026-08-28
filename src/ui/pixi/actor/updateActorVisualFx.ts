@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import type { PixiTileActorVisual } from "~/ui/pixi/actor/PixiTileActorVisual";
+import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import { fitSingleLineTextFx } from "~/ui/pixi/text/fitSingleLineTextFx";
 import { formatTileBadgeLabelFx } from "~/ui/tile/formatTileBadgeLabelFx";
@@ -12,7 +12,7 @@ export namespace updateActorVisualFx {
 		readonly item: TileActorItem;
 		readonly palette: PixiScenePalette;
 		readonly size: number;
-		readonly visual: PixiTileActorVisual;
+		readonly visual: ActorVisual;
 	}
 }
 

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import { burstFeedbackParticlesFx } from "~/ui/pixi/animation/burstFeedbackParticlesFx";
 
 /** Bursts contact acknowledgement only while the canonical target actor still exists. */
@@ -10,8 +10,8 @@ export const flashMotionTargetFx = Effect.fn("flashMotionTargetFx")(function* ({
 	animator,
 	targetActorId,
 }: {
-	readonly actorStore: Pick<PixiMainSceneActorStore, "actors">;
-	readonly animator: PixiActorAnimator;
+	readonly actorStore: Pick<MainActorStore, "actors">;
+	readonly animator: ActorAnimator;
 	readonly targetActorId: string;
 }) {
 	const target = actorStore.actors.get(targetActorId);

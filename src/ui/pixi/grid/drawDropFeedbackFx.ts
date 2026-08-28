@@ -2,11 +2,11 @@ import { Effect } from "effect";
 import type { Graphics } from "pixi.js";
 
 import { readSurfaceRadiusFx } from "~/ui/pixi/grid/readSurfaceRadiusFx";
-import type { PixiGridSurfaceLayout } from "~/ui/pixi/layout/PixiSceneLayout";
+import type { SurfaceLayout } from "~/ui/pixi/layout/SceneLayout";
 
 const drawRoundedOuterSlotPath = (
 	graphics: Graphics,
-	surface: PixiGridSurfaceLayout,
+	surface: SurfaceLayout,
 	slot: NonNullable<drawDropFeedbackFx.Props["slot"]>,
 	radius: number,
 ) => {
@@ -53,7 +53,7 @@ export namespace drawDropFeedbackFx {
 			readonly x: number;
 			readonly y: number;
 		} | null;
-		readonly surface: PixiGridSurfaceLayout | null;
+		readonly surface: SurfaceLayout | null;
 	}
 }
 

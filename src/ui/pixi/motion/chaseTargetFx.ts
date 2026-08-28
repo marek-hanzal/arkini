@@ -3,31 +3,28 @@ import { Effect } from "effect";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type {
-	PixiActorAnimator,
-	PixiActorPresentedPose,
-} from "~/ui/pixi/animation/PixiActorAnimator";
-import type { PixiAnimationCurve } from "~/ui/pixi/animation/PixiAnimationDriver";
+import type { ActorAnimator, PresentedPose } from "~/ui/pixi/animation/ActorAnimator";
+import type { AnimationCurve } from "~/ui/pixi/animation/AnimationDriver";
 import { readTravelDurationMsFx } from "~/ui/pixi/animation/readTravelDurationMsFx";
 import { createMotionPoseSamplerFx } from "~/ui/pixi/motion/createMotionPoseSamplerFx";
-import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
-import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
+import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
+import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
 
 export namespace chaseTargetFx {
 	export interface Props {
 		readonly actor: PixiTileActor;
-		readonly animator: PixiActorAnimator;
-		readonly curve?: PixiAnimationCurve;
+		readonly animator: ActorAnimator;
+		readonly curve?: AnimationCurve;
 		readonly delayMs?: number;
 		readonly durationMs?: number;
-		readonly fallbackTarget: PixiTileActorPose;
-		readonly onPose?: (pose: PixiActorPresentedPose) => void;
+		readonly fallbackTarget: ActorPose;
+		readonly onPose?: (pose: PresentedPose) => void;
 		readonly onSettled: () => void;
 		readonly ownerKey: string;
-		readonly readLiveTarget?: () => Required<PixiActorPresentedPose> | null;
+		readonly readLiveTarget?: () => Required<PresentedPose> | null;
 		readonly settleWithinTileRatio?: number;
 		readonly shouldSettle?: () => boolean;
-		readonly surface: PixiMainSceneSurface;
+		readonly surface: MainSurface;
 		readonly targetLocation: TileActorItem["location"];
 	}
 }
@@ -64,7 +61,7 @@ export const chaseTargetFx = Effect.fn("chaseTargetFx")(function* ({
 		settled = true;
 		onSettled();
 	};
-	const isInsideSettlementField = (pose: PixiActorPresentedPose) => {
+	const isInsideSettlementField = (pose: PresentedPose) => {
 		const liveTarget = readLiveTarget?.();
 		return (
 			settleWithinTileRatio !== undefined &&

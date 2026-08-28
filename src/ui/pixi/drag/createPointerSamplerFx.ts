@@ -41,22 +41,21 @@ export const createPointerSamplerFx = Effect.fn("createPointerSamplerFx")(functi
 
 	return {
 		cancelFx: Effect.sync(cancel),
-		flushFx: Effect.fn("PixiMainScenePointerSampler.flushFx")(
-			(sample?: createPointerSamplerFx.Sample) =>
-				Effect.sync(() => {
-					const latest = sample ?? pendingSample;
-					cancel();
-					if (latest !== null) onApply(latest);
-				}),
+		flushFx: Effect.fn("PointerSampler.flushFx")((sample?: createPointerSamplerFx.Sample) =>
+			Effect.sync(() => {
+				const latest = sample ?? pendingSample;
+				cancel();
+				if (latest !== null) onApply(latest);
+			}),
 		),
-		scheduleFallbackFx: Effect.fn("PixiMainScenePointerSampler.scheduleFallbackFx")(
+		scheduleFallbackFx: Effect.fn("PointerSampler.scheduleFallbackFx")(
 			(sample: createPointerSamplerFx.Sample) =>
 				Effect.gen(function* () {
 					pendingSample ??= sample;
 					yield* requestFrameFx;
 				}),
 		),
-		scheduleFx: Effect.fn("PixiMainScenePointerSampler.scheduleFx")(
+		scheduleFx: Effect.fn("PointerSampler.scheduleFx")(
 			(sample: createPointerSamplerFx.Sample) =>
 				Effect.gen(function* () {
 					pendingSample = sample;

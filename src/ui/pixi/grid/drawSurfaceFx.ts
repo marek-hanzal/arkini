@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import type { Graphics } from "pixi.js";
 
 import { readSurfaceRadiusFx } from "~/ui/pixi/grid/readSurfaceRadiusFx";
-import type { PixiGridSurfaceLayout } from "~/ui/pixi/layout/PixiSceneLayout";
+import type { SurfaceLayout } from "~/ui/pixi/layout/SceneLayout";
 
 export namespace drawSurfaceFx {
 	export interface Props {
@@ -12,7 +12,7 @@ export namespace drawSurfaceFx {
 			number,
 			number,
 		];
-		readonly surface: PixiGridSurfaceLayout | null;
+		readonly surface: SurfaceLayout | null;
 		readonly surfaceColor: number;
 	}
 }

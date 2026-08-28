@@ -2,18 +2,18 @@ import { Effect } from "effect";
 import { Texture } from "pixi.js";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { PixiTileActorVisual } from "~/ui/pixi/actor/PixiTileActorVisual";
+import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";
 import { beginVisualTextureLoadFx } from "~/ui/pixi/actor/beginVisualTextureLoadFx";
 import { completeVisualTextureLoadFx } from "~/ui/pixi/actor/completeVisualTextureLoadFx";
 import { failVisualTextureLoadFx } from "~/ui/pixi/actor/failVisualTextureLoadFx";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
-import type { PixiTextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
+import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
 
 export namespace loadVisualTexturesFx {
 	export interface Props {
 		readonly frames: DemandFrameLoop;
-		readonly textures: PixiTextureStore;
-		readonly visual: PixiTileActorVisual;
+		readonly textures: TextureStore;
+		readonly visual: ActorVisual;
 	}
 }
 

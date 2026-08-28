@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 
-import type { PixiGridSurfaceLayout } from "~/ui/pixi/layout/PixiSceneLayout";
+import type { SurfaceLayout } from "~/ui/pixi/layout/SceneLayout";
 
 export namespace readSlotFx {
 	export interface Props {
-		readonly surface: PixiGridSurfaceLayout | null;
+		readonly surface: SurfaceLayout | null;
 		readonly x: number;
 		readonly y: number;
 	}

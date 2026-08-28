@@ -19,7 +19,7 @@ const emptyReconciliationFacts = {
 	visibleActors: new Map(),
 };
 
-describe("Pixi main-scene delivery retention", () => {
+describe("main delivery retention", () => {
 	it("updates canonical visuals without stealing or prematurely releasing delivery pose", () => {
 		const current = createDeliveryActorItem("runtime:delivery");
 		const displayItem = createDeliveryActorItem(current.id, {

@@ -5,33 +5,33 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import { readParticleLightSurfaceFx } from "~/ui/pixi/appearance/readParticleLightSurfaceFx";
-import type { PixiTileActorParticleTextures } from "~/ui/pixi/actor/PixiTileActorParticleTextures";
+import type { ParticleTextures } from "~/ui/pixi/actor/ParticleTextures";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { createActivityParticlesFx } from "~/ui/pixi/actor/createActivityParticlesFx";
 import { createActorVisualFx } from "~/ui/pixi/actor/createActorVisualFx";
 import { readActorCursorFx } from "~/ui/pixi/actor/readActorCursorFx";
 import { readCrowdAlphaFx } from "~/ui/pixi/actor/readCrowdAlphaFx";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
-import type { PixiTextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
+import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
 
 export namespace createTileActorFx {
 	export interface Props {
 		readonly frames: DemandFrameLoop;
 		readonly item: TileActorItem;
 		readonly palette: PixiScenePalette;
-		readonly particleTextures?: Pick<PixiTileActorParticleTextures, "star">;
-		readonly textures: PixiTextureStore;
+		readonly particleTextures?: Pick<ParticleTextures, "star">;
+		readonly textures: TextureStore;
 	}
 }
 
-let nextPixiTileActorInstance = 0;
+let nextActorInstance = 0;
 
 /** Creates one retained native Pixi actor; async textures are generation guarded. */
 export const createTileActorFx = Effect.fn("createTileActorFx")(
 	({ frames, item, palette, particleTextures, textures }: createTileActorFx.Props) =>
 		Effect.gen(function* (): Effect.fn.Return<PixiTileActor> {
-			nextPixiTileActorInstance += 1;
-			const instanceId = `pixi-tile:${nextPixiTileActorInstance}`;
+			nextActorInstance += 1;
+			const instanceId = `pixi-tile:${nextActorInstance}`;
 			const container = new Container({
 				eventMode: "static",
 				label: `TileActor:${item.id}:${instanceId}`,

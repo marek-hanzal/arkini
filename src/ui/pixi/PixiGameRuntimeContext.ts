@@ -1,13 +1,11 @@
 import { createContext } from "react";
 
-import type { PixiGameInteractionControl } from "~/ui/pixi/runtime/createGameInteractionControlFx";
-import type { PixiTextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
+import type { GameInteractionControl } from "~/ui/pixi/runtime/createGameInteractionControlFx";
+import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
 
-export interface PixiGameRuntimeCapabilities {
-	readonly interaction: PixiGameInteractionControl;
-	readonly textures: PixiTextureStore;
+export interface GameRuntimeCapabilities {
+	readonly interaction: GameInteractionControl;
+	readonly textures: TextureStore;
 }
 
-export const PixiGameRuntimeContext = createContext<PixiGameRuntimeCapabilities | undefined>(
-	undefined,
-);
+export const PixiGameRuntimeContext = createContext<GameRuntimeCapabilities | undefined>(undefined);

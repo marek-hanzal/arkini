@@ -2,12 +2,12 @@ import { Effect } from "effect";
 import type { Graphics } from "pixi.js";
 
 import { readSurfaceRadiusFx } from "~/ui/pixi/grid/readSurfaceRadiusFx";
-import type { PixiGridSurfaceLayout } from "~/ui/pixi/layout/PixiSceneLayout";
+import type { SurfaceLayout } from "~/ui/pixi/layout/SceneLayout";
 
 export namespace drawMaskFx {
 	export interface Props {
 		readonly graphics: Graphics;
-		readonly surface: PixiGridSurfaceLayout | null;
+		readonly surface: SurfaceLayout | null;
 	}
 }
 

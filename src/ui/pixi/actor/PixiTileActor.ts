@@ -1,8 +1,8 @@
 import type { Container, FederatedPointerEvent, Graphics } from "pixi.js";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import type { PixiTileActorActivityParticles } from "~/ui/pixi/actor/PixiTileActorActivityParticles";
-import type { PixiTileActorVisual } from "~/ui/pixi/actor/PixiTileActorVisual";
+import type { ActivityParticles } from "~/ui/pixi/actor/ActivityParticles";
+import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";
 
 export interface PixiTileActor {
 	readonly instanceId: string;
@@ -11,11 +11,11 @@ export interface PixiTileActor {
 	readonly offsetLayer: Container;
 	readonly crowdLayer: Container;
 	readonly visualLayer: Container;
-	readonly activityParticles: PixiTileActorActivityParticles;
+	readonly activityParticles: ActivityParticles;
 	readonly progressBar: Graphics;
-	readonly visuals: Set<PixiTileActorVisual>;
-	currentVisual: PixiTileActorVisual;
-	pendingVisual: PixiTileActorVisual | null;
+	readonly visuals: Set<ActorVisual>;
+	currentVisual: ActorVisual;
+	pendingVisual: ActorVisual | null;
 	item: TileActorItem;
 	size: number;
 	visualTransitionGeneration: number;

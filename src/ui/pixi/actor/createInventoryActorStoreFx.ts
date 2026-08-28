@@ -6,16 +6,16 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 import { readTileActorsFx } from "~/bridge/tile/readTileActorsFx";
 import type {
-	PixiInventoryActorReconciliation,
-	PixiInventoryActorStore,
-} from "~/ui/pixi/actor/PixiInventoryActorStore";
-import type { PixiTileActorParticleTextures } from "~/ui/pixi/actor/PixiTileActorParticleTextures";
+	InventoryReconciliation,
+	InventoryActorStore,
+} from "~/ui/pixi/actor/InventoryActorStore";
+import type { ParticleTextures } from "~/ui/pixi/actor/ParticleTextures";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { createTileActorFx } from "~/ui/pixi/actor/createTileActorFx";
 import { readCrowdAlphaFx } from "~/ui/pixi/actor/readCrowdAlphaFx";
 import { destroyTileActorFx } from "~/ui/pixi/actor/destroyTileActorFx";
 import { updateTileActorFx } from "~/ui/pixi/actor/updateTileActorFx";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import { animateRetargetablePoseFx } from "~/ui/pixi/animation/animateRetargetablePoseFx";
 import { startActivityParticlesFx } from "~/ui/pixi/animation/startActivityParticlesFx";
 import { stopActivityParticlesFx } from "~/ui/pixi/animation/stopActivityParticlesFx";
@@ -23,18 +23,18 @@ import { restoreActorExitFx } from "~/ui/pixi/animation/restoreActorExitFx";
 import { startActorEnterFx } from "~/ui/pixi/animation/startActorEnterFx";
 import { startActorExitFx } from "~/ui/pixi/animation/startActorExitFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
-import type { PixiTextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
-import type { PixiInventoryDropTarget } from "~/ui/pixi/scene/PixiInventoryDropTarget";
-import type { PixiInventorySceneSurface } from "~/ui/pixi/scene/PixiInventorySceneSurface";
+import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
+import type { InventoryDropTarget } from "~/ui/pixi/scene/InventoryDropTarget";
+import type { InventorySurface } from "~/ui/pixi/scene/InventorySurface";
 
 export namespace createInventoryActorStoreFx {
 	export interface Props {
-		readonly animator: PixiActorAnimator;
+		readonly animator: ActorAnimator;
 		readonly application: PixiApplicationOwner;
 		readonly game: GameEngine;
-		readonly particleTextures: Pick<PixiTileActorParticleTextures, "star">;
-		readonly surface: PixiInventorySceneSurface;
-		readonly textures: PixiTextureStore;
+		readonly particleTextures: Pick<ParticleTextures, "star">;
+		readonly surface: InventorySurface;
+		readonly textures: TextureStore;
 	}
 }
 
@@ -60,7 +60,7 @@ export const createInventoryActorStoreFx = Effect.fn("createInventoryActorStoreF
 		surface,
 		textures,
 	}: createInventoryActorStoreFx.Props) =>
-		Effect.sync((): PixiInventoryActorStore => {
+		Effect.sync((): InventoryActorStore => {
 			const actors = new Map<string, PixiTileActor>();
 			const exitingActors = new Map<string, PixiTileActor>();
 			let closed = false;
@@ -94,7 +94,7 @@ export const createInventoryActorStoreFx = Effect.fn("createInventoryActorStoreF
 					actors.clear();
 					exitingActors.clear();
 				}),
-				destroyRemovedFx: Effect.fn("PixiInventoryActorStore.destroyRemovedFx")((removed) =>
+				destroyRemovedFx: Effect.fn("InventoryActorStore.destroyRemovedFx")((removed) =>
 					Effect.forEach(
 						removed,
 						(actor) =>
@@ -123,11 +123,11 @@ export const createInventoryActorStoreFx = Effect.fn("createInventoryActorStoreF
 						},
 					),
 				),
-				readActorFx: Effect.fn("PixiInventoryActorStore.readActorFx")((itemId) =>
+				readActorFx: Effect.fn("InventoryActorStore.readActorFx")((itemId) =>
 					Effect.sync(() => actors.get(itemId) ?? null),
 				),
-				readOccupantFx: Effect.fn("PixiInventoryActorStore.readOccupantFx")(
-					(target: PixiInventoryDropTarget) =>
+				readOccupantFx: Effect.fn("InventoryActorStore.readOccupantFx")(
+					(target: InventoryDropTarget) =>
 						Effect.sync(() => {
 							for (const actor of actors.values()) {
 								const location = actor.item.location;
@@ -142,8 +142,8 @@ export const createInventoryActorStoreFx = Effect.fn("createInventoryActorStoreF
 							return null;
 						}),
 				),
-				reconcileFx: Effect.fn("PixiInventoryActorStore.reconcileFx")((transition) =>
-					Effect.sync((): PixiInventoryActorReconciliation => {
+				reconcileFx: Effect.fn("InventoryActorStore.reconcileFx")((transition) =>
+					Effect.sync((): InventoryReconciliation => {
 						if (closed) {
 							return {
 								created: [],

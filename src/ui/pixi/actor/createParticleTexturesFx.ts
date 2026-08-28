@@ -1,13 +1,13 @@
 import { Effect } from "effect";
 import { Texture } from "pixi.js";
 
-import type { PixiTileActorParticleTextures } from "~/ui/pixi/actor/PixiTileActorParticleTextures";
+import type { ParticleTextures } from "~/ui/pixi/actor/ParticleTextures";
 
 const textureSize = 32;
 
 /** Creates one private procedural five-point star shared by every retained particle. */
 export const createParticleTexturesFx = Effect.fn("createParticleTexturesFx")(() =>
-	Effect.sync((): PixiTileActorParticleTextures => {
+	Effect.sync((): ParticleTextures => {
 		const canvas = document.createElement("canvas");
 		canvas.width = textureSize;
 		canvas.height = textureSize;

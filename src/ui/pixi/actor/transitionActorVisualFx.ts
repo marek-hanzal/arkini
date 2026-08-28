@@ -5,19 +5,19 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { PixiTileActorVisual } from "~/ui/pixi/actor/PixiTileActorVisual";
+import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";
 import { whenVisualReadyFx } from "~/ui/pixi/actor/whenVisualReadyFx";
 import { createActorVisualFx } from "~/ui/pixi/actor/createActorVisualFx";
 import { destroyActorVisualFx } from "~/ui/pixi/actor/destroyActorVisualFx";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import { resumeActorEnterFx } from "~/ui/pixi/animation/resumeActorEnterFx";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
-import type { PixiTextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
+import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
 
 export namespace transitionActorVisualFx {
 	export interface Props {
 		readonly actor: PixiTileActor;
-		readonly animator: PixiActorAnimator;
+		readonly animator: ActorAnimator;
 		readonly durationMs: number;
 		readonly frames: DemandFrameLoop;
 		readonly item: TileActorItem;
@@ -25,13 +25,13 @@ export namespace transitionActorVisualFx {
 		readonly ownerKey: string;
 		readonly palette: PixiScenePalette;
 		readonly size: number;
-		readonly textures: PixiTextureStore;
+		readonly textures: TextureStore;
 	}
 }
 
-export const pixiTileActorVisualCrossfadeDurationMs = 950;
+export const visualCrossfadeDurationMs = 950;
 
-const readEffectiveAlpha = (visual: PixiTileActorVisual, visualLayer: Container) => {
+const readEffectiveAlpha = (visual: ActorVisual, visualLayer: Container) => {
 	let alpha = visual.container.alpha;
 	let parent = visual.container.parent;
 	while (parent !== null && parent !== visualLayer) {

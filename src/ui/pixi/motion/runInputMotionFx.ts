@@ -2,45 +2,45 @@ import { Effect } from "effect";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileInputMotionCue } from "~/bridge/tile/motion/TileMotionCue";
-import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
+import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { createTileActorFx } from "~/ui/pixi/actor/createTileActorFx";
 import { destroyTileActorFx } from "~/ui/pixi/actor/destroyTileActorFx";
 import { updateTileActorFx } from "~/ui/pixi/actor/updateTileActorFx";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import { burstFeedbackParticlesFx } from "~/ui/pixi/animation/burstFeedbackParticlesFx";
 import { startActorExitFx } from "~/ui/pixi/animation/startActorExitFx";
 import { startRemainderFeedbackFx } from "~/ui/pixi/animation/startRemainderFeedbackFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
-import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
+import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
 import { chaseTargetFx } from "~/ui/pixi/motion/chaseTargetFx";
 import { createMagneticProjectorFx } from "~/ui/pixi/motion/createMagneticProjectorFx";
 import { flashMotionTargetFx } from "~/ui/pixi/motion/flashMotionTargetFx";
 import { projectMotionItemFx } from "~/ui/pixi/motion/projectMotionItemFx";
 import { makeLiveContactPoseReaderFx } from "~/ui/pixi/motion/makeLiveContactPoseReaderFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
-import type { PixiTextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
-import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
-import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
+import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
+import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
+import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
 
 export namespace runInputMotionFx {
 	export interface Props {
-		readonly actorStore: PixiMainSceneActorStore;
-		readonly animator: PixiActorAnimator;
+		readonly actorStore: MainActorStore;
+		readonly animator: ActorAnimator;
 		readonly application: PixiApplicationOwner;
 		readonly cue: TileInputMotionCue;
 		readonly cueKey: string;
 		readonly delayMs: number;
-		readonly magneticField: PixiTileMagneticField;
+		readonly magneticField: MagneticField;
 		readonly onComplete: () => void;
 		readonly onRemainderRevealed: () => void;
 		readonly readSourceSurvives: () => boolean;
 		readonly onPayloadCreated: (actor: PixiTileActor) => void;
-		readonly origin: PixiTileActorPose;
+		readonly origin: ActorPose;
 		readonly readPalette: () => PixiScenePalette;
-		readonly surface: PixiMainSceneSurface;
-		readonly target: PixiTileActorPose;
-		readonly textures: PixiTextureStore;
+		readonly surface: MainSurface;
+		readonly target: ActorPose;
+		readonly textures: TextureStore;
 	}
 }
 
@@ -57,7 +57,7 @@ const destroyInputTransientFx = Effect.fn("destroyInputTransientFx")(function* (
 	animator,
 	transient,
 }: {
-	readonly animator: PixiActorAnimator;
+	readonly animator: ActorAnimator;
 	readonly transient: PixiTileActor;
 }) {
 	yield* animator.cancelActorFx(transient);
@@ -69,7 +69,7 @@ const exitAndDestroyInputTransientFx = Effect.fn("exitAndDestroyInputTransientFx
 	onComplete,
 	transient,
 }: {
-	readonly animator: PixiActorAnimator;
+	readonly animator: ActorAnimator;
 	readonly onComplete: () => void;
 	readonly transient: PixiTileActor;
 }) {
@@ -102,8 +102,8 @@ const finishConsumedStackFx = Effect.fn("finishConsumedStackFx")(function* ({
 	source,
 	transient,
 }: {
-	readonly actorStore: PixiMainSceneActorStore;
-	readonly animator: PixiActorAnimator;
+	readonly actorStore: MainActorStore;
+	readonly animator: ActorAnimator;
 	readonly onComplete: () => void;
 	readonly source: PixiTileActor | null;
 	readonly transient: PixiTileActor;
@@ -140,7 +140,7 @@ const flashInputRemainderFx = Effect.fn("flashInputRemainderFx")(function* ({
 	onRemainderRevealed,
 	transient,
 }: {
-	readonly animator: PixiActorAnimator;
+	readonly animator: ActorAnimator;
 	readonly cueKey: string;
 	readonly onComplete: () => void;
 	readonly onRemainderRevealed: () => void;
@@ -169,15 +169,15 @@ const returnInputRemainderFx = Effect.fn("returnInputRemainderFx")(function* ({
 	surface,
 	transient,
 }: {
-	readonly actorStore: PixiMainSceneActorStore;
-	readonly animator: PixiActorAnimator;
+	readonly actorStore: MainActorStore;
+	readonly animator: ActorAnimator;
 	readonly cue: TileInputMotionCue;
 	readonly cueKey: string;
-	readonly magneticField: PixiTileMagneticField;
+	readonly magneticField: MagneticField;
 	readonly onComplete: () => void;
 	readonly source: PixiTileActor | null;
-	readonly sourceHome: PixiTileActorPose;
-	readonly surface: PixiMainSceneSurface;
+	readonly sourceHome: ActorPose;
+	readonly surface: MainSurface;
 	readonly transient: PixiTileActor;
 }) {
 	const readLiveContactPose = yield* makeLiveContactPoseReaderFx();

@@ -2,29 +2,29 @@ import { Effect } from "effect";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileSpawnMotionCue } from "~/bridge/tile/motion/TileMotionCue";
-import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import { readTravelDurationMsFx } from "~/ui/pixi/animation/readTravelDurationMsFx";
 import { startActorEnterFx } from "~/ui/pixi/animation/startActorEnterFx";
-import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
+import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
 import { createMagneticProjectorFx } from "~/ui/pixi/motion/createMagneticProjectorFx";
 import { createMotionPoseSamplerFx } from "~/ui/pixi/motion/createMotionPoseSamplerFx";
 import { chaseTargetFx } from "~/ui/pixi/motion/chaseTargetFx";
-import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
-import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
+import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
+import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
 
 export namespace runSpawnMotionFx {
 	export interface Props {
-		readonly actorStore: PixiMainSceneActorStore;
-		readonly animator: PixiActorAnimator;
+		readonly actorStore: MainActorStore;
+		readonly animator: ActorAnimator;
 		readonly cue: TileSpawnMotionCue;
 		readonly cueKey: string;
 		readonly delayMs: number;
-		readonly magneticField: PixiTileMagneticField;
+		readonly magneticField: MagneticField;
 		readonly onComplete: () => void;
-		readonly origin: PixiTileActorPose;
-		readonly surface: PixiMainSceneSurface;
-		readonly target: PixiTileActorPose;
+		readonly origin: ActorPose;
+		readonly surface: MainSurface;
+		readonly target: ActorPose;
 	}
 }
 

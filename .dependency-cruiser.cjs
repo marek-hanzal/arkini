@@ -120,7 +120,7 @@ const boundaryRules = [
 		from: {
 			path: "^src/ui/pixi(?:/|$)",
 			pathNot: [
-				"^src/ui/pixi/animation/createPixiAnimationDriverFx[.]ts$",
+				"^src/ui/pixi/animation/createAnimationDriverFx[.]ts$",
 			],
 		},
 		to: {
@@ -133,7 +133,7 @@ const boundaryRules = [
 			"The Pixi animation driver uses Motion's framework-neutral runtime and never its React entrypoint.",
 		severity: "error",
 		from: {
-			path: "^src/ui/pixi/animation/createPixiAnimationDriverFx[.]ts$",
+			path: "^src/ui/pixi/animation/createAnimationDriverFx[.]ts$",
 		},
 		to: {
 			path: "^node_modules/(?:framer-motion(?:/|$)|motion/(?:react(?:[-/]|$)|dist/(?:es/)?react(?:[./-]|$)))",

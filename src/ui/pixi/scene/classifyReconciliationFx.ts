@@ -1,24 +1,24 @@
 import { Effect } from "effect";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { TileActorFeedbackCue } from "~/bridge/tile/feedback/TileActorFeedbackCue";
-import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
+import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
 
-export interface PixiMainSceneVisibleActor {
+export interface VisibleActor {
 	readonly item: TileActorItem;
-	readonly pose: PixiTileActorPose;
+	readonly pose: ActorPose;
 }
 
-export type PixiMainSceneActorArrival =
+export type ActorArrival =
 	| {
 			readonly kind: "add";
-			readonly visible: PixiMainSceneVisibleActor;
+			readonly visible: VisibleActor;
 	  }
 	| {
 			readonly kind: "update";
-			readonly visible: PixiMainSceneVisibleActor;
+			readonly visible: VisibleActor;
 	  };
 
-export type PixiMainSceneActorDeparture =
+export type ActorDeparture =
 	| {
 			readonly actorId: string;
 			readonly kind: "remove-immediately";
@@ -34,9 +34,9 @@ export type PixiMainSceneActorDeparture =
 			readonly kind: "release-hidden";
 	  };
 
-export interface PixiMainSceneReconciliationPlan {
-	readonly arrivals: ReadonlyArray<PixiMainSceneActorArrival>;
-	readonly departures: ReadonlyArray<PixiMainSceneActorDeparture>;
+export interface ReconciliationPlan {
+	readonly arrivals: ReadonlyArray<ActorArrival>;
+	readonly departures: ReadonlyArray<ActorDeparture>;
 }
 
 export namespace classifyReconciliationFx {
@@ -48,7 +48,7 @@ export namespace classifyReconciliationFx {
 		readonly inventoryActorIds: ReadonlySet<string>;
 		readonly motionRetainedActorIds: ReadonlySet<string>;
 		readonly pendingActorIds: ReadonlySet<string>;
-		readonly visibleActors: ReadonlyMap<string, PixiMainSceneVisibleActor>;
+		readonly visibleActors: ReadonlyMap<string, VisibleActor>;
 	}
 }
 
@@ -73,7 +73,7 @@ export const classifyReconciliationFx = Effect.fnUntraced(function* ({
 	const arrivals = [
 		...visibleActors.entries(),
 	].map(
-		([actorId, visible]): PixiMainSceneActorArrival => ({
+		([actorId, visible]): ActorArrival => ({
 			kind: currentActorIdSet.has(actorId) ? "update" : "add",
 			visible,
 		}),
@@ -84,7 +84,7 @@ export const classifyReconciliationFx = Effect.fnUntraced(function* ({
 			.filter(({ actorId }) => !visibleActorIds.has(actorId))
 			.map(({ actorId }) => actorId),
 	);
-	const departures: PixiMainSceneActorDeparture[] = [];
+	const departures: ActorDeparture[] = [];
 	for (const actorId of currentActorIds) {
 		if (visibleActors.has(actorId)) continue;
 		if (pendingActorIds.has(actorId)) continue;

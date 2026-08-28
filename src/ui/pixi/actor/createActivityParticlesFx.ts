@@ -1,20 +1,20 @@
 import { Effect } from "effect";
 import { Particle, ParticleContainer, Rectangle, Texture } from "pixi.js";
 
-import type { PixiTileActorActivityParticles } from "~/ui/pixi/actor/PixiTileActorActivityParticles";
-import type { PixiTileActorParticleTextures } from "~/ui/pixi/actor/PixiTileActorParticleTextures";
+import type { ActivityParticles } from "~/ui/pixi/actor/ActivityParticles";
+import type { ParticleTextures } from "~/ui/pixi/actor/ParticleTextures";
 
 export namespace createActivityParticlesFx {
 	export interface Props {
 		readonly actorId: string;
 		readonly instanceId: string;
 		readonly lightSurface: boolean;
-		readonly textures?: Pick<PixiTileActorParticleTextures, "star">;
+		readonly textures?: Pick<ParticleTextures, "star">;
 		readonly tint: number;
 	}
 }
 
-const pixiTileActorActivityParticleCount = 12;
+const activityParticleCount = 12;
 
 const goldenAngle = Math.PI * (3 - Math.sqrt(5));
 
@@ -29,10 +29,10 @@ export const createActivityParticlesFx = Effect.fn("createActivityParticlesFx")(
 		},
 		tint,
 	}: createActivityParticlesFx.Props) =>
-		Effect.sync((): PixiTileActorActivityParticles => {
+		Effect.sync((): ActivityParticles => {
 			const particles = Array.from(
 				{
-					length: pixiTileActorActivityParticleCount,
+					length: activityParticleCount,
 				},
 				(_, index) => {
 					const particle = new Particle({
@@ -45,10 +45,9 @@ export const createActivityParticlesFx = Effect.fn("createActivityParticlesFx")(
 					return {
 						alphaScale: 0.84 + ((index * 37) % 17) / 100,
 						particle,
-						phaseOffset: index / pixiTileActorActivityParticleCount,
+						phaseOffset: index / activityParticleCount,
 						spreadOffset:
-							(((index * 7) % pixiTileActorActivityParticleCount) /
-								(pixiTileActorActivityParticleCount - 1)) *
+							(((index * 7) % activityParticleCount) / (activityParticleCount - 1)) *
 								2 -
 							1,
 						speedCycles: 1 + ((index * 5) % 3),

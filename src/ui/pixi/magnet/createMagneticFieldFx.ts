@@ -2,22 +2,19 @@ import { Effect } from "effect";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
-import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
+import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
+import type { AnimationDriver, AnimationSpring } from "~/ui/pixi/animation/AnimationDriver";
 import type {
-	PixiAnimationDriver,
-	PixiAnimationSpring,
-} from "~/ui/pixi/animation/PixiAnimationDriver";
-import type {
-	PixiTileMagneticField,
-	PixiTileMagneticFieldSample,
-	PixiTileMagneticSourceKind,
-} from "~/ui/pixi/magnet/PixiTileMagneticField";
+	MagneticField,
+	MagneticSample,
+	MagneticSourceKind,
+} from "~/ui/pixi/magnet/MagneticField";
 
 export namespace createMagneticFieldFx {
 	export interface Props {
-		readonly actorStore: PixiMainSceneActorStore;
-		readonly animationDriver: PixiAnimationDriver;
+		readonly actorStore: MainActorStore;
+		readonly animationDriver: AnimationDriver;
 		/** Injectable structural counters for focused performance tests. */
 		readonly onApply?: () => void;
 		readonly onDisplacementEvaluation?: (actorId: string, sourceActorId: string) => void;
@@ -126,8 +123,8 @@ interface ActorSpring {
 	readonly actor: PixiTileActor;
 	targetX: number;
 	targetY: number;
-	readonly x: PixiAnimationSpring;
-	readonly y: PixiAnimationSpring;
+	readonly x: AnimationSpring;
+	readonly y: AnimationSpring;
 }
 
 const crowdSpring = {
@@ -138,8 +135,8 @@ const crowdSpring = {
 	restSpeed: 0.05,
 } as const;
 
-interface ActiveMagneticSample extends PixiTileMagneticFieldSample {
-	readonly sourceKind: PixiTileMagneticSourceKind;
+interface ActiveMagneticSample extends MagneticSample {
+	readonly sourceKind: MagneticSourceKind;
 }
 
 const compareText = (left: string, right: string) => (left < right ? -1 : left > right ? 1 : 0);
@@ -150,7 +147,7 @@ const compareSource = (left: ActiveMagneticSample, right: ActiveMagneticSample) 
 	compareText(left.sourceInstanceId, right.sourceInstanceId);
 
 const readSourceKey = (
-	sourceKind: PixiTileMagneticSourceKind,
+	sourceKind: MagneticSourceKind,
 	sourceActorId: string,
 	sourceInstanceId: string,
 ) =>
@@ -176,12 +173,10 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 		onSpringTargetWrite,
 		scheduleApply,
 	}: createMagneticFieldFx.Props) =>
-		Effect.sync((): PixiTileMagneticField => {
+		Effect.sync((): MagneticField => {
 			const springs = new Map<string, ActorSpring>();
 			const samples = new Map<string, ActiveMagneticSample>();
-			const sourceMembershipListeners = new Set<
-				(sourceKind: PixiTileMagneticSourceKind) => void
-			>();
+			const sourceMembershipListeners = new Set<(sourceKind: MagneticSourceKind) => void>();
 			let affectedActorIds = new Set<string>();
 			let cancelScheduledApply: (() => void) | null = null;
 			let closed = false;
@@ -223,7 +218,7 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 						options: crowdSpring,
 					}),
 				);
-				let y: PixiAnimationSpring;
+				let y: AnimationSpring;
 				try {
 					y = RendererRuntime.runSync(
 						animationDriver.createSpringFx({
@@ -434,7 +429,7 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 			};
 
 			const release = (
-				sourceKind: PixiTileMagneticSourceKind,
+				sourceKind: MagneticSourceKind,
 				sourceActorId: string,
 				sourceInstanceId: string,
 			) => {
@@ -444,7 +439,7 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 				}
 			};
 
-			const releaseSources = (sourceKind: PixiTileMagneticSourceKind) => {
+			const releaseSources = (sourceKind: MagneticSourceKind) => {
 				let released = false;
 				for (const [key, sample] of samples) {
 					if (sample.sourceKind !== sourceKind) continue;
@@ -457,7 +452,7 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 				}
 			};
 
-			const update = (sample: PixiTileMagneticFieldSample) => {
+			const update = (sample: MagneticSample) => {
 				const activeSample = {
 					...sample,
 					sourceKind: sample.sourceKind ?? "drag",
@@ -507,19 +502,18 @@ export const createMagneticFieldFx = Effect.fn("createMagneticFieldFx")(
 						.sort(compareSource)
 						.map(({ sourceActorId }) => sourceActorId),
 				),
-				releaseFx: Effect.fn("PixiTileMagneticField.releaseFx")(
+				releaseFx: Effect.fn("MagneticField.releaseFx")(
 					({ sourceActorId, sourceInstanceId, sourceKind }) =>
 						Effect.sync(() => {
 							if (closed) return;
 							release(sourceKind, sourceActorId, sourceInstanceId);
 						}),
 				),
-				releaseSourcesFx: Effect.fn("PixiTileMagneticField.releaseSourcesFx")(
-					(sourceKind) =>
-						Effect.sync(() => {
-							if (closed) return;
-							releaseSources(sourceKind);
-						}),
+				releaseSourcesFx: Effect.fn("MagneticField.releaseSourcesFx")((sourceKind) =>
+					Effect.sync(() => {
+						if (closed) return;
+						releaseSources(sourceKind);
+					}),
 				),
 				resetFx: Effect.sync(() => reset()),
 				subscribeSourceMembershipFx: (listen) =>

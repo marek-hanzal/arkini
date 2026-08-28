@@ -2,12 +2,12 @@ import { Effect } from "effect";
 import { Container, Graphics, Sprite, Text, TextStyle, Texture } from "pixi.js";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import type { PixiTileActorVisual } from "~/ui/pixi/actor/PixiTileActorVisual";
+import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";
 import { loadVisualTexturesFx } from "~/ui/pixi/actor/loadVisualTexturesFx";
 import { updateActorVisualFx } from "~/ui/pixi/actor/updateActorVisualFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
-import type { PixiTextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
+import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
 
 export namespace createActorVisualFx {
 	export interface Props {
@@ -15,7 +15,7 @@ export namespace createActorVisualFx {
 		readonly item: TileActorItem;
 		readonly palette: PixiScenePalette;
 		readonly size: number;
-		readonly textures: PixiTextureStore;
+		readonly textures: TextureStore;
 	}
 }
 
@@ -70,7 +70,7 @@ export const createActorVisualFx = Effect.fn("createActorVisualFx")(function* ({
 		size,
 		textureGeneration: 0,
 		textureState: "loading",
-	} satisfies PixiTileActorVisual;
+	} satisfies ActorVisual;
 	yield* updateActorVisualFx({
 		item,
 		palette,

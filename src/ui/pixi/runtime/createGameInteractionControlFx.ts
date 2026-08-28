@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-export interface PixiGameInteractionControl {
+export interface GameInteractionControl {
 	readonly cancelFx: Effect.Effect<void>;
 	readonly registerFx: (cancel: () => void) => Effect.Effect<() => void>;
 	readonly closeFx: Effect.Effect<void>;
@@ -8,14 +8,14 @@ export interface PixiGameInteractionControl {
 
 /** Owns the route-local cancellation edge into the currently mounted main Pixi scene. */
 export const createGameInteractionControlFx = Effect.fn("createGameInteractionControlFx")(() =>
-	Effect.sync((): PixiGameInteractionControl => {
+	Effect.sync((): GameInteractionControl => {
 		const cancellations = new Set<() => void>();
 		let closed = false;
 		return {
 			cancelFx: Effect.sync(() => {
 				for (const cancel of cancellations) cancel();
 			}),
-			registerFx: Effect.fn("PixiGameInteractionControl.registerFx")((cancel) =>
+			registerFx: Effect.fn("GameInteractionControl.registerFx")((cancel) =>
 				Effect.sync(() => {
 					if (closed) return () => undefined;
 					cancellations.add(cancel);

@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 
-type PixiMainSceneTransitionDelivery = "hydrate" | "present";
+type TransitionDelivery = "hydrate" | "present";
 
-export interface PixiMainSceneSubscriptionReplayGate {
-	readonly classifyFx: (sequence: number) => Effect.Effect<PixiMainSceneTransitionDelivery>;
+export interface SubscriptionReplayGate {
+	readonly classifyFx: (sequence: number) => Effect.Effect<TransitionDelivery>;
 }
 
 /**
@@ -14,17 +14,16 @@ export interface PixiMainSceneSubscriptionReplayGate {
  */
 export const createSubscriptionReplayGateFx = Effect.fn("createSubscriptionReplayGateFx")(
 	(hydratedSequence: number) =>
-		Effect.sync((): PixiMainSceneSubscriptionReplayGate => {
+		Effect.sync((): SubscriptionReplayGate => {
 			let awaitingInitialReplay = true;
 
 			return {
-				classifyFx: Effect.fn("PixiMainSceneSubscriptionReplayGate.classifyFx")(
-					(sequence) =>
-						Effect.sync(() => {
-							if (!awaitingInitialReplay) return "present";
-							awaitingInitialReplay = false;
-							return sequence === hydratedSequence ? "hydrate" : "present";
-						}),
+				classifyFx: Effect.fn("SubscriptionReplayGate.classifyFx")((sequence) =>
+					Effect.sync(() => {
+						if (!awaitingInitialReplay) return "present";
+						awaitingInitialReplay = false;
+						return sequence === hydratedSequence ? "hydrate" : "present";
+					}),
 				),
 			};
 		}),

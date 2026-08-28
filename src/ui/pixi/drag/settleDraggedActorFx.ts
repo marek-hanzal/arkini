@@ -3,16 +3,16 @@ import { Effect } from "effect";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readActorCursorFx } from "~/ui/pixi/actor/readActorCursorFx";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import { createRetargetablePoseSamplerFx } from "~/ui/pixi/animation/createRetargetablePoseSamplerFx";
 import { readSettleDurationMsFx } from "~/ui/pixi/drag/readSettleDurationMsFx";
-import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
+import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 
 export namespace settleDraggedActorFx {
 	export interface Props {
 		readonly actor: PixiTileActor;
-		readonly animator: PixiActorAnimator;
-		readonly surface: PixiMainSceneSurface;
+		readonly animator: ActorAnimator;
+		readonly surface: MainSurface;
 	}
 }
 

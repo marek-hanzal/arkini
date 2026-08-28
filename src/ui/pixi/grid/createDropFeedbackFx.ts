@@ -1,23 +1,20 @@
 import { Effect } from "effect";
 import { Container, Graphics } from "pixi.js";
 
-import type {
-	PixiAnimationControl,
-	PixiAnimationDriver,
-} from "~/ui/pixi/animation/PixiAnimationDriver";
-import type { PixiGridDropFeedback } from "~/ui/pixi/grid/PixiGridDropFeedback";
+import type { AnimationControl, AnimationDriver } from "~/ui/pixi/animation/AnimationDriver";
+import type { DropFeedback } from "~/ui/pixi/grid/DropFeedback";
 import { drawDropFeedbackFx } from "~/ui/pixi/grid/drawDropFeedbackFx";
-import type { PixiGridSurfaceLayout } from "~/ui/pixi/layout/PixiSceneLayout";
+import type { SurfaceLayout } from "~/ui/pixi/layout/SceneLayout";
 
 export namespace createDropFeedbackFx {
 	export interface Props {
-		readonly animationDriver: PixiAnimationDriver;
+		readonly animationDriver: AnimationDriver;
 		readonly label: string;
 	}
 }
 
 interface FeedbackLayer {
-	control: PixiAnimationControl | null;
+	control: AnimationControl | null;
 	generation: number;
 	readonly graphics: Graphics;
 }
@@ -27,8 +24,8 @@ const exitDurationMs = 180;
 
 const readTargetKey = (
 	color: number,
-	slot: NonNullable<Parameters<PixiGridDropFeedback["renderFx"]>[0]["slot"]>,
-	surface: PixiGridSurfaceLayout,
+	slot: NonNullable<Parameters<DropFeedback["renderFx"]>[0]["slot"]>,
+	surface: SurfaceLayout,
 ) =>
 	[
 		color,
@@ -43,7 +40,7 @@ const readTargetKey = (
 /** Crossfades retained drop markers without delaying canonical hover targeting. */
 export const createDropFeedbackFx = Effect.fn("createDropFeedbackFx")(
 	({ animationDriver, label }: createDropFeedbackFx.Props) =>
-		Effect.sync((): PixiGridDropFeedback => {
+		Effect.sync((): DropFeedback => {
 			const container = new Container({
 				eventMode: "none",
 				label,
@@ -131,7 +128,7 @@ export const createDropFeedbackFx = Effect.fn("createDropFeedbackFx")(
 						});
 					}
 				}),
-				renderFx: Effect.fn("PixiGridDropFeedback.renderFx")(({ color, slot, surface }) =>
+				renderFx: Effect.fn("DropFeedback.renderFx")(({ color, slot, surface }) =>
 					Effect.gen(function* () {
 						if (closed) return;
 						if (slot === null || surface === null) {

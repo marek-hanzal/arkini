@@ -3,14 +3,14 @@ import { Effect } from "effect";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { whenVisualReadyFx } from "~/ui/pixi/actor/whenVisualReadyFx";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 
-export const pixiTileActorLifecycleDurationMs = 260;
-export const pixiTileActorLifecycleReducedScale = 0.8;
+export const lifecycleDurationMs = 260;
+export const lifecycleReducedScale = 0.8;
 
 interface LifecycleProps {
 	readonly actor: PixiTileActor;
-	readonly animator: PixiActorAnimator;
+	readonly animator: ActorAnimator;
 }
 
 export namespace runActorLifecycleFx {
@@ -117,7 +117,7 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 			yield* animator.setFx({
 				actor,
 				channel: "lifecycle-scale",
-				scale: pixiTileActorLifecycleReducedScale,
+				scale: lifecycleReducedScale,
 			});
 			yield* animator.setFx({
 				actor,
@@ -132,7 +132,7 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 		}
 		case "start-enter": {
 			const delayMs = action.delayMs ?? 0;
-			const durationMs = action.durationMs ?? pixiTileActorLifecycleDurationMs;
+			const durationMs = action.durationMs ?? lifecycleDurationMs;
 			actor.lifecycleIntentGeneration += 1;
 			actor.lifecycleTargetAlpha = 1;
 			actor.lifecycleTransitionStarted = false;
@@ -141,7 +141,7 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 			yield* animator.setFx({
 				actor,
 				channel: "lifecycle-scale",
-				scale: pixiTileActorLifecycleReducedScale,
+				scale: lifecycleReducedScale,
 			});
 			yield* animator.setFx({
 				actor,
@@ -152,7 +152,7 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 			return;
 		}
 		case "start-exit": {
-			const durationMs = action.durationMs ?? pixiTileActorLifecycleDurationMs;
+			const durationMs = action.durationMs ?? lifecycleDurationMs;
 			actor.lifecycleIntentGeneration += 1;
 			actor.lifecycleTargetAlpha = 0;
 			actor.lifecycleTransitionStarted = true;
@@ -163,12 +163,12 @@ export const runActorLifecycleFx = Effect.fn("runActorLifecycleFx")(function* (
 				onCancel: action.onCancel,
 				onComplete: action.onComplete,
 				toAlpha: 0,
-				toScale: pixiTileActorLifecycleReducedScale,
+				toScale: lifecycleReducedScale,
 			});
 			return;
 		}
 		case "restore-exit": {
-			const durationMs = action.durationMs ?? pixiTileActorLifecycleDurationMs;
+			const durationMs = action.durationMs ?? lifecycleDurationMs;
 			actor.lifecycleIntentGeneration += 1;
 			actor.lifecycleTargetAlpha = 1;
 			actor.lifecycleTransitionStarted = true;

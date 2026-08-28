@@ -144,4 +144,37 @@ describe("analyzeEditorProjectCompatibilityFx semantic diff", () => {
 			]),
 		});
 	});
+
+	it("correlates renamed items by immutable UID instead of reporting two subtrees", () => {
+		const previous = withProducer();
+		const producer = previous.items.producer;
+		if (producer?.type !== "producer") throw new Error("Missing producer fixture.");
+		const next = GameConfigSchema.parse({
+			...previous,
+			items: {
+				water: previous.items.water,
+				renamed: {
+					...producer,
+					id: "renamed",
+				},
+			},
+		});
+
+		expect(analyze(previous, next)).toMatchObject({
+			result: "major",
+			context: [
+				{
+					before: "producer",
+					after: "renamed",
+					operation: "change",
+					path: [
+						"items",
+						"renamed",
+						"id",
+					],
+					result: "major",
+				},
+			],
+		});
+	});
 });

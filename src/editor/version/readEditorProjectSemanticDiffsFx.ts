@@ -220,17 +220,31 @@ const readLineDiffs = (
 const readItemDiffs = (
 	before: GameConfigSchema.Type["items"],
 	after: GameConfigSchema.Type["items"],
-): ReadonlyArray<EditorProjectSemanticDiff> =>
-	Array.from(
+): ReadonlyArray<EditorProjectSemanticDiff> => {
+	const beforeByUid = new Map(
+		Object.values(before).map((item) => [
+			item.uid,
+			item,
+		]),
+	);
+	const afterByUid = new Map(
+		Object.values(after).map((item) => [
+			item.uid,
+			item,
+		]),
+	);
+	return Array.from(
 		new Set([
-			...Object.keys(before),
-			...Object.keys(after),
+			...beforeByUid.keys(),
+			...afterByUid.keys(),
 		]),
 	)
 		.sort()
-		.flatMap((itemId) => {
-			const beforeItem = before[itemId];
-			const afterItem = after[itemId];
+		.flatMap((uid) => {
+			const beforeItem = beforeByUid.get(uid);
+			const afterItem = afterByUid.get(uid);
+			const itemId = afterItem?.id ?? beforeItem?.id;
+			if (itemId === undefined) return [];
 			const path: EditorProjectCompatibilityPath = [
 				"items",
 				itemId,
@@ -253,6 +267,7 @@ const readItemDiffs = (
 				...readLineDiffs(itemId, beforeItem, afterItem),
 			];
 		});
+};
 
 /** Produces stable semantic config paths without classifying compatibility policy. */
 export const readEditorProjectSemanticDiffsFx = Effect.fn("readEditorProjectSemanticDiffsFx")(

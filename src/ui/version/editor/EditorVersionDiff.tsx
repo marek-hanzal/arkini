@@ -3,6 +3,7 @@ import type {
 	EditorProjectVersionDiff,
 	EditorProjectVersionValueChange,
 } from "~/editor/version/EditorProjectVersion";
+import type { EditorProjectCompatibilityDiffResult } from "~/editor/version/EditorProjectCompatibility";
 
 const formatValue = (value: unknown) => {
 	if (value === undefined) return "—";
@@ -10,10 +11,27 @@ const formatValue = (value: unknown) => {
 	return json ?? String(value);
 };
 
+const VersionBump = ({ bump }: { readonly bump?: EditorProjectCompatibilityDiffResult }) =>
+	bump === undefined ? null : (
+		<span
+			className={`shrink-0 rounded-full border px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider ${
+				bump === "major"
+					? "border-danger/40 bg-danger/10 text-danger"
+					: "border-success/40 bg-success/10 text-success"
+			}`}
+			data-bump={bump}
+		>
+			{bump} bump
+		</span>
+	);
+
 const ValueChange = ({ change }: { readonly change: EditorProjectVersionValueChange }) => (
 	<div className="grid gap-2 rounded-lg border border-line bg-surface p-3">
-		<div className="break-all text-xs font-semibold text-accent">
-			{change.path || "Entire item"}
+		<div className="flex items-start justify-between gap-3">
+			<div className="min-w-0 break-all text-xs font-semibold text-accent">
+				{change.path || "Entire item"}
+			</div>
+			<VersionBump bump={change.bump} />
 		</div>
 		<div className="grid gap-2 lg:grid-cols-2">
 			<div className="min-w-0">
@@ -50,12 +68,13 @@ const BinaryChanges = ({
 				{changes.map((change) => (
 					<span
 						key={change.id}
-						className="rounded-full border border-line bg-surface px-2.5 py-1 text-xs"
+						className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-2.5 py-1 text-xs"
 					>
-						<span className="mr-1 font-semibold capitalize text-accent">
+						<span className="font-semibold capitalize text-accent">
 							{change.change}
 						</span>
 						{change.id}
+						<VersionBump bump={change.bump} />
 					</span>
 				))}
 			</div>

@@ -335,7 +335,7 @@ describe("editor MCP server", () => {
 		});
 		expect(diff.content).toMatchObject([
 			{
-				text: expect.stringContaining("config.meta.title"),
+				text: expect.stringContaining("config.meta.title · minor bump"),
 			},
 		]);
 		const tagged = await client.callTool({

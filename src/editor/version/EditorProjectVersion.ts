@@ -1,6 +1,7 @@
 import type { Effect } from "effect";
 
 import type { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
+import type { EditorProjectCompatibilityDiffResult } from "~/editor/version/EditorProjectCompatibility";
 
 /** Lightweight immutable node in one project's version tree. */
 export interface EditorProjectVersionDescriptor {
@@ -63,6 +64,7 @@ export interface EditorProjectVersionValueChange {
 	readonly path: string;
 	readonly before?: unknown;
 	readonly after?: unknown;
+	readonly bump?: EditorProjectCompatibilityDiffResult;
 }
 
 export interface EditorProjectVersionItemDiff {
@@ -73,6 +75,7 @@ export interface EditorProjectVersionItemDiff {
 
 export interface EditorProjectVersionBinaryDiff {
 	readonly change: "added" | "changed" | "deleted";
+	readonly bump?: EditorProjectCompatibilityDiffResult;
 	readonly id: string;
 }
 

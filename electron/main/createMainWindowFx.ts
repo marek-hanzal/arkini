@@ -1,4 +1,4 @@
-import { BrowserWindow, ipcMain, screen } from "electron";
+import { BrowserWindow, ipcMain, Menu, screen } from "electron";
 import { fileURLToPath } from "node:url";
 import { Effect, Exit } from "effect";
 import { ArkiniWindowTitle } from "../../shared/ArkiniAppMetadata";
@@ -38,6 +38,7 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 		Effect.gen(function* () {
 			const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
 			const bounds = yield* calculateInitialWindowBoundsFx(display.workArea);
+			Menu.setApplicationMenu(null);
 			const window = new BrowserWindow({
 				...bounds,
 				show: false,

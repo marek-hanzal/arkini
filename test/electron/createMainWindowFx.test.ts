@@ -1,5 +1,5 @@
 import type { BrowserWindow, WebContents } from "electron";
-import { ipcMain } from "electron";
+import { ipcMain, Menu } from "electron";
 import { EventEmitter } from "node:events";
 import { Cause, Effect, Exit, Option } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -78,6 +78,9 @@ vi.mock("electron", async () => {
 	return {
 		BrowserWindow: TestBrowserWindow,
 		ipcMain: ipc,
+		Menu: {
+			setApplicationMenu: vi.fn(),
+		},
 		screen: {
 			getCursorScreenPoint: () => ({
 				x: 0,
@@ -170,6 +173,7 @@ describe("createMainWindowFx", () => {
 		expect(window.options.title).toBe(ArkiniWindowTitle);
 		expect(window.options.fullscreen).toBe(false);
 		expect(window.options.fullscreenable).toBe(true);
+		expect(Menu.setApplicationMenu).toHaveBeenLastCalledWith(null);
 		expect(window.maximize).toHaveBeenCalledOnce();
 		expect(window.destroy).toHaveBeenCalledOnce();
 		expect(window.isDestroyed()).toBe(true);

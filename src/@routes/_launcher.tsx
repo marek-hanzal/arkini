@@ -13,7 +13,12 @@ import { resolveLauncherLeaveDestinationFx } from "~/ui/navigation/resolveLaunch
 export const Route = createFileRoute("/_launcher")({
 	beforeLoad: ({ context, location }) => {
 		const resource = context.rendererRuntime.runSync(readCurrentGameEngineResourceFx());
-		if (resource === null || location.pathname === "/settings") return;
+		if (
+			resource === null ||
+			location.pathname === "/settings" ||
+			location.pathname.startsWith("/settings/")
+		)
+			return;
 		throw redirect({
 			to: "/game/$packageId/action/leave",
 			params: {

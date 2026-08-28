@@ -323,6 +323,21 @@ describe("createArkiniRouterFx", () => {
 		for (const [from, to, types] of pairs) {
 			expect(resolveTypes(from, to)).toEqual(types);
 		}
+		expect(resolveTypes("/main-menu", "/settings/common")).toEqual([
+			"arkini-route",
+			"hero-to-hero",
+			"main-menu-to-settings",
+		]);
+		expect(resolveTypes("/settings/common", "/settings/game")).toEqual([
+			"arkini-route",
+			"hero-to-hero",
+			"settings-to-settings",
+		]);
+		expect(resolveTypes("/settings/game", "/settings/dev")).toEqual([
+			"arkini-route",
+			"hero-to-hero",
+			"settings-to-settings",
+		]);
 		expect(() => resolveTypes("/game/built-in/board", "/dev/shell")).toThrow(
 			"Missing View Transition classification",
 		);

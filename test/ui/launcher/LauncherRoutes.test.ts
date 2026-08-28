@@ -50,6 +50,17 @@ describe("launcher routes", () => {
 
 	it("keeps launcher leaves as standalone top-level destinations", async () => {
 		const router = await loadRoute("/settings");
-		expect(router.state.location.pathname).toBe("/settings");
+		expect(router.state.location.pathname).toBe("/settings/common");
+	});
+
+	it("loads every routed Settings section directly", async () => {
+		for (const pathname of [
+			"/settings/common",
+			"/settings/game",
+			"/settings/dev",
+		]) {
+			const router = await loadRoute(pathname);
+			expect(router.state.location.pathname).toBe(pathname);
+		}
 	});
 });

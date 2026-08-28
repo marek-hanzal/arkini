@@ -21,6 +21,10 @@ import { Route as ActionRecoverGameSaveRouteImport } from "./@routes/action/reco
 import { Route as EditorProjectIdRouteImport } from "./@routes/editor/$projectId"
 import { Route as EditorWelcomeRouteImport } from "./@routes/editor/welcome"
 import { Route as GamePackageIdRouteImport } from "./@routes/game/$packageId"
+import { Route as LauncherSettingsIndexRouteImport } from "./@routes/_launcher/settings/index"
+import { Route as LauncherSettingsCommonRouteImport } from "./@routes/_launcher/settings/common"
+import { Route as LauncherSettingsDevRouteImport } from "./@routes/_launcher/settings/dev"
+import { Route as LauncherSettingsGameRouteImport } from "./@routes/_launcher/settings/game"
 import { Route as ActionLoadGamePackageIdRouteImport } from "./@routes/action/load-game/$packageId"
 import { Route as EditorProjectIdAssetsRouteImport } from "./@routes/editor/$projectId/assets"
 import { Route as EditorProjectIdBoardRouteImport } from "./@routes/editor/$projectId/board"
@@ -128,6 +132,26 @@ const GamePackageIdRoute = GamePackageIdRouteImport.update({
   id: "/game/$packageId",
   path: "/game/$packageId",
   getParentRoute: () => rootRouteImport,
+} as any)
+const LauncherSettingsIndexRoute = LauncherSettingsIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => LauncherSettingsRoute,
+} as any)
+const LauncherSettingsCommonRoute = LauncherSettingsCommonRouteImport.update({
+  id: "/common",
+  path: "/common",
+  getParentRoute: () => LauncherSettingsRoute,
+} as any)
+const LauncherSettingsDevRoute = LauncherSettingsDevRouteImport.update({
+  id: "/dev",
+  path: "/dev",
+  getParentRoute: () => LauncherSettingsRoute,
+} as any)
+const LauncherSettingsGameRoute = LauncherSettingsGameRouteImport.update({
+  id: "/game",
+  path: "/game",
+  getParentRoute: () => LauncherSettingsRoute,
 } as any)
 const ActionLoadGamePackageIdRoute = ActionLoadGamePackageIdRouteImport.update({
   id: "/action/load-game/$packageId",
@@ -406,12 +430,15 @@ export interface FileRoutesByFullPath {
   "/about": typeof LauncherAboutRoute
   "/arkpacks": typeof LauncherArkpacksRoute
   "/main-menu": typeof LauncherMainMenuRoute
-  "/settings": typeof LauncherSettingsRoute
+  "/settings": typeof LauncherSettingsRouteWithChildren
   "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
   "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/editor/$projectId": typeof EditorProjectIdRouteWithChildren
   "/editor/welcome": typeof EditorWelcomeRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
+  "/settings/common": typeof LauncherSettingsCommonRoute
+  "/settings/dev": typeof LauncherSettingsDevRoute
+  "/settings/game": typeof LauncherSettingsGameRoute
   "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
   "/editor/$projectId/assets": typeof EditorProjectIdAssetsRouteWithChildren
   "/editor/$projectId/board": typeof EditorProjectIdBoardRouteWithChildren
@@ -425,6 +452,7 @@ export interface FileRoutesByFullPath {
   "/editor/$projectId/project": typeof EditorProjectIdProjectRouteWithChildren
   "/editor/$projectId/versions": typeof EditorProjectIdVersionsRouteWithChildren
   "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
+  "/settings/": typeof LauncherSettingsIndexRoute
   "/editor/$projectId/assets/$resourceId": typeof EditorProjectIdAssetsResourceIdRouteWithChildren
   "/editor/$projectId/board/inventory": typeof EditorProjectIdBoardInventoryRoute
   "/editor/$projectId/editor/items": typeof EditorProjectIdEditorItemsRouteWithChildren
@@ -466,12 +494,14 @@ export interface FileRoutesByTo {
   "/about": typeof LauncherAboutRoute
   "/arkpacks": typeof LauncherArkpacksRoute
   "/main-menu": typeof LauncherMainMenuRoute
-  "/settings": typeof LauncherSettingsRoute
   "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
   "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/editor/$projectId": typeof EditorProjectIdRouteWithChildren
   "/editor/welcome": typeof EditorWelcomeRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
+  "/settings/common": typeof LauncherSettingsCommonRoute
+  "/settings/dev": typeof LauncherSettingsDevRoute
+  "/settings/game": typeof LauncherSettingsGameRoute
   "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
   "/editor/$projectId/build": typeof EditorProjectIdBuildRoute
   "/editor/$projectId/chatgpt": typeof EditorProjectIdChatgptRoute
@@ -479,6 +509,7 @@ export interface FileRoutesByTo {
   "/editor/$projectId/flow": typeof EditorProjectIdFlowRoute
   "/editor/$projectId/notes": typeof EditorProjectIdNotesRoute
   "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
+  "/settings": typeof LauncherSettingsIndexRoute
   "/editor/$projectId/assets/$resourceId": typeof EditorProjectIdAssetsResourceIdRouteWithChildren
   "/editor/$projectId/board/inventory": typeof EditorProjectIdBoardInventoryRoute
   "/editor/$projectId/editor/items": typeof EditorProjectIdEditorItemsRouteWithChildren
@@ -520,12 +551,15 @@ export interface FileRoutesById {
   "/_launcher/about": typeof LauncherAboutRoute
   "/_launcher/arkpacks": typeof LauncherArkpacksRoute
   "/_launcher/main-menu": typeof LauncherMainMenuRoute
-  "/_launcher/settings": typeof LauncherSettingsRoute
+  "/_launcher/settings": typeof LauncherSettingsRouteWithChildren
   "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
   "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/editor/$projectId": typeof EditorProjectIdRouteWithChildren
   "/editor/welcome": typeof EditorWelcomeRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
+  "/_launcher/settings/common": typeof LauncherSettingsCommonRoute
+  "/_launcher/settings/dev": typeof LauncherSettingsDevRoute
+  "/_launcher/settings/game": typeof LauncherSettingsGameRoute
   "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
   "/editor/$projectId/assets": typeof EditorProjectIdAssetsRouteWithChildren
   "/editor/$projectId/board": typeof EditorProjectIdBoardRouteWithChildren
@@ -540,6 +574,7 @@ export interface FileRoutesById {
   "/editor/$projectId/versions": typeof EditorProjectIdVersionsRouteWithChildren
   "/game/$packageId/_scene": typeof GamePackageIdSceneRouteWithChildren
   "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
+  "/_launcher/settings/": typeof LauncherSettingsIndexRoute
   "/editor/$projectId/assets/$resourceId": typeof EditorProjectIdAssetsResourceIdRouteWithChildren
   "/editor/$projectId/board/inventory": typeof EditorProjectIdBoardInventoryRoute
   "/editor/$projectId/editor/items": typeof EditorProjectIdEditorItemsRouteWithChildren
@@ -589,6 +624,9 @@ export interface FileRouteTypes {
     | "/editor/$projectId"
     | "/editor/welcome"
     | "/game/$packageId"
+    | "/settings/common"
+    | "/settings/dev"
+    | "/settings/game"
     | "/action/load-game/$packageId"
     | "/editor/$projectId/assets"
     | "/editor/$projectId/board"
@@ -602,6 +640,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/project"
     | "/editor/$projectId/versions"
     | "/game/$packageId/cheats"
+    | "/settings/"
     | "/editor/$projectId/assets/$resourceId"
     | "/editor/$projectId/board/inventory"
     | "/editor/$projectId/editor/items"
@@ -643,12 +682,14 @@ export interface FileRouteTypes {
     | "/about"
     | "/arkpacks"
     | "/main-menu"
-    | "/settings"
     | "/action/discard-failed-game"
     | "/action/recover-game-save"
     | "/editor/$projectId"
     | "/editor/welcome"
     | "/game/$packageId"
+    | "/settings/common"
+    | "/settings/dev"
+    | "/settings/game"
     | "/action/load-game/$packageId"
     | "/editor/$projectId/build"
     | "/editor/$projectId/chatgpt"
@@ -656,6 +697,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/flow"
     | "/editor/$projectId/notes"
     | "/game/$packageId/cheats"
+    | "/settings"
     | "/editor/$projectId/assets/$resourceId"
     | "/editor/$projectId/board/inventory"
     | "/editor/$projectId/editor/items"
@@ -702,6 +744,9 @@ export interface FileRouteTypes {
     | "/editor/$projectId"
     | "/editor/welcome"
     | "/game/$packageId"
+    | "/_launcher/settings/common"
+    | "/_launcher/settings/dev"
+    | "/_launcher/settings/game"
     | "/action/load-game/$packageId"
     | "/editor/$projectId/assets"
     | "/editor/$projectId/board"
@@ -716,6 +761,7 @@ export interface FileRouteTypes {
     | "/editor/$projectId/versions"
     | "/game/$packageId/_scene"
     | "/game/$packageId/cheats"
+    | "/_launcher/settings/"
     | "/editor/$projectId/assets/$resourceId"
     | "/editor/$projectId/board/inventory"
     | "/editor/$projectId/editor/items"
@@ -847,6 +893,34 @@ declare module "@tanstack/react-router" {
       fullPath: "/game/$packageId"
       preLoaderRoute: typeof GamePackageIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    "/_launcher/settings/": {
+      id: "/_launcher/settings/"
+      path: "/"
+      fullPath: "/settings/"
+      preLoaderRoute: typeof LauncherSettingsIndexRouteImport
+      parentRoute: typeof LauncherSettingsRoute
+    }
+    "/_launcher/settings/common": {
+      id: "/_launcher/settings/common"
+      path: "/common"
+      fullPath: "/settings/common"
+      preLoaderRoute: typeof LauncherSettingsCommonRouteImport
+      parentRoute: typeof LauncherSettingsRoute
+    }
+    "/_launcher/settings/dev": {
+      id: "/_launcher/settings/dev"
+      path: "/dev"
+      fullPath: "/settings/dev"
+      preLoaderRoute: typeof LauncherSettingsDevRouteImport
+      parentRoute: typeof LauncherSettingsRoute
+    }
+    "/_launcher/settings/game": {
+      id: "/_launcher/settings/game"
+      path: "/game"
+      fullPath: "/settings/game"
+      preLoaderRoute: typeof LauncherSettingsGameRouteImport
+      parentRoute: typeof LauncherSettingsRoute
     }
     "/action/load-game/$packageId": {
       id: "/action/load-game/$packageId"
@@ -1187,18 +1261,35 @@ declare module "@tanstack/react-router" {
   }
 }
 
+interface LauncherSettingsRouteChildren {
+  LauncherSettingsCommonRoute: typeof LauncherSettingsCommonRoute
+  LauncherSettingsDevRoute: typeof LauncherSettingsDevRoute
+  LauncherSettingsGameRoute: typeof LauncherSettingsGameRoute
+  LauncherSettingsIndexRoute: typeof LauncherSettingsIndexRoute
+}
+
+const LauncherSettingsRouteChildren: LauncherSettingsRouteChildren = {
+  LauncherSettingsCommonRoute: LauncherSettingsCommonRoute,
+  LauncherSettingsDevRoute: LauncherSettingsDevRoute,
+  LauncherSettingsGameRoute: LauncherSettingsGameRoute,
+  LauncherSettingsIndexRoute: LauncherSettingsIndexRoute,
+}
+
+const LauncherSettingsRouteWithChildren =
+  LauncherSettingsRoute._addFileChildren(LauncherSettingsRouteChildren)
+
 interface LauncherRouteChildren {
   LauncherAboutRoute: typeof LauncherAboutRoute
   LauncherArkpacksRoute: typeof LauncherArkpacksRoute
   LauncherMainMenuRoute: typeof LauncherMainMenuRoute
-  LauncherSettingsRoute: typeof LauncherSettingsRoute
+  LauncherSettingsRoute: typeof LauncherSettingsRouteWithChildren
 }
 
 const LauncherRouteChildren: LauncherRouteChildren = {
   LauncherAboutRoute: LauncherAboutRoute,
   LauncherArkpacksRoute: LauncherArkpacksRoute,
   LauncherMainMenuRoute: LauncherMainMenuRoute,
-  LauncherSettingsRoute: LauncherSettingsRoute,
+  LauncherSettingsRoute: LauncherSettingsRouteWithChildren,
 }
 
 const LauncherRouteWithChildren = LauncherRoute._addFileChildren(

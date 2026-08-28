@@ -1,4 +1,4 @@
-import { useNavigate, useRouter } from "@tanstack/react-router";
+import { Outlet, useNavigate, useRouter } from "@tanstack/react-router";
 import { Effect } from "effect";
 import { useMemo } from "react";
 import { MainPageLayout } from "~/ui/main-page/MainPageLayout";
@@ -32,10 +32,15 @@ export const SettingsPage = () => {
 
 	return (
 		<MainPageLayout
+			heroPlacement="behind-panel"
 			labelledBy="settings-title"
 			page="settings"
+			panelClassName="h-full"
+			panelContentClassName="h-full"
 		>
-			<Settings onBackFx={onBackFx} />
+			<Settings onBackFx={onBackFx}>
+				<Outlet />
+			</Settings>
 		</MainPageLayout>
 	);
 };

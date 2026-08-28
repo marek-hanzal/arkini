@@ -120,6 +120,7 @@
 ::view-transition-group(arkini-action-panel),
 ::view-transition-group(arkini-action-progress),
 ::view-transition-group(arkini-startup-content),
+::view-transition-group(arkini-settings-content),
 ::view-transition-group(arkini-game-board),
 ::view-transition-group(arkini-editor-game-board),
 ::view-transition-group(arkini-editor-shell),
@@ -167,6 +168,10 @@
 	overflow: visible;
 }
 
+::view-transition-group(arkini-settings-content) {
+	z-index: 45;
+}
+
 ::view-transition-group(arkini-editor-navigation) {
 	z-index: 30;
 }
@@ -210,6 +215,8 @@
 ::view-transition-new(arkini-action-progress),
 ::view-transition-old(arkini-startup-content),
 ::view-transition-new(arkini-startup-content),
+::view-transition-old(arkini-settings-content),
+::view-transition-new(arkini-settings-content),
 ::view-transition-old(arkini-game-board),
 ::view-transition-new(arkini-game-board),
 ::view-transition-old(arkini-editor-game-board),
@@ -290,6 +297,50 @@
 
 ::view-transition-new(arkini-startup-content) {
 	animation: arkini-vt-fade-in 280ms 190ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+::view-transition-old(arkini-settings-content) {
+	animation: arkini-vt-fade-out 180ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+::view-transition-new(arkini-settings-content) {
+	animation: arkini-vt-fade-in 320ms 190ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Internal Settings navigation keeps the full-height panel fixed and only crossfades its content. */
+:root:active-view-transition-type(settings-to-settings)::view-transition-group(
+	arkini-panel-settings
+),
+:root:active-view-transition-type(settings-to-settings)::view-transition-old(arkini-panel-settings),
+:root:active-view-transition-type(settings-to-settings)::view-transition-new(arkini-panel-settings),
+:root:active-view-transition-type(settings-to-settings)::view-transition-group(
+	arkini-settings-content
+) {
+	animation: none;
+}
+
+:root:active-view-transition-type(settings-to-settings)::view-transition-old(
+	arkini-panel-settings
+) {
+	opacity: 0;
+}
+
+:root:active-view-transition-type(settings-to-settings)::view-transition-new(
+	arkini-panel-settings
+) {
+	opacity: 1;
+}
+
+:root:active-view-transition-type(settings-to-settings)::view-transition-old(
+	arkini-settings-content
+) {
+	animation: arkini-vt-fade-out 100ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+:root:active-view-transition-type(settings-to-settings)::view-transition-new(
+	arkini-settings-content
+) {
+	animation: arkini-vt-fade-in 140ms 100ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* Board and Hero scene handoffs use two stages instead of overlaying complete screens. */

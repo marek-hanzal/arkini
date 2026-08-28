@@ -22,6 +22,7 @@ const editorWelcomePattern = /^\/editor(?:\/welcome)?\/?$/;
 const editorProjectPattern = /^\/editor\/(?!welcome(?:\/|$))[^/]+(?:\/.*)?$/;
 const editorBoardPattern = /^\/editor\/[^/]+\/board\/?$/;
 const editorBoardInventoryPattern = /^\/editor\/[^/]+\/board\/inventory\/?$/;
+const settingsPattern = /^\/settings(?:\/(?:common|game|dev))?\/?$/;
 
 const isEditorBoardLeafTransition = (from: string, to: string) =>
 	(editorBoardPattern.test(from) && editorBoardInventoryPattern.test(to)) ||
@@ -30,7 +31,7 @@ const isEditorBoardLeafTransition = (from: string, to: string) =>
 const resolveVisualRouteId = (pathname: string): VisualRouteId => {
 	if (pathname === "/") return "startup";
 	if (pathname === "/main-menu") return "main-menu";
-	if (pathname === "/settings") return "settings";
+	if (settingsPattern.test(pathname)) return "settings";
 	if (pathname === "/about") return "about";
 	if (pathname === "/arkpacks") return "arkpacks";
 	if (editorWelcomePattern.test(pathname)) return "editor-welcome";

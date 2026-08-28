@@ -22,10 +22,12 @@ type MainPagePanelMode = keyof typeof panelModeClassNames;
 export namespace MainPageLayout {
 	export interface Props extends PropsWithChildren {
 		readonly foregroundOverlay?: ReactNode;
+		readonly heroPlacement?: "above-panel" | "behind-panel";
 		readonly labelledBy?: string;
 		readonly overlay?: ReactNode;
 		readonly page: MainPage;
 		readonly panelClassName?: string;
+		readonly panelContentClassName?: string;
 		readonly panelMode?: MainPagePanelMode;
 	}
 }
@@ -34,17 +36,19 @@ export namespace MainPageLayout {
 export const MainPageLayout = ({
 	children,
 	foregroundOverlay,
+	heroPlacement = "above-panel",
 	labelledBy,
 	overlay,
 	page,
 	panelClassName,
+	panelContentClassName,
 	panelMode = "responsive",
 }: MainPageLayout.Props) => (
 	<LauncherScene
 		compactHero
 		dataUi="MainPageLayout"
 		foregroundOverlay={foregroundOverlay}
-		layout="fixed-hero"
+		layout={heroPlacement === "above-panel" ? "fixed-hero" : "overlaid-hero"}
 		overlay={overlay}
 	>
 		<section
@@ -65,6 +69,7 @@ export const MainPageLayout = ({
 				className={twMerge(
 					"relative z-10 min-h-0 min-w-0",
 					panelContentModeClassNames[panelMode],
+					panelContentClassName,
 				)}
 				data-ui="MainPagePanelContent"
 			>

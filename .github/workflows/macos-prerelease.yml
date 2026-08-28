@@ -104,13 +104,13 @@ jobs:
       contents: write
     steps:
       - name: Download macOS artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: arkini-macos-arm64-${{ github.run_number }}-${{ github.run_attempt }}
           path: release/macos
 
       - name: Download Windows artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: arkini-windows-x64-${{ github.run_number }}-${{ github.run_attempt }}
           path: release/windows

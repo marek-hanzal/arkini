@@ -5,15 +5,15 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { createEditorMcpOwnershipFx } from "../../../../electron/main/editor-mcp/http/createEditorMcpOwnershipFx";
 import {
-	cleanupEditorMcpHarnesses,
-	createEditorMcpHarness,
-	createEditorMcpProjectRepository,
-	createTestEditorMcpStorage,
-	registerEditorMcpCleanup,
-	reserveReleasedEditorMcpPort,
-} from "./support/createEditorMcpHarness";
+	cleanupMcpHarnesses,
+	createMcpHarness,
+	createProjectRepository,
+	createTestStorage,
+	registerMcpCleanup,
+	reserveReleasedPort,
+} from "./support/createMcpHarness";
 
-afterEach(cleanupEditorMcpHarnesses);
+afterEach(cleanupMcpHarnesses);
 
 const sendRawRequest = (port: number, target: string) =>
 	new Promise<string>((resolve, reject) => {
@@ -36,7 +36,7 @@ const createOwnership = async (
 	port: number,
 	editor: createEditorMcpOwnershipFx.Props["editor"],
 ) => {
-	const storage = await createTestEditorMcpStorage(port);
+	const storage = await createTestStorage(port);
 	const ownership = Effect.runSync(
 		createEditorMcpOwnershipFx({
 			editor,
@@ -49,13 +49,13 @@ const createOwnership = async (
 			},
 		}),
 	);
-	registerEditorMcpCleanup(() => Effect.runPromise(ownership.closeFx));
+	registerMcpCleanup(() => Effect.runPromise(ownership.closeFx));
 	return ownership;
 };
 
 describe("createEditorMcpOwnershipFx", () => {
 	it("starts local MCP explicitly once, stops it, and releases its port", async () => {
-		const { ownership, port } = await createEditorMcpHarness();
+		const { ownership, port } = await createMcpHarness();
 		expect(ownership.readLocalStatus()).toEqual({
 			type: "inactive",
 		});
@@ -110,13 +110,13 @@ describe("createEditorMcpOwnershipFx", () => {
 				resolve(address.port);
 			});
 		});
-		registerEditorMcpCleanup(
+		registerMcpCleanup(
 			() =>
 				new Promise<void>((resolve, reject) =>
 					occupied.close((error) => (error === undefined ? resolve() : reject(error))),
 				),
 		);
-		const repository = await createEditorMcpProjectRepository();
+		const repository = await createProjectRepository();
 		const ownership = await createOwnership(port, {
 			type: "ready",
 			repository,
@@ -147,12 +147,11 @@ describe("createEditorMcpOwnershipFx", () => {
 	});
 
 	it("serializes a port change before a concurrent local start", async () => {
-		const originalPort = await reserveReleasedEditorMcpPort();
-		let replacementPort = await reserveReleasedEditorMcpPort();
-		while (replacementPort === originalPort)
-			replacementPort = await reserveReleasedEditorMcpPort();
-		const repository = await createEditorMcpProjectRepository();
-		const storage = await createTestEditorMcpStorage(originalPort);
+		const originalPort = await reserveReleasedPort();
+		let replacementPort = await reserveReleasedPort();
+		while (replacementPort === originalPort) replacementPort = await reserveReleasedPort();
+		const repository = await createProjectRepository();
+		const storage = await createTestStorage(originalPort);
 		let currentPort = originalPort;
 		let releaseWrite: () => void = () => undefined;
 		const writeMayFinish = new Promise<void>((resolve) => {
@@ -190,7 +189,7 @@ describe("createEditorMcpOwnershipFx", () => {
 				},
 			}),
 		);
-		registerEditorMcpCleanup(() => Effect.runPromise(ownership.closeFx));
+		registerMcpCleanup(() => Effect.runPromise(ownership.closeFx));
 
 		const configure = Effect.runPromise(
 			ownership.configureFx({

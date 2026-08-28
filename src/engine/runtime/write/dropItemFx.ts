@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
+import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import { commitMergeDropFx } from "~/engine/runtime/drop/commitMergeDropFx";
 import { commitMoveDropFx } from "~/engine/runtime/drop/commitMoveDropFx";
 import { commitStackDropFx } from "~/engine/runtime/drop/commitStackDropFx";
@@ -44,7 +44,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 	}
 
 	if (
-		yield* isSameGridLocationFx({
+		isSameGridLocationFn({
 			left: sourceLocation,
 			right: target.location,
 		})

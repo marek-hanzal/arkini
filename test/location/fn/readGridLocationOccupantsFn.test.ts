@@ -1,7 +1,6 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readGridLocationOccupantsFx } from "~/engine/location/read/readGridLocationOccupantsFx";
+import { readGridLocationOccupantsFn } from "~/engine/location/fn/readGridLocationOccupantsFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import { placementTestConfig } from "~test/placement/fx/support/placementTestConfig";
@@ -28,7 +27,7 @@ const runtimeItem = (
 	revision: `revision:${id}`,
 });
 
-describe("readGridLocationOccupantsFx", () => {
+describe("readGridLocationOccupantsFn", () => {
 	it("groups by full slot identity while preserving requested location and item order", () => {
 		const firstSpaceZero = boardLocation(0, 1);
 		const duplicateSpaceZero = boardLocation(0, 1);
@@ -41,21 +40,19 @@ describe("readGridLocationOccupantsFx", () => {
 			},
 		} satisfies GridLocationSchema.Type;
 
-		const result = Effect.runSync(
-			readGridLocationOccupantsFx({
-				items: [
-					runtimeItem("runtime:first", firstSpaceZero),
-					runtimeItem("runtime:other-space", spaceOne),
-					runtimeItem("runtime:second", duplicateSpaceZero),
-				],
-				locations: [
-					firstSpaceZero,
-					duplicateSpaceZero,
-					spaceOne,
-					empty,
-				],
-			}),
-		);
+		const result = readGridLocationOccupantsFn({
+			items: [
+				runtimeItem("runtime:first", firstSpaceZero),
+				runtimeItem("runtime:other-space", spaceOne),
+				runtimeItem("runtime:second", duplicateSpaceZero),
+			],
+			locations: [
+				firstSpaceZero,
+				duplicateSpaceZero,
+				spaceOne,
+				empty,
+			],
+		});
 
 		expect(result).toHaveLength(3);
 		expect(result[0]?.location).toBe(firstSpaceZero);

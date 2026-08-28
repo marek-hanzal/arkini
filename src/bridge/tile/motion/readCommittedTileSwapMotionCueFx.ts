@@ -4,7 +4,7 @@ import type { GameTransition } from "~/bridge/game/GameSession";
 import type { TileLocation } from "~/bridge/tile/TileLocation";
 import type { TileSwapMotionCue } from "~/bridge/tile/motion/TileMotionCue";
 import { readGridRuntimeItemFx } from "~/bridge/tile/motion/readGridRuntimeItemFx";
-import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
+import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 
 interface CapturedTileSwapActor {
 	readonly id: string;
@@ -51,24 +51,24 @@ export const readCommittedTileSwapMotionCueFx = Effect.fn("readCommittedTileSwap
 		) {
 			return null;
 		}
-		const exactExchange = yield* Effect.all([
-			isSameGridLocationFx({
+		const exactExchange = [
+			isSameGridLocationFn({
 				left: previousSource.location,
 				right: source.location,
 			}),
-			isSameGridLocationFx({
+			isSameGridLocationFn({
 				left: previousTarget.location,
 				right: target.location,
 			}),
-			isSameGridLocationFx({
+			isSameGridLocationFn({
 				left: currentSource.location,
 				right: target.location,
 			}),
-			isSameGridLocationFx({
+			isSameGridLocationFn({
 				left: currentTarget.location,
 				right: source.location,
 			}),
-		]);
+		];
 		if (exactExchange.includes(false)) return null;
 		return {
 			kind: "swap",

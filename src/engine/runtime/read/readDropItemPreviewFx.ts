@@ -3,12 +3,12 @@ import { match } from "ts-pattern";
 
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import { isItemLocationScopeAllowedFx } from "~/engine/location/read/isItemLocationScopeAllowedFx";
+import { isItemLocationScopeAllowedFn } from "~/engine/location/fn/isItemLocationScopeAllowedFn";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { resolveLineInputStoreFx } from "~/engine/input/fx/resolveLineInputStoreFx";
-import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
-import { readGridLocationClaimAtFx } from "~/engine/location/read/readGridLocationClaimAtFx";
-import { readGridLocationClaimsFx } from "~/engine/location/read/readGridLocationClaimsFx";
+import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
+import { readGridLocationClaimAtFn } from "~/engine/location/fn/readGridLocationClaimAtFn";
+import { readGridLocationClaimsFn } from "~/engine/location/fn/readGridLocationClaimsFn";
 import { resolveMergeRuleFx } from "~/engine/merge/fx/resolveMergeRuleFx";
 import type { DropItemCommand } from "~/engine/runtime/DropItemCommand";
 import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
@@ -65,7 +65,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		return rejected(DropItemRejectedReason.UnsupportedTarget);
 	}
 	if (
-		yield* isSameGridLocationFx({
+		isSameGridLocationFn({
 			left: sourceLocation,
 			right: target.location,
 		})
@@ -85,28 +85,28 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		return rejected(DropItemRejectedReason.InvalidSource);
 	}
 	if (
-		!(yield* isSameGridLocationFx({
+		!isSameGridLocationFn({
 			left: source.location,
 			right: sourceLocation,
-		}))
+		})
 	) {
 		return rejected(DropItemRejectedReason.StaleSource);
 	}
 	if (target.occupant === null) {
-		const claim = yield* readGridLocationClaimAtFx({
-			claims: (yield* readGridLocationClaimsFx({
+		const claim = readGridLocationClaimAtFn({
+			claims: readGridLocationClaimsFn({
 				runtime,
-			})).filter((candidate) => candidate.itemId !== sourceItemId),
+			}).filter((candidate) => candidate.itemId !== sourceItemId),
 			location: target.location,
 		});
 		if (claim !== undefined) {
 			return rejected(DropItemRejectedReason.Occupied);
 		}
 		if (
-			!(yield* isItemLocationScopeAllowedFx({
+			!isItemLocationScopeAllowedFn({
 				item: source.item,
 				locationScope: target.location.scope,
-			}))
+			})
 		) {
 			return rejected(DropItemRejectedReason.InvalidTarget);
 		}
@@ -140,10 +140,10 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		return rejected(DropItemRejectedReason.InvalidTarget);
 	}
 	if (
-		!(yield* isSameGridLocationFx({
+		!isSameGridLocationFn({
 			left: targetItem.location,
 			right: target.location,
-		}))
+		})
 	) {
 		return rejected(DropItemRejectedReason.StaleTarget);
 	}
@@ -168,10 +168,10 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	if (targetItem.item.type === TypeSchema.enum.Inventory) {
 		if (
 			source.location.scope === LocationScopeEnumSchema.enum.Inventory ||
-			!(yield* isItemLocationScopeAllowedFx({
+			!isItemLocationScopeAllowedFn({
 				item: source.item,
 				locationScope: LocationScopeEnumSchema.enum.Inventory,
-			}))
+			})
 		) {
 			return rejected(DropItemRejectedReason.InvalidTarget);
 		}
@@ -233,11 +233,11 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 			}),
 		);
 	}
-	const sourceScopeAllowed = yield* isItemLocationScopeAllowedFx({
+	const sourceScopeAllowed = isItemLocationScopeAllowedFn({
 		item: source.item,
 		locationScope: targetItem.location.scope,
 	});
-	const targetScopeAllowed = yield* isItemLocationScopeAllowedFx({
+	const targetScopeAllowed = isItemLocationScopeAllowedFn({
 		item: targetItem.item,
 		locationScope: source.location.scope,
 	});

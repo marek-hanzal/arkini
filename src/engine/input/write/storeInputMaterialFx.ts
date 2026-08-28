@@ -15,7 +15,7 @@ import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { LineInputClosedError } from "~/engine/line/error/LineInputClosedError";
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
-import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
+import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
@@ -94,10 +94,10 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 					);
 				}
 				if (
-					!(yield* isSameGridLocationFx({
+					!isSameGridLocationFn({
 						left: gridOwner.location,
 						right: expectedOwnerLocation,
-					}))
+					})
 				) {
 					return yield* Effect.fail(
 						new ItemLocationConflictError({
@@ -128,10 +128,10 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 			}
 			if (
 				expectedSourceLocation !== undefined &&
-				!(yield* isSameGridLocationFx({
+				!isSameGridLocationFn({
 					left: source.location,
 					right: expectedSourceLocation,
-				}))
+				})
 			) {
 				return yield* Effect.fail(
 					new ItemLocationConflictError({

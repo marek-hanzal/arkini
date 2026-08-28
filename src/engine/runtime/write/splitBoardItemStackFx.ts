@@ -4,7 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
-import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
+import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
 import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
@@ -60,10 +60,10 @@ export const splitBoardItemStackFx = Effect.fn("splitBoardItemStackFx")(function
 				);
 			}
 			if (
-				!(yield* isSameGridLocationFx({
+				!isSameGridLocationFn({
 					left: sourceBefore.location,
 					right: location,
-				}))
+				})
 			) {
 				return yield* Effect.fail(
 					new ItemLocationConflictError({

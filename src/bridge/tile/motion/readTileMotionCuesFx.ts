@@ -10,7 +10,7 @@ import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
 import { readGridRuntimeItemFx } from "~/bridge/tile/motion/readGridRuntimeItemFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
-import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
+import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { readRuntimeInventoryOpenerFx } from "~/engine/runtime/read/readRuntimeInventoryOpenerFx";
@@ -91,10 +91,10 @@ const readTargetFx = Effect.fn("readTileMotionCueTargetFx")(function* ({
 	if (
 		target === null ||
 		target.item.id !== canonicalItemId ||
-		!(yield* isSameGridLocationFx({
+		!isSameGridLocationFn({
 			left: target.location,
 			right: location,
-		}))
+		})
 	) {
 		return null;
 	}
@@ -286,10 +286,10 @@ const readEventCueFx = Effect.fn("readTileMotionEventCueFx")(function* ({
 					if (
 						source === null ||
 						source.item.id !== stored.canonicalItemId ||
-						!(yield* isSameGridLocationFx({
+						!isSameGridLocationFn({
 							left: source.location,
 							right: stored.previousSourceLocation,
-						}))
+						})
 					) {
 						return null;
 					}

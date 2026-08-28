@@ -1,5 +1,3 @@
-import { Effect } from "effect";
-
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -16,11 +14,7 @@ export interface GridLocationClaim {
  * A delivery origin stays claimed until the same transition either commits the complete item
  * elsewhere or places its returning remainder home. There are no placeholder runtime items.
  */
-export const readGridLocationClaimsFx = Effect.fn("readGridLocationClaimsFx")(function* ({
-	runtime,
-}: {
-	readonly runtime: RuntimeSchema.Type;
-}) {
+export const readGridLocationClaimsFn = ({ runtime }: { readonly runtime: RuntimeSchema.Type }) => {
 	const claims: GridLocationClaim[] = [];
 	for (const item of runtime.items) {
 		if (
@@ -44,4 +38,4 @@ export const readGridLocationClaimsFx = Effect.fn("readGridLocationClaimsFx")(fu
 		}
 	}
 	return claims;
-});
+};

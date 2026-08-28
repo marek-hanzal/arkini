@@ -44,7 +44,7 @@ export const EditorFormSectionPage = ({
 			/>
 		}
 	>
-		<div className="grid gap-[var(--ak-viewport-gap)]">
+		<div className="grid gap-3">
 			{notice}
 			<EditorFormContent
 				error={error}

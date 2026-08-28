@@ -83,7 +83,7 @@ package_windows_artifacts() {
 		sha256sum \
 			"Arkini-$version-win-x64.exe" \
 			"Arkini-$version-win-x64.zip" \
-			arkini.arkpack >SHA256SUMS
+			arkini.arkpack >SHA256SUMS-windows-x64
 	)
 }
 

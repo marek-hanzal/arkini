@@ -6,7 +6,7 @@ import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { LocationSchema } from "~/engine/location/schema/LocationSchema";
 import { createRevisionFx } from "~/engine/revision/fx/createRevisionFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 
 export namespace createRuntimeItemFx {
 	export interface Props<Location extends LocationSchema.Type> {
@@ -48,7 +48,7 @@ export const createRuntimeItemFx = Effect.fn("createRuntimeItemFx")(function* <
 		remainingCharges,
 		remainingDurationMs:
 			remainingDurationMs ??
-			(item.type === ItemEnumSchema.enum.Temporary ? item.durationMs : undefined),
+			(item.type === TypeSchema.enum.Temporary ? item.durationMs : undefined),
 		revision,
 	} satisfies createRuntimeItemFx.Result<Location>;
 });

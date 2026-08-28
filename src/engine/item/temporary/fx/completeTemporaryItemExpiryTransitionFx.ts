@@ -9,7 +9,7 @@ import { outputFx } from "~/engine/output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { makeTemporaryExpiryRandomFx } from "~/engine/item/temporary/random/makeTemporaryExpiryRandomFx";
 
 export namespace completeTemporaryItemExpiryTransitionFx {
@@ -31,7 +31,7 @@ export const completeTemporaryItemExpiryTransitionFx = Effect.fn(
 	const item = runtime.items.find((candidate) => candidate.id === itemId);
 	if (item === undefined)
 		return yield* Effect.die(new Error(`Temporary item ${itemId} is missing.`));
-	if (item.item.type !== ItemEnumSchema.enum.Temporary) {
+	if (item.item.type !== TypeSchema.enum.Temporary) {
 		return yield* Effect.die(new Error(`Runtime item ${item.id} is not temporary.`));
 	}
 	if (item.location.scope !== LocationScopeEnumSchema.enum.Board) {

@@ -3,14 +3,14 @@ import { z } from "zod";
 import { InputSchema } from "~/engine/action/schema/InputSchema";
 import { RuleSchema } from "~/engine/action/schema/RuleSchema";
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import { BaseItemSchema } from "./BaseItemSchema";
-import { ItemEnumSchema } from "./ItemEnumSchema";
+import { BaseSchema } from "./BaseSchema";
+import { TypeSchema } from "./TypeSchema";
 
 /** An immediately activated item that transitions gameplay to one authored space. */
-export const SpaceItemSchema = z
+export const SpaceSchema = z
 	.object({
-		...BaseItemSchema.shape,
-		type: ItemEnumSchema.extract([
+		...BaseSchema.shape,
+		type: TypeSchema.extract([
 			"Space",
 		]),
 		space: NonNegativeIntegerSchema.describe(
@@ -27,8 +27,8 @@ export const SpaceItemSchema = z
 			"An item whose shared immediate action requirements settle atomically with navigation.",
 	});
 
-export type SpaceItemSchema = typeof SpaceItemSchema;
+export type SpaceSchema = typeof SpaceSchema;
 
-export namespace SpaceItemSchema {
-	export type Type = z.infer<SpaceItemSchema>;
+export namespace SpaceSchema {
+	export type Type = z.infer<SpaceSchema>;
 }

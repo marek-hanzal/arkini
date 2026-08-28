@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 import { P, match } from "ts-pattern";
 
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 
 export namespace readTileActorActivityEffectFx {
 	export interface Props {
-		readonly itemType: ItemEnumSchema.Type;
+		readonly itemType: TypeSchema.Type;
 		readonly running: boolean;
 	}
 }
@@ -17,20 +17,20 @@ export const readTileActorActivityEffectFx = Effect.fn("readTileActorActivityEff
 			match(itemType)
 				.with(
 					P.union(
-						ItemEnumSchema.enum.Blueprint,
-						ItemEnumSchema.enum.Craft,
-						ItemEnumSchema.enum.Deposit,
-						ItemEnumSchema.enum.Producer,
+						TypeSchema.enum.Blueprint,
+						TypeSchema.enum.Craft,
+						TypeSchema.enum.Deposit,
+						TypeSchema.enum.Producer,
 					),
 					() => running,
 				)
 				.with(
 					P.union(
-						ItemEnumSchema.enum.Inventory,
-						ItemEnumSchema.enum.Simple,
-						ItemEnumSchema.enum.Space,
-						ItemEnumSchema.enum.Stash,
-						ItemEnumSchema.enum.Temporary,
+						TypeSchema.enum.Inventory,
+						TypeSchema.enum.Simple,
+						TypeSchema.enum.Space,
+						TypeSchema.enum.Stash,
+						TypeSchema.enum.Temporary,
 					),
 					() => false,
 				)

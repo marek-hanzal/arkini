@@ -2,10 +2,10 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { LocationSchema } from "~/engine/location/schema/LocationSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import type { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+import type { StorageSchema } from "~/engine/scope/schema/StorageSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace readItemDetailInfoFx {
@@ -43,8 +43,8 @@ export namespace readItemDetailInfoFx {
 				readonly kind: "available";
 				readonly itemId: IdSchema.Type;
 				readonly description: string;
-				readonly itemType: ItemEnumSchema.Type;
-				readonly storageScope: StorageScopeEnumSchema.Type;
+				readonly itemType: TypeSchema.Type;
+				readonly storageScope: StorageSchema.Type;
 				readonly location: Location;
 				readonly quantity: number;
 				readonly maxStackSize: number;

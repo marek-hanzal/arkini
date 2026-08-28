@@ -9,7 +9,7 @@ import {
 	expectNamedJsonSchemaGraph,
 	isJsonSchemaRecord,
 } from "~test/schema/expectNamedJsonSchemaGraph";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import {
 	cleanupEditorMcpHarnesses,
 	connectEditorMcpClient,
@@ -87,7 +87,7 @@ describe("editor MCP server", () => {
 			? collectionSchema.$defs
 			: {};
 		expect(collectionDefinitions.EditorMcpItemTypeSchema).toMatchObject({
-			enum: ItemEnumSchema.options,
+			enum: TypeSchema.options,
 			type: "string",
 		});
 		const schemaIds = tools.tools.map(({ inputSchema, name }) => {

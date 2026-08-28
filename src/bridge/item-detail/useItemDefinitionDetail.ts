@@ -4,9 +4,9 @@ import { useCallback } from "react";
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import type { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+import type { StorageSchema } from "~/engine/scope/schema/StorageSchema";
 
 export namespace useItemDefinitionDetail {
 	export type Projection =
@@ -17,8 +17,8 @@ export namespace useItemDefinitionDetail {
 				readonly sourceUrl: string;
 				readonly compositeUrl?: string;
 				readonly description: string;
-				readonly itemType: ItemEnumSchema.Type;
-				readonly storageScope: StorageScopeEnumSchema.Type;
+				readonly itemType: TypeSchema.Type;
+				readonly storageScope: StorageSchema.Type;
 				readonly maxStackSize: number;
 				readonly ownedQuantity: number;
 				readonly maxCount?: number;

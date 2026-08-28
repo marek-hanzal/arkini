@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { compileGameSourcesFx } from "~/engine/compiler/fx/compileGameSourcesFx";
-import { DepositItemSchema } from "~/engine/item/schema/DepositItemSchema";
+import { DepositSchema } from "~/engine/item/schema/DepositSchema";
 import { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import {
 	createOutput,
@@ -14,7 +14,7 @@ import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticC
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 
 const createDeposit = (id: string) =>
-	DepositItemSchema.parse({
+	DepositSchema.parse({
 		...createSimpleItem(id),
 		type: "deposit",
 		charges: {

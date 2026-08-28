@@ -8,7 +8,7 @@ import { IdSchema } from "~/engine/common/schema/IdSchema";
  * Item visuals remain declared on each item. This root config owns only named
  * non-item roles such as the splash hero so no filesystem convention is needed.
  */
-export const ResourceConfigSchema = z
+export const RolesSchema = z
 	.object({
 		hero: IdSchema.describe("The explicit resource ID used by the game splash hero."),
 		"avatar-01": IdSchema.optional(),
@@ -25,8 +25,8 @@ export const ResourceConfigSchema = z
 		description: "Named non-item resource references required by the game.",
 	});
 
-export type ResourceConfigSchema = typeof ResourceConfigSchema;
+export type RolesSchema = typeof RolesSchema;
 
-export namespace ResourceConfigSchema {
-	export type Type = z.infer<ResourceConfigSchema>;
+export namespace RolesSchema {
+	export type Type = z.infer<RolesSchema>;
 }

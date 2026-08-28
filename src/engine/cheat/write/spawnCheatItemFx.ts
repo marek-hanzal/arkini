@@ -11,7 +11,7 @@ import { assertPlacementPlanCompleteFx } from "~/engine/placement/fx/assertPlace
 import { planBoardPlacementFx } from "~/engine/placement/fx/planBoardPlacementFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
-import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
 import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
 import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
 
@@ -29,10 +29,7 @@ export const spawnCheatItemFx = Effect.fn("spawnCheatItemFx")(function* ({
 	const item = yield* resolveItemFx({
 		itemId,
 	});
-	if (
-		item.scope !== StorageScopeEnumSchema.enum.Board &&
-		item.scope !== StorageScopeEnumSchema.enum.Any
-	) {
+	if (item.scope !== StorageSchema.enum.Board && item.scope !== StorageSchema.enum.Any) {
 		return yield* Effect.fail(
 			new CheatItemNotSpawnableError({
 				itemId,

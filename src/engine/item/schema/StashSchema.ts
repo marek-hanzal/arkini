@@ -2,18 +2,18 @@ import { z } from "zod";
 
 import { LineSchema } from "~/engine/line/schema/LineSchema";
 
-import { BaseItemSchema } from "./BaseItemSchema";
-import { ItemEnumSchema } from "./ItemEnumSchema";
+import { BaseSchema } from "./BaseSchema";
+import { TypeSchema } from "./TypeSchema";
 
 /**
  * An item configuration that owns one ordinary product line.
  *
  * Output and placement use the shared line contract. Item lifetime is expressed independently through optional charges.
  */
-export const StashItemSchema = z
+export const StashSchema = z
 	.object({
-		...BaseItemSchema.shape,
-		type: ItemEnumSchema.extract([
+		...BaseSchema.shape,
+		type: TypeSchema.extract([
 			"Stash",
 		]),
 		line: LineSchema.describe("The one product line owned by this stash."),
@@ -24,8 +24,8 @@ export const StashItemSchema = z
 		description: "An item configuration with one product line.",
 	});
 
-export type StashItemSchema = typeof StashItemSchema;
+export type StashSchema = typeof StashSchema;
 
-export namespace StashItemSchema {
-	export type Type = z.infer<StashItemSchema>;
+export namespace StashSchema {
+	export type Type = z.infer<StashSchema>;
 }

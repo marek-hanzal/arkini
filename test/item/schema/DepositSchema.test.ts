@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { DepositItemSchema } from "~/engine/item/schema/DepositItemSchema";
+import { DepositSchema } from "~/engine/item/schema/DepositSchema";
 
-describe("DepositItemSchema", () => {
+describe("DepositSchema", () => {
 	it("accepts the shared positive item charge contract", () => {
 		const item = {
 			uid: "deposit:tree",
@@ -22,9 +22,9 @@ describe("DepositItemSchema", () => {
 			},
 		};
 
-		expect(DepositItemSchema.safeParse(item).success).toBe(true);
+		expect(DepositSchema.safeParse(item).success).toBe(true);
 		expect(
-			DepositItemSchema.safeParse({
+			DepositSchema.safeParse({
 				...item,
 				charges: {
 					amount: 0,
@@ -34,7 +34,7 @@ describe("DepositItemSchema", () => {
 	});
 
 	it("accepts optional production lines on a finite deposit", () => {
-		const result = DepositItemSchema.parse({
+		const result = DepositSchema.parse({
 			uid: "deposit:well",
 			id: "deposit:well",
 			title: "Well",

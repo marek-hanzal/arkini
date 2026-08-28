@@ -2,7 +2,7 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
 import { readLineOwnerLinesFx } from "~/engine/line/read/readLineOwnerLinesFx";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
@@ -58,7 +58,7 @@ export const resolveOneHopLineOutputMaxCountFx = Effect.fn("resolveOneHopLineOut
 			const intermediate = yield* resolveItemFx({
 				itemId: intermediateItemId,
 			});
-			if (intermediate.type !== ItemEnumSchema.enum.Blueprint) continue;
+			if (intermediate.type !== TypeSchema.enum.Blueprint) continue;
 			const owner = Option.getOrUndefined(yield* isLineOwnerItemFx(intermediate));
 			if (owner === undefined) continue;
 			const applicable = (yield* readLineOwnerLinesFx(owner)).filter(

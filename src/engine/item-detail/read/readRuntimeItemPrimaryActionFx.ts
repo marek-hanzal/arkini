@@ -1,6 +1,6 @@
 import { Effect, Option } from "effect";
 
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { resolveJobQueueFx } from "~/engine/job/fx/read/resolveJobQueueFx";
 import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
 import { readEffectiveDefaultLineFx } from "~/engine/line/read/readEffectiveDefaultLineFx";
@@ -38,13 +38,13 @@ export namespace readRuntimeItemPrimaryActionFx {
 /** Resolves the canonical single-click action of one exact live item. */
 export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryActionFx")(
 	function* ({ item, runtime }: readRuntimeItemPrimaryActionFx.Props) {
-		if (item.item.type === ItemEnumSchema.enum.Space) {
+		if (item.item.type === TypeSchema.enum.Space) {
 			return {
 				currentSpace: runtime.currentSpace,
 				kind: "activate-space" as const,
 			} satisfies readRuntimeItemPrimaryActionFx.Result;
 		}
-		if (item.item.type === ItemEnumSchema.enum.Inventory) {
+		if (item.item.type === TypeSchema.enum.Inventory) {
 			return {
 				kind: "open-inventory" as const,
 			} satisfies readRuntimeItemPrimaryActionFx.Result;

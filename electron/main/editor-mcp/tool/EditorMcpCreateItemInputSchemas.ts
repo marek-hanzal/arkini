@@ -3,21 +3,21 @@ import { z } from "zod";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { TimeSchema } from "~/engine/common/schema/TimeSchema";
 import { AssetSchema } from "~/engine/item/schema/AssetSchema";
-import { BlueprintItemSchema } from "~/engine/item/schema/BlueprintItemSchema";
-import { CraftItemSchema } from "~/engine/item/schema/CraftItemSchema";
-import { DepositItemSchema } from "~/engine/item/schema/DepositItemSchema";
-import { InventoryItemSchema } from "~/engine/item/schema/InventoryItemSchema";
-import { ProducerItemSchema } from "~/engine/item/schema/ProducerItemSchema";
-import { SimpleItemSchema } from "~/engine/item/schema/SimpleItemSchema";
-import { SpaceItemSchema } from "~/engine/item/schema/SpaceItemSchema";
-import { StashItemSchema } from "~/engine/item/schema/StashItemSchema";
-import { TemporaryItemSchema } from "~/engine/item/schema/TemporaryItemSchema";
-import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+import { BlueprintSchema } from "~/engine/item/schema/BlueprintSchema";
+import { CraftSchema } from "~/engine/item/schema/CraftSchema";
+import { DepositSchema } from "~/engine/item/schema/DepositSchema";
+import { InventorySchema } from "~/engine/item/schema/InventorySchema";
+import { ProducerSchema } from "~/engine/item/schema/ProducerSchema";
+import { SimpleSchema } from "~/engine/item/schema/SimpleSchema";
+import { SpaceSchema } from "~/engine/item/schema/SpaceSchema";
+import { StashSchema } from "~/engine/item/schema/StashSchema";
+import { TemporarySchema } from "~/engine/item/schema/TemporarySchema";
+import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
 
 const draftAsset = AssetSchema.optional().describe(
 	"Optional visual asset definition; defaults to the first asset in the open project.",
 );
-const draftScope = StorageScopeEnumSchema.optional().describe(
+const draftScope = StorageSchema.optional().describe(
 	"Optional storage scope; defaults to any, matching a new Editor form.",
 );
 const draftMaxStackSize = PositiveIntegerSchema.optional().describe(
@@ -29,7 +29,7 @@ const draftMaxQueueSize = PositiveIntegerSchema.optional().describe(
 
 /** Human-facing create inputs; omitted fields use the matching Editor form's draft values. */
 export const EditorMcpCreateItemInputSchemas = {
-	simple: SimpleItemSchema.omit({
+	simple: SimpleSchema.omit({
 		asset: true,
 		maxStackSize: true,
 		scope: true,
@@ -48,7 +48,7 @@ export const EditorMcpCreateItemInputSchemas = {
 			title: "Create simple item tool input",
 			description: "Authoring fields accepted when creating one simple item.",
 		}),
-	space: SpaceItemSchema.omit({
+	space: SpaceSchema.omit({
 		asset: true,
 		enable: true,
 		input: true,
@@ -60,9 +60,9 @@ export const EditorMcpCreateItemInputSchemas = {
 	})
 		.extend({
 			asset: draftAsset,
-			enable: SpaceItemSchema.shape.enable.removeDefault().optional(),
-			input: SpaceItemSchema.shape.input.removeDefault().optional(),
-			rules: SpaceItemSchema.shape.rules.removeDefault().optional(),
+			enable: SpaceSchema.shape.enable.removeDefault().optional(),
+			input: SpaceSchema.shape.input.removeDefault().optional(),
+			rules: SpaceSchema.shape.rules.removeDefault().optional(),
 			scope: draftScope,
 			maxStackSize: draftMaxStackSize,
 		})
@@ -73,7 +73,7 @@ export const EditorMcpCreateItemInputSchemas = {
 			title: "Create space item tool input",
 			description: "Authoring fields accepted when creating one space item.",
 		}),
-	producer: ProducerItemSchema.omit({
+	producer: ProducerSchema.omit({
 		asset: true,
 		lines: true,
 		maxQueueSize: true,
@@ -87,7 +87,7 @@ export const EditorMcpCreateItemInputSchemas = {
 			scope: draftScope,
 			maxStackSize: draftMaxStackSize,
 			maxQueueSize: draftMaxQueueSize,
-			lines: ProducerItemSchema.shape.lines
+			lines: ProducerSchema.shape.lines
 				.optional()
 				.describe(
 					"Optional non-empty product lines; defaults to the Editor's initial producer line.",
@@ -100,7 +100,7 @@ export const EditorMcpCreateItemInputSchemas = {
 			title: "Create producer item tool input",
 			description: "Authoring fields accepted when creating one producer item.",
 		}),
-	craft: CraftItemSchema.omit({
+	craft: CraftSchema.omit({
 		asset: true,
 		line: true,
 		maxStackSize: true,
@@ -112,7 +112,7 @@ export const EditorMcpCreateItemInputSchemas = {
 			asset: draftAsset,
 			scope: draftScope,
 			maxStackSize: draftMaxStackSize,
-			line: CraftItemSchema.shape.line
+			line: CraftSchema.shape.line
 				.optional()
 				.describe("Optional product line; defaults to the Editor's initial craft line."),
 		})
@@ -123,7 +123,7 @@ export const EditorMcpCreateItemInputSchemas = {
 			title: "Create craft item tool input",
 			description: "Authoring fields accepted when creating one craft item.",
 		}),
-	blueprint: BlueprintItemSchema.omit({
+	blueprint: BlueprintSchema.omit({
 		asset: true,
 		line: true,
 		maxStackSize: true,
@@ -135,7 +135,7 @@ export const EditorMcpCreateItemInputSchemas = {
 			asset: draftAsset,
 			scope: draftScope,
 			maxStackSize: draftMaxStackSize,
-			line: BlueprintItemSchema.shape.line
+			line: BlueprintSchema.shape.line
 				.optional()
 				.describe(
 					"Optional product line; defaults to the Editor's initial blueprint line.",
@@ -148,7 +148,7 @@ export const EditorMcpCreateItemInputSchemas = {
 			title: "Create blueprint item tool input",
 			description: "Authoring fields accepted when creating one blueprint item.",
 		}),
-	deposit: DepositItemSchema.omit({
+	deposit: DepositSchema.omit({
 		asset: true,
 		lines: true,
 		maxQueueSize: true,
@@ -162,7 +162,7 @@ export const EditorMcpCreateItemInputSchemas = {
 			scope: draftScope,
 			maxStackSize: draftMaxStackSize,
 			maxQueueSize: draftMaxQueueSize,
-			lines: DepositItemSchema.shape.lines.optional(),
+			lines: DepositSchema.shape.lines.optional(),
 		})
 		.strict()
 		.meta({
@@ -171,7 +171,7 @@ export const EditorMcpCreateItemInputSchemas = {
 			title: "Create deposit item tool input",
 			description: "Authoring fields accepted when creating one deposit item.",
 		}),
-	stash: StashItemSchema.omit({
+	stash: StashSchema.omit({
 		asset: true,
 		line: true,
 		maxStackSize: true,
@@ -183,7 +183,7 @@ export const EditorMcpCreateItemInputSchemas = {
 			asset: draftAsset,
 			scope: draftScope,
 			maxStackSize: draftMaxStackSize,
-			line: StashItemSchema.shape.line
+			line: StashSchema.shape.line
 				.optional()
 				.describe("Optional product line; defaults to the Editor's initial stash line."),
 		})
@@ -194,7 +194,7 @@ export const EditorMcpCreateItemInputSchemas = {
 			title: "Create stash item tool input",
 			description: "Authoring fields accepted when creating one stash item.",
 		}),
-	temporary: TemporaryItemSchema.omit({
+	temporary: TemporarySchema.omit({
 		asset: true,
 		durationMs: true,
 		maxStackSize: true,
@@ -215,7 +215,7 @@ export const EditorMcpCreateItemInputSchemas = {
 			title: "Create temporary item tool input",
 			description: "Authoring fields accepted when creating one temporary item.",
 		}),
-	inventory: InventoryItemSchema.omit({
+	inventory: InventorySchema.omit({
 		asset: true,
 		maxCount: true,
 		maxStackSize: true,

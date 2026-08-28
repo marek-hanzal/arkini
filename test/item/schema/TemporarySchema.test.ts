@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { TemporaryItemSchema } from "~/engine/item/schema/TemporaryItemSchema";
+import { TemporarySchema } from "~/engine/item/schema/TemporarySchema";
 
 const item = {
 	uid: "item:effect:minor-haste",
@@ -16,9 +16,9 @@ const item = {
 	durationMs: 300_000,
 };
 
-describe("TemporaryItemSchema", () => {
+describe("TemporarySchema", () => {
 	it("defaults temporary items to board-only singleton stacks", () => {
-		expect(TemporaryItemSchema.parse(item)).toMatchObject({
+		expect(TemporarySchema.parse(item)).toMatchObject({
 			maxStackSize: 1,
 			scope: "board",
 			type: "temporary",
@@ -41,7 +41,7 @@ describe("TemporaryItemSchema", () => {
 			},
 		]) {
 			expect(
-				TemporaryItemSchema.safeParse({
+				TemporarySchema.safeParse({
 					...item,
 					...override,
 				}).success,
@@ -51,7 +51,7 @@ describe("TemporaryItemSchema", () => {
 
 	it("accepts an optional expiry output", () => {
 		expect(
-			TemporaryItemSchema.safeParse({
+			TemporarySchema.safeParse({
 				...item,
 				output: {
 					set: [

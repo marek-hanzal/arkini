@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { MetaSchema } from "~/engine/meta/schema/MetaSchema";
-import { ResourceConfigSchema } from "~/engine/resource/schema/ResourceConfigSchema";
+import { RolesSchema } from "~/engine/resource/schema/RolesSchema";
 import { StartSchema } from "~/engine/start/schema/StartSchema";
 
 export const EditorMcpEditProjectInputSchema = z
@@ -23,7 +23,7 @@ export const EditorMcpEditProjectInputSchema = z
 					.describe(
 						"Complete replacement metadata. The stable game ID cannot be changed.",
 					),
-				resources: ResourceConfigSchema.optional().describe(
+				resources: RolesSchema.optional().describe(
 					"Complete replacement of every named non-item resource role.",
 				),
 				start: StartSchema.optional().describe(

@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { readTileActorBadgeCountFx } from "~/bridge/tile/readTileActorBadgeCountFx";
 import { readTileActorProgressRatioFx } from "~/bridge/tile/readTileActorProgressRatioFx";
 import { readTileActorQueueBadgeCountFx } from "~/bridge/tile/readTileActorQueueBadgeCountFx";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { formatTileBadgeLabelFx } from "~/ui/tile/formatTileBadgeLabelFx";
@@ -130,12 +130,12 @@ describe("tile actor overlay projection", () => {
 	it("shows stack quantity only above one and always projects deposit charges", () => {
 		const single = runtimeItem({
 			item: {
-				type: ItemEnumSchema.enum.Simple,
+				type: TypeSchema.enum.Simple,
 			},
 		});
 		const stack = runtimeItem({
 			item: {
-				type: ItemEnumSchema.enum.Simple,
+				type: TypeSchema.enum.Simple,
 			},
 			quantity: 120,
 		});
@@ -144,7 +144,7 @@ describe("tile actor overlay projection", () => {
 				charges: {
 					amount: 12,
 				},
-				type: ItemEnumSchema.enum.Deposit,
+				type: TypeSchema.enum.Deposit,
 			},
 		});
 		const usedDeposit = runtimeItem({
@@ -152,7 +152,7 @@ describe("tile actor overlay projection", () => {
 				charges: {
 					amount: 12,
 				},
-				type: ItemEnumSchema.enum.Deposit,
+				type: TypeSchema.enum.Deposit,
 			},
 			remainingCharges: 4,
 		});
@@ -166,13 +166,13 @@ describe("tile actor overlay projection", () => {
 	it("fills job progress forward and temporary lifetime backward", () => {
 		const owner = runtimeItem({
 			item: {
-				type: ItemEnumSchema.enum.Producer,
+				type: TypeSchema.enum.Producer,
 			},
 		});
 		const temporary = runtimeItem({
 			item: {
 				durationMs: 1_000,
-				type: ItemEnumSchema.enum.Temporary,
+				type: TypeSchema.enum.Temporary,
 			},
 			remainingDurationMs: 600,
 		});

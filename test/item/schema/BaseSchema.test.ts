@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { BaseItemSchema } from "~/engine/item/schema/BaseItemSchema";
-import { SimpleItemSchema } from "~/engine/item/schema/SimpleItemSchema";
+import { BaseSchema } from "~/engine/item/schema/BaseSchema";
+import { SimpleSchema } from "~/engine/item/schema/SimpleSchema";
 
-describe("BaseItemSchema", () => {
+describe("BaseSchema", () => {
 	it("requires immutable identity, presentation, storage scope, and permits an optional positive total limit", () => {
 		const item = {
 			uid: "tree",
@@ -19,39 +19,39 @@ describe("BaseItemSchema", () => {
 			maxStackSize: 1,
 		};
 
-		expect(BaseItemSchema.safeParse(item).success).toBe(true);
+		expect(BaseSchema.safeParse(item).success).toBe(true);
 		expect(
-			BaseItemSchema.safeParse({
+			BaseSchema.safeParse({
 				...item,
 				uid: undefined,
 			}).success,
 		).toBe(false);
 		expect(
-			BaseItemSchema.safeParse({
+			BaseSchema.safeParse({
 				...item,
 				maxCount: 0,
 			}).success,
 		).toBe(false);
 		expect(
-			BaseItemSchema.safeParse({
+			BaseSchema.safeParse({
 				...item,
 				maxStackSize: 0,
 			}).success,
 		).toBe(false);
 		expect(
-			BaseItemSchema.safeParse({
+			BaseSchema.safeParse({
 				...item,
 				title: "",
 			}).success,
 		).toBe(false);
 		expect(
-			BaseItemSchema.safeParse({
+			BaseSchema.safeParse({
 				...item,
 				merge: [],
 			}).success,
 		).toBe(false);
 		expect(
-			BaseItemSchema.safeParse({
+			BaseSchema.safeParse({
 				...item,
 				merge: [
 					{
@@ -84,9 +84,9 @@ describe("BaseItemSchema", () => {
 			maxStackSize: 1,
 		};
 
-		expect(SimpleItemSchema.safeParse(item).success).toBe(true);
+		expect(SimpleSchema.safeParse(item).success).toBe(true);
 		expect(
-			SimpleItemSchema.safeParse({
+			SimpleSchema.safeParse({
 				...item,
 				maxStackSize: 0,
 			}).success,

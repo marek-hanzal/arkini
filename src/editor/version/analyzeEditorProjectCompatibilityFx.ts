@@ -9,7 +9,7 @@ import {
 } from "~/editor/version/EditorProjectCompatibility";
 import type { EditorProjectSemanticDiff } from "~/editor/version/EditorProjectSemanticDiff";
 import { readEditorProjectSemanticDiffsFx } from "~/editor/version/readEditorProjectSemanticDiffsFx";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 interface CompatibilityDecision {
@@ -171,8 +171,8 @@ const readTemporaryDurationDecision = (
 		return undefined;
 	const itemId = diff.path[1];
 	if (
-		previous.items[itemId]?.type !== ItemEnumSchema.enum.Temporary ||
-		next.items[itemId]?.type !== ItemEnumSchema.enum.Temporary
+		previous.items[itemId]?.type !== TypeSchema.enum.Temporary ||
+		next.items[itemId]?.type !== TypeSchema.enum.Temporary
 	)
 		return undefined;
 	return {

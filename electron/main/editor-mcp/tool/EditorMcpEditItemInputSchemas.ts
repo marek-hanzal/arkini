@@ -1,16 +1,16 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { BaseItemSchema } from "~/engine/item/schema/BaseItemSchema";
-import { BlueprintItemSchema } from "~/engine/item/schema/BlueprintItemSchema";
-import { CraftItemSchema } from "~/engine/item/schema/CraftItemSchema";
-import { DepositItemSchema } from "~/engine/item/schema/DepositItemSchema";
-import { InventoryItemSchema } from "~/engine/item/schema/InventoryItemSchema";
-import { ProducerItemSchema } from "~/engine/item/schema/ProducerItemSchema";
-import { SimpleItemSchema } from "~/engine/item/schema/SimpleItemSchema";
-import { SpaceItemSchema } from "~/engine/item/schema/SpaceItemSchema";
-import { StashItemSchema } from "~/engine/item/schema/StashItemSchema";
-import { TemporaryItemSchema } from "~/engine/item/schema/TemporaryItemSchema";
+import { BaseSchema } from "~/engine/item/schema/BaseSchema";
+import { BlueprintSchema } from "~/engine/item/schema/BlueprintSchema";
+import { CraftSchema } from "~/engine/item/schema/CraftSchema";
+import { DepositSchema } from "~/engine/item/schema/DepositSchema";
+import { InventorySchema } from "~/engine/item/schema/InventorySchema";
+import { ProducerSchema } from "~/engine/item/schema/ProducerSchema";
+import { SimpleSchema } from "~/engine/item/schema/SimpleSchema";
+import { SpaceSchema } from "~/engine/item/schema/SpaceSchema";
+import { StashSchema } from "~/engine/item/schema/StashSchema";
+import { TemporarySchema } from "~/engine/item/schema/TemporarySchema";
 
 const requireReplacement = <Schema extends z.ZodType<Record<string, unknown>>>(patch: Schema) =>
 	patch.refine(
@@ -24,29 +24,29 @@ const immutableItemFields = {
 	uid: true,
 } as const;
 const nullableBaseItemFields = {
-	charges: BaseItemSchema.shape.charges.nullable(),
-	maxCount: BaseItemSchema.shape.maxCount.nullable(),
-	merge: BaseItemSchema.shape.merge.nullable(),
+	charges: BaseSchema.shape.charges.nullable(),
+	maxCount: BaseSchema.shape.maxCount.nullable(),
+	merge: BaseSchema.shape.merge.nullable(),
 } as const;
 
 const simplePatch = requireReplacement(
-	SimpleItemSchema.omit(immutableItemFields).partial().extend(nullableBaseItemFields).strict(),
+	SimpleSchema.omit(immutableItemFields).partial().extend(nullableBaseItemFields).strict(),
 ).meta({
 	id: "EditorMcpSimpleItemPatchSchema",
 	description: "Top-level replacements accepted for an existing simple item.",
 });
 const spacePatch = requireReplacement(
-	SpaceItemSchema.omit(immutableItemFields).partial().extend(nullableBaseItemFields).strict(),
+	SpaceSchema.omit(immutableItemFields).partial().extend(nullableBaseItemFields).strict(),
 ).meta({
 	id: "EditorMcpSpaceItemPatchSchema",
 	description: "Top-level replacements accepted for an existing space item.",
 });
 const producerPatch = requireReplacement(
-	ProducerItemSchema.omit(immutableItemFields)
+	ProducerSchema.omit(immutableItemFields)
 		.partial()
 		.extend({
 			...nullableBaseItemFields,
-			maxQueueSize: ProducerItemSchema.shape.maxQueueSize.removeDefault().optional(),
+			maxQueueSize: ProducerSchema.shape.maxQueueSize.removeDefault().optional(),
 		})
 		.strict(),
 ).meta({
@@ -54,24 +54,24 @@ const producerPatch = requireReplacement(
 	description: "Top-level replacements accepted for an existing producer item.",
 });
 const craftPatch = requireReplacement(
-	CraftItemSchema.omit(immutableItemFields).partial().extend(nullableBaseItemFields).strict(),
+	CraftSchema.omit(immutableItemFields).partial().extend(nullableBaseItemFields).strict(),
 ).meta({
 	id: "EditorMcpCraftItemPatchSchema",
 	description: "Top-level replacements accepted for an existing craft item.",
 });
 const blueprintPatch = requireReplacement(
-	BlueprintItemSchema.omit(immutableItemFields).partial().extend(nullableBaseItemFields).strict(),
+	BlueprintSchema.omit(immutableItemFields).partial().extend(nullableBaseItemFields).strict(),
 ).meta({
 	id: "EditorMcpBlueprintItemPatchSchema",
 	description: "Top-level replacements accepted for an existing blueprint item.",
 });
 const depositPatch = requireReplacement(
-	DepositItemSchema.omit(immutableItemFields)
+	DepositSchema.omit(immutableItemFields)
 		.partial()
 		.extend({
 			...nullableBaseItemFields,
-			lines: DepositItemSchema.shape.lines.nullable(),
-			maxQueueSize: DepositItemSchema.shape.maxQueueSize.removeDefault().optional(),
+			lines: DepositSchema.shape.lines.nullable(),
+			maxQueueSize: DepositSchema.shape.maxQueueSize.removeDefault().optional(),
 		})
 		.strict(),
 ).meta({
@@ -79,13 +79,13 @@ const depositPatch = requireReplacement(
 	description: "Top-level replacements accepted for an existing deposit item.",
 });
 const stashPatch = requireReplacement(
-	StashItemSchema.omit(immutableItemFields).partial().extend(nullableBaseItemFields).strict(),
+	StashSchema.omit(immutableItemFields).partial().extend(nullableBaseItemFields).strict(),
 ).meta({
 	id: "EditorMcpStashItemPatchSchema",
 	description: "Top-level replacements accepted for an existing stash item.",
 });
 const temporaryPatch = requireReplacement(
-	TemporaryItemSchema.omit({
+	TemporarySchema.omit({
 		...immutableItemFields,
 		maxStackSize: true,
 		scope: true,
@@ -93,7 +93,7 @@ const temporaryPatch = requireReplacement(
 		.partial()
 		.extend({
 			...nullableBaseItemFields,
-			output: TemporaryItemSchema.shape.output.nullable(),
+			output: TemporarySchema.shape.output.nullable(),
 		})
 		.strict(),
 ).meta({
@@ -101,7 +101,7 @@ const temporaryPatch = requireReplacement(
 	description: "Top-level replacements accepted for an existing temporary item.",
 });
 const inventoryPatch = requireReplacement(
-	InventoryItemSchema.omit({
+	InventorySchema.omit({
 		...immutableItemFields,
 		maxCount: true,
 		maxStackSize: true,

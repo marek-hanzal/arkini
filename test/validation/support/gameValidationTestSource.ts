@@ -1,13 +1,13 @@
 import { GameSourceFileSchema } from "~/engine/source/schema/GameSourceFileSchema";
-import { ProducerItemSchema } from "~/engine/item/schema/ProducerItemSchema";
-import { SimpleItemSchema } from "~/engine/item/schema/SimpleItemSchema";
+import { ProducerSchema } from "~/engine/item/schema/ProducerSchema";
+import { SimpleSchema } from "~/engine/item/schema/SimpleSchema";
 import { LineSchema } from "~/engine/line/schema/LineSchema";
 import { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import type { InputSchema } from "~/engine/input/schema/InputSchema";
 import type { StartSchema } from "~/engine/start/schema/StartSchema";
 
 export const createSimpleItem = (id: string) =>
-	SimpleItemSchema.parse({
+	SimpleSchema.parse({
 		uid: id,
 		id,
 		title: id,
@@ -59,7 +59,7 @@ export const createProducerItem = ({
 	output?: OutputSchema.Type;
 	lines?: ReadonlyArray<LineSchema.Type>;
 }) =>
-	ProducerItemSchema.parse({
+	ProducerSchema.parse({
 		...createSimpleItem(id),
 		type: "producer",
 		lines: lines ?? [

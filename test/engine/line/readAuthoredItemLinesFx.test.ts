@@ -2,8 +2,8 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { readAuthoredItemLinesFx } from "~/engine/line/read/readAuthoredItemLinesFx";
-import { CraftItemSchema } from "~/engine/item/schema/CraftItemSchema";
-import { DepositItemSchema } from "~/engine/item/schema/DepositItemSchema";
+import { CraftSchema } from "~/engine/item/schema/CraftSchema";
+import { DepositSchema } from "~/engine/item/schema/DepositSchema";
 import {
 	createLine,
 	createProducerItem,
@@ -23,7 +23,7 @@ describe("readAuthoredItemLinesFx", () => {
 				id: "line:multi:second",
 			}),
 		];
-		const craft = CraftItemSchema.parse({
+		const craft = CraftSchema.parse({
 			...createSimpleItem("craft"),
 			line: singleLine,
 			type: "craft",
@@ -32,7 +32,7 @@ describe("readAuthoredItemLinesFx", () => {
 			id: "producer",
 			lines: multiLine,
 		});
-		const deposit = DepositItemSchema.parse({
+		const deposit = DepositSchema.parse({
 			...createSimpleItem("deposit"),
 			lines: [
 				singleLine,
@@ -40,7 +40,7 @@ describe("readAuthoredItemLinesFx", () => {
 			maxQueueSize: 1,
 			type: "deposit",
 		});
-		const passiveDeposit = DepositItemSchema.parse({
+		const passiveDeposit = DepositSchema.parse({
 			...createSimpleItem("passive-deposit"),
 			maxQueueSize: 1,
 			type: "deposit",

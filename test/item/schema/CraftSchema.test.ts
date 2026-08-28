@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { CraftItemSchema } from "~/engine/item/schema/CraftItemSchema";
+import { CraftSchema } from "~/engine/item/schema/CraftSchema";
 
 const craft = {
 	uid: "item:craft",
@@ -40,9 +40,9 @@ const craft = {
 	},
 } as const;
 
-describe("CraftItemSchema", () => {
+describe("CraftSchema", () => {
 	it("defaults authored material capacity to zero", () => {
-		const parsed = CraftItemSchema.parse(craft);
+		const parsed = CraftSchema.parse(craft);
 		const input = parsed.line.input[0];
 		if (input.type !== "materials") {
 			throw new Error("Expected one material input.");
@@ -53,7 +53,7 @@ describe("CraftItemSchema", () => {
 
 	it("accepts both zero and positive material capacity at the shared schema boundary", () => {
 		expect(
-			CraftItemSchema.safeParse({
+			CraftSchema.safeParse({
 				...craft,
 				line: {
 					...craft.line,
@@ -67,7 +67,7 @@ describe("CraftItemSchema", () => {
 			}).success,
 		).toBe(true);
 		expect(
-			CraftItemSchema.safeParse({
+			CraftSchema.safeParse({
 				...craft,
 				line: {
 					...craft.line,

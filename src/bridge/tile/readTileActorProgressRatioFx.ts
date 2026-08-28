@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { match, P } from "ts-pattern";
 
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 
 export namespace readTileActorProgressRatioFx {
@@ -36,7 +36,7 @@ export const readTileActorProgressRatioFx = Effect.fn("readTileActorProgressRati
 						activeJob: P.nullish,
 						item: {
 							item: {
-								type: ItemEnumSchema.enum.Temporary,
+								type: TypeSchema.enum.Temporary,
 							},
 						},
 					},

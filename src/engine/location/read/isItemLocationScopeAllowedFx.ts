@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
-import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
 
 export namespace isItemLocationScopeAllowedFx {
 	export interface Props {
@@ -15,10 +15,10 @@ export namespace isItemLocationScopeAllowedFx {
 
 /** Checks passive-grid scope permission without allocating an Effect in indexed scans. */
 const isItemLocationScopeAllowed = ({ item, locationScope }: isItemLocationScopeAllowedFx.Props) =>
-	item.type === ItemEnumSchema.enum.Inventory
+	item.type === TypeSchema.enum.Inventory
 		? locationScope === LocationScopeEnumSchema.enum.Board ||
 			locationScope === LocationScopeEnumSchema.enum.Toolbar
-		: item.scope === StorageScopeEnumSchema.enum.Any || item.scope === locationScope;
+		: item.scope === StorageSchema.enum.Any || item.scope === locationScope;
 
 /**
  * Reads whether one canonical item may own one concrete passive-grid scope.

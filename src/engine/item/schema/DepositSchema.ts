@@ -3,13 +3,13 @@ import { z } from "zod";
 import { LineSchema } from "~/engine/line/schema/LineSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 
-import { BaseItemSchema } from "./BaseItemSchema";
-import { ItemEnumSchema } from "./ItemEnumSchema";
+import { BaseSchema } from "./BaseSchema";
+import { TypeSchema } from "./TypeSchema";
 
 /** A board resource deposit that may expose its own finite production lines. */
-export const DepositItemSchema = z
+export const DepositSchema = z
 	.object({
-		...BaseItemSchema.shape,
+		...BaseSchema.shape,
 		/**
 		 * Maximum number of this deposit's product lines that may run in parallel.
 		 *
@@ -19,7 +19,7 @@ export const DepositItemSchema = z
 		maxQueueSize: PositiveIntegerSchema.default(1).describe(
 			"The maximum number of this deposit's product lines that may run in parallel.",
 		),
-		type: ItemEnumSchema.extract([
+		type: TypeSchema.extract([
 			"Deposit",
 		]),
 		/**
@@ -42,8 +42,8 @@ export const DepositItemSchema = z
 			"A board resource deposit that may expose finite self-consuming product lines.",
 	});
 
-export type DepositItemSchema = typeof DepositItemSchema;
+export type DepositSchema = typeof DepositSchema;
 
-export namespace DepositItemSchema {
-	export type Type = z.infer<DepositItemSchema>;
+export namespace DepositSchema {
+	export type Type = z.infer<DepositSchema>;
 }

@@ -1,7 +1,7 @@
 import { Array, Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { JobCompletionOwner } from "~/engine/job/completion/JobCompletionContext";
 import { completeLineJobRuntimeFx } from "~/engine/job/completion/fx/completeLineJobRuntimeFx";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
@@ -60,11 +60,11 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 	if (line === undefined)
 		return yield* Effect.die(new Error(`Job ${job.id} line ${job.lineId} is missing.`));
 	if (
-		owner.item.type !== ItemEnumSchema.enum.Blueprint &&
-		owner.item.type !== ItemEnumSchema.enum.Craft &&
-		owner.item.type !== ItemEnumSchema.enum.Deposit &&
-		owner.item.type !== ItemEnumSchema.enum.Producer &&
-		owner.item.type !== ItemEnumSchema.enum.Stash
+		owner.item.type !== TypeSchema.enum.Blueprint &&
+		owner.item.type !== TypeSchema.enum.Craft &&
+		owner.item.type !== TypeSchema.enum.Deposit &&
+		owner.item.type !== TypeSchema.enum.Producer &&
+		owner.item.type !== TypeSchema.enum.Stash
 	) {
 		return yield* Effect.die(
 			new Error(`Job ${job.id} owner ${owner.id} does not expose a product line.`),

@@ -2,7 +2,7 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { isItemLocationScopeAllowedFx } from "~/engine/location/read/isItemLocationScopeAllowedFx";
 import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
@@ -91,7 +91,7 @@ export const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(functi
 			}
 			if (
 				inventory === undefined ||
-				inventory.item.type !== ItemEnumSchema.enum.Inventory ||
+				inventory.item.type !== TypeSchema.enum.Inventory ||
 				!(yield* isSameGridLocationFx({
 					left: inventory.location,
 					right: inventoryLocation,

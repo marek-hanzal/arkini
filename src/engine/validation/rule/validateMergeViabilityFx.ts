@@ -8,7 +8,7 @@ import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagn
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 import { InvalidMergeReasonEnumSchema } from "~/engine/validation/schema/InvalidMergeReasonEnumSchema";
-import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
 
 export namespace validateMergeViabilityFx {
 	export interface Props {
@@ -31,8 +31,8 @@ export const validateMergeViabilityFx = Effect.fn("validateMergeViabilityFx")(fu
 				const exactSelfTargetUnavailable =
 					merge.target.itemId === ownerItemId &&
 					owner.maxCount === 1 &&
-					(owner.scope === StorageScopeEnumSchema.enum.Board ||
-						owner.scope === StorageScopeEnumSchema.enum.Any);
+					(owner.scope === StorageSchema.enum.Board ||
+						owner.scope === StorageSchema.enum.Any);
 				if (exactSelfTargetUnavailable) {
 					diagnostics.push({
 						code: DiagnosticCodeEnumSchema.enum.MergeInvalid,
@@ -58,8 +58,8 @@ export const validateMergeViabilityFx = Effect.fn("validateMergeViabilityFx")(fu
 				});
 				const targetAvailable = matchedTargets.some((candidate) => {
 					return (
-						candidate.scope === StorageScopeEnumSchema.enum.Board ||
-						candidate.scope === StorageScopeEnumSchema.enum.Any
+						candidate.scope === StorageSchema.enum.Board ||
+						candidate.scope === StorageSchema.enum.Any
 					);
 				});
 				if (!targetAvailable) {
@@ -86,8 +86,8 @@ export const validateMergeViabilityFx = Effect.fn("validateMergeViabilityFx")(fu
 			const result = config.items[merge.result];
 			if (
 				result === undefined ||
-				result.scope === StorageScopeEnumSchema.enum.Board ||
-				result.scope === StorageScopeEnumSchema.enum.Any
+				result.scope === StorageSchema.enum.Board ||
+				result.scope === StorageSchema.enum.Any
 			) {
 				continue;
 			}

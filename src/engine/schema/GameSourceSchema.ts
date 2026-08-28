@@ -4,7 +4,7 @@ import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { MetaSchema } from "~/engine/meta/schema/MetaSchema";
 import { StartSchema } from "~/engine/start/schema/StartSchema";
-import { ResourceConfigSchema } from "~/engine/resource/schema/ResourceConfigSchema";
+import { RolesSchema } from "~/engine/resource/schema/RolesSchema";
 
 /**
  * Internal assembly value shared by the canonical `game.json` root and
@@ -29,7 +29,7 @@ export const GameSourceSchema = z
 		/**
 		 * Optional named non-item resources contributed by this source fragment.
 		 */
-		resources: ResourceConfigSchema.optional().describe(
+		resources: RolesSchema.optional().describe(
 			"The optional named non-item resources contributed by this source fragment.",
 		),
 		/**

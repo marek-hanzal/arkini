@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { compileGameSourcesFx } from "~/engine/compiler/fx/compileGameSourcesFx";
-import { DepositItemSchema } from "~/engine/item/schema/DepositItemSchema";
+import { DepositSchema } from "~/engine/item/schema/DepositSchema";
 import { assertGameConfigValidFx } from "~/engine/validation/fx/assertGameConfigValidFx";
 import {
 	createRootSource,
@@ -13,7 +13,7 @@ import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/Diagnos
 
 describe("assertGameConfigValidFx", () => {
 	it("returns a completed config when diagnostics contain only warnings", async () => {
-		const deposit = DepositItemSchema.parse({
+		const deposit = DepositSchema.parse({
 			...createSimpleItem("item:deposit"),
 			type: "deposit",
 			charges: {

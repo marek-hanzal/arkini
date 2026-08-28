@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
 
 /**
  * How far one gameplay query may search through the runtime world.
@@ -9,7 +9,7 @@ import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSc
  */
 export const ScopeSchema = z
 	.enum({
-		...StorageScopeEnumSchema.enum,
+		...StorageSchema.enum,
 		Universe: "universe",
 	})
 	.meta({

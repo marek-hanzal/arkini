@@ -3,7 +3,7 @@ import { z } from "zod";
 /**
  * Where one canonical item may physically exist in grid state.
  */
-export const StorageScopeEnumSchema = z
+export const StorageSchema = z
 	.enum({
 		Board: "board",
 		Inventory: "inventory",
@@ -15,8 +15,8 @@ export const StorageScopeEnumSchema = z
 		description: "Where one canonical item may physically exist in grid state.",
 	});
 
-export type StorageScopeEnumSchema = typeof StorageScopeEnumSchema;
+export type StorageSchema = typeof StorageSchema;
 
-export namespace StorageScopeEnumSchema {
-	export type Type = z.infer<StorageScopeEnumSchema>;
+export namespace StorageSchema {
+	export type Type = z.infer<StorageSchema>;
 }

@@ -3,15 +3,15 @@ import { z } from "zod";
 import { LineSchema } from "~/engine/line/schema/LineSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 
-import { BaseItemSchema } from "./BaseItemSchema";
-import { ItemEnumSchema } from "./ItemEnumSchema";
+import { BaseSchema } from "./BaseSchema";
+import { TypeSchema } from "./TypeSchema";
 
 /**
  * An item that provides one or more selectable product lines.
  */
-export const ProducerItemSchema = z
+export const ProducerSchema = z
 	.object({
-		...BaseItemSchema.shape,
+		...BaseSchema.shape,
 		/**
 		 * Maximum number of this producer's product lines that may run in parallel.
 		 */
@@ -21,7 +21,7 @@ export const ProducerItemSchema = z
 		/**
 		 * Identifies this item as a producer with one or more product lines.
 		 */
-		type: ItemEnumSchema.extract([
+		type: TypeSchema.extract([
 			"Producer",
 		]),
 		/**
@@ -42,8 +42,8 @@ export const ProducerItemSchema = z
 		description: "An item that provides one or more selectable product lines.",
 	});
 
-export type ProducerItemSchema = typeof ProducerItemSchema;
+export type ProducerSchema = typeof ProducerSchema;
 
-export namespace ProducerItemSchema {
-	export type Type = z.infer<ProducerItemSchema>;
+export namespace ProducerSchema {
+	export type Type = z.infer<ProducerSchema>;
 }

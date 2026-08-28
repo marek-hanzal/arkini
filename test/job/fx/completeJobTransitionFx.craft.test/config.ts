@@ -1,7 +1,7 @@
 import type { z } from "zod";
 
-import { CraftItemSchema } from "~/engine/item/schema/CraftItemSchema";
-import { SimpleItemSchema } from "~/engine/item/schema/SimpleItemSchema";
+import { CraftSchema } from "~/engine/item/schema/CraftSchema";
+import { SimpleSchema } from "~/engine/item/schema/SimpleSchema";
 import { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
@@ -110,7 +110,7 @@ const craftItem = ({
 		title: id,
 		type: "craft",
 		uid: id,
-	}) satisfies z.input<typeof CraftItemSchema>;
+	}) satisfies z.input<typeof CraftSchema>;
 
 const simpleItem = (id: string, scope: "any" | "board" = "any") =>
 	({
@@ -126,7 +126,7 @@ const simpleItem = (id: string, scope: "any" | "board" = "any") =>
 		title: id,
 		type: "simple",
 		uid: id,
-	}) satisfies z.input<typeof SimpleItemSchema>;
+	}) satisfies z.input<typeof SimpleSchema>;
 
 /** One canonical parse owns every compact authored fixture builder above. */
 export const craftCompletionConfig = GameConfigSchema.parse({

@@ -3,7 +3,7 @@ import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
 import { compileGameSourcesFx } from "~/engine/compiler/fx/compileGameSourcesFx";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { readPngAssetFx } from "~/engine/pack/fx/readPngAssetFx";
 import { readResourceDescriptorsFx } from "~/engine/resource/fx/readResourceDescriptorsFx";
 import { createGameProjectJsonSchema } from "~/engine/schema/fx/writeGameProjectJsonSchemaFx";
@@ -108,7 +108,7 @@ export const readFilesystemEditorProjectFilesFx = Effect.fn("readFilesystemEdito
 					"expected items/<type>/<encoded uid>.json.",
 				);
 			}
-			const parsedType = ItemEnumSchema.safeParse(segments[0]);
+			const parsedType = TypeSchema.safeParse(segments[0]);
 			if (!parsedType.success) {
 				return yield* failInvalidItemFileFx(
 					sourcePath,

@@ -5,7 +5,7 @@ import { resolveActionInputFx } from "~/engine/action/fx/resolveActionInputFx";
 import { resolveActionRulesFx } from "~/engine/action/fx/resolveActionRulesFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { InputChargeRunPlanSchema } from "~/engine/input/schema/run/InputChargeRunPlanSchema";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -26,7 +26,7 @@ export const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* 
 		runtime,
 	});
 	const owner = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeItem));
-	if (owner === undefined || owner.item.type !== ItemEnumSchema.enum.Space) {
+	if (owner === undefined || owner.item.type !== TypeSchema.enum.Space) {
 		return yield* Effect.fail(
 			new SpaceActionUnavailableError({
 				itemId,

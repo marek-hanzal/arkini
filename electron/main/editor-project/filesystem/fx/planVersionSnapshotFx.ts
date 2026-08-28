@@ -1,3 +1,5 @@
+import { Effect } from "effect";
+
 import type { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
 import { GameProjectGameSchemaReference } from "~/engine/source/GameProjectReference";
 import { GameFileSchema } from "~/engine/source/schema/GameFileSchema";
@@ -26,7 +28,7 @@ const sortedRecord = (
 		].sort(([left], [right]) => left.localeCompare(right)),
 	);
 
-export namespace createVersionSnapshotPlan {
+export namespace planVersionSnapshotFx {
 	export interface Props {
 		readonly arkpack: ArkpackVersionSchema.Type;
 		readonly config: GameConfigSchema.Type;
@@ -36,12 +38,20 @@ export namespace createVersionSnapshotPlan {
 }
 
 /** Creates the one canonical manifest/fingerprint plan shared by preview and object writes. */
-export const createVersionSnapshotPlan = ({
+export const planVersionSnapshotFx = Effect.fn("planVersionSnapshotFx")(
+	(props: planVersionSnapshotFx.Props) =>
+		Effect.try({
+			try: () => materializePlan(props),
+			catch: (cause) => cause,
+		}),
+);
+
+const materializePlan = ({
 	arkpack,
 	config,
 	resources,
 	scenarios,
-}: createVersionSnapshotPlan.Props) => {
+}: planVersionSnapshotFx.Props) => {
 	const jsonObjects = new Map<string, unknown>();
 	const pngObjects = new Map<string, Uint8Array>();
 	const addJson = (value: unknown) => {

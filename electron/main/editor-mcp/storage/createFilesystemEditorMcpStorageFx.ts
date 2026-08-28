@@ -240,7 +240,7 @@ const createStorageFx = Effect.fn("createFilesystemEditorMcpStorageFx")(function
 	const operations = yield* Semaphore.make(1);
 	let state: State | undefined;
 	const writeStateFx = (next: State) =>
-		filesystemWrite.writeFileFx({
+		filesystemWrite.replaceFileFx({
 			lock,
 			target: path,
 			bytes: new TextEncoder().encode(JSON.stringify(serializeState(next))),
@@ -446,7 +446,7 @@ const createStorageFx = Effect.fn("createFilesystemEditorMcpStorageFx")(function
 	} satisfies McpStorage;
 });
 
-/** Owns the installation-wide MCP configuration and recoverable OAuth state. */
+/** Owns the installation-wide MCP configuration and atomically replaced OAuth state. */
 export const createFilesystemEditorMcpStorageFx = (
 	props: createFilesystemEditorMcpStorageFx.Props,
 ) => createStorageFx(props).pipe(Effect.provide(NodeServices.layer));

@@ -19,6 +19,7 @@ import type { ProjectPaths } from "../ProjectPaths";
 import type { ProjectFiles } from "./ProjectFiles";
 import { addGitignoreRulesFx } from "./addGitignoreRulesFx";
 import { assertProjectFileFx } from "./assertProjectFileFx";
+import { writeProjectFileSetFx } from "./writeProjectFileSetFx";
 
 const encoder = new TextEncoder();
 const encodeJson = (value: unknown) =>
@@ -187,34 +188,37 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 ) {
 	const { root, next } = props;
 	const fileSystem = yield* FileSystem.FileSystem;
-	const paths = yield* createProjectPathsFx(root);
-	const nextSnapshot = yield* createSnapshotFx(paths, next);
-	const previousSnapshot =
-		props.previous === undefined ? undefined : yield* createSnapshotFx(paths, props.previous);
 	const filesystemWrite = yield* createFilesystemWriteFx();
-	const scenarioFiles =
-		props.scenarios === undefined
-			? undefined
-			: yield* Effect.try({
-					try: () => EditorBoardScenarioFileSchema.array().parse(props.scenarios),
-					catch: (cause) =>
-						new Error("The Editor Board scenarios are invalid.", {
-							cause,
-						}),
-				});
-	const versionHead =
-		props.versionHead === undefined
-			? undefined
-			: yield* Effect.try({
-					try: () => EditorVersionHeadFileSchema.parse(props.versionHead),
-					catch: (cause) =>
-						new Error("The Editor version head is invalid.", {
-							cause,
-						}),
-				});
-	yield* filesystemWrite.withLockFx(
-		paths.lockFile,
-		Effect.gen(function* () {
+	yield* writeProjectFileSetFx({
+		filesystemWrite,
+		root,
+		planFx: Effect.gen(function* () {
+			const paths = yield* createProjectPathsFx(root);
+			const nextSnapshot = yield* createSnapshotFx(paths, next);
+			const previousSnapshot =
+				props.previous === undefined
+					? undefined
+					: yield* createSnapshotFx(paths, props.previous);
+			const scenarioFiles =
+				props.scenarios === undefined
+					? undefined
+					: yield* Effect.try({
+							try: () => EditorBoardScenarioFileSchema.array().parse(props.scenarios),
+							catch: (cause) =>
+								new Error("The Editor Board scenarios are invalid.", {
+									cause,
+								}),
+						});
+			const versionHead =
+				props.versionHead === undefined
+					? undefined
+					: yield* Effect.try({
+							try: () => EditorVersionHeadFileSchema.parse(props.versionHead),
+							catch: (cause) =>
+								new Error("The Editor version head is invalid.", {
+									cause,
+								}),
+						});
 			const writes = [
 				{
 					target: paths.schemaFile,
@@ -280,12 +284,10 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 				target: paths.projectFile,
 				bytes: encodeJson(nextSnapshot.marker),
 			});
-			yield* filesystemWrite.writeFilesFx({
-				lock: paths.lockFile,
-				root: paths.root,
+			return {
 				writes,
 				deletes,
-			});
+			};
 		}),
-	);
+	});
 });

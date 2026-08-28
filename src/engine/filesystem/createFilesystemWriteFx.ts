@@ -6,9 +6,9 @@ import {
 	readFilesystemWritePathsFx,
 	type FilesystemWritePaths,
 } from "./internal/readFilesystemWritePathsFx";
-import { recoverFilesystemWriteFx } from "./internal/recoverFilesystemWriteFx";
+import { removeFileFx } from "./internal/removeFileFx";
+import { replaceFileFx } from "./internal/replaceFileFx";
 import { withFilesystemLockFx } from "./internal/withFilesystemLockFx";
-import { writeFilesFx } from "./internal/writeFilesFx";
 
 const HeldFilesystemWriteLocks = Context.Reference<ReadonlyMap<string, number>>(
 	"Arkini/FilesystemWrite/HeldLocks",
@@ -17,7 +17,7 @@ const HeldFilesystemWriteLocks = Context.Reference<ReadonlyMap<string, number>>(
 	},
 );
 
-/** Creates the Node-only lock and crash-recoverable filesystem write capability. */
+/** Creates the Node-only canonical lock and exact single-file write capability. */
 export const createFilesystemWriteFx = Effect.fn("createFilesystemWriteFx")(function* () {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
@@ -28,7 +28,7 @@ export const createFilesystemWriteFx = Effect.fn("createFilesystemWriteFx")(func
 			Effect.provideService(FileSystem.FileSystem, fileSystem),
 			Effect.provideService(Path.Path, path),
 		);
-	const mapInternal = (operation: "lock" | "write-file" | "write-files") =>
+	const mapInternal = (operation: "lock" | "remove-file" | "replace-file") =>
 		Effect.mapError((cause) =>
 			cause instanceof FilesystemWriteError
 				? cause
@@ -40,7 +40,6 @@ export const createFilesystemWriteFx = Effect.fn("createFilesystemWriteFx")(func
 		);
 	const underLockFx = <Value, Failure, Requirements>(
 		paths: FilesystemWritePaths,
-		operation: "lock" | "write-file" | "write-files",
 		effect: Effect.Effect<Value, Failure, Requirements>,
 	) =>
 		Effect.gen(function* () {
@@ -49,9 +48,7 @@ export const createFilesystemWriteFx = Effect.fn("createFilesystemWriteFx")(func
 			if (held.get(paths.lock) === fiberId) return yield* effect;
 			return yield* withFilesystemLockFx(
 				paths.lock,
-				recoverFilesystemWriteFx(paths).pipe(
-					mapInternal(operation),
-					Effect.andThen(effect),
+				effect.pipe(
 					Effect.provideService(
 						HeldFilesystemWriteLocks,
 						new Map<string, number>(held).set(paths.lock, fiberId),
@@ -63,55 +60,42 @@ export const createFilesystemWriteFx = Effect.fn("createFilesystemWriteFx")(func
 		provide(
 			readFilesystemWritePathsFx(lock).pipe(
 				mapInternal("lock"),
-				Effect.flatMap((paths) => underLockFx(paths, "lock", effect)),
+				Effect.flatMap((paths) => underLockFx(paths, effect)),
 			),
 		);
-	const writeFiles: FilesystemWrite["writeFilesFx"] = (props) =>
+	const replaceFile: FilesystemWrite["replaceFileFx"] = (props) =>
 		provide(
 			readFilesystemWritePathsFx(props.lock).pipe(
-				mapInternal("write-files"),
+				mapInternal("replace-file"),
 				Effect.flatMap((paths) =>
 					underLockFx(
 						paths,
-						"write-files",
-						writeFilesFx({
-							operation: "write-files",
+						replaceFileFx({
 							paths,
 							props,
-						}).pipe(mapInternal("write-files")),
+						}).pipe(mapInternal("replace-file")),
 					),
 				),
 			),
 		);
-	const writeFile: FilesystemWrite["writeFileFx"] = ({ lock, target, bytes }) =>
+	const removeFile: FilesystemWrite["removeFileFx"] = (props) =>
 		provide(
-			readFilesystemWritePathsFx(lock).pipe(
-				mapInternal("write-file"),
+			readFilesystemWritePathsFx(props.lock).pipe(
+				mapInternal("remove-file"),
 				Effect.flatMap((paths) =>
 					underLockFx(
 						paths,
-						"write-file",
-						writeFilesFx({
-							operation: "write-file",
+						removeFileFx({
 							paths,
-							props: {
-								lock,
-								root: path.dirname(path.resolve(lock)),
-								writes: [
-									{
-										target,
-										bytes,
-									},
-								],
-							},
-						}).pipe(mapInternal("write-file")),
+							props,
+						}).pipe(mapInternal("remove-file")),
 					),
 				),
 			),
 		);
 	return {
 		withLockFx,
-		writeFileFx: writeFile,
-		writeFilesFx: writeFiles,
+		removeFileFx: removeFile,
+		replaceFileFx: replaceFile,
 	} satisfies FilesystemWrite;
 });

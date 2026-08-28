@@ -1,4 +1,5 @@
 import { gunzipSync } from "node:zlib";
+import { lstat, symlink } from "node:fs/promises";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Deferred, Effect, Fiber, FileSystem, Path, Ref } from "effect";
 import { TestClock } from "effect/testing";
@@ -56,6 +57,25 @@ describe("packDirectoryFx game-project contract", () => {
 				type: "space",
 				space: 9,
 			});
+		}).pipe(Effect.provide(NodeServices.layer)),
+	);
+
+	it.effect("preserves a dangling Editor recovery symlink and refuses to pack", () =>
+		Effect.gen(function* () {
+			const fileSystem = yield* FileSystem.FileSystem;
+			const path = yield* Path.Path;
+			const input = yield* writeGameProjectFixtureFx();
+			const recovery = path.join(input, "editor.lock.write");
+			yield* Effect.promise(() => symlink(path.join(input, "missing"), recovery));
+			const result = yield* Effect.result(
+				packDirectoryFx({
+					input,
+				}),
+			);
+
+			expect(result._tag).toBe("Failure");
+			expect((yield* Effect.promise(() => lstat(recovery))).isSymbolicLink()).toBe(true);
+			expect(yield* fileSystem.exists(path.join(input, "build"))).toBe(false);
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
 
@@ -140,6 +160,29 @@ describe("packDirectoryFx game-project contract", () => {
 					]),
 				},
 			});
+		}).pipe(Effect.provide(NodeServices.layer)),
+	);
+
+	it.effect("refuses to pack an interrupted portable Editor tree", () =>
+		Effect.gen(function* () {
+			const fileSystem = yield* FileSystem.FileSystem;
+			const path = yield* Path.Path;
+			const input = yield* writeGameProjectFixtureFx();
+			const recovery = path.join(input, "editor.lock.write");
+			yield* fileSystem.makeDirectory(recovery);
+			const result = yield* Effect.result(
+				packDirectoryFx({
+					input,
+				}),
+			);
+
+			expect(result).toMatchObject({
+				_tag: "Failure",
+				failure: {
+					message: expect.stringContaining("reopen it in the Editor before packing"),
+				},
+			});
+			expect(yield* fileSystem.exists(path.join(input, "build"))).toBe(false);
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
 

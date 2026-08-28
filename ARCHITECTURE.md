@@ -103,7 +103,7 @@ The Editor ChatGPT page is the one deliberate foreign surface. Electron owns a s
 
 ## Filesystem and persistence
 
-The Node-only `FilesystemWrite` capability is the shared mechanical boundary for Electron, Editor, CLI, saves, and Arkpack publication. Readers and writers use the same canonical per-target lock. Writes stage beside the target, sync staged file contents, publish simple phase markers, and recover interrupted owned operations before the next read/write. Recovery distinguishes absent, owned, and unowned paths; confirmed symlink, containment, or missing-artifact ambiguity fails closed. Domain owners still serialize, validate, and map their own errors.
+The Node-only `FilesystemWrite` capability is the shared mechanical boundary for Electron, Editor, CLI, saves, and Arkpack publication. Readers and writers use the same canonical per-owner lock. A single owned file is replaced through one exact sibling staging file: sync the staged contents, atomically rename over the target without a delete fallback, then clean only that staging path. The portable Editor current tree is the only multi-file transaction; its rollback journal preserves old-or-new tree semantics for ordinary commits and Version checkout. Tree recovery distinguishes absent, owned, and unowned paths; confirmed symlink, containment, target-type, or missing-artifact ambiguity fails closed. Domain owners still serialize, validate, and map their own errors.
 
 Electron user data is split by owner:
 

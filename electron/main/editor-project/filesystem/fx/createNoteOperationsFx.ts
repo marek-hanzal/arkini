@@ -10,6 +10,7 @@ import { EditorNoteContentSchema, EditorNoteSchema } from "~/editor/note/EditorN
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
 import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
+import { withProjectLockFx } from "./withProjectLockFx";
 
 const encoder = new TextEncoder();
 const encodeJson = (value: unknown) =>
@@ -113,17 +114,21 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 						updatedAtMs: createdAtMs,
 					});
 					const target = yield* state.paths.noteFileFx(note.noteId);
-					yield* filesystemWrite.writeFileFx({
-						lock: state.paths.lockFile,
-						target,
-						bytes: encodeJson(
-							EditorProjectNoteFileSchema.parse({
-								content: note.content,
-								createdAtMs: note.createdAtMs,
-								updatedAtMs: note.updatedAtMs,
-							}),
-						),
-					});
+					yield* withProjectLockFx(
+						filesystemWrite,
+						state.paths.root,
+						filesystemWrite.replaceFileFx({
+							lock: state.paths.lockFile,
+							target,
+							bytes: encodeJson(
+								EditorProjectNoteFileSchema.parse({
+									content: note.content,
+									createdAtMs: note.createdAtMs,
+									updatedAtMs: note.updatedAtMs,
+								}),
+							),
+						}),
+					);
 					publishNotes(state, [
 						note,
 						...notes,
@@ -171,15 +176,19 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 						updatedAtMs: Math.max(clockMs, latest + 1),
 					});
 					const target = yield* state.paths.noteFileFx(noteId);
-					yield* filesystemWrite.writeFileFx({
-						lock: state.paths.lockFile,
-						target,
-						bytes: encodeJson({
-							content: note.content,
-							createdAtMs: note.createdAtMs,
-							updatedAtMs: note.updatedAtMs,
+					yield* withProjectLockFx(
+						filesystemWrite,
+						state.paths.root,
+						filesystemWrite.replaceFileFx({
+							lock: state.paths.lockFile,
+							target,
+							bytes: encodeJson({
+								content: note.content,
+								createdAtMs: note.createdAtMs,
+								updatedAtMs: note.updatedAtMs,
+							}),
 						}),
-					});
+					);
 					publishNotes(state, [
 						note,
 						...notes.filter((candidate) => candidate.noteId !== noteId),
@@ -214,14 +223,14 @@ export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(functi
 								`Editor note ${noteId} does not exist in project ${projectId}.`,
 							),
 						);
-					yield* filesystemWrite.writeFilesFx({
-						lock: state.paths.lockFile,
-						root: state.paths.root,
-						writes: [],
-						deletes: [
+					yield* withProjectLockFx(
+						filesystemWrite,
+						state.paths.root,
+						filesystemWrite.removeFileFx({
+							lock: state.paths.lockFile,
 							target,
-						],
-					});
+						}),
+					);
 					publishNotes(
 						state,
 						state.notes.filter((note) => note.noteId !== noteId),

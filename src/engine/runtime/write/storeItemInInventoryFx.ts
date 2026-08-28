@@ -3,8 +3,8 @@ import { Effect, Option } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import { isItemLocationScopeAllowedFx } from "~/engine/location/read/isItemLocationScopeAllowedFx";
-import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
+import { isItemLocationScopeAllowedFn } from "~/engine/location/fn/isItemLocationScopeAllowedFn";
+import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
@@ -76,10 +76,10 @@ export const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(functi
 				);
 			}
 			if (
-				!(yield* isSameGridLocationFx({
+				!isSameGridLocationFn({
 					left: source.location,
 					right: sourceLocation,
-				}))
+				})
 			) {
 				return yield* Effect.fail(
 					new ItemLocationConflictError({
@@ -92,10 +92,10 @@ export const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(functi
 			if (
 				inventory === undefined ||
 				inventory.item.type !== TypeSchema.enum.Inventory ||
-				!(yield* isSameGridLocationFx({
+				!isSameGridLocationFn({
 					left: inventory.location,
 					right: inventoryLocation,
-				}))
+				})
 			) {
 				return yield* Effect.fail(
 					new ItemInventoryTargetInvalidError({
@@ -105,10 +105,10 @@ export const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(functi
 			}
 			if (
 				source.location.scope === LocationScopeEnumSchema.enum.Inventory ||
-				!(yield* isItemLocationScopeAllowedFx({
+				!isItemLocationScopeAllowedFn({
 					item: source.item,
 					locationScope: LocationScopeEnumSchema.enum.Inventory,
-				}))
+				})
 			) {
 				return yield* Effect.fail(
 					new ItemInventoryStorageUnavailableError({

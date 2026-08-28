@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { isItemLocationScopeAllowedFx } from "~/engine/location/read/isItemLocationScopeAllowedFx";
+import { isItemLocationScopeAllowedFn } from "~/engine/location/fn/isItemLocationScopeAllowedFn";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
-import { indexGridLocationClaimsFx } from "~/engine/location/read/indexGridLocationClaimsFx";
-import { readGridLocationClaimsFx } from "~/engine/location/read/readGridLocationClaimsFx";
+import { indexGridLocationClaimsFn } from "~/engine/location/fn/indexGridLocationClaimsFn";
+import { readGridLocationClaimsFn } from "~/engine/location/fn/readGridLocationClaimsFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -59,7 +59,7 @@ export const checkRuntimeLocationsFx = Effect.fn("checkRuntimeLocationsFx")(func
 
 	for (const { item, location } of items) {
 		const configuredScope = item.item.scope;
-		const scopeAllowed = yield* isItemLocationScopeAllowedFx({
+		const scopeAllowed = isItemLocationScopeAllowedFn({
 			item: item.item,
 			locationScope: location.scope,
 		});
@@ -91,8 +91,8 @@ export const checkRuntimeLocationsFx = Effect.fn("checkRuntimeLocationsFx")(func
 		}
 	}
 
-	const claimsByLocation = yield* indexGridLocationClaimsFx(
-		yield* readGridLocationClaimsFx({
+	const claimsByLocation = indexGridLocationClaimsFn(
+		readGridLocationClaimsFn({
 			runtime,
 		}),
 	);

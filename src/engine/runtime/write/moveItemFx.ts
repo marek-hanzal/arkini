@@ -4,9 +4,9 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/engine/item/error/ItemNotFoundError";
 import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
-import { readGridLocationClaimAtFx } from "~/engine/location/read/readGridLocationClaimAtFx";
-import { readGridLocationClaimsFx } from "~/engine/location/read/readGridLocationClaimsFx";
-import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
+import { readGridLocationClaimAtFn } from "~/engine/location/fn/readGridLocationClaimAtFn";
+import { readGridLocationClaimsFn } from "~/engine/location/fn/readGridLocationClaimsFn";
+import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
@@ -73,10 +73,10 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 
 			if (
 				expectedLocation !== undefined &&
-				!(yield* isSameGridLocationFx({
+				!isSameGridLocationFn({
 					left: item.location,
 					right: expectedLocation,
-				}))
+				})
 			) {
 				return yield* Effect.fail(
 					new ItemLocationConflictError({
@@ -87,7 +87,7 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 				);
 			}
 			if (
-				yield* isSameGridLocationFx({
+				isSameGridLocationFn({
 					left: item.location,
 					right: location,
 				})
@@ -127,10 +127,10 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 				);
 			}
 
-			const claim = yield* readGridLocationClaimAtFx({
-				claims: (yield* readGridLocationClaimsFx({
+			const claim = readGridLocationClaimAtFn({
+				claims: readGridLocationClaimsFn({
 					runtime,
-				})).filter((candidate) => candidate.itemId !== itemId),
+				}).filter((candidate) => candidate.itemId !== itemId),
 				location,
 			});
 			if (claim !== undefined) {

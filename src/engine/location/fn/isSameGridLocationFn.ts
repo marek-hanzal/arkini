@@ -1,9 +1,7 @@
-import { Effect } from "effect";
-
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
-export namespace isSameGridLocationFx {
+export namespace isSameGridLocationFn {
 	export interface Props {
 		readonly left: GridLocationSchema.Type;
 		readonly right: GridLocationSchema.Type;
@@ -11,10 +9,7 @@ export namespace isSameGridLocationFx {
 }
 
 /** Compares two concrete board/inventory/toolbar locations by their full identity. */
-export const isSameGridLocationFx = Effect.fn("isSameGridLocationFx")(function* ({
-	left,
-	right,
-}: isSameGridLocationFx.Props) {
+export const isSameGridLocationFn = ({ left, right }: isSameGridLocationFn.Props) => {
 	if (left.scope !== right.scope) return false;
 	if (left.position.x !== right.position.x || left.position.y !== right.position.y) {
 		return false;
@@ -24,4 +19,4 @@ export const isSameGridLocationFx = Effect.fn("isSameGridLocationFx")(function* 
 		right.scope !== LocationScopeEnumSchema.enum.Board ||
 		left.space === right.space
 	);
-});
+};

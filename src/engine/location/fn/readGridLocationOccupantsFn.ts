@@ -1,10 +1,8 @@
-import { Effect } from "effect";
-
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
-import { readGridLocationKeyFx } from "./readGridLocationKeyFx";
+import { readGridLocationKeyFn } from "./readGridLocationKeyFn";
 
-export namespace readGridLocationOccupantsFx {
+export namespace readGridLocationOccupantsFn {
 	export interface Props {
 		items: ReadonlyArray<GridRuntimeItemSchema.Type>;
 		locations: ReadonlyArray<GridLocationSchema.Type>;
@@ -12,13 +10,13 @@ export namespace readGridLocationOccupantsFx {
 }
 
 /** Groups live grid items by one explicit set of concrete board, inventory, or toolbar cells. */
-export const readGridLocationOccupantsFx = Effect.fn("readGridLocationOccupantsFx")(function* ({
+export const readGridLocationOccupantsFn = ({
 	items,
 	locations,
-}: readGridLocationOccupantsFx.Props) {
+}: readGridLocationOccupantsFn.Props) => {
 	const itemsByLocation = new Map<string, GridRuntimeItemSchema.Type[]>();
 	for (const item of items) {
-		const key = yield* readGridLocationKeyFx(item.location);
+		const key = readGridLocationKeyFn(item.location);
 		const occupants = itemsByLocation.get(key);
 		if (occupants === undefined) {
 			itemsByLocation.set(key, [
@@ -35,7 +33,7 @@ export const readGridLocationOccupantsFx = Effect.fn("readGridLocationOccupantsF
 	}[] = [];
 	const seenLocations = new Set<string>();
 	for (const location of locations) {
-		const key = yield* readGridLocationKeyFx(location);
+		const key = readGridLocationKeyFn(location);
 		if (seenLocations.has(key)) continue;
 		seenLocations.add(key);
 		occupants.push({
@@ -44,4 +42,4 @@ export const readGridLocationOccupantsFx = Effect.fn("readGridLocationOccupantsF
 		});
 	}
 	return occupants;
-});
+};

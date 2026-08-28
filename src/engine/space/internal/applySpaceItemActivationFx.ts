@@ -4,7 +4,7 @@ import { settleActionChargesFx } from "~/engine/action/fx/settleActionChargesFx"
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
-import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
+import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
@@ -56,10 +56,10 @@ export const applySpaceItemActivationFx = Effect.fn("applySpaceItemActivationFx"
 		);
 	}
 	if (
-		!(yield* isSameGridLocationFx({
+		!isSameGridLocationFn({
 			left: item.location,
 			right: location,
-		}))
+		})
 	) {
 		return yield* Effect.fail(
 			new ItemLocationConflictError({

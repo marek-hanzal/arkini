@@ -55,7 +55,6 @@
 		"@iconify/tailwind4": "1.2.3",
 		"@modelcontextprotocol/client": "^2.0.0",
 		"@modelcontextprotocol/inspector": "2.3.0",
-		"@sigstore/mock": "^0.13.0",
 		"@sigstore/tuf": "^5.0.0",
 		"@tailwindcss/vite": "4.3.3",
 		"@tanstack/router-plugin": "1.168.34",

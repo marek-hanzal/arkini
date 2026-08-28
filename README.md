@@ -175,6 +175,7 @@ Application commands:
 ./Argcfile.sh preview-macos
 ./Argcfile.sh package-macos
 ./Argcfile.sh package-windows
+./Argcfile.sh package-linux
 ```
 
 Arkini is an [Electron](https://www.electronjs.org/docs/latest/)-only product. `dev` starts Electron with a [Vite](https://vite.dev/guide/)-powered renderer. The editor's MCP workspace explicitly starts either the open loopback endpoint at `http://127.0.0.1:32310/editor/mcp` or an OAuth-protected Remote MCP endpoint over ngrok; both modes share one lazy local listener and remain off until requested. `mcp-inspect` starts the pinned Inspector independently for the loopback endpoint. MCP tools are dynamically scoped to the single project currently mounted in the editor and fail without touching persistence when no project is open. Port, ngrok configuration, generated password, OAuth clients, codes, and tokens persist in `<userData>/arkini/editor/mcp.json`; only the ngrok `authtoken` value is encrypted with Electron `safeStorage`. Explicit Reset auth replaces the password and OAuth state while preserving transport configuration. Vite may replace modules during development, but Arkini treats application state as disposable and implements no HMR preservation, shutdown, or ownership handoff. `build` compiles the production Electron application, then uses that exact built CLI to run the standard pack command against `./game/arkini`. Local and Editor builds are External; only the tagged macOS development-prerelease workflow keyless-signs the official game. `preview-macos` rebuilds the same inputs, creates an unpacked arm64 application, and launches it. There is no standalone web target, web persistence fallback, or alternate renderer startup path.
@@ -215,22 +216,22 @@ The current macOS development distribution target is unsigned Apple Silicon. Bui
 ./Argcfile.sh package-macos
 ```
 
-The recipe cleans `.out/desktop`, builds Electron main/preload/renderer once, packs the official Arkini game through the built product CLI, and runs one concrete [`electron-builder`](https://www.electron.build/docs/) arm64 DMG/ZIP operation. The Electron Builder config maps `.out/desktop/build/**` directly below `app/**` in ASAR, overrides the packaged entrypoint, and excludes repository `node_modules` because all runtime dependencies are already bundled. The recipe writes `SHA256SUMS` with macOS `shasum` and smoke-tests the packaged `arkini-cli --version`. Output lives under `.out/desktop/release/`:
+The recipe cleans `.out/desktop`, builds Electron main/preload/renderer once, packs the official Arkini game through the built product CLI, and runs one concrete [`electron-builder`](https://www.electron.build/docs/) arm64 DMG/ZIP operation. The Electron Builder config maps `.out/desktop/build/**` directly below `app/**` in ASAR, overrides the packaged entrypoint, and includes only the platform ngrok binding outside the bundled application code. The recipe writes `SHA256SUMS-macos-arm64` with macOS `shasum` and smoke-tests the packaged `arkini-cli --version`. Output lives under `.out/desktop/release/`:
 
 ```text
 Arkini-<version>-mac-arm64.dmg
 Arkini-<version>-mac-arm64.zip
 arkini.arkpack
-arkini.arksig  # tagged release build only
-SHA256SUMS
+SHA256SUMS-macos-arm64
+SHA256SUMS-arkpack
 mac-arm64/Arkini.app
 ```
 
-Verify downloads with `shasum -a 256 -c SHA256SUMS`. These development artifacts are intentionally unsigned and unnotarized. macOS may require opening the application through Finder's **Open** action or allowing it from **System Settings → Privacy & Security**. Do not add ad-hoc signing, fake certificates, or notarization placeholders to this milestone.
+Verify the application archives with `shasum -a 256 -c SHA256SUMS-macos-arm64` and the standalone Arkpack with `shasum -a 256 -c SHA256SUMS-arkpack`. These development artifacts are intentionally unsigned and unnotarized. macOS may require opening the application through Finder's **Open** action or allowing it from **System Settings → Privacy & Security**. Do not add ad-hoc signing, fake certificates, or notarization placeholders to this milestone.
 
-The [development prerelease workflow](.github/workflows/macos-prerelease.yml) installs the repository tools through `mise-action` and invokes the same `./Argcfile.sh package-macos` and `./Argcfile.sh package-windows` entrypoints on GitHub-hosted macOS Apple Silicon and Windows x64 runners. Each platform packages exactly once and neither repeats repository validation; validation belongs to the working-branch workflow. Manual dispatch uploads External workflow artifacts only. Tags matching `v*-dev.*`, such as `v0.1.0-dev.1`, use GitHub OIDC to keyless-sign the exact bundled Arkpack and create one immutable GitHub prerelease containing the macOS DMG/ZIP, Windows NSIS/ZIP, standalone Arkpack, its Sigstore bundle, and platform checksum files.
+The [development prerelease workflow](.github/workflows/macos-prerelease.yml) installs the repository tools through `mise-action` and invokes the same `./Argcfile.sh package-macos`, `./Argcfile.sh package-windows`, and `./Argcfile.sh package-linux` entrypoints on GitHub-hosted macOS Apple Silicon, Windows x64, and Linux x64 runners. Each platform packages exactly once and none repeats repository validation; validation belongs to the working-branch workflow. Manual dispatch uploads External workflow artifacts only. Tags matching `v*-dev.*`, such as `v0.1.0-dev.1`, use GitHub OIDC to keyless-sign the exact Arkpack embedded in the macOS application and create one immutable GitHub prerelease containing the macOS DMG/ZIP, Windows NSIS/ZIP, Linux AppImage, standalone Arkpack, self-contained platform checksum files, and a separate Arkpack checksum. The detached signature is not published as a standalone release asset.
 
-A stable version tag on a concrete `main` commit runs the separate [stable release workflow](.github/workflows/release.yml). It invokes `package-macos` on macOS arm64 and `package-windows` on Windows x64, uploads each platform's unsigned artifacts, and deliberately runs no repository checks or tests. Working branches already own validation; `main` and release tags remain the escape hatch. Linux stays outside the initial release set until it has a concrete packaging command and hosted delivery gate.
+A stable version tag on a concrete `main` commit runs the separate [stable release workflow](.github/workflows/release.yml). It invokes `package-macos` on macOS arm64, `package-windows` on Windows x64, and `package-linux` on Linux x64, uploads each platform's unsigned artifacts, and deliberately runs no repository checks or tests. Working branches already own validation; `main` and release tags remain the escape hatch.
 
 Useful focused commands:
 
@@ -281,7 +282,7 @@ arkini-cli game pack
 - `game schema` writes the authoring JSON Schema to [`game/arkini/schema.json`](game/arkini/schema.json).
 - `game validate` runs the canonical compiler and all diagnostics.
 - `game pack`, implemented by the [pack command](src/engine/pack/cli/PackCommand.ts), validates the current project, reads PNG resources, derives the package ID from `config.meta.id`, compresses it with gzip, and atomically replaces `<project>/build/<encoded projectId>.arkpack`. Ordinary local builds remove any stale `.arksig` and are External.
-- The desktop build compiles Electron/Vite and then invokes that built `arkini-cli game pack ./game/arkini`. A tagged GitHub release sets `ARKINI_RELEASE_SIGN=1`, allowing the built CLI to obtain keyless Sigstore provenance and publish `arkini.arksig` before `electron-builder` copies the release pair into packaged `Resources/game`.
+- The desktop build compiles Electron/Vite and then invokes that built `arkini-cli game pack ./game/arkini`. A tagged GitHub prerelease sets `ARKINI_RELEASE_SIGN=1` in the macOS packaging job, allowing the built CLI to obtain keyless Sigstore provenance before `electron-builder` embeds the signed pair in packaged `Resources/game`; the detached signature is not a standalone GitHub release asset.
 
 [`ARKPACK_SIGNING.md`](ARKPACK_SIGNING.md) is the complete release identity, offline verification, trust-state, and root-update contract.
 

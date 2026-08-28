@@ -30,6 +30,10 @@ jobs:
             os: windows-2025
             command: package-windows
             artifact: arkini-windows-x64
+          - name: Linux x64
+            os: ubuntu-24.04
+            command: package-linux
+            artifact: arkini-linux-x64
     defaults:
       run:
         shell: bash
@@ -56,6 +60,7 @@ jobs:
           path: |
             .out/desktop/release/*.dmg
             .out/desktop/release/*.exe
+            .out/desktop/release/*.AppImage
             .out/desktop/release/*.zip
             .out/desktop/release/*.arkpack
             .out/desktop/release/SHA256SUMS*

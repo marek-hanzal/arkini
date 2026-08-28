@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { chmod, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { chmod, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { promisify } from "node:util";
@@ -116,7 +116,7 @@ describe.skipIf(process.platform === "win32")("filesystem CLI installation", () 
 		});
 	});
 
-	it("refuses to replace a foreign command", async () => {
+	it("requires an explicit replace before atomically taking over a foreign command", async () => {
 		const fixture = await createFixture();
 		await mkdir(dirname(fixture.commandPath), {
 			recursive: true,
@@ -125,10 +125,55 @@ describe.skipIf(process.platform === "win32")("filesystem CLI installation", () 
 
 		await expect(Effect.runPromise(fixture.installation.readStatusFx)).resolves.toMatchObject({
 			type: "conflict",
+			replaceable: true,
 		});
 		await expect(Effect.runPromise(fixture.installation.installFx)).rejects.toThrow(
 			"install the CLI command",
 		);
 		expect(await readFile(fixture.commandPath, "utf8")).toBe("foreign\n");
+
+		await expect(Effect.runPromise(fixture.installation.replaceFx)).resolves.toMatchObject({
+			type: "installed",
+		});
+		expect(await readFile(fixture.commandPath, "utf8")).toContain(
+			"# arkini-cli managed launcher",
+		);
+	});
+
+	it("replaces a conflicting symlink without modifying its target", async () => {
+		const fixture = await createFixture();
+		const foreignPath = join(dirname(fixture.commandPath), "foreign-command");
+		await mkdir(dirname(fixture.commandPath), {
+			recursive: true,
+		});
+		await writeFile(foreignPath, "foreign\n");
+		await symlink(foreignPath, fixture.commandPath);
+
+		await expect(Effect.runPromise(fixture.installation.readStatusFx)).resolves.toMatchObject({
+			type: "conflict",
+			replaceable: true,
+		});
+		await expect(Effect.runPromise(fixture.installation.replaceFx)).resolves.toMatchObject({
+			type: "installed",
+		});
+		expect(await readFile(foreignPath, "utf8")).toBe("foreign\n");
+		expect(await readFile(fixture.commandPath, "utf8")).toContain(
+			"# arkini-cli managed launcher",
+		);
+	});
+
+	it("refuses to replace a conflicting directory", async () => {
+		const fixture = await createFixture();
+		await mkdir(fixture.commandPath, {
+			recursive: true,
+		});
+
+		await expect(Effect.runPromise(fixture.installation.readStatusFx)).resolves.toMatchObject({
+			type: "conflict",
+			replaceable: false,
+		});
+		await expect(Effect.runPromise(fixture.installation.replaceFx)).rejects.toThrow(
+			"replace the CLI command",
+		);
 	});
 });

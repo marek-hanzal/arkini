@@ -2,6 +2,7 @@ import type { AppearanceAccentSchema } from "./appearance/AppearanceAccentSchema
 import type { AppearanceThemeSchema } from "./appearance/AppearanceThemeSchema";
 import type { CheatAvailabilitySchema } from "./cheat/CheatAvailabilitySchema";
 import type { CliInstallationStatus } from "./cli/CliInstallationStatus";
+import type { CliCompletionStatus } from "./cli/CliCompletionStatus";
 import type {
 	ChatGptAssetCandidateSchema,
 	ChatGptSurfaceSchema,
@@ -38,7 +39,12 @@ export namespace ArkiniElectronApi {
 		clipboardWriteText: "arkini:clipboard:write-text",
 		cliStatus: "arkini:cli:status",
 		cliInstall: "arkini:cli:install",
+		cliReplace: "arkini:cli:replace",
 		cliUninstall: "arkini:cli:uninstall",
+		cliCompletionStatus: "arkini:cli:completion:status",
+		cliCompletionInstall: "arkini:cli:completion:install",
+		cliCompletionReplace: "arkini:cli:completion:replace",
+		cliCompletionUninstall: "arkini:cli:completion:uninstall",
 		launcherLastPackageIdRead: "arkini:launcher:last-package:read",
 		launcherLastPackageIdWrite: "arkini:launcher:last-package:write",
 		editorStatus: "arkini:editor:status",
@@ -169,7 +175,14 @@ export namespace ArkiniElectronApi {
 		readonly cli: {
 			readonly status: () => Promise<CliInstallationStatus>;
 			readonly install: () => Promise<CliInstallationStatus>;
+			readonly replace: () => Promise<CliInstallationStatus>;
 			readonly uninstall: () => Promise<CliInstallationStatus>;
+			readonly completion: {
+				readonly status: () => Promise<CliCompletionStatus>;
+				readonly install: () => Promise<CliCompletionStatus>;
+				readonly replace: () => Promise<CliCompletionStatus>;
+				readonly uninstall: () => Promise<CliCompletionStatus>;
+			};
 		};
 		readonly launcher: {
 			readonly readLastPackageId: () => Promise<LastPackageIdSchema.Type | null>;

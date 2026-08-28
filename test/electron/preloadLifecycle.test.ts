@@ -248,7 +248,7 @@ describe("Electron preload lifecycle", () => {
 		);
 	});
 
-	it("routes CLI installation through its dedicated IPC channels", async () => {
+	it("routes CLI and shell-completion installation through their dedicated IPC channels", async () => {
 		electron.ipcRenderer.invoke.mockResolvedValue({
 			type: "not-installed",
 			commandPath: "/tmp/arkini-cli",
@@ -257,7 +257,12 @@ describe("Electron preload lifecycle", () => {
 
 		await api.cli.status();
 		await api.cli.install();
+		await api.cli.replace();
 		await api.cli.uninstall();
+		await api.cli.completion.status();
+		await api.cli.completion.install();
+		await api.cli.completion.replace();
+		await api.cli.completion.uninstall();
 		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
 			1,
 			ArkiniElectronContract.channels.cliStatus,
@@ -268,7 +273,27 @@ describe("Electron preload lifecycle", () => {
 		);
 		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
 			3,
+			ArkiniElectronContract.channels.cliReplace,
+		);
+		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
+			4,
 			ArkiniElectronContract.channels.cliUninstall,
+		);
+		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
+			5,
+			ArkiniElectronContract.channels.cliCompletionStatus,
+		);
+		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
+			6,
+			ArkiniElectronContract.channels.cliCompletionInstall,
+		);
+		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
+			7,
+			ArkiniElectronContract.channels.cliCompletionReplace,
+		);
+		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
+			8,
+			ArkiniElectronContract.channels.cliCompletionUninstall,
 		);
 	});
 

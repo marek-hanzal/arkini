@@ -3,8 +3,6 @@ import { Effect, FileSystem, Path } from "effect";
 export interface FilesystemWritePaths {
 	readonly lock: string;
 	readonly parent: string;
-	readonly active: string;
-	readonly cleanup: string;
 }
 
 /** Canonicalizes one explicit lock below its real parent directory. */
@@ -22,7 +20,5 @@ export const readFilesystemWritePathsFx = Effect.fn("readFilesystemWritePathsFx"
 	return {
 		lock,
 		parent,
-		active: `${lock}.write`,
-		cleanup: `${lock}.write.cleanup`,
 	} satisfies FilesystemWritePaths;
 });

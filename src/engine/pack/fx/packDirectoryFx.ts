@@ -8,6 +8,7 @@ import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 import { compileGameDirectoryFx } from "~/engine/compiler/fx/compileGameDirectoryFx";
 import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
+import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
 import { assertGameConfigValidFx } from "~/engine/validation/fx/assertGameConfigValidFx";
 import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
 import { encodeFx } from "./encodeFx";
@@ -145,9 +146,21 @@ export const packDirectoryFx = Effect.fn("packDirectoryFx")(function* (
 	const root = yield* fileSystem.realPath(path.resolve(props.input));
 	return yield* filesystemWrite.withLockFx(
 		path.join(root, "editor.lock"),
-		packDirectoryUnlockedFx({
-			...props,
-			input: root,
+		Effect.gen(function* () {
+			const recovery = path.join(root, "editor.lock.write");
+			if (
+				!(yield* isFilesystemPathSafeFx(fileSystem, root, recovery)) ||
+				(yield* fileSystem.exists(recovery))
+			)
+				return yield* Effect.fail(
+					new Error(
+						`Project ${root} has an interrupted Editor transaction at ${recovery}; reopen it in the Editor before packing.`,
+					),
+				);
+			return yield* packDirectoryUnlockedFx({
+				...props,
+				input: root,
+			});
 		}),
 	);
 });

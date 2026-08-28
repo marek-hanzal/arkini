@@ -1,6 +1,6 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect, FileSystem } from "effect";
-import { access, mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -114,26 +114,5 @@ describe("listArkpackFilesFx", () => {
 				}),
 			),
 		).resolves.toEqual([]);
-	});
-
-	it("discovers and recovers an interrupted first user-file publication", async () => {
-		const recovery = join(root, ".orphan.arkpack.lock.write");
-		await mkdir(recovery);
-		const fileSystem = await Effect.runPromise(
-			FileSystem.FileSystem.pipe(Effect.provide(NodeServices.layer)),
-		);
-
-		await expect(
-			Effect.runPromise(
-				listArkpackFilesFx({
-					root,
-					fileSystem,
-					source: "user",
-				}),
-			),
-		).resolves.toEqual([]);
-		await expect(access(recovery)).rejects.toMatchObject({
-			code: "ENOENT",
-		});
 	});
 });

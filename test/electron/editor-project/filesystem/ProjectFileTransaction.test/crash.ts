@@ -3,23 +3,25 @@ import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect, FileSystem } from "effect";
 import { join } from "node:path";
 
-import { createFilesystemWriteFx } from "../../../../src/engine/filesystem/createFilesystemWriteFx";
+import { withProjectLockFx } from "../../../../../electron/main/editor-project/filesystem/fx/withProjectLockFx";
+import { writeProjectFileSetFx } from "../../../../../electron/main/editor-project/filesystem/fx/writeProjectFileSetFx";
+import { createFilesystemWriteFx } from "../../../../../src/engine/filesystem/createFilesystemWriteFx";
 
 const [mode, root] = process.argv.slice(2);
 if (mode === undefined || root === undefined) throw new Error("Expected a mode and root.");
 
-const lock = join(root, ".write.lock");
-const targetRoot = mode === "nested-partial" ? join(root, "nested", "child") : root;
-const first = join(targetRoot, "first.json");
-const second = join(targetRoot, "second.json");
-
 await Effect.runPromise(
 	Effect.gen(function* () {
 		const nodeFileSystem = yield* FileSystem.FileSystem;
+		const targetRoot = mode === "nested-partial" ? join(root, "nested", "child") : root;
+		const first = join(targetRoot, "first.json");
+		const second = join(targetRoot, "second.json");
+		const third = join(targetRoot, "third.json");
 		if (mode === "read") {
 			const filesystemWrite = yield* createFilesystemWriteFx();
-			const values = yield* filesystemWrite.withLockFx(
-				lock,
+			const values = yield* withProjectLockFx(
+				filesystemWrite,
+				root,
 				Effect.all([
 					nodeFileSystem.readFileString(first),
 					nodeFileSystem.readFileString(second),
@@ -28,21 +30,10 @@ await Effect.runPromise(
 			process.stdout.write(JSON.stringify(values));
 			return;
 		}
-		if (mode === "hold") {
-			const filesystemWrite = yield* createFilesystemWriteFx();
-			yield* filesystemWrite.withLockFx(
-				lock,
-				Effect.sync(() => process.stdout.write("locked\n")).pipe(
-					Effect.andThen(Effect.sleep("2 seconds")),
-				),
-			);
-			return;
-		}
 		const canonicalRoot = yield* nodeFileSystem.realPath(root);
 		const canonicalTargetRoot = yield* nodeFileSystem.realPath(targetRoot);
-		const canonicalLock = join(canonicalRoot, ".write.lock");
 		const canonicalFirst = join(canonicalTargetRoot, "first.json");
-
+		const canonicalThird = join(canonicalTargetRoot, "third.json");
 		const fileSystem: FileSystem.FileSystem = {
 			...nodeFileSystem,
 			rename: (oldPath, newPath) =>
@@ -56,14 +47,17 @@ await Effect.runPromise(
 								: Effect.void,
 						),
 					),
-			open: (path, options) =>
-				nodeFileSystem.open(path, options).pipe(
+			open: (target, options) =>
+				nodeFileSystem.open(target, options).pipe(
 					Effect.map((file) =>
-						mode === "committed" && String(path) === `${canonicalLock}.write/committed`
+						(mode === "committed" &&
+							String(target) ===
+								join(canonicalRoot, "editor.lock.write", "committed")) ||
+						(mode === "staged" && String(target) === `${canonicalThird}.arkini-replace`)
 							? new Proxy(file, {
-									get(target, property, receiver) {
+									get(proxyTarget, property, receiver) {
 										if (property !== "sync")
-											return Reflect.get(target, property, receiver);
+											return Reflect.get(proxyTarget, property, receiver);
 										return file.sync.pipe(
 											Effect.tap(() =>
 												Effect.sync(() =>
@@ -81,19 +75,29 @@ await Effect.runPromise(
 			Effect.provide(NodePath.layer),
 			Effect.provideService(FileSystem.FileSystem, fileSystem),
 		);
-		yield* filesystemWrite.writeFilesFx({
-			lock,
+		yield* writeProjectFileSetFx({
+			filesystemWrite,
 			root,
-			writes: [
-				{
-					target: first,
-					bytes: new TextEncoder().encode("new-first"),
-				},
-				{
-					target: second,
-					bytes: new TextEncoder().encode("new-second"),
-				},
-			],
+			planFx: Effect.succeed({
+				writes:
+					mode === "staged"
+						? [
+								{
+									target: third,
+									bytes: new TextEncoder().encode("new-third"),
+								},
+							]
+						: [
+								{
+									target: first,
+									bytes: new TextEncoder().encode("new-first"),
+								},
+								{
+									target: second,
+									bytes: new TextEncoder().encode("new-second"),
+								},
+							],
+			}),
 		});
 	}).pipe(Effect.provide(NodeServices.layer)),
 );

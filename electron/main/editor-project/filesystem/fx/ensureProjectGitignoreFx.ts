@@ -20,7 +20,7 @@ export const ensureProjectGitignoreFx = Effect.fn("ensureProjectGitignoreFx")(fu
 			const source = exists ? yield* fileSystem.readFileString(paths.gitignoreFile) : "";
 			const next = yield* addGitignoreRulesFx(source);
 			if (next === source) return;
-			yield* filesystemWrite.writeFileFx({
+			yield* filesystemWrite.replaceFileFx({
 				lock: paths.lockFile,
 				target: paths.gitignoreFile,
 				bytes: encoder.encode(next),

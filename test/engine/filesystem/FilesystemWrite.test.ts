@@ -1,17 +1,15 @@
 import * as NodePath from "@effect/platform-node/NodePath";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Deferred, Effect, Fiber, FileSystem, Option, PlatformError } from "effect";
-import { execFile, spawn } from "node:child_process";
-import { lstat, mkdir, mkdtemp, readFile, rename, rm, symlink, writeFile } from "node:fs/promises";
+import { spawn } from "node:child_process";
+import { lstat, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { basename, join } from "node:path";
-import { promisify } from "node:util";
+import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createFilesystemWriteFx } from "../../../src/engine/filesystem/createFilesystemWriteFx";
 
-const runFile = promisify(execFile);
-const helper = join(import.meta.dirname, "FilesystemWrite.test", "crash.ts");
+const helper = join(import.meta.dirname, "FilesystemWrite.test", "lock-holder.ts");
 const tsx = join(process.cwd(), "node_modules", "tsx", "dist", "cli.mjs");
 const encoder = new TextEncoder();
 let root = "";
@@ -36,31 +34,6 @@ const createWrite = (fileSystem?: FileSystem.FileSystem) =>
 
 const readNodeFileSystem = () =>
 	Effect.runPromise(FileSystem.FileSystem.pipe(Effect.provide(NodeServices.layer)));
-
-const expectFreshProcessStateAfterCrash = async (
-	mode: "committed" | "partial",
-	expected: ReadonlyArray<string>,
-) => {
-	await Promise.all([
-		writeFile(join(root, "first.json"), "old-first"),
-		writeFile(join(root, "second.json"), "old-second"),
-	]);
-	await expect(
-		runFile(process.execPath, [
-			tsx,
-			helper,
-			mode,
-			root,
-		]),
-	).rejects.toBeDefined();
-	const reopened = await runFile(process.execPath, [
-		tsx,
-		helper,
-		"read",
-		root,
-	]);
-	expect(JSON.parse(reopened.stdout)).toEqual(expected);
-};
 
 beforeEach(async () => {
 	root = await mkdtemp(join(tmpdir(), "arkini-filesystem-write-"));
@@ -107,7 +80,7 @@ describe("FilesystemWrite", () => {
 		]);
 		const lock = join(root, ".shared.lock");
 		const firstWrite = Effect.runPromise(
-			one.writeFileFx({
+			one.replaceFileFx({
 				lock,
 				target: first,
 				bytes: encoder.encode("first"),
@@ -115,7 +88,7 @@ describe("FilesystemWrite", () => {
 		);
 		await Effect.runPromise(Deferred.await(firstEntered));
 		const sameWrite = Effect.runPromise(
-			two.writeFileFx({
+			two.replaceFileFx({
 				lock,
 				target: same,
 				bytes: encoder.encode("same"),
@@ -123,7 +96,7 @@ describe("FilesystemWrite", () => {
 		);
 		await expect(
 			Effect.runPromise(
-				three.writeFileFx({
+				three.replaceFileFx({
 					lock: join(root, ".other.lock"),
 					target: other,
 					bytes: encoder.encode("other"),
@@ -138,11 +111,76 @@ describe("FilesystemWrite", () => {
 		]);
 	});
 
+	it("keeps the old file until one synced rename publishes the new file", async () => {
+		const target = join(root, "target.json");
+		await writeFile(target, "old");
+		const nodeFileSystem = await readNodeFileSystem();
+		const canonicalRoot = await Effect.runPromise(nodeFileSystem.realPath(root));
+		const canonicalTarget = join(canonicalRoot, "target.json");
+		const pending = `${canonicalTarget}.arkini-replace`;
+		let rejectRename = true;
+		let synced = false;
+		const fileSystem: FileSystem.FileSystem = {
+			...nodeFileSystem,
+			open: (candidate, options) =>
+				nodeFileSystem.open(candidate, options).pipe(
+					Effect.map((file) =>
+						String(candidate) === pending
+							? new Proxy(file, {
+									get(target, property, receiver) {
+										if (property !== "sync")
+											return Reflect.get(target, property, receiver);
+										return file.sync.pipe(
+											Effect.tap(() =>
+												Effect.sync(() => {
+													synced = true;
+												}),
+											),
+										);
+									},
+								})
+							: file,
+					),
+				),
+			rename: (from, to) =>
+				String(to) === canonicalTarget && rejectRename
+					? Effect.fail(systemError("rename"))
+					: nodeFileSystem.rename(from, to),
+		};
+		const filesystemWrite = await createWrite(fileSystem);
+		const replace = () =>
+			Effect.runPromise(
+				filesystemWrite.replaceFileFx({
+					lock: join(root, ".target.lock"),
+					target,
+					bytes: encoder.encode("new"),
+				}),
+			);
+
+		await expect(replace()).rejects.toThrow("replacement failed");
+		expect(synced).toBe(true);
+		await expect(readFile(target, "utf8")).resolves.toBe("old");
+		await expect(lstat(pending)).rejects.toMatchObject({
+			code: "ENOENT",
+		});
+
+		rejectRename = false;
+		synced = false;
+		await expect(replace()).resolves.toBeUndefined();
+		expect(synced).toBe(true);
+		await expect(readFile(target, "utf8")).resolves.toBe("new");
+		await expect(lstat(pending)).rejects.toMatchObject({
+			code: "ENOENT",
+		});
+		await expect(lstat(join(canonicalRoot, ".target.lock.write"))).rejects.toMatchObject({
+			code: "ENOENT",
+		});
+	});
+
 	it("waits for a live CLI process using the same lock", async () => {
 		const child = spawn(process.execPath, [
 			tsx,
 			helper,
-			"hold",
 			root,
 		]);
 		let stderr = "";
@@ -227,7 +265,7 @@ describe("FilesystemWrite", () => {
 		const filesystemWrite = await createWrite();
 		await expect(
 			Effect.runPromise(
-				filesystemWrite.writeFileFx({
+				filesystemWrite.replaceFileFx({
 					lock: join(root, ".symlink.lock"),
 					target,
 					bytes: encoder.encode("replaced"),
@@ -237,110 +275,73 @@ describe("FilesystemWrite", () => {
 		await expect(readFile(outside, "utf8")).resolves.toBe("outside");
 	});
 
-	it("reopens the old file set after a process crashes during replacement", async () => {
-		await expectFreshProcessStateAfterCrash("partial", [
-			"old-first",
-			"old-second",
-		]);
-	}, 12_000);
-
-	it("reopens the committed file set after a process crashes during cleanup", async () => {
-		await expectFreshProcessStateAfterCrash("committed", [
-			"new-first",
-			"new-second",
-		]);
-	}, 12_000);
-
-	it("refuses recovery through a replaced parent symlink", async () => {
-		const nested = join(root, "nested");
-		const nestedChild = join(nested, "child");
-		const outside = await mkdtemp(join(tmpdir(), "arkini-filesystem-outside-"));
-		const outsideChild = join(outside, "child");
-		try {
-			await Promise.all([
-				mkdir(nestedChild, {
-					recursive: true,
+	it("preserves a dangling symbolic link occupying the exact staging path", async () => {
+		const target = join(root, "target");
+		const pending = `${target}.arkini-replace`;
+		await symlink(join(root, "missing"), pending);
+		const filesystemWrite = await createWrite();
+		await expect(
+			Effect.runPromise(
+				filesystemWrite.replaceFileFx({
+					lock: join(root, ".symlink.lock"),
+					target,
+					bytes: encoder.encode("replacement"),
 				}),
-				mkdir(outsideChild),
-			]);
-			await Promise.all([
-				writeFile(join(nestedChild, "first.json"), "old-first"),
-				writeFile(join(nestedChild, "second.json"), "old-second"),
-				writeFile(join(outsideChild, "first.json"), "outside-first"),
-				writeFile(join(outsideChild, "second.json"), "outside-second"),
-			]);
-			await expect(
-				runFile(process.execPath, [
-					tsx,
-					helper,
-					"nested-partial",
-					root,
-				]),
-			).rejects.toBeDefined();
-			await rename(nested, join(root, "nested-owned"));
-			await symlink(outside, nested);
+			),
+		).rejects.toThrow("staging file");
+		expect((await lstat(pending)).isSymbolicLink()).toBe(true);
+	});
 
+	it("rejects external and non-file targets without recursive cleanup", async () => {
+		const outside = await mkdtemp(join(tmpdir(), "arkini-filesystem-external-"));
+		const outsideFile = join(outside, "outside.json");
+		const directory = join(root, "owned-directory");
+		const child = join(directory, "preserved.json");
+		try {
+			await writeFile(outsideFile, "outside");
+			await mkdir(directory);
+			await writeFile(child, "preserved");
 			const filesystemWrite = await createWrite();
 			await expect(
 				Effect.runPromise(
-					filesystemWrite.withLockFx(join(root, ".write.lock"), Effect.void),
+					filesystemWrite.replaceFileFx({
+						lock: join(root, ".owned.lock"),
+						target: outsideFile,
+						bytes: encoder.encode("replacement"),
+					}),
 				),
-			).rejects.toThrow("is unsafe");
-			await expect(readFile(join(outsideChild, "first.json"), "utf8")).resolves.toBe(
-				"outside-first",
-			);
-			await expect(readFile(join(outsideChild, "second.json"), "utf8")).resolves.toBe(
-				"outside-second",
-			);
+			).rejects.toThrow("is outside");
+			await expect(
+				Effect.runPromise(
+					filesystemWrite.removeFileFx({
+						lock: join(root, ".owned.lock"),
+						target: directory,
+					}),
+				),
+			).rejects.toThrow("must be canonical");
+			await expect(readFile(outsideFile, "utf8")).resolves.toBe("outside");
+			await expect(readFile(child, "utf8")).resolves.toBe("preserved");
 		} finally {
 			await rm(outside, {
 				force: true,
 				recursive: true,
 			});
 		}
-	}, 12_000);
+	});
 
-	it("preserves the backup and reports its exact location when recovery fails", async () => {
-		await Promise.all([
-			writeFile(join(root, "first.json"), "old-first"),
-			writeFile(join(root, "second.json"), "old-second"),
-		]);
+	it("does not create missing parents while removing an absent exact file", async () => {
+		const parent = join(root, "missing");
+		const filesystemWrite = await createWrite();
 		await expect(
-			runFile(process.execPath, [
-				tsx,
-				helper,
-				"partial",
-				root,
-			]),
-		).rejects.toBeDefined();
-		const nodeFileSystem = await readNodeFileSystem();
-		const fileSystem: FileSystem.FileSystem = {
-			...nodeFileSystem,
-			copyFile: (from, to) =>
-				basename(String(from)).startsWith("backup-") &&
-				basename(String(to)).endsWith(".restore")
-					? Effect.fail(systemError("copyFile"))
-					: nodeFileSystem.copyFile(from, to),
-		};
-		const filesystemWrite = await createWrite(fileSystem);
-		const recovery = join(
-			await Effect.runPromise(nodeFileSystem.realPath(root)),
-			".write.lock.write",
-		);
-		let failure: unknown;
-		try {
-			await Effect.runPromise(
-				filesystemWrite.withLockFx(join(root, ".write.lock"), Effect.void),
-			);
-		} catch (cause) {
-			failure = cause;
-		}
-		expect(failure).toMatchObject({
-			recovery,
+			Effect.runPromise(
+				filesystemWrite.removeFileFx({
+					lock: join(root, ".owned.lock"),
+					target: join(parent, "child.json"),
+				}),
+			),
+		).resolves.toBeUndefined();
+		await expect(lstat(parent)).rejects.toMatchObject({
+			code: "ENOENT",
 		});
-		await expect(lstat(recovery)).resolves.toMatchObject({
-			isDirectory: expect.any(Function),
-		});
-		await expect(readFile(join(recovery, "backup-0"), "utf8")).resolves.toBe("old-first");
-	}, 12_000);
+	});
 });

@@ -1,9 +1,7 @@
 import { Effect } from "effect";
 
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import type { OutputResultSchema } from "~/engine/output/schema/OutputResultSchema";
-import type { DropPlacementResultSchema } from "~/engine/placement/schema/DropPlacementResultSchema";
-import type { OutputPlacementResultSchema } from "~/engine/placement/schema/OutputPlacementResultSchema";
+import type { outputFx } from "~/engine/output/fx/outputFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { applyPlacementPlanFx } from "./applyPlacementPlanFx";
 import { planDropPlacementFx } from "./planDropPlacementFx";
@@ -12,8 +10,17 @@ export namespace applyOutputPlacementFx {
 	export interface Props {
 		excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
 		origin: GridLocationSchema.Type;
-		output: OutputResultSchema.Type;
+		output: outputFx.Result;
 		runtime: RuntimeSchema.Type;
+	}
+
+	export interface DropPlacement {
+		readonly drop: outputFx.Result["drop"][number];
+		readonly placement: applyPlacementPlanFx.Result;
+	}
+
+	export interface Result {
+		readonly drop: ReadonlyArray<DropPlacement>;
 	}
 }
 
@@ -37,7 +44,7 @@ export const applyOutputPlacementFx = Effect.fn("applyOutputPlacementFx")(functi
 		output.drop,
 		() => ({
 			draft: runtime,
-			results: [] as DropPlacementResultSchema.Type[],
+			results: [] as applyOutputPlacementFx.DropPlacement[],
 		}),
 		(state, drop) => {
 			return Effect.gen(function* () {
@@ -69,7 +76,7 @@ export const applyOutputPlacementFx = Effect.fn("applyOutputPlacementFx")(functi
 	return [
 		{
 			drop: placement.results,
-		} satisfies OutputPlacementResultSchema.Type,
+		} satisfies applyOutputPlacementFx.Result,
 		placement.draft,
 	] as const;
 });

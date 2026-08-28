@@ -6,7 +6,7 @@ import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { readInputRunItemFx } from "~/engine/input/read/readInputRunItemFx";
-import type { InputMaterialRunPlanSchema } from "~/engine/input/schema/run/InputMaterialRunPlanSchema";
+import type { InputRun } from "~/engine/input/InputRun";
 import type { JobLocationSchema } from "~/engine/location/schema/JobLocationSchema";
 import { createRuntimeItemFx } from "~/engine/runtime/fx/createRuntimeItemFx";
 import { createRuntimeItemIdFx } from "~/engine/runtime/fx/createRuntimeItemIdFx";
@@ -23,7 +23,7 @@ export namespace applyInputMaterialConsumeRunPlanFx {
 		ownerItemId: IdSchema.Type;
 		lineId: IdSchema.Type;
 		inputIndex: NonNegativeIntegerSchema.Type;
-		plan: InputMaterialRunPlanSchema.Type;
+		plan: InputRun.MaterialPlan;
 		runtime: RuntimeSchema.Type;
 	}
 

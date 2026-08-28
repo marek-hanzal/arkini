@@ -2,12 +2,12 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { resolveInputRunFx } from "~/engine/input/fx/run/resolveInputRunFx";
-import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
+import type { InputRun } from "~/engine/input/InputRun";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
 import { LineNotFoundError } from "~/engine/line/error/LineNotFoundError";
 import { lineRulesFx } from "~/engine/line/fx/lineRulesFx";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
-import type { LineRunResolutionSchema } from "~/engine/line/schema/run/LineRunResolutionSchema";
+import type { LineRun } from "~/engine/line/LineRun";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
@@ -83,7 +83,7 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 		line,
 		rules,
 	});
-	const resolvedInputs: InputRunResolutionSchema.Type[] = [];
+	const resolvedInputs: InputRun.Resolution[] = [];
 	const reservedCharges = new Map<IdSchema.Type, number>();
 	for (const [inputIndex, configuredInput] of line.input.entries()) {
 		const resolvedInput = yield* resolveInputRunFx({
@@ -111,9 +111,9 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 	const input = [
 		firstInput,
 		...remainingInputs,
-	] satisfies [
-		InputRunResolutionSchema.Type,
-		...InputRunResolutionSchema.Type[],
+	] satisfies readonly [
+		InputRun.Resolution,
+		...InputRun.Resolution[],
 	];
 	const plan = yield* planLineRunFx({
 		enable,
@@ -134,5 +134,5 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 		input,
 		ready,
 		plan,
-	} satisfies LineRunResolutionSchema.Type;
+	} satisfies LineRun.Resolution;
 });

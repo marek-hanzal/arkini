@@ -5,10 +5,10 @@ import { resolveActionChargeFx } from "~/engine/action/fx/resolveActionChargeFx"
 import { resolveActionDepositInputFx } from "~/engine/action/fx/resolveActionDepositInputFx";
 import type { InputSchema } from "~/engine/action/schema/InputSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { InputRun } from "~/engine/input/InputRun";
 import { resolveInputSimpleFx } from "~/engine/input/fx/resolveInputSimpleFx";
 import { planInputSimpleRunFx } from "~/engine/input/fx/run/planInputSimpleRunFx";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
-import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 /** Resolves one immediate Simple or Deposit requirement without mutating runtime. */
@@ -50,7 +50,7 @@ export const resolveActionInputFx = Effect.fn("resolveActionInputFx")(function* 
 									charges: charges.plan,
 								})
 							: undefined,
-					} satisfies InputRunResolutionSchema.Type;
+					} satisfies InputRun.Resolution;
 				}),
 		)
 		.with(

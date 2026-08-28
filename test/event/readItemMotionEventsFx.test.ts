@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
-import type { OutputPlacementResultSchema } from "~/engine/placement/schema/OutputPlacementResultSchema";
+import type { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 
@@ -70,7 +70,7 @@ describe("item motion event readers", () => {
 					},
 				},
 			],
-		} satisfies OutputPlacementResultSchema.Type;
+		} satisfies applyOutputPlacementFx.Result;
 
 		expect(
 			Effect.runSync(
@@ -124,7 +124,7 @@ describe("item motion event readers", () => {
 					},
 				},
 			],
-		} satisfies OutputPlacementResultSchema.Type;
+		} satisfies applyOutputPlacementFx.Result;
 
 		expect(
 			Effect.runSync(

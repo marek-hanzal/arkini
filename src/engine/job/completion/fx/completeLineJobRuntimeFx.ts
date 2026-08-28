@@ -7,14 +7,13 @@ import { releaseOwnerInputsFx } from "~/engine/input/fx/releaseOwnerInputsFx";
 import type { JobCompletionContext } from "~/engine/job/completion/JobCompletionContext";
 import { makeChargeDepletionRandomFx } from "~/engine/job/random/makeChargeDepletionRandomFx";
 import { outputFx } from "~/engine/output/fx/outputFx";
-import type { OutputResultSchema } from "~/engine/output/schema/OutputResultSchema";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
 import { releaseJobReservationsFx } from "./releaseJobReservationsFx";
 
 const emptyOutput = {
 	drop: [],
-} satisfies OutputResultSchema.Type;
+} satisfies outputFx.Result;
 
 export namespace completeLineJobRuntimeFx {
 	export interface Result {

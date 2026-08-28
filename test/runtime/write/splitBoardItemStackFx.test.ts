@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
+import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
@@ -243,7 +243,7 @@ describe("splitBoardItemStackFx", () => {
 		if (Result.isFailure(result.attempt)) {
 			expect(result.attempt.failure).toMatchObject({
 				_tag: "PlacementUnavailableError",
-				reason: PlacementFailureReasonEnumSchema.enum.BoardFull,
+				reason: PlacementUnavailableError.Reason.BoardFull,
 				remainingQuantity: 3,
 			});
 		}

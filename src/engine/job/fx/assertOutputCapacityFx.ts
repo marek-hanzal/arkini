@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { OutputCapacityError } from "~/engine/job/error/OutputCapacityError";
 import { resolveStartOutputCapacityFx } from "~/engine/job/fx/read/resolveStartOutputCapacityFx";
-import type { LineRunPlanSchema } from "~/engine/line/schema/run/LineRunPlanSchema";
+import type { LineRun } from "~/engine/line/LineRun";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace assertOutputCapacityFx {
@@ -11,7 +11,7 @@ export namespace assertOutputCapacityFx {
 		readonly candidateId: IdSchema.Type;
 		readonly lineId: IdSchema.Type;
 		readonly ownerItemId: IdSchema.Type;
-		readonly plan: LineRunPlanSchema.Type | undefined;
+		readonly plan: LineRun.Plan | undefined;
 		readonly runtime: RuntimeSchema.Type;
 	}
 }

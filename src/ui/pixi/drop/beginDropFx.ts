@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
+import { DropItemResultKind } from "~/bridge/tile/DropItemResultKind";
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
 import type { DropPresentation } from "~/ui/pixi/drop/DropPresentation";
@@ -30,7 +30,7 @@ export const beginDropFx = Effect.fn("beginDropFx")(function* ({
 	targetItem,
 }: beginDropFx.Props) {
 	const swapCandidate =
-		previewKind === DropItemResultKindEnumSchema.enum.Swap && targetItem !== null
+		previewKind === DropItemResultKind.Swap && targetItem !== null
 			? {
 					source: {
 						id: sourceItem.id,

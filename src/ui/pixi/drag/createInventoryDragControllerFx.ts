@@ -5,7 +5,7 @@ import { match, P } from "ts-pattern";
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
+import { DropItemResultKind } from "~/bridge/tile/DropItemResultKind";
 import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 import { isSameTileActorLocationFx } from "~/bridge/tile/isSameTileActorLocationFx";
 import {
@@ -137,19 +137,19 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 			const receiverActorId = match(result)
 				.with(
 					{
-						kind: DropItemResultKindEnumSchema.enum.Stack,
+						kind: DropItemResultKind.Stack,
 					},
 					({ target }) => target.itemId,
 				)
 				.with(
 					{
-						kind: DropItemResultKindEnumSchema.enum.StoreInput,
+						kind: DropItemResultKind.StoreInput,
 					},
 					({ owner }) => owner.itemId,
 				)
 				.with(
 					{
-						kind: DropItemResultKindEnumSchema.enum.StoreInventory,
+						kind: DropItemResultKind.StoreInventory,
 					},
 					({ inventory }) => inventory.itemId,
 				)
@@ -170,9 +170,9 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 				.with(
 					{
 						kind: P.union(
-							DropItemResultKindEnumSchema.enum.Stack,
-							DropItemResultKindEnumSchema.enum.StoreInput,
-							DropItemResultKindEnumSchema.enum.StoreInventory,
+							DropItemResultKind.Stack,
+							DropItemResultKind.StoreInput,
+							DropItemResultKind.StoreInventory,
 						),
 						source: {
 							current: P.nonNullable,
@@ -434,8 +434,8 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 							RendererRuntime.runSync(application.frames.invalidateFx);
 						}
 						if (
-							result.kind !== DropItemResultKindEnumSchema.enum.Reject &&
-							result.kind !== DropItemResultKindEnumSchema.enum.Ignored
+							result.kind !== DropItemResultKind.Reject &&
+							result.kind !== DropItemResultKind.Ignored
 						) {
 							flashSurvivingSource(result);
 							flashReceiver(result);

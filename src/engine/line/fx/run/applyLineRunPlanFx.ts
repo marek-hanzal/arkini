@@ -4,13 +4,13 @@ import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { applyInputMaterialConsumeRunPlanFx } from "~/engine/input/fx/run/applyInputMaterialConsumeRunPlanFx";
 import { applyInputRunPlanFx } from "~/engine/input/fx/run/applyInputRunPlanFx";
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
-import type { LineRunPlanSchema } from "~/engine/line/schema/run/LineRunPlanSchema";
+import type { LineRun } from "~/engine/line/LineRun";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace applyLineRunPlanFx {
 	export interface Props {
 		job: JobSchema.Type;
-		plan: LineRunPlanSchema.Type;
+		plan: LineRun.Plan;
 		runtime: RuntimeSchema.Type;
 	}
 }

@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 
 import type { RuntimeAdjustmentSchema } from "~/engine/line/schema/rule/RuntimeAdjustmentSchema";
-import type { RuleRuntimeAdjustResultSchema } from "~/engine/line/schema/rule/RuleRuntimeAdjustResultSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import { whenFx } from "~/engine/when/fx/whenFx";
 
@@ -9,6 +8,13 @@ export namespace lineRuleRuntimeAdjustFx {
 	export interface Props {
 		origin: BoardLocationSchema.Type;
 		rule: RuntimeAdjustmentSchema.Type;
+	}
+
+	export interface Result {
+		readonly active: boolean;
+		readonly failedWhenIndex?: number;
+		readonly type: "runtime:adjust";
+		readonly adjustMs: number;
 	}
 }
 
@@ -34,5 +40,5 @@ export const lineRuleRuntimeAdjustFx = Effect.fn("lineRuleRuntimeAdjustFx")(func
 		active,
 		adjustMs: rule.adjustMs,
 		type: rule.type,
-	} satisfies RuleRuntimeAdjustResultSchema.Type;
+	} satisfies lineRuleRuntimeAdjustFx.Result;
 });

@@ -151,10 +151,9 @@ jobs:
           if-no-files-found: error
           retention-days: ${{ contains(github.ref_name, '-') && 14 || 30 }}
 
-  publish_prerelease:
+  publish_release:
     needs: package
-    if: ${{ contains(github.ref_name, '-') }}
-    name: Publish complete prerelease
+    name: Publish complete release
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -179,11 +178,15 @@ jobs:
         with:
           name: arkini-linux-arm64-${{ github.ref_name }}
           path: release/linux-arm64
-      - name: Publish GitHub prerelease
+      - name: Publish GitHub release
         env:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ github.token }}
         run: |
+          release_flags=()
+          if [[ "$GITHUB_REF_NAME" == *-* ]]; then
+            release_flags+=(--prerelease)
+          fi
           gh release create "$GITHUB_REF_NAME" \
             release/macos/*.dmg \
             release/macos/*.zip \
@@ -193,6 +196,6 @@ jobs:
             release/linux-x64/*.AppImage \
             release/linux-arm64/*.AppImage \
             --verify-tag \
-            --prerelease \
+            "${release_flags[@]}" \
             --title "Arkini $GITHUB_REF_NAME" \
             --notes "Unsigned macOS Apple Silicon, Windows x64, and Linux x64/arm64 applications with one embedded official Arkpack, plus the same standalone Arkpack. GitHub exposes the SHA-256 digest of every asset; macOS requires the normal Gatekeeper override."

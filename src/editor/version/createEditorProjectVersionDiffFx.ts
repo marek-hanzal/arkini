@@ -46,6 +46,34 @@ const materializeContext = (
 	};
 };
 
+const readContextItemUid = (
+	before: GameConfigSchema.Type["items"],
+	after: GameConfigSchema.Type["items"],
+	beforeByUid: ReadonlyMap<string, GameConfigSchema.Type["items"][string]>,
+	afterByUid: ReadonlyMap<string, GameConfigSchema.Type["items"][string]>,
+	context: EditorProjectCompatibilityContext,
+	itemId: string,
+) => {
+	if (context.operation === "remove") {
+		const uid = before[itemId]?.uid;
+		if (uid === undefined)
+			throw new Error(`Removed item ${itemId} is missing from the before snapshot.`);
+		return uid;
+	}
+	if (context.operation === "add") {
+		const uid = after[itemId]?.uid;
+		if (uid === undefined)
+			throw new Error(`Added item ${itemId} is missing from the after snapshot.`);
+		return uid;
+	}
+	const uid = after[itemId]?.uid;
+	if (uid === undefined)
+		throw new Error(`Changed item ${itemId} is missing from the after snapshot.`);
+	if (!beforeByUid.has(uid) || !afterByUid.has(uid))
+		throw new Error(`Changed item ${itemId} does not preserve its UID.`);
+	return uid;
+};
+
 const readItemDiffs = (
 	before: GameConfigSchema.Type["items"],
 	after: GameConfigSchema.Type["items"],
@@ -67,8 +95,7 @@ const readItemDiffs = (
 	for (const context of contexts) {
 		if (context.path[0] !== "items" || typeof context.path[1] !== "string") continue;
 		const itemId = context.path[1];
-		const uid = before[itemId]?.uid ?? after[itemId]?.uid;
-		if (uid === undefined) continue;
+		const uid = readContextItemUid(before, after, beforeByUid, afterByUid, context, itemId);
 		const values = changesByUid.get(uid) ?? [];
 		values.push(materializeContext(context, context.path.slice(2).join(".")));
 		changesByUid.set(uid, values);

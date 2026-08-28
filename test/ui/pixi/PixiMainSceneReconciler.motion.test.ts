@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
-import { settlePixiMainSceneDraggedActorFx } from "~/ui/pixi/drag/settlePixiMainSceneDraggedActorFx";
+import { settleDraggedActorFx } from "~/ui/pixi/drag/settleDraggedActorFx";
 
 import {
 	boardLocation,
@@ -201,7 +201,7 @@ describe("Pixi main-scene reconciliation / layout and landing", () => {
 			current,
 		];
 		Effect.runSync(
-			settlePixiMainSceneDraggedActorFx({
+			settleDraggedActorFx({
 				actor,
 				animator: harness.animator,
 				surface: harness.surface,

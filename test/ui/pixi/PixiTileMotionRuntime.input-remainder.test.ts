@@ -3,7 +3,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
+import { readTravelDurationMsFx } from "~/ui/pixi/animation/readTravelDurationMsFx";
 
 import {
 	createMotionHarness,
@@ -192,7 +192,7 @@ describe("Pixi tile input remainder travel", () => {
 		});
 		expect(returnTravel.durationMs).toBe(
 			Effect.runSync(
-				readPixiTileTravelDurationMsFx({
+				readTravelDurationMsFx({
 					fromX: 340,
 					fromY: 40,
 					tileSize: 80,

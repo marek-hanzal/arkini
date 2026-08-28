@@ -10,11 +10,11 @@ import type {
 	PixiActorAnimator,
 	PixiActorPresentationWrite,
 } from "~/ui/pixi/animation/PixiActorAnimator";
-import { createPixiMainSceneDragControllerFx } from "~/ui/pixi/drag/createPixiMainSceneDragControllerFx";
+import { createMainDragControllerFx } from "~/ui/pixi/drag/createMainDragControllerFx";
 import type { PixiCursorGrabMotion } from "~/ui/pixi/drag/PixiCursorGrabMotion";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
-import { createPixiMainSceneDropPresentationFx } from "~/ui/pixi/drop/createPixiMainSceneDropPresentationFx";
-import { createPixiMainSceneDropSubmissionFx } from "~/ui/pixi/drop/createPixiMainSceneDropSubmissionFx";
+import { createDropPresentationFx } from "~/ui/pixi/drop/createDropPresentationFx";
+import { createDropSubmissionFx } from "~/ui/pixi/drop/createDropSubmissionFx";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRuntime";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
@@ -241,7 +241,7 @@ export const mountController = ({
 	const reportCriticalFailure = vi.fn();
 	const beginInteractionHandoff = vi.fn((_actorId: string) => true);
 	const releasePointerCapture = vi.fn();
-	const dropPresentation = Effect.runSync(createPixiMainSceneDropPresentationFx());
+	const dropPresentation = Effect.runSync(createDropPresentationFx());
 	const onDrop = vi.fn(() =>
 		Promise.resolve({
 			kind: "move" as const,
@@ -421,7 +421,7 @@ export const mountController = ({
 		transientActorLayer,
 	} satisfies PixiMainSceneSurface;
 	const dropSubmission = Effect.runSync(
-		createPixiMainSceneDropSubmissionFx({
+		createDropSubmissionFx({
 			actorStore,
 			animator,
 			cursorGrab,
@@ -445,7 +445,7 @@ export const mountController = ({
 	let controller: PixiMainSceneDragController;
 	try {
 		controller = Effect.runSync(
-			createPixiMainSceneDragControllerFx({
+			createMainDragControllerFx({
 				actorStore,
 				animator,
 				application: {

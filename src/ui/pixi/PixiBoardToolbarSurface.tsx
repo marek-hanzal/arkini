@@ -14,7 +14,7 @@ import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { useInventoryShortcutKey } from "~/ui/navigation/useInventoryShortcutKey";
 import type { PixiMainSceneRuntime } from "~/ui/pixi/scene/PixiMainSceneRuntime";
 import type { PixiMainSceneActivationIntent } from "~/ui/pixi/scene/PixiMainSceneActivationIntent";
-import { createPixiMainSceneRuntimeFx } from "~/ui/pixi/scene/createPixiMainSceneRuntimeFx";
+import { createMainRuntimeFx } from "~/ui/pixi/scene/createMainRuntimeFx";
 import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";
 
 /**
@@ -173,7 +173,7 @@ export const PixiBoardToolbarSurface = ({ onOpenInventory }: PixiBoardToolbarSur
 		let runtime: PixiMainSceneRuntime | null = null;
 		let unregisterInteraction: () => void = () => undefined;
 		void RendererRuntime.runPromise(
-			createPixiMainSceneRuntimeFx({
+			createMainRuntimeFx({
 				game,
 				host,
 				onActivate: activate,

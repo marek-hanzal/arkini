@@ -8,8 +8,8 @@ import "~test/ui/pixi/PixiTileMotionRuntime.test/fixture";
 import {
 	pixiTileActorLifecycleDurationMs,
 	pixiTileActorLifecycleReducedScale,
-} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
-import { runPixiInputMotionFx } from "~/ui/pixi/motion/runPixiInputMotionFx";
+} from "~/ui/pixi/animation/runActorLifecycleFx";
+import { runInputMotionFx } from "~/ui/pixi/motion/runInputMotionFx";
 
 import {
 	createActorMap,
@@ -87,7 +87,7 @@ describe("Pixi Inventory input travel", () => {
 		} satisfies TileMotionCue;
 
 		Effect.runSync(
-			runPixiInputMotionFx({
+			runInputMotionFx({
 				actorStore: createActorStore({
 					actors,
 					canonicalItems: createItemMap(owner.item),

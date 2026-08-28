@@ -10,7 +10,7 @@ import type {
 	PixiActorAnimator,
 	PixiActorPresentationWrite,
 } from "~/ui/pixi/animation/PixiActorAnimator";
-import { createPixiCursorGrabMotionFx } from "~/ui/pixi/drag/createPixiCursorGrabMotionFx";
+import { createCursorGrabMotionFx } from "~/ui/pixi/drag/createCursorGrabMotionFx";
 
 type SpringProps = Parameters<PixiAnimationDriver["createSpringFx"]>[0];
 
@@ -65,7 +65,7 @@ const createFixture = (failSpringAt: number | null = null) => {
 			}),
 	} satisfies PixiActorAnimator;
 	const motion = Effect.runSync(
-		createPixiCursorGrabMotionFx({
+		createCursorGrabMotionFx({
 			animationDriver,
 			animator,
 		}),

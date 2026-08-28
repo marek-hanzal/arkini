@@ -7,8 +7,8 @@ import { describe, expect, it } from "vitest";
 import {
 	pixiTileActorLifecycleDurationMs,
 	pixiTileActorLifecycleReducedScale,
-} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
-import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
+} from "~/ui/pixi/animation/runActorLifecycleFx";
+import { readTravelDurationMsFx } from "~/ui/pixi/animation/readTravelDurationMsFx";
 
 import {
 	createMotionHarness,
@@ -180,7 +180,7 @@ describe("Pixi motion delivery batch", () => {
 		}
 		expect(finalContact.durationMs).toBe(
 			Effect.runSync(
-				readPixiTileTravelDurationMsFx({
+				readTravelDurationMsFx({
 					fromX: 900,
 					fromY: 400,
 					tileSize: 120,

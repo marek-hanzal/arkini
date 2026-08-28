@@ -65,19 +65,19 @@ vi.mock("~/ui/pixi/runtime/createDemandFrameLoopFx", () => ({
 		}),
 }));
 
-import { createPixiApplicationOwnerFx } from "~/ui/pixi/runtime/createPixiApplicationOwnerFx";
+import { createApplicationOwnerFx } from "~/ui/pixi/runtime/createApplicationOwnerFx";
 
 describe("Pixi application owner", () => {
 	it("never lets an older async initialization replace a newer host owner", async () => {
 		const host = document.createElement("div");
 		const first = Effect.runPromise(
-			createPixiApplicationOwnerFx({
+			createApplicationOwnerFx({
 				host,
 				reportCriticalFailure: vi.fn(),
 			}),
 		);
 		const second = Effect.runPromise(
-			createPixiApplicationOwnerFx({
+			createApplicationOwnerFx({
 				host,
 				reportCriticalFailure: vi.fn(),
 			}),

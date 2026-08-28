@@ -2,7 +2,7 @@ import { Effect, Exit } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { createPixiMainSceneActorStoreFx } from "~/ui/pixi/actor/createPixiMainSceneActorStoreFx";
+import { createMainActorStoreFx } from "~/ui/pixi/actor/createMainActorStoreFx";
 
 const board = (x: number, y: number, space = 0) =>
 	({
@@ -45,7 +45,7 @@ const item = (
 
 describe("Pixi main-scene canonical occupancy", () => {
 	it("atomically replaces exact Board and Toolbar identities with their latest revisions", () => {
-		const store = Effect.runSync(createPixiMainSceneActorStoreFx());
+		const store = Effect.runSync(createMainActorStoreFx());
 		const boardItem = item("runtime:board", board(2, 3));
 		const toolbarItem = item("runtime:toolbar", toolbar(1));
 		Effect.runSync(
@@ -76,7 +76,7 @@ describe("Pixi main-scene canonical occupancy", () => {
 	});
 
 	it("returns unique occupants in deterministic caller slot order", () => {
-		const store = Effect.runSync(createPixiMainSceneActorStoreFx());
+		const store = Effect.runSync(createMainActorStoreFx());
 		const first = item("runtime:first", board(1, 0));
 		const second = item("runtime:second", board(2, 0));
 		const tool = item("runtime:tool", toolbar(0));
@@ -105,7 +105,7 @@ describe("Pixi main-scene canonical occupancy", () => {
 	});
 
 	it("rejects impossible duplicate occupancy without publishing a partial replacement", () => {
-		const store = Effect.runSync(createPixiMainSceneActorStoreFx());
+		const store = Effect.runSync(createMainActorStoreFx());
 		const retained = item("runtime:retained", board(0, 0));
 		Effect.runSync(
 			store.replaceCanonicalItemsFx([
@@ -144,7 +144,7 @@ describe("Pixi main-scene canonical occupancy", () => {
 	});
 
 	it("clears old-space and teardown occupancy with the canonical projection", () => {
-		const store = Effect.runSync(createPixiMainSceneActorStoreFx());
+		const store = Effect.runSync(createMainActorStoreFx());
 		const oldSpace = item("runtime:old", board(0, 0, 0));
 		const nextSpace = item("runtime:next", board(0, 0, 1));
 		Effect.runSync(

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 import { Effect } from "effect";
-import { pixiTileActorLifecycleReducedScale } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+import { pixiTileActorLifecycleReducedScale } from "~/ui/pixi/animation/runActorLifecycleFx";
 
 import {
 	boardLocation,

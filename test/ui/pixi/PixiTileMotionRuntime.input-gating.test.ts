@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import {
 	pixiTileActorLifecycleDurationMs,
 	pixiTileActorLifecycleReducedScale,
-} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+} from "~/ui/pixi/animation/runActorLifecycleFx";
 
 import {
 	createMotionHarness,

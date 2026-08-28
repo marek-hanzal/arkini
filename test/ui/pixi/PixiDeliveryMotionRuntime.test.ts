@@ -10,14 +10,14 @@ import type {
 	PixiActorAnimator,
 	PixiActorPresentationWrite,
 } from "~/ui/pixi/animation/PixiActorAnimator";
-import { createPixiDeliveryMotionRuntimeFx } from "~/ui/pixi/delivery/createPixiDeliveryMotionRuntimeFx";
+import { createDeliveryRuntimeFx } from "~/ui/pixi/delivery/createDeliveryRuntimeFx";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 
-vi.mock("~/ui/pixi/actor/updatePixiTileActorFx", async () => {
+vi.mock("~/ui/pixi/actor/updateTileActorFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
-		updatePixiTileActorFx: ({
+		updateTileActorFx: ({
 			actor,
 			item,
 			size,
@@ -33,10 +33,10 @@ vi.mock("~/ui/pixi/actor/updatePixiTileActorFx", async () => {
 	};
 });
 
-vi.mock("~/ui/pixi/motion/flashPixiMotionTargetFx", async () => {
+vi.mock("~/ui/pixi/motion/flashMotionTargetFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
-		flashPixiMotionTargetFx: () => EffectModule.void,
+		flashMotionTargetFx: () => EffectModule.void,
 	};
 });
 
@@ -130,7 +130,7 @@ describe("PixiDeliveryMotionRuntime", () => {
 			setFx: () => Effect.void,
 		} satisfies PixiActorAnimator;
 		const runtime = Effect.runSync(
-			createPixiDeliveryMotionRuntimeFx({
+			createDeliveryRuntimeFx({
 				actorStore: {
 					actors,
 					canonicalItems: new Map(),
@@ -292,7 +292,7 @@ describe("PixiDeliveryMotionRuntime", () => {
 		const updateMagnetFx = vi.fn(() => Effect.void);
 		const releaseMagnetFx = vi.fn(() => Effect.void);
 		const runtime = Effect.runSync(
-			createPixiDeliveryMotionRuntimeFx({
+			createDeliveryRuntimeFx({
 				actorStore: {
 					actors,
 					canonicalItems,

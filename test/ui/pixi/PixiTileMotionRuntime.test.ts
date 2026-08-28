@@ -4,7 +4,7 @@ import { Effect } from "effect";
 import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
-import { chasePixiTileMotionTargetFx } from "~/ui/pixi/motion/chasePixiTileMotionTargetFx";
+import { chaseTargetFx } from "~/ui/pixi/motion/chaseTargetFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 
 import {
@@ -137,7 +137,7 @@ describe("Pixi tile motion stack payload", () => {
 				}),
 		} satisfies PixiActorAnimator;
 		Effect.runSync(
-			chasePixiTileMotionTargetFx({
+			chaseTargetFx({
 				actor,
 				animator,
 				fallbackTarget: {

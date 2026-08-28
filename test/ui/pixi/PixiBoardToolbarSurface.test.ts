@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { PixiBoardToolbarSurface } from "~/ui/pixi/PixiBoardToolbarSurface";
-import type { createPixiMainSceneRuntimeFx } from "~/ui/pixi/scene/createPixiMainSceneRuntimeFx";
+import type { createMainRuntimeFx } from "~/ui/pixi/scene/createMainRuntimeFx";
 
 (
 	globalThis as {
@@ -17,7 +17,7 @@ import type { createPixiMainSceneRuntimeFx } from "~/ui/pixi/scene/createPixiMai
 
 const boardState = vi.hoisted(() => ({
 	close: vi.fn(),
-	createProps: null as createPixiMainSceneRuntimeFx.Props | null,
+	createProps: null as createMainRuntimeFx.Props | null,
 	navigate: vi.fn(() => Promise.resolve()),
 	openItemDetail: vi.fn(),
 	runDrop: vi.fn(),
@@ -120,8 +120,8 @@ vi.mock("~/ui/pixi/usePixiGameRuntime", () => ({
 	}),
 }));
 
-vi.mock("~/ui/pixi/scene/createPixiMainSceneRuntimeFx", () => ({
-	createPixiMainSceneRuntimeFx: (props: createPixiMainSceneRuntimeFx.Props) =>
+vi.mock("~/ui/pixi/scene/createMainRuntimeFx", () => ({
+	createMainRuntimeFx: (props: createMainRuntimeFx.Props) =>
 		Effect.sync(() => {
 			boardState.createProps = props;
 			return {

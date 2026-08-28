@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { createPixiMainSceneDropPresentationFx } from "~/ui/pixi/drop/createPixiMainSceneDropPresentationFx";
+import { createDropPresentationFx } from "~/ui/pixi/drop/createDropPresentationFx";
 
 import {
 	moveResult,
@@ -11,7 +11,7 @@ import {
 
 describe("Pixi main-scene drop presentation", () => {
 	it("settles one drop without clearing another pending generation", () => {
-		const presentation = Effect.runSync(createPixiMainSceneDropPresentationFx());
+		const presentation = Effect.runSync(createDropPresentationFx());
 		const first = Effect.runSync(
 			presentation.beginFx({
 				sourceActorId: "runtime:first",
@@ -51,7 +51,7 @@ describe("Pixi main-scene drop presentation", () => {
 	});
 
 	it("releases an accepted swap only through its exact generation", () => {
-		const presentation = Effect.runSync(createPixiMainSceneDropPresentationFx());
+		const presentation = Effect.runSync(createDropPresentationFx());
 		const generation = Effect.runSync(
 			presentation.beginFx({
 				sourceActorId: swapCandidate.source.id,

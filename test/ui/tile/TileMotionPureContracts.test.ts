@@ -6,7 +6,7 @@ import type {
 	TileMotionCue,
 	TileStackMotionCue,
 } from "~/bridge/tile/motion/TileMotionCue";
-import { readPixiTileInteractionClaimsFx } from "~/ui/pixi/motion/readPixiTileInteractionClaimsFx";
+import { readInteractionClaimsFx } from "~/ui/pixi/motion/readInteractionClaimsFx";
 import { readTileMotionActorClaimsFx } from "~/ui/tile/motion/readTileMotionActorClaimsFx";
 import { readTileMotionLaneClaimsFx } from "~/ui/tile/motion/readTileMotionLaneClaimsFx";
 import { readTileMotionStaggerDelaySecondsFx } from "~/ui/tile/motion/readTileMotionStaggerDelaySecondsFx";
@@ -143,7 +143,7 @@ describe("pure tile motion contracts", () => {
 		);
 		expect(
 			Effect.runSync(
-				readPixiTileInteractionClaimsFx([
+				readInteractionClaimsFx([
 					spawn,
 					stack,
 				]),
@@ -184,7 +184,7 @@ describe("pure tile motion contracts", () => {
 				"runtime:owner",
 			]),
 		);
-		expect(Effect.runSync(readPixiTileInteractionClaimsFx(cues))).toEqual(
+		expect(Effect.runSync(readInteractionClaimsFx(cues))).toEqual(
 			new Map([
 				[
 					"runtime:source",

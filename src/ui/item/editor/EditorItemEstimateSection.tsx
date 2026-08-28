@@ -21,8 +21,8 @@ const diagnosticText = (diagnostic: EditorItemEstimateDiagnostic) => {
 	switch (diagnostic.kind) {
 		case "quantity-limit-exceeded":
 			return `${diagnostic.factId} × ${formatQuantity(diagnostic.quantity)} exceeds the static estimate limit of ${diagnostic.maximumQuantity} (${diagnostic.source}).`;
-		case "joint-output-accounting-unsupported":
-			return `Correlated output demand on ${diagnostic.routeId} exceeds the bounded static state space.`;
+		case "quantity-specific-route-not-retried":
+			return `${diagnostic.factId} × ${formatQuantity(diagnostic.quantity)} exceeds selected scalar route ${diagnostic.routeId}; quantity-specific alternatives were not retried.`;
 		case "cycle":
 			return `Cycle on route ${diagnostic.routeId}: ${diagnostic.factIds.join(" → ")}.`;
 		case "unreachable":
@@ -55,22 +55,26 @@ const EditorItemEstimateMethodDetails = ({
 		<header className="flex items-start gap-3 border-b border-line/70 pb-3">
 			<span className="icon-[lucide--calculator] mt-0.5 size-5 shrink-0 text-sky-700" />
 			<div>
-				<h3 className="font-semibold text-foreground">Static dependency estimator</h3>
-				<p className="mt-1 text-xs text-muted">Optimistic authored-graph analysis</p>
+				<h3 className="font-semibold text-foreground">Approximate dependency estimator</h3>
+				<p className="mt-1 text-xs text-muted">Optimistic scalar authored-graph analysis</p>
 			</div>
 		</header>
 		<p className="py-3 text-xs leading-relaxed text-muted">
-			Compares complete canonical acquisition routes using expected random-output economics
-			and an optimistic parallel critical path. Independent dependency branches may overlap;
-			positive enable prerequisites still contribute acquisition time. Runtime rule effects,
-			placement, charge capacity, and finite resource capacity are ignored.
+			Expands from authored starting facts and records the first locally ranked route when
+			each fact becomes reachable. Ranking uses scalar action time with stable route identity
+			as the tie-break; demand is divided by scalar expected yield. The materialized witness
+			is timed as an optimistic parallel critical path. Equivalent independent route
+			occurrences are compressed into one row; shared outputs, shared finite roots, runtime
+			rule effects, placement, charge capacity, renewal, and finite resource capacity are not
+			simulated. Route admission proves one scalar output unit; larger propagated demand can
+			return partial without retrying quantity-specific alternatives.
 		</p>
 		<ul className="grid gap-2 border-t border-line/70 pt-3 text-xs leading-relaxed text-muted">
 			{estimate.obtainable ? (
 				<>
 					<li>Selected route: {estimate.route.routeId}.</li>
 					<li>
-						Expected action runs: {formatQuantity(estimate.route.actionRuns)}; output
+						Approximate action runs: {formatQuantity(estimate.route.actionRuns)}; output
 						samples: {formatQuantity(estimate.route.outputRuns)}.
 					</li>
 				</>
@@ -82,7 +86,7 @@ const EditorItemEstimateMethodDetails = ({
 				</li>
 			)}
 			<li>Starting authored items contribute no acquisition time.</li>
-			<li>Route requirements provide the complete timing explanation.</li>
+			<li>Route occurrences provide the deterministic approximation explanation.</li>
 			{estimate.obtainable && estimate.diagnostics.length > 0 ? (
 				<li>
 					Rejected alternatives:{" "}
@@ -98,7 +102,7 @@ const EditorItemEstimateMethodDetails = ({
 
 const EditorItemEstimateHeading = ({ estimate }: { readonly estimate?: EditorItemEstimate }) => (
 	<header className="flex items-center gap-1">
-		<h2 className="text-lg font-semibold text-foreground">Estimated acquisition path</h2>
+		<h2 className="text-lg font-semibold text-foreground">Approximate acquisition path</h2>
 		{estimate === undefined ? null : (
 			<EditorInfoTooltip
 				className="size-7"
@@ -115,7 +119,7 @@ const EditorItemEstimateSummary = ({ estimate }: { readonly estimate: EditorItem
 		<EditorItemEstimateHeading estimate={estimate} />
 		<p className="shrink-0 font-semibold tabular-nums text-foreground">
 			{estimate.obtainable
-				? formatRuntime(estimate.durationMs)
+				? `≈ ${formatRuntime(estimate.durationMs)}`
 				: estimate.status === "partial"
 					? "Indeterminate"
 					: "Unreachable"}
@@ -148,7 +152,7 @@ const EditorItemEstimateResult = ({
 			<div className="mt-4 grid gap-3 border-t border-line/70 pt-4 text-sm leading-relaxed text-muted">
 				<p className="font-medium text-foreground">
 					{estimate.status === "partial"
-						? "The authored path exceeds a bounded static-analysis limit, so totals are indeterminate."
+						? "The requested path exceeded either the static-analysis limit or its selected scalar-unit witness, so totals are indeterminate."
 						: "The authored dependency graph contains no complete route from the configured starting facts."}
 				</p>
 				<ul className="grid gap-2">

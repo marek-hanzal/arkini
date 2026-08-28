@@ -15,6 +15,8 @@ const estimate = (factId: string): EditorItemEstimate => {
 		actionRuns: 1,
 		durationMs: 1,
 		factId,
+		occurrenceCount: 1,
+		occurrenceId: `occurrence:${factId}`,
 		outputRuns: 1,
 		quantity: 1,
 		requirements: [],

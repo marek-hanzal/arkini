@@ -1,11 +1,9 @@
-import { Effect } from "effect";
-
 import type {
 	EditorAcquisitionGraph,
 	EditorAcquisitionRequirement,
 	EditorAcquisitionRoute,
 } from "~/editor/EditorAcquisitionGraph";
-import { estimateEditorItemFx } from "~/editor/estimator/estimateEditorItemFx";
+import { estimateEditorItemsFn } from "~/editor/estimator/fn/estimateEditorItemsFn";
 
 const requirement = (
 	factId: string,
@@ -27,31 +25,20 @@ const requirement = (
 const route = ({
 	allOf = [],
 	anyOf = [],
-	chargeUses,
 	durationMs,
+	expectedYield = 1,
 	id,
-	operation,
-	operationOutputGroupId,
 	output,
-	outputQuantity = 1,
-	quantityDistribution,
+	runMultiplier = 1,
 }: {
 	readonly allOf?: ReadonlyArray<EditorAcquisitionRequirement>;
 	readonly anyOf?: ReadonlyArray<ReadonlyArray<EditorAcquisitionRequirement>>;
-	readonly chargeUses?: EditorAcquisitionRoute["chargeUses"];
 	readonly durationMs: number;
+	readonly expectedYield?: number;
 	readonly id: string;
-	readonly operation?: EditorAcquisitionRoute["operation"];
-	readonly operationOutputGroupId?: string;
 	readonly output: string;
-	readonly outputQuantity?: number;
-	readonly quantityDistribution?: EditorAcquisitionRoute["output"]["quantityDistribution"];
+	readonly runMultiplier?: number;
 }): EditorAcquisitionRoute => ({
-	...(chargeUses === undefined
-		? {}
-		: {
-				chargeUses,
-			}),
 	durationMs,
 	id,
 	metadata: {
@@ -60,35 +47,20 @@ const route = ({
 		lineTitle: id,
 		ownerItemId: "owner",
 	},
-	...(operation === undefined
-		? {}
-		: {
-				operation,
-			}),
 	output: {
 		annotation: {
 			alternativeSet: false,
 			placement: "drop",
 			quantity: {
-				max: outputQuantity,
-				min: outputQuantity,
+				max: expectedYield,
+				min: expectedYield,
 			},
 			selectionKind: "guaranteed",
 		},
+		expectedYield,
 		factId: output,
-		...(operationOutputGroupId === undefined
-			? {}
-			: {
-					operationOutputGroupId,
-				}),
-		quantityDistribution: quantityDistribution ?? [
-			{
-				probability: 1,
-				quantity: outputQuantity,
-			},
-		],
 	},
-	runMultiplier: 1,
+	runMultiplier,
 	requirements: {
 		allOf,
 		anyOf,
@@ -101,26 +73,38 @@ const graph = ({
 	routes,
 }: {
 	readonly facts: ReadonlyArray<string>;
-	readonly roots: ReadonlyArray<string>;
+	readonly roots: ReadonlyArray<
+		| string
+		| {
+				readonly factId: string;
+				readonly quantity: number;
+		  }
+	>;
 	readonly routes: ReadonlyArray<EditorAcquisitionRoute>;
 }): EditorAcquisitionGraph => ({
 	factIds: facts,
 	limitations: [],
-	roots: roots.map((factId) => ({
-		factId,
-		quantity: "unbounded",
-	})),
+	roots: roots.map((root) =>
+		typeof root === "string"
+			? {
+					factId: root,
+					quantity: "unbounded" as const,
+				}
+			: root,
+	),
 	routes,
 });
 
 const estimate = (dependencyGraph: EditorAcquisitionGraph, factId = "target", quantity = 1) =>
-	Effect.runSync(
-		estimateEditorItemFx({
-			factId,
-			graph: dependencyGraph,
-			quantity,
-		}),
-	);
+	estimateEditorItemsFn({
+		graph: dependencyGraph,
+		requests: [
+			{
+				factId,
+				quantity,
+			},
+		],
+	})[0]!;
 
 /** Minimal authored-graph vocabulary shared by estimator contract tests. */
 export const editorItemEstimateTestFixture = {

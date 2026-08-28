@@ -7,11 +7,11 @@ import {
 	selectableInactiveClassName,
 } from "~/ui/form/SelectableStateClassName";
 import { EditorItemFlowSearch } from "~/ui/item/editor/EditorItemFlowSearch";
-import { EditorOriginFlowSection } from "~/ui/item/editor/EditorOriginFlowSection";
+import { OriginFlow } from "~/ui/item/editor/origin-flow/OriginFlow";
 import { useEditorItemSearchOptions } from "~/ui/item/editor/useEditorItemSearchOptions";
-import type { EditorOriginFlowDirection } from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
+import type { OriginFlowDirection } from "~/ui/item/editor/origin-flow/Highlight";
 
-const readGraphFilterDescription = (direction: EditorOriginFlowDirection) =>
+const readGraphFilterDescription = (direction: OriginFlowDirection) =>
 	direction === "input"
 		? "Search selects an item; Input highlights downstream operations that use it."
 		: "Search selects an item; Output highlights upstream operations that produce it.";
@@ -24,10 +24,10 @@ export const EditorGameFlow = ({
 	onDirectionChange,
 	onItemIdChange,
 }: {
-	readonly direction: EditorOriginFlowDirection;
+	readonly direction: OriginFlowDirection;
 	readonly itemId?: string;
 	readonly projectId: string;
-	readonly onDirectionChange: (direction: EditorOriginFlowDirection) => void;
+	readonly onDirectionChange: (direction: OriginFlowDirection) => void;
 	readonly onItemIdChange: (itemId: string) => Promise<void>;
 }) => {
 	const [focusRequestKey, setFocusRequestKey] = useState(0);
@@ -93,7 +93,7 @@ export const EditorGameFlow = ({
 					</div>
 				</div>
 			</div>
-			<EditorOriginFlowSection
+			<OriginFlow
 				direction={direction}
 				focusItemId={itemId || undefined}
 				focusRequestKey={focusRequestKey}

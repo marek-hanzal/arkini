@@ -39,7 +39,7 @@ export const EditorArkpackImportButton = ({
 				data-ui="EditorArkpackImportButton"
 			>
 				<span className="icon-[lucide--package-open] size-9 text-accent" />
-				<span className="text-lg">{pending ? "Importing arkpack…" : "Import arkpack"}</span>
+				<span className="text-lg">Import arkpack</span>
 				<span className="text-xs font-medium opacity-75">
 					Choose an existing .arkpack file
 				</span>

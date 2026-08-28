@@ -128,20 +128,19 @@ export const EditorItemDeleteDialog = ({
 			<p className="mt-2 text-xs text-subtle">Item ID: {item.id}</p>
 			<EditorItemDeleteError error={error} />
 			<div className="mt-6 flex flex-wrap justify-end gap-2">
-				{pending ? null : (
-					<ButtonLink
-						data-ui="EditorItemDeleteCreateVersion"
-						to="/editor/$projectId/versions/commit"
-						params={{
-							projectId: project.projectId,
-						}}
-						search={{
-							returnTo: `/editor/${encodeURIComponent(project.projectId)}/editor/items/${encodeURIComponent(item.uid)}/detail/delete`,
-						}}
-					>
-						Create version first…
-					</ButtonLink>
-				)}
+				<ButtonLink
+					aria-disabled={pending}
+					data-ui="EditorItemDeleteCreateVersion"
+					to="/editor/$projectId/versions/commit"
+					params={{
+						projectId: project.projectId,
+					}}
+					search={{
+						returnTo: `/editor/${encodeURIComponent(project.projectId)}/editor/items/${encodeURIComponent(item.uid)}/detail/delete`,
+					}}
+				>
+					Create version first…
+				</ButtonLink>
 				<Button
 					disabled={pending}
 					onClick={onCancel}
@@ -154,7 +153,7 @@ export const EditorItemDeleteDialog = ({
 					data-ui="EditorItemDeleteConfirm"
 					onClick={onConfirm}
 				>
-					{pending ? "Deleting…" : force ? "Force delete item" : "Delete item"}
+					{force ? "Force delete item" : "Delete item"}
 				</DangerButton>
 			</div>
 		</div>

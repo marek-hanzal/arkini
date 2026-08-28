@@ -51,7 +51,7 @@ export const EditorBuildMajorUpdateDialog = ({
 					cursorIntent={pending ? "progress" : undefined}
 					onClick={onConfirm}
 				>
-					{pending ? "Updating…" : "Update package"}
+					Update package
 				</DangerButton>
 			</div>
 		</div>

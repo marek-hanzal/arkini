@@ -60,7 +60,7 @@ const EditorUnsavedChangesPrompt = ({
 							cursorIntent={state.saving ? "progress" : undefined}
 							onClick={() => void owner.decide("save")}
 						>
-							{state.saving ? "Saving…" : "Save"}
+							Save
 						</PrimaryButton>
 					) : null}
 				</div>

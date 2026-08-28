@@ -94,7 +94,7 @@ export const MainMenu = () => {
 				disabled={exitPending}
 				onClick={() => requestExit(undefined)}
 			>
-				{exitPending ? "Exiting…" : "Exit"}
+				Exit
 			</Button>
 			<p
 				className="pt-1 text-center text-xs text-subtle"

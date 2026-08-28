@@ -81,9 +81,7 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 						onClick={actions.importJsonDirectory}
 					>
 						<span className="icon-[lucide--file-json-2] size-9 text-accent" />
-						<span className="text-lg">
-							{actions.active === "import-json" ? "Opening…" : "Open folder"}
-						</span>
+						<span className="text-lg">Open folder</span>
 						<span className="text-xs font-medium opacity-75">
 							Use an existing Editor project in place
 						</span>
@@ -95,9 +93,7 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 						onClick={actions.createProject}
 					>
 						<span className="icon-[lucide--file-plus-2] size-9" />
-						<span className="text-lg">
-							{actions.active === "create" ? "Creating…" : "New project"}
-						</span>
+						<span className="text-lg">New project</span>
 						<span className="text-xs font-medium opacity-75">
 							Start with an empty project
 						</span>
@@ -152,9 +148,7 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 						disabled={actions.blocked}
 						cursorIntent={actions.active === "exit" ? "progress" : undefined}
 						onClick={actions.exit}
-					>
-						{actions.active === "exit" ? "Returning…" : "Back"}
-					</BackButton>
+					/>
 				</footer>
 			</div>
 			{projectToDelete === null ? null : (

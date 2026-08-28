@@ -43,25 +43,24 @@ export const EditorAssetDeleteDialog = ({
 			<p className="mt-2 text-xs text-subtle">Asset ID: {resourceId}</p>
 			<EditorAssetDeleteError error={error} />
 			<div className="mt-6 flex flex-wrap justify-end gap-2">
-				{pending ? null : (
-					<ButtonLink
-						data-ui="EditorAssetDeleteCreateVersion"
-						to="/editor/$projectId/versions/commit"
-						params={{
-							projectId: project.projectId,
-						}}
-						search={{
-							returnTo: `/editor/${encodeURIComponent(project.projectId)}/assets/${encodeURIComponent(resourceId)}/detail/delete?${new URLSearchParams(
-								{
-									filter,
-									query,
-								},
-							)}`,
-						}}
-					>
-						Create version first…
-					</ButtonLink>
-				)}
+				<ButtonLink
+					aria-disabled={pending}
+					data-ui="EditorAssetDeleteCreateVersion"
+					to="/editor/$projectId/versions/commit"
+					params={{
+						projectId: project.projectId,
+					}}
+					search={{
+						returnTo: `/editor/${encodeURIComponent(project.projectId)}/assets/${encodeURIComponent(resourceId)}/detail/delete?${new URLSearchParams(
+							{
+								filter,
+								query,
+							},
+						)}`,
+					}}
+				>
+					Create version first…
+				</ButtonLink>
 				<Button
 					disabled={pending}
 					onClick={onCancel}
@@ -74,7 +73,7 @@ export const EditorAssetDeleteDialog = ({
 					data-ui="EditorAssetDeleteConfirm"
 					onClick={onConfirm}
 				>
-					{pending ? "Deleting…" : "Delete asset"}
+					Delete asset
 				</DangerButton>
 			</div>
 		</div>

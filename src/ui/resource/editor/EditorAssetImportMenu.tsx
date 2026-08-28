@@ -36,7 +36,7 @@ export const EditorAssetImportMenu = ({
 					onClick={onImportArkpack}
 				>
 					<span className="icon-[lucide--package-open] size-4" />
-					{pending ? "Importing…" : "Import assets"}
+					Import assets
 				</PrimaryButton>
 				<PrimaryButton
 					ref={refs.setReference}

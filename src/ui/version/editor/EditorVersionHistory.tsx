@@ -148,7 +148,7 @@ export const EditorVersionHistory = () => {
 									}
 									onClick={controller.restoreSelected}
 								>
-									{controller.checkoutPending ? "Restoring…" : "Restore version"}
+									Restore version
 								</DangerButton>
 							</div>
 							{controller.selected.body === undefined ? null : (
@@ -179,9 +179,7 @@ export const EditorVersionHistory = () => {
 										disabled={controller.tagPending}
 										onClick={controller.saveTag}
 									>
-										<span
-											className={`${controller.tagPending ? "icon-[lucide--loader-circle] animate-spin" : "icon-[lucide--save]"} size-4`}
-										/>
+										<span className="icon-[lucide--save] size-4" />
 										Save
 									</Button>
 								</div>

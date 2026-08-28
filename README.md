@@ -26,8 +26,7 @@ src/engine    framework-neutral gameplay, config, compiler, pack and domain oper
 src/editor    platform-neutral Editor domain
 src/bridge    renderer access to public engine/editor/Electron contracts
 src/ui        reusable React and Pixi presentation
-src/page      route-level visual composition
-src/@routes   TanStack Router registration and route lifecycle orchestration
+src/@routes   TanStack Router registration, lifecycle and route-specific composition
 electron      pure transport contract plus main/preload/platform ownership
 shared        immutable cross-process application metadata and hard limits only
 game/arkini   official portable game project

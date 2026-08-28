@@ -7,8 +7,7 @@ This is the canonical map of implemented ownership and lifecycle. It does not ca
 The renderer dependency DAG is:
 
 ```text
-src/@routes → { src/page, src/ui, src/bridge, public src/editor }
-src/page    → src/ui
+src/@routes → { src/ui, src/bridge, public src/editor }
 src/ui      → { src/bridge, public src/editor }
 src/bridge  → { public src/engine, public src/editor, electron/contract }
 src/editor  → public src/engine
@@ -17,7 +16,7 @@ src/editor  → public src/engine
 - `src/engine` is framework-neutral gameplay, config, compiler, validation, pack, and CLI domain code.
 - `src/editor` is the platform-neutral Editor domain.
 - `src/bridge` is the renderer lifecycle/transport connection to engine and the pure `electron/contract` seam. Platform-neutral public Editor operations and projections may be consumed directly where the executable dependency rules allow them.
-- `src/ui` owns reusable presentation and transient interaction; `src/page` composes screens; `src/@routes` owns registration, loaders, redirects, and route context.
+- `src/ui` owns reusable presentation and transient interaction. `src/@routes` owns registration, loaders, redirects, route context, and route-specific composition; routes may share only explicitly ignored `-*` route-private helpers, never import another route module.
 - `electron/main` owns physical desktop capabilities and composes public engine/editor domains. It never imports renderer code or engine internals. `electron/preload` is transport-only; engine/editor code never imports Electron.
 
 [`.dependency-cruiser.cjs`](.dependency-cruiser.cjs) is the executable import-boundary authority. Do not duplicate those rules in tests or prose.
@@ -84,7 +83,7 @@ Shutdown order for a session is: reject commands, stop Tick, close session scope
 
 ## Renderer ownership
 
-React owns routes, pages, forms, menus, modal state, command presentation, and disposable projections. Feature-owned Effect Atoms own asynchronous renderer commands when admission/result must survive React remounts; lifecycle operations belong to route loaders or process services, not component effects. React may never own gameplay snapshots, package/catalog truth, persistence truth, or Game lifecycle.
+React owns routes, route-specific screen composition, forms, menus, modal state, command presentation, and disposable projections. Feature-owned Effect Atoms own asynchronous renderer commands when admission/result must survive React remounts; lifecycle operations belong to route loaders or process services, not component effects. React may never own gameplay snapshots, package/catalog truth, persistence truth, or Game lifecycle.
 
 Pixi owns retained Board, Toolbar, and Inventory scene presentation: display objects, geometry, hit testing, z-order, pointer lifecycle, and demand rendering. Motion is the only interpolation clock. The engine still decides every action and drop outcome. Main and Inventory canvases have separate actor stores; their handoff carries presentation geometry only and cannot assert runtime identity continuity. See the local [`src/ui/pixi/README.md`](src/ui/pixi/README.md).
 

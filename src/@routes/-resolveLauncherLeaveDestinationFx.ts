@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { GameLeaveDestinationSchema } from "~/ui/navigation/GameLeaveDestinationSchema";
+import type { GameLeaveDestinationSchema } from "~/@routes/action/-GameLeaveDestinationSchema";
 
 /** Converts one launcher pathname into the exact post-release action destination. */
 export const resolveLauncherLeaveDestinationFx = Effect.fn("resolveLauncherLeaveDestinationFx")(

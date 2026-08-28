@@ -5,17 +5,6 @@ import { GameEngineProvider } from "~/bridge/game/GameEngineProvider";
 import { readCurrentGameEngineResourceFx } from "~/bridge/game/readCurrentGameEngineResourceFx";
 import { GameCriticalFailureBoundary } from "~/ui/game/GameCriticalFailureBoundary";
 
-const GameRoute = () => {
-	const { gameEngine } = Route.useRouteContext();
-	return (
-		<GameCriticalFailureBoundary>
-			<GameEngineProvider game={gameEngine}>
-				<Outlet />
-			</GameEngineProvider>
-		</GameCriticalFailureBoundary>
-	);
-};
-
 /**
  * Publishes one exact Game resource to all descendants and rejects stale package
  * URLs. Ordinary game routes require a usable resource. Controlled exit instead
@@ -43,5 +32,14 @@ export const Route = createFileRoute("/game/$packageId")({
 			gameEngineResource: resource,
 		};
 	},
-	component: GameRoute,
+	component: () => {
+		const { gameEngine } = Route.useRouteContext();
+		return (
+			<GameCriticalFailureBoundary>
+				<GameEngineProvider game={gameEngine}>
+					<Outlet />
+				</GameEngineProvider>
+			</GameCriticalFailureBoundary>
+		);
+	},
 });

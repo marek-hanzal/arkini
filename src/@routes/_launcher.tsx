@@ -1,8 +1,8 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Effect } from "effect";
 
+import { resolveLauncherLeaveDestinationFx } from "~/@routes/-resolveLauncherLeaveDestinationFx";
 import { readCurrentGameEngineResourceFx } from "~/bridge/game/readCurrentGameEngineResourceFx";
-import { resolveLauncherLeaveDestinationFx } from "~/ui/navigation/resolveLauncherLeaveDestinationFx";
 
 /**
  * Launcher pages must not silently replace an active Game. Funnel every such
@@ -28,5 +28,4 @@ export const Route = createFileRoute("/_launcher")({
 			replace: true,
 		});
 	},
-	component: Outlet,
 });

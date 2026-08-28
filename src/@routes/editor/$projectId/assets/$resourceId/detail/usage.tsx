@@ -1,12 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { EditorAssetUsagePage } from "~/page/editor/EditorAssetUsagePage";
+import { EditorAssetUsage } from "~/ui/resource/editor/EditorAssetUsage";
 
 export const Route = createFileRoute("/editor/$projectId/assets/$resourceId/detail/usage")({
-	component: EditorAssetUsageRoute,
+	component: () => {
+		const { resourceId } = Route.useParams();
+		return <EditorAssetUsage resourceId={resourceId} />;
+	},
 });
-
-function EditorAssetUsageRoute() {
-	const { resourceId } = Route.useParams();
-	return <EditorAssetUsagePage resourceId={resourceId} />;
-}

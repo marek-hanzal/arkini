@@ -3,13 +3,13 @@ const boundaryRules = [
 	{
 		name: "engine-no-presentation-imports",
 		comment:
-			"The standalone engine never depends on UI, page composition, routes, or renderer entrypoints.",
+			"The standalone engine never depends on UI, route composition, or renderer entrypoints.",
 		severity: "error",
 		from: {
 			path: "^src/engine(?:/|$)",
 		},
 		to: {
-			path: "^src/(?:bridge|ui|page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
+			path: "^src/(?:bridge|ui|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
 		},
 	},
 	{
@@ -55,25 +55,25 @@ const boundaryRules = [
 	{
 		name: "editor-domain-no-presentation-imports",
 		comment:
-			"The shared editor domain is platform-neutral and never depends on bridge, UI, pages, routes, renderer entrypoints, or Electron.",
+			"The shared editor domain is platform-neutral and never depends on bridge, UI, routes, renderer entrypoints, or Electron.",
 		severity: "error",
 		from: {
 			path: "^src/editor(?:/|$)",
 		},
 		to: {
-			path: "^src/(?:bridge|ui|page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$|^electron(?:/|$)|^node_modules/electron(?:/|$)",
+			path: "^src/(?:bridge|ui|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$|^electron(?:/|$)|^node_modules/electron(?:/|$)",
 		},
 	},
 	{
 		name: "bridge-no-presentation-imports",
 		comment:
-			"Bridge domains connect UI to public engine contracts and never depend on reusable UI, pages, routes, or renderer entrypoints.",
+			"Bridge domains connect UI to public engine contracts and never depend on reusable UI, routes, or renderer entrypoints.",
 		severity: "error",
 		from: {
 			path: "^src/bridge(?:/|$)",
 		},
 		to: {
-			path: "^src/(?:ui|page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
+			path: "^src/(?:ui|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
 		},
 	},
 	{
@@ -101,15 +101,15 @@ const boundaryRules = [
 		},
 	},
 	{
-		name: "ui-no-page-or-route-imports",
+		name: "ui-no-route-imports",
 		comment:
-			"Reusable UI may depend on bridge domains but never on route-level page composition or router registration.",
+			"Reusable UI may depend on bridge domains but never on route registration or route-specific composition.",
 		severity: "error",
 		from: {
 			path: "^src/ui(?:/|$)",
 		},
 		to: {
-			path: "^src/(?:page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
+			path: "^src/@routes(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
 		},
 	},
 	{
@@ -140,27 +140,23 @@ const boundaryRules = [
 		},
 	},
 	{
-		name: "page-only-composes-ui",
-		comment:
-			"Pages compose UI and router layout only; engine and bridge access stays inside reusable UI boundaries.",
-		severity: "error",
-		from: {
-			path: "^src/page(?:/|$)",
-		},
-		to: {
-			path: "^src/(?:engine|bridge|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
-		},
-	},
-	{
 		name: "routes-enter-public-renderer-seams",
 		comment:
-			"File routes own TanStack registration and lifecycle orchestration through pages, reusable UI, public editor, and bridge capabilities, but never engine internals or other route modules.",
+			"File routes own TanStack registration, lifecycle, and route-specific composition through reusable UI, public editor, and bridge capabilities. They may share only ignored route-private helpers, never engine internals or other route modules.",
 		severity: "error",
 		from: {
 			path: "^src/@routes(?:/|$)",
 		},
 		to: {
 			path: "^src/(?:engine|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
+			pathNot: [
+				"^src/@routes/-resolveLauncherLeaveDestinationFx[.]ts$",
+				"^src/@routes/action/-GameLeaveDestinationSchema[.]ts$",
+				"^src/@routes/action/-runActionRouteFx[.]ts$",
+				"^src/@routes/editor/[$]projectId/editor/items/[$]itemUid/-parseEditorItemSectionIdFx[.]ts$",
+				"^src/@routes/editor/[$]projectId/mcp/-parseEditorMcpSectionIdFx[.]ts$",
+				"^src/@routes/editor/[$]projectId/project/-parseEditorProjectSectionIdFx[.]ts$",
+			],
 		},
 	},
 
@@ -170,7 +166,7 @@ const boundaryRules = [
 			"Renderer code may consume the pure Electron transport contract through bridge domains, but never Electron runtime adapters or the Electron package.",
 		severity: "error",
 		from: {
-			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?)(?:/|$)",
+			path: "^(?:src/(?:engine|bridge|ui|@routes)|src/(?:main|router|_route)\\.tsx?)(?:/|$)",
 		},
 		to: {
 			path: "^(?:electron(?:/|$)|node_modules/electron(?:/|$))",
@@ -194,13 +190,13 @@ const boundaryRules = [
 	{
 		name: "electron-main-no-renderer-imports",
 		comment:
-			"Electron main is the application backend and composition root: it may consume public editor and engine modules, but never renderer bridges, presentation, pages, routes, or renderer entrypoints.",
+			"Electron main is the application backend and composition root: it may consume public editor and engine modules, but never renderer bridges, presentation, routes, or renderer entrypoints.",
 		severity: "error",
 		from: {
 			path: "^electron/main(?:/|$)",
 		},
 		to: {
-			path: "^src/(?:bridge|ui|page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
+			path: "^src/(?:bridge|ui|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
 		},
 	},
 	{
@@ -248,10 +244,10 @@ const boundaryRules = [
 	{
 		name: "electron-contract-only-through-bridge-or-electron",
 		comment:
-			"The shared Electron contract is consumed only by renderer bridge domains and Electron platform adapters, never by engine, UI, pages, or renderer entrypoints.",
+			"The shared Electron contract is consumed only by renderer bridge domains and Electron platform adapters, never by engine, UI, routes, or renderer entrypoints.",
 		severity: "error",
 		from: {
-			path: "^(?:src/(?:engine|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?)(?:/|$)",
+			path: "^(?:src/(?:engine|ui|@routes)|src/(?:main|router|_route)\\.tsx?)(?:/|$)",
 		},
 		to: {
 			path: "^electron/contract(?:/|$)",
@@ -278,7 +274,7 @@ const boundaryRules = [
 			"Production and tooling code never import test support; tests may depend on active code, never the reverse.",
 		severity: "error",
 		from: {
-			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron)(?:/|$)",
+			path: "^(?:src/(?:engine|bridge|ui|@routes)|src/(?:main|router|_route)\\.tsx?|electron)(?:/|$)",
 		},
 		to: {
 			path: "^test(?:/|$)",
@@ -290,7 +286,7 @@ const boundaryRules = [
 			"The historical tree is a read-only oracle outside every active source root and may never be imported by production or tests.",
 		severity: "error",
 		from: {
-			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|test)(?:/|$)",
+			path: "^(?:src/(?:engine|bridge|ui|@routes)|src/(?:main|router|_route)\\.tsx?|electron|test)(?:/|$)",
 		},
 		to: {
 			path: "^src/_archive(?:/|$)",
@@ -340,7 +336,7 @@ module.exports = {
 				"Active production source must not import devDependencies unless the import is type-only or test-only.",
 			severity: "error",
 			from: {
-				path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron)(?:/|$)",
+				path: "^(?:src/(?:engine|bridge|ui|@routes)|src/(?:main|router|_route)\\.tsx?|electron)(?:/|$)",
 				pathNot: [
 					"[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$",
 				],
@@ -364,7 +360,7 @@ module.exports = {
 				"Production code must not import tests or fixtures. Tests may depend on production, never the reverse.",
 			severity: "error",
 			from: {
-				path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron)(?:/|$)",
+				path: "^(?:src/(?:engine|bridge|ui|@routes)|src/(?:main|router|_route)\\.tsx?|electron)(?:/|$)",
 				pathNot: [
 					"[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$",
 				],

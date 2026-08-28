@@ -18,7 +18,7 @@ import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
 import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
 import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycleOwnerAtom";
 import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLifecycleFx";
-import { MainMenuPage } from "~/page/launcher/MainMenuPage";
+import { Route as MainMenuRouteDefinition } from "~/@routes/_launcher/main-menu";
 import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";
 import { LauncherStartupConfigAtom } from "~/ui/launcher/LauncherStartupConfigAtom";
 import { EditorServiceStatusAtom } from "~/bridge/editor/EditorServiceStatusAtom";
@@ -31,6 +31,8 @@ import { EditorServiceStatusAtom } from "~/bridge/editor/EditorServiceStatusAtom
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const registries: AtomRegistry.AtomRegistry[] = [];
+const MainMenuRoute = MainMenuRouteDefinition.options.component;
+if (MainMenuRoute === undefined) throw new Error("Main menu route component is missing.");
 
 afterEach(async () => {
 	await act(async () => {
@@ -130,7 +132,7 @@ describe("MainMenu", () => {
 				{
 					value: registry,
 				},
-				createElement(MainMenuPage),
+				createElement(MainMenuRoute),
 			);
 		const rootRoute = createRootRoute({
 			component: App,

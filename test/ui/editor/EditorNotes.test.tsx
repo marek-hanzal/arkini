@@ -30,8 +30,11 @@ vi.mock("~/ui/overlay/Tooltip", () => ({
 }));
 vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
 
-import { EditorNotes } from "~/ui/note/editor/EditorNotes";
+import { Route as EditorNotesRouteDefinition } from "~/@routes/editor/$projectId/notes";
 import { editorNotesTestState as state } from "~test/ui/editor/EditorNotes.test/fixture";
+
+const EditorNotes = EditorNotesRouteDefinition.options.component;
+if (EditorNotes === undefined) throw new Error("Editor Notes route component is missing.");
 
 (
 	globalThis as {

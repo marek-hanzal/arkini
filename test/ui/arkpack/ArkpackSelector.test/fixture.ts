@@ -12,7 +12,7 @@ import { createRoot } from "react-dom/client";
 import { vi } from "vitest";
 import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
 import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
-import { ArkpackSelectorPage } from "~/page/arkpack/ArkpackSelectorPage";
+import { Route as ArkpackSelectorRouteDefinition } from "~/@routes/_launcher/arkpacks";
 
 (
 	globalThis as {
@@ -22,6 +22,9 @@ import { ArkpackSelectorPage } from "~/page/arkpack/ArkpackSelectorPage";
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const registries: AtomRegistry.AtomRegistry[] = [];
+const ArkpackSelectorRoute = ArkpackSelectorRouteDefinition.options.component;
+if (ArkpackSelectorRoute === undefined)
+	throw new Error("Arkpack selector route component is missing.");
 
 export const cleanupArkpackSelectorTests = async () => {
 	await act(async () => {
@@ -81,7 +84,7 @@ export const renderArkpackSelector = async ({
 				{
 					value: registry,
 				},
-				createElement(ArkpackSelectorPage),
+				createElement(ArkpackSelectorRoute),
 			),
 	});
 	const mainMenuRoute = createRoute({

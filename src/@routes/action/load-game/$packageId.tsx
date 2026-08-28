@@ -1,14 +1,14 @@
 import { createFileRoute, redirect, type ErrorComponentProps } from "@tanstack/react-router";
 
 import { Cause, Effect, Exit, Option } from "effect";
+import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
 import { releaseCurrentEditorBoardGameFx } from "~/bridge/editor/board/releaseCurrentEditorBoardGameFx";
 import { acquireGameEngineLeaseFx } from "~/bridge/game/acquireGameEngineLeaseFx";
 import { adoptGameEngineLeaseFx } from "~/bridge/game/adoptGameEngineLeaseFx";
 import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 import { readCurrentGameEngineResourceFx } from "~/bridge/game/readCurrentGameEngineResourceFx";
-import { ActionPendingPage } from "~/page/action/ActionPendingPage";
-import { runActionRouteFx } from "~/page/action/runActionRouteFx";
-import { GameEngineErrorPage } from "~/page/game/GameEngineErrorPage";
+import { GameEngineErrorView } from "~/ui/game/GameEngineErrorView";
+import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
 
 const loadGameRouteFx = Effect.fn("loadGameRouteFx")((packageId: string) =>
 	Effect.scoped(
@@ -92,16 +92,14 @@ export const Route = createFileRoute("/action/load-game/$packageId")({
 	},
 	pendingMs: 0,
 	pendingMinMs: 2_500,
-	pendingComponent: () => <ActionPendingPage label="Loading game…" />,
-	errorComponent: GameLoadErrorPage,
+	pendingComponent: () => <ActionLoadingScreen label="Loading game…" />,
+	errorComponent: (props: ErrorComponentProps) => {
+		const { packageId } = Route.useParams();
+		return (
+			<GameEngineErrorView
+				{...props}
+				packageId={packageId}
+			/>
+		);
+	},
 });
-
-function GameLoadErrorPage(props: ErrorComponentProps) {
-	const { packageId } = Route.useParams();
-	return (
-		<GameEngineErrorPage
-			{...props}
-			packageId={packageId}
-		/>
-	);
-}

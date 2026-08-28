@@ -4,20 +4,25 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { GamePage } from "~/page/game/GamePage";
+import { Route as GameBoardRouteDefinition } from "~/@routes/game/$packageId/_scene/board";
 
 const pageState = vi.hoisted(() => ({
 	navigate: vi.fn(() => Promise.resolve()),
 }));
 
 vi.mock("@tanstack/react-router", () => ({
-	getRouteApi: () => ({
+	createFileRoute: () => (options: object) => ({
+		options,
 		useParams: () => ({
 			packageId: "package-game-page",
 		}),
 	}),
 	useNavigate: () => pageState.navigate,
 }));
+
+const GameBoardRoute = GameBoardRouteDefinition.options.component;
+if (GameBoardRoute === undefined)
+	throw new Error("Installed Game Board route component is missing.");
 
 vi.mock("~/ui/game/PlayableBoard", async () => {
 	const { createElement: createReactElement } = await import("react");
@@ -44,13 +49,13 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-describe("GamePage", () => {
+describe("installed Game Board route", () => {
 	it("opens Inventory within the exact installed package", async () => {
 		const host = document.createElement("div");
 		document.body.append(host);
 		const root = createRoot(host);
 		roots.push(root);
-		await act(async () => root.render(createElement(GamePage)));
+		await act(async () => root.render(createElement(GameBoardRoute)));
 
 		const inventory = host.querySelector("button");
 		if (inventory === null) throw new Error("Inventory control is missing.");

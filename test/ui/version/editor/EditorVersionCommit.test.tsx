@@ -4,7 +4,11 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { EditorVersionCommit } from "~/ui/version/editor/EditorVersionCommit";
+import { Route as EditorVersionCommitRouteDefinition } from "~/@routes/editor/$projectId/versions/commit";
+
+const EditorVersionCommit = EditorVersionCommitRouteDefinition.options.component;
+if (EditorVersionCommit === undefined)
+	throw new Error("Editor version Commit route component is missing.");
 
 (
 	globalThis as {

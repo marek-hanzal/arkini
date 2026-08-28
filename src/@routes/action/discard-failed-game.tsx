@@ -4,12 +4,18 @@ import {
 	type ErrorComponentProps,
 	useRouter,
 } from "@tanstack/react-router";
+import { z } from "zod";
 
+import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
 import { discardFailedGameEngineFx } from "~/bridge/game/discardFailedGameEngineFx";
-import { ActionPendingPage } from "~/page/action/ActionPendingPage";
-import { runActionRouteFx } from "~/page/action/runActionRouteFx";
 import { ActionErrorPage } from "~/ui/action/ActionErrorPage";
-import { FailedGameDiscardSearchSchema } from "~/ui/navigation/FailedGameDiscardSearchSchema";
+import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
+
+const FailedGameDiscardSearchSchema = z
+	.object({
+		packageId: z.string().min(1),
+	})
+	.strict();
 
 export const Route = createFileRoute("/action/discard-failed-game")({
 	validateSearch: FailedGameDiscardSearchSchema,
@@ -25,21 +31,19 @@ export const Route = createFileRoute("/action/discard-failed-game")({
 	},
 	pendingMs: 0,
 	pendingMinMs: 2_500,
-	pendingComponent: () => <ActionPendingPage label="Leaving failed game…" />,
-	errorComponent: DiscardFailedGameErrorPage,
+	pendingComponent: () => <ActionLoadingScreen label="Leaving failed game…" />,
+	errorComponent: (props: ErrorComponentProps) => {
+		const router = useRouter();
+		return (
+			<ActionErrorPage
+				{...props}
+				description="Arkini could not discard the exact failed Game bootstrap state. No save was deleted and no replacement Game was removed."
+				reset={() => {
+					void router.invalidate().catch(() => undefined);
+				}}
+				resetLabel="Retry exit"
+				title="Game exit failed"
+			/>
+		);
+	},
 });
-
-function DiscardFailedGameErrorPage(props: ErrorComponentProps) {
-	const router = useRouter();
-	return (
-		<ActionErrorPage
-			{...props}
-			description="Arkini could not discard the exact failed Game bootstrap state. No save was deleted and no replacement Game was removed."
-			reset={() => {
-				void router.invalidate().catch(() => undefined);
-			}}
-			resetLabel="Retry exit"
-			title="Game exit failed"
-		/>
-	);
-}

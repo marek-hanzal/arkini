@@ -18,7 +18,7 @@ export const readArkpackCandidatesFx = Effect.fn("readArkpackCandidatesFx")(func
 				bytes: new Uint8Array(file.bytes),
 				filename: file.filename,
 				packageId: file.packageId,
-				trust: file.trust,
+				provenance: file.provenance,
 				source: file.source,
 				overridesBundled: file.overridesBundled,
 			}),

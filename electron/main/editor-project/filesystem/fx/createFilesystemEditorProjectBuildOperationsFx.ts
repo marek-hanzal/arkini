@@ -242,10 +242,10 @@ export const createFilesystemEditorProjectBuildOperationsFx = Effect.fn(
 								new Error("The Editor build Arkpack is a symbolic link."),
 							);
 						const info = yield* fileSystem.stat(arkpackPath);
-						if (info.size > ArkpackLimits.maxCompressedBytes)
+						if (info.size > ArkpackLimits.maxArkpackBytes)
 							return yield* Effect.fail(
 								new Error(
-									`Arkpack exceeds the ${ArkpackLimits.maxCompressedBytes} byte compressed limit.`,
+									`Arkpack exceeds the ${ArkpackLimits.maxArkpackBytes} byte limit.`,
 								),
 							);
 						const bytes = Uint8Array.from(yield* fileSystem.readFile(arkpackPath));

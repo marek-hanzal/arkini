@@ -3,7 +3,7 @@ import { Effect, SubscriptionRef } from "effect";
 import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
 import type { EditorBuildMajorUpdateConfirmation } from "~/bridge/arkpack/editor/readEditorBuildInstallPlanFx";
 import { readEditorBuildInstallPlanFx } from "~/bridge/arkpack/editor/readEditorBuildInstallPlanFx";
-import { readArkpackArtifactNames } from "~/bridge/arkpack/readArkpackArtifactNames";
+import { readArkpackArtifactName } from "~/bridge/arkpack/readArkpackArtifactName";
 import type { EditorProjectRepositoryService } from "~/bridge/editor/EditorProjectRepository";
 import type { EditorProjectBuildSchema } from "~/editor/EditorProjectBuildSchema";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
@@ -53,7 +53,7 @@ export const installBuiltEditorArkpackFx = Effect.fn("installBuiltEditorArkpackF
 			contentHash: artifact.contentHash,
 		}),
 		expectedCurrent: plan.expectedCurrent,
-		filename: readArkpackArtifactNames(artifact.projectId).arkpack,
+		filename: readArkpackArtifactName(artifact.projectId),
 		packageId: artifact.projectId,
 	});
 });

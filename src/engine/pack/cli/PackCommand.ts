@@ -38,10 +38,12 @@ const runPackCommandFx = Effect.fn("runPackCommandFx")(function* ({
 	yield* Console.log(`Packed ${result.json} JSON sources and ${result.png} PNG assets.`);
 	yield* Console.log(`Wrote ${result.arkpack} (${result.bytes} bytes).`);
 	if (process.env.ARKINI_RELEASE_SIGN === "1") {
-		const signed = yield* signArkpackFileFx({
+		const signedBytes = yield* signArkpackFileFx({
 			arkpackPath: result.arkpack,
 		});
-		yield* Console.log(`Wrote ${signed.signaturePath}.`);
+		yield* Console.log(
+			`Embedded release proof in ${result.arkpack} (${signedBytes.byteLength} bytes).`,
+		);
 	}
 });
 

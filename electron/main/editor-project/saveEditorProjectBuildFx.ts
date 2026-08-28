@@ -4,7 +4,7 @@ import { FileSystem } from "effect";
 import { Effect } from "effect";
 
 import type { EditorProjectTransport } from "../../contract/editor/EditorProjectTransport";
-import { writeArkpackArtifactPairFx } from "../arkpack/writeArkpackArtifactPairFx";
+import { writeArkpackFileFx } from "../arkpack/writeArkpackFileFx";
 import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnership";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
@@ -45,7 +45,7 @@ export const saveEditorProjectBuildFx = Effect.fn("saveEditorProjectBuildFx")(
 				? selection.filePath
 				: `${selection.filePath}.arkpack`;
 			const fileSystem = yield* FileSystem.FileSystem;
-			yield* writeArkpackArtifactPairFx({
+			yield* writeArkpackFileFx({
 				arkpackPath,
 				bytes: content.bytes,
 				fileSystem,

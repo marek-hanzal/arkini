@@ -40,8 +40,8 @@ export const createGame = ({
 		title: testArkpackConfig.meta.title,
 		version: "1.0",
 		arkini: ArkiniAppVersion,
-		trust: {
-			type: "external",
+		provenance: {
+			type: "community",
 		} as const,
 		source: "user",
 	},

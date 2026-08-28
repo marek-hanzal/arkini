@@ -4,10 +4,10 @@ import { Console, Effect } from "effect";
 import { verifyArkpackFileFx } from "~/engine/pack/fx/verifyArkpackFileFx";
 
 const runArkpackVerifyFx = Effect.fn("runArkpackVerifyFx")(function* (arkpackPath: string) {
-	const trust = yield* verifyArkpackFileFx({
+	const provenance = yield* verifyArkpackFileFx({
 		arkpackPath,
 	});
-	yield* Console.log(JSON.stringify(trust));
+	yield* Console.log(JSON.stringify(provenance));
 });
 
 export const ArkpackVerifyCommand = Command.make(
@@ -16,4 +16,4 @@ export const ArkpackVerifyCommand = Command.make(
 		arkpack: Argument.file("arkpack"),
 	},
 	({ arkpack }) => runArkpackVerifyFx(arkpack),
-).pipe(Command.withDescription("Offline-classify one Arkpack as Trusted or External."));
+).pipe(Command.withDescription("Offline-classify one Arkpack as Official or Community."));

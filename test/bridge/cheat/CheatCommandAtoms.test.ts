@@ -33,8 +33,8 @@ const createGame = (commandFx: Effect.Effect<unknown, unknown> = Effect.void): G
 		title: "Cheat command game",
 		version: "1.0",
 		arkini: "1.0",
-		trust: {
-			type: "external",
+		provenance: {
+			type: "community",
 		} as const,
 		source: "user",
 	},

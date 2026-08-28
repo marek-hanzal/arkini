@@ -13,12 +13,12 @@ describe("importArkpackFileFx", () => {
 				importArkpackFileFx({
 					file: {
 						name: "oversized.arkpack",
-						size: ArkpackLimits.maxCompressedBytes + 1,
+						size: ArkpackLimits.maxArkpackBytes + 1,
 						arrayBuffer,
 					},
 				}),
 			),
-		).rejects.toThrow("compressed limit");
+		).rejects.toThrow("byte limit");
 		expect(arrayBuffer).not.toHaveBeenCalled();
 	});
 });

@@ -9,6 +9,7 @@ import {
 	type EditorProjectRepositoryService,
 } from "~/bridge/editor/EditorProjectRepository";
 import { encodeFx } from "~/engine/pack/fx/encodeFx";
+import { encodeArkpackEnvelopeFx } from "~/engine/pack/fx/encodeArkpackEnvelopeFx";
 import type { PayloadSchema } from "~/engine/pack/schema/PayloadSchema";
 import {
 	createTestPngBytes,
@@ -29,7 +30,11 @@ const validPayload: PayloadSchema.Type = {
 };
 
 const createArkpackBytes = (payload = validPayload) =>
-	new Uint8Array(gzipSync(Effect.runSync(encodeFx(payload))));
+	Effect.runSync(
+		encodeArkpackEnvelopeFx({
+			payload: new Uint8Array(gzipSync(Effect.runSync(encodeFx(payload)))),
+		}),
+	);
 
 const createRepository = (
 	createProjectFx: EditorProjectRepositoryService["createProjectFx"],

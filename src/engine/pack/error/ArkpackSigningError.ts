@@ -1,11 +1,11 @@
 import { Data } from "effect";
 
-import type { ArkpackTrustSchema } from "~/engine/pack/schema/ArkpackTrustSchema";
+import type { ArkpackProvenanceSchema } from "~/engine/pack/schema/ArkpackProvenanceSchema";
 
-/** The official signing workflow could not establish its requested trusted identity. */
+/** The official signing workflow could not establish its requested provenance. */
 export class ArkpackSigningError extends Data.TaggedError("ArkpackSigningError")<{
 	readonly reason: "release-signing" | "post-sign-verification";
-	readonly actualTrust?: ArkpackTrustSchema.Type;
+	readonly actualProvenance?: ArkpackProvenanceSchema.Type;
 	readonly message: string;
 	readonly cause?: unknown;
 }> {}

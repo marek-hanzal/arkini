@@ -17,8 +17,8 @@ const testArkpack = {
 	version: "1.0",
 	arkini: "1",
 	source: "bundled",
-	trust: {
-		type: "trusted",
+	provenance: {
+		type: "official",
 	},
 } satisfies ArkpackDescriptor;
 

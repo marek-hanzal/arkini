@@ -88,8 +88,8 @@ const builtIn = {
 	title: "Arkini",
 	version: "1.0",
 	arkini: "1.0",
-	trust: {
-		type: "trusted" as const,
+	provenance: {
+		type: "official" as const,
 	},
 	source: "bundled" as const,
 };

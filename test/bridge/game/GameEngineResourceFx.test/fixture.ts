@@ -40,8 +40,8 @@ export const makeResource = ({
 				title: testArkpackConfig.meta.title,
 				version: "1.0",
 				arkini: ArkiniAppVersion,
-				trust: {
-					type: "external",
+				provenance: {
+					type: "community",
 				},
 				source: "user",
 			},

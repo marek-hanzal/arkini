@@ -29,31 +29,20 @@ export const readPackageFilename = (packageId: string) =>
 export const readPackagePath = (root: string, packageId: string) =>
 	join(root, readPackageFilename(packageId));
 
-export const readSignaturePath = (root: string, packageId: string) =>
-	join(root, `${encodeGameProjectFileStem(packageId)}.arksig`);
-
 export const writePackage = async ({
 	bytes,
 	packageId,
 	root,
-	signature,
 }: {
 	readonly bytes: Uint8Array;
 	readonly packageId: string;
 	readonly root: string;
-	readonly signature?: unknown;
 }) => {
 	await mkdir(root, {
 		recursive: true,
 	});
 	const path = readPackagePath(root, packageId);
 	await writeFile(path, bytes);
-	if (signature !== undefined) {
-		await writeFile(
-			readSignaturePath(root, packageId),
-			typeof signature === "string" ? signature : JSON.stringify(signature),
-		);
-	}
 	return path;
 };
 
@@ -61,20 +50,18 @@ export const readFileRecord = ({
 	bytes,
 	overridesBundled = false,
 	packageId,
-	signature: _signature,
 	source,
 }: {
 	readonly bytes: Uint8Array;
 	readonly overridesBundled?: boolean;
 	readonly packageId: string;
-	readonly signature?: unknown;
 	readonly source: ArkiniElectronApi.ArkpackFile["source"];
 }): ArkiniElectronApi.ArkpackFile => ({
 	packageId,
 	filename: readPackageFilename(packageId),
 	bytes,
-	trust: {
-		type: "external",
+	provenance: {
+		type: "community",
 	},
 	source,
 	overridesBundled,

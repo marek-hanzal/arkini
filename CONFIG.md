@@ -55,7 +55,7 @@ arkini-cli game validate [project]
 arkini-cli game pack [project]
 ```
 
-The repository wrappers are `argc game:schema`, `argc build`, and `argc check`. Run schema generation after a source-schema change, validation after content/resource changes, and packing only through the canonical command. Packing validates again and atomically replaces `<project>/build/<encoded projectId>.arkpack`; ordinary builds remove a stale sibling signature and are External.
+The repository wrappers are `argc game:schema`, `argc build`, and `argc check`. Run schema generation after a source-schema change, validation after content/resource changes, and packing only through the canonical command. Packing validates again and atomically replaces `<project>/build/<encoded projectId>.arkpack`; ordinary local and Editor builds are Community.
 
 [`Argcfile.sh`](Argcfile.sh) `version` updates `package.json`, `package-lock.json`, and the official `project.json.arkini` writer stamp as one repository operation.
 

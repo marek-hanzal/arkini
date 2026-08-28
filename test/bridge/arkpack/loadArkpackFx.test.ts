@@ -27,8 +27,8 @@ describe("loadArkpackFx", () => {
 						packageId: "package:future",
 						filename: "package%3Afuture.arkpack",
 						bytes: bytes.buffer,
-						trust: {
-							type: "external",
+						provenance: {
+							type: "community",
 						},
 						source: "user",
 						overridesBundled: true,
@@ -55,8 +55,8 @@ describe("loadArkpackFx", () => {
 			packageId: "package:selected",
 			filename: "package%3Aselected.arkpack",
 			bytes: bytes.buffer,
-			trust: {
-				type: "external",
+			provenance: {
+				type: "community",
 			},
 			source: "user",
 			overridesBundled: true,
@@ -110,7 +110,7 @@ describe("loadArkpackFx", () => {
 		).rejects.toThrow("Arkpack missing is not installed");
 	});
 
-	it("plays an External user override without treating trust as admission", async () => {
+	it("plays a Community user override without treating provenance as admission", async () => {
 		const bundledBytes = createTestArkpack(undefined, "package:tampered");
 		const userBytes = createTestArkpack(undefined, "package:tampered");
 		const storage: ArkpackStorage = {
@@ -121,8 +121,8 @@ describe("loadArkpackFx", () => {
 						packageId: "package:tampered",
 						filename: "package%3Atampered.arkpack",
 						bytes: bundledBytes.buffer,
-						trust: {
-							type: "trusted",
+						provenance: {
+							type: "official",
 						},
 						source: "bundled",
 						overridesBundled: false,
@@ -131,8 +131,8 @@ describe("loadArkpackFx", () => {
 						packageId: "package:tampered",
 						filename: "package%3Atampered.arkpack",
 						bytes: userBytes.buffer,
-						trust: {
-							type: "external",
+						provenance: {
+							type: "community",
 						},
 						source: "user",
 						overridesBundled: true,
@@ -151,8 +151,8 @@ describe("loadArkpackFx", () => {
 		);
 		expect(loaded.descriptor).toMatchObject({
 			source: "user",
-			trust: {
-				type: "external",
+			provenance: {
+				type: "community",
 			},
 		});
 	});

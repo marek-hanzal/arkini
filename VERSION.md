@@ -1,6 +1,6 @@
 # Arkini version and external data contract
 
-This document owns release compatibility, persisted-envelope identity, and Arkpack trust. Exact structural schemas remain in source; filesystem publication mechanics live in [`ARCHITECTURE.md`](ARCHITECTURE.md).
+This document owns release compatibility, persisted-envelope identity, and Arkpack provenance. Exact structural schemas remain in source; filesystem publication mechanics live in [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ## Compatibility promise
 
@@ -17,7 +17,9 @@ Every persisted Arkini writer stamp records the complete release version, includ
 - matching major is admitted regardless of minor/patch/prerelease ordering;
 - mismatching major is rejected as incompatible;
 - minor/patch must never select a parser, migration, fallback, or conditional data path;
-- version admission never bypasses strict validation, semantic invariants, integrity, or trust checks.
+- version admission never bypasses strict validation, semantic invariants, integrity, or provenance checks.
+
+Reader compatibility and release provenance deliberately use the version differently. Reader admission compares only the major, while an Official proof must bind the exact complete current build version, including prerelease suffix. Exact-version proof matching never selects a parser or rejects otherwise valid Community gameplay.
 
 Project-owned gameplay version uses `<major>.<minor>` and is a separate authority. A save/scenario and its Arkpack are compatible when their gameplay majors match; minor ordering cannot reject data or choose another reader. Writers always stamp current complete provenance.
 
@@ -61,9 +63,8 @@ The Editor installation catalog stores discovery roots, managed/external ownersh
 
 | Artifact | Contract |
 | --- | --- |
-| `.arkpack` | Compressed MessagePack manifest plus config/resources. Manifest owns gameplay `version`, Arkini writer, config byte length, and resource IDs/lengths needed to slice the stream. Package ID comes only from `config.meta.id`. |
-| `.arksig` | Serialized Sigstore bundle for the exact sibling Arkpack bytes. It contains no alternate package identity. |
-| Editor build descriptor | `{ projectId, revision, contentHash, size, diagnostics }`; disposable proof of one External build, invalidated by later project mutation. |
+| `.arkpack` | Self-contained magic/length envelope around one gzip-compressed MessagePack gameplay payload and optional Sigstore proof through EOF. The proof signs only the exact compressed payload. Manifest owns gameplay `version`, Arkini writer, config byte length, and resource IDs/lengths needed to slice the stream. Package ID comes only from `config.meta.id`. |
+| Editor build descriptor | `{ projectId, revision, contentHash, size, diagnostics }`; disposable proof of one Community build, invalidated by later project mutation. `contentHash` covers only the inner gameplay payload. |
 | `.arksave` | MessagePack `{ version, arkini, state }` below the collision-safe encoded package directory. Path owns package identity; payload owns gameplay compatibility, writer provenance, and complete State. |
 
 Preferences are individual strictly validated scalar JSON files and need no envelope. Diagnostics are library-owned JSONL. OAuth records use the protocol's fields; Arkini validates complete identities but adds no format marker. Public MCP and generated JSON schemas use stable explicit IDs so references are never anonymous or `any`.
@@ -72,20 +73,20 @@ Preferences are individual strictly validated scalar JSON files and need no enve
 
 `main` is Arkini's only long-lived branch and represents the current development snapshot. A release version tag identifies one concrete `main` commit. A bad release is fixed on `main` and followed by a new release; existing tags are not moved and user data is not downgraded.
 
-## Arkpack trust
+## Arkpack provenance
 
-Trust is soft release provenance, independent from schema, semantic validation, integrity admission, compatibility, package identity, location, and user overrides:
+Provenance is soft and independent from schema, semantic validation, integrity admission, compatibility, package identity, location, and user overrides:
 
-- `Trusted`: the exact Arkpack bytes have a valid Sigstore bundle from the repository and tagged release-workflow identity embedded in this Arkini build.
-- `External`: that exact proof is missing or fails—for local/Editor builds, changed bytes, malformed/missing bundles, or another repository/workflow.
+- `Official`: the embedded Sigstore proof offline-validates the exact inner gameplay payload for the issuer, exact repository workflow, and exact full version embedded in this Arkini build.
+- `Community`: that proof is absent or fails—for local/Editor/manual builds, changed payload bytes, malformed proof, another full version, or another repository/workflow.
 
-Both states are playable. Trust is a label, not an anti-tampering or content-admission system.
+Both states are playable. Provenance is a label, not an anti-tampering or content-admission system. A structurally invalid payload still fails normal loading; proof failure alone never does.
 
-A separately distributed Arkpack is Trusted only while its exact sibling `.arksig` is distributed with it. A bare standalone `.arkpack` has no proof and is External; it must not be described as Trusted or official.
+The one `.arkpack` is the complete distributable artifact. Its proof is optional and signs only the immutable inner payload, avoiding circular self-signing. Proof nondeterminism therefore cannot change gameplay identity or save association.
 
-Only the tagged development-prerelease workflow keyless-signs the Trusted Arkpack pair. It receives a short-lived OIDC identity, uses Sigstore Fulcio/Rekor transparency proofs, writes the sibling `.arksig`, and verifies the final pair before packaging. There is no stored signing key, signing secret, local key generation, developer mode, or standalone signing command. Manual workflow, stable-tag packaging, local `argc build`, and every Editor build remain External; ordinary rebuilds remove stale signatures.
+Tagged development and stable workflows receive a short-lived OIDC identity, use Sigstore Fulcio/Rekor transparency proofs, build and sign the canonical Arkpack once, and verify it as Official before packaging. Every platform receives and embeds those exact final bytes. There is no stored signing key, signing secret, local key generation, developer mode, or standalone signing command. Manual workflow, local `argc build`, and every Editor build remain Community.
 
-Load and `arkini-cli arkpack verify <file>` classify the exact pair offline. Verification checks digest/signature, Fulcio chain and certificate-transparency proof, Rekor proof, issuer, repository, and workflow identity against the embedded [`src/engine/pack/trusted-root.json`](src/engine/pack/trusted-root.json). Failure becomes External, never a load rejection.
+Load and `arkini-cli arkpack verify <file>` classify the single file offline. Verification checks payload digest/signature, Fulcio chain and certificate-transparency proof, Rekor proof, issuer, exact repository workflow identity, and `refs/tags/v<full current version>` against the embedded [`src/engine/pack/trusted-root.json`](src/engine/pack/trusted-root.json). Failure becomes Community, never a load rejection.
 
 Refresh a future embedded root through the deliberate networked maintenance command:
 

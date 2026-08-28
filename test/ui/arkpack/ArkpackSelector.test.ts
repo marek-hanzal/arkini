@@ -15,7 +15,7 @@ afterEach(async () => {
 });
 
 describe("ArkpackSelector", () => {
-	it("shows catalog trust and returns to the main menu", async () => {
+	it("shows catalog provenance and returns to the main menu", async () => {
 		const catalogState = {
 			type: "ready" as const,
 			arkpacks: [
@@ -25,8 +25,8 @@ describe("ArkpackSelector", () => {
 					title: "Arkini",
 					version: "1.0",
 					arkini: "1",
-					trust: {
-						type: "trusted",
+					provenance: {
+						type: "official",
 					} as const,
 					source: "bundled" as const,
 					overridesBundled: false,
@@ -37,8 +37,8 @@ describe("ArkpackSelector", () => {
 					title: "Local package",
 					version: "1.0",
 					arkini: "1",
-					trust: {
-						type: "external",
+					provenance: {
+						type: "community",
 					} as const,
 					source: "user" as const,
 					overridesBundled: false,
@@ -64,8 +64,8 @@ describe("ArkpackSelector", () => {
 			catalogList?.querySelectorAll<HTMLElement>('[data-ui="ArkpackCatalogRow"]') ?? [],
 		);
 		expect(catalogRows).toHaveLength(2);
-		expect(catalogRows[0]?.textContent).toContain("Trusted");
-		expect(catalogRows[1]?.textContent).toContain("External");
+		expect(catalogRows[0]?.textContent).toContain("Official");
+		expect(catalogRows[1]?.textContent).toContain("Community");
 		const returnButton = layout?.lastElementChild?.querySelector("button");
 
 		await act(async () => returnButton?.click());

@@ -19,8 +19,8 @@ afterEach(async () => {
 	});
 });
 
-describe("Arkpack trust CLI", () => {
-	it("offline-classifies a local artifact without a bundle as External", async () => {
+describe("Arkpack provenance CLI", () => {
+	it("offline-classifies a local artifact without a proof as Community", async () => {
 		const arkpackPath = join(root, "fixture.arkpack");
 		await writeFile(arkpackPath, "local bytes");
 
@@ -39,7 +39,7 @@ describe("Arkpack trust CLI", () => {
 		);
 
 		expect(JSON.parse(result.stdout.trim())).toEqual({
-			type: "external",
+			type: "community",
 		});
 	}, 15_000);
 });

@@ -31,8 +31,8 @@ const createStorages = async (version = "1.0") => {
 		readArkpackFx({
 			bytes,
 			filename: "bridge.arkpack",
-			trust: {
-				type: "external",
+			provenance: {
+				type: "community",
 			},
 			source: "user",
 		}),
@@ -41,8 +41,8 @@ const createStorages = async (version = "1.0") => {
 		packageId: loaded.descriptor.packageId,
 		filename: "bridge.arkpack",
 		bytes: bytes.slice().buffer,
-		trust: {
-			type: "external",
+		provenance: {
+			type: "community",
 		},
 		source: "user",
 		overridesBundled: false,
@@ -451,8 +451,8 @@ describe("createGameFx", () => {
 						packageId: storages.packageId,
 						filename: "bridge.arkpack",
 						bytes: Uint8Array.of(1, 2, 3).buffer,
-						trust: {
-							type: "external",
+						provenance: {
+							type: "community",
 						},
 						source: "user",
 						overridesBundled: false,

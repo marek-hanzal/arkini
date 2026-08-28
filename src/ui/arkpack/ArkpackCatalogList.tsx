@@ -56,18 +56,18 @@ export const ArkpackCatalogList = ({
 										{arkpack.title}
 									</h2>
 									<span className="rounded-full bg-surface-raised px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-muted">
-										{match(arkpack.trust)
+										{match(arkpack.provenance)
 											.with(
 												{
-													type: "trusted",
+													type: "official",
 												},
-												() => "Trusted",
+												() => "Official",
 											)
 											.with(
 												{
-													type: "external",
+													type: "community",
 												},
-												() => "External",
+												() => "Community",
 											)
 											.exhaustive()}
 									</span>

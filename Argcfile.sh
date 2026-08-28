@@ -21,6 +21,31 @@ clean_desktop() {
 	rm -rf .out/desktop
 }
 
+build_desktop() {
+	electron-vite build
+}
+
+install_game_arkpack() {
+	local source target verdict
+	target=game/arkini/build/arkini.arkpack
+	if [[ -z "${ARKINI_PREBUILT_ARKPACK:-}" ]]; then
+		node .out/desktop/build/main/cli/arkini.js game pack ./game/arkini
+		return
+	fi
+	source=$(cd -- "$(dirname -- "$ARKINI_PREBUILT_ARKPACK")" && pwd)/$(basename -- "$ARKINI_PREBUILT_ARKPACK")
+	if [[ ! -f "$source" ]]; then
+		echo "Prebuilt Arkpack does not exist: $source" >&2
+		exit 1
+	fi
+	rm -rf game/arkini/build
+	mkdir -p game/arkini/build
+	cp "$source" "$target"
+	cmp "$source" "$target"
+	verdict=${ARKINI_EXPECTED_PROVENANCE:-community}
+	node .out/desktop/build/main/cli/arkini.js arkpack verify "$target" |
+		grep -Fx "{\"type\":\"$verdict\"}"
+}
+
 format_check() {
 	biome format .
 }
@@ -47,25 +72,18 @@ package_macos_artifacts() {
 		--arm64 \
 		--publish never
 	cp game/arkini/build/arkini.arkpack .out/desktop/release/arkini.arkpack
-	if [[ -f game/arkini/build/arkini.arksig ]]; then
-		cp game/arkini/build/arkini.arksig .out/desktop/release/arkini.arksig
-	fi
 	(
-		local -a arkpack_artifacts=(arkini.arkpack)
 		cd .out/desktop/release
 		shasum -a 256 \
 			"Arkini-$version-mac-arm64.dmg" \
 			"Arkini-$version-mac-arm64.zip" >SHA256SUMS-macos-arm64
-		if [[ -f arkini.arksig ]]; then
-			arkpack_artifacts+=(arkini.arksig)
-		fi
-		shasum -a 256 "${arkpack_artifacts[@]}" >SHA256SUMS-arkpack
+		shasum -a 256 arkini.arkpack >SHA256SUMS-arkpack
 	)
 	"$packaged_cli" --version | grep -F "$version"
-	if [[ "${ARKINI_RELEASE_SIGN:-}" == "1" ]]; then
-		"$packaged_cli" arkpack verify .out/desktop/release/arkini.arkpack |
-			grep -Fx '{"type":"trusted"}'
-	fi
+	cmp game/arkini/build/arkini.arkpack \
+		.out/desktop/release/mac-arm64/Arkini.app/Contents/Resources/game/arkini.arkpack
+	"$packaged_cli" arkpack verify game/arkini/build/arkini.arkpack |
+		grep -Fx "{\"type\":\"${ARKINI_EXPECTED_PROVENANCE:-community}\"}"
 }
 
 package_windows_artifacts() {
@@ -76,6 +94,8 @@ package_windows_artifacts() {
 		--win \
 		--x64 \
 		--publish never
+	cmp game/arkini/build/arkini.arkpack \
+		.out/desktop/release/win-unpacked/resources/game/arkini.arkpack
 	(
 		cd .out/desktop/release
 		sha256sum \
@@ -85,15 +105,21 @@ package_windows_artifacts() {
 }
 
 package_linux_artifacts() {
-	local architecture artifact_arch version
+	local architecture artifact_arch unpacked version
 	architecture=$1
 	artifact_arch=$2
+	unpacked=linux-unpacked
+	if [[ "$architecture" == "arm64" ]]; then
+		unpacked=linux-arm64-unpacked
+	fi
 	version=$(desktop_version)
 	electron-builder \
 		--config electron-builder.yml \
 		--linux AppImage \
 		"--$architecture" \
 		--publish never
+	cmp game/arkini/build/arkini.arkpack \
+		".out/desktop/release/$unpacked/resources/game/arkini.arkpack"
 	(
 		cd .out/desktop/release
 		sha256sum \
@@ -241,8 +267,8 @@ mcp-inspect() {
 
 # @cmd Build Electron and the bundled game project
 build() {
-	electron-vite build
-	node .out/desktop/build/main/cli/arkini.js game pack ./game/arkini
+	build_desktop
+	install_game_arkpack
 }
 
 # @cmd Build and open the unpacked macOS arm64 application
@@ -258,31 +284,35 @@ preview-macos() {
 	open .out/desktop/release/mac-arm64/Arkini.app
 }
 
-# @cmd Build unsigned macOS arm64 release artifacts
+# @cmd Build macOS arm64 release artifacts
 package-macos() {
 	clean_desktop
-	build
+	build_desktop
+	install_game_arkpack
 	package_macos_artifacts
 }
 
-# @cmd Build unsigned Windows x64 release artifacts
+# @cmd Build Windows x64 release artifacts
 package-windows() {
 	clean_desktop
-	build
+	build_desktop
+	install_game_arkpack
 	package_windows_artifacts
 }
 
-# @cmd Build unsigned Linux x64 AppImage release artifacts
+# @cmd Build Linux x64 AppImage release artifacts
 package-linux() {
 	clean_desktop
-	build
+	build_desktop
+	install_game_arkpack
 	package_linux_artifacts x64 x86_64
 }
 
-# @cmd Build unsigned Linux arm64 AppImage release artifacts
+# @cmd Build Linux arm64 AppImage release artifacts
 package-linux-arm64() {
 	clean_desktop
-	build
+	build_desktop
+	install_game_arkpack
 	package_linux_artifacts arm64 arm64
 }
 

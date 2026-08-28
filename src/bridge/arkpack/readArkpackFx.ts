@@ -3,8 +3,9 @@ import { Effect } from "effect";
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { validateArkpackPayloadFx } from "~/bridge/arkpack/validateArkpackPayloadFx";
 import { decodeFx } from "~/engine/pack/fx/decodeFx";
+import { decodeArkpackEnvelopeFx } from "~/engine/pack/fx/decodeArkpackEnvelopeFx";
 import { readArkpackContentHashFx } from "~/engine/pack/fx/readArkpackContentHashFx";
-import type { ArkpackTrustSchema } from "~/engine/pack/schema/ArkpackTrustSchema";
+import type { ArkpackProvenanceSchema } from "~/engine/pack/schema/ArkpackProvenanceSchema";
 import { GameValidationError } from "~/engine/validation/error/GameValidationError";
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 
@@ -13,7 +14,7 @@ export namespace readArkpackFx {
 		bytes: Uint8Array;
 		filename?: string;
 		packageId?: string;
-		trust: ArkpackTrustSchema.Type;
+		provenance: ArkpackProvenanceSchema.Type;
 		source: "bundled" | "user";
 		overridesBundled?: boolean;
 	}
@@ -22,9 +23,9 @@ export namespace readArkpackFx {
 const decompressArkpackFx = Effect.fn("decompressArkpackFx")((bytes: Uint8Array) =>
 	Effect.tryPromise({
 		try: async () => {
-			if (bytes.byteLength > ArkpackLimits.maxCompressedBytes) {
+			if (bytes.byteLength > ArkpackLimits.maxPayloadBytes) {
 				throw new Error(
-					`Arkpack exceeds the ${ArkpackLimits.maxCompressedBytes} byte compressed limit.`,
+					`Arkpack payload exceeds the ${ArkpackLimits.maxPayloadBytes} byte compressed limit.`,
 				);
 			}
 			const reader = new Blob([
@@ -64,19 +65,13 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 	bytes,
 	filename,
 	packageId,
-	trust,
+	provenance,
 	source,
 	overridesBundled = false,
 }: readArkpackFx.Props) {
-	if (bytes.byteLength > ArkpackLimits.maxCompressedBytes) {
-		return yield* Effect.fail(
-			new Error(
-				`Arkpack exceeds the ${ArkpackLimits.maxCompressedBytes} byte compressed limit.`,
-			),
-		);
-	}
 	const contentHash = yield* readArkpackContentHashFx(bytes);
-	const payload = yield* decodeFx(yield* decompressArkpackFx(bytes));
+	const envelope = yield* decodeArkpackEnvelopeFx(bytes);
+	const payload = yield* decodeFx(yield* decompressArkpackFx(envelope.payload));
 	const diagnostics = yield* validateArkpackPayloadFx(payload);
 	const errors = diagnostics.filter(
 		({ severity }) => severity === DiagnosticSeverityEnumSchema.enum.Error,
@@ -103,7 +98,7 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 			title: payload.config.meta.title,
 			version: payload.version,
 			arkini: payload.arkini,
-			trust,
+			provenance,
 			source,
 			overridesBundled,
 			...(filename === undefined

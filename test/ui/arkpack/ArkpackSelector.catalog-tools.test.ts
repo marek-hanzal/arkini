@@ -43,8 +43,8 @@ const createCatalog = ({
 					title: "Custom Arkini",
 					version: "1.0",
 					arkini: "1",
-					trust: {
-						type: "external",
+					provenance: {
+						type: "community",
 					},
 					source: "user",
 					overridesBundled: true,
@@ -70,7 +70,7 @@ describe("ArkpackSelector catalog tools", () => {
 			openUserDirectory,
 		});
 
-		expect(container.textContent).toContain("External");
+		expect(container.textContent).toContain("Community");
 		expect(container.textContent).toContain("User override");
 		expect(buttonByText(container, "Remove override")).toBeInstanceOf(HTMLButtonElement);
 

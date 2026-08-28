@@ -76,8 +76,8 @@ describe("openEditorArkpackFx", () => {
 					title: project.title,
 					version: project.version,
 					arkini: ArkiniAppVersion,
-					trust: {
-						type: "external",
+					provenance: {
+						type: "community",
 					},
 					source: "user",
 					overridesBundled: false,

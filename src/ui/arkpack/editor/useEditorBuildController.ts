@@ -18,7 +18,7 @@ import {
 } from "~/bridge/arkpack/editor/readEditorBuildFailureFx";
 import { saveBuiltEditorArkpackCommandAtom } from "~/bridge/arkpack/editor/saveBuiltEditorArkpackCommandAtom";
 import { ArkpackCatalogAtom } from "~/bridge/arkpack/ArkpackCatalogAtom";
-import { readArkpackArtifactNames } from "~/bridge/arkpack/readArkpackArtifactNames";
+import { readArkpackArtifactName } from "~/bridge/arkpack/readArkpackArtifactName";
 import { exportEditorJsonDirectoryCommandAtom } from "~/bridge/editor/exportEditorJsonDirectoryCommandAtom";
 import type { EditorSourceExport } from "~/bridge/editor/exportEditorJsonDirectoryFx";
 import { openEditorExportDirectoryCommandAtom } from "~/bridge/editor/openEditorExportDirectoryCommandAtom";
@@ -198,7 +198,7 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 		.with(
 			P.nonNullable,
 			(currentArtifact) =>
-				`${readArkpackArtifactNames(currentArtifact.projectId).arkpack} · ${RendererRuntime.runSync(formatByteSizeFx(currentArtifact.size))} · v${project.version} · Arkini ${ArkiniAppVersion} · External · ${currentArtifact.contentHash}`,
+				`${readArkpackArtifactName(currentArtifact.projectId)} · ${RendererRuntime.runSync(formatByteSizeFx(currentArtifact.size))} · v${project.version} · Arkini ${ArkiniAppVersion} · Community · ${currentArtifact.contentHash}`,
 		)
 		.otherwise(() => undefined);
 	const installedPackageId =

@@ -16,11 +16,9 @@ export const readEditorArkpackFileFx = Effect.fn("readEditorArkpackFileFx")(func
 	if (!file.name.toLowerCase().endsWith(".arkpack")) {
 		return yield* Effect.fail(new Error("Choose a .arkpack file."));
 	}
-	if (file.size > ArkpackLimits.maxCompressedBytes) {
+	if (file.size > ArkpackLimits.maxArkpackBytes) {
 		return yield* Effect.fail(
-			new Error(
-				`Arkpack exceeds the ${ArkpackLimits.maxCompressedBytes} byte compressed limit.`,
-			),
+			new Error(`Arkpack exceeds the ${ArkpackLimits.maxArkpackBytes} byte limit.`),
 		);
 	}
 	const bytes = yield* Effect.tryPromise({
@@ -30,8 +28,8 @@ export const readEditorArkpackFileFx = Effect.fn("readEditorArkpackFileFx")(func
 	return yield* readArkpackFx({
 		bytes,
 		filename: file.name,
-		trust: {
-			type: "external",
+		provenance: {
+			type: "community",
 		},
 		source: "user",
 	});

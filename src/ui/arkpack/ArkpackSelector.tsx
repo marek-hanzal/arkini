@@ -50,11 +50,6 @@ export const ArkpackSelector = () => {
 					Editor imports an Arkpack into a separate project. Changes aren’t live—build and
 					install the project to update the Arkpack.
 				</p>
-				{actions.busyAction === "remove" ? (
-					<p className="mt-3 text-sm text-accent">Removing package…</p>
-				) : actions.busyAction === "open-directory" ? (
-					<p className="mt-3 text-sm text-accent">Opening Arkpack folder…</p>
-				) : null}
 				{actions.actionError === undefined ? null : (
 					<p className="mt-3 text-sm text-danger">{String(actions.actionError)}</p>
 				)}
@@ -77,11 +72,7 @@ export const ArkpackSelector = () => {
 				>
 					<span className="icon-[lucide--package-open] size-8 shrink-0 text-accent" />
 					<span className="min-w-0">
-						<span className="block text-lg font-semibold">
-							{actions.busyAction === "import"
-								? "Importing Arkpack…"
-								: "Import Arkpack"}
-						</span>
+						<span className="block text-lg font-semibold">Import Arkpack</span>
 						<span className="mt-1 block text-xs font-normal text-subtle">
 							Choose an existing .arkpack file
 						</span>
@@ -101,7 +92,7 @@ export const ArkpackSelector = () => {
 					disabled={blocked}
 					onClick={actions.requestMainMenu}
 				>
-					{actions.exitPending ? "Returning…" : "Back"}
+					Back
 				</BackButton>
 			</footer>
 		</div>

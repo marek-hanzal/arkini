@@ -40,8 +40,6 @@ export const useArkpackSelectorActions = () => {
 	const mountedRef = useRef(false);
 	const [actionError, setActionError] = useState<unknown>();
 	const { active, claim, release } = useExclusiveAction<ActiveAction>();
-	const busyAction: BusyAction | null = active === "exit" ? null : active;
-	const exitPending = active === "exit";
 
 	useEffect(() => {
 		mountedRef.current = true;
@@ -177,9 +175,7 @@ export const useArkpackSelectorActions = () => {
 	return {
 		state,
 		inputRef,
-		busyAction,
-		blocked: busyAction !== null || exitPending || state.type === "loading",
-		exitPending,
+		blocked: active !== null || state.type === "loading",
 		actionError,
 		upload,
 		removeArkpack,

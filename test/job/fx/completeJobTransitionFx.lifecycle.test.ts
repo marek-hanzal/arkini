@@ -1,7 +1,8 @@
-import { Effect } from "effect";
+import { Effect, type Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
@@ -209,13 +210,13 @@ const lifecycleConfig = GameConfigSchema.parse({
 	},
 });
 
-const run = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
+const run = <A, E>(effect: Effect.Effect<A, E, Layer.Success<ReturnType<typeof GameLayerFx>>>) =>
 	Effect.runSync(
 		effect.pipe(
 			useGameFx({
 				config: lifecycleConfig,
 			}),
-		) as Effect.Effect<A, E, never>,
+		),
 	);
 
 describe("job completion charge lifecycle", () => {

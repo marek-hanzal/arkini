@@ -1,6 +1,7 @@
-import { Effect } from "effect";
+import { Effect, type Layer } from "effect";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
@@ -215,8 +216,8 @@ export const spawnInventoryOpenerFx = () =>
 		quantity: 1,
 	});
 
-export const run = <A, E, R>(
-	effect: Effect.Effect<A, E, R>,
+export const run = <A, E>(
+	effect: Effect.Effect<A, E, Layer.Success<ReturnType<typeof GameLayerFx>>>,
 	gameConfig: GameConfigSchema.Type = config,
 ) =>
 	Effect.runSync(
@@ -224,5 +225,5 @@ export const run = <A, E, R>(
 			useGameFx({
 				config: gameConfig,
 			}),
-		) as Effect.Effect<A, E, never>,
+		),
 	);

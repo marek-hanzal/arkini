@@ -1,7 +1,8 @@
-import { Effect } from "effect";
+import { Effect, type Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
 import { setDefaultLineFx } from "~/engine/line/write/setDefaultLineFx";
@@ -82,8 +83,8 @@ const authoredDefaultBlockedConfig = GameConfigSchema.parse({
 	},
 });
 
-const run = <A, E, R>(
-	effect: Effect.Effect<A, E, R>,
+const run = <A, E>(
+	effect: Effect.Effect<A, E, Layer.Success<ReturnType<typeof GameLayerFx>>>,
 	config: GameConfigSchema.Type = inputRuntimeTestConfig,
 ) =>
 	Effect.runSync(
@@ -91,7 +92,7 @@ const run = <A, E, R>(
 			useGameFx({
 				config,
 			}),
-		) as Effect.Effect<A, E, never>,
+		),
 	);
 
 const setupFx = ({ quantity }: { readonly quantity: number }) =>

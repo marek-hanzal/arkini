@@ -1,7 +1,8 @@
-import { Effect } from "effect";
+import { Effect, type Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import { setDefaultLineFx } from "~/engine/line/write/setDefaultLineFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
@@ -85,8 +86,8 @@ const inputBeforeStackConfig = GameConfigSchema.parse({
 	},
 });
 
-const run = <A, E, R>(
-	effect: Effect.Effect<A, E, R>,
+const run = <A, E>(
+	effect: Effect.Effect<A, E, Layer.Success<ReturnType<typeof GameLayerFx>>>,
 	config: GameConfigSchema.Type = purityTestConfig,
 ) =>
 	Effect.runSync(
@@ -94,7 +95,7 @@ const run = <A, E, R>(
 			useGameFx({
 				config,
 			}),
-		) as Effect.Effect<A, E, never>,
+		),
 	);
 
 const occupiedTarget = ({

@@ -1,8 +1,9 @@
-import { Effect, Result } from "effect";
+import { Effect, type Layer, Result } from "effect";
 import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { setItemQuantityFx } from "~/engine/runtime/write/setItemQuantityFx";
@@ -114,13 +115,15 @@ const spawnLimitedFx = ({ id, quantity, x }: { id: string; quantity: number; x: 
 		quantity,
 	});
 
-const run = <Result, Error, Requirements>(effect: Effect.Effect<Result, Error, Requirements>) => {
+const run = <Result, Error>(
+	effect: Effect.Effect<Result, Error, Layer.Success<ReturnType<typeof GameLayerFx>>>,
+) => {
 	return Effect.runSync(
 		effect.pipe(
 			useGameFx({
 				config,
 			}),
-		) as Effect.Effect<Result, Error, never>,
+		),
 	);
 };
 

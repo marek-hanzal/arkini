@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
 
 /** Reads the canonical authored lines owned by one exact line-capable item. */
@@ -11,19 +11,19 @@ export const readLineOwnerLinesFx = Effect.fn("readLineOwnerLinesFx")(function* 
 	return match(item)
 		.with(
 			{
-				type: ItemEnumSchema.enum.Deposit,
+				type: TypeSchema.enum.Deposit,
 			},
 			({ lines }) => lines,
 		)
 		.with(
 			{
-				type: ItemEnumSchema.enum.Producer,
+				type: TypeSchema.enum.Producer,
 			},
 			({ lines }) => lines,
 		)
 		.with(
 			{
-				type: ItemEnumSchema.enum.Blueprint,
+				type: TypeSchema.enum.Blueprint,
 			},
 			({ line }) => [
 				line,
@@ -31,7 +31,7 @@ export const readLineOwnerLinesFx = Effect.fn("readLineOwnerLinesFx")(function* 
 		)
 		.with(
 			{
-				type: ItemEnumSchema.enum.Craft,
+				type: TypeSchema.enum.Craft,
 			},
 			({ line }) => [
 				line,
@@ -39,7 +39,7 @@ export const readLineOwnerLinesFx = Effect.fn("readLineOwnerLinesFx")(function* 
 		)
 		.with(
 			{
-				type: ItemEnumSchema.enum.Stash,
+				type: TypeSchema.enum.Stash,
 			},
 			({ line }) => [
 				line,

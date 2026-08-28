@@ -1,7 +1,7 @@
 import type { z } from "zod";
 
-import { BlueprintItemSchema } from "~/engine/item/schema/BlueprintItemSchema";
-import { SimpleItemSchema } from "~/engine/item/schema/SimpleItemSchema";
+import { BlueprintSchema } from "~/engine/item/schema/BlueprintSchema";
+import { SimpleSchema } from "~/engine/item/schema/SimpleSchema";
 import { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -17,7 +17,7 @@ const simpleItem = ({
 	scope?: "any" | "board";
 	maxStackSize?: number;
 }) =>
-	SimpleItemSchema.parse({
+	SimpleSchema.parse({
 		uid: id,
 		id,
 		type: "simple" as const,
@@ -44,7 +44,7 @@ const blueprintItem = ({
 	output?: z.input<typeof OutputSchema>;
 	reserveTool?: boolean;
 }) =>
-	BlueprintItemSchema.parse({
+	BlueprintSchema.parse({
 		uid: id,
 		id,
 		type: "blueprint" as const,

@@ -1,22 +1,22 @@
 import { z } from "zod";
 
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
 
-import { BaseItemSchema } from "./BaseItemSchema";
-import { ItemEnumSchema } from "./ItemEnumSchema";
+import { BaseSchema } from "./BaseSchema";
+import { TypeSchema } from "./TypeSchema";
 
 /** A singleton Board/Toolbar item that opens the shared inventory surface. */
-export const InventoryItemSchema = z
+export const InventorySchema = z
 	.object({
-		...BaseItemSchema.shape,
-		type: ItemEnumSchema.extract([
+		...BaseSchema.shape,
+		type: TypeSchema.extract([
 			"Inventory",
 		]).describe("Identifies this item as the shared inventory opener."),
-		scope: StorageScopeEnumSchema.extract([
+		scope: StorageSchema.extract([
 			"Board",
 		])
-			.default(StorageScopeEnumSchema.enum.Board)
+			.default(StorageSchema.enum.Board)
 			.describe(
 				"Uses Board for automatic placement; the inventory item type also permits an exact Toolbar location.",
 			),
@@ -33,8 +33,8 @@ export const InventoryItemSchema = z
 		description: "A singleton Board/Toolbar item that opens the shared inventory surface.",
 	});
 
-export type InventoryItemSchema = typeof InventoryItemSchema;
+export type InventorySchema = typeof InventorySchema;
 
-export namespace InventoryItemSchema {
-	export type Type = z.infer<InventoryItemSchema>;
+export namespace InventorySchema {
+	export type Type = z.infer<InventorySchema>;
 }

@@ -3,10 +3,10 @@ import { z } from "zod";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { TimeSchema } from "~/engine/common/schema/TimeSchema";
 import { OutputSchema } from "~/engine/output/schema/OutputSchema";
-import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
 
-import { BaseItemSchema } from "./BaseItemSchema";
-import { ItemEnumSchema } from "./ItemEnumSchema";
+import { BaseSchema } from "./BaseSchema";
+import { TypeSchema } from "./TypeSchema";
 
 /**
  * A board-only item authoring contract with a configured lifetime.
@@ -15,22 +15,22 @@ import { ItemEnumSchema } from "./ItemEnumSchema";
  * only through canonical fixed Tick steps, and atomically expires with its
  * optional output.
  */
-export const TemporaryItemSchema = z
+export const TemporarySchema = z
 	.object({
-		...BaseItemSchema.shape,
+		...BaseSchema.shape,
 		/**
 		 * Identifies this item as a temporary board item.
 		 */
-		type: ItemEnumSchema.extract([
+		type: TypeSchema.extract([
 			"Temporary",
 		]).describe("Identifies this item as a temporary board item."),
 		/**
 		 * Temporary items are always stored on the board.
 		 */
-		scope: StorageScopeEnumSchema.extract([
+		scope: StorageSchema.extract([
 			"Board",
 		])
-			.default(StorageScopeEnumSchema.enum.Board)
+			.default(StorageSchema.enum.Board)
 			.describe("Restricts temporary items to board storage."),
 		/**
 		 * Temporary item instances never stack because each owns its lifetime.
@@ -58,8 +58,8 @@ export const TemporaryItemSchema = z
 			"A board-only, non-stackable item configuration with lifetime and optional expiry output.",
 	});
 
-export type TemporaryItemSchema = typeof TemporaryItemSchema;
+export type TemporarySchema = typeof TemporarySchema;
 
-export namespace TemporaryItemSchema {
-	export type Type = z.infer<TemporaryItemSchema>;
+export namespace TemporarySchema {
+	export type Type = z.infer<TemporarySchema>;
 }

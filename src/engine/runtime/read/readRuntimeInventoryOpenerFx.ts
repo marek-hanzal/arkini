@@ -1,7 +1,7 @@
 import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { InventoryOpenerUnavailableError } from "~/engine/runtime/error/InventoryOpenerUnavailableError";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
@@ -37,7 +37,7 @@ export const readRuntimeInventoryOpenerFx = Effect.fn("readRuntimeInventoryOpene
 	runtime,
 }: readRuntimeInventoryOpenerFx.Props) {
 	const runtimeOpener = runtime.items.find(
-		(candidate) => candidate.item.type === ItemEnumSchema.enum.Inventory,
+		(candidate) => candidate.item.type === TypeSchema.enum.Inventory,
 	);
 	const opener =
 		runtimeOpener === undefined

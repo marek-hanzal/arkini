@@ -2,9 +2,9 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { readTileActorActivityEffectFx } from "~/bridge/tile/readTileActorActivityEffectFx";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 
-const readActivityEffect = (itemType: ItemEnumSchema.Type, running: boolean) =>
+const readActivityEffect = (itemType: TypeSchema.Type, running: boolean) =>
 	Effect.runSync(
 		readTileActorActivityEffectFx({
 			itemType,
@@ -14,20 +14,20 @@ const readActivityEffect = (itemType: ItemEnumSchema.Type, running: boolean) =>
 
 describe("tile actor activity-effect projection", () => {
 	it.each([
-		ItemEnumSchema.enum.Blueprint,
-		ItemEnumSchema.enum.Craft,
-		ItemEnumSchema.enum.Deposit,
-		ItemEnumSchema.enum.Producer,
+		TypeSchema.enum.Blueprint,
+		TypeSchema.enum.Craft,
+		TypeSchema.enum.Deposit,
+		TypeSchema.enum.Producer,
 	])("enables running feedback for %s", (itemType) => {
 		expect(readActivityEffect(itemType, true)).toBe(true);
 		expect(readActivityEffect(itemType, false)).toBe(false);
 	});
 
 	it.each([
-		ItemEnumSchema.enum.Inventory,
-		ItemEnumSchema.enum.Simple,
-		ItemEnumSchema.enum.Stash,
-		ItemEnumSchema.enum.Temporary,
+		TypeSchema.enum.Inventory,
+		TypeSchema.enum.Simple,
+		TypeSchema.enum.Stash,
+		TypeSchema.enum.Temporary,
 	])("keeps unrelated feedback off for %s", (itemType) => {
 		expect(readActivityEffect(itemType, true)).toBe(false);
 		expect(readActivityEffect(itemType, false)).toBe(false);

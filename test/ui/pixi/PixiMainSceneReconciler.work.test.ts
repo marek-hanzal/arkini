@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 import { Effect } from "effect";
 import { pixiTileActorLifecycleReducedScale } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
@@ -16,10 +16,10 @@ import {
 describe("Pixi main-scene reconciliation / work and consumption", () => {
 	it("dims a craft as soon as its active job starts collecting inputs", () => {
 		const idle = createItem("runtime:craft", boardLocation, {
-			itemType: ItemEnumSchema.enum.Craft,
+			itemType: TypeSchema.enum.Craft,
 		});
 		const collecting = createItem(idle.id, boardLocation, {
-			itemType: ItemEnumSchema.enum.Craft,
+			itemType: TypeSchema.enum.Craft,
 			jobStatus: JobStatusEnumSchema.enum.Paused,
 		});
 		const actor = createActor(idle);

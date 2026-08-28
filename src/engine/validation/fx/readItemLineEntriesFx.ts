@@ -3,7 +3,7 @@ import { match, P } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 
 import type { ItemLineEntrySchema } from "../schema/ItemLineEntrySchema";
 
@@ -22,7 +22,7 @@ export const readItemLineEntriesFx = Effect.fn("readItemLineEntriesFx")(function
 	return match(item)
 		.with(
 			{
-				type: ItemEnumSchema.enum.Producer,
+				type: TypeSchema.enum.Producer,
 			},
 			({ lines }) =>
 				lines.map(
@@ -40,7 +40,7 @@ export const readItemLineEntriesFx = Effect.fn("readItemLineEntriesFx")(function
 		)
 		.with(
 			{
-				type: ItemEnumSchema.enum.Deposit,
+				type: TypeSchema.enum.Deposit,
 			},
 			({ lines }) =>
 				(lines ?? []).map(
@@ -59,9 +59,9 @@ export const readItemLineEntriesFx = Effect.fn("readItemLineEntriesFx")(function
 		.with(
 			{
 				type: P.union(
-					ItemEnumSchema.enum.Blueprint,
-					ItemEnumSchema.enum.Craft,
-					ItemEnumSchema.enum.Stash,
+					TypeSchema.enum.Blueprint,
+					TypeSchema.enum.Craft,
+					TypeSchema.enum.Stash,
 				),
 			},
 			({ line }) => [
@@ -78,10 +78,10 @@ export const readItemLineEntriesFx = Effect.fn("readItemLineEntriesFx")(function
 		.with(
 			{
 				type: P.union(
-					ItemEnumSchema.enum.Simple,
-					ItemEnumSchema.enum.Space,
-					ItemEnumSchema.enum.Temporary,
-					ItemEnumSchema.enum.Inventory,
+					TypeSchema.enum.Simple,
+					TypeSchema.enum.Space,
+					TypeSchema.enum.Temporary,
+					TypeSchema.enum.Inventory,
 				),
 			},
 			() => [] as ItemLineEntrySchema.Type[],

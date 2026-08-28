@@ -2,7 +2,7 @@ import { Effect, Option } from "effect";
 import { match } from "ts-pattern";
 
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { isItemLocationScopeAllowedFx } from "~/engine/location/read/isItemLocationScopeAllowedFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { resolveLineInputStoreFx } from "~/engine/input/fx/resolveLineInputStoreFx";
@@ -165,7 +165,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	) {
 		return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
 	}
-	if (targetItem.item.type === ItemEnumSchema.enum.Inventory) {
+	if (targetItem.item.type === TypeSchema.enum.Inventory) {
 		if (
 			source.location.scope === LocationScopeEnumSchema.enum.Inventory ||
 			!(yield* isItemLocationScopeAllowedFx({

@@ -3,7 +3,7 @@ import { match, P } from "ts-pattern";
 
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 
 export namespace readItemQueueSizeFx {
 	export interface Props {
@@ -18,19 +18,19 @@ export const readItemQueueSizeFx = Effect.fn("readItemQueueSizeFx")(function* ({
 	return match(item)
 		.with(
 			{
-				type: P.union(ItemEnumSchema.enum.Deposit, ItemEnumSchema.enum.Producer),
+				type: P.union(TypeSchema.enum.Deposit, TypeSchema.enum.Producer),
 			},
 			({ maxQueueSize }) => maxQueueSize,
 		)
 		.with(
 			{
-				type: P.union(ItemEnumSchema.enum.Blueprint, ItemEnumSchema.enum.Craft),
+				type: P.union(TypeSchema.enum.Blueprint, TypeSchema.enum.Craft),
 			},
 			() => 1,
 		)
 		.with(
 			{
-				type: ItemEnumSchema.enum.Stash,
+				type: TypeSchema.enum.Stash,
 			},
 			() => 1,
 		)

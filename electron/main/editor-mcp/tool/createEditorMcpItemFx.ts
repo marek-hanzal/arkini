@@ -5,7 +5,7 @@ import type { EditorProject } from "~/editor/EditorProject";
 import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
 import { createEditorItemDraftFx } from "~/editor/createEditorItemDraftFx";
 import { saveEditorItemWithRepositoryFx } from "~/editor/saveEditorItemWithRepositoryFx";
-import type { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { EditorMcpCreateItemInput } from "./EditorMcpCreateItemInputSchemas";
 import { notifyEditorMcpProjectChangedFx } from "./notifyEditorMcpProjectChangedFx";
 
@@ -21,7 +21,7 @@ export const createEditorMcpItemFx = Effect.fn("createEditorMcpItemFx")(function
 	readonly notifyProjectChanged: (projectId: string) => void;
 	readonly project: EditorProject;
 	readonly repository: EditorProjectRepositoryService;
-	readonly type: ItemEnumSchema.Type;
+	readonly type: TypeSchema.Type;
 }) {
 	const draft = yield* createEditorItemDraftFx({
 		resourceId: project.resources[0]?.id ?? "missing-asset",

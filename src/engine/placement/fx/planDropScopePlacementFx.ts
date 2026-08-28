@@ -8,7 +8,7 @@ import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSc
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { DropResultSchema } from "~/engine/output/schema/DropResultSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
 
 import { assertPlacementPlanCompleteFx } from "./assertPlacementPlanCompleteFx";
 import { planBoardPlacementFx } from "./planBoardPlacementFx";
@@ -38,7 +38,7 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 	runtime,
 }: planDropScopePlacementFx.Props) {
 	return yield* match(item.scope)
-		.with(StorageScopeEnumSchema.enum.Board, () => {
+		.with(StorageSchema.enum.Board, () => {
 			return Effect.gen(function* () {
 				if (origin.scope !== "board") {
 					return yield* assertPlacementPlanCompleteFx({
@@ -72,7 +72,7 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 				});
 			});
 		})
-		.with(StorageScopeEnumSchema.enum.Inventory, () => {
+		.with(StorageSchema.enum.Inventory, () => {
 			return Effect.gen(function* () {
 				const plan = yield* planInventoryPlacementFx({
 					excludedLocations,
@@ -90,7 +90,7 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 				});
 			});
 		})
-		.with(StorageScopeEnumSchema.enum.Toolbar, () => {
+		.with(StorageSchema.enum.Toolbar, () => {
 			return Effect.gen(function* () {
 				const plan = yield* planToolbarPlacementFx({
 					excludedLocations,
@@ -108,7 +108,7 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 				});
 			});
 		})
-		.with(StorageScopeEnumSchema.enum.Any, () => {
+		.with(StorageSchema.enum.Any, () => {
 			return origin.scope === "board"
 				? planBoardThenStoragePlacementFx({
 						drop,

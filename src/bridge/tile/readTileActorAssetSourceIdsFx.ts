@@ -3,7 +3,7 @@ import { match, P } from "ts-pattern";
 
 import { readRuntimeItemDefaultAssetIdsFx } from "~/engine/item/read/readRuntimeItemDefaultAssetIdsFx";
 import type { AssetSchema } from "~/engine/item/schema/AssetSchema";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { readRuntimeLineFillProgressFx } from "~/engine/line/read/readRuntimeLineFillProgressFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -29,20 +29,20 @@ export const readTileActorAssetSourceIdsFx = Effect.fn("readTileActorAssetSource
 	const progressLine = match(item.item)
 		.with(
 			{
-				type: P.union(ItemEnumSchema.enum.Blueprint, ItemEnumSchema.enum.Craft),
+				type: P.union(TypeSchema.enum.Blueprint, TypeSchema.enum.Craft),
 			},
 			({ line }) => line,
 		)
 		.with(
 			{
 				type: P.union(
-					ItemEnumSchema.enum.Deposit,
-					ItemEnumSchema.enum.Inventory,
-					ItemEnumSchema.enum.Producer,
-					ItemEnumSchema.enum.Simple,
-					ItemEnumSchema.enum.Space,
-					ItemEnumSchema.enum.Stash,
-					ItemEnumSchema.enum.Temporary,
+					TypeSchema.enum.Deposit,
+					TypeSchema.enum.Inventory,
+					TypeSchema.enum.Producer,
+					TypeSchema.enum.Simple,
+					TypeSchema.enum.Space,
+					TypeSchema.enum.Stash,
+					TypeSchema.enum.Temporary,
 				),
 			},
 			() => null,

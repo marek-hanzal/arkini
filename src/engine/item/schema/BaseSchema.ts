@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
 import { DescriptionSchema } from "~/engine/common/schema/DescriptionSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
@@ -12,10 +12,10 @@ import { ChargeSchema } from "./ChargeSchema";
 /**
  * Fields shared by every item configuration.
  *
- * Specialized item schemas spread `BaseItemSchema.shape` to preserve this common
+ * Specialized item schemas spread `BaseSchema.shape` to preserve this common
  * contract while adding their discriminator and future type-specific fields.
  */
-export const BaseItemSchema = z
+export const BaseSchema = z
 	.object({
 		/**
 		 * Stable low-level identity of this canonical game item.
@@ -45,9 +45,7 @@ export const BaseItemSchema = z
 		/**
 		 * Part of game state in which this item may be stored.
 		 */
-		scope: StorageScopeEnumSchema.describe(
-			"The part of game state in which this item may be stored.",
-		),
+		scope: StorageSchema.describe("The part of game state in which this item may be stored."),
 		/**
 		 * Optional maximum number of this item allowed across the game state.
 		 */
@@ -90,8 +88,8 @@ export const BaseItemSchema = z
 		description: "The common fields shared by every game item.",
 	});
 
-export type BaseItemSchema = typeof BaseItemSchema;
+export type BaseSchema = typeof BaseSchema;
 
-export namespace BaseItemSchema {
-	export type Type = z.infer<BaseItemSchema>;
+export namespace BaseSchema {
+	export type Type = z.infer<BaseSchema>;
 }

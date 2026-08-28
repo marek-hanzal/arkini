@@ -7,7 +7,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 
 import { readItemOutputEntriesFx } from "../fx/readItemOutputEntriesFx";
 import {
@@ -49,7 +49,7 @@ export const validateLimitedDepositsFx = Effect.fn("validateLimitedDepositsFx")(
 		});
 		for (const { output } of outputs) {
 			for (const depositId of Object.keys(config.items)) {
-				if (config.items[depositId]?.type !== ItemEnumSchema.enum.Deposit) continue;
+				if (config.items[depositId]?.type !== TypeSchema.enum.Deposit) continue;
 				const outputCertainty = yield* readOutputRecreationCertaintyFx(output, depositId);
 				certainty.set(
 					depositId,
@@ -61,7 +61,7 @@ export const validateLimitedDepositsFx = Effect.fn("validateLimitedDepositsFx")(
 
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 	for (const [itemId, item] of Object.entries(config.items)) {
-		if (item.type !== ItemEnumSchema.enum.Deposit || item.charges === undefined) continue;
+		if (item.type !== TypeSchema.enum.Deposit || item.charges === undefined) continue;
 		const itemCertainty = certainty.get(itemId) ?? "none";
 		if (itemCertainty === "guaranteed") continue;
 		if (itemCertainty === "stochastic") {

@@ -4,7 +4,7 @@ import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { MetaSchema } from "~/engine/meta/schema/MetaSchema";
 import { StartSchema } from "~/engine/start/schema/StartSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { ResourceConfigSchema } from "~/engine/resource/schema/ResourceConfigSchema";
+import { RolesSchema } from "~/engine/resource/schema/RolesSchema";
 
 /**
  * The root schema for a game's configuration.
@@ -28,9 +28,7 @@ export const GameConfigSchema = z
 		/**
 		 * Explicit non-item resource roles used by the game shell.
 		 */
-		resources: ResourceConfigSchema.describe(
-			"Explicit non-item resource roles used by the game shell.",
-		),
+		resources: RolesSchema.describe("Explicit non-item resource roles used by the game shell."),
 		/**
 		 * Board and inventory contents created for a new game.
 		 */

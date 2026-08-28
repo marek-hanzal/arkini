@@ -1,14 +1,14 @@
 import { z } from "zod";
 
-import { BlueprintItemSchema } from "./BlueprintItemSchema";
-import { CraftItemSchema } from "./CraftItemSchema";
-import { DepositItemSchema } from "./DepositItemSchema";
-import { InventoryItemSchema } from "./InventoryItemSchema";
-import { ProducerItemSchema } from "./ProducerItemSchema";
-import { SimpleItemSchema } from "./SimpleItemSchema";
-import { SpaceItemSchema } from "./SpaceItemSchema";
-import { StashItemSchema } from "./StashItemSchema";
-import { TemporaryItemSchema } from "./TemporaryItemSchema";
+import { BlueprintSchema } from "./BlueprintSchema";
+import { CraftSchema } from "./CraftSchema";
+import { DepositSchema } from "./DepositSchema";
+import { InventorySchema } from "./InventorySchema";
+import { ProducerSchema } from "./ProducerSchema";
+import { SimpleSchema } from "./SimpleSchema";
+import { SpaceSchema } from "./SpaceSchema";
+import { StashSchema } from "./StashSchema";
+import { TemporarySchema } from "./TemporarySchema";
 
 /**
  * An item configuration, resolved by its `type` discriminator.
@@ -18,15 +18,15 @@ import { TemporaryItemSchema } from "./TemporaryItemSchema";
  */
 export const ItemSchema = z
 	.discriminatedUnion("type", [
-		BlueprintItemSchema,
-		DepositItemSchema,
-		SimpleItemSchema,
-		SpaceItemSchema,
-		ProducerItemSchema,
-		CraftItemSchema,
-		StashItemSchema,
-		TemporaryItemSchema,
-		InventoryItemSchema,
+		BlueprintSchema,
+		DepositSchema,
+		SimpleSchema,
+		SpaceSchema,
+		ProducerSchema,
+		CraftSchema,
+		StashSchema,
+		TemporarySchema,
+		InventorySchema,
 	])
 	.meta({
 		id: "ItemSchema",

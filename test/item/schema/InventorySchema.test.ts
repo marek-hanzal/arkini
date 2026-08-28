@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { InventoryItemSchema } from "~/engine/item/schema/InventoryItemSchema";
+import { InventorySchema } from "~/engine/item/schema/InventorySchema";
 
 const item = {
 	uid: "item:inventory",
@@ -15,9 +15,9 @@ const item = {
 	},
 };
 
-describe("InventoryItemSchema", () => {
+describe("InventorySchema", () => {
 	it("fixes inventory openers to one Board-default singleton", () => {
-		expect(InventoryItemSchema.parse(item)).toMatchObject({
+		expect(InventorySchema.parse(item)).toMatchObject({
 			maxCount: 1,
 			maxStackSize: 1,
 			scope: "board",
@@ -37,7 +37,7 @@ describe("InventoryItemSchema", () => {
 			},
 		]) {
 			expect(
-				InventoryItemSchema.safeParse({
+				InventorySchema.safeParse({
 					...item,
 					...override,
 				}).success,

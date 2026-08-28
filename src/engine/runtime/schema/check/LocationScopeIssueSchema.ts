@@ -4,14 +4,14 @@ import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/Runti
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
 
 /**
  * One live item occupies a grid forbidden by its canonical item definition.
  */
 export const LocationScopeIssueSchema = z
 	.object({
-		configuredScope: StorageScopeEnumSchema.describe(
+		configuredScope: StorageSchema.describe(
 			"The storage scope allowed by the canonical item definition.",
 		),
 		itemId: IdSchema.describe("The live item stored in a forbidden grid."),

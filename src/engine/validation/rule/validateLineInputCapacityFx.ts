@@ -6,7 +6,7 @@ import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagn
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema as ItemTypeSchema } from "~/engine/item/schema/TypeSchema";
 
 import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
 
@@ -25,7 +25,7 @@ export const validateLineInputCapacityFx = Effect.fn("validateLineInputCapacityF
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 
 	for (const [itemId, item] of Object.entries(config.items)) {
-		if (item.type === ItemEnumSchema.enum.Producer) {
+		if (item.type === ItemTypeSchema.enum.Producer) {
 			continue;
 		}
 		const lines = yield* readItemLineEntriesFx({

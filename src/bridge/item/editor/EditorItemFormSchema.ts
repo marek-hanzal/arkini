@@ -2,16 +2,16 @@ import { z } from "zod";
 
 import type { InputSchema } from "~/engine/action/schema/InputSchema";
 import type { RuleSchema } from "~/engine/action/schema/RuleSchema";
-import type { BaseItemSchema } from "~/engine/item/schema/BaseItemSchema";
-import type { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import type { BaseSchema } from "~/engine/item/schema/BaseSchema";
+import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 
 /** Local presentation values owned only by one mounted item form. */
-export type EditorItemFormValues = Omit<BaseItemSchema.Type, "merge"> & {
-	readonly type: ItemEnumSchema.Type;
+export type EditorItemFormValues = Omit<BaseSchema.Type, "merge"> & {
+	readonly type: TypeSchema.Type;
 	readonly durationMs?: number;
 	readonly enable?: boolean;
 	readonly input?: InputSchema.Type[];

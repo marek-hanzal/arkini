@@ -1,7 +1,7 @@
 import type { InputSchema as ImmediateInputSchema } from "~/engine/action/schema/InputSchema";
 import type { RuleSchema } from "~/engine/action/schema/RuleSchema";
 import type { InputSchema as LineInputSchema } from "~/engine/input/schema/InputSchema";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { RuleSchema as LineRuleSchema } from "~/engine/line/schema/rule/RuleSchema";
@@ -18,7 +18,7 @@ import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
 import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
 
 export type EditorItem = ItemSchema.Type;
-export type EditorItemType = ItemEnumSchema.Type;
+export type EditorItemType = TypeSchema.Type;
 export type EditorInput = LineInputSchema.Type;
 export type EditorActionInput = ImmediateInputSchema.Type;
 export type EditorActionRule = RuleSchema.Type;
@@ -36,7 +36,7 @@ export type EditorRollSet = SetSchema.Type;
 export type EditorSelector = SelectorSchema.Type;
 export type EditorWhen = WhenSchema.Type;
 
-export const EditorItemTypes: ReadonlyArray<EditorItemType> = ItemEnumSchema.options;
+export const EditorItemTypes: ReadonlyArray<EditorItemType> = TypeSchema.options;
 
 /** Public bridge schema used by editor route search validation. */
-export const EditorItemTypeSchema = ItemEnumSchema;
+export const EditorItemTypeSchema = TypeSchema;

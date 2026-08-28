@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { EditorProject } from "~/editor/EditorProject";
 import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
 import { saveEditorItemWithRepositoryFx } from "~/editor/saveEditorItemWithRepositoryFx";
-import type { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { EditorMcpEditItemInput } from "./EditorMcpEditItemInputSchemas";
 import { notifyEditorMcpProjectChangedFx } from "./notifyEditorMcpProjectChangedFx";
@@ -20,7 +20,7 @@ export const editEditorMcpItemFx = Effect.fn("editEditorMcpItemFx")(function* ({
 	readonly notifyProjectChanged: (projectId: string) => void;
 	readonly project: EditorProject;
 	readonly repository: EditorProjectRepositoryService;
-	readonly type: ItemEnumSchema.Type;
+	readonly type: TypeSchema.Type;
 }) {
 	const current = project.config.items[input.itemId];
 	if (current === undefined)

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { analyzeEditorProjectCompatibilityFx } from "~/editor/version/analyzeEditorProjectCompatibilityFx";
 import type { EditorProjectCompatibility } from "~/editor/version/EditorProjectCompatibility";
-import { TemporaryItemSchema } from "~/engine/item/schema/TemporaryItemSchema";
+import { TemporarySchema } from "~/engine/item/schema/TemporarySchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { editorTestConfig } from "~test/editor/support/editorTestPayload";
 import {
@@ -91,7 +91,7 @@ describe("analyzeEditorProjectCompatibilityFx", () => {
 	});
 
 	it("keeps Temporary lifetime changes minor in either direction", () => {
-		const temporary = TemporaryItemSchema.parse({
+		const temporary = TemporarySchema.parse({
 			...createSimpleItem("temporary"),
 			type: "temporary",
 			scope: "board",

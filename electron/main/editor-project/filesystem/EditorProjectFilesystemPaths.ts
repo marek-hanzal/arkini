@@ -1,7 +1,7 @@
 import type { Effect } from "effect";
 
 import type { EditorObjectHashSchema } from "~/editor/filesystem/EditorObjectHashSchema";
-import type { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 
 /** Complete path grammar below one portable Editor project root. */
 export interface EditorProjectFilesystemPaths {
@@ -21,7 +21,7 @@ export interface EditorProjectFilesystemPaths {
 	readonly versionHeadFile: string;
 	readonly objects: string;
 	readonly itemFileFx: (props: {
-		readonly type: ItemEnumSchema.Type;
+		readonly type: TypeSchema.Type;
 		readonly uid: string;
 	}) => Effect.Effect<string>;
 	readonly assetFileFx: (resourceId: string) => Effect.Effect<string, Error>;

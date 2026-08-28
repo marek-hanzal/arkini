@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { DistanceSchema } from "~/engine/distance/schema/DistanceSchema";
 import { ChargeSourceSchema } from "~/engine/input/schema/ChargeSourceSchema";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema as ItemTypeSchema } from "~/engine/item/schema/TypeSchema";
 import { selectItemsFx } from "~/engine/selector/fx/selectItemsFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
@@ -10,7 +10,7 @@ import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagn
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 import { InvalidInputChargesReasonEnumSchema } from "~/engine/validation/schema/InvalidInputChargesReasonEnumSchema";
-import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import type { InputSchema } from "~/engine/input/schema/InputSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -46,7 +46,7 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 			input: line.input,
 			path,
 		}));
-		if (item.type === ItemEnumSchema.enum.Space) {
+		if (item.type === ItemTypeSchema.enum.Space) {
 			actions.push({
 				id: item.id,
 				input: item.input,
@@ -75,7 +75,7 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 				if (
 					input.type === TypeSchema.enum.Deposit &&
 					input.query.distance === DistanceSchema.enum.Self &&
-					item.type !== ItemEnumSchema.enum.Deposit
+					item.type !== ItemTypeSchema.enum.Deposit
 				) {
 					diagnostics.push({
 						code: DiagnosticCodeEnumSchema.enum.InputChargesInvalid,
@@ -116,7 +116,7 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 				if (input.charges.from === ChargeSourceSchema.enum.Self) {
 					if (
 						input.type === TypeSchema.enum.Deposit &&
-						item.type !== ItemEnumSchema.enum.Space
+						item.type !== ItemTypeSchema.enum.Space
 					) {
 						diagnostics.push({
 							code: DiagnosticCodeEnumSchema.enum.InputChargesInvalid,
@@ -197,8 +197,8 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 				});
 				const available = matchedCandidates.some((candidate) => {
 					return (
-						(candidate.scope === StorageScopeEnumSchema.enum.Board ||
-							candidate.scope === StorageScopeEnumSchema.enum.Any) &&
+						(candidate.scope === StorageSchema.enum.Board ||
+							candidate.scope === StorageSchema.enum.Any) &&
 						candidate.charges !== undefined &&
 						candidate.charges.amount >= targetChargeCost
 					);
@@ -222,8 +222,8 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 				const payer = config.items[payerItemId];
 				if (
 					payer === undefined ||
-					(payer.scope !== StorageScopeEnumSchema.enum.Board &&
-						payer.scope !== StorageScopeEnumSchema.enum.Any) ||
+					(payer.scope !== StorageSchema.enum.Board &&
+						payer.scope !== StorageSchema.enum.Any) ||
 					payer.charges === undefined ||
 					payer.maxCount === undefined
 				) {

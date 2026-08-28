@@ -5,7 +5,7 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { readTileActorBadgeCountFx } from "~/bridge/tile/readTileActorBadgeCountFx";
 import { readTileActorAssetSourceIdsFx } from "~/bridge/tile/readTileActorAssetSourceIdsFx";
 import { readTileActorVisualFx } from "~/bridge/tile/readTileActorVisualFx";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { isDeliveryRuntimeItemFx } from "~/engine/runtime/read/isDeliveryRuntimeItemFx";
@@ -40,7 +40,7 @@ export const readTileDeliveriesFx = Effect.fnUntraced(function* ({
 }: readTileDeliveriesFx.Props) {
 	const inventoryOpener = runtime.items.find(
 		(candidate) =>
-			candidate.item.type === ItemEnumSchema.enum.Inventory &&
+			candidate.item.type === TypeSchema.enum.Inventory &&
 			(candidate.location.scope === LocationScopeEnumSchema.enum.Toolbar ||
 				(candidate.location.scope === LocationScopeEnumSchema.enum.Board &&
 					candidate.location.space === runtime.currentSpace)),

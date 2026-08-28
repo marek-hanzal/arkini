@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match, P } from "ts-pattern";
 
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -11,22 +11,22 @@ const readOwnedLines = (item: RuntimeItemSchema.Type): readonly LineSchema.Type[
 	match(item.item)
 		.with(
 			{
-				type: ItemEnumSchema.enum.Producer,
+				type: TypeSchema.enum.Producer,
 			},
 			({ lines }) => lines,
 		)
 		.with(
 			{
-				type: ItemEnumSchema.enum.Deposit,
+				type: TypeSchema.enum.Deposit,
 			},
 			({ lines }) => lines ?? [],
 		)
 		.with(
 			{
 				type: P.union(
-					ItemEnumSchema.enum.Blueprint,
-					ItemEnumSchema.enum.Craft,
-					ItemEnumSchema.enum.Stash,
+					TypeSchema.enum.Blueprint,
+					TypeSchema.enum.Craft,
+					TypeSchema.enum.Stash,
 				),
 			},
 			({ line }) => [

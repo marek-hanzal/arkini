@@ -3,13 +3,13 @@ import { match } from "ts-pattern";
 
 import type { InputSchema as ImmediateInputSchema } from "~/engine/action/schema/InputSchema";
 import type { InputSchema as LineInputSchema } from "~/engine/input/schema/InputSchema";
-import type { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 
 export interface CreateEditorItemDraftFxProps {
 	readonly resourceId: string;
-	readonly type: ItemEnumSchema.Type;
+	readonly type: TypeSchema.Type;
 	readonly uid: string;
 }
 

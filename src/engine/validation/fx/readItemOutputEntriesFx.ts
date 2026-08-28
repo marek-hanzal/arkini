@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 
 import type { ItemOutputEntrySchema } from "../schema/ItemOutputEntrySchema";
 import { readItemLineEntriesFx } from "./readItemLineEntriesFx";
@@ -49,7 +49,7 @@ export const readItemOutputEntriesFx = Effect.fn("readItemOutputEntriesFx")(func
 		});
 	}
 
-	if (item.type === ItemEnumSchema.enum.Temporary && item.output !== undefined) {
+	if (item.type === TypeSchema.enum.Temporary && item.output !== undefined) {
 		entries.push({
 			output: item.output,
 			path: [

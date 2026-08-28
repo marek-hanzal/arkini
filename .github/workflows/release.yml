@@ -58,6 +58,6 @@ jobs:
             .out/desktop/release/*.exe
             .out/desktop/release/*.zip
             .out/desktop/release/*.arkpack
-            .out/desktop/release/SHA256SUMS
+            .out/desktop/release/SHA256SUMS*
           if-no-files-found: error
           retention-days: 30

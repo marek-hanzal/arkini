@@ -12,8 +12,8 @@ import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { ItemInventoryStorageUnavailableError } from "~/engine/runtime/error/ItemInventoryStorageUnavailableError";
 import { ItemInventoryTargetInvalidError } from "~/engine/runtime/error/ItemInventoryTargetInvalidError";
 import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
-import { applyStoreItemInInventoryPlanFx } from "~/engine/runtime/fx/applyStoreItemInInventoryPlanFx";
-import { readStoreItemInInventoryPlanFx } from "~/engine/runtime/fx/readStoreItemInInventoryPlanFx";
+import { applyInventoryStoragePlanFx } from "~/engine/runtime/fx/applyInventoryStoragePlanFx";
+import { planInventoryStorageFx } from "~/engine/runtime/fx/planInventoryStorageFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
@@ -116,11 +116,11 @@ export const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(functi
 					}),
 				);
 			}
-			const plan = yield* readStoreItemInInventoryPlanFx({
+			const plan = yield* planInventoryStorageFx({
 				item: source,
 				runtime,
 			});
-			const stored = yield* applyStoreItemInInventoryPlanFx({
+			const stored = yield* applyInventoryStoragePlanFx({
 				item: source,
 				plan,
 				runtime,

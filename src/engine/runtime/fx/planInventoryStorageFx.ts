@@ -15,7 +15,7 @@ import type { PlacementPlanSchema } from "~/engine/placement/schema/PlacementPla
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
-export type StoreItemInInventoryPlan =
+export type InventoryStoragePlan =
 	| {
 			readonly kind: "pure";
 			readonly detachedRuntime: RuntimeSchema.Type;
@@ -26,7 +26,7 @@ export type StoreItemInInventoryPlan =
 			readonly location: InventoryLocationSchema.Type;
 	  };
 
-export namespace readStoreItemInInventoryPlanFx {
+export namespace planInventoryStorageFx {
 	export interface Props {
 		readonly item: GridRuntimeItemSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
@@ -34,8 +34,8 @@ export namespace readStoreItemInInventoryPlanFx {
 }
 
 /** Plans one whole live grid item into Inventory without mutating the runtime. */
-export const readStoreItemInInventoryPlanFx = Effect.fn("readStoreItemInInventoryPlanFx")(
-	function* ({ item, runtime }: readStoreItemInInventoryPlanFx.Props) {
+export const planInventoryStorageFx = Effect.fn("planInventoryStorageFx")(
+	function* ({ item, runtime }: planInventoryStorageFx.Props) {
 		const pure = yield* isItemPureFx({
 			item,
 			runtime,
@@ -65,7 +65,7 @@ export const readStoreItemInInventoryPlanFx = Effect.fn("readStoreItemInInventor
 				kind: "pure",
 				detachedRuntime,
 				plan,
-			} satisfies StoreItemInInventoryPlan;
+			} satisfies InventoryStoragePlan;
 		}
 
 		if (item.quantity !== 1) {
@@ -97,6 +97,6 @@ export const readStoreItemInInventoryPlanFx = Effect.fn("readStoreItemInInventor
 		return {
 			kind: "stateful",
 			location,
-		} satisfies StoreItemInInventoryPlan;
+		} satisfies InventoryStoragePlan;
 	},
 );

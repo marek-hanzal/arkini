@@ -1,0 +1,287 @@
+// @vitest-environment jsdom
+
+import { RegistryContext } from "@effect/atom-react";
+import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
+import {
+	createMemoryHistory,
+	createRootRoute,
+	createRoute,
+	createRouter,
+	Outlet,
+	redirect,
+	RouterProvider,
+} from "@tanstack/react-router";
+import { act, createElement } from "react";
+import { createRoot } from "react-dom/client";
+import { afterEach, vi } from "vitest";
+import { AppearanceAtom } from "~/bridge/appearance/AppearanceAtom";
+import { WindowModeAtom } from "~/bridge/window/WindowModeAtom";
+import type { CliInstallationStatus } from "../../../../electron/contract/cli/CliInstallationStatus";
+import type { Game } from "~/bridge/game/Game";
+import type { GameEngine } from "~/bridge/game/GameEngine";
+import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
+import { SettingsPage } from "~/page/settings/SettingsPage";
+import { SettingsCommonPage } from "~/page/settings/SettingsCommonPage";
+import { SettingsDevPage } from "~/page/settings/SettingsDevPage";
+import { SettingsGamePage } from "~/page/settings/SettingsGamePage";
+import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
+import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import {
+	adoptTestGameEngineResourceFx,
+	createTestRendererRuntime,
+} from "~test/support/createTestRendererRuntime";
+import { AppearanceDataset } from "~/ui/appearance/AppearanceDataset";
+
+(
+	globalThis as {
+		IS_REACT_ACT_ENVIRONMENT?: boolean;
+	}
+).IS_REACT_ACT_ENVIRONMENT = true;
+
+export const roots: Array<ReturnType<typeof createRoot>> = [];
+export const registries: Array<ReturnType<typeof AtomRegistry.make>> = [];
+const runtimeHarnesses: Array<ReturnType<typeof createTestRendererRuntime>> = [];
+
+afterEach(async () => {
+	await act(async () => {
+		for (const root of roots.splice(0)) root.unmount();
+	});
+	for (const runtimeHarness of runtimeHarnesses.splice(0)) {
+		await runtimeHarness.rendererRuntime.dispose();
+		runtimeHarness.atomRegistry.dispose();
+	}
+	for (const registry of registries.splice(0)) registry.dispose();
+	vi.restoreAllMocks();
+	document.body.replaceChildren();
+	Reflect.deleteProperty(window, "arkini");
+});
+
+const createDeferred = () => {
+	let resolve: () => void = () => undefined;
+	let reject: (error: unknown) => void = () => undefined;
+	const promise = new Promise<void>((complete, fail) => {
+		resolve = complete;
+		reject = fail;
+	});
+	return {
+		promise,
+		reject,
+		resolve,
+	};
+};
+export const buttonByText = (container: ParentNode, text: string) => {
+	const button = Array.from(container.querySelectorAll("button")).find(
+		(candidate) => candidate.textContent === text,
+	);
+	if (!(button instanceof HTMLButtonElement)) throw new Error(`Expected ${text}.`);
+	return button;
+};
+
+export const linkByText = (container: ParentNode, text: string) => {
+	const link = Array.from(container.querySelectorAll("a")).find(
+		(candidate) => candidate.textContent === text,
+	);
+	if (!(link instanceof HTMLAnchorElement)) throw new Error(`Expected ${text}.`);
+	return link;
+};
+
+export const renderSettings = async (
+	initialEntries: ReadonlyArray<string>,
+	{
+		activeGame = false,
+		cliStatus = {
+			type: "unavailable",
+			commandPath: "/tmp/arkini-cli",
+			message: "Available in packaged builds.",
+		},
+	}: {
+		readonly activeGame?: boolean;
+		readonly cliStatus?: CliInstallationStatus;
+	} = {},
+) => {
+	const deferred = createDeferred();
+	const write = vi.fn(() => deferred.promise);
+	const writeCheatAvailability = vi.fn(() => Promise.resolve());
+	const openDiagnostics = vi.fn(() => Promise.resolve());
+	const openUserData = vi.fn(() => Promise.resolve());
+	const readCliStatus = vi.fn(() => Promise.resolve(cliStatus));
+	const registry = AtomRegistry.make({
+		initialValues: [
+			[
+				AppearanceAtom,
+				{
+					theme: "dark",
+					accent: "rose",
+				},
+			],
+			[
+				WindowModeAtom,
+				"default",
+			],
+		],
+	});
+	const writeWindowMode = vi.fn((mode: "default" | "bordered" | "fullscreen") => {
+		registry.set(WindowModeAtom, mode);
+		return Promise.resolve();
+	});
+	registries.push(registry);
+	Object.defineProperty(window, "scrollTo", {
+		configurable: true,
+		value: vi.fn(),
+	});
+	Object.defineProperty(window, "arkini", {
+		configurable: true,
+		value: {
+			cli: {
+				status: readCliStatus,
+				install: vi.fn(),
+				uninstall: vi.fn(),
+			},
+			appearance: {
+				write,
+			},
+			cheats: {
+				writeAvailable: writeCheatAvailability,
+			},
+			diagnostics: {
+				openDirectory: openDiagnostics,
+			},
+			userData: {
+				openDirectory: openUserData,
+			},
+			window: {
+				writeMode: writeWindowMode,
+			},
+		},
+	});
+	let game: GameEngine | null = null;
+	if (activeGame) {
+		const config = createJobTestConfig();
+		const session = await createTestGameSession({
+			config,
+			tickIntervalMs: 60_000,
+		});
+		const createdGame: Game = {
+			...session,
+			arkpack: {
+				packageId: "package:settings",
+				contentHash: "content:settings",
+				title: "Settings game",
+				version: "1.0",
+				arkini: "1.0",
+				provenance: {
+					type: "community",
+				} as const,
+				source: "user",
+			},
+			config,
+			getResourceUrl: () => "blob:test",
+			saveKey: {
+				packageId: "package:settings",
+			},
+		};
+		const runtimeHarness = createTestRendererRuntime({
+			createResourceFx: () => createGameEngineResourceFx(createdGame),
+		});
+		runtimeHarnesses.push(runtimeHarness);
+		game = (
+			await runtimeHarness.rendererRuntime.runPromise(
+				adoptTestGameEngineResourceFx(createdGame.arkpack.packageId),
+			)
+		).game;
+	}
+	const rootRoute = createRootRoute({
+		component: Outlet,
+	});
+	const settingsRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/settings",
+		component: () =>
+			createElement(
+				RegistryContext.Provider,
+				{
+					value: registry,
+				},
+				createElement(AppearanceDataset),
+				createElement(SettingsPage),
+			),
+	});
+	const settingsIndexRoute = createRoute({
+		getParentRoute: () => settingsRoute,
+		path: "/",
+		beforeLoad: () => {
+			throw redirect({
+				to: "/settings/common",
+				replace: true,
+			});
+		},
+	});
+	const settingsCommonRoute = createRoute({
+		getParentRoute: () => settingsRoute,
+		path: "/common",
+		component: SettingsCommonPage,
+	});
+	const settingsGameRoute = createRoute({
+		getParentRoute: () => settingsRoute,
+		path: "/game",
+		component: SettingsGamePage,
+	});
+	const settingsDevRoute = createRoute({
+		getParentRoute: () => settingsRoute,
+		path: "/dev",
+		component: SettingsDevPage,
+	});
+	const mainMenuRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/main-menu",
+		component: () => createElement("p", null, "Main menu destination"),
+	});
+	const gameRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/game/$packageId",
+		component: () => createElement("p", null, "Game destination"),
+	});
+	const router = createRouter({
+		routeTree: rootRoute.addChildren([
+			settingsRoute.addChildren([
+				settingsIndexRoute,
+				settingsCommonRoute,
+				settingsGameRoute,
+				settingsDevRoute,
+			]),
+			mainMenuRoute,
+			gameRoute,
+		]),
+		history: createMemoryHistory({
+			initialEntries: [
+				...initialEntries,
+			],
+		}),
+	});
+	await router.load();
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	roots.push(root);
+	await act(async () => {
+		root.render(
+			createElement(RouterProvider, {
+				router,
+			}),
+		);
+	});
+	return {
+		container,
+		deferred,
+		game,
+		root,
+		router,
+		write,
+		writeCheatAvailability,
+		writeWindowMode,
+		openDiagnostics,
+		openUserData,
+		readCliStatus,
+		registry,
+	};
+};

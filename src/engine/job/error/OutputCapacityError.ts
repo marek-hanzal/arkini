@@ -4,7 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 
 /** Starting one job would overbook a canonical item's worst-case future maxCount capacity. */
-export class JobOutputMaxCountError extends Data.TaggedError("JobOutputMaxCountError")<{
+export class OutputCapacityError extends Data.TaggedError("OutputCapacityError")<{
 	jobId: IdSchema.Type;
 	ownerItemId: IdSchema.Type;
 	lineId: IdSchema.Type;

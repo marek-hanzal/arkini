@@ -26,8 +26,8 @@ import { createVersionReaderFx } from "./createVersionReaderFx";
 import { createVersionSnapshotFx } from "./createVersionSnapshotFx";
 import { assertProjectDirectoryFx } from "./assertProjectDirectoryFx";
 import { readVersionSnapshotFx } from "./readVersionSnapshotFx";
-import { withFilesystemEditorProjectLockFx } from "./withFilesystemEditorProjectLockFx";
-import { writeFilesystemEditorProjectFilesFx } from "./writeFilesystemEditorProjectFilesFx";
+import { withProjectLockFx } from "./withProjectLockFx";
+import { writeProjectFilesFx } from "./writeProjectFilesFx";
 import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
 import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
 
@@ -336,7 +336,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 							],
 						});
 
-						const snapshot = yield* withFilesystemEditorProjectLockFx(
+						const snapshot = yield* withProjectLockFx(
 							filesystemWrite,
 							current.state.paths.root,
 							Effect.gen(function* () {
@@ -492,13 +492,13 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 							current: versionId,
 						});
 
-						yield* withFilesystemEditorProjectLockFx(
+						yield* withProjectLockFx(
 							filesystemWrite,
 							current.state.paths.root,
 							Effect.gen(function* () {
 								yield* assertVersionDirectoryFx(current.state);
 								yield* providePlatform(
-									writeFilesystemEditorProjectFilesFx({
+									writeProjectFilesFx({
 										root: current.state.paths.root,
 										previous: {
 											arkpack: current.state.project.version,
@@ -580,7 +580,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 										tag,
 									}),
 						});
-						yield* withFilesystemEditorProjectLockFx(
+						yield* withProjectLockFx(
 							filesystemWrite,
 							state.paths.root,
 							Effect.gen(function* () {

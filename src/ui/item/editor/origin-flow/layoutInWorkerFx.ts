@@ -9,7 +9,7 @@ import type {
 } from "~/ui/item/editor/origin-flow/LayoutWorkerProtocol";
 import { readNodeMetricsFx } from "~/ui/item/editor/origin-flow/readNodeMetricsFx";
 
-class LayoutWorkerError extends Data.TaggedError("EditorItemOriginFlowLayoutWorkerError")<{
+class LayoutWorkerError extends Data.TaggedError("LayoutWorkerError")<{
 	readonly cause?: unknown;
 	readonly message: string;
 }> {}

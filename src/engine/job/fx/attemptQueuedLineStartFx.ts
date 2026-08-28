@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemChargesUnavailableError } from "~/engine/item/error/ItemChargesUnavailableError";
 import type { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
-import type { JobOutputMaxCountError } from "~/engine/job/error/JobOutputMaxCountError";
+import type { OutputCapacityError } from "~/engine/job/error/OutputCapacityError";
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
 import { LineRunUnavailableError } from "~/engine/line/error/LineRunUnavailableError";
 import type { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
@@ -29,7 +29,7 @@ export namespace attemptQueuedLineStartFx {
 				error:
 					| ItemChargesUnavailableError
 					| ItemNotOnBoardError
-					| JobOutputMaxCountError
+					| OutputCapacityError
 					| LineRunUnavailableError
 					| PlacementUnavailableError;
 				runtime: RuntimeSchema.Type;
@@ -128,7 +128,7 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 					error,
 					runtime,
 				} satisfies attemptQueuedLineStartFx.Result),
-			JobOutputMaxCountError: (error) =>
+			OutputCapacityError: (error) =>
 				Effect.succeed({
 					type: "blocked",
 					error,

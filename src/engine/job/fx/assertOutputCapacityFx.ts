@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { JobOutputMaxCountError } from "~/engine/job/error/JobOutputMaxCountError";
+import { OutputCapacityError } from "~/engine/job/error/OutputCapacityError";
 import { resolveStartOutputCapacityFx } from "~/engine/job/fx/read/resolveStartOutputCapacityFx";
 import type { LineRunPlanSchema } from "~/engine/line/schema/run/LineRunPlanSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -33,7 +33,7 @@ export const assertOutputCapacityFx = Effect.fn("assertOutputCapacityFx")(functi
 	if (block === undefined) return;
 
 	return yield* Effect.fail(
-		new JobOutputMaxCountError({
+		new OutputCapacityError({
 			jobId: candidateId,
 			ownerItemId,
 			lineId,

@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 
 import type { RuntimeMultiplierSchema } from "~/engine/line/schema/rule/RuntimeMultiplierSchema";
-import type { RuleRuntimeMultiplierResultSchema } from "~/engine/line/schema/rule/RuleRuntimeMultiplierResultSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import { whenFx } from "~/engine/when/fx/whenFx";
 
@@ -9,6 +8,13 @@ export namespace lineRuleRuntimeMultiplierFx {
 	export interface Props {
 		origin: BoardLocationSchema.Type;
 		rule: RuntimeMultiplierSchema.Type;
+	}
+
+	export interface Result {
+		readonly active: boolean;
+		readonly failedWhenIndex?: number;
+		readonly type: "runtime:multiplier";
+		readonly multiplier: number;
 	}
 }
 
@@ -36,5 +42,5 @@ export const lineRuleRuntimeMultiplierFx = Effect.fn("lineRuleRuntimeMultiplierF
 		active,
 		multiplier: rule.multiplier,
 		type: rule.type,
-	} satisfies RuleRuntimeMultiplierResultSchema.Type;
+	} satisfies lineRuleRuntimeMultiplierFx.Result;
 });

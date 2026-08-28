@@ -2,7 +2,6 @@ import { Effect } from "effect";
 
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RuleSchema } from "~/engine/output/schema/drop/rule/RuleSchema";
-import type { RulesResultSchema } from "~/engine/output/schema/drop/rule/RulesResultSchema";
 import { dropRuleFx } from "./dropRuleFx";
 
 export namespace dropRulesFx {
@@ -10,6 +9,8 @@ export namespace dropRulesFx {
 		origin: GridLocationSchema.Type;
 		rules: RuleSchema.Type[];
 	}
+
+	export type Result = ReadonlyArray<dropRuleFx.Result>;
 }
 
 /**
@@ -25,5 +26,5 @@ export const dropRulesFx = Effect.fn("dropRulesFx")(function* ({
 			origin,
 			rule,
 		});
-	})) satisfies RulesResultSchema.Type;
+	})) satisfies dropRulesFx.Result;
 });

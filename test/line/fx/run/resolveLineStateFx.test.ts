@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { resolveLineEnableFx } from "~/engine/line/fx/run/resolveLineEnableFx";
 import { resolveLineRuntimeFx } from "~/engine/line/fx/run/resolveLineRuntimeFx";
 import { resolveLineShowFx } from "~/engine/line/fx/run/resolveLineShowFx";
-import type { RulesResultSchema } from "~/engine/line/schema/rule/RulesResultSchema";
+import type { lineRulesFx } from "~/engine/line/fx/lineRulesFx";
 
 const activeRules = [
 	{
@@ -33,7 +33,7 @@ const activeRules = [
 		active: true,
 		multiplier: 1.5,
 	},
-] satisfies RulesResultSchema.Type;
+] satisfies lineRulesFx.Result;
 
 describe("line run rule projections", () => {
 	it("lets an active show rule reveal a hidden line", () => {

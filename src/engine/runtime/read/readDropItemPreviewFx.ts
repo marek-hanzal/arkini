@@ -10,16 +10,16 @@ import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationF
 import { readGridLocationClaimAtFx } from "~/engine/location/read/readGridLocationClaimAtFx";
 import { readGridLocationClaimsFx } from "~/engine/location/read/readGridLocationClaimsFx";
 import { resolveMergeRuleFx } from "~/engine/merge/fx/resolveMergeRuleFx";
-import type { DropItemCommand } from "~/engine/runtime/schema/command/DropItemCommand";
+import type { DropItemCommand } from "~/engine/runtime/DropItemCommand";
 import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { readDropItemStackRejectedReasonFx } from "~/engine/runtime/read/readDropItemStackRejectedReasonFx";
 import { readItemStackResolutionFx } from "~/engine/runtime/read/readItemStackResolutionFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { planInventoryStorageFx } from "~/engine/runtime/fx/planInventoryStorageFx";
-import { DropItemIgnoredReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemIgnoredReasonEnumSchema";
-import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
-import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { DropItemIgnoredReason } from "~/engine/runtime/DropItemResult";
+import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 
 export namespace readDropItemPreviewFx {
 	export type Props = DropItemCommand;
@@ -27,30 +27,30 @@ export namespace readDropItemPreviewFx {
 	export type Result =
 		| {
 				readonly kind:
-					| typeof DropItemResultKindEnumSchema.enum.Move
-					| typeof DropItemResultKindEnumSchema.enum.Swap
-					| typeof DropItemResultKindEnumSchema.enum.Merge
-					| typeof DropItemResultKindEnumSchema.enum.StoreInventory
-					| typeof DropItemResultKindEnumSchema.enum.Stack;
+					| typeof DropItemResultKind.Move
+					| typeof DropItemResultKind.Swap
+					| typeof DropItemResultKind.Merge
+					| typeof DropItemResultKind.StoreInventory
+					| typeof DropItemResultKind.Stack;
 		  }
 		| {
-				readonly kind: typeof DropItemResultKindEnumSchema.enum.StoreInput;
+				readonly kind: typeof DropItemResultKind.StoreInput;
 				readonly lineId: string;
 				readonly inputIndex: number;
 				readonly quantity: number;
 		  }
 		| {
-				readonly kind: typeof DropItemResultKindEnumSchema.enum.Ignored;
-				readonly reason: DropItemIgnoredReasonEnumSchema.Type;
+				readonly kind: typeof DropItemResultKind.Ignored;
+				readonly reason: DropItemIgnoredReason;
 		  }
 		| {
-				readonly kind: typeof DropItemResultKindEnumSchema.enum.Reject;
-				readonly reason: DropItemRejectedReasonEnumSchema.Type;
+				readonly kind: typeof DropItemResultKind.Reject;
+				readonly reason: DropItemRejectedReason;
 		  };
 }
 
-const rejected = (reason: DropItemRejectedReasonEnumSchema.Type): readDropItemPreviewFx.Result => ({
-	kind: DropItemResultKindEnumSchema.enum.Reject,
+const rejected = (reason: DropItemRejectedReason): readDropItemPreviewFx.Result => ({
+	kind: DropItemResultKind.Reject,
 	reason,
 });
 
@@ -62,7 +62,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	target,
 }: readDropItemPreviewFx.Props) {
 	if (target.kind === "unsupported") {
-		return rejected(DropItemRejectedReasonEnumSchema.enum.UnsupportedTarget);
+		return rejected(DropItemRejectedReason.UnsupportedTarget);
 	}
 	if (
 		yield* isSameGridLocationFx({
@@ -71,18 +71,18 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		})
 	) {
 		return {
-			kind: DropItemResultKindEnumSchema.enum.Ignored,
-			reason: DropItemIgnoredReasonEnumSchema.enum.SameLocation,
+			kind: DropItemResultKind.Ignored,
+			reason: DropItemIgnoredReason.SameLocation,
 		} satisfies readDropItemPreviewFx.Result;
 	}
 	const runtime = yield* readRuntimeFx();
 	const runtimeSource = runtime.items.find((item) => item.id === sourceItemId);
 	if (runtimeSource === undefined || runtimeSource.revision !== sourceRevision) {
-		return rejected(DropItemRejectedReasonEnumSchema.enum.StaleSource);
+		return rejected(DropItemRejectedReason.StaleSource);
 	}
 	const source = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeSource));
 	if (source === undefined) {
-		return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidSource);
+		return rejected(DropItemRejectedReason.InvalidSource);
 	}
 	if (
 		!(yield* isSameGridLocationFx({
@@ -90,7 +90,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 			right: sourceLocation,
 		}))
 	) {
-		return rejected(DropItemRejectedReasonEnumSchema.enum.StaleSource);
+		return rejected(DropItemRejectedReason.StaleSource);
 	}
 	if (target.occupant === null) {
 		const claim = yield* readGridLocationClaimAtFx({
@@ -100,7 +100,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 			location: target.location,
 		});
 		if (claim !== undefined) {
-			return rejected(DropItemRejectedReasonEnumSchema.enum.Occupied);
+			return rejected(DropItemRejectedReason.Occupied);
 		}
 		if (
 			!(yield* isItemLocationScopeAllowedFx({
@@ -108,7 +108,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 				locationScope: target.location.scope,
 			}))
 		) {
-			return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
+			return rejected(DropItemRejectedReason.InvalidTarget);
 		}
 		const config = yield* GameConfigFx;
 		const targetSize = match(target.location.scope)
@@ -123,21 +123,21 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 			target.location.position.x >= targetSize.width ||
 			target.location.position.y >= targetSize.height
 		) {
-			return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
+			return rejected(DropItemRejectedReason.InvalidTarget);
 		}
 		return {
-			kind: DropItemResultKindEnumSchema.enum.Move,
+			kind: DropItemResultKind.Move,
 		} satisfies readDropItemPreviewFx.Result;
 	}
 
 	const targetOccupant = target.occupant;
 	const runtimeTargetItem = runtime.items.find((item) => item.id === targetOccupant.itemId);
 	if (runtimeTargetItem === undefined || runtimeTargetItem.revision !== targetOccupant.revision) {
-		return rejected(DropItemRejectedReasonEnumSchema.enum.StaleTarget);
+		return rejected(DropItemRejectedReason.StaleTarget);
 	}
 	const targetItem = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeTargetItem));
 	if (targetItem === undefined) {
-		return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
+		return rejected(DropItemRejectedReason.InvalidTarget);
 	}
 	if (
 		!(yield* isSameGridLocationFx({
@@ -145,7 +145,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 			right: target.location,
 		}))
 	) {
-		return rejected(DropItemRejectedReasonEnumSchema.enum.StaleTarget);
+		return rejected(DropItemRejectedReason.StaleTarget);
 	}
 	const boardSource = Option.getOrUndefined(yield* isBoardRuntimeItemFx(source));
 	const boardTarget = Option.getOrUndefined(yield* isBoardRuntimeItemFx(targetItem));
@@ -154,7 +154,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		boardTarget !== undefined &&
 		boardSource.location.space !== boardTarget.location.space
 	) {
-		return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
+		return rejected(DropItemRejectedReason.InvalidTarget);
 	}
 	const oneBoardItem = (boardSource === undefined) !== (boardTarget === undefined);
 	const boardItem = boardSource ?? boardTarget;
@@ -163,7 +163,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		boardItem !== undefined &&
 		boardItem.location.space !== runtime.currentSpace
 	) {
-		return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
+		return rejected(DropItemRejectedReason.InvalidTarget);
 	}
 	if (targetItem.item.type === TypeSchema.enum.Inventory) {
 		if (
@@ -173,7 +173,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 				locationScope: LocationScopeEnumSchema.enum.Inventory,
 			}))
 		) {
-			return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
+			return rejected(DropItemRejectedReason.InvalidTarget);
 		}
 		const storagePlan = yield* planInventoryStorageFx({
 			item: source,
@@ -181,9 +181,9 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		}).pipe(Effect.option);
 		return Option.isSome(storagePlan)
 			? {
-					kind: DropItemResultKindEnumSchema.enum.StoreInventory,
+					kind: DropItemResultKind.StoreInventory,
 				}
-			: rejected(DropItemRejectedReasonEnumSchema.enum.Blocked);
+			: rejected(DropItemRejectedReason.Blocked);
 	}
 	if (targetItem.location.scope === LocationScopeEnumSchema.enum.Board) {
 		const mergeRule = yield* resolveMergeRuleFx({
@@ -192,7 +192,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		}).pipe(Effect.option);
 		if (Option.isSome(mergeRule)) {
 			return {
-				kind: DropItemResultKindEnumSchema.enum.Merge,
+				kind: DropItemResultKind.Merge,
 			} satisfies readDropItemPreviewFx.Result;
 		}
 	}
@@ -206,7 +206,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	});
 	if (inputStore !== undefined) {
 		return {
-			kind: DropItemResultKindEnumSchema.enum.StoreInput,
+			kind: DropItemResultKind.StoreInput,
 			lineId: inputStore.lineId,
 			inputIndex: inputStore.inputIndex,
 			quantity: inputStore.quantity,
@@ -223,7 +223,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	});
 	if (stackResolution.kind === "available") {
 		return {
-			kind: DropItemResultKindEnumSchema.enum.Stack,
+			kind: DropItemResultKind.Stack,
 		} satisfies readDropItemPreviewFx.Result;
 	}
 	if (stackResolution.kind === "blocked") {
@@ -242,9 +242,9 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		locationScope: source.location.scope,
 	});
 	if (!sourceScopeAllowed || !targetScopeAllowed) {
-		return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
+		return rejected(DropItemRejectedReason.InvalidTarget);
 	}
 	return {
-		kind: DropItemResultKindEnumSchema.enum.Swap,
+		kind: DropItemResultKind.Swap,
 	} satisfies readDropItemPreviewFx.Result;
 });

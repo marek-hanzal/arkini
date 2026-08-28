@@ -1,19 +1,18 @@
 import { Effect } from "effect";
 
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import type { DropResultSchema } from "~/engine/output/schema/DropResultSchema";
+import type { dropFx } from "~/engine/output/fx/dropFx";
 import { PlacementPlanInvalidError } from "~/engine/placement/error/PlacementPlanInvalidError";
 import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
-import type { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
-import type { PlacementPlanSchema } from "~/engine/placement/schema/PlacementPlanSchema";
+import type { PlacementPlan } from "~/engine/placement/PlacementPlan";
 import { readPlacementPlanQuantityFx } from "./readPlacementPlanQuantityFx";
 
 export namespace assertPlacementPlanCompleteFx {
 	export interface Props {
-		drop: DropResultSchema.Type;
-		plan: PlacementPlanSchema.Type;
+		drop: dropFx.Result;
+		plan: PlacementPlan;
 		quantity: PositiveIntegerSchema.Type;
-		reason: PlacementFailureReasonEnumSchema.Type;
+		reason: PlacementUnavailableError.Reason;
 	}
 }
 

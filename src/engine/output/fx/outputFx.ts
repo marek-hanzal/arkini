@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 
-import type { OutputResultSchema } from "~/engine/output/schema/OutputResultSchema";
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import { rollSetFx } from "~/engine/roll/fx/rollSetFx";
 import { selectRollSetFx } from "~/engine/roll/fx/selectRollSetFx";
@@ -11,6 +10,10 @@ export namespace outputFx {
 	export interface Props {
 		origin: GridLocationSchema.Type;
 		output: OutputSchema.Type;
+	}
+
+	export interface Result {
+		readonly drop: ReadonlyArray<dropFx.Result>;
 	}
 }
 
@@ -35,5 +38,5 @@ export const outputFx = Effect.fn("outputFx")(function* ({ origin, output }: out
 		drop: results.filter((result): result is NonNullable<typeof result> => {
 			return result !== undefined;
 		}),
-	} satisfies OutputResultSchema.Type;
+	} satisfies outputFx.Result;
 });

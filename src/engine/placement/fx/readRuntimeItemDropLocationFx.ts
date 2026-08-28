@@ -2,7 +2,6 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
-import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
@@ -68,10 +67,10 @@ export const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocat
 
 	const reason =
 		item.item.scope === StorageSchema.enum.Board
-			? PlacementFailureReasonEnumSchema.enum.BoardFull
+			? PlacementUnavailableError.Reason.BoardFull
 			: item.item.scope === StorageSchema.enum.Toolbar
-				? PlacementFailureReasonEnumSchema.enum.ToolbarFull
-				: PlacementFailureReasonEnumSchema.enum.InventoryFull;
+				? PlacementUnavailableError.Reason.ToolbarFull
+				: PlacementUnavailableError.Reason.InventoryFull;
 	return yield* Effect.fail(
 		new PlacementUnavailableError({
 			itemId: item.item.id,

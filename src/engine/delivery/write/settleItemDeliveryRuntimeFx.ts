@@ -9,7 +9,6 @@ import { applyInputMaterialStorePlanFx } from "~/engine/input/fx/applyInputMater
 import { planInputMaterialStoreFx } from "~/engine/input/fx/planInputMaterialStoreFx";
 import { filterInputSlotItemsFx } from "~/engine/input/read/filterInputSlotItemsFx";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
-import type { InputMaterialStorePlanSchema } from "~/engine/input/schema/store/InputMaterialStorePlanSchema";
 import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
@@ -154,7 +153,7 @@ export const settleItemDeliveryRuntimeFx = Effect.fn("settleItemDeliveryRuntimeF
 					lineId: line.id,
 					ownerItemId: owner.id,
 				});
-				const plan: InputMaterialStorePlanSchema.Type | undefined =
+				const plan: planInputMaterialStoreFx.Plan | undefined =
 					yield* planInputMaterialStoreFx({
 						input,
 						item: source,

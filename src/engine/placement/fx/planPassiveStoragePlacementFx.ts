@@ -3,8 +3,8 @@ import { Effect } from "effect";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import type { DropResultSchema } from "~/engine/output/schema/DropResultSchema";
-import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
+import type { dropFx } from "~/engine/output/fx/dropFx";
+import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { assertPlacementPlanCompleteFx } from "./assertPlacementPlanCompleteFx";
 import { mergePlacementPlansFx } from "./mergePlacementPlansFx";
@@ -14,7 +14,7 @@ import { readPlacementPlanQuantityFx } from "./readPlacementPlanQuantityFx";
 
 export namespace planPassiveStoragePlacementFx {
 	export interface Props {
-		drop: DropResultSchema.Type;
+		drop: dropFx.Result;
 		excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
 		item: ItemSchema.Type;
 		origin: Extract<
@@ -85,7 +85,7 @@ export const planPassiveStoragePlacementFx = Effect.fn("planPassiveStoragePlacem
 		quantity,
 		reason:
 			origin.scope === "inventory"
-				? PlacementFailureReasonEnumSchema.enum.ToolbarFull
-				: PlacementFailureReasonEnumSchema.enum.InventoryFull,
+				? PlacementUnavailableError.Reason.ToolbarFull
+				: PlacementUnavailableError.Reason.InventoryFull,
 	});
 });

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
+import type { InputRun } from "~/engine/input/InputRun";
 import type { SimpleSchema } from "~/engine/input/schema/SimpleSchema";
-import type { InputSimpleResolutionSchema } from "~/engine/input/schema/resolution/InputSimpleResolutionSchema";
 
 export namespace resolveInputSimpleFx {
 	export interface Props {
@@ -20,5 +20,5 @@ export const resolveInputSimpleFx = Effect.fn("resolveInputSimpleFx")(function* 
 	return {
 		type: input.type,
 		ready: true,
-	} satisfies InputSimpleResolutionSchema.Type;
+	} satisfies InputRun.SimpleResolution;
 });

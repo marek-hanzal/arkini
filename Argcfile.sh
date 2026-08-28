@@ -47,16 +47,23 @@ package_macos_artifacts() {
 		--arm64 \
 		--publish never
 	cp game/arkini/build/arkini.arkpack .out/desktop/release/arkini.arkpack
+	if [[ -f game/arkini/build/arkini.arksig ]]; then
+		cp game/arkini/build/arkini.arksig .out/desktop/release/arkini.arksig
+	fi
 	(
+		local -a arkpack_artifacts=(arkini.arkpack)
 		cd .out/desktop/release
 		shasum -a 256 \
 			"Arkini-$version-mac-arm64.dmg" \
 			"Arkini-$version-mac-arm64.zip" >SHA256SUMS-macos-arm64
-		shasum -a 256 arkini.arkpack >SHA256SUMS-arkpack
+		if [[ -f arkini.arksig ]]; then
+			arkpack_artifacts+=(arkini.arksig)
+		fi
+		shasum -a 256 "${arkpack_artifacts[@]}" >SHA256SUMS-arkpack
 	)
 	"$packaged_cli" --version | grep -F "$version"
 	if [[ "${ARKINI_RELEASE_SIGN:-}" == "1" ]]; then
-		"$packaged_cli" arkpack verify game/arkini/build/arkini.arkpack |
+		"$packaged_cli" arkpack verify .out/desktop/release/arkini.arkpack |
 			grep -Fx '{"type":"trusted"}'
 	fi
 }

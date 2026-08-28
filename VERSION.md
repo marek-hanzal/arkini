@@ -81,7 +81,9 @@ Trust is soft release provenance, independent from schema, semantic validation, 
 
 Both states are playable. Trust is a label, not an anti-tampering or content-admission system.
 
-Only the tagged GitHub release workflow keyless-signs the official Arkpack. It receives a short-lived OIDC identity, uses Sigstore Fulcio/Rekor transparency proofs, writes the sibling `.arksig`, and verifies the final pair before packaging. There is no stored signing key, signing secret, local key generation, developer mode, or standalone signing command. Manual workflow, local `argc build`, and every Editor build remain External; ordinary rebuilds remove stale signatures.
+A separately distributed Arkpack is Trusted only while its exact sibling `.arksig` is distributed with it. A bare standalone `.arkpack` has no proof and is External; it must not be described as Trusted or official.
+
+Only the tagged development-prerelease workflow keyless-signs the Trusted Arkpack pair. It receives a short-lived OIDC identity, uses Sigstore Fulcio/Rekor transparency proofs, writes the sibling `.arksig`, and verifies the final pair before packaging. There is no stored signing key, signing secret, local key generation, developer mode, or standalone signing command. Manual workflow, stable-tag packaging, local `argc build`, and every Editor build remain External; ordinary rebuilds remove stale signatures.
 
 Load and `arkini-cli arkpack verify <file>` classify the exact pair offline. Verification checks digest/signature, Fulcio chain and certificate-transparency proof, Rekor proof, issuer, repository, and workflow identity against the embedded [`src/engine/pack/trusted-root.json`](src/engine/pack/trusted-root.json). Failure becomes External, never a load rejection.
 

@@ -50,6 +50,7 @@ jobs:
             .out/desktop/release/*.dmg
             .out/desktop/release/*.zip
             .out/desktop/release/*.arkpack
+            .out/desktop/release/*.arksig
             .out/desktop/release/SHA256SUMS-macos-arm64
             .out/desktop/release/SHA256SUMS-arkpack
           if-no-files-found: error
@@ -184,6 +185,7 @@ jobs:
             release/macos/*.dmg \
             release/macos/*.zip \
             release/macos/arkini.arkpack \
+            release/macos/arkini.arksig \
             release/macos/SHA256SUMS-macos-arm64 \
             release/macos/SHA256SUMS-arkpack \
             release/windows/*.exe \
@@ -196,4 +198,4 @@ jobs:
             --verify-tag \
             --prerelease \
             --title "Arkini $GITHUB_REF_NAME" \
-            --notes "Unsigned macOS Apple Silicon, Windows x64, and Linux x64/arm64 builds plus the standalone official Arkpack. Verify the platform checksum file before opening; macOS requires the normal Gatekeeper override."
+            --notes "Unsigned macOS Apple Silicon, Windows x64, and Linux x64/arm64 builds plus the standalone Arkpack and its detached Sigstore proof. Keep the .arkpack and .arksig together for Trusted classification. Verify the target checksum file before opening; macOS requires the normal Gatekeeper override."

@@ -72,13 +72,6 @@ package_macos_artifacts() {
 		--arm64 \
 		--publish never
 	cp game/arkini/build/arkini.arkpack .out/desktop/release/arkini.arkpack
-	(
-		cd .out/desktop/release
-		shasum -a 256 \
-			"Arkini-$version-mac-arm64.dmg" \
-			"Arkini-$version-mac-arm64.zip" >SHA256SUMS-macos-arm64
-		shasum -a 256 arkini.arkpack >SHA256SUMS-arkpack
-	)
 	"$packaged_cli" --version | grep -F "$version"
 	cmp game/arkini/build/arkini.arkpack \
 		.out/desktop/release/mac-arm64/Arkini.app/Contents/Resources/game/arkini.arkpack
@@ -87,8 +80,6 @@ package_macos_artifacts() {
 }
 
 package_windows_artifacts() {
-	local version
-	version=$(desktop_version)
 	electron-builder \
 		--config electron-builder.yml \
 		--win \
@@ -96,23 +87,15 @@ package_windows_artifacts() {
 		--publish never
 	cmp game/arkini/build/arkini.arkpack \
 		.out/desktop/release/win-unpacked/resources/game/arkini.arkpack
-	(
-		cd .out/desktop/release
-		sha256sum \
-			"Arkini-$version-win-x64.exe" \
-			"Arkini-$version-win-x64.zip" >SHA256SUMS-windows-x64
-	)
 }
 
 package_linux_artifacts() {
-	local architecture artifact_arch unpacked version
+	local architecture unpacked
 	architecture=$1
-	artifact_arch=$2
 	unpacked=linux-unpacked
 	if [[ "$architecture" == "arm64" ]]; then
 		unpacked=linux-arm64-unpacked
 	fi
-	version=$(desktop_version)
 	electron-builder \
 		--config electron-builder.yml \
 		--linux AppImage \
@@ -120,11 +103,6 @@ package_linux_artifacts() {
 		--publish never
 	cmp game/arkini/build/arkini.arkpack \
 		".out/desktop/release/$unpacked/resources/game/arkini.arkpack"
-	(
-		cd .out/desktop/release
-		sha256sum \
-			"Arkini-$version-linux-$artifact_arch.AppImage" >"SHA256SUMS-linux-$architecture"
-	)
 }
 
 # @cmd Install exact JavaScript dependencies from the lockfile
@@ -305,7 +283,7 @@ package-linux() {
 	clean_desktop
 	build_desktop
 	install_game_arkpack
-	package_linux_artifacts x64 x86_64
+	package_linux_artifacts x64
 }
 
 # @cmd Build Linux arm64 AppImage release artifacts
@@ -313,7 +291,7 @@ package-linux-arm64() {
 	clean_desktop
 	build_desktop
 	install_game_arkpack
-	package_linux_artifacts arm64 arm64
+	package_linux_artifacts arm64
 }
 
 # @cmd Format the repository

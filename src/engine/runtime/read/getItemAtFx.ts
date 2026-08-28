@@ -1,7 +1,7 @@
 import { Array, Effect } from "effect";
 
 import { ItemNotFoundError } from "~/engine/item/error/ItemNotFoundError";
-import { readGridLocationOccupantsFx } from "~/engine/location/read/readGridLocationOccupantsFx";
+import { readGridLocationOccupantsFn } from "~/engine/location/fn/readGridLocationOccupantsFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { isGridRuntimeItemFx } from "./isGridRuntimeItemFx";
 import { getItemsFx } from "./getItemsFx";
@@ -16,7 +16,7 @@ export namespace getItemAtFx {
 export const getItemAtFx = Effect.fn("getItemAtFx")(function* ({ location }: getItemAtFx.Props) {
 	const items = yield* getItemsFx();
 	const gridItems = Array.getSomes(yield* Effect.forEach(items, isGridRuntimeItemFx));
-	const [occupants] = yield* readGridLocationOccupantsFx({
+	const [occupants] = readGridLocationOccupantsFn({
 		items: gridItems,
 		locations: [
 			location,

@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { PositionSchema } from "~/engine/grid/schema/PositionSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
+import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { PlacementPlan } from "~/engine/placement/PlacementPlan";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -40,7 +40,7 @@ export const planScopePlacementFx = Effect.fn("planScopePlacementFx")(function* 
 		let excluded = false;
 		for (const excludedLocation of excludedLocations) {
 			if (
-				yield* isSameGridLocationFx({
+				isSameGridLocationFn({
 					left: location,
 					right: excludedLocation,
 				})

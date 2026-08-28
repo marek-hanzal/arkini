@@ -2,7 +2,7 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
-import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
+import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
@@ -95,18 +95,18 @@ export const readItemStackResolutionFx = Effect.fn("readItemStackResolutionFx")(
 		return blocked(StackItemsUnavailableError.Reason.TargetNotOnGrid);
 	}
 	if (
-		!(yield* isSameGridLocationFx({
+		!isSameGridLocationFn({
 			left: source.location,
 			right: sourceLocation,
-		}))
+		})
 	) {
 		return blocked(StackItemsUnavailableError.Reason.StaleSourceLocation);
 	}
 	if (
-		!(yield* isSameGridLocationFx({
+		!isSameGridLocationFn({
 			left: target.location,
 			right: targetLocation,
-		}))
+		})
 	) {
 		return blocked(StackItemsUnavailableError.Reason.StaleTargetLocation);
 	}

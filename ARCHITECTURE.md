@@ -21,6 +21,8 @@ src/editor  → public src/engine
 
 [`.dependency-cruiser.cjs`](.dependency-cruiser.cjs) is the executable import-boundary authority. Do not duplicate those rules in tests or prose.
 
+Within an exact domain owner, `fn/` contains only total synchronous explicit-input data-to-data operations named `*Fn` and their operation-owned co-located Props, Result, or other type declarations. It never contains Effect programs or standalone/declaration-only concepts such as schemas, standalone types, Context/Layer/errors, capabilities, or constant-only modules, and never replaces domain ownership with a global shared layer. One Fn and its owned declarations remain one exported concept. Fn composes only Fn, while Fx may compose Fn or Fx, so value dependencies cannot reach into effects or stateful capabilities.
+
 Each physical process has one Effect execution root:
 
 ```text

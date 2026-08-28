@@ -6,7 +6,7 @@ import { resolveLineEnableFx } from "~/engine/line/fx/run/resolveLineEnableFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { isPassiveStorageLocationFx } from "~/engine/location/read/isPassiveStorageLocationFx";
+import { isPassiveStorageLocationFn } from "~/engine/location/fn/isPassiveStorageLocationFn";
 export namespace resolveJobRunnableFx {
 	export interface Props {
 		job: JobSchema.Type;
@@ -22,7 +22,7 @@ export const resolveJobRunnableFx = Effect.fn("resolveJobRunnableFx")(function* 
 		itemId: job.ownerItemId,
 		runtime,
 	});
-	if (yield* isPassiveStorageLocationFx(runtimeOwner.location)) return false;
+	if (isPassiveStorageLocationFn(runtimeOwner.location)) return false;
 	const { line, owner } = yield* readBoardItemLineFx({
 		lineId: job.lineId,
 		ownerItemId: job.ownerItemId,

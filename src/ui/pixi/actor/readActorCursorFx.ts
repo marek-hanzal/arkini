@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
+import { DropItemResultKind } from "~/bridge/tile/DropItemResultKind";
 import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
 
 export namespace readActorCursorFx {
@@ -58,7 +58,7 @@ export const readActorCursorFx = Effect.fn("readActorCursorFx")(
 					{
 						dragPolicy: "preview-result",
 						phase: "dragging",
-						previewKind: DropItemResultKindEnumSchema.enum.Reject,
+						previewKind: DropItemResultKind.Reject,
 					},
 					() => "not-allowed" as const,
 				)
@@ -66,7 +66,7 @@ export const readActorCursorFx = Effect.fn("readActorCursorFx")(
 					{
 						dragPolicy: "preview-result",
 						phase: "dragging",
-						previewKind: DropItemResultKindEnumSchema.enum.Ignored,
+						previewKind: DropItemResultKind.Ignored,
 					},
 					() => "grab" as const,
 				)

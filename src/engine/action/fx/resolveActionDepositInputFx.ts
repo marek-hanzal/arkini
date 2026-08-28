@@ -2,9 +2,9 @@ import { Array, Effect, Option } from "effect";
 
 import { resolveActionChargeFx } from "~/engine/action/fx/resolveActionChargeFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { InputRun } from "~/engine/input/InputRun";
 import type { DepositSchema } from "~/engine/input/schema/DepositSchema";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
-import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
 import { queryFx } from "~/engine/query/fx/queryFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
@@ -73,7 +73,7 @@ export const resolveActionDepositInputFx = Effect.fn("resolveActionDepositInputF
 				ready: false,
 			},
 			plan: undefined,
-		} satisfies InputRunResolutionSchema.Type;
+		} satisfies InputRun.Resolution;
 	}
 
 	const candidates = yield* queryFx({
@@ -107,7 +107,7 @@ export const resolveActionDepositInputFx = Effect.fn("resolveActionDepositInputF
 				type: TypeSchema.enum.Deposit,
 				charges: charges.plan,
 			},
-		} satisfies InputRunResolutionSchema.Type;
+		} satisfies InputRun.Resolution;
 	}
 
 	return {
@@ -116,5 +116,5 @@ export const resolveActionDepositInputFx = Effect.fn("resolveActionDepositInputF
 			ready: false,
 		},
 		plan: undefined,
-	} satisfies InputRunResolutionSchema.Type;
+	} satisfies InputRun.Resolution;
 });

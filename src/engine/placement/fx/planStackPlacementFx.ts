@@ -1,7 +1,7 @@
 import { Array, Effect, Option, pipe } from "effect";
 
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import type { PlacementPlanSchema } from "~/engine/placement/schema/PlacementPlanSchema";
+import type { PlacementPlan } from "~/engine/placement/PlacementPlan";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 
 export namespace planStackPlacementFx {
@@ -28,7 +28,7 @@ export const planStackPlacementFx = Effect.fn("planStackPlacementFx")(function* 
 				? Option.some({
 						itemId: item.id,
 						quantity: placedQuantity,
-					} satisfies PlacementPlanSchema.Type["stack"][number])
+					} satisfies PlacementPlan["stack"][number])
 				: Option.none(),
 		] as const;
 	});

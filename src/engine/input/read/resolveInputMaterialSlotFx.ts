@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
-import type { InputMaterialResolutionSchema } from "~/engine/input/schema/resolution/InputMaterialResolutionSchema";
+import type { InputRun } from "~/engine/input/InputRun";
 import { getItemFx } from "~/engine/runtime/read/getItemFx";
 import { readInputMaterialItemsFx } from "./readInputMaterialItemsFx";
 import { readItemMaterialInputFx } from "./readItemMaterialInputFx";
@@ -46,5 +46,5 @@ export const resolveInputMaterialSlotFx = Effect.fn("resolveInputMaterialSlotFx"
 	return (yield* resolveInputMaterialFx({
 		input,
 		storedQuantity,
-	})) satisfies InputMaterialResolutionSchema.Type;
+	})) satisfies InputRun.MaterialResolution;
 });

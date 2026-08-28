@@ -2,14 +2,14 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
-import type { OutputPlacementResultSchema } from "~/engine/placement/schema/OutputPlacementResultSchema";
+import type { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 
 export namespace readOutputPlacementItemEventsFx {
 	export interface Props {
 		readonly originItemId: IdSchema.Type;
-		readonly placement: OutputPlacementResultSchema.Type;
+		readonly placement: applyOutputPlacementFx.Result;
 	}
 }
 

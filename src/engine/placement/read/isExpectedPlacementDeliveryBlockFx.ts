@@ -1,19 +1,19 @@
 import { Effect } from "effect";
 import { match, P } from "ts-pattern";
 
-import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
+import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 
 /** Keeps only the placement failures that may legitimately defer output delivery. */
 export const isExpectedPlacementDeliveryBlockFx = Effect.fn("isExpectedPlacementDeliveryBlockFx")(
-	function* (reason: PlacementFailureReasonEnumSchema.Type) {
+	function* (reason: PlacementUnavailableError.Reason) {
 		return match(reason)
-			.with(PlacementFailureReasonEnumSchema.enum.BoardOriginUnavailable, () => false)
+			.with(PlacementUnavailableError.Reason.BoardOriginUnavailable, () => false)
 			.with(
 				P.union(
-					PlacementFailureReasonEnumSchema.enum.BoardFull,
-					PlacementFailureReasonEnumSchema.enum.InventoryFull,
-					PlacementFailureReasonEnumSchema.enum.ToolbarFull,
-					PlacementFailureReasonEnumSchema.enum.ItemMaxCount,
+					PlacementUnavailableError.Reason.BoardFull,
+					PlacementUnavailableError.Reason.InventoryFull,
+					PlacementUnavailableError.Reason.ToolbarFull,
+					PlacementUnavailableError.Reason.ItemMaxCount,
 				),
 				() => true,
 			)

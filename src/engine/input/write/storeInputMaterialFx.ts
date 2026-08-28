@@ -11,7 +11,6 @@ import { applyInputMaterialStorePlanFx } from "~/engine/input/fx/applyInputMater
 import { planInputMaterialStoreFx } from "~/engine/input/fx/planInputMaterialStoreFx";
 import { filterInputSlotItemsFx } from "~/engine/input/read/filterInputSlotItemsFx";
 import { readItemMaterialInputFx } from "~/engine/input/read/readItemMaterialInputFx";
-import type { InputMaterialStoreResultSchema } from "~/engine/input/schema/command/InputMaterialStoreResultSchema";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { LineInputClosedError } from "~/engine/line/error/LineInputClosedError";
@@ -27,6 +26,8 @@ import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
+import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
+import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
 import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBoardOperationError";
 
 export namespace storeInputMaterialFx {
@@ -40,6 +41,13 @@ export namespace storeInputMaterialFx {
 		sourceItemRevision: RevisionSchema.Type;
 		expectedSourceLocation?: GridLocationSchema.Type;
 		quantity: PositiveIntegerSchema.Type;
+	}
+
+	export interface Result {
+		readonly sourceBefore: GridRuntimeItemSchema.Type;
+		readonly ownerItem: GridRuntimeItemSchema.Type;
+		readonly storedItem: InputRuntimeItemSchema.Type;
+		readonly sourceItem?: GridRuntimeItemSchema.Type;
 	}
 }
 
@@ -268,7 +276,7 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 					...result,
 					sourceBefore: source,
 					ownerItem,
-				} satisfies InputMaterialStoreResultSchema.Type,
+				} satisfies storeInputMaterialFx.Result,
 				reconciledRuntime,
 				[
 					{

@@ -7,9 +7,9 @@ import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { makeDropActorRejectedResultFx } from "~/engine/runtime/drop/makeDropActorRejectedResultFx";
 import { makeDropRejectedResultFx } from "~/engine/runtime/drop/makeDropRejectedResultFx";
 import { projectDropTransferActorFx } from "~/engine/runtime/drop/projectDropTransferActorFx";
-import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
-import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
-import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
+import type { DropItemResult } from "~/engine/runtime/DropItemResult";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 
 export namespace commitStoreInputDropFx {
 	export interface Props {
@@ -24,7 +24,7 @@ export namespace commitStoreInputDropFx {
 		readonly quantity: number;
 	}
 
-	export type Result = DropItemResultSchema.Type;
+	export type Result = DropItemResult;
 }
 
 /** Commits one exact default-line input store and normalizes both actor identities. */
@@ -41,7 +41,7 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 }: commitStoreInputDropFx.Props) {
 	const rejectBlockedFx = () =>
 		makeDropRejectedResultFx({
-			reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
+			reason: DropItemRejectedReason.Blocked,
 			sourceItemId,
 			targetItemId,
 		});
@@ -63,7 +63,7 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 		});
 
 		return {
-			kind: DropItemResultKindEnumSchema.enum.StoreInput,
+			kind: DropItemResultKind.StoreInput,
 			storedQuantity: stored.storedItem.quantity,
 			lineId,
 			inputIndex,
@@ -106,7 +106,7 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 				}),
 			CrossSpaceBoardOperationError: () =>
 				makeDropRejectedResultFx({
-					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+					reason: DropItemRejectedReason.InvalidTarget,
 					sourceItemId,
 					targetItemId,
 				}),

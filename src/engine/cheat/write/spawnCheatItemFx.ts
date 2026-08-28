@@ -13,7 +13,7 @@ import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
 import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
-import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
+import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 
 export namespace spawnCheatItemFx {
 	export interface Props {
@@ -74,7 +74,7 @@ export const spawnCheatItemFx = Effect.fn("spawnCheatItemFx")(function* ({
 				drop,
 				plan,
 				quantity: 1,
-				reason: PlacementFailureReasonEnumSchema.enum.BoardFull,
+				reason: PlacementUnavailableError.Reason.BoardFull,
 			});
 			const [result, nextRuntime] = yield* applyPlacementPlanFx({
 				plan,

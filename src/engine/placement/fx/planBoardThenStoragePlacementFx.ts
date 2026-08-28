@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 
-import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
+import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import type { DropResultSchema } from "~/engine/output/schema/DropResultSchema";
+import type { dropFx } from "~/engine/output/fx/dropFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 import { assertPlacementPlanCompleteFx } from "./assertPlacementPlanCompleteFx";
@@ -18,7 +18,7 @@ import { readPlacementPlanQuantityFx } from "./readPlacementPlanQuantityFx";
 
 export namespace planBoardThenStoragePlacementFx {
 	export interface Props {
-		drop: DropResultSchema.Type;
+		drop: dropFx.Result;
 		excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
 		item: ItemSchema.Type;
 		origin: BoardLocationSchema.Type;
@@ -84,7 +84,7 @@ export const planBoardThenStoragePlacementFx = Effect.fn("planBoardThenStoragePl
 				drop,
 				plan,
 				quantity,
-				reason: PlacementFailureReasonEnumSchema.enum.InventoryFull,
+				reason: PlacementUnavailableError.Reason.InventoryFull,
 			});
 		}
 
@@ -105,7 +105,7 @@ export const planBoardThenStoragePlacementFx = Effect.fn("planBoardThenStoragePl
 			drop,
 			plan,
 			quantity,
-			reason: PlacementFailureReasonEnumSchema.enum.ToolbarFull,
+			reason: PlacementUnavailableError.Reason.ToolbarFull,
 		});
 	},
 );

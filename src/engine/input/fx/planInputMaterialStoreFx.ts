@@ -3,7 +3,6 @@ import { Effect } from "effect";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { MaterialSchema } from "~/engine/input/schema/MaterialSchema";
-import type { InputMaterialStoreResolutionSchema } from "~/engine/input/schema/store/InputMaterialStoreResolutionSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import { readMaterialInputEligibilityFx } from "~/engine/input/read/readMaterialInputEligibilityFx";
 import { selectItemsFx } from "~/engine/selector/fx/selectItemsFx";
@@ -15,6 +14,11 @@ export namespace planInputMaterialStoreFx {
 		item: RuntimeItemSchema.Type;
 		requestedQuantity: PositiveIntegerSchema.Type;
 		storedQuantity: NonNegativeIntegerSchema.Type;
+	}
+
+	export interface Plan {
+		readonly sourceItemId: RuntimeItemSchema.Type["id"];
+		readonly quantity: PositiveIntegerSchema.Type;
 	}
 }
 
@@ -53,5 +57,5 @@ export const planInputMaterialStoreFx = Effect.fn("planInputMaterialStoreFx")(fu
 	return {
 		sourceItemId: item.id,
 		quantity: Math.min(item.quantity, requestedQuantity, resolution.availableCapacity),
-	} satisfies InputMaterialStoreResolutionSchema.Type;
+	} satisfies planInputMaterialStoreFx.Plan;
 });

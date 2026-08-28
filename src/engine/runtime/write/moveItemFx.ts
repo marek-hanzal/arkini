@@ -15,7 +15,6 @@ import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBo
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
-import type { MoveItemResultSchema } from "~/engine/runtime/schema/command/MoveItemResultSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
@@ -26,6 +25,11 @@ export namespace moveItemFx {
 		location: GridLocationSchema.Type;
 		revision: RevisionSchema.Type;
 		expectedLocation?: GridLocationSchema.Type;
+	}
+
+	export interface Result {
+		readonly item: RuntimeItemSchema.Type;
+		readonly previousLocation: GridLocationSchema.Type;
 	}
 }
 
@@ -92,7 +96,7 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 					{
 						item,
 						previousLocation: item.location,
-					} satisfies MoveItemResultSchema.Type,
+					} satisfies moveItemFx.Result,
 					runtime,
 				] as const;
 			}
@@ -147,7 +151,7 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 			const result = {
 				item: movedItem,
 				previousLocation: item.location,
-			} satisfies MoveItemResultSchema.Type;
+			} satisfies moveItemFx.Result;
 
 			const nextRuntime = {
 				...runtime,

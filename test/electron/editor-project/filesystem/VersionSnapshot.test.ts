@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { createEditorProjectFilesystemPathsFx } from "../../../../electron/main/editor-project/filesystem/createEditorProjectFilesystemPathsFx";
+import { createProjectPathsFx } from "../../../../electron/main/editor-project/filesystem/createProjectPathsFx";
 import { createVersionSnapshotFx } from "../../../../electron/main/editor-project/filesystem/fx/createVersionSnapshotFx";
 import { readVersionSnapshotFx } from "../../../../electron/main/editor-project/filesystem/fx/readVersionSnapshotFx";
 import { EditorBoardScenarioSchema } from "~/editor/board/EditorBoardScenarioSchema";
@@ -49,7 +49,7 @@ describe("filesystem Editor version objects", () => {
 		});
 		const { paths, snapshot } = await Effect.runPromise(
 			Effect.gen(function* () {
-				const paths = yield* createEditorProjectFilesystemPathsFx(root);
+				const paths = yield* createProjectPathsFx(root);
 				const snapshot = yield* writeSnapshotFx({
 					arkpack: editorTestPayload.version,
 					config: editorTestPayload.config,
@@ -159,7 +159,7 @@ describe("filesystem Editor version objects", () => {
 
 	it("rejects a symbolic-link object directory before writing snapshot bytes", async () => {
 		const paths = await Effect.runPromise(
-			createEditorProjectFilesystemPathsFx(root).pipe(Effect.provide(NodeServices.layer)),
+			createProjectPathsFx(root).pipe(Effect.provide(NodeServices.layer)),
 		);
 		const elsewhere = join(root, "elsewhere");
 		await mkdir(elsewhere);

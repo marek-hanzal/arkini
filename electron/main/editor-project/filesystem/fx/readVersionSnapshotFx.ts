@@ -1,7 +1,7 @@
 import { FileSystem } from "effect";
 import { Effect } from "effect";
 
-import type { EditorProjectFilesystemPaths } from "../EditorProjectFilesystemPaths";
+import type { ProjectPaths } from "../ProjectPaths";
 import { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
 import { GameFileSchema } from "~/engine/source/schema/GameFileSchema";
 import { EditorVersionManifestSchema } from "~/editor/filesystem/EditorVersionManifestSchema";
@@ -20,7 +20,7 @@ export namespace readVersionSnapshotFx {
 	export interface Props {
 		readonly manifest: EditorVersionManifestSchema.Type;
 		readonly objectCache?: Map<string, Uint8Array>;
-		readonly paths: EditorProjectFilesystemPaths;
+		readonly paths: ProjectPaths;
 	}
 
 	export interface Success {

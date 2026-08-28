@@ -140,7 +140,7 @@ describe("blueprint output reservation", () => {
 					availability: {
 						kind: "unavailable",
 						reason: {
-							kind: "direct-output-max-count",
+							kind: "direct-output-capacity",
 							itemId: "item:byproduct",
 						},
 					},

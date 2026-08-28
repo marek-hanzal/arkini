@@ -105,14 +105,14 @@ export namespace ItemDetailLines {
 				readonly distance: DistanceSchema.Type;
 		  }
 		| {
-				readonly kind: "direct-output-max-count";
+				readonly kind: "direct-output-capacity";
 				readonly itemId: IdSchema.Type;
 				readonly liveQuantity: number;
 				readonly reservedQuantity: number;
 				readonly maxCount: number;
 		  }
 		| {
-				readonly kind: "downstream-output-max-count";
+				readonly kind: "downstream-output-capacity";
 				readonly intermediateItemId: IdSchema.Type;
 				readonly itemId: IdSchema.Type;
 				readonly liveQuantity: number;

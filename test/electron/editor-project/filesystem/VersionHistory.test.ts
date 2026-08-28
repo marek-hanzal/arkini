@@ -6,7 +6,7 @@ import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
-import { createEditorProjectFilesystemPathsFx } from "../../../../electron/main/editor-project/filesystem/createEditorProjectFilesystemPathsFx";
+import { createProjectPathsFx } from "../../../../electron/main/editor-project/filesystem/createProjectPathsFx";
 import { readVersionHistoryFx } from "../../../../electron/main/editor-project/filesystem/fx/readVersionHistoryFx";
 
 let root = "";
@@ -25,7 +25,7 @@ afterEach(async () => {
 describe("readVersionHistoryFx", () => {
 	it("rejects a published version whose parent is absent from the head", async () => {
 		const paths = await Effect.runPromise(
-			createEditorProjectFilesystemPathsFx(root).pipe(Effect.provide(NodeServices.layer)),
+			createProjectPathsFx(root).pipe(Effect.provide(NodeServices.layer)),
 		);
 		const versionId = "child";
 		const versionDirectory = await Effect.runPromise(

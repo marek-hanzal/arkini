@@ -5,14 +5,14 @@ import {
 	GameProjectManifestFileName,
 	GameProjectSchemaFileName,
 } from "~/engine/source/GameProjectReference";
-import type { EditorProjectFilesystemPaths } from "./EditorProjectFilesystemPaths";
+import type { ProjectPaths } from "./ProjectPaths";
 
 const encodeFileStem = (value: string) => encodeURIComponent(value).replaceAll(".", "%2E");
 
 /** Resolves every fixed and identity-derived path below one Editor project root. */
-export const createEditorProjectFilesystemPathsFx = Effect.fn(
-	"createEditorProjectFilesystemPathsFx",
-)(function* (projectRoot: string) {
+export const createProjectPathsFx = Effect.fn("createProjectPathsFx")(function* (
+	projectRoot: string,
+) {
 	const path = yield* Path.Path;
 	const root = path.resolve(projectRoot);
 	const items = path.join(root, "items");
@@ -23,24 +23,25 @@ export const createEditorProjectFilesystemPathsFx = Effect.fn(
 	const versions = path.join(root, "versions");
 	const objects = path.join(root, "objects");
 
-	const readResourceFileFx = Effect.fn("EditorProjectFilesystemPaths.readResourceFileFx")(
-		function* (directory: string, resourceId: string) {
-			if (
-				path.basename(resourceId) !== resourceId ||
-				resourceId.includes("\\") ||
-				resourceId.includes("\0") ||
-				resourceId === "." ||
-				resourceId === ".."
-			) {
-				return yield* Effect.fail(
-					new Error(
-						`Resource ${JSON.stringify(resourceId)} cannot be represented by a PNG filename.`,
-					),
-				);
-			}
-			return path.join(directory, `${resourceId}.png`);
-		},
-	);
+	const readResourceFileFx = Effect.fn("ProjectPaths.readResourceFileFx")(function* (
+		directory: string,
+		resourceId: string,
+	) {
+		if (
+			path.basename(resourceId) !== resourceId ||
+			resourceId.includes("\\") ||
+			resourceId.includes("\0") ||
+			resourceId === "." ||
+			resourceId === ".."
+		) {
+			return yield* Effect.fail(
+				new Error(
+					`Resource ${JSON.stringify(resourceId)} cannot be represented by a PNG filename.`,
+				),
+			);
+		}
+		return path.join(directory, `${resourceId}.png`);
+	});
 
 	return {
 		root,
@@ -75,5 +76,5 @@ export const createEditorProjectFilesystemPathsFx = Effect.fn(
 			Effect.succeed(path.join(versions, encodeFileStem(versionId), "manifest.json")),
 		jsonObjectFileFx: (hash) => Effect.succeed(path.join(objects, `${hash}.json`)),
 		pngObjectFileFx: (hash) => Effect.succeed(path.join(objects, `${hash}.png`)),
-	} satisfies EditorProjectFilesystemPaths;
+	} satisfies ProjectPaths;
 });

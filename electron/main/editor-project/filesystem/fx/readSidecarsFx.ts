@@ -2,7 +2,7 @@ import { Buffer } from "node:buffer";
 import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
-import type { EditorProjectFilesystemPaths } from "../EditorProjectFilesystemPaths";
+import type { ProjectPaths } from "../ProjectPaths";
 import { EditorBoardScenarioSchema } from "~/editor/board/EditorBoardScenarioSchema";
 import { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
 import { EditorProjectNoteFileSchema } from "~/editor/filesystem/EditorProjectNoteFileSchema";
@@ -49,7 +49,7 @@ export const readSidecarsFx = Effect.fn("readSidecarsFx")(function* ({
 	paths,
 	projectId,
 }: {
-	readonly paths: EditorProjectFilesystemPaths;
+	readonly paths: ProjectPaths;
 	readonly projectId: string;
 }) {
 	const path = yield* Path.Path;

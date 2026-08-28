@@ -4,7 +4,7 @@ import type { EditorObjectHashSchema } from "~/editor/filesystem/EditorObjectHas
 import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 
 /** Complete path grammar below one portable Editor project root. */
-export interface EditorProjectFilesystemPaths {
+export interface ProjectPaths {
 	readonly root: string;
 	readonly build: string;
 	readonly gitignoreFile: string;

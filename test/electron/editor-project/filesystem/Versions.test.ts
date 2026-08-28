@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 import type { ProjectState } from "../../../../electron/main/editor-project/filesystem/ProjectState";
-import { createEditorProjectFilesystemPathsFx } from "../../../../electron/main/editor-project/filesystem/createEditorProjectFilesystemPathsFx";
+import { createProjectPathsFx } from "../../../../electron/main/editor-project/filesystem/createProjectPathsFx";
 import { createVersionOperationsFx } from "../../../../electron/main/editor-project/filesystem/fx/createVersionOperationsFx";
 import { readProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/readProjectFilesFx";
 import { readVersionHistoryFx } from "../../../../electron/main/editor-project/filesystem/fx/readVersionHistoryFx";
@@ -54,7 +54,7 @@ describe("filesystem Editor project versions", () => {
 		});
 		const result = await Effect.runPromise(
 			Effect.gen(function* () {
-				const paths = yield* createEditorProjectFilesystemPathsFx(root);
+				const paths = yield* createProjectPathsFx(root);
 				const filesystemWrite = yield* createFilesystemWriteFx();
 				const writeJsonFx = (target: string, value: unknown) =>
 					filesystemWrite.writeFileFx({

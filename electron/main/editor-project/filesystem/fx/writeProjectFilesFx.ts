@@ -14,8 +14,8 @@ import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSche
 import { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
 import { EditorVersionHeadFileSchema } from "~/editor/filesystem/EditorVersionHeadFileSchema";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
-import { createEditorProjectFilesystemPathsFx } from "../createEditorProjectFilesystemPathsFx";
-import type { EditorProjectFilesystemPaths } from "../EditorProjectFilesystemPaths";
+import { createProjectPathsFx } from "../createProjectPathsFx";
+import type { ProjectPaths } from "../ProjectPaths";
 import type { ProjectFiles } from "./ProjectFiles";
 import { addGitignoreRulesFx } from "./addGitignoreRulesFx";
 import { assertProjectFileFx } from "./assertProjectFileFx";
@@ -55,7 +55,7 @@ const addUniqueTarget = <
 };
 
 const createSnapshotFx = Effect.fn("writeProjectFilesFx.createSnapshotFx")(function* (
-	paths: EditorProjectFilesystemPaths,
+	paths: ProjectPaths,
 	files: ProjectFiles,
 ) {
 	const config = yield* Effect.try({
@@ -187,7 +187,7 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 ) {
 	const { root, next } = props;
 	const fileSystem = yield* FileSystem.FileSystem;
-	const paths = yield* createEditorProjectFilesystemPathsFx(root);
+	const paths = yield* createProjectPathsFx(root);
 	const nextSnapshot = yield* createSnapshotFx(paths, next);
 	const previousSnapshot =
 		props.previous === undefined ? undefined : yield* createSnapshotFx(paths, props.previous);

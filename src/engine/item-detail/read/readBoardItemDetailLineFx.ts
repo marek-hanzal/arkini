@@ -113,9 +113,9 @@ export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(
 			})
 		: undefined;
 	const directOutputBlock =
-		outputBlock?.kind === "direct-output-max-count" ? outputBlock : undefined;
+		outputBlock?.kind === "direct-output-capacity" ? outputBlock : undefined;
 	const downstreamOutputBlock =
-		outputBlock?.kind === "downstream-output-max-count" ? outputBlock : undefined;
+		outputBlock?.kind === "downstream-output-capacity" ? outputBlock : undefined;
 	const input = yield* readItemDetailInputsFx({
 		configured: line.input,
 		lineId: line.id,
@@ -138,7 +138,7 @@ export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(
 			? {
 					kind: "unavailable",
 					reason: {
-						kind: "direct-output-max-count",
+						kind: "direct-output-capacity",
 						itemId: directOutputBlock.itemId,
 						liveQuantity: directOutputBlock.liveQuantity,
 						reservedQuantity: directOutputBlock.reservedQuantity,
@@ -149,7 +149,7 @@ export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(
 				? {
 						kind: "unavailable",
 						reason: {
-							kind: "downstream-output-max-count",
+							kind: "downstream-output-capacity",
 							intermediateItemId: downstreamOutputBlock.intermediateItemId,
 							itemId: downstreamOutputBlock.itemId,
 							liveQuantity: downstreamOutputBlock.liveQuantity,

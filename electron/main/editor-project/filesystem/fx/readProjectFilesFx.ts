@@ -12,7 +12,7 @@ import { ItemFileSchema } from "~/engine/source/schema/ItemFileSchema";
 import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
 import { admitArkiniVersionFx } from "~/engine/version/ArkiniVersionAdmission";
 import type { GameSourceFileSchema } from "~/engine/source/schema/GameSourceFileSchema";
-import { createEditorProjectFilesystemPathsFx } from "../createEditorProjectFilesystemPathsFx";
+import { createProjectPathsFx } from "../createProjectPathsFx";
 import type { ProjectFiles } from "./ProjectFiles";
 
 const parseJsonFx = <Value>(file: string, parse: (candidate: unknown) => Value, label: string) =>
@@ -35,7 +35,7 @@ const failInvalidItemFileFx = (file: string, message: string) =>
 export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (projectRoot: string) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
-	const paths = yield* createEditorProjectFilesystemPathsFx(projectRoot);
+	const paths = yield* createProjectPathsFx(projectRoot);
 	const canonicalRoot = yield* fileSystem.realPath(paths.root);
 	const assertCanonicalPathFx = (target: string) =>
 		Effect.gen(function* () {

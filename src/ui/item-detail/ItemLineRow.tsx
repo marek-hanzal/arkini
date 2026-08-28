@@ -28,10 +28,10 @@ const ItemLineUnavailableReason = ({
 	return match(reason)
 		.with(
 			{
-				kind: "direct-output-max-count",
+				kind: "direct-output-capacity",
 			},
 			{
-				kind: "downstream-output-max-count",
+				kind: "downstream-output-capacity",
 			},
 			(limit) => (
 				<p>

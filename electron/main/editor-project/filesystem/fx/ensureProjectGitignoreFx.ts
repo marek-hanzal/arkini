@@ -1,7 +1,7 @@
 import { Effect, FileSystem } from "effect";
 
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
-import type { EditorProjectFilesystemPaths } from "../EditorProjectFilesystemPaths";
+import type { ProjectPaths } from "../ProjectPaths";
 import { addGitignoreRulesFx } from "./addGitignoreRulesFx";
 import { assertProjectFileFx } from "./assertProjectFileFx";
 
@@ -9,7 +9,7 @@ const encoder = new TextEncoder();
 
 /** Preserves the user file while ensuring the one derived project-build exclusion. */
 export const ensureProjectGitignoreFx = Effect.fn("ensureProjectGitignoreFx")(function* (
-	paths: EditorProjectFilesystemPaths,
+	paths: ProjectPaths,
 ) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const filesystemWrite = yield* createFilesystemWriteFx();

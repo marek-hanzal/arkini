@@ -1,6 +1,7 @@
-import { Effect } from "effect";
+import { Effect, type Layer } from "effect";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { blueprintConfig } from "~test/job/fx/completeJobTransitionFx.blueprint.test/config";
 
@@ -41,13 +42,15 @@ export const spawnBlueprintFx = Effect.fn("spawnBlueprintFx")(function* ({
 	});
 });
 
-export const runBlueprint = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
+export const runBlueprint = <A, E>(
+	effect: Effect.Effect<A, E, Layer.Success<ReturnType<typeof GameLayerFx>>>,
+) =>
 	Effect.runSync(
 		effect.pipe(
 			useGameFx({
 				config: blueprintConfig,
 			}),
-		) as Effect.Effect<A, E, never>,
+		),
 	);
 
 export const sourceLine = (lineId: string) => {

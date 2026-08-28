@@ -1,6 +1,7 @@
-import { Effect, Result } from "effect";
+import { Effect, type Layer, Result } from "effect";
 import { describe, expect, it } from "vitest";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import { startLineRuntimeFx } from "~/engine/job/fx/startLineRuntimeFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import { readLineRunFx } from "~/engine/line/fx/run/readLineRunFx";
@@ -514,13 +515,15 @@ export const chargesConfig = GameConfigSchema.parse({
 	},
 });
 
-export const run = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
+export const run = <A, E>(
+	effect: Effect.Effect<A, E, Layer.Success<ReturnType<typeof GameLayerFx>>>,
+) =>
 	Effect.runSync(
 		effect.pipe(
 			useGameFx({
 				config: chargesConfig,
 			}),
-		) as Effect.Effect<A, E, never>,
+		),
 	);
 
 export const board = (x: number, y = 0) => ({

@@ -1,6 +1,7 @@
-import { Effect } from "effect";
+import { Effect, type Layer } from "effect";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { craftCompletionConfig } from "~test/job/fx/completeJobTransitionFx.craft.test/config";
@@ -12,13 +13,15 @@ type CraftItemId =
 	| "craft:reserve"
 	| "craft:sink";
 
-export const runCraft = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
+export const runCraft = <A, E>(
+	effect: Effect.Effect<A, E, Layer.Success<ReturnType<typeof GameLayerFx>>>,
+) =>
 	Effect.runSync(
 		effect.pipe(
 			useGameFx({
 				config: craftCompletionConfig,
 			}),
-		) as Effect.Effect<A, E, never>,
+		),
 	);
 
 export const spawnCraftFx = Effect.fn("spawnCraftFx")(function* ({

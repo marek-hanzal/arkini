@@ -1,7 +1,8 @@
-import { Effect } from "effect";
+import { Effect, type Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import { readOwnerJobQueueFx } from "~/engine/job/read/readOwnerJobQueueFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import { checkRuntimeLocationsFx } from "~/engine/runtime/check/checkRuntimeLocationsFx";
@@ -131,13 +132,13 @@ const toolbar = (x: number) => ({
 		y: 0,
 	},
 });
-const run = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
+const run = <A, E>(effect: Effect.Effect<A, E, Layer.Success<ReturnType<typeof GameLayerFx>>>) =>
 	Effect.runSync(
 		effect.pipe(
 			useGameFx({
 				config,
 			}),
-		) as Effect.Effect<A, E, never>,
+		),
 	);
 
 describe("Toolbar engine", () => {

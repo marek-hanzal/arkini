@@ -339,7 +339,7 @@ export const ItemLineRow = forwardRef<
 								cursorIntent={pending.default ? "progress" : undefined}
 								data-ui="TileLineSetDefaultButton"
 								data-default={line.isDefault ? "true" : "false"}
-								disabled={disabled || unavailable}
+								disabled={disabled || pending.default || unavailable}
 								onClick={() => {
 									if (line.isDefault) {
 										unsetDefaultLine.run({
@@ -353,17 +353,15 @@ export const ItemLineRow = forwardRef<
 									});
 								}}
 							>
-								{pending.default
-									? "Saving…"
-									: line.isDefault
-										? "Unset default"
-										: "Set default"}
+								{line.isDefault ? "Unset default" : "Set default"}
 							</Button>
 							<PrimaryButton
 								aria-busy={pending.enqueue}
 								cursorIntent={pending.enqueue ? "progress" : undefined}
 								data-ui="TileLineEnqueueButton"
-								disabled={disabled || !line.actions.enqueue.enabled}
+								disabled={
+									disabled || pending.enqueue || !line.actions.enqueue.enabled
+								}
 								onClick={() =>
 									enqueueLine.run({
 										ownerItemId,

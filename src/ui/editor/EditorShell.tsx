@@ -190,20 +190,18 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 					</Button>
 				</Tooltip>
 				<Tooltip
-					content={exitPending ? "Exiting…" : "Exit"}
+					content="Exit"
 					placement="right"
 				>
 					<Button
 						className="size-11 min-h-0 shrink-0 border-transparent bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised"
 						data-ui="EditorExit"
-						aria-label={exitPending ? "Exiting…" : "Exit"}
+						aria-label="Exit"
 						disabled={exitPending || refresh.pending}
 						cursorIntent={exitPending ? "progress" : undefined}
 						onClick={() => void closeAndExit()}
 					>
-						<span
-							className={`${exitPending ? "icon-[lucide--loader-circle] animate-spin" : "icon-[lucide--log-out]"} size-5`}
-						/>
+						<span className="icon-[lucide--log-out] size-5" />
 					</Button>
 				</Tooltip>
 			</aside>

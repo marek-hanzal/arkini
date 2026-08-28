@@ -64,7 +64,7 @@ export const EditorAssetEdit = ({ filter, query, resourceId }: EditorAssetEdit.P
 							className="min-h-0 px-4 py-2 text-sm"
 							onClick={() => void controller.save()}
 						>
-							{controller.saving ? "Saving…" : "Save"}
+							Save
 						</PrimaryButton>
 					}
 				/>

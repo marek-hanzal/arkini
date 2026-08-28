@@ -32,10 +32,10 @@ const ItemLineInputsHeader = ({
 						className="text-xs"
 						cursorIntent={withdraw.pending ? "progress" : undefined}
 						data-ui="TileLineWithdrawButton"
-						disabled={withdraw.disabled}
+						disabled={withdraw.disabled || withdraw.pending}
 						onClick={withdraw.onClick}
 					>
-						{withdraw.pending ? "Withdrawing…" : "Withdraw"}
+						Withdraw
 					</LinkButton>
 				</motion.div>
 			)}
@@ -80,7 +80,7 @@ const MaterialInputWithdraw = ({
 				className="text-xs"
 				cursorIntent={pending ? "progress" : undefined}
 				data-ui="TileLineInputWithdrawButton"
-				disabled={disabled || !input.canWithdraw}
+				disabled={disabled || pending || !input.canWithdraw}
 				onClick={() =>
 					withdraw.run({
 						ownerItemId,
@@ -89,7 +89,7 @@ const MaterialInputWithdraw = ({
 					})
 				}
 			>
-				{pending ? "Withdrawing…" : "Withdraw"}
+				Withdraw
 			</LinkButton>
 			{error === null ? null : <p className="mt-1 text-xs text-danger">{error}</p>}
 		</div>

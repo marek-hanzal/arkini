@@ -13,19 +13,16 @@ import {
 } from "./ItemLinesTab.commands.test/fixture";
 
 describe("ItemLinesTab command boundary", () => {
-	it("keeps an engine-eligible enqueue admitted while its presentation is pending", async () => {
+	it("blocks duplicate enqueue admission while its command is pending", async () => {
 		setPendingAction("enqueue");
 		await renderLines(projection);
 		const enqueue = document.querySelector<HTMLButtonElement>(
 			'[data-ui="TileLineEnqueueButton"]',
 		);
 
-		expect(enqueue?.disabled).toBe(false);
+		expect(enqueue?.disabled).toBe(true);
 		await act(async () => enqueue?.click());
-		expect(commands.enqueue).toHaveBeenCalledWith({
-			ownerItemId: projection.itemId,
-			lineId: projection.line[0]?.lineId,
-		});
+		expect(commands.enqueue).not.toHaveBeenCalled();
 	});
 
 	it("wires save-backed default set and unset to the exact owner and line", async () => {

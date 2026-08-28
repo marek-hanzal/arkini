@@ -52,7 +52,7 @@ export const EditorProjectDeleteDialog = ({
 					data-ui="EditorProjectDeleteConfirm"
 					onClick={onConfirm}
 				>
-					{pending ? "Removing…" : "Remove project"}
+					Remove project
 				</DangerButton>
 			</div>
 		</div>

@@ -93,9 +93,7 @@ export const About = () => {
 					cursorIntent={exitPending ? "progress" : undefined}
 					disabled={exitPending}
 					onClick={requestMainMenu}
-				>
-					{exitPending ? "Returning…" : "Back"}
-				</BackButton>
+				/>
 			</div>
 		</div>
 	);

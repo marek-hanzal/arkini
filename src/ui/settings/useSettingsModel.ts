@@ -20,7 +20,6 @@ export const useSettingsModel = ({
 	const windowMode = useAtomValue(WindowModeAtom);
 	const [commandState, runCommand] = useAtom(SettingsCommandAtom);
 	const blocked = commandState.kind === "pending";
-	const exitPending = commandState.kind === "pending" && commandState.action === "exit";
 	const goBack = useCallback(() => {
 		runCommand({
 			action: "exit",
@@ -46,7 +45,6 @@ export const useSettingsModel = ({
 	return {
 		blocked,
 		cheatToolsAvailable: cheatAvailability.available,
-		exitPending,
 		status: commandState,
 		theme: appearance.theme,
 		windowMode,

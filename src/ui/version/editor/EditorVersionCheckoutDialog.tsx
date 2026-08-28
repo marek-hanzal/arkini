@@ -43,7 +43,7 @@ export const EditorVersionCheckoutDialog = ({
 					cursorIntent={pending ? "progress" : undefined}
 					onClick={onRestore}
 				>
-					{pending ? "Restoring…" : "Restore and discard"}
+					Restore and discard
 				</DangerButton>
 			</div>
 		</div>

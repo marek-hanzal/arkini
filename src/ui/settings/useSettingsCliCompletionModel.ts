@@ -52,23 +52,15 @@ export const useSettingsCliCompletionModel = ({
 			(state.kind === "error" && status === undefined) ||
 			(status?.type === "conflict" && !status.replaceable) ||
 			status?.type === "unavailable",
-		cliCompletionActionLabel: pending
-			? state.action === "install"
-				? state.status.type === "repairable"
-					? "Repairing…"
-					: "Installing…"
-				: state.action === "replace"
-					? "Replacing…"
-					: "Uninstalling…"
-			: cleanupWithoutCommand
+		cliCompletionActionLabel: cleanupWithoutCommand
+			? "Uninstall"
+			: status?.type === "installed"
 				? "Uninstall"
-				: status?.type === "installed"
-					? "Uninstall"
-					: status?.type === "repairable"
-						? "Repair"
-						: status?.type === "conflict"
-							? "Replace"
-							: "Install",
+				: status?.type === "repairable"
+					? "Repair"
+					: status?.type === "conflict"
+						? "Replace"
+						: "Install",
 		toggleCliCompletion: () =>
 			runCommand(
 				cleanupWithoutCommand || status?.type === "installed"

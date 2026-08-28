@@ -291,7 +291,7 @@ export const ItemQueueTab = ({
 										})
 									}
 								>
-									{pending ? "Clearing…" : "Clear queue"}
+									Clear queue
 								</LinkButton>
 							</motion.div>
 						)}

@@ -63,9 +63,7 @@ export const EditorBoardScenarioToolbar = ({
 					title="Save current Board state"
 					onClick={() => void controller.saveScenario()}
 				>
-					<span
-						className={`${controller.pending ? "icon-[lucide--loader-circle] animate-spin" : "icon-[lucide--save]"} size-4`}
-					/>
+					<span className="icon-[lucide--save] size-4" />
 				</Button>
 			</div>
 			<p className="truncate text-xs text-muted">{controller.message}</p>

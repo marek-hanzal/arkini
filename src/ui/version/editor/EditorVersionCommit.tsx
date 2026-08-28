@@ -81,7 +81,7 @@ export const EditorVersionCommit = () => {
 								cursorIntent={controller.pending ? "progress" : undefined}
 								onClick={controller.commit}
 							>
-								{controller.pending ? "Committing…" : "Commit version"}
+								Commit version
 							</PrimaryButton>
 						</div>
 					</div>

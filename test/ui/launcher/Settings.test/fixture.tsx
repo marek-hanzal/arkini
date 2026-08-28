@@ -21,10 +21,10 @@ import type { InstallationStatus } from "../../../../electron/contract/cli/Insta
 import type { Game } from "~/bridge/game/Game";
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
-import { SettingsPage } from "~/page/settings/SettingsPage";
-import { CommonPage } from "~/page/settings/CommonPage";
-import { DevPage } from "~/page/settings/DevPage";
-import { GamePage } from "~/page/settings/GamePage";
+import { Route as SettingsRouteDefinition } from "~/@routes/_launcher/settings";
+import { Route as CommonSettingsRouteDefinition } from "~/@routes/_launcher/settings/common";
+import { Route as DevSettingsRouteDefinition } from "~/@routes/_launcher/settings/dev";
+import { Route as GameSettingsRouteDefinition } from "~/@routes/_launcher/settings/game";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import {
@@ -32,6 +32,15 @@ import {
 	createTestRendererRuntime,
 } from "~test/support/createTestRendererRuntime";
 import { AppearanceDataset } from "~/ui/appearance/AppearanceDataset";
+
+const SettingsRoute = SettingsRouteDefinition.options.component;
+const CommonSection = CommonSettingsRouteDefinition.options.component;
+const DevSection = DevSettingsRouteDefinition.options.component;
+const GameSection = GameSettingsRouteDefinition.options.component;
+if (SettingsRoute === undefined) throw new Error("Settings route component is missing.");
+if (CommonSection === undefined) throw new Error("Common Settings route component is missing.");
+if (DevSection === undefined) throw new Error("Dev Settings route component is missing.");
+if (GameSection === undefined) throw new Error("Game Settings route component is missing.");
 
 (
 	globalThis as {
@@ -234,7 +243,7 @@ export const renderSettings = async (
 					value: registry,
 				},
 				createElement(AppearanceDataset),
-				createElement(SettingsPage),
+				createElement(SettingsRoute),
 			),
 	});
 	const settingsIndexRoute = createRoute({
@@ -250,17 +259,17 @@ export const renderSettings = async (
 	const settingsCommonRoute = createRoute({
 		getParentRoute: () => settingsRoute,
 		path: "/common",
-		component: CommonPage,
+		component: CommonSection,
 	});
 	const settingsGameRoute = createRoute({
 		getParentRoute: () => settingsRoute,
 		path: "/game",
-		component: GamePage,
+		component: GameSection,
 	});
 	const settingsDevRoute = createRoute({
 		getParentRoute: () => settingsRoute,
 		path: "/dev",
-		component: DevPage,
+		component: DevSection,
 	});
 	const mainMenuRoute = createRoute({
 		getParentRoute: () => rootRoute,

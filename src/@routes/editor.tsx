@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import { prepareEditorGameHandoffFx } from "~/bridge/game/prepareEditorGameHandoffFx";
 import { refreshEditorServiceStatusFx } from "~/bridge/editor/refreshEditorServiceStatusFx";
@@ -41,5 +41,4 @@ export const Route = createFileRoute("/editor")({
 			});
 		}
 	},
-	component: Outlet,
 });

@@ -129,8 +129,11 @@ vi.mock("~/ui/button/Button", () => ({
 		),
 }));
 
-import { EditorBuild } from "~/ui/arkpack/editor/EditorBuild";
+import { Route as EditorBuildRouteDefinition } from "~/@routes/editor/$projectId/build";
 import { useEditorBuildController } from "~/ui/arkpack/editor/useEditorBuildController";
+
+const EditorBuild = EditorBuildRouteDefinition.options.component;
+if (EditorBuild === undefined) throw new Error("Editor Build route component is missing.");
 
 (
 	globalThis as {

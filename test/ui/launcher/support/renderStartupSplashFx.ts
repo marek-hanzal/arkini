@@ -17,9 +17,12 @@ import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
 import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
 import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycleOwnerAtom";
 import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLifecycleFx";
+import { Route as StartupRouteDefinition } from "~/@routes/index";
 import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
 import { LauncherStartupConfigAtom } from "~/ui/launcher/LauncherStartupConfigAtom";
-import { StartupSplash } from "~/ui/launcher/StartupSplash";
+
+const StartupSplash = StartupRouteDefinition.options.component;
+if (StartupSplash === undefined) throw new Error("Startup route component is missing.");
 
 export namespace renderStartupSplashFx {
 	export interface Props {

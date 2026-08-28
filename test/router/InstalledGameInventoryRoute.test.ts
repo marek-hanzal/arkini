@@ -4,7 +4,7 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { InventoryPage } from "~/page/game/InventoryPage";
+import { Route as GameInventoryRouteDefinition } from "~/@routes/game/$packageId/_scene/inventory";
 
 (
 	globalThis as {
@@ -19,13 +19,18 @@ const pageState = vi.hoisted(() => ({
 }));
 
 vi.mock("@tanstack/react-router", () => ({
-	getRouteApi: () => ({
+	createFileRoute: () => (options: object) => ({
+		options,
 		useParams: () => ({
 			packageId: "package-inventory-page",
 		}),
 	}),
 	useNavigate: () => pageState.navigate,
 }));
+
+const GameInventoryRoute = GameInventoryRouteDefinition.options.component;
+if (GameInventoryRoute === undefined)
+	throw new Error("Installed Game Inventory route component is missing.");
 
 vi.mock("~/ui/game-menu/useGameMenuControl", () => ({
 	useGameMenuControl: () => ({
@@ -57,12 +62,12 @@ vi.mock("~/ui/inventory/Inventory", async () => {
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
-const renderPage = async () => {
+const renderRoute = async () => {
 	const host = document.createElement("div");
 	document.body.append(host);
 	const root = createRoot(host);
 	roots.push(root);
-	await act(async () => root.render(createElement(InventoryPage)));
+	await act(async () => root.render(createElement(GameInventoryRoute)));
 	return host;
 };
 
@@ -76,9 +81,9 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-describe("InventoryPage", () => {
+describe("installed Game Inventory route", () => {
 	it("returns the close button and unclaimed navigation keys deterministically to the Board", async () => {
-		const host = await renderPage();
+		const host = await renderRoute();
 		const close = host.querySelector<HTMLButtonElement>('[data-ui="InventoryRouteClose"]');
 		if (close === null) throw new Error("Inventory close control is missing.");
 
@@ -113,7 +118,7 @@ describe("InventoryPage", () => {
 
 	it("leaves navigation keys to higher-priority Game Menu and Item Detail owners", async () => {
 		pageState.detailOpen = true;
-		await renderPage();
+		await renderRoute();
 		const detailEscape = new KeyboardEvent("keydown", {
 			cancelable: true,
 			key: "Escape",
@@ -133,7 +138,7 @@ describe("InventoryPage", () => {
 		await act(async () => root.unmount());
 		pageState.detailOpen = false;
 		pageState.menuOpen = true;
-		await renderPage();
+		await renderRoute();
 		const menuEscape = new KeyboardEvent("keydown", {
 			cancelable: true,
 			key: "Escape",
@@ -150,7 +155,7 @@ describe("InventoryPage", () => {
 	});
 
 	it("does not hijack modified, repeated, or editable i key input", async () => {
-		const host = await renderPage();
+		const host = await renderRoute();
 		const input = document.createElement("input");
 		host.append(input);
 

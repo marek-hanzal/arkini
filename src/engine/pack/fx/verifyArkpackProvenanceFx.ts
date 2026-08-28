@@ -5,7 +5,7 @@ import { toSignedEntity, toTrustMaterial, Verifier } from "@sigstore/verify";
 import { KeyObject, verify as verifyNodeSignature } from "node:crypto";
 import { Effect } from "effect";
 
-import { ArkiniReleaseIdentity } from "~/engine/pack/ArkiniReleaseIdentity";
+import { ArkpackDistributionChannel } from "~/engine/pack/ArkpackDistributionChannel";
 import type { ArkpackProvenanceSchema } from "~/engine/pack/schema/ArkpackProvenanceSchema";
 import trustedRootJson from "~/engine/pack/trusted-root.json";
 import { decodeArkpackEnvelopeFx } from "./decodeArkpackEnvelopeFx";
@@ -17,10 +17,10 @@ export namespace verifyArkpackProvenanceFx {
 }
 
 export const createArkpackProvenanceVerifier = ({
-	identity,
+	channel,
 	trustedRoot,
 }: {
-	readonly identity: {
+	readonly channel: {
 		readonly issuer: string;
 		readonly subjectAlternativeName: RegExp;
 	};
@@ -45,9 +45,9 @@ export const createArkpackProvenanceVerifier = ({
 		};
 		try {
 			return verifier.verify(entity, {
-				subjectAlternativeName: identity.subjectAlternativeName,
+				subjectAlternativeName: channel.subjectAlternativeName,
 				extensions: {
-					issuer: identity.issuer,
+					issuer: channel.issuer,
 				},
 			});
 		} finally {
@@ -79,7 +79,7 @@ export const createArkpackProvenanceVerifier = ({
 };
 
 const verifyReleaseProvenance = createArkpackProvenanceVerifier({
-	identity: ArkiniReleaseIdentity,
+	channel: ArkpackDistributionChannel,
 	trustedRoot: trustedRootJson,
 });
 

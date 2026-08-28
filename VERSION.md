@@ -19,7 +19,7 @@ Every persisted Arkini writer stamp records the complete release version, includ
 - minor/patch must never select a parser, migration, fallback, or conditional data path;
 - version admission never bypasses strict validation, semantic invariants, integrity, or provenance checks.
 
-Reader compatibility and release provenance deliberately use the version differently. Reader admission compares only the major, while an Official proof must bind the exact complete current build version, including prerelease suffix. Exact-version proof matching never selects a parser or rejects otherwise valid Community gameplay.
+Reader compatibility and release provenance are independent. Reader admission compares only the major. Official provenance instead binds the signed payload to the distribution channel configured in the reading application; the writer's full version or release tag never changes trust and never selects a parser or rejects otherwise valid Community gameplay.
 
 Project-owned gameplay version uses `<major>.<minor>` and is a separate authority. A save/scenario and its Arkpack are compatible when their gameplay majors match; minor ordering cannot reject data or choose another reader. Writers always stamp current complete provenance.
 
@@ -77,8 +77,8 @@ Preferences are individual strictly validated scalar JSON files and need no enve
 
 Provenance is soft and independent from schema, semantic validation, integrity admission, compatibility, package identity, location, and user overrides:
 
-- `Official`: the embedded Sigstore proof offline-validates the exact inner gameplay payload for the issuer, exact repository workflow, and exact full version embedded in this Arkini build.
-- `Community`: that proof is absent or fails—for local/Editor/manual builds, changed payload bytes, malformed proof, another full version, or another repository/workflow.
+- `Official`: the embedded Sigstore proof offline-validates the exact inner gameplay payload for the configured distribution channel: its issuer and exact repository workflow identity. Any release produced by that channel remains Official across older and newer application versions.
+- `Community`: that proof is absent or fails—for local/Editor/manual builds, changed payload bytes, malformed proof, or another issuer/repository/workflow channel.
 
 Both states are playable. Provenance is a label, not an anti-tampering or content-admission system. A structurally invalid payload still fails normal loading; proof failure alone never does.
 
@@ -86,7 +86,7 @@ The one `.arkpack` is the complete distributable artifact. Its proof is optional
 
 The one tag workflow receives a short-lived OIDC identity, uses Sigstore Fulcio/Rekor transparency proofs, builds and signs the canonical Arkpack once, and verifies it as Official before packaging. Prerelease tags first repeat the hosted branch gates: the complete repository gate on Linux and focused operating-system boundary gates on macOS and Windows. Stable tags deliberately skip checks. Every platform receives and embeds the same final Arkpack bytes. There is no stored signing key, signing secret, local key generation, developer mode, or standalone signing command. Local `argc build` and every Editor build remain Community.
 
-Load and `arkini-cli arkpack verify <file>` classify the single file offline. Verification checks payload digest/signature, Fulcio chain and certificate-transparency proof, Rekor proof, issuer, exact repository workflow identity, and `refs/tags/v<full current version>` against the embedded [`src/engine/pack/trusted-root.json`](src/engine/pack/trusted-root.json). Failure becomes Community, never a load rejection.
+Load and `arkini-cli arkpack verify <file>` classify the single file offline. Verification checks payload digest/signature, Fulcio chain and certificate-transparency proof, Rekor proof, issuer, and exact repository workflow identity against the embedded [`src/engine/pack/trusted-root.json`](src/engine/pack/trusted-root.json). The certificate's workflow ref and the application's version are not channel identity. Failure becomes Community, never a load rejection.
 
 Refresh a future embedded root through the deliberate networked maintenance command:
 
@@ -94,4 +94,4 @@ Refresh a future embedded root through the deliberate networked maintenance comm
 argc signing:update-trusted-root
 ```
 
-Root rotation reaches users only in an Arkini application update. A fork derives and embeds its own repository/workflow authority; it does not inherit upstream trust.
+Root rotation reaches users only in an Arkini application update. A fork derives and embeds its own issuer/repository/workflow channel; every build configured for that channel accepts its valid proofs across release versions and does not inherit upstream trust.

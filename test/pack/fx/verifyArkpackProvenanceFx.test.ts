@@ -1,43 +1,67 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { createArkiniReleaseIdentity } from "~/engine/pack/ArkiniReleaseIdentity";
+import { createArkpackDistributionChannelFx } from "~/engine/pack/fx/createArkpackDistributionChannelFx";
 import { encodeArkpackEnvelopeFx } from "~/engine/pack/fx/encodeArkpackEnvelopeFx";
 import { createArkpackProvenanceVerifier } from "~/engine/pack/fx/verifyArkpackProvenanceFx";
 import { readArkpackContentHashFx } from "~/engine/pack/fx/readArkpackContentHashFx";
 import { createTestSigstore } from "./verifyArkpackProvenanceFx.test/createTestSigstore";
 
 const payload = new TextEncoder().encode("deterministic compressed gameplay");
-const identity = "https://github.com/marek-hanzal/arkini/.github/workflows/release.yml";
-const version = "0.5.0-dev.550.1";
-const subject = `${identity}@refs/tags/v${version}`;
+const workflow = "https://github.com/marek-hanzal/arkini/.github/workflows/release.yml";
+const issuer = "https://token.actions.githubusercontent.com";
+const channel = Effect.runSync(
+	createArkpackDistributionChannelFx({
+		issuer,
+		workflow,
+	}),
+);
 
 describe("Arkpack release provenance", () => {
-	it("proves only the exact payload, repository workflow, and full build version", async () => {
+	it("accepts older and newer release proofs from the configured distribution channel", async () => {
 		const sigstore = await createTestSigstore();
 		const verify = createArkpackProvenanceVerifier({
-			identity: createArkiniReleaseIdentity({
-				identity,
-				issuer: "https://token.actions.githubusercontent.com",
-				version,
-			}),
+			channel,
 			trustedRoot: sigstore.trustedRoot,
 		});
-		const proof = await sigstore.sign(payload, subject);
-		const official = await Effect.runPromise(
+		const olderProof = await sigstore.sign(payload, `${workflow}@refs/tags/v0.4.9`);
+		const olderRelease = await Effect.runPromise(
 			encodeArkpackEnvelopeFx({
 				payload,
-				proof: new TextEncoder().encode(JSON.stringify(proof)),
+				proof: new TextEncoder().encode(JSON.stringify(olderProof)),
 			}),
 		);
-		const otherVersionProof = await sigstore.sign(
-			payload,
-			`${identity}@refs/tags/v0.5.0-dev.550.2`,
-		);
-		const otherVersion = await Effect.runPromise(
+		const newerProof = await sigstore.sign(payload, `${workflow}@refs/tags/v0.6.0-dev.1`);
+		const newerRelease = await Effect.runPromise(
 			encodeArkpackEnvelopeFx({
 				payload,
-				proof: new TextEncoder().encode(JSON.stringify(otherVersionProof)),
+				proof: new TextEncoder().encode(JSON.stringify(newerProof)),
+			}),
+		);
+
+		expect(verify(olderRelease)).toEqual({
+			type: "official",
+		});
+		expect(verify(newerRelease)).toEqual({
+			type: "official",
+		});
+	});
+
+	it("keeps foreign-channel and changed-payload proofs Community", async () => {
+		const sigstore = await createTestSigstore();
+		const verify = createArkpackProvenanceVerifier({
+			channel,
+			trustedRoot: sigstore.trustedRoot,
+		});
+		const proof = await sigstore.sign(payload, `${workflow}@refs/tags/v0.5.0`);
+		const foreignProof = await sigstore.sign(
+			payload,
+			"https://github.com/pepa/arkini/.github/workflows/release.yml@refs/tags/v9.0.0",
+		);
+		const foreignChannel = await Effect.runPromise(
+			encodeArkpackEnvelopeFx({
+				payload,
+				proof: new TextEncoder().encode(JSON.stringify(foreignProof)),
 			}),
 		);
 		const changedPayload = payload.slice();
@@ -49,10 +73,7 @@ describe("Arkpack release provenance", () => {
 			}),
 		);
 
-		expect(verify(official)).toEqual({
-			type: "official",
-		});
-		expect(verify(otherVersion)).toEqual({
+		expect(verify(foreignChannel)).toEqual({
 			type: "community",
 		});
 		expect(verify(changed)).toEqual({
@@ -63,11 +84,7 @@ describe("Arkpack release provenance", () => {
 	it("keeps missing or malformed proof Community without changing gameplay identity", async () => {
 		const sigstore = await createTestSigstore();
 		const verify = createArkpackProvenanceVerifier({
-			identity: createArkiniReleaseIdentity({
-				identity,
-				issuer: "https://token.actions.githubusercontent.com",
-				version,
-			}),
+			channel,
 			trustedRoot: sigstore.trustedRoot,
 		});
 		const unsigned = await Effect.runPromise(

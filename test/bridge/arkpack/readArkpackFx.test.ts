@@ -106,20 +106,37 @@ describe("readArkpackFx", () => {
 		expect(first.payload.config).toEqual(testArkpackConfig);
 	});
 
-	it("preserves provenance independently of payload validation", async () => {
-		const loaded = await Effect.runPromise(
-			readArkpackFx({
-				bytes: createTestArkpack(),
-				provenance: {
-					type: "official",
-				},
-				source: "user",
-			}),
-		);
+	it("keeps provenance classification independent from normal data admission", async () => {
+		const bytes = createTestArkpack();
+		const [official, community] = await Promise.all([
+			Effect.runPromise(
+				readArkpackFx({
+					bytes,
+					provenance: {
+						type: "official",
+					},
+					source: "user",
+				}),
+			),
+			Effect.runPromise(
+				readArkpackFx({
+					bytes,
+					provenance: {
+						type: "community",
+					},
+					source: "user",
+				}),
+			),
+		]);
 
-		expect(loaded.descriptor.provenance).toEqual({
+		expect(official.descriptor.provenance).toEqual({
 			type: "official",
 		});
+		expect(community.descriptor.provenance).toEqual({
+			type: "community",
+		});
+		expect(official.payload).toEqual(community.payload);
+		expect(official.descriptor.contentHash).toBe(community.descriptor.contentHash);
 	});
 
 	it("plays valid gameplay with malformed or oversized proof bytes", async () => {

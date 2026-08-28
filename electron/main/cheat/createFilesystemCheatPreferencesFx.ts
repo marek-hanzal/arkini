@@ -22,17 +22,16 @@ export const createFilesystemCheatPreferencesFx = Effect.fn("createFilesystemChe
 		const filesystemWrite = yield* createFilesystemWriteFx().pipe(
 			Effect.provideService(FileSystem.FileSystem, fileSystem),
 		);
-		const writeAvailableFx: CheatPreferences["writeAvailableFx"] = Effect.fn(
-			"FilesystemCheatPreferences.writeAvailableFx",
-		)((available) =>
-			writeElectronPreferenceFx({
-				filesystemWrite,
-				lock: join(root, ".cheats-available.lock"),
-				target: currentPath,
-				value: available,
-				operation: "persist the cheat availability preference",
-				serialize: (value) => JSON.stringify(CheatAvailabilitySchema.parse(value)),
-			}),
+		const writeAvailableFx = Effect.fn("FilesystemCheatPreferences.writeAvailableFx")(
+			(available: CheatAvailabilitySchema.Type) =>
+				writeElectronPreferenceFx({
+					filesystemWrite,
+					lock: join(root, ".cheats-available.lock"),
+					target: currentPath,
+					value: available,
+					operation: "persist the cheat availability preference",
+					serialize: (value) => JSON.stringify(CheatAvailabilitySchema.parse(value)),
+				}),
 		);
 		return {
 			readAvailableFx: readElectronPreferenceFx({

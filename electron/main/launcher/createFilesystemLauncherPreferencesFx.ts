@@ -26,17 +26,16 @@ export const createFilesystemLauncherPreferencesFx = Effect.fn(
 	const filesystemWrite = yield* createFilesystemWriteFx().pipe(
 		Effect.provideService(FileSystem.FileSystem, fileSystem),
 	);
-	const writeLastPackageIdFx: LauncherPreferences["writeLastPackageIdFx"] = Effect.fn(
-		"FilesystemLauncherPreferences.writeLastPackageIdFx",
-	)((packageId) =>
-		writeElectronPreferenceFx({
-			filesystemWrite,
-			lock: join(root, ".launcher-last-package.lock"),
-			target: currentPath,
-			value: packageId,
-			operation: "persist the last package preference",
-			serialize: (value) => JSON.stringify(LastPackageIdSchema.parse(value)),
-		}),
+	const writeLastPackageIdFx = Effect.fn("FilesystemLauncherPreferences.writeLastPackageIdFx")(
+		(packageId: LastPackageIdSchema.Type) =>
+			writeElectronPreferenceFx({
+				filesystemWrite,
+				lock: join(root, ".launcher-last-package.lock"),
+				target: currentPath,
+				value: packageId,
+				operation: "persist the last package preference",
+				serialize: (value) => JSON.stringify(LastPackageIdSchema.parse(value)),
+			}),
 	);
 	return {
 		readLastPackageIdFx: readElectronPreferenceFx({

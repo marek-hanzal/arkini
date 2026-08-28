@@ -2,13 +2,26 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import { RuleTypeSchema } from "~/engine/action/schema/RuleTypeSchema";
-import type {
-	ActionRuleDisableResultSchema,
-	ActionRuleEnableResultSchema,
-} from "~/engine/action/schema/ActionRuleResultSchema";
 import type { RuleSchema } from "~/engine/action/schema/RuleSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { whenFx } from "~/engine/when/fx/whenFx";
+
+export namespace resolveActionRuleFx {
+	interface BaseResult {
+		readonly active: boolean;
+		readonly failedWhenIndex?: number;
+	}
+
+	export interface EnableResult extends BaseResult {
+		readonly type: "enable";
+	}
+
+	export interface DisableResult extends BaseResult {
+		readonly type: "disable";
+	}
+
+	export type Result = EnableResult | DisableResult;
+}
 
 /** Evaluates one immediate-action availability rule from a real visible origin. */
 export const resolveActionRuleFx = Effect.fn("resolveActionRuleFx")(function* ({
@@ -45,7 +58,7 @@ export const resolveActionRuleFx = Effect.fn("resolveActionRuleFx")(function* ({
 							: {
 									failedWhenIndex,
 								}),
-					} satisfies ActionRuleEnableResultSchema.Type;
+					} satisfies resolveActionRuleFx.EnableResult;
 				}),
 		)
 		.with(
@@ -69,7 +82,7 @@ export const resolveActionRuleFx = Effect.fn("resolveActionRuleFx")(function* ({
 					return {
 						active,
 						type: rule.type,
-					} satisfies ActionRuleDisableResultSchema.Type;
+					} satisfies resolveActionRuleFx.DisableResult;
 				}),
 		)
 		.exhaustive();

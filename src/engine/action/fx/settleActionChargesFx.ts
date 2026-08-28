@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
-import type { InputChargeRunPlanSchema } from "~/engine/input/schema/run/InputChargeRunPlanSchema";
+import type { InputRun } from "~/engine/input/InputRun";
 import { readItemRemainingChargesFx } from "~/engine/item/fx/readItemRemainingChargesFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -23,7 +23,7 @@ export const settleActionChargesFx = Effect.fn("settleActionChargesFx")(function
 	runtime,
 }: {
 	actionId: IdSchema.Type;
-	charges: ReadonlyArray<InputChargeRunPlanSchema.Type>;
+	charges: ReadonlyArray<InputRun.ChargePlan>;
 	ownerItemId: IdSchema.Type;
 	runtime: RuntimeSchema.Type;
 }) {

@@ -163,21 +163,10 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				config: canonicalConfig,
 				resources,
 			},
-			previousScenarioNames: state.scenarios.map(({ name }) => name),
-			...(compatibility.result === "major"
-				? {
-						scenarios: [],
-					}
-				: {}),
 		});
 		states.set(state.project.projectId, {
 			...state,
 			project: nextProject,
-			...(compatibility.result === "major"
-				? {
-						scenarios: [],
-					}
-				: {}),
 		});
 		return cloneProject(nextProject);
 	});

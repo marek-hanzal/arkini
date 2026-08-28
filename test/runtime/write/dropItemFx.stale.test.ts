@@ -3,9 +3,9 @@ import { Effect } from "effect";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
-import { DropItemIgnoredReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemIgnoredReasonEnumSchema";
-import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
+import { DropItemIgnoredReason } from "~/engine/runtime/DropItemResult";
+import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
 
 import { emptyLocation, occupiedLocation, run, sourceLocation } from "./dropItemFx.test/fixture";
 
@@ -42,8 +42,8 @@ describe("dropItemFx / stale and ignored identity", () => {
 		);
 
 		expect(result.outcome).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.Ignored,
-			reason: DropItemIgnoredReasonEnumSchema.enum.SameLocation,
+			kind: DropItemResultKind.Ignored,
+			reason: DropItemIgnoredReason.SameLocation,
 			itemId: "runtime:water",
 			location: sourceLocation,
 		});
@@ -80,8 +80,8 @@ describe("dropItemFx / stale and ignored identity", () => {
 		);
 
 		expect(result.outcome).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.Reject,
-			reason: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+			kind: DropItemResultKind.Reject,
+			reason: DropItemRejectedReason.StaleSource,
 			itemId: "runtime:water",
 		});
 		expect(result.runtime.items).toEqual([
@@ -126,8 +126,8 @@ describe("dropItemFx / stale and ignored identity", () => {
 		);
 
 		expect(result.outcome).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.Reject,
-			reason: DropItemRejectedReasonEnumSchema.enum.StaleTarget,
+			kind: DropItemResultKind.Reject,
+			reason: DropItemRejectedReason.StaleTarget,
 			itemId: "runtime:water",
 			targetItemId: "runtime:stone",
 		});

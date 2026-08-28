@@ -29,9 +29,10 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 							Arkpack.
 						</p>
 						<p className="mt-1 text-xs text-subtle">
-							Arkpack v{controller.project.version}. Compatible edits keep saves and
-							Board scenarios; a major project save permanently deletes its scenarios
-							and existing published game saves remain stored but cannot be restored.
+							Arkpack v{controller.project.version}. Board scenarios remain stored
+							across project updates. A major save makes older scenarios and published
+							game saves incompatible with the new gameplay version without deleting
+							them.
 						</p>
 					</div>
 				</header>

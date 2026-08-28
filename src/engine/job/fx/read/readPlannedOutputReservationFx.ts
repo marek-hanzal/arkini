@@ -5,7 +5,7 @@ import { ModeSchema } from "~/engine/input/schema/ModeSchema";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import { readItemRemainingChargesFx } from "~/engine/item/fx/readItemRemainingChargesFx";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
-import type { LineRunPlanSchema } from "~/engine/line/schema/run/LineRunPlanSchema";
+import type { LineRun } from "~/engine/line/LineRun";
 import { readOutputMaximumQuantitiesFx } from "~/engine/output/fx/readOutputMaximumQuantitiesFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -16,7 +16,7 @@ import { clampOutputReservationFx } from "./clampOutputReservationFx";
 export namespace readPlannedOutputReservationFx {
 	export interface Props {
 		readonly line: LineSchema.Type;
-		readonly plan: LineRunPlanSchema.Type;
+		readonly plan: LineRun.Plan;
 		readonly runtime: RuntimeSchema.Type;
 	}
 }

@@ -1,13 +1,12 @@
 import { Effect } from "effect";
 
+import type { InputRun } from "~/engine/input/InputRun";
 import type { SimpleSchema } from "~/engine/input/schema/SimpleSchema";
-import type { InputChargeRunPlanSchema } from "~/engine/input/schema/run/InputChargeRunPlanSchema";
-import type { InputSimpleRunPlanSchema } from "~/engine/input/schema/run/InputSimpleRunPlanSchema";
 
 export namespace planInputSimpleRunFx {
 	export interface Props {
 		input: SimpleSchema.Type;
-		charges?: InputChargeRunPlanSchema.Type;
+		charges?: InputRun.ChargePlan;
 	}
 }
 
@@ -21,5 +20,5 @@ export const planInputSimpleRunFx = Effect.fn("planInputSimpleRunFx")(function* 
 	return {
 		type: input.type,
 		charges,
-	} satisfies InputSimpleRunPlanSchema.Type;
+	} satisfies InputRun.SimplePlan;
 });

@@ -4,14 +4,21 @@ import { resolveActionEnableFx } from "~/engine/action/fx/resolveActionEnableFx"
 import { resolveActionInputFx } from "~/engine/action/fx/resolveActionInputFx";
 import { resolveActionRulesFx } from "~/engine/action/fx/resolveActionRulesFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { InputChargeRunPlanSchema } from "~/engine/input/schema/run/InputChargeRunPlanSchema";
+import type { InputRun } from "~/engine/input/InputRun";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBoardOperationError";
 import { SpaceActionUnavailableError } from "~/engine/space/error/SpaceActionUnavailableError";
-import type { SpaceActionPlanSchema } from "~/engine/space/schema/SpaceActionPlanSchema";
+
+export namespace resolveSpaceActionFx {
+	export interface Plan {
+		readonly ownerItemId: IdSchema.Type;
+		readonly space: number;
+		readonly charges: ReadonlyArray<InputRun.ChargePlan>;
+	}
+}
 
 /** Resolves one Space activation against a single read-only runtime snapshot. */
 export const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* ({
@@ -59,7 +66,7 @@ export const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* 
 	}
 
 	const reservedCharges = new Map<IdSchema.Type, number>();
-	const charges: InputChargeRunPlanSchema.Type[] = [];
+	const charges: InputRun.ChargePlan[] = [];
 	for (const input of owner.item.input) {
 		const resolution = yield* resolveActionInputFx({
 			input,
@@ -88,5 +95,5 @@ export const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* 
 		ownerItemId: owner.id,
 		space: owner.item.space,
 		charges,
-	} satisfies SpaceActionPlanSchema.Type;
+	} satisfies resolveSpaceActionFx.Plan;
 });

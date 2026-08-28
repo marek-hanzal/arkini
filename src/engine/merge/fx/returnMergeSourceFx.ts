@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
-import type { DropResultSchema } from "~/engine/output/schema/DropResultSchema";
+import type { dropFx } from "~/engine/output/fx/dropFx";
 import { applyPlacementPlanFx } from "~/engine/placement/fx/applyPlacementPlanFx";
 import { planDropPlacementFx } from "~/engine/placement/fx/planDropPlacementFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -9,7 +9,7 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 export namespace returnMergeSourceFx {
 	export interface Props {
 		origin: BoardLocationSchema.Type;
-		returnDrop?: DropResultSchema.Type;
+		returnDrop?: dropFx.Result;
 		runtime: RuntimeSchema.Type;
 	}
 }

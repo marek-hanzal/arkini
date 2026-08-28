@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 
-import type { PlacementPlanSchema } from "~/engine/placement/schema/PlacementPlanSchema";
+import type { PlacementPlan } from "~/engine/placement/PlacementPlan";
 
 export namespace mergePlacementPlansFx {
 	export interface Props {
-		plans: ReadonlyArray<PlacementPlanSchema.Type>;
+		plans: ReadonlyArray<PlacementPlan>;
 	}
 }
 
@@ -18,5 +18,5 @@ export const mergePlacementPlansFx = Effect.fn("mergePlacementPlansFx")(function
 		remove: plans.flatMap((plan) => plan.remove),
 		spawn: plans.flatMap((plan) => plan.spawn),
 		stack: plans.flatMap((plan) => plan.stack),
-	} satisfies PlacementPlanSchema.Type;
+	} satisfies PlacementPlan;
 });

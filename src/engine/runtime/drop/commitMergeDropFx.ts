@@ -7,9 +7,9 @@ import { makeDropActorRejectedResultFx } from "~/engine/runtime/drop/makeDropAct
 import { makeDropRejectedResultFx } from "~/engine/runtime/drop/makeDropRejectedResultFx";
 import { projectDropActorCurrentFx } from "~/engine/runtime/drop/projectDropActorCurrentFx";
 import { projectDropTransferActorFx } from "~/engine/runtime/drop/projectDropTransferActorFx";
-import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
-import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
-import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
+import type { DropItemResult } from "~/engine/runtime/DropItemResult";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 
 export namespace commitMergeDropFx {
 	export interface Props {
@@ -19,7 +19,7 @@ export namespace commitMergeDropFx {
 		readonly targetRevision: RevisionSchema.Type;
 	}
 
-	export type Result = DropItemResultSchema.Type;
+	export type Result = DropItemResult;
 }
 
 /** Commits one exact authored merge and normalizes both actor identities. */
@@ -31,7 +31,7 @@ export const commitMergeDropFx = Effect.fn("commitMergeDropFx")(function* ({
 }: commitMergeDropFx.Props) {
 	const rejectBlockedFx = () =>
 		makeDropRejectedResultFx({
-			reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
+			reason: DropItemRejectedReason.Blocked,
 			sourceItemId,
 			targetItemId,
 		});
@@ -50,7 +50,7 @@ export const commitMergeDropFx = Effect.fn("commitMergeDropFx")(function* ({
 				});
 
 				return {
-					kind: DropItemResultKindEnumSchema.enum.Merge,
+					kind: DropItemResultKind.Merge,
 					action: result.event.action,
 					effect: result.event.effect,
 					resultCanonicalItemId: result.event.resultCanonicalItemId,
@@ -82,25 +82,25 @@ export const commitMergeDropFx = Effect.fn("commitMergeDropFx")(function* ({
 				}),
 			ItemNotOnGridError: () =>
 				makeDropRejectedResultFx({
-					reason: DropItemRejectedReasonEnumSchema.enum.InvalidSource,
+					reason: DropItemRejectedReason.InvalidSource,
 					sourceItemId,
 					targetItemId,
 				}),
 			ItemNotOnBoardError: () =>
 				makeDropRejectedResultFx({
-					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+					reason: DropItemRejectedReason.InvalidTarget,
 					sourceItemId,
 					targetItemId,
 				}),
 			CrossSpaceBoardOperationError: () =>
 				makeDropRejectedResultFx({
-					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+					reason: DropItemRejectedReason.InvalidTarget,
 					sourceItemId,
 					targetItemId,
 				}),
 			MergeRuleNotFoundError: () =>
 				makeDropRejectedResultFx({
-					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+					reason: DropItemRejectedReason.InvalidTarget,
 					sourceItemId,
 					targetItemId,
 				}),

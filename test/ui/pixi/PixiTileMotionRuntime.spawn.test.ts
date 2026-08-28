@@ -6,8 +6,8 @@ import { describe, expect, it, vi } from "vitest";
 import {
 	pixiTileActorLifecycleDurationMs,
 	pixiTileActorLifecycleReducedScale,
-} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
-import { finalizePixiTileMotionActorsFx } from "~/ui/pixi/motion/finalizePixiTileMotionActorsFx";
+} from "~/ui/pixi/animation/runActorLifecycleFx";
+import { finalizeMotionActorsFx } from "~/ui/pixi/motion/finalizeMotionActorsFx";
 
 import {
 	createActorMap,
@@ -89,7 +89,7 @@ describe("Pixi spawn lifecycle", () => {
 		const exitingActors = new Set<PixiTileActor>();
 
 		Effect.runSync(
-			finalizePixiTileMotionActorsFx({
+			finalizeMotionActorsFx({
 				actorIds: new Set([
 					actor.item.id,
 				]),

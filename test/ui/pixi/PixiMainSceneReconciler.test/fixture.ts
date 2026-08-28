@@ -10,7 +10,7 @@ import { Container, Graphics, Particle, ParticleContainer, Texture } from "pixi.
 
 import { Effect } from "effect";
 
-import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
+import { destroyTileActorFx } from "~/ui/pixi/actor/destroyTileActorFx";
 
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 
@@ -27,13 +27,13 @@ import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRunti
 
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 
-import { createPixiMainSceneDropPresentationFx } from "~/ui/pixi/drop/createPixiMainSceneDropPresentationFx";
+import { createDropPresentationFx } from "~/ui/pixi/drop/createDropPresentationFx";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
 
-import { createPixiMainSceneReconcilerFx } from "~/ui/pixi/scene/createPixiMainSceneReconcilerFx";
+import { createMainReconcilerFx } from "~/ui/pixi/scene/createMainReconcilerFx";
 
-import { replacementCrossfadeDurationMs as productionReplacementCrossfadeDurationMs } from "~/ui/pixi/scene/runPixiMainSceneReplacementsFx";
+import { replacementCrossfadeDurationMs as productionReplacementCrossfadeDurationMs } from "~/ui/pixi/scene/runReplacementsFx";
 
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 
@@ -91,11 +91,11 @@ vi.mock("~/bridge/tile/motion/readTileMotionCuesFx", async () => {
 	};
 });
 
-vi.mock("~/ui/pixi/actor/createPixiTileActorVisualFx", async () => {
+vi.mock("~/ui/pixi/actor/createActorVisualFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	const { Container: PixiContainer } = await import("pixi.js");
 	return {
-		createPixiTileActorVisualFx: ({
+		createActorVisualFx: ({
 			item,
 			size,
 		}: {
@@ -120,18 +120,17 @@ vi.mock("~/ui/pixi/actor/createPixiTileActorVisualFx", async () => {
 	};
 });
 
-vi.mock("~/ui/pixi/text/fitPixiSingleLineTextFx", async () => {
+vi.mock("~/ui/pixi/text/fitSingleLineTextFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
-		fitPixiSingleLineTextFx: ({ text }: { readonly text: string }) =>
-			EffectModule.succeed(text),
+		fitSingleLineTextFx: ({ text }: { readonly text: string }) => EffectModule.succeed(text),
 	};
 });
 
-vi.mock("~/ui/pixi/actor/updatePixiTileActorFx", async () => {
+vi.mock("~/ui/pixi/actor/updateTileActorFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
-		updatePixiTileActorFx: ({
+		updateTileActorFx: ({
 			actor,
 			item,
 			size,
@@ -306,7 +305,7 @@ export const createActorStore = (actor: PixiTileActor) => {
 			destroyExitingActorFx: (exitingActor: PixiTileActor) =>
 				Effect.gen(function* () {
 					exitingActors.delete(exitingActor);
-					yield* destroyPixiTileActorFx(exitingActor);
+					yield* destroyTileActorFx(exitingActor);
 				}),
 			readActorFx: (actorId: string) => Effect.succeed(actors.get(actorId) ?? null),
 			readCanonicalItemFx: (actorId: string) =>
@@ -517,7 +516,7 @@ export const createReconcilerHarness = ({
 			),
 		transientActorLayer,
 	} as unknown as PixiMainSceneSurface;
-	const dropPresentation = Effect.runSync(createPixiMainSceneDropPresentationFx());
+	const dropPresentation = Effect.runSync(createDropPresentationFx());
 	const game = {
 		readOrThrow: (query: unknown) => {
 			const projection = query as {
@@ -530,7 +529,7 @@ export const createReconcilerHarness = ({
 		},
 	} as unknown as GameEngine;
 	const reconciler = Effect.runSync(
-		createPixiMainSceneReconcilerFx({
+		createMainReconcilerFx({
 			actorStore: store,
 			animator: animatorHarness.animator,
 			application: {

@@ -2,9 +2,9 @@ import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
-import { createPixiTileMagneticFieldFx } from "~/ui/pixi/magnet/createPixiTileMagneticFieldFx";
+import { createMagneticFieldFx } from "~/ui/pixi/magnet/createMagneticFieldFx";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
-import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
+import { createMagneticProjectorFx } from "~/ui/pixi/motion/createMagneticProjectorFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 
 import {
@@ -16,7 +16,7 @@ describe("Pixi tile magnet", () => {
 	it("coalesces pending projection and cancels it on close", () => {
 		const scheduled: Array<() => void> = [];
 		const field = Effect.runSync(
-			createPixiTileMagneticFieldFx({
+			createMagneticFieldFx({
 				actorStore: {
 					actors: new Map(),
 				} as unknown as PixiMainSceneActorStore,
@@ -74,7 +74,7 @@ describe("Pixi tile magnet", () => {
 		const release = vi.fn();
 		const actor = createMagneticActor("runtime:source", 0);
 		const projector = Effect.runSync(
-			createPixiTileMotionMagneticProjectorFx({
+			createMagneticProjectorFx({
 				actor,
 				attractedActorId: null,
 				eligibleAttractionActorIds: new Set(),
@@ -126,7 +126,7 @@ describe("Pixi tile magnet", () => {
 			],
 		]);
 		const field = Effect.runSync(
-			createPixiTileMagneticFieldFx({
+			createMagneticFieldFx({
 				actorStore: {
 					actors,
 				} as unknown as PixiMainSceneActorStore,
@@ -177,7 +177,7 @@ describe("Pixi tile magnet", () => {
 		const receiver = createMagneticActor("runtime:receiver", 1);
 		const neighbour = createMagneticActor("runtime:neighbour", 2);
 		const field = Effect.runSync(
-			createPixiTileMagneticFieldFx({
+			createMagneticFieldFx({
 				actorStore: {
 					actors: new Map([
 						[

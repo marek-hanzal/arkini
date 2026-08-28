@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { createPixiAnimationDriverFx } from "~/ui/pixi/animation/createPixiAnimationDriverFx";
+import { createAnimationDriverFx } from "~/ui/pixi/animation/createAnimationDriverFx";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 
 interface FakeMotionValue {
@@ -136,7 +136,7 @@ const createDriver = () => {
 	const invalidate = vi.fn();
 	const reportCriticalFailure = vi.fn();
 	const driver = Effect.runSync(
-		createPixiAnimationDriverFx({
+		createAnimationDriverFx({
 			cancelFrame: (frameId) => {
 				frameCallbacks.delete(frameId);
 			},

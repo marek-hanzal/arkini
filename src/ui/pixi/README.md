@@ -1,21 +1,21 @@
 # Pixi renderer map
 
-Pixi is Arkini's retained gameplay presentation owner. The engine remains gameplay truth; React owns routes, pages, menus, and Item Detail. Start at `scene/createPixiMainSceneRuntimeFx.ts` for Board + Toolbar and `scene/createPixiInventorySceneRuntimeFx.ts` for Inventory.
+Pixi is Arkini's retained gameplay presentation owner. The engine remains gameplay truth; React owns routes, pages, menus, and Item Detail. Start at `scene/createMainRuntimeFx.ts` for Board + Toolbar and `scene/createInventoryRuntimeFx.ts` for Inventory.
 
 ## Owners
 
 | Area | Owner |
 | --- | --- |
-| Canvas, resize, demand rendering | `runtime/createPixiApplicationOwnerFx.ts` |
+| Canvas, resize, demand rendering | `runtime/createApplicationOwnerFx.ts` |
 | Surface geometry, layers, masks, feedback | `scene/*Surface*` and `layout/` |
 | Retained identity within one canvas | `actor/*ActorStore*` |
-| Canonical reconciliation | `scene/createPixiMainSceneReconcilerFx.ts` |
+| Canonical reconciliation | `scene/createMainReconcilerFx.ts` |
 | Pointer gesture and frozen release facts | `drag/*DragController*` |
 | Drop submission/presentation | `drop/` |
 | Engine-delivery presentation | `delivery/` |
-| Cue sequencing and handoffs | `motion/createPixiTileMotionRuntimeFx.ts` |
-| Interpolation/springs | `animation/createPixiAnimationDriverFx.ts` |
-| Typed actor-channel writes | `animation/createPixiActorAnimatorFx.ts` |
+| Cue sequencing and handoffs | `motion/createMotionRuntimeFx.ts` |
+| Interpolation/springs | `animation/createAnimationDriverFx.ts` |
+| Typed actor-channel writes | `animation/createActorAnimatorFx.ts` |
 
 Main and Inventory actors are separate because display objects cannot cross canvases. Cross-canvas handoff carries consume-once origin geometry keyed by the releasing actor; the receiving scene still derives identity/outcome from committed engine facts.
 
@@ -48,7 +48,7 @@ Delivery endpoints, generation, phase, and remaining time are engine state. Tick
 
 | Change | Start at |
 | --- | --- |
-| Scene composition/teardown | `scene/createPixi*SceneRuntimeFx.ts` |
+| Scene composition/teardown | `scene/create*RuntimeFx.ts` |
 | Actor identity/appearance | `actor/` + main reconciler |
 | Click/drag/drop | `drag/` + `drop/` |
 | Spawn/swap/stack/replacement cues | `motion/` |

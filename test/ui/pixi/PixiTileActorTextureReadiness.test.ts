@@ -5,29 +5,28 @@ import { Texture } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { createPixiTileActorFx } from "~/ui/pixi/actor/createPixiTileActorFx";
-import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
+import { createTileActorFx } from "~/ui/pixi/actor/createTileActorFx";
+import { updateTileActorFx } from "~/ui/pixi/actor/updateTileActorFx";
 import type { PixiActorAnimation, PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import {
 	pixiTileActorLifecycleDurationMs,
 	pixiTileActorLifecycleReducedScale,
-} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
-import { startPixiTileActorEnterFx } from "~/ui/pixi/animation/startPixiTileActorEnterFx";
+} from "~/ui/pixi/animation/runActorLifecycleFx";
+import { startActorEnterFx } from "~/ui/pixi/animation/startActorEnterFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
-import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
+import type { PixiTextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
 
-vi.mock("~/ui/pixi/text/fitPixiSingleLineTextFx", async () => {
+vi.mock("~/ui/pixi/text/fitSingleLineTextFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
-		fitPixiSingleLineTextFx: ({ text }: { readonly text: string }) =>
-			EffectModule.succeed(text),
+		fitSingleLineTextFx: ({ text }: { readonly text: string }) => EffectModule.succeed(text),
 	};
 });
 
-vi.mock("~/ui/pixi/actor/updatePixiTileActorVisualFx", async () => {
+vi.mock("~/ui/pixi/actor/updateActorVisualFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
-		updatePixiTileActorVisualFx: ({
+		updateActorVisualFx: ({
 			item,
 			size,
 			visual,
@@ -166,7 +165,7 @@ const createActor = ({
 }) => {
 	const { frames, invalidate } = createFrames();
 	const actor = Effect.runSync(
-		createPixiTileActorFx({
+		createTileActorFx({
 			frames,
 			item,
 			palette,
@@ -219,7 +218,7 @@ describe("Pixi tile actor visual readiness", () => {
 		});
 
 		Effect.runSync(
-			updatePixiTileActorFx({
+			updateTileActorFx({
 				actor,
 				animator,
 				frames,
@@ -247,7 +246,7 @@ describe("Pixi tile actor visual readiness", () => {
 		const transitionGeneration = actor.visualTransitionGeneration;
 
 		Effect.runSync(
-			updatePixiTileActorFx({
+			updateTileActorFx({
 				actor,
 				animator,
 				frames,
@@ -301,7 +300,7 @@ describe("Pixi tile actor visual readiness", () => {
 		actor.container.alpha = 0;
 
 		Effect.runSync(
-			startPixiTileActorEnterFx({
+			startActorEnterFx({
 				actor,
 				animator,
 			}),
@@ -311,7 +310,7 @@ describe("Pixi tile actor visual readiness", () => {
 		expect(animations).toEqual([]);
 
 		Effect.runSync(
-			updatePixiTileActorFx({
+			updateTileActorFx({
 				actor,
 				animator,
 				frames,

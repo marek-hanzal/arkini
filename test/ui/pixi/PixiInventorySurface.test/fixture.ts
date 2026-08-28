@@ -139,8 +139,8 @@ vi.mock("~/ui/pixi/usePixiGameRuntime", () => ({
 	}),
 }));
 
-vi.mock("~/ui/pixi/scene/createPixiInventorySceneRuntimeFx", () => ({
-	createPixiInventorySceneRuntimeFx: (props: NonNullable<typeof surfaceState.createProps>) =>
+vi.mock("~/ui/pixi/scene/createInventoryRuntimeFx", () => ({
+	createInventoryRuntimeFx: (props: NonNullable<typeof surfaceState.createProps>) =>
 		Effect.sync(() => {
 			surfaceState.createProps = props;
 			return {

@@ -2,8 +2,8 @@ import { type PropsWithChildren, useEffect, useMemo, useRef } from "react";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { PixiGameRuntimeContext } from "~/ui/pixi/PixiGameRuntimeContext";
-import { createPixiGameInteractionControlFx } from "~/ui/pixi/runtime/createPixiGameInteractionControlFx";
-import { createPixiTextureStoreFx } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
+import { createGameInteractionControlFx } from "~/ui/pixi/runtime/createGameInteractionControlFx";
+import { createTextureStoreFx } from "~/ui/pixi/runtime/createTextureStoreFx";
 
 /**
  * Owns route-local capabilities that must survive Board and Inventory scene alternation.
@@ -14,10 +14,10 @@ import { createPixiTextureStoreFx } from "~/ui/pixi/runtime/createPixiTextureSto
  */
 export const PixiGameProvider = ({ children }: PropsWithChildren) => {
 	const interaction = useMemo(
-		() => RendererRuntime.runSync(createPixiGameInteractionControlFx()),
+		() => RendererRuntime.runSync(createGameInteractionControlFx()),
 		[],
 	);
-	const textures = useMemo(() => RendererRuntime.runSync(createPixiTextureStoreFx()), []);
+	const textures = useMemo(() => RendererRuntime.runSync(createTextureStoreFx()), []);
 	const capabilities = useMemo(
 		() => ({
 			interaction,

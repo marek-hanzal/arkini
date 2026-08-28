@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
-import { pixiTileActorConsumedSourceFadeDurationMs } from "~/ui/pixi/animation/flashPixiTileActorConsumedSourceFx";
+import { pixiTileActorConsumedSourceFadeDurationMs } from "~/ui/pixi/animation/flashConsumedSourceFx";
 import type { GameEngine } from "~/bridge/game/GameEngine";
 
 import {

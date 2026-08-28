@@ -6,8 +6,8 @@ import { describe, expect, it } from "vitest";
 import {
 	pixiTileActorLifecycleDurationMs,
 	pixiTileActorLifecycleReducedScale,
-} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
-import { startPixiTileActorExitFx } from "~/ui/pixi/animation/startPixiTileActorExitFx";
+} from "~/ui/pixi/animation/runActorLifecycleFx";
+import { startActorExitFx } from "~/ui/pixi/animation/startActorExitFx";
 
 import {
 	createActor,
@@ -120,7 +120,7 @@ describe("Pixi tile motion stack contact", () => {
 		actors.set(source.item.id, source);
 		canonicalItems.delete(source.item.id);
 		Effect.runSync(
-			startPixiTileActorExitFx({
+			startActorExitFx({
 				actor: source,
 				animator,
 			}),

@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 
 import { describe, expect, it, vi } from "vitest";
-import { pixiTileActorConsumedSourceFadeDurationMs } from "~/ui/pixi/animation/flashPixiTileActorConsumedSourceFx";
-import { pixiTileActorFeedbackParticlesDurationMs } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
+import { pixiTileActorConsumedSourceFadeDurationMs } from "~/ui/pixi/animation/flashConsumedSourceFx";
+import { pixiTileActorFeedbackParticlesDurationMs } from "~/ui/pixi/animation/runActivityParticlesFx";
 import { Effect } from "effect";
 
 import {

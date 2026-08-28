@@ -3,7 +3,7 @@
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
-import { pixiTileActorLifecycleDurationMs } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+import { pixiTileActorLifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
 
 import {
 	inventoryLocation,

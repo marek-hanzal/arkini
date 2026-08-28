@@ -4,7 +4,7 @@ import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRunti
 import {
 	pixiTileActorLifecycleDurationMs,
 	pixiTileActorLifecycleReducedScale,
-} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+} from "~/ui/pixi/animation/runActorLifecycleFx";
 
 import {
 	boardLocation,

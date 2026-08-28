@@ -29,16 +29,16 @@ import type {
 	PixiTileMagneticField,
 	PixiTileMagneticFieldSample,
 } from "~/ui/pixi/magnet/PixiTileMagneticField";
-import { createPixiTileMotionRuntimeFx } from "~/ui/pixi/motion/createPixiTileMotionRuntimeFx";
+import { createMotionRuntimeFx } from "~/ui/pixi/motion/createMotionRuntimeFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
 
-vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
+vi.mock("~/ui/pixi/actor/createTileActorFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	const { Container: PixiContainer } = await import("pixi.js");
 	return {
-		createPixiTileActorFx: ({
+		createTileActorFx: ({
 			item,
 		}: {
 			readonly item: {
@@ -109,10 +109,10 @@ vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
 	};
 });
 
-vi.mock("~/ui/pixi/actor/updatePixiTileActorFx", async () => {
+vi.mock("~/ui/pixi/actor/updateTileActorFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
-		updatePixiTileActorFx: ({
+		updateTileActorFx: ({
 			actor,
 			item,
 			size,
@@ -675,7 +675,7 @@ export const createMotionHarness = ({
 		updates: magneticUpdates,
 	});
 	const runtime = Effect.runSync(
-		createPixiTileMotionRuntimeFx({
+		createMotionRuntimeFx({
 			actorStore,
 			animator,
 			application,

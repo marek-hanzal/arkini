@@ -4,9 +4,9 @@ import { describe, expect, it, vi } from "vitest";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { PixiTileActorVisual } from "~/ui/pixi/actor/PixiTileActorVisual";
-import { completePixiTileActorVisualTextureLoadFx } from "~/ui/pixi/actor/completePixiTileActorVisualTextureLoadFx";
-import { createPixiMainSceneActorStoreFx } from "~/ui/pixi/actor/createPixiMainSceneActorStoreFx";
-import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
+import { completeVisualTextureLoadFx } from "~/ui/pixi/actor/completeVisualTextureLoadFx";
+import { createMainActorStoreFx } from "~/ui/pixi/actor/createMainActorStoreFx";
+import { destroyTileActorFx } from "~/ui/pixi/actor/destroyTileActorFx";
 
 const createVisual = () => {
 	const destroy = vi.fn();
@@ -65,8 +65,8 @@ describe("Pixi tile actor destruction", () => {
 			visualTransitionGeneration: 7,
 		} as unknown as PixiTileActor;
 
-		Effect.runSync(destroyPixiTileActorFx(actor));
-		Effect.runSync(destroyPixiTileActorFx(actor));
+		Effect.runSync(destroyTileActorFx(actor));
+		Effect.runSync(destroyTileActorFx(actor));
 
 		expect(actor.lifecycleIntentGeneration).toBe(4);
 		expect(actor.visualTransitionGeneration).toBe(8);
@@ -116,9 +116,9 @@ describe("Pixi tile actor destruction", () => {
 		} as unknown as PixiTileActor;
 		const staleGeneration = visual.textureGeneration;
 
-		Effect.runSync(destroyPixiTileActorFx(actor));
+		Effect.runSync(destroyTileActorFx(actor));
 		Effect.runSync(
-			completePixiTileActorVisualTextureLoadFx({
+			completeVisualTextureLoadFx({
 				generation: staleGeneration,
 				visual,
 			}),
@@ -162,7 +162,7 @@ describe("Pixi tile actor destruction", () => {
 			]),
 			visualTransitionGeneration: 0,
 		} as unknown as PixiTileActor;
-		const store = Effect.runSync(createPixiMainSceneActorStoreFx());
+		const store = Effect.runSync(createMainActorStoreFx());
 		const staleGeneration = visual.textureGeneration;
 
 		Effect.runSync(store.setActorFx(actor));
@@ -173,7 +173,7 @@ describe("Pixi tile actor destruction", () => {
 		expect(actorContainer.eventMode).toBe("none");
 		Effect.runSync(store.closeFx);
 		Effect.runSync(
-			completePixiTileActorVisualTextureLoadFx({
+			completeVisualTextureLoadFx({
 				generation: staleGeneration,
 				visual,
 			}),
@@ -217,7 +217,7 @@ describe("Pixi tile actor destruction", () => {
 		};
 		const previous = createActor(previousVisual, "instance:previous");
 		const replacement = createActor(replacementVisual, "instance:replacement");
-		const store = Effect.runSync(createPixiMainSceneActorStoreFx());
+		const store = Effect.runSync(createMainActorStoreFx());
 
 		Effect.runSync(store.setActorFx(previous));
 		Effect.runSync(store.releaseActorFx(previous.item.id));

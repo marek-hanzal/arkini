@@ -8,15 +8,15 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 
-import { pixiTileActorFeedbackParticlesDurationMs } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
+import { pixiTileActorFeedbackParticlesDurationMs } from "~/ui/pixi/animation/runActivityParticlesFx";
 
 import { Effect } from "effect";
 
-import { readPixiMainSceneLayoutFx } from "~/ui/pixi/layout/readPixiMainSceneLayoutFx";
+import { readMainLayoutFx } from "~/ui/pixi/layout/readMainLayoutFx";
 
-import { readPixiInventorySceneLayoutFx } from "~/ui/pixi/layout/readPixiInventorySceneLayoutFx";
+import { readInventoryLayoutFx } from "~/ui/pixi/layout/readInventoryLayoutFx";
 
-import { createPixiInventorySceneRuntimeFx } from "~/ui/pixi/scene/createPixiInventorySceneRuntimeFx";
+import { createInventoryRuntimeFx } from "~/ui/pixi/scene/createInventoryRuntimeFx";
 
 export interface FakePointerEvent {
 	readonly button: number;
@@ -200,10 +200,10 @@ vi.mock("pixi.js", () => {
 	};
 });
 
-vi.mock("~/ui/pixi/runtime/createPixiApplicationOwnerFx", async () => {
+vi.mock("~/ui/pixi/runtime/createApplicationOwnerFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
-		createPixiApplicationOwnerFx: ({ host }: { readonly host: HTMLElement }) =>
+		createApplicationOwnerFx: ({ host }: { readonly host: HTMLElement }) =>
 			EffectModule.sync(() => {
 				const createContainer = sceneState.createContainer;
 				if (createContainer === undefined) throw new Error("Pixi mock is not ready.");
@@ -260,10 +260,10 @@ vi.mock("~/ui/pixi/runtime/createPixiApplicationOwnerFx", async () => {
 	};
 });
 
-vi.mock("~/ui/pixi/actor/createPixiTileActorParticleTexturesFx", async () => {
+vi.mock("~/ui/pixi/actor/createParticleTexturesFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
-		createPixiTileActorParticleTexturesFx: () =>
+		createParticleTexturesFx: () =>
 			EffectModule.succeed({
 				closeFx: EffectModule.sync(sceneState.particleTextureClose),
 				...sceneState.particleTextures,
@@ -271,10 +271,10 @@ vi.mock("~/ui/pixi/actor/createPixiTileActorParticleTexturesFx", async () => {
 	};
 });
 
-vi.mock("~/ui/pixi/animation/createPixiAnimationDriverFx", async () => {
+vi.mock("~/ui/pixi/animation/createAnimationDriverFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
-		createPixiAnimationDriverFx: () =>
+		createAnimationDriverFx: () =>
 			EffectModule.succeed({
 				closeFx: EffectModule.void,
 				createSpringFx: ({
@@ -334,10 +334,10 @@ vi.mock("~/ui/pixi/animation/createPixiAnimationDriverFx", async () => {
 	};
 });
 
-vi.mock("~/ui/pixi/appearance/readPixiScenePaletteFx", async () => {
+vi.mock("~/ui/pixi/appearance/readScenePaletteFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
-		readPixiScenePaletteFx: () =>
+		readScenePaletteFx: () =>
 			EffectModule.succeed({
 				accent: 0x00ff00,
 				danger: 0xff0000,
@@ -381,10 +381,10 @@ vi.mock("~/bridge/tile/readTileDropPreviewFx", async () => {
 	};
 });
 
-vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
+vi.mock("~/ui/pixi/actor/createTileActorFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
-		createPixiTileActorFx: ({
+		createTileActorFx: ({
 			item,
 			particleTextures,
 		}: {
@@ -454,10 +454,10 @@ vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
 	};
 });
 
-vi.mock("~/ui/pixi/actor/updatePixiTileActorFx", async () => {
+vi.mock("~/ui/pixi/actor/updateTileActorFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
-		updatePixiTileActorFx: ({
+		updateTileActorFx: ({
 			actor,
 			item,
 			size,
@@ -527,7 +527,7 @@ export const pointer = (x: number, y: number, button = 0): FakePointerEvent => (
 
 export const readTestInventoryLayout = (width = 800, height = 480) => {
 	const preferredCellSize = Effect.runSync(
-		readPixiMainSceneLayoutFx({
+		readMainLayoutFx({
 			boardHeight: 7,
 			boardWidth: 11,
 			height,
@@ -536,7 +536,7 @@ export const readTestInventoryLayout = (width = 800, height = 480) => {
 		}),
 	).board.cellSize;
 	return Effect.runSync(
-		readPixiInventorySceneLayoutFx({
+		readInventoryLayoutFx({
 			columns: 5,
 			height,
 			preferredCellSize,
@@ -609,13 +609,13 @@ export const mountScene = async ({
 	}),
 }: {
 	readonly game?: GameEngine;
-	readonly onActivate?: createPixiInventorySceneRuntimeFx.Props["onActivate"];
-	readonly onDrop?: createPixiInventorySceneRuntimeFx.Props["onDrop"];
+	readonly onActivate?: createInventoryRuntimeFx.Props["onActivate"];
+	readonly onDrop?: createInventoryRuntimeFx.Props["onDrop"];
 } = {}) => {
 	const host = document.createElement("div");
 	document.body.append(host);
 	const runtime = await Effect.runPromise(
-		createPixiInventorySceneRuntimeFx({
+		createInventoryRuntimeFx({
 			game,
 			host,
 			onActivate,

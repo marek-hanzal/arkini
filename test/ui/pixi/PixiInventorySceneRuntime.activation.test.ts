@@ -2,8 +2,8 @@
 
 import { describe, expect, it, vi } from "vitest";
 import { Effect } from "effect";
-import { readPixiMainSceneLayoutFx } from "~/ui/pixi/layout/readPixiMainSceneLayoutFx";
-import { pixiTileActorLifecycleDurationMs } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+import { readMainLayoutFx } from "~/ui/pixi/layout/readMainLayoutFx";
+import { pixiTileActorLifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 
 import {
@@ -20,7 +20,7 @@ describe("Pixi Inventory scene runtime / activation lifecycle", () => {
 	it("uses the Board actor size and routes an ordinary click to Inventory activation", async () => {
 		const { actor, onActivate, runtime, stage } = await mountScene();
 		const expectedBoardSize = Effect.runSync(
-			readPixiMainSceneLayoutFx({
+			readMainLayoutFx({
 				boardHeight: 7,
 				boardWidth: 11,
 				height: 480,

@@ -3,10 +3,10 @@ import { Effect } from "effect";
 import {
 	pixiTileActorLifecycleDurationMs,
 	pixiTileActorLifecycleReducedScale,
-} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+} from "~/ui/pixi/animation/runActorLifecycleFx";
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { burstPixiTileActorAckParticlesFx } from "~/ui/pixi/animation/burstPixiTileActorAckParticlesFx";
+import { burstAckParticlesFx } from "~/ui/pixi/animation/burstAckParticlesFx";
 
 import {
 	boardLocation,
@@ -177,7 +177,7 @@ describe("Pixi main-scene reconciliation / feedback acknowledgements", () => {
 			actor,
 		});
 		Effect.runSync(
-			burstPixiTileActorAckParticlesFx({
+			burstAckParticlesFx({
 				actor,
 				animator: harness.animator,
 				tint: 0x57d7b2,

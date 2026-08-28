@@ -6,7 +6,7 @@ import type {
 	PixiAnimationDriver,
 	PixiAnimationSpring,
 } from "~/ui/pixi/animation/PixiAnimationDriver";
-import { createPixiActorAnimatorFx } from "~/ui/pixi/animation/createPixiActorAnimatorFx";
+import { createActorAnimatorFx } from "~/ui/pixi/animation/createActorAnimatorFx";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 
 type TweenProps = Parameters<PixiAnimationDriver["startTweenFx"]>[0];
@@ -126,7 +126,7 @@ const createAnimator = () => {
 	const { frames, invalidate } = createFrames();
 	return {
 		animator: Effect.runSync(
-			createPixiActorAnimatorFx({
+			createActorAnimatorFx({
 				animationDriver,
 				frames,
 			}),

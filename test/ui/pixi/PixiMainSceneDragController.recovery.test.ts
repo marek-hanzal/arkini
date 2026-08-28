@@ -6,7 +6,7 @@ import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import {
 	pixiTileActorLifecycleDurationMs,
 	pixiTileActorLifecycleReducedScale,
-} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+} from "~/ui/pixi/animation/runActorLifecycleFx";
 import {
 	createItem,
 	flushMicrotasks,

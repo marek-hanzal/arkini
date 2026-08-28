@@ -5,8 +5,8 @@ import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
 import "~test/ui/pixi/PixiTileMotionRuntime.test/fixture";
-import { readPixiTileMotionOriginFx } from "~/ui/pixi/motion/readPixiTileMotionOriginFx";
-import { runPixiInputMotionFx } from "~/ui/pixi/motion/runPixiInputMotionFx";
+import { readMotionOriginFx } from "~/ui/pixi/motion/readMotionOriginFx";
+import { runInputMotionFx } from "~/ui/pixi/motion/runInputMotionFx";
 
 import {
 	createActorMap,
@@ -83,7 +83,7 @@ describe("Pixi direct input remainder", () => {
 			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
 		};
 		const origin = Effect.runSync(
-			readPixiTileMotionOriginFx({
+			readMotionOriginFx({
 				originActor: source,
 				originLocation: firstBoardLocation,
 				surface,
@@ -107,7 +107,7 @@ describe("Pixi direct input remainder", () => {
 		} satisfies TileMotionCue;
 
 		Effect.runSync(
-			runPixiInputMotionFx({
+			runInputMotionFx({
 				actorStore: createActorStore({
 					actors,
 					canonicalItems,

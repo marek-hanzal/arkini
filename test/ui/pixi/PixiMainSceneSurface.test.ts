@@ -4,10 +4,10 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { createPixiMainSceneActorStoreFx } from "~/ui/pixi/actor/createPixiMainSceneActorStoreFx";
+import { createMainActorStoreFx } from "~/ui/pixi/actor/createMainActorStoreFx";
 import type { PixiGridDropFeedback } from "~/ui/pixi/grid/PixiGridDropFeedback";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
-import { createPixiMainSceneSurfaceFx } from "~/ui/pixi/scene/createPixiMainSceneSurfaceFx";
+import { createMainSurfaceFx } from "~/ui/pixi/scene/createMainSurfaceFx";
 
 interface FakeDisplayObject {
 	readonly children: FakeDisplayObject[];
@@ -138,7 +138,7 @@ const item = (
 
 describe("Pixi main scene surface", () => {
 	it("reads coherent target facts and deterministic grid-local candidates from canonical occupancy", () => {
-		const actorStore = Effect.runSync(createPixiMainSceneActorStoreFx());
+		const actorStore = Effect.runSync(createMainActorStoreFx());
 		const boardFirst = item("runtime:board-first", {
 			scope: "board",
 			space: 0,
@@ -194,7 +194,7 @@ describe("Pixi main scene surface", () => {
 			stage,
 		} as unknown as PixiApplicationOwner;
 		const surface = Effect.runSync(
-			createPixiMainSceneSurfaceFx({
+			createMainSurfaceFx({
 				actorStore,
 				application,
 				dropFeedback: {
@@ -391,8 +391,8 @@ describe("Pixi main scene surface", () => {
 			stage,
 		} as unknown as PixiApplicationOwner;
 		const surface = Effect.runSync(
-			createPixiMainSceneSurfaceFx({
-				actorStore: Effect.runSync(createPixiMainSceneActorStoreFx()),
+			createMainSurfaceFx({
+				actorStore: Effect.runSync(createMainActorStoreFx()),
 				application,
 				dropFeedback,
 				game,

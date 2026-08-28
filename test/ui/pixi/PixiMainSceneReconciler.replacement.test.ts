@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
 import type { PixiTileActorVisual } from "~/ui/pixi/actor/PixiTileActorVisual";
-import { completePixiTileActorVisualTextureLoadFx } from "~/ui/pixi/actor/completePixiTileActorVisualTextureLoadFx";
+import { completeVisualTextureLoadFx } from "~/ui/pixi/actor/completeVisualTextureLoadFx";
 import {
 	boardLocation,
 	createActor,
@@ -62,7 +62,7 @@ describe("Pixi main-scene reconciliation / replacement visuals", () => {
 		expect(harness.animations.some(({ channel }) => channel === "visual-mix")).toBe(false);
 
 		Effect.runSync(
-			completePixiTileActorVisualTextureLoadFx({
+			completeVisualTextureLoadFx({
 				generation: incoming.textureGeneration,
 				visual: incoming,
 			}),
@@ -177,13 +177,13 @@ describe("Pixi main-scene reconciliation / replacement visuals", () => {
 		]);
 
 		Effect.runSync(
-			completePixiTileActorVisualTextureLoadFx({
+			completeVisualTextureLoadFx({
 				generation: pendingSecond.textureGeneration,
 				visual: pendingSecond,
 			}),
 		);
 		Effect.runSync(
-			completePixiTileActorVisualTextureLoadFx({
+			completeVisualTextureLoadFx({
 				generation: pendingThird.textureGeneration,
 				visual: pendingThird,
 			}),
@@ -198,7 +198,7 @@ describe("Pixi main-scene reconciliation / replacement visuals", () => {
 		expect(pendingThird.container.destroyed).toBe(true);
 
 		Effect.runSync(
-			completePixiTileActorVisualTextureLoadFx({
+			completeVisualTextureLoadFx({
 				generation: pendingThird.textureGeneration - 1,
 				visual: pendingThird,
 			}),

@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
-import { createPixiGameInteractionControlFx } from "~/ui/pixi/runtime/createPixiGameInteractionControlFx";
+import { createGameInteractionControlFx } from "~/ui/pixi/runtime/createGameInteractionControlFx";
 
 describe("Pixi game interaction control", () => {
 	it("cancels every registered scene gesture and releases exact registrations", () => {
-		const control = Effect.runSync(createPixiGameInteractionControlFx());
+		const control = Effect.runSync(createGameInteractionControlFx());
 		const cancelMain = vi.fn();
 		const cancelInventory = vi.fn();
 		const unregisterMain = Effect.runSync(control.registerFx(cancelMain));

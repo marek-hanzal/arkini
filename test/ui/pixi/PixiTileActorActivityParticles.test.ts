@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { burstPixiTileActorAckParticlesFx } from "~/ui/pixi/animation/burstPixiTileActorAckParticlesFx";
-import { startPixiTileActorActivityParticlesFx } from "~/ui/pixi/animation/startPixiTileActorActivityParticlesFx";
-import { stopPixiTileActorActivityParticlesFx } from "~/ui/pixi/animation/stopPixiTileActorActivityParticlesFx";
+import { burstAckParticlesFx } from "~/ui/pixi/animation/burstAckParticlesFx";
+import { startActivityParticlesFx } from "~/ui/pixi/animation/startActivityParticlesFx";
+import { stopActivityParticlesFx } from "~/ui/pixi/animation/stopActivityParticlesFx";
 
 import {
 	createActivityParticleActor,
@@ -18,7 +18,7 @@ describe("Pixi tile actor activity particles", () => {
 		const { animations, animator, cancellations, writes } = createActivityParticleAnimator();
 
 		Effect.runSync(
-			startPixiTileActorActivityParticlesFx({
+			startActivityParticlesFx({
 				actor,
 				animator,
 			}),
@@ -56,7 +56,7 @@ describe("Pixi tile actor activity particles", () => {
 		};
 
 		Effect.runSync(
-			stopPixiTileActorActivityParticlesFx({
+			stopActivityParticlesFx({
 				actor,
 				animator,
 			}),
@@ -83,7 +83,7 @@ describe("Pixi tile actor activity particles", () => {
 			activityEffect: false,
 		};
 		Effect.runSync(
-			burstPixiTileActorAckParticlesFx({
+			burstAckParticlesFx({
 				actor,
 				animator,
 				tint: 0x57d7b2,
@@ -95,7 +95,7 @@ describe("Pixi tile actor activity particles", () => {
 		};
 
 		Effect.runSync(
-			startPixiTileActorActivityParticlesFx({
+			startActivityParticlesFx({
 				actor,
 				animator,
 			}),
@@ -120,7 +120,7 @@ describe("Pixi tile actor activity particles", () => {
 		const actor = createActivityParticleActor();
 		const { animations, animator, cancellations } = createActivityParticleAnimator();
 		Effect.runSync(
-			burstPixiTileActorAckParticlesFx({
+			burstAckParticlesFx({
 				actor,
 				animator,
 				tint: 0x57d7b2,
@@ -132,7 +132,7 @@ describe("Pixi tile actor activity particles", () => {
 		};
 
 		Effect.runSync(
-			stopPixiTileActorActivityParticlesFx({
+			stopActivityParticlesFx({
 				actor,
 				animator,
 			}),

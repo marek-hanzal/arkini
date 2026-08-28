@@ -3,7 +3,7 @@
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { createPixiTileActorParticleTexturesFx } from "~/ui/pixi/actor/createPixiTileActorParticleTexturesFx";
+import { createParticleTexturesFx } from "~/ui/pixi/actor/createParticleTexturesFx";
 
 afterEach(() => {
 	vi.restoreAllMocks();
@@ -19,7 +19,7 @@ describe("Pixi tile actor particle textures", () => {
 			lineTo: vi.fn(),
 			moveTo: vi.fn(),
 		} as never);
-		const textures = Effect.runSync(createPixiTileActorParticleTexturesFx());
+		const textures = Effect.runSync(createParticleTexturesFx());
 		const source = textures.star.source;
 
 		Effect.runSync(textures.closeFx);

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { GameTransition } from "~/bridge/game/GameSession";
-import { createPixiSpaceActionTransitionPresenterFx } from "~/ui/pixi/scene/createPixiSpaceActionTransitionPresenterFx";
+import { createSpaceActionPresenterFx } from "~/ui/pixi/scene/createSpaceActionPresenterFx";
 
 const runtime = (currentSpace: number): GameTransition["runtime"] => ({
 	cheats: {
@@ -61,7 +61,7 @@ describe("Pixi Space Action transition presenter", () => {
 			readonly work: () => void;
 		}> = [];
 		const presenter = Effect.runSync(
-			createPixiSpaceActionTransitionPresenterFx({
+			createSpaceActionPresenterFx({
 				applyTransition: (transition) => {
 					applied.push(
 						`${transition.sequence}:${transition.runtime.currentSpace}:${transition.events
@@ -128,7 +128,7 @@ describe("Pixi Space Action transition presenter", () => {
 		const applied: GameTransition[] = [];
 		let renderAcknowledgment: () => void = () => undefined;
 		const presenter = Effect.runSync(
-			createPixiSpaceActionTransitionPresenterFx({
+			createSpaceActionPresenterFx({
 				applyTransition: (transition) => applied.push(transition),
 				initialSequence: 0,
 				scheduleAfterRender: (work) => {
@@ -165,7 +165,7 @@ describe("Pixi Space Action transition presenter", () => {
 		const applied: string[] = [];
 		let renderAcknowledgment: () => void = () => undefined;
 		const presenter = Effect.runSync(
-			createPixiSpaceActionTransitionPresenterFx({
+			createSpaceActionPresenterFx({
 				applyTransition: (transition) => {
 					applied.push(
 						`${transition.sequence}:${transition.runtime.currentSpace}:${transition.events

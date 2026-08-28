@@ -1,14 +1,9 @@
 import { Effect, FileSystem, Path } from "effect";
 
-import { FilesystemWriteError } from "../FilesystemWriteError";
-import { isFilesystemPathSafeFx } from "../isFilesystemPathSafeFx";
+import { FilesystemWriteError } from "./FilesystemWriteError";
+import { isFilesystemPathSafeFx } from "./isFilesystemPathSafeFx";
 
-const isContained = (path: Path.Path, root: string, target: string) => {
-	const relative = path.relative(root, target);
-	return relative !== "" && !relative.startsWith("..") && !path.isAbsolute(relative);
-};
-
-/** Creates and verifies one canonical parent below the exact owned root. */
+/** Resolves one contained target and creates canonical parents only for writes. */
 export const prepareFilesystemWriteTargetFx = Effect.fn("prepareFilesystemWriteTargetFx")(
 	function* ({
 		operation,
@@ -16,7 +11,7 @@ export const prepareFilesystemWriteTargetFx = Effect.fn("prepareFilesystemWriteT
 		requestedRoot,
 		target: requestedTarget,
 	}: {
-		readonly operation: "write-file" | "write-files";
+		readonly operation: "remove-file" | "replace-file" | "write-files";
 		readonly root: string;
 		readonly requestedRoot: string;
 		readonly target: string;
@@ -24,7 +19,12 @@ export const prepareFilesystemWriteTargetFx = Effect.fn("prepareFilesystemWriteT
 		const fileSystem = yield* FileSystem.FileSystem;
 		const path = yield* Path.Path;
 		const resolvedTarget = path.resolve(requestedTarget);
-		if (!isContained(path, requestedRoot, resolvedTarget))
+		const requestedRelative = path.relative(requestedRoot, resolvedTarget);
+		if (
+			requestedRelative === "" ||
+			requestedRelative.startsWith("..") ||
+			path.isAbsolute(requestedRelative)
+		)
 			return yield* Effect.fail(
 				new FilesystemWriteError({
 					operation,
@@ -38,6 +38,10 @@ export const prepareFilesystemWriteTargetFx = Effect.fn("prepareFilesystemWriteT
 		for (const segment of segments) {
 			directory = path.join(directory, segment);
 			if (!(yield* fileSystem.exists(directory))) {
+				if (operation === "remove-file")
+					return {
+						target,
+					};
 				yield* fileSystem.makeDirectory(directory);
 				continue;
 			}
@@ -53,9 +57,16 @@ export const prepareFilesystemWriteTargetFx = Effect.fn("prepareFilesystemWriteT
 					}),
 				);
 		}
+		if (!(yield* isFilesystemPathSafeFx(fileSystem, root, target)))
+			return yield* Effect.fail(
+				new FilesystemWriteError({
+					operation,
+					message: `Filesystem write target ${target} must be canonical and must not be a symbolic link.`,
+				}),
+			);
 		if (yield* fileSystem.exists(target)) {
 			const info = yield* fileSystem.stat(target);
-			if (info.type !== "File" || !(yield* isFilesystemPathSafeFx(fileSystem, root, target)))
+			if (info.type !== "File")
 				return yield* Effect.fail(
 					new FilesystemWriteError({
 						operation,

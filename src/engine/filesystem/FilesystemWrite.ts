@@ -11,28 +11,13 @@ export interface FilesystemWrite {
 		Failure | FilesystemWriteError,
 		Exclude<Exclude<Requirements, FileSystem.FileSystem>, Path.Path>
 	>;
-	readonly writeFileFx: (
-		props: FilesystemWrite.File,
-	) => Effect.Effect<void, FilesystemWriteError>;
-	readonly writeFilesFx: (
-		props: FilesystemWrite.Files,
-	) => Effect.Effect<void, FilesystemWriteError>;
-}
-
-export namespace FilesystemWrite {
-	export interface Write {
+	readonly replaceFileFx: (props: {
+		readonly lock: string;
 		readonly target: string;
 		readonly bytes: Uint8Array;
-	}
-
-	export interface File extends Write {
+	}) => Effect.Effect<void, FilesystemWriteError>;
+	readonly removeFileFx: (props: {
 		readonly lock: string;
-	}
-
-	export interface Files {
-		readonly lock: string;
-		readonly root: string;
-		readonly writes: ReadonlyArray<Write>;
-		readonly deletes?: ReadonlyArray<string>;
-	}
+		readonly target: string;
+	}) => Effect.Effect<void, FilesystemWriteError>;
 }

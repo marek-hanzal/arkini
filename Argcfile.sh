@@ -47,24 +47,16 @@ package_macos_artifacts() {
 		--arm64 \
 		--publish never
 	cp game/arkini/build/arkini.arkpack .out/desktop/release/arkini.arkpack
-	if [[ -f game/arkini/build/arkini.arksig ]]; then
-		cp game/arkini/build/arkini.arksig .out/desktop/release/arkini.arksig
-	fi
 	(
-		local -a checksum_artifacts=(
-			"Arkini-$version-mac-arm64.dmg"
-			"Arkini-$version-mac-arm64.zip"
-			arkini.arkpack
-		)
 		cd .out/desktop/release
-		if [[ -f arkini.arksig ]]; then
-			checksum_artifacts+=(arkini.arksig)
-		fi
-		shasum -a 256 "${checksum_artifacts[@]}" >SHA256SUMS
+		shasum -a 256 \
+			"Arkini-$version-mac-arm64.dmg" \
+			"Arkini-$version-mac-arm64.zip" >SHA256SUMS-macos-arm64
+		shasum -a 256 arkini.arkpack >SHA256SUMS-arkpack
 	)
 	"$packaged_cli" --version | grep -F "$version"
 	if [[ "${ARKINI_RELEASE_SIGN:-}" == "1" ]]; then
-		"$packaged_cli" arkpack verify .out/desktop/release/arkini.arkpack |
+		"$packaged_cli" arkpack verify game/arkini/build/arkini.arkpack |
 			grep -Fx '{"type":"trusted"}'
 	fi
 }
@@ -77,13 +69,26 @@ package_windows_artifacts() {
 		--win \
 		--x64 \
 		--publish never
-	cp game/arkini/build/arkini.arkpack .out/desktop/release/arkini.arkpack
 	(
 		cd .out/desktop/release
 		sha256sum \
 			"Arkini-$version-win-x64.exe" \
-			"Arkini-$version-win-x64.zip" \
-			arkini.arkpack >SHA256SUMS-windows-x64
+			"Arkini-$version-win-x64.zip" >SHA256SUMS-windows-x64
+	)
+}
+
+package_linux_artifacts() {
+	local version
+	version=$(desktop_version)
+	electron-builder \
+		--config electron-builder.yml \
+		--linux AppImage \
+		--x64 \
+		--publish never
+	(
+		cd .out/desktop/release
+		sha256sum \
+			"Arkini-$version-linux-x86_64.AppImage" >SHA256SUMS-linux-x64
 	)
 }
 
@@ -256,6 +261,13 @@ package-windows() {
 	clean_desktop
 	build
 	package_windows_artifacts
+}
+
+# @cmd Build unsigned Linux x64 AppImage release artifacts
+package-linux() {
+	clean_desktop
+	build
+	package_linux_artifacts
 }
 
 # @cmd Format the repository

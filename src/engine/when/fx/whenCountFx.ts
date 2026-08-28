@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import type { WhenCountSchema } from "~/engine/when/schema/WhenCountSchema";
+import type { CountSchema } from "~/engine/when/schema/CountSchema";
 
 export namespace whenCountFx {
-	export type Props = Pick<WhenCountSchema.Type, "count"> & {
+	export type Props = Pick<CountSchema.Type, "count"> & {
 		quantity: NonNegativeIntegerSchema.Type;
 	};
 }

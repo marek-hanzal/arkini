@@ -9,7 +9,7 @@ import { assertPlacementPlanCompleteFx } from "~/engine/placement/fx/assertPlace
 import { planInventoryPlacementFx } from "~/engine/placement/fx/planInventoryPlacementFx";
 import { readEmptyLocationsFx } from "~/engine/placement/fx/readEmptyLocationsFx";
 import { readInventoryLocationsFx } from "~/engine/placement/fx/readInventoryLocationsFx";
-import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
+import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
 import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
 import type { PlacementPlanSchema } from "~/engine/placement/schema/PlacementPlanSchema";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
@@ -47,7 +47,7 @@ export const readStoreItemInInventoryPlanFx = Effect.fn("readStoreItemInInventor
 			} satisfies RuntimeSchema.Type;
 			const drop = {
 				itemId: item.item.id,
-				placement: PlacementEnumSchema.enum.Drop,
+				placement: PlacementSchema.enum.Drop,
 				quantity: item.quantity,
 			} as const;
 			const partialPlan = yield* planInventoryPlacementFx({
@@ -87,7 +87,7 @@ export const readStoreItemInInventoryPlanFx = Effect.fn("readStoreItemInInventor
 			return yield* Effect.fail(
 				new PlacementUnavailableError({
 					itemId: item.item.id,
-					placement: PlacementEnumSchema.enum.Drop,
+					placement: PlacementSchema.enum.Drop,
 					quantity: item.quantity,
 					reason: PlacementFailureReasonEnumSchema.enum.InventoryFull,
 					remainingQuantity: item.quantity,

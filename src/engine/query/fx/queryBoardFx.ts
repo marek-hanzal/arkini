@@ -2,7 +2,7 @@ import { Array, Effect } from "effect";
 
 import { distanceFx } from "~/engine/distance/fx/distanceFx";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
-import type { QueryBoardSchema } from "~/engine/query/schema/QueryBoardSchema";
+import type { BoardSchema } from "~/engine/query/schema/BoardSchema";
 import { getItemsFx } from "~/engine/runtime/read/getItemsFx";
 import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import { queryItemsFx } from "./queryItemsFx";
@@ -10,7 +10,7 @@ import { queryItemsFx } from "./queryItemsFx";
 export namespace queryBoardFx {
 	export interface Props {
 		origin: BoardLocationSchema.Type;
-		query: QueryBoardSchema.Type;
+		query: BoardSchema.Type;
 	}
 }
 

@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { MergeKeepSchema } from "./MergeKeepSchema";
-import { MergeRemoveSchema } from "./MergeRemoveSchema";
-import { MergeReplaceSchema } from "./MergeReplaceSchema";
+import { KeepSchema } from "./KeepSchema";
+import { RemoveSchema } from "./RemoveSchema";
+import { ReplaceSchema } from "./ReplaceSchema";
 
 /**
  * A target-specific directional interaction initiated by dropping its owning
@@ -13,9 +13,9 @@ import { MergeReplaceSchema } from "./MergeReplaceSchema";
  */
 export const MergeSchema = z
 	.discriminatedUnion("effect", [
-		MergeKeepSchema,
-		MergeRemoveSchema,
-		MergeReplaceSchema,
+		KeepSchema,
+		RemoveSchema,
+		ReplaceSchema,
 	])
 	.meta({
 		id: "MergeSchema",

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { ActionRuleEnumSchema } from "~/engine/action/schema/ActionRuleEnumSchema";
+import { RuleTypeSchema } from "~/engine/action/schema/RuleTypeSchema";
 import type {
 	ActionRuleDisableResultSchema,
 	ActionRuleEnableResultSchema,
@@ -16,10 +16,8 @@ export const resolveActionEnableFx = Effect.fn("resolveActionEnableFx")(function
 		ActionRuleEnableResultSchema.Type | ActionRuleDisableResultSchema.Type
 	>;
 }) {
-	const enableRules = rules.filter((rule) => rule.type === ActionRuleEnumSchema.enum.Enable);
+	const enableRules = rules.filter((rule) => rule.type === RuleTypeSchema.enum.Enable);
 	const enabled = enableRules.length > 0 ? enableRules.every((rule) => rule.active) : enable;
-	const disabled = rules.some(
-		(rule) => rule.type === ActionRuleEnumSchema.enum.Disable && rule.active,
-	);
+	const disabled = rules.some((rule) => rule.type === RuleTypeSchema.enum.Disable && rule.active);
 	return enabled && !disabled;
 });

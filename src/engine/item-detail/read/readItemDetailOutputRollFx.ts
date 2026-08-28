@@ -7,7 +7,7 @@ import {
 	readItemDetailOutputItemsFx,
 } from "~/engine/item-detail/read/readItemDetailOutputItemsFx";
 import { readItemDetailQuantityBoundsFx } from "~/engine/item-detail/read/readItemDetailQuantityBoundsFx";
-import { RollEnumSchema } from "~/engine/roll/schema/RollEnumSchema";
+import { TypeSchema } from "~/engine/roll/schema/TypeSchema";
 import type { RollSchema } from "~/engine/roll/schema/RollSchema";
 
 /** Projects one exact authored output roll without flattening its probability semantics. */
@@ -21,7 +21,7 @@ export const readItemDetailOutputRollFx = Effect.fn("readItemDetailOutputRollFx"
 	return yield* match(roll)
 		.with(
 			{
-				type: RollEnumSchema.enum.Guaranteed,
+				type: TypeSchema.enum.Guaranteed,
 			},
 			({ drop }) =>
 				Effect.gen(function* () {
@@ -36,7 +36,7 @@ export const readItemDetailOutputRollFx = Effect.fn("readItemDetailOutputRollFx"
 		)
 		.with(
 			{
-				type: RollEnumSchema.enum.Chance,
+				type: TypeSchema.enum.Chance,
 			},
 			({ chance, drop }) =>
 				Effect.gen(function* () {
@@ -52,7 +52,7 @@ export const readItemDetailOutputRollFx = Effect.fn("readItemDetailOutputRollFx"
 		)
 		.with(
 			{
-				type: RollEnumSchema.enum.Weight,
+				type: TypeSchema.enum.Weight,
 			},
 			({ quantity, drop }) =>
 				Effect.gen(function* () {

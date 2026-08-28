@@ -1,11 +1,11 @@
 import { z } from "zod";
 
-import { ActionRuleDisableSchema } from "~/engine/action/schema/ActionRuleDisableSchema";
-import { ActionRuleEnableSchema } from "~/engine/action/schema/ActionRuleEnableSchema";
-import { RuleHideSchema } from "./RuleHideSchema";
-import { RuleRuntimeAdjustSchema } from "./RuleRuntimeAdjustSchema";
-import { RuleRuntimeMultiplierSchema } from "./RuleRuntimeMultiplierSchema";
-import { RuleShowSchema } from "./RuleShowSchema";
+import { DisableRuleSchema } from "~/engine/action/schema/DisableRuleSchema";
+import { EnableRuleSchema } from "~/engine/action/schema/EnableRuleSchema";
+import { HideSchema } from "./HideSchema";
+import { RuntimeAdjustmentSchema } from "./RuntimeAdjustmentSchema";
+import { RuntimeMultiplierSchema } from "./RuntimeMultiplierSchema";
+import { ShowSchema } from "./ShowSchema";
 
 /**
  * A rule evaluated for a product line.
@@ -15,15 +15,15 @@ import { RuleShowSchema } from "./RuleShowSchema";
  */
 export const RuleSchema = z
 	.discriminatedUnion("type", [
-		RuleShowSchema,
-		RuleHideSchema,
-		ActionRuleEnableSchema,
-		ActionRuleDisableSchema,
-		RuleRuntimeAdjustSchema,
-		RuleRuntimeMultiplierSchema,
+		ShowSchema,
+		HideSchema,
+		EnableRuleSchema,
+		DisableRuleSchema,
+		RuntimeAdjustmentSchema,
+		RuntimeMultiplierSchema,
 	])
 	.meta({
-		id: "LineRuleSchema",
+		id: "line.RuleSchema",
 		description: "A rule evaluated for a product line.",
 	});
 

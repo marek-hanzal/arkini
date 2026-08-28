@@ -5,7 +5,7 @@ import type { QuerySchema } from "~/engine/query/schema/QuerySchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { BoardQueryOriginUnavailableError } from "~/engine/query/error/BoardQueryOriginUnavailableError";
-import { QueryScopeEnumSchema } from "~/engine/query/schema/QueryScopeEnumSchema";
+import { ScopeSchema } from "~/engine/query/schema/ScopeSchema";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 
 import { queryAnyFx } from "./queryAnyFx";
@@ -29,7 +29,7 @@ export const queryFx = Effect.fn("queryFx")(function* (props: queryFx.Props) {
 		.with(
 			{
 				query: {
-					scope: QueryScopeEnumSchema.enum.Board,
+					scope: ScopeSchema.enum.Board,
 				},
 			},
 			({ origin, query }) => {
@@ -49,7 +49,7 @@ export const queryFx = Effect.fn("queryFx")(function* (props: queryFx.Props) {
 		.with(
 			{
 				query: {
-					scope: QueryScopeEnumSchema.enum.Inventory,
+					scope: ScopeSchema.enum.Inventory,
 				},
 			},
 			({ query }) => {
@@ -61,7 +61,7 @@ export const queryFx = Effect.fn("queryFx")(function* (props: queryFx.Props) {
 		.with(
 			{
 				query: {
-					scope: QueryScopeEnumSchema.enum.Toolbar,
+					scope: ScopeSchema.enum.Toolbar,
 				},
 			},
 			({ query }) => {
@@ -73,7 +73,7 @@ export const queryFx = Effect.fn("queryFx")(function* (props: queryFx.Props) {
 		.with(
 			{
 				query: {
-					scope: QueryScopeEnumSchema.enum.Any,
+					scope: ScopeSchema.enum.Any,
 				},
 			},
 			({ origin, query }) => {
@@ -92,7 +92,7 @@ export const queryFx = Effect.fn("queryFx")(function* (props: queryFx.Props) {
 		.with(
 			{
 				query: {
-					scope: QueryScopeEnumSchema.enum.Universe,
+					scope: ScopeSchema.enum.Universe,
 				},
 			},
 			({ query }) => {

@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
-import { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
+import { ModeSchema } from "~/engine/input/schema/ModeSchema";
 
 import { InputRunItemPlanSchema } from "./InputRunItemPlanSchema";
 import { InputChargeRunPlanSchema } from "./InputChargeRunPlanSchema";
@@ -15,13 +15,13 @@ export const InputMaterialRunPlanSchema = z
 		/**
 		 * Identifies this plan as one material input.
 		 */
-		type: InputEnumSchema.extract([
+		type: TypeSchema.extract([
 			"Materials",
 		]),
 		/**
 		 * Whether the allocated material is consumed or reserved by the run.
 		 */
-		mode: InputModeEnumSchema.describe(
+		mode: ModeSchema.describe(
 			"Whether the allocated material is consumed or reserved by the line run.",
 		),
 		/**

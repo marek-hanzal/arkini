@@ -1,13 +1,13 @@
 import { Effect } from "effect";
 
-import type { GridSizeSchema } from "~/engine/grid/schema/GridSizeSchema";
+import type { SizeSchema } from "~/engine/grid/schema/SizeSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace readBoardLocationsFx {
 	export interface Props {
-		size: GridSizeSchema.Type;
+		size: SizeSchema.Type;
 		space: NonNegativeIntegerSchema.Type;
 	}
 }

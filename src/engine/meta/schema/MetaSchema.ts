@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { GridSizeSchema } from "~/engine/grid/schema/GridSizeSchema";
+import { SizeSchema } from "~/engine/grid/schema/SizeSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { TitleSchema } from "~/engine/common/schema/TitleSchema";
 import { ToolbarSizeSchema } from "./ToolbarSizeSchema";
@@ -21,13 +21,11 @@ export const MetaSchema = z
 		/**
 		 * Size of the board on which board items are placed.
 		 */
-		board: GridSizeSchema.describe("The size of the board on which items are placed."),
+		board: SizeSchema.describe("The size of the board on which items are placed."),
 		/**
 		 * Size of the inventory grid available to the player.
 		 */
-		inventory: GridSizeSchema.describe(
-			"The size of the inventory grid available to the player.",
-		),
+		inventory: SizeSchema.describe("The size of the inventory grid available to the player."),
 		/**
 		 * Optional number of slots in the one-row passive toolbar. Zero disables it.
 		 */

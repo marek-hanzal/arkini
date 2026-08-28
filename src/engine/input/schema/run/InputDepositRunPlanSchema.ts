@@ -1,13 +1,13 @@
 import { z } from "zod";
 
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 
 import { InputChargeRunPlanSchema } from "./InputChargeRunPlanSchema";
 
 /** Exact external charged-item target used by one deposit input. */
 export const InputDepositRunPlanSchema = z
 	.object({
-		type: InputEnumSchema.extract([
+		type: TypeSchema.extract([
 			"Deposit",
 		]),
 		charges: InputChargeRunPlanSchema.describe(

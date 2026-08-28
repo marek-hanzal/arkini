@@ -37,7 +37,7 @@ export const DepositItemSchema = z
 	})
 	.strict()
 	.meta({
-		id: "DepositItemSchema",
+		id: "item.DepositSchema",
 		description:
 			"A board resource deposit that may expose finite self-consuming product lines.",
 	});

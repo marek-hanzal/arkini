@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { WhenCountSchema } from "./WhenCountSchema";
-import { WhenExistsSchema } from "./WhenExistsSchema";
-import { WhenRangeSchema } from "./WhenRangeSchema";
+import { CountSchema } from "./CountSchema";
+import { ExistsSchema } from "./ExistsSchema";
+import { RangeSchema } from "./RangeSchema";
 
 /**
  * A standalone condition that produces a boolean result from game-state facts.
@@ -12,9 +12,9 @@ import { WhenRangeSchema } from "./WhenRangeSchema";
  */
 export const WhenSchema = z
 	.discriminatedUnion("type", [
-		WhenExistsSchema,
-		WhenCountSchema,
-		WhenRangeSchema,
+		ExistsSchema,
+		CountSchema,
+		RangeSchema,
 	])
 	.meta({
 		id: "WhenSchema",

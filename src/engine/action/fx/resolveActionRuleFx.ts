@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { ActionRuleEnumSchema } from "~/engine/action/schema/ActionRuleEnumSchema";
+import { RuleTypeSchema } from "~/engine/action/schema/RuleTypeSchema";
 import type {
 	ActionRuleDisableResultSchema,
 	ActionRuleEnableResultSchema,
 } from "~/engine/action/schema/ActionRuleResultSchema";
-import type { ActionRuleSchema } from "~/engine/action/schema/ActionRuleSchema";
+import type { RuleSchema } from "~/engine/action/schema/RuleSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { whenFx } from "~/engine/when/fx/whenFx";
 
@@ -16,12 +16,12 @@ export const resolveActionRuleFx = Effect.fn("resolveActionRuleFx")(function* ({
 	rule,
 }: {
 	readonly origin: GridLocationSchema.Type;
-	readonly rule: ActionRuleSchema.Type;
+	readonly rule: RuleSchema.Type;
 }) {
 	return yield* match(rule)
 		.with(
 			{
-				type: ActionRuleEnumSchema.enum.Enable,
+				type: RuleTypeSchema.enum.Enable,
 			},
 			(rule) =>
 				Effect.gen(function* () {
@@ -50,7 +50,7 @@ export const resolveActionRuleFx = Effect.fn("resolveActionRuleFx")(function* ({
 		)
 		.with(
 			{
-				type: ActionRuleEnumSchema.enum.Disable,
+				type: RuleTypeSchema.enum.Disable,
 			},
 			(rule) =>
 				Effect.gen(function* () {

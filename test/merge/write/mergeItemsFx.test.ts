@@ -2,8 +2,8 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
-import type { ActionEnumSchema } from "~/engine/merge/schema/ActionEnumSchema";
-import type { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
+import type { SourceActionSchema } from "~/engine/merge/schema/SourceActionSchema";
+import type { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
 import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
 import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
@@ -84,8 +84,8 @@ const runMergeFx = () =>
 	});
 
 const combinations: ReadonlyArray<{
-	action: ActionEnumSchema.Type;
-	effect: EffectEnumSchema.Type;
+	action: SourceActionSchema.Type;
+	effect: TargetEffectSchema.Type;
 }> = [
 	{
 		action: "use",

@@ -4,7 +4,7 @@ import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { TitleSchema } from "~/engine/common/schema/TitleSchema";
-import { GridSizeSchema } from "~/engine/grid/schema/GridSizeSchema";
+import { SizeSchema } from "~/engine/grid/schema/SizeSchema";
 import { PositionSchema } from "~/engine/grid/schema/PositionSchema";
 import { ToolbarSizeSchema } from "~/engine/meta/schema/ToolbarSizeSchema";
 import { BoardItemSchema } from "~/engine/start/schema/BoardItemSchema";
@@ -37,8 +37,8 @@ export const EditorProjectFormBaseSchema = z
 		title: TitleSchema,
 		hero: IdSchema,
 		avatars: z.array(IdSchema).max(EditorProjectAvatarKeys.length),
-		board: GridSizeSchema,
-		inventory: GridSizeSchema,
+		board: SizeSchema,
+		inventory: SizeSchema,
 		toolbarSize: ToolbarSizeSchema,
 		start: z
 			.object({

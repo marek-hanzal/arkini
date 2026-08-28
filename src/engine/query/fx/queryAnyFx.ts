@@ -2,14 +2,14 @@ import { Array, Effect } from "effect";
 
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import type { QueryAnySchema } from "~/engine/query/schema/QueryAnySchema";
+import type { AnySchema } from "~/engine/query/schema/AnySchema";
 import { getItemsFx } from "~/engine/runtime/read/getItemsFx";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { queryItemsFx } from "./queryItemsFx";
 
 export namespace queryAnyFx {
 	export interface Props {
-		query: QueryAnySchema.Type;
+		query: AnySchema.Type;
 		space: NonNegativeIntegerSchema.Type;
 	}
 }

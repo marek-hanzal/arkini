@@ -5,7 +5,7 @@ import {
 	GameProjectGameSchemaReference,
 	GameProjectItemSchemaReference,
 } from "~/engine/source/GameProjectReference";
-import { GameProjectFileSchema } from "~/engine/source/schema/GameProjectFileSchema";
+import { GameFileSchema } from "~/engine/source/schema/GameFileSchema";
 import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -89,7 +89,7 @@ const createSnapshotFx = Effect.fn("writeFilesystemEditorProjectFilesFx.createSn
 		const { $schema: _schema, items, ...gameCandidate } = config;
 		const game = yield* Effect.try({
 			try: () =>
-				GameProjectFileSchema.parse({
+				GameFileSchema.parse({
 					$schema: GameProjectGameSchemaReference,
 					version: arkpack,
 					...gameCandidate,

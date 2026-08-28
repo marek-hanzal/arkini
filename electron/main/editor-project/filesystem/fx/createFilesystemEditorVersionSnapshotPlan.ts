@@ -1,6 +1,6 @@
 import type { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
 import { GameProjectGameSchemaReference } from "~/engine/source/GameProjectReference";
-import { GameProjectFileSchema } from "~/engine/source/schema/GameProjectFileSchema";
+import { GameFileSchema } from "~/engine/source/schema/GameFileSchema";
 import { EditorVersionManifestSchema } from "~/editor/filesystem/EditorVersionManifestSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
@@ -56,7 +56,7 @@ export const createFilesystemEditorVersionSnapshotPlan = ({
 	};
 
 	const { $schema: _schema, items, ...gameCandidate } = config;
-	const game = GameProjectFileSchema.parse({
+	const game = GameFileSchema.parse({
 		$schema: GameProjectGameSchemaReference,
 		version: arkpack,
 		...gameCandidate,

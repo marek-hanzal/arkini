@@ -1,15 +1,15 @@
 import { Array, Effect } from "effect";
 
-import type { QueryInventorySchema } from "~/engine/query/schema/QueryInventorySchema";
+import type { InventorySchema } from "~/engine/query/schema/InventorySchema";
 import { getItemsFx } from "~/engine/runtime/read/getItemsFx";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
-import { QueryScopeEnumSchema } from "~/engine/query/schema/QueryScopeEnumSchema";
+import { ScopeSchema } from "~/engine/query/schema/ScopeSchema";
 
 import { queryItemsFx } from "./queryItemsFx";
 
 export namespace queryInventoryFx {
 	export interface Props {
-		query: QueryInventorySchema.Type;
+		query: InventorySchema.Type;
 	}
 }
 
@@ -24,7 +24,7 @@ export const queryInventoryFx = Effect.fn("queryInventoryFx")(function* ({
 
 	return yield* queryItemsFx({
 		items: gridItems.filter((item) => {
-			return item.location.scope === QueryScopeEnumSchema.enum.Inventory;
+			return item.location.scope === ScopeSchema.enum.Inventory;
 		}),
 		selector: query.selector,
 	});

@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 
-import type { GridSizeSchema } from "~/engine/grid/schema/GridSizeSchema";
+import type { SizeSchema } from "~/engine/grid/schema/SizeSchema";
 import type { InventoryLocationSchema } from "~/engine/location/schema/InventoryLocationSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace readInventoryLocationsFx {
 	export interface Props {
-		size: GridSizeSchema.Type;
+		size: SizeSchema.Type;
 	}
 }
 

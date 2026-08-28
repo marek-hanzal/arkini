@@ -8,7 +8,7 @@ import type { InputSchema } from "~/engine/input/schema/InputSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 
 import { resolveInputMaterialRunFx } from "./resolveInputMaterialRunFx";
 
@@ -37,7 +37,7 @@ export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 	return yield* match(input)
 		.with(
 			{
-				type: InputEnumSchema.enum.Simple,
+				type: TypeSchema.enum.Simple,
 			},
 			(input) => {
 				return resolveActionInputFx({
@@ -50,7 +50,7 @@ export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 		)
 		.with(
 			{
-				type: InputEnumSchema.enum.Materials,
+				type: TypeSchema.enum.Materials,
 			},
 			(input) => {
 				const materialItems = runtime.items.filter(
@@ -71,7 +71,7 @@ export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 		)
 		.with(
 			{
-				type: InputEnumSchema.enum.Deposit,
+				type: TypeSchema.enum.Deposit,
 			},
 			(input) => {
 				return resolveActionInputFx({

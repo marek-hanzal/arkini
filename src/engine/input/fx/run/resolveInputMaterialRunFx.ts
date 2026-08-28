@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { resolveActionChargeFx } from "~/engine/action/fx/resolveActionChargeFx";
 import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
-import type { InputMaterialSchema } from "~/engine/input/schema/InputMaterialSchema";
+import type { MaterialSchema } from "~/engine/input/schema/MaterialSchema";
 import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
 import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -11,7 +11,7 @@ import { planInputMaterialRunFx } from "./planInputMaterialRunFx";
 
 export namespace resolveInputMaterialRunFx {
 	export interface Props {
-		input: InputMaterialSchema.Type;
+		input: MaterialSchema.Type;
 		items: InputRuntimeItemSchema.Type[];
 		ownerItemId: IdSchema.Type;
 		reservedCharges: ReadonlyMap<IdSchema.Type, number>;

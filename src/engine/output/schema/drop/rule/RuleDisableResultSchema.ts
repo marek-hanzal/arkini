@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { BaseRuleResultSchema } from "./BaseRuleResultSchema";
-import { RuleEnumSchema } from "./RuleEnumSchema";
+import { TypeSchema } from "./TypeSchema";
 
 /**
  * Evaluation result of one selected-drop disable rule.
@@ -9,7 +9,7 @@ import { RuleEnumSchema } from "./RuleEnumSchema";
 export const RuleDisableResultSchema = z
 	.object({
 		...BaseRuleResultSchema.shape,
-		type: RuleEnumSchema.extract([
+		type: TypeSchema.extract([
 			"Disable",
 		]).describe("Identifies this result as an evaluated selected-drop disable rule."),
 	})

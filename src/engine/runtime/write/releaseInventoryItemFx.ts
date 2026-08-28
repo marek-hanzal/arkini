@@ -10,7 +10,7 @@ import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeE
 import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 import { placeRuntimeItemFx } from "~/engine/placement/fx/placeRuntimeItemFx";
 import { readBoardLocationsFx } from "~/engine/placement/fx/readBoardLocationsFx";
-import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
+import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
 import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
@@ -87,7 +87,7 @@ export const releaseInventoryItemFx = Effect.fn("releaseInventoryItemFx")(functi
 				return yield* Effect.fail(
 					new PlacementUnavailableError({
 						itemId: item.item.id,
-						placement: PlacementEnumSchema.enum.Drop,
+						placement: PlacementSchema.enum.Drop,
 						quantity: item.quantity,
 						reason: PlacementFailureReasonEnumSchema.enum.BoardFull,
 						remainingQuantity: item.quantity,
@@ -110,7 +110,7 @@ export const releaseInventoryItemFx = Effect.fn("releaseInventoryItemFx")(functi
 				return yield* Effect.fail(
 					new PlacementUnavailableError({
 						itemId: item.item.id,
-						placement: PlacementEnumSchema.enum.Drop,
+						placement: PlacementSchema.enum.Drop,
 						quantity: item.quantity,
 						reason: PlacementFailureReasonEnumSchema.enum.BoardFull,
 						remainingQuantity: item.quantity,

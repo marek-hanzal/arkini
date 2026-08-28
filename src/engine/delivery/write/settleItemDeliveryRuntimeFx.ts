@@ -8,7 +8,7 @@ import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { applyInputMaterialStorePlanFx } from "~/engine/input/fx/applyInputMaterialStorePlanFx";
 import { planInputMaterialStoreFx } from "~/engine/input/fx/planInputMaterialStoreFx";
 import { filterInputSlotItemsFx } from "~/engine/input/read/filterInputSlotItemsFx";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import type { InputMaterialStorePlanSchema } from "~/engine/input/schema/store/InputMaterialStorePlanSchema";
 import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
@@ -138,7 +138,7 @@ export const settleItemDeliveryRuntimeFx = Effect.fn("settleItemDeliveryRuntimeF
 				const input = line.input[allocation.inputIndex];
 				if (
 					input === undefined ||
-					input.type !== InputEnumSchema.enum.Materials ||
+					input.type !== TypeSchema.enum.Materials ||
 					(yield* isLineInputClosedFx({
 						input,
 						ownerItemId: owner.id,

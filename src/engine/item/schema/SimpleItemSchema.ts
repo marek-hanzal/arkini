@@ -18,7 +18,7 @@ export const SimpleItemSchema = z
 	})
 	.strict()
 	.meta({
-		id: "SimpleItemSchema",
+		id: "item.SimpleSchema",
 		description: "An item without specialized gameplay behavior.",
 	});
 

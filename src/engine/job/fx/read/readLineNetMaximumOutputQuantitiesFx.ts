@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
-import { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
+import { ModeSchema } from "~/engine/input/schema/ModeSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import { readOutputMaximumQuantitiesFx } from "~/engine/output/fx/readOutputMaximumQuantitiesFx";
 
@@ -19,10 +19,7 @@ export const readLineNetMaximumOutputQuantitiesFx = Effect.fn(
 					}),
 				);
 	for (const input of line.input) {
-		if (
-			input.type !== InputEnumSchema.enum.Materials ||
-			input.mode !== InputModeEnumSchema.enum.Consume
-		) {
+		if (input.type !== TypeSchema.enum.Materials || input.mode !== ModeSchema.enum.Consume) {
 			continue;
 		}
 		const netQuantity = Math.max(

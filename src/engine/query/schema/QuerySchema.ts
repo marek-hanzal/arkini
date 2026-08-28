@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-import { QueryAnySchema } from "./QueryAnySchema";
-import { QueryBoardSchema } from "./QueryBoardSchema";
-import { QueryInventorySchema } from "./QueryInventorySchema";
-import { QueryToolbarSchema } from "./QueryToolbarSchema";
-import { QueryUniverseSchema } from "./QueryUniverseSchema";
+import { AnySchema } from "./AnySchema";
+import { BoardSchema } from "./BoardSchema";
+import { InventorySchema } from "./InventorySchema";
+import { ToolbarSchema } from "./ToolbarSchema";
+import { UniverseSchema } from "./UniverseSchema";
 
 /**
  * A runtime item query selected by its search scope.
@@ -14,11 +14,11 @@ import { QueryUniverseSchema } from "./QueryUniverseSchema";
  */
 export const QuerySchema = z
 	.discriminatedUnion("scope", [
-		QueryBoardSchema,
-		QueryInventorySchema,
-		QueryToolbarSchema,
-		QueryAnySchema,
-		QueryUniverseSchema,
+		BoardSchema,
+		InventorySchema,
+		ToolbarSchema,
+		AnySchema,
+		UniverseSchema,
 	])
 	.meta({
 		id: "QuerySchema",

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import type { ActionInputSchema } from "~/engine/action/schema/ActionInputSchema";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import type { InputSchema } from "~/engine/action/schema/InputSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
 import type { DiagnosticPathSchema } from "../schema/DiagnosticPathSchema";
@@ -18,7 +18,7 @@ export const validateActionReferencesFx = Effect.fn("validateActionReferencesFx"
 }: {
 	config: GameConfigSchema.Type;
 	inputs: ReadonlyArray<{
-		input: ActionInputSchema.Type;
+		input: InputSchema.Type;
 		index: number;
 	}>;
 	path: DiagnosticPathSchema.Type;
@@ -31,7 +31,7 @@ export const validateActionReferencesFx = Effect.fn("validateActionReferencesFx"
 	source?: string;
 }) {
 	const inputDiagnostics = yield* Effect.forEach(inputs, ({ input, index }) =>
-		input.type === InputEnumSchema.enum.Simple
+		input.type === TypeSchema.enum.Simple
 			? Effect.succeed([])
 			: validateSelectorReferenceFx({
 					config,

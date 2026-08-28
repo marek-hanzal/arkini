@@ -4,7 +4,7 @@ import type { DeliveryTargetIssueSchema } from "~/engine/delivery/schema/check/D
 import { DeliveryTargetIssueReasonEnumSchema } from "~/engine/delivery/schema/check/DeliveryTargetIssueReasonEnumSchema";
 import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
 import { isMaterialInputEligibleFx } from "~/engine/input/read/isMaterialInputEligibleFx";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
@@ -82,7 +82,7 @@ export const checkRuntimeDeliveriesFx = Effect.fn("checkRuntimeDeliveriesFx")(fu
 
 		for (const allocation of target.input) {
 			const input = line.input[allocation.inputIndex];
-			if (input === undefined || input.type !== InputEnumSchema.enum.Materials) {
+			if (input === undefined || input.type !== TypeSchema.enum.Materials) {
 				issues.push(issue(DeliveryTargetIssueReasonEnumSchema.enum.SlotInvalid));
 				continue;
 			}
@@ -140,7 +140,7 @@ export const checkRuntimeDeliveriesFx = Effect.fn("checkRuntimeDeliveriesFx")(fu
 		});
 		if (line === undefined) continue;
 		const input = line.input[current.inputIndex];
-		if (input === undefined || input.type !== InputEnumSchema.enum.Materials) continue;
+		if (input === undefined || input.type !== TypeSchema.enum.Materials) continue;
 
 		const storedQuantity = runtime.items.reduce((total, candidate) => {
 			return candidate.location.scope === LocationScopeEnumSchema.enum.Input &&

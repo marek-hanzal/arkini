@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 
 import { InputChargeRunPlanSchema } from "./InputChargeRunPlanSchema";
 
@@ -12,7 +12,7 @@ export const InputSimpleRunPlanSchema = z
 		/**
 		 * Identifies this plan as one simple input.
 		 */
-		type: InputEnumSchema.extract([
+		type: TypeSchema.extract([
 			"Simple",
 		]),
 		charges: InputChargeRunPlanSchema.optional().describe(

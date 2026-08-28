@@ -21,7 +21,7 @@ export const ResourceConfigSchema = z
 	})
 	.strict()
 	.meta({
-		id: "ResourceConfigSchema",
+		id: "resource.RolesSchema",
 		description: "Named non-item resource references required by the game.",
 	});
 

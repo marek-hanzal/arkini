@@ -7,7 +7,7 @@ import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagn
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 import { DiagnosticRecordEntityEnumSchema } from "~/engine/validation/schema/DiagnosticRecordEntityEnumSchema";
-import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
+import { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
 
 import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
 import { readItemOutputEntriesFx } from "../fx/readItemOutputEntriesFx";
@@ -131,7 +131,7 @@ export const validateConfigReferencesFx = Effect.fn("validateConfigReferencesFx"
 			match(merge)
 				.with(
 					{
-						effect: EffectEnumSchema.enum.Replace,
+						effect: TargetEffectSchema.enum.Replace,
 					},
 					({ result }) => {
 						if (config.items[result] !== undefined) {
@@ -156,13 +156,13 @@ export const validateConfigReferencesFx = Effect.fn("validateConfigReferencesFx"
 				)
 				.with(
 					{
-						effect: EffectEnumSchema.enum.Keep,
+						effect: TargetEffectSchema.enum.Keep,
 					},
 					() => undefined,
 				)
 				.with(
 					{
-						effect: EffectEnumSchema.enum.Remove,
+						effect: TargetEffectSchema.enum.Remove,
 					},
 					() => undefined,
 				)

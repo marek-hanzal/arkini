@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 
-import type { InputSimpleSchema } from "~/engine/input/schema/InputSimpleSchema";
+import type { SimpleSchema } from "~/engine/input/schema/SimpleSchema";
 import type { InputChargeRunPlanSchema } from "~/engine/input/schema/run/InputChargeRunPlanSchema";
 import type { InputSimpleRunPlanSchema } from "~/engine/input/schema/run/InputSimpleRunPlanSchema";
 
 export namespace planInputSimpleRunFx {
 	export interface Props {
-		input: InputSimpleSchema.Type;
+		input: SimpleSchema.Type;
 		charges?: InputChargeRunPlanSchema.Type;
 	}
 }

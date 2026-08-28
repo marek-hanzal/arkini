@@ -3,8 +3,8 @@ import { z } from "zod";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import { ActionEnumSchema } from "~/engine/merge/schema/ActionEnumSchema";
-import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
+import { SourceActionSchema } from "~/engine/merge/schema/SourceActionSchema";
+import { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
 import { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { DropItemIgnoredReasonEnumSchema } from "./DropItemIgnoredReasonEnumSchema";
 import { DropItemRejectedReasonEnumSchema } from "./DropItemRejectedReasonEnumSchema";
@@ -56,8 +56,8 @@ const DropItemMergedResultSchema = z
 		kind: DropItemResultKindEnumSchema.extract([
 			"Merge",
 		]),
-		action: ActionEnumSchema,
-		effect: EffectEnumSchema,
+		action: SourceActionSchema,
+		effect: TargetEffectSchema,
 		resultCanonicalItemId: IdSchema.optional(),
 		source: z
 			.object({

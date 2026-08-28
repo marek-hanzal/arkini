@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { ActionInputSchema } from "~/engine/action/schema/ActionInputSchema";
-import { ActionRuleSchema } from "~/engine/action/schema/ActionRuleSchema";
+import { InputSchema } from "~/engine/action/schema/InputSchema";
+import { RuleSchema } from "~/engine/action/schema/RuleSchema";
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
@@ -17,12 +17,12 @@ export const SpaceItemSchema = z
 			"The authored board space selected after successful activation.",
 		),
 		enable: z.boolean().default(true),
-		input: z.array(ActionInputSchema).default([]),
-		rules: z.array(ActionRuleSchema).default([]),
+		input: z.array(InputSchema).default([]),
+		rules: z.array(RuleSchema).default([]),
 	})
 	.strict()
 	.meta({
-		id: "SpaceItemSchema",
+		id: "item.SpaceSchema",
 		description:
 			"An item whose shared immediate action requirements settle atomically with navigation.",
 	});

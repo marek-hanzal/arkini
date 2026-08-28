@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import { GameSourceFileSchema } from "~/engine/source/schema/GameSourceFileSchema";
-import { GameProjectFileSchema } from "~/engine/source/schema/GameProjectFileSchema";
-import { GameProjectItemFileSchema } from "~/engine/source/schema/GameProjectItemFileSchema";
+import { GameFileSchema } from "~/engine/source/schema/GameFileSchema";
+import { ItemFileSchema } from "~/engine/source/schema/ItemFileSchema";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
@@ -50,8 +50,8 @@ export const parseGameSourceFileFx = Effect.fn("parseGameSourceFileFx")(
 
 			const gameProjectRoot = relative === "game.json";
 			const parsed = gameProjectRoot
-				? GameProjectFileSchema.safeParse(json)
-				: GameProjectItemFileSchema.safeParse(json);
+				? GameFileSchema.safeParse(json)
+				: ItemFileSchema.safeParse(json);
 			if (!parsed.success) {
 				return {
 					diagnostics: gameSourceSchemaDiagnostics(path, parsed.error),
@@ -59,7 +59,7 @@ export const parseGameSourceFileFx = Effect.fn("parseGameSourceFileFx")(
 			}
 
 			if (gameProjectRoot) {
-				const { version, ...value } = parsed.data as GameProjectFileSchema.Type;
+				const { version, ...value } = parsed.data as GameFileSchema.Type;
 				return {
 					source: {
 						path,
@@ -73,7 +73,7 @@ export const parseGameSourceFileFx = Effect.fn("parseGameSourceFileFx")(
 				};
 			}
 			if (!gameProjectRoot) {
-				const value = parsed.data as GameProjectItemFileSchema.Type;
+				const value = parsed.data as ItemFileSchema.Type;
 				const item = value.item;
 				const segments = relative.split("/");
 				const expectedFilename = `${encodeURIComponent(item.uid).replaceAll(".", "%2E")}.json`;
@@ -103,7 +103,7 @@ export const parseGameSourceFileFx = Effect.fn("parseGameSourceFileFx")(
 				}
 			}
 
-			const itemFile = parsed.data as GameProjectItemFileSchema.Type;
+			const itemFile = parsed.data as ItemFileSchema.Type;
 			return {
 				source: {
 					path,

@@ -11,7 +11,7 @@ export const StorageScopeEnumSchema = z
 		Any: "any",
 	})
 	.meta({
-		id: "StorageScopeEnumSchema",
+		id: "scope.StorageSchema",
 		description: "Where one canonical item may physically exist in grid state.",
 	});
 

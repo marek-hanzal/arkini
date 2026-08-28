@@ -2,10 +2,10 @@ import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { DropWeightSchema } from "~/engine/roll/schema/DropWeightSchema";
+import type { WeightedDropSchema } from "~/engine/roll/schema/WeightedDropSchema";
 import { selectDropWeightFx } from "~/engine/roll/fx/selectDropWeightFx";
 
-const createDrop = (itemId: string, weight: number): DropWeightSchema.Type => {
+const createDrop = (itemId: string, weight: number): WeightedDropSchema.Type => {
 	return {
 		weight,
 		drop: [

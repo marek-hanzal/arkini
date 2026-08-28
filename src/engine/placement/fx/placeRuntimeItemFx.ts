@@ -1,6 +1,6 @@
 import { Effect, Option } from "effect";
 
-import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
+import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
@@ -85,7 +85,7 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 		const plan = yield* planDropPlacementFx({
 			drop: {
 				itemId: item.item.id,
-				placement: PlacementEnumSchema.enum.Drop,
+				placement: PlacementSchema.enum.Drop,
 				quantity: item.quantity,
 			},
 			origin,

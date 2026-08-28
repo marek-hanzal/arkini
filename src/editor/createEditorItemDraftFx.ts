@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import type { ActionInputSchema } from "~/engine/action/schema/ActionInputSchema";
-import type { InputSchema } from "~/engine/input/schema/InputSchema";
+import type { InputSchema as ImmediateInputSchema } from "~/engine/action/schema/InputSchema";
+import type { InputSchema as LineInputSchema } from "~/engine/input/schema/InputSchema";
 import type { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
@@ -44,7 +44,7 @@ export const createEditorItemDraftFx = Effect.fn("createEditorItemDraftFx")(
 						type: "simple",
 					},
 				] as [
-					InputSchema.Type,
+					LineInputSchema.Type,
 				],
 				rules: [],
 			} satisfies Omit<LineSchema.Type, "description" | "title">;
@@ -58,7 +58,7 @@ export const createEditorItemDraftFx = Effect.fn("createEditorItemDraftFx")(
 					type: matchedType,
 					space: 0,
 					enable: true,
-					input: [] as ActionInputSchema.Type[],
+					input: [] as ImmediateInputSchema.Type[],
 					rules: [],
 				}))
 				.with("inventory", (matchedType) => ({

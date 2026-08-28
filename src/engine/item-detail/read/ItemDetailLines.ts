@@ -1,8 +1,8 @@
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { TimeSchema } from "~/engine/common/schema/TimeSchema";
-import type { DistanceEnumSchema } from "~/engine/distance/schema/DistanceEnumSchema";
-import type { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
-import type { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
+import type { DistanceSchema } from "~/engine/distance/schema/DistanceSchema";
+import type { ChargeSourceSchema } from "~/engine/input/schema/ChargeSourceSchema";
+import type { ModeSchema } from "~/engine/input/schema/ModeSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 import type {
@@ -16,7 +16,7 @@ import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
 
 interface ItemDetailLineChargeCost {
 	readonly cost: number;
-	readonly from: InputChargeFromEnumSchema.Type;
+	readonly from: ChargeSourceSchema.Type;
 }
 
 /** Engine-owned projection contract for the Lines capability of Item Detail. */
@@ -32,7 +32,7 @@ export namespace ItemDetailLines {
 		readonly kind: "materials";
 		readonly inputIndex: NonNegativeIntegerSchema.Type;
 		readonly selector: SelectorSchema.Type;
-		readonly mode: InputModeEnumSchema.Type;
+		readonly mode: ModeSchema.Type;
 		readonly required: QuantityBounds;
 		readonly storedQuantity: number;
 		readonly deliveryQuantity: number;
@@ -49,7 +49,7 @@ export namespace ItemDetailLines {
 	export interface DepositInput {
 		readonly kind: "deposit";
 		readonly selector: SelectorSchema.Type;
-		readonly distance: DistanceEnumSchema.Type;
+		readonly distance: DistanceSchema.Type;
 		readonly requiredCharges: number;
 		readonly availableCharges: number;
 		readonly targetItemIds: readonly IdSchema.Type[];
@@ -102,7 +102,7 @@ export namespace ItemDetailLines {
 		| {
 				readonly kind: "deposit-target-missing";
 				readonly selector: SelectorSchema.Type;
-				readonly distance: DistanceEnumSchema.Type;
+				readonly distance: DistanceSchema.Type;
 		  }
 		| {
 				readonly kind: "direct-output-max-count";

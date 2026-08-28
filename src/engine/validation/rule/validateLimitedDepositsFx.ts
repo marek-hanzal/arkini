@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
+import { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -39,7 +39,7 @@ export const validateLimitedDepositsFx = Effect.fn("validateLimitedDepositsFx")(
 	const certainty = new Map<IdSchema.Type, OutputRecreationCertainty>();
 	for (const [itemId, item] of Object.entries(config.items)) {
 		for (const merge of item.merge ?? []) {
-			if (merge.effect === EffectEnumSchema.enum.Replace) {
+			if (merge.effect === TargetEffectSchema.enum.Replace) {
 				certainty.set(merge.result, "guaranteed");
 			}
 		}

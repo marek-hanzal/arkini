@@ -5,7 +5,7 @@ import { readLineInputDeliveryClaimsFx } from "~/engine/delivery/read/readLineIn
 import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
 import { isLineInputAutofillSourceLocationFx } from "~/engine/input/read/isLineInputAutofillSourceLocationFx";
 import { readMaterialInputEligibilityFx } from "~/engine/input/read/readMaterialInputEligibilityFx";
-import type { InputMaterialSchema } from "~/engine/input/schema/InputMaterialSchema";
+import type { MaterialSchema } from "~/engine/input/schema/MaterialSchema";
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
 import { readBoardItemLineFx } from "~/engine/line/fx/readBoardItemLineFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
@@ -14,7 +14,7 @@ import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { selectItemsFx } from "~/engine/selector/fx/selectItemsFx";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 
 export namespace planLineInputAutofillFx {
 	export interface Props {
@@ -131,7 +131,7 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 	const entryIndexByKey = new Map<string, number>();
 	const slots: {
 		readonly closed: boolean;
-		readonly input: InputMaterialSchema.Type;
+		readonly input: MaterialSchema.Type;
 		readonly inputIndex: number;
 		readonly matchingCanonicalItemIds: ReadonlySet<IdSchema.Type>;
 		readonly maxQuantity: number;
@@ -140,7 +140,7 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 	}[] = [];
 
 	for (const [inputIndex, input] of line.input.entries()) {
-		if (input.type !== InputEnumSchema.enum.Materials) continue;
+		if (input.type !== TypeSchema.enum.Materials) continue;
 
 		const storedItems = runtime.items.filter(
 			(item) =>

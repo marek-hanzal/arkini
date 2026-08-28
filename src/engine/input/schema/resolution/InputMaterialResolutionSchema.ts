@@ -2,8 +2,8 @@ import { z } from "zod";
 
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
-import { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
+import { ModeSchema } from "~/engine/input/schema/ModeSchema";
 import { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
 
 /**
@@ -14,13 +14,13 @@ export const InputMaterialResolutionSchema = z
 		/**
 		 * Identifies this resolution as one material input.
 		 */
-		type: InputEnumSchema.extract([
+		type: TypeSchema.extract([
 			"Materials",
 		]),
 		/**
 		 * Whether the resolved material is consumed or reserved by a line run.
 		 */
-		mode: InputModeEnumSchema.describe(
+		mode: ModeSchema.describe(
 			"Whether one ready line run consumes or reserves the resolved material.",
 		),
 		/**

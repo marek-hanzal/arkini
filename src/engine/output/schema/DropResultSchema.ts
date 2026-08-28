@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
+import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
 
 /**
  * A fully resolved item drop ready for placement.
@@ -27,7 +27,7 @@ export const DropResultSchema = z
 		/**
 		 * Board-placement strategy used after this drop is resolved.
 		 */
-		placement: PlacementEnumSchema.describe(
+		placement: PlacementSchema.describe(
 			"The board-placement strategy used for this resolved drop.",
 		),
 	})

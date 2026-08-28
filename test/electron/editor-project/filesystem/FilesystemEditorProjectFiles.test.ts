@@ -49,25 +49,25 @@ describe("filesystem Editor project current tree", () => {
 		expect(schema).toMatchObject({
 			anyOf: [
 				{
-					$ref: "urn:arkini:schema:game-project-source#/$defs/GameProjectFileSchema",
+					$ref: "urn:arkini:schema:project#/$defs/GameFileSchema",
 				},
 				{
-					$ref: "urn:arkini:schema:game-project-source#/$defs/GameProjectItemFileSchema",
+					$ref: "urn:arkini:schema:project#/$defs/ItemFileSchema",
 				},
 			],
 			$defs: {
-				GameProjectFileSchema: {
+				GameFileSchema: {
 					properties: {
 						version: {
-							$ref: "urn:arkini:schema:game-project-source#/$defs/ArkpackVersionSchema",
+							$ref: "urn:arkini:schema:project#/$defs/ArkpackVersionSchema",
 						},
 					},
 					type: "object",
 				},
-				GameProjectItemFileSchema: {
+				ItemFileSchema: {
 					properties: {
 						item: {
-							$ref: "urn:arkini:schema:game-project-source#/$defs/ItemSchema",
+							$ref: "urn:arkini:schema:project#/$defs/ItemSchema",
 						},
 					},
 					type: "object",

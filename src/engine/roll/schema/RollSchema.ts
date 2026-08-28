@@ -1,17 +1,17 @@
 import { z } from "zod";
 
-import { RollChanceSchema } from "./RollChanceSchema";
-import { RollGuaranteedSchema } from "./RollGuaranteedSchema";
-import { RollWeightSchema } from "./RollWeightSchema";
+import { ChanceSchema } from "./ChanceSchema";
+import { GuaranteedSchema } from "./GuaranteedSchema";
+import { WeightSchema } from "./WeightSchema";
 
 /**
  * A possible output roll, selected by its `type` discriminator.
  */
 export const RollSchema = z
 	.discriminatedUnion("type", [
-		RollGuaranteedSchema,
-		RollChanceSchema,
-		RollWeightSchema,
+		GuaranteedSchema,
+		ChanceSchema,
+		WeightSchema,
 	])
 	.meta({
 		id: "RollSchema",

@@ -24,7 +24,7 @@ export const CraftItemSchema = z
 	})
 	.strict()
 	.meta({
-		id: "CraftItemSchema",
+		id: "item.CraftSchema",
 		description: "An item configuration that owns one craft product line.",
 	});
 

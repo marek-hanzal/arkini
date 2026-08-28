@@ -12,7 +12,7 @@ import { LocationOccupiedError } from "~/engine/runtime/error/LocationOccupiedEr
 import { createRuntimeItemFx } from "~/engine/runtime/fx/createRuntimeItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
+import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
 
 export namespace spawnItemFx {
 	export interface Props {
@@ -74,7 +74,7 @@ export const spawnItemFx = Effect.fn("spawnItemFx")(function* ({
 			yield* assertPlacementMaxCountFx({
 				drop: {
 					itemId,
-					placement: PlacementEnumSchema.enum.Drop,
+					placement: PlacementSchema.enum.Drop,
 					quantity,
 				},
 				item,

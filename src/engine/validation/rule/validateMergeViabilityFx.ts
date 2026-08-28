@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
+import { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
 import { selectItemsFx } from "~/engine/selector/fx/selectItemsFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
@@ -82,7 +82,7 @@ export const validateMergeViabilityFx = Effect.fn("validateMergeViabilityFx")(fu
 				}
 			}
 
-			if (merge.effect !== EffectEnumSchema.enum.Replace) continue;
+			if (merge.effect !== TargetEffectSchema.enum.Replace) continue;
 			const result = config.items[merge.result];
 			if (
 				result === undefined ||

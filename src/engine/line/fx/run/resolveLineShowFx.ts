@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { RuleEnumSchema } from "~/engine/line/schema/rule/RuleEnumSchema";
+import { TypeSchema } from "~/engine/line/schema/rule/TypeSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { RulesResultSchema } from "~/engine/line/schema/rule/RulesResultSchema";
 
@@ -19,12 +19,12 @@ export const resolveLineShowFx = Effect.fn("resolveLineShowFx")(function* ({
 	rules,
 }: resolveLineShowFx.Props) {
 	const hidden = rules.some((rule) => {
-		return rule.type === RuleEnumSchema.enum.Hide && rule.active;
+		return rule.type === TypeSchema.enum.Hide && rule.active;
 	});
 	const shown =
 		line.show ||
 		rules.some((rule) => {
-			return rule.type === RuleEnumSchema.enum.Show && rule.active;
+			return rule.type === TypeSchema.enum.Show && rule.active;
 		});
 
 	return shown && !hidden;

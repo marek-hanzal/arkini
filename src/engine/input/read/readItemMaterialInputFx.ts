@@ -3,11 +3,11 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { InputMaterialNotFoundError } from "~/engine/input/error/InputMaterialNotFoundError";
-import type { InputMaterialSchema } from "~/engine/input/schema/InputMaterialSchema";
+import type { MaterialSchema } from "~/engine/input/schema/MaterialSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { LineNotFoundError } from "~/engine/line/error/LineNotFoundError";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 
 export namespace readItemMaterialInputFx {
 	export interface Props {
@@ -41,7 +41,7 @@ export const readItemMaterialInputFx = Effect.fn("readItemMaterialInputFx")(func
 	}
 
 	const input = line.input[inputIndex];
-	if (input === undefined || input.type !== InputEnumSchema.enum.Materials) {
+	if (input === undefined || input.type !== TypeSchema.enum.Materials) {
 		return yield* Effect.fail(
 			new InputMaterialNotFoundError({
 				ownerItemId,
@@ -51,5 +51,5 @@ export const readItemMaterialInputFx = Effect.fn("readItemMaterialInputFx")(func
 		);
 	}
 
-	return input satisfies InputMaterialSchema.Type;
+	return input satisfies MaterialSchema.Type;
 });

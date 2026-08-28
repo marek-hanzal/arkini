@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import { DistanceEnumSchema } from "~/engine/distance/schema/DistanceEnumSchema";
-import { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
+import { DistanceSchema } from "~/engine/distance/schema/DistanceSchema";
+import { ChargeSourceSchema } from "~/engine/input/schema/ChargeSourceSchema";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import { selectItemsFx } from "~/engine/selector/fx/selectItemsFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -11,7 +11,7 @@ import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticC
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 import { InvalidInputChargesReasonEnumSchema } from "~/engine/validation/schema/InvalidInputChargesReasonEnumSchema";
 import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import type { InputSchema } from "~/engine/input/schema/InputSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { DiagnosticPathSchema } from "~/engine/validation/schema/DiagnosticPathSchema";
@@ -73,8 +73,8 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 					"charges",
 				];
 				if (
-					input.type === InputEnumSchema.enum.Deposit &&
-					input.query.distance === DistanceEnumSchema.enum.Self &&
+					input.type === TypeSchema.enum.Deposit &&
+					input.query.distance === DistanceSchema.enum.Self &&
 					item.type !== ItemEnumSchema.enum.Deposit
 				) {
 					diagnostics.push({
@@ -97,7 +97,7 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 					});
 					continue;
 				}
-				if (input.type === InputEnumSchema.enum.Deposit && input.charges === undefined) {
+				if (input.type === TypeSchema.enum.Deposit && input.charges === undefined) {
 					diagnostics.push({
 						code: DiagnosticCodeEnumSchema.enum.InputChargesInvalid,
 						severity: DiagnosticSeverityEnumSchema.enum.Error,
@@ -113,9 +113,9 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 				}
 				if (input.charges === undefined) continue;
 
-				if (input.charges.from === InputChargeFromEnumSchema.enum.Self) {
+				if (input.charges.from === ChargeSourceSchema.enum.Self) {
 					if (
-						input.type === InputEnumSchema.enum.Deposit &&
+						input.type === TypeSchema.enum.Deposit &&
 						item.type !== ItemEnumSchema.enum.Space
 					) {
 						diagnostics.push({
@@ -163,7 +163,7 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 					continue;
 				}
 
-				if (input.type !== InputEnumSchema.enum.Deposit) {
+				if (input.type !== TypeSchema.enum.Deposit) {
 					diagnostics.push({
 						code: DiagnosticCodeEnumSchema.enum.InputChargesInvalid,
 						severity: DiagnosticSeverityEnumSchema.enum.Error,
@@ -188,7 +188,7 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 				const targetChargeCost = input.charges.cost;
 				const matchedCandidates = yield* selectItemsFx({
 					items:
-						input.query.distance === DistanceEnumSchema.enum.Self
+						input.query.distance === DistanceSchema.enum.Self
 							? [
 									item,
 								]

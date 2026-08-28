@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
+import { ChargeSourceSchema } from "~/engine/input/schema/ChargeSourceSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import { applyFinalChargePayerNetMaximumOutputFx } from "./applyFinalChargePayerNetMaximumOutputFx";
@@ -21,7 +21,7 @@ export const readDefinitionLineNetMaximumOutputQuantitiesFx = Effect.fn(
 	const quantities = new Map(yield* readLineNetMaximumOutputQuantitiesFx(line));
 	const selfChargeCost = line.input.reduce(
 		(total, input) =>
-			input.charges?.from === InputChargeFromEnumSchema.enum.Self
+			input.charges?.from === ChargeSourceSchema.enum.Self
 				? total + input.charges.cost
 				: total,
 		0,

@@ -4,7 +4,7 @@ import { match } from "ts-pattern";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
-import { RollEnumSchema } from "~/engine/roll/schema/RollEnumSchema";
+import { TypeSchema } from "~/engine/roll/schema/TypeSchema";
 
 export type OutputRecreationCertainty = "guaranteed" | "stochastic" | "none";
 
@@ -31,13 +31,13 @@ export const readOutputRecreationCertaintyFx = Effect.fn("readOutputRecreationCe
 				return match(roll)
 					.with(
 						{
-							type: RollEnumSchema.enum.Guaranteed,
+							type: TypeSchema.enum.Guaranteed,
 						},
 						(guaranteed) => readDropCertainty(guaranteed.drop, itemId),
 					)
 					.with(
 						{
-							type: RollEnumSchema.enum.Chance,
+							type: TypeSchema.enum.Chance,
 						},
 						(chance) => {
 							if (chance.chance === 0) return "none";
@@ -50,7 +50,7 @@ export const readOutputRecreationCertaintyFx = Effect.fn("readOutputRecreationCe
 					)
 					.with(
 						{
-							type: RollEnumSchema.enum.Weight,
+							type: TypeSchema.enum.Weight,
 						},
 						(weight) => {
 							const candidates = weight.drop.map((candidate) =>

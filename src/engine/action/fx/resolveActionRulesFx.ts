@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { resolveActionRuleFx } from "~/engine/action/fx/resolveActionRuleFx";
-import type { ActionRuleSchema } from "~/engine/action/schema/ActionRuleSchema";
+import type { RuleSchema } from "~/engine/action/schema/RuleSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 
 /** Evaluates ordered immediate-action availability rules without mutating runtime. */
@@ -10,7 +10,7 @@ export const resolveActionRulesFx = Effect.fn("resolveActionRulesFx")(function* 
 	rules,
 }: {
 	readonly origin: GridLocationSchema.Type;
-	readonly rules: ReadonlyArray<ActionRuleSchema.Type>;
+	readonly rules: ReadonlyArray<RuleSchema.Type>;
 }) {
 	return yield* Effect.forEach(rules, (rule) =>
 		resolveActionRuleFx({

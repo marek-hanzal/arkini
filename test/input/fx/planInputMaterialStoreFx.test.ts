@@ -2,10 +2,10 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { planInputMaterialStoreFx } from "~/engine/input/fx/planInputMaterialStoreFx";
-import { InputMaterialSchema } from "~/engine/input/schema/InputMaterialSchema";
+import { MaterialSchema } from "~/engine/input/schema/MaterialSchema";
 import { runtimeInputTestItem } from "~test/input/fx/support/inputTestItems";
 
-const input = InputMaterialSchema.parse({
+const input = MaterialSchema.parse({
 	type: "materials",
 	selector: {
 		type: "item",

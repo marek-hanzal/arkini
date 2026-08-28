@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { RuleRuntimeAdjustSchema } from "~/engine/line/schema/rule/RuleRuntimeAdjustSchema";
+import type { RuntimeAdjustmentSchema } from "~/engine/line/schema/rule/RuntimeAdjustmentSchema";
 import type { RuleRuntimeAdjustResultSchema } from "~/engine/line/schema/rule/RuleRuntimeAdjustResultSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import { whenFx } from "~/engine/when/fx/whenFx";
@@ -8,7 +8,7 @@ import { whenFx } from "~/engine/when/fx/whenFx";
 export namespace lineRuleRuntimeAdjustFx {
 	export interface Props {
 		origin: BoardLocationSchema.Type;
-		rule: RuleRuntimeAdjustSchema.Type;
+		rule: RuntimeAdjustmentSchema.Type;
 	}
 }
 

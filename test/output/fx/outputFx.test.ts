@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
 import type { RollSchema } from "~/engine/roll/schema/RollSchema";
-import type { RollSetSchema } from "~/engine/roll/schema/RollSetSchema";
+import type { SetSchema } from "~/engine/roll/schema/SetSchema";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { outputFx } from "~/engine/output/fx/outputFx";
@@ -117,7 +117,7 @@ const createRollSet = ({
 }: {
 	roll: RollSchema.Type;
 	weight?: number;
-}): RollSetSchema.Type => {
+}): SetSchema.Type => {
 	return {
 		weight: weight ?? 1,
 		roll: [

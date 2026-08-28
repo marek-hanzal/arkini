@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
-import type { InputMaterialSchema } from "~/engine/input/schema/InputMaterialSchema";
+import type { MaterialSchema } from "~/engine/input/schema/MaterialSchema";
 import type { InputCapacityExceededIssueSchema } from "~/engine/input/schema/check/InputCapacityExceededIssueSchema";
 import type { InputLineMissingIssueSchema } from "~/engine/input/schema/check/InputLineMissingIssueSchema";
 import type { InputOwnerMissingIssueSchema } from "~/engine/input/schema/check/InputOwnerMissingIssueSchema";
@@ -15,7 +15,7 @@ import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { matchesItemSelectorFx } from "~/engine/selector/fx/matchesItemSelectorFx";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace checkRuntimeInputLocationsFx {
@@ -30,7 +30,7 @@ interface LocatedInputItem {
 }
 
 interface ValidInputItem extends LocatedInputItem {
-	input: InputMaterialSchema.Type;
+	input: MaterialSchema.Type;
 }
 
 /**
@@ -84,7 +84,7 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 		}
 
 		const input = line.input[location.inputIndex];
-		if (input === undefined || input.type !== InputEnumSchema.enum.Materials) {
+		if (input === undefined || input.type !== TypeSchema.enum.Materials) {
 			slotIssues.push({
 				itemId: item.id,
 				location,

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { PositiveNumberSchema } from "~/engine/common/schema/PositiveNumberSchema";
 
 import { BaseRuleResultSchema } from "./BaseRuleResultSchema";
-import { RuleEnumSchema } from "./RuleEnumSchema";
+import { TypeSchema } from "./TypeSchema";
 
 /**
  * Evaluation result of one conditional runtime multiplier rule.
@@ -11,7 +11,7 @@ import { RuleEnumSchema } from "./RuleEnumSchema";
 export const RuleRuntimeMultiplierResultSchema = z
 	.object({
 		...BaseRuleResultSchema.shape,
-		type: RuleEnumSchema.extract([
+		type: TypeSchema.extract([
 			"RuntimeMultiplier",
 		]).describe("Identifies this result as an evaluated product-line runtime multiplier rule."),
 		multiplier: PositiveNumberSchema.describe(

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { DiagnosticPathSchema } from "../schema/DiagnosticPathSchema";
@@ -26,7 +26,7 @@ export const validateLineReferencesFx = Effect.fn("validateLineReferencesFx")(fu
 	const actionDiagnostics = yield* validateActionReferencesFx({
 		config,
 		inputs: line.input.flatMap((input, index) =>
-			input.type === InputEnumSchema.enum.Materials
+			input.type === TypeSchema.enum.Materials
 				? []
 				: [
 						{
@@ -43,7 +43,7 @@ export const validateLineReferencesFx = Effect.fn("validateLineReferencesFx")(fu
 		source,
 	});
 	const materialDiagnostics = yield* Effect.forEach(line.input, (input, inputIndex) =>
-		input.type !== InputEnumSchema.enum.Materials
+		input.type !== TypeSchema.enum.Materials
 			? Effect.succeed([])
 			: validateSelectorReferenceFx({
 					config,

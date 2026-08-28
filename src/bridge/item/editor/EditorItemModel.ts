@@ -1,6 +1,6 @@
-import type { ActionInputSchema } from "~/engine/action/schema/ActionInputSchema";
-import type { ActionRuleSchema } from "~/engine/action/schema/ActionRuleSchema";
-import type { InputSchema } from "~/engine/input/schema/InputSchema";
+import type { InputSchema as ImmediateInputSchema } from "~/engine/action/schema/InputSchema";
+import type { RuleSchema } from "~/engine/action/schema/RuleSchema";
+import type { InputSchema as LineInputSchema } from "~/engine/input/schema/InputSchema";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
@@ -11,17 +11,17 @@ import type { RuleSchema as DropRuleSchema } from "~/engine/output/schema/drop/r
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import type { QuerySchema } from "~/engine/query/schema/QuerySchema";
 import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
-import type { DropWeightSchema } from "~/engine/roll/schema/DropWeightSchema";
+import type { WeightedDropSchema } from "~/engine/roll/schema/WeightedDropSchema";
 import type { RollSchema } from "~/engine/roll/schema/RollSchema";
-import type { RollSetSchema } from "~/engine/roll/schema/RollSetSchema";
+import type { SetSchema } from "~/engine/roll/schema/SetSchema";
 import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
 import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
 
 export type EditorItem = ItemSchema.Type;
 export type EditorItemType = ItemEnumSchema.Type;
-export type EditorInput = InputSchema.Type;
-export type EditorActionInput = ActionInputSchema.Type;
-export type EditorActionRule = ActionRuleSchema.Type;
+export type EditorInput = LineInputSchema.Type;
+export type EditorActionInput = ImmediateInputSchema.Type;
+export type EditorActionRule = RuleSchema.Type;
 export type EditorLine = LineSchema.Type;
 export type EditorLineRule = LineRuleSchema.Type;
 export type EditorMerge = MergeSchema.Type;
@@ -30,9 +30,9 @@ export type EditorDropRule = DropRuleSchema.Type;
 export type EditorOutput = OutputSchema.Type;
 export type EditorQuery = QuerySchema.Type;
 export type EditorQuantity = QuantitySchema.Type;
-export type EditorDropWeight = DropWeightSchema.Type;
+export type EditorDropWeight = WeightedDropSchema.Type;
 export type EditorRoll = RollSchema.Type;
-export type EditorRollSet = RollSetSchema.Type;
+export type EditorRollSet = SetSchema.Type;
 export type EditorSelector = SelectorSchema.Type;
 export type EditorWhen = WhenSchema.Type;
 

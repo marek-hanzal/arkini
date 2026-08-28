@@ -10,7 +10,7 @@ import { readItemDetailMaterialAutofillAvailabilityFx } from "~/engine/item-deta
 import { readItemDetailQuantityBoundsFx } from "~/engine/item-detail/read/readItemDetailQuantityBoundsFx";
 import { readItemDetailSelectorKeyFx } from "~/engine/item-detail/read/readItemDetailSelectorKeyFx";
 import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import type { InputSchema } from "~/engine/input/schema/InputSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -42,7 +42,7 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 		yield* match(input)
 			.with(
 				{
-					type: InputEnumSchema.enum.Materials,
+					type: TypeSchema.enum.Materials,
 				},
 				(materialInput) =>
 					Effect.gen(function* () {
@@ -57,7 +57,7 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 								item.location.inputIndex === inputIndex,
 						);
 						const storedQuantity =
-							resolution?.type === InputEnumSchema.enum.Materials
+							resolution?.type === TypeSchema.enum.Materials
 								? resolution.storedQuantity
 								: storedItems.reduce((total, item) => total + item.quantity, 0);
 						const deliveryQuantity = (yield* readLineInputDeliveryClaimsFx({
@@ -67,7 +67,7 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 							runtime,
 						})).reduce((total, claim) => total + claim.quantity, 0);
 						const maxStoredQuantity =
-							resolution?.type === InputEnumSchema.enum.Materials
+							resolution?.type === TypeSchema.enum.Materials
 								? resolution.maxStoredQuantity
 								: required.max + materialInput.capacity;
 						const missingQuantity = Math.max(0, required.min - storedQuantity);
@@ -112,7 +112,7 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 			)
 			.with(
 				{
-					type: InputEnumSchema.enum.Deposit,
+					type: TypeSchema.enum.Deposit,
 				},
 				(depositInput) =>
 					Effect.gen(function* () {
@@ -152,7 +152,7 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 			)
 			.with(
 				{
-					type: InputEnumSchema.enum.Simple,
+					type: TypeSchema.enum.Simple,
 				},
 				(simpleInput) =>
 					Effect.gen(function* () {

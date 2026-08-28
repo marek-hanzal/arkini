@@ -23,6 +23,16 @@ export const SettingsDev = () => {
 				onClick={cli.toggleCliInstallation}
 			/>
 			<SettingsOpenActionRow
+				dataUi="SettingsCliCompletion"
+				title="Shell completion"
+				description={cli.cliCompletionDescription}
+				pending={cli.cliCompletionPending}
+				disabled={cli.cliCompletionDisabled}
+				pendingLabel={cli.cliCompletionActionLabel}
+				idleLabel={cli.cliCompletionActionLabel}
+				onClick={cli.toggleCliCompletion}
+			/>
+			<SettingsOpenActionRow
 				dataUi="SettingsDiagnostics"
 				title="Diagnostics"
 				description="Open the bounded rotating logs used to investigate crashes and broken gameplay sessions."
@@ -53,6 +63,11 @@ export const SettingsDev = () => {
 			{cli.cliStatus.kind === "error" ? (
 				<p className="text-center text-sm text-danger">
 					CLI installation failed: {cli.cliStatus.message}
+				</p>
+			) : null}
+			{cli.cliCompletionStatus.kind === "error" ? (
+				<p className="text-center text-sm text-danger">
+					Shell completion failed: {cli.cliCompletionStatus.message}
 				</p>
 			) : null}
 		</section>

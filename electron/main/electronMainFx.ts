@@ -1,6 +1,6 @@
 import { app, BrowserWindow, nativeTheme, safeStorage } from "electron";
 import { fileURLToPath } from "node:url";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { Effect } from "effect";
 import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
 import { createMainWindowFx } from "./createMainWindowFx";
@@ -22,6 +22,7 @@ import { createEditorMcpOwnershipFx } from "./editor-mcp/http/createEditorMcpOwn
 import { registerEditorProjectIpcFx } from "./editor-project/ipc/registerEditorProjectIpcFx";
 import { createFilesystemEditorProjectRepositoryFx } from "./editor-project/filesystem/fx/createFilesystemEditorProjectRepositoryFx";
 import { createFilesystemCliInstallationFx } from "./cli/createFilesystemCliInstallationFx";
+import { createFilesystemCliCompletionFx } from "./cli/createFilesystemCliCompletionFx";
 import { registerCliInstallationIpcFx } from "./cli/registerCliInstallationIpcFx";
 import { createChatGptViewControllerOwnershipFx } from "./chatgpt/createChatGptViewControllerOwnershipFx";
 import { registerChatGptIpcFx } from "./chatgpt/registerChatGptIpcFx";
@@ -185,16 +186,53 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const packagedCliLauncherPath = join(dirname(process.execPath), "arkini-cli");
 	const transientMacAppPath =
 		process.execPath.startsWith("/Volumes/") || process.execPath.includes("/AppTranslocation/");
+	const cliUnavailableMessage = !app.isPackaged
+		? "arkini-cli can be installed from a packaged Arkini build."
+		: process.platform === "darwin"
+			? transientMacAppPath
+				? "Move Arkini.app from the disk image to Applications before installing arkini-cli."
+				: undefined
+			: `arkini-cli installation is not available on ${process.platform} yet.`;
+	const homePath = app.getPath("home");
 	const cliInstallation = yield* createFilesystemCliInstallationFx({
-		commandPath: join(app.getPath("home"), ".local", "bin", "arkini-cli"),
+		commandPath: join(homePath, ".local", "bin", "arkini-cli"),
 		launcherPath: packagedCliLauncherPath,
-		unavailableMessage: !app.isPackaged
-			? "arkini-cli can be installed from a packaged Arkini build."
-			: process.platform === "darwin"
-				? transientMacAppPath
-					? "Move Arkini.app from the disk image to Applications before installing arkini-cli."
-					: undefined
-				: `arkini-cli installation is not available on ${process.platform} yet.`,
+		unavailableMessage: cliUnavailableMessage,
+	});
+	const shellName = basename(process.env.SHELL ?? "");
+	const cliCompletion = yield* createFilesystemCliCompletionFx({
+		completion:
+			shellName === "zsh"
+				? {
+						path: join(homePath, ".zsh", "completions", "_arkini-cli"),
+						shell: "zsh",
+					}
+				: shellName === "bash"
+					? {
+							path: join(
+								homePath,
+								".local",
+								"share",
+								"bash-completion",
+								"completions",
+								"arkini-cli",
+							),
+							shell: "bash",
+						}
+					: shellName === "fish"
+						? {
+								path: join(
+									homePath,
+									".config",
+									"fish",
+									"completions",
+									"arkini-cli.fish",
+								),
+								shell: "fish",
+							}
+						: undefined,
+		launcherPath: packagedCliLauncherPath,
+		unavailableMessage: cliUnavailableMessage,
 	});
 	yield* registerArkiniProtocolFx(rendererRoot);
 	yield* registerArkiniElectronIpcFx({
@@ -219,6 +257,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		ownership: editorMcpOwnership,
 	});
 	yield* registerCliInstallationIpcFx({
+		cliCompletion,
 		cliInstallation,
 		trustedRenderer,
 	});

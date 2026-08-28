@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
 import type { CliInstallation } from "../../electron/main/cli/CliInstallation";
+import type { CliCompletion } from "../../electron/main/cli/CliCompletion";
 import { registerCliInstallationIpcFx } from "../../electron/main/cli/registerCliInstallationIpcFx";
 import { ElectronMainError } from "../../electron/main/ElectronMainError";
 import type { TrustedRenderer } from "../../electron/main/security/TrustedRenderer";
@@ -39,12 +40,38 @@ afterEach(() => electron.reset());
 
 describe("CLI installation IPC", () => {
 	it("keeps every filesystem mutation behind the trusted renderer boundary", async () => {
+		const cliCompletion: CliCompletion = {
+			readStatusFx: Effect.succeed({
+				type: "not-installed",
+				completionPath: "/tmp/_arkini-cli",
+				shell: "zsh",
+			}),
+			installFx: Effect.succeed({
+				type: "installed",
+				completionPath: "/tmp/_arkini-cli",
+				shell: "zsh",
+			}),
+			replaceFx: Effect.succeed({
+				type: "installed",
+				completionPath: "/tmp/_arkini-cli",
+				shell: "zsh",
+			}),
+			uninstallFx: Effect.succeed({
+				type: "not-installed",
+				completionPath: "/tmp/_arkini-cli",
+				shell: "zsh",
+			}),
+		};
 		const cliInstallation: CliInstallation = {
 			readStatusFx: Effect.succeed({
 				type: "not-installed",
 				commandPath: "/tmp/arkini-cli",
 			}),
 			installFx: Effect.succeed({
+				type: "installed",
+				commandPath: "/tmp/arkini-cli",
+			}),
+			replaceFx: Effect.succeed({
 				type: "installed",
 				commandPath: "/tmp/arkini-cli",
 			}),
@@ -67,6 +94,7 @@ describe("CLI installation IPC", () => {
 		};
 		Effect.runSync(
 			registerCliInstallationIpcFx({
+				cliCompletion,
 				cliInstallation,
 				trustedRenderer,
 			}),
@@ -75,7 +103,12 @@ describe("CLI installation IPC", () => {
 		for (const channel of [
 			ArkiniElectronApi.channels.cliStatus,
 			ArkiniElectronApi.channels.cliInstall,
+			ArkiniElectronApi.channels.cliReplace,
 			ArkiniElectronApi.channels.cliUninstall,
+			ArkiniElectronApi.channels.cliCompletionStatus,
+			ArkiniElectronApi.channels.cliCompletionInstall,
+			ArkiniElectronApi.channels.cliCompletionReplace,
+			ArkiniElectronApi.channels.cliCompletionUninstall,
 		]) {
 			const handler = electron.handlers.get(channel);
 			if (handler === undefined) throw new Error(`Missing ${channel}.`);

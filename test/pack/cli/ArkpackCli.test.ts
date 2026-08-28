@@ -43,3 +43,30 @@ describe("Arkpack provenance CLI", () => {
 		});
 	}, 15_000);
 });
+
+describe("CLI completion", () => {
+	it("generates static Bash, Fish, and Zsh completion from the public command tree", async () => {
+		for (const shell of [
+			"bash",
+			"fish",
+			"zsh",
+		] as const) {
+			const result = await execFileAsync(
+				process.execPath,
+				[
+					"node_modules/tsx/dist/cli.mjs",
+					"src/engine/cli/arkini.ts",
+					"--completions",
+					shell,
+				],
+				{
+					env: process.env,
+				},
+			);
+
+			expect(result.stdout).toContain("arkini-cli");
+			expect(result.stdout).toContain("game");
+			expect(result.stdout).toContain("arkpack");
+		}
+	}, 15_000);
+});

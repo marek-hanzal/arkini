@@ -16,6 +16,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, vi } from "vitest";
 import { AppearanceAtom } from "~/bridge/appearance/AppearanceAtom";
 import { WindowModeAtom } from "~/bridge/window/WindowModeAtom";
+import type { CliCompletionStatus } from "../../../../electron/contract/cli/CliCompletionStatus";
 import type { CliInstallationStatus } from "../../../../electron/contract/cli/CliInstallationStatus";
 import type { Game } from "~/bridge/game/Game";
 import type { GameEngine } from "~/bridge/game/GameEngine";
@@ -94,9 +95,14 @@ export const renderSettings = async (
 			commandPath: "/tmp/arkini-cli",
 			message: "Available in packaged builds.",
 		},
+		completionStatus = {
+			type: "unavailable",
+			message: "Available in packaged builds.",
+		},
 	}: {
 		readonly activeGame?: boolean;
 		readonly cliStatus?: CliInstallationStatus;
+		readonly completionStatus?: CliCompletionStatus;
 	} = {},
 ) => {
 	const deferred = createDeferred();
@@ -104,7 +110,25 @@ export const renderSettings = async (
 	const writeCheatAvailability = vi.fn(() => Promise.resolve());
 	const openDiagnostics = vi.fn(() => Promise.resolve());
 	const openUserData = vi.fn(() => Promise.resolve());
+	const replaceCli = vi.fn(() =>
+		Promise.resolve({
+			type: "installed" as const,
+			commandPath: cliStatus.commandPath,
+		}),
+	);
 	const readCliStatus = vi.fn(() => Promise.resolve(cliStatus));
+	const readCompletionStatus = vi.fn(() => Promise.resolve(completionStatus));
+	const uninstallCompletion = vi.fn(() =>
+		Promise.resolve({
+			type: "not-installed" as const,
+			completionPath:
+				completionStatus.type === "unavailable"
+					? "/tmp/_arkini-cli"
+					: completionStatus.completionPath,
+			shell:
+				completionStatus.type === "unavailable" ? ("zsh" as const) : completionStatus.shell,
+		}),
+	);
 	const registry = AtomRegistry.make({
 		initialValues: [
 			[
@@ -135,7 +159,14 @@ export const renderSettings = async (
 			cli: {
 				status: readCliStatus,
 				install: vi.fn(),
+				replace: replaceCli,
 				uninstall: vi.fn(),
+				completion: {
+					status: readCompletionStatus,
+					install: vi.fn(),
+					replace: vi.fn(),
+					uninstall: uninstallCompletion,
+				},
 			},
 			appearance: {
 				write,
@@ -282,6 +313,9 @@ export const renderSettings = async (
 		openDiagnostics,
 		openUserData,
 		readCliStatus,
+		readCompletionStatus,
+		replaceCli,
+		uninstallCompletion,
 		registry,
 	};
 };

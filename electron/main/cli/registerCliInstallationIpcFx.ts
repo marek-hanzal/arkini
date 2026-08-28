@@ -4,6 +4,7 @@ import { Effect } from "effect";
 import { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ElectronMainRuntime } from "../ElectronMainRuntime";
 import type { TrustedRenderer } from "../security/TrustedRenderer";
+import type { CliCompletion } from "./CliCompletion";
 import type { CliInstallation } from "./CliInstallation";
 
 let registered = false;
@@ -11,9 +12,11 @@ let registered = false;
 /** Registers the CLI installation capability behind the trusted renderer boundary. */
 export const registerCliInstallationIpcFx = Effect.fn("registerCliInstallationIpcFx")(
 	({
+		cliCompletion,
 		cliInstallation,
 		trustedRenderer,
 	}: {
+		readonly cliCompletion: CliCompletion;
 		readonly cliInstallation: CliInstallation;
 		readonly trustedRenderer: TrustedRenderer;
 	}) =>
@@ -38,9 +41,29 @@ export const registerCliInstallationIpcFx = Effect.fn("registerCliInstallationIp
 					(event: IpcMainInvokeEvent) => runAuthorized(event, cliInstallation.installFx),
 				],
 				[
+					ArkiniElectronApi.channels.cliReplace,
+					(event: IpcMainInvokeEvent) => runAuthorized(event, cliInstallation.replaceFx),
+				],
+				[
 					ArkiniElectronApi.channels.cliUninstall,
 					(event: IpcMainInvokeEvent) =>
 						runAuthorized(event, cliInstallation.uninstallFx),
+				],
+				[
+					ArkiniElectronApi.channels.cliCompletionStatus,
+					(event: IpcMainInvokeEvent) => runAuthorized(event, cliCompletion.readStatusFx),
+				],
+				[
+					ArkiniElectronApi.channels.cliCompletionInstall,
+					(event: IpcMainInvokeEvent) => runAuthorized(event, cliCompletion.installFx),
+				],
+				[
+					ArkiniElectronApi.channels.cliCompletionReplace,
+					(event: IpcMainInvokeEvent) => runAuthorized(event, cliCompletion.replaceFx),
+				],
+				[
+					ArkiniElectronApi.channels.cliCompletionUninstall,
+					(event: IpcMainInvokeEvent) => runAuthorized(event, cliCompletion.uninstallFx),
 				],
 			] as const;
 			for (const [channel, handler] of handlers) ipcMain.handle(channel, handler);

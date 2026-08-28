@@ -7,5 +7,6 @@ import type { ElectronMainError } from "../ElectronMainError";
 export interface CliInstallation {
 	readonly readStatusFx: Effect.Effect<CliInstallationStatus, ElectronMainError>;
 	readonly installFx: Effect.Effect<CliInstallationStatus, ElectronMainError>;
+	readonly replaceFx: Effect.Effect<CliInstallationStatus, ElectronMainError>;
 	readonly uninstallFx: Effect.Effect<CliInstallationStatus, ElectronMainError>;
 }

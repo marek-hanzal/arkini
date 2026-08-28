@@ -3,7 +3,7 @@ import { z } from "zod";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 
 const ItemTypeSchema = z.enum(TypeSchema.options).meta({
-	id: "EditorMcpItemTypeSchema",
+	id: "ItemTypeSchema",
 	description:
 		"A canonical Arkini item type: deposit, blueprint, simple, space, producer, craft, stash, temporary, or inventory.",
 });
@@ -31,7 +31,7 @@ export const ItemCollectionInputSchema = z
 	})
 	.strict()
 	.meta({
-		id: "EditorMcpItemCollectionInputSchema",
+		id: "ItemCollectionInputSchema",
 		$id: "urn:arkini:schema:mcp:item-collection-input",
 		title: "Item collection tool input",
 		description: "Pagination, filtering, and search for the item collection tool.",

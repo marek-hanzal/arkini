@@ -32,13 +32,13 @@ const nullableBaseItemFields = {
 const simplePatch = requireReplacement(
 	SimpleSchema.omit(immutableItemFields).partial().extend(nullableBaseItemFields).strict(),
 ).meta({
-	id: "EditorMcpSimpleItemPatchSchema",
+	id: "SimpleItemPatchSchema",
 	description: "Top-level replacements accepted for an existing simple item.",
 });
 const spacePatch = requireReplacement(
 	SpaceSchema.omit(immutableItemFields).partial().extend(nullableBaseItemFields).strict(),
 ).meta({
-	id: "EditorMcpSpaceItemPatchSchema",
+	id: "SpaceItemPatchSchema",
 	description: "Top-level replacements accepted for an existing space item.",
 });
 const producerPatch = requireReplacement(
@@ -50,19 +50,19 @@ const producerPatch = requireReplacement(
 		})
 		.strict(),
 ).meta({
-	id: "EditorMcpProducerItemPatchSchema",
+	id: "ProducerItemPatchSchema",
 	description: "Top-level replacements accepted for an existing producer item.",
 });
 const craftPatch = requireReplacement(
 	CraftSchema.omit(immutableItemFields).partial().extend(nullableBaseItemFields).strict(),
 ).meta({
-	id: "EditorMcpCraftItemPatchSchema",
+	id: "CraftItemPatchSchema",
 	description: "Top-level replacements accepted for an existing craft item.",
 });
 const blueprintPatch = requireReplacement(
 	BlueprintSchema.omit(immutableItemFields).partial().extend(nullableBaseItemFields).strict(),
 ).meta({
-	id: "EditorMcpBlueprintItemPatchSchema",
+	id: "BlueprintItemPatchSchema",
 	description: "Top-level replacements accepted for an existing blueprint item.",
 });
 const depositPatch = requireReplacement(
@@ -75,13 +75,13 @@ const depositPatch = requireReplacement(
 		})
 		.strict(),
 ).meta({
-	id: "EditorMcpDepositItemPatchSchema",
+	id: "DepositItemPatchSchema",
 	description: "Top-level replacements accepted for an existing deposit item.",
 });
 const stashPatch = requireReplacement(
 	StashSchema.omit(immutableItemFields).partial().extend(nullableBaseItemFields).strict(),
 ).meta({
-	id: "EditorMcpStashItemPatchSchema",
+	id: "StashItemPatchSchema",
 	description: "Top-level replacements accepted for an existing stash item.",
 });
 const temporaryPatch = requireReplacement(
@@ -97,7 +97,7 @@ const temporaryPatch = requireReplacement(
 		})
 		.strict(),
 ).meta({
-	id: "EditorMcpTemporaryItemPatchSchema",
+	id: "TemporaryItemPatchSchema",
 	description: "Top-level replacements accepted for an existing temporary item.",
 });
 const inventoryPatch = requireReplacement(
@@ -114,7 +114,7 @@ const inventoryPatch = requireReplacement(
 		})
 		.strict(),
 ).meta({
-	id: "EditorMcpInventoryItemPatchSchema",
+	id: "InventoryItemPatchSchema",
 	description: "Top-level replacements accepted for an existing inventory item.",
 });
 
@@ -153,55 +153,55 @@ const editItemInput = <Schema extends z.ZodType<Record<string, unknown>>>(
 /** Type-owned replace patches; omitted fields remain untouched and null clears optional fields. */
 export const EditItemInputSchemas = {
 	simple: editItemInput(simplePatch, {
-		id: "EditorMcpEditSimpleItemInputSchema",
+		id: "EditSimpleItemInputSchema",
 		schemaId: "urn:arkini:schema:mcp:edit-simple-item-input",
 		title: "Edit simple item tool input",
 		description: "Identity, revision, and replacement patch for one simple item.",
 	}),
 	space: editItemInput(spacePatch, {
-		id: "EditorMcpEditSpaceItemInputSchema",
+		id: "EditSpaceItemInputSchema",
 		schemaId: "urn:arkini:schema:mcp:edit-space-item-input",
 		title: "Edit space item tool input",
 		description: "Identity, revision, and replacement patch for one space item.",
 	}),
 	producer: editItemInput(producerPatch, {
-		id: "EditorMcpEditProducerItemInputSchema",
+		id: "EditProducerItemInputSchema",
 		schemaId: "urn:arkini:schema:mcp:edit-producer-item-input",
 		title: "Edit producer item tool input",
 		description: "Identity, revision, and replacement patch for one producer item.",
 	}),
 	craft: editItemInput(craftPatch, {
-		id: "EditorMcpEditCraftItemInputSchema",
+		id: "EditCraftItemInputSchema",
 		schemaId: "urn:arkini:schema:mcp:edit-craft-item-input",
 		title: "Edit craft item tool input",
 		description: "Identity, revision, and replacement patch for one craft item.",
 	}),
 	blueprint: editItemInput(blueprintPatch, {
-		id: "EditorMcpEditBlueprintItemInputSchema",
+		id: "EditBlueprintItemInputSchema",
 		schemaId: "urn:arkini:schema:mcp:edit-blueprint-item-input",
 		title: "Edit blueprint item tool input",
 		description: "Identity, revision, and replacement patch for one blueprint item.",
 	}),
 	deposit: editItemInput(depositPatch, {
-		id: "EditorMcpEditDepositItemInputSchema",
+		id: "EditDepositItemInputSchema",
 		schemaId: "urn:arkini:schema:mcp:edit-deposit-item-input",
 		title: "Edit deposit item tool input",
 		description: "Identity, revision, and replacement patch for one deposit item.",
 	}),
 	stash: editItemInput(stashPatch, {
-		id: "EditorMcpEditStashItemInputSchema",
+		id: "EditStashItemInputSchema",
 		schemaId: "urn:arkini:schema:mcp:edit-stash-item-input",
 		title: "Edit stash item tool input",
 		description: "Identity, revision, and replacement patch for one stash item.",
 	}),
 	temporary: editItemInput(temporaryPatch, {
-		id: "EditorMcpEditTemporaryItemInputSchema",
+		id: "EditTemporaryItemInputSchema",
 		schemaId: "urn:arkini:schema:mcp:edit-temporary-item-input",
 		title: "Edit temporary item tool input",
 		description: "Identity, revision, and replacement patch for one temporary item.",
 	}),
 	inventory: editItemInput(inventoryPatch, {
-		id: "EditorMcpEditInventoryItemInputSchema",
+		id: "EditInventoryItemInputSchema",
 		schemaId: "urn:arkini:schema:mcp:edit-inventory-item-input",
 		title: "Edit inventory item tool input",
 		description: "Identity, revision, and replacement patch for one inventory item.",

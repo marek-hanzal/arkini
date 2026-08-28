@@ -40,7 +40,7 @@ export const EditProjectInputSchema = z
 		],
 	})
 	.meta({
-		id: "EditorMcpEditProjectInputSchema",
+		id: "EditProjectInputSchema",
 		$id: "urn:arkini:schema:mcp:edit-project-input",
 		title: "Edit project tool input",
 		description:

@@ -1,4 +1,4 @@
-export type CliInstallationStatus =
+export type InstallationStatus =
 	| {
 			readonly type: "installed";
 			readonly commandPath: string;

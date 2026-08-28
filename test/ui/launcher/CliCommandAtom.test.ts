@@ -4,7 +4,7 @@ import { scheduleTask } from "@effect/atom-react";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { SettingsCliCommandAtom } from "~/ui/settings/SettingsCliCommandAtom";
+import { CliCommandAtom } from "~/ui/settings/CliCommandAtom";
 
 let registry: AtomRegistry.AtomRegistry | undefined;
 
@@ -40,20 +40,20 @@ describe("Settings CLI command", () => {
 		registry = AtomRegistry.make({
 			scheduleTask,
 		});
-		registry.mount(SettingsCliCommandAtom);
-		registry.set(SettingsCliCommandAtom, "read");
+		registry.mount(CliCommandAtom);
+		registry.set(CliCommandAtom, "read");
 		await vi.waitFor(() =>
-			expect(registry?.get(SettingsCliCommandAtom)).toMatchObject({
+			expect(registry?.get(CliCommandAtom)).toMatchObject({
 				kind: "ready",
 				status: {
 					type: "not-installed",
 				},
 			}),
 		);
-		registry.set(SettingsCliCommandAtom, "install");
+		registry.set(CliCommandAtom, "install");
 		await vi.waitFor(() => expect(install).toHaveBeenCalledOnce());
 		await vi.waitFor(() =>
-			expect(registry?.get(SettingsCliCommandAtom)).toMatchObject({
+			expect(registry?.get(CliCommandAtom)).toMatchObject({
 				kind: "ready",
 				status: {
 					type: "installed",
@@ -89,18 +89,18 @@ describe("Settings CLI command", () => {
 		registry = AtomRegistry.make({
 			scheduleTask,
 		});
-		registry.mount(SettingsCliCommandAtom);
-		registry.set(SettingsCliCommandAtom, "read");
+		registry.mount(CliCommandAtom);
+		registry.set(CliCommandAtom, "read");
 		await vi.waitFor(() =>
-			expect(registry?.get(SettingsCliCommandAtom)).toMatchObject({
+			expect(registry?.get(CliCommandAtom)).toMatchObject({
 				kind: "ready",
 				status: {
 					type: "conflict",
 				},
 			}),
 		);
-		registry.set(SettingsCliCommandAtom, "install");
-		registry.set(SettingsCliCommandAtom, "replace");
+		registry.set(CliCommandAtom, "install");
+		registry.set(CliCommandAtom, "replace");
 		await vi.waitFor(() => expect(replace).toHaveBeenCalledOnce());
 	});
 });

@@ -21,9 +21,9 @@ import { registerEditorMcpPreferencesIpcFx } from "./editor-mcp/ipc/registerEdit
 import { createEditorMcpOwnershipFx } from "./editor-mcp/http/createEditorMcpOwnershipFx";
 import { registerEditorProjectIpcFx } from "./editor-project/ipc/registerEditorProjectIpcFx";
 import { createFilesystemEditorProjectRepositoryFx } from "./editor-project/filesystem/fx/createFilesystemEditorProjectRepositoryFx";
-import { createFilesystemCliInstallationFx } from "./cli/createFilesystemCliInstallationFx";
-import { createFilesystemCliCompletionFx } from "./cli/createFilesystemCliCompletionFx";
-import { registerCliInstallationIpcFx } from "./cli/registerCliInstallationIpcFx";
+import { createInstallationFx } from "./cli/createInstallationFx";
+import { createCompletionFx } from "./cli/createCompletionFx";
+import { registerCliIpcFx } from "./cli/registerCliIpcFx";
 import { createChatGptViewControllerOwnershipFx } from "./chatgpt/createChatGptViewControllerOwnershipFx";
 import { registerChatGptIpcFx } from "./chatgpt/registerChatGptIpcFx";
 import { createFilesystemEditorMcpStorageFx } from "./editor-mcp/storage/createFilesystemEditorMcpStorageFx";
@@ -194,13 +194,13 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 				: undefined
 			: `arkini-cli installation is not available on ${process.platform} yet.`;
 	const homePath = app.getPath("home");
-	const cliInstallation = yield* createFilesystemCliInstallationFx({
+	const cliInstallation = yield* createInstallationFx({
 		commandPath: join(homePath, ".local", "bin", "arkini-cli"),
 		launcherPath: packagedCliLauncherPath,
 		unavailableMessage: cliUnavailableMessage,
 	});
 	const shellName = basename(process.env.SHELL ?? "");
-	const cliCompletion = yield* createFilesystemCliCompletionFx({
+	const cliCompletion = yield* createCompletionFx({
 		completion:
 			shellName === "zsh"
 				? {
@@ -256,9 +256,9 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		trustedRenderer,
 		ownership: editorMcpOwnership,
 	});
-	yield* registerCliInstallationIpcFx({
-		cliCompletion,
-		cliInstallation,
+	yield* registerCliIpcFx({
+		completion: cliCompletion,
+		installation: cliInstallation,
 		trustedRenderer,
 	});
 	yield* registerChatGptIpcFx({

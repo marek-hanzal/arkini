@@ -16,15 +16,15 @@ import { createRoot } from "react-dom/client";
 import { afterEach, vi } from "vitest";
 import { AppearanceAtom } from "~/bridge/appearance/AppearanceAtom";
 import { WindowModeAtom } from "~/bridge/window/WindowModeAtom";
-import type { CliCompletionStatus } from "../../../../electron/contract/cli/CliCompletionStatus";
-import type { CliInstallationStatus } from "../../../../electron/contract/cli/CliInstallationStatus";
+import type { CompletionStatus } from "../../../../electron/contract/cli/CompletionStatus";
+import type { InstallationStatus } from "../../../../electron/contract/cli/InstallationStatus";
 import type { Game } from "~/bridge/game/Game";
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
 import { SettingsPage } from "~/page/settings/SettingsPage";
-import { SettingsCommonPage } from "~/page/settings/SettingsCommonPage";
-import { SettingsDevPage } from "~/page/settings/SettingsDevPage";
-import { SettingsGamePage } from "~/page/settings/SettingsGamePage";
+import { CommonPage } from "~/page/settings/CommonPage";
+import { DevPage } from "~/page/settings/DevPage";
+import { GamePage } from "~/page/settings/GamePage";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import {
@@ -101,8 +101,8 @@ export const renderSettings = async (
 		},
 	}: {
 		readonly activeGame?: boolean;
-		readonly cliStatus?: CliInstallationStatus;
-		readonly completionStatus?: CliCompletionStatus;
+		readonly cliStatus?: InstallationStatus;
+		readonly completionStatus?: CompletionStatus;
 	} = {},
 ) => {
 	const deferred = createDeferred();
@@ -250,17 +250,17 @@ export const renderSettings = async (
 	const settingsCommonRoute = createRoute({
 		getParentRoute: () => settingsRoute,
 		path: "/common",
-		component: SettingsCommonPage,
+		component: CommonPage,
 	});
 	const settingsGameRoute = createRoute({
 		getParentRoute: () => settingsRoute,
 		path: "/game",
-		component: SettingsGamePage,
+		component: GamePage,
 	});
 	const settingsDevRoute = createRoute({
 		getParentRoute: () => settingsRoute,
 		path: "/dev",
-		component: SettingsDevPage,
+		component: DevPage,
 	});
 	const mainMenuRoute = createRoute({
 		getParentRoute: () => rootRoute,

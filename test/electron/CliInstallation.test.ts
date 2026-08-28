@@ -6,7 +6,7 @@ import { promisify } from "node:util";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { createFilesystemCliInstallationFx } from "../../electron/main/cli/createFilesystemCliInstallationFx";
+import { createInstallationFx } from "../../electron/main/cli/createInstallationFx";
 
 const temporaryDirectories: string[] = [];
 const execFileAsync = promisify(execFile);
@@ -33,7 +33,7 @@ const createFixture = async () => {
 	await writeFile(launcherPath, "#!/bin/sh\nprintf '%s\\n' \"$@\"\n");
 	await chmod(launcherPath, 0o755);
 	const installation = Effect.runSync(
-		createFilesystemCliInstallationFx({
+		createInstallationFx({
 			commandPath,
 			launcherPath,
 		}),

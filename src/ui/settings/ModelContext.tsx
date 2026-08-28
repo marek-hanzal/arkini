@@ -4,17 +4,17 @@ import type { useSettingsModel } from "~/ui/settings/useSettingsModel";
 
 type SettingsModel = ReturnType<typeof useSettingsModel>;
 
-const SettingsModelContext = createContext<SettingsModel | undefined>(undefined);
+const ModelContext = createContext<SettingsModel | undefined>(undefined);
 
-export const SettingsModelProvider = ({
+export const ModelProvider = ({
 	children,
 	model,
 }: PropsWithChildren<{
 	readonly model: SettingsModel;
-}>) => <SettingsModelContext value={model}>{children}</SettingsModelContext>;
+}>) => <ModelContext value={model}>{children}</ModelContext>;
 
-export const useSettingsModelContext = () => {
-	const model = useContext(SettingsModelContext);
+export const useModelContext = () => {
+	const model = useContext(ModelContext);
 	if (model === undefined) throw new Error("Settings model is unavailable.");
 	return model;
 };

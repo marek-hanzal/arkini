@@ -4,7 +4,7 @@ import { match } from "ts-pattern";
 
 import { BackButton } from "~/ui/button/BackButton";
 import { ButtonLink } from "~/ui/button/Button";
-import { SettingsModelProvider } from "~/ui/settings/SettingsModelContext";
+import { ModelProvider } from "~/ui/settings/ModelContext";
 import { useSettingsModel } from "~/ui/settings/useSettingsModel";
 
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
@@ -43,7 +43,7 @@ export const Settings = ({ children, onBackFx }: Settings.Props) => {
 	});
 
 	return (
-		<SettingsModelProvider model={model}>
+		<ModelProvider model={model}>
 			<section
 				className="grid h-full min-h-0 grid-rows-[auto_auto_minmax(0,1fr)_auto_auto] gap-5"
 				data-ui="Settings"
@@ -170,6 +170,6 @@ export const Settings = ({ children, onBackFx }: Settings.Props) => {
 					onClick={model.goBack}
 				/>
 			</section>
-		</SettingsModelProvider>
+		</ModelProvider>
 	);
 };

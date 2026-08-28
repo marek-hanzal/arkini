@@ -53,6 +53,12 @@ export const MainMenu = () => {
 					{playUnavailable ? "Play unavailable" : "Preparing Play…"}
 				</PrimaryButton>
 			)}
+			<ButtonLink
+				to="/arkpacks"
+				className="rounded-xl"
+			>
+				Arkpacks
+			</ButtonLink>
 			{editorStatus.type === "ready" ? (
 				<ButtonLink
 					to="/editor/welcome"
@@ -70,12 +76,6 @@ export const MainMenu = () => {
 					{editorStatus.type === "starting" ? "Preparing Editor…" : "Editor unavailable"}
 				</Button>
 			)}
-			<ButtonLink
-				to="/arkpacks"
-				className="rounded-xl"
-			>
-				Arkpacks
-			</ButtonLink>
 			<ButtonLink
 				to="/settings"
 				className="rounded-xl"

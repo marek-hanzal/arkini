@@ -51,22 +51,54 @@ package_macos_artifacts() {
 		cp game/arkini/build/arkini.arksig .out/desktop/release/arkini.arksig
 	fi
 	(
-		local -a checksum_artifacts=(
-			"Arkini-$version-mac-arm64.dmg"
-			"Arkini-$version-mac-arm64.zip"
-			arkini.arkpack
-		)
+		local -a arkpack_artifacts=(arkini.arkpack)
 		cd .out/desktop/release
+		shasum -a 256 \
+			"Arkini-$version-mac-arm64.dmg" \
+			"Arkini-$version-mac-arm64.zip" >SHA256SUMS-macos-arm64
 		if [[ -f arkini.arksig ]]; then
-			checksum_artifacts+=(arkini.arksig)
+			arkpack_artifacts+=(arkini.arksig)
 		fi
-		shasum -a 256 "${checksum_artifacts[@]}" >SHA256SUMS
+		shasum -a 256 "${arkpack_artifacts[@]}" >SHA256SUMS-arkpack
 	)
 	"$packaged_cli" --version | grep -F "$version"
 	if [[ "${ARKINI_RELEASE_SIGN:-}" == "1" ]]; then
 		"$packaged_cli" arkpack verify .out/desktop/release/arkini.arkpack |
 			grep -Fx '{"type":"trusted"}'
 	fi
+}
+
+package_windows_artifacts() {
+	local version
+	version=$(desktop_version)
+	electron-builder \
+		--config electron-builder.yml \
+		--win \
+		--x64 \
+		--publish never
+	(
+		cd .out/desktop/release
+		sha256sum \
+			"Arkini-$version-win-x64.exe" \
+			"Arkini-$version-win-x64.zip" >SHA256SUMS-windows-x64
+	)
+}
+
+package_linux_artifacts() {
+	local architecture artifact_arch version
+	architecture=$1
+	artifact_arch=$2
+	version=$(desktop_version)
+	electron-builder \
+		--config electron-builder.yml \
+		--linux AppImage \
+		"--$architecture" \
+		--publish never
+	(
+		cd .out/desktop/release
+		sha256sum \
+			"Arkini-$version-linux-$artifact_arch.AppImage" >"SHA256SUMS-linux-$architecture"
+	)
 }
 
 # @cmd Install exact JavaScript dependencies from the lockfile
@@ -233,6 +265,27 @@ package-macos() {
 	package_macos_artifacts
 }
 
+# @cmd Build unsigned Windows x64 release artifacts
+package-windows() {
+	clean_desktop
+	build
+	package_windows_artifacts
+}
+
+# @cmd Build unsigned Linux x64 AppImage release artifacts
+package-linux() {
+	clean_desktop
+	build
+	package_linux_artifacts x64 x86_64
+}
+
+# @cmd Build unsigned Linux arm64 AppImage release artifacts
+package-linux-arm64() {
+	clean_desktop
+	build
+	package_linux_artifacts arm64 arm64
+}
+
 # @cmd Format the repository
 format() {
 	biome format --write .
@@ -260,18 +313,6 @@ check() {
 	format_check
 	typecheck
 	build
-	dependency_check
-	copy_paste_check
-	test
-}
-
-# @cmd Run the complete GitHub macOS packaging gate
-ci-macos() {
-	format_check
-	typecheck
-	clean_desktop
-	build
-	package_macos_artifacts
 	dependency_check
 	copy_paste_check
 	test

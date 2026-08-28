@@ -7,21 +7,22 @@ import { EditorBoardScenarioSchema } from "~/editor/board/EditorBoardScenarioSch
 import { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
 import { EditorProjectNoteFileSchema } from "~/editor/filesystem/EditorProjectNoteFileSchema";
 import { EditorNoteSchema } from "~/editor/note/EditorNoteSchema";
+import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
 
 const readJsonFilesFx = Effect.fn("readFilesystemEditorSidecarJsonFilesFx")(function* (
+	root: string,
 	directory: string,
 ) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
 	if (!(yield* fileSystem.exists(directory))) return [];
-	const canonicalDirectory = yield* fileSystem.realPath(directory);
 	const files = (yield* fileSystem.readDirectory(directory))
 		.filter((file) => file.endsWith(".json"))
 		.sort();
 	return yield* Effect.forEach(files, (file) => {
 		const target = path.join(directory, file);
 		return Effect.gen(function* () {
-			if ((yield* fileSystem.realPath(target)) !== path.join(canonicalDirectory, file))
+			if (!(yield* isFilesystemPathSafeFx(fileSystem, root, target)))
 				return yield* Effect.fail(
 					new Error(`Editor sidecar ${target} must not be a symbolic link.`),
 				);
@@ -54,43 +55,45 @@ export const readFilesystemEditorProjectSidecarsFx = Effect.fn(
 	readonly projectId: string;
 }) {
 	const path = yield* Path.Path;
-	const notes = yield* Effect.forEach(yield* readJsonFilesFx(paths.notes), ({ file, value }) =>
-		Effect.gen(function* () {
-			const noteId = yield* Effect.try({
-				try: () => decodeURIComponent(path.basename(file).slice(0, -".json".length)),
-				catch: (cause) =>
-					new Error(`Editor note ${file} has an invalid filename.`, {
-						cause,
-					}),
-			});
-			const note = yield* Effect.try({
-				try: () => EditorProjectNoteFileSchema.parse(value),
-				catch: (cause) =>
-					new Error(`Editor note ${file} is invalid.`, {
-						cause,
-					}),
-			});
-			const expected = yield* paths.noteFileFx(noteId);
-			if (path.resolve(file) !== expected)
-				return yield* Effect.fail(
-					new Error(`Editor note ${noteId} has an invalid filename.`),
-				);
-			return yield* Effect.try({
-				try: () =>
-					EditorNoteSchema.parse({
-						...note,
-						noteId,
-						projectId,
-					}),
-				catch: (cause) =>
-					new Error(`Editor note ${noteId} is invalid.`, {
-						cause,
-					}),
-			});
-		}),
+	const notes = yield* Effect.forEach(
+		yield* readJsonFilesFx(paths.root, paths.notes),
+		({ file, value }) =>
+			Effect.gen(function* () {
+				const noteId = yield* Effect.try({
+					try: () => decodeURIComponent(path.basename(file).slice(0, -".json".length)),
+					catch: (cause) =>
+						new Error(`Editor note ${file} has an invalid filename.`, {
+							cause,
+						}),
+				});
+				const note = yield* Effect.try({
+					try: () => EditorProjectNoteFileSchema.parse(value),
+					catch: (cause) =>
+						new Error(`Editor note ${file} is invalid.`, {
+							cause,
+						}),
+				});
+				const expected = yield* paths.noteFileFx(noteId);
+				if (path.resolve(file) !== expected)
+					return yield* Effect.fail(
+						new Error(`Editor note ${noteId} has an invalid filename.`),
+					);
+				return yield* Effect.try({
+					try: () =>
+						EditorNoteSchema.parse({
+							...note,
+							noteId,
+							projectId,
+						}),
+					catch: (cause) =>
+						new Error(`Editor note ${noteId} is invalid.`, {
+							cause,
+						}),
+				});
+			}),
 	);
 	const scenarios = yield* Effect.forEach(
-		yield* readJsonFilesFx(paths.scenarios),
+		yield* readJsonFilesFx(paths.root, paths.scenarios),
 		({ file, value }) =>
 			Effect.gen(function* () {
 				const scenario = yield* Effect.try({

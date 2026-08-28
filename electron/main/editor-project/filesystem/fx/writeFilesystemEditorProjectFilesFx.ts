@@ -232,6 +232,7 @@ export const writeFilesystemEditorProjectFilesFx = Effect.fn("writeFilesystemEdi
 				];
 				const gitignoreExists = yield* assertFilesystemEditorProjectFileFx(
 					fileSystem,
+					paths.root,
 					paths.gitignoreFile,
 				);
 				const gitignore = gitignoreExists

@@ -21,6 +21,7 @@ import { readFilesystemEditorProjectFilesFx } from "./readFilesystemEditorProjec
 import { ensureFilesystemEditorProjectGitignoreFx } from "./ensureFilesystemEditorProjectGitignoreFx";
 import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
 import { FilesystemWriteError } from "~/engine/filesystem/FilesystemWriteError";
+import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
 
 type Operations = Pick<EditorProjectRepositoryService, "buildProjectFx" | "readProjectBuildFx">;
 
@@ -224,14 +225,19 @@ export const createFilesystemEditorProjectBuildOperationsFx = Effect.fn(
 						const build = state.paths.build;
 						if (!(yield* fileSystem.exists(build)))
 							return yield* Effect.fail(new Error("No Editor project build exists."));
-						const canonicalBuild = yield* fileSystem.realPath(build);
-						if (canonicalBuild !== build)
+						if (!(yield* isFilesystemPathSafeFx(fileSystem, state.paths.root, build)))
 							return yield* Effect.fail(
 								new Error(`Project build directory ${build} is a symbolic link.`),
 							);
 						const stem = encodeGameProjectFileStem(projectId);
 						const arkpackPath = path.join(build, `${stem}.arkpack`);
-						if ((yield* fileSystem.realPath(arkpackPath)) !== arkpackPath)
+						if (
+							!(yield* isFilesystemPathSafeFx(
+								fileSystem,
+								state.paths.root,
+								arkpackPath,
+							))
+						)
 							return yield* Effect.fail(
 								new Error("The Editor build Arkpack is a symbolic link."),
 							);

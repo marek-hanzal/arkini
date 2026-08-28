@@ -102,7 +102,7 @@ The Editor ChatGPT page is the one deliberate foreign surface. Electron owns a s
 
 ## Filesystem and persistence
 
-The Node-only `FilesystemWrite` capability is the shared mechanical boundary for Electron, Editor, CLI, saves, and Arkpack publication. Readers and writers use the same canonical per-target lock. Writes stage beside the target, sync bytes and parent directories, publish durable phase markers, and recover interrupted owned operations before the next read/write. Recovery distinguishes absent, owned, and unowned paths; symlink, containment, cross-device, or missing-artifact ambiguity fails closed. Domain owners still serialize, validate, and map their own errors.
+The Node-only `FilesystemWrite` capability is the shared mechanical boundary for Electron, Editor, CLI, saves, and Arkpack publication. Readers and writers use the same canonical per-target lock. Writes stage beside the target, sync staged file contents, publish simple phase markers, and recover interrupted owned operations before the next read/write. Recovery distinguishes absent, owned, and unowned paths; confirmed symlink, containment, or missing-artifact ambiguity fails closed. Domain owners still serialize, validate, and map their own errors.
 
 Electron user data is split by owner:
 
@@ -128,3 +128,7 @@ Forms own local unsaved sessions. Save validates and publishes the complete owni
 Build validates the current disk revision, compiles through the canonical project pipeline, and atomically publishes an External Arkpack descriptor. Save As/Install reread exact bounded artifact bytes; renderer memory is not an artifact store. JSON export creates a new unique owned child, copies only portable allowlisted paths, validates it, and never replaces an existing destination.
 
 Versions are full immutable logical snapshots backed by content-addressed objects; `versions/head.json` publishes visibility last. Checkout replaces the current tree, scenarios, and head atomically while Notes remain outside Versions. Scenarios are explicit versioned State snapshots, never autosave. Estimate is disposable static authored dependency analysis with optimistic parallel critical-path timing, not simulation or an engine-valid witness; its domain/data source owns query, filter, sort, and selection before React renders results. Flow is likewise an authored graph projection, not gameplay truth.
+
+## Hosted validation and delivery
+
+`Argcfile.sh` owns every repository and packaging command; GitHub workflows only install the pinned toolchain and invoke those commands. Working branches run the complete repository gate on hosted Linux, macOS, and Windows, while `main` is the intentional release-only escape hatch. Stable tags package unsigned macOS arm64, Windows x64, Linux x64, and Linux arm64 artifacts independently without rerunning repository checks. Development tags keep their distinct Arkpack-signing and atomic combined-prerelease purpose; publication includes the standalone Arkpack and its detached proof as one required pair.

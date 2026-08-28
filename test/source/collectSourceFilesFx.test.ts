@@ -41,8 +41,12 @@ describe("collectSourceFilesFx", () => {
 					input: directory,
 				}).pipe(
 					Effect.map(({ json, png }) => ({
-						json: json.map((file) => path.relative(directory, file)),
-						png: png.map((file) => path.relative(directory, file)),
+						json: json.map((file) =>
+							path.relative(directory, file).split(path.sep).join("/"),
+						),
+						png: png.map((file) =>
+							path.relative(directory, file).split(path.sep).join("/"),
+						),
 					})),
 				);
 

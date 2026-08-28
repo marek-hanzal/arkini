@@ -2,9 +2,9 @@ import * as NodePath from "@effect/platform-node/NodePath";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Deferred, Effect, Fiber, FileSystem, Option, PlatformError } from "effect";
 import { execFile, spawn } from "node:child_process";
-import { lstat, mkdtemp, readFile, realpath, rm, symlink, writeFile } from "node:fs/promises";
+import { lstat, mkdir, mkdtemp, readFile, rename, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { promisify } from "node:util";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -12,7 +12,7 @@ import { createFilesystemWriteFx } from "../../../src/engine/filesystem/createFi
 
 const runFile = promisify(execFile);
 const helper = join(import.meta.dirname, "FilesystemWrite.test", "crash.ts");
-const tsx = join(process.cwd(), "node_modules", ".bin", "tsx");
+const tsx = join(process.cwd(), "node_modules", "tsx", "dist", "cli.mjs");
 const encoder = new TextEncoder();
 let root = "";
 
@@ -46,13 +46,15 @@ const expectFreshProcessStateAfterCrash = async (
 		writeFile(join(root, "second.json"), "old-second"),
 	]);
 	await expect(
-		runFile(tsx, [
+		runFile(process.execPath, [
+			tsx,
 			helper,
 			mode,
 			root,
 		]),
 	).rejects.toBeDefined();
-	const reopened = await runFile(tsx, [
+	const reopened = await runFile(process.execPath, [
+		tsx,
 		helper,
 		"read",
 		root,
@@ -80,7 +82,7 @@ describe("FilesystemWrite", () => {
 		const first = join(root, "first");
 		const same = join(root, "same");
 		const other = join(root, "other");
-		const canonicalRoot = await realpath(root);
+		const canonicalRoot = await Effect.runPromise(nodeFileSystem.realPath(root));
 		const canonicalFirst = join(canonicalRoot, "first");
 		const canonicalSame = join(canonicalRoot, "same");
 		const fileSystem: FileSystem.FileSystem = {
@@ -137,7 +139,8 @@ describe("FilesystemWrite", () => {
 	});
 
 	it("waits for a live CLI process using the same lock", async () => {
-		const child = spawn(tsx, [
+		const child = spawn(process.execPath, [
+			tsx,
 			helper,
 			"hold",
 			root,
@@ -216,59 +219,6 @@ describe("FilesystemWrite", () => {
 		await Effect.runPromise(Fiber.await(nested.fiber));
 	});
 
-	it("rolls back when the target parent cannot be synced", async () => {
-		const target = join(root, "value");
-		await writeFile(target, "old");
-		const canonicalRoot = await realpath(root);
-		const canonicalTarget = join(canonicalRoot, "value");
-		const nodeFileSystem = await readNodeFileSystem();
-		let replaced = false;
-		let failed = false;
-		const fileSystem: FileSystem.FileSystem = {
-			...nodeFileSystem,
-			rename: (oldPath, newPath) =>
-				nodeFileSystem
-					.rename(oldPath, newPath)
-					.pipe(
-						Effect.tap(() =>
-							Effect.sync(() => (replaced ||= String(newPath) === canonicalTarget)),
-						),
-					),
-			open: (path, options) => {
-				if (replaced && !failed && String(path) === canonicalRoot) {
-					failed = true;
-					return Effect.fail(systemError("open"));
-				}
-				return nodeFileSystem.open(path, options);
-			},
-		};
-		const filesystemWrite = await createWrite(fileSystem);
-		await expect(
-			Effect.runPromise(
-				filesystemWrite.writeFileFx({
-					lock: join(root, ".durable.lock"),
-					target,
-					bytes: encoder.encode("new"),
-				}),
-			),
-		).rejects.toBeDefined();
-		await expect(readFile(target, "utf8")).resolves.toBe("old");
-	});
-
-	it("applies an explicit private mode", async () => {
-		const target = join(root, "secret");
-		const filesystemWrite = await createWrite();
-		await Effect.runPromise(
-			filesystemWrite.writeFileFx({
-				lock: join(root, ".secret.lock"),
-				target,
-				bytes: encoder.encode("secret"),
-				mode: 0o600,
-			}),
-		);
-		expect((await lstat(target)).mode & 0o777).toBe(0o600);
-	});
-
 	it("rejects a symbolic-link target without touching its referent", async () => {
 		const outside = join(root, "outside");
 		const target = join(root, "target");
@@ -301,13 +251,63 @@ describe("FilesystemWrite", () => {
 		]);
 	}, 12_000);
 
+	it("refuses recovery through a replaced parent symlink", async () => {
+		const nested = join(root, "nested");
+		const nestedChild = join(nested, "child");
+		const outside = await mkdtemp(join(tmpdir(), "arkini-filesystem-outside-"));
+		const outsideChild = join(outside, "child");
+		try {
+			await Promise.all([
+				mkdir(nestedChild, {
+					recursive: true,
+				}),
+				mkdir(outsideChild),
+			]);
+			await Promise.all([
+				writeFile(join(nestedChild, "first.json"), "old-first"),
+				writeFile(join(nestedChild, "second.json"), "old-second"),
+				writeFile(join(outsideChild, "first.json"), "outside-first"),
+				writeFile(join(outsideChild, "second.json"), "outside-second"),
+			]);
+			await expect(
+				runFile(process.execPath, [
+					tsx,
+					helper,
+					"nested-partial",
+					root,
+				]),
+			).rejects.toBeDefined();
+			await rename(nested, join(root, "nested-owned"));
+			await symlink(outside, nested);
+
+			const filesystemWrite = await createWrite();
+			await expect(
+				Effect.runPromise(
+					filesystemWrite.withLockFx(join(root, ".write.lock"), Effect.void),
+				),
+			).rejects.toThrow("is unsafe");
+			await expect(readFile(join(outsideChild, "first.json"), "utf8")).resolves.toBe(
+				"outside-first",
+			);
+			await expect(readFile(join(outsideChild, "second.json"), "utf8")).resolves.toBe(
+				"outside-second",
+			);
+		} finally {
+			await rm(outside, {
+				force: true,
+				recursive: true,
+			});
+		}
+	}, 12_000);
+
 	it("preserves the backup and reports its exact location when recovery fails", async () => {
 		await Promise.all([
 			writeFile(join(root, "first.json"), "old-first"),
 			writeFile(join(root, "second.json"), "old-second"),
 		]);
 		await expect(
-			runFile(tsx, [
+			runFile(process.execPath, [
+				tsx,
 				helper,
 				"partial",
 				root,
@@ -317,12 +317,16 @@ describe("FilesystemWrite", () => {
 		const fileSystem: FileSystem.FileSystem = {
 			...nodeFileSystem,
 			copyFile: (from, to) =>
-				String(from).includes(".write/backup-") && String(to).endsWith(".restore")
+				basename(String(from)).startsWith("backup-") &&
+				basename(String(to)).endsWith(".restore")
 					? Effect.fail(systemError("copyFile"))
 					: nodeFileSystem.copyFile(from, to),
 		};
 		const filesystemWrite = await createWrite(fileSystem);
-		const recovery = `${await realpath(root)}/.write.lock.write`;
+		const recovery = join(
+			await Effect.runPromise(nodeFileSystem.realPath(root)),
+			".write.lock.write",
+		);
 		let failure: unknown;
 		try {
 			await Effect.runPromise(

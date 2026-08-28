@@ -1,4 +1,4 @@
-import { FileSystem, Path } from "effect";
+import { FileSystem } from "effect";
 import { Effect } from "effect";
 
 import type { EditorProjectFilesystemPaths } from "../EditorProjectFilesystemPaths";
@@ -9,6 +9,7 @@ import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
 import {
 	createFilesystemEditorVersionFingerprint,
 	hashFilesystemEditorVersionBytes,
@@ -43,8 +44,6 @@ export const readFilesystemEditorVersionSnapshotFx = Effect.fn(
 	paths,
 }: readFilesystemEditorVersionSnapshotFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
-	const path = yield* Path.Path;
-	const canonicalRoot = yield* fileSystem.realPath(paths.root);
 	const manifest = yield* Effect.try({
 		try: () => EditorVersionManifestSchema.parse(candidateManifest),
 		catch: (cause) =>
@@ -64,8 +63,7 @@ export const readFilesystemEditorVersionSnapshotFx = Effect.fn(
 			type === "json"
 				? yield* paths.jsonObjectFileFx(hash)
 				: yield* paths.pngObjectFileFx(hash);
-		const expected = path.join(canonicalRoot, path.relative(paths.root, target));
-		if ((yield* fileSystem.realPath(target)) !== expected)
+		if (!(yield* isFilesystemPathSafeFx(fileSystem, paths.root, target)))
 			return yield* Effect.fail(
 				new Error(`Editor version object ${hash} must not be a symbolic link.`),
 			);

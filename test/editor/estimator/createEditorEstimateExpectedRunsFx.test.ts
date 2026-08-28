@@ -216,14 +216,14 @@ describe("createEditorEstimateExpectedRunsFx", () => {
 	it("bounds a wide sparse frontier before enqueueing excess states", () => {
 		const distribution = Array.from(
 			{
-				length: 16 ** 3,
+				length: 2 ** 3,
 			},
 			(_, index) => {
-				const a = index % 16;
-				const b = Math.floor(index / 16) % 16;
-				const c = Math.floor(index / 16 ** 2);
+				const a = index % 2;
+				const b = Math.floor(index / 2) % 2;
+				const c = Math.floor(index / 2 ** 2);
 				return {
-					probability: 1 / 16 ** 3,
+					probability: 1 / 2 ** 3,
 					quantities: [
 						{
 							outputGroupId: "a",

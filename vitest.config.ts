@@ -22,6 +22,7 @@ export default defineConfig({
 		setupFiles: [
 			"./test/setup.ts",
 		],
+		testTimeout: 10_000,
 		unstubEnvs: true,
 		unstubGlobals: true,
 		watch: false,

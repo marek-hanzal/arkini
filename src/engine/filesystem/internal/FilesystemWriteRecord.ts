@@ -5,13 +5,11 @@ const FilesystemWriteEntrySchema = z
 		target: z.string().min(1),
 		backup: z.string().min(1),
 		hadTarget: z.boolean(),
-		oldMode: z.number().int().nonnegative().optional(),
 	})
 	.strict();
 
 const FilesystemWriteReplacementSchema = FilesystemWriteEntrySchema.extend({
 	pending: z.string().min(1),
-	newMode: z.number().int().nonnegative(),
 }).strict();
 
 export const FilesystemWriteRecordSchema = z

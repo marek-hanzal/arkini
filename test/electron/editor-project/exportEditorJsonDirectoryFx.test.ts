@@ -1,6 +1,6 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import type { BrowserWindow } from "electron";
-import { Effect, FileSystem } from "effect";
+import { Effect, FileSystem, Path } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 import { vi } from "vitest";
 
@@ -27,6 +27,7 @@ describe("exportEditorJsonDirectoryFx", () => {
 	it.effect("creates a new project folder inside the selected destination", () =>
 		Effect.gen(function* () {
 			const fileSystem = yield* FileSystem.FileSystem;
+			const path = yield* Path.Path;
 			const root = yield* fileSystem.makeTempDirectoryScoped();
 			const source = `${root}/source`;
 			const destination = `${root}/destination`;
@@ -50,7 +51,8 @@ describe("exportEditorJsonDirectoryFx", () => {
 
 			expect(exported).not.toBeNull();
 			if (exported === null) return;
-			expect(exported.root).toMatch(/\/destination\/project-one-json-[^/]+$/u);
+			expect(path.dirname(exported.root)).toBe(yield* fileSystem.realPath(destination));
+			expect(path.basename(exported.root)).toMatch(/^project-one-json-.+$/u);
 			expect((yield* readReimportableProjectFx(exported.root)).marker.revision).toBe(1);
 			expect(yield* fileSystem.readFileString(`${destination}/keep.txt`)).toBe("keep");
 		}).pipe(Effect.provide(NodeServices.layer)),

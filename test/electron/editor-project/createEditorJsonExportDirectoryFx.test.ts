@@ -15,6 +15,7 @@ describe("createEditorJsonExportDirectoryFx", () => {
 	it.effect("creates distinct verified allowlisted projects inside the selected folder", () =>
 		Effect.gen(function* () {
 			const fileSystem = yield* FileSystem.FileSystem;
+			const path = yield* Path.Path;
 			const root = yield* fileSystem.makeTempDirectoryScoped();
 			const source = `${root}/source`;
 			const parent = `${root}/destination`;
@@ -35,7 +36,8 @@ describe("createEditorJsonExportDirectoryFx", () => {
 			});
 
 			expect(first.root).not.toBe(second.root);
-			expect(first.root).toMatch(/\/project-one-json-[^/]+$/u);
+			expect(path.dirname(first.root)).toBe(yield* fileSystem.realPath(parent));
+			expect(path.basename(first.root)).toMatch(/^project-one-json-.+$/u);
 			expect((yield* readReimportableProjectFx(first.root)).marker.revision).toBe(2);
 			expect((yield* readReimportableProjectFx(second.root)).marker.revision).toBe(2);
 			expect(yield* fileSystem.readFileString(`${parent}/keep.txt`)).toBe(
@@ -57,6 +59,7 @@ describe("createEditorJsonExportDirectoryFx", () => {
 	it.effect("removes only its new folder when an allowlisted copy fails", () =>
 		Effect.gen(function* () {
 			const fileSystem = yield* FileSystem.FileSystem;
+			const path = yield* Path.Path;
 			const root = yield* fileSystem.makeTempDirectoryScoped();
 			const source = `${root}/source`;
 			const parent = `${root}/destination`;
@@ -66,7 +69,7 @@ describe("createEditorJsonExportDirectoryFx", () => {
 			const failing: FileSystem.FileSystem = {
 				...fileSystem,
 				copyFile: (from, to) =>
-					String(from).endsWith("/game.json")
+					path.basename(String(from)) === "game.json"
 						? Effect.fail(filesystemFailure("copyFile"))
 						: fileSystem.copyFile(from, to),
 			};
@@ -90,6 +93,7 @@ describe("createEditorJsonExportDirectoryFx", () => {
 	it.effect("does not retain an export that the production readers cannot reopen", () =>
 		Effect.gen(function* () {
 			const fileSystem = yield* FileSystem.FileSystem;
+			const path = yield* Path.Path;
 			const root = yield* fileSystem.makeTempDirectoryScoped();
 			const source = `${root}/source`;
 			const parent = `${root}/destination`;
@@ -97,11 +101,11 @@ describe("createEditorJsonExportDirectoryFx", () => {
 			yield* writeReimportableProjectFx(source, 4);
 			const failing: FileSystem.FileSystem = {
 				...fileSystem,
-				readFileString: (path, options) =>
-					String(path).includes("/project-one-json-") &&
-					String(path).endsWith("/game.json")
+				readFileString: (filePath, options) =>
+					path.basename(String(filePath)) === "game.json" &&
+					path.basename(path.dirname(String(filePath))).startsWith("project-one-json-")
 						? Effect.fail(filesystemFailure("readFileString"))
-						: fileSystem.readFileString(path, options),
+						: fileSystem.readFileString(filePath, options),
 			};
 
 			const result = yield* Effect.result(

@@ -1,9 +1,9 @@
 import { Effect, FileSystem, Path } from "effect";
 
 import { FilesystemWriteError } from "../FilesystemWriteError";
+import { isFilesystemPathSafeFx } from "../isFilesystemPathSafeFx";
 import { FilesystemWriteRecordSchema, type FilesystemWriteRecord } from "./FilesystemWriteRecord";
 import type { FilesystemWritePaths } from "./readFilesystemWritePathsFx";
-import { syncFilesystemPathFx } from "./syncFilesystemPathFx";
 
 const failRecovery = (recovery: string, message: string, cause?: unknown) =>
 	new FilesystemWriteError({
@@ -16,14 +16,16 @@ const failRecovery = (recovery: string, message: string, cause?: unknown) =>
 const assertCanonicalFx = Effect.fn("recoverFilesystemWriteFx.assertCanonicalFx")(function* ({
 	target,
 	type,
+	root,
 }: {
 	readonly target: string;
 	readonly type: "Directory" | "File";
+	readonly root: string;
 }) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	if (!(yield* fileSystem.exists(target))) return false;
 	const info = yield* fileSystem.stat(target);
-	if (info.type !== type || (yield* fileSystem.realPath(target)) !== target)
+	if (info.type !== type || !(yield* isFilesystemPathSafeFx(fileSystem, root, target)))
 		return yield* Effect.fail(
 			failRecovery(target, `Filesystem write recovery path ${target} is not canonical.`),
 		);
@@ -45,6 +47,7 @@ const readRecordFx = Effect.fn("recoverFilesystemWriteFx.readRecordFx")(function
 		);
 	}
 	yield* assertCanonicalFx({
+		root: active,
 		target: recordFile,
 		type: "File",
 	});
@@ -73,8 +76,8 @@ const assertRecordFx = Effect.fn("recoverFilesystemWriteFx.assertRecordFx")(func
 	if (
 		root !== record.root ||
 		!(yield* fileSystem.exists(root)) ||
-		(yield* fileSystem.realPath(root)) !== root ||
-		(yield* fileSystem.stat(root)).type !== "Directory"
+		(yield* fileSystem.stat(root)).type !== "Directory" ||
+		!(yield* isFilesystemPathSafeFx(fileSystem, root, root))
 	)
 		return yield* Effect.fail(
 			failRecovery(paths.active, `Filesystem write recovery root ${record.root} is unsafe.`),
@@ -111,19 +114,21 @@ const assertRecordFx = Effect.fn("recoverFilesystemWriteFx.assertRecordFx")(func
 		const parent = path.dirname(entry.target);
 		if (
 			!(yield* fileSystem.exists(parent)) ||
-			(yield* fileSystem.realPath(parent)) !== parent ||
-			(yield* fileSystem.stat(parent)).type !== "Directory"
+			(yield* fileSystem.stat(parent)).type !== "Directory" ||
+			!(yield* isFilesystemPathSafeFx(fileSystem, root, parent))
 		)
 			return yield* Effect.fail(
 				failRecovery(paths.active, `Filesystem write recovery parent ${parent} is unsafe.`),
 			);
 		if (yield* fileSystem.exists(entry.target))
 			yield* assertCanonicalFx({
+				root,
 				target: entry.target,
 				type: "File",
 			});
 		if (yield* fileSystem.exists(entry.backup))
 			yield* assertCanonicalFx({
+				root: paths.active,
 				target: entry.backup,
 				type: "File",
 			});
@@ -142,6 +147,7 @@ const assertRecordFx = Effect.fn("recoverFilesystemWriteFx.assertRecordFx")(func
 		]) {
 			if (yield* fileSystem.exists(candidate))
 				yield* assertCanonicalFx({
+					root,
 					target: candidate,
 					type: "File",
 				});
@@ -156,13 +162,13 @@ const removeCleanupFx = Effect.fn("recoverFilesystemWriteFx.removeCleanupFx")(fu
 	const fileSystem = yield* FileSystem.FileSystem;
 	if (!(yield* fileSystem.exists(paths.cleanup))) return;
 	yield* assertCanonicalFx({
+		root: paths.parent,
 		target: paths.cleanup,
 		type: "Directory",
 	});
 	yield* fileSystem.remove(paths.cleanup, {
 		recursive: true,
 	});
-	yield* syncFilesystemPathFx(paths.parent);
 });
 
 const removeTreeFx = Effect.fn("recoverFilesystemWriteFx.removeTreeFx")(function* (
@@ -172,11 +178,9 @@ const removeTreeFx = Effect.fn("recoverFilesystemWriteFx.removeTreeFx")(function
 	yield* removeCleanupFx(paths);
 	if (!(yield* fileSystem.exists(paths.active))) return;
 	yield* fileSystem.rename(paths.active, paths.cleanup);
-	yield* syncFilesystemPathFx(paths.parent);
 	yield* fileSystem.remove(paths.cleanup, {
 		recursive: true,
 	});
-	yield* syncFilesystemPathFx(paths.parent);
 });
 
 const restoreFx = Effect.fn("recoverFilesystemWriteFx.restoreFx")(function* ({
@@ -187,8 +191,6 @@ const restoreFx = Effect.fn("recoverFilesystemWriteFx.restoreFx")(function* ({
 	readonly record: FilesystemWriteRecord;
 }) {
 	const fileSystem = yield* FileSystem.FileSystem;
-	const path = yield* Path.Path;
-	const parents = new Set<string>();
 	for (const entry of [
 		...record.writes.filter(({ hadTarget }) => hadTarget),
 		...record.deletes,
@@ -201,25 +203,19 @@ const restoreFx = Effect.fn("recoverFilesystemWriteFx.restoreFx")(function* ({
 				),
 			);
 	for (const entry of record.writes) {
-		parents.add(path.dirname(entry.target));
 		if (!entry.hadTarget) continue;
 		const restore = `${entry.pending}.restore`;
 		yield* fileSystem.remove(restore, {
 			force: true,
 		});
 		yield* fileSystem.copyFile(entry.backup, restore);
-		yield* fileSystem.chmod(restore, entry.oldMode ?? 0o600);
-		yield* syncFilesystemPathFx(restore);
 	}
 	for (const entry of record.deletes) {
-		parents.add(path.dirname(entry.target));
 		const restore = `${entry.target}.arkini-restore`;
 		yield* fileSystem.remove(restore, {
 			force: true,
 		});
 		yield* fileSystem.copyFile(entry.backup, restore);
-		yield* fileSystem.chmod(restore, entry.oldMode ?? 0o600);
-		yield* syncFilesystemPathFx(restore);
 	}
 	for (const entry of record.writes)
 		if (entry.hadTarget) yield* fileSystem.rename(`${entry.pending}.restore`, entry.target);
@@ -229,7 +225,6 @@ const restoreFx = Effect.fn("recoverFilesystemWriteFx.restoreFx")(function* ({
 			});
 	for (const entry of record.deletes)
 		yield* fileSystem.rename(`${entry.target}.arkini-restore`, entry.target);
-	for (const parent of parents) yield* syncFilesystemPathFx(parent);
 });
 
 /** Restores an interrupted exact-file write or finishes its committed cleanup. */
@@ -241,6 +236,7 @@ export const recoverFilesystemWriteFx = Effect.fn("recoverFilesystemWriteFx")(fu
 		yield* removeCleanupFx(paths);
 		if (!(yield* fileSystem.exists(paths.active))) return;
 		yield* assertCanonicalFx({
+			root: paths.parent,
 			target: paths.active,
 			type: "Directory",
 		});

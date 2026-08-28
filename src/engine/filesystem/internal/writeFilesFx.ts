@@ -7,19 +7,15 @@ import type { FilesystemWriteRecord } from "./FilesystemWriteRecord";
 import { prepareFilesystemWriteTargetFx } from "./prepareFilesystemWriteTargetFx";
 import type { FilesystemWritePaths } from "./readFilesystemWritePathsFx";
 import { recoverFilesystemWriteFx } from "./recoverFilesystemWriteFx";
-import { syncFilesystemPathFx } from "./syncFilesystemPathFx";
 import { writeSyncedFileFx } from "./writeSyncedFileFx";
 
 const encoder = new TextEncoder();
 
 const writeMarkerFx = Effect.fn("writeFilesFx.writeMarkerFx")(function* (target: string) {
-	const path = yield* Path.Path;
 	yield* writeSyncedFileFx({
 		target,
 		bytes: Uint8Array.of(1),
-		mode: 0o600,
 	});
-	yield* syncFilesystemPathFx(path.dirname(target));
 });
 
 const writeRecordFx = Effect.fn("writeFilesFx.writeRecordFx")(function* ({
@@ -34,10 +30,8 @@ const writeRecordFx = Effect.fn("writeFilesFx.writeRecordFx")(function* ({
 	yield* writeSyncedFileFx({
 		target: pending,
 		bytes: encoder.encode(JSON.stringify(record)),
-		mode: 0o600,
 	});
 	yield* fileSystem.rename(pending, `${active}/record.json`);
-	yield* syncFilesystemPathFx(active);
 });
 
 const mapWriteError = (operation: "write-file" | "write-files", cause: unknown) =>
@@ -84,13 +78,6 @@ export const writeFilesFx = Effect.fn("writeFilesFx")(function* ({
 				message: `Filesystem write lock ${paths.lock} must be contained by ${root}.`,
 			}),
 		);
-	if ((yield* fileSystem.stat(root)).dev !== (yield* fileSystem.stat(paths.parent)).dev)
-		return yield* Effect.fail(
-			new FilesystemWriteError({
-				operation,
-				message: `Filesystem write lock ${paths.lock} crosses a device boundary.`,
-			}),
-		);
 	if (props.writes.length === 0 && (props.deletes?.length ?? 0) === 0) return;
 
 	const token = randomUUID();
@@ -122,25 +109,17 @@ export const writeFilesFx = Effect.fn("writeFilesFx")(function* ({
 	});
 	const writes: Array<{
 		readonly target: string;
-		readonly parent: string;
 		readonly bytes: Uint8Array;
-		readonly mode?: number;
 	}> = [];
 	for (const write of props.writes) {
 		const prepared = yield* prepareTargetFx(write.target);
 		writes.push({
 			...prepared,
 			bytes: write.bytes,
-			...(write.mode === undefined
-				? {}
-				: {
-						mode: write.mode,
-					}),
 		});
 	}
 	const deletes: Array<{
 		readonly target: string;
-		readonly parent: string;
 	}> = [];
 	for (const target of props.deletes ?? []) {
 		const prepared = yield* prepareTargetFx(target);
@@ -153,40 +132,23 @@ export const writeFilesFx = Effect.fn("writeFilesFx")(function* ({
 		writes: yield* Effect.forEach(writes, (write, index) =>
 			Effect.gen(function* () {
 				const exists = yield* fileSystem.exists(write.target);
-				const oldInfo = exists ? yield* fileSystem.stat(write.target) : undefined;
-				const oldMode = oldInfo === undefined ? undefined : oldInfo.mode & 0o777;
 				return {
 					target: write.target,
 					pending: `${write.target}.${token}.pending`,
 					backup: path.join(paths.active, `backup-${index}`),
 					hadTarget: exists,
-					...(exists
-						? {
-								oldMode,
-							}
-						: {}),
-					newMode: write.mode ?? oldMode ?? 0o666 & ~process.umask(),
 				};
 			}),
 		),
-		deletes: yield* Effect.forEach(deletes, (entry, index) =>
-			Effect.gen(function* () {
-				const info = yield* fileSystem.stat(entry.target);
-				return {
-					target: entry.target,
-					backup: path.join(paths.active, `backup-${writes.length + index}`),
-					hadTarget: true,
-					oldMode: info.mode & 0o777,
-				};
-			}),
-		),
+		deletes: deletes.map((entry, index) => ({
+			target: entry.target,
+			backup: path.join(paths.active, `backup-${writes.length + index}`),
+			hadTarget: true,
+		})),
 	};
 
 	const prepareFx = Effect.gen(function* () {
-		yield* fileSystem.makeDirectory(paths.active, {
-			mode: 0o700,
-		});
-		yield* syncFilesystemPathFx(paths.parent);
+		yield* fileSystem.makeDirectory(paths.active);
 		yield* writeRecordFx({
 			active: paths.active,
 			record,
@@ -197,19 +159,14 @@ export const writeFilesFx = Effect.fn("writeFilesFx")(function* ({
 		]) {
 			if (!entry.hadTarget) continue;
 			yield* fileSystem.copyFile(entry.target, entry.backup);
-			yield* fileSystem.chmod(entry.backup, entry.oldMode ?? 0o600);
-			yield* syncFilesystemPathFx(entry.backup);
 		}
 		for (let index = 0; index < record.writes.length; index += 1) {
 			const entry = record.writes[index];
 			yield* writeSyncedFileFx({
 				target: entry.pending,
 				bytes: writes[index].bytes,
-				mode: entry.newMode,
 			});
 		}
-		for (const parent of new Set(writes.map((write) => write.parent)))
-			yield* syncFilesystemPathFx(parent);
 	});
 	const applyFx = Effect.gen(function* () {
 		yield* writeMarkerFx(`${paths.active}/writing`);
@@ -218,11 +175,6 @@ export const writeFilesFx = Effect.fn("writeFilesFx")(function* ({
 			yield* fileSystem.remove(entry.target, {
 				force: true,
 			});
-		for (const parent of new Set([
-			...writes.map((write) => write.parent),
-			...deletes.map((entry) => entry.parent),
-		]))
-			yield* syncFilesystemPathFx(parent);
 		yield* writeMarkerFx(`${paths.active}/committed`);
 	});
 

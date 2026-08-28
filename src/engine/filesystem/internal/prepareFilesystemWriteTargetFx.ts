@@ -1,14 +1,14 @@
 import { Effect, FileSystem, Path } from "effect";
 
 import { FilesystemWriteError } from "../FilesystemWriteError";
-import { syncFilesystemPathFx } from "./syncFilesystemPathFx";
+import { isFilesystemPathSafeFx } from "../isFilesystemPathSafeFx";
 
 const isContained = (path: Path.Path, root: string, target: string) => {
 	const relative = path.relative(root, target);
 	return relative !== "" && !relative.startsWith("..") && !path.isAbsolute(relative);
 };
 
-/** Creates and verifies one same-device canonical parent below the exact owned root. */
+/** Creates and verifies one canonical parent below the exact owned root. */
 export const prepareFilesystemWriteTargetFx = Effect.fn("prepareFilesystemWriteTargetFx")(
 	function* ({
 		operation,
@@ -39,11 +39,13 @@ export const prepareFilesystemWriteTargetFx = Effect.fn("prepareFilesystemWriteT
 			directory = path.join(directory, segment);
 			if (!(yield* fileSystem.exists(directory))) {
 				yield* fileSystem.makeDirectory(directory);
-				yield* syncFilesystemPathFx(path.dirname(directory));
 				continue;
 			}
 			const info = yield* fileSystem.stat(directory);
-			if (info.type !== "Directory" || (yield* fileSystem.realPath(directory)) !== directory)
+			if (
+				info.type !== "Directory" ||
+				!(yield* isFilesystemPathSafeFx(fileSystem, root, directory))
+			)
 				return yield* Effect.fail(
 					new FilesystemWriteError({
 						operation,
@@ -51,18 +53,9 @@ export const prepareFilesystemWriteTargetFx = Effect.fn("prepareFilesystemWriteT
 					}),
 				);
 		}
-		const rootInfo = yield* fileSystem.stat(root);
-		const parentInfo = yield* fileSystem.stat(parent);
-		if (rootInfo.dev !== parentInfo.dev)
-			return yield* Effect.fail(
-				new FilesystemWriteError({
-					operation,
-					message: `Filesystem write target ${target} crosses a device boundary.`,
-				}),
-			);
 		if (yield* fileSystem.exists(target)) {
 			const info = yield* fileSystem.stat(target);
-			if (info.type !== "File" || (yield* fileSystem.realPath(target)) !== target)
+			if (info.type !== "File" || !(yield* isFilesystemPathSafeFx(fileSystem, root, target)))
 				return yield* Effect.fail(
 					new FilesystemWriteError({
 						operation,
@@ -71,7 +64,6 @@ export const prepareFilesystemWriteTargetFx = Effect.fn("prepareFilesystemWriteT
 				);
 		}
 		return {
-			parent,
 			target,
 		};
 	},

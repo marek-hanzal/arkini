@@ -1,322 +1,108 @@
 # Arkini gameplay contract
 
-This document describes gameplay semantics implemented by the current engine and the exact boundary between authored data, runtime behavior, and presentation controls. It does not describe historical systems, speculative wish lists, or UI-specific animation details.
+This document owns implemented gameplay meaning. [`CONFIG.md`](CONFIG.md) owns authoring syntax; [`ARCHITECTURE.md`](ARCHITECTURE.md) owns execution and lifecycle; source and focused tests prove the current implementation.
 
-Configuration owns concrete content and balance. This document owns the interpretation of current mechanics and the boundary between executable behavior and schema-only intent.
+## World, locations, and stacks
 
-## 1. Game shape
+Arkini runs multiple isolated Board spaces plus global Inventory and optional Toolbar storage. A Board cell is `space + x + y`; equal coordinates in different spaces never interact. `currentSpace` selects presentation and passive-storage release destination, but all spaces keep simulating.
 
-Arkini is a client-only, offline merge and production game played across multiple isolated Board spaces and two global passive-storage surfaces: Inventory and an optional Toolbar.
+Spatial mechanics—distance, placement, merge, charge targeting, and output—remain in their origin space. Inventory and Toolbar are the only bridges between spaces and are passive storage:
 
-The current engine lets callers create and move items, navigate persistent Board spaces, store line materials, enqueue product-line work, advance deterministic jobs, execute directional merges, resolve configured outputs, and place resulting quantities through one shared policy. Utility controls cross the runtime, session, storage, and presentation boundaries described later in this document.
+- active/ready jobs pause and queued work does not dispatch there;
+- new line input, job, or queue state cannot attach there;
+- moving an already stateful owner there preserves its identity, inputs, job, queue, charges, and remaining time;
+- returning it to a Board resumes evaluation against the destination space.
 
-## 2. Items and locations
+Configured storage scope is `board | inventory | toolbar | any`. Query reach is separate: `board` is the origin-space Board, `inventory` and `toolbar` are their global surfaces, `any` is the origin-space Board plus both passive surfaces, and `universe` is every Board plus both passive surfaces. `universe` is not a storage scope.
 
-Every live item is a runtime instance of one canonical configured item.
+Only compatible pure items stack, up to `maxStackSize`. Purity is derived from live state: an item is impure when it or an owned line carries identity-bound state such as input, a job, a queue request, or a partial charge count. An impure item has effective stack size `1`.
 
-Configured storage scope determines whether the item may occupy:
+When a Board operation first attaches state to a stacked identity, the original identity becomes quantity `1` and the pure remainder uses standard placement in the same atomic transition. Failure to place the remainder changes nothing. Generic stack/quantity operations accept only pure items.
 
-- Board;
-- Inventory;
-- Toolbar;
-- any of those three grids.
+## Lines, intent, and delivery
 
-The singleton Inventory opener is the deliberate exception: its authored Board scope controls automatic placement, while the live opener may occupy Board or Toolbar but never Inventory.
+Producer, craft, blueprint, and stash items share one line lifecycle. Input filling is passive and never starts work. Enqueue is the player-facing execution command: it appends explicit intent after validating the owner, line, rules, non-material requirements, charges, output capacity, and queue capacity. Missing concrete material may wait.
 
-Runtime may additionally place material representations into:
+A queued request is not a job. It owns no time, material, charge, or reservation. Only the FIFO head of an idle Board owner is considered, in canonical global queue order. A blocked head stays first and retries against fresh Runtime facts; nothing overtakes or silently removes it. The player may clear all pending requests for one owner without affecting its active job, materials, charges, or output.
 
-- a specific owner line-input slot;
-- a consumed job material or live reserved material.
+At a fixed-step boundary, queue playback may Autofill useful concrete material through canonical deliveries while retaining the request. Delivery travel is persisted engine state with fixed-step remaining duration. The material becomes available only when Tick settles delivery into input storage. Renderer geometry/contact never admits material or starts work. A missing or invalid soft target returns the same leased actor, including a partial remainder, to its persisted origin.
 
-Input and job locations are ownership states. They are not visible storage grids and cannot be manipulated as normal grid items.
+Only after required material has settled may a later queue pass create the job and remove its request. Start re-resolves every live fact and commits input ownership, charge spending, stateful-stack isolation, output reservations, and the job atomically.
 
-## 3. Board, Inventory, and Toolbar
+## Tick, jobs, and temporary items
 
-Every Board space is an active spatial surface. Board cells are identified by mandatory `space + x + y`, and equal coordinates in different spaces never collide. All spaces continue simulating together; `currentSpace` only selects the presented Board and the destination of explicit passive-storage-to-Board placement.
+Effect Clock is the production wall-clock source; simulation advances in canonical 100 ms fixed steps. A long elapsed interval equals the same sequence of explicit steps. Session-only observation/remainder state is not persisted, and an attempted complete step is acknowledged once even when advancement fails.
 
-Spatial mechanics never cross directly between Boards. Placement, distance, merge, charges, outputs, and release stay inside their origin space. The global Inventory and Toolbar are the only bridges between spaces.
-
-Inventory and Toolbar are passive storage:
-
-- active and ready jobs pause while their owner is on either surface;
-- queued work does not dispatch while the owner is on either surface;
-- Board-origin rules cannot use passive-storage coordinates;
-- Line input, job, and queue state cannot be attached there;
-- an immediate Space action may spend item charges there, isolating a charged stack from its real
-  passive slot when necessary;
-- returning the same owner to the board resumes normal evaluation.
-
-Moving an item to Inventory or Toolbar is not item removal. Instance state, jobs, queue requests, buffered inputs, and remaining time stay attached to the same owner.
-
-## 4. Stacks
-
-Compatible pure items may share one runtime stack up to the configured `maxStackSize`. An impure item has an effective stack size of `1`.
-
-A line becomes non-pure when it owns buffered input, an active job, or a queued request. An item is pure only when all of its lines and any item-owned lifecycle state are pure. A passive empty producer or craft can therefore stack; the same runtime item becomes non-pure as soon as state attaches to its identity.
-
-Placement fills compatible pure stacks before spawning additional item instances in empty locations. Generic stack and quantity commands reject non-pure items.
-
-When a board command first attaches identity-bound state to a stack, the original runtime identity keeps that state at quantity `1` and the remaining pure quantity follows standard placement. The attachment, split, remainder placement, and emitted events are one atomic mutation. If the remainder cannot be placed, nothing changes.
-
-Stack handling is automatic. Gameplay commands should operate on quantities rather than require the player or UI to normalize stacks manually.
-
-## 5. Current public gameplay operations
-
-The implemented write surface includes:
-
-- initialize a runtime from game configuration or persisted state;
-- spawn an item;
-- move an item;
-- swap two grid items;
-- set an item stack quantity;
-- place a resolved drop or output;
-- store material into a line input;
-- enqueue one explicit line request;
-- advance runtime time through the Tick service.
-
-Every write uses the canonical serialized mutation boundary. UI must not invent additional state transitions around these commands.
-
-## 6. Product lines
-
-Producers, crafts, blueprints, and stashes expose the shared product-line model. They use one input, start, queue, max-count, deterministic output, placement, and completion lifecycle. Separate item schemas remain for authoring identity and presentation, but item type does not decide output interpretation or whether the owner survives completion.
-
-A line owns:
-
-- runtime duration;
-- input requirements;
-- optional output;
-- visibility, enable, disable, and runtime rules.
-
-Filling an input is passive. It never starts work automatically.
-
-Enqueue is the sole player-facing line execution command. The fixed-step scheduler starts work only from the live FIFO head after its concrete inputs have physically settled.
-
-## 7. Input buffering
-
-Delivered materials may be stored in a specific owner/line/input slot before start. Delivering the first material to a stacked owner isolates one stateful owner instance before commit; this is shared line behavior rather than a producer, craft, blueprint, or stash exception.
-
-An input accepts only matching material and only up to its required quantity plus configured extra capacity. During an active job, a zero-capacity input is closed and rejects new delivery; a positive-capacity input remains open as storage. A queued request does not close the input.
-
-Item removal is not a generic player command. An authored gameplay mechanic may remove an idle board owner through the canonical engine transition, which releases every direct buffered root through canonical existing-item placement in the same atomic mutation. The released owner position is the single board origin; normal scope policy may still place an allowed item into inventory when board capacity is exhausted. A loaded owner in passive inventory must return to the board before removal because inventory coordinates are never invented as a board origin.
-
-Buffered material retains no historical stack, slot, or position. Pure roots may normalize into ordinary stacks and identities. Impure roots preserve their exact runtime identity, state, and passive owned subtree.
-
-If any release cannot be placed, owner removal and all releases roll back.
-
-## 8. Queueing and starting work
-
-Enqueue resolves the live owner and line inside the serialized runtime mutation and validates every hard queue boundary while deliberately allowing missing concrete material to wait. It appends one exact request and does not fill, reserve, or start the line in that command transaction.
-
-Queue admission validates:
-
-- owner existence and board eligibility;
-- line existence and live line rules;
-- non-material input requirements and charge availability;
-- output and `maxCount` constraints;
-- queue capacity.
-
-An owner may have at most one active job. A queued request:
-
-- is not a job;
-- owns no time;
-- consumes nothing;
-- reserves nothing;
-- stores only stable request, owner, and line identity;
-- may wait while concrete material is missing;
-- may be discarded only by explicitly clearing the whole pending queue of its owner.
-
-At each fixed-step boundary, the engine considers only the FIFO head of each idle owner in canonical global queue order. It first attempts the exact queued start against current runtime truth. If stored material is incomplete, canonical Autofill may schedule useful concrete material through physical delivery while retaining the same request. Only after those deliveries settle into input storage can a later step create the job and remove that queue row.
-
-Starting therefore remains an internal queue-playback transition rather than a separate player command. Its atomic candidate still revalidates current owner, line, rules, inputs, charges, output limits, placement, and other start invariants before committing.
-
-## 9. FIFO behavior
-
-Queued work starts only through the canonical queued-start pipeline.
-
-The oldest request is always considered first.
-
-A retryable blocked head remains at the front. Work behind it may not overtake it. The head keeps retrying against fresh runtime facts, so a later matching deposit or other restored requirement may unblock it. The engine never silently discards pending work.
-
-The player may explicitly clear every pending request of one owner. Clearing a queue does not cancel or modify an active job, return materials, spend or restore charges, or create output. Repeating the command on an empty queue is a safe no-op.
-
-Queue-only owners are valid runtime state and are retried at fixed-step boundaries.
-
-Missing owner, missing line, or structural corruption is not a retryable queue block and must surface as a real failure.
-
-## 10. Jobs and time
-
-A job stores:
+Jobs persist only:
 
 ```text
 durationMs
 remainingMs
 ```
 
-No wall-clock timestamps are part of a job.
+Runnable jobs decrement by one step, clamped at zero; paused jobs do not. Completions settle in stable job-ID order. Work admitted during that boundary receives no retroactive time. Started jobs cannot be cancelled.
 
-The engine advances jobs in canonical 100 ms fixed steps. A long elapsed interval must produce the same result as the equivalent sequence of fixed steps.
+Temporary items are Board-only, identity-bound, and non-stackable. Each persists `remainingDurationMs`, initialized from authored `durationMs`; identities present at a step boundary lose one step. Job output created in the current step starts at full duration. Ready temporaries expire after job completion in stable runtime-ID order. Expiry removes the item, resolves optional deterministic output from its released origin, and rolls back to the same zero-duration item if placement fails.
 
-At the start of one fixed step, every owner observes the same step-start runtime facts for time progression.
+## Material ownership
 
-Runnable jobs decrement by one step, clamped at zero. Paused jobs keep their remaining time.
+Material input uses one exact canonical item selector and one of two modes:
 
-Completions are applied at the step boundary in stable job-ID order. A queued successor may start at that boundary but receives no retroactive time from the completed step.
+- `consume`: the material stays intact while buffered; start discards its passive owned subtree, moves only the inaccessible root into `job` scope, and completion destroys it permanently. Conversion is not charge depletion and emits no depletion output.
+- `reserve`: start moves the same live instance into `reserved` scope. Completion relocates it from the owner's current Board origin. Pure material may normalize into ordinary stacks/identities; impure material preserves exact identity and needs one exclusive cell.
 
-Temporary board items store:
+Neither mode remembers historical stack, slot, or position. Job-owned material is inaccessible to generic mutations. A zero-capacity material input closes while its line runs; positive capacity remains open as storage. Temporary items cannot enter material input.
 
-```text
-durationMs             authored immutable lifetime
-remainingDurationMs    persisted runtime lifetime
-```
+Removing an authored idle Board owner releases its buffered roots through canonical existing-item placement in the same transition. A loaded passive owner must return to a Board first because no passive coordinate is reinterpreted as a Board origin. Any blocked release rolls the removal back.
 
-Every temporary identity present at the start of a fixed step loses one step, clamped at zero. Authored durations that are not exact multiples of 100 ms therefore expire on the first fixed boundary at or after their duration. Items created by work completed during the current step begin at the full authored duration and are first advanced by the next step.
+## Charges and completion
 
-After job completion and queue dispatch, ready temporary items expire in stable runtime-ID order. Expiry removes the temporary item and resolves its optional output from the released board origin through the same deterministic output and placement pipeline used elsewhere. A blocked output rolls the whole expiry back, leaves the item at zero, and retries from the same deterministic random stream after later runtime changes create capacity.
+An item may author finite `charges.amount` and optional depletion output. Missing live `remainingCharges` means the fresh full amount and remains pure. Input costs charge either the line owner (`self`) or the deterministic Board target of a deposit input (`target`). Queueing pays nothing.
 
-## 11. Inputs at job start
+Start reserves charge budget by runtime payer across the entire line, aggregates all costs per payer, and spends each payer once. Partial spending stores identity-bound charge state and isolates one stack quantity. Full idle depletion consumes one quantity in place. Idle external payers die and emit depletion output during start; an active owner may remain at zero until its job completes.
 
-Material inputs use one of two modes.
-
-### Consume
-
-Before start, the accepted material remains in its input with its complete owned state. When the job actually starts, its passive owned subtree is discarded without returns and only the consumed root moves into `job` scope. The root remains inaccessible while the job runs and is discarded permanently at completion. Hydration rejects any consumed root that still owns descendants, work, job material, or queued intent. Consuming a charged item does not trigger depletion output because conversion is not charge depletion.
-
-### Reserve
-
-The accepted quantity moves as the same live runtime instance into `reserved` scope and becomes inaccessible to generic item operations. Its identity, remaining charges, and passive owned subtree remain intact. Completion places that existing instance from the current board position of the line owner without remembering its former stack, slot, or position. Pure instances may normalize into ordinary stacks; impure instances preserve identity and require one exclusive cell.
-
-Job-owned materials are not a second inventory and do not remember where they came from. Consume and reserve are both committed only by the authoritative start candidate.
-
-Started jobs cannot be cancelled.
-
-## 12. Charges and completion
-
-Any item may have a finite authored lifetime:
+Completion removes the ready job and consumed roots in one candidate, keeps reserved roots live, then applies this order:
 
 ```text
-charges.amount
-charges.output?
+remove a depleted owner and its queue
+→ place optional line output
+→ place optional owner-depletion output
+→ release the depleted owner's buffered inputs
+→ relocate reserved instances
 ```
 
-Missing live `remainingCharges` means the instance is fresh at the authored full amount. Charge costs are authored on individual line inputs. A self cost charges the owner; a target cost charges the deterministic board item resolved by a deposit input. Here `deposit` names the external-board-target interaction, not a required target item category. Queueing pays nothing. Costs are resolved and paid only when a job actually starts.
+A non-depleted owner, its buffered storage, and pending queue remain. Any charge, placement, capacity, or return failure preserves the pre-completion state for retry. One blocked owner does not prevent independent owners from advancing.
 
-All costs for the same runtime payer are aggregated before mutation. The engine spends each payer once inside the same candidate. A partial spend makes one concrete item stateful and isolates it from a stack. Fully depleting an idle quantity consumes one quantity in place. An idle depleted target is removed immediately and emits its optional charge output from its former origin. A payer that owns an active job may temporarily remain at zero charges until that job completes.
+## Output capacity and randomness
 
-A ready job completes only while its owner is on the board. Completion resolves the live job by stable ID, removes the completed job and consumed roots inside one immutable candidate, keeps reserved instances live, and executes one generic lifecycle:
+Every active job reserves the worst possible future quantity of each canonical output against `maxCount`, including deferred owner-depletion output. Fixed quantities reserve their value, ranges their maximum, chance rolls success, repeated weighted rolls the worst candidate for every draw, rolls in a selected set add, and alternative sets use the per-item maximum. Queued requests reserve nothing.
+
+All quantity-creating paths and hydration include active-job reservations. Completion removes its own job before placement, spending rather than double-counting its reservation. Quantities that the same completion destroys—consumed material and a depleted owner—offset output of that canonical item. Immediate external depletion output is live output during start, not a later reservation. Overbooking rejects the whole candidate.
+
+Randomness derives from stable canonical identities and explicit algorithm versions, never Tick or wall time. Unchanged blocked start/completion/expiry retries therefore resolve the same rolls and placement order.
+
+## Placement and merge
+
+One scope-aware placement policy serves ordinary drops, line/depletion/expiry output, reserved-instance relocation, buffered release, and initial placement:
 
 ```text
-remove the owner when it is depleted
-→ resolve optional line.output
-→ resolve optional depleted-owner charges.output
-→ release depleted-owner buffered inputs
-→ relocate the same live reserved instances
-→ commit everything atomically
+validate live + reserved maxCount
+→ apply authored scope and Board strategy
+→ fill compatible pure stacks
+→ spawn into empty locations
+→ require the complete quantity
 ```
 
-A non-depleted owner remains available for later starts and retains buffered storage and queue state. A depleted owner loses its identity and queue before output placement, so line output gets first access to the freed origin and depletion output follows. Placement, charge, max-count, or return failure is a valid blocked state: the published runtime keeps the job, owner, queue, inputs, reservations, and charges unchanged for retry.
+`drop` starts from the supplied origin; `random` chooses one Board origin, including occupied cells, then uses the same stack-first, nearest-first policy. An `any` item may fall back Board → Inventory → Toolbar, never another Board. Existing pure items may normalize; impure items keep exact identity and require one empty cell. Partial placement is forbidden and rolls back the owning mutation.
 
-One blocked owner does not prevent unrelated owners from progressing or completing in the same fixed step.
+Directional merge is one engine command. The source item owns ordered rules; the first exact target selector wins and reverse matching is never inferred. One source quantity is consumed or used, one Board target is kept/removed/replaced, optional output uses ordinary placement, and a used source returns through ordinary placement. Source action, target effect, output, return, validation, and event commit together. Same-item stacking is separate from merge.
 
-## 13. Future output and `maxCount`
+## Cheats, save, and presentation
 
-A job may start only when every possible deferred output remains within canonical `maxCount` after accounting for live items and all active jobs. Deferred output includes `line.output` and `charges.output` when the owner has already paid its last charge. Capacity planning uses the worst possible result rather than an average or one sampled roll:
+Cheat availability is application preference; enabled cheat state, including Instant gameplay, is Runtime state. Instant settles valid time-based jobs and temporary lifetimes through the same authoritative engine without changing Tick units. Hard reset is renderer lifecycle: discard the exact Game without final save, clear only its verified save, then acquire a fresh Game. It is not an authored item command.
 
-- a fixed quantity reserves its value;
-- a range reserves its maximum;
-- a chance reserves the successful drop;
-- repeated weighted selection reserves the worst candidate for every draw;
-- all rolls in one selected set add together;
-- alternative sets reserve the per-item maximum.
+Serializable State contains items, deliveries, jobs, queues, current space, and gameplay cheat state—not wall-clock timestamps, Tick observation cursors, transient events, or UI state. Hydration strictly validates the current shape and invariants. Matching-major compatibility is defined only by [`VERSION.md`](VERSION.md).
 
-Queued requests reserve nothing. When the FIFO head attempts to become active, the same charge and max-count checks run; a blocked head stays first. Ordinary output placement, direct drops, direct spawn, and direct quantity mutation cannot consume capacity already promised to active jobs. A completing job is removed from the candidate before its output is placed, so its actual roll spends the reservation. A depleted owner offsets output of its own canonical item by the live quantity that disappears.
+Presentation may trail canonical Runtime and may redirect, shorten, collapse, or skip choreography. It never determines readiness, validity, placement, queue/job state, Tick progress, save, or event publication; a new subscriber never receives old events merely because another surface is still animating them.
 
-Immediate charge output from an idle external target is placed during the start candidate and is not left as a future reservation. After all charge spends, the final start max-count assertion validates the live immediate output together with every active-job reservation, including the job being started. Offline validation additionally catches the narrow exact-item case where unavoidable target costs exceed `charges.amount × finite maxCount`. Failure rolls back the complete start.
-
-## 14. Deterministic output
-
-Line completion and deferred owner-depletion randomness are stable for one job identity and explicit algorithm versions. Immediate external depletion randomness is stable for the unchanged owner, line, payer, quantity, pre-spend charge state, and cost.
-
-Deterministic streams control alternative set selection, chance, weights, quantity ranges, and random placement ordering. A blocked start, blocked completion, or restored saved state therefore retries the same result while the relevant canonical state is unchanged.
-
-## 15. Placement
-
-All runtime-executed output and relocation use the shared placement policy, including:
-
-- generic line output;
-- charge-depletion output;
-- existing reserved-instance return;
-- buffered-input release;
-- direct drop/output commands;
-- initial placement planning where applicable.
-
-Materialized drops respect configured storage scope, max count, purity and stack size, Board/Inventory/Toolbar capacity, authored `drop` or `random` Board strategy, and origin-based ordering. Existing-item placement uses the same scope and spatial policy: pure items may normalize through ordinary stack placement, while impure items preserve identity and require one exclusive cell. When an `any` placement cannot fit fully on the Board, the remainder continues through Inventory and then Toolbar.
-
-Partial placement is forbidden. The owning gameplay mutation rolls back if the complete quantity cannot be placed.
-
-## 16. Capability implementation boundaries
-
-The completed configuration and current command surface agree on the following non-trivial capability boundaries. Schema presence alone still never proves behavior without an owned command or Tick path and focused tests.
-
-### Merge
-
-Directional gameplay merge is runtime-backed through `mergeItemsFx`. Source-owned authored rules resolve one revised source against one revised board target; ordinary same-item stack placement and `mergePlacementPlansFx` remain a separate placement concern.
-
-### Line owners and charged items
-
-Craft, blueprint, and stash each expose one ordinary `LineSchema`; producers expose one or more. Positive material capacity is supported only for producer lines and is rejected for the other line owners by game validation. Like every line owner, the first attached input, active job, or partial charge state isolates one quantity from a pure stack. Starting work resolves the line from the pre-command world; changes produced by that same start may make the new job pause on its first Tick. This is intentional command semantics, not a second mid-command resolution.
-
-Every line may omit output and every item type may be persistent or charged. Item type never decides whether the owner survives. A blueprint can drop a random item nearby or produce nothing; its visual remains an explicit standard asset rather than being inferred from output. Deposit inputs are fully runtime-backed deterministic selectors for external charged board targets; deposit is not a separate capacity state system.
-
-### Temporary items
-
-Temporary items are board-only, non-stackable identities with fixed-step `remainingDurationMs`. Creation initializes the full authored `durationMs`; save/restore preserves the remaining value. Tick owns progression and atomic expiry. Optional expiry output uses standard deterministic output plus scope-aware placement, and blocked output keeps the zero-duration item available for retry. Their board-bound lifetime makes them ineligible for material-input storage.
-
-### Cheats and utility controls
-
-Cheat mode and Instant gameplay are persisted switches in `runtime.cheats`, not authored item kinds or session timing modes. `setInstantGameplayFx()` atomically changes the option. While both cheat behavior and Instant gameplay are enabled, valid jobs and temporary-item lifetimes settle through the authoritative engine without waiting for their authored wall-clock durations; Tick itself remains one unscaled 100 ms fixed-step system.
-
-Hard reset is renderer-owned lifecycle intent. It discards the exact live Game without a final save, clears only that package/content-hash save, and creates a fresh Game; no authored destructive item or gameplay mutation owns persisted-state deletion. The singleton Inventory opener remains an authored item with one canonical `open-inventory` primary action and opens the routed Inventory leaf with its isolated Pixi scene without inventing gameplay state.
-
-Tile interaction has no double-click gesture. In the Board + Toolbar scene, left click executes the canonical primary action, `Ctrl+left click` fills a line owner's remaining default-line queue, `Shift+left click` splits a Board stack, and right click opens Item Detail without executing another action. In the routed Inventory scene, left click releases the selected item and right click opens Item Detail.
-
-A capability is runtime-backed only when it has an owned command or Tick path and behavioral tests. Schema presence alone is not implementation.
-
-## 17. Save and reload semantics
-
-Serializable state contains live items, active jobs, and FIFO requests.
-
-Tick adapter observation state is session-only and is not persisted. Closing a session may discard a sub-step remainder smaller than one fixed step. Cheat switches, including Instant gameplay, are ordinary persisted runtime state.
-
-Restored jobs continue from persisted `remainingMs`. No due time is reconstructed from wall-clock history.
-
-Restored temporary items continue from persisted `remainingDurationMs`. Legacy state without that field initializes a temporary item at its full authored duration; no wall-clock lifetime is reconstructed.
-
-Invalid persisted state must fail close to hydration or runtime validation. Do not silently invent missing job, reservation, or queue history.
-
-## 18. Presentation lag
-
-Canonical runtime changes immediately when a command or Tick transition commits.
-
-UI animation is intentionally allowed to lag behind. It may visualize an older transition while runtime has already advanced further.
-
-This is valid provided that:
-
-- animation state never becomes gameplay truth;
-- engine progress never waits for animation;
-- new engine events may redirect or supersede presentation;
-- a new subscriber does not replay historical engine events merely because another surface is still animating them.
-
-## 19. Hard exclusions and extension rule
-
-Hard exclusions without a deliberate new design:
-
-- job cancellation;
-- wall-clock job timestamps;
-- reverse reservation history;
-- partial output placement;
-- queue overtaking;
-- passive-storage job progression;
-- gameplay state reconstructed from UI animation or transient events;
-- consumer mutation of committed runtime snapshots as an API feature.
-
-New capabilities must be implemented through canonical engine boundaries rather than UI patches. Directional merge stays an atomic engine command, deposit capacity and depletion compose ordinary input/charge/isolation/output contracts, temporary lifetime belongs to Tick, and utility controls cross only their explicitly owned runtime, session, storage, and presentation boundaries.
+Do not add job cancellation, wall-clock job timestamps, reverse reservation history, queue overtaking, partial output, passive-storage production, or gameplay truth reconstructed from UI/events without an explicit new product design.

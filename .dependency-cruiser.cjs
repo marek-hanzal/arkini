@@ -154,7 +154,7 @@ const boundaryRules = [
 	{
 		name: "routes-enter-public-renderer-seams",
 		comment:
-			"File routes own TanStack registration and lifecycle orchestration through pages, reusable UI contracts, and public bridge capabilities, but never engine internals or other route modules.",
+			"File routes own TanStack registration and lifecycle orchestration through pages, reusable UI, public editor, and bridge capabilities, but never engine internals or other route modules.",
 		severity: "error",
 		from: {
 			path: "^src/@routes(?:/|$)",

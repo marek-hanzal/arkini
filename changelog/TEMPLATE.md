@@ -1,31 +1,28 @@
 # Arkini X.Y.Z
 
 <!--
-Summarize the release in one short paragraph. Lead with the capabilities that
-matter most to players and game authors. Mention pre-stable or migration risk
-only when it applies. Remove every comment and unused section before release.
+Copy this file only for an explicitly chosen target version; never infer the next
+version or edit a released file for later work. Keep one cumulative <version>.md
+whose contents become the matching GitHub Release notes.
+
+Update it only for player/author-visible capability, compatibility, delivery, or
+data-safety changes. Write English shipped end state by audience, not commits,
+PRs, implementation history, refactors, or presentation-only cleanup. Fold new
+facts into existing prose, remove stale claims, empty sections, and all comments.
+Before tagging, compare the complete file with shipped behavior and VERSION.md.
+After tagging it is historical; subsequent work starts a new version file.
 -->
+
+Summarize the release in one short paragraph, leading with the most important player and author capabilities.
 
 ## For players
 
-<!-- Describe concrete gameplay, controls, presentation, and desktop behavior. -->
-
 ## For game authors
-
-<!-- Describe Editor, authoring, analysis, testing, build, and publishing capabilities. -->
 
 ## AI-assisted authoring
 
-<!-- Describe player- or author-relevant agent, MCP, or embedded AI capabilities. -->
-
 ## Arkpacks, saves, and distribution
-
-<!-- Describe package identity, trust, persistence, installation, CLI, and delivery. -->
 
 ## Reliability
 
-<!-- Include only reliability changes with a meaningful user or author consequence. -->
-
 ## Compatibility and migration
-
-<!-- State supported admission, rejected data, migration behavior, and required action. -->

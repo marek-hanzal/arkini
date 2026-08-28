@@ -1,194 +1,75 @@
 # Pixi renderer map
 
-This directory is Arkini's retained gameplay presentation layer. React still owns routes,
-pages, menus, modals, and Item Detail. The engine remains the only owner of gameplay truth;
-Pixi consumes bridge contracts and never decides whether a move, swap, stack, production, or
-storage action is valid.
+Pixi is Arkini's retained gameplay presentation owner. The engine remains gameplay truth; React owns routes, pages, menus, and Item Detail. Start at `scene/createPixiMainSceneRuntimeFx.ts` for Board + Toolbar and `scene/createPixiInventorySceneRuntimeFx.ts` for Inventory.
 
-Start with `scene/createPixiMainSceneRuntimeFx.ts` for Board + Toolbar and
-`scene/createPixiInventorySceneRuntimeFx.ts` for Inventory. They are the composition roots for
-all scene-local owners.
+## Owners
 
-## Ownership
-
-| Owner | Responsibility |
+| Area | Owner |
 | --- | --- |
-| `PixiGameProvider.tsx` | Route-local textures and interaction cancellation |
-| `runtime/createPixiApplicationOwnerFx.ts` | One canvas, Pixi application, resize lifecycle, and demand renderer |
-| `scene/*Surface*` | Layout, layers, hit geometry, masks, palette, and drop-feedback paint |
-| `actor/*ActorStore*` | Retained display-object identity for one canvas |
-| `actor/transitionPixiTileActorVisualFx.ts` | One double-buffer lifecycle for complete tile-face revisions |
-| `actor/*ParticleTextures*` | One procedural five-point star shared by actor particle containers |
-| `animation/createPixiActorAnimatorFx.ts` | Sole writer for root pose and typed presentation channels |
-| `scene/createPixiMainSceneReconcilerFx.ts` | Canonical actor reconciliation and presentation entry/exit |
-| `motion/createPixiTileMotionRuntimeFx.ts` | Ordered cue lanes, animation claims, transient payloads, and cue settlement |
-| `delivery/createPixiDeliveryMotionRuntimeFx.ts` | Presentation-only canonical delivery travel, retargeting, and contact choreography |
-| `drag/*DragController*` | One pointer gesture and its frozen source/release facts |
-| `drop/createPixiMainSceneDropPresentationFx.ts` | Accepted-drop presentation facts until canonical settlement |
-| `drop/createPixiMainSceneDropSubmissionFx.ts` | Frozen release command, optimistic feedback, and async drop settlement |
-| `animation/createPixiAnimationDriverFx.ts` | Motion controls and springs; the only interpolation clock |
-| `animation/createPixiActorAnimatorFx.ts` | Interruptible, keyed writes to actor presentation channels |
-| `animation/runPixiTileActorLifecycleFx.ts` | One semantic tile enter/exit/restore owner for shared alpha + centered lifecycle scale |
+| Canvas, resize, demand rendering | `runtime/createPixiApplicationOwnerFx.ts` |
+| Surface geometry, layers, masks, feedback | `scene/*Surface*` and `layout/` |
+| Retained identity within one canvas | `actor/*ActorStore*` |
+| Canonical reconciliation | `scene/createPixiMainSceneReconcilerFx.ts` |
+| Pointer gesture and frozen release facts | `drag/*DragController*` |
+| Drop submission/presentation | `drop/` |
+| Engine-delivery presentation | `delivery/` |
+| Cue sequencing and handoffs | `motion/createPixiTileMotionRuntimeFx.ts` |
+| Interpolation/springs | `animation/createPixiAnimationDriverFx.ts` |
+| Typed actor-channel writes | `animation/createPixiActorAnimatorFx.ts` |
 
-Main-scene and Inventory actors are intentionally separate: Pixi display objects cannot move
-between canvases. Inventory placement starts from the retained main-scene Inventory opener when it
-exists. Without that opener, choreography is skipped and ordinary reconciliation presents the
-committed transition. The receiving scene still resolves identity and outcome from that transition.
+Main and Inventory actors are separate because display objects cannot cross canvases. Cross-canvas handoff carries consume-once origin geometry keyed by the releasing actor; the receiving scene still derives identity/outcome from committed engine facts.
 
-## Data flows
+## Flows
 
-| Flow | Ordered ownership |
+```text
+committed transition
+→ bridge projection + current presentation claims
+→ reconciler plan
+→ retained actor allocation/reconciliation
+→ motion/animation channels
+→ demand-frame invalidation
+```
+
+```text
+pointer gesture
+→ fresh bridge preview
+→ freeze source/target/release facts
+→ one public atomic engine command
+→ reconcile its result with the latest committed transition
+```
+
+Delivery endpoints, generation, phase, and remaining time are engine state. Tick owns countdown and settlement even when no scene or geometry exists; Pixi may retarget, freeze, or hide presentation but never admits input or starts work.
+
+## Interaction
+
+- Board/Toolbar left click runs the primary action; `Ctrl+left click` fills remaining default-line queue capacity; `Shift+left click` splits a Board stack; right click opens Item Detail.
+- Inventory left click releases the item; right click opens Item Detail.
+- Crossing the drag threshold converts the same pointer gesture into drag. The retained actor is reparented; there is no ghost, screenshot, duplicate tile, or pointer-frequency React render.
+- Bridge preview owns validity and magnetic eligibility. Pixi geometry never infers merge, stack, storage, swap, or placement behavior.
+- Overlays block/cancel local interaction. A submitted engine command may settle canonically after route/gesture teardown.
+
+## Invariants
+
+- One reconciler owns actor allocation, visual generations, store mutation, and presentation-claim settlement.
+- One animator owns each typed presentation channel; ownership keys may cancel work but cannot create a competing writer. Motion is the only interpolation clock, and the Pixi ticker is not a second loop.
+- Root pose, grab offset, lifecycle, crowd, particles, and visual revision remain independent channels. Tuning belongs in implementation, not this contract.
+- Actor stores follow exact runtime identities within their canvas. Pure canonical placement may normalize identity; presentation never assumes continuity from intent.
+- Hydration presents the current snapshot without replaying historical events. Only later event batches drive choreography.
+- Async texture completion is generation-guarded. A complete current visual remains until a complete replacement is ready; superseded work cannot publish or destroy the surviving generation.
+- Teardown cancels gestures, subscriptions, animation, and async readiness before destroying actors, layers, textures, or the application.
+
+## Navigation
+
+| Change | Start at |
 | --- | --- |
-| Canonical presentation | A committed engine transition enters the scene runtime. The surface receives its exact snapshot, the reconciler projects bridge actors and motion cues, retained presentation mutates, then demand rendering is invalidated. |
-| Pointer release | The drag controller asks the bridge for a preview, freezes fresh release-time facts, submits the command, and hands its result plus the current committed transition to drop presentation and reconciliation. |
-| Canonical delivery | An engine delivery location projects persisted endpoints, phase, generation, and remaining travel time. Fixed-step Tick owns the countdown and canonical settlement. The delivery runtime only adopts and animates the retained actor from those facts; visual contact never submits gameplay state. |
+| Scene composition/teardown | `scene/createPixi*SceneRuntimeFx.ts` |
+| Actor identity/appearance | `actor/` + main reconciler |
+| Click/drag/drop | `drag/` + `drop/` |
+| Spawn/swap/stack/replacement cues | `motion/` |
+| Autofill delivery | `delivery/`; canonical behavior is `engine/delivery/` + Tick |
+| Inventory handoff | `PixiInventorySurface.tsx` + main Inventory opener |
+| Geometry/hit testing | `scene/*Surface*`, `layout/`, `grid/` |
+| Magnetic response | `magnet/` |
+| Frame/interpolation | `runtime/` + `animation/` |
 
-The renderer may lag, retain, hide, or animate committed facts, but it must not manufacture a
-gameplay outcome. Missing visual identities degrade to ordinary reconciliation.
-
-Main-scene reconciliation has one ordered authority boundary. The reconciler first reads committed
-bridge projections and the current drop, delivery, and motion claims. A pure local classifier turns
-that complete snapshot into ordered actor arrivals and departures. The reconciler then applies the
-plan, remaining the only owner that allocates visual generations, mutates the actor store, hands
-poses to motion, runs entry or exit effects, and finalizes presentation claims.
-
-## Interaction contract
-
-- Click performs the tile's primary action; a line owner with a default line appends one explicit
-  Enqueue intent through the same queue command as Item Detail.
-- Ctrl-click on a Board line owner fills its remaining canonical queue capacity through one
-  atomic engine command; waiting rows remain ordinary stable FIFO intents.
-- Right click opens Item Detail.
-- Crossing the drag threshold changes the same pointer gesture from activation to drag.
-- Press identity stays frozen for drag/drop commands, while click activation reads the latest
-  projected actor item. Async activation never owns the next pointer gesture.
-- A canonical actor already moving through spawn or swap choreography keeps its click path; crossing
-  the threshold explicitly hands its live pose from the motion lane to direct drag.
-- Drop validity and magnetic attraction come from bridge previews, never from Pixi geometry or
-  renderer-side compatibility rules.
-- Main-scene overlays block and cancel local interaction; route teardown closes either scene's
-  gesture owner. Submitted engine commands are allowed to settle through their canonical result.
-
-## Lifecycle invariants
-
-- Motion supplies interpolation only. Pixi owns display objects and Effect-owned runtime objects
-  own acquisition, cancellation, completion, and teardown.
-- The motion runtime keeps scheduling lanes, bounded completed-cue deduplication, detached swap
-  handoffs, and live target redirects as separate authorities. One cue-local lifecycle record owns
-  only that cue's started phase, revealed input remainder, transient payload actor, and active swap
-  legs, so completion and close cannot partially clear parallel bookkeeping.
-- Rendering is demand-driven. Every visual mutation invalidates the scene; no idle Pixi ticker or
-  second animation loop may run.
-- Gameplay feedback animations are intentional product behavior and must not branch on
-  `prefers-reduced-motion`; tune their motion directly instead of silently disabling or replacing it.
-- Every tile owns one fixed twelve-particle `ParticleContainer` above its face. Main and Inventory
-  scenes share one private procedural five-point star texture each; playback only mutates the retained pool,
-  widens from one bottom-center apex into an inverted-fire plume, rises through most of the slot
-  without crossing its bounds, and uses one linear repeated tween in the existing Motion-driven
-  demand renderer. Every star keeps a square aspect ratio while deterministic size and one-, two-, or
-  three-cycle rate variants break up the plume without adding another clock. Resolved
-  scene luminance directs each retained particle's semantic tint toward white on dark surfaces or
-  toward black on light surfaces. Foreground particles use normal compositing so their chroma survives
-  both light and dark regions of tile artwork, producing contrast-safe shimmer without allocating
-  display objects or restarting playback; appearance refresh updates every retained actor.
-- A click ACK owns the shared pool first. If canonical projection starts a job during that burst, its
-  final segment interpolates the same particles from ACK pose, alpha, shimmer, and semantic tint into
-  the sparse working plume. The infinite running tween adopts that exact final phase without a reset,
-  second writer, overlapping emitter, or blank frame.
-- Activity-particle bounds match the actor slot. Particle extents, horizontal wave, and the complete
-  bottom-anchored plume remain inside that slot while using most of its height. The retained particle
-  layer renders in front of the tile face while the progress overlay remains topmost.
-- Teardown stops subscriptions and interactions before destroying actors, layers, or the
-  application they reference.
-- Actor presentation is keyed by physical actor instance and typed channel. `pose`, `grab-offset`,
-  `lifecycle-opacity`, `lifecycle-scale`, `crowd-opacity`, `activity-particles`, and `visual-mix` each
-  have exactly one animator writer; caller ownership keys may cancel work, but may never create a
-  second writer for the same channel.
-- The animator is the only production writer of root `x`, `y`, pose `scale`, `pivot`, and `alpha`,
-  plus the centered inner lifecycle scale. Layout publishes canonical geometry through surfaces;
-  motion owns normalized progress. Lifecycle scale never changes canonical pose geometry, so enter
-  and exit animation can overlap travel, drag handoff, or retargeting without two writers fighting
-  over the root transform.
-- Retargetable placement samples current geometry without completion snaps. Stack and delivery
-  travel chase the receiver's live retained contact pose continuously; destructive stack motion only
-  begins its lifecycle exit after that final live contact is reached.
-- Every texture-bearing visual revision uses one complete private slot. The current slot remains
-  renderable until the pending slot has loaded all required textures, then the visual controller
-  crossfades both from their live alpha. A superseding revision flattens the surviving composite;
-  readiness, cancellation, promotion, and destruction are scoped to the physical visual generation.
-- Semantic tile lifecycle is one durable actor intent, independent from travel and from any
-  particular texture generation. A genuine entrance starts at alpha `0` plus the shared reduced
-  centered lifecycle scale and converges to alpha/scale `1`; a genuine exit mirrors those endpoints.
-  Travel may start immediately; whichever complete visual survives texture supersession resumes the
-  same entrance, while a later exit supersedes it from the exact live alpha and lifecycle scale.
-  Main Scene and Inventory use the same lifecycle owner. Initial hydration, remount, and texture
-  replacement do not replay semantic entrance. Visual revision replacement remains a same-actor slot
-  crossfade rather than fake actor death/rebirth.
-- Engine-driven spawn, swap, stack, and direct drag share one magnetic field. Spawn and swap repel
-  nearby board responders without attracting their own exchange counterpart; a stack payload
-  attracts and chases its receiver's live physical pose through distance-aware nonlinear segments.
-  Raw pointer events retain only the latest sample for the existing demand frame. Release flushes
-  exact coordinates synchronously; canonical publication, resize, and active motion-source
-  membership coalesce through that same bounded frame slot.
-- Main-scene target facts resolve pointer geometry, exact canonical occupant, and command target
-  from one surface-owned snapshot. The actor store rebuilds one derived active-scene slot index at
-  canonical publication boundaries; pointer reads never scan the complete canonical collection.
-- Magnetic broad phase converts the source's live AABB into bounded Board/Toolbar slot ranges, then
-  the field uses live actor AABBs for deterministic narrow phase. Active moving sources and the
-  exact target are explicit candidates; lazy bridge eligibility is scoped to the active drag and
-  exact source/target revisions. Previously affected actors reset once when they leave the field.
-  Settlement releases the exact physical source instance. The regular grid already supplies the
-  required locality, so no quadtree, second actor store, or additional animation clock exists.
-- Main-scene drag cursor is intentionally non-semantic: every Board or Toolbar target keeps
-  `grabbing`, and only leaving both surfaces shows `not-allowed`. Engine preview and physical drop
-  feedback remain authoritative and publish the actual outcome at drop.
-- Manual producer input remains committed by its drop command; autofill instead creates canonical
-  deliveries whose input is not available until the engine-owned travel countdown reaches its
-  settlement boundary. Queued work uses that delivery path for Producer, Craft, Blueprint, and every
-  other line owner. No job may start while any outbound delivery still targets that owner and line.
-- A delivery keeps its exact origin lease until its full quantity commits or returns. Player
-  interaction may reduce or invalidate its soft target claim; reconciliation then returns the same
-  actor, including any partial remainder, to the persisted origin.
-- Delivery presentation may retarget from its current live pose when its generation or geometry
-  changes. If either endpoint has no geometry, only presentation freezes or hides; canonical Tick
-  continues decrementing persisted `remainingDurationMs` and settles independently. Save/hydration
-  keeps the delivery phase, generation, endpoints, and countdown so remounting can resume presentation
-  without becoming a gameplay authority.
-- Canonical engine items remain the only gameplay truth. Delivery quantity stays canonical on its
-  runtime item; ordinary cue motion owns only its narrow, phase-aware presentation overlay. The
-  reconciler and animation-triggered refreshes use the same projector, so quantity and badge can
-  never disagree. A line owner shows an `xN` queue badge for every non-zero canonical active-job
-  plus queued-request count, including `x1`.
-- Accepted consumption presents exact result/event facts: the surviving source dips, a removed
-  source fades, and the receiver emits the shared accent particle burst. Drop-result facts cover manual
-  stack, producer-input, and Inventory storage commands that do not emit equivalent engine events.
-- Every admitted main-scene tile click immediately emits one optimistic semantic-success particle
-  burst before any asynchronous command work. ACK confirms that presentation heard the click; it
-  does not claim that the engine will accept the resulting action. If the owner becomes active, the
-  same fixed actor-owned pool changes back to its working tint and continues the sparse inverted-fire
-  plume without allocating or spawning a competing emitter.
-- The main actor store retains physical actors after canonical removal until their exit animation
-  completes. Scene teardown destroys every retained exit and cancels visual readiness before its
-  parent layers disappear.
-- A newly mounted main scene hydrates the current committed snapshot without compiling its
-  historical events into choreography. Only later subscription deliveries present motion cues and
-  replacements; subscription replay and geometry redraw remain hydration-only.
-- Async texture completion is generation-guarded, and route-level texture ownership outlives both
-  alternating canvases.
-
-## Where to change behavior
-
-| Change | Start here |
-| --- | --- |
-| Scene composition or teardown | `scene/createPixi*SceneRuntimeFx.ts` |
-| Canonical actor appearance or identity | `actor/` and `scene/createPixiMainSceneReconcilerFx.ts` |
-| Drag, left click, right click, or drop release | `drag/` |
-| Move, swap, stack, spawn, or replacement choreography | `motion/` and `scene/runPixiMainSceneReplacementsFx.ts` |
-| Autofill delivery presentation | `delivery/` and bridge `tile/readTileDeliveriesFx.ts`; canonical travel/settlement lives in `engine/delivery/` + Tick |
-| Cross-canvas Inventory release | `PixiInventorySurface.tsx` and the main-scene Inventory opener |
-| Hit testing, slot geometry, or masks | `scene/*Surface*`, `layout/`, and `grid/` |
-| Magnetic response | `magnet/`; eligibility must continue to come from the bridge |
-| Frame scheduling or interpolation | `runtime/` and `animation/` |
-
-Focused regression tests live under `test/ui/pixi`. Update or add an invariant-named test when an
-ownership, interruption, settlement, remount, or teardown contract changes.
+Focused Pixi tests live under `test/ui/pixi`.

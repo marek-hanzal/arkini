@@ -1,89 +1,90 @@
-# Arkini versioning contract
+# Arkini version and external data contract
 
-This document defines the product compatibility promise carried by an Arkini
-release version `<major>.<minor>.<patch>[-prerelease]`.
+This document owns release compatibility, persisted-envelope identity, and Arkpack trust. Exact structural schemas remain in source; filesystem publication mechanics live in [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
-## Compatibility
+## Compatibility promise
 
-### Major
+An Arkini release is `<major>.<minor>.<patch>[-prerelease]`. The table is the durable promise for data at and after the product owner's explicitly declared stable baseline; the temporary pre-stable override below governs older development shapes.
 
-A major release may be incompatible with data written by an earlier major
-release. This includes gameplay saves, Arkpacks, Editor projects, scenarios,
-version history, and every other persisted Arkini-owned format.
+| Change | Contract |
+| --- | --- |
+| Major | May break any earlier Arkini-owned data. Migration is an explicit product decision, never an implied promise. |
+| Minor | Must preserve every supported Arkpack, save, Editor project, scenario, version history, and other external contract from the previous release. A migration may implement compatibility, but is optional and must be proven safe. |
+| Patch | Contains fixes without material gameplay, architecture, or data-contract impact and inherits the minor guarantee. |
 
-Arkini may provide a migration, but a major release does not promise one. The
-application owns that decision for each major transition. A mismatching major
-is the only version-level reason for a reader to reject persisted data.
+Every persisted Arkini writer stamp records the complete release version, including prerelease provenance. Reader admission uses only its major:
 
-### Minor
+- matching major is admitted regardless of minor/patch/prerelease ordering;
+- mismatching major is rejected as incompatible;
+- minor/patch must never select a parser, migration, fallback, or conditional data path;
+- version admission never bypasses strict validation, semantic invariants, integrity, or trust checks.
 
-A minor release must not break any data supported by the previous release,
-including gameplay saves, Arkpacks, Editor projects, scenarios, and version
-history.
+Project-owned gameplay version uses `<major>.<minor>` and is a separate authority. A save/scenario and its Arkpack are compatible when their gameplay majors match; minor ordering cannot reject data or choose another reader. Writers always stamp current complete provenance.
 
-A minor release may change a persisted format and may include a migration, but
-the application must prove that the upgrade is safe. A migration is optional;
-data compatibility is not. Readers must not reject data solely because its
-minor version is older or newer than the current application or selected
-Arkpack.
+## Pre-stable policy
 
-### Patch
+Until the product owner explicitly declares the stable shape baseline, Arkini may move persisted structures forward without migrations, legacy readers, obsolete-shape fixtures, or compatibility abstractions unless requested. This pre-stable exception overrides minor shape preservation: for example, a structurally obsolete file written by `0.5.0` may pass the `0.x` version gate but fail the current strict shape in `0.6.0`. Its version number still must not trigger a separate reader.
 
-A patch release contains fixes and other changes without material gameplay,
-architecture, or data-contract impact. It inherits the minor-release
-compatibility guarantee.
+The first declared stable release establishes the durable baseline for data it supports. From that point, the minor guarantee applies to that baseline and later supported data; it is not retroactive to obsolete development shapes. Major-only version admission applies now. Public communication about discarded pre-stable data is a product decision, not a reason to preserve dead readers.
 
-## Reader admission
+## Field ownership
 
-Arkini release versions written into persisted data use
-`<major>.<minor>.<patch>[-prerelease]`. The optional prerelease suffix is part
-of complete writer provenance, but only the major is a reader-compatibility
-gate:
+Arkini release version is the only application-format version. Do not add `format`, `formatVersion`, namespaces, duplicated path identities, or fixed-value metadata. `$schema` and schema `$id` are links/identity for JSON Schema, not format versions.
 
-- a matching major is admitted regardless of minor or patch ordering;
-- a mismatching major is rejected as incompatible;
-- minor and patch must not select a parser, migration, fallback, or conditional
-  data path;
-- admission never bypasses strict validation of the actual persisted shape or
-  integrity checks.
+Use the smallest non-derivable payload:
 
-This applies consistently to Arkpacks, gameplay saves, Editor projects,
-scenarios, version history, and every other Arkini-owned persisted envelope.
-Writers always stamp the current complete Arkini release version; readers do
-not require that stamp to equal the running build.
+- a path owns filename/directory identity such as item UID/type, note ID, version ID, package/save namespace, and resource ID/kind;
+- a payload owns domain data and provenance that cannot be reconstructed safely;
+- a manifest stores lengths/hashes only where byte slicing or integrity requires them;
+- an external field is valid only when its owner and a reader that cannot derive it are both clear.
 
-Project-owned gameplay versions remain a separate domain authority. A save and
-its Arkpack are version-compatible when their gameplay majors match. Gameplay
-minor ordering must not reject a save or scenario and must not choose a
-different reader implementation.
+## Portable project and sidecars
 
-## Pre-stable development
+[`CONFIG.md`](CONFIG.md) owns the directory layout. External payload ownership is:
 
-Until the product owner explicitly declares the stable compatibility baseline,
-Arkini moves forward without migration, legacy-reader, or conditional-reader
-obligations. Pre-stable persisted shapes may still be replaced without a
-migration, compatibility fixture, or compatibility abstraction unless
-explicitly requested.
+| File | Payload owner |
+| --- | --- |
+| `project.json` | `{ arkini, revision }`: writer provenance and current project revision. |
+| `schema.json` | Current project JSON Schema with stable `$id` and explicit definitions. |
+| `game.json` | `$schema`, gameplay `version`, and complete non-item config; `meta.id` is package identity. |
+| `items/<type>/<uid>.json` | `$schema` plus direct `item`; path owns type/UID, item owns gameplay ID. |
+| `assets/<id>.png`, `resources/<id>.png` | Path owns ID/kind; extension owns current MIME. |
+| `notes/<noteId>.json` | Content and ordering timestamps; path owns note ID. |
+| `scenarios/<hash>.json` | Human name, revision, gameplay version, State bytes, and timestamps; hash path is content-safe identity. |
+| `versions/head.json` | Published current/list order. |
+| `versions/<versionId>/version.json` | Parent, subject/body/tag, writer/gameplay provenance, source revision, fingerprint, time; directory owns ID. |
+| `versions/<versionId>/manifest.json` | Hashes of the complete versioned project/scenario set. |
 
-This freedom does not weaken reader admission. Structurally current data with a
-matching major must not be rejected merely because it was stamped by a
-different minor or patch release. Unsupported obsolete shapes may fail current
-strict validation; their version number must not trigger a separate code path.
+The Editor installation catalog stores discovery roots, managed/external ownership, and timestamps only. It never copies canonical project identity or mutable project fields.
 
-Public communication and user expectations for discarded pre-stable data are a
-product-owner responsibility, not a reason to preserve obsolete code paths.
+## Built and runtime artifacts
 
-The first explicitly declared stable release establishes the durable shape
-baseline. The no-data-break promise applies to that release and the supported
-data it creates, not retroactively to obsolete development shapes. Major-only
-reader admission applies now and does not wait for that declaration.
+| Artifact | Contract |
+| --- | --- |
+| `.arkpack` | Compressed MessagePack manifest plus config/resources. Manifest owns gameplay `version`, Arkini writer, config byte length, and resource IDs/lengths needed to slice the stream. Package ID comes only from `config.meta.id`. |
+| `.arksig` | Serialized Sigstore bundle for the exact sibling Arkpack bytes. It contains no alternate package identity. |
+| Editor build descriptor | `{ projectId, revision, contentHash, size, diagnostics }`; disposable proof of one External build, invalidated by later project mutation. |
+| `.arksave` | MessagePack `{ version, arkini, state }` below the collision-safe encoded package directory. Path owns package identity; payload owns gameplay compatibility, writer provenance, and complete State. |
 
-## Version authorities
+Preferences are individual strictly validated scalar JSON files and need no envelope. Diagnostics are library-owned JSONL. OAuth records use the protocol's fields; Arkini validates complete identities but adds no format marker. Public MCP and generated JSON schemas use stable explicit IDs so references are never anonymous or `any`.
 
-The Arkini release version is the public compatibility promise. Project-owned
-gameplay versions may provide more specific runtime provenance, but they cannot
-weaken it: a minor Arkini release must not ship a gameplay or format change that
-breaks data from the preceding supported release.
+## Arkpack trust
 
-[DATA_CONTRACTS.md](DATA_CONTRACTS.md) inventories the current external file
-shapes and field ownership. It does not override this release policy.
+Trust is soft release provenance, independent from schema, semantic validation, integrity admission, compatibility, package identity, location, and user overrides:
+
+- `Trusted`: the exact Arkpack bytes have a valid Sigstore bundle from the repository and tagged release-workflow identity embedded in this Arkini build.
+- `External`: that exact proof is missing or fails—for local/Editor builds, changed bytes, malformed/missing bundles, or another repository/workflow.
+
+Both states are playable. Trust is a label, not an anti-tampering or content-admission system.
+
+Only the tagged GitHub release workflow keyless-signs the official Arkpack. It receives a short-lived OIDC identity, uses Sigstore Fulcio/Rekor transparency proofs, writes the sibling `.arksig`, and verifies the final pair before packaging. There is no stored signing key, signing secret, local key generation, developer mode, or standalone signing command. Manual workflow, local `argc build`, and every Editor build remain External; ordinary rebuilds remove stale signatures.
+
+Load and `arkini-cli arkpack verify <file>` classify the exact pair offline. Verification checks digest/signature, Fulcio chain and certificate-transparency proof, Rekor proof, issuer, repository, and workflow identity against the embedded [`src/engine/pack/trusted-root.json`](src/engine/pack/trusted-root.json). Failure becomes External, never a load rejection.
+
+Refresh a future embedded root through the deliberate networked maintenance command:
+
+```bash
+argc signing:update-trusted-root
+```
+
+Root rotation reaches users only in an Arkini application update. A fork derives and embeds its own repository/workflow authority; it does not inherit upstream trust.

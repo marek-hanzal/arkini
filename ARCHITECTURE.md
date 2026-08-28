@@ -1,582 +1,130 @@
 # Arkini architecture
 
-This document is the canonical technical architecture. It describes the implemented engine, not an aspirational rewrite.
+This is the canonical map of implemented ownership and lifecycle. It does not catalog routes, fields, UI tuning, or future work. Gameplay meaning belongs to [`GAME.MD`](GAME.MD), authoring to [`CONFIG.md`](CONFIG.md), and persisted-format compatibility to [`VERSION.md`](VERSION.md).
 
-Engine paths are relative to `src/engine` unless written explicitly. `src/bridge` is the only legal connection from React to public engine contracts and mirrors concrete domains as `bridge/<domain>/<operation>`. Reusable presentation and transient interaction code lives under `src/ui`; route-level visual composition lives under `src/page`; TanStack Router registration and route lifecycle orchestration live under `src/@routes`. Renderer dependencies form the DAG `@routes → {page, ui, bridge}`, `page → ui`, `ui → bridge`, and `bridge → engine`; routes may call public bridge Effects but never import the engine directly. `electron/main` is the physical backend process and composition root for feature-owned persistence, MCP, IPC, protocol, and public editor/engine capabilities. It never imports renderer modules or engine internals. `electron/preload` remains a transport-only adapter over `electron/contract`. Renderer bridge domains may import only that pure contract; editor and engine domains never import Electron runtime modules or the Electron package.
+## Dependency and process boundaries
 
-Enforcement is deliberately split by contract: Dependency Cruiser owns stable import boundaries; focused tests own runtime, lifecycle, security, persistence, UI, compiler, CLI, and packaging behavior; generated-output tests inspect real renderer/release artifacts; TypeScript and Zod own type/schema validity. Project grammar such as same-name `*Fx`, object + factory composition, one `IdSchema`, and semantic token usage lives in `CODE_GUIDE.md` plus review. The repository does not maintain source-text recurrence tests or a custom AST style policy system.
-
-## 0. Electron host boundary
-
-Electron main is Arkini's backend process and composition root, not another application or another game owner. Its boundary code owns physical capabilities and delegates product decisions to public editor and engine domains.
-
-## Effect runtime roots
-
-Each physical process has one explicit Effect execution root:
+The renderer dependency DAG is:
 
 ```text
-Electron main process
-→ ElectronMainRuntime
-
-renderer process
-→ RendererRuntime
-
-project CLI process
-→ NodeRuntime.runMain
+src/@routes → { src/page, src/ui, src/bridge, public src/editor }
+src/page    → src/ui
+src/ui      → { src/bridge, public src/editor }
+src/bridge  → { public src/engine, public src/editor, electron/contract }
+src/editor  → public src/engine
 ```
 
-`RendererRuntime` remains the renderer's non-React Effect execution root. React-visible Effect state has one separate renderer-process lifecycle boundary under `src/bridge/reactivity`: `RendererAtomRegistry` is the sole Atom state registry and `RendererAtomRuntime` is its zero-service Effect-backed Atom runtime. It does not duplicate process-owned service layers from `RendererRuntime`, and Atom state is deliberately not retained or handed off across HMR. Each live `PlayableGame` owns exactly one child session `ManagedRuntime` containing its engine services, Scope, Tick Fibers, subscriptions, and command runtime. Active source may re-enter these declared roots from process/bootstrap code, router loaders/actions, typed native transports, and explicitly scoped Pixi/Motion resource or callback adapters. Ordinary React feature code must consume an Atom, a named bridge capability, or local presentation state instead of inventing a Promise runner, observable store, or additional `ManagedRuntime`. Runtime behavior is protected by focused lifecycle tests; the same-named `*Fx` grammar is maintained through `CODE_GUIDE.md` and review rather than source-text policy tests.
+- `src/engine` is framework-neutral gameplay, config, compiler, validation, pack, and CLI domain code.
+- `src/editor` is the platform-neutral Editor domain.
+- `src/bridge` is the renderer lifecycle/transport connection to engine and the pure `electron/contract` seam. Platform-neutral public Editor operations and projections may be consumed directly where the executable dependency rules allow them.
+- `src/ui` owns reusable presentation and transient interaction; `src/page` composes screens; `src/@routes` owns registration, loaders, redirects, and route context.
+- `electron/main` owns physical desktop capabilities and composes public engine/editor domains. It never imports renderer code or engine internals. `electron/preload` is transport-only; engine/editor code never imports Electron.
+
+[`.dependency-cruiser.cjs`](.dependency-cruiser.cjs) is the executable import-boundary authority. Do not duplicate those rules in tests or prose.
+
+Each physical process has one Effect execution root:
 
 ```text
-electron/contract ← src/bridge
-→ the only pure cross-process transport seam
-
-electron/main + electron/preload + electron/security
-→ BrowserWindow, custom protocol, controlled close, window preferences, typed Arkpack/save filesystem capabilities
-
-src/@routes → src/page / src/ui / src/bridge → src/engine
-             src/page → src/ui → src/bridge
-→ the only renderer, route lifecycle, presentation, game bridge, and engine
+Electron main → ElectronMainRuntime
+renderer      → RendererRuntime
+product CLI   → NodeRuntime.runMain
 ```
 
-Development Electron loads the Vite HTTP origin; module replacement remains development tooling and never an application lifecycle boundary. Packaged Electron registers `arkini` as a privileged standard secure scheme and serves the same renderer from `arkini://app/*`. TanStack Router uses standard history routing in both environments: `/` owns the one-session startup splash, `/main-menu` the semantic launcher menu, `/arkpacks` the shared package selector, `/settings` the application theme control, `/about` credits, `/editor/welcome` editor project import, `/editor/$projectId/*` the integrated editor tools, `/game/$packageId` the non-visual live resource boundary, and `/game/$packageId/board` the explicit gameplay page. Electron does not interpret routes beyond static resource serving and SPA fallback.
+The renderer also has one process-lifetime Atom registry/runtime for React-visible Effect state. It does not duplicate `RendererRuntime` services. Each live game owns one child session `ManagedRuntime` and Scope containing engine services, Tick, subscriptions, commands, and cleanup. Ordinary callbacks, components, and IPC handlers must not create additional runtimes or private Promise schedulers. HMR may restart application state; it is not an ownership handoff.
 
-### Renderer startup and launcher ownership
+## Canonical game truth
 
-The root Atom registry owns launcher bootstrap as one Effect-backed `AsyncResult`, alongside focused writable/derived Atoms for appearance hydration, window-mode hydration, cheat readiness, Hero URL/readiness, and splash completion. `LauncherStartupHydrator` mounts that keep-alive bootstrap once under StrictMode; launcher components consume official Atom hooks directly, without a second Context, observer set, or synchronous snapshot object. Bootstrap starts immediately, while Electron main reports the actual `ready-to-show` moment through the typed preload lifecycle. The visible window stays pure black for approximately 500 ms from that renderer timestamp. Appearance and window mode publish early, but an Electron-confirmed native window event wins over a concurrent or retried persisted read. Hero readiness is explicit only after `HTMLImageElement.decode()`; the application-shell `/hero.png` is the non-failing fallback, while optional `lastPackageId` restores validated package-owned Hero bytes through the normal arkpack loader. Owned Hero object URLs live in the Hero Atom scope and are revoked exactly once on retry or registry disposal. A successful Game acquisition persists `lastPackageId` best-effort without making preference storage part of Game availability. Trusted preload readiness, one catalog refresh, and resolution of the effective default package complete the remaining hard bootstrap. Retry and idempotent splash completion are `Atom.fn` commands; application state is never handed off across module replacement.
-
-After the visible black hold and visual readiness, the complete Hero composition fades in as one scene even when the remaining catalog bootstrap is still truthfully loading. Automatic completion requires hard bootstrap readiness and five seconds from visible-window readiness; legal Escape may continue once readiness exists without queueing an earlier request. A failed bootstrap remains on `/` with explicit retry. Completion records the one-session splash and navigates to `/main-menu` through the typed native `startup-to-main-menu` View Transition. Main Menu is not mounted beneath Startup, and no cloned Hero, manual destination crossfade, or second local View Transition participates. Later client navigation to `/` redirects to `/main-menu` without replaying the splash.
-
-`/main-menu` asks the shared catalog for the effective default package ID and does not know whether that package came from the application or user root. `/arkpacks` reuses that same catalog owner and the existing selector; no duplicate catalog list exists. `/settings` is the only theme and native-window-mode control surface. Window mode is the first three-way segmented control and names physical states: `default` is canonical centered bounds, `bordered` is the maximized title-bar window, and `fullscreen` is Electron native fullscreen. One registry-owned tagged command Atom synchronously excludes theme, window-mode, cheat-availability, and exit commands across React remounts while its private runner composes the underlying Effect Atoms; React owns no parallel mutation refs or booleans for those commands. Each BrowserWindow has one main-process window-mode controller registered for IPC lookup. It explicitly enables fullscreen capability, owns shortcut and native enter/leave/maximize/unmaximize events, remembers the preceding windowed mode, applies default bounds after native unmaximize settles, persists only Electron-confirmed state, and publishes that state back through preload. The renderer never optimistically claims a requested mode, startup hydration never overwrites a newer native event, and an unconfirmed native transition fails with a bounded timeout instead of hanging IPC. Main-menu exit uses the same authority shape, while exact-Game Cheats and spawn commands remain subscription-scoped so leaving their owning screen interrupts them. `/about` is standalone. Preference writes are serialized before crossing the Electron transport and again by their main-process filesystem owners, so a superseded request cannot persist after its successor. Launcher and settings routes never create a `Game`; the Editor may create its separately owned ephemeral `EditorBoardGame`. `/game/$packageId` is the route-scoped resource boundary, `/game/$packageId/board` is the explicit gameplay leaf, and blocking leave/reset/recovery operations are sibling `action/*` leaves. Main-menu Exit, in-game Save and exit, title-bar close, and Ctrl+W all request the same trusted native controlled-close handshake. When that handshake observes a current or pending installed Game, the renderer replace-navigates to `/game/$packageId/action/exit`; its loader owns one best-effort final save/disposal and the shared Hero action presentation reaches a completed frame before preload sends `closeReady`. A no-game close remains direct. The game menu owns only local `closed | entering | open | exiting` presentation state rendered through Motion and does not survive navigation as a hidden lifecycle owner. Item Detail similarly keeps modal target, phase, generation, origin, and Motion settlement in one mounted presentation controller, while one provider-scoped writable Atom is the sole pending/error/execution authority for every exact command key. It admits same-key actions synchronously, permits distinct keys concurrently, and suppresses outcomes whose exact target-visit scope no longer owns the visible detail.
-
-Native route presentation uses one explicit typed graph. Every visible pair receives `arkini-route`, a broad Hero/Board relationship, and an exact directional pair. Chromium's implicit old/new root screenshots are hidden, so only named Arkini surfaces can paint during the handoff. Launcher backdrop and complete Hero layers are shared geometry; each launcher destination owns a distinct whole-panel snapshot containing its border, background, shadow, and content. Action progress, action errors, Board, and the GameMenu backdrop/dialog each use separate identities. Unrelated surfaces exit before their destination enters and are never assigned one shared name merely to manufacture a morph. Cross-route motion remains native View Transition CSS only. Motion is the sole local animation runtime; active renderer code contains no direct Web Animations API ownership.
-
-Tile interaction is renderer-native. One full-viewport Pixi scene owns Board plus the optional passive Toolbar row; the routed React-framed Inventory leaf owns one isolated Pixi scene. The main scene retains exactly one display actor per visible Board/Toolbar runtime identity. Inventory has its own actor registry because display objects cannot cross canvases; an explicit short-lived handoff carries only source presentation geometry keyed by the releasing actor ID. Engine placement may preserve that identity or normalize it into a stack, spawn, or replacement, and the receiving scene follows committed facts rather than assuming identity continuity. There is no cross-canvas drag or duplicate gameplay truth. Pixi owns geometry, hit testing, z-order, pointer lifecycle, display-object retention, and demand rendering. Motion is the sole interpolation runtime for distance-bounded travel, cursor pickup correction, magnetic crowd response, settlement, and entry/exit paint. Every drop preview and command uses frozen canonical source/target facts and the public atomic engine boundary; visual offsets never determine command validity or storage eligibility. The ordered semantic event stream remains independent and supplies producer, stack, swap, spawn, and replacement choreography. No ghost, screenshot, hidden canonical actor, pointer-frequency React render, direct WAAPI path, or second runtime projection exists.
-
-The renderer is also a strict authorization boundary. One main-process trusted-renderer capability owns the registered Arkini windows and parses every candidate URL with `URL`. Development allows only the exact configured loopback Vite origin; packaged mode ignores `ELECTRON_RENDERER_URL` and allows only the `arkini://app` origin. Main-frame navigation may remain within that origin, while external navigation, redirects, every subframe, `<webview>`, popup, and unused Chromium permission are denied before content is admitted. Every privileged invoke/send channel validates the registered `webContents`, exact main-frame identity, and trusted current frame URL. `webContents.id` alone is never authorization.
-
-The Editor ChatGPT route adds one explicitly untrusted foreign surface without widening that authorization boundary. A per-window Electron controller lazily owns one sandboxed, Node-free `WebContentsView` in the persistent `persist:arkini-chatgpt` partition. Renderer IPC may declare only its project identity and integer content bounds; Electron clamps those bounds, attaches the view only for a mounted surface, and destroys it with the window. The foreign `webContents` is never registered with the trusted-renderer capability and has no preload or Arkini IPC path. It denies permissions and non-HTTPS navigation, allows credential-free HTTPS origins required by federated login, and funnels popup targets into the same view instead of creating a second window. Every page load detaches the native surface so Arkini can present loading feedback; only a completed allowed page is reattached. Leaving the section preserves the live conversation and login session, while returning from an external or still-pending navigation loads `https://chatgpt.com` before showing the view. A visible view may stage only one bounded PNG download into a random temporary path, which is removed after exactly one candidate notification. Candidate confirmation is an editor-local unsaved session; canonical PNG validation and a revision-pinned single-resource filesystem write enforce insert-versus-explicit-replace policy independently of UI state.
-
-Packaged protocol responses set the production Content Security Policy. Development parses one canonical credential-free loopback HTTP URL, derives both the trusted renderer origin and exact Vite HMR WebSocket endpoint from it, and uses one random per-server CSP nonce for Vite's React Refresh preamble. The nonce and WebSocket allowance never enter packaged output. The policy permits same-origin code/styles plus the blob/data resource forms used by Arkini, and denies objects, frames, embedding, and forms. Window destruction removes trusted-window state and window listeners; process shutdown removes global IPC handlers.
-
-- The renderer entry declares `<base href="/">`, so generated relative assets resolve from the `arkini://app/` origin root even when the current history route is nested.
-
-`./Argcfile.sh build` compiles Electron/Vite first and then invokes that exact built product CLI with the ordinary `game pack ./game/arkini` command. Compilation therefore has no import or existence dependency on generated `.arkpack` or bundle files. The project packer owns the ignored `game/arkini/build` directory; development reads its External Arkpack directly and `electron-builder` copies the same artifact directory into packaged `Resources/game`. A tagged GitHub release adds the Sigstore bundle through the built CLI before packaging. There is no bundled-game packer, staging tree, or second packaging implementation. `preview-macos` performs clean → build → unpacked Electron Builder output → launch, while `package-macos` performs clean → build → one Electron Builder DMG/ZIP operation → copies the canonical Arkpack pair beside those archives → checksums → packaged-CLI smoke test. GitHub Actions installs the pinned mise toolchain and calls the same `ci-macos` recipe, which wraps packaging with the repository gates, requires the packaged Electron CLI to classify the release pair as Trusted, and publishes the standalone pair from that same package output. The clean-checkout delivery test exercises the real package path and asserts the generated bundled package, renderer output, packaged resources, bounded ASAR, working CLI launcher, and unchanged source checkout.
-
-Main/preload do not own game state, package semantics, save codec semantics, or Tick. Renderer domains do not import Electron or Node platform APIs. The shared `electron/contract/ArkiniElectronApi.ts` contract exposes only concrete Arkpack bytes with a two-state trust verdict, contained editor-project records and directory-open commands, opaque save bytes, theme/accent/window preferences, confirmed window-mode events, and controlled-close signals. Physical paths are derived in Electron main. An invalid Editor project row receives its exact cataloged root for diagnosis, but its native folder command is admitted only while that same root remains a currently blocked candidate; the renderer cannot open an arbitrary path.
-
-## 1. Core model
-
-Arkini has three distinct data forms:
+Arkini has three forms:
 
 ```text
-GameConfig
-→ validated static game definitions
-
-Runtime
-→ hydrated live gameplay snapshot
-
-State
-→ serializable gameplay state
+GameConfig → validated static definition
+Runtime    → live gameplay snapshot
+State      → serializable gameplay state
 ```
 
-`Runtime` contains live items, active jobs, and FIFO job requests. A committed runtime value is treated as an immutable snapshot by convention. The store is mutable; committed runtime graphs are not mutated in place.
-
-The engine does not maintain a second read model, React copy, runtime cache, or event-derived reconstruction of gameplay state.
-
-## 2. Canonical committed transition
-
-Every accepted gameplay mutation produces one transition:
+One `SubscriptionRef<CommittedTransition>` owns the current runtime, mutation serialization, and gap-free publication:
 
 ```text
-CommittedTransition {
-  runtime,
-  events
-}
+CommittedTransition { sequence, previousRuntime, runtime, events }
 ```
 
-The runtime and its transient events describe the same accepted mutation and commit together.
+`runtime` is current gameplay truth. The monotonic `sequence`, bounded previous snapshot, and events belong to that exact commit and let consumers order and compare presentation without maintaining another writable Runtime.
 
-A mutation that fails validation, is interrupted during planning, or produces neither a changed runtime nor events publishes nothing.
-
-## 3. Runtime write boundary
-
-All production writes enter through `modifyRuntimeFx`.
+Every production write enters `modifyRuntimeFx`:
 
 ```text
-public command or Tick
-→ acquire mutation-planning ownership
-→ read latest committed transition
-→ run effectful planning against one pinned runtime snapshot
-→ validate complete candidate runtime
-→ commit accepted transition
+resolve live facts inside the write boundary
+→ plan against one pinned snapshot
+→ build an immutable candidate
+→ validate the complete candidate
+→ commit runtime and its events once
 ```
 
-Nested runtime reads during planning receive the pinned transaction snapshot. A planner may not read a newer runtime halfway through and may not export a detached state-derived plan across the write boundary.
+Waiting and planning remain interruptible. Failure, defect, interruption, or an unchanged event-free result commits and publishes nothing. A successful transition makes runtime truth visible immediately; events describe that same commit and are never a second store.
 
-### 3.1 One synchronization owner
+Independent commands may run concurrently until their short mutation-planning section. Do not add an outer command queue, second semaphore, second current-value/sequence authority, event bus, deep-clone layer, or event-derived read model.
 
-One `SubscriptionRef<CommittedTransition>` owns mutation serialization, the current transition, and replaying publication. There is no outer semaphore, second current-value cell, second PubSub, or listener queue.
+Subscribers own current-plus-tail observation. Runtime listeners ignore event-only transitions; event listeners receive only later batches, never historical replay. Slow or failing external callbacks are isolated and may lag without delaying engine truth, Tick, save, or other listeners.
 
-`SubscriptionRef.modifySomeEffect` acquires the sole mutation ownership before reading the current transition. Waiting for ownership and the effectful candidate planner remain interruptible, so failure, defect, or interruption releases ownership without changing or publishing state.
+[`GAME.MD`](GAME.MD) owns Tick, queues, inputs, charges, placement, merge, and other gameplay semantics.
 
-The planner completes the serialized operation with one of two explicit outcomes:
+## Game and session ownership
+
+`GameSession` owns one canonical Runtime, Tick fibers, command/listener scopes, and save lifecycle. The bridge-level playable `Game` adds its completed config and resource URLs without mirroring Runtime. UI executes public Effects and reads the exact session snapshot through a non-owning `GameEngine` facade.
+
+`RendererRuntime` contains one scoped installed-game resource service. Acquisition uses scoped leases: same-package callers share one provisional result, the explicit load action adopts that exact lease, and `/game/$packageId` exposes only the adopted matching package through route context. A different package must finalize the current resource before acquisition. React mount/unmount is never desired-game state.
+
+Installed-game release, reset, failed-save recovery, bootstrap failure, controlled close, and service shutdown are serialized by that single owner. Ordinary release saves and disposes before publishing Idle. Reset discards without a final save, clears only the verified exact save, then allows fresh acquisition. A critical cleanup/ownership failure retains the exact resource as unusable and replaces gameplay with the root fatal boundary; Board cannot remount over it.
+
+Native close claims a pending or active installed resource through the same service. With a game, `/game/$packageId/action/exit` owns one best-effort final save/disposal and reports completion to Electron after its terminal presentation settles; without a game, close acknowledges directly. Force close is process policy and never pretends cleanup or save succeeded.
+
+The Editor has a separate process-owned, revision-pinned `EditorBoardGameResource`. It runs the same canonical gameplay surface without an Arkpack identity or autosave. Project publication, refresh, scenario restore, and route release discard the prior session before publishing a replacement. Installed and Editor games never share lifecycle ownership.
+
+Shutdown order for a session is: reject commands, stop Tick, close session scopes, flush the latest stable Runtime when applicable, then dispose its runtime. Concurrent cleanup callers join the same attempt. A failed ordinary final save freezes the session for an explicit retry; destructive reset/editor replacement uses discard-only disposal.
+
+## Renderer ownership
+
+React owns routes, pages, forms, menus, modal state, command presentation, and disposable projections. Feature-owned Effect Atoms own asynchronous renderer commands when admission/result must survive React remounts; lifecycle operations belong to route loaders or process services, not component effects. React may never own gameplay snapshots, package/catalog truth, persistence truth, or Game lifecycle.
+
+Pixi owns retained Board, Toolbar, and Inventory scene presentation: display objects, geometry, hit testing, z-order, pointer lifecycle, and demand rendering. Motion is the only interpolation clock. The engine still decides every action and drop outcome. Main and Inventory canvases have separate actor stores; their handoff carries presentation geometry only and cannot assert runtime identity continuity. See the local [`src/ui/pixi/README.md`](src/ui/pixi/README.md).
+
+Runtime commits immediately. Animation and audio may lag, redirect, collapse, or skip; they consume snapshots/events and never gate gameplay, Tick, publication, or save. Presentation state dies with its route, scene, or exact game owner.
+
+The router uses standard history routing in development and packaged Electron. `/` owns renderer-session bootstrap; launcher routes never create a Game; the game parent owns the installed resource; blocking load/leave/reset/recovery/exit operations are explicit action leaves. Pending/error components render complete states but do not orchestrate domains.
+
+## Electron and security
+
+Electron main is the desktop application's only filesystem, native-window, protocol, MCP transport, and privileged IPC owner. Renderer domains see typed capabilities through `electron/contract`; physical paths and native objects never cross that seam. The product CLI is a separate Node process owner that receives filesystem services at its one runtime root.
+
+Development admits only the configured loopback Vite origin. Packaged builds ignore development overrides and admit only `arkini://app/*`. Navigation, frames, popups, permissions, CSP, and every privileged channel are fail-closed. IPC validates the registered Arkini `webContents`, exact main frame, and current trusted URL; an ID alone is not authorization.
+
+The Editor ChatGPT page is the one deliberate foreign surface. Electron owns a separate sandboxed, Node-free `WebContentsView` with no preload or Arkini IPC authority. It allows only bounded HTTPS navigation needed by that surface. Downloaded PNG candidates remain temporary until canonical validation and explicit revision-pinned insertion; rejection/discard writes no project state.
+
+## Filesystem and persistence
+
+The Node-only `FilesystemWrite` capability is the shared mechanical boundary for Electron, Editor, CLI, saves, and Arkpack publication. Readers and writers use the same canonical per-target lock. Writes stage beside the target, sync bytes and parent directories, publish durable phase markers, and recover interrupted owned operations before the next read/write. Recovery distinguishes absent, owned, and unowned paths; symlink, containment, cross-device, or missing-artifact ambiguity fails closed. Domain owners still serialize, validate, and map their own errors.
+
+Electron user data is split by owner:
 
 ```text
-Option.none
-→ return the command result
-→ keep the identical transition
-→ publish nothing
-
-Option.some(nextTransition)
-→ store that exact transition
-→ publish it exactly once
-→ return the command result
+<userData>/arkini/game/    Arkpacks, saves, preferences, logs
+<userData>/arkini/editor/  project catalog, managed projects, MCP state
 ```
 
-`SubscriptionRef.changes` is the gap-free subscription primitive. Each scoped consumer receives the transition current at its subscription linearization and every later committed transition exactly once and in order. Runtime listeners drop the initial replay and notify only for changed runtime identity, transition listeners keep the replay, and transient event listeners drop the initial replay so stale events are never redelivered.
+The package catalog combines bundled and user candidates. A valid user package may override the same package ID; an invalid one falls back to the bundled candidate. Package removal touches only the user package, never its save. Exact load independently verifies filename/package identity, bytes, compatibility, config, resources, and trust. [`VERSION.md`](VERSION.md) owns external envelopes and Trusted/External provenance.
 
-## 4. Live game bridge boundary
+Autosave observes changed Runtime root identity, debounces, serializes writes, and always flushes the latest canonical snapshot. Event-only transitions do not wake or postpone it. Persistence is an observer, not gameplay truth.
 
-`GameSession` owns the Effect services, Tick, subscriptions, canonical runtime, and save lifecycle of one loaded engine. The bridge-level `Game` adds completed config and embedded resource URLs. Neither object mirrors runtime state, and React never owns the engine lifecycle.
+## Editor authority
 
-The live boundary exposes:
+One Electron-main Effect repository owns each portable project directory. The current tree is canonical; renderer context, Atoms, form drafts, object URLs, build descriptors, and Editor Board are projections. [`CONFIG.md`](CONFIG.md) owns the exact portable layout.
 
-- `getSnapshot()` — synchronous read of the canonical runtime;
-- `run(effect)` — execution of documented public engine Effects;
-- `subscribe(listener)` — runtime invalidation subscription;
-- `subscribeEvents(listener)` — transient event batches for presentation;
-- `flushSaveFx` — explicit persistence flush Effect;
-- `disposeFx` — coordinated shutdown Effect with a retryable final save. A failed flush freezes the session and retains the same canonical runtime for another disposal attempt; resources are released only after the save succeeds;
-- `disposeWithoutSaveFx` — explicit destructive disposal Effect used by hard reset or a bootstrap that must be abandoned without writing a final snapshot.
+The installation catalog stores only roots, managed/external ownership, and discovery metadata; project identity comes from validated `game.json`. Startup reconciles direct managed directories without deleting unlisted roots. Invalid cataloged projects remain independently visible and blocked with their concrete error. External projects are edited in place and deletion only unregisters them; managed deletion is explicit and may remove its owned directory.
 
-`GameSession` lifecycle operations are reusable Effect values rather than Promise-producing methods. One Effect-owned lifecycle state and one `Deferred` represent the active disposal attempt: concurrent fibers await that exact attempt, failure returns the session to a frozen retryable state, and a later disposal starts a new attempt. Promise exists only at explicit `ManagedRuntime`/process execution boundaries and is never cached as lifecycle state.
+Project mutations share `editor.lock`, validate the expected revision, and replace only Arkini-owned paths, preserving `.git` and unrelated files. External changes are ignored while mounted; explicit Refresh joins writes, discards drafts and the Editor Board, rereads the complete directory, and publishes one replacement. There is no watcher, merge, repair mode, partial load, or second project store.
 
-`GameSession.run()` remains generic by deliberate soft contract. Bridge domains may run public commands and reads only. UI never imports the engine directly and may not reach runtime-store services through the generic runner.
+Forms own local unsaved sessions. Save validates and publishes the complete owning entity; navigation outside a dirty session goes through one Save/Discard/Cancel guard. MCP mutations use the same schema, revision, reference checks, and filesystem repository. A successful external mutation emits a narrow invalidation; the renderer rereads canonical disk state.
 
-### 4.1 Route-owned installed Game resource
+Build validates the current disk revision, compiles through the canonical project pipeline, and atomically publishes an External Arkpack descriptor. Save As/Install reread exact bounded artifact bytes; renderer memory is not an artifact store. JSON export creates a new unique owned child, copies only portable allowlisted paths, validates it, and never replaces an existing destination.
 
-`/game/$packageId` is a non-visual TanStack Router resource boundary over the renderer-wide Game Engine authority. Creation belongs to the explicit load action; the game branch accepts only the adopted resource for its exact package:
-
-```text
-/action/load-game/$packageId loader
-→ RendererRuntime runs acquireGameEngineLeaseFx(packageId) in one Scope
-→ GameEngineResourceFx registers pending ownership immediately
-→ delay CPU-heavy bootstrap until the entering View Transition settles
-→ hold the provisional lease for the complete action presentation
-→ adopt that exact lease before its Scope closes
-
-/game/$packageId beforeLoad
-→ read GameEngineResourceFx.currentFx through the same RendererRuntime
-→ require resource.arkpack.packageId === route packageId
-→ return { gameEngine, gameEngineResource } through route context
-
-/game/$packageId/board
-→ render GameShell and Board
-
-/game/$packageId/action/*
-→ run lifecycle Effects against inherited gameEngineResource
-```
-
-`GameEngineResourceFx` is one scoped Effect service in `RendererRuntime` and the only renderer-wide installed-Game lifecycle authority. Its explicit state machine owns acquisition, provisional consumers, adoption, active identity, cancellation, release/reset finalization, bootstrap failure, exact failed-save recovery, fail-stop ownership failure, and service shutdown. One service semaphore linearizes state changes, while service-owned Fibers let cleanup complete even when a route caller is interrupted. Canonical gameplay state, subscriptions, persistence, and commands remain inside `GameSession`. The package route verifies its exact inherited resource and publishes it through a non-owning `GameEngineProvider`; shared gameplay components call `useGameEngine()` against that provider and never create or mirror gameplay state.
-
-Same-package consumers join one acquisition and receive opaque leases for the exact result. Closing the last unadopted lease cancels or disposes the provisional Game. A different package first finalizes the active Game, then starts a new acquisition; it can never receive the wrong package resource. Ordinary bootstrap failures remain sticky until exact discard, and verified `GameSaveBootstrapError` failures remain sticky until service-owned recovery clears only their exact save key. A defect or composite Cause is never downgraded into a recoverable save failure.
-
-`GameEngineResource` contains one `Game` and one private first-critical-failure guard. The enclosing service is the sole lifecycle lock owner and serializes every destructive operation for that exact resource:
-
-```text
-leave / exit
-→ Game.disposeFx
-→ transition to Idle only after success and exact identity match
-
-reset
-→ Game.disposeWithoutSaveFx
-→ clear exact packageId + contentHash save
-→ transition to Idle only after both steps succeed
-→ redirect to /game/$packageId/board
-→ the load action acquires one fresh Game
-```
-
-A failed ordinary leave or hard reset leaves the exact resource owned by the service but marks it permanently unusable for the current renderer. The original canonical critical failure is preserved for every waiter, the root fatal boundary replaces the application UI, and every later game-route publication check throws that same error. No Board remount, package switch, retry action, or in-process recovery is allowed. The lower-level `GameSession` disposal remains idempotent and may retain a frozen save obligation for controlled-close policy, but renderer ownership is fail-stop.
-
-The pathless launcher boundary reads the active resource through `RendererRuntime` and redirects launcher navigation through `/game/$packageId/action/leave`. A request for another package first routes through the current package's leave action, then enters the destination `/board`. React cleanup, provider unmount, and component effects are never desired-game signals.
-
-Controlled Electron close with an active Game is a terminal route transition. The renderer atomically claims a pending or adopted resource through the same service and replace-navigates to `/game/$packageId/action/exit`; that route joins any terminal finalization already running for the exact resource or owns one best-effort `disposeFx` attempt, logs a failed final save, and completes the shared Hero action presentation at 100%. Preload waits for that completed frame to paint and hold briefly before sending `closeReady`. Without a Game, the same trusted handshake acknowledges directly and never constructs a game route. No retry page, second save loop, or fatal-screen detour participates. Arkini does not coordinate Game shutdown, state preservation, or ownership handoff across HMR; development module replacement may restart application state. Explicit native force close remains process policy and never claims renderer cleanup or save success.
-
-Action routes own their operation in leaf loaders. `pendingComponent` and `errorComponent` are complete Hero pages and contain no domain orchestration. They are ordinary native View Transition destinations, not overlays over a still-mounted Board or launcher root.
-
-Bootstrap save recovery is necessarily top-level because the failing `/game/$packageId` resource boundary cannot load a child action. `GameEngineErrorPage` only links to `/action/recover-game-save` with the public package identity. The action loader asks the service to resolve the exact sticky bootstrap Cause, requires an uncontaminated `GameSaveBootstrapError`, clears its verified private save key, returns the service to Idle only after success, and redirects to the main menu. Package validation failures, defects, composite Causes, and unrelated errors cannot invoke save deletion.
-
-### 4.2 Desktop persistence
-
-Electron `userData` has one Arkini root for native game persistence:
-
-```text
-<userData>/arkini/
-  game/
-    arkpacks/
-      <encoded-packageId>.arkpack
-      <encoded-packageId>.arksig
-    saves/<encoded-packageId>/
-      current.arksave
-    preferences/
-      appearance.theme.json
-      appearance.accent.json
-      cheats.available.json
-      launcher.last-package.json
-      window.mode.json
-    logs/
-  editor/
-    projects.json
-    projects/<managed-project>/
-    mcp.json
-```
-
-The original validated Arkpack binary is canonical and derives its sole package identity from `config.meta.id`; no second manifest identity exists. SHA-256 remains the derived `contentHash` used by save identity. Electron scans two flat well-known roots using `<encoded-packageId>.arkpack` plus an optional Sigstore-bundle `.arksig`: `game/arkini/build` in development or packaged `Resources/game`, and writable `<userData>/arkini/game/arkpacks`. Under the same bounded filesystem snapshot, Electron main offline-verifies the exact bytes, Fulcio chain, certificate-transparency proof, Rekor proof, GitHub Actions issuer, and Arkini release workflow identity. It transports the raw candidate plus only `Trusted` or `External`; missing or failed proof always becomes External. The renderer validates user candidates first and falls back to bundled only when the user file cannot form a valid package. A structurally valid user package legally replaces a bundled package with the same ID regardless of trust, and both states remain playable. Exact list and load operations share this candidate selection, revalidate filename identity against `config.meta.id`, decode the config/resources, and run compatibility and semantic validation independently of trust. Install writes an External Arkpack and removes any stale bundle, removal touches only the user root and therefore reveals a bundled fallback, and package removal never removes saves.
-
-The editor is another renderer surface around the same engine/compiler contracts, not a parallel application. Its sole canonical project authority is one process-lifetime Effect repository in the Electron main process backed by the engine-owned portable game-project directory. A valid project root contains generated `schema.json`, `project.json`, `game.json`, `items/<type>/<uid>.json`, `assets/`, `resources/`, `notes/`, `scenarios/`, `versions/`, and `objects/`. The required `project.json` contains only `arkini` and `revision`; `game.json` owns package identity and gameplay `version` and references `./schema.json`, while each UID path owns one direct `item` referencing `../../schema.json`. Notes are portable project files that do not change the authoring revision, survive version checkout, and never enter Versions, Build, or Arkpack output. Named scenarios are portable and versioned. The live Editor Board session is deliberately excluded. The renderer reaches the main owner only through the narrow validated editor IPC repository. React Context, Atoms, route loader data, object URLs, and form values are projections or local drafts; none is a second writable project truth.
-
-Electron main owns `<userData>/arkini/editor/projects.json`, a discovery index containing only absolute roots, managed-versus-external ownership, and creation time. Every startup replaces the managed portion of that index with every canonical direct directory below the managed projects root and persists the reconciliation. A missing or invalid index discards external bindings; a valid index retains them. No unlisted managed directory is deleted. Every candidate passes the same complete production materialization of its current tree, resources, portable notes and Board scenarios, published version history, snapshots, and content-addressed objects. A successful candidate derives its project identity from `game.json` `meta.id`; the index never stores that identity. A failed candidate stays visible but blocked with its root and concrete validation error, while each other candidate is admitted independently. Project-list Refresh retries failed candidates without re-reading already mounted valid projects. New projects and Arkpack imports validate their input and create managed directories below user data. Project-folder import requires a completely valid project and opens that directory in place; it does not copy or compile a generic JSON source tree. External projects therefore remain directly versionable by tools outside Arkini, while deletion only unregisters them. Explicit managed-project deletion also removes its owned directory. Invalid projects expose no application-owned delete, repair, partial-load, or read-only mode. Project SQLite, renderer IndexedDB, and other historical formats are outside the runtime contract. MCP transport configuration and OAuth state share `<userData>/arkini/editor/mcp.json`.
-
-`FilesystemWrite` is the Node-only mechanical write boundary shared by Electron main, the CLI, and pack code. It canonicalizes every explicit lock and target, serializes the same lock across service instances and processes, stages beside the destination, syncs file data, renames, and syncs the parent directory. A recoverable exact-file operation records only the owned write/delete set, preserves previous files until the replacement is durable, and completes or rolls back interrupted work before the next operation under that lock. Recovery is authoritative; if the old state cannot be restored, the error retains the backup and reports its exact location. Unsafe symlink, containment, and cross-device cases are rejected, and callers may request a private file mode. Domain owners still serialize and validate their own data and map diagnostics.
-
-Editor project mutations use `<project>/editor.lock` and replace only the exact Arkini-owned files for that operation. An external project root is never swapped wholesale, so `.git` and unrelated files survive saves and version checkout. Checkout writes the current tree, named scenarios, and `versions/head.json` as one recoverable file set. Managed-project create/delete and catalog updates share a managed-root lifecycle lock. Startup never recursively deletes an unlisted managed directory; it reconciles every direct directory into the index, where complete validation admits it or reports it as blocked. There are no migrations, compatibility readers, or historical recovery formats.
-
-Editor JSON export holds the source project lock, creates one unique operation-owned child inside the selected destination, copies only portable project paths, and verifies the result with the production project, sidecar, and version-history readers. A failed export cleans only that incomplete child. Existing destination contents are never replaced, so export needs no backup, rollback, journal, or startup recovery protocol.
-
-Item routes use immutable item UID leaves: `items/list`, explicit `items/$itemUid/detail/$sectionId` read-only leaves, and one `items/$itemUid/form/$sectionId` authoring flow for both new and persisted items. One canonical item-section taxonomy owns Identity, Artwork, Charges, Merges, Estimate, and type-owned Production. Flow has one global authored-graph surface rather than a second item-local subgraph model; item detail links open that graph focused on the item in either input or output direction. The form parent owns exactly one local TanStack Form session above its section outlet, so routed form leaves share values, dirty state, touched fields, and validation, while routed detail leaves read the canonical loaded item without creating another draft. Form Save validates the complete item schema and writes its UID-owned JSON file; human-readable item IDs remain read-only after the first successful Save pending an explicit rename workflow. Project authoring likewise owns one local form session across General, Appearance, and Surfaces and one explicit form-native Project Save. Asset import accepts validated PNG files or the resources from a canonically validated Arkpack and replaces matching resource IDs without adopting the source config. There is no global staged project overlay, autosave, or editor-wide Save-all operation.
-
-MCP item authoring exposes one discoverable `create_<type>_item` and `edit_<type>_item` tool for every canonical item discriminator. Create inputs omit the immutable UID and discriminator and apply the same canonical draft defaults as the corresponding new-item UI form. Edit inputs preserve ID, UID, and type; supplied top-level fields replace their complete values, omitted fields remain untouched, and `null` clears only optional canonical fields. The bounded `item_config` tool returns one complete canonical item with its project `revision`, so an agent can preserve unchanged nested values and optionally copy that revision into an edit request. `project_config` does the same for complete non-item `meta`, `resources`, and `start` sections; `edit_project` replaces only supplied whole sections and preserves the immutable game ID. All other MCP results remain readable plain text. Project validation, reference-safe item rename, delete-impact preview, and revision-pinned safe or forced deletion reuse the completed-game validators and canonical filesystem repository boundary. A supplied stale revision rejects a mutation; an omitted revision on non-destructive patch tools edits the current snapshot, while the repository still guards the read-to-write interval. Every item edit validates the resulting whole item. Create and edit reach the same canonical schema and repository boundary as UI Save. A successful main-process mutation emits a narrow project-ID notification; the mounted renderer rereads that canonical project, publishes the newer snapshot, and synchronizes Editor Board. Notification is best-effort after persistence and cannot turn an already-written mutation into a failed MCP acknowledgement.
-
-The global MCP workspace owns explicit transport lifecycle rather than starting a server merely because an editor route mounted. Local MCP and Remote MCP independently enable one lazy loopback HTTP listener: `/editor/mcp` accepts only loopback host/origin traffic while `/remote/mcp` requires a bearer token issued by the colocated OAuth 2.1 routes. The user supplies one ngrok authtoken and assigned Development Domain; every Remote start publishes the listener on that same domain and verifies public OAuth metadata plus the bearer challenge before reporting ready. Port, domain, generated Remote password, OAuth clients, codes, and tokens live as recoverable plaintext in `mcp.json`; only the `authtoken` value is encrypted with Electron `safeStorage`. The shared file primitive durably replaces that file with mode `0600`. An ordinary stop or tunnel failure preserves this state; explicit Generate new password replaces the password and clears OAuth state while preserving port and ngrok configuration.
-
-One process-owned unsaved-changes guard coordinates the currently mounted Project, Item, and Asset form sessions without turning their local drafts into canonical state. Navigation inside a session's own form route remains uninterrupted. Leaving that route, Editor Exit, and native close share one decision: a valid dirty draft offers Save, Discard, or Cancel, while an invalid draft offers only Discard or Cancel. Save is persistence-only; after the user permits departure, Exit and native close still join already-admitted repository/catalog writes before leaving. The portable project directory remains the sole canonical project authority. React-visible asynchronous editor commands execute through feature-owned `Atom.fn` commands or the narrowly allowed domain-specific writable command authority when synchronous sibling exclusion must survive remounts, while standalone renderer Effects use the one process `RendererRuntime`. The renderer does not add a private Promise scheduler, query cache, copied project store, journal, or rollback layer.
-
-Build is the explicit heavy validation and publication boundary. CLI and Editor serialize on the same project lock, compile the portable project, and atomically replace `<project>/build/<encoded projectId>.arkpack`; ordinary builds remove a stale `.arksig` and are External. Only the tagged GitHub release workflow asks Sigstore to keyless-sign the final official-game bytes, writes the returned bundle, and post-verifies the configured release identity before packaging. Editor additionally proves that the disk tree still equals its mounted revision immediately before publication; an external change requires Refresh and cannot be mislabeled as the old revision. The renderer receives only an artifact descriptor. Save As and installation reread the exact bounded artifact by revision and content hash through Electron main, so bytes remain filesystem-owned and are never cached as a second renderer truth. A failed build publishes diagnostics and no artifact; any later project mutation makes the descriptor stale. JSON export excludes the ignored `build/` directory, awaits repository idle, and copies the portable allowlist into a new owned child of the chosen destination.
-
-External filesystem changes are deliberately ignored while a project is mounted. There is no watcher or merge. Explicit Refresh from disk blocks new writes, joins admitted writes, releases the Editor Board, rereads the complete project directory, discards every local form draft, publishes the disk snapshot, and starts a replacement Board. Refresh is a hard reset and never prompts to save discarded work.
-
-Versions store full logical snapshots without property-level deltas or parent replay. Each manifest maps the complete `game`, item, asset, resource, and named-scenario set to immutable content-addressed objects under `objects/`; version metadata records its parent and content fingerprint. Objects are written first, then the manifest and descriptor, and `versions/head.json` is the sole publish-last index of visible versions and the current checkout. Unreferenced objects or incomplete version directories are ignored, and no automatic garbage collection is required. Checkout materializes the selected full snapshot into the current tree while leaving project notes unchanged.
-
-The Editor Board is a real gameplay surface over a revision-pinned `EditorBoardGame`, not a static preview or a second runtime model. `EditorBoardGameResource` is a scoped process owner beside the installed-package authority. The project route starts it from the canonical completed config and immutable revision-local resource URLs without `arkpack`, `saveKey`, or autosave capability. Repository publication and explicit scenario restore synchronize replacements through one lifecycle semaphore: the old session must finish `disposeWithoutSaveFx` before a replacement can be created or published, and a failed disposal remains visible. Leaving the project releases the exact editor game. React only projects the owner's `SubscriptionRef` and injects its exact `GameEngine` into the same routed Board, Toolbar, Inventory, Item Detail, audio, cheat spotlight, and Pixi composition used by installed gameplay; the package-only Game Menu is intentionally absent. Editor sessions enable the canonical Cheat mode, and the Board admits `Cmd+P` independently of the player preference.
-
-Named Board scenarios are portable JSON envelopes separate from the live editor session and Arkpack output, and they participate in version manifests. Only the explicit Save button snapshots the canonical runtime through `fromRuntimeFx`; selection strictly decodes and hydrates that `StateSchema` before serially replacing the session. Each hashed scenario file stores `name`, `revision`, gameplay `version`, base64 `save`, and its creation/update timestamps. Every same-major scenario remains loadable regardless of minor ordering. Invalid decode, writer provenance, version, or hydration rejects restore while preserving the scenario bytes and current live session. Every major project configuration save removes all scenarios before publishing the new project marker; minor saves preserve them. There is no scenario autosave or best-effort replay.
-
-Editor item estimates are derived static analysis over one immutable acquisition graph compiled from the authored game definition. The graph records canonical starting quantities, complete alternative acquisition routes, AND requirements, output quantity distributions, requirement usage, and stable authored route identities. It does not bootstrap an Engine, Tick runtime, gameplay transition, or simulated player. The canonical game definition remains the only source of truth; an estimate is disposable analysis data.
-
-For every requested item quantity, the estimator evaluates each complete route recursively to authored roots. Its duration is the deterministic optimistic critical path: a selected operation starts after its slowest hard dependency, so independent sibling branches overlap without modeling concrete workers, producer instances, line capacity, or scheduling. Route selection uses the same own-duration-plus-slowest-dependency metric with canonical nested choices and stable route identity; it never searches combinations of sibling choices or runtime schedules. Co-products are shared when those canonical choices select the same authored operation, but discovering a cheaper cross-sibling co-product combination is deliberately outside this bounded analysis. Consumables retain authored quantities and batch scaling, while owners, infrastructure, merge identities, and other hard reusable prerequisites are acquired once. A deposit input is likewise a one-time dependency: it must be an authored root or have a structurally complete acquisition route, its acquisition time is paid once, and charge lifetime does not scale its use. Authored starting quantities remain finite credits for ordinary consumables. Cyclic or unreachable hard dependencies produce path diagnostics without poisoning a valid alternative route.
-
-The editor worker, UI, and MCP projection consume only the immutable estimate result. The renderer keeps at most one process-lifetime in-memory batch for the current project revision; a newer authored snapshot interrupts and replaces it. This batch is disposable derived data, never canonical editor-project persistence. The global UI data source and MCP `estimate` tool share one fuzzy query, optional incomplete-only filter, and `fastest`, `slowest`, and `demand` selection contract; React only renders the selected row order, while `item_estimate` remains the detailed single-item route projection. Presentation explains the selected normalized route DAG, optimistic parallel critical-path duration, aggregate consumed/one-time/ongoing demand, and explicit ignored runtime mechanics, but it must not claim an engine-valid witness or exact player wall-clock time. Every selected fact occurs once in the result and shared prerequisites use stable fact references, so UI and MCP output stay linear in the selected graph; the flat item breakdown may additionally show the direct selected facts that require each row. Bounded diagnostics from rejected alternatives remain available even when another route succeeds. Authored random output occurrences retain expected-run economics, including correlated co-products. Positive enable-rule facts participate as hard acquisition prerequisites and contribute their acquisition time, while rule truth, disable conditions, conditional runtime effects, scope and placement, charges, depletion capacity, renewal, and finite runtime resource capacity are not simulated. A real charge-depletion output remains an acquisition route: it pays the payer's acquisition and the authored repeated line work that produces the output, without recursively modeling later payer renewal.
-
-The engine's existing `StateSchema` is the complete canonical save state; creating a separate alias schema would add a second name without a second contract. `fromRuntimeFx` produces a detached state, and session construction hydrates a fresh runtime from validated state. The save codec wraps that state in exactly:
-
-```text
-{ version, arkini, state }
-```
-
-Electron stores the resulting MessagePack bytes opaquely. The shared file primitive stages and syncs the bytes beside `current.arksave`, replaces the committed save, and syncs its parent; failed or interrupted replacement restores the previous successful save before another operation under that save lock. The same collision-safe package-ID filename encoding used by Arkpacks selects the save directory and is intentionally absent from engine state and the envelope, while gameplay-major compatibility decides whether that package's save can resume or restore must be rejected without changing its bytes.
-
-Theme, accent, cheat, launcher, and window preference writes use the same shared file primitive with explicit per-domain locks; missing or malformed committed data resolves to its domain default. Product runtime always uses the Electron filesystem capabilities exposed by preload. Process-local in-memory adapters exist only as explicit test doubles under `test/support`; runtime never selects them automatically.
-
-Persistence is Effect-native on both sides of the IPC transport:
-
-```text
-renderer domain Effect
-→ ArkpackStorage / GameSaveStorage / appearance Effect capability
-→ one typed preload Promise invocation
-→ trusted Electron IPC handler
-→ one ElectronMainRuntime execution
-→ Effect-native filesystem capability
-```
-
-Promise exists only as the Electron IPC transport contract. Main-process package/save logic consumes the `FileSystem` and `Path` capabilities from `effect`, provided once by `@effect/platform-node`; renderer domain operations consume Effects directly. Arkini-owned persistence uses object + factory composition, has no repository/storage classes, and exposes no no-op `close()` lifecycle.
-
-## 5. Runtime and event subscriptions
-
-Each external listener owns its own scoped current-plus-tail subscription.
-
-Runtime listeners use the captured current runtime as an identity baseline and are notified only when a later transition changes the runtime root.
-
-Event listeners consume only later event batches. Historical transient events are never replayed to a listener registered after their commit.
-
-Callback delivery is best effort and may lag canonical runtime. Callback throws and rejected Promise-like results are isolated and cannot kill Tick, autosave, or other listeners.
-
-## 6. UI and presentation time
-
-The engine is framework-neutral and authoritative. React is an adapter.
-
-```text
-canonical runtime
-→ immediate gameplay truth
-
-live bridge projection
-→ synchronous view over that exact snapshot, never cached authority
-
-committed transient events
-→ facts about accepted mutations
-
-UI animation state
-→ intentionally delayed presentation
-```
-
-Animations may lag, change direction, collapse, or skip intermediate presentation. Runtime never waits for them.
-
-UI may own:
-
-- local panel, hover, camera, selection, and animation state;
-- coordinate-to-pixel or coordinate-to-3D transforms;
-- labels, icons, grouping, sorting, and interpolation;
-- presentation queues derived from transient events.
-
-UI appearance uses one semantic color-token source in `src/ui/styles.css`. Active components consume meaning-based utilities such as canvas, surface, foreground, accent, status, and overlay colors rather than palette-specific Tailwind classes or repeated `dark:` branches. Theme is `dark | light | system`; accent is one explicit semantic palette. `/settings` is the sole theme-control surface; the former floating canvas selector is removed. Its complete mutation applies the renderer value immediately, persists through the existing appearance Effect/IPC capability, rolls back on failure, and no-ops for the active value. Missing or malformed durable data defaults to dark and rose, while `system` is respected only after explicit user selection and continues to follow Electron `nativeTheme` updates. Electron persists theme and accent atomically; CSS `color-scheme`, `light-dark()`, and root accent tokens resolve the renderer palette without a second resolved-theme store. Appearance remains outside engine runtime and gameplay saves.
-
-UI may not own or reconstruct:
-
-- line start eligibility;
-- missing inputs;
-- reservation truth;
-- queue capacity or FIFO policy;
-- effect/rule availability;
-- accepted drop behavior;
-- job lifecycle state;
-- any second runtime snapshot.
-
-## 7. Tick and time
-
-Effect Clock is the only production wall-clock source.
-
-The Tick adapter owns transient observation state:
-
-```text
-observedAtMs
-pendingElapsedMs
-```
-
-`pendingElapsedMs` is simulation time, not raw wall time. Neither Tick observation field is persisted.
-
-Simulation uses one canonical 100 ms fixed step.
-
-```text
-observe new wall-clock delta
-→ add elapsed milliseconds to pending budget
-→ replay all complete fixed steps
-→ keep sub-step remainder for the live session
-```
-
-Instant gameplay is a persisted cheat switch in `runtime.cheats`, not a Tick multiplier or session timing mode. While cheat behavior and Instant gameplay are enabled, the authoritative engine completes valid time-based jobs and temporary-item lifetimes without waiting for their authored wall-clock durations. Explicit and observed Tick advancement still use the same unscaled simulation milliseconds.
-
-Every attempted complete-step budget is acknowledged exactly once. A failed advancement propagates its Cause but still consumes the attempted budget; it is never replayed implicitly on the next observation.
-
-Long elapsed intervals are replayed immediately as consecutive fixed steps and must match the equivalent sequence of explicit 100 ms advancements.
-
-One event-free step returning the identical runtime reference proves a stable no-op boundary; the remaining identical backlog may be skipped.
-
-Temporary board items own `remainingDurationMs`, initialized from their authored `durationMs` when the concrete runtime identity is committed. Each identity observed at a step boundary loses exactly one 100 ms step, clamped at zero. An item created by a completion during that step is not in the boundary snapshot and receives no retroactive time.
-
-Ready temporary items expire after job completions in stable runtime-ID order. Expiry removes the item first, then resolves and places its optional output from the released board origin through the canonical deterministic output and placement pipeline. Expected placement failure leaves the same item at `remainingDurationMs: 0` for a later retry; the complete random stream, including random placement origin, is derived from the stable temporary identity. Temporary items are board-only, always identity-bound, and therefore impure.
-
-## 8. Jobs and FIFO requests
-
-An owner may have:
-
-- zero or one active job;
-- FIFO queued start requests up to its configured capacity.
-
-A queued request is not a job. It owns no time, consumes nothing, and reserves nothing. Enqueue is
-the sole player-facing line execution command and records only explicit player intent; it never fills
-an input or starts work in the command transaction. Missing concrete material is therefore queueable.
-Pending requests remain editable intent: one explicit owner command may clear the whole pending
-queue without touching an active job, materials, charges, or outputs.
-
-Queue playback uses one concrete Autofill selection, physical delivery, input-store, and hard
-job-start pipeline for Producer, Craft, Blueprint, and every other line owner. It is opportunistic:
-only an idle owner's FIFO head is eligible. Each Tick may admit currently useful concrete material
-into delivery, including partial coverage, while retaining the exact queue request. Later Ticks retry
-the same head; only settled Input material can produce a job. Actual upstream output becomes ordinary
-concrete supply after commit; queued work never reasons about hypothetical future output. A blocked
-FIFO head remains first and cannot be overtaken. It waits for fresh runtime facts to make it runnable
-or for the player to clear that owner's pending queue; the engine never drops it automatically.
-
-Delivery travel is canonical engine state, not renderer lifecycle. Every delivery persists a fixed-step
-`remainingDurationMs`; Tick decrements it independently of route, current Board space, mounted canvas,
-or available Pixi geometry and commits the due generation through the same immutable settlement
-transition used by the public serialized command wrapper. Presentation may animate the projected
-countdown and endpoints, but Motion contact can never admit input, return material, or gate production.
-Legacy persisted deliveries without a countdown normalize as immediately due and settle on a later Tick.
-
-The persisted `jobQueue` array is also the canonical cross-owner priority. One bounded Tick settle
-walks eligible owner heads in that exact array order, reusing the runtime produced by every accepted
-delivery admission or start before considering the next head. No owner-ID sort, wall clock, renderer
-order, planned claim, or second scheduler participates.
-
-Jobs persist only:
-
-```text
-durationMs
-remainingMs
-```
-
-Do not add due times, start timestamps, pause timestamps, persisted Tick cursors, or wall-clock reconstruction metadata.
-
-Inventory and Toolbar are hard pauses for active and ready jobs. Returning the same owner to the board resumes evaluation without a separate resume mutation.
-
-Inventory and Toolbar are passive storage. Commands may move an already stateful owner into either surface. Line input, job, and queue state cannot be attached there; an immediate Space action whose Action input authors a self charge may spend item charges there and atomically isolate the charged identity from its real passive origin.
-
-Started jobs cannot be cancelled. Pending queue requests may be cleared only as the whole current queue of one owner; no command targets a previously observed request shape.
-
-## 9. Inputs and reservations
-
-Material inputs may be consumed or reserved. A material selector names its complete accepted candidate set; every matched item must be eligible to enter input storage. Temporary identities are board-bound and are rejected by both semantic validation and the authoritative store planner.
-
-- both modes commit the accepted quantity only when work actually starts;
-- `consume` discards the material's complete passive owned subtree at start, moves the surviving root into consumed `job` scope, and discards that root at completion;
-- `reserve` moves the same live instance into `reserved` scope, preserving its identity, runtime state, and passive owned subtree until completion relocates it;
-- a zero-capacity material input is closed while its line owns an active job;
-- a positive-capacity material input remains open as storage while the line runs.
-
-Input closure is resolved from the same live runtime draft as the delivery command. A queued request does not close an input because it is not an active job. Consumed and reserved items are exclusive job-owned locks and are inaccessible to generic item mutations.
-
-Storing the first input on a stacked owner is a general state-attachment transition. The input transfer is applied inside one candidate first, so a fully consumed source may free board capacity, then the original owner identity is isolated at quantity `1` and the pure remainder follows standard placement. A blocked remainder rolls back the input transfer, split, and every generated event together.
-
-Charge costs are authored on individual inputs. `from: "self"` charges the line owner; `from: "target"` charges the deterministic board item resolved by a deposit input. Resolution reserves charge budget by runtime item ID across the whole line so several inputs cannot independently overbook the same payer. Apply aggregates every cost for one payer and spends it exactly once inside the same candidate runtime.
-
-A fresh charged item keeps no redundant live counter: missing `remainingCharges` means the authored full amount and remains pure. A partial spend stores `remainingCharges`, makes the item stateful, isolates the original board identity at quantity `1`, and standard-places the pure remainder. Fully depleting one idle quantity consumes that quantity in place instead of relocating the rest of its stack. Idle payers that die are resolved before surviving payers that need isolation, allowing one atomic start to use board capacity it frees itself.
-
-A charged item dies when its remaining charges reach zero. An idle external payer is removed immediately during the starting command and emits its optional charge output from its own board origin. A self payer or any payer that already owns an active job may remain temporarily at `remainingCharges: 0`; that active job is the only legal deferred-depletion state.
-
-Completion resolves shared live facts once, removes the ready job and consumed material roots from one immutable draft, keeps reserved instances live, and executes one generic line lifecycle:
-
-```text
-discard consumed material roots
-→ remove a depleted owner identity and queue
-→ resolve optional line.output deterministically
-→ resolve optional depleted-owner charges.output deterministically
-→ release depleted-owner buffered inputs
-→ relocate the same live reserved instances
-```
-
-A non-depleted owner remains with its identity, inputs, and queue. A depleted owner is removed before output placement, so ordinary line output receives first access to its freed board origin and depletion output follows. Producer, craft, blueprint, and stash keep separate item schemas, but completion never switches on item type. Item lifetime is controlled only by optional charges and authored input costs.
-
-Starting any stacked line owner resolves eligibility from the pre-command snapshot, then creates the job, applies material plans, and pays all charge plans inside one candidate draft. Charge spending or the active job makes a surviving owner non-pure before isolation, so the pure remainder cannot merge back into it. Public item removal and completion share identity-removal primitives rather than nesting public write commands.
-
-Start and completion are all-or-nothing. Insufficient charges, max-count blockage, depletion-output placement failure, remainder placement failure, or material return blockage publishes no partial runtime or transient events.
-
-Reserved materials retain their runtime identity and state but no original stack, slot, or source position. Completion places each existing instance from the current board position of the line owner. Pure instances may normalize into ordinary stack placement and new identities; impure instances preserve their exact identity and require one exclusive grid cell. Consumed materials return nothing and never trigger charge depletion output merely because they were converted. Never add return-location metadata.
-
-Hydration requires every consumed `job` root to own no remaining input subtree, active work, committed job material, or queued intent. Destructive passive-state cleanup fails rather than cancelling active jobs or deleting committed job material.
-
-## 10. Future output and max-count reservations
-
-An active job reserves the worst-case future quantity of every canonical item its completion may create. This includes its `line.output` and, when its owner has already reached zero charges, the owner's deferred `charges.output`. The calculation is deliberately conservative:
-
-- fixed quantities reserve their value;
-- ranges reserve `max`;
-- chance rolls reserve the successful outcome;
-- repeated weighted rolls reserve the same worst candidate for every selection;
-- rolls inside one selected set add together;
-- alternative roll sets reserve the per-item maximum.
-
-A queued request owns no reservation. The same authoritative check runs when its FIFO head attempts dispatch; unavailable charges or max-count blockage leaves the request in place until fresh state makes it runnable or the player explicitly clears the owner's pending queue.
-
-Placement, direct spawn, and direct quantity mutation include active-job reservations in their max-count check, so later operations cannot consume capacity already promised to a job. Completion first detaches its ready job from the immutable candidate and then materializes output, which spends that job's reservation without double-counting it. A depleted owner offsets worst-case output of its own canonical item by the live quantity that will disappear.
-
-Immediate depletion output from an idle external payer is created during the start candidate rather than reserved afterward. After all charge spends, the final start max-count assertion validates those live immediate outputs together with every active job reservation, including the candidate job. Any overbooking rejects the complete candidate atomically.
-
-## 11. Deterministic randomness
-
-Line-completion randomness derives from stable job identity and an explicit algorithm version. Deferred depletion output derives from the same job plus the depleted item identity.
-
-Immediate depletion during start derives from stable owner, line, payer, quantity, pre-spend charges, cost, and an explicit algorithm version. An unchanged failed retry therefore resolves the same output and placement order; a successful spend changes the payer state before any later use.
-
-Roll-set selection, chance, weights, quantity ranges, and random placement ordering all use the owned deterministic stream. Tick state and wall-clock time never participate in the seed.
-
-## 12. Purity and placement
-
-Purity is a runtime-derived boolean, not an item-config flag. A line is pure only when it owns no buffered inputs, active job, or queued request. An item is pure only when every line it owns is pure and it owns no additional identity-bound state. Explicit `remainingCharges` is item-owned state; an untouched charged item with no stored counter remains pure at its authored full amount.
-
-Generic stack and quantity mutations may target only pure items. A pure item uses its configured stack size; an impure item has an effective stack size of `1`. Purity is resolved inside the same immutable runtime draft as the mutation and is checked both while planning stack placement and again while applying the plan. Never cache or carry a purity result across a write boundary.
-
-Every operation whose candidate would attach identity-bound state to quantity greater than `1` must preserve the original grid identity at quantity `1` and standard-place the pure remainder inside that same candidate. Input storage, line start, and partial charge spending share this isolation rule. Board-owned Line operations remain Board-only; immediate charge spending uses the concrete Board, Inventory, or Toolbar origin already owned by its item. Full idle depletion is consumption, not state attachment: it removes one quantity in place. Failure publishes no intermediate state or events. Do not add feature-specific split helpers or invent a Board coordinate for a passive owner.
-
-Placement is one shared policy used by commands, line output, charge-depletion output, reserved-instance return, and buffered-input release. `placeRuntimeItemFx` is the sole internal entry point for relocating an existing live item; lifecycle callsites must not invent specialized placement branches.
-
-Every board location includes mandatory `space`; one cell is `space + x + y`. Board origins carry that full location through the pipeline. Occupancy, stacking, nearest-first ordering, random origin, charges, merge, and output are local to the origin space. Query reach is explicit: `board` is origin-space Board with distance, `inventory` is shared Inventory, `toolbar` is shared Toolbar, `any` is origin-space Board plus both passive storage surfaces, and `universe` is every Board space plus both passive storage surfaces without distance. Scope fallback for an `any` item proceeds Board → Inventory → Toolbar but never enters another Board space. `runtime.currentSpace` is persistent presentation/navigation state only and never filters Tick, background completion, or explicit off-screen passive-storage interactions.
-
-Attached ownership state has no independent space while owned. A movable owner transports its complete ownership graph through Inventory or Toolbar; destination-local rules are re-evaluated after Board placement, and all surviving output or reserved state materializes from the owner's current Board location rather than any historical origin.
-
-Materialized drops follow this high-level order:
-
-```text
-validate max count against live and reserved quantities
-→ choose allowed scope policy
-→ fill compatible pure stacks
-→ spawn into empty locations
-→ require full quantity placement
-```
-
-Existing-item placement uses the same origin, scope, nearest-first board ordering, and inventory fallback. A pure existing item may normalize through ordinary stack/spawn placement and lose its disposable runtime identity. An impure existing item preserves its exact identity and complete state graph, cannot stack or split, and requires one exclusive empty cell. Buffered release starts only from a board owner position; a loaded owner in passive inventory must return to the board before removal, and inventory coordinates are never reinterpreted as a board origin.
-
-Output board placement is explicitly `drop` or `random`; inventory fallback is derived independently from item scope. Board-first fallback may continue into inventory when the item scope allows it.
-
-Placement failure is a domain failure and rolls back the complete owning mutation. Do not partially place an output, partially spend charges, or partially release reservations.
-
-## 13. Save boundary
-
-Autosave owns persistence, not gameplay truth. Item revisions are runtime-only stale-intent tokens: state omits them, and every hydration creates fresh revisions for the new session. Jobs and queued requests are not revisioned because no command targets their previously observed mutable shape.
-
-```text
-current + later committed transitions
-→ project runtime
-→ deduplicate by runtime root identity
-→ debounce
-→ serialize writes
-```
-
-Event-only transitions neither wake nor postpone autosave.
-
-Flush always reads the latest canonical runtime. Duplicate saves are acceptable. Failed mutations publish nothing and trigger no save.
-
-## 14. Shutdown
-
-Session disposal is coordinated:
-
-```text
-reject new commands
-→ stop production Tick
-→ close session-owned command and listener scopes
-→ flush latest stable runtime
-→ dispose ManagedRuntime
-```
-
-Concurrent callers share the same Effect-owned cleanup attempt. The root game owner awaits that attempt before any replacement bootstrap begins, so two sessions cannot write the same package save namespace concurrently. Hard reset uses the separate destructive path:
-
-```text
-reject new commands
-→ stop production Tick
-→ mark autosave discarded
-→ wait for any in-flight write
-→ close session scopes without final flush
-→ delete persisted state
-→ create a fresh session
-```
-
-The reset request is renderer-owned lifecycle intent rather than gameplay runtime mutation. Cancellation never enters this path, and storage failure propagates without manufacturing a fresh-session success.
-
-A long planner interrupted before `modifySomeEffect` accepts a new transition changes nothing. Once it accepts `Option.some`, the exact transition becomes both current state and the single replay publication from the same serialized operation.
-
-## 15. Explicit non-decisions
-
-Do not introduce without a concrete reproduced requirement:
-
-- a JavaScript or React runtime mirror;
-- a second event bus;
-- a central callback registry evaluated at delivery time;
-- runtime revision counters for subscription membership;
-- a command facade wrapping every public Effect;
-- a global command queue;
-- recursive deep cloning or freezing of every snapshot;
-- persisted Tick cursors or job timestamps;
-- job cancellation;
-- reverse reconstruction of reservation history;
-- gameplay decisions inside UI selectors;
-- a generic DTO/read-model hierarchy made only for architectural appearance.
+Versions are full immutable logical snapshots backed by content-addressed objects; `versions/head.json` publishes visibility last. Checkout replaces the current tree, scenarios, and head atomically while Notes remain outside Versions. Scenarios are explicit versioned State snapshots, never autosave. Estimate is disposable static authored dependency analysis with optimistic parallel critical-path timing, not simulation or an engine-valid witness; its domain/data source owns query, filter, sort, and selection before React renders results. Flow is likewise an authored graph projection, not gameplay truth.

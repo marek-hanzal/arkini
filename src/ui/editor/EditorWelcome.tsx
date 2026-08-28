@@ -64,7 +64,7 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 						onClick={() => void actions.refreshProjects()}
 					>
 						<span className="icon-[lucide--refresh-cw] size-4" />
-						{actions.refreshingProjects ? "Refreshing…" : "Refresh"}
+						Refresh
 					</LinkButton>
 				</header>
 
@@ -125,7 +125,7 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 							className="mt-3"
 							onClick={() => void actions.refreshProjects()}
 						>
-							{actions.refreshingProjects ? "Refreshing…" : "Refresh projects"}
+							Refresh projects
 						</Button>
 					</div>
 				)}

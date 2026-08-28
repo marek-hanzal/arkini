@@ -18,7 +18,7 @@ const estimateLabel = ({
 }) => {
 	if (status === "partial") return "Partial";
 	if (status === "unreachable") return "No path";
-	return runtimeMs === undefined ? "—" : `${formatNumber(runtimeMs / 1_000)} s`;
+	return runtimeMs === undefined ? "—" : `~${formatNumber(runtimeMs / 1_000)} s`;
 };
 
 const demandRatioLabel = (demand: number, maximumDemand: number) => {
@@ -56,10 +56,11 @@ export const readEstimateTextFx = Effect.fn("readEstimateTextFx")(function* (
 	const hasNextPage = input.page * input.pageSize < rows.length;
 	return [
 		"Global estimate",
-		"Method: static authored dependency graph",
-		"Timing: optimistic parallel critical path",
+		"Method: approximate scalar authored dependency graph",
+		"Timing: approximate optimistic parallel critical path",
+		"Route choice: first locally ranked route when each fact becomes reachable; scalar action time with stable route identity ties",
 		"Quantity: 1 of every item",
-		"Demand: aggregate selected-route quantity across every obtainable item estimate",
+		"Demand: aggregate approximate route-occurrence quantity across every obtainable item estimate",
 		`Incomplete only: ${input.incomplete}`,
 		`Sort: ${input.sort}`,
 		...(input.query === undefined

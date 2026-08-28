@@ -175,15 +175,6 @@ const readLineRoutesFx = Effect.fn("compileEditorAcquisitionLineRoutesFx.routes"
 		});
 	}
 	const outputModel = yield* readEditorAcquisitionOutputOccurrencesFx(descriptor.line.output);
-	const operation = {
-		...descriptor.operation,
-		...(outputModel.compilation === "complete"
-			? {}
-			: {
-					outputCompilation: outputModel.compilation,
-				}),
-		outputDistribution: outputModel.outputDistribution,
-	};
 	for (const occurrence of outputModel.occurrences)
 		routes.push({
 			...(chargeUses.length === 0
@@ -199,12 +190,11 @@ const readLineRoutesFx = Effect.fn("compileEditorAcquisitionLineRoutesFx.routes"
 				lineTitle: descriptor.line.title,
 				ownerItemId: descriptor.owner.id,
 			},
-			operation,
+			operation: descriptor.operation,
 			output: {
 				annotation: occurrence.annotation,
+				expectedYield: occurrence.expectedYield,
 				factId: occurrence.factId,
-				operationOutputGroupId: occurrence.operationOutputGroupId,
-				quantityDistribution: occurrence.quantityDistribution,
 			},
 			requirements: combineRequirements(descriptor.requirements, occurrence.requirements),
 			runMultiplier: 1,
@@ -232,18 +222,11 @@ const readLineRoutesFx = Effect.fn("compileEditorAcquisitionLineRoutesFx.routes"
 				operation: {
 					id: `source:${chargedItemId}:charges`,
 					inputs: [],
-					...(chargeOutputModel.compilation === "complete"
-						? {}
-						: {
-								outputCompilation: chargeOutputModel.compilation,
-							}),
-					outputDistribution: chargeOutputModel.outputDistribution,
 				},
 				output: {
 					annotation: occurrence.annotation,
+					expectedYield: occurrence.expectedYield,
 					factId: occurrence.factId,
-					operationOutputGroupId: occurrence.operationOutputGroupId,
-					quantityDistribution: occurrence.quantityDistribution,
 				},
 				requirements: combineRequirements(
 					makeChargeDepletionRequirements(descriptor.requirements, chargedItemId),

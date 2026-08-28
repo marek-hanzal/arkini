@@ -10,7 +10,7 @@ const runtimeLabel = (estimate: EditorItemEstimateIndexEntry) => {
 	if (estimate.status === "unreachable") return "No path";
 	if (estimate.runtimeMs === undefined) return "—";
 	const duration = RendererRuntime.runSync(formatItemDurationFx(estimate.runtimeMs));
-	return duration;
+	return `≈ ${duration}`;
 };
 
 const demandFormatter = new Intl.NumberFormat("en-US", {
@@ -63,7 +63,7 @@ export const EditorItemEstimateListRow = ({
 					<dd className="font-semibold text-foreground">{runtimeLabel(estimate)}</dd>
 				</div>
 				<div className="flex items-baseline justify-end gap-1.5">
-					<dt className="text-muted">Demand:</dt>
+					<dt className="text-muted">Approx. demand:</dt>
 					<dd className="font-semibold text-foreground">
 						{demandFormatter.format(estimate.demand)} (
 						{demandRatioLabel(estimate.demand, maximumDemand)})

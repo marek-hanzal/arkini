@@ -2,11 +2,14 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { createEditorAcquisitionGraphFx } from "~/editor/createEditorAcquisitionGraphFx";
-import { estimateEditorItemFx } from "~/editor/estimator/estimateEditorItemFx";
+import { estimateEditorItemsFn } from "~/editor/estimator/fn/estimateEditorItemsFn";
 import { compileGameSourcesFx } from "~/engine/compiler/fx/compileGameSourcesFx";
 import { resolveLineRunFx } from "~/engine/line/fx/run/resolveLineRunFx";
 import type { StartSchema } from "~/engine/start/schema/StartSchema";
-import { createMergeTestConfig } from "~test/merge/support/createMergeTestConfig";
+import {
+	createMergeTestConfig,
+	guaranteedMergeOutput,
+} from "~test/merge/support/createMergeTestConfig";
 import {
 	createLine,
 	createOutput,
@@ -108,13 +111,15 @@ describe("createEditorAcquisitionGraphFx", () => {
 					route.metadata.chargedItemId === "payer",
 			),
 		).toBe(false);
-		const threeRuns = Effect.runSync(
-			estimateEditorItemFx({
-				factId: "target",
-				graph: nonDivisible,
-				quantity: 3,
-			}),
-		);
+		const threeRuns = estimateEditorItemsFn({
+			graph: nonDivisible,
+			requests: [
+				{
+					factId: "target",
+					quantity: 3,
+				},
+			],
+		})[0]!;
 		expect(threeRuns).toMatchObject({
 			obtainable: true,
 		});
@@ -192,6 +197,33 @@ describe("createEditorAcquisitionGraphFx", () => {
 				}),
 			]),
 		);
+	});
+
+	it("adds replacement and same-result output into one scalar merge yield", () => {
+		const config = createMergeTestConfig({
+			rule: {
+				action: "consume",
+				effect: "replace",
+				output: guaranteedMergeOutput({
+					itemId: "result",
+					quantity: 2,
+				}),
+				result: "result",
+				target: {
+					itemId: "target",
+					type: "item",
+				},
+			},
+		});
+		const graph = Effect.runSync(createEditorAcquisitionGraphFx(config));
+		const sameResultOutput = graph.routes.find(
+			(route) =>
+				route.metadata.kind === "merge-output" &&
+				route.id.startsWith("merge-output:") &&
+				route.output.factId === "result",
+		);
+
+		expect(sameResultOutput?.output.expectedYield).toBe(3);
 	});
 
 	it("keeps a validator-valid route whose same canonical payer uses two identities", async () => {

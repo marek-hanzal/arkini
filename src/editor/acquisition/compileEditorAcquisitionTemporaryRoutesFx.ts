@@ -20,18 +20,11 @@ const readTemporaryRoutesFx = Effect.fn("compileEditorAcquisitionTemporaryRoutes
 				operation: {
 					id: `source:${item.id}:expiry`,
 					inputs: [],
-					...(outputModel.compilation === "complete"
-						? {}
-						: {
-								outputCompilation: outputModel.compilation,
-							}),
-					outputDistribution: outputModel.outputDistribution,
 				},
 				output: {
 					annotation: output.annotation,
+					expectedYield: output.expectedYield,
 					factId: output.factId,
-					operationOutputGroupId: output.operationOutputGroupId,
-					quantityDistribution: output.quantityDistribution,
 				},
 				requirements: {
 					allOf: [

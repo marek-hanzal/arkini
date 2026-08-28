@@ -17,7 +17,7 @@ const formatRuntime = (runtimeMs: number) =>
 
 type EditorItemEstimateSort = "quantity" | "time";
 
-/** Presents every selected acquisition fact once as a compact, navigable item row. */
+/** Presents compressed selected-route occurrence groups as compact, navigable item rows. */
 export const EditorItemEstimateRouteGraph = ({
 	config,
 	header,
@@ -30,13 +30,15 @@ export const EditorItemEstimateRouteGraph = ({
 	readonly routeSteps: ReadonlyArray<EditorItemEstimateRouteStep>;
 }) => {
 	const [sort, setSort] = useState<EditorItemEstimateSort>("time");
-	const requiredByFactId = new Map<string, Set<string>>();
+	const requiredByOccurrenceId = new Map<string, Set<string>>();
 	for (const route of routeSteps)
 		for (const requirement of route.requirements) {
-			if (requirement.factId === route.factId) continue;
-			const requiredBy = requiredByFactId.get(requirement.factId) ?? new Set<string>();
+			if (requirement.acquisitionOccurrenceId === undefined) continue;
+			const requiredBy =
+				requiredByOccurrenceId.get(requirement.acquisitionOccurrenceId) ??
+				new Set<string>();
 			requiredBy.add(route.factId);
-			requiredByFactId.set(requirement.factId, requiredBy);
+			requiredByOccurrenceId.set(requirement.acquisitionOccurrenceId, requiredBy);
 		}
 	const sortedRouteSteps = [
 		...routeSteps,
@@ -83,7 +85,7 @@ export const EditorItemEstimateRouteGraph = ({
 						<article
 							className={`ak-list-row flex min-h-16 min-w-0 items-center justify-between gap-4 rounded-xl p-3 text-sm ${item === undefined ? "" : "ak-list-row-interactive"}`}
 							data-ui="EditorItemEstimateRouteStep"
-							key={route.factId}
+							key={route.occurrenceId}
 						>
 							<div className="min-w-0 flex-1">
 								{item === undefined ? (
@@ -106,11 +108,17 @@ export const EditorItemEstimateRouteGraph = ({
 										{formatQuantity(route.rootQuantity)} from authored start
 									</p>
 								) : null}
-								{requiredByFactId.get(route.factId)?.size ? (
+								{route.occurrenceCount > 1 ? (
+									<p className="mt-1 truncate text-xs text-muted">
+										{formatQuantity(route.occurrenceCount)} equivalent
+										occurrences
+									</p>
+								) : null}
+								{requiredByOccurrenceId.get(route.occurrenceId)?.size ? (
 									<p className="mt-1 truncate text-xs text-muted">
 										Required by:{" "}
 										{[
-											...requiredByFactId.get(route.factId)!,
+											...requiredByOccurrenceId.get(route.occurrenceId)!,
 										]
 											.map((factId) => config.items[factId]?.title ?? factId)
 											.sort()
@@ -120,7 +128,9 @@ export const EditorItemEstimateRouteGraph = ({
 							</div>
 							<dl className="pointer-events-none relative z-10 grid shrink-0 gap-1 text-right tabular-nums">
 								<div className="flex items-baseline justify-end gap-1.5">
-									<dt className="text-xs text-muted">Quantity:</dt>
+									<dt className="text-xs text-muted">
+										{route.occurrenceCount > 1 ? "Quantity each:" : "Quantity:"}
+									</dt>
 									<dd className="font-semibold text-foreground">
 										×{formatQuantity(route.quantity)}
 									</dd>

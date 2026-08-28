@@ -126,9 +126,7 @@ export namespace createBuildOperationsFx {
 }
 
 /** Publishes and reads the one canonical artifact for an exact Editor project revision. */
-export const createBuildOperationsFx = Effect.fn(
-	"createBuildOperationsFx",
-)(function* ({
+export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(function* ({
 	filesystemWrite,
 	operations,
 	readState,

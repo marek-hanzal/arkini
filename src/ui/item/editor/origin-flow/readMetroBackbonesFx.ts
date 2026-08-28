@@ -17,10 +17,7 @@ interface MetroSegment {
 
 const sameCoordinate = (left: number, right: number) => Math.abs(left - right) <= CoordinateEpsilon;
 
-const appendPoint = (
-	points: LayoutPoint[],
-	point: LayoutPoint,
-) => {
+const appendPoint = (points: LayoutPoint[], point: LayoutPoint) => {
 	const previous = points.at(-1);
 	if (
 		previous === undefined ||
@@ -30,9 +27,7 @@ const appendPoint = (
 		points.push(point);
 };
 
-const normalizeBackbone = (
-	points: ReadonlyArray<LayoutPoint>,
-): ReadonlyArray<LayoutPoint> => {
+const normalizeBackbone = (points: ReadonlyArray<LayoutPoint>): ReadonlyArray<LayoutPoint> => {
 	const normalized: LayoutPoint[] = [];
 	for (const point of points) {
 		const previous = normalized.at(-1);
@@ -138,9 +133,7 @@ const readOffsetIntersection = (
 };
 
 /** Separates highlighted bundled flow routes into stable render-only metro lanes. */
-export const readMetroBackbonesFx = Effect.fn(
-	"readMetroBackbonesFx",
-)(
+export const readMetroBackbonesFx = Effect.fn("readMetroBackbonesFx")(
 	(
 		backbones: ReadonlyMap<string, ReadonlyArray<LayoutPoint>>,
 		highlightedEdgeIds: ReadonlyArray<string>,
@@ -158,10 +151,7 @@ export const readMetroBackbonesFx = Effect.fn(
 						] as const,
 				),
 			);
-			const pointsByEdgeId = new Map<
-				string,
-				ReadonlyArray<LayoutPoint>
-			>();
+			const pointsByEdgeId = new Map<string, ReadonlyArray<LayoutPoint>>();
 			const segmentsByEdgeId = new Map<string, ReadonlyArray<MetroSegment>>();
 			const trackGroups = new Map<string, MetroSegment[]>();
 
@@ -197,10 +187,7 @@ export const readMetroBackbonesFx = Effect.fn(
 					);
 			}
 
-			const metroBackbones = new Map<
-				string,
-				ReadonlyArray<LayoutPoint>
-			>();
+			const metroBackbones = new Map<string, ReadonlyArray<LayoutPoint>>();
 			for (const edgeId of orderedEdgeIds) {
 				const points = pointsByEdgeId.get(edgeId)!;
 				const segments = segmentsByEdgeId.get(edgeId)!;

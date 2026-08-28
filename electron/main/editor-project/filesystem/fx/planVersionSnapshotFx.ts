@@ -8,11 +8,7 @@ import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
-import {
-	createVersionFingerprint,
-	hashVersionBytes,
-	hashVersionJson,
-} from "./VersionFingerprint";
+import { createVersionFingerprint, hashVersionBytes, hashVersionJson } from "./VersionFingerprint";
 
 const sortedRecord = (
 	entries: ReadonlyArray<

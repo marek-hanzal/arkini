@@ -12,10 +12,7 @@ import {
 	readEditorItemOriginFlowFx,
 	type EditorItemOriginFlowRequest,
 } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
-import type {
-	LayoutNode,
-	LayoutPoint,
-} from "~/ui/item/editor/origin-flow/Layout";
+import type { LayoutNode, LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
 import { layoutInWorkerFx } from "~/ui/item/editor/origin-flow/layoutInWorkerFx";
 
 type State =
@@ -108,9 +105,7 @@ const createAtoms = () => {
 };
 
 /** Owns one subscription-scoped build of the complete authored game flow. */
-export const useOriginFlow = (
-	config: EditorItemOriginFlowRequest["config"],
-): State => {
+export const useOriginFlow = (config: EditorItemOriginFlowRequest["config"]): State => {
 	const { commandAtom, progressAtom } = useMemo(createAtoms, []);
 	const request = useMemo<CommandRequest>(
 		() => ({

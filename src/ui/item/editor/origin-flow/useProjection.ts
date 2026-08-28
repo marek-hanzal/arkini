@@ -2,14 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 
 import type { EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type {
-	LayoutNode,
-	LayoutPoint,
-} from "~/ui/item/editor/origin-flow/Layout";
-import type {
-	OriginFlowDirection,
-	Selection,
-} from "~/ui/item/editor/origin-flow/Highlight";
+import type { LayoutNode, LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
+import type { OriginFlowDirection, Selection } from "~/ui/item/editor/origin-flow/Highlight";
 import { readHighlightFx } from "~/ui/item/editor/origin-flow/readHighlightFx";
 import { readMetroBackbonesFx } from "~/ui/item/editor/origin-flow/readMetroBackbonesFx";
 import { readNavigationFx } from "~/ui/item/editor/origin-flow/readNavigationFx";
@@ -45,9 +39,7 @@ export const useProjection = ({
 		() =>
 			selection === undefined
 				? undefined
-				: RendererRuntime.runSync(
-						readHighlightFx(flow, selection, direction),
-					),
+				: RendererRuntime.runSync(readHighlightFx(flow, selection, direction)),
 		[
 			direction,
 			flow,
@@ -81,10 +73,7 @@ export const useProjection = ({
 			highlightDepthLimit >= maxHighlightLevel
 				? completeHighlight
 				: RendererRuntime.runSync(
-						readVisibleHighlightFx(
-							completeHighlight,
-							highlightDepthLimit,
-						),
+						readVisibleHighlightFx(completeHighlight, highlightDepthLimit),
 					),
 		[
 			completeHighlight,
@@ -94,8 +83,7 @@ export const useProjection = ({
 		],
 	);
 	const routeColors = useMemo(
-		() =>
-			RendererRuntime.runSync(readRouteColorsFx(flow, selection, highlight)),
+		() => RendererRuntime.runSync(readRouteColorsFx(flow, selection, highlight)),
 		[
 			flow,
 			highlight,
@@ -172,9 +160,7 @@ export const useProjection = ({
 	const rootNavigationNodeIds = useMemo(
 		() =>
 			selection?.kind === "node" && completeHighlight !== undefined
-				? RendererRuntime.runSync(
-						readRootNavigationFx(flow, completeHighlight),
-					)
+				? RendererRuntime.runSync(readRootNavigationFx(flow, completeHighlight))
 				: [],
 		[
 			completeHighlight,

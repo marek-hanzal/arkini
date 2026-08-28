@@ -121,9 +121,7 @@ export namespace createVersionOperationsFx {
 }
 
 /** Owns published full-snapshot history for filesystem Editor projects. */
-export const createVersionOperationsFx = Effect.fn(
-	"createVersionOperationsFx",
-)(function* ({
+export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(function* ({
 	filesystemWrite,
 	operations,
 	readState,

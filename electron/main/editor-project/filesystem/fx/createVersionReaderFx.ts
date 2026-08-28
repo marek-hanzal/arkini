@@ -19,13 +19,12 @@ export namespace createVersionReaderFx {
 }
 
 /** Reads published history and creates canonical current/version projections. */
-export const createVersionReaderFx = Effect.fn(
-	"createVersionReaderFx",
-)(function* ({ readState }: createVersionReaderFx.Props) {
+export const createVersionReaderFx = Effect.fn("createVersionReaderFx")(function* ({
+	readState,
+}: createVersionReaderFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const pathService = yield* Path.Path;
-	const readHeadFx = (state: ProjectState) =>
-		Effect.succeed(state.versionHistory.head);
+	const readHeadFx = (state: ProjectState) => Effect.succeed(state.versionHistory.head);
 
 	const readDescriptorFx = Effect.fn("readVersionDescriptorFx")(function* (
 		state: ProjectState,
@@ -62,39 +61,39 @@ export const createVersionReaderFx = Effect.fn(
 			: version;
 	});
 
-	const readCurrentSnapshotFx = Effect.fn("readCurrentVersionSnapshotFx")(
-		function* (projectId: string) {
-			const state = yield* readState(projectId);
-			const scenarios = state.scenarios.map((scenario) =>
-				EditorBoardScenarioFileSchema.parse({
-					name: scenario.name,
-					revision: scenario.projectRevision,
-					version: scenario.version,
-					save: Buffer.from(scenario.bytes).toString("base64"),
-					createdAtMs: scenario.createdAtMs,
-					updatedAtMs: scenario.updatedAtMs,
-				}),
-			);
-			const snapshot = yield* planVersionSnapshotFx({
-				arkpack: state.project.version,
-				config: state.project.config,
-				resources: state.project.resources,
-				scenarios,
-			}).pipe(
-				Effect.mapError(
-					(cause) =>
-						new Error("The current Editor version snapshot is invalid.", {
-							cause,
-						}),
-				),
-			);
-			return {
-				state,
-				manifest: snapshot.manifest,
-				contentFingerprint: snapshot.contentFingerprint,
-			};
-		},
-	);
+	const readCurrentSnapshotFx = Effect.fn("readCurrentVersionSnapshotFx")(function* (
+		projectId: string,
+	) {
+		const state = yield* readState(projectId);
+		const scenarios = state.scenarios.map((scenario) =>
+			EditorBoardScenarioFileSchema.parse({
+				name: scenario.name,
+				revision: scenario.projectRevision,
+				version: scenario.version,
+				save: Buffer.from(scenario.bytes).toString("base64"),
+				createdAtMs: scenario.createdAtMs,
+				updatedAtMs: scenario.updatedAtMs,
+			}),
+		);
+		const snapshot = yield* planVersionSnapshotFx({
+			arkpack: state.project.version,
+			config: state.project.config,
+			resources: state.project.resources,
+			scenarios,
+		}).pipe(
+			Effect.mapError(
+				(cause) =>
+					new Error("The current Editor version snapshot is invalid.", {
+						cause,
+					}),
+			),
+		);
+		return {
+			state,
+			manifest: snapshot.manifest,
+			contentFingerprint: snapshot.contentFingerprint,
+		};
+	});
 
 	const readDiffSnapshotFx = Effect.fn("readVersionDiffSnapshotFx")(function* (
 		state: ProjectState,

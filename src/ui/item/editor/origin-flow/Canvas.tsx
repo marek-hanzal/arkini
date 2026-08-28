@@ -10,10 +10,7 @@ import {
 	type Bounds,
 	type Viewport,
 } from "~/ui/item/editor/origin-flow/createViewportFx";
-import type {
-	LayoutNode,
-	LayoutPoint,
-} from "~/ui/item/editor/origin-flow/Layout";
+import type { LayoutNode, LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
 import {
 	type OriginFlowDirection,
 	type Highlight,
@@ -311,25 +308,24 @@ export const Canvas = ({
 		draw,
 	]);
 	scheduleDrawRef.current = scheduleDraw;
-	const { helpOpen, resetNavigation, setHelpOpen, visitHistoryRef } =
-		useNavigation({
-			canvasRef,
-			direction,
-			flow,
-			inputNodeIds: inputNavigationNodeIds,
-			maxHighlightLevel,
-			navigationNodeIds,
-			onSelectionChange,
-			outputNodeIds: outputNavigationNodeIds,
-			positions,
-			relationFocusNodeIdRef: relationNavigationFocusNodeIdRef,
-			rootNodeIds: rootNavigationNodeIds,
-			scheduleDraw,
-			selection,
-			setHighlightDepth,
-			viewport: FlowViewport,
-			viewportRef,
-		});
+	const { helpOpen, resetNavigation, setHelpOpen, visitHistoryRef } = useNavigation({
+		canvasRef,
+		direction,
+		flow,
+		inputNodeIds: inputNavigationNodeIds,
+		maxHighlightLevel,
+		navigationNodeIds,
+		onSelectionChange,
+		outputNodeIds: outputNavigationNodeIds,
+		positions,
+		relationFocusNodeIdRef: relationNavigationFocusNodeIdRef,
+		rootNodeIds: rootNavigationNodeIds,
+		scheduleDraw,
+		selection,
+		setHighlightDepth,
+		viewport: FlowViewport,
+		viewportRef,
+	});
 
 	useLayoutEffect(() => {
 		resetViewportRef.current = true;

@@ -1,7 +1,4 @@
-import type {
-	Layout,
-	LayoutInput,
-} from "~/ui/item/editor/origin-flow/Layout";
+import type { Layout, LayoutInput } from "~/ui/item/editor/origin-flow/Layout";
 
 export interface LayoutWorkerRequest {
 	readonly topology: LayoutInput;

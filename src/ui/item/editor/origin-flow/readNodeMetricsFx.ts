@@ -80,109 +80,95 @@ const readPortYs = (
 };
 
 /** Shared flow-canvas geometry for variable-height item cards and their embedded operation ports. */
-export const readNodeMetricsFx = Effect.fn("readNodeMetricsFx")(
-	(node: EditorItemOriginItemNode) =>
-		Effect.sync((): NodeMetrics => {
-			const itemTextBounds = {
-				height:
-					node.operations.length === 0
-						? NodeMinHeight
-						: NodeHeaderHeight,
-				width: NodeWidth - 120,
-				x: 102,
-				y: 0,
-			};
-			if (node.operations.length === 0) {
-				return {
-					headerHeight: NodeMinHeight,
-					height: NodeMinHeight,
-					itemPortY: readItemPortY(NodeMinHeight),
-					itemTextBounds,
-					operations: [],
-					portOffsets: new Map([
-						[
-							EditorItemOriginItemInputPortId,
-							{
-								x: -NodeWidth / 2,
-								y:
-									readItemPortY(NodeMinHeight) -
-									NodeMinHeight / 2,
-							},
-						],
-						[
-							EditorItemOriginItemOutputPortId,
-							{
-								x: NodeWidth / 2,
-								y:
-									readItemPortY(NodeMinHeight) -
-									NodeMinHeight / 2,
-							},
-						],
-					]),
-					width: NodeWidth,
-				};
-			}
-
-			let top = NodeHeaderHeight;
-			const operations: OperationMetrics[] = [];
-			for (const operation of node.operations) {
-				const height = readOperationHeight(operation);
-				const bodyHeight = readOperationBodyHeight(operation);
-				const bodyTop =
-					top +
-					OperationContentPadding +
-					OperationHeaderHeight +
-					OperationHeaderGap;
-				operations.push({
-					height,
-					id: operation.id,
-					inputPortYs: readPortYs(operation.inputs, bodyTop, bodyHeight),
-					outputPortYs: readPortYs(operation.outputs, bodyTop, bodyHeight),
-					top,
-				});
-				top += height + OperationGap;
-			}
-			const height = Math.max(
-				NodeMinHeight,
-				top - OperationGap + NodeBottomPadding,
-			);
-			const portOffsets = new Map<
-				string,
-				{
-					readonly x: number;
-					readonly y: number;
-				}
-			>();
-			portOffsets.set(EditorItemOriginItemInputPortId, {
-				x: -NodeWidth / 2,
-				y: readItemPortY(NodeHeaderHeight) - height / 2,
-			});
-			portOffsets.set(EditorItemOriginItemOutputPortId, {
-				x: NodeWidth / 2,
-				y: readItemPortY(NodeHeaderHeight) - height / 2,
-			});
-			for (const operation of operations) {
-				for (const [portId, y] of operation.inputPortYs) {
-					portOffsets.set(portId, {
-						x: -NodeWidth / 2,
-						y: y - height / 2,
-					});
-				}
-				for (const [portId, y] of operation.outputPortYs) {
-					portOffsets.set(portId, {
-						x: NodeWidth / 2,
-						y: y - height / 2,
-					});
-				}
-			}
+export const readNodeMetricsFx = Effect.fn("readNodeMetricsFx")((node: EditorItemOriginItemNode) =>
+	Effect.sync((): NodeMetrics => {
+		const itemTextBounds = {
+			height: node.operations.length === 0 ? NodeMinHeight : NodeHeaderHeight,
+			width: NodeWidth - 120,
+			x: 102,
+			y: 0,
+		};
+		if (node.operations.length === 0) {
 			return {
-				headerHeight: NodeHeaderHeight,
-				height,
-				itemPortY: readItemPortY(NodeHeaderHeight),
+				headerHeight: NodeMinHeight,
+				height: NodeMinHeight,
+				itemPortY: readItemPortY(NodeMinHeight),
 				itemTextBounds,
-				operations,
-				portOffsets,
+				operations: [],
+				portOffsets: new Map([
+					[
+						EditorItemOriginItemInputPortId,
+						{
+							x: -NodeWidth / 2,
+							y: readItemPortY(NodeMinHeight) - NodeMinHeight / 2,
+						},
+					],
+					[
+						EditorItemOriginItemOutputPortId,
+						{
+							x: NodeWidth / 2,
+							y: readItemPortY(NodeMinHeight) - NodeMinHeight / 2,
+						},
+					],
+				]),
 				width: NodeWidth,
 			};
-		}),
+		}
+
+		let top = NodeHeaderHeight;
+		const operations: OperationMetrics[] = [];
+		for (const operation of node.operations) {
+			const height = readOperationHeight(operation);
+			const bodyHeight = readOperationBodyHeight(operation);
+			const bodyTop =
+				top + OperationContentPadding + OperationHeaderHeight + OperationHeaderGap;
+			operations.push({
+				height,
+				id: operation.id,
+				inputPortYs: readPortYs(operation.inputs, bodyTop, bodyHeight),
+				outputPortYs: readPortYs(operation.outputs, bodyTop, bodyHeight),
+				top,
+			});
+			top += height + OperationGap;
+		}
+		const height = Math.max(NodeMinHeight, top - OperationGap + NodeBottomPadding);
+		const portOffsets = new Map<
+			string,
+			{
+				readonly x: number;
+				readonly y: number;
+			}
+		>();
+		portOffsets.set(EditorItemOriginItemInputPortId, {
+			x: -NodeWidth / 2,
+			y: readItemPortY(NodeHeaderHeight) - height / 2,
+		});
+		portOffsets.set(EditorItemOriginItemOutputPortId, {
+			x: NodeWidth / 2,
+			y: readItemPortY(NodeHeaderHeight) - height / 2,
+		});
+		for (const operation of operations) {
+			for (const [portId, y] of operation.inputPortYs) {
+				portOffsets.set(portId, {
+					x: -NodeWidth / 2,
+					y: y - height / 2,
+				});
+			}
+			for (const [portId, y] of operation.outputPortYs) {
+				portOffsets.set(portId, {
+					x: NodeWidth / 2,
+					y: y - height / 2,
+				});
+			}
+		}
+		return {
+			headerHeight: NodeHeaderHeight,
+			height,
+			itemPortY: readItemPortY(NodeHeaderHeight),
+			itemTextBounds,
+			operations,
+			portOffsets,
+			width: NodeWidth,
+		};
+	}),
 );

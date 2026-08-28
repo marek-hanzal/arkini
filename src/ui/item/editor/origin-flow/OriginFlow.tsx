@@ -2,21 +2,12 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import type {
-	OriginFlowDirection,
-	Selection,
-} from "~/ui/item/editor/origin-flow/Highlight";
+import type { OriginFlowDirection, Selection } from "~/ui/item/editor/origin-flow/Highlight";
 import { Canvas } from "~/ui/item/editor/origin-flow/Canvas";
-import type {
-	LayoutNode,
-	LayoutPoint,
-} from "~/ui/item/editor/origin-flow/Layout";
+import type { LayoutNode, LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
 import { useOriginFlow } from "~/ui/item/editor/origin-flow/useOriginFlow";
 
-const EmptyFlowBackbones: ReadonlyMap<
-	string,
-	ReadonlyArray<LayoutPoint>
-> = new Map();
+const EmptyFlowBackbones: ReadonlyMap<string, ReadonlyArray<LayoutPoint>> = new Map();
 const EmptyFlowPositions: ReadonlyMap<string, LayoutNode> = new Map();
 
 interface OriginFlowProps {

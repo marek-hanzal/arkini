@@ -1,10 +1,7 @@
 import { Effect } from "effect";
 
 import type { EditorItemOriginItemNode } from "~/bridge/item/editor/EditorItemOriginFlow";
-import type {
-	Highlight,
-	Selection,
-} from "~/ui/item/editor/origin-flow/Highlight";
+import type { Highlight, Selection } from "~/ui/item/editor/origin-flow/Highlight";
 
 const HighlightMinimumOpacity = 0.28;
 const HighlightOpacityStep = 0.12;
@@ -51,9 +48,7 @@ const readEdgeOpacity = (
 };
 
 /** Creates the visual emphasis policy for Canvas flow nodes and routes. */
-export const createCanvasHighlightFx = Effect.fn(
-	"createCanvasHighlightFx",
-)(() =>
+export const createCanvasHighlightFx = Effect.fn("createCanvasHighlightFx")(() =>
 	Effect.succeed({
 		readEdgeOpacity,
 		readNodeHighlight,

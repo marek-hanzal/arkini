@@ -84,9 +84,7 @@ export namespace createCommitOperationsFx {
 }
 
 /** Applies validated config/item/resource changes as ordered filesystem writes. */
-export const createCommitOperationsFx = Effect.fn(
-	"createCommitOperationsFx",
-)(function* ({
+export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(function* ({
 	operations,
 	readState,
 	states,

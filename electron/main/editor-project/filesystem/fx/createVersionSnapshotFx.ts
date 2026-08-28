@@ -33,9 +33,7 @@ export namespace createVersionSnapshotFx {
 }
 
 /** Writes one deduplicated immutable full snapshot without publishing a version. */
-export const createVersionSnapshotFx = Effect.fn(
-	"createVersionSnapshotFx",
-)(function* ({
+export const createVersionSnapshotFx = Effect.fn("createVersionSnapshotFx")(function* ({
 	arkpack,
 	config,
 	filesystemWrite,

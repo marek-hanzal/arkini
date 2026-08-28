@@ -45,9 +45,7 @@ export namespace createNoteOperationsFx {
 }
 
 /** Stores each portable Editor note as one independent JSON file. */
-export const createNoteOperationsFx = Effect.fn(
-	"createNoteOperationsFx",
-)(function* ({
+export const createNoteOperationsFx = Effect.fn("createNoteOperationsFx")(function* ({
 	filesystemWrite,
 	operations,
 	readState,
@@ -61,10 +59,7 @@ export const createNoteOperationsFx = Effect.fn(
 				...state.notes,
 			]),
 		);
-	const publishNotes = (
-		state: ProjectState,
-		notes: ReadonlyArray<EditorNoteSchema.Type>,
-	) =>
+	const publishNotes = (state: ProjectState, notes: ReadonlyArray<EditorNoteSchema.Type>) =>
 		states.set(state.project.projectId, {
 			...state,
 			notes: [

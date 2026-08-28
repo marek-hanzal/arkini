@@ -11,8 +11,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import { createProjectFilesHarness } from "./ProjectFiles.test/harness";
 
-const openHarnesses: Array<Awaited<ReturnType<typeof createProjectFilesHarness>>> =
-	[];
+const openHarnesses: Array<Awaited<ReturnType<typeof createProjectFilesHarness>>> = [];
 
 afterEach(async () => {
 	await Promise.all(openHarnesses.splice(0).map((harness) => harness.close()));

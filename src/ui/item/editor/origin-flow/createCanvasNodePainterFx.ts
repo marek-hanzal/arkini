@@ -18,10 +18,7 @@ import {
 	type NodeMetrics,
 } from "~/ui/item/editor/origin-flow/readNodeMetricsFx";
 
-const readItemTypeColor = (
-	palette: CanvasPalette,
-	type: EditorItemOriginItemNode["type"],
-) => {
+const readItemTypeColor = (palette: CanvasPalette, type: EditorItemOriginItemNode["type"]) => {
 	switch (type) {
 		case "blueprint":
 		case "producer":
@@ -41,10 +38,7 @@ const readItemTypeColor = (
 	}
 };
 
-const readSourceKindColor = (
-	palette: CanvasPalette,
-	kind: EditorItemOriginOperationKind,
-) => {
+const readSourceKindColor = (palette: CanvasPalette, kind: EditorItemOriginOperationKind) => {
 	switch (kind) {
 		case "line":
 			return palette.accent;
@@ -152,12 +146,8 @@ const drawFlowPort = (
 
 const createDrawItemNode =
 	(
-		FlowTextPainter: Effect.Success<
-			ReturnType<typeof createCanvasTextPainterFx>
-		>,
-		FlowArtworkPainter: Effect.Success<
-			ReturnType<typeof createCanvasArtworkPainterFx>
-		>,
+		FlowTextPainter: Effect.Success<ReturnType<typeof createCanvasTextPainterFx>>,
+		FlowArtworkPainter: Effect.Success<ReturnType<typeof createCanvasArtworkPainterFx>>,
 	) =>
 	(
 		context: CanvasRenderingContext2D,
@@ -292,10 +282,7 @@ const createDrawItemNode =
 
 			const iconSize = 18;
 			const headerX = rowX + OperationContentPadding;
-			const headerCenterY =
-				rowY +
-				OperationContentPadding +
-				OperationHeaderHeight / 2;
+			const headerCenterY = rowY + OperationContentPadding + OperationHeaderHeight / 2;
 			drawSourceIcon(
 				context,
 				operation.kind,
@@ -369,9 +356,7 @@ const createDrawItemNode =
 	};
 
 /** Creates the token-aware Canvas painter for editor origin-flow item nodes. */
-export const createCanvasNodePainterFx = Effect.fn(
-	"createCanvasNodePainterFx",
-)(function* () {
+export const createCanvasNodePainterFx = Effect.fn("createCanvasNodePainterFx")(function* () {
 	const FlowTextPainter = yield* createCanvasTextPainterFx();
 	const FlowArtworkPainter = yield* createCanvasArtworkPainterFx();
 	return {

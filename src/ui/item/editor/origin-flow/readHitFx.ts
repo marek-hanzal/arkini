@@ -5,15 +5,9 @@ import {
 	EditorItemOriginItemOutputPortId,
 	type EditorItemOriginFlow,
 } from "~/bridge/item/editor/EditorItemOriginFlow";
-import type {
-	LayoutNode,
-	LayoutPoint,
-} from "~/ui/item/editor/origin-flow/Layout";
+import type { LayoutNode, LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
 import type { ConnectedPorts } from "~/ui/item/editor/origin-flow/readConnectedPortsFx";
-import type {
-	Highlight,
-	Selection,
-} from "~/ui/item/editor/origin-flow/Highlight";
+import type { Highlight, Selection } from "~/ui/item/editor/origin-flow/Highlight";
 import type { NodeMetrics } from "~/ui/item/editor/origin-flow/readNodeMetricsFx";
 
 export type Hit =
@@ -27,12 +21,7 @@ export type Hit =
 			readonly kind: "item-detail";
 	  };
 
-const distanceToSegment = (
-	x: number,
-	y: number,
-	start: LayoutPoint,
-	end: LayoutPoint,
-) => {
+const distanceToSegment = (x: number, y: number, start: LayoutPoint, end: LayoutPoint) => {
 	const dx = end.x - start.x;
 	const dy = end.y - start.y;
 	if (dx === 0 && dy === 0) return Math.hypot(x - start.x, y - start.y);
@@ -43,11 +32,7 @@ const distanceToSegment = (
 	return Math.hypot(x - (start.x + t * dx), y - (start.y + t * dy));
 };
 
-const distanceToRoute = (
-	x: number,
-	y: number,
-	points: ReadonlyArray<LayoutPoint>,
-) => {
+const distanceToRoute = (x: number, y: number, points: ReadonlyArray<LayoutPoint>) => {
 	let distance = Number.POSITIVE_INFINITY;
 	for (let index = 1; index < points.length; index += 1)
 		distance = Math.min(distance, distanceToSegment(x, y, points[index - 1]!, points[index]!));
@@ -73,10 +58,7 @@ export const readHitFx = Effect.fn("readHitFx")(
 		readonly connectedPorts: ConnectedPorts;
 		readonly flow: EditorItemOriginFlow;
 		readonly highlight: Highlight | undefined;
-		readonly metroBackbones: ReadonlyMap<
-			string,
-			ReadonlyArray<LayoutPoint>
-		>;
+		readonly metroBackbones: ReadonlyMap<string, ReadonlyArray<LayoutPoint>>;
 		readonly nodeMetrics: ReadonlyMap<string, NodeMetrics>;
 		readonly positions: ReadonlyMap<string, LayoutNode>;
 		readonly selection: Selection | undefined;

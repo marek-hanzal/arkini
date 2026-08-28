@@ -6,18 +6,17 @@ export interface PoppedVisit {
 }
 
 /** Pops the current click-driven visit and returns the previous node when one exists. */
-export const popVisitFx = Effect.fn("popVisitFx")(
-	(history: ReadonlyArray<string>) =>
-		Effect.sync((): PoppedVisit => {
-			if (history.length < 2)
-				return {
-					history,
-					nodeId: undefined,
-				};
-			const nextHistory = history.slice(0, -1);
+export const popVisitFx = Effect.fn("popVisitFx")((history: ReadonlyArray<string>) =>
+	Effect.sync((): PoppedVisit => {
+		if (history.length < 2)
 			return {
-				history: nextHistory,
-				nodeId: nextHistory.at(-1),
+				history,
+				nodeId: undefined,
 			};
-		}),
+		const nextHistory = history.slice(0, -1);
+		return {
+			history: nextHistory,
+			nodeId: nextHistory.at(-1),
+		};
+	}),
 );

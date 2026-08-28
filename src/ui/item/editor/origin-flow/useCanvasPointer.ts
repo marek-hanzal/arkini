@@ -2,18 +2,9 @@ import { useRef, type PointerEvent as ReactPointerEvent, type RefObject } from "
 
 import type { EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type {
-	LayoutNode,
-	LayoutPoint,
-} from "~/ui/item/editor/origin-flow/Layout";
-import {
-	createViewportFx,
-	type Viewport,
-} from "~/ui/item/editor/origin-flow/createViewportFx";
-import type {
-	Highlight,
-	Selection,
-} from "~/ui/item/editor/origin-flow/Highlight";
+import type { LayoutNode, LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
+import { createViewportFx, type Viewport } from "~/ui/item/editor/origin-flow/createViewportFx";
+import type { Highlight, Selection } from "~/ui/item/editor/origin-flow/Highlight";
 import type { ConnectedPorts } from "~/ui/item/editor/origin-flow/readConnectedPortsFx";
 import { readHitFx } from "~/ui/item/editor/origin-flow/readHitFx";
 import type { NodeMetrics } from "~/ui/item/editor/origin-flow/readNodeMetricsFx";
@@ -131,9 +122,7 @@ export const useCanvasPointer = ({
 			resetNavigation();
 			let visitHistory = visitHistoryRef.current;
 			if (selection?.kind === "node")
-				visitHistory = RendererRuntime.runSync(
-					pushVisitFx(visitHistory, selection.id),
-				);
+				visitHistory = RendererRuntime.runSync(pushVisitFx(visitHistory, selection.id));
 			visitHistoryRef.current = RendererRuntime.runSync(
 				pushVisitFx(visitHistory, hit.targetNodeId),
 			);
@@ -147,12 +136,8 @@ export const useCanvasPointer = ({
 		if (hit?.kind === "node") {
 			let visitHistory = visitHistoryRef.current;
 			if (selection?.kind === "node")
-				visitHistory = RendererRuntime.runSync(
-					pushVisitFx(visitHistory, selection.id),
-				);
-			visitHistoryRef.current = RendererRuntime.runSync(
-				pushVisitFx(visitHistory, hit.id),
-			);
+				visitHistory = RendererRuntime.runSync(pushVisitFx(visitHistory, selection.id));
+			visitHistoryRef.current = RendererRuntime.runSync(pushVisitFx(visitHistory, hit.id));
 		}
 		if (
 			hit !== undefined &&

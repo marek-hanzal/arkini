@@ -5,8 +5,11 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ChatGptAssetCandidateSchema } from "../../../electron/contract/chatgpt/ChatGptSurfaceSchema";
-import { EditorChatGpt } from "~/ui/chatgpt/editor/EditorChatGpt";
+import { Route as EditorChatGptRouteDefinition } from "~/@routes/editor/$projectId/chatgpt";
 import { installChatGptDom, pngBytes } from "./EditorChatGpt.test/fixture";
+
+const EditorChatGpt = EditorChatGptRouteDefinition.options.component;
+if (EditorChatGpt === undefined) throw new Error("Editor ChatGPT route component is missing.");
 
 const state = vi.hoisted(() => ({
 	assetListeners: new Set<(candidate: ChatGptAssetCandidateSchema.Type) => void>(),

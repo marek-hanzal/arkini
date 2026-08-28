@@ -29,7 +29,6 @@
 		"src/engine",
 		"src/bridge",
 		"src/ui",
-		"src/page",
 		"src/@routes",
 		"src/main.tsx",
 		"src/createArkiniRouterFx.tsx",

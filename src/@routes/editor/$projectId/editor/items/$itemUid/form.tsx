@@ -1,8 +1,8 @@
 import { createFileRoute, Outlet, useParams } from "@tanstack/react-router";
 
 import { EditorItemTypeSchema, type EditorItemType } from "~/bridge/item/editor/EditorItemModel";
-import { EditorItemFormPage } from "~/page/editor/EditorItemFormPage";
-import type { EditorItemSectionId } from "~/page/editor/parseEditorItemSectionIdFx";
+import { EditorItemForm } from "~/ui/item/editor/EditorItemForm";
+import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
 
 type EditorItemOptionalCapability = "charges" | "merges";
 
@@ -30,27 +30,25 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 				}
 			: {}),
 	}),
-	component: EditorItemFormRoute,
+	component: () => {
+		const { itemUid } = Route.useParams();
+		const { enable, itemType, lineId } = Route.useSearch();
+		const params = useParams({
+			strict: false,
+		});
+		const sectionId = (
+			typeof params.sectionId === "string" ? params.sectionId : "identity"
+		) as EditorItemSectionId;
+		return (
+			<EditorItemForm
+				enableCapability={enable}
+				itemType={itemType}
+				productionLineId={lineId}
+				sectionId={sectionId}
+				uid={itemUid}
+			>
+				<Outlet />
+			</EditorItemForm>
+		);
+	},
 });
-
-function EditorItemFormRoute() {
-	const { itemUid } = Route.useParams();
-	const { enable, itemType, lineId } = Route.useSearch();
-	const params = useParams({
-		strict: false,
-	});
-	const sectionId = (
-		typeof params.sectionId === "string" ? params.sectionId : "identity"
-	) as EditorItemSectionId;
-	return (
-		<EditorItemFormPage
-			enableCapability={enable}
-			itemType={itemType}
-			productionLineId={lineId}
-			sectionId={sectionId}
-			uid={itemUid}
-		>
-			<Outlet />
-		</EditorItemFormPage>
-	);
-}

@@ -1,10 +1,10 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { match } from "ts-pattern";
 
+import { GameLeaveDestinationSchema } from "~/@routes/action/-GameLeaveDestinationSchema";
+import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
 import { releaseGameEngineResourceFx } from "~/bridge/game/releaseGameEngineResourceFx";
-import { ActionPendingPage } from "~/page/action/ActionPendingPage";
-import { runActionRouteFx } from "~/page/action/runActionRouteFx";
-import { GameLeaveDestinationSchema } from "~/ui/navigation/GameLeaveDestinationSchema";
+import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
 
 export const Route = createFileRoute("/game/$packageId/action/leave")({
 	validateSearch: GameLeaveDestinationSchema,
@@ -95,5 +95,5 @@ export const Route = createFileRoute("/game/$packageId/action/leave")({
 	},
 	pendingMs: 0,
 	pendingMinMs: 2_500,
-	pendingComponent: () => <ActionPendingPage label="Saving and leaving game…" />,
+	pendingComponent: () => <ActionLoadingScreen label="Saving and leaving game…" />,
 });

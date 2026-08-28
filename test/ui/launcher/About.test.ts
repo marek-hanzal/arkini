@@ -10,7 +10,10 @@ import {
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { AboutPage } from "~/page/launcher/AboutPage";
+import { Route as AboutRouteDefinition } from "~/@routes/_launcher/about";
+
+const AboutScene = AboutRouteDefinition.options.component;
+if (AboutScene === undefined) throw new Error("About route component is missing.");
 
 (
 	globalThis as {
@@ -43,7 +46,7 @@ afterEach(async () => {
 describe("About", () => {
 	it("shares the launcher route and panel identities without a nested Hero snapshot", async () => {
 		const rootRoute = createRootRoute({
-			component: AboutPage,
+			component: AboutScene,
 		});
 		const router = createRouter({
 			routeTree: rootRoute,
@@ -75,7 +78,7 @@ describe("About", () => {
 			"avatar:only",
 		];
 		const rootRoute = createRootRoute({
-			component: AboutPage,
+			component: AboutScene,
 		});
 		const router = createRouter({
 			routeTree: rootRoute,
@@ -118,7 +121,7 @@ describe("About", () => {
 			"avatar:seven",
 		];
 		const rootRoute = createRootRoute({
-			component: AboutPage,
+			component: AboutScene,
 		});
 		const router = createRouter({
 			routeTree: rootRoute,
@@ -158,7 +161,7 @@ describe("About", () => {
 		const aboutRoute = createRoute({
 			getParentRoute: () => rootRoute,
 			path: "/about",
-			component: AboutPage,
+			component: AboutScene,
 		});
 		const mainMenuRoute = createRoute({
 			getParentRoute: () => rootRoute,

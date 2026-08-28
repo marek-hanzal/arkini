@@ -1,11 +1,9 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Effect, Option } from "effect";
 
-import { EditorItemDetailSectionPage } from "~/page/editor/EditorItemDetailSectionPage";
-import {
-	type EditorItemSectionId,
-	parseEditorItemSectionIdFx,
-} from "~/page/editor/parseEditorItemSectionIdFx";
+import { parseEditorItemSectionIdFx } from "~/@routes/editor/$projectId/editor/items/$itemUid/-parseEditorItemSectionIdFx";
+import { EditorItemDetailSectionPage } from "~/ui/item/editor/EditorItemDetailSectionPage";
+import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/detail/$sectionId")({
 	beforeLoad: ({ context, params }) => {
@@ -22,15 +20,13 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 			replace: true,
 		});
 	},
-	component: EditorItemDetailSectionRoute,
+	component: () => {
+		const { itemUid, sectionId } = Route.useParams();
+		return (
+			<EditorItemDetailSectionPage
+				sectionId={sectionId as EditorItemSectionId}
+				uid={itemUid}
+			/>
+		);
+	},
 });
-
-function EditorItemDetailSectionRoute() {
-	const { itemUid, sectionId } = Route.useParams();
-	return (
-		<EditorItemDetailSectionPage
-			sectionId={sectionId as EditorItemSectionId}
-			uid={itemUid}
-		/>
-	);
-}

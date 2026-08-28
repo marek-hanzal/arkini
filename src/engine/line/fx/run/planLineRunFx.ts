@@ -2,16 +2,15 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { TimeSchema } from "~/engine/common/schema/TimeSchema";
-import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
-import type { LineRunPlanResolutionSchema } from "~/engine/line/schema/run/LineRunPlanResolutionSchema";
-import type { LineRunPlanSchema } from "~/engine/line/schema/run/LineRunPlanSchema";
+import type { InputRun } from "~/engine/input/InputRun";
+import type { LineRun } from "~/engine/line/LineRun";
 
 export namespace planLineRunFx {
 	export interface Props {
 		enable: boolean;
-		input: [
-			InputRunResolutionSchema.Type,
-			...InputRunResolutionSchema.Type[],
+		input: readonly [
+			InputRun.Resolution,
+			...InputRun.Resolution[],
 		];
 		lineId: IdSchema.Type;
 		ownerItemId: IdSchema.Type;
@@ -33,7 +32,7 @@ export const planLineRunFx = Effect.fn("planLineRunFx")(function* ({
 		return undefined;
 	}
 
-	const inputPlans: LineRunPlanSchema.Type["input"][number][] = [];
+	const inputPlans: InputRun.Plan[] = [];
 	for (const { plan } of input) {
 		if (plan === undefined) {
 			return undefined;
@@ -47,12 +46,12 @@ export const planLineRunFx = Effect.fn("planLineRunFx")(function* ({
 	const plannedInputs = [
 		firstInputPlan,
 		...remainingInputPlans,
-	] satisfies LineRunPlanSchema.Type["input"];
+	] satisfies LineRun.Plan["input"];
 
 	return {
 		ownerItemId,
 		lineId,
 		runtimeMs,
 		input: plannedInputs,
-	} satisfies LineRunPlanResolutionSchema.Type;
+	} satisfies LineRun.Plan;
 });

@@ -80,7 +80,7 @@ export const Route = createFileRoute("/editor/$projectId")({
 	errorComponent: ({ error }) => (
 		<main
 			className="grid h-dvh place-items-center bg-canvas p-[var(--ak-viewport-padding)] text-foreground"
-			data-ui="EditorProjectErrorRoute"
+			data-ui="EditorProjectErrorPage"
 		>
 			<section className="w-full max-w-xl rounded-2xl border border-danger/40 bg-surface p-6 shadow-2xl">
 				<h1 className="text-2xl font-semibold">Editor project could not be opened</h1>

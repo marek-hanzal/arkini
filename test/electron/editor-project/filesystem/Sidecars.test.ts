@@ -18,7 +18,7 @@ beforeEach(async () => {
 afterEach(async () => harness.close());
 
 describe("filesystem Editor project sidecars", () => {
-	it("caches portable notes and scenarios until Refresh, then drops scenarios on a major commit", async () => {
+	it("caches portable notes and scenarios until Refresh, then preserves scenarios on a major commit", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository);
 		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
@@ -101,8 +101,24 @@ describe("filesystem Editor project sidecars", () => {
 			}),
 		);
 		expect(breaking.version).toBe("2.0");
-		expect(await Effect.runPromise(repository.listBoardScenariosFx(project.projectId))).toEqual(
-			[],
+		expect(
+			await Effect.runPromise(repository.listBoardScenariosFx(project.projectId)),
+		).toHaveLength(1);
+		expect(
+			(
+				await Effect.runPromise(
+					repository.readBoardScenarioFx({
+						projectId: project.projectId,
+						name: "Opening",
+					}),
+				)
+			)?.bytes,
+		).toEqual(Uint8Array.of(9));
+		const persistedScenario = JSON.parse(await readFile(scenarioPath, "utf8")) as {
+			save: string;
+		};
+		expect(Buffer.from(persistedScenario.save, "base64")).toEqual(
+			Buffer.from(Uint8Array.of(9)),
 		);
 		expect(await Effect.runPromise(repository.listNotesFx(project.projectId))).toHaveLength(1);
 	});

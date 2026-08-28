@@ -16,6 +16,13 @@ export namespace lineRuleFx {
 		origin: BoardLocationSchema.Type;
 		rule: RuleSchema.Type;
 	}
+
+	export type Result =
+		| lineRuleShowFx.Result
+		| lineRuleHideFx.Result
+		| resolveActionRuleFx.Result
+		| lineRuleRuntimeAdjustFx.Result
+		| lineRuleRuntimeMultiplierFx.Result;
 }
 
 /**

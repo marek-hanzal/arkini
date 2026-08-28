@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { planLineRunFx } from "~/engine/line/fx/run/planLineRunFx";
-import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
+import type { InputRun } from "~/engine/input/InputRun";
 
 const simpleInput = {
 	resolution: {
@@ -12,7 +12,7 @@ const simpleInput = {
 	plan: {
 		type: "simple",
 	},
-} satisfies InputRunResolutionSchema.Type;
+} satisfies InputRun.Resolution;
 
 const materialInput = {
 	resolution: {
@@ -40,7 +40,7 @@ const materialInput = {
 			},
 		],
 	},
-} satisfies InputRunResolutionSchema.Type;
+} satisfies InputRun.Resolution;
 
 const planFx = ({
 	enable = true,
@@ -48,14 +48,14 @@ const planFx = ({
 		materialInput,
 		simpleInput,
 	] as [
-		InputRunResolutionSchema.Type,
-		...InputRunResolutionSchema.Type[],
+		InputRun.Resolution,
+		...InputRun.Resolution[],
 	],
 }: {
 	enable?: boolean;
 	input?: [
-		InputRunResolutionSchema.Type,
-		...InputRunResolutionSchema.Type[],
+		InputRun.Resolution,
+		...InputRun.Resolution[],
 	];
 } = {}) => {
 	return planLineRunFx({

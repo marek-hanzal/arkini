@@ -11,7 +11,6 @@ import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUna
 import { placeRuntimeItemFx } from "~/engine/placement/fx/placeRuntimeItemFx";
 import { readBoardLocationsFx } from "~/engine/placement/fx/readBoardLocationsFx";
 import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
-import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
@@ -89,7 +88,7 @@ export const releaseInventoryItemFx = Effect.fn("releaseInventoryItemFx")(functi
 						itemId: item.item.id,
 						placement: PlacementSchema.enum.Drop,
 						quantity: item.quantity,
-						reason: PlacementFailureReasonEnumSchema.enum.BoardFull,
+						reason: PlacementUnavailableError.Reason.BoardFull,
 						remainingQuantity: item.quantity,
 					}),
 				);
@@ -112,7 +111,7 @@ export const releaseInventoryItemFx = Effect.fn("releaseInventoryItemFx")(functi
 						itemId: item.item.id,
 						placement: PlacementSchema.enum.Drop,
 						quantity: item.quantity,
-						reason: PlacementFailureReasonEnumSchema.enum.BoardFull,
+						reason: PlacementUnavailableError.Reason.BoardFull,
 						remainingQuantity: item.quantity,
 					}),
 				);

@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+import type { InputRun } from "~/engine/input/InputRun";
 import type { MaterialSchema } from "~/engine/input/schema/MaterialSchema";
-import type { InputMaterialResolutionSchema } from "~/engine/input/schema/resolution/InputMaterialResolutionSchema";
 
 export namespace resolveInputMaterialFx {
 	export interface Props {
@@ -32,5 +32,5 @@ export const resolveInputMaterialFx = Effect.fn("resolveInputMaterialFx")(functi
 		missingQuantity: Math.max(0, required.min - storedQuantity),
 		availableCapacity: Math.max(0, maxStoredQuantity - storedQuantity),
 		ready,
-	} satisfies InputMaterialResolutionSchema.Type;
+	} satisfies InputRun.MaterialResolution;
 });

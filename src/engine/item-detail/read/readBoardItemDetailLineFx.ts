@@ -8,9 +8,9 @@ import { resolveActiveJobStatusFx } from "~/engine/job/fx/resolveActiveJobStatus
 import { resolveStartOutputCapacityFx } from "~/engine/job/fx/read/resolveStartOutputCapacityFx";
 import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
+import type { LineRun } from "~/engine/line/LineRun";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import { TypeSchema } from "~/engine/line/schema/rule/TypeSchema";
-import type { LineRunResolutionSchema } from "~/engine/line/schema/run/LineRunResolutionSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { readBoardRuntimeItemByIdFx } from "~/engine/runtime/read/readBoardRuntimeItemByIdFx";
@@ -27,7 +27,7 @@ export namespace readBoardItemDetailLineFx {
 
 const readLineDisabledCause = (
 	line: LineSchema.Type,
-	resolution: LineRunResolutionSchema.Type,
+	resolution: LineRun.Resolution,
 ): Extract<
 	ItemDetailLines.UnavailableReason,
 	{

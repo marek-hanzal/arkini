@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
+import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import type { DropResultSchema } from "~/engine/output/schema/DropResultSchema";
+import type { dropFx } from "~/engine/output/fx/dropFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
 
@@ -19,7 +19,7 @@ import { planToolbarPlacementFx } from "./planToolbarPlacementFx";
 
 export namespace planDropScopePlacementFx {
 	export interface Props {
-		drop: DropResultSchema.Type;
+		drop: dropFx.Result;
 		excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
 		item: ItemSchema.Type;
 		origin: GridLocationSchema.Type;
@@ -49,7 +49,7 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 							stack: [],
 						},
 						quantity,
-						reason: PlacementFailureReasonEnumSchema.enum.BoardOriginUnavailable,
+						reason: PlacementUnavailableError.Reason.BoardOriginUnavailable,
 					});
 				}
 				const plan = yield* planBoardPlacementFx({
@@ -68,7 +68,7 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 					drop,
 					plan,
 					quantity,
-					reason: PlacementFailureReasonEnumSchema.enum.BoardFull,
+					reason: PlacementUnavailableError.Reason.BoardFull,
 				});
 			});
 		})
@@ -86,7 +86,7 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 					drop,
 					plan,
 					quantity,
-					reason: PlacementFailureReasonEnumSchema.enum.InventoryFull,
+					reason: PlacementUnavailableError.Reason.InventoryFull,
 				});
 			});
 		})
@@ -104,7 +104,7 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 					drop,
 					plan,
 					quantity,
-					reason: PlacementFailureReasonEnumSchema.enum.ToolbarFull,
+					reason: PlacementUnavailableError.Reason.ToolbarFull,
 				});
 			});
 		})

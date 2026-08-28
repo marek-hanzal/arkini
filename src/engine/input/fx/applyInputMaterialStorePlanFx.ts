@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 
-import type { InputMaterialStorePlanSchema } from "~/engine/input/schema/store/InputMaterialStorePlanSchema";
 import type { InputLocationSchema } from "~/engine/location/schema/InputLocationSchema";
 import { createRuntimeItemFx } from "~/engine/runtime/fx/createRuntimeItemFx";
 import { createRuntimeItemIdFx } from "~/engine/runtime/fx/createRuntimeItemIdFx";
@@ -8,11 +7,12 @@ import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { planInputMaterialStoreFx } from "./planInputMaterialStoreFx";
 
 export namespace applyInputMaterialStorePlanFx {
 	export interface Props<Source extends RuntimeItemSchema.Type> {
 		location: InputLocationSchema.Type;
-		plan: InputMaterialStorePlanSchema.Type;
+		plan: planInputMaterialStoreFx.Plan;
 		runtime: RuntimeSchema.Type;
 		source: Source;
 	}

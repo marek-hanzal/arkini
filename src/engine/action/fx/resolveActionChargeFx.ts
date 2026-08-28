@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { InputRun } from "~/engine/input/InputRun";
 import { ChargeSourceSchema } from "~/engine/input/schema/ChargeSourceSchema";
 import type { ChargeSchema } from "~/engine/input/schema/ChargeSchema";
-import type { InputChargeRunPlanSchema } from "~/engine/input/schema/run/InputChargeRunPlanSchema";
 import { readItemRemainingChargesFx } from "~/engine/item/fx/readItemRemainingChargesFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -19,7 +19,7 @@ export namespace resolveActionChargeFx {
 
 	export interface Result {
 		readonly ready: boolean;
-		readonly plan?: InputChargeRunPlanSchema.Type;
+		readonly plan?: InputRun.ChargePlan;
 	}
 }
 

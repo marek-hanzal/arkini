@@ -1,13 +1,13 @@
 import { Effect } from "effect";
 
+import type { lineRulesFx } from "~/engine/line/fx/lineRulesFx";
 import { TypeSchema } from "~/engine/line/schema/rule/TypeSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
-import type { RulesResultSchema } from "~/engine/line/schema/rule/RulesResultSchema";
 
 export namespace resolveLineShowFx {
 	export interface Props {
 		line: Pick<LineSchema.Type, "show">;
-		rules: RulesResultSchema.Type;
+		rules: lineRulesFx.Result;
 	}
 }
 

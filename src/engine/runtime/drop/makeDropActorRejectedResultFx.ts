@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { makeDropRejectedResultFx } from "~/engine/runtime/drop/makeDropRejectedResultFx";
-import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
+import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
 
 export namespace makeDropActorRejectedResultFx {
 	export interface Props {
@@ -25,11 +25,11 @@ export const makeDropActorRejectedResultFx = Effect.fnUntraced(function* ({
 		reason:
 			failure === "stale"
 				? targetFailed
-					? DropItemRejectedReasonEnumSchema.enum.StaleTarget
-					: DropItemRejectedReasonEnumSchema.enum.StaleSource
+					? DropItemRejectedReason.StaleTarget
+					: DropItemRejectedReason.StaleSource
 				: targetFailed
-					? DropItemRejectedReasonEnumSchema.enum.InvalidTarget
-					: DropItemRejectedReasonEnumSchema.enum.InvalidSource,
+					? DropItemRejectedReason.InvalidTarget
+					: DropItemRejectedReason.InvalidSource,
 		sourceItemId,
 		targetItemId,
 	});

@@ -23,19 +23,19 @@ interface ToolResult {
 }
 
 const RevisionSchema = z.number().int().nonnegative().meta({
-	id: "EditorMcpRevisionSchema",
+	id: "RevisionSchema",
 	description: "The exact project revision returned by the preceding read tool.",
 });
 
 const ProjectConfigInputSchema = z.object({}).strict().meta({
-	id: "EditorMcpProjectConfigInputSchema",
+	id: "ProjectConfigInputSchema",
 	$id: "urn:arkini:schema:mcp:project-config-input",
 	title: "Project configuration tool input",
 	description: "The project configuration read tool accepts no arguments.",
 });
 
 const ValidateProjectInputSchema = z.object({}).strict().meta({
-	id: "EditorMcpValidateProjectInputSchema",
+	id: "ValidateProjectInputSchema",
 	$id: "urn:arkini:schema:mcp:validate-project-input",
 	title: "Validate project tool input",
 	description: "The project validation tool accepts no arguments.",
@@ -49,7 +49,7 @@ const RenameItemInputSchema = z
 	})
 	.strict()
 	.meta({
-		id: "EditorMcpRenameItemInputSchema",
+		id: "RenameItemInputSchema",
 		$id: "urn:arkini:schema:mcp:rename-item-input",
 		title: "Rename item tool input",
 		description: "The current and replacement item IDs with an optional revision guard.",
@@ -61,7 +61,7 @@ const ItemDeleteImpactInputSchema = z
 	})
 	.strict()
 	.meta({
-		id: "EditorMcpItemDeleteImpactInputSchema",
+		id: "ItemDeleteImpactInputSchema",
 		$id: "urn:arkini:schema:mcp:item-delete-impact-input",
 		title: "Item delete impact tool input",
 		description: "The item whose deletion impact should be inspected.",
@@ -78,7 +78,7 @@ const DeleteItemInputSchema = z
 	})
 	.strict()
 	.meta({
-		id: "EditorMcpDeleteItemInputSchema",
+		id: "DeleteItemInputSchema",
 		$id: "urn:arkini:schema:mcp:delete-item-input",
 		title: "Delete item tool input",
 		description: "A revision-guarded safe or forced item deletion request.",

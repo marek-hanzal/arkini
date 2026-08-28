@@ -36,14 +36,14 @@ const itemTypes = [
 ] as const;
 
 const ProjectInputSchema = z.object({}).strict().meta({
-	id: "EditorMcpProjectInputSchema",
+	id: "ProjectInputSchema",
 	$id: "urn:arkini:schema:mcp:project-input",
 	title: "Project tool input",
 	description: "The project summary tool accepts no arguments.",
 });
 
 const ItemMetaInputSchema = z.object({}).strict().meta({
-	id: "EditorMcpItemMetaInputSchema",
+	id: "ItemMetaInputSchema",
 	$id: "urn:arkini:schema:mcp:item-meta-input",
 	title: "Item metadata tool input",
 	description: "The item metadata summary tool accepts no arguments.",
@@ -55,7 +55,7 @@ const ItemDetailInputSchema = z
 	})
 	.strict()
 	.meta({
-		id: "EditorMcpItemDetailInputSchema",
+		id: "ItemDetailInputSchema",
 		$id: "urn:arkini:schema:mcp:item-detail-input",
 		title: "Item detail tool input",
 		description: "The identity of the item whose simplified detail is requested.",
@@ -67,7 +67,7 @@ const ItemConfigInputSchema = z
 	})
 	.strict()
 	.meta({
-		id: "EditorMcpItemConfigInputSchema",
+		id: "ItemConfigInputSchema",
 		$id: "urn:arkini:schema:mcp:item-config-input",
 		title: "Item configuration tool input",
 		description: "The identity of the item whose canonical configuration is requested.",
@@ -86,10 +86,7 @@ const itemRelationInputSchema = (role: "input" | "output") =>
 		})
 		.strict()
 		.meta({
-			id:
-				role === "input"
-					? "EditorMcpItemInputRelationInputSchema"
-					: "EditorMcpItemOutputRelationInputSchema",
+			id: role === "input" ? "ItemInputRelationInputSchema" : "ItemOutputRelationInputSchema",
 			$id: `urn:arkini:schema:mcp:item-${role}-input`,
 			title: `Item ${role} relation tool input`,
 			description: `The root item and traversal depth for the item ${role} relation tool.`,
@@ -102,7 +99,7 @@ const ItemEstimateInputSchema = z
 	})
 	.strict()
 	.meta({
-		id: "EditorMcpItemEstimateInputSchema",
+		id: "ItemEstimateInputSchema",
 		$id: "urn:arkini:schema:mcp:item-estimate-input",
 		title: "Item estimate tool input",
 		description: "The target item and quantity for one authored dependency estimate.",

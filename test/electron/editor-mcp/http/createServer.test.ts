@@ -76,7 +76,7 @@ describe("editor MCP server", () => {
 			throw new Error("item_collection schema is missing.");
 		expect(collectionProperties.itemTypes).toMatchObject({
 			items: {
-				$ref: "#/$defs/EditorMcpItemTypeSchema",
+				$ref: "#/$defs/ItemTypeSchema",
 			},
 			type: "array",
 		});
@@ -86,7 +86,7 @@ describe("editor MCP server", () => {
 		const collectionDefinitions = isJsonSchemaRecord(collectionSchema?.$defs)
 			? collectionSchema.$defs
 			: {};
-		expect(collectionDefinitions.EditorMcpItemTypeSchema).toMatchObject({
+		expect(collectionDefinitions.ItemTypeSchema).toMatchObject({
 			enum: TypeSchema.options,
 			type: "string",
 		});

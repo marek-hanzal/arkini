@@ -22,7 +22,7 @@ const StoredDateSchema = z.iso
 	.datetime()
 	.transform((value) => new Date(value))
 	.meta({
-		id: "EditorMcpStoredDateSchema",
+		id: "StoredDateSchema",
 		description: "One persisted MCP OAuth timestamp decoded as a Date.",
 	});
 const StoredAuthorizationCodeSchema = z
@@ -40,7 +40,7 @@ const StoredAuthorizationCodeSchema = z
 	})
 	.strict()
 	.meta({
-		id: "EditorMcpStoredAuthorizationCodeSchema",
+		id: "StoredAuthorizationCodeSchema",
 		description: "One complete persisted MCP OAuth authorization code.",
 	});
 const StoredAccessTokenSchema = z
@@ -55,11 +55,11 @@ const StoredAccessTokenSchema = z
 	})
 	.strict()
 	.meta({
-		id: "EditorMcpStoredAccessTokenSchema",
+		id: "StoredAccessTokenSchema",
 		description: "One complete persisted MCP OAuth access token.",
 	});
 const StoredRefreshTokenSchema = StoredAccessTokenSchema.meta({
-	id: "EditorMcpStoredRefreshTokenSchema",
+	id: "StoredRefreshTokenSchema",
 	description: "One complete persisted MCP OAuth refresh token.",
 });
 

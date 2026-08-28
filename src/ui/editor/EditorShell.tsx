@@ -12,8 +12,8 @@ import {
 } from "react";
 import { flushSync } from "react-dom";
 
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { waitForEditorProjectWritesCommandAtom } from "~/bridge/editor/waitForEditorProjectWritesCommandAtom";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { waitForEditorProjectWritesCommandAtom } from "~/ui/editor/waitForEditorProjectWritesCommandAtom";
 import { Button, ButtonLink } from "~/ui/button/Button";
 import {
 	EditorWorkspaceRoutes,

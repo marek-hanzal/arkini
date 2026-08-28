@@ -1,6 +1,6 @@
 import { Info } from "lucide-react";
 
-import type { EditorRoll } from "~/bridge/item/editor/EditorItemModel";
+import type { RollSchema } from "~/engine/roll/schema/RollSchema";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorNumberControl } from "~/ui/form/EditorValueControls";
@@ -11,7 +11,7 @@ import { useEditorItemOptionLabel } from "~/ui/item/editor/useEditorItemOptionLa
 import { Tooltip } from "~/ui/overlay/Tooltip";
 
 type EditorWeightedRoll = Extract<
-	EditorRoll,
+	RollSchema.Type,
 	{
 		readonly type: "weight";
 	}
@@ -57,7 +57,7 @@ export const EditorWeightedRollControl = ({
 	onChange,
 	roll,
 }: {
-	readonly onChange: (roll: EditorRoll | undefined) => void;
+	readonly onChange: (roll: RollSchema.Type | undefined) => void;
 	readonly roll: EditorWeightedRoll;
 }) => {
 	const readItemLabel = useEditorItemOptionLabel();

@@ -4,10 +4,11 @@ import {
 	type ErrorComponentProps,
 	useRouter,
 } from "@tanstack/react-router";
+import { Effect } from "effect";
 import { z } from "zod";
 
 import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
-import { recoverFailedGameSaveFx } from "~/bridge/game/recoverFailedGameSaveFx";
+import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
 import { ActionErrorPage } from "~/ui/action/ActionErrorPage";
 import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
 
@@ -22,7 +23,15 @@ export const Route = createFileRoute("/action/recover-game-save")({
 	loaderDeps: ({ search }) => search,
 	loader: async ({ context, deps }) => {
 		await context.rendererRuntime.runPromise(
-			runActionRouteFx(recoverFailedGameSaveFx(deps.packageId)),
+			runActionRouteFx(
+				GameEngineResourceFx.pipe(
+					Effect.flatMap((service) =>
+						service.recoverFailedSaveFx({
+							packageId: deps.packageId,
+						}),
+					),
+				),
+			),
 		);
 		throw redirect({
 			to: "/main-menu",

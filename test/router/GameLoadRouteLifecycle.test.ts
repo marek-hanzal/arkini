@@ -4,7 +4,7 @@ import { Effect } from "effect";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { readCurrentGameEngineResourceFx } from "~/bridge/game/readCurrentGameEngineResourceFx";
+import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
 import {
 	createGame,
 	createGameFxMock,
@@ -29,9 +29,11 @@ describe("game load action lifecycle", () => {
 
 		expect(createGameFxMock).toHaveBeenCalledOnce();
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack).toBe(
-			game.arkpack,
-		);
+		expect(
+			rendererRuntime.runSync(
+				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+			)?.game.arkpack,
+		).toBe(game.arkpack);
 	});
 
 	it("repairs a direct Board entry through the same explicit load action", async () => {
@@ -43,9 +45,11 @@ describe("game load action lifecycle", () => {
 
 		expect(createGameFxMock).toHaveBeenCalledOnce();
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack).toBe(
-			game.arkpack,
-		);
+		expect(
+			rendererRuntime.runSync(
+				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+			)?.game.arkpack,
+		).toBe(game.arkpack);
 	});
 
 	it("cancels an unfinished route-owned creation when navigation leaves the load action", async () => {
@@ -70,7 +74,11 @@ describe("game load action lifecycle", () => {
 
 		expect(router.state.location.pathname).toBe("/main-menu");
 		await waitForEffectSettlement(() => expect(interrupted).toHaveBeenCalledOnce());
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
+		expect(
+			rendererRuntime.runSync(
+				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+			),
+		).toBeNull();
 	});
 
 	it("keeps a completed Game provisional and discards it when the load action leaves during its hold", async () => {
@@ -85,7 +93,11 @@ describe("game load action lifecycle", () => {
 		const { rendererRuntime, router } = createHarness(`/action/load-game/${packageId}`);
 		const loading = router.load();
 		await vi.waitFor(() => expect(createGameFxMock).toHaveBeenCalledOnce());
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
+		expect(
+			rendererRuntime.runSync(
+				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+			),
+		).toBeNull();
 
 		await act(async () => {
 			const navigation = router.navigate({
@@ -100,7 +112,11 @@ describe("game load action lifecycle", () => {
 
 		expect(router.state.location.pathname).toBe("/main-menu");
 		await waitForEffectSettlement(() => expect(discard).toHaveBeenCalledOnce());
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
+		expect(
+			rendererRuntime.runSync(
+				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+			),
+		).toBeNull();
 	});
 
 	it("replaces a pending different-package creation without joining or poisoning either resource", async () => {
@@ -134,7 +150,9 @@ describe("game load action lifecycle", () => {
 		expect(createGameFxMock).toHaveBeenCalledTimes(2);
 		expect(router.state.location.pathname).toBe(`/game/${nextPackageId}/board`);
 		expect(
-			rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack.packageId,
+			rendererRuntime.runSync(
+				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+			)?.game.arkpack.packageId,
 		).toBe(nextPackageId);
 	});
 });

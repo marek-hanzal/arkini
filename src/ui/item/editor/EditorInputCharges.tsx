@@ -1,6 +1,6 @@
 import { BatteryMedium, Trash2 } from "lucide-react";
 
-import type { EditorInput } from "~/bridge/item/editor/EditorItemModel";
+import type { InputSchema as LineInputSchema } from "~/engine/input/schema/InputSchema";
 import { Button } from "~/ui/button/Button";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
@@ -11,8 +11,8 @@ export const EditorInputCharges = ({
 	input,
 	onChange,
 }: {
-	readonly input: EditorInput;
-	readonly onChange: (input: EditorInput) => void;
+	readonly input: LineInputSchema.Type;
+	readonly onChange: (input: LineInputSchema.Type) => void;
 }) => {
 	const charges = input.charges;
 	return (

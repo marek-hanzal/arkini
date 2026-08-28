@@ -1,6 +1,5 @@
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { createFileRoute, Outlet, useParams } from "@tanstack/react-router";
-
-import { EditorItemTypeSchema, type EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import { EditorItemForm } from "~/ui/item/editor/EditorItemForm";
 import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
 
@@ -8,7 +7,7 @@ type EditorItemOptionalCapability = "charges" | "merges";
 
 interface EditorItemFormSearch {
 	readonly enable?: EditorItemOptionalCapability;
-	readonly itemType?: EditorItemType;
+	readonly itemType?: TypeSchema.Type;
 	readonly lineId?: string;
 }
 
@@ -22,7 +21,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 		...(search.itemType === undefined
 			? {}
 			: {
-					itemType: EditorItemTypeSchema.parse(search.itemType),
+					itemType: TypeSchema.parse(search.itemType),
 				}),
 		...(typeof search.lineId === "string" && search.lineId.length > 0
 			? {

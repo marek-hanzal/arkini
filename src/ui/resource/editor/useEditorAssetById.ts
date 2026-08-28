@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
 
 /** Reads one exact asset from the current canonical editor project snapshot. */
 export const useEditorAssetById = (resourceId: string) => {

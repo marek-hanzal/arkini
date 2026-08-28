@@ -1,6 +1,5 @@
+import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
 import { match } from "ts-pattern";
-
-import type { EditorWhen } from "~/bridge/item/editor/EditorItemModel";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import {
 	EditorBoardDistanceControl,
@@ -12,8 +11,8 @@ export const EditorWhenControl = ({
 	onChange,
 	value,
 }: {
-	readonly onChange: (when: EditorWhen) => void;
-	readonly value: EditorWhen;
+	readonly onChange: (when: WhenSchema.Type) => void;
+	readonly value: WhenSchema.Type;
 }) => (
 	<div className="grid min-w-0 gap-3">
 		<EditorChoiceControl

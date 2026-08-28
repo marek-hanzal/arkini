@@ -1,8 +1,8 @@
 import { LogIn, LogOut, Pencil } from "lucide-react";
 import type { PropsWithChildren } from "react";
 
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { ButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
 import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";

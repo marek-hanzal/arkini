@@ -1,7 +1,7 @@
 import { GitCompareArrows } from "lucide-react";
 
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
 import type { EditorProjectCompatibility } from "~/editor/version/EditorProjectCompatibility";
 import { bumpArkpackVersionFx } from "~/editor/version/bumpArkpackVersionFx";
 

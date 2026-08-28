@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
-import { removeDraggedCheatItemFx } from "~/bridge/cheat/removeDraggedCheatItemFx";
-import type { GameEngine } from "~/bridge/game/GameEngine";
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import type { GameEngine } from "~/renderer/game/GameEngine";
+import { removeCheatItemFx as removeEngineCheatItemFx } from "~/engine/cheat/write/removeCheatItemFx";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 
 export namespace removeCheatItemFx {
 	export interface Props {
@@ -14,9 +14,15 @@ export namespace removeCheatItemFx {
 /** Removes one already-rebased dragged item through the cheat-authorized engine command. */
 export const removeCheatItemFx = Effect.fn("removeCheatItemFx")(
 	({ game, sourceItem }: removeCheatItemFx.Props) =>
-		removeDraggedCheatItemFx({
-			game,
-			itemId: sourceItem.id,
-			revision: sourceItem.revision,
-		}),
+		game
+			.runFx(
+				removeEngineCheatItemFx({
+					itemId: sourceItem.id,
+					revision: sourceItem.revision,
+				}),
+			)
+			.pipe(
+				Effect.as(true),
+				Effect.catch(() => Effect.succeed(false)),
+			),
 );

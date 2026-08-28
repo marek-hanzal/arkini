@@ -1,10 +1,10 @@
-import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import { EditorItemArtworkTimeline } from "~/ui/item/editor/EditorItemArtworkTimeline";
 
 interface EditorItemArtworkPreviewProps {
-	readonly asset: EditorItem["asset"];
+	readonly asset: ItemSchema.Type["asset"];
 	readonly onSelectProgress: (index: number) => void;
 	readonly selectedProgressIndex: number;
 }

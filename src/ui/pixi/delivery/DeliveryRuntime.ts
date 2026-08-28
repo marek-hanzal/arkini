@@ -1,6 +1,6 @@
 import type { Effect } from "effect";
 
-import type { TileDelivery } from "~/bridge/tile/readTileDeliveriesFx";
+import type { TileDelivery } from "~/ui/pixi/delivery/readTileDeliveriesFx";
 
 export interface DeliverySnapshot {
 	readonly retainedActorIds: ReadonlySet<string>;

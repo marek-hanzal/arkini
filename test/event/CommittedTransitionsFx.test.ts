@@ -1,6 +1,6 @@
 import { Deferred, Effect, Fiber, Stream } from "effect";
 import { describe, expect, it } from "@effect/vitest";
-import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
+import { createTestGameSession } from "~test/support/game/createTestGameSession";
 
 import { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";

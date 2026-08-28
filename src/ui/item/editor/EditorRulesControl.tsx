@@ -1,15 +1,13 @@
-import type {
-	EditorActionRule,
-	EditorDropRule,
-	EditorLineRule,
-} from "~/bridge/item/editor/EditorItemModel";
+import type { RuleSchema as ActionRuleSchema } from "~/engine/action/schema/RuleSchema";
+import type { RuleSchema as LineRuleSchema } from "~/engine/line/schema/rule/RuleSchema";
+import type { RuleSchema as DropRuleSchema } from "~/engine/output/schema/drop/rule/RuleSchema";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorRuleControl, type EditorRuleTarget } from "~/ui/item/editor/EditorRuleControl";
 
-type EditorRule = EditorActionRule | EditorLineRule | EditorDropRule;
-type EditorRuleType = EditorLineRule["type"];
+type EditorRule = ActionRuleSchema.Type | LineRuleSchema.Type | DropRuleSchema.Type;
+type EditorRuleType = LineRuleSchema.Type["type"];
 
 /** Assembles the shared conditional Rule collection used by lines and selected drops. */
 export const EditorRulesControl = ({
@@ -25,7 +23,7 @@ export const EditorRulesControl = ({
 	readonly rules: ReadonlyArray<EditorRule>;
 	readonly target: EditorRuleTarget;
 }) => {
-	const createRule = (type: EditorRuleType): EditorLineRule =>
+	const createRule = (type: EditorRuleType): LineRuleSchema.Type =>
 		({
 			type,
 			when: [
@@ -40,7 +38,7 @@ export const EditorRulesControl = ({
 							adjustMs: 0,
 						}
 					: {}),
-		}) as EditorLineRule;
+		}) as LineRuleSchema.Type;
 	return (
 		<section className="grid gap-3">
 			<EditorFormSectionDivider

@@ -3,11 +3,11 @@ import { AnimatePresence, motion } from "motion/react";
 import { forwardRef } from "react";
 import { match } from "ts-pattern";
 
-import { useEnqueueItemDetailLine } from "~/bridge/item-detail/useEnqueueItemDetailLine";
-import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
-import { useSetDefaultItemDetailLine } from "~/bridge/item-detail/useSetDefaultItemDetailLine";
-import { useUnsetDefaultItemDetailLine } from "~/bridge/item-detail/useUnsetDefaultItemDetailLine";
-import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
+import { useEnqueueItemDetailLine } from "~/ui/item-detail/useEnqueueItemDetailLine";
+import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
+import { useSetDefaultItemDetailLine } from "~/ui/item-detail/useSetDefaultItemDetailLine";
+import { useUnsetDefaultItemDetailLine } from "~/ui/item-detail/useUnsetDefaultItemDetailLine";
+import { useWithdrawItemDetailLine } from "~/ui/item-detail/useWithdrawItemDetailLine";
 import { Button, PrimaryButton } from "~/ui/button/Button";
 import { itemDetailFadeMotion } from "~/ui/item-detail/ItemDetailMotion";
 import { ItemLineInputs, ItemLineUnavailableWithdrawals } from "~/ui/item-detail/ItemLineInputs";

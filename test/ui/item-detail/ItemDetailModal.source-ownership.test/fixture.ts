@@ -63,32 +63,32 @@ vi.mock("~/ui/item-detail/useItemDetailMotion", () => ({
 	}),
 }));
 
-vi.mock("~/bridge/item-detail/useItemDetailIdentity", () => ({
+vi.mock("~/ui/item-detail/useItemDetailIdentity", () => ({
 	useItemDetailIdentity: () => ({
 		definitionId: "item",
 		kind: "available",
 	}),
 }));
 
-vi.mock("~/bridge/item-detail/useItemDetailInfo", () => ({
+vi.mock("~/ui/item-detail/useItemDetailInfo", () => ({
 	useItemDetailInfo: () => ({
 		kind: "unavailable",
 	}),
 }));
 
-vi.mock("~/bridge/item-detail/useItemDetailLines", () => ({
+vi.mock("~/ui/item-detail/useItemDetailLines", () => ({
 	useItemDetailLines: () => ({
 		kind: "unavailable",
 	}),
 }));
 
-vi.mock("~/bridge/item-detail/useItemDetailQueue", () => ({
+vi.mock("~/ui/item-detail/useItemDetailQueue", () => ({
 	useItemDetailQueue: () => ({
 		kind: "unavailable",
 	}),
 }));
 
-vi.mock("~/bridge/item-detail/useItemDetailSources", () => ({
+vi.mock("~/ui/item-detail/useItemDetailSources", () => ({
 	useItemDetailSources: () => ({
 		kind: "available",
 		source: [],
@@ -96,11 +96,11 @@ vi.mock("~/bridge/item-detail/useItemDetailSources", () => ({
 	}),
 }));
 
-vi.mock("~/bridge/item-detail/useItemDetailTabs", () => ({
+vi.mock("~/ui/item-detail/useItemDetailTabs", () => ({
 	useItemDetailTabs: () => state.tabs,
 }));
 
-vi.mock("~/bridge/item-detail/useItemDefinitionDetail", () => ({
+vi.mock("~/ui/item-detail/useItemDefinitionDetail", () => ({
 	useItemDefinitionDetail: () => ({
 		kind: "unavailable",
 	}),

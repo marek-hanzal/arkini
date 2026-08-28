@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { Effect } from "effect";
 import { readMainLayoutFx } from "~/ui/pixi/layout/readMainLayoutFx";
 import { lifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 
 import {
 	flushMicrotasks,

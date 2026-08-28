@@ -1,15 +1,19 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { Effect } from "effect";
 
-import { prepareEditorGameHandoffFx } from "~/bridge/game/prepareEditorGameHandoffFx";
-import { refreshEditorServiceStatusFx } from "~/bridge/editor/refreshEditorServiceStatusFx";
+import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
+import { refreshEditorServiceStatusFx } from "~/ui/editor/refreshEditorServiceStatusFx";
 
 /** Joins installed ownership; active Games still leave through their final-save route. */
 export const Route = createFileRoute("/editor")({
 	beforeLoad: async ({ abortController, context, location, preload }) => {
 		if (preload) return;
-		const resource = await context.rendererRuntime.runPromise(prepareEditorGameHandoffFx, {
-			signal: abortController.signal,
-		});
+		const resource = await context.rendererRuntime.runPromise(
+			GameEngineResourceFx.pipe(Effect.flatMap((service) => service.prepareEditorHandoffFx)),
+			{
+				signal: abortController.signal,
+			},
+		);
 		if (resource !== null) {
 			throw redirect({
 				to: "/game/$packageId/action/leave",

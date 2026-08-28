@@ -1,4 +1,4 @@
-import type { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import type { RendererRuntime } from "~/renderer/RendererRuntime";
 
 /** Shared router context assembled at the renderer root. */
 export interface RootContext {

@@ -5,16 +5,16 @@ import { match } from "ts-pattern";
 import {
 	configureEditorMcpFx,
 	type EditorMcpConfiguration,
-} from "~/bridge/editor-mcp/configureEditorMcpFx";
+} from "~/ui/editor-mcp/configureEditorMcpFx";
 import {
 	executeEditorMcpCommandFx,
 	type EditorMcpCommand,
-} from "~/bridge/editor-mcp/executeEditorMcpCommandFx";
+} from "~/ui/editor-mcp/executeEditorMcpCommandFx";
 import {
 	type EditorMcpOverview,
 	readEditorMcpOverviewFx,
-} from "~/bridge/editor-mcp/readEditorMcpOverviewFx";
-import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
+} from "~/ui/editor-mcp/readEditorMcpOverviewFx";
+import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
 
 export namespace EditorMcpCommandAtom {
 	export type Action = EditorMcpCommand | "configure" | "read";
@@ -109,7 +109,7 @@ const RunnerAtom = Atom.fn(
 				return;
 			}
 			if (Cause.hasInterruptsOnly(result.cause)) return yield* Effect.failCause(result.cause);
-			const exact = yield* readExactCauseFailureFx(result.cause);
+			const exact = readExactCauseFailureFn(result.cause);
 			const failure = Option.isSome(exact) ? exact.value : result.cause;
 			const current = yield* Atom.get(StateAtom);
 			yield* Atom.set(StateAtom, {

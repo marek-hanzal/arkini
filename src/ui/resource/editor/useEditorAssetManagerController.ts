@@ -4,8 +4,8 @@ import { BadgeCheck, Images, SearchX, type LucideIcon } from "lucide-react";
 import { type ChangeEventHandler, type RefObject, useCallback, useMemo, useRef } from "react";
 import { match, P } from "ts-pattern";
 
-import { importEditorAssetsCommandAtom } from "~/bridge/resource/editor/importEditorAssetsCommandAtom";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { importEditorAssetsCommandAtom } from "~/ui/resource/editor/importEditorAssetsCommandAtom";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorAssetLibrary } from "~/ui/resource/editor/useEditorAssetLibrary";
 

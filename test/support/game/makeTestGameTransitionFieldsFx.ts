@@ -1,8 +1,8 @@
 import { Effect, SubscriptionRef } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { GameSession } from "~/bridge/game/GameSession";
-import { GameSessionFatalError } from "~/bridge/game/GameSessionFatalError";
+import type { GameSession } from "~/renderer/game/session/GameSession";
+import { GameSessionFatalError } from "~/renderer/game/session/GameSessionFatalError";
 import type { CommittedTransitionSchema } from "~/engine/runtime/schema/CommittedTransitionSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 

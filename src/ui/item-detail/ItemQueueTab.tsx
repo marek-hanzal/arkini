@@ -1,9 +1,9 @@
 import { CircleOff, ListX } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
-import { useClearItemDetailQueue } from "~/bridge/item-detail/useClearItemDetailQueue";
-import type { useItemDetailQueue } from "~/bridge/item-detail/useItemDetailQueue";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { useClearItemDetailQueue } from "~/ui/item-detail/useClearItemDetailQueue";
+import type { useItemDetailQueue } from "~/ui/item-detail/useItemDetailQueue";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { LinkButton } from "~/ui/button/LinkButton";
 import { ItemIdentity } from "~/ui/item/ItemIdentity";
 import {

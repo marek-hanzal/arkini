@@ -1,27 +1,25 @@
-import type {
-	EditorDrop,
-	EditorDropRule,
-	EditorLineRule,
-	EditorOutput,
-	EditorQuery,
-	EditorQuantity,
-	EditorRoll,
-	EditorWhen,
-} from "~/bridge/item/editor/EditorItemModel";
+import type { RuleSchema as LineRuleSchema } from "~/engine/line/schema/rule/RuleSchema";
+import type { DropSchema } from "~/engine/output/schema/DropSchema";
+import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import type { RuleSchema as DropRuleSchema } from "~/engine/output/schema/drop/rule/RuleSchema";
+import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
+import type { QuerySchema } from "~/engine/query/schema/QuerySchema";
+import type { RollSchema } from "~/engine/roll/schema/RollSchema";
+import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
 import { DetailFact, DetailFacts, EmptyDetail } from "~/ui/item/editor/EditorItemDetailDefinition";
 import { EditorSelectorDetail } from "~/ui/item/editor/EditorSelectorDetail";
 
-const formatQuantity = (quantity: EditorQuantity) =>
+const formatQuantity = (quantity: QuantitySchema.Type) =>
 	quantity.min === quantity.max ? String(quantity.min) : `${quantity.min}–${quantity.max}`;
 
-const QueryDetail = ({ query }: { readonly query: EditorQuery }) => (
+const QueryDetail = ({ query }: { readonly query: QuerySchema.Type }) => (
 	<span>
 		<EditorSelectorDetail selector={query.selector} /> in {query.scope}
 		{"distance" in query ? ` · ${query.distance} distance` : ""}
 	</span>
 );
 
-const WhenDetail = ({ when }: { readonly when: EditorWhen }) => (
+const WhenDetail = ({ when }: { readonly when: WhenSchema.Type }) => (
 	<li>
 		<span className="font-medium capitalize">{when.type}</span>
 		{when.type === "count" ? ` ${when.count}` : ""}
@@ -30,7 +28,7 @@ const WhenDetail = ({ when }: { readonly when: EditorWhen }) => (
 	</li>
 );
 
-const RuleDetail = ({ rule }: { readonly rule: EditorDropRule | EditorLineRule }) => (
+const RuleDetail = ({ rule }: { readonly rule: DropRuleSchema.Type | LineRuleSchema.Type }) => (
 	<li className="py-3 first:pt-0 last:pb-0">
 		<p className="font-medium capitalize">
 			{rule.type}
@@ -56,7 +54,7 @@ const RuleDetail = ({ rule }: { readonly rule: EditorDropRule | EditorLineRule }
 const RulesDetail = ({
 	rules,
 }: {
-	readonly rules: ReadonlyArray<EditorDropRule | EditorLineRule>;
+	readonly rules: ReadonlyArray<DropRuleSchema.Type | LineRuleSchema.Type>;
 }) =>
 	rules.length === 0 ? (
 		<EmptyDetail>No rules.</EmptyDetail>
@@ -71,7 +69,7 @@ const RulesDetail = ({
 		</ul>
 	);
 
-const DropDetail = ({ drop }: { readonly drop: EditorDrop }) => (
+const DropDetail = ({ drop }: { readonly drop: DropSchema.Type }) => (
 	<li className="py-3 first:pt-0 last:pb-0">
 		<DetailFacts>
 			<DetailFact
@@ -97,7 +95,7 @@ const DropDetail = ({ drop }: { readonly drop: EditorDrop }) => (
 	</li>
 );
 
-const RollDetail = ({ roll }: { readonly roll: EditorRoll }) => {
+const RollDetail = ({ roll }: { readonly roll: RollSchema.Type }) => {
 	if (roll.type === "weight")
 		return (
 			<li className="grid gap-3 py-3 first:pt-0 last:pb-0">
@@ -143,7 +141,7 @@ const RollDetail = ({ roll }: { readonly roll: EditorRoll }) => {
 };
 
 /** Presents authored output sets, rolls, drops, and conditional rules. */
-export const OutputDetail = ({ output }: { readonly output?: EditorOutput }) =>
+export const OutputDetail = ({ output }: { readonly output?: OutputSchema.Type }) =>
 	output === undefined ? (
 		<EmptyDetail>No output.</EmptyDetail>
 	) : (

@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { DropItemResultKind } from "~/bridge/tile/DropItemResultKind";
-import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
+import type { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
 
 export namespace readActorCursorFx {
 	export interface Props {

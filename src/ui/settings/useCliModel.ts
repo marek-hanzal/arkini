@@ -1,7 +1,7 @@
 import { useAtom } from "@effect/atom-react";
 import { useEffect } from "react";
 
-import type { InstallationStatus } from "~/bridge/cli/Installation";
+import type { InstallationStatus } from "../../../electron/contract/cli/InstallationStatus";
 import { CliCommandAtom } from "~/ui/settings/CliCommandAtom";
 import { useCliCompletionModel } from "~/ui/settings/useCliCompletionModel";
 

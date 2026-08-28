@@ -2,11 +2,11 @@ import { useAtomValue } from "@effect/atom-react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useSyncExternalStore } from "react";
 
-import type { EditorBoardGame } from "~/bridge/editor/board/EditorBoardGame";
-import { EditorBoardGameAtom } from "~/bridge/editor/board/EditorBoardGameAtom";
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
-import { GameEngineProvider } from "~/bridge/game/GameEngineProvider";
+import type { EditorBoardGame } from "~/renderer/editor/board/EditorBoardGame";
+import { EditorBoardGameAtom } from "~/ui/board/editor/EditorBoardGameAtom";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
+import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
+import { GameEngineProvider } from "~/ui/game/GameEngineProvider";
 import { PlayableGameRoute } from "~/ui/game/PlayableGameRoute";
 import { EditorBoardItemDetailLink } from "~/ui/board/editor/EditorBoardItemDetailLink";
 import { EditorBoardProductionLineLink } from "~/ui/board/editor/EditorBoardProductionLineLink";

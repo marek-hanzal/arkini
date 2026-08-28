@@ -7,24 +7,24 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ArkiniDefaultPackageId } from "../../../shared/ArkiniAppMetadata";
-import { ArkpackCatalogAtom } from "~/bridge/arkpack/ArkpackCatalogAtom";
-import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
-import { createArkpackCatalogFx } from "~/bridge/arkpack/createArkpackCatalogFx";
-import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLifecycleFx";
-import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycleOwnerAtom";
+import { ArkpackCatalogAtom } from "~/ui/arkpack/ArkpackCatalogAtom";
+import { ArkpackCatalogOwnerAtom } from "~/renderer/arkpack/ArkpackCatalogOwnerAtom";
+import { createArkpackCatalogFx } from "~/renderer/arkpack/createArkpackCatalogFx";
+import { createRendererLifecycleFx } from "~/renderer/lifecycle/createRendererLifecycleFx";
+import { RendererLifecycleOwnerAtom } from "~/renderer/lifecycle/RendererLifecycleOwnerAtom";
 import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";
 import { LauncherStartupConfigAtom } from "~/ui/launcher/LauncherStartupConfigAtom";
 
-vi.mock("~/bridge/appearance/readAppearanceAccentFx", () => ({
+vi.mock("~/ui/appearance/readAppearanceAccentFx", () => ({
 	readAppearanceAccentFx: () => Effect.succeed("rose"),
 }));
-vi.mock("~/bridge/appearance/readAppearanceThemeFx", () => ({
+vi.mock("~/ui/appearance/readAppearanceThemeFx", () => ({
 	readAppearanceThemeFx: () => Effect.succeed("dark"),
 }));
-vi.mock("~/bridge/cheat/readCheatAvailabilityFx", () => ({
+vi.mock("~/ui/cheat-availability/readCheatAvailabilityFx", () => ({
 	readCheatAvailabilityFx: () => Effect.succeed(false),
 }));
-vi.mock("~/bridge/window/readWindowModeFx", () => ({
+vi.mock("~/renderer/window/readWindowModeFx", () => ({
 	readWindowModeFx: () => Effect.succeed("bordered"),
 }));
 vi.mock("~/ui/launcher/LauncherHeroAtom", () => ({

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
-import { applyCheatAvailabilityFx } from "~/bridge/cheat/applyCheatAvailabilityFx";
+import { applyCheatAvailabilityFx } from "~/ui/cheat-availability/applyCheatAvailabilityFx";
 import { LauncherCheatAvailabilityReadyAtom } from "~/ui/launcher/LauncherCheatAvailabilityReadyAtom";
 
 /** Publishes persisted cheat availability once and completes its Effect readiness gate. */

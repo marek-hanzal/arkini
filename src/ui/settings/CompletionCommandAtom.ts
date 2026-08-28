@@ -1,9 +1,6 @@
 import { Effect } from "effect";
 
-import { installCompletionFx } from "~/bridge/cli/installCompletionFx";
-import { readCompletionStatusFx, type CompletionStatus } from "~/bridge/cli/readCompletionStatusFx";
-import { replaceCompletionFx } from "~/bridge/cli/replaceCompletionFx";
-import { uninstallCompletionFx } from "~/bridge/cli/uninstallCompletionFx";
+import type { CompletionStatus } from "../../../electron/contract/cli/CompletionStatus";
 import {
 	createCliCommandAtomFx,
 	type CliCommand,
@@ -18,9 +15,25 @@ export namespace CompletionCommandAtom {
 /** Owns the Settings command sequence for the current shell completion file. */
 export const CompletionCommandAtom = Effect.runSync(
 	createCliCommandAtomFx({
-		readFx: readCompletionStatusFx,
-		installFx: installCompletionFx,
-		replaceFx: replaceCompletionFx,
-		uninstallFx: uninstallCompletionFx,
+		readFx: () =>
+			Effect.tryPromise({
+				try: (): Promise<CompletionStatus> => window.arkini.cli.completion.status(),
+				catch: (cause) => cause,
+			}),
+		installFx: () =>
+			Effect.tryPromise({
+				try: (): Promise<CompletionStatus> => window.arkini.cli.completion.install(),
+				catch: (cause) => cause,
+			}),
+		replaceFx: () =>
+			Effect.tryPromise({
+				try: (): Promise<CompletionStatus> => window.arkini.cli.completion.replace(),
+				catch: (cause) => cause,
+			}),
+		uninstallFx: () =>
+			Effect.tryPromise({
+				try: (): Promise<CompletionStatus> => window.arkini.cli.completion.uninstall(),
+				catch: (cause) => cause,
+			}),
 	}),
 );

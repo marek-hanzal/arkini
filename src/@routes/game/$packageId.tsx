@@ -1,8 +1,8 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { Effect } from "effect";
 
-import { claimGameEngineResourceForCloseFx } from "~/bridge/game/claimGameEngineResourceForCloseFx";
-import { GameEngineProvider } from "~/bridge/game/GameEngineProvider";
-import { readCurrentGameEngineResourceFx } from "~/bridge/game/readCurrentGameEngineResourceFx";
+import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
+import { GameEngineProvider } from "~/ui/game/GameEngineProvider";
 import { GameCriticalFailureBoundary } from "~/ui/game/GameCriticalFailureBoundary";
 
 /**
@@ -15,9 +15,11 @@ export const Route = createFileRoute("/game/$packageId")({
 	beforeLoad: ({ context, location, params }) => {
 		const controlledClose = location.pathname.endsWith("/action/exit");
 		const resource = context.rendererRuntime.runSync(
-			controlledClose
-				? claimGameEngineResourceForCloseFx()
-				: readCurrentGameEngineResourceFx(),
+			GameEngineResourceFx.pipe(
+				Effect.flatMap((service) =>
+					controlledClose ? service.claimForCloseFx : service.currentFx,
+				),
+			),
 		);
 		if (resource === null || resource.game.arkpack.packageId !== params.packageId) {
 			throw redirect({

@@ -1,6 +1,6 @@
 import { Order } from "effect";
 
-import type { EditorItemOriginEdge } from "~/bridge/item/editor/EditorItemOriginFlow";
+import type { EditorItemOriginEdge } from "~/editor/origin-flow/EditorItemOriginFlow";
 
 /** Input follows downstream consumers; Output follows upstream producers. */
 export type OriginFlowDirection = "input" | "output";

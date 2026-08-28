@@ -1,8 +1,7 @@
 import { Effect } from "effect";
 
-import type { GameTransition } from "~/bridge/game/GameSession";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { readSpaceActionPresentationPhasesFx } from "~/bridge/space/readSpaceActionPresentationPhasesFx";
+import type { GameTransition } from "~/renderer/game/session/GameSession";
+import { readSpaceActionPresentationPhasesFn } from "~/ui/pixi/scene/fn/readSpaceActionPresentationPhasesFn";
 
 export namespace createSpaceActionPresenterFx {
 	export type Delivery = "hydrate" | "present";
@@ -54,9 +53,7 @@ export const createSpaceActionPresenterFx = Effect.fn("createSpaceActionPresente
 					return;
 				}
 
-				const phases = RendererRuntime.runSync(
-					readSpaceActionPresentationPhasesFx(transition),
-				);
+				const phases = readSpaceActionPresentationPhasesFn(transition);
 				const accounting = phases[0];
 				const spaceSwitch = phases[1];
 				if (accounting?.kind !== "accounting" || spaceSwitch?.kind !== "space-switch") {

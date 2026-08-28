@@ -1,17 +1,15 @@
-import type {
-	EditorInput,
-	EditorItem,
-	EditorQuantity,
-	EditorSelector,
-} from "~/bridge/item/editor/EditorItemModel";
+import type { InputSchema as LineInputSchema } from "~/engine/input/schema/InputSchema";
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
+import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
 import { EditorItemDetailReference } from "~/ui/item/editor/EditorItemDetailReference";
 
-type EditorItemRegistry = Record<string, EditorItem>;
+type EditorItemRegistry = Record<string, ItemSchema.Type>;
 
-const formatQuantity = (quantity: EditorQuantity) =>
+const formatQuantity = (quantity: QuantitySchema.Type) =>
 	quantity.min === quantity.max ? String(quantity.min) : quantity.min + "–" + quantity.max;
 
-const formatChargeCost = (input: EditorInput) => {
+const formatChargeCost = (input: LineInputSchema.Type) => {
 	if (input.charges === undefined) return "";
 	return (
 		" · " +
@@ -30,7 +28,7 @@ const EditorLineInputReference = ({
 }: {
 	readonly items: EditorItemRegistry;
 	readonly projectId: string;
-	readonly selector: EditorSelector;
+	readonly selector: SelectorSchema.Type;
 }) => {
 	const item = items[selector.itemId];
 	return item === undefined ? (
@@ -48,7 +46,7 @@ const EditorLineInput = ({
 	items,
 	projectId,
 }: {
-	readonly input: EditorInput;
+	readonly input: LineInputSchema.Type;
 	readonly items: EditorItemRegistry;
 	readonly projectId: string;
 }) => {
@@ -100,7 +98,7 @@ export const EditorProductionLineInputs = ({
 	title = "Inputs",
 }: {
 	readonly emptyLabel?: string;
-	readonly input: readonly EditorInput[];
+	readonly input: readonly LineInputSchema.Type[];
 	readonly items: EditorItemRegistry;
 	readonly projectId: string;
 	readonly title?: string;

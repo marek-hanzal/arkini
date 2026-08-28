@@ -56,11 +56,11 @@ interface TestStartGridCell {
 	readonly y: number;
 }
 
-vi.mock("~/bridge/editor/useEditorProject", () => ({
+vi.mock("~/ui/editor/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
-vi.mock("~/bridge/project/editor/saveEditorProjectConfigCommandAtom", () => ({
+vi.mock("~/ui/project/editor/saveEditorProjectConfigCommandAtom", () => ({
 	saveEditorProjectConfigCommandAtom: () => ({
 		id: "save-editor-project",
 	}),
@@ -108,7 +108,7 @@ vi.mock("~/ui/project/editor/EditorProjectStartGrid", () => ({
 		),
 }));
 
-import type { EditorProject } from "~/bridge/editor/EditorProject";
+import type { EditorProject } from "~/editor/EditorProject";
 import { Route as EditorProjectFormRouteDefinition } from "~/@routes/editor/$projectId/project";
 import { EditorProjectBoardSection } from "~/ui/project/editor/EditorProjectBoardSection";
 import { EditorProjectGeneralSection } from "~/ui/project/editor/EditorProjectGeneralSection";

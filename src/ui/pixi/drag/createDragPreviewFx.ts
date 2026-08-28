@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 
-import type { GameEngine } from "~/bridge/game/GameEngine";
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { isSameTileActorLocationFx } from "~/bridge/tile/isSameTileActorLocationFx";
-import { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
+import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import { isSameTileActorLocationFn } from "~/ui/pixi/actor/fn/isSameTileActorLocationFn";
+import { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import { readActorCursorFx } from "~/ui/pixi/actor/readActorCursorFx";
 import type { DragPreview } from "~/ui/pixi/drag/DragPreview";
@@ -36,7 +36,7 @@ export const createDragPreviewFx = Effect.fn("createDragPreviewFx")(function* ({
 		const canonical = actorStore.canonicalItems.get(drag.sourceItem.id);
 		if (
 			canonical === undefined ||
-			!(yield* isSameTileActorLocationFx(canonical.location, drag.sourceItem.location))
+			!isSameTileActorLocationFn(canonical.location, drag.sourceItem.location)
 		) {
 			return null;
 		}
@@ -86,10 +86,10 @@ export const createDragPreviewFx = Effect.fn("createDragPreviewFx")(function* ({
 				cached !== undefined &&
 				cached.source.id === sourceItem.id &&
 				cached.source.revision === sourceItem.revision &&
-				(yield* isSameTileActorLocationFx(cached.source.location, sourceItem.location)) &&
+				isSameTileActorLocationFn(cached.source.location, sourceItem.location) &&
 				cached.target.id === targetItem.id &&
 				cached.target.revision === targetItem.revision &&
-				(yield* isSameTileActorLocationFx(cached.target.location, targetItem.location))
+				isSameTileActorLocationFn(cached.target.location, targetItem.location)
 			) {
 				if (cached.eligible) eligibleActorIds.add(actorId);
 				continue;
@@ -97,10 +97,7 @@ export const createDragPreviewFx = Effect.fn("createDragPreviewFx")(function* ({
 			const previewKind =
 				targetFacts.occupant?.id === targetItem.id &&
 				targetFacts.occupant.revision === targetItem.revision &&
-				(yield* isSameTileActorLocationFx(
-					targetFacts.occupant.location,
-					targetItem.location,
-				))
+				isSameTileActorLocationFn(targetFacts.occupant.location, targetItem.location)
 					? drag.previewKind
 					: (yield* readTileDropPreviewFx({
 							game,
@@ -159,7 +156,7 @@ export const createDragPreviewFx = Effect.fn("createDragPreviewFx")(function* ({
 			drag.previewSource !== null &&
 			drag.previewSource.id === sourceItem.id &&
 			drag.previewSource.revision === sourceItem.revision &&
-			(yield* isSameTileActorLocationFx(drag.previewSource.location, sourceItem.location))
+			isSameTileActorLocationFn(drag.previewSource.location, sourceItem.location)
 		) {
 			return sourceItem;
 		}

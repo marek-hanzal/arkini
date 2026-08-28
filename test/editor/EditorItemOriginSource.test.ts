@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 
 import type { EditorItemOriginSource } from "~/editor/EditorItemOriginSource";
 import { createEditorAcquisitionGraphFx } from "~/editor/createEditorAcquisitionGraphFx";
-import { readEditorItemOriginRelationSubgraphFx } from "~/editor/readEditorItemOriginRelationSubgraphFx";
-import { readEditorItemOriginRelationsFx } from "~/editor/readEditorItemOriginRelationsFx";
+import { readEditorItemOriginRelationSubgraphFn } from "~/editor/origin-flow/fn/readEditorItemOriginRelationSubgraphFn";
+import { readEditorItemOriginRelationsFn } from "~/editor/origin-flow/fn/readEditorItemOriginRelationsFn";
 import { readEditorItemOriginSourcesFx } from "~/editor/readEditorItemOriginSourcesFx";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
@@ -20,12 +20,12 @@ const readEditorItemOriginSources = (
 	);
 
 const readEditorItemOriginRelations = (
-	source: Parameters<typeof readEditorItemOriginRelationsFx>[0],
-) => Effect.runSync(readEditorItemOriginRelationsFx(source));
+	source: Parameters<typeof readEditorItemOriginRelationsFn>[0],
+) => readEditorItemOriginRelationsFn(source);
 
 const readEditorItemOriginRelationSubgraph = (
-	props: Parameters<typeof readEditorItemOriginRelationSubgraphFx>[0],
-) => Effect.runSync(readEditorItemOriginRelationSubgraphFx(props));
+	props: Parameters<typeof readEditorItemOriginRelationSubgraphFn>[0],
+) => readEditorItemOriginRelationSubgraphFn(props);
 
 const dropOf = (itemId: string): DropSchema.Type => ({
 	itemId,

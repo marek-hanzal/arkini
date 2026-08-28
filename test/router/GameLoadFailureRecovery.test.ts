@@ -4,8 +4,8 @@ import { Effect } from "effect";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
-import { readCurrentGameEngineResourceFx } from "~/bridge/game/readCurrentGameEngineResourceFx";
+import { GameSaveBootstrapError } from "~/renderer/game/GameSaveBootstrapError";
+import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
 import {
 	clearSaveMock,
 	clickControl,
@@ -43,7 +43,11 @@ describe("game load failure recovery", () => {
 		await clickControl(container, "Exit to Main Menu");
 
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
+		expect(
+			rendererRuntime.runSync(
+				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+			),
+		).toBeNull();
 		expect(clearSaveMock).not.toHaveBeenCalled();
 		await act(async () => {
 			router.history.back();
@@ -83,7 +87,11 @@ describe("game load failure recovery", () => {
 
 		await vi.waitFor(() => expect(clearSaveMock).toHaveBeenCalledOnce());
 		expect(clearSaveMock).toHaveBeenCalledWith(saveKey);
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
+		expect(
+			rendererRuntime.runSync(
+				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+			),
+		).toBeNull();
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
 		expect(createGameFxMock).toHaveBeenCalledTimes(createCallsBeforeCleanup);
 		await act(async () => {
@@ -109,9 +117,11 @@ describe("game load failure recovery", () => {
 		});
 
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack).toBe(
-			game.arkpack,
-		);
+		expect(
+			rendererRuntime.runSync(
+				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+			)?.game.arkpack,
+		).toBe(game.arkpack);
 		expect(createGameFxMock).toHaveBeenCalledTimes(createCallsBeforeCleanup + 1);
 	});
 
@@ -140,7 +150,11 @@ describe("game load failure recovery", () => {
 			expect(container.textContent).toContain("Save recovery failed");
 			expect(container.textContent).toContain("Retry cleanup");
 		});
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
+		expect(
+			rendererRuntime.runSync(
+				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+			),
+		).toBeNull();
 		expect(createGameFxMock).toHaveBeenCalledTimes(createCallsBeforeCleanup);
 	});
 

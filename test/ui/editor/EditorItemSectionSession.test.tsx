@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { act, createElement, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -51,7 +52,7 @@ vi.mock("~/ui/editor/useEditorUnsavedChangesRegistration", () => ({
 	},
 }));
 
-vi.mock("~/bridge/editor/useEditorProject", () => ({
+vi.mock("~/ui/editor/useEditorProject", () => ({
 	useEditorProject: () => ({
 		projectId: "editor-test",
 		revision: "revision-1",
@@ -64,13 +65,13 @@ vi.mock("~/bridge/editor/useEditorProject", () => ({
 	}),
 }));
 
-vi.mock("~/bridge/item/editor/saveEditorItemCommandAtom", () => ({
+vi.mock("~/ui/item/editor/saveEditorItemCommandAtom", () => ({
 	saveEditorItemCommandAtom: () => ({
 		id: "save-editor-item",
 	}),
 }));
 
-vi.mock("~/bridge/item/editor/useEditorItemDraft", () => ({
+vi.mock("~/ui/item/editor/useEditorItemDraft", () => ({
 	useEditorItemDraft: () => state.draft,
 }));
 
@@ -87,8 +88,6 @@ vi.mock("~/ui/item/editor/EditorItemAutocompleteField", () => ({
 	EditorItemAutocompleteField: ({ label }: { readonly label: string }) =>
 		createElement("span", null, label),
 }));
-
-import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import { EditorItemForm } from "~/ui/item/editor/EditorItemForm";
 import { EditorItemIdentitySection } from "~/ui/item/editor/EditorItemIdentitySection";
 import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
@@ -100,7 +99,7 @@ import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
-const item: EditorItem = {
+const item: ItemSchema.Type = {
 	uid: "q12cmsx5ussy30wyjiea8yaw",
 	id: "item:water",
 	type: "simple",

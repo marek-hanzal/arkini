@@ -1,6 +1,6 @@
 import { beforeEach, vi } from "vitest";
 
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 
@@ -29,7 +29,7 @@ import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 
 import { createDropPresentationFx } from "~/ui/pixi/drop/createDropPresentationFx";
 
-import type { GameEngine } from "~/bridge/game/GameEngine";
+import type { GameEngine } from "~/renderer/game/GameEngine";
 
 import { createMainReconcilerFx } from "~/ui/pixi/scene/createMainReconcilerFx";
 
@@ -49,12 +49,9 @@ const projectionState = vi.hoisted(() => ({
 
 export const projectionProbeState = projectionState;
 
-vi.mock("~/bridge/tile/feedback/readTileActorFeedbackCuesFx", async () => {
-	const { Effect: EffectModule } = await import("effect");
-	return {
-		readTileActorFeedbackCuesFx: () => EffectModule.succeed(projectionState.feedback),
-	};
-});
+vi.mock("~/ui/pixi/feedback/fn/readTileActorFeedbackCuesFn", () => ({
+	readTileActorFeedbackCuesFn: () => projectionState.feedback,
+}));
 
 const createdVisualState = vi.hoisted(() => ({
 	created: [] as unknown[],
@@ -64,27 +61,27 @@ export const __fixture_createdVisualState = createdVisualState;
 
 export const replacementCrossfadeDurationMs = productionReplacementCrossfadeDurationMs;
 
-vi.mock("~/bridge/tile/readTileActorsFx", () => ({
+vi.mock("~/ui/pixi/actor/readTileActorsFx", () => ({
 	readTileActorsFx: ({ surface }: { readonly surface: "inventory" | "main" }) => ({
 		kind: "tile-actors",
 		surface,
 	}),
 }));
 
-vi.mock("~/bridge/tile/readTileDeliveriesFx", () => ({
+vi.mock("~/ui/pixi/delivery/readTileDeliveriesFx", () => ({
 	readTileDeliveriesFx: () => ({
 		kind: "tile-deliveries",
 	}),
 }));
 
-vi.mock("~/bridge/tile/motion/readCommittedTileReplacementsFx", async () => {
+vi.mock("~/ui/pixi/motion/readCommittedTileReplacementsFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
 		readCommittedTileReplacementsFx: () => EffectModule.succeed(projectionState.replacements),
 	};
 });
 
-vi.mock("~/bridge/tile/motion/readTileMotionCuesFx", async () => {
+vi.mock("~/ui/pixi/motion/readTileMotionCuesFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
 		readTileMotionCuesFx: () => EffectModule.succeed(projectionState.cues),

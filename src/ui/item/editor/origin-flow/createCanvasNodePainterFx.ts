@@ -5,7 +5,7 @@ import {
 	EditorItemOriginItemOutputPortId,
 	type EditorItemOriginItemNode,
 	type EditorItemOriginOperationKind,
-} from "~/bridge/item/editor/EditorItemOriginFlow";
+} from "~/editor/origin-flow/EditorItemOriginFlow";
 import { ItemTypeLabel } from "~/ui/item-detail/ItemInfoPresentation";
 import type { LayoutNode } from "~/ui/item/editor/origin-flow/Layout";
 import { createCanvasArtworkPainterFx } from "~/ui/item/editor/origin-flow/createCanvasArtworkPainterFx";

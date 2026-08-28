@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { createEditorNotesCommandAtomsFx } from "~/bridge/editor/note/createEditorNotesCommandAtomsFx";
+import { createEditorNotesCommandAtomsFx } from "~/ui/note/editor/createEditorNotesCommandAtomsFx";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 
 export const editorNotesTestState = {

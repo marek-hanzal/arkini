@@ -11,7 +11,7 @@ import {
 	type LucideIcon,
 } from "lucide-react";
 
-import type { EditorItemType } from "~/bridge/item/editor/EditorItemModel";
+import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 
 /** Canonical editor copy and iconography for every authored item type. */
 export const EditorItemTypePresentation = {
@@ -52,7 +52,7 @@ export const EditorItemTypePresentation = {
 		icon: Timer,
 	},
 } as const satisfies Record<
-	EditorItemType,
+	TypeSchema.Type,
 	{
 		readonly description: string;
 		readonly icon: LucideIcon;

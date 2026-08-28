@@ -5,7 +5,7 @@ import {
 	EditorItemOriginItemOutputPortId,
 	type EditorItemOriginItemNode,
 	type EditorItemOriginOperation,
-} from "~/bridge/item/editor/EditorItemOriginFlow";
+} from "~/editor/origin-flow/EditorItemOriginFlow";
 
 const NodeWidth = 420;
 const NodeMinHeight = 176;

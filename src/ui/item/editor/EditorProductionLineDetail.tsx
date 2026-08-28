@@ -1,8 +1,8 @@
 import { ArrowUpRight, ChevronRight } from "lucide-react";
 
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { EditorLine } from "~/bridge/item/editor/EditorItemModel";
+import type { LineSchema } from "~/engine/line/schema/LineSchema";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { formatItemDurationFx } from "~/ui/item-detail/formatItemDurationFx";
 import { EditorProductionLineEditLink } from "~/ui/item/editor/EditorProductionLineEditLink";
 import { EditorProductionLineInputs } from "~/ui/item/editor/EditorProductionLineInputs";
@@ -26,7 +26,7 @@ export const EditorProductionLineDetail = ({
 	line,
 }: {
 	readonly itemUid: string;
-	readonly line: EditorLine;
+	readonly line: LineSchema.Type;
 }) => {
 	const project = useEditorProject();
 	const items = project.config?.items ?? {};

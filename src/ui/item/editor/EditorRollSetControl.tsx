@@ -1,4 +1,5 @@
-import type { EditorRoll, EditorRollSet } from "~/bridge/item/editor/EditorItemModel";
+import type { RollSchema } from "~/engine/roll/schema/RollSchema";
+import type { SetSchema } from "~/engine/roll/schema/SetSchema";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorNumberControl } from "~/ui/form/EditorValueControls";
@@ -6,7 +7,7 @@ import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefault
 import { EditorRollControl } from "~/ui/item/editor/EditorRollControl";
 import { useEditorItemOptionLabel } from "~/ui/item/editor/useEditorItemOptionLabel";
 
-const readFirstRollItemId = (roll: EditorRoll): string | undefined =>
+const readFirstRollItemId = (roll: RollSchema.Type): string | undefined =>
 	roll.type === "weight" ? roll.drop[0]?.drop[0]?.itemId : roll.drop[0]?.itemId;
 
 export const EditorRollSetControl = ({
@@ -15,8 +16,8 @@ export const EditorRollSetControl = ({
 	value,
 }: {
 	readonly index: number;
-	readonly onChange: (set: EditorRollSet | undefined) => void;
-	readonly value: EditorRollSet;
+	readonly onChange: (set: SetSchema.Type | undefined) => void;
+	readonly value: SetSchema.Type;
 }) => {
 	const readItemLabel = useEditorItemOptionLabel();
 	return (

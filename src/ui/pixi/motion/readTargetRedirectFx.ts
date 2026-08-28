@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { DropItemResultKind } from "~/bridge/tile/DropItemResultKind";
-import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
+import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import type { MotionRedirect } from "~/ui/pixi/motion/MotionTarget";
 
 /**

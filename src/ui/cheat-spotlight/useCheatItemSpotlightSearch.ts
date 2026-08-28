@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { useCheatItemCatalog } from "~/bridge/cheat/useCheatItemCatalog";
-import type { PlayableGame } from "~/bridge/game/PlayableGame";
+import { useCheatItemCatalog } from "~/ui/cheat-spotlight/useCheatItemCatalog";
+import type { PlayableGame } from "~/renderer/game/PlayableGame";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
 
 const maxVisibleResults = 10;

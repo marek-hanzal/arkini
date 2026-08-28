@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { DropItemResultKind } from "~/bridge/tile/DropItemResultKind";
-import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
-import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
+import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
+import type { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
 import type { DropPresentation } from "~/ui/pixi/drop/DropPresentation";
 
 export namespace beginDropFx {

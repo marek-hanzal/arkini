@@ -1,7 +1,7 @@
 import { Deferred, Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
-import { createEditorUnsavedChangesOwnerFx } from "~/bridge/editor/createEditorUnsavedChangesOwnerFx";
+import { createEditorUnsavedChangesOwnerFx } from "~/renderer/editor/unsaved/createEditorUnsavedChangesOwnerFx";
 
 const createSession = ({ valid = true }: { readonly valid?: boolean } = {}) => ({
 	discard: vi.fn(),

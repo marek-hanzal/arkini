@@ -4,7 +4,7 @@ import type {
 	EditorItemOriginEdge,
 	EditorItemOriginFlow,
 	EditorItemOriginItemNode,
-} from "~/bridge/item/editor/EditorItemOriginFlow";
+} from "~/editor/origin-flow/EditorItemOriginFlow";
 import { EdgeOrder, type Highlight } from "~/ui/item/editor/origin-flow/Highlight";
 
 /** Reads every direct producer branch and one deterministic acquisition proof below each branch. */

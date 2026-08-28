@@ -1,9 +1,8 @@
+import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { PropsWithChildren } from "react";
-
-import type { EditorItemType } from "~/bridge/item/editor/EditorItemModel";
-import { useEditorItemDraft } from "~/bridge/item/editor/useEditorItemDraft";
-import { convertEditorItemFx } from "~/bridge/item/editor/convertEditorItemFx";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { useEditorItemDraft } from "~/ui/item/editor/useEditorItemDraft";
+import { convertEditorItemFx } from "~/editor/item/fx/convertEditorItemFx";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { EditorItemFormSession } from "~/ui/item/editor/EditorItemFormSession";
 import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
 import type {
@@ -15,7 +14,7 @@ import { useEditorItemByUid } from "~/ui/item/editor/useEditorItemByUid";
 export namespace EditorItemForm {
 	export interface Props extends PropsWithChildren {
 		readonly enableCapability?: EditorItemOptionalCapability;
-		readonly itemType?: EditorItemType;
+		readonly itemType?: TypeSchema.Type;
 		readonly productionLineId?: string;
 		readonly sectionId?: EditorItemSectionId;
 		readonly uid: string;

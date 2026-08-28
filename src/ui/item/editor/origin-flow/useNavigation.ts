@@ -1,7 +1,7 @@
 import { type RefObject, useCallback, useEffect, useRef, useState } from "react";
 
-import type { EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import type { EditorItemOriginFlow } from "~/editor/origin-flow/EditorItemOriginFlow";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { LayoutNode } from "~/ui/item/editor/origin-flow/Layout";
 import type { Viewport } from "~/ui/item/editor/origin-flow/createViewportFx";
 import type { OriginFlowDirection, Selection } from "~/ui/item/editor/origin-flow/Highlight";

@@ -1,11 +1,11 @@
-import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { DetailSection } from "~/ui/item/editor/EditorItemDetailDefinition";
 import { EditorItemArtworkTimeline } from "~/ui/item/editor/EditorItemArtworkTimeline";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { EditorAssetDetailLink } from "~/ui/resource/editor/EditorAssetDetailLink";
 
 /** Presents default and progress artwork in authored composition order. */
-export const EditorItemArtworkDetail = ({ item }: { readonly item: EditorItem }) => (
+export const EditorItemArtworkDetail = ({ item }: { readonly item: ItemSchema.Type }) => (
 	<div className="grid gap-6">
 		<DetailSection
 			description="Default composition is shown in authoritative back-to-front order."

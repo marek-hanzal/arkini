@@ -21,8 +21,8 @@ Main and Inventory actors are separate because display objects cannot cross canv
 
 ## Flows
 
-- Committed transition: bridge projection and current presentation claims → reconciler plan → retained actor allocation/reconciliation → motion/animation channels → demand-frame invalidation.
-- Pointer gesture: fresh bridge preview → frozen source/target/release facts → one public atomic engine command → reconciliation with the latest committed transition.
+- Committed transition: game projection and current presentation claims → reconciler plan → retained actor allocation/reconciliation → motion/animation channels → demand-frame invalidation.
+- Pointer gesture: fresh engine preview → frozen source/target/release facts → one public atomic engine command → reconciliation with the latest committed transition.
 
 Delivery endpoints, generation, phase, and remaining time are engine state. Tick owns countdown and settlement even when no scene or geometry exists; Pixi may retarget, freeze, or hide presentation but never admits input or starts work.
 

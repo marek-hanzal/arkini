@@ -1,7 +1,7 @@
 import { RefreshCw } from "lucide-react";
 import { match } from "ts-pattern";
 
-import type { EditorMcpOverview } from "~/bridge/editor-mcp/readEditorMcpOverviewFx";
+import type { EditorMcpOverview } from "~/ui/editor-mcp/readEditorMcpOverviewFx";
 import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
 import type { EditorMcpController } from "~/ui/editor-mcp/useEditorMcpController";
 import {

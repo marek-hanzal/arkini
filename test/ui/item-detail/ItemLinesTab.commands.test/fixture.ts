@@ -5,7 +5,7 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, vi } from "vitest";
 
-import type { useItemDetailLines } from "~/bridge/item-detail/useItemDetailLines";
+import type { useItemDetailLines } from "~/ui/item-detail/useItemDetailLines";
 import type { ItemDetailPendingAction } from "~/ui/item-detail/ItemDetailControl";
 import { ItemLinesTab } from "~/ui/item-detail/ItemLinesTab";
 
@@ -38,7 +38,7 @@ vi.mock("~/ui/item-detail/useItemDetailControl", () => ({
 	useItemDetailControl: () => control,
 }));
 
-vi.mock("~/bridge/item-detail/useEnqueueItemDetailLine", () => ({
+vi.mock("~/ui/item-detail/useEnqueueItemDetailLine", () => ({
 	useEnqueueItemDetailLine: ({ pendingKey }: { readonly pendingKey: string }) => ({
 		error: control.readActionError(pendingKey),
 		pending: control.readPendingAction(pendingKey) === "enqueue",
@@ -46,7 +46,7 @@ vi.mock("~/bridge/item-detail/useEnqueueItemDetailLine", () => ({
 	}),
 }));
 
-vi.mock("~/bridge/item-detail/useSetDefaultItemDetailLine", () => ({
+vi.mock("~/ui/item-detail/useSetDefaultItemDetailLine", () => ({
 	useSetDefaultItemDetailLine: ({ pendingKey }: { readonly pendingKey: string }) => ({
 		error: control.readActionError(pendingKey),
 		pending: control.readPendingAction(pendingKey) === "default",
@@ -54,7 +54,7 @@ vi.mock("~/bridge/item-detail/useSetDefaultItemDetailLine", () => ({
 	}),
 }));
 
-vi.mock("~/bridge/item-detail/useUnsetDefaultItemDetailLine", () => ({
+vi.mock("~/ui/item-detail/useUnsetDefaultItemDetailLine", () => ({
 	useUnsetDefaultItemDetailLine: ({ pendingKey }: { readonly pendingKey: string }) => ({
 		error: control.readActionError(pendingKey),
 		pending: control.readPendingAction(pendingKey) === "default",
@@ -62,7 +62,7 @@ vi.mock("~/bridge/item-detail/useUnsetDefaultItemDetailLine", () => ({
 	}),
 }));
 
-vi.mock("~/bridge/item-detail/useWithdrawItemDetailLine", () => ({
+vi.mock("~/ui/item-detail/useWithdrawItemDetailLine", () => ({
 	useWithdrawItemDetailLine: ({ pendingKey }: { readonly pendingKey: string }) => ({
 		error: control.readActionError(pendingKey),
 		pending: control.readPendingAction(pendingKey) === "withdraw",

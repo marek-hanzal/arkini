@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import type { TileActorFeedbackCue } from "~/bridge/tile/feedback/TileActorFeedbackCue";
-import { DropItemResultKind } from "~/bridge/tile/DropItemResultKind";
-import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
+import type { TileActorFeedbackCue } from "~/ui/pixi/feedback/TileActorFeedbackCue";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
+import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import type {
 	DropPresentation,
 	DropSnapshot,

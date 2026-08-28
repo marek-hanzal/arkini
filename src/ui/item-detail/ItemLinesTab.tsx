@@ -2,7 +2,7 @@ import { ListX, SearchX, type LucideIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import type { ReactNode } from "react";
 
-import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
+import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
 import {
 	itemDetailFadeMotion,
 	itemDetailMotionTransition,

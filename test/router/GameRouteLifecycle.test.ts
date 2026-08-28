@@ -8,11 +8,11 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { routeTree } from "~/_route";
 import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
-import { applyCheatAvailabilityFx } from "~/bridge/cheat/applyCheatAvailabilityFx";
-import type { Game } from "~/bridge/game/Game";
-import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
-import { readCurrentGameEngineResourceFx } from "~/bridge/game/readCurrentGameEngineResourceFx";
-import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
+import { applyCheatAvailabilityFx } from "~/ui/cheat-availability/applyCheatAvailabilityFx";
+import type { Game } from "~/renderer/game/Game";
+import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
+import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
+import { testArkpackConfig } from "~test/support/arkpack/createTestArkpack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import {
 	adoptTestGameEngineResourceFx,
@@ -191,7 +191,11 @@ describe("game route lifecycle", () => {
 		);
 		expect(sceneMatch).toBeDefined();
 		expect(resource.game).toBe(engine);
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBe(resource);
+		expect(
+			rendererRuntime.runSync(
+				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+			),
+		).toBe(resource);
 		expect(router.state.location.pathname).toBe("/game/package-route/inventory");
 	});
 
@@ -208,7 +212,9 @@ describe("game route lifecycle", () => {
 		expect(router.state.location.pathname).toBe("/settings/common");
 		expect(dispose).not.toHaveBeenCalled();
 		expect(
-			rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack.packageId,
+			rendererRuntime.runSync(
+				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+			)?.game.arkpack.packageId,
 		).toBe("package-route");
 
 		await router.navigate({
@@ -220,7 +226,9 @@ describe("game route lifecycle", () => {
 
 		expect(dispose).not.toHaveBeenCalled();
 		expect(
-			rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack.packageId,
+			rendererRuntime.runSync(
+				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+			)?.game.arkpack.packageId,
 		).toBe("package-route");
 	});
 
@@ -256,7 +264,11 @@ describe("game route lifecycle", () => {
 		await navigation;
 
 		expect(dispose).toHaveBeenCalledOnce();
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
+		expect(
+			rendererRuntime.runSync(
+				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+			),
+		).toBeNull();
 		expect(router.state.location.pathname).toBe("/editor/welcome");
 	});
 
@@ -285,7 +297,11 @@ describe("game route lifecycle", () => {
 
 		expect(dispose).toHaveBeenCalledOnce();
 		expect(resource.game).toBe(engine);
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
+		expect(
+			rendererRuntime.runSync(
+				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+			),
+		).toBeNull();
 		expect(router.state.location.pathname).toBe("/main-menu");
 	});
 });

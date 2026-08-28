@@ -9,12 +9,12 @@ import {
 	useSyncExternalStore,
 } from "react";
 
-import type { GameEngine } from "~/bridge/game/GameEngine";
-import type { RunItemDetailPendingActionProps } from "~/bridge/item-detail/ItemDetailPendingActionOwner";
-import { createItemDetailCommandAtom } from "~/bridge/item-detail/createItemDetailCommandAtom";
-import { useResolveItemDefinitionDetailTarget } from "~/bridge/item-detail/useResolveItemDefinitionDetailTarget";
-import { useResolveItemDetailTarget } from "~/bridge/item-detail/useResolveItemDetailTarget";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { RunItemDetailPendingActionProps } from "~/ui/item-detail/ItemDetailPendingActionOwner";
+import { createItemDetailCommandAtom } from "~/ui/item-detail/createItemDetailCommandAtom";
+import { useResolveItemDefinitionDetailTarget } from "~/ui/item-detail/useResolveItemDefinitionDetailTarget";
+import { useResolveItemDetailTarget } from "~/ui/item-detail/useResolveItemDetailTarget";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { createItemDetailControllerFx } from "~/ui/item-detail/createItemDetailControllerFx";
 import { ItemDetailContext } from "~/ui/item-detail/ItemDetailContext";
 import type {

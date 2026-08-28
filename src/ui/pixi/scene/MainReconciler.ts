@@ -1,6 +1,6 @@
 import type { Effect } from "effect";
 
-import type { GameEngine } from "~/bridge/game/GameEngine";
+import type { GameEngine } from "~/renderer/game/GameEngine";
 
 export interface MainReconciler {
 	readonly hydrateFx: (

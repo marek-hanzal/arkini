@@ -8,11 +8,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { routeTree } from "~/_route";
 import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
-import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
-import type { Game } from "~/bridge/game/Game";
-import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
-import { readCurrentGameEngineResourceFx } from "~/bridge/game/readCurrentGameEngineResourceFx";
-import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
+import { CriticalGameLifecycleError } from "~/renderer/game/resource/CriticalGameLifecycleError";
+import type { Game } from "~/renderer/game/Game";
+import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
+import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
+import { testArkpackConfig } from "~test/support/arkpack/createTestArkpack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import {
 	adoptTestGameEngineResourceFx,
@@ -160,7 +160,11 @@ describe("game exit action route", () => {
 		});
 
 		expect(dispose).toHaveBeenCalledOnce();
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
+		expect(
+			rendererRuntime.runSync(
+				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+			),
+		).toBeNull();
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/action/exit`);
 		expect(container.querySelectorAll("button")).toHaveLength(0);
 	});
@@ -191,7 +195,9 @@ describe("game exit action route", () => {
 			cause: failure,
 		});
 		const currentFailure = rendererRuntime.runSync(
-			readCurrentGameEngineResourceFx().pipe(Effect.flip),
+			GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)).pipe(
+				Effect.flip,
+			),
 		);
 		expect(currentFailure).toBe(loggedCause);
 		expect(() => resource.assertUsable()).toThrow(loggedCause);
@@ -215,7 +221,9 @@ describe("game exit action route", () => {
 		expect(() => resource.assertUsable()).toThrow();
 		expect(disposeAttempts).toBe(1);
 		const firstLifecycleFailure = rendererRuntime.runSync(
-			readCurrentGameEngineResourceFx().pipe(Effect.flip),
+			GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)).pipe(
+				Effect.flip,
+			),
 		);
 
 		const exiting = router.navigate({
@@ -231,7 +239,9 @@ describe("game exit action route", () => {
 
 		expect(disposeAttempts).toBe(1);
 		const terminalLifecycleFailure = rendererRuntime.runSync(
-			readCurrentGameEngineResourceFx().pipe(Effect.flip),
+			GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)).pipe(
+				Effect.flip,
+			),
 		);
 		expect(terminalLifecycleFailure).toBe(firstLifecycleFailure);
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/action/exit`);

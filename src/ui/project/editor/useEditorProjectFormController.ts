@@ -2,13 +2,13 @@ import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { revalidateLogic, useStore } from "@tanstack/react-form";
 import { useCallback, useMemo, useRef } from "react";
 
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { createEditorProjectConfigFx } from "~/bridge/project/editor/createEditorProjectConfigFx";
-import { createEditorProjectFormSchemaFx } from "~/bridge/project/editor/createEditorProjectFormSchemaFx";
-import { analyzeEditorProjectStructuralCompatibilityFx } from "~/bridge/project/editor/analyzeEditorProjectStructuralCompatibilityFx";
-import { readEditorProjectFormValuesFx } from "~/bridge/project/editor/readEditorProjectFormValuesFx";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { saveEditorProjectConfigCommandAtom } from "~/bridge/project/editor/saveEditorProjectConfigCommandAtom";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { createEditorProjectConfigFn } from "~/ui/project/editor/fn/createEditorProjectConfigFn";
+import { createEditorProjectFormSchema } from "~/ui/project/editor/createEditorProjectFormSchema";
+import { analyzeEditorProjectStructuralCompatibilityFx } from "~/ui/project/editor/analyzeEditorProjectStructuralCompatibilityFx";
+import { readEditorProjectFormValuesFn } from "~/ui/project/editor/fn/readEditorProjectFormValuesFn";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { saveEditorProjectConfigCommandAtom } from "~/ui/project/editor/saveEditorProjectConfigCommandAtom";
 import { useAppForm } from "~/ui/form/EditorForm";
 import type { EditorProjectSectionId } from "~/ui/project/editor/EditorProjectSections";
 import { readEditorProjectSectionForPathFx } from "~/ui/project/editor/readEditorProjectSectionForPathFx";
@@ -23,13 +23,13 @@ export const useEditorProjectFormController = ({
 }) => {
 	const project = useEditorProject();
 	const canonicalValues = useMemo(
-		() => RendererRuntime.runSync(readEditorProjectFormValuesFx(project)),
+		() => readEditorProjectFormValuesFn(project),
 		[
 			project,
 		],
 	);
 	const schema = useMemo(
-		() => RendererRuntime.runSync(createEditorProjectFormSchemaFx(project)),
+		() => createEditorProjectFormSchema(project),
 		[
 			project,
 		],
@@ -51,7 +51,7 @@ export const useEditorProjectFormController = ({
 		},
 		onSubmit: async ({ formApi, value }) => {
 			const parsed = schema.parse(value);
-			const config = RendererRuntime.runSync(createEditorProjectConfigFx(project, parsed));
+			const config = createEditorProjectConfigFn(project, parsed);
 			await saveConfig({
 				config,
 				expectedRevision: project.revision,
@@ -69,7 +69,7 @@ export const useEditorProjectFormController = ({
 			return RendererRuntime.runSync(
 				analyzeEditorProjectStructuralCompatibilityFx(project, values),
 			);
-		const config = RendererRuntime.runSync(createEditorProjectConfigFx(project, parsed.data));
+		const config = createEditorProjectConfigFn(project, parsed.data);
 		return RendererRuntime.runSync(analyzeEditorProjectCompatibilityFx(project.config, config));
 	}, [
 		dirty,

@@ -5,14 +5,14 @@ import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
-	createFilesystemEditorProjectTestHarness,
-	type FilesystemEditorProjectTestHarness,
-} from "./support/createFilesystemEditorProjectTestHarness";
+	createProjectTestHarness,
+	type ProjectTestHarness,
+} from "./support/createProjectTestHarness";
 
-let harness: FilesystemEditorProjectTestHarness;
+let harness: ProjectTestHarness;
 
 beforeEach(async () => {
-	harness = await createFilesystemEditorProjectTestHarness("arkini-fs-sidecars-");
+	harness = await createProjectTestHarness("arkini-fs-sidecars-");
 });
 
 afterEach(async () => harness.close());

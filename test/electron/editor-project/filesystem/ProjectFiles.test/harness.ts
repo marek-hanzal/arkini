@@ -8,7 +8,7 @@ import type { FilesystemEditorProjectFiles } from "../../../../../electron/main/
 import { readFilesystemEditorProjectFilesFx } from "../../../../../electron/main/editor-project/filesystem/fx/readFilesystemEditorProjectFilesFx";
 import { writeFilesystemEditorProjectFilesFx } from "../../../../../electron/main/editor-project/filesystem/fx/writeFilesystemEditorProjectFilesFx";
 
-export const createFilesystemEditorProjectFilesHarness = async () => {
+export const createProjectFilesHarness = async () => {
 	const parent = await mkdtemp(join(tmpdir(), "arkini-editor-files-"));
 	const root = join(parent, "project");
 

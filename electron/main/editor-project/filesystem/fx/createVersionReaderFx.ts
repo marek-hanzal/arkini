@@ -2,33 +2,33 @@ import { Buffer } from "node:buffer";
 import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
-import type { FilesystemEditorProjectState } from "../FilesystemEditorProjectState";
+import type { ProjectState } from "../ProjectState";
 import type { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 import type { EditorProjectVersionReference } from "~/editor/version/EditorProjectVersion";
 import { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
-import { hashFilesystemEditorVersionBytes } from "./FilesystemEditorVersionFingerprint";
-import { createFilesystemEditorVersionSnapshotPlan } from "./createFilesystemEditorVersionSnapshotPlan";
-import { readFilesystemEditorVersionSnapshotFx } from "./readFilesystemEditorVersionSnapshotFx";
+import { hashVersionBytes } from "./VersionFingerprint";
+import { createVersionSnapshotPlan } from "./createVersionSnapshotPlan";
+import { readVersionSnapshotFx } from "./readVersionSnapshotFx";
 
-export namespace createFilesystemEditorProjectVersionReaderFx {
+export namespace createVersionReaderFx {
 	export interface Props {
 		readonly readState: (
 			projectId: string,
-		) => Effect.Effect<FilesystemEditorProjectState, EditorProjectRepositoryError>;
+		) => Effect.Effect<ProjectState, EditorProjectRepositoryError>;
 	}
 }
 
 /** Reads published history and creates canonical current/version projections. */
-export const createFilesystemEditorProjectVersionReaderFx = Effect.fn(
-	"createFilesystemEditorProjectVersionReaderFx",
-)(function* ({ readState }: createFilesystemEditorProjectVersionReaderFx.Props) {
+export const createVersionReaderFx = Effect.fn(
+	"createVersionReaderFx",
+)(function* ({ readState }: createVersionReaderFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const pathService = yield* Path.Path;
-	const readHeadFx = (state: FilesystemEditorProjectState) =>
+	const readHeadFx = (state: ProjectState) =>
 		Effect.succeed(state.versionHistory.head);
 
-	const readDescriptorFx = Effect.fn("readFilesystemEditorVersionDescriptorFx")(function* (
-		state: FilesystemEditorProjectState,
+	const readDescriptorFx = Effect.fn("readVersionDescriptorFx")(function* (
+		state: ProjectState,
 		versionId: string,
 	) {
 		const version = state.versionHistory.versions.get(versionId);
@@ -41,8 +41,8 @@ export const createFilesystemEditorProjectVersionReaderFx = Effect.fn(
 			: version.descriptor;
 	});
 
-	const readPublishedVersionFx = Effect.fn("readPublishedFilesystemEditorVersionFx")(function* (
-		state: FilesystemEditorProjectState,
+	const readPublishedVersionFx = Effect.fn("readPublishedVersionFx")(function* (
+		state: ProjectState,
 		versionId: string,
 	) {
 		const head = yield* readHeadFx(state);
@@ -62,7 +62,7 @@ export const createFilesystemEditorProjectVersionReaderFx = Effect.fn(
 			: version;
 	});
 
-	const readCurrentSnapshotFx = Effect.fn("readCurrentFilesystemEditorVersionSnapshotFx")(
+	const readCurrentSnapshotFx = Effect.fn("readCurrentVersionSnapshotFx")(
 		function* (projectId: string) {
 			const state = yield* readState(projectId);
 			const scenarios = state.scenarios.map((scenario) =>
@@ -77,7 +77,7 @@ export const createFilesystemEditorProjectVersionReaderFx = Effect.fn(
 			);
 			const snapshot = yield* Effect.try({
 				try: () =>
-					createFilesystemEditorVersionSnapshotPlan({
+					createVersionSnapshotPlan({
 						arkpack: state.project.version,
 						config: state.project.config,
 						resources: state.project.resources,
@@ -96,8 +96,8 @@ export const createFilesystemEditorProjectVersionReaderFx = Effect.fn(
 		},
 	);
 
-	const readDiffSnapshotFx = Effect.fn("readFilesystemEditorVersionDiffSnapshotFx")(function* (
-		state: FilesystemEditorProjectState,
+	const readDiffSnapshotFx = Effect.fn("readVersionDiffSnapshotFx")(function* (
+		state: ProjectState,
 		reference: EditorProjectVersionReference,
 	) {
 		if (reference.type === "current")
@@ -109,7 +109,7 @@ export const createFilesystemEditorProjectVersionReaderFx = Effect.fn(
 						resource.id,
 						JSON.stringify([
 							resource.mime,
-							hashFilesystemEditorVersionBytes(resource.bytes),
+							hashVersionBytes(resource.bytes),
 						]),
 					]),
 				),
@@ -118,13 +118,13 @@ export const createFilesystemEditorProjectVersionReaderFx = Effect.fn(
 						scenario.name,
 						JSON.stringify([
 							scenario.version,
-							hashFilesystemEditorVersionBytes(scenario.bytes),
+							hashVersionBytes(scenario.bytes),
 						]),
 					]),
 				),
 			};
 		const version = yield* readPublishedVersionFx(state, reference.versionId);
-		const snapshot = yield* readFilesystemEditorVersionSnapshotFx({
+		const snapshot = yield* readVersionSnapshotFx({
 			manifest: version.manifest,
 			paths: state.paths,
 		}).pipe(
@@ -149,7 +149,7 @@ export const createFilesystemEditorProjectVersionReaderFx = Effect.fn(
 					resource.id,
 					JSON.stringify([
 						resource.mime,
-						hashFilesystemEditorVersionBytes(resource.bytes),
+						hashVersionBytes(resource.bytes),
 					]),
 				]),
 			),
@@ -158,7 +158,7 @@ export const createFilesystemEditorProjectVersionReaderFx = Effect.fn(
 					scenario.name,
 					JSON.stringify([
 						scenario.version,
-						hashFilesystemEditorVersionBytes(Buffer.from(scenario.save, "base64")),
+						hashVersionBytes(Buffer.from(scenario.save, "base64")),
 					]),
 				]),
 			),

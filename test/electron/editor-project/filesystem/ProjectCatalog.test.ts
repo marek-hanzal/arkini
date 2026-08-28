@@ -5,7 +5,7 @@ import { dirname, join } from "node:path";
 import { Effect, FileSystem } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { createFilesystemEditorProjectCatalogFx } from "../../../../electron/main/editor-project/filesystem/fx/createFilesystemEditorProjectCatalogFx";
+import { createProjectCatalogFx } from "../../../../electron/main/editor-project/filesystem/fx/createProjectCatalogFx";
 
 const temporaryDirectories: Array<string> = [];
 
@@ -43,7 +43,7 @@ describe("filesystem Editor project catalog", () => {
 		const catalogPath = await createCatalogPath();
 		const create = () =>
 			Effect.runPromise(
-				createFilesystemEditorProjectCatalogFx({
+				createProjectCatalogFx({
 					catalogPath,
 					projectsRoot: join(dirname(catalogPath), "projects"),
 				}).pipe(Effect.provide(NodeServices.layer)),
@@ -99,7 +99,7 @@ describe("filesystem Editor project catalog", () => {
 		await writeFile(catalogPath, JSON.stringify(expected));
 
 		const catalog = await Effect.runPromise(
-			createFilesystemEditorProjectCatalogFx({
+			createProjectCatalogFx({
 				catalogPath,
 				projectsRoot,
 			}).pipe(Effect.provide(NodeServices.layer)),
@@ -148,7 +148,7 @@ describe("filesystem Editor project catalog", () => {
 		);
 
 		const catalog = await Effect.runPromise(
-			createFilesystemEditorProjectCatalogFx({
+			createProjectCatalogFx({
 				catalogPath,
 				projectsRoot,
 			}).pipe(Effect.provide(NodeServices.layer)),

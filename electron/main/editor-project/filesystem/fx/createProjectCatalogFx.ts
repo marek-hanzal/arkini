@@ -12,7 +12,7 @@ const encoder = new TextEncoder();
 
 type Entry = EditorProjectCatalogEntrySchema.Type;
 
-export interface FilesystemEditorProjectCatalog {
+export interface ProjectCatalog {
 	readonly addFx: (entry: Entry) => Effect.Effect<void, EditorProjectRepositoryError>;
 	readonly list: () => ReadonlyArray<Entry>;
 	readonly removeFx: (root: string) => Effect.Effect<void, EditorProjectRepositoryError>;
@@ -35,8 +35,8 @@ const parseStoredCatalog = (source: string) => {
 };
 
 /** Opens the one main-owned path registry; project contents always remain authoritative. */
-export const createFilesystemEditorProjectCatalogFx = Effect.fn(
-	"createFilesystemEditorProjectCatalogFx",
+export const createProjectCatalogFx = Effect.fn(
+	"createProjectCatalogFx",
 )(function* ({
 	catalogPath,
 	projectsRoot,
@@ -134,5 +134,5 @@ export const createFilesystemEditorProjectCatalogFx = Effect.fn(
 			]),
 		list: () => catalog.projects,
 		removeFx: (root) => updateFx((projects) => projects.filter((entry) => entry.root !== root)),
-	} satisfies FilesystemEditorProjectCatalog;
+	} satisfies ProjectCatalog;
 });

@@ -7,10 +7,10 @@ import type { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import {
-	createFilesystemEditorVersionFingerprint,
-	hashFilesystemEditorVersionBytes,
-	hashFilesystemEditorVersionJson,
-} from "./FilesystemEditorVersionFingerprint";
+	createVersionFingerprint,
+	hashVersionBytes,
+	hashVersionJson,
+} from "./VersionFingerprint";
 
 const sortedRecord = (
 	entries: ReadonlyArray<
@@ -26,7 +26,7 @@ const sortedRecord = (
 		].sort(([left], [right]) => left.localeCompare(right)),
 	);
 
-export namespace createFilesystemEditorVersionSnapshotPlan {
+export namespace createVersionSnapshotPlan {
 	export interface Props {
 		readonly arkpack: ArkpackVersionSchema.Type;
 		readonly config: GameConfigSchema.Type;
@@ -36,21 +36,21 @@ export namespace createFilesystemEditorVersionSnapshotPlan {
 }
 
 /** Creates the one canonical manifest/fingerprint plan shared by preview and object writes. */
-export const createFilesystemEditorVersionSnapshotPlan = ({
+export const createVersionSnapshotPlan = ({
 	arkpack,
 	config,
 	resources,
 	scenarios,
-}: createFilesystemEditorVersionSnapshotPlan.Props) => {
+}: createVersionSnapshotPlan.Props) => {
 	const jsonObjects = new Map<string, unknown>();
 	const pngObjects = new Map<string, Uint8Array>();
 	const addJson = (value: unknown) => {
-		const hash = hashFilesystemEditorVersionJson(value);
+		const hash = hashVersionJson(value);
 		if (!jsonObjects.has(hash)) jsonObjects.set(hash, value);
 		return hash;
 	};
 	const addPng = (bytes: Uint8Array) => {
-		const hash = hashFilesystemEditorVersionBytes(bytes);
+		const hash = hashVersionBytes(bytes);
 		if (!pngObjects.has(hash)) pngObjects.set(hash, bytes);
 		return hash;
 	};
@@ -138,7 +138,7 @@ export const createFilesystemEditorVersionSnapshotPlan = ({
 	});
 	return {
 		manifest,
-		contentFingerprint: createFilesystemEditorVersionFingerprint(manifest, scenarios),
+		contentFingerprint: createVersionFingerprint(manifest, scenarios),
 		jsonObjects,
 		pngObjects,
 	};

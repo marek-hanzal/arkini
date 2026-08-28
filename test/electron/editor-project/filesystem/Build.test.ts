@@ -4,17 +4,17 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
-	createFilesystemEditorProjectTestHarness,
-	type FilesystemEditorProjectTestHarness,
-} from "./support/createFilesystemEditorProjectTestHarness";
+	createProjectTestHarness,
+	type ProjectTestHarness,
+} from "./support/createProjectTestHarness";
 import { decodeArkpackEnvelopeFx } from "~/engine/pack/fx/decodeArkpackEnvelopeFx";
 import { encodeArkpackEnvelopeFx } from "~/engine/pack/fx/encodeArkpackEnvelopeFx";
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 
-let harness: FilesystemEditorProjectTestHarness;
+let harness: ProjectTestHarness;
 
 beforeEach(async () => {
-	harness = await createFilesystemEditorProjectTestHarness("arkini-fs-project-build-");
+	harness = await createProjectTestHarness("arkini-fs-project-build-");
 });
 
 afterEach(async () => harness.close());

@@ -2,16 +2,14 @@ import { FileSystem } from "effect";
 import { Effect } from "effect";
 
 import type { EditorProjectFilesystemPaths } from "../EditorProjectFilesystemPaths";
-import type {
-	FilesystemEditorProjectVersionHistory,
-	FilesystemEditorPublishedVersion,
-} from "../FilesystemEditorProjectVersionHistory";
+import type { PublishedVersion } from "../PublishedVersion";
+import type { VersionHistory } from "../VersionHistory";
 import { EditorVersionDescriptorFileSchema } from "~/editor/filesystem/EditorVersionDescriptorFileSchema";
 import { EditorVersionHeadFileSchema } from "~/editor/filesystem/EditorVersionHeadFileSchema";
 import { EditorVersionManifestSchema } from "~/editor/filesystem/EditorVersionManifestSchema";
 import { admitArkiniVersionFx } from "~/engine/version/ArkiniVersionAdmission";
 import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
-import { readFilesystemEditorVersionSnapshotFx } from "./readFilesystemEditorVersionSnapshotFx";
+import { readVersionSnapshotFx } from "./readVersionSnapshotFx";
 
 const readJsonFx = <Value>(target: string, parse: (candidate: unknown) => Value, message: string) =>
 	Effect.gen(function* () {
@@ -34,7 +32,7 @@ export const readFilesystemEditorProjectVersionHistoryFx = Effect.fn(
 	if (!(yield* fileSystem.exists(paths.versionHeadFile)))
 		return {
 			versions: new Map(),
-		} satisfies FilesystemEditorProjectVersionHistory;
+		} satisfies VersionHistory;
 
 	const assertCanonicalPathFx = (target: string) =>
 		Effect.gen(function* () {
@@ -49,7 +47,7 @@ export const readFilesystemEditorProjectVersionHistoryFx = Effect.fn(
 		(candidate) => EditorVersionHeadFileSchema.parse(candidate),
 		`Editor version head ${paths.versionHeadFile} is invalid.`,
 	);
-	const versions = new Map<string, FilesystemEditorPublishedVersion>();
+	const versions = new Map<string, PublishedVersion>();
 	for (const versionId of head.versions) {
 		const descriptorFile = yield* paths.versionDescriptorFileFx(versionId);
 		const manifestFile = yield* paths.versionManifestFileFx(versionId);
@@ -97,7 +95,7 @@ export const readFilesystemEditorProjectVersionHistoryFx = Effect.fn(
 	});
 	const objectCache = new Map<string, Uint8Array>();
 	for (const [versionId, version] of versions) {
-		const snapshot = yield* readFilesystemEditorVersionSnapshotFx({
+		const snapshot = yield* readVersionSnapshotFx({
 			manifest: version.manifest,
 			objectCache,
 			paths,
@@ -120,5 +118,5 @@ export const readFilesystemEditorProjectVersionHistoryFx = Effect.fn(
 	return {
 		head,
 		versions,
-	} satisfies FilesystemEditorProjectVersionHistory;
+	} satisfies VersionHistory;
 });

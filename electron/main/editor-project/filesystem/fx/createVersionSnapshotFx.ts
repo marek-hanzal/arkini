@@ -10,13 +10,13 @@ import type { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
-import { hashFilesystemEditorVersionBytes } from "./FilesystemEditorVersionFingerprint";
-import { assertFilesystemEditorProjectDirectoryFx } from "./assertFilesystemEditorProjectDirectoryFx";
-import { createFilesystemEditorVersionSnapshotPlan } from "./createFilesystemEditorVersionSnapshotPlan";
+import { hashVersionBytes } from "./VersionFingerprint";
+import { assertProjectDirectoryFx } from "./assertProjectDirectoryFx";
+import { createVersionSnapshotPlan } from "./createVersionSnapshotPlan";
 
 const encoder = new TextEncoder();
 
-export namespace createFilesystemEditorVersionSnapshotFx {
+export namespace createVersionSnapshotFx {
 	export interface Props {
 		readonly arkpack: ArkpackVersionSchema.Type;
 		readonly config: GameConfigSchema.Type;
@@ -33,8 +33,8 @@ export namespace createFilesystemEditorVersionSnapshotFx {
 }
 
 /** Writes one deduplicated immutable full snapshot without publishing a version. */
-export const createFilesystemEditorVersionSnapshotFx = Effect.fn(
-	"createFilesystemEditorVersionSnapshotFx",
+export const createVersionSnapshotFx = Effect.fn(
+	"createVersionSnapshotFx",
 )(function* ({
 	arkpack,
 	config,
@@ -42,12 +42,12 @@ export const createFilesystemEditorVersionSnapshotFx = Effect.fn(
 	resources,
 	scenarios,
 	paths,
-}: createFilesystemEditorVersionSnapshotFx.Props) {
+}: createVersionSnapshotFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const lock = `${paths.root}/editor.lock`;
 	const plan = yield* Effect.try({
 		try: () =>
-			createFilesystemEditorVersionSnapshotPlan({
+			createVersionSnapshotPlan({
 				arkpack,
 				config,
 				resources,
@@ -71,7 +71,7 @@ export const createFilesystemEditorVersionSnapshotFx = Effect.fn(
 	yield* fileSystem.makeDirectory(paths.objects, {
 		recursive: true,
 	});
-	yield* assertFilesystemEditorProjectDirectoryFx({
+	yield* assertProjectDirectoryFx({
 		root: paths.root,
 		directory: paths.objects,
 	});
@@ -81,7 +81,7 @@ export const createFilesystemEditorVersionSnapshotFx = Effect.fn(
 		const target = yield* paths.jsonObjectFileFx(hash);
 		if (yield* fileSystem.exists(target)) {
 			const current = yield* fileSystem.readFile(target);
-			if (hashFilesystemEditorVersionBytes(current) === hash) continue;
+			if (hashVersionBytes(current) === hash) continue;
 		}
 		yield* filesystemWrite.writeFileFx({
 			lock,
@@ -95,7 +95,7 @@ export const createFilesystemEditorVersionSnapshotFx = Effect.fn(
 		const target = yield* paths.pngObjectFileFx(hash);
 		if (yield* fileSystem.exists(target)) {
 			const current = yield* fileSystem.readFile(target);
-			if (hashFilesystemEditorVersionBytes(current) === hash) continue;
+			if (hashVersionBytes(current) === hash) continue;
 		}
 		yield* filesystemWrite.writeFileFx({
 			lock,
@@ -106,5 +106,5 @@ export const createFilesystemEditorVersionSnapshotFx = Effect.fn(
 	return {
 		manifest: plan.manifest,
 		contentFingerprint: plan.contentFingerprint,
-	} satisfies createFilesystemEditorVersionSnapshotFx.Success;
+	} satisfies createVersionSnapshotFx.Success;
 });

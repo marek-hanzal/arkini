@@ -328,14 +328,29 @@ typecheck() {
 	tsc -p tsconfig.electron.json --noEmit --noUnusedLocals --noUnusedParameters
 }
 
+run_tests() {
+	vitest run --no-color "$@"
+}
+
 # @cmd Run the permanent test suite, optionally filtered by paths
 # @arg filters~ Vitest file or directory filters
 test() {
 	if [[ -n "${argc_filters+x}" ]]; then
-		vitest run --no-color "${argc_filters[@]}"
+		run_tests "${argc_filters[@]}"
 		return
 	fi
-	vitest run --no-color
+	run_tests
+}
+
+# @cmd Build and test operating-system boundaries
+platform-check() {
+	build
+	run_tests \
+		test/engine/filesystem \
+		test/electron \
+		test/pack \
+		test/schema/fx \
+		test/source
 }
 
 # @cmd Run the complete repository gate

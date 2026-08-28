@@ -23,10 +23,13 @@ jobs:
         include:
           - name: Full repository gate (Linux)
             os: ubuntu-24.04
-          - name: Full repository gate (macOS)
+            command: check
+          - name: Platform boundary gate (macOS)
             os: macos-15
-          - name: Full repository gate (Windows)
+            command: platform-check
+          - name: Platform boundary gate (Windows)
             os: windows-2025
+            command: platform-check
     defaults:
       run:
         shell: bash
@@ -40,5 +43,5 @@ jobs:
       - name: Install dependencies
         run: ./Argcfile.sh install
 
-      - name: Run complete repository gate
-        run: ./Argcfile.sh check
+      - name: Run repository gate
+        run: ./Argcfile.sh "${{ matrix.command }}"

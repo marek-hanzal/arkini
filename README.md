@@ -53,15 +53,16 @@ Use `argc --help` for the current command list. Common focused commands are:
 argc typecheck
 argc test [path ...]
 argc build
+argc platform-check
 argc game:schema
 argc dev-control
 argc mcp-inspect
 ```
 
-`argc check` runs formatting, all TypeScript configurations, a production Electron build plus official Arkpack packing, dependency rules, copy/paste detection, and the permanent Vitest suite. Use focused tests during implementation; run the full gate when the requested scope warrants it.
+`argc check` runs formatting, all TypeScript configurations, a production Electron build plus Community Arkpack packing and verification, dependency rules, copy/paste detection, and the permanent Vitest suite. `argc platform-check` is the narrower hosted macOS/Windows portability gate: it runs that production build and the real filesystem, Electron, pack, source, and schema-writer suites. Use focused tests during implementation; `platform-check` does not replace the complete closing gate.
 
 Arkini is Electron-only: there is no web target or browser-storage fallback. Development uses the Vite renderer; packaged builds serve the same history-routed application from `arkini://app/`. Disposable build output lives below `.out/`; the official project owns its ignored `game/arkini/build/` artifacts.
 
 ## Distribution
 
-`argc preview-macos` launches an unpacked local arm64 app. The native package commands create unsigned macOS arm64, Windows x64, Linux x64, and Linux arm64 applications with target-specific checksum files. Working branches run the complete repository gate and explicit Community Arkpack verification on hosted Linux, macOS, and Windows; `main` deliberately runs nothing. Prerelease tags repeat the gate before packaging, while stable tags package without rerunning it. Every tag build creates the official game Arkpack once, embeds a keyless Sigstore proof, and reuses those exact self-contained `.arkpack` bytes in every native package and standalone prerelease artifact. Local and Editor packs are Community. Official and Community are both playable; [`VERSION.md`](VERSION.md) owns the exact soft-provenance contract.
+`argc preview-macos` launches an unpacked local arm64 app. The native package commands create unsigned macOS arm64, Windows x64, Linux x64, and Linux arm64 applications with target-specific checksum files. Working branches run the complete repository gate on hosted Linux and the focused platform boundary gate on macOS and Windows; every platform builds and explicitly verifies a Community Arkpack. `main` deliberately runs nothing. Prerelease tags repeat the same gates before packaging, while stable tags package without rerunning them. Every tag build creates the official game Arkpack once, embeds a keyless Sigstore proof, and reuses those exact self-contained `.arkpack` bytes in every native package and standalone prerelease artifact. Local and Editor packs are Community. Official and Community are both playable; [`VERSION.md`](VERSION.md) owns the exact soft-provenance contract.

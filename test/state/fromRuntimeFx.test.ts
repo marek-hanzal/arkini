@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
+import { createTestGameSession } from "~test/support/game/createTestGameSession";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
 import { startFx } from "~/engine/start/write/startFx";
-import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
+import { testArkpackConfig } from "~test/support/arkpack/createTestArkpack";
 
 describe("fromRuntimeFx", () => {
 	it("creates a detached complete state that constructs one fresh session", async () => {

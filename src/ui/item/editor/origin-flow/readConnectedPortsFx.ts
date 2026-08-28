@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { EditorItemOriginEdge } from "~/bridge/item/editor/EditorItemOriginFlow";
+import type { EditorItemOriginEdge } from "~/editor/origin-flow/EditorItemOriginFlow";
 
 export type ConnectedPorts = ReadonlyMap<string, ReadonlySet<string>>;
 

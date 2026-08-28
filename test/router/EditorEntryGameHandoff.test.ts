@@ -5,9 +5,7 @@ import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Route as EditorRoute } from "~/@routes/editor";
-import { acquireGameEngineLeaseFx } from "~/bridge/game/acquireGameEngineLeaseFx";
-import { adoptGameEngineLeaseFx } from "~/bridge/game/adoptGameEngineLeaseFx";
-import { readCurrentGameEngineResourceFx } from "~/bridge/game/readCurrentGameEngineResourceFx";
+import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
 import {
 	createGame,
 	createGameFxMock,
@@ -68,7 +66,11 @@ describe("Editor entry Game handoff", () => {
 		try {
 			const initialLoad = router.load();
 			await vi.waitFor(() => expect(createGameFxMock).toHaveBeenCalledOnce());
-			expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
+			expect(
+				rendererRuntime.runSync(
+					GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+				),
+			).toBeNull();
 			let staleEditorNavigation: ReturnType<typeof router.navigate>;
 			await act(async () => {
 				staleEditorNavigation = router.navigate({
@@ -101,7 +103,9 @@ describe("Editor entry Game handoff", () => {
 			expect(editorApis.activateMcp).not.toHaveBeenCalled();
 			expect(router.state.location.pathname).toBe(`/game/${nextPackageId}/board`);
 			expect(
-				rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack.packageId,
+				rendererRuntime.runSync(
+					GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+				)?.game.arkpack.packageId,
 			).toBe(nextPackageId);
 		} finally {
 			Effect.runSync(Deferred.succeed(disposalGate, undefined));
@@ -120,9 +124,14 @@ describe("Editor entry Game handoff", () => {
 
 		try {
 			const leasePromise = rendererRuntime.runPromise(
-				acquireGameEngineLeaseFx({
-					packageId,
-				}).pipe(Effect.provideService(Scope.Scope, scope)),
+				GameEngineResourceFx.pipe(
+					Effect.flatMap((service) =>
+						service.acquireLeaseFx({
+							packageId,
+						}),
+					),
+					Effect.provideService(Scope.Scope, scope),
+				),
 			);
 			await vi.waitFor(() => expect(createGameFxMock).toHaveBeenCalledOnce());
 			const lease = await leasePromise;
@@ -136,9 +145,13 @@ describe("Editor entry Game handoff", () => {
 			expect(discard).not.toHaveBeenCalled();
 			expect(editorApis.status).not.toHaveBeenCalled();
 			expect(editorApis.activateMcp).not.toHaveBeenCalled();
-			await expect(rendererRuntime.runPromise(adoptGameEngineLeaseFx(lease))).resolves.toBe(
-				lease.resource,
-			);
+			await expect(
+				rendererRuntime.runPromise(
+					GameEngineResourceFx.pipe(
+						Effect.flatMap((service) => service.adoptLeaseFx(lease)),
+					),
+				),
+			).resolves.toBe(lease.resource);
 		} finally {
 			await Effect.runPromise(Scope.close(scope, Exit.void));
 		}

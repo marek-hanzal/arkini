@@ -1,9 +1,9 @@
 import { useAtomSet } from "@effect/atom-react";
 import { useEffect, useMemo, useState } from "react";
 
-import type { EditorProject } from "~/bridge/editor/EditorProject";
-import type { EditorBoardGame } from "~/bridge/editor/board/EditorBoardGame";
-import { EditorBoardScenarioCommandAtoms } from "~/bridge/editor/board/EditorBoardScenarioCommandAtoms";
+import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorBoardGame } from "~/renderer/editor/board/EditorBoardGame";
+import { EditorBoardScenarioCommandAtoms } from "~/ui/board/editor/EditorBoardScenarioCommandAtoms";
 import type { EditorBoardScenarioDescriptorSchema } from "~/editor/board/EditorBoardScenarioSchema";
 
 export const editorBoardScenarioDraftOptionId = "editor-board-scenario:draft";

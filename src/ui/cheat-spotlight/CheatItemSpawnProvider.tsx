@@ -1,7 +1,7 @@
 import { useAtom } from "@effect/atom-react";
 import { type PropsWithChildren, useCallback, useMemo } from "react";
 
-import type { PlayableGame } from "~/bridge/game/PlayableGame";
+import type { PlayableGame } from "~/renderer/game/PlayableGame";
 import { CheatItemSpawnCommandAtom } from "~/ui/cheat-spotlight/CheatItemSpawnCommandAtom";
 import {
 	CheatItemSpawnContext,

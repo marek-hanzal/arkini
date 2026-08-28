@@ -5,26 +5,26 @@ import { match, P } from "ts-pattern";
 
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 
-import { buildEditorProjectCommandAtom } from "~/bridge/arkpack/editor/buildEditorProjectCommandAtom";
-import { installBuiltEditorArkpackCommandAtom } from "~/bridge/arkpack/editor/installBuiltEditorArkpackCommandAtom";
+import { buildEditorProjectCommandAtom } from "~/ui/arkpack/editor/buildEditorProjectCommandAtom";
+import { installBuiltEditorArkpackCommandAtom } from "~/ui/arkpack/editor/installBuiltEditorArkpackCommandAtom";
 import {
 	type EditorBuildMajorUpdateConfirmation,
-	readEditorBuildInstallPlanFx,
-} from "~/bridge/arkpack/editor/readEditorBuildInstallPlanFx";
+	readEditorBuildInstallPlanFn,
+} from "~/editor/build/fn/readEditorBuildInstallPlanFn";
 import {
 	type EditorBuildFailure,
 	type EditorGameDiagnostic,
-	readEditorBuildFailureFx,
-} from "~/bridge/arkpack/editor/readEditorBuildFailureFx";
-import { saveBuiltEditorArkpackCommandAtom } from "~/bridge/arkpack/editor/saveBuiltEditorArkpackCommandAtom";
-import { ArkpackCatalogAtom } from "~/bridge/arkpack/ArkpackCatalogAtom";
-import { readArkpackArtifactName } from "~/bridge/arkpack/readArkpackArtifactName";
-import { exportEditorJsonDirectoryCommandAtom } from "~/bridge/editor/exportEditorJsonDirectoryCommandAtom";
-import type { EditorSourceExport } from "~/bridge/editor/exportEditorJsonDirectoryFx";
-import { openEditorExportDirectoryCommandAtom } from "~/bridge/editor/openEditorExportDirectoryCommandAtom";
-import type { EditorProject } from "~/bridge/editor/EditorProject";
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+	readEditorBuildFailureFn,
+} from "~/editor/build/fn/readEditorBuildFailureFn";
+import { saveBuiltEditorArkpackCommandAtom } from "~/ui/arkpack/editor/saveBuiltEditorArkpackCommandAtom";
+import { ArkpackCatalogAtom } from "~/ui/arkpack/ArkpackCatalogAtom";
+import { readArkpackArtifactNameFn } from "~/engine/pack/fn/readArkpackArtifactNameFn";
+import { exportEditorJsonDirectoryCommandAtom } from "~/ui/editor/exportEditorJsonDirectoryCommandAtom";
+import type { EditorProjectTransport } from "../../../../electron/contract/editor/EditorProjectTransport";
+import { openEditorExportDirectoryCommandAtom } from "~/ui/editor/openEditorExportDirectoryCommandAtom";
+import type { EditorProject } from "~/editor/EditorProject";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { formatByteSizeFx } from "~/ui/arkpack/editor/formatByteSizeFx";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 
@@ -88,13 +88,11 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 	const catalogState = useAtomValue(ArkpackCatalogAtom);
 	const installPlan =
 		artifact !== undefined && catalogState.type === "ready"
-			? RendererRuntime.runSync(
-					readEditorBuildInstallPlanFx({
-						arkpacks: catalogState.arkpacks,
-						artifact,
-						targetVersion: project.version,
-					}),
-				)
+			? readEditorBuildInstallPlanFn({
+					arkpacks: catalogState.arkpacks,
+					artifact,
+					targetVersion: project.version,
+				})
 			: undefined;
 	const installAtom = installBuiltEditorArkpackCommandAtom(artifact?.contentHash ?? "unbuilt");
 	const saveAtom = saveBuiltEditorArkpackCommandAtom(artifact?.contentHash ?? "unbuilt");
@@ -113,7 +111,7 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 	const exportSourceError = RendererRuntime.runSync(
 		readSettledAsyncResultErrorFx(exportSourceResult),
 	);
-	const buildFailure = RendererRuntime.runSync(readEditorBuildFailureFx(buildError));
+	const buildFailure = readEditorBuildFailureFn(buildError);
 	const diagnostics =
 		buildFailure?.type === "validation"
 			? buildFailure.diagnostics
@@ -128,7 +126,7 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 	const sourceExportRef = useRef<
 		| {
 				readonly projectId: string;
-				readonly value: EditorSourceExport;
+				readonly value: EditorProjectTransport.SourceExport;
 		  }
 		| undefined
 	>(undefined);
@@ -198,7 +196,7 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 		.with(
 			P.nonNullable,
 			(currentArtifact) =>
-				`${readArkpackArtifactName(currentArtifact.projectId)} · ${RendererRuntime.runSync(formatByteSizeFx(currentArtifact.size))} · v${project.version} · Arkini ${ArkiniAppVersion} · Community · ${currentArtifact.contentHash}`,
+				`${readArkpackArtifactNameFn(currentArtifact.projectId)} · ${RendererRuntime.runSync(formatByteSizeFx(currentArtifact.size))} · v${project.version} · Arkini ${ArkiniAppVersion} · Community · ${currentArtifact.contentHash}`,
 		)
 		.otherwise(() => undefined);
 	const installedPackageId =

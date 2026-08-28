@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 
-import type { GameEngine } from "~/bridge/game/GameEngine";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import type { GameEngine } from "~/renderer/game/GameEngine";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { createMainActorStoreFx } from "~/ui/pixi/actor/createMainActorStoreFx";
 import { createParticleTexturesFx } from "~/ui/pixi/actor/createParticleTexturesFx";
 import { createAnimationDriverFx } from "~/ui/pixi/animation/createAnimationDriverFx";

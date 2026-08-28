@@ -2,7 +2,7 @@ import { Info } from "lucide-react";
 import { match } from "ts-pattern";
 import type { ReactNode } from "react";
 
-import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
+import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
 import { ItemReferenceButton } from "~/ui/item-detail/ItemReferenceButton";
 
 const ItemLineOutputItem = ({

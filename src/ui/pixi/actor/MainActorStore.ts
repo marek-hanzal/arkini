@@ -1,6 +1,6 @@
 import type { Effect } from "effect";
 
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 
 export interface MainActorStore {

@@ -1,4 +1,4 @@
-import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
+import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import type { SwapCandidate } from "~/ui/pixi/drop/DropPresentation";
 
 const sourceLocation = {

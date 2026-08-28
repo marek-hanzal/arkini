@@ -5,7 +5,7 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { PixiBoardToolbarSurface } from "~/ui/pixi/PixiBoardToolbarSurface";
 import type { createMainRuntimeFx } from "~/ui/pixi/scene/createMainRuntimeFx";
 
@@ -64,30 +64,30 @@ vi.mock("@effect/atom-react", () => ({
 				: boardState.runDrop,
 }));
 
-vi.mock("~/bridge/game/useGameEngine", () => ({
+vi.mock("~/ui/game/useGameEngine", () => ({
 	useGameEngine: () => ({}),
 }));
 
-vi.mock("~/bridge/runtime/RendererRuntime", () => ({
+vi.mock("~/renderer/RendererRuntime", () => ({
 	RendererRuntime: {
 		runPromise: Effect.runPromise,
 		runSync: Effect.runSync,
 	},
 }));
 
-vi.mock("~/bridge/tile/TileDefaultLineCommandAtom", () => ({
+vi.mock("~/ui/pixi/command/TileDefaultLineCommandAtom", () => ({
 	TileDefaultLineCommandAtom: () => ({}),
 }));
 
-vi.mock("~/bridge/tile/runTileDropAtom", () => ({
+vi.mock("~/ui/pixi/command/runTileDropAtom", () => ({
 	runTileDropAtom: () => tileAtoms.drop,
 }));
 
-vi.mock("~/bridge/tile/runTileSplitAtom", () => ({
+vi.mock("~/ui/pixi/command/runTileSplitAtom", () => ({
 	runTileSplitAtom: () => tileAtoms.split,
 }));
 
-vi.mock("~/bridge/space/runSpaceActivationAtom", () => ({
+vi.mock("~/ui/pixi/command/runSpaceActivationAtom", () => ({
 	runSpaceActivationAtom: () => tileAtoms.space,
 }));
 

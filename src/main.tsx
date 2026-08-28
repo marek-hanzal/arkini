@@ -2,21 +2,22 @@
 // is evaluated so Electron can keep its strict no-unsafe-eval CSP.
 import "pixi.js/unsafe-eval";
 import { RegistryContext } from "@effect/atom-react";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import { RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { ArkiniWindowTitle } from "../shared/ArkiniAppMetadata";
-import { configureArkpackCatalogFx } from "~/bridge/arkpack/configureArkpackCatalogFx";
-import { createArkpackCatalogFx } from "~/bridge/arkpack/createArkpackCatalogFx";
-import { configureRendererLifecycleFx } from "~/bridge/lifecycle/configureRendererLifecycleFx";
-import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLifecycleFx";
-import { RendererAtomRegistry } from "~/bridge/reactivity/RendererAtomRegistry";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { refreshEditorServiceStatusFx } from "~/bridge/editor/refreshEditorServiceStatusFx";
-import { installEditorMcpVersionCheckoutFx } from "~/bridge/editor/version/installEditorMcpVersionCheckoutFx";
-import { installRendererControlledCloseFx } from "~/installRendererControlledCloseFx";
-import { installRendererNativeDragGuardFx } from "~/installRendererNativeDragGuardFx";
-import { installWindowModeSyncFx } from "~/bridge/window/installWindowModeSyncFx";
+import { createArkpackCatalogFx } from "~/renderer/arkpack/createArkpackCatalogFx";
+import { createRendererLifecycleFx } from "~/renderer/lifecycle/createRendererLifecycleFx";
+import { ArkpackCatalogOwnerAtom } from "~/renderer/arkpack/ArkpackCatalogOwnerAtom";
+import { RendererLifecycleOwnerAtom } from "~/renderer/lifecycle/RendererLifecycleOwnerAtom";
+import { RendererAtomRegistry } from "~/renderer/RendererAtomRegistry";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { refreshEditorServiceStatusFx } from "~/ui/editor/refreshEditorServiceStatusFx";
+import { installEditorMcpVersionCheckoutFx } from "~/ui/version/editor/installEditorMcpVersionCheckoutFx";
+import { installRendererControlledCloseFx } from "~/ui/root/installRendererControlledCloseFx";
+import { installRendererNativeDragGuardFx } from "~/renderer/installRendererNativeDragGuardFx";
+import { installWindowModeSyncFx } from "~/renderer/window/installWindowModeSyncFx";
 import { createArkiniRouterFx } from "~/createArkiniRouterFx";
 import { AppearanceDataset } from "~/ui/appearance/AppearanceDataset";
 import { configureLauncherStartupFx } from "~/ui/launcher/configureLauncherStartupFx";
@@ -36,7 +37,7 @@ document.title = ArkiniWindowTitle;
  * duplicate the registry, runtime-backed authorities or native close listeners.
  */
 const catalog = RendererRuntime.runSync(createArkpackCatalogFx());
-RendererRuntime.runSync(configureArkpackCatalogFx(catalog));
+RendererRuntime.runSync(Atom.set(ArkpackCatalogOwnerAtom, catalog));
 void RendererRuntime.runPromise(refreshEditorServiceStatusFx);
 RendererRuntime.runSync(
 	installRendererNativeDragGuardFx({
@@ -44,7 +45,7 @@ RendererRuntime.runSync(
 	}),
 );
 const lifecycle = RendererRuntime.runSync(createRendererLifecycleFx(window.arkini.lifecycle));
-RendererRuntime.runSync(configureRendererLifecycleFx(lifecycle));
+RendererRuntime.runSync(Atom.set(RendererLifecycleOwnerAtom, lifecycle));
 RendererRuntime.runSync(installWindowModeSyncFx());
 RendererRuntime.runSync(
 	configureLauncherStartupFx({

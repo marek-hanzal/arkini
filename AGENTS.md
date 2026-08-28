@@ -42,7 +42,7 @@ Tests are fast risk feedback, not a coverage project.
 
 - Every test protects one named Arkini regression: a high-risk behavior, invariant, failure boundary, or lifecycle contract. If that regression cannot be stated, do not add the test.
 - Test the authoritative lower layer. A higher-layer test must prove a distinct boundary risk such as admission, exact identity wiring, cancellation, stale-result suppression, destructive navigation, or settlement—not repeat engine/schema/selector facts through React DOM.
-- Prioritize engine transactions, Tick, jobs, output, placement, merge ownership, persistence, compiler, and Arkpack integrity/trust/load/signing; then bridge concurrency; UI presentation last.
+- Prioritize engine transactions, Tick, jobs, output, placement, merge ownership, persistence, compiler, and Arkpack integrity/trust/load/signing; then renderer-process concurrency; UI presentation last.
 - Do not test copy, CSS/token spelling, markup inventories, visual tuning, framework behavior, trivial passthroughs, schema mechanics, enum membership, defaults, or permutations without distinct risk.
 - Use the smallest representative synthetic fixture. Permanent tests must not depend on `game/arkini`, generated official snapshots, or platform packaging.
 - Keep scenarios readable. Around 250 lines is a review signal; move non-trivial fixtures beside `Foo.test.ts` under `Foo.test/`, without a global fixture DSL.

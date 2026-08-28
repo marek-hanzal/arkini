@@ -2,7 +2,7 @@ import type {
 	EditorItemOriginFlow,
 	EditorItemOriginItemNode,
 	EditorItemOriginOperation,
-} from "~/bridge/item/editor/EditorItemOriginFlow";
+} from "~/editor/origin-flow/EditorItemOriginFlow";
 
 const operation = (
 	id: string,

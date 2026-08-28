@@ -2,7 +2,7 @@ import { createFormHook } from "@tanstack/react-form";
 import type { LucideIcon } from "lucide-react";
 import type { PropsWithChildren } from "react";
 
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { EditorBooleanToggleBadge } from "~/ui/form/EditorBooleanToggleBadge";
 import { EditorDurationHint } from "~/ui/form/EditorDurationHint";
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";

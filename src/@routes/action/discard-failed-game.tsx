@@ -4,10 +4,11 @@ import {
 	type ErrorComponentProps,
 	useRouter,
 } from "@tanstack/react-router";
+import { Effect } from "effect";
 import { z } from "zod";
 
 import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
-import { discardFailedGameEngineFx } from "~/bridge/game/discardFailedGameEngineFx";
+import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
 import { ActionErrorPage } from "~/ui/action/ActionErrorPage";
 import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
 
@@ -22,7 +23,11 @@ export const Route = createFileRoute("/action/discard-failed-game")({
 	loaderDeps: ({ search }) => search,
 	loader: async ({ context, deps }) => {
 		await context.rendererRuntime.runPromise(
-			runActionRouteFx(discardFailedGameEngineFx(deps.packageId)),
+			runActionRouteFx(
+				GameEngineResourceFx.pipe(
+					Effect.flatMap((service) => service.discardFailedFx(deps.packageId)),
+				),
+			),
 		);
 		throw redirect({
 			to: "/main-menu",

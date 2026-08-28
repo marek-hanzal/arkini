@@ -1,8 +1,8 @@
 import { Cause, Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
-import { requestApplicationCloseAtom } from "~/bridge/lifecycle/requestApplicationCloseAtom";
+import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
+import { readRendererLifecycleFx } from "~/renderer/lifecycle/readRendererLifecycleFx";
 
 export type MainMenuExitCommandState =
 	| {
@@ -23,14 +23,16 @@ const MainMenuExitCommandStateAtom = Atom.make<MainMenuExitCommandState>({
 	kind: "idle",
 }).pipe(Atom.keepAlive);
 
-const MainMenuExitCommandRunnerAtom = Atom.fn((_input: void, get) =>
+const MainMenuExitCommandRunnerAtom = Atom.fn((_input: void) =>
 	Effect.gen(function* () {
-		const exit = yield* Effect.exit(get.setResult(requestApplicationCloseAtom, undefined));
+		const exit = yield* Effect.exit(
+			readRendererLifecycleFx().pipe(Effect.flatMap((lifecycle) => lifecycle.requestCloseFx)),
+		);
 		if (Exit.isFailure(exit)) {
 			if (Cause.hasInterruptsOnly(exit.cause)) {
 				return yield* Effect.failCause(exit.cause);
 			}
-			const failure = yield* readExactCauseFailureFx(exit.cause);
+			const failure = readExactCauseFailureFn(exit.cause);
 			yield* Atom.set(MainMenuExitCommandStateAtom, {
 				kind: "error",
 				error: Option.isSome(failure) ? failure.value : exit.cause,

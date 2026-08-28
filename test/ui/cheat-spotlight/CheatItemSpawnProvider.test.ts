@@ -7,12 +7,12 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { Game } from "~/bridge/game/Game";
-import type { GameSession } from "~/bridge/game/GameSession";
+import type { Game } from "~/renderer/game/Game";
+import type { GameSession } from "~/renderer/game/session/GameSession";
 import type { CheatItemSpawnControl } from "~/ui/cheat-spotlight/CheatItemSpawnContext";
 import { CheatItemSpawnProvider } from "~/ui/cheat-spotlight/CheatItemSpawnProvider";
 import { useCheatItemSpawn } from "~/ui/cheat-spotlight/useCheatItemSpawn";
-import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
+import { createTestGameSession } from "~test/support/game/createTestGameSession";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 
 (

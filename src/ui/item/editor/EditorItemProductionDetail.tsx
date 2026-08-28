@@ -1,16 +1,16 @@
 import { Factory } from "lucide-react";
 
-import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
-import { readEditorItemLinesFx } from "~/bridge/item/editor/readEditorItemLinesFx";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { readAuthoredItemLinesFx } from "~/engine/line/read/readAuthoredItemLinesFx";
 import { DetailFact, DetailSection } from "~/ui/item/editor/EditorItemDetailDefinition";
 import { OutputDetail } from "~/ui/item/editor/EditorItemOutputDetail";
 import { EditorProductionLineDetail } from "~/ui/item/editor/EditorProductionLineDetail";
 import { Status } from "~/ui/status/Status";
 
 /** Dispatches production-capable lines, temporary lifetime, or the disabled contract. */
-export const EditorItemProductionDetail = ({ item }: { readonly item: EditorItem }) => {
-	const lines = RendererRuntime.runSync(readEditorItemLinesFx(item));
+export const EditorItemProductionDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
+	const lines = RendererRuntime.runSync(readAuthoredItemLinesFx(item));
 	if (lines.length > 0)
 		return (
 			<div className="ak-list grid gap-3">

@@ -1,0 +1,29 @@
+import type { PlayableGame } from "~/renderer/game/PlayableGame";
+import type { ItemDetailPendingActionOwner } from "~/ui/item-detail/ItemDetailPendingActionOwner";
+import { useItemDetailPendingCommand } from "~/ui/item-detail/useItemDetailPendingCommand";
+import { unsetDefaultLineFx } from "~/engine/line/write/unsetDefaultLineFx";
+
+export namespace useUnsetDefaultItemDetailLine {
+	export type Props = unsetDefaultLineFx.Props;
+
+	export interface Options {
+		readonly pendingKey: string;
+		readonly pendingOwner: ItemDetailPendingActionOwner;
+	}
+}
+
+const runUnsetDefaultFx = (game: PlayableGame, command: useUnsetDefaultItemDetailLine.Props) =>
+	game.runFx(unsetDefaultLineFx(command));
+
+/** Removes the authoritative save-backed default line from an exact Item Detail owner. */
+export const useUnsetDefaultItemDetailLine = ({
+	pendingKey,
+	pendingOwner,
+}: useUnsetDefaultItemDetailLine.Options) =>
+	useItemDetailPendingCommand({
+		action: "default",
+		failureMessage: "Default line could not be changed.",
+		pendingKey,
+		pendingOwner,
+		run: runUnsetDefaultFx,
+	});

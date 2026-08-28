@@ -35,7 +35,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => ({
 	useRouter: () => navigation.router,
 }));
 
-vi.mock("~/bridge/editor/deleteEditorProjectAtom", async () => {
+vi.mock("~/ui/editor/deleteEditorProjectAtom", async () => {
 	const { Effect } = await import("effect");
 	const Atom = await import("effect/unstable/reactivity/Atom");
 	return {
@@ -45,7 +45,7 @@ vi.mock("~/bridge/editor/deleteEditorProjectAtom", async () => {
 	};
 });
 
-vi.mock("~/bridge/editor/createFreshEditorProjectAtom", async () => {
+vi.mock("~/ui/editor/createFreshEditorProjectAtom", async () => {
 	const { Effect } = await import("effect");
 	const Atom = await import("effect/unstable/reactivity/Atom");
 	return {
@@ -53,19 +53,11 @@ vi.mock("~/bridge/editor/createFreshEditorProjectAtom", async () => {
 	};
 });
 
-vi.mock("~/bridge/arkpack/editor/importEditorArkpackFileAtom", async () => {
+vi.mock("~/ui/arkpack/editor/importEditorArkpackFileAtom", async () => {
 	const { Effect } = await import("effect");
 	const Atom = await import("effect/unstable/reactivity/Atom");
 	return {
 		importEditorArkpackFileAtom: Atom.fn(() => Effect.die("Unexpected arkpack import.")),
-	};
-});
-
-vi.mock("~/bridge/editor/importEditorJsonDirectoryAtom", async () => {
-	const { Effect } = await import("effect");
-	const Atom = await import("effect/unstable/reactivity/Atom");
-	return {
-		importEditorJsonDirectoryAtom: Atom.fn(() => Effect.die("Unexpected JSON import.")),
 	};
 });
 

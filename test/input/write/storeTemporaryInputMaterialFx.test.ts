@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
+import { createTestGameSession } from "~test/support/game/createTestGameSession";
 
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";

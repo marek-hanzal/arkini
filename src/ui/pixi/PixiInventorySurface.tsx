@@ -1,13 +1,13 @@
 import { useAtomSet } from "@effect/atom-react";
 import { useCallback, useLayoutEffect, useRef } from "react";
 
-import { useGameEngine } from "~/bridge/game/useGameEngine";
-import { runInventoryReleaseAtom } from "~/bridge/inventory/runInventoryReleaseAtom";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { runSpaceActivationAtom } from "~/bridge/space/runSpaceActivationAtom";
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
-import { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
+import { useGameEngine } from "~/ui/game/useGameEngine";
+import { runInventoryReleaseAtom } from "~/ui/pixi/command/runInventoryReleaseAtom";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { runSpaceActivationAtom } from "~/ui/pixi/command/runSpaceActivationAtom";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import type { InventoryRuntime } from "~/ui/pixi/scene/InventoryRuntime";
 import { createInventoryRuntimeFx } from "~/ui/pixi/scene/createInventoryRuntimeFx";

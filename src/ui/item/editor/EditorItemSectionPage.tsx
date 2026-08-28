@@ -1,4 +1,4 @@
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { EditorItemArtworkSection } from "~/ui/item/editor/EditorItemArtworkSection";
 import { EditorItemChargesSection } from "~/ui/item/editor/EditorItemChargesSection";
 import { useEditorItemFormSession } from "~/ui/item/editor/EditorItemFormContext";

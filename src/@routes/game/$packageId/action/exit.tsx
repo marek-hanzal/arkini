@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Effect } from "effect";
 
 import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
-import { closeGameEngineResourceFx } from "~/bridge/game/closeGameEngineResourceFx";
+import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
 import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
 
 /**
@@ -14,7 +15,11 @@ import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
 export const Route = createFileRoute("/game/$packageId/action/exit")({
 	loader: async ({ context }) => {
 		const result = await context.rendererRuntime.runPromise(
-			runActionRouteFx(closeGameEngineResourceFx(context.gameEngineResource)),
+			runActionRouteFx(
+				GameEngineResourceFx.pipe(
+					Effect.flatMap((service) => service.closeFx(context.gameEngineResource)),
+				),
+			),
 		);
 		if (result.type === "finalization-failed") {
 			console.error(

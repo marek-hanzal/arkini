@@ -1,15 +1,15 @@
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { revalidateLogic, useStore } from "@tanstack/react-form";
 import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
 import {
 	EditorItemFormSchema,
 	type EditorItemFormValues,
-} from "~/bridge/item/editor/EditorItemFormSchema";
-import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
-import { saveEditorItemCommandAtom } from "~/bridge/item/editor/saveEditorItemCommandAtom";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+} from "~/ui/item/editor/EditorItemFormSchema";
+import { saveEditorItemCommandAtom } from "~/ui/item/editor/saveEditorItemCommandAtom";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { useAppForm } from "~/ui/form/EditorForm";
 import type {
 	EditorItemOptionalCapability,
@@ -24,9 +24,9 @@ import { analyzeEditorProjectCompatibilityFx } from "~/editor/version/analyzeEdi
 export namespace useEditorItemFormController {
 	export interface Props {
 		readonly enableCapability?: EditorItemOptionalCapability;
-		readonly initialItem: EditorItem;
+		readonly initialItem: ItemSchema.Type;
 		readonly onInvalidSection: (section: EditorItemSectionId) => void | Promise<void>;
-		readonly onSaved?: (item: EditorItem) => void | Promise<void>;
+		readonly onSaved?: (item: ItemSchema.Type) => void | Promise<void>;
 	}
 }
 

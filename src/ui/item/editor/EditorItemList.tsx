@@ -1,10 +1,10 @@
 import { PackageOpen, Plus } from "lucide-react";
+import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { useMemo } from "react";
 
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import type { EditorItemType } from "~/bridge/item/editor/EditorItemModel";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
 import { searchEditorItemsFx } from "~/editor/searchEditorItemsFx";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { PrimaryButtonLink } from "~/ui/button/Button";
 import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import { EditorItemListRow } from "~/ui/item/editor/EditorItemListRow";
@@ -17,8 +17,8 @@ export const EditorItemList = ({
 	onQueryChange,
 	query,
 }: {
-	readonly itemType?: EditorItemType;
-	readonly onItemTypeChange: (itemType: EditorItemType | undefined) => void;
+	readonly itemType?: TypeSchema.Type;
+	readonly onItemTypeChange: (itemType: TypeSchema.Type | undefined) => void;
 	readonly onQueryChange: (query: string) => void;
 	readonly query: string;
 }) => {

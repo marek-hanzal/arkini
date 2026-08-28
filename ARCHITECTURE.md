@@ -7,17 +7,17 @@ This is the canonical map of implemented ownership and lifecycle. It does not ca
 The renderer dependency DAG is:
 
 ```text
-src/@routes → { src/ui, src/bridge, public src/editor }
-src/ui      → { src/bridge, public src/editor }
-src/bridge  → { public src/engine, public src/editor, electron/contract }
-src/editor  → public src/engine
+src/@routes → { src/ui, src/renderer, exact src/engine owners, src/editor, electron/contract }
+src/ui      → { src/renderer, exact src/engine owners, src/editor, electron/contract }
+src/renderer → { exact src/engine owners, src/editor, electron/contract }
+src/editor  → exact src/engine owners
 ```
 
-- `src/engine` is framework-neutral gameplay, config, compiler, validation, pack, and CLI domain code.
+- `src/engine` is framework-neutral gameplay, config, compiler, validation, pack, and CLI domain code. Consumers import exact Engine owners directly; there is no generic public/internal wall. Dependency Cruiser restricts only specifically enumerated mutable or raw authorities.
 - `src/editor` is the platform-neutral Editor domain.
-- `src/bridge` is the renderer lifecycle/transport connection to engine and the pure `electron/contract` seam. Platform-neutral public Editor operations and projections may be consumed directly where the executable dependency rules allow them.
+- `src/renderer` contains only concrete renderer-process runtime, lifecycle, concurrency, and transport capabilities. It is not a required gateway to Engine, Editor, or `electron/contract`; callers import the exact owner directly.
 - `src/ui` owns reusable presentation and transient interaction. `src/@routes` owns registration, loaders, redirects, route context, and route-specific composition; routes may share only explicitly ignored `-*` route-private helpers, never import another route module.
-- `electron/main` owns physical desktop capabilities and composes public engine/editor domains. It never imports renderer code or engine internals. `electron/preload` is transport-only; engine/editor code never imports Electron.
+- `electron/main` owns physical desktop capabilities and composes engine/editor owners directly. It never imports renderer code; concrete raw Engine authorities remain limited to their exact owners by Dependency Cruiser. `electron/preload` is transport-only; engine/editor code never imports Electron.
 
 [`.dependency-cruiser.cjs`](.dependency-cruiser.cjs) is the executable import-boundary authority. Do not duplicate those rules in tests or prose.
 
@@ -71,7 +71,7 @@ Subscribers own current-plus-tail observation. Runtime listeners ignore event-on
 
 ## Game and session ownership
 
-`GameSession` owns one canonical Runtime, Tick fibers, command/listener scopes, and save lifecycle. The bridge-level playable `Game` adds its completed config and resource URLs without mirroring Runtime. UI executes public Effects and reads the exact session snapshot through a non-owning `GameEngine` facade.
+`GameSession` owns one canonical Runtime, Tick fibers, command/listener scopes, and save lifecycle. The renderer-process playable `Game` adds its completed config and resource URLs without mirroring Runtime. UI executes exact Engine-owned Effects and reads the exact session snapshot through its concrete game capability.
 
 `RendererRuntime` contains one scoped installed-game resource service. Acquisition uses scoped leases: same-package callers share one provisional result, the explicit load action adopts that exact lease, and `/game/$packageId` exposes only the adopted matching package through route context. A different package must finalize the current resource before acquisition. React mount/unmount is never desired-game state.
 

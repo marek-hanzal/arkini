@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
+import type { TileMotionCue } from "~/ui/pixi/motion/TileMotionCue";
 import type { InteractionClaim } from "~/ui/pixi/motion/MotionRuntime";
 
 /** Projects drag ownership without turning presentation work into a click lock. */

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { TileReplacement } from "~/bridge/tile/motion/readCommittedTileReplacementsFx";
+import type { TileReplacement } from "~/ui/pixi/motion/readCommittedTileReplacementsFx";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import {
 	visualCrossfadeDurationMs,

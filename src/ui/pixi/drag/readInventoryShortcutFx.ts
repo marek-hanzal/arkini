@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { DropItemResultKind } from "~/bridge/tile/DropItemResultKind";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { DragPreview } from "~/ui/pixi/drag/DragPreview";
 import type { ActiveDrag } from "~/ui/pixi/drag/ActiveDrag";

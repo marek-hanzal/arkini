@@ -1,6 +1,6 @@
 import { ArrowDown, ArrowUp } from "lucide-react";
 
-import { EditorProjectAvatarKeys } from "~/bridge/project/editor/EditorProjectFormSchema";
+import { EditorProjectAvatarKeys } from "~/ui/project/editor/EditorProjectFormSchema";
 import { Button } from "~/ui/button/Button";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSection } from "~/ui/form/EditorFormSection";

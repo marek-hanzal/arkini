@@ -1,14 +1,12 @@
-import type {
-	EditorDrop,
-	EditorDropWeight,
-	EditorInput,
-	EditorMerge,
-	EditorOutput,
-	EditorQuery,
-	EditorRoll,
-	EditorRollSet,
-	EditorWhen,
-} from "~/bridge/item/editor/EditorItemModel";
+import type { InputSchema as LineInputSchema } from "~/engine/input/schema/InputSchema";
+import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
+import type { DropSchema } from "~/engine/output/schema/DropSchema";
+import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import type { QuerySchema } from "~/engine/query/schema/QuerySchema";
+import type { RollSchema } from "~/engine/roll/schema/RollSchema";
+import type { SetSchema } from "~/engine/roll/schema/SetSchema";
+import type { WeightedDropSchema } from "~/engine/roll/schema/WeightedDropSchema";
+import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
 
 const drop = {
 	itemId: "",
@@ -18,7 +16,7 @@ const drop = {
 	},
 	placement: "drop",
 	rules: [],
-} satisfies EditorDrop;
+} satisfies DropSchema.Type;
 
 const rolls = {
 	guaranteed: {
@@ -26,7 +24,7 @@ const rolls = {
 		drop: [
 			drop,
 		] as [
-			EditorDrop,
+			DropSchema.Type,
 		],
 	},
 	chance: {
@@ -35,7 +33,7 @@ const rolls = {
 		drop: [
 			drop,
 		] as [
-			EditorDrop,
+			DropSchema.Type,
 		],
 	},
 	weight: {
@@ -50,7 +48,7 @@ const rolls = {
 				drop: [
 					structuredClone(drop),
 				] as [
-					EditorDrop,
+					DropSchema.Type,
 				],
 			},
 			{
@@ -58,16 +56,16 @@ const rolls = {
 				drop: [
 					structuredClone(drop),
 				] as [
-					EditorDrop,
+					DropSchema.Type,
 				],
 			},
 		] as [
-			EditorDropWeight,
-			EditorDropWeight,
-			...EditorDropWeight[],
+			WeightedDropSchema.Type,
+			WeightedDropSchema.Type,
+			...WeightedDropSchema.Type[],
 		],
 	},
-} satisfies Record<EditorRoll["type"], EditorRoll>;
+} satisfies Record<RollSchema.Type["type"], RollSchema.Type>;
 
 const query = {
 	scope: "any",
@@ -75,7 +73,7 @@ const query = {
 		type: "item",
 		itemId: "",
 	},
-} satisfies EditorQuery;
+} satisfies QuerySchema.Type;
 
 /** Presentation-only defaults cloned by local item forms when adding nested values. */
 export const EditorItemDraftDefaults = {
@@ -107,7 +105,7 @@ export const EditorItemDraftDefaults = {
 				},
 			},
 		},
-	} satisfies Record<EditorInput["type"], EditorInput>,
+	} satisfies Record<LineInputSchema.Type["type"], LineInputSchema.Type>,
 	drop,
 	rolls,
 	output: {
@@ -117,13 +115,13 @@ export const EditorItemDraftDefaults = {
 				roll: [
 					rolls.guaranteed,
 				] as [
-					EditorRoll,
+					RollSchema.Type,
 				],
 			},
 		] as [
-			EditorRollSet,
+			SetSchema.Type,
 		],
-	} satisfies EditorOutput,
+	} satisfies OutputSchema.Type,
 	merge: {
 		target: {
 			type: "item",
@@ -131,9 +129,9 @@ export const EditorItemDraftDefaults = {
 		},
 		action: "use",
 		effect: "keep",
-	} satisfies EditorMerge,
+	} satisfies MergeSchema.Type,
 	when: {
 		type: "exists",
 		query,
-	} satisfies EditorWhen,
+	} satisfies WhenSchema.Type,
 } as const;

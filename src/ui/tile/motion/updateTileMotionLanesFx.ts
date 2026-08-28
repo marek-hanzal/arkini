@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
+import type { TileMotionCue } from "~/ui/pixi/motion/TileMotionCue";
 import type { TileMotionLanesState } from "~/ui/tile/motion/TileMotionLanesState";
 import {
 	type TileMotionLaneClaim,

@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, type PropsWithChildren } from "react";
 
-import type { EditorProject } from "~/bridge/editor/EditorProject";
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import type { EditorProject } from "~/editor/EditorProject";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
 import {
 	EditorResourceUrlContext,
 	type EditorResourceUrlStore,

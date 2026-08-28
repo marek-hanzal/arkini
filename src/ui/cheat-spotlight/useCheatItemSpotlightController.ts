@@ -11,8 +11,8 @@ import {
 } from "react";
 import { match, P } from "ts-pattern";
 
-import { useGameCheats } from "~/bridge/cheat/useGameCheats";
-import type { PlayableGame } from "~/bridge/game/PlayableGame";
+import { useGameCheats } from "~/ui/cheats/useGameCheats";
+import type { PlayableGame } from "~/renderer/game/PlayableGame";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 import { useCheatItemSpawn } from "~/ui/cheat-spotlight/useCheatItemSpawn";
 import { useCheatItemSpotlightSearch } from "~/ui/cheat-spotlight/useCheatItemSpotlightSearch";

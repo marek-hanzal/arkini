@@ -1,7 +1,7 @@
 import { Cause, Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { EditorProject } from "~/bridge/editor/EditorProject";
+import type { EditorProject } from "~/editor/EditorProject";
 import type { EditorItemEstimate } from "~/editor/estimator/EditorItemEstimate";
 import type {
 	EditorItemEstimateWorkerRequest,

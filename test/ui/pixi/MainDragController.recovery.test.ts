@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
-import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
+import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import {
 	lifecycleDurationMs,
 	lifecycleReducedScale,

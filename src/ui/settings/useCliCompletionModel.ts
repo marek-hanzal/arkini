@@ -1,7 +1,7 @@
 import { useAtom } from "@effect/atom-react";
 import { useEffect } from "react";
 
-import type { CompletionStatus } from "~/bridge/cli/readCompletionStatusFx";
+import type { CompletionStatus } from "../../../electron/contract/cli/CompletionStatus";
 import { CompletionCommandAtom } from "~/ui/settings/CompletionCommandAtom";
 
 const shellLabel = (status: CompletionStatus) =>

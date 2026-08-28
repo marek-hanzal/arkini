@@ -1,13 +1,13 @@
 import { GalleryHorizontalEnd, Layers2, Trash2 } from "lucide-react";
 
-import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { Button } from "~/ui/button/Button";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { withFieldGroup } from "~/ui/form/EditorForm";
 
-const defaultArtwork: EditorItem["asset"] = {
+const defaultArtwork: ItemSchema.Type["asset"] = {
 	default: [
 		"",
 	],

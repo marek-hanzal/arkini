@@ -7,7 +7,7 @@ import {
 	editorSectionTabClassName,
 	EditorSectionTabs,
 } from "~/ui/editor/EditorSectionTabs";
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
 import { EditorMcpSections, type EditorMcpSectionId } from "./EditorMcpSections";
 import { EditorMcpServerSettings } from "./EditorMcpServerSettings";
 import { EditorMcpSettings } from "./EditorMcpSettings";

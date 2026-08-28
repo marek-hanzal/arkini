@@ -2,9 +2,9 @@ import { createFileRoute, redirect, useNavigate, useRouter } from "@tanstack/rea
 import { Effect } from "effect";
 import { useCallback, useEffect, useRef } from "react";
 
-import { readCheatAvailabilitySnapshotFx } from "~/bridge/cheat/readCheatAvailabilitySnapshotFx";
-import { waitForCheatAvailabilityReadyFx } from "~/bridge/cheat/waitForCheatAvailabilityReadyFx";
-import { usePackageGameEngine } from "~/bridge/game/usePackageGameEngine";
+import { readCheatAvailabilitySnapshotFx } from "~/ui/cheat-availability/readCheatAvailabilitySnapshotFx";
+import { waitForCheatAvailabilityReadyFx } from "~/ui/cheat-availability/waitForCheatAvailabilityReadyFx";
+import { usePackageGameEngine } from "~/ui/game/usePackageGameEngine";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 import { Cheats } from "~/ui/cheats/Cheats";
 import { useCheatsModel } from "~/ui/cheats/useCheatsModel";

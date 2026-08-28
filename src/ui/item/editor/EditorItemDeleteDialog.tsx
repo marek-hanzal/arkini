@@ -1,5 +1,5 @@
-import type { EditorProject } from "~/bridge/editor/EditorProject";
-import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { EditorProject } from "~/editor/EditorProject";
 import type { EditorItemForceDeleteImpact } from "~/editor/forceDeleteEditorItemFx";
 import { Button, ButtonLink, DangerButton } from "~/ui/button/Button";
 
@@ -82,7 +82,7 @@ export const EditorItemDeleteDialog = ({
 	readonly error: unknown;
 	readonly force: boolean;
 	readonly impact: EditorItemForceDeleteImpact;
-	readonly item: EditorItem;
+	readonly item: ItemSchema.Type;
 	readonly pending: boolean;
 	readonly project: EditorProject;
 	readonly onCancel: () => void;

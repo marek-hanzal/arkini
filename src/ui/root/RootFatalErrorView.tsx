@@ -2,11 +2,11 @@ import { useRouter } from "@tanstack/react-router";
 import { Effect } from "effect";
 import { useEffect } from "react";
 
-import { forceApplicationCloseFx } from "~/bridge/lifecycle/forceApplicationCloseFx";
-import { openDiagnosticDirectoryFx } from "~/bridge/diagnostics/openDiagnosticDirectoryFx";
-import { toDiagnosticValueFx } from "~/bridge/diagnostics/toDiagnosticValueFx";
-import { writeDiagnosticRecordFx } from "~/bridge/diagnostics/writeDiagnosticRecordFx";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { readRendererLifecycleFx } from "~/renderer/lifecycle/readRendererLifecycleFx";
+import { openDiagnosticDirectoryFx } from "~/renderer/diagnostics/openDiagnosticDirectoryFx";
+import { toDiagnosticValueFn } from "~/renderer/diagnostics/fn/toDiagnosticValueFn";
+import { writeDiagnosticRecordFx } from "~/renderer/diagnostics/writeDiagnosticRecordFx";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { Button, DangerButton } from "~/ui/button/Button";
 import { Canvas } from "~/ui/canvas/Canvas";
 
@@ -31,7 +31,7 @@ export const RootFatalErrorView = ({ error }: RootFatalErrorView.Props) => {
 				event: "root-fatal-error-rendered",
 				level: "fatal",
 				data: {
-					error: RendererRuntime.runSync(toDiagnosticValueFx(error)),
+					error: toDiagnosticValueFn(error),
 				},
 			}),
 		);
@@ -69,7 +69,10 @@ export const RootFatalErrorView = ({ error }: RootFatalErrorView.Props) => {
 						<DangerButton
 							onClick={() =>
 								router.options.context.rendererRuntime.runSync(
-									forceApplicationCloseFx().pipe(Effect.orDie),
+									readRendererLifecycleFx().pipe(
+										Effect.flatMap((lifecycle) => lifecycle.forceCloseFx),
+										Effect.orDie,
+									),
 								)
 							}
 						>

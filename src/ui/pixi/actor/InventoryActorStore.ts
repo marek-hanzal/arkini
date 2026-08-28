@@ -1,7 +1,7 @@
 import type { Effect } from "effect";
 
-import type { GameEngine } from "~/bridge/game/GameEngine";
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { InventoryDropTarget } from "~/ui/pixi/scene/InventoryDropTarget";
 

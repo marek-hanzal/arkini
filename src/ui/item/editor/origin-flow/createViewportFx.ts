@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
+import type { EditorItemOriginFlow } from "~/editor/origin-flow/EditorItemOriginFlow";
 import type { LayoutNode, LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
 
 export interface Viewport {

@@ -1,10 +1,11 @@
 import { useRouter, useSearch } from "@tanstack/react-router";
+import { Effect } from "effect";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { commitEditorProjectVersionFx } from "~/bridge/editor/version/commitEditorProjectVersionFx";
-import { readEditorProjectVersionHistoryFx } from "~/bridge/editor/version/readEditorProjectVersionHistoryFx";
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
+import { readEditorProjectVersionHistoryFx } from "~/editor/version/fx/readEditorProjectVersionHistoryFx";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { EditorProjectVersionStatus } from "~/editor/version/EditorProjectVersion";
 
 const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
@@ -77,21 +78,23 @@ export const useEditorVersionCommitController = (): useEditorVersionCommitContro
 		setPending(true);
 		setError(undefined);
 		void RendererRuntime.runPromise(
-			commitEditorProjectVersionFx({
-				...(body.trim() === ""
-					? {}
-					: {
-							body,
-						}),
-				expectedFingerprint: status.currentFingerprint,
-				projectId: project.projectId,
-				subject,
-				...(tag.trim() === ""
-					? {}
-					: {
-							tag,
-						}),
-			}),
+			Effect.flatMap(EditorProjectRepository, (repository) =>
+				repository.createVersionFx({
+					...(body.trim() === ""
+						? {}
+						: {
+								body,
+							}),
+					expectedFingerprint: status.currentFingerprint,
+					projectId: project.projectId,
+					subject,
+					...(tag.trim() === ""
+						? {}
+						: {
+								tag,
+							}),
+				}),
+			),
 		)
 			.then(async () => {
 				if (

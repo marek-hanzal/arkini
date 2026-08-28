@@ -1,14 +1,14 @@
 import { Effect } from "effect";
 
-import type { GameEngine } from "~/bridge/game/GameEngine";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { TileActorFeedbackCue } from "~/bridge/tile/feedback/TileActorFeedbackCue";
-import { readTileActorFeedbackCuesFx } from "~/bridge/tile/feedback/readTileActorFeedbackCuesFx";
-import { readCommittedTileReplacementsFx } from "~/bridge/tile/motion/readCommittedTileReplacementsFx";
-import { readCommittedTileSwapMotionCueFx } from "~/bridge/tile/motion/readCommittedTileSwapMotionCueFx";
-import { readTileMotionCuesFx } from "~/bridge/tile/motion/readTileMotionCuesFx";
-import { readTileActorsFx } from "~/bridge/tile/readTileActorsFx";
-import { readTileDeliveriesFx } from "~/bridge/tile/readTileDeliveriesFx";
+import type { GameEngine } from "~/renderer/game/GameEngine";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import type { TileActorFeedbackCue } from "~/ui/pixi/feedback/TileActorFeedbackCue";
+import { readTileActorFeedbackCuesFn } from "~/ui/pixi/feedback/fn/readTileActorFeedbackCuesFn";
+import { readCommittedTileReplacementsFx } from "~/ui/pixi/motion/readCommittedTileReplacementsFx";
+import { readCommittedTileSwapMotionCueFx } from "~/ui/pixi/motion/readCommittedTileSwapMotionCueFx";
+import { readTileMotionCuesFx } from "~/ui/pixi/motion/readTileMotionCuesFx";
+import { readTileActorsFx } from "~/ui/pixi/actor/readTileActorsFx";
+import { readTileDeliveriesFx } from "~/ui/pixi/delivery/readTileDeliveriesFx";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { ParticleTextures } from "~/ui/pixi/actor/ParticleTextures";
 import { createTileActorFx } from "~/ui/pixi/actor/createTileActorFx";
@@ -67,7 +67,7 @@ const feedbackExitDurationMs = 420;
  * Reconciles one canonical transition into retained actors while motion owns presentation lag.
  *
  * Motion/drop claims may temporarily retain, hide, or offset actors, but this owner never infers a
- * gameplay result. It derives actors and cues through bridge reads and eventually converges every
+ * gameplay result. It derives actors and cues from canonical game reads and eventually converges every
  * unclaimed display object to the committed snapshot.
  */
 export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(function* ({
@@ -283,7 +283,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		};
 		const feedbackCues = presentCommittedEffects
 			? [
-					...RendererRuntime.runSync(readTileActorFeedbackCuesFx(transition)).filter(
+					...readTileActorFeedbackCuesFn(transition).filter(
 						(cue) => !belongsToInputMotion(cue),
 					),
 					...dropSnapshot.feedback.flatMap(({ cues }) =>

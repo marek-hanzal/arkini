@@ -1,4 +1,4 @@
-import type { EditorProject } from "~/bridge/editor/EditorProject";
+import type { EditorProject } from "~/editor/EditorProject";
 import type { EditorItemEstimate } from "~/editor/estimator/EditorItemEstimate";
 
 export interface EditorItemEstimateWorkerRequest {

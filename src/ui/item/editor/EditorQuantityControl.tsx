@@ -1,6 +1,5 @@
+import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
 import type { ReactNode } from "react";
-
-import type { EditorQuantity } from "~/bridge/item/editor/EditorItemModel";
 import { EditorNumberControl, EditorValueLabel } from "~/ui/form/EditorValueControls";
 
 export interface EditorQuantityControlProps {
@@ -8,8 +7,8 @@ export interface EditorQuantityControlProps {
 	readonly label?: string;
 	readonly maximumDescription?: string;
 	readonly minimumDescription?: string;
-	readonly onChange: (quantity: EditorQuantity) => void;
-	readonly value: EditorQuantity;
+	readonly onChange: (quantity: QuantitySchema.Type) => void;
+	readonly value: QuantitySchema.Type;
 }
 
 /** Renders the reusable minimum and maximum quantity fields without imposing layout. */

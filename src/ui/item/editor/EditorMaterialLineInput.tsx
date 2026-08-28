@@ -1,10 +1,10 @@
-import type { EditorInput } from "~/bridge/item/editor/EditorItemModel";
+import type { InputSchema as LineInputSchema } from "~/engine/input/schema/InputSchema";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { EditorQuantityFields } from "~/ui/item/editor/EditorQuantityControl";
 import { EditorSelectorControl } from "~/ui/item/editor/EditorSelectorControl";
 
 type EditorMaterialInput = Extract<
-	EditorInput,
+	LineInputSchema.Type,
 	{
 		readonly type: "materials";
 	}

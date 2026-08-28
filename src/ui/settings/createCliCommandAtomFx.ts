@@ -1,7 +1,7 @@
 import { Cause, Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
+import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
 
 export type CliCommand = "read" | "install" | "replace" | "uninstall";
 
@@ -84,7 +84,7 @@ export const createCliCommandAtomFx = Effect.fn("createCliCommandAtomFx")(
 						if (Cause.hasInterruptsOnly(result.cause)) {
 							return yield* Effect.failCause(result.cause);
 						}
-						const exactFailure = yield* readExactCauseFailureFx(result.cause);
+						const exactFailure = readExactCauseFailureFn(result.cause);
 						const failure = Option.isSome(exactFailure)
 							? exactFailure.value
 							: result.cause;

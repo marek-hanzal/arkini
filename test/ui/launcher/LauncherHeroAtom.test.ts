@@ -5,17 +5,17 @@ import { Effect, SubscriptionRef } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
-import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
-import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLifecycleFx";
-import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycleOwnerAtom";
+import type { ArkpackCatalog } from "~/renderer/arkpack/ArkpackCatalog";
+import { ArkpackCatalogOwnerAtom } from "~/renderer/arkpack/ArkpackCatalogOwnerAtom";
+import { createRendererLifecycleFx } from "~/renderer/lifecycle/createRendererLifecycleFx";
+import { RendererLifecycleOwnerAtom } from "~/renderer/lifecycle/RendererLifecycleOwnerAtom";
 import { LauncherAppearanceReadyAtom } from "~/ui/launcher/LauncherAppearanceReadyAtom";
 import { LauncherHeroReadyAtom } from "~/ui/launcher/LauncherHeroReadyAtom";
 import { LauncherHeroUrlAtom } from "~/ui/launcher/LauncherHeroUrlAtom";
 import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";
 import { LauncherStartupConfigAtom } from "~/ui/launcher/LauncherStartupConfigAtom";
 import { retryLauncherStartupAtom } from "~/ui/launcher/retryLauncherStartupAtom";
-import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
+import { testArkpackConfig } from "~test/support/arkpack/createTestArkpack";
 
 const harness = vi.hoisted(() => ({
 	lastPackageId: "package:last" as string | null,
@@ -26,22 +26,22 @@ const harness = vi.hoisted(() => ({
 	preloadedUrls: [] as string[],
 }));
 
-vi.mock("~/bridge/appearance/readAppearanceAccentFx", () => ({
+vi.mock("~/ui/appearance/readAppearanceAccentFx", () => ({
 	readAppearanceAccentFx: () => Effect.succeed("rose"),
 }));
-vi.mock("~/bridge/appearance/readAppearanceThemeFx", () => ({
+vi.mock("~/ui/appearance/readAppearanceThemeFx", () => ({
 	readAppearanceThemeFx: () => Effect.succeed("dark"),
 }));
-vi.mock("~/bridge/cheat/readCheatAvailabilityFx", () => ({
+vi.mock("~/ui/cheat-availability/readCheatAvailabilityFx", () => ({
 	readCheatAvailabilityFx: () => Effect.succeed(false),
 }));
-vi.mock("~/bridge/window/readWindowModeFx", () => ({
+vi.mock("~/renderer/window/readWindowModeFx", () => ({
 	readWindowModeFx: () => Effect.succeed("bordered"),
 }));
-vi.mock("~/bridge/launcher/readLastPackageIdFx", () => ({
+vi.mock("~/renderer/launcher/readLastPackageIdFx", () => ({
 	readLastPackageIdFx: () => Effect.succeed(harness.lastPackageId),
 }));
-vi.mock("~/bridge/arkpack/loadArkpackFx", () => ({
+vi.mock("~/renderer/arkpack/loadArkpackFx", () => ({
 	loadArkpackFx: ({ packageId }: { readonly packageId: string }) =>
 		Effect.suspend(() => {
 			harness.loadedPackageIds.push(packageId);

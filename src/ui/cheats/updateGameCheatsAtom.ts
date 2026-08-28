@@ -2,11 +2,11 @@ import { Cause, Effect, Exit } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { match } from "ts-pattern";
 
-import { setCheatEnabledAtom } from "~/bridge/cheat/setCheatEnabledAtom";
-import { setInstantGameplayAtom } from "~/bridge/cheat/setInstantGameplayAtom";
-import type { PlayableGame } from "~/bridge/game/PlayableGame";
-import { makeExactGameAtomFamilyFx } from "~/bridge/game/makeExactGameAtomFamilyFx";
-import { settleRendererCommandFailureFx } from "~/bridge/game/settleRendererCommandFailureFx";
+import type { PlayableGame } from "~/renderer/game/PlayableGame";
+import { makeExactGameAtomFamilyFx } from "~/ui/game/makeExactGameAtomFamilyFx";
+import { settleRendererCommandFailureFx } from "~/ui/game/settleRendererCommandFailureFx";
+import { setCheatEnabledFx } from "~/engine/cheat/write/setCheatEnabledFx";
+import { setInstantGameplayFx } from "~/engine/cheat/write/setInstantGameplayFx";
 
 type UpdateGameCheatsAction = "cheat-mode" | "instant-gameplay" | "exit";
 
@@ -60,20 +60,30 @@ export const updateGameCheatsAtom = Effect.runSync(
 			Atom.setIdleTTL(0),
 		);
 		const runnerAtom = Atom.fn(
-			(command: updateGameCheatsAtom.Command, get) =>
+			(command: updateGameCheatsAtom.Command) =>
 				Effect.gen(function* () {
 					const commandFx = match(command)
 						.with(
 							{
 								action: "cheat-mode",
 							},
-							({ enabled }) => get.setResult(setCheatEnabledAtom(game), enabled),
+							({ enabled }) =>
+								game.runFx(
+									setCheatEnabledFx({
+										enabled,
+									}),
+								),
 						)
 						.with(
 							{
 								action: "instant-gameplay",
 							},
-							({ enabled }) => get.setResult(setInstantGameplayAtom(game), enabled),
+							({ enabled }) =>
+								game.runFx(
+									setInstantGameplayFx({
+										enabled,
+									}),
+								),
 						)
 						.with(
 							{

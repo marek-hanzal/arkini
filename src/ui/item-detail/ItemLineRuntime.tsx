@@ -1,5 +1,5 @@
-import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { formatItemDurationFx } from "~/ui/item-detail/formatItemDurationFx";
 import { ItemRuntime } from "~/ui/item-detail/ItemRuntime";
 import { readActiveJobRuntimeFx } from "~/ui/item-detail/readActiveJobRuntimeFx";

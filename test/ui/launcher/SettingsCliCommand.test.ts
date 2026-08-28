@@ -32,6 +32,7 @@ describe("Settings CLI command", () => {
 							commandPath: "/tmp/arkini-cli",
 						}),
 					install,
+					replace: vi.fn(),
 					uninstall: vi.fn(),
 				},
 			},
@@ -59,5 +60,47 @@ describe("Settings CLI command", () => {
 				},
 			}),
 		);
+	});
+
+	it("requires the explicit replace command for a conflicting path", async () => {
+		const replace = vi.fn(() =>
+			Promise.resolve({
+				type: "installed" as const,
+				commandPath: "/tmp/arkini-cli",
+			}),
+		);
+		Object.defineProperty(window, "arkini", {
+			configurable: true,
+			value: {
+				cli: {
+					status: () =>
+						Promise.resolve({
+							type: "conflict" as const,
+							commandPath: "/tmp/arkini-cli",
+							message: "Another file already exists.",
+							replaceable: true,
+						}),
+					install: vi.fn(),
+					replace,
+					uninstall: vi.fn(),
+				},
+			},
+		});
+		registry = AtomRegistry.make({
+			scheduleTask,
+		});
+		registry.mount(SettingsCliCommandAtom);
+		registry.set(SettingsCliCommandAtom, "read");
+		await vi.waitFor(() =>
+			expect(registry?.get(SettingsCliCommandAtom)).toMatchObject({
+				kind: "ready",
+				status: {
+					type: "conflict",
+				},
+			}),
+		);
+		registry.set(SettingsCliCommandAtom, "install");
+		registry.set(SettingsCliCommandAtom, "replace");
+		await vi.waitFor(() => expect(replace).toHaveBeenCalledOnce());
 	});
 });

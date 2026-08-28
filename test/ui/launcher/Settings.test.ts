@@ -26,15 +26,17 @@ describe("Settings", () => {
 	});
 
 	it("loads developer capabilities only after the Dev section mounts", async () => {
-		const { container, readCliStatus } = await renderSettings([
+		const { container, readCliStatus, readCompletionStatus } = await renderSettings([
 			"/settings/common",
 		]);
 
 		await act(async () => Promise.resolve());
 		expect(readCliStatus).not.toHaveBeenCalled();
+		expect(readCompletionStatus).not.toHaveBeenCalled();
 
 		await act(async () => linkByText(container, "Dev").click());
 		await vi.waitFor(() => expect(readCliStatus).toHaveBeenCalledOnce());
+		await vi.waitFor(() => expect(readCompletionStatus).toHaveBeenCalledOnce());
 	});
 
 	it("changes and persists the authoritative theme, then returns through history with Escape", async () => {

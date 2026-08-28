@@ -1,25 +1,15 @@
 import { constants } from "node:fs";
-import { access, chmod, lstat, mkdir, readFile, unlink, writeFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import { access } from "node:fs/promises";
+import { resolve } from "node:path";
 import { Effect, Semaphore } from "effect";
 
 import type { CliInstallationStatus } from "../../contract/cli/CliInstallationStatus";
 import { ElectronMainError } from "../ElectronMainError";
 import type { CliInstallation } from "./CliInstallation";
+import { createFilesystemCliManagedFileFx } from "./createFilesystemCliManagedFileFx";
 
-const isMissing = (cause: unknown) =>
-	typeof cause === "object" && cause !== null && "code" in cause && cause.code === "ENOENT";
-const managedCommandMarker = "# arkini-cli managed launcher";
+const managedCommandPrefix = "#!/bin/sh\n# arkini-cli managed launcher\n";
 const quoteShellArgument = (value: string) => `'${value.replaceAll("'", `'"'"'`)}'`;
-
-type CommandInspection =
-	| {
-			readonly type: "missing" | "installed" | "repairable";
-	  }
-	| {
-			readonly type: "conflict";
-			readonly message: string;
-	  };
 
 export namespace createFilesystemCliInstallationFx {
 	export interface Props {
@@ -29,7 +19,7 @@ export namespace createFilesystemCliInstallationFx {
 	}
 }
 
-/** Creates the owned command shim used by Settings; foreign paths are never replaced. */
+/** Creates the owned command shim used by Settings; foreign file takeover stays explicit. */
 export const createFilesystemCliInstallationFx = Effect.fn("createFilesystemCliInstallationFx")(
 	function* ({
 		commandPath,
@@ -38,47 +28,16 @@ export const createFilesystemCliInstallationFx = Effect.fn("createFilesystemCliI
 	}: createFilesystemCliInstallationFx.Props) {
 		const semaphore = yield* Semaphore.make(1);
 		const resolvedLauncherPath = resolve(launcherPath);
-		const commandContents = `#!/bin/sh\n${managedCommandMarker}\nexec ${quoteShellArgument(resolvedLauncherPath)} "$@"\n`;
-		const inspectCommand = async (): Promise<CommandInspection> => {
-			let command;
-			try {
-				command = await lstat(commandPath);
-			} catch (cause) {
-				if (isMissing(cause))
-					return {
-						type: "missing",
-					};
-				throw cause;
-			}
-			if (!command.isFile()) {
-				return {
-					type: "conflict",
-					message: `Another file already exists at ${commandPath}.`,
-				};
-			}
-			const existingContents = await readFile(commandPath, "utf8");
-			if (existingContents === commandContents) {
-				try {
-					await access(commandPath, constants.X_OK);
-					return {
-						type: "installed",
-					};
-				} catch {
-					return {
-						type: "repairable",
-					};
-				}
-			}
-			if (existingContents.startsWith(`#!/bin/sh\n${managedCommandMarker}\n`)) {
-				return {
-					type: "repairable",
-				};
-			}
-			return {
-				type: "conflict",
-				message: `Another file already exists at ${commandPath}.`,
-			};
-		};
+		const commandContents = `${managedCommandPrefix}exec ${quoteShellArgument(resolvedLauncherPath)} "$@"\n`;
+		const managedFile = yield* createFilesystemCliManagedFileFx({
+			path: commandPath,
+			managedPrefix: managedCommandPrefix,
+			mode: 0o755,
+			subject: "The CLI command",
+			readExpectedContents: () => Promise.resolve(commandContents),
+			executable: true,
+		});
+
 		const readStatus = async (): Promise<CliInstallationStatus> => {
 			if (unavailableMessage !== undefined) {
 				return {
@@ -97,12 +56,13 @@ export const createFilesystemCliInstallationFx = Effect.fn("createFilesystemCliI
 				};
 			}
 
-			const inspection = await inspectCommand();
+			const inspection = await managedFile.inspect();
 			if (inspection.type === "conflict") {
 				return {
 					type: "conflict",
 					commandPath,
 					message: inspection.message,
+					replaceable: inspection.replaceable,
 				};
 			}
 			if (inspection.type === "repairable") {
@@ -118,6 +78,7 @@ export const createFilesystemCliInstallationFx = Effect.fn("createFilesystemCliI
 				commandPath,
 			};
 		};
+
 		const operation = (name: string, run: () => Promise<CliInstallationStatus>) =>
 			Effect.tryPromise({
 				try: run,
@@ -127,6 +88,7 @@ export const createFilesystemCliInstallationFx = Effect.fn("createFilesystemCliI
 						cause,
 					}),
 			});
+
 		const readStatusFx = operation("read the CLI installation", readStatus);
 		const installFx = semaphore.withPermits(1)(
 			operation("install the CLI command", async () => {
@@ -135,16 +97,23 @@ export const createFilesystemCliInstallationFx = Effect.fn("createFilesystemCliI
 				if (status.type !== "not-installed" && status.type !== "repairable") {
 					throw new Error(status.message);
 				}
-				await mkdir(dirname(commandPath), {
-					recursive: true,
-				});
-				if (status.type === "repairable") await unlink(commandPath);
-				await writeFile(commandPath, commandContents, {
-					encoding: "utf8",
-					flag: "wx",
-					mode: 0o755,
-				});
-				await chmod(commandPath, 0o755);
+				if (status.type === "repairable") {
+					await managedFile.repair();
+				} else {
+					await managedFile.publish(false);
+				}
+				return readStatus();
+			}),
+		);
+		const replaceFx = semaphore.withPermits(1)(
+			operation("replace the CLI command", async () => {
+				const status = await readStatus();
+				if (status.type === "installed") return status;
+				if (status.type === "unavailable") throw new Error(status.message);
+				if (status.type === "conflict" && !status.replaceable) {
+					throw new Error(status.message);
+				}
+				await managedFile.publish(status.type !== "not-installed");
 				return readStatus();
 			}),
 		);
@@ -155,7 +124,7 @@ export const createFilesystemCliInstallationFx = Effect.fn("createFilesystemCliI
 				if (status.type !== "installed" && status.type !== "repairable") {
 					throw new Error(status.message);
 				}
-				await unlink(commandPath);
+				await managedFile.remove();
 				return readStatus();
 			}),
 		);
@@ -163,6 +132,7 @@ export const createFilesystemCliInstallationFx = Effect.fn("createFilesystemCliI
 		return {
 			readStatusFx,
 			installFx,
+			replaceFx,
 			uninstallFx,
 		} satisfies CliInstallation;
 	},

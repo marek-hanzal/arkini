@@ -16,6 +16,7 @@ export type CliInstallationStatus =
 			readonly type: "conflict";
 			readonly commandPath: string;
 			readonly message: string;
+			readonly replaceable: boolean;
 	  }
 	| {
 			readonly type: "unavailable";

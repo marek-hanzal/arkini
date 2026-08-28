@@ -137,7 +137,14 @@ const api: ArkiniElectronApi.Api = {
 	cli: {
 		status: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliStatus),
 		install: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliInstall),
+		replace: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliReplace),
 		uninstall: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliUninstall),
+		completion: {
+			status: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliCompletionStatus),
+			install: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliCompletionInstall),
+			replace: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliCompletionReplace),
+			uninstall: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cliCompletionUninstall),
+		},
 	},
 	launcher: {
 		readLastPackageId: () =>

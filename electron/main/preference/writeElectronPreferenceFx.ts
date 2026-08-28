@@ -35,7 +35,7 @@ export const writeElectronPreferenceFx = Effect.fn("writeElectronPreferenceFx")(
 					}),
 			});
 			yield* filesystemWrite
-				.writeFileFx({
+				.replaceFileFx({
 					lock,
 					target,
 					bytes: encoder.encode(serialized),

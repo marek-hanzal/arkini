@@ -21,7 +21,7 @@ export const writeGameSaveFx = Effect.fn("writeGameSaveFx")(
 			const directoryName = yield* readGameSaveDirectoryNameFx(key);
 			const directory = join(root, directoryName);
 			const current = join(directory, "current.arksave");
-			yield* filesystemWrite.writeFileFx({
+			yield* filesystemWrite.replaceFileFx({
 				lock: join(root, `.${directoryName}.lock`),
 				target: current,
 				bytes,

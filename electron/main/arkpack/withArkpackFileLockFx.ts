@@ -12,7 +12,7 @@ export const readCanonicalArkpackPathFx = Effect.fn("readCanonicalArkpackPathFx"
 	return join(root, basename(arkpackPath));
 });
 
-/** Recovers pending one-file publication and excludes a concurrent writer while reading. */
+/** Excludes a concurrent writer while reading or removing one Arkpack file. */
 export const withArkpackFileLockFx = <Value, Error, Requirements>(
 	props: {
 		readonly arkpackPath: string;
@@ -31,8 +31,3 @@ export const withArkpackFileLockFx = <Value, Error, Requirements>(
 			effect(arkpackPath),
 		);
 	});
-
-export const recoverArkpackFileFx = Effect.fn("recoverArkpackFileFx")(
-	(props: { readonly arkpackPath: string; readonly fileSystem: FileSystem.FileSystem }) =>
-		withArkpackFileLockFx(props, () => Effect.void),
-);

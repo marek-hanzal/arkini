@@ -289,7 +289,7 @@ const projectAvailabilityFx = Effect.fn("projectItemDetailLineAvailabilityFx")(f
 			{
 				kind: "unavailable",
 				reason: {
-					kind: "direct-output-max-count",
+					kind: "direct-output-capacity",
 				},
 			},
 			({ reason }) =>
@@ -316,7 +316,7 @@ const projectAvailabilityFx = Effect.fn("projectItemDetailLineAvailabilityFx")(f
 			{
 				kind: "unavailable",
 				reason: {
-					kind: "downstream-output-max-count",
+					kind: "downstream-output-capacity",
 				},
 			},
 			({ reason }) =>

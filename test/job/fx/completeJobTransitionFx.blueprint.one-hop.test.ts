@@ -68,7 +68,7 @@ describe("blueprint one-hop capacity", () => {
 			availability: {
 				kind: "unavailable",
 				reason: {
-					kind: "downstream-output-max-count",
+					kind: "downstream-output-capacity",
 					intermediateItemId: "blueprint:plain",
 					itemId: "item:target",
 				},

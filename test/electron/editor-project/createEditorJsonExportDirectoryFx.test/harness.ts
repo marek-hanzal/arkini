@@ -1,6 +1,6 @@
 import { Effect, FileSystem, PlatformError } from "effect";
 
-import { createEditorProjectFilesystemPathsFx } from "../../../../electron/main/editor-project/filesystem/createEditorProjectFilesystemPathsFx";
+import { createProjectPathsFx } from "../../../../electron/main/editor-project/filesystem/createProjectPathsFx";
 import { readProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/readProjectFilesFx";
 import { readSidecarsFx } from "../../../../electron/main/editor-project/filesystem/fx/readSidecarsFx";
 import { readVersionHistoryFx } from "../../../../electron/main/editor-project/filesystem/fx/readVersionHistoryFx";
@@ -65,7 +65,7 @@ export const writeExportSourceExtrasFx = Effect.fn("writeExportSourceExtrasFx")(
 export const readReimportableProjectFx = Effect.fn("readReimportableProjectFx")(function* (
 	root: string,
 ) {
-	const paths = yield* createEditorProjectFilesystemPathsFx(root);
+	const paths = yield* createProjectPathsFx(root);
 	const project = yield* readProjectFilesFx(root);
 	yield* readSidecarsFx({
 		paths,

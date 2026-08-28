@@ -61,7 +61,7 @@ describe("blueprint depleted-owner accounting", () => {
 					availability: {
 						kind: "unavailable",
 						reason: {
-							kind: "direct-output-max-count",
+							kind: "direct-output-capacity",
 							itemId: "item:depletion-product",
 						},
 					},

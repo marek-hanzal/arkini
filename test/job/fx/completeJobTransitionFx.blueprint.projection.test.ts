@@ -111,7 +111,7 @@ describe("blueprint depletion projection", () => {
 					availability: {
 						kind: "unavailable",
 						reason: {
-							kind: "direct-output-max-count",
+							kind: "direct-output-capacity",
 							itemId: "item:depletion-product",
 						},
 					},

@@ -144,7 +144,7 @@ export namespace ItemDetailLines {
 				readonly message: string;
 		  }
 		| {
-				readonly kind: "direct-output-max-count";
+				readonly kind: "direct-output-capacity";
 				readonly itemId: string;
 				readonly itemTitle: string;
 				readonly liveQuantity: number;
@@ -154,7 +154,7 @@ export namespace ItemDetailLines {
 				readonly message: string;
 		  }
 		| {
-				readonly kind: "downstream-output-max-count";
+				readonly kind: "downstream-output-capacity";
 				readonly intermediateItemId: string;
 				readonly intermediateItemTitle: string;
 				readonly itemId: string;

@@ -20,7 +20,7 @@ export namespace resolveStartOutputCapacityFx {
 
 	export type Block =
 		| {
-				readonly kind: "direct-output-max-count";
+				readonly kind: "direct-output-capacity";
 				readonly itemId: IdSchema.Type;
 				readonly liveQuantity: number;
 				readonly reservedQuantity: number;
@@ -28,7 +28,7 @@ export namespace resolveStartOutputCapacityFx {
 				readonly excessQuantity: number;
 		  }
 		| {
-				readonly kind: "downstream-output-max-count";
+				readonly kind: "downstream-output-capacity";
 				readonly intermediateItemId: IdSchema.Type;
 				readonly itemId: IdSchema.Type;
 				readonly liveQuantity: number;
@@ -77,7 +77,7 @@ export const resolveStartOutputCapacityFx = Effect.fn("resolveStartOutputCapacit
 	});
 	if (downstream !== undefined) {
 		return {
-			kind: "downstream-output-max-count",
+			kind: "downstream-output-capacity",
 			...downstream,
 		} satisfies resolveStartOutputCapacityFx.Block;
 	}
@@ -88,7 +88,7 @@ export const resolveStartOutputCapacityFx = Effect.fn("resolveStartOutputCapacit
 	});
 	if (direct === undefined) return undefined;
 	return {
-		kind: "direct-output-max-count",
+		kind: "direct-output-capacity",
 		...direct,
 	} satisfies resolveStartOutputCapacityFx.Block;
 });

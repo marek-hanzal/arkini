@@ -4,7 +4,7 @@ import { Effect, type Semaphore } from "effect";
 
 import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
 import type { ProjectState } from "../ProjectState";
-import { createEditorProjectFilesystemPathsFx } from "../createEditorProjectFilesystemPathsFx";
+import { createProjectPathsFx } from "../createProjectPathsFx";
 import type { ProjectCatalog } from "./createProjectCatalogFx";
 import type { EditorProject } from "~/editor/EditorProject";
 import type { EditorProjectCandidate } from "~/editor/EditorProjectCandidate";
@@ -102,7 +102,7 @@ const materializeProjectFx = Effect.fn("materializeProjectFx")(function* (
 		filesystemWrite,
 		catalog.root,
 		Effect.gen(function* () {
-			const paths = yield* createEditorProjectFilesystemPathsFx(catalog.root);
+			const paths = yield* createProjectPathsFx(catalog.root);
 			const files = yield* readProjectFilesFx(paths.root);
 			const projectId = files.config.meta.id;
 			const sidecars = yield* readSidecarsFx({

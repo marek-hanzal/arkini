@@ -66,7 +66,7 @@ describe("blueprint one-hop reservations", () => {
 					availability: {
 						kind: "unavailable",
 						reason: {
-							kind: "downstream-output-max-count",
+							kind: "downstream-output-capacity",
 							intermediateItemId: "blueprint:capped",
 							itemId: "item:target",
 							liveQuantity: 0,
@@ -135,7 +135,7 @@ describe("blueprint one-hop reservations", () => {
 					availability: {
 						kind: "unavailable",
 						reason: {
-							kind: "downstream-output-max-count",
+							kind: "downstream-output-capacity",
 							intermediateItemId: "blueprint:plain",
 							itemId: "item:target",
 							liveQuantity: 0,

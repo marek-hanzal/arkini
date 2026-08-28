@@ -71,7 +71,7 @@ describe("ItemLinesTab command boundary", () => {
 						reason: {
 							itemId: "tree",
 							itemTitle: "Tree",
-							kind: "direct-output-max-count",
+							kind: "direct-output-capacity",
 							liveQuantity: 1,
 							maxCount: 1,
 							message: "Tree limit reached.",

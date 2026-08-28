@@ -2,7 +2,7 @@ import { Buffer } from "node:buffer";
 import { FileSystem } from "effect";
 import { Effect } from "effect";
 
-import type { EditorProjectFilesystemPaths } from "../EditorProjectFilesystemPaths";
+import type { ProjectPaths } from "../ProjectPaths";
 import { EditorBoardScenarioSchema } from "~/editor/board/EditorBoardScenarioSchema";
 import { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
 import type { EditorVersionManifestSchema } from "~/editor/filesystem/EditorVersionManifestSchema";
@@ -23,7 +23,7 @@ export namespace createVersionSnapshotFx {
 		readonly filesystemWrite: FilesystemWrite;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
 		readonly scenarios: ReadonlyArray<EditorBoardScenarioSchema.Type>;
-		readonly paths: EditorProjectFilesystemPaths;
+		readonly paths: ProjectPaths;
 	}
 
 	export interface Success {

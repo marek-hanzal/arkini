@@ -1,7 +1,7 @@
 import { FileSystem } from "effect";
 import { Effect } from "effect";
 
-import type { EditorProjectFilesystemPaths } from "../EditorProjectFilesystemPaths";
+import type { ProjectPaths } from "../ProjectPaths";
 import type { PublishedVersion } from "../PublishedVersion";
 import type { VersionHistory } from "../VersionHistory";
 import { EditorVersionDescriptorFileSchema } from "~/editor/filesystem/EditorVersionDescriptorFileSchema";
@@ -26,7 +26,7 @@ const readJsonFx = <Value>(target: string, parse: (candidate: unknown) => Value,
 
 /** Captures the published head, descriptors, and manifests; unlisted orphan files stay invisible. */
 export const readVersionHistoryFx = Effect.fn("readVersionHistoryFx")(function* (
-	paths: EditorProjectFilesystemPaths,
+	paths: ProjectPaths,
 ) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	if (!(yield* fileSystem.exists(paths.versionHeadFile)))

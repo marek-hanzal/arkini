@@ -2,11 +2,11 @@ import { Effect } from "effect";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 
 interface ActivityParticlesProps {
 	readonly actor: PixiTileActor;
-	readonly animator: PixiActorAnimator;
+	readonly animator: ActorAnimator;
 	readonly rampIn?: boolean;
 }
 
@@ -15,7 +15,7 @@ type ParticlePlaybackKind = "burst" | "running";
 const runningCycleDurationMs = 1_760;
 const runningRampDurationMs = 520;
 const drainDurationMs = 460;
-export const pixiTileActorFeedbackParticlesDurationMs = 720;
+export const feedbackDurationMs = 720;
 const waveTurns = 1.15;
 const shimmerTurns = 2.35;
 const twoPi = Math.PI * 2;
@@ -268,7 +268,7 @@ export const runActivityParticlesFx = Effect.fnUntraced(function* (
 			yield* animator.animateFx({
 				actor,
 				channel: "activity-particles",
-				durationMs: pixiTileActorFeedbackParticlesDurationMs,
+				durationMs: feedbackDurationMs,
 				ownerKey: animationKey,
 				onComplete: () => {
 					if (actor.container.destroyed) return;

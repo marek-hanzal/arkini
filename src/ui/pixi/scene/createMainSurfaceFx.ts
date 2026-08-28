@@ -7,26 +7,23 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
-import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
+import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
-import type { PixiGridDropFeedback } from "~/ui/pixi/grid/PixiGridDropFeedback";
+import type { DropFeedback } from "~/ui/pixi/grid/DropFeedback";
 import { drawMaskFx } from "~/ui/pixi/grid/drawMaskFx";
 import { drawSurfaceFx } from "~/ui/pixi/grid/drawSurfaceFx";
 import { readSlotFx } from "~/ui/pixi/grid/readSlotFx";
-import type { PixiMainSceneLayout } from "~/ui/pixi/layout/PixiSceneLayout";
+import type { MainLayout } from "~/ui/pixi/layout/SceneLayout";
 import { readMainLayoutFx } from "~/ui/pixi/layout/readMainLayoutFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
-import type {
-	PixiMainSceneSurface,
-	PixiMainSceneTargetFacts,
-} from "~/ui/pixi/scene/PixiMainSceneSurface";
+import type { MainSurface, TargetFacts } from "~/ui/pixi/scene/MainSurface";
 import type { PixiSceneDropTarget } from "~/ui/pixi/scene/PixiSceneDropTarget";
 
 export namespace createMainSurfaceFx {
 	export interface Props {
-		readonly actorStore: PixiMainSceneActorStore;
+		readonly actorStore: MainActorStore;
 		readonly application: PixiApplicationOwner;
-		readonly dropFeedback: PixiGridDropFeedback;
+		readonly dropFeedback: DropFeedback;
 		readonly game: GameEngine;
 		readonly palette: PixiScenePalette;
 	}
@@ -41,11 +38,11 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 		game,
 		palette: initialPalette,
 	}: createMainSurfaceFx.Props) =>
-		Effect.sync((): PixiMainSceneSurface => {
+		Effect.sync((): MainSurface => {
 			let palette = initialPalette;
 			let latestTransition = game.getTransitionSnapshot();
 			let layoutRevision = 0;
-			let layout: PixiMainSceneLayout = RendererRuntime.runSync(
+			let layout: MainLayout = RendererRuntime.runSync(
 				readMainLayoutFx({
 					boardHeight: game.config.meta.board.height,
 					boardWidth: game.config.meta.board.width,
@@ -151,7 +148,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 
 			const readTargetFactsFromTarget = (
 				target: PixiSceneDropTarget | null,
-			): Effect.Effect<PixiMainSceneTargetFacts> =>
+			): Effect.Effect<TargetFacts> =>
 				Effect.gen(function* () {
 					if (target === null) {
 						return {
@@ -227,7 +224,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 
 			const appendIntersectingLocations = (
 				locations: TileActorItem["location"][],
-				surface: PixiMainSceneLayout["board"] | null,
+				surface: MainLayout["board"] | null,
 				bounds: {
 					readonly height: number;
 					readonly paddingRatio?: number;
@@ -319,29 +316,28 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 						});
 					}
 				}),
-				readActorPoseFx: Effect.fn("PixiMainSceneSurface.readActorPoseFx")((item) =>
+				readActorPoseFx: Effect.fn("MainSurface.readActorPoseFx")((item) =>
 					Effect.sync(() => readLocationPose(item.location)),
 				),
-				readTargetFactsFx: Effect.fn("PixiMainSceneSurface.readTargetFactsFx")((x, y) =>
+				readTargetFactsFx: Effect.fn("MainSurface.readTargetFactsFx")((x, y) =>
 					Effect.gen(function* () {
 						const target = yield* readDropTarget(x, y);
 						return yield* readTargetFactsFromTarget(target);
 					}),
 				),
-				readLocationPoseFx: Effect.fn("PixiMainSceneSurface.readLocationPoseFx")(
-					(location) => Effect.sync(() => readLocationPose(location)),
+				readLocationPoseFx: Effect.fn("MainSurface.readLocationPoseFx")((location) =>
+					Effect.sync(() => readLocationPose(location)),
 				),
-				readLocalActorIdsFx: Effect.fn("PixiMainSceneSurface.readLocalActorIdsFx")(
-					(bounds) =>
-						Effect.gen(function* () {
-							const locations: TileActorItem["location"][] = [];
-							appendIntersectingLocations(locations, layout.board, bounds);
-							appendIntersectingLocations(locations, layout.toolbar, bounds);
-							const occupants = yield* actorStore.readCanonicalOccupantsFx(locations);
-							return occupants
-								.filter(({ id }) => id !== bounds.excludeActorId)
-								.map(({ id }) => id);
-						}),
+				readLocalActorIdsFx: Effect.fn("MainSurface.readLocalActorIdsFx")((bounds) =>
+					Effect.gen(function* () {
+						const locations: TileActorItem["location"][] = [];
+						appendIntersectingLocations(locations, layout.board, bounds);
+						appendIntersectingLocations(locations, layout.toolbar, bounds);
+						const occupants = yield* actorStore.readCanonicalOccupantsFx(locations);
+						return occupants
+							.filter(({ id }) => id !== bounds.excludeActorId)
+							.map(({ id }) => id);
+					}),
 				),
 				redrawFx: Effect.gen(function* () {
 					layoutRevision += 1;
@@ -390,7 +386,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 					});
 					yield* application.frames.invalidateFx;
 				}),
-				renderDropFeedbackFx: Effect.fn("PixiMainSceneSurface.renderDropFeedbackFx")(
+				renderDropFeedbackFx: Effect.fn("MainSurface.renderDropFeedbackFx")(
 					(
 						target: PixiSceneDropTarget | null,
 						kind: readTileDropPreviewFx.Result["kind"] | null,
@@ -408,12 +404,12 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 							yield* application.frames.invalidateFx;
 						}),
 				),
-				setPaletteFx: Effect.fn("PixiMainSceneSurface.setPaletteFx")((nextPalette) =>
+				setPaletteFx: Effect.fn("MainSurface.setPaletteFx")((nextPalette) =>
 					Effect.sync(() => {
 						palette = nextPalette;
 					}),
 				),
-				setTransitionFx: Effect.fn("PixiMainSceneSurface.setTransitionFx")((transition) =>
+				setTransitionFx: Effect.fn("MainSurface.setTransitionFx")((transition) =>
 					Effect.sync(() => {
 						latestTransition = transition;
 					}),

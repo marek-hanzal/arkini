@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
+import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { destroyTileActorFx } from "~/ui/pixi/actor/destroyTileActorFx";
 
@@ -17,7 +17,7 @@ const readCanonicalSlotKey = (location: PixiTileActor["item"]["location"]) => {
 
 /** Owns canonical item projections and retained actor identity for the main Pixi scene. */
 export const createMainActorStoreFx = Effect.fn("createMainActorStoreFx")(() =>
-	Effect.sync((): PixiMainSceneActorStore => {
+	Effect.sync((): MainActorStore => {
 		const actors = new Map<string, PixiTileActor>();
 		const canonicalItems = new Map<string, PixiTileActor["item"]>();
 		const canonicalOccupants = new Map<string, PixiTileActor["item"]>();
@@ -27,34 +27,33 @@ export const createMainActorStoreFx = Effect.fn("createMainActorStoreFx")(() =>
 		return {
 			actors,
 			canonicalItems,
-			deleteActorFx: Effect.fn("PixiMainSceneActorStore.deleteActorFx")((actorId) =>
+			deleteActorFx: Effect.fn("MainActorStore.deleteActorFx")((actorId) =>
 				Effect.sync(() => {
 					const actor = actors.get(actorId) ?? null;
 					actors.delete(actorId);
 					return actor;
 				}),
 			),
-			destroyExitingActorFx: Effect.fn("PixiMainSceneActorStore.destroyExitingActorFx")(
-				(actor) =>
-					Effect.gen(function* () {
-						exitingActors.delete(actor);
-						yield* destroyTileActorFx(actor);
-					}),
+			destroyExitingActorFx: Effect.fn("MainActorStore.destroyExitingActorFx")((actor) =>
+				Effect.gen(function* () {
+					exitingActors.delete(actor);
+					yield* destroyTileActorFx(actor);
+				}),
 			),
-			readActorFx: Effect.fn("PixiMainSceneActorStore.readActorFx")((actorId) =>
+			readActorFx: Effect.fn("MainActorStore.readActorFx")((actorId) =>
 				Effect.sync(() => actors.get(actorId) ?? null),
 			),
-			readCanonicalItemFx: Effect.fn("PixiMainSceneActorStore.readCanonicalItemFx")(
-				(actorId) => Effect.sync(() => canonicalItems.get(actorId) ?? null),
+			readCanonicalItemFx: Effect.fn("MainActorStore.readCanonicalItemFx")((actorId) =>
+				Effect.sync(() => canonicalItems.get(actorId) ?? null),
 			),
-			readCanonicalOccupantFx: Effect.fn("PixiMainSceneActorStore.readCanonicalOccupantFx")(
+			readCanonicalOccupantFx: Effect.fn("MainActorStore.readCanonicalOccupantFx")(
 				(location) =>
 					Effect.sync(() => {
 						const key = readCanonicalSlotKey(location);
 						return key === null ? null : (canonicalOccupants.get(key) ?? null);
 					}),
 			),
-			readCanonicalOccupantsFx: Effect.fn("PixiMainSceneActorStore.readCanonicalOccupantsFx")(
+			readCanonicalOccupantsFx: Effect.fn("MainActorStore.readCanonicalOccupantsFx")(
 				(locations) =>
 					Effect.sync(() => {
 						const seen = new Set<string>();
@@ -70,40 +69,39 @@ export const createMainActorStoreFx = Effect.fn("createMainActorStoreFx")(() =>
 						return occupants;
 					}),
 			),
-			replaceCanonicalItemsFx: Effect.fn("PixiMainSceneActorStore.replaceCanonicalItemsFx")(
-				(items) =>
-					Effect.sync(() => {
-						if (closed) return;
-						const nextCanonicalItems = new Map<string, PixiTileActor["item"]>();
-						const nextCanonicalOccupants = new Map<string, PixiTileActor["item"]>();
-						for (const item of items) {
-							if (nextCanonicalItems.has(item.id)) {
-								throw new Error(
-									`Canonical Pixi actor ${item.id} was projected more than once.`,
-								);
-							}
-							nextCanonicalItems.set(item.id, item);
-							const key = readCanonicalSlotKey(item.location);
-							if (key === null) continue;
-							const existing = nextCanonicalOccupants.get(key);
-							if (existing !== undefined && existing.id !== item.id) {
-								throw new Error(
-									`Canonical Pixi slot ${key} is occupied by both ${existing.id} and ${item.id}.`,
-								);
-							}
-							nextCanonicalOccupants.set(key, item);
+			replaceCanonicalItemsFx: Effect.fn("MainActorStore.replaceCanonicalItemsFx")((items) =>
+				Effect.sync(() => {
+					if (closed) return;
+					const nextCanonicalItems = new Map<string, PixiTileActor["item"]>();
+					const nextCanonicalOccupants = new Map<string, PixiTileActor["item"]>();
+					for (const item of items) {
+						if (nextCanonicalItems.has(item.id)) {
+							throw new Error(
+								`Canonical Pixi actor ${item.id} was projected more than once.`,
+							);
 						}
-						canonicalItems.clear();
-						canonicalOccupants.clear();
-						for (const [itemId, item] of nextCanonicalItems) {
-							canonicalItems.set(itemId, item);
+						nextCanonicalItems.set(item.id, item);
+						const key = readCanonicalSlotKey(item.location);
+						if (key === null) continue;
+						const existing = nextCanonicalOccupants.get(key);
+						if (existing !== undefined && existing.id !== item.id) {
+							throw new Error(
+								`Canonical Pixi slot ${key} is occupied by both ${existing.id} and ${item.id}.`,
+							);
 						}
-						for (const [key, item] of nextCanonicalOccupants) {
-							canonicalOccupants.set(key, item);
-						}
-					}),
+						nextCanonicalOccupants.set(key, item);
+					}
+					canonicalItems.clear();
+					canonicalOccupants.clear();
+					for (const [itemId, item] of nextCanonicalItems) {
+						canonicalItems.set(itemId, item);
+					}
+					for (const [key, item] of nextCanonicalOccupants) {
+						canonicalOccupants.set(key, item);
+					}
+				}),
 			),
-			releaseActorFx: Effect.fn("PixiMainSceneActorStore.releaseActorFx")((actorId) =>
+			releaseActorFx: Effect.fn("MainActorStore.releaseActorFx")((actorId) =>
 				Effect.sync(() => {
 					const actor = actors.get(actorId) ?? null;
 					actors.delete(actorId);
@@ -120,7 +118,7 @@ export const createMainActorStoreFx = Effect.fn("createMainActorStoreFx")(() =>
 					return actor;
 				}),
 			),
-			setActorFx: Effect.fn("PixiMainSceneActorStore.setActorFx")(function* (actor) {
+			setActorFx: Effect.fn("MainActorStore.setActorFx")(function* (actor) {
 				if (closed) {
 					yield* destroyTileActorFx(actor);
 					return;

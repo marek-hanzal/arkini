@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
-import type { PixiTileQuantityPresentation } from "~/ui/pixi/motion/PixiTileQuantityPresentation";
-import type { PixiTileMotionTargetRoute } from "~/ui/pixi/motion/PixiTileMotionTargetRoute";
+import type { QuantityPresentation } from "~/ui/pixi/motion/QuantityPresentation";
+import type { TargetRoute } from "~/ui/pixi/motion/MotionTarget";
 import { readUnsettledTileInputSourceQuantitiesFx } from "~/ui/tile/motion/readUnsettledTileInputSourceQuantitiesFx";
 
 export namespace readQuantityPresentationFx {
@@ -10,12 +10,12 @@ export namespace readQuantityPresentationFx {
 		readonly cues: ReadonlyArray<TileMotionCue>;
 		readonly readTargetRoute: (
 			actorId: string,
-			location: PixiTileMotionTargetRoute["location"],
-		) => PixiTileMotionTargetRoute;
+			location: TargetRoute["location"],
+		) => TargetRoute;
 		readonly revealedInputCueKeys: ReadonlySet<string>;
 	}
 
-	export type Result = ReadonlyMap<string, PixiTileQuantityPresentation>;
+	export type Result = ReadonlyMap<string, QuantityPresentation>;
 }
 
 /**
@@ -29,7 +29,7 @@ export const readQuantityPresentationFx = Effect.fn("readQuantityPresentationFx"
 	readTargetRoute,
 	revealedInputCueKeys,
 }: readQuantityPresentationFx.Props) {
-	const presentations = new Map<string, PixiTileQuantityPresentation>();
+	const presentations = new Map<string, QuantityPresentation>();
 	const inputQuantities = yield* readUnsettledTileInputSourceQuantitiesFx({
 		cues,
 		revealedCueKeys: revealedInputCueKeys,

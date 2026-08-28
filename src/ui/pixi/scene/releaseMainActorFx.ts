@@ -1,15 +1,15 @@
 import { Effect } from "effect";
 
-import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
+import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
+import type { MainDragController } from "~/ui/pixi/drag/MainDragController";
 
 export namespace releaseMainActorFx {
 	export interface Props {
 		readonly actorId: string;
-		readonly actorStore: PixiMainSceneActorStore;
-		readonly animator: PixiActorAnimator;
-		readonly drag: PixiMainSceneDragController;
+		readonly actorStore: MainActorStore;
+		readonly animator: ActorAnimator;
+		readonly drag: MainDragController;
 	}
 }
 

@@ -14,26 +14,26 @@ import {
 } from "~/bridge/tile/readTileDropPreviewFx";
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import { PointerDragThreshold } from "~/ui/drag/PointerDragThreshold";
-import type { PixiInventoryActorStore } from "~/ui/pixi/actor/PixiInventoryActorStore";
+import type { InventoryActorStore } from "~/ui/pixi/actor/InventoryActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readActorCursorFx } from "~/ui/pixi/actor/readActorCursorFx";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import { animateRetargetablePoseFx } from "~/ui/pixi/animation/animateRetargetablePoseFx";
 import { flashConsumedSourceFx } from "~/ui/pixi/animation/flashConsumedSourceFx";
 import { burstFeedbackParticlesFx } from "~/ui/pixi/animation/burstFeedbackParticlesFx";
-import type { PixiInventoryDragController } from "~/ui/pixi/drag/PixiInventoryDragController";
+import type { InventoryDragController } from "~/ui/pixi/drag/InventoryDragController";
 import { makePointerOffsetReaderFx } from "~/ui/pixi/drag/makePointerOffsetReaderFx";
 import { setDraggedActorPoseFx } from "~/ui/pixi/drag/setDraggedActorPoseFx";
 import { restoreActorExitFx } from "~/ui/pixi/animation/restoreActorExitFx";
 import { startActorExitFx } from "~/ui/pixi/animation/startActorExitFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
-import type { PixiInventoryDropTarget } from "~/ui/pixi/scene/PixiInventoryDropTarget";
-import type { PixiInventorySceneSurface } from "~/ui/pixi/scene/PixiInventorySceneSurface";
+import type { InventoryDropTarget } from "~/ui/pixi/scene/InventoryDropTarget";
+import type { InventorySurface } from "~/ui/pixi/scene/InventorySurface";
 
 export namespace createInventoryDragControllerFx {
 	export interface Props {
-		readonly actorStore: PixiInventoryActorStore;
-		readonly animator: PixiActorAnimator;
+		readonly actorStore: InventoryActorStore;
+		readonly animator: ActorAnimator;
 		readonly application: PixiApplicationOwner;
 		readonly game: GameEngine;
 		readonly onActivate: (
@@ -43,7 +43,7 @@ export namespace createInventoryDragControllerFx {
 		) => void | PromiseLike<unknown>;
 		readonly onAcceptedDropFx: Effect.Effect<void>;
 		readonly onDrop: (command: runTileDropAtom.Command) => PromiseLike<runTileDropAtom.Result>;
-		readonly surface: PixiInventorySceneSurface;
+		readonly surface: InventorySurface;
 	}
 }
 
@@ -57,7 +57,7 @@ interface ActiveInventoryDrag {
 	readonly startX: number;
 	readonly startY: number;
 	phase: "dragging" | "pressed" | "submitting";
-	target: PixiInventoryDropTarget | null;
+	target: InventoryDropTarget | null;
 }
 
 const expectedActivationFailureTags = new Set([
@@ -107,7 +107,7 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 			}
 		};
 
-		const readCommandTarget = (target: PixiInventoryDropTarget | null) => {
+		const readCommandTarget = (target: InventoryDropTarget | null) => {
 			if (target === null) {
 				return {
 					kind: "unsupported" as const,
@@ -260,7 +260,7 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 
 		const previewTarget = (
 			drag: ActiveInventoryDrag,
-			target: PixiInventoryDropTarget | null,
+			target: InventoryDropTarget | null,
 			force = false,
 		): TileActorItem | null => {
 			const current = RendererRuntime.runSync(actorStore.readActorFx(drag.sourceItem.id));
@@ -481,7 +481,7 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 		application.stage.on("pointercancel", cancelPointer);
 
 		return {
-			attachActorFx: Effect.fn("PixiInventoryDragController.attachActorFx")((actor) =>
+			attachActorFx: Effect.fn("InventoryDragController.attachActorFx")((actor) =>
 				Effect.sync(() => {
 					const onPointerDown = (event: FederatedPointerEvent) => {
 						if (
@@ -540,7 +540,7 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 				if (drag === null || drag.phase !== "dragging") return;
 				previewTarget(drag, drag.target, true);
 			}),
-			removeActorFx: Effect.fn("PixiInventoryDragController.removeActorFx")((actor) =>
+			removeActorFx: Effect.fn("InventoryDragController.removeActorFx")((actor) =>
 				Effect.sync(() => {
 					removalFeedbackGenerationByActorId.delete(actor.item.id);
 					if (actor.onPointerDown !== null) {
@@ -556,6 +556,6 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 					actor.dragging = false;
 				}),
 			),
-		} satisfies PixiInventoryDragController;
+		} satisfies InventoryDragController;
 	},
 );

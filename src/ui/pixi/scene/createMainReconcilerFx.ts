@@ -9,34 +9,34 @@ import { readCommittedTileSwapMotionCueFx } from "~/bridge/tile/motion/readCommi
 import { readTileMotionCuesFx } from "~/bridge/tile/motion/readTileMotionCuesFx";
 import { readTileActorsFx } from "~/bridge/tile/readTileActorsFx";
 import { readTileDeliveriesFx } from "~/bridge/tile/readTileDeliveriesFx";
-import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
-import type { PixiTileActorParticleTextures } from "~/ui/pixi/actor/PixiTileActorParticleTextures";
+import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
+import type { ParticleTextures } from "~/ui/pixi/actor/ParticleTextures";
 import { createTileActorFx } from "~/ui/pixi/actor/createTileActorFx";
 import { updateTileActorFx } from "~/ui/pixi/actor/updateTileActorFx";
 import { updateActorProgressFx } from "~/ui/pixi/actor/updateActorProgressFx";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import { animateRetargetablePoseFx } from "~/ui/pixi/animation/animateRetargetablePoseFx";
 import { flashConsumedSourceFx } from "~/ui/pixi/animation/flashConsumedSourceFx";
-import { pixiTileActorFeedbackParticlesDurationMs } from "~/ui/pixi/animation/runActivityParticlesFx";
+import { feedbackDurationMs } from "~/ui/pixi/animation/runActivityParticlesFx";
 import { burstFeedbackParticlesFx } from "~/ui/pixi/animation/burstFeedbackParticlesFx";
 import { startActivityParticlesFx } from "~/ui/pixi/animation/startActivityParticlesFx";
 import { stopActivityParticlesFx } from "~/ui/pixi/animation/stopActivityParticlesFx";
-import { pixiTileActorLifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
+import { lifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
 import { prepareActorEnterFx } from "~/ui/pixi/animation/prepareActorEnterFx";
 import { startActorEnterFx } from "~/ui/pixi/animation/startActorEnterFx";
 import { startActorExitFx } from "~/ui/pixi/animation/startActorExitFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
-import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
-import type { PixiDeliveryMotionRuntime } from "~/ui/pixi/delivery/PixiDeliveryMotionRuntime";
+import type { MainDragController } from "~/ui/pixi/drag/MainDragController";
+import type { DeliveryRuntime } from "~/ui/pixi/delivery/DeliveryRuntime";
 import { readSettleDurationMsFx } from "~/ui/pixi/drag/readSettleDurationMsFx";
-import type { PixiMainSceneDropPresentation } from "~/ui/pixi/drop/PixiMainSceneDropPresentation";
-import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
-import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRuntime";
+import type { DropPresentation } from "~/ui/pixi/drop/DropPresentation";
+import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
+import type { MotionRuntime } from "~/ui/pixi/motion/MotionRuntime";
 import { projectMotionItemFx } from "~/ui/pixi/motion/projectMotionItemFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
-import type { PixiTextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
-import type { PixiMainSceneReconciler } from "~/ui/pixi/scene/PixiMainSceneReconciler";
-import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
+import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
+import type { MainReconciler } from "~/ui/pixi/scene/MainReconciler";
+import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 import { classifyActorUpdateFx } from "~/ui/pixi/scene/classifyActorUpdateFx";
 import { classifyReconciliationFx } from "~/ui/pixi/scene/classifyReconciliationFx";
 import { releaseMainActorFx } from "~/ui/pixi/scene/releaseMainActorFx";
@@ -44,19 +44,19 @@ import { runReplacementsFx } from "~/ui/pixi/scene/runReplacementsFx";
 
 export namespace createMainReconcilerFx {
 	export interface Props {
-		readonly actorStore: PixiMainSceneActorStore;
-		readonly animator: PixiActorAnimator;
+		readonly actorStore: MainActorStore;
+		readonly animator: ActorAnimator;
 		readonly application: PixiApplicationOwner;
-		readonly drag: PixiMainSceneDragController;
-		readonly delivery: PixiDeliveryMotionRuntime;
-		readonly dropPresentation: PixiMainSceneDropPresentation;
+		readonly drag: MainDragController;
+		readonly delivery: DeliveryRuntime;
+		readonly dropPresentation: DropPresentation;
 		readonly game: GameEngine;
-		readonly magneticField: PixiTileMagneticField;
-		readonly motion: PixiTileMotionRuntime;
-		readonly particleTextures: PixiTileActorParticleTextures;
+		readonly magneticField: MagneticField;
+		readonly motion: MotionRuntime;
+		readonly particleTextures: ParticleTextures;
 		readonly readPalette: () => PixiScenePalette;
-		readonly surface: PixiMainSceneSurface;
-		readonly textures: PixiTextureStore;
+		readonly surface: MainSurface;
+		readonly textures: TextureStore;
 	}
 }
 
@@ -97,27 +97,23 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		}
 	};
 
-	const runActorFeedbackCueFx = Effect.fn("PixiMainSceneReconciler.runActorFeedbackCueFx")(
-		function* ({
+	const runActorFeedbackCueFx = Effect.fn("MainReconciler.runActorFeedbackCueFx")(function* ({
+		actor,
+		cue,
+	}: {
+		readonly actor: NonNullable<ReturnType<typeof actorStore.actors.get>>;
+		readonly cue: TileActorFeedbackCue;
+	}) {
+		if (processedFeedbackKeys.has(cue.key) || actor.container.destroyed) return;
+		processedFeedbackKeys.add(cue.key);
+		retainNewestFeedbackKeys();
+		yield* (cue.kind === "consume-source" ? flashConsumedSourceFx : burstFeedbackParticlesFx)({
 			actor,
-			cue,
-		}: {
-			readonly actor: NonNullable<ReturnType<typeof actorStore.actors.get>>;
-			readonly cue: TileActorFeedbackCue;
-		}) {
-			if (processedFeedbackKeys.has(cue.key) || actor.container.destroyed) return;
-			processedFeedbackKeys.add(cue.key);
-			retainNewestFeedbackKeys();
-			yield* (
-				cue.kind === "consume-source" ? flashConsumedSourceFx : burstFeedbackParticlesFx
-			)({
-				actor,
-				animator,
-			});
-		},
-	);
+			animator,
+		});
+	});
 
-	const runFeedbackCuesFx = Effect.fn("PixiMainSceneReconciler.runFeedbackCuesFx")(function* (
+	const runFeedbackCuesFx = Effect.fn("MainReconciler.runFeedbackCuesFx")(function* (
 		cues: ReadonlyArray<TileActorFeedbackCue>,
 	) {
 		for (const cue of cues) {
@@ -146,7 +142,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		);
 	};
 
-	const removeActorImmediatelyFx = Effect.fn("PixiMainSceneReconciler.removeActorImmediatelyFx")(
+	const removeActorImmediatelyFx = Effect.fn("MainReconciler.removeActorImmediatelyFx")(
 		function* (actorId: string) {
 			const actor = yield* releaseMainActorFx({
 				actorId,
@@ -160,412 +156,403 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		},
 	);
 
-	const releaseActorWithExitFx = Effect.fn("PixiMainSceneReconciler.releaseActorWithExitFx")(
-		function* ({
-			adoptActiveLifecycleExit = false,
-			actorId,
-			durationMs,
-			feedbackCues,
-		}: {
-			readonly adoptActiveLifecycleExit?: boolean;
-			readonly actorId: string;
-			readonly durationMs: number;
-			readonly feedbackCues: ReadonlyArray<TileActorFeedbackCue>;
-		}) {
-			const retainedActor = actorStore.actors.get(actorId);
-			const adoptedDurationMs =
-				adoptActiveLifecycleExit &&
-				retainedActor !== undefined &&
-				retainedActor.lifecycleTargetAlpha === 0 &&
-				retainedActor.lifecycleTransitionStarted
-					? Math.max(
-							0,
-							retainedActor.lifecycleNotBeforeMs +
-								retainedActor.lifecycleDurationMs -
-								performance.now(),
-						)
-					: null;
-			const actor = yield* releaseMainActorFx({
-				actorId,
-				actorStore,
-				animator,
-				drag,
-			});
-			if (actor === null) return;
-			for (const cue of feedbackCues) {
-				yield* runActorFeedbackCueFx({
-					actor,
-					cue,
-				});
-			}
-			if (adoptedDurationMs === 0) {
-				yield* actorStore.destroyExitingActorFx(actor);
-				yield* application.frames.invalidateFx;
-				return;
-			}
-			const exitDurationMs = adoptedDurationMs ?? durationMs;
-			yield* startActorExitFx({
-				actor,
-				animator,
-				durationMs: exitDurationMs,
-				onComplete: () => {
-					RendererRuntime.runSync(animator.cancelActorFx(actor));
-					RendererRuntime.runSync(actorStore.destroyExitingActorFx(actor));
-				},
-			});
-		},
-	);
-
-	const reconcileTransitionFx = Effect.fn("PixiMainSceneReconciler.reconcileTransitionFx")(
-		function* ({
-			presentCommittedEffects,
-			transition,
-		}: {
-			readonly presentCommittedEffects: boolean;
-			readonly transition: ReturnType<GameEngine["getTransitionSnapshot"]>;
-		}) {
-			if (closed) return;
-			const nextItems = game.readOrThrow(
-				readTileActorsFx({
-					game,
-					runtime: transition.runtime,
-					surface: "main",
-				}),
-			);
-			const inventoryActorIds = new Set(
-				game
-					.readOrThrow(
-						readTileActorsFx({
-							game,
-							runtime: transition.runtime,
-							surface: "inventory",
-						}),
+	const releaseActorWithExitFx = Effect.fn("MainReconciler.releaseActorWithExitFx")(function* ({
+		adoptActiveLifecycleExit = false,
+		actorId,
+		durationMs,
+		feedbackCues,
+	}: {
+		readonly adoptActiveLifecycleExit?: boolean;
+		readonly actorId: string;
+		readonly durationMs: number;
+		readonly feedbackCues: ReadonlyArray<TileActorFeedbackCue>;
+	}) {
+		const retainedActor = actorStore.actors.get(actorId);
+		const adoptedDurationMs =
+			adoptActiveLifecycleExit &&
+			retainedActor !== undefined &&
+			retainedActor.lifecycleTargetAlpha === 0 &&
+			retainedActor.lifecycleTransitionStarted
+				? Math.max(
+						0,
+						retainedActor.lifecycleNotBeforeMs +
+							retainedActor.lifecycleDurationMs -
+							performance.now(),
 					)
-					.map((item) => item.id),
-			);
-			const dropSnapshot = yield* dropPresentation.readSnapshotFx;
-			yield* actorStore.replaceCanonicalItemsFx(nextItems);
-			yield* delivery.syncFx(
-				game.readOrThrow(
-					readTileDeliveriesFx({
+				: null;
+		const actor = yield* releaseMainActorFx({
+			actorId,
+			actorStore,
+			animator,
+			drag,
+		});
+		if (actor === null) return;
+		for (const cue of feedbackCues) {
+			yield* runActorFeedbackCueFx({
+				actor,
+				cue,
+			});
+		}
+		if (adoptedDurationMs === 0) {
+			yield* actorStore.destroyExitingActorFx(actor);
+			yield* application.frames.invalidateFx;
+			return;
+		}
+		const exitDurationMs = adoptedDurationMs ?? durationMs;
+		yield* startActorExitFx({
+			actor,
+			animator,
+			durationMs: exitDurationMs,
+			onComplete: () => {
+				RendererRuntime.runSync(animator.cancelActorFx(actor));
+				RendererRuntime.runSync(actorStore.destroyExitingActorFx(actor));
+			},
+		});
+	});
+
+	const reconcileTransitionFx = Effect.fn("MainReconciler.reconcileTransitionFx")(function* ({
+		presentCommittedEffects,
+		transition,
+	}: {
+		readonly presentCommittedEffects: boolean;
+		readonly transition: ReturnType<GameEngine["getTransitionSnapshot"]>;
+	}) {
+		if (closed) return;
+		const nextItems = game.readOrThrow(
+			readTileActorsFx({
+				game,
+				runtime: transition.runtime,
+				surface: "main",
+			}),
+		);
+		const inventoryActorIds = new Set(
+			game
+				.readOrThrow(
+					readTileActorsFx({
 						game,
 						runtime: transition.runtime,
+						surface: "inventory",
 					}),
-				),
-			);
-			const deliverySnapshot = yield* delivery.readSnapshotFx;
-			const compiledCues = presentCommittedEffects
-				? [
-						...RendererRuntime.runSync(
-							readTileMotionCuesFx({
-								game,
-								transition,
-							}),
-						),
-					]
-				: [];
-			const replacements = presentCommittedEffects
-				? RendererRuntime.runSync(
-						readCommittedTileReplacementsFx({
+				)
+				.map((item) => item.id),
+		);
+		const dropSnapshot = yield* dropPresentation.readSnapshotFx;
+		yield* actorStore.replaceCanonicalItemsFx(nextItems);
+		yield* delivery.syncFx(
+			game.readOrThrow(
+				readTileDeliveriesFx({
+					game,
+					runtime: transition.runtime,
+				}),
+			),
+		);
+		const deliverySnapshot = yield* delivery.readSnapshotFx;
+		const compiledCues = presentCommittedEffects
+			? [
+					...RendererRuntime.runSync(
+						readTileMotionCuesFx({
 							game,
 							transition,
 						}),
-					)
-				: [];
-			const inputMotionCues = compiledCues.filter((cue) => cue.kind === "input");
-			const inputMotionFeedbackPrefixes = new Set(
-				inputMotionCues.map((cue) => `${cue.sequence}:${cue.eventIndex}:`),
-			);
-			const inputMotionActorIds = new Set(
-				inputMotionCues.flatMap((cue) => [
-					cue.sourceActorId,
-					cue.targetActorId,
-				]),
-			);
-			const belongsToInputMotion = (cue: TileActorFeedbackCue) => {
-				for (const prefix of inputMotionFeedbackPrefixes) {
-					if (cue.key.startsWith(prefix)) return true;
-				}
-				return false;
-			};
-			const feedbackCues = presentCommittedEffects
-				? [
-						...RendererRuntime.runSync(readTileActorFeedbackCuesFx(transition)).filter(
-							(cue) => !belongsToInputMotion(cue),
-						),
-						...dropSnapshot.feedback.flatMap(({ cues }) =>
-							cues.filter((cue) => !inputMotionActorIds.has(cue.actorId)),
-						),
-					]
-				: [];
-			const replacementActorIds = new Set(replacements.map(({ actorId }) => actorId));
-			if (presentCommittedEffects) {
-				for (const swap of dropSnapshot.swaps) {
-					const swapCue = RendererRuntime.runSync(
-						readCommittedTileSwapMotionCueFx({
-							...swap.candidate,
-							transition,
-						}),
-					);
-					if (swapCue !== null) {
-						compiledCues.push(swapCue);
-						yield* dropPresentation.clearSwapFx(swap.generation);
-					}
-				}
+					),
+				]
+			: [];
+		const replacements = presentCommittedEffects
+			? RendererRuntime.runSync(
+					readCommittedTileReplacementsFx({
+						game,
+						transition,
+					}),
+				)
+			: [];
+		const inputMotionCues = compiledCues.filter((cue) => cue.kind === "input");
+		const inputMotionFeedbackPrefixes = new Set(
+			inputMotionCues.map((cue) => `${cue.sequence}:${cue.eventIndex}:`),
+		);
+		const inputMotionActorIds = new Set(
+			inputMotionCues.flatMap((cue) => [
+				cue.sourceActorId,
+				cue.targetActorId,
+			]),
+		);
+		const belongsToInputMotion = (cue: TileActorFeedbackCue) => {
+			for (const prefix of inputMotionFeedbackPrefixes) {
+				if (cue.key.startsWith(prefix)) return true;
 			}
-			if (presentCommittedEffects) {
-				yield* motion.enqueueFx(compiledCues);
-			}
-			const motionSnapshot = yield* motion.readSnapshotFx;
-			const visibleItems = new Map(
-				nextItems.flatMap((item) => {
-					if (dropSnapshot.hiddenActorIds.has(item.id)) return [];
-					const pose = RendererRuntime.runSync(surface.readActorPoseFx(item));
-					return pose === null
-						? []
-						: [
-								[
-									item.id,
-									{
-										item,
-										pose,
-									},
-								] as const,
-							];
-				}),
-			);
-			const reconciliationPlan = yield* classifyReconciliationFx({
-				actorIds: actorStore.actors.keys(),
-				deliveryRetainedActorIds: deliverySnapshot.retainedActorIds,
-				feedbackCues,
-				hiddenActorIds: dropSnapshot.hiddenActorIds,
-				inventoryActorIds,
-				motionRetainedActorIds: motionSnapshot.retainedActorIds,
-				pendingActorIds: dropSnapshot.pendingActorIds,
-				visibleActors: visibleItems,
-			});
-			for (const departure of reconciliationPlan.departures) {
-				if (departure.kind === "release-hidden") {
-					yield* releaseActorWithExitFx({
-						adoptActiveLifecycleExit: true,
-						actorId: departure.actorId,
-						durationMs: feedbackExitDurationMs,
-						feedbackCues: [],
-					});
-					continue;
-				}
-				if (departure.kind === "remove-immediately") {
-					yield* removeActorImmediatelyFx(departure.actorId);
-					continue;
-				}
-				yield* releaseActorWithExitFx({
-					actorId: departure.actorId,
-					durationMs:
-						departure.style === "feedback-particles"
-							? pixiTileActorFeedbackParticlesDurationMs
-							: departure.style === "feedback"
-								? feedbackExitDurationMs
-								: pixiTileActorLifecycleDurationMs,
-					feedbackCues: departure.feedbackCues,
-				});
-			}
-
-			for (const arrival of reconciliationPlan.arrivals) {
-				const {
-					visible: { item, pose },
-				} = arrival;
-				const displayItem = yield* projectMotionItemFx(
-					item,
-					motionSnapshot.quantityPresentationByActorId.get(item.id),
+			return false;
+		};
+		const feedbackCues = presentCommittedEffects
+			? [
+					...RendererRuntime.runSync(readTileActorFeedbackCuesFx(transition)).filter(
+						(cue) => !belongsToInputMotion(cue),
+					),
+					...dropSnapshot.feedback.flatMap(({ cues }) =>
+						cues.filter((cue) => !inputMotionActorIds.has(cue.actorId)),
+					),
+				]
+			: [];
+		const replacementActorIds = new Set(replacements.map(({ actorId }) => actorId));
+		if (presentCommittedEffects) {
+			for (const swap of dropSnapshot.swaps) {
+				const swapCue = RendererRuntime.runSync(
+					readCommittedTileSwapMotionCueFx({
+						...swap.candidate,
+						transition,
+					}),
 				);
-				if (arrival.kind === "add") {
-					const created = RendererRuntime.runSync(
-						createTileActorFx({
-							frames: application.frames,
-							item: displayItem,
-							palette: readPalette(),
-							particleTextures,
-							textures,
-						}),
-					);
-					yield* actorStore.setActorFx(created);
-					pose.layer.addChild(created.container);
-					const spawnCue = motionSnapshot.spawnCueByActorId.get(item.id);
-					const spawnOrigin =
-						spawnCue === undefined
-							? null
-							: RendererRuntime.runSync(
-									surface.readLocationPoseFx(spawnCue.originLocation),
-								);
-					yield* animator.setFx({
-						actor: created,
-						channel: "pose",
-						scale: 1,
-						x: spawnOrigin?.x ?? pose.x,
-						y: spawnOrigin?.y ?? pose.y,
-					});
-					if (presentCommittedEffects) {
-						yield* prepareActorEnterFx({
-							actor: created,
-							animator,
-						});
-					}
-					yield* drag.attachActorFx(created);
-					yield* updateTileActorFx({
-						actor: created,
-						animator,
-						frames: application.frames,
-						item: displayItem,
-						palette: readPalette(),
-						size: pose.size,
-						textures,
-					});
-					if (displayItem.activityEffect) {
-						yield* startActivityParticlesFx({
-							actor: created,
-							animator,
-						});
-					}
-					if (presentCommittedEffects && spawnCue === undefined) {
-						yield* startActorEnterFx({
-							actor: created,
-							animator,
-						});
-					}
-					continue;
+				if (swapCue !== null) {
+					compiledCues.push(swapCue);
+					yield* dropPresentation.clearSwapFx(swap.generation);
 				}
-
-				const actor = actorStore.actors.get(item.id);
-				if (actor === undefined) continue;
-				const updatePlan = yield* classifyActorUpdateFx({
-					actor,
-					deliveryRetained: deliverySnapshot.retainedActorIds.has(item.id),
-					directLanding: dropSnapshot.landingActorIds.has(item.id),
-					displayItem,
-					motionClaimed: motionSnapshot.interactionClaimByActorId.has(item.id),
-					pose,
-					poseChannelActive:
-						presentCommittedEffects &&
-						(yield* animator.isChannelActiveFx(actor, "pose")),
-					preserveVisual: replacementActorIds.has(item.id),
+			}
+		}
+		if (presentCommittedEffects) {
+			yield* motion.enqueueFx(compiledCues);
+		}
+		const motionSnapshot = yield* motion.readSnapshotFx;
+		const visibleItems = new Map(
+			nextItems.flatMap((item) => {
+				if (dropSnapshot.hiddenActorIds.has(item.id)) return [];
+				const pose = RendererRuntime.runSync(surface.readActorPoseFx(item));
+				return pose === null
+					? []
+					: [
+							[
+								item.id,
+								{
+									item,
+									pose,
+								},
+							] as const,
+						];
+			}),
+		);
+		const reconciliationPlan = yield* classifyReconciliationFx({
+			actorIds: actorStore.actors.keys(),
+			deliveryRetainedActorIds: deliverySnapshot.retainedActorIds,
+			feedbackCues,
+			hiddenActorIds: dropSnapshot.hiddenActorIds,
+			inventoryActorIds,
+			motionRetainedActorIds: motionSnapshot.retainedActorIds,
+			pendingActorIds: dropSnapshot.pendingActorIds,
+			visibleActors: visibleItems,
+		});
+		for (const departure of reconciliationPlan.departures) {
+			if (departure.kind === "release-hidden") {
+				yield* releaseActorWithExitFx({
+					adoptActiveLifecycleExit: true,
+					actorId: departure.actorId,
+					durationMs: feedbackExitDurationMs,
+					feedbackCues: [],
 				});
-				if (updatePlan.item.kind === "visual") {
-					yield* updateTileActorFx({
-						actor,
-						animator,
+				continue;
+			}
+			if (departure.kind === "remove-immediately") {
+				yield* removeActorImmediatelyFx(departure.actorId);
+				continue;
+			}
+			yield* releaseActorWithExitFx({
+				actorId: departure.actorId,
+				durationMs:
+					departure.style === "feedback-particles"
+						? feedbackDurationMs
+						: departure.style === "feedback"
+							? feedbackExitDurationMs
+							: lifecycleDurationMs,
+				feedbackCues: departure.feedbackCues,
+			});
+		}
+
+		for (const arrival of reconciliationPlan.arrivals) {
+			const {
+				visible: { item, pose },
+			} = arrival;
+			const displayItem = yield* projectMotionItemFx(
+				item,
+				motionSnapshot.quantityPresentationByActorId.get(item.id),
+			);
+			if (arrival.kind === "add") {
+				const created = RendererRuntime.runSync(
+					createTileActorFx({
 						frames: application.frames,
 						item: displayItem,
 						palette: readPalette(),
-						preserveVisual: updatePlan.item.preserveVisual,
-						size: updatePlan.item.size,
+						particleTextures,
 						textures,
-					});
-				} else if (updatePlan.item.kind === "progress") {
-					yield* updateActorProgressFx({
-						actor,
-						frames: application.frames,
-						item: displayItem,
-						palette: readPalette(),
-						size: actor.size,
-					});
-				} else {
-					actor.item = displayItem;
-				}
-				if (updatePlan.crowdAlpha !== null) {
-					yield* animator.animateFx({
-						actor,
-						channel: "crowd-opacity",
-						durationMs: runningTransitionDurationMs,
-						ownerKey: `running:${item.id}`,
-						toCrowdAlpha: updatePlan.crowdAlpha,
-					});
-				}
-				if (updatePlan.activityEffect !== null) {
-					yield* (
-						updatePlan.activityEffect === "start"
-							? startActivityParticlesFx
-							: stopActivityParticlesFx
-					)({
-						actor,
+					}),
+				);
+				yield* actorStore.setActorFx(created);
+				pose.layer.addChild(created.container);
+				const spawnCue = motionSnapshot.spawnCueByActorId.get(item.id);
+				const spawnOrigin =
+					spawnCue === undefined
+						? null
+						: RendererRuntime.runSync(
+								surface.readLocationPoseFx(spawnCue.originLocation),
+							);
+				yield* animator.setFx({
+					actor: created,
+					channel: "pose",
+					scale: 1,
+					x: spawnOrigin?.x ?? pose.x,
+					y: spawnOrigin?.y ?? pose.y,
+				});
+				if (presentCommittedEffects) {
+					yield* prepareActorEnterFx({
+						actor: created,
 						animator,
 					});
 				}
-				if (updatePlan.pose.kind === "owned") continue;
-				if (
-					updatePlan.pose.kind === "travel" &&
-					updatePlan.pose.scaleBeforeTravel !== null
-				) {
-					yield* animator.setFx({
-						actor,
-						channel: "pose",
-						scale: updatePlan.pose.scaleBeforeTravel,
-						x: actor.container.x,
-						y: actor.container.y,
-					});
-				}
-				if (updatePlan.pose.kind === "travel") {
-					surface.transientActorLayer.addChild(actor.container);
-					const finishTravel = () => {
-						if (actor.container.destroyed) return;
-						const latest =
-							RendererRuntime.runSync(surface.readActorPoseFx(actor.item)) ?? pose;
-						latest.layer.addChild(actor.container);
-					};
-					yield* animateRetargetablePoseFx({
-						actor,
+				yield* drag.attachActorFx(created);
+				yield* updateTileActorFx({
+					actor: created,
+					animator,
+					frames: application.frames,
+					item: displayItem,
+					palette: readPalette(),
+					size: pose.size,
+					textures,
+				});
+				if (displayItem.activityEffect) {
+					yield* startActivityParticlesFx({
+						actor: created,
 						animator,
-						curve: updatePlan.pose.directLanding
-							? {
-									bounce: 0.14,
-									kind: "spring",
-								}
-							: undefined,
-						durationMs: updatePlan.pose.directLanding
-							? yield* readSettleDurationMsFx({
-									fromX: actor.container.x,
-									fromY: actor.container.y,
-									tileSize: pose.size,
-									toX: pose.x,
-									toY: pose.y,
-								})
-							: undefined,
-						onComplete: finishTravel,
-						readSize: () =>
-							RendererRuntime.runSync(surface.readActorPoseFx(actor.item))?.size ??
-							pose.size,
-						readTarget: () =>
-							RendererRuntime.runSync(surface.readActorPoseFx(actor.item)),
-						target: pose,
 					});
-				} else {
-					pose.layer.addChild(actor.container);
 				}
+				if (presentCommittedEffects && spawnCue === undefined) {
+					yield* startActorEnterFx({
+						actor: created,
+						animator,
+					});
+				}
+				continue;
 			}
 
-			yield* runReplacementsFx({
-				actorStore,
-				animator,
-				application,
-				processedKeys: processedReplacementKeys,
-				readPalette,
-				replacements,
-				surface,
-				textures,
+			const actor = actorStore.actors.get(item.id);
+			if (actor === undefined) continue;
+			const updatePlan = yield* classifyActorUpdateFx({
+				actor,
+				deliveryRetained: deliverySnapshot.retainedActorIds.has(item.id),
+				directLanding: dropSnapshot.landingActorIds.has(item.id),
+				displayItem,
+				motionClaimed: motionSnapshot.interactionClaimByActorId.has(item.id),
+				pose,
+				poseChannelActive:
+					presentCommittedEffects && (yield* animator.isChannelActiveFx(actor, "pose")),
+				preserveVisual: replacementActorIds.has(item.id),
 			});
-			yield* runFeedbackCuesFx(feedbackCues);
-			for (const feedback of dropSnapshot.feedback) {
-				yield* dropPresentation.clearFeedbackFx(feedback.generation);
+			if (updatePlan.item.kind === "visual") {
+				yield* updateTileActorFx({
+					actor,
+					animator,
+					frames: application.frames,
+					item: displayItem,
+					palette: readPalette(),
+					preserveVisual: updatePlan.item.preserveVisual,
+					size: updatePlan.item.size,
+					textures,
+				});
+			} else if (updatePlan.item.kind === "progress") {
+				yield* updateActorProgressFx({
+					actor,
+					frames: application.frames,
+					item: displayItem,
+					palette: readPalette(),
+					size: actor.size,
+				});
+			} else {
+				actor.item = displayItem;
 			}
-			yield* dropPresentation.reconcileActorIdsFx({
-				inventoryActorIds,
-				mainActorIds: new Set(nextItems.map((item) => item.id)),
-			});
-			yield* magneticField.pruneFx;
-			yield* motion.syncPresentationFx;
-			yield* motion.startFx;
-			yield* drag.requestRefreshFx;
-		},
-	);
+			if (updatePlan.crowdAlpha !== null) {
+				yield* animator.animateFx({
+					actor,
+					channel: "crowd-opacity",
+					durationMs: runningTransitionDurationMs,
+					ownerKey: `running:${item.id}`,
+					toCrowdAlpha: updatePlan.crowdAlpha,
+				});
+			}
+			if (updatePlan.activityEffect !== null) {
+				yield* (
+					updatePlan.activityEffect === "start"
+						? startActivityParticlesFx
+						: stopActivityParticlesFx
+				)({
+					actor,
+					animator,
+				});
+			}
+			if (updatePlan.pose.kind === "owned") continue;
+			if (updatePlan.pose.kind === "travel" && updatePlan.pose.scaleBeforeTravel !== null) {
+				yield* animator.setFx({
+					actor,
+					channel: "pose",
+					scale: updatePlan.pose.scaleBeforeTravel,
+					x: actor.container.x,
+					y: actor.container.y,
+				});
+			}
+			if (updatePlan.pose.kind === "travel") {
+				surface.transientActorLayer.addChild(actor.container);
+				const finishTravel = () => {
+					if (actor.container.destroyed) return;
+					const latest =
+						RendererRuntime.runSync(surface.readActorPoseFx(actor.item)) ?? pose;
+					latest.layer.addChild(actor.container);
+				};
+				yield* animateRetargetablePoseFx({
+					actor,
+					animator,
+					curve: updatePlan.pose.directLanding
+						? {
+								bounce: 0.14,
+								kind: "spring",
+							}
+						: undefined,
+					durationMs: updatePlan.pose.directLanding
+						? yield* readSettleDurationMsFx({
+								fromX: actor.container.x,
+								fromY: actor.container.y,
+								tileSize: pose.size,
+								toX: pose.x,
+								toY: pose.y,
+							})
+						: undefined,
+					onComplete: finishTravel,
+					readSize: () =>
+						RendererRuntime.runSync(surface.readActorPoseFx(actor.item))?.size ??
+						pose.size,
+					readTarget: () => RendererRuntime.runSync(surface.readActorPoseFx(actor.item)),
+					target: pose,
+				});
+			} else {
+				pose.layer.addChild(actor.container);
+			}
+		}
+
+		yield* runReplacementsFx({
+			actorStore,
+			animator,
+			application,
+			processedKeys: processedReplacementKeys,
+			readPalette,
+			replacements,
+			surface,
+			textures,
+		});
+		yield* runFeedbackCuesFx(feedbackCues);
+		for (const feedback of dropSnapshot.feedback) {
+			yield* dropPresentation.clearFeedbackFx(feedback.generation);
+		}
+		yield* dropPresentation.reconcileActorIdsFx({
+			inventoryActorIds,
+			mainActorIds: new Set(nextItems.map((item) => item.id)),
+		});
+		yield* magneticField.pruneFx;
+		yield* motion.syncPresentationFx;
+		yield* motion.startFx;
+		yield* drag.requestRefreshFx;
+	});
 
 	return {
 		hydrateFx: (transition) =>
@@ -586,5 +573,5 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			processedFeedbackKeys.clear();
 			processedReplacementKeys.clear();
 		}),
-	} satisfies PixiMainSceneReconciler;
+	} satisfies MainReconciler;
 });

@@ -18,9 +18,9 @@ import { createDropSubmissionFx } from "~/ui/pixi/drop/createDropSubmissionFx";
 import { createMagneticFieldFx } from "~/ui/pixi/magnet/createMagneticFieldFx";
 import { createMotionRuntimeFx } from "~/ui/pixi/motion/createMotionRuntimeFx";
 import { createApplicationOwnerFx } from "~/ui/pixi/runtime/createApplicationOwnerFx";
-import type { PixiTextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
-import type { PixiMainSceneRuntime } from "~/ui/pixi/scene/PixiMainSceneRuntime";
-import type { PixiMainSceneActivationIntent } from "~/ui/pixi/scene/PixiMainSceneActivationIntent";
+import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
+import type { MainRuntime } from "~/ui/pixi/scene/MainRuntime";
+import type { MainActivationIntent } from "~/ui/pixi/scene/MainActivationIntent";
 import { createMainReconcilerFx } from "~/ui/pixi/scene/createMainReconcilerFx";
 import { createSubscriptionReplayGateFx } from "~/ui/pixi/scene/createSubscriptionReplayGateFx";
 import { createMainSurfaceFx } from "~/ui/pixi/scene/createMainSurfaceFx";
@@ -32,11 +32,11 @@ export namespace createMainRuntimeFx {
 		readonly host: HTMLElement;
 		readonly onActivate: (
 			item: TileActorItem,
-			intent: PixiMainSceneActivationIntent,
+			intent: MainActivationIntent,
 			origin: HTMLElement,
 		) => void | PromiseLike<void>;
 		readonly onDrop: (command: runTileDropAtom.Command) => PromiseLike<runTileDropAtom.Result>;
-		readonly textures: PixiTextureStore;
+		readonly textures: TextureStore;
 	}
 }
 
@@ -260,6 +260,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 				closed = true;
 				yield* rollbackFx;
 			}),
-		} satisfies PixiMainSceneRuntime;
+		} satisfies MainRuntime;
 	}).pipe(Effect.onError(() => rollbackFx));
 });

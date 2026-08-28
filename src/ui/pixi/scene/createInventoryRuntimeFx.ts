@@ -6,21 +6,21 @@ import { readSpaceActionPresentationPhasesFx } from "~/bridge/space/readSpaceAct
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { readTileActorFeedbackCuesFx } from "~/bridge/tile/feedback/readTileActorFeedbackCuesFx";
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
-import type { PixiInventoryActorStore } from "~/ui/pixi/actor/PixiInventoryActorStore";
-import type { PixiTileActorParticleTextures } from "~/ui/pixi/actor/PixiTileActorParticleTextures";
+import type { InventoryActorStore } from "~/ui/pixi/actor/InventoryActorStore";
+import type { ParticleTextures } from "~/ui/pixi/actor/ParticleTextures";
 import { createInventoryActorStoreFx } from "~/ui/pixi/actor/createInventoryActorStoreFx";
 import { createParticleTexturesFx } from "~/ui/pixi/actor/createParticleTexturesFx";
 import { createActorAnimatorFx } from "~/ui/pixi/animation/createActorAnimatorFx";
 import { createAnimationDriverFx } from "~/ui/pixi/animation/createAnimationDriverFx";
 import { createDropFeedbackFx } from "~/ui/pixi/grid/createDropFeedbackFx";
 import { flashConsumedSourceFx } from "~/ui/pixi/animation/flashConsumedSourceFx";
-import type { PixiInventoryDragController } from "~/ui/pixi/drag/PixiInventoryDragController";
+import type { InventoryDragController } from "~/ui/pixi/drag/InventoryDragController";
 import { createInventoryDragControllerFx } from "~/ui/pixi/drag/createInventoryDragControllerFx";
-import type { PixiGridDropFeedback } from "~/ui/pixi/grid/PixiGridDropFeedback";
+import type { DropFeedback } from "~/ui/pixi/grid/DropFeedback";
 import { createApplicationOwnerFx } from "~/ui/pixi/runtime/createApplicationOwnerFx";
-import type { PixiTextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
-import type { PixiInventorySceneRuntime } from "~/ui/pixi/scene/PixiInventorySceneRuntime";
-import type { PixiInventorySceneSurface } from "~/ui/pixi/scene/PixiInventorySceneSurface";
+import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
+import type { InventoryRuntime } from "~/ui/pixi/scene/InventoryRuntime";
+import type { InventorySurface } from "~/ui/pixi/scene/InventorySurface";
 import { createInventorySurfaceFx } from "~/ui/pixi/scene/createInventorySurfaceFx";
 import { createSubscriptionReplayGateFx } from "~/ui/pixi/scene/createSubscriptionReplayGateFx";
 
@@ -34,7 +34,7 @@ export namespace createInventoryRuntimeFx {
 			origin: HTMLElement,
 		) => void | PromiseLike<unknown>;
 		readonly onDrop: (command: runTileDropAtom.Command) => PromiseLike<runTileDropAtom.Result>;
-		readonly textures: PixiTextureStore;
+		readonly textures: TextureStore;
 	}
 }
 
@@ -66,11 +66,11 @@ export const createInventoryRuntimeFx = Effect.fn("createInventoryRuntimeFx")(fu
 		animationDriver,
 		frames: application.frames,
 	});
-	let surface: PixiInventorySceneSurface | null = null;
-	let dropFeedback: PixiGridDropFeedback | null = null;
-	let actorStore: PixiInventoryActorStore | null = null;
-	let particleTextures: PixiTileActorParticleTextures | null = null;
-	let drag: PixiInventoryDragController | null = null;
+	let surface: InventorySurface | null = null;
+	let dropFeedback: DropFeedback | null = null;
+	let actorStore: InventoryActorStore | null = null;
+	let particleTextures: ParticleTextures | null = null;
+	let drag: InventoryDragController | null = null;
 	let removeResizeListener: (() => void) | null = null;
 	let appearanceObserver: MutationObserver | null = null;
 	let unsubscribeTransitions: (() => void) | null = null;
@@ -257,6 +257,6 @@ export const createInventoryRuntimeFx = Effect.fn("createInventoryRuntimeFx")(fu
 			cancelInteractionFx: createdDrag.cancelInteractionFx,
 			projectSpaceActivationFx,
 			closeFx,
-		} satisfies PixiInventorySceneRuntime;
+		} satisfies InventoryRuntime;
 	}).pipe(Effect.onError(() => closeFx));
 });

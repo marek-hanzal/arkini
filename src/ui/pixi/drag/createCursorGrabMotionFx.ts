@@ -2,17 +2,14 @@ import { Effect } from "effect";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type {
-	PixiAnimationDriver,
-	PixiAnimationSpring,
-} from "~/ui/pixi/animation/PixiAnimationDriver";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import type { PixiCursorGrabMotion } from "~/ui/pixi/drag/PixiCursorGrabMotion";
+import type { AnimationDriver, AnimationSpring } from "~/ui/pixi/animation/AnimationDriver";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
+import type { CursorGrabMotion } from "~/ui/pixi/drag/CursorGrabMotion";
 
 export namespace createCursorGrabMotionFx {
 	export interface Props {
-		readonly animationDriver: PixiAnimationDriver;
-		readonly animator: PixiActorAnimator;
+		readonly animationDriver: AnimationDriver;
+		readonly animator: ActorAnimator;
 	}
 }
 
@@ -29,8 +26,8 @@ const cursorGrabSpring = {
 /** Uses Motion springs to settle a dragged tile's center beneath the pointer. */
 export const createCursorGrabMotionFx = Effect.fn("createCursorGrabMotionFx")(
 	({ animationDriver, animator }: createCursorGrabMotionFx.Props) =>
-		Effect.sync((): PixiCursorGrabMotion => {
-			let springs: ReadonlyArray<PixiAnimationSpring> = [];
+		Effect.sync((): CursorGrabMotion => {
+			let springs: ReadonlyArray<AnimationSpring> = [];
 			let closed = false;
 
 			const stop = () => {
@@ -76,10 +73,10 @@ export const createCursorGrabMotionFx = Effect.fn("createCursorGrabMotionFx")(
 			};
 
 			return {
-				finishFx: Effect.fn("PixiCursorGrabMotion.finishFx")((actor) =>
+				finishFx: Effect.fn("CursorGrabMotion.finishFx")((actor) =>
 					Effect.sync(() => finish(actor)),
 				),
-				startFx: Effect.fn("PixiCursorGrabMotion.startFx")((actor, pointer) =>
+				startFx: Effect.fn("CursorGrabMotion.startFx")((actor, pointer) =>
 					Effect.sync(() => {
 						if (closed) return;
 						stop();
@@ -108,7 +105,7 @@ export const createCursorGrabMotionFx = Effect.fn("createCursorGrabMotionFx")(
 								options: cursorGrabSpring,
 							}),
 						);
-						let y: PixiAnimationSpring;
+						let y: AnimationSpring;
 						try {
 							y = RendererRuntime.runSync(
 								animationDriver.createSpringFx({

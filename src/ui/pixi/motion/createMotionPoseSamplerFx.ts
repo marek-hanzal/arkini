@@ -1,31 +1,29 @@
 import { Effect } from "effect";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { PixiActorPresentedPose } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { PresentedPose } from "~/ui/pixi/animation/ActorAnimator";
 import { createRetargetablePoseSamplerFx } from "~/ui/pixi/animation/createRetargetablePoseSamplerFx";
-import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
-import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
+import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
+import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
 
 export namespace createMotionPoseSamplerFx {
 	export interface Props {
 		readonly actorBaseSize: number;
-		readonly from: Required<PixiActorPresentedPose>;
-		readonly readLiveTarget?: () => Required<PixiActorPresentedPose> | null;
-		readonly surface: PixiMainSceneSurface;
-		readonly target: PixiTileActorPose;
-		readonly targetLocation: Parameters<PixiMainSceneSurface["readLocationPoseFx"]>[0];
+		readonly from: Required<PresentedPose>;
+		readonly readLiveTarget?: () => Required<PresentedPose> | null;
+		readonly surface: MainSurface;
+		readonly target: ActorPose;
+		readonly targetLocation: Parameters<MainSurface["readLocationPoseFx"]>[0];
 	}
 
 	export interface Result {
 		readonly needsCompletionSettle: () => boolean;
-		readonly readPose: (progress: number) => PixiActorPresentedPose;
+		readonly readPose: (progress: number) => PresentedPose;
 	}
 }
 
-const samePose = (
-	left: Required<PixiActorPresentedPose>,
-	right: Required<PixiActorPresentedPose>,
-) => left.x === right.x && left.y === right.y && left.scale === right.scale;
+const samePose = (left: Required<PresentedPose>, right: Required<PresentedPose>) =>
+	left.x === right.x && left.y === right.y && left.scale === right.scale;
 
 /**
  * Retargets travel from its live presentation toward the latest semantic destination.
@@ -39,7 +37,7 @@ export const createMotionPoseSamplerFx = Effect.fn("createMotionPoseSamplerFx")(
 		Effect.gen(function* (): Effect.fn.Return<createMotionPoseSamplerFx.Result> {
 			let sampleProgress = 0;
 			let completionRetargeted = false;
-			let previousTarget: Required<PixiActorPresentedPose> = {
+			let previousTarget: Required<PresentedPose> = {
 				scale: props.target.size / Math.max(1, props.actorBaseSize),
 				x: props.target.x,
 				y: props.target.y,

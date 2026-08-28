@@ -1,39 +1,36 @@
 import { Effect } from "effect";
 
-import type {
-	PixiTileActorVisual,
-	PixiTileActorVisualReadyListener,
-} from "~/ui/pixi/actor/PixiTileActorVisual";
+import type { ActorVisual, VisualReadyListener } from "~/ui/pixi/actor/ActorVisual";
 
 export namespace runVisualReadinessFx {
 	export type Action =
 		| {
 				readonly kind: "begin";
-				readonly visual: PixiTileActorVisual;
+				readonly visual: ActorVisual;
 		  }
 		| {
 				readonly generation: number;
 				readonly kind: "complete";
-				readonly visual: PixiTileActorVisual;
+				readonly visual: ActorVisual;
 		  }
 		| {
 				readonly generation: number;
 				readonly kind: "fail";
-				readonly visual: PixiTileActorVisual;
+				readonly visual: ActorVisual;
 		  }
 		| {
 				readonly kind: "cancel";
-				readonly visual: PixiTileActorVisual;
+				readonly visual: ActorVisual;
 		  }
 		| {
 				readonly kind: "when-ready";
 				readonly onCancel?: () => void;
 				readonly onReady: () => void;
-				readonly visual: PixiTileActorVisual;
+				readonly visual: ActorVisual;
 		  };
 }
 
-const invokeListener = (visual: PixiTileActorVisual, callback: () => void) => {
+const invokeListener = (visual: ActorVisual, callback: () => void) => {
 	try {
 		callback();
 	} catch (cause) {
@@ -42,8 +39,8 @@ const invokeListener = (visual: PixiTileActorVisual, callback: () => void) => {
 };
 
 const drainListeners = (
-	visual: PixiTileActorVisual,
-	select: (listener: PixiTileActorVisualReadyListener) => (() => void) | undefined,
+	visual: ActorVisual,
+	select: (listener: VisualReadyListener) => (() => void) | undefined,
 ) => {
 	const listeners = [
 		...visual.readyListeners,

@@ -1,14 +1,14 @@
 import { Effect } from "effect";
 import { Assets, type Texture } from "pixi.js";
 
-export interface PixiTextureStore {
+export interface TextureStore {
 	readonly loadFx: (url: string) => Effect.Effect<Texture, unknown>;
 	readonly closeFx: Effect.Effect<void, unknown>;
 }
 
 /** Retains package textures across both canvases and unloads them at the route boundary. */
 export const createTextureStoreFx = Effect.fn("createTextureStoreFx")(() =>
-	Effect.sync((): PixiTextureStore => {
+	Effect.sync((): TextureStore => {
 		const urls = new Set<string>();
 		let closed = false;
 		return {

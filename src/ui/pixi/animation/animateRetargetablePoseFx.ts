@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import type { PixiAnimationCurve } from "~/ui/pixi/animation/PixiAnimationDriver";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
+import type { AnimationCurve } from "~/ui/pixi/animation/AnimationDriver";
 import { createRetargetablePoseSamplerFx } from "~/ui/pixi/animation/createRetargetablePoseSamplerFx";
 import { readTravelDurationMsFx } from "~/ui/pixi/animation/readTravelDurationMsFx";
 
@@ -25,8 +25,8 @@ export const animateRetargetablePoseFx = Effect.fn("animateRetargetablePoseFx")(
 	target,
 }: {
 	readonly actor: PixiTileActor;
-	readonly animator: PixiActorAnimator;
-	readonly curve?: PixiAnimationCurve;
+	readonly animator: ActorAnimator;
+	readonly curve?: AnimationCurve;
 	readonly durationMs?: number;
 	readonly onCancel?: () => void;
 	readonly onComplete?: () => void;

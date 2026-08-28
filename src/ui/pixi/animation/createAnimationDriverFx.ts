@@ -9,10 +9,10 @@ import {
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type {
-	PixiAnimationControl,
-	PixiAnimationDriver,
-	PixiAnimationSpring,
-} from "~/ui/pixi/animation/PixiAnimationDriver";
+	AnimationControl,
+	AnimationDriver,
+	AnimationSpring,
+} from "~/ui/pixi/animation/AnimationDriver";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 
 export namespace createAnimationDriverFx {
@@ -35,15 +35,15 @@ export const createAnimationDriverFx = Effect.fn("createAnimationDriverFx")(
 		frames,
 		requestFrame = requestAnimationFrame,
 	}: createAnimationDriverFx.Props) =>
-		Effect.sync((): PixiAnimationDriver => {
+		Effect.sync((): AnimationDriver => {
 			const activeClosers = new Set<() => void>();
 			let closed = false;
 
 			const invalidate = () => RendererRuntime.runSync(frames.invalidateFx);
-			const inactiveControl: PixiAnimationControl = {
+			const inactiveControl: AnimationControl = {
 				stopFx: Effect.void,
 			};
-			const inactiveSpring: PixiAnimationSpring = {
+			const inactiveSpring: AnimationSpring = {
 				closeFx: Effect.void,
 				setTargetFx: () => Effect.void,
 			};
@@ -60,9 +60,9 @@ export const createAnimationDriverFx = Effect.fn("createAnimationDriverFx")(
 			};
 
 			return {
-				createSpringFx: Effect.fn("PixiAnimationDriver.createSpringFx")(
+				createSpringFx: Effect.fn("AnimationDriver.createSpringFx")(
 					({ initialValue, onUpdate, options }) =>
-						Effect.sync((): PixiAnimationSpring => {
+						Effect.sync((): AnimationSpring => {
 							if (closed) return inactiveSpring;
 							const target = motionValue(initialValue);
 							let value: MotionValue<number>;
@@ -126,7 +126,7 @@ export const createAnimationDriverFx = Effect.fn("createAnimationDriverFx")(
 							};
 						}),
 				),
-				startTweenFx: Effect.fn("PixiAnimationDriver.startTweenFx")(
+				startTweenFx: Effect.fn("AnimationDriver.startTweenFx")(
 					({
 						curve = {
 							kind: "ease-in-out",
@@ -139,7 +139,7 @@ export const createAnimationDriverFx = Effect.fn("createAnimationDriverFx")(
 						repeat,
 						to,
 					}) =>
-						Effect.sync((): PixiAnimationControl => {
+						Effect.sync((): AnimationControl => {
 							if (closed) return inactiveControl;
 							let controls: AnimationPlaybackControls | null = null;
 							let completionFrameId: number | null = null;

@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
+import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
 import { readAttractionActorIdFx } from "~/ui/pixi/magnet/readAttractionActorIdFx";
 
 export namespace updateMagneticFieldFx {
@@ -11,7 +11,7 @@ export namespace updateMagneticFieldFx {
 		readonly actor: PixiTileActor;
 		readonly candidateActorIds: ReadonlyArray<string>;
 		readonly eligibleAttractionActorIds: ReadonlySet<string>;
-		readonly field: PixiTileMagneticField;
+		readonly field: MagneticField;
 		readonly previewKind: readTileDropPreviewFx.Result["kind"] | null;
 		readonly sourceDirection: {
 			readonly x: number;

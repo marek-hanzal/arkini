@@ -2,38 +2,38 @@ import { Effect } from "effect";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileDelivery } from "~/bridge/tile/readTileDeliveriesFx";
-import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
+import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { PixiTileActorParticleTextures } from "~/ui/pixi/actor/PixiTileActorParticleTextures";
+import type { ParticleTextures } from "~/ui/pixi/actor/ParticleTextures";
 import { createTileActorFx } from "~/ui/pixi/actor/createTileActorFx";
 import { updateTileActorFx } from "~/ui/pixi/actor/updateTileActorFx";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import { startActorExitFx } from "~/ui/pixi/animation/startActorExitFx";
 import { startRemainderFeedbackFx } from "~/ui/pixi/animation/startRemainderFeedbackFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
-import type { PixiDeliveryMotionRuntime } from "~/ui/pixi/delivery/PixiDeliveryMotionRuntime";
-import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
-import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
+import type { DeliveryRuntime } from "~/ui/pixi/delivery/DeliveryRuntime";
+import type { MainDragController } from "~/ui/pixi/drag/MainDragController";
+import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
 import { chaseTargetFx } from "~/ui/pixi/motion/chaseTargetFx";
 import { createMagneticProjectorFx } from "~/ui/pixi/motion/createMagneticProjectorFx";
 import { flashMotionTargetFx } from "~/ui/pixi/motion/flashMotionTargetFx";
 import { makeLiveContactPoseReaderFx } from "~/ui/pixi/motion/makeLiveContactPoseReaderFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
-import type { PixiTextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
-import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
-import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
+import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
+import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
+import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
 
 export namespace createDeliveryRuntimeFx {
 	export interface Props {
-		readonly actorStore: PixiMainSceneActorStore;
-		readonly animator: PixiActorAnimator;
+		readonly actorStore: MainActorStore;
+		readonly animator: ActorAnimator;
 		readonly application: PixiApplicationOwner;
-		readonly drag: PixiMainSceneDragController;
-		readonly magneticField: PixiTileMagneticField;
-		readonly particleTextures: PixiTileActorParticleTextures;
+		readonly drag: MainDragController;
+		readonly magneticField: MagneticField;
+		readonly particleTextures: ParticleTextures;
 		readonly readPalette: () => PixiScenePalette;
-		readonly surface: PixiMainSceneSurface;
-		readonly textures: PixiTextureStore;
+		readonly surface: MainSurface;
+		readonly textures: TextureStore;
 	}
 }
 
@@ -50,7 +50,7 @@ interface ActiveDelivery {
 		| "exiting"
 		| "contacted"
 		| "traveling";
-	target: PixiTileActorPose | null;
+	target: ActorPose | null;
 }
 
 const deliveryOutboundCurve = {
@@ -121,7 +121,7 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 	}: {
 		readonly active: ActiveDelivery;
 		readonly delivery: TileDelivery;
-		readonly to: PixiTileActorPose;
+		readonly to: ActorPose;
 	}) {
 		active.stage = "traveling";
 		active.releaseMagnet();
@@ -186,7 +186,7 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 	}: {
 		readonly active: ActiveDelivery;
 		readonly delivery: TileDelivery;
-		readonly to: PixiTileActorPose;
+		readonly to: ActorPose;
 	}) {
 		const ownerKey = `delivery:${delivery.item.id}:${delivery.generation}:consume`;
 		active.stage = "contact-fade-out";
@@ -245,7 +245,7 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 		readSnapshotFx: Effect.sync(() => ({
 			retainedActorIds: new Set(activeByItemId.keys()),
 		})),
-		syncFx: Effect.fn("PixiDeliveryMotionRuntime.syncFx")(function* (
+		syncFx: Effect.fn("DeliveryRuntime.syncFx")(function* (
 			deliveries: ReadonlyArray<TileDelivery>,
 		) {
 			if (closed) return;
@@ -471,5 +471,5 @@ export const createDeliveryRuntimeFx = Effect.fn("createDeliveryRuntimeFx")(func
 				}
 			}
 		}),
-	} satisfies PixiDeliveryMotionRuntime;
+	} satisfies DeliveryRuntime;
 });

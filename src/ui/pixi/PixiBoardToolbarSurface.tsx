@@ -12,8 +12,8 @@ import { runTileSplitAtom } from "~/bridge/tile/runTileSplitAtom";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { useInventoryShortcutKey } from "~/ui/navigation/useInventoryShortcutKey";
-import type { PixiMainSceneRuntime } from "~/ui/pixi/scene/PixiMainSceneRuntime";
-import type { PixiMainSceneActivationIntent } from "~/ui/pixi/scene/PixiMainSceneActivationIntent";
+import type { MainRuntime } from "~/ui/pixi/scene/MainRuntime";
+import type { MainActivationIntent } from "~/ui/pixi/scene/MainActivationIntent";
 import { createMainRuntimeFx } from "~/ui/pixi/scene/createMainRuntimeFx";
 import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";
 
@@ -47,7 +47,7 @@ export const PixiBoardToolbarSurface = ({ onOpenInventory }: PixiBoardToolbarSur
 	});
 	const hostRef = useRef<HTMLDivElement>(null);
 	const isInventoryShortcutKey = useInventoryShortcutKey();
-	const runtimeRef = useRef<PixiMainSceneRuntime | null>(null);
+	const runtimeRef = useRef<MainRuntime | null>(null);
 	const interactionBlockedRef = useRef(false);
 	const interactionBlocked = gameMenu.isOpen || itemDetail.isOpen;
 	interactionBlockedRef.current = interactionBlocked;
@@ -59,7 +59,7 @@ export const PixiBoardToolbarSurface = ({ onOpenInventory }: PixiBoardToolbarSur
 	};
 
 	const activate = useCallback(
-		async (item: TileActorItem, intent: PixiMainSceneActivationIntent, origin: HTMLElement) => {
+		async (item: TileActorItem, intent: MainActivationIntent, origin: HTMLElement) => {
 			const { itemDetail: currentItemDetail } = controlsRef.current;
 			if (intent === "detail") {
 				RendererRuntime.runSync(
@@ -170,7 +170,7 @@ export const PixiBoardToolbarSurface = ({ onOpenInventory }: PixiBoardToolbarSur
 		const host = hostRef.current;
 		if (host === null) return;
 		let cancelled = false;
-		let runtime: PixiMainSceneRuntime | null = null;
+		let runtime: MainRuntime | null = null;
 		let unregisterInteraction: () => void = () => undefined;
 		void RendererRuntime.runPromise(
 			createMainRuntimeFx({

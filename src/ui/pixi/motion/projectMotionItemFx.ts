@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import type { PixiTileQuantityPresentation } from "~/ui/pixi/motion/PixiTileQuantityPresentation";
+import type { QuantityPresentation } from "~/ui/pixi/motion/QuantityPresentation";
 
 /**
  * Applies the one narrow piece of canonical truth that motion may delay.
@@ -11,7 +11,7 @@ import type { PixiTileQuantityPresentation } from "~/ui/pixi/motion/PixiTileQuan
  */
 export const projectMotionItemFx = Effect.fnUntraced(function* (
 	item: TileActorItem,
-	presentation: PixiTileQuantityPresentation | undefined,
+	presentation: QuantityPresentation | undefined,
 ): Generator<never, TileActorItem, never> {
 	if (presentation === undefined) return item;
 	const quantity =

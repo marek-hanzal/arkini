@@ -1,24 +1,24 @@
 import { Effect } from "effect";
 
-import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
+import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import { updateTileActorFx } from "~/ui/pixi/actor/updateTileActorFx";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
-import type { PixiTextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
-import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
-import type { PixiTileQuantityPresentation } from "~/ui/pixi/motion/PixiTileQuantityPresentation";
+import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
+import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
+import type { QuantityPresentation } from "~/ui/pixi/motion/QuantityPresentation";
 import { projectMotionItemFx } from "~/ui/pixi/motion/projectMotionItemFx";
 
 export namespace syncMotionPresentationFx {
 	export interface Props {
-		readonly actorStore: PixiMainSceneActorStore;
-		readonly animator: PixiActorAnimator;
+		readonly actorStore: MainActorStore;
+		readonly animator: ActorAnimator;
 		readonly application: PixiApplicationOwner;
 		readonly readPalette: () => PixiScenePalette;
-		readonly surface: PixiMainSceneSurface;
-		readonly textures: PixiTextureStore;
-		readonly quantityPresentationByActorId: ReadonlyMap<string, PixiTileQuantityPresentation>;
+		readonly surface: MainSurface;
+		readonly textures: TextureStore;
+		readonly quantityPresentationByActorId: ReadonlyMap<string, QuantityPresentation>;
 	}
 }
 

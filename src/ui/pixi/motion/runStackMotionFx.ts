@@ -2,48 +2,48 @@ import { Effect } from "effect";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileStackMotionCue } from "~/bridge/tile/motion/TileMotionCue";
-import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
+import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { createTileActorFx } from "~/ui/pixi/actor/createTileActorFx";
 import { destroyTileActorFx } from "~/ui/pixi/actor/destroyTileActorFx";
 import { updateTileActorFx } from "~/ui/pixi/actor/updateTileActorFx";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import { restoreActorExitFx } from "~/ui/pixi/animation/restoreActorExitFx";
 import { startActorEnterFx } from "~/ui/pixi/animation/startActorEnterFx";
 import { startActorExitFx } from "~/ui/pixi/animation/startActorExitFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
-import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
+import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
 import { chaseTargetFx } from "~/ui/pixi/motion/chaseTargetFx";
 import { createMagneticProjectorFx } from "~/ui/pixi/motion/createMagneticProjectorFx";
 import { flashMotionTargetFx } from "~/ui/pixi/motion/flashMotionTargetFx";
 import { projectMotionItemFx } from "~/ui/pixi/motion/projectMotionItemFx";
 import { makeLiveContactPoseReaderFx } from "~/ui/pixi/motion/makeLiveContactPoseReaderFx";
-import type { PixiTileMotionTargetRoute } from "~/ui/pixi/motion/PixiTileMotionTargetRoute";
+import type { TargetRoute } from "~/ui/pixi/motion/MotionTarget";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
-import type { PixiTextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
-import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
-import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
+import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
+import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
+import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
 
 export namespace runStackMotionFx {
 	export interface Props {
-		readonly actorStore: PixiMainSceneActorStore;
-		readonly animator: PixiActorAnimator;
+		readonly actorStore: MainActorStore;
+		readonly animator: ActorAnimator;
 		readonly application: PixiApplicationOwner;
 		readonly cue: TileStackMotionCue;
 		readonly cueKey: string;
 		readonly delayMs: number;
-		readonly magneticField: PixiTileMagneticField;
+		readonly magneticField: MagneticField;
 		readonly onComplete: () => void;
 		readonly onPayloadCreated: (actor: PixiTileActor) => void;
-		readonly origin: PixiTileActorPose;
+		readonly origin: ActorPose;
 		readonly readPalette: () => PixiScenePalette;
 		readonly readTargetRoute: (
 			actorId: string,
-			location: PixiTileMotionTargetRoute["location"],
-		) => PixiTileMotionTargetRoute;
-		readonly surface: PixiMainSceneSurface;
-		readonly target: PixiTileActorPose;
-		readonly textures: PixiTextureStore;
+			location: TargetRoute["location"],
+		) => TargetRoute;
+		readonly surface: MainSurface;
+		readonly target: ActorPose;
+		readonly textures: TextureStore;
 	}
 }
 

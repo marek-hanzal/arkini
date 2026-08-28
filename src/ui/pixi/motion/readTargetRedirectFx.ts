@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
-import type { PixiTileMotionTargetRedirect } from "~/ui/pixi/motion/PixiTileMotionTargetRoute";
+import type { MotionRedirect } from "~/ui/pixi/motion/MotionTarget";
 
 /**
  * Projects one committed drop into a presentation-only ownership handoff.
@@ -13,7 +13,7 @@ import type { PixiTileMotionTargetRedirect } from "~/ui/pixi/motion/PixiTileMoti
  */
 export const readTargetRedirectFx = Effect.fnUntraced(function* (
 	result: runTileDropAtom.Result,
-): Generator<never, PixiTileMotionTargetRedirect | null, never> {
+): Generator<never, MotionRedirect | null, never> {
 	return match(result)
 		.with(
 			{

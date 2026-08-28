@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { PixiMainSceneLayout } from "~/ui/pixi/layout/PixiSceneLayout";
+import type { MainLayout } from "~/ui/pixi/layout/SceneLayout";
 
 export namespace readMainLayoutFx {
 	export interface Props {
@@ -20,7 +20,7 @@ const toolbarGapInBoardCells = 0.25;
 /** Fits Board and optional Toolbar into the full-screen native Pixi viewport. */
 export const readMainLayoutFx = Effect.fn("readMainLayoutFx")(
 	({ boardHeight, boardWidth, height, toolbarSize, width }: readMainLayoutFx.Props) =>
-		Effect.sync((): PixiMainSceneLayout => {
+		Effect.sync((): MainLayout => {
 			const shortestViewportSide = Math.min(width, height);
 			const maximumFittingPadding = Math.max(0, (shortestViewportSide - 1) / 2);
 			const viewportPadding = Math.min(

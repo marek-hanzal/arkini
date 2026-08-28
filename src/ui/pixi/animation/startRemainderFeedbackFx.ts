@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 
 const remainderFadeOutDurationMs = 275;
 const remainderFadeInDurationMs = 375;
@@ -20,7 +20,7 @@ export const startRemainderFeedbackFx = Effect.fn("startRemainderFeedbackFx")(fu
 	ownerKey,
 }: {
 	readonly actor: PixiTileActor;
-	readonly animator: PixiActorAnimator;
+	readonly animator: ActorAnimator;
 	readonly onCancel?: () => void;
 	readonly onHiddenFx: Effect.Effect<void>;
 	readonly onRevealed: () => void;

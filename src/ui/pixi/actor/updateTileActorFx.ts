@@ -8,25 +8,25 @@ import { readParticleLightSurfaceFx } from "~/ui/pixi/appearance/readParticleLig
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readActorCursorFx } from "~/ui/pixi/actor/readActorCursorFx";
 import {
-	pixiTileActorVisualCrossfadeDurationMs,
+	visualCrossfadeDurationMs,
 	transitionActorVisualFx,
 } from "~/ui/pixi/actor/transitionActorVisualFx";
 import { updateActorVisualFx } from "~/ui/pixi/actor/updateActorVisualFx";
 import { updateActorProgressFx } from "~/ui/pixi/actor/updateActorProgressFx";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
-import type { PixiTextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
+import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
 
 export namespace updateTileActorFx {
 	export interface Props {
 		readonly actor: PixiTileActor;
-		readonly animator: PixiActorAnimator;
+		readonly animator: ActorAnimator;
 		readonly frames: DemandFrameLoop;
 		readonly item: TileActorItem;
 		readonly palette: PixiScenePalette;
 		readonly preserveVisual?: boolean;
 		readonly size: number;
-		readonly textures: PixiTextureStore;
+		readonly textures: TextureStore;
 	}
 }
 
@@ -138,7 +138,7 @@ export const updateTileActorFx = Effect.fn("updateTileActorFx")(function* ({
 				transitionActorVisualFx({
 					actor,
 					animator,
-					durationMs: pixiTileActorVisualCrossfadeDurationMs,
+					durationMs: visualCrossfadeDurationMs,
 					frames,
 					item,
 					ownerKey: `visual-update:${actor.item.id}:${item.revision}`,

@@ -4,36 +4,36 @@ import type { GameEngine } from "~/bridge/game/GameEngine";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
-import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
+import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readActorCursorFx } from "~/ui/pixi/actor/readActorCursorFx";
 import { animateRetargetablePoseFx } from "~/ui/pixi/animation/animateRetargetablePoseFx";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import { restoreActorExitFx } from "~/ui/pixi/animation/restoreActorExitFx";
 import { startActorExitFx } from "~/ui/pixi/animation/startActorExitFx";
 import { burstFeedbackParticlesFx } from "~/ui/pixi/animation/burstFeedbackParticlesFx";
 import { settleDraggedActorFx } from "~/ui/pixi/drag/settleDraggedActorFx";
-import type { PixiCursorGrabMotion } from "~/ui/pixi/drag/PixiCursorGrabMotion";
+import type { CursorGrabMotion } from "~/ui/pixi/drag/CursorGrabMotion";
 import { beginDropFx } from "~/ui/pixi/drop/beginDropFx";
-import type { PixiMainSceneDropPresentation } from "~/ui/pixi/drop/PixiMainSceneDropPresentation";
-import type { PixiMainSceneDropSubmission } from "~/ui/pixi/drop/PixiMainSceneDropSubmission";
-import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
-import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRuntime";
+import type { DropPresentation } from "~/ui/pixi/drop/DropPresentation";
+import type { DropSubmission } from "~/ui/pixi/drop/DropSubmission";
+import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
+import type { MotionRuntime } from "~/ui/pixi/motion/MotionRuntime";
 import { readTargetRedirectFx } from "~/ui/pixi/motion/readTargetRedirectFx";
-import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
+import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 
 export namespace createDropSubmissionFx {
 	export interface Props {
-		readonly actorStore: PixiMainSceneActorStore;
-		readonly animator: PixiActorAnimator;
-		readonly cursorGrab: PixiCursorGrabMotion;
-		readonly dropPresentation: PixiMainSceneDropPresentation;
+		readonly actorStore: MainActorStore;
+		readonly animator: ActorAnimator;
+		readonly cursorGrab: CursorGrabMotion;
+		readonly dropPresentation: DropPresentation;
 		readonly game: GameEngine;
-		readonly magneticField: PixiTileMagneticField;
-		readonly motion: PixiTileMotionRuntime;
+		readonly magneticField: MagneticField;
+		readonly motion: MotionRuntime;
 		readonly onAcceptedDrop: () => void;
 		readonly onDrop: (command: runTileDropAtom.Command) => PromiseLike<runTileDropAtom.Result>;
-		readonly surface: PixiMainSceneSurface;
+		readonly surface: MainSurface;
 	}
 }
 
@@ -96,12 +96,12 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 	};
 
 	return {
-		isPendingActorFx: Effect.fn("PixiMainSceneDropSubmission.isPendingActorFx")((actorId) =>
+		isPendingActorFx: Effect.fn("DropSubmission.isPendingActorFx")((actorId) =>
 			Effect.map(dropPresentation.readSnapshotFx, ({ pendingActorIds }) =>
 				pendingActorIds.has(actorId),
 			),
 		),
-		submitFx: Effect.fn("PixiMainSceneDropSubmission.submitFx")(
+		submitFx: Effect.fn("DropSubmission.submitFx")(
 			({ actor, commandTarget, previewKind, shortcutReceiver, sourceItem, targetItem }) =>
 				Effect.sync(() => {
 					if (closed) return;
@@ -330,5 +330,5 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 			if (closed) return;
 			closed = true;
 		}),
-	} satisfies PixiMainSceneDropSubmission;
+	} satisfies DropSubmission;
 });

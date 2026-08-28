@@ -1,18 +1,16 @@
 import { Effect } from "effect";
 
-import type { PixiActorPresentedPose } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { PresentedPose } from "~/ui/pixi/animation/ActorAnimator";
 
 export namespace createRetargetablePoseSamplerFx {
 	export interface Props {
-		readonly from: Required<PixiActorPresentedPose>;
-		readonly readTarget: () => Required<PixiActorPresentedPose>;
+		readonly from: Required<PresentedPose>;
+		readonly readTarget: () => Required<PresentedPose>;
 	}
 }
 
-const samePose = (
-	left: Required<PixiActorPresentedPose>,
-	right: Required<PixiActorPresentedPose>,
-) => left.x === right.x && left.y === right.y && left.scale === right.scale;
+const samePose = (left: Required<PresentedPose>, right: Required<PresentedPose>) =>
+	left.x === right.x && left.y === right.y && left.scale === right.scale;
 
 const mix = (from: number, to: number, progress: number) => from + (to - from) * progress;
 
@@ -25,7 +23,7 @@ export const createRetargetablePoseSamplerFx = Effect.fn("createRetargetablePose
 			let target = readTarget();
 			let lastPose = from;
 
-			return (progress: number): Required<PixiActorPresentedPose> => {
+			return (progress: number): Required<PresentedPose> => {
 				const nextTarget = readTarget();
 				const remainingProgress =
 					segmentStart >= 1 ? 0 : (progress - segmentStart) / (1 - segmentStart);

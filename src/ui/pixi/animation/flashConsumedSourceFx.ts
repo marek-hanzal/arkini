@@ -2,17 +2,17 @@ import { Effect } from "effect";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 
 export namespace flashConsumedSourceFx {
 	export interface Props {
 		readonly actor: PixiTileActor;
-		readonly animator: PixiActorAnimator;
+		readonly animator: ActorAnimator;
 	}
 }
 
-export const pixiTileActorConsumedSourceFadeDurationMs = 130;
-const pixiTileActorConsumedSourceRestoreDurationMs = 360;
+export const consumedFadeDurationMs = 130;
+const consumedRestoreDurationMs = 360;
 const consumedSourceAlpha = 0.42;
 const readActorAlphaAnimationKey = (actor: Pick<PixiTileActor, "instanceId">) =>
 	`actor-alpha:${actor.instanceId}`;
@@ -30,7 +30,7 @@ export const flashConsumedSourceFx = Effect.fn("flashConsumedSourceFx")(function
 	yield* animator.animateFx({
 		actor,
 		channel: "lifecycle-opacity",
-		durationMs: pixiTileActorConsumedSourceFadeDurationMs,
+		durationMs: consumedFadeDurationMs,
 		ownerKey: readActorAlphaAnimationKey(actor),
 		onComplete: () => {
 			if (
@@ -44,7 +44,7 @@ export const flashConsumedSourceFx = Effect.fn("flashConsumedSourceFx")(function
 				animator.animateFx({
 					actor,
 					channel: "lifecycle-opacity",
-					durationMs: pixiTileActorConsumedSourceRestoreDurationMs,
+					durationMs: consumedRestoreDurationMs,
 					ownerKey: readActorAlphaAnimationKey(actor),
 					toAlpha: 1,
 				}),

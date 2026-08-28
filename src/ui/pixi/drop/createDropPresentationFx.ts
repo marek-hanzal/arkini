@@ -5,10 +5,10 @@ import type { TileActorFeedbackCue } from "~/bridge/tile/feedback/TileActorFeedb
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import type {
-	PixiMainSceneDropPresentation,
-	PixiMainSceneDropPresentationSnapshot,
-	PixiSceneSwapCandidate,
-} from "~/ui/pixi/drop/PixiMainSceneDropPresentation";
+	DropPresentation,
+	DropSnapshot,
+	SwapCandidate,
+} from "~/ui/pixi/drop/DropPresentation";
 
 interface PendingDrop {
 	readonly generation: number;
@@ -16,7 +16,7 @@ interface PendingDrop {
 }
 
 interface PendingSwap {
-	readonly candidate: PixiSceneSwapCandidate;
+	readonly candidate: SwapCandidate;
 	readonly generation: number;
 }
 
@@ -94,7 +94,7 @@ const readFeedbackCues = (
  * one Promise completion clearing another drop's presentation work.
  */
 export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(() =>
-	Effect.sync((): PixiMainSceneDropPresentation => {
+	Effect.sync((): DropPresentation => {
 		const feedback = new Map<number, PendingFeedback>();
 		const hiddenActorIds = new Set<string>();
 		const landingActorIds = new Set<string>();
@@ -110,74 +110,69 @@ export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(()
 		};
 
 		return {
-			beginFx: Effect.fn("PixiMainSceneDropPresentation.beginFx")(
-				({ sourceActorId, swapCandidate }) =>
-					Effect.sync(() => {
-						if (closed) {
-							throw new Error(
-								"Cannot begin a drop after presentation ownership closed.",
-							);
-						}
-						nextGeneration += 1;
-						const generation = nextGeneration;
-						pending.set(generation, {
+			beginFx: Effect.fn("DropPresentation.beginFx")(({ sourceActorId, swapCandidate }) =>
+				Effect.sync(() => {
+					if (closed) {
+						throw new Error("Cannot begin a drop after presentation ownership closed.");
+					}
+					nextGeneration += 1;
+					const generation = nextGeneration;
+					pending.set(generation, {
+						generation,
+						sourceActorId,
+					});
+					if (swapCandidate !== null) {
+						swaps.set(generation, {
+							candidate: swapCandidate,
 							generation,
-							sourceActorId,
 						});
-						if (swapCandidate !== null) {
-							swaps.set(generation, {
-								candidate: swapCandidate,
-								generation,
-							});
-						}
-						return generation;
-					}),
+					}
+					return generation;
+				}),
 			),
-			clearSwapFx: Effect.fn("PixiMainSceneDropPresentation.clearSwapFx")((generation) =>
+			clearSwapFx: Effect.fn("DropPresentation.clearSwapFx")((generation) =>
 				Effect.sync(() => {
 					swaps.delete(generation);
 				}),
 			),
-			clearFeedbackFx: Effect.fn("PixiMainSceneDropPresentation.clearFeedbackFx")(
-				(generation) =>
-					Effect.sync(() => {
-						feedback.delete(generation);
-					}),
+			clearFeedbackFx: Effect.fn("DropPresentation.clearFeedbackFx")((generation) =>
+				Effect.sync(() => {
+					feedback.delete(generation);
+				}),
 			),
-			completeFx: Effect.fn("PixiMainSceneDropPresentation.completeFx")(
-				({ generation, result }) =>
-					Effect.sync(() => {
-						if (closed || !pending.delete(generation)) return;
-						const cues = readFeedbackCues(generation, result);
-						if (cues.length > 0) {
-							feedback.set(generation, {
-								cues,
-								generation,
-							});
-						}
-						if (
-							result.kind === DropItemResultKindEnumSchema.enum.StoreInventory ||
-							(result.kind === DropItemResultKindEnumSchema.enum.Stack &&
-								result.source.current === null)
-						) {
-							hiddenActorIds.add(result.source.itemId);
-						}
-						if (result.kind === DropItemResultKindEnumSchema.enum.Move) {
-							landingActorIds.add(result.itemId);
-						}
-						if (result.kind !== DropItemResultKindEnumSchema.enum.Swap) {
-							swaps.delete(generation);
-						}
-					}),
+			completeFx: Effect.fn("DropPresentation.completeFx")(({ generation, result }) =>
+				Effect.sync(() => {
+					if (closed || !pending.delete(generation)) return;
+					const cues = readFeedbackCues(generation, result);
+					if (cues.length > 0) {
+						feedback.set(generation, {
+							cues,
+							generation,
+						});
+					}
+					if (
+						result.kind === DropItemResultKindEnumSchema.enum.StoreInventory ||
+						(result.kind === DropItemResultKindEnumSchema.enum.Stack &&
+							result.source.current === null)
+					) {
+						hiddenActorIds.add(result.source.itemId);
+					}
+					if (result.kind === DropItemResultKindEnumSchema.enum.Move) {
+						landingActorIds.add(result.itemId);
+					}
+					if (result.kind !== DropItemResultKindEnumSchema.enum.Swap) {
+						swaps.delete(generation);
+					}
+				}),
 			),
-			failFx: Effect.fn("PixiMainSceneDropPresentation.failFx")((generation) =>
+			failFx: Effect.fn("DropPresentation.failFx")((generation) =>
 				Effect.sync(() => {
 					if (closed) return;
 					clearGeneration(generation);
 				}),
 			),
 			readSnapshotFx: Effect.sync(
-				(): PixiMainSceneDropPresentationSnapshot => ({
+				(): DropSnapshot => ({
 					feedback: Array.from(feedback.values()),
 					hiddenActorIds: new Set(hiddenActorIds),
 					landingActorIds: new Set(landingActorIds),
@@ -187,7 +182,7 @@ export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(()
 					swaps: Array.from(swaps.values()),
 				}),
 			),
-			reconcileActorIdsFx: Effect.fn("PixiMainSceneDropPresentation.reconcileActorIdsFx")(
+			reconcileActorIdsFx: Effect.fn("DropPresentation.reconcileActorIdsFx")(
 				({ inventoryActorIds, mainActorIds }) =>
 					Effect.sync(() => {
 						if (closed) return;

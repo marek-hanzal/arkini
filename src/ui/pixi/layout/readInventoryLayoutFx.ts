@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { PixiInventorySceneLayout } from "~/ui/pixi/layout/PixiSceneLayout";
+import type { InventoryLayout } from "~/ui/pixi/layout/SceneLayout";
 
 export namespace readInventoryLayoutFx {
 	export interface Props {
@@ -15,7 +15,7 @@ export namespace readInventoryLayoutFx {
 /** Centers Inventory at Board scale, shrinking only when its grid cannot fit the viewport. */
 export const readInventoryLayoutFx = Effect.fn("readInventoryLayoutFx")(
 	({ columns, height, preferredCellSize, rows, width }: readInventoryLayoutFx.Props) =>
-		Effect.sync((): PixiInventorySceneLayout => {
+		Effect.sync((): InventoryLayout => {
 			const cellSize = Math.max(
 				1,
 				Math.min(

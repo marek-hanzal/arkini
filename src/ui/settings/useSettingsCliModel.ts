@@ -44,15 +44,8 @@ export const useSettingsCliModel = () => {
 			(state.kind === "error" && status === undefined) ||
 			(status?.type === "conflict" && !status.replaceable) ||
 			status?.type === "unavailable",
-		cliActionLabel: pending
-			? state.action === "install"
-				? state.status.type === "repairable"
-					? "Repairing…"
-					: "Installing…"
-				: state.action === "replace"
-					? "Replacing…"
-					: "Uninstalling…"
-			: status?.type === "installed"
+		cliActionLabel:
+			status?.type === "installed"
 				? "Uninstall"
 				: status?.type === "repairable"
 					? "Repair"

@@ -168,9 +168,7 @@ export const Settings = ({ children, onBackFx }: Settings.Props) => {
 					cursorIntent={model.blocked ? "progress" : undefined}
 					disabled={model.blocked}
 					onClick={model.goBack}
-				>
-					{model.exitPending ? "Returning…" : "Back"}
-				</BackButton>
+				/>
 			</section>
 		</SettingsModelProvider>
 	);

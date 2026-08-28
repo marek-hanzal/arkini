@@ -7,7 +7,6 @@ export namespace SettingsOpenActionRow {
 		readonly description: string;
 		readonly pending: boolean;
 		readonly disabled?: boolean;
-		readonly pendingLabel: string;
 		readonly idleLabel: string;
 		readonly onClick: () => void;
 	}
@@ -20,7 +19,6 @@ export const SettingsOpenActionRow = ({
 	description,
 	pending,
 	disabled = false,
-	pendingLabel,
 	idleLabel,
 	onClick,
 }: SettingsOpenActionRow.Props) => (
@@ -38,7 +36,7 @@ export const SettingsOpenActionRow = ({
 			disabled={pending || disabled}
 			onClick={onClick}
 		>
-			{pending ? pendingLabel : idleLabel}
+			{idleLabel}
 		</Button>
 	</div>
 );

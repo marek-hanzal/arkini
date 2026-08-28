@@ -66,7 +66,7 @@ export const EditorBuild = () => {
 					onClick={controller.build}
 				>
 					<span className="icon-[lucide--package-check] mr-2 size-4" />
-					{controller.buildPending ? "Building…" : "Build"}
+					Build
 				</PrimaryButton>
 			</article>
 			{controller.artifactSummary === undefined ? null : (
@@ -85,11 +85,7 @@ export const EditorBuild = () => {
 							<span
 								className={`${controller.installAction === "update" ? "icon-[lucide--package-check]" : "icon-[lucide--package-plus]"} mr-2 size-4`}
 							/>
-							{controller.installPending
-								? "Installing…"
-								: controller.installAction === "update"
-									? "Update"
-									: "Install"}
+							{controller.installAction === "update" ? "Update" : "Install"}
 						</PrimaryButton>
 						<Button
 							className="border-transparent bg-transparent shadow-none hover:border-transparent hover:bg-surface-raised disabled:hover:bg-transparent"
@@ -99,7 +95,7 @@ export const EditorBuild = () => {
 							onClick={controller.saveArtifact}
 						>
 							<span className="icon-[lucide--download] mr-2 size-4" />
-							{controller.savePending ? "Saving…" : "Save as…"}
+							Save as…
 						</Button>
 					</div>
 					{controller.saveError === undefined ? null : (
@@ -129,7 +125,7 @@ export const EditorBuild = () => {
 						onClick={controller.exportSource}
 					>
 						<span className="icon-[lucide--folder-output] mr-2 size-4" />
-						{controller.exportSourcePending ? "Exporting…" : "Export"}
+						Export
 					</PrimaryButton>
 					{controller.openSourceExportAvailable ? (
 						<Button
@@ -140,7 +136,7 @@ export const EditorBuild = () => {
 							}
 							onClick={controller.openSourceExport}
 						>
-							{controller.openSourceExportPending ? "Opening…" : "Open folder"}
+							Open folder
 						</Button>
 					) : null}
 				</div>

@@ -63,17 +63,11 @@ export const useEditorProjectRefreshController = ({
 	return useMemo(
 		() => ({
 			disabled,
-			icon: pending
-				? "icon-[lucide--loader-circle] animate-spin"
-				: "icon-[lucide--refresh-cw]",
+			icon: "icon-[lucide--refresh-cw]",
 			pending,
 			refresh,
 			tooltip:
-				error === undefined
-					? pending
-						? "Refreshing from disk…"
-						: "Refresh from disk"
-					: `Refresh failed: ${message(error)}`,
+				error === undefined ? "Refresh from disk" : `Refresh failed: ${message(error)}`,
 		}),
 		[
 			disabled,

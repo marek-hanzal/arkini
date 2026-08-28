@@ -16,6 +16,6 @@ export const EditorFormSaveButton = ({
 		cursorIntent={saving ? "progress" : undefined}
 		onClick={() => void save().catch(() => undefined)}
 	>
-		{saving ? "Saving…" : "Save"}
+		Save
 	</PrimaryButton>
 );

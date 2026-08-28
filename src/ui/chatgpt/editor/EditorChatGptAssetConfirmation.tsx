@@ -80,7 +80,7 @@ export const EditorChatGptAssetConfirmation = ({
 							cursorIntent={controller.saving ? "progress" : undefined}
 							onClick={() => void controller.save()}
 						>
-							{controller.saving ? "Replacing…" : "Replace asset"}
+							Replace asset
 						</DangerButton>
 					) : (
 						<PrimaryButton
@@ -92,11 +92,7 @@ export const EditorChatGptAssetConfirmation = ({
 							cursorIntent={controller.saving ? "progress" : undefined}
 							onClick={() => void controller.save()}
 						>
-							{controller.candidateValidating
-								? "Validating…"
-								: controller.saving
-									? "Saving…"
-									: "Save & return"}
+							Save &amp; return
 						</PrimaryButton>
 					)}
 				</div>

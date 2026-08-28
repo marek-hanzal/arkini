@@ -177,7 +177,7 @@ describe("Editor ChatGPT asset confirmation", () => {
 
 		expect(state.unsavedSession?.isDirty()).toBe(true);
 		await expect(state.unsavedSession?.isValid()).resolves.toBe(false);
-		expect(readButton(container, "Validating…").disabled).toBe(true);
+		expect(readButton(container, "Save & return").disabled).toBe(true);
 
 		await act(async () => {
 			resolveBitmap?.({

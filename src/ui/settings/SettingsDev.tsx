@@ -18,7 +18,6 @@ export const SettingsDev = () => {
 				description={cli.cliDescription}
 				pending={cli.cliPending}
 				disabled={cli.cliDisabled}
-				pendingLabel={cli.cliActionLabel}
 				idleLabel={cli.cliActionLabel}
 				onClick={cli.toggleCliInstallation}
 			/>
@@ -28,7 +27,6 @@ export const SettingsDev = () => {
 				description={cli.cliCompletionDescription}
 				pending={cli.cliCompletionPending}
 				disabled={cli.cliCompletionDisabled}
-				pendingLabel={cli.cliCompletionActionLabel}
 				idleLabel={cli.cliCompletionActionLabel}
 				onClick={cli.toggleCliCompletion}
 			/>
@@ -37,7 +35,6 @@ export const SettingsDev = () => {
 				title="Diagnostics"
 				description="Open the bounded rotating logs used to investigate crashes and broken gameplay sessions."
 				pending={directories.diagnosticsStatus.kind === "pending"}
-				pendingLabel="Opening…"
 				idleLabel="Open logs"
 				onClick={directories.openDiagnostics}
 			/>
@@ -46,7 +43,6 @@ export const SettingsDev = () => {
 				title="Application data"
 				description="Open Arkini's data root containing editor projects, Arkpacks, saves, preferences, and logs."
 				pending={directories.userDataStatus.kind === "pending"}
-				pendingLabel="Opening…"
 				idleLabel="Open data folder"
 				onClick={directories.openUserData}
 			/>

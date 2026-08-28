@@ -71,7 +71,7 @@ export const EditorNotes = () => {
 							cursorIntent={controller.pending ? "progress" : undefined}
 							onClick={controller.create}
 						>
-							{controller.pending ? "Saving…" : "Create note"}
+							Create note
 						</PrimaryButton>
 					</div>
 				</section>

@@ -5,26 +5,26 @@ import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveInteg
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
-export interface OutputMaxCountBlock {
-	readonly itemId: IdSchema.Type;
-	readonly liveQuantity: number;
-	readonly reservedQuantity: PositiveIntegerSchema.Type;
-	readonly maxCount: PositiveIntegerSchema.Type;
-	readonly excessQuantity: PositiveIntegerSchema.Type;
-}
-
-export namespace resolveOutputMaxCountFx {
+export namespace resolveOutputCapacityFx {
 	export interface Props {
 		readonly reserved: ReadonlyMap<IdSchema.Type, number>;
 		readonly runtime: RuntimeSchema.Type;
 	}
+
+	export interface Block {
+		readonly itemId: IdSchema.Type;
+		readonly liveQuantity: number;
+		readonly reservedQuantity: PositiveIntegerSchema.Type;
+		readonly maxCount: PositiveIntegerSchema.Type;
+		readonly excessQuantity: PositiveIntegerSchema.Type;
+	}
 }
 
 /** Resolves the first deterministic canonical maxCount violation for future output. */
-export const resolveOutputMaxCountFx = Effect.fn("resolveOutputMaxCountFx")(function* ({
+export const resolveOutputCapacityFx = Effect.fn("resolveOutputCapacityFx")(function* ({
 	reserved,
 	runtime,
-}: resolveOutputMaxCountFx.Props) {
+}: resolveOutputCapacityFx.Props) {
 	for (const itemId of [
 		...reserved.keys(),
 	].sort()) {
@@ -49,7 +49,7 @@ export const resolveOutputMaxCountFx = Effect.fn("resolveOutputMaxCountFx")(func
 			reservedQuantity: reservedQuantity as PositiveIntegerSchema.Type,
 			maxCount: item.maxCount,
 			excessQuantity: excessQuantity as PositiveIntegerSchema.Type,
-		} satisfies OutputMaxCountBlock;
+		} satisfies resolveOutputCapacityFx.Block;
 	}
 	return undefined;
 });

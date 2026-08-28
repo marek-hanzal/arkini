@@ -1,7 +1,7 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { resolveOneHopLineOutputMaxCountFx } from "~/engine/job/fx/read/resolveOneHopLineOutputMaxCountFx";
+import { resolveOneHopOutputCapacityFx } from "~/engine/job/fx/read/resolveOneHopOutputCapacityFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
@@ -174,7 +174,7 @@ describe("blueprint one-hop reservations", () => {
 					quantity: 1,
 				});
 				const runtime = yield* readRuntimeFx();
-				const resolved = yield* resolveOneHopLineOutputMaxCountFx({
+				const resolved = yield* resolveOneHopOutputCapacityFx({
 					line: sourceLine("line:producer:correlated-blueprint"),
 					runtime,
 				});

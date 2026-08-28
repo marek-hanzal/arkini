@@ -2,8 +2,8 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 
-/** Applies one exact quantity delta while keeping zero entries out of the net-output map. */
-export const adjustLineNetMaximumOutputQuantityFx = Effect.fnUntraced(function* (
+/** Applies one exact quantity delta while keeping zero entries out of the reservation map. */
+export const adjustOutputReservationFx = Effect.fnUntraced(function* (
 	quantities: Map<IdSchema.Type, number>,
 	itemId: IdSchema.Type,
 	delta: number,

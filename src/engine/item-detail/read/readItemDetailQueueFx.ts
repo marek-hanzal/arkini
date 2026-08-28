@@ -10,7 +10,7 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { readLineInputAutofillCoverageFx } from "~/engine/input/fx/readLineInputAutofillCoverageFx";
 import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
-import { assertLineOutputMaxCountFx } from "~/engine/job/fx/assertLineOutputMaxCountFx";
+import { assertOutputCapacityFx } from "~/engine/job/fx/assertOutputCapacityFx";
 import { assertLineEnqueueConditionsFx } from "~/engine/job/fx/assertLineEnqueueConditionsFx";
 
 interface ItemDetailQueueRequest {
@@ -166,7 +166,7 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 							runtime,
 						});
 						const output = yield* Effect.result(
-							assertLineOutputMaxCountFx({
+							assertOutputCapacityFx({
 								candidateId: request.id,
 								ownerItemId: owner.id,
 								lineId: request.lineId,

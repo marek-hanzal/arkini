@@ -6,10 +6,10 @@ import { ModeSchema } from "~/engine/input/schema/ModeSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import { readOutputMaximumQuantitiesFx } from "~/engine/output/fx/readOutputMaximumQuantitiesFx";
 
-/** Reads conservative net authored output after guaranteed exact-item consumption. */
-export const readLineNetMaximumOutputQuantitiesFx = Effect.fn(
-	"readLineNetMaximumOutputQuantitiesFx",
-)(function* (line: LineSchema.Type) {
+/** Reads one line's worst-case output reservation after guaranteed exact-item consumption. */
+export const readOutputReservationFx = Effect.fn("readOutputReservationFx")(function* (
+	line: LineSchema.Type,
+) {
 	const quantities =
 		line.output === undefined
 			? new Map<IdSchema.Type, number>()
@@ -22,12 +22,12 @@ export const readLineNetMaximumOutputQuantitiesFx = Effect.fn(
 		if (input.type !== TypeSchema.enum.Materials || input.mode !== ModeSchema.enum.Consume) {
 			continue;
 		}
-		const netQuantity = Math.max(
+		const reservedQuantity = Math.max(
 			0,
 			(quantities.get(input.selector.itemId) ?? 0) - input.quantity.min,
 		);
-		if (netQuantity === 0) quantities.delete(input.selector.itemId);
-		else quantities.set(input.selector.itemId, netQuantity);
+		if (reservedQuantity === 0) quantities.delete(input.selector.itemId);
+		else quantities.set(input.selector.itemId, reservedQuantity);
 	}
 	return quantities;
 });

@@ -52,7 +52,7 @@ describe("GameEngineResourceFx / reset and disposal", () => {
 		});
 		expect(discard).toHaveBeenCalledOnce();
 		expect(clearedKeys).toEqual([
-			resource.game.saveKey,
+			resource.session.saveKey,
 		]);
 		expect(createResourceFx).toHaveBeenCalledOnce();
 		await samePackage.close();

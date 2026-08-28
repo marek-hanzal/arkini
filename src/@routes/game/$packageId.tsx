@@ -19,7 +19,7 @@ export const Route = createFileRoute("/game/$packageId")({
 				? claimGameEngineResourceForCloseFx()
 				: readCurrentGameEngineResourceFx(),
 		);
-		if (resource === null || resource.game.arkpack.packageId !== params.packageId) {
+		if (resource === null || resource.game.resourceMetadata.packageId !== params.packageId) {
 			throw redirect({
 				to: "/action/load-game/$packageId",
 				params,

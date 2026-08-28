@@ -109,7 +109,7 @@ describe("game load failure recovery", () => {
 		});
 
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack).toBe(
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.session.arkpack).toBe(
 			game.arkpack,
 		);
 		expect(createGameFxMock).toHaveBeenCalledTimes(createCallsBeforeCleanup + 1);

@@ -19,7 +19,9 @@ export const runInventoryReleaseAtom = RendererRuntime.runSync(
 	makeExactGameAtomFamilyFx((game) =>
 		Atom.fn(
 			(command: runInventoryReleaseAtom.Command) =>
-				Effect.yieldNow.pipe(Effect.andThen(game.runFx(releaseInventoryItemFx(command)))),
+				Effect.yieldNow.pipe(
+					Effect.andThen(game.runEngineFx(releaseInventoryItemFx(command))),
+				),
 			{
 				concurrent: true,
 			},

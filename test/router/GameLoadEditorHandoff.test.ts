@@ -46,7 +46,18 @@ describe("game load editor handoff", () => {
 		const createEditorResourceFx = vi.fn((candidate: EditorProject) =>
 			createEditorBoardGameFx({
 				project: candidate,
-			}).pipe(Effect.flatMap((game) => createGameEngineResourceFx(game))),
+			}).pipe(
+				Effect.flatMap((game) =>
+					createGameEngineResourceFx({
+						session: game,
+						resourceMetadata: {
+							type: "editor",
+							projectId: game.projectId,
+							projectRevision: game.projectRevision,
+						},
+					}),
+				),
+			),
 		);
 		const editorOwner = await rendererRuntime.runPromise(
 			createEditorBoardGameResourceFx({
@@ -76,7 +87,7 @@ describe("game load editor handoff", () => {
 		await vi.advanceTimersByTimeAsync(2_500);
 		await loading;
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack).toBe(
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.session.arkpack).toBe(
 			installedGame.arkpack,
 		);
 
@@ -117,7 +128,7 @@ describe("game load editor handoff", () => {
 		await loading;
 
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack).toBe(
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.session.arkpack).toBe(
 			game.arkpack,
 		);
 	});
@@ -164,7 +175,7 @@ describe("game load editor handoff", () => {
 
 		expect(releaseAttempts).toBe(2);
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack).toBe(
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.session.arkpack).toBe(
 			game.arkpack,
 		);
 	});

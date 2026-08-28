@@ -221,7 +221,14 @@ export const renderSettings = async (
 			},
 		};
 		const runtimeHarness = createTestRendererRuntime({
-			createResourceFx: () => createGameEngineResourceFx(createdGame),
+			createResourceFx: () =>
+				createGameEngineResourceFx({
+					session: createdGame,
+					resourceMetadata: {
+						type: "package",
+						packageId: createdGame.arkpack.packageId,
+					},
+				}),
 		});
 		runtimeHarnesses.push(runtimeHarness);
 		game = (

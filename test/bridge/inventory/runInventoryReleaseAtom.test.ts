@@ -3,7 +3,7 @@ import { Deferred, Effect, Exit } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { Game } from "~/bridge/game/Game";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import { runInventoryReleaseAtom } from "~/bridge/inventory/runInventoryReleaseAtom";
 
 const command: runInventoryReleaseAtom.Command = {
@@ -35,7 +35,7 @@ describe("runInventoryReleaseAtom", () => {
 		const secondOutcome = {
 			transition: "second-released",
 		};
-		const runFx = vi
+		const runEngineFx = vi
 			.fn()
 			.mockReturnValueOnce(
 				Effect.sync(firstEntered).pipe(
@@ -46,8 +46,8 @@ describe("runInventoryReleaseAtom", () => {
 			)
 			.mockReturnValueOnce(Effect.succeed(secondOutcome));
 		const game = {
-			runFx,
-		} as unknown as Game;
+			runEngineFx,
+		} as unknown as GameEngine;
 		const registry = AtomRegistry.make({
 			scheduleTask,
 		});
@@ -62,7 +62,7 @@ describe("runInventoryReleaseAtom", () => {
 			itemId: "runtime:second-inventory",
 			revision: "revision:second-inventory",
 		});
-		await vi.waitFor(() => expect(runFx).toHaveBeenCalledTimes(2));
+		await vi.waitFor(() => expect(runEngineFx).toHaveBeenCalledTimes(2));
 		expect(firstInterrupted).not.toHaveBeenCalled();
 
 		Effect.runSync(Deferred.succeed(firstGate, undefined));
@@ -80,13 +80,13 @@ describe("runInventoryReleaseAtom", () => {
 		const outcome = {
 			transition: "released",
 		};
-		const runFx = vi.fn(() => Effect.succeed(outcome));
+		const runEngineFx = vi.fn(() => Effect.succeed(outcome));
 		const first = {
-			runFx,
-		} as unknown as Game;
+			runEngineFx,
+		} as unknown as GameEngine;
 		const second = {
-			runFx,
-		} as unknown as Game;
+			runEngineFx,
+		} as unknown as GameEngine;
 		const registry = AtomRegistry.make({
 			scheduleTask,
 		});
@@ -102,7 +102,7 @@ describe("runInventoryReleaseAtom", () => {
 		);
 
 		expect(exit).toEqual(Exit.succeed(outcome));
-		expect(runFx).toHaveBeenCalledOnce();
+		expect(runEngineFx).toHaveBeenCalledOnce();
 		expect(runInventoryReleaseAtom(first)).toBe(atom);
 		expect(runInventoryReleaseAtom(second)).not.toBe(atom);
 		unmount();

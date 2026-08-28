@@ -15,7 +15,7 @@ export namespace removeDraggedCheatItemFx {
  */
 export const removeDraggedCheatItemFx = Effect.fn("removeDraggedCheatItemFx")(
 	({ game, ...command }: removeDraggedCheatItemFx.Props) =>
-		game.runFx(removeCheatItemFx(command)).pipe(
+		game.runEngineFx(removeCheatItemFx(command)).pipe(
 			Effect.as(true),
 			Effect.catch(() => Effect.succeed(false)),
 		),

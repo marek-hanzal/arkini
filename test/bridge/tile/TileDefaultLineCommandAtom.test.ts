@@ -3,14 +3,14 @@ import { Cause, Deferred, Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Game } from "~/bridge/game/Game";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import { TileDefaultLineCommandAtom } from "~/bridge/tile/TileDefaultLineCommandAtom";
 
 const engineCommands = vi.hoisted(() => ({
 	enqueue: vi.fn(),
 	fill: vi.fn(),
 }));
-const failStop = vi.fn<Game["failStop"]>();
+const reportCriticalFailure = vi.fn<GameEngine["reportCriticalFailure"]>();
 
 vi.mock("~/engine/job/write/enqueueDefaultLineFx", () => ({
 	enqueueDefaultLineFx: (props: unknown) => engineCommands.enqueue(props),
@@ -35,9 +35,9 @@ const createRegistry = () => {
 };
 
 const game = {
-	failStop,
-	runFx: ((effect: Effect.Effect<unknown, unknown>) => effect) as Game["runFx"],
-} as unknown as Game;
+	reportCriticalFailure,
+	runEngineFx: ((effect: Effect.Effect<unknown, unknown>) => effect) as GameEngine["runEngineFx"],
+} as unknown as GameEngine;
 
 const runCommand = async () => {
 	const registry = createRegistry();
@@ -55,7 +55,7 @@ const runCommand = async () => {
 beforeEach(() => {
 	engineCommands.enqueue.mockReset();
 	engineCommands.fill.mockReset();
-	failStop.mockReset();
+	reportCriticalFailure.mockReset();
 });
 
 afterEach(() => {
@@ -146,7 +146,7 @@ describe("TileDefaultLineCommandAtom", () => {
 		unmount();
 		await Effect.runPromise(Deferred.await(interrupted));
 
-		expect(failStop).not.toHaveBeenCalled();
+		expect(reportCriticalFailure).not.toHaveBeenCalled();
 	});
 
 	it("settles one accepted Enqueue without invoking immediate work", async () => {
@@ -221,7 +221,7 @@ describe("TileDefaultLineCommandAtom", () => {
 				ownerItemId: command.ownerItemId,
 			});
 		});
-		expect(failStop).not.toHaveBeenCalled();
+		expect(reportCriticalFailure).not.toHaveBeenCalled();
 		unmount();
 	});
 
@@ -230,8 +230,8 @@ describe("TileDefaultLineCommandAtom", () => {
 		engineCommands.enqueue.mockReturnValue(Effect.failCause(defectCause));
 
 		await expect(runCommand()).rejects.toBe(defectCause);
-		expect(failStop).toHaveBeenCalledOnce();
-		expect(failStop).toHaveBeenCalledWith("ui", defectCause);
+		expect(reportCriticalFailure).toHaveBeenCalledOnce();
+		expect(reportCriticalFailure).toHaveBeenCalledWith("game-runtime", defectCause);
 	});
 
 	it("propagates a mixed Enqueue Cause instead of projecting its typed failure", async () => {
@@ -244,7 +244,7 @@ describe("TileDefaultLineCommandAtom", () => {
 		engineCommands.enqueue.mockReturnValue(Effect.failCause(mixedCause));
 
 		await expect(runCommand()).rejects.toBe(mixedCause);
-		expect(failStop).toHaveBeenCalledOnce();
-		expect(failStop).toHaveBeenCalledWith("ui", mixedCause);
+		expect(reportCriticalFailure).toHaveBeenCalledOnce();
+		expect(reportCriticalFailure).toHaveBeenCalledWith("game-runtime", mixedCause);
 	});
 });

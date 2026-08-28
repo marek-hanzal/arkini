@@ -8,6 +8,8 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Game } from "~/bridge/game/Game";
+import type { GameEngine } from "~/bridge/game/GameEngine";
+import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
 import { Cheats } from "~/ui/cheats/Cheats";
 import { useCheatsModel } from "~/ui/cheats/useCheatsModel";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
@@ -35,7 +37,7 @@ const CheatsHarness = ({
 	game,
 	onExit = () => undefined,
 }: {
-	readonly game: Game;
+	readonly game: GameEngine;
 	readonly onExit?: (admitted: boolean) => void;
 }) => {
 	const model = useCheatsModel(game);
@@ -54,7 +56,7 @@ const CheatsAdmissionHarness = ({
 	game,
 	onExit,
 }: {
-	readonly game: Game;
+	readonly game: GameEngine;
 	readonly onExit: (admitted: boolean) => void;
 }) => {
 	const model = useCheatsModel(game);
@@ -93,7 +95,7 @@ describe("Cheats", () => {
 			config,
 			tickIntervalMs: 60_000,
 		});
-		const game: Game = {
+		const lifecycleGame: Game = {
 			...session,
 			arkpack: {
 				packageId: "package:cheats",
@@ -112,7 +114,16 @@ describe("Cheats", () => {
 				packageId: "package:cheats",
 			},
 		};
-		sessions.push(game);
+		sessions.push(lifecycleGame);
+		const game = Effect.runSync(
+			createGameEngineResourceFx({
+				session: lifecycleGame,
+				resourceMetadata: {
+					type: "package",
+					packageId: lifecycleGame.arkpack.packageId,
+				},
+			}),
+		).game;
 		const container = document.createElement("div");
 		document.body.append(container);
 		const root = createRoot(container);
@@ -170,7 +181,7 @@ describe("Cheats", () => {
 			config,
 			tickIntervalMs: 60_000,
 		});
-		const game: Game = {
+		const lifecycleGame: Game = {
 			...session,
 			arkpack: {
 				packageId: "package:cheats-race",
@@ -189,7 +200,16 @@ describe("Cheats", () => {
 				packageId: "package:cheats-race",
 			},
 		};
-		sessions.push(game);
+		sessions.push(lifecycleGame);
+		const game = Effect.runSync(
+			createGameEngineResourceFx({
+				session: lifecycleGame,
+				resourceMetadata: {
+					type: "package",
+					packageId: lifecycleGame.arkpack.packageId,
+				},
+			}),
+		).game;
 		const onExit = vi.fn();
 		const container = document.createElement("div");
 		document.body.append(container);

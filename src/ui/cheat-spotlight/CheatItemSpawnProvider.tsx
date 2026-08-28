@@ -1,7 +1,7 @@
 import { useAtom } from "@effect/atom-react";
 import { type PropsWithChildren, useCallback, useMemo } from "react";
 
-import type { PlayableGame } from "~/bridge/game/PlayableGame";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import { CheatItemSpawnCommandAtom } from "~/ui/cheat-spotlight/CheatItemSpawnCommandAtom";
 import {
 	CheatItemSpawnContext,
@@ -13,7 +13,7 @@ export const CheatItemSpawnProvider = ({
 	children,
 	game,
 }: PropsWithChildren<{
-	readonly game: PlayableGame;
+	readonly game: GameEngine;
 }>) => {
 	const commandAtom = CheatItemSpawnCommandAtom(game);
 	const [state, runCommand] = useAtom(commandAtom);

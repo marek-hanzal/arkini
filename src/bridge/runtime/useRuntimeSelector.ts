@@ -3,13 +3,13 @@ import { Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { useMemo } from "react";
 
-import type { PlayableGame } from "~/bridge/game/PlayableGame";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import { GameRuntimeAtom } from "~/bridge/runtime/GameRuntimeAtom";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 /** Selects a stable projection from the latest committed runtime snapshot. */
 export const useRuntimeSelector = <Selected>(
-	game: PlayableGame,
+	game: GameEngine,
 	selector: (runtime: RuntimeSchema.Type) => Selected,
 	isEqual: (left: Selected, right: Selected) => boolean = Object.is,
 ): Selected => {

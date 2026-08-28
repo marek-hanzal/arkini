@@ -21,7 +21,7 @@ export const runSpaceActivationAtom = RendererRuntime.runSync(
 			(command: runSpaceActivationAtom.Command) =>
 				Effect.yieldNow.pipe(
 					Effect.andThen(
-						game.runFx(activateSpaceItemWithTransitionFx(command)).pipe(
+						game.runEngineFx(activateSpaceItemWithTransitionFx(command)).pipe(
 							Effect.map(({ transition }) => ({
 								transition,
 							})),

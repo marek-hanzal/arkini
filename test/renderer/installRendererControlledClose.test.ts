@@ -19,12 +19,18 @@ import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProject
 type CloseListener = () => Promise<void>;
 
 const createResource = (packageId: string): GameEngineResource => ({
-	game: {
+	session: {
 		arkpack: {
 			packageId,
 		},
 		disposeFx: Effect.void,
 		disposeWithoutSaveFx: Effect.void,
+	} as unknown as GameEngineResource["session"],
+	game: {
+		resourceMetadata: {
+			type: "package",
+			packageId,
+		},
 	} as unknown as GameEngineResource["game"],
 	assertUsable: () => undefined,
 	getCriticalFailure: () => null,

@@ -1,15 +1,12 @@
-import { Exit } from "effect";
 import { useMemo } from "react";
 
-import type { PlayableGame } from "~/bridge/game/PlayableGame";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import { readCheatItemCatalogFx } from "~/engine/cheat/read/readCheatItemCatalogFx";
 
 /** Resolves the static engine-owned Cheat Spotlight catalog and package resource URLs. */
-export const useCheatItemCatalog = (game: PlayableGame) =>
+export const useCheatItemCatalog = (game: GameEngine) =>
 	useMemo(() => {
-		const exit = game.read(readCheatItemCatalogFx());
-		if (Exit.isFailure(exit)) throw exit.cause;
-		return exit.value.map((entry) => ({
+		return game.readOrThrow(readCheatItemCatalogFx()).map((entry) => ({
 			...entry,
 			sourceUrl: game.getResourceUrl(entry.sourceResourceId),
 		}));

@@ -268,7 +268,7 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 									return finalization.finalizeFx(
 										decision.resource,
 										"release",
-										Effect.suspend(() => decision.resource.game.disposeFx),
+										Effect.suspend(() => decision.resource.session.disposeFx),
 										true,
 									);
 								case "Done":
@@ -349,7 +349,7 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 					finalization.finalizeFx(
 						resource,
 						"release",
-						Effect.suspend(() => resource.game.disposeFx),
+						Effect.suspend(() => resource.session.disposeFx),
 						true,
 						true,
 					),

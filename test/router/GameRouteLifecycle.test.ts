@@ -63,7 +63,14 @@ const createHarness = async (
 	} = {},
 ) => {
 	const { rendererRuntime } = createTestRendererRuntime({
-		createResourceFx: () => createGameEngineResourceFx(game),
+		createResourceFx: () =>
+			createGameEngineResourceFx({
+				session: game,
+				resourceMetadata: {
+					type: "package",
+					packageId: game.arkpack.packageId,
+				},
+			}),
 	});
 	runtimes.push(rendererRuntime);
 	rendererRuntime.runSync(applyCheatAvailabilityFx(cheatsAvailable));
@@ -208,7 +215,7 @@ describe("game route lifecycle", () => {
 		expect(router.state.location.pathname).toBe("/settings/common");
 		expect(dispose).not.toHaveBeenCalled();
 		expect(
-			rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack.packageId,
+			rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.session.arkpack.packageId,
 		).toBe("package-route");
 
 		await router.navigate({
@@ -220,7 +227,7 @@ describe("game route lifecycle", () => {
 
 		expect(dispose).not.toHaveBeenCalled();
 		expect(
-			rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack.packageId,
+			rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.session.arkpack.packageId,
 		).toBe("package-route");
 	});
 

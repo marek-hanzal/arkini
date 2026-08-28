@@ -41,7 +41,7 @@ export const Route = createFileRoute("/game/$packageId/cheats")({
 						navigate({
 							to: "/game/$packageId/board",
 							params: {
-								packageId: game.arkpack.packageId,
+								packageId: game.resourceMetadata.packageId,
 							},
 							replace: true,
 						}),
@@ -49,7 +49,7 @@ export const Route = createFileRoute("/game/$packageId/cheats")({
 				}).pipe(Effect.asVoid);
 			},
 			[
-				game.arkpack.packageId,
+				game.resourceMetadata.packageId,
 				navigate,
 				router,
 			],

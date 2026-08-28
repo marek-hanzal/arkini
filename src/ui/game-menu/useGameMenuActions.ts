@@ -4,7 +4,7 @@ import { Cause, Exit, Option } from "effect";
 import { useEffect, useState } from "react";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 
-import type { Game } from "~/bridge/game/Game";
+import type { PackageGameEngine } from "~/bridge/game/GameEngine";
 import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { GameMenuAction, GameMenuPhase } from "~/ui/game-menu/GameMenuControl";
@@ -24,7 +24,7 @@ export const useGameMenuActions = ({
 	game,
 	phase,
 }: {
-	readonly game: Game;
+	readonly game: PackageGameEngine;
 	readonly phase: Exclude<GameMenuPhase, "closed">;
 }) => {
 	const menu = useGameMenuControl();
@@ -51,7 +51,7 @@ export const useGameMenuActions = ({
 		}
 		const failure = RendererRuntime.runSync(readExactCauseFailureFx(settledCommand.exit.cause));
 		if (Option.isNone(failure)) {
-			game.failStop("ui", settledCommand.exit.cause);
+			game.reportCriticalFailure("game-runtime", settledCommand.exit.cause);
 			throw settledCommand.exit.cause;
 		}
 		return {
@@ -115,7 +115,7 @@ export const useGameMenuActions = ({
 			navigate({
 				to: "/game/$packageId/cheats",
 				params: {
-					packageId: game.arkpack.packageId,
+					packageId: game.resourceMetadata.packageId,
 				},
 			}),
 		);
@@ -125,7 +125,7 @@ export const useGameMenuActions = ({
 			navigate({
 				to: "/game/$packageId/action/leave",
 				params: {
-					packageId: game.arkpack.packageId,
+					packageId: game.resourceMetadata.packageId,
 				},
 				search: {
 					destination: "main-menu",
@@ -148,7 +148,7 @@ export const useGameMenuActions = ({
 			navigate({
 				to: "/game/$packageId/action/reset",
 				params: {
-					packageId: game.arkpack.packageId,
+					packageId: game.resourceMetadata.packageId,
 				},
 			}),
 		);

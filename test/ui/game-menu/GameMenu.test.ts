@@ -16,6 +16,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CheatAvailabilityAtom } from "~/bridge/cheat/CheatAvailabilityAtom";
 import type { Game } from "~/bridge/game/Game";
+import type { PackageGameEngine } from "~/bridge/game/GameEngine";
 import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLifecycleFx";
 import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycleOwnerAtom";
 import { RendererAtomRegistry } from "~/bridge/reactivity/RendererAtomRegistry";
@@ -24,7 +25,6 @@ import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
-import { testGameRead } from "~test/support/game/testGameRead";
 
 vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
 
@@ -74,25 +74,13 @@ const gameSnapshots = {
 const createGame = (
 	flushSaveFx: Game["flushSaveFx"] = Effect.void,
 	cheatEnabled = false,
-): Game => ({
-	arkpack: {
+): PackageGameEngine => ({
+	resourceMetadata: {
+		type: "package",
 		packageId: "package:menu",
-		contentHash: "content:menu",
-		title: "Menu game",
-		version: "1.0",
-		arkini: "1.0",
-		provenance: {
-			type: "community",
-		} as const,
-		source: "user",
 	},
 	config: testArkpackConfig,
-	saveKey: {
-		packageId: "package:menu",
-	},
-	disposeFx: Effect.void,
-	disposeWithoutSaveFx: Effect.void,
-	flushSaveFx,
+	saveFx: flushSaveFx,
 	getResourceUrl: () => "blob:test",
 	...Effect.runSync(
 		makeTestGameTransitionFieldsFx(
@@ -101,11 +89,12 @@ const createGame = (
 			>,
 		),
 	),
-	read: testGameRead,
-	runFx: ((_effect) => flushSaveFx) as Game["runFx"],
-	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
-	subscribe: () => () => undefined,
 	subscribeEvents: () => () => undefined,
+	reportCriticalFailure: () => undefined,
+	readOrThrow: (() => {
+		throw new Error("Not used by this test.");
+	}) as PackageGameEngine["readOrThrow"],
+	runEngineFx: ((_effect) => flushSaveFx) as PackageGameEngine["runEngineFx"],
 });
 
 beforeEach(() => {
@@ -159,7 +148,7 @@ const renderMenu = async ({
 	cheatsAvailable = false,
 	requestClose = vi.fn(() => new Promise<void>(() => undefined)),
 }: {
-	readonly game?: Game;
+	readonly game?: PackageGameEngine;
 	readonly cheatsAvailable?: boolean;
 	readonly requestClose?: () => Promise<void>;
 } = {}) => {

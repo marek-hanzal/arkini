@@ -17,7 +17,7 @@ export const runTileSplitAtom = RendererRuntime.runSync(
 			(command: runTileSplitAtom.Command) =>
 				Effect.yieldNow.pipe(
 					Effect.andThen(
-						game.runFx(splitBoardItemStackFx(command)).pipe(
+						game.runEngineFx(splitBoardItemStackFx(command)).pipe(
 							Effect.as(true),
 							Effect.catch(() => Effect.succeed(false)),
 						),

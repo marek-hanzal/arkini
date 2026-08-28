@@ -73,7 +73,7 @@ export const TileDefaultLineCommandAtom = RendererRuntime.runSync(
 			(command: AdmittedQueueCommand) =>
 				Effect.gen(function* () {
 					const exit = yield* Effect.exit(
-						game.runFx(
+						game.runEngineFx(
 							Effect.gen(function* () {
 								const commandExit = yield* Effect.exit(
 									Effect.gen(function* () {

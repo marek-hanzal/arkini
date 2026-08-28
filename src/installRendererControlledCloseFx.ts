@@ -75,7 +75,7 @@ export const installRendererControlledCloseFx = Effect.fn("installRendererContro
 				await router.navigate({
 					to: "/game/$packageId/action/exit",
 					params: {
-						packageId: resource.game.arkpack.packageId,
+						packageId: resource.session.arkpack.packageId,
 					},
 					replace: true,
 				});

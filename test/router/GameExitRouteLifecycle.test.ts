@@ -70,7 +70,14 @@ const createGame = (disposeFx: Game["disposeFx"]): Game => ({
 
 const createHarness = async (game: Game) => {
 	const { rendererRuntime } = createTestRendererRuntime({
-		createResourceFx: () => createGameEngineResourceFx(game),
+		createResourceFx: () =>
+			createGameEngineResourceFx({
+				session: game,
+				resourceMetadata: {
+					type: "package",
+					packageId: game.arkpack.packageId,
+				},
+			}),
 	});
 	runtimes.push(rendererRuntime);
 	const usesFakeTimers = vi.isFakeTimers();

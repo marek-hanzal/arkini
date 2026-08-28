@@ -61,7 +61,7 @@ afterEach(() => {
 describe("runSpaceActivationAtom", () => {
 	it("preserves exact commit, accepted no-op, and rejected command as distinct results", async () => {
 		const getTransitionSnapshot = vi.fn(() => laterTransition);
-		const runFx = vi
+		const runEngineFx = vi
 			.fn()
 			.mockReturnValueOnce(
 				Effect.succeed({
@@ -78,7 +78,7 @@ describe("runSpaceActivationAtom", () => {
 			.mockReturnValueOnce(Effect.fail("space-action-unavailable"));
 		const game = {
 			getTransitionSnapshot,
-			runFx,
+			runEngineFx,
 		} as unknown as GameEngine;
 		const registry = AtomRegistry.make({
 			scheduleTask,

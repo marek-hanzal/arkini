@@ -208,7 +208,7 @@ export const createGameEngineFinalizationCapabilityFx = Effect.fn(
 				finalizeFx(
 					resource,
 					"release",
-					Effect.suspend(() => resource.game.disposeFx),
+					Effect.suspend(() => resource.session.disposeFx),
 					allowAlreadyFinalized,
 				),
 			);
@@ -219,8 +219,8 @@ export const createGameEngineFinalizationCapabilityFx = Effect.fn(
 				finalizeFx(
 					resource,
 					"reset",
-					Effect.suspend(() => resource.game.disposeWithoutSaveFx).pipe(
-						Effect.andThen(Effect.suspend(() => clearSaveFx(resource.game.saveKey))),
+					Effect.suspend(() => resource.session.disposeWithoutSaveFx).pipe(
+						Effect.andThen(Effect.suspend(() => clearSaveFx(resource.session.saveKey))),
 					),
 					false,
 				),

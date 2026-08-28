@@ -46,7 +46,7 @@ describe("editor project route lifecycle", () => {
 		);
 		expect(switched.type).toBe("ready");
 		if (switched.type !== "ready") throw new Error("Project B was not published.");
-		expect(switched.resource.game.projectId).toBe("project-b");
+		expect(switched.resource.game.resourceMetadata.projectId).toBe("project-b");
 
 		await harness.router.navigate({
 			to: "/editor/welcome",
@@ -152,7 +152,7 @@ describe("editor project route lifecycle", () => {
 		);
 		expect(state.type).toBe("ready");
 		if (state.type !== "ready") throw new Error("Revision 2 is not ready.");
-		expect(state.resource.game.projectRevision).toBe(2);
+		expect(state.resource.game.resourceMetadata.projectRevision).toBe(2);
 
 		await harness.router.navigate({
 			to: "/editor/welcome",

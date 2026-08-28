@@ -6,13 +6,20 @@ import {
 } from "~/bridge/game/CriticalGameLifecycleError";
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
-import type { GameSessionServices } from "~/bridge/game/GameSession";
+import type { GameEngineServices } from "~/bridge/game/GameSession";
 import type { PlayableGame } from "~/bridge/game/PlayableGame";
 import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
+import { RuntimeSaveFx } from "~/bridge/save/RuntimeSaveFx";
 
 /** Wraps one exact playable session in a presentation fail-stop guard. */
 export const createGameEngineResourceFx = Effect.fn("createGameEngineResourceFx")(
-	<GameType extends PlayableGame>(game: GameType) =>
+	<SessionType extends PlayableGame, Metadata extends GameEngine.Metadata>({
+		session,
+		resourceMetadata,
+	}: {
+		readonly session: SessionType;
+		readonly resourceMetadata: Metadata;
+	}) =>
 		Effect.sync(() => {
 			let criticalFailure: CriticalGameLifecycleError | null = null;
 			let explicitFailurePublication = false;
@@ -40,7 +47,7 @@ export const createGameEngineResourceFx = Effect.fn("createGameEngineResourceFx"
 			};
 			const publishSessionFatal = () => {
 				if (explicitFailurePublication) return;
-				const fatal = game.getFatalError();
+				const fatal = session.getFatalError();
 				if (fatal === null) return;
 				markCriticalFailure(
 					fatal.source === "autosave"
@@ -52,7 +59,7 @@ export const createGameEngineResourceFx = Effect.fn("createGameEngineResourceFx"
 				);
 			};
 			publishSessionFatal();
-			game.subscribeFatalError(publishSessionFatal);
+			session.subscribeFatalError(publishSessionFatal);
 			const reportCriticalFailure: GameEngine["reportCriticalFailure"] = (
 				operation,
 				cause,
@@ -60,7 +67,7 @@ export const createGameEngineResourceFx = Effect.fn("createGameEngineResourceFx"
 				explicitFailurePublication = true;
 				let fatal: ReturnType<PlayableGame["failStop"]>;
 				try {
-					fatal = game.failStop(
+					fatal = session.failStop(
 						operation === "game-presentation" ? "presentation" : "runtime",
 						cause,
 					);
@@ -69,18 +76,18 @@ export const createGameEngineResourceFx = Effect.fn("createGameEngineResourceFx"
 				}
 				markCriticalFailure(operation, fatal);
 			};
-			const readOrThrow = <Result, Error, Requirements extends GameSessionServices>(
+			const readOrThrow = <Result, Error, Requirements extends GameEngineServices>(
 				effect: Effect.Effect<Result, Error, Requirements>,
 			): Result => {
 				assertUsable();
-				const exit = game.read(effect);
+				const exit = session.read(effect);
 				if (Exit.isFailure(exit)) {
-					const failureExit = game.read(readExactCauseFailureFx(exit.cause));
+					const failureExit = session.read(readExactCauseFailureFx(exit.cause));
 					const failure = Exit.isSuccess(failureExit) ? failureExit.value : Option.none();
 					explicitFailurePublication = true;
 					let fatal: ReturnType<PlayableGame["failStop"]>;
 					try {
-						fatal = game.failStop(
+						fatal = session.failStop(
 							"runtime",
 							Option.isSome(failure) ? failure.value : exit.cause,
 						);
@@ -91,12 +98,24 @@ export const createGameEngineResourceFx = Effect.fn("createGameEngineResourceFx"
 				}
 				return exit.value;
 			};
-			const engine: GameEngine<GameType> = {
-				...game,
+			const engine: GameEngine<Metadata> = {
+				resourceMetadata,
+				diagnosticSessionId: session.diagnosticSessionId,
+				config: session.config,
+				getResourceUrl: session.getResourceUrl,
+				committedTransitionAtom: session.committedTransitionAtom,
+				getTransitionSnapshot: session.getTransitionSnapshot,
+				subscribeTransitions: session.subscribeTransitions,
+				subscribeEvents: session.subscribeEvents,
 				readOrThrow,
 				reportCriticalFailure,
+				runEngineFx: session.runFx,
+				saveFx: session.runFx(
+					RuntimeSaveFx.pipe(Effect.flatMap((service) => service.flush)),
+				),
 			};
 			return {
+				session,
 				game: engine,
 				getCriticalFailure: () => criticalFailure,
 				assertUsable,
@@ -107,6 +126,6 @@ export const createGameEngineResourceFx = Effect.fn("createGameEngineResourceFx"
 						criticalFailureListeners.delete(listener);
 					};
 				},
-			} satisfies GameEngineResource<GameType>;
+			} satisfies GameEngineResource<SessionType, Metadata>;
 		}),
 );

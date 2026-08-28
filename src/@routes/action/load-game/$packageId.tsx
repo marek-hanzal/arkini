@@ -36,11 +36,11 @@ export const Route = createFileRoute("/action/load-game/$packageId")({
 		const resource = context.rendererRuntime.runSync(readCurrentGameEngineResourceFx());
 		if (resource === null) return;
 		resource.assertUsable();
-		if (resource.game.arkpack.packageId === params.packageId) return;
+		if (resource.game.resourceMetadata.packageId === params.packageId) return;
 		throw redirect({
 			to: "/game/$packageId/action/leave",
 			params: {
-				packageId: resource.game.arkpack.packageId,
+				packageId: resource.game.resourceMetadata.packageId,
 			},
 			search: {
 				destination: "game",
@@ -70,11 +70,11 @@ export const Route = createFileRoute("/action/load-game/$packageId")({
 			throw completed.cause;
 		}
 		const resource = completed.value;
-		if (resource.game.arkpack.packageId !== params.packageId) {
+		if (resource.game.resourceMetadata.packageId !== params.packageId) {
 			throw redirect({
 				to: "/game/$packageId/action/leave",
 				params: {
-					packageId: resource.game.arkpack.packageId,
+					packageId: resource.game.resourceMetadata.packageId,
 				},
 				search: {
 					destination: "game",

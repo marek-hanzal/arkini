@@ -95,7 +95,15 @@ const createHarness = async ({
 				catch: (cause) => cause,
 			}),
 		createResourceFx: () =>
-			game === undefined ? Effect.never : createGameEngineResourceFx(game),
+			game === undefined
+				? Effect.never
+				: createGameEngineResourceFx({
+						session: game,
+						resourceMetadata: {
+							type: "package",
+							packageId: game.arkpack.packageId,
+						},
+					}),
 	});
 	runtimes.push(rendererRuntime);
 	const usesFakeTimers = vi.isFakeTimers();

@@ -57,8 +57,11 @@ describe("editor project route publication", () => {
 				type: "ready",
 				resource: {
 					game: {
-						projectId: "project-b",
-						projectRevision: 1,
+						resourceMetadata: {
+							type: "editor",
+							projectId: "project-b",
+							projectRevision: 1,
+						},
 					},
 				},
 			});
@@ -76,8 +79,8 @@ describe("editor project route publication", () => {
 		);
 		expect(state.type).toBe("ready");
 		if (state.type !== "ready") throw new Error("Project B is not ready.");
-		expect(state.resource.game.projectId).toBe("project-b");
-		expect(state.resource.game.projectRevision).toBe(1);
+		expect(state.resource.game.resourceMetadata.projectId).toBe("project-b");
+		expect(state.resource.game.resourceMetadata.projectRevision).toBe(1);
 		expect(harness.events).not.toContain("create-project-a-r2");
 
 		await harness.router.navigate({

@@ -13,9 +13,11 @@ import type { GameSessionLayerFx } from "~/engine/game/layer/GameSessionLayerFx"
 import type { CommittedTransitionSchema } from "~/engine/runtime/schema/CommittedTransitionSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
-export type GameSessionServices =
-	| LayerModule.Success<ReturnType<typeof GameSessionLayerFx>>
-	| RuntimeSaveFx;
+/** Engine services admitted to presentation commands and live projections. */
+export type GameEngineServices = LayerModule.Success<ReturnType<typeof GameSessionLayerFx>>;
+
+/** Complete internal session runtime, including bridge-owned save lifecycle. */
+export type GameSessionServices = GameEngineServices | RuntimeSaveFx;
 
 /** Exact committed game fact exposed across the renderer bridge boundary. */
 export type GameTransition = CommittedTransitionSchema.Type;

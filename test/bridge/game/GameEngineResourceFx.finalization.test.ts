@@ -193,7 +193,7 @@ describe("GameEngineResourceFx / finalization", () => {
 		const harness = createHarness(() => Effect.succeed(resource));
 		const owner = harness.startLease("package:close-defect");
 		await harness.adopt(await owner.promise);
-		Object.defineProperty(resource.game, "disposeFx", {
+		Object.defineProperty(resource.session, "disposeFx", {
 			configurable: true,
 			get: () => {
 				throw disposeDefect;

@@ -31,37 +31,43 @@ export const makeResource = ({
 	readonly disposeFx?: Game["disposeFx"];
 	readonly disposeWithoutSaveFx?: Game["disposeWithoutSaveFx"];
 	readonly packageId: string;
-}) =>
-	Effect.runSync(
-		createGameEngineResourceFx<Game>({
-			arkpack: {
-				packageId,
-				contentHash: `content:${packageId}`,
-				title: testArkpackConfig.meta.title,
-				version: "1.0",
-				arkini: ArkiniAppVersion,
-				provenance: {
-					type: "community",
-				},
-				source: "user",
+}) => {
+	const session: Game = {
+		arkpack: {
+			packageId,
+			contentHash: `content:${packageId}`,
+			title: testArkpackConfig.meta.title,
+			version: "1.0",
+			arkini: ArkiniAppVersion,
+			provenance: {
+				type: "community",
 			},
-			config: testArkpackConfig,
-			disposeFx,
-			disposeWithoutSaveFx,
-			flushSaveFx: Effect.void,
-			getResourceUrl: () => "blob:test",
-			...Effect.runSync(
-				makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshot"]>),
-			),
-			read: testGameRead,
-			run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
-			saveKey: {
+			source: "user",
+		},
+		config: testArkpackConfig,
+		disposeFx,
+		disposeWithoutSaveFx,
+		flushSaveFx: Effect.void,
+		getResourceUrl: () => "blob:test",
+		...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshot"]>)),
+		read: testGameRead,
+		run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
+		saveKey: {
+			packageId,
+		},
+		subscribe: () => () => undefined,
+		subscribeEvents: () => () => undefined,
+	};
+	return Effect.runSync(
+		createGameEngineResourceFx({
+			session,
+			resourceMetadata: {
+				type: "package",
 				packageId,
 			},
-			subscribe: () => () => undefined,
-			subscribeEvents: () => () => undefined,
 		}),
 	);
+};
 
 export const createHarness = (
 	createResourceFx: (packageId: string) => Effect.Effect<GameEngineResource, unknown>,

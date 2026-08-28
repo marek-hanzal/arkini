@@ -3,10 +3,9 @@ import { describe, expect, it } from "@effect/vitest";
 import { afterEach, vi } from "vitest";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
-import type { EditorBoardGame } from "~/bridge/editor/board/EditorBoardGame";
+import type { EditorBoardGameResource } from "~/bridge/editor/board/EditorBoardGameResource";
 import { createEditorBoardGameFx } from "~/bridge/editor/board/createEditorBoardGameFx";
 import { createEditorBoardGameResourceFx } from "~/bridge/editor/board/createEditorBoardGameResourceFx";
-import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
@@ -37,19 +36,26 @@ describe("createEditorBoardGameResourceFx", () => {
 					const game = yield* createEditorBoardGameFx({
 						project,
 					});
-					const resource = yield* createGameEngineResourceFx(game);
+					const resource = yield* createGameEngineResourceFx({
+						session: game,
+						resourceMetadata: {
+							type: "editor",
+							projectId: game.projectId,
+							projectRevision: game.projectRevision,
+						},
+					});
 					if (project.revision !== 1) {
 						const disposeWithoutSaveFx = Effect.sync(() => {
 							events.push(`release-${project.revision}`);
 						}).pipe(Effect.andThen(game.disposeWithoutSaveFx));
 						return {
 							...resource,
-							game: {
-								...resource.game,
+							session: {
+								...resource.session,
 								disposeFx: disposeWithoutSaveFx,
 								disposeWithoutSaveFx,
 							},
-						} satisfies GameEngineResource<EditorBoardGame>;
+						} satisfies EditorBoardGameResource.Resource;
 					}
 					const disposeWithoutSaveFx = Effect.sync(() => {
 						events.push("release-start-1");
@@ -60,12 +66,12 @@ describe("createEditorBoardGameResourceFx", () => {
 					);
 					return {
 						...resource,
-						game: {
-							...resource.game,
+						session: {
+							...resource.session,
 							disposeFx: disposeWithoutSaveFx,
 							disposeWithoutSaveFx,
 						},
-					} satisfies GameEngineResource<EditorBoardGame>;
+					} satisfies EditorBoardGameResource.Resource;
 				});
 			const owner = yield* createEditorBoardGameResourceFx({
 				createResourceFx,
@@ -91,7 +97,7 @@ describe("createEditorBoardGameResourceFx", () => {
 			const state = yield* SubscriptionRef.get(owner.state);
 			expect(state.type).toBe("ready");
 			if (state.type !== "ready") throw new Error("Replacement editor game is missing.");
-			expect(state.resource.game.projectRevision).toBe(2);
+			expect(state.resource.game.resourceMetadata.projectRevision).toBe(2);
 			expect(events).toEqual([
 				"create-1",
 				"release-start-1",
@@ -123,7 +129,14 @@ describe("createEditorBoardGameResourceFx", () => {
 						const game = yield* createEditorBoardGameFx({
 							project,
 						});
-						const resource = yield* createGameEngineResourceFx(game);
+						const resource = yield* createGameEngineResourceFx({
+							session: game,
+							resourceMetadata: {
+								type: "editor",
+								projectId: game.projectId,
+								projectRevision: game.projectRevision,
+							},
+						});
 						if (project.revision !== 1) return resource;
 						const disposeWithoutSaveFx = Effect.suspend(() => {
 							if (failFirstDisposal) {
@@ -134,12 +147,12 @@ describe("createEditorBoardGameResourceFx", () => {
 						});
 						return {
 							...resource,
-							game: {
-								...resource.game,
+							session: {
+								...resource.session,
 								disposeFx: disposeWithoutSaveFx,
 								disposeWithoutSaveFx,
 							},
-						} satisfies GameEngineResource<EditorBoardGame>;
+						} satisfies EditorBoardGameResource.Resource;
 					});
 				const owner = yield* createEditorBoardGameResourceFx({
 					createResourceFx,
@@ -170,7 +183,7 @@ describe("createEditorBoardGameResourceFx", () => {
 				expect(recovered.type).toBe("ready");
 				if (recovered.type !== "ready")
 					throw new Error("Recovered editor game is missing.");
-				expect(recovered.resource.game.projectRevision).toBe(2);
+				expect(recovered.resource.game.resourceMetadata.projectRevision).toBe(2);
 				expect(created).toEqual([
 					1,
 					2,
@@ -196,7 +209,14 @@ describe("createEditorBoardGameResourceFx", () => {
 					const game = yield* createEditorBoardGameFx({
 						project,
 					});
-					return yield* createGameEngineResourceFx(game);
+					return yield* createGameEngineResourceFx({
+						session: game,
+						resourceMetadata: {
+							type: "editor",
+							projectId: game.projectId,
+							projectRevision: game.projectRevision,
+						},
+					});
 				});
 			const owner = yield* createEditorBoardGameResourceFx({
 				createResourceFx,
@@ -227,7 +247,7 @@ describe("createEditorBoardGameResourceFx", () => {
 			const recovered = yield* SubscriptionRef.get(owner.state);
 			expect(recovered.type).toBe("ready");
 			if (recovered.type !== "ready") throw new Error("Revision 2 did not recover.");
-			expect(recovered.resource.game.projectRevision).toBe(2);
+			expect(recovered.resource.game.resourceMetadata.projectRevision).toBe(2);
 			expect(created).toEqual([
 				1,
 				2,

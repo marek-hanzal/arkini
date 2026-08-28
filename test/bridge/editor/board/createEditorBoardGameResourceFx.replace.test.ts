@@ -4,8 +4,8 @@ import { vi } from "vitest";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import type { EditorBoardGame } from "~/bridge/editor/board/EditorBoardGame";
+import type { EditorBoardGameResource } from "~/bridge/editor/board/EditorBoardGameResource";
 import { createEditorBoardGameResourceFx } from "~/bridge/editor/board/createEditorBoardGameResourceFx";
-import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
@@ -35,12 +35,19 @@ const state: StateSchema.Type = {
 const createResource = (
 	ownedProject: EditorProject,
 	disposeWithoutSaveFx: Effect.Effect<void>,
-): GameEngineResource<EditorBoardGame> => ({
-	game: {
+): EditorBoardGameResource.Resource => ({
+	session: {
 		projectId: ownedProject.projectId,
 		projectRevision: ownedProject.revision,
 		disposeWithoutSaveFx,
-	} as unknown as GameEngineResource<EditorBoardGame>["game"],
+	} as unknown as EditorBoardGame,
+	game: {
+		resourceMetadata: {
+			type: "editor",
+			projectId: ownedProject.projectId,
+			projectRevision: ownedProject.revision,
+		},
+	} as unknown as EditorBoardGameResource.Resource["game"],
 	assertUsable: () => undefined,
 	getCriticalFailure: () => null,
 	markCriticalFailure: () => {
@@ -120,7 +127,9 @@ describe("EditorBoardGameResource.replaceFx", () => {
 			const current = yield* SubscriptionRef.get(owner.state);
 			expect(current.type).toBe("ready");
 			if (current.type !== "ready") throw new Error("Expected the newer editor game.");
-			expect(current.resource.game.projectRevision).toBe(newerProject.revision);
+			expect(current.resource.game.resourceMetadata.projectRevision).toBe(
+				newerProject.revision,
+			);
 			yield* owner.releaseCurrentFx;
 		}),
 	);

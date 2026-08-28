@@ -77,8 +77,8 @@ const game = {
 		},
 	},
 	getTransitionSnapshot: () => unrelatedTransition,
-	runFx: <Result, Error>(effect: Effect.Effect<Result, Error>) => effect,
-} as GameEngine;
+	runEngineFx: <Result, Error>(effect: Effect.Effect<Result, Error>) => effect,
+} as unknown as GameEngine;
 
 vi.mock("~/bridge/game/useGameEngine", () => ({
 	useGameEngine: () => game,

@@ -9,7 +9,7 @@ export const useResolveItemDetailTarget = () => {
 	const game = useGameEngine();
 	return useCallback(
 		(props: Omit<resolveItemDetailTargetFx.Props, "runtime" | "sources">) => {
-			const runtime = game.getSnapshot();
+			const runtime = game.getTransitionSnapshot().runtime;
 			const sources = game.readOrThrow(
 				readItemDetailSourcesFx({
 					target: {

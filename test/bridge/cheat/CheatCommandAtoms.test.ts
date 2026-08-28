@@ -7,10 +7,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { setCheatEnabledAtom } from "~/bridge/cheat/setCheatEnabledAtom";
 import { setInstantGameplayAtom } from "~/bridge/cheat/setInstantGameplayAtom";
 import { spawnCheatItemAtom } from "~/bridge/cheat/spawnCheatItemAtom";
-import type { Game } from "~/bridge/game/Game";
-import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
-import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
-import { testGameRead } from "~test/support/game/testGameRead";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
 
@@ -26,33 +23,10 @@ const makeRegistry = () => {
 	return registry;
 };
 
-const createGame = (commandFx: Effect.Effect<unknown, unknown> = Effect.void): Game => ({
-	arkpack: {
-		packageId: "package:cheat-command",
-		contentHash: "content:cheat-command",
-		title: "Cheat command game",
-		version: "1.0",
-		arkini: "1.0",
-		provenance: {
-			type: "community",
-		} as const,
-		source: "user",
-	},
-	config: testArkpackConfig,
-	saveKey: {
-		packageId: "package:cheat-command",
-	},
-	disposeFx: Effect.void,
-	disposeWithoutSaveFx: Effect.void,
-	flushSaveFx: Effect.void,
-	getResourceUrl: () => "blob:test",
-	...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshot"]>)),
-	read: testGameRead,
-	runFx: ((_effect) => commandFx) as Game["runFx"],
-	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
-	subscribe: () => () => undefined,
-	subscribeEvents: () => () => undefined,
-});
+const createGame = (commandFx: Effect.Effect<unknown, unknown> = Effect.void): GameEngine =>
+	({
+		runEngineFx: () => commandFx,
+	}) as unknown as GameEngine;
 
 const runCommand = <Value, Error, Input>(
 	registry: AtomRegistry.AtomRegistry,
@@ -68,7 +42,7 @@ const runCommand = <Value, Error, Input>(
 };
 
 describe("Cheat command atoms", () => {
-	it("routes every gameplay Cheat command exclusively through the exact Game.runFx", async () => {
+	it("routes every gameplay Cheat command exclusively through the exact Engine admission", async () => {
 		const run = vi.fn();
 		const game = createGame(Effect.sync(run));
 		const registry = makeRegistry();

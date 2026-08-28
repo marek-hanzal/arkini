@@ -1,6 +1,6 @@
 import { Cause, Effect, Option } from "effect";
 
-import type { PlayableGame } from "~/bridge/game/PlayableGame";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 
 /** Projects one renderer command failure while preserving interruption and fail-stop semantics. */
@@ -12,7 +12,7 @@ export const settleRendererCommandFailureFx = Effect.fn("settleRendererCommandFa
 		setFatalCause,
 	}: {
 		readonly cause: Cause.Cause<unknown>;
-		readonly game: PlayableGame;
+		readonly game: GameEngine;
 		readonly onFailure: (
 			failure: unknown,
 		) => Effect.Effect<void, FailureError, FailureRequirements>;
@@ -27,7 +27,7 @@ export const settleRendererCommandFailureFx = Effect.fn("settleRendererCommandFa
 		if (Option.isSome(failure)) {
 			return yield* onFailure(failure.value);
 		}
-		game.failStop("ui", cause);
+		game.reportCriticalFailure("game-runtime", cause);
 		yield* setFatalCause(cause);
 		return yield* Effect.failCause(cause);
 	},

@@ -12,7 +12,7 @@ import {
 import { match, P } from "ts-pattern";
 
 import { useGameCheats } from "~/bridge/cheat/useGameCheats";
-import type { PlayableGame } from "~/bridge/game/PlayableGame";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 import { useCheatItemSpawn } from "~/ui/cheat-spotlight/useCheatItemSpawn";
 import { useCheatItemSpotlightSearch } from "~/ui/cheat-spotlight/useCheatItemSpotlightSearch";
@@ -27,7 +27,7 @@ const errorMessage = (error: unknown) =>
 export namespace useCheatItemSpotlightController {
 	export interface Props {
 		readonly alwaysAvailable?: boolean;
-		readonly game: PlayableGame;
+		readonly game: GameEngine;
 		readonly onBeforeOpen?: () => void;
 	}
 

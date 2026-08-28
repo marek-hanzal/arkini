@@ -101,7 +101,8 @@ describe("Editor entry Game handoff", () => {
 			expect(editorApis.activateMcp).not.toHaveBeenCalled();
 			expect(router.state.location.pathname).toBe(`/game/${nextPackageId}/board`);
 			expect(
-				rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack.packageId,
+				rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.session.arkpack
+					.packageId,
 			).toBe(nextPackageId);
 		} finally {
 			Effect.runSync(Deferred.succeed(disposalGate, undefined));

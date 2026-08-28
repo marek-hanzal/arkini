@@ -5,14 +5,12 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { routeTree } from "~/_route";
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import type { EditorProjectRepositoryService } from "~/bridge/editor/EditorProjectRepository";
-import type { EditorBoardGame } from "~/bridge/editor/board/EditorBoardGame";
 import {
 	type EditorBoardGameResource,
 	EditorBoardGameResourceOwnerAtom,
 } from "~/bridge/editor/board/EditorBoardGameResource";
 import { createEditorBoardGameFx } from "~/bridge/editor/board/createEditorBoardGameFx";
 import { createEditorBoardGameResourceFx } from "~/bridge/editor/board/createEditorBoardGameResourceFx";
-import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import { createTestRendererRuntime } from "~test/support/createTestRendererRuntime";
@@ -101,7 +99,14 @@ export const createEditorProjectRouteHarness = async () => {
 					const game = yield* createEditorBoardGameFx({
 						project,
 					});
-					const resource = yield* createGameEngineResourceFx(game);
+					const resource = yield* createGameEngineResourceFx({
+						session: game,
+						resourceMetadata: {
+							type: "editor",
+							projectId: game.projectId,
+							projectRevision: game.projectRevision,
+						},
+					});
 					const disposeWithoutSaveFx = Effect.gen(function* () {
 						events.push(`release-start-${project.projectId}-r${project.revision}`);
 						if (project.projectId === projectA.projectId) {
@@ -112,12 +117,12 @@ export const createEditorProjectRouteHarness = async () => {
 					});
 					return {
 						...resource,
-						game: {
-							...resource.game,
+						session: {
+							...resource.session,
 							disposeFx: disposeWithoutSaveFx,
 							disposeWithoutSaveFx,
 						},
-					} satisfies GameEngineResource<EditorBoardGame>;
+					} satisfies EditorBoardGameResource.Resource;
 				}),
 		}),
 	);

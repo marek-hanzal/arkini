@@ -13,7 +13,7 @@ export const spawnCheatItemAtom = Effect.runSync(
 				// independent engine commands behind the previous spawn.
 				Effect.yieldNow.pipe(
 					Effect.andThen(
-						game.runFx(
+						game.runEngineFx(
 							spawnCheatItemFx({
 								itemId,
 							}),

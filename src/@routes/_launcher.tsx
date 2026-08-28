@@ -22,7 +22,7 @@ export const Route = createFileRoute("/_launcher")({
 		throw redirect({
 			to: "/game/$packageId/action/leave",
 			params: {
-				packageId: resource.game.arkpack.packageId,
+				packageId: resource.game.resourceMetadata.packageId,
 			},
 			search: Effect.runSync(resolveLauncherLeaveDestinationFx(location.pathname)),
 			replace: true,

@@ -69,8 +69,8 @@ describe("acquireGameEngineResourceFx", () => {
 				"create:package:acquire",
 				"remember:package:acquire",
 			]);
-			expect(resource.game.arkpack).toBe(game.arkpack);
-			yield* resource.game.disposeWithoutSaveFx;
+			expect(resource.session.arkpack).toBe(game.arkpack);
+			yield* resource.session.disposeWithoutSaveFx;
 		}),
 	);
 

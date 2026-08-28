@@ -113,17 +113,17 @@ export const createGameEngineAcquisitionCapabilityFx = Effect.fn(
 			const validateResourceFx = Effect.fn("GameEngineAcquisitionFx.validateResourceFx")(
 				(owner: AcquisitionOwner, resource: GameEngineResource) =>
 					Effect.gen(function* () {
-						if (resource.game.arkpack.packageId === owner.packageId) {
+						if (resource.session.arkpack.packageId === owner.packageId) {
 							return resource;
 						}
 						const identityFailure = new CriticalGameLifecycleError({
 							operation: "engine-ownership",
 							cause: new Error(
-								`Game Engine creation returned package ${resource.game.arkpack.packageId} for requested package ${owner.packageId}.`,
+								`Game Engine creation returned package ${resource.session.arkpack.packageId} for requested package ${owner.packageId}.`,
 							),
 						});
 						const disposeExit = yield* Effect.exit(
-							Effect.suspend(() => resource.game.disposeWithoutSaveFx),
+							Effect.suspend(() => resource.session.disposeWithoutSaveFx),
 						);
 						const disposeFailure = Exit.isFailure(disposeExit)
 							? yield* readExactCauseFailureFx(disposeExit.cause)
@@ -172,7 +172,7 @@ export const createGameEngineAcquisitionCapabilityFx = Effect.fn(
 									};
 								}
 								if (state._tag === "Active") {
-									return state.resource.game.arkpack.packageId === packageId
+									return state.resource.session.arkpack.packageId === packageId
 										? {
 												_tag: "Resource" as const,
 												resource: state.resource,
@@ -300,7 +300,7 @@ export const createGameEngineAcquisitionCapabilityFx = Effect.fn(
 								return finalizeFx(
 									decision.resource,
 									"release",
-									Effect.suspend(() => decision.resource.game.disposeFx),
+									Effect.suspend(() => decision.resource.session.disposeFx),
 									false,
 								).pipe(
 									Effect.andThen(

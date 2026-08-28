@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 
-import type { PlayableGame } from "~/bridge/game/PlayableGame";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import type {
 	ItemDetailPendingAction,
@@ -14,7 +14,7 @@ export namespace useItemDetailPendingCommand {
 		readonly pendingKey: string;
 		readonly pendingOwner: ItemDetailPendingActionOwner;
 		readonly run: (
-			game: PlayableGame,
+			game: GameEngine,
 			props: Props,
 		) => import("effect").Effect.Effect<Result, Failure>;
 	}

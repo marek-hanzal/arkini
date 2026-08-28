@@ -9,7 +9,7 @@ export const setInstantGameplayAtom = Effect.runSync(
 	makeExactGameAtomFamilyFx((game) =>
 		Atom.fn(
 			(enabled: boolean) =>
-				game.runFx(
+				game.runEngineFx(
 					setInstantGameplayFx({
 						enabled,
 					}),

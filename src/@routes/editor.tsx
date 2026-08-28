@@ -14,7 +14,7 @@ export const Route = createFileRoute("/editor")({
 			throw redirect({
 				to: "/game/$packageId/action/leave",
 				params: {
-					packageId: resource.game.arkpack.packageId,
+					packageId: resource.game.resourceMetadata.packageId,
 				},
 				search: {
 					destination: "editor",

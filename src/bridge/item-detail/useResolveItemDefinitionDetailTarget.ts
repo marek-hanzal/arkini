@@ -35,7 +35,7 @@ export const useResolveItemDefinitionDetailTarget = () => {
 			itemId,
 			requestedTab,
 		}: useResolveItemDefinitionDetailTarget.Props): useResolveItemDefinitionDetailTarget.Result => {
-			const runtime = game.getSnapshot();
+			const runtime = game.getTransitionSnapshot().runtime;
 			const sources = game.readOrThrow(
 				readItemDetailSourcesFx({
 					target: {

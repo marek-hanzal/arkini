@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useCheatItemCatalog } from "~/bridge/cheat/useCheatItemCatalog";
-import type { PlayableGame } from "~/bridge/game/PlayableGame";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
 
 const maxVisibleResults = 10;
@@ -10,7 +10,7 @@ export namespace useCheatItemSpotlightSearch {
 	export type Item = ReturnType<typeof useCheatItemCatalog>[number];
 
 	export interface Props {
-		readonly game: PlayableGame;
+		readonly game: GameEngine;
 	}
 
 	export interface Output {

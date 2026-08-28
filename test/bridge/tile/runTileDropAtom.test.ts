@@ -3,7 +3,7 @@ import { Cause, Deferred, Effect, Exit, Option } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { Game } from "~/bridge/game/Game";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
 import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
@@ -46,16 +46,16 @@ const makeRegistry = () => {
 };
 
 const createGame = (effect: Effect.Effect<runTileDropAtom.Result, unknown>) => {
-	const runFx = vi.fn(() => effect);
+	const runEngineFx = vi.fn(() => effect);
 	return {
 		game: {
-			runFx,
-		} as unknown as Game,
-		runFx,
+			runEngineFx,
+		} as unknown as GameEngine,
+		runEngineFx,
 	};
 };
 
-const runDrop = async (registry: AtomRegistry.AtomRegistry, game: Game) => {
+const runDrop = async (registry: AtomRegistry.AtomRegistry, game: GameEngine) => {
 	const atom = runTileDropAtom(game);
 	const unmount = registry.mount(atom);
 	registry.set(atom, command);
@@ -80,7 +80,7 @@ describe("runTileDropAtom", () => {
 		const registry = makeRegistry();
 
 		expect(await runDrop(registry, success.game)).toEqual(Exit.succeed(outcome));
-		expect(success.runFx).toHaveBeenCalledOnce();
+		expect(success.runEngineFx).toHaveBeenCalledOnce();
 
 		const typedExit = await runDrop(registry, createGame(Effect.fail(typedFailure)).game);
 		expect(Exit.isFailure(typedExit)).toBe(true);
@@ -118,7 +118,7 @@ describe("runTileDropAtom", () => {
 		const second = createGame(Effect.succeed(outcome));
 		expect(runTileDropAtom(first.game)).not.toBe(runTileDropAtom(second.game));
 		expect(await runDrop(registry, second.game)).toEqual(Exit.succeed(outcome));
-		expect(second.runFx).toHaveBeenCalledOnce();
+		expect(second.runEngineFx).toHaveBeenCalledOnce();
 		expect(registry.getNodes().has(firstAtom)).toBe(false);
 	});
 });

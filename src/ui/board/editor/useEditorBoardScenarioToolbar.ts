@@ -2,8 +2,8 @@ import { useAtomSet } from "@effect/atom-react";
 import { useEffect, useMemo, useState } from "react";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
-import type { EditorBoardGame } from "~/bridge/editor/board/EditorBoardGame";
 import { EditorBoardScenarioCommandAtoms } from "~/bridge/editor/board/EditorBoardScenarioCommandAtoms";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { EditorBoardScenarioDescriptorSchema } from "~/editor/board/EditorBoardScenarioSchema";
 
 export const editorBoardScenarioDraftOptionId = "editor-board-scenario:draft";
@@ -34,7 +34,7 @@ export const useEditorBoardScenarioToolbar = ({
 	game,
 	project,
 }: {
-	readonly game?: EditorBoardGame;
+	readonly game?: GameEngine<GameEngine.EditorMetadata>;
 	readonly project: EditorProject;
 }) => {
 	const list = useAtomSet(EditorBoardScenarioCommandAtoms.list(project.projectId), {

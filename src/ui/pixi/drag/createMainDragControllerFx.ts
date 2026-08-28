@@ -485,7 +485,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			event.altKey ||
 			event.ctrlKey ||
 			event.metaKey ||
-			!game.getSnapshot().cheats.enabled
+			!game.getTransitionSnapshot().runtime.cheats.enabled
 		) {
 			return;
 		}

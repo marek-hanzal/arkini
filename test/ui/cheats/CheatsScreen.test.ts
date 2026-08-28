@@ -46,10 +46,8 @@ vi.mock("~/ui/game/PlayableGameRoute", async () => {
 });
 vi.mock("~/bridge/game/useGameEngine", () => ({
 	useGameEngine: () => ({
-		arkpack: {
-			packageId: "package:cheats",
-		},
-		saveKey: {
+		resourceMetadata: {
+			type: "package",
 			packageId: "package:cheats",
 		},
 	}),

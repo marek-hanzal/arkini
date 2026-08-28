@@ -3,11 +3,12 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import type { EditorBoardGame } from "~/bridge/editor/board/EditorBoardGame";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 
 export namespace EditorBoardGameResource {
-	export type Resource = GameEngineResource<EditorBoardGame>;
+	export type Resource = GameEngineResource<EditorBoardGame, GameEngine.EditorMetadata>;
 	export type State =
 		| {
 				readonly type: "idle";

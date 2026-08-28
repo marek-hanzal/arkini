@@ -3,7 +3,6 @@ import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 import { Effect } from "effect";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
-import type { Game } from "~/bridge/game/Game";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { createTickFailureTestConfig } from "~test/tick/support/createTickFailureTestConfig";
 import { startLineFx } from "~test/job/support/startLineTestFx";
@@ -19,16 +18,16 @@ describe("createGameSessionFx / fail-stop", () => {
 		});
 		const resource = Effect.runSync(
 			createGameEngineResourceFx({
-				...session,
-				arkpack: {
+				session: {
+					...session,
+					config,
+					getResourceUrl: () => "blob:test",
+				},
+				resourceMetadata: {
+					type: "package",
 					packageId: "fail-stop-test",
 				},
-				config,
-				getResourceUrl: () => "blob:test",
-				saveKey: {
-					packageId: "fail-stop-test",
-				},
-			} as unknown as Game),
+			}),
 		);
 		let notifications = 0;
 		let readWasFrozenDuringNotification = false;
@@ -53,6 +52,10 @@ describe("createGameSessionFx / fail-stop", () => {
 			expect(notifications).toBe(1);
 			expect(readWasFrozenDuringNotification).toBe(true);
 			expect(runWasFrozenDuringNotification).toBe(true);
+			await expect(Effect.runPromise(resource.game.saveFx)).rejects.toMatchObject({
+				_tag: "GameSessionNotRunningError",
+				state: "frozen",
+			});
 			await expect(session.run(Effect.void)).rejects.toMatchObject({
 				_tag: "GameSessionNotRunningError",
 				state: "frozen",
@@ -60,6 +63,10 @@ describe("createGameSessionFx / fail-stop", () => {
 		} finally {
 			await Effect.runPromise(session.disposeFx);
 		}
+		await expect(Effect.runPromise(resource.game.saveFx)).rejects.toMatchObject({
+			_tag: "GameSessionNotRunningError",
+			state: "disposed",
+		});
 	});
 	it("freezes the exact session before publishing a failed readOrThrow", async () => {
 		const config = createJobTestConfig();
@@ -69,16 +76,16 @@ describe("createGameSessionFx / fail-stop", () => {
 		});
 		const resource = Effect.runSync(
 			createGameEngineResourceFx({
-				...session,
-				arkpack: {
+				session: {
+					...session,
+					config,
+					getResourceUrl: () => "blob:test",
+				},
+				resourceMetadata: {
+					type: "package",
 					packageId: "failed-read-test",
 				},
-				config,
-				getResourceUrl: () => "blob:test",
-				saveKey: {
-					packageId: "failed-read-test",
-				},
-			} as unknown as Game),
+			}),
 		);
 		let readWasFrozenDuringNotification = false;
 		let runWasFrozenDuringNotification = false;

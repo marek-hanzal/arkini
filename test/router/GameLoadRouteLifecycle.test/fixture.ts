@@ -69,7 +69,15 @@ export const createHarness = (initialPath: string) => {
 			}),
 		createResourceFx: (selectedPackageId) =>
 			(createGameFxMock(selectedPackageId) as Effect.Effect<Game, unknown>).pipe(
-				Effect.flatMap((game) => createGameEngineResourceFx(game)),
+				Effect.flatMap((game) =>
+					createGameEngineResourceFx({
+						session: game,
+						resourceMetadata: {
+							type: "package",
+							packageId: game.arkpack.packageId,
+						},
+					}),
+				),
 			),
 	});
 	runtimes.push(rendererRuntime);

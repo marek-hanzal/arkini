@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { match } from "ts-pattern";
 
-import type { Game } from "~/bridge/game/Game";
+import type { PackageGameEngine } from "~/bridge/game/GameEngine";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
 import type { GameMenuPhase } from "~/ui/game-menu/GameMenuControl";
@@ -26,7 +26,7 @@ const GameMenuDialog = ({
 	game,
 	phase,
 }: {
-	readonly game: Game;
+	readonly game: PackageGameEngine;
 	readonly phase: Exclude<GameMenuPhase, "closed">;
 }) => {
 	const cheatAvailability = useCheatAvailability();
@@ -204,7 +204,7 @@ const GameMenuDialog = ({
 };
 
 /** Renders the active game overlay through one explicit enter/open/exit lifecycle. */
-export const GameMenu = ({ game }: { readonly game: Game }) => {
+export const GameMenu = ({ game }: { readonly game: PackageGameEngine }) => {
 	const { phase } = useGameMenuControl();
 	return match(phase)
 		.with("closed", () => null)

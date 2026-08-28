@@ -89,6 +89,7 @@ describe("GameCriticalFailureBoundary", () => {
 		let failure: CriticalGameLifecycleError | null = null;
 		const listeners = new Set<() => void>();
 		routeMocks.resource = {
+			session: {} as GameEngineResource["session"],
 			game: {} as GameEngineResource["game"],
 			assertUsable: () => undefined,
 			getCriticalFailure: () => failure,
@@ -144,6 +145,7 @@ describe("GameCriticalFailureBoundary", () => {
 			cause: new Error("best-effort final save failed"),
 		});
 		routeMocks.resource = {
+			session: {} as GameEngineResource["session"],
 			game: {} as GameEngineResource["game"],
 			assertUsable: () => {
 				throw failure;

@@ -3,7 +3,7 @@ import { Cause, Data, Deferred, Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { describe, expect, it, vi } from "vitest";
 
-import type { Game } from "~/bridge/game/Game";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import { createItemDetailCommandAtom } from "~/bridge/item-detail/createItemDetailCommandAtom";
 
 class ExpectedCommandFailure extends Data.TaggedError("ExpectedCommandFailure")<{
@@ -12,8 +12,8 @@ class ExpectedCommandFailure extends Data.TaggedError("ExpectedCommandFailure")<
 
 const makeGame = () =>
 	({
-		failStop: vi.fn(),
-	}) as unknown as Game;
+		reportCriticalFailure: vi.fn(),
+	}) as unknown as GameEngine;
 
 const makeRegistry = () =>
 	AtomRegistry.make({
@@ -149,7 +149,7 @@ describe("Item Detail command authority", () => {
 				"Exact typed failure.",
 			),
 		);
-		expect(game.failStop).not.toHaveBeenCalled();
+		expect(game.reportCriticalFailure).not.toHaveBeenCalled();
 
 		const retry = Effect.runSync(Deferred.make<void>());
 		registry.set(atom, {
@@ -222,7 +222,7 @@ describe("Item Detail command authority", () => {
 		unmount();
 		await Effect.runPromise(Deferred.await(interrupted));
 
-		expect(game.failStop).not.toHaveBeenCalled();
+		expect(game.reportCriticalFailure).not.toHaveBeenCalled();
 		registry.dispose();
 	});
 
@@ -255,8 +255,8 @@ describe("Item Detail command authority", () => {
 			run: Effect.failCause(defectCause),
 		});
 
-		await vi.waitFor(() => expect(game.failStop).toHaveBeenCalledOnce());
-		expect(game.failStop).toHaveBeenCalledWith("ui", defectCause);
+		await vi.waitFor(() => expect(game.reportCriticalFailure).toHaveBeenCalledOnce());
+		expect(game.reportCriticalFailure).toHaveBeenCalledWith("game-runtime", defectCause);
 		await vi.waitFor(() => expect(scheduledFailures).toContain(defectCause));
 		let renderedFailure: unknown;
 		try {

@@ -98,7 +98,7 @@ export const createGameEngineCancellationCapabilityFx = Effect.fn(
 							(Exit.isSuccess(fiberExit) ? fiberExit.value : undefined);
 						if (resource === undefined) return;
 						const disposeExit = yield* Effect.exit(
-							Effect.suspend(() => resource.game.disposeWithoutSaveFx),
+							Effect.suspend(() => resource.session.disposeWithoutSaveFx),
 						);
 						if (Exit.isFailure(disposeExit)) {
 							const failure = yield* readExactCauseFailureFx(disposeExit.cause);

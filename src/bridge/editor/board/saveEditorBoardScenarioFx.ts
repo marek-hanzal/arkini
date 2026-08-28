@@ -2,13 +2,13 @@ import { Effect } from "effect";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
-import type { EditorBoardGame } from "~/bridge/editor/board/EditorBoardGame";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import { encodeArkiniSaveFx } from "~/bridge/save/encodeArkiniSaveFx";
 import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
 
 export namespace saveEditorBoardScenarioFx {
 	export interface Props {
-		readonly game: EditorBoardGame;
+		readonly game: GameEngine<GameEngine.EditorMetadata>;
 		readonly name: string;
 		readonly project: EditorProject;
 	}
@@ -21,7 +21,7 @@ export const saveEditorBoardScenarioFx = Effect.fn("saveEditorBoardScenarioFx")(
 	project,
 }: saveEditorBoardScenarioFx.Props) {
 	const state = yield* fromRuntimeFx({
-		runtime: game.getSnapshot(),
+		runtime: game.getTransitionSnapshot().runtime,
 	});
 	const bytes = yield* encodeArkiniSaveFx({
 		version: project.version,

@@ -1,4 +1,4 @@
-import type { PlayableGame } from "~/bridge/game/PlayableGame";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { ItemDetailPendingActionOwner } from "~/bridge/item-detail/ItemDetailPendingActionOwner";
 import { useItemDetailPendingCommand } from "~/bridge/item-detail/useItemDetailPendingCommand";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
@@ -12,8 +12,8 @@ export namespace useEnqueueItemDetailLine {
 	}
 }
 
-const runEnqueueFx = (game: PlayableGame, command: useEnqueueItemDetailLine.Props) =>
-	game.runFx(enqueueLineFx(command));
+const runEnqueueFx = (game: GameEngine, command: useEnqueueItemDetailLine.Props) =>
+	game.runEngineFx(enqueueLineFx(command));
 
 /** Appends one explicit future Item Detail line intent without filling or starting it. */
 export const useEnqueueItemDetailLine = ({

@@ -29,7 +29,7 @@ describe("game load action lifecycle", () => {
 
 		expect(createGameFxMock).toHaveBeenCalledOnce();
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack).toBe(
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.session.arkpack).toBe(
 			game.arkpack,
 		);
 	});
@@ -43,7 +43,7 @@ describe("game load action lifecycle", () => {
 
 		expect(createGameFxMock).toHaveBeenCalledOnce();
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack).toBe(
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.session.arkpack).toBe(
 			game.arkpack,
 		);
 	});
@@ -134,7 +134,7 @@ describe("game load action lifecycle", () => {
 		expect(createGameFxMock).toHaveBeenCalledTimes(2);
 		expect(router.state.location.pathname).toBe(`/game/${nextPackageId}/board`);
 		expect(
-			rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack.packageId,
+			rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.session.arkpack.packageId,
 		).toBe(nextPackageId);
 	});
 });

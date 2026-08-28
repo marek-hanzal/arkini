@@ -4,21 +4,18 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { Game } from "~/bridge/game/Game";
+import type { PackageGameEngine } from "~/bridge/game/GameEngine";
 import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycleOwnerAtom";
 import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLifecycleFx";
 import { requestApplicationCloseAtom } from "~/bridge/lifecycle/requestApplicationCloseAtom";
 import { gameMenuCommandAtom } from "~/ui/game-menu/gameMenuCommandAtom";
-import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
-import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
-import { testGameRead } from "~test/support/game/testGameRead";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
-const failStop = vi.fn<Game["failStop"]>();
+const reportCriticalFailure = vi.fn<PackageGameEngine["reportCriticalFailure"]>();
 
 afterEach(() => {
 	for (const registry of registries.splice(0)) registry.dispose();
-	failStop.mockReset();
+	reportCriticalFailure.mockReset();
 	vi.restoreAllMocks();
 	Reflect.deleteProperty(globalThis, "window");
 });
@@ -31,34 +28,17 @@ const makeRegistry = () => {
 	return registry;
 };
 
-const createGame = (explicitSaveFx: Effect.Effect<void, unknown> = Effect.void): Game => ({
-	arkpack: {
-		packageId: "package:menu",
-		contentHash: "content:menu",
-		title: "Menu game",
-		version: "1.0",
-		arkini: "1.0",
-		provenance: {
-			type: "community",
-		} as const,
-		source: "user",
-	},
-	config: testArkpackConfig,
-	saveKey: {
-		packageId: "package:menu",
-	},
-	disposeFx: Effect.void,
-	disposeWithoutSaveFx: Effect.void,
-	flushSaveFx: Effect.die("Lifecycle flushSaveFx must not own an explicit UI save."),
-	getResourceUrl: () => "blob:test",
-	...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshot"]>)),
-	failStop,
-	read: testGameRead,
-	runFx: ((_effect) => explicitSaveFx) as Game["runFx"],
-	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
-	subscribe: () => () => undefined,
-	subscribeEvents: () => () => undefined,
-});
+const createGame = (
+	explicitSaveFx: Effect.Effect<void, unknown> = Effect.void,
+): PackageGameEngine =>
+	({
+		resourceMetadata: {
+			type: "package",
+			packageId: "package:menu",
+		},
+		reportCriticalFailure,
+		saveFx: explicitSaveFx,
+	}) as unknown as PackageGameEngine;
 
 const runCommand = <Value, Error, Input>(
 	registry: AtomRegistry.AtomRegistry,
@@ -218,7 +198,7 @@ describe("game menu command atoms", () => {
 		if (Exit.isFailure(exit)) throw new Error("Expected a settled Game Menu result.");
 		expect(exit.value.command).toBe("save");
 		expect(exit.value.exit).toEqual(Exit.fail(failure));
-		expect(failStop).not.toHaveBeenCalled();
+		expect(reportCriticalFailure).not.toHaveBeenCalled();
 	});
 
 	it("propagates pure save interruption without fail-stopping the Game", async () => {
@@ -233,7 +213,7 @@ describe("game menu command atoms", () => {
 		expect(Exit.isFailure(exit)).toBe(true);
 		if (Exit.isSuccess(exit)) throw new Error("Expected save interruption.");
 		expect(Cause.hasInterruptsOnly(exit.cause)).toBe(true);
-		expect(failStop).not.toHaveBeenCalled();
+		expect(reportCriticalFailure).not.toHaveBeenCalled();
 	});
 
 	it("propagates a save defect instead of flattening it into a Game Menu error", async () => {
@@ -251,8 +231,8 @@ describe("game menu command atoms", () => {
 		const found = Cause.findDefect(exit.cause);
 		expect(Result.isSuccess(found)).toBe(true);
 		if (Result.isSuccess(found)) expect(found.success).toBe(defect);
-		expect(failStop).toHaveBeenCalledOnce();
-		expect(failStop).toHaveBeenCalledWith("ui", exit.cause);
+		expect(reportCriticalFailure).toHaveBeenCalledOnce();
+		expect(reportCriticalFailure).toHaveBeenCalledWith("game-runtime", exit.cause);
 	});
 
 	it("propagates a mixed save Cause instead of projecting its typed failure", async () => {
@@ -271,7 +251,7 @@ describe("game menu command atoms", () => {
 		);
 
 		expect(exit).toEqual(Exit.failCause(mixedCause));
-		expect(failStop).toHaveBeenCalledOnce();
-		expect(failStop).toHaveBeenCalledWith("ui", mixedCause);
+		expect(reportCriticalFailure).toHaveBeenCalledOnce();
+		expect(reportCriticalFailure).toHaveBeenCalledWith("game-runtime", mixedCause);
 	});
 });

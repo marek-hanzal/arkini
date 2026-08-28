@@ -8,19 +8,17 @@ import { StrictMode, act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { Game } from "~/bridge/game/Game";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import { GameRuntimeAtom } from "~/bridge/runtime/GameRuntimeAtom";
 import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { startFx } from "~/engine/start/write/startFx";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
-import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 import {
 	type TestGameTransitionFields,
 	makeTestGameTransitionFieldsFx,
 } from "~test/support/game/makeTestGameTransitionFieldsFx";
-import { testGameRead } from "~test/support/game/testGameRead";
 
 (
 	globalThis as {
@@ -29,7 +27,7 @@ import { testGameRead } from "~test/support/game/testGameRead";
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 interface TestGame {
-	readonly game: Game;
+	readonly game: GameEngine;
 	readonly transitions: TestGameTransitionFields;
 }
 
@@ -38,31 +36,12 @@ const makeTestGameFx = Effect.fn("makeRuntimeSelectorTestGameFx")(
 		Effect.gen(function* () {
 			const transitions = yield* makeTestGameTransitionFieldsFx(runtime);
 			const game = {
-				arkpack: {
-					packageId,
-					contentHash: `content:${packageId}`,
-					title: testArkpackConfig.meta.title,
-					version: "1.0",
-					arkini: ArkiniAppVersion,
-					provenance: {
-						type: "community",
-					} as const,
-					source: "user" as const,
-				},
-				config: testArkpackConfig,
-				saveKey: {
+				resourceMetadata: {
+					type: "package",
 					packageId,
 				},
-				...transitions,
-				getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
-				subscribe: () => () => undefined,
-				subscribeEvents: () => () => undefined,
-				read: testGameRead,
-				run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
-				disposeFx: Effect.void,
-				disposeWithoutSaveFx: Effect.void,
-				flushSaveFx: Effect.void,
-			} satisfies Game;
+				committedTransitionAtom: transitions.committedTransitionAtom,
+			} as unknown as GameEngine;
 
 			return {
 				game,
@@ -221,7 +200,7 @@ describe("useRuntimeSelector", () => {
 		const gameB = Effect.runSync(makeTestGameFx("game:b", runtimeB));
 		const registry = makeRegistry();
 		const values: number[] = [];
-		const Probe = ({ game }: { readonly game: Game }) => {
+		const Probe = ({ game }: { readonly game: GameEngine }) => {
 			const currentSpace = useRuntimeSelector(game, selectCurrentSpace);
 			values.push(currentSpace);
 			return createElement("output", null, currentSpace);

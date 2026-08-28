@@ -1,9 +1,9 @@
 import { Effect, Equal, Hash } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { PlayableGame } from "~/bridge/game/PlayableGame";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 
-interface ExactGameIdentity<GameType extends PlayableGame> extends Equal.Equal {
+interface ExactGameIdentity<GameType extends GameEngine> extends Equal.Equal {
 	readonly game: GameType;
 }
 
@@ -12,7 +12,7 @@ interface ExactGameIdentity<GameType extends PlayableGame> extends Equal.Equal {
  * The explicit identity key prevents Effect Hash from traversing the Game facade.
  */
 export const makeExactGameAtomFamilyFx = Effect.fn("makeExactGameAtomFamilyFx")(
-	<GameType extends PlayableGame, Result extends object>(make: (game: GameType) => Result) =>
+	<GameType extends GameEngine, Result extends object>(make: (game: GameType) => Result) =>
 		Effect.sync(() => {
 			const identities = new WeakMap<GameType, ExactGameIdentity<GameType>>();
 			const family = Atom.family((identity: ExactGameIdentity<GameType>) =>

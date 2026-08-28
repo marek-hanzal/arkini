@@ -7,7 +7,7 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { Game } from "~/bridge/game/Game";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { GameSession } from "~/bridge/game/GameSession";
 import type { CheatItemSpawnControl } from "~/ui/cheat-spotlight/CheatItemSpawnContext";
 import { CheatItemSpawnProvider } from "~/ui/cheat-spotlight/CheatItemSpawnProvider";
@@ -48,26 +48,14 @@ const makeGame = (
 	session: GameSession,
 	commandFx: Effect.Effect<unknown, unknown>,
 	suffix: string,
-): Game => ({
-	...session,
-	arkpack: {
-		packageId: `package:spawn-${suffix}`,
-		contentHash: `content:spawn-${suffix}`,
-		title: `Spawn ${suffix}`,
-		version: "1.0",
-		arkini: "1.0",
-		provenance: {
-			type: "community",
-		} as const,
-		source: "user",
-	},
-	config: createJobTestConfig(),
-	saveKey: {
-		packageId: `package:spawn-${suffix}`,
-	},
-	getResourceUrl: () => "blob:test",
-	runFx: ((_effect) => session.runFx(commandFx)) as Game["runFx"],
-});
+): GameEngine =>
+	({
+		resourceMetadata: {
+			type: "package",
+			packageId: `package:spawn-${suffix}`,
+		},
+		runEngineFx: ((_effect) => session.runFx(commandFx)) as GameEngine["runEngineFx"],
+	}) as unknown as GameEngine;
 
 const makePendingCommand = () => {
 	const entered = Effect.runSync(Deferred.make<void>());
@@ -95,7 +83,7 @@ const renderProvider = ({
 	registry,
 	root,
 }: {
-	readonly game: Game;
+	readonly game: GameEngine;
 	readonly observe: (control: CheatItemSpawnControl) => void;
 	readonly registry: AtomRegistry.AtomRegistry;
 	readonly root: ReturnType<typeof createRoot>;

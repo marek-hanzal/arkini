@@ -70,7 +70,13 @@ export const acquireGameEngineResourceFx = Effect.fn("acquireGameEngineResourceF
 									yield* rememberPackageFx(packageId).pipe(
 										Effect.catch(() => Effect.void),
 									);
-									return yield* createGameEngineResourceFx(game);
+									return yield* createGameEngineResourceFx({
+										session: game,
+										resourceMetadata: {
+											type: "package",
+											packageId: game.arkpack.packageId,
+										},
+									});
 								}),
 							),
 						);

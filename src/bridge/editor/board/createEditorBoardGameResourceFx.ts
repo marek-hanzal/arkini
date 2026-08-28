@@ -4,6 +4,7 @@ import type { EditorProject } from "~/bridge/editor/EditorProject";
 import type { EditorBoardGame } from "~/bridge/editor/board/EditorBoardGame";
 import { type EditorBoardGameResource } from "~/bridge/editor/board/EditorBoardGameResource";
 import { createEditorBoardGameFx } from "~/bridge/editor/board/createEditorBoardGameFx";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
@@ -17,16 +18,19 @@ export namespace createEditorBoardGameResourceFx {
 	}
 }
 
-const ownsRevision = (resource: GameEngineResource<EditorBoardGame>, project: EditorProject) =>
-	resource.game.projectId === project.projectId &&
-	resource.game.projectRevision === project.revision;
+const ownsRevision = (
+	resource: GameEngineResource<EditorBoardGame, GameEngine.EditorMetadata>,
+	project: EditorProject,
+) =>
+	resource.session.projectId === project.projectId &&
+	resource.session.projectRevision === project.revision;
 
 const ownsNewerRevision = (state: EditorBoardGameResource.State, project: EditorProject) => {
 	if (state.type === "idle") return false;
 	if (state.type === "ready") {
 		return (
-			state.resource.game.projectId === project.projectId &&
-			state.resource.game.projectRevision > project.revision
+			state.resource.session.projectId === project.projectId &&
+			state.resource.session.projectRevision > project.revision
 		);
 	}
 	return state.projectId === project.projectId && state.projectRevision > project.revision;
@@ -58,7 +62,18 @@ export const createEditorBoardGameResourceFx = Effect.fn("createEditorBoardGameR
 							: {
 									state,
 								}),
-					}).pipe(Effect.flatMap((game) => createGameEngineResourceFx(game))));
+					}).pipe(
+						Effect.flatMap((game) =>
+							createGameEngineResourceFx({
+								session: game,
+								resourceMetadata: {
+									type: "editor",
+									projectId: game.projectId,
+									projectRevision: game.projectRevision,
+								},
+							}),
+						),
+					));
 			const publishFailureFx = (project: EditorProject, cause: Cause.Cause<unknown>) =>
 				SubscriptionRef.set(state, {
 					type: "failed",
@@ -83,7 +98,7 @@ export const createEditorBoardGameResourceFx = Effect.fn("createEditorBoardGameR
 						projectRevision: project.revision,
 					});
 					if (current !== undefined) {
-						const release = yield* Effect.exit(current.game.disposeWithoutSaveFx);
+						const release = yield* Effect.exit(current.session.disposeWithoutSaveFx);
 						if (Exit.isFailure(release)) {
 							yield* publishFailureFx(project, release.cause);
 							return;
@@ -144,7 +159,9 @@ export const createEditorBoardGameResourceFx = Effect.fn("createEditorBoardGameR
 							projectRevision: project.revision,
 						});
 						if (current !== undefined) {
-							const release = yield* Effect.exit(current.game.disposeWithoutSaveFx);
+							const release = yield* Effect.exit(
+								current.session.disposeWithoutSaveFx,
+							);
 							if (Exit.isFailure(release)) {
 								yield* publishFailureFx(project, release.cause);
 								return yield* Effect.failCause(release.cause);
@@ -170,12 +187,12 @@ export const createEditorBoardGameResourceFx = Effect.fn("createEditorBoardGameR
 						routedProjectId = undefined;
 						if (current !== undefined) {
 							const owned = current;
-							const release = yield* Effect.exit(owned.game.disposeWithoutSaveFx);
+							const release = yield* Effect.exit(owned.session.disposeWithoutSaveFx);
 							if (Exit.isFailure(release)) {
 								yield* SubscriptionRef.set(state, {
 									type: "failed",
-									projectId: owned.game.projectId,
-									projectRevision: owned.game.projectRevision,
+									projectId: owned.session.projectId,
+									projectRevision: owned.session.projectRevision,
 									error: Cause.squash(release.cause),
 								});
 								return yield* Effect.failCause(release.cause);

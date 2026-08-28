@@ -22,7 +22,7 @@ export const runTileDropAtom = RendererRuntime.runSync(
 	makeExactGameAtomFamilyFx((game) =>
 		Atom.fn(
 			(command: runTileDropAtom.Command) =>
-				Effect.yieldNow.pipe(Effect.andThen(game.runFx(dropItemFx(command)))),
+				Effect.yieldNow.pipe(Effect.andThen(game.runEngineFx(dropItemFx(command)))),
 			{
 				concurrent: true,
 			},

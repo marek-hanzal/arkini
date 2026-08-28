@@ -6,7 +6,7 @@ import { createRoot } from "react-dom/client";
 import { vi } from "vitest";
 
 import { CheatAvailabilityAtom } from "~/bridge/cheat/CheatAvailabilityAtom";
-import type { Game } from "~/bridge/game/Game";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import { CheatItemSpotlight } from "~/ui/cheat-spotlight/CheatItemSpotlight";
 import { CheatItemSpawnProvider } from "~/ui/cheat-spotlight/CheatItemSpawnProvider";
 
@@ -73,9 +73,9 @@ const roots: Array<ReturnType<typeof createRoot>> = [];
 const registries: AtomRegistry.AtomRegistry[] = [];
 let registry: AtomRegistry.AtomRegistry;
 
-export const createGame = (): Game =>
+export const createGame = (): GameEngine =>
 	({
-		runFx: ((effect: Effect.Effect<unknown, unknown>) => {
+		runEngineFx: ((effect: Effect.Effect<unknown, unknown>) => {
 			state.run(effect);
 			if (state.mode === "success") return effect;
 			return Effect.callback<void>((resume) => {
@@ -86,8 +86,8 @@ export const createGame = (): Game =>
 				};
 				return Effect.sync(state.interrupted);
 			}).pipe(Effect.andThen(effect));
-		}) as Game["runFx"],
-	}) as Game;
+		}) as GameEngine["runEngineFx"],
+	}) as GameEngine;
 
 export const beforeEachSpotlightTest = () => {
 	registry = AtomRegistry.make({
@@ -116,7 +116,7 @@ export const setCheatAvailability = (available: boolean) => {
 
 export interface RenderSpotlightProps {
 	readonly alwaysAvailable?: boolean;
-	readonly game?: Game;
+	readonly game?: GameEngine;
 	readonly onBeforeOpen?: () => void;
 }
 

@@ -2,7 +2,7 @@ import { Cause, Effect, Exit } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { spawnCheatItemAtom } from "~/bridge/cheat/spawnCheatItemAtom";
-import type { PlayableGame } from "~/bridge/game/PlayableGame";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import { makeExactGameAtomFamilyFx } from "~/bridge/game/makeExactGameAtomFamilyFx";
 import { settleRendererCommandFailureFx } from "~/bridge/game/settleRendererCommandFailureFx";
 
@@ -51,7 +51,7 @@ type AdmittedSpawnCommand = SpawnCommand & {
  * interrupts every surviving command.
  */
 export const CheatItemSpawnCommandAtom = Effect.runSync(
-	makeExactGameAtomFamilyFx((game: PlayableGame) => {
+	makeExactGameAtomFamilyFx((game: GameEngine) => {
 		let latestCommandGeneration = 0;
 		const stateAtom = Atom.make<CheatItemSpawnCommandAtom.State>({
 			kind: "idle",

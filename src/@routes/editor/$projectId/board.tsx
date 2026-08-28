@@ -2,10 +2,9 @@ import { useAtomValue } from "@effect/atom-react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useSyncExternalStore } from "react";
 
-import type { EditorBoardGame } from "~/bridge/editor/board/EditorBoardGame";
 import { EditorBoardGameAtom } from "~/bridge/editor/board/EditorBoardGameAtom";
+import type { EditorBoardGameResource } from "~/bridge/editor/board/EditorBoardGameResource";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import { GameEngineProvider } from "~/bridge/game/GameEngineProvider";
 import { PlayableGameRoute } from "~/ui/game/PlayableGameRoute";
 import { EditorBoardItemDetailLink } from "~/ui/board/editor/EditorBoardItemDetailLink";
@@ -13,7 +12,7 @@ import { EditorBoardProductionLineLink } from "~/ui/board/editor/EditorBoardProd
 import { EditorBoardScenarioToolbar } from "~/ui/board/editor/EditorBoardScenarioToolbar";
 import { PlayableGameShell } from "~/ui/shell/GameShell";
 
-type EditorGameResource = GameEngineResource<EditorBoardGame>;
+type EditorGameResource = EditorBoardGameResource.Resource;
 
 const EditorBoardStatus = ({
 	detail,
@@ -68,8 +67,8 @@ export const Route = createFileRoute("/editor/$projectId/board")({
 		const state = useAtomValue(EditorBoardGameAtom);
 		const ready =
 			state.type === "ready" &&
-			state.resource.game.projectId === project.projectId &&
-			state.resource.game.projectRevision === project.revision;
+			state.resource.game.resourceMetadata.projectId === project.projectId &&
+			state.resource.game.resourceMetadata.projectRevision === project.revision;
 		return (
 			<section className="grid size-full min-h-0 grid-rows-[auto_minmax(0,1fr)]">
 				<EditorBoardScenarioToolbar

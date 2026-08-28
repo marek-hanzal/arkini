@@ -329,9 +329,11 @@ export const mountController = ({
 		startFx: (actor, pointer) => Effect.sync(() => startCursorGrab(actor, pointer)),
 	} satisfies CursorGrabMotion;
 	const game = {
-		getSnapshot: () => ({
-			cheats: {
-				enabled: cheatsEnabled,
+		getTransitionSnapshot: () => ({
+			runtime: {
+				cheats: {
+					enabled: cheatsEnabled,
+				},
 			},
 		}),
 		reportCriticalFailure,

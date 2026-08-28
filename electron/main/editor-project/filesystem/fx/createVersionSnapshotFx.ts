@@ -12,7 +12,7 @@ import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersio
 import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
 import { hashVersionBytes } from "./VersionFingerprint";
 import { assertProjectDirectoryFx } from "./assertProjectDirectoryFx";
-import { createVersionSnapshotPlan } from "./createVersionSnapshotPlan";
+import { planVersionSnapshotFx } from "./planVersionSnapshotFx";
 
 const encoder = new TextEncoder();
 
@@ -45,29 +45,37 @@ export const createVersionSnapshotFx = Effect.fn(
 }: createVersionSnapshotFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const lock = `${paths.root}/editor.lock`;
-	const plan = yield* Effect.try({
+	const snapshotScenarios = yield* Effect.try({
 		try: () =>
-			createVersionSnapshotPlan({
-				arkpack,
-				config,
-				resources,
-				scenarios: scenarios.map((scenario) => {
-					const parsed = EditorBoardScenarioSchema.parse(scenario);
-					return EditorBoardScenarioFileSchema.parse({
-						name: parsed.name,
-						revision: parsed.projectRevision,
-						version: parsed.version,
-						save: Buffer.from(parsed.bytes).toString("base64"),
-						createdAtMs: parsed.createdAtMs,
-						updatedAtMs: parsed.updatedAtMs,
-					});
-				}),
+			scenarios.map((scenario) => {
+				const parsed = EditorBoardScenarioSchema.parse(scenario);
+				return EditorBoardScenarioFileSchema.parse({
+					name: parsed.name,
+					revision: parsed.projectRevision,
+					version: parsed.version,
+					save: Buffer.from(parsed.bytes).toString("base64"),
+					createdAtMs: parsed.createdAtMs,
+					updatedAtMs: parsed.updatedAtMs,
+				});
 			}),
 		catch: (cause) =>
 			new Error("The Editor version snapshot is invalid.", {
 				cause,
 			}),
 	});
+	const plan = yield* planVersionSnapshotFx({
+		arkpack,
+		config,
+		resources,
+		scenarios: snapshotScenarios,
+	}).pipe(
+		Effect.mapError(
+			(cause) =>
+				new Error("The Editor version snapshot is invalid.", {
+					cause,
+				}),
+		),
+	);
 	yield* fileSystem.makeDirectory(paths.objects, {
 		recursive: true,
 	});

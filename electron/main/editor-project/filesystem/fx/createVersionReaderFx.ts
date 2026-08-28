@@ -7,7 +7,7 @@ import type { EditorProjectRepositoryError } from "~/editor/EditorProjectReposit
 import type { EditorProjectVersionReference } from "~/editor/version/EditorProjectVersion";
 import { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
 import { hashVersionBytes } from "./VersionFingerprint";
-import { createVersionSnapshotPlan } from "./createVersionSnapshotPlan";
+import { planVersionSnapshotFx } from "./planVersionSnapshotFx";
 import { readVersionSnapshotFx } from "./readVersionSnapshotFx";
 
 export namespace createVersionReaderFx {
@@ -75,19 +75,19 @@ export const createVersionReaderFx = Effect.fn(
 					updatedAtMs: scenario.updatedAtMs,
 				}),
 			);
-			const snapshot = yield* Effect.try({
-				try: () =>
-					createVersionSnapshotPlan({
-						arkpack: state.project.version,
-						config: state.project.config,
-						resources: state.project.resources,
-						scenarios,
-					}),
-				catch: (cause) =>
-					new Error("The current Editor version snapshot is invalid.", {
-						cause,
-					}),
-			});
+			const snapshot = yield* planVersionSnapshotFx({
+				arkpack: state.project.version,
+				config: state.project.config,
+				resources: state.project.resources,
+				scenarios,
+			}).pipe(
+				Effect.mapError(
+					(cause) =>
+						new Error("The current Editor version snapshot is invalid.", {
+							cause,
+						}),
+				),
+			);
 			return {
 				state,
 				manifest: snapshot.manifest,

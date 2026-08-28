@@ -23,6 +23,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 	const original = await importOriginal<typeof import("@tanstack/react-router")>();
 	return {
 		...original,
+		Outlet: () => state.section,
 		useNavigate: () => vi.fn().mockResolvedValue(undefined),
 	};
 });
@@ -45,6 +46,7 @@ vi.mock("~/ui/button/Button", () => ({
 
 const state = vi.hoisted(() => ({
 	project: undefined as unknown,
+	section: undefined as ReactNode,
 }));
 
 interface TestStartGridCell {
@@ -107,8 +109,8 @@ vi.mock("~/ui/project/editor/EditorProjectStartGrid", () => ({
 }));
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
+import { Route as EditorProjectFormRouteDefinition } from "~/@routes/editor/$projectId/project";
 import { EditorProjectBoardSection } from "~/ui/project/editor/EditorProjectBoardSection";
-import { EditorProjectForm } from "~/ui/project/editor/EditorProjectForm";
 import { EditorProjectGeneralSection } from "~/ui/project/editor/EditorProjectGeneralSection";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import { boardSpaceProject } from "~test/ui/editor/EditorProjectSectionSession.test/BoardSpaceProject";
@@ -120,6 +122,9 @@ import { boardSpaceProject } from "~test/ui/editor/EditorProjectSectionSession.t
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
+const EditorProjectForm = EditorProjectFormRouteDefinition.options.component;
+if (EditorProjectForm === undefined)
+	throw new Error("Editor project form route component is missing.");
 
 afterEach(async () => {
 	await act(async () => {
@@ -158,8 +163,9 @@ describe("project section form session", () => {
 		const root = createRoot(container);
 		roots.push(root);
 		const renderSection = async (section: ReactNode) => {
+			state.section = section;
 			await act(async () => {
-				root.render(<EditorProjectForm>{section}</EditorProjectForm>);
+				root.render(createElement(EditorProjectForm));
 			});
 		};
 
@@ -192,12 +198,9 @@ describe("project section form session", () => {
 		const root = createRoot(container);
 		roots.push(root);
 
+		state.section = <EditorProjectBoardSection />;
 		await act(async () => {
-			root.render(
-				<EditorProjectForm>
-					<EditorProjectBoardSection />
-				</EditorProjectForm>,
-			);
+			root.render(createElement(EditorProjectForm));
 		});
 
 		const spaceInput = container.querySelector<HTMLInputElement>(
@@ -234,20 +237,10 @@ describe("project section form session", () => {
 		await act(async () => switchButton.click());
 		expect(readGridCells()).toBe("water:3:1:1");
 
-		await act(async () => {
-			root.render(
-				<EditorProjectForm>
-					<EditorProjectGeneralSection />
-				</EditorProjectForm>,
-			);
-		});
-		await act(async () => {
-			root.render(
-				<EditorProjectForm>
-					<EditorProjectBoardSection />
-				</EditorProjectForm>,
-			);
-		});
+		state.section = <EditorProjectGeneralSection />;
+		await act(async () => root.render(createElement(EditorProjectForm)));
+		state.section = <EditorProjectBoardSection />;
+		await act(async () => root.render(createElement(EditorProjectForm)));
 		expect(
 			container.querySelector<HTMLInputElement>('input[type="number"][min="0"]')?.value,
 		).toBe("0");

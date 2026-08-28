@@ -1,21 +1,19 @@
 import { createFileRoute, useSearch } from "@tanstack/react-router";
 
-import { EditorAssetDeletePage } from "~/page/editor/EditorAssetDeletePage";
+import { EditorAssetDeleteSection } from "~/ui/resource/editor/EditorAssetDeleteSection";
 
 export const Route = createFileRoute("/editor/$projectId/assets/$resourceId/detail/delete")({
-	component: EditorAssetDeleteRoute,
+	component: () => {
+		const { resourceId } = Route.useParams();
+		const search = useSearch({
+			from: "/editor/$projectId/assets",
+		});
+		return (
+			<EditorAssetDeleteSection
+				filter={search.filter ?? "all"}
+				query={search.query ?? ""}
+				resourceId={resourceId}
+			/>
+		);
+	},
 });
-
-function EditorAssetDeleteRoute() {
-	const { resourceId } = Route.useParams();
-	const search = useSearch({
-		from: "/editor/$projectId/assets",
-	});
-	return (
-		<EditorAssetDeletePage
-			filter={search.filter ?? "all"}
-			query={search.query ?? ""}
-			resourceId={resourceId}
-		/>
-	);
-}

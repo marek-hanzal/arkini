@@ -1,17 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
 import { closeGameEngineResourceFx } from "~/bridge/game/closeGameEngineResourceFx";
-import { ActionPendingPage } from "~/page/action/ActionPendingPage";
-import { runActionRouteFx } from "~/page/action/runActionRouteFx";
-
-const label = "Saving and exiting Arkini…";
-
-const GameExitCompletedPage = () => (
-	<ActionPendingPage
-		completed
-		label={label}
-	/>
-);
+import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
 
 /**
  * Terminal renderer side of the native controlled-close handshake. This route
@@ -34,6 +25,11 @@ export const Route = createFileRoute("/game/$packageId/action/exit")({
 	},
 	pendingMs: 0,
 	pendingMinMs: 2_500,
-	pendingComponent: () => <ActionPendingPage label={label} />,
-	component: GameExitCompletedPage,
+	pendingComponent: () => <ActionLoadingScreen label="Saving and exiting Arkini…" />,
+	component: () => (
+		<ActionLoadingScreen
+			completed
+			label="Saving and exiting Arkini…"
+		/>
+	),
 });

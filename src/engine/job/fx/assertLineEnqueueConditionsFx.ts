@@ -4,7 +4,7 @@ import { resolveActionChargeFx } from "~/engine/action/fx/resolveActionChargeFx"
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ChargeSourceSchema } from "~/engine/input/schema/ChargeSourceSchema";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
-import { assertLineOutputMaxCountFx } from "~/engine/job/fx/assertLineOutputMaxCountFx";
+import { assertOutputCapacityFx } from "~/engine/job/fx/assertOutputCapacityFx";
 import type { LineStartResolutionSchema } from "~/engine/job/schema/read/LineStartResolutionSchema";
 import { readBoardItemLineFx } from "~/engine/line/fx/readBoardItemLineFx";
 import { LineRunUnavailableError } from "~/engine/line/error/LineRunUnavailableError";
@@ -83,7 +83,7 @@ export const assertLineEnqueueConditionsFx = Effect.fn("assertLineEnqueueConditi
 		);
 	}
 
-	yield* assertLineOutputMaxCountFx({
+	yield* assertOutputCapacityFx({
 		candidateId,
 		ownerItemId: resolution.ownerItemId,
 		lineId: resolution.lineId,

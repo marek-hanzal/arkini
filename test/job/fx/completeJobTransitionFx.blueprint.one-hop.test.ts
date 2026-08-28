@@ -1,7 +1,7 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { resolveOneHopLineOutputMaxCountFx } from "~/engine/job/fx/read/resolveOneHopLineOutputMaxCountFx";
+import { resolveOneHopOutputCapacityFx } from "~/engine/job/fx/read/resolveOneHopOutputCapacityFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
@@ -128,23 +128,23 @@ describe("blueprint one-hop capacity", () => {
 					quantity: 1,
 				});
 				const runtime = yield* readRuntimeFx();
-				const ordinary = yield* resolveOneHopLineOutputMaxCountFx({
+				const ordinary = yield* resolveOneHopOutputCapacityFx({
 					line: sourceLine("line:producer:ordinary-material"),
 					runtime,
 				});
-				const safe = yield* resolveOneHopLineOutputMaxCountFx({
+				const safe = yield* resolveOneHopOutputCapacityFx({
 					line: sourceLine("line:producer:safe-blueprint"),
 					runtime,
 				});
-				const random = yield* resolveOneHopLineOutputMaxCountFx({
+				const random = yield* resolveOneHopOutputCapacityFx({
 					line: sourceLine("line:producer:random-blueprint"),
 					runtime,
 				});
-				const cycle = yield* resolveOneHopLineOutputMaxCountFx({
+				const cycle = yield* resolveOneHopOutputCapacityFx({
 					line: sourceLine("line:producer:two-hop-cycle"),
 					runtime,
 				});
-				const lifecycle = yield* resolveOneHopLineOutputMaxCountFx({
+				const lifecycle = yield* resolveOneHopOutputCapacityFx({
 					line: sourceLine("line:producer:lifecycle-blueprint"),
 					runtime,
 				});

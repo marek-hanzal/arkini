@@ -5,7 +5,7 @@ import type { ItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines"
 import { readItemDetailInputsFx } from "~/engine/item-detail/read/readItemDetailInputsFx";
 import { readItemDetailOutputFx } from "~/engine/item-detail/read/readItemDetailOutputFx";
 import { resolveActiveJobStatusFx } from "~/engine/job/fx/resolveActiveJobStatusFx";
-import { resolveLineStartOutputMaxCountFx } from "~/engine/job/fx/read/resolveLineStartOutputMaxCountFx";
+import { resolveStartOutputCapacityFx } from "~/engine/job/fx/read/resolveStartOutputCapacityFx";
 import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
@@ -105,7 +105,7 @@ export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(
 					runtime,
 				});
 	const outputBlock = resolution.enable
-		? yield* resolveLineStartOutputMaxCountFx({
+		? yield* resolveStartOutputCapacityFx({
 				lineId: line.id,
 				ownerItemId,
 				plan: resolution.plan,

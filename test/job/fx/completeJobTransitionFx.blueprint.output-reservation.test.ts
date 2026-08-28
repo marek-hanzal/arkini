@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
-import { readPlannedLineNetMaximumOutputQuantitiesFx } from "~/engine/job/fx/read/readPlannedLineNetMaximumOutputQuantitiesFx";
+import { readPlannedOutputReservationFx } from "~/engine/job/fx/read/readPlannedOutputReservationFx";
 import { readReservedJobOutputQuantitiesFx } from "~/engine/job/fx/read/readReservedJobOutputQuantitiesFx";
 import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
@@ -15,7 +15,7 @@ import {
 	spawnBlueprintFx,
 } from "~test/job/fx/completeJobTransitionFx.blueprint.test/fixture";
 
-describe("blueprint net output capacity", () => {
+describe("blueprint output reservation", () => {
 	it("does not let a consuming candidate cancel another active job reservation", () => {
 		const result = runBlueprint(
 			Effect.gen(function* () {
@@ -85,7 +85,7 @@ describe("blueprint net output capacity", () => {
 				}
 				const line = consumerDefinition.lines[0];
 				return {
-					candidate: yield* readPlannedLineNetMaximumOutputQuantitiesFx({
+					candidate: yield* readPlannedOutputReservationFx({
 						line,
 						plan: resolution.run.plan,
 						runtime,

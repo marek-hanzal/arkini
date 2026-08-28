@@ -2,11 +2,11 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { JobOutputMaxCountError } from "~/engine/job/error/JobOutputMaxCountError";
-import { resolveLineStartOutputMaxCountFx } from "~/engine/job/fx/read/resolveLineStartOutputMaxCountFx";
+import { resolveStartOutputCapacityFx } from "~/engine/job/fx/read/resolveStartOutputCapacityFx";
 import type { LineRunPlanSchema } from "~/engine/line/schema/run/LineRunPlanSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
-export namespace assertLineOutputMaxCountFx {
+export namespace assertOutputCapacityFx {
 	export interface Props {
 		readonly candidateId: IdSchema.Type;
 		readonly lineId: IdSchema.Type;
@@ -17,14 +17,14 @@ export namespace assertLineOutputMaxCountFx {
 }
 
 /** Revalidates direct and bounded downstream output limits before start or queue admission. */
-export const assertLineOutputMaxCountFx = Effect.fn("assertLineOutputMaxCountFx")(function* ({
+export const assertOutputCapacityFx = Effect.fn("assertOutputCapacityFx")(function* ({
 	candidateId,
 	lineId,
 	ownerItemId,
 	plan,
 	runtime,
-}: assertLineOutputMaxCountFx.Props) {
-	const block = yield* resolveLineStartOutputMaxCountFx({
+}: assertOutputCapacityFx.Props) {
+	const block = yield* resolveStartOutputCapacityFx({
 		ownerItemId,
 		lineId,
 		plan,

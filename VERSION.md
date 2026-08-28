@@ -68,6 +68,10 @@ The Editor installation catalog stores discovery roots, managed/external ownersh
 
 Preferences are individual strictly validated scalar JSON files and need no envelope. Diagnostics are library-owned JSONL. OAuth records use the protocol's fields; Arkini validates complete identities but adds no format marker. Public MCP and generated JSON schemas use stable explicit IDs so references are never anonymous or `any`.
 
+## Release commits
+
+`main` is Arkini's only long-lived branch and represents the current development snapshot. A release version tag identifies one concrete `main` commit. A bad release is fixed on `main` and followed by a new release; existing tags are not moved and user data is not downgraded.
+
 ## Arkpack trust
 
 Trust is soft release provenance, independent from schema, semantic validation, integrity admission, compatibility, package identity, location, and user overrides:

@@ -1,7 +1,7 @@
 import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
 import type { WindowMode } from "~/bridge/window/WindowMode";
 import { SettingsSegmentedChoice } from "~/ui/settings/SettingsSegmentedChoice";
-import { useSettingsModelContext } from "~/ui/settings/SettingsModelContext";
+import { useModelContext } from "~/ui/settings/ModelContext";
 
 const ThemeOptions: ReadonlyArray<{
 	readonly value: AppearanceTheme;
@@ -39,8 +39,8 @@ const WindowModeOptions: ReadonlyArray<{
 	},
 ];
 
-export const SettingsCommon = () => {
-	const model = useSettingsModelContext();
+export const CommonSection = () => {
+	const model = useModelContext();
 	return (
 		<section
 			className="grid gap-5"

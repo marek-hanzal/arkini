@@ -3,9 +3,9 @@ import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
-import type { CliInstallation } from "../../electron/main/cli/CliInstallation";
-import type { CliCompletion } from "../../electron/main/cli/CliCompletion";
-import { registerCliInstallationIpcFx } from "../../electron/main/cli/registerCliInstallationIpcFx";
+import type { Installation } from "../../electron/main/cli/Installation";
+import type { Completion } from "../../electron/main/cli/Completion";
+import { registerCliIpcFx } from "../../electron/main/cli/registerCliIpcFx";
 import { ElectronMainError } from "../../electron/main/ElectronMainError";
 import type { TrustedRenderer } from "../../electron/main/security/TrustedRenderer";
 
@@ -40,7 +40,7 @@ afterEach(() => electron.reset());
 
 describe("CLI installation IPC", () => {
 	it("keeps every filesystem mutation behind the trusted renderer boundary", async () => {
-		const cliCompletion: CliCompletion = {
+		const cliCompletion: Completion = {
 			readStatusFx: Effect.succeed({
 				type: "not-installed",
 				completionPath: "/tmp/_arkini-cli",
@@ -62,7 +62,7 @@ describe("CLI installation IPC", () => {
 				shell: "zsh",
 			}),
 		};
-		const cliInstallation: CliInstallation = {
+		const cliInstallation: Installation = {
 			readStatusFx: Effect.succeed({
 				type: "not-installed",
 				commandPath: "/tmp/arkini-cli",
@@ -93,9 +93,9 @@ describe("CLI installation IPC", () => {
 			registerWindowFx: () => Effect.void,
 		};
 		Effect.runSync(
-			registerCliInstallationIpcFx({
-				cliCompletion,
-				cliInstallation,
+			registerCliIpcFx({
+				completion: cliCompletion,
+				installation: cliInstallation,
 				trustedRenderer,
 			}),
 		);

@@ -1,11 +1,11 @@
 import { useAtom } from "@effect/atom-react";
 import { useEffect } from "react";
 
-import type { CliInstallationStatus } from "~/bridge/cli/CliInstallation";
-import { SettingsCliCommandAtom } from "~/ui/settings/SettingsCliCommandAtom";
-import { useSettingsCliCompletionModel } from "~/ui/settings/useSettingsCliCompletionModel";
+import type { InstallationStatus } from "~/bridge/cli/Installation";
+import { CliCommandAtom } from "~/ui/settings/CliCommandAtom";
+import { useCliCompletionModel } from "~/ui/settings/useCliCompletionModel";
 
-const describeCliInstallation = (status: CliInstallationStatus | undefined) => {
+const describeInstallation = (status: InstallationStatus | undefined) => {
 	if (status === undefined) return "Checking whether arkini-cli can be installed…";
 	switch (status.type) {
 		case "installed":
@@ -20,8 +20,8 @@ const describeCliInstallation = (status: CliInstallationStatus | undefined) => {
 	}
 };
 
-export const useSettingsCliModel = () => {
-	const [state, runCommand] = useAtom(SettingsCliCommandAtom);
+export const useCliModel = () => {
+	const [state, runCommand] = useAtom(CliCommandAtom);
 	useEffect(() => {
 		runCommand("read");
 	}, [
@@ -30,21 +30,21 @@ export const useSettingsCliModel = () => {
 
 	const status = "status" in state ? state.status : undefined;
 	const pending = state.kind === "pending";
-	const completion = useSettingsCliCompletionModel({
+	const completion = useCliCompletionModel({
 		commandInstalled: status?.type === "installed",
 	});
 	return {
 		...completion,
-		cliStatus: state,
-		cliDescription: describeCliInstallation(status),
-		cliPending: pending,
-		cliDisabled:
+		installationStatus: state,
+		installationDescription: describeInstallation(status),
+		installationPending: pending,
+		installationDisabled:
 			state.kind === "uninitialized" ||
 			state.kind === "loading" ||
 			(state.kind === "error" && status === undefined) ||
 			(status?.type === "conflict" && !status.replaceable) ||
 			status?.type === "unavailable",
-		cliActionLabel:
+		installationActionLabel:
 			status?.type === "installed"
 				? "Uninstall"
 				: status?.type === "repairable"
@@ -52,7 +52,7 @@ export const useSettingsCliModel = () => {
 					: status?.type === "conflict"
 						? "Replace"
 						: "Install",
-		toggleCliInstallation: () =>
+		toggleInstallation: () =>
 			runCommand(
 				status?.type === "installed"
 					? "uninstall"
@@ -63,4 +63,4 @@ export const useSettingsCliModel = () => {
 	};
 };
 
-export type SettingsCliModel = ReturnType<typeof useSettingsCliModel>;
+export type CliModel = ReturnType<typeof useCliModel>;

@@ -1,8 +1,8 @@
 import type { AppearanceAccentSchema } from "./appearance/AppearanceAccentSchema";
 import type { AppearanceThemeSchema } from "./appearance/AppearanceThemeSchema";
 import type { CheatAvailabilitySchema } from "./cheat/CheatAvailabilitySchema";
-import type { CliInstallationStatus } from "./cli/CliInstallationStatus";
-import type { CliCompletionStatus } from "./cli/CliCompletionStatus";
+import type { InstallationStatus } from "./cli/InstallationStatus";
+import type { CompletionStatus } from "./cli/CompletionStatus";
 import type {
 	ChatGptAssetCandidateSchema,
 	ChatGptSurfaceSchema,
@@ -173,15 +173,15 @@ export namespace ArkiniElectronApi {
 			readonly writeText: (text: string) => Promise<void>;
 		};
 		readonly cli: {
-			readonly status: () => Promise<CliInstallationStatus>;
-			readonly install: () => Promise<CliInstallationStatus>;
-			readonly replace: () => Promise<CliInstallationStatus>;
-			readonly uninstall: () => Promise<CliInstallationStatus>;
+			readonly status: () => Promise<InstallationStatus>;
+			readonly install: () => Promise<InstallationStatus>;
+			readonly replace: () => Promise<InstallationStatus>;
+			readonly uninstall: () => Promise<InstallationStatus>;
 			readonly completion: {
-				readonly status: () => Promise<CliCompletionStatus>;
-				readonly install: () => Promise<CliCompletionStatus>;
-				readonly replace: () => Promise<CliCompletionStatus>;
-				readonly uninstall: () => Promise<CliCompletionStatus>;
+				readonly status: () => Promise<CompletionStatus>;
+				readonly install: () => Promise<CompletionStatus>;
+				readonly replace: () => Promise<CompletionStatus>;
+				readonly uninstall: () => Promise<CompletionStatus>;
 			};
 		};
 		readonly launcher: {

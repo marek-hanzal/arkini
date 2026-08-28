@@ -1,10 +1,10 @@
 import { useAtom } from "@effect/atom-react";
 import { useEffect } from "react";
 
-import type { CliCompletionStatus } from "~/bridge/cli/readCliCompletionStatusFx";
-import { SettingsCliCompletionCommandAtom } from "~/ui/settings/SettingsCliCompletionCommandAtom";
+import type { CompletionStatus } from "~/bridge/cli/readCompletionStatusFx";
+import { CompletionCommandAtom } from "~/ui/settings/CompletionCommandAtom";
 
-const shellLabel = (status: CliCompletionStatus) =>
+const shellLabel = (status: CompletionStatus) =>
 	status.type === "unavailable"
 		? "Shell"
 		: status.shell === "zsh"
@@ -13,7 +13,7 @@ const shellLabel = (status: CliCompletionStatus) =>
 				? "Bash"
 				: "Fish";
 
-const describeCompletion = (status: CliCompletionStatus | undefined) => {
+const describeCompletion = (status: CompletionStatus | undefined) => {
 	if (status === undefined) return "Checking shell completion support…";
 	if (status.type === "unavailable") return status.message;
 	if (status.type === "repairable" || status.type === "conflict") return status.message;
@@ -25,12 +25,12 @@ const describeCompletion = (status: CliCompletionStatus | undefined) => {
 		: location;
 };
 
-export const useSettingsCliCompletionModel = ({
+export const useCliCompletionModel = ({
 	commandInstalled,
 }: {
 	readonly commandInstalled: boolean;
 }) => {
-	const [state, runCommand] = useAtom(SettingsCliCompletionCommandAtom);
+	const [state, runCommand] = useAtom(CompletionCommandAtom);
 	useEffect(() => {
 		runCommand("read");
 	}, [
@@ -42,17 +42,17 @@ export const useSettingsCliCompletionModel = ({
 	const cleanupWithoutCommand =
 		!commandInstalled && (status?.type === "installed" || status?.type === "repairable");
 	return {
-		cliCompletionStatus: state,
-		cliCompletionDescription: describeCompletion(status),
-		cliCompletionPending: pending,
-		cliCompletionDisabled:
+		completionStatus: state,
+		completionDescription: describeCompletion(status),
+		completionPending: pending,
+		completionDisabled:
 			(!commandInstalled && !cleanupWithoutCommand) ||
 			state.kind === "uninitialized" ||
 			state.kind === "loading" ||
 			(state.kind === "error" && status === undefined) ||
 			(status?.type === "conflict" && !status.replaceable) ||
 			status?.type === "unavailable",
-		cliCompletionActionLabel: cleanupWithoutCommand
+		completionActionLabel: cleanupWithoutCommand
 			? "Uninstall"
 			: status?.type === "installed"
 				? "Uninstall"
@@ -61,7 +61,7 @@ export const useSettingsCliCompletionModel = ({
 					: status?.type === "conflict"
 						? "Replace"
 						: "Install",
-		toggleCliCompletion: () =>
+		toggleCompletion: () =>
 			runCommand(
 				cleanupWithoutCommand || status?.type === "installed"
 					? "uninstall"
@@ -72,4 +72,4 @@ export const useSettingsCliCompletionModel = ({
 	};
 };
 
-export type SettingsCliCompletionModel = ReturnType<typeof useSettingsCliCompletionModel>;
+export type CliCompletionModel = ReturnType<typeof useCliCompletionModel>;

@@ -4,7 +4,7 @@ import { scheduleTask } from "@effect/atom-react";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { SettingsCliCompletionCommandAtom } from "~/ui/settings/SettingsCliCompletionCommandAtom";
+import { CompletionCommandAtom } from "~/ui/settings/CompletionCommandAtom";
 
 let registry: AtomRegistry.AtomRegistry | undefined;
 
@@ -44,17 +44,17 @@ describe("Settings CLI completion command", () => {
 		registry = AtomRegistry.make({
 			scheduleTask,
 		});
-		registry.mount(SettingsCliCompletionCommandAtom);
-		registry.set(SettingsCliCompletionCommandAtom, "read");
+		registry.mount(CompletionCommandAtom);
+		registry.set(CompletionCommandAtom, "read");
 		await vi.waitFor(() =>
-			expect(registry?.get(SettingsCliCompletionCommandAtom)).toMatchObject({
+			expect(registry?.get(CompletionCommandAtom)).toMatchObject({
 				kind: "ready",
 				status: {
 					type: "not-installed",
 				},
 			}),
 		);
-		registry.set(SettingsCliCompletionCommandAtom, "install");
+		registry.set(CompletionCommandAtom, "install");
 		await vi.waitFor(() => expect(install).toHaveBeenCalledOnce());
 	});
 });

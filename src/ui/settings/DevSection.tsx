@@ -1,11 +1,11 @@
 import { SettingsOpenActionRow } from "~/ui/settings/SettingsOpenActionRow";
-import { useSettingsCliModel } from "~/ui/settings/useSettingsCliModel";
+import { useCliModel } from "~/ui/settings/useCliModel";
 import { useSettingsDirectoriesModel } from "~/ui/settings/useSettingsDirectoriesModel";
 
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
-export const SettingsDev = () => {
-	const cli = useSettingsCliModel();
+export const DevSection = () => {
+	const cli = useCliModel();
 	const directories = useSettingsDirectoriesModel();
 	return (
 		<section
@@ -15,20 +15,20 @@ export const SettingsDev = () => {
 			<SettingsOpenActionRow
 				dataUi="SettingsCli"
 				title="Command line"
-				description={cli.cliDescription}
-				pending={cli.cliPending}
-				disabled={cli.cliDisabled}
-				idleLabel={cli.cliActionLabel}
-				onClick={cli.toggleCliInstallation}
+				description={cli.installationDescription}
+				pending={cli.installationPending}
+				disabled={cli.installationDisabled}
+				idleLabel={cli.installationActionLabel}
+				onClick={cli.toggleInstallation}
 			/>
 			<SettingsOpenActionRow
 				dataUi="SettingsCliCompletion"
 				title="Shell completion"
-				description={cli.cliCompletionDescription}
-				pending={cli.cliCompletionPending}
-				disabled={cli.cliCompletionDisabled}
-				idleLabel={cli.cliCompletionActionLabel}
-				onClick={cli.toggleCliCompletion}
+				description={cli.completionDescription}
+				pending={cli.completionPending}
+				disabled={cli.completionDisabled}
+				idleLabel={cli.completionActionLabel}
+				onClick={cli.toggleCompletion}
 			/>
 			<SettingsOpenActionRow
 				dataUi="SettingsDiagnostics"
@@ -56,14 +56,14 @@ export const SettingsDev = () => {
 					Opening data folder failed: {errorMessage(directories.userDataStatus.error)}
 				</p>
 			) : null}
-			{cli.cliStatus.kind === "error" ? (
+			{cli.installationStatus.kind === "error" ? (
 				<p className="text-center text-sm text-danger">
-					CLI installation failed: {cli.cliStatus.message}
+					CLI installation failed: {cli.installationStatus.message}
 				</p>
 			) : null}
-			{cli.cliCompletionStatus.kind === "error" ? (
+			{cli.completionStatus.kind === "error" ? (
 				<p className="text-center text-sm text-danger">
-					Shell completion failed: {cli.cliCompletionStatus.message}
+					Shell completion failed: {cli.completionStatus.message}
 				</p>
 			) : null}
 		</section>

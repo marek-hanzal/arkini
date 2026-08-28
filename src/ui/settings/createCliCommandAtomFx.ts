@@ -3,9 +3,9 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 
-export type SettingsCliCapabilityCommand = "read" | "install" | "replace" | "uninstall";
+export type CliCommand = "read" | "install" | "replace" | "uninstall";
 
-export type SettingsCliCapabilityState<Status> =
+export type CliState<Status> =
 	| {
 			readonly kind: "uninitialized" | "loading";
 	  }
@@ -24,7 +24,7 @@ export type SettingsCliCapabilityState<Status> =
 			readonly status?: Status;
 	  };
 
-type SettingsCliCapabilityStatus =
+type CliStatus =
 	| {
 			readonly type: "installed" | "not-installed" | "repairable" | "unavailable";
 	  }
@@ -33,18 +33,15 @@ type SettingsCliCapabilityStatus =
 			readonly replaceable: boolean;
 	  };
 
-const admitsMutation = (
-	command: Exclude<SettingsCliCapabilityCommand, "read">,
-	status: SettingsCliCapabilityStatus,
-) =>
+const admitsMutation = (command: Exclude<CliCommand, "read">, status: CliStatus) =>
 	command === "install"
 		? status.type === "not-installed" || status.type === "repairable"
 		: command === "replace"
 			? status.type === "conflict" && status.replaceable
 			: status.type === "installed" || status.type === "repairable";
 
-export namespace createSettingsCliCapabilityCommandAtomFx {
-	export interface Props<Status extends SettingsCliCapabilityStatus> {
+export namespace createCliCommandAtomFx {
+	export interface Props<Status extends CliStatus> {
 		readonly readFx: () => Effect.Effect<Status, unknown>;
 		readonly installFx: () => Effect.Effect<Status, unknown>;
 		readonly replaceFx: () => Effect.Effect<Status, unknown>;
@@ -53,21 +50,19 @@ export namespace createSettingsCliCapabilityCommandAtomFx {
 }
 
 /** Builds one Settings-owned command authority for a CLI filesystem capability. */
-export const createSettingsCliCapabilityCommandAtomFx = Effect.fn(
-	"createSettingsCliCapabilityCommandAtomFx",
-)(
-	<Status extends SettingsCliCapabilityStatus>({
+export const createCliCommandAtomFx = Effect.fn("createCliCommandAtomFx")(
+	<Status extends CliStatus>({
 		readFx,
 		installFx,
 		replaceFx,
 		uninstallFx,
-	}: createSettingsCliCapabilityCommandAtomFx.Props<Status>) =>
+	}: createCliCommandAtomFx.Props<Status>) =>
 		Effect.sync(() => {
-			const stateAtom = Atom.make<SettingsCliCapabilityState<Status>>({
+			const stateAtom = Atom.make<CliState<Status>>({
 				kind: "uninitialized",
 			}).pipe(Atom.keepAlive);
 			const runnerAtom = Atom.fn(
-				(command: SettingsCliCapabilityCommand, get) =>
+				(command: CliCommand, get) =>
 					Effect.gen(function* () {
 						const priorState = get(stateAtom);
 						const result = yield* Effect.exit(
@@ -110,7 +105,7 @@ export const createSettingsCliCapabilityCommandAtomFx = Effect.fn(
 
 			return Atom.writable(
 				(get) => get(stateAtom),
-				(context, command: SettingsCliCapabilityCommand) => {
+				(context, command: CliCommand) => {
 					const state = context.get(stateAtom);
 					if (command === "read") {
 						if (state.kind !== "uninitialized" && state.kind !== "error") return;

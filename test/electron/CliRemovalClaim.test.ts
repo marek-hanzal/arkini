@@ -36,8 +36,8 @@ vi.mock("node:fs/promises", async (importOriginal) => {
 	};
 });
 
-import { createFilesystemCliCompletionFx } from "../../electron/main/cli/createFilesystemCliCompletionFx";
-import { createFilesystemCliInstallationFx } from "../../electron/main/cli/createFilesystemCliInstallationFx";
+import { createCompletionFx } from "../../electron/main/cli/createCompletionFx";
+import { createInstallationFx } from "../../electron/main/cli/createInstallationFx";
 
 const temporaryDirectories: string[] = [];
 
@@ -92,7 +92,7 @@ describe.skipIf(process.platform === "win32")("CLI removal claims", () => {
 		const launcherPath = await createLauncher(directory);
 		const commandPath = join(directory, "home", ".local", "bin", "arkini-cli");
 		const installation = Effect.runSync(
-			createFilesystemCliInstallationFx({
+			createInstallationFx({
 				commandPath,
 				launcherPath,
 			}),
@@ -112,7 +112,7 @@ describe.skipIf(process.platform === "win32")("CLI removal claims", () => {
 		const launcherPath = await createLauncher(directory);
 		const completionPath = join(directory, "home", ".zsh", "completions", "_arkini-cli");
 		const completion = Effect.runSync(
-			createFilesystemCliCompletionFx({
+			createCompletionFx({
 				completion: {
 					path: completionPath,
 					shell: "zsh",

@@ -1,7 +1,7 @@
-import { useSettingsModelContext } from "~/ui/settings/SettingsModelContext";
+import { useModelContext } from "~/ui/settings/ModelContext";
 
-export const SettingsGame = () => {
-	const model = useSettingsModelContext();
+export const GameSection = () => {
+	const model = useModelContext();
 	return (
 		<section data-ui="SettingsGame">
 			<label

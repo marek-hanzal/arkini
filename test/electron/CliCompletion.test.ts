@@ -4,7 +4,7 @@ import { dirname, join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { createFilesystemCliCompletionFx } from "../../electron/main/cli/createFilesystemCliCompletionFx";
+import { createCompletionFx } from "../../electron/main/cli/createCompletionFx";
 
 const temporaryDirectories: string[] = [];
 
@@ -30,7 +30,7 @@ const createFixture = async () => {
 	await writeFile(launcherPath, "#!/bin/sh\nprintf '# generated %s completion\\n' \"$2\"\n");
 	await chmod(launcherPath, 0o755);
 	const completion = Effect.runSync(
-		createFilesystemCliCompletionFx({
+		createCompletionFx({
 			completion: {
 				path: completionPath,
 				shell: "zsh",

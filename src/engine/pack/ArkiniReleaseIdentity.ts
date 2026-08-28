@@ -7,7 +7,7 @@ const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\
 
 export const ArkiniReleaseIdentityDefaults = {
 	issuer: "https://token.actions.githubusercontent.com",
-	identity: "https://github.com/marek-hanzal/arkini/.github/workflows/macos-prerelease.yml",
+	identity: "https://github.com/marek-hanzal/arkini/.github/workflows/release.yml",
 } as const;
 
 export const createArkiniReleaseIdentity = ({

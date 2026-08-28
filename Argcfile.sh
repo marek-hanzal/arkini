@@ -30,17 +30,17 @@ install_game_arkpack() {
 	target=game/arkini/build/arkini.arkpack
 	if [[ -z "${ARKINI_PREBUILT_ARKPACK:-}" ]]; then
 		node .out/desktop/build/main/cli/arkini.js game pack ./game/arkini
-		return
+	else
+		source=$(cd -- "$(dirname -- "$ARKINI_PREBUILT_ARKPACK")" && pwd)/$(basename -- "$ARKINI_PREBUILT_ARKPACK")
+		if [[ ! -f "$source" ]]; then
+			echo "Prebuilt Arkpack does not exist: $source" >&2
+			exit 1
+		fi
+		rm -rf game/arkini/build
+		mkdir -p game/arkini/build
+		cp "$source" "$target"
+		cmp "$source" "$target"
 	fi
-	source=$(cd -- "$(dirname -- "$ARKINI_PREBUILT_ARKPACK")" && pwd)/$(basename -- "$ARKINI_PREBUILT_ARKPACK")
-	if [[ ! -f "$source" ]]; then
-		echo "Prebuilt Arkpack does not exist: $source" >&2
-		exit 1
-	fi
-	rm -rf game/arkini/build
-	mkdir -p game/arkini/build
-	cp "$source" "$target"
-	cmp "$source" "$target"
 	verdict=${ARKINI_EXPECTED_PROVENANCE:-community}
 	node .out/desktop/build/main/cli/arkini.js arkpack verify "$target" |
 		grep -Fx "{\"type\":\"$verdict\"}"
@@ -214,7 +214,7 @@ version() {
 	cp -p package.json "$version_backup/package.json"
 	cp -p package-lock.json "$version_backup/package-lock.json"
 	cp -p game/arkini/project.json "$version_backup/project.json"
-	if ! npm version --no-git-tag-version "$argc_version"; then
+	if ! npm version --allow-same-version --no-git-tag-version "$argc_version"; then
 		cp -p "$version_backup/package.json" package.json
 		cp -p "$version_backup/package-lock.json" package-lock.json
 		cp -p "$version_backup/project.json" game/arkini/project.json
@@ -265,7 +265,7 @@ mcp-inspect() {
 		--transport http
 }
 
-# @cmd Build Electron and the bundled game project
+# @cmd Build Electron and verify the bundled game Arkpack
 build() {
 	build_desktop
 	install_game_arkpack

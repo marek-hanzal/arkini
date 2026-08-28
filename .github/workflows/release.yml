@@ -27,10 +27,13 @@ jobs:
         include:
           - name: repository gate (Linux)
             os: ubuntu-24.04
-          - name: repository gate (macOS)
+            command: check
+          - name: platform boundary gate (macOS)
             os: macos-15
-          - name: repository gate (Windows)
+            command: platform-check
+          - name: platform boundary gate (Windows)
             os: windows-2025
+            command: platform-check
     defaults:
       run:
         shell: bash
@@ -43,8 +46,8 @@ jobs:
         run: ./Argcfile.sh install
       - name: Use tag version for release checks
         run: ./Argcfile.sh version "${GITHUB_REF_NAME#v}"
-      - name: Run complete repository gate
-        run: ./Argcfile.sh check
+      - name: Run repository gate
+        run: ./Argcfile.sh "${{ matrix.command }}"
 
   prepare_arkpack:
     needs: prerelease_checks

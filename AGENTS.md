@@ -45,6 +45,8 @@ Tests are fast risk feedback, not a coverage project.
 - Keep scenarios readable. Around 250 lines is a review signal; move non-trivial fixtures beside `Foo.test.ts` under `Foo.test/`, without a global fixture DSL.
 - Search the owning suites first. Do not duplicate an existing proof; delete an older scenario when a new one subsumes it.
 - Run the narrowest useful focused suite while implementing. `argc check`, build, hosted/platform delivery, and packaging are deliberate closing gates, not substitutes for focused feedback.
+- Hosted branch and prerelease validation runs the complete `argc check` once on Linux. macOS and Windows run `argc platform-check`: the production build and Community Arkpack verification plus the real filesystem, Electron, pack, source, and schema-writer suites. Pure engine, domain, and UI behavior is not repeated per operating system.
+- A regression that depends on native filesystem semantics, paths, Electron-main integration, or portable artifact I/O belongs under an owner already selected by `platform-check`; extend that canonical command in the same change when a new platform boundary has a different owner. `platform-check` is hosted portability evidence, not a local substitute for focused tests or the complete closing gate.
 
 ## Independent review
 

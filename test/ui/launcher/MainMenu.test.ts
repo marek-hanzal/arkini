@@ -59,8 +59,8 @@ describe("MainMenu", () => {
 					title: "Other Game",
 					version: "1.0",
 					arkini: "1",
-					trust: {
-						type: "trusted",
+					provenance: {
+						type: "official",
 					} as const,
 					source: "bundled" as const,
 				},
@@ -70,8 +70,8 @@ describe("MainMenu", () => {
 					title: "Arkini",
 					version: "1.0",
 					arkini: "1",
-					trust: {
-						type: "trusted",
+					provenance: {
+						type: "official",
 					} as const,
 					source: "bundled" as const,
 				},
@@ -167,8 +167,8 @@ describe("MainMenu", () => {
 					arkpacks: [
 						{
 							...catalogState.arkpacks[1]!,
-							trust: {
-								type: "external",
+							provenance: {
+								type: "community",
 							},
 						},
 					],

@@ -5,8 +5,8 @@ import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { ElectronMainError } from "../ElectronMainError";
 import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
-import { verifyArkpackTrustFx } from "~/engine/pack/fx/verifyArkpackTrustFx";
-import type { ArkpackTrustSchema } from "~/engine/pack/schema/ArkpackTrustSchema";
+import { verifyArkpackProvenanceFx } from "~/engine/pack/fx/verifyArkpackProvenanceFx";
+import type { ArkpackProvenanceSchema } from "~/engine/pack/schema/ArkpackProvenanceSchema";
 
 export namespace readArkpackFileFx {
 	export interface Props {
@@ -14,21 +14,20 @@ export namespace readArkpackFileFx {
 		readonly fileSystem: FileSystem.FileSystem;
 		readonly packageId: string;
 		readonly source: ArkiniElectronApi.ArkpackFile["source"];
-		readonly verifyTrustFx?: (props: {
+		readonly verifyProvenanceFx?: (props: {
 			readonly bytes: Uint8Array;
-			readonly signature?: unknown;
-		}) => Effect.Effect<ArkpackTrustSchema.Type>;
+		}) => Effect.Effect<ArkpackProvenanceSchema.Type>;
 	}
 }
 
-/** Reads exact package bytes and offline-classifies its optional Sigstore bundle. */
+/** Reads one exact package and offline-classifies its embedded proof. */
 export const readArkpackFileFx = Effect.fn("readArkpackFileFx")(
 	({
 		root,
 		fileSystem,
 		packageId,
 		source,
-		verifyTrustFx = verifyArkpackTrustFx,
+		verifyProvenanceFx = verifyArkpackProvenanceFx,
 	}: readArkpackFileFx.Props) =>
 		Effect.gen(function* () {
 			if (packageId.length === 0) return null;
@@ -37,39 +36,18 @@ export const readArkpackFileFx = Effect.fn("readArkpackFileFx")(
 			const path = join(root, filename);
 			if (!(yield* fileSystem.exists(path))) return null;
 			const info = yield* fileSystem.stat(path);
-			if (info.size > ArkpackLimits.maxCompressedBytes) {
+			if (info.size > ArkpackLimits.maxArkpackBytes) {
 				return yield* Effect.fail(
-					new Error(
-						`Arkpack exceeds the ${ArkpackLimits.maxCompressedBytes} byte compressed limit.`,
-					),
+					new Error(`Arkpack exceeds the ${ArkpackLimits.maxArkpackBytes} byte limit.`),
 				);
 			}
 			const bytes = yield* fileSystem.readFile(path);
-			const signaturePath = join(root, `${stem}.arksig`);
-			const signature = yield* fileSystem.exists(signaturePath).pipe(
-				Effect.flatMap((exists) =>
-					exists
-						? fileSystem
-								.stat(signaturePath)
-								.pipe(
-									Effect.flatMap((info) =>
-										info.size <= ArkpackLimits.maxSignatureBytes
-											? fileSystem.readFileString(signaturePath)
-											: Effect.succeed(undefined),
-									),
-								)
-						: Effect.succeed(undefined),
-				),
-				Effect.map((value) => value?.trim()),
-				Effect.catch(() => Effect.succeed(undefined)),
-			);
 			const file: ArkiniElectronApi.ArkpackFile = {
 				packageId,
 				filename,
 				bytes: Uint8Array.from(bytes),
-				trust: yield* verifyTrustFx({
+				provenance: yield* verifyProvenanceFx({
 					bytes,
-					signature,
 				}),
 				source,
 				overridesBundled: false,

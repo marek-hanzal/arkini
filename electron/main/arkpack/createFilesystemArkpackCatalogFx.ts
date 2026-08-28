@@ -7,7 +7,7 @@ import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFile
 import type { ArkpackCatalog } from "./ArkpackCatalog";
 import { listArkpackFilesFx } from "./listArkpackFilesFx";
 import { readArkpackFileFx } from "./readArkpackFileFx";
-import { withRecoveredArkpackArtifactPairFx } from "./recoverArkpackArtifactPairFx";
+import { withArkpackFileLockFx } from "./withArkpackFileLockFx";
 import { removeUserArkpackFx } from "./removeUserArkpackFx";
 import { writeUserArkpackFx } from "./writeUserArkpackFx";
 
@@ -18,7 +18,7 @@ export namespace createFilesystemArkpackCatalogFx {
 		readonly maxCatalogCandidates?: number;
 		readonly userRoot: string;
 		readonly fileSystem?: FileSystem.FileSystem;
-		readonly verifyTrustFx?: readArkpackFileFx.Props["verifyTrustFx"];
+		readonly verifyProvenanceFx?: readArkpackFileFx.Props["verifyProvenanceFx"];
 	}
 }
 
@@ -30,7 +30,7 @@ export const createFilesystemArkpackCatalogFx = Effect.fn("createFilesystemArkpa
 		maxCatalogCandidates = ArkpackLimits.maxCatalogCandidates,
 		userRoot,
 		fileSystem: providedFileSystem,
-		verifyTrustFx,
+		verifyProvenanceFx,
 	}: createFilesystemArkpackCatalogFx.Props) {
 		const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
 		const operations = yield* Semaphore.make(1);
@@ -44,7 +44,7 @@ export const createFilesystemArkpackCatalogFx = Effect.fn("createFilesystemArkpa
 					maxCandidates: rootCandidateLimit,
 					maxTotalBytes: rootBudget,
 					source: "bundled",
-					verifyTrustFx,
+					verifyProvenanceFx,
 				}),
 				user: listArkpackFilesFx({
 					root: userRoot,
@@ -52,7 +52,7 @@ export const createFilesystemArkpackCatalogFx = Effect.fn("createFilesystemArkpa
 					maxCandidates: rootCandidateLimit,
 					maxTotalBytes: rootBudget,
 					source: "user",
-					verifyTrustFx,
+					verifyProvenanceFx,
 				}),
 			},
 			{
@@ -102,11 +102,11 @@ export const createFilesystemArkpackCatalogFx = Effect.fn("createFilesystemArkpa
 					fileSystem,
 					packageId,
 					source,
-					verifyTrustFx,
+					verifyProvenanceFx,
 				});
 			const candidate =
 				source === "user"
-					? withRecoveredArkpackArtifactPairFx(
+					? withArkpackFileLockFx(
 							{
 								arkpackPath: join(
 									root,

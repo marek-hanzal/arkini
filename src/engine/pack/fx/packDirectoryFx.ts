@@ -11,6 +11,7 @@ import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWri
 import { assertGameConfigValidFx } from "~/engine/validation/fx/assertGameConfigValidFx";
 import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
 import { encodeFx } from "./encodeFx";
+import { encodeArkpackEnvelopeFx } from "./encodeArkpackEnvelopeFx";
 import { readArkpackContentHashFx } from "./readArkpackContentHashFx";
 import { readPngAssetFx } from "./readPngAssetFx";
 
@@ -63,7 +64,10 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 		resources: pngAssets,
 	});
 	const compressed = yield* Effect.promise(async () => new Uint8Array(await gzipAsync(bytes)));
-	const contentHash = yield* readArkpackContentHashFx(compressed);
+	const arkpack = yield* encodeArkpackEnvelopeFx({
+		payload: compressed,
+	});
+	const contentHash = yield* readArkpackContentHashFx(arkpack);
 
 	const root = yield* fileSystem.realPath(path.resolve(input));
 	const build = path.join(root, "build");
@@ -84,7 +88,7 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 		if (assertCurrentFx !== undefined) yield* assertCurrentFx;
 		yield* fileSystem.makeDirectory(pending);
 		const stagedArkpack = path.join(pending, filename);
-		yield* writeSyncedFileFx(stagedArkpack, compressed);
+		yield* writeSyncedFileFx(stagedArkpack, arkpack);
 
 		yield* Effect.uninterruptible(
 			Effect.gen(function* () {
@@ -125,8 +129,8 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 		version: identity.version,
 		json: compilation.json,
 		png: pngAssets.length,
-		bytes: compressed.byteLength,
-		content: compressed,
+		bytes: arkpack.byteLength,
+		content: arkpack,
 		contentHash,
 		diagnostics: compilation.diagnostics,
 	} as const;

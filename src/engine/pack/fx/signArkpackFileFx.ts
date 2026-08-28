@@ -1,10 +1,12 @@
-import { FileSystem } from "effect";
+import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
+import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 import { ArkpackSigningError } from "~/engine/pack/error/ArkpackSigningError";
+import { decodeArkpackEnvelopeFx } from "./decodeArkpackEnvelopeFx";
+import { encodeArkpackEnvelopeFx } from "./encodeArkpackEnvelopeFx";
 import { signArkpackFx } from "./signArkpackFx";
-import { verifyArkpackTrustFx } from "./verifyArkpackTrustFx";
-import { writeArkpackSignatureFx } from "./writeArkpackSignatureFx";
+import { verifyArkpackProvenanceFx } from "./verifyArkpackProvenanceFx";
 
 export namespace signArkpackFileFx {
 	export interface Props {
@@ -12,34 +14,38 @@ export namespace signArkpackFileFx {
 	}
 }
 
-/** Keyless-signs one exact Arkpack and publishes its bundle after offline verification. */
+/** Keyless-signs one inner payload and atomically embeds its verified proof. */
 export const signArkpackFileFx = Effect.fn("signArkpackFileFx")(function* ({
 	arkpackPath,
 }: signArkpackFileFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
+	const path = yield* Path.Path;
 	const bytes = yield* fileSystem.readFile(arkpackPath);
+	const { payload } = yield* decodeArkpackEnvelopeFx(bytes);
 	const signature = yield* signArkpackFx({
-		bytes,
+		bytes: payload,
 	});
-	const trust = yield* verifyArkpackTrustFx({
-		bytes,
-		signature,
+	const signedBytes = yield* encodeArkpackEnvelopeFx({
+		payload,
+		proof: new TextEncoder().encode(JSON.stringify(signature)),
 	});
-	if (trust.type !== "trusted") {
+	const provenance = yield* verifyArkpackProvenanceFx({
+		bytes: signedBytes,
+	});
+	if (provenance.type !== "official") {
 		return yield* Effect.fail(
 			new ArkpackSigningError({
 				reason: "post-sign-verification",
-				actualTrust: trust,
+				actualProvenance: provenance,
 				message: "Release signature did not prove the configured workflow identity.",
 			}),
 		);
 	}
-	const signaturePath = yield* writeArkpackSignatureFx({
-		arkpackPath,
-		signature,
+	const filesystemWrite = yield* createFilesystemWriteFx();
+	yield* filesystemWrite.writeFileFx({
+		lock: path.join(path.dirname(arkpackPath), `.${path.basename(arkpackPath)}.lock`),
+		target: arkpackPath,
+		bytes: signedBytes,
 	});
-	return {
-		signature,
-		signaturePath,
-	} as const;
+	return signedBytes;
 });

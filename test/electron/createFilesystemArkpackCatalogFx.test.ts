@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { ArkpackLimits } from "../../shared/ArkpackLimits";
-import { writeArkpackArtifactPairFx } from "../../electron/main/arkpack/writeArkpackArtifactPairFx";
+import { writeArkpackFileFx } from "../../electron/main/arkpack/writeArkpackFileFx";
 import {
 	bundledBytes,
 	createCatalog,
@@ -13,7 +13,6 @@ import {
 	createPromiseGate,
 	readFileRecord,
 	readPackagePath,
-	readSignaturePath,
 	readRoots,
 	userBytes,
 	writePackage,
@@ -33,16 +32,12 @@ afterEach(async () => {
 });
 
 describe("createFilesystemArkpackCatalogFx", () => {
-	const signature = (byte: number) => btoa(String.fromCharCode(...new Uint8Array(64).fill(byte)));
-
-	it("discovers convention-named files and their optional signatures without descriptors", async () => {
+	it("discovers convention-named self-contained files without descriptors", async () => {
 		const roots = readRoots(root);
-		const signature = "detached-signature";
 		await writePackage({
 			root: roots.bundled,
 			packageId: "arkini",
 			bytes: bundledBytes,
-			signature,
 		});
 		await writePackage({
 			root: roots.user,
@@ -57,7 +52,6 @@ describe("createFilesystemArkpackCatalogFx", () => {
 			readFileRecord({
 				packageId: "arkini",
 				bytes: bundledBytes,
-				signature,
 				source: "bundled",
 			}),
 			readFileRecord({
@@ -71,7 +65,6 @@ describe("createFilesystemArkpackCatalogFx", () => {
 	it("prefers the user copy and reveals the untouched bundled package after removal", async () => {
 		const roots = readRoots(root);
 		const packageId = "arkini";
-		const userSignature = "user-signature";
 		const bundledPath = await writePackage({
 			root: roots.bundled,
 			packageId,
@@ -81,7 +74,6 @@ describe("createFilesystemArkpackCatalogFx", () => {
 			root: roots.user,
 			packageId,
 			bytes: userBytes,
-			signature: userSignature,
 		});
 		const catalog = await createCatalog(root);
 		const bundled = readFileRecord({
@@ -92,7 +84,6 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		const userOverride = readFileRecord({
 			packageId,
 			bytes: userBytes,
-			signature: userSignature,
 			source: "user",
 			overridesBundled: true,
 		});
@@ -109,7 +100,6 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		await Effect.runPromise(catalog.removeFx(packageId));
 
 		await expect(access(userPath)).rejects.toBeDefined();
-		await expect(access(readSignaturePath(roots.user, packageId))).rejects.toBeDefined();
 		await expect(access(bundledPath)).resolves.toBeUndefined();
 		expect(await Effect.runPromise(catalog.listFx)).toEqual([
 			readFileRecord({
@@ -133,7 +123,7 @@ describe("createFilesystemArkpackCatalogFx", () => {
 			packageId,
 			bytes: new Uint8Array(),
 		});
-		await truncate(path, ArkpackLimits.maxCompressedBytes + 1);
+		await truncate(path, ArkpackLimits.maxArkpackBytes + 1);
 		const nodeFileSystem = await createNodeFileSystem();
 		let payloadRead = false;
 		const fileSystem = {
@@ -223,7 +213,7 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		const catalog = await createCatalog(root, fileSystem);
 
 		const installing = Effect.runPromise(
-			writeArkpackArtifactPairFx({
+			writeArkpackFileFx({
 				arkpackPath: output,
 				bytes: userBytes,
 				fileSystem,
@@ -243,14 +233,13 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		expect(await Effect.runPromise(catalog.readFx(packageId))).toEqual([]);
 	});
 
-	it("reads a signed user pair under the same lock as an external writer", async () => {
+	it("reads one user file under the same lock as an external writer", async () => {
 		const roots = readRoots(root);
 		const packageId = "locked-reader";
 		const output = await writePackage({
 			root: roots.user,
 			packageId,
 			bytes: bundledBytes,
-			signature: signature(1),
 		});
 		const nodeFileSystem = await createNodeFileSystem();
 		const publicationEntered = createPromiseGate();
@@ -273,11 +262,10 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		} satisfies FileSystem.FileSystem;
 		const catalog = await createCatalog(root, fileSystem);
 		const writing = Effect.runPromise(
-			writeArkpackArtifactPairFx({
+			writeArkpackFileFx({
 				arkpackPath: output,
 				bytes: userBytes,
 				fileSystem,
-				signature: signature(2),
 			}),
 		);
 		await publicationEntered.promise;
@@ -291,7 +279,6 @@ describe("createFilesystemArkpackCatalogFx", () => {
 			readFileRecord({
 				packageId,
 				bytes: userBytes,
-				signature: signature(2),
 				source: "user",
 			}),
 		]);

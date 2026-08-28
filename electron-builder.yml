@@ -36,7 +36,6 @@ extraResources:
     to: game
     filter:
       - arkini.arkpack
-      - arkini.arksig
 mac:
   category: public.app-category.games
   icon: icon.png

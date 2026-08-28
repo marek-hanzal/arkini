@@ -5,10 +5,7 @@ import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { ElectronMainError } from "../ElectronMainError";
 import { readArkpackFileFx } from "./readArkpackFileFx";
-import {
-	recoverArkpackArtifactPairFx,
-	withRecoveredArkpackArtifactPairFx,
-} from "./recoverArkpackArtifactPairFx";
+import { recoverArkpackFileFx, withArkpackFileLockFx } from "./withArkpackFileLockFx";
 import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
 
 const suffix = ".arkpack";
@@ -20,7 +17,7 @@ export namespace listArkpackFilesFx {
 		readonly maxCandidates?: number;
 		readonly maxTotalBytes?: number;
 		readonly source: ArkiniElectronApi.ArkpackFile["source"];
-		readonly verifyTrustFx?: readArkpackFileFx.Props["verifyTrustFx"];
+		readonly verifyProvenanceFx?: readArkpackFileFx.Props["verifyProvenanceFx"];
 	}
 }
 
@@ -32,7 +29,7 @@ export const listArkpackFilesFx = Effect.fn("listArkpackFilesFx")(
 		maxCandidates = ArkpackLimits.maxCatalogCandidates / 2,
 		maxTotalBytes = ArkpackLimits.maxCatalogBytes / 2,
 		source,
-		verifyTrustFx,
+		verifyProvenanceFx,
 	}: listArkpackFilesFx.Props) =>
 		Effect.gen(function* () {
 			if (source === "user") {
@@ -43,17 +40,17 @@ export const listArkpackFilesFx = Effect.fn("listArkpackFilesFx")(
 				return [];
 			}
 			if (source === "user") {
-				const transactionSuffix = `${suffix}.transaction`;
-				const cleanupSuffix = `${transactionSuffix}.cleanup`;
+				const writeSuffix = `${suffix}.lock.write`;
+				const cleanupSuffix = `${writeSuffix}.cleanup`;
 				for (const entry of yield* fileSystem.readDirectory(root)) {
 					if (
 						!entry.startsWith(".") ||
-						(!entry.endsWith(transactionSuffix) && !entry.endsWith(cleanupSuffix))
+						(!entry.endsWith(writeSuffix) && !entry.endsWith(cleanupSuffix))
 					)
 						continue;
 					const journalSuffix = entry.endsWith(cleanupSuffix)
-						? ".transaction.cleanup"
-						: ".transaction";
+						? ".lock.write.cleanup"
+						: ".lock.write";
 					const arkpackEntry = entry.slice(1, -journalSuffix.length);
 					let packageId: string;
 					try {
@@ -63,7 +60,7 @@ export const listArkpackFilesFx = Effect.fn("listArkpackFilesFx")(
 					}
 					if (`${encodeGameProjectFileStem(packageId)}${suffix}` !== arkpackEntry)
 						continue;
-					yield* recoverArkpackArtifactPairFx({
+					yield* recoverArkpackFileFx({
 						arkpackPath: join(root, arkpackEntry),
 						fileSystem,
 					});
@@ -88,34 +85,14 @@ export const listArkpackFilesFx = Effect.fn("listArkpackFilesFx")(
 				const readCandidateFx = (path: string) =>
 					Effect.gen(function* () {
 						const candidateRoot = dirname(path);
-						const signaturePath = join(
-							candidateRoot,
-							`${entry.slice(0, -suffix.length)}.arksig`,
-						);
-						const signatureSize = yield* fileSystem.exists(signaturePath).pipe(
-							Effect.flatMap((exists) =>
-								exists
-									? fileSystem
-											.stat(signaturePath)
-											.pipe(
-												Effect.map((info) =>
-													info.size <= ArkpackLimits.maxSignatureBytes
-														? Number(info.size)
-														: 0,
-												),
-											)
-									: Effect.succeed(0),
-							),
-							Effect.catch(() => Effect.succeed(0)),
-						);
-						const size = Number((yield* fileSystem.stat(path)).size) + signatureSize;
+						const size = Number((yield* fileSystem.stat(path)).size);
 						if (totalBytes + size > maxTotalBytes) return null;
 						const file = yield* readArkpackFileFx({
 							root: candidateRoot,
 							fileSystem,
 							packageId,
 							source,
-							verifyTrustFx,
+							verifyProvenanceFx,
 						});
 						return file === null
 							? null
@@ -127,7 +104,7 @@ export const listArkpackFilesFx = Effect.fn("listArkpackFilesFx")(
 				const requestedPath = join(root, entry);
 				const file = yield* (
 					source === "user"
-						? withRecoveredArkpackArtifactPairFx(
+						? withArkpackFileLockFx(
 								{
 									arkpackPath: requestedPath,
 									fileSystem,

@@ -34,8 +34,8 @@ export const createInMemoryArkpackStorageFx = Effect.fn("createInMemoryArkpackSt
 						packageId,
 						filename: `${encodeURIComponent(packageId)}.arkpack`,
 						bytes: bytes.slice(0),
-						trust: {
-							type: "external",
+						provenance: {
+							type: "community",
 						},
 						source: "user",
 						overridesBundled: false,

@@ -12,7 +12,8 @@ export const readCanonicalArkpackPathFx = Effect.fn("readCanonicalArkpackPathFx"
 	return join(root, basename(arkpackPath));
 });
 
-const withArkpackLockFx = <Value, Error, Requirements>(
+/** Recovers pending one-file publication and excludes a concurrent writer while reading. */
+export const withArkpackFileLockFx = <Value, Error, Requirements>(
 	props: {
 		readonly arkpackPath: string;
 		readonly fileSystem: FileSystem.FileSystem;
@@ -31,17 +32,7 @@ const withArkpackLockFx = <Value, Error, Requirements>(
 		);
 	});
 
-/** Recovers an interrupted artifact-pair write before the pair is observed. */
-export const recoverArkpackArtifactPairFx = Effect.fn("recoverArkpackArtifactPairFx")(
+export const recoverArkpackFileFx = Effect.fn("recoverArkpackFileFx")(
 	(props: { readonly arkpackPath: string; readonly fileSystem: FileSystem.FileSystem }) =>
-		withArkpackLockFx(props, () => Effect.void),
+		withArkpackFileLockFx(props, () => Effect.void),
 );
-
-/** Runs one read against a recovered pair while its writer is excluded. */
-export const withRecoveredArkpackArtifactPairFx = <Value, Error, Requirements>(
-	props: {
-		readonly arkpackPath: string;
-		readonly fileSystem: FileSystem.FileSystem;
-	},
-	effect: (arkpackPath: string) => Effect.Effect<Value, Error, Requirements>,
-) => withArkpackLockFx(props, effect);

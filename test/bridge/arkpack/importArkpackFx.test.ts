@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { importArkpackFx } from "~/bridge/arkpack/importArkpackFx";
 import { loadArkpackFx } from "~/bridge/arkpack/loadArkpackFx";
 import { encodeFx } from "~/engine/pack/fx/encodeFx";
+import { encodeArkpackEnvelopeFx } from "~/engine/pack/fx/encodeArkpackEnvelopeFx";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 import {
 	createTestArkpack,
@@ -97,7 +98,11 @@ describe("importArkpackFx", () => {
 		await expect(
 			Effect.runPromise(
 				importArkpackFx({
-					bytes: new Uint8Array(gzipSync(encoded)),
+					bytes: Effect.runSync(
+						encodeArkpackEnvelopeFx({
+							payload: new Uint8Array(gzipSync(encoded)),
+						}),
+					),
 					filename: "invalid.arkpack",
 					storage,
 				}),

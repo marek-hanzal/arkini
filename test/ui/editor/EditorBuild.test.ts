@@ -267,8 +267,8 @@ describe("EditorBuild", () => {
 					title: "Existing",
 					version: "2.0",
 					arkini: "0.5.0",
-					trust: {
-						type: "external",
+					provenance: {
+						type: "community",
 					},
 					source: "user",
 				},

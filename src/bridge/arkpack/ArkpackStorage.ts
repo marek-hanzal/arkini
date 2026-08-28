@@ -1,12 +1,12 @@
 import type { Effect } from "effect";
-import type { ArkpackTrustSchema } from "~/engine/pack/schema/ArkpackTrustSchema";
+import type { ArkpackProvenanceSchema } from "~/engine/pack/schema/ArkpackProvenanceSchema";
 
 export namespace ArkpackStorage {
 	export interface File {
 		readonly packageId: string;
 		readonly filename: string;
 		readonly bytes: ArrayBuffer;
-		readonly trust: ArkpackTrustSchema.Type;
+		readonly provenance: ArkpackProvenanceSchema.Type;
 		readonly source: "bundled" | "user";
 		readonly overridesBundled: boolean;
 	}

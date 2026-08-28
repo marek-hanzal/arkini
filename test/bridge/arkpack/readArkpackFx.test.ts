@@ -6,6 +6,7 @@ import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 import { GameValidationError } from "~/engine/validation/error/GameValidationError";
 import { encodeFx } from "~/engine/pack/fx/encodeFx";
+import { encodeArkpackEnvelopeFx } from "~/engine/pack/fx/encodeArkpackEnvelopeFx";
 import {
 	createTestArkpack,
 	testArkpackConfig,
@@ -40,8 +41,8 @@ describe("readArkpackFx", () => {
 					"1.0",
 					arkini,
 				),
-				trust: {
-					type: "external",
+				provenance: {
+					type: "community",
 				},
 				source: "user",
 			}),
@@ -61,8 +62,8 @@ describe("readArkpackFx", () => {
 						"1.0",
 						arkini,
 					),
-					trust: {
-						type: "external",
+					provenance: {
+						type: "community",
 					},
 					source: "user",
 				}),
@@ -76,8 +77,8 @@ describe("readArkpackFx", () => {
 			readArkpackFx({
 				bytes,
 				filename: "bridge.arkpack",
-				trust: {
-					type: "external",
+				provenance: {
+					type: "community",
 				},
 				source: "user",
 			}),
@@ -86,8 +87,8 @@ describe("readArkpackFx", () => {
 			readArkpackFx({
 				bytes,
 				filename: "renamed.arkpack",
-				trust: {
-					type: "external",
+				provenance: {
+					type: "community",
 				},
 				source: "user",
 			}),
@@ -105,34 +106,64 @@ describe("readArkpackFx", () => {
 		expect(first.payload.config).toEqual(testArkpackConfig);
 	});
 
-	it("preserves the trust classification independently of payload validation", async () => {
+	it("preserves provenance independently of payload validation", async () => {
 		const loaded = await Effect.runPromise(
 			readArkpackFx({
 				bytes: createTestArkpack(),
-				trust: {
-					type: "trusted",
+				provenance: {
+					type: "official",
 				},
 				source: "user",
 			}),
 		);
 
-		expect(loaded.descriptor.trust).toEqual({
-			type: "trusted",
+		expect(loaded.descriptor.provenance).toEqual({
+			type: "official",
 		});
+	});
+
+	it("plays valid gameplay with malformed or oversized proof bytes", async () => {
+		const unsigned = createTestArkpack();
+		const withSuffix = (suffix: Uint8Array) => {
+			const bytes = new Uint8Array(unsigned.byteLength + suffix.byteLength);
+			bytes.set(unsigned);
+			bytes.set(suffix, unsigned.byteLength);
+			return bytes;
+		};
+		const malformed = withSuffix(new TextEncoder().encode("not-json"));
+		const oversized = withSuffix(new Uint8Array(ArkpackLimits.maxProofBytes + 1));
+		const load = (bytes: Uint8Array) =>
+			Effect.runPromise(
+				readArkpackFx({
+					bytes,
+					provenance: {
+						type: "community",
+					},
+					source: "user",
+				}),
+			);
+
+		const [plain, malformedProof, oversizedProof] = await Promise.all([
+			load(unsigned),
+			load(malformed),
+			load(oversized),
+		]);
+		expect(malformedProof.descriptor.contentHash).toBe(plain.descriptor.contentHash);
+		expect(oversizedProof.descriptor.contentHash).toBe(plain.descriptor.contentHash);
 	});
 
 	it("rejects oversized non-File byte inputs at the reader boundary", async () => {
 		await expect(
 			Effect.runPromise(
 				readArkpackFx({
-					bytes: new Uint8Array(ArkpackLimits.maxCompressedBytes + 1),
-					trust: {
-						type: "external",
+					bytes: new Uint8Array(ArkpackLimits.maxArkpackBytes + 1),
+					provenance: {
+						type: "community",
 					},
 					source: "user",
 				}),
 			),
-		).rejects.toThrow("compressed limit");
+		).rejects.toThrow("byte limit");
 	});
 
 	it("rejects PNG resources whose actual bytes cannot decode", async () => {
@@ -171,9 +202,13 @@ describe("readArkpackFx", () => {
 		await expect(
 			Effect.runPromise(
 				readArkpackFx({
-					bytes: new Uint8Array(gzipSync(encoded)),
-					trust: {
-						type: "external",
+					bytes: Effect.runSync(
+						encodeArkpackEnvelopeFx({
+							payload: new Uint8Array(gzipSync(encoded)),
+						}),
+					),
+					provenance: {
+						type: "community",
 					},
 					source: "user",
 				}),
@@ -215,9 +250,13 @@ describe("readArkpackFx", () => {
 		const result = await Effect.runPromise(
 			Effect.result(
 				readArkpackFx({
-					bytes: new Uint8Array(gzipSync(encoded)),
-					trust: {
-						type: "external",
+					bytes: Effect.runSync(
+						encodeArkpackEnvelopeFx({
+							payload: new Uint8Array(gzipSync(encoded)),
+						}),
+					),
+					provenance: {
+						type: "community",
 					},
 					source: "user",
 				}),

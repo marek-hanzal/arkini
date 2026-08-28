@@ -125,8 +125,8 @@ const installedDescriptor = (version: string, source: "bundled" | "user") => ({
 	title: "Existing",
 	version,
 	arkini: "1.0.0",
-	trust: {
-		type: "external" as const,
+	provenance: {
+		type: "community" as const,
 	},
 	source,
 });

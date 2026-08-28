@@ -5,6 +5,7 @@ import { TestClock } from "effect/testing";
 import { describe, expect, it } from "@effect/vitest";
 
 import { decodeFx } from "~/engine/pack/fx/decodeFx";
+import { decodeArkpackEnvelopeFx } from "~/engine/pack/fx/decodeArkpackEnvelopeFx";
 import { packDirectoryFx } from "~/engine/pack/fx/packDirectoryFx";
 import {
 	png,
@@ -19,8 +20,9 @@ describe("packDirectoryFx game-project contract", () => {
 			const result = yield* packDirectoryFx({
 				input,
 			});
-			const compressed = yield* fileSystem.readFile(result.arkpack);
-			const payload = yield* decodeFx(new Uint8Array(gunzipSync(compressed)));
+			const arkpack = yield* fileSystem.readFile(result.arkpack);
+			const envelope = yield* decodeArkpackEnvelopeFx(arkpack);
+			const payload = yield* decodeFx(new Uint8Array(gunzipSync(envelope.payload)));
 
 			expect(result).toMatchObject({
 				filename: "project-game.arkpack",

@@ -22,11 +22,9 @@ export const importArkpackFileFx = Effect.fn("importArkpackFileFx")(function* ({
 	file,
 	storage,
 }: importArkpackFileFx.Props) {
-	if (file.size > ArkpackLimits.maxCompressedBytes) {
+	if (file.size > ArkpackLimits.maxArkpackBytes) {
 		return yield* Effect.fail(
-			new Error(
-				`Arkpack exceeds the ${ArkpackLimits.maxCompressedBytes} byte compressed limit.`,
-			),
+			new Error(`Arkpack exceeds the ${ArkpackLimits.maxArkpackBytes} byte limit.`),
 		);
 	}
 	const bytes = yield* Effect.tryPromise({

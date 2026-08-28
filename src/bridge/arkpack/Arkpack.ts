@@ -1,4 +1,4 @@
-import type { ArkpackTrustSchema } from "~/engine/pack/schema/ArkpackTrustSchema";
+import type { ArkpackProvenanceSchema } from "~/engine/pack/schema/ArkpackProvenanceSchema";
 import type { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 
@@ -11,7 +11,7 @@ export interface ArkpackDescriptor {
 	readonly title: string;
 	readonly version: ArkpackVersionSchema.Type;
 	readonly arkini: ArkiniVersionSchema.Type;
-	readonly trust: ArkpackTrustSchema.Type;
+	readonly provenance: ArkpackProvenanceSchema.Type;
 	readonly source: ArkpackSource;
 	readonly overridesBundled?: boolean;
 	readonly filename?: string;

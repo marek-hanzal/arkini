@@ -6,17 +6,17 @@ import { KeyObject, verify as verifyNodeSignature } from "node:crypto";
 import { Effect } from "effect";
 
 import { ArkiniReleaseIdentity } from "~/engine/pack/ArkiniReleaseIdentity";
-import type { ArkpackTrustSchema } from "~/engine/pack/schema/ArkpackTrustSchema";
+import type { ArkpackProvenanceSchema } from "~/engine/pack/schema/ArkpackProvenanceSchema";
 import trustedRootJson from "~/engine/pack/trusted-root.json";
+import { decodeArkpackEnvelopeFx } from "./decodeArkpackEnvelopeFx";
 
-export namespace verifyArkpackTrustFx {
+export namespace verifyArkpackProvenanceFx {
 	export interface Props {
 		readonly bytes: Uint8Array;
-		readonly signature?: unknown;
 	}
 }
 
-export const createArkpackTrustVerifier = ({
+export const createArkpackProvenanceVerifier = ({
 	identity,
 	trustedRoot,
 }: {
@@ -54,32 +54,37 @@ export const createArkpackTrustVerifier = ({
 			sigstoreCrypto.verify = originalVerify;
 		}
 	};
-	return ({ bytes, signature }: verifyArkpackTrustFx.Props): ArkpackTrustSchema.Type => {
-		if (signature === undefined)
-			return {
-				type: "external",
-			};
+	return (bytes: Uint8Array): ArkpackProvenanceSchema.Type => {
 		try {
-			const serialized = typeof signature === "string" ? JSON.parse(signature) : signature;
-			const entity = toSignedEntity(bundleFromJSON(serialized), Buffer.from(bytes));
-			verifySigstore(entity);
+			const { payload, proof } = Effect.runSync(decodeArkpackEnvelopeFx(bytes));
+			if (proof === undefined)
+				return {
+					type: "community",
+				};
+			const serialized = JSON.parse(
+				new TextDecoder("utf-8", {
+					fatal: true,
+				}).decode(proof),
+			);
+			verifySigstore(toSignedEntity(bundleFromJSON(serialized), Buffer.from(payload)));
 			return {
-				type: "trusted",
+				type: "official",
 			};
 		} catch {
 			return {
-				type: "external",
+				type: "community",
 			};
 		}
 	};
 };
 
-const verifyReleaseTrust = createArkpackTrustVerifier({
+const verifyReleaseProvenance = createArkpackProvenanceVerifier({
 	identity: ArkiniReleaseIdentity,
 	trustedRoot: trustedRootJson,
 });
 
-/** Offline soft classification of exact bytes and an optional Sigstore bundle. */
-export const verifyArkpackTrustFx = Effect.fn("verifyArkpackTrustFx")(
-	(props: verifyArkpackTrustFx.Props) => Effect.sync(() => verifyReleaseTrust(props)),
+/** Offline soft classification of the proof embedded in one self-contained Arkpack. */
+export const verifyArkpackProvenanceFx = Effect.fn("verifyArkpackProvenanceFx")(
+	({ bytes }: verifyArkpackProvenanceFx.Props) =>
+		Effect.sync(() => verifyReleaseProvenance(bytes)),
 );

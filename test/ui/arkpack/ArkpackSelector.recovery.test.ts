@@ -33,8 +33,8 @@ describe("ArkpackSelector action recovery", () => {
 							title: "Local package",
 							version: "1.0",
 							arkini: "1",
-							trust: {
-								type: "external",
+							provenance: {
+								type: "community",
 							} as const,
 							source: "user" as const,
 							overridesBundled: false,
@@ -83,8 +83,8 @@ describe("ArkpackSelector action recovery", () => {
 			title: "Imported package",
 			version: "1.0",
 			arkini: "1",
-			trust: {
-				type: "external",
+			provenance: {
+				type: "community",
 			},
 			source: "user",
 			overridesBundled: false,

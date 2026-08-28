@@ -26,8 +26,8 @@ export const importArkpackFx = Effect.fn("importArkpackFx")(function* ({
 			bytes,
 			filename,
 			packageId,
-			trust: {
-				type: "external",
+			provenance: {
+				type: "community",
 			},
 			source: "user",
 		});

@@ -8,4 +8,4 @@ export const ArkpackCommand = Command.make("arkpack")
 			ArkpackVerifyCommand,
 		]),
 	)
-	.pipe(Command.withDescription("Offline Arkpack release-trust inspection."));
+	.pipe(Command.withDescription("Offline Arkpack release-provenance inspection."));

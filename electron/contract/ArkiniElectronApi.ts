@@ -102,12 +102,12 @@ export namespace ArkiniElectronApi {
 		readonly packageId: string;
 		readonly filename: string;
 		readonly bytes: Uint8Array;
-		readonly trust:
+		readonly provenance:
 			| {
-					readonly type: "trusted";
+					readonly type: "official";
 			  }
 			| {
-					readonly type: "external";
+					readonly type: "community";
 			  };
 		readonly source: "bundled" | "user";
 		readonly overridesBundled: boolean;

@@ -38,8 +38,8 @@ const createGame = (explicitSaveFx: Effect.Effect<void, unknown> = Effect.void):
 		title: "Menu game",
 		version: "1.0",
 		arkini: "1.0",
-		trust: {
-			type: "external",
+		provenance: {
+			type: "community",
 		} as const,
 		source: "user",
 	},

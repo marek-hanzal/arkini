@@ -26,8 +26,8 @@ const descriptor = (
 	title: "Installed title is not identity",
 	version,
 	arkini: ArkiniAppVersion,
-	trust: {
-		type: "external",
+	provenance: {
+		type: "community",
 	},
 	source,
 });

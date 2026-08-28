@@ -11,7 +11,6 @@ import { sign } from "sigstore";
 
 const fulcioUrl = "https://fulcio.arkini.test";
 const rekorUrl = "https://rekor.arkini.test";
-
 const encodeTokenPart = (value: unknown) =>
 	Buffer.from(JSON.stringify(value)).toString("base64url");
 

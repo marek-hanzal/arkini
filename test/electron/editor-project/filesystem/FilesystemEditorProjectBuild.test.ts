@@ -7,6 +7,8 @@ import {
 	createFilesystemEditorProjectTestHarness,
 	type FilesystemEditorProjectTestHarness,
 } from "./support/createFilesystemEditorProjectTestHarness";
+import { decodeArkpackEnvelopeFx } from "~/engine/pack/fx/decodeArkpackEnvelopeFx";
+import { encodeArkpackEnvelopeFx } from "~/engine/pack/fx/encodeArkpackEnvelopeFx";
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 
 let harness: FilesystemEditorProjectTestHarness;
@@ -63,13 +65,20 @@ describe("filesystem Editor project build", () => {
 				expectedRevision: project.revision,
 			}),
 		);
+		const arkpackPath = join(root, "build", "project-tamper.arkpack");
+		const envelope = Effect.runSync(
+			decodeArkpackEnvelopeFx(new Uint8Array(await readFile(arkpackPath))),
+		);
+		const changedPayload = envelope.payload.slice();
+		changedPayload[0] = (changedPayload[0] ?? 0) ^ 1;
 		await writeFile(
-			join(root, "build", "project-tamper.arkpack"),
-			new Uint8Array([
-				1,
-				2,
-				3,
-			]),
+			arkpackPath,
+			Effect.runSync(
+				encodeArkpackEnvelopeFx({
+					payload: changedPayload,
+					proof: envelope.proof,
+				}),
+			),
 		);
 
 		await expect(

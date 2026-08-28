@@ -16,7 +16,7 @@ Read the smallest entry point needed for the task:
 | Runtime, process, UI, Editor, persistence ownership | [`ARCHITECTURE.md`](ARCHITECTURE.md) |
 | Implemented gameplay semantics | [`GAME.MD`](GAME.MD) |
 | Project layout, authoring, compiler, validation | [`CONFIG.md`](CONFIG.md) |
-| Compatibility, external formats, Arkpack trust | [`VERSION.md`](VERSION.md) |
+| Compatibility, external formats, Arkpack provenance | [`VERSION.md`](VERSION.md) |
 | Pixi implementation navigation | [`src/ui/pixi/README.md`](src/ui/pixi/README.md) |
 
 ## Repository map
@@ -64,4 +64,4 @@ Arkini is Electron-only: there is no web target or browser-storage fallback. Dev
 
 ## Distribution
 
-`argc preview-macos` launches an unpacked local arm64 app. The native package commands create unsigned macOS arm64, Windows x64, Linux x64, and Linux arm64 artifacts with target-specific checksum files. Working branches run the complete repository gate on hosted Linux, macOS, and Windows; `main` deliberately skips that gate and release tags package without repeating it. Tagged development releases retain their separate keyless Arkpack-signing and combined-prerelease purpose, publishing the standalone `.arkpack` together with its required detached `.arksig`; a bare pack is External. Trust is a soft provenance label—both Trusted and External packages remain playable—and its exact contract lives in [`VERSION.md`](VERSION.md).
+`argc preview-macos` launches an unpacked local arm64 app. The native package commands create unsigned macOS arm64, Windows x64, Linux x64, and Linux arm64 applications with target-specific checksum files. Working branches run the complete repository gate on hosted Linux, macOS, and Windows; `main` deliberately skips that gate and release tags package without repeating it. Tagged workflows build the official game Arkpack once, embed a keyless Sigstore proof, and reuse those exact self-contained `.arkpack` bytes in every native package and standalone artifact. Local, Editor, and manual-workflow packs are Community. Official and Community are both playable; [`VERSION.md`](VERSION.md) owns the exact soft-provenance contract.

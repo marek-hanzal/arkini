@@ -4,7 +4,7 @@ import { join } from "node:path";
 import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { ElectronMainError } from "../ElectronMainError";
-import { writeArkpackArtifactPairFx } from "./writeArkpackArtifactPairFx";
+import { writeArkpackFileFx } from "./writeArkpackFileFx";
 import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
 
 export namespace writeUserArkpackFx {
@@ -22,15 +22,13 @@ export const writeUserArkpackFx = Effect.fn("writeUserArkpackFx")(
 			if (record.packageId.length === 0) {
 				return yield* Effect.fail(new Error("Arkpack package identity is empty."));
 			}
-			if (record.bytes.byteLength > ArkpackLimits.maxCompressedBytes) {
+			if (record.bytes.byteLength > ArkpackLimits.maxArkpackBytes) {
 				return yield* Effect.fail(
-					new Error(
-						`Arkpack exceeds the ${ArkpackLimits.maxCompressedBytes} byte compressed limit.`,
-					),
+					new Error(`Arkpack exceeds the ${ArkpackLimits.maxArkpackBytes} byte limit.`),
 				);
 			}
 			const stem = encodeGameProjectFileStem(record.packageId);
-			yield* writeArkpackArtifactPairFx({
+			yield* writeArkpackFileFx({
 				arkpackPath: join(root, `${stem}.arkpack`),
 				bytes: record.bytes,
 				fileSystem,

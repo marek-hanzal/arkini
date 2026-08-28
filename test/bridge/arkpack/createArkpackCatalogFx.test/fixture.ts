@@ -6,8 +6,8 @@ export const builtIn: ArkpackDescriptor = {
 	title: "Arkini",
 	version: "1.0",
 	arkini: "1",
-	trust: {
-		type: "trusted",
+	provenance: {
+		type: "official",
 	},
 	source: "bundled",
 };
@@ -18,8 +18,8 @@ export const imported: ArkpackDescriptor = {
 	title: "Imported",
 	version: "1.0",
 	arkini: "1",
-	trust: {
-		type: "external",
+	provenance: {
+		type: "community",
 	},
 	source: "user",
 };

@@ -2,6 +2,7 @@ import { gzipSync } from "node:zlib";
 import { Effect } from "effect";
 
 import { encodeFx } from "~/engine/pack/fx/encodeFx";
+import { encodeArkpackEnvelopeFx } from "~/engine/pack/fx/encodeArkpackEnvelopeFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import type { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
@@ -85,5 +86,9 @@ export const createTestArkpack = (
 			],
 		}),
 	);
-	return new Uint8Array(gzipSync(encoded));
+	return Effect.runSync(
+		encodeArkpackEnvelopeFx({
+			payload: new Uint8Array(gzipSync(encoded)),
+		}),
+	);
 };

@@ -1,6 +1,8 @@
 declare const __ARKINI_RELEASE_ISSUER__: string | undefined;
 declare const __ARKINI_RELEASE_IDENTITY__: string | undefined;
 
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 export const ArkiniReleaseIdentityDefaults = {
@@ -11,12 +13,16 @@ export const ArkiniReleaseIdentityDefaults = {
 export const createArkiniReleaseIdentity = ({
 	identity,
 	issuer,
+	version,
 }: {
 	readonly identity: string;
 	readonly issuer: string;
+	readonly version: string;
 }) => ({
 	issuer,
-	subjectAlternativeName: new RegExp(`^${escapeRegExp(identity)}@refs/tags/[^/]+$`),
+	subjectAlternativeName: new RegExp(
+		`^${escapeRegExp(identity)}@refs/tags/${escapeRegExp(`v${version}`)}$`,
+	),
 });
 
 /** The one workflow whose keyless provenance this particular Arkini build trusts. */
@@ -29,4 +35,5 @@ export const ArkiniReleaseIdentity = createArkiniReleaseIdentity({
 		typeof __ARKINI_RELEASE_IDENTITY__ === "string"
 			? __ARKINI_RELEASE_IDENTITY__
 			: ArkiniReleaseIdentityDefaults.identity,
+	version: ArkiniAppVersion,
 });

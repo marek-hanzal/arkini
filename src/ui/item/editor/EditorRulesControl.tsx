@@ -3,7 +3,6 @@ import type {
 	EditorDropRule,
 	EditorLineRule,
 } from "~/bridge/item/editor/EditorItemModel";
-import { twMerge } from "tailwind-merge";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
@@ -15,14 +14,12 @@ type EditorRuleType = EditorLineRule["type"];
 /** Assembles the shared conditional Rule collection used by lines and selected drops. */
 export const EditorRulesControl = ({
 	allowedTypes,
-	className,
 	description,
 	onChange,
 	rules,
 	target,
 }: {
 	readonly allowedTypes: ReadonlyArray<EditorRuleType>;
-	readonly className?: string;
 	readonly description: string;
 	readonly onChange: (rules: EditorRule[]) => void;
 	readonly rules: ReadonlyArray<EditorRule>;
@@ -45,7 +42,7 @@ export const EditorRulesControl = ({
 					: {}),
 		}) as EditorLineRule;
 	return (
-		<section className={twMerge("grid gap-3", className)}>
+		<section className="grid gap-3">
 			<EditorFormSectionDivider
 				description={description}
 				title="Rules"

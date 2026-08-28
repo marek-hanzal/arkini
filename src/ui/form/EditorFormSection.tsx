@@ -16,9 +16,14 @@ export const EditorFormSection = ({
 	title,
 }: EditorFormSectionProps) => (
 	<section className="grid gap-4">
-		<div className="flex min-w-0 items-center gap-4">
+		<div
+			className={
+				action === undefined
+					? "min-w-0"
+					: "grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-4"
+			}
+		>
 			<EditorFormSectionDivider
-				className="min-w-0 flex-1"
 				description={description}
 				title={title}
 			/>

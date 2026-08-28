@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { FolderOpen, PackageOpen, RefreshCw } from "lucide-react";
 
 import { ArkpackCatalogList } from "~/ui/arkpack/ArkpackCatalogList";
 import { useArkpackSelectorActions } from "~/ui/arkpack/useArkpackSelectorActions";
@@ -16,7 +17,6 @@ export const Route = createFileRoute("/_launcher/arkpacks")({
 			<MainPageLayout
 				labelledBy="arkpack-selector-title"
 				page="arkpacks"
-				panelMode="viewport"
 			>
 				<div
 					className="grid h-full min-h-0 w-full grid-rows-[auto_minmax(0,1fr)_auto] gap-[var(--ak-viewport-gap)]"
@@ -34,7 +34,7 @@ export const Route = createFileRoute("/_launcher/arkpacks")({
 									className="inline-flex items-center gap-1.5"
 									onClick={actions.openArkpackDirectory}
 								>
-									<span className="icon-[lucide--folder-open] size-4" />
+									<FolderOpen className="size-4" />
 									Open Arkpack folder
 								</LinkButton>
 								<LinkButton
@@ -43,7 +43,7 @@ export const Route = createFileRoute("/_launcher/arkpacks")({
 									className="inline-flex items-center gap-1.5"
 									onClick={actions.refreshArkpacks}
 								>
-									<span className="icon-[lucide--refresh-cw] size-4" />
+									<RefreshCw className="size-4" />
 									Refresh
 								</LinkButton>
 							</div>
@@ -82,7 +82,7 @@ export const Route = createFileRoute("/_launcher/arkpacks")({
 							disabled={blocked}
 							onClick={() => actions.inputRef.current?.click()}
 						>
-							<span className="icon-[lucide--package-open] size-8 shrink-0 text-accent" />
+							<PackageOpen className="size-8 shrink-0 text-accent" />
 							<span className="min-w-0">
 								<span className="block text-lg font-semibold">Import Arkpack</span>
 								<span className="mt-1 block text-xs font-normal text-subtle">

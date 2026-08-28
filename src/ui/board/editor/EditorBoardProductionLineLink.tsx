@@ -1,3 +1,5 @@
+import { ArrowUpRight } from "lucide-react";
+
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { readEditorItemLinesFx } from "~/bridge/item/editor/readEditorItemLinesFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
@@ -26,7 +28,7 @@ export const EditorBoardProductionLineLink = ({
 			dataUi="EditorBoardProductionLineLink"
 		>
 			{children}
-			<span className="icon-[lucide--arrow-up-right] size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />
+			<ArrowUpRight className="size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />
 		</EditorProductionLineEditLink>
 	);
 };

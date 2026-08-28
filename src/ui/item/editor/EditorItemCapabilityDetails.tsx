@@ -1,3 +1,5 @@
+import { BatteryCharging, Combine, type LucideIcon } from "lucide-react";
+
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import type { EditorItem, EditorMerge } from "~/bridge/item/editor/EditorItemModel";
 import { PrimaryButtonLink } from "~/ui/button/Button";
@@ -22,7 +24,7 @@ const DisabledCapabilityDetail = ({
 	readonly actionLabel: string;
 	readonly capability: EditorItemOptionalCapability;
 	readonly description: string;
-	readonly icon: string;
+	readonly icon: LucideIcon;
 	readonly itemUid: string;
 	readonly title: string;
 }) => {
@@ -59,7 +61,7 @@ export const EditorItemChargesDetail = ({ item }: { readonly item: EditorItem })
 			actionLabel="Enable charges"
 			capability="charges"
 			description="Charges give this item a finite number of uses. Spending the last charge depletes it and may emit a configured output."
-			icon="icon-[lucide--battery-charging]"
+			icon={BatteryCharging}
 			itemUid={item.uid}
 			title="Charges are disabled"
 		/>
@@ -120,7 +122,7 @@ export const EditorItemMergesDetail = ({ item }: { readonly item: EditorItem }) 
 			actionLabel="Enable merges"
 			capability="merges"
 			description="Merges define what happens when this item is dropped onto a matching target, including source consumption, target changes and optional output."
-			icon="icon-[lucide--combine]"
+			icon={Combine}
 			itemUid={item.uid}
 			title="Merges are disabled"
 		/>

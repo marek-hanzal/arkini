@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Download, FolderOutput, PackageCheck, PackagePlus } from "lucide-react";
 
 import { EditorBuildDiagnostics } from "~/ui/arkpack/editor/EditorBuildDiagnostics";
 import { EditorBuildMajorUpdateDialog } from "~/ui/arkpack/editor/EditorBuildMajorUpdateDialog";
@@ -9,6 +10,7 @@ import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 export const Route = createFileRoute("/editor/$projectId/build")({
 	component: () => {
 		const controller = useEditorBuildController();
+		const InstallIcon = controller.installAction === "update" ? PackageCheck : PackagePlus;
 
 		return (
 			<section
@@ -70,7 +72,7 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 						cursorIntent={controller.buildPending ? "progress" : undefined}
 						onClick={controller.build}
 					>
-						<span className="icon-[lucide--package-check] mr-2 size-4" />
+						<PackageCheck className="mr-2 size-4" />
 						Build
 					</PrimaryButton>
 				</article>
@@ -87,9 +89,7 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 								cursorIntent={controller.installPending ? "progress" : undefined}
 								onClick={controller.installArtifact}
 							>
-								<span
-									className={`${controller.installAction === "update" ? "icon-[lucide--package-check]" : "icon-[lucide--package-plus]"} mr-2 size-4`}
-								/>
+								<InstallIcon className="mr-2 size-4" />
 								{controller.installAction === "update" ? "Update" : "Install"}
 							</PrimaryButton>
 							<Button
@@ -99,7 +99,7 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 								cursorIntent={controller.savePending ? "progress" : undefined}
 								onClick={controller.saveArtifact}
 							>
-								<span className="icon-[lucide--download] mr-2 size-4" />
+								<Download className="mr-2 size-4" />
 								Save as…
 							</Button>
 						</div>
@@ -130,7 +130,7 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 							cursorIntent={controller.exportSourcePending ? "progress" : undefined}
 							onClick={controller.exportSource}
 						>
-							<span className="icon-[lucide--folder-output] mr-2 size-4" />
+							<FolderOutput className="mr-2 size-4" />
 							Export
 						</PrimaryButton>
 						{controller.openSourceExportAvailable ? (

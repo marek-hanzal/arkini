@@ -1,3 +1,5 @@
+import { ArrowRight, ShieldAlert, ShieldCheck } from "lucide-react";
+
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
@@ -44,7 +46,7 @@ const EditorItemDeleteBlockerLink = ({
 						{blocker.message}
 					</span>
 				</span>
-				<span className="icon-[lucide--arrow-right] size-4 text-muted" />
+				<ArrowRight className="size-4 text-muted" />
 			</ButtonLink>
 		);
 	}
@@ -68,7 +70,7 @@ const EditorItemDeleteBlockerLink = ({
 					{blocker.message}
 				</span>
 			</span>
-			<span className="icon-[lucide--arrow-right] size-4 text-muted" />
+			<ArrowRight className="size-4 text-muted" />
 		</ButtonLink>
 	);
 };
@@ -79,6 +81,7 @@ export const EditorItemDeleteSection = ({ item }: { readonly item: EditorItem })
 		item,
 	});
 	const blocked = controller.blockers.length > 0;
+	const StateIcon = blocked ? ShieldAlert : ShieldCheck;
 	return (
 		<>
 			<section
@@ -86,12 +89,8 @@ export const EditorItemDeleteSection = ({ item }: { readonly item: EditorItem })
 				data-ui="EditorItemDeleteSection"
 			>
 				<div className="flex items-start gap-3">
-					<span
-						className={
-							blocked
-								? "icon-[lucide--shield-alert] mt-0.5 size-6 shrink-0 text-warning"
-								: "icon-[lucide--shield-check] mt-0.5 size-6 shrink-0 text-success"
-						}
+					<StateIcon
+						className={`mt-0.5 size-6 shrink-0 ${blocked ? "text-warning" : "text-success"}`}
 					/>
 					<div>
 						<h2 className="text-lg font-semibold">

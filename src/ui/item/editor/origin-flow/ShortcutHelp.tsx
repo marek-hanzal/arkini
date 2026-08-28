@@ -1,3 +1,4 @@
+import { X } from "lucide-react";
 import { Fragment } from "react";
 
 import { useDialogFocus } from "~/ui/focus/useDialogFocus";
@@ -94,7 +95,7 @@ export const ShortcutHelp = ({ direction, onClose }: ShortcutHelpProps) => {
 						onClick={onClose}
 						type="button"
 					>
-						<span className="icon-[lucide--x] size-4" />
+						<X className="size-4" />
 					</button>
 				</div>
 				<div className="mt-5 grid grid-cols-[auto_1fr] gap-x-4 gap-y-3 text-sm">

@@ -1,3 +1,5 @@
+import { Calculator, Info, LoaderCircle, TriangleAlert } from "lucide-react";
+
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type {
@@ -5,10 +7,10 @@ import type {
 	EditorItemEstimateDiagnostic,
 } from "~/editor/estimator/EditorItemEstimate";
 import type { EditorAcquisitionLimitation } from "~/editor/EditorAcquisitionGraph";
-import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import { formatItemDurationFx } from "~/ui/item-detail/formatItemDurationFx";
 import { EditorItemEstimateRouteGraph } from "~/ui/item/editor/EditorItemEstimateRouteGraph";
 import { useEditorItemEstimate } from "~/ui/item/editor/useEditorItemEstimate";
+import { Tooltip } from "~/ui/overlay/Tooltip";
 import { Status } from "~/ui/status/Status";
 
 const formatQuantity = (quantity: number) =>
@@ -53,7 +55,7 @@ const EditorItemEstimateMethodDetails = ({
 		data-ui="EditorItemEstimateMethod"
 	>
 		<header className="flex items-start gap-3 border-b border-line/70 pb-3">
-			<span className="icon-[lucide--calculator] mt-0.5 size-5 shrink-0 text-sky-700" />
+			<Calculator className="mt-0.5 size-5 shrink-0 text-sky-700" />
 			<div>
 				<h3 className="font-semibold text-foreground">Approximate dependency estimator</h3>
 				<p className="mt-1 text-xs text-muted">Optimistic scalar authored-graph analysis</p>
@@ -104,12 +106,23 @@ const EditorItemEstimateHeading = ({ estimate }: { readonly estimate?: EditorIte
 	<header className="flex items-center gap-1">
 		<h2 className="text-lg font-semibold text-foreground">Approximate acquisition path</h2>
 		{estimate === undefined ? null : (
-			<EditorInfoTooltip
-				className="size-7"
+			<Tooltip
 				content={<EditorItemEstimateMethodDetails estimate={estimate} />}
+				contentClassName="w-[min(40rem,calc(100vw-2rem))] max-w-none p-4"
 				placement="bottom-start"
-				tooltipClassName="w-[min(40rem,calc(100vw-2rem))] max-w-none p-4"
-			/>
+			>
+				<button
+					type="button"
+					data-ui="EditorInfoTooltip"
+					className="grid size-7 min-h-0 min-w-0 shrink-0 cursor-help place-items-center rounded-full border-0 bg-transparent p-0 text-muted hover:text-foreground"
+					onClick={(event) => {
+						event.preventDefault();
+						event.stopPropagation();
+					}}
+				>
+					<Info className="size-4" />
+				</button>
+			</Tooltip>
 		)}
 	</header>
 );
@@ -185,7 +198,8 @@ export const EditorItemEstimateSection = ({ itemId }: { readonly itemId: string 
 				<Status
 					dataUi="EditorItemEstimateLoading"
 					description="Analyzing authored routes and their requirements."
-					icon="icon-[lucide--loader-circle] animate-spin"
+					icon={LoaderCircle}
+					iconSpin
 					title="Calculating estimate"
 				/>
 			) : null}
@@ -193,7 +207,7 @@ export const EditorItemEstimateSection = ({ itemId }: { readonly itemId: string 
 				<Status
 					dataUi="EditorItemEstimateError"
 					description={state.message}
-					icon="icon-[lucide--triangle-alert]"
+					icon={TriangleAlert}
 					title="Estimate calculation failed"
 				/>
 			) : null}

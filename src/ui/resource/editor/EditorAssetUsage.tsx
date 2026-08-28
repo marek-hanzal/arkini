@@ -1,3 +1,5 @@
+import { Unlink } from "lucide-react";
+
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { useEditorResourceUsages } from "~/bridge/resource/editor/useEditorResourceUsages";
 import { ButtonLink } from "~/ui/button/Button";
@@ -11,7 +13,7 @@ export const EditorAssetUsage = ({ resourceId }: { readonly resourceId: string }
 			<Status
 				dataUi="EditorAssetUnused"
 				description="No saved project or item currently references this asset."
-				icon="icon-[lucide--unlink]"
+				icon={Unlink}
 				title="This asset is not used"
 				variant="flat"
 			/>

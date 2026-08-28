@@ -1,47 +1,60 @@
+import {
+	Backpack,
+	Box,
+	Factory,
+	Hammer,
+	MapPinned,
+	Mountain,
+	PackageOpen,
+	ScrollText,
+	Timer,
+	type LucideIcon,
+} from "lucide-react";
+
 import type { EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 
 /** Canonical editor copy and iconography for every authored item type. */
 export const EditorItemTypePresentation = {
 	blueprint: {
 		description: "A build plan with one construction line.",
-		icon: "icon-[lucide--scroll-text]",
+		icon: ScrollText,
 	},
 	craft: {
 		description: "A consumable or quest-like item with one product line.",
-		icon: "icon-[lucide--hammer]",
+		icon: Hammer,
 	},
 	deposit: {
 		description: "A board resource source with optional finite production lines.",
-		icon: "icon-[lucide--mountain]",
+		icon: Mountain,
 	},
 	inventory: {
 		description: "The singleton item that opens the shared inventory.",
-		icon: "icon-[lucide--backpack]",
+		icon: Backpack,
 	},
 	producer: {
 		description: "A building or actor with one or more selectable product lines.",
-		icon: "icon-[lucide--factory]",
+		icon: Factory,
 	},
 	simple: {
 		description: "A regular stackable item without specialized behavior.",
-		icon: "icon-[lucide--box]",
+		icon: Box,
 	},
 	space: {
 		description: "An immediately activated item that moves play to an authored space.",
-		icon: "icon-[lucide--map-pinned]",
+		icon: MapPinned,
 	},
 	stash: {
 		description: "A chest or reward container with one opening line.",
-		icon: "icon-[lucide--package-open]",
+		icon: PackageOpen,
 	},
 	temporary: {
 		description: "A board-only effect that expires after an authored duration.",
-		icon: "icon-[lucide--timer]",
+		icon: Timer,
 	},
 } as const satisfies Record<
 	EditorItemType,
 	{
 		readonly description: string;
-		readonly icon: string;
+		readonly icon: LucideIcon;
 	}
 >;

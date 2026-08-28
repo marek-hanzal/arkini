@@ -1,3 +1,5 @@
+import { Combine } from "lucide-react";
+
 import type { EditorMerge } from "~/bridge/item/editor/EditorItemModel";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
@@ -31,7 +33,7 @@ export const EditorMergeFields = ({
 					<EditorCapabilityStatus
 						actionLabel="Enable merges"
 						description="Merges let dropping this item onto a matching target consume or retain the source, change the target and optionally emit an output."
-						icon="icon-[lucide--combine]"
+						icon={Combine}
 						onEnable={() =>
 							onChange([
 								structuredClone(EditorItemDraftDefaults.merge),

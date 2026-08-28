@@ -1,5 +1,6 @@
-import { AnimatePresence, motion } from "motion/react";
 import { createFileRoute } from "@tanstack/react-router";
+import { ArrowLeft, NotebookPen, Pencil, Save, Trash2 } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 
 import { EditorNoteContentMaxLength } from "~/editor/note/EditorNoteSchema";
 import { Button, PrimaryButton } from "~/ui/button/Button";
@@ -107,7 +108,7 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 										<Status
 											dataUi="EditorNotesEmpty"
 											description="Write the first one above to start a lightweight project journal."
-											icon="icon-[lucide--notebook-pen]"
+											icon={NotebookPen}
 											title="Your notes will live here"
 										/>
 									</motion.div>
@@ -144,7 +145,7 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 																			controller.cancelEdit
 																		}
 																	>
-																		<span className="icon-[lucide--arrow-left] size-4" />
+																		<ArrowLeft className="size-4" />
 																	</Button>
 																</Tooltip>
 																<Tooltip
@@ -167,7 +168,7 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 																			controller.saveEdit
 																		}
 																	>
-																		<span className="icon-[lucide--save] size-4" />
+																		<Save className="size-4" />
 																	</Button>
 																</Tooltip>
 															</>
@@ -192,7 +193,7 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 																			)
 																		}
 																	>
-																		<span className="icon-[lucide--pencil] size-4" />
+																		<Pencil className="size-4" />
 																	</Button>
 																</Tooltip>
 																<Tooltip
@@ -212,7 +213,7 @@ export const Route = createFileRoute("/editor/$projectId/notes")({
 																			)
 																		}
 																	>
-																		<span className="icon-[lucide--trash-2] size-4" />
+																		<Trash2 className="size-4" />
 																	</Button>
 																</Tooltip>
 															</>

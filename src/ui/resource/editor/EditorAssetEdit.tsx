@@ -1,3 +1,5 @@
+import { FileQuestion } from "lucide-react";
+
 import { PrimaryButton } from "~/ui/button/Button";
 import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
@@ -23,7 +25,7 @@ export const EditorAssetEdit = ({ filter, query, resourceId }: EditorAssetEdit.P
 			<Status
 				dataUi="EditorAssetNotFound"
 				description={`Resource ${resourceId} is not present in this project.`}
-				icon="icon-[lucide--file-question]"
+				icon={FileQuestion}
 				title="Asset not found"
 				action={
 					<EditorHistoryBackButton
@@ -70,25 +72,26 @@ export const EditorAssetEdit = ({ filter, query, resourceId }: EditorAssetEdit.P
 				/>
 			}
 		>
-			<EditorFormContent
-				className="mx-auto max-w-3xl"
-				error={controller.error}
-				save={controller.save}
-			>
-				<label className="grid gap-1.5 text-sm font-semibold">
-					Asset ID
-					<input
-						className={editorInputClassName}
-						value={controller.nextId}
-						onChange={(event) => controller.setNextId(event.currentTarget.value)}
+			<div className="mx-auto w-full max-w-3xl">
+				<EditorFormContent
+					error={controller.error}
+					save={controller.save}
+				>
+					<label className="grid gap-1.5 text-sm font-semibold">
+						Asset ID
+						<input
+							className={editorInputClassName}
+							value={controller.nextId}
+							onChange={(event) => controller.setNextId(event.currentTarget.value)}
+						/>
+					</label>
+					<EditorAssetImageDropZone
+						currentUrl={controller.currentUrl}
+						file={controller.file}
+						onFile={controller.setFile}
 					/>
-				</label>
-				<EditorAssetImageDropZone
-					currentUrl={controller.currentUrl}
-					file={controller.file}
-					onFile={controller.setFile}
-				/>
-			</EditorFormContent>
+				</EditorFormContent>
+			</div>
 		</EditorSectionPage>
 	);
 };

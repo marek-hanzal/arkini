@@ -86,8 +86,8 @@ const itemRelationInputSchema = (role: "input" | "output") =>
 		})
 		.strict()
 		.meta({
-			id: role === "input" ? "ItemInputRelationInputSchema" : "ItemOutputRelationInputSchema",
-			$id: `urn:arkini:schema:mcp:item-${role}-input`,
+			id: role === "input" ? "ItemInputRelationSchema" : "ItemOutputRelationSchema",
+			$id: `urn:arkini:schema:mcp:item-${role}-relation`,
 			title: `Item ${role} relation tool input`,
 			description: `The root item and traversal depth for the item ${role} relation tool.`,
 		});

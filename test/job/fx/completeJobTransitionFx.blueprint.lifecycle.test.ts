@@ -36,7 +36,7 @@ describe("blueprint completion lifecycle", () => {
 		expect(Result.isFailure(result.started)).toBe(true);
 		if (Result.isFailure(result.started)) {
 			expect(result.started.failure).toMatchObject({
-				_tag: "JobOutputMaxCountError",
+				_tag: "OutputCapacityError",
 				itemId: "item:limited",
 				reservedQuantity: 5,
 				maxCount: 4,

@@ -9,7 +9,7 @@ import {
 	createFilesystemEditorProjectRepositoryFx,
 	type FilesystemEditorProjectRepository,
 } from "../../../../../electron/main/editor-project/filesystem/fx/createFilesystemEditorProjectRepositoryFx";
-import { writeFilesystemEditorProjectFilesFx } from "../../../../../electron/main/editor-project/filesystem/fx/writeFilesystemEditorProjectFilesFx";
+import { writeProjectFilesFx } from "../../../../../electron/main/editor-project/filesystem/fx/writeProjectFilesFx";
 import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
@@ -65,7 +65,7 @@ export const createProjectTestHarness = async (temporaryPrefix: string) => {
 			externalSequence += 1;
 			const root = join(temporaryDirectory, `external-${externalSequence}`);
 			await Effect.runPromise(
-				writeFilesystemEditorProjectFilesFx({
+				writeProjectFilesFx({
 					root,
 					next: {
 						arkpack: editorTestPayload.version,

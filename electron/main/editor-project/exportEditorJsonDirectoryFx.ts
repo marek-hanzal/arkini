@@ -6,7 +6,7 @@ import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryEr
 import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
 import { createEditorJsonExportDirectoryFx } from "./createEditorJsonExportDirectoryFx";
 import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnership";
-import { withFilesystemEditorProjectLockFx } from "./filesystem/fx/withFilesystemEditorProjectLockFx";
+import { withProjectLockFx } from "./filesystem/fx/withProjectLockFx";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 
 export namespace exportEditorJsonDirectoryFx {
@@ -56,7 +56,7 @@ export const exportEditorJsonDirectoryFx = Effect.fn("exportEditorJsonDirectoryF
 						message: `Editor project ${projectId} does not exist.`,
 					}),
 				);
-			const exported = yield* withFilesystemEditorProjectLockFx(
+			const exported = yield* withProjectLockFx(
 				filesystemWrite,
 				source,
 				createEditorJsonExportDirectoryFx({

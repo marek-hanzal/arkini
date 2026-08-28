@@ -9,7 +9,7 @@ import { EditorProjectNoteFileSchema } from "~/editor/filesystem/EditorProjectNo
 import { EditorNoteSchema } from "~/editor/note/EditorNoteSchema";
 import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
 
-const readJsonFilesFx = Effect.fn("readFilesystemEditorSidecarJsonFilesFx")(function* (
+const readJsonFilesFx = Effect.fn("readSidecarJsonFilesFx")(function* (
 	root: string,
 	directory: string,
 ) {
@@ -45,9 +45,7 @@ const readJsonFilesFx = Effect.fn("readFilesystemEditorSidecarJsonFilesFx")(func
 });
 
 /** Loads the portable note and named Board-scenario state captured by open/Refresh. */
-export const readFilesystemEditorProjectSidecarsFx = Effect.fn(
-	"readFilesystemEditorProjectSidecarsFx",
-)(function* ({
+export const readSidecarsFx = Effect.fn("readSidecarsFx")(function* ({
 	paths,
 	projectId,
 }: {

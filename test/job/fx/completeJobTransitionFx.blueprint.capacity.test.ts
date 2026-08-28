@@ -75,7 +75,7 @@ describe("blueprint direct output capacity", () => {
 		expect(Result.isFailure(result.secondStart)).toBe(true);
 		if (Result.isFailure(result.secondStart)) {
 			expect(result.secondStart.failure).toMatchObject({
-				_tag: "JobOutputMaxCountError",
+				_tag: "OutputCapacityError",
 				itemId: "item:target",
 				maxCount: 1,
 			});
@@ -182,7 +182,7 @@ describe("blueprint direct output capacity", () => {
 		expect(result.queued).toEqual(
 			Result.fail(
 				expect.objectContaining({
-					_tag: "JobOutputMaxCountError",
+					_tag: "OutputCapacityError",
 					itemId: "item:queue-product",
 				}),
 			),

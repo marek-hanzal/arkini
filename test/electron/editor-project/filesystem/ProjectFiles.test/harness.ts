@@ -4,9 +4,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
 
-import type { FilesystemEditorProjectFiles } from "../../../../../electron/main/editor-project/filesystem/fx/FilesystemEditorProjectFiles";
-import { readFilesystemEditorProjectFilesFx } from "../../../../../electron/main/editor-project/filesystem/fx/readFilesystemEditorProjectFilesFx";
-import { writeFilesystemEditorProjectFilesFx } from "../../../../../electron/main/editor-project/filesystem/fx/writeFilesystemEditorProjectFilesFx";
+import type { ProjectFiles } from "../../../../../electron/main/editor-project/filesystem/fx/ProjectFiles";
+import { readProjectFilesFx } from "../../../../../electron/main/editor-project/filesystem/fx/readProjectFilesFx";
+import { writeProjectFilesFx } from "../../../../../electron/main/editor-project/filesystem/fx/writeProjectFilesFx";
 
 export const createProjectFilesHarness = async () => {
 	const parent = await mkdtemp(join(tmpdir(), "arkini-editor-files-"));
@@ -15,12 +15,10 @@ export const createProjectFilesHarness = async () => {
 	return {
 		root,
 		read: () =>
+			Effect.runPromise(readProjectFilesFx(root).pipe(Effect.provide(NodeServices.layer))),
+		write: (next: ProjectFiles, previous?: ProjectFiles) =>
 			Effect.runPromise(
-				readFilesystemEditorProjectFilesFx(root).pipe(Effect.provide(NodeServices.layer)),
-			),
-		write: (next: FilesystemEditorProjectFiles, previous?: FilesystemEditorProjectFiles) =>
-			Effect.runPromise(
-				writeFilesystemEditorProjectFilesFx({
+				writeProjectFilesFx({
 					root,
 					previous,
 					next,

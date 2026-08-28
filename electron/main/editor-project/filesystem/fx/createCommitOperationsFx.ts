@@ -20,7 +20,7 @@ import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
-import { writeFilesystemEditorProjectFilesFx } from "./writeFilesystemEditorProjectFilesFx";
+import { writeProjectFilesFx } from "./writeProjectFilesFx";
 
 type Operations = Pick<
 	EditorProjectRepositoryService,
@@ -91,8 +91,8 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 }: createCommitOperationsFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
-	const writeProjectFx = (props: Parameters<typeof writeFilesystemEditorProjectFilesFx>[0]) =>
-		writeFilesystemEditorProjectFilesFx(props).pipe(
+	const writeProjectFx = (props: Parameters<typeof writeProjectFilesFx>[0]) =>
+		writeProjectFilesFx(props).pipe(
 			Effect.provideService(FileSystem.FileSystem, fileSystem),
 			Effect.provideService(Path.Path, path),
 		);

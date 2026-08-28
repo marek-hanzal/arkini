@@ -1,10 +1,10 @@
 import { Effect, FileSystem, PlatformError } from "effect";
 
 import { createEditorProjectFilesystemPathsFx } from "../../../../electron/main/editor-project/filesystem/createEditorProjectFilesystemPathsFx";
-import { readFilesystemEditorProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/readFilesystemEditorProjectFilesFx";
-import { readFilesystemEditorProjectSidecarsFx } from "../../../../electron/main/editor-project/filesystem/fx/readFilesystemEditorProjectSidecarsFx";
-import { readFilesystemEditorProjectVersionHistoryFx } from "../../../../electron/main/editor-project/filesystem/fx/readFilesystemEditorProjectVersionHistoryFx";
-import { writeFilesystemEditorProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/writeFilesystemEditorProjectFilesFx";
+import { readProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/readProjectFilesFx";
+import { readSidecarsFx } from "../../../../electron/main/editor-project/filesystem/fx/readSidecarsFx";
+import { readVersionHistoryFx } from "../../../../electron/main/editor-project/filesystem/fx/readVersionHistoryFx";
+import { writeProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/writeProjectFilesFx";
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
@@ -18,7 +18,7 @@ export const filesystemFailure = (method: string) =>
 	});
 
 export const writeReimportableProjectFx = (root: string, revision: number) =>
-	writeFilesystemEditorProjectFilesFx({
+	writeProjectFilesFx({
 		root,
 		next: {
 			arkpack: editorTestPayload.version,
@@ -66,12 +66,12 @@ export const readReimportableProjectFx = Effect.fn("readReimportableProjectFx")(
 	root: string,
 ) {
 	const paths = yield* createEditorProjectFilesystemPathsFx(root);
-	const project = yield* readFilesystemEditorProjectFilesFx(root);
-	yield* readFilesystemEditorProjectSidecarsFx({
+	const project = yield* readProjectFilesFx(root);
+	yield* readSidecarsFx({
 		paths,
 		projectId: project.config.meta.id,
 	});
-	yield* readFilesystemEditorProjectVersionHistoryFx(paths);
+	yield* readVersionHistoryFx(paths);
 	return project;
 });
 

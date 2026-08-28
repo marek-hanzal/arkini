@@ -25,9 +25,9 @@ const readJsonFx = <Value>(target: string, parse: (candidate: unknown) => Value,
 	});
 
 /** Captures the published head, descriptors, and manifests; unlisted orphan files stay invisible. */
-export const readFilesystemEditorProjectVersionHistoryFx = Effect.fn(
-	"readFilesystemEditorProjectVersionHistoryFx",
-)(function* (paths: EditorProjectFilesystemPaths) {
+export const readVersionHistoryFx = Effect.fn("readVersionHistoryFx")(function* (
+	paths: EditorProjectFilesystemPaths,
+) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	if (!(yield* fileSystem.exists(paths.versionHeadFile)))
 		return {

@@ -77,7 +77,7 @@ describe("blueprint one-hop capacity", () => {
 		expect(result.started).toEqual(
 			Result.fail(
 				expect.objectContaining({
-					_tag: "JobOutputMaxCountError",
+					_tag: "OutputCapacityError",
 					itemId: "item:target",
 				}),
 			),

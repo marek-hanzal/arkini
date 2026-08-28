@@ -16,8 +16,8 @@ import { readArkpackContentHashFx } from "~/engine/pack/fx/readArkpackContentHas
 import { GameValidationError } from "~/engine/validation/error/GameValidationError";
 import { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
 import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
-import { withFilesystemEditorProjectLockFx } from "./withFilesystemEditorProjectLockFx";
-import { readFilesystemEditorProjectFilesFx } from "./readFilesystemEditorProjectFilesFx";
+import { withProjectLockFx } from "./withProjectLockFx";
+import { readProjectFilesFx } from "./readProjectFilesFx";
 import { ensureProjectGitignoreFx } from "./ensureProjectGitignoreFx";
 import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
 import { FilesystemWriteError } from "~/engine/filesystem/FilesystemWriteError";
@@ -147,13 +147,13 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 				const state = yield* readState(projectId);
 				yield* assertRevisionFx(state, expectedRevision, "build-project");
 				yield* providePlatform(
-					withFilesystemEditorProjectLockFx(
+					withProjectLockFx(
 						filesystemWrite,
 						state.paths.root,
 						ensureProjectGitignoreFx(state.paths),
 					),
 				);
-				const assertCurrentFx = readFilesystemEditorProjectFilesFx(state.paths.root).pipe(
+				const assertCurrentFx = readProjectFilesFx(state.paths.root).pipe(
 					Effect.mapError(projectChangedBeforeBuild),
 					Effect.filterOrFail(
 						(files) =>
@@ -216,7 +216,7 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 			Effect.gen(function* () {
 				const state = yield* readState(projectId);
 				yield* assertRevisionFx(state, expectedRevision, "read-project-build");
-				return yield* withFilesystemEditorProjectLockFx(
+				return yield* withProjectLockFx(
 					filesystemWrite,
 					state.paths.root,
 					Effect.gen(function* () {

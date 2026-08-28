@@ -146,7 +146,7 @@ describe("item charges / max count reservations", () => {
 		expect(result.attempt).toEqual(
 			Result.fail(
 				expect.objectContaining({
-					_tag: "JobOutputMaxCountError",
+					_tag: "OutputCapacityError",
 					itemId: "item:capped-gift",
 				}),
 			),
@@ -192,7 +192,7 @@ describe("item charges / max count reservations", () => {
 		expect(result.attempt).toEqual(
 			Result.fail(
 				expect.objectContaining({
-					_tag: "JobOutputMaxCountError",
+					_tag: "OutputCapacityError",
 					itemId: "item:capped-seed",
 				}),
 			),

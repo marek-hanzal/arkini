@@ -2,20 +2,20 @@ import { FileSystem } from "effect";
 import { Effect } from "effect";
 
 import { createEditorProjectFilesystemPathsFx } from "./filesystem/createEditorProjectFilesystemPathsFx";
-import { readFilesystemEditorProjectFilesFx } from "./filesystem/fx/readFilesystemEditorProjectFilesFx";
-import { readFilesystemEditorProjectSidecarsFx } from "./filesystem/fx/readFilesystemEditorProjectSidecarsFx";
-import { readFilesystemEditorProjectVersionHistoryFx } from "./filesystem/fx/readFilesystemEditorProjectVersionHistoryFx";
+import { readProjectFilesFx } from "./filesystem/fx/readProjectFilesFx";
+import { readSidecarsFx } from "./filesystem/fx/readSidecarsFx";
+import { readVersionHistoryFx } from "./filesystem/fx/readVersionHistoryFx";
 
 /** Opens one complete portable Editor project with the production filesystem readers. */
 export const readEditorJsonExportFx = Effect.fn("readEditorJsonExportFx")(function* (root: string) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const paths = yield* createEditorProjectFilesystemPathsFx(root);
-	const project = yield* readFilesystemEditorProjectFilesFx(root);
-	yield* readFilesystemEditorProjectSidecarsFx({
+	const project = yield* readProjectFilesFx(root);
+	yield* readSidecarsFx({
 		paths,
 		projectId: project.config.meta.id,
 	});
-	yield* readFilesystemEditorProjectVersionHistoryFx(paths);
+	yield* readVersionHistoryFx(paths);
 	return {
 		files: yield* fileSystem.readDirectory(root, {
 			recursive: true,

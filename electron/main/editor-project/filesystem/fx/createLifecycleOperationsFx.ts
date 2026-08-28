@@ -18,11 +18,11 @@ import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
 import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
-import { readFilesystemEditorProjectFilesFx } from "./readFilesystemEditorProjectFilesFx";
-import { readFilesystemEditorProjectSidecarsFx } from "./readFilesystemEditorProjectSidecarsFx";
-import { readFilesystemEditorProjectVersionHistoryFx } from "./readFilesystemEditorProjectVersionHistoryFx";
-import { writeFilesystemEditorProjectFilesFx } from "./writeFilesystemEditorProjectFilesFx";
-import { withFilesystemEditorProjectLockFx } from "./withFilesystemEditorProjectLockFx";
+import { readProjectFilesFx } from "./readProjectFilesFx";
+import { readSidecarsFx } from "./readSidecarsFx";
+import { readVersionHistoryFx } from "./readVersionHistoryFx";
+import { writeProjectFilesFx } from "./writeProjectFilesFx";
+import { withProjectLockFx } from "./withProjectLockFx";
 
 export interface LifecycleOperations {
 	readonly createProjectFx: (
@@ -98,18 +98,18 @@ const materializeProjectFx = Effect.fn("materializeProjectFx")(function* (
 	catalog: EditorProjectCatalogEntrySchema.Type,
 	filesystemWrite: FilesystemWrite,
 ) {
-	return yield* withFilesystemEditorProjectLockFx(
+	return yield* withProjectLockFx(
 		filesystemWrite,
 		catalog.root,
 		Effect.gen(function* () {
 			const paths = yield* createEditorProjectFilesystemPathsFx(catalog.root);
-			const files = yield* readFilesystemEditorProjectFilesFx(paths.root);
+			const files = yield* readProjectFilesFx(paths.root);
 			const projectId = files.config.meta.id;
-			const sidecars = yield* readFilesystemEditorProjectSidecarsFx({
+			const sidecars = yield* readSidecarsFx({
 				paths,
 				projectId,
 			});
-			const versionHistory = yield* readFilesystemEditorProjectVersionHistoryFx(paths);
+			const versionHistory = yield* readVersionHistoryFx(paths);
 			return {
 				catalog,
 				...sidecars,
@@ -185,8 +185,8 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 				providePlatform(materializeProjectFx(safeEntry, filesystemWrite)),
 			),
 		);
-	const writeProjectFx = (props: Parameters<typeof writeFilesystemEditorProjectFilesFx>[0]) =>
-		providePlatform(writeFilesystemEditorProjectFilesFx(props));
+	const writeProjectFx = (props: Parameters<typeof writeProjectFilesFx>[0]) =>
+		providePlatform(writeProjectFilesFx(props));
 	const readCandidatesFx = Effect.gen(function* () {
 		const candidates: Array<EditorProjectCandidate> = [];
 		const listedRoots = new Set<string>();

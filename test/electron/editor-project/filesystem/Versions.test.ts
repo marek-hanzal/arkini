@@ -9,9 +9,9 @@ import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 import type { ProjectState } from "../../../../electron/main/editor-project/filesystem/ProjectState";
 import { createEditorProjectFilesystemPathsFx } from "../../../../electron/main/editor-project/filesystem/createEditorProjectFilesystemPathsFx";
 import { createVersionOperationsFx } from "../../../../electron/main/editor-project/filesystem/fx/createVersionOperationsFx";
-import { readFilesystemEditorProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/readFilesystemEditorProjectFilesFx";
-import { readFilesystemEditorProjectVersionHistoryFx } from "../../../../electron/main/editor-project/filesystem/fx/readFilesystemEditorProjectVersionHistoryFx";
-import { writeFilesystemEditorProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/writeFilesystemEditorProjectFilesFx";
+import { readProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/readProjectFilesFx";
+import { readVersionHistoryFx } from "../../../../electron/main/editor-project/filesystem/fx/readVersionHistoryFx";
+import { writeProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/writeProjectFilesFx";
 import { EditorBoardScenarioSchema } from "~/editor/board/EditorBoardScenarioSchema";
 import { EditorProjectCatalogEntrySchema } from "~/editor/filesystem/EditorProjectCatalogEntrySchema";
 import { GameProjectGameSchemaReference } from "~/engine/source/GameProjectReference";
@@ -66,7 +66,7 @@ describe("filesystem Editor project versions", () => {
 					arkini: ArkiniAppVersion,
 					revision: 1,
 				});
-				yield* writeFilesystemEditorProjectFilesFx({
+				yield* writeProjectFilesFx({
 					root,
 					next: {
 						arkpack: "1.0",
@@ -155,7 +155,7 @@ describe("filesystem Editor project versions", () => {
 					...firstVersion.descriptor,
 					arkini: `${writerMajor}.999.999`,
 				});
-				const admittedHistory = yield* readFilesystemEditorProjectVersionHistoryFx(paths);
+				const admittedHistory = yield* readVersionHistoryFx(paths);
 				states.set(projectId, {
 					...firstState,
 					versionHistory: admittedHistory,
@@ -179,9 +179,7 @@ describe("filesystem Editor project versions", () => {
 					"\t",
 				)}\n`;
 				yield* writeJsonFx(firstDescriptorFile, JSON.parse(incompatibleSource));
-				const incompatibleError = yield* Effect.flip(
-					readFilesystemEditorProjectVersionHistoryFx(paths),
-				);
+				const incompatibleError = yield* Effect.flip(readVersionHistoryFx(paths));
 				const preservedIncompatibleSource = yield* fileSystemRead(firstDescriptorFile);
 				yield* writeJsonFx(firstDescriptorFile, taggedFile);
 
@@ -211,7 +209,7 @@ describe("filesystem Editor project versions", () => {
 					...marker,
 					revision: 2,
 				});
-				yield* writeFilesystemEditorProjectFilesFx({
+				yield* writeProjectFilesFx({
 					root,
 					previous: {
 						arkpack: "1.0",
@@ -330,7 +328,7 @@ describe("filesystem Editor project versions", () => {
 					projectId,
 					versionId: first.versionId,
 				});
-				const restoredFiles = yield* readFilesystemEditorProjectFilesFx(root);
+				const restoredFiles = yield* readProjectFilesFx(root);
 				const restoredScenario = JSON.parse(
 					yield* fileSystemRead(yield* paths.scenarioFileFx(initialScenario.name)),
 				) as unknown;

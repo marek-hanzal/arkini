@@ -80,7 +80,7 @@ describe("blueprint one-hop reservations", () => {
 		expect(result.sourceStarted).toEqual(
 			Result.fail(
 				expect.objectContaining({
-					_tag: "JobOutputMaxCountError",
+					_tag: "OutputCapacityError",
 					itemId: "item:target",
 					reservedQuantity: 2,
 				}),
@@ -149,7 +149,7 @@ describe("blueprint one-hop reservations", () => {
 		expect(result.secondStarted).toEqual(
 			Result.fail(
 				expect.objectContaining({
-					_tag: "JobOutputMaxCountError",
+					_tag: "OutputCapacityError",
 					itemId: "item:target",
 					reservedQuantity: 2,
 				}),

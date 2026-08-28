@@ -282,7 +282,7 @@ describe("consume material lifecycle", () => {
 		expect(result.attempt).toEqual(
 			Result.fail(
 				expect.objectContaining({
-					_tag: "JobOutputMaxCountError",
+					_tag: "OutputCapacityError",
 					itemId: "item:product",
 				}),
 			),

@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 import { createEditorProjectFilesystemPathsFx } from "../../../../electron/main/editor-project/filesystem/createEditorProjectFilesystemPathsFx";
-import { readFilesystemEditorProjectVersionHistoryFx } from "../../../../electron/main/editor-project/filesystem/fx/readFilesystemEditorProjectVersionHistoryFx";
+import { readVersionHistoryFx } from "../../../../electron/main/editor-project/filesystem/fx/readVersionHistoryFx";
 
 let root = "";
 
@@ -22,7 +22,7 @@ afterEach(async () => {
 	});
 });
 
-describe("readFilesystemEditorProjectVersionHistoryFx", () => {
+describe("readVersionHistoryFx", () => {
 	it("rejects a published version whose parent is absent from the head", async () => {
 		const paths = await Effect.runPromise(
 			createEditorProjectFilesystemPathsFx(root).pipe(Effect.provide(NodeServices.layer)),
@@ -76,11 +76,7 @@ describe("readFilesystemEditorProjectVersionHistoryFx", () => {
 		]);
 
 		await expect(
-			Effect.runPromise(
-				readFilesystemEditorProjectVersionHistoryFx(paths).pipe(
-					Effect.provide(NodeServices.layer),
-				),
-			),
+			Effect.runPromise(readVersionHistoryFx(paths).pipe(Effect.provide(NodeServices.layer))),
 		).rejects.toThrow("references missing parent missing-parent");
 	});
 });

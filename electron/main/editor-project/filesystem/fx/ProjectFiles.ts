@@ -4,7 +4,7 @@ import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 
 /** Canonical current-tree data backed by one Editor project directory. */
-export interface FilesystemEditorProjectFiles {
+export interface ProjectFiles {
 	readonly arkpack: ArkpackVersionSchema.Type;
 	readonly marker: GameProjectManifestSchema.Type;
 	readonly config: GameConfigSchema.Type;

@@ -1,3 +1,4 @@
+import { ListX, SearchX, type LucideIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import type { ReactNode } from "react";
 
@@ -36,21 +37,24 @@ const ItemLinesEmptyState = ({
 }: {
 	readonly children: ReactNode;
 	readonly dataUi: string;
-	readonly icon: string;
-}) => (
-	<div
-		className="grid min-h-48 place-items-center px-4 text-center text-sm text-muted"
-		data-ui={dataUi}
-	>
-		<div className="grid max-w-sm justify-items-center gap-2">
-			<span
-				className={`${icon} size-6 text-subtle`}
-				aria-hidden="true"
-			/>
-			{children}
+	readonly icon: LucideIcon;
+}) => {
+	const Icon = icon;
+	return (
+		<div
+			className="grid min-h-48 place-items-center px-4 text-center text-sm text-muted"
+			data-ui={dataUi}
+		>
+			<div className="grid max-w-sm justify-items-center gap-2">
+				<Icon
+					className="size-6 text-subtle"
+					aria-hidden="true"
+				/>
+				{children}
+			</div>
 		</div>
-	</div>
-);
+	);
+};
 
 /** Renders the authoritative visible product-line overview inside Item Detail. */
 export const ItemLinesTab = ({
@@ -179,7 +183,7 @@ export const ItemLinesTab = ({
 						>
 							<ItemLinesEmptyState
 								dataUi="ItemLinesVisibleEmpty"
-								icon="icon-[lucide--list-x]"
+								icon={ListX}
 							>
 								<p>No product line is currently visible.</p>
 							</ItemLinesEmptyState>
@@ -191,7 +195,7 @@ export const ItemLinesTab = ({
 						>
 							<ItemLinesEmptyState
 								dataUi="ItemLinesSearchEmpty"
-								icon="icon-[lucide--search-x]"
+								icon={SearchX}
 							>
 								<p>No visible lines match “{normalizedQuery}”.</p>
 							</ItemLinesEmptyState>

@@ -16,7 +16,6 @@ export namespace useEditorProjectRefreshController {
 
 	export interface Output {
 		readonly disabled: boolean;
-		readonly icon: string;
 		readonly pending: boolean;
 		readonly refresh: () => void;
 		readonly tooltip: string;
@@ -63,7 +62,6 @@ export const useEditorProjectRefreshController = ({
 	return useMemo(
 		() => ({
 			disabled,
-			icon: "icon-[lucide--refresh-cw]",
 			pending,
 			refresh,
 			tooltip:

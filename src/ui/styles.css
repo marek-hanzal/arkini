@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@plugin "@iconify/tailwind4";
 
 @import "./styles/tokens.css";
 @import "./styles/editor-chrome.css";

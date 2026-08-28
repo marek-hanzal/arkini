@@ -1,3 +1,5 @@
+import { Factory } from "lucide-react";
+
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import { readEditorItemLinesFx } from "~/bridge/item/editor/readEditorItemLinesFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
@@ -26,7 +28,7 @@ export const EditorItemProductionDetail = ({ item }: { readonly item: EditorItem
 			<Status
 				dataUi="EditorProductionLinesDisabledStatus"
 				description="This item has no production lines, so it cannot run production jobs or transform inputs into outputs. Configure a production-capable item to add that behavior."
-				icon="icon-[lucide--factory]"
+				icon={Factory}
 				title="Production lines are disabled"
 			/>
 		);

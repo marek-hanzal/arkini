@@ -1,3 +1,4 @@
+import { PackageOpen, Plus } from "lucide-react";
 import { useMemo } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
@@ -84,7 +85,7 @@ export const EditorItemList = ({
 						}}
 						className="h-12 min-h-0 shrink-0 gap-2 px-4 text-sm"
 					>
-						<span className="icon-[lucide--plus] size-4" />
+						<Plus className="size-4" />
 						New item
 					</PrimaryButtonLink>
 				)}
@@ -94,7 +95,7 @@ export const EditorItemList = ({
 					<Status
 						dataUi="EditorItemsEmpty"
 						description="Create the first item to start authoring this game."
-						icon="icon-[lucide--package-open]"
+						icon={PackageOpen}
 						title="No items yet"
 						action={
 							<PrimaryButtonLink
@@ -104,7 +105,7 @@ export const EditorItemList = ({
 								}}
 								className="gap-2"
 							>
-								<span className="icon-[lucide--plus] size-4" />
+								<Plus className="size-4" />
 								New item
 							</PrimaryButtonLink>
 						}

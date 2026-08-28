@@ -1,3 +1,5 @@
+import { ArrowUpRight, ChevronRight } from "lucide-react";
+
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { EditorLine } from "~/bridge/item/editor/EditorItemModel";
@@ -44,7 +46,7 @@ export const EditorProductionLineDetail = ({
 								lineId={line.id}
 							>
 								{line.title}
-								<span className="icon-[lucide--arrow-up-right] size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />
+								<ArrowUpRight className="size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />
 							</EditorProductionLineEditLink>
 						</h3>
 						{!line.enable ? (
@@ -74,7 +76,7 @@ export const EditorProductionLineDetail = ({
 					className="grid place-items-center text-muted"
 					data-ui="EditorProductionLineFlowChevron"
 				>
-					<span className="icon-[lucide--chevron-right] size-5" />
+					<ChevronRight className="size-5" />
 				</div>
 				<EditorProductionLineOutputs
 					items={items}

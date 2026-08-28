@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { CloudOff, FileWarning, LoaderCircle } from "lucide-react";
 
 import { Button } from "~/ui/button/Button";
 import { EditorChatGptAssetConfirmation } from "~/ui/chatgpt/editor/EditorChatGptAssetConfirmation";
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/editor/$projectId/chatgpt")({
 									? controller.candidateError.message
 									: String(controller.candidateError)
 							}
-							icon="icon-[lucide--file-warning]"
+							icon={FileWarning}
 							title="Downloaded image was rejected"
 							action={
 								<Button onClick={controller.discard}>Discard &amp; return</Button>
@@ -42,7 +43,8 @@ export const Route = createFileRoute("/editor/$projectId/chatgpt")({
 						<Status
 							dataUi="EditorChatGptLoading"
 							description="The isolated browser is loading the next page."
-							icon="icon-[lucide--loader-circle] animate-spin"
+							icon={LoaderCircle}
+							iconSpin
 							title="Loading ChatGPT…"
 						/>
 					</div>
@@ -54,7 +56,7 @@ export const Route = createFileRoute("/editor/$projectId/chatgpt")({
 						<Status
 							dataUi="EditorChatGptUnavailable"
 							description={controller.viewState.message}
-							icon="icon-[lucide--cloud-off]"
+							icon={CloudOff}
 							title="ChatGPT is unavailable"
 							action={<Button onClick={controller.retry}>Retry</Button>}
 						/>

@@ -1,3 +1,5 @@
+import { PackagePlus } from "lucide-react";
+
 import type { EditorMerge } from "~/bridge/item/editor/EditorItemModel";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
@@ -112,7 +114,7 @@ export const EditorMergeField = ({
 			<EditorOptionalOutputControl
 				addLabel="Enable merge output"
 				emptyDescription="The merge currently changes only its source and target. Enable an output to emit additional items when it resolves."
-				emptyIcon="icon-[lucide--package-plus]"
+				emptyIcon={PackagePlus}
 				emptyTitle="No merge output"
 				value={merge.output}
 				onChange={(output) =>

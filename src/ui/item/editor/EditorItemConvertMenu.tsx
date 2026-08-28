@@ -1,4 +1,5 @@
 import { FloatingPortal } from "@floating-ui/react";
+import { Replace } from "lucide-react";
 
 import { EditorItemTypes, type EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import { Button, ButtonLink } from "~/ui/button/Button";
@@ -25,7 +26,7 @@ export const EditorItemConvertMenu = ({
 				className={`${editorSectionTabClassName} h-10 min-h-10 gap-2`}
 				{...getReferenceProps()}
 			>
-				<span className="icon-[lucide--replace] size-4" />
+				<Replace className="size-4" />
 				Convert
 			</Button>
 			{open ? (
@@ -42,6 +43,7 @@ export const EditorItemConvertMenu = ({
 						</p>
 						{EditorItemTypes.filter((type) => type !== itemType).map((type) => {
 							const presentation = EditorItemTypePresentation[type];
+							const Icon = presentation.icon;
 							return (
 								<ButtonLink
 									key={type}
@@ -56,9 +58,7 @@ export const EditorItemConvertMenu = ({
 									}}
 									className="min-h-0 justify-start gap-3 border-0 bg-transparent px-2.5 py-2 text-left shadow-none"
 								>
-									<span
-										className={`${presentation.icon} size-6 shrink-0 text-accent`}
-									/>
+									<Icon className="size-6 shrink-0 text-accent" />
 									<span className="min-w-0">
 										<span className="block font-semibold capitalize">
 											{type}

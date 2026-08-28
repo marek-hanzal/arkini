@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Save } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 
 import type { EditorProjectVersionDescriptor } from "~/editor/version/EditorProjectVersion";
@@ -183,7 +184,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/history")({
 											disabled={controller.tagPending}
 											onClick={controller.saveTag}
 										>
-											<span className="icon-[lucide--save] size-4" />
+											<Save className="size-4" />
 											Save
 										</Button>
 									</div>

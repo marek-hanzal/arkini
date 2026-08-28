@@ -30,11 +30,7 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 			(catalogState.type === "ready" && AsyncResult.isSuccess(startup) && !startup.waiting);
 
 		return (
-			<MainPageLayout
-				page="main-menu"
-				panelMode="compact"
-				panelClassName="overflow-visible border-0 bg-transparent shadow-none"
-			>
+			<MainPageLayout page="main-menu">
 				<nav
 					className="grid w-full gap-4"
 					aria-label="Main menu"

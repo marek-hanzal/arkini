@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorFlowPage } from "~/page/editor/EditorFlowPage";
-import type { EditorOriginFlowDirection } from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
+import type { OriginFlowDirection } from "~/ui/item/editor/origin-flow/Highlight";
 
 interface EditorFlowRouteSearch {
-	readonly direction: EditorOriginFlowDirection;
+	readonly direction: OriginFlowDirection;
 	readonly itemId?: string;
 }
 

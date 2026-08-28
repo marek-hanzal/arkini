@@ -1,20 +1,20 @@
 import { Effect } from "effect";
 
 import { applyPlacementPlanFx } from "~/engine/placement/fx/applyPlacementPlanFx";
-import type { StoreItemInInventoryPlan } from "~/engine/runtime/fx/readStoreItemInInventoryPlanFx";
+import type { InventoryStoragePlan } from "~/engine/runtime/fx/planInventoryStorageFx";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 /** Applies one validated Inventory-storage plan to an immutable runtime draft. */
-export const applyStoreItemInInventoryPlanFx = Effect.fn("applyStoreItemInInventoryPlanFx")(
+export const applyInventoryStoragePlanFx = Effect.fn("applyInventoryStoragePlanFx")(
 	function* ({
 		item,
 		plan,
 		runtime,
 	}: {
 		readonly item: GridRuntimeItemSchema.Type;
-		readonly plan: StoreItemInInventoryPlan;
+		readonly plan: InventoryStoragePlan;
 		readonly runtime: RuntimeSchema.Type;
 	}) {
 		if (plan.kind === "pure") {

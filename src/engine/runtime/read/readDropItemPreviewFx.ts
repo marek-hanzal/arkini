@@ -16,7 +16,7 @@ import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { readDropItemStackRejectedReasonFx } from "~/engine/runtime/read/readDropItemStackRejectedReasonFx";
 import { readItemStackResolutionFx } from "~/engine/runtime/read/readItemStackResolutionFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { readStoreItemInInventoryPlanFx } from "~/engine/runtime/fx/readStoreItemInInventoryPlanFx";
+import { planInventoryStorageFx } from "~/engine/runtime/fx/planInventoryStorageFx";
 import { DropItemIgnoredReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemIgnoredReasonEnumSchema";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
@@ -175,7 +175,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		) {
 			return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
 		}
-		const storagePlan = yield* readStoreItemInInventoryPlanFx({
+		const storagePlan = yield* planInventoryStorageFx({
 			item: source,
 			runtime,
 		}).pipe(Effect.option);

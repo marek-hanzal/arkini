@@ -111,7 +111,7 @@ Electron user data is split by owner:
 <userData>/arkini/editor/  project catalog, managed projects, MCP state
 ```
 
-The package catalog combines bundled and user candidates. A valid user package may override the same package ID; an invalid one falls back to the bundled candidate. Package removal touches only the user package, never its save. Exact load independently verifies filename/package identity, the self-contained envelope, compatibility, config, resources, and soft provenance. [`VERSION.md`](VERSION.md) owns external envelopes and Official/Community provenance.
+The package catalog combines bundled and user candidates. A valid user package may override the same package ID; an invalid one falls back to the bundled candidate. Package removal touches only the user package, never its save. Exact load independently verifies filename/package identity, the self-contained envelope, compatibility, config, resources, and soft provenance. Provenance trust is owned by the reading build's configured issuer/repository/workflow distribution channel, not its application version or the signing tag. [`VERSION.md`](VERSION.md) owns external envelopes and Official/Community provenance.
 
 Autosave observes changed Runtime root identity, debounces, serializes writes, and always flushes the latest canonical snapshot. Event-only transitions do not wake or postpone it. Persistence is an observer, not gameplay truth.
 

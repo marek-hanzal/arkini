@@ -8,14 +8,15 @@ import { defineConfig } from "electron-vite";
 import { Effect } from "effect";
 import { RendererDevelopmentServer } from "./electron/security/RendererDevelopmentUrl";
 import { createRendererDevelopmentContentSecurityPolicyFx } from "./electron/security/createRendererDevelopmentContentSecurityPolicyFx";
-import { ArkiniReleaseIdentityDefaults } from "./src/engine/pack/ArkiniReleaseIdentity";
+import { ArkpackDistributionChannelDefaults } from "./src/engine/pack/ArkpackDistributionChannel";
 
 const sourceAlias = {
 	"~": fileURLToPath(new URL("./src", import.meta.url)),
 };
-const releaseIssuer = process.env.ARKINI_RELEASE_ISSUER ?? ArkiniReleaseIdentityDefaults.issuer;
+const releaseIssuer =
+	process.env.ARKINI_RELEASE_ISSUER ?? ArkpackDistributionChannelDefaults.issuer;
 const releaseIdentity =
-	process.env.ARKINI_RELEASE_IDENTITY ?? ArkiniReleaseIdentityDefaults.identity;
+	process.env.ARKINI_RELEASE_IDENTITY ?? ArkpackDistributionChannelDefaults.workflow;
 new URL(releaseIssuer);
 new URL(releaseIdentity);
 

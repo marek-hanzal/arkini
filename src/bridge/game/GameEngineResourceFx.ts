@@ -43,6 +43,15 @@ export interface GameEngineResourceFxService {
 	/** Reads only the adopted or currently finalizing renderer Game. */
 	readonly currentFx: Effect.Effect<GameEngineResource | null, CriticalGameLifecycleError>;
 	/**
+	 * Joins every in-flight ownership transition before handing the renderer to
+	 * an Editor game. An active resource is returned so its save route can own
+	 * the final handoff; provisional ownership is cancelled here.
+	 */
+	readonly prepareEditorHandoffFx: Effect.Effect<
+		GameEngineResource | null,
+		CriticalGameLifecycleError
+	>;
+	/**
 	 * Acquires one scoped lease. Its Scope owns provisional cleanup until the
 	 * exact lease is adopted by the route.
 	 */

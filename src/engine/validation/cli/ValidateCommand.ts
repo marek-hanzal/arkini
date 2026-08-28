@@ -3,7 +3,7 @@ import { Console, Effect } from "effect";
 
 import { compileGameDirectoryFx } from "~/engine/compiler/fx/compileGameDirectoryFx";
 import { assertGameConfigValidFx } from "~/engine/validation/fx/assertGameConfigValidFx";
-import { renderGameDiagnosticsFx } from "~/engine/validation/fx/renderGameDiagnosticsFx";
+import { printGameDiagnosticsForCliFx } from "~/engine/validation/printer/printGameDiagnosticsForCliFx";
 
 export namespace ValidateCommand {
 	export interface Props {
@@ -17,7 +17,7 @@ const runValidateCommandFx = Effect.fn("runValidateCommandFx")(function* ({
 	const result = yield* compileGameDirectoryFx({
 		input,
 	});
-	yield* renderGameDiagnosticsFx(result.diagnostics);
+	yield* printGameDiagnosticsForCliFx(result.diagnostics);
 	yield* assertGameConfigValidFx(result);
 	yield* Console.log(`Validated ${input}.`);
 });
@@ -35,6 +35,6 @@ export const ValidateCommand = ({ input }: ValidateCommand.Props) =>
 			}),
 	).pipe(
 		Command.withDescription(
-			"Compile and validate one fragmented game-authoring directory without packing it.",
+			"Compile and validate one portable game-project directory without packing it.",
 		),
 	);

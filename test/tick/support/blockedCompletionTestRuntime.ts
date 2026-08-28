@@ -29,6 +29,7 @@ export const createBlockedCompletionTestConfig = () => {
 			...base.items,
 			blocker: {
 				...base.items.tool,
+				uid: "blocker",
 				id: "blocker",
 				title: "Blocker",
 				description: "Occupies board delivery capacity.",
@@ -37,12 +38,14 @@ export const createBlockedCompletionTestConfig = () => {
 			},
 			ingot: {
 				...base.items.tool,
+				uid: "ingot",
 				id: "ingot",
 				title: "Ingot",
 				description: "Blocked forge output.",
 			},
 			blockedForge: {
 				...forge,
+				uid: "blockedForge",
 				id: "blockedForge",
 				title: "Blocked forge",
 				description: "Cannot deliver while capacity is full.",
@@ -60,8 +63,8 @@ export const createBlockedCompletionTestConfig = () => {
 												{
 													itemId: "ingot",
 													quantity: {
-														type: "value",
-														value: 1,
+														min: 1,
+														max: 1,
 													},
 													placement: "drop",
 													rules: [],
@@ -77,6 +80,7 @@ export const createBlockedCompletionTestConfig = () => {
 			},
 			freeForge: {
 				...forge,
+				uid: "freeForge",
 				id: "freeForge",
 				title: "Free forge",
 				description: "Completes without delivery placement.",

@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "kca4372si0oimuanh9v4ucxq",
+		"id": "item:key-t1",
+		"title": "Key I",
+		"description": "Basic goldsmith key used to open Chest I and bootstrap the gem/key expedition loop.",
+		"asset": {
+			"default": [
+				"item-key-t1"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 20,
+		"type": "simple"
+	}
+}

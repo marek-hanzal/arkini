@@ -55,6 +55,9 @@ describe("runtime purity invariants", () => {
 					remainingMs: 1_000,
 				},
 			],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
 		const result = Effect.runSync(
@@ -112,6 +115,8 @@ describe("runtime purity invariants", () => {
 			],
 			jobs: [],
 			jobQueue: [],
+
+			defaultLineByOwnerItemId: {},
 		},
 		{
 			name: "active job",
@@ -132,6 +137,8 @@ describe("runtime purity invariants", () => {
 				},
 			],
 			jobQueue: [],
+
+			defaultLineByOwnerItemId: {},
 		},
 		{
 			name: "queued request",
@@ -150,6 +157,8 @@ describe("runtime purity invariants", () => {
 					lineId: "line:producer:buffer",
 				},
 			],
+
+			defaultLineByOwnerItemId: {},
 		},
 	])("rejects an impure producer stack with $name", ({ items, jobs, jobQueue }) => {
 		const runtime = {
@@ -171,6 +180,8 @@ describe("runtime purity invariants", () => {
 			],
 			jobs,
 			jobQueue,
+
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
 		const result = Effect.runSync(
@@ -210,6 +221,9 @@ describe("runtime purity invariants", () => {
 				},
 			],
 			jobs: [],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
 		const result = Effect.runSync(
@@ -263,6 +277,9 @@ describe("runtime purity invariants", () => {
 					remainingMs: 1_000,
 				},
 			],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
 		const result = Effect.runSync(

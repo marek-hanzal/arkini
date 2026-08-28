@@ -7,7 +7,6 @@ import type {
 	PixiAnimationSpring,
 } from "~/ui/pixi/animation/PixiAnimationDriver";
 import { createPixiActorAnimatorFx } from "~/ui/pixi/animation/createPixiActorAnimatorFx";
-import { readPixiActorAlphaAnimationKey } from "~/ui/pixi/animation/readPixiActorAlphaAnimationKey";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 
 type TweenProps = Parameters<PixiAnimationDriver["startTweenFx"]>[0];
@@ -63,6 +62,16 @@ const createFrames = () => {
 		frames: {
 			closeFx: Effect.void,
 			invalidateFx: Effect.sync(invalidate),
+			scheduleAfterRenderFx: (work) =>
+				Effect.sync(() => {
+					work();
+					return () => {};
+				}),
+			scheduleFx: (work) =>
+				Effect.sync(() => {
+					work();
+					return () => {};
+				}),
 			reportCriticalFailure: vi.fn(),
 		} satisfies DemandFrameLoop,
 		invalidate,
@@ -85,6 +94,14 @@ const createActor = (id = "runtime:actor", instanceId = `instance:${id}`) =>
 		},
 		crowdLayer: {
 			alpha: 1,
+		},
+		lifecycleLayer: {
+			scale: {
+				set(value: number) {
+					this.x = value;
+				},
+				x: 1,
+			},
 		},
 		activityParticles: {
 			container: {
@@ -195,6 +212,37 @@ describe("Pixi actor animator", () => {
 		expect(actor.activityParticles.particles[0]?.particle.alpha).toBeCloseTo(0.5);
 		expect(actor.container.x).toBe(100);
 		expect(actor.container.y).toBe(200);
+	});
+
+	it("keeps lifecycle scale independent from canonical pose scale", () => {
+		const actor = createActor();
+		const { animator, tweens } = createAnimator();
+
+		Effect.runSync(
+			animator.animateFx({
+				actor,
+				channel: "pose",
+				durationMs: 300,
+				toScale: 1,
+				toX: 100,
+				toY: 200,
+			}),
+		);
+		Effect.runSync(
+			animator.animateFx({
+				actor,
+				channel: "lifecycle-scale",
+				durationMs: 300,
+				toScale: 0.8,
+			}),
+		);
+		tweens[0]?.update(0.5);
+		tweens[1]?.update(0.5);
+
+		expect(actor.container.scale.x).toBeCloseTo(0.875);
+		expect(actor.lifecycleLayer.scale.x).toBeCloseTo(0.9);
+		expect(actor.container.x).toBeCloseTo(55);
+		expect(actor.container.y).toBeCloseTo(110);
 	});
 
 	it("supersedes different owners on one actor channel while another channel keeps producing frames", () => {
@@ -406,7 +454,7 @@ describe("Pixi actor animator", () => {
 				actor: exiting,
 				channel: "lifecycle-opacity",
 				durationMs: 220,
-				ownerKey: readPixiActorAlphaAnimationKey(exiting),
+				ownerKey: `actor-alpha:${exiting.instanceId}`,
 				toAlpha: 0,
 			}),
 		);
@@ -415,13 +463,13 @@ describe("Pixi actor animator", () => {
 				actor: replacement,
 				channel: "lifecycle-opacity",
 				durationMs: 520,
-				ownerKey: readPixiActorAlphaAnimationKey(replacement),
+				ownerKey: `actor-alpha:${replacement.instanceId}`,
 				toAlpha: 1,
 			}),
 		);
 
-		expect(readPixiActorAlphaAnimationKey(exiting)).not.toBe(
-			readPixiActorAlphaAnimationKey(replacement),
+		expect(`actor-alpha:${exiting.instanceId}`).not.toBe(
+			`actor-alpha:${replacement.instanceId}`,
 		);
 		expect(tweens[0]?.stop).not.toHaveBeenCalled();
 		expect(tweens[1]?.stop).not.toHaveBeenCalled();

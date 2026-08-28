@@ -8,7 +8,6 @@ import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSc
 import { whenFx } from "~/engine/when/fx/whenFx";
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -27,36 +26,31 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		source: {
+			uid: "source",
 			id: "source",
 			title: "Source",
 			description: "A query origin.",
 			asset: {
-				source: [
+				default: [
 					"asset:source",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "board",
 			maxStackSize: 1,
 			type: "simple",
 		},
 		tree: {
+			uid: "tree",
 			id: "tree",
 			title: "Tree",
 			description: "A living tree.",
 			asset: {
-				source: [
+				default: [
 					"asset:tree",
 				],
 			},
-			tags: [
-				"forest",
-			],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 			type: "simple",
@@ -148,8 +142,8 @@ describe("whenFx", () => {
 						query: {
 							scope: "inventory",
 							selector: {
-								tag: "forest",
-								type: "tag",
+								itemId: "tree",
+								type: "item",
 							},
 						},
 						type: "exists",

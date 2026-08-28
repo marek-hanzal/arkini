@@ -24,7 +24,6 @@ import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/comman
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
 const configInput = {
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -44,80 +43,74 @@ const configInput = {
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		water: {
+			uid: "water",
 			id: "water",
 			type: "simple",
 			title: "Water",
 			description: "Water",
 			asset: {
-				source: [
+				default: [
 					"asset:water",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 		},
 		stone: {
+			uid: "stone",
 			id: "stone",
 			type: "simple",
 			title: "Stone",
 			description: "Stone",
 			asset: {
-				source: [
+				default: [
 					"asset:stone",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 		},
 		boardOnly: {
+			uid: "boardOnly",
 			id: "boardOnly",
 			type: "simple",
 			title: "Board only",
 			description: "Board only",
 			asset: {
-				source: [
+				default: [
 					"asset:board-only",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "board",
 			maxStackSize: 1,
 		},
 		inventoryOnly: {
+			uid: "inventoryOnly",
 			id: "inventoryOnly",
 			type: "simple",
 			title: "Inventory only",
 			description: "Inventory only",
 			asset: {
-				source: [
+				default: [
 					"asset:inventory-only",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "inventory",
 			maxStackSize: 1,
 		},
 		backpack: {
+			uid: "backpack",
 			id: "backpack",
 			type: "inventory",
 			title: "Backpack",
 			description: "Backpack",
 			asset: {
-				source: [
+				default: [
 					"asset:backpack",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 		},
 	},
 } as const;

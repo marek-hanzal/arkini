@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "tdvgzkzaosctyleu65rjeutn",
+		"id": "item:sand",
+		"title": "Sand",
+		"description": "Fine sand prepared as the base material for glassmaking.",
+		"asset": {
+			"default": [
+				"item-sand"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 50,
+		"type": "simple"
+	}
+}

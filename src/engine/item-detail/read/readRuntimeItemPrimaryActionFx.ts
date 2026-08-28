@@ -1,6 +1,7 @@
 import { Effect, Option } from "effect";
 
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { resolveJobQueueFx } from "~/engine/job/fx/read/resolveJobQueueFx";
 import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
 import { readEffectiveDefaultLineFx } from "~/engine/line/read/readEffectiveDefaultLineFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
@@ -12,11 +13,20 @@ export namespace readRuntimeItemPrimaryActionFx {
 				readonly kind: "none";
 		  }
 		| {
+				readonly currentSpace: number;
+				readonly kind: "activate-space";
+		  }
+		| {
 				readonly kind: "open-inventory";
 		  }
 		| {
 				readonly kind: "enqueue-default-line";
 				readonly lineId: string;
+				readonly queue: {
+					readonly available: boolean;
+					readonly capacity: number;
+					readonly used: number;
+				};
 		  };
 
 	export interface Props {
@@ -28,6 +38,12 @@ export namespace readRuntimeItemPrimaryActionFx {
 /** Resolves the canonical single-click action of one exact live item. */
 export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryActionFx")(
 	function* ({ item, runtime }: readRuntimeItemPrimaryActionFx.Props) {
+		if (item.item.type === ItemEnumSchema.enum.Space) {
+			return {
+				currentSpace: runtime.currentSpace,
+				kind: "activate-space" as const,
+			} satisfies readRuntimeItemPrimaryActionFx.Result;
+		}
 		if (item.item.type === ItemEnumSchema.enum.Inventory) {
 			return {
 				kind: "open-inventory" as const,
@@ -45,9 +61,18 @@ export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryA
 			runtime,
 		});
 		if (defaultLine !== undefined) {
+			const queue = yield* resolveJobQueueFx({
+				owner: item,
+				runtime,
+			});
 			return {
 				kind: "enqueue-default-line" as const,
 				lineId: defaultLine.id,
+				queue: {
+					available: queue.available,
+					capacity: queue.capacity,
+					used: queue.used,
+				},
 			} satisfies readRuntimeItemPrimaryActionFx.Result;
 		}
 		return {

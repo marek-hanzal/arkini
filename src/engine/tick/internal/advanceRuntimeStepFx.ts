@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import { isPassiveStorageLocationFx } from "~/engine/location/read/isPassiveStorageLocationFx";
 import { isInstantGameplayEnabledFx } from "~/engine/cheat/read/isInstantGameplayEnabledFx";
+import { settleItemDeliveryRuntimeFx } from "~/engine/delivery/write/settleItemDeliveryRuntimeFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
@@ -14,6 +15,7 @@ import type { JobSchema } from "~/engine/job/schema/JobSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { TickStepMs } from "~/engine/tick/TickStepMs";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 interface RuntimeStepResult {
 	readonly events: readonly GameEventSchema.Type[];
@@ -33,6 +35,59 @@ const sortTemporaryItems = (runtime: RuntimeSchema.Type) =>
 const replaceJob = (runtime: RuntimeSchema.Type, job: JobSchema.Type): RuntimeSchema.Type => ({
 	...runtime,
 	jobs: runtime.jobs.map((candidate) => (candidate.id === job.id ? job : candidate)),
+});
+
+const advanceDeliveriesFx = Effect.fn("advanceDeliveriesFx")(function* (
+	runtime: RuntimeSchema.Type,
+) {
+	const instantGameplay = yield* isInstantGameplayEnabledFx({
+		runtime,
+	});
+	const deliveryIds = runtime.items
+		.filter((item) => item.location.scope === LocationScopeEnumSchema.enum.Delivery)
+		.map((item) => item.id)
+		.sort((first, second) => first.localeCompare(second));
+	let draft = runtime;
+	for (const itemId of deliveryIds) {
+		const liveItem = draft.items.find((item) => item.id === itemId);
+		if (liveItem?.location.scope !== LocationScopeEnumSchema.enum.Delivery) continue;
+		if (liveItem.location.remainingDurationMs === 0) continue;
+		const advanced = {
+			...liveItem,
+			location: {
+				...liveItem.location,
+				remainingDurationMs: instantGameplay
+					? 0
+					: Math.max(0, liveItem.location.remainingDurationMs - TickStepMs),
+			},
+		};
+		draft = {
+			...draft,
+			items: draft.items.map((item) => (item.id === itemId ? advanced : item)),
+		};
+	}
+
+	const events: GameEventSchema.Type[] = [];
+	for (const itemId of deliveryIds) {
+		const liveItem = draft.items.find((item) => item.id === itemId);
+		if (
+			liveItem?.location.scope !== LocationScopeEnumSchema.enum.Delivery ||
+			liveItem.location.remainingDurationMs !== 0
+		)
+			continue;
+		const [, settledRuntime, settledEvents = []] = yield* settleItemDeliveryRuntimeFx({
+			itemId,
+			generation: liveItem.location.generation,
+			runtime: draft,
+		});
+		draft = settledRuntime;
+		events.push(...settledEvents);
+	}
+
+	return {
+		events,
+		runtime: draft,
+	} satisfies RuntimeStepResult;
 });
 
 const dispatchQueueRequestFx = Effect.fn("dispatchQueueRequestFx")(function* (
@@ -65,7 +120,7 @@ const dispatchIdleQueueHeadsFx = Effect.fn("dispatchIdleQueueHeadsFx")(function*
 ) {
 	const activeOwnerItemIds = new Set(runtime.jobs.map((job) => job.ownerItemId));
 	const visitedOwnerItemIds = new Set<IdSchema.Type>();
-	const queueSnapshot = runtime.jobQueue ?? [];
+	const queueSnapshot = runtime.jobQueue;
 
 	let draft = runtime;
 	const events: GameEventSchema.Type[] = [];
@@ -104,11 +159,12 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 	stepStart: RuntimeSchema.Type,
 ) {
 	const boundaryStart = yield* dispatchIdleQueueHeadsFx(stepStart);
+	const deliveryStart = yield* advanceDeliveriesFx(boundaryStart.runtime);
 	const instantGameplay = yield* isInstantGameplayEnabledFx({
-		runtime: boundaryStart.runtime,
+		runtime: deliveryStart.runtime,
 	});
-	const jobs = sortJobs(boundaryStart.runtime.jobs);
-	const temporaryItems = sortTemporaryItems(boundaryStart.runtime);
+	const jobs = sortJobs(deliveryStart.runtime.jobs);
+	const temporaryItems = sortTemporaryItems(deliveryStart.runtime);
 	const runnableByJobId = new Map<IdSchema.Type, boolean>();
 	for (const job of jobs) {
 		runnableByJobId.set(
@@ -117,14 +173,14 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 				? false
 				: yield* resolveJobRunnableFx({
 						job,
-						runtime: boundaryStart.runtime,
+						runtime: deliveryStart.runtime,
 					}),
 		);
 	}
 
 	let draft = yield* advanceTemporaryItemDurationsFx({
 		items: temporaryItems,
-		runtime: boundaryStart.runtime,
+		runtime: deliveryStart.runtime,
 	});
 	for (const job of jobs) {
 		if (job.remainingMs === 0 || runnableByJobId.get(job.id) !== true) continue;
@@ -138,6 +194,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 
 	const events: GameEventSchema.Type[] = [
 		...boundaryStart.events,
+		...deliveryStart.events,
 	];
 	const completedOwnerItemIds: IdSchema.Type[] = [];
 	for (const job of jobs) {

@@ -13,7 +13,6 @@ import { queryFx } from "~/engine/query/fx/queryFx";
 import type { QuerySchema } from "~/engine/query/schema/QuerySchema";
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -33,21 +32,17 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		tree: {
+			uid: "tree",
 			id: "tree",
 			title: "Tree",
 			description: "A living tree.",
 			asset: {
-				source: [
+				default: [
 					"asset:tree",
 				],
 			},
-			tags: [
-				"forest",
-			],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 			type: "simple",
@@ -87,7 +82,7 @@ const readIds = (items: ReadonlyArray<RuntimeItemSchema.Type>) => {
 };
 
 describe("queryFx", () => {
-	it("selects exact board distance rings and excludes the origin", () => {
+	it("selects the origin and exact board distance rings", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const origin = yield* placeTreeFx({
@@ -134,6 +129,21 @@ describe("queryFx", () => {
 						},
 					},
 				});
+				const self = yield* queryFx({
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
+					query: {
+						distance: "self",
+						scope: "board",
+						selector: {
+							itemId: "tree",
+							type: "item",
+						},
+					},
+				});
 				const close = yield* queryFx({
 					origin: {
 						scope: "board",
@@ -144,8 +154,8 @@ describe("queryFx", () => {
 						distance: "close",
 						scope: "board",
 						selector: {
-							tag: "forest",
-							type: "tag",
+							itemId: "tree",
+							type: "item",
 						},
 					},
 				});
@@ -159,8 +169,8 @@ describe("queryFx", () => {
 						distance: "near",
 						scope: "board",
 						selector: {
-							tag: "forest",
-							type: "tag",
+							itemId: "tree",
+							type: "item",
 						},
 					},
 				});
@@ -174,8 +184,8 @@ describe("queryFx", () => {
 						distance: "far",
 						scope: "board",
 						selector: {
-							tag: "forest",
-							type: "tag",
+							itemId: "tree",
+							type: "item",
 						},
 					},
 				});
@@ -184,6 +194,7 @@ describe("queryFx", () => {
 					close,
 					far,
 					near,
+					self,
 				};
 			}).pipe(
 				useGameFx({
@@ -192,6 +203,9 @@ describe("queryFx", () => {
 			),
 		);
 
+		expect(readIds(result.self)).toEqual([
+			"origin",
+		]);
 		expect(readIds(result.close)).toEqual([
 			"close",
 		]);
@@ -429,6 +443,9 @@ describe("queryFx", () => {
 					},
 				}),
 			],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 		const runQuery = (query: QuerySchema.Type) => {
 			return queryFx({

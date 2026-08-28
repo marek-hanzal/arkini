@@ -21,6 +21,7 @@ const boardState = vi.hoisted(() => ({
 	navigate: vi.fn(() => Promise.resolve()),
 	openItemDetail: vi.fn(),
 	runDrop: vi.fn(),
+	runSpaceActivation: vi.fn(() => Promise.resolve(true)),
 	splitStack: vi.fn(() => Promise.resolve(true)),
 	registerInteraction: vi.fn(),
 	enqueueLine: vi.fn(),
@@ -45,6 +46,9 @@ const tileAtoms = vi.hoisted(() => ({
 	split: {
 		kind: "split",
 	},
+	space: {
+		kind: "space",
+	},
 }));
 
 vi.mock("@effect/atom-react", () => ({
@@ -53,19 +57,15 @@ vi.mock("@effect/atom-react", () => ({
 		boardState.enqueueLine,
 	],
 	useAtomSet: (atom: unknown) =>
-		atom === tileAtoms.split ? boardState.splitStack : boardState.runDrop,
-}));
-
-vi.mock("@tanstack/react-router", () => ({
-	useNavigate: () => boardState.navigate,
+		atom === tileAtoms.split
+			? boardState.splitStack
+			: atom === tileAtoms.space
+				? boardState.runSpaceActivation
+				: boardState.runDrop,
 }));
 
 vi.mock("~/bridge/game/useGameEngine", () => ({
-	useGameEngine: () => ({
-		arkpack: {
-			packageId: "package-board",
-		},
-	}),
+	useGameEngine: () => ({}),
 }));
 
 vi.mock("~/bridge/runtime/RendererRuntime", () => ({
@@ -85,6 +85,10 @@ vi.mock("~/bridge/tile/runTileDropAtom", () => ({
 
 vi.mock("~/bridge/tile/runTileSplitAtom", () => ({
 	runTileSplitAtom: () => tileAtoms.split,
+}));
+
+vi.mock("~/bridge/space/runSpaceActivationAtom", () => ({
+	runSpaceActivationAtom: () => tileAtoms.space,
 }));
 
 vi.mock("~/ui/game-menu/useGameMenuControl", () => ({
@@ -131,6 +135,22 @@ vi.mock("~/ui/pixi/scene/createPixiMainSceneRuntimeFx", () => ({
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
+const renderSurface = async () => {
+	const host = document.createElement("div");
+	document.body.append(host);
+	const root = createRoot(host);
+	roots.push(root);
+	await act(async () => {
+		root.render(
+			createElement(PixiBoardToolbarSurface, {
+				onOpenInventory: boardState.navigate,
+			}),
+		);
+		await Promise.resolve();
+	});
+	return host;
+};
+
 afterEach(async () => {
 	await act(async () => {
 		for (const root of roots.splice(0)) root.unmount();
@@ -141,6 +161,7 @@ afterEach(async () => {
 	boardState.navigate.mockClear();
 	boardState.openItemDetail.mockClear();
 	boardState.runDrop.mockClear();
+	boardState.runSpaceActivation.mockClear();
 	boardState.splitStack.mockClear();
 	boardState.registerInteraction.mockClear();
 	boardState.enqueueLine.mockClear();
@@ -160,15 +181,7 @@ describe("PixiBoardToolbarSurface", () => {
 			},
 			ownerItemId: "runtime:producer",
 		};
-		const host = document.createElement("div");
-		document.body.append(host);
-		const root = createRoot(host);
-		roots.push(root);
-
-		await act(async () => {
-			root.render(createElement(PixiBoardToolbarSurface));
-			await Promise.resolve();
-		});
+		await renderSurface();
 
 		expect(boardState.openItemDetail).not.toHaveBeenCalled();
 		expect(boardState.enqueueLine).toHaveBeenCalledWith({
@@ -177,14 +190,7 @@ describe("PixiBoardToolbarSurface", () => {
 	});
 
 	it("keeps an unavailable left click inert and reserves Item Detail for right click", async () => {
-		const host = document.createElement("div");
-		document.body.append(host);
-		const root = createRoot(host);
-		roots.push(root);
-		await act(async () => {
-			root.render(createElement(PixiBoardToolbarSurface));
-			await Promise.resolve();
-		});
+		await renderSurface();
 		const createProps = boardState.createProps;
 		if (createProps === null) throw new Error("Board scene did not create its runtime.");
 		const owner = {
@@ -226,15 +232,26 @@ describe("PixiBoardToolbarSurface", () => {
 		expect(boardState.enqueueLine).not.toHaveBeenCalled();
 	});
 
-	it("submits an exact Board-stack split without invoking the tile primary action", async () => {
-		const host = document.createElement("div");
-		document.body.append(host);
-		const root = createRoot(host);
-		roots.push(root);
-		await act(async () => {
-			root.render(createElement(PixiBoardToolbarSurface));
-			await Promise.resolve();
+	it("suppresses the native macOS Control-click context menu without dispatching a command", async () => {
+		const host = await renderSurface();
+		const surface = host.querySelector<HTMLElement>('[data-ui="PixiBoardToolbarSurface"]');
+		if (surface === null) throw new Error("Missing Board surface.");
+		const contextMenu = new MouseEvent("contextmenu", {
+			bubbles: true,
+			cancelable: true,
+			button: 2,
+			ctrlKey: true,
 		});
+
+		surface.dispatchEvent(contextMenu);
+
+		expect(contextMenu.defaultPrevented).toBe(true);
+		expect(boardState.enqueueLine).not.toHaveBeenCalled();
+		expect(boardState.openItemDetail).not.toHaveBeenCalled();
+	});
+
+	it("submits an exact Board-stack split without invoking the tile primary action", async () => {
+		await renderSurface();
 		const createProps = boardState.createProps;
 		if (createProps === null) throw new Error("Board scene did not create its runtime.");
 		const stack = {
@@ -271,15 +288,8 @@ describe("PixiBoardToolbarSurface", () => {
 		expect(boardState.openItemDetail).not.toHaveBeenCalled();
 	});
 
-	it("sends another default-line command for a running owner and lets the engine enqueue or reject it", async () => {
-		const host = document.createElement("div");
-		document.body.append(host);
-		const root = createRoot(host);
-		roots.push(root);
-		await act(async () => {
-			root.render(createElement(PixiBoardToolbarSurface));
-			await Promise.resolve();
-		});
+	it("routes single and fill default-line intents without interpreting queue capacity", async () => {
+		await renderSurface();
 		const createProps = boardState.createProps;
 		if (createProps === null) throw new Error("Board scene did not create its runtime.");
 		const producer = {
@@ -297,6 +307,11 @@ describe("PixiBoardToolbarSurface", () => {
 			primaryAction: {
 				kind: "enqueue-default-line",
 				lineId: "line:default",
+				queue: {
+					available: true,
+					capacity: 5,
+					used: 2,
+				},
 			},
 			quantity: 1,
 			revision: "revision:producer:running",
@@ -310,21 +325,39 @@ describe("PixiBoardToolbarSurface", () => {
 
 		expect(boardState.enqueueLine).toHaveBeenCalledWith({
 			kind: "enqueue",
-			lineId: "line:default",
 			ownerItemId: producer.id,
 		});
+		await createProps.onActivate(
+			producer,
+			"fill-default-line-queue",
+			document.createElement("canvas"),
+		);
+
+		expect(boardState.enqueueLine).toHaveBeenLastCalledWith({
+			kind: "fill",
+			ownerItemId: producer.id,
+		});
+		await createProps.onActivate(
+			{
+				...producer,
+				location: {
+					scope: "toolbar",
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+			},
+			"fill-default-line-queue",
+			document.createElement("canvas"),
+		);
+
+		expect(boardState.enqueueLine).toHaveBeenCalledTimes(2);
 		expect(boardState.openItemDetail).not.toHaveBeenCalled();
 	});
 
 	it("routes the open-inventory primary action to the sibling Inventory leaf", async () => {
-		const host = document.createElement("div");
-		document.body.append(host);
-		const root = createRoot(host);
-		roots.push(root);
-		await act(async () => {
-			root.render(createElement(PixiBoardToolbarSurface));
-			await Promise.resolve();
-		});
+		await renderSurface();
 		const createProps = boardState.createProps;
 		if (createProps === null) throw new Error("Board scene did not create its runtime.");
 		const item = {
@@ -352,24 +385,12 @@ describe("PixiBoardToolbarSurface", () => {
 
 		await createProps.onActivate(item, "primary", document.createElement("canvas"));
 
-		expect(boardState.navigate).toHaveBeenCalledWith({
-			to: "/game/$packageId/inventory",
-			params: {
-				packageId: "package-board",
-			},
-		});
+		expect(boardState.navigate).toHaveBeenCalledWith();
 		expect(boardState.registerInteraction).toHaveBeenCalledOnce();
 	});
 
 	it("opens Inventory with an unmodified i key while the Board is idle", async () => {
-		const host = document.createElement("div");
-		document.body.append(host);
-		const root = createRoot(host);
-		roots.push(root);
-		await act(async () => {
-			root.render(createElement(PixiBoardToolbarSurface));
-			await Promise.resolve();
-		});
+		await renderSurface();
 		const event = new KeyboardEvent("keydown", {
 			cancelable: true,
 			key: "i",
@@ -382,23 +403,11 @@ describe("PixiBoardToolbarSurface", () => {
 
 		expect(event.defaultPrevented).toBe(true);
 		expect(boardState.navigate).toHaveBeenCalledOnce();
-		expect(boardState.navigate).toHaveBeenCalledWith({
-			to: "/game/$packageId/inventory",
-			params: {
-				packageId: "package-board",
-			},
-		});
+		expect(boardState.navigate).toHaveBeenCalledWith();
 	});
 
 	it("does not hijack modified, repeated, or editable i key input", async () => {
-		const host = document.createElement("div");
-		document.body.append(host);
-		const root = createRoot(host);
-		roots.push(root);
-		await act(async () => {
-			root.render(createElement(PixiBoardToolbarSurface));
-			await Promise.resolve();
-		});
+		await renderSurface();
 		const input = document.createElement("input");
 		document.body.append(input);
 

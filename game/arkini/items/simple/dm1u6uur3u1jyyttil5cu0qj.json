@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "dm1u6uur3u1jyyttil5cu0qj",
+		"id": "item:flour",
+		"title": "Flour",
+		"description": "Milled grain produced by windmills and baked into bread.",
+		"asset": {
+			"default": [
+				"item-flour"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 50,
+		"type": "simple"
+	}
+}

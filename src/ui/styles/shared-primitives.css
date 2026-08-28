@@ -1,0 +1,123 @@
+:where(:focus, :focus-visible) {
+	outline: none !important;
+}
+
+::selection {
+	color: var(--ak-accent-contrast);
+	background: var(--ak-accent);
+}
+
+.ak-list {
+	isolation: isolate;
+}
+
+.ak-list-row {
+	position: relative;
+	background-color: var(--ak-list-row-surface);
+	box-shadow: inset 0 0 0 1px var(--ak-line);
+	transition:
+		background-color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
+		border-color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
+		box-shadow var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
+		opacity var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing);
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.ak-list-row-interactive:not(.ak-list-row-pending):not(:disabled):not(
+		[aria-disabled="true"]
+	):hover {
+		background-color: var(--ak-list-row-interactive-surface);
+		box-shadow: inset 0 0 0 1px var(--ak-list-row-emphasis-border);
+	}
+}
+
+.ak-list-row-active {
+	background-color: var(--ak-list-row-active-surface);
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ak-success) 34%, transparent);
+}
+
+.ak-line-input {
+	transition:
+		background-color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
+		color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
+		opacity var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing);
+}
+
+.ak-list-row-selected {
+	color: var(--ak-list-row-selected-foreground);
+	background-color: var(--ak-list-row-selected-surface);
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ak-accent-contrast) 18%, transparent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.ak-list-row-interactive.ak-list-row-selected:not(.ak-list-row-pending):not(:disabled):not(
+		[aria-disabled="true"]
+	):hover {
+		color: var(--ak-list-row-selected-foreground);
+		background-color: var(--ak-list-row-selected-surface);
+		box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ak-accent-contrast) 48%, transparent);
+	}
+}
+
+.ak-list-row-pending {
+	background-color: var(--ak-list-row-pending-surface);
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ak-info) 40%, transparent);
+}
+
+.ak-list-row-disabled,
+.ak-list-row:disabled:not(.ak-list-row-pending),
+.ak-list-row[aria-disabled="true"]:not(.ak-list-row-pending) {
+	background-color: var(--ak-list-row-disabled-surface);
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ak-line) 58%, transparent);
+	opacity: 0.62;
+}
+
+.ak-spotlight-option {
+	color: var(--ak-foreground);
+	background-color: var(--ak-spotlight-option-surface);
+	border-color: transparent;
+	transition:
+		background-color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
+		border-color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
+		box-shadow var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
+		color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
+		opacity var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing);
+}
+
+.ak-spotlight-option-secondary {
+	color: var(--ak-muted);
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.ak-spotlight-option:not(:disabled):not([data-selected="true"]):hover {
+		background-color: var(--ak-spotlight-option-hover-surface);
+		border-color: var(--ak-spotlight-option-emphasis-border);
+	}
+}
+
+.ak-spotlight-option[data-selected="true"] {
+	color: var(--ak-spotlight-option-selected-foreground);
+	background-color: var(--ak-spotlight-option-selected-surface);
+	border-color: color-mix(
+		in srgb,
+		var(--ak-spotlight-option-selected-foreground) 42%,
+		transparent
+	);
+}
+
+.ak-spotlight-option[data-selected="true"] .ak-spotlight-option-secondary {
+	color: var(--ak-spotlight-option-selected-secondary);
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.ak-spotlight-option[data-selected="true"]:not(:disabled):hover {
+		color: var(--ak-spotlight-option-selected-foreground);
+		background-color: var(--ak-spotlight-option-selected-hover-surface);
+		box-shadow: inset 0 0 0 1px
+			color-mix(in srgb, var(--ak-spotlight-option-selected-foreground) 58%, transparent);
+	}
+}
+
+.ak-spotlight-option:disabled {
+	opacity: 0.6;
+}

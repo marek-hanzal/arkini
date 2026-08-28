@@ -35,20 +35,17 @@ const createGame = (explicitSaveFx: Effect.Effect<void, unknown> = Effect.void):
 	arkpack: {
 		packageId: "package:menu",
 		contentHash: "content:menu",
-		gameId: "game:menu",
 		title: "Menu game",
-		configVersion: "1.0",
-		compressedSize: 0,
-		trust: {
-			type: "external",
-			reason: "unsigned",
+		version: "1.0",
+		arkini: "1.0",
+		provenance: {
+			type: "community",
 		} as const,
-		source: "imported",
+		source: "user",
 	},
 	config: testArkpackConfig,
 	saveKey: {
 		packageId: "package:menu",
-		contentHash: "a".repeat(64),
 	},
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,

@@ -12,21 +12,19 @@ import { readTileDeliveriesFx } from "~/bridge/tile/readTileDeliveriesFx";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiTileActorParticleTextures } from "~/ui/pixi/actor/PixiTileActorParticleTextures";
 import { createPixiTileActorFx } from "~/ui/pixi/actor/createPixiTileActorFx";
-import {
-	updatePixiTileActorFx,
-	updatePixiTileActorProgressFx,
-} from "~/ui/pixi/actor/updatePixiTileActorFx";
+import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
+import { updatePixiTileActorProgressFx } from "~/ui/pixi/actor/updatePixiTileActorProgressFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { animatePixiActorToRetargetablePoseFx } from "~/ui/pixi/animation/animatePixiActorToRetargetablePoseFx";
 import { flashPixiTileActorConsumedSourceFx } from "~/ui/pixi/animation/flashPixiTileActorConsumedSourceFx";
-import { readPixiActorAlphaAnimationKey } from "~/ui/pixi/animation/readPixiActorAlphaAnimationKey";
-import {
-	burstPixiTileActorFeedbackParticlesFx,
-	pixiTileActorFeedbackParticlesDurationMs,
-	startPixiTileActorActivityParticlesFx,
-	stopPixiTileActorActivityParticlesFx,
-} from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
-import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
+import { pixiTileActorFeedbackParticlesDurationMs } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
+import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/burstPixiTileActorFeedbackParticlesFx";
+import { startPixiTileActorActivityParticlesFx } from "~/ui/pixi/animation/startPixiTileActorActivityParticlesFx";
+import { stopPixiTileActorActivityParticlesFx } from "~/ui/pixi/animation/stopPixiTileActorActivityParticlesFx";
+import { pixiTileActorLifecycleDurationMs } from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+import { preparePixiTileActorEnterFx } from "~/ui/pixi/animation/preparePixiTileActorEnterFx";
+import { startPixiTileActorEnterFx } from "~/ui/pixi/animation/startPixiTileActorEnterFx";
+import { startPixiTileActorExitFx } from "~/ui/pixi/animation/startPixiTileActorExitFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
 import type { PixiDeliveryMotionRuntime } from "~/ui/pixi/delivery/PixiDeliveryMotionRuntime";
@@ -34,15 +32,13 @@ import { readPixiDragSettleDurationMsFx } from "~/ui/pixi/drag/readPixiDragSettl
 import type { PixiMainSceneDropPresentation } from "~/ui/pixi/drop/PixiMainSceneDropPresentation";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRuntime";
-import { projectPixiTileMotionItem } from "~/ui/pixi/motion/projectPixiTileMotionItem";
+import { projectPixiTileMotionItemFx } from "~/ui/pixi/motion/projectPixiTileMotionItemFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiMainSceneReconciler } from "~/ui/pixi/scene/PixiMainSceneReconciler";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
-import {
-	classifyPixiMainSceneActorUpdate,
-	classifyPixiMainSceneReconciliation,
-} from "~/ui/pixi/scene/classifyPixiMainSceneReconciliation";
+import { classifyPixiMainSceneActorUpdateFx } from "~/ui/pixi/scene/classifyPixiMainSceneActorUpdateFx";
+import { classifyPixiMainSceneReconciliationFx } from "~/ui/pixi/scene/classifyPixiMainSceneReconciliationFx";
 import { releasePixiMainSceneActorFx } from "~/ui/pixi/scene/releasePixiMainSceneActorFx";
 import { runPixiMainSceneReplacementsFx } from "~/ui/pixi/scene/runPixiMainSceneReplacementsFx";
 
@@ -66,7 +62,6 @@ export namespace createPixiMainSceneReconcilerFx {
 
 const runningTransitionDurationMs = 180;
 const feedbackExitDurationMs = 420;
-const defaultExitDurationMs = 220;
 
 /**
  * Reconciles one canonical transition into retained actors while motion owns presentation lag.
@@ -185,7 +180,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 					adoptActiveLifecycleExit &&
 					retainedActor !== undefined &&
 					retainedActor.lifecycleTargetAlpha === 0 &&
-					retainedActor.lifecycleFadeStarted
+					retainedActor.lifecycleTransitionStarted
 						? Math.max(
 								0,
 								retainedActor.lifecycleNotBeforeMs +
@@ -212,24 +207,14 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 					return;
 				}
 				const exitDurationMs = adoptedDurationMs ?? durationMs;
-				yield* animator.animateFx({
+				yield* startPixiTileActorExitFx({
 					actor,
-					channel: "lifecycle-opacity",
+					animator,
 					durationMs: exitDurationMs,
-					ownerKey: readPixiActorAlphaAnimationKey(actor),
 					onComplete: () => {
 						RendererRuntime.runSync(animator.cancelActorFx(actor));
 						RendererRuntime.runSync(actorStore.destroyExitingActorFx(actor));
 					},
-					toAlpha: 0,
-				});
-				yield* animator.animateFx({
-					actor,
-					channel: "pose",
-					durationMs: exitDurationMs,
-					toScale: 0.76,
-					toX: actor.container.x,
-					toY: actor.container.y,
 				});
 			},
 		);
@@ -352,7 +337,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 								];
 					}),
 				);
-				const reconciliationPlan = classifyPixiMainSceneReconciliation({
+				const reconciliationPlan = yield* classifyPixiMainSceneReconciliationFx({
 					actorIds: actorStore.actors.keys(),
 					deliveryRetainedActorIds: deliverySnapshot.retainedActorIds,
 					feedbackCues,
@@ -383,7 +368,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 								? pixiTileActorFeedbackParticlesDurationMs
 								: departure.style === "feedback"
 									? feedbackExitDurationMs
-									: defaultExitDurationMs,
+									: pixiTileActorLifecycleDurationMs,
 						feedbackCues: departure.feedbackCues,
 					});
 				}
@@ -392,7 +377,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 					const {
 						visible: { item, pose },
 					} = arrival;
-					const displayItem = projectPixiTileMotionItem(
+					const displayItem = yield* projectPixiTileMotionItemFx(
 						item,
 						motionSnapshot.quantityPresentationByActorId.get(item.id),
 					);
@@ -418,15 +403,16 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 						yield* animator.setFx({
 							actor: created,
 							channel: "pose",
-							scale: presentCommittedEffects && spawnCue === undefined ? 0.82 : 1,
+							scale: 1,
 							x: spawnOrigin?.x ?? pose.x,
 							y: spawnOrigin?.y ?? pose.y,
 						});
-						yield* animator.setFx({
-							actor: created,
-							alpha: presentCommittedEffects ? 0 : 1,
-							channel: "lifecycle-opacity",
-						});
+						if (presentCommittedEffects) {
+							yield* preparePixiTileActorEnterFx({
+								actor: created,
+								animator,
+							});
+						}
 						yield* drag.attachActorFx(created);
 						yield* updatePixiTileActorFx({
 							actor: created,
@@ -444,17 +430,9 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 							});
 						}
 						if (presentCommittedEffects && spawnCue === undefined) {
-							yield* startPixiTileActorFadeInFx({
+							yield* startPixiTileActorEnterFx({
 								actor: created,
 								animator,
-							});
-							yield* animator.animateFx({
-								actor: created,
-								channel: "pose",
-								durationMs: 260,
-								toScale: 1,
-								toX: pose.x,
-								toY: pose.y,
 							});
 						}
 						continue;
@@ -462,7 +440,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 
 					const actor = actorStore.actors.get(item.id);
 					if (actor === undefined) continue;
-					const updatePlan = classifyPixiMainSceneActorUpdate({
+					const updatePlan = yield* classifyPixiMainSceneActorUpdateFx({
 						actor,
 						deliveryRetained: deliverySnapshot.retainedActorIds.has(item.id),
 						directLanding: dropSnapshot.landingActorIds.has(item.id),
@@ -589,6 +567,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 				yield* magneticField.pruneFx;
 				yield* motion.syncPresentationFx;
 				yield* motion.startFx;
+				yield* drag.requestRefreshFx;
 			},
 		);
 

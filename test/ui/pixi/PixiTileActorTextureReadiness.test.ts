@@ -8,7 +8,11 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { createPixiTileActorFx } from "~/ui/pixi/actor/createPixiTileActorFx";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimation, PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
+import {
+	pixiTileActorLifecycleDurationMs,
+	pixiTileActorLifecycleReducedScale,
+} from "~/ui/pixi/animation/runPixiTileActorLifecycleFx";
+import { startPixiTileActorEnterFx } from "~/ui/pixi/animation/startPixiTileActorEnterFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 
@@ -119,6 +123,8 @@ const createFrames = () => {
 			closeFx: Effect.void,
 			invalidateFx: Effect.sync(invalidate),
 			reportCriticalFailure,
+			scheduleAfterRenderFx: () => Effect.succeed(() => {}),
+			scheduleFx: () => Effect.succeed(() => {}),
 		},
 		invalidate,
 		reportCriticalFailure,
@@ -139,7 +145,14 @@ const createAnimator = () => {
 			cancelFx: () => Effect.void,
 			closeFx: Effect.void,
 			isChannelActiveFx: () => Effect.succeed(false),
-			setFx: () => Effect.void,
+			setFx: (write) =>
+				Effect.sync(() => {
+					if (write.channel === "lifecycle-opacity") {
+						write.actor.container.alpha = write.alpha;
+					} else if (write.channel === "lifecycle-scale") {
+						write.actor.lifecycleLayer.scale.set(write.scale);
+					}
+				}),
 		} satisfies PixiActorAnimator,
 	};
 };
@@ -288,11 +301,13 @@ describe("Pixi tile actor visual readiness", () => {
 		actor.container.alpha = 0;
 
 		Effect.runSync(
-			startPixiTileActorFadeInFx({
+			startPixiTileActorEnterFx({
 				actor,
 				animator,
 			}),
 		);
+		expect(actor.container.alpha).toBe(0);
+		expect(actor.lifecycleLayer.scale.x).toBe(pixiTileActorLifecycleReducedScale);
 		expect(animations).toEqual([]);
 
 		Effect.runSync(
@@ -319,18 +334,24 @@ describe("Pixi tile actor visual readiness", () => {
 			expect(animations.some(({ channel }) => channel === "visual-mix")).toBe(true);
 		});
 		const lifecycleFade = animations.find(({ channel }) => channel === "lifecycle-opacity");
+		const lifecycleScale = animations.find(({ channel }) => channel === "lifecycle-scale");
 		const visualMix = animations.find(({ channel }) => channel === "visual-mix");
 		expect(actor.currentVisual).toBe(originalVisual);
 		visualMix?.onComplete?.();
 		expect(originalVisual.container.destroyed).toBe(true);
 		expect(actor.lifecycleTargetAlpha).toBe(1);
-		expect(actor.lifecycleFadeStarted).toBe(true);
+		expect(actor.lifecycleTransitionStarted).toBe(true);
 		expect(lifecycleFade).toMatchObject({
 			actor,
 			channel: "lifecycle-opacity",
-			durationMs: 520,
-			ownerKey: `actor-alpha:${actor.instanceId}`,
+			durationMs: pixiTileActorLifecycleDurationMs,
 			toAlpha: 1,
+		});
+		expect(lifecycleScale).toMatchObject({
+			actor,
+			channel: "lifecycle-scale",
+			durationMs: pixiTileActorLifecycleDurationMs,
+			toScale: 1,
 		});
 
 		actor.container.destroy({

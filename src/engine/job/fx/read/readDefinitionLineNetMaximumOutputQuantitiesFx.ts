@@ -4,7 +4,7 @@ import { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFrom
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import { applyFinalChargePayerNetMaximumOutputFx } from "./applyFinalChargePayerNetMaximumOutputFx";
-import { clampLineNetMaximumOutputQuantities } from "./lineNetMaximumOutputQuantities";
+import { clampLineNetMaximumOutputQuantitiesFx } from "./clampLineNetMaximumOutputQuantitiesFx";
 import { readLineNetMaximumOutputQuantitiesFx } from "./readLineNetMaximumOutputQuantitiesFx";
 
 export namespace readDefinitionLineNetMaximumOutputQuantitiesFx {
@@ -27,11 +27,11 @@ export const readDefinitionLineNetMaximumOutputQuantitiesFx = Effect.fn(
 		0,
 	);
 	if (selfChargeCost <= 0 || owner.charges?.amount !== selfChargeCost) {
-		return clampLineNetMaximumOutputQuantities(quantities);
+		return yield* clampLineNetMaximumOutputQuantitiesFx(quantities);
 	}
 	yield* applyFinalChargePayerNetMaximumOutputFx({
 		payer: owner,
 		quantities,
 	});
-	return clampLineNetMaximumOutputQuantities(quantities);
+	return yield* clampLineNetMaximumOutputQuantitiesFx(quantities);
 });

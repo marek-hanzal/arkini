@@ -3,6 +3,7 @@
 import { Deferred, Effect, Exit, Scope } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { EditorProjectRepositoryService } from "~/bridge/editor/EditorProjectRepository";
 import { acquireGameEngineLeaseFx } from "~/bridge/game/acquireGameEngineLeaseFx";
 import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
@@ -13,6 +14,7 @@ import {
 	adoptTestGameEngineResourceFx,
 	createTestRendererRuntime,
 } from "~test/support/createTestRendererRuntime";
+import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 type CloseListener = () => Promise<void>;
 
@@ -119,6 +121,7 @@ describe("installRendererControlledClose", () => {
 		const remove = rendererRuntime.runSync(
 			installRendererControlledCloseFx({
 				lifecycle: lifecycle.lifecycle,
+				requestEditorLeaveFx: Effect.succeed(true),
 				rendererRuntime,
 				router: router.router,
 			}),
@@ -168,6 +171,7 @@ describe("installRendererControlledClose", () => {
 		const remove = rendererRuntime.runSync(
 			installRendererControlledCloseFx({
 				lifecycle: lifecycle.lifecycle,
+				requestEditorLeaveFx: Effect.succeed(true),
 				rendererRuntime,
 				router: router.router,
 			}),
@@ -178,6 +182,82 @@ describe("installRendererControlledClose", () => {
 
 		expect(router.navigate).not.toHaveBeenCalled();
 		expect(frames.requestAnimationFrame).not.toHaveBeenCalled();
+		remove();
+	});
+
+	it("cancels native close before joining writes when an editor draft stays unsaved", async () => {
+		const { rendererRuntime } = createTestRendererRuntime({
+			createResourceFx: () => Effect.never,
+		});
+		runtimes.push(rendererRuntime);
+		const lifecycle = createLifecycle();
+		const router = createRouter();
+		const remove = rendererRuntime.runSync(
+			installRendererControlledCloseFx({
+				lifecycle: lifecycle.lifecycle,
+				requestEditorLeaveFx: Effect.succeed(false),
+				rendererRuntime,
+				router: router.router,
+			}),
+		);
+
+		await expect(lifecycle.readBeforeClose()()).rejects.toThrow("unsaved changes");
+		expect(router.navigate).not.toHaveBeenCalled();
+		remove();
+	});
+
+	it("waits for admitted editor operations before selecting an active Game exit route", async () => {
+		const idle = Effect.runSync(Deferred.make<void>());
+		const resource = createResource("package:editor-idle");
+		const repository: EditorProjectRepositoryService = {
+			...UnusedEditorProjectRepository,
+			awaitIdleFx: Deferred.await(idle),
+			createProjectFx: () => Effect.die("Unexpected create."),
+			listProjectsFx: Effect.die("Unexpected list."),
+			readProjectFx: () => Effect.die("Unexpected read."),
+			replaceConfigFx: () => Effect.die("Unexpected config save."),
+			replaceResourceFx: () => Effect.die("Unexpected resource replacement."),
+			deleteItemFx: () => Effect.die("Unexpected item delete."),
+			upsertItemFx: () => Effect.die("Unexpected item save."),
+			upsertResourcesFx: () => Effect.die("Unexpected resource save."),
+		};
+		const { rendererRuntime } = createTestRendererRuntime({
+			createResourceFx: () => Effect.succeed(resource),
+			editorProjectRepository: repository,
+		});
+		runtimes.push(rendererRuntime);
+		vi.useRealTimers();
+		await rendererRuntime.runPromise(adoptTestGameEngineResourceFx("package:editor-idle"));
+		vi.useFakeTimers();
+		const lifecycle = createLifecycle();
+		const router = createRouter();
+		const remove = rendererRuntime.runSync(
+			installRendererControlledCloseFx({
+				lifecycle: lifecycle.lifecycle,
+				requestEditorLeaveFx: Effect.succeed(true),
+				rendererRuntime,
+				router: router.router,
+			}),
+		);
+
+		let closed = false;
+		const close = lifecycle
+			.readBeforeClose()()
+			.then(() => {
+				closed = true;
+			});
+		await Promise.resolve();
+		expect(closed).toBe(false);
+		Effect.runSync(Deferred.succeed(idle, undefined));
+		await close;
+		expect(closed).toBe(true);
+		expect(router.navigate).toHaveBeenCalledWith({
+			to: "/game/$packageId/action/exit",
+			params: {
+				packageId: "package:editor-idle",
+			},
+			replace: true,
+		});
 		remove();
 	});
 
@@ -201,6 +281,7 @@ describe("installRendererControlledClose", () => {
 		const remove = rendererRuntime.runSync(
 			installRendererControlledCloseFx({
 				lifecycle: lifecycle.lifecycle,
+				requestEditorLeaveFx: Effect.succeed(true),
 				rendererRuntime,
 				router: router.router,
 			}),

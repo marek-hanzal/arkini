@@ -17,8 +17,8 @@ describe("LineSchema", () => {
 						itemId: "tree",
 					},
 					quantity: {
-						type: "value",
-						value: 1,
+						min: 1,
+						max: 1,
 					},
 					capacity: 3,
 				},
@@ -33,8 +33,8 @@ describe("LineSchema", () => {
 									{
 										itemId: "wood",
 										quantity: {
-											type: "value",
-											value: 1,
+											min: 1,
+											max: 1,
 										},
 										rules: [],
 									},

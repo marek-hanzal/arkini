@@ -3,7 +3,7 @@ import { Effect, Option } from "effect";
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { readTileActorBadgeCountFx } from "~/bridge/tile/readTileActorBadgeCountFx";
-import { readTileActorPrimaryAssetIdFx } from "~/bridge/tile/readTileActorPrimaryAssetIdFx";
+import { readTileActorAssetSourceIdsFx } from "~/bridge/tile/readTileActorAssetSourceIdsFx";
 import { readTileActorVisualFx } from "~/bridge/tile/readTileActorVisualFx";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
@@ -16,6 +16,7 @@ export interface TileDelivery {
 	readonly generation: number;
 	readonly item: TileActorItem;
 	readonly phase: "outbound" | "returning";
+	readonly remainingDurationMs: number;
 	readonly targetActorId?: string;
 	readonly to: GridLocationSchema.Type;
 }
@@ -97,7 +98,7 @@ export const readTileDeliveriesFx = Effect.fnUntraced(function* ({
 		const visual = yield* readTileActorVisualFx({
 			game,
 			item: current.item,
-			primaryAssetId: yield* readTileActorPrimaryAssetIdFx({
+			sourceIds: yield* readTileActorAssetSourceIdsFx({
 				item: current,
 				runtime,
 			}),
@@ -125,6 +126,7 @@ export const readTileDeliveriesFx = Effect.fnUntraced(function* ({
 				},
 			},
 			phase: current.location.phase,
+			remainingDurationMs: current.location.remainingDurationMs,
 			...(current.location.phase === "outbound"
 				? {
 						targetActorId: current.location.target.ownerItemId,

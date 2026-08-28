@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "upw76khclrr0re43jydmqjmc",
+		"id": "item:feast",
+		"title": "Feast",
+		"description": "Hearty processed food platter that proves Era III food production is complete.",
+		"asset": {
+			"default": [
+				"item-feast"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 20,
+		"type": "simple"
+	}
+}

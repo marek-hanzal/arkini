@@ -4,7 +4,7 @@ import { match } from "ts-pattern";
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { readTileActorBadgeCountFx } from "~/bridge/tile/readTileActorBadgeCountFx";
-import { readTileActorPrimaryAssetIdFx } from "~/bridge/tile/readTileActorPrimaryAssetIdFx";
+import { readTileActorAssetSourceIdsFx } from "~/bridge/tile/readTileActorAssetSourceIdsFx";
 import { readTileActorVisualFx } from "~/bridge/tile/readTileActorVisualFx";
 import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
 import { readGridRuntimeItemFx } from "~/bridge/tile/motion/readGridRuntimeItemFx";
@@ -156,7 +156,7 @@ const readInventoryInputSourceItemFx = Effect.fn("readInventoryInputSourceItemFx
 	const visual = yield* readTileActorVisualFx({
 		game,
 		item: source.item,
-		primaryAssetId: yield* readTileActorPrimaryAssetIdFx({
+		sourceIds: yield* readTileActorAssetSourceIdsFx({
 			item: source,
 			runtime,
 		}),

@@ -15,8 +15,8 @@ export namespace distanceFx {
 /**
  * Tests two coordinates against one Chebyshev distance rule.
  *
- * `close` matches exactly one, `near` exactly two, and `far` every positive
- * distance. The origin itself therefore never matches any distance rule.
+ * `self` matches zero, `close` exactly one, `near` exactly two, and `far`
+ * every positive distance.
  */
 export const distanceFx = Effect.fn("distanceFx")(function* ({
 	distance,
@@ -28,6 +28,9 @@ export const distanceFx = Effect.fn("distanceFx")(function* ({
 	const value = Math.max(width, height);
 
 	return match(distance)
+		.with(DistanceEnumSchema.enum.Self, () => {
+			return value === 0;
+		})
 		.with(DistanceEnumSchema.enum.Close, () => {
 			return value === 1;
 		})

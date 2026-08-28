@@ -16,6 +16,7 @@ describe("tile actor activity-effect projection", () => {
 	it.each([
 		ItemEnumSchema.enum.Blueprint,
 		ItemEnumSchema.enum.Craft,
+		ItemEnumSchema.enum.Deposit,
 		ItemEnumSchema.enum.Producer,
 	])("enables running feedback for %s", (itemType) => {
 		expect(readActivityEffect(itemType, true)).toBe(true);
@@ -23,7 +24,6 @@ describe("tile actor activity-effect projection", () => {
 	});
 
 	it.each([
-		ItemEnumSchema.enum.Deposit,
 		ItemEnumSchema.enum.Inventory,
 		ItemEnumSchema.enum.Simple,
 		ItemEnumSchema.enum.Stash,

@@ -1,7 +1,6 @@
 import { Array, Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { removeLineJobQueueRequests } from "~/engine/job/fx/removeLineJobQueueRequests";
 import { readBoardItemLineFx } from "~/engine/line/fx/readBoardItemLineFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { isInputRuntimeItemFx } from "~/engine/runtime/read/isInputRuntimeItemFx";
@@ -19,7 +18,7 @@ export namespace withdrawLineInputsFx {
 	}
 }
 
-/** Atomically returns one line's buffered material roots through standard placement. */
+/** Returns one line's buffered roots while preserving its owner's pending queue intent. */
 export const withdrawLineInputsFx = Effect.fn("withdrawLineInputsFx")(function* ({
 	ownerItemId,
 	lineId,
@@ -49,11 +48,7 @@ export const withdrawLineInputsFx = Effect.fn("withdrawLineInputsFx")(function* 
 					withdrawnItemCount: returned.withdrawnItemCount,
 					withdrawnQuantity: returned.withdrawnQuantity,
 				} satisfies withdrawLineInputsFx.Result,
-				removeLineJobQueueRequests({
-					lineId,
-					ownerItemId,
-					runtime: returned.runtime,
-				}),
+				returned.runtime,
 				returned.events,
 			] as const;
 		}),

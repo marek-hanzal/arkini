@@ -1,4 +1,4 @@
-import { BrowserWindow, ipcMain, screen } from "electron";
+import { BrowserWindow, ipcMain, Menu, screen } from "electron";
 import { fileURLToPath } from "node:url";
 import { Effect, Exit } from "effect";
 import { ArkiniWindowTitle } from "../../shared/ArkiniAppMetadata";
@@ -9,23 +9,36 @@ import { showMainWindowFx } from "./showMainWindowFx";
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
 import type { TrustedRenderer } from "./security/TrustedRenderer";
 import { createWindowModeControllerFx } from "./window/createWindowModeControllerFx";
-import { registerWindowModeControllerFx } from "./window/WindowModeControllerRegistry";
+import { registerWindowModeControllerFx } from "./window/registerWindowModeControllerFx";
+import type { WindowModeControllerOwnership } from "./window/WindowModeControllerOwnership";
 import type { WindowPreferences } from "./window/WindowPreferences";
 import type { WindowModeSchema } from "../contract/window/WindowModeSchema";
+import { createChatGptViewControllerFx } from "./chatgpt/createChatGptViewControllerFx";
+import type { ChatGptViewControllerOwnership } from "./chatgpt/ChatGptViewControllerOwnership";
+import { registerChatGptViewControllerFx } from "./chatgpt/registerChatGptViewControllerFx";
 
 export namespace createMainWindowFx {
 	export interface Props {
+		readonly chatGptViewControllerOwnership: ChatGptViewControllerOwnership;
 		readonly trustedRenderer: TrustedRenderer;
 		readonly windowMode: WindowModeSchema.Type;
+		readonly windowModeControllerOwnership: WindowModeControllerOwnership;
 		readonly windowPreferences: WindowPreferences;
 	}
 }
 
 export const createMainWindowFx = Effect.fn("createMainWindowFx")(
-	({ trustedRenderer, windowMode, windowPreferences }: createMainWindowFx.Props) =>
+	({
+		chatGptViewControllerOwnership,
+		trustedRenderer,
+		windowMode,
+		windowModeControllerOwnership,
+		windowPreferences,
+	}: createMainWindowFx.Props) =>
 		Effect.gen(function* () {
 			const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
 			const bounds = yield* calculateInitialWindowBoundsFx(display.workArea);
+			Menu.setApplicationMenu(null);
 			const window = new BrowserWindow({
 				...bounds,
 				show: false,
@@ -48,6 +61,12 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 
 			return yield* Effect.gen(function* () {
 				yield* trustedRenderer.registerWindowFx(window);
+				const chatGptViewController = yield* createChatGptViewControllerFx(window);
+				yield* registerChatGptViewControllerFx({
+					controller: chatGptViewController,
+					ownership: chatGptViewControllerOwnership,
+					window,
+				});
 				if (windowMode === "bordered") {
 					yield* Effect.sync(() => window.maximize());
 				}
@@ -58,6 +77,7 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 				});
 				yield* registerWindowModeControllerFx({
 					controller: windowModeController,
+					ownership: windowModeControllerOwnership,
 					window,
 				});
 				yield* registerControlledWindowCloseFx({

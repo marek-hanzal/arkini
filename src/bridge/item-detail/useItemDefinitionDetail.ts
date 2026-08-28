@@ -14,13 +14,10 @@ export namespace useItemDefinitionDetail {
 				readonly kind: "available";
 				readonly itemId: IdSchema.Type;
 				readonly title: string;
-				readonly subtitle?: string;
 				readonly sourceUrl: string;
 				readonly compositeUrl?: string;
 				readonly description: string;
 				readonly itemType: ItemEnumSchema.Type;
-				readonly categoryTitle?: string;
-				readonly tags: readonly string[];
 				readonly storageScope: StorageScopeEnumSchema.Type;
 				readonly maxStackSize: number;
 				readonly ownedQuantity: number;
@@ -45,28 +42,18 @@ export const useItemDefinitionDetail = (
 		(runtime: RuntimeSchema.Type): useItemDefinitionDetail.Projection => {
 			const item = game.config.items[itemId];
 			if (item === undefined) return unavailable;
-			const categoryTitle = game.config.categories[item.categoryId]?.title;
 			return {
 				kind: "available",
 				itemId: item.id,
 				title: item.title,
-				...(categoryTitle === undefined
+				sourceUrl: game.getResourceUrl(item.asset.default[0]),
+				...(item.asset.default[1] === undefined
 					? {}
 					: {
-							subtitle: categoryTitle,
-							categoryTitle,
-						}),
-				sourceUrl: game.getResourceUrl(item.asset.source[0]),
-				...(item.asset.composite === undefined
-					? {}
-					: {
-							compositeUrl: game.getResourceUrl(item.asset.composite),
+							compositeUrl: game.getResourceUrl(item.asset.default[1]),
 						}),
 				description: item.description,
 				itemType: item.type,
-				tags: [
-					...item.tags,
-				],
 				storageScope: item.scope,
 				maxStackSize: item.maxStackSize,
 				ownedQuantity: runtime.items.reduce(

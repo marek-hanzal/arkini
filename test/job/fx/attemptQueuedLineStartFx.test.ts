@@ -58,6 +58,8 @@ describe("attemptQueuedLineStartFx", () => {
 			],
 			jobs: [],
 			jobQueue: [],
+
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
 		const result = runAttempt(runtime);
@@ -91,6 +93,8 @@ describe("attemptQueuedLineStartFx", () => {
 				request,
 				later,
 			],
+
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
 		const result = runAttempt(runtime, later.id);
@@ -119,6 +123,8 @@ describe("attemptQueuedLineStartFx", () => {
 			jobQueue: [
 				request,
 			],
+
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
 		const result = runAttempt(runtime);
@@ -160,6 +166,8 @@ describe("attemptQueuedLineStartFx", () => {
 			jobQueue: [
 				request,
 			],
+
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
 		const result = runAttempt(runtime);
@@ -189,6 +197,8 @@ describe("attemptQueuedLineStartFx", () => {
 			jobQueue: [
 				request,
 			],
+
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
 		expect(runAttempt(runtime)).toMatchObject({
@@ -218,6 +228,8 @@ describe("attemptQueuedLineStartFx", () => {
 			jobQueue: [
 				missingLineRequest,
 			],
+
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
 		expect(runAttempt(runtime)).toMatchObject({

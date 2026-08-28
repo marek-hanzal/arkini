@@ -8,7 +8,6 @@ import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticC
 
 const provenance = {
 	start: "start.json",
-	categories: {},
 	items: {},
 };
 
@@ -65,7 +64,7 @@ describe("validateStartStateFx", () => {
 		]);
 	});
 
-	it("rejects unavailable inventory capacity", () => {
+	it("rejects an exact inventory position outside the configured grid", () => {
 		const config = GameConfigSchema.parse({
 			...startTestConfig,
 			meta: {
@@ -85,7 +84,7 @@ describe("validateStartStateFx", () => {
 
 		expect(diagnostics[0]).toMatchObject({
 			code: DiagnosticCodeEnumSchema.enum.StartInvalid,
-			failureTag: "StartInventoryUnavailableError",
+			failureTag: "RuntimeInvalidError",
 		});
 	});
 

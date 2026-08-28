@@ -15,7 +15,7 @@ import { createItemDetailCommandAtom } from "~/bridge/item-detail/createItemDeta
 import { useResolveItemDefinitionDetailTarget } from "~/bridge/item-detail/useResolveItemDefinitionDetailTarget";
 import { useResolveItemDetailTarget } from "~/bridge/item-detail/useResolveItemDetailTarget";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { createItemDetailController } from "~/ui/item-detail/createItemDetailController";
+import { createItemDetailControllerFx } from "~/ui/item-detail/createItemDetailControllerFx";
 import { ItemDetailContext } from "~/ui/item-detail/ItemDetailContext";
 import type {
 	ItemDetailControl,
@@ -23,7 +23,7 @@ import type {
 	OpenItemDetailProps,
 	SelectRetainedItemDetailTabProps,
 } from "~/ui/item-detail/ItemDetailControl";
-import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
+import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 
 /**
  * Game-shell owner for one exact Item Detail target, modal lifecycle and
@@ -44,7 +44,7 @@ export const ItemDetailProvider = ({
 }>) => {
 	const resolveDefinitionTarget = useResolveItemDefinitionDetailTarget();
 	const resolveTarget = useResolveItemDetailTarget();
-	const [controller] = useState(createItemDetailController);
+	const [controller] = useState(() => RendererRuntime.runSync(createItemDetailControllerFx()));
 	const commandAtom = useMemo(
 		() =>
 			createItemDetailCommandAtom({
@@ -65,7 +65,7 @@ export const ItemDetailProvider = ({
 		],
 	);
 	const [closeResult, close] = useAtom(controller.closeAtom);
-	readSettledAsyncResultError(closeResult);
+	RendererRuntime.runSync(readSettledAsyncResultErrorFx(closeResult));
 	const snapshot = useSyncExternalStore(
 		controller.subscribe,
 		controller.getSnapshot,

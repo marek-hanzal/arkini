@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from "motion/react";
+import { forwardRef } from "react";
 import { match } from "ts-pattern";
 
 import { useEnqueueItemDetailLine } from "~/bridge/item-detail/useEnqueueItemDetailLine";
@@ -11,7 +12,10 @@ import { itemDetailFadeMotion } from "~/ui/item-detail/ItemDetailMotion";
 import { ItemLineInputs, ItemLineUnavailableWithdrawals } from "~/ui/item-detail/ItemLineInputs";
 import { ItemLineOutputs } from "~/ui/item-detail/ItemLineOutputs";
 import { ItemLineRuntime } from "~/ui/item-detail/ItemLineRuntime";
-import { ItemLineSummary } from "~/ui/item-detail/ItemLineSummary";
+import {
+	ItemLineSummary,
+	type ItemLineSummaryIdentityRenderer,
+} from "~/ui/item-detail/ItemLineSummary";
 import { ItemReferenceButton } from "~/ui/item-detail/ItemReferenceButton";
 import type { ItemDetailPendingAction } from "~/ui/item-detail/ItemDetailControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
@@ -60,36 +64,7 @@ const readUnavailableDependency = (reason: ItemDetailLines.DisabledReason) => {
 					status: `Required · None available (Board · ${reason.distance})`,
 				};
 	}
-	if (reason.kind !== "line-disabled" || reason.cause.kind !== "enable-rule") {
-		return undefined;
-	}
-	const detail = reason.cause.condition.detail;
-	return detail === undefined
-		? undefined
-		: {
-				detail,
-				status: match(reason.cause.condition)
-					.with(
-						{
-							kind: "exists",
-						},
-						({ locationLabel }) => `Required · ${locationLabel}`,
-					)
-					.with(
-						{
-							kind: "count",
-						},
-						({ count, locationLabel }) => `Required ${count} · ${locationLabel}`,
-					)
-					.with(
-						{
-							kind: "range",
-						},
-						({ locationLabel, max, min }) =>
-							`Required ${min}-${max} · ${locationLabel}`,
-					)
-					.exhaustive(),
-			};
+	return undefined;
 };
 
 const ItemLineUnavailableDependency = ({
@@ -139,18 +114,42 @@ const ItemLineUnavailableMessage = ({
 	</div>
 );
 
+const ItemLineRuleHints = ({ hints }: { readonly hints: readonly string[] }) =>
+	hints.length === 0 ? null : (
+		<ul
+			className="mt-3 grid gap-1.5 text-sm text-muted"
+			data-ui="TileLineRuleHints"
+		>
+			{hints.map((hint, index) => (
+				<li
+					className="flex min-w-0 items-start gap-2"
+					key={`${hint}-${index}`}
+				>
+					<span
+						className="icon-[lucide--info] mt-0.5 size-4 shrink-0 text-secondary-foreground"
+						aria-hidden="true"
+					/>
+					<span>{hint}</span>
+				</li>
+			))}
+		</ul>
+	);
+
 /** Renders one live product line with its commands, runtime, inputs, and outputs. */
-export const ItemLineRow = ({
-	disabled,
-	line,
-	ownerItemId,
-	stale = false,
-}: {
-	readonly disabled: boolean;
-	readonly line: ItemDetailLines.Line;
-	readonly ownerItemId: string;
-	readonly stale?: boolean;
-}) => {
+export const ItemLineRow = forwardRef<
+	HTMLElement,
+	{
+		readonly definitionItemId?: string;
+		readonly disabled: boolean;
+		readonly line: ItemDetailLines.Line;
+		readonly ownerItemId: string;
+		readonly renderIdentity?: ItemLineSummaryIdentityRenderer;
+		readonly stale?: boolean;
+	}
+>(function ItemLineRow(
+	{ definitionItemId, disabled, line, ownerItemId, renderIdentity, stale = false },
+	ref,
+) {
 	const itemDetail = useItemDetailControl();
 	const pendingKey = (action: ItemDetailPendingAction) =>
 		JSON.stringify([
@@ -199,6 +198,16 @@ export const ItemLineRow = ({
 			: undefined;
 	const showUnavailableReason = !stale && unavailable && line.activeJob === undefined;
 	const queued = !stale && line.activeJob === undefined && line.queuedRequestCount > 0;
+	const disclosedDisabledHint =
+		line.availability.kind === "unavailable" &&
+		line.availability.reason.kind === "line-disabled" &&
+		line.availability.reason.cause.kind !== "static"
+			? line.availability.reason.message
+			: undefined;
+	const activeRuleHints =
+		disclosedDisabledHint === undefined
+			? line.activeRuleHints
+			: line.activeRuleHints.filter((hint) => hint !== disclosedDisabledHint);
 	const contentReadOnly = disabled || line.activeJob !== undefined;
 	const lineWithdraw =
 		!stale &&
@@ -232,6 +241,7 @@ export const ItemLineRow = ({
 
 	return (
 		<motion.article
+			ref={ref}
 			layout
 			className={`ak-list-row overflow-hidden rounded-xl border-b border-l-2 border-line px-3 py-5 pl-4 first:pt-3 last:border-b-0 last:pb-5 ${
 				stale
@@ -279,9 +289,13 @@ export const ItemLineRow = ({
 			<div className="relative z-[1] flex flex-wrap items-start justify-between gap-4">
 				<div className="min-w-0 flex-1">
 					<ItemLineSummary
+						disabled={disabled}
+						itemId={definitionItemId}
 						line={line}
+						renderIdentity={renderIdentity}
 						stale={stale}
 					/>
+					{stale ? null : <ItemLineRuleHints hints={activeRuleHints} />}
 					<AnimatePresence initial={false}>
 						{queued ? (
 							<motion.p
@@ -425,4 +439,4 @@ export const ItemLineRow = ({
 			</AnimatePresence>
 		</motion.article>
 	);
-};
+});

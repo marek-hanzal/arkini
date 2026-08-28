@@ -4,7 +4,7 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import { readPixiActorAlphaAnimationKey } from "~/ui/pixi/animation/readPixiActorAlphaAnimationKey";
+import { startPixiTileActorExitFx } from "~/ui/pixi/animation/startPixiTileActorExitFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
@@ -47,20 +47,13 @@ export const finalizePixiTileMotionActorsFx = Effect.fn("finalizePixiTileMotionA
 			const pose = canonical === undefined ? null : yield* surface.readActorPoseFx(canonical);
 			if (canonical === undefined || pose === null) {
 				yield* actorStore.releaseActorFx(actorId);
-				yield* animator.cancelActorFx(actor);
-				actor.lifecycleIntentGeneration += 1;
-				actor.lifecycleTargetAlpha = 0;
-				actor.lifecycleFadeStarted = true;
-				yield* animator.animateFx({
+				yield* startPixiTileActorExitFx({
 					actor,
-					channel: "lifecycle-opacity",
-					durationMs: 220,
-					ownerKey: readPixiActorAlphaAnimationKey(actor),
+					animator,
 					onComplete: () => {
 						RendererRuntime.runSync(animator.cancelActorFx(actor));
 						RendererRuntime.runSync(actorStore.destroyExitingActorFx(actor));
 					},
-					toAlpha: 0,
 				});
 				continue;
 			}

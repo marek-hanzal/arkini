@@ -2,31 +2,30 @@ import { useAtom, useAtomValue } from "@effect/atom-react";
 import { Cause } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 
-import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
-import { ArkiniArkpack } from "~/bridge/arkpack/ArkiniArkpack";
+import { ArkiniAppVersion, ArkiniDefaultPackageId } from "../../../shared/ArkiniAppMetadata";
 import { useArkpacks } from "~/bridge/arkpack/useArkpacks";
 import { Button, ButtonLink, PrimaryButton, PrimaryButtonLink } from "~/ui/button/Button";
 import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";
 import { MainMenuExitCommandAtom } from "~/ui/launcher/MainMenuExitCommandAtom";
+import { EditorServiceStatusAtom } from "~/bridge/editor/EditorServiceStatusAtom";
 
 /** Renders the semantic out-of-game launcher actions over authoritative startup state. */
 export const MainMenu = () => {
 	const { state: catalogState } = useArkpacks();
 	const startup = useAtomValue(LauncherStartupAtom);
 	const [exitState, requestExit] = useAtom(MainMenuExitCommandAtom);
+	const editorStatus = useAtomValue(EditorServiceStatusAtom);
 	const exitPending = exitState.kind === "pending";
-	const builtInAvailable =
+	const defaultPackageAvailable =
 		AsyncResult.isSuccess(startup) &&
 		!startup.waiting &&
-		startup.value.builtInPackageId === ArkiniArkpack.packageId &&
+		startup.value.defaultPackageId === ArkiniDefaultPackageId &&
 		catalogState.type === "ready" &&
-		catalogState.arkpacks.some(
-			(arkpack) =>
-				arkpack.source === "built-in" &&
-				arkpack.trust.type === "official" &&
-				arkpack.gameId === "arkini" &&
-				arkpack.packageId === ArkiniArkpack.packageId,
-		);
+		catalogState.arkpacks.some((arkpack) => arkpack.packageId === ArkiniDefaultPackageId);
+	const playUnavailable =
+		catalogState.type === "failed" ||
+		(AsyncResult.isFailure(startup) && !startup.waiting) ||
+		(catalogState.type === "ready" && AsyncResult.isSuccess(startup) && !startup.waiting);
 
 	return (
 		<nav
@@ -34,12 +33,12 @@ export const MainMenu = () => {
 			aria-label="Main menu"
 			data-ui="MainMenu"
 		>
-			{builtInAvailable ? (
+			{defaultPackageAvailable ? (
 				<PrimaryButtonLink
 					to="/action/load-game/$packageId"
 					preload={false}
 					params={{
-						packageId: ArkiniArkpack.packageId,
+						packageId: ArkiniDefaultPackageId,
 					}}
 					className="rounded-xl"
 				>
@@ -48,18 +47,10 @@ export const MainMenu = () => {
 			) : (
 				<PrimaryButton
 					className="rounded-xl"
-					cursorIntent={
-						catalogState.type === "failed" ||
-						(AsyncResult.isFailure(startup) && !startup.waiting)
-							? "not-allowed"
-							: "progress"
-					}
+					cursorIntent={playUnavailable ? "not-allowed" : "progress"}
 					disabled
 				>
-					{catalogState.type === "failed" ||
-					(AsyncResult.isFailure(startup) && !startup.waiting)
-						? "Play unavailable"
-						: "Preparing Play…"}
+					{playUnavailable ? "Play unavailable" : "Preparing Play…"}
 				</PrimaryButton>
 			)}
 			<ButtonLink
@@ -68,6 +59,23 @@ export const MainMenu = () => {
 			>
 				Arkpacks
 			</ButtonLink>
+			{editorStatus.type === "ready" ? (
+				<ButtonLink
+					to="/editor/welcome"
+					preload={false}
+					className="rounded-xl"
+				>
+					Editor
+				</ButtonLink>
+			) : (
+				<Button
+					className="rounded-xl"
+					cursorIntent={editorStatus.type === "starting" ? "progress" : "not-allowed"}
+					disabled
+				>
+					{editorStatus.type === "starting" ? "Preparing Editor…" : "Editor unavailable"}
+				</Button>
+			)}
 			<ButtonLink
 				to="/settings"
 				className="rounded-xl"
@@ -102,6 +110,8 @@ export const MainMenu = () => {
 				<p className="text-center text-sm text-danger">
 					Startup failed: {String(Cause.squash(startup.cause))}
 				</p>
+			) : editorStatus.type === "unavailable" ? (
+				<p className="text-center text-sm text-danger">{editorStatus.message}</p>
 			) : exitState.kind === "error" ? (
 				<p className="text-center text-sm text-danger">
 					Exit failed: {String(exitState.error)}

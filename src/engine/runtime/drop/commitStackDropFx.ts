@@ -3,11 +3,8 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
-import {
-	makeDropRejectedResult,
-	makeStaleDropRejectedResult,
-} from "~/engine/runtime/drop/makeDropRejectedResult";
-import { projectDropTransferActor } from "~/engine/runtime/drop/projectDropTransferActor";
+import { makeDropRejectedResultFx } from "~/engine/runtime/drop/makeDropRejectedResultFx";
+import { projectDropTransferActorFx } from "~/engine/runtime/drop/projectDropTransferActorFx";
 import { readDropItemStackRejectedReasonFx } from "~/engine/runtime/read/readDropItemStackRejectedReasonFx";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
@@ -44,60 +41,63 @@ export const commitStackDropFx = Effect.fn("commitStackDropFx")(function* ({
 		targetRevision,
 		targetLocation,
 	}).pipe(
-		Effect.map(
-			(result): commitStackDropFx.Result => ({
-				kind: DropItemResultKindEnumSchema.enum.Stack,
-				transferredQuantity: result.transferredQuantity,
-				source: projectDropTransferActor({
-					after: result.sourceAfter,
-					before: result.sourceBefore,
-				}),
-				target: {
-					itemId: result.targetBefore.id,
-					canonicalItemId: result.targetBefore.item.id,
-					previousRevision: result.targetBefore.revision,
-					previousLocation: result.targetBefore.location,
-					previousQuantity: result.targetBefore.quantity,
-					current: {
-						itemId: result.targetAfter.id,
-						canonicalItemId: result.targetAfter.item.id,
-						revision: result.targetAfter.revision,
-						location: result.targetAfter.location,
-						quantity: result.targetAfter.quantity,
-					},
-				},
-			}),
+		Effect.flatMap((result) =>
+			projectDropTransferActorFx({
+				after: result.sourceAfter,
+				before: result.sourceBefore,
+			}).pipe(
+				Effect.map(
+					(source): commitStackDropFx.Result => ({
+						kind: DropItemResultKindEnumSchema.enum.Stack,
+						transferredQuantity: result.transferredQuantity,
+						source,
+						target: {
+							itemId: result.targetBefore.id,
+							canonicalItemId: result.targetBefore.item.id,
+							previousRevision: result.targetBefore.revision,
+							previousLocation: result.targetBefore.location,
+							previousQuantity: result.targetBefore.quantity,
+							current: {
+								itemId: result.targetAfter.id,
+								canonicalItemId: result.targetAfter.item.id,
+								revision: result.targetAfter.revision,
+								location: result.targetAfter.location,
+								quantity: result.targetAfter.quantity,
+							},
+						},
+					}),
+				),
+			),
 		),
 		Effect.catchTag("StackItemsUnavailableError", (error) =>
 			readDropItemStackRejectedReasonFx({
 				reason: error.reason,
 			}).pipe(
-				Effect.map((reason) => ({
-					...makeDropRejectedResult({
+				Effect.flatMap((reason) =>
+					makeDropRejectedResultFx({
 						reason,
 						sourceItemId,
 						targetItemId,
 					}),
-				})),
+				),
 			),
 		),
 		Effect.catchTags({
 			ItemNotFoundError: (error) =>
-				Effect.succeed(
-					makeStaleDropRejectedResult({
-						entityId: error.itemId,
-						sourceItemId,
-						targetItemId,
-					}),
-				),
+				makeDropRejectedResultFx({
+					reason:
+						error.itemId === targetItemId
+							? DropItemRejectedReasonEnumSchema.enum.StaleTarget
+							: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+					sourceItemId,
+					targetItemId,
+				}),
 			JobOwnerBusyError: () =>
-				Effect.succeed(
-					makeDropRejectedResult({
-						reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
-						sourceItemId,
-						targetItemId,
-					}),
-				),
+				makeDropRejectedResultFx({
+					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
+					sourceItemId,
+					targetItemId,
+				}),
 		}),
 	);
 });

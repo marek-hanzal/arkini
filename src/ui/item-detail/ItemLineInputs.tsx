@@ -290,14 +290,7 @@ const ItemLineInputRow = ({
 				kind: "materials",
 			},
 			(materials) => {
-				const label =
-					materials.selector.kind === "tag"
-						? materials.selector.label
-								.replaceAll(":", " ")
-								.replaceAll("-", " ")
-								.replaceAll("_", " ")
-								.replace(/\b\p{L}/gu, (letter) => letter.toUpperCase())
-						: materials.selector.label;
+				const label = materials.selector.label;
 				return (
 					<motion.div
 						layout
@@ -386,14 +379,7 @@ const ItemLineInputRow = ({
 				kind: "deposit",
 			},
 			(deposit) => {
-				const label =
-					deposit.selector.kind === "tag"
-						? deposit.selector.label
-								.replaceAll(":", " ")
-								.replaceAll("-", " ")
-								.replaceAll("_", " ")
-								.replace(/\b\p{L}/gu, (letter) => letter.toUpperCase())
-						: deposit.selector.label;
+				const label = deposit.selector.label;
 				return (
 					<motion.div
 						layout

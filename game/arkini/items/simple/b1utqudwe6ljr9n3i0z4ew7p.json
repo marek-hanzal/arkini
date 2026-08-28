@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "b1utqudwe6ljr9n3i0z4ew7p",
+		"id": "item:log",
+		"title": "Log",
+		"description": "Basic wood material produced by lumberjacks.",
+		"asset": {
+			"default": [
+				"item-log"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 24,
+		"type": "simple"
+	}
+}

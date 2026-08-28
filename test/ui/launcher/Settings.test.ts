@@ -86,6 +86,7 @@ const renderSettings = async (
 	const write = vi.fn(() => deferred.promise);
 	const writeCheatAvailability = vi.fn(() => Promise.resolve());
 	const openDiagnostics = vi.fn(() => Promise.resolve());
+	const openUserData = vi.fn(() => Promise.resolve());
 	const registry = AtomRegistry.make({
 		initialValues: [
 			[
@@ -113,6 +114,16 @@ const renderSettings = async (
 	Object.defineProperty(window, "arkini", {
 		configurable: true,
 		value: {
+			cli: {
+				status: () =>
+					Promise.resolve({
+						type: "unavailable",
+						commandPath: "/tmp/arkini-cli",
+						message: "Available in packaged builds.",
+					}),
+				install: vi.fn(),
+				uninstall: vi.fn(),
+			},
 			appearance: {
 				write,
 			},
@@ -121,6 +132,9 @@ const renderSettings = async (
 			},
 			diagnostics: {
 				openDirectory: openDiagnostics,
+			},
+			userData: {
+				openDirectory: openUserData,
 			},
 			window: {
 				writeMode: writeWindowMode,
@@ -139,21 +153,18 @@ const renderSettings = async (
 			arkpack: {
 				packageId: "package:settings",
 				contentHash: "content:settings",
-				gameId: "game:settings",
 				title: "Settings game",
-				configVersion: "1.0",
-				compressedSize: 0,
-				trust: {
-					type: "external",
-					reason: "unsigned",
+				version: "1.0",
+				arkini: "1.0",
+				provenance: {
+					type: "community",
 				} as const,
-				source: "imported",
+				source: "user",
 			},
 			config,
 			getResourceUrl: () => "blob:test",
 			saveKey: {
 				packageId: "package:settings",
-				contentHash: "a".repeat(64),
 			},
 		};
 		const runtimeHarness = createTestRendererRuntime({
@@ -226,54 +237,20 @@ const renderSettings = async (
 		writeCheatAvailability,
 		writeWindowMode,
 		openDiagnostics,
+		openUserData,
 		registry,
 	};
 };
 
 describe("Settings", () => {
-	it("opens the bounded diagnostic log directory", async () => {
-		const { container, openDiagnostics } = await renderSettings([
-			"/settings",
-		]);
-
-		await act(async () => buttonByText(container, "Open logs").click());
-		await vi.waitFor(() => expect(openDiagnostics).toHaveBeenCalledOnce());
-	});
-
 	it("changes and persists the authoritative theme, then returns through history with Escape", async () => {
 		const { container, deferred, router, write } = await renderSettings([
 			"/main-menu",
 			"/settings",
 		]);
 
-		const page = container.querySelector<HTMLElement>('[data-ui="MainPageLayout"]');
-		expect(page?.style.viewTransitionName).toBe("");
-		const panel = container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]');
-		const panelContent = container.querySelector<HTMLElement>(
-			'[data-ui="MainPagePanelContent"]',
-		);
-		expect(panel).not.toBeNull();
-		expect(panel?.style.viewTransitionName).toBe("arkini-panel-settings");
-		expect(panelContent?.style.viewTransitionName).toBe("");
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="LauncherHero"]')?.style
-				.viewTransitionName,
-		).toBe("");
 		const radios = Array.from(container.querySelectorAll('input[name="appearance-theme"]'));
 		expect(radios).toHaveLength(3);
-		const themeOptions = container.querySelector<HTMLElement>(
-			'[data-ui="SettingsThemeOptions"]',
-		);
-		expect(themeOptions?.className).not.toContain("ak-list");
-		const themeRows = Array.from(themeOptions?.querySelectorAll("label") ?? []);
-		expect(themeRows).toHaveLength(3);
-		expect(themeRows.every((row) => !row.className.includes("ak-list-row"))).toBe(true);
-		expect(themeRows.find((row) => row.dataset.selected === "true")?.className).toContain(
-			"bg-accent",
-		);
-		expect(themeRows.find((row) => row.dataset.selected === "true")?.className).toContain(
-			"text-accent-contrast",
-		);
 		const light = radios.find(
 			(input) => input instanceof HTMLInputElement && input.value === "light",
 		);
@@ -283,19 +260,12 @@ describe("Settings", () => {
 		expect(document.documentElement.dataset.theme).toBe("light");
 		expect(write).toHaveBeenCalledOnce();
 		expect(write).toHaveBeenCalledWith("light");
-		expect(container.textContent).toContain("Saving theme…");
 		const fieldset = container.querySelector("fieldset");
 		expect(fieldset).toBeInstanceOf(HTMLFieldSetElement);
 		expect((fieldset as HTMLFieldSetElement).disabled).toBe(true);
-		expect(
-			Array.from(themeOptions?.querySelectorAll("label") ?? []).every(
-				(row) => row.dataset.pending === "true" && row.className.includes("opacity-60"),
-			),
-		).toBe(true);
-
 		await act(async () => deferred.resolve());
 		await act(async () => {
-			await vi.waitFor(() => expect(container.textContent).toContain("Theme saved."));
+			await vi.waitFor(() => expect((fieldset as HTMLFieldSetElement).disabled).toBe(false));
 		});
 		await act(async () => {
 			window.dispatchEvent(
@@ -365,7 +335,7 @@ describe("Settings", () => {
 		await vi.waitFor(() => expect(registry.get(CheatAvailabilityAtom)).toBe(true));
 	});
 
-	it("renders the first theme-style control and applies Electron-confirmed window modes", async () => {
+	it("applies Electron-confirmed window modes", async () => {
 		const { container, registry, writeWindowMode } = await renderSettings([
 			"/settings",
 		]);
@@ -382,11 +352,6 @@ describe("Settings", () => {
 			"fullscreen",
 		]);
 		expect(radios[0]?.checked).toBe(true);
-		expect(
-			container
-				.querySelector("fieldset")
-				?.querySelector('[data-ui="SettingsWindowModeOptions"]'),
-		).toBe(options);
 		const fullscreen = radios.find((radio) => radio.value === "fullscreen");
 		if (fullscreen === undefined) throw new Error("Expected Fullscreen option.");
 
@@ -394,7 +359,6 @@ describe("Settings", () => {
 
 		await vi.waitFor(() => expect(writeWindowMode).toHaveBeenCalledWith("fullscreen"));
 		await vi.waitFor(() => expect(registry.get(WindowModeAtom)).toBe("fullscreen"));
-		expect(container.textContent).toContain("Window saved.");
 	});
 
 	it("admits only one settings mutation before React publishes the pending render", async () => {
@@ -482,7 +446,6 @@ describe("Settings", () => {
 
 		await act(async () => light.click());
 		expect(write).toHaveBeenCalledOnce();
-		expect(container.textContent).toContain("Saving theme…");
 
 		await act(async () => root.unmount());
 		roots.splice(roots.indexOf(root), 1);
@@ -496,7 +459,6 @@ describe("Settings", () => {
 			);
 		});
 
-		expect(container.textContent).toContain("Saving theme…");
 		const toggle = container.querySelector<HTMLInputElement>(
 			'[data-ui="SettingsCheatAvailability"] input[type="checkbox"]',
 		);

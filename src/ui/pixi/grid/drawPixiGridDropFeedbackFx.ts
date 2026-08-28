@@ -1,19 +1,19 @@
 import { Effect } from "effect";
 import type { Graphics } from "pixi.js";
 
-import { readPixiGridSurfaceRadius } from "~/ui/pixi/grid/readPixiGridSurfaceRadius";
+import { readPixiGridSurfaceRadiusFx } from "~/ui/pixi/grid/readPixiGridSurfaceRadiusFx";
 import type { PixiGridSurfaceLayout } from "~/ui/pixi/layout/PixiSceneLayout";
 
 const drawRoundedOuterSlotPath = (
 	graphics: Graphics,
 	surface: PixiGridSurfaceLayout,
 	slot: NonNullable<drawPixiGridDropFeedbackFx.Props["slot"]>,
+	radius: number,
 ) => {
 	const left = surface.x + slot.x * surface.cellSize;
 	const top = surface.y + slot.y * surface.cellSize;
 	const right = left + surface.cellSize;
 	const bottom = top + surface.cellSize;
-	const radius = readPixiGridSurfaceRadius(surface);
 	const isLeft = slot.x === 0;
 	const isRight = slot.x === surface.columns - 1;
 	const isTop = slot.y === 0;
@@ -58,20 +58,23 @@ export namespace drawPixiGridDropFeedbackFx {
 }
 
 /** Paints one accepted or rejected slot marker without owning preview semantics. */
-export const drawPixiGridDropFeedbackFx = Effect.fn("drawPixiGridDropFeedbackFx")(
-	({ color, graphics, slot, surface }: drawPixiGridDropFeedbackFx.Props) =>
-		Effect.sync(() => {
-			graphics.clear();
-			if (slot === null || surface === null) return;
-			drawRoundedOuterSlotPath(graphics, surface, slot)
-				.fill({
-					alpha: 0.16,
-					color,
-				})
-				.stroke({
-					alpha: 0.95,
-					color,
-					width: Math.max(2, surface.cellSize * 0.025),
-				});
-		}),
-);
+export const drawPixiGridDropFeedbackFx = Effect.fn("drawPixiGridDropFeedbackFx")(function* ({
+	color,
+	graphics,
+	slot,
+	surface,
+}: drawPixiGridDropFeedbackFx.Props) {
+	graphics.clear();
+	if (slot === null || surface === null) return;
+	const radius = yield* readPixiGridSurfaceRadiusFx(surface);
+	drawRoundedOuterSlotPath(graphics, surface, slot, radius)
+		.fill({
+			alpha: 0.16,
+			color,
+		})
+		.stroke({
+			alpha: 0.95,
+			color,
+			width: Math.max(2, surface.cellSize * 0.025),
+		});
+});

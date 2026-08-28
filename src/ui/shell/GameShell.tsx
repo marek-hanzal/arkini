@@ -1,22 +1,61 @@
-import type { PropsWithChildren } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
+import { usePackageGameEngine } from "~/bridge/game/usePackageGameEngine";
 import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
 import { ItemDetailHigherOwnerGuard } from "~/ui/item-detail/ItemDetailHigherOwnerGuard";
+import type { ItemDetailHeaderIdentityRenderer } from "~/ui/item-detail/ItemDetailHeader";
+import type { ItemLineSummaryIdentityRenderer } from "~/ui/item-detail/ItemLineSummary";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
-import { gameBoardViewTransitionName } from "~/ui/navigation/gameBoardViewTransitionName";
+import {
+	editorGameBoardViewTransitionName,
+	gameBoardViewTransitionName,
+} from "~/ui/navigation/gameBoardViewTransitionName";
 import { RouteBackdrop } from "~/ui/navigation/RouteBackdrop";
 import { PixiGameProvider } from "~/ui/pixi/PixiGameProvider";
 
-const GameTileScene = ({ children }: PropsWithChildren) => (
+type GameShellRoutePresentation = "embedded" | "embedded-transition" | "fullscreen";
+
+const GameSceneBackdrop = ({
+	routePresentation,
+}: {
+	readonly routePresentation: GameShellRoutePresentation;
+}) =>
+	routePresentation === "fullscreen" ? (
+		<RouteBackdrop
+			className="game-scene__backdrop pointer-events-none absolute inset-0 z-0"
+			dataUi="GameSceneBackdrop"
+		/>
+	) : (
+		<div
+			aria-hidden="true"
+			className="game-scene__backdrop pointer-events-none absolute inset-0 z-0"
+			data-ui="GameSceneBackdrop"
+		/>
+	);
+
+const GameTileScene = ({
+	children,
+	routePresentation,
+}: PropsWithChildren<{
+	readonly routePresentation: GameShellRoutePresentation;
+}>) => (
 	<div
 		className="relative isolate z-10 size-full min-h-0 min-w-0"
 		data-ui="TileScene"
-		style={{
-			viewTransitionName: gameBoardViewTransitionName,
-		}}
+		style={
+			{
+				fullscreen: {
+					viewTransitionName: gameBoardViewTransitionName,
+				},
+				"embedded-transition": {
+					viewTransitionName: editorGameBoardViewTransitionName,
+				},
+				embedded: undefined,
+			}[routePresentation]
+		}
 	>
 		<div
 			className="size-full min-h-0 min-w-0"
@@ -30,19 +69,30 @@ const GameTileScene = ({ children }: PropsWithChildren) => (
 const GameShellLayers = ({
 	children,
 	game,
+	itemDetailIdentityRenderer,
+	itemDetailLineIdentityRenderer,
+	menu,
+	routePresentation,
 }: PropsWithChildren<{
 	readonly game: ReturnType<typeof useGameEngine>;
+	readonly itemDetailIdentityRenderer?: ItemDetailHeaderIdentityRenderer;
+	readonly itemDetailLineIdentityRenderer?: ItemLineSummaryIdentityRenderer;
+	readonly menu?: ReactNode;
+	readonly routePresentation: GameShellRoutePresentation;
 }>) => {
 	return (
 		<>
 			<ItemDetailProvider game={game}>
 				<PixiGameProvider>
 					<ItemDetailHigherOwnerGuard />
-					<GameTileScene>{children}</GameTileScene>
-					<ItemDetailModal />
+					<GameTileScene routePresentation={routePresentation}>{children}</GameTileScene>
+					<ItemDetailModal
+						renderIdentity={itemDetailIdentityRenderer}
+						renderLineIdentity={itemDetailLineIdentityRenderer}
+					/>
 				</PixiGameProvider>
 			</ItemDetailProvider>
-			<GameMenu game={game} />
+			{menu}
 		</>
 	);
 };
@@ -59,21 +109,50 @@ const GameShellLayers = ({
  * the primary action, while right click requests Item Detail without introducing
  * delayed or double-click arbitration here.
  */
-export function GameShell({ children }: PropsWithChildren) {
-	const gameEngine = useGameEngine();
+export const PlayableGameShell = ({
+	children,
+	itemDetailIdentityRenderer,
+	itemDetailLineIdentityRenderer,
+	menu,
+	routePresentation,
+}: PropsWithChildren<{
+	readonly menu?: ReactNode;
+	readonly itemDetailIdentityRenderer?: ItemDetailHeaderIdentityRenderer;
+	readonly itemDetailLineIdentityRenderer?: ItemLineSummaryIdentityRenderer;
+	readonly routePresentation: GameShellRoutePresentation;
+}>) => {
+	const game = useGameEngine();
 	return (
 		<main
 			className="relative size-full min-h-0 min-w-0 overflow-hidden bg-canvas text-foreground outline-none"
 			data-ui="GameShell"
 			tabIndex={-1}
 		>
-			<RouteBackdrop
-				className="game-scene__backdrop pointer-events-none absolute inset-0 z-0"
-				dataUi="GameSceneBackdrop"
-			/>
-			<GameMenuProvider>
-				<GameShellLayers game={gameEngine}>{children}</GameShellLayers>
+			<GameSceneBackdrop routePresentation={routePresentation} />
+			<GameMenuProvider keyboardEnabled={menu !== undefined}>
+				<GameShellLayers
+					game={game}
+					itemDetailIdentityRenderer={itemDetailIdentityRenderer}
+					itemDetailLineIdentityRenderer={itemDetailLineIdentityRenderer}
+					menu={menu}
+					routePresentation={routePresentation}
+				>
+					{children}
+				</GameShellLayers>
 			</GameMenuProvider>
 		</main>
+	);
+};
+
+/** Adds installed-package Game Menu actions to the shared gameplay shell. */
+export function GameShell({ children }: PropsWithChildren) {
+	const game = usePackageGameEngine();
+	return (
+		<PlayableGameShell
+			menu={<GameMenu game={game} />}
+			routePresentation="fullscreen"
+		>
+			{children}
+		</PlayableGameShell>
 	);
 }

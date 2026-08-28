@@ -5,11 +5,10 @@ import { readOutputMaximumQuantitiesFx } from "~/engine/output/fx/readOutputMaxi
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 
 const value = (amount: number) => ({
-	type: "value" as const,
-	value: amount,
+	min: amount,
+	max: amount,
 });
 const range = (min: number, max: number) => ({
-	type: "range" as const,
 	min,
 	max,
 });
@@ -19,6 +18,7 @@ describe("readOutputMaximumQuantitiesFx", () => {
 		const output: OutputSchema.Type = {
 			set: [
 				{
+					weight: 1,
 					roll: [
 						{
 							type: "chance",
@@ -52,6 +52,7 @@ describe("readOutputMaximumQuantitiesFx", () => {
 		const output: OutputSchema.Type = {
 			set: [
 				{
+					weight: 1,
 					roll: [
 						{
 							type: "guaranteed",
@@ -85,6 +86,7 @@ describe("readOutputMaximumQuantitiesFx", () => {
 					],
 				},
 				{
+					weight: 1,
 					roll: [
 						{
 							type: "guaranteed",
@@ -124,6 +126,7 @@ describe("readOutputMaximumQuantitiesFx", () => {
 		const output: OutputSchema.Type = {
 			set: [
 				{
+					weight: 1,
 					roll: [
 						{
 							type: "weight",

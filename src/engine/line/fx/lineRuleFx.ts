@@ -1,13 +1,13 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import { resolveActionRuleFx } from "~/engine/action/fx/resolveActionRuleFx";
 import { RuleEnumSchema } from "~/engine/line/schema/rule/RuleEnumSchema";
 import type { RuleSchema } from "~/engine/line/schema/rule/RuleSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 
-import { lineRuleDisableFx } from "./lineRuleDisableFx";
-import { lineRuleEnableFx } from "./lineRuleEnableFx";
 import { lineRuleHideFx } from "./lineRuleHideFx";
+import { lineRuleRuntimeAdjustFx } from "./lineRuleRuntimeAdjustFx";
 import { lineRuleRuntimeMultiplierFx } from "./lineRuleRuntimeMultiplierFx";
 import { lineRuleShowFx } from "./lineRuleShowFx";
 
@@ -50,7 +50,7 @@ export const lineRuleFx = Effect.fn("lineRuleFx")(function* ({ origin, rule }: l
 				type: RuleEnumSchema.enum.Enable,
 			},
 			(rule) => {
-				return lineRuleEnableFx({
+				return resolveActionRuleFx({
 					origin,
 					rule,
 				});
@@ -61,7 +61,18 @@ export const lineRuleFx = Effect.fn("lineRuleFx")(function* ({ origin, rule }: l
 				type: RuleEnumSchema.enum.Disable,
 			},
 			(rule) => {
-				return lineRuleDisableFx({
+				return resolveActionRuleFx({
+					origin,
+					rule,
+				});
+			},
+		)
+		.with(
+			{
+				type: RuleEnumSchema.enum.RuntimeAdjust,
+			},
+			(rule) => {
+				return lineRuleRuntimeAdjustFx({
 					origin,
 					rule,
 				});

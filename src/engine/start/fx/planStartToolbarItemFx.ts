@@ -1,9 +1,7 @@
 import { Effect } from "effect";
 
-import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
-import { planSpawnPlacementFx } from "~/engine/placement/fx/planSpawnPlacementFx";
-import type { PlacementPlanSchema } from "~/engine/placement/schema/PlacementPlanSchema";
+import { planStartExactGridStackFx } from "~/engine/start/fx/planStartExactGridStackFx";
 import type { ToolbarItemSchema } from "~/engine/start/schema/ToolbarItemSchema";
 
 export namespace planStartToolbarItemFx {
@@ -12,29 +10,16 @@ export namespace planStartToolbarItemFx {
 	}
 }
 
-/**
- * Plans one exact initial toolbar item without fallback or location substitution.
- */
+/** Plans one exact initial toolbar stack without fallback or location substitution. */
 export const planStartToolbarItemFx = Effect.fn("planStartToolbarItemFx")(function* ({
 	item: startItem,
 }: planStartToolbarItemFx.Props) {
-	const item = yield* resolveItemFx({
+	return yield* planStartExactGridStackFx({
 		itemId: startItem.itemId,
+		location: {
+			position: startItem.position,
+			scope: LocationScopeEnumSchema.enum.Toolbar,
+		},
+		quantity: startItem.quantity ?? 1,
 	});
-	const spawn = yield* planSpawnPlacementFx({
-		item,
-		locations: [
-			{
-				position: startItem.position,
-				scope: LocationScopeEnumSchema.enum.Toolbar,
-			},
-		],
-		quantity: 1,
-	});
-
-	return {
-		remove: [],
-		spawn,
-		stack: [],
-	} satisfies PlacementPlanSchema.Type;
 });

@@ -7,6 +7,7 @@ import type { PixiTileActorVisual } from "~/ui/pixi/actor/PixiTileActorVisual";
 export interface PixiTileActor {
 	readonly instanceId: string;
 	readonly container: Container;
+	readonly lifecycleLayer: Container;
 	readonly offsetLayer: Container;
 	readonly crowdLayer: Container;
 	readonly visualLayer: Container;
@@ -19,7 +20,7 @@ export interface PixiTileActor {
 	size: number;
 	visualTransitionGeneration: number;
 	lifecycleIntentGeneration: number;
-	lifecycleFadeStarted: boolean;
+	lifecycleTransitionStarted: boolean;
 	lifecycleTargetAlpha: number;
 	lifecycleNotBeforeMs: number;
 	lifecycleDurationMs: number;

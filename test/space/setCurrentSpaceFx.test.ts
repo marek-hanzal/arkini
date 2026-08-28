@@ -1,5 +1,5 @@
 import { Deferred, Effect, Fiber, Option, Result, Stream } from "effect";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "@effect/vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
@@ -56,68 +56,57 @@ describe("current board space", () => {
 		expect(result.after).toEqual(result.initial);
 	});
 
-	it("commits one navigation event and treats the current space as an idempotent no-op", async () => {
-		const result = await Effect.runPromise(
-			Effect.scoped(
-				Effect.gen(function* () {
-					const transitions = yield* CommittedTransitionsFx;
-					const changedReplaySeen = yield* Deferred.make<void>();
-					const changedFiber = yield* transitions.changes.pipe(
-						Stream.tap(() => Deferred.succeed(changedReplaySeen, undefined)),
-						Stream.drop(1),
-						Stream.runHead,
-						Effect.forkChild,
-					);
-					yield* Deferred.await(changedReplaySeen);
-					const changed = yield* setCurrentSpaceFx({
-						space: 3,
-					});
-					const transition = Option.getOrThrow(yield* Fiber.join(changedFiber));
+	it.effect(
+		"commits one navigation event and treats the current space as an idempotent no-op",
+		() =>
+			Effect.gen(function* () {
+				const transitions = yield* CommittedTransitionsFx;
+				const changedReplaySeen = yield* Deferred.make<void>();
+				const changedFiber = yield* transitions.changes.pipe(
+					Stream.tap(() => Deferred.succeed(changedReplaySeen, undefined)),
+					Stream.drop(1),
+					Stream.runHead,
+					Effect.forkChild,
+				);
+				yield* Deferred.await(changedReplaySeen);
+				const changed = yield* setCurrentSpaceFx({
+					space: 3,
+				});
+				const transition = Option.getOrThrow(yield* Fiber.join(changedFiber));
 
-					const noOpReplaySeen = yield* Deferred.make<void>();
-					const noOpFiber = yield* transitions.changes.pipe(
-						Stream.tap(() => Deferred.succeed(noOpReplaySeen, undefined)),
-						Stream.drop(1),
-						Stream.runHead,
-						Effect.forkChild,
-					);
-					yield* Deferred.await(noOpReplaySeen);
-					const beforeNoOp = yield* readRuntimeFx();
-					const noOp = yield* setCurrentSpaceFx({
-						space: 3,
-					});
-					const afterNoOp = yield* readRuntimeFx();
-					const published = Option.fromNullishOr(noOpFiber.pollUnsafe());
-					yield* Fiber.interrupt(noOpFiber);
+				const noOpReplaySeen = yield* Deferred.make<void>();
+				const noOpFiber = yield* transitions.changes.pipe(
+					Stream.tap(() => Deferred.succeed(noOpReplaySeen, undefined)),
+					Stream.drop(1),
+					Stream.runHead,
+					Effect.forkChild,
+				);
+				yield* Deferred.await(noOpReplaySeen);
+				const beforeNoOp = yield* readRuntimeFx();
+				const noOp = yield* setCurrentSpaceFx({
+					space: 3,
+				});
+				const afterNoOp = yield* readRuntimeFx();
+				const published = Option.fromNullishOr(noOpFiber.pollUnsafe());
+				yield* Fiber.interrupt(noOpFiber);
 
-					return {
-						afterNoOp,
-						beforeNoOp,
-						changed,
-						noOp,
-						published,
-						transition,
-					};
-				}),
-			).pipe(
+				expect(changed).toBe(3);
+				expect(transition.events).toEqual([
+					{
+						type: GameEventEnumSchema.enum.CurrentSpaceChanged,
+						previousSpace: 0,
+						currentSpace: 3,
+					},
+				]);
+				expect(noOp).toBe(3);
+				expect(afterNoOp).toBe(beforeNoOp);
+				expect(Option.isNone(published)).toBe(true);
+			}).pipe(
 				useGameFx({
 					config: multiSpaceTestConfig,
 				}),
 			),
-		);
-
-		expect(result.changed).toBe(3);
-		expect(result.transition.events).toEqual([
-			{
-				type: GameEventEnumSchema.enum.CurrentSpaceChanged,
-				previousSpace: 0,
-				currentSpace: 3,
-			},
-		]);
-		expect(result.noOp).toBe(3);
-		expect(result.afterNoOp).toBe(result.beforeNoOp);
-		expect(Option.isNone(result.published)).toBe(true);
-	});
+	);
 
 	it("persists navigation and every explicit board space while reading only the current board", () => {
 		const result = Effect.runSync(

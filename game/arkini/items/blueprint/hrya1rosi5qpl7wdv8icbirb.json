@@ -1,0 +1,292 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "hrya1rosi5qpl7wdv8icbirb",
+		"id": "item:blueprint-house-of-engineers",
+		"title": "House of Engineers Blueprint",
+		"description": "Build plan for House of Engineers, one of the mutually exclusive Choose The Path keystone buildings.",
+		"asset": {
+			"default": [
+				"blueprint",
+				"producer-house-of-engineers"
+			],
+			"sources": [
+				"producer-house-of-engineers"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 1
+		},
+		"type": "blueprint",
+		"line": {
+			"id": "line:blueprint:house-of-engineers:construct",
+			"title": "Construct House of Engineers",
+			"description": "Consumes construction resources to build House of Engineers.",
+			"default": true,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 140000,
+			"input": [
+				{
+					"charges": {
+						"cost": 1,
+						"from": "self"
+					},
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:construction-bundle"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:guild-charter"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:treasure-chest"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:marble-block"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:stained-glass"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:iron-ingot"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 3,
+						"max": 3
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:gold-ingot"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:nails"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 4,
+						"max": 4
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:coin-stack"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 3,
+						"max": 3
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:morale-t4"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:morale-t3"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "producer:house-of-engineers",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": [
+				{
+					"when": [
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:blacksmith-t1"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						},
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:glazier-workshop-t1"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						},
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:library-t4"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						},
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:stonemason-t2"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						},
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:university"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						}
+					],
+					"type": "enable"
+				},
+				{
+					"when": [
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:cathedral"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						}
+					],
+					"type": "disable"
+				},
+				{
+					"when": [
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:mage-lodge"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						}
+					],
+					"type": "disable"
+				}
+			]
+		}
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "e0l14l9ow0mlz3y4r7n7u1uh",
+		"id": "item:raw-hide",
+		"title": "Raw Hide",
+		"description": "Untreated animal hide produced by slaughterhouses and processed by tanneries into leather.",
+		"asset": {
+			"default": [
+				"item-raw-hide"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 50,
+		"type": "simple"
+	}
+}

@@ -3,11 +3,9 @@ import { Texture } from "pixi.js";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { PixiTileActorVisual } from "~/ui/pixi/actor/PixiTileActorVisual";
-import {
-	beginPixiTileActorVisualTextureLoadFx,
-	completePixiTileActorVisualTextureLoadFx,
-	failPixiTileActorVisualTextureLoadFx,
-} from "~/ui/pixi/actor/PixiTileActorVisualReadiness";
+import { beginPixiTileActorVisualTextureLoadFx } from "~/ui/pixi/actor/beginPixiTileActorVisualTextureLoadFx";
+import { completePixiTileActorVisualTextureLoadFx } from "~/ui/pixi/actor/completePixiTileActorVisualTextureLoadFx";
+import { failPixiTileActorVisualTextureLoadFx } from "~/ui/pixi/actor/failPixiTileActorVisualTextureLoadFx";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 

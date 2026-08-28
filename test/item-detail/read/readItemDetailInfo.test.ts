@@ -13,10 +13,6 @@ describe("tile identity and Info projections", () => {
 		if (owner === undefined) throw new Error("Missing test owner.");
 		const item = {
 			...owner.item,
-			tags: [
-				"producer",
-				"era:I",
-			],
 			maxCount: 2,
 			charges: {
 				amount: 4,
@@ -55,10 +51,12 @@ describe("tile identity and Info projections", () => {
 			),
 		).toMatchObject({
 			kind: "available",
+			definitionId: "workshop",
 			itemId: owner.id,
 			title: "workshop",
-			categoryId: "resource",
-			sourceResourceId: "asset:workshop",
+			sourceResourceIds: [
+				"asset:workshop",
+			],
 		});
 		expect(
 			Effect.runSync(
@@ -72,11 +70,6 @@ describe("tile identity and Info projections", () => {
 			itemId: owner.id,
 			description: "workshop",
 			itemType: "producer",
-			categoryId: "resource",
-			tags: [
-				"producer",
-				"era:I",
-			],
 			storageScope: "board",
 			location: {
 				kind: "board",

@@ -1,4 +1,4 @@
-import type { Game } from "~/bridge/game/Game";
+import type { PlayableGame } from "~/bridge/game/PlayableGame";
 import type { ItemDetailPendingActionOwner } from "~/bridge/item-detail/ItemDetailPendingActionOwner";
 import { useItemDetailPendingCommand } from "~/bridge/item-detail/useItemDetailPendingCommand";
 import { unsetDefaultLineFx } from "~/engine/line/write/unsetDefaultLineFx";
@@ -12,7 +12,7 @@ export namespace useUnsetDefaultItemDetailLine {
 	}
 }
 
-const runUnsetDefaultFx = (game: Game, command: useUnsetDefaultItemDetailLine.Props) =>
+const runUnsetDefaultFx = (game: PlayableGame, command: useUnsetDefaultItemDetailLine.Props) =>
 	game.runFx(unsetDefaultLineFx(command));
 
 /** Removes the authoritative save-backed default line from an exact Item Detail owner. */

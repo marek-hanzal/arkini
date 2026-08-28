@@ -69,6 +69,7 @@ export namespace ItemDetailLines {
 	export interface OutputItem {
 		readonly itemId: IdSchema.Type;
 		readonly quantity: QuantityBounds;
+		readonly activeRuleHints: readonly string[];
 	}
 
 	export type OutputRoll = ItemDetailOutputRoll<OutputItem>;
@@ -83,12 +84,14 @@ export namespace ItemDetailLines {
 					  }
 					| {
 							readonly kind: "enable-rule";
+							readonly hint: string;
 							readonly ruleIndex: number;
 							readonly whenIndex: number;
 							readonly when: WhenSchema.Type;
 					  }
 					| {
 							readonly kind: "disable-rule";
+							readonly hint: string;
 							readonly ruleIndex: number;
 							readonly when: readonly WhenSchema.Type[];
 					  };
@@ -134,6 +137,7 @@ export namespace ItemDetailLines {
 		readonly baseRuntimeMs: TimeSchema.Type;
 		readonly effectiveRuntimeMs: TimeSchema.Type;
 		readonly availability: Availability;
+		readonly activeRuleHints: readonly string[];
 		readonly isDefault: boolean;
 		readonly queuedRequestCount: number;
 		readonly actions: {
@@ -155,6 +159,7 @@ export namespace ItemDetailLines {
 		| {
 				readonly kind: "available";
 				readonly itemId: IdSchema.Type;
+				readonly focusLineId?: IdSchema.Type;
 				readonly line: readonly Line[];
 		  }
 		| {

@@ -11,6 +11,7 @@ describe("createArkpackStorageFx", () => {
 				api: {
 					install: vi.fn(),
 					list: vi.fn().mockRejectedValue(cause),
+					openUserDirectory: vi.fn(),
 					read: vi.fn(),
 					remove: vi.fn(),
 				},

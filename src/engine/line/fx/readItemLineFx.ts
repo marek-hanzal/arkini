@@ -29,6 +29,12 @@ export const readItemLineFx = Effect.fn("readItemLineFx")(function* ({
 		)
 		.with(
 			{
+				type: ItemEnumSchema.enum.Deposit,
+			},
+			({ lines }) => lines?.find((line) => line.id === lineId),
+		)
+		.with(
+			{
 				type: P.union(
 					ItemEnumSchema.enum.Blueprint,
 					ItemEnumSchema.enum.Craft,

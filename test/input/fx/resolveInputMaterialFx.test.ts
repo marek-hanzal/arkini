@@ -11,8 +11,8 @@ const fixedInput = InputMaterialSchema.parse({
 		itemId: "item:water",
 	},
 	quantity: {
-		type: "value",
-		value: 3,
+		min: 3,
+		max: 3,
 	},
 	capacity: 2,
 });
@@ -63,12 +63,11 @@ describe("resolveInputMaterialFx", () => {
 		const input = InputMaterialSchema.parse({
 			type: "materials",
 			selector: {
-				type: "tag",
-				tag: "fuel",
+				type: "item",
+				itemId: "item:fuel",
 			},
 			mode: "reserve",
 			quantity: {
-				type: "range",
 				min: 2,
 				max: 5,
 			},

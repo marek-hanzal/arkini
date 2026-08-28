@@ -1,0 +1,115 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "klpyrin9sowztu7c17tzo7x2",
+		"id": "item:blueprint-sheep-pasture-t1",
+		"title": "Sheep Pasture I Blueprint",
+		"description": "Build plan that can be filled with resources to construct Sheep Pasture I.",
+		"asset": {
+			"default": [
+				"blueprint",
+				"producer-sheep-pasture-t1"
+			],
+			"sources": [
+				"producer-sheep-pasture-t1"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 1
+		},
+		"type": "blueprint",
+		"line": {
+			"id": "line:blueprint:sheep-pasture-t1:construct",
+			"title": "Construct Sheep Pasture I",
+			"description": "Consumes construction resources to build Sheep Pasture I.",
+			"default": true,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 22000,
+			"input": [
+				{
+					"charges": {
+						"cost": 1,
+						"from": "self"
+					},
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:plank"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:stone"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:grain"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:water"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "producer:sheep-pasture-t1",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": []
+		}
+	}
+}

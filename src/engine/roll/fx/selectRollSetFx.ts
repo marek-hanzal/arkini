@@ -11,7 +11,7 @@ export namespace selectRollSetFx {
 /**
  * Selects exactly one roll set according to its relative configured weight.
  *
- * A set without an explicit weight participates with the default weight one.
+ * Every canonical set has one explicit positive relative weight.
  */
 export const selectRollSetFx = Effect.fn("selectRollSetFx")(function* ({
 	set,
@@ -21,7 +21,7 @@ export const selectRollSetFx = Effect.fn("selectRollSetFx")(function* ({
 	}
 
 	const [totalWeight, weightedSet] = Array.mapAccum(set, 0, (accumulatedWeight, candidate) => {
-		const maximumWeight = accumulatedWeight + (candidate.weight ?? 1);
+		const maximumWeight = accumulatedWeight + candidate.weight;
 
 		return [
 			maximumWeight,

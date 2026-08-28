@@ -206,61 +206,61 @@ describe("stackItemsFx", () => {
 			stateful: "target" as const,
 			reason: "target-stateful",
 		},
-	])("rejects a $stateful identity and preserves the complete runtime", ({
-		stateful,
-		reason,
-	}) => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const source = yield* spawnItemFx({
-					id: "runtime:source",
-					itemId: "producer",
-					location: board(0),
-					quantity: 1,
-				});
-				const target = yield* spawnItemFx({
-					id: "runtime:target",
-					itemId: "producer",
-					location: board(1),
-					quantity: 1,
-				});
-				yield* setDefaultLineFx({
-					ownerItemId: stateful === "source" ? source.id : target.id,
-					lineId: "line:producer:zero",
-				});
-				const before = yield* readRuntimeFx();
-				const stacked = yield* Effect.result(
-					stackItemsFx({
-						sourceItemId: source.id,
-						sourceRevision: source.revision,
-						sourceLocation: source.location,
-						targetItemId: target.id,
-						targetRevision: target.revision,
-						targetLocation: target.location,
+	])(
+		"rejects a $stateful identity and preserves the complete runtime",
+		({ stateful, reason }) => {
+			const result = Effect.runSync(
+				Effect.gen(function* () {
+					const source = yield* spawnItemFx({
+						id: "runtime:source",
+						itemId: "producer",
+						location: board(0),
+						quantity: 1,
+					});
+					const target = yield* spawnItemFx({
+						id: "runtime:target",
+						itemId: "producer",
+						location: board(1),
+						quantity: 1,
+					});
+					yield* setDefaultLineFx({
+						ownerItemId: stateful === "source" ? source.id : target.id,
+						lineId: "line:producer:zero",
+					});
+					const before = yield* readRuntimeFx();
+					const stacked = yield* Effect.result(
+						stackItemsFx({
+							sourceItemId: source.id,
+							sourceRevision: source.revision,
+							sourceLocation: source.location,
+							targetItemId: target.id,
+							targetRevision: target.revision,
+							targetLocation: target.location,
+						}),
+					);
+
+					return {
+						after: yield* readRuntimeFx(),
+						before,
+						stacked,
+					};
+				}).pipe(
+					useGameFx({
+						config: purityTestConfig,
 					}),
-				);
+				),
+			);
 
-				return {
-					after: yield* readRuntimeFx(),
-					before,
-					stacked,
-				};
-			}).pipe(
-				useGameFx({
-					config: purityTestConfig,
-				}),
-			),
-		);
-
-		expect(Result.isFailure(result.stacked)).toBe(true);
-		if (Result.isFailure(result.stacked)) {
-			expect(result.stacked.failure).toMatchObject({
-				_tag: "StackItemsUnavailableError",
-				reason,
-			});
-		}
-		expect(result.after).toBe(result.before);
-	});
+			expect(Result.isFailure(result.stacked)).toBe(true);
+			if (Result.isFailure(result.stacked)) {
+				expect(result.stacked.failure).toMatchObject({
+					_tag: "StackItemsUnavailableError",
+					reason,
+				});
+			}
+			expect(result.after).toBe(result.before);
+		},
+	);
 
 	it("rejects stale revisions and exact-location mismatches without a partial commit", () => {
 		const result = Effect.runSync(

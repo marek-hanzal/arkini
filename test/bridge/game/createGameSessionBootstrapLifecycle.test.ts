@@ -1,5 +1,6 @@
-import { Cause, Effect, Exit, Fiber, Layer, Option } from "effect";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { Cause, Deferred, Effect, Exit, Fiber, Layer, Option } from "effect";
+import { describe, expect, it } from "@effect/vitest";
+import { beforeEach, vi } from "vitest";
 
 import { createGameSessionFx } from "~/bridge/game/createGameSessionFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
@@ -64,16 +65,6 @@ vi.mock("~/bridge/game/createGameSessionTransitionSubscriptionsFx", async (impor
 	};
 });
 
-const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {
-	const startedAt = performance.now();
-	while (!assertion()) {
-		if (performance.now() - startedAt > timeoutMs) {
-			throw new Error("Timed out while waiting for GameSession bootstrap.");
-		}
-		await new Promise((resolve) => setTimeout(resolve, 5));
-	}
-};
-
 const expectSingleOrderedRelease = () => {
 	expect(bootstrap.events.filter((event) => event === "session-scope-closed")).toHaveLength(1);
 	expect(bootstrap.events.filter((event) => event === "managed-runtime-disposed")).toHaveLength(
@@ -91,93 +82,100 @@ describe("createGameSessionFx bootstrap lifecycle", () => {
 		bootstrap.probeRuntime = false;
 	});
 
-	it("releases its partial scopes and managed runtime exactly once after a post-boot failure", async () => {
-		const failure = new Error("post-boot initialization failed");
-		bootstrap.controlledFx = Effect.fail(failure);
-		bootstrap.probeRuntime = true;
+	it.effect(
+		"releases its partial scopes and managed runtime exactly once after a post-boot failure",
+		() =>
+			Effect.gen(function* () {
+				const failure = new Error("post-boot initialization failed");
+				bootstrap.controlledFx = Effect.fail(failure);
+				bootstrap.probeRuntime = true;
 
-		const exit = await Effect.runPromiseExit(
-			createGameSessionFx({
-				config: createJobTestConfig(),
-				tickIntervalMs: 60_000,
+				const exit = yield* Effect.exit(
+					createGameSessionFx({
+						config: createJobTestConfig(),
+						tickIntervalMs: 60_000,
+					}),
+				);
+
+				expect(Exit.isFailure(exit)).toBe(true);
+				if (Exit.isFailure(exit)) {
+					const found = Cause.findErrorOption(exit.cause);
+					expect(Option.isSome(found)).toBe(true);
+					if (Option.isSome(found)) expect(found.value).toBe(failure);
+				}
+				expect(bootstrap.events).toContain("managed-runtime-acquired");
+				expect(bootstrap.events).toContain("bootstrap-entered");
+				expectSingleOrderedRelease();
 			}),
-		);
+	);
 
-		expect(Exit.isFailure(exit)).toBe(true);
-		if (Exit.isFailure(exit)) {
-			const found = Cause.findErrorOption(exit.cause);
-			expect(Option.isSome(found)).toBe(true);
-			if (Option.isSome(found)) expect(found.value).toBe(failure);
-		}
-		expect(bootstrap.events).toContain("managed-runtime-acquired");
-		expect(bootstrap.events).toContain("bootstrap-entered");
-		expectSingleOrderedRelease();
-	});
+	it.effect(
+		"interrupts post-boot initialization and stops the live Tick/save runtime before returning",
+		() =>
+			Effect.gen(function* () {
+				const config = createJobTestConfig(2, "board", 60_000);
+				let preparedState: StateSchema.Type | undefined;
+				const preparation = yield* createGameSessionFx({
+					config,
+					tickIntervalMs: 60_000,
+					save: {
+						debounceMs: 60_000,
+						write: (state) =>
+							Effect.sync(() => {
+								preparedState = state;
+							}),
+					},
+				});
+				const owner = yield* preparation.runFx(prepareJobLineFx());
+				yield* preparation.runFx(
+					startLineFx({
+						ownerItemId: owner.id,
+						lineId: "line:forge:run",
+					}),
+				);
+				yield* preparation.flushSaveFx;
+				yield* preparation.disposeWithoutSaveFx;
+				if (preparedState === undefined)
+					throw new Error("Expected one prepared saved state.");
 
-	it("interrupts post-boot initialization and stops the live Tick/save runtime before returning", async () => {
-		const config = createJobTestConfig(2, "board", 60_000);
-		let preparedState: StateSchema.Type | undefined;
-		const preparation = await Effect.runPromise(
-			createGameSessionFx({
-				config,
-				tickIntervalMs: 60_000,
-				save: {
-					debounceMs: 60_000,
-					write: (state) =>
-						Effect.sync(() => {
-							preparedState = state;
-						}),
-				},
+				let writes = 0;
+				const bootstrapEntered = yield* Deferred.make<void>();
+				const secondWriteStarted = yield* Deferred.make<void>();
+				bootstrap.events.length = 0;
+				bootstrap.controlledFx = Deferred.succeed(bootstrapEntered, undefined).pipe(
+					Effect.andThen(Effect.never),
+				);
+				bootstrap.probeRuntime = true;
+				const creating = yield* createGameSessionFx({
+					config,
+					state: preparedState,
+					tickIntervalMs: 2,
+					save: {
+						debounceMs: 0,
+						write: () =>
+							Effect.gen(function* () {
+								writes += 1;
+								if (writes === 2) {
+									yield* Deferred.succeed(secondWriteStarted, undefined);
+								}
+							}),
+					},
+				}).pipe(Effect.forkChild);
+
+				yield* Effect.gen(function* () {
+					yield* Deferred.await(bootstrapEntered);
+					yield* Deferred.await(secondWriteStarted);
+					yield* Fiber.interrupt(creating);
+					const interrupted = yield* Fiber.await(creating);
+
+					expect(Exit.isFailure(interrupted)).toBe(true);
+					if (Exit.isFailure(interrupted)) {
+						expect(Cause.hasInterruptsOnly(interrupted.cause)).toBe(true);
+						expect(Option.isNone(Cause.findErrorOption(interrupted.cause))).toBe(true);
+					}
+					expectSingleOrderedRelease();
+					expect(writes).toBeGreaterThanOrEqual(2);
+				}).pipe(Effect.ensuring(Fiber.interrupt(creating)));
 			}),
-		);
-		const owner = await preparation.run(prepareJobLineFx());
-		await preparation.run(
-			startLineFx({
-				ownerItemId: owner.id,
-				lineId: "line:forge:run",
-			}),
-		);
-		await Effect.runPromise(preparation.flushSaveFx);
-		await Effect.runPromise(preparation.disposeWithoutSaveFx);
-		if (preparedState === undefined) throw new Error("Expected one prepared saved state.");
-
-		let writes = 0;
-		bootstrap.events.length = 0;
-		bootstrap.controlledFx = Effect.never;
-		bootstrap.probeRuntime = true;
-		const creating = Effect.runFork(
-			createGameSessionFx({
-				config,
-				state: preparedState,
-				tickIntervalMs: 2,
-				save: {
-					debounceMs: 0,
-					write: () =>
-						Effect.sync(() => {
-							writes += 1;
-						}),
-				},
-			}),
-		);
-
-		try {
-			await waitFor(() => bootstrap.events.includes("bootstrap-entered"));
-			await waitFor(() => writes >= 2);
-			await Effect.runPromise(Fiber.interrupt(creating));
-			const interrupted = await Effect.runPromise(Fiber.await(creating));
-
-			expect(Exit.isFailure(interrupted)).toBe(true);
-			if (Exit.isFailure(interrupted)) {
-				expect(Cause.hasInterruptsOnly(interrupted.cause)).toBe(true);
-				expect(Option.isNone(Cause.findErrorOption(interrupted.cause))).toBe(true);
-			}
-			expectSingleOrderedRelease();
-
-			const writesAfterRelease = writes;
-			await new Promise((resolve) => setTimeout(resolve, 30));
-			expect(writes).toBe(writesAfterRelease);
-		} finally {
-			await Effect.runPromise(Fiber.interrupt(creating));
-		}
-	});
+	);
 });

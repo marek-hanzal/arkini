@@ -1,8 +1,11 @@
 import { z } from "zod";
 
-import { RuleDisableResultSchema } from "./RuleDisableResultSchema";
-import { RuleEnableResultSchema } from "./RuleEnableResultSchema";
+import {
+	ActionRuleDisableResultSchema,
+	ActionRuleEnableResultSchema,
+} from "~/engine/action/schema/ActionRuleResultSchema";
 import { RuleHideResultSchema } from "./RuleHideResultSchema";
+import { RuleRuntimeAdjustResultSchema } from "./RuleRuntimeAdjustResultSchema";
 import { RuleRuntimeMultiplierResultSchema } from "./RuleRuntimeMultiplierResultSchema";
 import { RuleShowResultSchema } from "./RuleShowResultSchema";
 
@@ -13,8 +16,9 @@ export const RuleResultSchema = z
 	.discriminatedUnion("type", [
 		RuleShowResultSchema,
 		RuleHideResultSchema,
-		RuleEnableResultSchema,
-		RuleDisableResultSchema,
+		ActionRuleEnableResultSchema,
+		ActionRuleDisableResultSchema,
+		RuleRuntimeAdjustResultSchema,
 		RuleRuntimeMultiplierResultSchema,
 	])
 	.meta({

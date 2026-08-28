@@ -1,17 +1,17 @@
 import { useAtom, useAtomSet } from "@effect/atom-react";
-import { useNavigate } from "@tanstack/react-router";
 import { match } from "ts-pattern";
 import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { runSpaceActivationAtom } from "~/bridge/space/runSpaceActivationAtom";
 import { TileDefaultLineCommandAtom } from "~/bridge/tile/TileDefaultLineCommandAtom";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import { runTileSplitAtom } from "~/bridge/tile/runTileSplitAtom";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
-import { isInventoryShortcutKey } from "~/ui/navigation/isInventoryShortcutKey";
+import { useInventoryShortcutKey } from "~/ui/navigation/useInventoryShortcutKey";
 import type { PixiMainSceneRuntime } from "~/ui/pixi/scene/PixiMainSceneRuntime";
 import type { PixiMainSceneActivationIntent } from "~/ui/pixi/scene/PixiMainSceneActivationIntent";
 import { createPixiMainSceneRuntimeFx } from "~/ui/pixi/scene/createPixiMainSceneRuntimeFx";
@@ -20,15 +20,20 @@ import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";
 /**
  * Mounts the one Pixi-native Board + Toolbar scene into the React-owned game shell.
  *
- * Left click performs the canonical primary action, Shift+left click splits a Board stack, and
- * right click opens Item Detail. React forwards commands and overlay cancellation only; the scene
- * runtime owns pointer and display lifecycle.
+ * Left click performs the canonical primary action, Ctrl+left click fills its default-line queue,
+ * Shift+left click splits a Board stack, and right click opens Item Detail. React forwards commands
+ * and overlay cancellation only; the scene runtime owns pointer and display lifecycle.
  */
-export const PixiBoardToolbarSurface = () => {
+export namespace PixiBoardToolbarSurface {
+	export interface Props {
+		readonly onOpenInventory: () => void | PromiseLike<void>;
+	}
+}
+
+export const PixiBoardToolbarSurface = ({ onOpenInventory }: PixiBoardToolbarSurface.Props) => {
 	const game = useGameEngine();
 	const gameMenu = useGameMenuControl();
 	const itemDetail = useItemDetailControl();
-	const navigate = useNavigate();
 	const { interaction, textures } = usePixiGameRuntime();
 	const [enqueueLineState, enqueueLine] = useAtom(TileDefaultLineCommandAtom(game));
 	const runDrop = useAtomSet(runTileDropAtom(game), {
@@ -37,7 +42,11 @@ export const PixiBoardToolbarSurface = () => {
 	const runSplit = useAtomSet(runTileSplitAtom(game), {
 		mode: "promise",
 	});
+	const runSpaceActivation = useAtomSet(runSpaceActivationAtom(game), {
+		mode: "promise",
+	});
 	const hostRef = useRef<HTMLDivElement>(null);
+	const isInventoryShortcutKey = useInventoryShortcutKey();
 	const runtimeRef = useRef<PixiMainSceneRuntime | null>(null);
 	const interactionBlockedRef = useRef(false);
 	const interactionBlocked = gameMenu.isOpen || itemDetail.isOpen;
@@ -48,20 +57,6 @@ export const PixiBoardToolbarSurface = () => {
 	controlsRef.current = {
 		itemDetail,
 	};
-
-	const openInventory = useCallback(
-		() =>
-			navigate({
-				to: "/game/$packageId/inventory",
-				params: {
-					packageId: game.arkpack.packageId,
-				},
-			}).then(() => undefined),
-		[
-			game.arkpack.packageId,
-			navigate,
-		],
-	);
 
 	const activate = useCallback(
 		async (item: TileActorItem, intent: PixiMainSceneActivationIntent, origin: HTMLElement) => {
@@ -84,6 +79,19 @@ export const PixiBoardToolbarSurface = () => {
 				});
 				return;
 			}
+			if (intent === "fill-default-line-queue") {
+				if (
+					item.location.scope !== "board" ||
+					item.primaryAction.kind !== "enqueue-default-line"
+				) {
+					return;
+				}
+				enqueueLine({
+					kind: "fill",
+					ownerItemId: item.id,
+				});
+				return;
+			}
 			await match(item.primaryAction)
 				.with(
 					{
@@ -93,18 +101,29 @@ export const PixiBoardToolbarSurface = () => {
 				)
 				.with(
 					{
+						kind: "activate-space",
+					},
+					(primaryAction) =>
+						runSpaceActivation({
+							currentSpace: primaryAction.currentSpace,
+							itemId: item.id,
+							location: item.location,
+							revision: item.revision,
+						}),
+				)
+				.with(
+					{
 						kind: "open-inventory",
 					},
-					() => openInventory(),
+					() => onOpenInventory(),
 				)
 				.with(
 					{
 						kind: "enqueue-default-line",
 					},
-					({ lineId }) => {
+					() => {
 						enqueueLine({
 							kind: "enqueue",
-							lineId,
 							ownerItemId: item.id,
 						});
 					},
@@ -112,8 +131,9 @@ export const PixiBoardToolbarSurface = () => {
 				.exhaustive();
 		},
 		[
-			openInventory,
 			enqueueLine,
+			onOpenInventory,
+			runSpaceActivation,
 			runSplit,
 		],
 	);
@@ -135,7 +155,7 @@ export const PixiBoardToolbarSurface = () => {
 			}
 			event.preventDefault();
 			event.stopPropagation();
-			void openInventory().catch((cause) => {
+			void Promise.resolve(onOpenInventory()).catch((cause) => {
 				console.error("Inventory failed to open from the Board.", cause);
 			});
 		};
@@ -143,7 +163,7 @@ export const PixiBoardToolbarSurface = () => {
 		return () => window.removeEventListener("keydown", openInventoryFromKeyboard);
 	}, [
 		interactionBlocked,
-		openInventory,
+		onOpenInventory,
 	]);
 
 	useLayoutEffect(() => {

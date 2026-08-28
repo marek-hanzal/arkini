@@ -1,17 +1,18 @@
-import type { ArkpackTrustSchema } from "~/engine/pack/schema/ArkpackTrustSchema";
+import type { ArkpackProvenanceSchema } from "~/engine/pack/schema/ArkpackProvenanceSchema";
+import type { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
+import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 
-type ArkpackSource = "built-in" | "imported";
+type ArkpackSource = "bundled" | "user";
 
-/** Stable metadata used by the package catalog without reading package payload bytes. */
+/** Descriptor derived from a validated package payload and its soft release provenance. */
 export interface ArkpackDescriptor {
 	readonly packageId: string;
 	readonly contentHash: string;
-	readonly gameId: string;
 	readonly title: string;
-	readonly configVersion: string;
-	readonly compressedSize: number;
-	readonly trust: ArkpackTrustSchema.Type;
+	readonly version: ArkpackVersionSchema.Type;
+	readonly arkini: ArkiniVersionSchema.Type;
+	readonly provenance: ArkpackProvenanceSchema.Type;
 	readonly source: ArkpackSource;
+	readonly overridesBundled?: boolean;
 	readonly filename?: string;
-	readonly importedAtMs?: number;
 }

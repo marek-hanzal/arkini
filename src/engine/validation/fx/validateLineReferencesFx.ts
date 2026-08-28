@@ -1,13 +1,11 @@
 import { Effect } from "effect";
-import { match } from "ts-pattern";
 
-import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
-
+import type { LineSchema } from "~/engine/line/schema/LineSchema";
+import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { DiagnosticPathSchema } from "../schema/DiagnosticPathSchema";
+import { validateActionReferencesFx } from "./validateActionReferencesFx";
 import { validateSelectorReferenceFx } from "./validateSelectorReferenceFx";
-import { validateWhenReferenceFx } from "./validateWhenReferenceFx";
 
 export namespace validateLineReferencesFx {
 	export interface Props {
@@ -18,77 +16,49 @@ export namespace validateLineReferencesFx {
 	}
 }
 
-/** Validates selectors used by one line's inputs and availability rules. */
+/** Validates shared action references plus Line-owned material selectors. */
 export const validateLineReferencesFx = Effect.fn("validateLineReferencesFx")(function* ({
 	config,
 	line,
 	path,
 	source,
 }: validateLineReferencesFx.Props) {
-	const inputDiagnostics = yield* Effect.forEach(line.input, (input, inputIndex) =>
-		match(input)
-			.with(
-				{
-					type: InputEnumSchema.enum.Simple,
-				},
-				() => Effect.succeed([]),
-			)
-			.with(
-				{
-					type: InputEnumSchema.enum.Materials,
-				},
-				({ selector }) =>
-					validateSelectorReferenceFx({
-						config,
-						selector,
-						path: [
-							...path,
-							"input",
-							inputIndex,
-							"selector",
-						],
-						source,
-					}),
-			)
-			.with(
-				{
-					type: InputEnumSchema.enum.Deposit,
-				},
-				({ query }) =>
-					validateSelectorReferenceFx({
-						config,
-						selector: query.selector,
-						path: [
-							...path,
-							"input",
-							inputIndex,
-							"query",
-							"selector",
-						],
-						source,
-					}),
-			)
-			.exhaustive(),
-	);
-	const ruleDiagnostics = yield* Effect.forEach(line.rules, (rule, ruleIndex) =>
-		Effect.forEach(rule.when, (when, whenIndex) =>
-			validateWhenReferenceFx({
-				config,
-				when,
-				path: [
-					...path,
-					"rules",
-					ruleIndex,
-					"when",
-					whenIndex,
-				],
-				source,
-			}),
+	const actionDiagnostics = yield* validateActionReferencesFx({
+		config,
+		inputs: line.input.flatMap((input, index) =>
+			input.type === InputEnumSchema.enum.Materials
+				? []
+				: [
+						{
+							input,
+							index,
+						},
+					],
 		),
+		path,
+		rules: line.rules.map((rule, index) => ({
+			index,
+			rule,
+		})),
+		source,
+	});
+	const materialDiagnostics = yield* Effect.forEach(line.input, (input, inputIndex) =>
+		input.type !== InputEnumSchema.enum.Materials
+			? Effect.succeed([])
+			: validateSelectorReferenceFx({
+					config,
+					selector: input.selector,
+					path: [
+						...path,
+						"input",
+						inputIndex,
+						"selector",
+					],
+					source,
+				}),
 	);
-
 	return [
-		...inputDiagnostics.flat(),
-		...ruleDiagnostics.flat(2),
+		...actionDiagnostics,
+		...materialDiagnostics.flat(),
 	];
 });

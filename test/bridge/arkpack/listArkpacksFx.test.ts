@@ -1,50 +1,33 @@
 import { Effect } from "effect";
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { ArkiniArkpack } from "~/bridge/arkpack/ArkiniArkpack";
+import { beforeEach, describe, expect, it } from "vitest";
+
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
-import { DemoArkpack } from "~/bridge/arkpack/DemoArkpack";
 import { listArkpacksFx } from "~/bridge/arkpack/listArkpacksFx";
+import { createTestArkpack } from "~test/bridge/arkpack/support/createTestArkpack";
+import { installTestPngDecoder } from "~test/bridge/arkpack/support/createTestPngBytes";
 
-const imported = {
-	packageId: "a".repeat(64),
-	contentHash: "a".repeat(64),
-	gameId: "local",
-	title: "Local package",
-	configVersion: "1.0",
-	compressedSize: 128,
-	trust: {
-		type: "external",
-		reason: "unsigned",
-	} as const,
-	source: "imported" as const,
-	filename: "local.arkpack",
-	importedAtMs: 1,
-};
-
-afterEach(() => {
-	vi.unstubAllGlobals();
-});
+beforeEach(installTestPngDecoder);
 
 describe("listArkpacksFx", () => {
-	it("lists signed and unsigned bundled metadata before imports without reading payloads", async () => {
-		const fetch = vi.fn();
-		const list = vi.fn();
-		const read = vi.fn();
-		vi.stubGlobal("fetch", fetch);
+	it("derives descriptors from the effective raw files", async () => {
+		const bytes = createTestArkpack(undefined, "package:catalog");
 		const storage: ArkpackStorage = {
-			listFx: Effect.sync(() => {
-				list();
-				return [
-					imported,
-				];
-			}),
-			readFx: () =>
-				Effect.sync(() => {
-					read();
-					throw new Error("catalog listing must not read an exact payload");
-				}),
+			listFx: Effect.succeed([
+				{
+					packageId: "package:catalog",
+					filename: "package%3Acatalog.arkpack",
+					bytes: bytes.buffer,
+					provenance: {
+						type: "community",
+					},
+					source: "user",
+					overridesBundled: true,
+				},
+			]),
+			readFx: () => Effect.die("Unexpected exact read."),
 			removeFx: () => Effect.void,
 			writeFx: () => Effect.void,
+			openUserDirectoryFx: Effect.void,
 		};
 
 		await expect(
@@ -54,12 +37,57 @@ describe("listArkpacksFx", () => {
 				}),
 			),
 		).resolves.toEqual([
-			ArkiniArkpack.descriptor,
-			DemoArkpack.descriptor,
-			imported,
+			expect.objectContaining({
+				packageId: "package:catalog",
+				source: "user",
+				overridesBundled: true,
+			}),
 		]);
-		expect(fetch).not.toHaveBeenCalled();
-		expect(list).toHaveBeenCalledOnce();
-		expect(read).not.toHaveBeenCalled();
+	});
+
+	it("falls back to bundled when a user candidate fails payload validation", async () => {
+		const bundledBytes = createTestArkpack(undefined, "package:filename");
+		const userBytes = createTestArkpack(undefined, "package:payload");
+		const storage: ArkpackStorage = {
+			listFx: Effect.succeed([
+				{
+					packageId: "package:filename",
+					filename: "package%3Afilename.arkpack",
+					bytes: bundledBytes.buffer,
+					provenance: {
+						type: "official",
+					},
+					source: "bundled",
+					overridesBundled: false,
+				},
+				{
+					packageId: "package:filename",
+					filename: "package%3Afilename.arkpack",
+					bytes: userBytes.buffer,
+					provenance: {
+						type: "community",
+					},
+					source: "user",
+					overridesBundled: true,
+				},
+			]),
+			readFx: () => Effect.die("Unexpected exact read."),
+			removeFx: () => Effect.void,
+			writeFx: () => Effect.void,
+			openUserDirectoryFx: Effect.void,
+		};
+
+		await expect(
+			Effect.runPromise(
+				listArkpacksFx({
+					storage,
+				}),
+			),
+		).resolves.toEqual([
+			expect.objectContaining({
+				packageId: "package:filename",
+				source: "bundled",
+			}),
+		]);
 	});
 });

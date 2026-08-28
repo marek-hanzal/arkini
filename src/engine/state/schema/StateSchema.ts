@@ -13,7 +13,7 @@ export const StateSchema = z
 		),
 		items: z.array(StateItemSchema),
 		jobs: z.array(JobSchema),
-		jobQueue: z.array(JobQueueRequestSchema).optional(),
+		jobQueue: z.array(JobQueueRequestSchema),
 		defaultLineByOwnerItemId: DefaultLineByOwnerItemIdSchema.optional(),
 	})
 	.strict()

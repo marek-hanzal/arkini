@@ -13,7 +13,6 @@ import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { swapItemsFx } from "~/engine/runtime/write/swapItemsFx";
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -32,34 +31,31 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		log: {
+			uid: "log",
 			id: "log",
 			title: "Log",
 			description: "A log.",
 			asset: {
-				source: [
+				default: [
 					"asset:log",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 			type: "simple",
 		},
 		stone: {
+			uid: "stone",
 			id: "stone",
 			title: "Stone",
 			description: "A stone.",
 			asset: {
-				source: [
+				default: [
 					"asset:stone",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 			type: "simple",

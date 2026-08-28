@@ -1,57 +1,75 @@
 import { encode } from "@msgpack/msgpack";
 import { Cause, Effect, Exit, Option } from "effect";
-import { readFile } from "node:fs/promises";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { DemoArkpack } from "~/bridge/arkpack/DemoArkpack";
+import type { DiagnosticRecord } from "../../../electron/contract/diagnostics/DiagnosticRecord";
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
-import { createGameFx } from "~/bridge/game/createGameFx";
+import { createGameFx as createGameFromPackageFx } from "~/bridge/game/createGameFx";
 import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
 import { decodeArkiniSaveFx } from "~/bridge/save/decodeArkiniSaveFx";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
-import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import {
 	createTestArkpack,
 	testArkpackConfig,
 } from "~test/bridge/arkpack/support/createTestArkpack";
+import { installTestPngDecoder } from "~test/bridge/arkpack/support/createTestPngBytes";
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 
-const trustedKeys = {
-	formatVersion: 1 as const,
-	keys: [],
-};
+const writerMajor = ArkiniAppVersion.slice(0, ArkiniAppVersion.indexOf("."));
 
-const createStorages = async () => {
-	const bytes = createTestArkpack();
+const createGameFx = (props: Omit<createGameFromPackageFx.Props, "runRendererEffect">) =>
+	createGameFromPackageFx({
+		...props,
+		runRendererEffect: Effect.runSync,
+	});
+
+const createStorages = async (version = "1.0") => {
+	const bytes = createTestArkpack(testArkpackConfig, testArkpackConfig.meta.id, version);
 	const loaded = await Effect.runPromise(
 		readArkpackFx({
 			bytes,
 			filename: "bridge.arkpack",
-			signature: {
-				trustedKeys,
+			provenance: {
+				type: "community",
 			},
-			source: "imported",
+			source: "user",
 		}),
 	);
-	const record = {
-		descriptor: loaded.descriptor,
+	const file: ArkpackStorage.File = {
+		packageId: loaded.descriptor.packageId,
+		filename: "bridge.arkpack",
 		bytes: bytes.slice().buffer,
+		provenance: {
+			type: "community",
+		},
+		source: "user",
+		overridesBundled: false,
 	};
 	const arkpackStorage: ArkpackStorage = {
 		listFx: Effect.succeed([
-			record.descriptor,
+			file,
 		]),
 		readFx: (packageId) =>
-			Effect.succeed(packageId === record.descriptor.packageId ? record : undefined),
+			Effect.succeed(
+				packageId === file.packageId
+					? [
+							file,
+						]
+					: [],
+			),
 		removeFx: () => Effect.void,
 		writeFx: () => Effect.void,
+		openUserDirectoryFx: Effect.void,
 	};
 	let saved: Uint8Array | null = null;
+	let clears = 0;
 	const saveStorage: GameSaveStorage = {
 		readFx: () => Effect.sync(() => saved?.slice() ?? null),
 		clearFx: () =>
 			Effect.sync(() => {
+				clears += 1;
 				saved = null;
 			}),
 		writeFx: (_key, bytes) =>
@@ -61,13 +79,13 @@ const createStorages = async () => {
 	};
 	return {
 		arkpackStorage,
-		descriptor: record.descriptor,
-		packageId: record.descriptor.packageId,
+		descriptor: loaded.descriptor,
+		packageId: loaded.descriptor.packageId,
 		saveKey: {
-			packageId: record.descriptor.packageId,
-			contentHash: record.descriptor.contentHash,
+			packageId: loaded.descriptor.packageId,
 		} satisfies GameSaveStorage.Key,
 		readSaved: () => saved,
+		readClearCount: () => clears,
 		setSaved: (bytes: Uint8Array | null) => {
 			saved = bytes?.slice() ?? null;
 		},
@@ -76,65 +94,13 @@ const createStorages = async () => {
 };
 
 describe("createGameFx", () => {
+	beforeEach(() => {
+		installTestPngDecoder();
+	});
+
 	afterEach(() => {
 		vi.restoreAllMocks();
 		vi.unstubAllGlobals();
-	});
-
-	it("starts the bundled unsigned demo and completes its authored merge", async () => {
-		const bytes = await readFile("game/demo.game.arkpack");
-		const fetch = vi.fn().mockResolvedValue(new Response(bytes));
-		vi.stubGlobal("fetch", fetch);
-		const saveStorage: GameSaveStorage = {
-			readFx: () => Effect.succeed(null),
-			clearFx: () => Effect.void,
-			writeFx: () => Effect.void,
-		};
-		const game = await Effect.runPromise(
-			createGameFx({
-				packageId: DemoArkpack.packageId,
-				saveStorage,
-			}),
-		);
-
-		try {
-			expect(fetch).toHaveBeenCalledOnce();
-			expect(fetch).toHaveBeenCalledWith(DemoArkpack.url);
-			expect(game.arkpack).toEqual(DemoArkpack.descriptor);
-			expect(game.arkpack.trust).toEqual({
-				type: "external",
-				reason: "unsigned",
-			});
-			expect(game.saveKey).toEqual({
-				packageId: "demo",
-				contentHash: DemoArkpack.descriptor.contentHash,
-			});
-
-			const initial = game.getSnapshot();
-			const water = initial.items.find((item) => item.item.id === "item:water");
-			const tree = initial.items.find((item) => item.item.id === "item:tree");
-			if (water === undefined || tree === undefined) {
-				throw new Error("Expected the authored demo merge participants.");
-			}
-			await game.run(
-				mergeItemsFx({
-					sourceItemId: water.id,
-					sourceRevision: water.revision,
-					targetItemId: tree.id,
-					targetRevision: tree.revision,
-				}),
-			);
-
-			expect(game.getSnapshot().items).toEqual([
-				expect.objectContaining({
-					item: expect.objectContaining({
-						id: "item:double-tree",
-					}),
-				}),
-			]);
-		} finally {
-			await Effect.runPromise(game.disposeWithoutSaveFx);
-		}
 	});
 
 	it("starts one selected package, persists its state and restores it without a second start", async () => {
@@ -181,8 +147,159 @@ describe("createGameFx", () => {
 		}
 	});
 
+	it("restores an older compatible minor save and stamps the current arkpack version", async () => {
+		const storages = await createStorages("1.1");
+		const first = await Effect.runPromise(
+			createGameFx({
+				packageId: storages.packageId,
+				arkpackStorage: storages.arkpackStorage,
+				saveStorage: storages.saveStorage,
+			}),
+		);
+		await Effect.runPromise(first.disposeFx);
+		const bytes = storages.readSaved();
+		if (bytes === null) throw new Error("Expected a save.");
+		const saved = await Effect.runPromise(decodeArkiniSaveFx(bytes));
+		storages.setSaved(
+			encode({
+				...saved,
+				version: "1.0",
+			}),
+		);
+
+		const restored = await Effect.runPromise(
+			createGameFx({
+				packageId: storages.packageId,
+				arkpackStorage: storages.arkpackStorage,
+				saveStorage: storages.saveStorage,
+			}),
+		);
+		await Effect.runPromise(restored.disposeFx);
+		const upgradedBytes = storages.readSaved();
+		if (upgradedBytes === null) throw new Error("Expected an upgraded save.");
+		expect((await Effect.runPromise(decodeArkiniSaveFx(upgradedBytes))).version).toBe("1.1");
+	});
+
+	it("rejects a different gameplay major without changing its save", async () => {
+		const storages = await createStorages();
+		const first = await Effect.runPromise(
+			createGameFx({
+				packageId: storages.packageId,
+				arkpackStorage: storages.arkpackStorage,
+				saveStorage: storages.saveStorage,
+			}),
+		);
+		await first.run(
+			spawnItemFx({
+				id: "runtime:old-major",
+				itemId: "water",
+				location: {
+					scope: "inventory",
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+				quantity: 1,
+			}),
+		);
+		await Effect.runPromise(first.disposeFx);
+		const bytes = storages.readSaved();
+		if (bytes === null) throw new Error("Expected a save.");
+		const saved = await Effect.runPromise(decodeArkiniSaveFx(bytes));
+		const incompatibleBytes = encode({
+			...saved,
+			version: "2.0",
+		});
+		storages.setSaved(incompatibleBytes);
+
+		await expect(
+			Effect.runPromise(
+				createGameFx({
+					packageId: storages.packageId,
+					arkpackStorage: storages.arkpackStorage,
+					saveStorage: storages.saveStorage,
+				}),
+			),
+		).rejects.toBeInstanceOf(GameSaveBootstrapError);
+		expect(storages.readClearCount()).toBe(0);
+		expect(storages.readSaved()).toEqual(incompatibleBytes);
+	});
+
+	it("restores a save written by an older same-major Arkini version", async () => {
+		const storages = await createStorages();
+		const first = await Effect.runPromise(
+			createGameFx({
+				packageId: storages.packageId,
+				arkpackStorage: storages.arkpackStorage,
+				saveStorage: storages.saveStorage,
+			}),
+		);
+		await Effect.runPromise(first.disposeFx);
+		const bytes = storages.readSaved();
+		if (bytes === null) throw new Error("Expected a save.");
+		const saved = await Effect.runPromise(decodeArkiniSaveFx(bytes));
+		const compatibleBytes = encode({
+			...saved,
+			arkini: `${writerMajor}.0.0`,
+		});
+		storages.setSaved(compatibleBytes);
+
+		const restored = await Effect.runPromise(
+			createGameFx({
+				packageId: storages.packageId,
+				arkpackStorage: storages.arkpackStorage,
+				saveStorage: storages.saveStorage,
+			}),
+		);
+		expect(storages.readClearCount()).toBe(0);
+		await Effect.runPromise(restored.disposeWithoutSaveFx);
+	});
+
+	it("restores a higher same-major gameplay minor", async () => {
+		const storages = await createStorages();
+		const first = await Effect.runPromise(
+			createGameFx({
+				packageId: storages.packageId,
+				arkpackStorage: storages.arkpackStorage,
+				saveStorage: storages.saveStorage,
+			}),
+		);
+		await Effect.runPromise(first.disposeFx);
+		const bytes = storages.readSaved();
+		if (bytes === null) throw new Error("Expected a save.");
+		const saved = await Effect.runPromise(decodeArkiniSaveFx(bytes));
+		const futureBytes = encode({
+			...saved,
+			version: "1.1",
+		});
+		storages.setSaved(futureBytes);
+
+		const restored = await Effect.runPromise(
+			createGameFx({
+				packageId: storages.packageId,
+				arkpackStorage: storages.arkpackStorage,
+				saveStorage: storages.saveStorage,
+			}),
+		);
+		expect(storages.readClearCount()).toBe(0);
+		expect(storages.readSaved()).toEqual(futureBytes);
+		await Effect.runPromise(restored.disposeWithoutSaveFx);
+	});
+
 	it("retries failed public game disposal without releasing its retry resources", async () => {
 		const storages = await createStorages();
+		const diagnosticWrites: Array<DiagnosticRecord> = [];
+		vi.stubGlobal("window", {
+			arkini: {
+				diagnostics: {
+					write: (record: DiagnosticRecord) => {
+						diagnosticWrites.push(record);
+						return Promise.resolve();
+					},
+				},
+			},
+		});
 		const failure = new Error("disk full");
 		let writes = 0;
 		const saveStorage: GameSaveStorage = {
@@ -220,6 +337,7 @@ describe("createGameFx", () => {
 
 		await expect(Effect.runPromise(game.disposeFx)).rejects.toThrow("disk full");
 		expect(writes).toBe(1);
+		expect(diagnosticWrites.some(({ event }) => event === "session-ended")).toBe(false);
 		expect(game.getResourceUrl("asset:water")).toBe(resourceUrl);
 		expect(revokeObjectUrl).not.toHaveBeenCalled();
 		await expect(
@@ -241,6 +359,13 @@ describe("createGameFx", () => {
 
 		await expect(Effect.runPromise(game.disposeFx)).resolves.toBeUndefined();
 		expect(writes).toBe(2);
+		expect(diagnosticWrites.filter(({ event }) => event === "session-ended")).toEqual([
+			expect.objectContaining({
+				data: expect.objectContaining({
+					reason: "saved",
+				}),
+			}),
+		]);
 		expect(revokeObjectUrl.mock.calls.filter(([url]) => url === resourceUrl)).toHaveLength(1);
 		expect(() => game.getResourceUrl("asset:water")).toThrow(
 			"Game resource asset:water is unavailable.",
@@ -254,6 +379,16 @@ describe("createGameFx", () => {
 
 	it("releases public game resources after explicit discard of a failed save", async () => {
 		const storages = await createStorages();
+		vi.spyOn(console, "warn").mockImplementation(() => undefined);
+		vi.stubGlobal("window", {
+			arkini: {
+				diagnostics: {
+					write: () => {
+						throw new Error("logger unavailable");
+					},
+				},
+			},
+		});
 		const saveStorage: GameSaveStorage = {
 			...storages.saveStorage,
 			writeFx: () => Effect.fail(new Error("disk still full")),
@@ -278,8 +413,8 @@ describe("createGameFx", () => {
 		const storages = await createStorages();
 		storages.setSaved(
 			encode({
-				namespace: "arkini",
-				format: 999,
+				version: "not-a-version",
+				arkini: ArkiniAppVersion,
 				state: {},
 			}),
 		);
@@ -311,10 +446,18 @@ describe("createGameFx", () => {
 		const corruptStorage: ArkpackStorage = {
 			...storages.arkpackStorage,
 			readFx: () =>
-				Effect.succeed({
-					descriptor: storages.descriptor,
-					bytes: Uint8Array.of(1, 2, 3).buffer,
-				}),
+				Effect.succeed([
+					{
+						packageId: storages.packageId,
+						filename: "bridge.arkpack",
+						bytes: Uint8Array.of(1, 2, 3).buffer,
+						provenance: {
+							type: "community",
+						},
+						source: "user",
+						overridesBundled: false,
+					},
+				]),
 		};
 		const exit = await Effect.runPromiseExit(
 			createGameFx({

@@ -9,7 +9,7 @@ export namespace deleteGameSaveFx {
 	}
 }
 
-/** Deletes only one exact package/hash save and never its installed Arkpack binary. */
+/** Deletes one package save and never its installed Arkpack binary. */
 export const deleteGameSaveFx = Effect.fn("deleteGameSaveFx")(function* ({
 	key,
 	storage: providedStorage,

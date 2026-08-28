@@ -15,11 +15,10 @@ export namespace discardRuntimeItemOwnedStateFx {
 }
 
 /**
- * Permanently discards passive input-owned state beneath one item identity.
+ * Permanently discards passive input-owned state beneath one idle item identity.
  *
- * The root object survives for its caller's consume/remove transition, but identity-bound intents
- * for the complete ownership tree are discarded. Active jobs and their committed materials remain
- * strict precondition failures.
+ * The root object survives for its caller's consume/remove transition. Active or queued work
+ * anywhere in the complete ownership tree is a strict precondition failure.
  */
 export const discardRuntimeItemOwnedStateFx = Effect.fn("discardRuntimeItemOwnedStateFx")(
 	function* ({ ownerItemId, runtime }: discardRuntimeItemOwnedStateFx.Props) {
@@ -27,12 +26,12 @@ export const discardRuntimeItemOwnedStateFx = Effect.fn("discardRuntimeItemOwned
 			ownerItemId,
 			runtime,
 		});
-		if (owned.jobs.length > 0 || owned.jobItems.length > 0) {
+		if (owned.jobs.length > 0 || owned.jobItems.length > 0 || owned.queue.length > 0) {
 			return yield* Effect.fail(
 				new JobOwnerBusyError({
 					ownerItemId,
 					jobIds: owned.jobs.map((job) => job.id),
-					requestIds: [],
+					requestIds: owned.queue.map((request) => request.id),
 				}),
 			);
 		}

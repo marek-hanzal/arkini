@@ -1,9 +1,8 @@
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
-import {
-	formatItemDuration,
-	ItemRuntime,
-	readActiveJobRuntime,
-} from "~/ui/item-detail/ItemRuntime";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { formatItemDurationFx } from "~/ui/item-detail/formatItemDurationFx";
+import { ItemRuntime } from "~/ui/item-detail/ItemRuntime";
+import { readActiveJobRuntimeFx } from "~/ui/item-detail/readActiveJobRuntimeFx";
 
 /** Renders the effective or active runtime presentation for one visible product line. */
 export const ItemLineRuntime = ({ line }: { readonly line: ItemDetailLines.Line }) => {
@@ -11,13 +10,13 @@ export const ItemLineRuntime = ({ line }: { readonly line: ItemDetailLines.Line 
 	const runtime =
 		activeJob === undefined
 			? {
-					value: formatItemDuration(line.effectiveRuntimeMs),
+					value: RendererRuntime.runSync(formatItemDurationFx(line.effectiveRuntimeMs)),
 					detail:
 						line.baseRuntimeMs === line.effectiveRuntimeMs
 							? "Per cycle"
-							: `Base ${formatItemDuration(line.baseRuntimeMs)}`,
+							: `Base ${RendererRuntime.runSync(formatItemDurationFx(line.baseRuntimeMs))}`,
 				}
-			: readActiveJobRuntime(activeJob);
+			: RendererRuntime.runSync(readActiveJobRuntimeFx(activeJob));
 	return (
 		<ItemRuntime
 			dataUi="TileLineRuntime"

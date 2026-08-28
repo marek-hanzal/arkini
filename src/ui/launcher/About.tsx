@@ -2,7 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useExclusiveAction } from "~/ui/action/useExclusiveAction";
-import { PrimaryButton } from "~/ui/button/Button";
+import { BackButton } from "~/ui/button/BackButton";
 
 /** Renders project and authorship credits for the normalized About page. */
 export const About = () => {
@@ -78,7 +78,7 @@ export const About = () => {
 					</p>
 					<p className="mt-2 text-sm leading-6 text-muted">
 						Arkini is being forged through the hard work of ChatGPT-5.6, standing on the
-						blood-soaked legacy of ChatGPT-5.4 and ChatGPT-5.5, whose heroic suffering
+						the blood-soaked work of ChatGPT-5.4 and ChatGPT-5.5, whose heroic suffering
 						produced the original v0; Marek Hanzal, serving as chief mega-nag,
 						relentless tormentor, and supreme authority on whether anything is actually
 						good enough; and with inspiration from his wife, Šárka Hanušová.
@@ -89,14 +89,13 @@ export const About = () => {
 						Navigation failed: {errorMessage(navigationError)}
 					</p>
 				)}
-				<PrimaryButton
-					className="mx-auto"
+				<BackButton
 					cursorIntent={exitPending ? "progress" : undefined}
 					disabled={exitPending}
 					onClick={requestMainMenu}
 				>
-					{exitPending ? "Returning…" : "Return to main menu"}
-				</PrimaryButton>
+					{exitPending ? "Returning…" : "Back"}
+				</BackButton>
 			</div>
 		</div>
 	);

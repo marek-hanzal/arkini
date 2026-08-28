@@ -10,10 +10,8 @@ import { readOutputMaximumQuantitiesFx } from "~/engine/output/fx/readOutputMaxi
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { applyFinalChargePayerNetMaximumOutputFx } from "./applyFinalChargePayerNetMaximumOutputFx";
-import {
-	adjustLineNetMaximumOutputQuantity,
-	clampLineNetMaximumOutputQuantities,
-} from "./lineNetMaximumOutputQuantities";
+import { adjustLineNetMaximumOutputQuantityFx } from "./adjustLineNetMaximumOutputQuantityFx";
+import { clampLineNetMaximumOutputQuantitiesFx } from "./clampLineNetMaximumOutputQuantitiesFx";
 
 export namespace readPlannedLineNetMaximumOutputQuantitiesFx {
 	export interface Props {
@@ -51,7 +49,11 @@ export const readPlannedLineNetMaximumOutputQuantitiesFx = Effect.fn(
 				itemId: allocation.itemId,
 				runtime,
 			});
-			adjustLineNetMaximumOutputQuantity(quantities, item.item.id, -allocation.quantity);
+			yield* adjustLineNetMaximumOutputQuantityFx(
+				quantities,
+				item.item.id,
+				-allocation.quantity,
+			);
 		}
 	}
 
@@ -76,5 +78,5 @@ export const readPlannedLineNetMaximumOutputQuantitiesFx = Effect.fn(
 		});
 	}
 
-	return clampLineNetMaximumOutputQuantities(quantities);
+	return yield* clampLineNetMaximumOutputQuantitiesFx(quantities);
 });

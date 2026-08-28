@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { decodeArkiniSaveFx } from "~/bridge/save/decodeArkiniSaveFx";
 import { encodeArkiniSaveFx } from "~/bridge/save/encodeArkiniSaveFx";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 
 const state: StateSchema.Type = {
 	cheats: {
@@ -16,15 +17,98 @@ const state: StateSchema.Type = {
 	jobs: [],
 	jobQueue: [],
 };
+const writerMajor = ArkiniAppVersion.slice(0, ArkiniAppVersion.indexOf("."));
 
 describe("Arkini save codec", () => {
-	it("round-trips the minimal format-1 envelope", async () => {
-		const bytes = await Effect.runPromise(encodeArkiniSaveFx(state));
+	it("round-trips arkpack and writer compatibility with canonical state", async () => {
+		const bytes = await Effect.runPromise(
+			encodeArkiniSaveFx({
+				version: "1.2",
+				state,
+			}),
+		);
 		await expect(Effect.runPromise(decodeArkiniSaveFx(bytes))).resolves.toEqual({
-			namespace: "arkini",
-			format: 1,
+			version: "1.2",
+			arkini: ArkiniAppVersion,
 			state,
 		});
+	});
+
+	it.each([
+		`${writerMajor}.0.0`,
+		`${writerMajor}.999.999`,
+	])("admits structurally current same-major writer %s", async (arkini) => {
+		await expect(
+			Effect.runPromise(
+				decodeArkiniSaveFx(
+					encode({
+						version: "1.2",
+						arkini,
+						state,
+					}),
+				),
+			),
+		).resolves.toMatchObject({
+			arkini,
+			state,
+		});
+	});
+
+	it("rejects a different writer major with a typed incompatibility", async () => {
+		const arkini = `${Number(writerMajor) + 1}.0.0`;
+		await expect(
+			Effect.runPromise(
+				decodeArkiniSaveFx(
+					encode({
+						version: "1.2",
+						arkini,
+						state,
+					}),
+				),
+			),
+		).rejects.toMatchObject({
+			_tag: "ArkiniVersionIncompatibleError",
+			artifact: "save",
+			writerVersion: arkini,
+		});
+	});
+
+	it("preserves interleaved multi-owner queue identity and global accepted order", async () => {
+		const queuedState: StateSchema.Type = {
+			...state,
+			jobQueue: [
+				{
+					id: "job:queue:first",
+					ownerItemId: "runtime:forge:b",
+					lineId: "line:forge:run",
+				},
+				{
+					id: "job:queue:second",
+					ownerItemId: "runtime:forge:a",
+					lineId: "line:forge:run",
+				},
+				{
+					id: "job:queue:third",
+					ownerItemId: "runtime:forge:b",
+					lineId: "line:forge:run",
+				},
+			],
+		};
+
+		const bytes = await Effect.runPromise(
+			encodeArkiniSaveFx({
+				version: "1.2",
+				state: queuedState,
+			}),
+		);
+		const decoded = await Effect.runPromise(decodeArkiniSaveFx(bytes));
+
+		expect(decoded.state.jobQueue).toEqual(queuedState.jobQueue);
+		expect(decoded.state.jobQueue?.map(({ id }) => id)).toEqual([
+			"job:queue:first",
+			"job:queue:second",
+			"job:queue:third",
+		]);
 	});
 
 	it("keeps canonical-state encoder failures in the defect channel", () => {
@@ -34,27 +118,33 @@ describe("Arkini save codec", () => {
 		} as unknown as StateSchema.Type;
 
 		expect(() =>
-			Effect.runSync(Effect.result(encodeArkiniSaveFx(invalidCanonicalState))),
+			Effect.runSync(
+				Effect.result(
+					encodeArkiniSaveFx({
+						version: "1.2",
+						state: invalidCanonicalState,
+					}),
+				),
+			),
 		).toThrow();
 	});
 
 	it.each([
 		{
-			namespace: "other",
-			format: 1,
+			extra: true,
+			version: "1.2",
+			arkini: ArkiniAppVersion,
 			state,
 		},
 		{
-			namespace: "arkini",
-			format: 2,
+			version: "1.2.3",
+			arkini: ArkiniAppVersion,
 			state,
 		},
 		{
-			namespace: "arkini",
-			format: 1,
-			state: {
-				currentSpace: -1,
-			},
+			version: "1.2",
+			arkini: "invalid",
+			state,
 		},
 	])("rejects unsupported or malformed envelopes", async (value) => {
 		const result = await Effect.runPromise(

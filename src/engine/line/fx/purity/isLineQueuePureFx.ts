@@ -17,7 +17,7 @@ export const isLineQueuePureFx = Effect.fn("isLineQueuePureFx")(function* ({
 	lineId,
 	runtime,
 }: isLineQueuePureFx.Props) {
-	return !(runtime.jobQueue ?? []).some((request) => {
+	return !runtime.jobQueue.some((request) => {
 		return request.ownerItemId === ownerItemId && request.lineId === lineId;
 	});
 });

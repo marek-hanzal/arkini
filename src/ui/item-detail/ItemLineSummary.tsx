@@ -1,120 +1,73 @@
 import { AnimatePresence, motion } from "motion/react";
-import { match } from "ts-pattern";
+import type { ComponentType, ReactNode } from "react";
 
 import { JobStatusEnumSchema } from "~/bridge/job/JobStatusEnumSchema";
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
-import { BadgeCount } from "~/ui/badge/BadgeCount";
 import { itemDetailBadgeMotion, itemDetailFadeMotion } from "~/ui/item-detail/ItemDetailMotion";
 
-/** Renders one line's identity, readiness, active state, and description. */
+export interface ItemLineSummaryIdentityRenderProps {
+	readonly children: ReactNode;
+	readonly disabled: boolean;
+	readonly itemId: string;
+	readonly lineId: string;
+}
+
+export type ItemLineSummaryIdentityRenderer = ComponentType<ItemLineSummaryIdentityRenderProps>;
+
+/** Renders one line's identity, default marker, and description. */
 export const ItemLineSummary = ({
+	disabled = false,
+	itemId,
 	line,
+	renderIdentity,
 	stale = false,
 }: {
+	readonly disabled?: boolean;
+	readonly itemId?: string;
 	readonly line: ItemDetailLines.Line;
+	readonly renderIdentity?: ItemLineSummaryIdentityRenderer;
 	readonly stale?: boolean;
 }) => {
-	const readiness = match(line.availability)
-		.with(
-			{
-				kind: "available",
-				readiness: "ready",
-			},
-			() => undefined,
-		)
-		.with(
-			{
-				kind: "unavailable",
-			},
-			() => ({
-				label: "Disabled",
-				className: "border-danger/35 bg-danger/10 text-foreground",
-			}),
-		)
-		.with(
-			{
-				kind: "available",
-				readiness: "inputs",
-			},
-			() => ({
-				label: "Missing inputs",
-				className: "border-warning/35 bg-warning/10 text-foreground",
-			}),
-		)
-		.with(
-			{
-				kind: "available",
-				readiness: "queue",
-			},
-			() => ({
-				label: "Queue full",
-				className: "border-warning/35 bg-warning/10 text-foreground",
-			}),
-		)
-		.exhaustive();
-	const activeWork =
-		line.activeJob === undefined
-			? undefined
-			: match(line.activeJob.status)
-					.with(JobStatusEnumSchema.enum.Running, () => undefined)
-					.with(JobStatusEnumSchema.enum.Paused, () => "Paused")
-					.with(JobStatusEnumSchema.enum.AwaitingOutput, () => "Awaiting output")
-					.exhaustive();
+	const status =
+		line.activeJob?.status === JobStatusEnumSchema.enum.Paused
+			? {
+					className: "border-success/40 bg-success/12",
+					label: "Paused",
+				}
+			: line.activeJob === undefined && line.availability.kind === "unavailable"
+				? {
+						className: "border-danger/35 bg-danger/10",
+						label: "Disabled",
+					}
+				: undefined;
 
+	const IdentityRenderer = renderIdentity;
 	return (
 		<div className="min-w-0 flex-1">
 			<div className="flex flex-wrap items-center gap-2">
 				<h3 className="text-lg font-semibold leading-tight text-foreground">
-					{line.title}
+					{IdentityRenderer === undefined || itemId === undefined ? (
+						line.title
+					) : (
+						<IdentityRenderer
+							disabled={disabled}
+							itemId={itemId}
+							lineId={line.lineId}
+						>
+							{line.title}
+						</IdentityRenderer>
+					)}
 				</h3>
-				<AnimatePresence
-					initial={false}
-					mode="popLayout"
-				>
-					{stale || activeWork === undefined ? null : (
+				<AnimatePresence initial={false}>
+					{stale || status === undefined ? null : (
 						<motion.span
-							key={`active:${activeWork}`}
+							key={status.label}
 							layout
-							className="rounded-full border border-success/40 bg-success/12 px-2.5 py-1 text-xs font-semibold text-foreground"
+							className={`rounded-full border px-2.5 py-1 text-xs font-semibold text-foreground ${status.className}`}
+							data-ui="TileLineStatusBadge"
 							{...itemDetailBadgeMotion}
 						>
-							{activeWork}
-						</motion.span>
-					)}
-				</AnimatePresence>
-				<AnimatePresence
-					initial={false}
-					mode="popLayout"
-				>
-					{stale ||
-					line.activeJob !== undefined ||
-					line.queuedRequestCount === 0 ? null : (
-						<motion.span
-							key={`queued:${line.queuedRequestCount}`}
-							layout
-							{...itemDetailBadgeMotion}
-						>
-							<BadgeCount
-								count={line.queuedRequestCount}
-								dataUi="TileLineQueuedBadge"
-								label="Queued"
-							/>
-						</motion.span>
-					)}
-				</AnimatePresence>
-				<AnimatePresence
-					initial={false}
-					mode="popLayout"
-				>
-					{stale || line.activeJob !== undefined || readiness === undefined ? null : (
-						<motion.span
-							key={`readiness:${readiness.label}`}
-							layout
-							className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${readiness.className}`}
-							data-ui="TileLineReadinessBadge"
-							{...itemDetailBadgeMotion}
-						>
-							{readiness.label}
+							{status.label}
 						</motion.span>
 					)}
 				</AnimatePresence>

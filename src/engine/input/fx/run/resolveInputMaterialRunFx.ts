@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import { resolveActionChargeFx } from "~/engine/action/fx/resolveActionChargeFx";
 import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
 import type { InputMaterialSchema } from "~/engine/input/schema/InputMaterialSchema";
 import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
@@ -7,7 +8,6 @@ import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntim
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { planInputMaterialRunFx } from "./planInputMaterialRunFx";
-import { resolveInputChargeRunFx } from "./resolveInputChargeRunFx";
 
 export namespace resolveInputMaterialRunFx {
 	export interface Props {
@@ -36,7 +36,7 @@ export const resolveInputMaterialRunFx = Effect.fn("resolveInputMaterialRunFx")(
 		input,
 		storedQuantity,
 	});
-	const charges = yield* resolveInputChargeRunFx({
+	const charges = yield* resolveActionChargeFx({
 		charges: input.charges,
 		ownerItemId,
 		reservedCharges,

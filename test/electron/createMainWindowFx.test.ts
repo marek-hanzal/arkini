@@ -1,5 +1,5 @@
 import type { BrowserWindow, WebContents } from "electron";
-import { ipcMain } from "electron";
+import { ipcMain, Menu } from "electron";
 import { EventEmitter } from "node:events";
 import { Cause, Effect, Exit, Option } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -7,7 +7,9 @@ import { ArkiniWindowTitle } from "../../shared/ArkiniAppMetadata";
 import { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
 import { createMainWindowFx } from "../../electron/main/createMainWindowFx";
 import { ElectronMainError } from "../../electron/main/ElectronMainError";
+import { createChatGptViewControllerOwnershipFx } from "../../electron/main/chatgpt/createChatGptViewControllerOwnershipFx";
 import type { TrustedRenderer } from "../../electron/main/security/TrustedRenderer";
+import { createWindowModeControllerOwnershipFx } from "../../electron/main/window/createWindowModeControllerOwnershipFx";
 import type { WindowPreferences } from "../../electron/main/window/WindowPreferences";
 
 const electronState = vi.hoisted(() => ({
@@ -76,6 +78,9 @@ vi.mock("electron", async () => {
 	return {
 		BrowserWindow: TestBrowserWindow,
 		ipcMain: ipc,
+		Menu: {
+			setApplicationMenu: vi.fn(),
+		},
 		screen: {
 			getCursorScreenPoint: () => ({
 				x: 0,
@@ -106,6 +111,24 @@ beforeEach(() => {
 	(ipcMain as unknown as EventEmitter).removeAllListeners();
 });
 
+const createTestMainWindowFx = Effect.fn("createTestMainWindowFx")(
+	(
+		props: Omit<
+			createMainWindowFx.Props,
+			"chatGptViewControllerOwnership" | "windowModeControllerOwnership"
+		>,
+	) =>
+		Effect.gen(function* () {
+			const chatGptViewControllerOwnership = yield* createChatGptViewControllerOwnershipFx();
+			const windowModeControllerOwnership = yield* createWindowModeControllerOwnershipFx();
+			return yield* createMainWindowFx({
+				...props,
+				chatGptViewControllerOwnership,
+				windowModeControllerOwnership,
+			});
+		}),
+);
+
 describe("createMainWindowFx", () => {
 	it("destroys a failed hidden window and releases its lifecycle listeners", async () => {
 		const trustedWindowRemoved = vi.fn();
@@ -123,7 +146,7 @@ describe("createMainWindowFx", () => {
 		};
 
 		const exit = await Effect.runPromiseExit(
-			createMainWindowFx({
+			createTestMainWindowFx({
 				trustedRenderer,
 				windowMode: "bordered",
 				windowPreferences,
@@ -150,6 +173,7 @@ describe("createMainWindowFx", () => {
 		expect(window.options.title).toBe(ArkiniWindowTitle);
 		expect(window.options.fullscreen).toBe(false);
 		expect(window.options.fullscreenable).toBe(true);
+		expect(Menu.setApplicationMenu).toHaveBeenLastCalledWith(null);
 		expect(window.maximize).toHaveBeenCalledOnce();
 		expect(window.destroy).toHaveBeenCalledOnce();
 		expect(window.isDestroyed()).toBe(true);
@@ -180,7 +204,7 @@ describe("createMainWindowFx", () => {
 		};
 
 		await Effect.runPromiseExit(
-			createMainWindowFx({
+			createTestMainWindowFx({
 				trustedRenderer,
 				windowMode: "fullscreen",
 				windowPreferences,
@@ -209,7 +233,7 @@ describe("createMainWindowFx", () => {
 		};
 
 		await Effect.runPromiseExit(
-			createMainWindowFx({
+			createTestMainWindowFx({
 				trustedRenderer,
 				windowMode: "default",
 				windowPreferences,

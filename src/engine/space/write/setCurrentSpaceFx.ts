@@ -1,11 +1,9 @@
 import { Effect } from "effect";
 
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import type { CurrentSpaceChangedGameEventSchema } from "~/engine/event/schema/CurrentSpaceChangedGameEventSchema";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { SpaceInvalidError } from "~/engine/space/error/SpaceInvalidError";
+import { setCurrentSpaceRuntimeFx } from "~/engine/space/internal/setCurrentSpaceRuntimeFx";
 
 export namespace setCurrentSpaceFx {
 	export interface Props {
@@ -27,29 +25,14 @@ export const setCurrentSpaceFx = Effect.fn("setCurrentSpaceFx")(function* ({
 
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
-			if (runtime.currentSpace === space) {
-				return [
-					space,
-					runtime,
-				] as const;
-			}
-
-			const event = {
-				type: GameEventEnumSchema.enum.CurrentSpaceChanged,
-				previousSpace: runtime.currentSpace,
-				currentSpace: space,
-			} satisfies CurrentSpaceChangedGameEventSchema.Type;
-			const nextRuntime = {
-				...runtime,
-				currentSpace: space,
-			} satisfies RuntimeSchema.Type;
-
+			const transition = yield* setCurrentSpaceRuntimeFx({
+				runtime,
+				space,
+			});
 			return [
 				space,
-				nextRuntime,
-				[
-					event,
-				],
+				transition.runtime,
+				transition.events,
 			] as const;
 		}),
 	);

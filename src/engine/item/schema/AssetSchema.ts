@@ -2,35 +2,44 @@ import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 
+export const AssetCompositionSchema = z
+	.union([
+		z.tuple([
+			IdSchema,
+		]),
+		z.tuple([
+			IdSchema,
+			IdSchema,
+		]),
+	])
+	.meta({
+		id: "AssetCompositionSchema",
+		description: "A one- or two-layer visual asset composition in back-to-front order.",
+	});
+
 /**
  * Describes the visual representation of a game item.
  *
- * The ordered source list always has at least one asset. Craft and blueprint
- * tiles distribute their entries from an empty to a completely filled material
- * line; other item kinds render the first entry. When `composite` is set, the
- * renderer composes that secondary asset with the selected source asset.
+ * `default` is the complete one- or two-layer composition shown when the engine
+ * does not project progress. Optional `sources` are later single-layer progress
+ * states. The asset contract itself is item-type agnostic.
  */
 export const AssetSchema = z
 	.object({
 		/**
-		 * Ordered primary asset IDs from the empty to the fully filled visual.
+		 * Complete default composition in authoritative back-to-front order.
 		 */
-		source: z
-			.tuple(
-				[
-					IdSchema,
-				],
-				IdSchema,
-			)
-			.describe(
-				"The ordered primary asset IDs from the empty to the fully filled visual representation.",
-			),
-		/**
-		 * Optional secondary asset composed with the selected primary asset.
-		 */
-		composite: IdSchema.optional().describe(
-			"The optional secondary asset composed with the selected primary asset.",
+		default: AssetCompositionSchema.describe(
+			"The default one- or two-layer visual composition in back-to-front order.",
 		),
+		/**
+		 * Later single-layer states selected by engine-owned progress.
+		 */
+		sources: z
+			.array(IdSchema)
+			.min(1)
+			.optional()
+			.describe("The optional ordered single-layer progress states after the default."),
 	})
 	.strict()
 	.meta({

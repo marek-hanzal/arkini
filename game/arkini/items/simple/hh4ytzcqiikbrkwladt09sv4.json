@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "hh4ytzcqiikbrkwladt09sv4",
+		"id": "item:vegetables",
+		"title": "Vegetables",
+		"description": "Fresh vegetables grown in small gardens for base food supply chains.",
+		"asset": {
+			"default": [
+				"item-vegetables"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 50,
+		"type": "simple"
+	}
+}

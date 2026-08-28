@@ -7,6 +7,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { routeTree } from "~/_route";
+import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
 import { applyCheatAvailabilityFx } from "~/bridge/cheat/applyCheatAvailabilityFx";
 import type { Game } from "~/bridge/game/Game";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
@@ -29,15 +30,13 @@ const createGame = (
 	arkpack: {
 		packageId: "package-route",
 		contentHash: "content-route",
-		gameId: testArkpackConfig.meta.id,
 		title: testArkpackConfig.meta.title,
-		configVersion: testArkpackConfig.version,
-		compressedSize: 0,
-		trust: {
-			type: "external",
-			reason: "unsigned",
+		version: "1.0",
+		arkini: ArkiniAppVersion,
+		provenance: {
+			type: "community",
 		} as const,
-		source: "imported",
+		source: "user",
 	},
 	config: testArkpackConfig,
 	disposeFx,
@@ -49,7 +48,6 @@ const createGame = (
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 	saveKey: {
 		packageId: "package-route",
-		contentHash: "0".repeat(64),
 	},
 	subscribe: () => () => undefined,
 	subscribeEvents,
@@ -101,6 +99,7 @@ afterEach(async () => {
 	});
 	vi.useRealTimers();
 	for (const runtime of runtimes.splice(0)) await runtime.dispose();
+	Reflect.deleteProperty(window, "arkini");
 });
 
 describe("game route lifecycle", () => {
@@ -211,6 +210,42 @@ describe("game route lifecycle", () => {
 		expect(
 			rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack.packageId,
 		).toBe("package-route");
+	});
+
+	it("releases the active Game before opening the editor", async () => {
+		vi.useFakeTimers();
+		Object.defineProperty(window, "arkini", {
+			configurable: true,
+			value: {
+				editor: {
+					status: () =>
+						Promise.resolve({
+							type: "ready" as const,
+						}),
+				},
+				editorMcp: {
+					activate: () =>
+						Promise.resolve({
+							type: "ready" as const,
+							port: 32_310,
+						}),
+				},
+			},
+		});
+		const dispose = vi.fn();
+		const game = createGame(Effect.sync(dispose));
+		const { rendererRuntime, router } = await createHarness("/game/package-route/board", game);
+		await router.load();
+
+		const navigation = router.navigate({
+			to: "/editor/welcome",
+		});
+		await vi.advanceTimersByTimeAsync(2_500);
+		await navigation;
+
+		expect(dispose).toHaveBeenCalledOnce();
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
+		expect(router.state.location.pathname).toBe("/editor/welcome");
 	});
 
 	it("keeps one parent Game while moving from board into its action sibling", async () => {

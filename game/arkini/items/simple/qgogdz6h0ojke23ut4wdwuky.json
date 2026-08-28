@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "qgogdz6h0ojke23ut4wdwuky",
+		"id": "item:gold-ingot",
+		"title": "Gold Ingot",
+		"description": "Refined gold produced by smelters from gold ore and coal.",
+		"asset": {
+			"default": [
+				"item-gold-ingot"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 50,
+		"type": "simple"
+	}
+}

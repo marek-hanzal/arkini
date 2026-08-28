@@ -1,21 +1,25 @@
-import { Effect, Exit, Scope } from "effect";
+import { Effect } from "effect";
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { loadArkpackFx } from "~/bridge/arkpack/loadArkpackFx";
 import type { Game } from "~/bridge/game/Game";
-import type { GameSession } from "~/bridge/game/GameSession";
 import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
 import { createGameSessionFx } from "~/bridge/game/createGameSessionFx";
-import { installGameDiagnostics } from "~/bridge/game/installGameDiagnostics";
+import { createGameResourceUrlsFx } from "~/bridge/game/createGameResourceUrlsFx";
+import { discardGameBootstrapFx } from "~/bridge/game/discardGameBootstrapFx";
+import { installGameDiagnosticsFx } from "~/bridge/game/installGameDiagnosticsFx";
+import { readArkpackVersionFx } from "~/bridge/game/ArkpackVersionCompatibility";
 import { createGameSaveStorageFx } from "~/bridge/save/createGameSaveStorageFx";
 import { decodeArkiniSaveFx } from "~/bridge/save/decodeArkiniSaveFx";
 import { encodeArkiniSaveFx } from "~/bridge/save/encodeArkiniSaveFx";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
+import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { startFx } from "~/engine/start/write/startFx";
 
 export namespace createGameFx {
 	export interface Props {
 		packageId: string;
 		arkpackStorage?: ArkpackStorage;
+		runRendererEffect: installGameDiagnosticsFx.Props["runRendererEffect"];
 		saveStorage?: GameSaveStorage;
 	}
 }
@@ -29,6 +33,7 @@ export namespace createGameFx {
 export const createGameFx = Effect.fn("createGameFx")(function* ({
 	packageId,
 	arkpackStorage,
+	runRendererEffect,
 	saveStorage: providedSaveStorage,
 }: createGameFx.Props) {
 	const loaded = yield* loadArkpackFx({
@@ -40,120 +45,99 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 				}),
 	});
 	const saveStorage = providedSaveStorage ?? (yield* createGameSaveStorageFx());
-	const resourceUrls = new Map<string, string>();
-	const resourceScope = yield* Scope.make();
-	let session: GameSession | undefined;
-
-	yield* Scope.addFinalizer(
-		resourceScope,
-		Effect.sync(() => {
-			for (const url of resourceUrls.values()) URL.revokeObjectURL(url);
-			resourceUrls.clear();
-		}),
-	);
-	const releaseResourcesFx = Scope.close(resourceScope, Exit.void);
-	const discardFailedBootstrapFx = Effect.gen(function* () {
-		if (session !== undefined) yield* session.disposeWithoutSaveFx.pipe(Effect.ignore);
-		yield* releaseResourcesFx;
-	}).pipe(Effect.ignore);
-
-	return yield* Effect.gen(function* () {
-		const saveKey: GameSaveStorage.Key = {
-			packageId: loaded.descriptor.packageId,
-			contentHash: loaded.descriptor.contentHash,
-		};
-		const savedBytes = yield* saveStorage.readFx(saveKey);
-		const state =
-			savedBytes === null
-				? undefined
-				: (yield* decodeArkiniSaveFx(savedBytes).pipe(
-						Effect.mapError(
-							(cause) =>
-								new GameSaveBootstrapError({
-									cause,
-									saveKey,
-								}),
-						),
-					)).state;
-		session = yield* createGameSessionFx({
-			config: loaded.payload.config,
-			...(state === undefined
-				? {}
-				: {
-						state,
+	const saveKey: GameSaveStorage.Key = {
+		packageId: loaded.descriptor.packageId,
+	};
+	const savedBytes = yield* saveStorage.readFx(saveKey);
+	let state: StateSchema.Type | undefined;
+	if (savedBytes !== null) {
+		const saved = yield* decodeArkiniSaveFx(savedBytes).pipe(
+			Effect.mapError(
+				(cause) =>
+					new GameSaveBootstrapError({
+						cause,
+						saveKey,
 					}),
-			save: {
-				write: (nextState) =>
-					encodeArkiniSaveFx(nextState).pipe(
-						Effect.flatMap((bytes) => saveStorage.writeFx(saveKey, bytes)),
-					),
-			},
-		}).pipe(
-			Effect.mapError((cause) =>
-				savedBytes === null
-					? cause
-					: new GameSaveBootstrapError({
-							cause,
-							saveKey,
-						}),
 			),
 		);
-		yield* Effect.sync(() => {
-			for (const resource of loaded.payload.resources) {
-				resourceUrls.set(
-					resource.id,
-					URL.createObjectURL(
-						new Blob(
-							[
-								resource.bytes.slice().buffer,
-							],
-							{
-								type: resource.mime,
-							},
-						),
+		const arkpackVersion = yield* readArkpackVersionFx(loaded.payload.version);
+		const saveVersion = yield* readArkpackVersionFx(saved.version);
+		if (saveVersion.major !== arkpackVersion.major) {
+			return yield* Effect.fail(
+				new GameSaveBootstrapError({
+					cause: new Error(
+						`Save version ${saved.version} is incompatible with arkpack version ${loaded.payload.version}.`,
 					),
-				);
-			}
+					saveKey,
+				}),
+			);
+		}
+		state = saved.state;
+	}
+	const session = yield* createGameSessionFx({
+		config: loaded.payload.config,
+		...(state === undefined
+			? {}
+			: {
+					state,
+				}),
+		save: {
+			write: (nextState) =>
+				encodeArkiniSaveFx({
+					version: loaded.payload.version,
+					state: nextState,
+				}).pipe(Effect.flatMap((bytes) => saveStorage.writeFx(saveKey, bytes))),
+		},
+	}).pipe(
+		Effect.mapError((cause) =>
+			state === undefined
+				? cause
+				: new GameSaveBootstrapError({
+						cause,
+						saveKey,
+					}),
+		),
+	);
+	let resourceUrls: Effect.Success<ReturnType<typeof createGameResourceUrlsFx>> | undefined;
+	const discardFailedBootstrapFx = discardGameBootstrapFx(
+		session,
+		Effect.suspend(() => resourceUrls?.releaseFx ?? Effect.void),
+	);
+
+	return yield* Effect.gen(function* () {
+		resourceUrls = yield* createGameResourceUrlsFx({
+			owner: "Game",
+			resources: loaded.payload.resources,
 		});
 		if (state === undefined) {
 			// A restored save is already started; only a new state receives the initial command.
 			yield* session.runFx(startFx());
 		}
 
-		const liveSession = session;
-		const diagnostics = installGameDiagnostics({
+		const liveResourceUrls = resourceUrls;
+		const diagnostics = yield* installGameDiagnosticsFx({
 			arkpack: loaded.descriptor,
 			restored: state !== undefined,
-			session: liveSession,
+			runRendererEffect,
+			session,
 		});
+		const closeDiagnosticsFx = (reason: "discarded" | "saved") =>
+			Effect.sync(() => diagnostics.close(reason)).pipe(Effect.catchCause(() => Effect.void));
 		return {
-			...liveSession,
+			...session,
 			arkpack: loaded.descriptor,
 			config: loaded.payload.config,
 			diagnosticSessionId: diagnostics.sessionId,
-			disposeFx: liveSession.disposeFx.pipe(
-				Effect.tap(() =>
-					Effect.sync(() => {
-						diagnostics.close("saved");
-					}),
-				),
-				Effect.andThen(releaseResourcesFx),
+			disposeFx: session.disposeFx.pipe(
+				Effect.tap(() => closeDiagnosticsFx("saved")),
+				Effect.andThen(liveResourceUrls.releaseFx),
 			),
-			disposeWithoutSaveFx: liveSession.disposeWithoutSaveFx.pipe(
-				Effect.tap(() =>
-					Effect.sync(() => {
-						diagnostics.close("discarded");
-					}),
-				),
-				Effect.andThen(releaseResourcesFx),
+			disposeWithoutSaveFx: session.disposeWithoutSaveFx.pipe(
+				Effect.tap(() => closeDiagnosticsFx("discarded")),
+				Effect.andThen(liveResourceUrls.releaseFx),
 			),
 			saveKey,
-			getResourceUrl: (resourceId) => {
-				const url = resourceUrls.get(resourceId);
-				if (url === undefined)
-					throw new Error(`Game resource ${resourceId} is unavailable.`);
-				return url;
-			},
+			getResourceUrl: liveResourceUrls.get,
 		} satisfies Game;
 	}).pipe(Effect.onError(() => discardFailedBootstrapFx));
 });

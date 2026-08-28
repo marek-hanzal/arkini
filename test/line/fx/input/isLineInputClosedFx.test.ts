@@ -21,6 +21,9 @@ const activeRuntime = {
 			remainingMs: 1_000,
 		},
 	],
+
+	jobQueue: [],
+	defaultLineByOwnerItemId: {},
 } satisfies RuntimeSchema.Type;
 
 describe("isLineInputClosedFx", () => {
@@ -72,6 +75,9 @@ describe("isLineInputClosedFx", () => {
 						currentSpace: 0,
 						items: [],
 						jobs: [],
+
+						jobQueue: [],
+						defaultLineByOwnerItemId: {},
 					},
 				}),
 			),

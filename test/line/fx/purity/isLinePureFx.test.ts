@@ -35,6 +35,8 @@ const baseRuntime = {
 	],
 	jobs: [],
 	jobQueue: [],
+
+	defaultLineByOwnerItemId: {},
 } satisfies RuntimeSchema.Type;
 
 const lineProps = {

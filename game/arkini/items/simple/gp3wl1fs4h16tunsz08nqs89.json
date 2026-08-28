@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "gp3wl1fs4h16tunsz08nqs89",
+		"id": "item:glass",
+		"title": "Glass",
+		"description": "Finished glass panels prepared for advanced building and luxury chains.",
+		"asset": {
+			"default": [
+				"item-glass"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 50,
+		"type": "simple"
+	}
+}

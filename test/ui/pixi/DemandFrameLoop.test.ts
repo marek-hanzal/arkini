@@ -72,6 +72,93 @@ describe("DemandFrameLoop", () => {
 		expect(render).not.toHaveBeenCalled();
 	});
 
+	it("runs scheduled work once in the owned frame and supports exact cancellation", () => {
+		const fake = createFakeFrames();
+		const work = vi.fn();
+		const canceledWork = vi.fn();
+		const loop = Effect.runSync(
+			createDemandFrameLoopFx({
+				cancelFrame: fake.cancelFrame,
+				reportCriticalFailure: vi.fn(),
+				render: vi.fn(),
+				requestFrame: fake.requestFrame,
+			}),
+		);
+
+		Effect.runSync(loop.scheduleFx(work));
+		const cancel = Effect.runSync(loop.scheduleFx(canceledWork));
+		cancel();
+		expect(fake.callbacks).toHaveLength(1);
+		fake.runNext(10);
+
+		expect(work).toHaveBeenCalledOnce();
+		expect(canceledWork).not.toHaveBeenCalled();
+	});
+
+	it("runs post-render work only after the projected frame", () => {
+		const fake = createFakeFrames();
+		const order: string[] = [];
+		const canceled = vi.fn();
+		const loop = Effect.runSync(
+			createDemandFrameLoopFx({
+				cancelFrame: fake.cancelFrame,
+				reportCriticalFailure: vi.fn(),
+				render: () => order.push("projected"),
+				requestFrame: fake.requestFrame,
+			}),
+		);
+
+		const cancel = Effect.runSync(loop.scheduleAfterRenderFx(canceled));
+		cancel();
+		Effect.runSync(loop.scheduleAfterRenderFx(() => order.push("space-switch")));
+		fake.runNext(10);
+
+		expect(order).toEqual([
+			"projected",
+			"space-switch",
+		]);
+		expect(canceled).not.toHaveBeenCalled();
+	});
+
+	it("stops later callbacks from the same frame when an earlier callback closes it", () => {
+		const fake = createFakeFrames();
+		const laterWork = vi.fn();
+		const loop = Effect.runSync(
+			createDemandFrameLoopFx({
+				cancelFrame: fake.cancelFrame,
+				reportCriticalFailure: vi.fn(),
+				render: vi.fn(),
+				requestFrame: fake.requestFrame,
+			}),
+		);
+
+		Effect.runSync(loop.scheduleFx(() => Effect.runSync(loop.closeFx)));
+		Effect.runSync(loop.scheduleFx(laterWork));
+		fake.runNext(10);
+
+		expect(laterWork).not.toHaveBeenCalled();
+	});
+
+	it("honors cancellation of a later callback during the same frame", () => {
+		const fake = createFakeFrames();
+		const laterWork = vi.fn();
+		const loop = Effect.runSync(
+			createDemandFrameLoopFx({
+				cancelFrame: fake.cancelFrame,
+				reportCriticalFailure: vi.fn(),
+				render: vi.fn(),
+				requestFrame: fake.requestFrame,
+			}),
+		);
+		let cancelLater = () => {};
+
+		Effect.runSync(loop.scheduleFx(() => cancelLater()));
+		cancelLater = Effect.runSync(loop.scheduleFx(laterWork));
+		fake.runNext(10);
+
+		expect(laterWork).not.toHaveBeenCalled();
+	});
+
 	it("poisons the loop after a renderer failure instead of spinning", () => {
 		const fake = createFakeFrames();
 		const reportCriticalFailure = vi.fn();

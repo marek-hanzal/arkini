@@ -7,7 +7,6 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -46,20 +45,18 @@ const config = GameConfigSchema.parse({
 			},
 		],
 	},
-	categories: {},
 	items: {
 		producer: {
+			uid: "producer",
 			id: "producer",
 			type: "producer",
 			title: "Producer",
 			description: "Produces resources.",
 			asset: {
-				source: [
+				default: [
 					"asset:producer",
 				],
 			},
-			tags: [],
-			categoryId: "building",
 			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 1,
@@ -80,32 +77,30 @@ const config = GameConfigSchema.parse({
 			],
 		},
 		resource: {
+			uid: "resource",
 			id: "resource",
 			type: "simple",
 			title: "Resource",
 			description: "One resource.",
 			asset: {
-				source: [
+				default: [
 					"asset:resource",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 		},
 		"satchel-control": {
+			uid: "satchel-control",
 			id: "satchel-control",
 			type: "inventory",
 			title: "Satchel",
 			description: "Opens the shared inventory.",
 			asset: {
-				source: [
+				default: [
 					"asset:satchel",
 				],
 			},
-			tags: [],
-			categoryId: "utility",
 		},
 	},
 });
@@ -147,6 +142,11 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 		).toEqual({
 			kind: "enqueue-default-line",
 			lineId: "line:produce",
+			queue: {
+				available: true,
+				capacity: 1,
+				used: 0,
+			},
 		});
 	});
 
@@ -198,6 +198,11 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 		).toEqual({
 			kind: "enqueue-default-line",
 			lineId: "line:produce",
+			queue: {
+				available: true,
+				capacity: 1,
+				used: 0,
+			},
 		});
 		expect(
 			Effect.runSync(
@@ -228,6 +233,34 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 			),
 		).toEqual({
 			kind: "none",
+		});
+	});
+
+	it("projects the canonical active-job and waiting-row capacity state", () => {
+		expect(
+			Effect.runSync(
+				readRuntimeItemPrimaryActionFx({
+					item: producer,
+					runtime: {
+						...runtime,
+						jobQueue: [
+							{
+								id: "queue:producer",
+								lineId: "line:produce",
+								ownerItemId: producer.id,
+							},
+						],
+					},
+				}),
+			),
+		).toEqual({
+			kind: "enqueue-default-line",
+			lineId: "line:produce",
+			queue: {
+				available: false,
+				capacity: 1,
+				used: 1,
+			},
 		});
 	});
 });

@@ -3,7 +3,9 @@ import { match } from "ts-pattern";
 
 import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
 import type { WindowMode } from "~/bridge/window/WindowMode";
-import { Button, PrimaryButton } from "~/ui/button/Button";
+import { BackButton } from "~/ui/button/BackButton";
+import { SettingsOpenActionRow } from "~/ui/settings/SettingsOpenActionRow";
+import { SettingsSegmentedChoice } from "~/ui/settings/SettingsSegmentedChoice";
 import { useSettingsModel } from "~/ui/settings/useSettingsModel";
 
 const ThemeOptions: ReadonlyArray<{
@@ -78,42 +80,15 @@ export const Settings = ({ onBackFx }: Settings.Props) => {
 				disabled={model.blocked}
 			>
 				<legend className="text-sm font-semibold text-foreground">Window</legend>
-				<div
-					className="grid grid-cols-3 gap-1 rounded-xl border border-line bg-surface-raised/65 p-1"
-					role="radiogroup"
-					aria-label="Window mode"
-					data-ui="SettingsWindowModeOptions"
-				>
-					{WindowModeOptions.map((option) => {
-						const selected = model.windowMode === option.value;
-						return (
-							<label
-								key={option.value}
-								className={`relative rounded-lg px-3 py-2.5 text-center text-sm font-semibold transition-colors ${
-									model.blocked
-										? selected
-											? "cursor-progress bg-accent text-accent-contrast opacity-60"
-											: "cursor-progress text-muted opacity-60"
-										: selected
-											? "cursor-pointer bg-accent text-accent-contrast hover:bg-accent-hover"
-											: "cursor-pointer text-muted hover:bg-surface"
-								}`}
-								data-selected={selected ? "true" : "false"}
-								data-pending={model.blocked ? "true" : "false"}
-							>
-								<input
-									type="radio"
-									name="window-mode"
-									value={option.value}
-									checked={selected}
-									className="sr-only"
-									onChange={() => model.selectWindowMode(option.value)}
-								/>
-								{option.label}
-							</label>
-						);
-					})}
-				</div>
+				<SettingsSegmentedChoice
+					options={WindowModeOptions}
+					selected={model.windowMode}
+					pending={model.blocked}
+					name="window-mode"
+					ariaLabel="Window mode"
+					dataUi="SettingsWindowModeOptions"
+					onChange={model.selectWindowMode}
+				/>
 				<p className="text-sm leading-6 text-muted">
 					Default uses the standard window size. Bordered fills the screen with its title
 					bar. Fullscreen uses the native fullscreen space.
@@ -125,42 +100,15 @@ export const Settings = ({ onBackFx }: Settings.Props) => {
 				disabled={model.blocked}
 			>
 				<legend className="text-sm font-semibold text-foreground">Theme</legend>
-				<div
-					className="grid grid-cols-3 gap-1 rounded-xl border border-line bg-surface-raised/65 p-1"
-					role="radiogroup"
-					aria-label="Theme"
-					data-ui="SettingsThemeOptions"
-				>
-					{ThemeOptions.map((option) => {
-						const selected = model.theme === option.value;
-						return (
-							<label
-								key={option.value}
-								className={`relative rounded-lg px-3 py-2.5 text-center text-sm font-semibold transition-colors ${
-									model.blocked
-										? selected
-											? "cursor-progress bg-accent text-accent-contrast opacity-60"
-											: "cursor-progress text-muted opacity-60"
-										: selected
-											? "cursor-pointer bg-accent text-accent-contrast hover:bg-accent-hover"
-											: "cursor-pointer text-muted hover:bg-surface"
-								}`}
-								data-selected={selected ? "true" : "false"}
-								data-pending={model.blocked ? "true" : "false"}
-							>
-								<input
-									type="radio"
-									name="appearance-theme"
-									value={option.value}
-									checked={selected}
-									className="sr-only"
-									onChange={() => model.selectTheme(option.value)}
-								/>
-								{option.label}
-							</label>
-						);
-					})}
-				</div>
+				<SettingsSegmentedChoice
+					options={ThemeOptions}
+					selected={model.theme}
+					pending={model.blocked}
+					name="appearance-theme"
+					ariaLabel="Theme"
+					dataUi="SettingsThemeOptions"
+					onChange={model.selectTheme}
+				/>
 				<p className="text-sm leading-6 text-muted">
 					System follows the operating-system appearance. Light and Dark override it.
 				</p>
@@ -191,28 +139,34 @@ export const Settings = ({ onBackFx }: Settings.Props) => {
 						}
 					/>
 				</label>
-				<div
-					className="ak-list-row flex items-center justify-between gap-4 rounded-lg border border-line px-4 py-3"
-					data-ui="SettingsDiagnostics"
-				>
-					<span className="grid gap-1">
-						<span className="text-sm font-semibold text-foreground">Diagnostics</span>
-						<span className="text-sm leading-5 text-muted">
-							Open the bounded rotating logs used to investigate crashes and broken
-							gameplay sessions.
-						</span>
-					</span>
-					<Button
-						className="shrink-0"
-						cursorIntent={
-							model.diagnosticsStatus.kind === "pending" ? "progress" : undefined
-						}
-						disabled={model.diagnosticsStatus.kind === "pending"}
-						onClick={model.openDiagnostics}
-					>
-						{model.diagnosticsStatus.kind === "pending" ? "Opening…" : "Open logs"}
-					</Button>
-				</div>
+				<SettingsOpenActionRow
+					dataUi="SettingsCli"
+					title="Command line"
+					description={model.cliDescription}
+					pending={model.cliPending}
+					disabled={model.cliDisabled}
+					pendingLabel={model.cliActionLabel}
+					idleLabel={model.cliActionLabel}
+					onClick={model.toggleCliInstallation}
+				/>
+				<SettingsOpenActionRow
+					dataUi="SettingsDiagnostics"
+					title="Diagnostics"
+					description="Open the bounded rotating logs used to investigate crashes and broken gameplay sessions."
+					pending={model.diagnosticsStatus.kind === "pending"}
+					pendingLabel="Opening…"
+					idleLabel="Open logs"
+					onClick={model.openDiagnostics}
+				/>
+				<SettingsOpenActionRow
+					dataUi="SettingsUserData"
+					title="Application data"
+					description="Open Arkini's data root containing editor projects, Arkpacks, saves, preferences, and logs."
+					pending={model.userDataStatus.kind === "pending"}
+					pendingLabel="Opening…"
+					idleLabel="Open data folder"
+					onClick={model.openUserData}
+				/>
 			</fieldset>
 
 			<div
@@ -223,6 +177,16 @@ export const Settings = ({ onBackFx }: Settings.Props) => {
 				{model.diagnosticsStatus.kind === "error" ? (
 					<p className="text-danger">
 						Diagnostics failed: {errorMessage(model.diagnosticsStatus.error)}
+					</p>
+				) : null}
+				{model.userDataStatus.kind === "error" ? (
+					<p className="text-danger">
+						Opening data folder failed: {errorMessage(model.userDataStatus.error)}
+					</p>
+				) : null}
+				{model.cliStatus.kind === "error" ? (
+					<p className="text-danger">
+						CLI installation failed: {model.cliStatus.message}
 					</p>
 				) : null}
 				{match(model.status)
@@ -287,14 +251,13 @@ export const Settings = ({ onBackFx }: Settings.Props) => {
 					.exhaustive()}
 			</div>
 
-			<PrimaryButton
-				className="mx-auto"
+			<BackButton
 				cursorIntent={model.blocked ? "progress" : undefined}
 				disabled={model.blocked}
 				onClick={model.goBack}
 			>
 				{model.exitPending ? "Returning…" : "Back"}
-			</PrimaryButton>
+			</BackButton>
 		</section>
 	);
 };

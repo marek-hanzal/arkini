@@ -2,7 +2,7 @@ import { Deferred, Effect, Exit, Option, Ref, Scope, type Semaphore } from "effe
 
 import type { GameEngineResourceFxService } from "~/bridge/game/GameEngineResourceFx";
 import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 import type {
 	FailedSaveRecovery,
 	GameEngineResourceServiceState,
@@ -55,7 +55,7 @@ export const createFailedSaveRecoveryCapabilityFx = Effect.fn(
 								),
 							);
 						}
-						const exactFailure = readExactCauseFailure(state.cause);
+						const exactFailure = yield* readExactCauseFailureFx(state.cause);
 						const failure: Option.Option<GameSaveBootstrapError> =
 							Option.isSome(exactFailure) &&
 							exactFailure.value instanceof GameSaveBootstrapError
@@ -144,7 +144,7 @@ export const createFailedSaveRecoveryCapabilityFx = Effect.fn(
 										),
 									} as const;
 								}
-								const exactFailure = readExactCauseFailure(state.cause);
+								const exactFailure = yield* readExactCauseFailureFx(state.cause);
 								const failure: Option.Option<GameSaveBootstrapError> =
 									Option.isSome(exactFailure) &&
 									exactFailure.value instanceof GameSaveBootstrapError

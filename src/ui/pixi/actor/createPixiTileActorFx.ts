@@ -4,16 +4,13 @@ import { Container, Graphics } from "pixi.js";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
-import {
-	readPixiParticleBlendMode,
-	readPixiParticleLightSurface,
-} from "~/ui/pixi/appearance/readPixiParticleBlendMode";
+import { readPixiParticleLightSurfaceFx } from "~/ui/pixi/appearance/readPixiParticleLightSurfaceFx";
 import type { PixiTileActorParticleTextures } from "~/ui/pixi/actor/PixiTileActorParticleTextures";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { createPixiTileActorActivityParticlesFx } from "~/ui/pixi/actor/createPixiTileActorActivityParticlesFx";
 import { createPixiTileActorVisualFx } from "~/ui/pixi/actor/createPixiTileActorVisualFx";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";
-import { readPixiTileActorCrowdAlpha } from "~/ui/pixi/actor/readPixiTileActorCrowdAlpha";
+import { readPixiTileActorCrowdAlphaFx } from "~/ui/pixi/actor/readPixiTileActorCrowdAlphaFx";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 
@@ -46,6 +43,10 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 					running: item.running,
 				}),
 			);
+			const lifecycleLayer = new Container({
+				eventMode: "none",
+				label: `TileActorLifecycle:${item.id}:${instanceId}`,
+			});
 			const offsetLayer = new Container({
 				eventMode: "none",
 				label: `TileActorOffset:${item.id}:${instanceId}`,
@@ -54,7 +55,7 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 				eventMode: "none",
 				label: `TileActorCrowd:${item.id}:${instanceId}`,
 			});
-			crowdLayer.alpha = readPixiTileActorCrowdAlpha(item);
+			crowdLayer.alpha = yield* readPixiTileActorCrowdAlphaFx(item);
 			const visualLayer = new Container({
 				eventMode: "none",
 				label: `TileActorVisualLayer:${item.id}:${instanceId}`,
@@ -62,11 +63,11 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 			const activityParticles = yield* createPixiTileActorActivityParticlesFx({
 				actorId: item.id,
 				instanceId,
-				lightSurface: readPixiParticleLightSurface(palette),
+				lightSurface: yield* readPixiParticleLightSurfaceFx(palette),
 				textures: particleTextures,
 				tint: palette.accent,
 			});
-			activityParticles.container.blendMode = readPixiParticleBlendMode();
+			activityParticles.container.blendMode = "normal";
 			const progressBar = new Graphics({
 				eventMode: "none",
 				label: `TileActorProgress:${item.id}:${instanceId}`,
@@ -85,11 +86,13 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 			visualLayer.addChild(currentVisual.container);
 			crowdLayer.addChild(visualLayer);
 			offsetLayer.addChild(crowdLayer, activityParticles.container, progressBar);
-			container.addChild(offsetLayer);
+			lifecycleLayer.addChild(offsetLayer);
+			container.addChild(lifecycleLayer);
 
 			return {
 				instanceId,
 				container,
+				lifecycleLayer,
 				offsetLayer,
 				crowdLayer,
 				visualLayer,
@@ -102,7 +105,7 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 				size: 0,
 				visualTransitionGeneration: 0,
 				lifecycleIntentGeneration: 0,
-				lifecycleFadeStarted: false,
+				lifecycleTransitionStarted: false,
 				lifecycleTargetAlpha: 1,
 				lifecycleNotBeforeMs: 0,
 				lifecycleDurationMs: 0,

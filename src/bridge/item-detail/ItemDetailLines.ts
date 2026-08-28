@@ -1,5 +1,6 @@
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+import type { DistanceEnumSchema } from "~/engine/distance/schema/DistanceEnumSchema";
 import type { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
 import type { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
 import type { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
@@ -54,7 +55,7 @@ export namespace ItemDetailLines {
 		| {
 				readonly kind: "deposit";
 				readonly selector: Selector;
-				readonly distance: "close" | "near" | "far";
+				readonly distance: DistanceEnumSchema.Type;
 				readonly requiredCharges: number;
 				readonly availableCharges: number;
 				readonly availableChargesLabel: string;
@@ -74,6 +75,7 @@ export namespace ItemDetailLines {
 		readonly itemId: string;
 		readonly title: string;
 		readonly quantity: QuantityBounds;
+		readonly activeRuleHints: readonly string[];
 		readonly sourceUrl?: string;
 		readonly compositeUrl?: string;
 		readonly definitionItemId?: string;
@@ -117,12 +119,14 @@ export namespace ItemDetailLines {
 					  }
 					| {
 							readonly kind: "enable-rule";
+							readonly hint: string;
 							readonly ruleIndex: number;
 							readonly whenIndex: number;
 							readonly condition: DisabledCondition;
 					  }
 					| {
 							readonly kind: "disable-rule";
+							readonly hint: string;
 							readonly ruleIndex: number;
 							readonly condition: readonly DisabledCondition[];
 					  };
@@ -133,7 +137,7 @@ export namespace ItemDetailLines {
 		| {
 				readonly kind: "deposit-target-missing";
 				readonly selector: Selector;
-				readonly distance: "close" | "near" | "far";
+				readonly distance: DistanceEnumSchema.Type;
 				readonly detail?: DetailReference;
 				readonly messageBeforeDetail?: string;
 				readonly messageAfterDetail?: string;
@@ -192,6 +196,7 @@ export namespace ItemDetailLines {
 		readonly baseRuntimeMs: number;
 		readonly effectiveRuntimeMs: number;
 		readonly availability: Availability;
+		readonly activeRuleHints: readonly string[];
 		readonly isDefault: boolean;
 		readonly queuedRequestCount: number;
 		readonly actions: LineActions;
@@ -204,6 +209,7 @@ export namespace ItemDetailLines {
 		| {
 				readonly kind: "available";
 				readonly itemId: IdSchema.Type;
+				readonly focusLineId?: IdSchema.Type;
 				readonly line: readonly Line[];
 		  }
 		| {

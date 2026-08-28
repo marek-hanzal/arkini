@@ -10,7 +10,6 @@ import { readPixiTileInteractionClaimsFx } from "~/ui/pixi/motion/readPixiTileIn
 import { readTileMotionActorClaimsFx } from "~/ui/tile/motion/readTileMotionActorClaimsFx";
 import { readTileMotionLaneClaimsFx } from "~/ui/tile/motion/readTileMotionLaneClaimsFx";
 import { readTileMotionStaggerDelaySecondsFx } from "~/ui/tile/motion/readTileMotionStaggerDelaySecondsFx";
-import { readUnsettledTileStackQuantitiesFx } from "~/ui/tile/motion/readUnsettledTileStackQuantitiesFx";
 import { readUnsettledTileInputSourceQuantitiesFx } from "~/ui/tile/motion/readUnsettledTileInputSourceQuantitiesFx";
 import { updateTileMotionLanesFx } from "~/ui/tile/motion/updateTileMotionLanesFx";
 
@@ -165,45 +164,6 @@ describe("pure tile motion contracts", () => {
 		};
 		expect(Effect.runSync(readTileMotionLaneClaimsFx(spawn))).toContainEqual(producerLane);
 		expect(Effect.runSync(readTileMotionLaneClaimsFx(stack))).toContainEqual(producerLane);
-	});
-
-	it("sums unsettled stack payloads by exact target", () => {
-		const cues: ReadonlyArray<TileMotionCue> = [
-			stackCue({
-				eventIndex: 0,
-				quantity: 1,
-				targetActorId: "runtime:first",
-			}),
-			stackCue({
-				eventIndex: 1,
-				quantity: 3,
-				targetActorId: "runtime:first",
-			}),
-			stackCue({
-				eventIndex: 2,
-				quantity: 2,
-				targetActorId: "runtime:second",
-			}),
-		];
-
-		expect(
-			Effect.runSync(
-				readUnsettledTileStackQuantitiesFx({
-					cues,
-				}),
-			),
-		).toEqual(
-			new Map([
-				[
-					"runtime:first",
-					4,
-				],
-				[
-					"runtime:second",
-					2,
-				],
-			]),
-		);
 	});
 
 	it("keeps the delivered source click-only and exposes only its oldest unsettled quantity", () => {

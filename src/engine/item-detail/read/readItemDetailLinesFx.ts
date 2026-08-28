@@ -68,9 +68,24 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 		if (boardLine !== undefined) projected.push(boardLine);
 	}
 
+	const activeLineId = projected.find((line) => line.activeJob !== undefined)?.lineId;
+	const visibleLineIds = new Set(projected.map((line) => line.lineId));
+	const earliestQueuedLineId = runtime.jobQueue.find(
+		(request) => request.ownerItemId === owner.id,
+	)?.lineId;
+	const queuedLineId =
+		earliestQueuedLineId !== undefined && visibleLineIds.has(earliestQueuedLineId)
+			? earliestQueuedLineId
+			: undefined;
+	const focusLineId = activeLineId ?? queuedLineId;
 	return {
 		kind: "available",
 		itemId: owner.id,
+		...(focusLineId === undefined
+			? {}
+			: {
+					focusLineId,
+				}),
 		line: projected,
 	} satisfies ItemDetailLines.Result;
 });

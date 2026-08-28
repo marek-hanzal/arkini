@@ -1,4 +1,10 @@
-import { createLink, type LinkComponent } from "@tanstack/react-router";
+import {
+	type AnyRouter,
+	createLink,
+	type LinkComponent,
+	type LinkComponentProps,
+	type RegisteredRouter,
+} from "@tanstack/react-router";
 import {
 	forwardRef,
 	type AnchorHTMLAttributes,
@@ -14,7 +20,7 @@ const ButtonBaseClassName =
 
 const ButtonVariantClassNames = {
 	default:
-		"border border-line bg-surface/75 text-foreground shadow-lg backdrop-blur-md hover:border-line-strong hover:bg-surface-raised active:bg-surface-raised disabled:hover:border-line disabled:hover:bg-surface/75 disabled:active:bg-surface/75 aria-disabled:hover:border-line aria-disabled:hover:bg-surface/75 aria-disabled:active:bg-surface/75",
+		"border border-line bg-surface/75 text-foreground shadow-lg hover:border-line-strong hover:bg-surface-raised active:bg-surface-raised disabled:hover:border-line disabled:hover:bg-surface/75 disabled:active:bg-surface/75 aria-disabled:hover:border-line aria-disabled:hover:bg-surface/75 aria-disabled:active:bg-surface/75",
 	primary:
 		"bg-accent text-accent-contrast shadow-lg hover:bg-accent-hover active:bg-accent-hover disabled:hover:bg-accent disabled:active:bg-accent aria-disabled:hover:bg-accent aria-disabled:active:bg-accent",
 	danger: "bg-danger text-danger-contrast shadow-lg hover:opacity-90 active:opacity-80 disabled:hover:opacity-60 disabled:active:opacity-60 aria-disabled:hover:opacity-60 aria-disabled:active:opacity-60",
@@ -122,6 +128,14 @@ const DangerButtonAnchor = createButtonAnchor("DangerButtonAnchor", "danger");
 const CreatedButtonLink = createLink(ButtonAnchor);
 const CreatedPrimaryButtonLink = createLink(PrimaryButtonAnchor);
 const CreatedDangerButtonLink = createLink(DangerButtonAnchor);
+
+export type ButtonLinkProps<
+	TRouter extends AnyRouter = RegisteredRouter,
+	TFrom extends string = string,
+	TTo extends string | undefined = undefined,
+	TMaskFrom extends string = TFrom,
+	TMaskTo extends string = "",
+> = LinkComponentProps<typeof ButtonAnchor, TRouter, TFrom, TTo, TMaskFrom, TMaskTo>;
 
 /** Renders the canonical neutral game action with TanStack Router Link semantics. */
 export const ButtonLink: LinkComponent<typeof ButtonAnchor> = (props) => (

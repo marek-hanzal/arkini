@@ -12,8 +12,8 @@ const createDrop = (itemId: string, weight: number): DropWeightSchema.Type => {
 			{
 				itemId,
 				quantity: {
-					type: "value",
-					value: 1,
+					min: 1,
+					max: 1,
 				},
 				placement: "drop",
 				rules: [],

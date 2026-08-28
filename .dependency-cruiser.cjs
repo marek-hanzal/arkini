@@ -33,7 +33,7 @@ const boundaryRules = [
 			path: "^src/engine(?:/|$)",
 			pathNot: [
 				"^src/engine/game/layer/GameCoreLayerFx[.]ts$",
-				"^src/engine/runtime/internal/(?:makeRuntimeStoreFx|modifyRuntimeFx)[.]ts$",
+				"^src/engine/runtime/internal/(?:makeRuntimeStoreFx|modifyRuntimeWithTransitionFx)[.]ts$",
 			],
 		},
 		to: {
@@ -53,18 +53,17 @@ const boundaryRules = [
 		},
 	},
 	{
-		name: "cli-no-presentation-imports",
+		name: "editor-domain-no-presentation-imports",
 		comment:
-			"CLI tooling may use the engine but never bridge, UI, page, route, or renderer entrypoint code.",
+			"The shared editor domain is platform-neutral and never depends on bridge, UI, pages, routes, renderer entrypoints, or Electron.",
 		severity: "error",
 		from: {
-			path: "^cli(?:/|$)",
+			path: "^src/editor(?:/|$)",
 		},
 		to: {
-			path: "^src/(?:bridge|ui|page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
+			path: "^src/(?:bridge|ui|page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$|^electron(?:/|$)|^node_modules/electron(?:/|$)",
 		},
 	},
-
 	{
 		name: "bridge-no-presentation-imports",
 		comment:
@@ -155,7 +154,7 @@ const boundaryRules = [
 	{
 		name: "routes-enter-public-renderer-seams",
 		comment:
-			"File routes own TanStack registration and lifecycle orchestration through pages, reusable UI contracts, and public bridge capabilities, but never engine internals or other route modules.",
+			"File routes own TanStack registration and lifecycle orchestration through pages, reusable UI, public editor, and bridge capabilities, but never engine internals or other route modules.",
 		severity: "error",
 		from: {
 			path: "^src/@routes(?:/|$)",
@@ -186,43 +185,73 @@ const boundaryRules = [
 			"Application code consumes authored Game resources only through validated arkpacks, never through direct source-tree imports.",
 		severity: "error",
 		from: {
-			path: "^(?:src|electron|cli)(?:/|$)",
+			path: "^(?:src|electron)(?:/|$)",
 		},
 		to: {
 			path: "^game/[^/]+/(?:assets|resources)(?:/|$)",
 		},
 	},
 	{
-		name: "cli-no-electron-runtime-imports",
+		name: "electron-main-no-renderer-imports",
 		comment:
-			"CLI tooling may reuse explicit Electron build verification, but never Electron main/preload runtime adapters.",
+			"Electron main is the application backend and composition root: it may consume public editor and engine modules, but never renderer bridges, presentation, pages, routes, or renderer entrypoints.",
 		severity: "error",
 		from: {
-			path: "^cli(?:/|$)",
+			path: "^electron/main(?:/|$)",
 		},
 		to: {
-			path: "^electron/(?:main|preload)(?:/|$)|^node_modules/electron(?:/|$)",
+			path: "^src/(?:bridge|ui|page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
 		},
 	},
 	{
-		name: "electron-platform-no-renderer-imports",
+		name: "electron-main-only-imports-public-engine-modules",
 		comment:
-			"Electron main/preload are thin platform adapters and never import engine, bridge, React UI, pages, routes, or renderer entrypoints.",
+			"Electron main may compose public engine capabilities but never reach through a domain's internal implementation boundary.",
+		severity: "error",
+		from: {
+			path: "^electron/main(?:/|$)",
+		},
+		to: {
+			path: "^src/engine/.+/internal(?:/|$)",
+		},
+	},
+	{
+		name: "electron-support-no-application-imports",
+		comment:
+			"Electron support modules outside main and the pure contract stay platform-owned and never reach into application domains.",
 		severity: "error",
 		from: {
 			path: "^electron(?:/|$)",
+			pathNot: [
+				"^electron/(?:contract|main)(?:/|$)",
+			],
 		},
 		to: {
-			path: "^src/(?:engine|bridge|ui|page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
+			path: "^src(?:/|$)|^electron/main(?:/|$)",
+		},
+	},
+	{
+		name: "electron-preload-is-transport-only",
+		comment:
+			"Electron preload exposes the pure transport contract and never reaches into application, backend, or renderer domains.",
+		severity: "error",
+		from: {
+			path: "^electron/preload(?:/|$)",
+		},
+		to: {
+			path: "^(?:src|electron)(?:/|$)",
+			pathNot: [
+				"^electron/(?:contract|preload)(?:/|$)",
+			],
 		},
 	},
 	{
 		name: "electron-contract-only-through-bridge-or-electron",
 		comment:
-			"The shared Electron contract is consumed only by renderer bridge domains and Electron platform adapters, never by engine, UI, pages, routes, renderer entrypoints, or CLI.",
+			"The shared Electron contract is consumed only by renderer bridge domains and Electron platform adapters, never by engine, UI, pages, or renderer entrypoints.",
 		severity: "error",
 		from: {
-			path: "^(?:src/(?:engine|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|cli)(?:/|$)",
+			path: "^(?:src/(?:engine|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?)(?:/|$)",
 		},
 		to: {
 			path: "^electron/contract(?:/|$)",
@@ -231,13 +260,13 @@ const boundaryRules = [
 	{
 		name: "electron-contract-is-pure",
 		comment:
-			"The shared Electron contract contains schemas, transport types, and channel names only; it never imports renderer, engine, Electron runtime, or CLI implementation code.",
+			"The shared Electron contract contains schemas, transport types, and channel names only; it never imports renderer, engine, or Electron runtime implementation code.",
 		severity: "error",
 		from: {
 			path: "^electron/contract(?:/|$)",
 		},
 		to: {
-			path: "^(?:src|electron|cli)(?:/|$)|^node_modules/electron(?:/|$)",
+			path: "^(?:src|electron)(?:/|$)|^node_modules/electron(?:/|$)",
 			pathNot: [
 				"^electron/contract(?:/|$)",
 			],
@@ -249,7 +278,7 @@ const boundaryRules = [
 			"Production and tooling code never import test support; tests may depend on active code, never the reverse.",
 		severity: "error",
 		from: {
-			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|cli)(?:/|$)",
+			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron)(?:/|$)",
 		},
 		to: {
 			path: "^test(?:/|$)",
@@ -258,10 +287,10 @@ const boundaryRules = [
 	{
 		name: "active-code-no-archive-imports",
 		comment:
-			"The historical tree is a read-only oracle outside every active source root and may never be imported by production, CLI, or tests.",
+			"The historical tree is a read-only oracle outside every active source root and may never be imported by production or tests.",
 		severity: "error",
 		from: {
-			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|cli|test)(?:/|$)",
+			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|test)(?:/|$)",
 		},
 		to: {
 			path: "^src/_archive(?:/|$)",
@@ -335,7 +364,7 @@ module.exports = {
 				"Production code must not import tests or fixtures. Tests may depend on production, never the reverse.",
 			severity: "error",
 			from: {
-				path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|cli)(?:/|$)",
+				path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron)(?:/|$)",
 				pathNot: [
 					"[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$",
 				],

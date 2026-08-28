@@ -9,11 +9,9 @@ import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";
 import { animatePixiActorToRetargetablePoseFx } from "~/ui/pixi/animation/animatePixiActorToRetargetablePoseFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import {
-	restorePixiTileActorRemovalFeedbackFx,
-	startPixiTileActorRemovalFeedbackFx,
-} from "~/ui/pixi/animation/startPixiTileActorRemovalFeedbackFx";
-import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
+import { restorePixiTileActorExitFx } from "~/ui/pixi/animation/restorePixiTileActorExitFx";
+import { startPixiTileActorExitFx } from "~/ui/pixi/animation/startPixiTileActorExitFx";
+import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/burstPixiTileActorFeedbackParticlesFx";
 import { settlePixiMainSceneDraggedActorFx } from "~/ui/pixi/drag/settlePixiMainSceneDraggedActorFx";
 import type { PixiCursorGrabMotion } from "~/ui/pixi/drag/PixiCursorGrabMotion";
 import { beginPixiMainSceneDropFx } from "~/ui/pixi/drop/beginPixiMainSceneDropFx";
@@ -21,7 +19,7 @@ import type { PixiMainSceneDropPresentation } from "~/ui/pixi/drop/PixiMainScene
 import type { PixiMainSceneDropSubmission } from "~/ui/pixi/drop/PixiMainSceneDropSubmission";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRuntime";
-import { readPixiTileMotionTargetRedirect } from "~/ui/pixi/motion/readPixiTileMotionTargetRedirect";
+import { readPixiTileMotionTargetRedirectFx } from "~/ui/pixi/motion/readPixiTileMotionTargetRedirectFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 
 export namespace createPixiMainSceneDropSubmissionFx {
@@ -91,7 +89,7 @@ export const createPixiMainSceneDropSubmissionFx = Effect.fn("createPixiMainScen
 				return;
 			}
 			RendererRuntime.runSync(
-				restorePixiTileActorRemovalFeedbackFx({
+				restorePixiTileActorExitFx({
 					actor,
 					animator,
 				}),
@@ -105,7 +103,7 @@ export const createPixiMainSceneDropSubmissionFx = Effect.fn("createPixiMainScen
 				),
 			),
 			submitFx: Effect.fn("PixiMainSceneDropSubmission.submitFx")(
-				({ actor, previewKind, shortcutReceiver, sourceItem, target, targetItem }) =>
+				({ actor, commandTarget, previewKind, shortcutReceiver, sourceItem, targetItem }) =>
 					Effect.sync(() => {
 						if (closed) return;
 						RendererRuntime.runSync(cursorGrab.finishFx(actor));
@@ -120,11 +118,10 @@ export const createPixiMainSceneDropSubmissionFx = Effect.fn("createPixiMainScen
 						);
 						const drop = RendererRuntime.runSync(
 							beginPixiMainSceneDropFx({
+								commandTarget,
 								dropPresentation,
 								previewKind,
 								sourceItem,
-								surface,
-								target,
 								targetItem,
 							}),
 						);
@@ -153,7 +150,7 @@ export const createPixiMainSceneDropSubmissionFx = Effect.fn("createPixiMainScen
 							if (optimisticRemoval === null || removalStarted) return;
 							removalStarted = true;
 							RendererRuntime.runSync(
-								startPixiTileActorRemovalFeedbackFx({
+								startPixiTileActorExitFx({
 									actor: optimisticRemoval.actor,
 									animator,
 									onCancel: () => {
@@ -182,7 +179,9 @@ export const createPixiMainSceneDropSubmissionFx = Effect.fn("createPixiMainScen
 							if (finalized || closed) return;
 							try {
 								if (!targetRedirected) {
-									const targetRedirect = readPixiTileMotionTargetRedirect(result);
+									const targetRedirect = RendererRuntime.runSync(
+										readPixiTileMotionTargetRedirectFx(result),
+									);
 									if (targetRedirect !== null) {
 										RendererRuntime.runSync(
 											motion.redirectTargetFx(targetRedirect),

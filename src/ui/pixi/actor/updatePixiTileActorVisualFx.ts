@@ -4,7 +4,8 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiTileActorVisual } from "~/ui/pixi/actor/PixiTileActorVisual";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import { fitPixiSingleLineTextFx } from "~/ui/pixi/text/fitPixiSingleLineTextFx";
-import { formatTileBadgeLabel } from "~/ui/tile/formatTileBadgeCount";
+import { formatTileBadgeLabelFx } from "~/ui/tile/formatTileBadgeLabelFx";
+import { readPixiTileActorArtworkLayoutFx } from "~/ui/pixi/actor/readPixiTileActorArtworkLayoutFx";
 
 export namespace updatePixiTileActorVisualFx {
 	export interface Props {
@@ -16,7 +17,6 @@ export namespace updatePixiTileActorVisualFx {
 }
 
 const tileToSlotRatio = 0.8;
-
 /** Applies one complete logical face revision to one private visual slot. */
 export const updatePixiTileActorVisualFx = Effect.fn("updatePixiTileActorVisualFx")(function* ({
 	item,
@@ -33,15 +33,19 @@ export const updatePixiTileActorVisualFx = Effect.fn("updatePixiTileActorVisualF
 
 	visual.item = item;
 	visual.size = size;
-	for (const sprite of [
-		visual.primary,
-		visual.composite,
-	]) {
-		sprite.x = inset;
-		sprite.y = inset;
-		sprite.width = faceSize;
-		sprite.height = faceSize;
-	}
+	const artwork = yield* readPixiTileActorArtworkLayoutFx({
+		faceSize,
+		inset,
+		layered: item.compositeUrl !== undefined,
+	});
+	visual.primary.x = artwork.primary.x;
+	visual.primary.y = artwork.primary.y;
+	visual.primary.width = artwork.primary.size;
+	visual.primary.height = artwork.primary.size;
+	visual.composite.x = artwork.secondary.x;
+	visual.composite.y = artwork.secondary.y;
+	visual.composite.width = artwork.secondary.size;
+	visual.composite.height = artwork.secondary.size;
 
 	visual.titleStyle.fontSize = titleFontSize;
 	visual.title.text = yield* fitPixiSingleLineTextFx({
@@ -69,7 +73,7 @@ export const updatePixiTileActorVisualFx = Effect.fn("updatePixiTileActorVisualF
 	visual.quantity.text =
 		item.badgeCount === undefined
 			? ""
-			: formatTileBadgeLabel({
+			: yield* formatTileBadgeLabelFx({
 					count: item.badgeCount,
 					kind: item.badgeKind,
 				});

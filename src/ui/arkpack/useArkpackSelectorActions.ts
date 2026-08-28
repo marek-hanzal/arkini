@@ -2,25 +2,37 @@ import { useAtomSet } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { openEditorArkpackAtom } from "~/bridge/arkpack/editor/openEditorArkpackAtom";
 import { importArkpackFileAtom } from "~/bridge/arkpack/importArkpackFileAtom";
+import { openUserArkpackDirectoryAtom } from "~/bridge/arkpack/openUserArkpackDirectoryAtom";
+import { refreshArkpackCatalogAtom } from "~/bridge/arkpack/refreshArkpackCatalogAtom";
 import { removeArkpackAtom } from "~/bridge/arkpack/removeArkpackAtom";
 import { useArkpacks } from "~/bridge/arkpack/useArkpacks";
 import { useExclusiveAction } from "~/ui/action/useExclusiveAction";
 
-type BusyAction = "import" | "remove";
+type BusyAction = "editor" | "import" | "open-directory" | "refresh" | "remove";
 type ActiveAction = BusyAction | "exit";
 
-/** Owns Arkpack import, removal, exit navigation, mounted guards, and Escape lifecycle. */
+/** Owns selector actions, exit navigation, mounted guards, and Escape lifecycle. */
 export const useArkpackSelectorActions = () => {
 	const { state } = useArkpacks();
 	// TODO(#397): Revalidate stable promise-mode ownership, rejection, and interruption
 	// semantics; keep it only while this mounted selector owns the complete async action.
 	// Promise-mode command results are atom-wide, so the selector claims one exclusive action
-	// before invoking either setter and never overlaps awaited import/remove calls.
+	// before invoking a setter and never overlaps awaited catalog or storage calls.
 	const importFile = useAtomSet(importArkpackFileAtom, {
 		mode: "promise",
 	});
+	const openEditor = useAtomSet(openEditorArkpackAtom, {
+		mode: "promise",
+	});
 	const remove = useAtomSet(removeArkpackAtom, {
+		mode: "promise",
+	});
+	const refresh = useAtomSet(refreshArkpackCatalogAtom, {
+		mode: "promise",
+	});
+	const openUserDirectory = useAtomSet(openUserArkpackDirectoryAtom, {
 		mode: "promise",
 	});
 	const navigate = useNavigate();
@@ -28,9 +40,6 @@ export const useArkpackSelectorActions = () => {
 	const mountedRef = useRef(false);
 	const [actionError, setActionError] = useState<unknown>();
 	const { active, claim, release } = useExclusiveAction<ActiveAction>();
-	const busyAction: BusyAction | null =
-		active === "import" || active === "remove" ? active : null;
-	const exitPending = active === "exit";
 
 	useEffect(() => {
 		mountedRef.current = true;
@@ -104,37 +113,75 @@ export const useArkpackSelectorActions = () => {
 		],
 	);
 
-	const removeArkpack = useCallback(
-		(packageId: string) => {
-			if (state.type === "loading" || !claim("remove")) return;
+	const runBusyAction = useCallback(
+		(action: Exclude<BusyAction, "import">, operation: () => Promise<unknown>) => {
+			if (state.type === "loading" || !claim(action)) return;
 			setActionError(undefined);
-			void (async () => {
-				try {
-					await remove(packageId);
-				} catch (error) {
+			void operation()
+				.catch((error: unknown) => {
 					if (mountedRef.current) setActionError(error);
-				} finally {
-					release("remove");
-				}
-			})();
+				})
+				.finally(() => release(action));
 		},
 		[
 			claim,
 			release,
-			remove,
 			state.type,
+		],
+	);
+
+	const removeArkpack = useCallback(
+		(packageId: string) => runBusyAction("remove", () => remove(packageId)),
+		[
+			remove,
+			runBusyAction,
+		],
+	);
+
+	const refreshArkpacks = useCallback(
+		() => runBusyAction("refresh", () => refresh()),
+		[
+			refresh,
+			runBusyAction,
+		],
+	);
+
+	const openArkpackDirectory = useCallback(
+		() => runBusyAction("open-directory", () => openUserDirectory()),
+		[
+			openUserDirectory,
+			runBusyAction,
+		],
+	);
+
+	const openArkpackInEditor = useCallback(
+		(packageId: string) =>
+			runBusyAction("editor", async () => {
+				const project = await openEditor(packageId);
+				await navigate({
+					to: "/editor/$projectId/editor/items/list",
+					params: {
+						projectId: project.projectId,
+					},
+				});
+			}),
+		[
+			navigate,
+			openEditor,
+			runBusyAction,
 		],
 	);
 
 	return {
 		state,
 		inputRef,
-		busyAction,
-		blocked: busyAction !== null || exitPending || state.type === "loading",
-		exitPending,
+		blocked: active !== null || state.type === "loading",
 		actionError,
 		upload,
 		removeArkpack,
+		openArkpackInEditor,
+		refreshArkpacks,
+		openArkpackDirectory,
 		requestMainMenu,
 	};
 };

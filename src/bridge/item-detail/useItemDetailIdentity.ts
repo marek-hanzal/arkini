@@ -11,9 +11,9 @@ export namespace useItemDetailIdentity {
 	export type Projection =
 		| {
 				readonly kind: "available";
+				readonly definitionId: IdSchema.Type;
 				readonly itemId: IdSchema.Type;
 				readonly title: string;
-				readonly subtitle?: string;
 				readonly sourceUrl: string;
 				readonly compositeUrl?: string;
 		  }
@@ -38,21 +38,16 @@ export const useItemDetailIdentity = (itemId: IdSchema.Type): useItemDetailIdent
 				}),
 			);
 			if (identity.kind === "unavailable") return unavailable;
-			const subtitle = game.config.categories[identity.categoryId]?.title;
 			return {
 				kind: "available",
+				definitionId: identity.definitionId,
 				itemId: identity.itemId,
 				title: identity.title,
-				...(subtitle === undefined
+				sourceUrl: game.getResourceUrl(identity.sourceResourceIds[0]),
+				...(identity.sourceResourceIds[1] === undefined
 					? {}
 					: {
-							subtitle,
-						}),
-				sourceUrl: game.getResourceUrl(identity.sourceResourceId),
-				...(identity.compositeResourceId === undefined
-					? {}
-					: {
-							compositeUrl: game.getResourceUrl(identity.compositeResourceId),
+							compositeUrl: game.getResourceUrl(identity.sourceResourceIds[1]),
 						}),
 			};
 		},

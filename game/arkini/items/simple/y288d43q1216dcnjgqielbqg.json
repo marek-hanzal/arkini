@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "y288d43q1216dcnjgqielbqg",
+		"id": "item:stained-glass",
+		"title": "Stained Glass",
+		"description": "Prestige colored glass panels finished by Glazier Workshops for later high-civic and luxury buildings.",
+		"asset": {
+			"default": [
+				"item-stained-glass"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 20,
+		"type": "simple"
+	}
+}

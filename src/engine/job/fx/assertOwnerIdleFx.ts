@@ -19,7 +19,7 @@ export const assertOwnerIdleFx = Effect.fn("assertOwnerIdleFx")(function* ({
 	const jobIds = runtime.jobs
 		.filter((job) => job.ownerItemId === ownerItemId)
 		.map((job) => job.id);
-	const requestIds = (runtime.jobQueue ?? [])
+	const requestIds = runtime.jobQueue
 		.filter((request) => request.ownerItemId === ownerItemId)
 		.map((request) => request.id);
 

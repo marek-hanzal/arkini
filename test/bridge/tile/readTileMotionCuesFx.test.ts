@@ -10,7 +10,6 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -53,35 +52,32 @@ const config = GameConfigSchema.parse({
 			},
 		],
 	},
-	categories: {},
 	items: {
 		water: {
+			uid: "water",
 			id: "water",
 			type: "simple",
 			title: "Water",
 			description: "Water",
 			asset: {
-				source: [
+				default: [
 					"asset:water",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 		},
 		inventory: {
+			uid: "inventory",
 			id: "inventory",
 			type: "inventory",
 			title: "Inventory",
 			description: "Inventory",
 			asset: {
-				source: [
+				default: [
 					"asset:inventory",
 				],
 			},
-			tags: [],
-			categoryId: "utility",
 		},
 	},
 });

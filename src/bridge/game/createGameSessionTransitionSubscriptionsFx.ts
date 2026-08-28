@@ -50,8 +50,12 @@ const invokeListenerFx = <Value>(
 	);
 
 const isSubscriptionClosure = (cause: Cause.Cause<unknown>) =>
-	Cause.hasInterruptsOnly(cause) ||
-	cause.reasons.every((reason) => Cause.isFailReason(reason) && Cause.isDone(reason.error));
+	cause.reasons.length > 0 &&
+	cause.reasons.every(
+		(reason) =>
+			Cause.isInterruptReason(reason) ||
+			(Cause.isFailReason(reason) && Cause.isDone(reason.error)),
+	);
 
 /** Owns one listener subscription scope, delivery fiber and explicit cleanup pair. */
 const openGameSessionTransitionSubscriptionFx = Effect.fn(

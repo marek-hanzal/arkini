@@ -32,7 +32,9 @@ describe("Diagnostic log", () => {
 	it("writes parseable JSONL, opens its exact directory, and rotates before growing unbounded", async () => {
 		const userDataPath = mkdtempSync(join(tmpdir(), "arkini-diagnostics-"));
 		temporaryDirectories.push(userDataPath);
-		const diagnostics = Effect.runSync(createDiagnosticLogFx(userDataPath));
+		const diagnostics = Effect.runSync(
+			createDiagnosticLogFx(join(userDataPath, "arkini", "game", "logs")),
+		);
 
 		await Effect.runPromise(diagnostics.openDirectoryFx);
 		expect(electron.openPath).toHaveBeenCalledWith(diagnostics.directoryPath);
@@ -41,7 +43,6 @@ describe("Diagnostic log", () => {
 		for (let index = 0; index < 90; index += 1) {
 			Effect.runSync(
 				diagnostics.writeFx({
-					schemaVersion: 1,
 					category: [
 						"test",
 						"rotation",
@@ -84,7 +85,6 @@ describe("Diagnostic log", () => {
 			properties: {
 				event: "large-record",
 				index: 89,
-				schemaVersion: 1,
 				sessionId: "session:test",
 			},
 		});

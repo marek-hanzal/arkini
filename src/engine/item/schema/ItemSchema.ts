@@ -6,6 +6,7 @@ import { DepositItemSchema } from "./DepositItemSchema";
 import { InventoryItemSchema } from "./InventoryItemSchema";
 import { ProducerItemSchema } from "./ProducerItemSchema";
 import { SimpleItemSchema } from "./SimpleItemSchema";
+import { SpaceItemSchema } from "./SpaceItemSchema";
 import { StashItemSchema } from "./StashItemSchema";
 import { TemporaryItemSchema } from "./TemporaryItemSchema";
 
@@ -20,6 +21,7 @@ export const ItemSchema = z
 		BlueprintItemSchema,
 		DepositItemSchema,
 		SimpleItemSchema,
+		SpaceItemSchema,
 		ProducerItemSchema,
 		CraftItemSchema,
 		StashItemSchema,

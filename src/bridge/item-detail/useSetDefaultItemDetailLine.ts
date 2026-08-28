@@ -1,4 +1,4 @@
-import type { Game } from "~/bridge/game/Game";
+import type { PlayableGame } from "~/bridge/game/PlayableGame";
 import type { ItemDetailPendingActionOwner } from "~/bridge/item-detail/ItemDetailPendingActionOwner";
 import { useItemDetailPendingCommand } from "~/bridge/item-detail/useItemDetailPendingCommand";
 import { setDefaultLineFx } from "~/engine/line/write/setDefaultLineFx";
@@ -12,7 +12,7 @@ export namespace useSetDefaultItemDetailLine {
 	}
 }
 
-const runSetDefaultFx = (game: Game, command: useSetDefaultItemDetailLine.Props) =>
+const runSetDefaultFx = (game: PlayableGame, command: useSetDefaultItemDetailLine.Props) =>
 	game.runFx(setDefaultLineFx(command));
 
 /** Selects one authoritative save-backed default line for an exact Item Detail owner. */

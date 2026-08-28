@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { defaultLoadingMinimumDurationMs } from "~/ui/loading/ActionLoadingScreen";
+import { defaultLoadingMinimumDurationMs } from "~/ui/loading/defaultLoadingMinimumDurationMs";
 import { waitForActiveViewTransitionFx } from "~/ui/navigation/waitForActiveViewTransitionFx";
 
 /** Lets the action page enter cleanly, then keeps it pending long enough to remain deliberate. */

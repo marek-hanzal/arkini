@@ -1,0 +1,92 @@
+import { Effect, Option } from "effect";
+
+import { resolveActionEnableFx } from "~/engine/action/fx/resolveActionEnableFx";
+import { resolveActionInputFx } from "~/engine/action/fx/resolveActionInputFx";
+import { resolveActionRulesFx } from "~/engine/action/fx/resolveActionRulesFx";
+import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { InputChargeRunPlanSchema } from "~/engine/input/schema/run/InputChargeRunPlanSchema";
+import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBoardOperationError";
+import { SpaceActionUnavailableError } from "~/engine/space/error/SpaceActionUnavailableError";
+import type { SpaceActionPlanSchema } from "~/engine/space/schema/SpaceActionPlanSchema";
+
+/** Resolves one Space activation against a single read-only runtime snapshot. */
+export const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* ({
+	itemId,
+	runtime,
+}: {
+	itemId: IdSchema.Type;
+	runtime: RuntimeSchema.Type;
+}) {
+	const runtimeItem = yield* readRuntimeItemByIdFx({
+		itemId,
+		runtime,
+	});
+	const owner = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeItem));
+	if (owner === undefined || owner.item.type !== ItemEnumSchema.enum.Space) {
+		return yield* Effect.fail(
+			new SpaceActionUnavailableError({
+				itemId,
+			}),
+		);
+	}
+	if (owner.location.scope === "board" && owner.location.space !== runtime.currentSpace) {
+		return yield* Effect.fail(
+			new CrossSpaceBoardOperationError({
+				fromSpace: owner.location.space,
+				toSpace: runtime.currentSpace,
+			}),
+		);
+	}
+
+	const rules = yield* resolveActionRulesFx({
+		origin: owner.location,
+		rules: owner.item.rules,
+	});
+	const enabled = yield* resolveActionEnableFx({
+		enable: owner.item.enable,
+		rules,
+	});
+	if (!enabled) {
+		return yield* Effect.fail(
+			new SpaceActionUnavailableError({
+				itemId,
+			}),
+		);
+	}
+
+	const reservedCharges = new Map<IdSchema.Type, number>();
+	const charges: InputChargeRunPlanSchema.Type[] = [];
+	for (const input of owner.item.input) {
+		const resolution = yield* resolveActionInputFx({
+			input,
+			ownerItemId: owner.id,
+			reservedCharges,
+			runtime,
+		});
+		if (!resolution.resolution.ready || resolution.plan === undefined) {
+			return yield* Effect.fail(
+				new SpaceActionUnavailableError({
+					itemId,
+				}),
+			);
+		}
+		if (resolution.plan.charges !== undefined) {
+			charges.push(resolution.plan.charges);
+			reservedCharges.set(
+				resolution.plan.charges.itemId,
+				(reservedCharges.get(resolution.plan.charges.itemId) ?? 0) +
+					resolution.plan.charges.cost,
+			);
+		}
+	}
+
+	return {
+		ownerItemId: owner.id,
+		space: owner.item.space,
+		charges,
+	} satisfies SpaceActionPlanSchema.Type;
+});

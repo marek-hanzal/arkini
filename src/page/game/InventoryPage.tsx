@@ -1,10 +1,9 @@
-import { useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect } from "react";
+import { getRouteApi, useNavigate } from "@tanstack/react-router";
+import { useCallback } from "react";
 
-import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
-import { Inventory } from "~/ui/inventory/Inventory";
-import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
-import { isInventoryShortcutKey } from "~/ui/navigation/isInventoryShortcutKey";
+import { PlayableInventory } from "~/ui/game/PlayableInventory";
+
+const inventoryRoute = getRouteApi("/game/$packageId/_scene/inventory");
 
 /**
  * Owns only Inventory-to-Board navigation; the parent scene route keeps the
@@ -13,11 +12,10 @@ import { isInventoryShortcutKey } from "~/ui/navigation/isInventoryShortcutKey";
  * consumes input first, then Game Menu, and only an otherwise unclaimed
  * navigation key replaces this leaf with Board.
  */
-export const InventoryPage = ({ packageId }: { readonly packageId: string }) => {
-	const gameMenu = useGameMenuControl();
-	const itemDetail = useItemDetailControl();
+export const InventoryPage = () => {
+	const { packageId } = inventoryRoute.useParams();
 	const navigate = useNavigate();
-	const returnToBoard = useCallback(() => {
+	const onClose = useCallback(() => {
 		void navigate({
 			to: "/game/$packageId/board",
 			params: {
@@ -32,27 +30,5 @@ export const InventoryPage = ({ packageId }: { readonly packageId: string }) => 
 		packageId,
 	]);
 
-	useEffect(() => {
-		const onKeyDown = (event: KeyboardEvent) => {
-			if (
-				(event.key !== "Escape" && !isInventoryShortcutKey(event)) ||
-				event.defaultPrevented ||
-				gameMenu.isOpen ||
-				itemDetail.isOpen
-			) {
-				return;
-			}
-			event.preventDefault();
-			event.stopPropagation();
-			returnToBoard();
-		};
-		window.addEventListener("keydown", onKeyDown, true);
-		return () => window.removeEventListener("keydown", onKeyDown, true);
-	}, [
-		gameMenu.isOpen,
-		itemDetail.isOpen,
-		returnToBoard,
-	]);
-
-	return <Inventory onClose={returnToBoard} />;
+	return <PlayableInventory onClose={onClose} />;
 };

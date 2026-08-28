@@ -9,7 +9,6 @@ import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -28,19 +27,17 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		source: {
+			uid: "source",
 			id: "source",
 			title: "Source",
 			description: "Reusable source.",
 			asset: {
-				source: [
+				default: [
 					"asset:source",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 1,
 			type: "simple",
@@ -56,16 +53,15 @@ const config = GameConfigSchema.parse({
 			],
 		},
 		target: {
+			uid: "target",
 			id: "target",
 			title: "Target",
 			description: "Remote explicit target.",
 			asset: {
-				source: [
+				default: [
 					"asset:target",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "board",
 			maxStackSize: 1,
 			type: "simple",
@@ -107,6 +103,7 @@ const state = {
 			quantity: 1,
 		},
 	],
+	jobQueue: [],
 	jobs: [],
 } satisfies StateSchema.Type;
 

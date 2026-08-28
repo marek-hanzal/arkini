@@ -12,7 +12,6 @@ import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -31,50 +30,46 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		any: {
+			uid: "any",
 			id: "any",
 			title: "Any item",
 			description: "May occupy any grid.",
 			asset: {
-				source: [
+				default: [
 					"asset:any",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 			type: "simple",
 		},
 		limited: {
+			uid: "limited",
 			id: "limited",
 			title: "Limited item",
 			description: "Has count and stack limits.",
 			asset: {
-				source: [
+				default: [
 					"asset:limited",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxCount: 3,
 			maxStackSize: 2,
 			type: "simple",
 		},
 		board: {
+			uid: "board",
 			id: "board",
 			title: "Board item",
 			description: "May occupy only the board.",
 			asset: {
-				source: [
+				default: [
 					"asset:board",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "board",
 			maxStackSize: 1,
 			type: "simple",
@@ -155,6 +150,9 @@ describe("checkRuntimeFx", () => {
 				},
 			],
 			jobs: [],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 		const result = Effect.runSync(
 			checkRuntimeFx({
@@ -219,6 +217,9 @@ describe("checkRuntimeFx", () => {
 				},
 			],
 			jobs: [],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 		const result = Effect.runSync(
 			checkRuntimeFx({
@@ -333,6 +334,9 @@ describe("checkRuntimeFx", () => {
 				},
 			],
 			jobs: [],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		});
 		const result = Effect.runSync(
 			Effect.result(

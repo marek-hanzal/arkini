@@ -1,0 +1,171 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "c2vjo4aibomc8j0mwkq9hfdo",
+		"id": "item:blueprint-townhall-t2",
+		"title": "Town Hall II Blueprint",
+		"description": "Build plan that can be filled with resources to construct Town Hall II.",
+		"asset": {
+			"default": [
+				"blueprint",
+				"producer-townhall-t2"
+			],
+			"sources": [
+				"producer-townhall-t2"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 1
+		},
+		"type": "blueprint",
+		"line": {
+			"id": "line:blueprint:townhall-t2:construct",
+			"title": "Construct Town Hall II",
+			"description": "Consumes construction resources to build Town Hall II.",
+			"default": true,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 30000,
+			"input": [
+				{
+					"charges": {
+						"cost": 1,
+						"from": "self"
+					},
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "producer:townhall-t1"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:plank"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:stone-block"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:water"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "producer:townhall-t2",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": [
+				{
+					"when": [
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:lumberjack-t1"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						},
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:quarry-t1"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						},
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:sawmill-t1"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						},
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:stonemason-t1"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						},
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:well-t1"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						}
+					],
+					"type": "enable"
+				}
+			]
+		}
+	}
+}

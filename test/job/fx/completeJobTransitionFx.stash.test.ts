@@ -14,8 +14,8 @@ import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 import { completeJobRuntimeForTestFx } from "~test/job/support/completeJobRuntimeForTestFx";
 
 const value = (value: number) => ({
-	type: "value" as const,
-	value,
+	min: value,
+	max: value,
 });
 
 const output = (
@@ -57,17 +57,16 @@ const output = (
 });
 
 const simpleItem = (id: string, scope: "any" | "board" = "any") => ({
+	uid: id,
 	id,
 	type: "simple" as const,
 	title: id,
 	description: id,
 	asset: {
-		source: [
+		default: [
 			`asset:${id}`,
 		],
 	},
-	tags: [],
-	categoryId: "test",
 	scope,
 	maxStackSize: 1,
 });
@@ -81,6 +80,7 @@ const stashItem = ({
 	lineId: string;
 	lineOutput: ReturnType<typeof output>;
 }) => ({
+	uid: id,
 	id,
 	type: "stash" as const,
 	charges: {
@@ -89,12 +89,10 @@ const stashItem = ({
 	title: id,
 	description: id,
 	asset: {
-		source: [
+		default: [
 			`asset:${id}`,
 		],
 	},
-	tags: [],
-	categoryId: "test",
 	scope: "board" as const,
 	maxStackSize: 1,
 	line: {
@@ -122,7 +120,6 @@ const stashItem = ({
 });
 
 const stashConfig = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -141,7 +138,6 @@ const stashConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		"stash:guaranteed": stashItem({
 			id: "stash:guaranteed",

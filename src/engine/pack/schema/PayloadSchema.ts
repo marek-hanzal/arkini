@@ -2,9 +2,13 @@ import { z } from "zod";
 
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { ResourceSchema } from "./ResourceSchema";
+import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
+import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 
 export const PayloadSchema = z
 	.object({
+		version: ArkpackVersionSchema.describe("The gameplay compatibility version."),
+		arkini: ArkiniVersionSchema.describe("The Arkini version that built this package."),
 		config: GameConfigSchema.describe("The decoded completed game configuration."),
 		resources: z.array(ResourceSchema).describe("The decoded binary resources."),
 	})

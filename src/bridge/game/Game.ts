@@ -1,18 +1,11 @@
 import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
-import type { GameSession } from "~/bridge/game/GameSession";
+import type { PlayableGame } from "~/bridge/game/PlayableGame";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
-import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 /** One loaded game instance exclusively owned by its package route resource. */
-export interface Game extends GameSession {
-	/** Correlates renderer command diagnostics with this exact loaded session. */
-	readonly diagnosticSessionId?: string;
+export interface Game extends PlayableGame {
 	/** Exact package identity and launcher metadata for this live game. */
 	readonly arkpack: ArkpackDescriptor;
-	/** Exact filesystem save identity owned by this live game. */
+	/** Stable filesystem save identity owned by this live game. */
 	readonly saveKey: GameSaveStorage.Key;
-	/** Immutable completed configuration used by this loaded game. */
-	readonly config: GameConfigSchema.Type;
-	/** Resolves one validated embedded resource to its renderer object URL. */
-	readonly getResourceUrl: (resourceId: string) => string;
 }

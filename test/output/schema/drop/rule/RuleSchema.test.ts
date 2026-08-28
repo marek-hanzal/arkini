@@ -43,4 +43,21 @@ describe("drop RuleSchema", () => {
 			).toBe(false);
 		}
 	});
+
+	it("accepts an optional trimmed player hint and rejects blank hints", () => {
+		expect(
+			RuleSchema.parse({
+				type: "disable",
+				hint: "  Blocked while the warehouse is full.  ",
+				when,
+			}).hint,
+		).toBe("Blocked while the warehouse is full.");
+		expect(
+			RuleSchema.safeParse({
+				type: "disable",
+				hint: "   ",
+				when,
+			}).success,
+		).toBe(false);
+	});
 });

@@ -2,10 +2,14 @@ import { gzipSync } from "node:zlib";
 import { Effect } from "effect";
 
 import { encodeFx } from "~/engine/pack/fx/encodeFx";
+import { encodeArkpackEnvelopeFx } from "~/engine/pack/fx/encodeArkpackEnvelopeFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import type { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
+import { createTestPngBytes } from "~test/bridge/arkpack/support/createTestPngBytes";
+import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 
 export const testArkpackConfig = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -32,52 +36,59 @@ export const testArkpackConfig = GameConfigSchema.parse({
 			},
 		],
 	},
-	categories: {
-		resource: {
-			id: "resource",
-			title: "Resources",
-		},
-	},
 	items: {
 		water: {
+			uid: "water",
 			id: "water",
 			type: "simple",
 			title: "Water",
 			description: "Water",
 			asset: {
-				source: [
+				default: [
 					"asset:water",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 		},
 	},
 });
 
-export const createTestArkpack = (config = testArkpackConfig) => {
+export const createTestArkpack = (
+	config = testArkpackConfig,
+	packageId = config.meta.id,
+	version: ArkpackVersionSchema.Type = "1.0",
+	arkini: ArkiniVersionSchema.Type = ArkiniAppVersion,
+) => {
+	const identifiedConfig = {
+		...config,
+		meta: {
+			...config.meta,
+			id: packageId,
+		},
+	};
 	const encoded = Effect.runSync(
 		encodeFx({
-			config,
+			version,
+			arkini,
+			config: identifiedConfig,
 			resources: [
 				{
 					id: "hero",
 					mime: "image/png",
-					bytes: new Uint8Array([
-						1,
-					]),
+					bytes: createTestPngBytes(),
 				},
 				{
 					id: "asset:water",
 					mime: "image/png",
-					bytes: new Uint8Array([
-						2,
-					]),
+					bytes: createTestPngBytes(),
 				},
 			],
 		}),
 	);
-	return new Uint8Array(gzipSync(encoded));
+	return Effect.runSync(
+		encodeArkpackEnvelopeFx({
+			payload: new Uint8Array(gzipSync(encoded)),
+		}),
+	);
 };

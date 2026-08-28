@@ -3,15 +3,10 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { commitMergeItemsFx } from "~/engine/merge/internal/commitMergeItemsFx";
-import {
-	makeDropRejectedResult,
-	makeBlockedDropRejectedResult,
-	makeStaleDropRejectedResult,
-} from "~/engine/runtime/drop/makeDropRejectedResult";
-import {
-	projectDropActorCurrent,
-	projectDropTransferActor,
-} from "~/engine/runtime/drop/projectDropTransferActor";
+import { makeDropActorRejectedResultFx } from "~/engine/runtime/drop/makeDropActorRejectedResultFx";
+import { makeDropRejectedResultFx } from "~/engine/runtime/drop/makeDropRejectedResultFx";
+import { projectDropActorCurrentFx } from "~/engine/runtime/drop/projectDropActorCurrentFx";
+import { projectDropTransferActorFx } from "~/engine/runtime/drop/projectDropTransferActorFx";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
@@ -35,86 +30,80 @@ export const commitMergeDropFx = Effect.fn("commitMergeDropFx")(function* ({
 	targetRevision,
 }: commitMergeDropFx.Props) {
 	const rejectBlockedFx = () =>
-		Effect.succeed(
-			makeBlockedDropRejectedResult({
-				sourceItemId,
-				targetItemId,
-			}),
-		);
+		makeDropRejectedResultFx({
+			reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
+			sourceItemId,
+			targetItemId,
+		});
 	return yield* commitMergeItemsFx({
 		sourceItemId,
 		sourceRevision,
 		targetItemId,
 		targetRevision,
 	}).pipe(
-		Effect.map(
-			(result): commitMergeDropFx.Result => ({
-				kind: DropItemResultKindEnumSchema.enum.Merge,
-				action: result.event.action,
-				effect: result.event.effect,
-				resultCanonicalItemId: result.event.resultCanonicalItemId,
-				source: {
-					itemId: result.sourceBefore.id,
-					previousRevision: result.sourceBefore.revision,
-					previousLocation: result.sourceBefore.location,
-					previousQuantity: result.sourceBefore.quantity,
-					current: projectDropActorCurrent(result.sourceAfter),
-				},
-				target: projectDropTransferActor({
+		Effect.flatMap((result) =>
+			Effect.gen(function* () {
+				const sourceCurrent = yield* projectDropActorCurrentFx(result.sourceAfter);
+				const target = yield* projectDropTransferActorFx({
 					after: result.targetAfter,
 					before: result.targetBefore,
-				}),
+				});
+
+				return {
+					kind: DropItemResultKindEnumSchema.enum.Merge,
+					action: result.event.action,
+					effect: result.event.effect,
+					resultCanonicalItemId: result.event.resultCanonicalItemId,
+					source: {
+						itemId: result.sourceBefore.id,
+						previousRevision: result.sourceBefore.revision,
+						previousLocation: result.sourceBefore.location,
+						previousQuantity: result.sourceBefore.quantity,
+						current: sourceCurrent,
+					},
+					target,
+				} satisfies commitMergeDropFx.Result;
 			}),
 		),
 		Effect.catchTags({
 			ItemNotFoundError: (error) =>
-				Effect.succeed(
-					makeStaleDropRejectedResult({
-						entityId: error.itemId,
-						sourceItemId,
-						targetItemId,
-					}),
-				),
+				makeDropActorRejectedResultFx({
+					failedItemId: error.itemId,
+					failure: "stale",
+					sourceItemId,
+					targetItemId,
+				}),
 			RevisionConflictError: (error) =>
-				Effect.succeed(
-					makeStaleDropRejectedResult({
-						entityId: error.entityId,
-						sourceItemId,
-						targetItemId,
-					}),
-				),
+				makeDropActorRejectedResultFx({
+					failedItemId: error.entityId,
+					failure: "stale",
+					sourceItemId,
+					targetItemId,
+				}),
 			ItemNotOnGridError: () =>
-				Effect.succeed(
-					makeDropRejectedResult({
-						reason: DropItemRejectedReasonEnumSchema.enum.InvalidSource,
-						sourceItemId,
-						targetItemId,
-					}),
-				),
+				makeDropRejectedResultFx({
+					reason: DropItemRejectedReasonEnumSchema.enum.InvalidSource,
+					sourceItemId,
+					targetItemId,
+				}),
 			ItemNotOnBoardError: () =>
-				Effect.succeed(
-					makeDropRejectedResult({
-						reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
-						sourceItemId,
-						targetItemId,
-					}),
-				),
+				makeDropRejectedResultFx({
+					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+					sourceItemId,
+					targetItemId,
+				}),
 			CrossSpaceBoardOperationError: () =>
-				Effect.succeed(
-					makeDropRejectedResult({
-						reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
-						sourceItemId,
-						targetItemId,
-					}),
-				),
+				makeDropRejectedResultFx({
+					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+					sourceItemId,
+					targetItemId,
+				}),
 			MergeRuleNotFoundError: () =>
-				Effect.succeed(
-					makeDropRejectedResult({
-						reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
-						sourceItemId,
-						targetItemId,
-					}),
-				),
+				makeDropRejectedResultFx({
+					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+					sourceItemId,
+					targetItemId,
+				}),
 		}),
 		Effect.catchTags({
 			ItemStatefulError: rejectBlockedFx,

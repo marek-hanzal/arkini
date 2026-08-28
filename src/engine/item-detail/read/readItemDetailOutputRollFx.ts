@@ -2,15 +2,22 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { ItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines";
-import { readItemDetailOutputItemsFx } from "~/engine/item-detail/read/readItemDetailOutputItemsFx";
+import {
+	type ItemDetailOutputRuleContext,
+	readItemDetailOutputItemsFx,
+} from "~/engine/item-detail/read/readItemDetailOutputItemsFx";
 import { readItemDetailQuantityBoundsFx } from "~/engine/item-detail/read/readItemDetailQuantityBoundsFx";
 import { RollEnumSchema } from "~/engine/roll/schema/RollEnumSchema";
 import type { RollSchema } from "~/engine/roll/schema/RollSchema";
 
 /** Projects one exact authored output roll without flattening its probability semantics. */
-export const readItemDetailOutputRollFx = Effect.fn("readItemDetailOutputRollFx")(function* (
-	roll: RollSchema.Type,
-) {
+export const readItemDetailOutputRollFx = Effect.fn("readItemDetailOutputRollFx")(function* ({
+	roll,
+	ruleContext,
+}: {
+	readonly roll: RollSchema.Type;
+	readonly ruleContext?: ItemDetailOutputRuleContext;
+}) {
 	return yield* match(roll)
 		.with(
 			{
@@ -20,7 +27,10 @@ export const readItemDetailOutputRollFx = Effect.fn("readItemDetailOutputRollFx"
 				Effect.gen(function* () {
 					return {
 						kind: "guaranteed",
-						item: yield* readItemDetailOutputItemsFx(drop),
+						item: yield* readItemDetailOutputItemsFx({
+							drops: drop,
+							ruleContext,
+						}),
 					} satisfies ItemDetailLines.OutputRoll;
 				}),
 		)
@@ -33,7 +43,10 @@ export const readItemDetailOutputRollFx = Effect.fn("readItemDetailOutputRollFx"
 					return {
 						kind: "chance",
 						chance,
-						item: yield* readItemDetailOutputItemsFx(drop),
+						item: yield* readItemDetailOutputItemsFx({
+							drops: drop,
+							ruleContext,
+						}),
 					} satisfies ItemDetailLines.OutputRoll;
 				}),
 		)
@@ -50,7 +63,10 @@ export const readItemDetailOutputRollFx = Effect.fn("readItemDetailOutputRollFx"
 					for (const candidate of drop) {
 						option.push({
 							weight: candidate.weight,
-							item: yield* readItemDetailOutputItemsFx(candidate.drop),
+							item: yield* readItemDetailOutputItemsFx({
+								drops: candidate.drop,
+								ruleContext,
+							}),
 						});
 					}
 					return {

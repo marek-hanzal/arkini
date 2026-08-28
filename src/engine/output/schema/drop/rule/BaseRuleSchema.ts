@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { NonEmptyStringSchema } from "~/engine/common/schema/NonEmptyStringSchema";
 import { WhenSchema } from "~/engine/when/schema/WhenSchema";
 
 /**
@@ -9,6 +10,13 @@ import { WhenSchema } from "~/engine/when/schema/WhenSchema";
  */
 export const BaseRuleSchema = z
 	.object({
+		/**
+		 * Optional player-facing explanation shown while this rule applies.
+		 * Omitted hints keep the rule as background gameplay behavior.
+		 */
+		hint: NonEmptyStringSchema.optional().describe(
+			"Player-facing explanation shown while this selected-drop rule applies.",
+		),
 		/**
 		 * Conditions that must all pass for this rule to apply.
 		 */

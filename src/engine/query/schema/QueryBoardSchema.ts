@@ -20,12 +20,11 @@ export const QueryBoardSchema = z
 		/**
 		 * Chebyshev distance rule from the query origin to a matching item.
 		 *
-		 * `close` matches exactly distance one, `near` exactly distance two, and
-		 * `far` every positive distance. All variants exclude the origin itself at
-		 * distance zero.
+		 * `self` matches the origin, `close` exactly distance one, `near` exactly
+		 * distance two, and `far` every positive distance.
 		 */
 		distance: DistanceEnumSchema.describe(
-			"The exact close or near Chebyshev distance, or any positive far distance from the query origin.",
+			"The origin itself, an exact close or near Chebyshev distance, or any positive far distance.",
 		),
 	})
 	.strict()

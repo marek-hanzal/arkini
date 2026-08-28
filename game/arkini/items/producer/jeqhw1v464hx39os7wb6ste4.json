@@ -1,0 +1,112 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "jeqhw1v464hx39os7wb6ste4",
+		"id": "producer:sheep-pasture-t1",
+		"title": "Sheep Pasture I",
+		"description": "Consumes grain and water to produce wool.",
+		"asset": {
+			"default": [
+				"producer-sheep-pasture-t1"
+			]
+		},
+		"scope": "any",
+		"maxCount": 1,
+		"maxStackSize": 1,
+		"maxQueueSize": 1,
+		"type": "producer",
+		"lines": [
+			{
+				"id": "line:sheep-pasture-t1:wool",
+				"title": "Wool",
+				"description": "Runs wool for Sheep Pasture I.",
+				"default": false,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 28000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:grain"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 4
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:water"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						},
+						"capacity": 4
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:wool",
+											"quantity": {
+												"min": 2,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.2,
+									"drop": [
+										{
+											"itemId": "item:bio-waste",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.1,
+									"drop": [
+										{
+											"itemId": "item:trash",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

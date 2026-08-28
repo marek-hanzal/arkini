@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import type { PayloadSchema } from "~/engine/pack/schema/PayloadSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 
 export namespace makeAboutPortraitPayloadFx {
 	export interface Props {
@@ -24,8 +25,9 @@ export const makeAboutPortraitPayloadFx = Effect.fn("makeAboutPortraitPayloadFx"
 	({ roles }: makeAboutPortraitPayloadFx.Props) =>
 		Effect.sync(
 			(): PayloadSchema.Type => ({
+				version: "1.0",
+				arkini: ArkiniAppVersion,
 				config: GameConfigSchema.parse({
-					version: "1.0",
 					resources: {
 						hero: "hero",
 						...roles,
@@ -45,7 +47,6 @@ export const makeAboutPortraitPayloadFx = Effect.fn("makeAboutPortraitPayloadFx"
 					start: {
 						currentSpace: 0,
 					},
-					categories: {},
 					items: {},
 				}),
 				resources: [

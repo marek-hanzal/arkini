@@ -10,16 +10,15 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 
 const baseItem = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number }) => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,
 	asset: {
-		source: [
+		default: [
 			`asset:${id}`,
 		],
 	},
-	tags: [],
-	categoryId: "test",
 	scope: "any" as const,
 	maxStackSize,
 });
@@ -31,15 +30,14 @@ const materialInput = (itemId: string) => ({
 		itemId,
 	},
 	quantity: {
-		type: "value" as const,
-		value: 1,
+		min: 1,
+		max: 1,
 	},
 	capacity: 1,
 	mode: "reserve" as const,
 });
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -58,7 +56,6 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		outer: {
 			...baseItem({
@@ -79,8 +76,8 @@ const config = GameConfigSchema.parse({
 							...materialInput("material"),
 							capacity: 3,
 							quantity: {
-								type: "value",
-								value: 3,
+								min: 3,
+								max: 3,
 							},
 						},
 					],
@@ -223,6 +220,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 					ownerItemId: "runtime:worker",
 				}),
 			],
+			jobQueue: [],
 			jobs: [],
 		} satisfies StateSchema.Type;
 		const result = Effect.runSync(runRemoveFx(state));
@@ -310,6 +308,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 					quantity: 2,
 				},
 			],
+			jobQueue: [],
 			jobs: [],
 		} satisfies StateSchema.Type;
 		const result = Effect.runSync(runRemoveFx(state));
@@ -386,6 +385,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 					quantity: 1,
 				},
 			],
+			jobQueue: [],
 			jobs: [],
 		} satisfies StateSchema.Type;
 		const result = Effect.runSync(runRemoveFx(state));
@@ -462,6 +462,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 					quantity: 1,
 				},
 			],
+			jobQueue: [],
 			jobs: [],
 		} satisfies StateSchema.Type;
 		const result = Effect.runSync(runRemoveFx(state));

@@ -98,21 +98,18 @@ describe("Cheats", () => {
 			arkpack: {
 				packageId: "package:cheats",
 				contentHash: "content:cheats",
-				gameId: "game:cheats",
 				title: "Cheats game",
-				configVersion: "1.0",
-				compressedSize: 0,
-				trust: {
-					type: "external",
-					reason: "unsigned",
+				version: "1.0",
+				arkini: "1.0",
+				provenance: {
+					type: "community",
 				} as const,
-				source: "imported",
+				source: "user",
 			},
 			config,
 			getResourceUrl: () => "blob:test",
 			saveKey: {
 				packageId: "package:cheats",
-				contentHash: "c".repeat(64),
 			},
 		};
 		sessions.push(game);
@@ -178,21 +175,18 @@ describe("Cheats", () => {
 			arkpack: {
 				packageId: "package:cheats-race",
 				contentHash: "content:cheats-race",
-				gameId: "game:cheats-race",
 				title: "Cheats race game",
-				configVersion: "1.0",
-				compressedSize: 0,
-				trust: {
-					type: "external",
-					reason: "unsigned",
+				version: "1.0",
+				arkini: "1.0",
+				provenance: {
+					type: "community",
 				} as const,
-				source: "imported",
+				source: "user",
 			},
 			config,
 			getResourceUrl: () => "blob:test",
 			saveKey: {
 				packageId: "package:cheats-race",
-				contentHash: "d".repeat(64),
 			},
 		};
 		sessions.push(game);

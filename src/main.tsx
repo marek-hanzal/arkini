@@ -12,6 +12,8 @@ import { configureRendererLifecycleFx } from "~/bridge/lifecycle/configureRender
 import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLifecycleFx";
 import { RendererAtomRegistry } from "~/bridge/reactivity/RendererAtomRegistry";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { refreshEditorServiceStatusFx } from "~/bridge/editor/refreshEditorServiceStatusFx";
+import { installEditorMcpVersionCheckoutFx } from "~/bridge/editor/version/installEditorMcpVersionCheckoutFx";
 import { installRendererControlledCloseFx } from "~/installRendererControlledCloseFx";
 import { installRendererNativeDragGuardFx } from "~/installRendererNativeDragGuardFx";
 import { installWindowModeSyncFx } from "~/bridge/window/installWindowModeSyncFx";
@@ -35,6 +37,7 @@ document.title = ArkiniWindowTitle;
  */
 const catalog = RendererRuntime.runSync(createArkpackCatalogFx());
 RendererRuntime.runSync(configureArkpackCatalogFx(catalog));
+void RendererRuntime.runPromise(refreshEditorServiceStatusFx);
 RendererRuntime.runSync(
 	installRendererNativeDragGuardFx({
 		root: rootElement,
@@ -53,7 +56,13 @@ const router = RendererRuntime.runSync(
 		rendererRuntime: RendererRuntime,
 	}),
 );
-
+RendererRuntime.runSync(
+	installEditorMcpVersionCheckoutFx({
+		editorMcp: window.arkini.editorMcp,
+		rendererRuntime: RendererRuntime,
+		router,
+	}),
+);
 // Install the native handshake once at the process boundary, outside React ownership.
 RendererRuntime.runSync(
 	installRendererControlledCloseFx({

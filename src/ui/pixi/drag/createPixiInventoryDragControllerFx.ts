@@ -7,25 +7,25 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
+import { isSameTileActorLocationFx } from "~/bridge/tile/isSameTileActorLocationFx";
 import {
 	readTileDropPreviewFx,
 	type readTileDropPreviewFx as ReadTileDropPreviewFx,
 } from "~/bridge/tile/readTileDropPreviewFx";
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
+import { PointerDragThreshold } from "~/ui/drag/PointerDragThreshold";
 import type { PixiInventoryActorStore } from "~/ui/pixi/actor/PixiInventoryActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { animatePixiActorToRetargetablePoseFx } from "~/ui/pixi/animation/animatePixiActorToRetargetablePoseFx";
 import { flashPixiTileActorConsumedSourceFx } from "~/ui/pixi/animation/flashPixiTileActorConsumedSourceFx";
-import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
+import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/burstPixiTileActorFeedbackParticlesFx";
 import type { PixiInventoryDragController } from "~/ui/pixi/drag/PixiInventoryDragController";
-import { readPixiDragPointerOffset } from "~/ui/pixi/drag/readPixiDragPointerOffset";
+import { makePixiDragPointerOffsetReaderFx } from "~/ui/pixi/drag/makePixiDragPointerOffsetReaderFx";
 import { setPixiDraggedActorPoseFx } from "~/ui/pixi/drag/setPixiDraggedActorPoseFx";
-import {
-	restorePixiInventoryActorRemovalFeedbackFx,
-	startPixiInventoryActorRemovalFeedbackFx,
-} from "~/ui/pixi/drag/startPixiInventoryActorRemovalFeedbackFx";
+import { restorePixiTileActorExitFx } from "~/ui/pixi/animation/restorePixiTileActorExitFx";
+import { startPixiTileActorExitFx } from "~/ui/pixi/animation/startPixiTileActorExitFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiInventoryDropTarget } from "~/ui/pixi/scene/PixiInventoryDropTarget";
 import type { PixiInventorySceneSurface } from "~/ui/pixi/scene/PixiInventorySceneSurface";
@@ -60,7 +60,6 @@ interface ActiveInventoryDrag {
 	target: PixiInventoryDropTarget | null;
 }
 
-const dragThreshold = 6;
 const expectedActivationFailureTags = new Set([
 	"InventoryOpenerUnavailableError",
 	"ItemLocationConflictError",
@@ -96,6 +95,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 		surface,
 	}: createPixiInventoryDragControllerFx.Props) {
 		const removalFeedbackGenerationByActorId = new Map<string, number>();
+		const readPixiDragPointerOffset = yield* makePixiDragPointerOffsetReaderFx();
 		let activeDrag: ActiveInventoryDrag | null = null;
 		let closed = false;
 
@@ -194,12 +194,16 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 
 		const activateActor = (actor: PixiTileActor, openDetail: boolean) => {
 			const item = actor.item;
+			const presentsOptimisticRemoval =
+				!openDetail && item.primaryAction.kind !== "activate-space";
 			if (!openDetail && removalFeedbackGenerationByActorId.has(item.id)) return;
 			const removalFeedbackGeneration = openDetail
 				? null
 				: (removalFeedbackGenerationByActorId.get(item.id) ?? 0) + 1;
 			if (removalFeedbackGeneration !== null) {
 				removalFeedbackGenerationByActorId.set(item.id, removalFeedbackGeneration);
+			}
+			if (presentsOptimisticRemoval) {
 				actor.container.cursor = RendererRuntime.runSync(
 					readPixiTileActorCursorFx({
 						phase: "pending",
@@ -208,7 +212,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 					}),
 				);
 				RendererRuntime.runSync(
-					startPixiInventoryActorRemovalFeedbackFx({
+					startPixiTileActorExitFx({
 						actor,
 						animator,
 					}),
@@ -234,6 +238,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 						return;
 					}
 					removalFeedbackGenerationByActorId.delete(item.id);
+					if (!presentsOptimisticRemoval) return;
 					if (closed) return;
 					const current = RendererRuntime.runSync(actorStore.readActorFx(item.id));
 					if (current !== actor || actor.container.destroyed) return;
@@ -245,7 +250,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 						}),
 					);
 					RendererRuntime.runSync(
-						restorePixiInventoryActorRemovalFeedbackFx({
+						restorePixiTileActorExitFx({
 							actor,
 							animator,
 						}),
@@ -257,17 +262,32 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 			drag: ActiveInventoryDrag,
 			target: PixiInventoryDropTarget | null,
 			force = false,
-		) => {
-			if (!force && drag.target?.x === target?.x && drag.target?.y === target?.y) return;
+		): TileActorItem | null => {
+			const current = RendererRuntime.runSync(actorStore.readActorFx(drag.sourceItem.id));
+			if (
+				current === null ||
+				current !== drag.actor ||
+				current.container.destroyed ||
+				!RendererRuntime.runSync(
+					isSameTileActorLocationFx(current.item.location, drag.sourceItem.location),
+				)
+			) {
+				cancelInteraction();
+				return null;
+			}
+			const sourceItem = current.item;
+			if (!force && drag.target?.x === target?.x && drag.target?.y === target?.y) {
+				return sourceItem;
+			}
 			drag.target = target;
 			let kind: ReadTileDropPreviewFx.Result["kind"] | null = null;
 			try {
 				kind = RendererRuntime.runSync(
 					readTileDropPreviewFx({
 						game,
-						sourceItemId: drag.sourceItem.id,
-						sourceLocation: drag.sourceItem.location,
-						sourceRevision: drag.sourceItem.revision,
+						sourceItemId: sourceItem.id,
+						sourceLocation: sourceItem.location,
+						sourceRevision: sourceItem.revision,
 						target: readCommandTarget(target),
 					}),
 				).kind;
@@ -278,10 +298,11 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 				readPixiTileActorCursorFx({
 					phase: "dragging",
 					previewKind: kind,
-					running: drag.sourceItem.running,
+					running: sourceItem.running,
 				}),
 			);
 			RendererRuntime.runSync(surface.renderDropFeedbackFx(target, kind));
+			return sourceItem;
 		};
 
 		const settleActor = (actor: PixiTileActor) => {
@@ -321,7 +342,8 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 			const pointer = readPixiDragPointerOffset(event, activeDrag);
 			if (pointer === null) return;
 			const { drag, offsetX, offsetY } = pointer;
-			if (drag.phase === "pressed" && Math.hypot(offsetX, offsetY) < dragThreshold) return;
+			if (drag.phase === "pressed" && Math.hypot(offsetX, offsetY) < PointerDragThreshold)
+				return;
 			if (drag.phase === "pressed" && drag.openDetail) {
 				releasePointerCapture(drag.pointerId);
 				activeDrag = null;
@@ -368,20 +390,21 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 				surface.readDropTargetFx(event.global.x, event.global.y),
 			);
 			// The occupant may have changed while the pointer remained over this slot.
-			previewTarget(drag, target, true);
+			const sourceItem = previewTarget(drag, target, true);
+			if (sourceItem === null) return;
 			RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
 			drag.phase = "submitting";
 			drag.actor.container.cursor = RendererRuntime.runSync(
 				readPixiTileActorCursorFx({
 					phase: "pending",
 					previewKind: null,
-					running: drag.sourceItem.running,
+					running: sourceItem.running,
 				}),
 			);
 			const command = {
-				sourceItemId: drag.sourceItem.id,
-				sourceLocation: drag.sourceItem.location,
-				sourceRevision: drag.sourceItem.revision,
+				sourceItemId: sourceItem.id,
+				sourceLocation: sourceItem.location,
+				sourceRevision: sourceItem.revision,
 				target: readCommandTarget(target),
 			} satisfies runTileDropAtom.Command;
 			let submittedDrop: PromiseLike<runTileDropAtom.Result | null>;
@@ -398,7 +421,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 						const current = RendererRuntime.runSync(
 							actorStore.readActorFx(drag.sourceItem.id),
 						);
-						if (current !== null) {
+						if (current === drag.actor) {
 							current.dragging = false;
 							current.container.zIndex = 0;
 							current.container.cursor = RendererRuntime.runSync(
@@ -430,7 +453,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 					const current = RendererRuntime.runSync(
 						actorStore.readActorFx(drag.sourceItem.id),
 					);
-					if (current !== null) {
+					if (current === drag.actor) {
 						current.dragging = false;
 						settleActor(current);
 					}

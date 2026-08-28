@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { PixiTileActorVisual } from "~/ui/pixi/actor/PixiTileActorVisual";
-import { completePixiTileActorVisualTextureLoadFx } from "~/ui/pixi/actor/PixiTileActorVisualReadiness";
+import { completePixiTileActorVisualTextureLoadFx } from "~/ui/pixi/actor/completePixiTileActorVisualTextureLoadFx";
 import { createPixiMainSceneActorStoreFx } from "~/ui/pixi/actor/createPixiMainSceneActorStoreFx";
 import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 

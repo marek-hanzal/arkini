@@ -1,12 +1,10 @@
 import { z } from "zod";
 
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import { CategorySchema } from "~/engine/category/schema/CategorySchema";
 import { MetaSchema } from "~/engine/meta/schema/MetaSchema";
 import { StartSchema } from "~/engine/start/schema/StartSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ResourceConfigSchema } from "~/engine/resource/schema/ResourceConfigSchema";
-import { VersionEnumSchema } from "./VersionEnumSchema";
 
 /**
  * The root schema for a game's configuration.
@@ -40,16 +38,6 @@ export const GameConfigSchema = z
 			"The initial board, inventory, and toolbar contents created for a new game.",
 		),
 		/**
-		 * Canonical UI-facing categories keyed by their stable identifier.
-		 */
-		categories: z
-			.record(IdSchema, CategorySchema)
-			.describe("Canonical UI-facing categories keyed by a non-empty identifier."),
-		/**
-		 * Version of this game configuration's schema contract.
-		 */
-		version: VersionEnumSchema,
-		/**
 		 * Canonical game items keyed by their unique identifier.
 		 */
 		items: z
@@ -59,6 +47,8 @@ export const GameConfigSchema = z
 	.strict()
 	.meta({
 		id: "GameConfigSchema",
+		$id: "urn:arkini:schema:game-config",
+		title: "Arkini game configuration",
 		description: "The root configuration for a game.",
 	});
 

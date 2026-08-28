@@ -6,7 +6,6 @@ import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { TitleSchema } from "~/engine/common/schema/TitleSchema";
 import { MergeSchema } from "~/engine/merge/schema/MergeSchema";
-import { TagSchema } from "~/engine/tag/schema/TagSchema";
 import { AssetSchema } from "./AssetSchema";
 import { ChargeSchema } from "./ChargeSchema";
 
@@ -19,9 +18,16 @@ import { ChargeSchema } from "./ChargeSchema";
 export const BaseItemSchema = z
 	.object({
 		/**
-		 * Stable ID of this canonical game item.
+		 * Stable low-level identity of this canonical game item.
+		 *
+		 * The editor generates this CUID2 exactly once. Renaming the human-readable
+		 * `id` never changes this identity.
 		 */
-		id: IdSchema.describe("The stable ID of this canonical game item."),
+		uid: IdSchema.describe("The immutable CUID2 identity of this canonical game item."),
+		/**
+		 * Stable authoring ID of this canonical game item.
+		 */
+		id: IdSchema.describe("The stable authoring ID of this canonical game item."),
 		/**
 		 * Human-readable title of this item.
 		 */
@@ -36,20 +42,6 @@ export const BaseItemSchema = z
 		 * Visual asset definition used to render this item.
 		 */
 		asset: AssetSchema.describe("The visual asset definition used to render this item."),
-		/**
-		 * Semantic labels used to classify this item for content and future rules.
-		 */
-		tags: z
-			.array(TagSchema)
-			.describe(
-				"The semantic labels used to classify this item for content and future rules.",
-			),
-		/**
-		 * ID of the canonical UI-facing group shared with similar items.
-		 */
-		categoryId: IdSchema.describe(
-			"The ID of the canonical UI-facing group shared with similar items.",
-		),
 		/**
 		 * Part of game state in which this item may be stored.
 		 */

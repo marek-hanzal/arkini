@@ -27,6 +27,7 @@ const createConfig = (scope: "any" | "universe") => {
 			...base.items,
 			permit: {
 				...base.items.tool,
+				uid: "permit",
 				id: "permit",
 				title: "Permit",
 				description: "Dependency left behind in the original space.",
@@ -34,6 +35,7 @@ const createConfig = (scope: "any" | "universe") => {
 			},
 			ingot: {
 				...base.items.tool,
+				uid: "ingot",
 				id: "ingot",
 				title: "Ingot",
 				description: "Completion output.",
@@ -41,6 +43,7 @@ const createConfig = (scope: "any" | "universe") => {
 			},
 			blocker: {
 				...base.items.tool,
+				uid: "blocker",
 				id: "blocker",
 				title: "Blocker",
 				description: "Fills destination capacity.",
@@ -77,8 +80,8 @@ const createConfig = (scope: "any" | "universe") => {
 											{
 												itemId: "ingot",
 												quantity: {
-													type: "value",
-													value: 1,
+													min: 1,
+													max: 1,
 												},
 												placement: "drop",
 												rules: [],

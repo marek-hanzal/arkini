@@ -3,11 +3,11 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetailSourcesFx";
-import { isMaterialInputEligible } from "~/engine/input/read/readMaterialInputEligibilityFx";
-import { isLineInputAutofillSourceLocation } from "~/engine/input/read/isLineInputAutofillSourceLocation";
+import { isMaterialInputEligibleFx } from "~/engine/input/read/isMaterialInputEligibleFx";
+import { isLineInputAutofillSourceLocationFx } from "~/engine/input/read/isLineInputAutofillSourceLocationFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { matchesItemSelector } from "~/engine/selector/fx/selectItemsFx";
+import { matchesItemSelectorFx } from "~/engine/selector/fx/matchesItemSelectorFx";
 import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
 
 export namespace readItemDetailMaterialAutofillAvailabilityFx {
@@ -44,50 +44,55 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 		owner?.location.scope === LocationScopeEnumSchema.enum.Board
 			? owner.location.space
 			: runtime.currentSpace;
-	const availableQuantity = runtime.items.reduce((total, candidate) => {
+	const activeJobOwnerItemIds = new Set(runtime.jobs.map((job) => job.ownerItemId));
+	let availableQuantity = 0;
+	for (const candidate of runtime.items) {
 		if (
 			candidate.id === ownerItemId ||
-			!isMaterialInputEligible(candidate.item) ||
-			!matchesItemSelector({
+			activeJobOwnerItemIds.has(candidate.id) ||
+			!(yield* isMaterialInputEligibleFx(candidate.item)) ||
+			!(yield* matchesItemSelectorFx({
 				item: candidate.item,
 				selector,
-			})
+			}))
 		) {
-			return total;
+			continue;
 		}
 
 		if (candidate.location.scope === LocationScopeEnumSchema.enum.Delivery) {
 			if (
-				!isLineInputAutofillSourceLocation({
+				!(yield* isLineInputAutofillSourceLocationFx({
 					location: candidate.location.origin,
 					ownerSpace: space,
-				})
+				}))
 			) {
-				return total;
+				continue;
 			}
 			if (candidate.location.phase === "returning") {
-				return total + candidate.quantity;
+				availableQuantity += candidate.quantity;
+				continue;
 			}
 			const claimedQuantity = candidate.location.target.input.reduce(
 				(quantity, allocation) => quantity + allocation.quantity,
 				0,
 			);
-			return total + Math.max(0, candidate.quantity - claimedQuantity);
+			availableQuantity += Math.max(0, candidate.quantity - claimedQuantity);
+			continue;
 		}
 
 		if (
 			(candidate.location.scope !== LocationScopeEnumSchema.enum.Board &&
 				candidate.location.scope !== LocationScopeEnumSchema.enum.Inventory &&
 				candidate.location.scope !== LocationScopeEnumSchema.enum.Toolbar) ||
-			!isLineInputAutofillSourceLocation({
+			!(yield* isLineInputAutofillSourceLocationFx({
 				location: candidate.location,
 				ownerSpace: space,
-			})
+			}))
 		) {
-			return total;
+			continue;
 		}
-		return total + candidate.quantity;
-	}, 0);
+		availableQuantity += candidate.quantity;
+	}
 
 	if (availableQuantity > 0) {
 		return {
@@ -96,16 +101,18 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 	}
 
 	const config = yield* GameConfigFx;
-	const matchingDefinitionIds = Object.values(config.items)
-		.filter(
-			(item) =>
-				isMaterialInputEligible(item) &&
-				matchesItemSelector({
-					item,
-					selector,
-				}),
-		)
-		.map((item) => item.id);
+	const matchingDefinitionIds: IdSchema.Type[] = [];
+	for (const item of Object.values(config.items)) {
+		if (
+			(yield* isMaterialInputEligibleFx(item)) &&
+			(yield* matchesItemSelectorFx({
+				item,
+				selector,
+			}))
+		) {
+			matchingDefinitionIds.push(item.id);
+		}
+	}
 	const producerItemIds = new Set<IdSchema.Type>();
 	for (const itemId of matchingDefinitionIds) {
 		const sources = yield* readItemDetailSourcesFx({

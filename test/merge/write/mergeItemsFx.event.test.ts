@@ -2,22 +2,39 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
+import type { GameSession } from "~/bridge/game/GameSession";
 import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
 import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import {
 	createMergeTestConfig,
 	guaranteedMergeOutput,
 } from "~test/merge/support/createMergeTestConfig";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 
-const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {
-	const startedAt = performance.now();
-	while (!assertion()) {
-		if (performance.now() - startedAt > timeoutMs) {
-			throw new Error("Timed out while waiting for the merge event.");
-		}
-		await new Promise((resolve) => setTimeout(resolve, 5));
-	}
+const captureNextPublication = (session: GameSession) => {
+	let publish:
+		| ((publication: {
+				readonly batch: GameEventBatchSchema.Type;
+				readonly runtime: RuntimeSchema.Type;
+		  }) => void)
+		| undefined;
+	const published = new Promise<{
+		readonly batch: GameEventBatchSchema.Type;
+		readonly runtime: RuntimeSchema.Type;
+	}>((resolve) => {
+		publish = resolve;
+	});
+	const unsubscribe = session.subscribeEvents((batch) => {
+		publish?.({
+			batch,
+			runtime: session.getSnapshot(),
+		});
+	});
+	return {
+		published,
+		unsubscribe,
+	};
 };
 
 describe("mergeItemsFx events", () => {
@@ -73,10 +90,7 @@ describe("mergeItemsFx events", () => {
 			},
 			tickIntervalMs: 60_000,
 		});
-		const batches: GameEventBatchSchema.Type[] = [];
-		const unsubscribe = session.subscribeEvents((batch) => {
-			batches.push(batch);
-		});
+		const publication = captureNextPublication(session);
 
 		try {
 			const before = session.getSnapshot();
@@ -94,7 +108,7 @@ describe("mergeItemsFx events", () => {
 					targetRevision: target.revision,
 				}),
 			);
-			await waitFor(() => batches.length === 1);
+			const published = await publication.published;
 
 			expect(event).toEqual({
 				type: GameEventEnumSchema.enum.ItemMerged,
@@ -106,14 +120,14 @@ describe("mergeItemsFx events", () => {
 				effect: "replace",
 				resultCanonicalItemId: "result",
 			});
-			expect(batches[0]?.events).toEqual([
+			expect(published.batch.events).toEqual([
 				event,
 			]);
 			expect(
-				session.getSnapshot().items.find((item) => item.id === "runtime:target")?.item.id,
+				published.runtime.items.find((item) => item.id === "runtime:target")?.item.id,
 			).toBe("result");
 		} finally {
-			unsubscribe();
+			publication.unsubscribe();
 			await Effect.runPromise(session.disposeFx);
 		}
 	});
@@ -170,10 +184,7 @@ describe("mergeItemsFx events", () => {
 			},
 			tickIntervalMs: 60_000,
 		});
-		const batches: GameEventBatchSchema.Type[] = [];
-		const unsubscribe = session.subscribeEvents((batch) => {
-			batches.push(batch);
-		});
+		const publication = captureNextPublication(session);
 
 		try {
 			const before = session.getSnapshot();
@@ -191,15 +202,15 @@ describe("mergeItemsFx events", () => {
 					targetRevision: target.revision,
 				}),
 			);
-			await waitFor(() => batches.length === 1);
-			const targetRemainder = session
-				.getSnapshot()
-				.items.find((item) => item.item.id === "target");
+			const published = await publication.published;
+			const targetRemainder = published.runtime.items.find(
+				(item) => item.item.id === "target",
+			);
 			if (targetRemainder === undefined) {
 				throw new Error("Expected isolated target remainder.");
 			}
 
-			expect(batches[0]?.events).toEqual([
+			expect(published.batch.events).toEqual([
 				event,
 				{
 					type: GameEventEnumSchema.enum.ItemSplit,
@@ -219,7 +230,7 @@ describe("mergeItemsFx events", () => {
 				},
 			]);
 		} finally {
-			unsubscribe();
+			publication.unsubscribe();
 			await Effect.runPromise(session.disposeFx);
 		}
 	});
@@ -276,10 +287,7 @@ describe("mergeItemsFx events", () => {
 			},
 			tickIntervalMs: 60_000,
 		});
-		const batches: GameEventBatchSchema.Type[] = [];
-		const unsubscribe = session.subscribeEvents((batch) => {
-			batches.push(batch);
-		});
+		const publication = captureNextPublication(session);
 
 		try {
 			const before = session.getSnapshot();
@@ -297,11 +305,11 @@ describe("mergeItemsFx events", () => {
 					targetRevision: target.revision,
 				}),
 			);
-			await waitFor(() => batches.length === 1);
-			const output = session.getSnapshot().items.find((item) => item.item.id === "output");
+			const published = await publication.published;
+			const output = published.runtime.items.find((item) => item.item.id === "output");
 			if (output === undefined) throw new Error("Expected merge output.");
 
-			expect(batches[0]?.events).toEqual([
+			expect(published.batch.events).toEqual([
 				event,
 				{
 					type: GameEventEnumSchema.enum.ItemSpawned,
@@ -313,7 +321,7 @@ describe("mergeItemsFx events", () => {
 				},
 			]);
 		} finally {
-			unsubscribe();
+			publication.unsubscribe();
 			await Effect.runPromise(session.disposeFx);
 		}
 	});

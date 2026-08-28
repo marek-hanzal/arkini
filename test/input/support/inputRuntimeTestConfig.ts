@@ -10,23 +10,21 @@ const baseItem = ({
 	scope: "any" | "board" | "inventory";
 }) => {
 	return {
+		uid: id,
 		id,
 		title: id,
 		description: id,
 		asset: {
-			source: [
+			default: [
 				`asset:${id}`,
 			],
 		},
-		tags: [],
-		categoryId: "resource",
 		scope,
 		maxStackSize,
 	} as const;
 };
 
 export const inputRuntimeTestConfig = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -45,7 +43,6 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		workshop: {
 			...baseItem({
@@ -68,8 +65,8 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 								itemId: "water",
 							},
 							quantity: {
-								type: "value",
-								value: 3,
+								min: 3,
+								max: 3,
 							},
 							capacity: 2,
 						},

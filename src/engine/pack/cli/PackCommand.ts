@@ -2,51 +2,55 @@ import { Argument, Command } from "effect/unstable/cli";
 import { Console, Effect } from "effect";
 
 import { packDirectoryFx } from "~/engine/pack/fx/packDirectoryFx";
-import { renderGameDiagnosticsFx } from "~/engine/validation/fx/renderGameDiagnosticsFx";
+import { signArkpackFileFx } from "~/engine/pack/fx/signArkpackFileFx";
+import { printGameDiagnosticsForCliFx } from "~/engine/validation/printer/printGameDiagnosticsForCliFx";
+import { GameValidationError } from "~/engine/validation/error/GameValidationError";
 
 export namespace PackCommand {
 	export interface Props {
 		input: string;
 		name?: string;
-		metadata?: {
-			readonly output: string;
-			readonly packageId: string;
-		};
 	}
 }
 
 namespace runPackCommandFx {
 	export interface Props {
 		readonly input: string;
-		readonly metadata?: PackCommand.Props["metadata"];
 	}
 }
 
 const runPackCommandFx = Effect.fn("runPackCommandFx")(function* ({
 	input,
-	metadata,
 }: runPackCommandFx.Props) {
 	const result = yield* packDirectoryFx({
 		input,
-		metadata,
 	}).pipe(
-		Effect.catchTag("GameValidationError", (error) =>
-			renderGameDiagnosticsFx(error.diagnostics).pipe(Effect.andThen(Effect.fail(error))),
+		Effect.catch((error) =>
+			error instanceof GameValidationError
+				? printGameDiagnosticsForCliFx(error.diagnostics).pipe(
+						Effect.andThen(Effect.fail(error)),
+					)
+				: Effect.fail(error),
 		),
 	);
-	yield* renderGameDiagnosticsFx(result.diagnostics);
+	yield* printGameDiagnosticsForCliFx(result.diagnostics);
 
 	yield* Console.log(`Packed ${result.json} JSON sources and ${result.png} PNG assets.`);
-	yield* Console.log(`Wrote ${result.output} (${result.bytes} bytes).`);
-	if (result.metadataOutput !== undefined) {
-		yield* Console.log(`Wrote ${result.metadataOutput}.`);
+	yield* Console.log(`Wrote ${result.arkpack} (${result.bytes} bytes).`);
+	if (process.env.ARKINI_RELEASE_SIGN === "1") {
+		const signedBytes = yield* signArkpackFileFx({
+			arkpackPath: result.arkpack,
+		});
+		yield* Console.log(
+			`Embedded release proof in ${result.arkpack} (${signedBytes.byteLength} bytes).`,
+		);
 	}
 });
 
 /**
  * CLI command that packs one game source directory into an Arkini binary package.
  */
-export const PackCommand = ({ input, name = "pack", metadata }: PackCommand.Props) =>
+export const PackCommand = ({ input, name = "pack" }: PackCommand.Props) =>
 	Command.make(
 		name,
 		{
@@ -55,10 +59,9 @@ export const PackCommand = ({ input, name = "pack", metadata }: PackCommand.Prop
 		({ input }) =>
 			runPackCommandFx({
 				input,
-				metadata,
 			}),
 	).pipe(
 		Command.withDescription(
-			"Pack JSON game sources and PNG assets into a compressed `.arkpack` file.",
+			"Pack one current portable game project into a compressed `.arkpack` file.",
 		),
 	);

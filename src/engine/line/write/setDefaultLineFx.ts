@@ -42,7 +42,7 @@ export const setDefaultLineFx = Effect.fn("setDefaultLineFx")(function* ({
 					}),
 				);
 			}
-			if (runtime.defaultLineByOwnerItemId?.[ownerItemId] === lineId) {
+			if (runtime.defaultLineByOwnerItemId[ownerItemId] === lineId) {
 				return [
 					{
 						ownerItemId,
@@ -54,7 +54,7 @@ export const setDefaultLineFx = Effect.fn("setDefaultLineFx")(function* ({
 			const selectedRuntime = {
 				...runtime,
 				defaultLineByOwnerItemId: {
-					...(runtime.defaultLineByOwnerItemId ?? {}),
+					...runtime.defaultLineByOwnerItemId,
 					[ownerItemId]: lineId,
 				},
 			} satisfies RuntimeSchema.Type;

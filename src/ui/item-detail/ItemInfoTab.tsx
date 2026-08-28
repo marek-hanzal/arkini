@@ -1,55 +1,13 @@
 import { match } from "ts-pattern";
 
-import type { useItemDetailIdentity } from "~/bridge/item-detail/useItemDetailIdentity";
 import type { useItemDetailInfo } from "~/bridge/item-detail/useItemDetailInfo";
+import {
+	ItemInfoFact,
+	ItemInfoFacts,
+	ItemStorageScopeLabel,
+	ItemTypeLabel,
+} from "~/ui/item-detail/ItemInfoPresentation";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
-
-const itemTypeLabel = {
-	blueprint: "Blueprint",
-	craft: "Craft owner",
-	deposit: "Resource deposit",
-	inventory: "Inventory control",
-	producer: "Producer",
-	simple: "Simple item",
-	stash: "Stash",
-	temporary: "Temporary item",
-} as const satisfies Record<
-	Extract<
-		useItemDetailInfo.Projection,
-		{
-			readonly kind: "available";
-		}
-	>["itemType"],
-	string
->;
-
-const storageScopeLabel = {
-	any: "Board, Inventory & Toolbar",
-	board: "Board only",
-	inventory: "Inventory only",
-	toolbar: "Toolbar only",
-} as const satisfies Record<
-	Extract<
-		useItemDetailInfo.Projection,
-		{
-			readonly kind: "available";
-		}
-	>["storageScope"],
-	string
->;
-
-const InfoFact = ({ label, value }: { readonly label: string; readonly value: string }) => (
-	<div
-		className="grid min-w-0 gap-1 border-b border-line/70 py-3 last:border-b-0"
-		data-ui="TileInfoFact"
-		data-label={label}
-	>
-		<dt className="text-xs font-medium uppercase tracking-[0.08em] text-muted">{label}</dt>
-		<dd className="min-w-0 text-pretty text-sm font-medium leading-snug text-foreground">
-			{value}
-		</dd>
-	</div>
-);
 
 const LocationInfoFact = ({
 	location,
@@ -61,7 +19,8 @@ const LocationInfoFact = ({
 		}
 	>["location"];
 }) => (
-	<InfoFact
+	<ItemInfoFact
+		dataUi="TileInfoFact"
 		label="Location"
 		value={match(location)
 			.with(
@@ -110,32 +69,11 @@ const LocationInfoFact = ({
 	/>
 );
 
-const TagLabel = ({ tag }: { readonly tag: string }) => {
-	const era = /^era:(.+)$/u.exec(tag);
-	if (era?.[1] !== undefined) return <>Era {era[1]}</>;
-	return (
-		<>
-			{tag
-				.replaceAll(":", " ")
-				.replaceAll("-", " ")
-				.replaceAll("_", " ")
-				.replace(/\b\p{L}/gu, (letter) => letter.toUpperCase())}
-		</>
-	);
-};
-
 /** Renders the broad first-pass item facts shared by every canonical item definition. */
 export const ItemInfoTab = ({
-	identity,
 	info,
 	stale = false,
 }: {
-	readonly identity: Extract<
-		useItemDetailIdentity.Projection,
-		{
-			readonly kind: "available";
-		}
-	>;
 	readonly info: Extract<
 		useItemDetailInfo.Projection,
 		{
@@ -158,66 +96,50 @@ export const ItemInfoTab = ({
 		</section>
 
 		<section className="border-t border-line pt-2">
-			<dl className="grid min-w-0 grid-cols-2 gap-x-8 max-[48rem]:grid-cols-1">
-				<InfoFact
-					label="Category"
-					value={info.categoryTitle ?? identity.subtitle ?? "Uncategorized"}
-				/>
-				<InfoFact
+			<ItemInfoFacts>
+				<ItemInfoFact
+					dataUi="TileInfoFact"
 					label="Type"
-					value={itemTypeLabel[info.itemType]}
+					value={ItemTypeLabel[info.itemType]}
 				/>
 				{stale ? null : <LocationInfoFact location={info.location} />}
-				<InfoFact
+				<ItemInfoFact
+					dataUi="TileInfoFact"
 					label="Storage"
-					value={storageScopeLabel[info.storageScope]}
+					value={ItemStorageScopeLabel[info.storageScope]}
 				/>
 				{stale ? null : (
-					<InfoFact
+					<ItemInfoFact
+						dataUi="TileInfoFact"
 						label="Current stack"
 						value={`${info.quantity} ${info.quantity === 1 ? "item" : "items"}`}
 					/>
 				)}
-				<InfoFact
+				<ItemInfoFact
+					dataUi="TileInfoFact"
 					label="Stack capacity"
 					value={info.maxStackSize === 1 ? "Single item" : `${info.maxStackSize} items`}
 				/>
 				{stale ? null : (
-					<InfoFact
+					<ItemInfoFact
+						dataUi="TileInfoFact"
 						label="Owned"
 						value={`${info.ownedQuantity}${info.maxCount === undefined ? "" : ` / ${info.maxCount}`}`}
 					/>
 				)}
-				<InfoFact
+				<ItemInfoFact
+					dataUi="TileInfoFact"
 					label="Game limit"
 					value={info.maxCount === undefined ? "No configured limit" : `${info.maxCount}`}
 				/>
 				{stale || info.charges === undefined ? null : (
-					<InfoFact
+					<ItemInfoFact
+						dataUi="TileInfoFact"
 						label="Charges"
 						value={`${info.charges.remaining} / ${info.charges.total}`}
 					/>
 				)}
-			</dl>
+			</ItemInfoFacts>
 		</section>
-
-		{info.tags.length === 0 ? null : (
-			<section className="border-t border-line pt-5">
-				<h3 className="text-sm font-semibold">Traits</h3>
-				<div
-					className="mt-3 flex flex-wrap gap-2"
-					data-ui="TileInfoTraits"
-				>
-					{info.tags.map((tag) => (
-						<span
-							key={tag}
-							className="rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium text-muted"
-						>
-							<TagLabel tag={tag} />
-						</span>
-					))}
-				</div>
-			</section>
-		)}
 	</Scrollable>
 );

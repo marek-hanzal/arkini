@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "k2ektomsyls4a54fri8zyrg1",
+		"id": "item:master-knowledge",
+		"title": "Master Knowledge",
+		"description": "University-level scholarship used to authorize the most ambitious expeditions and future high-civic progression.",
+		"asset": {
+			"default": [
+				"item-master-knowledge"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 50,
+		"type": "simple"
+	}
+}

@@ -2,7 +2,6 @@ import { Effect } from "effect";
 import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
-import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { TileDelivery } from "~/bridge/tile/readTileDeliveriesFx";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
@@ -96,7 +95,7 @@ describe("PixiDeliveryMotionRuntime", () => {
 				instanceId: `actor:${deliveryItem.id}`,
 				item: deliveryItem,
 				lifecycleDurationMs: 0,
-				lifecycleFadeStarted: false,
+				lifecycleTransitionStarted: false,
 				lifecycleIntentGeneration: 0,
 				lifecycleNotBeforeMs: 0,
 				lifecycleTargetAlpha: 1,
@@ -130,7 +129,6 @@ describe("PixiDeliveryMotionRuntime", () => {
 			isChannelActiveFx: () => Effect.succeed(false),
 			setFx: () => Effect.void,
 		} satisfies PixiActorAnimator;
-		const run = vi.fn(() => Promise.resolve(undefined));
 		const runtime = Effect.runSync(
 			createPixiDeliveryMotionRuntimeFx({
 				actorStore: {
@@ -158,21 +156,21 @@ describe("PixiDeliveryMotionRuntime", () => {
 					attachActorFx: () => Effect.void,
 					detachActorFx: () => Effect.void,
 				} as unknown as PixiMainSceneDragController,
-				game: {
-					reportCriticalFailure: vi.fn(),
-					run,
-				} as unknown as GameEngine,
 				magneticField: {
 					closeFx: Effect.void,
+					flushFx: Effect.void,
 					pruneFx: Effect.void,
+					readActiveSourceActorIdsFx: Effect.succeed([]),
 					releaseFx: () => Effect.void,
 					releaseSourcesFx: () => Effect.void,
 					resetFx: Effect.void,
+					subscribeSourceMembershipFx: () => Effect.succeed(() => {}),
 					updateFx: () => Effect.void,
 				},
 				particleTextures: {} as never,
 				readPalette: () => ({}) as never,
 				surface: {
+					readLocalActorIdsFx: () => Effect.succeed([]),
 					readLocationPoseFx: (location: typeof origin) =>
 						Effect.succeed({
 							layer: new Container(),
@@ -189,6 +187,7 @@ describe("PixiDeliveryMotionRuntime", () => {
 			{
 				from: target,
 				generation: 1,
+				remainingDurationMs: 500,
 				item: firstItem,
 				phase: "returning",
 				to: origin,
@@ -196,6 +195,7 @@ describe("PixiDeliveryMotionRuntime", () => {
 			{
 				from: target,
 				generation: 1,
+				remainingDurationMs: 500,
 				item: secondItem,
 				phase: "returning",
 				to: origin,
@@ -208,7 +208,6 @@ describe("PixiDeliveryMotionRuntime", () => {
 		for (const travel of travels) {
 			travel.onComplete?.();
 		}
-		expect(run).toHaveBeenCalledTimes(2);
 
 		Effect.runSync(runtime.syncFx([]));
 		const fades = animations.filter(
@@ -229,7 +228,7 @@ describe("PixiDeliveryMotionRuntime", () => {
 		expect(Effect.runSync(runtime.readSnapshotFx).retainedActorIds).toEqual(new Set());
 	});
 
-	it("adopts one actor, turns from its live pose on override, and settles each generation once", () => {
+	it("adopts one actor and follows canonical generation changes without submitting gameplay", () => {
 		const container = new Container();
 		container.position.set(200, 0);
 		const actor = {
@@ -290,7 +289,6 @@ describe("PixiDeliveryMotionRuntime", () => {
 		} satisfies PixiActorAnimator;
 		const detachActorFx = vi.fn(() => Effect.void);
 		const attachActorFx = vi.fn(() => Effect.void);
-		const run = vi.fn(() => Promise.resolve(undefined));
 		const updateMagnetFx = vi.fn(() => Effect.void);
 		const releaseMagnetFx = vi.fn(() => Effect.void);
 		const runtime = Effect.runSync(
@@ -309,21 +307,21 @@ describe("PixiDeliveryMotionRuntime", () => {
 					attachActorFx,
 					detachActorFx,
 				} as unknown as PixiMainSceneDragController,
-				game: {
-					reportCriticalFailure: vi.fn(),
-					run,
-				} as unknown as GameEngine,
 				magneticField: {
 					closeFx: Effect.void,
+					flushFx: Effect.void,
 					pruneFx: Effect.void,
+					readActiveSourceActorIdsFx: Effect.succeed([]),
 					releaseFx: releaseMagnetFx,
 					releaseSourcesFx: () => Effect.void,
 					resetFx: Effect.void,
+					subscribeSourceMembershipFx: () => Effect.succeed(() => {}),
 					updateFx: updateMagnetFx,
 				},
 				particleTextures: {} as never,
 				readPalette: () => ({}) as never,
 				surface: {
+					readLocalActorIdsFx: () => Effect.succeed([]),
 					readLocationPoseFx: (location: typeof origin) =>
 						Effect.succeed(
 							geometryAvailable
@@ -346,6 +344,7 @@ describe("PixiDeliveryMotionRuntime", () => {
 				{
 					from: origin,
 					generation: 0,
+					remainingDurationMs: 500,
 					item,
 					phase: "outbound",
 					targetActorId: targetActor.item.id,
@@ -357,6 +356,7 @@ describe("PixiDeliveryMotionRuntime", () => {
 		expect(animations).toHaveLength(1);
 		expect(animations[0]).toMatchObject({
 			channel: "pose",
+			durationMs: 400,
 			ownerKey: "delivery:runtime:water:0",
 		});
 		if (animations[0]?.channel !== "pose") throw new Error("Expected outbound chase.");
@@ -380,6 +380,7 @@ describe("PixiDeliveryMotionRuntime", () => {
 				{
 					from: origin,
 					generation: 0,
+					remainingDurationMs: 500,
 					item,
 					phase: "outbound",
 					targetActorId: targetActor.item.id,
@@ -397,6 +398,7 @@ describe("PixiDeliveryMotionRuntime", () => {
 				{
 					from: origin,
 					generation: 0,
+					remainingDurationMs: 500,
 					item,
 					phase: "outbound",
 					targetActorId: targetActor.item.id,
@@ -412,7 +414,6 @@ describe("PixiDeliveryMotionRuntime", () => {
 			sourceActorId: item.id,
 			sourceKind: "motion",
 		});
-		expect(run).toHaveBeenCalledOnce();
 
 		container.position.set(90, 0);
 		Effect.runSync(
@@ -420,6 +421,7 @@ describe("PixiDeliveryMotionRuntime", () => {
 				{
 					from: target,
 					generation: 1,
+					remainingDurationMs: 500,
 					item: {
 						...item,
 						location: target,
@@ -446,6 +448,7 @@ describe("PixiDeliveryMotionRuntime", () => {
 				{
 					from: target,
 					generation: 1,
+					remainingDurationMs: 500,
 					item: {
 						...item,
 						location: target,
@@ -476,6 +479,7 @@ describe("PixiDeliveryMotionRuntime", () => {
 				{
 					from: target,
 					generation: 1,
+					remainingDurationMs: 500,
 					item: {
 						...item,
 						location: target,
@@ -504,7 +508,6 @@ describe("PixiDeliveryMotionRuntime", () => {
 		});
 		animations[4].onComplete?.();
 		animations[4].onComplete?.();
-		expect(run).toHaveBeenCalledTimes(2);
 		expect(Effect.runSync(runtime.readSnapshotFx).retainedActorIds).toEqual(
 			new Set([
 				"runtime:water",

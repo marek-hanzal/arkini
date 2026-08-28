@@ -20,12 +20,12 @@
 		},
 		"resolveJsonModule": true,
 		"types": [
-			"vite/client"
+			"vite/client",
+			"node"
 		]
 	},
 	"include": [
 		"electron/contract",
-		"cli",
 		"src/engine",
 		"src/bridge",
 		"src/ui",

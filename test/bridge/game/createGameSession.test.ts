@@ -1,46 +1,16 @@
-import { Deferred, Effect } from "effect";
-import * as Atom from "effect/unstable/reactivity/Atom";
 import { describe, expect, it } from "vitest";
+import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
-
-import type { Game } from "~/bridge/game/Game";
+import { Effect } from "effect";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
-import { startLineFx } from "~test/job/support/startLineTestFx";
-import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
+import type { Game } from "~/bridge/game/Game";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
-import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 import { createTickFailureTestConfig } from "~test/tick/support/createTickFailureTestConfig";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { startLineFx } from "~test/job/support/startLineTestFx";
 
-const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {
-	const startedAt = performance.now();
-	while (!assertion()) {
-		if (performance.now() - startedAt > timeoutMs) {
-			throw new Error("Timed out while waiting for the game session.");
-		}
-		await new Promise((resolve) => setTimeout(resolve, 5));
-	}
-};
+import { emitCompletedEventFx } from "./createGameSession.test/fixture";
 
-const emitCompletedEventFx = (jobId: string) =>
-	modifyRuntimeFx((runtime) =>
-		Effect.succeed([
-			undefined,
-			runtime,
-			[
-				{
-					type: GameEventEnumSchema.enum.JobCompleted,
-					jobId,
-					ownerItemId: "owner:listener",
-					lineId: "line:listener",
-				},
-			],
-		] as const),
-	);
-
-describe("createGameSessionFx", () => {
+describe("createGameSessionFx / fail-stop", () => {
 	it("freezes the exact session before publishing a presentation failure", async () => {
 		const config = createJobTestConfig();
 		const session = await createTestGameSession({
@@ -57,7 +27,6 @@ describe("createGameSessionFx", () => {
 				getResourceUrl: () => "blob:test",
 				saveKey: {
 					packageId: "fail-stop-test",
-					contentHash: "0".repeat(64),
 				},
 			} as unknown as Game),
 		);
@@ -92,7 +61,6 @@ describe("createGameSessionFx", () => {
 			await Effect.runPromise(session.disposeFx);
 		}
 	});
-
 	it("freezes the exact session before publishing a failed readOrThrow", async () => {
 		const config = createJobTestConfig();
 		const session = await createTestGameSession({
@@ -109,7 +77,6 @@ describe("createGameSessionFx", () => {
 				getResourceUrl: () => "blob:test",
 				saveKey: {
 					packageId: "failed-read-test",
-					contentHash: "0".repeat(64),
 				},
 			} as unknown as Game),
 		);
@@ -147,757 +114,29 @@ describe("createGameSessionFx", () => {
 			await Effect.runPromise(session.disposeFx);
 		}
 	});
-
-	it("exposes its authoritative committed transition source as truly read-only", async () => {
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-		});
-
-		try {
-			expect(Atom.isWritable(session.committedTransitionAtom)).toBe(false);
-		} finally {
-			await Effect.runPromise(session.disposeFx);
-		}
-	});
-
-	it("replays one exact current committed transition and then every later commit in order", async () => {
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-		});
-		const transitions: Array<{
-			readonly sequence: number;
-			readonly previousItems: number | null;
-			readonly currentItems: number;
-			readonly eventJobIds: ReadonlyArray<string>;
-		}> = [];
-		const unsubscribe = session.subscribeTransitions((transition) => {
-			transitions.push({
-				sequence: transition.sequence,
-				previousItems: transition.previousRuntime?.items.length ?? null,
-				currentItems: transition.runtime.items.length,
-				eventJobIds: transition.events.flatMap((event) =>
-					"jobId" in event
-						? [
-								event.jobId,
-							]
-						: [],
-				),
-			});
-		});
-
-		try {
-			await waitFor(() => transitions.length === 1);
-			expect(transitions).toEqual([
-				{
-					sequence: 0,
-					previousItems: null,
-					currentItems: 0,
-					eventJobIds: [],
-				},
-			]);
-
-			await session.run(
-				spawnItemFx({
-					id: "runtime:transition:ordered",
-					itemId: "water",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				}),
-			);
-			await session.run(emitCompletedEventFx("job:transition:ordered"));
-			await waitFor(() => transitions.length === 3);
-
-			expect(transitions).toEqual([
-				{
-					sequence: 0,
-					previousItems: null,
-					currentItems: 0,
-					eventJobIds: [],
-				},
-				{
-					sequence: 1,
-					previousItems: 0,
-					currentItems: 1,
-					eventJobIds: [],
-				},
-				{
-					sequence: 2,
-					previousItems: 1,
-					currentItems: 1,
-					eventJobIds: [
-						"job:transition:ordered",
-					],
-				},
-			]);
-			expect(session.getTransitionSnapshot().sequence).toBe(2);
-			expect(session.getTransitionSnapshot().runtime).toBe(session.getSnapshot());
-		} finally {
-			unsubscribe();
-			await Effect.runPromise(session.disposeFx);
-		}
-	});
-
-	it("does not replay the initial committed transition to React subscribers", async () => {
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-		});
-		const initial = session.getSnapshot();
-		let notifications = 0;
-		const unsubscribe = session.subscribe(() => {
-			notifications += 1;
-		});
-
-		try {
-			await new Promise((resolve) => setTimeout(resolve, 20));
-			expect(session.getSnapshot()).toBe(initial);
-			expect(notifications).toBe(0);
-		} finally {
-			unsubscribe();
-			await Effect.runPromise(session.disposeFx);
-		}
-	});
-
-	it("opens runtime subscriptions synchronously while a mutation is still planning", async () => {
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-		});
-		let markPlanningEntered: (() => void) | undefined;
-		let releasePlanning: (() => void) | undefined;
-		const planningEntered = new Promise<void>((resolve) => {
-			markPlanningEntered = resolve;
-		});
-		const planningGate = new Promise<void>((resolve) => {
-			releasePlanning = resolve;
-		});
-		let notifications = 0;
-
-		try {
-			const pending = session.run(
-				modifyRuntimeFx((runtime) =>
-					Effect.promise(async () => {
-						markPlanningEntered?.();
-						await planningGate;
-
-						return [
-							undefined,
-							{
-								...runtime,
-							},
-						] as const;
-					}),
-				),
-			);
-			await planningEntered;
-
-			const unsubscribe = session.subscribe(() => {
-				notifications += 1;
-			});
-
-			try {
-				releasePlanning?.();
-				await pending;
-				await waitFor(() => notifications === 1);
-			} finally {
-				unsubscribe();
-			}
-		} finally {
-			releasePlanning?.();
-			await Effect.runPromise(session.disposeFx);
-		}
-	});
-
-	it("opens event subscriptions synchronously while a mutation is still planning", async () => {
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-		});
-		let markPlanningEntered: (() => void) | undefined;
-		let releasePlanning: (() => void) | undefined;
-		const planningEntered = new Promise<void>((resolve) => {
-			markPlanningEntered = resolve;
-		});
-		const planningGate = new Promise<void>((resolve) => {
-			releasePlanning = resolve;
-		});
-		const jobIds: string[] = [];
-
-		try {
-			const pending = session.run(
-				modifyRuntimeFx((runtime) =>
-					Effect.promise(async () => {
-						markPlanningEntered?.();
-						await planningGate;
-
-						return [
-							undefined,
-							runtime,
-							[
-								{
-									type: GameEventEnumSchema.enum.JobCompleted,
-									jobId: "job:event:planned",
-									ownerItemId: "owner:event:planned",
-									lineId: "line:event:planned",
-								},
-							],
-						] as const;
-					}),
-				),
-			);
-			await planningEntered;
-
-			const unsubscribe = session.subscribeEvents((batch) => {
-				jobIds.push(
-					...batch.events.flatMap((event) =>
-						"jobId" in event
-							? [
-									event.jobId,
-								]
-							: [],
-					),
-				);
-			});
-
-			try {
-				releasePlanning?.();
-				await pending;
-				await waitFor(() => jobIds.length === 1);
-				expect(jobIds).toEqual([
-					"job:event:planned",
-				]);
-			} finally {
-				unsubscribe();
-			}
-		} finally {
-			releasePlanning?.();
-			await Effect.runPromise(session.disposeFx);
-		}
-	});
-
-	it("exposes a committed command runtime synchronously when run resolves", async () => {
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-		});
-		const initial = session.getSnapshot();
-		let notifications = 0;
-		const unsubscribe = session.subscribe(() => {
-			notifications += 1;
-		});
-
-		try {
-			const item = await session.run(
-				spawnItemFx({
-					id: "runtime:water:ui",
-					itemId: "water",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				}),
-			);
-
-			const committed = session.getSnapshot();
-			expect(committed).not.toBe(initial);
-			expect(committed.items.some((candidate) => candidate.id === item.id)).toBe(true);
-			expect(committed.items).toHaveLength(1);
-			await waitFor(() => notifications === 1);
-		} finally {
-			unsubscribe();
-			await Effect.runPromise(session.disposeFx);
-		}
-	});
-
-	it("does not replay transitions committed before event subscription", async () => {
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-		});
-		const jobIds: string[] = [];
-		const afterSubscribeDelivered = Effect.runSync(Deferred.make<void>());
-
-		try {
-			await session.run(emitCompletedEventFx("job:event:before-subscribe"));
-			const unsubscribe = session.subscribeEvents((batch) => {
-				jobIds.push(
-					...batch.events.flatMap((event) =>
-						"jobId" in event
-							? [
-									event.jobId,
-								]
-							: [],
-					),
-				);
-				if (jobIds.includes("job:event:after-subscribe")) {
-					Effect.runSync(Deferred.succeed(afterSubscribeDelivered, undefined));
-				}
-			});
-
-			try {
-				expect(jobIds).toEqual([]);
-
-				await session.run(emitCompletedEventFx("job:event:after-subscribe"));
-				await Effect.runPromise(Deferred.await(afterSubscribeDelivered));
-				expect(jobIds).toEqual([
-					"job:event:after-subscribe",
-				]);
-			} finally {
-				unsubscribe();
-			}
-		} finally {
-			await Effect.runPromise(session.disposeFx);
-		}
-	});
-
-	it("does not invalidate runtime subscribers for commits completed before registration", async () => {
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-		});
-		let notifications = 0;
-
-		try {
-			await session.run(
-				spawnItemFx({
-					id: "runtime:before-subscribe",
-					itemId: "water",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				}),
-			);
-			const unsubscribe = session.subscribe(() => {
-				notifications += 1;
-			});
-
-			try {
-				await new Promise((resolve) => setTimeout(resolve, 20));
-				expect(notifications).toBe(0);
-
-				await session.run(
-					spawnItemFx({
-						id: "runtime:after-subscribe",
-						itemId: "water",
-						location: {
-							scope: "inventory",
-							position: {
-								x: 1,
-								y: 0,
-							},
-						},
-						quantity: 1,
-					}),
-				);
-				await waitFor(() => notifications === 1);
-			} finally {
-				unsubscribe();
-			}
-		} finally {
-			await Effect.runPromise(session.disposeFx);
-		}
-	});
-
-	it("does not notify runtime subscribers for event-only transitions", async () => {
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-		});
-		let runtimeNotifications = 0;
-		let eventNotifications = 0;
-		const unsubscribeRuntime = session.subscribe(() => {
-			runtimeNotifications += 1;
-		});
-		const unsubscribeEvents = session.subscribeEvents(() => {
-			eventNotifications += 1;
-		});
-
-		try {
-			const before = session.getSnapshot();
-			await session.run(emitCompletedEventFx("job:event-only"));
-			expect(session.getSnapshot()).toBe(before);
-			await waitFor(() => eventNotifications === 1);
-			expect(runtimeNotifications).toBe(0);
-		} finally {
-			unsubscribeRuntime();
-			unsubscribeEvents();
-			await Effect.runPromise(session.disposeFx);
-		}
-	});
-
-	it("does not notify React subscribers for a no-op Tick commit", async () => {
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-		});
-		let notifications = 0;
-		const unsubscribe = session.subscribe(() => {
-			notifications += 1;
-		});
-
-		try {
-			await session.run(
-				runTickRuntimeByFx({
-					elapsedMs: 100,
-				}),
-			);
-			await new Promise((resolve) => setTimeout(resolve, 20));
-			expect(notifications).toBe(0);
-		} finally {
-			unsubscribe();
-			await Effect.runPromise(session.disposeFx);
-		}
-	});
-
-	it("updates the canonical runtime before delivering transition events", async () => {
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-		});
-		let observedStartedJob = false;
-		const unsubscribe = session.subscribeEvents((batch) => {
-			const started = batch.events.find(
-				(event) => event.type === GameEventEnumSchema.enum.JobStarted,
-			);
-			if (started !== undefined) {
-				observedStartedJob = session
-					.getSnapshot()
-					.jobs.some((job) => job.id === started.jobId);
-			}
-		});
-
-		try {
-			const owner = await session.run(prepareJobLineFx());
-			await session.run(
-				startLineFx({
-					ownerItemId: owner.id,
-					lineId: "line:forge:run",
-				}),
-			);
-
-			await waitFor(() => observedStartedJob);
-			expect(observedStartedJob).toBe(true);
-		} finally {
-			unsubscribe();
-			await Effect.runPromise(session.disposeFx);
-		}
-	});
-
-	it("exposes the canonical runtime to every callback for a combined transition", async () => {
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-		});
-		let runtimeNotifications = 0;
-		let eventNotifications = 0;
-		let observedSnapshot = session.getSnapshot();
-		const unsubscribeRuntime = session.subscribe(() => {
-			runtimeNotifications += 1;
-		});
-		const unsubscribeEvents = session.subscribeEvents(() => {
-			eventNotifications += 1;
-			observedSnapshot = session.getSnapshot();
-		});
-
-		try {
-			const before = session.getSnapshot();
-			await session.run(
-				modifyRuntimeFx((runtime) =>
-					Effect.succeed([
-						undefined,
-						{
-							...runtime,
-						},
-						[
-							{
-								type: GameEventEnumSchema.enum.JobCompleted,
-								jobId: "job:combined",
-								ownerItemId: "owner:combined",
-								lineId: "line:combined",
-							},
-						],
-					] as const),
-				),
-			);
-			const committed = session.getSnapshot();
-			expect(committed).not.toBe(before);
-			await waitFor(() => runtimeNotifications === 1 && eventNotifications === 1);
-			expect(observedSnapshot).toBe(committed);
-		} finally {
-			unsubscribeRuntime();
-			unsubscribeEvents();
-			await Effect.runPromise(session.disposeFx);
-		}
-	});
-
-	it("does not deliver the current transition to listeners registered during its callbacks", async () => {
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-		});
-		const nestedJobIds: string[] = [];
-		let nestedUnsubscribe: (() => void) | undefined;
-		const unsubscribeRuntime = session.subscribe(() => {
-			nestedUnsubscribe ??= session.subscribeEvents((batch) => {
-				nestedJobIds.push(
-					...batch.events.flatMap((event) =>
-						"jobId" in event
-							? [
-									event.jobId,
-								]
-							: [],
-					),
-				);
-			});
-		});
-
-		try {
-			await session.run(
-				modifyRuntimeFx((runtime) =>
-					Effect.succeed([
-						undefined,
-						{
-							...runtime,
-						},
-						[
-							{
-								type: GameEventEnumSchema.enum.JobCompleted,
-								jobId: "job:nested:current",
-								ownerItemId: "owner:nested",
-								lineId: "line:nested",
-							},
-						],
-					] as const),
-				),
-			);
-			await waitFor(() => nestedUnsubscribe !== undefined);
-			await new Promise((resolve) => setTimeout(resolve, 20));
-			expect(nestedJobIds).toEqual([]);
-
-			await session.run(emitCompletedEventFx("job:nested:next"));
-			await waitFor(() => nestedJobIds.length === 1);
-			expect(nestedJobIds).toEqual([
-				"job:nested:next",
-			]);
-		} finally {
-			nestedUnsubscribe?.();
-			unsubscribeRuntime();
-			await Effect.runPromise(session.disposeFx);
-		}
-	});
-
-	it("stops subscriptions synchronously before later commits", async () => {
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-		});
-		let notifications = 0;
-		const unsubscribe = session.subscribeEvents(() => {
-			notifications += 1;
-		});
-		const healthyDelivered = Effect.runSync(Deferred.make<void>());
-		const unsubscribeHealthy = session.subscribeEvents(() => {
-			Effect.runSync(Deferred.succeed(healthyDelivered, undefined));
-		});
-
-		try {
-			unsubscribe();
-			await session.run(emitCompletedEventFx("job:after-unsubscribe"));
-			await Effect.runPromise(Deferred.await(healthyDelivered));
-			expect(notifications).toBe(0);
-		} finally {
-			unsubscribeHealthy();
-			await Effect.runPromise(session.disposeFx);
-		}
-	});
-
-	it("does not let pending async listeners block the remaining delivery", async () => {
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-		});
-		let releasePending: (() => void) | undefined;
-		const pending = new Promise<void>((resolve) => {
-			releasePending = resolve;
-		});
-		let healthyNotifications = 0;
-		let eventNotifications = 0;
-		const unsubscribePending = session.subscribe(async () => {
-			await pending;
-		});
-		const unsubscribeHealthy = session.subscribe(() => {
-			healthyNotifications += 1;
-		});
-		const unsubscribeEvents = session.subscribeEvents(() => {
-			eventNotifications += 1;
-		});
-
-		try {
-			const item = await session.run(
-				spawnItemFx({
-					id: "runtime:water:pending-listener",
-					itemId: "water",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				}),
-			);
-
-			expect(session.getSnapshot().items.some((candidate) => candidate.id === item.id)).toBe(
-				true,
-			);
-			await waitFor(() => healthyNotifications === 1);
-			expect(eventNotifications).toBe(0);
-		} finally {
-			releasePending?.();
-			unsubscribePending();
-			unsubscribeHealthy();
-			unsubscribeEvents();
-			await Effect.runPromise(session.disposeFx);
-		}
-	});
-
-	it("disposes an in-flight planner without committing runtime or events", async () => {
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-		});
-		const planningEntered = await Effect.runPromise(Deferred.make<void>());
-		const planningGate = await Effect.runPromise(Deferred.make<void>());
-		let runtimeNotifications = 0;
-		let eventNotifications = 0;
-		const unsubscribeRuntime = session.subscribe(() => {
-			runtimeNotifications += 1;
-		});
-		const unsubscribeEvents = session.subscribeEvents(() => {
-			eventNotifications += 1;
-		});
-		const pending = session.run(
-			modifyRuntimeFx((runtime) =>
-				Deferred.succeed(planningEntered, undefined).pipe(
-					Effect.andThen(Deferred.await(planningGate)),
-					Effect.as([
-						undefined,
-						{
-							...runtime,
-						},
-						[
-							{
-								type: GameEventEnumSchema.enum.JobCompleted,
-								jobId: "job:dispose:pending",
-								ownerItemId: "owner:dispose:pending",
-								lineId: "line:dispose:pending",
-							},
-						],
-					] as const),
-				),
-			),
-		);
-
-		try {
-			await Effect.runPromise(Deferred.await(planningEntered));
-			const disposing = Effect.runPromise(session.disposeFx);
-
-			await expect(pending).rejects.toBeDefined();
-			await disposing;
-			expect(runtimeNotifications).toBe(0);
-			expect(eventNotifications).toBe(0);
-		} finally {
-			unsubscribeRuntime();
-			unsubscribeEvents();
-			await Effect.runPromise(session.disposeFx);
-		}
-	});
-
-	it("publishes ordered committed job event batches to the session event source", async () => {
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-		});
-		const batches: Array<ReadonlyArray<string>> = [];
-		const unsubscribe = session.subscribeEvents((batch) => {
-			const jobEvents = batch.events.flatMap((event) =>
-				event.type === GameEventEnumSchema.enum.JobStarted ||
-				event.type === GameEventEnumSchema.enum.JobCompleted
-					? [
-							event.type,
-						]
-					: [],
-			);
-			if (jobEvents.length > 0) batches.push(jobEvents);
-		});
-
-		try {
-			const owner = await session.run(prepareJobLineFx());
-			await session.run(
-				startLineFx({
-					ownerItemId: owner.id,
-					lineId: "line:forge:run",
-				}),
-			);
-			await session.run(
-				enqueueLineFx({
-					ownerItemId: owner.id,
-					lineId: "line:forge:run",
-				}),
-			);
-			await session.run(
-				runTickRuntimeByFx({
-					elapsedMs: 2_000,
-				}),
-			);
-			expect(session.getSnapshot().jobs).toHaveLength(0);
-
-			await waitFor(() => batches.length === 2);
-			expect(batches).toEqual([
-				[
-					"job:started",
-				],
-				[
-					"job:completed",
-					"job:started",
-					"job:completed",
-				],
-			]);
-		} finally {
-			unsubscribe();
-			await Effect.runPromise(session.disposeFx);
-		}
-	});
-
 	it("freezes the session when a runtime listener throws", async () => {
 		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
 		let runtimeNotifications = 0;
+		let markRuntimeDelivered: (() => void) | undefined;
+		const runtimeDelivered = new Promise<void>((resolve) => {
+			markRuntimeDelivered = resolve;
+		});
+		let markFatalDelivered: (() => void) | undefined;
+		const fatalDelivered = new Promise<void>((resolve) => {
+			markFatalDelivered = resolve;
+		});
 		const unsubscribeThrowingRuntime = session.subscribe(() => {
 			throw new Error("runtime listener exploded");
 		});
 		const unsubscribeHealthyRuntime = session.subscribe(() => {
 			runtimeNotifications += 1;
+			markRuntimeDelivered?.();
+		});
+		const unsubscribeFatal = session.subscribeFatalError(() => {
+			markFatalDelivered?.();
 		});
 
 		try {
@@ -915,8 +154,10 @@ describe("createGameSessionFx", () => {
 					quantity: 1,
 				}),
 			);
-			await waitFor(() => session.getFatalError() !== null);
-			await new Promise((resolve) => setTimeout(resolve, 20));
+			await Promise.all([
+				fatalDelivered,
+				runtimeDelivered,
+			]);
 
 			expect(runtimeNotifications).toBe(1);
 			expect(session.getFatalError()?.source).toBe("subscription");
@@ -929,14 +170,21 @@ describe("createGameSessionFx", () => {
 		} finally {
 			unsubscribeThrowingRuntime();
 			unsubscribeHealthyRuntime();
+			unsubscribeFatal();
 			await Effect.runPromise(session.disposeFx);
 		}
 	});
-
 	it("freezes the session when an event listener rejects", async () => {
 		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
+		});
+		let markFatalDelivered: (() => void) | undefined;
+		const fatalDelivered = new Promise<void>((resolve) => {
+			markFatalDelivered = resolve;
+		});
+		const unsubscribeFatal = session.subscribeFatalError(() => {
+			markFatalDelivered?.();
 		});
 		const unsubscribe = session.subscribeEvents(async () => {
 			throw new Error("async event listener exploded");
@@ -944,14 +192,14 @@ describe("createGameSessionFx", () => {
 
 		try {
 			await session.run(emitCompletedEventFx("job:listener:rejected"));
-			await waitFor(() => session.getFatalError() !== null);
+			await fatalDelivered;
 			expect(session.getFatalError()?.source).toBe("subscription");
 		} finally {
 			unsubscribe();
+			unsubscribeFatal();
 			await Effect.runPromise(session.disposeFx);
 		}
 	});
-
 	it("freezes the session exactly once when Tick fails", async () => {
 		const config = createTickFailureTestConfig();
 		const session = await createTestGameSession({
@@ -959,8 +207,13 @@ describe("createGameSessionFx", () => {
 			tickIntervalMs: 5,
 		});
 		let notifications = 0;
+		let markFatalDelivered: (() => void) | undefined;
+		const fatalDelivered = new Promise<void>((resolve) => {
+			markFatalDelivered = resolve;
+		});
 		const unsubscribe = session.subscribeFatalError(() => {
 			notifications += 1;
+			markFatalDelivered?.();
 		});
 
 		try {
@@ -987,9 +240,11 @@ describe("createGameSessionFx", () => {
 			);
 			delete (config.items as Record<string, unknown>).inventoryOutput;
 
-			await waitFor(() => session.getFatalError() !== null, 2_000);
-			await new Promise((resolve) => setTimeout(resolve, 30));
-			expect(session.getFatalError()?.source).toBe("tick");
+			await fatalDelivered;
+			const fatal = session.getFatalError();
+			expect(fatal?.source).toBe("tick");
+			session.failStop("presentation", new Error("later failure"));
+			expect(session.getFatalError()).toBe(fatal);
 			expect(notifications).toBe(1);
 			await expect(session.run(Effect.void)).rejects.toMatchObject({
 				_tag: "GameSessionNotRunningError",
@@ -997,119 +252,6 @@ describe("createGameSessionFx", () => {
 			});
 		} finally {
 			unsubscribe();
-			await Effect.runPromise(session.disposeFx);
-		}
-	});
-
-	it("keeps a failed final save retryable until the same runtime is persisted", async () => {
-		const failure = new Error("save target unavailable");
-		let writes = 0;
-		const savedItemIds: string[][] = [];
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-			save: {
-				debounceMs: 60_000,
-				write: (state) =>
-					Effect.suspend(() => {
-						writes += 1;
-						savedItemIds.push(state.items.map(({ id }) => id));
-						return writes === 1 ? Effect.fail(failure) : Effect.void;
-					}),
-			},
-		});
-		await session.run(
-			spawnItemFx({
-				id: "runtime:retry-final-save",
-				itemId: "water",
-				location: {
-					scope: "inventory",
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
-				quantity: 1,
-			}),
-		);
-
-		await expect(Effect.runPromise(session.disposeFx)).rejects.toThrow(
-			"save target unavailable",
-		);
-		await expect(
-			session.run(
-				spawnItemFx({
-					id: "runtime:must-not-change-after-shutdown",
-					itemId: "water",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 1,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				}),
-			),
-		).rejects.toThrow("Game session is shutting down.");
-		await expect(Effect.runPromise(session.disposeFx)).resolves.toBeUndefined();
-		expect(writes).toBe(2);
-		expect(savedItemIds).toEqual([
-			[
-				"runtime:retry-final-save",
-			],
-			[
-				"runtime:retry-final-save",
-			],
-		]);
-	});
-
-	it("permits explicit discard cleanup after a failed final save", async () => {
-		const failure = new Error("save target unavailable");
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-			save: {
-				debounceMs: 60_000,
-				write: () => Effect.fail(failure),
-			},
-		});
-
-		await expect(Effect.runPromise(session.disposeFx)).rejects.toThrow(
-			"save target unavailable",
-		);
-		await expect(Effect.runPromise(session.disposeWithoutSaveFx)).resolves.toBeUndefined();
-		await expect(Effect.runPromise(session.disposeWithoutSaveFx)).resolves.toBeUndefined();
-	});
-
-	it("runs the production Tick loop from Effect Clock and completes jobs", async () => {
-		const config = createJobTestConfig();
-		const forge = config.items.forge;
-		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
-		forge.lines[0]!.runtimeMs = 25;
-		const session = await createTestGameSession({
-			config,
-			tickIntervalMs: 5,
-		});
-
-		try {
-			const owner = await session.run(prepareJobLineFx());
-			await session.run(
-				startLineFx({
-					ownerItemId: owner.id,
-					lineId: "line:forge:run",
-				}),
-			);
-			await waitFor(() => session.getSnapshot().jobs.length === 0);
-			expect(
-				session
-					.getSnapshot()
-					.items.some(
-						(item) =>
-							item.location.scope === "job" || item.location.scope === "reserved",
-					),
-			).toBe(false);
-		} finally {
 			await Effect.runPromise(session.disposeFx);
 		}
 	});

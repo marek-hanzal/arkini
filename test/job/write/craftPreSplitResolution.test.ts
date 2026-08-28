@@ -9,7 +9,6 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -28,19 +27,17 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		craft: {
+			uid: "craft",
 			id: "craft",
 			title: "Craft",
 			description: "A stackable craft.",
 			asset: {
-				source: [
+				default: [
 					"asset:craft",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 			type: "craft",

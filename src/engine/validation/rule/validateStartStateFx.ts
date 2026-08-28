@@ -38,6 +38,7 @@ export const validateStartStateFx = Effect.fn("validateStartStateFx")(function* 
 				items: [],
 				jobs: [],
 				jobQueue: [],
+				defaultLineByOwnerItemId: {},
 			},
 			start: config.start,
 		}).pipe(Effect.provideService(GameConfigFx, config)),

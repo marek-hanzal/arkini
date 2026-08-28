@@ -4,16 +4,15 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 const baseItem = ({ id, scope }: { id: string; scope: "any" | "board" }) => {
 	return {
+		uid: id,
 		id,
 		title: id,
 		description: id,
 		asset: {
-			source: [
+			default: [
 				`asset:${id}`,
 			],
 		},
-		tags: [],
-		categoryId: "resource",
 		scope,
 		maxStackSize: 10,
 	} as const;
@@ -33,7 +32,6 @@ const existsWhen = (itemId: string) => {
 };
 
 export const lineRunTestConfig = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -52,7 +50,6 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		workshop: {
 			...baseItem({
@@ -78,8 +75,8 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 								itemId: "water",
 							},
 							quantity: {
-								type: "value",
-								value: 3,
+								min: 3,
+								max: 3,
 							},
 							capacity: 2,
 						},
@@ -269,5 +266,8 @@ export const lineRunRuntime = ({
 		currentSpace: 0,
 		items,
 		jobs: [],
+
+		jobQueue: [],
+		defaultLineByOwnerItemId: {},
 	} satisfies RuntimeSchema.Type;
 };

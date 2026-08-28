@@ -38,8 +38,9 @@ export const readStoredItemDetailLineFx = Effect.fn("readStoredItemDetailLineFx"
 				kind: "owner-stored",
 			},
 		},
+		activeRuleHints: [],
 		isDefault,
-		queuedRequestCount: (runtime.jobQueue ?? []).filter(
+		queuedRequestCount: runtime.jobQueue.filter(
 			(request) => request.ownerItemId === ownerItemId && request.lineId === line.id,
 		).length,
 		actions: {
@@ -54,7 +55,9 @@ export const readStoredItemDetailLineFx = Effect.fn("readStoredItemDetailLineFx"
 			ownerItemId,
 			runtime,
 		}),
-		output: yield* readItemDetailOutputFx(line),
+		output: yield* readItemDetailOutputFx({
+			line,
+		}),
 		...(activeJob === undefined
 			? {}
 			: {

@@ -2,20 +2,18 @@ import { encode } from "@msgpack/msgpack";
 import { Effect } from "effect";
 
 import { Magic } from "~/engine/pack/Magic";
-import type { PayloadSchema } from "~/engine/pack/schema/PayloadSchema";
+import { PayloadSchema } from "~/engine/pack/schema/PayloadSchema";
 
-export const encodeFx = Effect.fn("encodeFx")(function* ({
-	config,
-	resources,
-}: PayloadSchema.Type) {
+export const encodeFx = Effect.fn("encodeFx")(function* (payload: PayloadSchema.Type) {
 	return yield* Effect.sync(() => {
+		const { version, arkini, config, resources } = PayloadSchema.parse(payload);
 		const configBytes = encode(config);
 		const manifestBytes = encode({
-			version: 1,
+			version,
+			arkini,
 			length: configBytes.byteLength,
 			resources: resources.map((resource) => ({
 				id: resource.id,
-				mime: resource.mime,
 				length: resource.bytes.byteLength,
 			})),
 		});

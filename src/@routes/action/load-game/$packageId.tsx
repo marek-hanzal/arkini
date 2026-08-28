@@ -1,9 +1,10 @@
 import { createFileRoute, redirect, type ErrorComponentProps } from "@tanstack/react-router";
 
 import { Cause, Effect, Exit, Option } from "effect";
+import { releaseCurrentEditorBoardGameFx } from "~/bridge/editor/board/releaseCurrentEditorBoardGameFx";
 import { acquireGameEngineLeaseFx } from "~/bridge/game/acquireGameEngineLeaseFx";
 import { adoptGameEngineLeaseFx } from "~/bridge/game/adoptGameEngineLeaseFx";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 import { readCurrentGameEngineResourceFx } from "~/bridge/game/readCurrentGameEngineResourceFx";
 import { ActionPendingPage } from "~/page/action/ActionPendingPage";
 import { runActionRouteFx } from "~/page/action/runActionRouteFx";
@@ -11,11 +12,15 @@ import { GameEngineErrorPage } from "~/page/game/GameEngineErrorPage";
 
 const loadGameRouteFx = Effect.fn("loadGameRouteFx")((packageId: string) =>
 	Effect.scoped(
-		runActionRouteFx(
-			acquireGameEngineLeaseFx({
-				packageId,
-			}),
-		).pipe(Effect.flatMap(adoptGameEngineLeaseFx)),
+		Effect.gen(function* () {
+			yield* releaseCurrentEditorBoardGameFx;
+			const lease = yield* runActionRouteFx(
+				acquireGameEngineLeaseFx({
+					packageId,
+				}),
+			);
+			return yield* adoptGameEngineLeaseFx(lease);
+		}),
 	),
 );
 
@@ -23,7 +28,8 @@ const loadGameRouteFx = Effect.fn("loadGameRouteFx")((packageId: string) =>
  * This action route is the only route-level Game acquisition owner. A newly
  * acquired lease survives the scoped loader only when adoption publishes it;
  * interruption otherwise releases it. Package switches first traverse the
- * current Game's leave route, preventing two live resources from overlapping.
+ * current Game's leave route, while editor handoff joins its ephemeral disposal
+ * here, preventing two live resources from overlapping.
  */
 export const Route = createFileRoute("/action/load-game/$packageId")({
 	beforeLoad: ({ context, params }) => {
@@ -51,7 +57,9 @@ export const Route = createFileRoute("/action/load-game/$packageId")({
 			},
 		);
 		if (Exit.isFailure(completed)) {
-			const failure = readExactCauseFailure(completed.cause);
+			const failure = context.rendererRuntime.runSync(
+				readExactCauseFailureFx(completed.cause),
+			);
 			if (Option.isSome(failure)) throw failure.value;
 			if (Cause.hasInterruptsOnly(completed.cause) && abortController.signal.aborted) {
 				throw (

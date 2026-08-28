@@ -7,6 +7,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { routeTree } from "~/_route";
+import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
 import type { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
 import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { Game } from "~/bridge/game/Game";
@@ -39,15 +40,13 @@ const createGame = ({
 	arkpack: {
 		packageId,
 		contentHash: "content-critical",
-		gameId: testArkpackConfig.meta.id,
 		title: testArkpackConfig.meta.title,
-		configVersion: testArkpackConfig.version,
-		compressedSize: 0,
-		trust: {
-			type: "external",
-			reason: "unsigned",
+		version: "1.0",
+		arkini: ArkiniAppVersion,
+		provenance: {
+			type: "community",
 		} as const,
-		source: "imported",
+		source: "user",
 	},
 	config: testArkpackConfig,
 	disposeFx,
@@ -59,7 +58,6 @@ const createGame = ({
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 	saveKey: {
 		packageId,
-		contentHash: "0".repeat(64),
 	},
 	subscribe: () => () => undefined,
 	subscribeEvents: () => () => undefined,

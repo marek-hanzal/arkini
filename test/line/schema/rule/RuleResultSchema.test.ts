@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { RuleResultSchema } from "~/engine/line/schema/rule/RuleResultSchema";
 
 describe("line RuleResultSchema", () => {
-	it("discriminates boolean and runtime multiplier results", () => {
+	it("discriminates boolean and runtime modifier results", () => {
 		for (const type of [
 			"show",
 			"hide",
@@ -21,6 +21,13 @@ describe("line RuleResultSchema", () => {
 		expect(
 			RuleResultSchema.safeParse({
 				active: true,
+				adjustMs: -1_000,
+				type: "runtime:adjust",
+			}).success,
+		).toBe(true);
+		expect(
+			RuleResultSchema.safeParse({
+				active: true,
 				multiplier: 1.5,
 				type: "runtime:multiplier",
 			}).success,
@@ -29,6 +36,12 @@ describe("line RuleResultSchema", () => {
 			RuleResultSchema.safeParse({
 				active: true,
 				type: "runtime:multiplier",
+			}).success,
+		).toBe(false);
+		expect(
+			RuleResultSchema.safeParse({
+				active: true,
+				type: "runtime:adjust",
 			}).success,
 		).toBe(false);
 	});

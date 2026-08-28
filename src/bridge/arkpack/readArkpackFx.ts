@@ -1,38 +1,31 @@
 import { Effect } from "effect";
 
-import { ArkpackLimits } from "~/bridge/arkpack/ArkpackLimits";
-import { assertExpectedArkpackTrustFx } from "~/bridge/arkpack/assertExpectedArkpackTrustFx";
+import { ArkpackLimits } from "../../../shared/ArkpackLimits";
+import { validateArkpackPayloadFx } from "~/bridge/arkpack/validateArkpackPayloadFx";
 import { decodeFx } from "~/engine/pack/fx/decodeFx";
-import { verifyArkpackTrustFx } from "~/engine/pack/fx/verifyArkpackTrustFx";
-import type { ArkpackTrustedKeysSchema } from "~/engine/pack/schema/ArkpackTrustedKeysSchema";
-import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
+import { decodeArkpackEnvelopeFx } from "~/engine/pack/fx/decodeArkpackEnvelopeFx";
+import { readArkpackContentHashFx } from "~/engine/pack/fx/readArkpackContentHashFx";
+import type { ArkpackProvenanceSchema } from "~/engine/pack/schema/ArkpackProvenanceSchema";
 import { GameValidationError } from "~/engine/validation/error/GameValidationError";
-import { validateGameConfigFx } from "~/engine/validation/fx/validateGameConfigFx";
-import { validateGameResourcesFx } from "~/engine/validation/rule/validateGameResourcesFx";
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 
 export namespace readArkpackFx {
 	export interface Props {
 		bytes: Uint8Array;
 		filename?: string;
-		importedAtMs?: number;
 		packageId?: string;
-		signature: {
-			/** Official key identity required by trusted bundled content. */
-			readonly expectedKeyId?: string;
-			readonly metadata?: unknown;
-			readonly trustedKeys: ArkpackTrustedKeysSchema.Type;
-		};
-		source: "built-in" | "imported";
+		provenance: ArkpackProvenanceSchema.Type;
+		source: "bundled" | "user";
+		overridesBundled?: boolean;
 	}
 }
 
 const decompressArkpackFx = Effect.fn("decompressArkpackFx")((bytes: Uint8Array) =>
 	Effect.tryPromise({
 		try: async () => {
-			if (bytes.byteLength > ArkpackLimits.maxCompressedBytes) {
+			if (bytes.byteLength > ArkpackLimits.maxPayloadBytes) {
 				throw new Error(
-					`Arkpack exceeds the ${ArkpackLimits.maxCompressedBytes} byte compressed limit.`,
+					`Arkpack payload exceeds the ${ArkpackLimits.maxPayloadBytes} byte compressed limit.`,
 				);
 			}
 			const reader = new Blob([
@@ -67,88 +60,19 @@ const decompressArkpackFx = Effect.fn("decompressArkpackFx")((bytes: Uint8Array)
 	}),
 );
 
-const createPackProvenance = (
-	gameId: string,
-	categories: Readonly<Record<string, unknown>>,
-	items: Readonly<Record<string, unknown>>,
-): GameSourceProvenanceSchema.Type => {
-	const source = `arkpack:${gameId}`;
-	return {
-		meta: source,
-		resources: source,
-		start: source,
-		version: source,
-		categories: Object.fromEntries(
-			Object.keys(categories).map((id) => [
-				id,
-				source,
-			]),
-		),
-		items: Object.fromEntries(
-			Object.keys(items).map((id) => [
-				id,
-				source,
-			]),
-		),
-	};
-};
-
 /** Decodes, schema-validates and semantically validates one compressed arkpack binary. */
 export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 	bytes,
 	filename,
-	importedAtMs,
 	packageId,
-	signature,
+	provenance,
 	source,
+	overridesBundled = false,
 }: readArkpackFx.Props) {
-	if (bytes.byteLength > ArkpackLimits.maxCompressedBytes) {
-		return yield* Effect.fail(
-			new Error(
-				`Arkpack exceeds the ${ArkpackLimits.maxCompressedBytes} byte compressed limit.`,
-			),
-		);
-	}
-	const verification = yield* verifyArkpackTrustFx({
-		bytes,
-		signature: signature.metadata,
-		trustedKeys: signature.trustedKeys,
-	});
-	yield* assertExpectedArkpackTrustFx({
-		expectedKeyId: signature.expectedKeyId,
-		trust: verification.trust,
-	});
-	const contentHash = verification.contentHash;
-	const payload = yield* decodeFx(yield* decompressArkpackFx(bytes));
-	for (const resource of payload.resources) {
-		if (resource.mime !== "image/png") {
-			return yield* Effect.fail(
-				new Error(
-					`Unsupported arkpack resource MIME ${resource.mime}; only image/png is allowed.`,
-				),
-			);
-		}
-	}
-	const provenance = createPackProvenance(
-		payload.config.meta.id,
-		payload.config.categories,
-		payload.config.items,
-	);
-	const diagnostics = [
-		...(yield* validateGameConfigFx({
-			config: payload.config,
-			provenance,
-		})),
-		...(yield* validateGameResourcesFx({
-			config: payload.config,
-			provenance,
-			resources: payload.resources.map((resource) => ({
-				id: resource.id,
-				mime: "image/png" as const,
-				path: `arkpack:${resource.id}`,
-			})),
-		})),
-	];
+	const contentHash = yield* readArkpackContentHashFx(bytes);
+	const envelope = yield* decodeArkpackEnvelopeFx(bytes);
+	const payload = yield* decodeFx(yield* decompressArkpackFx(envelope.payload));
+	const diagnostics = yield* validateArkpackPayloadFx(payload);
 	const errors = diagnostics.filter(
 		({ severity }) => severity === DiagnosticSeverityEnumSchema.enum.Error,
 	);
@@ -159,26 +83,28 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 			}),
 		);
 	}
-
+	const payloadPackageId = payload.config.meta.id;
+	if (packageId !== undefined && packageId !== payloadPackageId) {
+		return yield* Effect.fail(
+			new Error(
+				`Arkpack was addressed as package ${packageId}, but its config declares ${payloadPackageId}.`,
+			),
+		);
+	}
 	return {
 		descriptor: {
-			packageId: packageId ?? contentHash,
+			packageId: payloadPackageId,
 			contentHash,
-			gameId: payload.config.meta.id,
 			title: payload.config.meta.title,
-			configVersion: payload.config.version,
-			compressedSize: bytes.byteLength,
-			trust: verification.trust,
+			version: payload.version,
+			arkini: payload.arkini,
+			provenance,
 			source,
+			overridesBundled,
 			...(filename === undefined
 				? {}
 				: {
 						filename,
-					}),
-			...(importedAtMs === undefined
-				? {}
-				: {
-						importedAtMs,
 					}),
 		},
 		payload,

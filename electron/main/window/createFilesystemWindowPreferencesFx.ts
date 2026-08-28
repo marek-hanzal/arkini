@@ -1,14 +1,15 @@
 import { FileSystem } from "effect";
-import { Effect, Semaphore } from "effect";
+import { Effect } from "effect";
 import { join } from "node:path";
 import { WindowModeSchema } from "../../contract/window/WindowModeSchema";
 import { readElectronPreferenceFx } from "../preference/readElectronPreferenceFx";
 import { writeElectronPreferenceFx } from "../preference/writeElectronPreferenceFx";
 import type { WindowPreferences } from "./WindowPreferences";
+import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 
 export namespace createFilesystemWindowPreferencesFx {
 	export interface Props {
-		readonly userDataPath: string;
+		readonly root: string;
 		readonly fileSystem?: FileSystem.FileSystem;
 	}
 }
@@ -16,27 +17,25 @@ export namespace createFilesystemWindowPreferencesFx {
 /** Creates the one persisted global window-mode capability. */
 export const createFilesystemWindowPreferencesFx = Effect.fn("createFilesystemWindowPreferencesFx")(
 	function* ({
-		userDataPath,
+		root,
 		fileSystem: providedFileSystem,
 	}: createFilesystemWindowPreferencesFx.Props) {
 		const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
-		const root = join(userDataPath, "arkini", "preferences");
-		const path = join(root, "window.mode");
-		const writeSemaphore = yield* Semaphore.make(1);
+		const path = join(root, "window.mode.json");
+		const filesystemWrite = yield* createFilesystemWriteFx().pipe(
+			Effect.provideService(FileSystem.FileSystem, fileSystem),
+		);
 		const writeModeFx: WindowPreferences["writeModeFx"] = Effect.fn(
 			"FilesystemWindowPreferences.writeModeFx",
 		)((mode) =>
-			writeSemaphore.withPermits(1)(
-				writeElectronPreferenceFx({
-					root,
-					fileSystem,
-					pendingPath: join(root, "window.pending"),
-					currentPath: path,
-					value: mode,
-					operation: "persist the window mode preference",
-					serialize: (value) => WindowModeSchema.parse(value),
-				}),
-			),
+			writeElectronPreferenceFx({
+				filesystemWrite,
+				lock: join(root, ".window-mode.lock"),
+				target: path,
+				value: mode,
+				operation: "persist the window mode preference",
+				serialize: (value) => JSON.stringify(WindowModeSchema.parse(value)),
+			}),
 		);
 
 		return {
@@ -45,7 +44,13 @@ export const createFilesystemWindowPreferencesFx = Effect.fn("createFilesystemWi
 				path,
 				fallback: "default" as const,
 				operation: "read the window mode preference",
-				parse: (stored) => WindowModeSchema.safeParse(stored.trim()).data,
+				parse: (stored) => {
+					try {
+						return WindowModeSchema.safeParse(JSON.parse(stored)).data;
+					} catch {
+						return undefined;
+					}
+				},
 			}),
 			writeModeFx,
 		} satisfies WindowPreferences;

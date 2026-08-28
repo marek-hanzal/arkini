@@ -1,10 +1,6 @@
 import type { ReactNode } from "react";
 
-const artworkSizeClassName = {
-	lg: "size-16",
-	md: "size-12",
-	sm: "size-11",
-} as const;
+import { ItemArtwork, type ItemArtworkProps } from "~/ui/item/ItemArtwork";
 
 export interface ItemIdentityProps {
 	readonly artworkClassName?: string;
@@ -15,7 +11,7 @@ export interface ItemIdentityProps {
 	readonly dataUi?: string;
 	readonly description?: ReactNode;
 	readonly rootTag?: "div" | "span";
-	readonly size?: keyof typeof artworkSizeClassName;
+	readonly size?: ItemArtworkProps["size"];
 	readonly sourceUrl: string;
 	readonly title: string;
 	readonly titleClassName?: string;
@@ -46,25 +42,14 @@ export const ItemIdentity = ({
 			className={`flex min-w-0 items-center gap-3 ${className}`}
 			data-ui={dataUi}
 		>
-			<span
-				className={`relative block shrink-0 ${artworkSizeClassName[size]} ${artworkClassName}`}
-				data-ui={artworkDataUi}
-			>
-				<img
-					className={`absolute inset-0 size-full object-contain drop-shadow-[0_0.3rem_0.5rem_color-mix(in_srgb,var(--ak-overlay)_28%,transparent)] ${artworkImageClassName}`}
-					src={sourceUrl}
-					alt=""
-					draggable={false}
-				/>
-				{compositeUrl === undefined ? null : (
-					<img
-						className={`absolute inset-0 size-full object-contain drop-shadow-[0_0.3rem_0.5rem_color-mix(in_srgb,var(--ak-overlay)_28%,transparent)] ${artworkImageClassName}`}
-						src={compositeUrl}
-						alt=""
-						draggable={false}
-					/>
-				)}
-			</span>
+			<ItemArtwork
+				className={artworkClassName}
+				compositeUrl={compositeUrl}
+				dataUi={artworkDataUi}
+				imageClassName={artworkImageClassName}
+				size={size}
+				sourceUrl={sourceUrl}
+			/>
 			<Text className="min-w-0">
 				<Title
 					id={titleId}

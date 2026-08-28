@@ -10,7 +10,6 @@ import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -29,35 +28,32 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		limited: {
+			uid: "limited",
 			id: "limited",
 			title: "Limited",
 			description: "Limited",
 			asset: {
-				source: [
+				default: [
 					"asset:limited",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "board",
 			maxStackSize: 10,
 			maxCount: 3,
 			type: "simple",
 		},
 		producer: {
+			uid: "producer",
 			id: "producer",
 			title: "Producer",
 			description: "Producer",
 			asset: {
-				source: [
+				default: [
 					"asset:producer",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "board",
 			maxStackSize: 1,
 			type: "producer",
@@ -82,8 +78,8 @@ const config = GameConfigSchema.parse({
 											{
 												itemId: "limited",
 												quantity: {
-													type: "value",
-													value: 1,
+													min: 1,
+													max: 1,
 												},
 												placement: "drop",
 												rules: [],

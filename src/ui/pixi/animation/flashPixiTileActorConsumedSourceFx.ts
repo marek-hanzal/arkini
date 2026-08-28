@@ -3,7 +3,6 @@ import { Effect } from "effect";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import { readPixiActorAlphaAnimationKey } from "~/ui/pixi/animation/readPixiActorAlphaAnimationKey";
 
 export namespace flashPixiTileActorConsumedSourceFx {
 	export interface Props {
@@ -15,6 +14,8 @@ export namespace flashPixiTileActorConsumedSourceFx {
 export const pixiTileActorConsumedSourceFadeDurationMs = 130;
 const pixiTileActorConsumedSourceRestoreDurationMs = 360;
 const consumedSourceAlpha = 0.42;
+const readActorAlphaAnimationKey = (actor: Pick<PixiTileActor, "instanceId">) =>
+	`actor-alpha:${actor.instanceId}`;
 
 /**
  * Dips a surviving consumed source, then restores it through the same instance-scoped lifecycle
@@ -23,15 +24,12 @@ const consumedSourceAlpha = 0.42;
 export const flashPixiTileActorConsumedSourceFx = Effect.fn("flashPixiTileActorConsumedSourceFx")(
 	function* ({ actor, animator }: flashPixiTileActorConsumedSourceFx.Props) {
 		if (actor.container.destroyed) return;
-		actor.lifecycleIntentGeneration += 1;
 		const intentGeneration = actor.lifecycleIntentGeneration;
-		actor.lifecycleTargetAlpha = 1;
-		actor.lifecycleFadeStarted = true;
 		yield* animator.animateFx({
 			actor,
 			channel: "lifecycle-opacity",
 			durationMs: pixiTileActorConsumedSourceFadeDurationMs,
-			ownerKey: readPixiActorAlphaAnimationKey(actor),
+			ownerKey: readActorAlphaAnimationKey(actor),
 			onComplete: () => {
 				if (
 					actor.container.destroyed ||
@@ -45,7 +43,7 @@ export const flashPixiTileActorConsumedSourceFx = Effect.fn("flashPixiTileActorC
 						actor,
 						channel: "lifecycle-opacity",
 						durationMs: pixiTileActorConsumedSourceRestoreDurationMs,
-						ownerKey: readPixiActorAlphaAnimationKey(actor),
+						ownerKey: readActorAlphaAnimationKey(actor),
 						toAlpha: 1,
 					}),
 				);

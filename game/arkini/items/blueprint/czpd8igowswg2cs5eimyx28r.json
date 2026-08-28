@@ -1,0 +1,154 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "czpd8igowswg2cs5eimyx28r",
+		"id": "item:blueprint-quarry-t2",
+		"title": "Quarry Blueprint",
+		"description": "Build plan that upgrades Quarry 1 into Quarry 2 for marble extraction.",
+		"asset": {
+			"default": [
+				"blueprint",
+				"producer-quarry-t2"
+			],
+			"sources": [
+				"producer-quarry-t2"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 1
+		},
+		"type": "blueprint",
+		"line": {
+			"id": "line:blueprint:quarry-t2:construct",
+			"title": "Construct Quarry",
+			"description": "Consumes construction resources to build Quarry.",
+			"default": true,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 72000,
+			"input": [
+				{
+					"charges": {
+						"cost": 1,
+						"from": "self"
+					},
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "producer:quarry-t1"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:construction-bundle"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:guild-charter"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:iron-ingot"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:coin-stack"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "producer:quarry-t2",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": [
+				{
+					"when": [
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "item:marble-deposit"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						},
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:university"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						}
+					],
+					"type": "enable"
+				}
+			]
+		}
+	}
+}

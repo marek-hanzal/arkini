@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "segwxrf9hjdaz3f040o0935w",
+		"id": "item:wine-barrel",
+		"title": "Wine Barrel",
+		"description": "A barrel of wine produced by wineries and served by taverns.",
+		"asset": {
+			"default": [
+				"item-wine-barrel"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 20,
+		"type": "simple"
+	}
+}

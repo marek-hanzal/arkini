@@ -3,9 +3,9 @@ import { Array, Effect } from "effect";
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { readTileActorBadgeCountFx } from "~/bridge/tile/readTileActorBadgeCountFx";
-import { readTileActorPrimaryAssetIdFx } from "~/bridge/tile/readTileActorPrimaryAssetIdFx";
+import { readTileActorAssetSourceIdsFx } from "~/bridge/tile/readTileActorAssetSourceIdsFx";
 import { readTileActorProgressRatioFx } from "~/bridge/tile/readTileActorProgressRatioFx";
-import { readTileActorQueueBadgeCount } from "~/bridge/tile/readTileActorQueueBadgeCount";
+import { readTileActorQueueBadgeCountFx } from "~/bridge/tile/readTileActorQueueBadgeCountFx";
 import { readTileActorVisualFx } from "~/bridge/tile/readTileActorVisualFx";
 import { readTileActorActivityEffectFx } from "~/bridge/tile/readTileActorActivityEffectFx";
 import { readRuntimeItemPrimaryActionFx } from "~/engine/item-detail/read/readRuntimeItemPrimaryActionFx";
@@ -58,13 +58,13 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 			const visual = yield* readTileActorVisualFx({
 				game,
 				item: item.item,
-				primaryAssetId: yield* readTileActorPrimaryAssetIdFx({
+				sourceIds: yield* readTileActorAssetSourceIdsFx({
 					item,
 					runtime,
 				}),
 			});
 			const running = activeJobStatus === JobStatusEnumSchema.enum.Running;
-			const queueBadgeCount = readTileActorQueueBadgeCount({
+			const queueBadgeCount = yield* readTileActorQueueBadgeCountFx({
 				ownerItemId: item.id,
 				runtime,
 			});

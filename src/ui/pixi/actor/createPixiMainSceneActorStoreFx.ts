@@ -4,11 +4,23 @@ import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActor
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 
+const readCanonicalSlotKey = (location: PixiTileActor["item"]["location"]) => {
+	switch (location.scope) {
+		case "board":
+			return `board:${location.space}:${location.position.x}:${location.position.y}`;
+		case "toolbar":
+			return `toolbar:${location.position.x}`;
+		default:
+			return null;
+	}
+};
+
 /** Owns canonical item projections and retained actor identity for the main Pixi scene. */
 export const createPixiMainSceneActorStoreFx = Effect.fn("createPixiMainSceneActorStoreFx")(() =>
 	Effect.sync((): PixiMainSceneActorStore => {
 		const actors = new Map<string, PixiTileActor>();
 		const canonicalItems = new Map<string, PixiTileActor["item"]>();
+		const canonicalOccupants = new Map<string, PixiTileActor["item"]>();
 		const exitingActors = new Set<PixiTileActor>();
 		let closed = false;
 
@@ -35,11 +47,60 @@ export const createPixiMainSceneActorStoreFx = Effect.fn("createPixiMainSceneAct
 			readCanonicalItemFx: Effect.fn("PixiMainSceneActorStore.readCanonicalItemFx")(
 				(actorId) => Effect.sync(() => canonicalItems.get(actorId) ?? null),
 			),
+			readCanonicalOccupantFx: Effect.fn("PixiMainSceneActorStore.readCanonicalOccupantFx")(
+				(location) =>
+					Effect.sync(() => {
+						const key = readCanonicalSlotKey(location);
+						return key === null ? null : (canonicalOccupants.get(key) ?? null);
+					}),
+			),
+			readCanonicalOccupantsFx: Effect.fn("PixiMainSceneActorStore.readCanonicalOccupantsFx")(
+				(locations) =>
+					Effect.sync(() => {
+						const seen = new Set<string>();
+						const occupants: PixiTileActor["item"][] = [];
+						for (const location of locations) {
+							const key = readCanonicalSlotKey(location);
+							if (key === null) continue;
+							const occupant = canonicalOccupants.get(key);
+							if (occupant === undefined || seen.has(occupant.id)) continue;
+							seen.add(occupant.id);
+							occupants.push(occupant);
+						}
+						return occupants;
+					}),
+			),
 			replaceCanonicalItemsFx: Effect.fn("PixiMainSceneActorStore.replaceCanonicalItemsFx")(
 				(items) =>
 					Effect.sync(() => {
+						if (closed) return;
+						const nextCanonicalItems = new Map<string, PixiTileActor["item"]>();
+						const nextCanonicalOccupants = new Map<string, PixiTileActor["item"]>();
+						for (const item of items) {
+							if (nextCanonicalItems.has(item.id)) {
+								throw new Error(
+									`Canonical Pixi actor ${item.id} was projected more than once.`,
+								);
+							}
+							nextCanonicalItems.set(item.id, item);
+							const key = readCanonicalSlotKey(item.location);
+							if (key === null) continue;
+							const existing = nextCanonicalOccupants.get(key);
+							if (existing !== undefined && existing.id !== item.id) {
+								throw new Error(
+									`Canonical Pixi slot ${key} is occupied by both ${existing.id} and ${item.id}.`,
+								);
+							}
+							nextCanonicalOccupants.set(key, item);
+						}
 						canonicalItems.clear();
-						for (const item of items) canonicalItems.set(item.id, item);
+						canonicalOccupants.clear();
+						for (const [itemId, item] of nextCanonicalItems) {
+							canonicalItems.set(itemId, item);
+						}
+						for (const [key, item] of nextCanonicalOccupants) {
+							canonicalOccupants.set(key, item);
+						}
 					}),
 			),
 			releaseActorFx: Effect.fn("PixiMainSceneActorStore.releaseActorFx")((actorId) =>
@@ -84,6 +145,7 @@ export const createPixiMainSceneActorStoreFx = Effect.fn("createPixiMainSceneAct
 				}
 				actors.clear();
 				canonicalItems.clear();
+				canonicalOccupants.clear();
 				exitingActors.clear();
 			}),
 		};

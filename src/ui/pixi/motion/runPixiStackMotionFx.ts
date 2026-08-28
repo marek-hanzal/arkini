@@ -8,16 +8,16 @@ import { createPixiTileActorFx } from "~/ui/pixi/actor/createPixiTileActorFx";
 import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
-import { restorePixiTileActorRemovalFeedbackFx } from "~/ui/pixi/animation/startPixiTileActorRemovalFeedbackFx";
-import { startPixiTileActorVanishFeedbackFx } from "~/ui/pixi/animation/startPixiTileActorVanishFeedbackFx";
+import { restorePixiTileActorExitFx } from "~/ui/pixi/animation/restorePixiTileActorExitFx";
+import { startPixiTileActorEnterFx } from "~/ui/pixi/animation/startPixiTileActorEnterFx";
+import { startPixiTileActorExitFx } from "~/ui/pixi/animation/startPixiTileActorExitFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { chasePixiTileMotionTargetFx } from "~/ui/pixi/motion/chasePixiTileMotionTargetFx";
 import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
 import { flashPixiMotionTargetFx } from "~/ui/pixi/motion/flashPixiMotionTargetFx";
-import { projectPixiTileMotionItem } from "~/ui/pixi/motion/projectPixiTileMotionItem";
-import { readPixiLiveActorContactPose } from "~/ui/pixi/motion/readPixiLiveActorContactPose";
+import { projectPixiTileMotionItemFx } from "~/ui/pixi/motion/projectPixiTileMotionItemFx";
+import { makePixiLiveActorContactPoseReaderFx } from "~/ui/pixi/motion/makePixiLiveActorContactPoseReaderFx";
 import type { PixiTileMotionTargetRoute } from "~/ui/pixi/motion/PixiTileMotionTargetRoute";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
@@ -65,6 +65,7 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 	target,
 	textures,
 }: runPixiStackMotionFx.Props) {
+	const readPixiLiveActorContactPose = yield* makePixiLiveActorContactPoseReaderFx();
 	const canonical =
 		actorStore.canonicalItems.get(cue.targetActorId) ??
 		actorStore.actors.get(cue.targetActorId)?.item;
@@ -82,7 +83,7 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 		source ??
 		(yield* createPixiTileActorFx({
 			frames: application.frames,
-			item: projectPixiTileMotionItem(
+			item: yield* projectPixiTileMotionItemFx(
 				{
 					...canonical,
 					id: `motion:${cueKey}`,
@@ -96,7 +97,7 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 			textures,
 		}));
 	if (source !== null) {
-		yield* restorePixiTileActorRemovalFeedbackFx({
+		yield* restorePixiTileActorExitFx({
 			actor: source,
 			animator,
 		});
@@ -116,17 +117,12 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 	if (source === null) {
 		yield* animator.setFx({
 			actor: payload,
-			alpha: 0,
-			channel: "lifecycle-opacity",
-		});
-		yield* animator.setFx({
-			actor: payload,
 			channel: "pose",
 			scale: origin.size / Math.max(1, payload.size),
 			x: origin.x,
 			y: origin.y,
 		});
-		yield* startPixiTileActorFadeInFx({
+		yield* startPixiTileActorEnterFx({
 			actor: payload,
 			animator,
 			delayMs,
@@ -148,6 +144,7 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 			cue.targetActorId,
 		]),
 		magneticField,
+		surface,
 		readAttraction: () => {
 			const route = readCurrentRoute();
 			return {
@@ -183,7 +180,7 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 				onComplete();
 			};
 			RendererRuntime.runSync(
-				startPixiTileActorVanishFeedbackFx({
+				startPixiTileActorExitFx({
 					actor: payload,
 					animator,
 					onCancel: settle,
@@ -193,7 +190,6 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 		},
 		ownerKey: `motion:${cueKey}`,
 		readLiveTarget,
-		settleWithinTileRatio: 0.5,
 		surface,
 		targetLocation: cue.targetLocation,
 	});

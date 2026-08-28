@@ -43,4 +43,21 @@ describe("line RuleSchema", () => {
 			).toBe(false);
 		}
 	});
+
+	it("accepts an optional trimmed player hint and rejects blank hints", () => {
+		expect(
+			RuleSchema.parse({
+				type: "enable",
+				hint: "  Requires a building permit.  ",
+				when,
+			}).hint,
+		).toBe("Requires a building permit.");
+		expect(
+			RuleSchema.safeParse({
+				type: "enable",
+				hint: "   ",
+				when,
+			}).success,
+		).toBe(false);
+	});
 });

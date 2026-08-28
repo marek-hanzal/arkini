@@ -1,28 +1,21 @@
 import { FileSystem } from "effect";
 import { Effect } from "effect";
 
-import type { ArkpackTrustedKeysSchema } from "~/engine/pack/schema/ArkpackTrustedKeysSchema";
-import { readArkpackSignatureFx } from "./readArkpackSignatureFx";
-import { verifyArkpackTrustFx } from "./verifyArkpackTrustFx";
+import { verifyArkpackProvenanceFx } from "./verifyArkpackProvenanceFx";
 
 export namespace verifyArkpackFileFx {
 	export interface Props {
 		readonly arkpackPath: string;
-		readonly trustedKeys: ArkpackTrustedKeysSchema.Type;
 	}
 }
 
-/** Verifies one file and its optional canonical sidecar without decoding the Arkpack. */
+/** Offline-classifies the optional proof embedded in one Arkpack file. */
 export const verifyArkpackFileFx = Effect.fn("verifyArkpackFileFx")(function* ({
 	arkpackPath,
-	trustedKeys,
 }: verifyArkpackFileFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const bytes = yield* fileSystem.readFile(arkpackPath);
-	const signature = yield* readArkpackSignatureFx(arkpackPath);
-	return yield* verifyArkpackTrustFx({
+	return yield* verifyArkpackProvenanceFx({
 		bytes,
-		signature,
-		trustedKeys,
 	});
 });

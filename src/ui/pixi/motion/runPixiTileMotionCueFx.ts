@@ -6,7 +6,7 @@ import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
+import { startPixiTileActorEnterFx } from "~/ui/pixi/animation/startPixiTileActorEnterFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { readPixiTileMotionOriginFx } from "~/ui/pixi/motion/readPixiTileMotionOriginFx";
@@ -198,7 +198,7 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 									}),
 								);
 								RendererRuntime.runSync(
-									startPixiTileActorFadeInFx({
+									startPixiTileActorEnterFx({
 										actor,
 										animator,
 										delayMs: 0,

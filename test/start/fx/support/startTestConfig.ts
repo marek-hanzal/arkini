@@ -10,16 +10,15 @@ const simpleItem = ({
 	scope: "any" | "board" | "inventory";
 }) => {
 	return {
+		uid: id,
 		id,
 		title: id,
 		description: id,
 		asset: {
-			source: [
+			default: [
 				`asset:${id}`,
 			],
 		},
-		tags: [],
-		categoryId: "resource",
 		scope,
 		maxStackSize,
 		type: "simple",
@@ -27,7 +26,6 @@ const simpleItem = ({
 };
 
 export const startTestConfig = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -57,12 +55,23 @@ export const startTestConfig = GameConfigSchema.parse({
 		inventory: [
 			{
 				itemId: "log",
-				quantity: 4,
+				position: {
+					x: 0,
+					y: 0,
+				},
+				quantity: 3,
+			},
+			{
+				itemId: "log",
+				position: {
+					x: 1,
+					y: 0,
+				},
+				quantity: 1,
 			},
 		],
 		toolbar: [],
 	},
-	categories: {},
 	items: {
 		tree: simpleItem({
 			id: "tree",
@@ -80,17 +89,16 @@ export const startTestConfig = GameConfigSchema.parse({
 			scope: "inventory",
 		}),
 		backpack: {
+			uid: "backpack",
 			id: "backpack",
 			type: "inventory",
 			title: "Backpack",
 			description: "Backpack",
 			asset: {
-				source: [
+				default: [
 					"asset:backpack",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 		},
 	},
 });

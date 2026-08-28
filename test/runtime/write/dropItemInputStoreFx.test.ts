@@ -44,7 +44,7 @@ const mergeBeforeInputConfig = GameConfigSchema.parse({
 });
 
 const workshopDefinition = inputRuntimeTestConfig.items.workshop;
-if (workshopDefinition === undefined || !("lines" in workshopDefinition)) {
+if (workshopDefinition?.type !== "producer") {
 	throw new Error("Expected workshop producer definition.");
 }
 
@@ -230,7 +230,7 @@ describe("dropItemFx default-line input storage", () => {
 			quantity: 1,
 		});
 		expect(result.outcome.kind).toBe(DropItemResultKindEnumSchema.enum.StoreInput);
-		expect(result.runtime.defaultLineByOwnerItemId).toBeUndefined();
+		expect(result.runtime.defaultLineByOwnerItemId).toEqual({});
 		expect(result.isolated).toMatchObject({
 			id: "runtime:workshop",
 			quantity: 1,

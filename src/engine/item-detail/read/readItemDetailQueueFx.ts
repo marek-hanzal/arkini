@@ -106,7 +106,7 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 				}),
 			),
 	);
-	const requests = (runtime.jobQueue ?? []).filter((request) => request.ownerItemId === owner.id);
+	const requests = runtime.jobQueue.filter((request) => request.ownerItemId === owner.id);
 	const projectedRequests = yield* Effect.forEach(requests, (request, index) =>
 		Effect.gen(function* () {
 			let status: ItemDetailQueueRequest["status"] =

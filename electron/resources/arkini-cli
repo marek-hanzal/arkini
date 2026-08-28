@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+
+launcher_path=$0
+while [ -L "$launcher_path" ]; do
+	link_target=$(readlink "$launcher_path")
+	case "$link_target" in
+		/*) launcher_path=$link_target ;;
+		*) launcher_path=$(dirname "$launcher_path")/$link_target ;;
+	esac
+done
+
+macos_directory=$(cd "$(dirname "$launcher_path")" && pwd)
+export ELECTRON_RUN_AS_NODE=1
+exec "$macos_directory/Arkini" \
+	"$macos_directory/../Resources/app.asar/app/main/cli/arkini.js" \
+	"$@"

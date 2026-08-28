@@ -26,11 +26,9 @@ export const InputMaterialSchema = z
 			"Materials",
 		]).describe("Identifies this input as a directly delivered material item."),
 		/**
-		 * Item or tag matching strategy for materials accepted by this input.
+		 * Canonical item accepted by this input.
 		 */
-		selector: SelectorSchema.describe(
-			"The item or tag matching strategy for materials accepted by this input.",
-		),
+		selector: SelectorSchema.describe("The canonical item accepted by this input."),
 		/**
 		 * Whether this input is consumed or temporarily reserved by the line.
 		 *
@@ -46,7 +44,7 @@ export const InputMaterialSchema = z
 		 * Exact or bounded total amount accepted by this input.
 		 *
 		 * The amount aggregates every material item that matches this selector. A
-		 * range quantity replaces the legacy `upTo` input mode.
+		 * range quantity expresses the optional amount above the required minimum.
 		 */
 		quantity: QuantitySchema.describe(
 			"The exact or bounded total amount accepted across all matching materials.",

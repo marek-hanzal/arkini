@@ -5,7 +5,6 @@ import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativ
 import { LineInputEmptyError } from "~/engine/input/error/LineInputEmptyError";
 import { filterInputSlotItemsFx } from "~/engine/input/read/filterInputSlotItemsFx";
 import { readItemMaterialInputFx } from "~/engine/input/read/readItemMaterialInputFx";
-import { removeLineJobQueueRequests } from "~/engine/job/fx/removeLineJobQueueRequests";
 import { readBoardItemLineFx } from "~/engine/line/fx/readBoardItemLineFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { returnBufferedLineItemsFx } from "./returnBufferedLineItemsFx";
@@ -23,7 +22,7 @@ export namespace withdrawLineInputFx {
 	}
 }
 
-/** Atomically returns every buffered root from one exact material input through standard placement. */
+/** Returns one input's buffered roots while preserving its owner's pending queue intent. */
 export const withdrawLineInputFx = Effect.fn("withdrawLineInputFx")(function* ({
 	ownerItemId,
 	lineId,
@@ -69,11 +68,7 @@ export const withdrawLineInputFx = Effect.fn("withdrawLineInputFx")(function* ({
 					withdrawnItemCount: returned.withdrawnItemCount,
 					withdrawnQuantity: returned.withdrawnQuantity,
 				} satisfies withdrawLineInputFx.Result,
-				removeLineJobQueueRequests({
-					lineId,
-					ownerItemId,
-					runtime: returned.runtime,
-				}),
+				returned.runtime,
 				returned.events,
 			] as const;
 		}),

@@ -1,7 +1,11 @@
 import { Effect, Exit, Option } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 
+import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
+import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
+import { EditorUnsavedChanges } from "~/bridge/editor/EditorUnsavedChanges";
 import { claimGameEngineResourceForCloseFx } from "~/bridge/game/claimGameEngineResourceForCloseFx";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
 import { waitForActionLoadingCompletionFrameFx } from "~/ui/loading/waitForActionLoadingCompletionFrameFx";
 import type { RootContext } from "~/ui/root/RootContext";
@@ -13,6 +17,7 @@ export namespace installRendererControlledCloseFx {
 			"onBeforeClose" | "onBeforeCloseReady"
 		>;
 		readonly rendererRuntime: RootContext["rendererRuntime"];
+		readonly requestEditorLeaveFx?: Effect.Effect<boolean, never, EditorUnsavedChanges>;
 		readonly router: Pick<ArkiniRouter, "navigate">;
 	}
 }
@@ -27,9 +32,23 @@ export namespace installRendererControlledCloseFx {
  * itself.
  */
 export const installRendererControlledCloseFx = Effect.fn("installRendererControlledCloseFx")(
-	({ lifecycle, rendererRuntime, router }: installRendererControlledCloseFx.Props) =>
+	({
+		lifecycle,
+		requestEditorLeaveFx = Effect.flatMap(EditorUnsavedChanges, (owner) =>
+			Effect.promise(() => owner.requestLeave()),
+		),
+		rendererRuntime,
+		router,
+	}: installRendererControlledCloseFx.Props) =>
 		Effect.sync(() => {
 			let exitPresentationRequired = false;
+			const awaitEditorOperations = async () => {
+				await rendererRuntime.runPromise(
+					Effect.flatMap(EditorProjectRepository, (repository) => repository.awaitIdleFx),
+				);
+				const catalog = await rendererRuntime.runPromise(Atom.get(ArkpackCatalogOwnerAtom));
+				if (catalog !== undefined) await rendererRuntime.runPromise(catalog.awaitIdleFx);
+			};
 
 			const removeBeforeClose = lifecycle.onBeforeClose(async () => {
 				exitPresentationRequired = false;
@@ -37,11 +56,20 @@ export const installRendererControlledCloseFx = Effect.fn("installRendererContro
 					claimGameEngineResourceForCloseFx(),
 				);
 				if (Exit.isFailure(exit)) {
-					const failure = readExactCauseFailure(exit.cause);
+					const failure = rendererRuntime.runSync(readExactCauseFailureFx(exit.cause));
 					throw Option.isSome(failure) ? failure.value : exit.cause;
 				}
 				const resource = exit.value;
-				if (resource === null) return;
+				if (resource === null) {
+					if (!(await rendererRuntime.runPromise(requestEditorLeaveFx))) {
+						throw new Error(
+							"Native close was canceled because the editor has unsaved changes.",
+						);
+					}
+					await awaitEditorOperations();
+					return;
+				}
+				await awaitEditorOperations();
 				exitPresentationRequired = true;
 				// Route ownership keeps finalization identical for UI-requested and native close.
 				await router.navigate({

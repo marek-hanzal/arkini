@@ -2,7 +2,7 @@ import type { Effect } from "effect";
 import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import type { ElectronMainError } from "../ElectronMainError";
 
-/** Effect-native main-process capability for exact package/hash save persistence. */
+/** Effect-native main-process capability for stable package save persistence. */
 export interface GameSaveFiles {
 	readonly readFx: (
 		key: ArkiniElectronApi.SaveKey,

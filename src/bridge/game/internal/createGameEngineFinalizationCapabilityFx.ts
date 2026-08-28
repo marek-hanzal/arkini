@@ -3,7 +3,7 @@ import { Deferred, Effect, Exit, Option, Ref, Scope, type Semaphore } from "effe
 import type { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import type { GameEngineResourceFxService } from "~/bridge/game/GameEngineResourceFx";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
 import type {
 	Finalization,
@@ -67,7 +67,7 @@ export const createGameEngineFinalizationCapabilityFx = Effect.fn(
 									: {
 											_tag: "OwnershipFailed",
 											error: Option.getOrThrow(
-												readExactCauseFailure(exit.cause),
+												yield* readExactCauseFailureFx(exit.cause),
 											),
 											finalization,
 										},
@@ -81,9 +81,9 @@ export const createGameEngineFinalizationCapabilityFx = Effect.fn(
 			const canonicalFinalizationExitFx = Effect.fn(
 				"GameEngineFinalizationFx.canonicalFinalizationExitFx",
 			)((finalization: Finalization, exit: Exit.Exit<void, unknown>) =>
-				Effect.sync(() => {
+				Effect.gen(function* () {
 					if (Exit.isSuccess(exit)) return Exit.void;
-					const failure = readExactCauseFailure(exit.cause);
+					const failure = yield* readExactCauseFailureFx(exit.cause);
 					return Exit.fail(
 						finalization.resource.markCriticalFailure(
 							finalization.operation === "release" ? "game-leave" : "game-reset",

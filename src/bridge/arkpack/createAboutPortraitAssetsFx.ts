@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { ArkiniArkpack } from "~/bridge/arkpack/ArkiniArkpack";
+import { ArkiniDefaultPackageId } from "../../../shared/ArkiniAppMetadata";
 import { loadArkpackFx } from "~/bridge/arkpack/loadArkpackFx";
 import { readAboutPortraitResourcesFx } from "~/bridge/arkpack/readAboutPortraitResourcesFx";
 
@@ -17,7 +17,7 @@ const revokeUrls = (urls: readonly string[]) => {
 export const createAboutPortraitAssetsFx = Effect.fn("createAboutPortraitAssetsFx")(() =>
 	Effect.gen(function* () {
 		const loaded = yield* loadArkpackFx({
-			packageId: ArkiniArkpack.packageId,
+			packageId: ArkiniDefaultPackageId,
 		});
 		const resources = yield* readAboutPortraitResourcesFx(loaded.payload);
 		return yield* Effect.acquireRelease(

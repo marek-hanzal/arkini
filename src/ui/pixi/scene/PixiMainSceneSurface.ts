@@ -9,18 +9,32 @@ import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiSceneDropTarget } from "~/ui/pixi/scene/PixiSceneDropTarget";
 import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
 
+export interface PixiMainSceneTargetFacts {
+	readonly commandTarget: runTileDropAtom.Command["target"];
+	readonly occupant: TileActorItem | null;
+	readonly stableKey: string;
+	readonly target: PixiSceneDropTarget | null;
+}
+
 export interface PixiMainSceneSurface {
 	readonly transientActorLayer: Container;
 	readonly closeFx: Effect.Effect<void>;
 	readonly readActorPoseFx: (item: TileActorItem) => Effect.Effect<PixiTileActorPose | null>;
-	readonly readCommandTargetFx: (
-		target: PixiSceneDropTarget | null,
-	) => Effect.Effect<runTileDropAtom.Command["target"]>;
-	readonly readDropTargetFx: (x: number, y: number) => Effect.Effect<PixiSceneDropTarget | null>;
+	/** Resolves pointer geometry and canonical target identity from one current snapshot. */
+	readonly readTargetFactsFx: (x: number, y: number) => Effect.Effect<PixiMainSceneTargetFacts>;
 	readonly readLocationPoseFx: (
 		location: TileActorItem["location"],
 	) => Effect.Effect<PixiTileActorPose | null>;
-	readonly readOccupantFx: (target: PixiSceneDropTarget) => Effect.Effect<TileActorItem | null>;
+	/** Returns stable canonical actor IDs in Board-then-Toolbar grid order. */
+	readonly readLocalActorIdsFx: (bounds: {
+		readonly excludeActorId?: string;
+		readonly height: number;
+		/** Expands per surface using the larger of source size and destination cell size. */
+		readonly paddingRatio?: number;
+		readonly width: number;
+		readonly x: number;
+		readonly y: number;
+	}) => Effect.Effect<ReadonlyArray<string>>;
 	readonly redrawFx: Effect.Effect<void>;
 	readonly renderDropFeedbackFx: (
 		target: PixiSceneDropTarget | null,

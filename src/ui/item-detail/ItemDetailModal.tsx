@@ -12,11 +12,19 @@ import { useItemDetailSources } from "~/bridge/item-detail/useItemDetailSources"
 import { useItemDetailTabs } from "~/bridge/item-detail/useItemDetailTabs";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { BadgeCount } from "~/ui/badge/BadgeCount";
-import { ItemIdentity } from "~/ui/item/ItemIdentity";
+import {
+	selectableActiveClassName,
+	selectableInactiveClassName,
+} from "~/ui/form/SelectableStateClassName";
 import { ItemDefinitionInfoTab } from "~/ui/item-detail/ItemDefinitionInfoTab";
+import {
+	ItemDetailHeader,
+	type ItemDetailHeaderIdentityRenderer,
+} from "~/ui/item-detail/ItemDetailHeader";
 import type { ItemDetailState, ItemDetailTarget } from "~/ui/item-detail/ItemDetailControl";
 import { ItemInfoTab } from "~/ui/item-detail/ItemInfoTab";
 import { ItemLinesTab } from "~/ui/item-detail/ItemLinesTab";
+import type { ItemLineSummaryIdentityRenderer } from "~/ui/item-detail/ItemLineSummary";
 import { ItemQueueTab } from "~/ui/item-detail/ItemQueueTab";
 import { ItemSourcesTab } from "~/ui/item-detail/ItemSourcesTab";
 import { useCloseItemDetail } from "~/ui/item-detail/useCloseItemDetail";
@@ -42,64 +50,6 @@ const tabLabel = {
 	sources: "Sources",
 } as const satisfies Record<ItemDetailTab, string>;
 
-interface HeaderIdentity {
-	readonly title: string;
-	readonly subtitle?: string;
-	readonly sourceUrl: string;
-	readonly compositeUrl?: string;
-}
-
-const ItemDetailHeader = ({
-	disabled,
-	identity,
-	stale,
-}: {
-	readonly disabled: boolean;
-	readonly identity: HeaderIdentity;
-	readonly stale: boolean;
-}) => {
-	const closeItemDetail = useCloseItemDetail();
-	return (
-		<header className="flex min-w-0 items-center justify-between gap-4 border-b border-line pb-3">
-			<ItemIdentity
-				artworkDataUi="ItemDetailHeaderArtwork"
-				compositeUrl={identity.compositeUrl}
-				description={
-					<>
-						{identity.subtitle === undefined ? null : (
-							<p className="mt-1 truncate text-sm text-muted">{identity.subtitle}</p>
-						)}
-						{stale ? (
-							<p className="mt-1 text-xs font-medium text-warning">
-								This item no longer exists. Showing the last known detail.
-							</p>
-						) : null}
-					</>
-				}
-				size="lg"
-				sourceUrl={identity.sourceUrl}
-				title={identity.title}
-				titleClassName="truncate text-lg font-semibold leading-tight"
-				titleId="item-detail-title"
-				titleTag="h2"
-			/>
-			<button
-				type="button"
-				className="grid size-14 shrink-0 cursor-pointer place-items-center bg-transparent text-foreground transition-[color,transform] hover:scale-110 hover:text-accent disabled:cursor-not-allowed"
-				aria-label="Close item detail"
-				data-ui="ItemDetailCloseButton"
-				disabled={disabled}
-				onClick={() => closeItemDetail()}
-			>
-				<span
-					className="icon-[lucide--x] size-10"
-					aria-hidden="true"
-				/>
-			</button>
-		</header>
-	);
-};
-
 const ItemDetailTabs = ({
 	active,
 	disabled,
@@ -120,7 +70,7 @@ const ItemDetailTabs = ({
 	const itemDetail = useItemDetailControl();
 	return (
 		<nav
-			className="flex min-w-0 gap-1 overflow-x-auto border-b border-line py-2"
+			className="flex min-w-0 gap-2 overflow-x-auto py-2"
 			aria-label="Item detail tabs"
 			data-ui="ItemDetailTabs"
 		>
@@ -128,7 +78,7 @@ const ItemDetailTabs = ({
 				<button
 					key={tab}
 					type="button"
-					className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-accent/10 hover:text-foreground aria-selected:bg-accent/15 aria-selected:text-foreground disabled:cursor-not-allowed"
+					className={`inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium disabled:cursor-not-allowed ${tab === active ? selectableActiveClassName : selectableInactiveClassName}`}
 					aria-selected={tab === active}
 					disabled={disabled}
 					data-tab={tab}
@@ -194,7 +144,6 @@ const ItemInfoContent = ({
 			inert={disabled}
 		>
 			<ItemInfoTab
-				identity={identity}
 				info={info}
 				stale={stale}
 			/>
@@ -203,14 +152,18 @@ const ItemInfoContent = ({
 };
 
 const ItemLinesContent = ({
+	definitionItemId,
 	disabled,
 	initialQuery,
 	lines,
+	renderIdentity,
 	stale,
 }: {
+	readonly definitionItemId?: string;
 	readonly disabled: boolean;
 	readonly initialQuery?: string;
 	readonly lines?: useItemDetailLines.Projection;
+	readonly renderIdentity?: ItemLineSummaryIdentityRenderer;
 	readonly stale: boolean;
 }) => {
 	if (lines?.kind !== "available") {
@@ -222,9 +175,11 @@ const ItemLinesContent = ({
 	}
 	return (
 		<ItemLinesTab
+			definitionItemId={definitionItemId}
 			disabled={disabled}
 			initialQuery={initialQuery}
 			lines={lines}
+			renderIdentity={renderIdentity}
 			stale={stale}
 		/>
 	);
@@ -296,22 +251,26 @@ const ItemSourcesContent = ({
 };
 
 const ItemDetailContent = ({
+	definitionItemId,
 	disabled,
 	itemId,
 	identity,
 	info,
 	linesSearchQuery,
 	lines,
+	renderLineIdentity,
 	sources,
 	stale,
 	tab,
 }: {
+	readonly definitionItemId?: string;
 	readonly disabled: boolean;
 	readonly itemId: string;
 	readonly identity?: useItemDetailIdentity.Projection;
 	readonly info?: useItemDetailInfo.Projection;
 	readonly linesSearchQuery?: string;
 	readonly lines?: useItemDetailLines.Projection;
+	readonly renderLineIdentity?: ItemLineSummaryIdentityRenderer;
 	readonly sources?: useItemDetailSources.Projection;
 	readonly stale: boolean;
 	readonly tab: ItemDetailTab;
@@ -327,9 +286,11 @@ const ItemDetailContent = ({
 		))
 		.with("lines", () => (
 			<ItemLinesContent
+				definitionItemId={definitionItemId}
 				disabled={disabled}
 				initialQuery={linesSearchQuery}
 				lines={lines}
+				renderIdentity={renderLineIdentity}
 				stale={stale}
 			/>
 		))
@@ -379,9 +340,13 @@ const ItemDetailBodyTransition = ({
 
 const RuntimeItemDetailScene = ({
 	disabled,
+	renderIdentity,
+	renderLineIdentity,
 	target,
 }: {
 	readonly disabled: boolean;
+	readonly renderIdentity?: ItemDetailHeaderIdentityRenderer;
+	readonly renderLineIdentity?: ItemLineSummaryIdentityRenderer;
 	readonly target: Extract<
 		ItemDetailTarget,
 		{
@@ -465,6 +430,7 @@ const RuntimeItemDetailScene = ({
 				<ItemDetailHeader
 					disabled={disabled}
 					identity={identity}
+					renderIdentity={renderIdentity}
 					stale={stale}
 				/>
 			) : (
@@ -499,12 +465,16 @@ const RuntimeItemDetailScene = ({
 			>
 				<ItemDetailBodyTransition target={target}>
 					<ItemDetailContent
+						definitionItemId={
+							identity?.kind === "available" ? identity.definitionId : undefined
+						}
 						disabled={disabled}
 						itemId={target.itemId}
 						identity={identity}
 						info={info}
 						linesSearchQuery={target.linesSearchQuery}
 						lines={lines}
+						renderLineIdentity={renderLineIdentity}
 						sources={sources}
 						stale={stale}
 						tab={target.tab}
@@ -517,9 +487,11 @@ const RuntimeItemDetailScene = ({
 
 const DefinitionItemDetailScene = ({
 	disabled,
+	renderIdentity,
 	target,
 }: {
 	readonly disabled: boolean;
+	readonly renderIdentity?: ItemDetailHeaderIdentityRenderer;
 	readonly target: Extract<
 		ItemDetailTarget,
 		{
@@ -581,7 +553,11 @@ const DefinitionItemDetailScene = ({
 		>
 			<ItemDetailHeader
 				disabled={disabled}
-				identity={definition}
+				identity={{
+					...definition,
+					definitionId: definition.itemId,
+				}}
+				renderIdentity={renderIdentity}
 				stale={false}
 			/>
 			<ItemDetailTabs
@@ -607,8 +583,12 @@ const DefinitionItemDetailScene = ({
 };
 
 const ItemDetailDialog = ({
+	renderIdentity,
+	renderLineIdentity,
 	state,
 }: {
+	readonly renderIdentity?: ItemDetailHeaderIdentityRenderer;
+	readonly renderLineIdentity?: ItemLineSummaryIdentityRenderer;
 	readonly state: Exclude<
 		ItemDetailState,
 		{
@@ -673,6 +653,8 @@ const ItemDetailDialog = ({
 						(target) => (
 							<RuntimeItemDetailScene
 								disabled={disabled}
+								renderIdentity={renderIdentity}
+								renderLineIdentity={renderLineIdentity}
 								target={target}
 							/>
 						),
@@ -684,6 +666,7 @@ const ItemDetailDialog = ({
 						(target) => (
 							<DefinitionItemDetailScene
 								disabled={disabled}
+								renderIdentity={renderIdentity}
 								target={target}
 							/>
 						),
@@ -695,7 +678,12 @@ const ItemDetailDialog = ({
 };
 
 /** Renders the one active Item Detail modal over the unchanged tile scene. */
-export const ItemDetailModal = () => {
+export interface ItemDetailModalProps {
+	readonly renderIdentity?: ItemDetailHeaderIdentityRenderer;
+	readonly renderLineIdentity?: ItemLineSummaryIdentityRenderer;
+}
+
+export const ItemDetailModal = ({ renderIdentity, renderLineIdentity }: ItemDetailModalProps) => {
 	const itemDetail = useItemDetailControl();
 	return match(itemDetail.state)
 		.with(
@@ -714,7 +702,13 @@ export const ItemDetailModal = () => {
 			{
 				phase: "exiting",
 			},
-			(state) => <ItemDetailDialog state={state} />,
+			(state) => (
+				<ItemDetailDialog
+					renderIdentity={renderIdentity}
+					renderLineIdentity={renderLineIdentity}
+					state={state}
+				/>
+			),
 		)
 		.exhaustive();
 };

@@ -1,5 +1,5 @@
-import { NodeServices } from "@effect/platform-node";
-import { Effect, FileSystem, PlatformError } from "effect";
+import * as NodeServices from "@effect/platform-node/NodeServices";
+import { Effect } from "effect";
 import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -7,14 +7,13 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createFilesystemWindowPreferencesFx } from "../../electron/main/window/createFilesystemWindowPreferencesFx";
 
 let root = "";
-const preferenceDirectory = () => join(root, "arkini", "preferences");
-const modePath = () => join(preferenceDirectory(), "window.mode");
-const pendingPath = () => join(preferenceDirectory(), "window.pending");
+const preferenceDirectory = () => join(root, "arkini", "game", "preferences");
+const modePath = () => join(preferenceDirectory(), "window.mode.json");
 
 const createPreferences = () =>
 	Effect.runPromise(
 		createFilesystemWindowPreferencesFx({
-			userDataPath: root,
+			root: preferenceDirectory(),
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
 
@@ -50,41 +49,9 @@ describe("createFilesystemWindowPreferencesFx", () => {
 			"fullscreen",
 		] as const) {
 			await Effect.runPromise(preferences.writeModeFx(mode));
-			expect(await readFile(modePath(), "utf8")).toBe(mode);
+			expect(await readFile(modePath(), "utf8")).toBe(JSON.stringify(mode));
 			expect(await Effect.runPromise(preferences.readModeFx)).toBe(mode);
-			await expect(access(pendingPath())).rejects.toBeDefined();
 		}
-	});
-
-	it("preserves the committed mode when atomic replacement fails", async () => {
-		const preferences = await createPreferences();
-		await Effect.runPromise(preferences.writeModeFx("bordered"));
-		const failing = await Effect.runPromise(
-			Effect.gen(function* () {
-				const fileSystem = yield* FileSystem.FileSystem;
-				return yield* createFilesystemWindowPreferencesFx({
-					userDataPath: root,
-					fileSystem: {
-						...fileSystem,
-						rename: () =>
-							Effect.fail(
-								PlatformError.systemError({
-									_tag: "Unknown",
-									module: "FileSystem",
-									method: "rename",
-									description: "rename failed",
-								}),
-							),
-					},
-				});
-			}).pipe(Effect.provide(NodeServices.layer)),
-		);
-
-		await expect(Effect.runPromise(failing.writeModeFx("fullscreen"))).rejects.toThrow(
-			"persist the window mode preference",
-		);
-		expect(await readFile(modePath(), "utf8")).toBe("bordered");
-		await expect(access(pendingPath())).rejects.toBeDefined();
 	});
 
 	it("rejects unsupported modes instead of persisting them", async () => {

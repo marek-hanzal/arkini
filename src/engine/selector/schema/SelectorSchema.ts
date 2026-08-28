@@ -1,23 +1,19 @@
 import { z } from "zod";
 
-import { SelectorItemSchema } from "./SelectorItemSchema";
-import { SelectorTagSchema } from "./SelectorTagSchema";
+import { IdSchema } from "~/engine/common/schema/IdSchema";
 
 /**
- * A discriminated item selector that resolves to one or more canonical items.
- *
- * Each selector member owns its matching strategy and fields. The `type`
- * discriminator keeps consumers explicit and directly compatible with
- * `ts-pattern`.
+ * One explicit canonical item selector.
  */
 export const SelectorSchema = z
-	.discriminatedUnion("type", [
-		SelectorItemSchema,
-		SelectorTagSchema,
-	])
+	.object({
+		type: z.literal("item"),
+		itemId: IdSchema.describe("The stable ID of the selected canonical item."),
+	})
+	.strict()
 	.meta({
 		id: "SelectorSchema",
-		description: "A selector that resolves to one or more canonical game items.",
+		description: "A selector that resolves one canonical game item by stable ID.",
 	});
 
 export type SelectorSchema = typeof SelectorSchema;

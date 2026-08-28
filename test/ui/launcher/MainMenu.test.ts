@@ -21,6 +21,7 @@ import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLife
 import { MainMenuPage } from "~/page/launcher/MainMenuPage";
 import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";
 import { LauncherStartupConfigAtom } from "~/ui/launcher/LauncherStartupConfigAtom";
+import { EditorServiceStatusAtom } from "~/bridge/editor/EditorServiceStatusAtom";
 
 (
 	globalThis as {
@@ -41,7 +42,7 @@ afterEach(async () => {
 });
 
 describe("MainMenu", () => {
-	it("plays the authoritative built-in package and requests native exit once", async () => {
+	it("plays the effective default package and requests native exit once", async () => {
 		let resolveClose: (() => void) | undefined;
 		const requestClose = vi.fn(
 			() =>
@@ -55,35 +56,36 @@ describe("MainMenu", () => {
 				{
 					packageId: "competing-official",
 					contentHash: "b".repeat(64),
-					gameId: "other-game",
 					title: "Other Game",
-					configVersion: "1",
-					compressedSize: 1,
-					trust: {
+					version: "1.0",
+					arkini: "1",
+					provenance: {
 						type: "official",
-						keyId: "other-official",
 					} as const,
-					source: "built-in" as const,
+					source: "bundled" as const,
 				},
 				{
 					packageId: "arkini",
 					contentHash: "a".repeat(64),
-					gameId: "arkini",
 					title: "Arkini",
-					configVersion: "1",
-					compressedSize: 1,
-					trust: {
+					version: "1.0",
+					arkini: "1",
+					provenance: {
 						type: "official",
-						keyId: "test-official",
 					} as const,
-					source: "built-in" as const,
+					source: "bundled" as const,
 				},
 			],
 		};
+		const catalogStateRef = Effect.runSync(
+			SubscriptionRef.make<ArkpackCatalog.State>(catalogState),
+		);
 		const catalog: ArkpackCatalog = {
-			state: Effect.runSync(SubscriptionRef.make<ArkpackCatalog.State>(catalogState)),
+			awaitIdleFx: Effect.void,
+			state: catalogStateRef,
 			refreshFx: Effect.void,
 			importFileFx: () => Effect.die("unused"),
+			installFx: () => Effect.die("unused"),
 			removeFx: () => Effect.die("unused"),
 		};
 		const registry = AtomRegistry.make({
@@ -91,6 +93,9 @@ describe("MainMenu", () => {
 			scheduleTask,
 		});
 		registries.push(registry);
+		registry.set(EditorServiceStatusAtom, {
+			type: "ready",
+		});
 		registry.set(ArkpackCatalogOwnerAtom, catalog);
 		registry.set(
 			RendererLifecycleOwnerAtom,
@@ -109,7 +114,7 @@ describe("MainMenu", () => {
 					theme: "dark" as const,
 					accent: "rose" as const,
 				},
-				builtInPackageId: "arkini",
+				defaultPackageId: "arkini",
 				cheatsAvailable: false,
 				windowMode: "bordered" as const,
 			}),
@@ -155,36 +160,46 @@ describe("MainMenu", () => {
 			(link) => link.textContent === "Play",
 		);
 		expect(play?.getAttribute("href")).toContain("/action/load-game/arkini");
+		await act(async () => {
+			await Effect.runPromise(
+				SubscriptionRef.set(catalogStateRef, {
+					type: "ready",
+					arkpacks: [
+						{
+							...catalogState.arkpacks[1]!,
+							provenance: {
+								type: "community",
+							},
+						},
+					],
+				}),
+			);
+		});
+		await vi.waitFor(() => expect(container.textContent).toContain("Play"));
+		const editor = Array.from(container.querySelectorAll("a")).find(
+			(link) => link.textContent === "Editor",
+		);
+		expect(editor?.getAttribute("href")).toBe("/editor/welcome");
+		await act(async () => {
+			registry.set(EditorServiceStatusAtom, {
+				type: "unavailable",
+				message: "SQLite unavailable.",
+			});
+		});
+		await vi.waitFor(() => expect(container.textContent).toContain("Editor unavailable"));
 		expect(
-			container.querySelector<HTMLElement>('[data-ui="MainPageLayout"]')?.style
-				.viewTransitionName,
-		).toBe("");
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]')?.style
-				.viewTransitionName,
-		).toBe("arkini-panel-main-menu");
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="MainPagePanelContent"]')?.style
-				.viewTransitionName,
-		).toBe("");
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="LauncherHero"]')?.style
-				.viewTransitionName,
-		).toBe("");
-		expect(container.querySelector('[data-ui="LauncherHeroShadow"]')).not.toBeNull();
-		const menu = container.querySelector<HTMLElement>('[data-ui="MainMenu"]');
-		const panel = container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]');
-		expect(menu?.className).not.toContain("ak-list");
-		expect(menu?.className).toContain("gap-4");
-		expect(panel?.className).toContain("border-0");
-		expect(panel?.className).toContain("bg-transparent");
-		expect(panel?.className).toContain("shadow-none");
-		expect(play?.className).toContain("bg-accent");
-		expect(play?.className).toContain("text-accent-contrast");
-		expect(
-			Array.from(menu?.querySelectorAll("a, button") ?? []).every(
-				(control) => !control.className.includes("ak-list-row"),
+			Array.from(container.querySelectorAll("a")).some((link) =>
+				link.getAttribute("href")?.includes("/editor"),
 			),
+		).toBe(false);
+		const unavailableEditor = Array.from(container.querySelectorAll("button")).find(
+			(button) => button.textContent === "Editor unavailable",
+		);
+		expect(unavailableEditor).toBeInstanceOf(HTMLButtonElement);
+		expect((unavailableEditor as HTMLButtonElement).disabled).toBe(true);
+		expect(container.textContent).toContain("SQLite unavailable.");
+		expect(
+			Array.from(container.querySelectorAll("a")).some((link) => link.textContent === "Play"),
 		).toBe(true);
 		expect(container.textContent).toContain("Arkpacks");
 		expect(container.textContent).toContain("Settings");

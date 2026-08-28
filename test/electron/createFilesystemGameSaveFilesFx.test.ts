@@ -1,30 +1,28 @@
 import { FileSystem } from "effect";
-import { NodeServices } from "@effect/platform-node";
+import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Deferred, Effect, Option } from "effect";
 import { access, mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createFilesystemGameSaveFilesFx } from "../../electron/main/save/createFilesystemGameSaveFilesFx";
+import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
 
 let root = "";
 const first = {
 	packageId: "arkini",
-	contentHash: "a".repeat(64),
 };
 const second = {
-	packageId: "arkini",
-	contentHash: "b".repeat(64),
+	packageId: "second",
 };
 const demo = {
 	packageId: "demo",
-	contentHash: "c".repeat(64),
 };
 
 const createRepository = (fileSystem?: FileSystem.FileSystem) =>
 	Effect.runPromise(
 		createFilesystemGameSaveFilesFx({
-			userDataPath: root,
+			root: join(root, "arkini", "game", "saves"),
 			fileSystem,
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
@@ -43,7 +41,7 @@ afterEach(async () => {
 });
 
 describe("createFilesystemGameSaveFilesFx", () => {
-	it("writes exact saves through pending/current replacement and isolates clear", async () => {
+	it("writes package saves through pending/current replacement and isolates clear", async () => {
 		const repository = await createRepository();
 		await Effect.runPromise(
 			repository.writeFx(
@@ -75,9 +73,6 @@ describe("createFilesystemGameSaveFilesFx", () => {
 				4,
 			]),
 		);
-		await expect(
-			access(join(root, "arkini", "saves", "arkini", first.contentHash, "pending.arksave")),
-		).rejects.toBeDefined();
 		await Effect.runPromise(repository.clearFx(first));
 		expect(await Effect.runPromise(repository.readFx(first))).toBeNull();
 		expect(await Effect.runPromise(repository.readFx(second))).toEqual(
@@ -101,14 +96,7 @@ describe("createFilesystemGameSaveFilesFx", () => {
 		expect(
 			new Uint8Array(
 				await readFile(
-					join(
-						root,
-						"arkini",
-						"saves",
-						demo.packageId,
-						demo.contentHash,
-						"current.arksave",
-					),
+					join(root, "arkini", "game", "saves", demo.packageId, "current.arksave"),
 				),
 			),
 		).toEqual(bytes);
@@ -116,74 +104,12 @@ describe("createFilesystemGameSaveFilesFx", () => {
 		expect(await Effect.runPromise(repository.readFx(demo))).toBeNull();
 	});
 
-	it("serializes concurrent writes before either can reuse the shared pending path", async () => {
-		const fileSystem = await readNodeFileSystem();
-		const firstRenameEntered = Effect.runSync(Deferred.make<void>());
-		const releaseFirstRename = Effect.runSync(Deferred.make<void>());
-		const secondRenameEntered = Effect.runSync(Deferred.make<void>());
-		let renameCalls = 0;
-		const gatedFileSystem: FileSystem.FileSystem = {
-			...fileSystem,
-			rename: (oldPath, newPath) =>
-				Effect.suspend(() => {
-					renameCalls += 1;
-					const rename = fileSystem.rename(oldPath, newPath);
-					if (renameCalls === 1) {
-						return Deferred.succeed(firstRenameEntered, undefined).pipe(
-							Effect.andThen(Deferred.await(releaseFirstRename)),
-							Effect.andThen(rename),
-						);
-					}
-					return Deferred.succeed(secondRenameEntered, undefined).pipe(
-						Effect.andThen(rename),
-					);
-				}),
-		};
-		const repository = await createRepository(gatedFileSystem);
-		const firstWrite = Effect.runPromise(
-			repository.writeFx(
-				first,
-				new Uint8Array([
-					1,
-				]),
-			),
-		);
-		await Effect.runPromise(Deferred.await(firstRenameEntered));
-
-		const secondWrite = Effect.runPromise(
-			repository.writeFx(
-				first,
-				new Uint8Array([
-					2,
-				]),
-			),
-		);
-		expect(Option.isNone(await Effect.runPromise(Deferred.poll(secondRenameEntered)))).toBe(
-			true,
-		);
-
-		Effect.runSync(Deferred.succeed(releaseFirstRename, undefined));
-		await Promise.all([
-			firstWrite,
-			secondWrite,
-		]);
-
-		expect(await Effect.runPromise(repository.readFx(first))).toEqual(
-			new Uint8Array([
-				2,
-			]),
-		);
-		await expect(
-			access(join(root, "arkini", "saves", "arkini", first.contentHash, "pending.arksave")),
-		).rejects.toBeDefined();
-	});
-
 	it("orders clear after an already admitted write", async () => {
 		const fileSystem = await readNodeFileSystem();
 		const renameEntered = Effect.runSync(Deferred.make<void>());
 		const releaseRename = Effect.runSync(Deferred.make<void>());
 		const clearEntered = Effect.runSync(Deferred.make<void>());
-		const saveDirectory = join(root, "arkini", "saves", first.packageId, first.contentHash);
+		const saveDirectory = join(root, "arkini", "game", "saves", first.packageId);
 		const gatedFileSystem: FileSystem.FileSystem = {
 			...fileSystem,
 			rename: (oldPath, newPath) =>
@@ -220,93 +146,7 @@ describe("createFilesystemGameSaveFilesFx", () => {
 		expect(await Effect.runPromise(repository.readFx(first))).toBeNull();
 	});
 
-	it("preserves the previous current save when atomic replacement fails", async () => {
-		const repository = await createRepository();
-		await Effect.runPromise(
-			repository.writeFx(
-				first,
-				new Uint8Array([
-					1,
-					2,
-					3,
-				]),
-			),
-		);
-		const failing = await Effect.runPromise(
-			Effect.gen(function* () {
-				const fileSystem = yield* FileSystem.FileSystem;
-				return yield* createFilesystemGameSaveFilesFx({
-					userDataPath: root,
-					fileSystem: {
-						...fileSystem,
-						rename: () => Effect.die(new Error("rename failed")),
-					},
-				});
-			}).pipe(Effect.provide(NodeServices.layer)),
-		);
-		await expect(
-			Effect.runPromise(
-				failing.writeFx(
-					first,
-					new Uint8Array([
-						9,
-					]),
-				),
-			),
-		).rejects.toThrow("rename failed");
-		expect(await Effect.runPromise(repository.readFx(first))).toEqual(
-			new Uint8Array([
-				1,
-				2,
-				3,
-			]),
-		);
-		await expect(
-			access(join(root, "arkini", "saves", "arkini", first.contentHash, "pending.arksave")),
-		).rejects.toBeDefined();
-	});
-
-	it("releases save serialization after a failed operation", async () => {
-		const fileSystem = await readNodeFileSystem();
-		let renameCalls = 0;
-		const failingOnceFileSystem: FileSystem.FileSystem = {
-			...fileSystem,
-			rename: (oldPath, newPath) =>
-				Effect.suspend(() => {
-					renameCalls += 1;
-					return renameCalls === 1
-						? Effect.die(new Error("rename failed"))
-						: fileSystem.rename(oldPath, newPath);
-				}),
-		};
-		const repository = await createRepository(failingOnceFileSystem);
-		await expect(
-			Effect.runPromise(
-				repository.writeFx(
-					first,
-					new Uint8Array([
-						1,
-					]),
-				),
-			),
-		).rejects.toThrow("rename failed");
-
-		await Effect.runPromise(
-			repository.writeFx(
-				first,
-				new Uint8Array([
-					2,
-				]),
-			),
-		);
-		expect(await Effect.runPromise(repository.readFx(first))).toEqual(
-			new Uint8Array([
-				2,
-			]),
-		);
-	});
-
-	it("replaces the complete current file and rejects unsafe keys", async () => {
+	it("replaces the complete current file and encodes every canonical package identity", async () => {
 		const repository = await createRepository();
 		await Effect.runPromise(
 			repository.writeFx(
@@ -327,22 +167,39 @@ describe("createFilesystemGameSaveFilesFx", () => {
 				]),
 			),
 		);
-		const path = join(root, "arkini", "saves", "arkini", first.contentHash, "current.arksave");
+		const path = join(root, "arkini", "game", "saves", "arkini", "current.arksave");
 		expect(new Uint8Array(await readFile(path))).toEqual(
 			new Uint8Array([
 				9,
 			]),
 		);
+		const encoded = {
+			packageId: "studio:game/one",
+		};
+		await Effect.runPromise(
+			repository.writeFx(
+				encoded,
+				new Uint8Array([
+					5,
+				]),
+			),
+		);
+		expect(await Effect.runPromise(repository.readFx(encoded))).toEqual(
+			new Uint8Array([
+				5,
+			]),
+		);
 		await expect(
-			Effect.runPromise(
-				repository.writeFx(
-					{
-						packageId: "../escape",
-						contentHash: first.contentHash,
-					},
-					new Uint8Array(),
+			access(
+				join(
+					root,
+					"arkini",
+					"game",
+					"saves",
+					encodeGameProjectFileStem(encoded.packageId),
+					"current.arksave",
 				),
 			),
-		).rejects.toThrow("Invalid Arkini save identity");
+		).resolves.toBeUndefined();
 	});
 });

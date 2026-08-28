@@ -18,7 +18,7 @@ export const checkRuntimeDefaultLinesFx = Effect.fn("checkRuntimeDefaultLinesFx"
 	runtime,
 }: checkRuntimeDefaultLinesFx.Props) {
 	const issues: DefaultLineIssueSchema.Type[] = [];
-	for (const [ownerItemId, lineId] of Object.entries(runtime.defaultLineByOwnerItemId ?? {})) {
+	for (const [ownerItemId, lineId] of Object.entries(runtime.defaultLineByOwnerItemId)) {
 		const owner = runtime.items.find((item) => item.id === ownerItemId);
 		if (owner === undefined) {
 			issues.push({

@@ -1,4 +1,4 @@
-name: macOS Development Prerelease
+name: Development Prerelease
 
 on:
   workflow_dispatch:
@@ -6,80 +6,174 @@ on:
     tags:
       - "v*-dev.*"
 
-permissions:
-  contents: write
-
 concurrency:
-  group: macos-prerelease-${{ github.ref }}
+  group: development-prerelease-${{ github.ref }}
   cancel-in-progress: false
 
+env:
+  ARKINI_RELEASE_ISSUER: https://token.actions.githubusercontent.com
+  ARKINI_RELEASE_IDENTITY: ${{ github.server_url }}/${{ github.repository }}/.github/workflows/macos-prerelease.yml
+
 jobs:
-  package:
-    name: Build unsigned macOS arm64 artifacts
-    runs-on: macos-15
-    timeout-minutes: 60
-    env:
-      CSC_IDENTITY_AUTO_DISCOVERY: "false"
+  prepare-arkpack:
+    name: Build the canonical Arkpack once
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 22.16.0
-
-      - name: Verify pinned Node and npm toolchain
-        run: |
-          test "$(node --version)" = "v22.16.0"
-          test "$(npm --version)" = "10.9.2"
-
+      - name: Install repository toolchain
+        uses: jdx/mise-action@3c2e0cf82a5b2e5249f0d3635a4d83d0ae861518 # v4.2.5
+      - name: Install dependencies
+        run: ./Argcfile.sh install
       - name: Use tag version for release artifacts
         if: startsWith(github.ref, 'refs/tags/')
-        run: npm version --no-git-tag-version "${GITHUB_REF_NAME#v}"
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run source repository gates
-        run: |
-          npm run format:check
-          npm run typecheck
-          npm run game:validate
-
-      - name: Package unsigned macOS arm64 application with signed official game content
+        run: ./Argcfile.sh version "${GITHUB_REF_NAME#v}"
+      - name: Build and optionally sign the canonical Arkpack
         env:
-          ARKINI_ARKPACK_PRIVATE_KEY: ${{ secrets.ARKINI_ARKPACK_PRIVATE_KEY }}
-        run: npm run package:mac
-
-      - name: Verify dependency graph and permanent tests against packaged build inputs
+          ARKINI_RELEASE_SIGN: ${{ startsWith(github.ref, 'refs/tags/') && '1' || '0' }}
+        run: ./Argcfile.sh build
+      - name: Verify canonical provenance
+        env:
+          EXPECTED_PROVENANCE: ${{ startsWith(github.ref, 'refs/tags/') && 'official' || 'community' }}
         run: |
-          npm run dc
-          npm run test:shards
-
-      - name: Upload workflow artifact
-        uses: actions/upload-artifact@v5
+          node .out/desktop/build/main/cli/arkini.js arkpack verify game/arkini/build/arkini.arkpack |
+            grep -Fx "{\"type\":\"$EXPECTED_PROVENANCE\"}"
+      - name: Upload canonical Arkpack
+        uses: actions/upload-artifact@v6
         with:
-          name: arkini-macos-arm64-${{ github.run_number }}
-          path: |
-            .out/desktop/release/*.dmg
-            .out/desktop/release/*.zip
-            .out/desktop/release/SHA256SUMS
+          name: arkini-canonical-${{ github.run_number }}-${{ github.run_attempt }}
+          path: game/arkini/build/arkini.arkpack
           if-no-files-found: error
           retention-days: 14
 
-      - name: Publish GitHub prerelease
+  package:
+    name: Build release-channel ${{ matrix.name }} artifacts
+    needs: prepare-arkpack
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS arm64
+            os: macos-15
+            command: package-macos
+            artifact: arkini-macos-arm64
+            paths: |
+              .out/desktop/release/*.dmg
+              .out/desktop/release/*.zip
+              .out/desktop/release/*.arkpack
+              .out/desktop/release/SHA256SUMS-macos-arm64
+              .out/desktop/release/SHA256SUMS-arkpack
+          - name: Windows x64
+            os: windows-2025
+            command: package-windows
+            artifact: arkini-windows-x64
+            paths: |
+              .out/desktop/release/*.exe
+              .out/desktop/release/*.zip
+              .out/desktop/release/SHA256SUMS-windows-x64
+          - name: Linux x64
+            os: ubuntu-24.04
+            command: package-linux
+            artifact: arkini-linux-x64
+            paths: |
+              .out/desktop/release/*.AppImage
+              .out/desktop/release/SHA256SUMS-linux-x64
+          - name: Linux arm64
+            os: ubuntu-24.04-arm
+            command: package-linux-arm64
+            artifact: arkini-linux-arm64
+            paths: |
+              .out/desktop/release/*.AppImage
+              .out/desktop/release/SHA256SUMS-linux-arm64
+    defaults:
+      run:
+        shell: bash
+    env:
+      ARKINI_EXPECTED_PROVENANCE: ${{ startsWith(github.ref, 'refs/tags/') && 'official' || 'community' }}
+      ARKINI_PREBUILT_ARKPACK: ${{ github.workspace }}/.release/arkini.arkpack
+      CSC_IDENTITY_AUTO_DISCOVERY: "false"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+      - name: Install repository toolchain
+        uses: jdx/mise-action@3c2e0cf82a5b2e5249f0d3635a4d83d0ae861518 # v4.2.5
+      - name: Install dependencies
+        run: ./Argcfile.sh install
+      - name: Use tag version for release artifacts
         if: startsWith(github.ref, 'refs/tags/')
+        run: ./Argcfile.sh version "${GITHUB_REF_NAME#v}"
+      - name: Download canonical Arkpack
+        uses: actions/download-artifact@v8
+        with:
+          name: arkini-canonical-${{ github.run_number }}-${{ github.run_attempt }}
+          path: .release
+      - name: Package application with canonical Arkpack
+        run: ./Argcfile.sh "${{ matrix.command }}"
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ matrix.artifact }}-${{ github.run_number }}-${{ github.run_attempt }}
+          path: ${{ matrix.paths }}
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish complete development prerelease
+    needs: package
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download macOS artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: arkini-macos-arm64-${{ github.run_number }}-${{ github.run_attempt }}
+          path: release/macos
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: arkini-windows-x64-${{ github.run_number }}-${{ github.run_attempt }}
+          path: release/windows
+      - name: Download Linux x64 artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: arkini-linux-x64-${{ github.run_number }}-${{ github.run_attempt }}
+          path: release/linux-x64
+      - name: Download Linux arm64 artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: arkini-linux-arm64-${{ github.run_number }}-${{ github.run_attempt }}
+          path: release/linux-arm64
+      - name: Publish GitHub prerelease
         env:
+          GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "$GITHUB_REF_NAME" \
-            .out/desktop/release/*.dmg \
-            .out/desktop/release/*.zip \
-            .out/desktop/release/SHA256SUMS \
+            release/macos/*.dmg \
+            release/macos/*.zip \
+            release/macos/arkini.arkpack \
+            release/macos/SHA256SUMS-macos-arm64 \
+            release/macos/SHA256SUMS-arkpack \
+            release/windows/*.exe \
+            release/windows/*.zip \
+            release/windows/SHA256SUMS-windows-x64 \
+            release/linux-x64/*.AppImage \
+            release/linux-x64/SHA256SUMS-linux-x64 \
+            release/linux-arm64/*.AppImage \
+            release/linux-arm64/SHA256SUMS-linux-arm64 \
             --verify-tag \
             --prerelease \
             --title "Arkini $GITHUB_REF_NAME" \
-            --notes "Unsigned macOS Apple Silicon development build. Verify SHA256SUMS before opening and use the normal macOS Gatekeeper override for unsigned local testing."
+            --notes "Unsigned macOS Apple Silicon, Windows x64, and Linux x64/arm64 applications with one embedded official Arkpack, plus the same standalone Arkpack. Verify the platform checksum file before opening; macOS requires the normal Gatekeeper override."

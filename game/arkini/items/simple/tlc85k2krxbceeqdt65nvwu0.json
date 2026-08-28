@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "tlc85k2krxbceeqdt65nvwu0",
+		"id": "item:marble-block",
+		"title": "Marble Block",
+		"description": "Polished marble construction block for future prestige buildings that should not be made from yet another heroic pile of planks.",
+		"asset": {
+			"default": [
+				"item-marble-block"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 30,
+		"type": "simple"
+	}
+}

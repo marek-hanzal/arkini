@@ -5,19 +5,15 @@ import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { selectItemsFx } from "~/engine/selector/fx/selectItemsFx";
 
 const item = {
+	uid: "tree",
 	id: "tree",
 	title: "Tree",
 	description: "A living tree.",
 	asset: {
-		source: [
+		default: [
 			"asset:tree",
 		],
 	},
-	tags: [
-		"nature",
-		"forest",
-	],
-	categoryId: "resource",
 	scope: "board",
 	maxStackSize: 1,
 	type: "simple",
@@ -25,11 +21,9 @@ const item = {
 
 const stone = {
 	...item,
+	uid: "stone",
 	id: "stone",
 	title: "Stone",
-	tags: [
-		"mineral",
-	],
 } satisfies ItemSchema.Type;
 
 describe("selectItemsFx", () => {
@@ -39,25 +33,6 @@ describe("selectItemsFx", () => {
 				selector: {
 					type: "item",
 					itemId: "tree",
-				},
-				items: [
-					item,
-					stone,
-				],
-			}),
-		);
-
-		expect(selected).toEqual([
-			item,
-		]);
-	});
-
-	it("selects canonical items by semantic tag", () => {
-		const selected = Effect.runSync(
-			selectItemsFx({
-				selector: {
-					type: "tag",
-					tag: "forest",
 				},
 				items: [
 					item,

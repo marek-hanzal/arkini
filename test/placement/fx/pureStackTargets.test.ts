@@ -84,6 +84,8 @@ describe("pure placement stack targets", () => {
 					lineId: "line:craft",
 				},
 			],
+
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
 		const stacks = Effect.runSync(
@@ -126,6 +128,9 @@ describe("pure placement stack targets", () => {
 			jobs: [
 				activeJob(active.id),
 			],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
 		const stacks = Effect.runSync(
@@ -170,6 +175,9 @@ describe("pure placement stack targets", () => {
 			jobs: [
 				activeJob(active.id),
 			],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
 		const [placement, nextRuntime] = Effect.runSync(
@@ -221,6 +229,9 @@ describe("pure placement stack targets", () => {
 				excludedStack,
 			],
 			jobs: [],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
 		const [placement, nextRuntime] = Effect.runSync(
@@ -274,6 +285,9 @@ describe("pure placement stack targets", () => {
 			jobs: [
 				activeJob(active.id),
 			],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
 		const result = Effect.runSync(

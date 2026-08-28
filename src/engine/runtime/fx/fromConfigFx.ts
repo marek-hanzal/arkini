@@ -17,6 +17,7 @@ export const fromConfigFx = Effect.fn("fromConfigFx")(function* () {
 		items: [],
 		jobs: [],
 		jobQueue: [],
+		defaultLineByOwnerItemId: {},
 	};
 	return runtime;
 });

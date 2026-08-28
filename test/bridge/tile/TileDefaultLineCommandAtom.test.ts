@@ -8,16 +8,19 @@ import { TileDefaultLineCommandAtom } from "~/bridge/tile/TileDefaultLineCommand
 
 const engineCommands = vi.hoisted(() => ({
 	enqueue: vi.fn(),
+	fill: vi.fn(),
 }));
 const failStop = vi.fn<Game["failStop"]>();
 
-vi.mock("~/engine/job/write/enqueueLineFx", () => ({
-	enqueueLineFx: (props: unknown) => engineCommands.enqueue(props),
+vi.mock("~/engine/job/write/enqueueDefaultLineFx", () => ({
+	enqueueDefaultLineFx: (props: unknown) => engineCommands.enqueue(props),
+}));
+vi.mock("~/engine/job/write/fillDefaultLineQueueFx", () => ({
+	fillDefaultLineQueueFx: (props: unknown) => engineCommands.fill(props),
 }));
 
 const command = {
 	kind: "enqueue",
-	lineId: "line:producer",
 	ownerItemId: "runtime:producer",
 } as const satisfies TileDefaultLineCommandAtom.Command;
 
@@ -51,6 +54,7 @@ const runCommand = async () => {
 
 beforeEach(() => {
 	engineCommands.enqueue.mockReset();
+	engineCommands.fill.mockReset();
 	failStop.mockReset();
 });
 
@@ -160,9 +164,45 @@ describe("TileDefaultLineCommandAtom", () => {
 			});
 		});
 		expect(engineCommands.enqueue).toHaveBeenCalledWith({
-			lineId: command.lineId,
 			ownerItemId: command.ownerItemId,
 		});
+		unmount();
+	});
+
+	it("routes one fill command and excludes another action for the same unsettled owner", async () => {
+		const gate = Effect.runSync(Deferred.make<void>());
+		engineCommands.fill.mockReturnValue(
+			Deferred.await(gate).pipe(
+				Effect.as({
+					added: [],
+					capacity: 5,
+					lineId: "line:producer",
+					used: 5,
+				}),
+			),
+		);
+		const registry = createRegistry();
+		const atom = TileDefaultLineCommandAtom(game);
+		const unmount = registry.mount(atom);
+
+		registry.set(atom, {
+			kind: "fill",
+			ownerItemId: command.ownerItemId,
+		});
+		await vi.waitFor(() => expect(engineCommands.fill).toHaveBeenCalledOnce());
+		registry.set(atom, command);
+		await Promise.resolve();
+
+		expect(engineCommands.fill).toHaveBeenCalledWith({
+			ownerItemId: command.ownerItemId,
+		});
+		expect(engineCommands.enqueue).not.toHaveBeenCalled();
+		Effect.runSync(Deferred.succeed(gate, undefined));
+		await vi.waitFor(() =>
+			expect(registry.get(atom)).toEqual({
+				kind: "idle",
+			}),
+		);
 		unmount();
 	});
 

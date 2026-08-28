@@ -24,6 +24,7 @@ export const placeDropForTestFx = Effect.fn("placeDropForTestFx")(function* ({
 		output: {
 			set: [
 				{
+					weight: 1,
 					roll: [
 						{
 							drop: [

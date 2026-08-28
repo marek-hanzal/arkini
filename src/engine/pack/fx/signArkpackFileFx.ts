@@ -1,36 +1,51 @@
-import { FileSystem } from "effect";
+import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
+import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
+import { ArkpackSigningError } from "~/engine/pack/error/ArkpackSigningError";
+import { decodeArkpackEnvelopeFx } from "./decodeArkpackEnvelopeFx";
+import { encodeArkpackEnvelopeFx } from "./encodeArkpackEnvelopeFx";
 import { signArkpackFx } from "./signArkpackFx";
-import { writeArkpackSignatureFx } from "./writeArkpackSignatureFx";
+import { verifyArkpackProvenanceFx } from "./verifyArkpackProvenanceFx";
 
 export namespace signArkpackFileFx {
 	export interface Props {
 		readonly arkpackPath: string;
-		readonly keyId: string;
-		readonly privateKey: string;
 	}
 }
 
-/** Signs one exact Arkpack file and atomically publishes its detached sidecar. */
+/** Keyless-signs one inner payload and atomically embeds its verified proof. */
 export const signArkpackFileFx = Effect.fn("signArkpackFileFx")(function* ({
 	arkpackPath,
-	keyId,
-	privateKey,
 }: signArkpackFileFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
+	const path = yield* Path.Path;
 	const bytes = yield* fileSystem.readFile(arkpackPath);
+	const { payload } = yield* decodeArkpackEnvelopeFx(bytes);
 	const signature = yield* signArkpackFx({
-		bytes,
-		keyId,
-		privateKey,
+		bytes: payload,
 	});
-	const signaturePath = yield* writeArkpackSignatureFx({
-		arkpackPath,
-		signature,
+	const signedBytes = yield* encodeArkpackEnvelopeFx({
+		payload,
+		proof: new TextEncoder().encode(JSON.stringify(signature)),
 	});
-	return {
-		signature,
-		signaturePath,
-	} as const;
+	const provenance = yield* verifyArkpackProvenanceFx({
+		bytes: signedBytes,
+	});
+	if (provenance.type !== "official") {
+		return yield* Effect.fail(
+			new ArkpackSigningError({
+				reason: "post-sign-verification",
+				actualProvenance: provenance,
+				message: "Release signature did not prove the configured workflow identity.",
+			}),
+		);
+	}
+	const filesystemWrite = yield* createFilesystemWriteFx();
+	yield* filesystemWrite.writeFileFx({
+		lock: path.join(path.dirname(arkpackPath), `.${path.basename(arkpackPath)}.lock`),
+		target: arkpackPath,
+		bytes: signedBytes,
+	});
+	return signedBytes;
 });

@@ -5,7 +5,10 @@ import type { RootContext } from "~/ui/root/RootContext";
 import { resolveRouteViewTransitionTypesFx } from "~/ui/navigation/resolveRouteViewTransitionTypesFx";
 
 const isSkippedViewTransition = (error: unknown) =>
-	typeof error === "object" && error !== null && "name" in error && error.name === "AbortError";
+	typeof error === "object" &&
+	error !== null &&
+	"name" in error &&
+	(error.name === "AbortError" || error.name === "InvalidStateError");
 
 const observeSkippedViewTransition = (transition: ViewTransition) => {
 	void transition.ready.catch((error: unknown) => {
@@ -34,6 +37,13 @@ export const createArkiniRouterFx = Effect.fn("createArkiniRouterFx")((context: 
 					}
 				: false,
 			scrollRestoration: true,
+			scrollToTopSelectors: [
+				'[data-scroll-restoration-id="editor-asset-list"]',
+				'[data-scroll-restoration-id="editor-estimate-list"]',
+				'[data-scroll-restoration-id="editor-item-list"]',
+				'[data-scroll-restoration-id="editor-item-type-picker"]',
+				'[data-scroll-restoration-id="editor-section-page"]',
+			],
 		});
 		const startRouterViewTransition = router.startViewTransition.bind(router);
 		router.startViewTransition = (update) => {

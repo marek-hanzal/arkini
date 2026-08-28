@@ -1,10 +1,8 @@
 import { Effect } from "effect";
 
-import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
-import type { PlacementPlanSchema } from "~/engine/placement/schema/PlacementPlanSchema";
-import { planSpawnPlacementFx } from "~/engine/placement/fx/planSpawnPlacementFx";
-import type { BoardItemSchema } from "~/engine/start/schema/BoardItemSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { planStartExactGridStackFx } from "~/engine/start/fx/planStartExactGridStackFx";
+import type { BoardItemSchema } from "~/engine/start/schema/BoardItemSchema";
 
 export namespace planStartBoardItemFx {
 	export interface Props {
@@ -12,33 +10,20 @@ export namespace planStartBoardItemFx {
 	}
 }
 
-/**
- * Plans one exact initial board item without fallback or location substitution.
- */
+/** Plans one exact initial board stack without fallback or location substitution. */
 export const planStartBoardItemFx = Effect.fn("planStartBoardItemFx")(function* ({
 	item: startItem,
 }: planStartBoardItemFx.Props) {
-	const item = yield* resolveItemFx({
+	return yield* planStartExactGridStackFx({
 		itemId: startItem.itemId,
-	});
-	const spawn = yield* planSpawnPlacementFx({
-		item,
-		locations: [
-			{
-				space: startItem.space,
-				position: {
-					x: startItem.x,
-					y: startItem.y,
-				},
-				scope: LocationScopeEnumSchema.enum.Board,
+		location: {
+			space: startItem.space,
+			position: {
+				x: startItem.x,
+				y: startItem.y,
 			},
-		],
-		quantity: 1,
+			scope: LocationScopeEnumSchema.enum.Board,
+		},
+		quantity: startItem.quantity ?? 1,
 	});
-
-	return {
-		remove: [],
-		spawn,
-		stack: [],
-	} satisfies PlacementPlanSchema.Type;
 });

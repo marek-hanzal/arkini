@@ -65,7 +65,7 @@ export const enqueueLineRuntimeFx = Effect.fn("enqueueLineRuntimeFx")(function* 
 		runtime: {
 			...runtime,
 			jobQueue: [
-				...(runtime.jobQueue ?? []),
+				...runtime.jobQueue,
 				request,
 			],
 		},

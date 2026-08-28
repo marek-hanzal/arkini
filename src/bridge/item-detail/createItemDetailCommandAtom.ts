@@ -1,8 +1,8 @@
 import { Cause, Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { Game } from "~/bridge/game/Game";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import type { PlayableGame } from "~/bridge/game/PlayableGame";
+import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 import type {
 	ItemDetailPendingAction,
 	RunItemDetailPendingActionProps,
@@ -10,7 +10,7 @@ import type {
 
 export namespace createItemDetailCommandAtom {
 	export interface Dependencies {
-		readonly game: Game;
+		readonly game: PlayableGame;
 		readonly readOutcomeScope: () => string | undefined;
 	}
 
@@ -70,6 +70,10 @@ export const createItemDetailCommandAtom = ({
 				Effect.andThen(
 					Effect.gen(function* () {
 						const exit = yield* Effect.exit(command.run);
+						const failure =
+							Exit.isFailure(exit) && !Cause.hasInterruptsOnly(exit.cause)
+								? yield* readExactCauseFailureFx(exit.cause)
+								: Option.none();
 						yield* Atom.update(stateAtom, (state) => {
 							const pending = state.pendingActions.get(command.key);
 							if (pending?.token !== command.token) return state;
@@ -81,7 +85,6 @@ export const createItemDetailCommandAtom = ({
 									pendingActions,
 								};
 							}
-							const failure = readExactCauseFailure(exit.cause);
 							if (Option.isNone(failure)) {
 								game.failStop("ui", exit.cause);
 								return {

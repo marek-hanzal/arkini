@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import { resolveActionInputFx } from "~/engine/action/fx/resolveActionInputFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { InputSchema } from "~/engine/input/schema/InputSchema";
@@ -10,8 +11,6 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
 
 import { resolveInputMaterialRunFx } from "./resolveInputMaterialRunFx";
-import { resolveInputSimpleRunFx } from "./resolveInputSimpleRunFx";
-import { resolveInputDepositRunFx } from "./resolveInputDepositRunFx";
 
 export namespace resolveInputRunFx {
 	export interface Props {
@@ -41,7 +40,7 @@ export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 				type: InputEnumSchema.enum.Simple,
 			},
 			(input) => {
-				return resolveInputSimpleRunFx({
+				return resolveActionInputFx({
 					input,
 					ownerItemId,
 					reservedCharges,
@@ -75,7 +74,7 @@ export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 				type: InputEnumSchema.enum.Deposit,
 			},
 			(input) => {
-				return resolveInputDepositRunFx({
+				return resolveActionInputFx({
 					input,
 					ownerItemId,
 					reservedCharges,

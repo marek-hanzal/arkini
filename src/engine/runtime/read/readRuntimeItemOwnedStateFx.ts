@@ -76,6 +76,6 @@ export const readRuntimeItemOwnedStateFx = Effect.fn("readRuntimeItemOwnedStateF
 		inputItems: runtime.items.filter((item) => inputItemIds.has(item.id)),
 		jobs: runtime.jobs.filter((job) => jobIds.has(job.id)),
 		jobItems: runtime.items.filter((item) => jobItemIds.has(item.id)),
-		queue: (runtime.jobQueue ?? []).filter((request) => ownerItemIds.has(request.ownerItemId)),
+		queue: runtime.jobQueue.filter((request) => ownerItemIds.has(request.ownerItemId)),
 	} satisfies readRuntimeItemOwnedStateFx.Result;
 });

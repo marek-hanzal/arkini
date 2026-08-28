@@ -53,20 +53,17 @@ const makeGame = (
 	arkpack: {
 		packageId: `package:spawn-${suffix}`,
 		contentHash: `content:spawn-${suffix}`,
-		gameId: `game:spawn-${suffix}`,
 		title: `Spawn ${suffix}`,
-		configVersion: "1.0",
-		compressedSize: 0,
-		trust: {
-			type: "external",
-			reason: "unsigned",
+		version: "1.0",
+		arkini: "1.0",
+		provenance: {
+			type: "community",
 		} as const,
-		source: "imported",
+		source: "user",
 	},
 	config: createJobTestConfig(),
 	saveKey: {
 		packageId: `package:spawn-${suffix}`,
-		contentHash: suffix.repeat(64).slice(0, 64),
 	},
 	getResourceUrl: () => "blob:test",
 	runFx: ((_effect) => session.runFx(commandFx)) as Game["runFx"],

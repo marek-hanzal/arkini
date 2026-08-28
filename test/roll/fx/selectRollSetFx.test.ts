@@ -2,16 +2,12 @@ import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { RollSetSchema } from "~/engine/roll/schema/RollSetSchema";
+import { RollSetSchema } from "~/engine/roll/schema/RollSetSchema";
 import { selectRollSetFx } from "~/engine/roll/fx/selectRollSetFx";
 
-const createSet = (itemId: string, weight?: number): RollSetSchema.Type => {
+const createSet = (itemId: string, weight = 1): RollSetSchema.Type => {
 	return {
-		...(weight === undefined
-			? {}
-			: {
-					weight,
-				}),
+		weight,
 		roll: [
 			{
 				type: "guaranteed",
@@ -19,8 +15,8 @@ const createSet = (itemId: string, weight?: number): RollSetSchema.Type => {
 					{
 						itemId,
 						quantity: {
-							type: "value",
-							value: 1,
+							min: 1,
+							max: 1,
 						},
 						placement: "drop",
 						rules: [],
@@ -32,26 +28,10 @@ const createSet = (itemId: string, weight?: number): RollSetSchema.Type => {
 };
 
 describe("selectRollSetFx", () => {
-	it("treats omitted weights as one", () => {
-		const first = createSet("item:first");
-		const second = createSet("item:second");
-		const result = Effect.runSync(
-			selectRollSetFx({
-				set: [
-					first,
-					second,
-				],
-			}).pipe(
-				Effect.provideServiceEffect(
-					Random.Random,
-					makeFixedRandomFx([
-						0.75,
-					]),
-				),
-			),
-		);
+	it("normalizes authored shorthand to the canonical weight one", () => {
+		const { weight: _weight, ...source } = createSet("item:first");
 
-		expect(result).toBe(second);
+		expect(RollSetSchema.parse(source).weight).toBe(1);
 	});
 
 	it("selects a candidate from the middle cumulative weight range", () => {

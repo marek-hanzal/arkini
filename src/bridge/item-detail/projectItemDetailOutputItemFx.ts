@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
-import { readRuntimeItemPrimaryAssetIdFx } from "~/engine/item/read/readRuntimeItemPrimaryAssetIdFx";
+import { readRuntimeItemDefaultAssetIdsFx } from "~/engine/item/read/readRuntimeItemDefaultAssetIdsFx";
 import type { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
 
 export namespace projectItemDetailOutputItemFx {
@@ -25,20 +25,22 @@ export const projectItemDetailOutputItemFx = Effect.fn("projectItemDetailOutputI
 			itemId: item.itemId,
 			title: item.itemId,
 			quantity: item.quantity,
+			activeRuleHints: item.activeRuleHints,
 		} satisfies projectItemDetailOutputItemFx.Result;
 	}
-	const sourceAssetId = yield* readRuntimeItemPrimaryAssetIdFx({
+	const sourceAssetIds = yield* readRuntimeItemDefaultAssetIdsFx({
 		item: configured,
 	});
 	return {
 		itemId: item.itemId,
 		title: configured.title,
 		quantity: item.quantity,
-		sourceUrl: game.getResourceUrl(sourceAssetId),
-		...(configured.asset.composite === undefined
+		activeRuleHints: item.activeRuleHints,
+		sourceUrl: game.getResourceUrl(sourceAssetIds[0]),
+		...(sourceAssetIds[1] === undefined
 			? {}
 			: {
-					compositeUrl: game.getResourceUrl(configured.asset.composite),
+					compositeUrl: game.getResourceUrl(sourceAssetIds[1]),
 				}),
 		definitionItemId: configured.id,
 	} satisfies projectItemDetailOutputItemFx.Result;

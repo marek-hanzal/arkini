@@ -30,20 +30,17 @@ const createGame = (commandFx: Effect.Effect<unknown, unknown> = Effect.void): G
 	arkpack: {
 		packageId: "package:cheat-command",
 		contentHash: "content:cheat-command",
-		gameId: "game:cheat-command",
 		title: "Cheat command game",
-		configVersion: "1.0",
-		compressedSize: 0,
-		trust: {
-			type: "external",
-			reason: "unsigned",
+		version: "1.0",
+		arkini: "1.0",
+		provenance: {
+			type: "community",
 		} as const,
-		source: "imported",
+		source: "user",
 	},
 	config: testArkpackConfig,
 	saveKey: {
 		packageId: "package:cheat-command",
-		contentHash: "a".repeat(64),
 	},
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,

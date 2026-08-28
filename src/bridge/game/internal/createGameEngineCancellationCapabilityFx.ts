@@ -1,7 +1,7 @@
 import { Cause, Deferred, Effect, Exit, Fiber, Option, Ref, Scope, type Semaphore } from "effect";
 
 import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 import type {
 	AcquisitionOwner,
 	Cancellation,
@@ -52,7 +52,7 @@ export const createGameEngineCancellationCapabilityFx = Effect.fn(
 						const state = yield* Ref.get(stateRef);
 						if (state._tag === "Cancelling" && state.cancellation === cancellation) {
 							const failure = Exit.isFailure(exit)
-								? readExactCauseFailure(exit.cause)
+								? yield* readExactCauseFailureFx(exit.cause)
 								: Option.none();
 							yield* Ref.set(
 								stateRef,
@@ -101,7 +101,7 @@ export const createGameEngineCancellationCapabilityFx = Effect.fn(
 							Effect.suspend(() => resource.game.disposeWithoutSaveFx),
 						);
 						if (Exit.isFailure(disposeExit)) {
-							const failure = readExactCauseFailure(disposeExit.cause);
+							const failure = yield* readExactCauseFailureFx(disposeExit.cause);
 							return yield* Effect.fail(
 								resource.markCriticalFailure(
 									"engine-ownership",

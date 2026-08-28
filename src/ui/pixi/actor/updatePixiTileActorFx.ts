@@ -4,10 +4,7 @@ import { match } from "ts-pattern";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
-import {
-	readPixiParticleBlendMode,
-	readPixiParticleLightSurface,
-} from "~/ui/pixi/appearance/readPixiParticleBlendMode";
+import { readPixiParticleLightSurfaceFx } from "~/ui/pixi/appearance/readPixiParticleLightSurfaceFx";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";
 import {
@@ -15,6 +12,7 @@ import {
 	transitionPixiTileActorVisualFx,
 } from "~/ui/pixi/actor/transitionPixiTileActorVisualFx";
 import { updatePixiTileActorVisualFx } from "~/ui/pixi/actor/updatePixiTileActorVisualFx";
+import { updatePixiTileActorProgressFx } from "~/ui/pixi/actor/updatePixiTileActorProgressFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
@@ -32,65 +30,7 @@ export namespace updatePixiTileActorFx {
 	}
 }
 
-export namespace updatePixiTileActorProgressFx {
-	export interface Props {
-		readonly actor: PixiTileActor;
-		readonly frames: DemandFrameLoop;
-		readonly item: TileActorItem;
-		readonly palette: PixiScenePalette;
-		readonly size: number;
-	}
-}
-
 const tileToSlotRatio = 0.8;
-
-const updateProgressBar = ({
-	actor,
-	palette,
-	size,
-}: {
-	readonly actor: PixiTileActor;
-	readonly palette: PixiScenePalette;
-	readonly size: number;
-}) => {
-	const progressRatio = actor.item.progressRatio;
-	actor.progressBar.clear();
-	actor.progressBar.visible = progressRatio !== undefined;
-	if (progressRatio === undefined) return;
-	const inset = (size * (1 - tileToSlotRatio)) / 2;
-	const faceSize = Math.max(1, size - inset * 2);
-	const width = faceSize * 0.76;
-	const height = Math.max(2, faceSize * 0.045);
-	const x = inset + (faceSize - width) / 2;
-	const y = inset + faceSize + Math.max(1, (inset - height) / 2);
-	const radius = height / 2;
-	actor.progressBar.roundRect(x, y, width, height, radius).fill({
-		alpha: 0.62,
-		color: palette.overlay,
-	});
-	if (progressRatio <= 0) return;
-	actor.progressBar.roundRect(x, y, width * progressRatio, height, radius).fill({
-		alpha: 0.96,
-		color: palette.accent,
-	});
-};
-
-/** Updates the 10 Hz job overlay without remeasuring or rebuilding either retained tile face. */
-export const updatePixiTileActorProgressFx = Effect.fnUntraced(function* ({
-	actor,
-	frames,
-	item,
-	palette,
-	size,
-}: updatePixiTileActorProgressFx.Props) {
-	actor.item = item;
-	updateProgressBar({
-		actor,
-		palette,
-		size,
-	});
-	yield* frames.invalidateFx;
-});
 
 const sameVisualRevision = (left: TileActorItem, right: TileActorItem) =>
 	left.revision === right.revision &&
@@ -137,11 +77,8 @@ export const updatePixiTileActorFx = Effect.fn("updatePixiTileActorFx")(function
 		});
 	}
 	actor.size = size;
-	updateProgressBar({
-		actor,
-		palette,
-		size,
-	});
+	actor.lifecycleLayer.position.set(size / 2, size / 2);
+	actor.lifecycleLayer.pivot.set(size / 2, size / 2);
 	actor.container.hitArea = {
 		contains: (x: number, y: number) => x >= 0 && x <= size && y >= 0 && y <= size,
 	};
@@ -160,8 +97,8 @@ export const updatePixiTileActorFx = Effect.fn("updatePixiTileActorFx")(function
 		Math.max(0, size / 2 - largestParticleHalfWidth) / 1.075,
 	);
 	activityParticles.workingTint = palette.accent;
-	activityParticles.lightSurface = readPixiParticleLightSurface(palette);
-	activityParticles.container.blendMode = readPixiParticleBlendMode();
+	activityParticles.lightSurface = yield* readPixiParticleLightSurfaceFx(palette);
+	activityParticles.container.blendMode = "normal";
 	activityParticles.container.boundsArea = new Rectangle(0, 0, size, size);
 	for (const [index, { particle }] of activityParticles.particles.entries()) {
 		const particleSize = faceSize * (index % 4 === 0 ? 0.18 : index % 3 === 0 ? 0.15 : 0.11);
@@ -244,5 +181,11 @@ export const updatePixiTileActorFx = Effect.fn("updatePixiTileActorFx")(function
 			() => Effect.void,
 		)
 		.exhaustive();
-	yield* frames.invalidateFx;
+	yield* updatePixiTileActorProgressFx({
+		actor,
+		frames,
+		item,
+		palette,
+		size,
+	});
 });

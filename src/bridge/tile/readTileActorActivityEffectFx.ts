@@ -10,7 +10,7 @@ export namespace readTileActorActivityEffectFx {
 	}
 }
 
-/** Restricts active-job particle feedback to the three product-facing line owners. */
+/** Restricts active-job particle feedback to product-facing line owners. */
 export const readTileActorActivityEffectFx = Effect.fn("readTileActorActivityEffectFx")(
 	({ itemType, running }: readTileActorActivityEffectFx.Props) =>
 		Effect.succeed(
@@ -19,15 +19,16 @@ export const readTileActorActivityEffectFx = Effect.fn("readTileActorActivityEff
 					P.union(
 						ItemEnumSchema.enum.Blueprint,
 						ItemEnumSchema.enum.Craft,
+						ItemEnumSchema.enum.Deposit,
 						ItemEnumSchema.enum.Producer,
 					),
 					() => running,
 				)
 				.with(
 					P.union(
-						ItemEnumSchema.enum.Deposit,
 						ItemEnumSchema.enum.Inventory,
 						ItemEnumSchema.enum.Simple,
+						ItemEnumSchema.enum.Space,
 						ItemEnumSchema.enum.Stash,
 						ItemEnumSchema.enum.Temporary,
 					),

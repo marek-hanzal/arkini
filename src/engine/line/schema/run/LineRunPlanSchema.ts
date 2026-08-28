@@ -22,10 +22,10 @@ export const LineRunPlanSchema = z
 		 */
 		lineId: IdSchema.describe("The stable ID of the configured product line."),
 		/**
-		 * Effective runtime after active runtime multiplier rules are applied.
+		 * Effective runtime after active runtime modifier rules are applied.
 		 */
 		runtimeMs: TimeSchema.describe(
-			"The effective runtime after active runtime multiplier rules are applied.",
+			"The effective runtime after active runtime modifier rules are applied.",
 		),
 		/**
 		 * Exact input operations prepared in configured input order.

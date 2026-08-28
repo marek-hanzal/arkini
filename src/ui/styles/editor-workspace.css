@@ -1,0 +1,20 @@
+.ak-editor-search-input::-webkit-search-cancel-button {
+	display: none;
+}
+
+.ak-editor-workspace-tab {
+	transition: none;
+}
+
+.ak-editor-workspace-tabs:has(.ak-editor-workspace-tab[data-transitioning])
+	.ak-editor-workspace-tab[aria-current="page"]:not([data-transitioning]) {
+	color: var(--ak-foreground);
+	background-color: transparent;
+	border-color: transparent;
+}
+
+.ak-editor-workspace-tabs .ak-editor-workspace-tab[data-transitioning] {
+	color: var(--ak-accent-contrast);
+	background-color: var(--ak-accent);
+	border-color: var(--ak-accent);
+}

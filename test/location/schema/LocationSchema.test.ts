@@ -37,6 +37,35 @@ describe("LocationSchema", () => {
 		).toBe(true);
 	});
 
+	it("requires the canonical delivery travel countdown", () => {
+		expect(
+			LocationSchema.safeParse({
+				scope: LocationScopeEnumSchema.enum.Delivery,
+				phase: "outbound",
+				generation: 0,
+				origin: {
+					scope: LocationScopeEnumSchema.enum.Board,
+					space: 0,
+					position: {
+						x: 1,
+						y: 0,
+					},
+				},
+				target: {
+					kind: "line-input",
+					ownerItemId: "runtime:owner",
+					lineId: "line:owner:work",
+					input: [
+						{
+							inputIndex: 0,
+							quantity: 1,
+						},
+					],
+				},
+			}).success,
+		).toBe(false);
+	});
+
 	it("rejects abstract or incomplete locations", () => {
 		expect(
 			LocationSchema.safeParse({

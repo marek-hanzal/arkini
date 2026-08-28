@@ -11,7 +11,8 @@ import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActor
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
+import { restorePixiTileActorExitFx } from "~/ui/pixi/animation/restorePixiTileActorExitFx";
+import { startPixiTileActorEnterFx } from "~/ui/pixi/animation/startPixiTileActorEnterFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import type {
@@ -197,15 +198,6 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 		);
 	};
 
-	const releaseMagneticSource = (actorId: string) => {
-		RendererRuntime.runSync(
-			magneticField.releaseFx({
-				sourceActorId: actorId,
-				sourceKind: "motion",
-			}),
-		);
-	};
-
 	const releaseDetachedCueLifecycleIfSettled = (cueKey: string) => {
 		const lifecycle = cueLifecycleByKey.get(cueKey);
 		if (lifecycle === undefined || lifecycle.activeSwapLegActorIds.size > 0) return;
@@ -264,7 +256,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 			const sourceActor = actorStore.actors.get(cue.sourceActorId);
 			if (sourceActor !== undefined && !sourceActor.container.destroyed) {
 				RendererRuntime.runSync(
-					startPixiTileActorFadeInFx({
+					restorePixiTileActorExitFx({
 						actor: sourceActor,
 						animator,
 					}),
@@ -443,7 +435,6 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 						const lifecycle = cueLifecycleByKey.get(detached.cueKey);
 						lifecycle?.activeSwapLegActorIds.delete(actorId);
 						releaseDetachedCueLifecycleIfSettled(detached.cueKey);
-						releaseMagneticSource(actorId);
 					}
 					const cues = readCues();
 					const superseded = cues.filter(
@@ -528,7 +519,6 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 									}),
 							)
 							.exhaustive();
-						if (started) releaseMagneticSource(actorId);
 						if (lifecycle !== undefined) lifecycle.payloadActor = null;
 					}
 					const filteredMotionLanes = {
@@ -589,7 +579,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 						) {
 							continue;
 						}
-						yield* startPixiTileActorFadeInFx({
+						yield* startPixiTileActorEnterFx({
 							actor: pendingSpawnActor,
 							animator,
 						});

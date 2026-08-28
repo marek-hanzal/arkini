@@ -12,8 +12,8 @@ const input = InputMaterialSchema.parse({
 		itemId: "item:water",
 	},
 	quantity: {
-		type: "value",
-		value: 3,
+		min: 3,
+		max: 3,
 	},
 	capacity: 2,
 });
@@ -71,37 +71,5 @@ describe("planInputMaterialStoreFx", () => {
 				}),
 			),
 		).toBeUndefined();
-	});
-
-	it("accepts tag-selected materials", () => {
-		const taggedInput = InputMaterialSchema.parse({
-			type: "materials",
-			selector: {
-				type: "tag",
-				tag: "liquid",
-			},
-			quantity: {
-				type: "value",
-				value: 1,
-			},
-		});
-
-		expect(
-			Effect.runSync(
-				planInputMaterialStoreFx({
-					input: taggedInput,
-					requestedQuantity: 10,
-					item: runtimeInputTestItem({
-						id: "runtime:water",
-						itemId: "water",
-						quantity: 2,
-					}),
-					storedQuantity: 0,
-				}),
-			),
-		).toEqual({
-			sourceItemId: "runtime:water",
-			quantity: 1,
-		});
 	});
 });

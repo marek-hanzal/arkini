@@ -31,10 +31,10 @@ export const LineRunResolutionSchema = z
 			"The ordered evaluated line-rule facts used to derive this resolution.",
 		),
 		/**
-		 * Effective runtime after active runtime multiplier rules are applied.
+		 * Effective runtime after active runtime modifier rules are applied.
 		 */
 		runtimeMs: TimeSchema.describe(
-			"The effective runtime after active runtime multiplier rules are applied.",
+			"The effective runtime after active runtime modifier rules are applied.",
 		),
 		/**
 		 * Current readiness and optional operation of every configured input.

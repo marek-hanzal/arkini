@@ -16,6 +16,8 @@ const makeEmptyRuntime = (): RuntimeSchema.Type => ({
 	items: [],
 	jobs: [],
 	jobQueue: [],
+
+	defaultLineByOwnerItemId: {},
 });
 
 describe("makeTickFx idle scheduling", () => {

@@ -19,6 +19,11 @@ const pageState = vi.hoisted(() => ({
 }));
 
 vi.mock("@tanstack/react-router", () => ({
+	getRouteApi: () => ({
+		useParams: () => ({
+			packageId: "package-inventory-page",
+		}),
+	}),
 	useNavigate: () => pageState.navigate,
 }));
 
@@ -57,13 +62,7 @@ const renderPage = async () => {
 	document.body.append(host);
 	const root = createRoot(host);
 	roots.push(root);
-	await act(async () =>
-		root.render(
-			createElement(InventoryPage, {
-				packageId: "package-inventory",
-			}),
-		),
-	);
+	await act(async () => root.render(createElement(InventoryPage)));
 	return host;
 };
 
@@ -87,7 +86,7 @@ describe("InventoryPage", () => {
 		expect(pageState.navigate).toHaveBeenCalledWith({
 			to: "/game/$packageId/board",
 			params: {
-				packageId: "package-inventory",
+				packageId: "package-inventory-page",
 			},
 			replace: true,
 		});

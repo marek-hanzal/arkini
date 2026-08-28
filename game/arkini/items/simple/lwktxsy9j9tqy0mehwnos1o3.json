@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "lwktxsy9j9tqy0mehwnos1o3",
+		"id": "item:common-clothing",
+		"title": "Common Clothing",
+		"description": "Practical clothing sewn from common cloth and leather.",
+		"asset": {
+			"default": [
+				"item-common-clothing"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 30,
+		"type": "simple"
+	}
+}

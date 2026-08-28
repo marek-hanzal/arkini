@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "ifbhjw7n3dithzkj8foocurd",
+		"id": "item:sapphire",
+		"title": "Sapphire",
+		"description": "A polished blue gemstone from better guild rewards.",
+		"asset": {
+			"default": [
+				"item-sapphire"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 20,
+		"type": "simple"
+	}
+}

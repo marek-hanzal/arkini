@@ -5,7 +5,7 @@ import type { TileSpawnMotionCue } from "~/bridge/tile/motion/TileMotionCue";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
-import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
+import { startPixiTileActorEnterFx } from "~/ui/pixi/animation/startPixiTileActorEnterFx";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
 import { createPixiTileMotionPoseSamplerFx } from "~/ui/pixi/motion/createPixiTileMotionPoseSamplerFx";
@@ -54,7 +54,7 @@ export const runPixiSpawnMotionFx = Effect.fn("runPixiSpawnMotionFx")(function* 
 		x: origin.x,
 		y: origin.y,
 	});
-	yield* startPixiTileActorFadeInFx({
+	yield* startPixiTileActorEnterFx({
 		actor,
 		animator,
 		delayMs,
@@ -82,6 +82,7 @@ export const runPixiSpawnMotionFx = Effect.fn("runPixiSpawnMotionFx")(function* 
 		attractedActorId: null,
 		eligibleAttractionActorIds: new Set(),
 		magneticField,
+		surface,
 	});
 	yield* animator.animateFx({
 		actor,
@@ -89,6 +90,7 @@ export const runPixiSpawnMotionFx = Effect.fn("runPixiSpawnMotionFx")(function* 
 		delayMs,
 		durationMs,
 		ownerKey: `motion:${cueKey}`,
+		onCancel: magneticProjector.release,
 		onComplete: () => {
 			const settle = () => {
 				magneticProjector.release();

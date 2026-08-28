@@ -11,7 +11,6 @@ import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -30,22 +29,17 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		tree: {
+			uid: "tree",
 			id: "tree",
 			title: "Tree",
 			description: "A living tree.",
 			asset: {
-				source: [
+				default: [
 					"asset:tree",
 				],
 			},
-			tags: [
-				"nature",
-				"forest",
-			],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 			type: "simple",
@@ -251,7 +245,7 @@ describe("fromStateFx", () => {
 					itemId: "missing",
 				};
 			}),
-
+			jobQueue: [],
 			jobs: [],
 		});
 		const result = Effect.runSync(

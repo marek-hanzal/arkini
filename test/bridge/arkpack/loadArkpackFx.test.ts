@@ -1,112 +1,159 @@
-import { readFile } from "node:fs/promises";
 import { Effect } from "effect";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
-import { ArkiniArkpack } from "~/bridge/arkpack/ArkiniArkpack";
-import { DemoArkpack } from "~/bridge/arkpack/DemoArkpack";
+import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { loadArkpackFx } from "~/bridge/arkpack/loadArkpackFx";
 import { createTestArkpack } from "~test/bridge/arkpack/support/createTestArkpack";
+import { installTestPngDecoder } from "~test/bridge/arkpack/support/createTestPngBytes";
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+import { ArkiniVersionIncompatibleError } from "~/engine/version/ArkiniVersionAdmission";
 
-afterEach(() => {
-	vi.unstubAllGlobals();
-});
+beforeEach(installTestPngDecoder);
 
-describe("loadArkpackFx official package", () => {
-	it("reads and fully revalidates the selected bundled binary against catalog metadata", async () => {
-		const bytes = await readFile("game/arkini.game.arkpack");
-		const signature = await readFile("game/arkini.game.arkpack.sig", "utf8");
-		const fetch = vi.fn((input: string) =>
-			Promise.resolve(new Response(input === ArkiniArkpack.signatureUrl ? signature : bytes)),
+describe("loadArkpackFx", () => {
+	it("surfaces an installed package's writer-major incompatibility", async () => {
+		const currentMajor = ArkiniAppVersion.slice(0, ArkiniAppVersion.indexOf("."));
+		const bytes = createTestArkpack(
+			undefined,
+			"package:future",
+			"1.0",
+			`${Number(currentMajor) + 1}.0.0`,
 		);
-		vi.stubGlobal("fetch", fetch);
-
-		const loaded = await Effect.runPromise(
-			loadArkpackFx({
-				packageId: ArkiniArkpack.packageId,
-			}),
-		);
-
-		expect(fetch).toHaveBeenCalledTimes(2);
-		expect(fetch).toHaveBeenNthCalledWith(1, ArkiniArkpack.url);
-		expect(fetch).toHaveBeenNthCalledWith(2, ArkiniArkpack.signatureUrl);
-		expect(loaded.descriptor).toEqual(ArkiniArkpack.descriptor);
-		expect(loaded.payload.config.meta.id).toBe("arkini");
-	});
-
-	it("fails closed before decode when official bytes do not match the detached signature", async () => {
-		const signature = await readFile("game/arkini.game.arkpack.sig", "utf8");
-		vi.stubGlobal(
-			"fetch",
-			vi.fn((input: string) =>
-				Promise.resolve(
-					new Response(
-						input === ArkiniArkpack.signatureUrl ? signature : createTestArkpack(),
-					),
-				),
-			),
-		);
+		const storage: ArkpackStorage = {
+			listFx: Effect.die("Unexpected catalog list."),
+			readFx: () =>
+				Effect.succeed([
+					{
+						packageId: "package:future",
+						filename: "package%3Afuture.arkpack",
+						bytes: bytes.buffer,
+						provenance: {
+							type: "community",
+						},
+						source: "user",
+						overridesBundled: true,
+					},
+				]),
+			removeFx: () => Effect.void,
+			writeFx: () => Effect.void,
+			openUserDirectoryFx: Effect.void,
+		};
 
 		await expect(
 			Effect.runPromise(
 				loadArkpackFx({
-					packageId: ArkiniArkpack.packageId,
+					packageId: "package:future",
+					storage,
 				}),
 			),
-		).rejects.toThrow("expected official signature");
+		).rejects.toBeInstanceOf(ArkiniVersionIncompatibleError);
 	});
 
-	it("fails closed when the official detached signature is missing", async () => {
-		const bytes = await readFile("game/arkini.game.arkpack");
-		vi.stubGlobal(
-			"fetch",
-			vi.fn((input: string) =>
-				Promise.resolve(
-					input === ArkiniArkpack.signatureUrl
-						? new Response(undefined, {
-								status: 404,
-								statusText: "Not Found",
-							})
-						: new Response(bytes),
+	it("loads the exact effective file selected by package identity", async () => {
+		const bytes = createTestArkpack(undefined, "package:selected");
+		const file: ArkpackStorage.File = {
+			packageId: "package:selected",
+			filename: "package%3Aselected.arkpack",
+			bytes: bytes.buffer,
+			provenance: {
+				type: "community",
+			},
+			source: "user",
+			overridesBundled: true,
+		};
+		const storage: ArkpackStorage = {
+			listFx: Effect.die("Unexpected catalog list."),
+			readFx: (packageId) =>
+				Effect.succeed(
+					packageId === file.packageId
+						? [
+								file,
+							]
+						: [],
 				),
-			),
-		);
-
-		const result = await Effect.runPromise(
-			Effect.result(
-				loadArkpackFx({
-					packageId: ArkiniArkpack.packageId,
-				}),
-			),
-		);
-		expect(result._tag).toBe("Failure");
-		if (result._tag === "Failure") {
-			expect(result.failure).toMatchObject({
-				_tag: "ArkpackLoadError",
-				operation: "fetch-signature",
-				packageId: "arkini",
-				message: expect.stringContaining("Unable to load bundled arkini signature"),
-			});
-		}
-	});
-
-	it("loads the bundled unsigned demo as external content", async () => {
-		const bytes = await readFile("game/demo.game.arkpack");
-		const fetch = vi.fn().mockResolvedValue(new Response(bytes));
-		vi.stubGlobal("fetch", fetch);
+			removeFx: () => Effect.void,
+			writeFx: () => Effect.void,
+			openUserDirectoryFx: Effect.void,
+		};
 
 		const loaded = await Effect.runPromise(
 			loadArkpackFx({
-				packageId: DemoArkpack.packageId,
+				packageId: "package:selected",
+				storage,
 			}),
 		);
 
-		expect(fetch).toHaveBeenCalledOnce();
-		expect(fetch).toHaveBeenCalledWith(DemoArkpack.url);
-		expect(loaded.descriptor).toEqual(DemoArkpack.descriptor);
-		expect(loaded.descriptor.trust).toEqual({
-			type: "external",
-			reason: "unsigned",
+		expect(loaded.descriptor).toMatchObject({
+			packageId: "package:selected",
+			source: "user",
+			overridesBundled: true,
 		});
-		expect(loaded.payload.config.meta.id).toBe("demo");
+		expect(loaded.payload.config.meta.id).toBe("package:selected");
+	});
+
+	it("fails when the requested package is absent", async () => {
+		const storage: ArkpackStorage = {
+			listFx: Effect.die("Unexpected catalog list."),
+			readFx: () => Effect.succeed([]),
+			removeFx: () => Effect.void,
+			writeFx: () => Effect.void,
+			openUserDirectoryFx: Effect.void,
+		};
+
+		await expect(
+			Effect.runPromise(
+				loadArkpackFx({
+					packageId: "missing",
+					storage,
+				}),
+			),
+		).rejects.toThrow("Arkpack missing is not installed");
+	});
+
+	it("plays a Community user override without treating provenance as admission", async () => {
+		const bundledBytes = createTestArkpack(undefined, "package:tampered");
+		const userBytes = createTestArkpack(undefined, "package:tampered");
+		const storage: ArkpackStorage = {
+			listFx: Effect.die("Unexpected catalog list."),
+			readFx: () =>
+				Effect.succeed([
+					{
+						packageId: "package:tampered",
+						filename: "package%3Atampered.arkpack",
+						bytes: bundledBytes.buffer,
+						provenance: {
+							type: "official",
+						},
+						source: "bundled",
+						overridesBundled: false,
+					},
+					{
+						packageId: "package:tampered",
+						filename: "package%3Atampered.arkpack",
+						bytes: userBytes.buffer,
+						provenance: {
+							type: "community",
+						},
+						source: "user",
+						overridesBundled: true,
+					},
+				]),
+			removeFx: () => Effect.void,
+			writeFx: () => Effect.void,
+			openUserDirectoryFx: Effect.void,
+		};
+
+		const loaded = await Effect.runPromise(
+			loadArkpackFx({
+				packageId: "package:tampered",
+				storage,
+			}),
+		);
+		expect(loaded.descriptor).toMatchObject({
+			source: "user",
+			provenance: {
+				type: "community",
+			},
+		});
 	});
 });

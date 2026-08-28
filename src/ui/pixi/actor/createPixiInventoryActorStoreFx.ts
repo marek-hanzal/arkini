@@ -12,20 +12,16 @@ import type {
 import type { PixiTileActorParticleTextures } from "~/ui/pixi/actor/PixiTileActorParticleTextures";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { createPixiTileActorFx } from "~/ui/pixi/actor/createPixiTileActorFx";
-import { readPixiTileActorCrowdAlpha } from "~/ui/pixi/actor/readPixiTileActorCrowdAlpha";
+import { readPixiTileActorCrowdAlphaFx } from "~/ui/pixi/actor/readPixiTileActorCrowdAlphaFx";
 import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { animatePixiActorToRetargetablePoseFx } from "~/ui/pixi/animation/animatePixiActorToRetargetablePoseFx";
-import {
-	startPixiTileActorActivityParticlesFx,
-	stopPixiTileActorActivityParticlesFx,
-} from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
-import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
-import {
-	restorePixiInventoryActorRemovalFeedbackFx,
-	startPixiInventoryActorRemovalFeedbackFx,
-} from "~/ui/pixi/drag/startPixiInventoryActorRemovalFeedbackFx";
+import { startPixiTileActorActivityParticlesFx } from "~/ui/pixi/animation/startPixiTileActorActivityParticlesFx";
+import { stopPixiTileActorActivityParticlesFx } from "~/ui/pixi/animation/stopPixiTileActorActivityParticlesFx";
+import { restorePixiTileActorExitFx } from "~/ui/pixi/animation/restorePixiTileActorExitFx";
+import { startPixiTileActorEnterFx } from "~/ui/pixi/animation/startPixiTileActorEnterFx";
+import { startPixiTileActorExitFx } from "~/ui/pixi/animation/startPixiTileActorExitFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiInventoryDropTarget } from "~/ui/pixi/scene/PixiInventoryDropTarget";
@@ -111,7 +107,7 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 								)
 									return;
 								exitingActors.set(actorId, actor);
-								yield* startPixiInventoryActorRemovalFeedbackFx({
+								yield* startPixiTileActorExitFx({
 									actor,
 									animator,
 									onComplete: () => {
@@ -188,7 +184,7 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 									created.push(actor);
 									changed = true;
 									RendererRuntime.runSync(
-										restorePixiInventoryActorRemovalFeedbackFx({
+										restorePixiTileActorExitFx({
 											actor,
 											animator,
 										}),
@@ -212,8 +208,9 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 								created.push(actor);
 							}
 							const crowdAlphaChanged =
-								readPixiTileActorCrowdAlpha(actor.item) !==
-								readPixiTileActorCrowdAlpha(item);
+								RendererRuntime.runSync(
+									readPixiTileActorCrowdAlphaFx(actor.item),
+								) !== RendererRuntime.runSync(readPixiTileActorCrowdAlphaFx(item));
 							const activityEffectChanged =
 								actor.item.activityEffect !== item.activityEffect;
 							const sizeChanged = actor.size !== actorSize;
@@ -235,7 +232,9 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 										channel: "crowd-opacity",
 										durationMs: 180,
 										ownerKey: `running:${item.id}`,
-										toCrowdAlpha: readPixiTileActorCrowdAlpha(item),
+										toCrowdAlpha: RendererRuntime.runSync(
+											readPixiTileActorCrowdAlphaFx(item),
+										),
 									}),
 								);
 							}
@@ -261,24 +260,9 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 								);
 								if (hydrated) {
 									RendererRuntime.runSync(
-										animator.setFx({
-											actor,
-											alpha: 0,
-											channel: "lifecycle-opacity",
-										}),
-									);
-									RendererRuntime.runSync(
-										startPixiTileActorFadeInFx({
+										startPixiTileActorEnterFx({
 											actor,
 											animator,
-										}),
-									);
-								} else {
-									RendererRuntime.runSync(
-										animator.setFx({
-											actor,
-											alpha: 1,
-											channel: "lifecycle-opacity",
 										}),
 									);
 								}

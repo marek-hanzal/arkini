@@ -14,16 +14,14 @@ import type {
 	AcquisitionOwner,
 	GameEngineResourceServiceState,
 } from "~/bridge/game/internal/GameEngineResourceServiceState";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
 
 export namespace createGameEngineResourceServiceFx {
 	export interface Dependencies {
 		readonly clearSaveFx: (key: GameSaveStorage.Key) => Effect.Effect<void, unknown>;
 		/**
-		 * Creates the resource only. This service is the sole lifecycle lock owner;
-		 * cutover must remove the legacy per-resource lifecycle lock instead of
-		 * composing both locks.
+		 * Creates the resource only. This service is the sole lifecycle lock owner.
 		 */
 		readonly createResourceFx: (
 			packageId: string,
@@ -197,13 +195,17 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 												decision.token,
 											),
 										),
-										Effect.catchCause((cause) => {
-											const failure = readExactCauseFailure(cause);
-											return Option.isSome(failure) &&
-												failure.value instanceof CriticalGameLifecycleError
-												? Effect.fail(failure.value)
-												: Effect.succeed(null);
-										}),
+										Effect.catchCause((cause) =>
+											readExactCauseFailureFx(cause).pipe(
+												Effect.flatMap((failure) =>
+													Option.isSome(failure) &&
+													failure.value instanceof
+														CriticalGameLifecycleError
+														? Effect.fail(failure.value)
+														: Effect.succeed(null),
+												),
+											),
+										),
 									);
 							}
 						}),
@@ -296,6 +298,50 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 				),
 			);
 
+			const prepareEditorHandoffFx: GameEngineResourceFxService["prepareEditorHandoffFx"] =
+				Effect.fn("GameEngineResourceFx.prepareEditorHandoffFx")(() =>
+					Effect.suspend(() => {
+						const retryAfterFx = (operationFx: Effect.Effect<void, unknown>) =>
+							Effect.exit(operationFx).pipe(Effect.andThen(prepareEditorHandoffFx));
+						return withLifecycleLockFx(
+							Ref.get(stateRef).pipe(
+								Effect.map(
+									(
+										state,
+									): GameEngineResourceFxService["prepareEditorHandoffFx"] => {
+										switch (state._tag) {
+											case "Idle":
+											case "BootstrapFailed":
+												return Effect.succeed(null);
+											case "OwnershipFailed":
+												return Effect.fail(state.error);
+											case "Active":
+												return Effect.succeed(state.resource);
+											case "Acquiring":
+											case "Provisional":
+												return cancellation
+													.beginCancellationFx(state.owner, true)
+													.pipe(Effect.andThen(prepareEditorHandoffFx));
+											case "Cancelling":
+												return retryAfterFx(
+													Deferred.await(state.cancellation.completion),
+												);
+											case "Finalizing":
+												return retryAfterFx(
+													Deferred.await(state.finalization.completion),
+												);
+											case "RecoveringFailedSave":
+												return retryAfterFx(
+													Deferred.await(state.recovery.completion),
+												);
+										}
+									},
+								),
+							),
+						).pipe(Effect.flatten);
+					}),
+				)();
+
 			const closeFx: GameEngineResourceFxService["closeFx"] = Effect.fn(
 				"GameEngineResourceFx.closeFx",
 			)((resource) =>
@@ -308,23 +354,25 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 						true,
 					),
 				).pipe(
-					Effect.map((exit): GameEngineResourceFx.CloseResult => {
+					Effect.flatMap((exit): Effect.Effect<GameEngineResourceFx.CloseResult> => {
 						if (Exit.isSuccess(exit)) {
-							return {
+							return Effect.succeed({
 								type: "saved",
-							};
+							});
 						}
-						const failure = readExactCauseFailure(exit.cause);
-						return {
-							type: "finalization-failed",
-							cause: Option.isSome(failure) ? failure.value : exit.cause,
-						};
+						return readExactCauseFailureFx(exit.cause).pipe(
+							Effect.map((failure) => ({
+								type: "finalization-failed" as const,
+								cause: Option.isSome(failure) ? failure.value : exit.cause,
+							})),
+						);
 					}),
 				),
 			);
 
 			const service = {
 				currentFx: readCurrentFx(),
+				prepareEditorHandoffFx,
 				acquireLeaseFx: acquisition.acquireLeaseFx,
 				adoptLeaseFx: acquisition.adoptLeaseFx,
 				claimForCloseFx,

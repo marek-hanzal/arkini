@@ -6,7 +6,7 @@ import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import type { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { orderBoardLocationsFx } from "./orderBoardLocationsFx";
+import { orderGridLocationsFx } from "./orderGridLocationsFx";
 import { planScopePlacementFx } from "./planScopePlacementFx";
 import { readBoardLocationsFx } from "./readBoardLocationsFx";
 import { resolveBoardPlacementOriginFx } from "./resolveBoardPlacementOriginFx";
@@ -41,7 +41,7 @@ export const planBoardPlacementFx = Effect.fn("planBoardPlacementFx")(function* 
 		size: config.meta.board,
 		space: origin.space,
 	});
-	const orderedBoardLocations = yield* orderBoardLocationsFx({
+	const orderedBoardLocations = yield* orderGridLocationsFx({
 		locations: boardLocations,
 		origin: placementOrigin.position,
 	});

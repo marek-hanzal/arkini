@@ -30,14 +30,10 @@ export const fromStateFx = Effect.fn("fromStateFx")(function* ({ state }: fromSt
 			currentSpace: state.currentSpace,
 			items,
 			jobs: state.jobs,
-			jobQueue: state.jobQueue ?? [],
-			...(state.defaultLineByOwnerItemId === undefined
-				? {}
-				: {
-						defaultLineByOwnerItemId: {
-							...state.defaultLineByOwnerItemId,
-						},
-					}),
+			jobQueue: state.jobQueue,
+			defaultLineByOwnerItemId: {
+				...(state.defaultLineByOwnerItemId ?? {}),
+			},
 		} satisfies RuntimeSchema.Type,
 	});
 });

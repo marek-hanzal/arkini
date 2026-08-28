@@ -13,6 +13,7 @@ import { RuleEnumSchema } from "~/engine/line/schema/rule/RuleEnumSchema";
 import type { LineRunResolutionSchema } from "~/engine/line/schema/run/LineRunResolutionSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { readBoardRuntimeItemByIdFx } from "~/engine/runtime/read/readBoardRuntimeItemByIdFx";
 
 export namespace readBoardItemDetailLineFx {
 	export interface Props {
@@ -37,8 +38,13 @@ const readLineDisabledCause = (
 		if (result.type !== RuleEnumSchema.enum.Disable || !result.active) continue;
 		const rule = line.rules[ruleIndex];
 		if (rule?.type !== RuleEnumSchema.enum.Disable) continue;
+		if (rule.hint === undefined)
+			return {
+				kind: "static",
+			};
 		return {
 			kind: "disable-rule",
+			hint: rule.hint,
 			ruleIndex,
 			when: rule.when,
 		};
@@ -47,9 +53,14 @@ const readLineDisabledCause = (
 		if (result.type !== RuleEnumSchema.enum.Enable || result.active) continue;
 		const rule = line.rules[ruleIndex];
 		if (rule?.type !== RuleEnumSchema.enum.Enable) continue;
+		if (rule.hint === undefined)
+			return {
+				kind: "static",
+			};
 		const whenIndex = result.failedWhenIndex ?? 0;
 		return {
 			kind: "enable-rule",
+			hint: rule.hint,
 			ruleIndex,
 			whenIndex,
 			when: rule.when[whenIndex] ?? rule.when[0],
@@ -71,6 +82,10 @@ export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(
 	const start = yield* resolveLineStartFx({
 		lineId: line.id,
 		ownerItemId,
+		runtime,
+	});
+	const owner = yield* readBoardRuntimeItemByIdFx({
+		itemId: ownerItemId,
 		runtime,
 	});
 	const resolution = start.run;
@@ -162,8 +177,16 @@ export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(
 		baseRuntimeMs: line.runtimeMs,
 		effectiveRuntimeMs: resolution.runtimeMs,
 		availability,
+		activeRuleHints: resolution.rules.flatMap((result, ruleIndex) => {
+			const hint = line.rules[ruleIndex]?.hint;
+			return result.active && hint !== undefined
+				? [
+						hint,
+					]
+				: [];
+		}),
 		isDefault: line.id === defaultLineId,
-		queuedRequestCount: (runtime.jobQueue ?? []).filter(
+		queuedRequestCount: runtime.jobQueue.filter(
 			(request) => request.ownerItemId === ownerItemId && request.lineId === line.id,
 		).length,
 		actions: {
@@ -173,7 +196,13 @@ export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(
 			canWithdraw,
 		},
 		input,
-		output: yield* readItemDetailOutputFx(line),
+		output: yield* readItemDetailOutputFx({
+			line,
+			ruleContext: {
+				origin: owner.location,
+				runtime,
+			},
+		}),
 		...(activeJob === undefined
 			? {}
 			: {

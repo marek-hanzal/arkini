@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { Game } from "~/bridge/game/Game";
+import type { PlayableGame } from "~/bridge/game/PlayableGame";
 import type { ItemDetailPendingActionOwner } from "~/bridge/item-detail/ItemDetailPendingActionOwner";
 import { useItemDetailPendingCommand } from "~/bridge/item-detail/useItemDetailPendingCommand";
 import { withdrawLineInputFx } from "~/engine/input/write/withdrawLineInputFx";
@@ -15,7 +15,7 @@ export namespace useWithdrawItemDetailLine {
 	}
 }
 
-const runWithdrawFx = (game: Game, command: useWithdrawItemDetailLine.Props) =>
+const runWithdrawFx = (game: PlayableGame, command: useWithdrawItemDetailLine.Props) =>
 	game
 		.runFx(
 			"inputIndex" in command ? withdrawLineInputFx(command) : withdrawLineInputsFx(command),

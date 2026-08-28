@@ -53,6 +53,41 @@ const reportWindowVisible = () => {
 	handler();
 };
 
+const reportEditorProjectChanged = (projectId: string) => {
+	const handler = electron.handlers.get(ArkiniElectronContract.channels.editorProjectChanged);
+	if (handler === undefined) throw new Error("Expected editor-project listener registration.");
+	handler(undefined, projectId);
+};
+
+const reportChatGptState = (state: { readonly type: "loading" | "ready" }) => {
+	const handler = electron.handlers.get(ArkiniElectronContract.channels.chatGptStateChanged);
+	if (handler === undefined) throw new Error("Expected ChatGPT state listener registration.");
+	handler(undefined, state);
+};
+
+const requestEditorMcpVersionCheckout = async (request: {
+	readonly projectId: string;
+	readonly versionId: string;
+}) => {
+	const handler = electron.handlers.get(
+		ArkiniElectronContract.channels.editorMcpVersionCheckoutRequest,
+	);
+	if (handler === undefined) throw new Error("Expected MCP version checkout listener.");
+	const port = {
+		close: vi.fn(),
+		postMessage: vi.fn(),
+	};
+	await handler(
+		{
+			ports: [
+				port,
+			],
+		},
+		request,
+	);
+	return port;
+};
+
 describe("Electron preload lifecycle", () => {
 	beforeEach(() => {
 		electron.reset();
@@ -97,11 +132,91 @@ describe("Electron preload lifecycle", () => {
 		);
 	});
 
+	it("routes the mounted editor project context through dedicated MCP IPC channels", async () => {
+		electron.ipcRenderer.invoke.mockResolvedValue(undefined);
+		const api = await loadPreload();
+
+		await expect(api.editorMcp.setProjectContext("project-one")).resolves.toBeUndefined();
+		await expect(api.editorMcp.clearProjectContext("project-one")).resolves.toBeUndefined();
+		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
+			1,
+			ArkiniElectronContract.channels.editorMcpProjectContextSet,
+			"project-one",
+		);
+		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
+			2,
+			ArkiniElectronContract.channels.editorMcpProjectContextClear,
+			"project-one",
+		);
+	});
+
+	it("exposes declarative ChatGPT surface placement and removable state listeners", async () => {
+		electron.ipcRenderer.invoke.mockResolvedValue(undefined);
+		const api = await loadPreload();
+		const listener = vi.fn();
+		const unsubscribe = api.chatGpt.onStateChanged(listener);
+		const surface = {
+			projectId: "project-one",
+			bounds: {
+				x: 64,
+				y: 0,
+				width: 800,
+				height: 600,
+			},
+		};
+
+		await expect(api.chatGpt.setSurface(surface)).resolves.toBeUndefined();
+		reportChatGptState({
+			type: "ready",
+		});
+		unsubscribe();
+		reportChatGptState({
+			type: "loading",
+		});
+		expect(electron.ipcRenderer.invoke).toHaveBeenCalledWith(
+			ArkiniElectronContract.channels.chatGptSurfaceSet,
+			surface,
+		);
+		expect(listener).toHaveBeenCalledExactlyOnceWith({
+			type: "ready",
+		});
+	});
+
+	it("subscribes the renderer to main-process editor project mutations", async () => {
+		const api = await loadPreload();
+		const listener = vi.fn();
+		const unsubscribe = api.editor.onProjectChanged(listener);
+
+		reportEditorProjectChanged("project-one");
+		unsubscribe();
+		reportEditorProjectChanged("project-two");
+
+		expect(listener).toHaveBeenCalledExactlyOnceWith("project-one");
+	});
+
+	it("returns renderer MCP version checkout completion through its private port", async () => {
+		const api = await loadPreload();
+		const listener = vi.fn(() => Promise.resolve());
+		const unsubscribe = api.editorMcp.onVersionCheckoutRequested(listener);
+		const request = {
+			projectId: "project-one",
+			versionId: "version-one",
+		};
+
+		const port = await requestEditorMcpVersionCheckout(request);
+
+		expect(listener).toHaveBeenCalledExactlyOnceWith(request);
+		expect(port.postMessage).toHaveBeenCalledWith({
+			type: "success",
+		});
+		expect(port.close).toHaveBeenCalledOnce();
+		unsubscribe();
+	});
+
 	it("routes bounded diagnostics through dedicated IPC channels", async () => {
 		electron.ipcRenderer.invoke.mockResolvedValue(undefined);
 		const api = await loadPreload();
 		const record: Parameters<typeof api.diagnostics.write>[0] = {
-			schemaVersion: 1,
 			level: "fatal",
 			category: [
 				"renderer",
@@ -120,6 +235,40 @@ describe("Electron preload lifecycle", () => {
 		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
 			2,
 			ArkiniElectronContract.channels.diagnosticsOpenDirectory,
+		);
+	});
+
+	it("routes the Arkini user-data root through its dedicated IPC channel", async () => {
+		electron.ipcRenderer.invoke.mockResolvedValue(undefined);
+		const api = await loadPreload();
+
+		await expect(api.userData.openDirectory()).resolves.toBeUndefined();
+		expect(electron.ipcRenderer.invoke).toHaveBeenCalledWith(
+			ArkiniElectronContract.channels.userDataOpenDirectory,
+		);
+	});
+
+	it("routes CLI installation through its dedicated IPC channels", async () => {
+		electron.ipcRenderer.invoke.mockResolvedValue({
+			type: "not-installed",
+			commandPath: "/tmp/arkini-cli",
+		});
+		const api = await loadPreload();
+
+		await api.cli.status();
+		await api.cli.install();
+		await api.cli.uninstall();
+		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
+			1,
+			ArkiniElectronContract.channels.cliStatus,
+		);
+		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
+			2,
+			ArkiniElectronContract.channels.cliInstall,
+		);
+		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
+			3,
+			ArkiniElectronContract.channels.cliUninstall,
 		);
 	});
 

@@ -1,5 +1,5 @@
 {
-	"$schema": "../schema.json",
+	"$schema": "./schema.json",
 	"meta": {
 		"id": "arkini",
 		"title": "Arkini",
@@ -24,124 +24,106 @@
 		"avatar-07": "avatar-07"
 	},
 	"start": {
+		"currentSpace": 0,
 		"board": [
 			{
-				"itemId": "item:tree",
 				"x": 1,
 				"y": 0,
-				"space": 0
+				"space": 0,
+				"itemId": "item:tree",
+				"quantity": 1
 			},
 			{
-				"itemId": "item:tree",
 				"x": 0,
 				"y": 1,
-				"space": 0
+				"space": 0,
+				"itemId": "item:tree",
+				"quantity": 1
 			},
 			{
-				"itemId": "item:tree",
 				"x": 1,
 				"y": 2,
-				"space": 0
+				"space": 0,
+				"itemId": "item:tree",
+				"quantity": 1
 			},
 			{
-				"itemId": "producer:lumberjack-t1",
 				"x": 1,
 				"y": 1,
-				"space": 0
+				"space": 0,
+				"itemId": "producer:lumberjack-t1",
+				"quantity": 1
 			},
 			{
-				"itemId": "producer:townhall-t1",
 				"x": 4,
 				"y": 3,
-				"space": 0
+				"space": 0,
+				"itemId": "producer:townhall-t1",
+				"quantity": 1
 			},
 			{
-				"itemId": "item:rock",
 				"x": 6,
 				"y": 0,
-				"space": 0
+				"space": 0,
+				"itemId": "item:rock",
+				"quantity": 1
 			},
 			{
-				"itemId": "producer:quarry-t1",
 				"x": 6,
 				"y": 1,
-				"space": 0
+				"space": 0,
+				"itemId": "producer:quarry-t1",
+				"quantity": 1
+			},
+			{
+				"x": 8,
+				"y": 5,
+				"space": 0,
+				"itemId": "item:tree",
+				"quantity": 1
+			},
+			{
+				"x": 9,
+				"y": 5,
+				"space": 0,
+				"itemId": "jump",
+				"quantity": 1
+			},
+			{
+				"x": 2,
+				"y": 1,
+				"space": 1,
+				"itemId": "producer:armory-t1",
+				"quantity": 1
+			},
+			{
+				"x": 5,
+				"y": 2,
+				"space": 1,
+				"itemId": "back-to-0",
+				"quantity": 1
 			}
 		],
 		"inventory": [
 			{
 				"itemId": "item:magnifying-glass",
+				"position": {
+					"x": 0,
+					"y": 0
+				},
 				"quantity": 1
 			}
 		],
 		"toolbar": [
 			{
 				"itemId": "item:inventory",
+				"quantity": 1,
 				"position": {
-					"x": 12,
+					"x": 14,
 					"y": 0
 				}
 			}
-		],
-		"currentSpace": 0
+		]
 	},
-	"categories": {
-		"material": {
-			"id": "material",
-			"title": "Materials"
-		},
-		"waste": {
-			"id": "waste",
-			"title": "Waste"
-		},
-		"source": {
-			"id": "source",
-			"title": "Sources"
-		},
-		"equipment": {
-			"id": "equipment",
-			"title": "Equipment"
-		},
-		"quest": {
-			"id": "quest",
-			"title": "Quests"
-		},
-		"blueprint": {
-			"id": "blueprint",
-			"title": "Blueprints"
-		},
-		"food": {
-			"id": "food",
-			"title": "Food"
-		},
-		"morale": {
-			"id": "morale",
-			"title": "Morale"
-		},
-		"currency": {
-			"id": "currency",
-			"title": "Currency"
-		},
-		"knowledge": {
-			"id": "knowledge",
-			"title": "Knowledge"
-		},
-		"clothing": {
-			"id": "clothing",
-			"title": "Clothing"
-		},
-		"building": {
-			"id": "building",
-			"title": "Buildings"
-		},
-		"treasure": {
-			"id": "treasure",
-			"title": "Treasure"
-		},
-		"utility": {
-			"id": "utility",
-			"title": "Utility"
-		}
-	},
-	"version": "1.0"
+	"version": "2.4"
 }

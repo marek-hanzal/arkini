@@ -1,0 +1,17 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "z0acma2wm3ysang7rc6b8yu4",
+		"id": "item:beer-barrel",
+		"title": "Beer Barrel",
+		"description": "A barrel of beer produced by breweries and served by taverns.",
+		"asset": {
+			"default": [
+				"item-beer-barrel"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 20,
+		"type": "simple"
+	}
+}

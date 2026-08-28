@@ -16,7 +16,7 @@ const panelContentModeClassNames = {
 	viewport: "size-full overflow-hidden p-[var(--ak-panel-padding)]",
 } as const;
 
-type MainPage = "about" | "arkpacks" | "main-menu" | "settings";
+type MainPage = "about" | "arkpacks" | "editor-welcome" | "main-menu" | "settings";
 type MainPagePanelMode = keyof typeof panelModeClassNames;
 
 export namespace MainPageLayout {

@@ -57,6 +57,7 @@ const makeState = ({
 				quantity: targetQuantity,
 			},
 		],
+		jobQueue: [],
 		jobs: [],
 	}) satisfies StateSchema.Type;
 
@@ -219,16 +220,13 @@ describe("mergeItemsFx", () => {
 		);
 	});
 
-	it("uses the first source-owned matching selector and never synthesizes the reverse direction", () => {
+	it("uses the first source-owned matching rule and never synthesizes the reverse direction", () => {
 		const config = createMergeTestConfig({
-			targetTags: [
-				"mergeable",
-			],
 			rule: [
 				{
 					target: {
-						type: "tag",
-						tag: "mergeable",
+						type: "item",
+						itemId: "target",
 					},
 					action: "consume",
 					effect: "keep",

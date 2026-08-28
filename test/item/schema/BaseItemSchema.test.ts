@@ -4,25 +4,28 @@ import { BaseItemSchema } from "~/engine/item/schema/BaseItemSchema";
 import { SimpleItemSchema } from "~/engine/item/schema/SimpleItemSchema";
 
 describe("BaseItemSchema", () => {
-	it("requires presentation, storage scope, and permits an optional positive total limit", () => {
+	it("requires immutable identity, presentation, storage scope, and permits an optional positive total limit", () => {
 		const item = {
+			uid: "tree",
 			id: "tree",
 			title: "Tree",
 			description: "A living tree.",
 			asset: {
-				source: [
+				default: [
 					"asset:tree",
 				],
 			},
-			tags: [
-				"nature",
-			],
-			categoryId: "resource",
 			scope: "board",
 			maxStackSize: 1,
 		};
 
 		expect(BaseItemSchema.safeParse(item).success).toBe(true);
+		expect(
+			BaseItemSchema.safeParse({
+				...item,
+				uid: undefined,
+			}).success,
+		).toBe(false);
 		expect(
 			BaseItemSchema.safeParse({
 				...item,
@@ -39,18 +42,6 @@ describe("BaseItemSchema", () => {
 			BaseItemSchema.safeParse({
 				...item,
 				title: "",
-			}).success,
-		).toBe(false);
-		expect(
-			BaseItemSchema.safeParse({
-				...item,
-				tags: undefined,
-			}).success,
-		).toBe(false);
-		expect(
-			BaseItemSchema.safeParse({
-				...item,
-				categoryId: undefined,
 			}).success,
 		).toBe(false);
 		expect(
@@ -79,16 +70,15 @@ describe("BaseItemSchema", () => {
 
 	it("inherits the base stack limit for simple items", () => {
 		const item = {
+			uid: "tree",
 			id: "tree",
 			title: "Tree",
 			description: "A living tree.",
 			asset: {
-				source: [
+				default: [
 					"asset:tree",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "board",
 			type: "simple",
 			maxStackSize: 1,

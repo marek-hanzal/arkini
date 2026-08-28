@@ -25,9 +25,6 @@ export const releasePixiMainSceneActorFx = Effect.fn("releasePixiMainSceneActorF
 	yield* drag.detachActorFx(actor);
 	yield* actorStore.releaseActorFx(actorId);
 	yield* animator.cancelActorFx(actor);
-	actor.lifecycleIntentGeneration += 1;
-	actor.lifecycleTargetAlpha = 0;
-	actor.lifecycleFadeStarted = true;
 	actor.visualTransitionGeneration += 1;
 	return actor;
 });

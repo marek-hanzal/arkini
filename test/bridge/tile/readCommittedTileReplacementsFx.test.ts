@@ -8,7 +8,6 @@ import { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -27,35 +26,32 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		stone: {
+			uid: "stone",
 			id: "stone",
 			type: "simple",
 			title: "Stone",
 			description: "Stone",
 			asset: {
-				source: [
+				default: [
 					"asset:stone",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 		},
 		mud: {
+			uid: "mud",
 			id: "mud",
 			type: "simple",
 			title: "Mud",
 			description: "Mud",
 			asset: {
-				source: [
+				default: [
 					"asset:mud",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 		},
@@ -89,6 +85,8 @@ const runtime = (item: (typeof config.items)["stone"] | (typeof config.items)["m
 			},
 		],
 		jobs: [],
+		jobQueue: [],
+		defaultLineByOwnerItemId: {},
 	});
 
 const game = {

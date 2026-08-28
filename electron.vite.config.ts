@@ -8,7 +8,16 @@ import { defineConfig } from "electron-vite";
 import { Effect } from "effect";
 import { RendererDevelopmentServer } from "./electron/security/RendererDevelopmentUrl";
 import { createRendererDevelopmentContentSecurityPolicyFx } from "./electron/security/createRendererDevelopmentContentSecurityPolicyFx";
-import { ProjectOutputPaths } from "./shared/ProjectOutputPaths";
+import { ArkiniReleaseIdentityDefaults } from "./src/engine/pack/ArkiniReleaseIdentity";
+
+const sourceAlias = {
+	"~": fileURLToPath(new URL("./src", import.meta.url)),
+};
+const releaseIssuer = process.env.ARKINI_RELEASE_ISSUER ?? ArkiniReleaseIdentityDefaults.issuer;
+const releaseIdentity =
+	process.env.ARKINI_RELEASE_IDENTITY ?? ArkiniReleaseIdentityDefaults.identity;
+new URL(releaseIssuer);
+new URL(releaseIdentity);
 
 export default defineConfig(({ command }) => {
 	const developmentCspNonce =
@@ -16,16 +25,36 @@ export default defineConfig(({ command }) => {
 
 	return {
 		main: {
+			define: {
+				__ARKINI_RELEASE_ISSUER__: JSON.stringify(releaseIssuer),
+				__ARKINI_RELEASE_IDENTITY__: JSON.stringify(releaseIdentity),
+			},
+			resolve: {
+				alias: sourceAlias,
+			},
 			build: {
-				outDir: resolve(ProjectOutputPaths.desktop.build, "main"),
+				externalizeDeps: false,
+				minify: true,
+				outDir: resolve(".out/desktop/build/main"),
 				rollupOptions: {
-					input: resolve("electron/main/index.ts"),
+					external: [
+						/^@ngrok\/ngrok(?:$|-)/,
+					],
+					input: {
+						index: resolve("electron/main/index.ts"),
+						"cli/arkini": resolve("src/engine/cli/arkini.ts"),
+					},
 				},
 			},
 		},
 		preload: {
+			resolve: {
+				alias: sourceAlias,
+			},
 			build: {
-				outDir: resolve(ProjectOutputPaths.desktop.build, "preload"),
+				externalizeDeps: false,
+				minify: true,
+				outDir: resolve(".out/desktop/build/preload"),
 				rollupOptions: {
 					input: resolve("electron/preload/index.ts"),
 					output: {
@@ -63,16 +92,14 @@ export default defineConfig(({ command }) => {
 							cspNonce: developmentCspNonce,
 						},
 			resolve: {
-				alias: {
-					"~": fileURLToPath(new URL("./src", import.meta.url)),
-				},
+				alias: sourceAlias,
 			},
 			plugins: [
 				tanstackRouter({
 					target: "react",
 					routesDirectory: "./src/@routes",
 					generatedRouteTree: "./src/_route.ts",
-					tmpDir: ProjectOutputPaths.cache.tanstack,
+					tmpDir: ".out/cache/tanstack",
 					autoCodeSplitting: false,
 					quoteStyle: "double",
 				}),
@@ -80,7 +107,7 @@ export default defineConfig(({ command }) => {
 				viteReact(),
 			],
 			build: {
-				outDir: resolve(ProjectOutputPaths.desktop.build, "renderer"),
+				outDir: resolve(".out/desktop/build/renderer"),
 				target: "esnext",
 				rollupOptions: {
 					input: resolve("index.html"),

@@ -12,6 +12,7 @@ describe("isExpectedPlacementDeliveryBlock", () => {
 			),
 		).toEqual([
 			true,
+			false,
 			true,
 			true,
 			true,

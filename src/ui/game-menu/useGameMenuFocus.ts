@@ -1,7 +1,8 @@
-import { type KeyboardEvent as ReactKeyboardEvent, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import type { GameMenuPhase } from "~/ui/game-menu/GameMenuControl";
-import { dialogFocusableSelector, keepDialogFocusInside } from "~/ui/focus/keepDialogFocusInside";
+import { dialogFocusableSelector } from "~/ui/focus/dialogFocusableSelector";
+import { useDialogFocusContainment } from "~/ui/focus/useDialogFocusContainment";
 
 /** Owns game-menu focus entry, containment, restoration, and blocked Escape handling. */
 export const useGameMenuFocus = ({
@@ -35,13 +36,10 @@ export const useGameMenuFocus = ({
 		phase,
 	]);
 
-	const keepFocusInside = (event: ReactKeyboardEvent<HTMLDivElement>) => {
-		keepDialogFocusInside({
-			blockEscape: blocked,
-			dialogRef,
-			event,
-		});
-	};
+	const keepFocusInside = useDialogFocusContainment({
+		blockEscape: blocked,
+		dialogRef,
+	});
 
 	return {
 		dialogRef,

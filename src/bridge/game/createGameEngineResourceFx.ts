@@ -1,58 +1,64 @@
 import { Effect, Exit, Option } from "effect";
 
-import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
-import type { Game } from "~/bridge/game/Game";
+import {
+	CriticalGameLifecycleError,
+	type CriticalGameLifecycleOperation,
+} from "~/bridge/game/CriticalGameLifecycleError";
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import type { GameSessionServices } from "~/bridge/game/GameSession";
+import type { PlayableGame } from "~/bridge/game/PlayableGame";
+import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
 
-/** Wraps one concrete Game in the fail-stop guard owned by the renderer lifecycle service. */
-export const createGameEngineResourceFx = Effect.fn("createGameEngineResourceFx")((game: Game) =>
-	Effect.sync(() => {
-		let criticalFailure: CriticalGameLifecycleError | null = null;
-		let explicitFailurePublication = false;
-		const criticalFailureListeners = new Set<() => void>();
-		const assertUsable = () => {
-			if (criticalFailure !== null) throw criticalFailure;
-		};
-		const markCriticalFailure: GameEngineResource["markCriticalFailure"] = (
-			operation,
-			cause,
-		) => {
-			if (criticalFailure !== null) return criticalFailure;
-			criticalFailure =
-				cause instanceof CriticalGameLifecycleError
-					? cause
-					: new CriticalGameLifecycleError({
-							operation,
-							cause,
-						});
-			for (const listener of [
-				...criticalFailureListeners,
-			])
-				listener();
-			return criticalFailure;
-		};
-		const publishSessionFatal = () => {
-			if (explicitFailurePublication) return;
-			const fatal = game.getFatalError();
-			if (fatal === null) return;
-			markCriticalFailure(
-				fatal.source === "autosave"
-					? "game-save"
-					: fatal.source === "presentation"
-						? "game-presentation"
-						: "game-runtime",
-				fatal,
-			);
-		};
-		publishSessionFatal();
-		game.subscribeFatalError(publishSessionFatal);
-		const engine = {
-			...game,
-			reportCriticalFailure: (operation, cause) => {
+/** Wraps one exact playable session in a presentation fail-stop guard. */
+export const createGameEngineResourceFx = Effect.fn("createGameEngineResourceFx")(
+	<GameType extends PlayableGame>(game: GameType) =>
+		Effect.sync(() => {
+			let criticalFailure: CriticalGameLifecycleError | null = null;
+			let explicitFailurePublication = false;
+			const criticalFailureListeners = new Set<() => void>();
+			const assertUsable = () => {
+				if (criticalFailure !== null) throw criticalFailure;
+			};
+			const markCriticalFailure = (
+				operation: CriticalGameLifecycleOperation,
+				cause: unknown,
+			) => {
+				if (criticalFailure !== null) return criticalFailure;
+				criticalFailure =
+					cause instanceof CriticalGameLifecycleError
+						? cause
+						: new CriticalGameLifecycleError({
+								operation,
+								cause,
+							});
+				for (const listener of [
+					...criticalFailureListeners,
+				])
+					listener();
+				return criticalFailure;
+			};
+			const publishSessionFatal = () => {
+				if (explicitFailurePublication) return;
+				const fatal = game.getFatalError();
+				if (fatal === null) return;
+				markCriticalFailure(
+					fatal.source === "autosave"
+						? "game-save"
+						: fatal.source === "presentation"
+							? "game-presentation"
+							: "game-runtime",
+					fatal,
+				);
+			};
+			publishSessionFatal();
+			game.subscribeFatalError(publishSessionFatal);
+			const reportCriticalFailure: GameEngine["reportCriticalFailure"] = (
+				operation,
+				cause,
+			) => {
 				explicitFailurePublication = true;
-				let fatal: ReturnType<Game["failStop"]>;
+				let fatal: ReturnType<PlayableGame["failStop"]>;
 				try {
 					fatal = game.failStop(
 						operation === "game-presentation" ? "presentation" : "runtime",
@@ -62,14 +68,17 @@ export const createGameEngineResourceFx = Effect.fn("createGameEngineResourceFx"
 					explicitFailurePublication = false;
 				}
 				markCriticalFailure(operation, fatal);
-			},
-			readOrThrow: (effect) => {
+			};
+			const readOrThrow = <Result, Error, Requirements extends GameSessionServices>(
+				effect: Effect.Effect<Result, Error, Requirements>,
+			): Result => {
 				assertUsable();
 				const exit = game.read(effect);
 				if (Exit.isFailure(exit)) {
-					const failure = readExactCauseFailure(exit.cause);
+					const failureExit = game.read(readExactCauseFailureFx(exit.cause));
+					const failure = Exit.isSuccess(failureExit) ? failureExit.value : Option.none();
 					explicitFailurePublication = true;
-					let fatal: ReturnType<Game["failStop"]>;
+					let fatal: ReturnType<PlayableGame["failStop"]>;
 					try {
 						fatal = game.failStop(
 							"runtime",
@@ -81,19 +90,23 @@ export const createGameEngineResourceFx = Effect.fn("createGameEngineResourceFx"
 					throw markCriticalFailure("game-read", fatal);
 				}
 				return exit.value;
-			},
-		} satisfies GameEngine;
-		return {
-			game: engine,
-			getCriticalFailure: () => criticalFailure,
-			assertUsable,
-			markCriticalFailure,
-			subscribeCriticalFailure: (listener) => {
-				criticalFailureListeners.add(listener);
-				return () => {
-					criticalFailureListeners.delete(listener);
-				};
-			},
-		} satisfies GameEngineResource;
-	}),
+			};
+			const engine: GameEngine<GameType> = {
+				...game,
+				readOrThrow,
+				reportCriticalFailure,
+			};
+			return {
+				game: engine,
+				getCriticalFailure: () => criticalFailure,
+				assertUsable,
+				markCriticalFailure,
+				subscribeCriticalFailure: (listener) => {
+					criticalFailureListeners.add(listener);
+					return () => {
+						criticalFailureListeners.delete(listener);
+					};
+				},
+			} satisfies GameEngineResource<GameType>;
+		}),
 );

@@ -65,6 +65,9 @@ describe("planDropScopePlacementFx", () => {
 				}),
 			],
 			jobs: [],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
 		const result = run(
@@ -123,6 +126,9 @@ describe("planDropScopePlacementFx", () => {
 				}),
 			],
 			jobs: [],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
 		const plan = run(
@@ -191,6 +197,9 @@ describe("planDropScopePlacementFx", () => {
 				}),
 			],
 			jobs: [],
+
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
 		const plan = run(

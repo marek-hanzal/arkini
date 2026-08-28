@@ -34,7 +34,6 @@ const line = (id: string, title: string, isDefault = false) => ({
 });
 
 const config = GameConfigSchema.parse({
-	version: "1.0",
 	resources: {
 		hero: "hero",
 	},
@@ -61,20 +60,18 @@ const config = GameConfigSchema.parse({
 			},
 		],
 	},
-	categories: {},
 	items: {
 		producer: {
+			uid: "producer",
 			id: "producer",
 			type: "producer",
 			title: "Producer",
 			description: "Owns two lines.",
 			asset: {
-				source: [
+				default: [
 					"asset:producer",
 				],
 			},
-			tags: [],
-			categoryId: "building",
 			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 1,
@@ -87,7 +84,6 @@ const config = GameConfigSchema.parse({
 });
 const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 	GameConfigSchema.parse({
-		version: "1.0",
 		resources: {
 			hero: "hero",
 		},
@@ -106,20 +102,18 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 		start: {
 			currentSpace: 0,
 		},
-		categories: {},
 		items: {
 			producer: {
+				uid: "producer",
 				id: "producer",
 				type: "producer",
 				title: "Producer",
 				description: "Owns one line.",
 				asset: {
-					source: [
+					default: [
 						"asset:producer",
 					],
 				},
-				tags: [],
-				categoryId: "building",
 				scope: "any",
 				maxStackSize: 3,
 				maxQueueSize: 1,
@@ -128,17 +122,16 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 				],
 			},
 			blocker: {
+				uid: "blocker",
 				id: "blocker",
 				type: "simple",
 				title: "Blocker",
 				description: "Blocks placement.",
 				asset: {
-					source: [
+					default: [
 						"asset:blocker",
 					],
 				},
-				tags: [],
-				categoryId: "resource",
 				scope: "any",
 				maxStackSize: 1,
 			},
@@ -170,7 +163,7 @@ describe("setDefaultLineFx", () => {
 			),
 		);
 
-		expect(result.runtime.defaultLineByOwnerItemId).toBeUndefined();
+		expect(result.runtime.defaultLineByOwnerItemId).toEqual({});
 		expect(result.pure).toBe(true);
 		expect(result.projection).toMatchObject({
 			kind: "available",
@@ -396,7 +389,7 @@ describe("setDefaultLineFx", () => {
 		);
 
 		expect(result.items).toEqual([]);
-		expect(result.defaultLineByOwnerItemId).toBeUndefined();
+		expect(result.defaultLineByOwnerItemId).toEqual({});
 	});
 	it("atomically isolates one exact stacked owner before selecting its default", () => {
 		const result = Effect.runSync(

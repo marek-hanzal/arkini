@@ -1,4 +1,4 @@
-import type { Game } from "~/bridge/game/Game";
+import type { PlayableGame } from "~/bridge/game/PlayableGame";
 import type { ItemDetailPendingActionOwner } from "~/bridge/item-detail/ItemDetailPendingActionOwner";
 import { useItemDetailPendingCommand } from "~/bridge/item-detail/useItemDetailPendingCommand";
 import { clearItemJobQueueFx } from "~/engine/job/write/clearItemJobQueueFx";
@@ -12,7 +12,7 @@ export namespace useClearItemDetailQueue {
 	}
 }
 
-const runClearQueueFx = (game: Game, command: useClearItemDetailQueue.Props) =>
+const runClearQueueFx = (game: PlayableGame, command: useClearItemDetailQueue.Props) =>
 	game.runFx(clearItemJobQueueFx(command));
 
 /** Clears only queued line-start intents for one exact Item Detail target. */

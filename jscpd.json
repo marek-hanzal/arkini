@@ -4,13 +4,13 @@
 	"minTokens": 80,
 	"mode": "mild",
 	"path": [
-		"src",
-		"cli"
+		"src"
 	],
 	"ignore": [
 		"**/*.test.ts",
 		"**/*.test.tsx",
 		"**/*.d.ts",
+		"**/_route.ts",
 		"**/node_modules/**",
 		"**/dist/**"
 	],

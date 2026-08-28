@@ -38,7 +38,7 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 	const timeIssues: JobTimeInvalidIssueSchema.Type[] = [];
 	const materialOrphanIssues: JobMaterialOrphanIssueSchema.Type[] = [];
 	const consumedStateIssues: JobConsumedMaterialStateIssueSchema.Type[] = [];
-	const queue = runtime.jobQueue ?? [];
+	const queue = runtime.jobQueue;
 	const entries = [
 		...runtime.jobs,
 		...queue,

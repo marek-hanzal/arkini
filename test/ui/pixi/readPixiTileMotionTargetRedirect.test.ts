@@ -1,7 +1,8 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
-import { readPixiTileMotionTargetRedirect } from "~/ui/pixi/motion/readPixiTileMotionTargetRedirect";
+import { readPixiTileMotionTargetRedirectFx } from "~/ui/pixi/motion/readPixiTileMotionTargetRedirectFx";
 
 const sourceLocation = {
 	scope: "board" as const,
@@ -29,7 +30,7 @@ const storedSource = {
 	previousRevision: "revision:log:1",
 } as const;
 
-describe("readPixiTileMotionTargetRedirect", () => {
+describe("readPixiTileMotionTargetRedirectFx", () => {
 	it("hands a consumed input source to its physical line owner", () => {
 		const result = {
 			inputIndex: 0,
@@ -44,7 +45,7 @@ describe("readPixiTileMotionTargetRedirect", () => {
 			storedQuantity: 1,
 		} satisfies runTileDropAtom.Result;
 
-		expect(readPixiTileMotionTargetRedirect(result)).toEqual({
+		expect(Effect.runSync(readPixiTileMotionTargetRedirectFx(result))).toEqual({
 			sourceActorId: storedSource.itemId,
 			targetActorId: result.owner.itemId,
 			targetLocation: result.owner.location,
@@ -79,7 +80,7 @@ describe("readPixiTileMotionTargetRedirect", () => {
 			},
 		} satisfies runTileDropAtom.Result;
 
-		expect(readPixiTileMotionTargetRedirect(result)).toEqual({
+		expect(Effect.runSync(readPixiTileMotionTargetRedirectFx(result))).toEqual({
 			sourceActorId: storedSource.itemId,
 			targetActorId: result.target.current.itemId,
 			targetLocation: result.target.current.location,
@@ -110,6 +111,6 @@ describe("readPixiTileMotionTargetRedirect", () => {
 			storedQuantity: 1,
 		} satisfies runTileDropAtom.Result;
 
-		expect(readPixiTileMotionTargetRedirect(result)).toBeNull();
+		expect(Effect.runSync(readPixiTileMotionTargetRedirectFx(result))).toBeNull();
 	});
 });

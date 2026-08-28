@@ -18,7 +18,7 @@ export namespace removeRuntimeItemFx {
 	}
 }
 
-/** Removes one item, releases its buffered inputs, and discards its queued identity-bound work. */
+/** Removes one idle item and releases its buffered inputs through canonical placement. */
 export const removeRuntimeItemFx = Effect.fn("removeRuntimeItemFx")(function* ({
 	item,
 	runtime,

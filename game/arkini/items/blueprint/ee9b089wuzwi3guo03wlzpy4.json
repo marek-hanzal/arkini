@@ -1,0 +1,131 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "ee9b089wuzwi3guo03wlzpy4",
+		"id": "item:blueprint-market-t2",
+		"title": "Market II Blueprint",
+		"description": "Build plan that can upgrade Market into Market II.",
+		"asset": {
+			"default": [
+				"blueprint",
+				"producer-market-t2"
+			],
+			"sources": [
+				"producer-market-t2"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 1
+		},
+		"type": "blueprint",
+		"line": {
+			"id": "line:blueprint:market-t2:construct",
+			"title": "Construct Market II",
+			"description": "Consumes construction resources to build Market II.",
+			"default": true,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 36000,
+			"input": [
+				{
+					"charges": {
+						"cost": 1,
+						"from": "self"
+					},
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "producer:market-t1"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:building-permit"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:paper"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 2,
+						"max": 2
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:coin"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 3,
+						"max": 3
+					},
+					"capacity": 0
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "producer:market-t2",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": [
+				{
+					"when": [
+						{
+							"query": {
+								"selector": {
+									"type": "item",
+									"itemId": "producer:civic-office-t1"
+								},
+								"scope": "universe"
+							},
+							"type": "exists"
+						}
+					],
+					"type": "enable"
+				}
+			]
+		}
+	}
+}

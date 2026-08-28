@@ -19,7 +19,6 @@ describe("createGameSaveStorageFx", () => {
 			storage.writeFx(
 				{
 					packageId: "arkini",
-					contentHash: "a".repeat(64),
 				},
 				new Uint8Array([
 					1,

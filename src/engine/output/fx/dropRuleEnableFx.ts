@@ -1,13 +1,13 @@
 import { Effect } from "effect";
 
-import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
+import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RuleEnableResultSchema } from "~/engine/output/schema/drop/rule/RuleEnableResultSchema";
 import type { RuleEnableSchema } from "~/engine/output/schema/drop/rule/RuleEnableSchema";
 import { whenFx } from "~/engine/when/fx/whenFx";
 
 export namespace dropRuleEnableFx {
 	export interface Props {
-		origin: BoardLocationSchema.Type;
+		origin: GridLocationSchema.Type;
 		rule: RuleEnableSchema.Type;
 	}
 }

@@ -18,7 +18,12 @@ const initialState = {
 } as const satisfies GameMenuState;
 
 /** Owns the mounted Game Menu presentation lifecycle and synchronous UI action claim. */
-export const GameMenuProvider = ({ children }: PropsWithChildren) => {
+export const GameMenuProvider = ({
+	children,
+	keyboardEnabled = true,
+}: PropsWithChildren<{
+	readonly keyboardEnabled?: boolean;
+}>) => {
 	const stateRef = useRef<GameMenuState>(initialState);
 	const [state, setState] = useState<GameMenuState>(initialState);
 	const publish = useCallback((next: GameMenuState) => {
@@ -108,6 +113,7 @@ export const GameMenuProvider = ({ children }: PropsWithChildren) => {
 	]);
 
 	useEffect(() => {
+		if (!keyboardEnabled) return;
 		const onKeyDown = (event: KeyboardEvent) => {
 			if (event.key !== "Escape" || event.defaultPrevented) return;
 			const current = stateRef.current;
@@ -121,6 +127,7 @@ export const GameMenuProvider = ({ children }: PropsWithChildren) => {
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
 	}, [
+		keyboardEnabled,
 		toggle,
 	]);
 

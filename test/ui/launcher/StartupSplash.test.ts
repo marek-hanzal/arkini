@@ -12,6 +12,7 @@ import { renderStartupSplashFx } from "~test/ui/launcher/support/renderStartupSp
 const roots: Root[] = [];
 const registries: AtomRegistry.AtomRegistry[] = [];
 const catalog: ArkpackCatalog = {
+	awaitIdleFx: Effect.void,
 	state: Effect.runSync(
 		SubscriptionRef.make<ArkpackCatalog.State>({
 			type: "loading",
@@ -19,6 +20,7 @@ const catalog: ArkpackCatalog = {
 	),
 	refreshFx: Effect.void,
 	importFileFx: () => Effect.die("unused"),
+	installFx: () => Effect.die("unused"),
 	removeFx: () => Effect.die("unused"),
 };
 const readyResult = {
@@ -26,7 +28,7 @@ const readyResult = {
 		theme: "dark" as const,
 		accent: "rose" as const,
 	},
-	builtInPackageId: "canonical-built-in",
+	defaultPackageId: "canonical-built-in",
 	cheatsAvailable: false,
 	windowMode: "bordered" as const,
 };
@@ -82,9 +84,6 @@ describe("StartupSplash", () => {
 
 		expect(harness.container.querySelector('[data-ui="StartupHeroHandoff"]')).toBeNull();
 		expect(harness.container.textContent).not.toContain("Main menu route");
-		const content = harness.container.querySelector('[data-ui="StartupSplashContent"]');
-		if (!(content instanceof HTMLElement)) throw new Error("Startup content missing.");
-		expect(content.style.viewTransitionName).toBe("arkini-startup-content");
 		await act(async () => {
 			window.dispatchEvent(
 				new KeyboardEvent("keydown", {

@@ -31,6 +31,32 @@ describe("compileGameSourcesFx", () => {
 		expect(result.diagnostics).toEqual([]);
 	});
 
+	it("preserves the complete default composition and ordered progress sources", async () => {
+		const item = {
+			...createSimpleItem("item:layered"),
+			asset: {
+				default: [
+					"asset:base",
+					"asset:overlay",
+				],
+				sources: [
+					"asset:progress-1",
+					"asset:progress-2",
+				],
+			},
+		};
+		const result = await compile(
+			createRootSource({
+				items: {
+					[item.id]: item,
+				},
+			}),
+		);
+
+		expect(result.config?.items[item.id]?.asset).toEqual(item.asset);
+		expect(result.diagnostics).toEqual([]);
+	});
+
 	it("preserves an authored default line through the compiler used by packing", async () => {
 		const item = createProducerItem({
 			id: "item:producer",
@@ -49,7 +75,7 @@ describe("compileGameSourcesFx", () => {
 			}),
 		);
 		const compiled = result.config?.items[item.id];
-		if (compiled === undefined || !("lines" in compiled)) {
+		if (compiled?.type !== "producer") {
 			throw new Error("Expected compiled producer.");
 		}
 
@@ -98,7 +124,6 @@ describe("compileGameSourcesFx", () => {
 			GameSourceFileSchema.parse({
 				path: "/game/game.json",
 				value: {
-					version: "1.0",
 					meta: {
 						id: "game:test",
 						title: "Test",
@@ -111,7 +136,6 @@ describe("compileGameSourcesFx", () => {
 							height: 1,
 						},
 					},
-					categories: {},
 					items: {},
 				},
 			}),
@@ -216,12 +240,35 @@ describe("compileGameSourcesFx", () => {
 		);
 		expect(result.config?.$schema).toBe("../schema.json");
 	});
+
+	it("accepts equivalent portable relative JSON Schema references", async () => {
+		const result = await compile(
+			createRootSource({
+				path: "game.json",
+			}),
+			GameSourceFileSchema.parse({
+				path: "simple/a.json",
+				value: {
+					$schema: "../../schema.json",
+				},
+			}),
+		);
+
+		expect(result.diagnostics).not.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					code: DiagnosticCodeEnumSchema.enum.SourceSchemaReferenceConflict,
+				}),
+			]),
+		);
+		expect(result.config?.$schema).toBe("../schema.json");
+	});
+
 	it("requires explicit completed collection providers", async () => {
 		const result = await compile(
 			GameSourceFileSchema.parse({
 				path: "/game/game.json",
 				value: {
-					version: "1.0",
 					meta: {
 						id: "game:test",
 						title: "Test",
@@ -249,12 +296,6 @@ describe("compileGameSourcesFx", () => {
 				expect.objectContaining({
 					code: DiagnosticCodeEnumSchema.enum.ConfigSchema,
 					path: [
-						"categories",
-					],
-				}),
-				expect.objectContaining({
-					code: DiagnosticCodeEnumSchema.enum.ConfigSchema,
-					path: [
 						"items",
 					],
 				}),
@@ -265,44 +306,7 @@ describe("compileGameSourcesFx", () => {
 	it("accepts explicit empty completed collections", async () => {
 		const result = await compile(createRootSource());
 
-		expect(result.config?.categories).toEqual({
-			"category:test": {
-				id: "category:test",
-				title: "Test",
-			},
-		});
 		expect(result.config?.items).toEqual({});
-	});
-
-	it("reports duplicate category keys with both source paths", async () => {
-		const result = await compile(
-			createRootSource(),
-			GameSourceFileSchema.parse({
-				path: "/game/categories/test.json",
-				value: {
-					categories: {
-						"category:test": {
-							id: "category:test",
-							title: "Other",
-						},
-					},
-				},
-			}),
-		);
-
-		expect(result.diagnostics).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					code: DiagnosticCodeEnumSchema.enum.SourceDuplicateRecord,
-					entity: DiagnosticRecordEntityEnumSchema.enum.Category,
-					key: "category:test",
-					sources: [
-						"/game/game.json",
-						"/game/categories/test.json",
-					],
-				}),
-			]),
-		);
 	});
 
 	it("reports JSON Schema references resolving to different targets", async () => {

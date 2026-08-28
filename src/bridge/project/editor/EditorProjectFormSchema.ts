@@ -1,0 +1,56 @@
+import { z } from "zod";
+
+import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+import { TitleSchema } from "~/engine/common/schema/TitleSchema";
+import { GridSizeSchema } from "~/engine/grid/schema/GridSizeSchema";
+import { PositionSchema } from "~/engine/grid/schema/PositionSchema";
+import { ToolbarSizeSchema } from "~/engine/meta/schema/ToolbarSizeSchema";
+import { BoardItemSchema } from "~/engine/start/schema/BoardItemSchema";
+import { InventoryItemSchema } from "~/engine/start/schema/InventoryItemSchema";
+import { ToolbarItemSchema } from "~/engine/start/schema/ToolbarItemSchema";
+
+export const EditorProjectAvatarKeys = [
+	"avatar-01",
+	"avatar-02",
+	"avatar-03",
+	"avatar-04",
+	"avatar-05",
+	"avatar-06",
+	"avatar-07",
+] as const;
+
+const EditorProjectStartBoardItemSchema = BoardItemSchema.extend({
+	quantity: PositiveIntegerSchema,
+});
+const EditorProjectStartToolbarItemSchema = ToolbarItemSchema.extend({
+	quantity: PositiveIntegerSchema,
+});
+const EditorProjectStartInventoryItemSchema = InventoryItemSchema.extend({
+	position: PositionSchema,
+	quantity: PositiveIntegerSchema,
+});
+
+export const EditorProjectFormBaseSchema = z
+	.object({
+		title: TitleSchema,
+		hero: IdSchema,
+		avatars: z.array(IdSchema).max(EditorProjectAvatarKeys.length),
+		board: GridSizeSchema,
+		inventory: GridSizeSchema,
+		toolbarSize: ToolbarSizeSchema,
+		start: z
+			.object({
+				currentSpace: NonNegativeIntegerSchema,
+				board: z.array(EditorProjectStartBoardItemSchema),
+				inventory: z.array(EditorProjectStartInventoryItemSchema),
+				toolbar: z.array(EditorProjectStartToolbarItemSchema),
+			})
+			.strict(),
+	})
+	.strict();
+
+export namespace EditorProjectFormSchema {
+	export type Type = z.infer<typeof EditorProjectFormBaseSchema>;
+}

@@ -1,0 +1,129 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "udc7lewgrjfo5cn9ac32h3qp",
+		"id": "item:feast-plate",
+		"title": "Feast Plate",
+		"description": "An empty serving plate from the cookhouse. Fill it with Era II farm food on the board to assemble a proper feast.",
+		"asset": {
+			"default": [
+				"item-feast-plate"
+			],
+			"sources": [
+				"item-feast-plate-stage-1",
+				"item-feast-plate-stage-2",
+				"item-feast"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 1
+		},
+		"type": "craft",
+		"line": {
+			"id": "line:feast-plate:assemble",
+			"title": "Assemble Feast",
+			"description": "Consumes Era II farm food to assemble a proper feast.",
+			"default": false,
+			"show": true,
+			"enable": true,
+			"runtimeMs": 9000,
+			"input": [
+				{
+					"charges": {
+						"cost": 1,
+						"from": "self"
+					},
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:grain"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:piglet"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:milk"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:egg"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				},
+				{
+					"type": "materials",
+					"selector": {
+						"type": "item",
+						"itemId": "item:vegetables"
+					},
+					"mode": "consume",
+					"quantity": {
+						"min": 1,
+						"max": 1
+					},
+					"capacity": 0
+				}
+			],
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "item:feast",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			"rules": []
+		}
+	}
+}

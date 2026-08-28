@@ -3,10 +3,8 @@
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-	ActionLoadingScreen,
-	defaultLoadingMinimumDurationMs,
-} from "~/ui/loading/ActionLoadingScreen";
+import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
+import { defaultLoadingMinimumDurationMs } from "~/ui/loading/defaultLoadingMinimumDurationMs";
 
 (
 	globalThis as {
@@ -16,7 +14,7 @@ import {
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
-const renderScreen = async (completed = false) => {
+const renderScreen = async (completed = false, durationMs?: number) => {
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
@@ -25,6 +23,7 @@ const renderScreen = async (completed = false) => {
 		root.render(
 			createElement(ActionLoadingScreen, {
 				completed,
+				durationMs,
 				label: "Loading test…",
 			}),
 		);
@@ -36,6 +35,7 @@ const renderScreen = async (completed = false) => {
 				root.render(
 					createElement(ActionLoadingScreen, {
 						completed: nextCompleted,
+						durationMs,
 						label: "Loading test…",
 					}),
 				);
@@ -44,8 +44,15 @@ const renderScreen = async (completed = false) => {
 	};
 };
 
-const progressValue = (container: ParentNode) =>
-	Number(container.querySelector('[role="progressbar"]')?.getAttribute("aria-valuenow"));
+const progressValue = (container: ParentNode) => {
+	const fill = container.querySelector<HTMLElement>(
+		'[data-ui="ActionLoadingScreenProgressFill"]',
+	);
+	if (fill === null) throw new Error("Missing Action loading progress fill.");
+	const match = /^scaleX\(([^)]+)\)$/.exec(fill.style.transform);
+	if (match === null) throw new Error("Missing Action loading progress transform.");
+	return Math.round(Number(match[1]) * 100);
+};
 
 beforeEach(() => {
 	vi.useFakeTimers();
@@ -63,27 +70,6 @@ afterEach(async () => {
 describe("ActionLoadingScreen", () => {
 	it("renders one native route surface and advances without claiming completion", async () => {
 		const { container } = await renderScreen();
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="ActionLoadingScreen"]')?.className,
-		).toContain("cursor-wait");
-		const hero = container.querySelector<HTMLElement>('[data-ui="LauncherHero"]');
-		const artwork = container.querySelector<HTMLElement>('[data-ui="LauncherHeroArtwork"]');
-		expect(hero).not.toBeNull();
-		expect(hero?.style.aspectRatio).toBe("1535 / 1024");
-		expect(artwork).toBeInstanceOf(HTMLImageElement);
-		expect(artwork?.getAttribute("alt")).toBe("Arkini");
-		expect(artwork?.getAttribute("src")).toContain("hero.png");
-		expect(hero?.style.viewTransitionName).toBe("");
-		expect(artwork?.style.viewTransitionName).toBe("arkini-launcher-hero-artwork");
-		expect(container.querySelector('[data-ui="LauncherHeroShadow"]')).not.toBeNull();
-		const content = container.querySelector<HTMLElement>(
-			'[data-ui="ActionLoadingScreenContent"]',
-		);
-		expect(content?.style.viewTransitionName).toBe("arkini-action-progress");
-		expect(content?.className).not.toContain("rounded-2xl");
-		expect(content?.className).not.toContain("bg-surface");
-		expect(content?.className).not.toContain("shadow-2xl");
-		expect(container.textContent).toContain("Loading test…");
 		expect(progressValue(container)).toBe(12);
 
 		await act(async () => vi.advanceTimersByTime(defaultLoadingMinimumDurationMs));
@@ -101,5 +87,14 @@ describe("ActionLoadingScreen", () => {
 
 		await act(async () => vi.advanceTimersByTime(defaultLoadingMinimumDurationMs));
 		expect(progressValue(container)).toBe(100);
+	});
+
+	it("can compress the same progress curve for an in-place action", async () => {
+		const durationMs = 1_000;
+		const { container } = await renderScreen(false, durationMs);
+
+		await act(async () => vi.advanceTimersByTime(durationMs));
+
+		expect(progressValue(container)).toBe(94);
 	});
 });

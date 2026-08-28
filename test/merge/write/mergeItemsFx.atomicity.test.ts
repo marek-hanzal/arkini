@@ -77,6 +77,7 @@ const blockedOutputState = (includeBlocker = true) =>
 					]
 				: []),
 		],
+		jobQueue: [],
 		jobs: [],
 	}) satisfies StateSchema.Type;
 
@@ -130,6 +131,7 @@ describe("mergeItemsFx atomicity", () => {
 					quantity: 1,
 				},
 			],
+			jobQueue: [],
 			jobs: [],
 		} satisfies StateSchema.Type;
 		const result = Effect.runSync(
@@ -177,6 +179,7 @@ describe("mergeItemsFx atomicity", () => {
 				boardItem("source", "source", 0),
 				boardItem("target", "target", 1),
 			],
+			jobQueue: [],
 			jobs: [],
 		} satisfies StateSchema.Type;
 		const result = Effect.runSync(
@@ -335,6 +338,7 @@ describe("mergeItemsFx atomicity", () => {
 				boardItem("source", "source", 0),
 				boardItem("target", "target", 1),
 			],
+			jobQueue: [],
 			jobs: [],
 		} satisfies StateSchema.Type;
 		const result = Effect.runSync(

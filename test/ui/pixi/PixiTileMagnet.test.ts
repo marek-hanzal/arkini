@@ -1,171 +1,19 @@
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type {
-	PixiAnimationDriver,
-	PixiAnimationSpring,
-} from "~/ui/pixi/animation/PixiAnimationDriver";
 import { createPixiTileMagneticFieldFx } from "~/ui/pixi/magnet/createPixiTileMagneticFieldFx";
-import { readPixiTileAttractionActorIdFx } from "~/ui/pixi/magnet/readPixiTileAttractionActorIdFx";
-import { readPixiTileMagneticDisplacementFx } from "~/ui/pixi/magnet/readPixiTileMagneticDisplacementFx";
+import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
+import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
+import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 
-const targetItem = {
-	id: "runtime:target",
-} as TileActorItem;
-
-const readDisplacement = (overrides: Partial<readPixiTileMagneticDisplacementFx.Props> = {}) =>
-	Effect.runSync(
-		readPixiTileMagneticDisplacementFx({
-			actorId: "runtime:target",
-			actorRect: {
-				height: 100,
-				width: 100,
-				x: 100,
-				y: 0,
-			},
-			attractedActorId: null,
-			eligibleAttractionActorIds: new Set(),
-			sourceActorId: "runtime:source",
-			sourceDirection: {
-				x: 1,
-				y: 0,
-			},
-			sourceRect: {
-				height: 100,
-				width: 100,
-				x: 0,
-				y: 0,
-			},
-			...overrides,
-		}),
-	);
+import {
+	createMagneticActor,
+	createSpringAnimationDriverProbe,
+} from "./PixiTileMagnet.test/fixture";
 
 describe("Pixi tile magnet", () => {
-	it("does not move actors outside the magnetic radius", () => {
-		expect(
-			readDisplacement({
-				actorRect: {
-					height: 100,
-					width: 100,
-					x: 151,
-					y: 0,
-				},
-			}),
-		).toEqual({
-			x: 0,
-			y: 0,
-		});
-	});
-
-	it("repels ordinary neighbours and caps displacement below fourteen percent", () => {
-		const displacement = readDisplacement();
-
-		expect(displacement.x).toBeGreaterThan(0);
-		expect(displacement.y).toBe(0);
-		expect(Math.hypot(displacement.x, displacement.y)).toBeLessThanOrEqual(14);
-	});
-
-	it("attracts only the engine-confirmed combine actor", () => {
-		const displacement = readDisplacement({
-			attractedActorId: "runtime:target",
-			eligibleAttractionActorIds: new Set([
-				"runtime:target",
-			]),
-		});
-
-		expect(displacement.x).toBeLessThan(0);
-		expect(displacement.y).toBe(-0);
-		expect(Math.hypot(displacement.x, displacement.y)).toBeLessThanOrEqual(4.5);
-	});
-
-	it("keeps eligible responders neutral before hover while invalid neighbours repel", () => {
-		expect(
-			readDisplacement({
-				eligibleAttractionActorIds: new Set([
-					"runtime:target",
-				]),
-			}),
-		).toEqual({
-			x: 0,
-			y: 0,
-		});
-		expect(
-			readDisplacement({
-				eligibleAttractionActorIds: new Set([
-					"runtime:other",
-				]),
-			}).x,
-		).toBeGreaterThan(0);
-	});
-
-	it("excludes the dragged source and resolves exact overlap deterministically", () => {
-		expect(
-			readDisplacement({
-				actorId: "runtime:source",
-			}),
-		).toEqual({
-			x: 0,
-			y: 0,
-		});
-		const first = readDisplacement({
-			actorRect: {
-				height: 100,
-				width: 100,
-				x: 0,
-				y: 0,
-			},
-			sourceDirection: null,
-		});
-		const second = readDisplacement({
-			actorRect: {
-				height: 100,
-				width: 100,
-				x: 0,
-				y: 0,
-			},
-			sourceDirection: null,
-		});
-
-		expect(first).toEqual(second);
-		expect(Math.hypot(first.x, first.y)).toBeCloseTo(14);
-	});
-
-	it.each([
-		"merge",
-		"stack",
-		"store-input",
-	] as const)("attracts the occupied target for %s", (previewKind) => {
-		expect(
-			Effect.runSync(
-				readPixiTileAttractionActorIdFx({
-					previewKind,
-					targetItem,
-				}),
-			),
-		).toBe(targetItem.id);
-	});
-
-	it.each([
-		"move",
-		"swap",
-		"store-inventory",
-		"ignored",
-		"reject",
-	] as const)("does not attract the occupied target for %s", (previewKind) => {
-		expect(
-			Effect.runSync(
-				readPixiTileAttractionActorIdFx({
-					previewKind,
-					targetItem,
-				}),
-			),
-		).toBeNull();
-	});
-
-	it("coalesces multiple source updates into one magnetic projection pass", () => {
+	it("coalesces pending projection and cancels it on close", () => {
 		const scheduled: Array<() => void> = [];
 		const field = Effect.runSync(
 			createPixiTileMagneticFieldFx({
@@ -176,20 +24,24 @@ describe("Pixi tile magnet", () => {
 					closeFx: Effect.void,
 					createSpringFx: () =>
 						Effect.die("An empty actor store must not acquire springs."),
-					startTweenFx: () =>
-						Effect.succeed({
-							stopFx: Effect.void,
-						}),
+					startTweenFx: () => Effect.die("Magnet does not own tweens."),
 				},
-				scheduleApply: (apply) => scheduled.push(apply),
+				scheduleApply: (apply) => {
+					scheduled.push(apply);
+					return () => {
+						const index = scheduled.indexOf(apply);
+						if (index >= 0) scheduled.splice(index, 1);
+					};
+				},
 			}),
 		);
 		const sample = {
 			attractedActorId: null,
+			candidateActorIds: [],
 			eligibleAttractionActorIds: new Set<string>(),
 			sourceActorId: "runtime:source",
+			sourceInstanceId: "pixi:source",
 			sourceDirection: null,
-			sourceItem: targetItem,
 			sourceX: 0,
 			sourceY: 0,
 		};
@@ -202,90 +54,67 @@ describe("Pixi tile magnet", () => {
 			}),
 		);
 		expect(scheduled).toHaveLength(1);
-		scheduled[0]?.();
-		expect(scheduled).toHaveLength(1);
-
-		Effect.runSync(
-			field.releaseFx({
-				sourceActorId: "runtime:missing",
-				sourceKind: "motion",
-			}),
-		);
-		Effect.runSync(field.releaseSourcesFx("motion"));
-		expect(scheduled).toHaveLength(1);
+		scheduled.shift()?.();
+		expect(scheduled).toHaveLength(0);
 
 		Effect.runSync(
 			field.releaseFx({
 				sourceActorId: sample.sourceActorId,
+				sourceInstanceId: sample.sourceInstanceId,
 				sourceKind: "drag",
 			}),
 		);
-		expect(scheduled).toHaveLength(2);
+		expect(scheduled).toHaveLength(1);
 		Effect.runSync(field.closeFx);
-		expect(() => scheduled[1]?.()).not.toThrow();
+		expect(scheduled).toHaveLength(0);
 	});
 
-	it("reuses, prunes and closes persistent actor spring pairs", () => {
-		const springs: Array<{
-			readonly close: ReturnType<typeof vi.fn>;
-			readonly setTarget: ReturnType<typeof vi.fn>;
-		}> = [];
-		const animationDriver = {
-			closeFx: Effect.void,
-			createSpringFx: () =>
-				Effect.sync(() => {
-					const close = vi.fn();
-					const setTarget = vi.fn();
-					springs.push({
-						close,
-						setTarget,
-					});
-					return {
-						closeFx: Effect.sync(close),
-						setTargetFx: (value) => Effect.sync(() => setTarget(value)),
-					} satisfies PixiAnimationSpring;
-				}),
-			startTweenFx: () =>
-				Effect.succeed({
-					stopFx: Effect.void,
-				}),
-		} satisfies PixiAnimationDriver;
-		const createActor = (id: string, x: number) =>
-			({
-				container: {
-					destroyed: false,
-					pivot: {
-						x: 0,
-						y: 0,
-					},
-					scale: {
-						x: 1,
-					},
-					x: x * 80,
-					y: 0,
-				},
-				offsetLayer: {
-					position: {
-						set: vi.fn(),
-					},
-					x: 0,
-					y: 0,
-				},
-				item: {
-					id,
-					location: {
-						position: {
-							x,
-							y: 0,
-						},
-						scope: "board",
-						space: 0,
-					},
-				},
-				size: 80,
-			}) as unknown as PixiTileActor;
-		const source = createActor("runtime:source", 0);
-		const target = createActor("runtime:target", 1);
+	it("keeps projector release terminal against late pose callbacks", () => {
+		const update = vi.fn();
+		const release = vi.fn();
+		const actor = createMagneticActor("runtime:source", 0);
+		const projector = Effect.runSync(
+			createPixiTileMotionMagneticProjectorFx({
+				actor,
+				attractedActorId: null,
+				eligibleAttractionActorIds: new Set(),
+				magneticField: {
+					releaseFx: (source: Parameters<PixiTileMagneticField["releaseFx"]>[0]) =>
+						Effect.sync(() => release(source)),
+					updateFx: (sample: Parameters<PixiTileMagneticField["updateFx"]>[0]) =>
+						Effect.sync(() => update(sample)),
+				} as unknown as PixiTileMagneticField,
+				surface: {
+					readLocalActorIdsFx: () => Effect.succeed([]),
+				} as unknown as PixiMainSceneSurface,
+			}),
+		);
+
+		projector.projectPose({
+			scale: 1,
+			x: 20,
+			y: 0,
+		});
+		projector.release();
+		projector.projectPose({
+			scale: 1,
+			x: 40,
+			y: 0,
+		});
+
+		expect(update).toHaveBeenCalledOnce();
+		expect(release).toHaveBeenCalledOnce();
+		expect(release).toHaveBeenCalledWith({
+			sourceActorId: actor.item.id,
+			sourceInstanceId: actor.instanceId,
+			sourceKind: "motion",
+		});
+	});
+
+	it("reuses springs and releases exact actor generations on prune and close", () => {
+		const { animationDriver, springs } = createSpringAnimationDriverProbe();
+		const source = createMagneticActor("runtime:source", 0);
+		const target = createMagneticActor("runtime:target", 1);
 		const actors = new Map([
 			[
 				source.item.id,
@@ -302,18 +131,24 @@ describe("Pixi tile magnet", () => {
 					actors,
 				} as unknown as PixiMainSceneActorStore,
 				animationDriver,
-				scheduleApply: (apply) => apply(),
+				scheduleApply: (apply) => {
+					apply();
+					return () => {};
+				},
 			}),
 		);
 		const sample = {
 			attractedActorId: null,
+			candidateActorIds: [
+				target.item.id,
+			],
 			eligibleAttractionActorIds: new Set<string>(),
 			sourceActorId: source.item.id,
+			sourceInstanceId: source.instanceId,
 			sourceDirection: {
 				x: 1,
 				y: 0,
 			},
-			sourceItem: source.item,
 			sourceX: 0,
 			sourceY: 0,
 		};
@@ -321,13 +156,8 @@ describe("Pixi tile magnet", () => {
 		Effect.runSync(field.updateFx(sample));
 		Effect.runSync(field.updateFx(sample));
 		expect(springs).toHaveLength(2);
-		expect(springs[0]?.setTarget).toHaveBeenCalledOnce();
-		expect(springs[1]?.setTarget).not.toHaveBeenCalled();
-		Effect.runSync(field.resetFx);
-		expect(springs[0]?.setTarget).toHaveBeenLastCalledWith(0);
-		expect(springs[1]?.setTarget).not.toHaveBeenCalled();
 
-		const replacement = createActor(target.item.id, 1);
+		const replacement = createMagneticActor(target.item.id, 1);
 		actors.set(target.item.id, replacement);
 		Effect.runSync(field.pruneFx);
 		expect(springs[0]?.close).toHaveBeenCalledOnce();
@@ -342,60 +172,10 @@ describe("Pixi tile magnet", () => {
 		expect(replacement.offsetLayer.position.set).toHaveBeenCalledWith(0);
 	});
 
-	it("composes an incoming payload with a receiver drag without flipping polarity", () => {
-		const targets: Array<ReturnType<typeof vi.fn>> = [];
-		const animationDriver = {
-			closeFx: Effect.void,
-			createSpringFx: () =>
-				Effect.sync(() => {
-					const setTarget = vi.fn();
-					targets.push(setTarget);
-					return {
-						closeFx: Effect.void,
-						setTargetFx: (value) => Effect.sync(() => setTarget(value)),
-					} satisfies PixiAnimationSpring;
-				}),
-			startTweenFx: () =>
-				Effect.succeed({
-					stopFx: Effect.void,
-				}),
-		} satisfies PixiAnimationDriver;
-		const createActor = (id: string, x: number) =>
-			({
-				container: {
-					destroyed: false,
-					pivot: {
-						x: 0,
-						y: 0,
-					},
-					scale: {
-						x: 1,
-					},
-					x,
-					y: 0,
-				},
-				offsetLayer: {
-					position: {
-						set: vi.fn(),
-					},
-					x: 0,
-					y: 0,
-				},
-				item: {
-					id,
-					location: {
-						position: {
-							x: x / 80,
-							y: 0,
-						},
-						scope: "board",
-						space: 0,
-					},
-				},
-				size: 80,
-			}) as unknown as PixiTileActor;
-		const receiver = createActor("runtime:receiver", 80);
-		const neighbour = createActor("runtime:neighbour", 160);
+	it("keeps drag and motion owners isolated until their exact release", () => {
+		const { animationDriver, springs } = createSpringAnimationDriverProbe();
+		const receiver = createMagneticActor("runtime:receiver", 1);
+		const neighbour = createMagneticActor("runtime:neighbour", 2);
 		const field = Effect.runSync(
 			createPixiTileMagneticFieldFx({
 				actorStore: {
@@ -411,20 +191,26 @@ describe("Pixi tile magnet", () => {
 					]),
 				} as unknown as PixiMainSceneActorStore,
 				animationDriver,
-				scheduleApply: (apply) => apply(),
+				scheduleApply: (apply) => {
+					apply();
+					return () => {};
+				},
 			}),
 		);
 
 		Effect.runSync(
 			field.updateFx({
 				attractedActorId: null,
+				candidateActorIds: [
+					neighbour.item.id,
+				],
 				eligibleAttractionActorIds: new Set(),
 				sourceActorId: receiver.item.id,
+				sourceInstanceId: receiver.instanceId,
 				sourceDirection: {
 					x: 1,
 					y: 0,
 				},
-				sourceItem: receiver.item,
 				sourceX: 80,
 				sourceY: 0,
 			}),
@@ -432,15 +218,19 @@ describe("Pixi tile magnet", () => {
 		Effect.runSync(
 			field.updateFx({
 				attractedActorId: receiver.item.id,
+				candidateActorIds: [
+					receiver.item.id,
+					neighbour.item.id,
+				],
 				eligibleAttractionActorIds: new Set([
 					receiver.item.id,
 				]),
 				sourceActorId: "motion:incoming",
+				sourceInstanceId: "pixi:incoming",
 				sourceDirection: {
 					x: 1,
 					y: 0,
 				},
-				sourceItem: receiver.item,
 				sourceKind: "motion",
 				sourceSize: 80,
 				sourceX: 0,
@@ -448,17 +238,23 @@ describe("Pixi tile magnet", () => {
 			}),
 		);
 
-		expect(targets[2]?.mock.lastCall?.[0]).toBeLessThan(0);
-		const receiverTargetCount = targets[2]?.mock.calls.length;
+		const dragTarget = springs[0]?.setTarget;
+		const motionTarget = springs[2]?.setTarget;
+		expect(dragTarget?.mock.lastCall?.[0]).toBeGreaterThan(0);
+		expect(motionTarget?.mock.lastCall?.[0]).toBeLessThan(0);
+		const motionTargetCalls = motionTarget?.mock.calls.length;
 		Effect.runSync(
 			field.releaseFx({
 				sourceActorId: receiver.item.id,
+				sourceInstanceId: receiver.instanceId,
 				sourceKind: "motion",
 			}),
 		);
-		expect(targets[2]).toHaveBeenCalledTimes(receiverTargetCount ?? 0);
+		expect(motionTarget).toHaveBeenCalledTimes(motionTargetCalls ?? 0);
+
 		Effect.runSync(field.releaseSourcesFx("motion"));
-		expect(targets[2]).toHaveBeenLastCalledWith(0);
-		expect(targets[0]?.mock.lastCall?.[0]).toBeGreaterThan(0);
+		expect(motionTarget).toHaveBeenLastCalledWith(0);
+		expect(dragTarget?.mock.lastCall?.[0]).toBeGreaterThan(0);
+		Effect.runSync(field.closeFx);
 	});
 });

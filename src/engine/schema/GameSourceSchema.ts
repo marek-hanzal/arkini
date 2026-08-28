@@ -2,18 +2,13 @@ import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import { CategorySchema } from "~/engine/category/schema/CategorySchema";
 import { MetaSchema } from "~/engine/meta/schema/MetaSchema";
 import { StartSchema } from "~/engine/start/schema/StartSchema";
 import { ResourceConfigSchema } from "~/engine/resource/schema/ResourceConfigSchema";
-import { VersionEnumSchema } from "./VersionEnumSchema";
 
 /**
- * One authoring fragment that contributes data to a complete game configuration.
- *
- * Game source data is intentionally split across files such as `game.json` and
- * `era-I/simple/*.json`. Each fragment is valid independently; the source
- * packer merges all fragments, while the validator owns completed-game checks.
+ * Internal assembly value shared by the canonical `game.json` root and
+ * `items/<type>/<uid>.json` project files.
  */
 export const GameSourceSchema = z
 	.object({
@@ -44,21 +39,6 @@ export const GameSourceSchema = z
 			"The optional initial board, inventory, and toolbar state contributed by this source fragment.",
 		),
 		/**
-		 * Optional canonical UI-facing categories contributed by this source fragment.
-		 */
-		categories: z
-			.record(IdSchema, CategorySchema)
-			.optional()
-			.describe(
-				"The optional canonical UI-facing categories contributed by this source fragment.",
-			),
-		/**
-		 * Optional version contributed by this source fragment.
-		 */
-		version: VersionEnumSchema.optional().describe(
-			"The optional version contributed by this source fragment.",
-		),
-		/**
 		 * Optional canonical items contributed by this source fragment.
 		 */
 		items: z
@@ -69,8 +49,9 @@ export const GameSourceSchema = z
 	.strict()
 	.meta({
 		id: "GameSourceSchema",
-		description:
-			"One authoring fragment that contributes data to a complete game configuration.",
+		$id: "urn:arkini:schema:game-source",
+		title: "Arkini game source",
+		description: "The internal assembly value for one canonical game project.",
 	});
 
 export type GameSourceSchema = typeof GameSourceSchema;

@@ -6,7 +6,7 @@ export interface PixiDeliveryMotionSnapshot {
 	readonly retainedActorIds: ReadonlySet<string>;
 }
 
-/** Main-scene owner for canonical delivery actors and generation-guarded settlement. */
+/** Main-scene owner for presentation-only canonical delivery actors and travel. */
 export interface PixiDeliveryMotionRuntime {
 	readonly closeFx: Effect.Effect<void>;
 	readonly readSnapshotFx: Effect.Effect<PixiDeliveryMotionSnapshot>;

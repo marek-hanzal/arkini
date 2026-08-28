@@ -1,12 +1,31 @@
+import { Cause, Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { ArkiniElectronApi } from "../../../electron/contract/ArkiniElectronApi";
-import type { DiagnosticRecord } from "../../../electron/contract/diagnostics/DiagnosticRecord";
+import {
+	type DiagnosticRecord,
+	DiagnosticRecordSchema,
+} from "../../../electron/contract/diagnostics/DiagnosticRecord";
+import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
 import type { GameSession, GameTransition } from "~/bridge/game/GameSession";
-import { installGameDiagnostics } from "~/bridge/game/installGameDiagnostics";
+import { installGameDiagnosticsFx } from "~/bridge/game/installGameDiagnosticsFx";
 import { GameSessionFatalError } from "~/bridge/game/GameSessionFatalError";
+import { RuntimeInvalidError } from "~/engine/runtime/error/RuntimeInvalidError";
 
 const originalWindow = globalThis.window;
+const runRendererEffect = <Value>(effect: Effect.Effect<Value>) => Effect.runSync(effect);
+
+const testArkpack = {
+	packageId: "package:test",
+	contentHash: "content:test",
+	title: "Test",
+	version: "1.0",
+	arkini: "1",
+	source: "bundled",
+	provenance: {
+		type: "official",
+	},
+} satisfies ArkpackDescriptor;
 
 afterEach(() => {
 	Object.defineProperty(globalThis, "window", {
@@ -23,12 +42,16 @@ const createTransition = (sequence: number): GameTransition =>
 		runtime: {
 			items: [],
 			jobs: [],
+			jobQueue: [],
 		},
 	}) as unknown as GameTransition;
 
 describe("Game diagnostics", () => {
 	it("keeps tick-only commits quiet while preserving semantic, delivery, and fatal context", () => {
-		const write = vi.fn<(record: DiagnosticRecord) => Promise<void>>(() => Promise.resolve());
+		const write = vi.fn<(record: DiagnosticRecord) => Promise<void>>((record) => {
+			DiagnosticRecordSchema.parse(record);
+			return Promise.resolve();
+		});
 		Object.defineProperty(globalThis, "window", {
 			configurable: true,
 			value: {
@@ -60,24 +83,18 @@ describe("Game diagnostics", () => {
 				};
 			},
 			getFatalError: () => fatal,
-		} as unknown as GameSession;
-		const diagnostics = installGameDiagnostics({
-			arkpack: {
-				packageId: "package:test",
-				contentHash: "content:test",
-				gameId: "game:test",
-				title: "Test",
-				configVersion: "1",
-				compressedSize: 0,
-				source: "built-in",
-				trust: {
-					type: "official",
-					keyId: "test",
-				},
-			},
-			restored: true,
-			session,
-		});
+		} satisfies Pick<
+			GameSession,
+			"getFatalError" | "subscribeFatalError" | "subscribeTransitions"
+		>;
+		const diagnostics = Effect.runSync(
+			installGameDiagnosticsFx({
+				arkpack: testArkpack,
+				restored: true,
+				runRendererEffect,
+				session,
+			}),
+		);
 
 		expect(write.mock.calls.map(([record]) => record.event)).toEqual([
 			"session-started",
@@ -105,15 +122,72 @@ describe("Game diagnostics", () => {
 		});
 
 		fatal = new GameSessionFatalError({
-			source: "presentation",
-			cause: new TypeError("destroyed transform"),
+			source: "tick",
+			cause: Cause.fail(
+				new RuntimeInvalidError({
+					result: {
+						issues: [
+							{
+								type: "job:owner-not-on-grid",
+								jobId: "job:stuck",
+								ownerItemId: "runtime:item:worker",
+								location: {
+									scope: "delivery",
+									phase: "outbound",
+									generation: 0,
+									remainingDurationMs: 500,
+									origin: {
+										scope: "board",
+										space: 0,
+										position: {
+											x: 2,
+											y: 3,
+										},
+									},
+									target: {
+										kind: "line-input",
+										ownerItemId: "runtime:item:upgrade",
+										lineId: "line:upgrade",
+										input: [
+											{
+												inputIndex: 0,
+												quantity: 1,
+											},
+										],
+									},
+								},
+							},
+						],
+					},
+				}),
+			),
 		});
 		fatalListener?.();
 		expect(write.mock.calls.at(-1)?.[0]).toMatchObject({
 			event: "session-failed",
 			level: "fatal",
 			data: {
-				source: "presentation",
+				error: {
+					cause: {
+						reasons: [
+							{
+								error: {
+									_tag: "RuntimeInvalidError",
+									result: {
+										issues: [
+											{
+												type: "job:owner-not-on-grid",
+												jobId: "job:stuck",
+												ownerItemId: "runtime:item:worker",
+											},
+										],
+									},
+								},
+							},
+						],
+					},
+				},
+				source: "tick",
 				sequence: 2,
 			},
 		});

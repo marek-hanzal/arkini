@@ -74,8 +74,8 @@ const inputBeforeStackConfig = GameConfigSchema.parse({
 								itemId: "producer",
 							},
 							quantity: {
-								type: "value",
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 							capacity: 2,
 						},

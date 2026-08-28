@@ -1,0 +1,18 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "olapvslbvoq7czinfdxicc12",
+		"id": "item:wheat-seed",
+		"title": "Wheat Seed",
+		"description": "Wheat seed prepared for a future crop-growing lifecycle.",
+		"asset": {
+			"default": [
+				"item-seed",
+				"item-grain"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 50,
+		"type": "simple"
+	}
+}

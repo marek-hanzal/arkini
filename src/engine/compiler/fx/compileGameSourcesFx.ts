@@ -20,9 +20,6 @@ const readSourcePath = (
 	if (root === "items" && typeof key === "string") {
 		return provenance.items[key];
 	}
-	if (root === "categories" && typeof key === "string") {
-		return provenance.categories[key];
-	}
 	if (root === "meta") {
 		return provenance.meta;
 	}
@@ -31,9 +28,6 @@ const readSourcePath = (
 	}
 	if (root === "start") {
 		return provenance.start;
-	}
-	if (root === "version") {
-		return provenance.version;
 	}
 	if (root === "$schema") {
 		return provenance.schema?.path;

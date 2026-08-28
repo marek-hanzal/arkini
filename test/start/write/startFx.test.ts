@@ -2,11 +2,9 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
-import { getItemAtFx } from "~/engine/runtime/read/getItemAtFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 import { startTestConfig } from "~test/start/fx/support/startTestConfig";
 import { startFx } from "~/engine/start/write/startFx";
 
@@ -79,10 +77,18 @@ describe("startFx", () => {
 				inventory: [
 					{
 						itemId: "log",
+						position: {
+							x: 0,
+							y: 0,
+						},
 						quantity: 2,
 					},
 					{
 						itemId: "log",
+						position: {
+							x: 1,
+							y: 0,
+						},
 						quantity: 3,
 					},
 				],
@@ -98,8 +104,8 @@ describe("startFx", () => {
 
 		expect(runtime.items).toHaveLength(2);
 		expect(runtime.items.map((item) => item.quantity)).toEqual([
-			3,
 			2,
+			3,
 		]);
 		expect(runtime.items.reduce((sum, item) => sum + item.quantity, 0)).toBe(5);
 	});
@@ -193,7 +199,7 @@ describe("startFx", () => {
 		expect(result.runtime.items).toEqual([]);
 	});
 
-	it("rolls back the complete start when initial inventory cannot fit", () => {
+	it("rolls back the complete start when an exact inventory position is out of bounds", () => {
 		const config = GameConfigSchema.parse({
 			...startTestConfig,
 			meta: {
@@ -223,108 +229,10 @@ describe("startFx", () => {
 		expect(Result.isFailure(result.started)).toBe(true);
 		if (Result.isFailure(result.started)) {
 			expect(result.started.failure).toMatchObject({
-				_tag: "StartInventoryUnavailableError",
-				itemId: "log",
-				remainingQuantity: 1,
+				_tag: "RuntimeInvalidError",
 			});
 		}
 		expect(result.runtime.items).toEqual([]);
-	});
-
-	it("boots the current Arkini authoring config into a valid runtime", async () => {
-		const config = GameConfigSchema.parse(await readArkiniGameConfigSource());
-		expect(config.meta.board).toEqual({
-			width: 15,
-			height: 9,
-		});
-		expect(config.meta.inventory).toEqual({
-			width: 15,
-			height: 9,
-		});
-		expect(config.meta.toolbarSize).toBe(15);
-
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const runtime = yield* startFx();
-				const edgeItem = yield* spawnItemFx({
-					id: "runtime:official-edge",
-					itemId: "item:tree",
-					location: {
-						space: 0,
-						position: {
-							x: 14,
-							y: 8,
-						},
-						scope: "board",
-					},
-					quantity: 1,
-				});
-				const queriedEdgeItem = yield* getItemAtFx({
-					location: edgeItem.location,
-				});
-
-				return {
-					edgeItem,
-					queriedEdgeItem,
-					runtime,
-				};
-			}).pipe(
-				useGameFx({
-					config,
-				}),
-			),
-		);
-
-		expect(result.runtime.items).toHaveLength(9);
-		expect(result.queriedEdgeItem).toBe(result.edgeItem);
-		expect(result.edgeItem.location).toEqual({
-			space: 0,
-			position: {
-				x: 14,
-				y: 8,
-			},
-			scope: "board",
-		});
-		expect(result.runtime.items).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					item: config.items["producer:townhall-t1"],
-					location: {
-						space: 0,
-						position: {
-							x: 4,
-							y: 3,
-						},
-						scope: "board",
-					},
-				}),
-				expect.objectContaining({
-					item: config.items["item:magnifying-glass"],
-					location: {
-						position: {
-							x: 0,
-							y: 0,
-						},
-						scope: "inventory",
-					},
-					quantity: 1,
-				}),
-				expect.objectContaining({
-					item: config.items["item:inventory"],
-					location: {
-						position: {
-							x: 12,
-							y: 0,
-						},
-						scope: "toolbar",
-					},
-					quantity: 1,
-				}),
-			]),
-		);
-		expect(
-			result.runtime.items.filter((item) => item.item.id === "item:inventory"),
-		).toHaveLength(1);
 	});
 
 	it("serializes concurrent start attempts against one empty runtime", async () => {

@@ -5,8 +5,8 @@ import { WhenSchema } from "~/engine/when/schema/WhenSchema";
 const inventoryQuery = {
 	scope: "inventory",
 	selector: {
-		type: "tag",
-		tag: "food",
+		type: "item",
+		itemId: "item:food",
 	},
 } as const;
 

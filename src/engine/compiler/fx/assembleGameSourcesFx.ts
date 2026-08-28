@@ -1,5 +1,3 @@
-import path from "node:path";
-
 import { Effect } from "effect";
 import { match, P } from "ts-pattern";
 
@@ -13,6 +11,36 @@ import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/Diagnos
 import { DiagnosticRecordEntityEnumSchema } from "~/engine/validation/schema/DiagnosticRecordEntityEnumSchema";
 import { DiagnosticProviderEnumSchema } from "~/engine/validation/schema/DiagnosticProviderEnumSchema";
 
+const resolveSourceReference = (sourcePath: string, reference: string) => {
+	const portableSource = sourcePath.replaceAll("\\", "/");
+	const portableReference = reference.replaceAll("\\", "/");
+	const absoluteReference =
+		portableReference.startsWith("/") || /^[A-Za-z]:\//.test(portableReference);
+	const sourceDirectory = portableSource.includes("/")
+		? portableSource.slice(0, portableSource.lastIndexOf("/"))
+		: ".";
+	const unresolved = absoluteReference
+		? portableReference
+		: `${sourceDirectory}/${portableReference}`;
+	const drive = unresolved.match(/^[A-Za-z]:/)?.[0];
+	const absolute = drive !== undefined || unresolved.startsWith("/");
+	const segments: string[] = [];
+	for (const segment of unresolved.replace(/^[A-Za-z]:/, "").split("/")) {
+		if (segment === "" || segment === ".") continue;
+		if (segment === "..") {
+			if (segments.at(-1) !== undefined && segments.at(-1) !== "..") {
+				segments.pop();
+			} else if (!absolute) {
+				segments.push(segment);
+			}
+			continue;
+		}
+		segments.push(segment);
+	}
+	const prefix = drive === undefined ? (absolute ? "/" : "") : `${drive}/`;
+	return `${prefix}${segments.join("/")}` || (absolute ? prefix : ".");
+};
+
 /**
  * Assembles parsed source fragments without allowing later files to overwrite
  * earlier providers silently. The first provider remains the deterministic
@@ -23,7 +51,6 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 ) {
 	const value: GameSourceSchema.Type = {};
 	const provenance: GameSourceProvenanceSchema.Type = {
-		categories: {},
 		items: {},
 	};
 	const diagnostics: GameDiagnosticsSchema.Type = [];
@@ -31,7 +58,7 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 	for (const source of sources) {
 		const schemaReference = source.value.$schema;
 		if (schemaReference !== undefined) {
-			const resolved = path.resolve(path.dirname(source.path), schemaReference);
+			const resolved = resolveSourceReference(source.path, schemaReference);
 			const current = provenance.schema;
 			match({
 				current,
@@ -136,39 +163,7 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 				.with(DiagnosticProviderEnumSchema.enum.Start, () => {
 					value.start = source.value.start;
 				})
-				.with(DiagnosticProviderEnumSchema.enum.Version, () => {
-					value.version = source.value.version;
-				})
 				.exhaustive();
-		}
-
-		const categories =
-			source.value.categories === undefined ? undefined : (value.categories ??= {});
-
-		for (const [key, category] of Object.entries(source.value.categories ?? {})) {
-			const previousPath = provenance.categories[key];
-			if (previousPath !== undefined) {
-				diagnostics.push({
-					code: DiagnosticCodeEnumSchema.enum.SourceDuplicateRecord,
-					severity: DiagnosticSeverityEnumSchema.enum.Error,
-					path: [
-						"categories",
-						key,
-					],
-					source: source.path,
-					message: `Category ${key} is provided by more than one source fragment.`,
-					entity: DiagnosticRecordEntityEnumSchema.enum.Category,
-					key,
-					sources: [
-						previousPath,
-						source.path,
-					],
-				});
-				continue;
-			}
-
-			provenance.categories[key] = source.path;
-			categories![key] = category;
 		}
 
 		const items = source.value.items === undefined ? undefined : (value.items ??= {});

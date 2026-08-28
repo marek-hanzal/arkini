@@ -67,6 +67,7 @@ describe("readTileDeliveriesFx", () => {
 			{
 				from: sourceLocation(2),
 				generation: 0,
+				remainingDurationMs: 300,
 				item: {
 					id: "runtime:water",
 					location: sourceLocation(2),
@@ -84,6 +85,7 @@ describe("readTileDeliveriesFx", () => {
 			{
 				from: workshopLocation,
 				generation: 1,
+				remainingDurationMs: 300,
 				item: {
 					id: "runtime:water",
 					quantity: 4,
@@ -146,6 +148,7 @@ describe("readTileDeliveriesFx", () => {
 		expect(result).toMatchObject([
 			{
 				from: openerLocation,
+				remainingDurationMs: 500,
 				item: {
 					id: "runtime:inventory-water",
 					location: openerLocation,

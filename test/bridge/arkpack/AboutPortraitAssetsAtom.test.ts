@@ -7,7 +7,7 @@ import { StrictMode, act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AboutPortraitAssetsAtom } from "~/bridge/arkpack/AboutPortraitAssetsAtom";
-import { ArkiniArkpack } from "~/bridge/arkpack/ArkiniArkpack";
+import { ArkiniDefaultPackageId } from "../../../shared/ArkiniAppMetadata";
 import { useAboutPortraitAssets } from "~/bridge/arkpack/useAboutPortraitAssets";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
@@ -24,7 +24,6 @@ const harness = vi.hoisted(() => ({
 
 const payload = {
 	config: GameConfigSchema.parse({
-		version: "1.0",
 		resources: {
 			hero: "hero",
 			"avatar-01": "avatar:one",
@@ -45,7 +44,6 @@ const payload = {
 		start: {
 			currentSpace: 0,
 		},
-		categories: {},
 		items: {},
 	}),
 	resources: [
@@ -142,7 +140,7 @@ describe("AboutPortraitAssetsAtom", () => {
 		);
 
 		expect(harness.loadedPackageIds).toEqual([
-			ArkiniArkpack.packageId,
+			ArkiniDefaultPackageId,
 		]);
 		expect(createObjectUrl).toHaveBeenCalledTimes(2);
 		expect(createObjectUrl.mock.calls[0]?.[0]).toBeInstanceOf(Blob);
@@ -193,7 +191,7 @@ describe("AboutPortraitAssetsAtom", () => {
 
 		expect(container.textContent).toBe("[]");
 		expect(harness.loadedPackageIds).toEqual([
-			ArkiniArkpack.packageId,
+			ArkiniDefaultPackageId,
 		]);
 		expect(createObjectUrl).not.toHaveBeenCalled();
 		expect(revokeObjectUrl).not.toHaveBeenCalled();
@@ -287,7 +285,7 @@ describe("AboutPortraitAssetsAtom", () => {
 		await act(async () => root.render(null));
 		await vi.waitFor(() => expect(revokeObjectUrl).toHaveBeenCalledTimes(2));
 		expect(harness.loadedPackageIds).toEqual([
-			ArkiniArkpack.packageId,
+			ArkiniDefaultPackageId,
 		]);
 	});
 
@@ -325,7 +323,7 @@ describe("AboutPortraitAssetsAtom", () => {
 		await vi.waitFor(() => expect(createObjectUrl).toHaveBeenCalledTimes(2));
 
 		expect(harness.loadedPackageIds).toEqual([
-			ArkiniArkpack.packageId,
+			ArkiniDefaultPackageId,
 		]);
 		expect(revokeObjectUrl).not.toHaveBeenCalled();
 

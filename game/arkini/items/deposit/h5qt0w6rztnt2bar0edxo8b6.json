@@ -1,0 +1,44 @@
+{
+	"$schema": "../../schema.json",
+	"item": {
+		"uid": "h5qt0w6rztnt2bar0edxo8b6",
+		"id": "item:double-tree",
+		"title": "Double Tree",
+		"description": "Tier-2 watered wood source: two conifers packed together for stronger nearby lumberjack log rolls. Harvesting it with a single-use axe removes the source and drops logs.",
+		"asset": {
+			"default": [
+				"item-double-tree"
+			]
+		},
+		"scope": "any",
+		"maxStackSize": 1,
+		"charges": {
+			"amount": 36,
+			"output": {
+				"set": [
+					{
+						"weight": 1,
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "item:seed",
+										"quantity": {
+											"min": 1,
+											"max": 1
+										},
+										"placement": "drop",
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		"maxQueueSize": 1,
+		"type": "deposit"
+	}
+}

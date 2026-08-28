@@ -6,7 +6,7 @@ import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ArkiniArkpack } from "~/bridge/arkpack/ArkiniArkpack";
+import { ArkiniDefaultPackageId } from "../../../shared/ArkiniAppMetadata";
 import { ArkpackCatalogAtom } from "~/bridge/arkpack/ArkpackCatalogAtom";
 import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
 import { createArkpackCatalogFx } from "~/bridge/arkpack/createArkpackCatalogFx";
@@ -37,16 +37,13 @@ vi.mock("~/ui/launcher/LauncherHeroAtom", () => ({
 }));
 
 const registries: AtomRegistry.AtomRegistry[] = [];
-
 afterEach(() => {
 	for (const registry of registries.splice(0)) registry.dispose();
 });
 
 describe("Launcher catalog integration", () => {
-	it("drives launcher bootstrap and the Arkpacks projection from one configured owner", async () => {
-		const list = vi.fn(() => [
-			ArkiniArkpack.descriptor,
-		]);
+	it("reaches the launcher with an empty catalog so the user can repair it", async () => {
+		const list = vi.fn(() => []);
 		const catalog = Effect.runSync(
 			createArkpackCatalogFx({
 				listFx: Effect.sync(list),
@@ -82,13 +79,11 @@ describe("Launcher catalog integration", () => {
 
 		const startup = registry.get(LauncherStartupAtom);
 		if (!AsyncResult.isSuccess(startup)) throw new Error("Expected successful startup.");
-		expect(startup.value.builtInPackageId).toBe(ArkiniArkpack.packageId);
+		expect(startup.value.defaultPackageId).toBe(ArkiniDefaultPackageId);
 		expect(registry.get(ArkpackCatalogOwnerAtom)).toBe(catalog);
 		expect(registry.get(ArkpackCatalogAtom)).toEqual({
 			type: "ready",
-			arkpacks: [
-				ArkiniArkpack.descriptor,
-			],
+			arkpacks: [],
 		});
 		expect(list).toHaveBeenCalledOnce();
 	});

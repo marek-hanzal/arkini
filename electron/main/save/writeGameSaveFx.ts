@@ -1,48 +1,31 @@
-import { FileSystem } from "effect";
 import { Effect } from "effect";
 import { join } from "node:path";
 import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ElectronMainError } from "../ElectronMainError";
-import { assertGameSaveKeyFx } from "./assertGameSaveKeyFx";
+import { readGameSaveDirectoryNameFx } from "./readGameSaveDirectoryNameFx";
+import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
 
 export namespace writeGameSaveFx {
 	export interface Props {
 		readonly root: string;
-		readonly fileSystem: FileSystem.FileSystem;
+		readonly filesystemWrite: FilesystemWrite;
 		readonly key: ArkiniElectronApi.SaveKey;
 		readonly bytes: Uint8Array;
 	}
 }
 
-/** Fsyncs one pending save then atomically replaces the exact committed save. */
+/** Writes one exact committed save through the shared crash-safe file primitive. */
 export const writeGameSaveFx = Effect.fn("writeGameSaveFx")(
-	({ root, fileSystem, key, bytes }: writeGameSaveFx.Props) =>
+	({ root, filesystemWrite, key, bytes }: writeGameSaveFx.Props) =>
 		Effect.gen(function* () {
-			const valid = yield* assertGameSaveKeyFx(key);
-			const directory = join(root, valid.packageId, valid.contentHash);
-			const pending = join(directory, "pending.arksave");
+			const directoryName = yield* readGameSaveDirectoryNameFx(key);
+			const directory = join(root, directoryName);
 			const current = join(directory, "current.arksave");
-			yield* fileSystem.makeDirectory(directory, {
-				recursive: true,
+			yield* filesystemWrite.writeFileFx({
+				lock: join(root, `.${directoryName}.lock`),
+				target: current,
+				bytes,
 			});
-			yield* Effect.scoped(
-				Effect.gen(function* () {
-					const file = yield* fileSystem.open(pending, {
-						flag: "w",
-					});
-					yield* file.writeAll(bytes);
-					yield* file.sync;
-				}),
-			);
-			yield* fileSystem.rename(pending, current).pipe(
-				Effect.ensuring(
-					fileSystem
-						.remove(pending, {
-							force: true,
-						})
-						.pipe(Effect.ignore),
-				),
-			);
 		}).pipe(
 			Effect.mapError((cause) =>
 				cause instanceof ElectronMainError

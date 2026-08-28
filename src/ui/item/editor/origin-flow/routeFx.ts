@@ -1,10 +1,6 @@
 import { Effect } from "effect";
 
-import type {
-	LayoutInput,
-	LayoutNode,
-	LayoutPoint,
-} from "~/ui/item/editor/origin-flow/Layout";
+import type { LayoutInput, LayoutNode, LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
 
 const RouteEscape = 56;
 const RouteDetourGap = 84;
@@ -37,10 +33,7 @@ const readPortPoint = (
 	};
 };
 
-const appendRoutePoint = (
-	points: LayoutPoint[],
-	point: LayoutPoint,
-) => {
+const appendRoutePoint = (points: LayoutPoint[], point: LayoutPoint) => {
 	const previous = points.at(-1);
 	if (
 		previous === undefined ||
@@ -58,10 +51,7 @@ const snapSourceTrack = (x: number) =>
 const snapTargetTrack = (x: number) =>
 	Math.floor((x - RouteEscape) / RouteBundleGrid) * RouteBundleGrid;
 
-const readForwardTracks = (
-	source: LayoutPoint,
-	target: LayoutPoint,
-) => {
+const readForwardTracks = (source: LayoutPoint, target: LayoutPoint) => {
 	const minimumX = source.x + RouteEscape;
 	const maximumX = target.x - RouteEscape;
 	let sourceTrackX = snapSourceTrack(source.x);
@@ -123,9 +113,7 @@ const readOrthogonalRoutePlan = (
 	};
 };
 
-const readOrthogonalRoute = (
-	plan: OrthogonalRoutePlan,
-): ReadonlyArray<LayoutPoint> => {
+const readOrthogonalRoute = (plan: OrthogonalRoutePlan): ReadonlyArray<LayoutPoint> => {
 	const points: LayoutPoint[] = [
 		plan.source,
 	];
@@ -151,10 +139,7 @@ const readOrthogonalRoute = (
 
 /** Routes every edge onto the shared coarse orthogonal track lattice. */
 export const routeFx = Effect.fn("routeFx")(
-	(
-		flow: LayoutInput,
-		positions: ReadonlyMap<string, LayoutNode>,
-	) =>
+	(flow: LayoutInput, positions: ReadonlyMap<string, LayoutNode>) =>
 		Effect.sync((): ReadonlyMap<string, ReadonlyArray<LayoutPoint>> => {
 			const nodeById = new Map(
 				flow.nodes.map(

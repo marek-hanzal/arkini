@@ -1,10 +1,7 @@
 import { Effect } from "effect";
 
 import type { EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
-import type {
-	Highlight,
-	Selection,
-} from "~/ui/item/editor/origin-flow/Highlight";
+import type { Highlight, Selection } from "~/ui/item/editor/origin-flow/Highlight";
 
 const HighlightRouteColors = Array.from(
 	{

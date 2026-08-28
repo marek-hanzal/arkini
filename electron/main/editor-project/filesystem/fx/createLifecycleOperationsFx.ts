@@ -141,9 +141,7 @@ export namespace createLifecycleOperationsFx {
 }
 
 /** Owns project discovery, managed creation, direct-folder open, hard refresh, and deletion. */
-export const createLifecycleOperationsFx = Effect.fn(
-	"createLifecycleOperationsFx",
-)(function* ({
+export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsFx")(function* ({
 	catalog,
 	filesystemWrite,
 	operations,
@@ -380,9 +378,7 @@ export const createLifecycleOperationsFx = Effect.fn(
 			),
 		);
 
-	const openProjectFx: LifecycleOperations["openProjectFx"] = ({
-		root: candidateRoot,
-	}) =>
+	const openProjectFx: LifecycleOperations["openProjectFx"] = ({ root: candidateRoot }) =>
 		operations.withPermits(1)(
 			Effect.gen(function* () {
 				const root = yield* fileSystem.realPath(path.resolve(candidateRoot));

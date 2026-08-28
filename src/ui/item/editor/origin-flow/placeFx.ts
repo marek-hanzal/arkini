@@ -4,10 +4,7 @@ import { Effect } from "effect";
 
 import type { LayoutInput } from "~/ui/item/editor/origin-flow/Layout";
 import type { Communities } from "~/ui/item/editor/origin-flow/readCommunitiesFx";
-import type {
-	LayoutProfile,
-	Pair,
-} from "~/ui/item/editor/origin-flow/Topology";
+import type { LayoutProfile, Pair } from "~/ui/item/editor/origin-flow/Topology";
 
 cytoscape.use(fcose);
 

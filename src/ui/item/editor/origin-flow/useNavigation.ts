@@ -4,10 +4,7 @@ import type { EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOrigin
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { LayoutNode } from "~/ui/item/editor/origin-flow/Layout";
 import type { Viewport } from "~/ui/item/editor/origin-flow/createViewportFx";
-import type {
-	OriginFlowDirection,
-	Selection,
-} from "~/ui/item/editor/origin-flow/Highlight";
+import type { OriginFlowDirection, Selection } from "~/ui/item/editor/origin-flow/Highlight";
 import { popVisitFx } from "~/ui/item/editor/origin-flow/popVisitFx";
 import {
 	type HighlightDepth,
@@ -105,9 +102,7 @@ export const useNavigation = ({
 		value:
 			| HighlightDepth
 			| undefined
-			| ((
-					current: HighlightDepth | undefined,
-			  ) => HighlightDepth | undefined),
+			| ((current: HighlightDepth | undefined) => HighlightDepth | undefined),
 	) => void;
 	readonly viewportRef: RefObject<Viewport>;
 	readonly viewport: {
@@ -236,9 +231,7 @@ export const useNavigation = ({
 				return;
 			}
 			if (shortcut === "back") {
-				const back = RendererRuntime.runSync(
-					popVisitFx(visitHistoryRef.current),
-				);
+				const back = RendererRuntime.runSync(popVisitFx(visitHistoryRef.current));
 				if (back.nodeId === undefined || !focusNode(back.nodeId)) return;
 				visitHistoryRef.current = back.history;
 				onSelectionChange({

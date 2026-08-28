@@ -96,6 +96,4 @@ export const createProjectTestHarness = async (temporaryPrefix: string) => {
 	};
 };
 
-export type ProjectTestHarness = Awaited<
-	ReturnType<typeof createProjectTestHarness>
->;
+export type ProjectTestHarness = Awaited<ReturnType<typeof createProjectTestHarness>>;

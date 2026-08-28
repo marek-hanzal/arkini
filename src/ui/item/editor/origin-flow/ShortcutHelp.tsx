@@ -57,10 +57,7 @@ const readShortcutRows = (direction: OriginFlowDirection) =>
 	] as const;
 
 /** Explains the keyboard navigation available on the Game Flow canvas. */
-export const ShortcutHelp = ({
-	direction,
-	onClose,
-}: ShortcutHelpProps) => {
+export const ShortcutHelp = ({ direction, onClose }: ShortcutHelpProps) => {
 	const { dialogRef, keepFocusInside } = useDialogFocus({
 		onClose,
 	});

@@ -97,9 +97,7 @@ const drawItemArtwork = (
 };
 
 /** Creates item-artwork composition backed by the bounded Canvas image cache. */
-export const createCanvasArtworkPainterFx = Effect.fn(
-	"createCanvasArtworkPainterFx",
-)(() =>
+export const createCanvasArtworkPainterFx = Effect.fn("createCanvasArtworkPainterFx")(() =>
 	Effect.succeed({
 		drawItemArtwork,
 	} as const),

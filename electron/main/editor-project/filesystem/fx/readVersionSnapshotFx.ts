@@ -10,10 +10,7 @@ import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
-import {
-	createVersionFingerprint,
-	hashVersionBytes,
-} from "./VersionFingerprint";
+import { createVersionFingerprint, hashVersionBytes } from "./VersionFingerprint";
 
 const decoder = new TextDecoder("utf-8", {
 	fatal: true,
@@ -36,9 +33,7 @@ export namespace readVersionSnapshotFx {
 }
 
 /** Verifies and materializes every object referenced by one full version manifest. */
-export const readVersionSnapshotFx = Effect.fn(
-	"readVersionSnapshotFx",
-)(function* ({
+export const readVersionSnapshotFx = Effect.fn("readVersionSnapshotFx")(function* ({
 	manifest: candidateManifest,
 	objectCache,
 	paths,
@@ -76,9 +71,7 @@ export const readVersionSnapshotFx = Effect.fn(
 		objectCache?.set(cacheKey, bytes);
 		return bytes;
 	});
-	const readJsonObjectFx = Effect.fn("readVersionJsonObjectFx")(function* (
-		hash: string,
-	) {
+	const readJsonObjectFx = Effect.fn("readVersionJsonObjectFx")(function* (hash: string) {
 		const bytes = yield* readObjectFx(hash, "json");
 		return yield* Effect.try({
 			try: () => JSON.parse(decoder.decode(bytes)) as unknown,

@@ -5,10 +5,7 @@ import type { DirectedPair } from "~/ui/item/editor/origin-flow/Topology";
 
 /** Collapses feedback cycles and assigns a stable forward rank to each flow node. */
 export const readRanksFx = Effect.fn("readRanksFx")(
-	(
-		flow: LayoutInput,
-		directedPairs: ReadonlyArray<DirectedPair>,
-	) =>
+	(flow: LayoutInput, directedPairs: ReadonlyArray<DirectedPair>) =>
 		Effect.sync(() => {
 			const nodeIds = flow.nodes
 				.map(({ id }) => id)

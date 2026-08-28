@@ -4,21 +4,14 @@ import type { LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
 import type { Viewport } from "~/ui/item/editor/origin-flow/createViewportFx";
 import type { CanvasPalette } from "~/ui/item/editor/origin-flow/CanvasPalette";
 
-const traceFlowRoute = (
-	context: CanvasRenderingContext2D,
-	points: ReadonlyArray<LayoutPoint>,
-) => {
+const traceFlowRoute = (context: CanvasRenderingContext2D, points: ReadonlyArray<LayoutPoint>) => {
 	const first = points[0];
 	if (first === undefined) return;
 	context.moveTo(first.x, first.y);
 	for (const point of points.slice(1)) context.lineTo(point.x, point.y);
 };
 
-const drawArrow = (
-	context: CanvasRenderingContext2D,
-	from: LayoutPoint,
-	to: LayoutPoint,
-) => {
+const drawArrow = (context: CanvasRenderingContext2D, from: LayoutPoint, to: LayoutPoint) => {
 	const angle = Math.atan2(to.y - from.y, to.x - from.x);
 	const length = 8;
 	context.beginPath();
@@ -90,9 +83,7 @@ const drawGrid = (
 };
 
 /** Creates the Canvas painter for origin-flow routes and the viewport grid. */
-export const createCanvasRoutePainterFx = Effect.fn(
-	"createCanvasRoutePainterFx",
-)(() =>
+export const createCanvasRoutePainterFx = Effect.fn("createCanvasRoutePainterFx")(() =>
 	Effect.succeed({
 		drawEdge,
 		drawGrid,

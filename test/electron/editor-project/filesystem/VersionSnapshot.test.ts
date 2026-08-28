@@ -14,9 +14,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
-const writeSnapshotFx = (
-	props: Omit<createVersionSnapshotFx.Props, "filesystemWrite">,
-) =>
+const writeSnapshotFx = (props: Omit<createVersionSnapshotFx.Props, "filesystemWrite">) =>
 	Effect.gen(function* () {
 		const filesystemWrite = yield* createFilesystemWriteFx();
 		return yield* createVersionSnapshotFx({

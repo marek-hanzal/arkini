@@ -1,9 +1,6 @@
 import { Effect } from "effect";
 
-import type {
-	LayoutProfile,
-	Pair,
-} from "~/ui/item/editor/origin-flow/Topology";
+import type { LayoutProfile, Pair } from "~/ui/item/editor/origin-flow/Topology";
 import type { LayoutInput } from "~/ui/item/editor/origin-flow/Layout";
 
 /** Derives node spacing pressure from topology degree and connected operation ports. */

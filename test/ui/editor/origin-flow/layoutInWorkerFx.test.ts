@@ -7,10 +7,7 @@ import {
 	type EditorItemOriginFlow,
 } from "~/bridge/item/editor/EditorItemOriginFlow";
 import { layoutInWorkerFx } from "~/ui/item/editor/origin-flow/layoutInWorkerFx";
-import type {
-	Layout,
-	LayoutInput,
-} from "~/ui/item/editor/origin-flow/Layout";
+import type { Layout, LayoutInput } from "~/ui/item/editor/origin-flow/Layout";
 
 const flow: EditorItemOriginFlow = {
 	edges: [],

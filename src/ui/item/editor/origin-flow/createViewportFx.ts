@@ -1,10 +1,7 @@
 import { Effect } from "effect";
 
 import type { EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
-import type {
-	LayoutNode,
-	LayoutPoint,
-} from "~/ui/item/editor/origin-flow/Layout";
+import type { LayoutNode, LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
 
 export interface Viewport {
 	x: number;
@@ -81,12 +78,7 @@ const readFit = (
 	};
 };
 
-const readNode = (
-	position: LayoutNode,
-	width: number,
-	height: number,
-	zoom: number,
-): Viewport => ({
+const readNode = (position: LayoutNode, width: number, height: number, zoom: number): Viewport => ({
 	x: width / 2 - (position.x + position.width / 2) * zoom,
 	y: height / 2 - (position.y + position.height / 2) * zoom,
 	zoom,
@@ -141,9 +133,7 @@ const readVisibleBounds = (
 	};
 };
 
-const readBackboneBounds = (
-	backbones: ReadonlyMap<string, ReadonlyArray<LayoutPoint>>,
-) =>
+const readBackboneBounds = (backbones: ReadonlyMap<string, ReadonlyArray<LayoutPoint>>) =>
 	new Map(
 		[
 			...backbones,
@@ -173,10 +163,7 @@ export const createViewportFx = Effect.fn("createViewportFx")(() =>
 			bounds.maxY >= visible.minY &&
 			bounds.minX <= visible.maxX &&
 			bounds.minY <= visible.maxY,
-		isNodeVisible: (
-			position: LayoutNode,
-			visible: Bounds,
-		) =>
+		isNodeVisible: (position: LayoutNode, visible: Bounds) =>
 			position.x + position.width >= visible.minX &&
 			position.y + position.height >= visible.minY &&
 			position.x <= visible.maxX &&

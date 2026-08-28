@@ -77,9 +77,7 @@ const relaxOverlaps = (nodes: MutableNodePosition[]) => {
 };
 
 /** Removes placement overlap and normalizes final flow positions into positive canvas space. */
-export const normalizePositionsFx = Effect.fn(
-	"normalizePositionsFx",
-)(
+export const normalizePositionsFx = Effect.fn("normalizePositionsFx")(
 	(
 		placed: ReadonlyArray<PlacedNode>,
 		profiles: ReadonlyMap<string, LayoutProfile>,

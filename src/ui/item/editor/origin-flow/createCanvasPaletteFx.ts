@@ -47,9 +47,7 @@ const readPalette = (host: HTMLElement): CanvasPalette => {
 };
 
 /** Creates the reader that resolves Canvas colors from active editor theme tokens. */
-export const createCanvasPaletteFx = Effect.fn(
-	"createCanvasPaletteFx",
-)(() =>
+export const createCanvasPaletteFx = Effect.fn("createCanvasPaletteFx")(() =>
 	Effect.succeed({
 		readPalette,
 	} as const),

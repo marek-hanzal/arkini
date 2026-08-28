@@ -2,40 +2,27 @@ import { Data, Effect } from "effect";
 
 import type { EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
 import LayoutWorker from "~/ui/item/editor/origin-flow/layout.worker.ts?worker";
-import type {
-	Layout,
-	LayoutInput,
-} from "~/ui/item/editor/origin-flow/Layout";
+import type { Layout, LayoutInput } from "~/ui/item/editor/origin-flow/Layout";
 import type {
 	LayoutWorkerRequest,
 	LayoutWorkerResponse,
 } from "~/ui/item/editor/origin-flow/LayoutWorkerProtocol";
 import { readNodeMetricsFx } from "~/ui/item/editor/origin-flow/readNodeMetricsFx";
 
-class LayoutWorkerError extends Data.TaggedError(
-	"EditorItemOriginFlowLayoutWorkerError",
-)<{
+class LayoutWorkerError extends Data.TaggedError("EditorItemOriginFlowLayoutWorkerError")<{
 	readonly cause?: unknown;
 	readonly message: string;
 }> {}
 
-type RunLayout = (
-	topology: LayoutInput,
-	worker: Worker,
-) => Promise<Layout>;
+type RunLayout = (topology: LayoutInput, worker: Worker) => Promise<Layout>;
 
-const runLayout = (
-	topology: LayoutInput,
-	worker: Worker,
-): Promise<Layout> =>
+const runLayout = (topology: LayoutInput, worker: Worker): Promise<Layout> =>
 	new Promise((resolve, reject) => {
 		const cleanUp = () => {
 			worker.removeEventListener("message", handleMessage);
 			worker.removeEventListener("error", handleError);
 		};
-		const handleMessage = ({
-			data,
-		}: MessageEvent<LayoutWorkerResponse>) => {
+		const handleMessage = ({ data }: MessageEvent<LayoutWorkerResponse>) => {
 			cleanUp();
 			if (data.status === "success") resolve(data.layout);
 			else reject(new Error(data.message));
@@ -84,9 +71,7 @@ const readTopologyFx = (flow: EditorItemOriginFlow) =>
 	});
 
 /** Computes one flow layout off the renderer thread and terminates its worker on exit. */
-export const layoutInWorkerFx = Effect.fn(
-	"layoutInWorkerFx",
-)(
+export const layoutInWorkerFx = Effect.fn("layoutInWorkerFx")(
 	(
 		flow: EditorItemOriginFlow,
 		options: {

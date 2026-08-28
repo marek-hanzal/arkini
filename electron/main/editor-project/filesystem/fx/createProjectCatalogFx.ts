@@ -35,9 +35,7 @@ const parseStoredCatalog = (source: string) => {
 };
 
 /** Opens the one main-owned path registry; project contents always remain authoritative. */
-export const createProjectCatalogFx = Effect.fn(
-	"createProjectCatalogFx",
-)(function* ({
+export const createProjectCatalogFx = Effect.fn("createProjectCatalogFx")(function* ({
 	catalogPath,
 	projectsRoot,
 }: {

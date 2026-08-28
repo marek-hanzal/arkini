@@ -109,9 +109,7 @@ const drawTextLines = (
 };
 
 /** Creates the fitting and wrapping policy used by Canvas flow labels. */
-export const createCanvasTextPainterFx = Effect.fn(
-	"createCanvasTextPainterFx",
-)(() =>
+export const createCanvasTextPainterFx = Effect.fn("createCanvasTextPainterFx")(() =>
 	Effect.succeed({
 		drawTextLines,
 		fitText,

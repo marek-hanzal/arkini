@@ -34,69 +34,70 @@ export namespace planInventoryStorageFx {
 }
 
 /** Plans one whole live grid item into Inventory without mutating the runtime. */
-export const planInventoryStorageFx = Effect.fn("planInventoryStorageFx")(
-	function* ({ item, runtime }: planInventoryStorageFx.Props) {
-		const pure = yield* isItemPureFx({
-			item,
-			runtime,
+export const planInventoryStorageFx = Effect.fn("planInventoryStorageFx")(function* ({
+	item,
+	runtime,
+}: planInventoryStorageFx.Props) {
+	const pure = yield* isItemPureFx({
+		item,
+		runtime,
+	});
+	if (pure) {
+		const detachedRuntime = {
+			...runtime,
+			items: runtime.items.filter((candidate) => candidate.id !== item.id),
+		} satisfies RuntimeSchema.Type;
+		const drop = {
+			itemId: item.item.id,
+			placement: PlacementSchema.enum.Drop,
+			quantity: item.quantity,
+		} as const;
+		const partialPlan = yield* planInventoryPlacementFx({
+			item: item.item,
+			quantity: item.quantity,
+			runtime: detachedRuntime,
 		});
-		if (pure) {
-			const detachedRuntime = {
-				...runtime,
-				items: runtime.items.filter((candidate) => candidate.id !== item.id),
-			} satisfies RuntimeSchema.Type;
-			const drop = {
+		const plan = yield* assertPlacementPlanCompleteFx({
+			drop,
+			plan: partialPlan,
+			quantity: item.quantity,
+			reason: PlacementFailureReasonEnumSchema.enum.InventoryFull,
+		});
+		return {
+			kind: "pure",
+			detachedRuntime,
+			plan,
+		} satisfies InventoryStoragePlan;
+	}
+
+	if (item.quantity !== 1) {
+		return yield* Effect.fail(
+			new ItemStatefulError({
+				itemId: item.id,
+			}),
+		);
+	}
+	const config = yield* GameConfigFx;
+	const locations = yield* readInventoryLocationsFx({
+		size: config.meta.inventory,
+	});
+	const [location] = yield* readEmptyLocationsFx({
+		locations,
+		runtime,
+	});
+	if (location === undefined) {
+		return yield* Effect.fail(
+			new PlacementUnavailableError({
 				itemId: item.item.id,
 				placement: PlacementSchema.enum.Drop,
 				quantity: item.quantity,
-			} as const;
-			const partialPlan = yield* planInventoryPlacementFx({
-				item: item.item,
-				quantity: item.quantity,
-				runtime: detachedRuntime,
-			});
-			const plan = yield* assertPlacementPlanCompleteFx({
-				drop,
-				plan: partialPlan,
-				quantity: item.quantity,
 				reason: PlacementFailureReasonEnumSchema.enum.InventoryFull,
-			});
-			return {
-				kind: "pure",
-				detachedRuntime,
-				plan,
-			} satisfies InventoryStoragePlan;
-		}
-
-		if (item.quantity !== 1) {
-			return yield* Effect.fail(
-				new ItemStatefulError({
-					itemId: item.id,
-				}),
-			);
-		}
-		const config = yield* GameConfigFx;
-		const locations = yield* readInventoryLocationsFx({
-			size: config.meta.inventory,
-		});
-		const [location] = yield* readEmptyLocationsFx({
-			locations,
-			runtime,
-		});
-		if (location === undefined) {
-			return yield* Effect.fail(
-				new PlacementUnavailableError({
-					itemId: item.item.id,
-					placement: PlacementSchema.enum.Drop,
-					quantity: item.quantity,
-					reason: PlacementFailureReasonEnumSchema.enum.InventoryFull,
-					remainingQuantity: item.quantity,
-				}),
-			);
-		}
-		return {
-			kind: "stateful",
-			location,
-		} satisfies InventoryStoragePlan;
-	},
-);
+				remainingQuantity: item.quantity,
+			}),
+		);
+	}
+	return {
+		kind: "stateful",
+		location,
+	} satisfies InventoryStoragePlan;
+});

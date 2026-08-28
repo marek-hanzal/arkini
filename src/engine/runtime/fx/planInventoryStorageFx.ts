@@ -10,8 +10,7 @@ import { planInventoryPlacementFx } from "~/engine/placement/fx/planInventoryPla
 import { readEmptyLocationsFx } from "~/engine/placement/fx/readEmptyLocationsFx";
 import { readInventoryLocationsFx } from "~/engine/placement/fx/readInventoryLocationsFx";
 import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
-import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
-import type { PlacementPlanSchema } from "~/engine/placement/schema/PlacementPlanSchema";
+import type { PlacementPlan } from "~/engine/placement/PlacementPlan";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -19,7 +18,7 @@ export type InventoryStoragePlan =
 	| {
 			readonly kind: "pure";
 			readonly detachedRuntime: RuntimeSchema.Type;
-			readonly plan: PlacementPlanSchema.Type;
+			readonly plan: PlacementPlan;
 	  }
 	| {
 			readonly kind: "stateful";
@@ -61,7 +60,7 @@ export const planInventoryStorageFx = Effect.fn("planInventoryStorageFx")(functi
 			drop,
 			plan: partialPlan,
 			quantity: item.quantity,
-			reason: PlacementFailureReasonEnumSchema.enum.InventoryFull,
+			reason: PlacementUnavailableError.Reason.InventoryFull,
 		});
 		return {
 			kind: "pure",
@@ -91,7 +90,7 @@ export const planInventoryStorageFx = Effect.fn("planInventoryStorageFx")(functi
 				itemId: item.item.id,
 				placement: PlacementSchema.enum.Drop,
 				quantity: item.quantity,
-				reason: PlacementFailureReasonEnumSchema.enum.InventoryFull,
+				reason: PlacementUnavailableError.Reason.InventoryFull,
 				remainingQuantity: item.quantity,
 			}),
 		);

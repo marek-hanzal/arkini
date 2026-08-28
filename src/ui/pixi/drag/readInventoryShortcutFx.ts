@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
+import { DropItemResultKind } from "~/bridge/tile/DropItemResultKind";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { DragPreview } from "~/ui/pixi/drag/DragPreview";
 import type { ActiveDrag } from "~/ui/pixi/drag/ActiveDrag";
@@ -46,7 +46,7 @@ export const readInventoryShortcutFx = Effect.fn("readInventoryShortcutFx")(func
 		targetFacts,
 	});
 	if (
-		kind !== DropItemResultKindEnumSchema.enum.StoreInventory ||
+		kind !== DropItemResultKind.StoreInventory ||
 		targetFacts.occupant?.id !== inventoryActor.item.id
 	) {
 		return null;

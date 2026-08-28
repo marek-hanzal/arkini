@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 
 import type { RuleSchema } from "~/engine/line/schema/rule/RuleSchema";
-import type { RulesResultSchema } from "~/engine/line/schema/rule/RulesResultSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import { lineRuleFx } from "./lineRuleFx";
 
@@ -10,6 +9,8 @@ export namespace lineRulesFx {
 		origin: BoardLocationSchema.Type;
 		rules: RuleSchema.Type[];
 	}
+
+	export type Result = ReadonlyArray<lineRuleFx.Result>;
 }
 
 /**
@@ -25,5 +26,5 @@ export const lineRulesFx = Effect.fn("lineRulesFx")(function* ({
 			origin,
 			rule,
 		});
-	})) satisfies RulesResultSchema.Type;
+	})) satisfies lineRulesFx.Result;
 });

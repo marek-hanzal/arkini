@@ -5,9 +5,9 @@ import { ModeSchema } from "~/engine/input/schema/ModeSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+import type { InputRun } from "~/engine/input/InputRun";
 import { applyInputMaterialConsumeRunPlanFx } from "~/engine/input/fx/run/applyInputMaterialConsumeRunPlanFx";
 import { applyInputMaterialReserveRunPlanFx } from "~/engine/input/fx/run/applyInputMaterialReserveRunPlanFx";
-import type { InputRunPlanSchema } from "~/engine/input/schema/run/InputRunPlanSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 
@@ -17,7 +17,7 @@ export namespace applyInputRunPlanFx {
 		ownerItemId: IdSchema.Type;
 		lineId: IdSchema.Type;
 		inputIndex: NonNegativeIntegerSchema.Type;
-		plan: InputRunPlanSchema.Type;
+		plan: InputRun.Plan;
 		runtime: RuntimeSchema.Type;
 	}
 

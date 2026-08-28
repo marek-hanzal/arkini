@@ -5,8 +5,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Game } from "~/bridge/game/Game";
 import { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
-import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
-import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 
 const command: runTileDropAtom.Command = {
 	sourceItemId: "runtime:source",
@@ -25,8 +25,8 @@ const command: runTileDropAtom.Command = {
 };
 
 const outcome: runTileDropAtom.Result = {
-	kind: DropItemResultKindEnumSchema.enum.Reject,
-	reason: DropItemRejectedReasonEnumSchema.enum.UnsupportedTarget,
+	kind: DropItemResultKind.Reject,
+	reason: DropItemRejectedReason.UnsupportedTarget,
 	itemId: command.sourceItemId,
 };
 

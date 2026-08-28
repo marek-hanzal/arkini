@@ -2,13 +2,13 @@ import { Effect } from "effect";
 
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { JobQueueFullError } from "~/engine/job/error/JobQueueFullError";
-import type { LineStartResolutionSchema } from "~/engine/job/schema/read/LineStartResolutionSchema";
+import type { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
 import { LineRunUnavailableError } from "~/engine/line/error/LineRunUnavailableError";
-import type { LineRunPlanSchema } from "~/engine/line/schema/run/LineRunPlanSchema";
+import type { LineRun } from "~/engine/line/LineRun";
 
 export namespace assertLineStartReadyFx {
 	export interface Props {
-		resolution: LineStartResolutionSchema.Type;
+		resolution: resolveLineStartFx.Result;
 	}
 }
 
@@ -43,5 +43,5 @@ export const assertLineStartReadyFx = Effect.fn("assertLineStartReadyFx")(functi
 		);
 	}
 
-	return plan satisfies LineRunPlanSchema.Type;
+	return plan satisfies LineRun.Plan;
 });

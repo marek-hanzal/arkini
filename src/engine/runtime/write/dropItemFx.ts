@@ -9,16 +9,16 @@ import { commitStoreInventoryDropFx } from "~/engine/runtime/drop/commitStoreInv
 import { commitStoreInputDropFx } from "~/engine/runtime/drop/commitStoreInputDropFx";
 import { commitSwapDropFx } from "~/engine/runtime/drop/commitSwapDropFx";
 import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
-import type { DropItemCommand } from "~/engine/runtime/schema/command/DropItemCommand";
-import { DropItemIgnoredReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemIgnoredReasonEnumSchema";
-import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
-import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
-import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import type { DropItemCommand } from "~/engine/runtime/DropItemCommand";
+import { DropItemIgnoredReason } from "~/engine/runtime/DropItemResult";
+import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
+import type { DropItemResult } from "~/engine/runtime/DropItemResult";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 
 export namespace dropItemFx {
 	export type Props = DropItemCommand;
 
-	export type Result = DropItemResultSchema.Type;
+	export type Result = DropItemResult;
 }
 
 /**
@@ -37,8 +37,8 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 }: dropItemFx.Props) {
 	if (target.kind === "unsupported") {
 		return {
-			kind: DropItemResultKindEnumSchema.enum.Reject,
-			reason: DropItemRejectedReasonEnumSchema.enum.UnsupportedTarget,
+			kind: DropItemResultKind.Reject,
+			reason: DropItemRejectedReason.UnsupportedTarget,
 			itemId: sourceItemId,
 		} satisfies dropItemFx.Result;
 	}
@@ -50,8 +50,8 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 		})
 	) {
 		return {
-			kind: DropItemResultKindEnumSchema.enum.Ignored,
-			reason: DropItemIgnoredReasonEnumSchema.enum.SameLocation,
+			kind: DropItemResultKind.Ignored,
+			reason: DropItemIgnoredReason.SameLocation,
 			itemId: sourceItemId,
 			location: sourceLocation,
 		} satisfies dropItemFx.Result;
@@ -63,9 +63,9 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 		sourceLocation,
 		target,
 	});
-	if (preflight.kind === DropItemResultKindEnumSchema.enum.Reject) {
+	if (preflight.kind === DropItemResultKind.Reject) {
 		return {
-			kind: DropItemResultKindEnumSchema.enum.Reject,
+			kind: DropItemResultKind.Reject,
 			reason: preflight.reason,
 			itemId: sourceItemId,
 			...(target.occupant === null
@@ -75,13 +75,10 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 					}),
 		} satisfies dropItemFx.Result;
 	}
-	if (
-		target.inputStore !== undefined &&
-		preflight.kind !== DropItemResultKindEnumSchema.enum.StoreInput
-	) {
+	if (target.inputStore !== undefined && preflight.kind !== DropItemResultKind.StoreInput) {
 		return {
-			kind: DropItemResultKindEnumSchema.enum.Reject,
-			reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
+			kind: DropItemResultKind.Reject,
+			reason: DropItemRejectedReason.Blocked,
 			itemId: sourceItemId,
 			...(target.occupant === null
 				? {}
@@ -92,7 +89,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 	}
 
 	if (target.occupant === null) {
-		if (preflight.kind !== DropItemResultKindEnumSchema.enum.Move) {
+		if (preflight.kind !== DropItemResultKind.Move) {
 			return yield* Effect.die(
 				new Error(`Empty-slot drop preview unexpectedly resolved as "${preflight.kind}".`),
 			);
@@ -111,7 +108,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 	return yield* match(preflight)
 		.with(
 			{
-				kind: DropItemResultKindEnumSchema.enum.Merge,
+				kind: DropItemResultKind.Merge,
 			},
 			() =>
 				commitMergeDropFx({
@@ -123,7 +120,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 		)
 		.with(
 			{
-				kind: DropItemResultKindEnumSchema.enum.StoreInventory,
+				kind: DropItemResultKind.StoreInventory,
 			},
 			() =>
 				commitStoreInventoryDropFx({
@@ -137,7 +134,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 		)
 		.with(
 			{
-				kind: DropItemResultKindEnumSchema.enum.StoreInput,
+				kind: DropItemResultKind.StoreInput,
 			},
 			(storeInput) =>
 				commitStoreInputDropFx({
@@ -154,7 +151,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 		)
 		.with(
 			{
-				kind: DropItemResultKindEnumSchema.enum.Stack,
+				kind: DropItemResultKind.Stack,
 			},
 			() =>
 				commitStackDropFx({
@@ -168,7 +165,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 		)
 		.with(
 			{
-				kind: DropItemResultKindEnumSchema.enum.Swap,
+				kind: DropItemResultKind.Swap,
 			},
 			() =>
 				commitSwapDropFx({
@@ -182,7 +179,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 		)
 		.with(
 			{
-				kind: DropItemResultKindEnumSchema.enum.Move,
+				kind: DropItemResultKind.Move,
 			},
 			(unexpected) =>
 				Effect.die(
@@ -193,7 +190,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 		)
 		.with(
 			{
-				kind: DropItemResultKindEnumSchema.enum.Ignored,
+				kind: DropItemResultKind.Ignored,
 			},
 			(unexpected) =>
 				Effect.die(

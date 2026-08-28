@@ -5,7 +5,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readDropMaximumQuantitiesFx } from "~/engine/output/fx/readDropMaximumQuantitiesFx";
 import { readQuantityMaximumFx } from "~/engine/quantity/fx/readQuantityMaximumFx";
 import type { RollSchema } from "~/engine/roll/schema/RollSchema";
-import { RollEnumSchema } from "~/engine/roll/schema/RollEnumSchema";
+import { TypeSchema } from "~/engine/roll/schema/TypeSchema";
 
 export namespace readRollMaximumQuantitiesFx {
 	export interface Props {
@@ -20,7 +20,7 @@ export const readRollMaximumQuantitiesFx = Effect.fn("readRollMaximumQuantitiesF
 	return yield* match(roll)
 		.with(
 			{
-				type: RollEnumSchema.enum.Guaranteed,
+				type: TypeSchema.enum.Guaranteed,
 			},
 			({ drop }) =>
 				readDropMaximumQuantitiesFx({
@@ -29,7 +29,7 @@ export const readRollMaximumQuantitiesFx = Effect.fn("readRollMaximumQuantitiesF
 		)
 		.with(
 			{
-				type: RollEnumSchema.enum.Chance,
+				type: TypeSchema.enum.Chance,
 			},
 			({ chance, drop }) =>
 				chance === 0
@@ -40,7 +40,7 @@ export const readRollMaximumQuantitiesFx = Effect.fn("readRollMaximumQuantitiesF
 		)
 		.with(
 			{
-				type: RollEnumSchema.enum.Weight,
+				type: TypeSchema.enum.Weight,
 			},
 			(roll) =>
 				Effect.gen(function* () {

@@ -1,13 +1,13 @@
 import { Array, Effect } from "effect";
 
-import type { QueryUniverseSchema } from "~/engine/query/schema/QueryUniverseSchema";
+import type { UniverseSchema } from "~/engine/query/schema/UniverseSchema";
 import { getItemsFx } from "~/engine/runtime/read/getItemsFx";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { queryItemsFx } from "./queryItemsFx";
 
 export namespace queryUniverseFx {
 	export interface Props {
-		query: QueryUniverseSchema.Type;
+		query: UniverseSchema.Type;
 	}
 }
 

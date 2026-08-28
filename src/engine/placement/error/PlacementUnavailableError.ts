@@ -2,7 +2,7 @@ import { Data } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import type { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
+import type { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
 import type { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
 
 /**
@@ -10,7 +10,7 @@ import type { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema
  */
 export class PlacementUnavailableError extends Data.TaggedError("PlacementUnavailableError")<{
 	itemId: IdSchema.Type;
-	placement: PlacementEnumSchema.Type;
+	placement: PlacementSchema.Type;
 	quantity: PositiveIntegerSchema.Type;
 	reason: PlacementFailureReasonEnumSchema.Type;
 	remainingQuantity: PositiveIntegerSchema.Type;

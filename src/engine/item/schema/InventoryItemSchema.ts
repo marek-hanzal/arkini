@@ -29,7 +29,7 @@ export const InventoryItemSchema = z
 	})
 	.strict()
 	.meta({
-		id: "InventoryItemSchema",
+		id: "item.InventorySchema",
 		description: "A singleton Board/Toolbar item that opens the shared inventory surface.",
 	});
 

@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import type { InputMaterialSchema } from "~/engine/input/schema/InputMaterialSchema";
+import type { MaterialSchema } from "~/engine/input/schema/MaterialSchema";
 import type { InputMaterialResolutionSchema } from "~/engine/input/schema/resolution/InputMaterialResolutionSchema";
 
 export namespace resolveInputMaterialFx {
 	export interface Props {
-		input: InputMaterialSchema.Type;
+		input: MaterialSchema.Type;
 		storedQuantity: NonNegativeIntegerSchema.Type;
 	}
 }

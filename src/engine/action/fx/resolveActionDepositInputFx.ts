@@ -2,8 +2,8 @@ import { Array, Effect, Option } from "effect";
 
 import { resolveActionChargeFx } from "~/engine/action/fx/resolveActionChargeFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { InputDepositSchema } from "~/engine/input/schema/InputDepositSchema";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import type { DepositSchema } from "~/engine/input/schema/DepositSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
 import { queryFx } from "~/engine/query/fx/queryFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
@@ -56,7 +56,7 @@ export const resolveActionDepositInputFx = Effect.fn("resolveActionDepositInputF
 	reservedCharges,
 	runtime,
 }: {
-	readonly input: InputDepositSchema.Type;
+	readonly input: DepositSchema.Type;
 	readonly ownerItemId: IdSchema.Type;
 	readonly reservedCharges: ReadonlyMap<IdSchema.Type, number>;
 	readonly runtime: RuntimeSchema.Type;
@@ -69,7 +69,7 @@ export const resolveActionDepositInputFx = Effect.fn("resolveActionDepositInputF
 	if (owner === undefined) {
 		return {
 			resolution: {
-				type: InputEnumSchema.enum.Deposit,
+				type: TypeSchema.enum.Deposit,
 				ready: false,
 			},
 			plan: undefined,
@@ -99,12 +99,12 @@ export const resolveActionDepositInputFx = Effect.fn("resolveActionDepositInputF
 		if (!charges.ready || charges.plan === undefined) continue;
 		return {
 			resolution: {
-				type: InputEnumSchema.enum.Deposit,
+				type: TypeSchema.enum.Deposit,
 				ready: true,
 				targetItemId: target.id,
 			},
 			plan: {
-				type: InputEnumSchema.enum.Deposit,
+				type: TypeSchema.enum.Deposit,
 				charges: charges.plan,
 			},
 		} satisfies InputRunResolutionSchema.Type;
@@ -112,7 +112,7 @@ export const resolveActionDepositInputFx = Effect.fn("resolveActionDepositInputF
 
 	return {
 		resolution: {
-			type: InputEnumSchema.enum.Deposit,
+			type: TypeSchema.enum.Deposit,
 			ready: false,
 		},
 		plan: undefined,

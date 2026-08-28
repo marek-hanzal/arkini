@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
+import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
 import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
@@ -78,7 +78,7 @@ export const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocat
 	return yield* Effect.fail(
 		new PlacementUnavailableError({
 			itemId: item.item.id,
-			placement: PlacementEnumSchema.enum.Drop,
+			placement: PlacementSchema.enum.Drop,
 			quantity: item.quantity,
 			reason,
 			remainingQuantity: item.quantity,

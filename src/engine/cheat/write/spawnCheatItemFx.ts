@@ -12,7 +12,7 @@ import { planBoardPlacementFx } from "~/engine/placement/fx/planBoardPlacementFx
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
-import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
+import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
 import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
 
 export namespace spawnCheatItemFx {
@@ -41,7 +41,7 @@ export const spawnCheatItemFx = Effect.fn("spawnCheatItemFx")(function* ({
 	}
 	const drop = {
 		itemId,
-		placement: PlacementEnumSchema.enum.Drop,
+		placement: PlacementSchema.enum.Drop,
 		quantity: 1 as const,
 	};
 
@@ -69,7 +69,7 @@ export const spawnCheatItemFx = Effect.fn("spawnCheatItemFx")(function* ({
 						y: Math.floor(config.meta.board.height / 2),
 					},
 				},
-				placement: PlacementEnumSchema.enum.Drop,
+				placement: PlacementSchema.enum.Drop,
 				quantity: 1,
 				runtime,
 			});

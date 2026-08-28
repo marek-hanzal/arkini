@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { match, P } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -36,7 +36,7 @@ export const readRuntimeLineFillProgressFx = Effect.fn("readRuntimeLineFillProgr
 		match(input)
 			.with(
 				{
-					type: InputEnumSchema.enum.Materials,
+					type: TypeSchema.enum.Materials,
 				},
 				(materialInput) =>
 					Effect.gen(function* () {
@@ -60,7 +60,7 @@ export const readRuntimeLineFillProgressFx = Effect.fn("readRuntimeLineFillProgr
 			)
 			.with(
 				{
-					type: P.union(InputEnumSchema.enum.Deposit, InputEnumSchema.enum.Simple),
+					type: P.union(TypeSchema.enum.Deposit, TypeSchema.enum.Simple),
 				},
 				() => Effect.succeed(null),
 			)

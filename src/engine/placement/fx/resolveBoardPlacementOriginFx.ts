@@ -1,16 +1,16 @@
 import { Effect, Random } from "effect";
 import { match } from "ts-pattern";
 
-import type { GridSizeSchema } from "~/engine/grid/schema/GridSizeSchema";
+import type { SizeSchema } from "~/engine/grid/schema/SizeSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
-import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
+import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace resolveBoardPlacementOriginFx {
 	export interface Props {
 		origin: BoardLocationSchema.Type;
-		placement: PlacementEnumSchema.Type;
-		size: GridSizeSchema.Type;
+		placement: PlacementSchema.Type;
+		size: SizeSchema.Type;
 	}
 }
 
@@ -21,8 +21,8 @@ export const resolveBoardPlacementOriginFx = Effect.fn("resolveBoardPlacementOri
 	size,
 }: resolveBoardPlacementOriginFx.Props) {
 	return yield* match(placement)
-		.with(PlacementEnumSchema.enum.Drop, () => Effect.succeed(origin))
-		.with(PlacementEnumSchema.enum.Random, () =>
+		.with(PlacementSchema.enum.Drop, () => Effect.succeed(origin))
+		.with(PlacementSchema.enum.Random, () =>
 			Random.nextIntBetween(0, size.width * size.height, {
 				halfOpen: true,
 			}).pipe(

@@ -4,7 +4,7 @@ import type { InputMaterialResolutionSchema } from "~/engine/input/schema/resolu
 import type { InputMaterialRunPlanResolutionSchema } from "~/engine/input/schema/run/InputMaterialRunPlanResolutionSchema";
 import type { InputChargeRunPlanSchema } from "~/engine/input/schema/run/InputChargeRunPlanSchema";
 import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 
 export namespace planInputMaterialRunFx {
 	export interface Props {
@@ -53,7 +53,7 @@ export const planInputMaterialRunFx = Effect.fn("planInputMaterialRunFx")(functi
 	}
 
 	return {
-		type: InputEnumSchema.enum.Materials,
+		type: TypeSchema.enum.Materials,
 		mode: resolution.mode,
 		quantity: resolution.runQuantity,
 		charges,

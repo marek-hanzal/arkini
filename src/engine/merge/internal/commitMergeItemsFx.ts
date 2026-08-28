@@ -18,7 +18,7 @@ import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBoardOperationError";
-import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
+import { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
 
 export namespace commitMergeItemsFx {
 	export interface Props {
@@ -126,7 +126,7 @@ export const commitMergeItemsFx = Effect.fn("commitMergeItemsFx")(function* ({
 				action: resolved.rule.action,
 				effect: resolved.rule.effect,
 				resultCanonicalItemId:
-					resolved.rule.effect === EffectEnumSchema.enum.Replace
+					resolved.rule.effect === TargetEffectSchema.enum.Replace
 						? resolved.rule.result
 						: undefined,
 			} satisfies ItemMergedGameEventSchema.Type;

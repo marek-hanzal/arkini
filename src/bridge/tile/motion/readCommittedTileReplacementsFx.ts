@@ -7,7 +7,7 @@ import type { TileActorVisual } from "~/bridge/tile/TileActorVisual";
 import { readTileActorVisualFx } from "~/bridge/tile/readTileActorVisualFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
-import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
+import { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 
 export interface TileReplacement {
@@ -32,7 +32,7 @@ export const readCommittedTileReplacementsFx = Effect.fn("readCommittedTileRepla
 				.with(
 					{
 						type: GameEventEnumSchema.enum.ItemMerged,
-						effect: EffectEnumSchema.enum.Replace,
+						effect: TargetEffectSchema.enum.Replace,
 					},
 					(merged) =>
 						Effect.gen(function* () {

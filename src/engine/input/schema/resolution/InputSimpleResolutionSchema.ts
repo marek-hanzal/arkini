@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 
 /**
  * Readiness of one simple input that requires no material operation.
@@ -10,7 +10,7 @@ export const InputSimpleResolutionSchema = z
 		/**
 		 * Identifies this resolution as one simple input.
 		 */
-		type: InputEnumSchema.extract([
+		type: TypeSchema.extract([
 			"Simple",
 		]),
 		/**

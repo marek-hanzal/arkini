@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import type { WhenRangeSchema } from "~/engine/when/schema/WhenRangeSchema";
+import type { RangeSchema } from "~/engine/when/schema/RangeSchema";
 
 export namespace whenRangeFx {
-	export type Props = Pick<WhenRangeSchema.Type, "max" | "min"> & {
+	export type Props = Pick<RangeSchema.Type, "max" | "min"> & {
 		quantity: NonNegativeIntegerSchema.Type;
 	};
 }

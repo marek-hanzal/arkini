@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 
-import type { InputSimpleSchema } from "~/engine/input/schema/InputSimpleSchema";
+import type { SimpleSchema } from "~/engine/input/schema/SimpleSchema";
 import type { InputSimpleResolutionSchema } from "~/engine/input/schema/resolution/InputSimpleResolutionSchema";
 
 export namespace resolveInputSimpleFx {
 	export interface Props {
-		input: InputSimpleSchema.Type;
+		input: SimpleSchema.Type;
 	}
 }
 

@@ -16,7 +16,7 @@ export const ItemEnumSchema = z
 		Inventory: "inventory",
 	})
 	.meta({
-		id: "ItemEnumSchema",
+		id: "item.TypeSchema",
 		description: "The kind of gameplay item described by an item configuration.",
 	});
 

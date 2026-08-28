@@ -7,7 +7,7 @@ import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagn
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 import { DiagnosticRecordEntityEnumSchema } from "~/engine/validation/schema/DiagnosticRecordEntityEnumSchema";
-import { RollEnumSchema } from "~/engine/roll/schema/RollEnumSchema";
+import { TypeSchema } from "~/engine/roll/schema/TypeSchema";
 
 import type { DiagnosticPathSchema } from "../schema/DiagnosticPathSchema";
 import { validateWhenReferenceFx } from "./validateWhenReferenceFx";
@@ -82,10 +82,7 @@ export const validateOutputReferencesFx = Effect.fn("validateOutputReferencesFx"
 
 	for (const [setIndex, set] of output.set.entries()) {
 		for (const [rollIndex, roll] of set.roll.entries()) {
-			if (
-				roll.type === RollEnumSchema.enum.Guaranteed ||
-				roll.type === RollEnumSchema.enum.Chance
-			) {
+			if (roll.type === TypeSchema.enum.Guaranteed || roll.type === TypeSchema.enum.Chance) {
 				for (const [dropIndex, drop] of roll.drop.entries()) {
 					diagnostics.push(
 						...(yield* validateDropFx({

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { RuleRuntimeMultiplierSchema } from "~/engine/line/schema/rule/RuleRuntimeMultiplierSchema";
+import type { RuntimeMultiplierSchema } from "~/engine/line/schema/rule/RuntimeMultiplierSchema";
 import type { RuleRuntimeMultiplierResultSchema } from "~/engine/line/schema/rule/RuleRuntimeMultiplierResultSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import { whenFx } from "~/engine/when/fx/whenFx";
@@ -8,7 +8,7 @@ import { whenFx } from "~/engine/when/fx/whenFx";
 export namespace lineRuleRuntimeMultiplierFx {
 	export interface Props {
 		origin: BoardLocationSchema.Type;
-		rule: RuleRuntimeMultiplierSchema.Type;
+		rule: RuntimeMultiplierSchema.Type;
 	}
 }
 

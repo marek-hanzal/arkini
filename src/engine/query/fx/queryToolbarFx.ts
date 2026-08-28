@@ -1,15 +1,15 @@
 import { Array, Effect } from "effect";
 
-import type { QueryToolbarSchema } from "~/engine/query/schema/QueryToolbarSchema";
+import type { ToolbarSchema } from "~/engine/query/schema/ToolbarSchema";
 import { getItemsFx } from "~/engine/runtime/read/getItemsFx";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
-import { QueryScopeEnumSchema } from "~/engine/query/schema/QueryScopeEnumSchema";
+import { ScopeSchema } from "~/engine/query/schema/ScopeSchema";
 
 import { queryItemsFx } from "./queryItemsFx";
 
 export namespace queryToolbarFx {
 	export interface Props {
-		query: QueryToolbarSchema.Type;
+		query: ToolbarSchema.Type;
 	}
 }
 
@@ -22,7 +22,7 @@ export const queryToolbarFx = Effect.fn("queryToolbarFx")(function* ({
 
 	return yield* queryItemsFx({
 		items: gridItems.filter((item) => {
-			return item.location.scope === QueryScopeEnumSchema.enum.Toolbar;
+			return item.location.scope === ScopeSchema.enum.Toolbar;
 		}),
 		selector: query.selector,
 	});

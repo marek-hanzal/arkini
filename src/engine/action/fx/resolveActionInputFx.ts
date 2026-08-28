@@ -3,11 +3,11 @@ import { match } from "ts-pattern";
 
 import { resolveActionChargeFx } from "~/engine/action/fx/resolveActionChargeFx";
 import { resolveActionDepositInputFx } from "~/engine/action/fx/resolveActionDepositInputFx";
-import type { ActionInputSchema } from "~/engine/action/schema/ActionInputSchema";
+import type { InputSchema } from "~/engine/action/schema/InputSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { resolveInputSimpleFx } from "~/engine/input/fx/resolveInputSimpleFx";
 import { planInputSimpleRunFx } from "~/engine/input/fx/run/planInputSimpleRunFx";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -18,7 +18,7 @@ export const resolveActionInputFx = Effect.fn("resolveActionInputFx")(function* 
 	reservedCharges,
 	runtime,
 }: {
-	readonly input: ActionInputSchema.Type;
+	readonly input: InputSchema.Type;
 	readonly ownerItemId: IdSchema.Type;
 	readonly reservedCharges: ReadonlyMap<IdSchema.Type, number>;
 	readonly runtime: RuntimeSchema.Type;
@@ -26,7 +26,7 @@ export const resolveActionInputFx = Effect.fn("resolveActionInputFx")(function* 
 	return yield* match(input)
 		.with(
 			{
-				type: InputEnumSchema.enum.Simple,
+				type: TypeSchema.enum.Simple,
 			},
 			(input) =>
 				Effect.gen(function* () {
@@ -55,7 +55,7 @@ export const resolveActionInputFx = Effect.fn("resolveActionInputFx")(function* 
 		)
 		.with(
 			{
-				type: InputEnumSchema.enum.Deposit,
+				type: TypeSchema.enum.Deposit,
 			},
 			(input) =>
 				resolveActionDepositInputFx({

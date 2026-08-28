@@ -4,7 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readDeliveryTravelDurationMsFx } from "~/engine/delivery/read/readDeliveryTravelDurationMsFx";
 import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
 import { isMaterialInputEligibleFx } from "~/engine/input/read/isMaterialInputEligibleFx";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
@@ -60,7 +60,7 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 				const input = line.input[allocation.inputIndex];
 				if (
 					input === undefined ||
-					input.type !== InputEnumSchema.enum.Materials ||
+					input.type !== TypeSchema.enum.Materials ||
 					!(yield* isMaterialInputEligibleFx(current.item)) ||
 					!(yield* matchesItemSelectorFx({
 						item: current.item,

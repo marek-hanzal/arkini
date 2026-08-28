@@ -2,7 +2,7 @@ import { FileSystem } from "effect";
 import { Effect } from "effect";
 import { z } from "zod";
 
-import { GameProjectSourceSchema } from "~/engine/source/schema/GameProjectSourceSchema";
+import { ProjectSchema } from "~/engine/source/schema/ProjectSchema";
 
 const qualifyRootReferences = (schema: Record<string, unknown>) => {
 	const rootId = schema.$id;
@@ -26,7 +26,7 @@ const qualifyRootReferences = (schema: Record<string, unknown>) => {
 
 export const createGameProjectJsonSchema = () =>
 	qualifyRootReferences(
-		z.toJSONSchema(GameProjectSourceSchema, {
+		z.toJSONSchema(ProjectSchema, {
 			reused: "inline",
 			target: "draft-2020-12",
 		}),

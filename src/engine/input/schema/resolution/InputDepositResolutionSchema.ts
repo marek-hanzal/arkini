@@ -1,12 +1,12 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 
 /** Current readiness of one external charged-item input. */
 export const InputDepositResolutionSchema = z
 	.object({
-		type: InputEnumSchema.extract([
+		type: TypeSchema.extract([
 			"Deposit",
 		]),
 		ready: z.boolean().describe("Whether one matching board target can pay the authored cost."),

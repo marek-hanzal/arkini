@@ -24,7 +24,7 @@ describe("writeGameProjectJsonSchemaFx", () => {
 			],
 			[
 				createGameProjectJsonSchema(),
-				"urn:arkini:schema:game-project-source",
+				"urn:arkini:schema:project",
 				"union",
 			],
 		] as const;
@@ -36,7 +36,7 @@ describe("writeGameProjectJsonSchemaFx", () => {
 				root,
 			});
 		expect(new Set(schemas.map(([schema]) => schema.$id)).size).toBe(schemas.length);
-		expect(createGameProjectJsonSchema().$defs).toHaveProperty("AssetCompositionSchema");
+		expect(createGameProjectJsonSchema().$defs).toHaveProperty("item.CompositionSchema");
 	});
 
 	it.effect("writes the portable game-project JSON Schema", () =>
@@ -54,7 +54,7 @@ describe("writeGameProjectJsonSchemaFx", () => {
 			const schema = JSON.parse(jsonSchema);
 
 			expect(schema).toMatchObject({
-				$id: "urn:arkini:schema:game-project-source",
+				$id: "urn:arkini:schema:project",
 				anyOf: expect.any(Array),
 			});
 			expect(Object.keys(schema.$defs ?? {})).not.toContain(
@@ -67,9 +67,7 @@ describe("writeGameProjectJsonSchemaFx", () => {
 				]),
 				properties: {
 					currentSpace: {
-						$ref: expect.stringMatching(
-							/^urn:arkini:schema:game-project-source#\/\$defs\//,
-						),
+						$ref: expect.stringMatching(/^urn:arkini:schema:project#\/\$defs\//),
 					},
 				},
 			});

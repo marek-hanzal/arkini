@@ -7,8 +7,8 @@ import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import { readPngAssetFx } from "~/engine/pack/fx/readPngAssetFx";
 import { readResourceDescriptorsFx } from "~/engine/resource/fx/readResourceDescriptorsFx";
 import { createGameProjectJsonSchema } from "~/engine/schema/fx/writeGameProjectJsonSchemaFx";
-import { GameProjectFileSchema } from "~/engine/source/schema/GameProjectFileSchema";
-import { GameProjectItemFileSchema } from "~/engine/source/schema/GameProjectItemFileSchema";
+import { GameFileSchema } from "~/engine/source/schema/GameFileSchema";
+import { ItemFileSchema } from "~/engine/source/schema/ItemFileSchema";
 import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
 import { admitArkiniVersionFx } from "~/engine/version/ArkiniVersionAdmission";
 import type { GameSourceFileSchema } from "~/engine/source/schema/GameSourceFileSchema";
@@ -80,7 +80,7 @@ export const readFilesystemEditorProjectFilesFx = Effect.fn("readFilesystemEdito
 			);
 		const gameFile = yield* parseJsonFx(
 			paths.gameFile,
-			(candidate) => GameProjectFileSchema.parse(candidate),
+			(candidate) => GameFileSchema.parse(candidate),
 			"Editor game file",
 		);
 		const { version, ...game } = gameFile;
@@ -117,7 +117,7 @@ export const readFilesystemEditorProjectFilesFx = Effect.fn("readFilesystemEdito
 			}
 			const source = yield* parseJsonFx(
 				sourcePath,
-				(candidate) => GameProjectItemFileSchema.parse(candidate),
+				(candidate) => ItemFileSchema.parse(candidate),
 				"Editor item file",
 			);
 			const item = source.item;

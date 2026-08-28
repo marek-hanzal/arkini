@@ -38,7 +38,7 @@ export const ProducerItemSchema = z
 	})
 	.strict()
 	.meta({
-		id: "ProducerItemSchema",
+		id: "item.ProducerSchema",
 		description: "An item that provides one or more selectable product lines.",
 	});
 

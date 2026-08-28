@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readQuantityMaximumFx } from "~/engine/quantity/fx/readQuantityMaximumFx";
-import { RollEnumSchema } from "~/engine/roll/schema/RollEnumSchema";
+import { TypeSchema } from "~/engine/roll/schema/TypeSchema";
 import type { RollSchema } from "~/engine/roll/schema/RollSchema";
 import type { OutputSchema } from "../schema/OutputSchema";
 import { readDropMaximumQuantitiesFx } from "./readDropMaximumQuantitiesFx";
@@ -38,14 +38,14 @@ const readRollConditionalMaximumQuantitiesFx = Effect.fn("readRollConditionalMax
 		return yield* match(roll)
 			.with(
 				{
-					type: RollEnumSchema.enum.Guaranteed,
+					type: TypeSchema.enum.Guaranteed,
 				},
 				{
-					type: RollEnumSchema.enum.Chance,
+					type: TypeSchema.enum.Chance,
 				},
 				(roll) =>
 					Effect.gen(function* () {
-						if (roll.type === RollEnumSchema.enum.Chance && roll.chance === 0) {
+						if (roll.type === TypeSchema.enum.Chance && roll.chance === 0) {
 							return undefined;
 						}
 						const quantities = yield* readDropMaximumQuantitiesFx({
@@ -56,7 +56,7 @@ const readRollConditionalMaximumQuantitiesFx = Effect.fn("readRollConditionalMax
 			)
 			.with(
 				{
-					type: RollEnumSchema.enum.Weight,
+					type: TypeSchema.enum.Weight,
 				},
 				(roll) =>
 					Effect.gen(function* () {

@@ -1,13 +1,13 @@
 import { Effect } from "effect";
 
 import type { RollResultSchema } from "~/engine/roll/schema/RollResultSchema";
-import type { RollWeightSchema } from "~/engine/roll/schema/RollWeightSchema";
+import type { WeightSchema } from "~/engine/roll/schema/WeightSchema";
 import { rollQuantityFx } from "~/engine/quantity/fx/rollQuantityFx";
 import { selectDropWeightFx } from "./selectDropWeightFx";
 
 export namespace rollWeightFx {
 	export interface Props {
-		roll: RollWeightSchema.Type;
+		roll: WeightSchema.Type;
 	}
 }
 

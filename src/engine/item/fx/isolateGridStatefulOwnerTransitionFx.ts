@@ -7,7 +7,7 @@ import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
-import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
+import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
@@ -76,7 +76,7 @@ export const isolateGridStatefulOwnerTransitionFx = Effect.fn(
 				{
 					itemId: owner.item.id,
 					quantity: owner.quantity - 1,
-					placement: PlacementEnumSchema.enum.Drop,
+					placement: PlacementSchema.enum.Drop,
 				},
 			],
 		},

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 
 import type { MaterialInputEdgeSchema } from "../schema/MaterialInputEdgeSchema";
 import { readItemLineEntriesFx } from "./readItemLineEntriesFx";
@@ -29,7 +29,7 @@ export const collectMaterialInputEdgesFx = Effect.fn("collectMaterialInputEdgesF
 
 		for (const { line, path } of lines) {
 			for (const [inputIndex, input] of line.input.entries()) {
-				if (input.type !== InputEnumSchema.enum.Materials) {
+				if (input.type !== TypeSchema.enum.Materials) {
 					continue;
 				}
 

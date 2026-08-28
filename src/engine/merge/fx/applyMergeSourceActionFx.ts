@@ -3,18 +3,18 @@ import { Effect } from "effect";
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
 import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
 import { assertOwnerIdleFx } from "~/engine/job/fx/assertOwnerIdleFx";
-import { ActionEnumSchema } from "~/engine/merge/schema/ActionEnumSchema";
+import { SourceActionSchema } from "~/engine/merge/schema/SourceActionSchema";
 import type { DropResultSchema } from "~/engine/output/schema/DropResultSchema";
 import { discardRuntimeItemOwnedStateFx } from "~/engine/runtime/fx/discardRuntimeItemOwnedStateFx";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
+import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
 
 export namespace applyMergeSourceActionFx {
 	export interface Props {
-		action: ActionEnumSchema.Type;
+		action: SourceActionSchema.Type;
 		runtime: RuntimeSchema.Type;
 		source: GridRuntimeItemSchema.Type;
 	}
@@ -36,7 +36,7 @@ export const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(fu
 		runtime,
 	});
 
-	if (action === ActionEnumSchema.enum.Use) {
+	if (action === SourceActionSchema.enum.Use) {
 		const pure = yield* isItemPureFx({
 			item: source,
 			runtime,
@@ -64,7 +64,7 @@ export const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(fu
 		};
 	} else {
 		const withoutOwnedState =
-			action === ActionEnumSchema.enum.Consume
+			action === SourceActionSchema.enum.Consume
 				? yield* discardRuntimeItemOwnedStateFx({
 						ownerItemId: source.id,
 						runtime,
@@ -78,10 +78,10 @@ export const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(fu
 
 	return {
 		returnDrop:
-			action === ActionEnumSchema.enum.Use
+			action === SourceActionSchema.enum.Use
 				? {
 						itemId: source.item.id,
-						placement: PlacementEnumSchema.enum.Drop,
+						placement: PlacementSchema.enum.Drop,
 						quantity: 1,
 					}
 				: undefined,

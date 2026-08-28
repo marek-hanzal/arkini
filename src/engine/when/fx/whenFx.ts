@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { WhenEnumSchema } from "~/engine/when/schema/WhenEnumSchema";
+import { TypeSchema } from "~/engine/when/schema/TypeSchema";
 import { queryFx } from "~/engine/query/fx/queryFx";
 import { queryQuantityFx } from "~/engine/query/fx/queryQuantityFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
@@ -33,7 +33,7 @@ export const whenFx = Effect.fn("whenFx")(function* ({ origin, when }: whenFx.Pr
 	return yield* match(when)
 		.with(
 			{
-				type: WhenEnumSchema.enum.Exists,
+				type: TypeSchema.enum.Exists,
 			},
 			() => {
 				return whenExistsFx({
@@ -43,7 +43,7 @@ export const whenFx = Effect.fn("whenFx")(function* ({ origin, when }: whenFx.Pr
 		)
 		.with(
 			{
-				type: WhenEnumSchema.enum.Count,
+				type: TypeSchema.enum.Count,
 			},
 			({ count }) => {
 				return whenCountFx({
@@ -54,7 +54,7 @@ export const whenFx = Effect.fn("whenFx")(function* ({ origin, when }: whenFx.Pr
 		)
 		.with(
 			{
-				type: WhenEnumSchema.enum.Range,
+				type: TypeSchema.enum.Range,
 			},
 			({ max, min }) => {
 				return whenRangeFx({

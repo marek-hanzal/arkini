@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import type { InputMaterialSchema } from "~/engine/input/schema/InputMaterialSchema";
+import type { MaterialSchema } from "~/engine/input/schema/MaterialSchema";
 import type { InputMaterialStoreResolutionSchema } from "~/engine/input/schema/store/InputMaterialStoreResolutionSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import { readMaterialInputEligibilityFx } from "~/engine/input/read/readMaterialInputEligibilityFx";
@@ -11,7 +11,7 @@ import { resolveInputMaterialFx } from "./resolveInputMaterialFx";
 
 export namespace planInputMaterialStoreFx {
 	export interface Props {
-		input: InputMaterialSchema.Type;
+		input: MaterialSchema.Type;
 		item: RuntimeItemSchema.Type;
 		requestedQuantity: PositiveIntegerSchema.Type;
 		storedQuantity: NonNegativeIntegerSchema.Type;

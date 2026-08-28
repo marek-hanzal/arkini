@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import type { ActionInputSchema } from "~/engine/action/schema/ActionInputSchema";
-import type { ActionRuleSchema } from "~/engine/action/schema/ActionRuleSchema";
+import type { InputSchema } from "~/engine/action/schema/InputSchema";
+import type { RuleSchema } from "~/engine/action/schema/RuleSchema";
 import type { BaseItemSchema } from "~/engine/item/schema/BaseItemSchema";
 import type { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
@@ -14,13 +14,13 @@ export type EditorItemFormValues = Omit<BaseItemSchema.Type, "merge"> & {
 	readonly type: ItemEnumSchema.Type;
 	readonly durationMs?: number;
 	readonly enable?: boolean;
-	readonly input?: ActionInputSchema.Type[];
+	readonly input?: InputSchema.Type[];
 	readonly line?: LineSchema.Type;
 	readonly lines?: LineSchema.Type[];
 	readonly maxQueueSize?: number;
 	readonly merge?: MergeSchema.Type[];
 	readonly output?: OutputSchema.Type;
-	readonly rules?: ActionRuleSchema.Type[];
+	readonly rules?: RuleSchema.Type[];
 	readonly space?: number;
 };
 

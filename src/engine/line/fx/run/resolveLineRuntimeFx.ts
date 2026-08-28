@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { RuleEnumSchema } from "~/engine/line/schema/rule/RuleEnumSchema";
+import { TypeSchema } from "~/engine/line/schema/rule/TypeSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { RulesResultSchema } from "~/engine/line/schema/rule/RulesResultSchema";
 import type { TimeSchema } from "~/engine/common/schema/TimeSchema";
@@ -20,12 +20,12 @@ export const resolveLineRuntimeFx = Effect.fn("resolveLineRuntimeFx")(function* 
 	rules,
 }: resolveLineRuntimeFx.Props) {
 	const multiplier = rules.reduce((value, rule) => {
-		return rule.type === RuleEnumSchema.enum.RuntimeMultiplier && rule.active
+		return rule.type === TypeSchema.enum.RuntimeMultiplier && rule.active
 			? value * rule.multiplier
 			: value;
 	}, 1);
 	const adjustmentMs = rules.reduce((value, rule) => {
-		return rule.type === RuleEnumSchema.enum.RuntimeAdjust && rule.active
+		return rule.type === TypeSchema.enum.RuntimeAdjust && rule.active
 			? value + rule.adjustMs
 			: value;
 	}, 0);

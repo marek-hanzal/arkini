@@ -12,7 +12,7 @@ import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailL
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { match } from "ts-pattern";
-import { WhenEnumSchema } from "~/engine/when/schema/WhenEnumSchema";
+import { TypeSchema } from "~/engine/when/schema/TypeSchema";
 import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
 
 export namespace projectItemDetailLinesFx {
@@ -99,7 +99,7 @@ const projectDisabledConditionFx = Effect.fn("projectDisabledConditionFx")(funct
 	return match(when)
 		.with(
 			{
-				type: WhenEnumSchema.enum.Exists,
+				type: TypeSchema.enum.Exists,
 			},
 			() => ({
 				condition: {
@@ -117,7 +117,7 @@ const projectDisabledConditionFx = Effect.fn("projectDisabledConditionFx")(funct
 		)
 		.with(
 			{
-				type: WhenEnumSchema.enum.Count,
+				type: TypeSchema.enum.Count,
 			},
 			({ count }) => ({
 				condition: {
@@ -136,7 +136,7 @@ const projectDisabledConditionFx = Effect.fn("projectDisabledConditionFx")(funct
 		)
 		.with(
 			{
-				type: WhenEnumSchema.enum.Range,
+				type: TypeSchema.enum.Range,
 			},
 			({ max, min }) => ({
 				condition: {

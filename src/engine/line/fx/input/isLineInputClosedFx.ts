@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { InputMaterialSchema } from "~/engine/input/schema/InputMaterialSchema";
+import type { MaterialSchema } from "~/engine/input/schema/MaterialSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace isLineInputClosedFx {
 	export interface Props {
-		input: Pick<InputMaterialSchema.Type, "capacity">;
+		input: Pick<MaterialSchema.Type, "capacity">;
 		ownerItemId: IdSchema.Type;
 		lineId: IdSchema.Type;
 		runtime: RuntimeSchema.Type;

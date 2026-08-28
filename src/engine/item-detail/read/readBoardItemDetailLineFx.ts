@@ -9,7 +9,7 @@ import { resolveLineStartOutputMaxCountFx } from "~/engine/job/fx/read/resolveLi
 import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
-import { RuleEnumSchema } from "~/engine/line/schema/rule/RuleEnumSchema";
+import { TypeSchema } from "~/engine/line/schema/rule/TypeSchema";
 import type { LineRunResolutionSchema } from "~/engine/line/schema/run/LineRunResolutionSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -35,9 +35,9 @@ const readLineDisabledCause = (
 	}
 >["cause"] => {
 	for (const [ruleIndex, result] of resolution.rules.entries()) {
-		if (result.type !== RuleEnumSchema.enum.Disable || !result.active) continue;
+		if (result.type !== TypeSchema.enum.Disable || !result.active) continue;
 		const rule = line.rules[ruleIndex];
-		if (rule?.type !== RuleEnumSchema.enum.Disable) continue;
+		if (rule?.type !== TypeSchema.enum.Disable) continue;
 		if (rule.hint === undefined)
 			return {
 				kind: "static",
@@ -50,9 +50,9 @@ const readLineDisabledCause = (
 		};
 	}
 	for (const [ruleIndex, result] of resolution.rules.entries()) {
-		if (result.type !== RuleEnumSchema.enum.Enable || result.active) continue;
+		if (result.type !== TypeSchema.enum.Enable || result.active) continue;
 		const rule = line.rules[ruleIndex];
-		if (rule?.type !== RuleEnumSchema.enum.Enable) continue;
+		if (rule?.type !== TypeSchema.enum.Enable) continue;
 		if (rule.hint === undefined)
 			return {
 				kind: "static",

@@ -8,12 +8,12 @@ import { lineRulesFx } from "~/engine/line/fx/lineRulesFx";
 import { resolveLineShowFx } from "~/engine/line/fx/run/resolveLineShowFx";
 import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
 import { readLineOwnerLinesFx } from "~/engine/line/read/readLineOwnerLinesFx";
-import { RuleEnumSchema } from "~/engine/line/schema/rule/RuleEnumSchema";
+import { TypeSchema as LineRuleTypeSchema } from "~/engine/line/schema/rule/TypeSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
-import { RollEnumSchema } from "~/engine/roll/schema/RollEnumSchema";
+import { TypeSchema as RollTypeSchema } from "~/engine/roll/schema/TypeSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace readItemDetailSourcesFx {
@@ -133,7 +133,7 @@ const readMatchingFacts = ({
 			match(roll)
 				.with(
 					{
-						type: RollEnumSchema.enum.Guaranteed,
+						type: RollTypeSchema.enum.Guaranteed,
 					},
 					({ drop }) => {
 						const quantity = targetQuantity({
@@ -151,7 +151,7 @@ const readMatchingFacts = ({
 				)
 				.with(
 					{
-						type: RollEnumSchema.enum.Chance,
+						type: RollTypeSchema.enum.Chance,
 					},
 					({ chance, drop }) => {
 						const quantity = targetQuantity({
@@ -170,7 +170,7 @@ const readMatchingFacts = ({
 				)
 				.with(
 					{
-						type: RollEnumSchema.enum.Weight,
+						type: RollTypeSchema.enum.Weight,
 					},
 					({ drop, quantity: selections }) => {
 						const totalOptionWeight = drop.reduce(
@@ -233,8 +233,8 @@ const readOwnedSourcesFx = Effect.fn("readOwnedItemDetailSourcesFx")(function* (
 			if (boardLocation !== undefined) {
 				const visibilityRules = line.rules.filter(
 					(rule) =>
-						rule.type === RuleEnumSchema.enum.Show ||
-						rule.type === RuleEnumSchema.enum.Hide,
+						rule.type === LineRuleTypeSchema.enum.Show ||
+						rule.type === LineRuleTypeSchema.enum.Hide,
 				);
 				let visible = line.show;
 				if (visibilityRules.length > 0) {

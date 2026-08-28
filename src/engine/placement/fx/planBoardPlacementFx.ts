@@ -4,7 +4,7 @@ import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveInteg
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
-import type { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
+import type { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { orderGridLocationsFx } from "./orderGridLocationsFx";
 import { planScopePlacementFx } from "./planScopePlacementFx";
@@ -16,7 +16,7 @@ export namespace planBoardPlacementFx {
 		excludedLocations?: ReadonlyArray<BoardLocationSchema.Type>;
 		item: ItemSchema.Type;
 		origin: BoardLocationSchema.Type;
-		placement: PlacementEnumSchema.Type;
+		placement: PlacementSchema.Type;
 		quantity: PositiveIntegerSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}

@@ -2,9 +2,9 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
-import { InputMaterialSchema } from "~/engine/input/schema/InputMaterialSchema";
+import { MaterialSchema } from "~/engine/input/schema/MaterialSchema";
 
-const fixedInput = InputMaterialSchema.parse({
+const fixedInput = MaterialSchema.parse({
 	type: "materials",
 	selector: {
 		type: "item",
@@ -60,7 +60,7 @@ describe("resolveInputMaterialFx", () => {
 	});
 
 	it("uses the stored quantity inside one accepted range", () => {
-		const input = InputMaterialSchema.parse({
+		const input = MaterialSchema.parse({
 			type: "materials",
 			selector: {
 				type: "item",

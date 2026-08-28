@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { RuleEnumSchema } from "~/engine/output/schema/drop/rule/RuleEnumSchema";
+import { TypeSchema } from "~/engine/output/schema/drop/rule/TypeSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { DropResolutionSchema } from "~/engine/output/schema/DropResolutionSchema";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
@@ -35,13 +35,13 @@ export const dropFx = Effect.fn("dropFx")(function* ({ drop, origin }: dropFx.Pr
 				match(result)
 					.with(
 						{
-							type: RuleEnumSchema.enum.Enable,
+							type: TypeSchema.enum.Enable,
 						},
 						({ active }) => active,
 					)
 					.with(
 						{
-							type: RuleEnumSchema.enum.Disable,
+							type: TypeSchema.enum.Disable,
 						},
 						({ active }) => !active,
 					)

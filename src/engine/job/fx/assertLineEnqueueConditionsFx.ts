@@ -2,8 +2,8 @@ import { Effect } from "effect";
 
 import { resolveActionChargeFx } from "~/engine/action/fx/resolveActionChargeFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { ChargeSourceSchema } from "~/engine/input/schema/ChargeSourceSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import { assertLineOutputMaxCountFx } from "~/engine/job/fx/assertLineOutputMaxCountFx";
 import type { LineStartResolutionSchema } from "~/engine/job/schema/read/LineStartResolutionSchema";
 import { readBoardItemLineFx } from "~/engine/line/fx/readBoardItemLineFx";
@@ -51,14 +51,14 @@ export const assertLineEnqueueConditionsFx = Effect.fn("assertLineEnqueueConditi
 		}
 		if (runInput.resolution.ready) continue;
 		if (
-			runInput.resolution.type !== InputEnumSchema.enum.Materials ||
-			configuredInput.type !== InputEnumSchema.enum.Materials ||
+			runInput.resolution.type !== TypeSchema.enum.Materials ||
+			configuredInput.type !== TypeSchema.enum.Materials ||
 			runInput.resolution.missingQuantity === 0
 		) {
 			missingConcreteInputsOnly = false;
 			break;
 		}
-		if (configuredInput.charges?.from !== InputChargeFromEnumSchema.enum.Self) continue;
+		if (configuredInput.charges?.from !== ChargeSourceSchema.enum.Self) continue;
 		const charges = yield* resolveActionChargeFx({
 			charges: configuredInput.charges,
 			ownerItemId: resolution.ownerItemId,

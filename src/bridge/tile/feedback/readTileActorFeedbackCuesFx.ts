@@ -4,8 +4,8 @@ import { match, P } from "ts-pattern";
 import type { GameTransition } from "~/bridge/game/GameSession";
 import type { TileActorFeedbackCue } from "~/bridge/tile/feedback/TileActorFeedbackCue";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import { ActionEnumSchema } from "~/engine/merge/schema/ActionEnumSchema";
-import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
+import { SourceActionSchema } from "~/engine/merge/schema/SourceActionSchema";
+import { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
 
 /**
  * Compiles exact committed facts into actor-local feedback without leaking choreography into the
@@ -81,7 +81,7 @@ export const readTileActorFeedbackCuesFx = Effect.fn("readTileActorFeedbackCuesF
 						},
 						(merged) => {
 							const cues: TileActorFeedbackCue[] =
-								merged.action === ActionEnumSchema.enum.Consume
+								merged.action === SourceActionSchema.enum.Consume
 									? [
 											{
 												actorId: merged.sourceItemId,
@@ -96,7 +96,7 @@ export const readTileActorFeedbackCuesFx = Effect.fn("readTileActorFeedbackCuesF
 							})
 								.with(
 									{
-										effect: EffectEnumSchema.enum.Replace,
+										effect: TargetEffectSchema.enum.Replace,
 									},
 									() =>
 										({
@@ -107,7 +107,7 @@ export const readTileActorFeedbackCuesFx = Effect.fn("readTileActorFeedbackCuesF
 								)
 								.with(
 									{
-										action: ActionEnumSchema.enum.Consume,
+										action: SourceActionSchema.enum.Consume,
 									},
 									() =>
 										({
@@ -118,10 +118,10 @@ export const readTileActorFeedbackCuesFx = Effect.fn("readTileActorFeedbackCuesF
 								)
 								.with(
 									{
-										action: ActionEnumSchema.enum.Use,
+										action: SourceActionSchema.enum.Use,
 										effect: P.union(
-											EffectEnumSchema.enum.Keep,
-											EffectEnumSchema.enum.Remove,
+											TargetEffectSchema.enum.Keep,
+											TargetEffectSchema.enum.Remove,
 										),
 									},
 									() => null,

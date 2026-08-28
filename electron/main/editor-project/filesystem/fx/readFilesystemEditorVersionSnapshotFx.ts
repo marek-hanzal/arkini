@@ -3,7 +3,7 @@ import { Effect } from "effect";
 
 import type { EditorProjectFilesystemPaths } from "../EditorProjectFilesystemPaths";
 import { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
-import { GameProjectFileSchema } from "~/engine/source/schema/GameProjectFileSchema";
+import { GameFileSchema } from "~/engine/source/schema/GameFileSchema";
 import { EditorVersionManifestSchema } from "~/editor/filesystem/EditorVersionManifestSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
@@ -92,7 +92,7 @@ export const readFilesystemEditorVersionSnapshotFx = Effect.fn(
 	const gameFile = yield* readJsonObjectFx(manifest.game).pipe(
 		Effect.flatMap((candidate) =>
 			Effect.try({
-				try: () => GameProjectFileSchema.parse(candidate),
+				try: () => GameFileSchema.parse(candidate),
 				catch: (cause) =>
 					new Error("The Editor version game object is invalid.", {
 						cause,

@@ -22,7 +22,7 @@ export const BlueprintItemSchema = z
 	})
 	.strict()
 	.meta({
-		id: "BlueprintItemSchema",
+		id: "item.BlueprintSchema",
 		description: "A construction-blueprint configuration with one product line.",
 	});
 

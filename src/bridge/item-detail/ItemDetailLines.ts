@@ -1,8 +1,8 @@
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import type { DistanceEnumSchema } from "~/engine/distance/schema/DistanceEnumSchema";
-import type { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
-import type { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
+import type { DistanceSchema } from "~/engine/distance/schema/DistanceSchema";
+import type { ChargeSourceSchema } from "~/engine/input/schema/ChargeSourceSchema";
+import type { ModeSchema } from "~/engine/input/schema/ModeSchema";
 import type { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 import type {
 	ItemDetailOutputRoll,
@@ -17,7 +17,7 @@ export namespace ItemDetailLines {
 
 	export interface ChargeCost {
 		readonly cost: number;
-		readonly from: InputChargeFromEnumSchema.Type;
+		readonly from: ChargeSourceSchema.Type;
 	}
 
 	export interface Selector {
@@ -38,7 +38,7 @@ export namespace ItemDetailLines {
 				readonly kind: "materials";
 				readonly inputIndex: NonNegativeIntegerSchema.Type;
 				readonly selector: Selector;
-				readonly mode: InputModeEnumSchema.Type;
+				readonly mode: ModeSchema.Type;
 				readonly required: QuantityBounds;
 				readonly storedQuantity: number;
 				readonly deliveryQuantity: number;
@@ -55,7 +55,7 @@ export namespace ItemDetailLines {
 		| {
 				readonly kind: "deposit";
 				readonly selector: Selector;
-				readonly distance: DistanceEnumSchema.Type;
+				readonly distance: DistanceSchema.Type;
 				readonly requiredCharges: number;
 				readonly availableCharges: number;
 				readonly availableChargesLabel: string;
@@ -137,7 +137,7 @@ export namespace ItemDetailLines {
 		| {
 				readonly kind: "deposit-target-missing";
 				readonly selector: Selector;
-				readonly distance: DistanceEnumSchema.Type;
+				readonly distance: DistanceSchema.Type;
 				readonly detail?: DetailReference;
 				readonly messageBeforeDetail?: string;
 				readonly messageAfterDetail?: string;

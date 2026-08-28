@@ -9,7 +9,7 @@ import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
 import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
-import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
+import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
 import type { OutputPlacementResultSchema } from "~/engine/placement/schema/OutputPlacementResultSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
@@ -116,7 +116,7 @@ export const splitBoardItemStackFx = Effect.fn("splitBoardItemStackFx")(function
 					drop: [
 						{
 							itemId: sourceBefore.item.id,
-							placement: PlacementEnumSchema.enum.Drop,
+							placement: PlacementSchema.enum.Drop,
 							quantity: splitQuantity,
 						},
 					],

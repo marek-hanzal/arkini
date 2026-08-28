@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { RuleShowSchema } from "~/engine/line/schema/rule/RuleShowSchema";
+import type { ShowSchema } from "~/engine/line/schema/rule/ShowSchema";
 import type { RuleShowResultSchema } from "~/engine/line/schema/rule/RuleShowResultSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import { whenFx } from "~/engine/when/fx/whenFx";
@@ -8,7 +8,7 @@ import { whenFx } from "~/engine/when/fx/whenFx";
 export namespace lineRuleShowFx {
 	export interface Props {
 		origin: BoardLocationSchema.Type;
-		rule: RuleShowSchema.Type;
+		rule: ShowSchema.Type;
 	}
 }
 

@@ -5,7 +5,7 @@ import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSour
 import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 
 import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
@@ -34,7 +34,7 @@ export const validateLineInputCapacityFx = Effect.fn("validateLineInputCapacityF
 		});
 		for (const { line, path } of lines) {
 			for (const [inputIndex, input] of line.input.entries()) {
-				if (input.type !== InputEnumSchema.enum.Materials || input.capacity === 0) {
+				if (input.type !== TypeSchema.enum.Materials || input.capacity === 0) {
 					continue;
 				}
 				diagnostics.push({

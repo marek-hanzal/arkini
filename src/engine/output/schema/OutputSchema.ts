@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { RollSetSchema } from "~/engine/roll/schema/RollSetSchema";
+import { SetSchema } from "~/engine/roll/schema/SetSchema";
 
 /**
  * A named result produced by a gameplay source such as a production line or stash.
@@ -15,9 +15,9 @@ export const OutputSchema = z
 		set: z
 			.tuple(
 				[
-					RollSetSchema,
+					SetSchema,
 				],
-				RollSetSchema,
+				SetSchema,
 			)
 			.describe("One or more alternative roll sets provided by this output."),
 	})

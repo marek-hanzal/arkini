@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
-import { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
+import { ModeSchema } from "~/engine/input/schema/ModeSchema";
 import { readItemRemainingChargesFx } from "~/engine/item/fx/readItemRemainingChargesFx";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { LineRunPlanSchema } from "~/engine/line/schema/run/LineRunPlanSchema";
@@ -38,10 +38,7 @@ export const readPlannedLineNetMaximumOutputQuantitiesFx = Effect.fn(
 				);
 
 	for (const input of plan.input) {
-		if (
-			input.type !== InputEnumSchema.enum.Materials ||
-			input.mode !== InputModeEnumSchema.enum.Consume
-		) {
+		if (input.type !== TypeSchema.enum.Materials || input.mode !== ModeSchema.enum.Consume) {
 			continue;
 		}
 		for (const allocation of input.item) {

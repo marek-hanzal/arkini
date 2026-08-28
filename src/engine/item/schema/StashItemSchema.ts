@@ -20,7 +20,7 @@ export const StashItemSchema = z
 	})
 	.strict()
 	.meta({
-		id: "StashItemSchema",
+		id: "item.StashSchema",
 		description: "An item configuration with one product line.",
 	});
 

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { RuleDisableSchema } from "./RuleDisableSchema";
-import { RuleEnableSchema } from "./RuleEnableSchema";
+import { DisableSchema } from "./DisableSchema";
+import { EnableSchema } from "./EnableSchema";
 
 /**
  * An availability rule evaluated for a drop selected by a successful roll.
@@ -11,11 +11,11 @@ import { RuleEnableSchema } from "./RuleEnableSchema";
  */
 export const RuleSchema = z
 	.discriminatedUnion("type", [
-		RuleEnableSchema,
-		RuleDisableSchema,
+		EnableSchema,
+		DisableSchema,
 	])
 	.meta({
-		id: "DropRuleSchema",
+		id: "drop.RuleSchema",
 		description: "An availability rule evaluated for a selected drop.",
 	});
 

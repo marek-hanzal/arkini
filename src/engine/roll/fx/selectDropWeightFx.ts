@@ -1,10 +1,10 @@
 import { Array, Effect, Option, pipe, Random } from "effect";
 
-import type { RollWeightSchema } from "~/engine/roll/schema/RollWeightSchema";
+import type { WeightSchema } from "~/engine/roll/schema/WeightSchema";
 
 export namespace selectDropWeightFx {
 	export interface Props {
-		drop: RollWeightSchema.Type["drop"];
+		drop: WeightSchema.Type["drop"];
 	}
 }
 

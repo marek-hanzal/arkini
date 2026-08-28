@@ -2,13 +2,13 @@ import { Effect } from "effect";
 
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RuleDisableResultSchema } from "~/engine/output/schema/drop/rule/RuleDisableResultSchema";
-import type { RuleDisableSchema } from "~/engine/output/schema/drop/rule/RuleDisableSchema";
+import type { DisableSchema } from "~/engine/output/schema/drop/rule/DisableSchema";
 import { whenFx } from "~/engine/when/fx/whenFx";
 
 export namespace dropRuleDisableFx {
 	export interface Props {
 		origin: GridLocationSchema.Type;
-		rule: RuleDisableSchema.Type;
+		rule: DisableSchema.Type;
 	}
 }
 

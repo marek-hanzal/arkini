@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 
-import type { RollChanceSchema } from "~/engine/roll/schema/RollChanceSchema";
+import type { ChanceSchema } from "~/engine/roll/schema/ChanceSchema";
 import type { RollResultSchema } from "~/engine/roll/schema/RollResultSchema";
 import { testChanceFx } from "./testChanceFx";
 
 export namespace rollChanceFx {
 	export interface Props {
-		roll: RollChanceSchema.Type;
+		roll: ChanceSchema.Type;
 	}
 }
 

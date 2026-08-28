@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 
-import type { RollGuaranteedSchema } from "~/engine/roll/schema/RollGuaranteedSchema";
+import type { GuaranteedSchema } from "~/engine/roll/schema/GuaranteedSchema";
 import type { RollResultSchema } from "~/engine/roll/schema/RollResultSchema";
 
 export namespace rollGuaranteedFx {
 	export interface Props {
-		roll: RollGuaranteedSchema.Type;
+		roll: GuaranteedSchema.Type;
 	}
 }
 

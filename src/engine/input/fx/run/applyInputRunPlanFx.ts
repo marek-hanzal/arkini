@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
+import { ModeSchema } from "~/engine/input/schema/ModeSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
@@ -9,7 +9,7 @@ import { applyInputMaterialConsumeRunPlanFx } from "~/engine/input/fx/run/applyI
 import { applyInputMaterialReserveRunPlanFx } from "~/engine/input/fx/run/applyInputMaterialReserveRunPlanFx";
 import type { InputRunPlanSchema } from "~/engine/input/schema/run/InputRunPlanSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 
 export namespace applyInputRunPlanFx {
 	export interface Props {
@@ -40,7 +40,7 @@ export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 	return yield* match(plan)
 		.with(
 			{
-				type: InputEnumSchema.enum.Simple,
+				type: TypeSchema.enum.Simple,
 			},
 			() =>
 				Effect.succeed({
@@ -51,8 +51,8 @@ export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 		)
 		.with(
 			{
-				type: InputEnumSchema.enum.Materials,
-				mode: InputModeEnumSchema.enum.Consume,
+				type: TypeSchema.enum.Materials,
+				mode: ModeSchema.enum.Consume,
 			},
 			(plan) =>
 				applyInputMaterialConsumeRunPlanFx({
@@ -66,8 +66,8 @@ export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 		)
 		.with(
 			{
-				type: InputEnumSchema.enum.Materials,
-				mode: InputModeEnumSchema.enum.Reserve,
+				type: TypeSchema.enum.Materials,
+				mode: ModeSchema.enum.Reserve,
 			},
 			(plan) =>
 				applyInputMaterialReserveRunPlanFx({
@@ -90,7 +90,7 @@ export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 		)
 		.with(
 			{
-				type: InputEnumSchema.enum.Deposit,
+				type: TypeSchema.enum.Deposit,
 			},
 			() =>
 				Effect.succeed({

@@ -4,13 +4,13 @@ import { match } from "ts-pattern";
 import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
+import { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import { assertOwnerIdleFx } from "~/engine/job/fx/assertOwnerIdleFx";
 import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
 import { resolveMergeReplacementChargesFx } from "~/engine/merge/fx/resolveMergeReplacementChargesFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
-import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
+import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
 import { createRuntimeItemFx } from "~/engine/runtime/fx/createRuntimeItemFx";
 import { removeRuntimeItemFx } from "~/engine/runtime/fx/removeRuntimeItemFx";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
@@ -39,7 +39,7 @@ export const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(fu
 	return yield* match(rule)
 		.with(
 			{
-				effect: EffectEnumSchema.enum.Keep,
+				effect: TargetEffectSchema.enum.Keep,
 			},
 			() =>
 				Effect.succeed({
@@ -49,7 +49,7 @@ export const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(fu
 		)
 		.with(
 			{
-				effect: EffectEnumSchema.enum.Remove,
+				effect: TargetEffectSchema.enum.Remove,
 			},
 			() =>
 				Effect.gen(function* () {
@@ -83,7 +83,7 @@ export const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(fu
 		)
 		.with(
 			{
-				effect: EffectEnumSchema.enum.Replace,
+				effect: TargetEffectSchema.enum.Replace,
 			},
 			({ result }) =>
 				Effect.gen(function* () {
@@ -125,7 +125,7 @@ export const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(fu
 							drop: [
 								{
 									itemId: target.item.id,
-									placement: PlacementEnumSchema.enum.Drop,
+									placement: PlacementSchema.enum.Drop,
 									quantity: target.quantity - 1,
 								},
 							],

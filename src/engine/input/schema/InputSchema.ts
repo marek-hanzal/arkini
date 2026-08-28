@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { InputDepositSchema } from "./InputDepositSchema";
-import { InputMaterialSchema } from "./InputMaterialSchema";
-import { InputSimpleSchema } from "./InputSimpleSchema";
+import { DepositSchema } from "./DepositSchema";
+import { MaterialSchema } from "./MaterialSchema";
+import { SimpleSchema } from "./SimpleSchema";
 
 /**
  * A discriminated resource requirement for one product line.
@@ -14,9 +14,9 @@ import { InputSimpleSchema } from "./InputSimpleSchema";
  */
 export const InputSchema = z
 	.discriminatedUnion("type", [
-		InputSimpleSchema,
-		InputMaterialSchema,
-		InputDepositSchema,
+		SimpleSchema,
+		MaterialSchema,
+		DepositSchema,
 	])
 	.meta({
 		id: "InputSchema",

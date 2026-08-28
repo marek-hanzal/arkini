@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 
-import { ActionRuleEnumSchema } from "./ActionRuleEnumSchema";
+import { RuleTypeSchema } from "./RuleTypeSchema";
 
 const BaseActionRuleResultSchema = z
 	.object({
@@ -14,7 +14,7 @@ const BaseActionRuleResultSchema = z
 export const ActionRuleEnableResultSchema = z
 	.object({
 		...BaseActionRuleResultSchema.shape,
-		type: ActionRuleEnumSchema.extract([
+		type: RuleTypeSchema.extract([
 			"Enable",
 		]),
 	})
@@ -31,7 +31,7 @@ export namespace ActionRuleEnableResultSchema {
 export const ActionRuleDisableResultSchema = z
 	.object({
 		...BaseActionRuleResultSchema.shape,
-		type: ActionRuleEnumSchema.extract([
+		type: RuleTypeSchema.extract([
 			"Disable",
 		]),
 	})

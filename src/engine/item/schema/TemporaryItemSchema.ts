@@ -53,7 +53,7 @@ export const TemporaryItemSchema = z
 	})
 	.strict()
 	.meta({
-		id: "TemporaryItemSchema",
+		id: "item.TemporarySchema",
 		description:
 			"A board-only, non-stackable item configuration with lifetime and optional expiry output.",
 	});

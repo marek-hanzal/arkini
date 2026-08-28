@@ -5,7 +5,132 @@ import { createEditorProjectVersionDiffFx } from "~/editor/version/createEditorP
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
+const from = {
+	type: "version" as const,
+	versionId: "before",
+};
+const to = {
+	type: "current" as const,
+};
+
+const readConfigDiff = (before: GameConfigSchema.Type, after: GameConfigSchema.Type) =>
+	Effect.runSync(
+		createEditorProjectVersionDiffFx(
+			from,
+			to,
+			{
+				arkpackVersion: "1.0",
+				config: before,
+				resources: new Map(),
+				scenarios: new Map(),
+			},
+			{
+				arkpackVersion: "2.0",
+				config: after,
+				resources: new Map(),
+				scenarios: new Map(),
+			},
+		),
+	);
+
 describe("createEditorProjectVersionDiffFx", () => {
+	it("keeps an item ID rename under its UID when another item releases that ID", () => {
+		const reserved = {
+			...editorTestPayload.config.items.water,
+			id: "reserved",
+			uid: "reserved",
+			title: "Reserved",
+		};
+		const beforeConfig = GameConfigSchema.parse({
+			...editorTestPayload.config,
+			items: {
+				reserved,
+				water: editorTestPayload.config.items.water,
+			},
+		});
+		const afterConfig = GameConfigSchema.parse({
+			...beforeConfig,
+			start: {
+				...beforeConfig.start,
+				board: beforeConfig.start.board.map((item) => ({
+					...item,
+					itemId: "reserved",
+				})),
+			},
+			items: {
+				reserved: {
+					...beforeConfig.items.water,
+					id: "reserved",
+				},
+			},
+		});
+		const diff = readConfigDiff(beforeConfig, afterConfig);
+
+		expect(diff.items).toEqual([
+			{
+				change: "deleted",
+				uid: "reserved",
+				values: [
+					{
+						before: reserved,
+						bump: "major",
+						path: "",
+					},
+				],
+			},
+			{
+				change: "changed",
+				uid: "water",
+				values: [
+					{
+						before: "water",
+						after: "reserved",
+						bump: "major",
+						path: "id",
+					},
+				],
+			},
+		]);
+	});
+
+	it("keeps replacement item identities separate when one item ID changes UID", () => {
+		const afterConfig = GameConfigSchema.parse({
+			...editorTestPayload.config,
+			items: {
+				water: {
+					...editorTestPayload.config.items.water,
+					uid: "water-new",
+				},
+			},
+		});
+		const diff = readConfigDiff(editorTestPayload.config, afterConfig);
+
+		expect(diff.items).toEqual([
+			{
+				change: "deleted",
+				uid: "water",
+				values: [
+					{
+						before: editorTestPayload.config.items.water,
+						bump: "major",
+						path: "",
+					},
+				],
+			},
+			{
+				change: "added",
+				uid: "water-new",
+				values: [
+					{
+						after: afterConfig.items.water,
+						bump: "major",
+						path: "",
+					},
+				],
+			},
+		]);
+	});
+
 	it("projects the canonical compatibility diff and classifies opaque resource changes", () => {
 		const oil = {
 			...editorTestPayload.config.items.water,
@@ -31,13 +156,6 @@ describe("createEditorProjectVersionDiffFx", () => {
 				},
 			},
 		});
-		const from = {
-			type: "version" as const,
-			versionId: "before",
-		};
-		const to = {
-			type: "current" as const,
-		};
 		const diff = Effect.runSync(
 			createEditorProjectVersionDiffFx(
 				from,

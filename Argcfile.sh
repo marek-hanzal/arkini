@@ -78,17 +78,19 @@ package_windows_artifacts() {
 }
 
 package_linux_artifacts() {
-	local version
+	local architecture artifact_arch version
+	architecture=$1
+	artifact_arch=$2
 	version=$(desktop_version)
 	electron-builder \
 		--config electron-builder.yml \
 		--linux AppImage \
-		--x64 \
+		"--$architecture" \
 		--publish never
 	(
 		cd .out/desktop/release
 		sha256sum \
-			"Arkini-$version-linux-x86_64.AppImage" >SHA256SUMS-linux-x64
+			"Arkini-$version-linux-$artifact_arch.AppImage" >"SHA256SUMS-linux-$architecture"
 	)
 }
 
@@ -267,7 +269,14 @@ package-windows() {
 package-linux() {
 	clean_desktop
 	build
-	package_linux_artifacts
+	package_linux_artifacts x64 x86_64
+}
+
+# @cmd Build unsigned Linux arm64 AppImage release artifacts
+package-linux-arm64() {
+	clean_desktop
+	build
+	package_linux_artifacts arm64 arm64
 }
 
 # @cmd Format the repository

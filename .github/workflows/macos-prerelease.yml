@@ -93,11 +93,23 @@ jobs:
           retention-days: 14
 
   package-linux:
-    name: Build release-channel Linux x64 artifacts
-    runs-on: ubuntu-24.04
+    name: Build release-channel Linux ${{ matrix.architecture }} artifacts
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - architecture: x64
+            os: ubuntu-24.04
+            command: package-linux
+            artifact: arkini-linux-x64
+          - architecture: arm64
+            os: ubuntu-24.04-arm
+            command: package-linux-arm64
+            artifact: arkini-linux-arm64
     defaults:
       run:
         shell: bash
@@ -115,16 +127,16 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         run: ./Argcfile.sh version "${GITHUB_REF_NAME#v}"
 
-      - name: Package Linux x64 application
-        run: ./Argcfile.sh package-linux
+      - name: Package Linux application
+        run: ./Argcfile.sh "${{ matrix.command }}"
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v6
         with:
-          name: arkini-linux-x64-${{ github.run_number }}-${{ github.run_attempt }}
+          name: ${{ matrix.artifact }}-${{ github.run_number }}-${{ github.run_attempt }}
           path: |
             .out/desktop/release/*.AppImage
-            .out/desktop/release/SHA256SUMS-linux-x64
+            .out/desktop/release/SHA256SUMS-linux-${{ matrix.architecture }}
           if-no-files-found: error
           retention-days: 14
 
@@ -151,11 +163,17 @@ jobs:
           name: arkini-windows-x64-${{ github.run_number }}-${{ github.run_attempt }}
           path: release/windows
 
-      - name: Download Linux artifacts
+      - name: Download Linux x64 artifacts
         uses: actions/download-artifact@v8
         with:
           name: arkini-linux-x64-${{ github.run_number }}-${{ github.run_attempt }}
-          path: release/linux
+          path: release/linux-x64
+
+      - name: Download Linux arm64 artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: arkini-linux-arm64-${{ github.run_number }}-${{ github.run_attempt }}
+          path: release/linux-arm64
 
       - name: Publish GitHub prerelease
         env:
@@ -171,9 +189,11 @@ jobs:
             release/windows/*.exe \
             release/windows/*.zip \
             release/windows/SHA256SUMS-windows-x64 \
-            release/linux/*.AppImage \
-            release/linux/SHA256SUMS-linux-x64 \
+            release/linux-x64/*.AppImage \
+            release/linux-x64/SHA256SUMS-linux-x64 \
+            release/linux-arm64/*.AppImage \
+            release/linux-arm64/SHA256SUMS-linux-arm64 \
             --verify-tag \
             --prerelease \
             --title "Arkini $GITHUB_REF_NAME" \
-            --notes "Unsigned macOS Apple Silicon, Windows x64, and Linux x64 builds plus the standalone official Arkpack. Verify the platform checksum file before opening; macOS requires the normal Gatekeeper override."
+            --notes "Unsigned macOS Apple Silicon, Windows x64, and Linux x64/arm64 builds plus the standalone official Arkpack. Verify the platform checksum file before opening; macOS requires the normal Gatekeeper override."

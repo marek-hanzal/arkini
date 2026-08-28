@@ -18,8 +18,8 @@ export interface EditorItemEstimateRequirementSummary {
 }
 
 export interface EditorItemEstimateRequirementStep {
-	/** Canonical fact whose route establishes this requirement, when acquisition is needed. */
-	readonly acquisitionFactId?: string;
+	/** Selected route occurrence that establishes this requirement. */
+	readonly acquisitionOccurrenceId?: string;
 	readonly factId: string;
 	readonly quantity: number;
 	/** Authored reasons that make this fact a prerequisite of the selected route. */
@@ -33,6 +33,10 @@ export interface EditorItemEstimateRouteStep {
 	readonly durationMs: number;
 	readonly factId: string;
 	readonly metadata?: EditorAcquisitionRouteMetadata;
+	/** Equivalent independent occurrences compressed into this scalar witness node. */
+	readonly occurrenceCount: number;
+	/** Stable identity of this compressed occurrence group. */
+	readonly occurrenceId: string;
 	readonly outputRuns: number;
 	readonly quantity: number;
 	readonly requirements: ReadonlyArray<EditorItemEstimateRequirementStep>;
@@ -50,8 +54,9 @@ export type EditorItemEstimateDiagnostic =
 			readonly source: "authored-demand" | "request";
 	  }
 	| {
-			readonly kind: "joint-output-accounting-unsupported";
-			readonly reason: "state-space";
+			readonly factId: string;
+			readonly kind: "quantity-specific-route-not-retried";
+			readonly quantity: number;
 			readonly routeId: string;
 	  }
 	| {
@@ -72,7 +77,7 @@ export type EditorItemEstimateDiagnostic =
 	  };
 
 interface EditorItemEstimateBase {
-	/** Failure evidence; complete estimates may retain bounded diagnostics from rejected alternatives. */
+	/** Bounded evidence for partial or unreachable estimates. */
 	readonly diagnostics: ReadonlyArray<EditorItemEstimateDiagnostic>;
 	readonly factId: string;
 	readonly limitations: ReadonlyArray<EditorAcquisitionLimitation>;
@@ -86,7 +91,7 @@ export interface ObtainableEditorItemEstimate extends EditorItemEstimateBase {
 	readonly obtainable: true;
 	readonly status: "complete";
 	readonly route: EditorItemEstimateRouteStep;
-	/** Normalized selected-route DAG. Every acquired fact occurs exactly once. */
+	/** Selected route occurrence groups in deterministic dependency order. */
 	readonly routeSteps: ReadonlyArray<EditorItemEstimateRouteStep>;
 }
 

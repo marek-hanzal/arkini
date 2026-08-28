@@ -205,7 +205,19 @@ describe("game route lifecycle", () => {
 		await vi.advanceTimersByTimeAsync(2_500);
 		await loading;
 
-		expect(router.state.location.pathname).toBe("/settings");
+		expect(router.state.location.pathname).toBe("/settings/common");
+		expect(dispose).not.toHaveBeenCalled();
+		expect(
+			rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack.packageId,
+		).toBe("package-route");
+
+		await router.navigate({
+			to: "/settings/game",
+		});
+		await router.navigate({
+			to: "/settings/dev",
+		});
+
 		expect(dispose).not.toHaveBeenCalled();
 		expect(
 			rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack.packageId,

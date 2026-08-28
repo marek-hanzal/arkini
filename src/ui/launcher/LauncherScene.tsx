@@ -7,16 +7,20 @@ const layoutClassNames = {
 		"flex size-full min-h-0 min-w-0 flex-col items-center justify-center gap-[var(--ak-viewport-gap)]",
 	"fixed-hero":
 		"grid size-full min-h-0 min-w-0 justify-items-center gap-[var(--ak-viewport-gap)]",
+	"overlaid-hero": "grid size-full min-h-0 min-w-0 justify-items-center",
 } as const;
 
 const heroSlotClassNames = {
 	centered: "flex shrink-0 items-center justify-center",
 	"fixed-hero": "flex min-h-0 w-full items-end justify-center",
+	"overlaid-hero": "col-start-1 row-start-1 flex min-h-0 w-full items-start justify-center",
 } as const;
 
 const contentSlotClassNames = {
 	centered: "flex min-h-0 min-w-0 flex-col items-center justify-center",
 	"fixed-hero": "flex size-full min-h-0 min-w-0 flex-col items-center justify-start",
+	"overlaid-hero":
+		"relative z-10 col-start-1 row-start-1 flex size-full min-h-0 min-w-0 flex-col items-center justify-start",
 } as const;
 
 type LauncherSceneLayout = keyof typeof layoutClassNames;

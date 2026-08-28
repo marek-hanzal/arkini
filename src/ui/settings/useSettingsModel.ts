@@ -7,8 +7,6 @@ import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
 import type { WindowMode } from "~/bridge/window/WindowMode";
 import { WindowModeAtom } from "~/bridge/window/WindowModeAtom";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
-import { useSettingsDirectoriesModel } from "~/ui/settings/useSettingsDirectoriesModel";
-import { useSettingsCliModel } from "~/ui/settings/useSettingsCliModel";
 import { SettingsCommandAtom } from "~/ui/settings/SettingsCommandAtom";
 
 /** Owns application settings commands and the one Escape lifecycle for the settings surface. */
@@ -21,8 +19,6 @@ export const useSettingsModel = ({
 	const cheatAvailability = useCheatAvailability();
 	const windowMode = useAtomValue(WindowModeAtom);
 	const [commandState, runCommand] = useAtom(SettingsCommandAtom);
-	const cli = useSettingsCliModel();
-	const directories = useSettingsDirectoriesModel();
 	const blocked = commandState.kind === "pending";
 	const exitPending = commandState.kind === "pending" && commandState.action === "exit";
 	const goBack = useCallback(() => {
@@ -50,9 +46,7 @@ export const useSettingsModel = ({
 	return {
 		blocked,
 		cheatToolsAvailable: cheatAvailability.available,
-		...cli,
 		exitPending,
-		...directories,
 		status: commandState,
 		theme: appearance.theme,
 		windowMode,

@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { CircleCheckBig } from "lucide-react";
 
 import { PrimaryButton } from "~/ui/button/Button";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
@@ -35,7 +36,7 @@ export const Route = createFileRoute("/editor/$projectId/versions/commit")({
 						<Status
 							dataUi="EditorVersionCommitClean"
 							description="Working copy matches its current base. Change the saved project before creating another version."
-							icon="icon-[lucide--circle-check-big]"
+							icon={CircleCheckBig}
 							title="Working copy is clean"
 						/>
 					) : (

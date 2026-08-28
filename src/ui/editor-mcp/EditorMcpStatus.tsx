@@ -1,3 +1,5 @@
+import { Check, Copy } from "lucide-react";
+
 const statusClassNames = {
 	muted: "text-sm text-muted",
 	danger: "text-sm text-danger",
@@ -25,16 +27,19 @@ export const EditorMcpCopyButton = ({
 	readonly copied: boolean;
 	readonly onCopy: () => void;
 	readonly title: string;
-}) => (
-	<button
-		type="button"
-		className="grid size-6 shrink-0 cursor-pointer place-items-center border-0 bg-transparent p-0 text-current opacity-65 transition-opacity hover:opacity-100"
-		title={copied ? "Copied" : title}
-		onClick={onCopy}
-	>
-		<span className={`${copied ? "icon-[lucide--check]" : "icon-[lucide--copy]"} size-4`} />
-	</button>
-);
+}) => {
+	const Icon = copied ? Check : Copy;
+	return (
+		<button
+			type="button"
+			className="grid size-6 shrink-0 cursor-pointer place-items-center border-0 bg-transparent p-0 text-current opacity-65 transition-opacity hover:opacity-100"
+			title={copied ? "Copied" : title}
+			onClick={onCopy}
+		>
+			<Icon className="size-4" />
+		</button>
+	);
+};
 
 export const EditorMcpCopyableUrl = ({
 	copied,

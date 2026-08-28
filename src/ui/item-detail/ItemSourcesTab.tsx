@@ -1,3 +1,5 @@
+import { ChevronRight } from "lucide-react";
+
 import type { useItemDetailSources } from "~/bridge/item-detail/useItemDetailSources";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { ItemIdentity } from "~/ui/item/ItemIdentity";
@@ -55,8 +57,8 @@ const SourceRow = ({
 					titleClassName="truncate text-base font-semibold text-foreground"
 					titleTag="h3"
 				/>
-				<span
-					className="icon-[lucide--chevron-right] size-5 shrink-0 text-muted transition-colors group-hover:text-accent"
+				<ChevronRight
+					className="size-5 shrink-0 text-muted transition-colors group-hover:text-accent"
 					aria-hidden="true"
 				/>
 			</button>

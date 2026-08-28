@@ -97,10 +97,10 @@ export const EditorItemEstimateRouteGraph = ({
 									</span>
 								) : (
 									<EditorItemDetailReference
-										className="flex-1 before:absolute before:inset-0 before:content-['']"
 										item={item}
 										projectId={projectId}
 										sectionId="estimate"
+										stretched
 									/>
 								)}
 								{route.rootQuantity > 0 ? (

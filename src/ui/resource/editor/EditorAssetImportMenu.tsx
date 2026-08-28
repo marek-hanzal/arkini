@@ -1,4 +1,5 @@
 import { FloatingPortal } from "@floating-ui/react";
+import { ChevronDown, Images, PackageOpen } from "lucide-react";
 
 import { Button, PrimaryButton } from "~/ui/button/Button";
 import { useEditorFloatingMenu } from "~/ui/editor/useEditorFloatingMenu";
@@ -35,7 +36,7 @@ export const EditorAssetImportMenu = ({
 					disabled={pending}
 					onClick={onImportArkpack}
 				>
-					<span className="icon-[lucide--package-open] size-4" />
+					<PackageOpen className="size-4" />
 					Import assets
 				</PrimaryButton>
 				<PrimaryButton
@@ -46,7 +47,7 @@ export const EditorAssetImportMenu = ({
 					disabled={pending}
 					{...getReferenceProps()}
 				>
-					<span className="icon-[lucide--chevron-down] size-4" />
+					<ChevronDown className="size-4" />
 				</PrimaryButton>
 			</div>
 			{open ? (
@@ -63,7 +64,7 @@ export const EditorAssetImportMenu = ({
 							data-ui="EditorAssetImportArkpackOption"
 							onClick={() => runImport(onImportArkpack)}
 						>
-							<span className="icon-[lucide--package-open] size-5 shrink-0 text-accent" />
+							<PackageOpen className="size-5 shrink-0 text-accent" />
 							<span>
 								<span className="block font-semibold">From arkpack</span>
 								<span className="mt-0.5 block text-xs font-normal leading-4 text-muted">
@@ -76,7 +77,7 @@ export const EditorAssetImportMenu = ({
 							data-ui="EditorAssetImportFilesOption"
 							onClick={() => runImport(onImportFiles)}
 						>
-							<span className="icon-[lucide--images] size-5 shrink-0 text-accent" />
+							<Images className="size-5 shrink-0 text-accent" />
 							<span>
 								<span className="block font-semibold">PNG files</span>
 								<span className="mt-0.5 block text-xs font-normal leading-4 text-muted">

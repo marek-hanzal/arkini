@@ -1,3 +1,5 @@
+import { Factory } from "lucide-react";
+
 import type { EditorLine } from "~/bridge/item/editor/EditorItemModel";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
@@ -91,7 +93,7 @@ export const EditorProductionFields = withFieldGroup({
 								<EditorCapabilityStatus
 									actionLabel="Enable production lines"
 									description="This deposit currently only supplies matching deposit inputs. Production lines add self-consuming jobs that can transform the deposit and emit outputs."
-									icon="icon-[lucide--factory]"
+									icon={Factory}
 									onEnable={addLine}
 									title="Production lines are disabled"
 								/>

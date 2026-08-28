@@ -1,3 +1,4 @@
+import { CircleOff, ListX } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 import { useClearItemDetailQueue } from "~/bridge/item-detail/useClearItemDetailQueue";
@@ -94,8 +95,8 @@ const ActiveQueueSlot = ({
 						transition={itemDetailMotionTransition}
 					>
 						<h3 className="flex items-center gap-2 text-lg font-semibold leading-tight text-foreground">
-							<span
-								className="icon-[lucide--circle-off] size-5 shrink-0 text-muted"
+							<CircleOff
+								className="size-5 shrink-0 text-muted"
 								aria-hidden="true"
 							/>
 							No active job
@@ -336,8 +337,8 @@ export const ItemQueueTab = ({
 								{...itemDetailFadeMotion}
 							>
 								<div className="grid justify-items-center gap-2">
-									<span
-										className="icon-[lucide--list-x] size-6 text-subtle"
+									<ListX
+										className="size-6 text-subtle"
 										aria-hidden="true"
 									/>
 									<p>Queue is empty</p>

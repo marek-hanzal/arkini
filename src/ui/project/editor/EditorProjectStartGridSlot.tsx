@@ -1,5 +1,5 @@
+import { Plus } from "lucide-react";
 import { type PointerEvent as ReactPointerEvent, type RefObject } from "react";
-import { twMerge } from "tailwind-merge";
 
 import type { EditorProjectStartScope } from "~/bridge/project/editor/EditorProjectStartScope";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
@@ -51,11 +51,7 @@ export const EditorProjectStartGridSlot = ({
 				? `Empty ${scope} slot ${position.x + 1}, ${position.y + 1}`
 				: `${itemTitle ?? cell.itemId}, quantity ${cell.quantity}`
 		}
-		className={twMerge(
-			"relative grid size-[4.5rem] cursor-pointer place-items-center rounded-lg border border-line bg-surface/70 text-subtle transition-[background-color,border-color,opacity,box-shadow] hover:border-line-strong hover:bg-surface-raised",
-			isDragSource && "opacity-30",
-			isDragTarget && "border-accent ring-2 ring-accent/60 ring-offset-1 ring-offset-canvas",
-		)}
+		className={`relative grid size-[4.5rem] cursor-pointer place-items-center rounded-lg border bg-surface/70 text-subtle transition-[background-color,border-color,opacity,box-shadow] hover:border-line-strong hover:bg-surface-raised ${isDragTarget ? "border-accent ring-2 ring-accent/60 ring-offset-1 ring-offset-canvas" : "border-line"}${isDragSource ? " opacity-30" : ""}`}
 		data-start-grid-cell="true"
 		data-x={position.x}
 		data-y={position.y}
@@ -113,7 +109,7 @@ export const EditorProjectStartGridSlot = ({
 		type="button"
 	>
 		{itemResourceIds === undefined ? (
-			<span className="icon-[lucide--plus] size-4 opacity-35" />
+			<Plus className="size-4 opacity-35" />
 		) : (
 			<EditorItemThumbnail
 				className="size-14 border-0 bg-transparent"

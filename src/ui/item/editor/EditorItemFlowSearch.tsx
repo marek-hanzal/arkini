@@ -1,3 +1,5 @@
+import { X } from "lucide-react";
+
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import { type EditorSearchOption, EditorSearchCombobox } from "~/ui/form/EditorSearchCombobox";
 import { EditorItemSearchThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
@@ -44,7 +46,7 @@ export const EditorItemFlowSearch = ({
 					className="grid min-h-[var(--ak-control-min-height)] min-w-[var(--ak-control-min-height)] cursor-pointer place-items-center rounded-lg border border-line-strong bg-surface-raised text-muted hover:text-foreground"
 					onClick={() => onChange("")}
 				>
-					<span className="icon-[lucide--x] size-5" />
+					<X className="size-5" />
 				</button>
 			</Tooltip>
 		)}

@@ -67,7 +67,7 @@ export const Route = createFileRoute("/")({
 				},
 				({ content }) => (
 					<LauncherScene
-						className={content.kind === "loading" ? "cursor-wait" : "cursor-default"}
+						cursor={content.kind === "loading" ? "wait" : "default"}
 						dataUi="StartupSplash"
 						onClick={lifecycle.skip}
 					>

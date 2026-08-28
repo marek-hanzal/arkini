@@ -1,3 +1,4 @@
+import { ArrowLeft } from "lucide-react";
 import { forwardRef, type ComponentPropsWithoutRef } from "react";
 import { twMerge } from "tailwind-merge";
 import { PrimaryButton } from "~/ui/button/Button";
@@ -12,8 +13,8 @@ export const BackButton = forwardRef<HTMLButtonElement, BackButtonProps>(
 			className={twMerge("mx-auto gap-2", className)}
 			{...props}
 		>
-			<span
-				className="icon-[lucide--arrow-left] size-4"
+			<ArrowLeft
+				className="size-4"
 				aria-hidden="true"
 			/>
 			{children}

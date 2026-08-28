@@ -1,3 +1,5 @@
+import { FileJson2, FilePlus2, RefreshCw } from "lucide-react";
+
 import type {
 	EditorProjectCandidate,
 	EditorProjectOwnership,
@@ -63,7 +65,7 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 						className="inline-flex items-center gap-1.5"
 						onClick={() => void actions.refreshProjects()}
 					>
-						<span className="icon-[lucide--refresh-cw] size-4" />
+						<RefreshCw className="size-4" />
 						Refresh
 					</LinkButton>
 				</header>
@@ -80,7 +82,7 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 						className="min-h-44 flex-col gap-3 rounded-2xl"
 						onClick={actions.importJsonDirectory}
 					>
-						<span className="icon-[lucide--file-json-2] size-9 text-accent" />
+						<FileJson2 className="size-9 text-accent" />
 						<span className="text-lg">Open folder</span>
 						<span className="text-xs font-medium opacity-75">
 							Use an existing Editor project in place
@@ -92,7 +94,7 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 						className="min-h-44 flex-col gap-3 rounded-2xl"
 						onClick={actions.createProject}
 					>
-						<span className="icon-[lucide--file-plus-2] size-9" />
+						<FilePlus2 className="size-9" />
 						<span className="text-lg">New project</span>
 						<span className="text-xs font-medium opacity-75">
 							Start with an empty project

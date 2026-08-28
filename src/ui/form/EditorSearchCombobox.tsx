@@ -1,3 +1,5 @@
+import { Check, Search, X } from "lucide-react";
+
 import {
 	autoUpdate,
 	flip,
@@ -159,7 +161,7 @@ export const EditorSearchCombobox = ({
 					ref={refs.setReference}
 					className="relative min-w-0 flex-1"
 				>
-					<span className="icon-[lucide--search] pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-subtle" />
+					<Search className="pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-subtle" />
 					<input
 						type="search"
 						role="combobox"
@@ -227,7 +229,7 @@ export const EditorSearchCombobox = ({
 								setOpen(true);
 							}}
 						>
-							<span className="icon-[lucide--x] size-5" />
+							<X className="size-5" />
 						</button>
 					)}
 				</span>
@@ -275,7 +277,7 @@ export const EditorSearchCombobox = ({
 									)}
 								</span>
 								{option.id === value ? (
-									<span className="icon-[lucide--check] size-4 shrink-0 text-accent" />
+									<Check className="size-4 shrink-0 text-accent" />
 								) : null}
 							</button>
 						))}

@@ -1,3 +1,4 @@
+import { X } from "lucide-react";
 import type { ComponentType, ReactNode } from "react";
 
 import { ItemIdentity } from "~/ui/item/ItemIdentity";
@@ -71,8 +72,8 @@ export const ItemDetailHeader = ({
 				disabled={disabled}
 				onClick={() => closeItemDetail()}
 			>
-				<span
-					className="icon-[lucide--x] size-10"
+				<X
+					className="size-10"
 					aria-hidden="true"
 				/>
 			</button>

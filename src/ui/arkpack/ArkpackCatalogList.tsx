@@ -1,3 +1,4 @@
+import { Play, Sparkles, Trash2 } from "lucide-react";
 import { match } from "ts-pattern";
 
 import type { useArkpacks } from "~/bridge/arkpack/useArkpacks";
@@ -89,7 +90,7 @@ export const ArkpackCatalogList = ({
 										disabled={blocked}
 										onClick={() => onRemove(arkpack.packageId)}
 									>
-										<span className="icon-[lucide--trash-2] mr-1.5 size-4" />
+										<Trash2 className="mr-1.5 size-4" />
 										{arkpack.overridesBundled ? "Remove override" : "Remove"}
 									</DangerButton>
 								) : null}
@@ -99,7 +100,7 @@ export const ArkpackCatalogList = ({
 									disabled={blocked}
 									onClick={() => onOpenEditor(arkpack.packageId)}
 								>
-									<span className="icon-[lucide--sparkles] size-4" />
+									<Sparkles className="size-4" />
 									Editor
 								</LinkButton>
 								<PrimaryButtonLink
@@ -112,7 +113,7 @@ export const ArkpackCatalogList = ({
 									className="min-h-0 gap-1.5 px-3 py-2 text-xs shadow-none"
 									cursorIntent={blocked ? "progress" : undefined}
 								>
-									<span className="icon-[lucide--play] size-4" />
+									<Play className="size-4" />
 									Play
 								</PrimaryButtonLink>
 							</div>

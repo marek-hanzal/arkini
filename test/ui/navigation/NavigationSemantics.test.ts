@@ -1,17 +1,14 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { mainPagePanelViewTransitionNameFx } from "~/ui/navigation/mainPagePanelViewTransitionNameFx";
+import { mainPagePanelViewTransitionNameFn } from "~/ui/main-page/fn/mainPagePanelViewTransitionNameFn";
 
-describe("navigation semantic effects", () => {
+describe("navigation semantics", () => {
 	it("maps settings to its semantic panel", () => {
-		expect(Effect.runSync(mainPagePanelViewTransitionNameFx("settings"))).toBe(
-			"arkini-panel-settings",
-		);
+		expect(mainPagePanelViewTransitionNameFn("settings")).toBe("arkini-panel-settings");
 	});
 
 	it("assigns the editor welcome screen its own panel identity", () => {
-		expect(Effect.runSync(mainPagePanelViewTransitionNameFx("editor-welcome"))).toBe(
+		expect(mainPagePanelViewTransitionNameFn("editor-welcome")).toBe(
 			"arkini-panel-editor-welcome",
 		);
 	});

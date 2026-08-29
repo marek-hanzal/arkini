@@ -1,7 +1,6 @@
-import { Effect } from "effect";
 import type { PropsWithChildren, ReactNode } from "react";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
-import { mainPagePanelViewTransitionNameFx } from "~/ui/navigation/mainPagePanelViewTransitionNameFx";
+import { mainPagePanelViewTransitionNameFn } from "~/ui/main-page/fn/mainPagePanelViewTransitionNameFn";
 
 const MainPagePresentation = {
 	about: {
@@ -66,7 +65,7 @@ export const MainPageLayout = ({
 				data-ui="MainPagePanel"
 				tabIndex={-1}
 				style={{
-					viewTransitionName: Effect.runSync(mainPagePanelViewTransitionNameFx(page)),
+					viewTransitionName: mainPagePanelViewTransitionNameFn(page),
 				}}
 			>
 				<div

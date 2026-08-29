@@ -1,23 +1,22 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { resolveLauncherLeaveDestinationFx } from "~/@routes/-resolveLauncherLeaveDestinationFx";
+import { resolveLauncherLeaveDestinationFn } from "~/@routes/-launcher/fn/resolveLauncherLeaveDestinationFn";
 
 describe("launcher leave destination", () => {
 	it("maps launcher routes to the exact post-release destination", () => {
-		expect(Effect.runSync(resolveLauncherLeaveDestinationFx("/about"))).toEqual({
+		expect(resolveLauncherLeaveDestinationFn("/about")).toEqual({
 			destination: "about",
 		});
-		expect(Effect.runSync(resolveLauncherLeaveDestinationFx("/arkpacks"))).toEqual({
+		expect(resolveLauncherLeaveDestinationFn("/arkpacks")).toEqual({
 			destination: "arkpacks",
 		});
-		expect(Effect.runSync(resolveLauncherLeaveDestinationFx("/settings"))).toEqual({
+		expect(resolveLauncherLeaveDestinationFn("/settings")).toEqual({
 			destination: "settings",
 		});
 	});
 
 	it("defaults unknown launcher paths to the main menu", () => {
-		expect(Effect.runSync(resolveLauncherLeaveDestinationFx("/unknown"))).toEqual({
+		expect(resolveLauncherLeaveDestinationFn("/unknown")).toEqual({
 			destination: "main-menu",
 		});
 	});

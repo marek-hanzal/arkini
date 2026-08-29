@@ -3,13 +3,24 @@ import { Effect, Semaphore } from "effect";
 import { dirname, join } from "node:path";
 import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
+import type { ElectronMainError } from "../ElectronMainError";
 import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
-import type { ArkpackCatalog } from "./ArkpackCatalog";
 import { listArkpackFilesFx } from "./listArkpackFilesFx";
 import { readArkpackFileFx } from "./readArkpackFileFx";
 import { withArkpackFileLockFx } from "./withArkpackFileLockFx";
 import { removeUserArkpackFx } from "./removeUserArkpackFx";
 import { writeUserArkpackFx } from "./writeUserArkpackFx";
+
+interface ArkpackCatalog {
+	readonly listFx: Effect.Effect<ReadonlyArray<ArkiniElectronApi.ArkpackFile>, ElectronMainError>;
+	readonly readFx: (
+		packageId: string,
+	) => Effect.Effect<ReadonlyArray<ArkiniElectronApi.ArkpackFile>, ElectronMainError>;
+	readonly installFx: (
+		record: ArkiniElectronApi.ArkpackInstall,
+	) => Effect.Effect<void, ElectronMainError>;
+	readonly removeFx: (packageId: string) => Effect.Effect<void, ElectronMainError>;
+}
 
 export namespace createFilesystemArkpackCatalogFx {
 	export interface Props {

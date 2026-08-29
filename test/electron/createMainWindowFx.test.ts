@@ -10,10 +10,11 @@ import { ElectronMainError } from "../../electron/main/ElectronMainError";
 import { createChatGptViewControllerOwnershipFx } from "../../electron/main/chatgpt/createChatGptViewControllerOwnershipFx";
 import type { TrustedRenderer } from "../../electron/main/security/TrustedRenderer";
 import { createWindowModeControllerOwnershipFx } from "../../electron/main/window/createWindowModeControllerOwnershipFx";
-import type { WindowPreferences } from "../../electron/main/window/WindowPreferences";
+import type { WindowPreferences } from "../../electron/main/window/createFilesystemWindowPreferencesFx";
 
 const electronState = vi.hoisted(() => ({
 	loadFailure: new Error("renderer unavailable"),
+	loadSucceeds: false,
 	windows: [] as Array<unknown>,
 }));
 
@@ -57,7 +58,11 @@ vi.mock("electron", async () => {
 			height: 675,
 		}));
 		readonly isFullScreen = vi.fn(() => false);
-		readonly loadURL = vi.fn(() => Promise.reject(electronState.loadFailure));
+		readonly loadURL = vi.fn(() =>
+			electronState.loadSucceeds
+				? Promise.resolve()
+				: Promise.reject(electronState.loadFailure),
+		);
 		readonly maximize = vi.fn();
 		readonly setFullScreen = vi.fn();
 		readonly setBounds = vi.fn();
@@ -107,6 +112,7 @@ vi.mock("electron", async () => {
 });
 
 beforeEach(() => {
+	electronState.loadSucceeds = false;
 	electronState.windows.length = 0;
 	(ipcMain as unknown as EventEmitter).removeAllListeners();
 });
@@ -222,6 +228,7 @@ describe("createMainWindowFx", () => {
 	});
 
 	it("keeps the canonical default window at its calculated bounds", async () => {
+		electronState.loadSucceeds = true;
 		const trustedRenderer = {
 			developmentRendererUrl: undefined,
 			isTrustedIpcSender: () => false,
@@ -232,7 +239,7 @@ describe("createMainWindowFx", () => {
 			writeModeFx: () => Effect.void,
 		};
 
-		await Effect.runPromiseExit(
+		await Effect.runPromise(
 			createTestMainWindowFx({
 				trustedRenderer,
 				windowMode: "default",
@@ -241,18 +248,28 @@ describe("createMainWindowFx", () => {
 		);
 
 		const window = electronState.windows[0] as BrowserWindow & {
+			readonly emit: (event: string) => boolean;
 			readonly maximize: ReturnType<typeof vi.fn>;
+			readonly show: ReturnType<typeof vi.fn>;
 			readonly options: {
 				readonly fullscreen?: boolean;
 				readonly height?: number;
 				readonly width?: number;
 			};
 		};
+		window.emit("ready-to-show");
 		expect(window.options).toMatchObject({
 			fullscreen: false,
 			width: 1_200,
 			height: 675,
 		});
 		expect(window.maximize).not.toHaveBeenCalled();
+		expect(window.show).toHaveBeenCalledOnce();
+		expect(window.webContents.send).toHaveBeenCalledWith(
+			ArkiniElectronApi.channels.windowVisible,
+		);
+		expect(window.show.mock.invocationCallOrder[0]).toBeLessThan(
+			(window.webContents.send as ReturnType<typeof vi.fn>).mock.invocationCallOrder[0] ?? 0,
+		);
 	});
 });

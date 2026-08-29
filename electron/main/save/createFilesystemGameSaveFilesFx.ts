@@ -3,11 +3,22 @@ import { Effect } from "effect";
 import { join } from "node:path";
 import { clearGameSaveFx } from "./clearGameSaveFx";
 import { ElectronMainError } from "../ElectronMainError";
-import type { GameSaveFiles } from "./GameSaveFiles";
+import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { readGameSaveFx } from "./readGameSaveFx";
 import { writeGameSaveFx } from "./writeGameSaveFx";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 import { readGameSaveDirectoryNameFx } from "./readGameSaveDirectoryNameFx";
+
+interface GameSaveFiles {
+	readonly readFx: (
+		key: ArkiniElectronApi.SaveKey,
+	) => Effect.Effect<Uint8Array | null, ElectronMainError>;
+	readonly writeFx: (
+		key: ArkiniElectronApi.SaveKey,
+		bytes: Uint8Array,
+	) => Effect.Effect<void, ElectronMainError>;
+	readonly clearFx: (key: ArkiniElectronApi.SaveKey) => Effect.Effect<void, ElectronMainError>;
+}
 
 export namespace createFilesystemGameSaveFilesFx {
 	export interface Props {

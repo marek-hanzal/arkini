@@ -2,10 +2,18 @@ import { FileSystem } from "effect";
 import { Effect } from "effect";
 import { join } from "node:path";
 import { CheatAvailabilitySchema } from "../../contract/cheat/CheatAvailabilitySchema";
+import type { ElectronMainError } from "../ElectronMainError";
 import { readElectronPreferenceFx } from "../preference/readElectronPreferenceFx";
 import { writeElectronPreferenceFx } from "../preference/writeElectronPreferenceFx";
-import type { CheatPreferences } from "./CheatPreferences";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
+
+/** Effect-native main-process capability for application-wide cheat-tool availability. */
+export interface CheatPreferences {
+	readonly readAvailableFx: Effect.Effect<CheatAvailabilitySchema.Type, ElectronMainError>;
+	readonly writeAvailableFx: (
+		available: CheatAvailabilitySchema.Type,
+	) => Effect.Effect<void, ElectronMainError>;
+}
 
 export namespace createFilesystemCheatPreferencesFx {
 	export interface Props {

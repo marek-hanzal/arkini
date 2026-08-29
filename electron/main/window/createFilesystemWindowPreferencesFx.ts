@@ -2,10 +2,16 @@ import { FileSystem } from "effect";
 import { Effect } from "effect";
 import { join } from "node:path";
 import { WindowModeSchema } from "../../contract/window/WindowModeSchema";
+import type { ElectronMainError } from "../ElectronMainError";
 import { readElectronPreferenceFx } from "../preference/readElectronPreferenceFx";
 import { writeElectronPreferenceFx } from "../preference/writeElectronPreferenceFx";
-import type { WindowPreferences } from "./WindowPreferences";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
+
+/** Effect-native main-process capability for the global native window mode. */
+export interface WindowPreferences {
+	readonly readModeFx: Effect.Effect<WindowModeSchema.Type, ElectronMainError>;
+	readonly writeModeFx: (mode: WindowModeSchema.Type) => Effect.Effect<void, ElectronMainError>;
+}
 
 export namespace createFilesystemWindowPreferencesFx {
 	export interface Props {

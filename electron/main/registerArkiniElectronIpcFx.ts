@@ -11,19 +11,18 @@ import { Effect } from "effect";
 import { mkdir } from "node:fs/promises";
 import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
 import { createFilesystemArkpackCatalogFx } from "./arkpack/createFilesystemArkpackCatalogFx";
-import type { AppearancePreferences } from "./appearance/AppearancePreferences";
-import type { CheatPreferences } from "./cheat/CheatPreferences";
+import type { AppearancePreferences } from "./appearance/createFilesystemAppearancePreferencesFx";
+import type { CheatPreferences } from "./cheat/createFilesystemCheatPreferencesFx";
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
-import type { LauncherPreferences } from "./launcher/LauncherPreferences";
+import type { LauncherPreferences } from "./launcher/createFilesystemLauncherPreferencesFx";
 import { createFilesystemGameSaveFilesFx } from "./save/createFilesystemGameSaveFilesFx";
 import type { ArkiniUserDataPaths } from "./user-data/ArkiniUserDataPaths";
 import type { TrustedRenderer } from "./security/TrustedRenderer";
 import { DiagnosticRecordSchema } from "../contract/diagnostics/DiagnosticRecord";
-import type { DiagnosticLog } from "./diagnostics/DiagnosticLog";
+import type { DiagnosticLog } from "./diagnostics/createDiagnosticLogFx";
 import { WindowModeSchema } from "../contract/window/WindowModeSchema";
-import type { WindowPreferences } from "./window/WindowPreferences";
-import { readWindowModeControllerFx } from "./window/readWindowModeControllerFx";
-import type { WindowModeControllerOwnership } from "./window/WindowModeControllerOwnership";
+import type { WindowPreferences } from "./window/createFilesystemWindowPreferencesFx";
+import type { WindowModeControllerOwnership } from "./window/createWindowModeControllerOwnershipFx";
 
 let registered = false;
 const maxClipboardTextLength = 65_536;
@@ -181,10 +180,8 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 									new Error("The trusted renderer has no owning BrowserWindow."),
 								);
 							}
-							const controller = yield* readWindowModeControllerFx({
-								ownership: windowModeControllerOwnership,
-								window,
-							});
+							const controller =
+								yield* windowModeControllerOwnership.readControllerFx(window);
 							yield* controller.requestModeFx(mode);
 						}),
 					),

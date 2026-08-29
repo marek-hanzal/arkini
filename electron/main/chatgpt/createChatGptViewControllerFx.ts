@@ -18,7 +18,13 @@ import {
 	type ChatGptViewStateSchema,
 } from "../../contract/chatgpt/ChatGptSurfaceSchema";
 import { ElectronMainRuntime } from "../ElectronMainRuntime";
-import type { ChatGptViewController } from "./ChatGptViewController";
+
+/** Owns the isolated ChatGPT WebContentsView attached to one Arkini window. */
+export interface ChatGptViewController {
+	readonly setSurfaceFx: (
+		surface: ChatGptSurfaceSchema.Type | null,
+	) => Effect.Effect<void, unknown>;
+}
 
 const CHAT_GPT_URL = "https://chatgpt.com/";
 const CHAT_GPT_ORIGIN = new URL(CHAT_GPT_URL).origin;

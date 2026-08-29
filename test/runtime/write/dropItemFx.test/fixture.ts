@@ -3,7 +3,7 @@ import { Effect, type Layer } from "effect";
 import { useGameFx } from "~test/support/game/useGameFx";
 import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 

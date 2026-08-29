@@ -16,7 +16,7 @@ import {
 
 import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
 
-import { testArkpackConfig } from "~test/support/arkpack/createTestArkpack";
+import { testArkpackConfig } from "~test/arkpack/support/createTestArkpack";
 
 import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 

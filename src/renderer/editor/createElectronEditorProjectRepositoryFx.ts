@@ -20,10 +20,6 @@ import {
 import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import { EditorNoteSchema } from "~/editor/note/EditorNoteSchema";
-import {
-	EditorProjectBuildContentSchema,
-	EditorProjectBuildSchema,
-} from "~/editor/EditorProjectBuildSchema";
 import { invokeEditorProjectTransportFx } from "~/renderer/editor/invokeEditorProjectTransportFx";
 
 const versionReferenceSchema = z.discriminatedUnion("type", [
@@ -151,15 +147,6 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 			() => window.arkini.editor.awaitIdle(),
 			() => undefined,
 		),
-		buildProjectFx: (request) =>
-			writeFx(
-				"build-project",
-				callFx(
-					"build-project",
-					() => window.arkini.editor.buildProject(request),
-					(value) => EditorProjectBuildSchema.parse(value),
-				),
-			),
 		createProjectFx: (request) =>
 			writeFx(
 				"create-project",
@@ -277,12 +264,6 @@ export const createElectronEditorProjectRepositoryFx = Effect.sync(
 				"read-project",
 				() => window.arkini.editor.readProject(projectId),
 				(value) => (value === null ? null : parseProject(value)),
-			),
-		readProjectBuildFx: (request) =>
-			callFx(
-				"read-project-build",
-				() => window.arkini.editor.readProjectBuild(request),
-				(value) => EditorProjectBuildContentSchema.parse(value),
 			),
 		readVersionStatusFx: (projectId) =>
 			callFx(

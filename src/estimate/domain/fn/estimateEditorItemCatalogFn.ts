@@ -2,7 +2,7 @@ import { Order } from "effect";
 
 import { createEditorAcquisitionGraphFn } from "~/flow/domain/fn/createEditorAcquisitionGraphFn";
 import { estimateEditorItemsFn } from "~/estimate/domain/fn/estimateEditorItemsFn";
-import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 /** Computes the immutable quantity-one estimate batch used by the global Estimate view. */
 export const estimateEditorItemCatalogFn = (config: GameConfigSchema.Type) =>

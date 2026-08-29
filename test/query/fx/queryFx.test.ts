@@ -7,7 +7,7 @@ import type { QuerySchema } from "~/engine/query/schema/QuerySchema";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 const config = GameConfigSchema.parse({
 	resources: {

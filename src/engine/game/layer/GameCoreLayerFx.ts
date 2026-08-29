@@ -8,7 +8,7 @@ import { fromConfigFx } from "~/engine/runtime/fx/fromConfigFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import { makeRuntimeStoreFx } from "~/engine/runtime/internal/makeRuntimeStoreFx";
 import { RuntimeStoreFx } from "~/engine/runtime/internal/RuntimeStoreFx";
-import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { TickFx } from "~/engine/tick/context/TickFx";
 import type { TickFxService } from "~/engine/tick/context/TickFx";

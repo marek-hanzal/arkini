@@ -6,7 +6,7 @@ import { indexGridLocationClaimsFn } from "~/engine/location/fn/indexGridLocatio
 import { readGridLocationClaimsFn } from "~/engine/location/fn/readGridLocationClaimsFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { LocationOccupiedIssueSchema } from "~/engine/runtime/schema/check/LocationOccupiedIssueSchema";
 import type { LocationOutOfBoundsIssueSchema } from "~/engine/runtime/schema/check/LocationOutOfBoundsIssueSchema";

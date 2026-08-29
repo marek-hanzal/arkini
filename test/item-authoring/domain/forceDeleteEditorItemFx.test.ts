@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { forceDeleteEditorItemFx } from "~/item-authoring/domain/fx/forceDeleteEditorItemFx";
 import { editorTestConfig } from "~test/editor/support/editorTestPayload";
 import {
@@ -9,7 +9,7 @@ import {
 	createOutput,
 	createProducerItem,
 	createSimpleItem,
-} from "~test/validation/support/gameValidationTestSource";
+} from "~test/game-config/validation/support/gameValidationTestSource";
 
 const waterOutput = createOutput([
 	{

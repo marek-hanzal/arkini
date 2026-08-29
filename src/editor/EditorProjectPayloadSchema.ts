@@ -3,8 +3,8 @@ import { z } from "zod";
 import type { EditorProjectCommit } from "~/editor/EditorProject";
 import { EditorProjectDescriptorSchema } from "~/editor/EditorProjectDescriptor";
 import { EditorProjectRecordSchema } from "~/editor/EditorProjectRecordSchema";
-import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 const projectTransportSchema = z
 	.object({

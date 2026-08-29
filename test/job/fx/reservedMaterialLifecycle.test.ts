@@ -8,7 +8,7 @@ import { startLineFx } from "~test/job/support/startLineTestFx";
 import { RuntimeStoreFx } from "~/engine/runtime/internal/RuntimeStoreFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 
 const base = (id: string, scope: "any" | "board" = "board") => ({

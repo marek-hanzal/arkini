@@ -3,7 +3,7 @@ import { dialog, type BrowserWindow } from "electron";
 import { Effect } from "effect";
 
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
-import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
+import { encodeGameProjectFileStemFn } from "~/game-config/source/encodeGameProjectFileStemFn";
 import { createEditorJsonExportDirectoryFx } from "./createEditorJsonExportDirectoryFx";
 import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnership";
 import { withProjectLockFx } from "./filesystem/fx/withProjectLockFx";
@@ -60,7 +60,7 @@ export const exportEditorJsonDirectoryFx = Effect.fn("exportEditorJsonDirectoryF
 				filesystemWrite,
 				source,
 				createEditorJsonExportDirectoryFx({
-					directoryName: encodeGameProjectFileStem(projectId),
+					directoryName: encodeGameProjectFileStemFn(projectId),
 					parent: selected,
 					source,
 				}),

@@ -6,9 +6,31 @@ import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { ElectronMainError } from "../ElectronMainError";
 import { readArkpackFileFx } from "./readArkpackFileFx";
 import { withArkpackFileLockFx } from "./withArkpackFileLockFx";
-import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
+import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
 
 const suffix = ".arkpack";
+
+const decodeGameProjectFileStemFn = (stem: string): string | null => {
+	let decoded = "";
+	let chunkStart = 0;
+	// The encoder reserves invalid UTF-8 surrogate byte sequences only for lone UTF-16 code units.
+	for (const match of stem.matchAll(/%ED%([AB][0-9A-F])%([89AB][0-9A-F])/g)) {
+		try {
+			decoded += decodeURIComponent(stem.slice(chunkStart, match.index));
+		} catch {
+			return null;
+		}
+		const second = Number.parseInt(match[1], 16);
+		const third = Number.parseInt(match[2], 16);
+		decoded += String.fromCharCode(0xd000 | ((second & 0x3f) << 6) | (third & 0x3f));
+		chunkStart = match.index + match[0].length;
+	}
+	try {
+		return decoded + decodeURIComponent(stem.slice(chunkStart));
+	} catch {
+		return null;
+	}
+};
 
 export namespace listArkpackFilesFx {
 	export interface Props {
@@ -46,13 +68,9 @@ export const listArkpackFilesFx = Effect.fn("listArkpackFilesFx")(
 			let inspectedCandidates = 0;
 			let totalBytes = 0;
 			for (const entry of entries) {
-				let packageId: string;
-				try {
-					packageId = decodeURIComponent(entry.slice(0, -suffix.length));
-				} catch {
-					continue;
-				}
-				if (`${encodeGameProjectFileStem(packageId)}${suffix}` !== entry) continue;
+				const packageId = decodeGameProjectFileStemFn(entry.slice(0, -suffix.length));
+				if (packageId === null) continue;
+				if (readArkpackArtifactNameFn(packageId) !== entry) continue;
 				if (inspectedCandidates >= maxCandidates) break;
 				inspectedCandidates += 1;
 				const readCandidateFx = (path: string) =>

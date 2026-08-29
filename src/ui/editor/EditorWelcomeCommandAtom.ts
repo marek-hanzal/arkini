@@ -10,7 +10,7 @@ import {
 import { invokeEditorProjectTransportFx } from "~/renderer/editor/invokeEditorProjectTransportFx";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
-import { importEditorArkpackFileFx } from "~/ui/arkpack/editor/importEditorArkpackFileFx";
+import { importEditorArkpackFileFx } from "~/renderer/editor/importEditorArkpackFileFx";
 
 export namespace EditorWelcomeCommandAtom {
 	export type Action =

@@ -330,9 +330,9 @@ platform-check() {
 	run_tests \
 		test/engine/filesystem \
 		test/electron \
-		test/pack \
-		test/schema/fx \
-		test/source
+		test/arkpack/artifact \
+		test/game-config/source \
+		test/game-config/compiler/fx/readGameSourceFilesFx.test.ts
 }
 
 # @cmd Run the complete repository gate

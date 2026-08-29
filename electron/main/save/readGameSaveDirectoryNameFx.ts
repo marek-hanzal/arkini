@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
+import { encodeGameProjectFileStemFn } from "~/game-config/source/encodeGameProjectFileStemFn";
 import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ElectronMainError } from "../ElectronMainError";
 
@@ -10,7 +10,7 @@ export const readGameSaveDirectoryNameFx = Effect.fn("readGameSaveDirectoryNameF
 	key: ArkiniElectronApi.SaveKey,
 ) {
 	const parsed = IdSchema.safeParse(key.packageId);
-	if (parsed.success) return encodeGameProjectFileStem(parsed.data);
+	if (parsed.success) return encodeGameProjectFileStemFn(parsed.data);
 	return yield* Effect.fail(
 		new ElectronMainError({
 			operation: "Invalid Arkini save identity",

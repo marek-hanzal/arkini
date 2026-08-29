@@ -1,7 +1,7 @@
 import type { EditorAcquisitionRoute } from "~/flow/domain/EditorAcquisitionGraph";
 import { readEditorAcquisitionOutputOccurrencesFn } from "~/flow/domain/fn/readEditorAcquisitionOutputOccurrencesFn";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 const combineRequirements = (
 	left: EditorAcquisitionRoute["requirements"],

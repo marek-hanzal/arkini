@@ -10,7 +10,7 @@ import {
 	type EditorItemOriginItemNode,
 } from "~/flow/domain/EditorItemOriginFlow";
 import { readEditorItemOriginFlowFx } from "~/flow/domain/fx/readEditorItemOriginFlowFx";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { RuleSchema as LineRuleSchema } from "~/engine/line/schema/rule/RuleSchema";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import { createMergeTestConfig } from "~test/merge/support/createMergeTestConfig";

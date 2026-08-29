@@ -9,7 +9,7 @@ import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { TickFx } from "~/engine/tick/context/TickFx";
 import { advanceRuntimeStepFx } from "~/engine/tick/internal/advanceRuntimeStepFx";
 import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";

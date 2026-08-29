@@ -22,7 +22,10 @@ Read the smallest entry point needed for the task:
 ## Repository map
 
 ```text
-src/engine    framework-neutral gameplay, config, compiler, pack and domain operations
+src/engine    framework-neutral live gameplay and its exact runtime operations
+src/game-config  authored config, source, diagnostics, validation, resources and compiler
+src/arkpack   artifact bytes/provenance, renderer catalog/runtime and package UI
+src/editor-build  Build contract, renderer admission and Build presentation
 src/editor    shared platform-neutral Editor project and repository capabilities
 src/item-authoring  authored Item domain and product UI
 src/flow      authored acquisition graph, global Flow and layout worker

@@ -3,13 +3,13 @@ import { describe, expect, it } from "vitest";
 import { analyzeEditorProjectCompatibilityFn } from "~/editor/version/fn/analyzeEditorProjectCompatibilityFn";
 import type { EditorProjectCompatibility } from "~/editor/version/EditorProjectCompatibility";
 import { TemporarySchema } from "~/engine/item/schema/TemporarySchema";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { editorTestConfig } from "~test/editor/support/editorTestPayload";
 import {
 	createLine,
 	createProducerItem,
 	createSimpleItem,
-} from "~test/validation/support/gameValidationTestSource";
+} from "~test/game-config/validation/support/gameValidationTestSource";
 
 const analyze = (
 	previous: GameConfigSchema.Type,

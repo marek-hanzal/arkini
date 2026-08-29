@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { readItemEstimateTextFx } from "../../../../electron/main/editor-mcp/tool/readItemEstimateTextFx";
 import { readItemRelationTextFx } from "../../../../electron/main/editor-mcp/tool/readItemRelationTextFx";
 import { editorItemEstimateMaximumQuantity } from "~/estimate/domain/EditorItemEstimateQuantitySchema";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { createGraphProject, createToolProject } from "./support/createToolProject";
 
 describe("editor MCP graph tool text", () => {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { readEditorItemDeleteBlockersFn } from "~/item-authoring/domain/fn/readEditorItemDeleteBlockersFn";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { editorTestConfig } from "~test/editor/support/editorTestPayload";
 
 describe("readEditorItemDeleteBlockersFn", () => {

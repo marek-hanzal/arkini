@@ -10,7 +10,7 @@ import { readEditorItemOriginSourcesFn } from "~/flow/domain/fn/readEditorItemOr
 import { reportEditorItemOriginFlowProgressFx } from "~/flow/domain/fx/reportEditorItemOriginFlowProgressFx";
 import { yieldEditorItemOriginFlowFx } from "~/flow/domain/fx/yieldEditorItemOriginFlowFx";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 const unique = <Value>(values: ReadonlyArray<Value>): Value[] => [
 	...new Set(values),

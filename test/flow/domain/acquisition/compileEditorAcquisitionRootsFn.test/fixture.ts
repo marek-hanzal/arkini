@@ -1,13 +1,13 @@
 import { Effect } from "effect";
 
-import { compileGameSourcesFx } from "~/engine/compiler/fx/compileGameSourcesFx";
+import { compileGameSourcesFx } from "~/game-config/compiler/fx/compileGameSourcesFx";
 import { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import {
 	createLine,
 	createProducerItem,
 	createRootSource,
 	createSimpleItem,
-} from "~test/validation/support/gameValidationTestSource";
+} from "~test/game-config/validation/support/gameValidationTestSource";
 
 const createRuledOutput = (type: "disable" | "enable") =>
 	OutputSchema.parse({

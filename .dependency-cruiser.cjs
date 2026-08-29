@@ -2,10 +2,13 @@ const activeCodePattern = "^(?:src|electron|shared|scripts)(?:/|$)";
 const activeCodeAndTestsPattern = "^(?:src|electron|shared|scripts|test)(?:/|$)";
 const productionCodePattern = "^(?:src|electron|shared)(?:/|$)";
 const applicationEntrypointPattern = "^src/(?:main|createArkiniRouterFx|_route)[.]tsx?$";
-const productDomainPattern = "^src/(?:item-authoring|flow|estimate)/domain(?:/|$)";
-const productPresentationPattern = "^src/(?:item-authoring|flow|estimate)/(?:ui|worker)(?:/|$)";
-const reusablePresentationPattern =
-	"^src/(?:ui(?:/|$)|(?:item-authoring|flow|estimate)/(?:ui|worker)(?:/|$))";
+const gameConfigPattern = "^src/game-config(?:/|$)";
+const arkpackArtifactPattern = "^src/arkpack/(?:ArkpackDescriptor[.]ts$|artifact(?:/|$))";
+const productDomainPattern = "^src/(?:item-authoring|flow|estimate|editor-build)/domain(?:/|$)";
+const productRendererPattern = "^src/(?:arkpack|editor-build)/renderer(?:/|$)";
+const productPresentationPattern =
+	"^src/(?:item-authoring|flow|estimate)/(?:ui|worker)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)";
+const reusablePresentationPattern = `^src/ui(?:/|$)|${productPresentationPattern}`;
 
 /** @type {import('dependency-cruiser').IForbiddenRuleType[]} */
 const boundaryRules = [
@@ -18,19 +21,67 @@ const boundaryRules = [
 			path: "^src/engine(?:/|$)",
 		},
 		to: {
-			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productPresentationPattern}`,
+			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}`,
 		},
 	},
 	{
-		name: "engine-compiler-no-pack-imports",
+		name: "game-config-is-upstream-of-delivery",
 		comment:
-			"The completed-config compiler is upstream of binary packing and never depends on pack implementation modules.",
+			"Authored config, source, diagnostics, validation, resources, and compilation stay platform-neutral and upstream of Arkpack delivery and Editor Build.",
 		severity: "error",
 		from: {
-			path: "^src/engine/compiler(?:/|$)",
+			path: gameConfigPattern,
 		},
 		to: {
-			path: "^src/engine/pack(?:/|$)",
+			path: `^src/(?:arkpack|editor-build|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+		},
+	},
+	{
+		name: "game-config-source-stays-upstream",
+		comment:
+			"Canonical source reading and schema emission never depend on semantic validation or completed-config compilation.",
+		severity: "error",
+		from: {
+			path: "^src/game-config/source(?:/|$)",
+		},
+		to: {
+			path: "^src/game-config/(?:compiler|validation)(?:/|$)",
+		},
+	},
+	{
+		name: "game-config-validation-stays-upstream-of-compilation",
+		comment:
+			"Validation owns semantic diagnostics and never reaches into the compiler that sequences it.",
+		severity: "error",
+		from: {
+			path: "^src/game-config/validation(?:/|$)",
+		},
+		to: {
+			path: "^src/game-config/compiler(?:/|$)",
+		},
+	},
+	{
+		name: "arkpack-artifact-stays-upstream-of-runtime-and-build",
+		comment:
+			"Arkpack bytes, signing, provenance, and artifact schemas never depend on catalog/runtime, presentation, or Editor Build.",
+		severity: "error",
+		from: {
+			path: arkpackArtifactPattern,
+		},
+		to: {
+			path: `^src/arkpack/(?:renderer|ui)(?:/|$)|^src/editor-build(?:/|$)|^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+		},
+	},
+	{
+		name: "arkpack-renderer-stays-upstream-of-build-and-presentation",
+		comment:
+			"The Arkpack renderer catalog and load lifecycle never depend on Editor Build, presentation, or route composition.",
+		severity: "error",
+		from: {
+			path: "^src/arkpack/renderer(?:/|$)",
+		},
+		to: {
+			path: `^src/editor-build(?:/|$)|^src/(?:ui|@routes)(?:/|$)|${productPresentationPattern}`,
 		},
 	},
 	{
@@ -112,25 +163,25 @@ const boundaryRules = [
 	{
 		name: "editor-domain-no-presentation-imports",
 		comment:
-			"The shared editor domain is platform-neutral and never depends on renderer process ownership, UI, routes, or Electron.",
+			"The shared editor domain is platform-neutral and never owns Arkpack delivery, Editor Build, renderer process ownership, UI, routes, or Electron.",
 		severity: "error",
 		from: {
 			path: "^src/editor(?:/|$)",
 		},
 		to: {
-			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productPresentationPattern}|^electron(?:/|$)|^node_modules/electron(?:/|$)`,
+			path: `^src/(?:arkpack|editor-build|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|^electron(?:/|$)|^node_modules/electron(?:/|$)`,
 		},
 	},
 	{
 		name: "product-domain-no-presentation-imports",
 		comment:
-			"Item Authoring, Flow, and Estimate domain subtrees stay platform-neutral and never import product UI/workers, shared UI, renderer ownership, routes, or Electron.",
+			"Item Authoring, Flow, Estimate, and Editor Build domain subtrees stay platform-neutral and never import product UI/workers, shared UI, renderer ownership, routes, or Electron.",
 		severity: "error",
 		from: {
 			path: productDomainPattern,
 		},
 		to: {
-			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productPresentationPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
 		},
 	},
 	{
@@ -139,7 +190,7 @@ const boundaryRules = [
 			"Concrete renderer-process lifecycle and transport owners never depend on reusable UI, routes, or renderer entrypoints.",
 		severity: "error",
 		from: {
-			path: "^src/renderer(?:/|$)",
+			path: `^src/renderer(?:/|$)|${productRendererPattern}`,
 		},
 		to: {
 			path: `^src/(?:ui|@routes)(?:/|$)|${productPresentationPattern}`,
@@ -259,7 +310,7 @@ const boundaryRules = [
 			path: "^electron/main(?:/|$)",
 		},
 		to: {
-			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productPresentationPattern}`,
+			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}`,
 		},
 	},
 	{
@@ -295,10 +346,10 @@ const boundaryRules = [
 	{
 		name: "domain-code-does-not-import-electron-contract",
 		comment:
-			"Framework-neutral Engine, shared Editor, and product domains never depend on Electron transport contracts.",
+			"Framework-neutral Engine, authored Game configuration, Arkpack artifacts, shared Editor, and product domains never depend on Electron transport contracts.",
 		severity: "error",
 		from: {
-			path: `^src/(?:engine|editor)(?:/|$)|${productDomainPattern}`,
+			path: `^src/(?:engine|editor)(?:/|$)|${gameConfigPattern}|${arkpackArtifactPattern}|${productDomainPattern}`,
 		},
 		to: {
 			path: "^electron/contract(?:/|$)",

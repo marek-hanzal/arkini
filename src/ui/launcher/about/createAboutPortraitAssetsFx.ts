@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { ArkiniDefaultPackageId } from "../../../../shared/ArkiniAppMetadata";
-import { loadArkpackFx } from "~/renderer/arkpack/loadArkpackFx";
+import { loadArkpackFx } from "~/arkpack/renderer/loadArkpackFx";
 import { readAboutPortraitResourcesFn } from "~/ui/launcher/about/fn/readAboutPortraitResourcesFn";
 
 const revokeUrls = (urls: readonly string[]) => {

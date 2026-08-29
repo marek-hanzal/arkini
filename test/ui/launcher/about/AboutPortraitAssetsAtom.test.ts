@@ -8,7 +8,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AboutPortraitAssetsAtom } from "~/ui/launcher/about/AboutPortraitAssetsAtom";
 import { ArkiniDefaultPackageId } from "../../../../shared/ArkiniAppMetadata";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 (
 	globalThis as {
@@ -64,7 +64,7 @@ const payload = {
 	],
 };
 
-vi.mock("~/renderer/arkpack/loadArkpackFx", async () => {
+vi.mock("~/arkpack/renderer/loadArkpackFx", async () => {
 	const { Effect } = await import("effect");
 	return {
 		loadArkpackFx: ({ packageId }: { readonly packageId: string }) =>

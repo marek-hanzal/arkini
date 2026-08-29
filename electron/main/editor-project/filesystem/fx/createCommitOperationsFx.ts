@@ -10,7 +10,7 @@ import {
 	type EditorProjectRepositoryOperation,
 } from "~/editor/EditorProjectRepositoryError";
 import { forceDeleteEditorItemFx } from "~/editor/forceDeleteEditorItemFx";
-import { readEditorAssetDeleteBlockersFx } from "~/editor/readEditorAssetDeleteBlockersFx";
+import { readEditorAssetDeleteBlockersFn } from "~/editor/resource/fn/readEditorAssetDeleteBlockersFn";
 import { readEditorItemDeleteBlockersFx } from "~/editor/readEditorItemDeleteBlockersFx";
 import { analyzeEditorProjectCompatibilityFn } from "~/editor/version/fn/analyzeEditorProjectCompatibilityFn";
 import { bumpArkpackVersionFn } from "~/editor/version/fn/bumpArkpackVersionFn";
@@ -454,7 +454,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 					return yield* Effect.fail(
 						error("delete-resource", `Resource ${resourceId} does not exist.`),
 					);
-				const blockers = yield* readEditorAssetDeleteBlockersFx({
+				const blockers = readEditorAssetDeleteBlockersFn({
 					config: state.project.config,
 					resourceId,
 				});

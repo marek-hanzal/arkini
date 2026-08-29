@@ -1,3 +1,5 @@
+import { Order } from "effect";
+
 import type { PositionSchema } from "~/engine/grid/schema/PositionSchema";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 
@@ -18,7 +20,7 @@ export const orderStackItemsFn = ({ items, origin }: orderStackItemsFn.Props) =>
 		const scanOrder =
 			left.location.position.y - right.location.position.y ||
 			left.location.position.x - right.location.position.x ||
-			left.id.localeCompare(right.id);
+			Order.String(left.id, right.id);
 		if (origin === undefined) {
 			return scanOrder;
 		}

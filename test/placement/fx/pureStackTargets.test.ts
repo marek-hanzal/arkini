@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { applyPlacementPlanFx } from "~/engine/placement/fx/applyPlacementPlanFx";
-import { readAvailableStackItemsFx } from "~/engine/placement/fx/readAvailableStackItemsFx";
+import { readAvailableStackItemsFn } from "~/engine/placement/fn/readAvailableStackItemsFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { purityTestConfig } from "~test/line/support/purityTestConfig";
 
@@ -49,7 +49,7 @@ const activeJob = (ownerItemId: string) => ({
 });
 
 describe("pure placement stack targets", () => {
-	it("excludes active and queued owners while retaining idle compatible stacks", () => {
+	it("excludes stateful owners and orders idle candidates by code unit", () => {
 		const active = craft({
 			id: "runtime:active",
 			location: board(0),
@@ -58,8 +58,12 @@ describe("pure placement stack targets", () => {
 			id: "runtime:queued",
 			location: board(1),
 		});
-		const idle = craft({
-			id: "runtime:idle",
+		const accentedIdle = craft({
+			id: "runtime:é",
+			location: board(2),
+		});
+		const asciiIdle = craft({
+			id: "runtime:z",
 			location: board(2),
 		});
 		const runtime = {
@@ -72,7 +76,8 @@ describe("pure placement stack targets", () => {
 			items: [
 				active,
 				queued,
-				idle,
+				accentedIdle,
+				asciiIdle,
 			],
 			jobs: [
 				activeJob(active.id),
@@ -88,20 +93,19 @@ describe("pure placement stack targets", () => {
 			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
-		const stacks = Effect.runSync(
-			readAvailableStackItemsFx({
-				itemId: "craft",
-				locations: [
-					board(0),
-					board(1),
-					board(2),
-				],
-				runtime,
-			}),
-		);
+		const stacks = readAvailableStackItemsFn({
+			itemId: "craft",
+			locations: [
+				board(0),
+				board(1),
+				board(2),
+			],
+			runtime,
+		});
 
 		expect(stacks.map((item) => item.id)).toEqual([
-			idle.id,
+			asciiIdle.id,
+			accentedIdle.id,
 		]);
 	});
 
@@ -133,16 +137,14 @@ describe("pure placement stack targets", () => {
 			defaultLineByOwnerItemId: {},
 		} satisfies RuntimeSchema.Type;
 
-		const stacks = Effect.runSync(
-			readAvailableStackItemsFx({
-				itemId: "craft",
-				locations: [
-					inventory(0),
-					inventory(1),
-				],
-				runtime,
-			}),
-		);
+		const stacks = readAvailableStackItemsFn({
+			itemId: "craft",
+			locations: [
+				inventory(0),
+				inventory(1),
+			],
+			runtime,
+		});
 
 		expect(stacks.map((item) => item.id)).toEqual([
 			idle.id,

@@ -8,12 +8,12 @@ import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSc
 import { mergePlacementPlansFn } from "~/engine/placement/fn/mergePlacementPlansFn";
 import { orderStackItemsFn } from "~/engine/placement/fn/orderStackItemsFn";
 import { planStackPlacementFn } from "~/engine/placement/fn/planStackPlacementFn";
+import { readAvailableStackItemsFn } from "~/engine/placement/fn/readAvailableStackItemsFn";
 import { readEmptyLocationsFn } from "~/engine/placement/fn/readEmptyLocationsFn";
 import { readPlacementPlanQuantityFn } from "~/engine/placement/fn/readPlacementPlanQuantityFn";
 import type { PlacementPlan } from "~/engine/placement/PlacementPlan";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { planSpawnPlacementFx } from "./planSpawnPlacementFx";
-import { readAvailableStackItemsFx } from "./readAvailableStackItemsFx";
 
 export namespace planScopePlacementFx {
 	export interface Props {
@@ -51,7 +51,7 @@ export const planScopePlacementFx = Effect.fn("planScopePlacementFx")(function* 
 		}
 		if (!excluded) eligibleLocations.push(location);
 	}
-	const availableStacks = yield* readAvailableStackItemsFx({
+	const availableStacks = readAvailableStackItemsFn({
 		itemId: item.id,
 		locations: eligibleLocations,
 		runtime,

@@ -9,7 +9,7 @@ import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativ
 import type { CurrentSpaceChangedGameEventSchema } from "~/game-event/schema/CurrentSpaceChangedGameEventSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import type { InputRun } from "~/production-input/InputRun";

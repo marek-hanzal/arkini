@@ -1,6 +1,6 @@
 import { createEditorItemDraftFn } from "~/item-authoring/domain/fn/createEditorItemDraftFn";
-import { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
 
 /** Converts one canonical item while retaining every field understood by the target type. */

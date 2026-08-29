@@ -3,7 +3,7 @@ import { z } from "zod";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { TimeSchema } from "~/engine/common/schema/TimeSchema";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
-import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
+import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 
 import { BaseSchema } from "./BaseSchema";
 import { TypeSchema } from "./TypeSchema";

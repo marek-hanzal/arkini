@@ -1,6 +1,6 @@
 import type { EditorProjectCompatibilityPath } from "~/project-version/EditorProjectCompatibility";
 import type { EditorProjectSemanticDiff } from "~/project-version/EditorProjectSemanticDiff";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 

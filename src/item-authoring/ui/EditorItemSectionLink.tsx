@@ -1,4 +1,4 @@
-import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { ButtonLink } from "~/ui/button/Button";
 import {
 	editorSectionTabActiveClassName,

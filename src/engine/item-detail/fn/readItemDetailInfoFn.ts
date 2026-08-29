@@ -1,10 +1,10 @@
 import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { LocationSchema } from "~/item-location/schema/LocationSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import type { StorageSchema } from "~/engine/scope/schema/StorageSchema";
+import type { StorageSchema } from "~/item-definition/schema/StorageSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 export namespace readItemDetailInfoFn {

@@ -1,4 +1,4 @@
-import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { PropsWithChildren } from "react";
 import { useEditorItemDraft } from "~/item-authoring/ui/useEditorItemDraft";
 import { convertEditorItemFn } from "~/item-authoring/domain/fn/convertEditorItemFn";

@@ -2,7 +2,7 @@ import { Effect, Option } from "effect";
 import { match } from "ts-pattern";
 
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { isItemLocationScopeAllowedFn } from "~/item-location/fn/isItemLocationScopeAllowedFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { resolveLineInputStoreFn } from "~/production-input/fn/resolveLineInputStoreFn";

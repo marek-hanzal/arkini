@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import type { PositionSchema } from "~/item-location/schema/PositionSchema";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { orderGridLocationsFn } from "~/item-placement/fn/orderGridLocationsFn";
 import { readInventoryLocationsFn } from "~/item-placement/fn/readInventoryLocationsFn";

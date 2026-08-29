@@ -71,6 +71,8 @@ The package ID has one owner: `game.json` `meta.id`. Catalogs, paths, manifests,
 
 Exact item variants, line/input/rule/output shapes, conditions, rolls, and fields come from `schema.json`. Important cross-field rules are:
 
+The canonical immutable Item vocabulary lives in [`src/item-definition`](src/item-definition): Item schema identities, storage permission, bounded quantities, selectors, authored query shapes, and total selection policy over explicit definitions. Live item reads and runtime query execution remain in `src/engine`; `SpaceSchema` remains with the Space action that interprets it, game metadata remains in `src/game-config`, and toolbar size is owned beside location contracts in `src/item-location`.
+
 - storage scope (`board | inventory | toolbar | any`) is different from query reach (`board | inventory | toolbar | any | universe`); `universe` is never storage;
 - every start-Board coordinate and current Board selection has explicit `space`; no default or cross-space inference exists;
 - runtime purity and stack eligibility are derived state, never an authored flag;

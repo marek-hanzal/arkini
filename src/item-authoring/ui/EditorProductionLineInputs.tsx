@@ -1,7 +1,7 @@
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
-import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
+import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 import { EditorItemDetailReference } from "~/item-authoring/ui/EditorItemDetailReference";
 
 type EditorItemRegistry = Record<string, ItemSchema.Type>;

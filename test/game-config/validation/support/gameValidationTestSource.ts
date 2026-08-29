@@ -1,6 +1,6 @@
 import { GameSourceFileSchema } from "~/game-config/source/schema/GameSourceFileSchema";
-import { ProducerSchema } from "~/engine/item/schema/ProducerSchema";
-import { SimpleSchema } from "~/engine/item/schema/SimpleSchema";
+import { ProducerSchema } from "~/item-definition/schema/ProducerSchema";
+import { SimpleSchema } from "~/item-definition/schema/SimpleSchema";
 import { LineSchema } from "~/production-line/schema/LineSchema";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { InputSchema } from "~/production-input/schema/InputSchema";

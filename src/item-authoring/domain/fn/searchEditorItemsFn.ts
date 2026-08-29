@@ -1,6 +1,6 @@
 import Fuse from "fuse.js";
 
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 const normalizeExactTerm = (value: string) => value.trim().toLowerCase();
 

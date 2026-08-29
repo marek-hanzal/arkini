@@ -1,4 +1,4 @@
-import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { createContext, useContext, type PropsWithChildren } from "react";
 import type { EditorItemFormController } from "~/item-authoring/ui/useEditorItemFormController";
 

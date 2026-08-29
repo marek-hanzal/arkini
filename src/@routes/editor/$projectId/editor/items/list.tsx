@@ -1,4 +1,4 @@
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { EditorItemList } from "~/item-authoring/ui/EditorItemList";
 

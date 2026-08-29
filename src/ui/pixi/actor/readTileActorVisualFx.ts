@@ -2,8 +2,8 @@ import { Effect } from "effect";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { TileActorVisual } from "~/ui/pixi/actor/TileActorVisual";
-import type { AssetSchema } from "~/engine/item/schema/AssetSchema";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { AssetSchema } from "~/item-definition/schema/AssetSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 export namespace readTileActorVisualFx {
 	export interface Props {

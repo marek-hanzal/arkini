@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { BaseSchema } from "~/engine/item/schema/BaseSchema";
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import { BaseSchema } from "~/item-definition/schema/BaseSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { InputSchema } from "~/production-action/schema/InputSchema";
 import { RuleSchema } from "~/production-action/schema/RuleSchema";
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";

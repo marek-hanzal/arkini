@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { MergeRuleNotFoundError } from "~/item-merge/error/MergeRuleNotFoundError";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import { selectItemsFn } from "~/engine/selector/fn/selectItemsFn";
+import { selectItemsFn } from "~/item-definition/fn/selectItemsFn";
 
 interface ResolveMergeRuleProps {
 	readonly source: RuntimeItemSchema.Type;

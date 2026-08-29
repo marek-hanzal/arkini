@@ -12,7 +12,7 @@ import type { GridLocationSchema } from "~/item-location/schema/GridLocationSche
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import { isDeliveryRuntimeItemFn } from "~/engine/runtime/read/fn/isDeliveryRuntimeItemFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { matchesItemSelectorFn } from "~/engine/selector/fn/matchesItemSelectorFn";
+import { matchesItemSelectorFn } from "~/item-definition/fn/matchesItemSelectorFn";
 
 export namespace reconcileOutboundDeliveriesRuntimeFx {
 	export interface Props {

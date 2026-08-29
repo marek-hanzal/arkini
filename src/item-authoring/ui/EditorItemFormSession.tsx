@@ -1,5 +1,5 @@
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, type PropsWithChildren } from "react";
 

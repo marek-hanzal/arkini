@@ -1,7 +1,7 @@
 import { match, P } from "ts-pattern";
 
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 /** Returns whether one canonical item may enter material-input storage. */
 export const isMaterialInputEligibleFn = (item: ItemSchema.Type) =>

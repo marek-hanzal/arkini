@@ -1,4 +1,4 @@
-import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
+import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 
 export type EditorAcquisitionRequirementUsage = "consume" | "one-time" | "ongoing";
 

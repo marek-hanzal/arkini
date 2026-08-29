@@ -12,7 +12,7 @@ import { TypeSchema as LineRuleTypeSchema } from "~/production-line/schema/rule/
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
-import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
+import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 import { TypeSchema as RollTypeSchema } from "~/production-output/roll/schema/TypeSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 

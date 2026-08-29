@@ -1,4 +1,4 @@
-import type { ToolbarSizeSchema } from "~/engine/meta/schema/ToolbarSizeSchema";
+import type { ToolbarSizeSchema } from "~/item-location/schema/ToolbarSizeSchema";
 import type { ToolbarLocationSchema } from "~/item-location/schema/ToolbarLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 

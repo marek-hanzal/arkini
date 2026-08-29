@@ -2,8 +2,8 @@ import { match } from "ts-pattern";
 
 import type { InputSchema as ImmediateInputSchema } from "~/production-action/schema/InputSchema";
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
-import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 
 export interface CreateEditorItemDraftFnProps {

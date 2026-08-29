@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 const ItemTypeSchema = z.enum(TypeSchema.options).meta({
 	id: "ItemTypeSchema",

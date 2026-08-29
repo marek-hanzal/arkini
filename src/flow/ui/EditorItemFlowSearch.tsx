@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
 
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { type EditorSearchOption, EditorSearchCombobox } from "~/ui/form/EditorSearchCombobox";
 import { EditorItemSearchThumbnail } from "~/ui/item/EditorItemThumbnail";
 import { Tooltip } from "~/ui/overlay/Tooltip";

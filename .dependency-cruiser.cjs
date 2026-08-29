@@ -5,6 +5,7 @@ const applicationEntrypointPattern = "^src/(?:main|createArkiniRouterFx|_route)[
 const gameEventPattern = "^src/game-event(?:/|$)";
 const gameConfigPattern = "^src/game-config(?:/|$)";
 const gameStartPattern = "^src/game-start(?:/|$)";
+const itemDefinitionPattern = "^src/item-definition(?:/|$)";
 const arkpackArtifactPattern = "^src/arkpack/(?:ArkpackDescriptor[.]ts$|artifact(?:/|$))";
 const productionPipelinePattern =
 	"^src/(?:production-action|production-condition|production-delivery|production-input|production-job|production-line|production-output)(?:/|$)";
@@ -37,6 +38,18 @@ const boundaryRules = [
 		},
 		to: {
 			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}`,
+		},
+	},
+	{
+		name: "item-definition-is-authored-vocabulary",
+		comment:
+			"Item Definition owns immutable authored item, query, selector, quantity, and storage contracts plus explicit-input selection policy; it may compose only exact schema leaves and never live Runtime, product, platform, or presentation ownership.",
+		severity: "error",
+		from: {
+			path: itemDefinitionPattern,
+		},
+		to: {
+			path: "^src/(?!item-definition(?:/|$)|engine/common/schema/(?:DescriptionSchema|IdSchema|PositiveIntegerSchema|TimeSchema|TitleSchema)[.]ts$|item-location/schema/DistanceSchema[.]ts$|item-merge/schema/MergeSchema[.]ts$|space-action/schema/SpaceSchema[.]ts$|production-line/schema/LineSchema[.]ts$|production-output/schema/OutputSchema[.]ts$)|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)",
 		},
 	},
 	{
@@ -581,7 +594,7 @@ const boundaryRules = [
 			"Framework-neutral Engine, Game Event facts, authored Game configuration, Arkpack artifacts, and product domains never depend on Electron transport contracts.",
 		severity: "error",
 		from: {
-			path: `^src/(?:engine|editor)(?:/|$)|${gameStartPattern}|${gameEventPattern}|${boardSpatialPattern}|${gameConfigPattern}|${arkpackArtifactPattern}|${productDomainPattern}|${authoringProductCorePattern}`,
+			path: `^src/(?:engine|editor)(?:/|$)|${gameStartPattern}|${gameEventPattern}|${itemDefinitionPattern}|${boardSpatialPattern}|${gameConfigPattern}|${arkpackArtifactPattern}|${productDomainPattern}|${authoringProductCorePattern}`,
 		},
 		to: {
 			path: "^electron/contract(?:/|$)",

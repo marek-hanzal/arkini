@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
+import { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 
 import { BaseSchema } from "./BaseSchema";
 import { TypeSchema } from "./TypeSchema";

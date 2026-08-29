@@ -1,6 +1,6 @@
 import { readMaterialInputEligibilityFn } from "~/production-input/read/fn/readMaterialInputEligibilityFn";
 import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { selectItemsFn } from "~/engine/selector/fn/selectItemsFn";
+import { selectItemsFn } from "~/item-definition/fn/selectItemsFn";
 import type { GameSourceProvenanceSchema } from "~/game-config/source/schema/GameSourceProvenanceSchema";
 import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticSeverityEnumSchema";

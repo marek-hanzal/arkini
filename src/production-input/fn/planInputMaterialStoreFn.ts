@@ -3,7 +3,7 @@ import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveInteg
 import type { MaterialSchema } from "~/production-input/schema/MaterialSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import { readMaterialInputEligibilityFn } from "~/production-input/read/fn/readMaterialInputEligibilityFn";
-import { selectItemsFn } from "~/engine/selector/fn/selectItemsFn";
+import { selectItemsFn } from "~/item-definition/fn/selectItemsFn";
 import { resolveInputMaterialFn } from "~/production-input/fn/resolveInputMaterialFn";
 
 export namespace planInputMaterialStoreFn {

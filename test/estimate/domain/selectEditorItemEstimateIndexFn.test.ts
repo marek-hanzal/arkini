@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { EditorItemEstimateIndexEntry } from "~/estimate/domain/EditorItemEstimateIndex";
 import { selectEditorItemEstimateIndexFn } from "~/estimate/domain/fn/selectEditorItemEstimateIndexFn";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 const item = (id: string, title: string) =>
 	({

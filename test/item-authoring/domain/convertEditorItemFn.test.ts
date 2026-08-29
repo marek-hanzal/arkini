@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import { convertEditorItemFn } from "~/item-authoring/domain/fn/convertEditorItemFn";
 import { createEditorItemDraftFn } from "~/item-authoring/domain/fn/createEditorItemDraftFn";
-import { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 
 const createItem = (type: (typeof TypeSchema.options)[number]): ItemSchema.Type => ({

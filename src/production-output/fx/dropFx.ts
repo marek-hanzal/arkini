@@ -7,16 +7,15 @@ import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import { rollQuantityFx } from "~/engine/quantity/fx/rollQuantityFx";
-
 import { dropRuleFx } from "./dropRuleFx";
+import { rollQuantityFx } from "./rollQuantityFx";
+
+interface Props {
+	readonly drop: DropSchema.Type;
+	readonly origin: GridLocationSchema.Type;
+}
 
 export namespace dropFx {
-	export interface Props {
-		drop: DropSchema.Type;
-		origin: GridLocationSchema.Type;
-	}
-
 	export interface Result {
 		readonly itemId: IdSchema.Type;
 		readonly quantity: PositiveIntegerSchema.Type;
@@ -32,7 +31,7 @@ export namespace dropFx {
  * discarded without consuming quantity randomness, rerolling, or selecting a
  * replacement candidate.
  */
-export const dropFx = Effect.fn("dropFx")(function* ({ drop, origin }: dropFx.Props) {
+export const dropFx = Effect.fn("dropFx")(function* ({ drop, origin }: Props) {
 	let enabled = true;
 	for (const rule of drop.rules) {
 		const ruleEnabled = yield* dropRuleFx({

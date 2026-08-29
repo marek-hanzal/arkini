@@ -2,10 +2,10 @@ import { screen, type BrowserWindow } from "electron";
 import { Deferred, Effect, Exit, Fiber, FiberHandle, Queue, Scope, SynchronizedRef } from "effect";
 import { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import type { WindowModeSchema } from "../../contract/window/WindowModeSchema";
-import { calculateInitialWindowBoundsFx } from "../calculateInitialWindowBoundsFx";
 import { ElectronMainRuntime } from "../ElectronMainRuntime";
 import type { WindowModeController } from "./WindowModeController";
 import type { WindowPreferences } from "./WindowPreferences";
+import { calculateInitialWindowBoundsFn } from "./fn/calculateInitialWindowBoundsFn";
 
 type WindowedMode = Exclude<WindowModeSchema.Type, "fullscreen">;
 
@@ -65,7 +65,7 @@ export const createWindowModeControllerFx = Effect.fn("createWindowModeControlle
 						return;
 					}
 					const display = screen.getDisplayMatching(window.getBounds());
-					const { x, y, width, height } = yield* calculateInitialWindowBoundsFx(
+					const { x, y, width, height } = calculateInitialWindowBoundsFn(
 						display.workArea,
 					);
 					const wasMaximized = window.isMaximized();

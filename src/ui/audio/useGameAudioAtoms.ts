@@ -6,7 +6,7 @@ import type { PlayableGame } from "~/renderer/game/PlayableGame";
 import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
 import type { useGameEvents } from "~/ui/game/useGameEvents";
 import type { createGameAudioSynthFx } from "~/ui/audio/createGameAudioSynthFx";
-import { readGameAudioCuesFx } from "~/ui/audio/readGameAudioCuesFx";
+import { readGameAudioCuesFn } from "~/ui/audio/fn/readGameAudioCuesFn";
 
 export namespace useGameAudioAtoms {
 	export type CreateSynthFx = () => Effect.Effect<createGameAudioSynthFx.Result>;
@@ -84,9 +84,7 @@ export const useGameAudioAtoms = (
 			(batch: useGameEvents.Batch, get) =>
 				Effect.yieldNow.pipe(
 					Effect.andThen(get.result(synthAtom)),
-					Effect.flatMap((audio) =>
-						readGameAudioCuesFx(batch).pipe(Effect.flatMap(audio.playFx)),
-					),
+					Effect.flatMap((audio) => audio.playFx(readGameAudioCuesFn(batch))),
 					Effect.catchCause((cause) =>
 						Cause.hasInterruptsOnly(cause)
 							? Effect.void

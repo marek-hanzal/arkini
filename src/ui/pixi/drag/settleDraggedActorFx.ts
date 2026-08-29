@@ -5,7 +5,7 @@ import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readActorCursorFn } from "~/ui/pixi/actor/fn/readActorCursorFn";
 import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import { createRetargetablePoseSamplerFx } from "~/ui/pixi/animation/createRetargetablePoseSamplerFx";
-import { readSettleDurationMsFx } from "~/ui/pixi/drag/readSettleDurationMsFx";
+import { readSettleDurationMsFn } from "~/ui/pixi/drag/fn/readSettleDurationMsFn";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 
 export namespace settleDraggedActorFx {
@@ -32,7 +32,7 @@ export const settleDraggedActorFx = Effect.fn("settleDraggedActorFx")(function* 
 		previewKind: null,
 		running: actor.item.running,
 	});
-	const durationMs = yield* readSettleDurationMsFx({
+	const durationMs = readSettleDurationMsFn({
 		fromX: actor.container.x,
 		fromY: actor.container.y,
 		tileSize: pose.size,

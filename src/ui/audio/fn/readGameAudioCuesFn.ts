@@ -1,10 +1,9 @@
-import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { useGameEvents } from "~/ui/game/useGameEvents";
 
-export namespace readGameAudioCuesFx {
+export namespace readGameAudioCuesFn {
 	export type Kind =
 		| "space-change"
 		| "job-start"
@@ -31,7 +30,7 @@ type GameEvent = useGameEvents.Batch["events"][number];
 
 const maximumBatchCues = 6;
 
-const cuePriority: Record<readGameAudioCuesFx.Kind, number> = {
+const cuePriority: Record<readGameAudioCuesFn.Kind, number> = {
 	"space-change": 1,
 	"job-start": 2,
 	"job-complete": 3,
@@ -53,12 +52,12 @@ const clampStrength = (strength: number) => Math.min(3, Math.max(1, strength));
 const strengthForQuantity = (quantity: number) =>
 	clampStrength(1 + Math.log2(Math.max(1, quantity)));
 
-const cue = (kind: readGameAudioCuesFx.Kind, strength: number): readGameAudioCuesFx.Result => ({
+const cue = (kind: readGameAudioCuesFn.Kind, strength: number): readGameAudioCuesFn.Result => ({
 	kind,
 	strength: clampStrength(strength),
 });
 
-const readGameAudioCue = (event: GameEvent): readGameAudioCuesFx.Result =>
+const readGameAudioCue = (event: GameEvent): readGameAudioCuesFn.Result =>
 	match(event)
 		.with(
 			{
@@ -148,9 +147,9 @@ const readGameAudioCue = (event: GameEvent): readGameAudioCuesFx.Result =>
 
 const coalesceCues = (
 	events: ReadonlyArray<GameEvent>,
-): ReadonlyArray<readGameAudioCuesFx.Result> => {
-	const cues: Array<readGameAudioCuesFx.Result> = [];
-	const indexByKind = new Map<readGameAudioCuesFx.Kind, number>();
+): ReadonlyArray<readGameAudioCuesFn.Result> => {
+	const cues: Array<readGameAudioCuesFn.Result> = [];
+	const indexByKind = new Map<readGameAudioCuesFn.Kind, number>();
 
 	for (const event of events) {
 		const next = readGameAudioCue(event);
@@ -172,25 +171,25 @@ const coalesceCues = (
 };
 
 /** Projects one committed event batch into a small, readable set of audio intentions. */
-export const readGameAudioCuesFx = Effect.fn("readGameAudioCuesFx")((batch: useGameEvents.Batch) =>
-	Effect.sync(() => {
-		const cues = coalesceCues(batch.events);
-		if (cues.length <= maximumBatchCues) return cues;
+export const readGameAudioCuesFn = (
+	batch: useGameEvents.Batch,
+): ReadonlyArray<readGameAudioCuesFn.Result> => {
+	const cues = coalesceCues(batch.events);
+	if (cues.length <= maximumBatchCues) return cues;
 
-		const ranked = cues
-			.map((candidate, index) => ({
-				candidate,
-				index,
-			}))
-			.sort(
-				(left, right) =>
-					cuePriority[right.candidate.kind] - cuePriority[left.candidate.kind] ||
-					left.index - right.index,
-			);
+	const ranked = cues
+		.map((candidate, index) => ({
+			candidate,
+			index,
+		}))
+		.sort(
+			(left, right) =>
+				cuePriority[right.candidate.kind] - cuePriority[left.candidate.kind] ||
+				left.index - right.index,
+		);
 
-		return ranked
-			.slice(0, maximumBatchCues)
-			.sort((left, right) => left.index - right.index)
-			.map(({ candidate }) => candidate);
-	}),
-);
+	return ranked
+		.slice(0, maximumBatchCues)
+		.sort((left, right) => left.index - right.index)
+		.map(({ candidate }) => candidate);
+};

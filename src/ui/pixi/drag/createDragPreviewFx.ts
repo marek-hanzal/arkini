@@ -7,7 +7,7 @@ import { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import { readActorCursorFn } from "~/ui/pixi/actor/fn/readActorCursorFn";
 import type { DragPreview } from "~/ui/pixi/drag/DragPreview";
-import { readAttractionActorIdFx } from "~/ui/pixi/magnet/readAttractionActorIdFx";
+import { readAttractionActorIdFn } from "~/ui/pixi/magnet/fn/readAttractionActorIdFn";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 
 export namespace createDragPreviewFx {
@@ -115,10 +115,10 @@ export const createDragPreviewFx = Effect.fn("createDragPreviewFx")(function* ({
 						})).kind;
 			if (previewKind === null) continue;
 			const eligible =
-				(yield* readAttractionActorIdFx({
+				readAttractionActorIdFn({
 					previewKind,
 					targetItem,
-				})) !== null;
+				}) !== null;
 			drag.attractionEligibilityByActorId.set(actorId, {
 				eligible,
 				source: {

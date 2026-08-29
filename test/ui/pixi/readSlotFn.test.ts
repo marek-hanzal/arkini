@@ -1,7 +1,6 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readSlotFx } from "~/ui/pixi/grid/readSlotFx";
+import { readSlotFn } from "~/ui/pixi/grid/fn/readSlotFn";
 import type { SurfaceLayout } from "~/ui/pixi/layout/SceneLayout";
 
 const surface = {
@@ -16,15 +15,13 @@ const surface = {
 } satisfies SurfaceLayout;
 
 const readSlot = (x: number, y: number) =>
-	Effect.runSync(
-		readSlotFx({
-			surface,
-			x,
-			y,
-		}),
-	);
+	readSlotFn({
+		surface,
+		x,
+		y,
+	});
 
-describe("readSlotFx", () => {
+describe("readSlotFn", () => {
 	it("maps pointer coordinates only into an owned grid slot", () => {
 		expect(readSlot(25, 35)).toEqual({
 			x: 0,
@@ -36,13 +33,11 @@ describe("readSlotFx", () => {
 		});
 		expect(readSlot(9, 35)).toBeNull();
 		expect(
-			Effect.runSync(
-				readSlotFx({
-					surface: null,
-					x: 25,
-					y: 35,
-				}),
-			),
+			readSlotFn({
+				surface: null,
+				x: 25,
+				y: 35,
+			}),
 		).toBeNull();
 	});
 });

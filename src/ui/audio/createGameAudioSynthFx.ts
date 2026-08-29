@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import type { readGameAudioCuesFx } from "~/ui/audio/readGameAudioCuesFx";
-import { readGameAudioTonePlanFx } from "~/ui/audio/readGameAudioTonePlanFx";
+import type { readGameAudioCuesFn } from "~/ui/audio/fn/readGameAudioCuesFn";
+import { readGameAudioTonePlanFn } from "~/ui/audio/fn/readGameAudioTonePlanFn";
 
 export namespace createGameAudioSynthFx {
 	export interface Props {
@@ -11,7 +11,7 @@ export namespace createGameAudioSynthFx {
 	export interface Result {
 		readonly prepareFx: Effect.Effect<void, unknown>;
 		readonly unlockFx: Effect.Effect<void, unknown>;
-		readonly playFx: (cues: ReadonlyArray<readGameAudioCuesFx.Result>) => Effect.Effect<void>;
+		readonly playFx: (cues: ReadonlyArray<readGameAudioCuesFn.Result>) => Effect.Effect<void>;
 		readonly closeFx: Effect.Effect<void, unknown>;
 	}
 }
@@ -135,69 +135,63 @@ export const createGameAudioSynthFx = Effect.fn("createGameAudioSynthFx")(
 					return Effect.forEach(
 						cues,
 						(cue) =>
-							readGameAudioTonePlanFx(cue).pipe(
-								Effect.tap((tones) =>
-									Effect.sync(() => {
-										for (const tone of tones) {
-											try {
-												const startAt =
-													batchStart +
-													cueCursorSeconds +
-													tone.offsetSeconds;
-												const attackAt =
-													startAt +
-													Math.min(0.008, tone.durationSeconds / 3);
-												const stopAt = startAt + tone.durationSeconds;
-												const oscillator = activeContext.createOscillator();
-												const envelope = activeContext.createGain();
-												oscillator.type = tone.waveform;
-												oscillator.frequency.setValueAtTime(
-													tone.startFrequencyHz,
-													startAt,
-												);
-												oscillator.frequency.exponentialRampToValueAtTime(
-													tone.endFrequencyHz,
-													stopAt,
-												);
-												envelope.gain.setValueAtTime(silentGain, startAt);
-												envelope.gain.exponentialRampToValueAtTime(
-													tone.gain,
-													attackAt,
-												);
-												envelope.gain.exponentialRampToValueAtTime(
-													silentGain,
-													stopAt,
-												);
-												oscillator.connect(envelope);
-												envelope.connect(activeOutput);
-												oscillator.addEventListener(
-													"ended",
-													() => {
-														oscillator.disconnect();
-														envelope.disconnect();
-													},
-													{
-														once: true,
-													},
-												);
-												oscillator.start(startAt);
-												oscillator.stop(stopAt + scheduleLeadSeconds);
-											} catch {
-												// One failed voice cannot block another cue or gameplay.
-											}
-										}
-										const cueDurationSeconds = tones.reduce(
-											(duration, tone) =>
-												Math.max(
-													duration,
-													tone.offsetSeconds + tone.durationSeconds,
-												),
-											0,
+							Effect.sync(() => {
+								const tones = readGameAudioTonePlanFn(cue);
+								for (const tone of tones) {
+									try {
+										const startAt =
+											batchStart + cueCursorSeconds + tone.offsetSeconds;
+										const attackAt =
+											startAt + Math.min(0.008, tone.durationSeconds / 3);
+										const stopAt = startAt + tone.durationSeconds;
+										const oscillator = activeContext.createOscillator();
+										const envelope = activeContext.createGain();
+										oscillator.type = tone.waveform;
+										oscillator.frequency.setValueAtTime(
+											tone.startFrequencyHz,
+											startAt,
 										);
-										cueCursorSeconds += cueDurationSeconds + cueGapSeconds;
-									}),
-								),
-							),
+										oscillator.frequency.exponentialRampToValueAtTime(
+											tone.endFrequencyHz,
+											stopAt,
+										);
+										envelope.gain.setValueAtTime(silentGain, startAt);
+										envelope.gain.exponentialRampToValueAtTime(
+											tone.gain,
+											attackAt,
+										);
+										envelope.gain.exponentialRampToValueAtTime(
+											silentGain,
+											stopAt,
+										);
+										oscillator.connect(envelope);
+										envelope.connect(activeOutput);
+										oscillator.addEventListener(
+											"ended",
+											() => {
+												oscillator.disconnect();
+												envelope.disconnect();
+											},
+											{
+												once: true,
+											},
+										);
+										oscillator.start(startAt);
+										oscillator.stop(stopAt + scheduleLeadSeconds);
+									} catch {
+										// One failed voice cannot block another cue or gameplay.
+									}
+								}
+								const cueDurationSeconds = tones.reduce(
+									(duration, tone) =>
+										Math.max(
+											duration,
+											tone.offsetSeconds + tone.durationSeconds,
+										),
+									0,
+								);
+								cueCursorSeconds += cueDurationSeconds + cueGapSeconds;
+							}),
 						{
 							discard: true,
 						},

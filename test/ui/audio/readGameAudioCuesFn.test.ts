@@ -1,9 +1,8 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { useGameEvents } from "~/ui/game/useGameEvents";
-import { readGameAudioCuesFx } from "~/ui/audio/readGameAudioCuesFx";
+import { readGameAudioCuesFn } from "~/ui/audio/fn/readGameAudioCuesFn";
 
 const boardLocation = {
 	scope: "board" as const,
@@ -21,7 +20,7 @@ const inputLocation = {
 	inputIndex: 0,
 };
 
-describe("readGameAudioCuesFx", () => {
+describe("readGameAudioCuesFn", () => {
 	it("preserves semantic order while coalescing repeated event kinds", () => {
 		const batch = {
 			events: [
@@ -68,7 +67,7 @@ describe("readGameAudioCuesFx", () => {
 			],
 		} satisfies useGameEvents.Batch;
 
-		expect(Effect.runSync(readGameAudioCuesFx(batch))).toEqual([
+		expect(readGameAudioCuesFn(batch)).toEqual([
 			{
 				kind: "job-complete",
 				strength: 2,
@@ -150,7 +149,7 @@ describe("readGameAudioCuesFx", () => {
 			],
 		} satisfies useGameEvents.Batch;
 
-		expect(Effect.runSync(readGameAudioCuesFx(batch)).map(({ kind }) => kind)).toEqual([
+		expect(readGameAudioCuesFn(batch).map(({ kind }) => kind)).toEqual([
 			"job-start",
 			"spawn",
 			"place",

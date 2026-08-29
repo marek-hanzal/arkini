@@ -4,7 +4,7 @@ import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import type { AnimationCurve } from "~/ui/pixi/animation/AnimationDriver";
 import { createRetargetablePoseSamplerFx } from "~/ui/pixi/animation/createRetargetablePoseSamplerFx";
-import { readTravelDurationMsFx } from "~/ui/pixi/animation/readTravelDurationMsFx";
+import { readTravelDurationMsFn } from "~/ui/pixi/animation/fn/readTravelDurationMsFn";
 
 interface TargetPose {
 	readonly x: number;
@@ -37,13 +37,13 @@ export const animateRetargetablePoseFx = Effect.fn("animateRetargetablePoseFx")(
 }) {
 	const durationMs =
 		requestedDurationMs ??
-		(yield* readTravelDurationMsFx({
+		readTravelDurationMsFn({
 			fromX: actor.container.x,
 			fromY: actor.container.y,
 			tileSize: actor.size,
 			toX: target.x,
 			toY: target.y,
-		}));
+		});
 	const readPose = yield* createRetargetablePoseSamplerFx({
 		from: {
 			scale: actor.container.scale.x,

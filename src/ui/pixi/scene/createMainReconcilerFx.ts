@@ -28,7 +28,7 @@ import { startActorExitFx } from "~/ui/pixi/animation/startActorExitFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { MainDragController } from "~/ui/pixi/drag/MainDragController";
 import type { DeliveryRuntime } from "~/ui/pixi/delivery/DeliveryRuntime";
-import { readSettleDurationMsFx } from "~/ui/pixi/drag/readSettleDurationMsFx";
+import { readSettleDurationMsFn } from "~/ui/pixi/drag/fn/readSettleDurationMsFn";
 import type { DropPresentation } from "~/ui/pixi/drop/DropPresentation";
 import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
 import type { MotionRuntime } from "~/ui/pixi/motion/MotionRuntime";
@@ -508,7 +508,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 							}
 						: undefined,
 					durationMs: updatePlan.pose.directLanding
-						? yield* readSettleDurationMsFx({
+						? readSettleDurationMsFn({
 								fromX: actor.container.x,
 								fromY: actor.container.y,
 								tileSize: pose.size,

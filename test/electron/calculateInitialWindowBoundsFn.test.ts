@@ -1,18 +1,15 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { calculateInitialWindowBoundsFx } from "../../electron/main/calculateInitialWindowBoundsFx";
+import { calculateInitialWindowBoundsFn } from "../../electron/main/window/fn/calculateInitialWindowBoundsFn";
 
-describe("calculateInitialWindowBoundsFx", () => {
+describe("calculateInitialWindowBoundsFn", () => {
 	it("centers a window at three quarters of the active display work area", () => {
 		expect(
-			Effect.runSync(
-				calculateInitialWindowBoundsFx({
-					x: 100,
-					y: 50,
-					width: 1600,
-					height: 1000,
-				}),
-			),
+			calculateInitialWindowBoundsFn({
+				x: 100,
+				y: 50,
+				width: 1600,
+				height: 1000,
+			}),
 		).toEqual({
 			x: 300,
 			y: 175,
@@ -25,14 +22,12 @@ describe("calculateInitialWindowBoundsFx", () => {
 
 	it("keeps minimum bounds inside very small work areas", () => {
 		expect(
-			Effect.runSync(
-				calculateInitialWindowBoundsFx({
-					x: 0,
-					y: 0,
-					width: 320,
-					height: 240,
-				}),
-			),
+			calculateInitialWindowBoundsFn({
+				x: 0,
+				y: 0,
+				width: 320,
+				height: 240,
+			}),
 		).toEqual({
 			x: 40,
 			y: 30,

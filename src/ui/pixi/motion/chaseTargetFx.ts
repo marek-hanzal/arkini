@@ -5,7 +5,7 @@ import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { ActorAnimator, PresentedPose } from "~/ui/pixi/animation/ActorAnimator";
 import type { AnimationCurve } from "~/ui/pixi/animation/AnimationDriver";
-import { readTravelDurationMsFx } from "~/ui/pixi/animation/readTravelDurationMsFx";
+import { readTravelDurationMsFn } from "~/ui/pixi/animation/fn/readTravelDurationMsFn";
 import { createMotionPoseSamplerFx } from "~/ui/pixi/motion/createMotionPoseSamplerFx";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
@@ -106,13 +106,13 @@ export const chaseTargetFx = Effect.fn("chaseTargetFx")(function* ({
 		delayMs,
 		durationMs:
 			durationMs ??
-			(yield* readTravelDurationMsFx({
+			readTravelDurationMsFn({
 				fromX: from.x,
 				fromY: from.y,
 				tileSize: Math.max(1, target.scale * actor.size),
 				toX: target.x,
 				toY: target.y,
-			})),
+			}),
 		ownerKey,
 		onCancel: () => {
 			if (!cancelingForProximitySettlement) settled = true;

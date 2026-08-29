@@ -1,8 +1,7 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { readGameAudioCuesFx } from "~/ui/audio/readGameAudioCuesFx";
-import { readGameAudioTonePlanFx } from "~/ui/audio/readGameAudioTonePlanFx";
+import type { readGameAudioCuesFn } from "~/ui/audio/fn/readGameAudioCuesFn";
+import { readGameAudioTonePlanFn } from "~/ui/audio/fn/readGameAudioTonePlanFn";
 
 const cues = {
 	"space-change": {
@@ -61,12 +60,12 @@ const cues = {
 		kind: "remove",
 		strength: 1,
 	},
-} satisfies Record<readGameAudioCuesFx.Kind, readGameAudioCuesFx.Result>;
+} satisfies Record<readGameAudioCuesFn.Kind, readGameAudioCuesFn.Result>;
 
-describe("readGameAudioTonePlanFx", () => {
+describe("readGameAudioTonePlanFn", () => {
 	it("defines bounded deterministic voices for every semantic cue", () => {
 		for (const cue of Object.values(cues)) {
-			const tones = Effect.runSync(readGameAudioTonePlanFx(cue));
+			const tones = readGameAudioTonePlanFn(cue);
 			expect(tones.length).toBeGreaterThan(0);
 			for (const tone of tones) {
 				expect(tone.startFrequencyHz).toBeGreaterThan(0);
@@ -80,9 +79,9 @@ describe("readGameAudioTonePlanFx", () => {
 	});
 
 	it("uses a two-voice completion signature without random variation", () => {
-		expect(Effect.runSync(readGameAudioTonePlanFx(cues["job-complete"]))).toEqual(
-			Effect.runSync(readGameAudioTonePlanFx(cues["job-complete"])),
+		expect(readGameAudioTonePlanFn(cues["job-complete"])).toEqual(
+			readGameAudioTonePlanFn(cues["job-complete"]),
 		);
-		expect(Effect.runSync(readGameAudioTonePlanFx(cues["job-complete"]))).toHaveLength(2);
+		expect(readGameAudioTonePlanFn(cues["job-complete"])).toHaveLength(2);
 	});
 });

@@ -3,7 +3,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readTravelDurationMsFx } from "~/ui/pixi/animation/readTravelDurationMsFx";
+import { readTravelDurationMsFn } from "~/ui/pixi/animation/fn/readTravelDurationMsFn";
 
 import {
 	createMotionHarness,
@@ -191,15 +191,13 @@ describe("input remainder travel", () => {
 			delayMs: 0,
 		});
 		expect(returnTravel.durationMs).toBe(
-			Effect.runSync(
-				readTravelDurationMsFx({
-					fromX: 340,
-					fromY: 40,
-					tileSize: 80,
-					toX: 100,
-					toY: 40,
-				}),
-			),
+			readTravelDurationMsFn({
+				fromX: 340,
+				fromY: 40,
+				tileSize: 80,
+				toX: 100,
+				toY: 40,
+			}),
 		);
 		expect(samplePoseAnimation(returnTravel, 1)).toEqual({
 			scale: 1,

@@ -11,7 +11,7 @@ import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { DropFeedback } from "~/ui/pixi/grid/DropFeedback";
 import { drawMaskFx } from "~/ui/pixi/grid/drawMaskFx";
 import { drawSurfaceFx } from "~/ui/pixi/grid/drawSurfaceFx";
-import { readSlotFx } from "~/ui/pixi/grid/readSlotFx";
+import { readSlotFn } from "~/ui/pixi/grid/fn/readSlotFn";
 import { readMainLayoutFn } from "~/ui/pixi/layout/fn/readMainLayoutFn";
 import type { MainLayout } from "~/ui/pixi/layout/SceneLayout";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
@@ -190,34 +190,33 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 					};
 				});
 
-			const readDropTarget = (x: number, y: number) =>
-				Effect.gen(function* () {
-					const toolbar = layout.toolbar;
-					const toolbarSlot = yield* readSlotFx({
-						surface: toolbar,
-						x,
-						y,
-					});
-					if (toolbar !== null && toolbarSlot !== null) {
-						return {
-							kind: "slot" as const,
-							layout: toolbar,
-							...toolbarSlot,
-						};
-					}
-					const boardSlot = yield* readSlotFx({
-						surface: layout.board,
-						x,
-						y,
-					});
-					return boardSlot === null
-						? null
-						: {
-								kind: "slot" as const,
-								layout: layout.board,
-								...boardSlot,
-							};
+			const readDropTarget = (x: number, y: number): PixiSceneDropTarget | null => {
+				const toolbar = layout.toolbar;
+				const toolbarSlot = readSlotFn({
+					surface: toolbar,
+					x,
+					y,
 				});
+				if (toolbar !== null && toolbarSlot !== null) {
+					return {
+						kind: "slot" as const,
+						layout: toolbar,
+						...toolbarSlot,
+					};
+				}
+				const boardSlot = readSlotFn({
+					surface: layout.board,
+					x,
+					y,
+				});
+				return boardSlot === null
+					? null
+					: {
+							kind: "slot" as const,
+							layout: layout.board,
+							...boardSlot,
+						};
+			};
 
 			const appendIntersectingLocations = (
 				locations: TileActorItem["location"][],
@@ -317,10 +316,7 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 					Effect.sync(() => readLocationPose(item.location)),
 				),
 				readTargetFactsFx: Effect.fn("MainSurface.readTargetFactsFx")((x, y) =>
-					Effect.gen(function* () {
-						const target = yield* readDropTarget(x, y);
-						return yield* readTargetFactsFromTarget(target);
-					}),
+					readTargetFactsFromTarget(readDropTarget(x, y)),
 				),
 				readLocationPoseFx: Effect.fn("MainSurface.readLocationPoseFx")((location) =>
 					Effect.sync(() => readLocationPose(location)),

@@ -1,4 +1,4 @@
-import { launcherBackdropViewTransitionName } from "~/ui/navigation/launcherBackdropViewTransitionName";
+const launcherBackdropViewTransitionName = "arkini-launcher-backdrop";
 
 export namespace RouteBackdrop {
 	export interface Props {

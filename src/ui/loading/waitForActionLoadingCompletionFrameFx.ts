@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { actionLoadingCompletionHoldMs } from "~/ui/loading/actionLoadingCompletionHoldMs";
+const actionLoadingCompletionHoldMs = 150;
 
 /** Waits until the completed action frame has painted, then keeps it visible deliberately. */
 export const waitForActionLoadingCompletionFrameFx = Effect.fn(

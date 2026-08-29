@@ -7,7 +7,6 @@ import { splitBoardItemStackFx } from "~/engine/runtime/write/splitBoardItemStac
 
 export namespace runTileSplitAtom {
 	export type Command = splitBoardItemStackFx.Props;
-	export type Result = boolean;
 }
 
 /** Runs one exact Board-stack split while keeping expected command failures recoverable. */

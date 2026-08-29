@@ -20,8 +20,8 @@ import { installRendererNativeDragGuardFx } from "~/renderer/installRendererNati
 import { installWindowModeSyncFx } from "~/renderer/window/installWindowModeSyncFx";
 import { createArkiniRouterFx } from "~/createArkiniRouterFx";
 import { AppearanceDataset } from "~/ui/appearance/AppearanceDataset";
-import { configureLauncherStartupFx } from "~/ui/launcher/configureLauncherStartupFx";
 import { LauncherHeroAsset } from "~/ui/launcher/LauncherHeroAsset";
+import { LauncherStartupConfigAtom } from "~/ui/launcher/LauncherStartupConfigAtom";
 import { LauncherStartupHydrator } from "~/ui/launcher/LauncherStartupHydrator";
 import "~/ui/styles.css";
 
@@ -48,7 +48,7 @@ const lifecycle = RendererRuntime.runSync(createRendererLifecycleFx(window.arkin
 RendererRuntime.runSync(Atom.set(RendererLifecycleOwnerAtom, lifecycle));
 RendererRuntime.runSync(installWindowModeSyncFx());
 RendererRuntime.runSync(
-	configureLauncherStartupFx({
+	Atom.set(LauncherStartupConfigAtom, {
 		heroUrl: LauncherHeroAsset.url,
 	}),
 );

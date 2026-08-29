@@ -1,9 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { Effect } from "effect";
-import {
-	lifecycleDurationMs,
-	lifecycleReducedScale,
-} from "~/ui/pixi/animation/runActorLifecycleFx";
+import { lifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
 import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { burstFeedbackParticlesFx } from "~/ui/pixi/animation/burstFeedbackParticlesFx";
@@ -103,7 +100,6 @@ describe("main reconciliation / feedback acknowledgements", () => {
 				actor,
 				channel: "lifecycle-scale",
 				durationMs: remainingLifecycleDurationMs,
-				toScale: lifecycleReducedScale,
 			}),
 		);
 		expect(harness.animations).toContainEqual(

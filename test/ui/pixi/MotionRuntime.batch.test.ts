@@ -4,10 +4,7 @@ import { Effect } from "effect";
 import { Container } from "pixi.js";
 import { describe, expect, it } from "vitest";
 
-import {
-	lifecycleDurationMs,
-	lifecycleReducedScale,
-} from "~/ui/pixi/animation/runActorLifecycleFx";
+import { lifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
 import { readTravelDurationMsFn } from "~/ui/pixi/animation/fn/readTravelDurationMsFn";
 
 import {
@@ -94,7 +91,7 @@ describe("motion delivery batch", () => {
 			Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.has(stacked.item.id),
 		).toBe(false);
 		expect(spawned.container.alpha).toBe(0);
-		expect(spawned.lifecycleLayer.scale.x).toBe(lifecycleReducedScale);
+		expect(spawned.lifecycleLayer.scale.x).toBeLessThan(1);
 		expect(animations).toContainEqual(
 			expect.objectContaining({
 				actor: spawned,

@@ -5,7 +5,7 @@ import {
 	type GameSessionFatalSource,
 } from "~/renderer/game/session/GameSessionFatalError";
 
-export interface GameSessionFatalSignal {
+interface GameSessionFatalSignal {
 	readonly getSnapshot: () => GameSessionFatalError | null;
 	readonly report: (
 		source: GameSessionFatalSource,

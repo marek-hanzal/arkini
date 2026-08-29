@@ -4,7 +4,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
 import { readRendererLifecycleFx } from "~/renderer/lifecycle/readRendererLifecycleFx";
 
-export type MainMenuExitCommandState =
+type MainMenuExitCommandState =
 	| {
 			readonly kind: "idle";
 	  }

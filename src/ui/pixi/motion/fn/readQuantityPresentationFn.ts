@@ -2,14 +2,10 @@ import type { TileMotionCue } from "~/ui/pixi/motion/TileMotionCue";
 import type { QuantityPresentation } from "~/ui/pixi/motion/QuantityPresentation";
 import { readUnsettledTileInputSourceQuantitiesFn } from "~/ui/tile/motion/fn/readUnsettledTileInputSourceQuantitiesFn";
 
-export namespace readQuantityPresentationFn {
-	export interface Props {
-		readonly cues: ReadonlyArray<TileMotionCue>;
-		readonly resolvedTargetActorIdByCueKey: ReadonlyMap<string, string>;
-		readonly revealedInputCueKeys: ReadonlySet<string>;
-	}
-
-	export type Result = ReadonlyMap<string, QuantityPresentation>;
+interface ReadQuantityPresentationProps {
+	readonly cues: ReadonlyArray<TileMotionCue>;
+	readonly resolvedTargetActorIdByCueKey: ReadonlyMap<string, string>;
+	readonly revealedInputCueKeys: ReadonlySet<string>;
 }
 
 /**
@@ -22,7 +18,7 @@ export const readQuantityPresentationFn = ({
 	cues,
 	resolvedTargetActorIdByCueKey,
 	revealedInputCueKeys,
-}: readQuantityPresentationFn.Props) => {
+}: ReadQuantityPresentationProps): ReadonlyMap<string, QuantityPresentation> => {
 	const presentations = new Map<string, QuantityPresentation>();
 	const inputQuantities = readUnsettledTileInputSourceQuantitiesFn({
 		cues,
@@ -59,5 +55,5 @@ export const readQuantityPresentationFn = ({
 			quantity,
 		});
 	}
-	return presentations as readQuantityPresentationFn.Result;
+	return presentations;
 };

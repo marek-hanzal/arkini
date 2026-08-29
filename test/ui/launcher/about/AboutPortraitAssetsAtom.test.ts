@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { RegistryContext, scheduleTask } from "@effect/atom-react";
+import { RegistryContext, scheduleTask, useAtomValue } from "@effect/atom-react";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { StrictMode, act, createElement } from "react";
@@ -8,7 +8,6 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AboutPortraitAssetsAtom } from "~/ui/launcher/about/AboutPortraitAssetsAtom";
 import { ArkiniDefaultPackageId } from "../../../../shared/ArkiniAppMetadata";
-import { useAboutPortraitAssets } from "~/ui/launcher/about/useAboutPortraitAssets";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 (
@@ -84,7 +83,8 @@ const roots: Array<ReturnType<typeof createRoot>> = [];
 const registries: AtomRegistry.AtomRegistry[] = [];
 
 const PortraitProbe = () => {
-	const urls = useAboutPortraitAssets();
+	const result = useAtomValue(AboutPortraitAssetsAtom);
+	const urls = AsyncResult.isSuccess(result) ? result.value : [];
 	return createElement("output", null, JSON.stringify(urls));
 };
 

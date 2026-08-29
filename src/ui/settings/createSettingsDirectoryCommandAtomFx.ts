@@ -3,7 +3,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
 
-export type SettingsDirectoryCommandState =
+type SettingsDirectoryCommandState =
 	| {
 			readonly kind: "idle" | "pending";
 	  }

@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { makeTickServiceFx } from "~/engine/tick/internal/makeTickServiceFx";
-import { TickStepMs } from "~/engine/tick/TickStepMs";
+import { makeTickServiceFx } from "~/game-tick/makeTickServiceFx";
+import { TickStepMs } from "~/game-tick/TickStepMs";
 
 const makeEmptyRuntime = (): RuntimeSchema.Type => ({
 	cheats: {

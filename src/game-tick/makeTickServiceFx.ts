@@ -2,27 +2,28 @@ import { Clock, Effect, Exit, SynchronizedRef } from "effect";
 
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { advanceRuntimeElapsedFx } from "~/engine/tick/internal/advanceRuntimeElapsedFx";
-import { TickSchema } from "~/engine/tick/schema/TickSchema";
-import { TickStepMs } from "~/engine/tick/TickStepMs";
+import { TickSchema } from "~/game-tick/TickSchema";
+import { TickStepMs } from "~/game-tick/TickStepMs";
 
 interface ElapsedObservation {
 	readonly elapsedMs: number;
 	readonly observedAtMs: number;
 }
 
-export namespace makeTickServiceFx {
-	export interface Props<Error, Requirements> {
-		readonly advanceRuntimeElapsed: (
-			props: advanceRuntimeElapsedFx.Props,
-		) => Effect.Effect<advanceRuntimeElapsedFx.Result, Error, Requirements>;
-	}
+interface RuntimeAdvanceResult {
+	readonly stableRuntime: RuntimeSchema.Type | null;
+}
+
+interface MakeTickServiceProps<Error, Requirements> {
+	readonly advanceRuntimeElapsed: (props: {
+		readonly elapsedMs: number;
+	}) => Effect.Effect<RuntimeAdvanceResult, Error, Requirements>;
 }
 
 /** Builds the Tick clock state around an injectable authoritative advancement boundary. */
 export const makeTickServiceFx = Effect.fn("makeTickServiceFx")(function* <Error, Requirements>({
 	advanceRuntimeElapsed,
-}: makeTickServiceFx.Props<Error, Requirements>) {
+}: MakeTickServiceProps<Error, Requirements>) {
 	const observedAtMs = yield* Clock.currentTimeMillis;
 	const runtimeFx = yield* RuntimeFx;
 	const store = yield* SynchronizedRef.make(
@@ -35,9 +36,7 @@ export const makeTickServiceFx = Effect.fn("makeTickServiceFx")(function* <Error
 
 	const advanceObservedFx = (
 		observe: (state: TickSchema.Type) => Effect.Effect<ElapsedObservation>,
-		apply: (
-			elapsedMs: number,
-		) => Effect.Effect<advanceRuntimeElapsedFx.Result, Error, Requirements>,
+		apply: (elapsedMs: number) => Effect.Effect<RuntimeAdvanceResult, Error, Requirements>,
 	) =>
 		Effect.uninterruptible(
 			SynchronizedRef.modifyEffect(store, (state) =>
@@ -53,7 +52,7 @@ export const makeTickServiceFx = Effect.fn("makeTickServiceFx")(function* <Error
 						return [
 							Exit.succeed({
 								stableRuntime,
-							} satisfies advanceRuntimeElapsedFx.Result),
+							} satisfies RuntimeAdvanceResult),
 							next,
 						] as const;
 					}
@@ -67,7 +66,7 @@ export const makeTickServiceFx = Effect.fn("makeTickServiceFx")(function* <Error
 						return [
 							Exit.succeed({
 								stableRuntime,
-							} satisfies advanceRuntimeElapsedFx.Result),
+							} satisfies RuntimeAdvanceResult),
 							{
 								...next,
 								pendingElapsedMs: next.pendingElapsedMs - applicableElapsedMs,

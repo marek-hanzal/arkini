@@ -1,9 +1,9 @@
 import { Effect, Layer } from "effect";
 
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
-import { GameLoopLayerFx } from "~/engine/game/layer/GameLoopLayerFx";
+import { GameLoopLayerFx } from "~/game-tick/GameLoopLayerFx";
 import { fromStateFx } from "~/engine/state/fx/fromStateFx";
-import { TickLayerFx } from "~/engine/tick/layer/TickLayerFx";
+import { TickLayerFx } from "~/game-tick/TickLayerFx";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { GameRuntimeLayerFx } from "~/game-runtime/layer/GameRuntimeLayerFx";

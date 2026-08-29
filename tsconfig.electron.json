@@ -24,6 +24,7 @@
 	},
 	"include": [
 		"electron",
+		"src/game-tick",
 		"src/game-runtime",
 		"src/game-start",
 		"src/game-event",

@@ -13,7 +13,7 @@ import { attemptQueuedLineStartFx } from "~/production-job/fx/attemptQueuedLineS
 import { resolveJobRunnableFx } from "~/production-job/fx/resolveJobRunnableFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { TickStepMs } from "~/engine/tick/TickStepMs";
+import { TickStepMs } from "~/game-tick/TickStepMs";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
@@ -22,17 +22,17 @@ interface RuntimeStepResult {
 	readonly runtime: RuntimeSchema.Type;
 }
 
-const sortJobs = (jobs: readonly JobSchema.Type[]) =>
+const sortJobsFn = (jobs: readonly JobSchema.Type[]) =>
 	[
 		...jobs,
 	].sort((first, second) => first.id.localeCompare(second.id));
 
-const sortTemporaryItems = (runtime: RuntimeSchema.Type) =>
+const sortTemporaryItemsFn = (runtime: RuntimeSchema.Type) =>
 	runtime.items
 		.filter((item) => item.item.type === TypeSchema.enum.Temporary)
 		.sort((first, second) => first.id.localeCompare(second.id));
 
-const replaceJob = (runtime: RuntimeSchema.Type, job: JobSchema.Type): RuntimeSchema.Type => ({
+const replaceJobFn = (runtime: RuntimeSchema.Type, job: JobSchema.Type): RuntimeSchema.Type => ({
 	...runtime,
 	jobs: runtime.jobs.map((candidate) => (candidate.id === job.id ? job : candidate)),
 });
@@ -163,8 +163,8 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 	const instantGameplay = yield* isInstantGameplayEnabledFx({
 		runtime: deliveryStart.runtime,
 	});
-	const jobs = sortJobs(deliveryStart.runtime.jobs);
-	const temporaryItems = sortTemporaryItems(deliveryStart.runtime);
+	const jobs = sortJobsFn(deliveryStart.runtime.jobs);
+	const temporaryItems = sortTemporaryItemsFn(deliveryStart.runtime);
 	const runnableByJobId = new Map<IdSchema.Type, boolean>();
 	for (const job of jobs) {
 		runnableByJobId.set(
@@ -186,7 +186,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		if (job.remainingMs === 0 || runnableByJobId.get(job.id) !== true) continue;
 		const liveJob = draft.jobs.find((candidate) => candidate.id === job.id);
 		if (liveJob === undefined) continue;
-		draft = replaceJob(draft, {
+		draft = replaceJobFn(draft, {
 			...liveJob,
 			remainingMs: instantGameplay ? 0 : Math.max(0, liveJob.remainingMs - TickStepMs),
 		});

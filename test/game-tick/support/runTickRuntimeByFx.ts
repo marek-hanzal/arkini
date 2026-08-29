@@ -1,16 +1,14 @@
 import { Effect } from "effect";
 
-import { TickFx } from "~/engine/tick/context/TickFx";
+import { TickFx } from "~/game-tick/TickFx";
 
-export namespace runTickRuntimeByFx {
-	export interface Props {
-		elapsedMs: number;
-	}
+interface RunTickRuntimeByProps {
+	readonly elapsedMs: number;
 }
 
 /** Advances one deterministic local Tick through the same failure-safe protocol. */
 export const runTickRuntimeByFx = Effect.fn("runTickRuntimeByFx")(function* ({
 	elapsedMs,
-}: runTickRuntimeByFx.Props) {
+}: RunTickRuntimeByProps) {
 	yield* (yield* TickFx).advanceRuntimeBy(elapsedMs);
 });

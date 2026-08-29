@@ -5,7 +5,7 @@ import { Effect } from "effect";
 import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
 import type { Game } from "~/renderer/game/Game";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { createTickFailureTestConfig } from "~test/tick/support/createTickFailureTestConfig";
+import { createTickFailureTestConfig } from "~test/game-tick/support/createTickFailureTestConfig";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 
 import { emitCompletedEventFx } from "./createGameSession.test/fixture";

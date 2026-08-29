@@ -2,22 +2,20 @@ import { Effect } from "effect";
 
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { TickStepMs } from "~/engine/tick/TickStepMs";
-import { advanceRuntimeStepFx } from "~/engine/tick/internal/advanceRuntimeStepFx";
+import { TickStepMs } from "~/game-tick/TickStepMs";
+import { advanceRuntimeStepFx } from "~/game-tick/advanceRuntimeStepFx";
 
-export namespace replayRuntimeStepsFx {
-	export interface Props {
-		elapsedMs: number;
-		runtime: RuntimeSchema.Type;
-	}
+interface ReplayRuntimeStepsProps {
+	readonly elapsedMs: number;
+	readonly runtime: RuntimeSchema.Type;
+}
 
-	export interface Result {
-		readonly events: readonly GameEventSchema.Type[];
-		readonly isStable: boolean;
-		readonly processedSteps: number;
-		readonly runtime: RuntimeSchema.Type;
-		readonly skippedSteps: number;
-	}
+interface ReplayRuntimeStepsResult {
+	readonly events: readonly GameEventSchema.Type[];
+	readonly isStable: boolean;
+	readonly processedSteps: number;
+	readonly runtime: RuntimeSchema.Type;
+	readonly skippedSteps: number;
 }
 
 /**
@@ -31,7 +29,7 @@ export namespace replayRuntimeStepsFx {
 export const replayRuntimeStepsFx = Effect.fn("replayRuntimeStepsFx")(function* ({
 	elapsedMs,
 	runtime,
-}: replayRuntimeStepsFx.Props) {
+}: ReplayRuntimeStepsProps) {
 	if (elapsedMs % TickStepMs !== 0) {
 		return yield* Effect.die(
 			new Error(`Tick advancement ${elapsedMs}ms is not divisible by ${TickStepMs}ms.`),
@@ -62,5 +60,5 @@ export const replayRuntimeStepsFx = Effect.fn("replayRuntimeStepsFx")(function* 
 		processedSteps,
 		runtime: draft,
 		skippedSteps: totalSteps - processedSteps,
-	} satisfies replayRuntimeStepsFx.Result;
+	} satisfies ReplayRuntimeStepsResult;
 });

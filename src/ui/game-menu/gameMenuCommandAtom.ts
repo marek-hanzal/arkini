@@ -5,7 +5,7 @@ import { match } from "ts-pattern";
 import type { Game } from "~/renderer/game/Game";
 import { makeExactGameAtomFamilyFx } from "~/ui/game/makeExactGameAtomFamilyFx";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
-import { readRendererLifecycleFx } from "~/renderer/lifecycle/readRendererLifecycleFx";
+import { readRendererLifecycleFx } from "~/application-runtime/lifecycle/readRendererLifecycleFx";
 import { RuntimeSaveFx } from "~/game-persistence/RuntimeSaveFx";
 
 export type GameMenuCommand = "save" | "save-and-exit";

@@ -3,7 +3,7 @@ import type { FederatedPointerEvent } from "pixi.js";
 import { match, P } from "ts-pattern";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/RendererRuntime";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { DropItemResultKind } from "~/item-interaction/DropItemResult";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";

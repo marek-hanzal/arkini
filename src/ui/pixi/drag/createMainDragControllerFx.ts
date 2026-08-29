@@ -3,7 +3,7 @@ import type { FederatedPointerEvent } from "pixi.js";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import { removeCheatItemFx as removeEngineCheatItemFx } from "~/engine/cheat/write/removeCheatItemFx";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/RendererRuntime";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { PointerDragThreshold } from "~/ui/drag/PointerDragThreshold";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";

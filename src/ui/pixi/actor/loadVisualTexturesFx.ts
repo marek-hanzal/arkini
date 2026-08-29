@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { Texture } from "pixi.js";
 
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/RendererRuntime";
 import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";
 import { runVisualReadinessFx } from "~/ui/pixi/actor/runVisualReadinessFx";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";

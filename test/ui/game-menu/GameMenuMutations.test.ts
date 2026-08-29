@@ -5,9 +5,9 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Game } from "~/renderer/game/Game";
-import { RendererLifecycleOwnerAtom } from "~/renderer/lifecycle/RendererLifecycleOwnerAtom";
-import { createRendererLifecycleFx } from "~/renderer/lifecycle/createRendererLifecycleFx";
-import { readRendererLifecycleFx } from "~/renderer/lifecycle/readRendererLifecycleFx";
+import { RendererLifecycleOwnerAtom } from "~/application-runtime/lifecycle/readRendererLifecycleFx";
+import { createRendererLifecycleFx } from "~/application-runtime/lifecycle/createRendererLifecycleFx";
+import { readRendererLifecycleFx } from "~/application-runtime/lifecycle/readRendererLifecycleFx";
 import { gameMenuCommandAtom } from "~/ui/game-menu/gameMenuCommandAtom";
 import { testArkpackConfig } from "~test/arkpack/support/createTestArkpack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";

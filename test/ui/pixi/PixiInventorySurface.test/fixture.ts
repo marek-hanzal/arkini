@@ -91,7 +91,7 @@ vi.mock("~/renderer/RendererRuntime", () => ({
 	},
 }));
 
-vi.mock("~/engine/runtime/write/releaseInventoryItemFx", () => ({
+vi.mock("~/item-interaction/write/releaseInventoryItemFx", () => ({
 	releaseInventoryItemFx: (props: unknown) =>
 		Effect.sync(() => {
 			surfaceState.release(props);

@@ -8,7 +8,8 @@ import { queryFx } from "~/engine/query/fx/queryFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { getItemFx } from "~test/support/runtime/getItemFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
-import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
+import { DropItemRejectedReason, DropItemResultKind } from "~/item-interaction/DropItemResult";
+import { dropItemFx } from "~/item-interaction/write/dropItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import {
 	inputRuntimeTestConfig,
@@ -152,7 +153,7 @@ describe("storeInputMaterialFx", () => {
 		expect(result.queried).toEqual([]);
 	});
 
-	it("keeps generic grid movement from bypassing the input command boundary", () => {
+	it("keeps item drops from bypassing the input command boundary", () => {
 		const moved = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
@@ -167,13 +168,16 @@ describe("storeInputMaterialFx", () => {
 					itemId: "runtime:water",
 				});
 
-				return yield* Effect.result(
-					moveItemFx({
-						itemId: "runtime:water",
+				return yield* dropItemFx({
+					sourceItemId: "runtime:water",
+					sourceLocation: sourceLocation(1),
+					sourceRevision: item.revision,
+					target: {
+						kind: "slot",
 						location: sourceLocation(2),
-						revision: item.revision,
-					}),
-				);
+						occupant: null,
+					},
+				});
 			}).pipe(
 				useGameFx({
 					config: inputRuntimeTestConfig,
@@ -181,13 +185,11 @@ describe("storeInputMaterialFx", () => {
 			),
 		);
 
-		expect(Result.isFailure(moved)).toBe(true);
-		if (Result.isFailure(moved)) {
-			expect(moved.failure).toMatchObject({
-				_tag: "ItemNotOnGridError",
-				itemId: "runtime:water",
-			});
-		}
+		expect(moved).toEqual({
+			kind: DropItemResultKind.Reject,
+			reason: DropItemRejectedReason.InvalidSource,
+			itemId: "runtime:water",
+		});
 	});
 
 	it("splits a partially accepted stack without changing the source location", () => {

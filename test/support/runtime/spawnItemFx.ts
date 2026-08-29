@@ -7,7 +7,7 @@ import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationCl
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { assertPlacementMaxCountFx } from "~/item-placement/fx/assertPlacementMaxCountFx";
-import { LocationOccupiedError } from "~/engine/runtime/error/LocationOccupiedError";
+import { LocationOccupiedError } from "~/item-interaction/error/LocationOccupiedError";
 import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
 import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";

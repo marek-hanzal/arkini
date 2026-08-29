@@ -7,7 +7,7 @@ import { storeInputMaterialFx } from "~/production-input/write/storeInputMateria
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { fromStateFx } from "~/engine/state/fx/fromStateFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
-import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
+import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
@@ -324,7 +324,7 @@ describe("stash line completion transition", () => {
 					elapsedMs: 200,
 				});
 				const blocked = yield* readRuntimeFx();
-				yield* removeItemFx({
+				yield* removeRuntimeItemForTestFx({
 					itemId: blocker.id,
 					revision: blocker.revision,
 				});

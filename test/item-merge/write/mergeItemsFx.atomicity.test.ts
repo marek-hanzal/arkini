@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { mergeItemsFx } from "~/item-merge/write/mergeItemsFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
-import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
+import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import {
 	createMergeTestConfig,
@@ -275,7 +275,7 @@ describe("mergeItemsFx atomicity", () => {
 				if (blocker === undefined) {
 					return yield* Effect.die(new Error("Expected blocker."));
 				}
-				yield* removeItemFx({
+				yield* removeRuntimeItemForTestFx({
 					itemId: blocker.id,
 					revision: blocker.revision,
 				});

@@ -5,7 +5,7 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
-import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
+import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { TickFx } from "~/game-tick/TickFx";
@@ -218,7 +218,7 @@ describe("job board and inventory flow", () => {
 				const pendingAfterBlocked = yield* (yield* TickFx).read;
 				const blocker = blocked.items.find((item) => item.item.id === "blocker");
 				if (blocker === undefined) throw new Error("Expected a board blocker.");
-				yield* removeItemFx({
+				yield* removeRuntimeItemForTestFx({
 					itemId: blocker.id,
 					revision: blocker.revision,
 				});
@@ -302,7 +302,7 @@ describe("job board and inventory flow", () => {
 				});
 				const beforePause = yield* readRuntimeFx();
 
-				yield* removeItemFx({
+				yield* removeRuntimeItemForTestFx({
 					itemId: permit.id,
 					revision: permit.revision,
 				});

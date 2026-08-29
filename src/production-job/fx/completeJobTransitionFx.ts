@@ -5,28 +5,42 @@ import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { JobCompletionOwner } from "~/production-job/completion/JobCompletionContext";
 import { completeLineJobRuntimeFx } from "~/production-job/completion/fx/completeLineJobRuntimeFx";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
+import type { JobRuntimeItemSchema } from "~/game-runtime/schema/JobRuntimeItemSchema";
+import type { ReservedRuntimeItemSchema } from "~/game-runtime/schema/ReservedRuntimeItemSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { JobNotFoundError } from "~/production-job/error/JobNotFoundError";
 import { JobNotReadyError } from "~/production-job/error/JobNotReadyError";
 import { makeJobCompletionRandomFx } from "~/production-job/random/makeJobCompletionRandomFx";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
-import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
-import { isJobRuntimeItemFn } from "~/engine/runtime/read/fn/isJobRuntimeItemFn";
-import { isReservedRuntimeItemFn } from "~/engine/runtime/read/fn/isReservedRuntimeItemFn";
-import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { isBoardRuntimeItemFn } from "~/game-runtime/read/fn/isBoardRuntimeItemFn";
+import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
-export namespace completeJobTransitionFx {
-	export interface Props {
-		jobId: IdSchema.Type;
-		runtime: RuntimeSchema.Type;
-	}
+const isJobRuntimeItemFn = (item: RuntimeItemSchema.Type) =>
+	Option.liftPredicate(
+		item,
+		(candidate): candidate is JobRuntimeItemSchema.Type =>
+			candidate.location.scope === LocationScopeEnumSchema.enum.Job,
+	);
+
+const isReservedRuntimeItemFn = (item: RuntimeItemSchema.Type) =>
+	Option.liftPredicate(
+		item,
+		(candidate): candidate is ReservedRuntimeItemSchema.Type =>
+			candidate.location.scope === LocationScopeEnumSchema.enum.Reserved,
+	);
+
+interface CompleteJobTransitionProps {
+	jobId: IdSchema.Type;
+	runtime: RuntimeSchema.Type;
 }
 
 /** Resolves one ready job once and applies line output plus charge depletion lifecycle. */
 export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(function* ({
 	jobId,
 	runtime,
-}: completeJobTransitionFx.Props) {
+}: CompleteJobTransitionProps) {
 	const job = runtime.jobs.find((candidate) => candidate.id === jobId);
 	if (job === undefined)
 		return yield* Effect.fail(

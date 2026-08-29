@@ -5,7 +5,7 @@ import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { completeJobTransitionFx } from "~/production-job/fx/completeJobTransitionFx";
 import type { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import { isExpectedPlacementDeliveryBlockFn } from "~/item-placement/read/fn/isExpectedPlacementDeliveryBlockFn";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace attemptJobCompletionFx {
 	export interface Props {

@@ -20,14 +20,14 @@ import type { GridLocationSchema } from "~/item-location/schema/GridLocationSche
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
-import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
-import { discardRuntimeItemIdentityStateFx } from "~/engine/runtime/fx/discardRuntimeItemIdentityStateFx";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
-import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
-import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
-import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
-import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
+import { ItemLocationConflictError } from "~/game-runtime/error/ItemLocationConflictError";
+import { discardRuntimeItemIdentityStateFx } from "~/game-runtime/fx/discardRuntimeItemIdentityStateFx";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { isBoardRuntimeItemFn } from "~/game-runtime/read/fn/isBoardRuntimeItemFn";
+import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
+import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
+import type { InputRuntimeItemSchema } from "~/game-runtime/schema/InputRuntimeItemSchema";
 import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceBoardOperationError";
 
 export namespace storeInputMaterialFx {

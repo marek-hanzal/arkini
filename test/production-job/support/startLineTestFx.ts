@@ -5,7 +5,7 @@ import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { resolveLineStartFx } from "~/production-job/fx/read/resolveLineStartFx";
 import { startLineRuntimeFx } from "~/production-job/fx/startLineRuntimeFx";
 import { LineRunUnavailableError } from "~/production-line/error/LineRunUnavailableError";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 
 export namespace startLineFx {
 	export interface Props {

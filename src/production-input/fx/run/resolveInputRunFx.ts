@@ -6,8 +6,8 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { InputSchema } from "~/production-input/schema/InputSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { InputRuntimeItemSchema } from "~/game-runtime/schema/InputRuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 
 import { resolveInputMaterialRunFx } from "./resolveInputMaterialRunFx";

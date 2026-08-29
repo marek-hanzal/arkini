@@ -4,8 +4,8 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { DefaultLineQueueUnavailableError } from "~/production-job/error/DefaultLineQueueUnavailableError";
 import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
 import { readEffectiveDefaultLineFn } from "~/production-line/fn/readEffectiveDefaultLineFn";
-import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace readDefaultLineQueueTargetFx {
 	export interface Props {

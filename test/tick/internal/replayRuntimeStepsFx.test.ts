@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { advanceRuntimeStepFx } from "~/engine/tick/internal/advanceRuntimeStepFx";
 import { replayRuntimeStepsFx } from "~/engine/tick/internal/replayRuntimeStepsFx";

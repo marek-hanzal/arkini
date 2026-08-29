@@ -5,13 +5,13 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { startFx } from "~/game-start/startFx";
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import {
 	lineRunRuntime,
 	lineRunTestConfig,
 } from "~test/production-line/fx/run/support/lineRunTestRuntime";
 import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 
 export {
 	Effect,

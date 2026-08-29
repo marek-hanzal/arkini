@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import { useGameEngine } from "~/ui/game/useGameEngine";
 import { useRuntimeSelector } from "~/ui/game/useRuntimeSelector";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { readItemDetailInfoFn } from "~/engine/item-detail/fn/readItemDetailInfoFn";
 
 export namespace useItemDetailInfo {

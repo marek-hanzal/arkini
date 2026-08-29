@@ -3,8 +3,8 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { LineNotFoundError } from "~/production-line/error/LineNotFoundError";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
-import { readBoardRuntimeItemByIdFx } from "~/engine/runtime/read/readBoardRuntimeItemByIdFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { readBoardRuntimeItemByIdFx } from "~/game-runtime/read/readBoardRuntimeItemByIdFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 /** Reads one board line together with its exact live owner. */
 export const readBoardItemLineFx = Effect.fn("readBoardItemLineFx")(function* ({

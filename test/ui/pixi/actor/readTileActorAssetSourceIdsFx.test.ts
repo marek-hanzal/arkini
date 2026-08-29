@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import { readTileActorAssetSourceIdsFx } from "~/ui/pixi/actor/readTileActorAssetSourceIdsFx";
 import { readTileActorsFx } from "~/ui/pixi/actor/readTileActorsFx";
-import { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 const config = GameConfigSchema.parse({

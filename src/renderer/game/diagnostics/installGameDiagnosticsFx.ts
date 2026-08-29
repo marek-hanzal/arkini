@@ -4,7 +4,7 @@ import type { ArkpackDescriptor } from "~/arkpack/ArkpackDescriptor";
 import { toDiagnosticValueFn } from "~/renderer/diagnostics/fn/toDiagnosticValueFn";
 import { writeDiagnosticRecordFx } from "~/renderer/diagnostics/writeDiagnosticRecordFx";
 import type { GameSession, GameTransition } from "~/renderer/game/session/GameSession";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 type GameDiagnosticsSession = Pick<
 	GameSession,

@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { removeItemRuntimeTransitionFx } from "~/engine/runtime/fx/removeItemRuntimeTransitionFx";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 
 export namespace removeItemFx {
 	export interface Props {

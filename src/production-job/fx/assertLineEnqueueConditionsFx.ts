@@ -8,7 +8,7 @@ import { assertOutputCapacityFx } from "~/production-job/fx/assertOutputCapacity
 import type { resolveLineStartFx } from "~/production-job/fx/read/resolveLineStartFx";
 import { readBoardItemLineFx } from "~/production-line/fx/readBoardItemLineFx";
 import { LineRunUnavailableError } from "~/production-line/error/LineRunUnavailableError";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace assertLineEnqueueConditionsFx {
 	export interface Props {

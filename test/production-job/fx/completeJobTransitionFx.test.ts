@@ -6,7 +6,7 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import { attemptJobCompletionFx } from "~/production-job/fx/attemptJobCompletionFx";
 import { makeJobCompletionRandomFx } from "~/production-job/random/makeJobCompletionRandomFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
-import { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import {
 	createRandomCompletionConfig,
 	prepareRandomCompletionRuntimeFx,

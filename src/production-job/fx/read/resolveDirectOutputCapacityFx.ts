@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readReservedJobOutputQuantitiesFn } from "~/production-job/fn/readReservedJobOutputQuantitiesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { readOutputReservationFn } from "~/production-job/fn/readOutputReservationFn";
 import { resolveOutputCapacityFx } from "./resolveOutputCapacityFx";
 

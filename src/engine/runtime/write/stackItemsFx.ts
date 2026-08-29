@@ -5,13 +5,13 @@ import type { GridLocationSchema } from "~/item-location/schema/GridLocationSche
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { StackItemsUnavailableError } from "~/engine/runtime/error/StackItemsUnavailableError";
-import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
-import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
+import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
+import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 import { readItemStackResolutionFn } from "~/engine/runtime/read/fn/readItemStackResolutionFn";
-import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace stackItemsFx {
 	export interface Props {

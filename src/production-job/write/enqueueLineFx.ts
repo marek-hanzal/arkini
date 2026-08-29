@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { enqueueLineRuntimeFx } from "~/production-job/fx/enqueueLineRuntimeFx";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 
 export namespace enqueueLineFx {
 	export interface Props {

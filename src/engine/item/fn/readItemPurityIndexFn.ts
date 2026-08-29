@@ -1,6 +1,6 @@
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export interface ItemPurityIndex {
 	readonly inputLineIdsByOwnerId: ReadonlyMap<IdSchema.Type, ReadonlySet<IdSchema.Type>>;

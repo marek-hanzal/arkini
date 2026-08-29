@@ -2,12 +2,12 @@ import { Effect, type Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
+import type { GameLayerFx } from "~test/support/game/GameLayerFx";
 import { setDefaultLineFx } from "~/production-line/write/setDefaultLineFx";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
-import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
+import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
 import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";

@@ -10,7 +10,7 @@ import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnu
 import { orderGridLocationsFn } from "~/item-placement/fn/orderGridLocationsFn";
 import { readBoardLocationsFn } from "~/item-placement/fn/readBoardLocationsFn";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { planScopePlacementFx } from "./planScopePlacementFx";
 
 interface PlanBoardPlacementProps {

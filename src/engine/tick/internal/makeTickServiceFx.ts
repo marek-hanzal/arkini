@@ -1,7 +1,7 @@
 import { Clock, Effect, Exit, SynchronizedRef } from "effect";
 
-import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { advanceRuntimeElapsedFx } from "~/engine/tick/internal/advanceRuntimeElapsedFx";
 import { TickSchema } from "~/engine/tick/schema/TickSchema";
 import { TickStepMs } from "~/engine/tick/TickStepMs";

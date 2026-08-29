@@ -2,7 +2,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readItemDetailTabsFn } from "~/engine/item-detail/fn/readItemDetailTabsFn";
 import type { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetailSourcesFx";
 import { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace resolveItemDetailTargetFn {
 	export interface Props {

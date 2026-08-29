@@ -18,14 +18,14 @@ import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacement
 import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";
 import { planDropPlacementFx } from "~/item-placement/fx/planDropPlacementFx";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
-import { createRuntimeItemFx } from "~/engine/runtime/fx/createRuntimeItemFx";
-import { discardRuntimeItemOwnedStateFx } from "~/engine/runtime/fx/discardRuntimeItemOwnedStateFx";
-import { removeRuntimeItemFx } from "~/engine/runtime/fx/removeRuntimeItemFx";
-import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
-import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
-import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
+import { discardRuntimeItemOwnedStateFx } from "~/game-runtime/fx/discardRuntimeItemOwnedStateFx";
+import { removeRuntimeItemFx } from "~/game-runtime/fx/removeRuntimeItemFx";
+import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
+import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
+import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
+import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function* ({
 	action,

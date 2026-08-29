@@ -4,8 +4,8 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { assertNonJobScopeFx } from "~/engine/runtime/fx/assertNonJobScopeFx";
-import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 /** Reads one exact mutable runtime root and validates its captured revision and scope. */
 export const readValidatedRuntimeItemFx = Effect.fn("readValidatedRuntimeItemFx")(function* ({

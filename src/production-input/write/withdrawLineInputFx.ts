@@ -6,7 +6,7 @@ import { LineInputEmptyError } from "~/production-input/error/LineInputEmptyErro
 import { filterInputSlotItemsFn } from "~/production-input/fn/filterInputSlotItemsFn";
 import { readItemMaterialInputFx } from "~/production-input/read/readItemMaterialInputFx";
 import { readBoardItemLineFx } from "~/production-line/fx/readBoardItemLineFx";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 import { returnBufferedLineItemsFx } from "./returnBufferedLineItemsFx";
 
 export namespace withdrawLineInputFx {

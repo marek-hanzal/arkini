@@ -6,7 +6,7 @@ import { readItemQueueSizeFn } from "~/production-job/fn/readItemQueueSizeFn";
 import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
 import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { readLineInputAutofillCoverageFx } from "~/production-input/fx/readLineInputAutofillCoverageFx";
 import { resolveLineStartFx } from "~/production-job/fx/read/resolveLineStartFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";

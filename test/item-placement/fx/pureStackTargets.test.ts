@@ -5,7 +5,7 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";
 import { planScopePlacementFx } from "~/item-placement/fx/planScopePlacementFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { purityTestConfig } from "~test/production-line/support/purityTestConfig";
 
 const board = (x: number) => ({

@@ -5,8 +5,8 @@ import type { InputRun } from "~/production-input/InputRun";
 import { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
 import type { ChargeSchema } from "~/production-input/schema/ChargeSchema";
 import { readItemRemainingChargesFn } from "~/engine/item/fn/readItemRemainingChargesFn";
-import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace resolveActionChargeFx {
 	export interface Props {

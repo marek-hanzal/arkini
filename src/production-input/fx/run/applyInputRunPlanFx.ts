@@ -8,7 +8,7 @@ import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativ
 import type { InputRun } from "~/production-input/InputRun";
 import { applyInputMaterialConsumeRunPlanFx } from "~/production-input/fx/run/applyInputMaterialConsumeRunPlanFx";
 import { applyInputMaterialReserveRunPlanFx } from "~/production-input/fx/run/applyInputMaterialReserveRunPlanFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 
 export namespace applyInputRunPlanFx {

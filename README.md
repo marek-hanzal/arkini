@@ -22,7 +22,8 @@ Read the smallest entry point needed for the task:
 ## Repository map
 
 ```text
-src/engine    remaining live gameplay runtime, session, Tick and platform-neutral support owners
+src/game-runtime  canonical live Runtime schemas, validation, identity, reads and atomic publication
+src/engine    remaining session, Tick, item-interaction, query, persistence and platform-neutral support owners
 src/game-start  initial-state schemas, exact placement planning and atomic runtime start
 src/game-event  committed gameplay event schemas and exact downstream event projection
 src/item-detail-frame  Item Detail target lifecycle, command settlement, reference navigation and frame presentation

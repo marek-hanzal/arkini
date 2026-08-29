@@ -1,10 +1,19 @@
-import { Layer } from "effect";
+import { Effect, Layer } from "effect";
 
-import { GameCoreLayerFx } from "~/engine/game/layer/GameCoreLayerFx";
+import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { GameLoopLayerFx } from "~/engine/game/layer/GameLoopLayerFx";
+import { fromStateFx } from "~/engine/state/fx/fromStateFx";
+import { TickLayerFx } from "~/engine/tick/layer/TickLayerFx";
+import type { StateSchema } from "~/engine/state/schema/StateSchema";
+import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameRuntimeLayerFx } from "~/game-runtime/layer/GameRuntimeLayerFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
-export namespace GameSessionLayerFx {
-	export interface Props extends GameCoreLayerFx.Props, GameLoopLayerFx.Props {}
+interface GameSessionLayerProps {
+	config: GameConfigSchema.Type;
+	state?: StateSchema.Type;
+	intervalMs?: number;
+	onFatalError?: (cause: unknown) => void;
 }
 
 /** Combines one game core with its scoped production loop. */
@@ -13,15 +22,25 @@ export const GameSessionLayerFx = ({
 	state,
 	intervalMs,
 	onFatalError,
-}: GameSessionLayerFx.Props) => {
-	const core = GameCoreLayerFx({
-		config,
-		state,
-	});
-	const loop = GameLoopLayerFx({
-		intervalMs,
-		onFatalError,
-	}).pipe(Layer.provide(core));
+}: GameSessionLayerProps) => {
+	const makeSessionLayer = (initialRuntime?: RuntimeSchema.Type) => {
+		const runtime = GameRuntimeLayerFx({
+			config,
+			initialRuntime,
+		});
+		const tick = TickLayerFx.pipe(Layer.provide(runtime));
+		const core = Layer.merge(runtime, tick);
+		const loop = GameLoopLayerFx({
+			intervalMs,
+			onFatalError,
+		}).pipe(Layer.provide(core));
+		return Layer.merge(core, loop);
+	};
 
-	return Layer.merge(core, loop);
+	if (state === undefined) return makeSessionLayer();
+	return Layer.unwrap(
+		fromStateFx({
+			state,
+		}).pipe(Effect.provideService(GameConfigFx, config), Effect.map(makeSessionLayer)),
+	);
 };

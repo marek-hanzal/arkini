@@ -12,7 +12,7 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { orderGridLocationsFn } from "~/item-placement/fn/orderGridLocationsFn";
 import { readToolbarLocationsFn } from "~/item-placement/fn/readToolbarLocationsFn";
 import type { dropFx } from "~/production-output/fx/dropFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 import type { PlacementPlan } from "~/item-placement/PlacementPlan";
 

@@ -10,7 +10,7 @@ import type { ArkpackDescriptor } from "~/arkpack/ArkpackDescriptor";
 import type { GameSession, GameTransition } from "~/renderer/game/session/GameSession";
 import { installGameDiagnosticsFx } from "~/renderer/game/diagnostics/installGameDiagnosticsFx";
 import { GameSessionFatalError } from "~/renderer/game/session/GameSessionFatalError";
-import { RuntimeInvalidError } from "~/engine/runtime/error/RuntimeInvalidError";
+import { RuntimeInvalidError } from "~/game-runtime/error/RuntimeInvalidError";
 
 const originalWindow = globalThis.window;
 const runRendererEffect = <Value>(effect: Effect.Effect<Value>) => Effect.runSync(effect);

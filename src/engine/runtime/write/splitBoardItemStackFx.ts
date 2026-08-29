@@ -11,14 +11,14 @@ import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
-import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
+import { ItemLocationConflictError } from "~/game-runtime/error/ItemLocationConflictError";
 import { ItemStackSplitUnavailableError } from "~/engine/runtime/error/ItemStackSplitUnavailableError";
-import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
+import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { isBoardRuntimeItemFn } from "~/game-runtime/read/fn/isBoardRuntimeItemFn";
 import { readValidatedRuntimeItemFx } from "~/engine/runtime/read/readValidatedRuntimeItemFx";
-import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace splitBoardItemStackFx {
 	export interface Props {

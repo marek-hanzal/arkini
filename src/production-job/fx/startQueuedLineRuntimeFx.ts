@@ -6,7 +6,7 @@ import { readLineInputAutofillCoverageFx } from "~/production-input/fx/readLineI
 import { startLineRuntimeFx } from "~/production-job/fx/startLineRuntimeFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { JobOwnerBusyError } from "~/production-job/error/JobOwnerBusyError";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace startQueuedLineRuntimeFx {
 	export interface Props {

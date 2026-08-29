@@ -1,6 +1,6 @@
 import { Option } from "effect";
 
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
 import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
 

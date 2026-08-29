@@ -2,9 +2,9 @@ import { Effect } from "effect";
 
 import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";
 import type { InventoryStoragePlan } from "~/engine/runtime/fx/planInventoryStorageFx";
-import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
+import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 /** Applies one validated Inventory-storage plan to an immutable runtime draft. */
 export const applyInventoryStoragePlanFx = Effect.fn("applyInventoryStoragePlanFx")(function* ({

@@ -6,8 +6,8 @@ import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatef
 import { LineNotFoundError } from "~/production-line/error/LineNotFoundError";
 import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
 import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace setDefaultLineFx {
 	export interface Props {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 const activeRuntime = {
 	cheats: {

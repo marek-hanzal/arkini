@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { InstantGameplayStepBudget } from "~/engine/cheat/InstantGameplayStepBudget";
 import { isInstantGameplayEnabledFx } from "~/engine/cheat/read/isInstantGameplayEnabledFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { advanceRuntimeElapsedFx } from "~/engine/tick/internal/advanceRuntimeElapsedFx";
 import { TickStepMs } from "~/engine/tick/TickStepMs";
 

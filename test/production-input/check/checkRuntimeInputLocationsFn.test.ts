@@ -2,13 +2,13 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { checkRuntimeFx } from "~/game-runtime/check/checkRuntimeFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import {
 	inputRuntimeTestConfig,
 	workshopLocation,
 } from "~test/production-input/support/inputRuntimeTestConfig";
-import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
 const owner = {
 	id: "runtime:workshop",

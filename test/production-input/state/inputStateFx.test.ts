@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
 import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
-import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { fromStateFx } from "~/engine/state/fx/fromStateFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
 import {

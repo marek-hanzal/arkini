@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { releaseInventoryItemFx } from "~/engine/runtime/write/releaseInventoryItemFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 
 import { run, sourceLocation, spawnInventoryOpenerFx } from "./dropItemFx.test/fixture";
 

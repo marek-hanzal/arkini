@@ -1,18 +1,15 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readEditorItemDeleteBlockersFx } from "~/editor/readEditorItemDeleteBlockersFx";
+import { readEditorItemDeleteBlockersFn } from "~/editor/item/fn/readEditorItemDeleteBlockersFn";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { editorTestConfig } from "~test/editor/support/editorTestPayload";
 
-describe("readEditorItemDeleteBlockersFx", () => {
+describe("readEditorItemDeleteBlockersFn", () => {
 	it("reports the exact project path that still references the item", () => {
-		const blockers = Effect.runSync(
-			readEditorItemDeleteBlockersFx({
-				config: editorTestConfig,
-				itemId: "water",
-			}),
-		);
+		const blockers = readEditorItemDeleteBlockersFn({
+			config: editorTestConfig,
+			itemId: "water",
+		});
 
 		expect(blockers).toEqual([
 			expect.objectContaining({
@@ -61,12 +58,10 @@ describe("readEditorItemDeleteBlockersFx", () => {
 		});
 
 		expect(
-			Effect.runSync(
-				readEditorItemDeleteBlockersFx({
-					config,
-					itemId: "water",
-				}),
-			),
+			readEditorItemDeleteBlockersFn({
+				config,
+				itemId: "water",
+			}),
 		).toEqual([
 			expect.objectContaining({
 				path: [

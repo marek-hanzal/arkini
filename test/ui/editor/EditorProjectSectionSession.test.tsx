@@ -60,12 +60,6 @@ vi.mock("~/ui/editor/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
-vi.mock("~/ui/project/editor/saveEditorProjectConfigCommandAtom", () => ({
-	saveEditorProjectConfigCommandAtom: () => ({
-		id: "save-editor-project",
-	}),
-}));
-
 vi.mock("~/ui/reactivity/readSettledAsyncResultErrorFx", () => ({
 	readSettledAsyncResultErrorFx: () => Effect.succeed(undefined),
 }));

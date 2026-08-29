@@ -1,8 +1,9 @@
 import { McpServer } from "@modelcontextprotocol/server";
-import { Effect } from "effect";
+import { Effect, Order } from "effect";
 import { z } from "zod";
 
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
+import type { EditorProject } from "~/editor/EditorProject";
 import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
 import { EditorItemEstimateQuantitySchema } from "~/editor/estimator/EditorItemEstimateQuantitySchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -14,10 +15,6 @@ import { createItemFx } from "./createItemFx";
 import { editItemFx } from "./editItemFx";
 import { readEstimateTextFn } from "./fn/readEstimateTextFn";
 import { readItemCollectionTextFn } from "./fn/readItemCollectionTextFn";
-import { readItemMetaTextFn } from "./fn/readItemMetaTextFn";
-import { readProjectTextFn } from "./fn/readProjectTextFn";
-import { readItemConfigTextFx } from "./readItemConfigTextFx";
-import { readItemDetailTextFx } from "./readItemDetailTextFx";
 import { readItemEstimateTextFx } from "./readItemEstimateTextFx";
 import { readItemRelationTextFx } from "./readItemRelationTextFx";
 import { registerGameplayDesignTools } from "./registerGameplayDesignTools";
@@ -100,6 +97,89 @@ const ItemEstimateInputSchema = z
 	});
 
 const errorText = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
+
+const readProjectTextFn = (project: EditorProject) => {
+	const avatarResourceIds = Object.entries(project.config.resources)
+		.filter(([role]) => role.startsWith("avatar-"))
+		.map(([, resourceId]) => resourceId);
+	return [
+		`Title: ${project.title}`,
+		`Project ID: ${project.projectId}`,
+		`Game ID: ${project.config.meta.id}`,
+		`Arkpack version: ${project.version}`,
+		`Revision: ${project.revision}`,
+		`Board: ${project.config.meta.board.width} × ${project.config.meta.board.height}`,
+		`Toolbar: ${project.config.meta.toolbarSize === undefined || project.config.meta.toolbarSize === 0 ? "disabled" : `${project.config.meta.toolbarSize} slots`}`,
+		`Inventory: ${project.config.meta.inventory.width} × ${project.config.meta.inventory.height}`,
+		`Hero asset: ${project.config.resources.hero}`,
+		...(avatarResourceIds.length === 0
+			? []
+			: [
+					`About avatars: ${avatarResourceIds.join(", ")}`,
+				]),
+		`Items: ${Object.keys(project.config.items).length}`,
+		`Resources: ${project.resources.length}`,
+	].join("\n");
+};
+
+const readItemMetaTextFn = (project: EditorProject) => {
+	const counts = new Map<string, number>();
+	for (const item of Object.values(project.config.items))
+		counts.set(item.type, (counts.get(item.type) ?? 0) + 1);
+	return [
+		`Total: ${Object.keys(project.config.items).length}`,
+		...[
+			...counts.entries(),
+		]
+			.sort(([left], [right]) => Order.String(left, right))
+			.map(([type, count]) => `${type}: ${count}`),
+	].join("\n");
+};
+
+const readItemDetailTextFx = Effect.fn("readItemDetailTextFx")(
+	(project: EditorProject, itemId: string) =>
+		Effect.gen(function* () {
+			const item = project.config.items[itemId];
+			if (item === undefined)
+				return yield* Effect.fail(
+					new Error(`Item ${itemId} does not exist in the open project.`),
+				);
+			return [
+				`Item: ${item.title}`,
+				`ID: ${item.id}`,
+				`UID: ${item.uid}`,
+				`Type: ${item.type}`,
+				"Description:",
+				...item.description.split("\n").map((line) => `  ${line}`),
+				`Storage: ${item.scope}`,
+				`Stack capacity: ${item.maxStackSize}`,
+				...(item.maxCount === undefined
+					? []
+					: [
+							`Game limit: ${item.maxCount}`,
+						]),
+			].join("\n");
+		}),
+);
+
+const readItemConfigTextFx = Effect.fn("readItemConfigTextFx")(
+	(project: EditorProject, itemId: string) =>
+		Effect.gen(function* () {
+			const item = project.config.items[itemId];
+			if (item === undefined)
+				return yield* Effect.fail(
+					new Error(`Item ${itemId} does not exist in the open project.`),
+				);
+			return JSON.stringify(
+				{
+					revision: project.revision,
+					item,
+				},
+				null,
+				2,
+			);
+		}),
+);
 
 const readCurrentProjectFx = (
 	repository: EditorProjectRepositoryService,

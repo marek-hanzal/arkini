@@ -1,6 +1,8 @@
 import { useAtomSet } from "@effect/atom-react";
 import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { useBlocker, useRouter } from "@tanstack/react-router";
+import { Effect } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import { LogOut, RefreshCw } from "lucide-react";
 import {
 	useCallback,
@@ -12,8 +14,10 @@ import {
 } from "react";
 import { flushSync } from "react-dom";
 
+import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
+import { ArkpackCatalogOwnerAtom } from "~/renderer/arkpack/ArkpackCatalogOwnerAtom";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { useEditorProject } from "~/ui/editor/useEditorProject";
-import { waitForEditorProjectWritesCommandAtom } from "~/ui/editor/waitForEditorProjectWritesCommandAtom";
 import { Button, ButtonLink } from "~/ui/button/Button";
 import {
 	EditorWorkspaceRoutes,
@@ -31,6 +35,18 @@ const tabClassName =
 const activeTabProps = {
 	className: "border-accent bg-accent text-accent-contrast hover:bg-accent-hover",
 } as const;
+
+const waitForEditorProjectWritesCommandAtom = RendererRuntime.runSync(
+	Effect.map(EditorProjectRepository, (repository) =>
+		Atom.fn((_, get) => {
+			const catalog = get(ArkpackCatalogOwnerAtom);
+			return Effect.all([
+				repository.awaitIdleFx,
+				catalog?.awaitIdleFx ?? Effect.void,
+			]).pipe(Effect.asVoid);
+		}).pipe(Atom.setIdleTTL(0)),
+	),
+);
 
 const readWorkspaceFromPathname = (
 	pathname: string,

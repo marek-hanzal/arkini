@@ -32,12 +32,6 @@ vi.mock("~/ui/editor/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
-vi.mock("~/ui/resource/editor/deleteEditorAssetCommandAtom", () => ({
-	deleteEditorAssetCommandAtom: () => ({
-		id: "delete-editor-asset",
-	}),
-}));
-
 vi.mock("~/ui/item/editor/EditorItemThumbnail", () => ({
 	EditorItemThumbnail: () =>
 		createElement("span", {

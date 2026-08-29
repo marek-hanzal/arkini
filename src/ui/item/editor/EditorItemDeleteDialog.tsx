@@ -1,6 +1,6 @@
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { EditorProject } from "~/editor/EditorProject";
-import type { EditorItemForceDeleteImpact } from "~/editor/forceDeleteEditorItemFx";
+import type { forceDeleteEditorItemFx } from "~/editor/item/fx/forceDeleteEditorItemFx";
 import { Button, ButtonLink, DangerButton } from "~/ui/button/Button";
 
 const EditorItemDeleteError = ({ error }: { readonly error: unknown }) =>
@@ -23,7 +23,7 @@ const EditorItemForceDeleteImpactList = ({
 	impact,
 	project,
 }: {
-	readonly impact: EditorItemForceDeleteImpact;
+	readonly impact: forceDeleteEditorItemFx.Impact;
 	readonly project: EditorProject;
 }) => {
 	const entries: string[] = [];
@@ -81,7 +81,7 @@ export const EditorItemDeleteDialog = ({
 }: {
 	readonly error: unknown;
 	readonly force: boolean;
-	readonly impact: EditorItemForceDeleteImpact;
+	readonly impact: forceDeleteEditorItemFx.Impact;
 	readonly item: ItemSchema.Type;
 	readonly pending: boolean;
 	readonly project: EditorProject;

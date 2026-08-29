@@ -2,7 +2,7 @@ import { ArrowRight, ShieldAlert, ShieldCheck } from "lucide-react";
 
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { EditorProject } from "~/editor/EditorProject";
-import type { EditorItemDeleteBlocker } from "~/editor/readEditorItemDeleteBlockersFx";
+import type { readEditorItemDeleteBlockersFn } from "~/editor/item/fn/readEditorItemDeleteBlockersFn";
 import { ButtonLink, DangerButton } from "~/ui/button/Button";
 import { EditorItemDeleteDialog } from "~/ui/item/editor/EditorItemDeleteDialog";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
@@ -14,7 +14,7 @@ const EditorItemDeleteBlockerLink = ({
 	blocker,
 	project,
 }: {
-	readonly blocker: EditorItemDeleteBlocker;
+	readonly blocker: readEditorItemDeleteBlockersFn.Blocker;
 	readonly project: EditorProject;
 }) => {
 	if (

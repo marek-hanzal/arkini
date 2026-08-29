@@ -1,13 +1,11 @@
 import { useRef, type PointerEvent as ReactPointerEvent, type RefObject } from "react";
 
 import type { EditorItemOriginFlow } from "~/editor/origin-flow/EditorItemOriginFlow";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { LayoutNode, LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
-import { createViewportFx, type Viewport } from "~/ui/item/editor/origin-flow/createViewportFx";
+import { OriginFlowViewport, type Viewport } from "~/ui/item/editor/origin-flow/Viewport";
 import type { ConnectedPorts } from "~/ui/item/editor/origin-flow/fn/readConnectedPortsFn";
 import { readHitFn } from "~/ui/item/editor/origin-flow/fn/readHitFn";
 import type { NodeMetrics } from "~/ui/item/editor/origin-flow/fn/readNodeMetricsFn";
-import { pushVisitFn } from "~/ui/item/editor/origin-flow/fn/pushVisitFn";
 import type { Highlight, Selection } from "~/ui/item/editor/origin-flow/Highlight";
 
 interface CanvasPan {
@@ -18,8 +16,17 @@ interface CanvasPan {
 	startViewport: Viewport;
 }
 
-const FlowViewport = RendererRuntime.runSync(createViewportFx());
+const FlowViewport = OriginFlowViewport;
 const ClickThreshold = 5;
+const VisitHistoryLimit = 32;
+
+const pushVisitFn = (history: ReadonlyArray<string>, nodeId: string) =>
+	history.at(-1) === nodeId
+		? history
+		: [
+				...history,
+				nodeId,
+			].slice(-VisitHistoryLimit);
 
 /** Owns pointer capture, panning, hit selection, and port-following for the flow canvas. */
 export const useCanvasPointer = ({

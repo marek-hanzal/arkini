@@ -1,8 +1,15 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
+import type { EditorProject } from "~/editor/EditorProject";
+import { EditorBoardGameResourceOwnerAtom } from "~/renderer/editor/board/EditorBoardGameResourceOwnerAtom";
 import { EditorProjectAtom } from "~/ui/editor/EditorProjectAtom";
-import { publishEditorBoardGameFx } from "~/ui/board/editor/publishEditorBoardGameFx";
+
+const publishEditorBoardGameFx = Effect.fn("publishEditorBoardGameFx")((project: EditorProject) =>
+	Atom.get(EditorBoardGameResourceOwnerAtom).pipe(
+		Effect.flatMap((owner) => (owner === undefined ? Effect.void : owner.publishFx(project))),
+	),
+);
 
 /** Publishes canonical data, then refreshes Board only for the still-routed project. */
 export const publishEditorProjectFx = Effect.fn("publishEditorProjectFx")(function* (

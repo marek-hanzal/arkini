@@ -1,15 +1,18 @@
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { revalidateLogic, useStore } from "@tanstack/react-form";
+import { Effect } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 
+import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
 import { useEditorProject } from "~/ui/editor/useEditorProject";
 import {
 	EditorItemFormSchema,
 	type EditorItemFormValues,
 } from "~/ui/item/editor/EditorItemFormSchema";
-import { saveEditorItemCommandAtom } from "~/ui/item/editor/saveEditorItemCommandAtom";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { saveEditorItemFx } from "~/ui/item/editor/saveEditorItemFx";
 import { useAppForm } from "~/ui/form/EditorForm";
 import type {
 	EditorItemOptionalCapability,
@@ -20,6 +23,19 @@ import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefault
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
 import { analyzeEditorProjectCompatibilityFn } from "~/editor/version/fn/analyzeEditorProjectCompatibilityFn";
+
+const saveEditorItemCommandAtom = RendererRuntime.runSync(
+	Effect.map(EditorProjectRepository, (repository) =>
+		Atom.family((projectId: string) =>
+			Atom.fn((item: saveEditorItemFx.Props["item"]) =>
+				saveEditorItemFx({
+					item,
+					projectId,
+				}).pipe(Effect.provideService(EditorProjectRepository, repository)),
+			).pipe(Atom.setIdleTTL(0)),
+		),
+	),
+);
 
 export namespace useEditorItemFormController {
 	export interface Props {

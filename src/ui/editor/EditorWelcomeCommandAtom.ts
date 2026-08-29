@@ -1,15 +1,16 @@
 import { Cause, Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { importEditorArkpackFileAtom } from "~/ui/arkpack/editor/importEditorArkpackFileAtom";
-import { createFreshEditorProjectAtom } from "~/ui/editor/createFreshEditorProjectAtom";
-import { deleteEditorProjectAtom } from "~/ui/editor/deleteEditorProjectAtom";
+import { createFreshEditorProjectFx } from "~/editor/project/fx/createFreshEditorProjectFx";
+import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
 import {
 	type EditorProjectDescriptor,
 	EditorProjectDescriptorSchema,
 } from "~/editor/EditorProjectDescriptor";
 import { invokeEditorProjectTransportFx } from "~/renderer/editor/invokeEditorProjectTransportFx";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
+import { importEditorArkpackFileFx } from "~/ui/arkpack/editor/importEditorArkpackFileFx";
 
 export namespace EditorWelcomeCommandAtom {
 	export type Action =
@@ -96,6 +97,8 @@ const EditorWelcomeCommandStateAtom = Atom.make<EditorWelcomeCommandAtom.State>(
 	kind: "idle",
 }).pipe(Atom.keepAlive);
 
+const editorProjectRepository = RendererRuntime.runSync(EditorProjectRepository);
+
 const publishCommandFailureFx = (cause: Cause.Cause<unknown>) =>
 	Cause.hasInterruptsOnly(cause)
 		? Effect.failCause(cause)
@@ -105,7 +108,7 @@ const publishCommandFailureFx = (cause: Cause.Cause<unknown>) =>
 			});
 
 const EditorWelcomeCommandRunnerAtom = Atom.fn(
-	(command: EditorWelcomeCommandAtom.Command, get) =>
+	(command: EditorWelcomeCommandAtom.Command) =>
 		Effect.gen(function* () {
 			if (command.action === "exit") {
 				yield* Atom.set(EditorWelcomeCommandStateAtom, {
@@ -116,7 +119,7 @@ const EditorWelcomeCommandRunnerAtom = Atom.fn(
 			}
 			if (command.action === "delete-project") {
 				const result = yield* Effect.exit(
-					get.setResult(deleteEditorProjectAtom, command.projectId),
+					editorProjectRepository.deleteProjectFx(command.projectId),
 				);
 				if (Exit.isFailure(result)) return yield* publishCommandFailureFx(result.cause);
 				yield* Atom.set(EditorWelcomeCommandStateAtom, {
@@ -144,9 +147,18 @@ const EditorWelcomeCommandRunnerAtom = Atom.fn(
 			}
 			const operation =
 				command.action === "create"
-					? get.setResult(createFreshEditorProjectAtom, undefined)
+					? createFreshEditorProjectFx().pipe(
+							Effect.provideService(EditorProjectRepository, editorProjectRepository),
+						)
 					: command.action === "import-arkpack"
-						? get.setResult(importEditorArkpackFileAtom, command.file)
+						? importEditorArkpackFileFx({
+								file: command.file,
+							}).pipe(
+								Effect.provideService(
+									EditorProjectRepository,
+									editorProjectRepository,
+								),
+							)
 						: invokeEditorProjectTransportFx({
 								call: () => window.arkini.editor.importJsonDirectory(),
 								operation: "import-json-directory",

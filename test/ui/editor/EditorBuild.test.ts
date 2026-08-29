@@ -17,6 +17,42 @@ const state = vi.hoisted(() => ({
 	project: undefined as unknown,
 }));
 
+vi.mock("effect/unstable/reactivity/Atom", async (importOriginal) => {
+	const original = await importOriginal<typeof import("effect/unstable/reactivity/Atom")>();
+	const familyKinds = [
+		"build",
+		"export",
+		"install",
+		"save",
+	] as const;
+	let familyIndex = 0;
+	const atom = (kind: (typeof familyKinds)[number] | "open-export", key: string) => {
+		const value = {
+			kind,
+			key,
+			pipe: () => value,
+		};
+		return value;
+	};
+	return {
+		...original,
+		family: () => {
+			const kind = familyKinds[familyIndex++];
+			if (kind === undefined) throw new Error("Unexpected Editor Build atom family.");
+			return (key: string) => atom(kind, key);
+		},
+		fn: () => atom("open-export", "completed-export"),
+		setIdleTTL: () => undefined,
+	};
+});
+
+vi.mock("~/editor/EditorProjectRepository", async () => {
+	const { Effect } = await import("effect");
+	return {
+		EditorProjectRepository: Effect.succeed({}),
+	};
+});
+
 vi.mock("@effect/atom-react", () => ({
 	useAtomSet: (atom: {
 		readonly kind: "build" | "catalog" | "export" | "install" | "open-export" | "save";
@@ -44,45 +80,10 @@ vi.mock("@effect/atom-react", () => ({
 						: AsyncResult.initial(),
 }));
 
-vi.mock("~/ui/arkpack/editor/buildEditorProjectCommandAtom", () => ({
-	buildEditorProjectCommandAtom: (projectId: string) => ({
-		kind: "build",
-		key: projectId,
-	}),
-}));
-
 vi.mock("~/ui/arkpack/ArkpackCatalogAtom", () => ({
 	ArkpackCatalogAtom: {
 		kind: "catalog",
 		key: "canonical",
-	},
-}));
-
-vi.mock("~/ui/arkpack/editor/installBuiltEditorArkpackCommandAtom", () => ({
-	installBuiltEditorArkpackCommandAtom: (contentHash: string) => ({
-		kind: "install",
-		key: contentHash,
-	}),
-}));
-
-vi.mock("~/ui/arkpack/editor/saveBuiltEditorArkpackCommandAtom", () => ({
-	saveBuiltEditorArkpackCommandAtom: (contentHash: string) => ({
-		kind: "save",
-		key: contentHash,
-	}),
-}));
-
-vi.mock("~/ui/editor/exportEditorJsonDirectoryCommandAtom", () => ({
-	exportEditorJsonDirectoryCommandAtom: (projectId: string) => ({
-		kind: "export",
-		key: projectId,
-	}),
-}));
-
-vi.mock("~/ui/editor/openEditorExportDirectoryCommandAtom", () => ({
-	openEditorExportDirectoryCommandAtom: {
-		kind: "open-export",
-		key: "completed-export",
 	},
 }));
 
@@ -297,6 +298,77 @@ describe("EditorBuild", () => {
 		controller?.build();
 		expect(state.commandSetters.get("build:editor-test")).toHaveBeenCalledWith({
 			expectedRevision: 0,
+		});
+	});
+
+	it("keeps a major bundled-package update cancellable before command admission", async () => {
+		const artifact = createArtifact("b".repeat(64), 0);
+		state.buildResult = AsyncResult.success(artifact);
+		state.catalogState = {
+			type: "ready",
+			arkpacks: [
+				{
+					packageId: "editor-test",
+					contentHash: "a".repeat(64),
+					title: "Existing",
+					version: "2.0",
+					arkini: "1.0.0",
+					provenance: {
+						type: "community",
+					},
+					source: "bundled",
+				},
+			],
+		};
+		await renderController();
+		const install = state.commandSetters.get(`install:${artifact.contentHash}`);
+
+		await act(async () => controller?.installArtifact());
+		expect(controller?.installAction).toBe("update");
+		expect(controller?.installConfirmation).toBeDefined();
+		expect(install).not.toHaveBeenCalled();
+
+		await act(async () => controller?.cancelInstall());
+		expect(controller?.installConfirmation).toBeUndefined();
+		expect(install).not.toHaveBeenCalled();
+
+		await act(async () => controller?.installArtifact());
+		const confirmation = controller?.installConfirmation;
+		await act(async () => controller?.confirmInstall());
+		expect(install).toHaveBeenCalledWith({
+			artifact,
+			confirmation,
+			targetVersion: "1.0",
+		});
+	});
+
+	it("admits a same-major user-package update without confirmation", async () => {
+		const artifact = createArtifact("b".repeat(64), 0);
+		state.buildResult = AsyncResult.success(artifact);
+		state.catalogState = {
+			type: "ready",
+			arkpacks: [
+				{
+					packageId: "editor-test",
+					contentHash: "a".repeat(64),
+					title: "Existing",
+					version: "1.9",
+					arkini: "1.0.0",
+					provenance: {
+						type: "community",
+					},
+					source: "user",
+				},
+			],
+		};
+		await renderController();
+
+		await act(async () => controller?.installArtifact());
+
+		expect(controller?.installConfirmation).toBeUndefined();
+		expect(state.commandSetters.get(`install:${artifact.contentHash}`)).toHaveBeenCalledWith({
+			artifact,
+			targetVersion: "1.0",
 		});
 	});
 });

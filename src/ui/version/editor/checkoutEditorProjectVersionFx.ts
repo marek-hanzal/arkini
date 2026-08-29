@@ -10,7 +10,18 @@ import { syncEditorBoardGameFx } from "~/renderer/editor/board/syncEditorBoardGa
 import { publishEditorProjectFx } from "~/ui/editor/publishEditorProjectFx";
 import { readEditorProjectFx } from "~/editor/project/fx/readEditorProjectFx";
 import { EditorProjectVersionCheckoutConfirmationRequired } from "~/ui/version/editor/EditorProjectVersionCheckoutConfirmationRequired";
-import { reloadEditorProjectAfterVersionRefreshFailureFx } from "~/ui/version/editor/reloadEditorProjectAfterVersionRefreshFailureFx";
+
+const reloadEditorProjectAfterVersionRefreshFailureFx = Effect.fn(
+	"reloadEditorProjectAfterVersionRefreshFailureFx",
+)(({ cause, projectId }: { readonly cause: unknown; readonly projectId: string }) =>
+	Effect.sync(() => {
+		console.error(
+			`Arkini editor project ${projectId} was restored but could not be refreshed in place. Reloading the renderer as a last resort.`,
+			cause,
+		);
+		window.location.reload();
+	}).pipe(Effect.andThen(Effect.never)),
+);
 
 export namespace checkoutEditorProjectVersionFx {
 	export interface Props {

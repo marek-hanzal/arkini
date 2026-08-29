@@ -1,16 +1,31 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
-import { Exit } from "effect";
+import { Effect, Exit } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import { useCallback, useMemo, useRef, useState } from "react";
 
+import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
 import { useEditorProject } from "~/ui/editor/useEditorProject";
-import { editEditorAssetCommandAtom } from "~/ui/resource/editor/editEditorAssetCommandAtom";
 import { validateEditorAssetDraftFx } from "~/renderer/editor/resource/validateEditorAssetDraftFx";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { editEditorAssetFx } from "~/ui/resource/editor/editEditorAssetFx";
 import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorAssetById } from "~/ui/resource/editor/useEditorAssetById";
 import { useEditorResourceUrl } from "~/ui/resource/editor/useEditorResourceUrl";
+
+const editEditorAssetCommandAtom = RendererRuntime.runSync(
+	Effect.map(EditorProjectRepository, (repository) =>
+		Atom.family((projectId: string) =>
+			Atom.fn((props: Omit<editEditorAssetFx.Props, "projectId">) =>
+				editEditorAssetFx({
+					...props,
+					projectId,
+				}).pipe(Effect.provideService(EditorProjectRepository, repository)),
+			).pipe(Atom.setIdleTTL(0)),
+		),
+	),
+);
 
 export namespace useEditorAssetEditController {
 	export interface Props {

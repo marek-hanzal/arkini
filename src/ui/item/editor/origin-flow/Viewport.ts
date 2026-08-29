@@ -1,5 +1,3 @@
-import { Effect } from "effect";
-
 import type { EditorItemOriginFlow } from "~/editor/origin-flow/EditorItemOriginFlow";
 import type { LayoutNode, LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
 
@@ -152,27 +150,25 @@ const readBackboneBounds = (backbones: ReadonlyMap<string, ReadonlyArray<LayoutP
 		}),
 	);
 
-/** Creates the pure viewport and culling capability used by one flow canvas module. */
-export const createViewportFx = Effect.fn("createViewportFx")(() =>
-	Effect.succeed({
-		clampZoom,
-		defaultViewport: DefaultViewport,
-		edgeCullPaddingPx: 64,
-		isEdgeVisible: (bounds: Bounds, visible: Bounds) =>
-			bounds.maxX >= visible.minX &&
-			bounds.maxY >= visible.minY &&
-			bounds.minX <= visible.maxX &&
-			bounds.minY <= visible.maxY,
-		isNodeVisible: (position: LayoutNode, visible: Bounds) =>
-			position.x + position.width >= visible.minX &&
-			position.y + position.height >= visible.minY &&
-			position.x <= visible.maxX &&
-			position.y <= visible.maxY,
-		readBackboneBounds,
-		readFit,
-		readInitialFocus,
-		readNode,
-		readVisibleBounds,
-		searchFocusZoom: 1,
-	} as const),
-);
+/** Pure viewport and culling policy shared by one flow canvas and its input owner. */
+export const OriginFlowViewport = {
+	clampZoom,
+	defaultViewport: DefaultViewport,
+	edgeCullPaddingPx: 64,
+	isEdgeVisible: (bounds: Bounds, visible: Bounds) =>
+		bounds.maxX >= visible.minX &&
+		bounds.maxY >= visible.minY &&
+		bounds.minX <= visible.maxX &&
+		bounds.minY <= visible.maxY,
+	isNodeVisible: (position: LayoutNode, visible: Bounds) =>
+		position.x + position.width >= visible.minX &&
+		position.y + position.height >= visible.minY &&
+		position.x <= visible.maxX &&
+		position.y <= visible.maxY,
+	readBackboneBounds,
+	readFit,
+	readInitialFocus,
+	readNode,
+	readVisibleBounds,
+	searchFocusZoom: 1,
+} as const;

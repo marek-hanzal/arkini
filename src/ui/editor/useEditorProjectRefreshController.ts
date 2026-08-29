@@ -1,12 +1,38 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useRouter } from "@tanstack/react-router";
+import { Effect } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import { useCallback, useMemo } from "react";
 
-import { refreshEditorProjectCommandAtom } from "~/ui/editor/refreshEditorProjectCommandAtom";
+import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
+import { EditorUnsavedChanges } from "~/renderer/editor/unsaved/EditorUnsavedChanges";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { refreshEditorProjectFx } from "~/ui/editor/refreshEditorProjectFx";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 
-const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
+const readErrorMessageFn = (error: unknown) =>
+	error instanceof Error ? error.message : String(error);
+
+const refreshEditorProjectCommandAtom = RendererRuntime.runSync(
+	Effect.gen(function* () {
+		const repository = yield* EditorProjectRepository;
+		const unsavedChanges = yield* EditorUnsavedChanges;
+		return Atom.family((projectId: string) =>
+			Atom.fn(
+				() =>
+					refreshEditorProjectFx({
+						projectId,
+					}).pipe(
+						Effect.provideService(EditorProjectRepository, repository),
+						Effect.provideService(EditorUnsavedChanges, unsavedChanges),
+					),
+				{
+					concurrent: false,
+				},
+			).pipe(Atom.setIdleTTL(0)),
+		);
+	}),
+);
 
 export namespace useEditorProjectRefreshController {
 	export interface Props {
@@ -65,7 +91,9 @@ export const useEditorProjectRefreshController = ({
 			pending,
 			refresh,
 			tooltip:
-				error === undefined ? "Refresh from disk" : `Refresh failed: ${message(error)}`,
+				error === undefined
+					? "Refresh from disk"
+					: `Refresh failed: ${readErrorMessageFn(error)}`,
 		}),
 		[
 			disabled,

@@ -44,11 +44,12 @@ vi.mock("~/ui/editor/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
-vi.mock("~/ui/resource/editor/saveEditorAssetCommandAtom", () => ({
-	saveEditorAssetCommandAtom: () => ({
-		id: "save-chatgpt-asset",
-	}),
-}));
+vi.mock("~/editor/EditorProjectRepository", async () => {
+	const { Effect } = await import("effect");
+	return {
+		EditorProjectRepository: Effect.succeed({}),
+	};
+});
 
 vi.mock("~/renderer/RendererRuntime", async () => {
 	const { Effect } = await import("effect");

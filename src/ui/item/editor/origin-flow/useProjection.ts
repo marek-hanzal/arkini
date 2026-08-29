@@ -7,9 +7,12 @@ import { readNavigationFn } from "~/ui/item/editor/origin-flow/fn/readNavigation
 import { readRelationNavigationFn } from "~/ui/item/editor/origin-flow/fn/readRelationNavigationFn";
 import { readRootNavigationFn } from "~/ui/item/editor/origin-flow/fn/readRootNavigationFn";
 import { readRouteColorsFn } from "~/ui/item/editor/origin-flow/fn/readRouteColorsFn";
-import { readVisibleHighlightFn } from "~/ui/item/editor/origin-flow/fn/readVisibleHighlightFn";
 import type { LayoutNode, LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
-import type { OriginFlowDirection, Selection } from "~/ui/item/editor/origin-flow/Highlight";
+import type {
+	Highlight,
+	OriginFlowDirection,
+	Selection,
+} from "~/ui/item/editor/origin-flow/Highlight";
 import { readMetroBackbonesFx } from "~/ui/item/editor/origin-flow/readMetroBackbonesFx";
 
 export const DefaultHighlightDepth = 1;
@@ -19,6 +22,26 @@ export interface HighlightDepth {
 	readonly limit: number;
 	readonly nodeId: string;
 }
+
+const readVisibleHighlightFn = (highlight: Highlight, maxLevel: number): Highlight => {
+	const boundedLevel = Math.max(0, Math.floor(maxLevel));
+	const nodeLevels = new Map(
+		[
+			...highlight.nodeLevels,
+		].filter(([, level]) => level <= boundedLevel),
+	);
+	const edgeLevels = new Map(
+		[
+			...highlight.edgeLevels,
+		].filter(([, level]) => level <= boundedLevel),
+	);
+	return {
+		edgeIds: new Set(edgeLevels.keys()),
+		edgeLevels,
+		nodeIds: new Set(nodeLevels.keys()),
+		nodeLevels,
+	};
+};
 
 /** Owns the complete direction-aware selection and navigation projection for one flow canvas. */
 export const useProjection = ({

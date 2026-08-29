@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { RegistryContext, scheduleTask } from "@effect/atom-react";
+import { Effect as EffectModule } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
@@ -27,19 +28,28 @@ vi.mock("@tanstack/react-router", async (importOriginal) => ({
 	}),
 }));
 
-vi.mock("~/ui/editor/deleteEditorProjectAtom", async () => {
+vi.mock("~/renderer/RendererRuntime", async () => {
 	const { Effect } = await import("effect");
-	const Atom = await import("effect/unstable/reactivity/Atom");
+	const { EditorProjectRepository } = await import("~/editor/EditorProjectRepository");
+	const repository = {
+		deleteProjectFx: () => Effect.void,
+	};
 	return {
-		deleteEditorProjectAtom: Atom.fn(() => Effect.void),
+		RendererRuntime: {
+			runSync: (effect: EffectModule.Effect<unknown, unknown, unknown>) =>
+				Effect.runSync(
+					effect.pipe(
+						Effect.provideService(EditorProjectRepository, repository as never),
+					) as EffectModule.Effect<unknown, unknown, never>,
+				),
+		},
 	};
 });
 
-vi.mock("~/ui/editor/createFreshEditorProjectAtom", async () => {
+vi.mock("~/editor/project/fx/createFreshEditorProjectFx", async () => {
 	const { Effect } = await import("effect");
-	const Atom = await import("effect/unstable/reactivity/Atom");
 	return {
-		createFreshEditorProjectAtom: Atom.fn(() =>
+		createFreshEditorProjectFx: () =>
 			Effect.succeed({
 				projectId: "project-created",
 				title: "Created",
@@ -48,15 +58,13 @@ vi.mock("~/ui/editor/createFreshEditorProjectAtom", async () => {
 				createdAtMs: 1,
 				updatedAtMs: 1,
 			}),
-		),
 	};
 });
 
-vi.mock("~/ui/arkpack/editor/importEditorArkpackFileAtom", async () => {
+vi.mock("~/ui/arkpack/editor/importEditorArkpackFileFx", async () => {
 	const { Effect } = await import("effect");
-	const Atom = await import("effect/unstable/reactivity/Atom");
 	return {
-		importEditorArkpackFileAtom: Atom.fn((file: File) =>
+		importEditorArkpackFileFx: ({ file }: { readonly file: File }) =>
 			file.name === "broken.arkpack"
 				? Effect.fail(new Error("Broken import"))
 				: Effect.succeed({
@@ -67,7 +75,6 @@ vi.mock("~/ui/arkpack/editor/importEditorArkpackFileAtom", async () => {
 						createdAtMs: 2,
 						updatedAtMs: 2,
 					}),
-		),
 	};
 });
 

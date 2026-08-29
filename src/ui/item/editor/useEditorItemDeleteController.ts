@@ -1,21 +1,31 @@
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
+import { Effect } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import { useCallback, useMemo, useState } from "react";
 
+import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
 import { useEditorProject } from "~/ui/editor/useEditorProject";
-import { deleteEditorItemCommandAtom } from "~/ui/item/editor/deleteEditorItemCommandAtom";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
-import {
-	forceDeleteEditorItemFx,
-	type EditorItemForceDeleteImpact,
-} from "~/editor/forceDeleteEditorItemFx";
-import {
-	readEditorItemDeleteBlockersFx,
-	type EditorItemDeleteBlocker,
-} from "~/editor/readEditorItemDeleteBlockersFx";
+import { forceDeleteEditorItemFx } from "~/editor/item/fx/forceDeleteEditorItemFx";
+import { readEditorItemDeleteBlockersFn } from "~/editor/item/fn/readEditorItemDeleteBlockersFn";
+import { deleteEditorItemFx } from "~/ui/item/editor/deleteEditorItemFx";
 import { useEditorHistoryBack } from "~/ui/editor/useEditorHistoryBack";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
+
+const deleteEditorItemCommandAtom = RendererRuntime.runSync(
+	Effect.map(EditorProjectRepository, (repository) =>
+		Atom.family((projectId: string) =>
+			Atom.fn((props: Omit<deleteEditorItemFx.Props, "projectId">) =>
+				deleteEditorItemFx({
+					...props,
+					projectId,
+				}).pipe(Effect.provideService(EditorProjectRepository, repository)),
+			).pipe(Atom.setIdleTTL(0)),
+		),
+	),
+);
 
 export namespace useEditorItemDeleteController {
 	export interface Props {
@@ -23,13 +33,13 @@ export namespace useEditorItemDeleteController {
 	}
 
 	export interface Output {
-		readonly blockers: ReadonlyArray<EditorItemDeleteBlocker>;
+		readonly blockers: ReadonlyArray<readEditorItemDeleteBlockersFn.Blocker>;
 		readonly cancel: () => void;
 		readonly confirm: () => Promise<void>;
 		readonly confirming: "safe" | "force" | null;
 		readonly deleting: boolean;
 		readonly error: unknown;
-		readonly forceImpact: EditorItemForceDeleteImpact;
+		readonly forceImpact: forceDeleteEditorItemFx.Impact;
 		readonly open: (force: boolean) => void;
 		readonly project: ReturnType<typeof useEditorProject>;
 	}
@@ -50,12 +60,10 @@ export const useEditorItemDeleteController = ({
 	const [confirming, setConfirming] = useState<"safe" | "force" | null>(null);
 	const blockers = useMemo(
 		() =>
-			RendererRuntime.runSync(
-				readEditorItemDeleteBlockersFx({
-					config: project.config,
-					itemId: item.id,
-				}),
-			),
+			readEditorItemDeleteBlockersFn({
+				config: project.config,
+				itemId: item.id,
+			}),
 		[
 			item.id,
 			project.config,

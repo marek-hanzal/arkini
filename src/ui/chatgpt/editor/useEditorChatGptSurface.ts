@@ -1,11 +1,31 @@
+import { Effect } from "effect";
 import { type RefObject, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-
-import { setChatGptSurfaceFx } from "~/ui/chatgpt/editor/setChatGptSurfaceFx";
 import {
-	type ChatGptViewState,
-	subscribeChatGptViewStateFx,
-} from "~/ui/chatgpt/editor/subscribeChatGptViewStateFx";
+	ChatGptViewStateSchema,
+	type ChatGptViewStateSchema as ChatGptViewStateSchemaType,
+} from "../../../../electron/contract/chatgpt/ChatGptSurfaceSchema";
+import type { ChatGptSurfaceSchema } from "../../../../electron/contract/chatgpt/ChatGptSurfaceSchema";
+
 import { RendererRuntime } from "~/renderer/RendererRuntime";
+
+type ChatGptViewState = ChatGptViewStateSchemaType.Type;
+
+const setChatGptSurfaceFx = Effect.fn("setChatGptSurfaceFx")(
+	(surface: ChatGptSurfaceSchema.Type | null) =>
+		Effect.tryPromise({
+			try: () => window.arkini.chatGpt.setSurface(surface),
+			catch: (cause) => cause,
+		}),
+);
+
+const subscribeChatGptViewStateFx = Effect.fn("subscribeChatGptViewStateFx")(
+	(listener: (state: ChatGptViewState) => void) =>
+		Effect.sync(() =>
+			window.arkini.chatGpt.onStateChanged((candidate) =>
+				listener(ChatGptViewStateSchema.parse(candidate)),
+			),
+		),
+);
 
 export namespace useEditorChatGptSurface {
 	export interface Props {

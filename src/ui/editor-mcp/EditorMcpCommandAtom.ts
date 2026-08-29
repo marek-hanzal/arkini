@@ -2,19 +2,54 @@ import { Cause, Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { match } from "ts-pattern";
 
-import {
-	configureEditorMcpFx,
-	type EditorMcpConfiguration,
-} from "~/ui/editor-mcp/configureEditorMcpFx";
-import {
-	executeEditorMcpCommandFx,
-	type EditorMcpCommand,
-} from "~/ui/editor-mcp/executeEditorMcpCommandFx";
-import {
-	type EditorMcpOverview,
-	readEditorMcpOverviewFx,
-} from "~/ui/editor-mcp/readEditorMcpOverviewFx";
+import { EditorMcpCommandResultSchema } from "../../../electron/contract/editor/EditorMcpCommandResultSchema";
+import { EditorMcpCommandSchema } from "../../../electron/contract/editor/EditorMcpCommandSchema";
+import { EditorMcpConfigurationSchema } from "../../../electron/contract/editor/EditorMcpConfigurationSchema";
+import { EditorMcpOverviewSchema } from "../../../electron/contract/editor/EditorMcpOverviewSchema";
 import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
+
+type EditorMcpCommand = EditorMcpCommandSchema.Type;
+type EditorMcpConfiguration = EditorMcpConfigurationSchema.Type;
+type EditorMcpOverview = EditorMcpOverviewSchema.Type;
+
+const readEditorMcpOverviewFx = Effect.tryPromise({
+	try: async () => EditorMcpOverviewSchema.parse(await window.arkini.editorMcp.readOverview()),
+	catch: (cause) => cause,
+});
+
+const configureEditorMcpFx = Effect.fn("configureEditorMcpFx")((candidate: unknown) =>
+	Effect.try({
+		try: () => EditorMcpConfigurationSchema.parse(candidate),
+		catch: (cause) => cause,
+	}).pipe(
+		Effect.flatMap((configuration) =>
+			Effect.tryPromise({
+				try: async () =>
+					EditorMcpOverviewSchema.parse(
+						await window.arkini.editorMcp.configure(configuration),
+					),
+				catch: (cause) => cause,
+			}),
+		),
+	),
+);
+
+const executeEditorMcpCommandFx = Effect.fn("executeEditorMcpCommandFx")((candidate: unknown) =>
+	Effect.try({
+		try: () => EditorMcpCommandSchema.parse(candidate),
+		catch: (cause) => cause,
+	}).pipe(
+		Effect.flatMap((command) =>
+			Effect.tryPromise({
+				try: async () =>
+					EditorMcpCommandResultSchema.parse(
+						await window.arkini.editorMcp.command(command),
+					),
+				catch: (cause) => cause,
+			}),
+		),
+	),
+);
 
 export namespace EditorMcpCommandAtom {
 	export type Action = EditorMcpCommand | "configure" | "read";

@@ -33,12 +33,6 @@ vi.mock("~/ui/editor/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
-vi.mock("~/ui/item/editor/deleteEditorItemCommandAtom", () => ({
-	deleteEditorItemCommandAtom: () => ({
-		id: "delete-editor-item",
-	}),
-}));
-
 vi.mock("~/ui/editor/useEditorHistoryBack", () => ({
 	useEditorHistoryBack: () => state.historyBack,
 }));

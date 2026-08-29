@@ -1,12 +1,15 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
+import { Effect } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import { useCallback, useMemo, useRef, useState } from "react";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { match, P } from "ts-pattern";
 
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
+import { EditorSourceExportSchema } from "../../../../electron/contract/editor/EditorSourceExportSchema";
+import type { EditorProjectTransport } from "../../../../electron/contract/editor/EditorProjectTransport";
 
-import { buildEditorProjectCommandAtom } from "~/ui/arkpack/editor/buildEditorProjectCommandAtom";
-import { installBuiltEditorArkpackCommandAtom } from "~/ui/arkpack/editor/installBuiltEditorArkpackCommandAtom";
+import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import {
 	type EditorBuildMajorUpdateConfirmation,
 	readEditorBuildInstallPlanFn,
@@ -16,16 +19,19 @@ import {
 	type EditorGameDiagnostic,
 	readEditorBuildFailureFn,
 } from "~/editor/build/fn/readEditorBuildFailureFn";
-import { saveBuiltEditorArkpackCommandAtom } from "~/ui/arkpack/editor/saveBuiltEditorArkpackCommandAtom";
 import { ArkpackCatalogAtom } from "~/ui/arkpack/ArkpackCatalogAtom";
 import { readArkpackArtifactNameFn } from "~/engine/pack/fn/readArkpackArtifactNameFn";
-import { exportEditorJsonDirectoryCommandAtom } from "~/ui/editor/exportEditorJsonDirectoryCommandAtom";
-import type { EditorProjectTransport } from "../../../../electron/contract/editor/EditorProjectTransport";
-import { openEditorExportDirectoryCommandAtom } from "~/ui/editor/openEditorExportDirectoryCommandAtom";
 import type { EditorProject } from "~/editor/EditorProject";
+import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
+import type { EditorProjectRepository as EditorProjectRepositoryContract } from "~/editor/EditorProjectRepository";
+import type { EditorProjectBuildSchema } from "~/editor/EditorProjectBuildSchema";
+import { ArkpackCatalogOwnerAtom } from "~/renderer/arkpack/ArkpackCatalogOwnerAtom";
+import { invokeEditorProjectTransportFx } from "~/renderer/editor/invokeEditorProjectTransportFx";
 import { useEditorProject } from "~/ui/editor/useEditorProject";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { formatByteSizeFn } from "~/ui/arkpack/editor/fn/formatByteSizeFn";
+import { installBuiltEditorArkpackFx } from "~/ui/arkpack/editor/installBuiltEditorArkpackFx";
+import { saveBuiltEditorArkpackFx } from "~/ui/arkpack/editor/saveBuiltEditorArkpackFx";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 
 const emptyDiagnostics: ReadonlyArray<EditorGameDiagnostic> = [];
@@ -39,6 +45,74 @@ const buildStatusLabels = {
 	stale: "Stale",
 	valid: "Valid",
 } as const;
+
+const EditorBuildCommandAtoms = RendererRuntime.runSync(
+	Effect.map(EditorProjectRepository, (repository) => ({
+		build: Atom.family((projectId: string) =>
+			Atom.fn(
+				(request: Omit<EditorProjectRepositoryContract.BuildProjectProps, "projectId">) =>
+					repository.buildProjectFx({
+						...request,
+						projectId,
+					}),
+			).pipe(Atom.setIdleTTL(0)),
+		),
+		exportSource: Atom.family((projectId: string) =>
+			Atom.fn(() =>
+				invokeEditorProjectTransportFx({
+					call: () => window.arkini.editor.exportJsonDirectory(projectId),
+					operation: "export-json-directory",
+					parse: (value) =>
+						value === null ? null : EditorSourceExportSchema.parse(value),
+					requestMessage: "The editor JSON export request failed.",
+					responseMessage: "The editor JSON export response is invalid.",
+				}),
+			).pipe(Atom.setIdleTTL(0)),
+		),
+		install: Atom.family((contentHash: string) =>
+			Atom.fn(
+				(
+					request: {
+						readonly artifact: EditorProjectBuildSchema.Type;
+						readonly confirmation?: EditorBuildMajorUpdateConfirmation;
+						readonly targetVersion: ArkpackVersionSchema.Type;
+					},
+					get,
+				) => {
+					const { artifact } = request;
+					if (artifact.contentHash !== contentHash)
+						return Effect.fail(
+							new Error("The selected editor build artifact is stale."),
+						);
+					const catalog = get(ArkpackCatalogOwnerAtom);
+					if (catalog === undefined)
+						return Effect.fail(new Error("Arkpack catalog is not configured."));
+					return installBuiltEditorArkpackFx({
+						...request,
+						catalog,
+						repository,
+					});
+				},
+			).pipe(Atom.setIdleTTL(0)),
+		),
+		openSourceExport: Atom.fn(() =>
+			invokeEditorProjectTransportFx({
+				call: () => window.arkini.editor.openExportDirectory(),
+				operation: "open-export-directory",
+				parse: () => undefined,
+				requestMessage: "The Editor project export folder request failed.",
+				responseMessage: "The Editor project export folder response is invalid.",
+			}),
+		).pipe(Atom.setIdleTTL(0)),
+		save: Atom.family((contentHash: string) =>
+			Atom.fn((artifact: EditorProjectBuildSchema.Type) =>
+				artifact.contentHash !== contentHash
+					? Effect.fail(new Error("The selected editor build artifact is stale."))
+					: saveBuiltEditorArkpackFx(artifact),
+			).pipe(Atom.setIdleTTL(0)),
+		),
+	})),
+);
 
 export namespace useEditorBuildController {
 	export type Status = "building" | "not-built" | "stale" | "valid";
@@ -78,7 +152,7 @@ export namespace useEditorBuildController {
 
 export const useEditorBuildController = (): useEditorBuildController.Output => {
 	const project = useEditorProject();
-	const buildAtom = buildEditorProjectCommandAtom(project.projectId);
+	const buildAtom = EditorBuildCommandAtoms.build(project.projectId);
 	const buildResult = useAtomValue(buildAtom);
 	const runBuild = useAtomSet(buildAtom);
 	const builtArtifact =
@@ -94,15 +168,15 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 					targetVersion: project.version,
 				})
 			: undefined;
-	const installAtom = installBuiltEditorArkpackCommandAtom(artifact?.contentHash ?? "unbuilt");
-	const saveAtom = saveBuiltEditorArkpackCommandAtom(artifact?.contentHash ?? "unbuilt");
+	const installAtom = EditorBuildCommandAtoms.install(artifact?.contentHash ?? "unbuilt");
+	const saveAtom = EditorBuildCommandAtoms.save(artifact?.contentHash ?? "unbuilt");
 	const installResult = useAtomValue(installAtom);
 	const runInstall = useAtomSet(installAtom, {
 		mode: "promise",
 	});
 	const saveResult = useAtomValue(saveAtom);
 	const runSave = useAtomSet(saveAtom);
-	const exportSourceAtom = exportEditorJsonDirectoryCommandAtom(project.projectId);
+	const exportSourceAtom = EditorBuildCommandAtoms.exportSource(project.projectId);
 	const exportSourceResult = useAtomValue(exportSourceAtom);
 	const runSourceExport = useAtomSet(exportSourceAtom);
 	const buildError = RendererRuntime.runSync(readSettledAsyncResultErrorFx(buildResult));
@@ -140,8 +214,8 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 		};
 	}
 	const sourceExport = sourceExportRef.current?.value;
-	const openSourceExportResult = useAtomValue(openEditorExportDirectoryCommandAtom);
-	const runOpenSourceExport = useAtomSet(openEditorExportDirectoryCommandAtom);
+	const openSourceExportResult = useAtomValue(EditorBuildCommandAtoms.openSourceExport);
+	const runOpenSourceExport = useAtomSet(EditorBuildCommandAtoms.openSourceExport);
 	const openSourceExportError = RendererRuntime.runSync(
 		readSettledAsyncResultErrorFx(openSourceExportResult),
 	);

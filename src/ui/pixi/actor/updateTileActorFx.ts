@@ -4,7 +4,7 @@ import { match } from "ts-pattern";
 
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
-import { readParticleLightSurfaceFx } from "~/ui/pixi/appearance/readParticleLightSurfaceFx";
+import { readParticleLightSurfaceFn } from "~/ui/pixi/appearance/fn/readParticleLightSurfaceFn";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readActorCursorFn } from "~/ui/pixi/actor/fn/readActorCursorFn";
 import {
@@ -97,7 +97,7 @@ export const updateTileActorFx = Effect.fn("updateTileActorFx")(function* ({
 		Math.max(0, size / 2 - largestParticleHalfWidth) / 1.075,
 	);
 	activityParticles.workingTint = palette.accent;
-	activityParticles.lightSurface = yield* readParticleLightSurfaceFx(palette);
+	activityParticles.lightSurface = readParticleLightSurfaceFn(palette);
 	activityParticles.container.blendMode = "normal";
 	activityParticles.container.boundsArea = new Rectangle(0, 0, size, size);
 	for (const [index, { particle }] of activityParticles.particles.entries()) {

@@ -7,7 +7,7 @@ import { readTileActorQueueBadgeCountFn } from "~/ui/pixi/actor/fn/readTileActor
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { formatTileBadgeLabelFx } from "~/ui/tile/formatTileBadgeLabelFx";
+import { formatTileBadgeLabelFn } from "~/ui/tile/fn/formatTileBadgeLabelFn";
 
 const runtimeItem = (overrides: {
 	readonly item: {
@@ -30,48 +30,36 @@ const runtimeItem = (overrides: {
 describe("tile actor overlay projection", () => {
 	it("uses one compact formatter for stack, queue, and capped badges", () => {
 		expect(
-			Effect.runSync(
-				formatTileBadgeLabelFx({
-					count: 1,
-				}),
-			),
+			formatTileBadgeLabelFn({
+				count: 1,
+			}),
 		).toBe("1");
 		expect(
-			Effect.runSync(
-				formatTileBadgeLabelFx({
-					count: 99,
-				}),
-			),
+			formatTileBadgeLabelFn({
+				count: 99,
+			}),
 		).toBe("99");
 		expect(
-			Effect.runSync(
-				formatTileBadgeLabelFx({
-					count: 100,
-				}),
-			),
+			formatTileBadgeLabelFn({
+				count: 100,
+			}),
 		).toBe("99+");
 		expect(
-			Effect.runSync(
-				formatTileBadgeLabelFx({
-					count: 450,
-				}),
-			),
+			formatTileBadgeLabelFn({
+				count: 450,
+			}),
 		).toBe("99+");
 		expect(
-			Effect.runSync(
-				formatTileBadgeLabelFx({
-					count: 3,
-					kind: "queue",
-				}),
-			),
+			formatTileBadgeLabelFn({
+				count: 3,
+				kind: "queue",
+			}),
 		).toBe("x3");
 		expect(
-			Effect.runSync(
-				formatTileBadgeLabelFx({
-					count: 1,
-					kind: "queue",
-				}),
-			),
+			formatTileBadgeLabelFn({
+				count: 1,
+				kind: "queue",
+			}),
 		).toBe("x1");
 	});
 

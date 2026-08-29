@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import type { Graphics } from "pixi.js";
 
-import { readSurfaceRadiusFx } from "~/ui/pixi/grid/readSurfaceRadiusFx";
+import { readSurfaceRadiusFn } from "~/ui/pixi/grid/fn/readSurfaceRadiusFn";
 import type { SurfaceLayout } from "~/ui/pixi/layout/SceneLayout";
 
 export namespace drawSurfaceFx {
@@ -31,7 +31,7 @@ export const drawSurfaceFx = Effect.fn("drawSurfaceFx")(function* ({
 		return;
 	}
 	graphics.visible = true;
-	const radius = yield* readSurfaceRadiusFx(surface);
+	const radius = readSurfaceRadiusFn(surface);
 	graphics.roundRect(surface.x, surface.y, surface.width, surface.height, radius).fill({
 		alpha: 0.78,
 		color: surfaceColor,

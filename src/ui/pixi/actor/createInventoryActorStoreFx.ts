@@ -12,7 +12,7 @@ import type {
 import type { ParticleTextures } from "~/ui/pixi/actor/ParticleTextures";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { createTileActorFx } from "~/ui/pixi/actor/createTileActorFx";
-import { readCrowdAlphaFx } from "~/ui/pixi/actor/readCrowdAlphaFx";
+import { readCrowdAlphaFn } from "~/ui/pixi/actor/fn/readCrowdAlphaFn";
 import { destroyTileActorFx } from "~/ui/pixi/actor/destroyTileActorFx";
 import { updateTileActorFx } from "~/ui/pixi/actor/updateTileActorFx";
 import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
@@ -208,8 +208,7 @@ export const createInventoryActorStoreFx = Effect.fn("createInventoryActorStoreF
 								created.push(actor);
 							}
 							const crowdAlphaChanged =
-								RendererRuntime.runSync(readCrowdAlphaFx(actor.item)) !==
-								RendererRuntime.runSync(readCrowdAlphaFx(item));
+								readCrowdAlphaFn(actor.item) !== readCrowdAlphaFn(item);
 							const activityEffectChanged =
 								actor.item.activityEffect !== item.activityEffect;
 							const sizeChanged = actor.size !== actorSize;
@@ -231,9 +230,7 @@ export const createInventoryActorStoreFx = Effect.fn("createInventoryActorStoreF
 										channel: "crowd-opacity",
 										durationMs: 180,
 										ownerKey: `running:${item.id}`,
-										toCrowdAlpha: RendererRuntime.runSync(
-											readCrowdAlphaFx(item),
-										),
+										toCrowdAlpha: readCrowdAlphaFn(item),
 									}),
 								);
 							}

@@ -1,6 +1,4 @@
-import { Effect } from "effect";
-
-export namespace readArtworkLayoutFx {
+export namespace readArtworkLayoutFn {
 	export interface Props {
 		readonly faceSize: number;
 		readonly inset: number;
@@ -11,11 +9,7 @@ export namespace readArtworkLayoutFx {
 const layeredArtworkToFaceRatio = 0.75;
 
 /** Projects stable artwork bounds for one tile face revision. */
-export const readArtworkLayoutFx = Effect.fnUntraced(function* ({
-	faceSize,
-	inset,
-	layered,
-}: readArtworkLayoutFx.Props) {
+export const readArtworkLayoutFn = ({ faceSize, inset, layered }: readArtworkLayoutFn.Props) => {
 	const artworkSize = layered ? faceSize * layeredArtworkToFaceRatio : faceSize;
 	return {
 		primary: {
@@ -29,4 +23,4 @@ export const readArtworkLayoutFx = Effect.fnUntraced(function* ({
 			size: artworkSize,
 		},
 	} as const;
-});
+};

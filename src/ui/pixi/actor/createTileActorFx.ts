@@ -3,13 +3,13 @@ import { Container, Graphics } from "pixi.js";
 
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
-import { readParticleLightSurfaceFx } from "~/ui/pixi/appearance/readParticleLightSurfaceFx";
+import { readParticleLightSurfaceFn } from "~/ui/pixi/appearance/fn/readParticleLightSurfaceFn";
 import type { ParticleTextures } from "~/ui/pixi/actor/ParticleTextures";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { createActivityParticlesFx } from "~/ui/pixi/actor/createActivityParticlesFx";
 import { createActorVisualFx } from "~/ui/pixi/actor/createActorVisualFx";
 import { readActorCursorFn } from "~/ui/pixi/actor/fn/readActorCursorFn";
-import { readCrowdAlphaFx } from "~/ui/pixi/actor/readCrowdAlphaFx";
+import { readCrowdAlphaFn } from "~/ui/pixi/actor/fn/readCrowdAlphaFn";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
 
@@ -52,7 +52,7 @@ export const createTileActorFx = Effect.fn("createTileActorFx")(
 				eventMode: "none",
 				label: `TileActorCrowd:${item.id}:${instanceId}`,
 			});
-			crowdLayer.alpha = yield* readCrowdAlphaFx(item);
+			crowdLayer.alpha = readCrowdAlphaFn(item);
 			const visualLayer = new Container({
 				eventMode: "none",
 				label: `TileActorVisualLayer:${item.id}:${instanceId}`,
@@ -60,7 +60,7 @@ export const createTileActorFx = Effect.fn("createTileActorFx")(
 			const activityParticles = yield* createActivityParticlesFx({
 				actorId: item.id,
 				instanceId,
-				lightSurface: yield* readParticleLightSurfaceFx(palette),
+				lightSurface: readParticleLightSurfaceFn(palette),
 				textures: particleTextures,
 				tint: palette.accent,
 			});

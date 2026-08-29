@@ -1,4 +1,3 @@
-import { Effect } from "effect";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import type { TileActorFeedbackCue } from "~/ui/pixi/feedback/TileActorFeedbackCue";
 import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
@@ -39,7 +38,7 @@ export interface ReconciliationPlan {
 	readonly departures: ReadonlyArray<ActorDeparture>;
 }
 
-export namespace classifyReconciliationFx {
+export namespace classifyReconciliationFn {
 	export interface Props {
 		readonly actorIds: Iterable<string>;
 		readonly deliveryRetainedActorIds: ReadonlySet<string>;
@@ -56,7 +55,7 @@ export namespace classifyReconciliationFx {
  * Classifies one fully-read presentation snapshot without mutating retained actors or allocating
  * visual generations. The reconciler remains the sole owner that applies this ordered plan.
  */
-export const classifyReconciliationFx = Effect.fnUntraced(function* ({
+export const classifyReconciliationFn = ({
 	actorIds,
 	deliveryRetainedActorIds,
 	feedbackCues,
@@ -65,7 +64,7 @@ export const classifyReconciliationFx = Effect.fnUntraced(function* ({
 	motionRetainedActorIds,
 	pendingActorIds,
 	visibleActors,
-}: classifyReconciliationFx.Props) {
+}: classifyReconciliationFn.Props) => {
 	const currentActorIds = [
 		...actorIds,
 	];
@@ -124,4 +123,4 @@ export const classifyReconciliationFx = Effect.fnUntraced(function* ({
 		arrivals,
 		departures,
 	};
-});
+};

@@ -1,8 +1,7 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { classifyActorUpdateFx } from "~/ui/pixi/scene/classifyActorUpdateFx";
-import { classifyReconciliationFx } from "~/ui/pixi/scene/classifyReconciliationFx";
+import { classifyActorUpdateFn } from "~/ui/pixi/scene/fn/classifyActorUpdateFn";
+import { classifyReconciliationFn } from "~/ui/pixi/scene/fn/classifyReconciliationFn";
 
 import {
 	boardLocation,
@@ -26,23 +25,21 @@ describe("main delivery retention", () => {
 			location: boardLocation(1),
 			revision: "revision:delivery:next",
 		});
-		const update = Effect.runSync(
-			classifyActorUpdateFx({
-				actor: createDeliveryActor(current),
-				deliveryRetained: true,
-				directLanding: false,
-				displayItem,
-				motionClaimed: false,
-				pose: {
-					layer: null as never,
-					size: 100,
-					x: 140,
-					y: 60,
-				},
-				poseChannelActive: false,
-				preserveVisual: false,
-			}),
-		);
+		const update = classifyActorUpdateFn({
+			actor: createDeliveryActor(current),
+			deliveryRetained: true,
+			directLanding: false,
+			displayItem,
+			motionClaimed: false,
+			pose: {
+				layer: null as never,
+				size: 100,
+				x: 140,
+				y: 60,
+			},
+			poseChannelActive: false,
+			preserveVisual: false,
+		});
 
 		expect(update.item).toEqual({
 			kind: "visual",
@@ -53,28 +50,24 @@ describe("main delivery retention", () => {
 			kind: "owned",
 		});
 
-		const retained = Effect.runSync(
-			classifyReconciliationFx({
-				...emptyReconciliationFacts,
-				actorIds: [
-					current.id,
-				],
-				deliveryRetainedActorIds: new Set([
-					current.id,
-				]),
-			}),
-		);
+		const retained = classifyReconciliationFn({
+			...emptyReconciliationFacts,
+			actorIds: [
+				current.id,
+			],
+			deliveryRetainedActorIds: new Set([
+				current.id,
+			]),
+		});
 		expect(retained.departures).toEqual([]);
 
-		const released = Effect.runSync(
-			classifyReconciliationFx({
-				...emptyReconciliationFacts,
-				actorIds: [
-					current.id,
-				],
-				deliveryRetainedActorIds: new Set(),
-			}),
-		);
+		const released = classifyReconciliationFn({
+			...emptyReconciliationFacts,
+			actorIds: [
+				current.id,
+			],
+			deliveryRetainedActorIds: new Set(),
+		});
 		expect(released.departures).toEqual([
 			{
 				actorId: current.id,

@@ -5,9 +5,8 @@ import { randomBytes } from "node:crypto";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "electron-vite";
-import { Effect } from "effect";
 import { RendererDevelopmentServer } from "./electron/security/RendererDevelopmentUrl";
-import { createRendererDevelopmentContentSecurityPolicyFx } from "./electron/security/createRendererDevelopmentContentSecurityPolicyFx";
+import { createRendererDevelopmentContentSecurityPolicyFn } from "./electron/security/fn/createRendererDevelopmentContentSecurityPolicyFn";
 import { ArkpackDistributionChannelDefaults } from "./src/engine/pack/ArkpackDistributionChannel";
 
 const sourceAlias = {
@@ -78,12 +77,11 @@ export default defineConfig(({ command }) => {
 					developmentCspNonce === undefined
 						? undefined
 						: {
-								"Content-Security-Policy": Effect.runSync(
-									createRendererDevelopmentContentSecurityPolicyFx({
+								"Content-Security-Policy":
+									createRendererDevelopmentContentSecurityPolicyFn({
 										developmentUrl: RendererDevelopmentServer,
 										nonce: developmentCspNonce,
 									}),
-								),
 							},
 			},
 			html:

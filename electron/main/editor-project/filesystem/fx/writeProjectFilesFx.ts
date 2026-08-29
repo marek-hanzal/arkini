@@ -16,8 +16,8 @@ import { EditorVersionHeadFileSchema } from "~/editor/filesystem/EditorVersionHe
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 import { createProjectPathsFx } from "../createProjectPathsFx";
 import type { ProjectPaths } from "../ProjectPaths";
+import { addGitignoreRulesFn } from "../fn/addGitignoreRulesFn";
 import type { ProjectFiles } from "./ProjectFiles";
-import { addGitignoreRulesFx } from "./addGitignoreRulesFx";
 import { assertProjectFileFx } from "./assertProjectFileFx";
 import { writeProjectFileSetFx } from "./writeProjectFileSetFx";
 
@@ -240,7 +240,7 @@ export const writeProjectFilesFx = Effect.fn("writeProjectFilesFx")(function* (
 			const gitignore = gitignoreExists
 				? yield* fileSystem.readFileString(paths.gitignoreFile)
 				: "";
-			const nextGitignore = yield* addGitignoreRulesFx(gitignore);
+			const nextGitignore = addGitignoreRulesFn(gitignore);
 			if (nextGitignore !== gitignore)
 				writes.push({
 					target: paths.gitignoreFile,

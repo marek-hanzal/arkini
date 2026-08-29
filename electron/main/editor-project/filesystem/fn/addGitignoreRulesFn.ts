@@ -1,5 +1,3 @@
-import { Effect } from "effect";
-
 const rules = [
 	{
 		line: "/build/",
@@ -19,12 +17,10 @@ const rules = [
 	},
 ] as const;
 
-export const addGitignoreRulesFx = Effect.fn("addGitignoreRulesFx")((source: string) => {
+export const addGitignoreRulesFn = (source: string) => {
 	const lines = source.split(/\r?\n/).map((line) => line.trim());
 	const missing = rules.filter(({ variants }) => !lines.some((line) => variants.has(line)));
-	return Effect.succeed(
-		missing.length === 0
-			? source
-			: `${source}${source.length === 0 || source.endsWith("\n") ? "" : "\n"}${missing.map(({ line }) => line).join("\n")}\n`,
-	);
-});
+	return missing.length === 0
+		? source
+		: `${source}${source.length === 0 || source.endsWith("\n") ? "" : "\n"}${missing.map(({ line }) => line).join("\n")}\n`;
+};

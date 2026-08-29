@@ -1,13 +1,12 @@
-import { Effect } from "effect";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { createArkiniUserDataPathsFx } from "../../electron/main/user-data/createArkiniUserDataPathsFx";
+import { createArkiniUserDataPathsFn } from "../../electron/main/user-data/fn/createArkiniUserDataPathsFn";
 
 describe("Arkini user data", () => {
 	it("separates canonical game persistence below one Arkini root", () => {
 		const userDataPath = join("tmp", "arkini-user-data");
-		const paths = Effect.runSync(createArkiniUserDataPathsFx(userDataPath));
+		const paths = createArkiniUserDataPathsFn(userDataPath);
 
 		expect(paths).toEqual({
 			root: join(userDataPath, "arkini"),

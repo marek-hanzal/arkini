@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { ArkpackDistributionChannel } from "~/engine/pack/ArkpackDistributionChannel";
-import { createArkpackDistributionChannelFx } from "~/engine/pack/fx/createArkpackDistributionChannelFx";
+import { createArkpackDistributionChannelFn } from "~/engine/pack/fn/createArkpackDistributionChannelFn";
 import { encodeArkpackEnvelopeFx } from "~/engine/pack/fx/encodeArkpackEnvelopeFx";
 import { createArkpackProvenanceVerifier } from "~/engine/pack/fx/verifyArkpackProvenanceFx";
 import { readArkpackContentHashFx } from "~/engine/pack/fx/readArkpackContentHashFx";
@@ -32,12 +32,10 @@ describe("Arkpack release provenance", () => {
 	});
 
 	it("keeps the same proof Community for another channel or payload", async () => {
-		const foreignChannel = Effect.runSync(
-			createArkpackDistributionChannelFx({
-				issuer: ArkpackDistributionChannel.issuer,
-				workflow: "https://github.com/pepa/arkini/.github/workflows/release.yml",
-			}),
-		);
+		const foreignChannel = createArkpackDistributionChannelFn({
+			issuer: ArkpackDistributionChannel.issuer,
+			workflow: "https://github.com/pepa/arkini/.github/workflows/release.yml",
+		});
 		const verifyForeignChannel = createArkpackProvenanceVerifier({
 			channel: foreignChannel,
 			trustedRoot: fixture.trustedRoot,

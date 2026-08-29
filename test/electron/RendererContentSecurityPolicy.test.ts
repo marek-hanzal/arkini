@@ -1,21 +1,18 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { RendererContentSecurityPolicy } from "../../electron/security/RendererContentSecurityPolicy";
-import { createRendererDevelopmentContentSecurityPolicyFx } from "../../electron/security/createRendererDevelopmentContentSecurityPolicyFx";
+import { createRendererDevelopmentContentSecurityPolicyFn } from "../../electron/security/fn/createRendererDevelopmentContentSecurityPolicyFn";
 import { parseRendererDevelopmentUrlFx } from "../../electron/security/parseRendererDevelopmentUrlFx";
 
 describe("RendererContentSecurityPolicy", () => {
 	it("allows the exact URL-derived HMR endpoint and one Vite development nonce", () => {
-		const policy = Effect.runSync(
-			parseRendererDevelopmentUrlFx("http://127.0.0.1:4040/").pipe(
-				Effect.flatMap((developmentUrl) =>
-					createRendererDevelopmentContentSecurityPolicyFx({
-						developmentUrl,
-						nonce: "arkini-test-nonce",
-					}),
-				),
-			),
+		const developmentUrl = Effect.runSync(
+			parseRendererDevelopmentUrlFx("http://127.0.0.1:4040/"),
 		);
+		const policy = createRendererDevelopmentContentSecurityPolicyFn({
+			developmentUrl,
+			nonce: "arkini-test-nonce",
+		});
 
 		expect(policy).toContain("script-src 'self' 'nonce-arkini-test-nonce'");
 		expect(policy).toContain("connect-src 'self' blob: data: ws://127.0.0.1:4040/");

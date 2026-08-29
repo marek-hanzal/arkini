@@ -8,8 +8,8 @@ import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { SwapSameItemError } from "~/engine/runtime/error/SwapSameItemError";
-import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
+import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBoardOperationError";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -81,7 +81,7 @@ export const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 				entityId: runtimeSecond.id,
 				expectedRevision: secondItemRevision,
 			});
-			const first = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeFirst));
+			const first = Option.getOrUndefined(isGridRuntimeItemFn(runtimeFirst));
 			if (first === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({
@@ -90,7 +90,7 @@ export const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 					}),
 				);
 			}
-			const second = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeSecond));
+			const second = Option.getOrUndefined(isGridRuntimeItemFn(runtimeSecond));
 			if (second === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({
@@ -99,8 +99,8 @@ export const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 					}),
 				);
 			}
-			const boardFirst = Option.getOrUndefined(yield* isBoardRuntimeItemFx(first));
-			const boardSecond = Option.getOrUndefined(yield* isBoardRuntimeItemFx(second));
+			const boardFirst = Option.getOrUndefined(isBoardRuntimeItemFn(first));
+			const boardSecond = Option.getOrUndefined(isBoardRuntimeItemFn(second));
 			if (
 				boardFirst !== undefined &&
 				boardSecond !== undefined &&

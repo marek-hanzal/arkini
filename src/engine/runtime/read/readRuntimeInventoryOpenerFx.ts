@@ -4,7 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { InventoryOpenerUnavailableError } from "~/engine/runtime/error/InventoryOpenerUnavailableError";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -42,7 +42,7 @@ export const readRuntimeInventoryOpenerFx = Effect.fn("readRuntimeInventoryOpene
 	const opener =
 		runtimeOpener === undefined
 			? undefined
-			: Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeOpener));
+			: Option.getOrUndefined(isGridRuntimeItemFn(runtimeOpener));
 	if (
 		opener === undefined ||
 		(opener.location.scope !== LocationScopeEnumSchema.enum.Board &&

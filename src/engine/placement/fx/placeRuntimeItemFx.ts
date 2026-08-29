@@ -11,7 +11,7 @@ import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocation
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { ItemJobScopedError } from "~/engine/runtime/error/ItemJobScopedError";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -97,7 +97,7 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 		});
 		const events: GameEventSchema.Type[] = [];
 		for (const stack of placement.stack) {
-			const stackedItem = Option.getOrUndefined(yield* isGridRuntimeItemFx(stack.item));
+			const stackedItem = Option.getOrUndefined(isGridRuntimeItemFn(stack.item));
 			if (stackedItem === undefined) {
 				return yield* Effect.die(
 					new Error(
@@ -116,9 +116,7 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 			});
 		}
 		for (const runtimeSpawnedItem of placement.spawn) {
-			const spawnedItem = Option.getOrUndefined(
-				yield* isGridRuntimeItemFx(runtimeSpawnedItem),
-			);
+			const spawnedItem = Option.getOrUndefined(isGridRuntimeItemFn(runtimeSpawnedItem));
 			if (spawnedItem === undefined) {
 				return yield* Effect.die(
 					new Error(

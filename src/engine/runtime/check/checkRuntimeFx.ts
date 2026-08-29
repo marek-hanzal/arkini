@@ -7,11 +7,11 @@ import { checkRuntimeDefaultLinesFn } from "~/engine/line/fn/checkRuntimeDefault
 import { checkRuntimeJobsFx } from "~/engine/job/check/checkRuntimeJobsFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { RuntimeCheckResultSchema } from "~/engine/runtime/schema/check/RuntimeCheckResultSchema";
-import { checkRuntimeItemIdsFx } from "./checkRuntimeItemIdsFx";
-import { checkRuntimeItemChargesFx } from "./checkRuntimeItemChargesFx";
+import { checkRuntimeItemChargesFn } from "./fn/checkRuntimeItemChargesFn";
+import { checkRuntimeItemIdsFn } from "./fn/checkRuntimeItemIdsFn";
 import { checkRuntimeItemQuantitiesFx } from "./checkRuntimeItemQuantitiesFx";
-import { checkRuntimeItemTemporaryDurationsFx } from "./checkRuntimeItemTemporaryDurationsFx";
-import { checkRuntimeLocationsFx } from "./checkRuntimeLocationsFx";
+import { checkRuntimeItemTemporaryDurationsFn } from "./fn/checkRuntimeItemTemporaryDurationsFn";
+import { checkRuntimeLocationsFn } from "./fn/checkRuntimeLocationsFn";
 
 export namespace checkRuntimeFx {
 	export interface Props {
@@ -26,16 +26,16 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 	runtime,
 }: checkRuntimeFx.Props) {
 	const config = yield* GameConfigFx;
-	const itemChargeIssues = yield* checkRuntimeItemChargesFx({
+	const itemChargeIssues = checkRuntimeItemChargesFn({
 		runtime,
 	});
-	const itemIdIssues = yield* checkRuntimeItemIdsFx({
+	const itemIdIssues = checkRuntimeItemIdsFn({
 		runtime,
 	});
 	const itemQuantityIssues = yield* checkRuntimeItemQuantitiesFx({
 		runtime,
 	});
-	const itemTemporaryDurationIssues = yield* checkRuntimeItemTemporaryDurationsFx({
+	const itemTemporaryDurationIssues = checkRuntimeItemTemporaryDurationsFn({
 		runtime,
 	});
 	const defaultLineIssues = checkRuntimeDefaultLinesFn({
@@ -50,7 +50,7 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 	const jobIssues = yield* checkRuntimeJobsFx({
 		runtime,
 	});
-	const locationIssues = yield* checkRuntimeLocationsFx({
+	const locationIssues = checkRuntimeLocationsFn({
 		config,
 		runtime,
 	});

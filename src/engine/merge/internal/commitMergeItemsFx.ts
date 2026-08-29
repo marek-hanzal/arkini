@@ -13,8 +13,8 @@ import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeE
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
+import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBoardOperationError";
@@ -72,7 +72,7 @@ export const commitMergeItemsFx = Effect.fn("commitMergeItemsFx")(function* ({
 				entityId: runtimeTarget.id,
 				expectedRevision: targetRevision,
 			});
-			const source = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeSource));
+			const source = Option.getOrUndefined(isGridRuntimeItemFn(runtimeSource));
 			if (source === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({
@@ -81,7 +81,7 @@ export const commitMergeItemsFx = Effect.fn("commitMergeItemsFx")(function* ({
 					}),
 				);
 			}
-			const target = Option.getOrUndefined(yield* isBoardRuntimeItemFx(runtimeTarget));
+			const target = Option.getOrUndefined(isBoardRuntimeItemFn(runtimeTarget));
 			if (target === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnBoardError({
@@ -90,7 +90,7 @@ export const commitMergeItemsFx = Effect.fn("commitMergeItemsFx")(function* ({
 					}),
 				);
 			}
-			const boardSource = Option.getOrUndefined(yield* isBoardRuntimeItemFx(source));
+			const boardSource = Option.getOrUndefined(isBoardRuntimeItemFn(source));
 			if (boardSource !== undefined && boardSource.location.space !== target.location.space) {
 				return yield* Effect.fail(
 					new CrossSpaceBoardOperationError({

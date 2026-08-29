@@ -3,7 +3,7 @@ import { Effect, Option } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
-import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
+import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
 import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -25,7 +25,7 @@ export const readPlacementOriginFx = Effect.fn("readPlacementOriginFx")(function
 		itemId: originItemId,
 		runtime,
 	});
-	const origin = Option.getOrUndefined(yield* isBoardRuntimeItemFx(runtimeOrigin));
+	const origin = Option.getOrUndefined(isBoardRuntimeItemFn(runtimeOrigin));
 	if (origin === undefined) {
 		return yield* Effect.fail(
 			new ItemNotOnBoardError({

@@ -8,7 +8,7 @@ import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
-import { isDeliveryRuntimeItemFx } from "~/engine/runtime/read/isDeliveryRuntimeItemFx";
+import { isDeliveryRuntimeItemFn } from "~/engine/runtime/read/fn/isDeliveryRuntimeItemFn";
 import type { DeliveryRuntimeItemSchema } from "~/engine/runtime/schema/DeliveryRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
@@ -34,7 +34,7 @@ export const checkRuntimeDeliveriesFx = Effect.fn("checkRuntimeDeliveriesFx")(fu
 	const validClaims: ValidClaim[] = [];
 
 	for (const item of runtime.items) {
-		const delivery = yield* isDeliveryRuntimeItemFx(item);
+		const delivery = isDeliveryRuntimeItemFn(item);
 		if (Option.isNone(delivery)) continue;
 		const current = delivery.value;
 		if (current.location.phase !== "outbound") continue;

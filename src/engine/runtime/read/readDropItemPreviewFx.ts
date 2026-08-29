@@ -11,9 +11,9 @@ import { readGridLocationClaimAtFn } from "~/engine/location/fn/readGridLocation
 import { readGridLocationClaimsFn } from "~/engine/location/fn/readGridLocationClaimsFn";
 import { resolveMergeRuleFx } from "~/engine/merge/fx/resolveMergeRuleFx";
 import type { DropItemCommand } from "~/engine/runtime/DropItemCommand";
-import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
-import { readDropItemStackRejectedReasonFx } from "~/engine/runtime/read/readDropItemStackRejectedReasonFx";
+import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
+import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
+import { readDropItemStackRejectedReasonFn } from "~/engine/runtime/read/fn/readDropItemStackRejectedReasonFn";
 import { readItemStackResolutionFx } from "~/engine/runtime/read/readItemStackResolutionFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { planInventoryStorageFx } from "~/engine/runtime/fx/planInventoryStorageFx";
@@ -80,7 +80,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	if (runtimeSource === undefined || runtimeSource.revision !== sourceRevision) {
 		return rejected(DropItemRejectedReason.StaleSource);
 	}
-	const source = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeSource));
+	const source = Option.getOrUndefined(isGridRuntimeItemFn(runtimeSource));
 	if (source === undefined) {
 		return rejected(DropItemRejectedReason.InvalidSource);
 	}
@@ -135,7 +135,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	if (runtimeTargetItem === undefined || runtimeTargetItem.revision !== targetOccupant.revision) {
 		return rejected(DropItemRejectedReason.StaleTarget);
 	}
-	const targetItem = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeTargetItem));
+	const targetItem = Option.getOrUndefined(isGridRuntimeItemFn(runtimeTargetItem));
 	if (targetItem === undefined) {
 		return rejected(DropItemRejectedReason.InvalidTarget);
 	}
@@ -147,8 +147,8 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	) {
 		return rejected(DropItemRejectedReason.StaleTarget);
 	}
-	const boardSource = Option.getOrUndefined(yield* isBoardRuntimeItemFx(source));
-	const boardTarget = Option.getOrUndefined(yield* isBoardRuntimeItemFx(targetItem));
+	const boardSource = Option.getOrUndefined(isBoardRuntimeItemFn(source));
+	const boardTarget = Option.getOrUndefined(isBoardRuntimeItemFn(targetItem));
 	if (
 		boardSource !== undefined &&
 		boardTarget !== undefined &&
@@ -228,7 +228,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	}
 	if (stackResolution.kind === "blocked") {
 		return rejected(
-			yield* readDropItemStackRejectedReasonFx({
+			readDropItemStackRejectedReasonFn({
 				reason: stackResolution.reason,
 			}),
 		);

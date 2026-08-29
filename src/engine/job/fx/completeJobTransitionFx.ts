@@ -9,9 +9,9 @@ import { JobNotFoundError } from "~/engine/job/error/JobNotFoundError";
 import { JobNotReadyError } from "~/engine/job/error/JobNotReadyError";
 import { makeJobCompletionRandomFx } from "~/engine/job/random/makeJobCompletionRandomFx";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
-import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
-import { isJobRuntimeItemFx } from "~/engine/runtime/read/isJobRuntimeItemFx";
-import { isReservedRuntimeItemFx } from "~/engine/runtime/read/isReservedRuntimeItemFx";
+import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
+import { isJobRuntimeItemFn } from "~/engine/runtime/read/fn/isJobRuntimeItemFn";
+import { isReservedRuntimeItemFn } from "~/engine/runtime/read/fn/isReservedRuntimeItemFn";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -45,7 +45,7 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 	const runtimeOwner = runtime.items.find((item) => item.id === job.ownerItemId);
 	if (runtimeOwner === undefined)
 		return yield* Effect.die(new Error(`Job ${job.id} owner is missing.`));
-	const owner = Option.getOrUndefined(yield* isBoardRuntimeItemFx(runtimeOwner));
+	const owner = Option.getOrUndefined(isBoardRuntimeItemFn(runtimeOwner));
 	if (owner === undefined)
 		return yield* Effect.fail(
 			new ItemNotOnBoardError({
@@ -70,12 +70,12 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 			new Error(`Job ${job.id} owner ${owner.id} does not expose a product line.`),
 		);
 	}
-	const consumedItems = Array.getSomes(
-		yield* Effect.forEach(runtime.items, isJobRuntimeItemFx),
-	).filter((item) => item.location.jobId === job.id);
-	const reservations = Array.getSomes(
-		yield* Effect.forEach(runtime.items, isReservedRuntimeItemFx),
-	).filter((item) => item.location.jobId === job.id);
+	const consumedItems = Array.getSomes(runtime.items.map(isJobRuntimeItemFn)).filter(
+		(item) => item.location.jobId === job.id,
+	);
+	const reservations = Array.getSomes(runtime.items.map(isReservedRuntimeItemFn)).filter(
+		(item) => item.location.jobId === job.id,
+	);
 	const completionOwner = {
 		...owner,
 		item: owner.item,

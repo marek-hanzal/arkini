@@ -1,4 +1,3 @@
-import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import { isItemLocationScopeAllowedFn } from "~/engine/location/fn/isItemLocationScopeAllowedFn";
@@ -14,7 +13,7 @@ import type { LocationOutOfBoundsIssueSchema } from "~/engine/runtime/schema/che
 import type { LocationScopeIssueSchema } from "~/engine/runtime/schema/check/LocationScopeIssueSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
-export namespace checkRuntimeLocationsFx {
+export namespace checkRuntimeLocationsFn {
 	export interface Props {
 		config: GameConfigSchema.Type;
 		runtime: RuntimeSchema.Type;
@@ -28,10 +27,7 @@ export namespace checkRuntimeLocationsFx {
  * refinements: canonical scope, configured grid bounds, and unique occupancy.
  * Line-input locations are validated by the input runtime checker.
  */
-export const checkRuntimeLocationsFx = Effect.fn("checkRuntimeLocationsFx")(function* ({
-	config,
-	runtime,
-}: checkRuntimeLocationsFx.Props) {
+export const checkRuntimeLocationsFn = ({ config, runtime }: checkRuntimeLocationsFn.Props) => {
 	const items: {
 		readonly item: RuntimeItemSchema.Type;
 		readonly location: GridLocationSchema.Type;
@@ -112,4 +108,4 @@ export const checkRuntimeLocationsFx = Effect.fn("checkRuntimeLocationsFx")(func
 		...boundsIssues,
 		...occupancyIssues,
 	];
-});
+};

@@ -8,7 +8,7 @@ import { readTileActorVisualFx } from "~/ui/pixi/actor/readTileActorVisualFx";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
-import { isDeliveryRuntimeItemFx } from "~/engine/runtime/read/isDeliveryRuntimeItemFx";
+import { isDeliveryRuntimeItemFn } from "~/engine/runtime/read/fn/isDeliveryRuntimeItemFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export interface TileDelivery {
@@ -59,7 +59,7 @@ export const readTileDeliveriesFx = Effect.fnUntraced(function* ({
 	const deliveries: TileDelivery[] = [];
 
 	for (const runtimeItem of runtime.items) {
-		const delivery = yield* isDeliveryRuntimeItemFx(runtimeItem);
+		const delivery = isDeliveryRuntimeItemFn(runtimeItem);
 		if (Option.isNone(delivery)) continue;
 		const current = delivery.value;
 		const semanticFrom =

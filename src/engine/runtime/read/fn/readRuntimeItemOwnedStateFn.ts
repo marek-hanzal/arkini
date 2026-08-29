@@ -1,5 +1,3 @@
-import { Effect } from "effect";
-
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { JobQueueRequestSchema } from "~/engine/job/schema/JobQueueRequestSchema";
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
@@ -7,7 +5,7 @@ import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchem
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
-export namespace readRuntimeItemOwnedStateFx {
+export namespace readRuntimeItemOwnedStateFn {
 	export interface Props {
 		ownerItemId: IdSchema.Type;
 		runtime: RuntimeSchema.Type;
@@ -23,10 +21,10 @@ export namespace readRuntimeItemOwnedStateFx {
 }
 
 /** Reads the complete runtime ownership tree beneath one live item identity. */
-export const readRuntimeItemOwnedStateFx = Effect.fn("readRuntimeItemOwnedStateFx")(function* ({
+export const readRuntimeItemOwnedStateFn = ({
 	ownerItemId,
 	runtime,
-}: readRuntimeItemOwnedStateFx.Props) {
+}: readRuntimeItemOwnedStateFn.Props) => {
 	const ownerItemIds = new Set<IdSchema.Type>([
 		ownerItemId,
 	]);
@@ -77,5 +75,5 @@ export const readRuntimeItemOwnedStateFx = Effect.fn("readRuntimeItemOwnedStateF
 		jobs: runtime.jobs.filter((job) => jobIds.has(job.id)),
 		jobItems: runtime.items.filter((item) => jobItemIds.has(item.id)),
 		queue: runtime.jobQueue.filter((request) => ownerItemIds.has(request.ownerItemId)),
-	} satisfies readRuntimeItemOwnedStateFx.Result;
-});
+	} satisfies readRuntimeItemOwnedStateFn.Result;
+};

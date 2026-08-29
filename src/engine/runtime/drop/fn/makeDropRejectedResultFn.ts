@@ -1,5 +1,3 @@
-import { Effect } from "effect";
-
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
 import type { DropItemResult } from "~/engine/runtime/DropItemResult";
@@ -12,7 +10,7 @@ type RejectedDropResult = Extract<
 	}
 >;
 
-export namespace makeDropRejectedResultFx {
+export namespace makeDropRejectedResultFn {
 	export interface Props {
 		readonly reason: DropItemRejectedReason;
 		readonly sourceItemId: IdSchema.Type;
@@ -21,11 +19,11 @@ export namespace makeDropRejectedResultFx {
 }
 
 /** Normalizes an expected optimistic drop race into the public rejected result. */
-export const makeDropRejectedResultFx = Effect.fnUntraced(function* ({
+export const makeDropRejectedResultFn = ({
 	reason,
 	sourceItemId,
 	targetItemId,
-}: makeDropRejectedResultFx.Props) {
+}: makeDropRejectedResultFn.Props) => {
 	return {
 		kind: DropItemResultKind.Reject,
 		reason,
@@ -36,4 +34,4 @@ export const makeDropRejectedResultFx = Effect.fnUntraced(function* ({
 					targetItemId,
 				}),
 	} satisfies RejectedDropResult;
-});
+};

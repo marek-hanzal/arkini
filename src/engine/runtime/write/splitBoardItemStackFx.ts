@@ -15,7 +15,7 @@ import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationCo
 import { ItemStackSplitUnavailableError } from "~/engine/runtime/error/ItemStackSplitUnavailableError";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
+import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
 import { readValidatedRuntimeItemFx } from "~/engine/runtime/read/readValidatedRuntimeItemFx";
 import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -50,7 +50,7 @@ export const splitBoardItemStackFx = Effect.fn("splitBoardItemStackFx")(function
 				revision,
 				runtime,
 			});
-			const sourceBefore = Option.getOrUndefined(yield* isBoardRuntimeItemFx(validatedItem));
+			const sourceBefore = Option.getOrUndefined(isBoardRuntimeItemFn(validatedItem));
 			if (sourceBefore === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnBoardError({

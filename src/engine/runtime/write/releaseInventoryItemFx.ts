@@ -15,7 +15,7 @@ import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import { readRuntimeInventoryOpenerFx } from "~/engine/runtime/read/readRuntimeInventoryOpenerFx";
 
@@ -44,7 +44,7 @@ export const releaseInventoryItemFx = Effect.fn("releaseInventoryItemFx")(functi
 				entityId: runtimeItem.id,
 				expectedRevision: revision,
 			});
-			const item = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeItem));
+			const item = Option.getOrUndefined(isGridRuntimeItemFn(runtimeItem));
 			if (item === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({

@@ -9,7 +9,7 @@ import { lineRulesFx } from "~/engine/line/fx/lineRulesFx";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
 import type { LineRun } from "~/engine/line/LineRun";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
-import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
+import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { planLineRunFx } from "./planLineRunFx";
@@ -40,7 +40,7 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 		itemId: ownerItemId,
 		runtime,
 	});
-	const owner = Option.getOrUndefined(yield* isBoardRuntimeItemFx(runtimeOwner));
+	const owner = Option.getOrUndefined(isBoardRuntimeItemFn(runtimeOwner));
 	if (owner === undefined) {
 		return yield* Effect.fail(
 			new ItemNotOnBoardError({

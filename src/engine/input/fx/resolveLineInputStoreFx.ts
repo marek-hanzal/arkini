@@ -10,7 +10,7 @@ import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx"
 import { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
 import { readEffectiveDefaultLineFn } from "~/engine/line/fn/readEffectiveDefaultLineFn";
 import { readLineOwnerLinesFn } from "~/engine/line/fn/readLineOwnerLinesFn";
-import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
+import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -51,7 +51,7 @@ export const resolveLineInputStoreFx = Effect.fn("resolveLineInputStoreFx")(func
 	if (owner.id === source.id) return undefined;
 	const narrowedLineOwnerItem = Option.getOrUndefined(isLineOwnerItemFn(lineOwnerItem));
 	if (narrowedLineOwnerItem === undefined) return undefined;
-	const boardOwner = Option.getOrUndefined(yield* isBoardRuntimeItemFx(owner));
+	const boardOwner = Option.getOrUndefined(isBoardRuntimeItemFn(owner));
 	if (boardOwner === undefined) return undefined;
 	const effectiveDefaultLine =
 		requestedLineId === undefined

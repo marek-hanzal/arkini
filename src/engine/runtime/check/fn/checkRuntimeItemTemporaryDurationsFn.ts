@@ -1,5 +1,3 @@
-import { Effect } from "effect";
-
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { ItemTemporaryDurationIssueSchema } from "~/engine/runtime/schema/check/ItemTemporaryDurationIssueSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
@@ -7,16 +5,16 @@ import { ItemTemporaryDurationIssueReasonEnumSchema } from "~/engine/runtime/sch
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 
-export namespace checkRuntimeItemTemporaryDurationsFx {
+export namespace checkRuntimeItemTemporaryDurationsFn {
 	export interface Props {
 		runtime: RuntimeSchema.Type;
 	}
 }
 
 /** Reports every non-canonical temporary-item lifetime state. */
-export const checkRuntimeItemTemporaryDurationsFx = Effect.fn(
-	"checkRuntimeItemTemporaryDurationsFx",
-)(function* ({ runtime }: checkRuntimeItemTemporaryDurationsFx.Props) {
+export const checkRuntimeItemTemporaryDurationsFn = ({
+	runtime,
+}: checkRuntimeItemTemporaryDurationsFn.Props) => {
 	const issues: ItemTemporaryDurationIssueSchema.Type[] = [];
 
 	for (const item of runtime.items) {
@@ -66,4 +64,4 @@ export const checkRuntimeItemTemporaryDurationsFx = Effect.fn(
 	}
 
 	return issues;
-});
+};

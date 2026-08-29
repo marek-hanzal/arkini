@@ -2,7 +2,7 @@ import { Array, Effect } from "effect";
 
 import type { ToolbarSchema } from "~/engine/query/schema/ToolbarSchema";
 import { getItemsFx } from "~/engine/runtime/read/getItemsFx";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import { ScopeSchema } from "~/engine/query/schema/ScopeSchema";
 
 import { queryItemsFx } from "./queryItemsFx";
@@ -18,7 +18,7 @@ export const queryToolbarFx = Effect.fn("queryToolbarFx")(function* ({
 	query,
 }: queryToolbarFx.Props) {
 	const items = yield* getItemsFx();
-	const gridItems = Array.getSomes(yield* Effect.forEach(items, isGridRuntimeItemFx));
+	const gridItems = Array.getSomes(items.map(isGridRuntimeItemFn));
 
 	return yield* queryItemsFx({
 		items: gridItems.filter((item) => {

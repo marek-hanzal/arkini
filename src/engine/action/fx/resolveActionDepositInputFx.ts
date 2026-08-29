@@ -7,7 +7,7 @@ import type { DepositSchema } from "~/engine/input/schema/DepositSchema";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import { queryFx } from "~/engine/query/fx/queryFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
-import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
+import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -65,7 +65,7 @@ export const resolveActionDepositInputFx = Effect.fn("resolveActionDepositInputF
 		itemId: ownerItemId,
 		runtime,
 	});
-	const owner = Option.getOrUndefined(yield* isBoardRuntimeItemFx(runtimeOwner));
+	const owner = Option.getOrUndefined(isBoardRuntimeItemFn(runtimeOwner));
 	if (owner === undefined) {
 		return {
 			resolution: {
@@ -84,9 +84,9 @@ export const resolveActionDepositInputFx = Effect.fn("resolveActionDepositInputF
 			read: Effect.succeed(runtime),
 		}),
 	);
-	const boardCandidates = Array.getSomes(
-		yield* Effect.forEach(candidates, isBoardRuntimeItemFx),
-	).sort((left, right) => compareTarget(owner.location.position, left, right));
+	const boardCandidates = Array.getSomes(candidates.map(isBoardRuntimeItemFn)).sort(
+		(left, right) => compareTarget(owner.location.position, left, right),
+	);
 
 	for (const target of boardCandidates) {
 		const charges = yield* resolveActionChargeFx({

@@ -3,7 +3,7 @@ import { Array, Effect } from "effect";
 import { ItemNotFoundError } from "~/engine/item/error/ItemNotFoundError";
 import { readGridLocationOccupantsFn } from "~/engine/location/fn/readGridLocationOccupantsFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import { isGridRuntimeItemFx } from "./isGridRuntimeItemFx";
+import { isGridRuntimeItemFn } from "./fn/isGridRuntimeItemFn";
 import { getItemsFx } from "./getItemsFx";
 
 export namespace getItemAtFx {
@@ -15,7 +15,7 @@ export namespace getItemAtFx {
 /** Reads one live item at a concrete location. */
 export const getItemAtFx = Effect.fn("getItemAtFx")(function* ({ location }: getItemAtFx.Props) {
 	const items = yield* getItemsFx();
-	const gridItems = Array.getSomes(yield* Effect.forEach(items, isGridRuntimeItemFx));
+	const gridItems = Array.getSomes(items.map(isGridRuntimeItemFn));
 	const [occupants] = readGridLocationOccupantsFn({
 		items: gridItems,
 		locations: [

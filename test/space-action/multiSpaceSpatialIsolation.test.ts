@@ -7,8 +7,8 @@ import { storeInputMaterialFx } from "~/production-input/write/storeInputMateria
 import { resolveLineRunFx } from "~/production-line/fx/run/resolveLineRunFx";
 import { mergeItemsFx } from "~/item-merge/write/mergeItemsFx";
 import { queryFx } from "~/engine/query/fx/queryFx";
-import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { checkRuntimeFx } from "~/game-runtime/check/checkRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { swapItemsFx } from "~/engine/runtime/write/swapItemsFx";

@@ -6,7 +6,7 @@ import { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetai
 import { isMaterialInputEligibleFn } from "~/production-input/read/fn/isMaterialInputEligibleFn";
 import { isLineInputAutofillSourceLocationFn } from "~/production-input/read/isLineInputAutofillSourceLocationFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { matchesItemSelectorFn } from "~/item-definition/fn/matchesItemSelectorFn";
 import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 

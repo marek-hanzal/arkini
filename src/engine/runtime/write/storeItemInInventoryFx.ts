@@ -11,13 +11,13 @@ import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { ItemInventoryStorageUnavailableError } from "~/engine/runtime/error/ItemInventoryStorageUnavailableError";
 import { ItemInventoryTargetInvalidError } from "~/engine/runtime/error/ItemInventoryTargetInvalidError";
-import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
+import { ItemLocationConflictError } from "~/game-runtime/error/ItemLocationConflictError";
 import { applyInventoryStoragePlanFx } from "~/engine/runtime/fx/applyInventoryStoragePlanFx";
 import { planInventoryStorageFx } from "~/engine/runtime/fx/planInventoryStorageFx";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
-import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
-import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
+import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 
 export namespace storeItemInInventoryFx {
 	export interface Props {

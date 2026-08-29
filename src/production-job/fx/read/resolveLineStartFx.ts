@@ -6,8 +6,8 @@ import { resolveJobQueueFx } from "~/production-job/fx/read/resolveJobQueueFx";
 import type { JobQueueResolutionSchema } from "~/production-job/schema/read/JobQueueResolutionSchema";
 import type { LineRun } from "~/production-line/LineRun";
 import { resolveLineRunFx } from "~/production-line/fx/run/resolveLineRunFx";
-import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace resolveLineStartFx {
 	export interface Props {

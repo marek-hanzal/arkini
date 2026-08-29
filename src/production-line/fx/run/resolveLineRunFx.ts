@@ -13,10 +13,10 @@ import { resolveLineShowFn } from "~/production-line/fn/resolveLineShowFn";
 import type { LineRun } from "~/production-line/LineRun";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { TypeSchema as LineRuleTypeSchema } from "~/production-line/schema/rule/TypeSchema";
-import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
-import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
-import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
+import { isBoardRuntimeItemFn } from "~/game-runtime/read/fn/isBoardRuntimeItemFn";
+import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace resolveLineRunFx {
 	export interface Props {

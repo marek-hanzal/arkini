@@ -5,8 +5,8 @@ import { createTestGameSession } from "~test/support/game/createTestGameSession"
 
 import { RuntimeSaveFx } from "~/engine/save/RuntimeSaveFx";
 import { RuntimeSaveLayerFx } from "~/engine/save/RuntimeSaveLayerFx";
-import { GameCoreLayerFx } from "~/engine/game/layer/GameCoreLayerFx";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
+import { GameRuntimeLayerFx } from "~/game-runtime/layer/GameRuntimeLayerFx";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
@@ -108,7 +108,7 @@ describe("RuntimeSaveLayerFx", () => {
 
 	it.effect("debounces committed snapshots and ignores failed mutations", () => {
 		const saves: StateSchema.Type[] = [];
-		const core = GameCoreLayerFx({
+		const core = GameRuntimeLayerFx({
 			config: createJobTestConfig(),
 		});
 		const save = RuntimeSaveLayerFx({
@@ -166,7 +166,7 @@ describe("RuntimeSaveLayerFx", () => {
 
 	it.effect("does not let event-only traffic wake or postpone runtime autosave", () => {
 		const savedItemCounts: number[] = [];
-		const core = GameCoreLayerFx({
+		const core = GameRuntimeLayerFx({
 			config: createJobTestConfig(),
 		});
 		const save = RuntimeSaveLayerFx({

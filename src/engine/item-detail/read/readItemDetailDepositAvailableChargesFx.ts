@@ -4,9 +4,9 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { DepositSchema } from "~/production-input/schema/DepositSchema";
 import { readItemRemainingChargesFn } from "~/engine/item/fn/readItemRemainingChargesFn";
 import { queryFx } from "~/engine/query/fx/queryFx";
-import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
-import { readBoardRuntimeItemByIdFx } from "~/engine/runtime/read/readBoardRuntimeItemByIdFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
+import { readBoardRuntimeItemByIdFx } from "~/game-runtime/read/readBoardRuntimeItemByIdFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace readItemDetailDepositAvailableChargesFx {
 	export interface Props {

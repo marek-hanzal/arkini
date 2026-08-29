@@ -2,8 +2,8 @@ import { match, P } from "ts-pattern";
 
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { ItemPurityIndex } from "./readItemPurityIndexFn";
 
 const readOwnedLines = (item: RuntimeItemSchema.Type): readonly LineSchema.Type[] =>

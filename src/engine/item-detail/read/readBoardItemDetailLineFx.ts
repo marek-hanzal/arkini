@@ -12,8 +12,8 @@ import type { LineRun } from "~/production-line/LineRun";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { TypeSchema } from "~/production-line/schema/rule/TypeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { readBoardRuntimeItemByIdFx } from "~/engine/runtime/read/readBoardRuntimeItemByIdFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+import { readBoardRuntimeItemByIdFx } from "~/game-runtime/read/readBoardRuntimeItemByIdFx";
 
 export namespace readBoardItemDetailLineFx {
 	export interface Props {

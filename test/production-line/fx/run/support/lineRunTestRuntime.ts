@@ -1,6 +1,6 @@
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 const baseItem = ({ id, scope }: { id: string; scope: "any" | "board" }) => {
 	return {

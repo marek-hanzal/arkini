@@ -6,7 +6,7 @@ import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
 import { projectItemDetailReferenceFx } from "~/item-detail-frame/projectItemDetailReferenceFx";
 import { projectItemDetailSelectorFn } from "~/ui/item-detail/fn/projectItemDetailSelectorFn";
 import type { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace projectItemDetailInputFx {
 	export interface Props {

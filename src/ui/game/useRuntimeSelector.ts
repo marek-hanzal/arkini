@@ -4,7 +4,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { useMemo } from "react";
 
 import type { PlayableGame } from "~/renderer/game/PlayableGame";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 /** Selects a stable projection from the latest committed runtime snapshot. */
 export const useRuntimeSelector = <Selected>(

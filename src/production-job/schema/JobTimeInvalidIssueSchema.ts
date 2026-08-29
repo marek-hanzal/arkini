@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { TimeSchema } from "~/engine/common/schema/TimeSchema";
 export const JobTimeInvalidIssueSchema = z

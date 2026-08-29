@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import type { JobQueueResolutionSchema } from "~/production-job/schema/read/JobQueueResolutionSchema";
 import { readItemQueueSizeFn } from "~/production-job/fn/readItemQueueSizeFn";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 export namespace resolveJobQueueFx {
 	export interface Props {
 		runtime: RuntimeSchema.Type;

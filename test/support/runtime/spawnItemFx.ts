@@ -1,4 +1,4 @@
-import { Array, Effect, Option, pipe } from "effect";
+import { Array, Data, Effect, Option, pipe } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
@@ -7,12 +7,15 @@ import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationCl
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { assertPlacementMaxCountFx } from "~/item-placement/fx/assertPlacementMaxCountFx";
-import { ItemAlreadyExistsError } from "~/engine/runtime/error/ItemAlreadyExistsError";
 import { LocationOccupiedError } from "~/engine/runtime/error/LocationOccupiedError";
-import { createRuntimeItemFx } from "~/engine/runtime/fx/createRuntimeItemFx";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
+
+class ItemAlreadyExistsError extends Data.TaggedError("ItemAlreadyExistsError")<{
+	itemId: IdSchema.Type;
+}> {}
 
 export namespace spawnItemFx {
 	export interface Props {

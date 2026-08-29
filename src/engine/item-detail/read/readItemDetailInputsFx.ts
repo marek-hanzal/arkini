@@ -11,7 +11,7 @@ import type { InputRun } from "~/production-input/InputRun";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import type { InputSchema } from "~/production-input/schema/InputSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace readItemDetailInputsFx {
 	export interface Props {

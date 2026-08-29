@@ -10,7 +10,7 @@ import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn"
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { readOutputConditionalMaximumQuantitiesFn } from "~/production-output/fn/readOutputConditionalMaximumQuantitiesFn";
 import { readOutputMaximumQuantitiesFn } from "~/production-output/fn/readOutputMaximumQuantitiesFn";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { readOutputReservationFn } from "~/production-job/fn/readOutputReservationFn";
 import { applyFinalChargeReservationFx } from "./applyFinalChargeReservationFx";
 import { clampOutputReservationFx } from "./clampOutputReservationFx";

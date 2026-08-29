@@ -8,8 +8,8 @@ import { withdrawLineInputFx } from "~/production-input/write/withdrawLineInputF
 import { withdrawLineInputsFx } from "~/production-input/write/withdrawLineInputsFx";
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
 import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
-import { getItemFx } from "~/engine/runtime/read/getItemFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { getItemFx } from "~test/support/runtime/getItemFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import {

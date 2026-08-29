@@ -7,8 +7,8 @@ import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { outputFx } from "~/production-output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
-import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { makeTemporaryExpiryRandomFx } from "~/engine/item/temporary/random/makeTemporaryExpiryRandomFx";
 

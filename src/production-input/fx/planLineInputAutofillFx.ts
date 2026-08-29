@@ -9,10 +9,10 @@ import type { MaterialSchema } from "~/production-input/schema/MaterialSchema";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { readBoardItemLineFx } from "~/production-line/fx/readBoardItemLineFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
-import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
-import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
+import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { selectItemsFn } from "~/item-definition/fn/selectItemsFn";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 

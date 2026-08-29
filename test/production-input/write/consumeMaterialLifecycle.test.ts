@@ -5,7 +5,7 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { setDefaultLineFx } from "~/production-line/write/setDefaultLineFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";

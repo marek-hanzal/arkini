@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { startTestConfig } from "~test/game-start/startTestConfig";
 import { planStartFx } from "~/game-start/planStartFx";
-import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
 describe("planStartFx", () => {
 	it("combines board and inventory plans against one evolving draft", () => {

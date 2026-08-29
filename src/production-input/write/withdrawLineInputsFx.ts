@@ -2,8 +2,8 @@ import { Array, Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readBoardItemLineFx } from "~/production-line/fx/readBoardItemLineFx";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { isInputRuntimeItemFn } from "~/engine/runtime/read/fn/isInputRuntimeItemFn";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { isInputRuntimeItemFn } from "~/production-input/read/fn/isInputRuntimeItemFn";
 import { returnBufferedLineItemsFx } from "./returnBufferedLineItemsFx";
 
 export namespace withdrawLineInputsFx {

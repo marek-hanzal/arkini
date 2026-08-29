@@ -4,8 +4,8 @@ import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveInteg
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { PlacementPlan } from "~/item-placement/PlacementPlan";
-import { createRuntimeItemFx } from "~/engine/runtime/fx/createRuntimeItemFx";
-import { createRuntimeItemIdFx } from "~/engine/runtime/fx/createRuntimeItemIdFx";
+import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
+import { createRuntimeItemIdFx } from "~/game-runtime/fx/createRuntimeItemIdFx";
 
 interface PlanSpawnPlacementProps {
 	readonly item: ItemSchema.Type;

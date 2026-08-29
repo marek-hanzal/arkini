@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
-import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { lineRulesFx } from "~/production-line/fx/lineRulesFx";
 import { resolveLineShowFn } from "~/production-line/fn/resolveLineShowFn";
 import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
@@ -14,7 +14,7 @@ import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 import { TypeSchema as RollTypeSchema } from "~/production-output/roll/schema/TypeSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace readItemDetailSourcesFx {
 	export interface Props {

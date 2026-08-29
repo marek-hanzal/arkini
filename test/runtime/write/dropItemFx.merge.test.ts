@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 import {
 	mergeConfig,

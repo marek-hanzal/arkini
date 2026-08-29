@@ -2,8 +2,8 @@ import { Effect } from "effect";
 
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";

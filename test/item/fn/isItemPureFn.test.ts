@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { purityTestConfig } from "~test/production-line/support/purityTestConfig";
 
 const location = {

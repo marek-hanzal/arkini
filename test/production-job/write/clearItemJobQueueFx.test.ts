@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { clearItemJobQueueFx } from "~/production-job/write/clearItemJobQueueFx";
 import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import {
 	clearItemJobQueueConfig,
 	clearItemJobQueueState,

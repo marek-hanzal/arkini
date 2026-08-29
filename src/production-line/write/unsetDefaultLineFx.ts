@@ -4,8 +4,8 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/engine/item/error/ItemNotFoundError";
 import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace unsetDefaultLineFx {
 	export interface Props {

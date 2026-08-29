@@ -2,7 +2,7 @@ import { match } from "ts-pattern";
 
 import { readItemRemainingChargesFn } from "~/engine/item/fn/readItemRemainingChargesFn";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 
 /** Projects the one count shown by a tile badge from canonical runtime truth. */
 export const readTileActorBadgeCountFn = (item: RuntimeItemSchema.Type) =>

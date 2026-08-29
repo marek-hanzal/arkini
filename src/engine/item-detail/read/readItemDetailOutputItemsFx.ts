@@ -5,8 +5,8 @@ import type { ItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines"
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { dropRulesFx } from "~/production-output/fx/dropRulesFx";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
-import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export interface ItemDetailOutputRuleContext {
 	readonly origin: BoardLocationSchema.Type;

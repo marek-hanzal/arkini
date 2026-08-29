@@ -1,6 +1,10 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { GameProjectItemSchemaReference } from "~/game-config/source/GameProjectReference";
 import { encodeGameProjectFileStemFn } from "~/game-config/source/encodeGameProjectFileStemFn";
+import { parseGameSourceFileFx } from "~/game-config/source/fx/parseGameSourceFileFx";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 describe("encodeGameProjectFileStemFn", () => {
 	it("preserves canonical filenames for valid project identities", () => {
@@ -26,5 +30,25 @@ describe("encodeGameProjectFileStemFn", () => {
 		expect(encodeGameProjectFileStemFn("\ud800")).not.toBe(
 			encodeGameProjectFileStemFn("\udc00"),
 		);
+	});
+
+	it("keeps canonical item path admission total for every schema-valid UID", () => {
+		const uid = "\ud800";
+		const result = Effect.runSync(
+			parseGameSourceFileFx({
+				path: "/game/items/simple/%ED%A0%80.json",
+				relative: "items/simple/%ED%A0%80.json",
+				source: JSON.stringify({
+					$schema: GameProjectItemSchemaReference,
+					item: {
+						...editorTestPayload.config.items.water,
+						uid,
+					},
+				}),
+			}),
+		);
+
+		expect(result.diagnostics).toEqual([]);
+		expect(result.source?.value.items?.water?.uid).toBe(uid);
 	});
 });

@@ -5,9 +5,8 @@ import {
 	GameProjectManifestFileName,
 	GameProjectSchemaFileName,
 } from "~/game-config/source/GameProjectReference";
+import { encodeGameProjectFileStemFn as encodeFileStem } from "~/game-config/source/encodeGameProjectFileStemFn";
 import type { ProjectPaths } from "./ProjectPaths";
-
-const encodeFileStem = (value: string) => encodeURIComponent(value).replaceAll(".", "%2E");
 
 /** Resolves every fixed and identity-derived path below one Editor project root. */
 export const createProjectPathsFx = Effect.fn("createProjectPathsFx")(function* (

@@ -1,10 +1,9 @@
 import type { DiagnosticValue } from "../../../../electron/contract/diagnostics/DiagnosticRecord";
 
-/** Converts unknown failures and Effect/Pixi objects into a bounded JSON-safe diagnostic value. */
-export const toDiagnosticValueFn = (
+const toDiagnosticValue = (
 	value: unknown,
-	depth = 0,
-	seen = new WeakSet<object>(),
+	depth: number,
+	seen: WeakSet<object>,
 ): DiagnosticValue => {
 	if (value === null || typeof value === "boolean" || typeof value === "string") {
 		return typeof value === "string" ? value.slice(0, 8_192) : value;
@@ -29,12 +28,12 @@ export const toDiagnosticValueFn = (
 					}),
 		};
 		if ("cause" in value && value.cause !== undefined) {
-			error.cause = toDiagnosticValueFn(value.cause, depth + 1, seen);
+			error.cause = toDiagnosticValue(value.cause, depth + 1, seen);
 		}
 		if (value instanceof AggregateError) {
 			error.errors = Array.from(value.errors)
 				.slice(0, 20)
-				.map((cause) => toDiagnosticValueFn(cause, depth + 1, seen));
+				.map((cause) => toDiagnosticValue(cause, depth + 1, seen));
 		}
 		for (const key of Object.keys(value).slice(0, 100)) {
 			if (
@@ -49,7 +48,7 @@ export const toDiagnosticValueFn = (
 			try {
 				// Custom Error fields are diagnostic roots. Their surrounding Cause/Error wrappers
 				// must not spend the depth budget before domain details such as runtime issues.
-				error[key.slice(0, 100)] = toDiagnosticValueFn(
+				error[key.slice(0, 100)] = toDiagnosticValue(
 					(value as unknown as Record<string, unknown>)[key],
 					0,
 					seen,
@@ -61,13 +60,13 @@ export const toDiagnosticValueFn = (
 		return error;
 	}
 	if (Array.isArray(value)) {
-		return value.slice(0, 100).map((entry) => toDiagnosticValueFn(entry, depth + 1, seen));
+		return value.slice(0, 100).map((entry) => toDiagnosticValue(entry, depth + 1, seen));
 	}
 
 	const result: Record<string, DiagnosticValue> = {};
 	for (const key of Object.keys(value).slice(0, 100)) {
 		try {
-			result[key.slice(0, 100)] = toDiagnosticValueFn(
+			result[key.slice(0, 100)] = toDiagnosticValue(
 				(value as Record<string, unknown>)[key],
 				depth + 1,
 				seen,
@@ -78,3 +77,7 @@ export const toDiagnosticValueFn = (
 	}
 	return result;
 };
+
+/** Converts unknown failures and Effect/Pixi objects into a bounded JSON-safe diagnostic value. */
+export const toDiagnosticValueFn = (value: unknown): DiagnosticValue =>
+	toDiagnosticValue(value, 0, new WeakSet<object>());

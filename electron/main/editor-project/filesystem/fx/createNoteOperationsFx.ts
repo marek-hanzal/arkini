@@ -3,10 +3,10 @@ import { Clock, FileSystem } from "effect";
 import { Effect, type Semaphore } from "effect";
 
 import type { ProjectState } from "../ProjectState";
-import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
-import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
-import { EditorProjectNoteFileSchema } from "~/editor/filesystem/EditorProjectNoteFileSchema";
-import { EditorNoteContentSchema, EditorNoteSchema } from "~/editor/note/EditorNoteSchema";
+import type { EditorProjectRepositoryService } from "~/project-authoring/repository/EditorProjectRepository";
+import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
+import { EditorProjectNoteFileSchema } from "~/project-note/EditorProjectNoteFileSchema";
+import { EditorNoteContentSchema, EditorNoteSchema } from "~/project-note/EditorNoteSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
 import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";

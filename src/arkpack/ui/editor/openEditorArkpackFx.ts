@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import { loadArkpackFx } from "~/arkpack/renderer/loadArkpackFx";
-import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
-import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
+import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
+import type { EditorProjectDescriptor } from "~/project-authoring/EditorProjectDescriptor";
 
 /** Opens an existing matching Editor project or creates it from the installed Arkpack. */
 export const openEditorArkpackFx = Effect.fn("openEditorArkpackFx")(function* (packageId: string) {

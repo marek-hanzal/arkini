@@ -5,8 +5,8 @@ import { EditorBuildDiagnostics } from "~/editor-build/ui/EditorBuildDiagnostics
 import { EditorBuildMajorUpdateDialog } from "~/editor-build/ui/EditorBuildMajorUpdateDialog";
 import { useEditorBuildController } from "~/editor-build/ui/useEditorBuildController";
 import { Button, PrimaryButton } from "~/ui/button/Button";
-import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
-import { EditorProjectExport } from "~/ui/editor/EditorProjectExport";
+import { EditorHistoryBackButton } from "~/authoring-shell/navigation/EditorHistoryBackButton";
+import { EditorProjectExport } from "~/project-authoring/export/EditorProjectExport";
 
 export const Route = createFileRoute("/editor/$projectId/build")({
 	component: () => {

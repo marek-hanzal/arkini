@@ -1,16 +1,16 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { Effect } from "effect";
 
-import { releaseCurrentEditorBoardGameFx } from "~/renderer/editor/board/releaseCurrentEditorBoardGameFx";
-import { syncEditorBoardGameFx } from "~/renderer/editor/board/syncEditorBoardGameFx";
-import type { EditorProject } from "~/editor/EditorProject";
-import { EditorProjectProvider } from "~/ui/editor/EditorProjectProvider";
-import { readEditorProjectFx } from "~/editor/project/fx/readEditorProjectFx";
+import { releaseCurrentEditorBoardGameFx } from "~/board-scenario/session/releaseCurrentEditorBoardGameFx";
+import { syncEditorBoardGameFx } from "~/board-scenario/session/syncEditorBoardGameFx";
+import type { EditorProject } from "~/project-authoring/EditorProject";
+import { EditorProjectProvider } from "~/authoring-session/EditorProjectProvider";
+import { readEditorProjectFx } from "~/project-authoring/readEditorProjectFx";
 import { ButtonLink } from "~/ui/button/Button";
-import { EditorProjectReplacementBoundary } from "~/ui/editor/EditorProjectReplacementBoundary";
-import { EditorShell } from "~/ui/editor/EditorShell";
+import { EditorProjectReplacementBoundary } from "~/authoring-session/EditorProjectReplacementBoundary";
+import { EditorShell } from "~/authoring-shell/EditorShell";
 import { EditorProjectResourceUrlProvider } from "~/ui/resource/editor/EditorResourceUrlProvider";
-import { EditorVersionRestoreAction } from "~/ui/version/editor/EditorVersionRestoreAction";
+import { EditorVersionRestoreAction } from "~/project-version/workspace/EditorVersionRestoreAction";
 
 const syncRoutedEditorBoardGameFx = Effect.fn("syncRoutedEditorBoardGameFx")(
 	(project: EditorProject | undefined) =>

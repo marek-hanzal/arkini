@@ -8,7 +8,7 @@ import {
 	GameProjectItemSchemaReference,
 } from "~/game-config/source/GameProjectReference";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { createProjectFilesHarness } from "./ProjectFiles.test/harness";
 
 const openHarnesses: Array<Awaited<ReturnType<typeof createProjectFilesHarness>>> = [];

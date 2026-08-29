@@ -1,7 +1,7 @@
 import { memo } from "react";
 
-import { useEditorProject } from "~/ui/editor/useEditorProject";
-import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
+import { useEditorProject } from "~/authoring-session/useEditorProject";
+import { EditorHistoryBackButton } from "~/authoring-shell/navigation/EditorHistoryBackButton";
 import {
 	selectableActiveClassName,
 	selectableInactiveClassName,

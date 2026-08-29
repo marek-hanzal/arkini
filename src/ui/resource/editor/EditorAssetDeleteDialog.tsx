@@ -1,4 +1,4 @@
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 import { Button, ButtonLink, DangerButton } from "~/ui/button/Button";
 
 const EditorAssetDeleteError = ({ error }: { readonly error: unknown }) =>

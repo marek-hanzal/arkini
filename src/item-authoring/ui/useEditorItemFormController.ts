@@ -5,8 +5,8 @@ import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 
-import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
-import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
+import { useEditorProject } from "~/authoring-session/useEditorProject";
 import {
 	EditorItemFormSchema,
 	type EditorItemFormValues,
@@ -21,8 +21,8 @@ import type {
 import { readEditorItemSectionForPathFn } from "~/item-authoring/ui/fn/readEditorItemSectionForPathFn";
 import { EditorItemDraftDefaults } from "~/item-authoring/ui/EditorItemDraftDefaults";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
-import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
-import { analyzeEditorProjectCompatibilityFn } from "~/editor/version/fn/analyzeEditorProjectCompatibilityFn";
+import { useEditorUnsavedChangesRegistration } from "~/authoring-session/useEditorUnsavedChangesRegistration";
+import { analyzeEditorProjectCompatibilityFn } from "~/project-version/fn/analyzeEditorProjectCompatibilityFn";
 
 const saveEditorItemCommandAtom = RendererRuntime.runSync(
 	Effect.map(EditorProjectRepository, (repository) =>

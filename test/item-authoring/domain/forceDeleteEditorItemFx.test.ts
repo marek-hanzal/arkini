@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { forceDeleteEditorItemFx } from "~/item-authoring/domain/fx/forceDeleteEditorItemFx";
-import { editorTestConfig } from "~test/editor/support/editorTestPayload";
+import { editorTestConfig } from "~test/project-authoring/support/editorTestPayload";
 import {
 	createLine,
 	createOutput,

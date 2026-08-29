@@ -1,9 +1,9 @@
 import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
-import { EditorProjectCatalogEntrySchema } from "~/editor/filesystem/EditorProjectCatalogEntrySchema";
-import { EditorProjectCatalogSchema } from "~/editor/filesystem/EditorProjectCatalogSchema";
-import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
+import { EditorProjectCatalogEntrySchema } from "~/project-authoring/EditorProjectCatalogEntrySchema";
+import { EditorProjectCatalogSchema } from "~/project-authoring/EditorProjectCatalogSchema";
+import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
 import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";

@@ -2,7 +2,7 @@ import { createFileRoute, redirect, type ErrorComponentProps } from "@tanstack/r
 
 import { Cause, Effect, Exit, Option } from "effect";
 import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
-import { releaseCurrentEditorBoardGameFx } from "~/renderer/editor/board/releaseCurrentEditorBoardGameFx";
+import { releaseCurrentEditorBoardGameFx } from "~/board-scenario/session/releaseCurrentEditorBoardGameFx";
 import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
 import { GameEngineErrorView } from "~/ui/game/GameEngineErrorView";

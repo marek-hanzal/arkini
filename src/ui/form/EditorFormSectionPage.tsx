@@ -1,7 +1,7 @@
 import type { PropsWithChildren, ReactNode } from "react";
 
-import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
-import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
+import { EditorSectionNavigation } from "~/authoring-shell/navigation/EditorSectionNavigation";
+import { EditorSectionPage } from "~/authoring-shell/navigation/EditorSectionPage";
 import { EditorFormContent } from "~/ui/form/EditorFormContent";
 import { EditorFormSaveButton } from "~/ui/form/EditorFormSaveButton";
 

@@ -3,10 +3,10 @@ import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
 import type { ProjectPaths } from "../ProjectPaths";
-import { EditorBoardScenarioSchema } from "~/editor/board/EditorBoardScenarioSchema";
-import { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
-import { EditorProjectNoteFileSchema } from "~/editor/filesystem/EditorProjectNoteFileSchema";
-import { EditorNoteSchema } from "~/editor/note/EditorNoteSchema";
+import { EditorBoardScenarioSchema } from "~/board-scenario/EditorBoardScenarioSchema";
+import { EditorBoardScenarioFileSchema } from "~/board-scenario/EditorBoardScenarioFileSchema";
+import { EditorProjectNoteFileSchema } from "~/project-note/EditorProjectNoteFileSchema";
+import { EditorNoteSchema } from "~/project-note/EditorNoteSchema";
 import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
 
 const readJsonFilesFx = Effect.fn("readSidecarJsonFilesFx")(function* (

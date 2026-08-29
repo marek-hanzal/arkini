@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { z } from "zod";
 
-import type { EditorProjectRepository } from "~/editor/EditorProjectRepository";
-import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
+import type { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
+import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
@@ -13,12 +13,12 @@ import type {
 	EditorProjectVersionCommitInput,
 	EditorProjectVersionDiffInput,
 	EditorProjectVersionTagInput,
-} from "~/editor/version/EditorProjectVersion";
+} from "~/project-version/EditorProjectVersion";
 import {
 	EditorProjectVersionBodySchema,
 	EditorProjectVersionSubjectSchema,
 	EditorProjectVersionTagSchema,
-} from "~/editor/version/EditorProjectVersionMetadataSchema";
+} from "~/project-version/EditorProjectVersionMetadataSchema";
 
 import { parseEditorProjectIpcRequestFx } from "./parseEditorProjectIpcRequestFx";
 

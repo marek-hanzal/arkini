@@ -5,7 +5,7 @@ import { act, createElement, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 
 const state = vi.hoisted(() => ({
 	navigate: vi.fn().mockResolvedValue(undefined),
@@ -28,7 +28,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 	};
 });
 
-vi.mock("~/ui/editor/useEditorProject", () => ({
+vi.mock("~/authoring-session/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
@@ -59,7 +59,7 @@ vi.mock("~/ui/button/Button", () => {
 	};
 });
 
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { EditorAssetDeleteSection } from "~/ui/resource/editor/EditorAssetDeleteSection";
 
 (

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { printEditorGameDiagnosticFn } from "~/editor-build/ui/fn/printEditorGameDiagnosticFn";
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 
 const project = {
 	config: {

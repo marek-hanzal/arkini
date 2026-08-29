@@ -1,14 +1,14 @@
 import { LogIn, LogOut, Pencil } from "lucide-react";
 import type { PropsWithChildren } from "react";
 
-import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { useEditorProject } from "~/authoring-session/useEditorProject";
 import { ButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
-import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
-import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
-import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
-import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
-import { EditorRootCard } from "~/ui/editor/EditorRootCard";
-import { useEditorEditShortcut } from "~/ui/editor/useEditorEditShortcut";
+import { EditorHistoryBackButton } from "~/authoring-shell/navigation/EditorHistoryBackButton";
+import { EditorSectionNavigation } from "~/authoring-shell/navigation/EditorSectionNavigation";
+import { EditorSectionPage } from "~/authoring-shell/navigation/EditorSectionPage";
+import { EditorSectionTabs } from "~/authoring-shell/navigation/EditorSectionTabs";
+import { EditorRootCard } from "~/authoring-shell/navigation/EditorRootCard";
+import { useEditorEditShortcut } from "~/authoring-shell/navigation/useEditorEditShortcut";
 import { ItemTypeLabel } from "~/ui/item-detail/ItemInfoPresentation";
 import { EditorItemNotFound } from "~/item-authoring/ui/EditorItemNotFound";
 import { EditorItemConvertMenu } from "~/item-authoring/ui/EditorItemConvertMenu";

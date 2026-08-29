@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
-import { publishEditorProjectFx } from "~/ui/editor/publishEditorProjectFx";
+import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
+import { publishEditorProjectFx } from "~/authoring-session/publishEditorProjectFx";
 
 export namespace deleteEditorAssetFx {
 	export interface Props {

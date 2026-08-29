@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
+import type { EditorProjectRepositoryService } from "~/project-authoring/repository/EditorProjectRepository";
 
 /** Explicitly unavailable repository domains for focused tests outside their ownership. */
 export const UnusedEditorProjectRepository = {

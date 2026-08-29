@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { startTestConfig } from "~test/start/fx/support/startTestConfig";
+import { startTestConfig } from "~test/game-start/startTestConfig";
 
 describe("modifyRuntimeFx", () => {
 	it("pins nested runtime reads to the serialized transaction snapshot", () => {

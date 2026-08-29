@@ -5,9 +5,7 @@ import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSch
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { PositionSchema } from "~/engine/grid/schema/PositionSchema";
 
-/**
- * Places one item instance at an explicit cell in the initial board layout.
- */
+/** Defines one item instance at an explicit cell in the initial board layout. */
 export const BoardItemSchema = z
 	.object({
 		...PositionSchema.shape,

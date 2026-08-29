@@ -3,7 +3,7 @@ import { z } from "zod";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { MetaSchema } from "~/engine/meta/schema/MetaSchema";
-import { StartSchema } from "~/engine/start/schema/StartSchema";
+import { StartSchema } from "~/game-start/StartSchema";
 import { RolesSchema } from "~/game-config/resource/schema/RolesSchema";
 
 /**

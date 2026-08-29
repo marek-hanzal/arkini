@@ -2,8 +2,8 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import { startTestConfig } from "~test/start/fx/support/startTestConfig";
-import { planStartFx } from "~/engine/start/fx/planStartFx";
+import { startTestConfig } from "~test/game-start/startTestConfig";
+import { planStartFx } from "~/game-start/planStartFx";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
 describe("planStartFx", () => {

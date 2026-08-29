@@ -65,7 +65,7 @@ const sceneState = vi.hoisted(() => ({
 	afterRenderWork: [] as Array<() => void>,
 	close: vi.fn(),
 	createContainer: undefined as (() => FakeContainer) | undefined,
-	deferredTweenDurations: new Set<number>(),
+	deferFiniteTweens: false,
 	drop: vi.fn(),
 	particleTextureClose: vi.fn(),
 	particleTextures: {
@@ -304,9 +304,7 @@ vi.mock("~/ui/pixi/animation/createAnimationDriverFx", async () => {
 					readonly to: number;
 				}) =>
 					EffectModule.sync(() => {
-						const deferred =
-							durationMs === 1_760 ||
-							sceneState.deferredTweenDurations.has(durationMs);
+						const deferred = durationMs === 1_760 || sceneState.deferFiniteTweens;
 						onUpdate(
 							durationMs === 1_760 || durationMs === feedbackDurationMs ? 0.5 : to,
 						);
@@ -663,7 +661,7 @@ beforeEach(() => {
 	sceneState.actors.length = 0;
 	sceneState.afterRenderWork.length = 0;
 	sceneState.close.mockClear();
-	sceneState.deferredTweenDurations.clear();
+	sceneState.deferFiniteTweens = false;
 	sceneState.drop.mockClear();
 	sceneState.particleTextureClose.mockClear();
 	sceneState.items = [

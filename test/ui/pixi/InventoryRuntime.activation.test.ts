@@ -3,7 +3,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { Effect } from "effect";
 import { readMainLayoutFn } from "~/ui/pixi/layout/fn/readMainLayoutFn";
-import { lifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 
 import {
@@ -43,7 +42,7 @@ describe("Inventory runtime / activation lifecycle", () => {
 		await Effect.runPromise(runtime.closeFx);
 	});
 	it("starts removal feedback on click and retains the removed actor until its fade completes", async () => {
-		sceneState.deferredTweenDurations.add(lifecycleDurationMs);
+		sceneState.deferFiniteTweens = true;
 		const onActivate = vi.fn(() => new Promise<void>(() => undefined));
 		const { actor, runtime, stage } = await mountScene({
 			onActivate,
@@ -110,7 +109,7 @@ describe("Inventory runtime / activation lifecycle", () => {
 		await Effect.runPromise(runtime.closeFx);
 	});
 	it("reclaims the same physical actor when its item returns before exit completes", async () => {
-		sceneState.deferredTweenDurations.add(lifecycleDurationMs);
+		sceneState.deferFiniteTweens = true;
 		const { actor, onActivate, runtime, stage } = await mountScene();
 
 		publishItems([]);

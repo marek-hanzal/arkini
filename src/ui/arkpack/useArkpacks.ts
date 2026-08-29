@@ -5,14 +5,14 @@ import type { ArkpackCatalog } from "~/renderer/arkpack/ArkpackCatalog";
 
 export namespace useArkpacks {
 	export type State = ArkpackCatalog.State;
+}
 
-	export interface Result {
-		readonly state: State;
-	}
+interface UseArkpacksResult {
+	readonly state: useArkpacks.State;
 }
 
 /** Reads the one root-owned Arkpack catalog without creating another cache. */
-export const useArkpacks = (): useArkpacks.Result => {
+export const useArkpacks = (): UseArkpacksResult => {
 	const state = useAtomValue(ArkpackCatalogAtom);
 
 	return {

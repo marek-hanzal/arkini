@@ -4,7 +4,6 @@ import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import { fitSingleLineTextFx } from "~/ui/pixi/text/fitSingleLineTextFx";
-import { formatTileBadgeLabelFn } from "~/ui/tile/fn/formatTileBadgeLabelFn";
 
 export namespace updateActorVisualFx {
 	export interface Props {
@@ -17,6 +16,9 @@ export namespace updateActorVisualFx {
 
 const tileToSlotRatio = 0.8;
 const layeredArtworkToFaceRatio = 0.75;
+const formatTileBadgeLabelFn = (count: number, kind?: "queue") =>
+	`${kind === "queue" ? "x" : ""}${count > 99 ? "99+" : String(count)}`;
+
 /** Applies one complete logical face revision to one private visual slot. */
 export const updateActorVisualFx = Effect.fn("updateActorVisualFx")(function* ({
 	item,
@@ -82,10 +84,7 @@ export const updateActorVisualFx = Effect.fn("updateActorVisualFx")(function* ({
 	visual.quantity.text =
 		item.badgeCount === undefined
 			? ""
-			: formatTileBadgeLabelFn({
-					count: item.badgeCount,
-					kind: item.badgeKind,
-				});
+			: formatTileBadgeLabelFn(item.badgeCount, item.badgeKind);
 	visual.quantity.visible = item.badgeCount !== undefined;
 	visual.quantityBackground.visible = item.badgeCount !== undefined;
 	if (item.badgeCount !== undefined) {

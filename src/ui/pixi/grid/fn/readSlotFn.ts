@@ -1,20 +1,18 @@
 import type { SurfaceLayout } from "~/ui/pixi/layout/SceneLayout";
 
-export namespace readSlotFn {
-	export interface Props {
-		readonly surface: SurfaceLayout | null;
-		readonly x: number;
-		readonly y: number;
-	}
+interface ReadSlotProps {
+	readonly surface: SurfaceLayout | null;
+	readonly x: number;
+	readonly y: number;
+}
 
-	export interface Result {
-		readonly x: number;
-		readonly y: number;
-	}
+interface Slot {
+	readonly x: number;
+	readonly y: number;
 }
 
 /** Resolves viewport coordinates to one clamped slot on the supplied grid. */
-export const readSlotFn = ({ surface, x, y }: readSlotFn.Props): readSlotFn.Result | null => {
+export const readSlotFn = ({ surface, x, y }: ReadSlotProps): Slot | null => {
 	if (
 		surface === null ||
 		x < surface.x ||

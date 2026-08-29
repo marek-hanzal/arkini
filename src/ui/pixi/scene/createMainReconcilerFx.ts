@@ -39,33 +39,31 @@ import { classifyActorUpdateFn } from "~/ui/pixi/scene/fn/classifyActorUpdateFn"
 import { classifyReconciliationFn } from "~/ui/pixi/scene/fn/classifyReconciliationFn";
 import { runReplacementsFx } from "~/ui/pixi/scene/runReplacementsFx";
 
-export namespace createMainReconcilerFx {
-	export interface Props {
-		readonly actorStore: MainActorStore;
-		readonly animator: ActorAnimator;
-		readonly application: PixiApplicationOwner;
-		readonly drag: MainDragController;
-		readonly delivery: DeliveryRuntime;
-		readonly dropPresentation: DropPresentation;
-		readonly game: GameEngine;
-		readonly magneticField: MagneticField;
-		readonly motion: MotionRuntime;
-		readonly particleTextures: ParticleTextures;
-		readonly readPalette: () => PixiScenePalette;
-		readonly surface: MainSurface;
-		readonly textures: TextureStore;
-	}
+interface CreateMainReconcilerProps {
+	readonly actorStore: MainActorStore;
+	readonly animator: ActorAnimator;
+	readonly application: PixiApplicationOwner;
+	readonly drag: MainDragController;
+	readonly delivery: DeliveryRuntime;
+	readonly dropPresentation: DropPresentation;
+	readonly game: GameEngine;
+	readonly magneticField: MagneticField;
+	readonly motion: MotionRuntime;
+	readonly particleTextures: ParticleTextures;
+	readonly readPalette: () => PixiScenePalette;
+	readonly surface: MainSurface;
+	readonly textures: TextureStore;
+}
 
-	export interface Result {
-		readonly hydrateFx: (
-			transition: ReturnType<GameEngine["getTransitionSnapshot"]>,
-		) => Effect.Effect<void>;
-		readonly reconcileFx: (
-			transition: ReturnType<GameEngine["getTransitionSnapshot"]>,
-		) => Effect.Effect<void>;
-		readonly refreshVisualsFx: Effect.Effect<void>;
-		readonly closeFx: Effect.Effect<void>;
-	}
+interface MainReconciler {
+	readonly hydrateFx: (
+		transition: ReturnType<GameEngine["getTransitionSnapshot"]>,
+	) => Effect.Effect<void>;
+	readonly reconcileFx: (
+		transition: ReturnType<GameEngine["getTransitionSnapshot"]>,
+	) => Effect.Effect<void>;
+	readonly refreshVisualsFx: Effect.Effect<void>;
+	readonly closeFx: Effect.Effect<void>;
 }
 
 const runningTransitionDurationMs = 180;
@@ -112,7 +110,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 	readPalette,
 	surface,
 	textures,
-}: createMainReconcilerFx.Props) {
+}: CreateMainReconcilerProps) {
 	const processedReplacementKeys = new Set<string>();
 	const processedFeedbackKeys = new Set<string>();
 	let closed = false;
@@ -600,5 +598,5 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			processedFeedbackKeys.clear();
 			processedReplacementKeys.clear();
 		}),
-	} satisfies createMainReconcilerFx.Result;
+	} satisfies MainReconciler;
 });

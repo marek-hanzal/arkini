@@ -9,7 +9,6 @@ import type { GameEngineResource } from "~/renderer/game/resource/GameEngineReso
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
 import { installRendererControlledCloseFx } from "~/ui/root/installRendererControlledCloseFx";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
-import { actionLoadingCompletionHoldMs } from "~/ui/loading/actionLoadingCompletionHoldMs";
 import {
 	adoptTestGameEngineResourceFx,
 	createTestRendererRuntime,
@@ -149,7 +148,7 @@ describe("installRendererControlledClose", () => {
 		expect(frames.callbacks).toHaveLength(1);
 		frames.callbacks.shift()?.(16);
 		await Promise.resolve();
-		await vi.advanceTimersByTimeAsync(actionLoadingCompletionHoldMs - 1);
+		await vi.advanceTimersByTimeAsync(149);
 		expect(ready).toBe(false);
 		await vi.advanceTimersByTimeAsync(1);
 		await presentation;

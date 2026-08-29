@@ -16,7 +16,6 @@ import { runSwapMotionFx } from "~/ui/pixi/motion/runSwapMotionFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
-import { readTileMotionStaggerDelaySecondsFn } from "~/ui/tile/motion/fn/readTileMotionStaggerDelaySecondsFn";
 import type { TargetRoute } from "~/ui/pixi/motion/MotionTarget";
 
 export namespace runMotionCueFx {
@@ -42,6 +41,11 @@ export namespace runMotionCueFx {
 		readonly textures: TextureStore;
 	}
 }
+
+const tileMotionStaggerStepSeconds = 0.055;
+const maximumTileMotionStaggerSteps = 4;
+const readTileMotionStaggerDelaySecondsFn = (staggerIndex: number) =>
+	Math.min(staggerIndex, maximumTileMotionStaggerSteps) * tileMotionStaggerStepSeconds;
 
 const readMotionOriginFx = Effect.fn("runMotionCueFx.readOriginFx")(function* ({
 	originActor,

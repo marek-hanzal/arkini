@@ -1,19 +1,61 @@
 import { Effect, SubscriptionRef } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { ArkiniDefaultPackageId } from "../../../shared/ArkiniAppMetadata";
+import type { WindowModeSchema } from "../../../electron/contract/window/WindowModeSchema";
 import { ArkpackCatalogOwnerAtom } from "~/renderer/arkpack/ArkpackCatalogOwnerAtom";
+import { WindowModeAtom } from "~/renderer/window/WindowModeAtom";
+import { WindowModeReadyAtom } from "~/renderer/window/WindowModeReadyAtom";
 import { readAppearanceAccentFx } from "~/ui/appearance/readAppearanceAccentFx";
 import { readAppearanceThemeFx } from "~/ui/appearance/readAppearanceThemeFx";
+import { AppearanceAtom } from "~/ui/appearance/AppearanceAtom";
+import { applyCheatAvailabilityFx } from "~/ui/cheat-availability/applyCheatAvailabilityFx";
 import { readCheatAvailabilityFx } from "~/ui/cheat-availability/readCheatAvailabilityFx";
 import { RendererLifecycleOwnerAtom } from "~/renderer/lifecycle/RendererLifecycleOwnerAtom";
 import { RendererLifecycleUnavailableError } from "~/renderer/lifecycle/RendererLifecycleUnavailableError";
 import { readWindowModeFx } from "~/renderer/window/readWindowModeFx";
 import { RendererAtomRuntime } from "~/renderer/RendererAtomRegistry";
-import { applyLauncherAppearanceHydrationFx } from "~/ui/launcher/applyLauncherAppearanceHydrationFx";
-import { applyLauncherCheatAvailabilityHydrationFx } from "~/ui/launcher/applyLauncherCheatAvailabilityHydrationFx";
-import { applyLauncherWindowModeHydrationFx } from "~/ui/launcher/applyLauncherWindowModeHydrationFx";
 import { LauncherHeroAtom } from "~/ui/launcher/LauncherHeroAtom";
+import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
+import { LauncherAppearanceReadyAtom } from "~/ui/launcher/LauncherAppearanceReadyAtom";
+import { LauncherCheatAvailabilityReadyAtom } from "~/ui/launcher/LauncherCheatAvailabilityReadyAtom";
 import { LauncherStartupConfigAtom } from "~/ui/launcher/LauncherStartupConfigAtom";
+
+/** Publishes persisted appearance once without overwriting later user changes on retry. */
+const applyLauncherAppearanceHydrationFx = Effect.fn("applyLauncherAppearanceHydrationFx")(
+	(appearance: LauncherStartup.Appearance) =>
+		Effect.uninterruptible(
+			Effect.gen(function* () {
+				if (yield* Atom.get(LauncherAppearanceReadyAtom)) return;
+				yield* Atom.set(AppearanceAtom, appearance);
+				yield* Atom.set(LauncherAppearanceReadyAtom, true);
+			}),
+		),
+);
+
+/** Completes the cheat preference readiness gate exactly once. */
+const applyLauncherCheatAvailabilityHydrationFx = Effect.fn(
+	"applyLauncherCheatAvailabilityHydrationFx",
+)((available: boolean) =>
+	Effect.uninterruptible(
+		Effect.gen(function* () {
+			if (yield* Atom.get(LauncherCheatAvailabilityReadyAtom)) return;
+			yield* applyCheatAvailabilityFx(available);
+			yield* Atom.set(LauncherCheatAvailabilityReadyAtom, true);
+		}),
+	),
+);
+
+/** Publishes persisted mode once without overwriting later native window events. */
+const applyLauncherWindowModeHydrationFx = Effect.fn("applyLauncherWindowModeHydrationFx")(
+	(mode: WindowModeSchema.Type) =>
+		Effect.uninterruptible(
+			Effect.gen(function* () {
+				if (yield* Atom.get(WindowModeReadyAtom)) return;
+				yield* Atom.set(WindowModeAtom, mode);
+				yield* Atom.set(WindowModeReadyAtom, true);
+			}),
+		),
+);
 
 /**
  * The authoritative launcher bootstrap AsyncResult.

@@ -11,7 +11,7 @@ export namespace flashConsumedSourceFx {
 	}
 }
 
-export const consumedFadeDurationMs = 130;
+const consumedFadeDurationMs = 130;
 const consumedRestoreDurationMs = 360;
 const consumedSourceAlpha = 0.42;
 const readActorAlphaAnimationKey = (actor: Pick<PixiTileActor, "instanceId">) =>

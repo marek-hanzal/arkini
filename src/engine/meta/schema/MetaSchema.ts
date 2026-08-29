@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { SizeSchema } from "~/engine/grid/schema/SizeSchema";
+import { SizeSchema } from "~/item-location/schema/SizeSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { TitleSchema } from "~/engine/common/schema/TitleSchema";
 import { ToolbarSizeSchema } from "./ToolbarSizeSchema";

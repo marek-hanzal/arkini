@@ -4,7 +4,7 @@ import { GameEventEnumSchema } from "./GameEventEnumSchema";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 
 export const ItemSplitGameEventSchema = z
 	.object({

@@ -6,7 +6,7 @@ import type { BaseSchema } from "~/engine/item/schema/BaseSchema";
 import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
+import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 
 /** Local presentation values owned only by one mounted item form. */

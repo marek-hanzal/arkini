@@ -98,7 +98,7 @@ vi.mock("~/engine/runtime/write/releaseInventoryItemFx", () => ({
 		}),
 }));
 
-vi.mock("~/engine/space/write/activateSpaceItemWithTransitionFx", () => ({
+vi.mock("~/space-action/write/activateSpaceItemFx", () => ({
 	activateSpaceItemWithTransitionFx: (props: unknown) =>
 		Effect.sync(() => {
 			surfaceState.activateSpace(props);

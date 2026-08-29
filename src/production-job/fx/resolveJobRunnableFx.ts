@@ -6,7 +6,7 @@ import { resolveLineEnableFn } from "~/production-line/fn/resolveLineEnableFn";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { isPassiveStorageLocationFn } from "~/engine/location/fn/isPassiveStorageLocationFn";
+import { isPassiveStorageLocationFn } from "~/item-location/fn/isPassiveStorageLocationFn";
 export namespace resolveJobRunnableFx {
 	export interface Props {
 		job: JobSchema.Type;

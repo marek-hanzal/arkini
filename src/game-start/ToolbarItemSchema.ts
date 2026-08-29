@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import { PositionSchema } from "~/engine/grid/schema/PositionSchema";
+import { PositionSchema } from "~/item-location/schema/PositionSchema";
 
 /** Defines one item instance at an explicit slot in the initial toolbar. */
 export const ToolbarItemSchema = z

@@ -13,7 +13,7 @@ import { readEditorItemOriginFlowFx } from "~/flow/domain/fx/readEditorItemOrigi
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { RuleSchema as LineRuleSchema } from "~/production-line/schema/rule/RuleSchema";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
-import { createMergeTestConfig } from "~test/merge/support/createMergeTestConfig";
+import { createMergeTestConfig } from "~test/item-merge/support/createMergeTestConfig";
 
 type EditorGuaranteedRoll = Extract<
 	OutputSchema.Type["set"][number]["roll"][number],

@@ -6,7 +6,7 @@ import type { GameEngine } from "~/renderer/game/GameEngine";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { isSameTileActorLocationFn } from "~/ui/pixi/actor/fn/isSameTileActorLocationFn";
 import {
 	readTileDropPreviewFx,

@@ -1,11 +1,11 @@
 import { Array, Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { DistanceSchema } from "~/engine/distance/schema/DistanceSchema";
-import type { PositionSchema } from "~/engine/grid/schema/PositionSchema";
+import { DistanceSchema } from "~/item-location/schema/DistanceSchema";
+import type { PositionSchema } from "~/item-location/schema/PositionSchema";
 import type { QuerySchema } from "~/engine/query/schema/QuerySchema";
-import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { BoardQueryOriginUnavailableError } from "~/engine/query/error/BoardQueryOriginUnavailableError";
 import { ScopeSchema } from "~/engine/query/schema/ScopeSchema";
 import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";

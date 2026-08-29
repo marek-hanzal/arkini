@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
+import { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { RuntimeItemSchema } from "./RuntimeItemSchema";
 
 /** One live runtime item currently placed on the board. */

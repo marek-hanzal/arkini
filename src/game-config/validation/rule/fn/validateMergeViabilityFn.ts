@@ -1,4 +1,4 @@
-import { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
+import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 import { selectItemsFn } from "~/engine/selector/fn/selectItemsFn";
 import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { GameSourceProvenanceSchema } from "~/game-config/source/schema/GameSourceProvenanceSchema";

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { LocationSchema } from "~/engine/location/schema/LocationSchema";
+import { LocationSchema } from "~/item-location/schema/LocationSchema";
 import { GameEventEnumSchema } from "./GameEventEnumSchema";
 
 /** One exact live item was removed through the explicit neutral remove command. */

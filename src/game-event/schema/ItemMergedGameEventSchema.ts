@@ -3,8 +3,8 @@ import { z } from "zod";
 import { GameEventEnumSchema } from "./GameEventEnumSchema";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { SourceActionSchema } from "~/engine/merge/schema/SourceActionSchema";
-import { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
+import { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
+import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 
 export const ItemMergedGameEventSchema = z
 	.object({

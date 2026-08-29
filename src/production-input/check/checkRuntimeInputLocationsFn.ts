@@ -6,7 +6,7 @@ import type { InputLineMissingIssueSchema } from "~/production-input/schema/chec
 import type { InputOwnerMissingIssueSchema } from "~/production-input/schema/check/InputOwnerMissingIssueSchema";
 import type { InputSelectorMismatchIssueSchema } from "~/production-input/schema/check/InputSelectorMismatchIssueSchema";
 import type { InputSlotInvalidIssueSchema } from "~/production-input/schema/check/InputSlotInvalidIssueSchema";
-import type { InputLocationSchema } from "~/engine/location/schema/InputLocationSchema";
+import type { InputLocationSchema } from "~/item-location/schema/InputLocationSchema";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import type { LineInputClosedIssueSchema } from "~/production-line/schema/check/LineInputClosedIssueSchema";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
@@ -14,7 +14,7 @@ import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchem
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { matchesItemSelectorFn } from "~/engine/selector/fn/matchesItemSelectorFn";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 export namespace checkRuntimeInputLocationsFn {
 	export interface Props {

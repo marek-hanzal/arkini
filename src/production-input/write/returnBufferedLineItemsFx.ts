@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
-import { placeRuntimeItemFx } from "~/engine/placement/fx/placeRuntimeItemFx";
+import { placeRuntimeItemFx } from "~/item-placement/fx/placeRuntimeItemFx";
 import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";

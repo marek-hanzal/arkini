@@ -7,7 +7,7 @@ import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { activateSpaceItemFx } from "~/engine/space/write/activateSpaceItemFx";
+import { activateSpaceItemFx } from "~/space-action/write/activateSpaceItemFx";
 import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 

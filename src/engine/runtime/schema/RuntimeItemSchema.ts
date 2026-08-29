@@ -4,7 +4,7 @@ import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import { LocationSchema } from "~/engine/location/schema/LocationSchema";
+import { LocationSchema } from "~/item-location/schema/LocationSchema";
 import { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { TimeSchema } from "~/engine/common/schema/TimeSchema";
 

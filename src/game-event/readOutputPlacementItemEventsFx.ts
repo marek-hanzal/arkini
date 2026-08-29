@@ -2,8 +2,8 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
-import type { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import type { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 
 interface ReadOutputPlacementItemEventsProps {

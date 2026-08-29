@@ -73,61 +73,90 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 		});
 	});
 
-	it("rejects committed work anywhere beneath the discarded ownership tree", () => {
-		const runtime = {
-			cheats: {
-				enabled: false,
-				everEnabled: false,
-				instantGameplay: false,
-			},
-			currentSpace: 0,
-			items: [
-				root,
-				passiveChild,
-				{
-					id: "runtime:job-material",
-					item: config.items.tool,
-					location: {
-						scope: "reserved",
-						jobId: "job:child",
-					},
-					quantity: 1,
-					revision: "revision:job-material",
+	it("rejects active or queued work anywhere beneath the discarded ownership tree", () => {
+		for (const mode of [
+			"active",
+			"queued",
+		] as const) {
+			const busyId = mode === "active" ? "job:child" : "request:child";
+			const busyEntry = {
+				id: busyId,
+				ownerItemId: passiveChild.id,
+				lineId: "line:missing",
+			};
+			const runtime = {
+				cheats: {
+					enabled: false,
+					everEnabled: false,
+					instantGameplay: false,
 				},
-			],
-			jobs: [
-				{
-					id: "job:child",
-					ownerItemId: passiveChild.id,
-					lineId: "line:missing",
-					durationMs: 200,
-					remainingMs: 200,
-				},
-			],
-			jobQueue: [],
-
-			defaultLineByOwnerItemId: {},
-		} satisfies RuntimeSchema.Type;
-		const result = Effect.runSync(
-			Effect.result(
-				discardRuntimeItemOwnedStateFx({
-					ownerItemId: root.id,
-					runtime,
-				}),
-			),
-		);
-
-		expect(Result.isFailure(result)).toBe(true);
-		if (Result.isFailure(result)) {
-			expect(result.failure).toMatchObject({
-				_tag: "JobOwnerBusyError",
-				ownerItemId: root.id,
-				jobIds: [
-					"job:child",
+				currentSpace: 0,
+				items: [
+					root,
+					passiveChild,
+					...(mode === "active"
+						? [
+								{
+									id: "runtime:job-material",
+									item: config.items.tool,
+									location: {
+										scope: "reserved" as const,
+										jobId: busyId,
+									},
+									quantity: 1,
+									revision: "revision:job-material",
+								},
+							]
+						: []),
 				],
-			});
+				jobs:
+					mode === "active"
+						? [
+								{
+									...busyEntry,
+									durationMs: 200,
+									remainingMs: 200,
+								},
+							]
+						: [],
+				jobQueue:
+					mode === "queued"
+						? [
+								busyEntry,
+							]
+						: [],
+				defaultLineByOwnerItemId: {},
+			} satisfies RuntimeSchema.Type;
+			const result = Effect.runSync(
+				Effect.result(
+					discardRuntimeItemOwnedStateFx({
+						ownerItemId: root.id,
+						runtime,
+					}),
+				),
+			);
+
+			expect(Result.isFailure(result)).toBe(true);
+			if (Result.isFailure(result)) {
+				expect(result.failure).toMatchObject({
+					_tag: "JobOwnerBusyError",
+					ownerItemId: root.id,
+					...(mode === "active"
+						? {
+								jobIds: [
+									busyId,
+								],
+							}
+						: {
+								requestIds: [
+									busyId,
+								],
+							}),
+				});
+			}
+			expect(runtime.items).toHaveLength(mode === "active" ? 3 : 2);
+			expect(runtime.jobs).toHaveLength(mode === "active" ? 1 : 0);
+			expect(runtime.jobQueue).toHaveLength(mode === "queued" ? 1 : 0);
 		}
-		expect(runtime.items).toHaveLength(3);
-		expect(runtime.jobs).toHaveLength(1);
 	});
 });

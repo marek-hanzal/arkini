@@ -6,7 +6,7 @@ import { readStoredItemDetailLineFx } from "~/engine/item-detail/read/readStored
 import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
 import { readEffectiveDefaultLineFn } from "~/production-line/fn/readEffectiveDefaultLineFn";
 import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 /** Public operation-owned aliases for the stable Item Detail Lines contract. */
 export namespace readItemDetailLinesFx {

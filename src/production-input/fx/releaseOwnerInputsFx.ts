@@ -2,8 +2,8 @@ import { Effect, Option } from "effect";
 
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
-import { placeRuntimeItemFx } from "~/engine/placement/fx/placeRuntimeItemFx";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
+import { placeRuntimeItemFx } from "~/item-placement/fx/placeRuntimeItemFx";
 import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
 import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";

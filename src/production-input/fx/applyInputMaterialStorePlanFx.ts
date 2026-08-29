@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { InputLocationSchema } from "~/engine/location/schema/InputLocationSchema";
+import type { InputLocationSchema } from "~/item-location/schema/InputLocationSchema";
 import { createRuntimeItemFx } from "~/engine/runtime/fx/createRuntimeItemFx";
 import { createRuntimeItemIdFx } from "~/engine/runtime/fx/createRuntimeItemIdFx";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";

@@ -6,8 +6,8 @@ import { readTileActorBadgeCountFn } from "~/ui/pixi/actor/fn/readTileActorBadge
 import { readTileActorAssetSourceIdsFx } from "~/ui/pixi/actor/readTileActorAssetSourceIdsFx";
 import { readTileActorVisualFx } from "~/ui/pixi/actor/readTileActorVisualFx";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { isDeliveryRuntimeItemFn } from "~/engine/runtime/read/fn/isDeliveryRuntimeItemFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 

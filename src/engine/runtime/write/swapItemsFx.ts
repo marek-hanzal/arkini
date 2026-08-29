@@ -10,7 +10,7 @@ import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { SwapSameItemError } from "~/engine/runtime/error/SwapSameItemError";
 import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
 import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
-import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBoardOperationError";
+import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceBoardOperationError";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 

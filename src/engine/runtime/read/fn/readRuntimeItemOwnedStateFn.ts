@@ -3,7 +3,7 @@ import type { JobQueueRequestSchema } from "~/production-job/schema/JobQueueRequ
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 export namespace readRuntimeItemOwnedStateFn {
 	export interface Props {

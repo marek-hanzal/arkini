@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
-import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
+import { mergeItemsFx } from "~/item-merge/write/mergeItemsFx";
 import { makeDropActorRejectedResultFn } from "~/engine/runtime/drop/fn/makeDropActorRejectedResultFn";
 import { makeDropRejectedResultFn } from "~/engine/runtime/drop/fn/makeDropRejectedResultFn";
 import { projectDropActorCurrentFn } from "~/engine/runtime/drop/fn/projectDropActorCurrentFn";

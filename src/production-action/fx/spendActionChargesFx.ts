@@ -11,7 +11,7 @@ import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { isolateGridStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateGridStatefulOwnerTransitionFx";
 import { readItemRemainingChargesFn } from "~/engine/item/fn/readItemRemainingChargesFn";
 import { outputFx } from "~/production-output/fx/outputFx";
-import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
+import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";

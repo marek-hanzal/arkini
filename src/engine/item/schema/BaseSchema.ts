@@ -5,7 +5,7 @@ import { DescriptionSchema } from "~/engine/common/schema/DescriptionSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { TitleSchema } from "~/engine/common/schema/TitleSchema";
-import { MergeSchema } from "~/engine/merge/schema/MergeSchema";
+import { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { AssetSchema } from "./AssetSchema";
 import { ChargeSchema } from "./ChargeSchema";
 

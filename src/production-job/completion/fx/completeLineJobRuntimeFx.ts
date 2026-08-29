@@ -7,7 +7,7 @@ import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx
 import type { JobCompletionContext } from "~/production-job/completion/JobCompletionContext";
 import { makeChargeDepletionRandomFx } from "~/production-job/random/makeChargeDepletionRandomFx";
 import { outputFx } from "~/production-output/fx/outputFx";
-import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
+import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
 import { releaseJobReservationsFx } from "./releaseJobReservationsFx";
 

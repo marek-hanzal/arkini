@@ -1,4 +1,4 @@
-import { DistanceSchema } from "~/engine/distance/schema/DistanceSchema";
+import { DistanceSchema } from "~/item-location/schema/DistanceSchema";
 import { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
 import { TypeSchema as ItemTypeSchema } from "~/engine/item/schema/TypeSchema";
 import { selectItemsFn } from "~/engine/selector/fn/selectItemsFn";

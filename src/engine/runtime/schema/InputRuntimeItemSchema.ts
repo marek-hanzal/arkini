@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { InputLocationSchema } from "~/engine/location/schema/InputLocationSchema";
+import { InputLocationSchema } from "~/item-location/schema/InputLocationSchema";
 import { RuntimeItemSchema } from "./RuntimeItemSchema";
 
 /**

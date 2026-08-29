@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { RuleSchema } from "~/production-output/schema/drop/rule/RuleSchema";
-import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { whenFx } from "~/production-condition/fx/whenFx";
 
 export namespace dropRuleFx {

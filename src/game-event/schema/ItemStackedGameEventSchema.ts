@@ -3,7 +3,7 @@ import { z } from "zod";
 import { GameEventEnumSchema } from "./GameEventEnumSchema";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 
 export const ItemStackedGameEventSchema = z
 	.object({

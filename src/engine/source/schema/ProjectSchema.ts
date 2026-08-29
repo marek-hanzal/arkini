@@ -10,7 +10,6 @@ export const ProjectSchema = z
 		ItemFileSchema,
 	])
 	.meta({
-		id: "ProjectSchema",
 		$id: "urn:arkini:schema:project",
 		title: "Arkini project authoring schema",
 		description: "A strict game.json root or one strict UID-owned item fragment.",

@@ -378,7 +378,8 @@
 					],
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-					}
+					},
+					"minItems": 1
 				},
 				"type": {
 					"type": "string",
@@ -418,7 +419,10 @@
 						{
 							"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
 						}
-					]
+					],
+					"items": false,
+					"minItems": 1,
+					"maxItems": 1
 				},
 				{
 					"type": "array",
@@ -429,7 +433,10 @@
 						{
 							"$ref": "urn:arkini:schema:project#/$defs/IdSchema"
 						}
-					]
+					],
+					"items": false,
+					"minItems": 2,
+					"maxItems": 2
 				}
 			],
 			"description": "A one- or two-layer visual asset composition in back-to-front order."
@@ -497,6 +504,7 @@
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/roll.SetSchema"
 					},
+					"minItems": 1,
 					"description": "One or more alternative roll sets provided by this output."
 				}
 			},
@@ -524,6 +532,7 @@
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/RollSchema"
 					},
+					"minItems": 1,
 					"description": "One or more rolls evaluated after this set is selected."
 				}
 			},
@@ -567,6 +576,7 @@
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/DropSchema"
 					},
+					"minItems": 1,
 					"description": "One or more items emitted when this roll succeeds."
 				}
 			},
@@ -665,6 +675,7 @@
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/WhenSchema"
 					},
+					"minItems": 1,
 					"description": "Conditions that must all pass for this selected-drop rule to apply."
 				},
 				"type": {
@@ -963,6 +974,7 @@
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/WhenSchema"
 					},
+					"minItems": 1,
 					"description": "Conditions that must all pass for this selected-drop rule to apply."
 				},
 				"type": {
@@ -1003,6 +1015,7 @@
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/DropSchema"
 					},
+					"minItems": 1,
 					"description": "One or more items emitted when this roll succeeds."
 				}
 			},
@@ -1046,6 +1059,7 @@
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/roll.WeightedDropSchema"
 					},
+					"minItems": 2,
 					"description": "At least two weighted drop candidates selected by this roll."
 				}
 			},
@@ -1074,6 +1088,7 @@
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/DropSchema"
 					},
+					"minItems": 1,
 					"description": "One or more items emitted when this weighted drop is selected."
 				}
 			},
@@ -1389,6 +1404,7 @@
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/WhenSchema"
 					},
+					"minItems": 1,
 					"description": "Conditions that must all pass for this product-line rule to apply."
 				},
 				"type": {
@@ -1423,6 +1439,7 @@
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/WhenSchema"
 					},
+					"minItems": 1,
 					"description": "Conditions that must all pass for this product-line rule to apply."
 				},
 				"type": {
@@ -1457,6 +1474,7 @@
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/WhenSchema"
 					},
+					"minItems": 1,
 					"description": "Conditions that must all pass for this action rule to apply."
 				},
 				"type": {
@@ -1490,6 +1508,7 @@
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/WhenSchema"
 					},
+					"minItems": 1,
 					"description": "Conditions that must all pass for this action rule to apply."
 				},
 				"type": {
@@ -1523,6 +1542,7 @@
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/WhenSchema"
 					},
+					"minItems": 1,
 					"description": "Conditions that must all pass for this product-line rule to apply."
 				},
 				"type": {
@@ -1564,6 +1584,7 @@
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/WhenSchema"
 					},
+					"minItems": 1,
 					"description": "Conditions that must all pass for this product-line rule to apply."
 				},
 				"type": {
@@ -1635,6 +1656,7 @@
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/InputSchema"
 					},
+					"minItems": 1,
 					"description": "One or more input requirements for this product line."
 				},
 				"output": {
@@ -1712,7 +1734,8 @@
 					],
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-					}
+					},
+					"minItems": 1
 				},
 				"maxQueueSize": {
 					"default": 1,
@@ -1735,7 +1758,8 @@
 					],
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/LineSchema"
-					}
+					},
+					"minItems": 1
 				}
 			},
 			"required": [
@@ -1801,7 +1825,8 @@
 					],
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-					}
+					},
+					"minItems": 1
 				},
 				"type": {
 					"type": "string",
@@ -1872,7 +1897,8 @@
 					],
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-					}
+					},
+					"minItems": 1
 				},
 				"type": {
 					"type": "string",
@@ -1991,7 +2017,8 @@
 					],
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-					}
+					},
+					"minItems": 1
 				},
 				"maxQueueSize": {
 					"default": 1,
@@ -2014,6 +2041,7 @@
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/LineSchema"
 					},
+					"minItems": 1,
 					"description": "One or more product lines provided by this producer."
 				}
 			},
@@ -2081,7 +2109,8 @@
 					],
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-					}
+					},
+					"minItems": 1
 				},
 				"type": {
 					"type": "string",
@@ -2157,7 +2186,8 @@
 					],
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-					}
+					},
+					"minItems": 1
 				},
 				"type": {
 					"type": "string",
@@ -2239,7 +2269,8 @@
 					],
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-					}
+					},
+					"minItems": 1
 				},
 				"type": {
 					"type": "string",
@@ -2331,7 +2362,8 @@
 					],
 					"items": {
 						"$ref": "urn:arkini:schema:project#/$defs/MergeSchema"
-					}
+					},
+					"minItems": 1
 				},
 				"type": {
 					"type": "string",

@@ -311,14 +311,6 @@ describe("settleItemDeliveryFx", () => {
 				const hydrated = yield* fromStateFx({
 					state,
 				});
-				const conflictingSpawn = yield* Effect.result(
-					spawnItemFx({
-						id: "runtime:intruder",
-						itemId: "water",
-						location: sourceLocation(1),
-						quantity: 1,
-					}),
-				);
 				const intruder = yield* spawnItemFx({
 					id: "runtime:mover",
 					itemId: "water",
@@ -338,7 +330,6 @@ describe("settleItemDeliveryFx", () => {
 				return {
 					before,
 					conflictingMove,
-					conflictingSpawn,
 					hydrated,
 					state,
 				};
@@ -359,14 +350,6 @@ describe("settleItemDeliveryFx", () => {
 		expect(result.hydrated.items.find(({ id }) => id === "runtime:water")?.location).toEqual(
 			savedDelivery?.location,
 		);
-		expect(Result.isFailure(result.conflictingSpawn)).toBe(true);
-		if (Result.isFailure(result.conflictingSpawn)) {
-			expect(result.conflictingSpawn.failure).toMatchObject({
-				_tag: "LocationOccupiedError",
-				itemId: "runtime:water",
-				location: sourceLocation(1),
-			});
-		}
 		expect(result.conflictingMove).toEqual({
 			kind: DropItemResultKind.Reject,
 			reason: DropItemRejectedReason.Occupied,

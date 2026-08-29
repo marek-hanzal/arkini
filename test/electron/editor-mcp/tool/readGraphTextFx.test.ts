@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Cause, Effect, Exit } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { readItemEstimateTextFx } from "../../../../electron/main/editor-mcp/tool/readItemEstimateTextFx";
@@ -110,5 +110,19 @@ describe("editor MCP graph tool text", () => {
 		expect(complete).toContain("- ingot [Ingot; simple] x 1 via");
 		expect(unreachable).toContain("Status: unreachable");
 		expect(bounded).toContain(`static estimate limit of ${editorItemEstimateMaximumQuantity}`);
+	});
+
+	it("rejects a missing estimate item through the typed failure channel", () => {
+		const exit = Effect.runSync(
+			readItemEstimateTextFx(createGraphProject(), "missing", 1).pipe(Effect.exit),
+		);
+
+		expect(Exit.isFailure(exit)).toBe(true);
+		if (Exit.isFailure(exit)) {
+			expect(Cause.hasDies(exit.cause)).toBe(false);
+			expect(Cause.pretty(exit.cause)).toContain(
+				"Item missing does not exist in the open project.",
+			);
+		}
 	});
 });

@@ -4,8 +4,8 @@ import { Effect } from "effect";
 
 import type { ProjectState } from "../ProjectState";
 import type { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
-import type { EditorProjectVersionReference } from "~/editor/version/EditorProjectVersion";
-import { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
+import type { EditorProjectVersionReference } from "~/project-version/EditorProjectVersion";
+import { EditorBoardScenarioFileSchema } from "~/board-scenario/EditorBoardScenarioFileSchema";
 import { hashVersionBytes } from "./VersionFingerprint";
 import { planVersionSnapshotFx } from "./planVersionSnapshotFx";
 import { readVersionSnapshotFx } from "./readVersionSnapshotFx";

@@ -5,7 +5,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
 
 import type { EditorProject } from "~/editor/EditorProject";
-import { EditorProjectContext } from "~/ui/editor/EditorProjectContext";
+import { EditorProjectContext } from "~/ui/editor/useEditorProject";
 import { useEditorItemDraft } from "~/item-authoring/ui/useEditorItemDraft";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { editorTestConfig, editorTestPayload } from "~test/editor/support/editorTestPayload";

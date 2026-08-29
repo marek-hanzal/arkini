@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import type { EditorProject } from "~/editor/EditorProject";
-import { EditorBoardGameResourceOwnerAtom } from "~/renderer/editor/board/EditorBoardGameResourceOwnerAtom";
+import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/session/EditorBoardGameResourceOwnerAtom";
 import { EditorProjectAtom } from "~/ui/editor/EditorProjectAtom";
 
 const publishEditorBoardGameFx = Effect.fn("publishEditorBoardGameFx")((project: EditorProject) =>

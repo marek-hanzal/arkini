@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 
-import type { EditorProjectStartScope } from "~/editor/project/EditorProjectStartScope";
+import type { EditorProjectStartScope } from "~/project-authoring/EditorProjectStartScope";
 import { useEditorItemSearchOptions } from "~/ui/item/useEditorItemSearchOptions";
 import { EditorProjectStartGridDragPreview } from "~/ui/project/editor/EditorProjectStartGridDragPreview";
 import { EditorProjectStartItemPicker } from "~/ui/project/editor/EditorProjectStartItemPicker";

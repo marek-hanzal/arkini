@@ -5,7 +5,7 @@ import {
 	EditorProjectBuildContentSchema,
 	EditorProjectBuildSchema,
 } from "~/editor-build/domain/EditorProjectBuildSchema";
-import { admitEditorProjectWriteFx } from "~/renderer/editor/EditorProjectWriteAdmission";
+import { admitEditorProjectWriteFx } from "~/project-authoring/repository/EditorProjectWriteAdmission";
 import { invokeEditorProjectTransportFx } from "~/renderer/editor/invokeEditorProjectTransportFx";
 
 /** Creates the renderer proxy for exact revision-pinned Editor Build operations. */

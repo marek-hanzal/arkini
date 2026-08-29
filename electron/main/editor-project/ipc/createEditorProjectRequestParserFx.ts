@@ -13,12 +13,12 @@ import type {
 	EditorProjectVersionCommitInput,
 	EditorProjectVersionDiffInput,
 	EditorProjectVersionTagInput,
-} from "~/editor/version/EditorProjectVersion";
+} from "~/project-version/EditorProjectVersion";
 import {
 	EditorProjectVersionBodySchema,
 	EditorProjectVersionSubjectSchema,
 	EditorProjectVersionTagSchema,
-} from "~/editor/version/EditorProjectVersionMetadataSchema";
+} from "~/project-version/EditorProjectVersionMetadataSchema";
 
 import { parseEditorProjectIpcRequestFx } from "./parseEditorProjectIpcRequestFx";
 

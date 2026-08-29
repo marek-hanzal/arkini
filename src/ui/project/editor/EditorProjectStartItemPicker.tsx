@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 
-import type { EditorProjectStartScope } from "~/editor/project/EditorProjectStartScope";
-import { readEditorProjectStartItemIdsFn } from "~/editor/project/fn/readEditorProjectStartItemIdsFn";
+import type { EditorProjectStartScope } from "~/project-authoring/EditorProjectStartScope";
+import { readEditorProjectStartItemIdsFn } from "~/project-authoring/fn/readEditorProjectStartItemIdsFn";
 import { useDialogFocus } from "~/ui/focus/useDialogFocus";
 import { EditorItemSearchThumbnail } from "~/ui/item/EditorItemThumbnail";
 import { useEditorItemSearchOptions } from "~/ui/item/useEditorItemSearchOptions";

@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { RuntimeNotEmptyError } from "~/engine/runtime/error/RuntimeNotEmptyError";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { planStartFx } from "~/engine/start/fx/planStartFx";
+import { planStartFx } from "./planStartFx";
 
 /**
  * Atomically creates the configured initial runtime from one empty game runtime.

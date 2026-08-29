@@ -4,9 +4,7 @@ import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { PositionSchema } from "~/engine/grid/schema/PositionSchema";
 
-/**
- * Adds a positive quantity of one canonical item to the initial inventory.
- */
+/** Defines a positive quantity of one canonical item in the initial inventory. */
 export const InventoryItemSchema = z
 	.object({
 		/**

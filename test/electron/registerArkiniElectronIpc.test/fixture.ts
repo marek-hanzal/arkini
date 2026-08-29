@@ -16,7 +16,7 @@ import { createFilesystemAppearancePreferencesFx } from "../../../electron/main/
 import { createFilesystemCheatPreferencesFx } from "../../../electron/main/cheat/createFilesystemCheatPreferencesFx";
 import { createFilesystemLauncherPreferencesFx } from "../../../electron/main/launcher/createFilesystemLauncherPreferencesFx";
 import { registerArkiniElectronIpcFx } from "../../../electron/main/registerArkiniElectronIpcFx";
-import { createArkiniUserDataPathsFx } from "../../../electron/main/user-data/createArkiniUserDataPathsFx";
+import { createArkiniUserDataPathsFn } from "../../../electron/main/user-data/fn/createArkiniUserDataPathsFn";
 import { createFilesystemWindowPreferencesFx } from "../../../electron/main/window/createFilesystemWindowPreferencesFx";
 import { createWindowModeControllerOwnershipFx } from "../../../electron/main/window/createWindowModeControllerOwnershipFx";
 import { registerWindowModeControllerFx } from "../../../electron/main/window/registerWindowModeControllerFx";
@@ -55,7 +55,7 @@ export const createRegisteredIpcHarness = async () => {
 
 	const userDataPath = await mkdtemp(join(tmpdir(), "arkini-ipc-"));
 	electronHarness.userDataPath.value = userDataPath;
-	const userDataPaths = Effect.runSync(createArkiniUserDataPathsFx(userDataPath));
+	const userDataPaths = createArkiniUserDataPathsFn(userDataPath);
 	const assertTrustedIpcSenderFx = vi.fn((event: IpcMainInvokeEvent) =>
 		event.senderFrame?.url.startsWith("arkini://app/")
 			? Effect.void

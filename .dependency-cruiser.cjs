@@ -3,6 +3,7 @@ const activeCodeAndTestsPattern = "^(?:src|electron|shared|scripts|test)(?:/|$)"
 const productionCodePattern = "^(?:src|electron|shared)(?:/|$)";
 const applicationEntrypointPattern = "^src/(?:main|createArkiniRouterFx|_route)[.]tsx?$";
 const gameConfigPattern = "^src/game-config(?:/|$)";
+const gameStartPattern = "^src/game-start(?:/|$)";
 const arkpackArtifactPattern = "^src/arkpack/(?:ArkpackDescriptor[.]ts$|artifact(?:/|$))";
 const productionPipelinePattern =
 	"^src/(?:production-action|production-condition|production-delivery|production-input|production-job|production-line|production-output)(?:/|$)";
@@ -34,6 +35,18 @@ const boundaryRules = [
 		},
 		to: {
 			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}`,
+		},
+	},
+	{
+		name: "game-start-is-a-framework-neutral-domain",
+		comment:
+			"Game Start schemas, exact placement planning, and atomic runtime initialization depend only on their own owner and exact Engine capabilities, never another product, presentation, routes, or Electron.",
+		severity: "error",
+		from: {
+			path: gameStartPattern,
+		},
+		to: {
+			path: "^src/(?!engine(?:/|$)|game-start(?:/|$))|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)",
 		},
 	},
 	{
@@ -472,7 +485,7 @@ const boundaryRules = [
 			"Framework-neutral Engine, authored Game configuration, Arkpack artifacts, and product domains never depend on Electron transport contracts.",
 		severity: "error",
 		from: {
-			path: `^src/engine(?:/|$)|${gameConfigPattern}|${arkpackArtifactPattern}|${productDomainPattern}|${authoringProductCorePattern}`,
+			path: `^src/engine(?:/|$)|${gameStartPattern}|${gameConfigPattern}|${arkpackArtifactPattern}|${productDomainPattern}|${authoringProductCorePattern}`,
 		},
 		to: {
 			path: "^electron/contract(?:/|$)",

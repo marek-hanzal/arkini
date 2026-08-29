@@ -13,6 +13,7 @@
 	"include": [
 		"electron/contract",
 		"src/engine",
+		"src/game-start",
 		"src/production-action",
 		"src/production-condition",
 		"src/production-delivery",

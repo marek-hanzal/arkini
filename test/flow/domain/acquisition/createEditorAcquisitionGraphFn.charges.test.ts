@@ -5,7 +5,7 @@ import { createEditorAcquisitionGraphFn } from "~/flow/domain/fn/createEditorAcq
 import { estimateEditorItemsFn } from "~/estimate/domain/fn/estimateEditorItemsFn";
 import { compileGameSourcesFx } from "~/game-config/compiler/fx/compileGameSourcesFx";
 import { resolveLineRunFx } from "~/production-line/fx/run/resolveLineRunFx";
-import type { StartSchema } from "~/engine/start/schema/StartSchema";
+import type { StartSchema } from "~/game-start/StartSchema";
 import {
 	createMergeTestConfig,
 	guaranteedMergeOutput,

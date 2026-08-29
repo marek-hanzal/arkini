@@ -5,7 +5,7 @@ import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
-import { placeDropForTestFx } from "~test/placement/support/placeDropForTestFx";
+import { placeDropForTestFx } from "~test/item-placement/support/placeDropForTestFx";
 import {
 	runBlueprint,
 	spawnBlueprintFx,

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { RuleSchema } from "~/production-line/schema/rule/RuleSchema";
-import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { lineRuleFx } from "./lineRuleFx";
 
 export namespace lineRulesFx {

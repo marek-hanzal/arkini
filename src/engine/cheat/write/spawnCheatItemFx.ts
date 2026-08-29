@@ -5,15 +5,15 @@ import { CheatModeDisabledError } from "~/engine/cheat/error/CheatModeDisabledEr
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
-import { applyPlacementPlanFx } from "~/engine/placement/fx/applyPlacementPlanFx";
-import { assertPlacementMaxCountFx } from "~/engine/placement/fx/assertPlacementMaxCountFx";
-import { assertPlacementPlanCompleteFx } from "~/engine/placement/fx/assertPlacementPlanCompleteFx";
-import { planBoardPlacementFx } from "~/engine/placement/fx/planBoardPlacementFx";
+import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";
+import { assertPlacementMaxCountFx } from "~/item-placement/fx/assertPlacementMaxCountFx";
+import { assertPlacementPlanCompleteFx } from "~/item-placement/fx/assertPlacementPlanCompleteFx";
+import { planBoardPlacementFx } from "~/item-placement/fx/planBoardPlacementFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
-import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
-import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
+import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
+import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 
 export namespace spawnCheatItemFx {
 	export interface Props {

@@ -2,7 +2,7 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { ItemTemporaryDurationIssueSchema } from "~/engine/runtime/schema/check/ItemTemporaryDurationIssueSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { ItemTemporaryDurationIssueReasonEnumSchema } from "~/engine/runtime/schema/check/ItemTemporaryDurationIssueReasonEnumSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 
 export namespace checkRuntimeItemTemporaryDurationsFn {

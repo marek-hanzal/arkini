@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { RuntimeItemSchema } from "./RuntimeItemSchema";
 
 /**

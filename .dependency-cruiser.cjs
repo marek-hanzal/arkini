@@ -12,6 +12,7 @@ const productDomainPattern =
 	"^src/(?:asset-authoring|item-authoring|flow|estimate|editor-build)/domain(?:/|$)";
 const productRendererPattern =
 	"^src/(?:arkpack|editor-build)/renderer(?:/|$)|^src/asset-authoring/(?:session|validation)(?:/|$)";
+const boardSpatialPattern = "^src/(?:item-location|item-placement|item-merge|space-action)(?:/|$)";
 const productPresentationPattern =
 	"^src/(?:asset-authoring|item-authoring|flow|estimate)/(?:ui|worker)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)";
 const authoringProductPattern =
@@ -41,13 +42,13 @@ const boundaryRules = [
 	{
 		name: "game-start-is-a-framework-neutral-domain",
 		comment:
-			"Game Start schemas, exact placement planning, and atomic runtime initialization depend only on their own owner and exact Engine capabilities, never another product, presentation, routes, or Electron.",
+			"Game Start schemas, exact placement planning, and atomic runtime initialization depend only on their own owner, spatial placement/location owners, and exact Engine capabilities, never another product, presentation, routes, or Electron.",
 		severity: "error",
 		from: {
 			path: gameStartPattern,
 		},
 		to: {
-			path: "^src/(?!engine(?:/|$)|game-start(?:/|$))|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)",
+			path: "^src/(?!engine(?:/|$)|game-start(?:/|$)|item-location(?:/|$)|item-placement(?:/|$))|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)",
 		},
 	},
 	{
@@ -62,10 +63,10 @@ const boundaryRules = [
 			path: "^src/(?!game-event(?:/|$))|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)",
 			pathNot: [
 				"^src/engine/common/schema/(?:IdSchema|NonNegativeIntegerSchema|PositiveIntegerSchema)[.]ts$",
-				"^src/engine/location/schema/(?:BoardLocationSchema|GridLocationSchema|InputLocationSchema|InventoryLocationSchema|LocationSchema|ReservedLocationSchema)[.]ts$",
-				"^src/engine/merge/schema/(?:SourceActionSchema|TargetEffectSchema)[.]ts$",
-				"^src/engine/placement/fx/applyOutputPlacementFx[.]ts$",
 				"^src/engine/runtime/read/fn/isGridRuntimeItemFn[.]ts$",
+				"^src/item-location/schema/(?:BoardLocationSchema|GridLocationSchema|InputLocationSchema|InventoryLocationSchema|LocationSchema|ReservedLocationSchema)[.]ts$",
+				"^src/item-merge/schema/(?:SourceActionSchema|TargetEffectSchema)[.]ts$",
+				"^src/item-placement/fx/applyOutputPlacementFx[.]ts$",
 			],
 		},
 	},
@@ -78,10 +79,70 @@ const boundaryRules = [
 			path: gameEventPattern,
 		},
 		to: {
-			path: "^src/engine/placement/fx/applyOutputPlacementFx[.]ts$",
+			path: "^src/item-placement/fx/applyOutputPlacementFx[.]ts$",
 			dependencyTypesNot: [
 				"type-only",
 			],
+		},
+	},
+	{
+		name: "board-spatial-owners-are-framework-neutral",
+		comment:
+			"Location, placement, merge, and Space actions own canonical gameplay semantics and never depend on authoring, delivery products, renderer ownership, presentation, routes, or Electron.",
+		severity: "error",
+		from: {
+			path: boardSpatialPattern,
+		},
+		to: {
+			path: `^src/(?:game-config|arkpack|editor-build|editor|item-authoring|flow|estimate|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+		},
+	},
+	{
+		name: "item-location-stays-upstream",
+		comment:
+			"Location identity, grid, and distance contracts never depend on placement, merge, or Space action operations.",
+		severity: "error",
+		from: {
+			path: "^src/item-location(?:/|$)",
+		},
+		to: {
+			path: "^src/(?:item-placement|item-merge|space-action)(?:/|$)",
+		},
+	},
+	{
+		name: "item-placement-stays-upstream-of-commands",
+		comment:
+			"Placement policy may depend on location identity but never reaches into merge or Space action commands.",
+		severity: "error",
+		from: {
+			path: "^src/item-placement(?:/|$)",
+		},
+		to: {
+			path: "^src/(?:item-merge|space-action)(?:/|$)",
+		},
+	},
+	{
+		name: "item-merge-stays-out-of-space-actions",
+		comment:
+			"Directional merge composes location and placement owners without taking over Space activation.",
+		severity: "error",
+		from: {
+			path: "^src/item-merge(?:/|$)",
+		},
+		to: {
+			path: "^src/space-action(?:/|$)",
+		},
+	},
+	{
+		name: "space-actions-stay-out-of-placement-and-merge",
+		comment:
+			"Space activation composes location and production action policy without owning placement or merge.",
+		severity: "error",
+		from: {
+			path: "^src/space-action(?:/|$)",
+		},
+		to: {
+			path: "^src/(?:item-placement|item-merge)(?:/|$)",
 		},
 	},
 	{
@@ -520,7 +581,7 @@ const boundaryRules = [
 			"Framework-neutral Engine, Game Event facts, authored Game configuration, Arkpack artifacts, and product domains never depend on Electron transport contracts.",
 		severity: "error",
 		from: {
-			path: `^src/engine(?:/|$)|${gameStartPattern}|${gameEventPattern}|${gameConfigPattern}|${arkpackArtifactPattern}|${productDomainPattern}|${authoringProductCorePattern}`,
+			path: `^src/(?:engine|editor)(?:/|$)|${gameStartPattern}|${gameEventPattern}|${boardSpatialPattern}|${gameConfigPattern}|${arkpackArtifactPattern}|${productDomainPattern}|${authoringProductCorePattern}`,
 		},
 		to: {
 			path: "^electron/contract(?:/|$)",

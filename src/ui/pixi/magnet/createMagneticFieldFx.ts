@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { RendererRuntime } from "~/renderer/RendererRuntime";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { AnimationDriver, AnimationSpring } from "~/ui/pixi/animation/AnimationDriver";

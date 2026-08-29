@@ -7,7 +7,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { readInputRunItemFx } from "~/production-input/read/readInputRunItemFx";
 import type { InputRun } from "~/production-input/InputRun";
-import type { JobLocationSchema } from "~/engine/location/schema/JobLocationSchema";
+import type { JobLocationSchema } from "~/item-location/schema/JobLocationSchema";
 import { createRuntimeItemFx } from "~/engine/runtime/fx/createRuntimeItemFx";
 import { createRuntimeItemIdFx } from "~/engine/runtime/fx/createRuntimeItemIdFx";
 import { discardRuntimeItemOwnedStateFx } from "~/engine/runtime/fx/discardRuntimeItemOwnedStateFx";
@@ -15,7 +15,7 @@ import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
 import type { JobRuntimeItemSchema } from "~/engine/runtime/schema/JobRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 export namespace applyInputMaterialConsumeRunPlanFx {
 	export interface Props {

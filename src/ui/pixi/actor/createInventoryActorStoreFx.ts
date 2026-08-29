@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { readTileActorsFx } from "~/ui/pixi/actor/readTileActorsFx";
 import type {
 	InventoryReconciliation,

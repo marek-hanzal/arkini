@@ -7,7 +7,7 @@ import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { detachLineInputSourceFx } from "~/production-input/fx/detachLineInputSourceFx";
 import { planLineInputAutofillFx } from "~/production-input/fx/planLineInputAutofillFx";
 import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";

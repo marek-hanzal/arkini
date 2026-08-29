@@ -17,7 +17,7 @@ import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemF
 import type { JobRuntimeItemSchema } from "~/engine/runtime/schema/JobRuntimeItemSchema";
 import { readRuntimeItemOwnedStateFn } from "~/engine/runtime/read/fn/readRuntimeItemOwnedStateFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 export namespace checkRuntimeJobsFn {
 	export interface Props {

@@ -22,9 +22,13 @@ Read the smallest entry point needed for the task:
 ## Repository map
 
 ```text
-src/engine    remaining live gameplay runtime, session, placement, merge and platform-neutral support owners
+src/engine    remaining live gameplay runtime, session, Tick and platform-neutral support owners
 src/game-start  initial-state schemas, exact placement planning and atomic runtime start
 src/game-event  committed gameplay event schemas and exact downstream event projection
+src/item-location  grid coordinates, distance, runtime locations, claims and cross-space identity
+src/item-placement  scope-aware stack, spawn, output and existing-item placement
+src/item-merge  directional merge contracts, admission and atomic source/target lifecycle
+src/space-action  authored Space items and atomic activation/navigation
 src/production-action  immediate action admission, rules and charge settlement
 src/production-condition  authored runtime condition evaluation
 src/production-input  line-input schemas, material planning and storage lifecycle

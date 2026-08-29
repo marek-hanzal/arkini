@@ -4,20 +4,20 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/engine/item/error/ItemNotFoundError";
 import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
-import { readGridLocationClaimAtFn } from "~/engine/location/fn/readGridLocationClaimAtFn";
-import { readGridLocationClaimsFn } from "~/engine/location/fn/readGridLocationClaimsFn";
-import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
-import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationClaimAtFn";
+import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
+import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { LocationOccupiedError } from "~/engine/runtime/error/LocationOccupiedError";
-import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBoardOperationError";
+import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceBoardOperationError";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 export namespace moveItemFx {
 	export interface Props {

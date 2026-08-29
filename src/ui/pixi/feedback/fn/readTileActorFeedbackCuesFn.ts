@@ -3,8 +3,8 @@ import { match, P } from "ts-pattern";
 import type { GameTransition } from "~/renderer/game/session/GameSession";
 import type { TileActorFeedbackCue } from "~/ui/pixi/feedback/TileActorFeedbackCue";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-import { SourceActionSchema } from "~/engine/merge/schema/SourceActionSchema";
-import { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
+import { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
+import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 
 /**
  * Compiles exact committed facts into actor-local feedback without leaking choreography into the

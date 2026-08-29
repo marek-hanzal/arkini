@@ -1,6 +1,6 @@
 import { Combine } from "lucide-react";
 
-import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
+import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";

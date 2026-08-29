@@ -4,7 +4,7 @@ import { Container, Graphics, Rectangle } from "pixi.js";
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
 import { readScenePaletteFx } from "~/ui/pixi/appearance/readScenePaletteFx";
 import type { DropFeedback } from "~/ui/pixi/grid/DropFeedback";

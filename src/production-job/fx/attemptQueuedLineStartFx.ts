@@ -6,12 +6,12 @@ import type { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardErro
 import type { OutputCapacityError } from "~/production-job/error/OutputCapacityError";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { LineRunUnavailableError } from "~/production-line/error/LineRunUnavailableError";
-import type { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
+import type { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { autofillLineInputsRuntimeFx } from "~/production-input/write/autofillLineInputsRuntimeFx";
 import { startQueuedLineRuntimeFx } from "./startQueuedLineRuntimeFx";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 export namespace attemptQueuedLineStartFx {
 	export interface Props {

@@ -1,7 +1,7 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { LocationSchema } from "~/engine/location/schema/LocationSchema";
+import type { LocationSchema } from "~/item-location/schema/LocationSchema";
 import { queryFx } from "~/engine/query/fx/queryFx";
 import type { QuerySchema } from "~/engine/query/schema/QuerySchema";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";

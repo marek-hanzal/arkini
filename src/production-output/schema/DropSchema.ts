@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
+import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 
 import { RuleSchema } from "./drop/rule/RuleSchema";
 

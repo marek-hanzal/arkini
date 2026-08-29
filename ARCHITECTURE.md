@@ -7,8 +7,8 @@ This is the canonical map of implemented ownership and lifecycle. It does not ca
 The product dependency map is:
 
 ```text
-src/@routes → { exact product owners, src/ui, src/renderer, exact production/engine owners, electron/contract }
-product presentation/workers → { exact product runtime/core owners, exact shared UI owners, src/game-event, exact production/engine owners, src/renderer, electron/contract }
+src/@routes → { exact product owners, src/ui, src/renderer, exact gameplay owners, electron/contract }
+product presentation/workers → { exact product runtime/core owners, exact shared UI owners, exact gameplay owners, src/renderer, electron/contract }
 authoring-shell → { authoring-session, exact authoring products, src/ui, src/renderer, electron/contract }
 authoring-session → { project-authoring repository runtime, Board session, src/renderer, electron/contract }
 src/arkpack/renderer → { src/arkpack/artifact, src/game-config, exact src/renderer owners, electron/contract }
@@ -19,12 +19,16 @@ project-authoring repository runtime → { Project Authoring core, src/game-conf
 src/asset-authoring/ui → { Asset Authoring session/validation/domain, authoring-session, src/ui, src/renderer }
 src/asset-authoring/session → { Asset Authoring validation, Project Authoring repository runtime, authoring-session, src/arkpack/renderer }
 src/asset-authoring/validation → { Asset Authoring domain, exact renderer PNG validation and Engine resource contracts }
-authoring product cores → { exact upstream authoring/config/production/engine owners }
-src/game-config → { src/game-start, exact production schemas, authored-config and remaining gameplay-schema owners in src/engine }
-src/game-start → exact item, placement, runtime and config-capability owners in src/engine
+authoring product cores → { exact upstream authoring/config/gameplay owners }
+src/game-config → { src/game-start, exact production/spatial schemas, authored-config and remaining gameplay-schema owners in src/engine }
+src/game-start → { src/item-location, src/item-placement, exact item/runtime and config-capability owners in src/engine }
 src/asset-authoring/domain → { exact authored-config resource owners }
 committed transition producers → src/game-event
-src/game-event → { exact Engine value schemas, placement results and Runtime item projections }
+src/game-event → { exact spatial/Engine value schemas, placement results and Runtime item projections }
+src/item-location → { exact item/runtime/delivery schema owners }
+src/item-placement → { src/game-event, src/item-location, exact item/runtime/output/job owners }
+src/item-merge → { src/game-event, src/item-placement, src/item-location, exact item/runtime/output/job owners }
+src/space-action → { src/game-event, src/item-location, src/production-action, src/production-input, exact item/runtime owners }
 src/production-condition → exact query/runtime facts in src/engine
 src/production-output → src/production-condition
 src/production-action → { src/production-condition, src/production-input, src/production-output }
@@ -37,7 +41,9 @@ src/production-job → { src/production-action, src/production-delivery, src/pro
 - The production pipeline has explicit semantic roots. `src/production-condition` owns authored runtime condition evaluation. `src/production-output` owns output, drop, and roll contracts/resolution. `src/production-action` owns immediate action admission and charge settlement. `src/production-input` owns line-input contracts, material planning, buffering, autofill, withdrawal, and storage mutation. `src/production-line` owns line definitions, rule interpretation, reads, and run planning. `src/production-job` owns FIFO queue admission, active-job state, output-capacity reservation, start/completion/cancellation sequencing, and job checks. `src/production-delivery` owns outbound allocation, travel, validation, reconciliation, and settlement. These roots import one another only through the executable directions in Dependency Cruiser; callers import exact owners directly.
 - `src/game-start` owns the public initial-state schemas, exact Board/Inventory/Toolbar placement planning, and the one atomic empty-runtime start transaction. Planning applies Board, then Inventory, then Toolbar entries through canonical placement against one evolving candidate and commits only the completely valid runtime.
 - `src/game-event` owns the strict committed-event vocabulary, ordered transient batches, and exact projection of already-applied placement results. Events are downstream facts from one committed transition, never canonical Runtime or serializable State. The owner cannot reach writable Runtime/transition authority, State, Tick, save, production decisions, renderer lifecycle, presentation, routes, or Electron; producers and consumers import its exact schemas and operation directly.
-- `src/engine` retains the framework-neutral live runtime/session, Tick, placement, merge, item, query, state, save, filesystem/version support, application CLI composition, and other untouched gameplay owners. It no longer owns Game Start, committed Game Event semantics, or the production action/input/line/output/roll/condition/job/delivery pipeline, and it does not own authored Game source, compilation, Arkpack delivery, or Editor Build.
+- The Board spatial boundary also has explicit semantic roots. `src/item-location` owns grid coordinates and size, gameplay distance labels, every persisted runtime location, concrete cell identity/claims, scope permission, and cross-space Board rejection. `src/item-placement` owns placement schemas, Manhattan ordering, scope fallback, stack/spawn planning, global max-count admission, existing-item return, and immutable placement application. `src/item-merge` owns directional merge schemas, first-rule admission, deterministic randomness, source/target/return lifecycle, output placement, and the atomic public merge command. `src/space-action` owns authored Space items plus revision/location-safe charge settlement and current-space navigation. Among these roots, dependencies flow `item-merge → item-placement → item-location` and `space-action → item-location`.
+- Aggregate root dependencies may point both ways where schema leaves define persisted Runtime/Delivery state and operations consume those exact schemas, or where placement consumes Output/Job decisions whose public contracts contain placement policy. Those are explicit product compositions, not module cycles: schemas remain upstream from operations, callers import exact files, and Dependency Cruiser rejects every concrete circular import. No barrel, adapter, or forwarding layer hides the relationship.
+- `src/engine` retains the framework-neutral live runtime/session, Tick, item, query, state, save, filesystem/version support, application CLI composition, and other untouched gameplay owners. It no longer owns Game Start, committed Game Event semantics, the production pipeline, spatial locations, placement, merge, or Space actions, and it does not own authored Game source, compilation, Arkpack delivery, or Editor Build.
 - `src/game-config` owns the complete authored-game pipeline: public completed/source schemas, canonical JSON source discovery and parsing, stable JSON Schema emission, diagnostics, semantic validation, resource identity/usage/rename behavior, and completed-config compilation. `source/` stays upstream of `validation/` and `compiler/`; validation never imports compilation. The root is platform-neutral and cannot import Arkpack, Editor Build, renderer, presentation, routes, or Electron.
 - `src/arkpack` owns package delivery with explicit boundaries. `artifact/` owns exact bytes, envelope, compression, signing, provenance, trusted root, artifact schemas, and artifact CLI commands. `renderer/` owns package admission, catalog, fallback, storage contracts, and load/import lifecycle. `ui/` owns catalog and import presentation. Artifact code stays upstream of renderer and UI and never imports Editor Build.
 - `src/editor-build` owns the Editor Build product independently of Project Authoring. `domain/` owns build descriptors, the Build repository capability, and install planning; `renderer/` owns the Electron proxy, exact Save request, and built-artifact admission into the Arkpack catalog; `ui/` owns Build command/diagnostic presentation. Electron main retains privileged build and filesystem publication; routes retain Build page composition.

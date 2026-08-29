@@ -1,7 +1,7 @@
 import type { EditorProject } from "~/project-authoring/EditorProject";
 import { EditorProjectFormBaseSchema } from "~/project-authoring/configuration/EditorProjectFormSchema";
 import { readEditorProjectStartItemIdsFn } from "~/project-authoring/fn/readEditorProjectStartItemIdsFn";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 /** Adds project-local resource and authored-start invariants to canonical field schemas. */
 export const createEditorProjectFormSchema = (

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { GameEventEnumSchema } from "./GameEventEnumSchema";
 
 /** One exact charged item committed a non-terminal charge spend. */

@@ -6,9 +6,9 @@ import { DepositSchema } from "./DepositSchema";
 import { InventorySchema } from "./InventorySchema";
 import { ProducerSchema } from "./ProducerSchema";
 import { SimpleSchema } from "./SimpleSchema";
-import { SpaceSchema } from "./SpaceSchema";
 import { StashSchema } from "./StashSchema";
 import { TemporarySchema } from "./TemporarySchema";
+import { SpaceSchema } from "~/space-action/schema/SpaceSchema";
 
 /**
  * An item configuration, resolved by its `type` discriminator.

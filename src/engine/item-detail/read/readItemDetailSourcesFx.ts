@@ -9,7 +9,7 @@ import { resolveLineShowFn } from "~/production-line/fn/resolveLineShowFn";
 import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
 import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import { TypeSchema as LineRuleTypeSchema } from "~/production-line/schema/rule/TypeSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";

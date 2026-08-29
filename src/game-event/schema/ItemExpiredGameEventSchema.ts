@@ -3,7 +3,7 @@ import { z } from "zod";
 import { GameEventEnumSchema } from "./GameEventEnumSchema";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
+import { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 
 export const ItemExpiredGameEventSchema = z
 	.object({

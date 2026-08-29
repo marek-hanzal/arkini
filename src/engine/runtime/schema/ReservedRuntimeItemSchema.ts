@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { ReservedLocationSchema } from "~/engine/location/schema/ReservedLocationSchema";
+import { ReservedLocationSchema } from "~/item-location/schema/ReservedLocationSchema";
 import { RuntimeItemSchema } from "./RuntimeItemSchema";
 
 /** One live runtime item temporarily retained by an active job. */

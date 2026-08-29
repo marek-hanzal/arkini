@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
+import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import { commitMergeDropFx } from "~/engine/runtime/drop/commitMergeDropFx";
 import { commitMoveDropFx } from "~/engine/runtime/drop/commitMoveDropFx";
 import { commitStackDropFx } from "~/engine/runtime/drop/commitStackDropFx";

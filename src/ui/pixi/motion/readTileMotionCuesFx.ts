@@ -1,5 +1,4 @@
 import { Effect, Option } from "effect";
-import { match } from "ts-pattern";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
@@ -7,7 +6,7 @@ import { readTileActorBadgeCountFx } from "~/ui/pixi/actor/readTileActorBadgeCou
 import { readTileActorAssetSourceIdsFx } from "~/ui/pixi/actor/readTileActorAssetSourceIdsFx";
 import { readTileActorVisualFx } from "~/ui/pixi/actor/readTileActorVisualFx";
 import type { TileMotionCue } from "~/ui/pixi/motion/TileMotionCue";
-import { readGridRuntimeItemFx } from "~/ui/pixi/motion/readGridRuntimeItemFx";
+import { readGridRuntimeItemFn } from "~/ui/pixi/motion/fn/readGridRuntimeItemFn";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
@@ -54,26 +53,26 @@ export namespace readTileMotionCuesFx {
 	}
 }
 
-const readOriginLocationFx = Effect.fn("readTileMotionCueOriginLocationFx")(function* ({
+const readOriginLocation = ({
 	originItemId,
 	transition,
 }: {
 	readonly originItemId: string;
 	readonly transition: CommittedTransitionSchema.Type;
-}) {
-	const previous = yield* readGridRuntimeItemFx({
+}) => {
+	const previous = readGridRuntimeItemFn({
 		itemId: originItemId,
 		runtime: transition.previousRuntime,
 	});
 	if (previous !== null) return previous.location;
-	const current = yield* readGridRuntimeItemFx({
+	const current = readGridRuntimeItemFn({
 		itemId: originItemId,
 		runtime: transition.runtime,
 	});
 	return current?.location ?? null;
-});
+};
 
-const readTargetFx = Effect.fn("readTileMotionCueTargetFx")(function* ({
+const readTarget = ({
 	canonicalItemId,
 	itemId,
 	location,
@@ -83,8 +82,8 @@ const readTargetFx = Effect.fn("readTileMotionCueTargetFx")(function* ({
 	readonly itemId: string;
 	readonly location: GridLocationSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
-}) {
-	const target = yield* readGridRuntimeItemFx({
+}) => {
+	const target = readGridRuntimeItemFn({
 		itemId,
 		runtime,
 	});
@@ -99,7 +98,7 @@ const readTargetFx = Effect.fn("readTileMotionCueTargetFx")(function* ({
 		return null;
 	}
 	return target;
-});
+};
 
 type SpawnMotionEvent = Pick<
 	Extract<
@@ -111,7 +110,7 @@ type SpawnMotionEvent = Pick<
 	"canonicalItemId" | "itemId" | "location" | "originItemId"
 >;
 
-const readSpawnCueFx = Effect.fn("readTileSpawnMotionCueFx")(function* ({
+const readSpawnCue = ({
 	event,
 	eventIndex,
 	transition,
@@ -119,19 +118,17 @@ const readSpawnCueFx = Effect.fn("readTileSpawnMotionCueFx")(function* ({
 	readonly event: SpawnMotionEvent;
 	readonly eventIndex: number;
 	readonly transition: CommittedTransitionSchema.Type;
-}) {
-	const [originLocation, target] = yield* Effect.all([
-		readOriginLocationFx({
-			originItemId: event.originItemId,
-			transition,
-		}),
-		readTargetFx({
-			canonicalItemId: event.canonicalItemId,
-			itemId: event.itemId,
-			location: event.location,
-			runtime: transition.runtime,
-		}),
-	]);
+}) => {
+	const originLocation = readOriginLocation({
+		originItemId: event.originItemId,
+		transition,
+	});
+	const target = readTarget({
+		canonicalItemId: event.canonicalItemId,
+		itemId: event.itemId,
+		location: event.location,
+		runtime: transition.runtime,
+	});
 	if (originLocation === null || target === null) return null;
 	return {
 		kind: "spawn",
@@ -142,7 +139,7 @@ const readSpawnCueFx = Effect.fn("readTileSpawnMotionCueFx")(function* ({
 		originLocation,
 		targetLocation: target.location,
 	} satisfies UnstaggeredTileMotionCue;
-});
+};
 
 const readInventoryInputSourceItemFx = Effect.fn("readInventoryInputSourceItemFx")(function* ({
 	game,
@@ -193,153 +190,120 @@ const readEventCueFx = Effect.fn("readTileMotionEventCueFx")(function* ({
 	readonly game: GameEngine;
 	readonly transition: CommittedTransitionSchema.Type;
 }) {
-	return yield* match(event)
-		.with(
-			{
-				type: GameEventEnumSchema.enum.ItemSpawned,
-			},
-			(spawned) =>
-				readSpawnCueFx({
-					event: spawned,
-					eventIndex,
-					transition,
-				}),
-		)
-		.with(
-			{
-				type: GameEventEnumSchema.enum.ItemStacked,
-			},
-			(stacked) =>
-				Effect.gen(function* () {
-					const [originLocation, target] = yield* Effect.all([
-						readOriginLocationFx({
-							originItemId: stacked.originItemId,
-							transition,
-						}),
-						readTargetFx({
-							canonicalItemId: stacked.canonicalItemId,
-							itemId: stacked.itemId,
-							location: stacked.location,
-							runtime: transition.runtime,
-						}),
-					]);
-					if (originLocation === null || target === null) return null;
-					return {
-						kind: "stack",
-						sequence: transition.sequence,
-						eventIndex,
-						targetActorId: target.id,
-						canonicalItemId: stacked.canonicalItemId,
-						quantity: stacked.quantity - stacked.previousQuantity,
-						originActorId: stacked.originItemId,
-						originLocation,
-						targetLocation: target.location,
-					} satisfies UnstaggeredTileMotionCue;
-				}),
-		)
-		.with(
-			{
-				type: GameEventEnumSchema.enum.ItemInputStored,
-				previousSourceLocation: {
-					scope: LocationScopeEnumSchema.enum.Board,
-				},
-			},
-			(stored) =>
-				readGridRuntimeItemFx({
-					itemId: stored.ownerItemId,
-					runtime: transition.runtime,
-				}).pipe(
-					Effect.map((target) =>
-						target === null
-							? null
-							: ({
-									kind: "input",
-									sequence: transition.sequence,
-									eventIndex,
-									sourceActorId: stored.sourceItemId,
-									targetActorId: stored.ownerItemId,
-									canonicalItemId: stored.canonicalItemId,
-									previousQuantity: stored.previousQuantity,
-									storedQuantity: stored.storedQuantity,
-									resultingQuantity: stored.resultingQuantity,
-									originActorId: stored.sourceItemId,
-									originLocation: stored.previousSourceLocation,
-									targetLocation: target.location,
-								} satisfies UnstaggeredTileMotionCue),
-					),
-				),
-		)
-		.with(
-			{
-				type: GameEventEnumSchema.enum.ItemInputStored,
-				previousSourceLocation: {
-					scope: LocationScopeEnumSchema.enum.Inventory,
-				},
-			},
-			(stored) =>
-				Effect.gen(function* () {
-					if (transition.previousRuntime === null) return null;
-					const source = yield* readGridRuntimeItemFx({
-						itemId: stored.sourceItemId,
-						runtime: transition.previousRuntime,
-					});
-					if (
-						source === null ||
-						source.item.id !== stored.canonicalItemId ||
-						!isSameGridLocationFn({
-							left: source.location,
-							right: stored.previousSourceLocation,
-						})
-					) {
-						return null;
-					}
-					const [inventoryOpener, target] = yield* Effect.all([
-						readRuntimeInventoryOpenerFx({
-							itemId: source.id,
-							runtime: transition.previousRuntime,
-						}).pipe(Effect.option),
-						readGridRuntimeItemFx({
-							itemId: stored.ownerItemId,
-							runtime: transition.runtime,
-						}),
-					]);
-					if (Option.isNone(inventoryOpener) || target === null) return null;
-					return {
-						kind: "input",
-						sequence: transition.sequence,
-						eventIndex,
-						sourceActorId: stored.sourceItemId,
-						sourceItem: yield* readInventoryInputSourceItemFx({
-							game,
-							runtime: transition.previousRuntime,
-							source,
-						}),
-						targetActorId: stored.ownerItemId,
-						canonicalItemId: stored.canonicalItemId,
-						previousQuantity: stored.previousQuantity,
-						storedQuantity: stored.storedQuantity,
-						resultingQuantity: stored.resultingQuantity,
-						originActorId: inventoryOpener.value.id,
-						originLocation: inventoryOpener.value.location,
-						targetLocation: target.location,
-					} satisfies UnstaggeredTileMotionCue;
-				}),
-		)
-		.with(
-			{
-				type: GameEventEnumSchema.enum.ItemPlaced,
-				previousLocation: {
-					scope: LocationScopeEnumSchema.enum.Inventory,
-				},
-			},
-			(placed) =>
-				readSpawnCueFx({
-					event: placed,
-					eventIndex,
-					transition,
-				}),
-		)
-		.otherwise(() => Effect.succeed(null));
+	if (event.type === GameEventEnumSchema.enum.ItemSpawned) {
+		return readSpawnCue({
+			event,
+			eventIndex,
+			transition,
+		});
+	}
+	if (event.type === GameEventEnumSchema.enum.ItemStacked) {
+		const originLocation = readOriginLocation({
+			originItemId: event.originItemId,
+			transition,
+		});
+		const target = readTarget({
+			canonicalItemId: event.canonicalItemId,
+			itemId: event.itemId,
+			location: event.location,
+			runtime: transition.runtime,
+		});
+		if (originLocation === null || target === null) return null;
+		return {
+			kind: "stack",
+			sequence: transition.sequence,
+			eventIndex,
+			targetActorId: target.id,
+			canonicalItemId: event.canonicalItemId,
+			quantity: event.quantity - event.previousQuantity,
+			originActorId: event.originItemId,
+			originLocation,
+			targetLocation: target.location,
+		} satisfies UnstaggeredTileMotionCue;
+	}
+	if (
+		event.type === GameEventEnumSchema.enum.ItemInputStored &&
+		event.previousSourceLocation.scope === LocationScopeEnumSchema.enum.Board
+	) {
+		const target = readGridRuntimeItemFn({
+			itemId: event.ownerItemId,
+			runtime: transition.runtime,
+		});
+		if (target === null) return null;
+		return {
+			kind: "input",
+			sequence: transition.sequence,
+			eventIndex,
+			sourceActorId: event.sourceItemId,
+			targetActorId: event.ownerItemId,
+			canonicalItemId: event.canonicalItemId,
+			previousQuantity: event.previousQuantity,
+			storedQuantity: event.storedQuantity,
+			resultingQuantity: event.resultingQuantity,
+			originActorId: event.sourceItemId,
+			originLocation: event.previousSourceLocation,
+			targetLocation: target.location,
+		} satisfies UnstaggeredTileMotionCue;
+	}
+	if (
+		event.type === GameEventEnumSchema.enum.ItemInputStored &&
+		event.previousSourceLocation.scope === LocationScopeEnumSchema.enum.Inventory
+	) {
+		if (transition.previousRuntime === null) return null;
+		const source = readGridRuntimeItemFn({
+			itemId: event.sourceItemId,
+			runtime: transition.previousRuntime,
+		});
+		if (
+			source === null ||
+			source.item.id !== event.canonicalItemId ||
+			!isSameGridLocationFn({
+				left: source.location,
+				right: event.previousSourceLocation,
+			})
+		) {
+			return null;
+		}
+		const inventoryOpener = yield* readRuntimeInventoryOpenerFx({
+			itemId: source.id,
+			runtime: transition.previousRuntime,
+		}).pipe(Effect.option);
+		const target = readGridRuntimeItemFn({
+			itemId: event.ownerItemId,
+			runtime: transition.runtime,
+		});
+		if (Option.isNone(inventoryOpener) || target === null) return null;
+		return {
+			kind: "input",
+			sequence: transition.sequence,
+			eventIndex,
+			sourceActorId: event.sourceItemId,
+			sourceItem: yield* readInventoryInputSourceItemFx({
+				game,
+				runtime: transition.previousRuntime,
+				source,
+			}),
+			targetActorId: event.ownerItemId,
+			canonicalItemId: event.canonicalItemId,
+			previousQuantity: event.previousQuantity,
+			storedQuantity: event.storedQuantity,
+			resultingQuantity: event.resultingQuantity,
+			originActorId: inventoryOpener.value.id,
+			originLocation: inventoryOpener.value.location,
+			targetLocation: target.location,
+		} satisfies UnstaggeredTileMotionCue;
+	}
+	if (
+		event.type === GameEventEnumSchema.enum.ItemPlaced &&
+		event.previousLocation.scope === LocationScopeEnumSchema.enum.Inventory
+	) {
+		return readSpawnCue({
+			event,
+			eventIndex,
+			transition,
+		});
+	}
+	return null;
 });
 
 /**

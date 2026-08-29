@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
-import { readCommittedTileSwapMotionCueFx } from "~/ui/pixi/motion/readCommittedTileSwapMotionCueFx";
+import { readCommittedTileSwapMotionCueFn } from "~/ui/pixi/motion/fn/readCommittedTileSwapMotionCueFn";
 import { readTileMotionCuesFx } from "~/ui/pixi/motion/readTileMotionCuesFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -486,29 +486,27 @@ const swappedRuntime = {
 	),
 };
 
-describe("readCommittedTileSwapMotionCueFx", () => {
+describe("readCommittedTileSwapMotionCueFn", () => {
 	it("compiles only the exchanged target half of an exact committed swap", () => {
 		expect(
-			Effect.runSync(
-				readCommittedTileSwapMotionCueFx({
-					source: {
-						id: source.id,
-						revision: source.revision,
-						location: sourceLocation,
-					},
-					target: {
-						id: target.id,
-						revision: target.revision,
-						location: targetLocation,
-					},
-					transition: {
-						sequence: 9,
-						previousRuntime: runtime,
-						runtime: swappedRuntime,
-						events: [],
-					},
-				}),
-			),
+			readCommittedTileSwapMotionCueFn({
+				source: {
+					id: source.id,
+					revision: source.revision,
+					location: sourceLocation,
+				},
+				target: {
+					id: target.id,
+					revision: target.revision,
+					location: targetLocation,
+				},
+				transition: {
+					sequence: 9,
+					previousRuntime: runtime,
+					runtime: swappedRuntime,
+					events: [],
+				},
+			}),
 		).toEqual({
 			kind: "swap",
 			sequence: 9,
@@ -524,26 +522,24 @@ describe("readCommittedTileSwapMotionCueFx", () => {
 
 	it("rejects a stale captured identity instead of animating an unrelated commit", () => {
 		expect(
-			Effect.runSync(
-				readCommittedTileSwapMotionCueFx({
-					source: {
-						id: source.id,
-						revision: "revision:stale",
-						location: sourceLocation,
-					},
-					target: {
-						id: target.id,
-						revision: target.revision,
-						location: targetLocation,
-					},
-					transition: {
-						sequence: 9,
-						previousRuntime: runtime,
-						runtime: swappedRuntime,
-						events: [],
-					},
-				}),
-			),
+			readCommittedTileSwapMotionCueFn({
+				source: {
+					id: source.id,
+					revision: "revision:stale",
+					location: sourceLocation,
+				},
+				target: {
+					id: target.id,
+					revision: target.revision,
+					location: targetLocation,
+				},
+				transition: {
+					sequence: 9,
+					previousRuntime: runtime,
+					runtime: swappedRuntime,
+					events: [],
+				},
+			}),
 		).toBeNull();
 	});
 
@@ -561,47 +557,41 @@ describe("readCommittedTileSwapMotionCueFx", () => {
 			},
 		};
 		expect(
-			Effect.runSync(
-				readCommittedTileSwapMotionCueFx({
-					...captured,
-					transition: {
-						sequence: 10,
-						previousRuntime: null,
-						runtime: swappedRuntime,
-						events: [],
-					},
-				}),
-			),
+			readCommittedTileSwapMotionCueFn({
+				...captured,
+				transition: {
+					sequence: 10,
+					previousRuntime: null,
+					runtime: swappedRuntime,
+					events: [],
+				},
+			}),
 		).toBeNull();
 		expect(
-			Effect.runSync(
-				readCommittedTileSwapMotionCueFx({
-					...captured,
-					source: {
-						...captured.source,
-						location: targetLocation,
-					},
-					transition: {
-						sequence: 10,
-						previousRuntime: runtime,
-						runtime: swappedRuntime,
-						events: [],
-					},
-				}),
-			),
+			readCommittedTileSwapMotionCueFn({
+				...captured,
+				source: {
+					...captured.source,
+					location: targetLocation,
+				},
+				transition: {
+					sequence: 10,
+					previousRuntime: runtime,
+					runtime: swappedRuntime,
+					events: [],
+				},
+			}),
 		).toBeNull();
 		expect(
-			Effect.runSync(
-				readCommittedTileSwapMotionCueFx({
-					...captured,
-					transition: {
-						sequence: 10,
-						previousRuntime: runtime,
-						runtime,
-						events: [],
-					},
-				}),
-			),
+			readCommittedTileSwapMotionCueFn({
+				...captured,
+				transition: {
+					sequence: 10,
+					previousRuntime: runtime,
+					runtime,
+					events: [],
+				},
+			}),
 		).toBeNull();
 	});
 });

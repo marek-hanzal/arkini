@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { createEditorItemDraftFn } from "~/editor/fn/createEditorItemDraftFn";
+import { createEditorItemDraftFn } from "~/editor/item/fn/createEditorItemDraftFn";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 

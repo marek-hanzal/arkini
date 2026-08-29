@@ -1,3 +1,5 @@
+import { Effect, Order } from "effect";
+
 import type { LayoutInput, LayoutNode, LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
 
 const RouteEscape = 56;
@@ -136,45 +138,57 @@ const readOrthogonalRoute = (plan: OrthogonalRoutePlan): ReadonlyArray<LayoutPoi
 };
 
 /** Routes every edge onto the shared coarse orthogonal track lattice. */
-export const routeFn = (
-	flow: LayoutInput,
-	positions: ReadonlyMap<string, LayoutNode>,
-): ReadonlyMap<string, ReadonlyArray<LayoutPoint>> => {
-	const nodeById = new Map(
-		flow.nodes.map(
-			(node) =>
-				[
-					node.id,
-					node,
-				] as const,
-		),
-	);
-	const routes = new Map<string, ReadonlyArray<LayoutPoint>>();
-	for (const edge of [
-		...flow.edges,
-	].sort((left, right) => left.id.localeCompare(right.id))) {
-		const sourceNode = nodeById.get(edge.source);
-		const targetNode = nodeById.get(edge.target);
-		const sourcePosition = positions.get(edge.source);
-		const targetPosition = positions.get(edge.target);
-		if (
-			sourceNode === undefined ||
-			targetNode === undefined ||
-			sourcePosition === undefined ||
-			targetPosition === undefined
-		)
-			throw new Error(`Cannot route flow edge ${edge.id}: missing endpoint layout data.`);
+export const routeFx = Effect.fn("routeFx")(
+	(flow: LayoutInput, positions: ReadonlyMap<string, LayoutNode>) =>
+		Effect.sync((): ReadonlyMap<string, ReadonlyArray<LayoutPoint>> => {
+			const nodeById = new Map(
+				flow.nodes.map(
+					(node) =>
+						[
+							node.id,
+							node,
+						] as const,
+				),
+			);
+			const routes = new Map<string, ReadonlyArray<LayoutPoint>>();
+			for (const edge of [
+				...flow.edges,
+			].sort((left, right) => Order.String(left.id, right.id))) {
+				const sourceNode = nodeById.get(edge.source);
+				const targetNode = nodeById.get(edge.target);
+				const sourcePosition = positions.get(edge.source);
+				const targetPosition = positions.get(edge.target);
+				if (
+					sourceNode === undefined ||
+					targetNode === undefined ||
+					sourcePosition === undefined ||
+					targetPosition === undefined
+				)
+					throw new Error(
+						`Cannot route flow edge ${edge.id}: missing endpoint layout data.`,
+					);
 
-		const source = readPortPoint(sourceNode, sourcePosition, edge.sourcePortId, "source");
-		const target = readPortPoint(targetNode, targetPosition, edge.targetPortId, "target");
-		const plan = readOrthogonalRoutePlan(
-			source,
-			target,
-			sourcePosition,
-			targetPosition,
-			edge.id,
-		);
-		routes.set(edge.id, readOrthogonalRoute(plan));
-	}
-	return routes;
-};
+				const source = readPortPoint(
+					sourceNode,
+					sourcePosition,
+					edge.sourcePortId,
+					"source",
+				);
+				const target = readPortPoint(
+					targetNode,
+					targetPosition,
+					edge.targetPortId,
+					"target",
+				);
+				const plan = readOrthogonalRoutePlan(
+					source,
+					target,
+					sourcePosition,
+					targetPosition,
+					edge.id,
+				);
+				routes.set(edge.id, readOrthogonalRoute(plan));
+			}
+			return routes;
+		}),
+);

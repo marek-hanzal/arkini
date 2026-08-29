@@ -1,3 +1,5 @@
+import { Effect } from "effect";
+
 import type { LayoutNode } from "~/ui/item/editor/origin-flow/Layout";
 import type { PlacedNode } from "~/ui/item/editor/origin-flow/PlacedNode";
 import type { LayoutProfile } from "~/ui/item/editor/origin-flow/Topology";
@@ -75,38 +77,41 @@ const relaxOverlaps = (nodes: MutableNodePosition[]) => {
 };
 
 /** Removes placement overlap and normalizes final flow positions into positive canvas space. */
-export const normalizePositionsFn = (
-	placed: ReadonlyArray<PlacedNode>,
-	profiles: ReadonlyMap<string, LayoutProfile>,
-	flowOrder: ReadonlyMap<string, number>,
-) => {
-	const relaxed = placed.map((node) => ({
-		...node,
-	}));
-	if (relaxed.length === 0) return new Map<string, LayoutNode>();
-	relaxOverlaps(relaxed);
+export const normalizePositionsFx = Effect.fn("normalizePositionsFx")(
+	(
+		placed: ReadonlyArray<PlacedNode>,
+		profiles: ReadonlyMap<string, LayoutProfile>,
+		flowOrder: ReadonlyMap<string, number>,
+	) =>
+		Effect.sync(() => {
+			const relaxed = placed.map((node) => ({
+				...node,
+			}));
+			if (relaxed.length === 0) return new Map<string, LayoutNode>();
+			relaxOverlaps(relaxed);
 
-	let minimumX = Number.POSITIVE_INFINITY;
-	let minimumY = Number.POSITIVE_INFINITY;
-	for (const node of relaxed) {
-		minimumX = Math.min(minimumX, node.x);
-		minimumY = Math.min(minimumY, node.y);
-	}
-	const shiftX = LayoutMargin - minimumX;
-	const shiftY = LayoutMargin - minimumY;
-	const positions = new Map<string, LayoutNode>();
-	for (const node of relaxed) {
-		const profile = profiles.get(node.id);
-		const order = flowOrder.get(node.id);
-		if (profile === undefined || order === undefined)
-			throw new Error(`Missing final flow layout data for ${node.id}.`);
-		positions.set(node.id, {
-			flowOrder: order,
-			height: node.height,
-			width: node.width,
-			x: node.x + shiftX,
-			y: node.y + shiftY,
-		});
-	}
-	return positions;
-};
+			let minimumX = Number.POSITIVE_INFINITY;
+			let minimumY = Number.POSITIVE_INFINITY;
+			for (const node of relaxed) {
+				minimumX = Math.min(minimumX, node.x);
+				minimumY = Math.min(minimumY, node.y);
+			}
+			const shiftX = LayoutMargin - minimumX;
+			const shiftY = LayoutMargin - minimumY;
+			const positions = new Map<string, LayoutNode>();
+			for (const node of relaxed) {
+				const profile = profiles.get(node.id);
+				const order = flowOrder.get(node.id);
+				if (profile === undefined || order === undefined)
+					throw new Error(`Missing final flow layout data for ${node.id}.`);
+				positions.set(node.id, {
+					flowOrder: order,
+					height: node.height,
+					width: node.width,
+					x: node.x + shiftX,
+					y: node.y + shiftY,
+				});
+			}
+			return positions;
+		}),
+);

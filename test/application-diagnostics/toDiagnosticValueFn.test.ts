@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { DiagnosticRecordSchema } from "../../electron/contract/diagnostics/DiagnosticRecord";
 import { toDiagnosticValueFn } from "~/application-diagnostics/fn/toDiagnosticValueFn";
 
 describe("toDiagnosticValueFn", () => {
@@ -25,6 +26,61 @@ describe("toDiagnosticValueFn", () => {
 		);
 
 		expect(toDiagnosticValueFn(unreadable)).toBe("[Unreadable: Error: reflection failed]");
+	});
+
+	it("preserves hostile object keys without changing the normalized record prototype", () => {
+		const hostile = Object.create(null) as Record<string, unknown>;
+		Object.defineProperty(hostile, "__proto__", {
+			value: "owned",
+			enumerable: true,
+		});
+
+		const normalized = toDiagnosticValueFn(hostile);
+
+		if (normalized === null || typeof normalized !== "object" || Array.isArray(normalized)) {
+			throw new Error("Expected a normalized diagnostic record.");
+		}
+		expect(Object.getPrototypeOf(normalized)).toBeNull();
+		expect(Object.hasOwn(normalized, "__proto__")).toBe(true);
+		expect(JSON.stringify(normalized)).toBe('{"__proto__":"owned"}');
+		expect(() =>
+			DiagnosticRecordSchema.parse({
+				level: "error",
+				category: [
+					"runtime",
+				],
+				event: "hostile-key",
+				data: normalized,
+			}),
+		).not.toThrow();
+	});
+
+	it("keeps long scalars and aggregate trees inside the diagnostic transport contract", () => {
+		const scalar = toDiagnosticValueFn(Symbol("x".repeat(9_000)));
+		const tree = toDiagnosticValueFn(
+			Array.from(
+				{
+					length: 100,
+				},
+				() => "\0".repeat(8_192),
+			),
+		);
+		const record = {
+			level: "error" as const,
+			category: [
+				"runtime",
+			],
+			event: "bounded-diagnostic",
+			data: {
+				scalar,
+				tree,
+			},
+		};
+
+		expect(typeof scalar).toBe("string");
+		expect((scalar as string).length).toBeLessThanOrEqual(8_192);
+		expect(JSON.stringify(record).length).toBeLessThan(65_536);
+		expect(() => DiagnosticRecordSchema.parse(record)).not.toThrow();
 	});
 
 	it("preserves an Error cause as structured diagnostic context", () => {

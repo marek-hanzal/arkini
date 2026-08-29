@@ -3,7 +3,6 @@ import { Effect } from "effect";
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readRuntimeItemDefaultAssetIdsFx } from "~/engine/item/read/readRuntimeItemDefaultAssetIdsFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace projectItemDetailReferenceFx {
@@ -29,9 +28,7 @@ export const projectItemDetailReferenceFx = Effect.fn("projectItemDetailReferenc
 	const live = preferredRuntimeItemIds
 		.map((runtimeItemId) => runtime.items.find((candidate) => candidate.id === runtimeItemId))
 		.find((candidate) => candidate?.item.id === itemId);
-	const sourceAssetIds = yield* readRuntimeItemDefaultAssetIdsFx({
-		item: configured,
-	});
+	const sourceAssetIds = configured.asset.default;
 	return {
 		itemId,
 		title: configured.title,

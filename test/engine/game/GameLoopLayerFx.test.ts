@@ -8,9 +8,9 @@ import { GameCoreLayerFx } from "~/engine/game/layer/GameCoreLayerFx";
 import { GameLoopLayerFx } from "~/engine/game/layer/GameLoopLayerFx";
 import { GameSessionLayerFx } from "~/engine/game/layer/GameSessionLayerFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
-import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
+import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { TickFx } from "~/engine/tick/context/TickFx";
 import { TickStepMs } from "~/engine/tick/TickStepMs";
 import { createTickFailureTestConfig } from "~test/tick/support/createTickFailureTestConfig";
@@ -79,10 +79,10 @@ describe("GameLoopLayerFx", () => {
 
 			yield* TestClock.adjust(TickStepMs * 2 - 1);
 			const beforeBoundary = yield* readRuntimeFx();
-			const transitionBeforeBoundary = yield* readCommittedTransitionFx();
+			const transitionBeforeBoundary = yield* (yield* CommittedTransitionsFx).read;
 			yield* TestClock.adjust(1);
 			const atBoundary = yield* readRuntimeFx();
-			const transitionAtBoundary = yield* readCommittedTransitionFx();
+			const transitionAtBoundary = yield* (yield* CommittedTransitionsFx).read;
 
 			expect(beforeBoundary.jobs[0]?.remainingMs).toBe(TickStepMs);
 			expect(beforeBoundary.items.some((item) => item.item.id === "inventoryOutput")).toBe(

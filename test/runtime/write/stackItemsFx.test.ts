@@ -1,12 +1,12 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { setDefaultLineFx } from "~/engine/line/write/setDefaultLineFx";
 import { readItemStackResolutionFn } from "~/engine/runtime/read/fn/readItemStackResolutionFn";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { stackItemsFx } from "~/engine/runtime/write/stackItemsFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { purityTestConfig } from "~test/line/support/purityTestConfig";
 

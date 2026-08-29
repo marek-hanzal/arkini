@@ -2,7 +2,7 @@ import { Effect, Option, Result } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { resolveActiveJobStatusFx } from "~/engine/job/fx/resolveActiveJobStatusFx";
 import type { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
-import { readItemQueueSizeFx } from "~/engine/job/read/readItemQueueSizeFx";
+import { readItemQueueSizeFn } from "~/engine/job/fn/readItemQueueSizeFn";
 import { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
 import { readLineOwnerLinesFn } from "~/engine/line/fn/readLineOwnerLinesFn";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
@@ -70,7 +70,7 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 	if (owner === undefined) return unavailable;
 	const lineOwner = isLineOwnerItemFn(owner.item);
 	if (Option.isNone(lineOwner)) return unavailable;
-	const capacity = yield* readItemQueueSizeFx({
+	const capacity = readItemQueueSizeFn({
 		item: lineOwner.value,
 	});
 	if (capacity === undefined) return unavailable;

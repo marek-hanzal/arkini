@@ -6,7 +6,7 @@ import { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
 import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 

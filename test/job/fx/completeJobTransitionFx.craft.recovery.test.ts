@@ -7,8 +7,8 @@ import type { JobSchema } from "~/engine/job/schema/JobSchema";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
 import { completeJobRuntimeForTestFx } from "~test/job/support/completeJobRuntimeForTestFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
@@ -172,7 +172,7 @@ describe("craft completion recovery", () => {
 					lineId: "line:craft:reserve",
 				});
 				const runtime = yield* readRuntimeFx();
-				const state = yield* fromRuntimeFx({
+				const state = fromRuntimeFn({
 					runtime,
 				});
 				const restored = yield* fromStateFx({

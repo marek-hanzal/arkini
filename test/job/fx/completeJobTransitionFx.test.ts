@@ -2,7 +2,7 @@ import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { attemptJobCompletionFx } from "~/engine/job/fx/attemptJobCompletionFx";
 import { makeJobCompletionRandomFx } from "~/engine/job/random/makeJobCompletionRandomFx";
 import type { JobSchema } from "~/engine/job/schema/JobSchema";

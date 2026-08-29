@@ -65,6 +65,14 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 		currentSpace: 0,
 	},
 	items: {
+		portal: {
+			...baseItem({
+				id: "portal",
+				scope: "board",
+			}),
+			type: "space",
+			space: 1,
+		},
 		origin: {
 			...baseItem({
 				id: "origin",

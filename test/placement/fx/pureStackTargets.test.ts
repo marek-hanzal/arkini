@@ -1,7 +1,7 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { applyPlacementPlanFx } from "~/engine/placement/fx/applyPlacementPlanFx";
 import { readAvailableStackItemsFn } from "~/engine/placement/fn/readAvailableStackItemsFn";

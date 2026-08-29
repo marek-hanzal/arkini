@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
-import { commitMergeItemsFx } from "~/engine/merge/internal/commitMergeItemsFx";
+import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
 import { makeDropActorRejectedResultFn } from "~/engine/runtime/drop/fn/makeDropActorRejectedResultFn";
 import { makeDropRejectedResultFn } from "~/engine/runtime/drop/fn/makeDropRejectedResultFn";
 import { projectDropActorCurrentFn } from "~/engine/runtime/drop/fn/projectDropActorCurrentFn";
@@ -37,7 +37,7 @@ export const commitMergeDropFx = Effect.fn("commitMergeDropFx")(function* ({
 				targetItemId,
 			}),
 		);
-	return yield* commitMergeItemsFx({
+	return yield* mergeItemsFx({
 		sourceItemId,
 		sourceRevision,
 		targetItemId,

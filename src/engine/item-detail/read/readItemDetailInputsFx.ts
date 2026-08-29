@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readLineInputDeliveryClaimsFx } from "~/engine/delivery/read/readLineInputDeliveryClaimsFx";
+import { readLineInputDeliveryClaimsFn } from "~/engine/delivery/fn/readLineInputDeliveryClaimsFn";
 import { readItemDetailChargeKeyFn } from "~/engine/item-detail/fn/readItemDetailChargeKeyFn";
 import type { ItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines";
 import { readItemDetailDepositAvailableChargesFx } from "~/engine/item-detail/read/readItemDetailDepositAvailableChargesFx";
@@ -56,12 +56,12 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 							resolution?.type === TypeSchema.enum.Materials
 								? resolution.storedQuantity
 								: storedItems.reduce((total, item) => total + item.quantity, 0);
-						const deliveryQuantity = (yield* readLineInputDeliveryClaimsFx({
+						const deliveryQuantity = readLineInputDeliveryClaimsFn({
 							inputIndex,
 							lineId,
 							ownerItemId,
 							runtime,
-						})).reduce((total, claim) => total + claim.quantity, 0);
+						}).reduce((total, claim) => total + claim.quantity, 0);
 						const maxStoredQuantity =
 							resolution?.type === TypeSchema.enum.Materials
 								? resolution.maxStoredQuantity

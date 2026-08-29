@@ -3,7 +3,6 @@ import { Effect } from "effect";
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
 import { projectItemDetailInputFx } from "~/ui/item-detail/projectItemDetailInputFx";
-import { projectItemDetailOutputRollFx } from "~/ui/item-detail/projectItemDetailOutputRollFx";
 import { projectItemDetailReferenceFx } from "~/ui/item-detail/projectItemDetailReferenceFx";
 import { projectItemDetailSelectorFn } from "~/ui/item-detail/fn/projectItemDetailSelectorFn";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -31,6 +30,95 @@ type ProjectedLineDisabledCause = Extract<
 		readonly kind: "line-disabled";
 	}
 >["cause"];
+
+const projectOutputItemFn = ({
+	game,
+	item,
+}: {
+	readonly game: GameEngine;
+	readonly item: readItemDetailLinesFx.OutputItem;
+}) => {
+	const configured = game.config.items[item.itemId];
+	if (configured === undefined) {
+		return {
+			itemId: item.itemId,
+			title: item.itemId,
+			quantity: item.quantity,
+			activeRuleHints: item.activeRuleHints,
+		} satisfies ItemDetailLines.OutputItem;
+	}
+	const sourceAssetIds = configured.asset.default;
+	return {
+		itemId: item.itemId,
+		title: configured.title,
+		quantity: item.quantity,
+		activeRuleHints: item.activeRuleHints,
+		sourceUrl: game.getResourceUrl(sourceAssetIds[0]),
+		...(sourceAssetIds[1] === undefined
+			? {}
+			: {
+					compositeUrl: game.getResourceUrl(sourceAssetIds[1]),
+				}),
+		definitionItemId: configured.id,
+	} satisfies ItemDetailLines.OutputItem;
+};
+
+const projectItemDetailOutputRollFn = ({
+	game,
+	roll,
+}: {
+	readonly game: GameEngine;
+	readonly roll: readItemDetailLinesFx.OutputRoll;
+}) =>
+	match(roll)
+		.with(
+			{
+				kind: "guaranteed",
+			},
+			(guaranteed) => ({
+				kind: "guaranteed" as const,
+				item: guaranteed.item.map((item) =>
+					projectOutputItemFn({
+						game,
+						item,
+					}),
+				),
+			}),
+		)
+		.with(
+			{
+				kind: "chance",
+			},
+			(chance) => ({
+				kind: "chance" as const,
+				chance: chance.chance,
+				item: chance.item.map((item) =>
+					projectOutputItemFn({
+						game,
+						item,
+					}),
+				),
+			}),
+		)
+		.with(
+			{
+				kind: "weight",
+			},
+			(weight) => ({
+				kind: "weight" as const,
+				selections: weight.selections,
+				option: weight.option.map((option) => ({
+					weight: option.weight,
+					item: option.item.map((item) =>
+						projectOutputItemFn({
+							game,
+							item,
+						}),
+					),
+				})),
+			}),
+		)
+		.exhaustive();
 
 const readQueryLocationLabel = (query: WhenSchema.Type["query"]) =>
 	match(query)
@@ -386,22 +474,16 @@ export const projectItemDetailLinesFx = Effect.fn("projectItemDetailLinesFx")(fu
 							}),
 						),
 					),
-					output: Effect.all(
-						line.output.map((set) =>
-							Effect.all(
-								set.roll.map((roll) =>
-									projectItemDetailOutputRollFx({
-										game,
-										roll,
-									}),
-								),
-							).pipe(
-								Effect.map((roll) => ({
-									weight: set.weight,
+					output: Effect.succeed(
+						line.output.map((set) => ({
+							weight: set.weight,
+							roll: set.roll.map((roll) =>
+								projectItemDetailOutputRollFn({
+									game,
 									roll,
-								})),
+								}),
 							),
-						),
+						})),
 					),
 				}).pipe(
 					Effect.map(({ availability, input, output }) => ({

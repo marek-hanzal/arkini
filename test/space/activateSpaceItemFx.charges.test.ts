@@ -10,17 +10,49 @@ import {
 	inventory,
 	readRuntimeFx,
 	run,
-	setCurrentSpaceFx,
 	spawnAndActivate,
 	spawnItemFx,
 } from "./activateSpaceItemFx.test/fixture";
 
 describe("Space item charge settlement", () => {
+	it("treats activation of the current space as an event-free same-runtime no-op", () => {
+		const result = run(
+			Effect.gen(function* () {
+				const portal = yield* spawnItemFx({
+					id: "runtime:same-space",
+					itemId: "sameSpacePortal",
+					location: inventory(0),
+					quantity: 1,
+				});
+				const before = yield* readRuntimeFx();
+				const activation = yield* activateSpaceItemWithTransitionFx({
+					currentSpace: before.currentSpace,
+					itemId: portal.id,
+					location: portal.location,
+					revision: portal.revision,
+				});
+				return {
+					after: yield* readRuntimeFx(),
+					activation,
+					before,
+				};
+			}),
+		);
+
+		expect(result.activation).toEqual({
+			result: 0,
+			transition: null,
+		});
+		expect(result.after).toBe(result.before);
+	});
+
 	it("spends only authored Action input charges and reserves self costs cumulatively", () => {
 		const success = run(
 			Effect.gen(function* () {
-				yield* setCurrentSpaceFx({
-					space: 4,
+				yield* spawnAndActivate({
+					id: "runtime:space-four-navigator",
+					itemId: "chargedPortal",
+					location: inventory(0),
 				});
 				return yield* spawnAndActivate({
 					id: "runtime:charged",
@@ -95,8 +127,11 @@ describe("Space item charge settlement", () => {
 					revision: portal.revision,
 				});
 				const after = yield* readRuntimeFx();
-				yield* setCurrentSpaceFx({
-					space: 10,
+				yield* spawnItemFx({
+					id: "runtime:later-commit",
+					itemId: "token",
+					location: inventory(3),
+					quantity: 1,
 				});
 				return {
 					after,

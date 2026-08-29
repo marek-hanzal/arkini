@@ -5,7 +5,7 @@ import { resolveOneHopOutputCapacityFx } from "~/engine/job/fx/read/resolveOneHo
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import {
 	runBlueprint,

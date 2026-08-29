@@ -9,12 +9,12 @@ import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { InputMaterialUnavailableError } from "~/engine/input/error/InputMaterialUnavailableError";
 import { applyInputMaterialStorePlanFx } from "~/engine/input/fx/applyInputMaterialStorePlanFx";
 import { planInputMaterialStoreFx } from "~/engine/input/fx/planInputMaterialStoreFx";
-import { filterInputSlotItemsFx } from "~/engine/input/read/filterInputSlotItemsFx";
+import { filterInputSlotItemsFn } from "~/engine/input/fn/filterInputSlotItemsFn";
 import { readItemMaterialInputFx } from "~/engine/input/read/readItemMaterialInputFx";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { LineInputClosedError } from "~/engine/line/error/LineInputClosedError";
-import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
+import { isLineInputClosedFn } from "~/engine/line/fn/isLineInputClosedFn";
 import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
@@ -184,7 +184,7 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				lineId,
 				ownerItemId,
 			});
-			const closed = yield* isLineInputClosedFx({
+			const closed = isLineInputClosedFn({
 				input,
 				ownerItemId,
 				lineId,
@@ -200,7 +200,7 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				);
 			}
 
-			const storedItems = yield* filterInputSlotItemsFx({
+			const storedItems = filterInputSlotItemsFn({
 				inputIndex,
 				items: runtime.items,
 				lineId,

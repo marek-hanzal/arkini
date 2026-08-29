@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
+import { readItemLineFn } from "~/engine/line/fn/readItemLineFn";
 import type { LineRun } from "~/engine/line/LineRun";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -49,7 +49,7 @@ export const resolveStartOutputCapacityFx = Effect.fn("resolveStartOutputCapacit
 		itemId: ownerItemId,
 		runtime,
 	});
-	const line = yield* readItemLineFx({
+	const line = readItemLineFn({
 		item: owner.item,
 		lineId,
 	});

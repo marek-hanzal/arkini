@@ -1,20 +1,18 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
-import { readOwnerJobQueueFx } from "~/engine/job/read/readOwnerJobQueueFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
+import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { TickFx } from "~/engine/tick/context/TickFx";
 import { advanceRuntimeStepFx } from "~/engine/tick/internal/advanceRuntimeStepFx";
-import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
-import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
+import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 import { existsWhen } from "~test/line/fx/support/lineTestRuntime";
 import {
@@ -101,22 +99,22 @@ describe("TickFx elapsed budget", () => {
 	it("does not commit stable idle ticks and advances again after an external command", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
-				const beforeIdle = yield* readCommittedTransitionFx();
+				const beforeIdle = yield* (yield* CommittedTransitionsFx).read;
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 2_000,
 				});
-				const afterIdle = yield* readCommittedTransitionFx();
+				const afterIdle = yield* (yield* CommittedTransitionsFx).read;
 
 				yield* prepareJobLineFx();
 				yield* startLineFx(props);
-				const afterCommand = yield* readCommittedTransitionFx();
+				const afterCommand = yield* (yield* CommittedTransitionsFx).read;
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
 				});
-				const afterRearmedTick = yield* readCommittedTransitionFx();
+				const afterRearmedTick = yield* (yield* CommittedTransitionsFx).read;
 
 				return {
 					afterCommand,
@@ -305,9 +303,7 @@ describe("runTickRuntimeByFx", () => {
 				yield* runTickRuntimeByFx({
 					elapsedMs: 500,
 				});
-				const paused = yield* readOwnerJobQueueFx({
-					ownerItemId: props.ownerItemId,
-				});
+				const paused = yield* readRuntimeFx();
 				yield* spawnItemFx({
 					id: "runtime:permit:return",
 					itemId: "permit",
@@ -324,9 +320,7 @@ describe("runTickRuntimeByFx", () => {
 				yield* runTickRuntimeByFx({
 					elapsedMs: 500,
 				});
-				const resumed = yield* readOwnerJobQueueFx({
-					ownerItemId: props.ownerItemId,
-				});
+				const resumed = yield* readRuntimeFx();
 				return {
 					paused,
 					resumed,
@@ -338,17 +332,11 @@ describe("runTickRuntimeByFx", () => {
 			),
 		);
 
-		expect(result.paused[0]).toMatchObject({
-			status: JobStatusEnumSchema.enum.Paused,
-			job: {
-				remainingMs: 1_000,
-			},
+		expect(result.paused.jobs[0]).toMatchObject({
+			remainingMs: 1_000,
 		});
-		expect(result.resumed[0]).toMatchObject({
-			status: JobStatusEnumSchema.enum.Running,
-			job: {
-				remainingMs: 500,
-			},
+		expect(result.resumed.jobs[0]).toMatchObject({
+			remainingMs: 500,
 		});
 	});
 });

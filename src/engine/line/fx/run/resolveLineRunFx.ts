@@ -1,21 +1,22 @@
 import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { TimeSchema } from "~/engine/common/schema/TimeSchema";
 import { resolveInputRunFx } from "~/engine/input/fx/run/resolveInputRunFx";
 import type { InputRun } from "~/engine/input/InputRun";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
 import { LineNotFoundError } from "~/engine/line/error/LineNotFoundError";
 import { lineRulesFx } from "~/engine/line/fx/lineRulesFx";
-import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
+import { readItemLineFn } from "~/engine/line/fn/readItemLineFn";
+import { resolveLineEnableFn } from "~/engine/line/fn/resolveLineEnableFn";
+import { resolveLineShowFn } from "~/engine/line/fn/resolveLineShowFn";
 import type { LineRun } from "~/engine/line/LineRun";
+import type { LineSchema } from "~/engine/line/schema/LineSchema";
+import { TypeSchema as LineRuleTypeSchema } from "~/engine/line/schema/rule/TypeSchema";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { planLineRunFx } from "./planLineRunFx";
-import { resolveLineEnableFx } from "./resolveLineEnableFx";
-import { resolveLineRuntimeFx } from "./resolveLineRuntimeFx";
-import { resolveLineShowFx } from "./resolveLineShowFx";
 
 export namespace resolveLineRunFx {
 	export interface Props {
@@ -24,6 +25,71 @@ export namespace resolveLineRunFx {
 		runtime: RuntimeSchema.Type;
 	}
 }
+
+const planLineRunFn = ({
+	enable,
+	input,
+	lineId,
+	ownerItemId,
+	runtimeMs,
+}: {
+	readonly enable: boolean;
+	readonly input: readonly [
+		InputRun.Resolution,
+		...InputRun.Resolution[],
+	];
+	readonly lineId: IdSchema.Type;
+	readonly ownerItemId: IdSchema.Type;
+	readonly runtimeMs: TimeSchema.Type;
+}) => {
+	if (!enable || input.some(({ resolution }) => !resolution.ready)) return undefined;
+
+	const inputPlans: InputRun.Plan[] = [];
+	for (const { plan } of input) {
+		if (plan === undefined) return undefined;
+		inputPlans.push(plan);
+	}
+	const [firstInputPlan, ...remainingInputPlans] = inputPlans;
+	if (firstInputPlan === undefined) return undefined;
+
+	return {
+		ownerItemId,
+		lineId,
+		runtimeMs,
+		input: [
+			firstInputPlan,
+			...remainingInputPlans,
+		],
+	} satisfies LineRun.Plan;
+};
+
+const resolveLineRuntimeFn = ({
+	line,
+	rules,
+}: {
+	readonly line: Pick<LineSchema.Type, "runtimeMs">;
+	readonly rules: lineRulesFx.Result;
+}) => {
+	const multiplier = rules.reduce(
+		(value, rule) =>
+			rule.type === LineRuleTypeSchema.enum.RuntimeMultiplier && rule.active
+				? value * rule.multiplier
+				: value,
+		1,
+	);
+	const adjustmentMs = rules.reduce(
+		(value, rule) =>
+			rule.type === LineRuleTypeSchema.enum.RuntimeAdjust && rule.active
+				? value + rule.adjustMs
+				: value,
+		0,
+	);
+
+	return Math.max(
+		0,
+		Math.ceil(line.runtimeMs * multiplier + adjustmentMs),
+	) satisfies TimeSchema.Type;
+};
 
 /**
  * Resolves one line run against one explicit immutable runtime snapshot.
@@ -50,7 +116,7 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 		);
 	}
 
-	const line = yield* readItemLineFx({
+	const line = readItemLineFn({
 		item: owner.item,
 		lineId,
 	});
@@ -71,15 +137,15 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 			read: Effect.succeed(runtime),
 		}),
 	);
-	const show = yield* resolveLineShowFx({
+	const show = resolveLineShowFn({
 		line,
 		rules,
 	});
-	const enable = yield* resolveLineEnableFx({
+	const enable = resolveLineEnableFn({
 		line,
 		rules,
 	});
-	const runtimeMs = yield* resolveLineRuntimeFx({
+	const runtimeMs = resolveLineRuntimeFn({
 		line,
 		rules,
 	});
@@ -115,7 +181,7 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 		InputRun.Resolution,
 		...InputRun.Resolution[],
 	];
-	const plan = yield* planLineRunFx({
+	const plan = planLineRunFn({
 		enable,
 		input,
 		lineId,

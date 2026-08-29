@@ -1,13 +1,12 @@
 import { Effect, type Layer } from "effect";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { activateSpaceItemFx } from "~/engine/space/write/activateSpaceItemFx";
-import { setCurrentSpaceFx } from "~/engine/space/write/setCurrentSpaceFx";
 
 const baseItem = (id: string, scope: "any" | "board" | "inventory" = "any") => ({
 	uid: `uid:${id}`,
@@ -69,6 +68,11 @@ export const config = GameConfigSchema.parse({
 		currentSpace: 0,
 	},
 	items: {
+		sameSpacePortal: {
+			...baseItem("sameSpacePortal", "inventory"),
+			type: "space",
+			space: 0,
+		},
 		portal: {
 			...baseItem("portal"),
 			type: "space",
@@ -365,4 +369,4 @@ export const spawnAndActivate = Effect.fn("spawnAndActivate")(function* ({
 	};
 });
 
-export { Effect, activateSpaceItemFx, readRuntimeFx, setCurrentSpaceFx, spawnItemFx };
+export { Effect, activateSpaceItemFx, readRuntimeFx, spawnItemFx };

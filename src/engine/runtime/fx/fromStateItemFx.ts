@@ -15,8 +15,7 @@ export namespace fromStateItemFx {
 /**
  * Builds one runtime item from persisted gameplay state with a fresh session revision.
  *
- * Counterpart: `fromRuntimeItemFx` in `~/engine/state/fx/fromRuntimeItemFx`
- * builds state from this runtime item.
+ * Counterpart: `fromRuntimeFn` projects runtime items back into persisted state.
  */
 export const fromStateItemFx = Effect.fn("fromStateItemFx")(function* ({
 	state,

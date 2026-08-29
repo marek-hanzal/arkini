@@ -2,15 +2,15 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
-import { useGameFx } from "~/engine/game/fx/useGameFx";
-import { autofillLineInputsFx } from "~/engine/input/write/autofillLineInputsFx";
+import { useGameFx } from "~test/support/game/useGameFx";
+import { autofillLineInputsFx } from "~test/support/input/autofillLineInputsFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { readItemDetailMaterialAutofillAvailabilityFx } from "~/engine/item-detail/read/readItemDetailMaterialAutofillAvailabilityFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
-import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 
 const baseItem = (id: string) =>
 	({

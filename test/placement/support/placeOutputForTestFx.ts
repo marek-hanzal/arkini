@@ -4,8 +4,8 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { outputFx } from "~/engine/output/fx/outputFx";
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
-import { readPlacementOriginFx } from "~/engine/placement/fx/readPlacementOriginFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
+import { readBoardRuntimeItemByIdFx } from "~/engine/runtime/read/readBoardRuntimeItemByIdFx";
 
 export namespace placeOutputForTestFx {
 	export interface Props {
@@ -23,8 +23,8 @@ export const placeOutputForTestFx = Effect.fn("placeOutputForTestFx")(function* 
 }: placeOutputForTestFx.Props) {
 	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
-			const origin = yield* readPlacementOriginFx({
-				originItemId,
+			const origin = yield* readBoardRuntimeItemByIdFx({
+				itemId: originItemId,
 				runtime,
 			});
 			const resolved = yield* outputFx({

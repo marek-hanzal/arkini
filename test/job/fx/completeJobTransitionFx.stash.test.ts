@@ -1,17 +1,17 @@
 import { Effect, type Layer, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
-import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
+import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 import { completeJobRuntimeForTestFx } from "~test/job/support/completeJobRuntimeForTestFx";
 
 const value = (value: number) => ({
@@ -362,7 +362,7 @@ describe("stash line completion transition", () => {
 					lineId: "line:stash:guaranteed",
 				});
 				const runtime = yield* readRuntimeFx();
-				const state = yield* fromRuntimeFx({
+				const state = fromRuntimeFn({
 					runtime,
 				});
 				const restored = yield* fromStateFx({

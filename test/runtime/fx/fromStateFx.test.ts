@@ -1,13 +1,11 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { StateSchema } from "~/engine/state/schema/StateSchema";
-import { getItemAtFx } from "~/engine/runtime/read/getItemAtFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
+import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 
 const config = GameConfigSchema.parse({
@@ -99,82 +97,6 @@ describe("fromStateFx", () => {
 		expect(runtime.items).toEqual([]);
 	});
 
-	it("atomically spawns and reads an item through its owned location", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const placed = yield* spawnItemFx({
-					id: "runtime:placed:tree",
-					itemId: "tree",
-					location: {
-						scope: "board",
-						space: 0,
-						position: {
-							x: 2,
-							y: 1,
-						},
-					},
-					quantity: 1,
-				});
-				const read = yield* getItemAtFx({
-					location: placed.location,
-				});
-
-				return {
-					placed,
-					read,
-				};
-			}).pipe(
-				useGameFx({
-					config,
-				}),
-			),
-		);
-
-		expect(result.placed).toBe(result.read);
-		expect(result.read.location).toEqual({
-			scope: "board",
-			space: 0,
-			position: {
-				x: 2,
-				y: 1,
-			},
-		});
-	});
-
-	it("uses the central item-not-found error for an empty runtime cell", () => {
-		const result = Effect.runSync(
-			Effect.result(
-				getItemAtFx({
-					location: {
-						scope: "inventory",
-						position: {
-							x: 4,
-							y: 3,
-						},
-					},
-				}),
-			).pipe(
-				useGameFx({
-					config,
-				}),
-			),
-		);
-
-		expect(Result.isFailure(result)).toBe(true);
-		if (Result.isFailure(result)) {
-			expect(result.failure).toMatchObject({
-				_tag: "ItemNotFoundError",
-				location: {
-					scope: "inventory",
-					position: {
-						x: 4,
-						y: 3,
-					},
-				},
-			});
-		}
-	});
-
 	it("builds every runtime item with the original canonical game object", () => {
 		const runtime = Effect.runSync(
 			fromStateFx({
@@ -202,7 +124,7 @@ describe("fromStateFx", () => {
 				const secondRuntime = yield* fromStateFx({
 					state,
 				});
-				const dehydrated = yield* fromRuntimeFx({
+				const dehydrated = fromRuntimeFn({
 					runtime: firstRuntime,
 				});
 

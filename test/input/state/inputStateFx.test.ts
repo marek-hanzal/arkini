@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
 import {
 	inputRuntimeTestConfig,
 	sourceLocation,
@@ -39,13 +39,13 @@ describe("input state", () => {
 				});
 
 				const runtime = yield* readRuntimeFx();
-				const state = yield* fromRuntimeFx({
+				const state = fromRuntimeFn({
 					runtime,
 				});
 				const restored = yield* fromStateFx({
 					state,
 				});
-				const restoredState = yield* fromRuntimeFx({
+				const restoredState = fromRuntimeFn({
 					runtime: restored,
 				});
 

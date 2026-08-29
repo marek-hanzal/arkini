@@ -1,15 +1,14 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
-import { setItemQuantityFx } from "~/engine/runtime/write/setItemQuantityFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 
 describe("job-scoped runtime commands", () => {
-	it("rejects generic removal and quantity mutation of reserved material", () => {
+	it("rejects generic removal of reserved material", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* prepareJobLineFx();
@@ -29,19 +28,10 @@ describe("job-scoped runtime commands", () => {
 						revision: reserved.revision,
 					}),
 				);
-				const quantity = yield* Effect.result(
-					setItemQuantityFx({
-						itemId: reserved.id,
-						quantity: reserved.quantity + 1,
-						revision: reserved.revision,
-					}),
-				);
-
 				return {
 					after: yield* readRuntimeFx(),
 					before,
 					jobId: reserved.location.jobId,
-					quantity,
 					removed,
 					reservedItemId: reserved.id,
 				};
@@ -52,18 +42,13 @@ describe("job-scoped runtime commands", () => {
 			),
 		);
 
-		for (const command of [
-			result.removed,
-			result.quantity,
-		]) {
-			expect(Result.isFailure(command)).toBe(true);
-			if (Result.isFailure(command)) {
-				expect(command.failure).toMatchObject({
-					_tag: "ItemJobScopedError",
-					itemId: result.reservedItemId,
-					jobId: result.jobId,
-				});
-			}
+		expect(Result.isFailure(result.removed)).toBe(true);
+		if (Result.isFailure(result.removed)) {
+			expect(result.removed.failure).toMatchObject({
+				_tag: "ItemJobScopedError",
+				itemId: result.reservedItemId,
+				jobId: result.jobId,
+			});
 		}
 		expect(result.after).toEqual(result.before);
 	});

@@ -4,7 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { JobQueueFullError } from "~/engine/job/error/JobQueueFullError";
 import { assertLineEnqueueConditionsFx } from "~/engine/job/fx/assertLineEnqueueConditionsFx";
-import { createJobQueueRequestFx } from "~/engine/job/fx/createJobQueueRequestFx";
+import { createJobIdFx } from "~/engine/job/fx/createJobIdFx";
 import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
 import type { JobQueueRequestSchema } from "~/engine/job/schema/JobQueueRequestSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -56,10 +56,11 @@ export const enqueueLineRuntimeFx = Effect.fn("enqueueLineRuntimeFx")(function* 
 		resolution,
 		runtime,
 	});
-	const request = yield* createJobQueueRequestFx({
+	const request = {
+		id: yield* createJobIdFx(),
 		ownerItemId,
 		lineId,
-	});
+	} satisfies JobQueueRequestSchema.Type;
 	const isolation = yield* isolateStatefulOwnerTransitionFx({
 		ownerItemId,
 		runtime: {

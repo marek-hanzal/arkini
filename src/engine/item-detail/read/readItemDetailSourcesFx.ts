@@ -5,7 +5,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { lineRulesFx } from "~/engine/line/fx/lineRulesFx";
-import { resolveLineShowFx } from "~/engine/line/fx/run/resolveLineShowFx";
+import { resolveLineShowFn } from "~/engine/line/fn/resolveLineShowFn";
 import { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
 import { readLineOwnerLinesFn } from "~/engine/line/fn/readLineOwnerLinesFn";
 import { TypeSchema as LineRuleTypeSchema } from "~/engine/line/schema/rule/TypeSchema";
@@ -246,7 +246,7 @@ const readOwnedSourcesFx = Effect.fn("readOwnedItemDetailSourcesFx")(function* (
 							read: Effect.succeed(runtime),
 						}),
 					);
-					visible = yield* resolveLineShowFx({
+					visible = resolveLineShowFn({
 						line,
 						rules,
 					});

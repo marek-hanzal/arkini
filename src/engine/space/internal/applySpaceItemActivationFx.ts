@@ -3,6 +3,8 @@ import { Effect, Option } from "effect";
 import { settleActionChargesFx } from "~/engine/action/fx/settleActionChargesFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+import type { CurrentSpaceChangedGameEventSchema } from "~/engine/event/schema/CurrentSpaceChangedGameEventSchema";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
@@ -12,7 +14,6 @@ import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemF
 import { readValidatedRuntimeItemFx } from "~/engine/runtime/read/readValidatedRuntimeItemFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { CurrentSpaceConflictError } from "~/engine/space/error/CurrentSpaceConflictError";
-import { setCurrentSpaceRuntimeFx } from "~/engine/space/internal/setCurrentSpaceRuntimeFx";
 import { resolveSpaceActionFx } from "~/engine/space/read/resolveSpaceActionFx";
 
 export namespace applySpaceItemActivationFx {
@@ -24,6 +25,34 @@ export namespace applySpaceItemActivationFx {
 		readonly revision: RevisionSchema.Type;
 	}
 }
+
+const setCurrentSpaceFn = ({
+	runtime,
+	space,
+}: {
+	readonly runtime: RuntimeSchema.Type;
+	readonly space: NonNegativeIntegerSchema.Type;
+}) => {
+	if (runtime.currentSpace === space) {
+		return {
+			events: [] as CurrentSpaceChangedGameEventSchema.Type[],
+			runtime,
+		};
+	}
+	return {
+		events: [
+			{
+				type: GameEventEnumSchema.enum.CurrentSpaceChanged,
+				previousSpace: runtime.currentSpace,
+				currentSpace: space,
+			} satisfies CurrentSpaceChangedGameEventSchema.Type,
+		],
+		runtime: {
+			...runtime,
+			currentSpace: space,
+		} satisfies RuntimeSchema.Type,
+	};
+};
 
 /** Applies the shared authoritative transaction body for one Space activation. */
 export const applySpaceItemActivationFx = Effect.fn("applySpaceItemActivationFx")(function* ({
@@ -80,7 +109,7 @@ export const applySpaceItemActivationFx = Effect.fn("applySpaceItemActivationFx"
 		ownerItemId: plan.ownerItemId,
 		runtime,
 	});
-	const navigation = yield* setCurrentSpaceRuntimeFx({
+	const navigation = setCurrentSpaceFn({
 		runtime: settlement.runtime,
 		space: plan.space,
 	});

@@ -2,18 +2,17 @@ import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
 import { Effect, Result, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
-import { readLineRunFx } from "~/engine/line/fx/run/readLineRunFx";
+import { resolveLineRunFx } from "~/engine/line/fx/run/resolveLineRunFx";
 import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
 import { queryFx } from "~/engine/query/fx/queryFx";
 import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
-import { getItemAtFx } from "~/engine/runtime/read/getItemAtFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { swapItemsFx } from "~/engine/runtime/write/swapItemsFx";
-import { setCurrentSpaceFx } from "~/engine/space/write/setCurrentSpaceFx";
+import { activateSpaceItemFx } from "~/engine/space/write/activateSpaceItemFx";
 import {
 	boardLocation,
 	inventoryLocation,
@@ -61,12 +60,8 @@ describe("multi-space spatial isolation", () => {
 
 				return {
 					checked,
-					first: yield* getItemAtFx({
-						location: first.location,
-					}),
-					second: yield* getItemAtFx({
-						location: second.location,
-					}),
+					first,
+					second,
 				};
 			}).pipe(useTestGame),
 		);
@@ -160,9 +155,10 @@ describe("multi-space spatial isolation", () => {
 					location: boardLocation(0, 1),
 					quantity: 1,
 				});
-				const remoteOnly = yield* readLineRunFx({
+				const remoteOnly = yield* resolveLineRunFx({
 					ownerItemId: owner.id,
 					lineId: "line:deposit:run",
+					runtime: yield* readRuntimeFx(),
 				});
 				yield* spawnItemFx({
 					id: "runtime:local-payer",
@@ -170,9 +166,10 @@ describe("multi-space spatial isolation", () => {
 					location: boardLocation(1, 1),
 					quantity: 1,
 				});
-				const local = yield* readLineRunFx({
+				const local = yield* resolveLineRunFx({
 					ownerItemId: owner.id,
 					lineId: "line:deposit:run",
+					runtime: yield* readRuntimeFx(),
 				});
 
 				return {
@@ -441,8 +438,18 @@ describe("multi-space spatial isolation", () => {
 						location: boardLocation(1, 0),
 					}),
 				);
-				yield* setCurrentSpaceFx({
-					space: 1,
+				const portal = yield* spawnItemFx({
+					id: "runtime:portal",
+					itemId: "portal",
+					location: boardLocation(0, 0),
+					quantity: 1,
+				});
+				const beforeNavigation = yield* readRuntimeFx();
+				yield* activateSpaceItemFx({
+					currentSpace: beforeNavigation.currentSpace,
+					itemId: portal.id,
+					location: portal.location,
+					revision: portal.revision,
 				});
 				const placed = yield* moveItemFx({
 					itemId: item.id,

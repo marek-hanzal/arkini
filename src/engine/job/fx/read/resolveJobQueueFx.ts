@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import type { JobQueueResolutionSchema } from "~/engine/job/schema/read/JobQueueResolutionSchema";
-import { filterOwnerJobsFx } from "~/engine/job/read/filterOwnerJobsFx";
-import { readItemQueueSizeFx } from "~/engine/job/read/readItemQueueSizeFx";
+import { readItemQueueSizeFn } from "~/engine/job/fn/readItemQueueSizeFn";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 export namespace resolveJobQueueFx {
@@ -14,7 +13,7 @@ export const resolveJobQueueFx = Effect.fn("resolveJobQueueFx")(function* ({
 	runtime,
 	owner,
 }: resolveJobQueueFx.Props) {
-	const capacity = yield* readItemQueueSizeFx({
+	const capacity = readItemQueueSizeFn({
 		item: owner.item,
 	});
 	if (capacity === undefined)
@@ -23,10 +22,7 @@ export const resolveJobQueueFx = Effect.fn("resolveJobQueueFx")(function* ({
 				`Runtime item ${owner.id} owns a line but does not define job queue capacity.`,
 			),
 		);
-	const jobs = yield* filterOwnerJobsFx({
-		jobs: runtime.jobs,
-		ownerItemId: owner.id,
-	});
+	const jobs = runtime.jobs.filter((job) => job.ownerItemId === owner.id);
 	const requests = runtime.jobQueue.filter((request) => request.ownerItemId === owner.id);
 	const used = jobs.length + requests.length;
 	return {

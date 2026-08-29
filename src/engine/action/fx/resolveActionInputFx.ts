@@ -6,8 +6,6 @@ import { resolveActionDepositInputFx } from "~/engine/action/fx/resolveActionDep
 import type { InputSchema } from "~/engine/action/schema/InputSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { InputRun } from "~/engine/input/InputRun";
-import { resolveInputSimpleFx } from "~/engine/input/fx/resolveInputSimpleFx";
-import { planInputSimpleRunFx } from "~/engine/input/fx/run/planInputSimpleRunFx";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -30,9 +28,6 @@ export const resolveActionInputFx = Effect.fn("resolveActionInputFx")(function* 
 			},
 			(input) =>
 				Effect.gen(function* () {
-					const baseResolution = yield* resolveInputSimpleFx({
-						input,
-					});
 					const charges = yield* resolveActionChargeFx({
 						charges: input.charges,
 						ownerItemId,
@@ -41,14 +36,14 @@ export const resolveActionInputFx = Effect.fn("resolveActionInputFx")(function* 
 					});
 					return {
 						resolution: {
-							...baseResolution,
+							type: input.type,
 							ready: charges.ready,
 						},
 						plan: charges.ready
-							? yield* planInputSimpleRunFx({
-									input,
+							? {
+									type: input.type,
 									charges: charges.plan,
-								})
+								}
 							: undefined,
 					} satisfies InputRun.Resolution;
 				}),

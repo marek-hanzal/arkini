@@ -1,7 +1,7 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
 import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import { setDefaultLineFx } from "~/engine/line/write/setDefaultLineFx";
@@ -11,9 +11,9 @@ import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
+import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
 import { startFx } from "~/engine/start/write/startFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { DefaultLineIssueReasonEnumSchema } from "~/engine/line/schema/check/DefaultLineIssueReasonEnumSchema";
 
@@ -199,7 +199,7 @@ describe("setDefaultLineFx", () => {
 					item: runtime.items[0]!,
 					runtime,
 				});
-				const state = yield* fromRuntimeFx({
+				const state = fromRuntimeFn({
 					runtime,
 				});
 				const restored = yield* fromStateFx({
@@ -267,7 +267,7 @@ describe("setDefaultLineFx", () => {
 					item: runtime.items[0]!,
 					runtime,
 				});
-				const state = yield* fromRuntimeFx({
+				const state = fromRuntimeFn({
 					runtime,
 				});
 				const restored = yield* fromStateFx({

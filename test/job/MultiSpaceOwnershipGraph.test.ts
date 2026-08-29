@@ -1,17 +1,15 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
-import { readOwnerJobQueueFx } from "~/engine/job/read/readOwnerJobQueueFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { setCurrentSpaceFx } from "~/engine/space/write/setCurrentSpaceFx";
-import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { activateSpaceItemFx } from "~/engine/space/write/activateSpaceItemFx";
+import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
-import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
 const ownerItemId = "runtime:forge";
 const lineId = "line:forge:run";
@@ -25,6 +23,15 @@ const createConfig = (scope: "any" | "universe") => {
 		...base,
 		items: {
 			...base.items,
+			portal: {
+				...base.items.tool,
+				uid: "portal",
+				id: "portal",
+				title: "Portal",
+				description: "Moves the active board to the destination space.",
+				type: "space",
+				space: 1,
+			},
 			permit: {
 				...base.items.tool,
 				uid: "permit",
@@ -113,8 +120,24 @@ const moveOwnerToSpaceFx = Effect.fn("moveOwnerToSpaceFx")(function* (space: num
 			},
 		},
 	});
-	yield* setCurrentSpaceFx({
-		space,
+	const portal = yield* spawnItemFx({
+		id: "runtime:portal",
+		itemId: "portal",
+		location: {
+			scope: "board",
+			space: runtime.currentSpace,
+			position: {
+				x: 0,
+				y: 0,
+			},
+		},
+		quantity: 1,
+	});
+	yield* activateSpaceItemFx({
+		currentSpace: runtime.currentSpace,
+		itemId: portal.id,
+		location: portal.location,
+		revision: portal.revision,
 	});
 	runtime = yield* readRuntimeFx();
 	owner = runtime.items.find((item) => item.id === ownerItemId);
@@ -203,9 +226,7 @@ describe("multi-space owner ownership graph", () => {
 				yield* runTickRuntimeByFx({
 					elapsedMs: 600,
 				});
-				return yield* readOwnerJobQueueFx({
-					ownerItemId,
-				});
+				return yield* readRuntimeFx();
 			}).pipe(
 				useGameFx({
 					config: createConfig("any"),
@@ -213,12 +234,9 @@ describe("multi-space owner ownership graph", () => {
 			),
 		);
 
-		expect(result).toEqual([
+		expect(result.jobs).toEqual([
 			expect.objectContaining({
-				status: JobStatusEnumSchema.enum.Paused,
-				job: expect.objectContaining({
-					remainingMs: 600,
-				}),
+				remainingMs: 600,
 			}),
 		]);
 	});

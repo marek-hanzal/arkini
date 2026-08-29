@@ -4,7 +4,7 @@ import type { EditorProject } from "~/editor/EditorProject";
 import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
 import type { EditorBoardGame } from "~/renderer/editor/board/EditorBoardGame";
 import { encodeArkiniSaveFn } from "~/engine/save/fn/encodeArkiniSaveFn";
-import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
+import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
 
 export namespace saveEditorBoardScenarioFx {
 	export interface Props {
@@ -20,7 +20,7 @@ export const saveEditorBoardScenarioFx = Effect.fn("saveEditorBoardScenarioFx")(
 	name,
 	project,
 }: saveEditorBoardScenarioFx.Props) {
-	const state = yield* fromRuntimeFx({
+	const state = fromRuntimeFn({
 		runtime: game.getSnapshot(),
 	});
 	const bytes = encodeArkiniSaveFn({

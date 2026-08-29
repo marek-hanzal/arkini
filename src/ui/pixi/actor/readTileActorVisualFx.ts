@@ -3,7 +3,6 @@ import { Effect } from "effect";
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { TileActorVisual } from "~/ui/pixi/actor/TileActorVisual";
 import type { AssetSchema } from "~/engine/item/schema/AssetSchema";
-import { readRuntimeItemDefaultAssetIdsFx } from "~/engine/item/read/readRuntimeItemDefaultAssetIdsFx";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 
 export namespace readTileActorVisualFx {
@@ -20,11 +19,7 @@ export const readTileActorVisualFx = Effect.fn("readTileActorVisualFx")(function
 	item,
 	sourceIds: requestedSourceIds,
 }: readTileActorVisualFx.Props) {
-	const sourceIds =
-		requestedSourceIds ??
-		(yield* readRuntimeItemDefaultAssetIdsFx({
-			item,
-		}));
+	const sourceIds = requestedSourceIds ?? item.asset.default;
 	return {
 		itemId: item.id,
 		title: item.title,

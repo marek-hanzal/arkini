@@ -1,16 +1,16 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { settleItemDeliveryFx } from "~/engine/delivery/write/settleItemDeliveryFx";
-import { useGameFx } from "~/engine/game/fx/useGameFx";
-import { autofillLineInputsFx } from "~/engine/input/write/autofillLineInputsFx";
+import { settleItemDeliveryFx } from "~test/support/delivery/settleItemDeliveryFx";
+import { useGameFx } from "~test/support/game/useGameFx";
+import { autofillLineInputsFx } from "~test/support/input/autofillLineInputsFx";
 import { getItemFx } from "~/engine/runtime/read/getItemFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
-import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
+import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import {
 	inputRuntimeTestConfig,
@@ -108,7 +108,7 @@ describe("settleItemDeliveryFx", () => {
 					generation: 0,
 				});
 				const afterContact = yield* readRuntimeFx();
-				const returningState = yield* fromRuntimeFx({
+				const returningState = fromRuntimeFn({
 					runtime: afterContact,
 				});
 				const hydratedReturning = yield* fromStateFx({
@@ -304,7 +304,7 @@ describe("settleItemDeliveryFx", () => {
 					lineId,
 				});
 				const before = yield* readRuntimeFx();
-				const state = yield* fromRuntimeFx({
+				const state = fromRuntimeFn({
 					runtime: before,
 				});
 				const hydrated = yield* fromStateFx({

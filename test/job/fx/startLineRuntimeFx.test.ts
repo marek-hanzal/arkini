@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { startLineRuntimeFx } from "~/engine/job/fx/startLineRuntimeFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";

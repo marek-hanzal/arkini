@@ -1,21 +1,19 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
-import { readOwnerJobQueueFx } from "~/engine/job/read/readOwnerJobQueueFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { releaseInventoryItemFx } from "~/engine/runtime/write/releaseInventoryItemFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { storeItemInInventoryFx } from "~/engine/runtime/write/storeItemInInventoryFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
-import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
 const ownerItemId = "runtime:forge";
 const lineId = "line:forge:run";
@@ -158,9 +156,7 @@ describe("job owner inventory contract", () => {
 				yield* runTickRuntimeByFx({
 					elapsedMs: 5_000,
 				});
-				const paused = yield* readOwnerJobQueueFx({
-					ownerItemId,
-				});
+				const paused = yield* readRuntimeFx();
 				yield* moveOwnerFx("board");
 				yield* runTickRuntimeByFx({
 					elapsedMs: 600,
@@ -176,12 +172,9 @@ describe("job owner inventory contract", () => {
 			),
 		);
 
-		expect(result.paused).toEqual([
+		expect(result.paused.jobs).toEqual([
 			expect.objectContaining({
-				status: JobStatusEnumSchema.enum.Paused,
-				job: expect.objectContaining({
-					remainingMs: 600,
-				}),
+				remainingMs: 600,
 			}),
 		]);
 		expect(result.resumed.jobs).toEqual([]);
@@ -283,9 +276,7 @@ describe("job owner inventory contract", () => {
 				yield* runTickRuntimeByFx({
 					elapsedMs: 2_000,
 				});
-				const paused = yield* readOwnerJobQueueFx({
-					ownerItemId,
-				});
+				const paused = yield* readRuntimeFx();
 				const inventoryRuntime = yield* readRuntimeFx();
 				yield* moveOwnerFx("board");
 				yield* runTickRuntimeByFx({
@@ -303,12 +294,9 @@ describe("job owner inventory contract", () => {
 			),
 		);
 
-		expect(result.paused).toEqual([
+		expect(result.paused.jobs).toEqual([
 			expect.objectContaining({
-				status: JobStatusEnumSchema.enum.Paused,
-				job: expect.objectContaining({
-					remainingMs: 0,
-				}),
+				remainingMs: 0,
 			}),
 		]);
 		expect(result.inventoryRuntime.jobs).toHaveLength(1);

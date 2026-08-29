@@ -8,8 +8,8 @@ import { setInstantGameplayFx } from "~/engine/cheat/write/setInstantGameplayFx"
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 import { TickStepMs } from "~/engine/tick/TickStepMs";
 
 const lineId = "line:forge:run";

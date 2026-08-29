@@ -11,8 +11,8 @@ import type { JobQueueExceededIssueSchema } from "~/engine/job/schema/JobQueueEx
 import type { JobConsumedMaterialStateIssueSchema } from "~/engine/job/schema/JobConsumedMaterialStateIssueSchema";
 import type { JobMaterialOrphanIssueSchema } from "~/engine/job/schema/JobMaterialOrphanIssueSchema";
 import type { JobTimeInvalidIssueSchema } from "~/engine/job/schema/JobTimeInvalidIssueSchema";
-import { readItemQueueSizeFx } from "~/engine/job/read/readItemQueueSizeFx";
-import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
+import { readItemQueueSizeFn } from "~/engine/job/fn/readItemQueueSizeFn";
+import { readItemLineFn } from "~/engine/line/fn/readItemLineFn";
 import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import type { JobRuntimeItemSchema } from "~/engine/runtime/schema/JobRuntimeItemSchema";
 import { readRuntimeItemOwnedStateFn } from "~/engine/runtime/read/fn/readRuntimeItemOwnedStateFn";
@@ -78,7 +78,7 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 				location: owner.location,
 				type: RuntimeCheckIssueEnumSchema.enum.JobOwnerNotOnGrid,
 			});
-		const line = yield* readItemLineFx({
+		const line = readItemLineFn({
 			item: owner.item,
 			lineId: entry.lineId,
 		});
@@ -107,7 +107,7 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 	for (const ownerItemId of new Set(entries.map((entry) => entry.ownerItemId))) {
 		const owner = runtime.items.find((item) => item.id === ownerItemId);
 		if (owner === undefined) continue;
-		const maxQueueSize = yield* readItemQueueSizeFx({
+		const maxQueueSize = readItemQueueSizeFn({
 			item: owner.item,
 		});
 		if (maxQueueSize === undefined) continue;

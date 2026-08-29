@@ -3,8 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { setItemQuantityFx } from "~/engine/runtime/write/setItemQuantityFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import { placeDropForTestFx } from "~test/placement/support/placeDropForTestFx";
 import {
@@ -95,57 +94,6 @@ describe("blueprint direct output capacity", () => {
 			});
 		}
 		expect(result.runtime.jobs).toHaveLength(1);
-	});
-
-	it("prevents direct quantity mutation from consuming output capacity promised to a job", () => {
-		const result = runBlueprint(
-			Effect.gen(function* () {
-				const byproduct = yield* spawnItemFx({
-					id: "runtime:byproduct",
-					itemId: "item:byproduct",
-					location: {
-						scope: "board",
-						space: 0,
-						position: {
-							x: 2,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				});
-				const owner = yield* spawnBlueprintFx({
-					id: "runtime:blueprint",
-					space: 0,
-					itemId: "blueprint:output",
-					x: 0,
-					y: 0,
-				});
-				yield* startLineFx({
-					ownerItemId: owner.id,
-					lineId: "line:blueprint:output",
-				});
-				const updated = yield* setItemQuantityFx({
-					itemId: byproduct.id,
-					quantity: 2,
-					revision: byproduct.revision,
-				}).pipe(Effect.result);
-				return {
-					updated,
-					runtime: yield* readRuntimeFx(),
-				};
-			}),
-		);
-
-		expect(Result.isFailure(result.updated)).toBe(true);
-		if (Result.isFailure(result.updated)) {
-			expect(result.updated.failure).toMatchObject({
-				_tag: "PlacementUnavailableError",
-				reason: "item:max-count",
-			});
-		}
-		expect(result.runtime.items.find((item) => item.id === "runtime:byproduct")?.quantity).toBe(
-			1,
-		);
 	});
 
 	it("rejects enqueue when the active reservation already fills direct maxCount", () => {

@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import { Deferred, Effect } from "effect";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 
 import { emitCompletedEventFx } from "./createGameSession.test/fixture";
 

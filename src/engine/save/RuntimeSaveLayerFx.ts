@@ -3,7 +3,7 @@ import { Cause, Effect, Fiber, Layer, Ref, Semaphore, Stream } from "effect";
 import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
+import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { RuntimeSaveFx } from "~/engine/save/RuntimeSaveFx";
 
@@ -45,12 +45,11 @@ export const RuntimeSaveLayerFx = <Error>({
 						Effect.flatMap(([runtime, saved]) =>
 							runtime === saved
 								? Effect.void
-								: fromRuntimeFx({
-										runtime,
-									}).pipe(
-										Effect.flatMap(save),
-										Effect.andThen(Ref.set(lastSaved, runtime)),
-									),
+								: save(
+										fromRuntimeFn({
+											runtime,
+										}),
+									).pipe(Effect.andThen(Ref.set(lastSaved, runtime))),
 						),
 					),
 				),

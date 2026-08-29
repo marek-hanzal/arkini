@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 export const dropRuleTestConfig = GameConfigSchema.parse({

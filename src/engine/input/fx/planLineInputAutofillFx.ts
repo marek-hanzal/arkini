@@ -1,12 +1,12 @@
 import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readLineInputDeliveryClaimsFx } from "~/engine/delivery/read/readLineInputDeliveryClaimsFx";
-import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
+import { readLineInputDeliveryClaimsFn } from "~/engine/delivery/fn/readLineInputDeliveryClaimsFn";
+import { resolveInputMaterialFn } from "~/engine/input/fn/resolveInputMaterialFn";
 import { isLineInputAutofillSourceLocationFx } from "~/engine/input/read/isLineInputAutofillSourceLocationFx";
 import { readMaterialInputEligibilityFn } from "~/engine/input/read/fn/readMaterialInputEligibilityFn";
 import type { MaterialSchema } from "~/engine/input/schema/MaterialSchema";
-import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
+import { isLineInputClosedFn } from "~/engine/line/fn/isLineInputClosedFn";
 import { readBoardItemLineFx } from "~/engine/line/fx/readBoardItemLineFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
@@ -151,19 +151,19 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 		);
 		const storedQuantity = storedItems.reduce((total, item) => total + item.quantity, 0);
 		const incomingQuantity = includeIncomingDeliveries
-			? (yield* readLineInputDeliveryClaimsFx({
+			? readLineInputDeliveryClaimsFn({
 					inputIndex,
 					lineId,
 					ownerItemId,
 					runtime,
-				})).reduce((total, claim) => total + claim.quantity, 0)
+				}).reduce((total, claim) => total + claim.quantity, 0)
 			: 0;
 		let plannedQuantity = storedQuantity + incomingQuantity;
-		const initialResolution = yield* resolveInputMaterialFx({
+		const initialResolution = resolveInputMaterialFn({
 			input,
 			storedQuantity: plannedQuantity,
 		});
-		const closed = yield* isLineInputClosedFx({
+		const closed = isLineInputClosedFn({
 			input,
 			ownerItemId,
 			lineId,

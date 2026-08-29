@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
+import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
 import { completeJobRuntimeForTestFx } from "~test/job/support/completeJobRuntimeForTestFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import {
@@ -61,7 +61,7 @@ describe("blueprint completion lifecycle", () => {
 					lineId: "line:blueprint:plain",
 				});
 				const runtime = yield* readRuntimeFx();
-				const state = yield* fromRuntimeFx({
+				const state = fromRuntimeFn({
 					runtime,
 				});
 				return {

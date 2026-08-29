@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -116,7 +116,7 @@ describe("mergeItemsFx multi-space inventory transfer", () => {
 				const target = before.items.find((item) => item.id === "runtime:target");
 				if (source === undefined || target === undefined)
 					throw new Error("Expected participants.");
-				const event = yield* mergeItemsFx({
+				const { event } = yield* mergeItemsFx({
 					sourceItemId: source.id,
 					sourceRevision: source.revision,
 					targetItemId: target.id,

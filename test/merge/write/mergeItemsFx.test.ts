@@ -1,7 +1,7 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import type { SourceActionSchema } from "~/engine/merge/schema/SourceActionSchema";
 import type { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
 import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
@@ -69,7 +69,7 @@ const runMergeFx = () =>
 		if (source === undefined || target === undefined) {
 			return yield* Effect.die(new Error("Expected merge participants."));
 		}
-		const event = yield* mergeItemsFx({
+		const { event } = yield* mergeItemsFx({
 			sourceItemId: source.id,
 			sourceRevision: source.revision,
 			targetItemId: target.id,

@@ -9,8 +9,8 @@ import {
 	setUpEditorProjectRouteTest,
 	tearDownEditorProjectRouteTest,
 } from "~test/router/EditorProjectRouteLifecycle.test/createEditorProjectRouteHarness";
-import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
-import { publishEditorProjectFx } from "~/bridge/editor/publishEditorProjectFx";
+import { EditorProjectAtom } from "~/ui/editor/EditorProjectAtom";
+import { publishEditorProjectFx } from "~/ui/editor/publishEditorProjectFx";
 
 beforeEach(setUpEditorProjectRouteTest);
 afterEach(tearDownEditorProjectRouteTest);

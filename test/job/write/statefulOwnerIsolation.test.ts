@@ -1,6 +1,6 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
-import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
+import { createTestGameSession } from "~test/support/game/createTestGameSession";
 
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { useGameFx } from "~/engine/game/fx/useGameFx";

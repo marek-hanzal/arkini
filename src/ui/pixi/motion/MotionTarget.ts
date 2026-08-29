@@ -1,4 +1,4 @@
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 
 export interface TargetRoute {
 	readonly actorId: string;

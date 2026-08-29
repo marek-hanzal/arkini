@@ -1,4 +1,4 @@
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { EditorItemArtworkDetail } from "~/ui/item/editor/EditorItemArtworkDetail";
 import {
 	EditorItemChargesDetail,

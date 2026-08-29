@@ -27,7 +27,8 @@
 	"include": [
 		"electron/contract",
 		"src/engine",
-		"src/bridge",
+		"src/editor",
+		"src/renderer",
 		"src/ui",
 		"src/@routes",
 		"src/main.tsx",

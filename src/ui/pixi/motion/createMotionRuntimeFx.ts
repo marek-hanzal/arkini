@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type {
 	TileMotionCue,
 	TileSpawnMotionCue,
 	TileSwapMotionCue,
-} from "~/bridge/tile/motion/TileMotionCue";
+} from "~/ui/pixi/motion/TileMotionCue";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { destroyTileActorFx } from "~/ui/pixi/actor/destroyTileActorFx";

@@ -10,8 +10,8 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { vi } from "vitest";
-import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
-import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
+import type { ArkpackCatalog } from "~/renderer/arkpack/ArkpackCatalog";
+import { ArkpackCatalogOwnerAtom } from "~/renderer/arkpack/ArkpackCatalogOwnerAtom";
 import { Route as ArkpackSelectorRouteDefinition } from "~/@routes/_launcher/arkpacks";
 
 (

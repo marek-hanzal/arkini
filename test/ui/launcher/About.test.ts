@@ -25,7 +25,7 @@ const portraitState = vi.hoisted(() => ({
 	urls: [] as string[],
 }));
 
-vi.mock("~/bridge/arkpack/useAboutPortraitAssets", () => ({
+vi.mock("~/ui/launcher/about/useAboutPortraitAssets", () => ({
 	useAboutPortraitAssets: () => portraitState.urls,
 }));
 

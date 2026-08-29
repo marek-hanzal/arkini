@@ -1,13 +1,15 @@
 import { Cause, Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { importEditorArkpackFileAtom } from "~/bridge/arkpack/editor/importEditorArkpackFileAtom";
-import { createFreshEditorProjectAtom } from "~/bridge/editor/createFreshEditorProjectAtom";
-import { deleteEditorProjectAtom } from "~/bridge/editor/deleteEditorProjectAtom";
-import { importEditorJsonDirectoryAtom } from "~/bridge/editor/importEditorJsonDirectoryAtom";
-import { openInvalidEditorProjectDirectoryFx } from "~/bridge/editor/openInvalidEditorProjectDirectoryFx";
-import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
-import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
+import { importEditorArkpackFileAtom } from "~/ui/arkpack/editor/importEditorArkpackFileAtom";
+import { createFreshEditorProjectAtom } from "~/ui/editor/createFreshEditorProjectAtom";
+import { deleteEditorProjectAtom } from "~/ui/editor/deleteEditorProjectAtom";
+import {
+	type EditorProjectDescriptor,
+	EditorProjectDescriptorSchema,
+} from "~/editor/EditorProjectDescriptor";
+import { invokeEditorProjectTransportFx } from "~/renderer/editor/invokeEditorProjectTransportFx";
+import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
 
 export namespace EditorWelcomeCommandAtom {
 	export type Action =
@@ -97,14 +99,10 @@ const EditorWelcomeCommandStateAtom = Atom.make<EditorWelcomeCommandAtom.State>(
 const publishCommandFailureFx = (cause: Cause.Cause<unknown>) =>
 	Cause.hasInterruptsOnly(cause)
 		? Effect.failCause(cause)
-		: readExactCauseFailureFx(cause).pipe(
-				Effect.flatMap((failure) =>
-					Atom.set(EditorWelcomeCommandStateAtom, {
-						kind: "error",
-						error: Option.isSome(failure) ? failure.value : cause,
-					}),
-				),
-			);
+		: Atom.set(EditorWelcomeCommandStateAtom, {
+				kind: "error",
+				error: Option.getOrElse(readExactCauseFailureFn(cause), () => cause),
+			});
 
 const EditorWelcomeCommandRunnerAtom = Atom.fn(
 	(command: EditorWelcomeCommandAtom.Command, get) =>
@@ -130,7 +128,13 @@ const EditorWelcomeCommandRunnerAtom = Atom.fn(
 			}
 			if (command.action === "open-project-folder") {
 				const result = yield* Effect.exit(
-					openInvalidEditorProjectDirectoryFx(command.root),
+					invokeEditorProjectTransportFx({
+						call: () => window.arkini.editor.openProjectDirectory(command.root),
+						operation: "open-project-directory",
+						parse: () => undefined,
+						requestMessage: "The invalid Editor project folder request failed.",
+						responseMessage: "The invalid Editor project folder response is invalid.",
+					}),
 				);
 				if (Exit.isFailure(result)) return yield* publishCommandFailureFx(result.cause);
 				yield* Atom.set(EditorWelcomeCommandStateAtom, {
@@ -143,7 +147,16 @@ const EditorWelcomeCommandRunnerAtom = Atom.fn(
 					? get.setResult(createFreshEditorProjectAtom, undefined)
 					: command.action === "import-arkpack"
 						? get.setResult(importEditorArkpackFileAtom, command.file)
-						: get.setResult(importEditorJsonDirectoryAtom, undefined);
+						: invokeEditorProjectTransportFx({
+								call: () => window.arkini.editor.importJsonDirectory(),
+								operation: "import-json-directory",
+								parse: (value) =>
+									value === null
+										? null
+										: EditorProjectDescriptorSchema.parse(value),
+								requestMessage: "The editor JSON import request failed.",
+								responseMessage: "The editor JSON import response is invalid.",
+							});
 			const result = yield* Effect.exit(operation);
 			if (Exit.isFailure(result)) return yield* publishCommandFailureFx(result.cause);
 			if (result.value === null) {

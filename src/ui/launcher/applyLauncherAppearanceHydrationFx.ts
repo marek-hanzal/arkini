@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
-import { AppearanceAtom } from "~/bridge/appearance/AppearanceAtom";
+import { AppearanceAtom } from "~/ui/appearance/AppearanceAtom";
 import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
 import { LauncherAppearanceReadyAtom } from "~/ui/launcher/LauncherAppearanceReadyAtom";
 

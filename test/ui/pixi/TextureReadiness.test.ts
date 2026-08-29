@@ -4,7 +4,7 @@ import { Effect } from "effect";
 import { Texture } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { createTileActorFx } from "~/ui/pixi/actor/createTileActorFx";
 import { updateTileActorFx } from "~/ui/pixi/actor/updateTileActorFx";
 import type { ActorAnimation, ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";

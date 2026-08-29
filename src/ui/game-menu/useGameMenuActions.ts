@@ -4,9 +4,8 @@ import { Cause, Exit, Option } from "effect";
 import { useEffect, useState } from "react";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 
-import type { Game } from "~/bridge/game/Game";
-import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import type { Game } from "~/renderer/game/Game";
+import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
 import type { GameMenuAction, GameMenuPhase } from "~/ui/game-menu/GameMenuControl";
 import { gameMenuCommandAtom } from "~/ui/game-menu/gameMenuCommandAtom";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
@@ -15,7 +14,7 @@ const errorMessage = (error: unknown) => (error instanceof Error ? error.message
 
 /**
  * Orchestrates menu intent without taking Game lifecycle ownership. Local save
- * remains an exact-Game bridge command; save-and-exit requests the application
+ * remains an exact-Game command; save-and-exit requests the application
  * close handshake; leave/reset delegate resource mutation to action-route
  * loaders; settings/cheats are navigation only. The action claim serializes
  * these paths until their command or navigation request settles.
@@ -49,7 +48,7 @@ export const useGameMenuActions = ({
 		if (Cause.hasInterruptsOnly(settledCommand.exit.cause)) {
 			throw settledCommand.exit.cause;
 		}
-		const failure = RendererRuntime.runSync(readExactCauseFailureFx(settledCommand.exit.cause));
+		const failure = readExactCauseFailureFn(settledCommand.exit.cause);
 		if (Option.isNone(failure)) {
 			game.failStop("ui", settledCommand.exit.cause);
 			throw settledCommand.exit.cause;

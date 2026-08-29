@@ -3,7 +3,7 @@
 import { Effect, SubscriptionRef } from "effect";
 import { act } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
+import type { ArkpackCatalog } from "~/renderer/arkpack/ArkpackCatalog";
 import {
 	buttonByText,
 	cleanupArkpackSelectorTests,
@@ -12,7 +12,7 @@ import {
 
 const openEditorArkpack = vi.hoisted(() => vi.fn());
 
-vi.mock("~/bridge/arkpack/editor/openEditorArkpackAtom", async () => {
+vi.mock("~/ui/arkpack/editor/openEditorArkpackAtom", async () => {
 	const { Effect } = await import("effect");
 	const Atom = await import("effect/unstable/reactivity/Atom");
 	return {

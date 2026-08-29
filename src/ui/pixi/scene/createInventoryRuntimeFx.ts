@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 
-import type { GameEngine } from "~/bridge/game/GameEngine";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { readSpaceActionPresentationPhasesFx } from "~/bridge/space/readSpaceActionPresentationPhasesFx";
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { readTileActorFeedbackCuesFx } from "~/bridge/tile/feedback/readTileActorFeedbackCuesFx";
-import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
+import type { GameEngine } from "~/renderer/game/GameEngine";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { readSpaceActionPresentationPhasesFn } from "~/ui/pixi/scene/fn/readSpaceActionPresentationPhasesFn";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import { readTileActorFeedbackCuesFn } from "~/ui/pixi/feedback/fn/readTileActorFeedbackCuesFn";
+import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import type { InventoryActorStore } from "~/ui/pixi/actor/InventoryActorStore";
 import type { ParticleTextures } from "~/ui/pixi/actor/ParticleTextures";
 import { createInventoryActorStoreFx } from "~/ui/pixi/actor/createInventoryActorStoreFx";
@@ -163,7 +163,7 @@ export const createInventoryRuntimeFx = Effect.fn("createInventoryRuntimeFx")(fu
 				RendererRuntime.runSync(createdDrag.attachActorFx(actor));
 			}
 			if (presentFeedback) {
-				const cues = RendererRuntime.runSync(readTileActorFeedbackCuesFx(transition));
+				const cues = readTileActorFeedbackCuesFn(transition);
 				for (const cue of cues) {
 					if (cue.kind !== "consume-source" || processedFeedbackKeys.has(cue.key)) {
 						continue;
@@ -222,7 +222,7 @@ export const createInventoryRuntimeFx = Effect.fn("createInventoryRuntimeFx")(fu
 		const projectSpaceActivationFx = (transition: GameTransition) =>
 			Effect.gen(function* () {
 				if (closed) return;
-				const phases = yield* readSpaceActionPresentationPhasesFx(transition);
+				const phases = readSpaceActionPresentationPhasesFn(transition);
 				const accounting = phases[0];
 				if (accounting?.kind !== "accounting") return;
 				if (transition.sequence >= latestTransition.sequence) {

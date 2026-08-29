@@ -1,5 +1,5 @@
-import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { EditorItemEstimateIndexEntry } from "~/editor/EditorItemEstimateIndex";
 import { ButtonLink } from "~/ui/button/Button";
 import { formatItemDurationFx } from "~/ui/item-detail/formatItemDurationFx";
@@ -31,7 +31,7 @@ export const EditorItemEstimateListRow = ({
 	projectId,
 }: {
 	readonly estimate: EditorItemEstimateIndexEntry;
-	readonly item: EditorItem;
+	readonly item: ItemSchema.Type;
 	readonly maximumDemand: number;
 	readonly projectId: string;
 }) => (

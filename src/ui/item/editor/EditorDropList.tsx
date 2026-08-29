@@ -1,4 +1,4 @@
-import type { EditorDrop } from "~/bridge/item/editor/EditorItemModel";
+import type { DropSchema } from "~/engine/output/schema/DropSchema";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorDropControl } from "~/ui/item/editor/EditorDropControl";
@@ -6,8 +6,8 @@ import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefault
 import { useEditorItemOptionLabel } from "~/ui/item/editor/useEditorItemOptionLabel";
 
 type EditorDropListValue = [
-	EditorDrop,
-	...EditorDrop[],
+	DropSchema.Type,
+	...DropSchema.Type[],
 ];
 
 export const EditorDropList = ({

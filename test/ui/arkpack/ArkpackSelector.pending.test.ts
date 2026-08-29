@@ -3,8 +3,8 @@
 import { Effect, SubscriptionRef } from "effect";
 import { act } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
-import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
+import type { ArkpackDescriptor } from "~/engine/pack/Arkpack";
+import type { ArkpackCatalog } from "~/renderer/arkpack/ArkpackCatalog";
 import {
 	cleanupArkpackSelectorTests,
 	renderArkpackSelector,

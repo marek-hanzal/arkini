@@ -1,6 +1,6 @@
 import { Factory } from "lucide-react";
 
-import type { EditorLine } from "~/bridge/item/editor/EditorItemModel";
+import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { withFieldGroup } from "~/ui/form/EditorForm";
@@ -10,7 +10,7 @@ import { EditorLineFields } from "~/ui/item/editor/EditorLineField";
 
 interface EditorProductionFieldValues {
 	readonly maxQueueSize?: number;
-	readonly lines: Array<EditorLine> | undefined;
+	readonly lines: Array<LineSchema.Type> | undefined;
 }
 
 const defaultValues: EditorProductionFieldValues = {
@@ -64,7 +64,7 @@ export const EditorProductionFields = withFieldGroup({
 							while (existingIds.has(`${lineIdPrefix}:${suffix}`)) suffix += 1;
 							id = `${lineIdPrefix}:${suffix}`;
 						}
-						const line: EditorLine = {
+						const line: LineSchema.Type = {
 							id,
 							title: `New ${kind} line`,
 							description: `Describe what this ${kind} line consumes and produces.`,

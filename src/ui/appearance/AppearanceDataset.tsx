@@ -1,6 +1,6 @@
 import { useAtomValue } from "@effect/atom-react";
 import { useLayoutEffect } from "react";
-import { AppearanceAtom } from "~/bridge/appearance/AppearanceAtom";
+import { AppearanceAtom } from "~/ui/appearance/AppearanceAtom";
 
 /** Applies the authoritative appearance snapshot at the renderer DOM boundary. */
 export const AppearanceDataset = () => {

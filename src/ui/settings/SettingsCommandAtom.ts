@@ -2,12 +2,12 @@ import { Cause, Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { match } from "ts-pattern";
 
-import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
-import { setAppearanceThemeAtom } from "~/bridge/appearance/setAppearanceThemeAtom";
-import { setCheatAvailabilityAtom } from "~/bridge/cheat/setCheatAvailabilityAtom";
-import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
-import type { WindowMode } from "~/bridge/window/WindowMode";
-import { setWindowModeAtom } from "~/bridge/window/setWindowModeAtom";
+import type { AppearanceThemeSchema } from "../../../electron/contract/appearance/AppearanceThemeSchema";
+import { setAppearanceThemeAtom } from "~/ui/appearance/setAppearanceThemeAtom";
+import { setCheatAvailabilityAtom } from "~/ui/cheat-availability/setCheatAvailabilityAtom";
+import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
+import type { WindowModeSchema } from "../../../electron/contract/window/WindowModeSchema";
+import { setWindowModeAtom } from "~/renderer/window/setWindowModeAtom";
 
 type SettingsCommandAction = "cheat-tools" | "window-mode" | "theme" | "exit";
 
@@ -19,11 +19,11 @@ export namespace SettingsCommandAtom {
 		  }
 		| {
 				readonly action: "theme";
-				readonly theme: AppearanceTheme;
+				readonly theme: AppearanceThemeSchema.Type;
 		  }
 		| {
 				readonly action: "window-mode";
-				readonly mode: WindowMode;
+				readonly mode: WindowModeSchema.Type;
 		  }
 		| {
 				readonly action: "exit";
@@ -95,7 +95,7 @@ const SettingsCommandRunnerAtom = Atom.fn(
 				if (Cause.hasInterruptsOnly(result.cause)) {
 					return yield* Effect.failCause(result.cause);
 				}
-				const failure = yield* readExactCauseFailureFx(result.cause);
+				const failure = readExactCauseFailureFn(result.cause);
 				const error = Option.isSome(failure) ? failure.value : result.cause;
 				yield* Atom.set(
 					SettingsCommandStateAtom,

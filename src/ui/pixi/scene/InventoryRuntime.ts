@@ -1,6 +1,6 @@
 import type { Effect } from "effect";
 
-import type { GameTransition } from "~/bridge/game/GameSession";
+import type { GameTransition } from "~/renderer/game/session/GameSession";
 
 export interface InventoryRuntime {
 	readonly canvas: HTMLCanvasElement;

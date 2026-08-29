@@ -3,8 +3,8 @@ import { FileJson2, FilePlus2, RefreshCw } from "lucide-react";
 import type {
 	EditorProjectCandidate,
 	EditorProjectOwnership,
-} from "~/bridge/editor/EditorProjectCandidate";
-import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
+} from "~/editor/EditorProjectCandidate";
+import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
 import { useEffect, useState } from "react";
 import { EditorArkpackImportButton } from "~/ui/arkpack/editor/EditorArkpackImportButton";
 import { BackButton } from "~/ui/button/BackButton";

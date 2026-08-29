@@ -1,8 +1,8 @@
 import { useAtom } from "@effect/atom-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { parseEditorMcpConfiguration } from "~/bridge/editor-mcp/configureEditorMcpFx";
-import { parseEditorMcpOverview } from "~/bridge/editor-mcp/readEditorMcpOverviewFx";
+import { parseEditorMcpConfiguration } from "~/ui/editor-mcp/configureEditorMcpFx";
+import { parseEditorMcpOverview } from "~/ui/editor-mcp/readEditorMcpOverviewFx";
 import { useClipboard } from "~/ui/clipboard/useClipboard";
 import { EditorMcpCommandAtom } from "~/ui/editor-mcp/EditorMcpCommandAtom";
 

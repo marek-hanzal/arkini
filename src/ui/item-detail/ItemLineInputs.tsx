@@ -1,9 +1,9 @@
 import { AnimatePresence, motion } from "motion/react";
 import { match } from "ts-pattern";
 
-import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
-import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
+import { useWithdrawItemDetailLine } from "~/ui/item-detail/useWithdrawItemDetailLine";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { LinkButton } from "~/ui/button/LinkButton";
 import { itemDetailBadgeMotion, itemDetailFadeMotion } from "~/ui/item-detail/ItemDetailMotion";
 import { ItemReferenceButton } from "~/ui/item-detail/ItemReferenceButton";

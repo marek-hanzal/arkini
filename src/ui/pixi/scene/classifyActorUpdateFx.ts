@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { isSameTileActorLocationFx } from "~/bridge/tile/isSameTileActorLocationFx";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import { isSameTileActorLocationFn } from "~/ui/pixi/actor/fn/isSameTileActorLocationFn";
 import { readCrowdAlphaFx } from "~/ui/pixi/actor/readCrowdAlphaFx";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { ActorUpdatePlan } from "~/ui/pixi/scene/ActorUpdatePlan";
@@ -54,7 +54,7 @@ export const classifyActorUpdateFx = Effect.fnUntraced(function* ({
 	poseChannelActive,
 	preserveVisual,
 }: classifyActorUpdateFx.Props) {
-	const moved = !(yield* isSameTileActorLocationFx(actor.item.location, displayItem.location));
+	const moved = !isSameTileActorLocationFn(actor.item.location, displayItem.location);
 	const visualChanged = !isSameMainSceneVisual(actor.currentVisual.item, displayItem);
 	const progressChanged = actor.item.progressRatio !== displayItem.progressRatio;
 	const sizeChanged = actor.size !== pose.size;

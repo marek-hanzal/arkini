@@ -3,8 +3,8 @@ import { Cause, Data, Deferred, Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { describe, expect, it, vi } from "vitest";
 
-import type { Game } from "~/bridge/game/Game";
-import { createItemDetailCommandAtom } from "~/bridge/item-detail/createItemDetailCommandAtom";
+import type { Game } from "~/renderer/game/Game";
+import { createItemDetailCommandAtom } from "~/ui/item-detail/createItemDetailCommandAtom";
 
 class ExpectedCommandFailure extends Data.TaggedError("ExpectedCommandFailure")<{
 	readonly message: string;

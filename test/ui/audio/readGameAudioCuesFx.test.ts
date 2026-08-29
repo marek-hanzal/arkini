@@ -1,7 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { GameEventEnumSchema, type useGameEvents } from "~/bridge/event/useGameEvents";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import type { useGameEvents } from "~/ui/game/useGameEvents";
 import { readGameAudioCuesFx } from "~/ui/audio/readGameAudioCuesFx";
 
 const boardLocation = {

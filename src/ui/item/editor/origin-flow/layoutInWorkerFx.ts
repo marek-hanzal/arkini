@@ -1,6 +1,6 @@
 import { Data, Effect } from "effect";
 
-import type { EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
+import type { EditorItemOriginFlow } from "~/editor/origin-flow/EditorItemOriginFlow";
 import LayoutWorker from "~/ui/item/editor/origin-flow/layout.worker.ts?worker";
 import type { Layout, LayoutInput } from "~/ui/item/editor/origin-flow/Layout";
 import type {

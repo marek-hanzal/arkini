@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { TileDelivery } from "~/bridge/tile/readTileDeliveriesFx";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import type { TileDelivery } from "~/ui/pixi/delivery/readTileDeliveriesFx";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { ParticleTextures } from "~/ui/pixi/actor/ParticleTextures";

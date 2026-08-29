@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
+import type { ArkpackStorage } from "~/renderer/arkpack/ArkpackStorage";
 
 /** Creates an explicit in-memory Arkpack capability for tests only. */
 export const createInMemoryArkpackStorageFx = Effect.fn("createInMemoryArkpackStorageFx")(() =>

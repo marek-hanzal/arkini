@@ -7,10 +7,10 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { Game } from "~/bridge/game/Game";
+import type { Game } from "~/renderer/game/Game";
 import { Cheats } from "~/ui/cheats/Cheats";
 import { useCheatsModel } from "~/ui/cheats/useCheatsModel";
-import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
+import { createTestGameSession } from "~test/support/game/createTestGameSession";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 
 (

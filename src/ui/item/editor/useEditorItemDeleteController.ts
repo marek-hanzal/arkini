@@ -1,11 +1,11 @@
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
 
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { deleteEditorItemCommandAtom } from "~/bridge/item/editor/deleteEditorItemCommandAtom";
-import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { deleteEditorItemCommandAtom } from "~/ui/item/editor/deleteEditorItemCommandAtom";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import {
 	forceDeleteEditorItemFx,
 	type EditorItemForceDeleteImpact,
@@ -19,7 +19,7 @@ import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncR
 
 export namespace useEditorItemDeleteController {
 	export interface Props {
-		readonly item: EditorItem;
+		readonly item: ItemSchema.Type;
 	}
 
 	export interface Output {

@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { useState } from "react";
 
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { ItemIdentity } from "~/ui/item/ItemIdentity";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 

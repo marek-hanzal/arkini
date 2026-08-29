@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 
-import type { GameEngine } from "~/bridge/game/GameEngine";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
-import { readTileActorsFx } from "~/bridge/tile/readTileActorsFx";
+import type { GameEngine } from "~/renderer/game/GameEngine";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { readTileActorsFx } from "~/ui/pixi/actor/readTileActorsFx";
 import type {
 	InventoryReconciliation,
 	InventoryActorStore,

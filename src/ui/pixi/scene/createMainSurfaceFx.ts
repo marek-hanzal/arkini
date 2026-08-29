@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 import { Container, Graphics, Rectangle } from "pixi.js";
 
-import type { GameEngine } from "~/bridge/game/GameEngine";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { DropItemResultKind } from "~/bridge/tile/DropItemResultKind";
-import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
-import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
+import type { GameEngine } from "~/renderer/game/GameEngine";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import type { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { DropFeedback } from "~/ui/pixi/grid/DropFeedback";

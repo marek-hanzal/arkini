@@ -14,18 +14,18 @@ import {
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, vi } from "vitest";
-import { AppearanceAtom } from "~/bridge/appearance/AppearanceAtom";
-import { WindowModeAtom } from "~/bridge/window/WindowModeAtom";
+import { AppearanceAtom } from "~/ui/appearance/AppearanceAtom";
+import { WindowModeAtom } from "~/renderer/window/WindowModeAtom";
 import type { CompletionStatus } from "../../../../electron/contract/cli/CompletionStatus";
 import type { InstallationStatus } from "../../../../electron/contract/cli/InstallationStatus";
-import type { Game } from "~/bridge/game/Game";
-import type { GameEngine } from "~/bridge/game/GameEngine";
-import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
+import type { Game } from "~/renderer/game/Game";
+import type { GameEngine } from "~/renderer/game/GameEngine";
+import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
 import { Route as SettingsRouteDefinition } from "~/@routes/_launcher/settings";
 import { Route as CommonSettingsRouteDefinition } from "~/@routes/_launcher/settings/common";
 import { Route as DevSettingsRouteDefinition } from "~/@routes/_launcher/settings/dev";
 import { Route as GameSettingsRouteDefinition } from "~/@routes/_launcher/settings/game";
-import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
+import { createTestGameSession } from "~test/support/game/createTestGameSession";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import {
 	adoptTestGameEngineResourceFx,

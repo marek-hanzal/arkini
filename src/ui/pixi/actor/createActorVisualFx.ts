@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { Container, Graphics, Sprite, Text, TextStyle, Texture } from "pixi.js";
 
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";
 import { loadVisualTexturesFx } from "~/ui/pixi/actor/loadVisualTexturesFx";
 import { updateActorVisualFx } from "~/ui/pixi/actor/updateActorVisualFx";

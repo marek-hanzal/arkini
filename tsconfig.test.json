@@ -13,7 +13,8 @@
 	"include": [
 		"electron/contract",
 		"src/engine",
-		"src/bridge",
+		"src/editor",
+		"src/renderer",
 		"src/ui",
 		"test",
 		"vitest.config.ts"

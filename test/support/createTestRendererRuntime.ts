@@ -5,21 +5,18 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
-} from "~/bridge/editor/EditorProjectRepository";
+} from "~/editor/EditorProjectRepository";
 import {
 	EditorProjectRepositoryError,
 	type EditorProjectRepositoryOperation,
-} from "~/bridge/editor/EditorProjectRepositoryError";
-import {
-	EditorUnsavedChanges,
-	EditorUnsavedChangesOwnerAtom,
-} from "~/bridge/editor/EditorUnsavedChanges";
-import { createEditorUnsavedChangesOwnerFx } from "~/bridge/editor/createEditorUnsavedChangesOwnerFx";
+} from "~/editor/EditorProjectRepositoryError";
+import { EditorUnsavedChanges } from "~/renderer/editor/unsaved/EditorUnsavedChanges";
+import { EditorUnsavedChangesOwnerAtom } from "~/renderer/editor/unsaved/EditorUnsavedChangesOwnerAtom";
+import { createEditorUnsavedChangesOwnerFx } from "~/renderer/editor/unsaved/createEditorUnsavedChangesOwnerFx";
 import * as Atom from "effect/unstable/reactivity/Atom";
-import { acquireGameEngineLeaseFx } from "~/bridge/game/acquireGameEngineLeaseFx";
-import { adoptGameEngineLeaseFx } from "~/bridge/game/adoptGameEngineLeaseFx";
-import { GameEngineResourceLayer } from "~/bridge/game/GameEngineResourceLayer";
-import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
+import { GameEngineResourceLayer } from "~/renderer/game/resource/GameEngineResourceLayer";
+import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
+import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 export interface TestRendererRuntimeProps {
@@ -85,8 +82,12 @@ export const createTestRendererRuntime = ({
 export const adoptTestGameEngineResourceFx = Effect.fn("adoptTestGameEngineResourceFx")(
 	(packageId: string) =>
 		Effect.scoped(
-			acquireGameEngineLeaseFx({
-				packageId,
-			}).pipe(Effect.flatMap(adoptGameEngineLeaseFx)),
+			Effect.gen(function* () {
+				const service = yield* GameEngineResourceFx;
+				const lease = yield* service.acquireLeaseFx({
+					packageId,
+				});
+				return yield* service.adoptLeaseFx(lease);
+			}),
 		),
 );

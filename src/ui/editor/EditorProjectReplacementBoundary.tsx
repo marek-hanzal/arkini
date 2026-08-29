@@ -1,8 +1,8 @@
 import { useAtomValue } from "@effect/atom-react";
 import { Fragment, type PropsWithChildren } from "react";
 
-import { EditorProjectReplacementEpochAtom } from "~/bridge/editor/EditorProjectReplacementEpochAtom";
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { EditorProjectReplacementEpochAtom } from "~/ui/editor/EditorProjectReplacementEpochAtom";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
 
 /** Recreates project-bound renderer owners only after an explicit whole-project replacement. */
 export const EditorProjectReplacementBoundary = ({ children }: PropsWithChildren) => {

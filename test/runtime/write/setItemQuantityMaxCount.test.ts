@@ -1,6 +1,6 @@
 import { Effect, type Layer, Result } from "effect";
 import { describe, expect, it } from "vitest";
-import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
+import { createTestGameSession } from "~test/support/game/createTestGameSession";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";

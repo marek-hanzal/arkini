@@ -1,4 +1,4 @@
-import type { EditorQuery } from "~/bridge/item/editor/EditorItemModel";
+import type { QuerySchema } from "~/engine/query/schema/QuerySchema";
 import { EditorChoiceControl } from "~/ui/form/EditorValueControls";
 import { EditorSelectorControl } from "~/ui/item/editor/EditorSelectorControl";
 
@@ -57,17 +57,17 @@ const boardDistanceOptions = [
 
 interface EditorQueryControlProps {
 	readonly scopeLocked?: boolean;
-	readonly onChange: (query: EditorQuery) => void;
-	readonly value: EditorQuery;
+	readonly onChange: (query: QuerySchema.Type) => void;
+	readonly value: QuerySchema.Type;
 }
 
 export const EditorBoardDistanceControl = ({
 	onChange,
 	value,
 }: {
-	readonly onChange: (query: EditorQuery) => void;
+	readonly onChange: (query: QuerySchema.Type) => void;
 	readonly value: Extract<
-		EditorQuery,
+		QuerySchema.Type,
 		{
 			readonly scope: "board";
 		}
@@ -90,8 +90,8 @@ export const EditorQueryScopeControl = ({
 	onChange,
 	value,
 }: {
-	readonly onChange: (query: EditorQuery) => void;
-	readonly value: EditorQuery;
+	readonly onChange: (query: QuerySchema.Type) => void;
+	readonly value: QuerySchema.Type;
 }) => (
 	<EditorChoiceControl
 		label="Query scope"

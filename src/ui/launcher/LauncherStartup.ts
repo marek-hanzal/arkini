@@ -1,19 +1,19 @@
 import type { Effect } from "effect";
-import type { AppearanceAccent } from "~/bridge/appearance/AppearanceAccent";
-import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
-import type { WindowMode } from "~/bridge/window/WindowMode";
+import type { AppearanceAccentSchema } from "../../../electron/contract/appearance/AppearanceAccentSchema";
+import type { AppearanceThemeSchema } from "../../../electron/contract/appearance/AppearanceThemeSchema";
+import type { WindowModeSchema } from "../../../electron/contract/window/WindowModeSchema";
 
 export namespace LauncherStartup {
 	export interface Appearance {
-		readonly theme: AppearanceTheme;
-		readonly accent: AppearanceAccent;
+		readonly theme: AppearanceThemeSchema.Type;
+		readonly accent: AppearanceAccentSchema.Type;
 	}
 
 	export interface Result {
 		readonly appearance: Appearance;
 		readonly defaultPackageId: string;
 		readonly cheatsAvailable: boolean;
-		readonly windowMode: WindowMode;
+		readonly windowMode: WindowModeSchema.Type;
 	}
 
 	export interface Props {

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
+import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
 import { useItemLineSearchCandidates } from "~/ui/item-detail/useItemLineSearchCandidates";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
 

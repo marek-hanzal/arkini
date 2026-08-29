@@ -1,4 +1,4 @@
-import type { EditorDrop } from "~/bridge/item/editor/EditorItemModel";
+import type { DropSchema } from "~/engine/output/schema/DropSchema";
 import { EditorChoiceControl } from "~/ui/form/EditorValueControls";
 import { EditorItemReferenceControl } from "~/ui/item/editor/EditorItemReferenceControl";
 import { EditorQuantityControl } from "~/ui/item/editor/EditorQuantityControl";
@@ -8,8 +8,8 @@ export const EditorDropControl = ({
 	onChange,
 	value,
 }: {
-	readonly onChange: (drop: EditorDrop) => void;
-	readonly value: EditorDrop;
+	readonly onChange: (drop: DropSchema.Type) => void;
+	readonly value: DropSchema.Type;
 }) => (
 	<div className="grid gap-3">
 		<EditorItemReferenceControl
@@ -70,7 +70,7 @@ export const EditorDropControl = ({
 			onChange={(rules) =>
 				onChange({
 					...value,
-					rules: rules as EditorDrop["rules"],
+					rules: rules as DropSchema.Type["rules"],
 				})
 			}
 		/>

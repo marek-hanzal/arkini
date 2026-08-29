@@ -1,6 +1,5 @@
+import type { RollSchema } from "~/engine/roll/schema/RollSchema";
 import { match } from "ts-pattern";
-
-import type { EditorRoll } from "~/bridge/item/editor/EditorItemModel";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { EditorDropList } from "~/ui/item/editor/EditorDropList";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
@@ -12,8 +11,8 @@ export const EditorRollControl = ({
 	onChange,
 	value,
 }: {
-	readonly onChange: (roll: EditorRoll | undefined) => void;
-	readonly value: EditorRoll;
+	readonly onChange: (roll: RollSchema.Type | undefined) => void;
+	readonly value: RollSchema.Type;
 }) => {
 	return (
 		<div className="grid gap-4">

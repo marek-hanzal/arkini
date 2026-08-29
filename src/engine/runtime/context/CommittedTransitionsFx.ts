@@ -5,7 +5,7 @@ import type { CommittedTransitionSchema } from "~/engine/runtime/schema/Committe
 export interface CommittedTransitionsFxService {
 	/** Latest exact canonical committed transition. */
 	readonly read: Effect.Effect<CommittedTransitionSchema.Type>;
-	/** Synchronous snapshot reserved for explicitly synchronous bridge boundaries. */
+	/** Synchronous snapshot reserved for explicitly synchronous renderer boundaries. */
 	readonly readUnsafe: () => CommittedTransitionSchema.Type;
 	/** Replays the latest transition, then every later commit exactly once and in order. */
 	readonly changes: Stream.Stream<CommittedTransitionSchema.Type>;

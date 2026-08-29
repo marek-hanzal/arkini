@@ -2,7 +2,7 @@
 
 import { describe, expect, it, vi } from "vitest";
 import { Effect } from "effect";
-import { readMainLayoutFx } from "~/ui/pixi/layout/readMainLayoutFx";
+import { readMainLayoutFn } from "~/ui/pixi/layout/fn/readMainLayoutFn";
 import { lifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 
@@ -19,15 +19,13 @@ import type { FakeContainer } from "./InventoryRuntime.test/fixture";
 describe("Inventory runtime / activation lifecycle", () => {
 	it("uses the Board actor size and routes an ordinary click to Inventory activation", async () => {
 		const { actor, onActivate, runtime, stage } = await mountScene();
-		const expectedBoardSize = Effect.runSync(
-			readMainLayoutFx({
-				boardHeight: 7,
-				boardWidth: 11,
-				height: 480,
-				toolbarSize: 8,
-				width: 800,
-			}),
-		).board.cellSize;
+		const expectedBoardSize = readMainLayoutFn({
+			boardHeight: 7,
+			boardWidth: 11,
+			height: 480,
+			toolbarSize: 8,
+			width: 800,
+		}).board.cellSize;
 
 		expect(actor.size).toBe(expectedBoardSize);
 		expect(sceneState.roundRects).toBeGreaterThanOrEqual(3);

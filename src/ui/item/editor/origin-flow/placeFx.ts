@@ -3,9 +3,9 @@ import fcose from "cytoscape-fcose";
 import { Effect } from "effect";
 
 import type { LayoutInput } from "~/ui/item/editor/origin-flow/Layout";
-import type { Communities } from "~/ui/item/editor/origin-flow/fn/readCommunitiesFn";
 import type { LayoutProfile, Pair } from "~/ui/item/editor/origin-flow/Topology";
 import type { PlacedNode } from "~/ui/item/editor/origin-flow/PlacedNode";
+import type { Communities } from "~/ui/item/editor/origin-flow/readCommunitiesFx";
 
 cytoscape.use(fcose);
 

@@ -13,6 +13,7 @@
 	"include": [
 		"electron/contract",
 		"src/engine",
+		"src/game-tick",
 		"src/game-runtime",
 		"src/game-start",
 		"src/game-event",

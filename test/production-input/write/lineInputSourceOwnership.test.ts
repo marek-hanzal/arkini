@@ -10,7 +10,7 @@ import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
-import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
+import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 
 const baseItem = (id: string) =>
 	({

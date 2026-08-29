@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { isInstantGameplayEnabledFx } from "~/engine/cheat/read/isInstantGameplayEnabledFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { TickStepMs } from "~/engine/tick/TickStepMs";
+import { TickStepMs } from "~/game-tick/TickStepMs";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 export namespace advanceTemporaryItemDurationsFx {

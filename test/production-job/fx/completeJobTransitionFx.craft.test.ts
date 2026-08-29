@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
+import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import {
 	runCraft,

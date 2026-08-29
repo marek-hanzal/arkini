@@ -6,8 +6,11 @@ const applicationDiagnosticsPattern = "^src/application-diagnostics(?:/|$)";
 const gameEventPattern = "^src/game-event(?:/|$)";
 const gameConfigPattern = "^src/game-config(?:/|$)";
 const gameRuntimePattern = "^src/game-runtime(?:/|$)";
+const gameTickPattern = "^src/game-tick(?:/|$)";
 const gameRuntimeAllowedSourceDependencyPattern =
 	"(?:game-runtime(?:/|$)|game-config/GameConfigSchema[.]ts$|engine/(?:cheat/schema/CheatStateSchema[.]ts$|common/schema/(?:IdSchema|NonNegativeIntegerSchema|PositiveIntegerSchema|TimeSchema)[.]ts$|game/context/GameConfigFx[.]ts$|item/(?:error/(?:ItemNotFoundError|ItemNotOnBoardError)[.]ts$|fn/(?:isItemPureWithIndexFn|readItemPurityIndexFn)[.]ts$|fx/resolveItemFx[.]ts$)|revision/(?:fx/createRevisionFx|schema/RevisionSchema)[.]ts$)|game-event/schema/GameEventSchema[.]ts$|item-definition/schema/(?:ItemSchema|StorageSchema|TypeSchema)[.]ts$|item-location/(?:fn/(?:indexGridLocationClaimsFn|isItemLocationScopeAllowedFn|readGridLocationClaimsFn)[.]ts$|schema/(?:BoardLocationSchema|DeliveryLocationSchema|GridLocationSchema|InputLocationSchema|JobLocationSchema|LocationSchema|LocationScopeEnumSchema|ReservedLocationSchema)[.]ts$)|production-delivery/(?:check/checkRuntimeDeliveriesFn|fx/reconcileOutboundDeliveriesRuntimeFx|schema/check/DeliveryTargetIssueSchema)[.]ts$|production-input/(?:check/checkRuntimeInputLocationsFn|fx/releaseOwnerInputsFx|schema/check/(?:InputCapacityExceededIssueSchema|InputLineMissingIssueSchema|InputOwnerMissingIssueSchema|InputSelectorMismatchIssueSchema|InputSlotInvalidIssueSchema))[.]ts$|production-job/(?:check/checkRuntimeJobsFn|error/JobOwnerBusyError|fn/readReservedJobOutputQuantitiesFn|schema/(?:JobQueueRequestSchema|JobSchema|DuplicateJobIdIssueSchema|JobConsumedMaterialStateIssueSchema|JobLineMissingIssueSchema|JobMaterialOrphanIssueSchema|JobOwnerMissingIssueSchema|JobOwnerMultipleActiveIssueSchema|JobOwnerNotOnGridIssueSchema|JobQueueExceededIssueSchema|JobTimeInvalidIssueSchema))[.]ts$|production-line/(?:fn/checkRuntimeDefaultLinesFn|schema/(?:DefaultLineByOwnerItemIdSchema|check/(?:DefaultLineIssueSchema|LineInputClosedIssueSchema)))[.]ts$)";
+const gameTickAllowedSourceDependencyPattern =
+	"(?:game-tick(?:/|$)|game-runtime/(?:context/RuntimeFx|internal/modifyRuntimeFx|schema/RuntimeSchema)[.]ts$|engine/(?:cheat/read/isInstantGameplayEnabledFx|common/schema/(?:IdSchema|TimeSchema|TimestampSchema)|item/temporary/fx/(?:advanceTemporaryItemDurationsFx|attemptTemporaryItemExpiryFx))[.]ts$|game-event/schema/(?:GameEventEnumSchema|GameEventSchema)[.]ts$|item-definition/schema/TypeSchema[.]ts$|item-location/(?:fn/isPassiveStorageLocationFn|schema/LocationScopeEnumSchema)[.]ts$|production-delivery/write/settleItemDeliveryRuntimeFx[.]ts$|production-job/(?:fx/(?:attemptJobCompletionFx|attemptQueuedLineStartFx|resolveJobRunnableFx)|schema/JobSchema)[.]ts$)";
 const gameStartPattern = "^src/game-start(?:/|$)";
 const itemDetailFramePattern = "^src/item-detail-frame(?:/|$)";
 const itemDefinitionPattern = "^src/item-definition(?:/|$)";
@@ -83,6 +86,32 @@ const boundaryRules = [
 		},
 		to: {
 			path: `^src/(?!${gameRuntimeAllowedSourceDependencyPattern})|^(?:electron|shared|scripts)(?:/|$)|^node_modules/(?!@paralleldrive/cuid2(?:/|$)|effect(?:/|$)|ts-pattern(?:/|$)|zod(?:/|$))`,
+			pathNot: [
+				gameTickPattern,
+			],
+		},
+	},
+	{
+		name: "game-runtime-stays-upstream-of-game-tick",
+		comment: "Game Runtime cannot import its downstream fixed-step consumer or loop.",
+		severity: "error",
+		from: {
+			path: gameRuntimePattern,
+		},
+		to: {
+			path: gameTickPattern,
+		},
+	},
+	{
+		name: "game-tick-is-a-runtime-dependent-fixed-step-owner",
+		comment:
+			"Game Tick owns fixed-step scheduling and advancement over Game Runtime without session, persistence, renderer, platform, or presentation dependencies.",
+		severity: "error",
+		from: {
+			path: gameTickPattern,
+		},
+		to: {
+			path: `^src/(?!${gameTickAllowedSourceDependencyPattern})|^(?:electron|shared|scripts)(?:/|$)|^node_modules/(?!effect(?:/|$)|zod(?:/|$))`,
 		},
 	},
 	{
@@ -405,33 +434,31 @@ const boundaryRules = [
 	{
 		name: "game-loop-has-concrete-owners",
 		comment:
-			"The mutable game loop is wired by its Engine layer and consumed only by the renderer game-session lifecycle.",
+			"The mutable game loop is wired by Game Tick and consumed only by the renderer game-session lifecycle.",
 		severity: "error",
 		from: {
 			path: "^(?:src|electron)(?:/|$)",
 			pathNot: [
-				"^src/engine/game/layer/GameLoopLayerFx[.]ts$",
+				"^src/game-tick/GameLoopLayerFx[.]ts$",
 				"^src/renderer/game/session/createGameSessionFx[.]ts$",
 			],
 		},
 		to: {
-			path: "^src/engine/game/context/GameLoopFx[.]ts$",
+			path: "^src/game-tick/GameLoopFx[.]ts$",
 		},
 	},
 	{
-		name: "tick-has-concrete-engine-owners",
-		comment:
-			"Tick mutation stays inside the Engine core, its factory, and explicit tick operations.",
+		name: "tick-has-concrete-game-tick-owners",
+		comment: "Tick mutation stays inside the Game Tick layer and scoped production loop.",
 		severity: "error",
 		from: {
 			path: "^(?:src|electron)(?:/|$)",
 			pathNot: [
-				"^src/engine/game/layer/GameLoopLayerFx[.]ts$",
-				"^src/engine/tick/layer/TickLayerFx[.]ts$",
+				"^src/game-tick/(?:GameLoopLayerFx|TickLayerFx)[.]ts$",
 			],
 		},
 		to: {
-			path: "^src/engine/tick/context/TickFx[.]ts$",
+			path: "^src/game-tick/TickFx[.]ts$",
 		},
 	},
 	{

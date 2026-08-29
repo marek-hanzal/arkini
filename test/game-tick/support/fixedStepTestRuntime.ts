@@ -154,7 +154,7 @@ export const prepareFixedStepRuntimeFx = Effect.fn("prepareFixedStepRuntimeFx")(
 	return yield* readRuntimeFx();
 });
 
-export const summarizeFixedStepRuntime = (runtime: RuntimeSchema.Type) => ({
+export const summarizeFixedStepRuntimeFn = (runtime: RuntimeSchema.Type) => ({
 	dependentRemainingMs: runtime.jobs.find((job) => job.ownerItemId === "runtime:dependent")
 		?.remainingMs,
 	enablerActive: runtime.jobs.some((job) => job.ownerItemId === "runtime:enabler"),

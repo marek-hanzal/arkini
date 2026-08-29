@@ -2,26 +2,24 @@ import { Effect } from "effect";
 
 import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { replayRuntimeStepsFx } from "~/engine/tick/internal/replayRuntimeStepsFx";
+import { replayRuntimeStepsFx } from "~/game-tick/replayRuntimeStepsFx";
 
-export namespace advanceRuntimeElapsedFx {
-	export interface Props {
-		elapsedMs: number;
-	}
+interface AdvanceRuntimeElapsedProps {
+	readonly elapsedMs: number;
+}
 
-	export interface Result {
-		/**
-		 * Exact runtime reference proven to remain unchanged by another fixed step.
-		 * A later authoritative command replaces the reference and invalidates the proof.
-		 */
-		readonly stableRuntime: RuntimeSchema.Type | null;
-	}
+interface AdvanceRuntimeElapsedResult {
+	/**
+	 * Exact runtime reference proven to remain unchanged by another fixed step.
+	 * A later authoritative command replaces the reference and invalidates the proof.
+	 */
+	readonly stableRuntime: RuntimeSchema.Type | null;
 }
 
 /** Replays one whole fixed-step elapsed budget inside one runtime transaction. */
 export const advanceRuntimeElapsedFx = Effect.fn("advanceRuntimeElapsedFx")(function* ({
 	elapsedMs,
-}: advanceRuntimeElapsedFx.Props) {
+}: AdvanceRuntimeElapsedProps) {
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
 			const replay = yield* replayRuntimeStepsFx({
@@ -31,7 +29,7 @@ export const advanceRuntimeElapsedFx = Effect.fn("advanceRuntimeElapsedFx")(func
 			return [
 				{
 					stableRuntime: replay.isStable ? replay.runtime : null,
-				} satisfies advanceRuntimeElapsedFx.Result,
+				} satisfies AdvanceRuntimeElapsedResult,
 				replay.runtime,
 				replay.events,
 			] as const;

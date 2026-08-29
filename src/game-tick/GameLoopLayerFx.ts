@@ -1,14 +1,12 @@
 import { Cause, Duration, Effect, Fiber, Layer, Schedule } from "effect";
 
-import { GameLoopFx } from "~/engine/game/context/GameLoopFx";
-import { TickFx } from "~/engine/tick/context/TickFx";
-import { TickStepMs } from "~/engine/tick/TickStepMs";
+import { GameLoopFx } from "~/game-tick/GameLoopFx";
+import { TickFx } from "~/game-tick/TickFx";
+import { TickStepMs } from "~/game-tick/TickStepMs";
 
-export namespace GameLoopLayerFx {
-	export interface Props {
-		intervalMs?: number;
-		onFatalError?: (cause: unknown) => void;
-	}
+interface GameLoopLayerProps {
+	readonly intervalMs?: number;
+	readonly onFatalError?: (cause: unknown) => void;
 }
 
 /**
@@ -21,7 +19,7 @@ export namespace GameLoopLayerFx {
 export const GameLoopLayerFx = ({
 	intervalMs = TickStepMs,
 	onFatalError = () => undefined,
-}: GameLoopLayerFx.Props = {}) => {
+}: GameLoopLayerProps = {}) => {
 	const advance = TickFx.pipe(
 		Effect.flatMap(({ advanceRuntime }) => advanceRuntime),
 		Effect.onError((cause) =>

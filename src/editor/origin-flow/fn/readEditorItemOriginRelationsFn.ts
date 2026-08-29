@@ -1,3 +1,5 @@
+import { Order } from "effect";
+
 import type {
 	EditorItemOriginRelation,
 	EditorItemOriginSource,
@@ -12,7 +14,7 @@ const projectEditorItemOriginRelations = (
 ): EditorItemOriginRelation[] => [
 	...unique(source.requirementItemIds)
 		.filter((itemId) => itemId !== source.ownerItemId)
-		.sort((left, right) => left.localeCompare(right))
+		.sort((left, right) => Order.String(left, right))
 		.map((itemId) => ({
 			fromItemId: itemId,
 			role: "input" as const,

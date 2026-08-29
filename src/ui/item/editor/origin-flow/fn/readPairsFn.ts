@@ -1,3 +1,5 @@
+import { Order } from "effect";
+
 import type { DirectedPair, Pair } from "~/ui/item/editor/origin-flow/Topology";
 import type { LayoutInput } from "~/ui/item/editor/origin-flow/Layout";
 
@@ -15,7 +17,7 @@ export const readPairsFn = (flow: LayoutInput) => {
 			});
 
 		const [a, b] =
-			edge.source.localeCompare(edge.target) <= 0
+			Order.String(edge.source, edge.target) <= 0
 				? [
 						edge.source,
 						edge.target,
@@ -36,10 +38,10 @@ export const readPairsFn = (flow: LayoutInput) => {
 			...directedPairs.values(),
 		].sort(
 			(left, right) =>
-				left.source.localeCompare(right.source) || left.target.localeCompare(right.target),
+				Order.String(left.source, right.source) || Order.String(left.target, right.target),
 		),
 		pairs: [
 			...pairs.values(),
-		].sort((left, right) => left.a.localeCompare(right.a) || left.b.localeCompare(right.b)),
+		].sort((left, right) => Order.String(left.a, right.a) || Order.String(left.b, right.b)),
 	};
 };

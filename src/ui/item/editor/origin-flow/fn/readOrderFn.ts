@@ -1,3 +1,5 @@
+import { Order } from "effect";
+
 import type { LayoutInput } from "~/ui/item/editor/origin-flow/Layout";
 
 interface WeightedGraph {
@@ -35,7 +37,7 @@ const sumWeights = (entries: ReadonlyMap<string, number>) => {
 /** Keeps feedback edges explicit while giving highlight traversal one stable forward order. */
 export const readOrderFn = (flow: LayoutInput): ReadonlyMap<string, number> => {
 	const graph = readWeightedGraph(flow);
-	const nodeIds = flow.nodes.map(({ id }) => id).sort((left, right) => left.localeCompare(right));
+	const nodeIds = flow.nodes.map(({ id }) => id).sort((left, right) => Order.String(left, right));
 	const active = new Set(nodeIds);
 	const inDegree = new Map(
 		nodeIds.map((id) => [
@@ -71,7 +73,7 @@ export const readOrderFn = (flow: LayoutInput): ReadonlyMap<string, number> => {
 				...active,
 			]
 				.filter((id) => (outDegree.get(id) ?? 0) === 0)
-				.sort((leftId, rightId) => leftId.localeCompare(rightId));
+				.sort((leftId, rightId) => Order.String(leftId, rightId));
 			for (const id of sinks) {
 				if (!active.has(id)) continue;
 				remove(id, "right");
@@ -81,7 +83,7 @@ export const readOrderFn = (flow: LayoutInput): ReadonlyMap<string, number> => {
 				...active,
 			]
 				.filter((id) => (inDegree.get(id) ?? 0) === 0)
-				.sort((leftId, rightId) => leftId.localeCompare(rightId));
+				.sort((leftId, rightId) => Order.String(leftId, rightId));
 			for (const id of sources) {
 				if (!active.has(id)) continue;
 				remove(id, "left");
@@ -96,7 +98,7 @@ export const readOrderFn = (flow: LayoutInput): ReadonlyMap<string, number> => {
 			const score = (outDegree.get(id) ?? 0) - (inDegree.get(id) ?? 0);
 			if (
 				score > bestScore ||
-				(score === bestScore && (bestId === undefined || id.localeCompare(bestId) < 0))
+				(score === bestScore && (bestId === undefined || Order.String(id, bestId) < 0))
 			) {
 				bestId = id;
 				bestScore = score;

@@ -2,9 +2,8 @@ import { PackageOpen, Plus } from "lucide-react";
 import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { useMemo } from "react";
 
+import { searchEditorItemsFn } from "~/editor/item/fn/searchEditorItemsFn";
 import { useEditorProject } from "~/ui/editor/useEditorProject";
-import { searchEditorItemsFx } from "~/editor/searchEditorItemsFx";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { PrimaryButtonLink } from "~/ui/button/Button";
 import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import { EditorItemListRow } from "~/ui/item/editor/EditorItemListRow";
@@ -35,11 +34,9 @@ export const EditorItemList = ({
 	const empty = items.length === 0;
 	const filteredItems = useMemo(
 		() =>
-			RendererRuntime.runSync(
-				searchEditorItemsFx(
-					items.filter((item) => itemType === undefined || item.type === itemType),
-					query,
-				),
+			searchEditorItemsFn(
+				items.filter((item) => itemType === undefined || item.type === itemType),
+				query,
 			),
 		[
 			itemType,

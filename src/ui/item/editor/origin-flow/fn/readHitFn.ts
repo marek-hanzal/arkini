@@ -1,3 +1,5 @@
+import { Order } from "effect";
+
 import {
 	EditorItemOriginItemInputPortId,
 	EditorItemOriginItemOutputPortId,
@@ -82,7 +84,7 @@ export const readHitFn = ({
 						? edge.target === node.id && edge.targetPortId === portId
 						: edge.source === node.id && edge.sourcePortId === portId,
 				)
-				.sort((left, right) => left.id.localeCompare(right.id))
+				.sort((left, right) => Order.String(left.id, right.id))
 				.map((edge) =>
 					portId === EditorItemOriginItemInputPortId ? edge.source : edge.target,
 				)

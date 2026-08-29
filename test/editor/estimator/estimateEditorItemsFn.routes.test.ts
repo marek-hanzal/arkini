@@ -5,6 +5,45 @@ import { editorItemEstimateTestFixture } from "~test/editor/estimator/editorItem
 const { estimate, graph, requirement, route } = editorItemEstimateTestFixture;
 
 describe("estimateEditorItemsFn route selection", () => {
+	it("breaks equal-cost non-ASCII route IDs by stable code units", () => {
+		const result = estimate(
+			graph({
+				facts: [
+					"root",
+					"target",
+				],
+				roots: [
+					"root",
+				],
+				routes: [
+					route({
+						allOf: [
+							requirement("root"),
+						],
+						durationMs: 10,
+						id: "ä-route",
+						output: "target",
+					}),
+					route({
+						allOf: [
+							requirement("root"),
+						],
+						durationMs: 10,
+						id: "z-route",
+						output: "target",
+					}),
+				],
+			}),
+		);
+
+		expect(result).toMatchObject({
+			obtainable: true,
+			route: {
+				routeId: "z-route",
+			},
+		});
+	});
+
 	it("scales demand by scalar expected yield", () => {
 		const result = estimate(
 			graph({

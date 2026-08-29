@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { EditorProject } from "~/editor/EditorProject";
-import { searchEditorItemsFx } from "~/editor/searchEditorItemsFx";
+import { searchEditorItemsFn } from "~/editor/item/fn/searchEditorItemsFn";
 import type { ItemCollectionInput } from "./ItemCollectionInputSchema";
 
 const indentText = (value: string) =>
@@ -24,7 +24,7 @@ export const readItemCollectionTextFx = Effect.fn("readItemCollectionTextFx")(fu
 	const matches =
 		input.query === undefined
 			? typeFilteredItems
-			: yield* searchEditorItemsFx(typeFilteredItems, input.query);
+			: searchEditorItemsFn(typeFilteredItems, input.query);
 	const totalPages = Math.ceil(matches.length / input.pageSize);
 	const pageItems = matches.slice((input.page - 1) * input.pageSize, input.page * input.pageSize);
 	const hasPreviousPage = input.page > 1;

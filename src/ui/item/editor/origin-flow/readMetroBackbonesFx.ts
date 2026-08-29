@@ -1,3 +1,5 @@
+import { Effect, Order } from "effect";
+
 import type { LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
 
 const MetroLaneSpacing = 10;
@@ -99,7 +101,7 @@ const readLaneOffset = (
 	].sort(
 		(left, right) =>
 			(edgeOrder.get(left) ?? Number.MAX_SAFE_INTEGER) -
-				(edgeOrder.get(right) ?? Number.MAX_SAFE_INTEGER) || left.localeCompare(right),
+				(edgeOrder.get(right) ?? Number.MAX_SAFE_INTEGER) || Order.String(left, right),
 	);
 	if (edgeIds.length <= 1) return 0;
 	const laneIndex = edgeIds.indexOf(segment.edgeId);
@@ -131,82 +133,91 @@ const readOffsetIntersection = (
 };
 
 /** Separates highlighted bundled flow routes into stable render-only metro lanes. */
-export const readMetroBackbonesFn = (
-	backbones: ReadonlyMap<string, ReadonlyArray<LayoutPoint>>,
-	highlightedEdgeIds: ReadonlyArray<string>,
-): ReadonlyMap<string, ReadonlyArray<LayoutPoint>> => {
-	const orderedEdgeIds = [
-		...new Set(highlightedEdgeIds),
-	].sort((left, right) => left.localeCompare(right));
-	const edgeOrder = new Map(
-		orderedEdgeIds.map(
-			(edgeId, index) =>
-				[
-					edgeId,
-					index,
-				] as const,
-		),
-	);
-	const pointsByEdgeId = new Map<string, ReadonlyArray<LayoutPoint>>();
-	const segmentsByEdgeId = new Map<string, ReadonlyArray<MetroSegment>>();
-	const trackGroups = new Map<string, MetroSegment[]>();
-
-	for (const edgeId of orderedEdgeIds) {
-		const backbone = backbones.get(edgeId);
-		if (backbone === undefined) throw new Error(`Missing bundled backbone for ${edgeId}.`);
-		const points = normalizeBackbone(backbone);
-		pointsByEdgeId.set(edgeId, points);
-		const segments: MetroSegment[] = [];
-		for (let index = 1; index < points.length; index += 1) {
-			const segment = readSegment(edgeId, index - 1, points[index - 1]!, points[index]!);
-			segments.push(segment);
-			const key = `${segment.orientation}:${segment.track.toFixed(4)}`;
-			const group = trackGroups.get(key) ?? [];
-			group.push(segment);
-			trackGroups.set(key, group);
-		}
-		segmentsByEdgeId.set(edgeId, segments);
-	}
-
-	const laneOffsetBySegment = new Map<string, number>();
-	for (const segmentsOnTrack of trackGroups.values()) {
-		for (const segment of segmentsOnTrack)
-			laneOffsetBySegment.set(
-				`${segment.edgeId}:${segment.index}`,
-				readLaneOffset(segment, segmentsOnTrack, edgeOrder),
-			);
-	}
-
-	const metroBackbones = new Map<string, ReadonlyArray<LayoutPoint>>();
-	for (const edgeId of orderedEdgeIds) {
-		const points = pointsByEdgeId.get(edgeId)!;
-		const segments = segmentsByEdgeId.get(edgeId)!;
-		if (segments.length <= 1) {
-			metroBackbones.set(edgeId, points);
-			continue;
-		}
-
-		const offsets = segments.map((segment, index) =>
-			index === 0 || index === segments.length - 1
-				? 0
-				: (laneOffsetBySegment.get(`${edgeId}:${segment.index}`) ?? 0),
-		);
-		const metro: LayoutPoint[] = [
-			points[0]!,
-		];
-		for (let pointIndex = 1; pointIndex < points.length - 1; pointIndex += 1)
-			appendPoint(
-				metro,
-				readOffsetIntersection(
-					points[pointIndex]!,
-					segments[pointIndex - 1]!,
-					offsets[pointIndex - 1]!,
-					segments[pointIndex]!,
-					offsets[pointIndex]!,
+export const readMetroBackbonesFx = Effect.fn("readMetroBackbonesFx")(
+	(
+		backbones: ReadonlyMap<string, ReadonlyArray<LayoutPoint>>,
+		highlightedEdgeIds: ReadonlyArray<string>,
+	) =>
+		Effect.sync((): ReadonlyMap<string, ReadonlyArray<LayoutPoint>> => {
+			const orderedEdgeIds = [
+				...new Set(highlightedEdgeIds),
+			].sort(Order.String);
+			const edgeOrder = new Map(
+				orderedEdgeIds.map(
+					(edgeId, index) =>
+						[
+							edgeId,
+							index,
+						] as const,
 				),
 			);
-		appendPoint(metro, points.at(-1)!);
-		metroBackbones.set(edgeId, normalizeBackbone(metro));
-	}
-	return metroBackbones;
-};
+			const pointsByEdgeId = new Map<string, ReadonlyArray<LayoutPoint>>();
+			const segmentsByEdgeId = new Map<string, ReadonlyArray<MetroSegment>>();
+			const trackGroups = new Map<string, MetroSegment[]>();
+
+			for (const edgeId of orderedEdgeIds) {
+				const backbone = backbones.get(edgeId);
+				if (backbone === undefined)
+					throw new Error(`Missing bundled backbone for ${edgeId}.`);
+				const points = normalizeBackbone(backbone);
+				pointsByEdgeId.set(edgeId, points);
+				const segments: MetroSegment[] = [];
+				for (let index = 1; index < points.length; index += 1) {
+					const segment = readSegment(
+						edgeId,
+						index - 1,
+						points[index - 1]!,
+						points[index]!,
+					);
+					segments.push(segment);
+					const key = `${segment.orientation}:${segment.track.toFixed(4)}`;
+					const group = trackGroups.get(key) ?? [];
+					group.push(segment);
+					trackGroups.set(key, group);
+				}
+				segmentsByEdgeId.set(edgeId, segments);
+			}
+
+			const laneOffsetBySegment = new Map<string, number>();
+			for (const segmentsOnTrack of trackGroups.values()) {
+				for (const segment of segmentsOnTrack)
+					laneOffsetBySegment.set(
+						`${segment.edgeId}:${segment.index}`,
+						readLaneOffset(segment, segmentsOnTrack, edgeOrder),
+					);
+			}
+
+			const metroBackbones = new Map<string, ReadonlyArray<LayoutPoint>>();
+			for (const edgeId of orderedEdgeIds) {
+				const points = pointsByEdgeId.get(edgeId)!;
+				const segments = segmentsByEdgeId.get(edgeId)!;
+				if (segments.length <= 1) {
+					metroBackbones.set(edgeId, points);
+					continue;
+				}
+
+				const offsets = segments.map((segment, index) =>
+					index === 0 || index === segments.length - 1
+						? 0
+						: (laneOffsetBySegment.get(`${edgeId}:${segment.index}`) ?? 0),
+				);
+				const metro: LayoutPoint[] = [
+					points[0]!,
+				];
+				for (let pointIndex = 1; pointIndex < points.length - 1; pointIndex += 1)
+					appendPoint(
+						metro,
+						readOffsetIntersection(
+							points[pointIndex]!,
+							segments[pointIndex - 1]!,
+							offsets[pointIndex - 1]!,
+							segments[pointIndex]!,
+							offsets[pointIndex]!,
+						),
+					);
+				appendPoint(metro, points.at(-1)!);
+				metroBackbones.set(edgeId, normalizeBackbone(metro));
+			}
+			return metroBackbones;
+		}),
+);

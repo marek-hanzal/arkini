@@ -1,5 +1,3 @@
-import { Effect } from "effect";
-
 import {
 	type EditorProjectCompatibility,
 	type EditorProjectCompatibilityContext,
@@ -8,7 +6,7 @@ import {
 	type EditorProjectCompatibilityRule,
 } from "~/editor/version/EditorProjectCompatibility";
 import type { EditorProjectSemanticDiff } from "~/editor/version/EditorProjectSemanticDiff";
-import { readEditorProjectSemanticDiffsFx } from "~/editor/version/readEditorProjectSemanticDiffsFx";
+import { readEditorProjectSemanticDiffsFn } from "~/editor/version/fn/readEditorProjectSemanticDiffsFn";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
@@ -235,21 +233,20 @@ const attachDecision = (
 };
 
 /** Classifies every semantic config diff and exposes the exact UI-ready decision context. */
-export const analyzeEditorProjectCompatibilityFx = Effect.fn("analyzeEditorProjectCompatibilityFx")(
-	function* (previous: GameConfigSchema.Type, next: GameConfigSchema.Type) {
-		const diffs = yield* readEditorProjectSemanticDiffsFx(previous, next);
-		const context = diffs.map((diff) =>
-			attachDecision(diff, classifyDiff(diff, previous, next)),
-		);
-		const compatibility: EditorProjectCompatibility = {
-			context,
-			result:
-				context.length === 0
-					? "noop"
-					: context.some(({ result }) => result === "major")
-						? "major"
-						: "minor",
-		};
-		return compatibility;
-	},
-);
+export const analyzeEditorProjectCompatibilityFn = (
+	previous: GameConfigSchema.Type,
+	next: GameConfigSchema.Type,
+) => {
+	const diffs = readEditorProjectSemanticDiffsFn(previous, next);
+	const context = diffs.map((diff) => attachDecision(diff, classifyDiff(diff, previous, next)));
+	const compatibility: EditorProjectCompatibility = {
+		context,
+		result:
+			context.length === 0
+				? "noop"
+				: context.some(({ result }) => result === "major")
+					? "major"
+					: "minor",
+	};
+	return compatibility;
+};

@@ -1,7 +1,6 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { analyzeEditorProjectCompatibilityFx } from "~/editor/version/analyzeEditorProjectCompatibilityFx";
+import { analyzeEditorProjectCompatibilityFn } from "~/editor/version/fn/analyzeEditorProjectCompatibilityFn";
 import type { EditorProjectCompatibility } from "~/editor/version/EditorProjectCompatibility";
 import { TemporarySchema } from "~/engine/item/schema/TemporarySchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -15,8 +14,7 @@ import {
 const analyze = (
 	previous: GameConfigSchema.Type,
 	next: GameConfigSchema.Type,
-): EditorProjectCompatibility =>
-	Effect.runSync(analyzeEditorProjectCompatibilityFx(previous, next));
+): EditorProjectCompatibility => analyzeEditorProjectCompatibilityFn(previous, next);
 
 const withProducer = () => {
 	const producer = createProducerItem({
@@ -39,7 +37,7 @@ const withProducer = () => {
 	});
 };
 
-describe("analyzeEditorProjectCompatibilityFx", () => {
+describe("analyzeEditorProjectCompatibilityFn", () => {
 	it("reports every explicitly whitelisted copy and timing change as minor", () => {
 		const previous = withProducer();
 		const producer = previous.items.producer;

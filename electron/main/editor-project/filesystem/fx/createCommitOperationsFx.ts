@@ -12,8 +12,8 @@ import {
 import { forceDeleteEditorItemFx } from "~/editor/forceDeleteEditorItemFx";
 import { readEditorAssetDeleteBlockersFx } from "~/editor/readEditorAssetDeleteBlockersFx";
 import { readEditorItemDeleteBlockersFx } from "~/editor/readEditorItemDeleteBlockersFx";
-import { analyzeEditorProjectCompatibilityFx } from "~/editor/version/analyzeEditorProjectCompatibilityFx";
-import { bumpArkpackVersionFx } from "~/editor/version/bumpArkpackVersionFx";
+import { analyzeEditorProjectCompatibilityFn } from "~/editor/version/fn/analyzeEditorProjectCompatibilityFn";
+import { bumpArkpackVersionFn } from "~/editor/version/fn/bumpArkpackVersionFn";
 import { GameProjectGameSchemaReference } from "~/engine/source/GameProjectReference";
 import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
@@ -118,7 +118,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			return yield* Effect.fail(
 				new Error("The Editor project ID can only change through Refresh from disk."),
 			);
-		const compatibility = yield* analyzeEditorProjectCompatibilityFx(
+		const compatibility = analyzeEditorProjectCompatibilityFn(
 			state.project.config,
 			canonicalConfig,
 		);
@@ -127,7 +127,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				? "minor"
 				: compatibility.result;
 		const updatedAtMs = Math.max(nowMs, state.project.updatedAtMs + 1);
-		const version = yield* bumpArkpackVersionFx(state.project.version, result);
+		const version = bumpArkpackVersionFn(state.project.version, result);
 		const marker = GameProjectManifestSchema.parse({
 			arkini: ArkiniAppVersion,
 			revision: updatedAtMs,

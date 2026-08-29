@@ -65,12 +65,6 @@ vi.mock("~/ui/editor/useEditorProject", () => ({
 	}),
 }));
 
-vi.mock("~/ui/item/editor/saveEditorItemCommandAtom", () => ({
-	saveEditorItemCommandAtom: () => ({
-		id: "save-editor-item",
-	}),
-}));
-
 vi.mock("~/ui/item/editor/useEditorItemDraft", () => ({
 	useEditorItemDraft: () => state.draft,
 }));

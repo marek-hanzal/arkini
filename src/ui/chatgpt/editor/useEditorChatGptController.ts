@@ -1,14 +1,15 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
-import { Exit } from "effect";
+import { Effect, Exit } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import { type RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ChatGptAssetCandidateSchema } from "../../../../electron/contract/chatgpt/ChatGptSurfaceSchema";
 
-import { subscribeChatGptAssetCandidateFx } from "~/ui/chatgpt/editor/subscribeChatGptAssetCandidateFx";
-import type { ChatGptViewState } from "~/ui/chatgpt/editor/subscribeChatGptViewStateFx";
 import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
 import { readEditorAssetResourceIdFn } from "~/editor/resource/fn/readEditorAssetResourceIdFn";
-import { saveEditorAssetCommandAtom } from "~/ui/resource/editor/saveEditorAssetCommandAtom";
 import { validateEditorAssetFileFx } from "~/renderer/editor/resource/validateEditorAssetFileFx";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { saveEditorAssetFx } from "~/ui/resource/editor/saveEditorAssetFx";
 import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorChatGptSurface } from "./useEditorChatGptSurface";
@@ -39,7 +40,7 @@ export namespace useEditorChatGptController {
 		readonly saving: boolean;
 		readonly setResourceId: (resourceId: string) => void;
 		readonly surfaceRef: RefObject<HTMLDivElement | null>;
-		readonly viewState: ChatGptViewState;
+		readonly viewState: useEditorChatGptSurface.Output["viewState"];
 	}
 }
 
@@ -53,6 +54,28 @@ const toFile = (filename: string, bytes: Uint8Array) =>
 			type: "image/png",
 		},
 	);
+
+const subscribeChatGptAssetCandidateFx = Effect.fn("subscribeChatGptAssetCandidateFx")(
+	(listener: (candidate: ChatGptAssetCandidateSchema.Type) => void) =>
+		Effect.sync(() =>
+			window.arkini.chatGpt.onAssetCandidate((candidate) =>
+				listener(ChatGptAssetCandidateSchema.parse(candidate)),
+			),
+		),
+);
+
+const saveEditorAssetCommandAtom = RendererRuntime.runSync(
+	Effect.map(EditorProjectRepository, (repository) =>
+		Atom.family((projectId: string) =>
+			Atom.fn((props: Omit<saveEditorAssetFx.Props, "projectId">) =>
+				saveEditorAssetFx({
+					...props,
+					projectId,
+				}).pipe(Effect.provideService(EditorProjectRepository, repository)),
+			).pipe(Atom.setIdleTTL(0)),
+		),
+	),
+);
 
 /** Owns the declarative native surface and one explicit downloaded-asset decision. */
 export const useEditorChatGptController = (): useEditorChatGptController.Output => {

@@ -6,7 +6,7 @@ import { EditorServiceStatusAtom } from "~/ui/editor/EditorServiceStatusAtom";
 
 export const EditorServiceReadinessTimeoutMs = 2_000;
 
-const editorServiceDidNotRespond = (): EditorProjectTransport.ServiceStatus => ({
+const readEditorServiceDidNotRespondFn = (): EditorProjectTransport.ServiceStatus => ({
 	type: "unavailable",
 	message: "The editor service did not respond.",
 });
@@ -18,8 +18,8 @@ export const refreshEditorServiceStatusFx = Effect.tryPromise({
 }).pipe(
 	Effect.timeoutOrElse({
 		duration: EditorServiceReadinessTimeoutMs,
-		orElse: () => Effect.succeed(editorServiceDidNotRespond()),
+		orElse: () => Effect.succeed(readEditorServiceDidNotRespondFn()),
 	}),
-	Effect.catch(() => Effect.succeed(editorServiceDidNotRespond())),
+	Effect.catch(() => Effect.succeed(readEditorServiceDidNotRespondFn())),
 	Effect.tap((status) => Atom.set(EditorServiceStatusAtom, status)),
 );

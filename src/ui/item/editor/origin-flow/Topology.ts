@@ -13,10 +13,3 @@ export interface DirectedPair {
 	readonly source: string;
 	readonly target: string;
 }
-
-export interface Topology {
-	readonly directedPairs: ReadonlyArray<DirectedPair>;
-	readonly flowOrder: ReadonlyMap<string, number>;
-	readonly pairs: ReadonlyArray<Pair>;
-	readonly profiles: ReadonlyMap<string, LayoutProfile>;
-}

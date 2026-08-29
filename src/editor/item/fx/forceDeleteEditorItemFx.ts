@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { GameConfigSchema as GameConfig } from "~/engine/schema/GameConfigSchema";
-import { readEditorItemDeleteBlockersFx } from "~/editor/readEditorItemDeleteBlockersFx";
+import { readEditorItemDeleteBlockersFn } from "~/editor/item/fn/readEditorItemDeleteBlockersFn";
 
 type StartSurface = "board" | "inventory" | "toolbar";
 
@@ -16,33 +16,40 @@ interface ItemCleanup {
 	removeLine: boolean;
 }
 
-export interface EditorItemForceDeleteImpact {
-	readonly deletedOwnerItemIds: ReadonlyArray<string>;
-	readonly removedActionInputs: ReadonlyArray<{
-		readonly ownerItemId: string;
-		readonly inputNumber: number;
-	}>;
-	readonly removedActionRules: ReadonlyArray<{
-		readonly ownerItemId: string;
-		readonly ruleNumber: number;
-	}>;
-	readonly removedChargeOutputOwnerIds: ReadonlyArray<string>;
-	readonly removedExpiryOutputOwnerIds: ReadonlyArray<string>;
-	readonly removedLines: ReadonlyArray<{
-		readonly ownerItemId: string;
-		readonly lineId: string;
-		readonly title: string;
-	}>;
-	readonly removedMergeRules: ReadonlyArray<{
-		readonly ownerItemId: string;
-		readonly ruleNumber: number;
-	}>;
-	readonly removedStartEntries: Readonly<Record<StartSurface, number>>;
-}
+export namespace forceDeleteEditorItemFx {
+	export interface Impact {
+		readonly deletedOwnerItemIds: ReadonlyArray<string>;
+		readonly removedActionInputs: ReadonlyArray<{
+			readonly ownerItemId: string;
+			readonly inputNumber: number;
+		}>;
+		readonly removedActionRules: ReadonlyArray<{
+			readonly ownerItemId: string;
+			readonly ruleNumber: number;
+		}>;
+		readonly removedChargeOutputOwnerIds: ReadonlyArray<string>;
+		readonly removedExpiryOutputOwnerIds: ReadonlyArray<string>;
+		readonly removedLines: ReadonlyArray<{
+			readonly ownerItemId: string;
+			readonly lineId: string;
+			readonly title: string;
+		}>;
+		readonly removedMergeRules: ReadonlyArray<{
+			readonly ownerItemId: string;
+			readonly ruleNumber: number;
+		}>;
+		readonly removedStartEntries: Readonly<Record<StartSurface, number>>;
+	}
 
-export interface EditorItemForceDeleteResult {
-	readonly config: GameConfigSchema.Type;
-	readonly impact: EditorItemForceDeleteImpact;
+	export interface Props {
+		readonly config: GameConfigSchema.Type;
+		readonly itemId: string;
+	}
+
+	export interface Result {
+		readonly config: GameConfigSchema.Type;
+		readonly impact: Impact;
+	}
 }
 
 const createItemCleanup = (): ItemCleanup => ({
@@ -59,11 +66,8 @@ const createItemCleanup = (): ItemCleanup => ({
 export const forceDeleteEditorItemFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 	config,
 	itemId,
-}: {
-	readonly config: GameConfigSchema.Type;
-	readonly itemId: string;
-}) {
-	const blockers = yield* readEditorItemDeleteBlockersFx({
+}: forceDeleteEditorItemFx.Props) {
+	const blockers = readEditorItemDeleteBlockersFn({
 		config,
 		itemId,
 	});
@@ -253,5 +257,5 @@ export const forceDeleteEditorItemFx = Effect.fn("forceDeleteEditorItemFx")(func
 				toolbar: startIndexes.toolbar.size,
 			},
 		},
-	} satisfies EditorItemForceDeleteResult;
+	};
 });

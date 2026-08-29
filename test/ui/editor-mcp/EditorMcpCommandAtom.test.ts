@@ -1,6 +1,6 @@
 import { scheduleTask } from "@effect/atom-react";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { EditorMcpOverviewSchema } from "../../../electron/contract/editor/EditorMcpOverviewSchema";
 import { EditorMcpCommandAtom } from "~/ui/editor-mcp/EditorMcpCommandAtom";
@@ -24,28 +24,18 @@ const mcpState = vi.hoisted(
 	}),
 );
 
-vi.mock("~/ui/editor-mcp/readEditorMcpOverviewFx", async () => {
-	const { Effect } = await import("effect");
-	return {
-		readEditorMcpOverviewFx: Effect.sync(() => mcpState.overview),
-	};
-});
-
-vi.mock("~/ui/editor-mcp/configureEditorMcpFx", async () => {
-	const { Effect } = await import("effect");
-	return {
-		configureEditorMcpFx: () => Effect.sync(() => mcpState.overview),
-	};
-});
-
-vi.mock("~/ui/editor-mcp/executeEditorMcpCommandFx", async () => {
-	const { Effect } = await import("effect");
-	return {
-		executeEditorMcpCommandFx: () =>
-			Effect.sync(() => ({
-				overview: mcpState.overview,
-			})),
-	};
+beforeEach(() => {
+	vi.stubGlobal("window", {
+		arkini: {
+			editorMcp: {
+				command: async () => ({
+					overview: mcpState.overview,
+				}),
+				configure: async () => mcpState.overview,
+				readOverview: async () => mcpState.overview,
+			},
+		},
+	});
 });
 
 const registries: AtomRegistry.AtomRegistry[] = [];
@@ -67,6 +57,7 @@ const waitForReady = async (registry: AtomRegistry.AtomRegistry) => {
 
 afterEach(() => {
 	for (const registry of registries.splice(0)) registry.dispose();
+	vi.unstubAllGlobals();
 });
 
 describe("EditorMcpCommandAtom", () => {

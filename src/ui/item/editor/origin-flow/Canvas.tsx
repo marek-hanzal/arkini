@@ -5,10 +5,10 @@ import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { CanvasPalette } from "~/ui/item/editor/origin-flow/CanvasPalette";
 import { createCanvasPainterFx } from "~/ui/item/editor/origin-flow/createCanvasPainterFx";
 import {
-	createViewportFx,
 	type Bounds,
+	OriginFlowViewport,
 	type Viewport,
-} from "~/ui/item/editor/origin-flow/createViewportFx";
+} from "~/ui/item/editor/origin-flow/Viewport";
 import type { LayoutNode, LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
 import {
 	type OriginFlowDirection,
@@ -59,7 +59,7 @@ interface RenderState {
 	readonly selection: Selection | undefined;
 }
 
-const FlowViewport = RendererRuntime.runSync(createViewportFx());
+const FlowViewport = OriginFlowViewport;
 const FlowPainter = RendererRuntime.runSync(createCanvasPainterFx());
 
 /** Renders the passive item flow directly to Canvas with imperative pan and zoom. */

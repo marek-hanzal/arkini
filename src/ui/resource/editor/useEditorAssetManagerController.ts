@@ -1,12 +1,16 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
+import { Effect } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { BadgeCheck, Images, SearchX, type LucideIcon } from "lucide-react";
 import { type ChangeEventHandler, type RefObject, useCallback, useMemo, useRef } from "react";
 import { match, P } from "ts-pattern";
 
-import { importEditorAssetsCommandAtom } from "~/ui/resource/editor/importEditorAssetsCommandAtom";
+import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { importEditorArkpackAssetsFx } from "~/ui/arkpack/editor/importEditorArkpackAssetsFx";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
+import { saveEditorAssetsFx } from "~/ui/resource/editor/saveEditorAssetsFx";
 import { useEditorAssetLibrary } from "~/ui/resource/editor/useEditorAssetLibrary";
 
 const filters = [
@@ -46,6 +50,25 @@ const errorMessage = (error: unknown) =>
 	match(error)
 		.with(P.instanceOf(Error), (current) => current.message)
 		.otherwise(String);
+
+type ImportEditorAssetsProps =
+	| (saveEditorAssetsFx.Props & {
+			readonly source: "files";
+	  })
+	| (importEditorArkpackAssetsFx.Props & {
+			readonly source: "arkpack";
+	  });
+
+const importEditorAssetsCommandAtom = RendererRuntime.runSync(
+	Effect.map(EditorProjectRepository, (repository) =>
+		Atom.fn((variables: ImportEditorAssetsProps) =>
+			(variables.source === "arkpack"
+				? importEditorArkpackAssetsFx(variables)
+				: saveEditorAssetsFx(variables)
+			).pipe(Effect.provideService(EditorProjectRepository, repository)),
+		).pipe(Atom.withLabel("EditorAssetsImport"), Atom.setIdleTTL(0)),
+	),
+);
 
 export namespace useEditorAssetManagerController {
 	export type Filter = "all" | "unused";

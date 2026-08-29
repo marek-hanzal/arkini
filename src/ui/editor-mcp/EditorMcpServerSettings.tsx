@@ -1,7 +1,7 @@
 import { RefreshCw } from "lucide-react";
 import { match } from "ts-pattern";
+import type { EditorMcpOverviewSchema } from "../../../electron/contract/editor/EditorMcpOverviewSchema";
 
-import type { EditorMcpOverview } from "~/ui/editor-mcp/readEditorMcpOverviewFx";
 import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
 import type { EditorMcpController } from "~/ui/editor-mcp/useEditorMcpController";
 import {
@@ -13,7 +13,7 @@ import {
 } from "./EditorMcpStatus";
 
 const readLocalStatus = (
-	status: EditorMcpOverview["local"] | undefined,
+	status: EditorMcpOverviewSchema.Type["local"] | undefined,
 ): {
 	readonly message: string;
 	readonly tone: EditorMcpStatusTone;
@@ -43,7 +43,7 @@ const readLocalStatus = (
 		}));
 
 const readRemoteStatus = (
-	status: EditorMcpOverview["remote"] | undefined,
+	status: EditorMcpOverviewSchema.Type["remote"] | undefined,
 ): {
 	readonly message: string;
 	readonly tone: EditorMcpStatusTone;

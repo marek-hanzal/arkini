@@ -1,23 +1,21 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { Effect, Option } from "effect";
 
-import { parseEditorItemSectionIdFx } from "~/@routes/editor/$projectId/editor/items/$itemUid/-parseEditorItemSectionIdFx";
 import { EditorItemArtworkSection } from "~/ui/item/editor/EditorItemArtworkSection";
 import { EditorItemChargesSection } from "~/ui/item/editor/EditorItemChargesSection";
 import { useEditorItemFormSession } from "~/ui/item/editor/EditorItemFormContext";
 import { EditorItemIdentitySection } from "~/ui/item/editor/EditorItemIdentitySection";
 import { EditorItemMergesSection } from "~/ui/item/editor/EditorItemMergesSection";
 import { EditorItemProductionSection } from "~/ui/item/editor/EditorItemProductionSection";
-import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
+import {
+	type EditorItemSectionId,
+	EditorItemSectionIds,
+} from "~/ui/item/editor/EditorItemSections";
 import { EditorSpaceActionSection } from "~/ui/item/editor/EditorSpaceActionSection";
 import { readEditorItemFormSectionsFn } from "~/ui/item/editor/fn/readEditorItemFormSectionsFn";
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/form/$sectionId")({
-	beforeLoad: ({ context, params }) => {
-		const section = context.rendererRuntime.runSync(
-			parseEditorItemSectionIdFx(params.sectionId).pipe(Effect.option),
-		);
-		if (Option.isSome(section)) return;
+	beforeLoad: ({ params }) => {
+		if (EditorItemSectionIds.some((section) => section === params.sectionId)) return;
 		throw redirect({
 			to: "/editor/$projectId/editor/items/$itemUid/form/$sectionId",
 			params: {

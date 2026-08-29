@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { RegistryContext, scheduleTask } from "@effect/atom-react";
+import { Effect as EffectModule } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement, Fragment } from "react";
 import { createRoot } from "react-dom/client";
@@ -35,29 +36,35 @@ vi.mock("@tanstack/react-router", async (importOriginal) => ({
 	useRouter: () => navigation.router,
 }));
 
-vi.mock("~/ui/editor/deleteEditorProjectAtom", async () => {
+vi.mock("~/renderer/RendererRuntime", async () => {
 	const { Effect } = await import("effect");
-	const Atom = await import("effect/unstable/reactivity/Atom");
+	const { EditorProjectRepository } = await import("~/editor/EditorProjectRepository");
+	const repository = {
+		deleteProjectFx: (projectId: string) => Effect.sync(() => deletion.run(projectId)),
+	};
 	return {
-		deleteEditorProjectAtom: Atom.fn((projectId: string) =>
-			Effect.sync(() => deletion.run(projectId)),
-		),
+		RendererRuntime: {
+			runSync: (effect: EffectModule.Effect<unknown, unknown, unknown>) =>
+				Effect.runSync(
+					effect.pipe(
+						Effect.provideService(EditorProjectRepository, repository as never),
+					) as EffectModule.Effect<unknown, unknown, never>,
+				),
+		},
 	};
 });
 
-vi.mock("~/ui/editor/createFreshEditorProjectAtom", async () => {
+vi.mock("~/editor/project/fx/createFreshEditorProjectFx", async () => {
 	const { Effect } = await import("effect");
-	const Atom = await import("effect/unstable/reactivity/Atom");
 	return {
-		createFreshEditorProjectAtom: Atom.fn(() => Effect.die("Unexpected create.")),
+		createFreshEditorProjectFx: () => Effect.die("Unexpected create."),
 	};
 });
 
-vi.mock("~/ui/arkpack/editor/importEditorArkpackFileAtom", async () => {
+vi.mock("~/ui/arkpack/editor/importEditorArkpackFileFx", async () => {
 	const { Effect } = await import("effect");
-	const Atom = await import("effect/unstable/reactivity/Atom");
 	return {
-		importEditorArkpackFileAtom: Atom.fn(() => Effect.die("Unexpected arkpack import.")),
+		importEditorArkpackFileFx: () => Effect.die("Unexpected arkpack import."),
 	};
 });
 

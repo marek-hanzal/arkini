@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
-import type { Viewport } from "~/ui/item/editor/origin-flow/createViewportFx";
+import type { Viewport } from "~/ui/item/editor/origin-flow/Viewport";
 import type { CanvasPalette } from "~/ui/item/editor/origin-flow/CanvasPalette";
 
 const traceFlowRoute = (context: CanvasRenderingContext2D, points: ReadonlyArray<LayoutPoint>) => {

@@ -1,10 +1,16 @@
 import { useAtom } from "@effect/atom-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { EditorMcpConfigurationSchema } from "../../../electron/contract/editor/EditorMcpConfigurationSchema";
+import { EditorMcpOverviewSchema } from "../../../electron/contract/editor/EditorMcpOverviewSchema";
 
-import { parseEditorMcpConfiguration } from "~/ui/editor-mcp/configureEditorMcpFx";
-import { parseEditorMcpOverview } from "~/ui/editor-mcp/readEditorMcpOverviewFx";
 import { useClipboard } from "~/ui/clipboard/useClipboard";
 import { EditorMcpCommandAtom } from "~/ui/editor-mcp/EditorMcpCommandAtom";
+
+const parseEditorMcpOverviewFn = (candidate: unknown) =>
+	EditorMcpOverviewSchema.safeParse(candidate);
+
+const parseEditorMcpConfigurationFn = (candidate: unknown) =>
+	EditorMcpConfigurationSchema.safeParse(candidate);
 
 export const useEditorMcpController = () => {
 	const [state, dispatch] = useAtom(EditorMcpCommandAtom);
@@ -20,7 +26,7 @@ export const useEditorMcpController = () => {
 			type: "read",
 		});
 		return window.arkini.editorMcp.onOverviewChanged((candidate) => {
-			const parsed = parseEditorMcpOverview(candidate);
+			const parsed = parseEditorMcpOverviewFn(candidate);
 			if (!parsed.success) return;
 			dispatch({
 				type: "synchronize",
@@ -96,7 +102,7 @@ export const useEditorMcpController = () => {
 					setLocalError("Enter the assigned ngrok domain first.");
 					return;
 				}
-				const ngrok = parseEditorMcpConfiguration({
+				const ngrok = parseEditorMcpConfigurationFn({
 					type: "ngrok",
 					authtoken,
 					domain: ngrokDomain,

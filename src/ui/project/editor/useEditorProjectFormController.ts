@@ -1,20 +1,36 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { revalidateLogic, useStore } from "@tanstack/react-form";
+import { Effect } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import { useCallback, useMemo, useRef } from "react";
 
+import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
 import { useEditorProject } from "~/ui/editor/useEditorProject";
 import { createEditorProjectConfigFn } from "~/ui/project/editor/fn/createEditorProjectConfigFn";
 import { createEditorProjectFormSchema } from "~/ui/project/editor/createEditorProjectFormSchema";
 import { analyzeEditorProjectStructuralCompatibilityFn } from "~/ui/project/editor/fn/analyzeEditorProjectStructuralCompatibilityFn";
 import { readEditorProjectFormValuesFn } from "~/ui/project/editor/fn/readEditorProjectFormValuesFn";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
-import { saveEditorProjectConfigCommandAtom } from "~/ui/project/editor/saveEditorProjectConfigCommandAtom";
+import { saveEditorProjectConfigFx } from "~/ui/project/editor/saveEditorProjectConfigFx";
 import { useAppForm } from "~/ui/form/EditorForm";
 import type { EditorProjectSectionId } from "~/ui/project/editor/EditorProjectSections";
 import { readEditorProjectSectionForPathFn } from "~/ui/project/editor/fn/readEditorProjectSectionForPathFn";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
 import { analyzeEditorProjectCompatibilityFn } from "~/editor/version/fn/analyzeEditorProjectCompatibilityFn";
+
+const saveEditorProjectConfigCommandAtom = RendererRuntime.runSync(
+	Effect.map(EditorProjectRepository, (repository) =>
+		Atom.family((projectId: string) =>
+			Atom.fn((props: Omit<saveEditorProjectConfigFx.Props, "projectId">) =>
+				saveEditorProjectConfigFx({
+					...props,
+					projectId,
+				}).pipe(Effect.provideService(EditorProjectRepository, repository)),
+			).pipe(Atom.setIdleTTL(0)),
+		),
+	),
+);
 
 export const useEditorProjectFormController = ({
 	onInvalidSection,

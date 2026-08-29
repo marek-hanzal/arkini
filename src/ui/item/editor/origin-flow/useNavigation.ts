@@ -1,9 +1,8 @@
 import { type RefObject, useCallback, useEffect, useRef, useState } from "react";
 
 import type { EditorItemOriginFlow } from "~/editor/origin-flow/EditorItemOriginFlow";
-import { popVisitFn } from "~/ui/item/editor/origin-flow/fn/popVisitFn";
 import type { LayoutNode } from "~/ui/item/editor/origin-flow/Layout";
-import type { Viewport } from "~/ui/item/editor/origin-flow/createViewportFx";
+import type { Viewport } from "~/ui/item/editor/origin-flow/Viewport";
 import type { OriginFlowDirection, Selection } from "~/ui/item/editor/origin-flow/Highlight";
 import {
 	type HighlightDepth,
@@ -22,6 +21,19 @@ type FlowNavigationShortcut =
 	| "outputs"
 	| "previous"
 	| "roots";
+
+const popVisitFn = (history: ReadonlyArray<string>) => {
+	if (history.length < 2)
+		return {
+			history,
+			nodeId: undefined,
+		};
+	const nextHistory = history.slice(0, -1);
+	return {
+		history: nextHistory,
+		nodeId: nextHistory.at(-1),
+	};
+};
 
 const readShortcut = (event: KeyboardEvent): FlowNavigationShortcut | undefined => {
 	const target = event.target;

@@ -1,15 +1,31 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
+import { Effect } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import { useCallback, useMemo, useState } from "react";
 
+import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
 import { useEditorProject } from "~/ui/editor/useEditorProject";
-import { deleteEditorAssetCommandAtom } from "~/ui/resource/editor/deleteEditorAssetCommandAtom";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { deleteEditorAssetFx } from "~/ui/resource/editor/deleteEditorAssetFx";
 import {
 	readEditorAssetDeleteBlockersFn,
 	type EditorAssetDeleteBlocker,
 } from "~/editor/resource/fn/readEditorAssetDeleteBlockersFn";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
+
+const deleteEditorAssetCommandAtom = RendererRuntime.runSync(
+	Effect.map(EditorProjectRepository, (repository) =>
+		Atom.family((projectId: string) =>
+			Atom.fn((props: Omit<deleteEditorAssetFx.Props, "projectId">) =>
+				deleteEditorAssetFx({
+					...props,
+					projectId,
+				}).pipe(Effect.provideService(EditorProjectRepository, repository)),
+			).pipe(Atom.setIdleTTL(0)),
+		),
+	),
+);
 
 export namespace useEditorAssetDeleteController {
 	export interface Props {

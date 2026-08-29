@@ -1,7 +1,8 @@
 import type { PropsWithChildren } from "react";
 import { Button, PrimaryButton } from "~/ui/button/Button";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
-import { actionPanelViewTransitionName } from "~/ui/navigation/actionPanelViewTransitionName";
+
+const actionPanelViewTransitionName = "arkini-action-panel";
 
 export namespace ActionErrorPage {
 	export interface Props extends PropsWithChildren {

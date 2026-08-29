@@ -4,46 +4,44 @@ import { readCrowdAlphaFn } from "~/ui/pixi/actor/fn/readCrowdAlphaFn";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
 
-export namespace classifyActorUpdateFn {
-	export interface Props {
-		readonly actor: PixiTileActor;
-		readonly deliveryRetained: boolean;
-		readonly directLanding: boolean;
-		readonly displayItem: TileActorItem;
-		readonly motionClaimed: boolean;
-		readonly pose: ActorPose;
-		readonly poseChannelActive: boolean;
-		readonly preserveVisual: boolean;
-	}
+interface ClassifyActorUpdateProps {
+	readonly actor: PixiTileActor;
+	readonly deliveryRetained: boolean;
+	readonly directLanding: boolean;
+	readonly displayItem: TileActorItem;
+	readonly motionClaimed: boolean;
+	readonly pose: ActorPose;
+	readonly poseChannelActive: boolean;
+	readonly preserveVisual: boolean;
+}
 
-	export interface Result {
-		readonly activityEffect: "start" | "stop" | null;
-		readonly crowdAlpha: number | null;
-		readonly item:
-			| {
-					readonly kind: "assign";
-			  }
-			| {
-					readonly kind: "progress";
-			  }
-			| {
-					readonly kind: "visual";
-					readonly preserveVisual: boolean;
-					readonly size: number;
-			  };
-		readonly pose:
-			| {
-					readonly kind: "owned";
-			  }
-			| {
-					readonly kind: "place";
-			  }
-			| {
-					readonly directLanding: boolean;
-					readonly kind: "travel";
-					readonly scaleBeforeTravel: number | null;
-			  };
-	}
+interface ActorUpdatePlan {
+	readonly activityEffect: "start" | "stop" | null;
+	readonly crowdAlpha: number | null;
+	readonly item:
+		| {
+				readonly kind: "assign";
+		  }
+		| {
+				readonly kind: "progress";
+		  }
+		| {
+				readonly kind: "visual";
+				readonly preserveVisual: boolean;
+				readonly size: number;
+		  };
+	readonly pose:
+		| {
+				readonly kind: "owned";
+		  }
+		| {
+				readonly kind: "place";
+		  }
+		| {
+				readonly directLanding: boolean;
+				readonly kind: "travel";
+				readonly scaleBeforeTravel: number | null;
+		  };
 }
 
 const isSameMainSceneVisual = (left: TileActorItem, right: TileActorItem) => {
@@ -79,7 +77,7 @@ export const classifyActorUpdateFn = ({
 	pose,
 	poseChannelActive,
 	preserveVisual,
-}: classifyActorUpdateFn.Props) => {
+}: ClassifyActorUpdateProps): ActorUpdatePlan => {
 	const moved = !isSameTileActorLocationFn(actor.item.location, displayItem.location);
 	const visualChanged = !isSameMainSceneVisual(actor.currentVisual.item, displayItem);
 	const progressChanged = actor.item.progressRatio !== displayItem.progressRatio;
@@ -94,7 +92,7 @@ export const classifyActorUpdateFn = ({
 				? "start"
 				: "stop";
 	const previousDisplayedSize = actor.size * actor.container.scale.x;
-	const item: classifyActorUpdateFn.Result["item"] =
+	const item: ActorUpdatePlan["item"] =
 		visualChanged || sizeChanged
 			? {
 					kind: "visual",

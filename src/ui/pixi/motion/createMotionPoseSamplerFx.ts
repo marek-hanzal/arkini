@@ -6,20 +6,18 @@ import { createRetargetablePoseSamplerFx } from "~/ui/pixi/animation/createRetar
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
 
-export namespace createMotionPoseSamplerFx {
-	export interface Props {
-		readonly actorBaseSize: number;
-		readonly from: Required<PresentedPose>;
-		readonly readLiveTarget?: () => Required<PresentedPose> | null;
-		readonly surface: MainSurface;
-		readonly target: ActorPose;
-		readonly targetLocation: Parameters<MainSurface["readLocationPoseFx"]>[0];
-	}
+interface CreateMotionPoseSamplerProps {
+	readonly actorBaseSize: number;
+	readonly from: Required<PresentedPose>;
+	readonly readLiveTarget?: () => Required<PresentedPose> | null;
+	readonly surface: MainSurface;
+	readonly target: ActorPose;
+	readonly targetLocation: Parameters<MainSurface["readLocationPoseFx"]>[0];
+}
 
-	export interface Result {
-		readonly needsCompletionSettle: () => boolean;
-		readonly readPose: (progress: number) => PresentedPose;
-	}
+interface MotionPoseSampler {
+	readonly needsCompletionSettle: () => boolean;
+	readonly readPose: (progress: number) => PresentedPose;
 }
 
 const samePose = (left: Required<PresentedPose>, right: Required<PresentedPose>) =>
@@ -33,8 +31,8 @@ const samePose = (left: Required<PresentedPose>, right: Required<PresentedPose>)
  * continually restarting, while progress 1 always publishes the latest canonical destination.
  */
 export const createMotionPoseSamplerFx = Effect.fn("createMotionPoseSamplerFx")(
-	(props: createMotionPoseSamplerFx.Props) =>
-		Effect.gen(function* (): Effect.fn.Return<createMotionPoseSamplerFx.Result> {
+	(props: CreateMotionPoseSamplerProps) =>
+		Effect.gen(function* (): Effect.fn.Return<MotionPoseSampler> {
 			let sampleProgress = 0;
 			let completionRetargeted = false;
 			let previousTarget: Required<PresentedPose> = {

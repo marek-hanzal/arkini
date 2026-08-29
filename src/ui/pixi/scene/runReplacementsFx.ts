@@ -33,8 +33,6 @@ const retainNewestKeys = (keys: Set<string>, maximumSize = 256) => {
 	}
 };
 
-export const replacementCrossfadeDurationMs = visualCrossfadeDurationMs;
-
 /**
  * Blends complete visual slots inside one canonical actor.
  *
@@ -69,7 +67,7 @@ export const runReplacementsFx = Effect.fn("runReplacementsFx")(function* ({
 		yield* transitionActorVisualFx({
 			actor,
 			animator,
-			durationMs: replacementCrossfadeDurationMs,
+			durationMs: visualCrossfadeDurationMs,
 			frames: application.frames,
 			item: canonical,
 			onDiscard: () => processedKeys.delete(replacement.key),

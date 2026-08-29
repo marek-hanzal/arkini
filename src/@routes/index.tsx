@@ -7,11 +7,11 @@ import { PrimaryButton } from "~/ui/button/Button";
 import { LauncherSplashCompletedAtom } from "~/ui/launcher/LauncherSplashCompletedAtom";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
 import { useStartupSplashLifecycle } from "~/ui/launcher/useStartupSplashLifecycle";
-import { startupContentViewTransitionName } from "~/ui/navigation/startupContentViewTransitionName";
 
 const readLauncherSplashCompletedFx = Effect.fn("readLauncherSplashCompletedFx")(() =>
 	Atom.get(LauncherSplashCompletedAtom),
 );
+const startupContentViewTransitionName = "arkini-startup-content";
 
 export const Route = createFileRoute("/")({
 	beforeLoad: ({ context }) => {

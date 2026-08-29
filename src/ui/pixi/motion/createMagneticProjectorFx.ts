@@ -6,23 +6,21 @@ import type { PresentedPose } from "~/ui/pixi/animation/ActorAnimator";
 import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 
-export namespace createMagneticProjectorFx {
-	export interface Props {
-		readonly actor: PixiTileActor;
+interface CreateMagneticProjectorProps {
+	readonly actor: PixiTileActor;
+	readonly attractedActorId: string | null;
+	readonly eligibleAttractionActorIds: ReadonlySet<string>;
+	readonly magneticField: MagneticField;
+	readonly surface: MainSurface;
+	readonly readAttraction?: () => {
 		readonly attractedActorId: string | null;
 		readonly eligibleAttractionActorIds: ReadonlySet<string>;
-		readonly magneticField: MagneticField;
-		readonly surface: MainSurface;
-		readonly readAttraction?: () => {
-			readonly attractedActorId: string | null;
-			readonly eligibleAttractionActorIds: ReadonlySet<string>;
-		};
-	}
+	};
+}
 
-	export interface Result {
-		readonly projectPose: (pose: PresentedPose) => void;
-		readonly release: () => void;
-	}
+interface MagneticProjector {
+	readonly projectPose: (pose: PresentedPose) => void;
+	readonly release: () => void;
 }
 
 /**
@@ -39,8 +37,8 @@ export const createMagneticProjectorFx = Effect.fn("createMagneticProjectorFx")(
 		magneticField,
 		readAttraction,
 		surface,
-	}: createMagneticProjectorFx.Props) =>
-		Effect.sync((): createMagneticProjectorFx.Result => {
+	}: CreateMagneticProjectorProps) =>
+		Effect.sync((): MagneticProjector => {
 			const sourceActorId = actor.item.id;
 			let acquired = false;
 			let released = false;

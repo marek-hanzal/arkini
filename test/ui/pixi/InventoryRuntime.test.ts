@@ -2,7 +2,6 @@
 
 import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
-import { consumedFadeDurationMs } from "~/ui/pixi/animation/flashConsumedSourceFx";
 import type { GameEngine } from "~/renderer/game/GameEngine";
 
 import {
@@ -47,7 +46,7 @@ describe("Inventory runtime / feedback and hydration", () => {
 		expect(sceneState.particleTextureClose).toHaveBeenCalledOnce();
 	});
 	it("dips a surviving Inventory source from a committed input-consumption fact", async () => {
-		sceneState.deferredTweenDurations.add(consumedFadeDurationMs);
+		sceneState.deferFiniteTweens = true;
 		const { actor, runtime } = await mountScene();
 		const current = sceneState.transition;
 		if (current === null) throw new Error("Test transition is missing.");
@@ -87,7 +86,7 @@ describe("Inventory runtime / feedback and hydration", () => {
 		await Effect.runPromise(runtime.closeFx);
 	});
 	it("hydrates historical Inventory feedback without replaying its animation", async () => {
-		sceneState.deferredTweenDurations.add(consumedFadeDurationMs);
+		sceneState.deferFiniteTweens = true;
 		sceneState.items = [
 			{
 				...inventoryItem,

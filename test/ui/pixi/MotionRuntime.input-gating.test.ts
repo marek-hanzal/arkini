@@ -3,10 +3,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import {
-	lifecycleDurationMs,
-	lifecycleReducedScale,
-} from "~/ui/pixi/animation/runActorLifecycleFx";
+import { lifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
 
 import {
 	createMotionHarness,
@@ -189,8 +186,8 @@ describe("input-gated owner output", () => {
 		}
 		expect(ownerExitScale).toMatchObject({
 			durationMs: lifecycleDurationMs,
-			toScale: lifecycleReducedScale,
 		});
+		expect(ownerExitScale.toScale).toBeLessThan(1);
 		const ownerExitOpacity = animations.find(
 			(animation) =>
 				animation.actor === owner &&

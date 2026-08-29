@@ -1,23 +1,34 @@
 import { Effect, Exit } from "effect";
 import { loadArkpackFx } from "~/renderer/arkpack/loadArkpackFx";
-import { readHeroResourceFx } from "~/ui/launcher/readHeroResourceFx";
+import type { PayloadSchema } from "~/engine/pack/schema/PayloadSchema";
 import { readLastPackageIdFx } from "~/renderer/launcher/readLastPackageIdFx";
 import { preloadLauncherHeroFx } from "~/ui/launcher/preloadLauncherHeroFx";
 
-export namespace prepareLauncherHeroFx {
-	export interface Props {
-		readonly fallbackUrl: string;
-	}
+interface PrepareLauncherHeroProps {
+	readonly fallbackUrl: string;
+}
 
+export namespace prepareLauncherHeroFx {
 	export interface Result {
 		readonly owned: boolean;
 		readonly url: string;
 	}
 }
 
+const readHeroResourceFx = Effect.fn("prepareLauncherHeroFx.readResourceFx")(function* (
+	payload: PayloadSchema.Type,
+) {
+	const resourceId = payload.config.resources.hero;
+	const resource = payload.resources.find((candidate) => candidate.id === resourceId);
+	if (resource === undefined) {
+		return yield* Effect.fail(new Error(`Arkpack Hero resource ${resourceId} is unavailable.`));
+	}
+	return resource;
+});
+
 /** Resolves and decodes the preferred package Hero, degrading any failure to the shell fallback. */
 export const prepareLauncherHeroFx = Effect.fn("prepareLauncherHeroFx")(
-	({ fallbackUrl }: prepareLauncherHeroFx.Props) =>
+	({ fallbackUrl }: PrepareLauncherHeroProps) =>
 		Effect.gen(function* () {
 			const packageId = yield* readLastPackageIdFx();
 			if (packageId === null) {

@@ -1,11 +1,18 @@
+import { useAtomValue } from "@effect/atom-react";
 import { createFileRoute } from "@tanstack/react-router";
+import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 
-import { useAboutPortraitAssets } from "~/ui/launcher/about/useAboutPortraitAssets";
 import { About } from "~/ui/launcher/About";
 import { AboutEasterEgg } from "~/ui/launcher/AboutEasterEgg";
 import { AboutJumpscare } from "~/ui/launcher/AboutJumpscare";
+import { AboutPortraitAssetsAtom } from "~/ui/launcher/about/AboutPortraitAssetsAtom";
 import { useAboutEasterEggDelay } from "~/ui/launcher/useAboutEasterEggDelay";
 import { MainPageLayout } from "~/ui/main-page/MainPageLayout";
+
+const useAboutPortraitAssets = (): readonly string[] => {
+	const result = useAtomValue(AboutPortraitAssetsAtom);
+	return AsyncResult.isSuccess(result) ? result.value : [];
+};
 
 export const Route = createFileRoute("/_launcher/about")({
 	component: () => {

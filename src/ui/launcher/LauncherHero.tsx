@@ -1,12 +1,12 @@
 import { useAtomValue } from "@effect/atom-react";
 import type { CSSProperties } from "react";
 import { LauncherHeroUrlAtom } from "~/ui/launcher/LauncherHeroUrlAtom";
-import { launcherHeroArtworkViewTransitionName } from "~/ui/navigation/launcherHeroArtworkViewTransitionName";
-import { launcherHeroShadowViewTransitionName } from "~/ui/navigation/launcherHeroShadowViewTransitionName";
 
 const heroAspectRatio = "1535 / 1024";
 const compactWidth = "var(--ak-compact-hero-width)";
 const fullWidth = "var(--ak-full-hero-width)";
+const launcherHeroArtworkViewTransitionName = "arkini-launcher-hero-artwork";
+const launcherHeroShadowViewTransitionName = "arkini-launcher-hero-shadow";
 
 export namespace LauncherHero {
 	export interface Props {

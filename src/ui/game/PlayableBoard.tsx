@@ -1,9 +1,9 @@
 import { useCallback } from "react";
 
 import { RendererRuntime } from "~/renderer/RendererRuntime";
-import { GameBoardLayout } from "~/ui/board/GameBoardLayout";
 import { CheatItemSpotlight } from "~/ui/cheat-spotlight/CheatItemSpotlight";
 import { useGameEngine } from "~/ui/game/useGameEngine";
+import { PixiBoardToolbarSurface } from "~/ui/pixi/PixiBoardToolbarSurface";
 import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";
 
 /** Shared Board + Toolbar gameplay leaf with its exact cheat presentation. */
@@ -24,7 +24,12 @@ export const PlayableBoard = ({
 
 	return (
 		<>
-			<GameBoardLayout onOpenInventory={onOpenInventory} />
+			<div
+				className="size-full min-h-0 min-w-0"
+				data-ui="GameBoardLayout"
+			>
+				<PixiBoardToolbarSurface onOpenInventory={onOpenInventory} />
+			</div>
 			<CheatItemSpotlight
 				alwaysAvailable={cheatAlwaysAvailable}
 				game={game}

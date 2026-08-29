@@ -1,12 +1,8 @@
 import type { TileMotionCue } from "~/ui/pixi/motion/TileMotionCue";
 
-export namespace readUnsettledTileInputSourceQuantitiesFn {
-	export interface Props {
-		readonly cues: ReadonlyArray<TileMotionCue>;
-		readonly revealedCueKeys?: ReadonlySet<string>;
-	}
-
-	export type Result = ReadonlyMap<string, number>;
+interface ReadUnsettledTileInputSourceQuantitiesProps {
+	readonly cues: ReadonlyArray<TileMotionCue>;
+	readonly revealedCueKeys?: ReadonlySet<string>;
 }
 
 /**
@@ -18,7 +14,7 @@ export namespace readUnsettledTileInputSourceQuantitiesFn {
 export const readUnsettledTileInputSourceQuantitiesFn = ({
 	cues,
 	revealedCueKeys = new Set(),
-}: readUnsettledTileInputSourceQuantitiesFn.Props) => {
+}: ReadUnsettledTileInputSourceQuantitiesProps): ReadonlyMap<string, number> => {
 	const quantities = new Map<string, number>();
 	for (const cue of cues) {
 		if (cue.kind !== "input" || quantities.has(cue.sourceActorId)) continue;
@@ -29,5 +25,5 @@ export const readUnsettledTileInputSourceQuantitiesFn = ({
 				: cue.previousQuantity,
 		);
 	}
-	return quantities as readUnsettledTileInputSourceQuantitiesFn.Result;
+	return quantities;
 };

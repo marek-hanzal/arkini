@@ -1,8 +1,6 @@
 // @vitest-environment jsdom
 
 import { describe, expect, it, vi } from "vitest";
-import { consumedFadeDurationMs } from "~/ui/pixi/animation/flashConsumedSourceFx";
-import { feedbackDurationMs } from "~/ui/pixi/animation/runActivityParticlesFx";
 import { Effect } from "effect";
 
 import {
@@ -25,8 +23,7 @@ describe("Inventory runtime / drop settlement", () => {
 			inventoryItem,
 			inventoryTargetItem,
 		];
-		sceneState.deferredTweenDurations.add(consumedFadeDurationMs);
-		sceneState.deferredTweenDurations.add(feedbackDurationMs);
+		sceneState.deferFiniteTweens = true;
 		const onDrop = vi.fn(() =>
 			Promise.resolve({
 				kind: "stack",

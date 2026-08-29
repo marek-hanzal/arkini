@@ -1,10 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
 import type { MotionRuntime } from "~/ui/pixi/motion/MotionRuntime";
-import {
-	lifecycleDurationMs,
-	lifecycleReducedScale,
-} from "~/ui/pixi/animation/runActorLifecycleFx";
+import { lifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
 
 import {
 	boardLocation,
@@ -146,7 +143,6 @@ describe("main reconciliation / delivery retention", () => {
 				actor,
 				channel: "lifecycle-scale",
 				durationMs: lifecycleDurationMs,
-				toScale: lifecycleReducedScale,
 			}),
 		);
 	});

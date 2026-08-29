@@ -2,7 +2,7 @@ import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { DetailSection } from "~/item-authoring/ui/EditorItemDetailDefinition";
 import { EditorItemArtworkTimeline } from "~/item-authoring/ui/EditorItemArtworkTimeline";
 import { EditorItemThumbnail } from "~/ui/item/EditorItemThumbnail";
-import { EditorAssetDetailLink } from "~/ui/resource/editor/EditorAssetDetailLink";
+import { EditorAssetDetailLink } from "~/asset-authoring/ui/EditorAssetDetailLink";
 
 /** Presents default and progress artwork in authored composition order. */
 export const EditorItemArtworkDetail = ({ item }: { readonly item: ItemSchema.Type }) => (

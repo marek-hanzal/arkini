@@ -10,7 +10,7 @@ import { readScenePaletteFx } from "~/ui/pixi/appearance/readScenePaletteFx";
 import type { DropFeedback } from "~/ui/pixi/grid/DropFeedback";
 import { drawMaskFx } from "~/ui/pixi/grid/drawMaskFx";
 import { drawSurfaceFx } from "~/ui/pixi/grid/drawSurfaceFx";
-import { readSlotFx } from "~/ui/pixi/grid/readSlotFx";
+import { readSlotFn } from "~/ui/pixi/grid/fn/readSlotFn";
 import { readInventoryLayoutFn } from "~/ui/pixi/layout/fn/readInventoryLayoutFn";
 import { readMainLayoutFn } from "~/ui/pixi/layout/fn/readMainLayoutFn";
 import type { InventoryLayout } from "~/ui/pixi/layout/SceneLayout";
@@ -87,11 +87,14 @@ export const createInventorySurfaceFx = Effect.fn("createInventorySurfaceFx")(fu
 
 	const readDropTargetFx = Effect.fn("InventorySurface.readDropTargetFx")(
 		(x: number, y: number) =>
-			readSlotFx({
-				surface: layout.surface,
-				x,
-				y,
-			}) satisfies Effect.Effect<InventoryDropTarget | null>,
+			Effect.sync(
+				() =>
+					readSlotFn({
+						surface: layout.surface,
+						x,
+						y,
+					}) satisfies InventoryDropTarget | null,
+			),
 	);
 
 	const renderDropFeedbackFx = Effect.fn("InventorySurface.renderDropFeedbackFx")(

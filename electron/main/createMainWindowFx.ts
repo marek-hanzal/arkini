@@ -2,13 +2,13 @@ import { BrowserWindow, ipcMain, Menu, screen } from "electron";
 import { fileURLToPath } from "node:url";
 import { Effect, Exit } from "effect";
 import { ArkiniWindowTitle } from "../../shared/ArkiniAppMetadata";
-import { calculateInitialWindowBoundsFx } from "./calculateInitialWindowBoundsFx";
 import { ElectronMainError } from "./ElectronMainError";
 import { registerControlledWindowCloseFx } from "./registerControlledWindowCloseFx";
 import { showMainWindowFx } from "./showMainWindowFx";
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
 import type { TrustedRenderer } from "./security/TrustedRenderer";
 import { createWindowModeControllerFx } from "./window/createWindowModeControllerFx";
+import { calculateInitialWindowBoundsFn } from "./window/fn/calculateInitialWindowBoundsFn";
 import { registerWindowModeControllerFx } from "./window/registerWindowModeControllerFx";
 import type { WindowModeControllerOwnership } from "./window/WindowModeControllerOwnership";
 import type { WindowPreferences } from "./window/WindowPreferences";
@@ -37,7 +37,7 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 	}: createMainWindowFx.Props) =>
 		Effect.gen(function* () {
 			const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
-			const bounds = yield* calculateInitialWindowBoundsFx(display.workArea);
+			const bounds = calculateInitialWindowBoundsFn(display.workArea);
 			Menu.setApplicationMenu(null);
 			const window = new BrowserWindow({
 				...bounds,

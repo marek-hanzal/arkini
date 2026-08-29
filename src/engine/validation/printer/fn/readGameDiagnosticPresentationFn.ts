@@ -1,5 +1,3 @@
-import { Effect } from "effect";
-
 import type { GameDiagnosticSchema } from "~/engine/validation/schema/GameDiagnosticSchema";
 import type { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 
@@ -71,12 +69,8 @@ const readDiagnosticContext = (diagnostic: GameDiagnosticSchema.Type): string | 
 };
 
 /** Human-facing copy projected from one machine-readable diagnostic. */
-export const readGameDiagnosticPresentationFx = Effect.fnUntraced(function* (
-	diagnostic: GameDiagnosticSchema.Type,
-) {
-	return {
-		title: diagnosticTitles[diagnostic.code],
-		detail: diagnostic.message,
-		context: readDiagnosticContext(diagnostic),
-	};
+export const readGameDiagnosticPresentationFn = (diagnostic: GameDiagnosticSchema.Type) => ({
+	title: diagnosticTitles[diagnostic.code],
+	detail: diagnostic.message,
+	context: readDiagnosticContext(diagnostic),
 });

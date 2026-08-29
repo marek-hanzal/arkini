@@ -4,7 +4,6 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, type PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/ui/editor/useEditorProject";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
 import { EditorFormSectionPage } from "~/ui/form/EditorFormSectionPage";
 import { EditorItemFormProvider } from "~/ui/item/editor/EditorItemFormContext";
@@ -13,7 +12,7 @@ import type {
 	EditorItemOptionalCapability,
 	EditorItemSectionId,
 } from "~/ui/item/editor/EditorItemSections";
-import { readEditorItemFormSectionsFx } from "~/ui/item/editor/readEditorItemFormSectionsFx";
+import { readEditorItemFormSectionsFn } from "~/ui/item/editor/fn/readEditorItemFormSectionsFn";
 import { EditorCompatibilityNotice } from "~/ui/editor/EditorCompatibilityNotice";
 import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import { useEditorItemFormController } from "~/ui/item/editor/useEditorItemFormController";
@@ -89,7 +88,7 @@ export const EditorItemFormSession = ({
 			productionLineId,
 		],
 	);
-	const sections = RendererRuntime.runSync(readEditorItemFormSectionsFx(initialItem));
+	const sections = readEditorItemFormSectionsFn(initialItem);
 	const params = {
 		projectId: project.projectId,
 		itemUid: initialItem.uid,

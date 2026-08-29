@@ -3,7 +3,7 @@ import { Effect, Option } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readDeliveryTravelDurationMsFx } from "~/engine/delivery/read/readDeliveryTravelDurationMsFx";
 import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
-import { isMaterialInputEligibleFx } from "~/engine/input/read/isMaterialInputEligibleFx";
+import { isMaterialInputEligibleFn } from "~/engine/input/read/fn/isMaterialInputEligibleFn";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
@@ -12,7 +12,7 @@ import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSc
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import { isDeliveryRuntimeItemFn } from "~/engine/runtime/read/fn/isDeliveryRuntimeItemFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { matchesItemSelectorFx } from "~/engine/selector/fx/matchesItemSelectorFx";
+import { matchesItemSelectorFn } from "~/engine/selector/fn/matchesItemSelectorFn";
 
 export namespace reconcileOutboundDeliveriesRuntimeFx {
 	export interface Props {
@@ -61,11 +61,11 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 				if (
 					input === undefined ||
 					input.type !== TypeSchema.enum.Materials ||
-					!(yield* isMaterialInputEligibleFx(current.item)) ||
-					!(yield* matchesItemSelectorFx({
+					!isMaterialInputEligibleFn(current.item) ||
+					!matchesItemSelectorFn({
 						item: current.item,
 						selector: input.selector,
-					})) ||
+					}) ||
 					(yield* isLineInputClosedFx({
 						input,
 						ownerItemId: owner.id,

@@ -3,11 +3,11 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetailSourcesFx";
-import { isMaterialInputEligibleFx } from "~/engine/input/read/isMaterialInputEligibleFx";
+import { isMaterialInputEligibleFn } from "~/engine/input/read/fn/isMaterialInputEligibleFn";
 import { isLineInputAutofillSourceLocationFx } from "~/engine/input/read/isLineInputAutofillSourceLocationFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { matchesItemSelectorFx } from "~/engine/selector/fx/matchesItemSelectorFx";
+import { matchesItemSelectorFn } from "~/engine/selector/fn/matchesItemSelectorFn";
 import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
 
 export namespace readItemDetailMaterialAutofillAvailabilityFx {
@@ -50,11 +50,11 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 		if (
 			candidate.id === ownerItemId ||
 			activeJobOwnerItemIds.has(candidate.id) ||
-			!(yield* isMaterialInputEligibleFx(candidate.item)) ||
-			!(yield* matchesItemSelectorFx({
+			!isMaterialInputEligibleFn(candidate.item) ||
+			!matchesItemSelectorFn({
 				item: candidate.item,
 				selector,
-			}))
+			})
 		) {
 			continue;
 		}
@@ -104,11 +104,11 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 	const matchingDefinitionIds: IdSchema.Type[] = [];
 	for (const item of Object.values(config.items)) {
 		if (
-			(yield* isMaterialInputEligibleFx(item)) &&
-			(yield* matchesItemSelectorFx({
+			isMaterialInputEligibleFn(item) &&
+			matchesItemSelectorFn({
 				item,
 				selector,
-			}))
+			})
 		) {
 			matchingDefinitionIds.push(item.id);
 		}

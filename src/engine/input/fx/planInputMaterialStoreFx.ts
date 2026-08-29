@@ -4,8 +4,8 @@ import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativ
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { MaterialSchema } from "~/engine/input/schema/MaterialSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import { readMaterialInputEligibilityFx } from "~/engine/input/read/readMaterialInputEligibilityFx";
-import { selectItemsFx } from "~/engine/selector/fx/selectItemsFx";
+import { readMaterialInputEligibilityFn } from "~/engine/input/read/fn/readMaterialInputEligibilityFn";
+import { selectItemsFn } from "~/engine/selector/fn/selectItemsFn";
 import { resolveInputMaterialFx } from "./resolveInputMaterialFx";
 
 export namespace planInputMaterialStoreFx {
@@ -31,13 +31,13 @@ export const planInputMaterialStoreFx = Effect.fn("planInputMaterialStoreFx")(fu
 	requestedQuantity,
 	storedQuantity,
 }: planInputMaterialStoreFx.Props) {
-	const matches = yield* selectItemsFx({
+	const matches = selectItemsFn({
 		items: [
 			item.item,
 		],
 		selector: input.selector,
 	});
-	const eligibility = yield* readMaterialInputEligibilityFx({
+	const eligibility = readMaterialInputEligibilityFn({
 		items: [
 			item.item,
 		],

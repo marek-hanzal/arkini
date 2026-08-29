@@ -6,9 +6,9 @@ import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { makeDropRejectedResultFx } from "~/engine/runtime/drop/makeDropRejectedResultFx";
 import { projectDropTransferActorFx } from "~/engine/runtime/drop/projectDropTransferActorFx";
 import { readDropItemStackRejectedReasonFx } from "~/engine/runtime/read/readDropItemStackRejectedReasonFx";
-import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
-import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
-import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
+import type { DropItemResult } from "~/engine/runtime/DropItemResult";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 import { stackItemsFx } from "~/engine/runtime/write/stackItemsFx";
 
 export namespace commitStackDropFx {
@@ -21,7 +21,7 @@ export namespace commitStackDropFx {
 		readonly targetLocation: GridLocationSchema.Type;
 	}
 
-	export type Result = DropItemResultSchema.Type;
+	export type Result = DropItemResult;
 }
 
 /** Commits one exact pure-stack transfer and normalizes both actor identities. */
@@ -48,7 +48,7 @@ export const commitStackDropFx = Effect.fn("commitStackDropFx")(function* ({
 			}).pipe(
 				Effect.map(
 					(source): commitStackDropFx.Result => ({
-						kind: DropItemResultKindEnumSchema.enum.Stack,
+						kind: DropItemResultKind.Stack,
 						transferredQuantity: result.transferredQuantity,
 						source,
 						target: {
@@ -87,14 +87,14 @@ export const commitStackDropFx = Effect.fn("commitStackDropFx")(function* ({
 				makeDropRejectedResultFx({
 					reason:
 						error.itemId === targetItemId
-							? DropItemRejectedReasonEnumSchema.enum.StaleTarget
-							: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+							? DropItemRejectedReason.StaleTarget
+							: DropItemRejectedReason.StaleSource,
 					sourceItemId,
 					targetItemId,
 				}),
 			JobOwnerBusyError: () =>
 				makeDropRejectedResultFx({
-					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
+					reason: DropItemRejectedReason.Blocked,
 					sourceItemId,
 					targetItemId,
 				}),

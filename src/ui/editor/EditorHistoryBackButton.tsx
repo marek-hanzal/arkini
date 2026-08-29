@@ -1,9 +1,12 @@
 import type { AnyRouter, RegisteredRouter } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { ButtonLink, type ButtonLinkProps } from "~/ui/button/Button";
-import { editorBackLinkClassName, EditorBackIcon } from "~/ui/editor/EditorBackIcon";
 import { useEditorHistoryBack } from "~/ui/editor/useEditorHistoryBack";
+
+const editorBackLinkClassName =
+	"min-h-0 shrink-0 border-0 bg-transparent p-1 shadow-none hover:border-transparent hover:bg-transparent active:bg-transparent";
 
 /** Presents the shared editor back action without inventing per-page navigation semantics. */
 export const EditorHistoryBackButton = <
@@ -41,7 +44,7 @@ export const EditorHistoryBackButton = <
 			preload={false}
 			replace
 		>
-			{props.children ?? <EditorBackIcon />}
+			{props.children ?? <ArrowLeft className="size-7" />}
 		</ButtonLink>
 	);
 };

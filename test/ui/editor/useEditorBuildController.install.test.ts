@@ -26,47 +26,47 @@ vi.mock("@effect/atom-react", () => ({
 				: AsyncResult.initial(),
 }));
 
-vi.mock("~/bridge/arkpack/ArkpackCatalogAtom", () => ({
+vi.mock("~/ui/arkpack/ArkpackCatalogAtom", () => ({
 	ArkpackCatalogAtom: {
 		kind: "catalog",
 	},
 }));
 
-vi.mock("~/bridge/arkpack/editor/buildEditorProjectCommandAtom", () => ({
+vi.mock("~/ui/arkpack/editor/buildEditorProjectCommandAtom", () => ({
 	buildEditorProjectCommandAtom: () => ({
 		kind: "build",
 	}),
 }));
 
-vi.mock("~/bridge/arkpack/editor/installBuiltEditorArkpackCommandAtom", () => ({
+vi.mock("~/ui/arkpack/editor/installBuiltEditorArkpackCommandAtom", () => ({
 	installBuiltEditorArkpackCommandAtom: () => ({
 		kind: "install",
 	}),
 }));
 
-vi.mock("~/bridge/arkpack/editor/saveBuiltEditorArkpackCommandAtom", () => ({
+vi.mock("~/ui/arkpack/editor/saveBuiltEditorArkpackCommandAtom", () => ({
 	saveBuiltEditorArkpackCommandAtom: () => ({
 		kind: "save",
 	}),
 }));
 
-vi.mock("~/bridge/editor/exportEditorJsonDirectoryCommandAtom", () => ({
+vi.mock("~/ui/editor/exportEditorJsonDirectoryCommandAtom", () => ({
 	exportEditorJsonDirectoryCommandAtom: () => ({
 		kind: "export",
 	}),
 }));
 
-vi.mock("~/bridge/editor/openEditorExportDirectoryCommandAtom", () => ({
+vi.mock("~/ui/editor/openEditorExportDirectoryCommandAtom", () => ({
 	openEditorExportDirectoryCommandAtom: {
 		kind: "open-export",
 	},
 }));
 
-vi.mock("~/bridge/editor/useEditorProject", () => ({
+vi.mock("~/ui/editor/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
-vi.mock("~/bridge/runtime/RendererRuntime", () => ({
+vi.mock("~/renderer/RendererRuntime", () => ({
 	RendererRuntime: {
 		runSync: Effect.runSync,
 	},

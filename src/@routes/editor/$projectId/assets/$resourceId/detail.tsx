@@ -1,23 +1,21 @@
 import { createFileRoute, Outlet, useSearch } from "@tanstack/react-router";
 
-import { EditorAssetDetailPage } from "~/page/editor/EditorAssetDetailPage";
+import { EditorAssetDetail } from "~/ui/resource/editor/EditorAssetDetail";
 
 export const Route = createFileRoute("/editor/$projectId/assets/$resourceId/detail")({
-	component: EditorAssetDetailRoute,
+	component: () => {
+		const { resourceId } = Route.useParams();
+		const search = useSearch({
+			from: "/editor/$projectId/assets",
+		});
+		return (
+			<EditorAssetDetail
+				filter={search.filter ?? "all"}
+				query={search.query ?? ""}
+				resourceId={resourceId}
+			>
+				<Outlet />
+			</EditorAssetDetail>
+		);
+	},
 });
-
-function EditorAssetDetailRoute() {
-	const { resourceId } = Route.useParams();
-	const search = useSearch({
-		from: "/editor/$projectId/assets",
-	});
-	return (
-		<EditorAssetDetailPage
-			filter={search.filter ?? "all"}
-			query={search.query ?? ""}
-			resourceId={resourceId}
-		>
-			<Outlet />
-		</EditorAssetDetailPage>
-	);
-}

@@ -4,12 +4,10 @@ import { EditorFormCard } from "~/ui/form/EditorFormCard";
 
 export const EditorFormContent = ({
 	children,
-	className,
 	error,
 	rootCard = true,
 	save,
 }: PropsWithChildren<{
-	readonly className?: string;
 	readonly error: unknown;
 	readonly rootCard?: boolean;
 	readonly save: () => Promise<boolean>;
@@ -24,7 +22,7 @@ export const EditorFormContent = ({
 		}}
 	>
 		{rootCard ? (
-			<EditorFormCard className={className}>
+			<EditorFormCard>
 				{error === undefined ? null : (
 					<p className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
 						{error instanceof Error ? error.message : String(error)}
@@ -33,7 +31,7 @@ export const EditorFormContent = ({
 				{children}
 			</EditorFormCard>
 		) : (
-			<div className={className}>
+			<div>
 				{error === undefined ? null : (
 					<p className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
 						{error instanceof Error ? error.message : String(error)}

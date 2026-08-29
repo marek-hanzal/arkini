@@ -1,4 +1,4 @@
-import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
+import type { TileMotionCue } from "~/ui/pixi/motion/TileMotionCue";
 
 /** Bounded actor-lane arbitration snapshot owned by one renderer scene. */
 export interface TileMotionLanesState {

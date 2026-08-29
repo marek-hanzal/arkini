@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 
-import { openUserDataDirectoryFx } from "~/bridge/user-data/openUserDataDirectoryFx";
 import {
 	createSettingsDirectoryCommandAtomFx,
 	type SettingsDirectoryCommandState,
@@ -10,5 +9,10 @@ export type SettingsUserDataCommandState = SettingsDirectoryCommandState;
 
 /** Owns one user-data-directory request and its interruption-safe settlement. */
 export const SettingsUserDataCommandAtom = Effect.runSync(
-	createSettingsDirectoryCommandAtomFx(openUserDataDirectoryFx()),
+	createSettingsDirectoryCommandAtomFx(
+		Effect.tryPromise({
+			try: () => window.arkini.userData.openDirectory(),
+			catch: (cause) => cause,
+		}),
+	),
 );

@@ -11,7 +11,6 @@ import { SwapSameItemError } from "~/engine/runtime/error/SwapSameItemError";
 import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBoardOperationError";
-import type { SwapItemsResultSchema } from "~/engine/runtime/schema/command/SwapItemsResultSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -21,6 +20,11 @@ export namespace swapItemsFx {
 		firstItemRevision: RevisionSchema.Type;
 		secondItemId: IdSchema.Type;
 		secondItemRevision: RevisionSchema.Type;
+	}
+
+	export interface Result {
+		readonly first: RuntimeItemSchema.Type;
+		readonly second: RuntimeItemSchema.Type;
 	}
 }
 
@@ -140,7 +144,7 @@ export const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 			const result = {
 				first: swappedFirst,
 				second: swappedSecond,
-			} satisfies SwapItemsResultSchema.Type;
+			} satisfies swapItemsFx.Result;
 			const nextRuntime = {
 				...runtime,
 				items: runtime.items.map((candidate) => {

@@ -1,5 +1,5 @@
-import type { EditorProject } from "~/bridge/editor/EditorProject";
-import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { EditorProject } from "~/editor/EditorProject";
 import type { EditorItemForceDeleteImpact } from "~/editor/forceDeleteEditorItemFx";
 import { Button, ButtonLink, DangerButton } from "~/ui/button/Button";
 
@@ -82,7 +82,7 @@ export const EditorItemDeleteDialog = ({
 	readonly error: unknown;
 	readonly force: boolean;
 	readonly impact: EditorItemForceDeleteImpact;
-	readonly item: EditorItem;
+	readonly item: ItemSchema.Type;
 	readonly pending: boolean;
 	readonly project: EditorProject;
 	readonly onCancel: () => void;
@@ -112,10 +112,10 @@ export const EditorItemDeleteDialog = ({
 			</p>
 			<div className="mt-3 grid gap-2 rounded-lg border border-danger/40 bg-danger/10 p-3 text-sm leading-6 text-danger">
 				<p>
-					Deleting an item is a breaking gameplay change: every current Board scenario in
-					this project will be deleted, and existing published game saves cannot load the
-					new major version but remain stored. Restoring a full saved version is the only
-					way to undo it.
+					Deleting an item is a breaking gameplay change. Current Board scenarios and
+					existing published game saves remain stored, but they cannot load the new major
+					version. Create a Version first to preserve the matching project for
+					restoration.
 				</p>
 				{force ? (
 					<p>

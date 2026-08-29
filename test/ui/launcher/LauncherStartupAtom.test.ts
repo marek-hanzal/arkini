@@ -5,12 +5,12 @@ import { Cause, Effect, SubscriptionRef } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
-import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
-import { AppearanceAtom } from "~/bridge/appearance/AppearanceAtom";
-import { CheatAvailabilityAtom } from "~/bridge/cheat/CheatAvailabilityAtom";
-import { WindowModeAtom } from "~/bridge/window/WindowModeAtom";
-import { WindowModeReadyAtom } from "~/bridge/window/WindowModeReadyAtom";
+import type { ArkpackCatalog } from "~/renderer/arkpack/ArkpackCatalog";
+import { ArkpackCatalogOwnerAtom } from "~/renderer/arkpack/ArkpackCatalogOwnerAtom";
+import { AppearanceAtom } from "~/ui/appearance/AppearanceAtom";
+import { CheatAvailabilityAtom } from "~/ui/cheat-availability/CheatAvailabilityAtom";
+import { WindowModeAtom } from "~/renderer/window/WindowModeAtom";
+import { WindowModeReadyAtom } from "~/renderer/window/WindowModeReadyAtom";
 import { LauncherAppearanceReadyAtom } from "~/ui/launcher/LauncherAppearanceReadyAtom";
 import { LauncherCheatAvailabilityReadyAtom } from "~/ui/launcher/LauncherCheatAvailabilityReadyAtom";
 import { LauncherSplashCompletedAtom } from "~/ui/launcher/LauncherSplashCompletedAtom";
@@ -98,7 +98,7 @@ describe("LauncherStartupAtom", () => {
 		registries.push(registry);
 		registry.set(ArkpackCatalogOwnerAtom, catalog);
 		let attempt = 0;
-		const failure = new Error("bridge unavailable");
+		const failure = new Error("catalog unavailable");
 		registry.set(LauncherStartupConfigAtom, {
 			heroUrl: "hero.png",
 			bootstrapFx: Effect.suspend(() => {

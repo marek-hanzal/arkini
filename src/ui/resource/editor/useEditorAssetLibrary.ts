@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 
-import type { EditorProject } from "~/bridge/editor/EditorProject";
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { useEditorResourceUsages } from "~/bridge/resource/editor/useEditorResourceUsages";
+import type { EditorProject } from "~/editor/EditorProject";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { useEditorResourceUsages } from "~/ui/resource/editor/useEditorResourceUsages";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
 
 export namespace useEditorAssetLibrary {

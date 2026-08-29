@@ -1,4 +1,4 @@
-import type { EditorInput } from "~/bridge/item/editor/EditorItemModel";
+import type { InputSchema as LineInputSchema } from "~/engine/input/schema/InputSchema";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
@@ -8,8 +8,8 @@ import { useEditorItemOptionLabel } from "~/ui/item/editor/useEditorItemOptionLa
 export interface EditorLineInputsControlProps {
 	readonly allowMaterials?: boolean;
 	readonly emptyAllowed?: boolean;
-	readonly onChange: (inputs: EditorInput[]) => void;
-	readonly value: ReadonlyArray<EditorInput>;
+	readonly onChange: (inputs: LineInputSchema.Type[]) => void;
+	readonly value: ReadonlyArray<LineInputSchema.Type>;
 }
 
 /** Assembles immediate input requirements, optionally including Line-owned materials. */
@@ -20,7 +20,7 @@ export const EditorLineInputsControl = ({
 	value,
 }: EditorLineInputsControlProps) => {
 	const readItemLabel = useEditorItemOptionLabel();
-	const replaceAt = (index: number, input: EditorInput) => {
+	const replaceAt = (index: number, input: LineInputSchema.Type) => {
 		const next = value.map((current, currentIndex) =>
 			currentIndex === index ? input : current,
 		);

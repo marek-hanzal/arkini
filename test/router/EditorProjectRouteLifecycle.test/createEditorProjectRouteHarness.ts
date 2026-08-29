@@ -3,17 +3,15 @@ import { Deferred, Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { routeTree } from "~/_route";
-import type { EditorProject } from "~/bridge/editor/EditorProject";
-import type { EditorProjectRepositoryService } from "~/bridge/editor/EditorProjectRepository";
-import type { EditorBoardGame } from "~/bridge/editor/board/EditorBoardGame";
-import {
-	type EditorBoardGameResource,
-	EditorBoardGameResourceOwnerAtom,
-} from "~/bridge/editor/board/EditorBoardGameResource";
-import { createEditorBoardGameFx } from "~/bridge/editor/board/createEditorBoardGameFx";
-import { createEditorBoardGameResourceFx } from "~/bridge/editor/board/createEditorBoardGameResourceFx";
-import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
-import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
+import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
+import type { EditorBoardGame } from "~/renderer/editor/board/EditorBoardGame";
+import type { EditorBoardGameResource } from "~/renderer/editor/board/EditorBoardGameResource";
+import { EditorBoardGameResourceOwnerAtom } from "~/renderer/editor/board/EditorBoardGameResourceOwnerAtom";
+import { createEditorBoardGameFx } from "~/renderer/editor/board/createEditorBoardGameFx";
+import { createEditorBoardGameResourceFx } from "~/renderer/editor/board/createEditorBoardGameResourceFx";
+import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
+import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import { createTestRendererRuntime } from "~test/support/createTestRendererRuntime";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";

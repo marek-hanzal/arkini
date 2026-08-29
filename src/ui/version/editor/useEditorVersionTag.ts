@@ -1,7 +1,8 @@
+import { Effect } from "effect";
 import { useCallback, useEffect, useState } from "react";
 
-import { updateEditorProjectVersionTagFx } from "~/bridge/editor/version/updateEditorProjectVersionTagFx";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { EditorProjectVersionDescriptor } from "~/editor/version/EditorProjectVersion";
 
 export namespace useEditorVersionTag {
@@ -41,15 +42,17 @@ export const useEditorVersionTag = ({
 		setPending(true);
 		reportError();
 		void RendererRuntime.runPromise(
-			updateEditorProjectVersionTagFx({
-				projectId,
-				...(draft.trim() === ""
-					? {}
-					: {
-							tag: draft,
-						}),
-				versionId: selected.versionId,
-			}),
+			Effect.flatMap(EditorProjectRepository, (repository) =>
+				repository.updateVersionTagFx({
+					projectId,
+					...(draft.trim() === ""
+						? {}
+						: {
+								tag: draft,
+							}),
+					versionId: selected.versionId,
+				}),
+			),
 		)
 			.then(() => {
 				setPending(false);

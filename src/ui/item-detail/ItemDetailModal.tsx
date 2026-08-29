@@ -2,15 +2,15 @@ import { motion } from "motion/react";
 import { type ReactNode, useEffect } from "react";
 import { match } from "ts-pattern";
 
-import type { ItemDetailTab } from "~/bridge/item-detail/ItemDetailTab";
-import { useItemDefinitionDetail } from "~/bridge/item-detail/useItemDefinitionDetail";
-import { useItemDetailIdentity } from "~/bridge/item-detail/useItemDetailIdentity";
-import { useItemDetailInfo } from "~/bridge/item-detail/useItemDetailInfo";
-import { useItemDetailLines } from "~/bridge/item-detail/useItemDetailLines";
-import { useItemDetailQueue } from "~/bridge/item-detail/useItemDetailQueue";
-import { useItemDetailSources } from "~/bridge/item-detail/useItemDetailSources";
-import { useItemDetailTabs } from "~/bridge/item-detail/useItemDetailTabs";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import type { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
+import { useItemDefinitionDetail } from "~/ui/item-detail/useItemDefinitionDetail";
+import { useItemDetailIdentity } from "~/ui/item-detail/useItemDetailIdentity";
+import { useItemDetailInfo } from "~/ui/item-detail/useItemDetailInfo";
+import { useItemDetailLines } from "~/ui/item-detail/useItemDetailLines";
+import { useItemDetailQueue } from "~/ui/item-detail/useItemDetailQueue";
+import { useItemDetailSources } from "~/ui/item-detail/useItemDetailSources";
+import { useItemDetailTabs } from "~/ui/item-detail/useItemDetailTabs";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { BadgeCount } from "~/ui/badge/BadgeCount";
 import {
 	selectableActiveClassName,
@@ -48,7 +48,7 @@ const tabLabel = {
 	lines: "Lines",
 	queue: "Queue",
 	sources: "Sources",
-} as const satisfies Record<ItemDetailTab, string>;
+} as const satisfies Record<ItemDetailTabEnumSchema.Type, string>;
 
 const ItemDetailTabs = ({
 	active,
@@ -59,12 +59,12 @@ const ItemDetailTabs = ({
 	tabs,
 	target,
 }: {
-	readonly active: ItemDetailTab;
+	readonly active: ItemDetailTabEnumSchema.Type;
 	readonly disabled: boolean;
 	readonly lineCount?: number;
 	readonly queueCount?: number;
 	readonly stale?: boolean;
-	readonly tabs: readonly ItemDetailTab[];
+	readonly tabs: readonly ItemDetailTabEnumSchema.Type[];
 	readonly target: ItemDetailTarget;
 }) => {
 	const itemDetail = useItemDetailControl();
@@ -273,7 +273,7 @@ const ItemDetailContent = ({
 	readonly renderLineIdentity?: ItemLineSummaryIdentityRenderer;
 	readonly sources?: useItemDetailSources.Projection;
 	readonly stale: boolean;
-	readonly tab: ItemDetailTab;
+	readonly tab: ItemDetailTabEnumSchema.Type;
 }) =>
 	match(tab)
 		.with("info", () => (

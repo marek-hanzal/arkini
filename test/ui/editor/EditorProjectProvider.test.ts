@@ -6,11 +6,11 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProject } from "~/bridge/editor/EditorProject";
-import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
-import { EditorProjectProvider } from "~/bridge/editor/EditorProjectProvider";
-import { RendererAtomRegistry } from "~/bridge/reactivity/RendererAtomRegistry";
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import type { EditorProject } from "~/editor/EditorProject";
+import { EditorProjectAtom } from "~/ui/editor/EditorProjectAtom";
+import { EditorProjectProvider } from "~/ui/editor/EditorProjectProvider";
+import { RendererAtomRegistry } from "~/renderer/RendererAtomRegistry";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 (

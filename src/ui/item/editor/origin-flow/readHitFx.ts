@@ -4,7 +4,7 @@ import {
 	EditorItemOriginItemInputPortId,
 	EditorItemOriginItemOutputPortId,
 	type EditorItemOriginFlow,
-} from "~/bridge/item/editor/EditorItemOriginFlow";
+} from "~/editor/origin-flow/EditorItemOriginFlow";
 import type { LayoutNode, LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
 import type { ConnectedPorts } from "~/ui/item/editor/origin-flow/readConnectedPortsFx";
 import type { Highlight, Selection } from "~/ui/item/editor/origin-flow/Highlight";

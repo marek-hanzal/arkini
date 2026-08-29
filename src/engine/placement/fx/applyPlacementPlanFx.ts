@@ -2,16 +2,24 @@ import { Effect } from "effect";
 
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
 import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
-import type { PlacementPlanSchema } from "~/engine/placement/schema/PlacementPlanSchema";
-import type { PlacementResultSchema } from "~/engine/placement/schema/PlacementResultSchema";
+import type { PlacementPlan } from "~/engine/placement/PlacementPlan";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace applyPlacementPlanFx {
 	export interface Props {
-		plan: PlacementPlanSchema.Type;
+		plan: PlacementPlan;
 		runtime: RuntimeSchema.Type;
+	}
+
+	export interface Result {
+		readonly remove: ReadonlyArray<RuntimeItemSchema.Type>;
+		readonly stack: ReadonlyArray<{
+			readonly item: RuntimeItemSchema.Type;
+			readonly quantity: number;
+		}>;
+		readonly spawn: ReadonlyArray<RuntimeItemSchema.Type>;
 	}
 }
 
@@ -23,7 +31,7 @@ export const applyPlacementPlanFx = Effect.fn("applyPlacementPlanFx")(function* 
 	runtime,
 }: applyPlacementPlanFx.Props) {
 	const removedItems = runtime.items.filter((item) => plan.remove.includes(item.id));
-	const stackResults: PlacementResultSchema.Type["stack"] = [];
+	const stackResults: applyPlacementPlanFx.Result["stack"][number][] = [];
 	const updatedItems: RuntimeItemSchema.Type[] = [];
 
 	for (const item of runtime.items) {
@@ -74,7 +82,7 @@ export const applyPlacementPlanFx = Effect.fn("applyPlacementPlanFx")(function* 
 		remove: removedItems,
 		spawn: spawnedItems,
 		stack: stackResults,
-	} satisfies PlacementResultSchema.Type;
+	} satisfies applyPlacementPlanFx.Result;
 
 	return [
 		result,

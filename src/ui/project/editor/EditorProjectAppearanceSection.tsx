@@ -1,4 +1,6 @@
-import { EditorProjectAvatarKeys } from "~/bridge/project/editor/EditorProjectFormSchema";
+import { ArrowDown, ArrowUp } from "lucide-react";
+
+import { EditorProjectAvatarKeys } from "~/ui/project/editor/EditorProjectFormSchema";
 import { Button } from "~/ui/button/Button";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSection } from "~/ui/form/EditorFormSection";
@@ -59,7 +61,7 @@ export const EditorProjectAppearanceSection = ({
 													selectIndex(index - 1);
 												}}
 											>
-												<span className="icon-[lucide--arrow-up] size-4" />
+												<ArrowUp className="size-4" />
 											</Button>
 											<Button
 												disabled={index === avatars.length - 1}
@@ -68,7 +70,7 @@ export const EditorProjectAppearanceSection = ({
 													selectIndex(index + 1);
 												}}
 											>
-												<span className="icon-[lucide--arrow-down] size-4" />
+												<ArrowDown className="size-4" />
 											</Button>
 										</div>
 									</div>

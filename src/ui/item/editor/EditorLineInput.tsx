@@ -1,6 +1,5 @@
+import type { InputSchema as LineInputSchema } from "~/engine/input/schema/InputSchema";
 import { match } from "ts-pattern";
-
-import type { EditorInput } from "~/bridge/item/editor/EditorItemModel";
 import { EditorChoiceControl } from "~/ui/form/EditorValueControls";
 import { EditorDepositLineInput } from "~/ui/item/editor/EditorDepositLineInput";
 import { EditorInputCharges } from "~/ui/item/editor/EditorInputCharges";
@@ -33,7 +32,7 @@ const inputTypeOptions = [
 ] as const satisfies ReadonlyArray<{
 	readonly description: string;
 	readonly label: string;
-	readonly value: EditorInput["type"];
+	readonly value: LineInputSchema.Type["type"];
 }>;
 
 export const EditorLineInput = ({
@@ -42,8 +41,8 @@ export const EditorLineInput = ({
 	onChange,
 }: {
 	readonly allowMaterials?: boolean;
-	readonly input: EditorInput;
-	readonly onChange: (input: EditorInput) => void;
+	readonly input: LineInputSchema.Type;
+	readonly onChange: (input: LineInputSchema.Type) => void;
 }) => (
 	<article className="grid gap-4">
 		<div className="flex flex-wrap items-start justify-between gap-4">

@@ -2,7 +2,7 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { assertPlacementPlanCompleteFx } from "~/engine/placement/fx/assertPlacementPlanCompleteFx";
-import type { PlacementPlanSchema } from "~/engine/placement/schema/PlacementPlanSchema";
+import type { PlacementPlan } from "~/engine/placement/PlacementPlan";
 
 const drop = {
 	itemId: "item:test",
@@ -20,7 +20,7 @@ const plan = (quantity: number) =>
 				quantity,
 			},
 		],
-	}) satisfies PlacementPlanSchema.Type;
+	}) satisfies PlacementPlan;
 
 const assert = (quantity: number) =>
 	Effect.runSync(

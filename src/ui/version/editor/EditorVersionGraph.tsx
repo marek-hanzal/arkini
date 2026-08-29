@@ -1,5 +1,3 @@
-import { twMerge } from "tailwind-merge";
-
 import type { EditorProjectVersionStatus } from "~/editor/version/EditorProjectVersion";
 import type { EditorVersionGraphLayout } from "~/ui/version/editor/layoutEditorVersionGraph";
 
@@ -109,11 +107,7 @@ export const EditorVersionGraph = ({
 		>
 			<button
 				type="button"
-				className={twMerge(
-					"flex min-h-16 w-full cursor-pointer items-center border-b border-line/60 px-2 text-left hover:bg-surface-raised",
-					workingCopy.backgroundClassName,
-					selectedReference === "current" && "bg-accent/10",
-				)}
+				className={`flex min-h-16 w-full cursor-pointer items-center border-b border-line/60 px-2 text-left hover:bg-surface-raised ${selectedReference === "current" ? "bg-accent/10" : workingCopy.backgroundClassName}`}
 				data-selected={selectedReference === "current" ? true : undefined}
 				data-ui="EditorVersionWorkingCopy"
 				onClick={onSelectWorkingCopy}
@@ -150,10 +144,7 @@ export const EditorVersionGraph = ({
 				<button
 					key={row.version.versionId}
 					type="button"
-					className={twMerge(
-						"flex min-h-16 w-full cursor-pointer items-center border-b border-line/60 px-2 text-left hover:bg-surface-raised",
-						selectedReference === row.version.versionId && "bg-accent/10",
-					)}
+					className={`flex min-h-16 w-full cursor-pointer items-center border-b border-line/60 px-2 text-left hover:bg-surface-raised${selectedReference === row.version.versionId ? " bg-accent/10" : ""}`}
 					data-selected={selectedReference === row.version.versionId ? true : undefined}
 					onClick={() => onSelect(row.version.versionId)}
 				>

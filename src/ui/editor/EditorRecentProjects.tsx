@@ -1,8 +1,10 @@
+import { ChevronRight, FolderKanban, FolderX, Trash2 } from "lucide-react";
+
 import type {
 	EditorProjectCandidate,
 	EditorProjectOwnership,
-} from "~/bridge/editor/EditorProjectCandidate";
-import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
+} from "~/editor/EditorProjectCandidate";
+import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
 import { Button, ButtonLink } from "~/ui/button/Button";
 
 const formatter = new Intl.DateTimeFormat(undefined, {
@@ -53,7 +55,7 @@ export const EditorRecentProjects = ({
 							className="ak-list-row flex min-w-0 items-center gap-3 px-4 py-3"
 							data-ui="EditorInvalidProject"
 						>
-							<span className="icon-[lucide--folder-x] size-5 shrink-0 text-danger" />
+							<FolderX className="size-5 shrink-0 text-danger" />
 							<span className="min-w-0 flex-1">
 								<span className="block truncate text-sm font-semibold">
 									{candidate.title}
@@ -89,7 +91,7 @@ export const EditorRecentProjects = ({
 								cursorIntent={blocked ? "progress" : undefined}
 								className="min-h-0 min-w-0 flex-1 justify-start gap-3 rounded-none border-0 bg-transparent px-4 py-3 text-left shadow-none hover:border-transparent hover:bg-transparent active:bg-transparent"
 							>
-								<span className="icon-[lucide--folder-kanban] size-5 shrink-0 text-accent" />
+								<FolderKanban className="size-5 shrink-0 text-accent" />
 								<span className="min-w-0 flex-1">
 									<span className="flex min-w-0 items-center gap-2">
 										<span className="truncate text-sm font-semibold">
@@ -116,7 +118,7 @@ export const EditorRecentProjects = ({
 									onDeleteProject(candidate.project, candidate.ownership)
 								}
 							>
-								<span className="icon-[lucide--trash-2] size-4" />
+								<Trash2 className="size-4" />
 							</button>
 							<ButtonLink
 								to="/editor/$projectId/editor/items/list"
@@ -133,7 +135,7 @@ export const EditorRecentProjects = ({
 								>
 									{formatter.format(candidate.project.updatedAtMs)}
 								</time>
-								<span className="icon-[lucide--chevron-right] size-4 shrink-0 text-subtle" />
+								<ChevronRight className="size-4 shrink-0 text-subtle" />
 							</ButtonLink>
 						</div>
 					),

@@ -5,7 +5,7 @@ import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import { ElectronMainError } from "../ElectronMainError";
 import { readArkpackFileFx } from "./readArkpackFileFx";
-import { recoverArkpackFileFx, withArkpackFileLockFx } from "./withArkpackFileLockFx";
+import { withArkpackFileLockFx } from "./withArkpackFileLockFx";
 import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
 
 const suffix = ".arkpack";
@@ -38,33 +38,6 @@ export const listArkpackFilesFx = Effect.fn("listArkpackFilesFx")(
 				});
 			} else if (!(yield* fileSystem.exists(root))) {
 				return [];
-			}
-			if (source === "user") {
-				const writeSuffix = `${suffix}.lock.write`;
-				const cleanupSuffix = `${writeSuffix}.cleanup`;
-				for (const entry of yield* fileSystem.readDirectory(root)) {
-					if (
-						!entry.startsWith(".") ||
-						(!entry.endsWith(writeSuffix) && !entry.endsWith(cleanupSuffix))
-					)
-						continue;
-					const journalSuffix = entry.endsWith(cleanupSuffix)
-						? ".lock.write.cleanup"
-						: ".lock.write";
-					const arkpackEntry = entry.slice(1, -journalSuffix.length);
-					let packageId: string;
-					try {
-						packageId = decodeURIComponent(arkpackEntry.slice(0, -suffix.length));
-					} catch {
-						continue;
-					}
-					if (`${encodeGameProjectFileStem(packageId)}${suffix}` !== arkpackEntry)
-						continue;
-					yield* recoverArkpackFileFx({
-						arkpackPath: join(root, arkpackEntry),
-						fileSystem,
-					});
-				}
 			}
 			const entries = (yield* fileSystem.readDirectory(root))
 				.filter((entry) => entry.endsWith(suffix))

@@ -6,11 +6,11 @@ import { act, createElement, type PropsWithChildren, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
 
-import type { EditorProject } from "~/bridge/editor/EditorProject";
-import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
-import { EditorProjectContext } from "~/bridge/editor/EditorProjectContext";
-import { EditorProjectReplacementEpochAtom } from "~/bridge/editor/EditorProjectReplacementEpochAtom";
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import type { EditorProject } from "~/editor/EditorProject";
+import { EditorProjectAtom } from "~/ui/editor/EditorProjectAtom";
+import { EditorProjectContext } from "~/ui/editor/EditorProjectContext";
+import { EditorProjectReplacementEpochAtom } from "~/ui/editor/EditorProjectReplacementEpochAtom";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
 import { EditorProjectReplacementBoundary } from "~/ui/editor/EditorProjectReplacementBoundary";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 

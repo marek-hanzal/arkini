@@ -1,6 +1,8 @@
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { EditorLine } from "~/bridge/item/editor/EditorItemModel";
+import { ArrowUpRight, ChevronRight } from "lucide-react";
+
+import type { LineSchema } from "~/engine/line/schema/LineSchema";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { formatItemDurationFx } from "~/ui/item-detail/formatItemDurationFx";
 import { EditorProductionLineEditLink } from "~/ui/item/editor/EditorProductionLineEditLink";
 import { EditorProductionLineInputs } from "~/ui/item/editor/EditorProductionLineInputs";
@@ -24,7 +26,7 @@ export const EditorProductionLineDetail = ({
 	line,
 }: {
 	readonly itemUid: string;
-	readonly line: EditorLine;
+	readonly line: LineSchema.Type;
 }) => {
 	const project = useEditorProject();
 	const items = project.config?.items ?? {};
@@ -44,7 +46,7 @@ export const EditorProductionLineDetail = ({
 								lineId={line.id}
 							>
 								{line.title}
-								<span className="icon-[lucide--arrow-up-right] size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />
+								<ArrowUpRight className="size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />
 							</EditorProductionLineEditLink>
 						</h3>
 						{!line.enable ? (
@@ -74,7 +76,7 @@ export const EditorProductionLineDetail = ({
 					className="grid place-items-center text-muted"
 					data-ui="EditorProductionLineFlowChevron"
 				>
-					<span className="icon-[lucide--chevron-right] size-5" />
+					<ChevronRight className="size-5" />
 				</div>
 				<EditorProductionLineOutputs
 					items={items}

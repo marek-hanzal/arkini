@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import type { EditorGameDiagnostic } from "~/bridge/arkpack/editor/readEditorBuildFailureFx";
-import type { EditorProject } from "~/bridge/editor/EditorProject";
+import type { EditorGameDiagnostic } from "~/editor/build/fn/readEditorBuildFailureFn";
+import type { EditorProject } from "~/editor/EditorProject";
 import type { EditorDiagnosticTarget } from "~/ui/arkpack/editor/EditorDiagnosticTarget";
 import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
 import { readEditorItemSectionForPathFx } from "~/ui/item/editor/readEditorItemSectionForPathFx";

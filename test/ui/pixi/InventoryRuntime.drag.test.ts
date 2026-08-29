@@ -16,7 +16,7 @@ import {
 import type { FakeContainer } from "./InventoryRuntime.test/fixture";
 
 describe("Inventory runtime / drag authority", () => {
-	it("drags only between Inventory slots and commits the release through the engine bridge", async () => {
+	it("drags only between Inventory slots and commits the release through the engine command boundary", async () => {
 		const { actor, onActivate, runtime, stage } = await mountScene();
 		const initialX = actor.container.x;
 		(actor.container as unknown as FakeContainer).emit("pointerdown", slotPointer(0));

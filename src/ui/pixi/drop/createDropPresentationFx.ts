@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import type { TileActorFeedbackCue } from "~/bridge/tile/feedback/TileActorFeedbackCue";
-import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
-import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
+import type { TileActorFeedbackCue } from "~/ui/pixi/feedback/TileActorFeedbackCue";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
+import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import type {
 	DropPresentation,
 	DropSnapshot,
@@ -32,7 +32,7 @@ const readFeedbackCues = (
 	match(result)
 		.with(
 			{
-				kind: DropItemResultKindEnumSchema.enum.Stack,
+				kind: DropItemResultKind.Stack,
 			},
 			({ source, target }) =>
 				[
@@ -50,7 +50,7 @@ const readFeedbackCues = (
 		)
 		.with(
 			{
-				kind: DropItemResultKindEnumSchema.enum.StoreInput,
+				kind: DropItemResultKind.StoreInput,
 			},
 			({ owner, source }) =>
 				[
@@ -68,7 +68,7 @@ const readFeedbackCues = (
 		)
 		.with(
 			{
-				kind: DropItemResultKindEnumSchema.enum.StoreInventory,
+				kind: DropItemResultKind.StoreInventory,
 			},
 			({ inventory, source }) =>
 				[
@@ -151,16 +151,15 @@ export const createDropPresentationFx = Effect.fn("createDropPresentationFx")(()
 						});
 					}
 					if (
-						result.kind === DropItemResultKindEnumSchema.enum.StoreInventory ||
-						(result.kind === DropItemResultKindEnumSchema.enum.Stack &&
-							result.source.current === null)
+						result.kind === DropItemResultKind.StoreInventory ||
+						(result.kind === DropItemResultKind.Stack && result.source.current === null)
 					) {
 						hiddenActorIds.add(result.source.itemId);
 					}
-					if (result.kind === DropItemResultKindEnumSchema.enum.Move) {
+					if (result.kind === DropItemResultKind.Move) {
 						landingActorIds.add(result.itemId);
 					}
-					if (result.kind !== DropItemResultKindEnumSchema.enum.Swap) {
+					if (result.kind !== DropItemResultKind.Swap) {
 						swaps.delete(generation);
 					}
 				}),

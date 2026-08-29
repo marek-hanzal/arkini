@@ -1,7 +1,8 @@
-import { Effect, Result } from "effect";
+import { Effect, type Layer, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
@@ -179,13 +180,13 @@ const stashConfig = GameConfigSchema.parse({
 	},
 });
 
-const run = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
+const run = <A, E>(effect: Effect.Effect<A, E, Layer.Success<ReturnType<typeof GameLayerFx>>>) =>
 	Effect.runSync(
 		effect.pipe(
 			useGameFx({
 				config: stashConfig,
 			}),
-		) as Effect.Effect<A, E, never>,
+		),
 	);
 
 const startStashFx = Effect.fn("startStashFx")(function* ({

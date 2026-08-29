@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 
-import { useGameEngine } from "~/bridge/game/useGameEngine";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { useGameEngine } from "~/ui/game/useGameEngine";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { CheatItemSpotlight } from "~/ui/cheat-spotlight/CheatItemSpotlight";
 import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";
 

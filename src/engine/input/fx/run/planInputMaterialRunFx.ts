@@ -1,16 +1,14 @@
 import { Array, Effect } from "effect";
 
-import type { InputMaterialResolutionSchema } from "~/engine/input/schema/resolution/InputMaterialResolutionSchema";
-import type { InputMaterialRunPlanResolutionSchema } from "~/engine/input/schema/run/InputMaterialRunPlanResolutionSchema";
-import type { InputChargeRunPlanSchema } from "~/engine/input/schema/run/InputChargeRunPlanSchema";
+import type { InputRun } from "~/engine/input/InputRun";
 import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 
 export namespace planInputMaterialRunFx {
 	export interface Props {
 		items: InputRuntimeItemSchema.Type[];
-		resolution: InputMaterialResolutionSchema.Type;
-		charges?: InputChargeRunPlanSchema.Type;
+		resolution: InputRun.MaterialResolution;
+		charges?: InputRun.ChargePlan;
 	}
 }
 
@@ -61,5 +59,5 @@ export const planInputMaterialRunFx = Effect.fn("planInputMaterialRunFx")(functi
 			firstItem,
 			...remainingItems,
 		],
-	} satisfies InputMaterialRunPlanResolutionSchema.Type;
+	} satisfies InputRun.MaterialPlan;
 });

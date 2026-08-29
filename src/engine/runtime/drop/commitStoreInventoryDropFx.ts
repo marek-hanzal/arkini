@@ -5,9 +5,9 @@ import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSc
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { makeDropRejectedResultFx } from "~/engine/runtime/drop/makeDropRejectedResultFx";
 import { projectDropTransferActorFx } from "~/engine/runtime/drop/projectDropTransferActorFx";
-import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
-import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
-import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
+import type { DropItemResult } from "~/engine/runtime/DropItemResult";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 import { storeItemInInventoryFx } from "~/engine/runtime/write/storeItemInInventoryFx";
 
 export namespace commitStoreInventoryDropFx {
@@ -32,8 +32,8 @@ export const commitStoreInventoryDropFx = Effect.fn("commitStoreInventoryDropFx"
 				before: result.sourceBefore,
 			}).pipe(
 				Effect.map(
-					(source): DropItemResultSchema.Type => ({
-						kind: DropItemResultKindEnumSchema.enum.StoreInventory,
+					(source): DropItemResult => ({
+						kind: DropItemResultKind.StoreInventory,
 						source,
 						inventory: {
 							itemId: result.inventoryItem.id,
@@ -49,8 +49,8 @@ export const commitStoreInventoryDropFx = Effect.fn("commitStoreInventoryDropFx"
 				makeDropRejectedResultFx({
 					reason:
 						error.itemId === props.inventoryItemId
-							? DropItemRejectedReasonEnumSchema.enum.StaleTarget
-							: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+							? DropItemRejectedReason.StaleTarget
+							: DropItemRejectedReason.StaleSource,
 					sourceItemId: props.sourceItemId,
 					targetItemId: props.inventoryItemId,
 				}),
@@ -58,44 +58,44 @@ export const commitStoreInventoryDropFx = Effect.fn("commitStoreInventoryDropFx"
 				makeDropRejectedResultFx({
 					reason:
 						error.entityId === props.inventoryItemId
-							? DropItemRejectedReasonEnumSchema.enum.StaleTarget
-							: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+							? DropItemRejectedReason.StaleTarget
+							: DropItemRejectedReason.StaleSource,
 					sourceItemId: props.sourceItemId,
 					targetItemId: props.inventoryItemId,
 				}),
 			ItemLocationConflictError: () =>
 				makeDropRejectedResultFx({
-					reason: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+					reason: DropItemRejectedReason.StaleSource,
 					sourceItemId: props.sourceItemId,
 					targetItemId: props.inventoryItemId,
 				}),
 			ItemNotOnGridError: () =>
 				makeDropRejectedResultFx({
-					reason: DropItemRejectedReasonEnumSchema.enum.InvalidSource,
+					reason: DropItemRejectedReason.InvalidSource,
 					sourceItemId: props.sourceItemId,
 					targetItemId: props.inventoryItemId,
 				}),
 			ItemInventoryStorageUnavailableError: () =>
 				makeDropRejectedResultFx({
-					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+					reason: DropItemRejectedReason.InvalidTarget,
 					sourceItemId: props.sourceItemId,
 					targetItemId: props.inventoryItemId,
 				}),
 			ItemInventoryTargetInvalidError: () =>
 				makeDropRejectedResultFx({
-					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+					reason: DropItemRejectedReason.InvalidTarget,
 					sourceItemId: props.sourceItemId,
 					targetItemId: props.inventoryItemId,
 				}),
 			ItemStatefulError: () =>
 				makeDropRejectedResultFx({
-					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
+					reason: DropItemRejectedReason.Blocked,
 					sourceItemId: props.sourceItemId,
 					targetItemId: props.inventoryItemId,
 				}),
 			PlacementUnavailableError: () =>
 				makeDropRejectedResultFx({
-					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
+					reason: DropItemRejectedReason.Blocked,
 					sourceItemId: props.sourceItemId,
 					targetItemId: props.inventoryItemId,
 				}),

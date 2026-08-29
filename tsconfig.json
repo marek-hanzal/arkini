@@ -27,9 +27,9 @@
 	"include": [
 		"electron/contract",
 		"src/engine",
-		"src/bridge",
+		"src/editor",
+		"src/renderer",
 		"src/ui",
-		"src/page",
 		"src/@routes",
 		"src/main.tsx",
 		"src/createArkiniRouterFx.tsx",

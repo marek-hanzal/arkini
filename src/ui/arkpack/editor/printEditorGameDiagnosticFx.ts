@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
-import type { EditorGameDiagnostic } from "~/bridge/arkpack/editor/readEditorBuildFailureFx";
-import { readEditorGameDiagnosticPresentationFx } from "~/bridge/arkpack/editor/readEditorGameDiagnosticPresentationFx";
-import type { EditorProject } from "~/bridge/editor/EditorProject";
+import type { EditorGameDiagnostic } from "~/editor/build/fn/readEditorBuildFailureFn";
+import type { EditorProject } from "~/editor/EditorProject";
+import { readGameDiagnosticPresentationFx } from "~/engine/validation/printer/readGameDiagnosticPresentationFx";
 import type { EditorDiagnosticTarget } from "~/ui/arkpack/editor/EditorDiagnosticTarget";
 import { readEditorGameDiagnosticTargetsFx } from "~/ui/arkpack/editor/readEditorGameDiagnosticTargetsFx";
 
@@ -23,7 +23,7 @@ export const printEditorGameDiagnosticFx = Effect.fn("printEditorGameDiagnosticF
 	diagnostic: EditorGameDiagnostic,
 	project: Pick<EditorProject, "config" | "resources">,
 ) {
-	const presentation = yield* readEditorGameDiagnosticPresentationFx(diagnostic);
+	const presentation = yield* readGameDiagnosticPresentationFx(diagnostic);
 	const targets = yield* readEditorGameDiagnosticTargetsFx(diagnostic, project);
 	const location = [
 		diagnostic.source,

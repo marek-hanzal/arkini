@@ -1,6 +1,6 @@
 import { type PropsWithChildren, useEffect, useMemo, useRef } from "react";
 
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { PixiGameRuntimeContext } from "~/ui/pixi/PixiGameRuntimeContext";
 import { createGameInteractionControlFx } from "~/ui/pixi/runtime/createGameInteractionControlFx";
 import { createTextureStoreFx } from "~/ui/pixi/runtime/createTextureStoreFx";

@@ -2,13 +2,13 @@ import { Effect } from "effect";
 
 import { settleActionChargesFx } from "~/engine/action/fx/settleActionChargesFx";
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
-import type { LineRunPlanSchema } from "~/engine/line/schema/run/LineRunPlanSchema";
+import type { LineRun } from "~/engine/line/LineRun";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace applyLineChargePlansFx {
 	export interface Props {
 		job: JobSchema.Type;
-		plan: LineRunPlanSchema.Type;
+		plan: LineRun.Plan;
 		runtime: RuntimeSchema.Type;
 	}
 }

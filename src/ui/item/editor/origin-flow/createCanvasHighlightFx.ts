@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { EditorItemOriginItemNode } from "~/bridge/item/editor/EditorItemOriginFlow";
+import type { EditorItemOriginItemNode } from "~/editor/origin-flow/EditorItemOriginFlow";
 import type { Highlight, Selection } from "~/ui/item/editor/origin-flow/Highlight";
 
 const HighlightMinimumOpacity = 0.28;

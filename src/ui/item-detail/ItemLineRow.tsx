@@ -1,12 +1,13 @@
+import { ChevronRight, CircleAlert, Clock3, Info } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { forwardRef } from "react";
 import { match } from "ts-pattern";
 
-import { useEnqueueItemDetailLine } from "~/bridge/item-detail/useEnqueueItemDetailLine";
-import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
-import { useSetDefaultItemDetailLine } from "~/bridge/item-detail/useSetDefaultItemDetailLine";
-import { useUnsetDefaultItemDetailLine } from "~/bridge/item-detail/useUnsetDefaultItemDetailLine";
-import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
+import { useEnqueueItemDetailLine } from "~/ui/item-detail/useEnqueueItemDetailLine";
+import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
+import { useSetDefaultItemDetailLine } from "~/ui/item-detail/useSetDefaultItemDetailLine";
+import { useUnsetDefaultItemDetailLine } from "~/ui/item-detail/useUnsetDefaultItemDetailLine";
+import { useWithdrawItemDetailLine } from "~/ui/item-detail/useWithdrawItemDetailLine";
 import { Button, PrimaryButton } from "~/ui/button/Button";
 import { itemDetailFadeMotion } from "~/ui/item-detail/ItemDetailMotion";
 import { ItemLineInputs, ItemLineUnavailableWithdrawals } from "~/ui/item-detail/ItemLineInputs";
@@ -89,8 +90,8 @@ const ItemLineUnavailableDependency = ({
 		/>
 		<span className="flex items-center gap-1.5">
 			{dependency.status}
-			<span
-				className="icon-[lucide--circle-alert] size-4 shrink-0 text-warning"
+			<CircleAlert
+				className="size-4 shrink-0 text-warning"
 				aria-hidden="true"
 			/>
 		</span>
@@ -106,8 +107,8 @@ const ItemLineUnavailableMessage = ({
 		className="mt-4 flex min-w-0 items-center gap-2 text-sm text-muted"
 		data-ui="TileLineUnavailableReason"
 	>
-		<span
-			className="icon-[lucide--circle-alert] size-4 shrink-0 text-warning"
+		<CircleAlert
+			className="size-4 shrink-0 text-warning"
 			aria-hidden="true"
 		/>
 		<ItemLineUnavailableReason reason={reason} />
@@ -125,8 +126,8 @@ const ItemLineRuleHints = ({ hints }: { readonly hints: readonly string[] }) =>
 					className="flex min-w-0 items-start gap-2"
 					key={`${hint}-${index}`}
 				>
-					<span
-						className="icon-[lucide--info] mt-0.5 size-4 shrink-0 text-secondary-foreground"
+					<Info
+						className="mt-0.5 size-4 shrink-0 text-secondary-foreground"
 						aria-hidden="true"
 					/>
 					<span>{hint}</span>
@@ -304,8 +305,8 @@ export const ItemLineRow = forwardRef<
 								data-ui="TileLineQueuedMessage"
 								{...itemDetailFadeMotion}
 							>
-								<span
-									className="icon-[lucide--clock-3] size-4 shrink-0"
+								<Clock3
+									className="size-4 shrink-0"
 									aria-hidden="true"
 								/>
 								Queued for automatic start when the required inputs become
@@ -426,7 +427,7 @@ export const ItemLineRow = forwardRef<
 							aria-hidden="true"
 							data-ui="TileLineFlowChevron"
 						>
-							<span className="icon-[lucide--chevron-right] size-5" />
+							<ChevronRight className="size-5" />
 						</div>
 						<ItemLineOutputs
 							disabled={contentReadOnly}

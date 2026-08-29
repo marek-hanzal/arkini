@@ -5,7 +5,7 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
-import { AppearanceAtom } from "~/bridge/appearance/AppearanceAtom";
+import { AppearanceAtom } from "~/ui/appearance/AppearanceAtom";
 import { AppearanceDataset } from "~/ui/appearance/AppearanceDataset";
 
 (

@@ -7,8 +7,8 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
-import type { EditorItemOriginFlowRequest } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import type { EditorItemOriginFlow } from "~/editor/origin-flow/EditorItemOriginFlow";
+import type { EditorItemOriginFlowRequest } from "~/editor/origin-flow/fx/readEditorItemOriginFlowFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { Layout } from "~/ui/item/editor/origin-flow/Layout";
 
@@ -17,7 +17,7 @@ const mocks = vi.hoisted(() => ({
 	read: vi.fn(),
 }));
 
-vi.mock("~/bridge/item/editor/readEditorItemOriginFlowFx", async (importOriginal) => ({
+vi.mock("~/editor/origin-flow/fx/readEditorItemOriginFlowFx", async (importOriginal) => ({
 	...(await importOriginal()),
 	readEditorItemOriginFlowFx: mocks.read,
 }));

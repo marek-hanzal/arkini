@@ -2,8 +2,8 @@ import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useRouter } from "@tanstack/react-router";
 import { useCallback, useState, useSyncExternalStore } from "react";
 
-import type { EditorProject } from "~/bridge/editor/EditorProject";
-import { EditorProjectVersionCheckoutConfirmationRequired } from "~/bridge/editor/version/EditorProjectVersionCheckoutConfirmationRequired";
+import type { EditorProject } from "~/editor/EditorProject";
+import { EditorProjectVersionCheckoutConfirmationRequired } from "~/ui/version/editor/EditorProjectVersionCheckoutConfirmationRequired";
 import type { EditorProjectVersionDescriptor } from "~/editor/version/EditorProjectVersion";
 import { useEditorUnsavedChangesOwner } from "~/ui/editor/useEditorUnsavedChangesRegistration";
 import { EditorVersionRestoreCommandAtom } from "~/ui/version/editor/EditorVersionRestoreCommandAtom";

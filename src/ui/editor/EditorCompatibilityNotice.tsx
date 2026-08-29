@@ -1,5 +1,7 @@
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
+import { GitCompareArrows } from "lucide-react";
+
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
 import type { EditorProjectCompatibility } from "~/editor/version/EditorProjectCompatibility";
 import { bumpArkpackVersionFx } from "~/editor/version/bumpArkpackVersionFx";
 
@@ -33,7 +35,7 @@ export const EditorCompatibilityNotice = ({
 			data-result={result}
 			data-ui="EditorCompatibilityNotice"
 		>
-			<span className="icon-[lucide--git-compare-arrows] size-4 shrink-0" />
+			<GitCompareArrows className="size-4 shrink-0" />
 			<p className="min-w-0 truncate font-semibold">
 				{presentation.title} · v{version}
 				{result === "noop" ? null : ` → v${next}`}

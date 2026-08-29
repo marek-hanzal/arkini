@@ -1,7 +1,8 @@
+import { LogIn, LogOut, Pencil } from "lucide-react";
 import type { PropsWithChildren } from "react";
 
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { ButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
 import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
@@ -88,7 +89,7 @@ export const EditorItemDetail = ({
 								}}
 								to="/editor/$projectId/flow"
 							>
-								<span className="icon-[lucide--log-in] size-4" />
+								<LogIn className="size-4" />
 								Inputs
 							</ButtonLink>
 							<ButtonLink
@@ -102,7 +103,7 @@ export const EditorItemDetail = ({
 								}}
 								to="/editor/$projectId/flow"
 							>
-								<span className="icon-[lucide--log-out] size-4" />
+								<LogOut className="size-4" />
 								Outputs
 							</ButtonLink>
 							<EditorItemConvertMenu
@@ -119,7 +120,7 @@ export const EditorItemDetail = ({
 								}}
 								className="h-10 min-h-10 gap-2 px-3 py-2 text-sm"
 							>
-								<span className="icon-[lucide--pencil] size-4" />
+								<Pencil className="size-4" />
 								Edit
 							</PrimaryButtonLink>
 						</div>

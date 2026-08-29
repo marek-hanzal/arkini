@@ -1,4 +1,5 @@
 import type { MouseEventHandler, PropsWithChildren, ReactNode } from "react";
+import { CursorClassName, type CursorSemantic } from "~/ui/cursor/CursorSemantic";
 import { LauncherHero } from "~/ui/launcher/LauncherHero";
 import { RouteBackdrop } from "~/ui/navigation/RouteBackdrop";
 
@@ -27,8 +28,8 @@ type LauncherSceneLayout = keyof typeof layoutClassNames;
 
 export namespace LauncherScene {
 	export interface Props extends PropsWithChildren {
-		readonly className?: string;
 		readonly compactHero?: boolean;
+		readonly cursor?: Extract<CursorSemantic, "default" | "wait">;
 		readonly dataUi: string;
 		readonly foregroundOverlay?: ReactNode;
 		readonly layout?: LauncherSceneLayout;
@@ -40,8 +41,8 @@ export namespace LauncherScene {
 /** Shared launcher/action composition with independently animated visual primitives. */
 export const LauncherScene = ({
 	children,
-	className,
 	compactHero = false,
+	cursor,
 	dataUi,
 	foregroundOverlay,
 	layout = "centered",
@@ -49,7 +50,7 @@ export const LauncherScene = ({
 	overlay,
 }: LauncherScene.Props) => (
 	<main
-		className={`launcher-scene relative size-full min-h-0 min-w-0 overflow-hidden bg-canvas text-foreground${className === undefined ? "" : ` ${className}`}`}
+		className={`launcher-scene relative size-full min-h-0 min-w-0 overflow-hidden bg-canvas text-foreground${cursor === undefined ? "" : ` ${CursorClassName[cursor]}`}`}
 		data-ui={dataUi}
 		onClick={onClick}
 	>

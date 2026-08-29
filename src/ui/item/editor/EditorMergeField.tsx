@@ -1,4 +1,6 @@
-import type { EditorMerge } from "~/bridge/item/editor/EditorItemModel";
+import { PackagePlus } from "lucide-react";
+
+import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorChoiceControl } from "~/ui/form/EditorValueControls";
@@ -11,8 +13,8 @@ export const EditorMergeField = ({
 	merge,
 	onChange,
 }: {
-	readonly merge: EditorMerge;
-	readonly onChange: (merge: EditorMerge) => void;
+	readonly merge: MergeSchema.Type;
+	readonly onChange: (merge: MergeSchema.Type) => void;
 }) => (
 	<div className="grid gap-[var(--ak-viewport-gap)]">
 		<EditorFormCard>
@@ -112,7 +114,7 @@ export const EditorMergeField = ({
 			<EditorOptionalOutputControl
 				addLabel="Enable merge output"
 				emptyDescription="The merge currently changes only its source and target. Enable an output to emit additional items when it resolves."
-				emptyIcon="icon-[lucide--package-plus]"
+				emptyIcon={PackagePlus}
 				emptyTitle="No merge output"
 				value={merge.output}
 				onChange={(output) =>

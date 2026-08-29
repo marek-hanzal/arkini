@@ -1,10 +1,11 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
+import { BadgeCheck, Images, SearchX, type LucideIcon } from "lucide-react";
 import { type ChangeEventHandler, type RefObject, useCallback, useMemo, useRef } from "react";
 import { match, P } from "ts-pattern";
 
-import { importEditorAssetsCommandAtom } from "~/bridge/resource/editor/importEditorAssetsCommandAtom";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { importEditorAssetsCommandAtom } from "~/ui/resource/editor/importEditorAssetsCommandAtom";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorAssetLibrary } from "~/ui/resource/editor/useEditorAssetLibrary";
 
@@ -23,21 +24,21 @@ const emptyStatus = {
 	action: "import",
 	dataUi: "EditorAssetsEmpty",
 	description: "Import assets from an arkpack or select PNG files to start the library.",
-	icon: "icon-[lucide--images]",
+	icon: Images,
 	title: "No assets yet",
 } as const;
 
 const unusedStatus = {
 	dataUi: "EditorAssetsFilteredEmpty",
 	description: "Every asset is referenced by the current project.",
-	icon: "icon-[lucide--badge-check]",
+	icon: BadgeCheck,
 	title: "No unused assets",
 } as const;
 
 const noMatchesStatus = {
 	dataUi: "EditorAssetsFilteredEmpty",
 	description: "No assets match the current search and usage filter.",
-	icon: "icon-[lucide--search-x]",
+	icon: SearchX,
 	title: "No matching assets",
 } as const;
 
@@ -70,7 +71,7 @@ export namespace useEditorAssetManagerController {
 		readonly action?: "import";
 		readonly dataUi: string;
 		readonly description: string;
-		readonly icon: string;
+		readonly icon: LucideIcon;
 		readonly title: string;
 	}
 

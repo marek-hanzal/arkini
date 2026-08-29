@@ -420,7 +420,7 @@ describe("multi-space spatial isolation", () => {
 		expect(result.after).toEqual(result.before);
 	});
 
-	it("uses inventory as the only bridge and targets the current space", () => {
+	it("uses inventory as the only cross-space transfer path and targets the current space", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const item = yield* spawnItemFx({

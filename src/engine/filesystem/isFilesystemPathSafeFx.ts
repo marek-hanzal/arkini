@@ -1,10 +1,5 @@
 import { Effect, FileSystem, Path } from "effect";
 
-const isContained = (path: Path.Path, root: string, target: string) => {
-	const relative = path.relative(root, target);
-	return relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative));
-};
-
 /** Verifies every existing path component stays below the owned root and is not a link. */
 export const isFilesystemPathSafeFx = Effect.fn("isFilesystemPathSafeFx")(function* (
 	fileSystem: FileSystem.FileSystem,
@@ -14,7 +9,8 @@ export const isFilesystemPathSafeFx = Effect.fn("isFilesystemPathSafeFx")(functi
 	const path = yield* Path.Path;
 	const resolvedRoot = path.resolve(root);
 	const resolvedTarget = path.resolve(target);
-	if (!isContained(path, resolvedRoot, resolvedTarget)) return false;
+	const resolvedRelative = path.relative(resolvedRoot, resolvedTarget);
+	if (resolvedRelative.startsWith("..") || path.isAbsolute(resolvedRelative)) return false;
 	const canonicalRoot = yield* fileSystem.realPath(resolvedRoot);
 	const candidates = [
 		resolvedRoot,
@@ -25,9 +21,6 @@ export const isFilesystemPathSafeFx = Effect.fn("isFilesystemPathSafeFx")(functi
 		.filter(Boolean))
 		candidates.push(path.join(candidates.at(-1) ?? resolvedRoot, segment));
 	for (const candidate of candidates) {
-		if (!(yield* fileSystem.exists(candidate))) break;
-		const canonicalCandidate = yield* fileSystem.realPath(candidate);
-		if (!isContained(path, canonicalRoot, canonicalCandidate)) return false;
 		if (
 			yield* fileSystem.readLink(candidate).pipe(
 				Effect.as(true),
@@ -35,6 +28,10 @@ export const isFilesystemPathSafeFx = Effect.fn("isFilesystemPathSafeFx")(functi
 			)
 		)
 			return false;
+		if (!(yield* fileSystem.exists(candidate))) break;
+		const canonicalCandidate = yield* fileSystem.realPath(candidate);
+		const canonicalRelative = path.relative(canonicalRoot, canonicalCandidate);
+		if (canonicalRelative.startsWith("..") || path.isAbsolute(canonicalRelative)) return false;
 	}
 	return true;
 });

@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 import type { EditorItemEstimateSortSchema } from "~/editor/EditorItemEstimateSortSchema";
-import { EditorEstimatePage } from "~/page/editor/EditorEstimatePage";
+import { EditorItemEstimateList } from "~/ui/item/editor/EditorItemEstimateList";
 
 interface EditorEstimateRouteSearch {
 	readonly incomplete?: boolean;
@@ -16,5 +16,44 @@ export const Route = createFileRoute("/editor/$projectId/estimate")({
 			typeof search.query === "string" && search.query.length > 0 ? search.query : undefined,
 		sort: search.sort === "demand" || search.sort === "slowest" ? search.sort : undefined,
 	}),
-	component: EditorEstimatePage,
+	component: () => {
+		const search = Route.useSearch();
+		const navigate = useNavigate({
+			from: Route.fullPath,
+		});
+		return (
+			<EditorItemEstimateList
+				incomplete={search.incomplete ?? false}
+				onIncompleteChange={(incomplete) =>
+					void navigate({
+						replace: true,
+						search: (current) => ({
+							...current,
+							incomplete: incomplete || undefined,
+						}),
+					})
+				}
+				onQueryChange={(query) =>
+					void navigate({
+						replace: true,
+						search: (current) => ({
+							...current,
+							query,
+						}),
+					})
+				}
+				onSortChange={(sort) =>
+					void navigate({
+						replace: true,
+						search: (current) => ({
+							...current,
+							sort,
+						}),
+					})
+				}
+				query={search.query ?? ""}
+				sort={search.sort ?? "fastest"}
+			/>
+		);
+	},
 });

@@ -3,8 +3,8 @@ import { Array, Effect, Option, pipe } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
-import { readGridLocationClaimAtFx } from "~/engine/location/read/readGridLocationClaimAtFx";
-import { readGridLocationClaimsFx } from "~/engine/location/read/readGridLocationClaimsFx";
+import { readGridLocationClaimAtFn } from "~/engine/location/fn/readGridLocationClaimAtFn";
+import { readGridLocationClaimsFn } from "~/engine/location/fn/readGridLocationClaimsFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { assertPlacementMaxCountFx } from "~/engine/placement/fx/assertPlacementMaxCountFx";
 import { ItemAlreadyExistsError } from "~/engine/runtime/error/ItemAlreadyExistsError";
@@ -56,8 +56,8 @@ export const spawnItemFx = Effect.fn("spawnItemFx")(function* ({
 				);
 			}
 
-			const claim = yield* readGridLocationClaimAtFx({
-				claims: yield* readGridLocationClaimsFx({
+			const claim = readGridLocationClaimAtFn({
+				claims: readGridLocationClaimsFn({
 					runtime,
 				}),
 				location,

@@ -1,6 +1,7 @@
+import { FileQuestion, Pencil } from "lucide-react";
 import type { PropsWithChildren } from "react";
 
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
 import { PrimaryButtonLink } from "~/ui/button/Button";
 import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
@@ -30,7 +31,7 @@ export const EditorAssetDetail = ({
 			<Status
 				dataUi="EditorAssetNotFound"
 				description={`Resource ${resourceId} is not present in this project.`}
-				icon="icon-[lucide--file-question]"
+				icon={FileQuestion}
 				title="Asset not found"
 				action={
 					<EditorHistoryBackButton
@@ -114,8 +115,8 @@ export const EditorAssetDetail = ({
 							}}
 							className="min-h-0 gap-2 px-4 py-2 text-sm"
 						>
-							<span
-								className="icon-[lucide--pencil] size-4"
+							<Pencil
+								className="size-4"
 								aria-hidden="true"
 							/>
 							Edit

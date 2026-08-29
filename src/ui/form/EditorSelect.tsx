@@ -1,3 +1,5 @@
+import { Check, ChevronDown } from "lucide-react";
+
 import {
 	autoUpdate,
 	flip,
@@ -68,7 +70,7 @@ export const EditorSelect = <Value extends string>({
 				{...getReferenceProps()}
 			>
 				<span>{selected?.label ?? value}</span>
-				<span className="icon-[lucide--chevron-down] size-4 shrink-0 text-muted" />
+				<ChevronDown className="size-4 shrink-0 text-muted" />
 			</Button>
 			{open ? (
 				<FloatingPortal>
@@ -93,7 +95,7 @@ export const EditorSelect = <Value extends string>({
 							>
 								{option.label}
 								{option.value === value ? (
-									<span className="icon-[lucide--check] size-4 shrink-0" />
+									<Check className="size-4 shrink-0" />
 								) : null}
 							</button>
 						))}

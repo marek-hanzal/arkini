@@ -1,11 +1,9 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Effect, Option } from "effect";
 
-import { EditorProjectSectionRoutePage } from "~/page/editor/EditorProjectSectionRoutePage";
-import {
-	type EditorProjectSectionId,
-	parseEditorProjectSectionIdFx,
-} from "~/page/editor/parseEditorProjectSectionIdFx";
+import { parseEditorProjectSectionIdFx } from "~/@routes/editor/$projectId/project/-parseEditorProjectSectionIdFx";
+import { EditorProjectSectionPage } from "~/ui/project/editor/EditorProjectSectionPage";
+import type { EditorProjectSectionId } from "~/ui/project/editor/EditorProjectSections";
 
 interface EditorProjectSectionSearch {
 	readonly avatar?: number;
@@ -34,16 +32,14 @@ export const Route = createFileRoute("/editor/$projectId/project/$sectionId")({
 			replace: true,
 		});
 	},
-	component: EditorProjectSectionRoute,
+	component: () => {
+		const { sectionId } = Route.useParams();
+		const { avatar } = Route.useSearch();
+		return (
+			<EditorProjectSectionPage
+				avatarIndex={avatar}
+				section={sectionId as EditorProjectSectionId}
+			/>
+		);
+	},
 });
-
-function EditorProjectSectionRoute() {
-	const { sectionId } = Route.useParams();
-	const { avatar } = Route.useSearch();
-	return (
-		<EditorProjectSectionRoutePage
-			avatarIndex={avatar}
-			section={sectionId as EditorProjectSectionId}
-		/>
-	);
-}

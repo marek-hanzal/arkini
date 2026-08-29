@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import type { PlacementPlanSchema } from "~/engine/placement/schema/PlacementPlanSchema";
+import type { PlacementPlan } from "~/engine/placement/PlacementPlan";
 import { createRuntimeItemFx } from "~/engine/runtime/fx/createRuntimeItemFx";
 import { createRuntimeItemIdFx } from "~/engine/runtime/fx/createRuntimeItemIdFx";
 
@@ -36,7 +36,7 @@ export const planSpawnPlacementFx = Effect.fn("planSpawnPlacementFx")(function* 
 
 			return {
 				item: runtimeItem,
-			} satisfies PlacementPlanSchema.Type["spawn"][number];
+			} satisfies PlacementPlan["spawn"][number];
 		});
 	});
 });

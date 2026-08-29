@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
-import { EditorFlowPage } from "~/page/editor/EditorFlowPage";
+import { EditorGameFlow } from "~/ui/item/editor/EditorGameFlow";
 import type { OriginFlowDirection } from "~/ui/item/editor/origin-flow/Highlight";
 
 interface EditorFlowRouteSearch {
@@ -9,7 +9,6 @@ interface EditorFlowRouteSearch {
 }
 
 export const Route = createFileRoute("/editor/$projectId/flow")({
-	component: EditorFlowPage,
 	validateSearch: (search): EditorFlowRouteSearch => ({
 		direction: search.direction === "output" ? "output" : "input",
 		...(typeof search.itemId === "string" && search.itemId.length > 0
@@ -18,4 +17,36 @@ export const Route = createFileRoute("/editor/$projectId/flow")({
 				}
 			: {}),
 	}),
+	component: () => {
+		const { projectId } = Route.useParams();
+		const search = Route.useSearch();
+		const navigate = useNavigate({
+			from: Route.fullPath,
+		});
+		return (
+			<EditorGameFlow
+				direction={search.direction}
+				itemId={search.itemId}
+				projectId={projectId}
+				onDirectionChange={(direction) =>
+					navigate({
+						replace: true,
+						search: (current) => ({
+							...current,
+							direction,
+						}),
+					})
+				}
+				onItemIdChange={(itemId) =>
+					navigate({
+						replace: true,
+						search: (current) => ({
+							...current,
+							itemId: itemId.length === 0 ? undefined : itemId,
+						}),
+					})
+				}
+			/>
+		);
+	},
 });

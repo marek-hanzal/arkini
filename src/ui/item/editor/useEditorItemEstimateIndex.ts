@@ -1,8 +1,8 @@
 import { useAtom } from "@effect/atom-react";
 import { useEffect, useMemo } from "react";
 
-import type { EditorProject } from "~/bridge/editor/EditorProject";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import type { EditorProject } from "~/editor/EditorProject";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { createEditorItemEstimateIndexFx } from "~/editor/createEditorItemEstimateIndexFx";
 import type { EditorItemEstimateIndexRow } from "~/editor/EditorItemEstimateIndex";
 import type { EditorItemEstimateSortSchema } from "~/editor/EditorItemEstimateSortSchema";

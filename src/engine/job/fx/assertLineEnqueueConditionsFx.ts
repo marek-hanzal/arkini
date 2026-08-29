@@ -5,7 +5,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ChargeSourceSchema } from "~/engine/input/schema/ChargeSourceSchema";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import { assertOutputCapacityFx } from "~/engine/job/fx/assertOutputCapacityFx";
-import type { LineStartResolutionSchema } from "~/engine/job/schema/read/LineStartResolutionSchema";
+import type { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
 import { readBoardItemLineFx } from "~/engine/line/fx/readBoardItemLineFx";
 import { LineRunUnavailableError } from "~/engine/line/error/LineRunUnavailableError";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -13,7 +13,7 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 export namespace assertLineEnqueueConditionsFx {
 	export interface Props {
 		readonly candidateId: IdSchema.Type;
-		readonly resolution: LineStartResolutionSchema.Type;
+		readonly resolution: resolveLineStartFx.Result;
 		readonly runtime: RuntimeSchema.Type;
 	}
 }

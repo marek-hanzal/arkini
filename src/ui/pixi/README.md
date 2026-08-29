@@ -21,8 +21,8 @@ Main and Inventory actors are separate because display objects cannot cross canv
 
 ## Flows
 
-- Committed transition: bridge projection and current presentation claims → reconciler plan → retained actor allocation/reconciliation → motion/animation channels → demand-frame invalidation.
-- Pointer gesture: fresh bridge preview → frozen source/target/release facts → one public atomic engine command → reconciliation with the latest committed transition.
+- Committed transition: game projection and current presentation claims → reconciler plan → retained actor allocation/reconciliation → motion/animation channels → demand-frame invalidation.
+- Pointer gesture: fresh engine preview → frozen source/target/release facts → one public atomic engine command → reconciliation with the latest committed transition.
 
 Delivery endpoints, generation, phase, and remaining time are engine state. Tick owns countdown and settlement even when no scene or geometry exists; Pixi may retarget, freeze, or hide presentation but never admits input or starts work.
 
@@ -31,7 +31,7 @@ Delivery endpoints, generation, phase, and remaining time are engine state. Tick
 - Board/Toolbar left click runs the primary action; `Ctrl+left click` fills remaining default-line queue capacity; `Shift+left click` splits a Board stack; right click opens Item Detail.
 - Inventory left click releases the item; right click opens Item Detail.
 - Crossing the drag threshold converts the same pointer gesture into drag. The retained actor is reparented; there is no ghost, screenshot, duplicate tile, or pointer-frequency React render.
-- Bridge preview owns validity and magnetic eligibility. Pixi geometry never infers merge, stack, storage, swap, or placement behavior.
+- The Engine drop preview owns validity and magnetic eligibility. Pixi geometry never infers merge, stack, storage, swap, or placement behavior.
 - Overlays block/cancel local interaction. A submitted engine command may settle canonically after route/gesture teardown.
 
 ## Invariants

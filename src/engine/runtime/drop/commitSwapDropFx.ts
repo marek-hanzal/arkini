@@ -5,10 +5,10 @@ import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSc
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { makeDropActorRejectedResultFx } from "~/engine/runtime/drop/makeDropActorRejectedResultFx";
 import { makeDropRejectedResultFx } from "~/engine/runtime/drop/makeDropRejectedResultFx";
-import { DropItemIgnoredReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemIgnoredReasonEnumSchema";
-import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
-import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
-import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { DropItemIgnoredReason } from "~/engine/runtime/DropItemResult";
+import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
+import type { DropItemResult } from "~/engine/runtime/DropItemResult";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 import { swapItemsFx } from "~/engine/runtime/write/swapItemsFx";
 
 export namespace commitSwapDropFx {
@@ -21,7 +21,7 @@ export namespace commitSwapDropFx {
 		readonly targetLocation: GridLocationSchema.Type;
 	}
 
-	export type Result = DropItemResultSchema.Type;
+	export type Result = DropItemResult;
 }
 
 /** Commits one exact grid swap and normalizes both actor identities. */
@@ -41,7 +41,7 @@ export const commitSwapDropFx = Effect.fn("commitSwapDropFx")(function* ({
 	}).pipe(
 		Effect.map(
 			(result): commitSwapDropFx.Result => ({
-				kind: DropItemResultKindEnumSchema.enum.Swap,
+				kind: DropItemResultKind.Swap,
 				source: {
 					itemId: result.first.id,
 					revision: result.first.revision,
@@ -80,14 +80,14 @@ export const commitSwapDropFx = Effect.fn("commitSwapDropFx")(function* ({
 				}),
 			CrossSpaceBoardOperationError: () =>
 				makeDropRejectedResultFx({
-					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+					reason: DropItemRejectedReason.InvalidTarget,
 					sourceItemId,
 					targetItemId,
 				}),
 			SwapSameItemError: () =>
 				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Ignored,
-					reason: DropItemIgnoredReasonEnumSchema.enum.SameLocation,
+					kind: DropItemResultKind.Ignored,
+					reason: DropItemIgnoredReason.SameLocation,
 					itemId: sourceItemId,
 					location: sourceLocation,
 				}),

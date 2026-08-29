@@ -1,9 +1,22 @@
 import { useMatchRoute } from "@tanstack/react-router";
+import {
+	Boxes,
+	Calculator,
+	FolderCog,
+	GitBranch,
+	GitFork,
+	Images,
+	LayoutGrid,
+	MessageCircleMore,
+	NotebookPen,
+	PackageCheck,
+	RadioTower,
+} from "lucide-react";
 
 export const EditorWorkspaceRoutes = [
 	{
 		id: "project",
-		icon: "icon-[lucide--folder-cog]",
+		icon: FolderCog,
 		label: "Project",
 		matchTo: "/editor/$projectId/project",
 		shortcut: "Mod+Shift+P",
@@ -11,7 +24,7 @@ export const EditorWorkspaceRoutes = [
 	},
 	{
 		id: "notes",
-		icon: "icon-[lucide--notebook-pen]",
+		icon: NotebookPen,
 		hiddenFromNavigation: true,
 		label: "Notes",
 		matchTo: "/editor/$projectId/notes",
@@ -20,7 +33,7 @@ export const EditorWorkspaceRoutes = [
 	},
 	{
 		id: "items",
-		icon: "icon-[lucide--boxes]",
+		icon: Boxes,
 		label: "Items",
 		matchTo: "/editor/$projectId/editor",
 		shortcut: "Mod+Shift+I",
@@ -28,7 +41,7 @@ export const EditorWorkspaceRoutes = [
 	},
 	{
 		id: "assets",
-		icon: "icon-[lucide--images]",
+		icon: Images,
 		label: "Assets",
 		matchTo: "/editor/$projectId/assets",
 		separatorAfter: true,
@@ -37,7 +50,7 @@ export const EditorWorkspaceRoutes = [
 	},
 	{
 		id: "estimate",
-		icon: "icon-[lucide--calculator]",
+		icon: Calculator,
 		label: "Estimate",
 		matchTo: "/editor/$projectId/estimate",
 		shortcut: "Mod+Shift+E",
@@ -45,7 +58,7 @@ export const EditorWorkspaceRoutes = [
 	},
 	{
 		id: "flow",
-		icon: "icon-[lucide--git-fork]",
+		icon: GitFork,
 		label: "Flow",
 		matchTo: "/editor/$projectId/flow",
 		separatorAfter: true,
@@ -54,7 +67,7 @@ export const EditorWorkspaceRoutes = [
 	},
 	{
 		id: "mcp",
-		icon: "icon-[lucide--radio-tower]",
+		icon: RadioTower,
 		label: "MCP",
 		matchTo: "/editor/$projectId/mcp",
 		shortcut: "Mod+Shift+M",
@@ -62,7 +75,7 @@ export const EditorWorkspaceRoutes = [
 	},
 	{
 		id: "chatgpt",
-		icon: "icon-[lucide--message-circle-more]",
+		icon: MessageCircleMore,
 		label: "ChatGPT",
 		matchTo: "/editor/$projectId/chatgpt",
 		separatorAfter: true,
@@ -71,7 +84,7 @@ export const EditorWorkspaceRoutes = [
 	},
 	{
 		id: "versions",
-		icon: "icon-[lucide--git-branch]",
+		icon: GitBranch,
 		label: "Versions",
 		matchTo: "/editor/$projectId/versions",
 		separatorAfter: true,
@@ -80,7 +93,7 @@ export const EditorWorkspaceRoutes = [
 	},
 	{
 		id: "board",
-		icon: "icon-[lucide--layout-grid]",
+		icon: LayoutGrid,
 		label: "Board",
 		matchTo: "/editor/$projectId/board",
 		separatorAfter: true,
@@ -89,7 +102,7 @@ export const EditorWorkspaceRoutes = [
 	},
 	{
 		id: "build",
-		icon: "icon-[lucide--package-check]",
+		icon: PackageCheck,
 		label: "Build",
 		matchTo: "/editor/$projectId/build",
 		shortcut: "Mod+Shift+U",

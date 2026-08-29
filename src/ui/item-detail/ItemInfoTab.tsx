@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 
-import type { useItemDetailInfo } from "~/bridge/item-detail/useItemDetailInfo";
+import type { useItemDetailInfo } from "~/ui/item-detail/useItemDetailInfo";
 import {
 	ItemInfoFact,
 	ItemInfoFacts,

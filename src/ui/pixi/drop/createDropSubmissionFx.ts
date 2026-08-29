@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 
-import type { GameEngine } from "~/bridge/game/GameEngine";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
-import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
+import type { GameEngine } from "~/renderer/game/GameEngine";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
+import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readActorCursorFx } from "~/ui/pixi/actor/readActorCursorFx";
@@ -125,9 +125,8 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 						}),
 					);
 					const optimisticRemoval =
-						previewKind === DropItemResultKindEnumSchema.enum.StoreInventory ||
-						(previewKind === DropItemResultKindEnumSchema.enum.Stack &&
-							sourceItem.quantity === 1)
+						previewKind === DropItemResultKind.StoreInventory ||
+						(previewKind === DropItemResultKind.Stack && sourceItem.quantity === 1)
 							? {
 									actor,
 									lifecycleGeneration: actor.lifecycleIntentGeneration + 1,
@@ -135,8 +134,7 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 								}
 							: null;
 					const optimisticInventoryReceiver =
-						previewKind === DropItemResultKindEnumSchema.enum.StoreInventory &&
-						targetItem !== null
+						previewKind === DropItemResultKind.StoreInventory && targetItem !== null
 							? (actorStore.actors.get(targetItem.id) ?? null)
 							: null;
 					let removalStarted = false;
@@ -194,7 +192,7 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 						}
 						if (
 							shortcutReceiver !== undefined &&
-							result.kind === DropItemResultKindEnumSchema.enum.StoreInventory &&
+							result.kind === DropItemResultKind.StoreInventory &&
 							!shortcutVisualComplete
 						) {
 							queuedResult = result;
@@ -209,7 +207,7 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 								}),
 							);
 							if (
-								result.kind === DropItemResultKindEnumSchema.enum.StoreInventory &&
+								result.kind === DropItemResultKind.StoreInventory &&
 								optimisticInventoryReceiver !== null &&
 								result.inventory.itemId === optimisticInventoryReceiver.item.id &&
 								actorStore.actors.get(result.inventory.itemId) ===
@@ -235,13 +233,12 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 								);
 							}
 							if (
-								result.kind !== DropItemResultKindEnumSchema.enum.Reject &&
-								result.kind !== DropItemResultKindEnumSchema.enum.Ignored
+								result.kind !== DropItemResultKind.Reject &&
+								result.kind !== DropItemResultKind.Ignored
 							) {
 								const removalAccepted =
-									result.kind ===
-										DropItemResultKindEnumSchema.enum.StoreInventory ||
-									(result.kind === DropItemResultKindEnumSchema.enum.Stack &&
+									result.kind === DropItemResultKind.StoreInventory ||
+									(result.kind === DropItemResultKind.Stack &&
 										result.source.current === null);
 								if (
 									!removalAccepted &&

@@ -4,9 +4,9 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/engine/item/error/ItemNotFoundError";
 import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
-import { readGridLocationClaimAtFx } from "~/engine/location/read/readGridLocationClaimAtFx";
-import { readGridLocationClaimsFx } from "~/engine/location/read/readGridLocationClaimsFx";
-import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
+import { readGridLocationClaimAtFn } from "~/engine/location/fn/readGridLocationClaimAtFn";
+import { readGridLocationClaimsFn } from "~/engine/location/fn/readGridLocationClaimsFn";
+import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
@@ -15,7 +15,6 @@ import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBo
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
-import type { MoveItemResultSchema } from "~/engine/runtime/schema/command/MoveItemResultSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
@@ -26,6 +25,11 @@ export namespace moveItemFx {
 		location: GridLocationSchema.Type;
 		revision: RevisionSchema.Type;
 		expectedLocation?: GridLocationSchema.Type;
+	}
+
+	export interface Result {
+		readonly item: RuntimeItemSchema.Type;
+		readonly previousLocation: GridLocationSchema.Type;
 	}
 }
 
@@ -69,10 +73,10 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 
 			if (
 				expectedLocation !== undefined &&
-				!(yield* isSameGridLocationFx({
+				!isSameGridLocationFn({
 					left: item.location,
 					right: expectedLocation,
-				}))
+				})
 			) {
 				return yield* Effect.fail(
 					new ItemLocationConflictError({
@@ -83,7 +87,7 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 				);
 			}
 			if (
-				yield* isSameGridLocationFx({
+				isSameGridLocationFn({
 					left: item.location,
 					right: location,
 				})
@@ -92,7 +96,7 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 					{
 						item,
 						previousLocation: item.location,
-					} satisfies MoveItemResultSchema.Type,
+					} satisfies moveItemFx.Result,
 					runtime,
 				] as const;
 			}
@@ -123,10 +127,10 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 				);
 			}
 
-			const claim = yield* readGridLocationClaimAtFx({
-				claims: (yield* readGridLocationClaimsFx({
+			const claim = readGridLocationClaimAtFn({
+				claims: readGridLocationClaimsFn({
 					runtime,
-				})).filter((candidate) => candidate.itemId !== itemId),
+				}).filter((candidate) => candidate.itemId !== itemId),
 				location,
 			});
 			if (claim !== undefined) {
@@ -147,7 +151,7 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 			const result = {
 				item: movedItem,
 				previousLocation: item.location,
-			} satisfies MoveItemResultSchema.Type;
+			} satisfies moveItemFx.Result;
 
 			const nextRuntime = {
 				...runtime,

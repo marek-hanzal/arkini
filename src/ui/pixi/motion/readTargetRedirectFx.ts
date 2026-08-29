@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
-import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
+import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import type { MotionRedirect } from "~/ui/pixi/motion/MotionTarget";
 
 /**
@@ -17,7 +17,7 @@ export const readTargetRedirectFx = Effect.fnUntraced(function* (
 	return match(result)
 		.with(
 			{
-				kind: DropItemResultKindEnumSchema.enum.StoreInventory,
+				kind: DropItemResultKind.StoreInventory,
 			},
 			(store) =>
 				store.source.current === null
@@ -30,7 +30,7 @@ export const readTargetRedirectFx = Effect.fnUntraced(function* (
 		)
 		.with(
 			{
-				kind: DropItemResultKindEnumSchema.enum.StoreInput,
+				kind: DropItemResultKind.StoreInput,
 			},
 			(store) =>
 				store.source.current === null
@@ -43,7 +43,7 @@ export const readTargetRedirectFx = Effect.fnUntraced(function* (
 		)
 		.with(
 			{
-				kind: DropItemResultKindEnumSchema.enum.Stack,
+				kind: DropItemResultKind.Stack,
 			},
 			(stack) =>
 				stack.source.current === null
@@ -56,7 +56,7 @@ export const readTargetRedirectFx = Effect.fnUntraced(function* (
 		)
 		.with(
 			{
-				kind: DropItemResultKindEnumSchema.enum.Merge,
+				kind: DropItemResultKind.Merge,
 			},
 			(merge) =>
 				merge.source.current === null && merge.target.current !== null
@@ -69,25 +69,25 @@ export const readTargetRedirectFx = Effect.fnUntraced(function* (
 		)
 		.with(
 			{
-				kind: DropItemResultKindEnumSchema.enum.Move,
+				kind: DropItemResultKind.Move,
 			},
 			() => null,
 		)
 		.with(
 			{
-				kind: DropItemResultKindEnumSchema.enum.Swap,
+				kind: DropItemResultKind.Swap,
 			},
 			() => null,
 		)
 		.with(
 			{
-				kind: DropItemResultKindEnumSchema.enum.Ignored,
+				kind: DropItemResultKind.Ignored,
 			},
 			() => null,
 		)
 		.with(
 			{
-				kind: DropItemResultKindEnumSchema.enum.Reject,
+				kind: DropItemResultKind.Reject,
 			},
 			() => null,
 		)

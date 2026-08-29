@@ -1,10 +1,8 @@
 import { useAtomValue } from "@effect/atom-react";
 import { useLayoutEffect, useRef } from "react";
 
-import {
-	EditorUnsavedChangesOwnerAtom,
-	type EditorUnsavedChangesSession,
-} from "~/bridge/editor/EditorUnsavedChanges";
+import type { EditorUnsavedChangesSession } from "~/renderer/editor/unsaved/EditorUnsavedChanges";
+import { EditorUnsavedChangesOwnerAtom } from "~/renderer/editor/unsaved/EditorUnsavedChangesOwnerAtom";
 
 export const useEditorUnsavedChangesOwner = () => {
 	const owner = useAtomValue(EditorUnsavedChangesOwnerAtom);

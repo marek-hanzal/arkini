@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 
 export interface EditorAssetsSearch {
 	readonly filter?: "all" | "unused";
@@ -10,5 +10,4 @@ export const Route = createFileRoute("/editor/$projectId/assets")({
 		filter: search.filter === "unused" ? "unused" : "all",
 		query: typeof search.query === "string" ? search.query : "",
 	}),
-	component: Outlet,
 });

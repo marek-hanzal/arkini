@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
-import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
+import type { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
 
 export namespace readActorCursorFx {
 	export interface Props {
@@ -58,7 +58,7 @@ export const readActorCursorFx = Effect.fn("readActorCursorFx")(
 					{
 						dragPolicy: "preview-result",
 						phase: "dragging",
-						previewKind: DropItemResultKindEnumSchema.enum.Reject,
+						previewKind: DropItemResultKind.Reject,
 					},
 					() => "not-allowed" as const,
 				)
@@ -66,7 +66,7 @@ export const readActorCursorFx = Effect.fn("readActorCursorFx")(
 					{
 						dragPolicy: "preview-result",
 						phase: "dragging",
-						previewKind: DropItemResultKindEnumSchema.enum.Ignored,
+						previewKind: DropItemResultKind.Ignored,
 					},
 					() => "grab" as const,
 				)

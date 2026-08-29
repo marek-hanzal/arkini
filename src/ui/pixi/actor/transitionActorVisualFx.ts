@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { Container } from "pixi.js";
 
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";

@@ -248,7 +248,7 @@ const createServer = (
 		"estimate",
 		{
 			description:
-				"Read one page of the global Estimate view for every item at quantity one. Supports the same incomplete-only filter, fastest, slowest, and aggregate-demand ordering, and fuzzy search as the Editor UI. Use item_estimate for one item's selected route detail.",
+				"Read one page of the global approximate Estimate view for every item at quantity one. Supports the same incomplete-only filter, fastest, slowest, aggregate-demand ordering, and fuzzy search as the Editor UI. Use item_estimate for one item's selected route detail.",
 			inputSchema: EstimateInputSchema,
 		},
 		async (input) =>
@@ -332,7 +332,7 @@ const createServer = (
 		"item_estimate",
 		{
 			description:
-				"Analyze one item against the authored dependency graph. Returns an optimistic parallel critical-path acquisition route with quantities, expected random-output economics, hard materials, owners, infrastructure, deposits, and positive enable prerequisites. Independent dependency branches may overlap without simulating runtime capacity. Rule truth, runtime rule effects, placement, charges, renewal, and finite capacity are ignored.",
+				"Approximate one item against the authored dependency graph. The estimator expands from authored starting facts and records the first locally ranked route when each fact becomes reachable, using scalar action time with stable route-ID ties. Admission proves one scalar output unit; larger propagated demand can return partial without retrying quantity-specific alternatives. Demand is divided by scalar expected output yield, and the materialized witness is timed as an optimistic parallel critical path. Equivalent independent occurrences are compressed with an explicit count; shared outputs, shared finite roots, rule truth, runtime effects, placement, charges, renewal, and finite capacity are not simulated.",
 			inputSchema: ItemEstimateInputSchema,
 		},
 		async ({ itemId, quantity }) =>

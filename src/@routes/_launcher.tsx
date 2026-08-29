@@ -1,8 +1,8 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Effect } from "effect";
 
-import { readCurrentGameEngineResourceFx } from "~/bridge/game/readCurrentGameEngineResourceFx";
-import { resolveLauncherLeaveDestinationFx } from "~/ui/navigation/resolveLauncherLeaveDestinationFx";
+import { resolveLauncherLeaveDestinationFx } from "~/@routes/-resolveLauncherLeaveDestinationFx";
+import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
 
 /**
  * Launcher pages must not silently replace an active Game. Funnel every such
@@ -12,7 +12,9 @@ import { resolveLauncherLeaveDestinationFx } from "~/ui/navigation/resolveLaunch
  */
 export const Route = createFileRoute("/_launcher")({
 	beforeLoad: ({ context, location }) => {
-		const resource = context.rendererRuntime.runSync(readCurrentGameEngineResourceFx());
+		const resource = context.rendererRuntime.runSync(
+			GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+		);
 		if (
 			resource === null ||
 			location.pathname === "/settings" ||
@@ -28,5 +30,4 @@ export const Route = createFileRoute("/_launcher")({
 			replace: true,
 		});
 	},
-	component: Outlet,
 });

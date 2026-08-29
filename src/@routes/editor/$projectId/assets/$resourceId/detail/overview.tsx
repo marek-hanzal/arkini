@@ -1,12 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { EditorAssetOverviewPage } from "~/page/editor/EditorAssetOverviewPage";
+import { EditorAssetOverview } from "~/ui/resource/editor/EditorAssetOverview";
 
 export const Route = createFileRoute("/editor/$projectId/assets/$resourceId/detail/overview")({
-	component: EditorAssetOverviewRoute,
+	component: () => {
+		const { resourceId } = Route.useParams();
+		return <EditorAssetOverview resourceId={resourceId} />;
+	},
 });
-
-function EditorAssetOverviewRoute() {
-	const { resourceId } = Route.useParams();
-	return <EditorAssetOverviewPage resourceId={resourceId} />;
-}

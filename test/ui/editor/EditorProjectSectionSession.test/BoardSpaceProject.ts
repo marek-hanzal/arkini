@@ -1,4 +1,4 @@
-import type { EditorProject } from "~/bridge/editor/EditorProject";
+import type { EditorProject } from "~/editor/EditorProject";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 export const boardSpaceProject = {

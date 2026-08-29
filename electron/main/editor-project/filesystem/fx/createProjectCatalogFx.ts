@@ -47,7 +47,7 @@ export const createProjectCatalogFx = Effect.fn("createProjectCatalogFx")(functi
 	const filesystemWrite = yield* createFilesystemWriteFx();
 	const lock = `${catalogPath}.lock`;
 	const writeJsonFx = (value: unknown) =>
-		filesystemWrite.writeFileFx({
+		filesystemWrite.replaceFileFx({
 			lock,
 			target: catalogPath,
 			bytes: encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`),

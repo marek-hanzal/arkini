@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { createEditorAcquisitionGraphFx } from "~/editor/createEditorAcquisitionGraphFx";
-import { estimateEditorItemFx } from "~/editor/estimator/estimateEditorItemFx";
+import { estimateEditorItemsFn } from "~/editor/estimator/fn/estimateEditorItemsFn";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 /** Computes the immutable quantity-one estimate batch used by the global Estimate view. */
@@ -9,12 +9,14 @@ export const estimateEditorItemsFx = Effect.fn("estimateEditorItemsFx")(
 	(config: GameConfigSchema.Type) =>
 		Effect.gen(function* () {
 			const graph = yield* createEditorAcquisitionGraphFx(config);
-			return yield* Effect.forEach(Object.keys(config.items).sort(), (itemId) =>
-				estimateEditorItemFx({
-					factId: itemId,
-					graph,
-					quantity: 1,
-				}),
-			);
+			return estimateEditorItemsFn({
+				graph,
+				requests: Object.keys(config.items)
+					.sort()
+					.map((factId) => ({
+						factId,
+						quantity: 1,
+					})),
+			});
 		}),
 );

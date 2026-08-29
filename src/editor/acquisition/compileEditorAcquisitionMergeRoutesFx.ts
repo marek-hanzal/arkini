@@ -1,9 +1,6 @@
 import { Effect } from "effect";
 
-import type {
-	EditorAcquisitionOperation,
-	EditorAcquisitionRoute,
-} from "~/editor/EditorAcquisitionGraph";
+import type { EditorAcquisitionRoute } from "~/editor/EditorAcquisitionGraph";
 import { readEditorAcquisitionOutputOccurrencesFx } from "~/editor/readEditorAcquisitionOutputOccurrencesFx";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -68,7 +65,6 @@ const readMergeRoutesFx = Effect.fn("compileEditorAcquisitionMergeRoutesFx.item"
 			targetItemId: merge.target.itemId,
 		} as const;
 		const outputModel = yield* readEditorAcquisitionOutputOccurrencesFx(merge.output);
-		const replacementOutputGroupId = "output:replacement";
 		const operation = {
 			id: `source:${source.id}:merge:${mergeIndex}`,
 			inputs: [
@@ -80,25 +76,7 @@ const readMergeRoutesFx = Effect.fn("compileEditorAcquisitionMergeRoutesFx.item"
 					},
 				},
 			],
-			...(outputModel.compilation === "complete"
-				? {}
-				: {
-						outputCompilation: outputModel.compilation,
-					}),
-			outputDistribution: outputModel.outputDistribution.map((outcome) => ({
-				...outcome,
-				quantities:
-					merge.effect === "replace"
-						? [
-								...outcome.quantities,
-								{
-									outputGroupId: replacementOutputGroupId,
-									quantity: 1,
-								},
-							]
-						: outcome.quantities,
-			})),
-		} satisfies EditorAcquisitionOperation;
+		};
 		if (merge.effect === "replace")
 			routes.push({
 				durationMs: 0,
@@ -115,14 +93,8 @@ const readMergeRoutesFx = Effect.fn("compileEditorAcquisitionMergeRoutesFx.item"
 						},
 						selectionKind: "replace",
 					},
+					expectedYield: 1,
 					factId: merge.result,
-					operationOutputGroupId: replacementOutputGroupId,
-					quantityDistribution: [
-						{
-							probability: 1,
-							quantity: 1,
-						},
-					],
 				},
 				requirements,
 				runMultiplier: 1,
@@ -135,9 +107,10 @@ const readMergeRoutesFx = Effect.fn("compileEditorAcquisitionMergeRoutesFx.item"
 				operation,
 				output: {
 					annotation: output.annotation,
+					expectedYield:
+						output.expectedYield +
+						(merge.effect === "replace" && output.factId === merge.result ? 1 : 0),
 					factId: output.factId,
-					operationOutputGroupId: output.operationOutputGroupId,
-					quantityDistribution: output.quantityDistribution,
 				},
 				requirements: combineRequirements(requirements, output.requirements),
 				runMultiplier: 1,

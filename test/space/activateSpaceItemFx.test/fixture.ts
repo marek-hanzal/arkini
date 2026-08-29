@@ -1,6 +1,7 @@
-import { Effect } from "effect";
+import { Effect, type Layer } from "effect";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
@@ -322,13 +323,15 @@ export const toolbar = (x: number) =>
 		},
 	}) as const;
 
-export const run = <A, E, R>(program: Effect.Effect<A, E, R>) =>
+export const run = <A, E>(
+	program: Effect.Effect<A, E, Layer.Success<ReturnType<typeof GameLayerFx>>>,
+) =>
 	Effect.runSync(
 		program.pipe(
 			useGameFx({
 				config,
 			}),
-		) as Effect.Effect<A, E, never>,
+		),
 	);
 
 export const spawnAndActivate = Effect.fn("spawnAndActivate")(function* ({

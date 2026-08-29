@@ -1,8 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 
-import type { EditorProjectStartScope } from "~/bridge/project/editor/EditorProjectStartScope";
-import { readEditorProjectStartItemIdsFx } from "~/bridge/project/editor/readEditorProjectStartItemIdsFx";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import type { EditorProjectStartScope } from "~/editor/project/EditorProjectStartScope";
+import { readEditorProjectStartItemIdsFn } from "~/editor/project/fn/readEditorProjectStartItemIdsFn";
 import { useDialogFocus } from "~/ui/focus/useDialogFocus";
 import { EditorItemSearchThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { useEditorItemSearchOptions } from "~/ui/item/editor/useEditorItemSearchOptions";
@@ -31,12 +30,10 @@ export const EditorProjectStartItemPicker = ({
 	const [selectedIndex, setSelectedIndex] = useState(0);
 	const allowedItemIds = useMemo(
 		() =>
-			RendererRuntime.runSync(
-				readEditorProjectStartItemIdsFx({
-					items,
-					scope,
-				}),
-			),
+			readEditorProjectStartItemIdsFn({
+				items,
+				scope,
+			}),
 		[
 			items,
 			scope,

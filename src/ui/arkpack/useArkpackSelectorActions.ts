@@ -2,12 +2,12 @@ import { useAtomSet } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { openEditorArkpackAtom } from "~/bridge/arkpack/editor/openEditorArkpackAtom";
-import { importArkpackFileAtom } from "~/bridge/arkpack/importArkpackFileAtom";
-import { openUserArkpackDirectoryAtom } from "~/bridge/arkpack/openUserArkpackDirectoryAtom";
-import { refreshArkpackCatalogAtom } from "~/bridge/arkpack/refreshArkpackCatalogAtom";
-import { removeArkpackAtom } from "~/bridge/arkpack/removeArkpackAtom";
-import { useArkpacks } from "~/bridge/arkpack/useArkpacks";
+import { openEditorArkpackAtom } from "~/ui/arkpack/editor/openEditorArkpackAtom";
+import { importArkpackFileAtom } from "~/ui/arkpack/importArkpackFileAtom";
+import { openUserArkpackDirectoryAtom } from "~/ui/arkpack/openUserArkpackDirectoryAtom";
+import { refreshArkpackCatalogAtom } from "~/ui/arkpack/refreshArkpackCatalogAtom";
+import { removeArkpackAtom } from "~/ui/arkpack/removeArkpackAtom";
+import { useArkpacks } from "~/ui/arkpack/useArkpacks";
 import { useExclusiveAction } from "~/ui/action/useExclusiveAction";
 
 type BusyAction = "editor" | "import" | "open-directory" | "refresh" | "remove";

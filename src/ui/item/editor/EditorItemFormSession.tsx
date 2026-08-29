@@ -1,9 +1,10 @@
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, type PropsWithChildren } from "react";
 
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import type { EditorItem, EditorItemType } from "~/bridge/item/editor/EditorItemModel";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
 import { EditorFormSectionPage } from "~/ui/form/EditorFormSectionPage";
 import { EditorItemFormProvider } from "~/ui/item/editor/EditorItemFormContext";
@@ -28,9 +29,9 @@ export const EditorItemFormSession = ({
 	sectionId,
 }: PropsWithChildren<{
 	readonly enableCapability?: EditorItemOptionalCapability;
-	readonly initialItem: EditorItem;
+	readonly initialItem: ItemSchema.Type;
 	readonly isNew: boolean;
-	readonly itemType?: EditorItemType;
+	readonly itemType?: TypeSchema.Type;
 	readonly productionLineId?: string;
 	readonly sectionId: EditorItemSectionId;
 }>) => {

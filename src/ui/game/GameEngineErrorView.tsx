@@ -1,5 +1,5 @@
-import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
-import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
+import { CriticalGameLifecycleError } from "~/renderer/game/resource/CriticalGameLifecycleError";
+import { GameSaveBootstrapError } from "~/renderer/game/GameSaveBootstrapError";
 import { ActionErrorPage } from "~/ui/action/ActionErrorPage";
 import { DangerButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
 

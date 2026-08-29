@@ -1,7 +1,8 @@
+import { Info } from "lucide-react";
 import { match } from "ts-pattern";
 import type { ReactNode } from "react";
 
-import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
+import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
 import { ItemReferenceButton } from "~/ui/item-detail/ItemReferenceButton";
 
 const ItemLineOutputItem = ({
@@ -45,8 +46,8 @@ const ItemLineOutputItem = ({
 				data-ui="TileLineOutputRuleHint"
 				key={`${hint}-${index}`}
 			>
-				<span
-					className="icon-[lucide--info] mt-px size-3.5 shrink-0 text-secondary-foreground"
+				<Info
+					className="mt-px size-3.5 shrink-0 text-secondary-foreground"
 					aria-hidden="true"
 				/>
 				<span>{hint}</span>

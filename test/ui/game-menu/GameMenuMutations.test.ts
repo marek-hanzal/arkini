@@ -4,12 +4,12 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { Game } from "~/bridge/game/Game";
-import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycleOwnerAtom";
-import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLifecycleFx";
-import { requestApplicationCloseAtom } from "~/bridge/lifecycle/requestApplicationCloseAtom";
+import type { Game } from "~/renderer/game/Game";
+import { RendererLifecycleOwnerAtom } from "~/renderer/lifecycle/RendererLifecycleOwnerAtom";
+import { createRendererLifecycleFx } from "~/renderer/lifecycle/createRendererLifecycleFx";
+import { readRendererLifecycleFx } from "~/renderer/lifecycle/readRendererLifecycleFx";
 import { gameMenuCommandAtom } from "~/ui/game-menu/gameMenuCommandAtom";
-import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
+import { testArkpackConfig } from "~test/support/arkpack/createTestArkpack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import { testGameRead } from "~test/support/game/testGameRead";
 
@@ -186,7 +186,12 @@ describe("game menu command atoms", () => {
 			),
 		);
 
-		const exit = await runCommand(registry, requestApplicationCloseAtom, undefined);
+		const exit = await Effect.runPromiseExit(
+			readRendererLifecycleFx().pipe(
+				Effect.flatMap((lifecycle) => lifecycle.requestCloseFx),
+				Effect.provideService(AtomRegistry.AtomRegistry, registry),
+			),
+		);
 
 		expect(Exit.isFailure(exit)).toBe(true);
 		if (Exit.isSuccess(exit)) throw new Error("Expected native close failure.");

@@ -1,5 +1,5 @@
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
 import {
 	DetailFact,
 	DetailFacts,
@@ -8,7 +8,7 @@ import {
 import { EditorProductionLineInputs } from "~/ui/item/editor/EditorProductionLineInputs";
 
 /** Presents the authored Space target and immediate action requirements. */
-export const EditorSpaceActionDetail = ({ item }: { readonly item: EditorItem }) => {
+export const EditorSpaceActionDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const project = useEditorProject();
 	if (item.type !== "space") return null;
 	return (

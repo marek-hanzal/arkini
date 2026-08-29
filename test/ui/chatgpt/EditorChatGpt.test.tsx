@@ -5,8 +5,11 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ChatGptAssetCandidateSchema } from "../../../electron/contract/chatgpt/ChatGptSurfaceSchema";
-import { EditorChatGpt } from "~/ui/chatgpt/editor/EditorChatGpt";
+import { Route as EditorChatGptRouteDefinition } from "~/@routes/editor/$projectId/chatgpt";
 import { installChatGptDom, pngBytes } from "./EditorChatGpt.test/fixture";
+
+const EditorChatGpt = EditorChatGptRouteDefinition.options.component;
+if (EditorChatGpt === undefined) throw new Error("Editor ChatGPT route component is missing.");
 
 const state = vi.hoisted(() => ({
 	assetListeners: new Set<(candidate: ChatGptAssetCandidateSchema.Type) => void>(),
@@ -37,17 +40,17 @@ vi.mock("@effect/atom-react", () => ({
 	}),
 }));
 
-vi.mock("~/bridge/editor/useEditorProject", () => ({
+vi.mock("~/ui/editor/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
-vi.mock("~/bridge/resource/editor/saveEditorAssetCommandAtom", () => ({
+vi.mock("~/ui/resource/editor/saveEditorAssetCommandAtom", () => ({
 	saveEditorAssetCommandAtom: () => ({
 		id: "save-chatgpt-asset",
 	}),
 }));
 
-vi.mock("~/bridge/runtime/RendererRuntime", async () => {
+vi.mock("~/renderer/RendererRuntime", async () => {
 	const { Effect } = await import("effect");
 	return {
 		RendererRuntime: {

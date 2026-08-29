@@ -5,7 +5,7 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { CheatsScreen } from "~/ui/cheats/CheatsScreen";
+import { Route as CheatsRouteDefinition } from "~/@routes/game/$packageId/cheats";
 
 (
 	globalThis as {
@@ -26,6 +26,10 @@ const state = vi.hoisted(() => ({
 }));
 
 vi.mock("@tanstack/react-router", () => ({
+	createFileRoute: () => (options: object) => ({
+		options,
+	}),
+	redirect: vi.fn(),
 	useNavigate: () => state.navigate,
 	useRouter: () => ({
 		history: {
@@ -34,7 +38,13 @@ vi.mock("@tanstack/react-router", () => ({
 		},
 	}),
 }));
-vi.mock("~/bridge/game/useGameEngine", () => ({
+vi.mock("~/ui/game/PlayableGameRoute", async () => {
+	const { Fragment } = await import("react");
+	return {
+		PlayableGameRoute: Fragment,
+	};
+});
+vi.mock("~/ui/game/useGameEngine", () => ({
 	useGameEngine: () => ({
 		arkpack: {
 			packageId: "package:cheats",
@@ -118,6 +128,9 @@ vi.mock("~/ui/cheats/Cheats", async () => {
 		},
 	};
 });
+
+const CheatsScreen = CheatsRouteDefinition.options.component;
+if (CheatsScreen === undefined) throw new Error("Cheats route component is missing.");
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 

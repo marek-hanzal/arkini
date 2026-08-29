@@ -1,4 +1,6 @@
-import type { EditorLine } from "~/bridge/item/editor/EditorItemModel";
+import { CircleCheck, CircleX, Eye, EyeOff, PackagePlus, Star, StarOff } from "lucide-react";
+
+import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { withFieldGroup } from "~/ui/form/EditorForm";
@@ -8,7 +10,7 @@ import { EditorLineInputsControl } from "~/ui/item/editor/EditorLineInputsContro
 import { EditorOutputControl } from "~/ui/item/editor/EditorOutputControl";
 import { EditorRulesControl } from "~/ui/item/editor/EditorRulesControl";
 
-const defaultLine: EditorLine = {
+const defaultLine: LineSchema.Type = {
 	id: "",
 	title: "",
 	description: "",
@@ -59,30 +61,30 @@ export const EditorLineFields = withFieldGroup({
 							<group.AppField name="default">
 								{(field) => (
 									<field.BoolToggle
-										checkedIcon="icon-[lucide--star]"
+										checkedIcon={Star}
 										description="The default line is selected first when this item starts production."
 										label="Default"
-										uncheckedIcon="icon-[lucide--star-off]"
+										uncheckedIcon={StarOff}
 									/>
 								)}
 							</group.AppField>
 							<group.AppField name="show">
 								{(field) => (
 									<field.BoolToggle
-										checkedIcon="icon-[lucide--eye]"
+										checkedIcon={Eye}
 										description="Visible lines are shown to the player before runtime rules alter their visibility."
 										label="Visible"
-										uncheckedIcon="icon-[lucide--eye-off]"
+										uncheckedIcon={EyeOff}
 									/>
 								)}
 							</group.AppField>
 							<group.AppField name="enable">
 								{(field) => (
 									<field.BoolToggle
-										checkedIcon="icon-[lucide--circle-check]"
+										checkedIcon={CircleCheck}
 										description="Enabled lines can accept production jobs before runtime rules alter their availability."
 										label="Enabled"
-										uncheckedIcon="icon-[lucide--circle-x]"
+										uncheckedIcon={CircleX}
 									/>
 								)}
 							</group.AppField>
@@ -114,20 +116,23 @@ export const EditorLineFields = withFieldGroup({
 								"runtime:multiplier",
 							]}
 							onChange={(next) =>
-								group.setFieldValue("rules", next as EditorLine["rules"])
+								group.setFieldValue("rules", next as LineSchema.Type["rules"])
 							}
 						/>
 					)}
 				</group.Subscribe>
 			</EditorFormCard>
-			<EditorFormCard className="grid min-w-0 grid-cols-2 gap-0">
+			<div
+				className="grid min-w-0 grid-cols-2 gap-0 rounded-2xl border border-l-2 border-line-strong bg-surface-raised/60 p-[var(--ak-panel-padding)]"
+				data-ui="EditorFormCard"
+			>
 				<div className="min-w-0 pr-[var(--ak-panel-padding)]">
 					<group.Subscribe selector={(state) => state.values.input}>
 						{(input) => (
 							<EditorLineInputsControl
 								value={input}
 								onChange={(next) =>
-									group.setFieldValue("input", next as EditorLine["input"])
+									group.setFieldValue("input", next as LineSchema.Type["input"])
 								}
 							/>
 						)}
@@ -141,7 +146,7 @@ export const EditorLineFields = withFieldGroup({
 									<EditorCapabilityStatus
 										actionLabel="Enable line output"
 										description="This line currently only applies its input and runtime behavior. Enable an output to emit weighted items when the job completes."
-										icon="icon-[lucide--package-plus]"
+										icon={PackagePlus}
 										onEnable={() =>
 											group.setFieldValue(
 												"output",
@@ -167,7 +172,7 @@ export const EditorLineFields = withFieldGroup({
 						)}
 					</group.Subscribe>
 				</div>
-			</EditorFormCard>
+			</div>
 		</div>
 	),
 });

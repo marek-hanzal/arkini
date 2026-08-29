@@ -2,8 +2,8 @@ import { Effect } from "effect";
 import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
-import type { GameEngine } from "~/bridge/game/GameEngine";
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { createMainActorStoreFx } from "~/ui/pixi/actor/createMainActorStoreFx";
 import type { DropFeedback } from "~/ui/pixi/grid/DropFeedback";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";

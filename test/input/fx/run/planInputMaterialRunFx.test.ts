@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { planInputMaterialRunFx } from "~/engine/input/fx/run/planInputMaterialRunFx";
-import type { InputMaterialResolutionSchema } from "~/engine/input/schema/resolution/InputMaterialResolutionSchema";
+import type { InputRun } from "~/engine/input/InputRun";
 import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
 import { inputTestItems } from "~test/input/fx/support/inputTestItems";
 
@@ -35,7 +35,7 @@ const resolution = ({ ready, runQuantity }: { ready: boolean; runQuantity: numbe
 		missingQuantity: ready ? 0 : 1,
 		availableCapacity: ready ? 2 : 6,
 		ready,
-	} satisfies InputMaterialResolutionSchema.Type;
+	} satisfies InputRun.MaterialResolution;
 };
 
 describe("planInputMaterialRunFx", () => {

@@ -107,7 +107,7 @@ const state = {
 	jobs: [],
 } satisfies StateSchema.Type;
 
-describe("mergeItemsFx multi-space inventory bridge", () => {
+describe("mergeItemsFx multi-space inventory transfer", () => {
 	it("allows an inventory use source to return around an explicit off-screen target", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {

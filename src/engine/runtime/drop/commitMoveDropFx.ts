@@ -3,9 +3,9 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
-import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
-import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
-import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
+import type { DropItemResult } from "~/engine/runtime/DropItemResult";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 
 export namespace commitMoveDropFx {
@@ -16,7 +16,7 @@ export namespace commitMoveDropFx {
 		readonly targetLocation: GridLocationSchema.Type;
 	}
 
-	export type Result = DropItemResultSchema.Type;
+	export type Result = DropItemResult;
 }
 
 /** Commits one exact empty-slot drop and normalizes its public result. */
@@ -34,7 +34,7 @@ export const commitMoveDropFx = Effect.fn("commitMoveDropFx")(function* ({
 	}).pipe(
 		Effect.map(
 			(result): commitMoveDropFx.Result => ({
-				kind: DropItemResultKindEnumSchema.enum.Move,
+				kind: DropItemResultKind.Move,
 				itemId: result.item.id,
 				revision: result.item.revision,
 				previousLocation: result.previousLocation,
@@ -44,39 +44,39 @@ export const commitMoveDropFx = Effect.fn("commitMoveDropFx")(function* ({
 		Effect.catchTags({
 			LocationOccupiedError: (error) =>
 				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.Occupied,
+					kind: DropItemResultKind.Reject,
+					reason: DropItemRejectedReason.Occupied,
 					itemId: sourceItemId,
 					targetItemId: error.itemId,
 				}),
 			ItemNotFoundError: () =>
 				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+					kind: DropItemResultKind.Reject,
+					reason: DropItemRejectedReason.StaleSource,
 					itemId: sourceItemId,
 				}),
 			RevisionConflictError: () =>
 				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+					kind: DropItemResultKind.Reject,
+					reason: DropItemRejectedReason.StaleSource,
 					itemId: sourceItemId,
 				}),
 			ItemLocationConflictError: () =>
 				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+					kind: DropItemResultKind.Reject,
+					reason: DropItemRejectedReason.StaleSource,
 					itemId: sourceItemId,
 				}),
 			ItemNotOnGridError: () =>
 				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.InvalidSource,
+					kind: DropItemResultKind.Reject,
+					reason: DropItemRejectedReason.InvalidSource,
 					itemId: sourceItemId,
 				}),
 			CrossSpaceBoardOperationError: () =>
 				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+					kind: DropItemResultKind.Reject,
+					reason: DropItemRejectedReason.InvalidTarget,
 					itemId: sourceItemId,
 				}),
 		}),

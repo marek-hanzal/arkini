@@ -1,4 +1,6 @@
-import type { EditorMerge } from "~/bridge/item/editor/EditorItemModel";
+import { Combine } from "lucide-react";
+
+import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
@@ -12,12 +14,12 @@ export const EditorMergeFields = ({
 	onChange,
 	value,
 }: {
-	readonly onChange: (value: EditorMerge[] | undefined) => void;
-	readonly value: EditorMerge[] | undefined;
+	readonly onChange: (value: MergeSchema.Type[] | undefined) => void;
+	readonly value: MergeSchema.Type[] | undefined;
 }) => {
 	const readItemLabel = useEditorItemOptionLabel();
 	const merges = value ?? [];
-	const update = (index: number, merge: EditorMerge) => {
+	const update = (index: number, merge: MergeSchema.Type) => {
 		const next = [
 			...merges,
 		];
@@ -31,7 +33,7 @@ export const EditorMergeFields = ({
 					<EditorCapabilityStatus
 						actionLabel="Enable merges"
 						description="Merges let dropping this item onto a matching target consume or retain the source, change the target and optionally emit an output."
-						icon="icon-[lucide--combine]"
+						icon={Combine}
 						onEnable={() =>
 							onChange([
 								structuredClone(EditorItemDraftDefaults.merge),

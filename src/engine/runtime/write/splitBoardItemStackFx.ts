@@ -4,13 +4,12 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
-import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
+import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
 import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
-import type { OutputPlacementResultSchema } from "~/engine/placement/schema/OutputPlacementResultSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
 import { ItemStackSplitUnavailableError } from "~/engine/runtime/error/ItemStackSplitUnavailableError";
@@ -29,7 +28,7 @@ export namespace splitBoardItemStackFx {
 	}
 
 	export interface Result {
-		readonly placement: OutputPlacementResultSchema.Type;
+		readonly placement: applyOutputPlacementFx.Result;
 		readonly sourceAfter: BoardRuntimeItemSchema.Type;
 		readonly sourceBefore: BoardRuntimeItemSchema.Type;
 	}
@@ -61,10 +60,10 @@ export const splitBoardItemStackFx = Effect.fn("splitBoardItemStackFx")(function
 				);
 			}
 			if (
-				!(yield* isSameGridLocationFx({
+				!isSameGridLocationFn({
 					left: sourceBefore.location,
 					right: location,
-				}))
+				})
 			) {
 				return yield* Effect.fail(
 					new ItemLocationConflictError({

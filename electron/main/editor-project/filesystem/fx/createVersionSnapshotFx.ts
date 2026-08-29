@@ -89,7 +89,7 @@ export const createVersionSnapshotFx = Effect.fn("createVersionSnapshotFx")(func
 			const current = yield* fileSystem.readFile(target);
 			if (hashVersionBytes(current) === hash) continue;
 		}
-		yield* filesystemWrite.writeFileFx({
+		yield* filesystemWrite.replaceFileFx({
 			lock,
 			target,
 			bytes: encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`),
@@ -103,7 +103,7 @@ export const createVersionSnapshotFx = Effect.fn("createVersionSnapshotFx")(func
 			const current = yield* fileSystem.readFile(target);
 			if (hashVersionBytes(current) === hash) continue;
 		}
-		yield* filesystemWrite.writeFileFx({
+		yield* filesystemWrite.replaceFileFx({
 			lock,
 			target,
 			bytes,

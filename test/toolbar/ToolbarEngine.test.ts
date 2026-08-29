@@ -1,7 +1,8 @@
-import { Effect } from "effect";
+import { Effect, type Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import { readOwnerJobQueueFx } from "~/engine/job/read/readOwnerJobQueueFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import { checkRuntimeLocationsFx } from "~/engine/runtime/check/checkRuntimeLocationsFx";
@@ -19,8 +20,8 @@ import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 import { StateSchema } from "~/engine/state/schema/StateSchema";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
-import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
-import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
+import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
 const configInput = {
@@ -131,13 +132,13 @@ const toolbar = (x: number) => ({
 		y: 0,
 	},
 });
-const run = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
+const run = <A, E>(effect: Effect.Effect<A, E, Layer.Success<ReturnType<typeof GameLayerFx>>>) =>
 	Effect.runSync(
 		effect.pipe(
 			useGameFx({
 				config,
 			}),
-		) as Effect.Effect<A, E, never>,
+		),
 	);
 
 describe("Toolbar engine", () => {
@@ -196,7 +197,7 @@ describe("Toolbar engine", () => {
 						occupant: null,
 					},
 				});
-				if (stored.kind !== DropItemResultKindEnumSchema.enum.Move)
+				if (stored.kind !== DropItemResultKind.Move)
 					throw new Error("Expected toolbar move.");
 				const restored = yield* dropItemFx({
 					sourceItemId: stored.itemId,
@@ -217,12 +218,12 @@ describe("Toolbar engine", () => {
 		);
 
 		expect(result.stored).toMatchObject({
-			kind: DropItemResultKindEnumSchema.enum.Move,
+			kind: DropItemResultKind.Move,
 			previousLocation: board(0, 0),
 			location: toolbar(0),
 		});
 		expect(result.restored).toMatchObject({
-			kind: DropItemResultKindEnumSchema.enum.Move,
+			kind: DropItemResultKind.Move,
 			previousLocation: toolbar(0),
 			location: board(2, 1),
 		});
@@ -266,7 +267,7 @@ describe("Toolbar engine", () => {
 		);
 
 		expect(result.outcome).toMatchObject({
-			kind: DropItemResultKindEnumSchema.enum.Swap,
+			kind: DropItemResultKind.Swap,
 			source: {
 				itemId: "runtime:water",
 				location: toolbar(1),
@@ -309,8 +310,8 @@ describe("Toolbar engine", () => {
 		);
 
 		expect(result.outcome).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.Reject,
-			reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+			kind: DropItemResultKind.Reject,
+			reason: DropItemRejectedReason.InvalidTarget,
 			itemId: "runtime:board-only",
 		});
 		expect(result.runtime.items[0]?.location).toEqual(board(1, 0));
@@ -345,7 +346,7 @@ describe("Toolbar engine", () => {
 						occupant: null,
 					},
 				});
-				if (stored.kind !== DropItemResultKindEnumSchema.enum.Move) {
+				if (stored.kind !== DropItemResultKind.Move) {
 					throw new Error("Expected Backpack toolbar move.");
 				}
 				const inventoryLocation = {
@@ -400,15 +401,15 @@ describe("Toolbar engine", () => {
 		);
 
 		expect(result.storePreview).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.Move,
+			kind: DropItemResultKind.Move,
 		});
 		expect(result.preview).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.Reject,
-			reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+			kind: DropItemResultKind.Reject,
+			reason: DropItemRejectedReason.InvalidTarget,
 		});
 		expect(result.rejected).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.Reject,
-			reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+			kind: DropItemResultKind.Reject,
+			reason: DropItemRejectedReason.InvalidTarget,
 			itemId: "runtime:backpack",
 		});
 		expect(result.afterRejected.items).toEqual([
@@ -419,7 +420,7 @@ describe("Toolbar engine", () => {
 			}),
 		]);
 		expect(result.restored).toMatchObject({
-			kind: DropItemResultKindEnumSchema.enum.Move,
+			kind: DropItemResultKind.Move,
 			previousLocation: toolbar(1),
 			location: board(2, 1),
 		});
@@ -508,8 +509,8 @@ describe("Toolbar engine", () => {
 			targetRejected,
 		]) {
 			expect(preview).toEqual({
-				kind: DropItemResultKindEnumSchema.enum.Reject,
-				reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+				kind: DropItemResultKind.Reject,
+				reason: DropItemRejectedReason.InvalidTarget,
 			});
 		}
 	});

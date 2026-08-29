@@ -1,20 +1,20 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
-import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
-import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
+import type { DropItemResult } from "~/engine/runtime/DropItemResult";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 
 type RejectedDropResult = Extract<
-	DropItemResultSchema.Type,
+	DropItemResult,
 	{
-		readonly kind: typeof DropItemResultKindEnumSchema.enum.Reject;
+		readonly kind: typeof DropItemResultKind.Reject;
 	}
 >;
 
 export namespace makeDropRejectedResultFx {
 	export interface Props {
-		readonly reason: DropItemRejectedReasonEnumSchema.Type;
+		readonly reason: DropItemRejectedReason;
 		readonly sourceItemId: IdSchema.Type;
 		readonly targetItemId?: IdSchema.Type;
 	}
@@ -27,7 +27,7 @@ export const makeDropRejectedResultFx = Effect.fnUntraced(function* ({
 	targetItemId,
 }: makeDropRejectedResultFx.Props) {
 	return {
-		kind: DropItemResultKindEnumSchema.enum.Reject,
+		kind: DropItemResultKind.Reject,
 		reason,
 		itemId: sourceItemId,
 		...(targetItemId === undefined

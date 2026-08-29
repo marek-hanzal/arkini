@@ -9,12 +9,11 @@ import { applyInputMaterialStorePlanFx } from "~/engine/input/fx/applyInputMater
 import { planInputMaterialStoreFx } from "~/engine/input/fx/planInputMaterialStoreFx";
 import { filterInputSlotItemsFx } from "~/engine/input/read/filterInputSlotItemsFx";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
-import type { InputMaterialStorePlanSchema } from "~/engine/input/schema/store/InputMaterialStorePlanSchema";
 import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
-import { readGridLocationClaimsFx } from "~/engine/location/read/readGridLocationClaimsFx";
-import { readGridLocationKeyFx } from "~/engine/location/read/readGridLocationKeyFx";
+import { readGridLocationClaimsFn } from "~/engine/location/fn/readGridLocationClaimsFn";
+import { readGridLocationKeyFn } from "~/engine/location/fn/readGridLocationKeyFn";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import { isDeliveryRuntimeItemFx } from "~/engine/runtime/read/isDeliveryRuntimeItemFx";
@@ -76,15 +75,15 @@ export const settleItemDeliveryRuntimeFx = Effect.fn("settleItemDeliveryRuntimeF
 		}
 		const current = delivery.value;
 		if (current.location.phase === "returning") {
-			const claims = yield* readGridLocationClaimsFx({
+			const claims = readGridLocationClaimsFn({
 				runtime,
 			});
-			const originKey = yield* readGridLocationKeyFx(current.location.origin);
+			const originKey = readGridLocationKeyFn(current.location.origin);
 			let conflictingClaim: (typeof claims)[number] | undefined;
 			for (const claim of claims) {
 				if (
 					claim.itemId !== current.id &&
-					(yield* readGridLocationKeyFx(claim.location)) === originKey
+					readGridLocationKeyFn(claim.location) === originKey
 				) {
 					conflictingClaim = claim;
 					break;
@@ -154,7 +153,7 @@ export const settleItemDeliveryRuntimeFx = Effect.fn("settleItemDeliveryRuntimeF
 					lineId: line.id,
 					ownerItemId: owner.id,
 				});
-				const plan: InputMaterialStorePlanSchema.Type | undefined =
+				const plan: planInputMaterialStoreFx.Plan | undefined =
 					yield* planInputMaterialStoreFx({
 						input,
 						item: source,

@@ -3,9 +3,9 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { vi } from "vitest";
 
-import type { GameEngine } from "~/bridge/game/GameEngine";
-import type { GameTransition } from "~/bridge/game/GameSession";
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { GameTransition } from "~/renderer/game/session/GameSession";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { PixiInventorySurface } from "~/ui/pixi/PixiInventorySurface";
 
 (
@@ -80,11 +80,11 @@ const game = {
 	runFx: <Result, Error>(effect: Effect.Effect<Result, Error>) => effect,
 } as GameEngine;
 
-vi.mock("~/bridge/game/useGameEngine", () => ({
+vi.mock("~/ui/game/useGameEngine", () => ({
 	useGameEngine: () => game,
 }));
 
-vi.mock("~/bridge/runtime/RendererRuntime", () => ({
+vi.mock("~/renderer/RendererRuntime", () => ({
 	RendererRuntime: {
 		runPromise: Effect.runPromise,
 		runSync: Effect.runSync,

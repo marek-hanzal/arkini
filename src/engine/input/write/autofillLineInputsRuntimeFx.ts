@@ -1,7 +1,7 @@
 import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readDeliveryTravelDurationMsFx } from "~/engine/delivery/read/readDeliveryTravelDurationMsFx";
+import { readDeliveryTravelDurationMsFn } from "~/engine/delivery/fn/readDeliveryTravelDurationMsFn";
 import { DeliveryPhaseEnumSchema } from "~/engine/delivery/schema/DeliveryPhaseEnumSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { detachLineInputSourceFx } from "~/engine/input/fx/detachLineInputSourceFx";
@@ -107,7 +107,7 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 					phase: DeliveryPhaseEnumSchema.enum.Outbound,
 					generation: 0,
 					origin: source.location,
-					remainingDurationMs: yield* readDeliveryTravelDurationMsFx({
+					remainingDurationMs: readDeliveryTravelDurationMsFn({
 						from: source.location,
 						to: owner.location,
 					}),

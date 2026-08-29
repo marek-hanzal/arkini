@@ -7,7 +7,7 @@ import type { InputSchema } from "~/production-action/schema/InputSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { InputRun } from "~/production-input/InputRun";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 /** Resolves one immediate Simple or Deposit requirement without mutating runtime. */
 export const resolveActionInputFx = Effect.fn("resolveActionInputFx")(function* ({

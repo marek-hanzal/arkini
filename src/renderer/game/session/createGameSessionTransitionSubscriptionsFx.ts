@@ -4,8 +4,8 @@ import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSch
 import {
 	CommittedTransitionsFx,
 	type CommittedTransitionsFxService,
-} from "~/engine/runtime/context/CommittedTransitionsFx";
-import type { CommittedTransitionSchema } from "~/engine/runtime/schema/CommittedTransitionSchema";
+} from "~/game-runtime/context/CommittedTransitionsFx";
+import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 
 export interface GameSessionTransitionSubscriptionCleanup {
 	readonly close: Effect.Effect<void>;

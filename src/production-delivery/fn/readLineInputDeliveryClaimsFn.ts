@@ -1,9 +1,9 @@
 import { Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { isDeliveryRuntimeItemFn } from "~/engine/runtime/read/fn/isDeliveryRuntimeItemFn";
-import type { DeliveryRuntimeItemSchema } from "~/engine/runtime/schema/DeliveryRuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { isDeliveryRuntimeItemFn } from "~/game-runtime/read/fn/isDeliveryRuntimeItemFn";
+import type { DeliveryRuntimeItemSchema } from "~/game-runtime/schema/DeliveryRuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 interface LineInputDeliveryClaim {
 	readonly delivery: DeliveryRuntimeItemSchema.Type;

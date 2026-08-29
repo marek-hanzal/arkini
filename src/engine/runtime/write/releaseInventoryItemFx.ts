@@ -13,10 +13,10 @@ import { readBoardLocationsFn } from "~/item-placement/fn/readBoardLocationsFn";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
-import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
-import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
+import { ItemLocationConflictError } from "~/game-runtime/error/ItemLocationConflictError";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
 import { readRuntimeInventoryOpenerFx } from "~/engine/runtime/read/readRuntimeInventoryOpenerFx";
 
 export namespace releaseInventoryItemFx {

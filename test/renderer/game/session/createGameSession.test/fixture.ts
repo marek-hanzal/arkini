@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 
 export const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {
 	const startedAt = performance.now();

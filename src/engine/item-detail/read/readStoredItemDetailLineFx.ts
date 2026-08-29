@@ -6,7 +6,7 @@ import { readItemDetailInputsFx } from "~/engine/item-detail/read/readItemDetail
 import { readItemDetailOutputFx } from "~/engine/item-detail/read/readItemDetailOutputFx";
 import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace readStoredItemDetailLineFx {
 	export interface Props {

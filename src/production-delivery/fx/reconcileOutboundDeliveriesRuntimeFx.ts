@@ -9,9 +9,9 @@ import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
-import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import { isDeliveryRuntimeItemFn } from "~/engine/runtime/read/fn/isDeliveryRuntimeItemFn";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
+import { isDeliveryRuntimeItemFn } from "~/game-runtime/read/fn/isDeliveryRuntimeItemFn";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { matchesItemSelectorFn } from "~/item-definition/fn/matchesItemSelectorFn";
 
 export namespace reconcileOutboundDeliveriesRuntimeFx {

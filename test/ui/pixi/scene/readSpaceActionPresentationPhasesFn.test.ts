@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { GameTransition } from "~/renderer/game/session/GameSession";
 import { readSpaceActionPresentationPhasesFn } from "~/ui/pixi/scene/fn/readSpaceActionPresentationPhasesFn";
-import { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 const chargedItem = {
 	uid: "uid:tree",

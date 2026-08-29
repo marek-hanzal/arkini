@@ -8,10 +8,10 @@ import type { GridLocationSchema } from "~/item-location/schema/GridLocationSche
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { BoardQueryOriginUnavailableError } from "~/engine/query/error/BoardQueryOriginUnavailableError";
 import { ScopeSchema } from "~/item-definition/query/schema/ScopeSchema";
-import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
-import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
+import { isBoardRuntimeItemFn } from "~/game-runtime/read/fn/isBoardRuntimeItemFn";
+import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import { selectItemsFn } from "~/item-definition/fn/selectItemsFn";
 import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 

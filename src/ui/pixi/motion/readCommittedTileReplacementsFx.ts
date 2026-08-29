@@ -8,7 +8,7 @@ import { readTileActorVisualFx } from "~/ui/pixi/actor/readTileActorVisualFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
-import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
+import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
 
 export interface TileReplacement {
 	readonly actorId: string;

@@ -1,4 +1,4 @@
-import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { resolveInputMaterialFn } from "~/production-input/fn/resolveInputMaterialFn";
 import type { MaterialSchema } from "~/production-input/schema/MaterialSchema";
 import type { InputCapacityExceededIssueSchema } from "~/production-input/schema/check/InputCapacityExceededIssueSchema";
@@ -10,8 +10,8 @@ import type { InputLocationSchema } from "~/item-location/schema/InputLocationSc
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import type { LineInputClosedIssueSchema } from "~/production-line/schema/check/LineInputClosedIssueSchema";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { matchesItemSelectorFn } from "~/item-definition/fn/matchesItemSelectorFn";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";

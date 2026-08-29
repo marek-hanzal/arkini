@@ -1,7 +1,7 @@
 import { Option } from "effect";
 
-import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace readGridRuntimeItemFn {
 	export interface Props {

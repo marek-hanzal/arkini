@@ -4,6 +4,9 @@ const productionCodePattern = "^(?:src|electron|shared)(?:/|$)";
 const applicationEntrypointPattern = "^src/(?:main|createArkiniRouterFx|_route)[.]tsx?$";
 const gameEventPattern = "^src/game-event(?:/|$)";
 const gameConfigPattern = "^src/game-config(?:/|$)";
+const gameRuntimePattern = "^src/game-runtime(?:/|$)";
+const gameRuntimeAllowedSourceDependencyPattern =
+	"(?:game-runtime(?:/|$)|game-config/GameConfigSchema[.]ts$|engine/(?:cheat/schema/CheatStateSchema[.]ts$|common/schema/(?:IdSchema|NonNegativeIntegerSchema|PositiveIntegerSchema|TimeSchema)[.]ts$|game/context/GameConfigFx[.]ts$|item/(?:error/(?:ItemNotFoundError|ItemNotOnBoardError)[.]ts$|fn/(?:isItemPureWithIndexFn|readItemPurityIndexFn)[.]ts$|fx/resolveItemFx[.]ts$)|revision/(?:fx/createRevisionFx|schema/RevisionSchema)[.]ts$)|game-event/schema/GameEventSchema[.]ts$|item-definition/schema/(?:ItemSchema|StorageSchema|TypeSchema)[.]ts$|item-location/(?:fn/(?:indexGridLocationClaimsFn|isItemLocationScopeAllowedFn|readGridLocationClaimsFn)[.]ts$|schema/(?:BoardLocationSchema|DeliveryLocationSchema|GridLocationSchema|InputLocationSchema|JobLocationSchema|LocationSchema|LocationScopeEnumSchema|ReservedLocationSchema)[.]ts$)|production-delivery/(?:check/checkRuntimeDeliveriesFn|fx/reconcileOutboundDeliveriesRuntimeFx|schema/check/DeliveryTargetIssueSchema)[.]ts$|production-input/(?:check/checkRuntimeInputLocationsFn|fx/releaseOwnerInputsFx|schema/check/(?:InputCapacityExceededIssueSchema|InputLineMissingIssueSchema|InputOwnerMissingIssueSchema|InputSelectorMismatchIssueSchema|InputSlotInvalidIssueSchema))[.]ts$|production-job/(?:check/checkRuntimeJobsFn|error/JobOwnerBusyError|fn/readReservedJobOutputQuantitiesFn|schema/(?:JobQueueRequestSchema|JobSchema|DuplicateJobIdIssueSchema|JobConsumedMaterialStateIssueSchema|JobLineMissingIssueSchema|JobMaterialOrphanIssueSchema|JobOwnerMissingIssueSchema|JobOwnerMultipleActiveIssueSchema|JobOwnerNotOnGridIssueSchema|JobQueueExceededIssueSchema|JobTimeInvalidIssueSchema))[.]ts$|production-line/(?:fn/checkRuntimeDefaultLinesFn|schema/(?:DefaultLineByOwnerItemIdSchema|check/(?:DefaultLineIssueSchema|LineInputClosedIssueSchema)))[.]ts$)";
 const gameStartPattern = "^src/game-start(?:/|$)";
 const itemDetailFramePattern = "^src/item-detail-frame(?:/|$)";
 const itemDefinitionPattern = "^src/item-definition(?:/|$)";
@@ -42,6 +45,18 @@ const boundaryRules = [
 		},
 	},
 	{
+		name: "game-runtime-is-a-framework-neutral-live-aggregate",
+		comment:
+			"Game Runtime owns canonical live state, validation, identity and atomic publication; presentation, platform, pending item interaction, Tick and persistence may depend on it, never the reverse.",
+		severity: "error",
+		from: {
+			path: gameRuntimePattern,
+		},
+		to: {
+			path: `^src/(?!${gameRuntimeAllowedSourceDependencyPattern})|^(?:electron|shared|scripts)(?:/|$)|^node_modules/(?!@paralleldrive/cuid2(?:/|$)|effect(?:/|$)|ts-pattern(?:/|$)|zod(?:/|$))`,
+		},
+	},
+	{
 		name: "item-definition-is-authored-vocabulary",
 		comment:
 			"Item Definition owns immutable authored item, query, selector, quantity, and storage contracts plus explicit-input selection policy; it may compose only exact schema leaves and never live Runtime, product, platform, or presentation ownership.",
@@ -62,7 +77,7 @@ const boundaryRules = [
 			path: gameStartPattern,
 		},
 		to: {
-			path: "^src/(?!engine(?:/|$)|game-start(?:/|$)|item-location(?:/|$)|item-placement(?:/|$))|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)",
+			path: "^src/(?!engine(?:/|$)|game-runtime(?:/|$)|game-start(?:/|$)|item-location(?:/|$)|item-placement(?:/|$))|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)",
 		},
 	},
 	{
@@ -77,7 +92,7 @@ const boundaryRules = [
 			path: "^src/(?!game-event(?:/|$))|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)",
 			pathNot: [
 				"^src/engine/common/schema/(?:IdSchema|NonNegativeIntegerSchema|PositiveIntegerSchema)[.]ts$",
-				"^src/engine/runtime/read/fn/isGridRuntimeItemFn[.]ts$",
+				"^src/game-runtime/read/fn/isGridRuntimeItemFn[.]ts$",
 				"^src/item-location/schema/(?:BoardLocationSchema|GridLocationSchema|InputLocationSchema|InventoryLocationSchema|LocationSchema|ReservedLocationSchema)[.]ts$",
 				"^src/item-merge/schema/(?:SourceActionSchema|TargetEffectSchema)[.]ts$",
 				"^src/item-placement/fx/applyOutputPlacementFx[.]ts$",
@@ -350,12 +365,12 @@ const boundaryRules = [
 		from: {
 			path: "^(?:src|electron)(?:/|$)",
 			pathNot: [
-				"^src/engine/game/layer/GameCoreLayerFx[.]ts$",
-				"^src/engine/runtime/internal/(?:makeRuntimeStoreFx|modifyRuntimeWithTransitionFx)[.]ts$",
+				"^src/game-runtime/layer/GameRuntimeLayerFx[.]ts$",
+				"^src/game-runtime/internal/(?:makeRuntimeStoreFx|modifyRuntimeWithTransitionFx)[.]ts$",
 			],
 		},
 		to: {
-			path: "^src/engine/runtime/internal/RuntimeStoreFx[.]ts$",
+			path: "^src/game-runtime/internal/RuntimeStoreFx[.]ts$",
 		},
 	},
 	{
@@ -382,7 +397,8 @@ const boundaryRules = [
 		from: {
 			path: "^(?:src|electron)(?:/|$)",
 			pathNot: [
-				"^src/engine/game/layer/(?:GameCoreLayerFx|GameLoopLayerFx)[.]ts$",
+				"^src/engine/game/layer/GameLoopLayerFx[.]ts$",
+				"^src/engine/tick/layer/TickLayerFx[.]ts$",
 			],
 		},
 		to: {
@@ -397,13 +413,13 @@ const boundaryRules = [
 		from: {
 			path: "^(?:src|electron)(?:/|$)",
 			pathNot: [
-				"^src/engine/game/layer/GameCoreLayerFx[.]ts$",
+				"^src/game-runtime/layer/GameRuntimeLayerFx[.]ts$",
 				"^src/engine/save/RuntimeSaveLayerFx[.]ts$",
 				"^src/renderer/game/session/(?:createGameSessionFx|createGameSessionTransitionSubscriptionsFx)[.]ts$",
 			],
 		},
 		to: {
-			path: "^src/engine/runtime/context/CommittedTransitionsFx[.]ts$",
+			path: "^src/game-runtime/context/CommittedTransitionsFx[.]ts$",
 		},
 	},
 	{
@@ -622,7 +638,7 @@ const boundaryRules = [
 			"Framework-neutral Engine, Game Event facts, authored Game configuration, Arkpack artifacts, and product domains never depend on Electron transport contracts.",
 		severity: "error",
 		from: {
-			path: `^src/(?:engine|editor)(?:/|$)|${gameStartPattern}|${gameEventPattern}|${itemDefinitionPattern}|${boardSpatialPattern}|${gameConfigPattern}|${arkpackArtifactPattern}|${productDomainPattern}|${authoringProductCorePattern}`,
+			path: `^src/(?:engine|editor)(?:/|$)|${gameRuntimePattern}|${gameStartPattern}|${gameEventPattern}|${itemDefinitionPattern}|${boardSpatialPattern}|${gameConfigPattern}|${arkpackArtifactPattern}|${productDomainPattern}|${authoringProductCorePattern}`,
 		},
 		to: {
 			path: "^electron/contract(?:/|$)",

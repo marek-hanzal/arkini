@@ -8,13 +8,13 @@ import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativ
 import { readInputRunItemFx } from "~/production-input/read/readInputRunItemFx";
 import type { InputRun } from "~/production-input/InputRun";
 import type { JobLocationSchema } from "~/item-location/schema/JobLocationSchema";
-import { createRuntimeItemFx } from "~/engine/runtime/fx/createRuntimeItemFx";
-import { createRuntimeItemIdFx } from "~/engine/runtime/fx/createRuntimeItemIdFx";
-import { discardRuntimeItemOwnedStateFx } from "~/engine/runtime/fx/discardRuntimeItemOwnedStateFx";
-import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
-import type { JobRuntimeItemSchema } from "~/engine/runtime/schema/JobRuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
+import { createRuntimeItemIdFx } from "~/game-runtime/fx/createRuntimeItemIdFx";
+import { discardRuntimeItemOwnedStateFx } from "~/game-runtime/fx/discardRuntimeItemOwnedStateFx";
+import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
+import type { InputRuntimeItemSchema } from "~/game-runtime/schema/InputRuntimeItemSchema";
+import type { JobRuntimeItemSchema } from "~/game-runtime/schema/JobRuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 export namespace applyInputMaterialConsumeRunPlanFx {

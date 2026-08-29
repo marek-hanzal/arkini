@@ -4,7 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace readRuntimeLineFillProgressFn {
 	export interface Props {

@@ -2,9 +2,9 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
-import type { ReservedRuntimeItemSchema } from "~/engine/runtime/schema/ReservedRuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
+import type { ReservedRuntimeItemSchema } from "~/game-runtime/schema/ReservedRuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 type JobCompletionItem = Extract<
 	ItemSchema.Type,

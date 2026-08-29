@@ -5,7 +5,7 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { releaseInventoryItemFx } from "~/engine/runtime/write/releaseInventoryItemFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";

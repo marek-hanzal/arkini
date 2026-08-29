@@ -5,9 +5,9 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
 import { queryFx } from "~/engine/query/fx/queryFx";
-import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
-import { getItemFx } from "~/engine/runtime/read/getItemFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
+import { getItemFx } from "~test/support/runtime/getItemFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import {

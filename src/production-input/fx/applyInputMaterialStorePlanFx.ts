@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 
 import type { InputLocationSchema } from "~/item-location/schema/InputLocationSchema";
-import { createRuntimeItemFx } from "~/engine/runtime/fx/createRuntimeItemFx";
-import { createRuntimeItemIdFx } from "~/engine/runtime/fx/createRuntimeItemIdFx";
-import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
+import { createRuntimeItemIdFx } from "~/game-runtime/fx/createRuntimeItemIdFx";
+import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
+import type { InputRuntimeItemSchema } from "~/game-runtime/schema/InputRuntimeItemSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { planInputMaterialStoreFn } from "../fn/planInputMaterialStoreFn";
 
 export namespace applyInputMaterialStorePlanFx {

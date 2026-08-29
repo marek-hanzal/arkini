@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 /** Artwork-backed navigation identity for one configured Item and an optional exact live target. */
 export interface ItemDetailReference {

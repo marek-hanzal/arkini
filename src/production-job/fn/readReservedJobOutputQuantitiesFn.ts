@@ -3,8 +3,8 @@ import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { readOutputMaximumQuantitiesFn } from "~/production-output/fn/readOutputMaximumQuantitiesFn";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 const addQuantities = (

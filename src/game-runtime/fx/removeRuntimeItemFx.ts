@@ -1,0 +1,38 @@
+import { Effect } from "effect";
+
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+import { removeRuntimeItemIdentityFx } from "./removeRuntimeItemIdentityFx";
+
+interface RemoveRuntimeItemProps {
+	item: RuntimeItemSchema.Type;
+	runtime: RuntimeSchema.Type;
+}
+
+interface RemoveRuntimeItemResult {
+	readonly events: readonly GameEventSchema.Type[];
+	readonly runtime: RuntimeSchema.Type;
+}
+
+/** Removes one idle item and releases its buffered inputs through canonical placement. */
+export const removeRuntimeItemFx = Effect.fn("removeRuntimeItemFx")(function* ({
+	item,
+	runtime,
+}: RemoveRuntimeItemProps) {
+	const releasedInputs = yield* releaseOwnerInputsFx({
+		owner: item,
+		runtime,
+	});
+
+	const removedRuntime = yield* removeRuntimeItemIdentityFx({
+		item,
+		runtime: releasedInputs.runtime,
+	});
+
+	return {
+		events: releasedInputs.events,
+		runtime: removedRuntime,
+	} satisfies RemoveRuntimeItemResult;
+});

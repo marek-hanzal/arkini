@@ -2,10 +2,10 @@ import { Deferred, Effect, Fiber, Stream } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
 
-import { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
+import { GameLayerFx } from "~test/support/game/GameLayerFx";
 import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
-import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
+import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";

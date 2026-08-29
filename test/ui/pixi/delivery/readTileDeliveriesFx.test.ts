@@ -6,7 +6,7 @@ import { readTileDeliveriesFx } from "~/ui/pixi/delivery/readTileDeliveriesFx";
 import { settleItemDeliveryFx } from "~test/support/delivery/settleItemDeliveryFx";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { autofillLineInputsFx } from "~test/support/input/autofillLineInputsFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import {
 	inputRuntimeTestConfig,

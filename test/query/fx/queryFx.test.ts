@@ -5,9 +5,9 @@ import type { GridLocationSchema } from "~/item-location/schema/GridLocationSche
 import type { LocationSchema } from "~/item-location/schema/LocationSchema";
 import { queryFx } from "~/engine/query/fx/queryFx";
 import type { QuerySchema } from "~/item-definition/query/schema/QuerySchema";
-import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 const config = GameConfigSchema.parse({

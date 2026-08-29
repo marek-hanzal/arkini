@@ -1,7 +1,7 @@
 import { Effect, type Layer } from "effect";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
+import type { GameLayerFx } from "~test/support/game/GameLayerFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { blueprintConfig } from "~test/production-job/fx/completeJobTransitionFx.blueprint.test/config";
 

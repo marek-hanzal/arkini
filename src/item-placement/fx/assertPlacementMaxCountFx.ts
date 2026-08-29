@@ -4,7 +4,7 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { readReservedJobOutputQuantitiesFn } from "~/production-job/fn/readReservedJobOutputQuantitiesFn";
 import type { dropFx } from "~/production-output/fx/dropFx";
 import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 interface AssertPlacementMaxCountProps {
 	readonly drop: dropFx.Result;

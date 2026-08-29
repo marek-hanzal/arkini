@@ -3,8 +3,8 @@ import { Option } from "effect";
 import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
 import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import type { DefaultLineIssueSchema } from "~/production-line/schema/check/DefaultLineIssueSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { DefaultLineIssueReasonEnumSchema } from "~/production-line/schema/check/DefaultLineIssueReasonEnumSchema";
 
 export namespace checkRuntimeDefaultLinesFn {

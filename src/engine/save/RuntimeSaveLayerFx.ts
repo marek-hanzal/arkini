@@ -1,8 +1,8 @@
 import { Cause, Effect, Fiber, Layer, Ref, Semaphore, Stream } from "effect";
 
-import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
-import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { RuntimeSaveFx } from "~/engine/save/RuntimeSaveFx";

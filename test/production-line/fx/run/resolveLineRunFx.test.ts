@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { resolveLineRunFx } from "~/production-line/fx/run/resolveLineRunFx";
-import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { lineRunRuntime } from "~test/production-line/fx/run/support/lineRunTestRuntime";
 
 const resolveFx = (runtime: ReturnType<typeof lineRunRuntime>) => {

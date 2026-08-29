@@ -3,9 +3,9 @@ import { Effect } from "effect";
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
 import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import type { PlacementPlan } from "~/item-placement/PlacementPlan";
-import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 interface ApplyPlacementPlanProps {
 	readonly plan: PlacementPlan;

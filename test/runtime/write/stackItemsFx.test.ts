@@ -4,10 +4,10 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { setDefaultLineFx } from "~/production-line/write/setDefaultLineFx";
 import { readItemStackResolutionFn } from "~/engine/runtime/read/fn/readItemStackResolutionFn";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { stackItemsFx } from "~/engine/runtime/write/stackItemsFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { purityTestConfig } from "~test/production-line/support/purityTestConfig";
 
 const board = (x: number, space = 0) => ({

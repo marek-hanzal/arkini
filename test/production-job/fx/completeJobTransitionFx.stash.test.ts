@@ -2,11 +2,11 @@ import { Effect, type Layer, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
+import type { GameLayerFx } from "~test/support/game/GameLayerFx";
 import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
-import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { fromStateFx } from "~/engine/state/fx/fromStateFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";

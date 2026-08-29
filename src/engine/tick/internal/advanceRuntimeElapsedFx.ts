@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { replayRuntimeStepsFx } from "~/engine/tick/internal/replayRuntimeStepsFx";
 
 export namespace advanceRuntimeElapsedFx {

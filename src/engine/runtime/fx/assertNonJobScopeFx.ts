@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import { ItemJobScopedError } from "~/engine/runtime/error/ItemJobScopedError";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
+import { ItemJobScopedError } from "~/game-runtime/error/ItemJobScopedError";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 export namespace assertNonJobScopeFx {

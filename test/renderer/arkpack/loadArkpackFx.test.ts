@@ -1,14 +1,30 @@
+import { gzipSync } from "node:zlib";
 import { Effect } from "effect";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import type { ArkpackStorage } from "~/renderer/arkpack/ArkpackStorage";
 import { loadArkpackFx } from "~/renderer/arkpack/loadArkpackFx";
+import { encodeArkpackEnvelopeFx } from "~/engine/pack/fx/encodeArkpackEnvelopeFx";
 import { createTestArkpack } from "~test/support/arkpack/createTestArkpack";
 import { installTestPngDecoder } from "~test/support/arkpack/createTestPngBytes";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 import { ArkiniVersionIncompatibleError } from "~/engine/version/ArkiniVersionAdmission";
 
 beforeEach(installTestPngDecoder);
+
+const malformedArkpackBytes = Effect.runSync(
+	encodeArkpackEnvelopeFx({
+		payload: new Uint8Array(gzipSync(new Uint8Array())),
+	}),
+);
+
+const createStorageFn = (files: ReadonlyArray<ArkpackStorage.File>): ArkpackStorage => ({
+	listFx: Effect.die("Unexpected catalog list."),
+	readFx: (packageId) => Effect.succeed(files.filter((file) => file.packageId === packageId)),
+	removeFx: () => Effect.void,
+	writeFx: () => Effect.void,
+	openUserDirectoryFx: Effect.void,
+});
 
 describe("loadArkpackFx", () => {
 	it("surfaces an installed package's writer-major incompatibility", async () => {
@@ -19,25 +35,18 @@ describe("loadArkpackFx", () => {
 			"1.0",
 			`${Number(currentMajor) + 1}.0.0`,
 		);
-		const storage: ArkpackStorage = {
-			listFx: Effect.die("Unexpected catalog list."),
-			readFx: () =>
-				Effect.succeed([
-					{
-						packageId: "package:future",
-						filename: "package%3Afuture.arkpack",
-						bytes: bytes.buffer,
-						provenance: {
-							type: "community",
-						},
-						source: "user",
-						overridesBundled: true,
-					},
-				]),
-			removeFx: () => Effect.void,
-			writeFx: () => Effect.void,
-			openUserDirectoryFx: Effect.void,
-		};
+		const storage = createStorageFn([
+			{
+				packageId: "package:future",
+				filename: "package%3Afuture.arkpack",
+				bytes: bytes.buffer,
+				provenance: {
+					type: "community",
+				},
+				source: "user",
+				overridesBundled: true,
+			},
+		]);
 
 		await expect(
 			Effect.runPromise(
@@ -61,20 +70,9 @@ describe("loadArkpackFx", () => {
 			source: "user",
 			overridesBundled: true,
 		};
-		const storage: ArkpackStorage = {
-			listFx: Effect.die("Unexpected catalog list."),
-			readFx: (packageId) =>
-				Effect.succeed(
-					packageId === file.packageId
-						? [
-								file,
-							]
-						: [],
-				),
-			removeFx: () => Effect.void,
-			writeFx: () => Effect.void,
-			openUserDirectoryFx: Effect.void,
-		};
+		const storage = createStorageFn([
+			file,
+		]);
 
 		const loaded = await Effect.runPromise(
 			loadArkpackFx({
@@ -91,14 +89,118 @@ describe("loadArkpackFx", () => {
 		expect(loaded.payload.config.meta.id).toBe("package:selected");
 	});
 
+	it("falls back from a malformed user override to the valid bundled package", async () => {
+		const packageId = "package:fallback";
+		const bundledBytes = createTestArkpack(undefined, packageId);
+		const storage = createStorageFn([
+			{
+				packageId,
+				filename: "package%3Afallback.arkpack",
+				bytes: bundledBytes.buffer,
+				provenance: {
+					type: "official",
+				},
+				source: "bundled",
+				overridesBundled: false,
+			},
+			{
+				packageId,
+				filename: "package%3Afallback.arkpack",
+				bytes: malformedArkpackBytes.buffer,
+				provenance: {
+					type: "community",
+				},
+				source: "user",
+				overridesBundled: true,
+			},
+		]);
+
+		const loaded = await Effect.runPromise(
+			loadArkpackFx({
+				packageId,
+				storage,
+			}),
+		);
+
+		expect(loaded.descriptor).toMatchObject({
+			packageId,
+			source: "bundled",
+			overridesBundled: false,
+			provenance: {
+				type: "official",
+			},
+		});
+	});
+
+	it("preserves bundled writer incompatibility after a malformed user override", async () => {
+		const packageId = "package:future-fallback";
+		const currentMajor = ArkiniAppVersion.slice(0, ArkiniAppVersion.indexOf("."));
+		const bundledBytes = createTestArkpack(
+			undefined,
+			packageId,
+			"1.0",
+			`${Number(currentMajor) + 1}.0.0`,
+		);
+		const storage = createStorageFn([
+			{
+				packageId,
+				filename: "package%3Afuture-fallback.arkpack",
+				bytes: bundledBytes.buffer,
+				provenance: {
+					type: "official",
+				},
+				source: "bundled",
+				overridesBundled: false,
+			},
+			{
+				packageId,
+				filename: "package%3Afuture-fallback.arkpack",
+				bytes: malformedArkpackBytes.buffer,
+				provenance: {
+					type: "community",
+				},
+				source: "user",
+				overridesBundled: true,
+			},
+		]);
+
+		await expect(
+			Effect.runPromise(
+				loadArkpackFx({
+					packageId,
+					storage,
+				}),
+			),
+		).rejects.toBeInstanceOf(ArkiniVersionIncompatibleError);
+	});
+
+	it("rejects an exact load when every candidate is malformed", async () => {
+		const packageId = "package:invalid";
+		const storage = createStorageFn([
+			{
+				packageId,
+				filename: "package%3Ainvalid.arkpack",
+				bytes: malformedArkpackBytes.buffer,
+				provenance: {
+					type: "community",
+				},
+				source: "user",
+				overridesBundled: true,
+			},
+		]);
+
+		await expect(
+			Effect.runPromise(
+				loadArkpackFx({
+					packageId,
+					storage,
+				}),
+			),
+		).rejects.toThrow(`Arkpack ${packageId} is not installed.`);
+	});
+
 	it("fails when the requested package is absent", async () => {
-		const storage: ArkpackStorage = {
-			listFx: Effect.die("Unexpected catalog list."),
-			readFx: () => Effect.succeed([]),
-			removeFx: () => Effect.void,
-			writeFx: () => Effect.void,
-			openUserDirectoryFx: Effect.void,
-		};
+		const storage = createStorageFn([]);
 
 		await expect(
 			Effect.runPromise(
@@ -113,35 +215,28 @@ describe("loadArkpackFx", () => {
 	it("plays a Community user override without treating provenance as admission", async () => {
 		const bundledBytes = createTestArkpack(undefined, "package:tampered");
 		const userBytes = createTestArkpack(undefined, "package:tampered");
-		const storage: ArkpackStorage = {
-			listFx: Effect.die("Unexpected catalog list."),
-			readFx: () =>
-				Effect.succeed([
-					{
-						packageId: "package:tampered",
-						filename: "package%3Atampered.arkpack",
-						bytes: bundledBytes.buffer,
-						provenance: {
-							type: "official",
-						},
-						source: "bundled",
-						overridesBundled: false,
-					},
-					{
-						packageId: "package:tampered",
-						filename: "package%3Atampered.arkpack",
-						bytes: userBytes.buffer,
-						provenance: {
-							type: "community",
-						},
-						source: "user",
-						overridesBundled: true,
-					},
-				]),
-			removeFx: () => Effect.void,
-			writeFx: () => Effect.void,
-			openUserDirectoryFx: Effect.void,
-		};
+		const storage = createStorageFn([
+			{
+				packageId: "package:tampered",
+				filename: "package%3Atampered.arkpack",
+				bytes: bundledBytes.buffer,
+				provenance: {
+					type: "official",
+				},
+				source: "bundled",
+				overridesBundled: false,
+			},
+			{
+				packageId: "package:tampered",
+				filename: "package%3Atampered.arkpack",
+				bytes: userBytes.buffer,
+				provenance: {
+					type: "community",
+				},
+				source: "user",
+				overridesBundled: true,
+			},
+		]);
 
 		const loaded = await Effect.runPromise(
 			loadArkpackFx({

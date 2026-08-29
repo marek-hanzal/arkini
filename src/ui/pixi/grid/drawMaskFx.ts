@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import type { Graphics } from "pixi.js";
 
-import { readSurfaceRadiusFx } from "~/ui/pixi/grid/readSurfaceRadiusFx";
+import { readSurfaceRadiusFn } from "~/ui/pixi/grid/fn/readSurfaceRadiusFn";
 import type { SurfaceLayout } from "~/ui/pixi/layout/SceneLayout";
 
 export namespace drawMaskFx {
@@ -24,7 +24,7 @@ export const drawMaskFx = Effect.fn("drawMaskFx")(function* ({
 			surface.y,
 			surface.width,
 			surface.height,
-			yield* readSurfaceRadiusFx(surface),
+			readSurfaceRadiusFn(surface),
 		)
 		.fill(0xffffff);
 });

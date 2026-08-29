@@ -3,8 +3,8 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { resolveActiveJobStatusFx } from "~/engine/job/fx/resolveActiveJobStatusFx";
 import type { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 import { readItemQueueSizeFx } from "~/engine/job/read/readItemQueueSizeFx";
-import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
-import { readLineOwnerLinesFx } from "~/engine/line/read/readLineOwnerLinesFx";
+import { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
+import { readLineOwnerLinesFn } from "~/engine/line/fn/readLineOwnerLinesFn";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { readLineInputAutofillCoverageFx } from "~/engine/input/fx/readLineInputAutofillCoverageFx";
@@ -68,14 +68,14 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 }: readItemDetailQueueFx.Props) {
 	const owner = runtime.items.find((candidate) => candidate.id === itemId);
 	if (owner === undefined) return unavailable;
-	const lineOwner = yield* isLineOwnerItemFx(owner.item);
+	const lineOwner = isLineOwnerItemFn(owner.item);
 	if (Option.isNone(lineOwner)) return unavailable;
 	const capacity = yield* readItemQueueSizeFx({
 		item: lineOwner.value,
 	});
 	if (capacity === undefined) return unavailable;
 	const lineById = new Map(
-		(yield* readLineOwnerLinesFx(lineOwner.value)).map((line) => [
+		readLineOwnerLinesFn(lineOwner.value).map((line) => [
 			line.id,
 			line,
 		]),

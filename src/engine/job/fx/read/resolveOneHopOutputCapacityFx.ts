@@ -3,8 +3,8 @@ import { Effect, Option } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
-import { readLineOwnerLinesFx } from "~/engine/line/read/readLineOwnerLinesFx";
+import { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
+import { readLineOwnerLinesFn } from "~/engine/line/fn/readLineOwnerLinesFn";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import { readOutputConditionalMaximumQuantitiesFx } from "~/engine/output/fx/readOutputConditionalMaximumQuantitiesFx";
 import { readOutputMaximumQuantitiesFx } from "~/engine/output/fx/readOutputMaximumQuantitiesFx";
@@ -62,9 +62,9 @@ export const resolveOneHopOutputCapacityFx = Effect.fn("resolveOneHopOutputCapac
 			itemId: intermediateItemId,
 		});
 		if (intermediate.type !== TypeSchema.enum.Blueprint) continue;
-		const owner = Option.getOrUndefined(yield* isLineOwnerItemFx(intermediate));
+		const owner = Option.getOrUndefined(isLineOwnerItemFn(intermediate));
 		if (owner === undefined) continue;
-		const applicable = (yield* readLineOwnerLinesFx(owner)).filter(
+		const applicable = readLineOwnerLinesFn(owner).filter(
 			(candidate) => candidate.show && candidate.enable,
 		);
 		if (applicable.length === 0) continue;

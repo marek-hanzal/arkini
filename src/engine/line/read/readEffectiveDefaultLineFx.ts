@@ -1,15 +1,15 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
-import { readLineOwnerLinesFx } from "~/engine/line/read/readLineOwnerLinesFx";
+import type { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
+import { readLineOwnerLinesFn } from "~/engine/line/fn/readLineOwnerLinesFn";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace readEffectiveDefaultLineFx {
 	export interface Props {
 		readonly ownerItemId: IdSchema.Type;
-		readonly ownerItem: isLineOwnerItemFx.Result;
+		readonly ownerItem: isLineOwnerItemFn.Result;
 		readonly runtime: Pick<RuntimeSchema.Type, "defaultLineByOwnerItemId">;
 	}
 
@@ -27,7 +27,7 @@ export const readEffectiveDefaultLineFx = Effect.fn("readEffectiveDefaultLineFx"
 	ownerItem,
 	runtime,
 }: readEffectiveDefaultLineFx.Props) {
-	const lines = yield* readLineOwnerLinesFx(ownerItem);
+	const lines = readLineOwnerLinesFn(ownerItem);
 	if (Object.hasOwn(runtime.defaultLineByOwnerItemId, ownerItemId)) {
 		const override = runtime.defaultLineByOwnerItemId[ownerItemId];
 		return override === null ? undefined : lines.find((line) => line.id === override);

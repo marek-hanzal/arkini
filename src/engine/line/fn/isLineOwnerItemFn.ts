@@ -1,9 +1,9 @@
-import { Effect, Option } from "effect";
+import { Option } from "effect";
 
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 
-export namespace isLineOwnerItemFx {
+export namespace isLineOwnerItemFn {
 	type DepositItem = Extract<
 		ItemSchema.Type,
 		{
@@ -28,14 +28,13 @@ export namespace isLineOwnerItemFx {
 }
 
 /** Narrows one canonical item to the exact variants that expose product lines. */
-export const isLineOwnerItemFx = Effect.fn("isLineOwnerItemFx")(function* (item: ItemSchema.Type) {
-	return Option.liftPredicate(
+export const isLineOwnerItemFn = (item: ItemSchema.Type): Option.Option<isLineOwnerItemFn.Result> =>
+	Option.liftPredicate(
 		item,
-		(candidate): candidate is isLineOwnerItemFx.Result =>
+		(candidate): candidate is isLineOwnerItemFn.Result =>
 			candidate.type === TypeSchema.enum.Producer ||
 			(candidate.type === TypeSchema.enum.Deposit && candidate.lines !== undefined) ||
 			candidate.type === TypeSchema.enum.Blueprint ||
 			candidate.type === TypeSchema.enum.Craft ||
 			candidate.type === TypeSchema.enum.Stash,
 	);
-});

@@ -15,7 +15,7 @@ import { createTrustedRendererFx } from "./security/createTrustedRendererFx";
 import { createDiagnosticLogFx } from "./diagnostics/createDiagnosticLogFx";
 import { createFilesystemWindowPreferencesFx } from "./window/createFilesystemWindowPreferencesFx";
 import { createWindowModeControllerOwnershipFx } from "./window/createWindowModeControllerOwnershipFx";
-import { createArkiniUserDataPathsFx } from "./user-data/createArkiniUserDataPathsFx";
+import { createArkiniUserDataPathsFn } from "./user-data/fn/createArkiniUserDataPathsFn";
 import type { EditorProjectServiceOwnership } from "./editor-project/EditorProjectServiceOwnership";
 import { registerEditorMcpPreferencesIpcFx } from "./editor-mcp/ipc/registerEditorMcpPreferencesIpcFx";
 import { createEditorMcpOwnershipFx } from "./editor-mcp/http/createEditorMcpOwnershipFx";
@@ -48,7 +48,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	yield* Effect.promise(() => app.whenReady());
 
 	const userDataPath = app.getPath("userData");
-	const userDataPaths = yield* createArkiniUserDataPathsFx(userDataPath);
+	const userDataPaths = createArkiniUserDataPathsFn(userDataPath);
 	const editorProjectServiceOwnership: EditorProjectServiceOwnership =
 		yield* createFilesystemEditorProjectRepositoryFx({
 			catalogPath: userDataPaths.editor.catalog,

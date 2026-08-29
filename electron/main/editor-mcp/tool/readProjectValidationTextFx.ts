@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { EditorProject } from "~/editor/EditorProject";
 import { validateGameConfigFx } from "~/engine/validation/fx/validateGameConfigFx";
-import { validateGameResourcesFx } from "~/engine/validation/rule/validateGameResourcesFx";
+import { validateGameResourcesFn } from "~/engine/validation/rule/fn/validateGameResourcesFn";
 
 /** Prints canonical saved-project semantic and resource-reference diagnostics. */
 export const readProjectValidationTextFx = Effect.fn("readProjectValidationTextFx")(function* (
@@ -20,12 +20,12 @@ export const readProjectValidationTextFx = Effect.fn("readProjectValidationTextF
 			]),
 		),
 	};
-	const diagnostics = (yield* Effect.all([
-		validateGameConfigFx({
+	const diagnostics = [
+		...(yield* validateGameConfigFx({
 			config: project.config,
 			provenance,
-		}),
-		validateGameResourcesFx({
+		})),
+		...validateGameResourcesFn({
 			config: project.config,
 			provenance,
 			resources: project.resources.map(({ id }) => ({
@@ -34,7 +34,7 @@ export const readProjectValidationTextFx = Effect.fn("readProjectValidationTextF
 				path: `${source}/resources/${id}.png`,
 			})),
 		}),
-	])).flat();
+	];
 	const errors = diagnostics.filter(({ severity }) => severity === "error").length;
 	const warnings = diagnostics.length - errors;
 	const lines = [

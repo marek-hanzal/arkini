@@ -4,7 +4,7 @@ import type { CriticalGameLifecycleError } from "~/renderer/game/resource/Critic
 import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
 import type { GameEngineResourceFxService } from "~/renderer/game/resource/GameEngineResourceFx";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
-import type { GameSaveStorage } from "~/engine/save/GameSaveStorage";
+import type { GameSaveStorage } from "~/game-persistence/GameSaveStorage";
 import type {
 	Finalization,
 	GameEngineResourceServiceState,

@@ -7,7 +7,7 @@ import { createGameSessionFx } from "~/renderer/game/session/createGameSessionFx
 import { discardGameBootstrapFx } from "~/renderer/game/discardGameBootstrapFx";
 import { startFx } from "~/game-start/startFx";
 import { setCheatEnabledFx } from "~/engine/cheat/write/setCheatEnabledFx";
-import type { StateSchema } from "~/engine/state/schema/StateSchema";
+import type { StateSchema } from "~/game-persistence/StateSchema";
 
 export namespace createEditorBoardGameFx {
 	export interface Props {

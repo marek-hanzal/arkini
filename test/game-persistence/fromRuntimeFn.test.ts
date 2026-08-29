@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
+import { fromRuntimeFn } from "~/game-persistence/fromRuntimeFn";
 import { startFx } from "~/game-start/startFx";
 import { testArkpackConfig } from "~test/arkpack/support/createTestArkpack";
 

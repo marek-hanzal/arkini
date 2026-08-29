@@ -11,9 +11,9 @@ import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransiti
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
-import { StateSchema } from "~/engine/state/schema/StateSchema";
-import { fromStateFx } from "~/engine/state/fx/fromStateFx";
+import { fromRuntimeFn } from "~/game-persistence/fromRuntimeFn";
+import { StateSchema } from "~/game-persistence/StateSchema";
+import { fromStateFx } from "~/game-persistence/fromStateFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";

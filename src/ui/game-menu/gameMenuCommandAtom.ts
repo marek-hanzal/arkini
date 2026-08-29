@@ -6,7 +6,7 @@ import type { Game } from "~/renderer/game/Game";
 import { makeExactGameAtomFamilyFx } from "~/ui/game/makeExactGameAtomFamilyFx";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import { readRendererLifecycleFx } from "~/renderer/lifecycle/readRendererLifecycleFx";
-import { RuntimeSaveFx } from "~/engine/save/RuntimeSaveFx";
+import { RuntimeSaveFx } from "~/game-persistence/RuntimeSaveFx";
 
 export type GameMenuCommand = "save" | "save-and-exit";
 

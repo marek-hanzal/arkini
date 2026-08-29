@@ -16,8 +16,8 @@ import { createEditorUnsavedChangesOwnerFx } from "~/authoring-session/createEdi
 import { GameEngineResourceLayer } from "~/renderer/game/resource/GameEngineResourceLayer";
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
 import { RendererAtomRegistryLayer } from "~/renderer/RendererAtomRegistry";
-import type { GameSaveStorage } from "~/engine/save/GameSaveStorage";
-import { createElectronGameSaveStorageFx } from "~/renderer/save/createElectronGameSaveStorageFx";
+import type { GameSaveStorage } from "~/game-persistence/GameSaveStorage";
+import { createElectronGameSaveStorageFx } from "~/game-persistence/electron/createElectronGameSaveStorageFx";
 
 const EditorUnsavedChangesLayer = Layer.effect(
 	EditorUnsavedChanges,

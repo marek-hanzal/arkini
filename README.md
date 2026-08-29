@@ -23,9 +23,10 @@ Read the smallest entry point needed for the task:
 
 ```text
 src/game-runtime  canonical live Runtime schemas, validation, identity, reads and atomic publication
+src/game-persistence  persisted State, hydration, save codecs, autosave and exact save transports
 src/game-tick  fixed-step budgeting, replay, job/delivery/temporary advancement and scoped loop
 src/item-interaction  optimistic drop reads, authoritative drop/write commands and ordinary click actions
-src/engine    remaining session, query, persistence and platform-neutral support owners
+src/engine    remaining session, query and platform-neutral support owners
 src/game-start  initial-state schemas, exact placement planning and atomic runtime start
 src/game-event  committed gameplay event schemas and exact downstream event projection
 src/item-detail-frame  Item Detail target lifecycle, command settlement, reference navigation and frame presentation

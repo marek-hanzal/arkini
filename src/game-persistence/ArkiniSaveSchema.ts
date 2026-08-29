@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { StateSchema } from "~/engine/state/schema/StateSchema";
+import { StateSchema } from "~/game-persistence/StateSchema";
 import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 

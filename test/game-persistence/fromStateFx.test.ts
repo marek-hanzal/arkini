@@ -3,9 +3,9 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { StateSchema } from "~/engine/state/schema/StateSchema";
-import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
-import { fromStateFx } from "~/engine/state/fx/fromStateFx";
+import { StateSchema } from "~/game-persistence/StateSchema";
+import { fromRuntimeFn } from "~/game-persistence/fromRuntimeFn";
+import { fromStateFx } from "~/game-persistence/fromStateFx";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
 const config = GameConfigSchema.parse({

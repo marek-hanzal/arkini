@@ -1,16 +1,18 @@
-import { Effect } from "effect";
-import type { GameSaveStorage } from "~/engine/save/GameSaveStorage";
-import { GameSaveStorageError } from "~/renderer/save/GameSaveStorageError";
+import { Data, Effect } from "effect";
+import type { GameSaveStorage } from "~/game-persistence/GameSaveStorage";
 
-export namespace createElectronGameSaveStorageFx {
-	export interface Props {
-		readonly api?: Window["arkini"]["save"];
-	}
+class GameSaveStorageError extends Data.TaggedError("GameSaveStorageError")<{
+	readonly operation: "clear" | "read" | "write";
+	readonly cause: unknown;
+}> {}
+
+interface Props {
+	readonly api?: Window["arkini"]["save"];
 }
 
 /** Adapts the typed preload Promise transport once into an Effect-native save capability. */
 export const createElectronGameSaveStorageFx = Effect.fn("createElectronGameSaveStorageFx")(
-	({ api = window.arkini.save }: createElectronGameSaveStorageFx.Props = {}) =>
+	({ api = window.arkini.save }: Props = {}) =>
 		Effect.succeed({
 			readFx: Effect.fn("GameSaveStorage.readFx")((key: GameSaveStorage.Key) =>
 				Effect.tryPromise({

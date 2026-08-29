@@ -7,8 +7,8 @@ import type { InventoryLocationSchema } from "~/engine/location/schema/Inventory
 import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 import { assertPlacementPlanCompleteFx } from "~/engine/placement/fx/assertPlacementPlanCompleteFx";
 import { planInventoryPlacementFx } from "~/engine/placement/fx/planInventoryPlacementFx";
-import { readEmptyLocationsFx } from "~/engine/placement/fx/readEmptyLocationsFx";
-import { readInventoryLocationsFx } from "~/engine/placement/fx/readInventoryLocationsFx";
+import { readEmptyLocationsFn } from "~/engine/placement/fn/readEmptyLocationsFn";
+import { readInventoryLocationsFn } from "~/engine/placement/fn/readInventoryLocationsFn";
 import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
 import type { PlacementPlan } from "~/engine/placement/PlacementPlan";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
@@ -77,10 +77,10 @@ export const planInventoryStorageFx = Effect.fn("planInventoryStorageFx")(functi
 		);
 	}
 	const config = yield* GameConfigFx;
-	const locations = yield* readInventoryLocationsFx({
+	const locations = readInventoryLocationsFn({
 		size: config.meta.inventory,
 	});
-	const [location] = yield* readEmptyLocationsFx({
+	const [location] = readEmptyLocationsFn({
 		locations,
 		runtime,
 	});

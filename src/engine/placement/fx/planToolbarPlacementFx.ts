@@ -5,10 +5,10 @@ import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import type { PositionSchema } from "~/engine/grid/schema/PositionSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import { orderGridLocationsFn } from "~/engine/placement/fn/orderGridLocationsFn";
+import { readToolbarLocationsFn } from "~/engine/placement/fn/readToolbarLocationsFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { orderGridLocationsFx } from "./orderGridLocationsFx";
 import { planScopePlacementFx } from "./planScopePlacementFx";
-import { readToolbarLocationsFx } from "./readToolbarLocationsFx";
 
 export namespace planToolbarPlacementFx {
 	export interface Props {
@@ -29,13 +29,13 @@ export const planToolbarPlacementFx = Effect.fn("planToolbarPlacementFx")(functi
 	runtime,
 }: planToolbarPlacementFx.Props) {
 	const config = yield* GameConfigFx;
-	const locations = yield* readToolbarLocationsFx({
+	const locations = readToolbarLocationsFn({
 		size: config.meta.toolbarSize ?? 0,
 	});
 	const orderedLocations =
 		origin === undefined
 			? locations
-			: yield* orderGridLocationsFx({
+			: orderGridLocationsFn({
 					locations,
 					origin,
 				});

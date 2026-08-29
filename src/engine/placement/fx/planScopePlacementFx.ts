@@ -5,15 +5,15 @@ import type { PositionSchema } from "~/engine/grid/schema/PositionSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import { mergePlacementPlansFn } from "~/engine/placement/fn/mergePlacementPlansFn";
+import { orderStackItemsFn } from "~/engine/placement/fn/orderStackItemsFn";
+import { planStackPlacementFn } from "~/engine/placement/fn/planStackPlacementFn";
+import { readEmptyLocationsFn } from "~/engine/placement/fn/readEmptyLocationsFn";
+import { readPlacementPlanQuantityFn } from "~/engine/placement/fn/readPlacementPlanQuantityFn";
 import type { PlacementPlan } from "~/engine/placement/PlacementPlan";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { mergePlacementPlansFx } from "./mergePlacementPlansFx";
-import { orderStackItemsFx } from "./orderStackItemsFx";
 import { planSpawnPlacementFx } from "./planSpawnPlacementFx";
-import { planStackPlacementFx } from "./planStackPlacementFx";
 import { readAvailableStackItemsFx } from "./readAvailableStackItemsFx";
-import { readEmptyLocationsFx } from "./readEmptyLocationsFx";
-import { readPlacementPlanQuantityFx } from "./readPlacementPlanQuantityFx";
 
 export namespace planScopePlacementFx {
 	export interface Props {
@@ -56,11 +56,11 @@ export const planScopePlacementFx = Effect.fn("planScopePlacementFx")(function* 
 		locations: eligibleLocations,
 		runtime,
 	});
-	const orderedStacks = yield* orderStackItemsFx({
+	const orderedStacks = orderStackItemsFn({
 		items: availableStacks,
 		origin,
 	});
-	const stack = yield* planStackPlacementFx({
+	const stack = planStackPlacementFn({
 		items: orderedStacks,
 		quantity,
 	});
@@ -69,7 +69,7 @@ export const planScopePlacementFx = Effect.fn("planScopePlacementFx")(function* 
 		spawn: [],
 		stack,
 	} satisfies PlacementPlan;
-	const stackedQuantity = yield* readPlacementPlanQuantityFx({
+	const stackedQuantity = readPlacementPlanQuantityFn({
 		plan: stackPlan,
 	});
 	const remainingQuantity = quantity - stackedQuantity;
@@ -77,7 +77,7 @@ export const planScopePlacementFx = Effect.fn("planScopePlacementFx")(function* 
 		return stackPlan;
 	}
 
-	const emptyLocations = yield* readEmptyLocationsFx({
+	const emptyLocations = readEmptyLocationsFn({
 		locations: eligibleLocations,
 		runtime,
 	});
@@ -87,7 +87,7 @@ export const planScopePlacementFx = Effect.fn("planScopePlacementFx")(function* 
 		quantity: remainingQuantity,
 	});
 
-	return yield* mergePlacementPlansFx({
+	return mergePlacementPlansFn({
 		plans: [
 			stackPlan,
 			{

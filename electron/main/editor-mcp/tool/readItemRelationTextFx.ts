@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { EditorProject } from "~/editor/EditorProject";
-import { createEditorAcquisitionGraphFx } from "~/editor/createEditorAcquisitionGraphFx";
+import { createEditorAcquisitionGraphFn } from "~/editor/acquisition/fn/createEditorAcquisitionGraphFn";
 import { readEditorItemOriginSourcesFn } from "~/editor/origin-flow/fn/readEditorItemOriginSourcesFn";
 import type {
 	EditorItemOriginOutputOccurrence,
@@ -95,7 +95,7 @@ export const readItemRelationTextFx = Effect.fn("readItemRelationTextFx")(functi
 	const item = project.config.items[itemId];
 	if (item === undefined)
 		return yield* Effect.fail(new Error(`Item ${itemId} does not exist in the open project.`));
-	const graph = yield* createEditorAcquisitionGraphFx(project.config);
+	const graph = createEditorAcquisitionGraphFn(project.config);
 	const sources = readEditorItemOriginSourcesFn(graph);
 	const subgraph = readEditorItemOriginRelationSubgraphFn({
 		level,

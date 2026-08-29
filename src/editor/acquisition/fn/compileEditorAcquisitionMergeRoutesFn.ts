@@ -1,7 +1,5 @@
-import { Effect } from "effect";
-
 import type { EditorAcquisitionRoute } from "~/editor/EditorAcquisitionGraph";
-import { readEditorAcquisitionOutputOccurrencesFx } from "~/editor/readEditorAcquisitionOutputOccurrencesFx";
+import { readEditorAcquisitionOutputOccurrencesFn } from "~/editor/acquisition/fn/readEditorAcquisitionOutputOccurrencesFn";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
@@ -23,9 +21,7 @@ const combineRequirements = (
 	],
 });
 
-const readMergeRoutesFx = Effect.fn("compileEditorAcquisitionMergeRoutesFx.item")(function* (
-	source: ItemSchema.Type,
-) {
+const readMergeRoutesFn = (source: ItemSchema.Type) => {
 	const routes: EditorAcquisitionRoute[] = [];
 	const matchedTargetItemIds = new Set<string>();
 	for (const [mergeIndex, merge] of (source.merge ?? []).entries()) {
@@ -64,7 +60,7 @@ const readMergeRoutesFx = Effect.fn("compileEditorAcquisitionMergeRoutesFx.item"
 			sourceItemId: source.id,
 			targetItemId: merge.target.itemId,
 		} as const;
-		const outputModel = yield* readEditorAcquisitionOutputOccurrencesFx(merge.output);
+		const outputModel = readEditorAcquisitionOutputOccurrencesFn(merge.output);
 		const operation = {
 			id: `source:${source.id}:merge:${mergeIndex}`,
 			inputs: [
@@ -117,15 +113,13 @@ const readMergeRoutesFx = Effect.fn("compileEditorAcquisitionMergeRoutesFx.item"
 			});
 	}
 	return routes;
-});
+};
 
 /** Compiles merge-output and replacement acquisition routes. */
-export const compileEditorAcquisitionMergeRoutesFx = Effect.fn(
-	"compileEditorAcquisitionMergeRoutesFx",
-)(function* (config: GameConfigSchema.Type) {
+export const compileEditorAcquisitionMergeRoutesFn = (config: GameConfigSchema.Type) => {
 	const routes: EditorAcquisitionRoute[] = [];
 	for (const item of Object.values(config.items)) {
-		routes.push(...(yield* readMergeRoutesFx(item)));
+		routes.push(...readMergeRoutesFn(item));
 	}
 	return routes;
-});
+};

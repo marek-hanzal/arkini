@@ -6,7 +6,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { useGameEngine } from "~/ui/game/useGameEngine";
 import { useRuntimeSelector } from "~/ui/game/useRuntimeSelector";
 import type { useItemDetailSources } from "~/ui/item-detail/useItemDetailSources";
-import { readItemDetailTabsFx } from "~/engine/item-detail/read/readItemDetailTabsFx";
+import { readItemDetailTabsFn } from "~/engine/item-detail/fn/readItemDetailTabsFn";
 import type { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -32,20 +32,18 @@ export const useItemDetailTabs = (
 	const { itemId, kind } = target;
 	const selector = useCallback(
 		(runtime: RuntimeSchema.Type) =>
-			game.readOrThrow(
-				readItemDetailTabsFx({
-					target:
-						kind === "runtime"
-							? {
-									kind,
-									item: runtime.items.find((item) => item.id === itemId),
-								}
-							: {
-									kind,
-								},
-					sources,
-				}),
-			),
+			readItemDetailTabsFn({
+				target:
+					kind === "runtime"
+						? {
+								kind,
+								item: runtime.items.find((item) => item.id === itemId),
+							}
+						: {
+								kind,
+							},
+				sources,
+			}),
 		[
 			game,
 			itemId,

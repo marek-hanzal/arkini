@@ -1,10 +1,8 @@
-import { Effect } from "effect";
-
 import type { EditorProject } from "~/editor/EditorProject";
-import { estimateEditorItemsFx } from "~/editor/estimateEditorItemsFx";
 import { createEditorItemEstimateIndexFn } from "~/editor/estimator/fn/createEditorItemEstimateIndexFn";
-import { selectEditorItemEstimateIndexFx } from "~/editor/selectEditorItemEstimateIndexFx";
-import type { EstimateInput } from "./EstimateInputSchema";
+import { estimateEditorItemCatalogFn } from "~/editor/estimator/fn/estimateEditorItemCatalogFn";
+import { selectEditorItemEstimateIndexFn } from "~/editor/estimator/fn/selectEditorItemEstimateIndexFn";
+import type { EstimateInput } from "../EstimateInputSchema";
 
 const formatNumber = (value: number) =>
 	Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.00$/, "");
@@ -28,11 +26,8 @@ const demandRatioLabel = (demand: number, maximumDemand: number) => {
 };
 
 /** Computes, selects, pages, and formats the global Estimate projection for MCP. */
-export const readEstimateTextFx = Effect.fn("readEstimateTextFx")(function* (
-	project: EditorProject,
-	input: EstimateInput,
-) {
-	const estimates = yield* estimateEditorItemsFx(project.config);
+export const readEstimateTextFn = (project: EditorProject, input: EstimateInput) => {
+	const estimates = estimateEditorItemCatalogFn(project.config);
 	const entries = createEditorItemEstimateIndexFn({
 		estimates: new Map(
 			estimates.map((estimate) => [
@@ -42,7 +37,7 @@ export const readEstimateTextFx = Effect.fn("readEstimateTextFx")(function* (
 		),
 		itemIds: Object.keys(project.config.items),
 	});
-	const rows = yield* selectEditorItemEstimateIndexFx({
+	const rows = selectEditorItemEstimateIndexFn({
 		entries,
 		incomplete: input.incomplete,
 		items: Object.values(project.config.items),
@@ -102,4 +97,4 @@ export const readEstimateTextFx = Effect.fn("readEstimateTextFx")(function* (
 					)
 					.join("\n\n"),
 	].join("\n");
-});
+};

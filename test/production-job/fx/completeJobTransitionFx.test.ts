@@ -13,7 +13,7 @@ import {
 	projectRandomCompletionItems,
 } from "~test/production-job/support/randomCompletionTestRuntime";
 import { completeJobRuntimeForTestFx } from "~test/production-job/support/completeJobRuntimeForTestFx";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 
 describe("job completion transition", () => {
 	it("replays one stable completion outcome across blocking, retry and restore", () => {

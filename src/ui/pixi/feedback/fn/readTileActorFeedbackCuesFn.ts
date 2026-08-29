@@ -2,7 +2,7 @@ import { match, P } from "ts-pattern";
 
 import type { GameTransition } from "~/renderer/game/session/GameSession";
 import type { TileActorFeedbackCue } from "~/ui/pixi/feedback/TileActorFeedbackCue";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { SourceActionSchema } from "~/engine/merge/schema/SourceActionSchema";
 import { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
 

@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
-import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { readOutputPlacementItemEventsFx } from "~/game-event/readOutputPlacementItemEventsFx";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import { assertOwnerIdleFx } from "~/production-job/fx/assertOwnerIdleFx";

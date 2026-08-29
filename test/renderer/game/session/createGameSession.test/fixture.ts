@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 
 export const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {

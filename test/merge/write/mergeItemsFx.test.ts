@@ -9,7 +9,7 @@ import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { createMergeTestConfig } from "~test/merge/support/createMergeTestConfig";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 
 const makeState = ({
 	sourceLocation = {

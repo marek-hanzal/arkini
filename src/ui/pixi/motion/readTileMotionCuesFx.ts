@@ -7,8 +7,8 @@ import { readTileActorAssetSourceIdsFx } from "~/ui/pixi/actor/readTileActorAsse
 import { readTileActorVisualFx } from "~/ui/pixi/actor/readTileActorVisualFx";
 import type { TileMotionCue } from "~/ui/pixi/motion/TileMotionCue";
 import { readGridRuntimeItemFn } from "~/ui/pixi/motion/fn/readGridRuntimeItemFn";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";

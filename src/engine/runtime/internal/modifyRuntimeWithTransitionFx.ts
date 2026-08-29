@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { assertRuntimeFx } from "~/engine/runtime/check/assertRuntimeFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import type { CommittedTransitionSchema } from "~/engine/runtime/schema/CommittedTransitionSchema";

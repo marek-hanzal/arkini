@@ -1,21 +1,19 @@
 import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import type { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 
-export namespace readOutputPlacementItemEventsFx {
-	export interface Props {
-		readonly originItemId: IdSchema.Type;
-		readonly placement: applyOutputPlacementFx.Result;
-	}
+interface ReadOutputPlacementItemEventsProps {
+	readonly originItemId: IdSchema.Type;
+	readonly placement: applyOutputPlacementFx.Result;
 }
 
 /** Translates concrete placement results into exact committed spawn and stack facts. */
 export const readOutputPlacementItemEventsFx = Effect.fn("readOutputPlacementItemEventsFx")(
-	function* ({ originItemId, placement }: readOutputPlacementItemEventsFx.Props) {
+	function* ({ originItemId, placement }: ReadOutputPlacementItemEventsProps) {
 		const events: GameEventSchema.Type[] = [];
 		for (const drop of placement.drop) {
 			for (const stack of drop.placement.stack) {

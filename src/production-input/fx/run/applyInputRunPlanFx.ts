@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 
 import { ModeSchema } from "~/production-input/schema/ModeSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { InputRun } from "~/production-input/InputRun";
 import { applyInputMaterialConsumeRunPlanFx } from "~/production-input/fx/run/applyInputMaterialConsumeRunPlanFx";

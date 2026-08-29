@@ -2,7 +2,7 @@ import { Deferred, Effect } from "effect";
 import { TestClock } from "effect/testing";
 import { describe, expect, it } from "@effect/vitest";
 
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { GameLoopFx } from "~/engine/game/context/GameLoopFx";
 import { GameCoreLayerFx } from "~/engine/game/layer/GameCoreLayerFx";
 import { GameLoopLayerFx } from "~/engine/game/layer/GameLoopLayerFx";

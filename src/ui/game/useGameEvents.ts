@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 import { useGameEngine } from "~/ui/game/useGameEngine";
-import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
+import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
 
 export namespace useGameEvents {
 	export type Batch = GameEventBatchSchema.Type;

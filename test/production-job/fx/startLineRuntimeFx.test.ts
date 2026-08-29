@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { startLineRuntimeFx } from "~/production-job/fx/startLineRuntimeFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";

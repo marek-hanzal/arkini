@@ -2,7 +2,7 @@ import { useCallback } from "react";
 
 import { useGameEngine } from "~/ui/game/useGameEngine";
 import { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetailSourcesFx";
-import { readItemDetailTabsFx } from "~/engine/item-detail/read/readItemDetailTabsFx";
+import { readItemDetailTabsFn } from "~/engine/item-detail/fn/readItemDetailTabsFn";
 import { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
 
 export namespace useResolveItemDefinitionDetailTarget {
@@ -45,14 +45,12 @@ export const useResolveItemDefinitionDetailTarget = () => {
 				}),
 			);
 			if (sources.kind === "unavailable") return unavailable;
-			const tabs = game.readOrThrow(
-				readItemDetailTabsFx({
-					target: {
-						kind: "definition",
-					},
-					sources,
-				}),
-			);
+			const tabs = readItemDetailTabsFn({
+				target: {
+					kind: "definition",
+				},
+				sources,
+			});
 			const tab =
 				requestedTab !== undefined && tabs.includes(requestedTab)
 					? requestedTab

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { EditorProject } from "~/editor/EditorProject";
-import { createEditorAcquisitionGraphFx } from "~/editor/createEditorAcquisitionGraphFx";
+import { createEditorAcquisitionGraphFn } from "~/editor/acquisition/fn/createEditorAcquisitionGraphFn";
 import type {
 	EditorItemEstimate,
 	EditorItemEstimateDiagnostic,
@@ -154,7 +154,7 @@ export const readItemEstimateTextFx = Effect.fn("readItemEstimateTextFx")(functi
 	itemId: string,
 	quantity: number,
 ) {
-	const graph = yield* createEditorAcquisitionGraphFx(project.config);
+	const graph = createEditorAcquisitionGraphFn(project.config);
 	const estimate = estimateEditorItemsFn({
 		graph,
 		requests: [

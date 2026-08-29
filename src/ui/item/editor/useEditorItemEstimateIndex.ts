@@ -3,10 +3,9 @@ import { useEffect, useMemo } from "react";
 
 import type { EditorProject } from "~/editor/EditorProject";
 import { createEditorItemEstimateIndexFn } from "~/editor/estimator/fn/createEditorItemEstimateIndexFn";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { EditorItemEstimateIndexRow } from "~/editor/EditorItemEstimateIndex";
 import type { EditorItemEstimateSortSchema } from "~/editor/EditorItemEstimateSortSchema";
-import { selectEditorItemEstimateIndexFx } from "~/editor/selectEditorItemEstimateIndexFx";
+import { selectEditorItemEstimateIndexFn } from "~/editor/estimator/fn/selectEditorItemEstimateIndexFn";
 import {
 	EditorItemEstimateCacheAtom,
 	type EditorItemEstimateCacheAtom as EditorItemEstimateCache,
@@ -75,15 +74,13 @@ export const useEditorItemEstimateIndex = (
 		});
 		return {
 			maximumDemand: Math.max(0, ...entries.map(({ demand }) => demand)),
-			rows: RendererRuntime.runSync(
-				selectEditorItemEstimateIndexFx({
-					entries,
-					incomplete,
-					items: Object.values(project.config.items),
-					query,
-					sort,
-				}),
-			),
+			rows: selectEditorItemEstimateIndexFn({
+				entries,
+				incomplete,
+				items: Object.values(project.config.items),
+				query,
+				sort,
+			}),
 		};
 	}, [
 		project.config.items,

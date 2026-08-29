@@ -4,11 +4,11 @@ import type { EditorItemOriginFlow } from "~/editor/origin-flow/EditorItemOrigin
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { LayoutNode, LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
 import { createViewportFx, type Viewport } from "~/ui/item/editor/origin-flow/createViewportFx";
+import type { ConnectedPorts } from "~/ui/item/editor/origin-flow/fn/readConnectedPortsFn";
+import { readHitFn } from "~/ui/item/editor/origin-flow/fn/readHitFn";
+import type { NodeMetrics } from "~/ui/item/editor/origin-flow/fn/readNodeMetricsFn";
+import { pushVisitFn } from "~/ui/item/editor/origin-flow/fn/pushVisitFn";
 import type { Highlight, Selection } from "~/ui/item/editor/origin-flow/Highlight";
-import type { ConnectedPorts } from "~/ui/item/editor/origin-flow/readConnectedPortsFx";
-import { readHitFx } from "~/ui/item/editor/origin-flow/readHitFx";
-import type { NodeMetrics } from "~/ui/item/editor/origin-flow/readNodeMetricsFx";
-import { pushVisitFx } from "~/ui/item/editor/origin-flow/pushVisitFx";
 
 interface CanvasPan {
 	moved: boolean;
@@ -64,21 +64,19 @@ export const useCanvasPointer = ({
 	};
 	const readHit = (event: ReactPointerEvent<HTMLCanvasElement>) => {
 		const point = readWorldPoint(event);
-		return RendererRuntime.runSync(
-			readHitFx({
-				backbones,
-				connectedPorts,
-				flow,
-				highlight,
-				metroBackbones,
-				nodeMetrics,
-				positions,
-				selection,
-				x: point.x,
-				y: point.y,
-				zoom: viewportRef.current.zoom,
-			}),
-		);
+		return readHitFn({
+			backbones,
+			connectedPorts,
+			flow,
+			highlight,
+			metroBackbones,
+			nodeMetrics,
+			positions,
+			selection,
+			x: point.x,
+			y: point.y,
+			zoom: viewportRef.current.zoom,
+		});
 	};
 	const isOverNode = (event: ReactPointerEvent<HTMLCanvasElement>) => {
 		const point = readWorldPoint(event);
@@ -121,11 +119,8 @@ export const useCanvasPointer = ({
 			);
 			resetNavigation();
 			let visitHistory = visitHistoryRef.current;
-			if (selection?.kind === "node")
-				visitHistory = RendererRuntime.runSync(pushVisitFx(visitHistory, selection.id));
-			visitHistoryRef.current = RendererRuntime.runSync(
-				pushVisitFx(visitHistory, hit.targetNodeId),
-			);
+			if (selection?.kind === "node") visitHistory = pushVisitFn(visitHistory, selection.id);
+			visitHistoryRef.current = pushVisitFn(visitHistory, hit.targetNodeId);
 			onSelectionChange({
 				id: hit.targetNodeId,
 				kind: "node",
@@ -135,9 +130,8 @@ export const useCanvasPointer = ({
 		}
 		if (hit?.kind === "node") {
 			let visitHistory = visitHistoryRef.current;
-			if (selection?.kind === "node")
-				visitHistory = RendererRuntime.runSync(pushVisitFx(visitHistory, selection.id));
-			visitHistoryRef.current = RendererRuntime.runSync(pushVisitFx(visitHistory, hit.id));
+			if (selection?.kind === "node") visitHistory = pushVisitFn(visitHistory, selection.id);
+			visitHistoryRef.current = pushVisitFn(visitHistory, hit.id);
 		}
 		if (
 			hit !== undefined &&

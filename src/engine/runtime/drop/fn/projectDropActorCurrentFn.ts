@@ -1,4 +1,4 @@
-import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 
 export interface DropTransferActor {
 	readonly id: string;

@@ -1,6 +1,6 @@
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 
 export namespace filterInputSlotItemsFn {

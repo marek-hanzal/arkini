@@ -4,7 +4,7 @@ import { match } from "ts-pattern";
 import { resolveActionRuleFx } from "~/production-action/fx/resolveActionRuleFx";
 import { TypeSchema } from "~/production-line/schema/rule/TypeSchema";
 import type { RuleSchema } from "~/production-line/schema/rule/RuleSchema";
-import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { whenFx } from "~/production-condition/fx/whenFx";
 
 interface ConditionalRuleResult {

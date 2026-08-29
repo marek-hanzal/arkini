@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
+import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";

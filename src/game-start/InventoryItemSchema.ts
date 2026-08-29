@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import { PositionSchema } from "~/engine/grid/schema/PositionSchema";
+import { PositionSchema } from "~/item-location/schema/PositionSchema";
 
 /** Defines a positive quantity of one canonical item in the initial inventory. */
 export const InventoryItemSchema = z

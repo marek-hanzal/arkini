@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 
 import { TypeSchema } from "~/production-condition/schema/TypeSchema";
 import { queryFx } from "~/engine/query/fx/queryFx";
-import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 export namespace whenFx {

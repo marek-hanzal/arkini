@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { readOutputPlacementItemEventsFx } from "~/game-event/readOutputPlacementItemEventsFx";
-import type { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
+import type { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 

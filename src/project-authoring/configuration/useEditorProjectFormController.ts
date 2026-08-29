@@ -11,7 +11,7 @@ import { createEditorProjectFormSchema } from "~/project-authoring/configuration
 import { readEditorProjectFormValuesFn } from "~/project-authoring/configuration/fn/readEditorProjectFormValuesFn";
 import type { EditorProject } from "~/project-authoring/EditorProject";
 import type { EditorProjectFormSchema } from "~/project-authoring/configuration/EditorProjectFormSchema";
-import { SizeSchema } from "~/engine/grid/schema/SizeSchema";
+import { SizeSchema } from "~/item-location/schema/SizeSchema";
 import { ToolbarSizeSchema } from "~/engine/meta/schema/ToolbarSizeSchema";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { saveEditorProjectConfigFx } from "~/project-authoring/configuration/saveEditorProjectConfigFx";

@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { whenFx } from "~/production-condition/fx/whenFx";
 
 const config = GameConfigSchema.parse({

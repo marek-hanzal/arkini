@@ -3,7 +3,7 @@ import { z } from "zod";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 
 /**
  * Multiple live items own one concrete location.

@@ -97,7 +97,7 @@ validate live + reserved maxCount
 
 `drop` starts from the supplied origin; `random` chooses one Board origin, including occupied cells, then uses the same stack-first, nearest-first policy. An `any` item may fall back Board → Inventory → Toolbar, never another Board. Existing pure items may normalize; impure items keep exact identity and require one empty cell. Partial placement is forbidden and rolls back the owning mutation.
 
-Directional merge is one engine command. The source item owns ordered rules; the first exact target selector wins and reverse matching is never inferred. One source quantity is consumed or used, one Board target is kept/removed/replaced, optional output uses ordinary placement, and a used source returns through ordinary placement. Source action, target effect, output, return, validation, and event commit together. Same-item stacking is separate from merge.
+Directional merge is one canonical gameplay command. The source item owns ordered rules; the first exact target selector wins and reverse matching is never inferred. One source quantity is consumed or used, one Board target is kept/removed/replaced, optional output uses ordinary placement, and a used source returns through ordinary placement. Source action, target effect, output, return, validation, and event commit together. Same-item stacking is separate from merge.
 
 ## Cheats, save, and presentation
 

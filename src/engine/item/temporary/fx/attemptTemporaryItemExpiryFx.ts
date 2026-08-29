@@ -2,8 +2,8 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
-import type { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
-import { isExpectedPlacementDeliveryBlockFn } from "~/engine/placement/read/fn/isExpectedPlacementDeliveryBlockFn";
+import type { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
+import { isExpectedPlacementDeliveryBlockFn } from "~/item-placement/read/fn/isExpectedPlacementDeliveryBlockFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 import { completeTemporaryItemExpiryTransitionFx } from "./completeTemporaryItemExpiryTransitionFx";

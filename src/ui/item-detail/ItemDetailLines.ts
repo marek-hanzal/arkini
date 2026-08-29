@@ -1,6 +1,6 @@
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import type { DistanceSchema } from "~/engine/distance/schema/DistanceSchema";
+import type { DistanceSchema } from "~/item-location/schema/DistanceSchema";
 import type { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
 import type { ModeSchema } from "~/production-input/schema/ModeSchema";
 import type { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";

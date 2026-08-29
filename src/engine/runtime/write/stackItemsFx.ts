@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { StackItemsUnavailableError } from "~/engine/runtime/error/StackItemsUnavailableError";

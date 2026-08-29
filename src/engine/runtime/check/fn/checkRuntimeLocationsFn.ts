@@ -1,17 +1,17 @@
 import { match } from "ts-pattern";
 
-import { isItemLocationScopeAllowedFn } from "~/engine/location/fn/isItemLocationScopeAllowedFn";
+import { isItemLocationScopeAllowedFn } from "~/item-location/fn/isItemLocationScopeAllowedFn";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
-import { indexGridLocationClaimsFn } from "~/engine/location/fn/indexGridLocationClaimsFn";
-import { readGridLocationClaimsFn } from "~/engine/location/fn/readGridLocationClaimsFn";
-import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import { indexGridLocationClaimsFn } from "~/item-location/fn/indexGridLocationClaimsFn";
+import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { LocationOccupiedIssueSchema } from "~/engine/runtime/schema/check/LocationOccupiedIssueSchema";
 import type { LocationOutOfBoundsIssueSchema } from "~/engine/runtime/schema/check/LocationOutOfBoundsIssueSchema";
 import type { LocationScopeIssueSchema } from "~/engine/runtime/schema/check/LocationScopeIssueSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 export namespace checkRuntimeLocationsFn {
 	export interface Props {

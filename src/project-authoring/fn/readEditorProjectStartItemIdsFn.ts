@@ -1,5 +1,5 @@
 import type { EditorProjectStartScope } from "~/project-authoring/EditorProjectStartScope";
-import { isItemLocationScopeAllowedFn } from "~/engine/location/fn/isItemLocationScopeAllowedFn";
+import { isItemLocationScopeAllowedFn } from "~/item-location/fn/isItemLocationScopeAllowedFn";
 import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 export namespace readEditorProjectStartItemIdsFn {

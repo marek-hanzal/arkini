@@ -9,7 +9,7 @@ import type { DiagnosticPathSchema } from "~/engine/validation/schema/Diagnostic
 import type { GameCompilationResultSchema } from "../schema/GameCompilationResultSchema";
 import type { GameSourceFileSchema } from "~/engine/source/schema/GameSourceFileSchema";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
-import { assembleGameSourcesFx } from "./assembleGameSourcesFx";
+import { assembleGameSourcesFn } from "../fn/assembleGameSourcesFn";
 import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
 
 const readSourcePath = (
@@ -43,7 +43,7 @@ const readSourcePath = (
 export const compileGameSourcesFx = Effect.fn("compileGameSourcesFx")(function* (
 	sources: ReadonlyArray<GameSourceFileSchema.Type>,
 ) {
-	const assembly = yield* assembleGameSourcesFx(sources);
+	const assembly = assembleGameSourcesFn(sources);
 	const parsed = GameConfigSchema.safeParse(assembly.value);
 	const diagnostics: GameDiagnosticsSchema.Type = [
 		...assembly.diagnostics,

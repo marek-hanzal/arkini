@@ -1,4 +1,3 @@
-import { Effect } from "effect";
 import { match, P } from "ts-pattern";
 
 import type { GameSourceSchema } from "~/engine/schema/GameSourceSchema";
@@ -46,9 +45,7 @@ const resolveSourceReference = (sourcePath: string, reference: string) => {
  * earlier providers silently. The first provider remains the deterministic
  * candidate while every conflicting provider is reported with provenance.
  */
-export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function* (
-	sources: ReadonlyArray<GameSourceFileSchema.Type>,
-) {
+export const assembleGameSourcesFn = (sources: ReadonlyArray<GameSourceFileSchema.Type>) => {
 	const value: GameSourceSchema.Type = {};
 	const provenance: GameSourceProvenanceSchema.Type = {
 		items: {},
@@ -200,4 +197,4 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 		diagnostics,
 		provenance,
 	} satisfies GameSourceAssemblySchema.Type;
-});
+};

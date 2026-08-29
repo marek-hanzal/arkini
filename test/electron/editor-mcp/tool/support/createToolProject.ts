@@ -1,5 +1,5 @@
 import type { EditorProject } from "~/editor/EditorProject";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 
 export const createToolProject = (config: GameConfigSchema.Type): EditorProject => ({

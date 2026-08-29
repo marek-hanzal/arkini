@@ -6,7 +6,7 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { RuntimeStoreFx } from "~/engine/runtime/internal/RuntimeStoreFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 
 const baseItem = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number }) => ({

@@ -4,7 +4,7 @@ import { Effect } from "effect";
 import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
 import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 const placeholderHeroBytes = Uint8Array.from(
 	atob(

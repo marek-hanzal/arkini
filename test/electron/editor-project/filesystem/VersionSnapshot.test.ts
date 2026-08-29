@@ -9,8 +9,8 @@ import { createProjectPathsFx } from "../../../../electron/main/editor-project/f
 import { createVersionSnapshotFx } from "../../../../electron/main/editor-project/filesystem/fx/createVersionSnapshotFx";
 import { readVersionSnapshotFx } from "../../../../electron/main/editor-project/filesystem/fx/readVersionSnapshotFx";
 import { EditorBoardScenarioSchema } from "~/editor/board/EditorBoardScenarioSchema";
-import { GameProjectGameSchemaReference } from "~/engine/source/GameProjectReference";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameProjectGameSchemaReference } from "~/game-config/source/GameProjectReference";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 

@@ -6,8 +6,8 @@ import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 import {
 	GameProjectGameSchemaReference,
 	GameProjectItemSchemaReference,
-} from "~/engine/source/GameProjectReference";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+} from "~/game-config/source/GameProjectReference";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import { createProjectFilesHarness } from "./ProjectFiles.test/harness";
 

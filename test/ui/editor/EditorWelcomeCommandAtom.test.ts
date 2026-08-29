@@ -61,7 +61,7 @@ vi.mock("~/editor/project/fx/createFreshEditorProjectFx", async () => {
 	};
 });
 
-vi.mock("~/ui/arkpack/editor/importEditorArkpackFileFx", async () => {
+vi.mock("~/renderer/editor/importEditorArkpackFileFx", async () => {
 	const { Effect } = await import("effect");
 	return {
 		importEditorArkpackFileFx: ({ file }: { readonly file: File }) =>

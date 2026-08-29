@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FolderOpen, PackageOpen, RefreshCw } from "lucide-react";
 
-import { ArkpackCatalogList } from "~/ui/arkpack/ArkpackCatalogList";
-import { useArkpackSelectorActions } from "~/ui/arkpack/useArkpackSelectorActions";
+import { ArkpackCatalogList } from "~/arkpack/ui/ArkpackCatalogList";
+import { useArkpackSelectorActions } from "~/arkpack/ui/useArkpackSelectorActions";
 import { BackButton } from "~/ui/button/BackButton";
 import { Button } from "~/ui/button/Button";
 import { LinkButton } from "~/ui/button/LinkButton";

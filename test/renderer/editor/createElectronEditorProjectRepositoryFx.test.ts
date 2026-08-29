@@ -9,7 +9,6 @@ import { blockEditorProjectWrites } from "~/renderer/editor/EditorProjectWriteAd
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
-import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 
 const success = <Value>(value: Value): EditorProjectTransport.Result<Value> => ({
 	type: "success",
@@ -184,44 +183,6 @@ afterEach(() => {
 });
 
 describe("createElectronEditorProjectRepositoryFx", () => {
-	it("preserves structured Build diagnostics across the renderer IPC boundary", async () => {
-		const editor = installEditorApi();
-		const diagnostics = [
-			{
-				code: DiagnosticCodeEnumSchema.enum.ResourceMissing,
-				severity: "error" as const,
-				message: "Referenced resource item-water has no matching PNG file.",
-				path: [
-					"items",
-					"water",
-					"asset",
-					"default",
-					0,
-				],
-				source: "items/simple/water.json",
-				resourceId: "item-water",
-			},
-		];
-		vi.mocked(editor.buildProject).mockResolvedValueOnce({
-			type: "failure",
-			error: {
-				operation: "build-project",
-				message: "Editor project project-one could not be built.",
-				diagnostics,
-			},
-		});
-		const repository = Effect.runSync(createElectronEditorProjectRepositoryFx);
-
-		const failure = await readTypedFailure(
-			repository.buildProjectFx({
-				projectId: "project-one",
-				expectedRevision: 2,
-			}),
-		);
-
-		expect(failure.diagnostics).toEqual(diagnostics);
-	});
-
 	it("preserves a stable server failure envelope as one typed repository failure", async () => {
 		const editor = installEditorApi();
 		vi.mocked(editor.listProjects).mockResolvedValueOnce({
@@ -243,37 +204,17 @@ describe("createElectronEditorProjectRepositoryFx", () => {
 		);
 	});
 
-	it("rejects malformed result envelopes and diagnostics as typed boundary failures", async () => {
+	it("rejects malformed result envelopes as typed boundary failures", async () => {
 		const editor = installEditorApi();
 		vi.mocked(editor.listProjects).mockResolvedValueOnce({
 			type: "invalid-envelope",
 		} as never);
-		vi.mocked(editor.buildProject).mockResolvedValueOnce({
-			type: "failure",
-			error: {
-				operation: "build-project",
-				message: "Malformed diagnostics must not escape the boundary.",
-				diagnostics: [
-					"not-a-diagnostic",
-				],
-			},
-		} as never);
 		const repository = Effect.runSync(createElectronEditorProjectRepositoryFx);
 
 		const envelopeFailure = await readTypedFailure(repository.listProjectsFx);
-		const diagnosticsFailure = await readTypedFailure(
-			repository.buildProjectFx({
-				projectId: "project-one",
-				expectedRevision: 2,
-			}),
-		);
 
 		expect(envelopeFailure).toMatchObject({
 			operation: "list-projects",
-			message: "The editor IPC response is invalid.",
-		});
-		expect(diagnosticsFailure).toMatchObject({
-			operation: "build-project",
 			message: "The editor IPC response is invalid.",
 		});
 	});

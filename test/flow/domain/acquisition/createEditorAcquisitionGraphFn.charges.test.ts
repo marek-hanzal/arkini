@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { createEditorAcquisitionGraphFn } from "~/flow/domain/fn/createEditorAcquisitionGraphFn";
 import { estimateEditorItemsFn } from "~/estimate/domain/fn/estimateEditorItemsFn";
-import { compileGameSourcesFx } from "~/engine/compiler/fx/compileGameSourcesFx";
+import { compileGameSourcesFx } from "~/game-config/compiler/fx/compileGameSourcesFx";
 import { resolveLineRunFx } from "~/engine/line/fx/run/resolveLineRunFx";
 import type { StartSchema } from "~/engine/start/schema/StartSchema";
 import {
@@ -16,7 +16,7 @@ import {
 	createProducerItem,
 	createRootSource,
 	createSimpleItem,
-} from "~test/validation/support/gameValidationTestSource";
+} from "~test/game-config/validation/support/gameValidationTestSource";
 
 const chargedDeposit = (itemId: string, cost = 1) => ({
 	charges: {

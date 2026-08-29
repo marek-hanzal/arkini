@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
 import { publishEditorProjectFx } from "~/ui/editor/publishEditorProjectFx";
-import type { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
+import type { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
 
 export namespace upsertEditorResourcesFx {
 	export interface Props {

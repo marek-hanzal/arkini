@@ -1,5 +1,5 @@
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import type { PayloadSchema } from "~/engine/pack/schema/PayloadSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import type { PayloadSchema } from "~/arkpack/artifact/schema/PayloadSchema";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 
 export const editorTestConfig = GameConfigSchema.parse({

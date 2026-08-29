@@ -5,7 +5,7 @@ import { vi } from "vitest";
 import { acquireGameEngineResourceFx } from "~/renderer/game/resource/acquireGameEngineResourceFx";
 import { CriticalGameLifecycleError } from "~/renderer/game/resource/CriticalGameLifecycleError";
 import type { Game } from "~/renderer/game/Game";
-import { testArkpackConfig } from "~test/support/arkpack/createTestArkpack";
+import { testArkpackConfig } from "~test/arkpack/support/createTestArkpack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import { testGameRead } from "~test/support/game/testGameRead";
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";

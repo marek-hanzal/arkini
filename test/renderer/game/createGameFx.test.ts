@@ -3,15 +3,15 @@ import { Cause, Effect, Exit, Option } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DiagnosticRecord } from "../../../electron/contract/diagnostics/DiagnosticRecord";
-import type { ArkpackStorage } from "~/renderer/arkpack/ArkpackStorage";
-import { readArkpackFx } from "~/renderer/arkpack/readArkpackFx";
+import type { ArkpackStorage } from "~/arkpack/renderer/ArkpackStorage";
+import { readArkpackFx } from "~/arkpack/renderer/readArkpackFx";
 import { createGameFx as createGameFromPackageFx } from "~/renderer/game/createGameFx";
 import { GameSaveBootstrapError } from "~/renderer/game/GameSaveBootstrapError";
 import { decodeArkiniSaveFx } from "~/engine/save/fx/decodeArkiniSaveFx";
 import type { GameSaveStorage } from "~/engine/save/GameSaveStorage";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { createTestArkpack, testArkpackConfig } from "~test/support/arkpack/createTestArkpack";
-import { installTestPngDecoder } from "~test/support/arkpack/createTestPngBytes";
+import { createTestArkpack, testArkpackConfig } from "~test/arkpack/support/createTestArkpack";
+import { installTestPngDecoder } from "~test/arkpack/support/createTestPngBytes";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 
 const writerMajor = ArkiniAppVersion.slice(0, ArkiniAppVersion.indexOf("."));

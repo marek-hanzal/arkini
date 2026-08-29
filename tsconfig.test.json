@@ -13,6 +13,9 @@
 	"include": [
 		"electron/contract",
 		"src/engine",
+		"src/game-config",
+		"src/arkpack",
+		"src/editor-build",
 		"src/editor",
 		"src/item-authoring",
 		"src/flow",

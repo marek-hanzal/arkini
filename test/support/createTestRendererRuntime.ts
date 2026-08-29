@@ -7,6 +7,10 @@ import {
 	type EditorProjectRepositoryService,
 } from "~/editor/EditorProjectRepository";
 import {
+	EditorBuildRepository,
+	type EditorBuildRepositoryService,
+} from "~/editor-build/domain/EditorBuildRepository";
+import {
 	EditorProjectRepositoryError,
 	type EditorProjectRepositoryOperation,
 } from "~/editor/EditorProjectRepositoryError";
@@ -22,6 +26,7 @@ import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProject
 export interface TestRendererRuntimeProps {
 	readonly clearSaveFx?: Parameters<typeof GameEngineResourceLayer>[0]["clearSaveFx"];
 	readonly createResourceFx: (packageId: string) => Effect.Effect<GameEngineResource, unknown>;
+	readonly editorBuildRepository?: EditorBuildRepositoryService;
 	readonly editorProjectRepository?: EditorProjectRepositoryService;
 }
 
@@ -47,10 +52,16 @@ const UnavailableEditorProjectRepository: EditorProjectRepositoryService = {
 	upsertResourcesFx: () => unavailableEditorProjectRepositoryFx("upsert-resource"),
 };
 
+const UnavailableEditorBuildRepository: EditorBuildRepositoryService = {
+	buildProjectFx: () => Effect.die("This test did not provide an Editor Build repository."),
+	readProjectBuildFx: () => Effect.die("This test did not provide an Editor Build repository."),
+};
+
 /** Creates one isolated renderer runtime with fresh Atom and Game lifecycle authorities. */
 export const createTestRendererRuntime = ({
 	clearSaveFx = () => Effect.void,
 	createResourceFx,
+	editorBuildRepository = UnavailableEditorBuildRepository,
 	editorProjectRepository = UnavailableEditorProjectRepository,
 }: TestRendererRuntimeProps) => {
 	const atomRegistry = AtomRegistry.make({
@@ -59,6 +70,7 @@ export const createTestRendererRuntime = ({
 	const rendererRuntime = ManagedRuntime.make(
 		Layer.mergeAll(
 			Layer.succeed(AtomRegistry.AtomRegistry, atomRegistry),
+			Layer.succeed(EditorBuildRepository, editorBuildRepository),
 			Layer.succeed(EditorProjectRepository, editorProjectRepository),
 			Layer.effect(
 				EditorUnsavedChanges,

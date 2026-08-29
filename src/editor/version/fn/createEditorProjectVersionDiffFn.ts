@@ -10,7 +10,7 @@ import type {
 	EditorProjectCompatibilityDiffResult,
 } from "~/editor/version/EditorProjectCompatibility";
 import { analyzeEditorProjectCompatibilityFn } from "~/editor/version/fn/analyzeEditorProjectCompatibilityFn";
-import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 export interface EditorProjectVersionDiffSnapshot {
 	readonly config: GameConfigSchema.Type;

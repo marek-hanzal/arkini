@@ -14,11 +14,11 @@ import { readEditorAssetDeleteBlockersFn } from "~/editor/resource/fn/readEditor
 import { readEditorItemDeleteBlockersFn } from "~/item-authoring/domain/fn/readEditorItemDeleteBlockersFn";
 import { analyzeEditorProjectCompatibilityFn } from "~/editor/version/fn/analyzeEditorProjectCompatibilityFn";
 import { bumpArkpackVersionFn } from "~/editor/version/fn/bumpArkpackVersionFn";
-import { GameProjectGameSchemaReference } from "~/engine/source/GameProjectReference";
-import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
+import { GameProjectGameSchemaReference } from "~/game-config/source/GameProjectReference";
+import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
 import { writeProjectFilesFx } from "./writeProjectFilesFx";
 

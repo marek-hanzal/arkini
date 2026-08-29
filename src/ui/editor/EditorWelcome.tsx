@@ -6,7 +6,7 @@ import type {
 } from "~/editor/EditorProjectCandidate";
 import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
 import { useEffect, useState } from "react";
-import { EditorArkpackImportButton } from "~/ui/arkpack/editor/EditorArkpackImportButton";
+import { EditorArkpackImportButton } from "~/arkpack/ui/editor/EditorArkpackImportButton";
 import { BackButton } from "~/ui/button/BackButton";
 import { Button } from "~/ui/button/Button";
 import { LinkButton } from "~/ui/button/LinkButton";

@@ -8,7 +8,7 @@ import { match, P } from "ts-pattern";
 
 import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
-import { importEditorArkpackAssetsFx } from "~/ui/arkpack/editor/importEditorArkpackAssetsFx";
+import { importEditorArkpackAssetsFx } from "~/ui/resource/editor/importEditorArkpackAssetsFx";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { saveEditorAssetsFx } from "~/ui/resource/editor/saveEditorAssetsFx";
 import { useEditorAssetLibrary } from "~/ui/resource/editor/useEditorAssetLibrary";

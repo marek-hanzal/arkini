@@ -4,7 +4,7 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { EditorItemEstimate } from "~/estimate/domain/EditorItemEstimate";
-import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import {
 	type EditorItemEstimateCacheAtom,
 	makeEditorItemEstimateCacheAtomFx,

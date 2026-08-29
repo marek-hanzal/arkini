@@ -9,7 +9,7 @@ import {
 	useEditorResourceUrls,
 } from "~/ui/resource/editor/useEditorResourceUrl";
 import { EditorResourceUrlProvider } from "~/ui/resource/editor/EditorResourceUrlProvider";
-import type { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
+import type { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
 
 (
 	globalThis as {

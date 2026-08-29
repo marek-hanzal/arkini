@@ -1,7 +1,7 @@
-import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
-import { DiagnosticRecordEntityEnumSchema } from "~/engine/validation/schema/DiagnosticRecordEntityEnumSchema";
-import { validateConfigReferencesFn } from "~/engine/validation/rule/fn/validateConfigReferencesFn";
+import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticRecordEntityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticRecordEntityEnumSchema";
+import { validateConfigReferencesFn } from "~/game-config/validation/rule/fn/validateConfigReferencesFn";
 
 export namespace readEditorItemDeleteBlockersFn {
 	export interface Blocker {

@@ -1,6 +1,6 @@
 import { Data } from "effect";
 
-import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
+import type { GameDiagnosticsSchema } from "~/game-config/diagnostic/schema/GameDiagnosticsSchema";
 
 export type EditorProjectRepositoryOperation =
 	| "await-idle"

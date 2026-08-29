@@ -4,7 +4,7 @@ import { Effect, Path } from "effect";
 import {
 	GameProjectManifestFileName,
 	GameProjectSchemaFileName,
-} from "~/engine/source/GameProjectReference";
+} from "~/game-config/source/GameProjectReference";
 import type { ProjectPaths } from "./ProjectPaths";
 
 const encodeFileStem = (value: string) => encodeURIComponent(value).replaceAll(".", "%2E");

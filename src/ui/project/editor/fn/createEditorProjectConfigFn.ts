@@ -3,7 +3,7 @@ import {
 	type EditorProjectFormSchema,
 	EditorProjectAvatarKeys,
 } from "~/ui/project/editor/EditorProjectFormSchema";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 /** Rebuilds the complete canonical config from one validated Project form value. */
 export const createEditorProjectConfigFn = (

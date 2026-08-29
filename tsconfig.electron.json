@@ -24,6 +24,10 @@
 	},
 	"include": [
 		"electron",
+		"src/game-config",
+		"src/arkpack/ArkpackDescriptor.ts",
+		"src/arkpack/artifact",
+		"src/editor-build/domain",
 		"src/editor",
 		"src/item-authoring/domain",
 		"src/flow/domain",

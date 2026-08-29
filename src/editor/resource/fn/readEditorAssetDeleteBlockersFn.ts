@@ -1,5 +1,5 @@
-import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { readGameResourceUsagesFn } from "~/engine/resource/fn/readGameResourceUsagesFn";
+import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { readGameResourceUsagesFn } from "~/game-config/resource/fn/readGameResourceUsagesFn";
 
 export type EditorAssetDeleteBlocker = readGameResourceUsagesFn.Usage;
 

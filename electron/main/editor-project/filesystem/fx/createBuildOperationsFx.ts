@@ -5,17 +5,17 @@ import { Data, Effect, type Semaphore } from "effect";
 
 import { ArkpackLimits } from "../../../../../shared/ArkpackLimits";
 import type { ProjectState } from "../ProjectState";
-import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
+import type { EditorBuildRepositoryService } from "~/editor-build/domain/EditorBuildRepository";
 import {
 	EditorProjectBuildContentSchema,
 	EditorProjectBuildSchema,
-} from "~/editor/EditorProjectBuildSchema";
+} from "~/editor-build/domain/EditorProjectBuildSchema";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
-import { packDirectoryFx } from "~/engine/pack/fx/packDirectoryFx";
-import { readArkpackContentHashFx } from "~/engine/pack/fx/readArkpackContentHashFx";
-import { GameValidationError } from "~/engine/validation/error/GameValidationError";
-import { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
-import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
+import { packDirectoryFx } from "~/arkpack/artifact/fx/packDirectoryFx";
+import { readArkpackContentHashFx } from "~/arkpack/artifact/fx/readArkpackContentHashFx";
+import { GameValidationError } from "~/game-config/diagnostic/error/GameValidationError";
+import { GameDiagnosticsSchema } from "~/game-config/diagnostic/schema/GameDiagnosticsSchema";
+import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
 import { withProjectLockFx } from "./withProjectLockFx";
 import { readProjectFilesFx } from "./readProjectFilesFx";
 import { ensureProjectGitignoreFx } from "./ensureProjectGitignoreFx";
@@ -23,7 +23,7 @@ import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
 import { FilesystemWriteError } from "~/engine/filesystem/FilesystemWriteError";
 import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
 
-type Operations = Pick<EditorProjectRepositoryService, "buildProjectFx" | "readProjectBuildFx">;
+type Operations = EditorBuildRepositoryService;
 
 class EditorProjectBuildOperationError extends Data.TaggedError(
 	"EditorProjectBuildOperationError",
@@ -31,13 +31,13 @@ class EditorProjectBuildOperationError extends Data.TaggedError(
 	readonly message: string;
 }> {}
 
-const projectChangedBeforeBuild = () =>
+const projectChangedBeforeBuildFn = () =>
 	new EditorProjectBuildOperationError({
 		message:
 			"The saved project changed before the build snapshot could be published. Refresh the project and build again.",
 	});
 
-const relativeDiagnosticSource = (projectRoot: string, source: string) => {
+const relativeDiagnosticSourceFn = (projectRoot: string, source: string) => {
 	if (!isAbsolute(source)) return source;
 	const projectRelative = relative(projectRoot, source);
 	return projectRelative.startsWith("..") || isAbsolute(projectRelative)
@@ -45,30 +45,25 @@ const relativeDiagnosticSource = (projectRoot: string, source: string) => {
 		: projectRelative.replaceAll("\\", "/");
 };
 
-const relativeDiagnosticProvenance = (
+const relativeDiagnosticProvenanceFn = (
 	projectRoot: string,
 	candidate: unknown,
 	key?: string,
 ): unknown => {
 	if (typeof candidate === "string" && (key === "source" || key === "sources"))
-		return relativeDiagnosticSource(projectRoot, candidate);
+		return relativeDiagnosticSourceFn(projectRoot, candidate);
 	if (Array.isArray(candidate))
-		return candidate.map((value) => relativeDiagnosticProvenance(projectRoot, value, key));
+		return candidate.map((value) => relativeDiagnosticProvenanceFn(projectRoot, value, key));
 	if (typeof candidate !== "object" || candidate === null) return candidate;
 	return Object.fromEntries(
 		Object.entries(candidate).map(([entryKey, value]) => [
 			entryKey,
-			relativeDiagnosticProvenance(projectRoot, value, entryKey),
+			relativeDiagnosticProvenanceFn(projectRoot, value, entryKey),
 		]),
 	);
 };
 
-const safeBuildDiagnostics = (projectRoot: string, diagnostics: GameDiagnosticsSchema.Type) =>
-	GameDiagnosticsSchema.parse(
-		diagnostics.map((diagnostic) => relativeDiagnosticProvenance(projectRoot, diagnostic)),
-	);
-
-const filesystemFailureMessage = (
+const filesystemFailureMessageFn = (
 	operation: "build-project" | "read-project-build",
 	cause: FilesystemWriteError,
 ) => {
@@ -78,7 +73,7 @@ const filesystemFailureMessage = (
 		: `The Editor build could not be ${action} safely. Recovery data was preserved; restart the Editor before retrying.`;
 };
 
-const error = (
+const createBuildErrorFn = (
 	operation: "build-project" | "read-project-build",
 	message: string,
 	cause?: unknown,
@@ -91,7 +86,7 @@ const error = (
 					cause instanceof EditorProjectBuildOperationError
 						? cause.message
 						: cause instanceof FilesystemWriteError
-							? filesystemFailureMessage(operation, cause)
+							? filesystemFailureMessageFn(operation, cause)
 							: message,
 				...(cause instanceof GameValidationError
 					? {
@@ -109,7 +104,7 @@ const assertRevisionFx = (
 	state.project.revision === expectedRevision
 		? Effect.void
 		: Effect.fail(
-				error(
+				createBuildErrorFn(
 					operation,
 					`Editor project ${state.project.projectId} changed from revision ${expectedRevision} to ${state.project.revision}.`,
 				),
@@ -133,7 +128,7 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 }: createBuildOperationsFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
-	const providePlatform = <Value, Failure, Requirements>(
+	const providePlatformFx = <Value, Failure, Requirements>(
 		effect: Effect.Effect<Value, Failure, Requirements>,
 	) =>
 		effect.pipe(
@@ -146,21 +141,21 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 			Effect.gen(function* () {
 				const state = yield* readState(projectId);
 				yield* assertRevisionFx(state, expectedRevision, "build-project");
-				const build = yield* providePlatform(
+				const build = yield* providePlatformFx(
 					withProjectLockFx(
 						filesystemWrite,
 						state.paths.root,
 						Effect.gen(function* () {
 							yield* ensureProjectGitignoreFx(state.paths);
 							const assertCurrentFx = readProjectFilesFx(state.paths.root).pipe(
-								Effect.mapError(projectChangedBeforeBuild),
+								Effect.mapError(projectChangedBeforeBuildFn),
 								Effect.filterOrFail(
 									(files) =>
 										files.marker.revision === state.project.revision &&
 										files.arkpack === state.project.version &&
 										isDeepStrictEqual(files.config, state.project.config) &&
 										isDeepStrictEqual(files.resources, state.project.resources),
-									projectChangedBeforeBuild,
+									projectChangedBeforeBuildFn,
 								),
 								Effect.asVoid,
 							);
@@ -172,9 +167,13 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 								Effect.mapError((cause) =>
 									cause instanceof GameValidationError
 										? new GameValidationError({
-												diagnostics: safeBuildDiagnostics(
-													state.paths.root,
-													cause.diagnostics,
+												diagnostics: GameDiagnosticsSchema.parse(
+													cause.diagnostics.map((diagnostic) =>
+														relativeDiagnosticProvenanceFn(
+															state.paths.root,
+															diagnostic,
+														),
+													),
 												),
 											})
 										: cause,
@@ -194,11 +193,15 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 					revision: state.project.revision,
 					contentHash: build.contentHash,
 					size: build.bytes,
-					diagnostics: safeBuildDiagnostics(state.paths.root, build.diagnostics),
+					diagnostics: GameDiagnosticsSchema.parse(
+						build.diagnostics.map((diagnostic) =>
+							relativeDiagnosticProvenanceFn(state.paths.root, diagnostic),
+						),
+					),
 				});
 			}).pipe(
 				Effect.mapError((cause) =>
-					error(
+					createBuildErrorFn(
 						"build-project",
 						`Editor project ${projectId} could not be built.`,
 						cause,
@@ -227,8 +230,7 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 							return yield* Effect.fail(
 								new Error(`Project build directory ${build} is a symbolic link.`),
 							);
-						const stem = encodeGameProjectFileStem(projectId);
-						const arkpackPath = path.join(build, `${stem}.arkpack`);
+						const arkpackPath = path.join(build, readArkpackArtifactNameFn(projectId));
 						if (
 							!(yield* isFilesystemPathSafeFx(
 								fileSystem,
@@ -260,7 +262,7 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 				);
 			}).pipe(
 				Effect.mapError((cause) =>
-					error(
+					createBuildErrorFn(
 						"read-project-build",
 						`Editor project ${projectId} build could not be read.`,
 						cause,

@@ -1,0 +1,28 @@
+import { z } from "zod";
+
+import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticSeverityEnumSchema";
+
+import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
+
+export const MissingResourceDiagnosticSchema = z
+	.object({
+		...BaseDiagnosticSchema.shape,
+		code: DiagnosticCodeEnumSchema.extract([
+			"ResourceMissing",
+		]),
+		severity: DiagnosticSeverityEnumSchema.extract([
+			"Error",
+		]),
+		resourceId: IdSchema,
+	})
+	.strict()
+	.meta({
+		id: "MissingResourceDiagnosticSchema",
+	});
+
+export type MissingResourceDiagnosticSchema = typeof MissingResourceDiagnosticSchema;
+export namespace MissingResourceDiagnosticSchema {
+	export type Type = z.infer<MissingResourceDiagnosticSchema>;
+}

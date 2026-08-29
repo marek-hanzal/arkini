@@ -6,10 +6,10 @@ import { ChatGptAssetCandidateSchema } from "../../../../electron/contract/chatg
 
 import { useEditorProject } from "~/authoring-session/useEditorProject";
 import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
-import { readEditorAssetResourceIdFn } from "~/editor/resource/fn/readEditorAssetResourceIdFn";
-import { validateEditorAssetFileFx } from "~/renderer/editor/resource/validateEditorAssetFileFx";
+import { readEditorAssetResourceIdFn } from "~/asset-authoring/domain/fn/readEditorAssetResourceIdFn";
+import { saveEditorAssetFx } from "~/asset-authoring/session/saveEditorAssetFx";
+import { validateEditorAssetFileFx } from "~/asset-authoring/validation/validateEditorAssetFileFx";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
-import { saveEditorAssetFx } from "~/ui/resource/editor/saveEditorAssetFx";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/useEditorUnsavedChangesRegistration";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorChatGptSurface } from "./useEditorChatGptSurface";
@@ -22,6 +22,13 @@ interface AssetCandidate {
 interface ReplacementApproval {
 	readonly resourceId: string;
 	readonly revision: number;
+}
+
+interface SaveEditorAssetCommandProps {
+	readonly expectedRevision: number;
+	readonly file: File;
+	readonly overwrite: boolean;
+	readonly resourceId: string;
 }
 
 export namespace useEditorChatGptController {
@@ -67,7 +74,7 @@ const subscribeChatGptAssetCandidateFx = Effect.fn("subscribeChatGptAssetCandida
 const saveEditorAssetCommandAtom = RendererRuntime.runSync(
 	Effect.map(EditorProjectRepository, (repository) =>
 		Atom.family((projectId: string) =>
-			Atom.fn((props: Omit<saveEditorAssetFx.Props, "projectId">) =>
+			Atom.fn((props: SaveEditorAssetCommandProps) =>
 				saveEditorAssetFx({
 					...props,
 					projectId,

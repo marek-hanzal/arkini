@@ -1,6 +1,6 @@
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { ItemArtwork } from "~/ui/item/ItemArtwork";
-import { useEditorResourceUrl } from "~/ui/resource/editor/useEditorResourceUrl";
+import { useEditorResourceUrl } from "~/asset-authoring/ui/EditorResourceUrlSession";
 import { twMerge } from "tailwind-merge";
 
 const thumbnailSizeClassName = {

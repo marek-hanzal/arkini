@@ -6,10 +6,12 @@ const gameConfigPattern = "^src/game-config(?:/|$)";
 const arkpackArtifactPattern = "^src/arkpack/(?:ArkpackDescriptor[.]ts$|artifact(?:/|$))";
 const productionPipelinePattern =
 	"^src/(?:production-action|production-condition|production-delivery|production-input|production-job|production-line|production-output)(?:/|$)";
-const productDomainPattern = "^src/(?:item-authoring|flow|estimate|editor-build)/domain(?:/|$)";
-const productRendererPattern = "^src/(?:arkpack|editor-build)/renderer(?:/|$)";
+const productDomainPattern =
+	"^src/(?:asset-authoring|item-authoring|flow|estimate|editor-build)/domain(?:/|$)";
+const productRendererPattern =
+	"^src/(?:arkpack|editor-build)/renderer(?:/|$)|^src/asset-authoring/(?:session|validation)(?:/|$)";
 const productPresentationPattern =
-	"^src/(?:item-authoring|flow|estimate)/(?:ui|worker)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)";
+	"^src/(?:asset-authoring|item-authoring|flow|estimate)/(?:ui|worker)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)";
 const authoringProductPattern =
 	"^src/(?:project-authoring|board-scenario|project-version|project-note|authoring-mcp|authoring-session|authoring-shell)(?:/|$)";
 const authoringProductCorePattern =
@@ -43,7 +45,7 @@ const boundaryRules = [
 			path: productionPipelinePattern,
 		},
 		to: {
-			path: `^src/(?:game-config|arkpack|editor-build|editor|item-authoring|flow|estimate|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+			path: `^src/(?:game-config|arkpack|asset-authoring|editor-build|item-authoring|flow|estimate|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
 		},
 	},
 	{
@@ -267,21 +269,9 @@ const boundaryRules = [
 		},
 	},
 	{
-		name: "editor-resource-core-no-presentation-imports",
-		comment:
-			"The residual Asset/Resource authoring policies remain platform-neutral until their dedicated product slice and never own delivery, Build, renderer process ownership, UI, routes, or Electron.",
-		severity: "error",
-		from: {
-			path: "^src/editor/resource(?:/|$)",
-		},
-		to: {
-			path: `^src/(?:arkpack|editor-build|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|^electron(?:/|$)|^node_modules/electron(?:/|$)`,
-		},
-	},
-	{
 		name: "product-domain-no-presentation-imports",
 		comment:
-			"Item Authoring, Flow, Estimate, and Editor Build domain subtrees stay platform-neutral and never import product UI/workers, shared UI, renderer ownership, routes, or Electron.",
+			"Asset Authoring, Item Authoring, Flow, Estimate, and Editor Build domain subtrees stay platform-neutral and never import product UI/workers, shared UI, renderer ownership, routes, or Electron.",
 		severity: "error",
 		from: {
 			path: productDomainPattern,
@@ -320,7 +310,7 @@ const boundaryRules = [
 	{
 		name: "renderer-process-no-presentation-imports",
 		comment:
-			"Concrete renderer-process lifecycle and transport owners never depend on reusable UI, routes, or renderer entrypoints.",
+			"Concrete renderer-process lifecycle, validation, session, and transport owners never depend on reusable UI, routes, or renderer entrypoints.",
 		severity: "error",
 		from: {
 			path: `^src/renderer(?:/|$)|${productRendererPattern}`,
@@ -479,10 +469,10 @@ const boundaryRules = [
 	{
 		name: "domain-code-does-not-import-electron-contract",
 		comment:
-			"Framework-neutral Engine, authored Game configuration, Arkpack artifacts, residual Asset/Resource authoring policies, and product domains never depend on Electron transport contracts.",
+			"Framework-neutral Engine, authored Game configuration, Arkpack artifacts, and product domains never depend on Electron transport contracts.",
 		severity: "error",
 		from: {
-			path: `^src/(?:engine|editor)(?:/|$)|${gameConfigPattern}|${arkpackArtifactPattern}|${productDomainPattern}|${authoringProductCorePattern}`,
+			path: `^src/engine(?:/|$)|${gameConfigPattern}|${arkpackArtifactPattern}|${productDomainPattern}|${authoringProductCorePattern}`,
 		},
 		to: {
 			path: "^electron/contract(?:/|$)",

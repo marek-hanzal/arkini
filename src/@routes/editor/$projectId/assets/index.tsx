@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 
-import { EditorAssetManager } from "~/ui/resource/editor/EditorAssetManager";
+import { EditorAssetManager } from "~/asset-authoring/ui/EditorAssetManager";
 
 const assetsRouteId = "/editor/$projectId/assets" as const;
 

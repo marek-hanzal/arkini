@@ -7,7 +7,7 @@ import { setCheatEnabledFx } from "~/engine/cheat/write/setCheatEnabledFx";
 import { spawnCheatItemFx } from "~/engine/cheat/write/spawnCheatItemFx";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 
 describe("Cheat item spawning", () => {
 	it("reads the compiled spawnable catalog and authorizes standard Board placement from persisted state", () => {

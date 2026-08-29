@@ -4,8 +4,8 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines";
 import { readItemDetailInputsFx } from "~/engine/item-detail/read/readItemDetailInputsFx";
 import { readItemDetailOutputFx } from "~/engine/item-detail/read/readItemDetailOutputFx";
-import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
-import type { LineSchema } from "~/engine/line/schema/LineSchema";
+import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
+import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace readStoredItemDetailLineFx {

@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { outputFx } from "~/engine/output/fx/outputFx";
-import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import { outputFx } from "~/production-output/fx/outputFx";
+import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { readBoardRuntimeItemByIdFx } from "~/engine/runtime/read/readBoardRuntimeItemByIdFx";

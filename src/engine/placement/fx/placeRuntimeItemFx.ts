@@ -6,7 +6,7 @@ import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
 import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
-import { assertOwnerIdleFx } from "~/engine/job/fx/assertOwnerIdleFx";
+import { assertOwnerIdleFx } from "~/production-job/fx/assertOwnerIdleFx";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { ItemJobScopedError } from "~/engine/runtime/error/ItemJobScopedError";

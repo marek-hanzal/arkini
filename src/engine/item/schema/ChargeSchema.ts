@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import { OutputSchema } from "~/production-output/schema/OutputSchema";
 
 /**
  * Finite authored lifetime of one concrete item instance.

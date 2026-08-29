@@ -5,7 +5,10 @@ import { readItemDetailQueueFx } from "~/engine/item-detail/read/readItemDetailQ
 import { useGameFx } from "~test/support/game/useGameFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { lineRunRuntime, lineRunTestConfig } from "~test/line/fx/run/support/lineRunTestRuntime";
+import {
+	lineRunRuntime,
+	lineRunTestConfig,
+} from "~test/production-line/fx/run/support/lineRunTestRuntime";
 
 const run = <A, E>(effect: Effect.Effect<A, E, never>) => Effect.runSync(effect);
 

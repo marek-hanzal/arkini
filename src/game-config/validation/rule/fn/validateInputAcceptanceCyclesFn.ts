@@ -3,7 +3,7 @@ import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { GameDiagnosticsSchema } from "~/game-config/diagnostic/schema/GameDiagnosticsSchema";
 import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticSeverityEnumSchema";
-import { TypeSchema } from "~/engine/input/schema/TypeSchema";
+import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import type { MaterialInputEdgeSchema } from "../../schema/MaterialInputEdgeSchema";
 import { readItemLineEntriesFn } from "../../fn/readItemLineEntriesFn";
 

@@ -2,9 +2,9 @@ import { Effect } from "effect";
 
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
 import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
-import { assertOwnerIdleFx } from "~/engine/job/fx/assertOwnerIdleFx";
+import { assertOwnerIdleFx } from "~/production-job/fx/assertOwnerIdleFx";
 import { SourceActionSchema } from "~/engine/merge/schema/SourceActionSchema";
-import type { dropFx } from "~/engine/output/fx/dropFx";
+import type { dropFx } from "~/production-output/fx/dropFx";
 import { discardRuntimeItemOwnedStateFx } from "~/engine/runtime/fx/discardRuntimeItemOwnedStateFx";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";

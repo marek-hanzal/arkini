@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import { createEditorAcquisitionGraphFn } from "~/flow/domain/fn/createEditorAcquisitionGraphFn";
 import { readEditorItemOriginSourcesFn } from "~/flow/domain/fn/readEditorItemOriginSourcesFn";
-import type { DropSchema } from "~/engine/output/schema/DropSchema";
-import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
-import { createJobTestConfig } from "~test/job/support/jobTestConfig";
-import { existsWhen } from "~test/line/fx/support/lineTestRuntime";
+import type { DropSchema } from "~/production-output/schema/DropSchema";
+import type { OutputSchema } from "~/production-output/schema/OutputSchema";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
+import { existsWhen } from "~test/production-line/fx/support/lineTestRuntime";
 import { createMergeTestConfig } from "~test/merge/support/createMergeTestConfig";
 
 const readEditorItemOriginSources = (

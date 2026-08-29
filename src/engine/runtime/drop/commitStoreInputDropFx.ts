@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
+import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { makeDropActorRejectedResultFn } from "~/engine/runtime/drop/fn/makeDropActorRejectedResultFn";

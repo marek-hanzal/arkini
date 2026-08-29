@@ -7,7 +7,7 @@ import { GameLoopFx } from "~/engine/game/context/GameLoopFx";
 import { GameCoreLayerFx } from "~/engine/game/layer/GameCoreLayerFx";
 import { GameLoopLayerFx } from "~/engine/game/layer/GameLoopLayerFx";
 import { GameSessionLayerFx } from "~/engine/game/layer/GameSessionLayerFx";
-import { startLineFx } from "~test/job/support/startLineTestFx";
+import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";

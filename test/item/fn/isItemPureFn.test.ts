@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { purityTestConfig } from "~test/line/support/purityTestConfig";
+import { purityTestConfig } from "~test/production-line/support/purityTestConfig";
 
 const location = {
 	scope: "board" as const,

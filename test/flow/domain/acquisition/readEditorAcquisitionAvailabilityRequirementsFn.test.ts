@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { readEditorAcquisitionAvailabilityRequirementsFn } from "~/flow/domain/fn/readEditorAcquisitionAvailabilityRequirementsFn";
-import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
+import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 const exists = (itemId: string): WhenSchema.Type => ({
 	query: {

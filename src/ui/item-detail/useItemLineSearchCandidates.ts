@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 
-import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
+import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
 import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
 
 /** Builds the stable semantic Fuse corpus for the current visible product lines. */

@@ -1,7 +1,7 @@
 import { match, P } from "ts-pattern";
 
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import type { LineSchema } from "~/engine/line/schema/LineSchema";
+import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { ItemPurityIndex } from "./readItemPurityIndexFn";

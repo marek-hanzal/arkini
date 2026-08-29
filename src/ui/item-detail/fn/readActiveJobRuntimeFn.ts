@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 
-import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
+import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
 import type { ItemRuntimeValue } from "~/ui/item-detail/ItemRuntime";
 import { formatItemDurationFn } from "~/ui/item-detail/fn/formatItemDurationFn";
 

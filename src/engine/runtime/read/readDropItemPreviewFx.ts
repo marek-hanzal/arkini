@@ -5,7 +5,7 @@ import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { isItemLocationScopeAllowedFn } from "~/engine/location/fn/isItemLocationScopeAllowedFn";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
-import { resolveLineInputStoreFx } from "~/engine/input/fx/resolveLineInputStoreFx";
+import { resolveLineInputStoreFn } from "~/production-input/fn/resolveLineInputStoreFn";
 import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import { readGridLocationClaimAtFn } from "~/engine/location/fn/readGridLocationClaimAtFn";
 import { readGridLocationClaimsFn } from "~/engine/location/fn/readGridLocationClaimsFn";
@@ -196,7 +196,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 			} satisfies readDropItemPreviewFx.Result;
 		}
 	}
-	const inputStore = yield* resolveLineInputStoreFx({
+	const inputStore = resolveLineInputStoreFn({
 		lineId: target.inputStore?.lineId,
 		inputIndex: target.inputStore?.inputIndex,
 		owner: targetItem,

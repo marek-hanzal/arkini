@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { purityTestConfig } from "~test/line/support/purityTestConfig";
+import { purityTestConfig } from "~test/production-line/support/purityTestConfig";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
 const board = (x: number) => ({

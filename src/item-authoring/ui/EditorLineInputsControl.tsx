@@ -1,4 +1,4 @@
-import type { InputSchema as LineInputSchema } from "~/engine/input/schema/InputSchema";
+import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorItemDraftDefaults } from "~/item-authoring/ui/EditorItemDraftDefaults";

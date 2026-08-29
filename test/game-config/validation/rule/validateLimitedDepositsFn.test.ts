@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { compileGameSourcesFx } from "~/game-config/compiler/fx/compileGameSourcesFx";
 import { DepositSchema } from "~/engine/item/schema/DepositSchema";
-import { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import {
 	createOutput,
 	createProducerItem,

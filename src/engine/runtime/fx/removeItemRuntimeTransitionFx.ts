@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
-import { assertOwnerIdleFx } from "~/engine/job/fx/assertOwnerIdleFx";
+import { assertOwnerIdleFx } from "~/production-job/fx/assertOwnerIdleFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";

@@ -1,6 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 
-import { readAuthoredItemLinesFn } from "~/engine/line/fn/readAuthoredItemLinesFn";
+import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
 import { useEditorProject } from "~/authoring-session/useEditorProject";
 import type { ItemLineSummaryIdentityRenderProps } from "~/ui/item-detail/ItemLineSummary";
 import { EditorProductionLineEditLink } from "~/item-authoring/ui/EditorProductionLineEditLink";

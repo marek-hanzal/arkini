@@ -2,14 +2,14 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readLineInputDeliveryClaimsFn } from "~/engine/delivery/fn/readLineInputDeliveryClaimsFn";
+import { readLineInputDeliveryClaimsFn } from "~/production-delivery/fn/readLineInputDeliveryClaimsFn";
 import { readItemDetailChargeKeyFn } from "~/engine/item-detail/fn/readItemDetailChargeKeyFn";
 import type { ItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines";
 import { readItemDetailDepositAvailableChargesFx } from "~/engine/item-detail/read/readItemDetailDepositAvailableChargesFx";
 import { readItemDetailMaterialAutofillAvailabilityFx } from "~/engine/item-detail/read/readItemDetailMaterialAutofillAvailabilityFx";
-import type { InputRun } from "~/engine/input/InputRun";
-import { TypeSchema } from "~/engine/input/schema/TypeSchema";
-import type { InputSchema } from "~/engine/input/schema/InputSchema";
+import type { InputRun } from "~/production-input/InputRun";
+import { TypeSchema } from "~/production-input/schema/TypeSchema";
+import type { InputSchema } from "~/production-input/schema/InputSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 

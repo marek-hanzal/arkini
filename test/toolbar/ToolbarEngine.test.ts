@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
 import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
-import { startLineFx } from "~test/job/support/startLineTestFx";
+import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { checkRuntimeLocationsFn } from "~/engine/runtime/check/fn/checkRuntimeLocationsFn";
 import { planDropScopePlacementFx } from "~/engine/placement/fx/planDropScopePlacementFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
@@ -16,7 +16,7 @@ import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
 import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 import { StateSchema } from "~/engine/state/schema/StateSchema";
-import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";

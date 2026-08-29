@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
 import { Effect } from "effect";
 import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
 import type { Game } from "~/renderer/game/Game";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { createTickFailureTestConfig } from "~test/tick/support/createTickFailureTestConfig";
-import { startLineFx } from "~test/job/support/startLineTestFx";
+import { startLineFx } from "~test/production-job/support/startLineTestFx";
 
 import { emitCompletedEventFx } from "./createGameSession.test/fixture";
 

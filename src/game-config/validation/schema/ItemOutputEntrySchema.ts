@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { DiagnosticPathSchema } from "~/game-config/diagnostic/schema/DiagnosticPathSchema";
 
 export const ItemOutputEntrySchema = z

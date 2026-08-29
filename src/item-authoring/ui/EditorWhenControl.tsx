@@ -1,4 +1,4 @@
-import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
+import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 import { match } from "ts-pattern";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import {

@@ -1,6 +1,6 @@
 import { BatteryMedium, Trash2 } from "lucide-react";
 
-import type { InputSchema as LineInputSchema } from "~/engine/input/schema/InputSchema";
+import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import { Button } from "~/ui/button/Button";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";

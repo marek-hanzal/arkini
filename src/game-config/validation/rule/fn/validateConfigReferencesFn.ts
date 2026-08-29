@@ -8,15 +8,15 @@ import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/Di
 import { DiagnosticRecordEntityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticRecordEntityEnumSchema";
 import type { DiagnosticPathSchema } from "~/game-config/diagnostic/schema/DiagnosticPathSchema";
 import type { GameDiagnosticSchema } from "~/game-config/diagnostic/schema/GameDiagnosticSchema";
-import type { InputSchema } from "~/engine/action/schema/InputSchema";
-import { TypeSchema as InputTypeSchema } from "~/engine/input/schema/TypeSchema";
-import type { LineSchema } from "~/engine/line/schema/LineSchema";
+import type { InputSchema } from "~/production-action/schema/InputSchema";
+import { TypeSchema as InputTypeSchema } from "~/production-input/schema/TypeSchema";
+import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
-import type { DropSchema } from "~/engine/output/schema/DropSchema";
-import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
-import { TypeSchema as RollTypeSchema } from "~/engine/roll/schema/TypeSchema";
+import type { DropSchema } from "~/production-output/schema/DropSchema";
+import type { OutputSchema } from "~/production-output/schema/OutputSchema";
+import { TypeSchema as RollTypeSchema } from "~/production-output/roll/schema/TypeSchema";
 import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
-import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
+import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 import { readItemLineEntriesFn } from "../../fn/readItemLineEntriesFn";
 import { readItemOutputEntriesFn } from "../../fn/readItemOutputEntriesFn";

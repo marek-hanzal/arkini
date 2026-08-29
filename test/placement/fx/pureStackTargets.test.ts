@@ -6,7 +6,7 @@ import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlaceme
 import { applyPlacementPlanFx } from "~/engine/placement/fx/applyPlacementPlanFx";
 import { readAvailableStackItemsFn } from "~/engine/placement/fn/readAvailableStackItemsFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { purityTestConfig } from "~test/line/support/purityTestConfig";
+import { purityTestConfig } from "~test/production-line/support/purityTestConfig";
 
 const board = (x: number) => ({
 	scope: "board" as const,

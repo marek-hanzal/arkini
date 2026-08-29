@@ -1,5 +1,5 @@
-import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
-import type { RollSchema } from "~/engine/roll/schema/RollSchema";
+import type { OutputSchema } from "~/production-output/schema/OutputSchema";
+import type { RollSchema } from "~/production-output/roll/schema/RollSchema";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorItemDraftDefaults } from "~/item-authoring/ui/EditorItemDraftDefaults";

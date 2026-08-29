@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
+import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";

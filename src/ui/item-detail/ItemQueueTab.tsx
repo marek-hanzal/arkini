@@ -1,7 +1,7 @@
 import { CircleOff, ListX } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
-import { clearItemJobQueueFx } from "~/engine/job/write/clearItemJobQueueFx";
+import { clearItemJobQueueFx } from "~/production-job/write/clearItemJobQueueFx";
 import type { useItemDetailQueue } from "~/ui/item-detail/useItemDetailQueue";
 import { LinkButton } from "~/ui/button/LinkButton";
 import { ItemIdentity } from "~/ui/item/ItemIdentity";

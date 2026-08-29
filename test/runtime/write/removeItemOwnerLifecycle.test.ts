@@ -3,15 +3,15 @@ import { describe, expect, it } from "vitest";
 
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { useGameFx } from "~test/support/game/useGameFx";
-import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
-import { startLineFx } from "~test/job/support/startLineTestFx";
-import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
+import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
+import { startLineFx } from "~test/production-job/support/startLineTestFx";
+import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { createJobTestConfig, prepareJobLineFx } from "../../job/support/jobTestConfig";
+import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 
 const startProps = {
 	ownerItemId: "runtime:forge",

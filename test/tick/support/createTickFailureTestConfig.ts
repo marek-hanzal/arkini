@@ -1,5 +1,5 @@
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 
 /** Creates one line whose output item can be removed after start to force a Tick failure. */
 export const createTickFailureTestConfig = () => {

@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
-import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import { startLineFx } from "~test/job/support/startLineTestFx";
+import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { Effect } from "effect";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
+import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
 import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 
 import { emitCompletedEventFx } from "./createGameSession.test/fixture";

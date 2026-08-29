@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import { startLineFx } from "~test/job/support/startLineTestFx";
+import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
 import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";

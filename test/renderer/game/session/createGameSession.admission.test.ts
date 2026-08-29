@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
-import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { Effect } from "effect";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";

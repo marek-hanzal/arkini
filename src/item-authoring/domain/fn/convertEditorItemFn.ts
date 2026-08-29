@@ -1,7 +1,7 @@
 import { createEditorItemDraftFn } from "~/item-authoring/domain/fn/createEditorItemDraftFn";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import { readAuthoredItemLinesFn } from "~/engine/line/fn/readAuthoredItemLinesFn";
+import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
 
 /** Converts one canonical item while retaining every field understood by the target type. */
 export const convertEditorItemFn = (

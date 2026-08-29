@@ -7,7 +7,7 @@ import type {
 	FailedSaveRecovery,
 	GameEngineResourceServiceState,
 } from "~/renderer/game/resource/internal/GameEngineResourceServiceState";
-import type { GameSaveStorage } from "~/engine/save/GameSaveStorage";
+import type { GameSaveStorage } from "~/game-persistence/GameSaveStorage";
 
 export namespace createFailedSaveRecoveryCapabilityFx {
 	export interface Dependencies {

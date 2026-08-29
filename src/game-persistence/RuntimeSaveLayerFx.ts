@@ -3,16 +3,14 @@ import { Cause, Effect, Fiber, Layer, Ref, Semaphore, Stream } from "effect";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
-import type { StateSchema } from "~/engine/state/schema/StateSchema";
-import { RuntimeSaveFx } from "~/engine/save/RuntimeSaveFx";
+import { fromRuntimeFn } from "~/game-persistence/fromRuntimeFn";
+import type { StateSchema } from "~/game-persistence/StateSchema";
+import { RuntimeSaveFx } from "~/game-persistence/RuntimeSaveFx";
 
-export namespace RuntimeSaveLayerFx {
-	export interface Props<Error = unknown> {
-		debounceMs?: number;
-		onFatalError?: (cause: Cause.Cause<Error>) => void;
-		save: (state: StateSchema.Type) => Effect.Effect<void, Error>;
-	}
+interface Props<Error = unknown> {
+	debounceMs?: number;
+	onFatalError?: (cause: Cause.Cause<Error>) => void;
+	save: (state: StateSchema.Type) => Effect.Effect<void, Error>;
 }
 
 /**
@@ -26,7 +24,7 @@ export const RuntimeSaveLayerFx = <Error>({
 	debounceMs = 250,
 	onFatalError = () => undefined,
 	save,
-}: RuntimeSaveLayerFx.Props<Error>) =>
+}: Props<Error>) =>
 	Layer.effect(
 		RuntimeSaveFx,
 		Effect.gen(function* () {

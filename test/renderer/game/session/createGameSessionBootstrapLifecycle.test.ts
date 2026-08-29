@@ -4,7 +4,7 @@ import { beforeEach, vi } from "vitest";
 
 import { createGameSessionFx } from "~/renderer/game/session/createGameSessionFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
-import type { StateSchema } from "~/engine/state/schema/StateSchema";
+import type { StateSchema } from "~/game-persistence/StateSchema";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 
 const bootstrap = vi.hoisted(() => ({

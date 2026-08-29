@@ -6,12 +6,15 @@ const applicationDiagnosticsPattern = "^src/application-diagnostics(?:/|$)";
 const gameEventPattern = "^src/game-event(?:/|$)";
 const gameConfigPattern = "^src/game-config(?:/|$)";
 const gameRuntimePattern = "^src/game-runtime(?:/|$)";
+const gamePersistencePattern = "^src/game-persistence(?:/|$)";
 const gameTickPattern = "^src/game-tick(?:/|$)";
 const itemInteractionPattern = "^src/item-interaction(?:/|$)";
 const itemInteractionAllowedSourceDependencyPattern =
 	"(?:item-interaction(?:/|$)|engine/(?:common/schema/(?:IdSchema|NonNegativeIntegerSchema|PositiveIntegerSchema)[.]ts$|game/context/GameConfigFx[.]ts$|item/(?:error/(?:ItemNotFoundError|ItemNotOnBoardError|ItemNotOnGridError|ItemStatefulError)[.]ts$|fn/isItemPureFn[.]ts$)|revision/(?:fx/assertRevisionFx|schema/RevisionSchema)[.]ts$)|game-event/(?:readOutputPlacementItemEventsFx[.]ts$|schema/(?:GameEventEnumSchema|GameEventSchema)[.]ts$)|game-runtime/(?:error/(?:ItemJobScopedError|ItemLocationConflictError)[.]ts$|fx/(?:removeRuntimeItemFx|removeRuntimeItemIdentityFx|reviseRuntimeItemFx)[.]ts$|internal/modifyRuntimeFx[.]ts$|read/(?:fn/(?:isBoardRuntimeItemFn|isGridRuntimeItemFn)[.]ts$|(?:readRuntimeFx|readRuntimeItemByIdFx)[.]ts$)|schema/(?:BoardRuntimeItemSchema|GridRuntimeItemSchema|RuntimeItemSchema|RuntimeSchema)[.]ts$)|item-definition/schema/TypeSchema[.]ts$|item-location/(?:error/CrossSpaceBoardOperationError[.]ts$|fn/(?:isItemLocationScopeAllowedFn|isSameGridLocationFn|readGridLocationClaimAtFn|readGridLocationClaimsFn)[.]ts$|schema/(?:BoardLocationSchema|GridLocationSchema|InventoryLocationSchema|LocationScopeEnumSchema)[.]ts$)|item-merge/(?:fx/resolveMergeRuleFx[.]ts$|schema/(?:SourceActionSchema|TargetEffectSchema)[.]ts$|write/mergeItemsFx[.]ts$)|item-placement/(?:PlacementPlan[.]ts$|error/PlacementUnavailableError[.]ts$|fn/(?:readBoardLocationsFn|readEmptyLocationsFn|readInventoryLocationsFn)[.]ts$|fx/(?:applyOutputPlacementFx|applyPlacementPlanFx|assertPlacementPlanCompleteFx|placeRuntimeItemFx|planInventoryPlacementFx)[.]ts$|schema/PlacementSchema[.]ts$)|production-input/(?:fn/resolveLineInputStoreFn[.]ts$|write/storeInputMaterialFx[.]ts$)|production-job/(?:fx/assertOwnerIdleFx[.]ts$|fx/read/resolveJobQueueFx[.]ts$)|production-line/fn/(?:isLineOwnerItemFn|readEffectiveDefaultLineFn)[.]ts$)";
 const gameRuntimeAllowedSourceDependencyPattern =
 	"(?:game-runtime(?:/|$)|game-config/GameConfigSchema[.]ts$|engine/(?:cheat/schema/CheatStateSchema[.]ts$|common/schema/(?:IdSchema|NonNegativeIntegerSchema|PositiveIntegerSchema|TimeSchema)[.]ts$|game/context/GameConfigFx[.]ts$|item/(?:error/(?:ItemNotFoundError|ItemNotOnBoardError)[.]ts$|fn/(?:isItemPureWithIndexFn|readItemPurityIndexFn)[.]ts$|fx/resolveItemFx[.]ts$)|revision/(?:fx/createRevisionFx|schema/RevisionSchema)[.]ts$)|game-event/schema/GameEventSchema[.]ts$|item-definition/schema/(?:ItemSchema|StorageSchema|TypeSchema)[.]ts$|item-location/(?:fn/(?:indexGridLocationClaimsFn|isItemLocationScopeAllowedFn|readGridLocationClaimsFn)[.]ts$|schema/(?:BoardLocationSchema|DeliveryLocationSchema|GridLocationSchema|InputLocationSchema|JobLocationSchema|LocationSchema|LocationScopeEnumSchema|ReservedLocationSchema)[.]ts$)|production-delivery/(?:check/checkRuntimeDeliveriesFn|fx/reconcileOutboundDeliveriesRuntimeFx|schema/check/DeliveryTargetIssueSchema)[.]ts$|production-input/(?:check/checkRuntimeInputLocationsFn|fx/releaseOwnerInputsFx|schema/check/(?:InputCapacityExceededIssueSchema|InputLineMissingIssueSchema|InputOwnerMissingIssueSchema|InputSelectorMismatchIssueSchema|InputSlotInvalidIssueSchema))[.]ts$|production-job/(?:check/checkRuntimeJobsFn|error/JobOwnerBusyError|fn/readReservedJobOutputQuantitiesFn|schema/(?:JobQueueRequestSchema|JobSchema|DuplicateJobIdIssueSchema|JobConsumedMaterialStateIssueSchema|JobLineMissingIssueSchema|JobMaterialOrphanIssueSchema|JobOwnerMissingIssueSchema|JobOwnerMultipleActiveIssueSchema|JobOwnerNotOnGridIssueSchema|JobQueueExceededIssueSchema|JobTimeInvalidIssueSchema))[.]ts$|production-line/(?:fn/checkRuntimeDefaultLinesFn|schema/(?:DefaultLineByOwnerItemIdSchema|check/(?:DefaultLineIssueSchema|LineInputClosedIssueSchema)))[.]ts$)";
+const gamePersistenceAllowedSourceDependencyPattern =
+	"(?:game-persistence(?:/|$)|game-config/source/encodeGameProjectFileStemFn[.]ts$|game-runtime/(?:check/assertRuntimeFx|context/(?:CommittedTransitionsFx|RuntimeFx)|schema/(?:RuntimeItemSchema|RuntimeSchema))[.]ts$|engine/(?:cheat/schema/CheatStateSchema[.]ts$|common/schema/(?:IdSchema|NonNegativeIntegerSchema|PositiveIntegerSchema|TimeSchema)[.]ts$|filesystem/(?:FilesystemWrite|createFilesystemWriteFx)[.]ts$|item/fx/resolveItemFx[.]ts$|revision/fx/createRevisionFx[.]ts$|version/(?:ArkiniVersionAdmission|schema/(?:ArkiniVersionSchema|ArkpackVersionSchema))[.]ts$)|item-definition/schema/TypeSchema[.]ts$|item-location/schema/LocationSchema[.]ts$|production-job/schema/(?:JobQueueRequestSchema|JobSchema)[.]ts$|production-line/schema/DefaultLineByOwnerItemIdSchema[.]ts$)";
 const gameTickAllowedSourceDependencyPattern =
 	"(?:game-tick(?:/|$)|game-runtime/(?:context/RuntimeFx|internal/modifyRuntimeFx|schema/RuntimeSchema)[.]ts$|engine/(?:cheat/read/isInstantGameplayEnabledFx|common/schema/(?:IdSchema|TimeSchema|TimestampSchema)|item/temporary/fx/(?:advanceTemporaryItemDurationsFx|attemptTemporaryItemExpiryFx))[.]ts$|game-event/schema/(?:GameEventEnumSchema|GameEventSchema)[.]ts$|item-definition/schema/TypeSchema[.]ts$|item-location/(?:fn/isPassiveStorageLocationFn|schema/LocationScopeEnumSchema)[.]ts$|production-delivery/write/settleItemDeliveryRuntimeFx[.]ts$|production-job/(?:fx/(?:attemptJobCompletionFx|attemptQueuedLineStartFx|resolveJobRunnableFx)|schema/JobSchema)[.]ts$)";
 const gameStartPattern = "^src/game-start(?:/|$)";
@@ -103,6 +106,65 @@ const boundaryRules = [
 		},
 		to: {
 			path: gameTickPattern,
+		},
+	},
+	{
+		name: "game-runtime-stays-upstream-of-game-persistence",
+		comment:
+			"Game Runtime cannot import persisted State, hydration, save codecs, storage, or transport adapters.",
+		severity: "error",
+		from: {
+			path: gameRuntimePattern,
+		},
+		to: {
+			path: gamePersistencePattern,
+		},
+	},
+	{
+		name: "game-persistence-is-a-runtime-dependent-durable-state-owner",
+		comment:
+			"Game Persistence owns serializable State, hydration, save codecs, autosave coordination, and exact transport adapters while depending only on explicit Runtime and durable-data leaves.",
+		severity: "error",
+		from: {
+			path: gamePersistencePattern,
+		},
+		to: {
+			path: `^src/(?!${gamePersistenceAllowedSourceDependencyPattern})|^electron(?:/|$)|^shared(?:/|$)|^scripts(?:/|$)|^node_modules/(?!@msgpack/msgpack(?:/|$)|effect(?:/|$)|zod(?:/|$))`,
+			pathNot: [
+				"^shared/ArkiniAppMetadata[.]ts$",
+			],
+		},
+	},
+	{
+		name: "game-persistence-has-explicit-composition-consumers",
+		comment:
+			"Only Game Session, installed-game, Board scenario, game-menu, and Electron-main composition consume persistence; lower gameplay domains never do.",
+		severity: "error",
+		from: {
+			path: activeCodePattern,
+			pathNot: [
+				gamePersistencePattern,
+				"^src/board-scenario/session/EditorBoardGameResource[.]ts$",
+				"^src/board-scenario/session/createEditorBoardGameFx[.]ts$",
+				"^src/board-scenario/session/createEditorBoardGameResourceFx[.]ts$",
+				"^src/board-scenario/session/restoreEditorBoardScenarioFx[.]ts$",
+				"^src/board-scenario/session/saveEditorBoardScenarioFx[.]ts$",
+				"^src/engine/game/layer/GameSessionLayerFx[.]ts$",
+				"^src/renderer/RendererRuntime[.]ts$",
+				"^src/renderer/game/Game[.]ts$",
+				"^src/renderer/game/GameSaveBootstrapError[.]ts$",
+				"^src/renderer/game/createGameFx[.]ts$",
+				"^src/renderer/game/resource/createGameEngineResourceServiceFx[.]ts$",
+				"^src/renderer/game/resource/internal/createFailedSaveRecoveryCapabilityFx[.]ts$",
+				"^src/renderer/game/resource/internal/createGameEngineFinalizationCapabilityFx[.]ts$",
+				"^src/renderer/game/session/GameSession[.]ts$",
+				"^src/renderer/game/session/createGameSessionFx[.]ts$",
+				"^src/ui/game-menu/gameMenuCommandAtom[.]ts$",
+				"^electron/main/registerArkiniElectronIpcFx[.]ts$",
+			],
+		},
+		to: {
+			path: gamePersistencePattern,
 		},
 	},
 	{
@@ -485,7 +547,7 @@ const boundaryRules = [
 			path: "^(?:src|electron)(?:/|$)",
 			pathNot: [
 				"^src/game-runtime/layer/GameRuntimeLayerFx[.]ts$",
-				"^src/engine/save/RuntimeSaveLayerFx[.]ts$",
+				"^src/game-persistence/RuntimeSaveLayerFx[.]ts$",
 				"^src/renderer/game/session/(?:createGameSessionFx|createGameSessionTransitionSubscriptionsFx)[.]ts$",
 			],
 		},
@@ -709,7 +771,7 @@ const boundaryRules = [
 			"Framework-neutral Engine, Game Event facts, authored Game configuration, Arkpack artifacts, and product domains never depend on Electron transport contracts.",
 		severity: "error",
 		from: {
-			path: `^src/(?:engine|editor)(?:/|$)|${gameRuntimePattern}|${gameStartPattern}|${gameEventPattern}|${itemDefinitionPattern}|${boardSpatialPattern}|${gameConfigPattern}|${arkpackArtifactPattern}|${productDomainPattern}|${authoringProductCorePattern}`,
+			path: `^src/(?:engine|editor)(?:/|$)|${gameRuntimePattern}|${gamePersistencePattern}|${gameStartPattern}|${gameEventPattern}|${itemDefinitionPattern}|${boardSpatialPattern}|${gameConfigPattern}|${arkpackArtifactPattern}|${productDomainPattern}|${authoringProductCorePattern}`,
 		},
 		to: {
 			path: "^electron/contract(?:/|$)",

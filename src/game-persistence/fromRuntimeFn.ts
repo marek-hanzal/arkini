@@ -1,6 +1,6 @@
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
-import type { StateSchema } from "~/engine/state/schema/StateSchema";
+import type { StateSchema } from "~/game-persistence/StateSchema";
 
 const fromRuntimeItemFn = ({ item }: { readonly item: RuntimeItemSchema.Type }) => ({
 	id: item.id,
@@ -10,10 +10,8 @@ const fromRuntimeItemFn = ({ item }: { readonly item: RuntimeItemSchema.Type }) 
 	remainingCharges: item.remainingCharges,
 	remainingDurationMs: item.remainingDurationMs,
 });
-export namespace fromRuntimeFn {
-	export interface Props {
-		runtime: RuntimeSchema.Type;
-	}
+interface Props {
+	runtime: RuntimeSchema.Type;
 }
 
 /**
@@ -23,7 +21,7 @@ export namespace fromRuntimeFn {
  * omitted; hydration will resolve item definitions and mint new revisions for
  * the next session.
  */
-export const fromRuntimeFn = ({ runtime }: fromRuntimeFn.Props) => {
+export const fromRuntimeFn = ({ runtime }: Props) => {
 	const items = runtime.items.map((item) =>
 		fromRuntimeItemFn({
 			item,

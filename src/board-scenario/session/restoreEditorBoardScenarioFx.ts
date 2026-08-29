@@ -5,9 +5,9 @@ import type { EditorProject } from "~/project-authoring/EditorProject";
 import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
 import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/session/EditorBoardGameResourceOwnerAtom";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
-import { fromStateFx } from "~/engine/state/fx/fromStateFx";
-import { decodeArkiniSaveFx } from "~/engine/save/fx/decodeArkiniSaveFx";
-import type { StateSchema } from "~/engine/state/schema/StateSchema";
+import { fromStateFx } from "~/game-persistence/fromStateFx";
+import { decodeArkiniSaveFx } from "~/game-persistence/decodeArkiniSaveFx";
+import type { StateSchema } from "~/game-persistence/StateSchema";
 import { readArkpackVersionFn } from "~/engine/version/fn/readArkpackVersionFn";
 
 export namespace restoreEditorBoardScenarioFx {

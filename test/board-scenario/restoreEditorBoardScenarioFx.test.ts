@@ -12,8 +12,8 @@ import {
 import type { EditorBoardGameResource } from "~/board-scenario/session/EditorBoardGameResource";
 import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/session/EditorBoardGameResourceOwnerAtom";
 import { restoreEditorBoardScenarioFx } from "~/board-scenario/session/restoreEditorBoardScenarioFx";
-import { encodeArkiniSaveFn } from "~/engine/save/fn/encodeArkiniSaveFn";
-import type { StateSchema } from "~/engine/state/schema/StateSchema";
+import { encodeArkiniSaveFn } from "~/game-persistence/encodeArkiniSaveFn";
+import type { StateSchema } from "~/game-persistence/StateSchema";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 

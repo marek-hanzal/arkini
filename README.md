@@ -23,9 +23,12 @@ Read the smallest entry point needed for the task:
 
 ```text
 src/engine    framework-neutral gameplay, config, compiler, pack and domain operations
-src/editor    platform-neutral Editor domain
+src/editor    shared platform-neutral Editor project and repository capabilities
+src/item-authoring  authored Item domain and product UI
+src/flow      authored acquisition graph, global Flow and layout worker
+src/estimate  static Estimate domain, projections, cache and worker
 src/renderer  concrete renderer-process runtime, lifecycle and transport capabilities
-src/ui        reusable React and Pixi presentation
+src/ui        cross-product primitives and reusable React/Pixi presentation
 src/@routes   TanStack Router registration, lifecycle and route-specific composition
 electron      pure transport contract plus main/preload/platform ownership
 shared        immutable cross-process application metadata and hard limits only

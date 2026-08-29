@@ -12,7 +12,7 @@ import {
 	selectableInactiveClassName,
 } from "~/ui/form/SelectableStateClassName";
 import { readEditorFieldErrorFn } from "~/ui/form/fn/readEditorFieldErrorFn";
-import { EditorItemAutocompleteField } from "~/ui/item/editor/EditorItemAutocompleteField";
+import { EditorItemAutocompleteField } from "~/ui/item/EditorItemAutocompleteField";
 import { EditorAssetAutocompleteField } from "~/ui/resource/editor/EditorAssetAutocompleteField";
 
 const EditorField = ({

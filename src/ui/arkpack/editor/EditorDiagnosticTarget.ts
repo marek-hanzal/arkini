@@ -1,4 +1,4 @@
-import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
+import type { EditorItemSectionId } from "~/item-authoring/ui/EditorItemSections";
 import type { EditorProjectSectionId } from "~/ui/project/editor/EditorProjectSections";
 
 export type EditorDiagnosticTarget =

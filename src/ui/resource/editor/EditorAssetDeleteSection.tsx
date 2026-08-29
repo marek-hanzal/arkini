@@ -4,7 +4,7 @@ import type { EditorProject } from "~/editor/EditorProject";
 import { EditorProjectAvatarKeys } from "~/ui/project/editor/EditorProjectFormSchema";
 import type { EditorAssetDeleteBlocker } from "~/editor/resource/fn/readEditorAssetDeleteBlockersFn";
 import { ButtonLink, DangerButton } from "~/ui/button/Button";
-import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
+import { EditorItemThumbnail } from "~/ui/item/EditorItemThumbnail";
 import { EditorAssetDeleteDialog } from "~/ui/resource/editor/EditorAssetDeleteDialog";
 import { useEditorAssetDeleteController } from "~/ui/resource/editor/useEditorAssetDeleteController";
 

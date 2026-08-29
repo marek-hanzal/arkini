@@ -1,6 +1,6 @@
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { EditorItemList } from "~/ui/item/editor/EditorItemList";
+import { EditorItemList } from "~/item-authoring/ui/EditorItemList";
 
 interface EditorItemsRouteSearch {
 	readonly itemType?: TypeSchema.Type;

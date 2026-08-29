@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
-import type { EditorItemEstimateSortSchema } from "~/editor/EditorItemEstimateSortSchema";
-import { EditorItemEstimateList } from "~/ui/item/editor/EditorItemEstimateList";
+import type { EditorItemEstimateSortSchema } from "~/estimate/domain/EditorItemEstimateSortSchema";
+import { EditorItemEstimateList } from "~/estimate/ui/EditorItemEstimateList";
 
 interface EditorEstimateRouteSearch {
 	readonly incomplete?: boolean;

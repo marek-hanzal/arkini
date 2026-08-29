@@ -1,6 +1,6 @@
 import type { RefObject } from "react";
 
-import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
+import { EditorItemThumbnail } from "~/ui/item/EditorItemThumbnail";
 
 /** Renders the pointer-following stack preview owned by a starting-grid drag session. */
 export const EditorProjectStartGridDragPreview = ({

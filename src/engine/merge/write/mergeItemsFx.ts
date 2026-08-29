@@ -1,8 +1,8 @@
 import { Effect, Option } from "effect";
 
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { ItemMergedGameEventSchema } from "~/engine/event/schema/ItemMergedGameEventSchema";
+import type { ItemMergedGameEventSchema } from "~/game-event/schema/ItemMergedGameEventSchema";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { applyMergeRuntimeFx } from "~/engine/merge/fx/applyMergeRuntimeFx";

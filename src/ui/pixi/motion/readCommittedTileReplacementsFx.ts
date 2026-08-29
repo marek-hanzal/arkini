@@ -5,7 +5,7 @@ import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { GameTransition } from "~/renderer/game/session/GameSession";
 import type { TileActorVisual } from "~/ui/pixi/actor/TileActorVisual";
 import { readTileActorVisualFx } from "~/ui/pixi/actor/readTileActorVisualFx";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
 import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";

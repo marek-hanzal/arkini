@@ -8,7 +8,7 @@ The product dependency map is:
 
 ```text
 src/@routes → { exact product owners, src/ui, src/renderer, exact production/engine owners, electron/contract }
-product presentation/workers → { exact product runtime/core owners, exact shared UI owners, exact production/engine owners, src/renderer, electron/contract }
+product presentation/workers → { exact product runtime/core owners, exact shared UI owners, src/game-event, exact production/engine owners, src/renderer, electron/contract }
 authoring-shell → { authoring-session, exact authoring products, src/ui, src/renderer, electron/contract }
 authoring-session → { project-authoring repository runtime, Board session, src/renderer, electron/contract }
 src/arkpack/renderer → { src/arkpack/artifact, src/game-config, exact src/renderer owners, electron/contract }
@@ -23,6 +23,8 @@ authoring product cores → { exact upstream authoring/config/production/engine 
 src/game-config → { src/game-start, exact production schemas, authored-config and remaining gameplay-schema owners in src/engine }
 src/game-start → exact item, placement, runtime and config-capability owners in src/engine
 src/asset-authoring/domain → { exact authored-config resource owners }
+committed transition producers → src/game-event
+src/game-event → { exact Engine value schemas, placement results and Runtime item projections }
 src/production-condition → exact query/runtime facts in src/engine
 src/production-output → src/production-condition
 src/production-action → { src/production-condition, src/production-input, src/production-output }
@@ -34,7 +36,8 @@ src/production-job → { src/production-action, src/production-delivery, src/pro
 
 - The production pipeline has explicit semantic roots. `src/production-condition` owns authored runtime condition evaluation. `src/production-output` owns output, drop, and roll contracts/resolution. `src/production-action` owns immediate action admission and charge settlement. `src/production-input` owns line-input contracts, material planning, buffering, autofill, withdrawal, and storage mutation. `src/production-line` owns line definitions, rule interpretation, reads, and run planning. `src/production-job` owns FIFO queue admission, active-job state, output-capacity reservation, start/completion/cancellation sequencing, and job checks. `src/production-delivery` owns outbound allocation, travel, validation, reconciliation, and settlement. These roots import one another only through the executable directions in Dependency Cruiser; callers import exact owners directly.
 - `src/game-start` owns the public initial-state schemas, exact Board/Inventory/Toolbar placement planning, and the one atomic empty-runtime start transaction. Planning applies Board, then Inventory, then Toolbar entries through canonical placement against one evolving candidate and commits only the completely valid runtime.
-- `src/engine` retains the framework-neutral live runtime/session, Tick, placement, merge, item, query, state, save, event, filesystem/version support, application CLI composition, and other untouched gameplay owners. It no longer owns Game Start or the production action/input/line/output/roll/condition/job/delivery pipeline, and it does not own authored Game source, compilation, Arkpack delivery, or Editor Build.
+- `src/game-event` owns the strict committed-event vocabulary, ordered transient batches, and exact projection of already-applied placement results. Events are downstream facts from one committed transition, never canonical Runtime or serializable State. The owner cannot reach writable Runtime/transition authority, State, Tick, save, production decisions, renderer lifecycle, presentation, routes, or Electron; producers and consumers import its exact schemas and operation directly.
+- `src/engine` retains the framework-neutral live runtime/session, Tick, placement, merge, item, query, state, save, filesystem/version support, application CLI composition, and other untouched gameplay owners. It no longer owns Game Start, committed Game Event semantics, or the production action/input/line/output/roll/condition/job/delivery pipeline, and it does not own authored Game source, compilation, Arkpack delivery, or Editor Build.
 - `src/game-config` owns the complete authored-game pipeline: public completed/source schemas, canonical JSON source discovery and parsing, stable JSON Schema emission, diagnostics, semantic validation, resource identity/usage/rename behavior, and completed-config compilation. `source/` stays upstream of `validation/` and `compiler/`; validation never imports compilation. The root is platform-neutral and cannot import Arkpack, Editor Build, renderer, presentation, routes, or Electron.
 - `src/arkpack` owns package delivery with explicit boundaries. `artifact/` owns exact bytes, envelope, compression, signing, provenance, trusted root, artifact schemas, and artifact CLI commands. `renderer/` owns package admission, catalog, fallback, storage contracts, and load/import lifecycle. `ui/` owns catalog and import presentation. Artifact code stays upstream of renderer and UI and never imports Editor Build.
 - `src/editor-build` owns the Editor Build product independently of Project Authoring. `domain/` owns build descriptors, the Build repository capability, and install planning; `renderer/` owns the Electron proxy, exact Save request, and built-artifact admission into the Arkpack catalog; `ui/` owns Build command/diagnostic presentation. Electron main retains privileged build and filesystem publication; routes retain Build page composition.
@@ -94,7 +97,7 @@ Waiting and planning remain interruptible. Failure, defect, interruption, or an 
 
 Independent commands may run concurrently until their short mutation-planning section. Do not add an outer command queue, second semaphore, second current-value/sequence authority, event bus, deep-clone layer, or event-derived read model.
 
-Subscribers own current-plus-tail observation. Runtime listeners ignore event-only transitions; event listeners receive only later batches, never historical replay. Slow or failing external callbacks are isolated and may lag without delaying engine truth, Tick, save, or other listeners.
+Subscribers own current-plus-tail observation. Runtime listeners ignore event-only transitions; event listeners receive only later batches, never historical replay. Slow external callbacks are isolated and may lag without delaying engine truth, Tick, save, or other listeners. A callback failure is observed independently after the triggering commit: it cannot roll back or stall that commit or peer delivery, but it enters the existing fatal session fail-stop.
 
 [`GAME.MD`](GAME.MD) owns Tick, queues, inputs, charges, placement, merge, and other gameplay semantics.
 

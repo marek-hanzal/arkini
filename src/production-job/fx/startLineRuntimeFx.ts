@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { TimeSchema } from "~/engine/common/schema/TimeSchema";
-import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { reconcileOutboundDeliveriesRuntimeFx } from "~/production-delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
 import { settleActionChargesFx } from "~/production-action/fx/settleActionChargesFx";
 import type { applyInputMaterialConsumeRunPlanFx } from "~/production-input/fx/run/applyInputMaterialConsumeRunPlanFx";

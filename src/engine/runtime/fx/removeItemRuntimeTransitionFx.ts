@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { assertOwnerIdleFx } from "~/production-job/fx/assertOwnerIdleFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";

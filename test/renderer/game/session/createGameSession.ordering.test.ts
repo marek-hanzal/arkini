@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { Effect } from "effect";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";

@@ -2,7 +2,7 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
 import { queryFx } from "~/engine/query/fx/queryFx";
 import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";

@@ -2,6 +2,7 @@ const activeCodePattern = "^(?:src|electron|shared|scripts)(?:/|$)";
 const activeCodeAndTestsPattern = "^(?:src|electron|shared|scripts|test)(?:/|$)";
 const productionCodePattern = "^(?:src|electron|shared)(?:/|$)";
 const applicationEntrypointPattern = "^src/(?:main|createArkiniRouterFx|_route)[.]tsx?$";
+const gameEventPattern = "^src/game-event(?:/|$)";
 const gameConfigPattern = "^src/game-config(?:/|$)";
 const gameStartPattern = "^src/game-start(?:/|$)";
 const arkpackArtifactPattern = "^src/arkpack/(?:ArkpackDescriptor[.]ts$|artifact(?:/|$))";
@@ -47,6 +48,40 @@ const boundaryRules = [
 		},
 		to: {
 			path: "^src/(?!engine(?:/|$)|game-start(?:/|$))|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)",
+		},
+	},
+	{
+		name: "game-event-is-a-downstream-framework-neutral-projection",
+		comment:
+			"Committed Game Events may project exact Engine value results but never own Runtime/State/Tick/save authority, production decisions, delivery products, renderer lifecycle, presentation, routes, or Electron.",
+		severity: "error",
+		from: {
+			path: gameEventPattern,
+		},
+		to: {
+			path: "^src/(?!game-event(?:/|$))|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)",
+			pathNot: [
+				"^src/engine/common/schema/(?:IdSchema|NonNegativeIntegerSchema|PositiveIntegerSchema)[.]ts$",
+				"^src/engine/location/schema/(?:BoardLocationSchema|GridLocationSchema|InputLocationSchema|InventoryLocationSchema|LocationSchema|ReservedLocationSchema)[.]ts$",
+				"^src/engine/merge/schema/(?:SourceActionSchema|TargetEffectSchema)[.]ts$",
+				"^src/engine/placement/fx/applyOutputPlacementFx[.]ts$",
+				"^src/engine/runtime/read/fn/isGridRuntimeItemFn[.]ts$",
+			],
+		},
+	},
+	{
+		name: "game-event-only-types-output-placement-application",
+		comment:
+			"Game Event may describe an already-applied output placement result but never execute placement itself.",
+		severity: "error",
+		from: {
+			path: gameEventPattern,
+		},
+		to: {
+			path: "^src/engine/placement/fx/applyOutputPlacementFx[.]ts$",
+			dependencyTypesNot: [
+				"type-only",
+			],
 		},
 	},
 	{
@@ -146,15 +181,15 @@ const boundaryRules = [
 		},
 	},
 	{
-		name: "game-config-is-upstream-of-delivery",
+		name: "game-config-is-upstream-of-gameplay-and-delivery",
 		comment:
-			"Authored config, source, diagnostics, validation, resources, and compilation stay platform-neutral and upstream of Arkpack delivery and Editor Build.",
+			"Authored config, source, diagnostics, validation, resources, and compilation stay platform-neutral and upstream of committed Game Events, Arkpack delivery, and Editor Build.",
 		severity: "error",
 		from: {
 			path: gameConfigPattern,
 		},
 		to: {
-			path: `^src/(?:arkpack|editor-build|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+			path: `^src/(?:game-event|arkpack|editor-build|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
 		},
 	},
 	{
@@ -482,10 +517,10 @@ const boundaryRules = [
 	{
 		name: "domain-code-does-not-import-electron-contract",
 		comment:
-			"Framework-neutral Engine, authored Game configuration, Arkpack artifacts, and product domains never depend on Electron transport contracts.",
+			"Framework-neutral Engine, Game Event facts, authored Game configuration, Arkpack artifacts, and product domains never depend on Electron transport contracts.",
 		severity: "error",
 		from: {
-			path: `^src/engine(?:/|$)|${gameStartPattern}|${gameConfigPattern}|${arkpackArtifactPattern}|${productDomainPattern}|${authoringProductCorePattern}`,
+			path: `^src/engine(?:/|$)|${gameStartPattern}|${gameEventPattern}|${gameConfigPattern}|${arkpackArtifactPattern}|${productDomainPattern}|${authoringProductCorePattern}`,
 		},
 		to: {
 			path: "^electron/contract(?:/|$)",

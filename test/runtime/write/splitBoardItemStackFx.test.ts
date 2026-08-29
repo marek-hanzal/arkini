@@ -2,7 +2,7 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";

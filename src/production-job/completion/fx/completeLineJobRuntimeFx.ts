@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
-import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import { readOutputPlacementItemEventsFx } from "~/game-event/readOutputPlacementItemEventsFx";
 import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx";
 import type { JobCompletionContext } from "~/production-job/completion/JobCompletionContext";
 import { makeChargeDepletionRandomFx } from "~/production-job/random/makeChargeDepletionRandomFx";

@@ -1,6 +1,6 @@
 import { Effect, Option } from "effect";
 
-import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { placeRuntimeItemFx } from "~/engine/placement/fx/placeRuntimeItemFx";

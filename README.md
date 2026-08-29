@@ -24,6 +24,7 @@ Read the smallest entry point needed for the task:
 ```text
 src/engine    remaining live gameplay runtime, session, placement, merge and platform-neutral support owners
 src/game-start  initial-state schemas, exact placement planning and atomic runtime start
+src/game-event  committed gameplay event schemas and exact downstream event projection
 src/production-action  immediate action admission, rules and charge settlement
 src/production-condition  authored runtime condition evaluation
 src/production-input  line-input schemas, material planning and storage lifecycle

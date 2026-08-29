@@ -1,15 +1,45 @@
-import { Cause, Effect, Exit } from "effect";
+import { encode } from "@msgpack/msgpack";
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { ArkpackDecodeError } from "~/engine/pack/error/ArkpackDecodeError";
+import { Magic } from "~/engine/pack/Magic";
 import { decodeFx } from "~/engine/pack/fx/decodeFx";
 
-describe("decodeFx", () => {
-	it("treats malformed pack data as a defect", () => {
-		const exit = Effect.runSyncExit(decodeFx(new Uint8Array()));
+const createManifestOnlyPackFn = (manifest: Uint8Array) => {
+	const headerLength = Magic.byteLength + 4;
+	const bytes = new Uint8Array(headerLength + manifest.byteLength);
+	bytes.set(Magic);
+	new DataView(bytes.buffer).setUint32(Magic.byteLength, manifest.byteLength, true);
+	bytes.set(manifest, headerLength);
+	return bytes;
+};
 
-		expect(Exit.isFailure(exit)).toBe(true);
-		if (Exit.isFailure(exit)) {
-			expect(Cause.hasDies(exit.cause)).toBe(true);
+describe("decodeFx", () => {
+	it.each([
+		[
+			"truncated header",
+			new Uint8Array(),
+		],
+		[
+			"invalid MessagePack manifest",
+			createManifestOnlyPackFn(
+				new Uint8Array([
+					0xc1,
+				]),
+			),
+		],
+		[
+			"schema-invalid manifest",
+			createManifestOnlyPackFn(encode({})),
+		],
+	])("rejects a %s through the typed decode channel", (_, bytes) => {
+		const result = Effect.runSync(Effect.result(decodeFx(bytes)));
+
+		expect(result._tag).toBe("Failure");
+		if (result._tag === "Failure") {
+			expect(result.failure).toBeInstanceOf(ArkpackDecodeError);
+			expect(result.failure.message.length).toBeGreaterThan(0);
 		}
 	});
 });

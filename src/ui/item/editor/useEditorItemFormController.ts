@@ -19,7 +19,7 @@ import { readEditorItemSectionForPathFx } from "~/ui/item/editor/readEditorItemS
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
-import { analyzeEditorProjectCompatibilityFx } from "~/editor/version/analyzeEditorProjectCompatibilityFx";
+import { analyzeEditorProjectCompatibilityFn } from "~/editor/version/fn/analyzeEditorProjectCompatibilityFn";
 
 export namespace useEditorItemFormController {
 	export interface Props {
@@ -120,12 +120,10 @@ export const useEditorItemFormController = ({
 		};
 		if (initialItem.id !== parsed.data.id) delete items[initialItem.id];
 		items[parsed.data.id] = parsed.data;
-		return RendererRuntime.runSync(
-			analyzeEditorProjectCompatibilityFx(project.config, {
-				...project.config,
-				items,
-			}),
-		);
+		return analyzeEditorProjectCompatibilityFn(project.config, {
+			...project.config,
+			items,
+		});
 	}, [
 		dirty,
 		initialItem.id,

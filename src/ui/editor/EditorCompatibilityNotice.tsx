@@ -1,9 +1,8 @@
 import { GitCompareArrows } from "lucide-react";
 
-import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
 import type { EditorProjectCompatibility } from "~/editor/version/EditorProjectCompatibility";
-import { bumpArkpackVersionFx } from "~/editor/version/bumpArkpackVersionFx";
+import { bumpArkpackVersionFn } from "~/editor/version/fn/bumpArkpackVersionFn";
 
 export const EditorCompatibilityNotice = ({
 	compatibility,
@@ -13,7 +12,7 @@ export const EditorCompatibilityNotice = ({
 	readonly version: EditorProjectDescriptor["version"];
 }) => {
 	const result = compatibility?.result ?? "noop";
-	const next = RendererRuntime.runSync(bumpArkpackVersionFx(version, result));
+	const next = bumpArkpackVersionFn(version, result);
 	const presentation =
 		result === "major"
 			? {

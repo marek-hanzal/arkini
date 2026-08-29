@@ -1,5 +1,3 @@
-import { Effect } from "effect";
-
 import type {
 	EditorProjectVersionBinaryDiff,
 	EditorProjectVersionDiff,
@@ -11,7 +9,7 @@ import type {
 	EditorProjectCompatibilityContext,
 	EditorProjectCompatibilityDiffResult,
 } from "~/editor/version/EditorProjectCompatibility";
-import { analyzeEditorProjectCompatibilityFx } from "~/editor/version/analyzeEditorProjectCompatibilityFx";
+import { analyzeEditorProjectCompatibilityFn } from "~/editor/version/fn/analyzeEditorProjectCompatibilityFn";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 export interface EditorProjectVersionDiffSnapshot {
@@ -147,54 +145,46 @@ const readBinaryDiffs = (
 		});
 
 /** Projects the canonical Editor semantic diff into Versions and adds opaque sidecar changes. */
-export const createEditorProjectVersionDiffFx = Effect.fn("createEditorProjectVersionDiffFx")(
-	function* (
-		from: EditorProjectVersionReference,
-		to: EditorProjectVersionReference,
-		before: EditorProjectVersionDiffSnapshot,
-		after: EditorProjectVersionDiffSnapshot,
-	) {
-		const compatibility = yield* analyzeEditorProjectCompatibilityFx(
-			before.config,
-			after.config,
-		);
-		const project = [
-			...(before.arkpackVersion === after.arkpackVersion
-				? []
-				: [
-						{
-							after: after.arkpackVersion,
-							before: before.arkpackVersion,
-							path: "arkpackVersion",
-						},
-					]),
-			...compatibility.context
-				.filter(({ path }) => path[0] !== "items")
-				.map((context) =>
-					materializeContext(
-						context,
-						[
-							"config",
-							...context.path,
-						].join("."),
-					),
+export const createEditorProjectVersionDiffFn = (
+	from: EditorProjectVersionReference,
+	to: EditorProjectVersionReference,
+	before: EditorProjectVersionDiffSnapshot,
+	after: EditorProjectVersionDiffSnapshot,
+) => {
+	const compatibility = analyzeEditorProjectCompatibilityFn(before.config, after.config);
+	const project = [
+		...(before.arkpackVersion === after.arkpackVersion
+			? []
+			: [
+					{
+						after: after.arkpackVersion,
+						before: before.arkpackVersion,
+						path: "arkpackVersion",
+					},
+				]),
+		...compatibility.context
+			.filter(({ path }) => path[0] !== "items")
+			.map((context) =>
+				materializeContext(
+					context,
+					[
+						"config",
+						...context.path,
+					].join("."),
 				),
-		];
-		const items = readItemDiffs(before.config.items, after.config.items, compatibility.context);
-		const resources = readBinaryDiffs(before.resources, after.resources, "minor");
-		const scenarios = readBinaryDiffs(before.scenarios, after.scenarios);
-		return {
-			from,
-			to,
-			hasChanges:
-				project.length > 0 ||
-				items.length > 0 ||
-				resources.length > 0 ||
-				scenarios.length > 0,
-			project,
-			items,
-			resources,
-			scenarios,
-		} satisfies EditorProjectVersionDiff;
-	},
-);
+			),
+	];
+	const items = readItemDiffs(before.config.items, after.config.items, compatibility.context);
+	const resources = readBinaryDiffs(before.resources, after.resources, "minor");
+	const scenarios = readBinaryDiffs(before.scenarios, after.scenarios);
+	return {
+		from,
+		to,
+		hasChanges:
+			project.length > 0 || items.length > 0 || resources.length > 0 || scenarios.length > 0,
+		project,
+		items,
+		resources,
+		scenarios,
+	} satisfies EditorProjectVersionDiff;
+};

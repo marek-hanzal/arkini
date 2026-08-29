@@ -5,7 +5,7 @@ import { useCallback, useMemo, useRef } from "react";
 import { useEditorProject } from "~/ui/editor/useEditorProject";
 import { createEditorProjectConfigFn } from "~/ui/project/editor/fn/createEditorProjectConfigFn";
 import { createEditorProjectFormSchema } from "~/ui/project/editor/createEditorProjectFormSchema";
-import { analyzeEditorProjectStructuralCompatibilityFx } from "~/ui/project/editor/analyzeEditorProjectStructuralCompatibilityFx";
+import { analyzeEditorProjectStructuralCompatibilityFn } from "~/ui/project/editor/fn/analyzeEditorProjectStructuralCompatibilityFn";
 import { readEditorProjectFormValuesFn } from "~/ui/project/editor/fn/readEditorProjectFormValuesFn";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { saveEditorProjectConfigCommandAtom } from "~/ui/project/editor/saveEditorProjectConfigCommandAtom";
@@ -14,7 +14,7 @@ import type { EditorProjectSectionId } from "~/ui/project/editor/EditorProjectSe
 import { readEditorProjectSectionForPathFx } from "~/ui/project/editor/readEditorProjectSectionForPathFx";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
-import { analyzeEditorProjectCompatibilityFx } from "~/editor/version/analyzeEditorProjectCompatibilityFx";
+import { analyzeEditorProjectCompatibilityFn } from "~/editor/version/fn/analyzeEditorProjectCompatibilityFn";
 
 export const useEditorProjectFormController = ({
 	onInvalidSection,
@@ -65,12 +65,9 @@ export const useEditorProjectFormController = ({
 	const compatibility = useMemo(() => {
 		if (!dirty) return undefined;
 		const parsed = schema.safeParse(values);
-		if (!parsed.success)
-			return RendererRuntime.runSync(
-				analyzeEditorProjectStructuralCompatibilityFx(project, values),
-			);
+		if (!parsed.success) return analyzeEditorProjectStructuralCompatibilityFn(project, values);
 		const config = createEditorProjectConfigFn(project, parsed.data);
-		return RendererRuntime.runSync(analyzeEditorProjectCompatibilityFx(project.config, config));
+		return analyzeEditorProjectCompatibilityFn(project.config, config);
 	}, [
 		dirty,
 		project,

@@ -1,5 +1,3 @@
-import { Effect } from "effect";
-
 import type { EditorProjectCompatibilityPath } from "~/editor/version/EditorProjectCompatibility";
 import type { EditorProjectSemanticDiff } from "~/editor/version/EditorProjectSemanticDiff";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
@@ -270,16 +268,16 @@ const readItemDiffs = (
 };
 
 /** Produces stable semantic config paths without classifying compatibility policy. */
-export const readEditorProjectSemanticDiffsFx = Effect.fn("readEditorProjectSemanticDiffsFx")(
-	(before: GameConfigSchema.Type, after: GameConfigSchema.Type) =>
-		Effect.sync(() => {
-			const omittedItems: ReadonlySet<string> = new Set([
-				"items",
-			]);
-			const diffs: ReadonlyArray<EditorProjectSemanticDiff> = [
-				...readRecordDiffs(asRecord(before), asRecord(after), [], omittedItems),
-				...readItemDiffs(before.items, after.items),
-			];
-			return diffs;
-		}),
-);
+export const readEditorProjectSemanticDiffsFn = (
+	before: GameConfigSchema.Type,
+	after: GameConfigSchema.Type,
+) => {
+	const omittedItems: ReadonlySet<string> = new Set([
+		"items",
+	]);
+	const diffs: ReadonlyArray<EditorProjectSemanticDiff> = [
+		...readRecordDiffs(asRecord(before), asRecord(after), [], omittedItems),
+		...readItemDiffs(before.items, after.items),
+	];
+	return diffs;
+};

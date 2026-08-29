@@ -1,7 +1,6 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { createEditorProjectVersionDiffFx } from "~/editor/version/createEditorProjectVersionDiffFx";
+import { createEditorProjectVersionDiffFn } from "~/editor/version/fn/createEditorProjectVersionDiffFn";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
@@ -14,26 +13,24 @@ const to = {
 };
 
 const readConfigDiff = (before: GameConfigSchema.Type, after: GameConfigSchema.Type) =>
-	Effect.runSync(
-		createEditorProjectVersionDiffFx(
-			from,
-			to,
-			{
-				arkpackVersion: "1.0",
-				config: before,
-				resources: new Map(),
-				scenarios: new Map(),
-			},
-			{
-				arkpackVersion: "2.0",
-				config: after,
-				resources: new Map(),
-				scenarios: new Map(),
-			},
-		),
+	createEditorProjectVersionDiffFn(
+		from,
+		to,
+		{
+			arkpackVersion: "1.0",
+			config: before,
+			resources: new Map(),
+			scenarios: new Map(),
+		},
+		{
+			arkpackVersion: "2.0",
+			config: after,
+			resources: new Map(),
+			scenarios: new Map(),
+		},
 	);
 
-describe("createEditorProjectVersionDiffFx", () => {
+describe("createEditorProjectVersionDiffFn", () => {
 	it("keeps an item ID rename under its UID when another item releases that ID", () => {
 		const reserved = {
 			...editorTestPayload.config.items.water,
@@ -156,55 +153,53 @@ describe("createEditorProjectVersionDiffFx", () => {
 				},
 			},
 		});
-		const diff = Effect.runSync(
-			createEditorProjectVersionDiffFx(
-				from,
-				to,
-				{
-					arkpackVersion: "1.0",
-					config: editorTestPayload.config,
-					resources: new Map([
-						[
-							"deleted",
-							"deleted-hash",
-						],
-						[
-							"hero",
-							"old-hero-hash",
-						],
-					]),
-					scenarios: new Map([
-						[
-							"Opening",
-							"same-save-hash",
-						],
-					]),
-				},
-				{
-					arkpackVersion: "2.0",
-					config: afterConfig,
-					resources: new Map([
-						[
-							"added",
-							"added-hash",
-						],
-						[
-							"hero",
-							"new-hero-hash",
-						],
-					]),
-					scenarios: new Map([
-						[
-							"Opening",
-							"same-save-hash",
-						],
-						[
-							"Variant",
-							"new-save-hash",
-						],
-					]),
-				},
-			),
+		const diff = createEditorProjectVersionDiffFn(
+			from,
+			to,
+			{
+				arkpackVersion: "1.0",
+				config: editorTestPayload.config,
+				resources: new Map([
+					[
+						"deleted",
+						"deleted-hash",
+					],
+					[
+						"hero",
+						"old-hero-hash",
+					],
+				]),
+				scenarios: new Map([
+					[
+						"Opening",
+						"same-save-hash",
+					],
+				]),
+			},
+			{
+				arkpackVersion: "2.0",
+				config: afterConfig,
+				resources: new Map([
+					[
+						"added",
+						"added-hash",
+					],
+					[
+						"hero",
+						"new-hero-hash",
+					],
+				]),
+				scenarios: new Map([
+					[
+						"Opening",
+						"same-save-hash",
+					],
+					[
+						"Variant",
+						"new-save-hash",
+					],
+				]),
+			},
 		);
 
 		expect(diff.from).toEqual(from);

@@ -1,4 +1,4 @@
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 const simpleItem = (id: string) => ({
 	uid: id,

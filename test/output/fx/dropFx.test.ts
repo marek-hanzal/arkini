@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { dropFx } from "~/engine/output/fx/dropFx";
 
 const config = GameConfigSchema.parse({

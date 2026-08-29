@@ -1,7 +1,7 @@
 import { Command } from "effect/unstable/cli";
-import { PackCommand } from "~/engine/pack/cli/PackCommand";
-import { SchemaCommand } from "~/engine/schema/cli/SchemaCommand";
-import { ValidateCommand } from "~/engine/validation/cli/ValidateCommand";
+import { PackCommand } from "~/arkpack/artifact/cli/PackCommand";
+import { SchemaCommand } from "~/game-config/cli/SchemaCommand";
+import { ValidateCommand } from "~/game-config/cli/ValidateCommand";
 
 export const GameCommand = Command.make("game")
 	.pipe(

@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { startTestConfig } from "~test/start/fx/support/startTestConfig";
 import { startFx } from "~/engine/start/write/startFx";
 

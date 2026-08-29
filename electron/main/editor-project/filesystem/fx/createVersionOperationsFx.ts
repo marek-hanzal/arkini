@@ -9,7 +9,7 @@ import type { EditorProject } from "~/editor/EditorProject";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 import type { EditorBoardScenarioSchema } from "~/editor/board/EditorBoardScenarioSchema";
 import { EditorBoardScenarioFileSchema } from "~/editor/filesystem/EditorBoardScenarioFileSchema";
-import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
+import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
 import { EditorVersionDescriptorFileSchema } from "~/editor/filesystem/EditorVersionDescriptorFileSchema";
 import { EditorVersionHeadFileSchema } from "~/editor/filesystem/EditorVersionHeadFileSchema";
 import type {

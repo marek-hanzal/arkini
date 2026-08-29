@@ -5,7 +5,7 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
 import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 
 const baseItem = ({ id }: { id: string }) => ({

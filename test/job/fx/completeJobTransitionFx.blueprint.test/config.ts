@@ -4,7 +4,7 @@ import { BlueprintSchema } from "~/engine/item/schema/BlueprintSchema";
 import { SimpleSchema } from "~/engine/item/schema/SimpleSchema";
 import { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 const simpleItem = ({
 	id,

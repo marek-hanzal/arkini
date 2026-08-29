@@ -6,7 +6,7 @@ import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { StateSchema } from "~/engine/state/schema/StateSchema";
 import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";

@@ -2,7 +2,7 @@ import type { EditorProjectCompatibilityPath } from "~/editor/version/EditorProj
 import type { EditorProjectSemanticDiff } from "~/editor/version/EditorProjectSemanticDiff";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
-import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 interface MissingDiffValue {
 	readonly type: "missing";

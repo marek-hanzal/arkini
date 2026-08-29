@@ -11,7 +11,7 @@ import { releaseInventoryItemFx } from "~/engine/runtime/write/releaseInventoryI
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { storeItemInInventoryFx } from "~/engine/runtime/write/storeItemInInventoryFx";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 

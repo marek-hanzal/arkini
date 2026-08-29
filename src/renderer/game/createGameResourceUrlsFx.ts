@@ -1,6 +1,6 @@
 import { Effect, Exit, Scope } from "effect";
 
-import type { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
+import type { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
 
 export namespace createGameResourceUrlsFx {
 	export interface Props {

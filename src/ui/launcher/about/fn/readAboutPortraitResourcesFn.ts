@@ -1,5 +1,5 @@
-import type { PayloadSchema } from "~/engine/pack/schema/PayloadSchema";
-import type { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
+import type { PayloadSchema } from "~/arkpack/artifact/schema/PayloadSchema";
+import type { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
 
 const avatarRoles = [
 	"avatar-01",

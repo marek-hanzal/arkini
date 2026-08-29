@@ -6,6 +6,8 @@ import { acquireGameEngineResourceFx } from "~/renderer/game/resource/acquireGam
 import { createGameFx } from "~/renderer/game/createGameFx";
 import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
 import { createElectronEditorProjectRepositoryFx } from "~/renderer/editor/createElectronEditorProjectRepositoryFx";
+import { EditorBuildRepository } from "~/editor-build/domain/EditorBuildRepository";
+import { createElectronEditorBuildRepositoryFx } from "~/editor-build/renderer/createElectronEditorBuildRepositoryFx";
 import { EditorBoardGameResourceOwnerAtom } from "~/renderer/editor/board/EditorBoardGameResourceOwnerAtom";
 import { createEditorBoardGameResourceFx } from "~/renderer/editor/board/createEditorBoardGameResourceFx";
 import { EditorUnsavedChanges } from "~/renderer/editor/unsaved/EditorUnsavedChanges";
@@ -44,6 +46,7 @@ const EditorBoardGameLayer = Layer.effectDiscard(
  */
 export const RendererRuntime: ManagedRuntime.ManagedRuntime<
 	| AtomRegistry.AtomRegistry
+	| EditorBuildRepository
 	| EditorProjectRepository
 	| EditorUnsavedChanges
 	| GameEngineResourceFx,
@@ -51,6 +54,7 @@ export const RendererRuntime: ManagedRuntime.ManagedRuntime<
 > = ManagedRuntime.make(
 	Layer.mergeAll(
 		RendererAtomRegistryLayer,
+		Layer.effect(EditorBuildRepository, createElectronEditorBuildRepositoryFx),
 		Layer.effect(EditorProjectRepository, createElectronEditorProjectRepositoryFx),
 		EditorBoardGameLayer,
 		EditorUnsavedChangesLayer,

@@ -8,7 +8,7 @@ import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx"
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { MetaSchema } from "~/engine/meta/schema/MetaSchema";
-import { RolesSchema } from "~/engine/resource/schema/RolesSchema";
+import { RolesSchema } from "~/game-config/resource/schema/RolesSchema";
 import { StartSchema } from "~/engine/start/schema/StartSchema";
 
 export const EditProjectInputSchema = z

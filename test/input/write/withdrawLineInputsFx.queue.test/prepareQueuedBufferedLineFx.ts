@@ -4,7 +4,7 @@ import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx"
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { getItemFx } from "~/engine/runtime/read/getItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import {
 	inputRuntimeTestConfig,
 	sourceLocation,

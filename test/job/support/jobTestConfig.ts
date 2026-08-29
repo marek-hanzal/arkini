@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 const baseItem = ({ id, scope }: { id: string; scope: "any" | "board" }) => ({
 	uid: id,

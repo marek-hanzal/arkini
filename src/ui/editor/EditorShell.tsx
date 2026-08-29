@@ -15,7 +15,7 @@ import {
 import { flushSync } from "react-dom";
 
 import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
-import { ArkpackCatalogOwnerAtom } from "~/renderer/arkpack/ArkpackCatalogOwnerAtom";
+import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerAtom";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { useEditorProject } from "~/ui/editor/useEditorProject";
 import { Button, ButtonLink } from "~/ui/button/Button";

@@ -4,7 +4,7 @@ import { Cause } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 
 import { ArkiniAppVersion, ArkiniDefaultPackageId } from "../../../shared/ArkiniAppMetadata";
-import { useArkpacks } from "~/ui/arkpack/useArkpacks";
+import { useArkpacks } from "~/arkpack/ui/useArkpacks";
 import { EditorServiceStatusAtom } from "~/ui/editor/EditorServiceStatusAtom";
 import { Button, ButtonLink, PrimaryButton, PrimaryButtonLink } from "~/ui/button/Button";
 import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";

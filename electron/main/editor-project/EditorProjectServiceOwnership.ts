@@ -6,8 +6,11 @@ import type {
 	EditorProjectRepositoryService,
 } from "~/editor/EditorProjectRepository";
 import type { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
+import type { EditorBuildRepositoryService } from "~/editor-build/domain/EditorBuildRepository";
 
-export interface OwnedEditorProjectRepository extends EditorProjectRepositoryService {
+export interface OwnedEditorProjectRepository
+	extends EditorProjectRepositoryService,
+		EditorBuildRepositoryService {
 	readonly closeFx: Effect.Effect<void>;
 	readonly openProjectFx: (
 		props: EditorProjectRepository.OpenProjectProps,

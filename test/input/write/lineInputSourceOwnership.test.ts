@@ -8,7 +8,7 @@ import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx"
 import { readItemDetailMaterialAutofillAvailabilityFx } from "~/engine/item-detail/read/readItemDetailMaterialAutofillAvailabilityFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 

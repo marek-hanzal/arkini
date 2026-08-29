@@ -2,7 +2,7 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { StateSchema } from "~/engine/state/schema/StateSchema";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";

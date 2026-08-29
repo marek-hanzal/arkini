@@ -1,6 +1,9 @@
 import { Effect } from "effect";
 
-import { PngResourceLimits, validatePngResourceFx } from "~/renderer/arkpack/validatePngResourceFx";
+import {
+	PngResourceLimits,
+	validatePngResourceFx,
+} from "~/renderer/resource/validatePngResourceFx";
 import { readEditorAssetResourceIdFn } from "~/editor/resource/fn/readEditorAssetResourceIdFn";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";

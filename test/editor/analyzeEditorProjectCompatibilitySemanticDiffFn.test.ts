@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import { analyzeEditorProjectCompatibilityFn } from "~/editor/version/fn/analyzeEditorProjectCompatibilityFn";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { editorTestConfig } from "~test/editor/support/editorTestPayload";
 import {
 	createLine,
 	createOutput,
 	createProducerItem,
-} from "~test/validation/support/gameValidationTestSource";
+} from "~test/game-config/validation/support/gameValidationTestSource";
 
 const analyze = (previous: GameConfigSchema.Type, next: GameConfigSchema.Type) =>
 	analyzeEditorProjectCompatibilityFn(previous, next);

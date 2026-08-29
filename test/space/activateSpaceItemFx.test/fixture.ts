@@ -5,7 +5,7 @@ import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { activateSpaceItemFx } from "~/engine/space/write/activateSpaceItemFx";
 
 const baseItem = (id: string, scope: "any" | "board" | "inventory" = "any") => ({

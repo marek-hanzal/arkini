@@ -6,7 +6,7 @@ import {
 	type DiagnosticRecord,
 	DiagnosticRecordSchema,
 } from "../../../../electron/contract/diagnostics/DiagnosticRecord";
-import type { ArkpackDescriptor } from "~/engine/pack/Arkpack";
+import type { ArkpackDescriptor } from "~/arkpack/ArkpackDescriptor";
 import type { GameSession, GameTransition } from "~/renderer/game/session/GameSession";
 import { installGameDiagnosticsFx } from "~/renderer/game/diagnostics/installGameDiagnosticsFx";
 import { GameSessionFatalError } from "~/renderer/game/session/GameSessionFatalError";

@@ -2,10 +2,18 @@ import { FileSystem } from "effect";
 import { Effect } from "effect";
 import { join } from "node:path";
 import { LastPackageIdSchema } from "../../contract/launcher/LastPackageIdSchema";
+import type { ElectronMainError } from "../ElectronMainError";
 import { readElectronPreferenceFx } from "../preference/readElectronPreferenceFx";
 import { writeElectronPreferenceFx } from "../preference/writeElectronPreferenceFx";
-import type { LauncherPreferences } from "./LauncherPreferences";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
+
+/** Effect-native main-process capability for application-wide launcher preferences. */
+export interface LauncherPreferences {
+	readonly readLastPackageIdFx: Effect.Effect<LastPackageIdSchema.Type | null, ElectronMainError>;
+	readonly writeLastPackageIdFx: (
+		packageId: LastPackageIdSchema.Type,
+	) => Effect.Effect<void, ElectronMainError>;
+}
 
 export namespace createFilesystemLauncherPreferencesFx {
 	export interface Props {

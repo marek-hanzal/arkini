@@ -3,9 +3,13 @@ import { Deferred, Effect, Exit, Fiber, FiberHandle, Queue, Scope, SynchronizedR
 import { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import type { WindowModeSchema } from "../../contract/window/WindowModeSchema";
 import { ElectronMainRuntime } from "../ElectronMainRuntime";
-import type { WindowModeController } from "./WindowModeController";
-import type { WindowPreferences } from "./WindowPreferences";
+import type { WindowPreferences } from "./createFilesystemWindowPreferencesFx";
 import { calculateInitialWindowBoundsFn } from "./fn/calculateInitialWindowBoundsFn";
+
+/** Sole per-BrowserWindow authority for requested and Electron-confirmed native modes. */
+export interface WindowModeController {
+	readonly requestModeFx: (mode: WindowModeSchema.Type) => Effect.Effect<void, unknown>;
+}
 
 type WindowedMode = Exclude<WindowModeSchema.Type, "fullscreen">;
 

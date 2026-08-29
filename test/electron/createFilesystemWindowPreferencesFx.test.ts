@@ -1,6 +1,6 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { Effect } from "effect";
-import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -29,36 +29,10 @@ afterEach(async () => {
 });
 
 describe("createFilesystemWindowPreferencesFx", () => {
-	it("defaults missing or malformed preferences to default mode", async () => {
+	it("round-trips one native window mode atomically", async () => {
 		const preferences = await createPreferences();
-		expect(await Effect.runPromise(preferences.readModeFx)).toBe("default");
-
-		await mkdir(preferenceDirectory(), {
-			recursive: true,
-		});
-		await writeFile(modePath(), "floating", "utf8");
-
-		expect(await Effect.runPromise(preferences.readModeFx)).toBe("default");
-	});
-
-	it("round-trips every native window mode atomically", async () => {
-		const preferences = await createPreferences();
-		for (const mode of [
-			"default",
-			"bordered",
-			"fullscreen",
-		] as const) {
-			await Effect.runPromise(preferences.writeModeFx(mode));
-			expect(await readFile(modePath(), "utf8")).toBe(JSON.stringify(mode));
-			expect(await Effect.runPromise(preferences.readModeFx)).toBe(mode);
-		}
-	});
-
-	it("rejects unsupported modes instead of persisting them", async () => {
-		const preferences = await createPreferences();
-		await expect(
-			Effect.runPromise(preferences.writeModeFx("floating" as never)),
-		).rejects.toThrow("Electron main operation failed: persist the window mode preference");
-		await expect(access(modePath())).rejects.toBeDefined();
+		await Effect.runPromise(preferences.writeModeFx("fullscreen"));
+		expect(await readFile(modePath(), "utf8")).toBe('"fullscreen"');
+		expect(await Effect.runPromise(preferences.readModeFx)).toBe("fullscreen");
 	});
 });

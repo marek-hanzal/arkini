@@ -7,11 +7,18 @@ import { Effect, Semaphore } from "effect";
 
 import type { CompletionShell, CompletionStatus } from "../../contract/cli/CompletionStatus";
 import { ElectronMainError } from "../ElectronMainError";
-import type { Completion } from "./Completion";
 import { createManagedFileFx } from "./createManagedFileFx";
 
 const execFileAsync = promisify(execFile);
 const managedCompletionPrefix = "# arkini-cli managed completion\n";
+
+/** Main-process ownership of one user-level shell completion file. */
+export interface Completion {
+	readonly readStatusFx: Effect.Effect<CompletionStatus, ElectronMainError>;
+	readonly installFx: Effect.Effect<CompletionStatus, ElectronMainError>;
+	readonly replaceFx: Effect.Effect<CompletionStatus, ElectronMainError>;
+	readonly uninstallFx: Effect.Effect<CompletionStatus, ElectronMainError>;
+}
 
 export namespace createCompletionFx {
 	export interface Props {

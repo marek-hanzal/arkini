@@ -2,20 +2,17 @@ import { BrowserWindow, ipcMain, Menu, screen } from "electron";
 import { fileURLToPath } from "node:url";
 import { Effect, Exit } from "effect";
 import { ArkiniWindowTitle } from "../../shared/ArkiniAppMetadata";
+import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
 import { ElectronMainError } from "./ElectronMainError";
 import { registerControlledWindowCloseFx } from "./registerControlledWindowCloseFx";
-import { showMainWindowFx } from "./showMainWindowFx";
-import { ElectronMainRuntime } from "./ElectronMainRuntime";
 import type { TrustedRenderer } from "./security/TrustedRenderer";
 import { createWindowModeControllerFx } from "./window/createWindowModeControllerFx";
 import { calculateInitialWindowBoundsFn } from "./window/fn/calculateInitialWindowBoundsFn";
-import { registerWindowModeControllerFx } from "./window/registerWindowModeControllerFx";
-import type { WindowModeControllerOwnership } from "./window/WindowModeControllerOwnership";
-import type { WindowPreferences } from "./window/WindowPreferences";
+import type { WindowModeControllerOwnership } from "./window/createWindowModeControllerOwnershipFx";
+import type { WindowPreferences } from "./window/createFilesystemWindowPreferencesFx";
 import type { WindowModeSchema } from "../contract/window/WindowModeSchema";
 import { createChatGptViewControllerFx } from "./chatgpt/createChatGptViewControllerFx";
-import type { ChatGptViewControllerOwnership } from "./chatgpt/ChatGptViewControllerOwnership";
-import { registerChatGptViewControllerFx } from "./chatgpt/registerChatGptViewControllerFx";
+import type { ChatGptViewControllerOwnership } from "./chatgpt/createChatGptViewControllerOwnershipFx";
 
 export namespace createMainWindowFx {
 	export interface Props {
@@ -56,17 +53,17 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 			});
 
 			const onReadyToShow = () => {
-				ElectronMainRuntime.runSync(showMainWindowFx(window));
+				window.show();
+				window.webContents.send(ArkiniElectronApi.channels.windowVisible);
 			};
 
 			return yield* Effect.gen(function* () {
 				yield* trustedRenderer.registerWindowFx(window);
 				const chatGptViewController = yield* createChatGptViewControllerFx(window);
-				yield* registerChatGptViewControllerFx({
-					controller: chatGptViewController,
-					ownership: chatGptViewControllerOwnership,
+				yield* chatGptViewControllerOwnership.attachControllerFx(
 					window,
-				});
+					chatGptViewController,
+				);
 				if (windowMode === "bordered") {
 					yield* Effect.sync(() => window.maximize());
 				}
@@ -75,11 +72,10 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 					window,
 					windowPreferences,
 				});
-				yield* registerWindowModeControllerFx({
-					controller: windowModeController,
-					ownership: windowModeControllerOwnership,
+				yield* windowModeControllerOwnership.attachControllerFx(
 					window,
-				});
+					windowModeController,
+				);
 				yield* registerControlledWindowCloseFx({
 					window,
 					ipc: ipcMain,

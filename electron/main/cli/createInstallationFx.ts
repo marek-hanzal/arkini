@@ -5,11 +5,18 @@ import { Effect, Semaphore } from "effect";
 
 import type { InstallationStatus } from "../../contract/cli/InstallationStatus";
 import { ElectronMainError } from "../ElectronMainError";
-import type { Installation } from "./Installation";
 import { createManagedFileFx } from "./createManagedFileFx";
 
 const managedCommandPrefix = "#!/bin/sh\n# arkini-cli managed launcher\n";
 const quoteShellArgument = (value: string) => `'${value.replaceAll("'", `'"'"'`)}'`;
+
+/** Main-process ownership of the one user-level arkini-cli command link. */
+export interface Installation {
+	readonly readStatusFx: Effect.Effect<InstallationStatus, ElectronMainError>;
+	readonly installFx: Effect.Effect<InstallationStatus, ElectronMainError>;
+	readonly replaceFx: Effect.Effect<InstallationStatus, ElectronMainError>;
+	readonly uninstallFx: Effect.Effect<InstallationStatus, ElectronMainError>;
+}
 
 export namespace createInstallationFx {
 	export interface Props {

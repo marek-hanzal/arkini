@@ -52,9 +52,8 @@ format_check() {
 
 dependency_check() {
 	depcruise \
-		src/engine src/editor src/renderer src/ui src/@routes \
-		src/main.tsx src/createArkiniRouterFx.tsx src/_route.ts \
-		electron electron.vite.config.ts test \
+		src electron shared scripts test \
+		electron.vite.config.ts vitest.config.ts \
 		--output-type err-long
 }
 
@@ -304,6 +303,11 @@ typecheck() {
 	tsc -p tsconfig.json --noEmit --noUnusedLocals --noUnusedParameters
 	tsc -p tsconfig.test.json --noEmit --noUnusedLocals --noUnusedParameters
 	tsc -p tsconfig.electron.json --noEmit --noUnusedLocals --noUnusedParameters
+}
+
+# @cmd Validate the complete active dependency graph
+dc() {
+	dependency_check
 }
 
 run_tests() {

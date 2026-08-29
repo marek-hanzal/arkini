@@ -4,9 +4,9 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
-import { makeDropActorRejectedResultFx } from "~/engine/runtime/drop/makeDropActorRejectedResultFx";
+import { makeDropActorRejectedResultFn } from "~/engine/runtime/drop/fn/makeDropActorRejectedResultFn";
 import { makeDropRejectedResultFn } from "~/engine/runtime/drop/fn/makeDropRejectedResultFn";
-import { projectDropTransferActorFx } from "~/engine/runtime/drop/projectDropTransferActorFx";
+import { projectDropTransferActorFn } from "~/engine/runtime/drop/fn/projectDropTransferActorFn";
 import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
 import type { DropItemResult } from "~/engine/runtime/DropItemResult";
 import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
@@ -59,7 +59,7 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 			expectedSourceLocation: sourceLocation,
 			quantity,
 		});
-		const source = yield* projectDropTransferActorFx({
+		const source = projectDropTransferActorFn({
 			after: stored.sourceItem,
 			before: stored.sourceBefore,
 		});
@@ -79,33 +79,41 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 	}).pipe(
 		Effect.catchTags({
 			ItemNotFoundError: (error) =>
-				makeDropActorRejectedResultFx({
-					failedItemId: error.itemId,
-					failure: "stale",
-					sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeDropActorRejectedResultFn({
+						failedItemId: error.itemId,
+						failure: "stale",
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			RevisionConflictError: (error) =>
-				makeDropActorRejectedResultFx({
-					failedItemId: error.entityId,
-					failure: "stale",
-					sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeDropActorRejectedResultFn({
+						failedItemId: error.entityId,
+						failure: "stale",
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			ItemLocationConflictError: (error) =>
-				makeDropActorRejectedResultFx({
-					failedItemId: error.itemId,
-					failure: "stale",
-					sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeDropActorRejectedResultFn({
+						failedItemId: error.itemId,
+						failure: "stale",
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			ItemNotOnGridError: (error) =>
-				makeDropActorRejectedResultFx({
-					failedItemId: error.itemId,
-					failure: "invalid-location",
-					sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeDropActorRejectedResultFn({
+						failedItemId: error.itemId,
+						failure: "invalid-location",
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			CrossSpaceBoardOperationError: () =>
 				Effect.succeed(
 					makeDropRejectedResultFn({

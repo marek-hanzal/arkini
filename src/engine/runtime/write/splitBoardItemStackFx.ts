@@ -7,7 +7,7 @@ import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocation
 import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
-import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
+import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
@@ -82,10 +82,10 @@ export const splitBoardItemStackFx = Effect.fn("splitBoardItemStackFx")(function
 				);
 			}
 			if (
-				!(yield* isItemPureFx({
+				!isItemPureFn({
 					item: sourceBefore,
 					runtime,
-				}))
+				})
 			) {
 				return yield* Effect.fail(
 					new ItemStatefulError({

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
-import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
+import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -27,7 +27,7 @@ export namespace resolveMergeReplacementChargesFx {
  */
 export const resolveMergeReplacementChargesFx = Effect.fn("resolveMergeReplacementChargesFx")(
 	function* ({ resultItem, runtime, target }: resolveMergeReplacementChargesFx.Props) {
-		const otherwisePure = yield* isItemPureFx({
+		const otherwisePure = isItemPureFn({
 			item: {
 				...target,
 				remainingCharges: undefined,

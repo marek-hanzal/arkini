@@ -9,7 +9,7 @@ import { releaseOwnerInputsFx } from "~/engine/input/fx/releaseOwnerInputsFx";
 import { ItemChargesUnavailableError } from "~/engine/item/error/ItemChargesUnavailableError";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { isolateGridStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateGridStatefulOwnerTransitionFx";
-import { readItemRemainingChargesFx } from "~/engine/item/fx/readItemRemainingChargesFx";
+import { readItemRemainingChargesFn } from "~/engine/item/fn/readItemRemainingChargesFn";
 import { outputFx } from "~/engine/output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
@@ -57,7 +57,7 @@ export const spendActionChargesFx = Effect.fn("spendActionChargesFx")(function* 
 		);
 	}
 
-	const remainingCharges = yield* readItemRemainingChargesFx(item);
+	const remainingCharges = readItemRemainingChargesFn(item);
 	if (remainingCharges === undefined || remainingCharges < cost) {
 		return yield* Effect.fail(
 			new ItemChargesUnavailableError({

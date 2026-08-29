@@ -1,7 +1,6 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
+import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { purityTestConfig } from "~test/line/support/purityTestConfig";
 
@@ -30,7 +29,7 @@ const simple = {
 	revision: "revision:material",
 };
 
-describe("isItemPureFx", () => {
+describe("isItemPureFn", () => {
 	it("accepts items that own no line or item state", () => {
 		const runtime = {
 			cheats: {
@@ -49,34 +48,30 @@ describe("isItemPureFx", () => {
 		} satisfies RuntimeSchema.Type;
 
 		expect(
-			Effect.runSync(
-				isItemPureFx({
-					item: producer,
-					runtime,
-				}),
-			),
+			isItemPureFn({
+				item: producer,
+				runtime,
+			}),
 		).toBe(true);
 		expect(
-			Effect.runSync(
-				isItemPureFx({
-					item: simple,
-					runtime: {
-						cheats: {
-							enabled: false,
-							everEnabled: false,
-							instantGameplay: false,
-						},
-						currentSpace: 0,
-						items: [
-							simple,
-						],
-						jobs: [],
-
-						jobQueue: [],
-						defaultLineByOwnerItemId: {},
+			isItemPureFn({
+				item: simple,
+				runtime: {
+					cheats: {
+						enabled: false,
+						everEnabled: false,
+						instantGameplay: false,
 					},
-				}),
-			),
+					currentSpace: 0,
+					items: [
+						simple,
+					],
+					jobs: [],
+
+					jobQueue: [],
+					defaultLineByOwnerItemId: {},
+				},
+			}),
 		).toBe(true);
 	});
 
@@ -107,12 +102,10 @@ describe("isItemPureFx", () => {
 		} satisfies RuntimeSchema.Type;
 
 		expect(
-			Effect.runSync(
-				isItemPureFx({
-					item: producer,
-					runtime,
-				}),
-			),
+			isItemPureFn({
+				item: producer,
+				runtime,
+			}),
 		).toBe(false);
 	});
 
@@ -163,20 +156,16 @@ describe("isItemPureFx", () => {
 		} satisfies RuntimeSchema.Type;
 
 		expect(
-			Effect.runSync(
-				isItemPureFx({
-					item: producer,
-					runtime: activeRuntime,
-				}),
-			),
+			isItemPureFn({
+				item: producer,
+				runtime: activeRuntime,
+			}),
 		).toBe(false);
 		expect(
-			Effect.runSync(
-				isItemPureFx({
-					item: producer,
-					runtime: queuedRuntime,
-				}),
-			),
+			isItemPureFn({
+				item: producer,
+				runtime: queuedRuntime,
+			}),
 		).toBe(false);
 	});
 });

@@ -2,7 +2,7 @@ import { Effect, Option } from "effect";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
-import { readTileActorBadgeCountFx } from "~/ui/pixi/actor/readTileActorBadgeCountFx";
+import { readTileActorBadgeCountFn } from "~/ui/pixi/actor/fn/readTileActorBadgeCountFn";
 import { readTileActorAssetSourceIdsFx } from "~/ui/pixi/actor/readTileActorAssetSourceIdsFx";
 import { readTileActorVisualFx } from "~/ui/pixi/actor/readTileActorVisualFx";
 import type { TileMotionCue } from "~/ui/pixi/motion/TileMotionCue";
@@ -158,7 +158,7 @@ const readInventoryInputSourceItemFx = Effect.fn("readInventoryInputSourceItemFx
 			runtime,
 		}),
 	});
-	const badgeCount = yield* readTileActorBadgeCountFx(source);
+	const badgeCount = readTileActorBadgeCountFn(source);
 	return {
 		...visual,
 		...(badgeCount === undefined

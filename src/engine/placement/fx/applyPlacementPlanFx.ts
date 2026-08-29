@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
-import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
+import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import type { PlacementPlan } from "~/engine/placement/PlacementPlan";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
@@ -45,7 +45,7 @@ export const applyPlacementPlanFx = Effect.fn("applyPlacementPlanFx")(function* 
 			continue;
 		}
 
-		const pure = yield* isItemPureFx({
+		const pure = isItemPureFn({
 			item,
 			runtime,
 		});

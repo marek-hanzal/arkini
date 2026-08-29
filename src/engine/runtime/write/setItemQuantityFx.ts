@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
-import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
+import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import { assertPlacementMaxCountFx } from "~/engine/placement/fx/assertPlacementMaxCountFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
@@ -37,7 +37,7 @@ export const setItemQuantityFx = Effect.fn("setItemQuantityFx")(function* ({
 				runtime,
 			});
 
-			const pure = yield* isItemPureFx({
+			const pure = isItemPureFn({
 				item,
 				runtime,
 			});

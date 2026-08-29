@@ -227,6 +227,12 @@ describe("editor MCP server", () => {
 				itemId: "tool",
 			},
 		});
+		const missingEstimate = await client.callTool({
+			name: "item_estimate",
+			arguments: {
+				itemId: "missing",
+			},
+		});
 
 		expect(relation.isError).not.toBe(true);
 		expect(relation).not.toHaveProperty("structuredContent");
@@ -249,6 +255,15 @@ describe("editor MCP server", () => {
 				text: expect.stringContaining("Item estimate\nItem ID: tool"),
 			},
 		]);
+		expect(missingEstimate).toMatchObject({
+			isError: true,
+			content: [
+				{
+					text: "Editor operation failed: Item missing does not exist in the open project.",
+					type: "text",
+				},
+			],
+		});
 	});
 
 	it("commits, inspects, tags, and renderer-checks out full project versions", async () => {

@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace clearItemJobQueueFx {
 	export interface Props {

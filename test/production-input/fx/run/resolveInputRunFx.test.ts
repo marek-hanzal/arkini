@@ -2,8 +2,8 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { resolveInputRunFx } from "~/production-input/fx/run/resolveInputRunFx";
-import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { InputRuntimeItemSchema } from "~/game-runtime/schema/InputRuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { inputRuntimeTestConfig } from "~test/production-input/support/inputRuntimeTestConfig";
 
 const workshop = inputRuntimeTestConfig.items.workshop;

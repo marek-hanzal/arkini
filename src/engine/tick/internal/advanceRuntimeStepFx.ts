@@ -12,7 +12,7 @@ import { attemptJobCompletionFx } from "~/production-job/fx/attemptJobCompletion
 import { attemptQueuedLineStartFx } from "~/production-job/fx/attemptQueuedLineStartFx";
 import { resolveJobRunnableFx } from "~/production-job/fx/resolveJobRunnableFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { TickStepMs } from "~/engine/tick/TickStepMs";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";

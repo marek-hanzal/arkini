@@ -4,8 +4,8 @@ import { match, P } from "ts-pattern";
 import type { AssetSchema } from "~/item-definition/schema/AssetSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { readRuntimeLineFillProgressFn } from "~/production-line/fn/readRuntimeLineFillProgressFn";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace readTileActorAssetSourceIdsFx {
 	export interface Props {

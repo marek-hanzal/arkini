@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { TickStepMs } from "~/engine/tick/TickStepMs";
 import { advanceRuntimeStepFx } from "~/engine/tick/internal/advanceRuntimeStepFx";
 

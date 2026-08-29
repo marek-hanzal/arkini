@@ -1,8 +1,8 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { activateSpaceItemFx } from "~/space-action/write/activateSpaceItemFx";
 import { activateSpaceItemWithTransitionFx } from "~/space-action/write/activateSpaceItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";

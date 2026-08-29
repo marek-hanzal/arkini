@@ -2,7 +2,7 @@ import { indexGridLocationClaimsFn } from "~/item-location/fn/indexGridLocationC
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
 import { readGridLocationKeyFn } from "~/item-location/fn/readGridLocationKeyFn";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 interface ReadEmptyLocationsProps<Location extends GridLocationSchema.Type> {
 	readonly locations: ReadonlyArray<Location>;

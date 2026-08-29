@@ -8,7 +8,7 @@ import type { JobCompletionContext } from "~/production-job/completion/JobComple
 import { makeChargeDepletionRandomFx } from "~/production-job/random/makeChargeDepletionRandomFx";
 import { outputFx } from "~/production-output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
-import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
+import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
 import { releaseJobReservationsFx } from "./releaseJobReservationsFx";
 
 const emptyOutput = {

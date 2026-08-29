@@ -13,9 +13,9 @@ import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { readRuntimeInventoryOpenerFx } from "~/engine/runtime/read/readRuntimeInventoryOpenerFx";
-import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
-import type { CommittedTransitionSchema } from "~/engine/runtime/schema/CommittedTransitionSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
+import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 type UnstaggeredTileMotionCue =
 	| Omit<

@@ -4,8 +4,8 @@ import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { resolveJobQueueFx } from "~/production-job/fx/read/resolveJobQueueFx";
 import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
 import { readEffectiveDefaultLineFn } from "~/production-line/fn/readEffectiveDefaultLineFn";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace readRuntimeItemPrimaryActionFx {
 	export type Result =

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import {
 	runBlueprint,

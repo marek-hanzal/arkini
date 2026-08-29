@@ -5,14 +5,14 @@ import { ItemNotFoundError } from "~/engine/item/error/ItemNotFoundError";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
-import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
+import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 import { SwapSameItemError } from "~/engine/runtime/error/SwapSameItemError";
-import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
-import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
+import { isBoardRuntimeItemFn } from "~/game-runtime/read/fn/isBoardRuntimeItemFn";
+import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
 import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceBoardOperationError";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace swapItemsFx {
 	export interface Props {

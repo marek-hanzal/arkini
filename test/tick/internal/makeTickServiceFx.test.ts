@@ -1,8 +1,8 @@
 import { Effect, Exit, Ref } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { makeTickServiceFx } from "~/engine/tick/internal/makeTickServiceFx";
 import { TickStepMs } from "~/engine/tick/TickStepMs";
 

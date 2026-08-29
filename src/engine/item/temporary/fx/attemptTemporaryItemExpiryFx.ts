@@ -4,7 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import type { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import { isExpectedPlacementDeliveryBlockFn } from "~/item-placement/read/fn/isExpectedPlacementDeliveryBlockFn";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 import { completeTemporaryItemExpiryTransitionFx } from "./completeTemporaryItemExpiryTransitionFx";
 

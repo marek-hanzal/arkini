@@ -1,9 +1,9 @@
 import { Effect, type Layer } from "effect";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
+import type { GameLayerFx } from "~test/support/game/GameLayerFx";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { activateSpaceItemFx } from "~/space-action/write/activateSpaceItemFx";

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { MergeRuleNotFoundError } from "~/item-merge/error/MergeRuleNotFoundError";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import { selectItemsFn } from "~/item-definition/fn/selectItemsFn";
 
 interface ResolveMergeRuleProps {

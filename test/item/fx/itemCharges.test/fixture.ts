@@ -1,23 +1,23 @@
 import { Effect, type Layer, Result } from "effect";
 import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/game/useGameFx";
-import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
+import type { GameLayerFx } from "~test/support/game/GameLayerFx";
 import { startLineRuntimeFx } from "~/production-job/fx/startLineRuntimeFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { resolveLineRunFx } from "~/production-line/fx/run/resolveLineRunFx";
-import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { checkRuntimeFx } from "~/game-runtime/check/checkRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
+import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
 import { StateSchema } from "~/engine/state/schema/StateSchema";
-import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
+import { fromStateFx } from "~/engine/state/fx/fromStateFx";
 import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
-import { ItemChargesIssueReasonEnumSchema } from "~/engine/runtime/schema/check/ItemChargesIssueReasonEnumSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { ItemChargesIssueReasonEnumSchema } from "~/game-runtime/schema/check/ItemChargesIssueReasonEnumSchema";
 
 export {
 	Effect,

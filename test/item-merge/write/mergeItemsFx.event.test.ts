@@ -5,7 +5,7 @@ import { createTestGameSession } from "~test/support/game/createTestGameSession"
 import type { GameSession } from "~/renderer/game/session/GameSession";
 import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
 import { mergeItemsFx } from "~/item-merge/write/mergeItemsFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import {
 	createMergeTestConfig,
 	guaranteedMergeOutput,

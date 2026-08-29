@@ -4,9 +4,9 @@ import { reconcileOutboundDeliveriesRuntimeFx } from "~/production-delivery/fx/r
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx";
-import { discardRuntimeItemIdentityStateFx } from "~/engine/runtime/fx/discardRuntimeItemIdentityStateFx";
-import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { discardRuntimeItemIdentityStateFx } from "~/game-runtime/fx/discardRuntimeItemIdentityStateFx";
+import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace detachLineInputSourceFx {
 	export interface Props {

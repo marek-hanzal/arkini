@@ -7,7 +7,7 @@ import {
 } from "~/item-detail-frame/projectItemDetailReferenceFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readItemDetailQueueFx } from "~/engine/item-detail/read/readItemDetailQueueFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 type EngineQueue = Extract<
 	readItemDetailQueueFx.Result,

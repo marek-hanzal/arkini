@@ -10,9 +10,9 @@ import type { GridLocationSchema } from "~/item-location/schema/GridLocationSche
 import { readEmptyLocationsFn } from "~/item-placement/fn/readEmptyLocationsFn";
 import { readPlacementPlanQuantityFn } from "~/item-placement/fn/readPlacementPlanQuantityFn";
 import type { PlacementPlan } from "~/item-placement/PlacementPlan";
-import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
-import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { planSpawnPlacementFx } from "./planSpawnPlacementFx";
 
 interface PlanScopePlacementProps {

@@ -8,10 +8,10 @@ import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
-import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
-import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
+import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace isolateGridStatefulOwnerTransitionFx {
 	export interface Props {

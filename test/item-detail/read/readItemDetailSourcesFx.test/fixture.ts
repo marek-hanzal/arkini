@@ -5,8 +5,8 @@ import {
 	readItemDetailSourcesFx,
 	type readItemDetailSourcesFx as Sources,
 } from "~/engine/item-detail/read/readItemDetailSourcesFx";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 const item = (id: string, title = id) => ({

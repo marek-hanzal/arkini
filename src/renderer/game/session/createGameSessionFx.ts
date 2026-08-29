@@ -24,8 +24,8 @@ import { RuntimeSaveFx } from "~/engine/save/RuntimeSaveFx";
 import { RuntimeSaveLayerFx } from "~/engine/save/RuntimeSaveLayerFx";
 import { GameLoopFx } from "~/engine/game/context/GameLoopFx";
 import { GameSessionLayerFx } from "~/engine/game/layer/GameSessionLayerFx";
-import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
-import type { CommittedTransitionSchema } from "~/engine/runtime/schema/CommittedTransitionSchema";
+import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
+import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 

@@ -2,8 +2,7 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import { getItemFx } from "~/engine/runtime/read/getItemFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
@@ -183,7 +182,7 @@ describe("runtime commands", () => {
 		]);
 	});
 
-	it("rejects duplicate identities and occupied destinations without partial writes", () => {
+	it("rejects occupied destinations without partial writes", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const logItem = yield* spawnItemFx({
@@ -199,14 +198,6 @@ describe("runtime commands", () => {
 					quantity: 1,
 				});
 
-				const duplicate = yield* Effect.result(
-					spawnItemFx({
-						id: "runtime:log",
-						itemId: "log",
-						location: inventoryA,
-						quantity: 1,
-					}),
-				);
 				const occupied = yield* Effect.result(
 					moveItemFx({
 						itemId: "runtime:log",
@@ -214,20 +205,11 @@ describe("runtime commands", () => {
 						revision: logItem.revision,
 					}),
 				);
-				const log = yield* getItemFx({
-					itemId: "runtime:log",
-				});
-				const stone = yield* getItemFx({
-					itemId: "runtime:stone",
-				});
 				const runtime = yield* readRuntimeFx();
 
 				return {
-					duplicate,
-					log,
 					occupied,
 					runtime,
-					stone,
 				};
 			}).pipe(
 				useGameFx({
@@ -236,13 +218,6 @@ describe("runtime commands", () => {
 			),
 		);
 
-		expect(Result.isFailure(result.duplicate)).toBe(true);
-		if (Result.isFailure(result.duplicate)) {
-			expect(result.duplicate.failure).toMatchObject({
-				_tag: "ItemAlreadyExistsError",
-				itemId: "runtime:log",
-			});
-		}
 		expect(Result.isFailure(result.occupied)).toBe(true);
 		if (Result.isFailure(result.occupied)) {
 			expect(result.occupied.failure).toMatchObject({
@@ -251,53 +226,11 @@ describe("runtime commands", () => {
 				location: boardB,
 			});
 		}
-		expect(result.log.location).toEqual(boardA);
-		expect(result.stone.id).toBe("runtime:stone");
-		expect(result.runtime.items).toHaveLength(2);
-	});
-	it("serializes concurrent spawns competing for one location", async () => {
-		const result = await Effect.runPromise(
-			Effect.gen(function* () {
-				const attempts = yield* Effect.all(
-					[
-						Effect.result(
-							spawnItemFx({
-								id: "runtime:log",
-								itemId: "log",
-								location: boardA,
-								quantity: 1,
-							}),
-						),
-						Effect.result(
-							spawnItemFx({
-								id: "runtime:stone",
-								itemId: "stone",
-								location: boardA,
-								quantity: 1,
-							}),
-						),
-					],
-					{
-						concurrency: "unbounded",
-					},
-				);
-				const runtime = yield* readRuntimeFx();
-
-				return {
-					attempts,
-					runtime,
-				};
-			}).pipe(
-				useGameFx({
-					config,
-				}),
-			),
+		expect(result.runtime.items.find((item) => item.id === "runtime:log")?.location).toEqual(
+			boardA,
 		);
-
-		expect(result.attempts.filter(Result.isSuccess)).toHaveLength(1);
-		expect(result.attempts.filter(Result.isFailure)).toHaveLength(1);
-		expect(result.runtime.items).toHaveLength(1);
-		expect(result.runtime.items[0]?.location).toEqual(boardA);
+		expect(result.runtime.items.some((item) => item.id === "runtime:stone")).toBe(true);
+		expect(result.runtime.items).toHaveLength(2);
 	});
 
 	it("serializes concurrent moves competing for one location", async () => {

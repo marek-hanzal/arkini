@@ -7,7 +7,7 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { orderGridLocationsFn } from "~/item-placement/fn/orderGridLocationsFn";
 import { readInventoryLocationsFn } from "~/item-placement/fn/readInventoryLocationsFn";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { planScopePlacementFx } from "./planScopePlacementFx";
 
 interface PlanInventoryPlacementProps {

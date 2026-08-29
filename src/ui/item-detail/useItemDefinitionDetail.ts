@@ -5,7 +5,7 @@ import { useGameEngine } from "~/ui/game/useGameEngine";
 import { useRuntimeSelector } from "~/ui/game/useRuntimeSelector";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { StorageSchema } from "~/item-definition/schema/StorageSchema";
 
 export namespace useItemDefinitionDetail {

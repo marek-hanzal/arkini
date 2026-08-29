@@ -1,6 +1,6 @@
 import { Effect, Random } from "effect";
 
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 
 /** Bump only when intentionally changing temporary-expiry random compatibility. */
 const TemporaryExpiryRandomVersion = 2;

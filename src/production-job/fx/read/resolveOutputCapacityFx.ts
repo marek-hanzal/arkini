@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace resolveOutputCapacityFx {
 	export interface Props {

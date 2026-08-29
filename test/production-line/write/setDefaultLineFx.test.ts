@@ -6,15 +6,15 @@ import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailL
 import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import { setDefaultLineFx } from "~/production-line/write/setDefaultLineFx";
 import { unsetDefaultLineFx } from "~/production-line/write/unsetDefaultLineFx";
-import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
-import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
-import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { checkRuntimeFx } from "~/game-runtime/check/checkRuntimeFx";
+import { fromStateFx } from "~/engine/state/fx/fromStateFx";
+import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
 import { startFx } from "~/game-start/startFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { DefaultLineIssueReasonEnumSchema } from "~/production-line/schema/check/DefaultLineIssueReasonEnumSchema";
 
 const line = (id: string, title: string, isDefault = false) => ({

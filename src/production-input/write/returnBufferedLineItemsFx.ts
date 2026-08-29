@@ -2,9 +2,9 @@ import { Effect } from "effect";
 
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { placeRuntimeItemFx } from "~/item-placement/fx/placeRuntimeItemFx";
-import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 /** Returns selected buffered roots through canonical placement and aggregates their result. */
 export const returnBufferedLineItemsFx = Effect.fn("returnBufferedLineItemsFx")(function* ({

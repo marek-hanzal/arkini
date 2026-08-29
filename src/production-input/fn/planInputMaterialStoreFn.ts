@@ -1,7 +1,7 @@
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { MaterialSchema } from "~/production-input/schema/MaterialSchema";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import { readMaterialInputEligibilityFn } from "~/production-input/read/fn/readMaterialInputEligibilityFn";
 import { selectItemsFn } from "~/item-definition/fn/selectItemsFn";
 import { resolveInputMaterialFn } from "~/production-input/fn/resolveInputMaterialFn";

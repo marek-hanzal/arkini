@@ -4,10 +4,10 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { InputRunPlanInvalidError } from "~/production-input/error/InputRunPlanInvalidError";
-import { isInputRuntimeItemFn } from "~/engine/runtime/read/fn/isInputRuntimeItemFn";
-import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
-import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { isInputRuntimeItemFn } from "~/production-input/read/fn/isInputRuntimeItemFn";
+import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
+import type { InputRuntimeItemSchema } from "~/game-runtime/schema/InputRuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace readInputRunItemFx {
 	export interface Props {

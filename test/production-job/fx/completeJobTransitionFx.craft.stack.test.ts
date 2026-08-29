@@ -1,7 +1,7 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";

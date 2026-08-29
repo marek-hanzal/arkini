@@ -8,9 +8,9 @@ import { detachLineInputSourceFx } from "~/production-input/fx/detachLineInputSo
 import { planLineInputAutofillFx } from "~/production-input/fx/planLineInputAutofillFx";
 import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
+import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace autofillLineInputsRuntimeFx {
 	export interface Props {

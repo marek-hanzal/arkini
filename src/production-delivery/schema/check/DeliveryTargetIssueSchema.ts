@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { LineInputDeliveryTargetSchema } from "~/production-delivery/schema/LineInputDeliveryTargetSchema";
-import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { DeliveryTargetIssueReasonEnumSchema } from "./DeliveryTargetIssueReasonEnumSchema";
 
 /** One or more outbound deliveries violate their canonical target contract. */

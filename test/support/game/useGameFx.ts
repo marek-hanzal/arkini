@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
+import { GameLayerFx } from "~test/support/game/GameLayerFx";
 
 export namespace useGameFx {
 	export interface Props extends GameLayerFx.Props {}

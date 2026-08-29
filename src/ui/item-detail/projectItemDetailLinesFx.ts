@@ -9,7 +9,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemDetailLines as EngineItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines";
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { match } from "ts-pattern";
 import { TypeSchema } from "~/production-condition/schema/TypeSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";

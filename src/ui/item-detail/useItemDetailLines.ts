@@ -6,7 +6,7 @@ import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
 import { projectItemDetailLinesFx } from "~/ui/item-detail/projectItemDetailLinesFx";
 import { useRuntimeSelector } from "~/ui/game/useRuntimeSelector";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace useItemDetailLines {
 	export type Input = ItemDetailLines.Input;

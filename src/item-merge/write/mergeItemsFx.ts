@@ -12,12 +12,12 @@ import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
-import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
-import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
-import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
+import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
+import { isBoardRuntimeItemFn } from "~/game-runtime/read/fn/isBoardRuntimeItemFn";
+import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
+import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
+import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceBoardOperationError";
 import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 

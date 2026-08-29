@@ -3,8 +3,8 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 
 import type { GameSession } from "~/renderer/game/session/GameSession";
 import { GameSessionFatalError } from "~/renderer/game/session/GameSessionFatalError";
-import type { CommittedTransitionSchema } from "~/engine/runtime/schema/CommittedTransitionSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 type TransitionFields = Pick<
 	GameSession,

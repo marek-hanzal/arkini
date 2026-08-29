@@ -7,7 +7,7 @@ import type { OutputCapacityError } from "~/production-job/error/OutputCapacityE
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { LineRunUnavailableError } from "~/production-line/error/LineRunUnavailableError";
 import type { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { autofillLineInputsRuntimeFx } from "~/production-input/write/autofillLineInputsRuntimeFx";
 import { startQueuedLineRuntimeFx } from "./startQueuedLineRuntimeFx";

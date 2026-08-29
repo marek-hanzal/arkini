@@ -8,7 +8,7 @@ import { useRuntimeSelector } from "~/ui/game/useRuntimeSelector";
 import type { useItemDetailSources } from "~/ui/item-detail/useItemDetailSources";
 import { readItemDetailTabsFn } from "~/engine/item-detail/fn/readItemDetailTabsFn";
 import type { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 /** Reads the authoritative Item Detail tabs supported by one exact live item. */
 export namespace useItemDetailTabs {

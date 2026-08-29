@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { readItemDetailTabsFn } from "~/engine/item-detail/fn/readItemDetailTabsFn";
 import { resolveItemDetailTargetFn } from "~/engine/item-detail/fn/resolveItemDetailTargetFn";
-import { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
+import { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import {
 	lineRunRuntime,
 	lineRunTestConfig,

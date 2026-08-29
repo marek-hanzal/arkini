@@ -4,12 +4,12 @@ import { describe, expect, it } from "@effect/vitest";
 
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { GameLoopFx } from "~/engine/game/context/GameLoopFx";
-import { GameCoreLayerFx } from "~/engine/game/layer/GameCoreLayerFx";
 import { GameLoopLayerFx } from "~/engine/game/layer/GameLoopLayerFx";
 import { GameSessionLayerFx } from "~/engine/game/layer/GameSessionLayerFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
-import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
+import { GameRuntimeLayerFx } from "~/game-runtime/layer/GameRuntimeLayerFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { TickFx } from "~/engine/tick/context/TickFx";
 import { TickStepMs } from "~/engine/tick/TickStepMs";
@@ -46,7 +46,7 @@ describe("GameLoopLayerFx", () => {
 					}),
 				}),
 				Effect.provide(
-					GameCoreLayerFx({
+					GameRuntimeLayerFx({
 						config: createTickFailureTestConfig(),
 					}),
 				),

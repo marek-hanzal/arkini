@@ -2,13 +2,13 @@ import { Effect, type Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
+import type { GameLayerFx } from "~test/support/game/GameLayerFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
-import { checkRuntimeLocationsFn } from "~/engine/runtime/check/fn/checkRuntimeLocationsFn";
+import { checkRuntimeFx } from "~/game-runtime/check/checkRuntimeFx";
 import { planDropPlacementFx } from "~/item-placement/fx/planDropPlacementFx";
-import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
+import { fromStateFx } from "~/engine/state/fx/fromStateFx";
 import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
@@ -17,7 +17,7 @@ import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
 import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 import { StateSchema } from "~/engine/state/schema/StateSchema";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
-import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
 
@@ -613,10 +613,15 @@ describe("Toolbar engine", () => {
 				toolbarSize: 0,
 			},
 		});
-		const issues = checkRuntimeLocationsFn({
-			config: disabledConfig,
-			runtime,
-		});
+		const { issues } = Effect.runSync(
+			checkRuntimeFx({
+				runtime,
+			}).pipe(
+				useGameFx({
+					config: disabledConfig,
+				}),
+			),
+		);
 
 		expect(issues).toContainEqual({
 			type: RuntimeCheckIssueEnumSchema.enum.LocationOutOfBounds,

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { outputFx } from "~/production-output/fx/outputFx";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { applyPlacementPlanFx } from "./applyPlacementPlanFx";
 import { planDropPlacementFx } from "./planDropPlacementFx";
 

@@ -1,3 +1,5 @@
+import { Order } from "effect";
+
 import type {
 	EditorItemOriginEdge,
 	EditorItemOriginFlow,
@@ -79,7 +81,7 @@ export const readInputHighlightFn = (
 		}
 		for (const operationId of [
 			...operationIds,
-		].sort((left, right) => left.localeCompare(right)))
+		].sort((left, right) => Order.String(left, right)))
 			traceOperation(operationId);
 	};
 

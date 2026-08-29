@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
-import { createEditorItemEstimateIndexFx } from "~/editor/createEditorItemEstimateIndexFx";
 import type { EditorProject } from "~/editor/EditorProject";
 import { estimateEditorItemsFx } from "~/editor/estimateEditorItemsFx";
+import { createEditorItemEstimateIndexFn } from "~/editor/estimator/fn/createEditorItemEstimateIndexFn";
 import { selectEditorItemEstimateIndexFx } from "~/editor/selectEditorItemEstimateIndexFx";
 import type { EstimateInput } from "./EstimateInputSchema";
 
@@ -33,7 +33,7 @@ export const readEstimateTextFx = Effect.fn("readEstimateTextFx")(function* (
 	input: EstimateInput,
 ) {
 	const estimates = yield* estimateEditorItemsFx(project.config);
-	const entries = yield* createEditorItemEstimateIndexFx({
+	const entries = createEditorItemEstimateIndexFn({
 		estimates: new Map(
 			estimates.map((estimate) => [
 				estimate.factId,

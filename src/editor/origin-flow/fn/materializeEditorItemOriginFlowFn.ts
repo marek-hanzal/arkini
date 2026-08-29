@@ -1,3 +1,5 @@
+import { Order } from "effect";
+
 import {
 	EditorItemOriginItemInputPortId,
 	EditorItemOriginItemOutputPortId,
@@ -56,7 +58,7 @@ const readOperation = (
 	id: source.id,
 	inputs: unique(source.requirementItemIds)
 		.filter((itemId) => itemId !== source.ownerItemId)
-		.sort((left, right) => left.localeCompare(right))
+		.sort((left, right) => Order.String(left, right))
 		.map((itemId) => ({
 			id: `${source.id}:input:${itemId}`,
 			itemId,
@@ -81,7 +83,7 @@ const readItemNode = (
 	const operations = [
 		...(index.sourcesByOwner.get(itemId) ?? []),
 	]
-		.sort((left, right) => left.id.localeCompare(right.id))
+		.sort((left, right) => Order.String(left.id, right.id))
 		.map((source) => readOperation(source, index.items));
 	return {
 		acquisitionSourceId: acquisitionSourceByItem.get(itemId),

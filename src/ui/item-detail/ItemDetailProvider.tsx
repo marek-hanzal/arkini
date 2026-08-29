@@ -27,7 +27,7 @@ import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncR
 
 /**
  * Game-shell owner for one exact Item Detail target, modal lifecycle and
- * command-presentation settlement. Bridge resolvers remain authoritative for
+ * command-presentation settlement. Engine-backed resolvers remain authoritative for
  * target availability and allowed tabs; this provider must not retain or
  * manufacture gameplay facts when a runtime item disappears.
  *

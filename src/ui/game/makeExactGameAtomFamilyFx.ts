@@ -9,7 +9,7 @@ interface ExactGameIdentity<GameType extends PlayableGame> extends Equal.Equal {
 
 /**
  * Memoizes one Atom object by exact live Game reference.
- * The explicit identity key prevents Effect Hash from traversing the Game facade.
+ * The explicit identity key prevents Effect Hash from traversing the live Game object.
  */
 export const makeExactGameAtomFamilyFx = Effect.fn("makeExactGameAtomFamilyFx")(
 	<GameType extends PlayableGame, Result extends object>(make: (game: GameType) => Result) =>

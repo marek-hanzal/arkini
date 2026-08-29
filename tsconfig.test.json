@@ -19,6 +19,7 @@
 		"src/item-interaction",
 		"src/game-start",
 		"src/game-event",
+		"src/item-line-detail",
 		"src/item-detail-frame",
 		"src/item-definition",
 		"src/item-location",

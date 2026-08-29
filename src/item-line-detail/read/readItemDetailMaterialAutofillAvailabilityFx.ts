@@ -10,17 +10,9 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { matchesItemSelectorFn } from "~/item-definition/fn/matchesItemSelectorFn";
 import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 
-export namespace readItemDetailMaterialAutofillAvailabilityFx {
-	export interface Props {
-		readonly ownerItemId: IdSchema.Type;
-		readonly runtime: RuntimeSchema.Type;
-		readonly selector: SelectorSchema.Type;
-	}
-
-	export interface Result {
-		readonly availableQuantity: number;
-		readonly producerItemId?: IdSchema.Type;
-	}
+interface MaterialAutofillAvailability {
+	readonly availableQuantity: number;
+	readonly producerItemId?: IdSchema.Type;
 }
 
 /**
@@ -38,7 +30,11 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 	ownerItemId,
 	runtime,
 	selector,
-}: readItemDetailMaterialAutofillAvailabilityFx.Props) {
+}: {
+	readonly ownerItemId: IdSchema.Type;
+	readonly runtime: RuntimeSchema.Type;
+	readonly selector: SelectorSchema.Type;
+}) {
 	const owner = runtime.items.find((candidate) => candidate.id === ownerItemId);
 	const space =
 		owner?.location.scope === LocationScopeEnumSchema.enum.Board
@@ -97,7 +93,7 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 	if (availableQuantity > 0) {
 		return {
 			availableQuantity,
-		} satisfies readItemDetailMaterialAutofillAvailabilityFx.Result;
+		} satisfies MaterialAutofillAvailability;
 	}
 
 	const config = yield* GameConfigFx;
@@ -140,5 +136,5 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 			: {
 					producerItemId: producer.id,
 				}),
-	} satisfies readItemDetailMaterialAutofillAvailabilityFx.Result;
+	} satisfies MaterialAutofillAvailability;
 });

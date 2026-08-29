@@ -5,11 +5,6 @@ import type { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceS
 import type { ModeSchema } from "~/production-input/schema/ModeSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
-import type {
-	ItemDetailOutputRoll,
-	ItemDetailOutputSet,
-	ItemDetailQuantityBounds,
-} from "~/engine/item-detail/read/ItemDetailOutput";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
@@ -19,14 +14,41 @@ interface ItemDetailLineChargeCost {
 	readonly from: ChargeSourceSchema.Type;
 }
 
-/** Engine-owned projection contract for the Lines capability of Item Detail. */
+/** Framework-neutral contract for the Item Line Detail read projection. */
 export namespace ItemDetailLines {
 	export interface Props {
 		readonly itemId: IdSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
 	}
 
-	export type QuantityBounds = ItemDetailQuantityBounds;
+	export interface QuantityBounds {
+		readonly min: number;
+		readonly max: number;
+	}
+
+	export type OutputRoll<Item> =
+		| {
+				readonly kind: "guaranteed";
+				readonly item: readonly Item[];
+		  }
+		| {
+				readonly kind: "chance";
+				readonly chance: number;
+				readonly item: readonly Item[];
+		  }
+		| {
+				readonly kind: "weight";
+				readonly selections: QuantityBounds;
+				readonly option: readonly {
+					readonly weight: number;
+					readonly item: readonly Item[];
+				}[];
+		  };
+
+	export interface OutputSet<Item> {
+		readonly weight: number;
+		readonly roll: readonly OutputRoll<Item>[];
+	}
 
 	export interface MaterialInput {
 		readonly kind: "materials";
@@ -72,8 +94,8 @@ export namespace ItemDetailLines {
 		readonly activeRuleHints: readonly string[];
 	}
 
-	export type OutputRoll = ItemDetailOutputRoll<OutputItem>;
-	export type OutputSet = ItemDetailOutputSet<OutputItem>;
+	export type LineOutputRoll = OutputRoll<OutputItem>;
+	export type LineOutputSet = OutputSet<OutputItem>;
 
 	export type UnavailableReason =
 		| {
@@ -147,7 +169,7 @@ export namespace ItemDetailLines {
 			readonly canWithdraw: boolean;
 		};
 		readonly input: readonly Input[];
-		readonly output: readonly OutputSet[];
+		readonly output: readonly LineOutputSet[];
 		readonly activeJob?: {
 			readonly status: JobStatusEnumSchema.Type;
 			readonly durationMs: TimeSchema.Type;

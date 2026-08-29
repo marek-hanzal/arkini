@@ -5,9 +5,9 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, vi } from "vitest";
 
-import type { useItemDetailLines } from "~/ui/item-detail/useItemDetailLines";
+import type { ItemDetailLines } from "~/item-line-detail/ui/ItemDetailLines";
 import type { ItemDetailPendingAction } from "~/item-detail-frame/ItemDetailControl";
-import { ItemLinesTab } from "~/ui/item-detail/ItemLinesTab";
+import { ItemLinesTab } from "~/item-line-detail/ui/ItemLinesTab";
 
 (
 	globalThis as {
@@ -111,7 +111,7 @@ export const input = {
 		label: "Tree",
 	},
 	storedQuantity: 0,
-} as const satisfies useItemDetailLines.Input;
+} as const satisfies ItemDetailLines.Input;
 
 export const projection = {
 	itemId: "runtime:producer",
@@ -142,7 +142,7 @@ export const projection = {
 			title: "First",
 		},
 	],
-} as const satisfies useItemDetailLines.Projection;
+} as const satisfies ItemDetailLines.Projection;
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
@@ -166,12 +166,8 @@ afterEach(async () => {
 	vi.unstubAllGlobals();
 });
 
-export const setPendingAction = (action: ItemDetailPendingAction) => {
-	control.readPendingAction.mockReturnValue(action);
-};
-
 type AvailableProjection = Extract<
-	useItemDetailLines.Projection,
+	ItemDetailLines.Projection,
 	{
 		readonly kind: "available";
 	}

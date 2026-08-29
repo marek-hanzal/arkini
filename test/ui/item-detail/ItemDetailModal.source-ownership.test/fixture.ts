@@ -76,7 +76,7 @@ vi.mock("~/ui/item-detail/useItemDetailInfo", () => ({
 	}),
 }));
 
-vi.mock("~/ui/item-detail/useItemDetailLines", () => ({
+vi.mock("~/item-line-detail/ui/useItemDetailLines", () => ({
 	useItemDetailLines: () => ({
 		kind: "unavailable",
 	}),

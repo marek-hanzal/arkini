@@ -29,6 +29,7 @@ src/item-interaction  optimistic drop reads, authoritative drop/write commands a
 src/engine    remaining session, query and platform-neutral support owners
 src/game-start  initial-state schemas, exact placement planning and atomic runtime start
 src/game-event  committed gameplay event schemas and exact downstream event projection
+src/item-line-detail  line-detail reads, board/stored projections, inputs/outputs/autofill and Item Lines presentation
 src/item-detail-frame  Item Detail target lifecycle, command settlement, reference navigation and frame presentation
 src/item-definition  immutable authored Item schemas, query/selector vocabulary and total selection policy
 src/item-location  grid coordinates, distance, runtime locations, claims and cross-space identity

@@ -9,8 +9,15 @@ const gameRuntimePattern = "^src/game-runtime(?:/|$)";
 const gamePersistencePattern = "^src/game-persistence(?:/|$)";
 const gameTickPattern = "^src/game-tick(?:/|$)";
 const itemInteractionPattern = "^src/item-interaction(?:/|$)";
+const itemLineDetailPattern = "^src/item-line-detail(?:/|$)";
+const itemLineDetailReadPattern = "^src/item-line-detail/read(?:/|$)";
+const itemLineDetailPresentationPattern = "^src/item-line-detail/ui(?:/|$)";
 const itemInteractionAllowedSourceDependencyPattern =
 	"(?:item-interaction(?:/|$)|engine/(?:common/schema/(?:IdSchema|NonNegativeIntegerSchema|PositiveIntegerSchema)[.]ts$|game/context/GameConfigFx[.]ts$|item/(?:error/(?:ItemNotFoundError|ItemNotOnBoardError|ItemNotOnGridError|ItemStatefulError)[.]ts$|fn/isItemPureFn[.]ts$)|revision/(?:fx/assertRevisionFx|schema/RevisionSchema)[.]ts$)|game-event/(?:readOutputPlacementItemEventsFx[.]ts$|schema/(?:GameEventEnumSchema|GameEventSchema)[.]ts$)|game-runtime/(?:error/(?:ItemJobScopedError|ItemLocationConflictError)[.]ts$|fx/(?:removeRuntimeItemFx|removeRuntimeItemIdentityFx|reviseRuntimeItemFx)[.]ts$|internal/modifyRuntimeFx[.]ts$|read/(?:fn/(?:isBoardRuntimeItemFn|isGridRuntimeItemFn)[.]ts$|(?:readRuntimeFx|readRuntimeItemByIdFx)[.]ts$)|schema/(?:BoardRuntimeItemSchema|GridRuntimeItemSchema|RuntimeItemSchema|RuntimeSchema)[.]ts$)|item-definition/schema/TypeSchema[.]ts$|item-location/(?:error/CrossSpaceBoardOperationError[.]ts$|fn/(?:isItemLocationScopeAllowedFn|isSameGridLocationFn|readGridLocationClaimAtFn|readGridLocationClaimsFn)[.]ts$|schema/(?:BoardLocationSchema|GridLocationSchema|InventoryLocationSchema|LocationScopeEnumSchema)[.]ts$)|item-merge/(?:fx/resolveMergeRuleFx[.]ts$|schema/(?:SourceActionSchema|TargetEffectSchema)[.]ts$|write/mergeItemsFx[.]ts$)|item-placement/(?:PlacementPlan[.]ts$|error/PlacementUnavailableError[.]ts$|fn/(?:readBoardLocationsFn|readEmptyLocationsFn|readInventoryLocationsFn)[.]ts$|fx/(?:applyOutputPlacementFx|applyPlacementPlanFx|assertPlacementPlanCompleteFx|placeRuntimeItemFx|planInventoryPlacementFx)[.]ts$|schema/PlacementSchema[.]ts$)|production-input/(?:fn/resolveLineInputStoreFn[.]ts$|write/storeInputMaterialFx[.]ts$)|production-job/(?:fx/assertOwnerIdleFx[.]ts$|fx/read/resolveJobQueueFx[.]ts$)|production-line/fn/(?:isLineOwnerItemFn|readEffectiveDefaultLineFn)[.]ts$)";
+const itemLineDetailReadAllowedSourceDependencyPattern =
+	"(?:item-line-detail/read(?:/|$)|engine/(?:common/schema/(?:IdSchema|NonNegativeIntegerSchema|TimeSchema)[.]ts$|game/context/GameConfigFx[.]ts$|item-detail/read/readItemDetailSourcesFx[.]ts$|item/fn/readItemRemainingChargesFn[.]ts$|query/fx/queryFx[.]ts$)|game-runtime/(?:context/RuntimeFx[.]ts$|read/readBoardRuntimeItemByIdFx[.]ts$|schema/RuntimeSchema[.]ts$)|item-definition/(?:fn/matchesItemSelectorFn[.]ts$|schema/SelectorSchema[.]ts$)|item-location/schema/(?:BoardLocationSchema|DistanceSchema|LocationScopeEnumSchema)[.]ts$|production-condition/schema/WhenSchema[.]ts$|production-delivery/fn/readLineInputDeliveryClaimsFn[.]ts$|production-input/(?:InputRun[.]ts$|read/(?:fn/isMaterialInputEligibleFn|isLineInputAutofillSourceLocationFn)[.]ts$|schema/(?:ChargeSourceSchema|DepositSchema|InputSchema|ModeSchema|TypeSchema)[.]ts$)|production-job/(?:fx/(?:resolveActiveJobStatusFx|read/(?:resolveLineStartFx|resolveStartOutputCapacityFx))[.]ts$|schema/read/JobStatusEnumSchema[.]ts$)|production-line/(?:LineRun[.]ts$|fn/(?:isLineOwnerItemFn|readEffectiveDefaultLineFn|readLineOwnerLinesFn)[.]ts$|schema/(?:LineSchema|rule/TypeSchema)[.]ts$)|production-output/(?:fx/dropRulesFx[.]ts$|roll/schema/(?:RollSchema|TypeSchema)[.]ts$|schema/DropSchema[.]ts$))";
+const itemLineDetailPresentationAllowedSourceDependencyPattern =
+	"(?:item-line-detail(?:/|$)|item-detail-frame(?:/|$)|engine/(?:common/schema/(?:IdSchema|NonNegativeIntegerSchema)[.]ts$|item/fx/resolveItemFx[.]ts$)|game-runtime/schema/RuntimeSchema[.]ts$|item-definition/schema/SelectorSchema[.]ts$|item-location/schema/DistanceSchema[.]ts$|production-condition/schema/(?:TypeSchema|WhenSchema)[.]ts$|production-input/(?:schema/(?:ChargeSourceSchema|ModeSchema)[.]ts$|write/(?:withdrawLineInputFx|withdrawLineInputsFx)[.]ts$)|production-job/(?:schema/read/JobStatusEnumSchema[.]ts$|ui/(?:ProductionJobRuntime[.]tsx|readActiveJobRuntimeFn[.]ts$)|write/enqueueLineFx[.]ts$)|production-line/write/(?:setDefaultLineFx|unsetDefaultLineFx)[.]ts$|renderer/(?:RendererRuntime[.]ts$|game/GameEngine[.]ts$)|ui/(?:button/(?:Button|LinkButton)[.]tsx$|formatDurationFn[.]ts$|game/(?:useGameEngine|useRuntimeSelector)[.]ts$|scrollable/Scrollable[.]tsx$|search/useFuseSearch[.]ts$))";
 const gameRuntimeAllowedSourceDependencyPattern =
 	"(?:game-runtime(?:/|$)|game-config/GameConfigSchema[.]ts$|engine/(?:cheat/schema/CheatStateSchema[.]ts$|common/schema/(?:IdSchema|NonNegativeIntegerSchema|PositiveIntegerSchema|TimeSchema)[.]ts$|game/context/GameConfigFx[.]ts$|item/(?:error/(?:ItemNotFoundError|ItemNotOnBoardError)[.]ts$|fn/(?:isItemPureWithIndexFn|readItemPurityIndexFn)[.]ts$|fx/resolveItemFx[.]ts$)|revision/(?:fx/createRevisionFx|schema/RevisionSchema)[.]ts$)|game-event/schema/GameEventSchema[.]ts$|item-definition/schema/(?:ItemSchema|StorageSchema|TypeSchema)[.]ts$|item-location/(?:fn/(?:indexGridLocationClaimsFn|isItemLocationScopeAllowedFn|readGridLocationClaimsFn)[.]ts$|schema/(?:BoardLocationSchema|DeliveryLocationSchema|GridLocationSchema|InputLocationSchema|JobLocationSchema|LocationSchema|LocationScopeEnumSchema|ReservedLocationSchema)[.]ts$)|production-delivery/(?:check/checkRuntimeDeliveriesFn|fx/reconcileOutboundDeliveriesRuntimeFx|schema/check/DeliveryTargetIssueSchema)[.]ts$|production-input/(?:check/checkRuntimeInputLocationsFn|fx/releaseOwnerInputsFx|schema/check/(?:InputCapacityExceededIssueSchema|InputLineMissingIssueSchema|InputOwnerMissingIssueSchema|InputSelectorMismatchIssueSchema|InputSlotInvalidIssueSchema))[.]ts$|production-job/(?:check/checkRuntimeJobsFn|error/JobOwnerBusyError|fn/readReservedJobOutputQuantitiesFn|schema/(?:JobQueueRequestSchema|JobSchema|DuplicateJobIdIssueSchema|JobConsumedMaterialStateIssueSchema|JobLineMissingIssueSchema|JobMaterialOrphanIssueSchema|JobOwnerMissingIssueSchema|JobOwnerMultipleActiveIssueSchema|JobOwnerNotOnGridIssueSchema|JobQueueExceededIssueSchema|JobTimeInvalidIssueSchema))[.]ts$|production-line/(?:fn/checkRuntimeDefaultLinesFn|schema/(?:DefaultLineByOwnerItemIdSchema|check/(?:DefaultLineIssueSchema|LineInputClosedIssueSchema)))[.]ts$)";
 const gamePersistenceAllowedSourceDependencyPattern =
@@ -29,7 +36,7 @@ const productRendererPattern =
 	"^src/(?:arkpack|editor-build)/renderer(?:/|$)|^src/asset-authoring/(?:session|validation)(?:/|$)";
 const productionJobPresentationPattern = "^src/production-job/ui(?:/|$)";
 const boardSpatialPattern = "^src/(?:item-location|item-placement|item-merge|space-action)(?:/|$)";
-const productPresentationPattern = `^src/(?:asset-authoring|item-authoring|flow|estimate)/(?:ui|worker)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)|${itemDetailFramePattern}|${productionJobPresentationPattern}`;
+const productPresentationPattern = `^src/(?:asset-authoring|item-authoring|flow|estimate)/(?:ui|worker)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)|${itemDetailFramePattern}|${itemLineDetailPresentationPattern}|${productionJobPresentationPattern}`;
 const authoringProductPattern =
 	"^src/(?:project-authoring|board-scenario|project-version|project-note|authoring-mcp|authoring-session|authoring-shell)(?:/|$)";
 const authoringProductCorePattern =
@@ -192,6 +199,49 @@ const boundaryRules = [
 		},
 	},
 	{
+		name: "item-line-detail-reads-are-framework-neutral-projections",
+		comment:
+			"Item Line Detail reads project canonical Runtime and exact production facts without presentation, frame, authoring, platform, or command ownership.",
+		severity: "error",
+		from: {
+			path: itemLineDetailReadPattern,
+		},
+		to: {
+			path: `^src/(?!${itemLineDetailReadAllowedSourceDependencyPattern})|^(?:electron|shared|scripts)(?:/|$)|^node_modules/(?!effect(?:/|$)|ts-pattern(?:/|$))`,
+		},
+	},
+	{
+		name: "item-line-detail-ui-consumes-only-its-exact-owners",
+		comment:
+			"Item Lines UI projects its read contract, admits exact production commands through Item Detail Frame, and consumes only concrete renderer and reusable UI leaves.",
+		severity: "error",
+		from: {
+			path: itemLineDetailPresentationPattern,
+		},
+		to: {
+			path: `^src/(?!${itemLineDetailPresentationAllowedSourceDependencyPattern})|^(?:electron|shared|scripts)(?:/|$)|^node_modules/(?!effect(?:/|$)|lucide-react(?:/|$)|motion(?:/|$)|react(?:/|$)|ts-pattern(?:/|$))`,
+		},
+	},
+	{
+		name: "item-line-detail-has-concrete-production-consumers",
+		comment:
+			"Only dialog composition, shell identity wiring, Board Scenario identity, and Item Authoring output reuse consume the Item Line Detail product outside its own root.",
+		severity: "error",
+		from: {
+			path: activeCodePattern,
+			pathNot: [
+				itemLineDetailPattern,
+				"^src/ui/item-detail/ItemDetailModal[.]tsx$",
+				"^src/ui/shell/GameShell[.]tsx$",
+				"^src/board-scenario/toolbar/EditorBoardProductionLineLink[.]tsx$",
+				"^src/item-authoring/ui/EditorProductionLineOutputs[.]tsx$",
+			],
+		},
+		to: {
+			path: itemLineDetailPattern,
+		},
+	},
+	{
 		name: "item-definition-is-authored-vocabulary",
 		comment:
 			"Item Definition owns immutable authored item, query, selector, quantity, and storage contracts plus explicit-input selection policy; it may compose only exact schema leaves and never live Runtime, product, platform, or presentation ownership.",
@@ -325,6 +375,18 @@ const boundaryRules = [
 		},
 	},
 	{
+		name: "production-owners-stay-upstream-of-item-line-detail",
+		comment:
+			"Production schemas, reads, commands, and job presentation never import the downstream Item Line Detail projection or UI.",
+		severity: "error",
+		from: {
+			path: productionPipelinePattern,
+		},
+		to: {
+			path: itemLineDetailPattern,
+		},
+	},
+	{
 		name: "production-job-presentation-is-read-only",
 		comment:
 			"Active-job UI presents public job status through shared frame/UI policy and never imports public gameplay command surfaces.",
@@ -345,7 +407,7 @@ const boundaryRules = [
 			path: itemDetailFramePattern,
 		},
 		to: {
-			path: "^src/ui/item-detail(?:/|$)|^src/(?:item-interaction|production-input|production-job|production-line)/write(?:/|$)",
+			path: "^src/(?:ui/item-detail|item-line-detail)(?:/|$)|^src/(?:item-interaction|production-input|production-job|production-line)/write(?:/|$)",
 		},
 	},
 	{

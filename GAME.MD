@@ -6,6 +6,8 @@ This document owns implemented gameplay meaning. [`CONFIG.md`](CONFIG.md) owns a
 
 Arkini runs multiple isolated Board spaces plus global Inventory and optional Toolbar storage. A Board cell is `space + x + y`; equal coordinates in different spaces never interact. `currentSpace` selects presentation and passive-storage release destination, but all spaces keep simulating.
 
+A new game applies authored start entries in Board → Inventory → Toolbar order against one evolving candidate Runtime. Board space and coordinates plus Inventory/Toolbar slots are exact; every entry uses canonical placement, and `currentSpace` plus the complete initial state commit atomically or not at all.
+
 Spatial mechanics—distance, placement, merge, charge targeting, and output—remain in their origin space. Inventory and Toolbar are the only bridges between spaces and are passive storage:
 
 - active/ready jobs pause and queued work does not dispatch there;

@@ -6,9 +6,7 @@ import { BoardItemSchema } from "./BoardItemSchema";
 import { InventoryItemSchema } from "./InventoryItemSchema";
 import { ToolbarItemSchema } from "./ToolbarItemSchema";
 
-/**
- * Defines the board, inventory, and toolbar contents used when a new game starts.
- */
+/** Defines the complete board, inventory, and toolbar state for a new game. */
 export const StartSchema = z
 	.object({
 		currentSpace: NonNegativeIntegerSchema.describe(

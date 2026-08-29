@@ -4,9 +4,7 @@ import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { PositionSchema } from "~/engine/grid/schema/PositionSchema";
 
-/**
- * Places one item instance at an explicit slot in the initial toolbar.
- */
+/** Defines one item instance at an explicit slot in the initial toolbar. */
 export const ToolbarItemSchema = z
 	.object({
 		/**

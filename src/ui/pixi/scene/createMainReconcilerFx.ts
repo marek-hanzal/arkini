@@ -5,7 +5,7 @@ import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { TileActorFeedbackCue } from "~/ui/pixi/feedback/TileActorFeedbackCue";
 import { readTileActorFeedbackCuesFn } from "~/ui/pixi/feedback/fn/readTileActorFeedbackCuesFn";
 import { readCommittedTileReplacementsFx } from "~/ui/pixi/motion/readCommittedTileReplacementsFx";
-import { readCommittedTileSwapMotionCueFx } from "~/ui/pixi/motion/readCommittedTileSwapMotionCueFx";
+import { readCommittedTileSwapMotionCueFn } from "~/ui/pixi/motion/fn/readCommittedTileSwapMotionCueFn";
 import { readTileMotionCuesFx } from "~/ui/pixi/motion/readTileMotionCuesFx";
 import { readTileActorsFx } from "~/ui/pixi/actor/readTileActorsFx";
 import { readTileDeliveriesFx } from "~/ui/pixi/delivery/readTileDeliveriesFx";
@@ -294,12 +294,10 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		const replacementActorIds = new Set(replacements.map(({ actorId }) => actorId));
 		if (presentCommittedEffects) {
 			for (const swap of dropSnapshot.swaps) {
-				const swapCue = RendererRuntime.runSync(
-					readCommittedTileSwapMotionCueFx({
-						...swap.candidate,
-						transition,
-					}),
-				);
+				const swapCue = readCommittedTileSwapMotionCueFn({
+					...swap.candidate,
+					transition,
+				});
 				if (swapCue !== null) {
 					compiledCues.push(swapCue);
 					yield* dropPresentation.clearSwapFx(swap.generation);

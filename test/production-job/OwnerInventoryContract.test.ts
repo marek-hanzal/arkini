@@ -6,11 +6,12 @@ import { storeInputMaterialFx } from "~/production-input/write/storeInputMateria
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
-import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
-import { releaseInventoryItemFx } from "~/engine/runtime/write/releaseInventoryItemFx";
-import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
+import { moveRuntimeItemForTestFx } from "~test/support/item-interaction/moveRuntimeItemForTestFx";
+import { DropItemResultKind } from "~/item-interaction/DropItemResult";
+import { dropItemFx } from "~/item-interaction/write/dropItemFx";
+import { releaseInventoryItemFx } from "~/item-interaction/write/releaseInventoryItemFx";
+import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { storeItemInInventoryFx } from "~/engine/runtime/write/storeItemInInventoryFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
@@ -44,7 +45,7 @@ const moveOwnerFx = Effect.fn("moveOwnerFx")(function* (scope: "board" | "invent
 	const runtime = yield* readRuntimeFx();
 	const owner = runtime.items.find((item) => item.id === ownerItemId);
 	if (owner === undefined) throw new Error("Expected forge owner.");
-	return yield* moveItemFx({
+	return yield* moveRuntimeItemForTestFx({
 		itemId: owner.id,
 		revision: owner.revision,
 		location:
@@ -73,7 +74,7 @@ const removeBufferedWaterFx = Effect.fn("removeBufferedWaterFx")(function* () {
 		(item) => item.item.id === "water" && item.location.scope === "input",
 	);
 	if (water === undefined) throw new Error("Expected buffered water.");
-	yield* removeItemFx({
+	yield* removeRuntimeItemForTestFx({
 		itemId: water.id,
 		revision: water.revision,
 	});
@@ -214,14 +215,24 @@ describe("job owner inventory contract", () => {
 				if (activeOwner === undefined || activeOwner.location.scope !== "board") {
 					throw new Error("Expected active Board owner.");
 				}
-				yield* storeItemInInventoryFx({
+				const stored = yield* dropItemFx({
 					sourceItemId: activeOwner.id,
 					sourceRevision: activeOwner.revision,
 					sourceLocation: activeOwner.location,
-					inventoryItemId: opener.id,
-					inventoryRevision: opener.revision,
-					inventoryLocation: opener.location,
+					target: {
+						kind: "slot",
+						location: opener.location,
+						occupant: {
+							itemId: opener.id,
+							revision: opener.revision,
+						},
+					},
 				});
+				if (stored.kind !== DropItemResultKind.StoreInventory) {
+					return yield* Effect.die(
+						new Error(`Expected Inventory store, received "${stored.kind}".`),
+					);
+				}
 				yield* runTickRuntimeByFx({
 					elapsedMs: 5_000,
 				});

@@ -5,7 +5,7 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
+import { moveRuntimeItemForTestFx } from "~test/support/item-interaction/moveRuntimeItemForTestFx";
 import { advanceRuntimeStepFx } from "~/game-tick/advanceRuntimeStepFx";
 import { replayRuntimeStepsFx } from "~/game-tick/replayRuntimeStepsFx";
 import { TickStepMs } from "~/game-tick/TickStepMs";
@@ -41,7 +41,7 @@ const moveOwnerToInventoryFx = Effect.fn("moveOwnerToInventoryFx")(function* () 
 	const runtime = yield* readRuntimeFx();
 	const owner = runtime.items.find((item) => item.id === ownerItemId);
 	if (owner === undefined) throw new Error("Expected forge owner.");
-	yield* moveItemFx({
+	yield* moveRuntimeItemForTestFx({
 		itemId: owner.id,
 		location: {
 			scope: "inventory",

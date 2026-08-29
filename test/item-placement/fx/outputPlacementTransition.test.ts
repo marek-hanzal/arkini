@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
-import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
+import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import {
 	boardLocation,
@@ -168,7 +168,7 @@ describe("output placement transition", () => {
 					quantity: 1,
 				});
 				const staleRuntime = yield* readRuntimeFx();
-				yield* removeItemFx({
+				yield* removeRuntimeItemForTestFx({
 					itemId: "runtime:permit",
 					revision: permit.revision,
 				});

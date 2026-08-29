@@ -7,7 +7,7 @@ import { RuntimeSaveFx } from "~/engine/save/RuntimeSaveFx";
 import { RuntimeSaveLayerFx } from "~/engine/save/RuntimeSaveLayerFx";
 import { GameRuntimeLayerFx } from "~/game-runtime/layer/GameRuntimeLayerFx";
 import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
-import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
+import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
@@ -153,7 +153,7 @@ describe("RuntimeSaveLayerFx", () => {
 				expect(item).not.toHaveProperty("revision");
 			}
 
-			const failure = yield* removeItemFx({
+			const failure = yield* removeRuntimeItemForTestFx({
 				itemId: first.id,
 				revision: "revision:stale",
 			}).pipe(Effect.flip);

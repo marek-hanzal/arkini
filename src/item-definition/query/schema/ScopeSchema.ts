@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
+import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 
 /**
  * How far one gameplay query may search through the runtime world.

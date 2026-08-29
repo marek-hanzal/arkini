@@ -2,7 +2,7 @@ import type {
 	EditorItemOriginRequirementOccurrence,
 	EditorItemOriginUnsupportedRequirementOccurrence,
 } from "~/flow/domain/EditorItemOriginSource";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 export type EditorItemOriginOperationKind = "line" | "charges" | "merge" | "expiry";
 

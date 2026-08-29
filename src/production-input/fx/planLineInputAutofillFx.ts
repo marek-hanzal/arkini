@@ -13,7 +13,7 @@ import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntim
 import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { selectItemsFn } from "~/engine/selector/fn/selectItemsFn";
+import { selectItemsFn } from "~/item-definition/fn/selectItemsFn";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 
 export namespace planLineInputAutofillFx {

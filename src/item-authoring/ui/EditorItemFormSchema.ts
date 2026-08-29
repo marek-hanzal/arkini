@@ -2,9 +2,9 @@ import { z } from "zod";
 
 import type { InputSchema } from "~/production-action/schema/InputSchema";
 import type { RuleSchema } from "~/production-action/schema/RuleSchema";
-import type { BaseSchema } from "~/engine/item/schema/BaseSchema";
-import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { BaseSchema } from "~/item-definition/schema/BaseSchema";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";

@@ -2,7 +2,7 @@ import type { InputSchema as LineInputSchema } from "~/production-input/schema/I
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
-import type { QuerySchema } from "~/engine/query/schema/QuerySchema";
+import type { QuerySchema } from "~/item-definition/query/schema/QuerySchema";
 import type { RollSchema } from "~/production-output/roll/schema/RollSchema";
 import type { SetSchema } from "~/production-output/roll/schema/SetSchema";
 import type { WeightedDropSchema } from "~/production-output/roll/schema/WeightedDropSchema";

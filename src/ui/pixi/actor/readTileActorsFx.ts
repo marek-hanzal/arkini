@@ -3,7 +3,7 @@ import { match, P } from "ts-pattern";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { readTileActorBadgeCountFn } from "~/ui/pixi/actor/fn/readTileActorBadgeCountFn";
 import { readTileActorAssetSourceIdsFx } from "~/ui/pixi/actor/readTileActorAssetSourceIdsFx";

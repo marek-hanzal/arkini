@@ -12,7 +12,7 @@ import { isDeliveryRuntimeItemFn } from "~/engine/runtime/read/fn/isDeliveryRunt
 import type { DeliveryRuntimeItemSchema } from "~/engine/runtime/schema/DeliveryRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
-import { matchesItemSelectorFn } from "~/engine/selector/fn/matchesItemSelectorFn";
+import { matchesItemSelectorFn } from "~/item-definition/fn/matchesItemSelectorFn";
 
 export namespace checkRuntimeDeliveriesFn {
 	export interface Props {

@@ -1,4 +1,4 @@
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { FloatingPortal } from "@floating-ui/react";
 import { Replace } from "lucide-react";
 import { Button, ButtonLink } from "~/ui/button/Button";

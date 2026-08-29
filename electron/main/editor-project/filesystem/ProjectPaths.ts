@@ -1,7 +1,7 @@
 import type { Effect } from "effect";
 
 import type { EditorObjectHashSchema } from "~/project-version/EditorObjectHashSchema";
-import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 /** Complete path grammar below one portable Editor project root. */
 export interface ProjectPaths {

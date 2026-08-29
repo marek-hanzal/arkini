@@ -4,7 +4,7 @@ import type { EditorBoardScenarioFileSchema } from "~/board-scenario/EditorBoard
 import { GameProjectGameSchemaReference } from "~/game-config/source/GameProjectReference";
 import { GameFileSchema } from "~/game-config/source/schema/GameFileSchema";
 import { EditorVersionManifestSchema } from "~/project-version/EditorVersionManifestSchema";
-import { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";

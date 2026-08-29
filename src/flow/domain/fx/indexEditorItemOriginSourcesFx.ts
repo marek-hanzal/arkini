@@ -9,7 +9,7 @@ import { createEditorAcquisitionGraphFn } from "~/flow/domain/fn/createEditorAcq
 import { readEditorItemOriginSourcesFn } from "~/flow/domain/fn/readEditorItemOriginSourcesFn";
 import { reportEditorItemOriginFlowProgressFx } from "~/flow/domain/fx/reportEditorItemOriginFlowProgressFx";
 import { yieldEditorItemOriginFlowFx } from "~/flow/domain/fx/yieldEditorItemOriginFlowFx";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 const unique = <Value>(values: ReadonlyArray<Value>): Value[] => [

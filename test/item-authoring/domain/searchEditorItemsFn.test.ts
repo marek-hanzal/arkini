@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { searchEditorItemsFn } from "~/item-authoring/domain/fn/searchEditorItemsFn";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 const item = (id: string, title: string) =>
 	({

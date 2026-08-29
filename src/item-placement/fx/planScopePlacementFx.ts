@@ -2,7 +2,7 @@ import { Array, Effect, Order } from "effect";
 
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { PositionSchema } from "~/item-location/schema/PositionSchema";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import { readGridLocationKeyFn } from "~/item-location/fn/readGridLocationKeyFn";

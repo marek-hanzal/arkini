@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
+import { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 
 /**
  * Fields shared by every runtime item query.

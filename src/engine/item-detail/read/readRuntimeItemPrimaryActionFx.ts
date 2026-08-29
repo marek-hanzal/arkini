@@ -1,6 +1,6 @@
 import { Effect, Option } from "effect";
 
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { resolveJobQueueFx } from "~/production-job/fx/read/resolveJobQueueFx";
 import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
 import { readEffectiveDefaultLineFn } from "~/production-line/fn/readEffectiveDefaultLineFn";

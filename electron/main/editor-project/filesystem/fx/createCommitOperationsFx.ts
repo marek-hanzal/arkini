@@ -16,7 +16,7 @@ import { analyzeEditorProjectCompatibilityFn } from "~/project-version/fn/analyz
 import { bumpArkpackVersionFn } from "~/project-version/fn/bumpArkpackVersionFn";
 import { GameProjectGameSchemaReference } from "~/game-config/source/GameProjectReference";
 import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
-import { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";

@@ -11,7 +11,7 @@ import {
 	type LucideIcon,
 } from "lucide-react";
 
-import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 /** Canonical editor copy and iconography for every authored item type. */
 export const EditorItemTypePresentation = {

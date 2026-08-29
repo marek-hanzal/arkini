@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
+import { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { SourceActionSchema } from "./SourceActionSchema";
 import { TargetEffectSchema } from "./TargetEffectSchema";

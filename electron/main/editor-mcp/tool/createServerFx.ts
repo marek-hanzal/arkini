@@ -12,7 +12,7 @@ import { EditItemInputSchemas, type EditItemInput } from "./EditItemInputSchemas
 import { ItemCollectionInputSchema } from "./ItemCollectionInputSchema";
 import { createItemFx } from "./createItemFx";
 import { editItemFx } from "./editItemFx";
-import { readEstimateTextFx } from "./readEstimateTextFx";
+import { readEstimateTextFn } from "./fn/readEstimateTextFn";
 import { readItemCollectionTextFx } from "./readItemCollectionTextFx";
 import { readItemConfigTextFx } from "./readItemConfigTextFx";
 import { readItemDetailTextFx } from "./readItemDetailTextFx";
@@ -247,9 +247,7 @@ const createServer = (
 		},
 		async (input) =>
 			runTool(
-				readProjectFx().pipe(
-					Effect.flatMap((project) => readEstimateTextFx(project, input)),
-				),
+				readProjectFx().pipe(Effect.map((project) => readEstimateTextFn(project, input))),
 			),
 	);
 	server.registerTool(

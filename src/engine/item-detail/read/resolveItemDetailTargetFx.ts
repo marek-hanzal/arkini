@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readItemDetailTabsFx } from "~/engine/item-detail/read/readItemDetailTabsFx";
+import { readItemDetailTabsFn } from "~/engine/item-detail/fn/readItemDetailTabsFn";
 import type { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetailSourcesFx";
 import { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -38,7 +38,7 @@ export const resolveItemDetailTargetFx = Effect.fn("resolveItemDetailTargetFx")(
 	sources,
 }: resolveItemDetailTargetFx.Props) {
 	const item = runtime.items.find((candidate) => candidate.id === itemId);
-	const tabs = yield* readItemDetailTabsFx({
+	const tabs = readItemDetailTabsFn({
 		target: {
 			kind: "runtime",
 			item,

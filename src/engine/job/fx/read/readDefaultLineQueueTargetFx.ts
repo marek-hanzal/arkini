@@ -3,7 +3,7 @@ import { Effect, Option } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { DefaultLineQueueUnavailableError } from "~/engine/job/error/DefaultLineQueueUnavailableError";
 import { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
-import { readEffectiveDefaultLineFx } from "~/engine/line/read/readEffectiveDefaultLineFx";
+import { readEffectiveDefaultLineFn } from "~/engine/line/fn/readEffectiveDefaultLineFn";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -31,7 +31,7 @@ export const readDefaultLineQueueTargetFx = Effect.fn("readDefaultLineQueueTarge
 			}),
 		);
 	}
-	const line = yield* readEffectiveDefaultLineFx({
+	const line = readEffectiveDefaultLineFn({
 		ownerItemId,
 		ownerItem,
 		runtime,

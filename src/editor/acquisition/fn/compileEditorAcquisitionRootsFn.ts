@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Order } from "effect";
 
 import type {
 	EditorAcquisitionGraph,
@@ -28,20 +28,16 @@ const requiresAbsentFact = (when: WhenSchema.Type) => {
 	}
 };
 
-const readItemOutputsFx = Effect.fn("compileEditorAcquisitionRootsFx.itemOutputs")(function* (
-	item: ItemSchema.Type,
-) {
+const readItemOutputsFn = (item: ItemSchema.Type) => {
 	return [
 		...readAuthoredItemLinesFn(item).map(({ output }) => output),
 		item.charges?.output,
 		...(item.merge ?? []).map(({ output }) => output),
 		item.type === "temporary" ? item.output : undefined,
 	];
-});
+};
 
-const readLimitationsFx = Effect.fn("compileEditorAcquisitionRootsFx.limitations")(function* (
-	config: GameConfigSchema.Type,
-) {
+const readLimitationsFn = (config: GameConfigSchema.Type) => {
 	const limitations = new Set<EditorAcquisitionLimitation>();
 	for (const item of Object.values(config.items)) {
 		for (const line of readAuthoredItemLinesFn(item)) {
@@ -64,7 +60,7 @@ const readLimitationsFx = Effect.fn("compileEditorAcquisitionRootsFx.limitations
 				limitations.add("spatial-requirements-approximated");
 		}
 		if (
-			(yield* readItemOutputsFx(item)).some((output) =>
+			readItemOutputsFn(item).some((output) =>
 				readOutputDrops(output).some(({ rules }) => {
 					if (
 						rules.some(
@@ -80,8 +76,8 @@ const readLimitationsFx = Effect.fn("compileEditorAcquisitionRootsFx.limitations
 	}
 	return [
 		...limitations,
-	].sort((left, right) => left.localeCompare(right));
-});
+	].sort(Order.String);
+};
 
 const readStartQuantityByItemId = (config: GameConfigSchema.Type) => {
 	const quantities = new Map<string, number>();
@@ -94,19 +90,17 @@ const readStartQuantityByItemId = (config: GameConfigSchema.Type) => {
 };
 
 /** Compiles authored starting quantities and static-analysis limitations. */
-export const compileEditorAcquisitionRootsFx = Effect.fn("compileEditorAcquisitionRootsFx")(
-	function* (config: GameConfigSchema.Type) {
-		const start = readStartQuantityByItemId(config);
-		return {
-			limitations: yield* readLimitationsFx(config),
-			roots: [
-				...start,
-			]
-				.sort(([left], [right]) => left.localeCompare(right))
-				.map(([factId, quantity]) => ({
-					factId,
-					quantity,
-				})),
-		} satisfies Pick<EditorAcquisitionGraph, "limitations" | "roots">;
-	},
-);
+export const compileEditorAcquisitionRootsFn = (config: GameConfigSchema.Type) => {
+	const start = readStartQuantityByItemId(config);
+	return {
+		limitations: readLimitationsFn(config),
+		roots: [
+			...start,
+		]
+			.sort(([left], [right]) => Order.String(left, right))
+			.map(([factId, quantity]) => ({
+				factId,
+				quantity,
+			})),
+	} satisfies Pick<EditorAcquisitionGraph, "limitations" | "roots">;
+};

@@ -1,4 +1,4 @@
-import { Effect, Option } from "effect";
+import { Option } from "effect";
 
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
@@ -13,7 +13,7 @@ type ItemDetailTabsTarget =
 			readonly kind: "definition";
 	  };
 
-export namespace readItemDetailTabsFx {
+export namespace readItemDetailTabsFn {
 	export type SourcesAvailability =
 		| {
 				readonly kind: "available";
@@ -31,7 +31,7 @@ export namespace readItemDetailTabsFx {
 
 const withSources = (
 	tabs: readonly ItemDetailTabEnumSchema.Type[],
-	sources: readItemDetailTabsFx.SourcesAvailability | undefined,
+	sources: readItemDetailTabsFn.SourcesAvailability | undefined,
 ): readonly ItemDetailTabEnumSchema.Type[] => {
 	if (sources?.kind !== "available" || sources.source?.length === 0) return tabs;
 	const infoIndex = tabs.indexOf(ItemDetailTabEnumSchema.enum.Info);
@@ -58,13 +58,10 @@ const lineOwnerTabs: readonly ItemDetailTabEnumSchema.Type[] = [
 ];
 
 /** Classifies the finite Item Detail tabs supported by one exact runtime or definition target. */
-export const readItemDetailTabsFx = Effect.fn("readItemDetailTabsFx")(function* ({
-	sources,
-	target,
-}: readItemDetailTabsFx.Props) {
+export const readItemDetailTabsFn = ({ sources, target }: readItemDetailTabsFn.Props) => {
 	if (target.kind === "definition") return withSources(infoTab, sources);
 	if (target.item === undefined) return noTabs;
 	const lineOwnerItem = Option.getOrUndefined(isLineOwnerItemFn(target.item.item));
 	if (lineOwnerItem === undefined) return withSources(infoTab, sources);
 	return withSources(lineOwnerTabs, sources);
-});
+};

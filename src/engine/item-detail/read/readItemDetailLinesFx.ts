@@ -4,7 +4,7 @@ import type { ItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines"
 import { readBoardItemDetailLineFx } from "~/engine/item-detail/read/readBoardItemDetailLineFx";
 import { readStoredItemDetailLineFx } from "~/engine/item-detail/read/readStoredItemDetailLineFx";
 import { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
-import { readEffectiveDefaultLineFx } from "~/engine/line/read/readEffectiveDefaultLineFx";
+import { readEffectiveDefaultLineFn } from "~/engine/line/fn/readEffectiveDefaultLineFn";
 import { readLineOwnerLinesFn } from "~/engine/line/fn/readLineOwnerLinesFn";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
@@ -33,11 +33,11 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 	if (ownerItem === undefined) return unavailable;
 
 	const lines = readLineOwnerLinesFn(ownerItem);
-	const defaultLineId = (yield* readEffectiveDefaultLineFx({
+	const defaultLineId = readEffectiveDefaultLineFn({
 		ownerItemId: owner.id,
 		ownerItem,
 		runtime,
-	}))?.id;
+	})?.id;
 	const projected: ItemDetailLines.Line[] = [];
 
 	for (const line of lines) {

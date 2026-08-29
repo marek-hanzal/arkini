@@ -8,7 +8,7 @@ import { filterInputSlotItemsFx } from "~/engine/input/read/filterInputSlotItems
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
 import { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
-import { readEffectiveDefaultLineFx } from "~/engine/line/read/readEffectiveDefaultLineFx";
+import { readEffectiveDefaultLineFn } from "~/engine/line/fn/readEffectiveDefaultLineFn";
 import { readLineOwnerLinesFn } from "~/engine/line/fn/readLineOwnerLinesFn";
 import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
@@ -55,7 +55,7 @@ export const resolveLineInputStoreFx = Effect.fn("resolveLineInputStoreFx")(func
 	if (boardOwner === undefined) return undefined;
 	const effectiveDefaultLine =
 		requestedLineId === undefined
-			? yield* readEffectiveDefaultLineFx({
+			? readEffectiveDefaultLineFn({
 					ownerItemId: boardOwner.id,
 					ownerItem: narrowedLineOwnerItem,
 					runtime,

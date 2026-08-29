@@ -5,7 +5,7 @@ import type {
 	EditorItemOriginItemNode,
 } from "~/editor/origin-flow/EditorItemOriginFlow";
 import { type EditorItemOriginSource } from "~/editor/EditorItemOriginSource";
-import { createEditorAcquisitionGraphFx } from "~/editor/createEditorAcquisitionGraphFx";
+import { createEditorAcquisitionGraphFn } from "~/editor/acquisition/fn/createEditorAcquisitionGraphFn";
 import { readEditorItemOriginSourcesFn } from "~/editor/origin-flow/fn/readEditorItemOriginSourcesFn";
 import { reportEditorItemOriginFlowProgressFx } from "~/editor/origin-flow/fx/reportEditorItemOriginFlowProgressFx";
 import { yieldEditorItemOriginFlowFx } from "~/editor/origin-flow/fx/yieldEditorItemOriginFlowFx";
@@ -58,7 +58,7 @@ export const indexEditorItemOriginSourcesFx = Effect.fn("indexEditorItemOriginSo
 		for (const entry of config.start.inventory) addStarter(entry.itemId, "Inventory");
 		for (const entry of config.start.toolbar) addStarter(entry.itemId, "Toolbar");
 
-		const graph = yield* createEditorAcquisitionGraphFx(config);
+		const graph = createEditorAcquisitionGraphFn(config);
 		const sources = readEditorItemOriginSourcesFn(graph);
 		yield* reportEditorItemOriginFlowProgressFx(onProgress, "indexing", 28);
 		yield* yieldEditorItemOriginFlowFx();

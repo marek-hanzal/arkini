@@ -1,7 +1,6 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { createEditorAcquisitionGraphFx } from "~/editor/createEditorAcquisitionGraphFx";
+import { createEditorAcquisitionGraphFn } from "~/editor/acquisition/fn/createEditorAcquisitionGraphFn";
 import { readEditorItemOriginSourcesFn } from "~/editor/origin-flow/fn/readEditorItemOriginSourcesFn";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
@@ -10,8 +9,8 @@ import { existsWhen } from "~test/line/fx/support/lineTestRuntime";
 import { createMergeTestConfig } from "~test/merge/support/createMergeTestConfig";
 
 const readEditorItemOriginSources = (
-	config: Parameters<typeof createEditorAcquisitionGraphFx>[0],
-) => readEditorItemOriginSourcesFn(Effect.runSync(createEditorAcquisitionGraphFx(config)));
+	config: Parameters<typeof createEditorAcquisitionGraphFn>[0],
+) => readEditorItemOriginSourcesFn(createEditorAcquisitionGraphFn(config));
 
 const dropOf = (itemId: string): DropSchema.Type => ({
 	itemId,
@@ -98,7 +97,7 @@ describe("readEditorItemOriginSourcesFn", () => {
 			output: outputOf("dust"),
 			rules: [],
 		});
-		const graph = Effect.runSync(createEditorAcquisitionGraphFx(config));
+		const graph = createEditorAcquisitionGraphFn(config);
 		const sources = readEditorItemOriginSourcesFn(graph);
 
 		expect(sources).toHaveLength(1);
@@ -147,7 +146,7 @@ describe("readEditorItemOriginSourcesFn", () => {
 				},
 			],
 		});
-		const graph = Effect.runSync(createEditorAcquisitionGraphFx(config));
+		const graph = createEditorAcquisitionGraphFn(config);
 		const sources = readEditorItemOriginSourcesFn(graph);
 
 		expect(sources).toHaveLength(1);
@@ -241,7 +240,7 @@ describe("readEditorItemOriginSourcesFn", () => {
 			]),
 		);
 
-		const graph = Effect.runSync(createEditorAcquisitionGraphFx(config));
+		const graph = createEditorAcquisitionGraphFn(config);
 		const withAlternativeClause = {
 			...graph,
 			routes: graph.routes.map((route) =>

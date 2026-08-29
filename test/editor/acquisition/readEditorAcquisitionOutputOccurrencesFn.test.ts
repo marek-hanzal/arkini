@@ -1,13 +1,12 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readEditorAcquisitionOutputOccurrencesFx } from "~/editor/readEditorAcquisitionOutputOccurrencesFx";
+import { readEditorAcquisitionOutputOccurrencesFn } from "~/editor/acquisition/fn/readEditorAcquisitionOutputOccurrencesFn";
 import { OutputSchema } from "~/engine/output/schema/OutputSchema";
 
 const read = (input: unknown) =>
-	Effect.runSync(readEditorAcquisitionOutputOccurrencesFx(OutputSchema.parse(input)));
+	readEditorAcquisitionOutputOccurrencesFn(OutputSchema.parse(input));
 
-describe("readEditorAcquisitionOutputOccurrencesFx", () => {
+describe("readEditorAcquisitionOutputOccurrencesFn", () => {
 	it("projects weighted selections and quantity ranges into scalar expected yields", () => {
 		const result = read({
 			set: [

@@ -1,8 +1,7 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { EditorItemEstimateIndexEntry } from "~/editor/EditorItemEstimateIndex";
-import { selectEditorItemEstimateIndexFx } from "~/editor/selectEditorItemEstimateIndexFx";
+import { selectEditorItemEstimateIndexFn } from "~/editor/estimator/fn/selectEditorItemEstimateIndexFn";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 
 const item = (id: string, title: string) =>
@@ -51,17 +50,15 @@ const items = [
 ];
 
 const readItemIds = (sort: "demand" | "fastest" | "slowest", query = "", incomplete = false) =>
-	Effect.runSync(
-		selectEditorItemEstimateIndexFx({
-			entries,
-			incomplete,
-			items,
-			query,
-			sort,
-		}),
-	).map(({ item }) => item.id);
+	selectEditorItemEstimateIndexFn({
+		entries,
+		incomplete,
+		items,
+		query,
+		sort,
+	}).map(({ item }) => item.id);
 
-describe("selectEditorItemEstimateIndexFx", () => {
+describe("selectEditorItemEstimateIndexFn", () => {
 	it("owns the global Estimate ordering and keeps indeterminate estimates last", () => {
 		expect(readItemIds("fastest")).toEqual([
 			"water",
@@ -113,15 +110,13 @@ describe("selectEditorItemEstimateIndexFx", () => {
 		];
 
 		expect(
-			Effect.runSync(
-				selectEditorItemEstimateIndexFx({
-					entries: tiedEntries,
-					incomplete: false,
-					items: tiedItems,
-					query: "",
-					sort: "fastest",
-				}),
-			).map(({ item }) => item.id),
+			selectEditorItemEstimateIndexFn({
+				entries: tiedEntries,
+				incomplete: false,
+				items: tiedItems,
+				query: "",
+				sort: "fastest",
+			}).map(({ item }) => item.id),
 		).toEqual([
 			"water",
 			"unused",

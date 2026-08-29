@@ -1,7 +1,6 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readEstimateTextFx } from "../../../../electron/main/editor-mcp/tool/readEstimateTextFx";
+import { readEstimateTextFn } from "../../../../electron/main/editor-mcp/tool/fn/readEstimateTextFn";
 import { createGraphProject } from "./support/createToolProject";
 
 const readEstimate = (
@@ -13,17 +12,15 @@ const readEstimate = (
 		readonly query?: string;
 	} = {},
 ) =>
-	Effect.runSync(
-		readEstimateTextFx(createGraphProject(), {
-			incomplete: options.incomplete ?? false,
-			page: options.page ?? 1,
-			pageSize: options.pageSize ?? 25,
-			query: options.query,
-			sort,
-		}),
-	);
+	readEstimateTextFn(createGraphProject(), {
+		incomplete: options.incomplete ?? false,
+		page: options.page ?? 1,
+		pageSize: options.pageSize ?? 25,
+		query: options.query,
+		sort,
+	});
 
-describe("readEstimateTextFx", () => {
+describe("readEstimateTextFn", () => {
 	it("formats the selected global Estimate order as a bounded page", () => {
 		const text = readEstimate("slowest", {
 			pageSize: 2,

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { createEditorAcquisitionGraphFx } from "~/editor/createEditorAcquisitionGraphFx";
+import { createEditorAcquisitionGraphFn } from "~/editor/acquisition/fn/createEditorAcquisitionGraphFn";
 import { estimateEditorItemsFn } from "~/editor/estimator/fn/estimateEditorItemsFn";
 import { compileGameSourcesFx } from "~/engine/compiler/fx/compileGameSourcesFx";
 import { resolveLineRunFx } from "~/engine/line/fx/run/resolveLineRunFx";
@@ -47,7 +47,7 @@ const compileConfig = async (items: Record<string, unknown>, start?: StartSchema
 	return result.config;
 };
 
-describe("createEditorAcquisitionGraphFx", () => {
+describe("createEditorAcquisitionGraphFn", () => {
 	it("only projects charge depletion after an exact number of authored spends", async () => {
 		const config = await compileConfig(
 			{
@@ -102,7 +102,7 @@ describe("createEditorAcquisitionGraphFx", () => {
 			},
 		);
 
-		const nonDivisible = Effect.runSync(createEditorAcquisitionGraphFx(config));
+		const nonDivisible = createEditorAcquisitionGraphFn(config);
 		expect(
 			nonDivisible.routes.some(
 				(route) =>
@@ -136,7 +136,7 @@ describe("createEditorAcquisitionGraphFx", () => {
 		const payer = divisibleConfig.items.payer;
 		if (payer?.charges === undefined) throw new Error("Expected a charged payer fixture.");
 		payer.charges.amount = 4;
-		const divisible = Effect.runSync(createEditorAcquisitionGraphFx(divisibleConfig));
+		const divisible = createEditorAcquisitionGraphFn(divisibleConfig);
 		expect(divisible.routes).toContainEqual(
 			expect.objectContaining({
 				metadata: expect.objectContaining({
@@ -175,7 +175,7 @@ describe("createEditorAcquisitionGraphFx", () => {
 			},
 			sourceMaxCount: 2,
 		});
-		const graph = Effect.runSync(createEditorAcquisitionGraphFx(config));
+		const graph = createEditorAcquisitionGraphFn(config);
 		const selfMerge = graph.routes.find(
 			(route) =>
 				route.metadata.kind === "merge-output" &&
@@ -215,7 +215,7 @@ describe("createEditorAcquisitionGraphFx", () => {
 				},
 			},
 		});
-		const graph = Effect.runSync(createEditorAcquisitionGraphFx(config));
+		const graph = createEditorAcquisitionGraphFn(config);
 		const sameResultOutput = graph.routes.find(
 			(route) =>
 				route.metadata.kind === "merge-output" &&
@@ -266,7 +266,7 @@ describe("createEditorAcquisitionGraphFx", () => {
 		expect(result.diagnostics).toEqual([]);
 		if (result.config === undefined) throw new Error("Expected validator-valid config.");
 
-		const graph = Effect.runSync(createEditorAcquisitionGraphFx(result.config));
+		const graph = createEditorAcquisitionGraphFn(result.config);
 		const route = graph.routes.find(({ output }) => output.factId === "target");
 		expect(route).toMatchObject({
 			chargeUses: [
@@ -401,7 +401,7 @@ describe("createEditorAcquisitionGraphFx", () => {
 			target: createSimpleItem("target"),
 		});
 
-		const graph = Effect.runSync(createEditorAcquisitionGraphFx(config));
+		const graph = createEditorAcquisitionGraphFn(config);
 		expect(graph.limitations).toContain("conditional-runtime-adjustments-ignored");
 	});
 });

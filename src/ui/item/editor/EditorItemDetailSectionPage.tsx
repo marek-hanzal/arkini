@@ -1,4 +1,3 @@
-import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { EditorItemArtworkDetail } from "~/ui/item/editor/EditorItemArtworkDetail";
 import {
 	EditorItemChargesDetail,
@@ -11,7 +10,7 @@ import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
 import { EditorItemProductionDetail } from "~/ui/item/editor/EditorItemProductionDetail";
 import { EditorSpaceActionDetail } from "~/ui/item/editor/EditorSpaceActionDetail";
 import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
-import { readEditorItemSectionsFx } from "~/ui/item/editor/readEditorItemSectionsFx";
+import { readEditorItemSectionsFn } from "~/ui/item/editor/fn/readEditorItemSectionsFn";
 import { useEditorItemByUid } from "~/ui/item/editor/useEditorItemByUid";
 
 /** Resolves and dispatches one canonical read-only item section. */
@@ -24,7 +23,7 @@ export const EditorItemDetailSectionPage = ({
 }) => {
 	const item = useEditorItemByUid(uid);
 	if (item === undefined) return <EditorItemNotFound uid={uid} />;
-	const available = RendererRuntime.runSync(readEditorItemSectionsFx(item)).some(
+	const available = readEditorItemSectionsFn(item).some(
 		(candidate) => candidate.id === sectionId,
 	);
 	if (!available)

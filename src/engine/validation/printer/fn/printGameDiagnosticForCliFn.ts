@@ -1,13 +1,9 @@
-import { Effect } from "effect";
-
 import type { GameDiagnosticSchema } from "~/engine/validation/schema/GameDiagnosticSchema";
-import { readGameDiagnosticPresentationFx } from "~/engine/validation/printer/readGameDiagnosticPresentationFx";
+import { readGameDiagnosticPresentationFn } from "~/engine/validation/printer/fn/readGameDiagnosticPresentationFn";
 
 /** Prints one structured diagnostic for terminal consumption. */
-export const printGameDiagnosticForCliFx = Effect.fnUntraced(function* (
-	diagnostic: GameDiagnosticSchema.Type,
-) {
-	const presentation = yield* readGameDiagnosticPresentationFx(diagnostic);
+export const printGameDiagnosticForCliFn = (diagnostic: GameDiagnosticSchema.Type) => {
+	const presentation = readGameDiagnosticPresentationFn(diagnostic);
 	const location = [
 		diagnostic.source,
 		diagnostic.path.length > 0 ? diagnostic.path.join(".") : undefined,
@@ -19,4 +15,4 @@ export const printGameDiagnosticForCliFx = Effect.fnUntraced(function* (
 	const suffix = location.length === 0 ? "" : ` (${location})`;
 
 	return `${heading}${context}${suffix}\n  ${presentation.detail}`;
-});
+};

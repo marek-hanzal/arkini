@@ -1,15 +1,14 @@
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { EditorItemEstimateIndexEntry } from "~/editor/EditorItemEstimateIndex";
 import { ButtonLink } from "~/ui/button/Button";
-import { formatItemDurationFx } from "~/ui/item-detail/formatItemDurationFx";
+import { formatItemDurationFn } from "~/ui/item-detail/fn/formatItemDurationFn";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 
 const runtimeLabel = (estimate: EditorItemEstimateIndexEntry) => {
 	if (estimate.status === "partial") return "Partial";
 	if (estimate.status === "unreachable") return "No path";
 	if (estimate.runtimeMs === undefined) return "—";
-	const duration = RendererRuntime.runSync(formatItemDurationFx(estimate.runtimeMs));
+	const duration = formatItemDurationFn(estimate.runtimeMs);
 	return `≈ ${duration}`;
 };
 

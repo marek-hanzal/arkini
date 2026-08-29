@@ -1,5 +1,3 @@
-import { Effect } from "effect";
-
 const readErrorMessage = (error: unknown) => {
 	if (
 		typeof error === "object" &&
@@ -13,7 +11,5 @@ const readErrorMessage = (error: unknown) => {
 };
 
 /** Reads the first user-facing message published for one registered form field. */
-export const readEditorFieldErrorFx = Effect.fn("readEditorFieldErrorFx")(
-	(errors: readonly unknown[]) =>
-		Effect.sync(() => errors.map(readErrorMessage).find((message) => message !== undefined)),
-);
+export const readEditorFieldErrorFn = (errors: readonly unknown[]) =>
+	errors.map(readErrorMessage).find((message) => message !== undefined);

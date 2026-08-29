@@ -1,9 +1,8 @@
 import { useMemo } from "react";
 
-import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { useEditorProject } from "~/ui/editor/useEditorProject";
 import { useFieldContext } from "~/ui/form/EditorFormContexts";
-import { readEditorFieldErrorFx } from "~/ui/form/readEditorFieldErrorFx";
+import { readEditorFieldErrorFn } from "~/ui/form/fn/readEditorFieldErrorFn";
 import { EditorSearchCombobox, type EditorSearchOption } from "~/ui/form/EditorSearchCombobox";
 import { EditorAssetThumbnail } from "~/ui/resource/editor/EditorAssetThumbnail";
 
@@ -21,7 +20,7 @@ export const EditorAssetAutocompleteField = ({
 	label,
 }: EditorAssetAutocompleteFieldProps) => {
 	const field = useFieldContext<string>();
-	const error = RendererRuntime.runSync(readEditorFieldErrorFx(field.state.meta.errors));
+	const error = readEditorFieldErrorFn(field.state.meta.errors);
 	const project = useEditorProject();
 	const options = useMemo(
 		() =>

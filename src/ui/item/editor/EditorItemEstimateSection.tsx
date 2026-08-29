@@ -1,13 +1,12 @@
 import { Calculator, Info, LoaderCircle, TriangleAlert } from "lucide-react";
 
 import { useEditorProject } from "~/ui/editor/useEditorProject";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type {
 	EditorItemEstimate,
 	EditorItemEstimateDiagnostic,
 } from "~/editor/estimator/EditorItemEstimate";
 import type { EditorAcquisitionLimitation } from "~/editor/EditorAcquisitionGraph";
-import { formatItemDurationFx } from "~/ui/item-detail/formatItemDurationFx";
+import { formatItemDurationFn } from "~/ui/item-detail/fn/formatItemDurationFn";
 import { EditorItemEstimateRouteGraph } from "~/ui/item/editor/EditorItemEstimateRouteGraph";
 import { useEditorItemEstimate } from "~/ui/item/editor/useEditorItemEstimate";
 import { Tooltip } from "~/ui/overlay/Tooltip";
@@ -16,8 +15,7 @@ import { Status } from "~/ui/status/Status";
 const formatQuantity = (quantity: number) =>
 	Number.isInteger(quantity) ? String(quantity) : quantity.toFixed(2).replace(/\.00$/, "");
 
-const formatRuntime = (runtimeMs: number) =>
-	RendererRuntime.runSync(formatItemDurationFx(runtimeMs));
+const formatRuntime = (runtimeMs: number) => formatItemDurationFn(runtimeMs);
 
 const diagnosticText = (diagnostic: EditorItemEstimateDiagnostic) => {
 	switch (diagnostic.kind) {

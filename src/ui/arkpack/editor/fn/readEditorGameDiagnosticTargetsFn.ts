@@ -1,11 +1,9 @@
-import { Effect } from "effect";
-
 import type { EditorGameDiagnostic } from "~/editor/build/fn/readEditorBuildFailureFn";
 import type { EditorProject } from "~/editor/EditorProject";
 import type { EditorDiagnosticTarget } from "~/ui/arkpack/editor/EditorDiagnosticTarget";
 import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
-import { readEditorItemSectionForPathFx } from "~/ui/item/editor/readEditorItemSectionForPathFx";
-import { readEditorProjectSectionForPathFx } from "~/ui/project/editor/readEditorProjectSectionForPathFx";
+import { readEditorItemSectionForPathFn } from "~/ui/item/editor/fn/readEditorItemSectionForPathFn";
+import { readEditorProjectSectionForPathFn } from "~/ui/project/editor/fn/readEditorProjectSectionForPathFn";
 
 const readItemIdFromPath = (path: ReadonlyArray<PropertyKey>) =>
 	path[0] === "items" && typeof path[1] === "string" ? path[1] : undefined;
@@ -67,48 +65,46 @@ const readOwnedItemSection = (
 };
 
 /** Resolves one diagnostic into canonical editor navigation targets. */
-export const readEditorGameDiagnosticTargetsFx = Effect.fn("readEditorGameDiagnosticTargetsFx")(
-	function* (
-		diagnostic: EditorGameDiagnostic,
-		project: Pick<EditorProject, "config" | "resources">,
-	) {
-		const itemSection =
-			readOwnedItemSection(diagnostic) ??
-			(yield* readEditorItemSectionForPathFx(diagnostic.path.slice(2)));
-		const itemTargets = [
-			...new Set(readDiagnosticItemIds(diagnostic)),
-		].flatMap((itemId) => {
-			const item = project.config.items[itemId];
-			return item === undefined
-				? []
-				: [
-						{
-							kind: "item",
-							itemUid: item.uid,
-							sectionId: itemSection,
-							label: item.title,
-						} satisfies EditorDiagnosticTarget,
-					];
-		});
-		if (itemTargets.length > 0) return itemTargets;
-		if (
-			(diagnostic.code === "resource:duplicate" || diagnostic.code === "resource:unused") &&
-			project.resources.some((resource) => resource.id === diagnostic.resourceId)
-		)
-			return [
-				{
-					kind: "asset",
-					resourceId: diagnostic.resourceId,
-					label: diagnostic.resourceId,
-				} satisfies EditorDiagnosticTarget,
-			];
-		if (diagnostic.code === "source:json-invalid") return [];
+export const readEditorGameDiagnosticTargetsFn = (
+	diagnostic: EditorGameDiagnostic,
+	project: Pick<EditorProject, "config" | "resources">,
+): ReadonlyArray<EditorDiagnosticTarget> => {
+	const itemSection =
+		readOwnedItemSection(diagnostic) ??
+		readEditorItemSectionForPathFn(diagnostic.path.slice(2));
+	const itemTargets = [
+		...new Set(readDiagnosticItemIds(diagnostic)),
+	].flatMap((itemId) => {
+		const item = project.config.items[itemId];
+		return item === undefined
+			? []
+			: [
+					{
+						kind: "item",
+						itemUid: item.uid,
+						sectionId: itemSection,
+						label: item.title,
+					} satisfies EditorDiagnosticTarget,
+				];
+	});
+	if (itemTargets.length > 0) return itemTargets;
+	if (
+		(diagnostic.code === "resource:duplicate" || diagnostic.code === "resource:unused") &&
+		project.resources.some((resource) => resource.id === diagnostic.resourceId)
+	)
 		return [
 			{
-				kind: "project",
-				sectionId: yield* readEditorProjectSectionForPathFx(diagnostic.path),
-				label: "project settings",
+				kind: "asset",
+				resourceId: diagnostic.resourceId,
+				label: diagnostic.resourceId,
 			} satisfies EditorDiagnosticTarget,
 		];
-	},
-);
+	if (diagnostic.code === "source:json-invalid") return [];
+	return [
+		{
+			kind: "project",
+			sectionId: readEditorProjectSectionForPathFn(diagnostic.path),
+			label: "project settings",
+		} satisfies EditorDiagnosticTarget,
+	];
+};

@@ -1,6 +1,5 @@
 import { useEditorProject } from "~/ui/editor/useEditorProject";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
-import { formatByteSizeFx } from "~/ui/arkpack/editor/formatByteSizeFx";
+import { formatByteSizeFn } from "~/ui/arkpack/editor/fn/formatByteSizeFn";
 import { ItemInfoFact, ItemInfoFacts } from "~/ui/item-detail/ItemInfoPresentation";
 import { useEditorAssetById } from "~/ui/resource/editor/useEditorAssetById";
 
@@ -22,7 +21,7 @@ export const EditorAssetTechnical = ({ resourceId }: { readonly resourceId: stri
 			/>
 			<ItemInfoFact
 				label="Byte size"
-				value={RendererRuntime.runSync(formatByteSizeFx(resource.bytes.byteLength))}
+				value={formatByteSizeFn(resource.bytes.byteLength)}
 			/>
 			<ItemInfoFact
 				label="Project revision"

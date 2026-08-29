@@ -1,4 +1,3 @@
-import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { EditorItemArtworkSection } from "~/ui/item/editor/EditorItemArtworkSection";
 import { EditorItemChargesSection } from "~/ui/item/editor/EditorItemChargesSection";
 import { useEditorItemFormSession } from "~/ui/item/editor/EditorItemFormContext";
@@ -7,7 +6,7 @@ import { EditorItemMergesSection } from "~/ui/item/editor/EditorItemMergesSectio
 import { EditorItemProductionSection } from "~/ui/item/editor/EditorItemProductionSection";
 import { EditorSpaceActionSection } from "~/ui/item/editor/EditorSpaceActionSection";
 import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
-import { readEditorItemFormSectionsFx } from "~/ui/item/editor/readEditorItemFormSectionsFx";
+import { readEditorItemFormSectionsFn } from "~/ui/item/editor/fn/readEditorItemFormSectionsFn";
 
 const renderSection = (section: EditorItemSectionId) => {
 	switch (section) {
@@ -29,7 +28,7 @@ const renderSection = (section: EditorItemSectionId) => {
 /** Renders one explicit item-form section from the shared parent form session. */
 export const EditorItemSectionPage = ({ section }: { readonly section: EditorItemSectionId }) => {
 	const session = useEditorItemFormSession();
-	const sections = RendererRuntime.runSync(readEditorItemFormSectionsFx(session.initialItem));
+	const sections = readEditorItemFormSectionsFn(session.initialItem);
 	const available = sections.some((candidate) => candidate.id === section);
 	return available ? (
 		renderSection(section)

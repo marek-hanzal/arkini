@@ -1,6 +1,5 @@
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import { Effect } from "effect";
 import type { EditorItemSectionDescriptor } from "~/ui/item/editor/EditorItemSections";
 
 const EditorItemSections = [
@@ -38,7 +37,7 @@ const EditorItemSections = [
 	},
 ] as const satisfies ReadonlyArray<EditorItemSectionDescriptor>;
 
-const ProductionItemTypes = new Set<TypeSchema.Type>([
+const ProductionItemTypes: ReadonlySet<TypeSchema.Type> = new Set([
 	"blueprint",
 	"craft",
 	"deposit",
@@ -48,19 +47,16 @@ const ProductionItemTypes = new Set<TypeSchema.Type>([
 ]);
 
 /** Returns the explicit sections supported by one item discriminator. */
-export const readEditorItemSectionsFx = Effect.fn("readEditorItemSectionsFx")(
-	(item: Pick<ItemSchema.Type, "type">) =>
-		Effect.sync(
-			(): ReadonlyArray<EditorItemSectionDescriptor> =>
-				EditorItemSections.filter((section) => {
-					switch (section.id) {
-						case "production":
-							return ProductionItemTypes.has(item.type);
-						case "action":
-							return item.type === "space";
-						default:
-							return true;
-					}
-				}),
-		),
-);
+export const readEditorItemSectionsFn = (
+	item: Pick<ItemSchema.Type, "type">,
+): ReadonlyArray<EditorItemSectionDescriptor> =>
+	EditorItemSections.filter((section) => {
+		switch (section.id) {
+			case "production":
+				return ProductionItemTypes.has(item.type);
+			case "action":
+				return item.type === "space";
+			default:
+				return true;
+		}
+	});

@@ -1,6 +1,5 @@
-import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { useFieldContext } from "~/ui/form/EditorFormContexts";
-import { readEditorFieldErrorFx } from "~/ui/form/readEditorFieldErrorFx";
+import { readEditorFieldErrorFn } from "~/ui/form/fn/readEditorFieldErrorFn";
 import { EditorSearchCombobox } from "~/ui/form/EditorSearchCombobox";
 import { EditorItemSearchThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { useEditorItemSearchOptions } from "~/ui/item/editor/useEditorItemSearchOptions";
@@ -16,7 +15,7 @@ export const EditorItemAutocompleteField = ({
 	label,
 }: EditorItemAutocompleteFieldProps) => {
 	const field = useFieldContext<string>();
-	const error = RendererRuntime.runSync(readEditorFieldErrorFx(field.state.meta.errors));
+	const error = readEditorFieldErrorFn(field.state.meta.errors);
 	const { items, options } = useEditorItemSearchOptions();
 	return (
 		<EditorSearchCombobox

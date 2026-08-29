@@ -2,8 +2,7 @@ import { ArrowUpRight, ChevronRight } from "lucide-react";
 
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import { useEditorProject } from "~/ui/editor/useEditorProject";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
-import { formatItemDurationFx } from "~/ui/item-detail/formatItemDurationFx";
+import { formatItemDurationFn } from "~/ui/item-detail/fn/formatItemDurationFn";
 import { EditorProductionLineEditLink } from "~/ui/item/editor/EditorProductionLineEditLink";
 import { EditorProductionLineInputs } from "~/ui/item/editor/EditorProductionLineInputs";
 import { EditorProductionLineOutputs } from "~/ui/item/editor/EditorProductionLineOutputs";
@@ -13,7 +12,7 @@ const EditorLineRuntime = ({ runtimeMs }: { readonly runtimeMs: number }) => (
 		<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">Runtime</p>
 		<div className="col-start-1 row-span-2 row-start-2 grid grid-rows-[1.5rem_1rem]">
 			<p className="self-center font-semibold tabular-nums text-foreground">
-				{RendererRuntime.runSync(formatItemDurationFx(runtimeMs))}
+				{formatItemDurationFn(runtimeMs)}
 			</p>
 			<p className="self-end text-xs tabular-nums text-muted">Per cycle</p>
 		</div>

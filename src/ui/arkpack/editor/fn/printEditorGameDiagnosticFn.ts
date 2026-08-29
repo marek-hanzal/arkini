@@ -1,12 +1,8 @@
-import { Effect } from "effect";
-
 import type { EditorGameDiagnostic } from "~/editor/build/fn/readEditorBuildFailureFn";
 import type { EditorProject } from "~/editor/EditorProject";
-import { readGameDiagnosticPresentationFx } from "~/engine/validation/printer/readGameDiagnosticPresentationFx";
+import { readGameDiagnosticPresentationFn } from "~/engine/validation/printer/fn/readGameDiagnosticPresentationFn";
 import type { EditorDiagnosticTarget } from "~/ui/arkpack/editor/EditorDiagnosticTarget";
-import { readEditorGameDiagnosticTargetsFx } from "~/ui/arkpack/editor/readEditorGameDiagnosticTargetsFx";
-
-export type { EditorDiagnosticTarget } from "~/ui/arkpack/editor/EditorDiagnosticTarget";
+import { readEditorGameDiagnosticTargetsFn } from "~/ui/arkpack/editor/fn/readEditorGameDiagnosticTargetsFn";
 
 export interface EditorGameDiagnosticPresentation {
 	readonly code: EditorGameDiagnostic["code"];
@@ -19,12 +15,12 @@ export interface EditorGameDiagnosticPresentation {
 }
 
 /** Projects one canonical diagnostic into editor copy and actionable route targets. */
-export const printEditorGameDiagnosticFx = Effect.fn("printEditorGameDiagnosticFx")(function* (
+export const printEditorGameDiagnosticFn = (
 	diagnostic: EditorGameDiagnostic,
 	project: Pick<EditorProject, "config" | "resources">,
-) {
-	const presentation = yield* readGameDiagnosticPresentationFx(diagnostic);
-	const targets = yield* readEditorGameDiagnosticTargetsFx(diagnostic, project);
+): EditorGameDiagnosticPresentation => {
+	const presentation = readGameDiagnosticPresentationFn(diagnostic);
+	const targets = readEditorGameDiagnosticTargetsFn(diagnostic, project);
 	const location = [
 		diagnostic.source,
 		diagnostic.path.length === 0 ? undefined : diagnostic.path.join("."),
@@ -38,5 +34,5 @@ export const printEditorGameDiagnosticFx = Effect.fn("printEditorGameDiagnosticF
 		...presentation,
 		location: location.length === 0 ? undefined : location,
 		targets,
-	} satisfies EditorGameDiagnosticPresentation;
-});
+	};
+};

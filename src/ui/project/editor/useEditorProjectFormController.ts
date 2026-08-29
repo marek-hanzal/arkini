@@ -11,7 +11,7 @@ import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { saveEditorProjectConfigCommandAtom } from "~/ui/project/editor/saveEditorProjectConfigCommandAtom";
 import { useAppForm } from "~/ui/form/EditorForm";
 import type { EditorProjectSectionId } from "~/ui/project/editor/EditorProjectSections";
-import { readEditorProjectSectionForPathFx } from "~/ui/project/editor/readEditorProjectSectionForPathFx";
+import { readEditorProjectSectionForPathFn } from "~/ui/project/editor/fn/readEditorProjectSectionForPathFn";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
 import { analyzeEditorProjectCompatibilityFn } from "~/editor/version/fn/analyzeEditorProjectCompatibilityFn";
@@ -88,9 +88,7 @@ export const useEditorProjectFormController = ({
 			const result = schema.safeParse(form.state.values);
 			const issue = result.success ? undefined : result.error.issues[0];
 			if (issue !== undefined) {
-				await onInvalidSection(
-					RendererRuntime.runSync(readEditorProjectSectionForPathFx(issue.path)),
-				);
+				await onInvalidSection(readEditorProjectSectionForPathFn(issue.path));
 				const focusInvalidField = () =>
 					document.querySelector<HTMLElement>("[aria-invalid='true']")?.focus();
 				if (typeof requestAnimationFrame === "function") {

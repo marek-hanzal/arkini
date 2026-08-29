@@ -2,14 +2,13 @@ import { ArrowRight, ShieldAlert, ShieldCheck } from "lucide-react";
 
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { EditorProject } from "~/editor/EditorProject";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { EditorItemDeleteBlocker } from "~/editor/readEditorItemDeleteBlockersFx";
 import { ButtonLink, DangerButton } from "~/ui/button/Button";
 import { EditorItemDeleteDialog } from "~/ui/item/editor/EditorItemDeleteDialog";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { useEditorItemDeleteController } from "~/ui/item/editor/useEditorItemDeleteController";
 import { EditorProjectSections } from "~/ui/project/editor/EditorProjectSections";
-import { readEditorProjectSectionForPathFx } from "~/ui/project/editor/readEditorProjectSectionForPathFx";
+import { readEditorProjectSectionForPathFn } from "~/ui/project/editor/fn/readEditorProjectSectionForPathFn";
 
 const EditorItemDeleteBlockerLink = ({
 	blocker,
@@ -51,7 +50,7 @@ const EditorItemDeleteBlockerLink = ({
 		);
 	}
 
-	const sectionId = RendererRuntime.runSync(readEditorProjectSectionForPathFx(blocker.path));
+	const sectionId = readEditorProjectSectionForPathFn(blocker.path);
 	const section = EditorProjectSections.find((candidate) => candidate.id === sectionId);
 	return (
 		<ButtonLink

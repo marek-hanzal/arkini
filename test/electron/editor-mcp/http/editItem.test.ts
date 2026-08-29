@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
-import { createEditorItemDraftFx } from "~/editor/createEditorItemDraftFx";
+import { createEditorItemDraftFn } from "~/editor/fn/createEditorItemDraftFn";
 import {
 	cleanupMcpHarnesses,
 	connectMcpClient,
@@ -20,13 +20,11 @@ describe("editor MCP item editing", () => {
 		);
 		const water = editorTestPayload.config.items.water;
 		const producer = {
-			...Effect.runSync(
-				createEditorItemDraftFx({
-					resourceId: editorTestPayload.resources[0]?.id ?? "missing-asset",
-					type: "producer",
-					uid: "producer-uid",
-				}),
-			),
+			...createEditorItemDraftFn({
+				resourceId: editorTestPayload.resources[0]?.id ?? "missing-asset",
+				type: "producer",
+				uid: "producer-uid",
+			}),
 			id: "producer:test",
 			title: "Test Producer",
 			description: "Existing non-simple item.",

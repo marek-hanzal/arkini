@@ -6,7 +6,7 @@ import type {
 } from "~/editor/origin-flow/EditorItemOriginFlow";
 import { type EditorItemOriginSource } from "~/editor/EditorItemOriginSource";
 import { createEditorAcquisitionGraphFx } from "~/editor/createEditorAcquisitionGraphFx";
-import { readEditorItemOriginSourcesFx } from "~/editor/readEditorItemOriginSourcesFx";
+import { readEditorItemOriginSourcesFn } from "~/editor/fn/readEditorItemOriginSourcesFn";
 import { reportEditorItemOriginFlowProgressFx } from "~/editor/origin-flow/fx/reportEditorItemOriginFlowProgressFx";
 import { yieldEditorItemOriginFlowFx } from "~/editor/origin-flow/fx/yieldEditorItemOriginFlowFx";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
@@ -59,7 +59,7 @@ export const indexEditorItemOriginSourcesFx = Effect.fn("indexEditorItemOriginSo
 		for (const entry of config.start.toolbar) addStarter(entry.itemId, "Toolbar");
 
 		const graph = yield* createEditorAcquisitionGraphFx(config);
-		const sources = yield* readEditorItemOriginSourcesFx(graph);
+		const sources = readEditorItemOriginSourcesFn(graph);
 		yield* reportEditorItemOriginFlowProgressFx(onProgress, "indexing", 28);
 		yield* yieldEditorItemOriginFlowFx();
 		const sourcesByOutput = new Map<string, EditorItemOriginSource[]>();

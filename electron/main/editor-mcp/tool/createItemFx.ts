@@ -3,7 +3,7 @@ import { Effect } from "effect";
 
 import type { EditorProject } from "~/editor/EditorProject";
 import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
-import { createEditorItemDraftFx } from "~/editor/createEditorItemDraftFx";
+import { createEditorItemDraftFn } from "~/editor/fn/createEditorItemDraftFn";
 import { saveEditorItemWithRepositoryFx } from "~/editor/saveEditorItemWithRepositoryFx";
 import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { CreateItemInput } from "./CreateItemInputSchemas";
@@ -23,7 +23,7 @@ export const createItemFx = Effect.fn("createItemFx")(function* ({
 	readonly repository: EditorProjectRepositoryService;
 	readonly type: TypeSchema.Type;
 }) {
-	const draft = yield* createEditorItemDraftFx({
+	const draft = createEditorItemDraftFn({
 		resourceId: project.resources[0]?.id ?? "missing-asset",
 		type,
 		uid: createId(),

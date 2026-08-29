@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { createEditorItemDraftFx } from "~/editor/createEditorItemDraftFx";
+import { createEditorItemDraftFn } from "~/editor/fn/createEditorItemDraftFn";
 import { readAuthoredItemLinesFx } from "~/engine/line/read/readAuthoredItemLinesFx";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
@@ -10,7 +10,7 @@ export const convertEditorItemFx = Effect.fn("convertEditorItemFx")(
 	(item: ItemSchema.Type, targetType: TypeSchema.Type) =>
 		Effect.gen(function* () {
 			if (item.type === targetType) return item;
-			const fallback = yield* createEditorItemDraftFx({
+			const fallback = createEditorItemDraftFn({
 				resourceId: item.asset.default[0],
 				type: targetType,
 				uid: item.uid,

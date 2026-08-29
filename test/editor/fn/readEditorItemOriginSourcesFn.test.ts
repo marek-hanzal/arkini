@@ -1,11 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { EditorItemOriginSource } from "~/editor/EditorItemOriginSource";
 import { createEditorAcquisitionGraphFx } from "~/editor/createEditorAcquisitionGraphFx";
-import { readEditorItemOriginRelationSubgraphFn } from "~/editor/origin-flow/fn/readEditorItemOriginRelationSubgraphFn";
-import { readEditorItemOriginRelationsFn } from "~/editor/origin-flow/fn/readEditorItemOriginRelationsFn";
-import { readEditorItemOriginSourcesFx } from "~/editor/readEditorItemOriginSourcesFx";
+import { readEditorItemOriginSourcesFn } from "~/editor/fn/readEditorItemOriginSourcesFn";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
@@ -14,18 +11,7 @@ import { createMergeTestConfig } from "~test/merge/support/createMergeTestConfig
 
 const readEditorItemOriginSources = (
 	config: Parameters<typeof createEditorAcquisitionGraphFx>[0],
-) =>
-	Effect.runSync(
-		readEditorItemOriginSourcesFx(Effect.runSync(createEditorAcquisitionGraphFx(config))),
-	);
-
-const readEditorItemOriginRelations = (
-	source: Parameters<typeof readEditorItemOriginRelationsFn>[0],
-) => readEditorItemOriginRelationsFn(source);
-
-const readEditorItemOriginRelationSubgraph = (
-	props: Parameters<typeof readEditorItemOriginRelationSubgraphFn>[0],
-) => readEditorItemOriginRelationSubgraphFn(props);
+) => readEditorItemOriginSourcesFn(Effect.runSync(createEditorAcquisitionGraphFx(config)));
 
 const dropOf = (itemId: string): DropSchema.Type => ({
 	itemId,
@@ -53,50 +39,7 @@ const outputOf = (itemId: string): OutputSchema.Type => ({
 	],
 });
 
-const source = ({
-	id,
-	outputItemId,
-	requirementItemId,
-}: {
-	readonly id: string;
-	readonly outputItemId: string;
-	readonly requirementItemId: string;
-}): EditorItemOriginSource => ({
-	id,
-	kind: "line",
-	label: id,
-	outputs: [
-		{
-			itemId: outputItemId,
-			placement: undefined,
-			quantity: {
-				min: 1,
-				max: 1,
-			},
-			requirements: {
-				allOf: [],
-				anyOf: [],
-			},
-			routeId: id,
-			selectionKind: "guaranteed",
-			weightedSet: false,
-		},
-	],
-	inputs: [],
-	ownerItemId: requirementItemId,
-	reference: {
-		type: "line",
-		lineId: id,
-	},
-	requirementItemIds: [
-		requirementItemId,
-	],
-	routeIds: [
-		id,
-	],
-});
-
-describe("editor item origin relations", () => {
+describe("readEditorItemOriginSourcesFn", () => {
 	it("uses canonical route IDs, conditions, and positive-probability outputs", () => {
 		const config = structuredClone(createJobTestConfig());
 		const forge = config.items.forge;
@@ -156,7 +99,7 @@ describe("editor item origin relations", () => {
 			rules: [],
 		});
 		const graph = Effect.runSync(createEditorAcquisitionGraphFx(config));
-		const sources = Effect.runSync(readEditorItemOriginSourcesFx(graph));
+		const sources = readEditorItemOriginSourcesFn(graph);
 
 		expect(sources).toHaveLength(1);
 		expect(sources[0]?.routeIds).toEqual(graph.routes.map(({ id }) => id));
@@ -205,7 +148,7 @@ describe("editor item origin relations", () => {
 			],
 		});
 		const graph = Effect.runSync(createEditorAcquisitionGraphFx(config));
-		const sources = Effect.runSync(readEditorItemOriginSourcesFx(graph));
+		const sources = readEditorItemOriginSourcesFn(graph);
 
 		expect(sources).toHaveLength(1);
 		expect(sources[0]?.routeIds).toEqual(graph.routes.map(({ id }) => id));
@@ -335,7 +278,7 @@ describe("editor item origin relations", () => {
 					: route,
 			),
 		};
-		const alternativeSlag = Effect.runSync(readEditorItemOriginSourcesFx(withAlternativeClause))
+		const alternativeSlag = readEditorItemOriginSourcesFn(withAlternativeClause)
 			.flatMap(({ outputs }) => outputs)
 			.find(({ itemId }) => itemId === "slag");
 		expect(alternativeSlag?.requirements.anyOf).toEqual([
@@ -353,148 +296,6 @@ describe("editor item origin relations", () => {
 				itemId: "permit-a",
 				reason: "upper-bound",
 				source: "output-condition",
-			},
-		]);
-	});
-
-	it("uses the same external-input and owner-output edges as the editor flow", () => {
-		const forge: EditorItemOriginSource = {
-			...source({
-				id: "source:forge",
-				outputItemId: "ingot",
-				requirementItemId: "forge",
-			}),
-			requirementItemIds: [
-				"forge",
-				"water",
-			],
-		};
-		expect(readEditorItemOriginRelations(forge)).toMatchObject([
-			{
-				fromItemId: "water",
-				role: "input",
-				toItemId: "forge",
-			},
-			{
-				fromItemId: "forge",
-				outputIndex: 0,
-				role: "output",
-				toItemId: "ingot",
-			},
-		]);
-	});
-
-	it("traverses input and output edges independently by relationship level", () => {
-		const forge: EditorItemOriginSource = {
-			...source({
-				id: "source:forge",
-				outputItemId: "ingot",
-				requirementItemId: "forge",
-			}),
-			requirementItemIds: [
-				"forge",
-				"water",
-			],
-		};
-		const ingot = source({
-			id: "source:ingot",
-			outputItemId: "plate",
-			requirementItemId: "ingot",
-		});
-		const kiln = source({
-			id: "source:kiln",
-			outputItemId: "ingot",
-			requirementItemId: "kiln",
-		});
-		const mill: EditorItemOriginSource = {
-			...source({
-				id: "source:mill",
-				outputItemId: "dust",
-				requirementItemId: "mill",
-			}),
-			requirementItemIds: [
-				"mill",
-				"forge",
-			],
-		};
-		const sources = [
-			forge,
-			ingot,
-			kiln,
-			mill,
-		];
-
-		const inputLevelOne = readEditorItemOriginRelationSubgraph({
-			level: 1,
-			role: "input",
-			sources,
-			targetItemId: "water",
-		});
-		expect(inputLevelOne.relations).toMatchObject([
-			{
-				fromItemId: "water",
-				level: 1,
-				toItemId: "forge",
-			},
-		]);
-		const inputLevelTwo = readEditorItemOriginRelationSubgraph({
-			level: 2,
-			role: "input",
-			sources,
-			targetItemId: "water",
-		});
-		expect(inputLevelTwo.relations).toMatchObject([
-			{
-				fromItemId: "water",
-				level: 1,
-				toItemId: "forge",
-			},
-			{
-				fromItemId: "forge",
-				level: 2,
-				toItemId: "mill",
-			},
-		]);
-
-		const outputLevelOne = readEditorItemOriginRelationSubgraph({
-			level: 1,
-			role: "output",
-			sources,
-			targetItemId: "ingot",
-		});
-		expect(outputLevelOne.relations).toMatchObject([
-			{
-				fromItemId: "forge",
-				level: 1,
-				toItemId: "ingot",
-			},
-			{
-				fromItemId: "kiln",
-				level: 1,
-				toItemId: "ingot",
-			},
-		]);
-		const outputLevelTwo = readEditorItemOriginRelationSubgraph({
-			level: 2,
-			role: "output",
-			sources,
-			targetItemId: "plate",
-		});
-		expect(outputLevelTwo.relations).toMatchObject([
-			{
-				fromItemId: "ingot",
-				level: 1,
-				toItemId: "plate",
-			},
-			{
-				fromItemId: "forge",
-				level: 2,
-				toItemId: "ingot",
-			},
-			{
-				fromItemId: "kiln",
-				level: 2,
-				toItemId: "ingot",
 			},
 		]);
 	});

@@ -1,6 +1,5 @@
 // @vitest-environment jsdom
 
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
@@ -29,8 +28,8 @@ const project: EditorProject = {
 	resources: editorTestPayload.resources,
 };
 
-const DraftProbe = ({ type, uid }: { readonly type: TypeSchema.Type; readonly uid: string }) => {
-	const draft = useEditorItemDraft(type, uid);
+const DraftProbe = ({ uid }: { readonly uid: string }) => {
+	const draft = useEditorItemDraft("simple", uid);
 	return createElement("output", null, JSON.stringify(draft));
 };
 
@@ -42,40 +41,36 @@ afterEach(async () => {
 });
 
 describe("useEditorItemDraft", () => {
-	it.each(TypeSchema.options)(
-		"creates one schema-valid %s local form seed after required copy is entered",
-		async (type) => {
-			const uid = `draft-${type}`;
-			const container = document.createElement("div");
-			document.body.append(container);
-			const root = createRoot(container);
-			roots.push(root);
-			await act(async () => {
-				root.render(
-					createElement(
-						EditorProjectContext.Provider,
-						{
-							value: project,
-						},
-						createElement(DraftProbe, {
-							type,
-							uid,
-						}),
-					),
-				);
-			});
-			const draft = JSON.parse(
-				container.querySelector("output")?.textContent ?? "null",
-			) as ItemSchema.Type;
-			const parsed = ItemSchema.safeParse({
-				...draft,
-				title: `New ${type}`,
-				description: `A new ${type} item.`,
-			});
-
-			expect(parsed.success).toBe(true);
-			expect(draft.uid).toBe(uid);
-			expect(draft.type).toBe(type);
-		},
-	);
+	it("binds the first project resource and preallocated UID into the local draft", async () => {
+		const uid = "draft-simple";
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				createElement(
+					EditorProjectContext.Provider,
+					{
+						value: project,
+					},
+					createElement(DraftProbe, {
+						uid,
+					}),
+				),
+			);
+		});
+		const draft = JSON.parse(
+			container.querySelector("output")?.textContent ?? "null",
+		) as ItemSchema.Type;
+		expect(draft).toMatchObject({
+			asset: {
+				default: [
+					project.resources[0]?.id,
+				],
+			},
+			type: "simple",
+			uid,
+		});
+	});
 });

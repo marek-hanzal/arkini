@@ -4,17 +4,15 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { convertEditorItemFx } from "~/editor/item/fx/convertEditorItemFx";
-import { createEditorItemDraftFx } from "~/editor/createEditorItemDraftFx";
+import { createEditorItemDraftFn } from "~/editor/fn/createEditorItemDraftFn";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 
 const createItem = (type: (typeof TypeSchema.options)[number]): ItemSchema.Type => ({
-	...Effect.runSync(
-		createEditorItemDraftFx({
-			resourceId: "asset:item",
-			type,
-			uid: "stable-item-uid",
-		}),
-	),
+	...createEditorItemDraftFn({
+		resourceId: "asset:item",
+		type,
+		uid: "stable-item-uid",
+	}),
 	title: "Test item",
 	description: "A valid item used by conversion tests.",
 });

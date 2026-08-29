@@ -19,7 +19,7 @@ import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 import { modifyRuntimeWithTransitionFx } from "~/game-runtime/internal/modifyRuntimeWithTransitionFx";
 import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
-import { readValidatedRuntimeItemFx } from "~/engine/runtime/read/readValidatedRuntimeItemFx";
+import { readValidatedRuntimeItemFx } from "~/item-interaction/read/readValidatedRuntimeItemFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceBoardOperationError";
 import { CurrentSpaceConflictError } from "~/space-action/error/CurrentSpaceConflictError";

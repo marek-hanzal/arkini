@@ -7,7 +7,7 @@ import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
-import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
+import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { TickFx } from "~/game-tick/TickFx";
@@ -32,7 +32,7 @@ const removeBufferedWaterFx = Effect.fn("removeBufferedWaterFx")(function* () {
 		(item) => item.item.id === "water" && item.location.scope === "input",
 	);
 	if (water === undefined) throw new Error("Expected buffered water.");
-	yield* removeItemFx({
+	yield* removeRuntimeItemForTestFx({
 		itemId: water.id,
 		revision: water.revision,
 	});
@@ -296,7 +296,7 @@ describe("runTickRuntimeByFx", () => {
 				});
 				yield* prepareJobLineFx();
 				yield* startLineFx(props);
-				yield* removeItemFx({
+				yield* removeRuntimeItemForTestFx({
 					itemId: permit.id,
 					revision: permit.revision,
 				});

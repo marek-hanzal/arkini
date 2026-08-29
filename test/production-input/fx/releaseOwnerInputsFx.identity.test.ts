@@ -5,7 +5,7 @@ import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { RuntimeStoreFx } from "~/game-runtime/internal/RuntimeStoreFx";
-import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
+import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 
@@ -176,7 +176,7 @@ const runRemoveFx = (state: StateSchema.Type) =>
 			return yield* Effect.die(new Error("Expected outer owner."));
 		}
 		const attempt = yield* Effect.result(
-			removeItemFx({
+			removeRuntimeItemForTestFx({
 				itemId: owner.id,
 				revision: owner.revision,
 			}),

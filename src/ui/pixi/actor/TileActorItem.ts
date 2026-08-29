@@ -1,4 +1,4 @@
-import type { readRuntimeItemPrimaryActionFx } from "~/engine/item-detail/read/readRuntimeItemPrimaryActionFx";
+import type { readRuntimeItemPrimaryActionFx } from "~/item-interaction/read/readRuntimeItemPrimaryActionFx";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";

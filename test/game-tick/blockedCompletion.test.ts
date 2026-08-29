@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
-import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
+import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { TickFx } from "~/game-tick/TickFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
@@ -27,7 +27,7 @@ describe("blocked job completion", () => {
 				const blocked = yield* readRuntimeFx();
 				const blocker = blocked.items.find((item) => item.item.id === "blocker");
 				if (blocker === undefined) throw new Error("Expected completion blocker.");
-				yield* removeItemFx({
+				yield* removeRuntimeItemForTestFx({
 					itemId: blocker.id,
 					revision: blocker.revision,
 				});

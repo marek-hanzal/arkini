@@ -7,9 +7,10 @@ import { autofillLineInputsFx } from "~test/support/input/autofillLineInputsFx";
 import { getItemFx } from "~test/support/runtime/getItemFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { fromStateFx } from "~/engine/state/fx/fromStateFx";
-import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
+import { DropItemRejectedReason, DropItemResultKind } from "~/item-interaction/DropItemResult";
+import { dropItemFx } from "~/item-interaction/write/dropItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
+import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
 import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import {
@@ -324,13 +325,16 @@ describe("settleItemDeliveryFx", () => {
 					location: sourceLocation(2),
 					quantity: 1,
 				});
-				const conflictingMove = yield* Effect.result(
-					moveItemFx({
-						itemId: intruder.id,
+				const conflictingMove = yield* dropItemFx({
+					sourceItemId: intruder.id,
+					sourceLocation: intruder.location,
+					sourceRevision: intruder.revision,
+					target: {
+						kind: "slot",
 						location: sourceLocation(1),
-						revision: intruder.revision,
-					}),
-				);
+						occupant: null,
+					},
+				});
 				return {
 					before,
 					conflictingMove,
@@ -363,14 +367,11 @@ describe("settleItemDeliveryFx", () => {
 				location: sourceLocation(1),
 			});
 		}
-		expect(Result.isFailure(result.conflictingMove)).toBe(true);
-		if (Result.isFailure(result.conflictingMove)) {
-			expect(result.conflictingMove.failure).toMatchObject({
-				_tag: "LocationOccupiedError",
-				itemId: "runtime:water",
-				location: sourceLocation(1),
-			});
-		}
+		expect(result.conflictingMove).toEqual({
+			kind: DropItemResultKind.Reject,
+			reason: DropItemRejectedReason.Occupied,
+			itemId: "runtime:mover",
+		});
 	});
 
 	it("leases an Inventory source slot with the same canonical contract", () => {
@@ -438,7 +439,7 @@ describe("settleItemDeliveryFx", () => {
 				const owner = yield* getItemFx({
 					itemId: ownerItemId,
 				});
-				yield* removeItemFx({
+				yield* removeRuntimeItemForTestFx({
 					itemId: owner.id,
 					revision: owner.revision,
 				});

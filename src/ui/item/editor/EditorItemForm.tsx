@@ -1,8 +1,7 @@
 import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { PropsWithChildren } from "react";
 import { useEditorItemDraft } from "~/ui/item/editor/useEditorItemDraft";
-import { convertEditorItemFx } from "~/editor/item/fx/convertEditorItemFx";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { convertEditorItemFn } from "~/editor/item/fn/convertEditorItemFn";
 import { EditorItemFormSession } from "~/ui/item/editor/EditorItemFormSession";
 import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
 import type {
@@ -39,7 +38,7 @@ export const EditorItemForm = ({
 			? draft
 			: itemType === undefined
 				? persistedItem
-				: RendererRuntime.runSync(convertEditorItemFx(persistedItem, itemType));
+				: convertEditorItemFn(persistedItem, itemType);
 	const isNew = persistedItem === undefined;
 	return (
 		<EditorItemFormSession

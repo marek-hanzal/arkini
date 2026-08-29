@@ -2,7 +2,7 @@ import { Effect, Option } from "effect";
 
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
-import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
+import { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
 
 type ItemDetailTabsTarget =
 	| {
@@ -64,7 +64,7 @@ export const readItemDetailTabsFx = Effect.fn("readItemDetailTabsFx")(function* 
 }: readItemDetailTabsFx.Props) {
 	if (target.kind === "definition") return withSources(infoTab, sources);
 	if (target.item === undefined) return noTabs;
-	const lineOwnerItem = Option.getOrUndefined(yield* isLineOwnerItemFx(target.item.item));
+	const lineOwnerItem = Option.getOrUndefined(isLineOwnerItemFn(target.item.item));
 	if (lineOwnerItem === undefined) return withSources(infoTab, sources);
 	return withSources(lineOwnerTabs, sources);
 });

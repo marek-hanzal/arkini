@@ -2,7 +2,7 @@ import { Effect, Option } from "effect";
 
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { resolveJobQueueFx } from "~/engine/job/fx/read/resolveJobQueueFx";
-import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
+import { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
 import { readEffectiveDefaultLineFx } from "~/engine/line/read/readEffectiveDefaultLineFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -49,7 +49,7 @@ export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryA
 				kind: "open-inventory" as const,
 			} satisfies readRuntimeItemPrimaryActionFx.Result;
 		}
-		const lineOwnerItem = Option.getOrUndefined(yield* isLineOwnerItemFx(item.item));
+		const lineOwnerItem = Option.getOrUndefined(isLineOwnerItemFn(item.item));
 		if (lineOwnerItem === undefined) {
 			return {
 				kind: "none" as const,

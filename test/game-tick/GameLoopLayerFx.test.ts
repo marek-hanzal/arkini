@@ -3,17 +3,17 @@ import { TestClock } from "effect/testing";
 import { describe, expect, it } from "@effect/vitest";
 
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-import { GameLoopFx } from "~/engine/game/context/GameLoopFx";
-import { GameLoopLayerFx } from "~/engine/game/layer/GameLoopLayerFx";
+import { GameLoopFx } from "~/game-tick/GameLoopFx";
+import { GameLoopLayerFx } from "~/game-tick/GameLoopLayerFx";
 import { GameSessionLayerFx } from "~/engine/game/layer/GameSessionLayerFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { GameRuntimeLayerFx } from "~/game-runtime/layer/GameRuntimeLayerFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { TickFx } from "~/engine/tick/context/TickFx";
-import { TickStepMs } from "~/engine/tick/TickStepMs";
-import { createTickFailureTestConfig } from "~test/tick/support/createTickFailureTestConfig";
+import { TickFx } from "~/game-tick/TickFx";
+import { TickStepMs } from "~/game-tick/TickStepMs";
+import { createTickFailureTestConfig } from "~test/game-tick/support/createTickFailureTestConfig";
 
 describe("GameLoopLayerFx", () => {
 	it.effect("does not report interruption of an in-flight Tick advance as fatal", () => {

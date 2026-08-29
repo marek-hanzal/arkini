@@ -7,8 +7,8 @@ import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransiti
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
-import { TickStepMs } from "~/engine/tick/TickStepMs";
+import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
+import { TickStepMs } from "~/game-tick/TickStepMs";
 
 const ownerKinds = [
 	"producer",

@@ -3,7 +3,7 @@ import { Effect, Layer } from "effect";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { fromStateFx } from "~/engine/state/fx/fromStateFx";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
-import { TickLayerFx } from "~/engine/tick/layer/TickLayerFx";
+import { TickLayerFx } from "~/game-tick/TickLayerFx";
 import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { GameRuntimeLayerFx } from "~/game-runtime/layer/GameRuntimeLayerFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";

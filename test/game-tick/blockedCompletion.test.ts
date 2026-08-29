@@ -6,15 +6,15 @@ import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { TickFx } from "~/engine/tick/context/TickFx";
-import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
+import { TickFx } from "~/game-tick/TickFx";
+import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import {
 	blockedCompletionOwnerId,
 	createBlockedCompletionTestConfig,
 	freeCompletionOwnerId,
 	prepareBlockedCompletionRuntimeFx,
-} from "~test/tick/support/blockedCompletionTestRuntime";
-import { createTickFailureTestConfig } from "~test/tick/support/createTickFailureTestConfig";
+} from "~test/game-tick/support/blockedCompletionTestRuntime";
+import { createTickFailureTestConfig } from "~test/game-tick/support/createTickFailureTestConfig";
 
 describe("blocked job completion", () => {
 	it("keeps one ready job blocked without rolling back unrelated owner completion", () => {

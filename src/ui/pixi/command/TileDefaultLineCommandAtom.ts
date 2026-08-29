@@ -6,8 +6,8 @@ import { settleRendererCommandFailureFx } from "~/ui/game/settleRendererCommandF
 import { toDiagnosticValueFn } from "~/renderer/diagnostics/fn/toDiagnosticValueFn";
 import { writeDiagnosticRecordFx } from "~/renderer/diagnostics/writeDiagnosticRecordFx";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
-import { enqueueDefaultLineFx } from "~/engine/job/write/enqueueDefaultLineFx";
-import { fillDefaultLineQueueFx } from "~/engine/job/write/fillDefaultLineQueueFx";
+import { enqueueDefaultLineFx } from "~/production-job/write/enqueueDefaultLineFx";
+import { fillDefaultLineQueueFx } from "~/production-job/write/fillDefaultLineQueueFx";
 
 export namespace TileDefaultLineCommandAtom {
 	export type Command =

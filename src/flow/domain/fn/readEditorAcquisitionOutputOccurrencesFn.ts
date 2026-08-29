@@ -6,8 +6,8 @@ import type {
 	EditorAcquisitionUnsupportedRequirement,
 } from "~/flow/domain/EditorAcquisitionGraph";
 import { readEditorAcquisitionAvailabilityRequirementsFn } from "~/flow/domain/fn/readEditorAcquisitionAvailabilityRequirementsFn";
-import type { DropSchema } from "~/engine/output/schema/DropSchema";
-import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import type { DropSchema } from "~/production-output/schema/DropSchema";
+import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 
 interface OutputOccurrence {
 	readonly annotation: EditorAcquisitionOutputAnnotation;

@@ -2,9 +2,9 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
-import { startLineFx } from "~test/job/support/startLineTestFx";
-import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
+import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
+import { startLineFx } from "~test/production-job/support/startLineTestFx";
+import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
@@ -13,8 +13,8 @@ import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { TickFx } from "~/engine/tick/context/TickFx";
 import { advanceRuntimeStepFx } from "~/engine/tick/internal/advanceRuntimeStepFx";
 import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
-import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
-import { existsWhen } from "~test/line/fx/support/lineTestRuntime";
+import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
+import { existsWhen } from "~test/production-line/fx/support/lineTestRuntime";
 import {
 	createFixedStepTestConfig,
 	prepareFixedStepRuntimeFx,

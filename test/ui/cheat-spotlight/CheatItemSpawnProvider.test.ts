@@ -15,7 +15,7 @@ import {
 } from "~/ui/cheat-spotlight/CheatItemSpawnContext";
 import { CheatItemSpawnProvider } from "~/ui/cheat-spotlight/CheatItemSpawnProvider";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
-import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 
 (
 	globalThis as {

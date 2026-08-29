@@ -5,7 +5,7 @@ import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import { isItemPureWithIndexFn } from "~/engine/item/fn/isItemPureWithIndexFn";
 import { readItemPurityIndexFn } from "~/engine/item/fn/readItemPurityIndexFn";
-import { readReservedJobOutputQuantitiesFx } from "~/engine/job/fx/read/readReservedJobOutputQuantitiesFx";
+import { readReservedJobOutputQuantitiesFn } from "~/production-job/fn/readReservedJobOutputQuantitiesFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { ItemMaxCountIssueSchema } from "~/engine/runtime/schema/check/ItemMaxCountIssueSchema";
 import type { ItemStackSizeIssueSchema } from "~/engine/runtime/schema/check/ItemStackSizeIssueSchema";
@@ -63,7 +63,7 @@ export const checkRuntimeItemQuantitiesFx = Effect.fn("checkRuntimeItemQuantitie
 		}
 	}
 
-	const reserved = yield* readReservedJobOutputQuantitiesFx({
+	const reserved = readReservedJobOutputQuantitiesFn({
 		runtime,
 	});
 	const canonicalItemIds = new Set<IdSchema.Type>([

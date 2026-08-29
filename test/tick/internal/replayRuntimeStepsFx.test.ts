@@ -2,14 +2,14 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import { startLineFx } from "~test/job/support/startLineTestFx";
+import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { advanceRuntimeStepFx } from "~/engine/tick/internal/advanceRuntimeStepFx";
 import { replayRuntimeStepsFx } from "~/engine/tick/internal/replayRuntimeStepsFx";
 import { TickStepMs } from "~/engine/tick/TickStepMs";
-import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 
 const hourMs = 60 * 60 * 1_000;
 const ownerItemId = "runtime:forge";

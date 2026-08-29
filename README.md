@@ -22,7 +22,14 @@ Read the smallest entry point needed for the task:
 ## Repository map
 
 ```text
-src/engine    framework-neutral live gameplay and its exact runtime operations
+src/engine    remaining live gameplay runtime, session, placement, merge and platform-neutral support owners
+src/production-action  immediate action admission, rules and charge settlement
+src/production-condition  authored runtime condition evaluation
+src/production-input  line-input schemas, material planning and storage lifecycle
+src/production-line  production-line definitions, rules, reads and run planning
+src/production-output  output, drop and roll schemas plus resolution policy
+src/production-job  queue admission, active-job lifecycle, capacity and completion
+src/production-delivery  outbound input delivery allocation, validation and settlement
 src/game-config  authored config, source, diagnostics, validation, resources and compiler
 src/arkpack   artifact bytes/provenance, renderer catalog/runtime and package UI
 src/editor-build  Build contract, renderer admission and Build presentation

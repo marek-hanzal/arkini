@@ -1,10 +1,10 @@
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { TimeSchema } from "~/engine/common/schema/TimeSchema";
 import type { DistanceSchema } from "~/engine/distance/schema/DistanceSchema";
-import type { ChargeSourceSchema } from "~/engine/input/schema/ChargeSourceSchema";
-import type { ModeSchema } from "~/engine/input/schema/ModeSchema";
+import type { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
+import type { ModeSchema } from "~/production-input/schema/ModeSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import type { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
+import type { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
 import type {
 	ItemDetailOutputRoll,
 	ItemDetailOutputSet,
@@ -12,7 +12,7 @@ import type {
 } from "~/engine/item-detail/read/ItemDetailOutput";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
-import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
+import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 interface ItemDetailLineChargeCost {
 	readonly cost: number;

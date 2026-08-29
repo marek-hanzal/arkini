@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
-import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { Deferred, Effect } from "effect";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 

@@ -1,6 +1,6 @@
 import { Factory } from "lucide-react";
 
-import type { LineSchema } from "~/engine/line/schema/LineSchema";
+import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { withFieldGroup } from "~/ui/form/EditorForm";

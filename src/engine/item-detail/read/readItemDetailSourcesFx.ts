@@ -4,16 +4,16 @@ import { match } from "ts-pattern";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
-import { lineRulesFx } from "~/engine/line/fx/lineRulesFx";
-import { resolveLineShowFn } from "~/engine/line/fn/resolveLineShowFn";
-import { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
-import { readLineOwnerLinesFn } from "~/engine/line/fn/readLineOwnerLinesFn";
-import { TypeSchema as LineRuleTypeSchema } from "~/engine/line/schema/rule/TypeSchema";
+import { lineRulesFx } from "~/production-line/fx/lineRulesFx";
+import { resolveLineShowFn } from "~/production-line/fn/resolveLineShowFn";
+import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
+import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
+import { TypeSchema as LineRuleTypeSchema } from "~/production-line/schema/rule/TypeSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
-import type { DropSchema } from "~/engine/output/schema/DropSchema";
-import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import type { DropSchema } from "~/production-output/schema/DropSchema";
+import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
-import { TypeSchema as RollTypeSchema } from "~/engine/roll/schema/TypeSchema";
+import { TypeSchema as RollTypeSchema } from "~/production-output/roll/schema/TypeSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace readItemDetailSourcesFx {

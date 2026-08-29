@@ -9,7 +9,7 @@ import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { splitBoardItemStackFx } from "~/engine/runtime/write/splitBoardItemStackFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { purityTestConfig } from "~test/line/support/purityTestConfig";
+import { purityTestConfig } from "~test/production-line/support/purityTestConfig";
 
 const board = (x: number) => ({
 	scope: "board" as const,

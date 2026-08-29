@@ -1,6 +1,6 @@
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import type { DropSchema } from "~/engine/output/schema/DropSchema";
-import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import type { DropSchema } from "~/production-output/schema/DropSchema";
+import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { ReactNode } from "react";
 import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
 import { ItemLineOutputs } from "~/ui/item-detail/ItemLineOutputs";

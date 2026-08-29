@@ -7,8 +7,8 @@ This is the canonical map of implemented ownership and lifecycle. It does not ca
 The product dependency map is:
 
 ```text
-src/@routes → { exact product owners, src/ui, src/renderer, exact src/engine owners, electron/contract }
-product presentation/workers → { exact product runtime/core owners, exact shared UI owners, src/renderer, electron/contract }
+src/@routes → { exact product owners, src/ui, src/renderer, exact production/engine owners, electron/contract }
+product presentation/workers → { exact product runtime/core owners, exact shared UI owners, exact production/engine owners, src/renderer, electron/contract }
 authoring-shell → { authoring-session, exact authoring products, src/ui, src/renderer, electron/contract }
 authoring-session → { project-authoring repository runtime, Board session, src/renderer, electron/contract }
 src/arkpack/renderer → { src/arkpack/artifact, src/game-config, exact src/renderer owners, electron/contract }
@@ -16,12 +16,20 @@ src/editor-build/renderer → { src/editor-build/domain, exact src/arkpack owner
 src/arkpack/artifact → { src/game-config, exact filesystem/version owners in src/engine }
 src/editor-build/domain → { Arkpack descriptor/version contracts, game diagnostics, Project Authoring repository failure contract }
 project-authoring repository runtime → { Project Authoring core, src/game-config, electron/contract }
-authoring product cores → { exact upstream authoring/config/engine owners }
-src/game-config → exact authored-config and gameplay-schema owners in src/engine
+authoring product cores → { exact upstream authoring/config/production/engine owners }
+src/game-config → { exact production schemas, authored-config and remaining gameplay-schema owners in src/engine }
 src/editor/resource → { exact authored-config and engine resource owners }
+src/production-condition → exact query/runtime facts in src/engine
+src/production-output → src/production-condition
+src/production-action → { src/production-condition, src/production-input, src/production-output }
+src/production-line → { src/production-action, src/production-condition, src/production-input, src/production-output }
+src/production-delivery → { src/production-input, src/production-line }
+src/production-input → { src/production-action, src/production-delivery, src/production-line }
+src/production-job → { src/production-action, src/production-delivery, src/production-input, src/production-line, src/production-output }
 ```
 
-- `src/engine` is framework-neutral live gameplay and its exact runtime operations, plus the existing application CLI composition and narrowly owned filesystem/version contracts. It does not own authored Game source, compilation, Arkpack delivery, or Editor Build.
+- The production pipeline has explicit semantic roots. `src/production-condition` owns authored runtime condition evaluation. `src/production-output` owns output, drop, and roll contracts/resolution. `src/production-action` owns immediate action admission and charge settlement. `src/production-input` owns line-input contracts, material planning, buffering, autofill, withdrawal, and storage mutation. `src/production-line` owns line definitions, rule interpretation, reads, and run planning. `src/production-job` owns FIFO queue admission, active-job state, output-capacity reservation, start/completion/cancellation sequencing, and job checks. `src/production-delivery` owns outbound allocation, travel, validation, reconciliation, and settlement. These roots import one another only through the executable directions in Dependency Cruiser; callers import exact owners directly.
+- `src/engine` retains the framework-neutral live runtime/session, Tick, placement, merge, item, query, state, save, event, filesystem/version support, application CLI composition, and other untouched gameplay owners. It no longer owns the production action/input/line/output/roll/condition/job/delivery pipeline, and it does not own authored Game source, compilation, Arkpack delivery, or Editor Build.
 - `src/game-config` owns the complete authored-game pipeline: public completed/source schemas, canonical JSON source discovery and parsing, stable JSON Schema emission, diagnostics, semantic validation, resource identity/usage/rename behavior, and completed-config compilation. `source/` stays upstream of `validation/` and `compiler/`; validation never imports compilation. The root is platform-neutral and cannot import Arkpack, Editor Build, renderer, presentation, routes, or Electron.
 - `src/arkpack` owns package delivery with explicit boundaries. `artifact/` owns exact bytes, envelope, compression, signing, provenance, trusted root, artifact schemas, and artifact CLI commands. `renderer/` owns package admission, catalog, fallback, storage contracts, and load/import lifecycle. `ui/` owns catalog and import presentation. Artifact code stays upstream of renderer and UI and never imports Editor Build.
 - `src/editor-build` owns the Editor Build product independently of Project Authoring. `domain/` owns build descriptors, the Build repository capability, and install planning; `renderer/` owns the Electron proxy, exact Save request, and built-artifact admission into the Arkpack catalog; `ui/` owns Build command/diagnostic presentation. Electron main retains privileged build and filesystem publication; routes retain Build page composition.
@@ -31,7 +39,7 @@ src/editor/resource → { exact authored-config and engine resource owners }
 - `src/editor/resource` temporarily retains only platform-neutral Asset/Resource authoring policies. Asset/Resource presentation and renderer validation remain in their existing exact owners until that dedicated product slice; this residual path is not a generic Editor domain.
 - `src/renderer` contains only concrete renderer-process runtime, lifecycle, concurrency, and transport capabilities. It is not a required gateway to Engine, Editor, or `electron/contract`; callers import the exact owner directly.
 - `src/ui` owns cross-product primitives and reusable presentation. Product-specific UI remains with its top-level product owner. `src/@routes` owns registration, loaders, redirects, route context, and route-specific composition; routes may share only explicitly ignored `-*` route-private helpers, never import another route module.
-- `electron/main` owns physical desktop capabilities and composes exact product-domain, Project Authoring repository-contract, and Engine owners directly. It never imports renderer or product-presentation code; concrete raw Engine authorities remain limited to their exact owners by Dependency Cruiser. `electron/preload` is transport-only; Engine and product-domain code never import Electron.
+- `electron/main` owns physical desktop capabilities and composes exact product-domain, Project Authoring repository-contract, production, and Engine owners directly. It never imports renderer or product-presentation code; concrete raw gameplay authorities remain limited to their exact owners by Dependency Cruiser. `electron/preload` is transport-only; production, Engine, and product-domain code never import Electron.
 
 [`.dependency-cruiser.cjs`](.dependency-cruiser.cjs) is the executable import-boundary authority. `argc dc` cruises the complete `src`, `electron`, `shared`, `scripts`, and `test` roots plus standalone TypeScript configs, so every product root participates in cycle, resolution, dependency, and orphan checks. Do not duplicate those rules in tests or prose.
 

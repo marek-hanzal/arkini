@@ -1,11 +1,11 @@
-import type { RuleSchema as LineRuleSchema } from "~/engine/line/schema/rule/RuleSchema";
-import type { DropSchema } from "~/engine/output/schema/DropSchema";
-import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
-import type { RuleSchema as DropRuleSchema } from "~/engine/output/schema/drop/rule/RuleSchema";
+import type { RuleSchema as LineRuleSchema } from "~/production-line/schema/rule/RuleSchema";
+import type { DropSchema } from "~/production-output/schema/DropSchema";
+import type { OutputSchema } from "~/production-output/schema/OutputSchema";
+import type { RuleSchema as DropRuleSchema } from "~/production-output/schema/drop/rule/RuleSchema";
 import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
 import type { QuerySchema } from "~/engine/query/schema/QuerySchema";
-import type { RollSchema } from "~/engine/roll/schema/RollSchema";
-import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
+import type { RollSchema } from "~/production-output/roll/schema/RollSchema";
+import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 import {
 	DetailFact,
 	DetailFacts,

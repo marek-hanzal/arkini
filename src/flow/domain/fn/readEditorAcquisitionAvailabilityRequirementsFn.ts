@@ -4,7 +4,7 @@ import type {
 	EditorAcquisitionRequirement,
 	EditorAcquisitionUnsupportedRequirement,
 } from "~/flow/domain/EditorAcquisitionGraph";
-import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
+import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 export namespace readEditorAcquisitionAvailabilityRequirementsFn {
 	export interface Props {

@@ -1,7 +1,7 @@
 import { CircleCheck, CircleX } from "lucide-react";
 
-import type { InputSchema as ActionInputSchema } from "~/engine/action/schema/InputSchema";
-import type { RuleSchema as ActionRuleSchema } from "~/engine/action/schema/RuleSchema";
+import type { InputSchema as ActionInputSchema } from "~/production-action/schema/InputSchema";
+import type { RuleSchema as ActionRuleSchema } from "~/production-action/schema/RuleSchema";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { useEditorItemFormSession } from "~/item-authoring/ui/EditorItemFormContext";

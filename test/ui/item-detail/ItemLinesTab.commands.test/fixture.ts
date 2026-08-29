@@ -46,28 +46,28 @@ vi.mock("~/ui/game/useGameEngine", () => ({
 	useGameEngine: () => game,
 }));
 
-vi.mock("~/engine/job/write/enqueueLineFx", () => ({
+vi.mock("~/production-job/write/enqueueLineFx", () => ({
 	enqueueLineFx: (command: unknown) => {
 		commands.enqueue(command);
 		return command;
 	},
 }));
 
-vi.mock("~/engine/line/write/setDefaultLineFx", () => ({
+vi.mock("~/production-line/write/setDefaultLineFx", () => ({
 	setDefaultLineFx: (command: unknown) => {
 		commands.setDefault(command);
 		return command;
 	},
 }));
 
-vi.mock("~/engine/line/write/unsetDefaultLineFx", () => ({
+vi.mock("~/production-line/write/unsetDefaultLineFx", () => ({
 	unsetDefaultLineFx: (command: unknown) => {
 		commands.unsetDefault(command);
 		return command;
 	},
 }));
 
-vi.mock("~/engine/input/write/withdrawLineInputFx", () => ({
+vi.mock("~/production-input/write/withdrawLineInputFx", () => ({
 	withdrawLineInputFx: (command: unknown) => {
 		commands.withdraw(command);
 		return {
@@ -76,7 +76,7 @@ vi.mock("~/engine/input/write/withdrawLineInputFx", () => ({
 	},
 }));
 
-vi.mock("~/engine/input/write/withdrawLineInputsFx", () => ({
+vi.mock("~/production-input/write/withdrawLineInputsFx", () => ({
 	withdrawLineInputsFx: (command: unknown) => {
 		commands.withdraw(command);
 		return {

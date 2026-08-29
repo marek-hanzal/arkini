@@ -2,26 +2,67 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readLineInputDeliveryClaimsFn } from "~/production-delivery/fn/readLineInputDeliveryClaimsFn";
-import { readItemDetailChargeKeyFn } from "~/engine/item-detail/fn/readItemDetailChargeKeyFn";
-import type { ItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines";
-import { readItemDetailDepositAvailableChargesFx } from "~/engine/item-detail/read/readItemDetailDepositAvailableChargesFx";
-import { readItemDetailMaterialAutofillAvailabilityFx } from "~/engine/item-detail/read/readItemDetailMaterialAutofillAvailabilityFx";
-import type { InputRun } from "~/production-input/InputRun";
-import { TypeSchema } from "~/production-input/schema/TypeSchema";
-import type { InputSchema } from "~/production-input/schema/InputSchema";
-import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
+import { readItemRemainingChargesFn } from "~/engine/item/fn/readItemRemainingChargesFn";
+import { queryFx } from "~/engine/query/fx/queryFx";
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
+import { readBoardRuntimeItemByIdFx } from "~/game-runtime/read/readBoardRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+import type { ItemDetailLines } from "~/item-line-detail/read/ItemDetailLines";
+import { readItemDetailMaterialAutofillAvailabilityFx } from "~/item-line-detail/read/readItemDetailMaterialAutofillAvailabilityFx";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
+import { readLineInputDeliveryClaimsFn } from "~/production-delivery/fn/readLineInputDeliveryClaimsFn";
+import type { InputRun } from "~/production-input/InputRun";
+import type { DepositSchema } from "~/production-input/schema/DepositSchema";
+import type { InputSchema } from "~/production-input/schema/InputSchema";
+import { TypeSchema } from "~/production-input/schema/TypeSchema";
 
-export namespace readItemDetailInputsFx {
-	export interface Props {
-		readonly configured: readonly InputSchema.Type[];
-		readonly lineId: IdSchema.Type;
-		readonly ownerItemId: IdSchema.Type;
-		readonly resolved?: readonly InputRun.Resolution[];
-		readonly runtime: RuntimeSchema.Type;
+const readItemDetailChargeKeyFn = (charges: InputSchema.Type["charges"]) =>
+	charges === undefined ? "none" : `${charges.from}:${charges.cost}`;
+
+const readItemDetailDepositAvailableChargesFx = Effect.fn(
+	"readItemDetailDepositAvailableChargesFx",
+)(function* ({
+	input,
+	ownerItemId,
+	runtime,
+}: {
+	readonly input: DepositSchema.Type;
+	readonly ownerItemId: IdSchema.Type;
+	readonly runtime: RuntimeSchema.Type;
+}) {
+	const configuredOwner = runtime.items.find((candidate) => candidate.id === ownerItemId);
+	if (
+		configuredOwner !== undefined &&
+		configuredOwner.location.scope !== LocationScopeEnumSchema.enum.Board
+	) {
+		return {
+			availableCharges: 0,
+			candidateItemIds: [],
+		};
 	}
-}
+	const owner = yield* readBoardRuntimeItemByIdFx({
+		itemId: ownerItemId,
+		runtime,
+	});
+	const candidates = yield* queryFx({
+		origin: owner.location,
+		query: input.query,
+	}).pipe(
+		Effect.provideService(RuntimeFx, {
+			read: Effect.succeed(runtime),
+		}),
+	);
+
+	let availableCharges = 0;
+	for (const candidate of candidates) {
+		const remainingCharges = readItemRemainingChargesFn(candidate);
+		availableCharges += (remainingCharges ?? 0) * candidate.quantity;
+	}
+	return {
+		availableCharges,
+		candidateItemIds: candidates.map((candidate) => candidate.id),
+	};
+});
 
 /** Aggregates one line's authored and resolved inputs into their visible Item Detail groups. */
 export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(function* ({
@@ -30,7 +71,13 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 	ownerItemId,
 	resolved,
 	runtime,
-}: readItemDetailInputsFx.Props) {
+}: {
+	readonly configured: readonly InputSchema.Type[];
+	readonly lineId: IdSchema.Type;
+	readonly ownerItemId: IdSchema.Type;
+	readonly resolved?: readonly InputRun.Resolution[];
+	readonly runtime: RuntimeSchema.Type;
+}) {
 	const materials = new Map<string, ItemDetailLines.MaterialInput>();
 	const deposits = new Map<string, ItemDetailLines.DepositInput>();
 	const simple = new Map<string, ItemDetailLines.SimpleInput>();

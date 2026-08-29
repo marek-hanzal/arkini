@@ -9,17 +9,19 @@ import { setDefaultLineFx } from "~/production-line/write/setDefaultLineFx";
 import { unsetDefaultLineFx } from "~/production-line/write/unsetDefaultLineFx";
 import { withdrawLineInputFx } from "~/production-input/write/withdrawLineInputFx";
 import { withdrawLineInputsFx } from "~/production-input/write/withdrawLineInputsFx";
-import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
+import type { ItemDetailLines } from "~/item-line-detail/ui/ItemDetailLines";
 import { Button, PrimaryButton } from "~/ui/button/Button";
 import { itemDetailFadeMotion } from "~/item-detail-frame/ItemDetailMotion";
-import { ItemLineInputs, ItemLineUnavailableWithdrawals } from "~/ui/item-detail/ItemLineInputs";
-import { ItemLineOutputs } from "~/ui/item-detail/ItemLineOutputs";
+import {
+	ItemLineInputs,
+	ItemLineUnavailableWithdrawals,
+} from "~/item-line-detail/ui/ItemLineInputs";
+import { ItemLineOutputs } from "~/item-line-detail/ui/ItemLineOutputs";
 import {
 	ItemLineSummary,
 	type ItemLineSummaryIdentityRenderer,
-} from "~/ui/item-detail/ItemLineSummary";
+} from "~/item-line-detail/ui/ItemLineSummary";
 import { ItemReferenceButton } from "~/item-detail-frame/ItemReferenceButton";
-import type { ItemDetailPendingAction } from "~/item-detail-frame/ItemDetailControl";
 import { useItemDetailControl } from "~/item-detail-frame/useItemDetailControl";
 import { useItemDetailPendingCommand } from "~/item-detail-frame/useItemDetailPendingCommand";
 import { formatDurationFn } from "~/ui/formatDurationFn";
@@ -61,7 +63,7 @@ const ItemLineUnavailableReason = ({
 		.exhaustive();
 };
 
-const readUnavailableDependency = (reason: ItemDetailLines.DisabledReason) => {
+const readUnavailableDependencyFn = (reason: ItemDetailLines.DisabledReason) => {
 	if (reason.kind === "deposit-target-missing") {
 		return reason.detail === undefined
 			? undefined
@@ -77,7 +79,7 @@ const ItemLineUnavailableDependency = ({
 	dependency,
 	disabled,
 }: {
-	readonly dependency: NonNullable<ReturnType<typeof readUnavailableDependency>>;
+	readonly dependency: NonNullable<ReturnType<typeof readUnavailableDependencyFn>>;
 	readonly disabled: boolean;
 }) => (
 	<div
@@ -157,17 +159,25 @@ export const ItemLineRow = forwardRef<
 	ref,
 ) {
 	const itemDetail = useItemDetailControl();
-	const pendingKey = (action: ItemDetailPendingAction) =>
-		JSON.stringify([
+	const pendingKeys = {
+		default: JSON.stringify([
 			"line",
 			ownerItemId,
 			line.lineId,
-			action,
-		]);
-	const pendingKeys = {
-		default: pendingKey("default"),
-		enqueue: pendingKey("enqueue"),
-		withdraw: pendingKey("withdraw"),
+			"default",
+		]),
+		enqueue: JSON.stringify([
+			"line",
+			ownerItemId,
+			line.lineId,
+			"enqueue",
+		]),
+		withdraw: JSON.stringify([
+			"line",
+			ownerItemId,
+			line.lineId,
+			"withdraw",
+		]),
 	} as const;
 	const setDefaultLine = useItemDetailPendingCommand({
 		action: "default",
@@ -219,7 +229,7 @@ export const ItemLineRow = forwardRef<
 	const unavailable = line.availability.kind === "unavailable";
 	const unavailableDependency =
 		line.availability.kind === "unavailable"
-			? readUnavailableDependency(line.availability.reason)
+			? readUnavailableDependencyFn(line.availability.reason)
 			: undefined;
 	const showUnavailableReason = !stale && unavailable && line.activeJob === undefined;
 	const queued = !stale && line.activeJob === undefined && line.queuedRequestCount > 0;

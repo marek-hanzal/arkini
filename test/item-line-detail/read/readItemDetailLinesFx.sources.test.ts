@@ -18,6 +18,7 @@ const createDepositConfig = (inputCount: number) =>
 			...lineRunTestConfig.items,
 			workshop: {
 				...workshop,
+				scope: "any",
 				lines: [
 					{
 						...workshop.lines[0],
@@ -211,6 +212,56 @@ describe("readItemDetailLinesFx / deposits", () => {
 						"runtime:tree",
 					],
 					ready: false,
+				},
+			],
+		});
+	});
+
+	it("projects stored deposit owners without inventing a board origin", () => {
+		const config = createDepositConfig(1);
+		const boardRuntime = createRuntime(config, [
+			{
+				id: "runtime:tree",
+				x: 1,
+				y: 0,
+			},
+		]);
+		const storedRuntime = {
+			...boardRuntime,
+			items: boardRuntime.items.map((item) =>
+				item.id === "runtime:workshop"
+					? {
+							...item,
+							location: {
+								scope: "inventory" as const,
+								position: {
+									x: 0,
+									y: 0,
+								},
+							},
+						}
+					: item,
+			),
+		} satisfies RuntimeSchema.Type;
+
+		const lines = readLines(storedRuntime, "runtime:workshop", config);
+		expect(lines).toMatchObject({
+			kind: "available",
+			line: [
+				{
+					availability: {
+						kind: "unavailable",
+						reason: {
+							kind: "owner-stored",
+						},
+					},
+					input: [
+						{
+							kind: "deposit",
+							availableCharges: 0,
+							targetItemIds: [],
+						},
+					],
 				},
 			],
 		});

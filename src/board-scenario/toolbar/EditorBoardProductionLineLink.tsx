@@ -2,7 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 
 import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
 import { useEditorProject } from "~/authoring-session/useEditorProject";
-import type { ItemLineSummaryIdentityRenderProps } from "~/ui/item-detail/ItemLineSummary";
+import type { ItemLineSummaryIdentityRenderProps } from "~/item-line-detail/ui/ItemLineSummary";
 import { EditorProductionLineEditLink } from "~/item-authoring/ui/EditorProductionLineEditLink";
 
 /** Links a shared gameplay line summary to that exact authored production line. */

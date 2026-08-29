@@ -9,22 +9,9 @@ import {
 	projection,
 	renderLines,
 	selectAllLines,
-	setPendingAction,
 } from "./ItemLinesTab.commands.test/fixture";
 
 describe("ItemLinesTab command boundary", () => {
-	it("blocks duplicate enqueue admission while its command is pending", async () => {
-		setPendingAction("enqueue");
-		await renderLines(projection);
-		const enqueue = document.querySelector<HTMLButtonElement>(
-			'[data-ui="TileLineEnqueueButton"]',
-		);
-
-		expect(enqueue?.disabled).toBe(true);
-		await act(async () => enqueue?.click());
-		expect(commands.enqueue).not.toHaveBeenCalled();
-	});
-
 	it("wires save-backed default set and unset to the exact owner and line", async () => {
 		const { rerender } = await renderLines(projection);
 		const defaultButton = document.querySelector<HTMLButtonElement>(

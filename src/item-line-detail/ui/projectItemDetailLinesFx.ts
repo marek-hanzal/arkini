@@ -1,28 +1,16 @@
 import { Effect } from "effect";
+import { match } from "ts-pattern";
 
-import type { GameEngine } from "~/renderer/game/GameEngine";
-import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
-import { projectItemDetailInputFx } from "~/ui/item-detail/projectItemDetailInputFx";
-import { projectItemDetailReferenceFx } from "~/item-detail-frame/projectItemDetailReferenceFx";
-import { projectItemDetailSelectorFn } from "~/ui/item-detail/fn/projectItemDetailSelectorFn";
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { ItemDetailLines as EngineItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines";
-import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { match } from "ts-pattern";
+import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
+import type { ItemDetailLines as EngineItemDetailLines } from "~/item-line-detail/read/ItemDetailLines";
+import { readItemDetailLinesFx } from "~/item-line-detail/read/readItemDetailLinesFx";
+import type { ItemDetailLines } from "~/item-line-detail/ui/ItemDetailLines";
+import { projectItemDetailReferenceFx } from "~/item-detail-frame/projectItemDetailReferenceFx";
 import { TypeSchema } from "~/production-condition/schema/TypeSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
-
-export namespace projectItemDetailLinesFx {
-	export interface Props {
-		readonly game: GameEngine;
-		readonly itemId: IdSchema.Type;
-		readonly runtime: RuntimeSchema.Type;
-	}
-
-	export type Result = ItemDetailLines.Projection;
-}
+import type { GameEngine } from "~/renderer/game/GameEngine";
 
 type ProjectedLineDisabledCause = Extract<
 	ItemDetailLines.DisabledReason,
@@ -31,96 +19,131 @@ type ProjectedLineDisabledCause = Extract<
 	}
 >["cause"];
 
-const projectOutputItemFn = ({
+const projectItemDetailSelectorFn = ({
+	items,
+	selector,
+}: {
+	readonly items: GameEngine["config"]["items"];
+	readonly selector: SelectorSchema.Type;
+}) => ({
+	kind: "item" as const,
+	label: items[selector.itemId]?.title ?? selector.itemId,
+});
+
+const projectOutputItemFx = Effect.fn("projectOutputItemFx")(function* ({
 	game,
 	item,
 }: {
 	readonly game: GameEngine;
-	readonly item: readItemDetailLinesFx.OutputItem;
-}) => {
-	const configured = game.config.items[item.itemId];
-	if (configured === undefined) {
+	readonly item: EngineItemDetailLines.OutputItem;
+}) {
+	return yield* Effect.sync(() => {
+		const configured = game.config.items[item.itemId];
+		if (configured === undefined) {
+			return {
+				itemId: item.itemId,
+				title: item.itemId,
+				quantity: item.quantity,
+				activeRuleHints: item.activeRuleHints,
+			} satisfies ItemDetailLines.OutputItem;
+		}
+		const sourceAssetIds = configured.asset.default;
 		return {
 			itemId: item.itemId,
-			title: item.itemId,
+			title: configured.title,
 			quantity: item.quantity,
 			activeRuleHints: item.activeRuleHints,
+			sourceUrl: game.getResourceUrl(sourceAssetIds[0]),
+			...(sourceAssetIds[1] === undefined
+				? {}
+				: {
+						compositeUrl: game.getResourceUrl(sourceAssetIds[1]),
+					}),
+			definitionItemId: configured.id,
 		} satisfies ItemDetailLines.OutputItem;
-	}
-	const sourceAssetIds = configured.asset.default;
-	return {
-		itemId: item.itemId,
-		title: configured.title,
-		quantity: item.quantity,
-		activeRuleHints: item.activeRuleHints,
-		sourceUrl: game.getResourceUrl(sourceAssetIds[0]),
-		...(sourceAssetIds[1] === undefined
-			? {}
-			: {
-					compositeUrl: game.getResourceUrl(sourceAssetIds[1]),
-				}),
-		definitionItemId: configured.id,
-	} satisfies ItemDetailLines.OutputItem;
-};
+	});
+});
 
-const projectItemDetailOutputRollFn = ({
+const projectItemDetailOutputRollFx = Effect.fn("projectItemDetailOutputRollFx")(function* ({
 	game,
 	roll,
 }: {
 	readonly game: GameEngine;
-	readonly roll: readItemDetailLinesFx.OutputRoll;
-}) =>
-	match(roll)
+	readonly roll: EngineItemDetailLines.LineOutputRoll;
+}) {
+	return yield* match(roll)
 		.with(
 			{
 				kind: "guaranteed",
 			},
-			(guaranteed) => ({
-				kind: "guaranteed" as const,
-				item: guaranteed.item.map((item) =>
-					projectOutputItemFn({
-						game,
+			(guaranteed) =>
+				Effect.all(
+					guaranteed.item.map((item) =>
+						projectOutputItemFx({
+							game,
+							item,
+						}),
+					),
+				).pipe(
+					Effect.map((item) => ({
+						kind: "guaranteed" as const,
 						item,
-					}),
+					})),
 				),
-			}),
 		)
 		.with(
 			{
 				kind: "chance",
 			},
-			(chance) => ({
-				kind: "chance" as const,
-				chance: chance.chance,
-				item: chance.item.map((item) =>
-					projectOutputItemFn({
-						game,
+			(chance) =>
+				Effect.all(
+					chance.item.map((item) =>
+						projectOutputItemFx({
+							game,
+							item,
+						}),
+					),
+				).pipe(
+					Effect.map((item) => ({
+						kind: "chance" as const,
+						chance: chance.chance,
 						item,
-					}),
+					})),
 				),
-			}),
 		)
 		.with(
 			{
 				kind: "weight",
 			},
-			(weight) => ({
-				kind: "weight" as const,
-				selections: weight.selections,
-				option: weight.option.map((option) => ({
-					weight: option.weight,
-					item: option.item.map((item) =>
-						projectOutputItemFn({
-							game,
-							item,
-						}),
+			(weight) =>
+				Effect.all(
+					weight.option.map((option) =>
+						Effect.all(
+							option.item.map((item) =>
+								projectOutputItemFx({
+									game,
+									item,
+								}),
+							),
+						).pipe(
+							Effect.map((item) => ({
+								weight: option.weight,
+								item,
+							})),
+						),
 					),
-				})),
-			}),
+				).pipe(
+					Effect.map((option) => ({
+						kind: "weight" as const,
+						selections: weight.selections,
+						option,
+					})),
+				),
 		)
 		.exhaustive();
+});
 
-const readQueryLocationLabel = (query: WhenSchema.Type["query"]) =>
+const readQueryLocationLabelFn = (query: WhenSchema.Type["query"]) =>
 	match(query)
 		.with(
 			{
@@ -154,7 +177,7 @@ const readQueryLocationLabel = (query: WhenSchema.Type["query"]) =>
 		)
 		.exhaustive();
 
-const readMaxCountMessageAfterTitle = ({
+const readMaxCountMessageAfterTitleFn = ({
 	liveQuantity,
 	maxCount,
 }: {
@@ -175,10 +198,10 @@ const projectDisabledConditionFx = Effect.fn("projectDisabledConditionFx")(funct
 	readonly when: WhenSchema.Type;
 }) {
 	const selector = projectItemDetailSelectorFn({
-		game,
+		items: game.config.items,
 		selector: when.query.selector,
 	});
-	const locationLabel = readQueryLocationLabel(when.query);
+	const locationLabel = readQueryLocationLabelFn(when.query);
 	const detail = yield* projectItemDetailReferenceFx({
 		game,
 		itemId: when.query.selector.itemId,
@@ -241,6 +264,103 @@ const projectDisabledConditionFx = Effect.fn("projectDisabledConditionFx")(funct
 				} satisfies ItemDetailLines.DisabledCondition,
 				phrase: `${min}-${max} ${selector.label}`,
 			}),
+		)
+		.exhaustive();
+});
+
+const projectItemDetailInputFx = Effect.fn("projectItemDetailInputFx")(function* ({
+	game,
+	input,
+	runtime,
+}: {
+	readonly game: GameEngine;
+	readonly input: EngineItemDetailLines.Input;
+	readonly runtime: RuntimeSchema.Type;
+}) {
+	return yield* match(input)
+		.with(
+			{
+				kind: "materials",
+			},
+			(materials) =>
+				Effect.gen(function* () {
+					const selector = projectItemDetailSelectorFn({
+						items: game.config.items,
+						selector: materials.selector,
+					});
+					const detail = yield* projectItemDetailReferenceFx({
+						game,
+						itemId: materials.selector.itemId,
+						runtime,
+					});
+					return {
+						...materials,
+						selector,
+						...(detail === undefined
+							? {}
+							: {
+									detail,
+								}),
+					} satisfies ItemDetailLines.Input;
+				}),
+		)
+		.with(
+			{
+				kind: "deposit",
+			},
+			(deposit) =>
+				Effect.gen(function* () {
+					const selector = projectItemDetailSelectorFn({
+						items: game.config.items,
+						selector: deposit.selector,
+					});
+					const exactTargetId =
+						deposit.targetItemIds.length === 1 ? deposit.targetItemIds[0] : undefined;
+					const detail = yield* projectItemDetailReferenceFx({
+						game,
+						itemId: deposit.selector.itemId,
+						preferredRuntimeItemIds:
+							exactTargetId === undefined
+								? []
+								: [
+										exactTargetId,
+									],
+						runtime,
+					});
+					return {
+						kind: deposit.kind,
+						selector,
+						distance: deposit.distance,
+						requiredCharges: deposit.requiredCharges,
+						availableCharges: deposit.availableCharges,
+						availableChargesLabel:
+							deposit.targetItemIds.length === 0
+								? "None"
+								: String(deposit.availableCharges),
+						targetTitles: deposit.targetItemIds.map(
+							(itemId) =>
+								runtime.items.find((item) => item.id === itemId)?.item.title ??
+								itemId,
+						),
+						ready: deposit.ready,
+						...(deposit.charges === undefined
+							? {}
+							: {
+									charges: deposit.charges,
+								}),
+						...(detail === undefined
+							? {}
+							: {
+									detail,
+								}),
+					} satisfies ItemDetailLines.Input;
+				}),
+		)
+		.with(
+			{
+				kind: "simple",
+			},
+			(simple) => Effect.succeed(simple),
 		)
 		.exhaustive();
 });
@@ -329,7 +449,7 @@ const projectAvailabilityFx = Effect.fn("projectItemDetailLineAvailabilityFx")(f
 			({ reason }) =>
 				Effect.gen(function* () {
 					const selector = projectItemDetailSelectorFn({
-						game,
+						items: game.config.items,
 						selector: reason.selector,
 					});
 					const detail = yield* projectItemDetailReferenceFx({
@@ -385,7 +505,7 @@ const projectAvailabilityFx = Effect.fn("projectItemDetailLineAvailabilityFx")(f
 					const item = yield* resolveItemFx({
 						itemId: reason.itemId,
 					});
-					const messageAfterTitle = readMaxCountMessageAfterTitle({
+					const messageAfterTitle = readMaxCountMessageAfterTitleFn({
 						liveQuantity: reason.liveQuantity,
 						maxCount: reason.maxCount,
 					});
@@ -415,7 +535,7 @@ const projectAvailabilityFx = Effect.fn("projectItemDetailLineAvailabilityFx")(f
 					const intermediate = yield* resolveItemFx({
 						itemId: reason.intermediateItemId,
 					});
-					const messageAfterTitle = readMaxCountMessageAfterTitle({
+					const messageAfterTitle = readMaxCountMessageAfterTitleFn({
 						liveQuantity: reason.liveQuantity,
 						maxCount: reason.maxCount,
 					});
@@ -439,7 +559,11 @@ export const projectItemDetailLinesFx = Effect.fn("projectItemDetailLinesFx")(fu
 	game,
 	itemId,
 	runtime,
-}: projectItemDetailLinesFx.Props) {
+}: {
+	readonly game: GameEngine;
+	readonly itemId: EngineItemDetailLines.Props["itemId"];
+	readonly runtime: RuntimeSchema.Type;
+}) {
 	const lines = yield* readItemDetailLinesFx({
 		itemId,
 		runtime,
@@ -447,7 +571,7 @@ export const projectItemDetailLinesFx = Effect.fn("projectItemDetailLinesFx")(fu
 	if (lines.kind === "unavailable") {
 		return {
 			kind: "unavailable",
-		} satisfies projectItemDetailLinesFx.Result;
+		} satisfies ItemDetailLines.Projection;
 	}
 	return {
 		kind: "available",
@@ -474,16 +598,22 @@ export const projectItemDetailLinesFx = Effect.fn("projectItemDetailLinesFx")(fu
 							}),
 						),
 					),
-					output: Effect.succeed(
-						line.output.map((set) => ({
-							weight: set.weight,
-							roll: set.roll.map((roll) =>
-								projectItemDetailOutputRollFn({
-									game,
+					output: Effect.all(
+						line.output.map((set) =>
+							Effect.all(
+								set.roll.map((roll) =>
+									projectItemDetailOutputRollFx({
+										game,
+										roll,
+									}),
+								),
+							).pipe(
+								Effect.map((roll) => ({
+									weight: set.weight,
 									roll,
-								}),
+								})),
 							),
-						})),
+						),
 					),
 				}).pipe(
 					Effect.map(({ availability, input, output }) => ({
@@ -495,5 +625,5 @@ export const projectItemDetailLinesFx = Effect.fn("projectItemDetailLinesFx")(fu
 				),
 			),
 		),
-	} satisfies projectItemDetailLinesFx.Result;
+	} satisfies ItemDetailLines.Projection;
 });

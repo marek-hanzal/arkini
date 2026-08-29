@@ -2,8 +2,8 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { ReactNode } from "react";
-import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
-import { ItemLineOutputs } from "~/ui/item-detail/ItemLineOutputs";
+import type { ItemDetailLines } from "~/item-line-detail/ui/ItemDetailLines";
+import { ItemLineOutputs } from "~/item-line-detail/ui/ItemLineOutputs";
 import { EditorItemDetailReference } from "~/item-authoring/ui/EditorItemDetailReference";
 
 type EditorItemRegistry = Record<string, ItemSchema.Type>;

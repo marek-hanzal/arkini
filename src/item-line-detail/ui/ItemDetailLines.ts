@@ -5,16 +5,12 @@ import type { DistanceSchema } from "~/item-location/schema/DistanceSchema";
 import type { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
 import type { ModeSchema } from "~/production-input/schema/ModeSchema";
 import type { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
-import type {
-	ItemDetailOutputRoll,
-	ItemDetailOutputSet,
-	ItemDetailQuantityBounds,
-} from "~/engine/item-detail/read/ItemDetailOutput";
+import type { ItemDetailLines as ReadItemDetailLines } from "~/item-line-detail/read/ItemDetailLines";
 import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 
 /** Renderer-owned contract for one live Item Detail lines projection. */
 export namespace ItemDetailLines {
-	export type QuantityBounds = ItemDetailQuantityBounds;
+	export type QuantityBounds = ReadItemDetailLines.QuantityBounds;
 
 	export interface ChargeCost {
 		readonly cost: number;
@@ -74,8 +70,8 @@ export namespace ItemDetailLines {
 		readonly definitionItemId?: string;
 	}
 
-	export type OutputRoll = ItemDetailOutputRoll<OutputItem>;
-	export type OutputSet = ItemDetailOutputSet<OutputItem>;
+	export type OutputRoll = ReadItemDetailLines.OutputRoll<OutputItem>;
+	export type OutputSet = ReadItemDetailLines.OutputSet<OutputItem>;
 
 	interface DisabledConditionContext {
 		readonly selector: Selector;

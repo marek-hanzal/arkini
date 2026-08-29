@@ -4,8 +4,8 @@ import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import { fitSingleLineTextFx } from "~/ui/pixi/text/fitSingleLineTextFx";
-import { formatTileBadgeLabelFx } from "~/ui/tile/formatTileBadgeLabelFx";
-import { readArtworkLayoutFx } from "~/ui/pixi/actor/readArtworkLayoutFx";
+import { readArtworkLayoutFn } from "~/ui/pixi/actor/fn/readArtworkLayoutFn";
+import { formatTileBadgeLabelFn } from "~/ui/tile/fn/formatTileBadgeLabelFn";
 
 export namespace updateActorVisualFx {
 	export interface Props {
@@ -33,7 +33,7 @@ export const updateActorVisualFx = Effect.fn("updateActorVisualFx")(function* ({
 
 	visual.item = item;
 	visual.size = size;
-	const artwork = yield* readArtworkLayoutFx({
+	const artwork = readArtworkLayoutFn({
 		faceSize,
 		inset,
 		layered: item.compositeUrl !== undefined,
@@ -73,7 +73,7 @@ export const updateActorVisualFx = Effect.fn("updateActorVisualFx")(function* ({
 	visual.quantity.text =
 		item.badgeCount === undefined
 			? ""
-			: yield* formatTileBadgeLabelFx({
+			: formatTileBadgeLabelFn({
 					count: item.badgeCount,
 					kind: item.badgeKind,
 				});

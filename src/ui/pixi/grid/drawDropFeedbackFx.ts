@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import type { Graphics } from "pixi.js";
 
-import { readSurfaceRadiusFx } from "~/ui/pixi/grid/readSurfaceRadiusFx";
+import { readSurfaceRadiusFn } from "~/ui/pixi/grid/fn/readSurfaceRadiusFn";
 import type { SurfaceLayout } from "~/ui/pixi/layout/SceneLayout";
 
 const drawRoundedOuterSlotPath = (
@@ -66,7 +66,7 @@ export const drawDropFeedbackFx = Effect.fn("drawDropFeedbackFx")(function* ({
 }: drawDropFeedbackFx.Props) {
 	graphics.clear();
 	if (slot === null || surface === null) return;
-	const radius = yield* readSurfaceRadiusFx(surface);
+	const radius = readSurfaceRadiusFn(surface);
 	drawRoundedOuterSlotPath(graphics, surface, slot, radius)
 		.fill({
 			alpha: 0.16,

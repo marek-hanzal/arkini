@@ -37,8 +37,8 @@ import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwne
 import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
 import type { MainReconciler } from "~/ui/pixi/scene/MainReconciler";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
-import { classifyActorUpdateFx } from "~/ui/pixi/scene/classifyActorUpdateFx";
-import { classifyReconciliationFx } from "~/ui/pixi/scene/classifyReconciliationFx";
+import { classifyActorUpdateFn } from "~/ui/pixi/scene/fn/classifyActorUpdateFn";
+import { classifyReconciliationFn } from "~/ui/pixi/scene/fn/classifyReconciliationFn";
 import { releaseMainActorFx } from "~/ui/pixi/scene/releaseMainActorFx";
 import { runReplacementsFx } from "~/ui/pixi/scene/runReplacementsFx";
 
@@ -325,7 +325,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 						];
 			}),
 		);
-		const reconciliationPlan = yield* classifyReconciliationFx({
+		const reconciliationPlan = classifyReconciliationFn({
 			actorIds: actorStore.actors.keys(),
 			deliveryRetainedActorIds: deliverySnapshot.retainedActorIds,
 			feedbackCues,
@@ -428,7 +428,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 
 			const actor = actorStore.actors.get(item.id);
 			if (actor === undefined) continue;
-			const updatePlan = yield* classifyActorUpdateFx({
+			const updatePlan = classifyActorUpdateFn({
 				actor,
 				deliveryRetained: deliverySnapshot.retainedActorIds.has(item.id),
 				directLanding: dropSnapshot.landingActorIds.has(item.id),

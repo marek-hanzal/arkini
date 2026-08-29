@@ -1,13 +1,11 @@
-import { Effect } from "effect";
-
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { isSameTileActorLocationFn } from "~/ui/pixi/actor/fn/isSameTileActorLocationFn";
-import { readCrowdAlphaFx } from "~/ui/pixi/actor/readCrowdAlphaFx";
+import { readCrowdAlphaFn } from "~/ui/pixi/actor/fn/readCrowdAlphaFn";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { ActorUpdatePlan } from "~/ui/pixi/scene/ActorUpdatePlan";
 import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
 
-export namespace classifyActorUpdateFx {
+export namespace classifyActorUpdateFn {
 	export interface Props {
 		readonly actor: PixiTileActor;
 		readonly deliveryRetained: boolean;
@@ -44,7 +42,7 @@ const isSameMainSceneVisual = (left: TileActorItem, right: TileActorItem) => {
 	);
 };
 
-export const classifyActorUpdateFx = Effect.fnUntraced(function* ({
+export const classifyActorUpdateFn = ({
 	actor,
 	deliveryRetained,
 	directLanding,
@@ -53,15 +51,14 @@ export const classifyActorUpdateFx = Effect.fnUntraced(function* ({
 	pose,
 	poseChannelActive,
 	preserveVisual,
-}: classifyActorUpdateFx.Props) {
+}: classifyActorUpdateFn.Props) => {
 	const moved = !isSameTileActorLocationFn(actor.item.location, displayItem.location);
 	const visualChanged = !isSameMainSceneVisual(actor.currentVisual.item, displayItem);
 	const progressChanged = actor.item.progressRatio !== displayItem.progressRatio;
 	const sizeChanged = actor.size !== pose.size;
 	const poseOwned = actor.dragging || deliveryRetained || motionClaimed || poseChannelActive;
-	const nextCrowdAlpha = yield* readCrowdAlphaFx(displayItem);
-	const crowdAlpha =
-		(yield* readCrowdAlphaFx(actor.item)) === nextCrowdAlpha ? null : nextCrowdAlpha;
+	const nextCrowdAlpha = readCrowdAlphaFn(displayItem);
+	const crowdAlpha = readCrowdAlphaFn(actor.item) === nextCrowdAlpha ? null : nextCrowdAlpha;
 	const activityEffect =
 		actor.item.activityEffect === displayItem.activityEffect
 			? null
@@ -111,4 +108,4 @@ export const classifyActorUpdateFx = Effect.fnUntraced(function* ({
 					kind: "place",
 				},
 	};
-});
+};

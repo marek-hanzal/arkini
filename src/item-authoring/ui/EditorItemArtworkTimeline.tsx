@@ -1,6 +1,6 @@
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { EditorItemThumbnail } from "~/ui/item/EditorItemThumbnail";
-import { EditorAssetDetailLink } from "~/ui/resource/editor/EditorAssetDetailLink";
+import { EditorAssetDetailLink } from "~/asset-authoring/ui/EditorAssetDetailLink";
 
 const formatProgress = (progress: number) =>
 	`${Number.isInteger(progress) ? progress : progress.toFixed(1)}%`;

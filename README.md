@@ -40,7 +40,7 @@ src/project-note  ordered project Notes contracts and workspace
 src/authoring-mcp  renderer-side MCP status, settings and checkout presentation
 src/authoring-session  mounted project publication, refresh, replacement and unsaved-change authority
 src/authoring-shell  cross-product Editor shell and navigation composition
-src/editor/resource  residual Asset/Resource authoring policies pending their dedicated product slice
+src/asset-authoring  Asset catalog, validation, import/edit/delete sessions and product presentation
 src/item-authoring  authored Item domain and product UI
 src/flow      authored acquisition graph, global Flow and layout worker
 src/estimate  static Estimate domain, projections, cache and worker

@@ -10,7 +10,7 @@ import {
 	type EditorProjectRepositoryOperation,
 } from "~/project-authoring/repository/EditorProjectRepositoryError";
 import { forceDeleteEditorItemFx } from "~/item-authoring/domain/fx/forceDeleteEditorItemFx";
-import { readEditorAssetDeleteBlockersFn } from "~/editor/resource/fn/readEditorAssetDeleteBlockersFn";
+import { readEditorAssetDeleteBlockersFn } from "~/asset-authoring/domain/fn/readEditorAssetDeleteBlockersFn";
 import { readEditorItemDeleteBlockersFn } from "~/item-authoring/domain/fn/readEditorItemDeleteBlockersFn";
 import { analyzeEditorProjectCompatibilityFn } from "~/project-version/fn/analyzeEditorProjectCompatibilityFn";
 import { bumpArkpackVersionFn } from "~/project-version/fn/bumpArkpackVersionFn";

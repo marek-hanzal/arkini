@@ -1,4 +1,4 @@
-import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -11,8 +11,8 @@ import {
 } from "~/flow/domain/EditorItemOriginFlow";
 import { readEditorItemOriginFlowFx } from "~/flow/domain/fx/readEditorItemOriginFlowFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import type { RuleSchema as LineRuleSchema } from "~/engine/line/schema/rule/RuleSchema";
-import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import type { RuleSchema as LineRuleSchema } from "~/production-line/schema/rule/RuleSchema";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { createMergeTestConfig } from "~test/merge/support/createMergeTestConfig";
 
 type EditorGuaranteedRoll = Extract<

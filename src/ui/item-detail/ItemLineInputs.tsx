@@ -3,8 +3,8 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
-import { withdrawLineInputFx } from "~/engine/input/write/withdrawLineInputFx";
-import { withdrawLineInputsFx } from "~/engine/input/write/withdrawLineInputsFx";
+import { withdrawLineInputFx } from "~/production-input/write/withdrawLineInputFx";
+import { withdrawLineInputsFx } from "~/production-input/write/withdrawLineInputsFx";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { LinkButton } from "~/ui/button/LinkButton";
 import { itemDetailBadgeMotion, itemDetailFadeMotion } from "~/ui/item-detail/ItemDetailMotion";

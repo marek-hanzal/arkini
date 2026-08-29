@@ -3,8 +3,8 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
-import { dropRulesFx } from "~/engine/output/fx/dropRulesFx";
-import type { DropSchema } from "~/engine/output/schema/DropSchema";
+import { dropRulesFx } from "~/production-output/fx/dropRulesFx";
+import type { DropSchema } from "~/production-output/schema/DropSchema";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 

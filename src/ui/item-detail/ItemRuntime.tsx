@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "motion/react";
 
-import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
+import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
 import { itemDetailFadeMotion } from "~/ui/item-detail/ItemDetailMotion";
 
 export interface ItemRuntimeValue {

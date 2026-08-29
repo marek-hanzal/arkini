@@ -27,6 +27,13 @@
 	"include": [
 		"electron/contract",
 		"src/engine",
+		"src/production-action",
+		"src/production-condition",
+		"src/production-delivery",
+		"src/production-input",
+		"src/production-job",
+		"src/production-line",
+		"src/production-output",
 		"src/game-config",
 		"src/arkpack",
 		"src/editor-build",

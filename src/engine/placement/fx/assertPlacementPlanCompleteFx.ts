@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import type { dropFx } from "~/engine/output/fx/dropFx";
+import type { dropFx } from "~/production-output/fx/dropFx";
 import { PlacementPlanInvalidError } from "~/engine/placement/error/PlacementPlanInvalidError";
 import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 import { readPlacementPlanQuantityFn } from "~/engine/placement/fn/readPlacementPlanQuantityFn";

@@ -3,7 +3,7 @@ import { match, P } from "ts-pattern";
 
 import type { AssetSchema } from "~/engine/item/schema/AssetSchema";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import { readRuntimeLineFillProgressFx } from "~/engine/line/read/readRuntimeLineFillProgressFx";
+import { readRuntimeLineFillProgressFn } from "~/production-line/fn/readRuntimeLineFillProgressFn";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -52,7 +52,7 @@ export const readTileActorAssetSourceIdsFx = Effect.fn("readTileActorAssetSource
 		return defaultAssetIds;
 	}
 
-	const progress = yield* readRuntimeLineFillProgressFx({
+	const progress = readRuntimeLineFillProgressFn({
 		line: progressLine,
 		ownerItemId: item.id,
 		runtime,

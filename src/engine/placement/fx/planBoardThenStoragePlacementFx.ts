@@ -6,7 +6,7 @@ import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import type { dropFx } from "~/engine/output/fx/dropFx";
+import type { dropFx } from "~/production-output/fx/dropFx";
 import { mergePlacementPlansFn } from "~/engine/placement/fn/mergePlacementPlansFn";
 import { readPlacementPlanQuantityFn } from "~/engine/placement/fn/readPlacementPlanQuantityFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";

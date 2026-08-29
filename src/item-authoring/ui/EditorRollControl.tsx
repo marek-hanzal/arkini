@@ -1,4 +1,4 @@
-import type { RollSchema } from "~/engine/roll/schema/RollSchema";
+import type { RollSchema } from "~/production-output/roll/schema/RollSchema";
 import { match } from "ts-pattern";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { EditorDropList } from "~/item-authoring/ui/EditorDropList";

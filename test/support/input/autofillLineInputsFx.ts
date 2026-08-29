@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { autofillLineInputsRuntimeFx } from "~/engine/input/write/autofillLineInputsRuntimeFx";
+import { autofillLineInputsRuntimeFx } from "~/production-input/write/autofillLineInputsRuntimeFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 
 export namespace autofillLineInputsFx {

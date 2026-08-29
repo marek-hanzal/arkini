@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { LineSchema } from "~/engine/line/schema/LineSchema";
+import { LineSchema } from "~/production-line/schema/LineSchema";
 import { DiagnosticPathSchema } from "~/game-config/diagnostic/schema/DiagnosticPathSchema";
 
 export const ItemLineEntrySchema = z

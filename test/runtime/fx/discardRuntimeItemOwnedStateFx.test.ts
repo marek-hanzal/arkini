@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { discardRuntimeItemOwnedStateFx } from "~/engine/runtime/fx/discardRuntimeItemOwnedStateFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 
 const config = createJobTestConfig();
 const board = {

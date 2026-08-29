@@ -1,6 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 
-import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorItemDraftDefaults } from "~/item-authoring/ui/EditorItemDraftDefaults";
 import { EditorOutputControl } from "~/item-authoring/ui/EditorOutputControl";

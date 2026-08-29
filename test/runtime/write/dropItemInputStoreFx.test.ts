@@ -3,9 +3,9 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
 import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
-import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
+import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
 import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
-import { setDefaultLineFx } from "~/engine/line/write/setDefaultLineFx";
+import { setDefaultLineFx } from "~/production-line/write/setDefaultLineFx";
 import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
@@ -16,7 +16,7 @@ import {
 	inputRuntimeTestConfig,
 	sourceLocation,
 	workshopLocation,
-} from "~test/input/support/inputRuntimeTestConfig";
+} from "~test/production-input/support/inputRuntimeTestConfig";
 
 const lineId = "line:workshop:build";
 

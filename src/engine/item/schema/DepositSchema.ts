@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { LineSchema } from "~/engine/line/schema/LineSchema";
+import { LineSchema } from "~/production-line/schema/LineSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 
 import { BaseSchema } from "./BaseSchema";

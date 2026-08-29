@@ -1,12 +1,12 @@
-import type { InputSchema as LineInputSchema } from "~/engine/input/schema/InputSchema";
+import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
-import type { DropSchema } from "~/engine/output/schema/DropSchema";
-import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import type { DropSchema } from "~/production-output/schema/DropSchema";
+import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { QuerySchema } from "~/engine/query/schema/QuerySchema";
-import type { RollSchema } from "~/engine/roll/schema/RollSchema";
-import type { SetSchema } from "~/engine/roll/schema/SetSchema";
-import type { WeightedDropSchema } from "~/engine/roll/schema/WeightedDropSchema";
-import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
+import type { RollSchema } from "~/production-output/roll/schema/RollSchema";
+import type { SetSchema } from "~/production-output/roll/schema/SetSchema";
+import type { WeightedDropSchema } from "~/production-output/roll/schema/WeightedDropSchema";
+import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 const drop = {
 	itemId: "",

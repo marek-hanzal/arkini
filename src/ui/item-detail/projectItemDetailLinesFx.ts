@@ -11,8 +11,8 @@ import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailL
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { match } from "ts-pattern";
-import { TypeSchema } from "~/engine/when/schema/TypeSchema";
-import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
+import { TypeSchema } from "~/production-condition/schema/TypeSchema";
+import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 export namespace projectItemDetailLinesFx {
 	export interface Props {

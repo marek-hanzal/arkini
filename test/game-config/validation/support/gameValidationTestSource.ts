@@ -1,9 +1,9 @@
 import { GameSourceFileSchema } from "~/game-config/source/schema/GameSourceFileSchema";
 import { ProducerSchema } from "~/engine/item/schema/ProducerSchema";
 import { SimpleSchema } from "~/engine/item/schema/SimpleSchema";
-import { LineSchema } from "~/engine/line/schema/LineSchema";
-import { OutputSchema } from "~/engine/output/schema/OutputSchema";
-import type { InputSchema } from "~/engine/input/schema/InputSchema";
+import { LineSchema } from "~/production-line/schema/LineSchema";
+import { OutputSchema } from "~/production-output/schema/OutputSchema";
+import type { InputSchema } from "~/production-input/schema/InputSchema";
 import type { StartSchema } from "~/engine/start/schema/StartSchema";
 
 export const createSimpleItem = (id: string) =>

@@ -1,4 +1,4 @@
-import type { InputSchema as LineInputSchema } from "~/engine/input/schema/InputSchema";
+import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
 import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";

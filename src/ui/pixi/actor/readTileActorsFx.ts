@@ -2,15 +2,15 @@ import { Array, Effect } from "effect";
 import { match, P } from "ts-pattern";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
-import type { JobSchema } from "~/engine/job/schema/JobSchema";
+import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { readTileActorBadgeCountFn } from "~/ui/pixi/actor/fn/readTileActorBadgeCountFn";
 import { readTileActorAssetSourceIdsFx } from "~/ui/pixi/actor/readTileActorAssetSourceIdsFx";
 import { readTileActorVisualFx } from "~/ui/pixi/actor/readTileActorVisualFx";
 import { readRuntimeItemPrimaryActionFx } from "~/engine/item-detail/read/readRuntimeItemPrimaryActionFx";
-import { resolveActiveJobStatusFx } from "~/engine/job/fx/resolveActiveJobStatusFx";
-import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
+import { resolveActiveJobStatusFx } from "~/production-job/fx/resolveActiveJobStatusFx";
+import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";

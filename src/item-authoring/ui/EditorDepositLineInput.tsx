@@ -1,4 +1,4 @@
-import type { InputSchema as LineInputSchema } from "~/engine/input/schema/InputSchema";
+import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import { EditorSelectorControl } from "~/item-authoring/ui/EditorSelectorControl";
 
 type EditorDepositInput = Extract<

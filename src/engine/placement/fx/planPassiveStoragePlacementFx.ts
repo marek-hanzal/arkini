@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import type { dropFx } from "~/engine/output/fx/dropFx";
+import type { dropFx } from "~/production-output/fx/dropFx";
 import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 import { mergePlacementPlansFn } from "~/engine/placement/fn/mergePlacementPlansFn";
 import { readPlacementPlanQuantityFn } from "~/engine/placement/fn/readPlacementPlanQuantityFn";

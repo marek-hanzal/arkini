@@ -4,7 +4,7 @@ import { describe, expect, it } from "@effect/vitest";
 import { GameCoreLayerFx } from "~/engine/game/layer/GameCoreLayerFx";
 import { RuntimeStoreFx } from "~/engine/runtime/internal/RuntimeStoreFx";
 import type { CommittedTransitionSchema } from "~/engine/runtime/schema/CommittedTransitionSchema";
-import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 
 const RuntimeStoreTestLayer = GameCoreLayerFx({
 	config: createJobTestConfig(),

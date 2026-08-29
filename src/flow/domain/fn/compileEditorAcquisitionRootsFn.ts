@@ -4,11 +4,11 @@ import type {
 	EditorAcquisitionGraph,
 	EditorAcquisitionLimitation,
 } from "~/flow/domain/EditorAcquisitionGraph";
-import { readAuthoredItemLinesFn } from "~/engine/line/fn/readAuthoredItemLinesFn";
-import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
+import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
+import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 const readOutputDrops = (output: OutputSchema.Type | undefined) =>
 	output?.set.flatMap((set) =>

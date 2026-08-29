@@ -3,9 +3,9 @@ import { describe, expect, it } from "@effect/vitest";
 import { beforeEach, vi } from "vitest";
 
 import { createGameSessionFx } from "~/renderer/game/session/createGameSessionFx";
-import { startLineFx } from "~test/job/support/startLineTestFx";
+import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
-import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 
 const bootstrap = vi.hoisted(() => ({
 	controlledFx: undefined as Effect.Effect<void, unknown> | undefined,

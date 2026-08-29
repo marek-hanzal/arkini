@@ -6,7 +6,7 @@ import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
-import { assertOwnerIdleFx } from "~/engine/job/fx/assertOwnerIdleFx";
+import { assertOwnerIdleFx } from "~/production-job/fx/assertOwnerIdleFx";
 import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
 import { resolveMergeReplacementChargesFx } from "~/engine/merge/fx/resolveMergeReplacementChargesFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";

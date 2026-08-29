@@ -6,7 +6,7 @@ import type { DiagnosticRecord } from "../../../../electron/contract/diagnostics
 import type { ArkpackDescriptor } from "~/arkpack/ArkpackDescriptor";
 import { installGameDiagnosticsFx } from "~/renderer/game/diagnostics/installGameDiagnosticsFx";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
-import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 
 const originalWindow = globalThis.window;
 const runRendererEffect = <Value>(effect: Effect.Effect<Value>) => Effect.runSync(effect);

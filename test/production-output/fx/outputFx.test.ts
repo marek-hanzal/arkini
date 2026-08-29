@@ -1,0 +1,340 @@
+import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
+import { Effect, Random } from "effect";
+import { describe, expect, it } from "vitest";
+
+import { useGameFx } from "~test/support/game/useGameFx";
+import type { DropSchema } from "~/production-output/schema/DropSchema";
+import type { RollSchema } from "~/production-output/roll/schema/RollSchema";
+import type { SetSchema } from "~/production-output/roll/schema/SetSchema";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { outputFx } from "~/production-output/fx/outputFx";
+
+const config = GameConfigSchema.parse({
+	resources: {
+		hero: "hero",
+	},
+	meta: {
+		id: "game:output-test",
+		title: "Output test",
+		board: {
+			width: 10,
+			height: 10,
+		},
+		inventory: {
+			width: 2,
+			height: 2,
+		},
+	},
+	start: {
+		currentSpace: 0,
+	},
+	items: {
+		source: {
+			uid: "source",
+			id: "source",
+			title: "Source",
+			description: "An output origin.",
+			asset: {
+				default: [
+					"asset:source",
+				],
+			},
+			scope: "board",
+			maxStackSize: 1,
+			type: "simple",
+		},
+	},
+});
+
+const createOriginFx = () => {
+	return spawnItemFx({
+		id: "origin",
+		itemId: "source",
+		location: {
+			scope: "board",
+			space: 0,
+			position: {
+				x: 5,
+				y: 5,
+			},
+		},
+		quantity: 1,
+	});
+};
+
+const createDrop = ({
+	itemId,
+	placement = "drop",
+	quantity = {
+		min: 1,
+		max: 1,
+	},
+	rules = [],
+}: {
+	itemId: string;
+	placement?: DropSchema.Type["placement"];
+	quantity?: DropSchema.Type["quantity"];
+	rules?: DropSchema.Type["rules"];
+}): DropSchema.Type => {
+	return {
+		itemId,
+		placement,
+		quantity,
+		rules,
+	};
+};
+
+const guaranteedRoll = (first: DropSchema.Type, ...drop: DropSchema.Type[]): RollSchema.Type => {
+	return {
+		type: "guaranteed",
+		drop: [
+			first,
+			...drop,
+		],
+	};
+};
+
+const chanceRoll = ({
+	chance,
+	drop,
+}: {
+	chance: number;
+	drop: DropSchema.Type;
+}): RollSchema.Type => {
+	return {
+		type: "chance",
+		chance,
+		drop: [
+			drop,
+		],
+	};
+};
+
+const createRollSet = ({
+	roll,
+	weight,
+}: {
+	roll: RollSchema.Type;
+	weight?: number;
+}): SetSchema.Type => {
+	return {
+		weight: weight ?? 1,
+		roll: [
+			roll,
+		],
+	};
+};
+
+const missingPermitWhen = {
+	type: "exists" as const,
+	query: {
+		scope: "any" as const,
+		selector: {
+			type: "item" as const,
+			itemId: "permit",
+		},
+	},
+};
+
+describe("outputFx", () => {
+	it("selects one roll set and resolves every selected drop in authored order", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const origin = yield* createOriginFx();
+
+				return yield* outputFx({
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
+					output: {
+						set: [
+							createRollSet({
+								weight: 1,
+								roll: guaranteedRoll(
+									createDrop({
+										itemId: "item:ignored",
+									}),
+								),
+							}),
+							createRollSet({
+								weight: 1,
+								roll: guaranteedRoll(
+									createDrop({
+										itemId: "item:log",
+										quantity: {
+											min: 2,
+											max: 2,
+										},
+									}),
+									createDrop({
+										itemId: "item:stone",
+										placement: "random",
+									}),
+								),
+							}),
+						],
+					},
+				});
+			}).pipe(
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
+						0.75,
+					]),
+				),
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(result).toEqual({
+			drop: [
+				{
+					itemId: "item:log",
+					placement: "drop",
+					quantity: 2,
+				},
+				{
+					itemId: "item:stone",
+					placement: "random",
+					quantity: 1,
+				},
+			],
+		});
+	});
+
+	it("discards rejected drops without disturbing accepted siblings", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const origin = yield* createOriginFx();
+
+				return yield* outputFx({
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
+					output: {
+						set: [
+							createRollSet({
+								roll: guaranteedRoll(
+									createDrop({
+										itemId: "item:rejected",
+										quantity: {
+											min: 2,
+											max: 4,
+										},
+										rules: [
+											{
+												type: "enable",
+												when: [
+													missingPermitWhen,
+												],
+											},
+										],
+									}),
+									createDrop({
+										itemId: "item:accepted",
+										placement: "random",
+										quantity: {
+											min: 2,
+											max: 4,
+										},
+									}),
+								),
+							}),
+						],
+					},
+				});
+			}).pipe(
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
+						0.75,
+					]),
+				),
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(result).toEqual({
+			drop: [
+				{
+					itemId: "item:accepted",
+					placement: "random",
+					quantity: 4,
+				},
+			],
+		});
+	});
+
+	it("does not evaluate unselected roll sets", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const origin = yield* createOriginFx();
+				const output = yield* outputFx({
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
+					output: {
+						set: [
+							createRollSet({
+								roll: chanceRoll({
+									chance: 0.5,
+									drop: createDrop({
+										itemId: "item:unselected",
+									}),
+								}),
+							}),
+							createRollSet({
+								roll: guaranteedRoll(
+									createDrop({
+										itemId: "item:selected",
+									}),
+								),
+							}),
+						],
+					},
+				});
+				const nextRandom = yield* Random.next;
+
+				return {
+					nextRandom,
+					output,
+				};
+			}).pipe(
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
+						0.75,
+						0.25,
+					]),
+				),
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(result).toEqual({
+			nextRandom: 0.25,
+			output: {
+				drop: [
+					{
+						itemId: "item:selected",
+						placement: "drop",
+						quantity: 1,
+					},
+				],
+			},
+		});
+	});
+});

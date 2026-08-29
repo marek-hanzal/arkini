@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { isInstantGameplayEnabledFx } from "~/engine/cheat/read/isInstantGameplayEnabledFx";
-import { lineRunRuntime } from "~test/line/fx/run/support/lineRunTestRuntime";
+import { lineRunRuntime } from "~test/production-line/fx/run/support/lineRunTestRuntime";
 
 describe("isInstantGameplayEnabledFx", () => {
 	it("requires both persisted cheat enablement and Instant gameplay", () => {

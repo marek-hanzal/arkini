@@ -4,6 +4,8 @@ const productionCodePattern = "^(?:src|electron|shared)(?:/|$)";
 const applicationEntrypointPattern = "^src/(?:main|createArkiniRouterFx|_route)[.]tsx?$";
 const gameConfigPattern = "^src/game-config(?:/|$)";
 const arkpackArtifactPattern = "^src/arkpack/(?:ArkpackDescriptor[.]ts$|artifact(?:/|$))";
+const productionPipelinePattern =
+	"^src/(?:production-action|production-condition|production-delivery|production-input|production-job|production-line|production-output)(?:/|$)";
 const productDomainPattern = "^src/(?:item-authoring|flow|estimate|editor-build)/domain(?:/|$)";
 const productRendererPattern = "^src/(?:arkpack|editor-build)/renderer(?:/|$)";
 const productPresentationPattern =
@@ -23,13 +25,109 @@ const boundaryRules = [
 	{
 		name: "engine-no-presentation-imports",
 		comment:
-			"The standalone engine never depends on UI, route composition, or renderer entrypoints.",
+			"The remaining Engine owners never depend on UI, route composition, or renderer entrypoints.",
 		severity: "error",
 		from: {
 			path: "^src/engine(?:/|$)",
 		},
 		to: {
 			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}`,
+		},
+	},
+	{
+		name: "production-pipeline-is-framework-neutral",
+		comment:
+			"Production actions, conditions, inputs, lines, outputs, jobs, and deliveries depend only on exact gameplay owners, never authoring, delivery products, renderer ownership, presentation, routes, or Electron.",
+		severity: "error",
+		from: {
+			path: productionPipelinePattern,
+		},
+		to: {
+			path: `^src/(?:game-config|arkpack|editor-build|editor|item-authoring|flow|estimate|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+		},
+	},
+	{
+		name: "production-condition-stays-upstream",
+		comment:
+			"Production conditions query Engine truth and never depend on a downstream production action, input, line, output, job, or delivery owner.",
+		severity: "error",
+		from: {
+			path: "^src/production-condition(?:/|$)",
+		},
+		to: {
+			path: "^src/(?:production-action|production-delivery|production-input|production-job|production-line|production-output)(?:/|$)",
+		},
+	},
+	{
+		name: "production-output-stays-upstream-of-execution",
+		comment:
+			"Output and roll policy may evaluate production conditions but never reaches into action, input, line, job, or delivery execution.",
+		severity: "error",
+		from: {
+			path: "^src/production-output(?:/|$)",
+		},
+		to: {
+			path: "^src/(?:production-action|production-delivery|production-input|production-job|production-line)(?:/|$)",
+		},
+	},
+	{
+		name: "production-action-stays-out-of-line-lifecycle",
+		comment:
+			"Immediate action admission may consume input, output, and condition policy but never owns line, job, or delivery lifecycle.",
+		severity: "error",
+		from: {
+			path: "^src/production-action(?:/|$)",
+		},
+		to: {
+			path: "^src/(?:production-delivery|production-job|production-line)(?:/|$)",
+		},
+	},
+	{
+		name: "production-delivery-settles-through-line-inputs",
+		comment:
+			"Delivery may validate and settle through line/input policy, but never starts actions or jobs and never produces outputs or conditions.",
+		severity: "error",
+		from: {
+			path: "^src/production-delivery(?:/|$)",
+		},
+		to: {
+			path: "^src/(?:production-action|production-condition|production-job|production-output)(?:/|$)",
+		},
+	},
+	{
+		name: "production-input-stays-out-of-output-and-job-ownership",
+		comment:
+			"Input planning may consult action, line, and delivery owners but never owns output policy, condition evaluation, or job lifecycle.",
+		severity: "error",
+		from: {
+			path: "^src/production-input(?:/|$)",
+		},
+		to: {
+			path: "^src/(?:production-condition|production-job|production-output)(?:/|$)",
+		},
+	},
+	{
+		name: "production-line-stays-upstream-of-job-and-delivery",
+		comment:
+			"Line definition and run planning compose action, condition, input, and output policy without taking over downstream job or delivery lifecycle.",
+		severity: "error",
+		from: {
+			path: "^src/production-line(?:/|$)",
+		},
+		to: {
+			path: "^src/(?:production-delivery|production-job)(?:/|$)",
+		},
+	},
+	{
+		name: "production-job-does-not-evaluate-conditions-directly",
+		comment:
+			"Job admission and completion sequence exact production owners and consume line decisions instead of bypassing them to evaluate authored conditions directly.",
+		severity: "error",
+		from: {
+			path: "^src/production-job(?:/|$)",
+		},
+		to: {
+			path: "^src/production-condition(?:/|$)",
 		},
 	},
 	{

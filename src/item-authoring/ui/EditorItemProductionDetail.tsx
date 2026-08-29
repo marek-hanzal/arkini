@@ -1,7 +1,7 @@
 import { Factory } from "lucide-react";
 
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import { readAuthoredItemLinesFn } from "~/engine/line/fn/readAuthoredItemLinesFn";
+import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
 import { DetailFact, DetailSection } from "~/item-authoring/ui/EditorItemDetailDefinition";
 import { OutputDetail } from "~/item-authoring/ui/EditorItemOutputDetail";
 import { EditorProductionLineDetail } from "~/item-authoring/ui/EditorProductionLineDetail";

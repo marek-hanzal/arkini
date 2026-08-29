@@ -1,5 +1,5 @@
 import { DistanceSchema } from "~/engine/distance/schema/DistanceSchema";
-import { ChargeSourceSchema } from "~/engine/input/schema/ChargeSourceSchema";
+import { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
 import { TypeSchema as ItemTypeSchema } from "~/engine/item/schema/TypeSchema";
 import { selectItemsFn } from "~/engine/selector/fn/selectItemsFn";
 import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
@@ -9,8 +9,8 @@ import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/Diagno
 import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticSeverityEnumSchema";
 import { InvalidInputChargesReasonEnumSchema } from "~/game-config/diagnostic/schema/InvalidInputChargesReasonEnumSchema";
 import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
-import { TypeSchema } from "~/engine/input/schema/TypeSchema";
-import type { InputSchema } from "~/engine/input/schema/InputSchema";
+import { TypeSchema } from "~/production-input/schema/TypeSchema";
+import type { InputSchema } from "~/production-input/schema/InputSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { DiagnosticPathSchema } from "~/game-config/diagnostic/schema/DiagnosticPathSchema";
 

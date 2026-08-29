@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
-import type { dropFx } from "~/engine/output/fx/dropFx";
+import type { dropFx } from "~/production-output/fx/dropFx";
 import { applyPlacementPlanFx } from "~/engine/placement/fx/applyPlacementPlanFx";
 import { planDropPlacementFx } from "~/engine/placement/fx/planDropPlacementFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";

@@ -3,8 +3,8 @@ import { Effect, Result, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
-import { resolveLineRunFx } from "~/engine/line/fx/run/resolveLineRunFx";
+import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
+import { resolveLineRunFx } from "~/production-line/fx/run/resolveLineRunFx";
 import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
 import { queryFx } from "~/engine/query/fx/queryFx";
 import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";

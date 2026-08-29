@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { readEditorAcquisitionOutputOccurrencesFn } from "~/flow/domain/fn/readEditorAcquisitionOutputOccurrencesFn";
-import { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import { OutputSchema } from "~/production-output/schema/OutputSchema";
 
 const read = (input: unknown) =>
 	readEditorAcquisitionOutputOccurrencesFn(OutputSchema.parse(input));

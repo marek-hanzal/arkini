@@ -3,8 +3,11 @@ import { describe, expect, it } from "vitest";
 import { readItemDetailTabsFn } from "~/engine/item-detail/fn/readItemDetailTabsFn";
 import { resolveItemDetailTargetFn } from "~/engine/item-detail/fn/resolveItemDetailTargetFn";
 import { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import { lineRunRuntime, lineRunTestConfig } from "~test/line/fx/run/support/lineRunTestRuntime";
-import { purityTestConfig } from "~test/line/support/purityTestConfig";
+import {
+	lineRunRuntime,
+	lineRunTestConfig,
+} from "~test/production-line/fx/run/support/lineRunTestRuntime";
+import { purityTestConfig } from "~test/production-line/support/purityTestConfig";
 
 const sourceProjection = {
 	kind: "available",

@@ -52,7 +52,7 @@ Delivery endpoints, generation, phase, and remaining time are engine state. Tick
 | Actor identity/appearance | `actor/` + main reconciler |
 | Click/drag/drop | `drag/` + `drop/` |
 | Spawn/swap/stack/replacement cues | `motion/` |
-| Autofill delivery | `delivery/`; canonical behavior is `engine/delivery/` + Tick |
+| Autofill delivery | `delivery/`; canonical behavior is `production-delivery/` + Tick |
 | Inventory handoff | `PixiInventorySurface.tsx` + main Inventory opener |
 | Geometry/hit testing | `scene/*Surface*`, `layout/`, `grid/` |
 | Magnetic response | `magnet/` |

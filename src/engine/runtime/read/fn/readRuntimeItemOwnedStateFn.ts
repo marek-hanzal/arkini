@@ -1,6 +1,6 @@
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { JobQueueRequestSchema } from "~/engine/job/schema/JobQueueRequestSchema";
-import type { JobSchema } from "~/engine/job/schema/JobSchema";
+import type { JobQueueRequestSchema } from "~/production-job/schema/JobQueueRequestSchema";
+import type { JobSchema } from "~/production-job/schema/JobSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";

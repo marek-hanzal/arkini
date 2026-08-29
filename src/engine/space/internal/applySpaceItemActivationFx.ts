@@ -1,6 +1,6 @@
 import { Effect, Option } from "effect";
 
-import { settleActionChargesFx } from "~/engine/action/fx/settleActionChargesFx";
+import { settleActionChargesFx } from "~/production-action/fx/settleActionChargesFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { CurrentSpaceChangedGameEventSchema } from "~/engine/event/schema/CurrentSpaceChangedGameEventSchema";

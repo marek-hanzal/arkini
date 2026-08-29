@@ -2,8 +2,8 @@ import { z } from "zod";
 
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { TimeSchema } from "~/engine/common/schema/TimeSchema";
-import { DeliveryPhaseEnumSchema } from "~/engine/delivery/schema/DeliveryPhaseEnumSchema";
-import { LineInputDeliveryTargetSchema } from "~/engine/delivery/schema/LineInputDeliveryTargetSchema";
+import { DeliveryPhaseEnumSchema } from "~/production-delivery/schema/DeliveryPhaseEnumSchema";
+import { LineInputDeliveryTargetSchema } from "~/production-delivery/schema/LineInputDeliveryTargetSchema";
 import { GridLocationSchema } from "./GridLocationSchema";
 import { LocationScopeEnumSchema } from "./LocationScopeEnumSchema";
 

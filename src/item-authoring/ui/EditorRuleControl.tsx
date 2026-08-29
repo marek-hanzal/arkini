@@ -1,6 +1,6 @@
-import type { RuleSchema as ActionRuleSchema } from "~/engine/action/schema/RuleSchema";
-import type { RuleSchema as LineRuleSchema } from "~/engine/line/schema/rule/RuleSchema";
-import type { RuleSchema as DropRuleSchema } from "~/engine/output/schema/drop/rule/RuleSchema";
+import type { RuleSchema as ActionRuleSchema } from "~/production-action/schema/RuleSchema";
+import type { RuleSchema as LineRuleSchema } from "~/production-line/schema/rule/RuleSchema";
+import type { RuleSchema as DropRuleSchema } from "~/production-output/schema/drop/rule/RuleSchema";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import {
 	EditorChoiceControl,

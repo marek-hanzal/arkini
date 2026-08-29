@@ -6,7 +6,7 @@ import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveInteg
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import type { dropFx } from "~/engine/output/fx/dropFx";
+import type { dropFx } from "~/production-output/fx/dropFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
 

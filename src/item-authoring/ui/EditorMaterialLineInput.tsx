@@ -1,4 +1,4 @@
-import type { InputSchema as LineInputSchema } from "~/engine/input/schema/InputSchema";
+import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { EditorQuantityFields } from "~/item-authoring/ui/EditorQuantityControl";
 import { EditorSelectorControl } from "~/item-authoring/ui/EditorSelectorControl";

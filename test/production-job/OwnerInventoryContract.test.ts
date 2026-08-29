@@ -12,7 +12,7 @@ import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { storeItemInInventoryFx } from "~/engine/runtime/write/storeItemInInventoryFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
+import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 
 const ownerItemId = "runtime:forge";

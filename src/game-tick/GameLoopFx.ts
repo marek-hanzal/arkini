@@ -1,6 +1,6 @@
 import { Context, type Effect } from "effect";
 
-export interface GameLoopFxService {
+interface GameLoopFxService {
 	/** Stops the production Tick loop and waits until its current iteration exits. */
 	readonly stop: Effect.Effect<void>;
 }

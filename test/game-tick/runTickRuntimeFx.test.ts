@@ -10,16 +10,16 @@ import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransiti
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { TickFx } from "~/engine/tick/context/TickFx";
-import { advanceRuntimeStepFx } from "~/engine/tick/internal/advanceRuntimeStepFx";
-import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
+import { TickFx } from "~/game-tick/TickFx";
+import { advanceRuntimeStepFx } from "~/game-tick/advanceRuntimeStepFx";
+import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 import { existsWhen } from "~test/production-line/fx/support/lineTestRuntime";
 import {
 	createFixedStepTestConfig,
 	prepareFixedStepRuntimeFx,
-	summarizeFixedStepRuntime,
-} from "~test/tick/support/fixedStepTestRuntime";
+	summarizeFixedStepRuntimeFn,
+} from "~test/game-tick/support/fixedStepTestRuntime";
 
 const props = {
 	ownerItemId: "runtime:forge",
@@ -460,10 +460,10 @@ describe("fixed Tick steps", () => {
 				const next = yield* advanceRuntimeStepFx(forward.runtime);
 				const third = yield* advanceRuntimeStepFx(next.runtime);
 				return {
-					forward: summarizeFixedStepRuntime(forward.runtime),
-					next: summarizeFixedStepRuntime(next.runtime),
-					reversed: summarizeFixedStepRuntime(reversed.runtime),
-					third: summarizeFixedStepRuntime(third.runtime),
+					forward: summarizeFixedStepRuntimeFn(forward.runtime),
+					next: summarizeFixedStepRuntimeFn(next.runtime),
+					reversed: summarizeFixedStepRuntimeFn(reversed.runtime),
+					third: summarizeFixedStepRuntimeFn(third.runtime),
 				};
 			}).pipe(
 				useGameFx({
@@ -500,7 +500,7 @@ describe("fixed Tick steps", () => {
 							elapsedMs,
 						});
 					}
-					return summarizeFixedStepRuntime(yield* readRuntimeFx());
+					return summarizeFixedStepRuntimeFn(yield* readRuntimeFx());
 				}).pipe(
 					useGameFx({
 						config: createFixedStepTestConfig(),

@@ -22,7 +22,7 @@ import {
 } from "~/renderer/game/session/createGameSessionTransitionSubscriptionsFx";
 import { RuntimeSaveFx } from "~/engine/save/RuntimeSaveFx";
 import { RuntimeSaveLayerFx } from "~/engine/save/RuntimeSaveLayerFx";
-import { GameLoopFx } from "~/engine/game/context/GameLoopFx";
+import { GameLoopFx } from "~/game-tick/GameLoopFx";
 import { GameSessionLayerFx } from "~/engine/game/layer/GameSessionLayerFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";

@@ -1,7 +1,7 @@
 import { Context, type Effect } from "effect";
 
-import type { advanceRuntimeElapsedFx } from "~/engine/tick/internal/advanceRuntimeElapsedFx";
-import type { TickSchema } from "~/engine/tick/schema/TickSchema";
+import type { advanceRuntimeElapsedFx } from "~/game-tick/advanceRuntimeElapsedFx";
+import type { TickSchema } from "~/game-tick/TickSchema";
 
 type RuntimeAdvanceFx =
 	ReturnType<typeof advanceRuntimeElapsedFx> extends Effect.Effect<
@@ -12,7 +12,7 @@ type RuntimeAdvanceFx =
 		? Effect.Effect<void, Error, Requirements>
 		: never;
 
-export interface TickFxService {
+interface TickFxService {
 	readonly read: Effect.Effect<TickSchema.Type>;
 	readonly advanceRuntime: RuntimeAdvanceFx;
 	readonly advanceRuntimeBy: (elapsedMs: number) => RuntimeAdvanceFx;

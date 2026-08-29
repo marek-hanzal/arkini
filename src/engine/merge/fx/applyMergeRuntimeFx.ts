@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
-import { outputFx } from "~/engine/output/fx/outputFx";
+import { outputFx } from "~/production-output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";

@@ -1,6 +1,6 @@
 import { CircleCheck, CircleX, Eye, EyeOff, PackagePlus, Star, StarOff } from "lucide-react";
 
-import type { LineSchema } from "~/engine/line/schema/LineSchema";
+import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { EditorItemDraftDefaults } from "~/item-authoring/ui/EditorItemDraftDefaults";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { withFieldGroup } from "~/ui/form/EditorForm";

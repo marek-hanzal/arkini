@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
-import { releaseOwnerInputsFx } from "~/engine/input/fx/releaseOwnerInputsFx";
+import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { removeRuntimeItemIdentityFx } from "./removeRuntimeItemIdentityFx";

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
 import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
-import { setDefaultLineFx } from "~/engine/line/write/setDefaultLineFx";
+import { setDefaultLineFx } from "~/production-line/write/setDefaultLineFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
@@ -13,7 +13,7 @@ import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { purityTestConfig } from "~test/line/support/purityTestConfig";
+import { purityTestConfig } from "~test/production-line/support/purityTestConfig";
 
 const board = (x: number) => ({
 	scope: "board" as const,

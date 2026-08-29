@@ -3,9 +3,9 @@ import { Effect, Option } from "effect";
 import type { ItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines";
 import { readBoardItemDetailLineFx } from "~/engine/item-detail/read/readBoardItemDetailLineFx";
 import { readStoredItemDetailLineFx } from "~/engine/item-detail/read/readStoredItemDetailLineFx";
-import { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
-import { readEffectiveDefaultLineFn } from "~/engine/line/fn/readEffectiveDefaultLineFn";
-import { readLineOwnerLinesFn } from "~/engine/line/fn/readLineOwnerLinesFn";
+import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
+import { readEffectiveDefaultLineFn } from "~/production-line/fn/readEffectiveDefaultLineFn";
+import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 /** Public operation-owned aliases for the stable Item Detail Lines contract. */

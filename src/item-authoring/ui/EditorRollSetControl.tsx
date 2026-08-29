@@ -1,5 +1,5 @@
-import type { RollSchema } from "~/engine/roll/schema/RollSchema";
-import type { SetSchema } from "~/engine/roll/schema/SetSchema";
+import type { RollSchema } from "~/production-output/roll/schema/RollSchema";
+import type { SetSchema } from "~/production-output/roll/schema/SetSchema";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorNumberControl } from "~/ui/form/EditorValueControls";

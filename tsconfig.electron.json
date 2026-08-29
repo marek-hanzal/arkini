@@ -24,6 +24,13 @@
 	},
 	"include": [
 		"electron",
+		"src/production-action",
+		"src/production-condition",
+		"src/production-delivery",
+		"src/production-input",
+		"src/production-job",
+		"src/production-line",
+		"src/production-output",
 		"src/game-config",
 		"src/arkpack/ArkpackDescriptor.ts",
 		"src/arkpack/artifact",

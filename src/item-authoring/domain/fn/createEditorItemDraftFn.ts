@@ -1,10 +1,10 @@
 import { match } from "ts-pattern";
 
-import type { InputSchema as ImmediateInputSchema } from "~/engine/action/schema/InputSchema";
-import type { InputSchema as LineInputSchema } from "~/engine/input/schema/InputSchema";
+import type { InputSchema as ImmediateInputSchema } from "~/production-action/schema/InputSchema";
+import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import type { LineSchema } from "~/engine/line/schema/LineSchema";
+import type { LineSchema } from "~/production-line/schema/LineSchema";
 
 export interface CreateEditorItemDraftFnProps {
 	readonly resourceId: string;

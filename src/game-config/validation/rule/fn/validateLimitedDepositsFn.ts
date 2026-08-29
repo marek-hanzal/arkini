@@ -7,9 +7,9 @@ import type { GameSourceProvenanceSchema } from "~/game-config/source/schema/Gam
 import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { GameDiagnosticsSchema } from "~/game-config/diagnostic/schema/GameDiagnosticsSchema";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import type { DropSchema } from "~/engine/output/schema/DropSchema";
-import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
-import { TypeSchema as RollTypeSchema } from "~/engine/roll/schema/TypeSchema";
+import type { DropSchema } from "~/production-output/schema/DropSchema";
+import type { OutputSchema } from "~/production-output/schema/OutputSchema";
+import { TypeSchema as RollTypeSchema } from "~/production-output/roll/schema/TypeSchema";
 
 import { readItemOutputEntriesFn } from "../../fn/readItemOutputEntriesFn";
 

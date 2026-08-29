@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
 import { SourceActionSchema } from "./SourceActionSchema";
 

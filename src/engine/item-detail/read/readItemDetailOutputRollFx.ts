@@ -6,8 +6,8 @@ import {
 	type ItemDetailOutputRuleContext,
 	readItemDetailOutputItemsFx,
 } from "~/engine/item-detail/read/readItemDetailOutputItemsFx";
-import { TypeSchema } from "~/engine/roll/schema/TypeSchema";
-import type { RollSchema } from "~/engine/roll/schema/RollSchema";
+import { TypeSchema } from "~/production-output/roll/schema/TypeSchema";
+import type { RollSchema } from "~/production-output/roll/schema/RollSchema";
 
 /** Projects one exact authored output roll without flattening its probability semantics. */
 export const readItemDetailOutputRollFx = Effect.fn("readItemDetailOutputRollFx")(function* ({

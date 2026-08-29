@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { compileGameSourcesFx } from "~/game-config/compiler/fx/compileGameSourcesFx";
-import { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import {
 	createLine,
 	createProducerItem,

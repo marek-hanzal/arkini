@@ -4,7 +4,7 @@ import { convertEditorItemFn } from "~/item-authoring/domain/fn/convertEditorIte
 import { createEditorItemDraftFn } from "~/item-authoring/domain/fn/createEditorItemDraftFn";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import type { LineSchema } from "~/engine/line/schema/LineSchema";
+import type { LineSchema } from "~/production-line/schema/LineSchema";
 
 const createItem = (type: (typeof TypeSchema.options)[number]): ItemSchema.Type => ({
 	...createEditorItemDraftFn({

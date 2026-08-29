@@ -7,7 +7,7 @@ import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchS
 import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 
 describe("committed transition events", () => {

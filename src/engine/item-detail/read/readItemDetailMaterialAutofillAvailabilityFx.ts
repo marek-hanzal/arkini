@@ -3,8 +3,8 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetailSourcesFx";
-import { isMaterialInputEligibleFn } from "~/engine/input/read/fn/isMaterialInputEligibleFn";
-import { isLineInputAutofillSourceLocationFx } from "~/engine/input/read/isLineInputAutofillSourceLocationFx";
+import { isMaterialInputEligibleFn } from "~/production-input/read/fn/isMaterialInputEligibleFn";
+import { isLineInputAutofillSourceLocationFn } from "~/production-input/read/isLineInputAutofillSourceLocationFn";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { matchesItemSelectorFn } from "~/engine/selector/fn/matchesItemSelectorFn";
@@ -61,10 +61,10 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 
 		if (candidate.location.scope === LocationScopeEnumSchema.enum.Delivery) {
 			if (
-				!(yield* isLineInputAutofillSourceLocationFx({
+				!isLineInputAutofillSourceLocationFn({
 					location: candidate.location.origin,
 					ownerSpace: space,
-				}))
+				})
 			) {
 				continue;
 			}
@@ -84,10 +84,10 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 			(candidate.location.scope !== LocationScopeEnumSchema.enum.Board &&
 				candidate.location.scope !== LocationScopeEnumSchema.enum.Inventory &&
 				candidate.location.scope !== LocationScopeEnumSchema.enum.Toolbar) ||
-			!(yield* isLineInputAutofillSourceLocationFx({
+			!isLineInputAutofillSourceLocationFn({
 				location: candidate.location,
 				ownerSpace: space,
-			}))
+			})
 		) {
 			continue;
 		}

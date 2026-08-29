@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
 import type { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
-import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 
 const config = createJobTestConfig();

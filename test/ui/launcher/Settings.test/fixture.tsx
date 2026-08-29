@@ -26,7 +26,7 @@ import { Route as CommonSettingsRouteDefinition } from "~/@routes/_launcher/sett
 import { Route as DevSettingsRouteDefinition } from "~/@routes/_launcher/settings/dev";
 import { Route as GameSettingsRouteDefinition } from "~/@routes/_launcher/settings/game";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
-import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import {
 	adoptTestGameEngineResourceFx,
 	createTestRendererRuntime,

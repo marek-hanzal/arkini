@@ -1,4 +1,4 @@
-import type { DropSchema } from "~/engine/output/schema/DropSchema";
+import type { DropSchema } from "~/production-output/schema/DropSchema";
 import { EditorChoiceControl } from "~/ui/form/EditorValueControls";
 import { EditorItemReferenceControl } from "~/item-authoring/ui/EditorItemReferenceControl";
 import { EditorQuantityControl } from "~/item-authoring/ui/EditorQuantityControl";

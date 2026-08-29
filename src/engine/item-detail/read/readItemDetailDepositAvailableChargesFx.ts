@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { DepositSchema } from "~/engine/input/schema/DepositSchema";
+import type { DepositSchema } from "~/production-input/schema/DepositSchema";
 import { readItemRemainingChargesFn } from "~/engine/item/fn/readItemRemainingChargesFn";
 import { queryFx } from "~/engine/query/fx/queryFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";

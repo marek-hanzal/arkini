@@ -13,7 +13,7 @@ import {
 	inputRuntimeToolbarTestConfig,
 	sourceLocation,
 	workshopLocation,
-} from "~test/input/support/inputRuntimeTestConfig";
+} from "~test/production-input/support/inputRuntimeTestConfig";
 
 const game = {
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,

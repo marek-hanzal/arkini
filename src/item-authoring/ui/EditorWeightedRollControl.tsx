@@ -1,6 +1,6 @@
 import { Info } from "lucide-react";
 
-import type { RollSchema } from "~/engine/roll/schema/RollSchema";
+import type { RollSchema } from "~/production-output/roll/schema/RollSchema";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorNumberControl } from "~/ui/form/EditorValueControls";

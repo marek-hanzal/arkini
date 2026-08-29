@@ -1,5 +1,5 @@
 import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
-import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 const simpleItem = ({

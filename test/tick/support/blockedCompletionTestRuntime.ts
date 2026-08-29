@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 
-import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
-import { startLineFx } from "~test/job/support/startLineTestFx";
+import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
+import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 
 export const blockedCompletionOwnerId = "runtime:blocked-forge";
 export const freeCompletionOwnerId = "runtime:free-forge";

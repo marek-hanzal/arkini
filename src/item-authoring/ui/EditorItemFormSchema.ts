@@ -1,13 +1,13 @@
 import { z } from "zod";
 
-import type { InputSchema } from "~/engine/action/schema/InputSchema";
-import type { RuleSchema } from "~/engine/action/schema/RuleSchema";
+import type { InputSchema } from "~/production-action/schema/InputSchema";
+import type { RuleSchema } from "~/production-action/schema/RuleSchema";
 import type { BaseSchema } from "~/engine/item/schema/BaseSchema";
 import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import type { LineSchema } from "~/engine/line/schema/LineSchema";
+import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
-import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 
 /** Local presentation values owned only by one mounted item form. */
 export type EditorItemFormValues = Omit<BaseSchema.Type, "merge"> & {

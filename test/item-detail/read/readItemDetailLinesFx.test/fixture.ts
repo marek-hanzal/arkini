@@ -6,8 +6,11 @@ import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { lineRunRuntime, lineRunTestConfig } from "~test/line/fx/run/support/lineRunTestRuntime";
-import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
+import {
+	lineRunRuntime,
+	lineRunTestConfig,
+} from "~test/production-line/fx/run/support/lineRunTestRuntime";
+import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 
 export {

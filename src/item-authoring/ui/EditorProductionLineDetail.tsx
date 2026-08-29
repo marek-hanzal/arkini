@@ -1,6 +1,6 @@
 import { ArrowUpRight, ChevronRight } from "lucide-react";
 
-import type { LineSchema } from "~/engine/line/schema/LineSchema";
+import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { useEditorProject } from "~/authoring-session/useEditorProject";
 import { formatItemDurationFn } from "~/ui/item-detail/fn/formatItemDurationFn";
 import { EditorProductionLineEditLink } from "~/item-authoring/ui/EditorProductionLineEditLink";

@@ -62,6 +62,7 @@
 		"src/flow",
 		"src/estimate",
 		"src/application-diagnostics",
+		"src/application-runtime",
 		"src/renderer",
 		"src/ui",
 		"src/@routes",

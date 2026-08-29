@@ -4,7 +4,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
 import { EditorUnsavedChanges } from "~/authoring-session/EditorUnsavedChanges";
 import { checkoutEditorProjectVersionFx } from "~/project-version/workspace/checkoutEditorProjectVersionFx";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/RendererRuntime";
 
 const minimumDurationMs = 1_000;
 const completedFrameDurationMs = 240;

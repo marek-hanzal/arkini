@@ -1,4 +1,4 @@
-import type { RendererRuntime } from "~/renderer/RendererRuntime";
+import type { RendererRuntime } from "~/application-runtime/RendererRuntime";
 
 /** Shared router context assembled at the renderer root. */
 export interface RootContext {

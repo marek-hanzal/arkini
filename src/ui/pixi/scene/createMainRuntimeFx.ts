@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/RendererRuntime";
 import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { createMainActorStoreFx } from "~/ui/pixi/actor/createMainActorStoreFx";

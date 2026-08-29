@@ -1,9 +1,7 @@
 import { Effect } from "effect";
 
-export namespace installRendererNativeDragGuardFx {
-	export interface Props {
-		readonly root: HTMLElement;
-	}
+interface Props {
+	readonly root: HTMLElement;
 }
 
 /**
@@ -13,7 +11,7 @@ export namespace installRendererNativeDragGuardFx {
  * browser drag-and-drop API.
  */
 export const installRendererNativeDragGuardFx = Effect.fn("installRendererNativeDragGuardFx")(
-	({ root }: installRendererNativeDragGuardFx.Props) =>
+	({ root }: Props) =>
 		Effect.sync(() => {
 			const preventNativeDrag = (event: DragEvent) => {
 				event.preventDefault();

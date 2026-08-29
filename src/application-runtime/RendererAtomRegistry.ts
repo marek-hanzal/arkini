@@ -15,12 +15,6 @@ export const RendererAtomRegistry = AtomRegistry.make({
 	scheduleTask,
 });
 
-/** Provides the one renderer Atom registry to non-React Effect programs. */
-export const RendererAtomRegistryLayer = Layer.succeed(
-	AtomRegistry.AtomRegistry,
-	RendererAtomRegistry,
-);
-
 /**
  * One process-lifetime zero-service Atom runtime for Effect-backed feature atoms.
  * Process-owned services remain in RendererRuntime.

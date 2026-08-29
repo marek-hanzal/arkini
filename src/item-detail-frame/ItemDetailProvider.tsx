@@ -16,7 +16,7 @@ import { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetai
 import { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
 import type { RunItemDetailPendingActionProps } from "~/item-detail-frame/ItemDetailControl";
 import { createItemDetailCommandAtom } from "~/item-detail-frame/createItemDetailCommandAtom";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/RendererRuntime";
 import { createItemDetailControllerFx } from "~/item-detail-frame/createItemDetailControllerFx";
 import { ItemDetailContext } from "~/item-detail-frame/ItemDetailContext";
 import type {

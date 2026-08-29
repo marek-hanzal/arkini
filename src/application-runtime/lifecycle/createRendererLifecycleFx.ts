@@ -1,7 +1,24 @@
-import { Effect } from "effect";
+import { Data, Effect } from "effect";
 import type { ArkiniElectronApi } from "../../../electron/contract/ArkiniElectronApi";
-import type { RendererLifecycle } from "~/renderer/lifecycle/RendererLifecycle";
-import { RendererLifecycleError } from "~/renderer/lifecycle/RendererLifecycleError";
+
+type RendererLifecycleOperation = "force-close" | "request-close" | "wait-until-visible";
+
+class RendererLifecycleError extends Data.TaggedError("RendererLifecycleError")<{
+	readonly operation: RendererLifecycleOperation;
+	readonly cause: unknown;
+}> {
+	override get message(): string {
+		const causeMessage = this.cause instanceof Error ? this.cause.message : String(this.cause);
+		return `Renderer lifecycle failed during ${this.operation}: ${causeMessage}`;
+	}
+}
+
+/** Effect-native renderer access to the narrow Electron lifecycle capability. */
+export interface RendererLifecycle {
+	readonly forceCloseFx: Effect.Effect<void, RendererLifecycleError>;
+	readonly requestCloseFx: Effect.Effect<void, RendererLifecycleError>;
+	readonly waitUntilVisibleFx: Effect.Effect<number, RendererLifecycleError>;
+}
 
 /**
  * Adapts only the pure preload contract into Effect. Renderer lifecycle callers

@@ -3,6 +3,11 @@ const activeCodeAndTestsPattern = "^(?:src|electron|shared|scripts|test)(?:/|$)"
 const productionCodePattern = "^(?:src|electron|shared)(?:/|$)";
 const applicationEntrypointPattern = "^src/(?:main|createArkiniRouterFx|_route)[.]tsx?$";
 const applicationDiagnosticsPattern = "^src/application-diagnostics(?:/|$)";
+const applicationRuntimePattern = "^src/application-runtime(?:/|$)";
+const applicationRuntimeLowerCapabilityPattern =
+	"^src/(?:renderer(?:/|$)|arkpack/renderer/ArkpackCatalogOwnerAtom[.]ts$|authoring-session/(?:EditorUnsavedChanges|EditorUnsavedChangesOwnerAtom|createEditorUnsavedChangesOwnerFx)[.]ts$|board-scenario/session/(?:EditorBoardGameResourceOwnerAtom|createEditorBoardGameResourceFx)[.]ts$|editor-build/domain/EditorBuildRepository[.]ts$|editor-build/renderer/createElectronEditorBuildRepositoryFx[.]ts$|game-persistence/(?:GameSaveStorage[.]ts$|electron/createElectronGameSaveStorageFx[.]ts$)|project-authoring/repository/(?:EditorProjectRepository|createElectronEditorProjectRepositoryFx)[.]ts$)";
+const applicationRuntimeAllowedDependencyPattern =
+	"src/(?:application-runtime(?:/|$)|application-diagnostics/fn/readExactCauseFailureFn[.]ts$|arkpack/renderer/ArkpackCatalogOwnerAtom[.]ts$|authoring-session/(?:EditorUnsavedChanges|EditorUnsavedChangesOwnerAtom|createEditorUnsavedChangesOwnerFx)[.]ts$|board-scenario/session/(?:EditorBoardGameResourceOwnerAtom|createEditorBoardGameResourceFx)[.]ts$|editor-build/domain/EditorBuildRepository[.]ts$|editor-build/renderer/createElectronEditorBuildRepositoryFx[.]ts$|game-persistence/(?:GameSaveStorage[.]ts$|electron/createElectronGameSaveStorageFx[.]ts$)|project-authoring/repository/(?:EditorProjectRepository|createElectronEditorProjectRepositoryFx)[.]ts$|renderer/game/(?:createGameFx[.]ts$|resource/(?:acquireGameEngineResourceFx|GameEngineResourceFx|GameEngineResourceLayer)[.]ts$))";
 const gameEventPattern = "^src/game-event(?:/|$)";
 const gameConfigPattern = "^src/game-config(?:/|$)";
 const gameRuntimePattern = "^src/game-runtime(?:/|$)";
@@ -17,7 +22,7 @@ const itemInteractionAllowedSourceDependencyPattern =
 const itemLineDetailReadAllowedSourceDependencyPattern =
 	"(?:item-line-detail/read(?:/|$)|engine/(?:common/schema/(?:IdSchema|NonNegativeIntegerSchema|TimeSchema)[.]ts$|game/context/GameConfigFx[.]ts$|item-detail/read/readItemDetailSourcesFx[.]ts$|item/fn/readItemRemainingChargesFn[.]ts$|query/fx/queryFx[.]ts$)|game-runtime/(?:context/RuntimeFx[.]ts$|read/readBoardRuntimeItemByIdFx[.]ts$|schema/RuntimeSchema[.]ts$)|item-definition/(?:fn/matchesItemSelectorFn[.]ts$|schema/SelectorSchema[.]ts$)|item-location/schema/(?:BoardLocationSchema|DistanceSchema|LocationScopeEnumSchema)[.]ts$|production-condition/schema/WhenSchema[.]ts$|production-delivery/fn/readLineInputDeliveryClaimsFn[.]ts$|production-input/(?:InputRun[.]ts$|read/(?:fn/isMaterialInputEligibleFn|isLineInputAutofillSourceLocationFn)[.]ts$|schema/(?:ChargeSourceSchema|DepositSchema|InputSchema|ModeSchema|TypeSchema)[.]ts$)|production-job/(?:fx/(?:resolveActiveJobStatusFx|read/(?:resolveLineStartFx|resolveStartOutputCapacityFx))[.]ts$|schema/read/JobStatusEnumSchema[.]ts$)|production-line/(?:LineRun[.]ts$|fn/(?:isLineOwnerItemFn|readEffectiveDefaultLineFn|readLineOwnerLinesFn)[.]ts$|schema/(?:LineSchema|rule/TypeSchema)[.]ts$)|production-output/(?:fx/dropRulesFx[.]ts$|roll/schema/(?:RollSchema|TypeSchema)[.]ts$|schema/DropSchema[.]ts$))";
 const itemLineDetailPresentationAllowedSourceDependencyPattern =
-	"(?:item-line-detail(?:/|$)|item-detail-frame(?:/|$)|engine/(?:common/schema/(?:IdSchema|NonNegativeIntegerSchema)[.]ts$|item/fx/resolveItemFx[.]ts$)|game-runtime/schema/RuntimeSchema[.]ts$|item-definition/schema/SelectorSchema[.]ts$|item-location/schema/DistanceSchema[.]ts$|production-condition/schema/(?:TypeSchema|WhenSchema)[.]ts$|production-input/(?:schema/(?:ChargeSourceSchema|ModeSchema)[.]ts$|write/(?:withdrawLineInputFx|withdrawLineInputsFx)[.]ts$)|production-job/(?:schema/read/JobStatusEnumSchema[.]ts$|ui/(?:ProductionJobRuntime[.]tsx|readActiveJobRuntimeFn[.]ts$)|write/enqueueLineFx[.]ts$)|production-line/write/(?:setDefaultLineFx|unsetDefaultLineFx)[.]ts$|renderer/(?:RendererRuntime[.]ts$|game/GameEngine[.]ts$)|ui/(?:button/(?:Button|LinkButton)[.]tsx$|formatDurationFn[.]ts$|game/(?:useGameEngine|useRuntimeSelector)[.]ts$|scrollable/Scrollable[.]tsx$|search/useFuseSearch[.]ts$))";
+	"(?:item-line-detail(?:/|$)|item-detail-frame(?:/|$)|application-runtime/RendererRuntime[.]ts$|engine/(?:common/schema/(?:IdSchema|NonNegativeIntegerSchema)[.]ts$|item/fx/resolveItemFx[.]ts$)|game-runtime/schema/RuntimeSchema[.]ts$|item-definition/schema/SelectorSchema[.]ts$|item-location/schema/DistanceSchema[.]ts$|production-condition/schema/(?:TypeSchema|WhenSchema)[.]ts$|production-input/(?:schema/(?:ChargeSourceSchema|ModeSchema)[.]ts$|write/(?:withdrawLineInputFx|withdrawLineInputsFx)[.]ts$)|production-job/(?:schema/read/JobStatusEnumSchema[.]ts$|ui/(?:ProductionJobRuntime[.]tsx|readActiveJobRuntimeFn[.]ts$)|write/enqueueLineFx[.]ts$)|production-line/write/(?:setDefaultLineFx|unsetDefaultLineFx)[.]ts$|renderer/game/GameEngine[.]ts$|ui/(?:button/(?:Button|LinkButton)[.]tsx$|formatDurationFn[.]ts$|game/(?:useGameEngine|useRuntimeSelector)[.]ts$|scrollable/Scrollable[.]tsx$|search/useFuseSearch[.]ts$))";
 const gameRuntimeAllowedSourceDependencyPattern =
 	"(?:game-runtime(?:/|$)|game-config/GameConfigSchema[.]ts$|engine/(?:cheat/schema/CheatStateSchema[.]ts$|common/schema/(?:IdSchema|NonNegativeIntegerSchema|PositiveIntegerSchema|TimeSchema)[.]ts$|game/context/GameConfigFx[.]ts$|item/(?:error/(?:ItemNotFoundError|ItemNotOnBoardError)[.]ts$|fn/(?:isItemPureWithIndexFn|readItemPurityIndexFn)[.]ts$|fx/resolveItemFx[.]ts$)|revision/(?:fx/createRevisionFx|schema/RevisionSchema)[.]ts$)|game-event/schema/GameEventSchema[.]ts$|item-definition/schema/(?:ItemSchema|StorageSchema|TypeSchema)[.]ts$|item-location/(?:fn/(?:indexGridLocationClaimsFn|isItemLocationScopeAllowedFn|readGridLocationClaimsFn)[.]ts$|schema/(?:BoardLocationSchema|DeliveryLocationSchema|GridLocationSchema|InputLocationSchema|JobLocationSchema|LocationSchema|LocationScopeEnumSchema|ReservedLocationSchema)[.]ts$)|production-delivery/(?:check/checkRuntimeDeliveriesFn|fx/reconcileOutboundDeliveriesRuntimeFx|schema/check/DeliveryTargetIssueSchema)[.]ts$|production-input/(?:check/checkRuntimeInputLocationsFn|fx/releaseOwnerInputsFx|schema/check/(?:InputCapacityExceededIssueSchema|InputLineMissingIssueSchema|InputOwnerMissingIssueSchema|InputSelectorMismatchIssueSchema|InputSlotInvalidIssueSchema))[.]ts$|production-job/(?:check/checkRuntimeJobsFn|error/JobOwnerBusyError|fn/readReservedJobOutputQuantitiesFn|schema/(?:JobQueueRequestSchema|JobSchema|DuplicateJobIdIssueSchema|JobConsumedMaterialStateIssueSchema|JobLineMissingIssueSchema|JobMaterialOrphanIssueSchema|JobOwnerMissingIssueSchema|JobOwnerMultipleActiveIssueSchema|JobOwnerNotOnGridIssueSchema|JobQueueExceededIssueSchema|JobTimeInvalidIssueSchema))[.]ts$|production-line/(?:fn/checkRuntimeDefaultLinesFn|schema/(?:DefaultLineByOwnerItemIdSchema|check/(?:DefaultLineIssueSchema|LineInputClosedIssueSchema)))[.]ts$)";
 const gamePersistenceAllowedSourceDependencyPattern =
@@ -64,17 +69,42 @@ const boundaryRules = [
 	{
 		name: "application-diagnostics-has-concrete-consumers",
 		comment:
-			"Only installed-game, authoring, root UI, and application command boundaries consume the shared diagnostics policy.",
+			"Only Application Runtime, installed-game, authoring, root UI, and application command boundaries consume the shared diagnostics policy.",
 		severity: "error",
 		from: {
 			path: activeCodePattern,
 			pathNot: [
 				applicationDiagnosticsPattern,
+				applicationRuntimePattern,
 				"^src/(?:@routes|authoring-mcp|item-detail-frame|project-authoring/welcome|renderer/game|ui)(?:/|$)",
 			],
 		},
 		to: {
 			path: applicationDiagnosticsPattern,
+		},
+	},
+	{
+		name: "application-runtime-has-exact-composition-dependencies",
+		comment:
+			"Application Runtime may depend only on its own modules, the exact lower capabilities it composes, the native lifecycle contract, diagnostics normalization, and Effect Atom infrastructure.",
+		severity: "error",
+		from: {
+			path: applicationRuntimePattern,
+		},
+		to: {
+			path: `^(?!${applicationRuntimeAllowedDependencyPattern}|electron/contract/ArkiniElectronApi[.]ts$|node_modules/(?:@effect/atom-react|effect)(?:/|$))`,
+		},
+	},
+	{
+		name: "application-runtime-composition-is-one-way",
+		comment:
+			"Installed Game, persistence, catalog, repository, Board-session and unsaved-change capabilities may be composed by Application Runtime but never import that process root back.",
+		severity: "error",
+		from: {
+			path: applicationRuntimeLowerCapabilityPattern,
+		},
+		to: {
+			path: applicationRuntimePattern,
 		},
 	},
 	{
@@ -86,7 +116,7 @@ const boundaryRules = [
 			path: "^src/engine(?:/|$)",
 		},
 		to: {
-			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}`,
+			path: `^src/(?:application-runtime|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}`,
 		},
 	},
 	{
@@ -145,7 +175,7 @@ const boundaryRules = [
 	{
 		name: "game-persistence-has-explicit-composition-consumers",
 		comment:
-			"Only Game Session, installed-game, Board scenario, game-menu, and Electron-main composition consume persistence; lower gameplay domains never do.",
+			"Only Application Runtime, Game Session, installed-game, Board scenario, game-menu, and Electron-main composition consume persistence; lower gameplay domains never do.",
 		severity: "error",
 		from: {
 			path: activeCodePattern,
@@ -157,7 +187,7 @@ const boundaryRules = [
 				"^src/board-scenario/session/restoreEditorBoardScenarioFx[.]ts$",
 				"^src/board-scenario/session/saveEditorBoardScenarioFx[.]ts$",
 				"^src/engine/game/layer/GameSessionLayerFx[.]ts$",
-				"^src/renderer/RendererRuntime[.]ts$",
+				"^src/application-runtime/RendererRuntime[.]ts$",
 				"^src/renderer/game/Game[.]ts$",
 				"^src/renderer/game/GameSaveBootstrapError[.]ts$",
 				"^src/renderer/game/createGameFx[.]ts$",
@@ -308,7 +338,7 @@ const boundaryRules = [
 			path: boardSpatialPattern,
 		},
 		to: {
-			path: `^src/(?:game-config|arkpack|editor-build|editor|item-authoring|flow|estimate|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+			path: `^src/(?:game-config|arkpack|editor-build|editor|item-authoring|flow|estimate|application-runtime|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
 		},
 	},
 	{
@@ -371,7 +401,7 @@ const boundaryRules = [
 			],
 		},
 		to: {
-			path: `^src/(?:game-config|arkpack|asset-authoring|editor-build|item-authoring|flow|estimate|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+			path: `^src/(?:game-config|arkpack|asset-authoring|editor-build|item-authoring|flow|estimate|application-runtime|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
 		},
 	},
 	{
@@ -503,7 +533,7 @@ const boundaryRules = [
 			path: gameConfigPattern,
 		},
 		to: {
-			path: `^src/(?:game-event|arkpack|editor-build|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+			path: `^src/(?:game-event|arkpack|editor-build|application-runtime|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
 		},
 	},
 	{
@@ -539,7 +569,7 @@ const boundaryRules = [
 			path: arkpackArtifactPattern,
 		},
 		to: {
-			path: `^src/arkpack/(?:renderer|ui)(?:/|$)|^src/editor-build(?:/|$)|^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+			path: `^src/arkpack/(?:renderer|ui)(?:/|$)|^src/editor-build(?:/|$)|^src/(?:application-runtime|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
 		},
 	},
 	{
@@ -638,7 +668,7 @@ const boundaryRules = [
 			path: productDomainPattern,
 		},
 		to: {
-			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductRuntimePattern}|${authoringProductPresentationPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+			path: `^src/(?:application-runtime|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductRuntimePattern}|${authoringProductPresentationPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
 		},
 	},
 	{
@@ -665,7 +695,7 @@ const boundaryRules = [
 			path: authoringProductCorePattern,
 		},
 		to: {
-			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productPresentationPattern}|${authoringProductRuntimePattern}|${authoringProductPresentationPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+			path: `^src/(?:application-runtime|renderer|ui|@routes)(?:/|$)|${productPresentationPattern}|${authoringProductRuntimePattern}|${authoringProductPresentationPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
 		},
 	},
 	{
@@ -794,7 +824,7 @@ const boundaryRules = [
 			path: "^electron/main(?:/|$)",
 		},
 		to: {
-			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductRuntimePattern}|${authoringProductPresentationPattern}`,
+			path: `^src/(?:application-runtime|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductRuntimePattern}|${authoringProductPresentationPattern}`,
 		},
 	},
 	{

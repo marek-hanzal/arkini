@@ -3,7 +3,7 @@ import { useCallback, useLayoutEffect, useRef } from "react";
 
 import { useGameEngine } from "~/ui/game/useGameEngine";
 import { runInventoryReleaseAtom } from "~/ui/pixi/command/runInventoryReleaseAtom";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/RendererRuntime";
 import { runSpaceActivationAtom } from "~/ui/pixi/command/runSpaceActivationAtom";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";

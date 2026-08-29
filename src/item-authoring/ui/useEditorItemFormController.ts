@@ -11,7 +11,7 @@ import {
 	EditorItemFormSchema,
 	type EditorItemFormValues,
 } from "~/item-authoring/ui/EditorItemFormSchema";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/RendererRuntime";
 import { saveEditorItemFx } from "~/item-authoring/ui/saveEditorItemFx";
 import { useAppForm } from "~/ui/form/EditorForm";
 import type {

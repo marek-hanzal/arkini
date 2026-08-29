@@ -7,7 +7,7 @@ import type { EditorProject } from "~/project-authoring/EditorProject";
 import { EditorProjectAtom } from "~/authoring-session/EditorProjectAtom";
 import { publishEditorProjectFx } from "~/authoring-session/publishEditorProjectFx";
 import { readEditorProjectFx } from "~/project-authoring/readEditorProjectFx";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/RendererRuntime";
 import { EditorProjectContext } from "~/authoring-session/useEditorProject";
 
 /** Publishes one committed repository snapshot to the mounted editor tree. */

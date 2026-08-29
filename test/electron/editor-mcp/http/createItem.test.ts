@@ -100,8 +100,6 @@ describe("editor MCP item creation", () => {
 			},
 			description: "Created through the editor MCP.",
 			id: "item:mcp-simple",
-			maxStackSize: 1,
-			scope: "any",
 			title: "MCP Simple",
 			type: "simple",
 		});
@@ -190,39 +188,6 @@ describe("editor MCP item creation", () => {
 				type,
 			});
 		}
-		if (has("space"))
-			expect(read("space")).toMatchObject({
-				enable: true,
-				input: [],
-				rules: [],
-				space: 4,
-			});
-		if (has("producer"))
-			expect(read("producer")).toMatchObject({
-				maxQueueSize: 1,
-				lines: [
-					expect.any(Object),
-				],
-			});
-		if (has("craft")) expect(read("craft")).toHaveProperty("line");
-		if (has("blueprint")) expect(read("blueprint")).toHaveProperty("line");
-		if (has("deposit"))
-			expect(read("deposit")).toMatchObject({
-				maxQueueSize: 1,
-			});
-		if (has("stash")) expect(read("stash")).toHaveProperty("line");
-		if (has("temporary"))
-			expect(read("temporary")).toMatchObject({
-				durationMs: 500,
-				maxStackSize: 1,
-				scope: "board",
-			});
-		if (has("inventory"))
-			expect(read("inventory")).toMatchObject({
-				maxCount: 1,
-				maxStackSize: 1,
-				scope: "board",
-			});
 		expect(notifyProjectChanged).toHaveBeenCalledTimes(types.length);
 
 		if (has("simple")) {

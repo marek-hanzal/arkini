@@ -1,5 +1,3 @@
-import { Effect } from "effect";
-
 import type {
 	EditorAcquisitionGraph,
 	EditorAcquisitionRoute,
@@ -199,18 +197,15 @@ const projectRoutes = (routes: ReadonlyArray<EditorAcquisitionRoute>): EditorIte
 };
 
 /** Groups canonical output-occurrence routes into their authored item-origin operations. */
-export const readEditorItemOriginSourcesFx = Effect.fn("readEditorItemOriginSourcesFx")(
-	(graph: EditorAcquisitionGraph) =>
-		Effect.sync(() => {
-			const routesByOperationId = new Map<string, EditorAcquisitionRoute[]>();
-			for (const route of graph.routes) {
-				const operationId = route.operation?.id ?? route.id;
-				const routes = routesByOperationId.get(operationId) ?? [];
-				routes.push(route);
-				routesByOperationId.set(operationId, routes);
-			}
-			return [
-				...routesByOperationId.values(),
-			].map(projectRoutes);
-		}),
-);
+export const readEditorItemOriginSourcesFn = (graph: EditorAcquisitionGraph) => {
+	const routesByOperationId = new Map<string, EditorAcquisitionRoute[]>();
+	for (const route of graph.routes) {
+		const operationId = route.operation?.id ?? route.id;
+		const routes = routesByOperationId.get(operationId) ?? [];
+		routes.push(route);
+		routesByOperationId.set(operationId, routes);
+	}
+	return [
+		...routesByOperationId.values(),
+	].map(projectRoutes);
+};

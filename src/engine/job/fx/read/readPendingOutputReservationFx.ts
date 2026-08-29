@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { ChargeSourceSchema } from "~/engine/input/schema/ChargeSourceSchema";
-import { readItemRemainingChargesFx } from "~/engine/item/fx/readItemRemainingChargesFx";
+import { readItemRemainingChargesFn } from "~/engine/item/fn/readItemRemainingChargesFn";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import { applyFinalChargeReservationFx } from "./applyFinalChargeReservationFx";
@@ -29,7 +29,7 @@ export const readPendingOutputReservationFx = Effect.fn("readPendingOutputReserv
 					: total,
 			0,
 		);
-		const remainingCharges = yield* readItemRemainingChargesFx(owner);
+		const remainingCharges = readItemRemainingChargesFn(owner);
 		if (selfChargeCost <= 0 || remainingCharges !== selfChargeCost) {
 			return yield* clampOutputReservationFx(quantities);
 		}

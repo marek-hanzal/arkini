@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ModeSchema } from "~/engine/input/schema/ModeSchema";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
-import { readItemRemainingChargesFx } from "~/engine/item/fx/readItemRemainingChargesFx";
+import { readItemRemainingChargesFn } from "~/engine/item/fn/readItemRemainingChargesFn";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { LineRun } from "~/engine/line/LineRun";
 import { readOutputMaximumQuantitiesFx } from "~/engine/output/fx/readOutputMaximumQuantitiesFx";
@@ -65,7 +65,7 @@ export const readPlannedOutputReservationFx = Effect.fn("readPlannedOutputReserv
 				itemId: payerId,
 				runtime,
 			});
-			const remainingCharges = yield* readItemRemainingChargesFx(payer);
+			const remainingCharges = readItemRemainingChargesFn(payer);
 			if (remainingCharges !== cost) continue;
 			yield* applyFinalChargeReservationFx({
 				payer: payer.item,

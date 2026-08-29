@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
-import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
+import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import type { InventoryLocationSchema } from "~/engine/location/schema/InventoryLocationSchema";
 import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 import { assertPlacementPlanCompleteFx } from "~/engine/placement/fx/assertPlacementPlanCompleteFx";
@@ -37,7 +37,7 @@ export const planInventoryStorageFx = Effect.fn("planInventoryStorageFx")(functi
 	item,
 	runtime,
 }: planInventoryStorageFx.Props) {
-	const pure = yield* isItemPureFx({
+	const pure = isItemPureFn({
 		item,
 		runtime,
 	});

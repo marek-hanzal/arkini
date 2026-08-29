@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
-import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
+import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import { setDefaultLineFx } from "~/engine/line/write/setDefaultLineFx";
 import { unsetDefaultLineFx } from "~/engine/line/write/unsetDefaultLineFx";
 import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
@@ -150,7 +150,7 @@ describe("setDefaultLineFx", () => {
 						itemId: owner.id,
 						runtime,
 					}),
-					pure: yield* isItemPureFx({
+					pure: isItemPureFn({
 						item: owner,
 						runtime,
 					}),
@@ -195,7 +195,7 @@ describe("setDefaultLineFx", () => {
 					itemId: owner.id,
 					runtime,
 				});
-				const pure = yield* isItemPureFx({
+				const pure = isItemPureFn({
 					item: runtime.items[0]!,
 					runtime,
 				});
@@ -263,7 +263,7 @@ describe("setDefaultLineFx", () => {
 					itemId: owner.id,
 					runtime,
 				});
-				const pure = yield* isItemPureFx({
+				const pure = isItemPureFn({
 					item: runtime.items[0]!,
 					runtime,
 				});
@@ -419,11 +419,11 @@ describe("setDefaultLineFx", () => {
 				if (isolated === undefined || remainder === undefined) {
 					throw new Error("Expected isolated default owner and pure remainder.");
 				}
-				const selectedPure = yield* isItemPureFx({
+				const selectedPure = isItemPureFn({
 					item: isolated,
 					runtime,
 				});
-				const remainderPure = yield* isItemPureFx({
+				const remainderPure = isItemPureFn({
 					item: remainder,
 					runtime,
 				});
@@ -433,7 +433,7 @@ describe("setDefaultLineFx", () => {
 				const clearedRuntime = yield* readRuntimeFx();
 				const clearedOwner = clearedRuntime.items.find((item) => item.id === owner.id);
 				if (clearedOwner === undefined) throw new Error("Expected cleared owner.");
-				const clearedPure = yield* isItemPureFx({
+				const clearedPure = isItemPureFn({
 					item: clearedOwner,
 					runtime: clearedRuntime,
 				});

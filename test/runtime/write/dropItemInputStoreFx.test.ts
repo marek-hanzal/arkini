@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
-import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
+import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import { setDefaultLineFx } from "~/engine/line/write/setDefaultLineFx";
 import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
@@ -187,7 +187,7 @@ describe("dropItemFx default-line input storage", () => {
 				const before = yield* readRuntimeFx();
 				const beforeOwner = before.items.find((item) => item.id === owner.id);
 				if (beforeOwner === undefined) throw new Error("Missing authored-default owner.");
-				const pureBefore = yield* isItemPureFx({
+				const pureBefore = isItemPureFn({
 					item: beforeOwner,
 					runtime: before,
 				});
@@ -213,7 +213,7 @@ describe("dropItemFx default-line input storage", () => {
 					preview,
 					pureBefore,
 					remainder,
-					remainderPure: yield* isItemPureFx({
+					remainderPure: isItemPureFn({
 						item: remainder,
 						runtime,
 					}),

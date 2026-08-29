@@ -4,7 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { InputRun } from "~/engine/input/InputRun";
-import { readItemRemainingChargesFx } from "~/engine/item/fx/readItemRemainingChargesFx";
+import { readItemRemainingChargesFn } from "~/engine/item/fn/readItemRemainingChargesFn";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { spendActionChargesFx } from "./spendActionChargesFx";
@@ -46,7 +46,7 @@ export const settleActionChargesFx = Effect.fn("settleActionChargesFx")(function
 			itemId,
 			runtime,
 		});
-		const remainingCharges = yield* readItemRemainingChargesFx(item);
+		const remainingCharges = readItemRemainingChargesFn(item);
 		if (remainingCharges === undefined || remainingCharges < cost) {
 			return yield* Effect.die(
 				new Error(`Charge payer ${itemId} was applied without sufficient charges.`),

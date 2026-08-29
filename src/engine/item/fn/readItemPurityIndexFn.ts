@@ -1,5 +1,3 @@
-import { Effect } from "effect";
-
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -29,7 +27,7 @@ const addOwnedLine = (
 };
 
 /** Indexes identity-bound line state once for repeated purity checks over one runtime snapshot. */
-export const readItemPurityIndexFx = Effect.fnUntraced(function* (runtime: RuntimeSchema.Type) {
+export const readItemPurityIndexFn = (runtime: RuntimeSchema.Type) => {
 	const inputLineIdsByOwnerId = new Map<IdSchema.Type, Set<IdSchema.Type>>();
 	const jobLineIdsByOwnerId = new Map<IdSchema.Type, Set<IdSchema.Type>>();
 	const queueLineIdsByOwnerId = new Map<IdSchema.Type, Set<IdSchema.Type>>();
@@ -60,4 +58,4 @@ export const readItemPurityIndexFx = Effect.fnUntraced(function* (runtime: Runti
 		jobLineIdsByOwnerId,
 		queueLineIdsByOwnerId,
 	} satisfies ItemPurityIndex;
-});
+};

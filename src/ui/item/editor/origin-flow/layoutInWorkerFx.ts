@@ -7,7 +7,7 @@ import type {
 	LayoutWorkerRequest,
 	LayoutWorkerResponse,
 } from "~/ui/item/editor/origin-flow/LayoutWorkerProtocol";
-import { readNodeMetricsFx } from "~/ui/item/editor/origin-flow/readNodeMetricsFx";
+import { readNodeMetricsFn } from "~/ui/item/editor/origin-flow/fn/readNodeMetricsFn";
 
 class LayoutWorkerError extends Data.TaggedError("LayoutWorkerError")<{
 	readonly cause?: unknown;
@@ -38,38 +38,6 @@ const runLayout = (topology: LayoutInput, worker: Worker): Promise<Layout> =>
 		} satisfies LayoutWorkerRequest);
 	});
 
-const readTopologyFx = (flow: EditorItemOriginFlow) =>
-	Effect.gen(function* () {
-		const nodes = yield* Effect.forEach(flow.nodes, (node) =>
-			Effect.gen(function* () {
-				const metrics = yield* readNodeMetricsFx(node);
-				return {
-					height: metrics.height,
-					id: node.id,
-					ports: [
-						...metrics.portOffsets,
-					].map(([id, offset]) => ({
-						id,
-						x: offset.x,
-						y: offset.y,
-					})),
-					type: node.type,
-					width: metrics.width,
-				};
-			}),
-		);
-		return {
-			edges: flow.edges.map(({ id, source, sourcePortId, target, targetPortId }) => ({
-				id,
-				source,
-				sourcePortId,
-				target,
-				targetPortId,
-			})),
-			nodes,
-		} satisfies LayoutInput;
-	});
-
 /** Computes one flow layout off the renderer thread and terminates its worker on exit. */
 export const layoutInWorkerFx = Effect.fn("layoutInWorkerFx")(
 	(
@@ -80,7 +48,31 @@ export const layoutInWorkerFx = Effect.fn("layoutInWorkerFx")(
 		} = {},
 	) =>
 		Effect.gen(function* () {
-			const topology = yield* readTopologyFx(flow);
+			const topology = {
+				edges: flow.edges.map(({ id, source, sourcePortId, target, targetPortId }) => ({
+					id,
+					source,
+					sourcePortId,
+					target,
+					targetPortId,
+				})),
+				nodes: flow.nodes.map((node) => {
+					const metrics = readNodeMetricsFn(node);
+					return {
+						height: metrics.height,
+						id: node.id,
+						ports: [
+							...metrics.portOffsets,
+						].map(([id, offset]) => ({
+							id,
+							x: offset.x,
+							y: offset.y,
+						})),
+						type: node.type,
+						width: metrics.width,
+					};
+				}),
+			} satisfies LayoutInput;
 			return yield* Effect.acquireUseRelease(
 				Effect.try({
 					try: options.spawn ?? (() => new LayoutWorker()),

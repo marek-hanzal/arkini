@@ -16,7 +16,7 @@ import {
 	OperationHeaderHeight,
 	OperationSidePadding,
 	type NodeMetrics,
-} from "~/ui/item/editor/origin-flow/readNodeMetricsFx";
+} from "~/ui/item/editor/origin-flow/fn/readNodeMetricsFn";
 
 const readItemTypeColor = (palette: CanvasPalette, type: EditorItemOriginItemNode["type"]) => {
 	switch (type) {

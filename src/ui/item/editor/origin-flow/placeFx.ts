@@ -3,8 +3,9 @@ import fcose from "cytoscape-fcose";
 import { Effect } from "effect";
 
 import type { LayoutInput } from "~/ui/item/editor/origin-flow/Layout";
-import type { Communities } from "~/ui/item/editor/origin-flow/readCommunitiesFx";
+import type { Communities } from "~/ui/item/editor/origin-flow/fn/readCommunitiesFn";
 import type { LayoutProfile, Pair } from "~/ui/item/editor/origin-flow/Topology";
+import type { PlacedNode } from "~/ui/item/editor/origin-flow/PlacedNode";
 
 cytoscape.use(fcose);
 
@@ -12,17 +13,6 @@ const RandomSeed = 0x4444bbbb;
 const HorizontalScale = 2.2;
 const VerticalScale = 0.95;
 const RankShift = 280;
-
-export interface PlacedNode {
-	readonly haloX: number;
-	readonly haloY: number;
-	readonly height: number;
-	readonly id: string;
-	readonly importance: number;
-	readonly width: number;
-	readonly x: number;
-	readonly y: number;
-}
 
 const seededRandom = (seed: number) => {
 	let state = seed >>> 0;

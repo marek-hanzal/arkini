@@ -10,8 +10,8 @@ import { ArkiniDefaultPackageId } from "../../../shared/ArkiniAppMetadata";
 import { ArkpackCatalogAtom } from "~/arkpack/ui/ArkpackCatalogAtom";
 import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerAtom";
 import { createArkpackCatalogFx } from "~/arkpack/renderer/createArkpackCatalogFx";
-import { createRendererLifecycleFx } from "~/renderer/lifecycle/createRendererLifecycleFx";
-import { RendererLifecycleOwnerAtom } from "~/renderer/lifecycle/RendererLifecycleOwnerAtom";
+import { createRendererLifecycleFx } from "~/application-runtime/lifecycle/createRendererLifecycleFx";
+import { RendererLifecycleOwnerAtom } from "~/application-runtime/lifecycle/readRendererLifecycleFx";
 import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";
 import { LauncherStartupConfigAtom } from "~/ui/launcher/LauncherStartupConfigAtom";
 

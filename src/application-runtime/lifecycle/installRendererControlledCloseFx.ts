@@ -6,21 +6,39 @@ import { EditorProjectRepository } from "~/project-authoring/repository/EditorPr
 import { EditorUnsavedChanges } from "~/authoring-session/EditorUnsavedChanges";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
-import type { ArkiniRouter } from "~/createArkiniRouterFx";
-import { waitForActionLoadingCompletionFrameFx } from "~/ui/loading/waitForActionLoadingCompletionFrameFx";
-import type { RootContext } from "~/ui/root/RootContext";
+import type { RendererRuntime } from "~/application-runtime/RendererRuntime";
 
-export namespace installRendererControlledCloseFx {
-	export interface Props {
-		readonly lifecycle: Pick<
-			Window["arkini"]["lifecycle"],
-			"onBeforeClose" | "onBeforeCloseReady"
-		>;
-		readonly rendererRuntime: RootContext["rendererRuntime"];
-		readonly requestEditorLeaveFx?: Effect.Effect<boolean, never, EditorUnsavedChanges>;
-		readonly router: Pick<ArkiniRouter, "navigate">;
-	}
+interface ExitRouter {
+	readonly navigate: (options: {
+		readonly params: {
+			readonly packageId: string;
+		};
+		readonly replace: true;
+		readonly to: "/game/$packageId/action/exit";
+	}) => Promise<unknown>;
 }
+
+interface Props {
+	readonly lifecycle: Pick<Window["arkini"]["lifecycle"], "onBeforeClose" | "onBeforeCloseReady">;
+	readonly rendererRuntime: typeof RendererRuntime;
+	readonly requestEditorLeaveFx?: Effect.Effect<boolean, never, EditorUnsavedChanges>;
+	readonly router: ExitRouter;
+}
+
+const actionLoadingCompletionHoldMs = 150;
+
+const waitForActionLoadingCompletionFrameFx = () =>
+	Effect.promise(async () => {
+		await new Promise<void>((resolve) => {
+			window.requestAnimationFrame(() => resolve());
+		});
+		await new Promise<void>((resolve) => {
+			window.requestAnimationFrame(() => resolve());
+		});
+		await new Promise<void>((resolve) => {
+			window.setTimeout(resolve, actionLoadingCompletionHoldMs);
+		});
+	});
 
 /**
  * Installs the renderer-owned half of the native close handshake.
@@ -39,7 +57,7 @@ export const installRendererControlledCloseFx = Effect.fn("installRendererContro
 		),
 		rendererRuntime,
 		router,
-	}: installRendererControlledCloseFx.Props) =>
+	}: Props) =>
 		Effect.sync(() => {
 			let exitPresentationRequired = false;
 			const awaitEditorOperations = async () => {

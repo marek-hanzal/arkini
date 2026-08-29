@@ -9,7 +9,7 @@ import { EditorProjectRepository } from "~/project-authoring/repository/EditorPr
 import { readEditorAssetResourceIdFn } from "~/asset-authoring/domain/fn/readEditorAssetResourceIdFn";
 import { saveEditorAssetFx } from "~/asset-authoring/session/saveEditorAssetFx";
 import { validateEditorAssetFileFx } from "~/asset-authoring/validation/validateEditorAssetFileFx";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/RendererRuntime";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/useEditorUnsavedChangesRegistration";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorChatGptSurface } from "./useEditorChatGptSurface";

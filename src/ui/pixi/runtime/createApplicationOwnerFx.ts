@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { Application, Ticker } from "pixi.js";
 
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/RendererRuntime";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import { createDemandFrameLoopFx } from "~/ui/pixi/runtime/createDemandFrameLoopFx";
 

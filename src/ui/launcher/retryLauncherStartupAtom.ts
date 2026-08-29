@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
-import { RendererAtomRuntime } from "~/renderer/RendererAtomRegistry";
+import { RendererAtomRuntime } from "~/application-runtime/RendererAtomRegistry";
 import { LauncherHeroAtom } from "~/ui/launcher/LauncherHeroAtom";
 import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";
 

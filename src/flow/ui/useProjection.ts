@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import type { EditorItemOriginFlow } from "~/flow/domain/EditorItemOriginFlow";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/RendererRuntime";
 import { readHighlightFn } from "~/flow/ui/fn/readHighlightFn";
 import { readNavigationFn } from "~/flow/ui/fn/readNavigationFn";
 import { readRelationNavigationFn } from "~/flow/ui/fn/readRelationNavigationFn";

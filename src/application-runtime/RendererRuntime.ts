@@ -15,14 +15,19 @@ import { EditorUnsavedChangesOwnerAtom } from "~/authoring-session/EditorUnsaved
 import { createEditorUnsavedChangesOwnerFx } from "~/authoring-session/createEditorUnsavedChangesOwnerFx";
 import { GameEngineResourceLayer } from "~/renderer/game/resource/GameEngineResourceLayer";
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
-import { RendererAtomRegistryLayer } from "~/renderer/RendererAtomRegistry";
+import { RendererAtomRegistry } from "~/application-runtime/RendererAtomRegistry";
 import type { GameSaveStorage } from "~/game-persistence/GameSaveStorage";
 import { createElectronGameSaveStorageFx } from "~/game-persistence/electron/createElectronGameSaveStorageFx";
 
+const RendererAtomRegistryLayer = Layer.succeed(AtomRegistry.AtomRegistry, RendererAtomRegistry);
+
 const EditorUnsavedChangesLayer = Layer.effect(
 	EditorUnsavedChanges,
-	createEditorUnsavedChangesOwnerFx().pipe(
-		Effect.tap((owner) => Atom.set(EditorUnsavedChangesOwnerAtom, owner)),
+	Effect.acquireRelease(
+		createEditorUnsavedChangesOwnerFx().pipe(
+			Effect.tap((owner) => Atom.set(EditorUnsavedChangesOwnerAtom, owner)),
+		),
+		() => Atom.set(EditorUnsavedChangesOwnerAtom, undefined),
 	),
 ).pipe(Layer.provide(RendererAtomRegistryLayer));
 

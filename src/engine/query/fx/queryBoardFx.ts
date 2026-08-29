@@ -4,7 +4,7 @@ import { distanceFx } from "~/engine/distance/fx/distanceFx";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import type { BoardSchema } from "~/engine/query/schema/BoardSchema";
 import { getItemsFx } from "~/engine/runtime/read/getItemsFx";
-import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
+import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
 import { queryItemsFx } from "./queryItemsFx";
 
 export namespace queryBoardFx {
@@ -22,14 +22,12 @@ export const queryBoardFx = Effect.fn("queryBoardFx")(function* ({
 	query,
 }: queryBoardFx.Props) {
 	const items = yield* getItemsFx();
-	const boardItems = Array.getSomes(yield* Effect.forEach(items, isBoardRuntimeItemFx));
+	const boardItems = Array.getSomes(items.map(isBoardRuntimeItemFn));
 	const selected = yield* queryItemsFx({
 		items: boardItems.filter((item) => item.location.space === origin.space),
 		selector: query.selector,
 	});
-	const selectedBoardItems = Array.getSomes(
-		yield* Effect.forEach(selected, isBoardRuntimeItemFx),
-	);
+	const selectedBoardItems = Array.getSomes(selected.map(isBoardRuntimeItemFn));
 
 	return yield* Effect.filter(selectedBoardItems, (item) => {
 		return distanceFx({

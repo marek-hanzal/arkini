@@ -3,9 +3,9 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
-import { makeDropRejectedResultFx } from "~/engine/runtime/drop/makeDropRejectedResultFx";
+import { makeDropRejectedResultFn } from "~/engine/runtime/drop/fn/makeDropRejectedResultFn";
 import { projectDropTransferActorFx } from "~/engine/runtime/drop/projectDropTransferActorFx";
-import { readDropItemStackRejectedReasonFx } from "~/engine/runtime/read/readDropItemStackRejectedReasonFx";
+import { readDropItemStackRejectedReasonFn } from "~/engine/runtime/read/fn/readDropItemStackRejectedReasonFn";
 import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
 import type { DropItemResult } from "~/engine/runtime/DropItemResult";
 import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
@@ -70,34 +70,36 @@ export const commitStackDropFx = Effect.fn("commitStackDropFx")(function* ({
 			),
 		),
 		Effect.catchTag("StackItemsUnavailableError", (error) =>
-			readDropItemStackRejectedReasonFx({
-				reason: error.reason,
-			}).pipe(
-				Effect.flatMap((reason) =>
-					makeDropRejectedResultFx({
-						reason,
-						sourceItemId,
-						targetItemId,
+			Effect.succeed(
+				makeDropRejectedResultFn({
+					reason: readDropItemStackRejectedReasonFn({
+						reason: error.reason,
 					}),
-				),
+					sourceItemId,
+					targetItemId,
+				}),
 			),
 		),
 		Effect.catchTags({
 			ItemNotFoundError: (error) =>
-				makeDropRejectedResultFx({
-					reason:
-						error.itemId === targetItemId
-							? DropItemRejectedReason.StaleTarget
-							: DropItemRejectedReason.StaleSource,
-					sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeDropRejectedResultFn({
+						reason:
+							error.itemId === targetItemId
+								? DropItemRejectedReason.StaleTarget
+								: DropItemRejectedReason.StaleSource,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			JobOwnerBusyError: () =>
-				makeDropRejectedResultFx({
-					reason: DropItemRejectedReason.Blocked,
-					sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeDropRejectedResultFn({
+						reason: DropItemRejectedReason.Blocked,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 		}),
 	);
 });

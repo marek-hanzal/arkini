@@ -10,7 +10,7 @@ import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx"
 import { readBoardItemLineFx } from "~/engine/line/fx/readBoardItemLineFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { selectItemsFx } from "~/engine/selector/fx/selectItemsFx";
@@ -103,7 +103,7 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 
 	const candidates: GridRuntimeItemSchema.Type[] = [];
 	for (const candidate of runtime.items) {
-		const gridCandidate = Option.getOrUndefined(yield* isGridRuntimeItemFx(candidate));
+		const gridCandidate = Option.getOrUndefined(isGridRuntimeItemFn(candidate));
 		if (
 			gridCandidate === undefined ||
 			gridCandidate.id === owner.id ||

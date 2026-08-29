@@ -8,7 +8,7 @@ import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn"
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import { readValidatedRuntimeItemFx } from "~/engine/runtime/read/readValidatedRuntimeItemFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { CurrentSpaceConflictError } from "~/engine/space/error/CurrentSpaceConflictError";
@@ -46,7 +46,7 @@ export const applySpaceItemActivationFx = Effect.fn("applySpaceItemActivationFx"
 		revision,
 		runtime,
 	});
-	const item = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeItem));
+	const item = Option.getOrUndefined(isGridRuntimeItemFn(runtimeItem));
 	if (item === undefined) {
 		return yield* Effect.fail(
 			new ItemNotOnGridError({

@@ -4,7 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { InputRunPlanInvalidError } from "~/engine/input/error/InputRunPlanInvalidError";
-import { isInputRuntimeItemFx } from "~/engine/runtime/read/isInputRuntimeItemFx";
+import { isInputRuntimeItemFn } from "~/engine/runtime/read/fn/isInputRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -33,7 +33,7 @@ export const readInputRunItemFx = Effect.fn("readInputRunItemFx")(function* ({
 		itemId,
 		runtime,
 	});
-	const item = Option.getOrUndefined(yield* isInputRuntimeItemFx(runtimeItem));
+	const item = Option.getOrUndefined(isInputRuntimeItemFn(runtimeItem));
 	const validLocation =
 		item !== undefined &&
 		item.location.ownerItemId === ownerItemId &&

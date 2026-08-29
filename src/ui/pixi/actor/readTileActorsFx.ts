@@ -12,7 +12,7 @@ import { readRuntimeItemPrimaryActionFx } from "~/engine/item-detail/read/readRu
 import { resolveActiveJobStatusFx } from "~/engine/job/fx/resolveActiveJobStatusFx";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace readTileActorsFx {
@@ -35,9 +35,7 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 			job,
 		]),
 	);
-	const gridItems = Array.getSomes(
-		yield* Effect.forEach(runtime.items, isGridRuntimeItemFx),
-	).filter((item) =>
+	const gridItems = Array.getSomes(runtime.items.map(isGridRuntimeItemFn)).filter((item) =>
 		surface === "inventory"
 			? item.location.scope === LocationScopeEnumSchema.enum.Inventory
 			: item.location.scope === LocationScopeEnumSchema.enum.Toolbar ||

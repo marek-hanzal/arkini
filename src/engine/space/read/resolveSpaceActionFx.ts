@@ -6,7 +6,7 @@ import { resolveActionRulesFx } from "~/engine/action/fx/resolveActionRulesFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { InputRun } from "~/engine/input/InputRun";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBoardOperationError";
@@ -32,7 +32,7 @@ export const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* 
 		itemId,
 		runtime,
 	});
-	const owner = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeItem));
+	const owner = Option.getOrUndefined(isGridRuntimeItemFn(runtimeItem));
 	if (owner === undefined || owner.item.type !== TypeSchema.enum.Space) {
 		return yield* Effect.fail(
 			new SpaceActionUnavailableError({

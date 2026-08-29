@@ -23,8 +23,8 @@ import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
 import { discardRuntimeItemIdentityStateFx } from "~/engine/runtime/fx/discardRuntimeItemIdentityStateFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
+import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
@@ -83,7 +83,7 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 					expectedRevision: ownerItemRevision,
 				});
 			}
-			const gridOwner = Option.getOrUndefined(yield* isGridRuntimeItemFx(owner));
+			const gridOwner = Option.getOrUndefined(isGridRuntimeItemFn(owner));
 			if (expectedOwnerLocation !== undefined) {
 				if (gridOwner === undefined) {
 					return yield* Effect.fail(
@@ -117,7 +117,7 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				entityId: runtimeSource.id,
 				expectedRevision: sourceItemRevision,
 			});
-			const source = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeSource));
+			const source = Option.getOrUndefined(isGridRuntimeItemFn(runtimeSource));
 			if (source === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({
@@ -141,8 +141,8 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 					}),
 				);
 			}
-			const boardOwner = Option.getOrUndefined(yield* isBoardRuntimeItemFx(owner));
-			const boardSource = Option.getOrUndefined(yield* isBoardRuntimeItemFx(source));
+			const boardOwner = Option.getOrUndefined(isBoardRuntimeItemFn(owner));
+			const boardSource = Option.getOrUndefined(isBoardRuntimeItemFn(source));
 			if (
 				boardOwner !== undefined &&
 				boardSource !== undefined &&
@@ -262,7 +262,7 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				itemId: ownerItemId,
 				runtime: reconciledRuntime,
 			});
-			const ownerItem = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeOwnerItem));
+			const ownerItem = Option.getOrUndefined(isGridRuntimeItemFn(runtimeOwnerItem));
 			if (ownerItem === undefined) {
 				return yield* Effect.die(
 					new Error(

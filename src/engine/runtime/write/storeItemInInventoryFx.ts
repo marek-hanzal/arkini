@@ -15,7 +15,7 @@ import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationCo
 import { applyInventoryStoragePlanFx } from "~/engine/runtime/fx/applyInventoryStoragePlanFx";
 import { planInventoryStorageFx } from "~/engine/runtime/fx/planInventoryStorageFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 
@@ -65,8 +65,8 @@ export const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(functi
 				entityId: runtimeInventory.id,
 				expectedRevision: inventoryRevision,
 			});
-			const source = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeSource));
-			const inventory = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeInventory));
+			const source = Option.getOrUndefined(isGridRuntimeItemFn(runtimeSource));
+			const inventory = Option.getOrUndefined(isGridRuntimeItemFn(runtimeInventory));
 			if (source === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({

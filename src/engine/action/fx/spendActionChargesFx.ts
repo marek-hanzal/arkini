@@ -14,7 +14,7 @@ import { outputFx } from "~/engine/output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -47,7 +47,7 @@ export const spendActionChargesFx = Effect.fn("spendActionChargesFx")(function* 
 		itemId,
 		runtime,
 	});
-	const item = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeItem));
+	const item = Option.getOrUndefined(isGridRuntimeItemFn(runtimeItem));
 	if (item === undefined) {
 		return yield* Effect.fail(
 			new ItemNotOnGridError({

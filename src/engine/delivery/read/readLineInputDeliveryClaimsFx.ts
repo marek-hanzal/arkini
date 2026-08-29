@@ -1,7 +1,7 @@
 import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { isDeliveryRuntimeItemFx } from "~/engine/runtime/read/isDeliveryRuntimeItemFx";
+import { isDeliveryRuntimeItemFn } from "~/engine/runtime/read/fn/isDeliveryRuntimeItemFn";
 import type { DeliveryRuntimeItemSchema } from "~/engine/runtime/schema/DeliveryRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -25,7 +25,7 @@ export const readLineInputDeliveryClaimsFx = Effect.fn("readLineInputDeliveryCla
 }) {
 	const claims: LineInputDeliveryClaim[] = [];
 	for (const item of runtime.items) {
-		const delivery = yield* isDeliveryRuntimeItemFx(item);
+		const delivery = isDeliveryRuntimeItemFn(item);
 		if (
 			Option.isNone(delivery) ||
 			delivery.value.location.phase !== "outbound" ||

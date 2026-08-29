@@ -1,10 +1,8 @@
-import { Effect } from "effect";
-
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { DuplicateItemIdIssueSchema } from "~/engine/runtime/schema/check/DuplicateItemIdIssueSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
-export namespace checkRuntimeItemIdsFx {
+export namespace checkRuntimeItemIdsFn {
 	export interface Props {
 		runtime: RuntimeSchema.Type;
 	}
@@ -13,9 +11,7 @@ export namespace checkRuntimeItemIdsFx {
 /**
  * Reports each live item identity owned by more than one runtime item.
  */
-export const checkRuntimeItemIdsFx = Effect.fn("checkRuntimeItemIdsFx")(function* ({
-	runtime,
-}: checkRuntimeItemIdsFx.Props) {
+export const checkRuntimeItemIdsFn = ({ runtime }: checkRuntimeItemIdsFn.Props) => {
 	const issues: DuplicateItemIdIssueSchema.Type[] = [];
 
 	for (const [index, item] of runtime.items.entries()) {
@@ -36,4 +32,4 @@ export const checkRuntimeItemIdsFx = Effect.fn("checkRuntimeItemIdsFx")(function
 	}
 
 	return issues;
-});
+};

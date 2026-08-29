@@ -6,7 +6,6 @@ import {
 	type ItemDetailOutputRuleContext,
 	readItemDetailOutputItemsFx,
 } from "~/engine/item-detail/read/readItemDetailOutputItemsFx";
-import { readItemDetailQuantityBoundsFx } from "~/engine/item-detail/read/readItemDetailQuantityBoundsFx";
 import { TypeSchema } from "~/engine/roll/schema/TypeSchema";
 import type { RollSchema } from "~/engine/roll/schema/RollSchema";
 
@@ -71,7 +70,7 @@ export const readItemDetailOutputRollFx = Effect.fn("readItemDetailOutputRollFx"
 					}
 					return {
 						kind: "weight",
-						selections: yield* readItemDetailQuantityBoundsFx(quantity),
+						selections: quantity,
 						option,
 					} satisfies ItemDetailLines.OutputRoll;
 				}),

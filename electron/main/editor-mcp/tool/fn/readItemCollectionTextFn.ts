@@ -1,8 +1,8 @@
-import { Effect } from "effect";
+import { Order } from "effect";
 
 import type { EditorProject } from "~/editor/EditorProject";
 import { searchEditorItemsFn } from "~/editor/item/fn/searchEditorItemsFn";
-import type { ItemCollectionInput } from "./ItemCollectionInputSchema";
+import type { ItemCollectionInput } from "../ItemCollectionInputSchema";
 
 const indentText = (value: string) =>
 	value
@@ -11,12 +11,9 @@ const indentText = (value: string) =>
 		.join("\n");
 
 /** Filters, pages, and formats one item_collection response. */
-export const readItemCollectionTextFx = Effect.fn("readItemCollectionTextFx")(function* (
-	project: EditorProject,
-	input: ItemCollectionInput,
-) {
+export const readItemCollectionTextFn = (project: EditorProject, input: ItemCollectionInput) => {
 	const items = Object.values(project.config.items).sort((left, right) =>
-		left.title.localeCompare(right.title),
+		Order.String(left.title, right.title),
 	);
 	const allowedTypes = input.itemTypes === undefined ? undefined : new Set(input.itemTypes);
 	const typeFilteredItems =
@@ -70,4 +67,4 @@ export const readItemCollectionTextFx = Effect.fn("readItemCollectionTextFx")(fu
 		"Items:",
 		renderedItems || "- none",
 	].join("\n");
-});
+};

@@ -13,13 +13,13 @@ import { ItemCollectionInputSchema } from "./ItemCollectionInputSchema";
 import { createItemFx } from "./createItemFx";
 import { editItemFx } from "./editItemFx";
 import { readEstimateTextFn } from "./fn/readEstimateTextFn";
-import { readItemCollectionTextFx } from "./readItemCollectionTextFx";
+import { readItemCollectionTextFn } from "./fn/readItemCollectionTextFn";
+import { readItemMetaTextFn } from "./fn/readItemMetaTextFn";
+import { readProjectTextFn } from "./fn/readProjectTextFn";
 import { readItemConfigTextFx } from "./readItemConfigTextFx";
 import { readItemDetailTextFx } from "./readItemDetailTextFx";
 import { readItemEstimateTextFx } from "./readItemEstimateTextFx";
-import { readItemMetaTextFx } from "./readItemMetaTextFx";
 import { readItemRelationTextFx } from "./readItemRelationTextFx";
-import { readProjectTextFx } from "./readProjectTextFx";
 import { registerGameplayDesignTools } from "./registerGameplayDesignTools";
 import { registerVersionTools } from "./registerVersionTools";
 
@@ -228,7 +228,7 @@ const createServer = (
 				"Summarize the project currently open in Arkini, including its identity, version, layouts, and collection sizes.",
 			inputSchema: ProjectInputSchema,
 		},
-		async () => runTool(readProjectFx().pipe(Effect.flatMap(readProjectTextFx))),
+		async () => runTool(readProjectFx().pipe(Effect.map(readProjectTextFn))),
 	);
 	server.registerTool(
 		"item_meta",
@@ -236,7 +236,7 @@ const createServer = (
 			description: "Count items in the open project by their canonical item type.",
 			inputSchema: ItemMetaInputSchema,
 		},
-		async () => runTool(readProjectFx().pipe(Effect.flatMap(readItemMetaTextFx))),
+		async () => runTool(readProjectFx().pipe(Effect.map(readItemMetaTextFn))),
 	);
 	server.registerTool(
 		"estimate",
@@ -260,7 +260,7 @@ const createServer = (
 		async (input) =>
 			runTool(
 				readProjectFx().pipe(
-					Effect.flatMap((project) => readItemCollectionTextFx(project, input)),
+					Effect.map((project) => readItemCollectionTextFn(project, input)),
 				),
 			),
 	);

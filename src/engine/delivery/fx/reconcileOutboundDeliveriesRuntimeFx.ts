@@ -1,7 +1,7 @@
 import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readDeliveryTravelDurationMsFx } from "~/engine/delivery/read/readDeliveryTravelDurationMsFx";
+import { readDeliveryTravelDurationMsFn } from "~/engine/delivery/fn/readDeliveryTravelDurationMsFn";
 import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
 import { isMaterialInputEligibleFn } from "~/engine/input/read/fn/isMaterialInputEligibleFn";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
@@ -133,7 +133,7 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 								phase: "returning" as const,
 								generation: current.location.generation + 1,
 								origin: current.location.origin,
-								remainingDurationMs: yield* readDeliveryTravelDurationMsFx({
+								remainingDurationMs: readDeliveryTravelDurationMsFn({
 									from: returnFrom,
 									to: current.location.origin,
 								}),

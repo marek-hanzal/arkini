@@ -1,9 +1,9 @@
 import { Array, Effect } from "effect";
 
+import { queryItemsFn } from "~/engine/query/fn/queryItemsFn";
 import type { UniverseSchema } from "~/engine/query/schema/UniverseSchema";
 import { getItemsFx } from "~/engine/runtime/read/getItemsFx";
 import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
-import { queryItemsFx } from "./queryItemsFx";
 
 export namespace queryUniverseFx {
 	export interface Props {
@@ -18,7 +18,7 @@ export const queryUniverseFx = Effect.fn("queryUniverseFx")(function* ({
 	const items = yield* getItemsFx();
 	const gridItems = Array.getSomes(items.map(isGridRuntimeItemFn));
 
-	return yield* queryItemsFx({
+	return queryItemsFn({
 		items: gridItems,
 		selector: query.selector,
 	});

@@ -32,7 +32,7 @@ import { readSettleDurationMsFx } from "~/ui/pixi/drag/readSettleDurationMsFx";
 import type { DropPresentation } from "~/ui/pixi/drop/DropPresentation";
 import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
 import type { MotionRuntime } from "~/ui/pixi/motion/MotionRuntime";
-import { projectMotionItemFx } from "~/ui/pixi/motion/projectMotionItemFx";
+import { projectMotionItemFn } from "~/ui/pixi/motion/fn/projectMotionItemFn";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
 import type { MainReconciler } from "~/ui/pixi/scene/MainReconciler";
@@ -367,7 +367,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			const {
 				visible: { item, pose },
 			} = arrival;
-			const displayItem = yield* projectMotionItemFx(
+			const displayItem = projectMotionItemFn(
 				item,
 				motionSnapshot.quantityPresentationByActorId.get(item.id),
 			);

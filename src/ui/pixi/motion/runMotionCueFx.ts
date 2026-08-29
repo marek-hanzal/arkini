@@ -17,7 +17,7 @@ import { runSwapMotionFx } from "~/ui/pixi/motion/runSwapMotionFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
-import { readTileMotionStaggerDelaySecondsFx } from "~/ui/tile/motion/readTileMotionStaggerDelaySecondsFx";
+import { readTileMotionStaggerDelaySecondsFn } from "~/ui/tile/motion/fn/readTileMotionStaggerDelaySecondsFn";
 import type { TargetRoute } from "~/ui/pixi/motion/MotionTarget";
 
 export namespace runMotionCueFx {
@@ -81,8 +81,7 @@ export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({
 			},
 			({ origin, target }) =>
 				Effect.gen(function* () {
-					const delayMs =
-						(yield* readTileMotionStaggerDelaySecondsFx(cue.staggerIndex)) * 1000;
+					const delayMs = readTileMotionStaggerDelaySecondsFn(cue.staggerIndex) * 1000;
 					return yield* match(cue)
 						.with(
 							{

@@ -16,7 +16,7 @@ import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
 import { chaseTargetFx } from "~/ui/pixi/motion/chaseTargetFx";
 import { createMagneticProjectorFx } from "~/ui/pixi/motion/createMagneticProjectorFx";
 import { flashMotionTargetFx } from "~/ui/pixi/motion/flashMotionTargetFx";
-import { projectMotionItemFx } from "~/ui/pixi/motion/projectMotionItemFx";
+import { projectMotionItemFn } from "~/ui/pixi/motion/fn/projectMotionItemFn";
 import { makeLiveContactPoseReaderFx } from "~/ui/pixi/motion/makeLiveContactPoseReaderFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
@@ -289,7 +289,7 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 		return;
 	}
 
-	const deliveryItem = yield* projectMotionItemFx(
+	const deliveryItem = projectMotionItemFn(
 		{
 			...sourceItem,
 			id: source === null ? `motion:${cueKey}` : sourceItem.id,
@@ -399,12 +399,10 @@ export const runInputMotionFx = Effect.fn("runInputMotionFx")(function* ({
 											actor: transient,
 											animator,
 											frames: application.frames,
-											item: RendererRuntime.runSync(
-												projectMotionItemFx(transient.item, {
-													kind: "exact",
-													quantity: cue.resultingQuantity,
-												}),
-											),
+											item: projectMotionItemFn(transient.item, {
+												kind: "exact",
+												quantity: cue.resultingQuantity,
+											}),
 											palette: readPalette(),
 											size: transient.size,
 											textures,

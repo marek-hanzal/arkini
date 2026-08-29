@@ -1,4 +1,3 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type {
@@ -7,7 +6,7 @@ import type {
 	TileStackMotionCue,
 	TileSwapMotionCue,
 } from "~/ui/pixi/motion/TileMotionCue";
-import { updateTileMotionLanesFx } from "~/ui/tile/motion/updateTileMotionLanesFx";
+import { updateTileMotionLanesFn } from "~/ui/tile/motion/fn/updateTileMotionLanesFn";
 
 const location = (x: number) => ({
 	scope: "board" as const,
@@ -83,20 +82,18 @@ const swapCue = ({
 });
 
 const enqueue = (cues: ReadonlyArray<TileMotionCue>) =>
-	Effect.runSync(
-		updateTileMotionLanesFx({
-			state: {
-				active: [],
-				pending: [],
-			},
-			action: {
-				type: "enqueue",
-				cues,
-			},
-		}),
-	);
+	updateTileMotionLanesFn({
+		state: {
+			active: [],
+			pending: [],
+		},
+		action: {
+			type: "enqueue",
+			cues,
+		},
+	});
 
-describe("updateTileMotionLanesFx", () => {
+describe("updateTileMotionLanesFn", () => {
 	it("runs independent actors concurrently and serializes a shared actor", () => {
 		const first = spawnCue({
 			sequence: 1,
@@ -122,15 +119,13 @@ describe("updateTileMotionLanesFx", () => {
 			conflict,
 		]);
 		expect(
-			Effect.runSync(
-				updateTileMotionLanesFx({
-					state,
-					action: {
-						type: "complete",
-						cue: first,
-					},
-				}),
-			).active,
+			updateTileMotionLanesFn({
+				state,
+				action: {
+					type: "complete",
+					cue: first,
+				},
+			}).active,
 		).toEqual([
 			independent,
 			conflict,
@@ -220,17 +215,15 @@ describe("updateTileMotionLanesFx", () => {
 			pending: [],
 		});
 		expect(
-			Effect.runSync(
-				updateTileMotionLanesFx({
-					state,
-					action: {
-						type: "enqueue",
-						cues: [
-							duplicateGeneration,
-						],
-					},
-				}),
-			),
+			updateTileMotionLanesFn({
+				state,
+				action: {
+					type: "enqueue",
+					cues: [
+						duplicateGeneration,
+					],
+				},
+			}),
 		).toEqual(state);
 	});
 

@@ -5,7 +5,7 @@ import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { isSameTileActorLocationFn } from "~/ui/pixi/actor/fn/isSameTileActorLocationFn";
 import { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
-import { readActorCursorFx } from "~/ui/pixi/actor/readActorCursorFx";
+import { readActorCursorFn } from "~/ui/pixi/actor/fn/readActorCursorFn";
 import type { DragPreview } from "~/ui/pixi/drag/DragPreview";
 import { readAttractionActorIdFx } from "~/ui/pixi/magnet/readAttractionActorIdFx";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
@@ -173,7 +173,7 @@ export const createDragPreviewFx = Effect.fn("createDragPreviewFx")(function* ({
 			location: sourceItem.location,
 			revision: sourceItem.revision,
 		};
-		drag.actor.container.cursor = yield* readActorCursorFx({
+		drag.actor.container.cursor = readActorCursorFn({
 			dragPolicy: "main-target-presence",
 			hasDropTarget: targetFacts.target !== null,
 			phase: "dragging",

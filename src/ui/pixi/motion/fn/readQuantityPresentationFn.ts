@@ -1,17 +1,11 @@
-import { Effect } from "effect";
-
 import type { TileMotionCue } from "~/ui/pixi/motion/TileMotionCue";
 import type { QuantityPresentation } from "~/ui/pixi/motion/QuantityPresentation";
-import type { TargetRoute } from "~/ui/pixi/motion/MotionTarget";
-import { readUnsettledTileInputSourceQuantitiesFx } from "~/ui/tile/motion/readUnsettledTileInputSourceQuantitiesFx";
+import { readUnsettledTileInputSourceQuantitiesFn } from "~/ui/tile/motion/fn/readUnsettledTileInputSourceQuantitiesFn";
 
-export namespace readQuantityPresentationFx {
+export namespace readQuantityPresentationFn {
 	export interface Props {
 		readonly cues: ReadonlyArray<TileMotionCue>;
-		readonly readTargetRoute: (
-			actorId: string,
-			location: TargetRoute["location"],
-		) => TargetRoute;
+		readonly resolvedTargetActorIdByCueKey: ReadonlyMap<string, string>;
 		readonly revealedInputCueKeys: ReadonlySet<string>;
 	}
 
@@ -24,13 +18,13 @@ export namespace readQuantityPresentationFx {
  * A later input's previous quantity already includes earlier stack events. Subtracting only stacks
  * queued before that input prevents either committed event from becoming visible before contact.
  */
-export const readQuantityPresentationFx = Effect.fn("readQuantityPresentationFx")(function* ({
+export const readQuantityPresentationFn = ({
 	cues,
-	readTargetRoute,
+	resolvedTargetActorIdByCueKey,
 	revealedInputCueKeys,
-}: readQuantityPresentationFx.Props) {
+}: readQuantityPresentationFn.Props) => {
 	const presentations = new Map<string, QuantityPresentation>();
-	const inputQuantities = yield* readUnsettledTileInputSourceQuantitiesFx({
+	const inputQuantities = readUnsettledTileInputSourceQuantitiesFn({
 		cues,
 		revealedCueKeys: revealedInputCueKeys,
 	});
@@ -42,7 +36,9 @@ export const readQuantityPresentationFx = Effect.fn("readQuantityPresentationFx"
 	const hiddenStackQuantities = new Map<string, number>();
 	for (const [index, cue] of cues.entries()) {
 		if (cue.kind !== "stack") continue;
-		const actorId = readTargetRoute(cue.targetActorId, cue.targetLocation).actorId;
+		const actorId =
+			resolvedTargetActorIdByCueKey.get(`${cue.sequence}:${cue.eventIndex}`) ??
+			cue.targetActorId;
 		const firstInputIndex = firstInputIndexByActorId.get(actorId);
 		if (firstInputIndex !== undefined && index >= firstInputIndex) continue;
 		hiddenStackQuantities.set(
@@ -63,5 +59,5 @@ export const readQuantityPresentationFx = Effect.fn("readQuantityPresentationFx"
 			quantity,
 		});
 	}
-	return presentations as readQuantityPresentationFx.Result;
-});
+	return presentations as readQuantityPresentationFn.Result;
+};

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import { readActorCursorFx } from "~/ui/pixi/actor/readActorCursorFx";
+import { readActorCursorFn } from "~/ui/pixi/actor/fn/readActorCursorFn";
 import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import { createRetargetablePoseSamplerFx } from "~/ui/pixi/animation/createRetargetablePoseSamplerFx";
 import { readSettleDurationMsFx } from "~/ui/pixi/drag/readSettleDurationMsFx";
@@ -27,7 +27,7 @@ export const settleDraggedActorFx = Effect.fn("settleDraggedActorFx")(function* 
 	surface.transientActorLayer.addChild(actor.container);
 	actor.dragging = false;
 	actor.container.zIndex = 0;
-	actor.container.cursor = yield* readActorCursorFx({
+	actor.container.cursor = readActorCursorFn({
 		phase: "idle",
 		previewKind: null,
 		running: actor.item.running,

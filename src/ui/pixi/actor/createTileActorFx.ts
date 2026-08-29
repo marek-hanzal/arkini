@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { Container, Graphics } from "pixi.js";
 
-import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import { readParticleLightSurfaceFx } from "~/ui/pixi/appearance/readParticleLightSurfaceFx";
@@ -9,7 +8,7 @@ import type { ParticleTextures } from "~/ui/pixi/actor/ParticleTextures";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { createActivityParticlesFx } from "~/ui/pixi/actor/createActivityParticlesFx";
 import { createActorVisualFx } from "~/ui/pixi/actor/createActorVisualFx";
-import { readActorCursorFx } from "~/ui/pixi/actor/readActorCursorFx";
+import { readActorCursorFn } from "~/ui/pixi/actor/fn/readActorCursorFn";
 import { readCrowdAlphaFx } from "~/ui/pixi/actor/readCrowdAlphaFx";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
@@ -36,13 +35,11 @@ export const createTileActorFx = Effect.fn("createTileActorFx")(
 				eventMode: "static",
 				label: `TileActor:${item.id}:${instanceId}`,
 			});
-			container.cursor = RendererRuntime.runSync(
-				readActorCursorFx({
-					phase: "idle",
-					previewKind: null,
-					running: item.running,
-				}),
-			);
+			container.cursor = readActorCursorFn({
+				phase: "idle",
+				previewKind: null,
+				running: item.running,
+			});
 			const lifecycleLayer = new Container({
 				eventMode: "none",
 				label: `TileActorLifecycle:${item.id}:${instanceId}`,

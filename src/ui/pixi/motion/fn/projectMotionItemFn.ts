@@ -1,4 +1,3 @@
-import { Effect } from "effect";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import type { QuantityPresentation } from "~/ui/pixi/motion/QuantityPresentation";
 
@@ -9,10 +8,10 @@ import type { QuantityPresentation } from "~/ui/pixi/motion/QuantityPresentation
  * every other badge mirrors the presented stack quantity. Keeping both fields here prevents the
  * reconciler and animation code from disagreeing.
  */
-export const projectMotionItemFx = Effect.fnUntraced(function* (
+export const projectMotionItemFn = (
 	item: TileActorItem,
 	presentation: QuantityPresentation | undefined,
-): Generator<never, TileActorItem, never> {
+): TileActorItem => {
 	if (presentation === undefined) return item;
 	const quantity =
 		presentation.kind === "exact"
@@ -28,4 +27,4 @@ export const projectMotionItemFx = Effect.fnUntraced(function* (
 					: undefined,
 		quantity,
 	};
-});
+};

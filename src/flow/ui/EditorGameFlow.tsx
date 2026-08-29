@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
-import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
+import { EditorHistoryBackButton } from "~/authoring-shell/navigation/EditorHistoryBackButton";
 import {
 	selectableActiveClassName,
 	selectableInactiveClassName,

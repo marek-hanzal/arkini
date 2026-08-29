@@ -1,9 +1,9 @@
 import { FileQuestion } from "lucide-react";
 
 import { PrimaryButton } from "~/ui/button/Button";
-import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
-import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
-import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
+import { EditorHistoryBackButton } from "~/authoring-shell/navigation/EditorHistoryBackButton";
+import { EditorSectionNavigation } from "~/authoring-shell/navigation/EditorSectionNavigation";
+import { EditorSectionPage } from "~/authoring-shell/navigation/EditorSectionPage";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
 import { EditorFormContent } from "~/ui/form/EditorFormContent";
 import { EditorAssetImageDropZone } from "~/ui/resource/editor/EditorAssetImageDropZone";

@@ -2,7 +2,7 @@ import { Effect, SubscriptionRef } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { afterAll, describe, expect, it } from "vitest";
 
-import { EditorBoardGameResourceOwnerAtom } from "~/renderer/editor/board/EditorBoardGameResourceOwnerAtom";
+import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/session/EditorBoardGameResourceOwnerAtom";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 
 afterAll(async () => {

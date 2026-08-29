@@ -5,7 +5,7 @@ import { z } from "zod";
 import { ArkiniElectronApi } from "../../../contract/ArkiniElectronApi";
 
 import { ElectronMainRuntime } from "../../ElectronMainRuntime";
-import { EditorBoardScenarioNameSchema } from "~/editor/board/EditorBoardScenarioSchema";
+import { EditorBoardScenarioNameSchema } from "~/board-scenario/EditorBoardScenarioSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { TrustedRenderer } from "../../security/TrustedRenderer";
 import type { EditorProjectServiceOwnership } from "../EditorProjectServiceOwnership";

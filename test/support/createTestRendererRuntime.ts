@@ -5,7 +5,7 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
-} from "~/editor/EditorProjectRepository";
+} from "~/project-authoring/repository/EditorProjectRepository";
 import {
 	EditorBuildRepository,
 	type EditorBuildRepositoryService,
@@ -13,10 +13,10 @@ import {
 import {
 	EditorProjectRepositoryError,
 	type EditorProjectRepositoryOperation,
-} from "~/editor/EditorProjectRepositoryError";
-import { EditorUnsavedChanges } from "~/renderer/editor/unsaved/EditorUnsavedChanges";
-import { EditorUnsavedChangesOwnerAtom } from "~/renderer/editor/unsaved/EditorUnsavedChangesOwnerAtom";
-import { createEditorUnsavedChangesOwnerFx } from "~/renderer/editor/unsaved/createEditorUnsavedChangesOwnerFx";
+} from "~/project-authoring/repository/EditorProjectRepositoryError";
+import { EditorUnsavedChanges } from "~/authoring-session/EditorUnsavedChanges";
+import { EditorUnsavedChangesOwnerAtom } from "~/authoring-session/EditorUnsavedChangesOwnerAtom";
+import { createEditorUnsavedChangesOwnerFx } from "~/authoring-session/createEditorUnsavedChangesOwnerFx";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { GameEngineResourceLayer } from "~/renderer/game/resource/GameEngineResourceLayer";
 import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";

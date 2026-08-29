@@ -4,15 +4,15 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { importEditorArkpackAssetsFx } from "~/ui/resource/editor/importEditorArkpackAssetsFx";
-import type { EditorProject } from "~/editor/EditorProject";
-import { EditorProjectAtom } from "~/ui/editor/EditorProjectAtom";
+import type { EditorProject } from "~/project-authoring/EditorProject";
+import { EditorProjectAtom } from "~/authoring-session/EditorProjectAtom";
 import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
-} from "~/editor/EditorProjectRepository";
+} from "~/project-authoring/repository/EditorProjectRepository";
 import { createTestArkpack } from "~test/arkpack/support/createTestArkpack";
 import { installTestPngDecoder } from "~test/arkpack/support/createTestPngBytes";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 const registries: Array<AtomRegistry.AtomRegistry> = [];

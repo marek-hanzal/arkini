@@ -3,14 +3,14 @@ import { Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProject } from "~/editor/EditorProject";
-import { EditorProjectAtom } from "~/ui/editor/EditorProjectAtom";
+import type { EditorProject } from "~/project-authoring/EditorProject";
+import { EditorProjectAtom } from "~/authoring-session/EditorProjectAtom";
 import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
-} from "~/editor/EditorProjectRepository";
+} from "~/project-authoring/repository/EditorProjectRepository";
 import { saveEditorItemFx } from "~/item-authoring/ui/saveEditorItemFx";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 const registries: AtomRegistry.AtomRegistry[] = [];

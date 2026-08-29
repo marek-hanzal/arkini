@@ -1,6 +1,6 @@
 import { Unlink } from "lucide-react";
 
-import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { useEditorProject } from "~/authoring-session/useEditorProject";
 import { useEditorResourceUsages } from "~/ui/resource/editor/useEditorResourceUsages";
 import { ButtonLink } from "~/ui/button/Button";
 import { Status } from "~/ui/status/Status";

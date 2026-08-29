@@ -7,7 +7,7 @@ import { readVersionHistoryFx } from "../../../../electron/main/editor-project/f
 import { writeProjectFilesFx } from "../../../../electron/main/editor-project/filesystem/fx/writeProjectFilesFx";
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 export const filesystemFailure = (method: string) =>
 	PlatformError.systemError({

@@ -17,7 +17,7 @@ vi.mock("@tanstack/react-router", () => ({
 	useNavigate: () => state.navigate,
 }));
 
-vi.mock("~/ui/editor/useEditorProject", () => ({
+vi.mock("~/authoring-session/useEditorProject", () => ({
 	useEditorProject: () => ({
 		config: {
 			items: {

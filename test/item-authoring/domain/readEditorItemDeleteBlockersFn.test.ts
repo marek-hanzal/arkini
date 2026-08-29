@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { readEditorItemDeleteBlockersFn } from "~/item-authoring/domain/fn/readEditorItemDeleteBlockersFn";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { editorTestConfig } from "~test/editor/support/editorTestPayload";
+import { editorTestConfig } from "~test/project-authoring/support/editorTestPayload";
 
 describe("readEditorItemDeleteBlockersFn", () => {
 	it("reports the exact project path that still references the item", () => {

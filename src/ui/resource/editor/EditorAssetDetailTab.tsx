@@ -2,7 +2,7 @@ import { ButtonLink } from "~/ui/button/Button";
 import {
 	editorSectionTabActiveClassName,
 	editorSectionTabClassName,
-} from "~/ui/editor/EditorSectionTabs";
+} from "~/authoring-shell/navigation/EditorSectionTabs";
 
 export const EditorAssetDetailTab = ({
 	filter,

@@ -3,9 +3,9 @@ import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { useMemo } from "react";
 
 import { searchEditorItemsFn } from "~/item-authoring/domain/fn/searchEditorItemsFn";
-import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { useEditorProject } from "~/authoring-session/useEditorProject";
 import { PrimaryButtonLink } from "~/ui/button/Button";
-import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
+import { EditorHistoryBackButton } from "~/authoring-shell/navigation/EditorHistoryBackButton";
 import { EditorItemListRow } from "~/item-authoring/ui/EditorItemListRow";
 import { Status } from "~/ui/status/Status";
 

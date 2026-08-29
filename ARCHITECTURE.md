@@ -7,26 +7,31 @@ This is the canonical map of implemented ownership and lifecycle. It does not ca
 The product dependency map is:
 
 ```text
-src/@routes → { product UI, src/ui, product renderer owners, src/renderer, product domains, exact src/engine owners, src/editor, electron/contract }
-product UI/workers → { product renderer/domain owners, exact product/shared UI owners, src/renderer, src/editor, electron/contract }
-product renderer owners → { upstream product renderer/domain owners, src/renderer, exact artifact/config/engine owners, src/editor, electron/contract }
+src/@routes → { exact product owners, src/ui, src/renderer, exact src/engine owners, electron/contract }
+product presentation/workers → { exact product runtime/core owners, exact shared UI owners, src/renderer, electron/contract }
+authoring-shell → { authoring-session, exact authoring products, src/ui, src/renderer, electron/contract }
+authoring-session → { project-authoring repository runtime, Board session, src/renderer, electron/contract }
 src/arkpack/renderer → { src/arkpack/artifact, src/game-config, exact src/renderer owners, electron/contract }
 src/editor-build/renderer → { src/editor-build/domain, exact src/arkpack owners, electron/contract }
 src/arkpack/artifact → { src/game-config, exact filesystem/version owners in src/engine }
-src/editor-build/domain → { Arkpack descriptor/version contracts, game diagnostics, shared Editor failure contract }
+src/editor-build/domain → { Arkpack descriptor/version contracts, game diagnostics, Project Authoring repository failure contract }
+project-authoring repository runtime → { Project Authoring core, src/game-config, electron/contract }
+authoring product cores → { exact upstream authoring/config/engine owners }
 src/game-config → exact authored-config and gameplay-schema owners in src/engine
-src/editor → { src/game-config, exact src/engine owners }
+src/editor/resource → { exact authored-config and engine resource owners }
 ```
 
 - `src/engine` is framework-neutral live gameplay and its exact runtime operations, plus the existing application CLI composition and narrowly owned filesystem/version contracts. It does not own authored Game source, compilation, Arkpack delivery, or Editor Build.
 - `src/game-config` owns the complete authored-game pipeline: public completed/source schemas, canonical JSON source discovery and parsing, stable JSON Schema emission, diagnostics, semantic validation, resource identity/usage/rename behavior, and completed-config compilation. `source/` stays upstream of `validation/` and `compiler/`; validation never imports compilation. The root is platform-neutral and cannot import Arkpack, Editor Build, renderer, presentation, routes, or Electron.
 - `src/arkpack` owns package delivery with explicit boundaries. `artifact/` owns exact bytes, envelope, compression, signing, provenance, trusted root, artifact schemas, and artifact CLI commands. `renderer/` owns package admission, catalog, fallback, storage contracts, and load/import lifecycle. `ui/` owns catalog and import presentation. Artifact code stays upstream of renderer and UI and never imports Editor Build.
-- `src/editor-build` owns the Editor Build product independently of shared Editor. `domain/` owns build descriptors, the Build repository capability, and install planning; `renderer/` owns the Electron proxy, exact Save request, and built-artifact admission into the Arkpack catalog; `ui/` owns Build command/diagnostic presentation. Electron main retains privileged build and filesystem publication; routes retain Build page composition.
+- `src/editor-build` owns the Editor Build product independently of Project Authoring. `domain/` owns build descriptors, the Build repository capability, and install planning; `renderer/` owns the Electron proxy, exact Save request, and built-artifact admission into the Arkpack catalog; `ui/` owns Build command/diagnostic presentation. Electron main retains privileged build and filesystem publication; routes retain Build page composition.
 - `src/item-authoring` owns authored Item forms, detail/list/delete policies, persistence commands, and Item-specific presentation. `src/flow` owns the canonical authored acquisition graph, global Flow projection, canvas, and layout worker. `src/estimate` owns static Estimate semantics, query/index projections, renderer cache, and estimate worker. Their `domain/` subtrees are platform-neutral and cannot import UI, renderer, routes, or Electron; their `ui/` and `worker/` subtrees own product-specific presentation and renderer execution boundaries.
-- `src/editor` retains shared platform-neutral project, repository, and portable authoring capabilities; it does not own Item Authoring, Flow, Estimate, or Build.
+- `src/project-authoring` owns the portable project model and repository contract, project configuration, catalog/welcome workflows, Arkpack-to-project import, and portable source export. `src/board-scenario`, `src/project-version`, and `src/project-note` independently own revision-pinned Board scenarios, the immutable version graph and checkout policies, and ordered Notes outside Versions.
+- `src/authoring-session` owns the one mounted renderer project projection, publication, refresh/replacement ordering, and cross-product unsaved-change guard. `src/authoring-mcp` owns renderer-side MCP status, settings, and checkout presentation. `src/authoring-shell` owns only cross-product Editor shell and navigation composition.
+- `src/editor/resource` temporarily retains only platform-neutral Asset/Resource authoring policies. Asset/Resource presentation and renderer validation remain in their existing exact owners until that dedicated product slice; this residual path is not a generic Editor domain.
 - `src/renderer` contains only concrete renderer-process runtime, lifecycle, concurrency, and transport capabilities. It is not a required gateway to Engine, Editor, or `electron/contract`; callers import the exact owner directly.
 - `src/ui` owns cross-product primitives and reusable presentation. Product-specific UI remains with its top-level product owner. `src/@routes` owns registration, loaders, redirects, route context, and route-specific composition; routes may share only explicitly ignored `-*` route-private helpers, never import another route module.
-- `electron/main` owns physical desktop capabilities and composes product-domain, shared Editor, and Engine owners directly. It never imports renderer or product-presentation code; concrete raw Engine authorities remain limited to their exact owners by Dependency Cruiser. `electron/preload` is transport-only; Engine, shared Editor, and product-domain code never imports Electron.
+- `electron/main` owns physical desktop capabilities and composes exact product-domain, Project Authoring repository-contract, and Engine owners directly. It never imports renderer or product-presentation code; concrete raw Engine authorities remain limited to their exact owners by Dependency Cruiser. `electron/preload` is transport-only; Engine and product-domain code never import Electron.
 
 [`.dependency-cruiser.cjs`](.dependency-cruiser.cjs) is the executable import-boundary authority. `argc dc` cruises the complete `src`, `electron`, `shared`, `scripts`, and `test` roots plus standalone TypeScript configs, so every product root participates in cycle, resolution, dependency, and orphan checks. Do not duplicate those rules in tests or prose.
 
@@ -129,7 +134,7 @@ Autosave observes changed Runtime root identity, debounces, serializes writes, a
 
 ## Editor authority
 
-One Electron-main Effect repository owns each portable project directory. The current tree is canonical; renderer context, Atoms, form drafts, object URLs, build descriptors, and Editor Board are projections. [`CONFIG.md`](CONFIG.md) owns the exact portable layout.
+One Electron-main Effect repository owns each portable project directory through the `src/project-authoring` repository contract. The current tree is canonical; `src/authoring-session`, form drafts, object URLs, build descriptors, and Editor Board are projections. [`CONFIG.md`](CONFIG.md) owns the exact portable layout.
 
 The installation catalog stores only roots, managed/external ownership, and discovery metadata; project identity comes from validated `game.json`. Startup reconciles direct managed directories without deleting unlisted roots. Invalid cataloged projects remain independently visible and blocked with their concrete error. External projects are edited in place and deletion only unregisters them; managed deletion is explicit and may remove its owned directory.
 

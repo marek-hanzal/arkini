@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import type { createEditorMcpOwnershipFx } from "../../../../electron/main/editor-mcp/http/createEditorMcpOwnershipFx";
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import {
 	expectNamedJsonSchemaGraph,

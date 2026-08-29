@@ -10,7 +10,7 @@ const state = vi.hoisted(() => ({
 	estimate: undefined as unknown,
 }));
 
-vi.mock("~/ui/editor/useEditorProject", () => ({
+vi.mock("~/authoring-session/useEditorProject", () => ({
 	useEditorProject: () => ({
 		config: {
 			items: {},

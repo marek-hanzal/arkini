@@ -8,7 +8,15 @@ const productDomainPattern = "^src/(?:item-authoring|flow|estimate|editor-build)
 const productRendererPattern = "^src/(?:arkpack|editor-build)/renderer(?:/|$)";
 const productPresentationPattern =
 	"^src/(?:item-authoring|flow|estimate)/(?:ui|worker)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)";
-const reusablePresentationPattern = `^src/ui(?:/|$)|${productPresentationPattern}`;
+const authoringProductPattern =
+	"^src/(?:project-authoring|board-scenario|project-version|project-note|authoring-mcp|authoring-session|authoring-shell)(?:/|$)";
+const authoringProductCorePattern =
+	"^src/(?:board-scenario/(?!session(?:/|$)|toolbar(?:/|$))|project-version/(?!workspace(?:/|$))|project-note/(?!workspace(?:/|$))|project-authoring/(?!configuration(?:/|$)|export(?:/|$)|welcome(?:/|$)|repository/(?:createElectronEditorProjectRepositoryFx|invokeEditorProjectTransportFx)[.]ts$))";
+const authoringProductRuntimePattern =
+	"^src/(?:board-scenario/session(?:/|$)|project-authoring/repository/(?:createElectronEditorProjectRepositoryFx|invokeEditorProjectTransportFx)[.]ts$|authoring-session/(?:EditorProjectAtom|EditorProjectReplacementEpochAtom|EditorUnsavedChanges|EditorUnsavedChangesOwnerAtom|createEditorUnsavedChangesOwnerFx|publishEditorProjectFx|refreshEditorProjectFx)[.]ts$)";
+const authoringProductPresentationPattern =
+	"^src/(?:authoring-mcp|authoring-shell)(?:/|$)|^src/(?:board-scenario/toolbar|project-version/workspace|project-note/workspace|project-authoring/(?:configuration|export|welcome))(?:/|$)|^src/authoring-session/(?:EditorProjectProvider[.]tsx|EditorProjectReplacementBoundary[.]tsx|useEditorProject[.]ts|useEditorProjectRefreshController[.]ts|useEditorUnsavedChangesRegistration[.]ts)$";
+const reusablePresentationPattern = `^src/ui(?:/|$)|${productPresentationPattern}|${authoringProductPresentationPattern}`;
 
 /** @type {import('dependency-cruiser').IForbiddenRuleType[]} */
 const boundaryRules = [
@@ -21,7 +29,7 @@ const boundaryRules = [
 			path: "^src/engine(?:/|$)",
 		},
 		to: {
-			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}`,
+			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}`,
 		},
 	},
 	{
@@ -33,7 +41,7 @@ const boundaryRules = [
 			path: gameConfigPattern,
 		},
 		to: {
-			path: `^src/(?:arkpack|editor-build|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+			path: `^src/(?:arkpack|editor-build|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
 		},
 	},
 	{
@@ -69,7 +77,7 @@ const boundaryRules = [
 			path: arkpackArtifactPattern,
 		},
 		to: {
-			path: `^src/arkpack/(?:renderer|ui)(?:/|$)|^src/editor-build(?:/|$)|^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+			path: `^src/arkpack/(?:renderer|ui)(?:/|$)|^src/editor-build(?:/|$)|^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
 		},
 	},
 	{
@@ -161,12 +169,12 @@ const boundaryRules = [
 		},
 	},
 	{
-		name: "editor-domain-no-presentation-imports",
+		name: "editor-resource-core-no-presentation-imports",
 		comment:
-			"The shared editor domain is platform-neutral and never owns Arkpack delivery, Editor Build, renderer process ownership, UI, routes, or Electron.",
+			"The residual Asset/Resource authoring policies remain platform-neutral until their dedicated product slice and never own delivery, Build, renderer process ownership, UI, routes, or Electron.",
 		severity: "error",
 		from: {
-			path: "^src/editor(?:/|$)",
+			path: "^src/editor/resource(?:/|$)",
 		},
 		to: {
 			path: `^src/(?:arkpack|editor-build|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|^electron(?:/|$)|^node_modules/electron(?:/|$)`,
@@ -181,7 +189,34 @@ const boundaryRules = [
 			path: productDomainPattern,
 		},
 		to: {
-			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductRuntimePattern}|${authoringProductPresentationPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+		},
+	},
+	{
+		name: "authoring-products-no-route-or-electron-runtime-imports",
+		comment:
+			"Project Authoring, Board Scenario, Project Version, Project Note, Authoring MCP, Authoring Session, and Authoring Shell own renderer-safe product semantics; route registration and privileged Electron runtime stay outside them.",
+		severity: "error",
+		from: {
+			path: authoringProductPattern,
+		},
+		to: {
+			path: "^src/@routes(?:/|$)|^electron(?:/|$)|^node_modules/electron(?:/|$)",
+			pathNot: [
+				"^electron/contract(?:/|$)",
+			],
+		},
+	},
+	{
+		name: "authoring-product-core-no-presentation-imports",
+		comment:
+			"Portable authoring schemas, policies, and repository contracts remain framework-neutral even when their product root also owns an explicit workspace, session, toolbar, configuration, import, export, or welcome surface.",
+		severity: "error",
+		from: {
+			path: authoringProductCorePattern,
+		},
+		to: {
+			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productPresentationPattern}|${authoringProductRuntimePattern}|${authoringProductPresentationPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
 		},
 	},
 	{
@@ -193,7 +228,7 @@ const boundaryRules = [
 			path: `^src/renderer(?:/|$)|${productRendererPattern}`,
 		},
 		to: {
-			path: `^src/(?:ui|@routes)(?:/|$)|${productPresentationPattern}`,
+			path: `^src/(?:ui|@routes)(?:/|$)|${productPresentationPattern}|${authoringProductPresentationPattern}`,
 		},
 	},
 	{
@@ -310,7 +345,7 @@ const boundaryRules = [
 			path: "^electron/main(?:/|$)",
 		},
 		to: {
-			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}`,
+			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductRuntimePattern}|${authoringProductPresentationPattern}`,
 		},
 	},
 	{
@@ -346,10 +381,10 @@ const boundaryRules = [
 	{
 		name: "domain-code-does-not-import-electron-contract",
 		comment:
-			"Framework-neutral Engine, authored Game configuration, Arkpack artifacts, shared Editor, and product domains never depend on Electron transport contracts.",
+			"Framework-neutral Engine, authored Game configuration, Arkpack artifacts, residual Asset/Resource authoring policies, and product domains never depend on Electron transport contracts.",
 		severity: "error",
 		from: {
-			path: `^src/(?:engine|editor)(?:/|$)|${gameConfigPattern}|${arkpackArtifactPattern}|${productDomainPattern}`,
+			path: `^src/(?:engine|editor)(?:/|$)|${gameConfigPattern}|${arkpackArtifactPattern}|${productDomainPattern}|${authoringProductCorePattern}`,
 		},
 		to: {
 			path: "^electron/contract(?:/|$)",

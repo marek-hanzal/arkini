@@ -3,17 +3,17 @@ import { Effect, type Semaphore } from "effect";
 
 import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
 import type { ProjectState } from "../ProjectState";
-import type { EditorProject, EditorProjectCommit } from "~/editor/EditorProject";
-import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
+import type { EditorProject, EditorProjectCommit } from "~/project-authoring/EditorProject";
+import type { EditorProjectRepositoryService } from "~/project-authoring/repository/EditorProjectRepository";
 import {
 	EditorProjectRepositoryError,
 	type EditorProjectRepositoryOperation,
-} from "~/editor/EditorProjectRepositoryError";
+} from "~/project-authoring/repository/EditorProjectRepositoryError";
 import { forceDeleteEditorItemFx } from "~/item-authoring/domain/fx/forceDeleteEditorItemFx";
 import { readEditorAssetDeleteBlockersFn } from "~/editor/resource/fn/readEditorAssetDeleteBlockersFn";
 import { readEditorItemDeleteBlockersFn } from "~/item-authoring/domain/fn/readEditorItemDeleteBlockersFn";
-import { analyzeEditorProjectCompatibilityFn } from "~/editor/version/fn/analyzeEditorProjectCompatibilityFn";
-import { bumpArkpackVersionFn } from "~/editor/version/fn/bumpArkpackVersionFn";
+import { analyzeEditorProjectCompatibilityFn } from "~/project-version/fn/analyzeEditorProjectCompatibilityFn";
+import { bumpArkpackVersionFn } from "~/project-version/fn/bumpArkpackVersionFn";
 import { GameProjectGameSchemaReference } from "~/game-config/source/GameProjectReference";
 import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";

@@ -1,19 +1,23 @@
 import { Effect } from "effect";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
-import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
-export namespace projectItemDetailReferenceFx {
-	export interface Props {
-		readonly game: GameEngine;
-		readonly itemId: IdSchema.Type;
-		readonly preferredRuntimeItemIds?: readonly IdSchema.Type[];
-		readonly runtime: RuntimeSchema.Type;
-	}
+/** Artwork-backed navigation identity for one configured Item and an optional exact live target. */
+export interface ItemDetailReference {
+	readonly itemId: string;
+	readonly title: string;
+	readonly sourceUrl: string;
+	readonly compositeUrl?: string;
+	readonly detailItemId?: string;
+}
 
-	export type Result = ItemDetailLines.DetailReference | undefined;
+interface ProjectItemDetailReferenceProps {
+	readonly game: GameEngine;
+	readonly itemId: IdSchema.Type;
+	readonly preferredRuntimeItemIds?: readonly IdSchema.Type[];
+	readonly runtime: RuntimeSchema.Type;
 }
 
 /** Projects one configured item and its preferred live identity into an Item Detail reference. */
@@ -22,7 +26,7 @@ export const projectItemDetailReferenceFx = Effect.fn("projectItemDetailReferenc
 	itemId,
 	preferredRuntimeItemIds = [],
 	runtime,
-}: projectItemDetailReferenceFx.Props) {
+}: ProjectItemDetailReferenceProps) {
 	const configured = game.config.items[itemId];
 	if (configured === undefined) return undefined;
 	const live = preferredRuntimeItemIds
@@ -43,5 +47,5 @@ export const projectItemDetailReferenceFx = Effect.fn("projectItemDetailReferenc
 			: {
 					detailItemId: live.id,
 				}),
-	} satisfies projectItemDetailReferenceFx.Result;
+	} satisfies ItemDetailReference;
 });

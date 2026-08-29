@@ -5,6 +5,7 @@ const applicationEntrypointPattern = "^src/(?:main|createArkiniRouterFx|_route)[
 const gameEventPattern = "^src/game-event(?:/|$)";
 const gameConfigPattern = "^src/game-config(?:/|$)";
 const gameStartPattern = "^src/game-start(?:/|$)";
+const itemDetailFramePattern = "^src/item-detail-frame(?:/|$)";
 const itemDefinitionPattern = "^src/item-definition(?:/|$)";
 const arkpackArtifactPattern = "^src/arkpack/(?:ArkpackDescriptor[.]ts$|artifact(?:/|$))";
 const productionPipelinePattern =
@@ -13,9 +14,9 @@ const productDomainPattern =
 	"^src/(?:asset-authoring|item-authoring|flow|estimate|editor-build)/domain(?:/|$)";
 const productRendererPattern =
 	"^src/(?:arkpack|editor-build)/renderer(?:/|$)|^src/asset-authoring/(?:session|validation)(?:/|$)";
+const productionJobPresentationPattern = "^src/production-job/ui(?:/|$)";
 const boardSpatialPattern = "^src/(?:item-location|item-placement|item-merge|space-action)(?:/|$)";
-const productPresentationPattern =
-	"^src/(?:asset-authoring|item-authoring|flow|estimate)/(?:ui|worker)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)";
+const productPresentationPattern = `^src/(?:asset-authoring|item-authoring|flow|estimate)/(?:ui|worker)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)|${itemDetailFramePattern}|${productionJobPresentationPattern}`;
 const authoringProductPattern =
 	"^src/(?:project-authoring|board-scenario|project-version|project-note|authoring-mcp|authoring-session|authoring-shell)(?:/|$)";
 const authoringProductCorePattern =
@@ -165,9 +166,36 @@ const boundaryRules = [
 		severity: "error",
 		from: {
 			path: productionPipelinePattern,
+			pathNot: [
+				productionJobPresentationPattern,
+			],
 		},
 		to: {
 			path: `^src/(?:game-config|arkpack|asset-authoring|editor-build|item-authoring|flow|estimate|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+		},
+	},
+	{
+		name: "production-job-presentation-is-read-only",
+		comment:
+			"Active-job UI presents public job status through shared frame/UI policy and never imports public gameplay command surfaces.",
+		severity: "error",
+		from: {
+			path: productionJobPresentationPattern,
+		},
+		to: {
+			path: "^src/(?:production-input|production-job|production-line)/write(?:/|$)",
+		},
+	},
+	{
+		name: "item-detail-frame-owns-visible-orchestration-only",
+		comment:
+			"Item Detail Frame owns target lifecycle, command settlement, retained presentation, and reference navigation without importing dialog areas or public gameplay command surfaces.",
+		severity: "error",
+		from: {
+			path: itemDetailFramePattern,
+		},
+		to: {
+			path: "^src/ui/item-detail(?:/|$)|^src/(?:production-input|production-job|production-line)/write(?:/|$)",
 		},
 	},
 	{

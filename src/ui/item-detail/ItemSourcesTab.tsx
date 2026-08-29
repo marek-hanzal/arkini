@@ -4,7 +4,7 @@ import type { useItemDetailSources } from "~/ui/item-detail/useItemDetailSources
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { ItemIdentity } from "~/ui/item/ItemIdentity";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
-import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
+import { useItemDetailControl } from "~/item-detail-frame/useItemDetailControl";
 
 const SourceRow = ({
 	disabled,

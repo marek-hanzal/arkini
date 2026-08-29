@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
 import { projectItemDetailInputFx } from "~/ui/item-detail/projectItemDetailInputFx";
-import { projectItemDetailReferenceFx } from "~/ui/item-detail/projectItemDetailReferenceFx";
+import { projectItemDetailReferenceFx } from "~/item-detail-frame/projectItemDetailReferenceFx";
 import { projectItemDetailSelectorFn } from "~/ui/item-detail/fn/projectItemDetailSelectorFn";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemDetailLines as EngineItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines";

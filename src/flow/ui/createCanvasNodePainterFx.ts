@@ -6,7 +6,7 @@ import {
 	type EditorItemOriginItemNode,
 	type EditorItemOriginOperationKind,
 } from "~/flow/domain/EditorItemOriginFlow";
-import { ItemTypeLabel } from "~/ui/item-detail/ItemInfoPresentation";
+import { ItemTypeLabel } from "~/item-definition/ItemDefinitionLabels";
 import type { LayoutNode } from "~/flow/worker/Layout";
 import { createCanvasArtworkPainterFx } from "~/flow/ui/createCanvasArtworkPainterFx";
 import { createCanvasTextPainterFx } from "~/flow/ui/createCanvasTextPainterFx";

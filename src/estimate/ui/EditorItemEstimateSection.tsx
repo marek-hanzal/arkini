@@ -6,7 +6,7 @@ import type {
 	EditorItemEstimateDiagnostic,
 } from "~/estimate/domain/EditorItemEstimate";
 import type { EditorAcquisitionLimitation } from "~/flow/domain/EditorAcquisitionGraph";
-import { formatItemDurationFn } from "~/ui/item-detail/fn/formatItemDurationFn";
+import { formatDurationFn } from "~/ui/formatDurationFn";
 import { EditorItemEstimateRouteGraph } from "~/estimate/ui/EditorItemEstimateRouteGraph";
 import { useEditorItemEstimate } from "~/estimate/ui/useEditorItemEstimate";
 import { Tooltip } from "~/ui/overlay/Tooltip";
@@ -15,7 +15,7 @@ import { Status } from "~/ui/status/Status";
 const formatQuantity = (quantity: number) =>
 	Number.isInteger(quantity) ? String(quantity) : quantity.toFixed(2).replace(/\.00$/, "");
 
-const formatRuntime = (runtimeMs: number) => formatItemDurationFn(runtimeMs);
+const formatRuntime = (runtimeMs: number) => formatDurationFn(runtimeMs);
 
 const diagnosticText = (diagnostic: EditorItemEstimateDiagnostic) => {
 	switch (diagnostic.kind) {

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { ItemInfoFact, ItemInfoFacts } from "~/ui/item-detail/ItemInfoPresentation";
+import { Fact, FactList } from "~/ui/fact/FactList";
 
 export const DetailSection = ({
 	children,
@@ -23,7 +23,7 @@ export const DetailSection = ({
 );
 
 export const DetailFacts = ({ children }: { readonly children: ReactNode }) => (
-	<ItemInfoFacts>{children}</ItemInfoFacts>
+	<FactList>{children}</FactList>
 );
 
 export const DetailFact = ({
@@ -35,7 +35,7 @@ export const DetailFact = ({
 	readonly mono?: boolean;
 	readonly value: ReactNode;
 }) => (
-	<ItemInfoFact
+	<Fact
 		label={label}
 		mono={mono}
 		value={value}

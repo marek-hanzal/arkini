@@ -1,22 +1,20 @@
 import { AnimatePresence, motion } from "motion/react";
 
 import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
-import { itemDetailFadeMotion } from "~/ui/item-detail/ItemDetailMotion";
-
-export interface ItemRuntimeValue {
-	readonly value: string;
-	readonly detail: string;
-}
+import { itemDetailFadeMotion } from "~/item-detail-frame/ItemDetailMotion";
 
 /** Renders the shared runtime value used by Lines and Queue cards. */
-export const ItemRuntime = ({
+export const ProductionJobRuntime = ({
 	dataUi,
 	jobStatus,
 	runtime,
 }: {
 	readonly dataUi: string;
 	readonly jobStatus: JobStatusEnumSchema.Type | "idle";
-	readonly runtime: ItemRuntimeValue;
+	readonly runtime: {
+		readonly value: string;
+		readonly detail: string;
+	};
 }) => (
 	<div
 		className="grid min-w-32 grid-rows-[1rem_1.5rem_1rem] text-right"

@@ -1,8 +1,10 @@
 import { Effect } from "effect";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
-import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
-import { projectItemDetailReferenceFx } from "~/ui/item-detail/projectItemDetailReferenceFx";
+import {
+	type ItemDetailReference,
+	projectItemDetailReferenceFx,
+} from "~/item-detail-frame/projectItemDetailReferenceFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readItemDetailQueueFx } from "~/engine/item-detail/read/readItemDetailQueueFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -19,7 +21,7 @@ type ProjectedWork<
 		readonly outputItemId?: IdSchema.Type;
 	},
 > = Omit<Work, "outputItemId"> & {
-	readonly identity?: ItemDetailLines.DetailReference;
+	readonly identity?: ItemDetailReference;
 };
 
 export namespace projectItemDetailQueueFx {

@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
-import { projectItemDetailReferenceFx } from "~/ui/item-detail/projectItemDetailReferenceFx";
+import { projectItemDetailReferenceFx } from "~/item-detail-frame/projectItemDetailReferenceFx";
 import { projectItemDetailSelectorFn } from "~/ui/item-detail/fn/projectItemDetailSelectorFn";
 import type { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";

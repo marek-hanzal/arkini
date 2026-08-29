@@ -14,17 +14,17 @@ import { resolveItemDetailTargetFn } from "~/engine/item-detail/fn/resolveItemDe
 import { readItemDetailTabsFn } from "~/engine/item-detail/fn/readItemDetailTabsFn";
 import { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetailSourcesFx";
 import { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
-import type { RunItemDetailPendingActionProps } from "~/ui/item-detail/ItemDetailPendingActionOwner";
-import { createItemDetailCommandAtom } from "~/ui/item-detail/createItemDetailCommandAtom";
+import type { RunItemDetailPendingActionProps } from "~/item-detail-frame/ItemDetailControl";
+import { createItemDetailCommandAtom } from "~/item-detail-frame/createItemDetailCommandAtom";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
-import { createItemDetailControllerFx } from "~/ui/item-detail/createItemDetailControllerFx";
-import { ItemDetailContext } from "~/ui/item-detail/ItemDetailContext";
+import { createItemDetailControllerFx } from "~/item-detail-frame/createItemDetailControllerFx";
+import { ItemDetailContext } from "~/item-detail-frame/ItemDetailContext";
 import type {
 	ItemDetailControl,
 	OpenItemDefinitionDetailProps,
 	OpenItemDetailProps,
 	SelectRetainedItemDetailTabProps,
-} from "~/ui/item-detail/ItemDetailControl";
+} from "~/item-detail-frame/ItemDetailControl";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 
 /**

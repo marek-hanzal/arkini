@@ -2,8 +2,8 @@ import { useEffect, useRef } from "react";
 import { match } from "ts-pattern";
 
 import { RendererRuntime } from "~/renderer/RendererRuntime";
-import type { ItemDetailState } from "~/ui/item-detail/ItemDetailControl";
-import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
+import type { ItemDetailState } from "~/item-detail-frame/ItemDetailControl";
+import { useItemDetailControl } from "~/item-detail-frame/useItemDetailControl";
 
 const visibleDialog = {
 	opacity: 1,

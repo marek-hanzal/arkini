@@ -2,15 +2,29 @@ import type { Effect } from "effect";
 import type * as Atom from "effect/unstable/reactivity/Atom";
 
 import type { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
-import type {
-	ItemDetailPendingAction,
-	RunItemDetailPendingActionProps,
-} from "~/ui/item-detail/ItemDetailPendingActionOwner";
 
-export type {
-	ItemDetailPendingAction,
-	RunItemDetailPendingActionProps,
-} from "~/ui/item-detail/ItemDetailPendingActionOwner";
+export type ItemDetailPendingAction =
+	| "autofill"
+	| "clear-queue"
+	| "default"
+	| "enqueue"
+	| "withdraw";
+
+export interface RunItemDetailPendingActionProps<Result = unknown, Failure = unknown> {
+	readonly key: string;
+	readonly action: ItemDetailPendingAction;
+	readonly failureMessage: string;
+	readonly run: Effect.Effect<Result, Failure>;
+}
+
+/** Narrow command-settlement capability shared by Item Detail command bindings. */
+export interface ItemDetailPendingActionOwner {
+	readonly readActionError: (key: string) => string | null;
+	readonly readPendingAction: (key: string) => ItemDetailPendingAction | null;
+	readonly runPendingAction: <Result, Failure>(
+		props: RunItemDetailPendingActionProps<Result, Failure>,
+	) => void;
+}
 
 export type ItemDetailTarget =
 	| {
@@ -71,13 +85,8 @@ export interface SelectRetainedItemDetailTabProps {
 }
 
 /** Canvas-local owner for one exact capability-tabbed Item Detail modal. */
-export interface ItemDetailControl {
+export interface ItemDetailControl extends ItemDetailPendingActionOwner {
 	readonly state: ItemDetailState;
-	readonly readActionError: (key: string) => string | null;
-	readonly readPendingAction: (key: string) => ItemDetailPendingAction | null;
-	readonly runPendingAction: <Result, Failure>(
-		props: RunItemDetailPendingActionProps<Result, Failure>,
-	) => void;
 	readonly openItemDetailFx: (props: OpenItemDetailProps) => Effect.Effect<boolean>;
 	readonly openItemDefinitionDetailFx: (
 		props: OpenItemDefinitionDetailProps,

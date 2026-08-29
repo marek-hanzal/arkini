@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 import type { ReactNode } from "react";
 
 import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
-import { ItemReferenceButton } from "~/ui/item-detail/ItemReferenceButton";
+import { ItemReferenceButton } from "~/item-detail-frame/ItemReferenceButton";
 
 const ItemLineOutputItem = ({
 	disabled,

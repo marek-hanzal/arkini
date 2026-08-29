@@ -6,10 +6,12 @@ import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { ItemLocationConflictError } from "~/game-runtime/error/ItemLocationConflictError";
+import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { isItemLocationScopeAllowedFn } from "~/item-location/fn/isItemLocationScopeAllowedFn";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
@@ -19,8 +21,9 @@ import type { DropItemResult } from "~/item-interaction/DropItemResult";
 import { DropItemResultKind } from "~/item-interaction/DropItemResult";
 import { makeDropRejectedResultFn } from "~/item-interaction/drop/fn/makeDropRejectedResultFn";
 import { projectDropTransferActorFn } from "~/item-interaction/drop/fn/projectDropTransferActorFn";
-import { applyInventoryStoragePlanFx } from "~/item-interaction/fx/applyInventoryStoragePlanFx";
+import type { InventoryStoragePlan } from "~/item-interaction/fx/planInventoryStorageFx";
 import { planInventoryStorageFx } from "~/item-interaction/fx/planInventoryStorageFx";
+import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";
 
 /** One canonical item cannot own a passive Inventory location. */
 class ItemInventoryStorageUnavailableError extends Data.TaggedError(
@@ -39,6 +42,42 @@ interface StoreItemInInventoryResult {
 	readonly sourceAfter?: GridRuntimeItemSchema.Type;
 	readonly inventoryItem: GridRuntimeItemSchema.Type;
 }
+
+const applyInventoryStoragePlanFx = Effect.fn("applyInventoryStoragePlanFx")(function* ({
+	item,
+	plan,
+	runtime,
+}: {
+	readonly item: GridRuntimeItemSchema.Type;
+	readonly plan: InventoryStoragePlan;
+	readonly runtime: RuntimeSchema.Type;
+}) {
+	if (plan.kind === "pure") {
+		const [, nextRuntime] = yield* applyPlacementPlanFx({
+			plan: plan.plan,
+			runtime: plan.detachedRuntime,
+		});
+		return {
+			current: null,
+			runtime: nextRuntime,
+		} as const;
+	}
+	const revisedItem = yield* reviseRuntimeItemFx({
+		item: {
+			...item,
+			location: plan.location,
+		} satisfies GridRuntimeItemSchema.Type,
+	});
+	return {
+		current: revisedItem,
+		runtime: {
+			...runtime,
+			items: runtime.items.map((candidate) =>
+				candidate.id === item.id ? revisedItem : candidate,
+			),
+		} satisfies RuntimeSchema.Type,
+	} as const;
+});
 
 const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(function* (
 	props: commitStoreInventoryDropFx.Props,

@@ -7,7 +7,6 @@ import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationCl
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { assertPlacementMaxCountFx } from "~/item-placement/fx/assertPlacementMaxCountFx";
-import { LocationOccupiedError } from "~/item-interaction/error/LocationOccupiedError";
 import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
 import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -15,6 +14,11 @@ import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 
 class ItemAlreadyExistsError extends Data.TaggedError("ItemAlreadyExistsError")<{
 	itemId: IdSchema.Type;
+}> {}
+
+class TestLocationOccupiedError extends Data.TaggedError("TestLocationOccupiedError")<{
+	itemId: IdSchema.Type;
+	location: GridLocationSchema.Type;
 }> {}
 
 export namespace spawnItemFx {
@@ -67,7 +71,7 @@ export const spawnItemFx = Effect.fn("spawnItemFx")(function* ({
 			});
 			if (claim !== undefined) {
 				return yield* Effect.fail(
-					new LocationOccupiedError({
+					new TestLocationOccupiedError({
 						itemId: claim.itemId,
 						location,
 					}),

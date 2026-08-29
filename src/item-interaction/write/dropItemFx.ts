@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import { commitMergeDropFx } from "~/item-interaction/drop/commitMergeDropFx";
 import { commitMoveDropFx } from "~/item-interaction/drop/commitMoveDropFx";
 import { commitStackDropFx } from "~/item-interaction/drop/commitStackDropFx";
@@ -10,8 +9,6 @@ import { commitStoreInputDropFx } from "~/item-interaction/drop/commitStoreInput
 import { commitSwapDropFx } from "~/item-interaction/drop/commitSwapDropFx";
 import { readDropItemPreviewFx } from "~/item-interaction/read/readDropItemPreviewFx";
 import type { DropItemCommand } from "~/item-interaction/DropItemCommand";
-import { DropItemIgnoredReason } from "~/item-interaction/DropItemResult";
-import { DropItemRejectedReason } from "~/item-interaction/DropItemResult";
 import type { DropItemResult } from "~/item-interaction/DropItemResult";
 import { DropItemResultKind } from "~/item-interaction/DropItemResult";
 
@@ -35,28 +32,6 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 	sourceLocation,
 	target,
 }: dropItemFx.Props) {
-	if (target.kind === "unsupported") {
-		return {
-			kind: DropItemResultKind.Reject,
-			reason: DropItemRejectedReason.UnsupportedTarget,
-			itemId: sourceItemId,
-		} satisfies dropItemFx.Result;
-	}
-
-	if (
-		isSameGridLocationFn({
-			left: sourceLocation,
-			right: target.location,
-		})
-	) {
-		return {
-			kind: DropItemResultKind.Ignored,
-			reason: DropItemIgnoredReason.SameLocation,
-			itemId: sourceItemId,
-			location: sourceLocation,
-		} satisfies dropItemFx.Result;
-	}
-
 	const preflight = yield* readDropItemPreviewFx({
 		sourceItemId,
 		sourceRevision,
@@ -68,24 +43,25 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 			kind: DropItemResultKind.Reject,
 			reason: preflight.reason,
 			itemId: sourceItemId,
-			...(target.occupant === null
-				? {}
-				: {
+			...(target.kind === "slot" && target.occupant !== null
+				? {
 						targetItemId: target.occupant.itemId,
-					}),
+					}
+				: {}),
 		} satisfies dropItemFx.Result;
 	}
-	if (target.inputStore !== undefined && preflight.kind !== DropItemResultKind.StoreInput) {
+	if (preflight.kind === DropItemResultKind.Ignored) {
 		return {
-			kind: DropItemResultKind.Reject,
-			reason: DropItemRejectedReason.Blocked,
+			kind: DropItemResultKind.Ignored,
+			reason: preflight.reason,
 			itemId: sourceItemId,
-			...(target.occupant === null
-				? {}
-				: {
-						targetItemId: target.occupant.itemId,
-					}),
+			location: sourceLocation,
 		} satisfies dropItemFx.Result;
+	}
+	if (target.kind === "unsupported") {
+		return yield* Effect.die(
+			new Error(`Unsupported drop target unexpectedly resolved as "${preflight.kind}".`),
+		);
 	}
 
 	if (target.occupant === null) {
@@ -180,17 +156,6 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 		.with(
 			{
 				kind: DropItemResultKind.Move,
-			},
-			(unexpected) =>
-				Effect.die(
-					new Error(
-						`Occupied drop preview unexpectedly resolved as "${unexpected.kind}".`,
-					),
-				),
-		)
-		.with(
-			{
-				kind: DropItemResultKind.Ignored,
 			},
 			(unexpected) =>
 				Effect.die(

@@ -1,4 +1,4 @@
-import { Array, Effect, Option, pipe } from "effect";
+import { Array, Data, Effect, Option, pipe } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/engine/item/error/ItemNotFoundError";
@@ -20,7 +20,11 @@ import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnu
 import { DropItemRejectedReason } from "~/item-interaction/DropItemResult";
 import type { DropItemResult } from "~/item-interaction/DropItemResult";
 import { DropItemResultKind } from "~/item-interaction/DropItemResult";
-import { LocationOccupiedError } from "~/item-interaction/error/LocationOccupiedError";
+
+class LocationOccupiedError extends Data.TaggedError("LocationOccupiedError")<{
+	readonly itemId: IdSchema.Type;
+	readonly location: GridLocationSchema.Type;
+}> {}
 
 interface MoveItemProps {
 	readonly itemId: IdSchema.Type;

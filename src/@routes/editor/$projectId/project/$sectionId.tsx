@@ -2,8 +2,12 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Effect, Option } from "effect";
 
 import { parseEditorProjectSectionIdFx } from "~/@routes/editor/$projectId/project/-parseEditorProjectSectionIdFx";
-import { EditorProjectSectionPage } from "~/ui/project/editor/EditorProjectSectionPage";
+import { EditorProjectAppearanceSection } from "~/ui/project/editor/EditorProjectAppearanceSection";
+import { EditorProjectBoardSection } from "~/ui/project/editor/EditorProjectBoardSection";
+import { EditorProjectGeneralSection } from "~/ui/project/editor/EditorProjectGeneralSection";
+import { EditorProjectInventorySection } from "~/ui/project/editor/EditorProjectInventorySection";
 import type { EditorProjectSectionId } from "~/ui/project/editor/EditorProjectSections";
+import { EditorProjectToolbarSection } from "~/ui/project/editor/EditorProjectToolbarSection";
 
 interface EditorProjectSectionSearch {
 	readonly avatar?: number;
@@ -35,11 +39,17 @@ export const Route = createFileRoute("/editor/$projectId/project/$sectionId")({
 	component: () => {
 		const { sectionId } = Route.useParams();
 		const { avatar } = Route.useSearch();
-		return (
-			<EditorProjectSectionPage
-				avatarIndex={avatar}
-				section={sectionId as EditorProjectSectionId}
-			/>
-		);
+		switch (sectionId as EditorProjectSectionId) {
+			case "general":
+				return <EditorProjectGeneralSection />;
+			case "appearance":
+				return <EditorProjectAppearanceSection initialAvatarIndex={avatar ?? 0} />;
+			case "board":
+				return <EditorProjectBoardSection />;
+			case "toolbar":
+				return <EditorProjectToolbarSection />;
+			case "inventory":
+				return <EditorProjectInventorySection />;
+		}
 	},
 });

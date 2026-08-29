@@ -1,7 +1,7 @@
 import { Cause, Effect, Option } from "effect";
 
 import type { PlayableGame } from "~/renderer/game/PlayableGame";
-import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
+import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 
 /** Projects one renderer command failure while preserving interruption and fail-stop semantics. */
 export const settleRendererCommandFailureFx = Effect.fn("settleRendererCommandFailureFx")(

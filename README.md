@@ -53,6 +53,7 @@ src/asset-authoring  Asset catalog, validation, import/edit/delete sessions and 
 src/item-authoring  authored Item domain and product UI
 src/flow      authored acquisition graph, global Flow and layout worker
 src/estimate  static Estimate domain, projections, cache and worker
+src/application-diagnostics  shared renderer-side failure extraction, diagnostic normalization and transport policy
 src/renderer  concrete renderer-process runtime, lifecycle and transport capabilities
 src/ui        cross-product primitives and reusable React/Pixi presentation
 src/@routes   TanStack Router registration, lifecycle and route-specific composition

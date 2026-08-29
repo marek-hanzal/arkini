@@ -3,7 +3,7 @@ import { Deferred, Effect, Exit, Option, Ref, Scope, type Semaphore } from "effe
 import type { CriticalGameLifecycleError } from "~/renderer/game/resource/CriticalGameLifecycleError";
 import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
 import type { GameEngineResourceFxService } from "~/renderer/game/resource/GameEngineResourceFx";
-import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
+import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import type { GameSaveStorage } from "~/engine/save/GameSaveStorage";
 import type {
 	Finalization,

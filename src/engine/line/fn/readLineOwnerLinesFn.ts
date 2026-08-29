@@ -1,14 +1,11 @@
-import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import type { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import type { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
 
 /** Reads the canonical authored lines owned by one exact line-capable item. */
-export const readLineOwnerLinesFx = Effect.fn("readLineOwnerLinesFx")(function* (
-	item: isLineOwnerItemFx.Result,
-) {
-	return match(item)
+export const readLineOwnerLinesFn = (item: isLineOwnerItemFn.Result) =>
+	match(item)
 		.with(
 			{
 				type: TypeSchema.enum.Deposit,
@@ -46,4 +43,3 @@ export const readLineOwnerLinesFx = Effect.fn("readLineOwnerLinesFx")(function* 
 			],
 		)
 		.exhaustive();
-});

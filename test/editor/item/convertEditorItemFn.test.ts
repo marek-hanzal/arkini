@@ -1,11 +1,10 @@
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import type { LineSchema } from "~/engine/line/schema/LineSchema";
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { convertEditorItemFx } from "~/editor/item/fx/convertEditorItemFx";
+import { convertEditorItemFn } from "~/editor/item/fn/convertEditorItemFn";
 import { createEditorItemDraftFn } from "~/editor/item/fn/createEditorItemDraftFn";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import type { LineSchema } from "~/engine/line/schema/LineSchema";
 
 const createItem = (type: (typeof TypeSchema.options)[number]): ItemSchema.Type => ({
 	...createEditorItemDraftFn({
@@ -17,14 +16,13 @@ const createItem = (type: (typeof TypeSchema.options)[number]): ItemSchema.Type 
 	description: "A valid item used by conversion tests.",
 });
 
-describe("convertEditorItem", () => {
+describe("convertEditorItemFn", () => {
 	it("produces a valid target for every supported conversion", () => {
 		for (const sourceType of TypeSchema.options) {
 			for (const targetType of TypeSchema.options) {
 				expect(
-					ItemSchema.safeParse(
-						Effect.runSync(convertEditorItemFx(createItem(sourceType), targetType)),
-					).success,
+					ItemSchema.safeParse(convertEditorItemFn(createItem(sourceType), targetType))
+						.success,
 				).toBe(true);
 			}
 		}
@@ -33,7 +31,7 @@ describe("convertEditorItem", () => {
 	it("preserves a craft line when promoted to a producer", () => {
 		const craft = createItem("craft");
 		if (craft.type !== "craft") throw new Error("Expected craft fixture.");
-		const producer = Effect.runSync(convertEditorItemFx(craft, "producer"));
+		const producer = convertEditorItemFn(craft, "producer");
 
 		expect(producer.type).toBe("producer");
 		if (producer.type !== "producer") throw new Error("Expected producer conversion.");
@@ -62,7 +60,7 @@ describe("convertEditorItem", () => {
 				LineSchema.Type,
 			],
 		};
-		const craft = Effect.runSync(convertEditorItemFx(source, "craft"));
+		const craft = convertEditorItemFn(source, "craft");
 
 		expect(craft.type).toBe("craft");
 		if (craft.type !== "craft") throw new Error("Expected craft conversion.");
@@ -71,7 +69,7 @@ describe("convertEditorItem", () => {
 
 	it("trims specialized fields when converted to a simple item", () => {
 		const producer = createItem("producer");
-		const simple = Effect.runSync(convertEditorItemFx(producer, "simple"));
+		const simple = convertEditorItemFn(producer, "simple");
 
 		expect(simple).toMatchObject({
 			id: producer.id,
@@ -91,7 +89,7 @@ describe("convertEditorItem", () => {
 			maxStackSize: 20,
 			scope: "inventory" as const,
 		};
-		const inventory = Effect.runSync(convertEditorItemFx(simple, "inventory"));
+		const inventory = convertEditorItemFn(simple, "inventory");
 
 		expect(inventory).toMatchObject({
 			maxCount: 1,

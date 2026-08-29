@@ -2,7 +2,7 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { DefaultLineQueueUnavailableError } from "~/engine/job/error/DefaultLineQueueUnavailableError";
-import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
+import { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
 import { readEffectiveDefaultLineFx } from "~/engine/line/read/readEffectiveDefaultLineFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -23,7 +23,7 @@ export const readDefaultLineQueueTargetFx = Effect.fn("readDefaultLineQueueTarge
 		itemId: ownerItemId,
 		runtime,
 	});
-	const ownerItem = Option.getOrUndefined(yield* isLineOwnerItemFx(owner.item));
+	const ownerItem = Option.getOrUndefined(isLineOwnerItemFn(owner.item));
 	if (ownerItem === undefined) {
 		return yield* Effect.fail(
 			new DefaultLineQueueUnavailableError({

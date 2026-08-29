@@ -1,16 +1,15 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readAuthoredItemLinesFx } from "~/engine/line/read/readAuthoredItemLinesFx";
 import { CraftSchema } from "~/engine/item/schema/CraftSchema";
 import { DepositSchema } from "~/engine/item/schema/DepositSchema";
+import { readAuthoredItemLinesFn } from "~/engine/line/fn/readAuthoredItemLinesFn";
 import {
 	createLine,
 	createProducerItem,
 	createSimpleItem,
 } from "~test/validation/support/gameValidationTestSource";
 
-describe("readAuthoredItemLinesFx", () => {
+describe("readAuthoredItemLinesFn", () => {
 	it("uses one narrowing contract for single-line, multi-line, and optional deposits", () => {
 		const singleLine = createLine({
 			id: "line:single",
@@ -46,13 +45,13 @@ describe("readAuthoredItemLinesFx", () => {
 			type: "deposit",
 		});
 
-		expect(Effect.runSync(readAuthoredItemLinesFx(craft))).toEqual([
+		expect(readAuthoredItemLinesFn(craft)).toEqual([
 			singleLine,
 		]);
-		expect(Effect.runSync(readAuthoredItemLinesFx(producer))).toEqual(multiLine);
-		expect(Effect.runSync(readAuthoredItemLinesFx(deposit))).toEqual([
+		expect(readAuthoredItemLinesFn(producer)).toEqual(multiLine);
+		expect(readAuthoredItemLinesFn(deposit)).toEqual([
 			singleLine,
 		]);
-		expect(Effect.runSync(readAuthoredItemLinesFx(passiveDeposit))).toEqual([]);
+		expect(readAuthoredItemLinesFn(passiveDeposit)).toEqual([]);
 	});
 });

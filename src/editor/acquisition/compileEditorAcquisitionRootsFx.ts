@@ -4,7 +4,7 @@ import type {
 	EditorAcquisitionGraph,
 	EditorAcquisitionLimitation,
 } from "~/editor/EditorAcquisitionGraph";
-import { readAuthoredItemLinesFx } from "~/engine/line/read/readAuthoredItemLinesFx";
+import { readAuthoredItemLinesFn } from "~/engine/line/fn/readAuthoredItemLinesFn";
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
@@ -32,7 +32,7 @@ const readItemOutputsFx = Effect.fn("compileEditorAcquisitionRootsFx.itemOutputs
 	item: ItemSchema.Type,
 ) {
 	return [
-		...(yield* readAuthoredItemLinesFx(item)).map(({ output }) => output),
+		...readAuthoredItemLinesFn(item).map(({ output }) => output),
 		item.charges?.output,
 		...(item.merge ?? []).map(({ output }) => output),
 		item.type === "temporary" ? item.output : undefined,
@@ -44,7 +44,7 @@ const readLimitationsFx = Effect.fn("compileEditorAcquisitionRootsFx.limitations
 ) {
 	const limitations = new Set<EditorAcquisitionLimitation>();
 	for (const item of Object.values(config.items)) {
-		for (const line of yield* readAuthoredItemLinesFx(item)) {
+		for (const line of readAuthoredItemLinesFn(item)) {
 			if (
 				line.rules.some(
 					(rule) => rule.type === "disable" && rule.when.some(requiresAbsentFact),

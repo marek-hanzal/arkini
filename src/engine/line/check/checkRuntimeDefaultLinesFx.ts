@@ -1,7 +1,7 @@
 import { Effect, Option } from "effect";
 
-import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
-import { readLineOwnerLinesFx } from "~/engine/line/read/readLineOwnerLinesFx";
+import { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
+import { readLineOwnerLinesFn } from "~/engine/line/fn/readLineOwnerLinesFn";
 import type { DefaultLineIssueSchema } from "~/engine/line/schema/check/DefaultLineIssueSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
@@ -29,7 +29,7 @@ export const checkRuntimeDefaultLinesFx = Effect.fn("checkRuntimeDefaultLinesFx"
 			});
 			continue;
 		}
-		const ownerItem = Option.getOrUndefined(yield* isLineOwnerItemFx(owner.item));
+		const ownerItem = Option.getOrUndefined(isLineOwnerItemFn(owner.item));
 		if (ownerItem === undefined) {
 			issues.push({
 				type: RuntimeCheckIssueEnumSchema.enum.DefaultLine,
@@ -40,7 +40,7 @@ export const checkRuntimeDefaultLinesFx = Effect.fn("checkRuntimeDefaultLinesFx"
 			continue;
 		}
 		if (lineId === null) continue;
-		const lines = yield* readLineOwnerLinesFx(ownerItem);
+		const lines = readLineOwnerLinesFn(ownerItem);
 		if (!lines.some((line) => line.id === lineId)) {
 			issues.push({
 				type: RuntimeCheckIssueEnumSchema.enum.DefaultLine,

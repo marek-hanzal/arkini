@@ -17,9 +17,9 @@ import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
 import type { MotionRuntime, MotionSnapshot } from "~/ui/pixi/motion/MotionRuntime";
 import { finalizeMotionActorsFx } from "~/ui/pixi/motion/finalizeMotionActorsFx";
-import { readInteractionClaimsFx } from "~/ui/pixi/motion/readInteractionClaimsFx";
-import { readMotionAnimationKeysFx } from "~/ui/pixi/motion/readMotionAnimationKeysFx";
-import { readQuantityPresentationFx } from "~/ui/pixi/motion/readQuantityPresentationFx";
+import { readInteractionClaimsFn } from "~/ui/pixi/motion/fn/readInteractionClaimsFn";
+import { readMotionAnimationKeysFn } from "~/ui/pixi/motion/fn/readMotionAnimationKeysFn";
+import { readQuantityPresentationFn } from "~/ui/pixi/motion/fn/readQuantityPresentationFn";
 import { runMotionCueFx } from "~/ui/pixi/motion/runMotionCueFx";
 import { chaseTargetFx } from "~/ui/pixi/motion/chaseTargetFx";
 import { syncMotionPresentationFx } from "~/ui/pixi/motion/syncMotionPresentationFx";
@@ -28,8 +28,8 @@ import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwne
 import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 import type { TileMotionLanesState } from "~/ui/tile/motion/TileMotionLanesState";
-import { readTileMotionActorClaimsFx } from "~/ui/tile/motion/readTileMotionActorClaimsFx";
-import { updateTileMotionLanesFx } from "~/ui/tile/motion/updateTileMotionLanesFx";
+import { readTileMotionActorClaimsFn } from "~/ui/tile/motion/fn/readTileMotionActorClaimsFn";
+import { updateTileMotionLanesFn } from "~/ui/tile/motion/fn/updateTileMotionLanesFn";
 
 export namespace createMotionRuntimeFx {
 	export interface Props {
@@ -137,7 +137,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 	};
 
 	const readInteractionClaims = () => {
-		const claims = RendererRuntime.runSync(readInteractionClaimsFx(readCues()));
+		const claims = readInteractionClaimsFn(readCues());
 		for (const actorId of detachedSwapLegByActorId.keys()) {
 			claims.set(actorId, "handoff");
 		}
@@ -147,7 +147,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 	const readRetainedActorIds = () => {
 		const actorIds = new Set(detachedSwapLegByActorId.keys());
 		for (const cue of readCues()) {
-			for (const actorId of RendererRuntime.runSync(readTileMotionActorClaimsFx(cue))) {
+			for (const actorId of readTileMotionActorClaimsFn(cue)) {
 				actorIds.add(actorId);
 			}
 		}
@@ -155,6 +155,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 	};
 
 	const readQuantityPresentation = () => {
+		const cues = readCues();
 		const revealedInputCueKeys = new Set(
 			[
 				...cueLifecycleByKey.entries(),
@@ -166,13 +167,22 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 					: [],
 			),
 		);
-		return RendererRuntime.runSync(
-			readQuantityPresentationFx({
-				cues: readCues(),
-				readTargetRoute,
-				revealedInputCueKeys,
-			}),
-		);
+		return readQuantityPresentationFn({
+			cues,
+			resolvedTargetActorIdByCueKey: new Map(
+				cues.flatMap((cue) =>
+					cue.kind === "stack"
+						? [
+								[
+									readCueKey(cue),
+									readTargetRoute(cue.targetActorId, cue.targetLocation).actorId,
+								],
+							]
+						: [],
+				),
+			),
+			revealedInputCueKeys,
+		});
 	};
 
 	const syncPresentation = () => {
@@ -216,19 +226,17 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 						),
 						pending: motionLanes.pending,
 					}
-				: RendererRuntime.runSync(
-						updateTileMotionLanesFx({
-							action: {
-								cue,
-								type: "complete",
-							},
-							state: motionLanes,
-						}),
-					);
+				: updateTileMotionLanesFn({
+						action: {
+							cue,
+							type: "complete",
+						},
+						state: motionLanes,
+					});
 		const stillClaimedActorIds = readRetainedActorIds();
 		RendererRuntime.runSync(
 			finalizeMotionActorsFx({
-				actorIds: RendererRuntime.runSync(readTileMotionActorClaimsFx(cue)),
+				actorIds: readTileMotionActorClaimsFn(cue),
 				actorStore,
 				animator,
 				application,
@@ -286,15 +294,13 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 			}),
 		);
 		if (detachedSwapLegByActorId.size > 0) return;
-		motionLanes = RendererRuntime.runSync(
-			updateTileMotionLanesFx({
-				action: {
-					cues: [],
-					type: "enqueue",
-				},
-				state: motionLanes,
-			}),
-		);
+		motionLanes = updateTileMotionLanesFn({
+			action: {
+				cues: [],
+				type: "enqueue",
+			},
+			state: motionLanes,
+		});
 		syncPresentation();
 		startCues();
 	}
@@ -434,7 +440,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				if (superseded.length === 0) {
 					if (!handedOffDetached) return false;
 					if (detachedSwapLegByActorId.size === 0) {
-						motionLanes = yield* updateTileMotionLanesFx({
+						motionLanes = updateTileMotionLanesFn({
 							action: {
 								cues: [],
 								type: "enqueue",
@@ -450,7 +456,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				const hasBlockingClaim = cues.some(
 					(cue) =>
 						!supersededCueKeys.has(readCueKey(cue)) &&
-						RendererRuntime.runSync(readTileMotionActorClaimsFx(cue)).has(actorId),
+						readTileMotionActorClaimsFn(cue).has(actorId),
 				);
 				if (hasBlockingClaim) return false;
 
@@ -522,7 +528,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 				motionLanes =
 					detachedSwapLegByActorId.size > 0
 						? filteredMotionLanes
-						: yield* updateTileMotionLanesFx({
+						: updateTileMotionLanesFn({
 								action: {
 									cues: [],
 									type: "enqueue",
@@ -597,15 +603,13 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 									...uniqueCues,
 								],
 							}
-						: RendererRuntime.runSync(
-								updateTileMotionLanesFx({
-									action: {
-										cues: uniqueCues,
-										type: "enqueue",
-									},
-									state: motionLanes,
-								}),
-							);
+						: updateTileMotionLanesFn({
+								action: {
+									cues: uniqueCues,
+									type: "enqueue",
+								},
+								state: motionLanes,
+							});
 			}),
 		),
 		redirectTargetFx: Effect.fn("MotionRuntime.redirectTargetFx")((redirect) =>
@@ -645,7 +649,7 @@ export const createMotionRuntimeFx = Effect.fn("createMotionRuntimeFx")(function
 			for (const cue of motionLanes.active) {
 				const cueKey = readCueKey(cue);
 				if (cueLifecycleByKey.get(cueKey)?.started !== true) continue;
-				const animationKeys = yield* readMotionAnimationKeysFx({
+				const animationKeys = readMotionAnimationKeysFn({
 					cue,
 					cueKey,
 				});

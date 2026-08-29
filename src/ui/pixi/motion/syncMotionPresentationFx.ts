@@ -8,7 +8,7 @@ import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwne
 import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 import type { QuantityPresentation } from "~/ui/pixi/motion/QuantityPresentation";
-import { projectMotionItemFx } from "~/ui/pixi/motion/projectMotionItemFx";
+import { projectMotionItemFn } from "~/ui/pixi/motion/fn/projectMotionItemFn";
 
 export namespace syncMotionPresentationFx {
 	export interface Props {
@@ -36,10 +36,7 @@ export const syncMotionPresentationFx = Effect.fn("syncMotionPresentationFx")(fu
 		const actor = actorStore.actors.get(actorId);
 		const pose = yield* surface.readActorPoseFx(canonical);
 		if (actor === undefined || canonical === undefined || pose === null) continue;
-		const item = yield* projectMotionItemFx(
-			canonical,
-			quantityPresentationByActorId.get(actorId),
-		);
+		const item = projectMotionItemFn(canonical, quantityPresentationByActorId.get(actorId));
 		const size = actor.dragging ? actor.size : pose.size;
 		if (
 			actor.item.quantity === item.quantity &&

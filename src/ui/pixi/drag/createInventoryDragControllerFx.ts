@@ -16,7 +16,7 @@ import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import { PointerDragThreshold } from "~/ui/drag/PointerDragThreshold";
 import type { InventoryActorStore } from "~/ui/pixi/actor/InventoryActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import { readActorCursorFx } from "~/ui/pixi/actor/readActorCursorFx";
+import { readActorCursorFn } from "~/ui/pixi/actor/fn/readActorCursorFn";
 import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import { animateRetargetablePoseFx } from "~/ui/pixi/animation/animateRetargetablePoseFx";
 import { flashConsumedSourceFx } from "~/ui/pixi/animation/flashConsumedSourceFx";
@@ -204,13 +204,11 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 				removalFeedbackGenerationByActorId.set(item.id, removalFeedbackGeneration);
 			}
 			if (presentsOptimisticRemoval) {
-				actor.container.cursor = RendererRuntime.runSync(
-					readActorCursorFx({
-						phase: "pending",
-						previewKind: null,
-						running: item.running,
-					}),
-				);
+				actor.container.cursor = readActorCursorFn({
+					phase: "pending",
+					previewKind: null,
+					running: item.running,
+				});
 				RendererRuntime.runSync(
 					startActorExitFx({
 						actor,
@@ -242,13 +240,11 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 					if (closed) return;
 					const current = RendererRuntime.runSync(actorStore.readActorFx(item.id));
 					if (current !== actor || actor.container.destroyed) return;
-					actor.container.cursor = RendererRuntime.runSync(
-						readActorCursorFx({
-							phase: "idle",
-							previewKind: null,
-							running: actor.item.running,
-						}),
-					);
+					actor.container.cursor = readActorCursorFn({
+						phase: "idle",
+						previewKind: null,
+						running: actor.item.running,
+					});
 					RendererRuntime.runSync(
 						restoreActorExitFx({
 							actor,
@@ -292,13 +288,11 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 			} catch (cause) {
 				game.reportCriticalFailure("game-presentation", cause);
 			}
-			drag.actor.container.cursor = RendererRuntime.runSync(
-				readActorCursorFx({
-					phase: "dragging",
-					previewKind: kind,
-					running: sourceItem.running,
-				}),
-			);
+			drag.actor.container.cursor = readActorCursorFn({
+				phase: "dragging",
+				previewKind: kind,
+				running: sourceItem.running,
+			});
 			RendererRuntime.runSync(surface.renderDropFeedbackFx(target, kind));
 			return sourceItem;
 		};
@@ -309,13 +303,11 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 			surface.actorLayer.addChild(actor.container);
 			actor.dragging = false;
 			actor.container.zIndex = 0;
-			actor.container.cursor = RendererRuntime.runSync(
-				readActorCursorFx({
-					phase: "idle",
-					previewKind: null,
-					running: actor.item.running,
-				}),
-			);
+			actor.container.cursor = readActorCursorFn({
+				phase: "idle",
+				previewKind: null,
+				running: actor.item.running,
+			});
 			RendererRuntime.runSync(
 				animateRetargetablePoseFx({
 					actor,
@@ -392,13 +384,11 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 			if (sourceItem === null) return;
 			RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
 			drag.phase = "submitting";
-			drag.actor.container.cursor = RendererRuntime.runSync(
-				readActorCursorFx({
-					phase: "pending",
-					previewKind: null,
-					running: sourceItem.running,
-				}),
-			);
+			drag.actor.container.cursor = readActorCursorFn({
+				phase: "pending",
+				previewKind: null,
+				running: sourceItem.running,
+			});
 			const command = {
 				sourceItemId: sourceItem.id,
 				sourceLocation: sourceItem.location,
@@ -422,13 +412,11 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 						if (current === drag.actor) {
 							current.dragging = false;
 							current.container.zIndex = 0;
-							current.container.cursor = RendererRuntime.runSync(
-								readActorCursorFx({
-									phase: "idle",
-									previewKind: null,
-									running: current.item.running,
-								}),
-							);
+							current.container.cursor = readActorCursorFn({
+								phase: "idle",
+								previewKind: null,
+								running: current.item.running,
+							});
 							RendererRuntime.runSync(application.frames.invalidateFx);
 						}
 						if (
@@ -512,13 +500,11 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 					actor.onPointerDown = onPointerDown;
 					actor.container.on("pointerdown", onPointerDown);
 					actor.container.eventMode = "static";
-					actor.container.cursor = RendererRuntime.runSync(
-						readActorCursorFx({
-							phase: "idle",
-							previewKind: null,
-							running: actor.item.running,
-						}),
-					);
+					actor.container.cursor = readActorCursorFn({
+						phase: "idle",
+						previewKind: null,
+						running: actor.item.running,
+					});
 				}),
 			),
 			cancelInteractionFx: Effect.sync(cancelInteraction),

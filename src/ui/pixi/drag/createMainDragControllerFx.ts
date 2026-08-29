@@ -7,7 +7,7 @@ import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { PointerDragThreshold } from "~/ui/drag/PointerDragThreshold";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import { readActorCursorFx } from "~/ui/pixi/actor/readActorCursorFx";
+import { readActorCursorFn } from "~/ui/pixi/actor/fn/readActorCursorFn";
 import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import { burstAckParticlesFx } from "~/ui/pixi/animation/burstAckParticlesFx";
 import type { ActiveDrag } from "~/ui/pixi/drag/ActiveDrag";
@@ -550,7 +550,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 					actor.container.off("pointerdown", actor.onPointerDown);
 				}
 				actor.container.eventMode = "static";
-				actor.container.cursor = yield* readActorCursorFx({
+				actor.container.cursor = readActorCursorFn({
 					phase: "idle",
 					previewKind: null,
 					running: actor.item.running,

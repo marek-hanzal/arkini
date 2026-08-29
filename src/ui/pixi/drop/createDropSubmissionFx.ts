@@ -6,7 +6,7 @@ import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import { readActorCursorFx } from "~/ui/pixi/actor/readActorCursorFx";
+import { readActorCursorFn } from "~/ui/pixi/actor/fn/readActorCursorFn";
 import { animateRetargetablePoseFx } from "~/ui/pixi/animation/animateRetargetablePoseFx";
 import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import { restoreActorExitFx } from "~/ui/pixi/animation/restoreActorExitFx";
@@ -19,7 +19,7 @@ import type { DropPresentation } from "~/ui/pixi/drop/DropPresentation";
 import type { DropSubmission } from "~/ui/pixi/drop/DropSubmission";
 import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
 import type { MotionRuntime } from "~/ui/pixi/motion/MotionRuntime";
-import { readTargetRedirectFx } from "~/ui/pixi/motion/readTargetRedirectFx";
+import { readTargetRedirectFn } from "~/ui/pixi/motion/fn/readTargetRedirectFn";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 
 export namespace createDropSubmissionFx {
@@ -108,13 +108,11 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 					RendererRuntime.runSync(cursorGrab.finishFx(actor));
 					RendererRuntime.runSync(magneticField.resetFx);
 					RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
-					actor.container.cursor = RendererRuntime.runSync(
-						readActorCursorFx({
-							phase: "pending",
-							previewKind,
-							running: sourceItem.running,
-						}),
-					);
+					actor.container.cursor = readActorCursorFn({
+						phase: "pending",
+						previewKind,
+						running: sourceItem.running,
+					});
 					const drop = RendererRuntime.runSync(
 						beginDropFx({
 							commandTarget,
@@ -176,9 +174,7 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 						if (finalized || closed) return;
 						try {
 							if (!targetRedirected) {
-								const targetRedirect = RendererRuntime.runSync(
-									readTargetRedirectFx(result),
-								);
+								const targetRedirect = readTargetRedirectFn(result);
 								if (targetRedirect !== null) {
 									RendererRuntime.runSync(
 										motion.redirectTargetFx(targetRedirect),
@@ -224,13 +220,11 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 							if (retainedSource !== null) {
 								retainedSource.dragging = false;
 								retainedSource.container.zIndex = 0;
-								retainedSource.container.cursor = RendererRuntime.runSync(
-									readActorCursorFx({
-										phase: "idle",
-										previewKind: null,
-										running: retainedSource.item.running,
-									}),
-								);
+								retainedSource.container.cursor = readActorCursorFn({
+									phase: "idle",
+									previewKind: null,
+									running: retainedSource.item.running,
+								});
 							}
 							if (
 								result.kind !== DropItemResultKind.Reject &&

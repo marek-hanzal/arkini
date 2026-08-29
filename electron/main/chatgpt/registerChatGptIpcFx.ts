@@ -4,8 +4,7 @@ import { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ChatGptSurfaceSchema } from "../../contract/chatgpt/ChatGptSurfaceSchema";
 import { ElectronMainRuntime } from "../ElectronMainRuntime";
 import type { TrustedRenderer } from "../security/TrustedRenderer";
-import type { ChatGptViewControllerOwnership } from "./ChatGptViewControllerOwnership";
-import { readChatGptViewControllerFx } from "./readChatGptViewControllerFx";
+import type { ChatGptViewControllerOwnership } from "./createChatGptViewControllerOwnershipFx";
 
 let registered = false;
 
@@ -39,10 +38,7 @@ export const registerChatGptIpcFx = Effect.fn("registerChatGptIpcFx")(
 												"The trusted renderer has no owning BrowserWindow.",
 											),
 										);
-									const controller = yield* readChatGptViewControllerFx({
-										ownership,
-										window,
-									});
+									const controller = yield* ownership.readControllerFx(window);
 									yield* controller.setSurfaceFx(surface);
 								}),
 							),

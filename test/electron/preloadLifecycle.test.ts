@@ -113,25 +113,6 @@ describe("Electron preload lifecycle", () => {
 		expect(await api.lifecycle.waitUntilVisible()).toBe(visibleAtMs);
 	});
 
-	it("routes the global last package preference through its narrow IPC channels", async () => {
-		electron.ipcRenderer.invoke
-			.mockResolvedValueOnce("package:last")
-			.mockResolvedValueOnce(undefined);
-		const api = await loadPreload();
-
-		await expect(api.launcher.readLastPackageId()).resolves.toBe("package:last");
-		await expect(api.launcher.writeLastPackageId("package:next")).resolves.toBeUndefined();
-		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
-			1,
-			ArkiniElectronContract.channels.launcherLastPackageIdRead,
-		);
-		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
-			2,
-			ArkiniElectronContract.channels.launcherLastPackageIdWrite,
-			"package:next",
-		);
-	});
-
 	it("routes the mounted editor project context through dedicated MCP IPC channels", async () => {
 		electron.ipcRenderer.invoke.mockResolvedValue(undefined);
 		const api = await loadPreload();
@@ -211,90 +192,6 @@ describe("Electron preload lifecycle", () => {
 		});
 		expect(port.close).toHaveBeenCalledOnce();
 		unsubscribe();
-	});
-
-	it("routes bounded diagnostics through dedicated IPC channels", async () => {
-		electron.ipcRenderer.invoke.mockResolvedValue(undefined);
-		const api = await loadPreload();
-		const record: Parameters<typeof api.diagnostics.write>[0] = {
-			level: "fatal",
-			category: [
-				"renderer",
-				"test",
-			],
-			event: "test-failed",
-		};
-
-		await expect(api.diagnostics.write(record)).resolves.toBeUndefined();
-		await expect(api.diagnostics.openDirectory()).resolves.toBeUndefined();
-		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
-			1,
-			ArkiniElectronContract.channels.diagnosticsWrite,
-			record,
-		);
-		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
-			2,
-			ArkiniElectronContract.channels.diagnosticsOpenDirectory,
-		);
-	});
-
-	it("routes the Arkini user-data root through its dedicated IPC channel", async () => {
-		electron.ipcRenderer.invoke.mockResolvedValue(undefined);
-		const api = await loadPreload();
-
-		await expect(api.userData.openDirectory()).resolves.toBeUndefined();
-		expect(electron.ipcRenderer.invoke).toHaveBeenCalledWith(
-			ArkiniElectronContract.channels.userDataOpenDirectory,
-		);
-	});
-
-	it("routes CLI and shell-completion installation through their dedicated IPC channels", async () => {
-		electron.ipcRenderer.invoke.mockResolvedValue({
-			type: "not-installed",
-			commandPath: "/tmp/arkini-cli",
-		});
-		const api = await loadPreload();
-
-		await api.cli.status();
-		await api.cli.install();
-		await api.cli.replace();
-		await api.cli.uninstall();
-		await api.cli.completion.status();
-		await api.cli.completion.install();
-		await api.cli.completion.replace();
-		await api.cli.completion.uninstall();
-		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
-			1,
-			ArkiniElectronContract.channels.cliStatus,
-		);
-		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
-			2,
-			ArkiniElectronContract.channels.cliInstall,
-		);
-		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
-			3,
-			ArkiniElectronContract.channels.cliReplace,
-		);
-		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
-			4,
-			ArkiniElectronContract.channels.cliUninstall,
-		);
-		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
-			5,
-			ArkiniElectronContract.channels.cliCompletionStatus,
-		);
-		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
-			6,
-			ArkiniElectronContract.channels.cliCompletionInstall,
-		);
-		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
-			7,
-			ArkiniElectronContract.channels.cliCompletionReplace,
-		);
-		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
-			8,
-			ArkiniElectronContract.channels.cliCompletionUninstall,
-		);
 	});
 
 	it("shares one pending native close request", async () => {

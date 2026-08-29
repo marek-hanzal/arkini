@@ -4,8 +4,8 @@ import { Effect } from "effect";
 import { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ElectronMainRuntime } from "../ElectronMainRuntime";
 import type { TrustedRenderer } from "../security/TrustedRenderer";
-import type { Completion } from "./Completion";
-import type { Installation } from "./Installation";
+import type { Completion } from "./createCompletionFx";
+import type { Installation } from "./createInstallationFx";
 
 let registered = false;
 

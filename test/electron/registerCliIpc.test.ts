@@ -3,8 +3,8 @@ import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
-import type { Installation } from "../../electron/main/cli/Installation";
-import type { Completion } from "../../electron/main/cli/Completion";
+import type { Completion } from "../../electron/main/cli/createCompletionFx";
+import type { Installation } from "../../electron/main/cli/createInstallationFx";
 import { registerCliIpcFx } from "../../electron/main/cli/registerCliIpcFx";
 import { ElectronMainError } from "../../electron/main/ElectronMainError";
 import type { TrustedRenderer } from "../../electron/main/security/TrustedRenderer";

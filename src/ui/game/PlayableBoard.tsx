@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/RendererRuntime";
 import { CheatItemSpotlight } from "~/ui/cheat-spotlight/CheatItemSpotlight";
 import { useGameEngine } from "~/ui/game/useGameEngine";
 import { PixiBoardToolbarSurface } from "~/ui/pixi/PixiBoardToolbarSurface";

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { useCallback, useEffect, useState } from "react";
 
 import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/RendererRuntime";
 import type { EditorProjectVersionDescriptor } from "~/project-version/EditorProjectVersion";
 
 export namespace useEditorVersionTag {

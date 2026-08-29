@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/RendererRuntime";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readActorCursorFn } from "~/ui/pixi/actor/fn/readActorCursorFn";
 import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";

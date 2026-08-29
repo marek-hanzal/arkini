@@ -28,7 +28,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => ({
 	}),
 }));
 
-vi.mock("~/renderer/RendererRuntime", async () => {
+vi.mock("~/application-runtime/RendererRuntime", async () => {
 	const { Effect } = await import("effect");
 	const { EditorProjectRepository } = await import(
 		"~/project-authoring/repository/EditorProjectRepository"

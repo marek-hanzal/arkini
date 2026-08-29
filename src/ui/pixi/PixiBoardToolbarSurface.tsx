@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
 import { useGameEngine } from "~/ui/game/useGameEngine";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/RendererRuntime";
 import { runSpaceActivationAtom } from "~/ui/pixi/command/runSpaceActivationAtom";
 import { TileDefaultLineCommandAtom } from "~/ui/pixi/command/TileDefaultLineCommandAtom";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";

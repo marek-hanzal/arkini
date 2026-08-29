@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/RendererRuntime";
 import type {
 	TileMotionCue,
 	TileSpawnMotionCue,

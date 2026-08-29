@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/RendererRuntime";
 import type { TileActorFeedbackCue } from "~/ui/pixi/feedback/TileActorFeedbackCue";
 import { readTileActorFeedbackCuesFn } from "~/ui/pixi/feedback/fn/readTileActorFeedbackCuesFn";
 import { readCommittedTileReplacementsFx } from "~/ui/pixi/motion/readCommittedTileReplacementsFx";

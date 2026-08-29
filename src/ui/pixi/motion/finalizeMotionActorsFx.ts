@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/RendererRuntime";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import { updateTileActorFx } from "~/ui/pixi/actor/updateTileActorFx";
 import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";

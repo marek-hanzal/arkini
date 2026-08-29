@@ -1,11 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import { readTileActorBadgeCountFn } from "~/ui/pixi/actor/fn/readTileActorBadgeCountFn";
-import { readTileActorProgressRatioFn } from "~/ui/pixi/actor/fn/readTileActorProgressRatioFn";
-import { readTileActorQueueBadgeCountFn } from "~/ui/pixi/actor/fn/readTileActorQueueBadgeCountFn";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { formatTileBadgeLabelFn } from "~/ui/tile/fn/formatTileBadgeLabelFn";
 
 const runtimeItem = (overrides: {
@@ -62,52 +59,6 @@ describe("tile actor overlay projection", () => {
 		).toBe("x1");
 	});
 
-	it("counts active and planned queue work for one exact owner", () => {
-		const runtime = {
-			jobs: [
-				{
-					ownerItemId: "runtime:owner",
-				},
-				{
-					ownerItemId: "runtime:other",
-				},
-			],
-			jobQueue: [
-				{
-					ownerItemId: "runtime:owner",
-				},
-				{
-					ownerItemId: "runtime:owner",
-				},
-				{
-					ownerItemId: "runtime:other",
-				},
-			],
-		} as RuntimeSchema.Type;
-
-		expect(
-			readTileActorQueueBadgeCountFn({
-				ownerItemId: "runtime:owner",
-				runtime,
-			}),
-		).toBe(3);
-		expect(
-			readTileActorQueueBadgeCountFn({
-				ownerItemId: "runtime:other",
-				runtime: {
-					...runtime,
-					jobs: [],
-				},
-			}),
-		).toBe(1);
-		expect(
-			readTileActorQueueBadgeCountFn({
-				ownerItemId: "runtime:missing",
-				runtime,
-			}),
-		).toBeUndefined();
-	});
-
 	it("shows stack quantity only above one and always projects deposit charges", () => {
 		const single = runtimeItem({
 			item: {
@@ -142,43 +93,5 @@ describe("tile actor overlay projection", () => {
 		expect(readTileActorBadgeCountFn(stack)).toBe(120);
 		expect(readTileActorBadgeCountFn(freshDeposit)).toBe(12);
 		expect(readTileActorBadgeCountFn(usedDeposit)).toBe(4);
-	});
-
-	it("fills job progress forward and temporary lifetime backward", () => {
-		const owner = runtimeItem({
-			item: {
-				type: TypeSchema.enum.Producer,
-			},
-		});
-		const temporary = runtimeItem({
-			item: {
-				durationMs: 1_000,
-				type: TypeSchema.enum.Temporary,
-			},
-			remainingDurationMs: 600,
-		});
-
-		expect(
-			readTileActorProgressRatioFn({
-				activeJob: {
-					durationMs: 1_000,
-					id: "job:one",
-					lineId: "line:one",
-					ownerItemId: "runtime:owner",
-					remainingMs: 600,
-				},
-				item: owner,
-			}),
-		).toBeCloseTo(0.4);
-		expect(
-			readTileActorProgressRatioFn({
-				item: temporary,
-			}),
-		).toBeCloseTo(0.6);
-		expect(
-			readTileActorProgressRatioFn({
-				item: owner,
-			}),
-		).toBeUndefined();
 	});
 });

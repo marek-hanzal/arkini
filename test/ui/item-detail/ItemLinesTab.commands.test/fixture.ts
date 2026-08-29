@@ -32,42 +32,57 @@ const commandSpies = vi.hoisted(() => ({
 
 export const commands = commandSpies;
 
+const game = vi.hoisted(() => ({
+	runFx: vi.fn((effect: unknown) => effect),
+}));
+
 vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
 
 vi.mock("~/ui/item-detail/useItemDetailControl", () => ({
 	useItemDetailControl: () => control,
 }));
 
-vi.mock("~/ui/item-detail/useEnqueueItemDetailLine", () => ({
-	useEnqueueItemDetailLine: ({ pendingKey }: { readonly pendingKey: string }) => ({
-		error: control.readActionError(pendingKey),
-		pending: control.readPendingAction(pendingKey) === "enqueue",
-		run: commands.enqueue,
-	}),
+vi.mock("~/ui/game/useGameEngine", () => ({
+	useGameEngine: () => game,
 }));
 
-vi.mock("~/ui/item-detail/useSetDefaultItemDetailLine", () => ({
-	useSetDefaultItemDetailLine: ({ pendingKey }: { readonly pendingKey: string }) => ({
-		error: control.readActionError(pendingKey),
-		pending: control.readPendingAction(pendingKey) === "default",
-		run: commands.setDefault,
-	}),
+vi.mock("~/engine/job/write/enqueueLineFx", () => ({
+	enqueueLineFx: (command: unknown) => {
+		commands.enqueue(command);
+		return command;
+	},
 }));
 
-vi.mock("~/ui/item-detail/useUnsetDefaultItemDetailLine", () => ({
-	useUnsetDefaultItemDetailLine: ({ pendingKey }: { readonly pendingKey: string }) => ({
-		error: control.readActionError(pendingKey),
-		pending: control.readPendingAction(pendingKey) === "default",
-		run: commands.unsetDefault,
-	}),
+vi.mock("~/engine/line/write/setDefaultLineFx", () => ({
+	setDefaultLineFx: (command: unknown) => {
+		commands.setDefault(command);
+		return command;
+	},
 }));
 
-vi.mock("~/ui/item-detail/useWithdrawItemDetailLine", () => ({
-	useWithdrawItemDetailLine: ({ pendingKey }: { readonly pendingKey: string }) => ({
-		error: control.readActionError(pendingKey),
-		pending: control.readPendingAction(pendingKey) === "withdraw",
-		run: commands.withdraw,
-	}),
+vi.mock("~/engine/line/write/unsetDefaultLineFx", () => ({
+	unsetDefaultLineFx: (command: unknown) => {
+		commands.unsetDefault(command);
+		return command;
+	},
+}));
+
+vi.mock("~/engine/input/write/withdrawLineInputFx", () => ({
+	withdrawLineInputFx: (command: unknown) => {
+		commands.withdraw(command);
+		return {
+			pipe: () => undefined,
+		};
+	},
+}));
+
+vi.mock("~/engine/input/write/withdrawLineInputsFx", () => ({
+	withdrawLineInputsFx: (command: unknown) => {
+		commands.withdraw(command);
+		return {
+			pipe: () => undefined,
+		};
+	},
 }));
 
 export const input = {
@@ -139,6 +154,7 @@ beforeEach(() => {
 	control.openItemDetailFx.mockReturnValue(Effect.succeed(true));
 	control.readActionError.mockReturnValue(null);
 	control.readPendingAction.mockReturnValue(null);
+	game.runFx.mockClear();
 	for (const command of Object.values(commands)) command.mockReset();
 });
 

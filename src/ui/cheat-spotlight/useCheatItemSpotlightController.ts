@@ -3,6 +3,7 @@ import {
 	type KeyboardEvent,
 	type PointerEvent,
 	type RefObject,
+	use,
 	useCallback,
 	useEffect,
 	useMemo,
@@ -14,7 +15,7 @@ import { match, P } from "ts-pattern";
 import { useGameCheats } from "~/ui/cheats/useGameCheats";
 import type { PlayableGame } from "~/renderer/game/PlayableGame";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
-import { useCheatItemSpawn } from "~/ui/cheat-spotlight/useCheatItemSpawn";
+import { CheatItemSpawnContext } from "~/ui/cheat-spotlight/CheatItemSpawnContext";
 import { useCheatItemSpotlightSearch } from "~/ui/cheat-spotlight/useCheatItemSpotlightSearch";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
@@ -62,14 +63,15 @@ export const useCheatItemSpotlightController = ({
 	const cheatAvailability = useCheatAvailability();
 	const gameMenu = useGameMenuControl();
 	const itemDetail = useItemDetailControl();
-	const spawn = useCheatItemSpawn();
+	const spawn = use(CheatItemSpawnContext);
+	if (spawn === null) throw new Error("CheatItemSpawnProvider is not mounted.");
 	const search = useCheatItemSpotlightSearch({
 		game,
 	});
 	const inputRef = useRef<HTMLInputElement>(null);
 	const preserveSpawnOutcomeRef = useRef(false);
 	const [open, setOpen] = useState(false);
-	const blockedByHigherOwner = gameMenu.isOpen || itemDetail.isOpen;
+	const blockedByHigherOwner = gameMenu.phase !== "closed" || itemDetail.state.phase !== "closed";
 	const admitted = alwaysAvailable || cheatAvailability.available;
 	const available = admitted && cheats.enabled && !blockedByHigherOwner;
 	const close = useCallback(() => {

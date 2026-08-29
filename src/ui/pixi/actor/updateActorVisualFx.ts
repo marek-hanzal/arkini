@@ -4,7 +4,6 @@ import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import { fitSingleLineTextFx } from "~/ui/pixi/text/fitSingleLineTextFx";
-import { readArtworkLayoutFn } from "~/ui/pixi/actor/fn/readArtworkLayoutFn";
 import { formatTileBadgeLabelFn } from "~/ui/tile/fn/formatTileBadgeLabelFn";
 
 export namespace updateActorVisualFx {
@@ -17,6 +16,7 @@ export namespace updateActorVisualFx {
 }
 
 const tileToSlotRatio = 0.8;
+const layeredArtworkToFaceRatio = 0.75;
 /** Applies one complete logical face revision to one private visual slot. */
 export const updateActorVisualFx = Effect.fn("updateActorVisualFx")(function* ({
 	item,
@@ -33,11 +33,20 @@ export const updateActorVisualFx = Effect.fn("updateActorVisualFx")(function* ({
 
 	visual.item = item;
 	visual.size = size;
-	const artwork = readArtworkLayoutFn({
-		faceSize,
-		inset,
-		layered: item.compositeUrl !== undefined,
-	});
+	const artworkSize =
+		item.compositeUrl === undefined ? faceSize : faceSize * layeredArtworkToFaceRatio;
+	const artwork = {
+		primary: {
+			x: inset,
+			y: inset,
+			size: artworkSize,
+		},
+		secondary: {
+			x: inset + faceSize - artworkSize,
+			y: inset + faceSize - artworkSize,
+			size: artworkSize,
+		},
+	};
 	visual.primary.x = artwork.primary.x;
 	visual.primary.y = artwork.primary.y;
 	visual.primary.width = artwork.primary.size;

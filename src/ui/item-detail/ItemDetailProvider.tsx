@@ -10,10 +10,12 @@ import {
 } from "react";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
+import { resolveItemDetailTargetFn } from "~/engine/item-detail/fn/resolveItemDetailTargetFn";
+import { readItemDetailTabsFn } from "~/engine/item-detail/fn/readItemDetailTabsFn";
+import { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetailSourcesFx";
+import { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
 import type { RunItemDetailPendingActionProps } from "~/ui/item-detail/ItemDetailPendingActionOwner";
 import { createItemDetailCommandAtom } from "~/ui/item-detail/createItemDetailCommandAtom";
-import { useResolveItemDefinitionDetailTarget } from "~/ui/item-detail/useResolveItemDefinitionDetailTarget";
-import { useResolveItemDetailTarget } from "~/ui/item-detail/useResolveItemDetailTarget";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { createItemDetailControllerFx } from "~/ui/item-detail/createItemDetailControllerFx";
 import { ItemDetailContext } from "~/ui/item-detail/ItemDetailContext";
@@ -42,8 +44,6 @@ export const ItemDetailProvider = ({
 }: PropsWithChildren<{
 	readonly game: GameEngine;
 }>) => {
-	const resolveDefinitionTarget = useResolveItemDefinitionDetailTarget();
-	const resolveTarget = useResolveItemDetailTarget();
 	const [controller] = useState(() => RendererRuntime.runSync(createItemDetailControllerFx()));
 	const commandAtom = useMemo(
 		() =>
@@ -79,16 +79,28 @@ export const ItemDetailProvider = ({
 		});
 	}, [
 		controller,
-		snapshot.state,
+		snapshot,
 		writeCommand,
 	]);
 
 	const openItemDetailFx = useCallback(
 		({ itemId, linesSearchQuery, tab, origin = null }: OpenItemDetailProps) =>
 			Effect.suspend(() => {
-				const resolved = resolveTarget({
+				const runtime = game.getSnapshot();
+				const sources = game.readOrThrow(
+					readItemDetailSourcesFx({
+						target: {
+							kind: "runtime",
+							itemId,
+						},
+						runtime,
+					}),
+				);
+				const resolved = resolveItemDetailTargetFn({
 					itemId,
 					requestedTab: tab,
+					runtime,
+					sources,
 				});
 				if (resolved.kind === "unavailable") return Effect.succeed(false);
 				return controller.openTargetFx({
@@ -104,35 +116,53 @@ export const ItemDetailProvider = ({
 			}),
 		[
 			controller,
-			resolveTarget,
+			game,
 		],
 	);
 
 	const openItemDefinitionDetailFx = useCallback(
 		({ itemId, origin = null, tab }: OpenItemDefinitionDetailProps) =>
 			Effect.suspend(() => {
-				const resolved = resolveDefinitionTarget({
-					itemId,
-					requestedTab: tab,
+				const runtime = game.getSnapshot();
+				const sources = game.readOrThrow(
+					readItemDetailSourcesFx({
+						target: {
+							kind: "definition",
+							itemId,
+						},
+						runtime,
+					}),
+				);
+				if (sources.kind === "unavailable") return Effect.succeed(false);
+				const tabs = readItemDetailTabsFn({
+					target: {
+						kind: "definition",
+					},
+					sources,
 				});
-				if (resolved.kind === "unavailable") return Effect.succeed(false);
+				const resolvedTab =
+					tab !== undefined && tabs.includes(tab)
+						? tab
+						: tabs.includes(ItemDetailTabEnumSchema.enum.Sources)
+							? ItemDetailTabEnumSchema.enum.Sources
+							: ItemDetailTabEnumSchema.enum.Info;
 				return controller.openTargetFx({
 					kind: "definition",
-					itemId: resolved.itemId,
-					tab: resolved.tab,
+					itemId: sources.targetDefinitionItemId,
+					tab: resolvedTab,
 					origin: controller.readOrigin(origin),
 				});
 			}),
 		[
 			controller,
-			resolveDefinitionTarget,
+			game,
 		],
 	);
 
 	const selectRetainedItemDetailTabFx = useCallback(
 		({ itemId, tab }: SelectRetainedItemDetailTabProps) =>
 			Effect.suspend(() => {
-				const current = controller.getSnapshot().state;
+				const current = controller.getSnapshot();
 				if (
 					current.phase === "closed" ||
 					current.phase === "exiting" ||
@@ -154,7 +184,7 @@ export const ItemDetailProvider = ({
 
 	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
-			const current = controller.getSnapshot().state;
+			const current = controller.getSnapshot();
 			if (event.key !== "Escape" || current.phase === "closed") return;
 			event.preventDefault();
 			event.stopPropagation();
@@ -180,8 +210,7 @@ export const ItemDetailProvider = ({
 
 	const control = useMemo<ItemDetailControl>(
 		() => ({
-			state: snapshot.state,
-			isOpen: snapshot.state.phase !== "closed",
+			state: snapshot,
 			readActionError: (key) => {
 				const error = commandState.actionErrors.get(key);
 				return error !== undefined && error.outcomeScope === controller.readOutcomeScope()

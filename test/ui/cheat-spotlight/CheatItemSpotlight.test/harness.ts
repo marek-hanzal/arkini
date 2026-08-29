@@ -1,5 +1,5 @@
 import { RegistryContext, scheduleTask } from "@effect/atom-react";
-import { Effect } from "effect";
+import { Effect, Exit } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
@@ -33,22 +33,6 @@ vi.mock("~/ui/cheats/useGameCheats", () => ({
 		instantGameplay: false,
 	}),
 }));
-vi.mock("~/ui/cheat-spotlight/useCheatItemCatalog", () => ({
-	useCheatItemCatalog: () => [
-		{
-			itemId: "item:alpha",
-			title: "Alpha",
-			sourceResourceId: "alpha",
-			sourceUrl: "blob:alpha",
-		},
-		{
-			itemId: "item:beta",
-			title: "Beta",
-			sourceResourceId: "beta",
-			sourceUrl: "blob:beta",
-		},
-	],
-}));
 vi.mock("~/engine/cheat/write/spawnCheatItemFx", async () => {
 	const { Effect } = await import("effect");
 	return {
@@ -60,12 +44,14 @@ vi.mock("~/engine/cheat/write/spawnCheatItemFx", async () => {
 });
 vi.mock("~/ui/game-menu/useGameMenuControl", () => ({
 	useGameMenuControl: () => ({
-		isOpen: false,
+		phase: "closed",
 	}),
 }));
 vi.mock("~/ui/item-detail/useItemDetailControl", () => ({
 	useItemDetailControl: () => ({
-		isOpen: false,
+		state: {
+			phase: "closed",
+		},
 	}),
 }));
 
@@ -75,6 +61,20 @@ let registry: AtomRegistry.AtomRegistry;
 
 export const createGame = (): Game =>
 	({
+		getResourceUrl: (resourceId: string) => `blob:${resourceId}`,
+		read: () =>
+			Exit.succeed([
+				{
+					itemId: "item:alpha",
+					title: "Alpha",
+					sourceResourceId: "alpha",
+				},
+				{
+					itemId: "item:beta",
+					title: "Beta",
+					sourceResourceId: "beta",
+				},
+			]),
 		runFx: ((effect: Effect.Effect<unknown, unknown>) => {
 			state.run(effect);
 			if (state.mode === "success") return effect;
@@ -87,7 +87,7 @@ export const createGame = (): Game =>
 				return Effect.sync(state.interrupted);
 			}).pipe(Effect.andThen(effect));
 		}) as Game["runFx"],
-	}) as Game;
+	}) as unknown as Game;
 
 export const beforeEachSpotlightTest = () => {
 	registry = AtomRegistry.make({

@@ -20,42 +20,50 @@ import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 	}
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
-vi.mock("~/ui/game/useGameEngine", () => ({
-	useGameEngine: () => ({
-		config: {
-			items: {},
-		},
-	}),
+vi.mock("~/engine/item-detail/read/readItemDetailSourcesFx", () => ({
+	readItemDetailSourcesFx: (props: unknown) => props,
 }));
 
-vi.mock("~/ui/item-detail/useResolveItemDetailTarget", () => ({
-	useResolveItemDetailTarget:
-		() =>
-		({ itemId, requestedTab }: { itemId: string; requestedTab?: string }) =>
-			itemId === "runtime:missing"
-				? {
-						kind: "unavailable",
-					}
-				: {
-						itemId,
-						kind: "available",
-						tab: requestedTab ?? "lines",
-						tabs: [
-							"lines",
-							"info",
-						],
-					},
-}));
-
-vi.mock("~/ui/item-detail/useResolveItemDefinitionDetailTarget", () => ({
-	useResolveItemDefinitionDetailTarget: () => () => ({
-		kind: "unavailable",
-	}),
+vi.mock("~/engine/item-detail/fn/resolveItemDetailTargetFn", () => ({
+	resolveItemDetailTargetFn: ({
+		itemId,
+		requestedTab,
+	}: {
+		readonly itemId: string;
+		readonly requestedTab?: string;
+	}) =>
+		itemId === "runtime:missing"
+			? {
+					kind: "unavailable",
+				}
+			: {
+					itemId,
+					kind: "available",
+					tab: requestedTab ?? "lines",
+					tabs: [
+						"lines",
+						"info",
+					],
+				},
 }));
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const providerGame = {
+	config: {
+		items: {},
+	},
+	getSnapshot: () => ({}),
 	id: "game:item-detail-provider",
+	readOrThrow: (request: {
+		readonly target?: {
+			readonly kind?: string;
+		};
+	}) =>
+		request.target?.kind === "definition"
+			? {
+					kind: "unavailable",
+				}
+			: request,
 } as unknown as GameEngine;
 
 export const openItemDetail = (

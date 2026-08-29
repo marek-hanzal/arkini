@@ -18,7 +18,6 @@ import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
 import type { MotionRuntime, MotionSnapshot } from "~/ui/pixi/motion/MotionRuntime";
 import { finalizeMotionActorsFx } from "~/ui/pixi/motion/finalizeMotionActorsFx";
 import { readInteractionClaimsFn } from "~/ui/pixi/motion/fn/readInteractionClaimsFn";
-import { readMotionAnimationKeysFn } from "~/ui/pixi/motion/fn/readMotionAnimationKeysFn";
 import { readQuantityPresentationFn } from "~/ui/pixi/motion/fn/readQuantityPresentationFn";
 import { runMotionCueFx } from "~/ui/pixi/motion/runMotionCueFx";
 import { chaseTargetFx } from "~/ui/pixi/motion/chaseTargetFx";
@@ -50,6 +49,44 @@ const emptyMotionLanes = {
 
 const maximumRememberedCueKeys = 256;
 const maximumRememberedTargetRedirects = 256;
+
+const readMotionAnimationKeysFn = ({ cue, cueKey }: { cue: TileMotionCue; cueKey: string }) =>
+	match(cue)
+		.with(
+			{
+				kind: "spawn",
+			},
+			() => [
+				`motion:${cueKey}`,
+			],
+		)
+		.with(
+			{
+				kind: "stack",
+			},
+			() => [
+				`motion:${cueKey}`,
+			],
+		)
+		.with(
+			{
+				kind: "input",
+			},
+			() => [
+				`motion:${cueKey}:consume`,
+				`motion:${cueKey}`,
+			],
+		)
+		.with(
+			{
+				kind: "swap",
+			},
+			(swap) => [
+				`motion:${cueKey}:${swap.actorId}`,
+				`motion:${cueKey}:${swap.counterpartActorId}`,
+			],
+		)
+		.exhaustive();
 
 interface DetachedSwapLeg {
 	readonly actorId: string;

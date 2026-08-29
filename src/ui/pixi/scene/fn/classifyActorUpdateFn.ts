@@ -2,7 +2,6 @@ import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { isSameTileActorLocationFn } from "~/ui/pixi/actor/fn/isSameTileActorLocationFn";
 import { readCrowdAlphaFn } from "~/ui/pixi/actor/fn/readCrowdAlphaFn";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { ActorUpdatePlan } from "~/ui/pixi/scene/ActorUpdatePlan";
 import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
 
 export namespace classifyActorUpdateFn {
@@ -15,6 +14,35 @@ export namespace classifyActorUpdateFn {
 		readonly pose: ActorPose;
 		readonly poseChannelActive: boolean;
 		readonly preserveVisual: boolean;
+	}
+
+	export interface Result {
+		readonly activityEffect: "start" | "stop" | null;
+		readonly crowdAlpha: number | null;
+		readonly item:
+			| {
+					readonly kind: "assign";
+			  }
+			| {
+					readonly kind: "progress";
+			  }
+			| {
+					readonly kind: "visual";
+					readonly preserveVisual: boolean;
+					readonly size: number;
+			  };
+		readonly pose:
+			| {
+					readonly kind: "owned";
+			  }
+			| {
+					readonly kind: "place";
+			  }
+			| {
+					readonly directLanding: boolean;
+					readonly kind: "travel";
+					readonly scaleBeforeTravel: number | null;
+			  };
 	}
 }
 
@@ -66,7 +94,7 @@ export const classifyActorUpdateFn = ({
 				? "start"
 				: "stop";
 	const previousDisplayedSize = actor.size * actor.container.scale.x;
-	const item: ActorUpdatePlan["item"] =
+	const item: classifyActorUpdateFn.Result["item"] =
 		visualChanged || sizeChanged
 			? {
 					kind: "visual",

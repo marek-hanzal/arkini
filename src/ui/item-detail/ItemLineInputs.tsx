@@ -1,13 +1,16 @@
 import { AnimatePresence, motion } from "motion/react";
+import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
-import { useWithdrawItemDetailLine } from "~/ui/item-detail/useWithdrawItemDetailLine";
+import { withdrawLineInputFx } from "~/engine/input/write/withdrawLineInputFx";
+import { withdrawLineInputsFx } from "~/engine/input/write/withdrawLineInputsFx";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { LinkButton } from "~/ui/button/LinkButton";
 import { itemDetailBadgeMotion, itemDetailFadeMotion } from "~/ui/item-detail/ItemDetailMotion";
 import { ItemReferenceButton } from "~/ui/item-detail/ItemReferenceButton";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
+import { useItemDetailPendingCommand } from "~/ui/item-detail/useItemDetailPendingCommand";
 
 export interface ItemLineInputsWithdrawAction {
 	readonly disabled: boolean;
@@ -67,9 +70,19 @@ const MaterialInputWithdraw = ({
 		input.inputIndex,
 		"withdraw",
 	]);
-	const withdraw = useWithdrawItemDetailLine({
+	const withdraw = useItemDetailPendingCommand({
+		action: "withdraw",
+		failureMessage: "Inputs could not be withdrawn.",
 		pendingKey,
 		pendingOwner: itemDetail,
+		run: (game, command: withdrawLineInputFx.Props | withdrawLineInputsFx.Props) =>
+			game
+				.runFx(
+					"inputIndex" in command
+						? withdrawLineInputFx(command)
+						: withdrawLineInputsFx(command),
+				)
+				.pipe(Effect.asVoid),
 	});
 	const pending = withdraw.pending;
 	const error = withdraw.error;

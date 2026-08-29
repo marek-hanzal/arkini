@@ -45,11 +45,10 @@ const removalState = vi.hoisted(() => ({
 	remove: vi.fn(),
 }));
 
-vi.mock("~/ui/pixi/drag/removeCheatItemFx", () => ({
+vi.mock("~/engine/cheat/write/removeCheatItemFx", () => ({
 	removeCheatItemFx: (props: unknown) =>
 		Effect.sync(() => {
 			removalState.remove(props);
-			return true;
 		}),
 }));
 
@@ -335,6 +334,7 @@ export const mountController = ({
 			},
 		}),
 		reportCriticalFailure,
+		runFx: (effect: Effect.Effect<unknown, unknown>) => effect,
 	} as never;
 	const magneticField = {
 		closeFx: Effect.void,

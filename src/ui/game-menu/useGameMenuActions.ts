@@ -162,7 +162,14 @@ export const useGameMenuActions = ({
 		if (navigationError !== undefined) {
 			return `Navigation failed: ${errorMessage(navigationError)}`;
 		}
-		if (menu.routePending) return "Opening action page…";
+		if (
+			menu.activeAction === "settings" ||
+			menu.activeAction === "cheats" ||
+			menu.activeAction === "main-menu" ||
+			menu.activeAction === "hard-reset"
+		) {
+			return "Opening action page…";
+		}
 		if (successfulCommand === "save-and-exit") return "Save and exit requested.";
 		if (successfulCommand === "save") return "Saved.";
 		return null;

@@ -10,7 +10,7 @@ import { whenVisualReadyFx } from "~/ui/pixi/actor/whenVisualReadyFx";
 import { createActorVisualFx } from "~/ui/pixi/actor/createActorVisualFx";
 import { destroyActorVisualFx } from "~/ui/pixi/actor/destroyActorVisualFx";
 import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
-import { resumeActorEnterFx } from "~/ui/pixi/animation/resumeActorEnterFx";
+import { runActorLifecycleFx } from "~/ui/pixi/animation/runActorLifecycleFx";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
 
@@ -94,9 +94,10 @@ export const transitionActorVisualFx = Effect.fn("transitionActorVisualFx")(func
 	actor.visuals.add(incoming);
 	actor.pendingVisual = incoming;
 	actor.visualLayer.addChild(incoming.container);
-	yield* resumeActorEnterFx({
+	yield* runActorLifecycleFx({
 		actor,
 		animator,
+		kind: "resume-enter",
 	});
 
 	const ownsIncoming = () =>

@@ -5,8 +5,7 @@ import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
 import "~test/ui/pixi/MotionRuntime.test/fixture";
-import { readMotionOriginFx } from "~/ui/pixi/motion/readMotionOriginFx";
-import { runInputMotionFx } from "~/ui/pixi/motion/runInputMotionFx";
+import { runMotionCueFx } from "~/ui/pixi/motion/runMotionCueFx";
 
 import {
 	createActorMap,
@@ -82,14 +81,6 @@ describe("direct input remainder", () => {
 			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
 			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
 		};
-		const origin = Effect.runSync(
-			readMotionOriginFx({
-				originActor: source,
-				originLocation: firstBoardLocation,
-				surface,
-			}),
-		);
-		if (origin === null) throw new Error("Expected the dragged actor origin.");
 		const cue = {
 			canonicalItemId: source.item.itemId,
 			eventIndex: 0,
@@ -107,7 +98,7 @@ describe("direct input remainder", () => {
 		} satisfies TileMotionCue;
 
 		Effect.runSync(
-			runInputMotionFx({
+			runMotionCueFx({
 				actorStore: createActorStore({
 					actors,
 					canonicalItems,
@@ -118,10 +109,9 @@ describe("direct input remainder", () => {
 				application,
 				cue,
 				cueKey: "42:0",
-				delayMs: 0,
 				magneticField: createRecordingMagneticField(),
 				onComplete: completed,
-				onRemainderRevealed: () => {
+				onInputRemainderRevealed: () => {
 					source.item = {
 						...source.item,
 						badgeCount: 7,
@@ -132,11 +122,16 @@ describe("direct input remainder", () => {
 				onPayloadCreated: (actor) => {
 					transients.push(actor);
 				},
-				origin,
+				onSwapLegSettled: vi.fn(),
+				onSwapLegStarted: vi.fn(),
 				readPalette: () => palette,
 				readSourceSurvives: () => true,
+				readTargetRoute: (actorId, location) => ({
+					actorId,
+					location,
+					redirected: false,
+				}),
 				surface,
-				target,
 				textures: {} as never,
 			}),
 		);

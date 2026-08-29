@@ -6,7 +6,7 @@ import {
 } from "~/ui/pixi/animation/runActorLifecycleFx";
 import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
-import { burstAckParticlesFx } from "~/ui/pixi/animation/burstAckParticlesFx";
+import { burstFeedbackParticlesFx } from "~/ui/pixi/animation/burstFeedbackParticlesFx";
 
 import {
 	boardLocation,
@@ -177,7 +177,7 @@ describe("main reconciliation / feedback acknowledgements", () => {
 			actor,
 		});
 		Effect.runSync(
-			burstAckParticlesFx({
+			burstFeedbackParticlesFx({
 				actor,
 				animator: harness.animator,
 				tint: 0x57d7b2,

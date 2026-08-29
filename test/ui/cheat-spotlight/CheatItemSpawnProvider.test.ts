@@ -3,15 +3,17 @@
 import { RegistryContext, scheduleTask } from "@effect/atom-react";
 import { Deferred, Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
-import { act, createElement } from "react";
+import { act, createElement, use } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Game } from "~/renderer/game/Game";
 import type { GameSession } from "~/renderer/game/session/GameSession";
-import type { CheatItemSpawnControl } from "~/ui/cheat-spotlight/CheatItemSpawnContext";
+import {
+	CheatItemSpawnContext,
+	type CheatItemSpawnControl,
+} from "~/ui/cheat-spotlight/CheatItemSpawnContext";
 import { CheatItemSpawnProvider } from "~/ui/cheat-spotlight/CheatItemSpawnProvider";
-import { useCheatItemSpawn } from "~/ui/cheat-spotlight/useCheatItemSpawn";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 
@@ -84,7 +86,8 @@ const makePendingCommand = () => {
 };
 
 const Probe = ({ observe }: { readonly observe: (control: CheatItemSpawnControl) => void }) => {
-	const control = useCheatItemSpawn();
+	const control = use(CheatItemSpawnContext);
+	if (control === null) throw new Error("CheatItemSpawnProvider is not mounted.");
 	observe(control);
 	return null;
 };

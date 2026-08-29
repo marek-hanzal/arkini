@@ -93,13 +93,15 @@ vi.mock("~/ui/pixi/command/runSpaceActivationAtom", () => ({
 
 vi.mock("~/ui/game-menu/useGameMenuControl", () => ({
 	useGameMenuControl: () => ({
-		isOpen: false,
+		phase: "closed",
 	}),
 }));
 
 vi.mock("~/ui/item-detail/useItemDetailControl", () => ({
 	useItemDetailControl: () => ({
-		isOpen: false,
+		state: {
+			phase: "closed",
+		},
 		openItemDetailFx: (props: unknown) =>
 			Effect.sync(() => {
 				boardState.openItemDetail(props);

@@ -21,8 +21,7 @@ import { feedbackDurationMs } from "~/ui/pixi/animation/runActivityParticlesFx";
 import { burstFeedbackParticlesFx } from "~/ui/pixi/animation/burstFeedbackParticlesFx";
 import { startActivityParticlesFx } from "~/ui/pixi/animation/startActivityParticlesFx";
 import { stopActivityParticlesFx } from "~/ui/pixi/animation/stopActivityParticlesFx";
-import { lifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
-import { prepareActorEnterFx } from "~/ui/pixi/animation/prepareActorEnterFx";
+import { lifecycleDurationMs, runActorLifecycleFx } from "~/ui/pixi/animation/runActorLifecycleFx";
 import { startActorEnterFx } from "~/ui/pixi/animation/startActorEnterFx";
 import { startActorExitFx } from "~/ui/pixi/animation/startActorExitFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
@@ -35,11 +34,9 @@ import type { MotionRuntime } from "~/ui/pixi/motion/MotionRuntime";
 import { projectMotionItemFn } from "~/ui/pixi/motion/fn/projectMotionItemFn";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
-import type { MainReconciler } from "~/ui/pixi/scene/MainReconciler";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 import { classifyActorUpdateFn } from "~/ui/pixi/scene/fn/classifyActorUpdateFn";
 import { classifyReconciliationFn } from "~/ui/pixi/scene/fn/classifyReconciliationFn";
-import { releaseMainActorFx } from "~/ui/pixi/scene/releaseMainActorFx";
 import { runReplacementsFx } from "~/ui/pixi/scene/runReplacementsFx";
 
 export namespace createMainReconcilerFx {
@@ -58,10 +55,41 @@ export namespace createMainReconcilerFx {
 		readonly surface: MainSurface;
 		readonly textures: TextureStore;
 	}
+
+	export interface Result {
+		readonly hydrateFx: (
+			transition: ReturnType<GameEngine["getTransitionSnapshot"]>,
+		) => Effect.Effect<void>;
+		readonly reconcileFx: (
+			transition: ReturnType<GameEngine["getTransitionSnapshot"]>,
+		) => Effect.Effect<void>;
+		readonly refreshVisualsFx: Effect.Effect<void>;
+		readonly closeFx: Effect.Effect<void>;
+	}
 }
 
 const runningTransitionDurationMs = 180;
 const feedbackExitDurationMs = 420;
+
+const releaseMainActorFx = Effect.fn("createMainReconcilerFx.releaseActorFx")(function* ({
+	actorId,
+	actorStore,
+	animator,
+	drag,
+}: {
+	readonly actorId: string;
+	readonly actorStore: MainActorStore;
+	readonly animator: ActorAnimator;
+	readonly drag: MainDragController;
+}) {
+	const actor = actorStore.actors.get(actorId);
+	if (actor === undefined) return null;
+	yield* drag.detachActorFx(actor);
+	yield* actorStore.releaseActorFx(actorId);
+	yield* animator.cancelActorFx(actor);
+	actor.visualTransitionGeneration += 1;
+	return actor;
+});
 
 /**
  * Reconciles one canonical transition into retained actors while motion owns presentation lag.
@@ -396,9 +424,10 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 					y: spawnOrigin?.y ?? pose.y,
 				});
 				if (presentCommittedEffects) {
-					yield* prepareActorEnterFx({
+					yield* runActorLifecycleFx({
 						actor: created,
 						animator,
+						kind: "prepare-enter",
 					});
 				}
 				yield* drag.attachActorFx(created);
@@ -571,5 +600,5 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			processedFeedbackKeys.clear();
 			processedReplacementKeys.clear();
 		}),
-	} satisfies MainReconciler;
+	} satisfies createMainReconcilerFx.Result;
 });

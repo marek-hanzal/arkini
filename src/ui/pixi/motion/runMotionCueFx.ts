@@ -9,7 +9,6 @@ import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import { startActorEnterFx } from "~/ui/pixi/animation/startActorEnterFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
-import { readMotionOriginFx } from "~/ui/pixi/motion/readMotionOriginFx";
 import { runInputMotionFx } from "~/ui/pixi/motion/runInputMotionFx";
 import { runSpawnMotionFx } from "~/ui/pixi/motion/runSpawnMotionFx";
 import { runStackMotionFx } from "~/ui/pixi/motion/runStackMotionFx";
@@ -43,6 +42,33 @@ export namespace runMotionCueFx {
 		readonly textures: TextureStore;
 	}
 }
+
+const readMotionOriginFx = Effect.fn("runMotionCueFx.readOriginFx")(function* ({
+	originActor,
+	originLocation,
+	surface,
+}: {
+	readonly originActor: PixiTileActor | null;
+	readonly originLocation: TileMotionCue["originLocation"];
+	readonly surface: MainSurface;
+}) {
+	if (originActor !== null && !originActor.container.destroyed) {
+		const scale = originActor.container.scale.x;
+		return {
+			layer: originActor.container.parent ?? surface.transientActorLayer,
+			size: originActor.size * scale,
+			x:
+				originActor.container.x -
+				originActor.container.pivot.x * scale +
+				originActor.offsetLayer.x * scale,
+			y:
+				originActor.container.y -
+				originActor.container.pivot.y * scale +
+				originActor.offsetLayer.y * scale,
+		};
+	}
+	return yield* surface.readLocationPoseFx(originLocation);
+});
 
 /** Resolves one cue and exhaustively delegates its stateless animation execution. */
 export const runMotionCueFx = Effect.fn("runMotionCueFx")(function* ({

@@ -137,6 +137,19 @@ const config = GameConfigSchema.parse({
 				rules: [],
 			},
 		},
+		temporary: {
+			uid: "temporary",
+			id: "temporary",
+			type: "temporary",
+			title: "Temporary",
+			description: "Temporary",
+			asset: {
+				default: [
+					"asset:temporary",
+				],
+			},
+			durationMs: 1_000,
+		},
 	},
 });
 const craftItem = config.items.craft;
@@ -157,11 +170,13 @@ const boardLocation = {
 const runtime = ({
 	active = false,
 	ownerItem = craftItem,
+	queued = 0,
 	storedQuantity = 0,
 	storedQuantities,
 }: {
 	readonly active?: boolean;
 	readonly ownerItem?: typeof craftItem | typeof blueprintItem;
+	readonly queued?: number;
 	readonly storedQuantity?: number;
 	readonly storedQuantities?: ReadonlyArray<number>;
 }) => {
@@ -213,7 +228,16 @@ const runtime = ({
 					},
 				]
 			: [],
-		jobQueue: [],
+		jobQueue: Array.from(
+			{
+				length: queued,
+			},
+			(_, index) => ({
+				id: `job:queue:${index}`,
+				ownerItemId: "runtime:owner",
+				lineId: ownerItem.line.id,
+			}),
+		),
 		defaultLineByOwnerItemId: {},
 	});
 };
@@ -395,9 +419,10 @@ describe("readTileActorAssetSourceIdsFx", () => {
 		expect(filled).not.toHaveProperty("compositeUrl");
 	});
 
-	it("projects active job progress through the canonical tile actor read", () => {
+	it("projects active work progress, activity, and queue count through the tile actor read", () => {
 		const nextRuntime = runtime({
 			active: true,
+			queued: 2,
 		});
 		const game = {
 			getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
@@ -410,7 +435,52 @@ describe("readTileActorAssetSourceIdsFx", () => {
 					runtime: nextRuntime,
 					surface: "main",
 				}),
-			)[0]?.progressRatio,
-		).toBe(0.5);
+			)[0],
+		).toMatchObject({
+			activityEffect: true,
+			badgeCount: 3,
+			badgeKind: "queue",
+			progressRatio: 0.5,
+		});
+	});
+
+	it("projects temporary lifetime through the tile actor read", () => {
+		const nextRuntime = RuntimeSchema.parse({
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
+			items: [
+				{
+					id: "runtime:temporary",
+					revision: "revision:temporary",
+					item: config.items.temporary,
+					location: boardLocation,
+					quantity: 1,
+					remainingDurationMs: 600,
+				},
+			],
+			jobs: [],
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
+		});
+		const game = {
+			getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
+		} as GameEngine;
+
+		expect(
+			Effect.runSync(
+				readTileActorsFx({
+					game,
+					runtime: nextRuntime,
+					surface: "main",
+				}),
+			)[0],
+		).toMatchObject({
+			activityEffect: false,
+			progressRatio: 0.6,
+		});
 	});
 });

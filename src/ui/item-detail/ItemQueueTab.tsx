@@ -1,7 +1,7 @@
 import { CircleOff, ListX } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
-import { useClearItemDetailQueue } from "~/ui/item-detail/useClearItemDetailQueue";
+import { clearItemJobQueueFx } from "~/engine/job/write/clearItemJobQueueFx";
 import type { useItemDetailQueue } from "~/ui/item-detail/useItemDetailQueue";
 import { LinkButton } from "~/ui/button/LinkButton";
 import { ItemIdentity } from "~/ui/item/ItemIdentity";
@@ -14,6 +14,7 @@ import { ItemRuntime } from "~/ui/item-detail/ItemRuntime";
 import { readActiveJobRuntimeFn } from "~/ui/item-detail/fn/readActiveJobRuntimeFn";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
+import { useItemDetailPendingCommand } from "~/ui/item-detail/useItemDetailPendingCommand";
 
 const statusLabel = {
 	"awaiting-output": "Awaiting output",
@@ -244,9 +245,12 @@ export const ItemQueueTab = ({
 		"queue",
 		queue.itemId,
 	]);
-	const clearQueue = useClearItemDetailQueue({
+	const clearQueue = useItemDetailPendingCommand({
+		action: "clear-queue",
+		failureMessage: "Queue could not be cleared.",
 		pendingKey,
 		pendingOwner: itemDetail,
+		run: (game, command: clearItemJobQueueFx.Props) => game.runFx(clearItemJobQueueFx(command)),
 	});
 	const pending = clearQueue.pending;
 	const error = clearQueue.error;

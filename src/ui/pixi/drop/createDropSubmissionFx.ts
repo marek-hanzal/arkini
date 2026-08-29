@@ -6,6 +6,7 @@ import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { readActorCursorFn } from "~/ui/pixi/actor/fn/readActorCursorFn";
 import { animateRetargetablePoseFx } from "~/ui/pixi/animation/animateRetargetablePoseFx";
 import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
@@ -14,7 +15,7 @@ import { startActorExitFx } from "~/ui/pixi/animation/startActorExitFx";
 import { burstFeedbackParticlesFx } from "~/ui/pixi/animation/burstFeedbackParticlesFx";
 import { settleDraggedActorFx } from "~/ui/pixi/drag/settleDraggedActorFx";
 import type { CursorGrabMotion } from "~/ui/pixi/drag/CursorGrabMotion";
-import { beginDropFx } from "~/ui/pixi/drop/beginDropFx";
+import type { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
 import type { DropPresentation } from "~/ui/pixi/drop/DropPresentation";
 import type { DropSubmission } from "~/ui/pixi/drop/DropSubmission";
 import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
@@ -38,6 +39,50 @@ export namespace createDropSubmissionFx {
 }
 
 const inventoryShortcutTravelOwnerPrefix = "inventory-shortcut-travel";
+
+const beginDropFx = Effect.fn("createDropSubmissionFx.beginDropFx")(function* ({
+	commandTarget,
+	dropPresentation,
+	previewKind,
+	sourceItem,
+	targetItem,
+}: {
+	readonly commandTarget: runTileDropAtom.Command["target"];
+	readonly dropPresentation: DropPresentation;
+	readonly previewKind: readTileDropPreviewFx.Result["kind"] | null;
+	readonly sourceItem: TileActorItem;
+	readonly targetItem: TileActorItem | null;
+}) {
+	const swapCandidate =
+		previewKind === DropItemResultKind.Swap && targetItem !== null
+			? {
+					source: {
+						id: sourceItem.id,
+						location: sourceItem.location,
+						revision: sourceItem.revision,
+					},
+					target: {
+						id: targetItem.id,
+						location: targetItem.location,
+						revision: targetItem.revision,
+					},
+				}
+			: null;
+	const command = {
+		sourceItemId: sourceItem.id,
+		sourceLocation: sourceItem.location,
+		sourceRevision: sourceItem.revision,
+		target: commandTarget,
+	} satisfies runTileDropAtom.Command;
+	const generation = yield* dropPresentation.beginFx({
+		sourceActorId: sourceItem.id,
+		swapCandidate,
+	});
+	return {
+		command,
+		generation,
+	};
+});
 
 /**
  * Owns each independent drop from frozen release facts through command settlement.

@@ -4,7 +4,6 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { useMemo } from "react";
 
 import type { PlayableGame } from "~/renderer/game/PlayableGame";
-import { GameRuntimeAtom } from "~/ui/game/GameRuntimeAtom";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 /** Selects a stable projection from the latest committed runtime snapshot. */
@@ -16,7 +15,7 @@ export const useRuntimeSelector = <Selected>(
 	const selectedAtom = useMemo(
 		() =>
 			Atom.readable((get) => {
-				const selected = selector(get(GameRuntimeAtom(game.committedTransitionAtom)));
+				const selected = selector(get(game.committedTransitionAtom).runtime);
 				return Option.match(get.self<Selected>(), {
 					onNone: () => selected,
 					onSome: (previous) => (isEqual(previous, selected) ? previous : selected),

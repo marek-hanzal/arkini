@@ -58,7 +58,7 @@ describe("ItemDetailController", () => {
 				}),
 			),
 		);
-		const entering = controller.getSnapshot().state;
+		const entering = controller.getSnapshot();
 		if (entering.phase !== "entering") throw new Error("Expected entering state.");
 		Effect.runSync(controller.completeEnterFx(entering.generation));
 
@@ -70,7 +70,7 @@ describe("ItemDetailController", () => {
 			),
 		);
 
-		expect(controller.getSnapshot().state).toMatchObject({
+		expect(controller.getSnapshot()).toMatchObject({
 			generation: entering.generation,
 			phase: "open",
 			target: {
@@ -93,21 +93,21 @@ describe("ItemDetailController", () => {
 				),
 			),
 		).toBe(true);
-		const entering = controller.getSnapshot().state;
+		const entering = controller.getSnapshot();
 		if (entering.phase !== "entering") throw new Error("Expected entering state.");
 		expect(controller.readOrigin(document.createElement("button"))).toBe(origin);
 		Effect.runSync(controller.completeEnterFx(entering.generation + 1));
-		expect(controller.getSnapshot().state.phase).toBe("entering");
+		expect(controller.getSnapshot().phase).toBe("entering");
 		Effect.runSync(controller.completeEnterFx(entering.generation));
 
 		const close = Effect.runPromise(controller.closeFx());
 		await Promise.resolve();
-		expect(controller.getSnapshot().state.phase).toBe("exiting");
+		expect(controller.getSnapshot().phase).toBe("exiting");
 		Effect.runSync(controller.completeExitFx(entering.generation + 1));
-		expect(controller.getSnapshot().state.phase).toBe("exiting");
+		expect(controller.getSnapshot().phase).toBe("exiting");
 		Effect.runSync(controller.completeExitFx(entering.generation));
 		await close;
-		expect(controller.getSnapshot().state).toEqual({
+		expect(controller.getSnapshot()).toEqual({
 			phase: "closed",
 		});
 		expect(listener).toHaveBeenCalledTimes(4);
@@ -116,14 +116,14 @@ describe("ItemDetailController", () => {
 	it("resolves an outstanding close when reset tears down the presentation owner", async () => {
 		const controller = Effect.runSync(createItemDetailControllerFx());
 		Effect.runSync(controller.openTargetFx(runtimeTarget()));
-		const entering = controller.getSnapshot().state;
+		const entering = controller.getSnapshot();
 		if (entering.phase !== "entering") throw new Error("Expected entering state.");
 		Effect.runSync(controller.completeEnterFx(entering.generation));
 		const close = Effect.runPromise(controller.closeFx());
 		await Promise.resolve();
 		Effect.runSync(controller.resetFx);
 		await close;
-		expect(controller.getSnapshot().state).toEqual({
+		expect(controller.getSnapshot()).toEqual({
 			phase: "closed",
 		});
 	});

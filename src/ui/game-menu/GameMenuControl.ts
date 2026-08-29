@@ -11,9 +11,7 @@ export type GameMenuAction =
 /** Synchronous game-menu intent plus transition completion at the game-shell boundary. */
 export interface GameMenuControl {
 	readonly phase: GameMenuPhase;
-	readonly isOpen: boolean;
 	readonly activeAction: GameMenuAction | null;
-	readonly routePending: boolean;
 	readonly open: () => void;
 	readonly close: () => void;
 	readonly toggle: () => void;

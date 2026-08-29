@@ -12,9 +12,9 @@ import { feedbackDurationMs } from "~/ui/pixi/animation/runActivityParticlesFx";
 
 import { Effect } from "effect";
 
-import { readMainLayoutFx } from "~/ui/pixi/layout/readMainLayoutFx";
+import { readMainLayoutFn } from "~/ui/pixi/layout/fn/readMainLayoutFn";
 
-import { readInventoryLayoutFx } from "~/ui/pixi/layout/readInventoryLayoutFx";
+import { readInventoryLayoutFn } from "~/ui/pixi/layout/fn/readInventoryLayoutFn";
 
 import { createInventoryRuntimeFx } from "~/ui/pixi/scene/createInventoryRuntimeFx";
 
@@ -523,24 +523,20 @@ export const pointer = (x: number, y: number, button = 0): FakePointerEvent => (
 });
 
 export const readTestInventoryLayout = (width = 800, height = 480) => {
-	const preferredCellSize = Effect.runSync(
-		readMainLayoutFx({
-			boardHeight: 7,
-			boardWidth: 11,
-			height,
-			toolbarSize: 8,
-			width,
-		}),
-	).board.cellSize;
-	return Effect.runSync(
-		readInventoryLayoutFx({
-			columns: 5,
-			height,
-			preferredCellSize,
-			rows: 4,
-			width,
-		}),
-	);
+	const preferredCellSize = readMainLayoutFn({
+		boardHeight: 7,
+		boardWidth: 11,
+		height,
+		toolbarSize: 8,
+		width,
+	}).board.cellSize;
+	return readInventoryLayoutFn({
+		columns: 5,
+		height,
+		preferredCellSize,
+		rows: 4,
+		width,
+	});
 };
 
 export const slotPointer = (x: number, button = 0) => {

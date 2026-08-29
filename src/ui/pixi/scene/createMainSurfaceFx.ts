@@ -2,7 +2,6 @@ import { Effect } from "effect";
 import { Container, Graphics, Rectangle } from "pixi.js";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
@@ -13,8 +12,8 @@ import type { DropFeedback } from "~/ui/pixi/grid/DropFeedback";
 import { drawMaskFx } from "~/ui/pixi/grid/drawMaskFx";
 import { drawSurfaceFx } from "~/ui/pixi/grid/drawSurfaceFx";
 import { readSlotFx } from "~/ui/pixi/grid/readSlotFx";
+import { readMainLayoutFn } from "~/ui/pixi/layout/fn/readMainLayoutFn";
 import type { MainLayout } from "~/ui/pixi/layout/SceneLayout";
-import { readMainLayoutFx } from "~/ui/pixi/layout/readMainLayoutFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { MainSurface, TargetFacts } from "~/ui/pixi/scene/MainSurface";
 import type { PixiSceneDropTarget } from "~/ui/pixi/scene/PixiSceneDropTarget";
@@ -42,15 +41,13 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 			let palette = initialPalette;
 			let latestTransition = game.getTransitionSnapshot();
 			let layoutRevision = 0;
-			let layout: MainLayout = RendererRuntime.runSync(
-				readMainLayoutFx({
-					boardHeight: game.config.meta.board.height,
-					boardWidth: game.config.meta.board.width,
-					height: application.app.screen.height,
-					toolbarSize: game.config.meta.toolbarSize ?? 0,
-					width: application.app.screen.width,
-				}),
-			);
+			let layout: MainLayout = readMainLayoutFn({
+				boardHeight: game.config.meta.board.height,
+				boardWidth: game.config.meta.board.width,
+				height: application.app.screen.height,
+				toolbarSize: game.config.meta.toolbarSize ?? 0,
+				width: application.app.screen.width,
+			});
 
 			const gridLayer = new Container({
 				eventMode: "none",
@@ -341,15 +338,13 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 				),
 				redrawFx: Effect.gen(function* () {
 					layoutRevision += 1;
-					layout = RendererRuntime.runSync(
-						readMainLayoutFx({
-							boardHeight: game.config.meta.board.height,
-							boardWidth: game.config.meta.board.width,
-							height: application.app.screen.height,
-							toolbarSize: game.config.meta.toolbarSize ?? 0,
-							width: application.app.screen.width,
-						}),
-					);
+					layout = readMainLayoutFn({
+						boardHeight: game.config.meta.board.height,
+						boardWidth: game.config.meta.board.width,
+						height: application.app.screen.height,
+						toolbarSize: game.config.meta.toolbarSize ?? 0,
+						width: application.app.screen.width,
+					});
 					application.stage.hitArea = new Rectangle(
 						0,
 						0,

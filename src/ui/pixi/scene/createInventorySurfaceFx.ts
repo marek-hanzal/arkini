@@ -2,7 +2,6 @@ import { Effect } from "effect";
 import { Container, Graphics, Rectangle } from "pixi.js";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
@@ -12,9 +11,9 @@ import type { DropFeedback } from "~/ui/pixi/grid/DropFeedback";
 import { drawMaskFx } from "~/ui/pixi/grid/drawMaskFx";
 import { drawSurfaceFx } from "~/ui/pixi/grid/drawSurfaceFx";
 import { readSlotFx } from "~/ui/pixi/grid/readSlotFx";
+import { readInventoryLayoutFn } from "~/ui/pixi/layout/fn/readInventoryLayoutFn";
+import { readMainLayoutFn } from "~/ui/pixi/layout/fn/readMainLayoutFn";
 import type { InventoryLayout } from "~/ui/pixi/layout/SceneLayout";
-import { readInventoryLayoutFx } from "~/ui/pixi/layout/readInventoryLayoutFx";
-import { readMainLayoutFx } from "~/ui/pixi/layout/readMainLayoutFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { InventoryDropTarget } from "~/ui/pixi/scene/InventoryDropTarget";
 import type { InventoryActorPose, InventorySurface } from "~/ui/pixi/scene/InventorySurface";
@@ -57,24 +56,20 @@ export const createInventorySurfaceFx = Effect.fn("createInventorySurfaceFx")(fu
 	const createLayout = () => {
 		const width = Math.max(1, application.app.screen.width);
 		const height = Math.max(1, application.app.screen.height);
-		const preferredCellSize = RendererRuntime.runSync(
-			readMainLayoutFx({
-				boardHeight: game.config.meta.board.height,
-				boardWidth: game.config.meta.board.width,
-				height,
-				toolbarSize: game.config.meta.toolbarSize ?? 0,
-				width,
-			}),
-		).board.cellSize;
-		return RendererRuntime.runSync(
-			readInventoryLayoutFx({
-				columns: game.config.meta.inventory.width,
-				height,
-				preferredCellSize,
-				rows: game.config.meta.inventory.height,
-				width,
-			}),
-		);
+		const preferredCellSize = readMainLayoutFn({
+			boardHeight: game.config.meta.board.height,
+			boardWidth: game.config.meta.board.width,
+			height,
+			toolbarSize: game.config.meta.toolbarSize ?? 0,
+			width,
+		}).board.cellSize;
+		return readInventoryLayoutFn({
+			columns: game.config.meta.inventory.width,
+			height,
+			preferredCellSize,
+			rows: game.config.meta.inventory.height,
+			width,
+		});
 	};
 
 	let layout: InventoryLayout = createLayout();

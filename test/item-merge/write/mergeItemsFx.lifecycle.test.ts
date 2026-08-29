@@ -9,7 +9,7 @@ import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { isBoardRuntimeItemFn } from "~/game-runtime/read/fn/isBoardRuntimeItemFn";
 import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import type { StateSchema } from "~/engine/state/schema/StateSchema";
+import type { StateSchema } from "~/game-persistence/StateSchema";
 
 const baseItem = ({ id }: { id: string }) => ({
 	uid: id,

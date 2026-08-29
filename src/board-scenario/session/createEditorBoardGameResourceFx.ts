@@ -6,7 +6,7 @@ import { type EditorBoardGameResource } from "~/board-scenario/session/EditorBoa
 import { createEditorBoardGameFx } from "~/board-scenario/session/createEditorBoardGameFx";
 import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
 import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
-import type { StateSchema } from "~/engine/state/schema/StateSchema";
+import type { StateSchema } from "~/game-persistence/StateSchema";
 
 export namespace createEditorBoardGameResourceFx {
 	export interface Dependencies {

@@ -2,8 +2,8 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import { fromStateFx } from "~/engine/state/fx/fromStateFx";
-import type { StateSchema } from "~/engine/state/schema/StateSchema";
+import { fromStateFx } from "~/game-persistence/fromStateFx";
+import type { StateSchema } from "~/game-persistence/StateSchema";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
 

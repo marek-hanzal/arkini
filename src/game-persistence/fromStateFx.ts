@@ -4,8 +4,8 @@ import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import { createRevisionFx } from "~/engine/revision/fx/createRevisionFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import type { StateSchema } from "~/engine/state/schema/StateSchema";
-import type { StateItemSchema } from "~/engine/state/schema/StateItemSchema";
+import type { StateSchema } from "~/game-persistence/StateSchema";
+import type { StateItemSchema } from "~/game-persistence/StateItemSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 interface FromStateProps {

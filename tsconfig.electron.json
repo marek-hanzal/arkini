@@ -26,6 +26,7 @@
 		"electron",
 		"src/game-tick",
 		"src/game-runtime",
+		"src/game-persistence",
 		"src/item-interaction",
 		"src/game-start",
 		"src/game-event",

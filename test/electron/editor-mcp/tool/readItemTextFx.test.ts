@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readItemCollectionTextFx } from "../../../../electron/main/editor-mcp/tool/readItemCollectionTextFx";
+import { readItemCollectionTextFn } from "../../../../electron/main/editor-mcp/tool/fn/readItemCollectionTextFn";
+import { readItemMetaTextFn } from "../../../../electron/main/editor-mcp/tool/fn/readItemMetaTextFn";
+import { readProjectTextFn } from "../../../../electron/main/editor-mcp/tool/fn/readProjectTextFn";
 import { readItemConfigTextFx } from "../../../../electron/main/editor-mcp/tool/readItemConfigTextFx";
 import { readItemDetailTextFx } from "../../../../electron/main/editor-mcp/tool/readItemDetailTextFx";
-import { readItemMetaTextFx } from "../../../../electron/main/editor-mcp/tool/readItemMetaTextFx";
-import { readProjectTextFx } from "../../../../electron/main/editor-mcp/tool/readProjectTextFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import { createGraphProject, createToolProject } from "./support/createToolProject";
 
@@ -16,21 +16,17 @@ describe("editor MCP item tool text", () => {
 			projectId: "project-context",
 			resources: editorTestPayload.resources,
 		};
-		const projectText = Effect.runSync(readProjectTextFx(project));
-		const metaText = Effect.runSync(readItemMetaTextFx(project));
-		const collectionText = Effect.runSync(
-			readItemCollectionTextFx(project, {
-				page: 1,
-				pageSize: 25,
-			}),
-		);
-		const fuzzyText = Effect.runSync(
-			readItemCollectionTextFx(project, {
-				page: 1,
-				pageSize: 25,
-				query: "watr",
-			}),
-		);
+		const projectText = readProjectTextFn(project);
+		const metaText = readItemMetaTextFn(project);
+		const collectionText = readItemCollectionTextFn(project, {
+			page: 1,
+			pageSize: 25,
+		});
+		const fuzzyText = readItemCollectionTextFn(project, {
+			page: 1,
+			pageSize: 25,
+			query: "watr",
+		});
 		const detailText = Effect.runSync(readItemDetailTextFx(project, "water"));
 		const configText = Effect.runSync(readItemConfigTextFx(project, "water"));
 
@@ -54,21 +50,17 @@ describe("editor MCP item tool text", () => {
 
 	it("filters and pages item collections without changing the tool text contract", () => {
 		const project = createGraphProject();
-		const producers = Effect.runSync(
-			readItemCollectionTextFx(project, {
-				itemTypes: [
-					"producer",
-				],
-				page: 1,
-				pageSize: 25,
-			}),
-		);
-		const lastPage = Effect.runSync(
-			readItemCollectionTextFx(project, {
-				page: 3,
-				pageSize: 2,
-			}),
-		);
+		const producers = readItemCollectionTextFn(project, {
+			itemTypes: [
+				"producer",
+			],
+			page: 1,
+			pageSize: 25,
+		});
+		const lastPage = readItemCollectionTextFn(project, {
+			page: 3,
+			pageSize: 2,
+		});
 
 		expect(producers).toContain("Item type filter (OR): producer");
 		expect(producers).toContain("Type-filtered items: 1");

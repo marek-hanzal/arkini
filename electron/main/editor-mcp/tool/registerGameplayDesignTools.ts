@@ -8,8 +8,8 @@ import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { deleteItemFx } from "./deleteItemFx";
 import { EditProjectInputSchema } from "./EditProjectInputSchema";
 import { editProjectFx } from "./editProjectFx";
+import { readProjectConfigTextFn } from "./fn/readProjectConfigTextFn";
 import { readItemDeleteImpactTextFx } from "./readItemDeleteImpactTextFx";
-import { readProjectConfigTextFx } from "./readProjectConfigTextFx";
 import { readProjectValidationTextFx } from "./readProjectValidationTextFx";
 import { renameItemFx } from "./renameItemFx";
 
@@ -100,7 +100,7 @@ export const registerGameplayDesignTools = ({
 				"Read JSON containing the complete editable non-item project config and its revision. The config contains full meta, resources, and start sections but intentionally excludes items. Read item_config for one complete item.",
 			inputSchema: ProjectConfigInputSchema,
 		},
-		async () => runTool(readProjectFx().pipe(Effect.flatMap(readProjectConfigTextFx))),
+		async () => runTool(readProjectFx().pipe(Effect.map(readProjectConfigTextFn))),
 	);
 	server.registerTool(
 		"edit_project",

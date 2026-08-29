@@ -176,7 +176,7 @@ const boundaryRules = [
 		to: {
 			path: "^src/@routes(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
 			pathNot: [
-				"^src/@routes/-resolveLauncherLeaveDestinationFx[.]ts$",
+				"^src/@routes/-launcher/fn/resolveLauncherLeaveDestinationFn[.]ts$",
 				"^src/@routes/action/-GameLeaveDestinationSchema[.]ts$",
 				"^src/@routes/action/-runActionRouteFx[.]ts$",
 				"^src/@routes/editor/[$]projectId/editor/items/[$]itemUid/-parseEditorItemSectionIdFx[.]ts$",

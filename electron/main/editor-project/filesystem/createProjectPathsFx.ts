@@ -5,7 +5,7 @@ import {
 	GameProjectManifestFileName,
 	GameProjectSchemaFileName,
 } from "~/game-config/source/GameProjectReference";
-import { encodeGameProjectFileStemFn as encodeFileStem } from "~/game-config/source/encodeGameProjectFileStemFn";
+import { encodeGameProjectFileStemFn } from "~/game-config/source/encodeGameProjectFileStemFn";
 import type { ProjectPaths } from "./ProjectPaths";
 
 /** Resolves every fixed and identity-derived path below one Editor project root. */
@@ -59,20 +59,25 @@ export const createProjectPathsFx = Effect.fn("createProjectPathsFx")(function* 
 		versionHeadFile: path.join(versions, "head.json"),
 		objects,
 		itemFileFx: ({ type, uid }) =>
-			Effect.succeed(path.join(items, type, `${encodeFileStem(uid)}.json`)),
+			Effect.succeed(path.join(items, type, `${encodeGameProjectFileStemFn(uid)}.json`)),
 		assetFileFx: (resourceId) => readResourceFileFx(assets, resourceId),
 		resourceFileFx: (resourceId) => readResourceFileFx(resources, resourceId),
-		noteFileFx: (noteId) => Effect.succeed(path.join(notes, `${encodeFileStem(noteId)}.json`)),
+		noteFileFx: (noteId) =>
+			Effect.succeed(path.join(notes, `${encodeGameProjectFileStemFn(noteId)}.json`)),
 		scenarioFileFx: (name) =>
 			Effect.succeed(
 				path.join(scenarios, `${createHash("sha256").update(name).digest("hex")}.json`),
 			),
 		versionDirectoryFx: (versionId) =>
-			Effect.succeed(path.join(versions, encodeFileStem(versionId))),
+			Effect.succeed(path.join(versions, encodeGameProjectFileStemFn(versionId))),
 		versionDescriptorFileFx: (versionId) =>
-			Effect.succeed(path.join(versions, encodeFileStem(versionId), "version.json")),
+			Effect.succeed(
+				path.join(versions, encodeGameProjectFileStemFn(versionId), "version.json"),
+			),
 		versionManifestFileFx: (versionId) =>
-			Effect.succeed(path.join(versions, encodeFileStem(versionId), "manifest.json")),
+			Effect.succeed(
+				path.join(versions, encodeGameProjectFileStemFn(versionId), "manifest.json"),
+			),
 		jsonObjectFileFx: (hash) => Effect.succeed(path.join(objects, `${hash}.json`)),
 		pngObjectFileFx: (hash) => Effect.succeed(path.join(objects, `${hash}.png`)),
 	} satisfies ProjectPaths;

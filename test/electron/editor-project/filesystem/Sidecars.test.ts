@@ -1,5 +1,5 @@
 import { Buffer } from "node:buffer";
-import { readFile, readdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -18,6 +18,49 @@ beforeEach(async () => {
 afterEach(async () => harness.close());
 
 describe("filesystem Editor project sidecars", () => {
+	it("refreshes and reopens notes whose exact IDs contain lone surrogates", async () => {
+		const repository = await harness.openRepository();
+		const project = await harness.createProject(repository);
+		const root = await Effect.runPromise(repository.readProjectRootFx(project.projectId));
+		if (root === null) throw new Error("Expected the managed project root.");
+		const notes = join(root, "notes");
+		await mkdir(notes);
+		const writeNote = (stem: string, content: string, timestamp: number) =>
+			writeFile(
+				join(notes, `${stem}.json`),
+				`${JSON.stringify({
+					content,
+					createdAtMs: timestamp,
+					updatedAtMs: timestamp,
+				})}\n`,
+			);
+		await Promise.all([
+			writeNote("%ED%A0%80", "High surrogate", 1),
+			writeNote("%ED%B0%80", "Low surrogate", 2),
+		]);
+
+		await Effect.runPromise(repository.refreshProjectFx(project.projectId));
+		expect(
+			(await Effect.runPromise(repository.listNotesFx(project.projectId))).map(
+				(note) => note.noteId,
+			),
+		).toEqual([
+			"\udc00",
+			"\ud800",
+		]);
+
+		await harness.closeRepository(repository);
+		const reopened = await harness.openRepository();
+		expect(
+			(await Effect.runPromise(reopened.listNotesFx(project.projectId))).map(
+				(note) => note.noteId,
+			),
+		).toEqual([
+			"\udc00",
+			"\ud800",
+		]);
+	});
+
 	it("caches portable notes and scenarios until Refresh, then preserves scenarios on a major commit", async () => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository);

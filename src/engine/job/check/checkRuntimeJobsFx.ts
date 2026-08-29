@@ -13,9 +13,9 @@ import type { JobMaterialOrphanIssueSchema } from "~/engine/job/schema/JobMateri
 import type { JobTimeInvalidIssueSchema } from "~/engine/job/schema/JobTimeInvalidIssueSchema";
 import { readItemQueueSizeFx } from "~/engine/job/read/readItemQueueSizeFx";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import type { JobRuntimeItemSchema } from "~/engine/runtime/schema/JobRuntimeItemSchema";
-import { readRuntimeItemOwnedStateFx } from "~/engine/runtime/read/readRuntimeItemOwnedStateFx";
+import { readRuntimeItemOwnedStateFn } from "~/engine/runtime/read/fn/readRuntimeItemOwnedStateFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
@@ -71,7 +71,7 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 			});
 			continue;
 		}
-		if (Option.isNone(yield* isGridRuntimeItemFx(owner)))
+		if (Option.isNone(isGridRuntimeItemFn(owner)))
 			ownerGridIssues.push({
 				jobId: entry.id,
 				ownerItemId: owner.id,
@@ -146,7 +146,7 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 			item.location.scope === LocationScopeEnumSchema.enum.Job,
 	);
 	for (const item of consumedItems) {
-		const owned = yield* readRuntimeItemOwnedStateFx({
+		const owned = readRuntimeItemOwnedStateFn({
 			ownerItemId: item.id,
 			runtime,
 		});

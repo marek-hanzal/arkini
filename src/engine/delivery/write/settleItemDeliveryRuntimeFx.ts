@@ -16,7 +16,7 @@ import { readGridLocationClaimsFn } from "~/engine/location/fn/readGridLocationC
 import { readGridLocationKeyFn } from "~/engine/location/fn/readGridLocationKeyFn";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import { isDeliveryRuntimeItemFx } from "~/engine/runtime/read/isDeliveryRuntimeItemFx";
+import { isDeliveryRuntimeItemFn } from "~/engine/runtime/read/fn/isDeliveryRuntimeItemFn";
 import type { DeliveryRuntimeItemSchema } from "~/engine/runtime/schema/DeliveryRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -62,7 +62,7 @@ export const settleItemDeliveryRuntimeFx = Effect.fn("settleItemDeliveryRuntimeF
 				runtime,
 			] as const;
 		}
-		const delivery = yield* isDeliveryRuntimeItemFx(runtimeItem);
+		const delivery = isDeliveryRuntimeItemFn(runtimeItem);
 		if (Option.isNone(delivery) || delivery.value.location.generation !== generation) {
 			const result: settleItemDeliveryRuntimeFx.SettlementResult = {
 				acceptedQuantity: 0,

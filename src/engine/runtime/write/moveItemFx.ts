@@ -14,7 +14,7 @@ import { LocationOccupiedError } from "~/engine/runtime/error/LocationOccupiedEr
 import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBoardOperationError";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
@@ -61,7 +61,7 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 				entityId: runtimeItem.id,
 				expectedRevision: revision,
 			});
-			const item = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeItem));
+			const item = Option.getOrUndefined(isGridRuntimeItemFn(runtimeItem));
 			if (item === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({

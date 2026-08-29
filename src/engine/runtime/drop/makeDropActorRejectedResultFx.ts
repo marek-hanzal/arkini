@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { makeDropRejectedResultFx } from "~/engine/runtime/drop/makeDropRejectedResultFx";
+import { makeDropRejectedResultFn } from "~/engine/runtime/drop/fn/makeDropRejectedResultFn";
 import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
 
 export namespace makeDropActorRejectedResultFx {
@@ -21,7 +21,7 @@ export const makeDropActorRejectedResultFx = Effect.fnUntraced(function* ({
 	targetItemId,
 }: makeDropActorRejectedResultFx.Props) {
 	const targetFailed = failedItemId === targetItemId;
-	return yield* makeDropRejectedResultFx({
+	return makeDropRejectedResultFn({
 		reason:
 			failure === "stale"
 				? targetFailed

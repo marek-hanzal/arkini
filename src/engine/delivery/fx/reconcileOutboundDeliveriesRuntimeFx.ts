@@ -10,7 +10,7 @@ import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import { isDeliveryRuntimeItemFx } from "~/engine/runtime/read/isDeliveryRuntimeItemFx";
+import { isDeliveryRuntimeItemFn } from "~/engine/runtime/read/fn/isDeliveryRuntimeItemFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { matchesItemSelectorFx } from "~/engine/selector/fx/matchesItemSelectorFx";
 
@@ -35,7 +35,7 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 	let nextRuntime = runtime;
 
 	for (const item of runtime.items) {
-		const delivery = yield* isDeliveryRuntimeItemFx(item);
+		const delivery = isDeliveryRuntimeItemFn(item);
 		if (Option.isNone(delivery)) continue;
 		const current = delivery.value;
 		if (current.location.phase !== "outbound") continue;

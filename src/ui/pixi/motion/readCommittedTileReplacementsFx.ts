@@ -8,7 +8,7 @@ import { readTileActorVisualFx } from "~/ui/pixi/actor/readTileActorVisualFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 
 export interface TileReplacement {
 	readonly actorId: string;
@@ -49,10 +49,10 @@ export const readCommittedTileReplacementsFx = Effect.fn("readCommittedTileRepla
 								return null;
 							}
 							const previous = Option.getOrUndefined(
-								yield* isGridRuntimeItemFx(previousRuntimeItem),
+								isGridRuntimeItemFn(previousRuntimeItem),
 							);
 							const current = Option.getOrUndefined(
-								yield* isGridRuntimeItemFx(currentRuntimeItem),
+								isGridRuntimeItemFn(currentRuntimeItem),
 							);
 							if (
 								previous === undefined ||

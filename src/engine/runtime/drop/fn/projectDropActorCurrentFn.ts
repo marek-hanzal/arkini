@@ -1,5 +1,3 @@
-import { Effect } from "effect";
-
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 
 export interface DropTransferActor {
@@ -13,9 +11,7 @@ export interface DropTransferActor {
 }
 
 /** Projects the canonical current actor shape shared by drop commit results. */
-export const projectDropActorCurrentFx = Effect.fnUntraced(function* (
-	item: DropTransferActor | undefined,
-) {
+export const projectDropActorCurrentFn = (item: DropTransferActor | undefined) => {
 	return item === undefined
 		? null
 		: {
@@ -25,4 +21,4 @@ export const projectDropActorCurrentFx = Effect.fnUntraced(function* (
 				location: item.location,
 				quantity: item.quantity,
 			};
-});
+};

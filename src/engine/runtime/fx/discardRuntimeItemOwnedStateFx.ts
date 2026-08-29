@@ -4,7 +4,7 @@ import { reconcileOutboundDeliveriesRuntimeFx } from "~/engine/delivery/fx/recon
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { JobOwnerBusyError } from "~/engine/job/error/JobOwnerBusyError";
 import { discardRuntimeItemIdentityStateFx } from "~/engine/runtime/fx/discardRuntimeItemIdentityStateFx";
-import { readRuntimeItemOwnedStateFx } from "~/engine/runtime/read/readRuntimeItemOwnedStateFx";
+import { readRuntimeItemOwnedStateFn } from "~/engine/runtime/read/fn/readRuntimeItemOwnedStateFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace discardRuntimeItemOwnedStateFx {
@@ -22,7 +22,7 @@ export namespace discardRuntimeItemOwnedStateFx {
  */
 export const discardRuntimeItemOwnedStateFx = Effect.fn("discardRuntimeItemOwnedStateFx")(
 	function* ({ ownerItemId, runtime }: discardRuntimeItemOwnedStateFx.Props) {
-		const owned = yield* readRuntimeItemOwnedStateFx({
+		const owned = readRuntimeItemOwnedStateFn({
 			ownerItemId,
 			runtime,
 		});

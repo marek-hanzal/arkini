@@ -9,6 +9,24 @@ import { EditorProjectNoteFileSchema } from "~/project-note/EditorProjectNoteFil
 import { EditorNoteSchema } from "~/project-note/EditorNoteSchema";
 import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
 
+const decodeNoteFileStemFn = (stem: string) => {
+	// URI decoding rejects the lone-surrogate triplets emitted by the total writer.
+	const withLoneSurrogates = stem.replace(
+		/%ED%([AB][0-9A-F])%([89AB][0-9A-F])/giu,
+		(_match, secondByte: string, thirdByte: string) =>
+			String.fromCharCode(
+				0xd000 |
+					((Number.parseInt(secondByte, 16) & 0x3f) << 6) |
+					(Number.parseInt(thirdByte, 16) & 0x3f),
+			),
+	);
+	try {
+		return decodeURIComponent(withLoneSurrogates);
+	} catch {
+		return undefined;
+	}
+};
+
 const readJsonFilesFx = Effect.fn("readSidecarJsonFilesFx")(function* (
 	root: string,
 	directory: string,
@@ -57,13 +75,16 @@ export const readSidecarsFx = Effect.fn("readSidecarsFx")(function* ({
 		yield* readJsonFilesFx(paths.root, paths.notes),
 		({ file, value }) =>
 			Effect.gen(function* () {
-				const noteId = yield* Effect.try({
-					try: () => decodeURIComponent(path.basename(file).slice(0, -".json".length)),
-					catch: (cause) =>
-						new Error(`Editor note ${file} has an invalid filename.`, {
-							cause,
-						}),
-				});
+				const noteId = decodeNoteFileStemFn(path.basename(file).slice(0, -".json".length));
+				if (noteId === undefined)
+					return yield* Effect.fail(
+						new Error(`Editor note ${file} has an invalid filename.`),
+					);
+				const expected = yield* paths.noteFileFx(noteId);
+				if (path.resolve(file) !== expected)
+					return yield* Effect.fail(
+						new Error(`Editor note ${noteId} has an invalid filename.`),
+					);
 				const note = yield* Effect.try({
 					try: () => EditorProjectNoteFileSchema.parse(value),
 					catch: (cause) =>
@@ -71,11 +92,6 @@ export const readSidecarsFx = Effect.fn("readSidecarsFx")(function* ({
 							cause,
 						}),
 				});
-				const expected = yield* paths.noteFileFx(noteId);
-				if (path.resolve(file) !== expected)
-					return yield* Effect.fail(
-						new Error(`Editor note ${noteId} has an invalid filename.`),
-					);
 				return yield* Effect.try({
 					try: () =>
 						EditorNoteSchema.parse({

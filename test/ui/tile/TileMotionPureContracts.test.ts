@@ -1,4 +1,3 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type {
@@ -6,12 +5,12 @@ import type {
 	TileMotionCue,
 	TileStackMotionCue,
 } from "~/ui/pixi/motion/TileMotionCue";
-import { readInteractionClaimsFx } from "~/ui/pixi/motion/readInteractionClaimsFx";
-import { readTileMotionActorClaimsFx } from "~/ui/tile/motion/readTileMotionActorClaimsFx";
-import { readTileMotionLaneClaimsFx } from "~/ui/tile/motion/readTileMotionLaneClaimsFx";
-import { readTileMotionStaggerDelaySecondsFx } from "~/ui/tile/motion/readTileMotionStaggerDelaySecondsFx";
-import { readUnsettledTileInputSourceQuantitiesFx } from "~/ui/tile/motion/readUnsettledTileInputSourceQuantitiesFx";
-import { updateTileMotionLanesFx } from "~/ui/tile/motion/updateTileMotionLanesFx";
+import { readInteractionClaimsFn } from "~/ui/pixi/motion/fn/readInteractionClaimsFn";
+import { readTileMotionActorClaimsFn } from "~/ui/tile/motion/fn/readTileMotionActorClaimsFn";
+import { readTileMotionLaneClaimsFn } from "~/ui/tile/motion/fn/readTileMotionLaneClaimsFn";
+import { readTileMotionStaggerDelaySecondsFn } from "~/ui/tile/motion/fn/readTileMotionStaggerDelaySecondsFn";
+import { readUnsettledTileInputSourceQuantitiesFn } from "~/ui/tile/motion/fn/readUnsettledTileInputSourceQuantitiesFn";
+import { updateTileMotionLanesFn } from "~/ui/tile/motion/fn/updateTileMotionLanesFn";
 
 const board = (x: number) => ({
 	scope: "board" as const,
@@ -80,7 +79,7 @@ describe("pure tile motion contracts", () => {
 				4,
 				5,
 				20,
-			].map((index) => Effect.runSync(readTileMotionStaggerDelaySecondsFx(index))),
+			].map((index) => readTileMotionStaggerDelaySecondsFn(index)),
 		).toEqual([
 			0,
 			0.055,
@@ -105,7 +104,7 @@ describe("pure tile motion contracts", () => {
 			targetLocation: board(0),
 		} satisfies TileMotionCue;
 
-		expect(Effect.runSync(readTileMotionActorClaimsFx(swap))).toEqual(
+		expect(readTileMotionActorClaimsFn(swap)).toEqual(
 			new Set([
 				"runtime:target",
 				"runtime:source",
@@ -130,24 +129,22 @@ describe("pure tile motion contracts", () => {
 			targetActorId: "runtime:stacked",
 		});
 
-		expect(Effect.runSync(readTileMotionActorClaimsFx(spawn))).toEqual(
+		expect(readTileMotionActorClaimsFn(spawn)).toEqual(
 			new Set([
 				"runtime:spawned",
 				"runtime:producer",
 			]),
 		);
-		expect(Effect.runSync(readTileMotionActorClaimsFx(stack))).toEqual(
+		expect(readTileMotionActorClaimsFn(stack)).toEqual(
 			new Set([
 				"runtime:producer",
 			]),
 		);
 		expect(
-			Effect.runSync(
-				readInteractionClaimsFx([
-					spawn,
-					stack,
-				]),
-			),
+			readInteractionClaimsFn([
+				spawn,
+				stack,
+			]),
 		).toEqual(
 			new Map([
 				[
@@ -162,8 +159,8 @@ describe("pure tile motion contracts", () => {
 			actorId: "runtime:producer",
 			batchKey: "7:runtime:producer",
 		};
-		expect(Effect.runSync(readTileMotionLaneClaimsFx(spawn))).toContainEqual(producerLane);
-		expect(Effect.runSync(readTileMotionLaneClaimsFx(stack))).toContainEqual(producerLane);
+		expect(readTileMotionLaneClaimsFn(spawn)).toContainEqual(producerLane);
+		expect(readTileMotionLaneClaimsFn(stack)).toContainEqual(producerLane);
 	});
 
 	it("keeps the delivered source click-only and exposes only its oldest unsettled quantity", () => {
@@ -178,13 +175,13 @@ describe("pure tile motion contracts", () => {
 			}),
 		];
 
-		expect(Effect.runSync(readTileMotionActorClaimsFx(cues[0]))).toEqual(
+		expect(readTileMotionActorClaimsFn(cues[0])).toEqual(
 			new Set([
 				"runtime:source",
 				"runtime:owner",
 			]),
 		);
-		expect(Effect.runSync(readInteractionClaimsFx(cues))).toEqual(
+		expect(readInteractionClaimsFn(cues)).toEqual(
 			new Map([
 				[
 					"runtime:source",
@@ -193,11 +190,9 @@ describe("pure tile motion contracts", () => {
 			]),
 		);
 		expect(
-			Effect.runSync(
-				readUnsettledTileInputSourceQuantitiesFx({
-					cues,
-				}),
-			),
+			readUnsettledTileInputSourceQuantitiesFn({
+				cues,
+			}),
 		).toEqual(
 			new Map([
 				[
@@ -207,14 +202,12 @@ describe("pure tile motion contracts", () => {
 			]),
 		);
 		expect(
-			Effect.runSync(
-				readUnsettledTileInputSourceQuantitiesFx({
-					cues,
-					revealedCueKeys: new Set([
-						`${cues[0].sequence}:${cues[0].eventIndex}`,
-					]),
-				}),
-			),
+			readUnsettledTileInputSourceQuantitiesFn({
+				cues,
+				revealedCueKeys: new Set([
+					`${cues[0].sequence}:${cues[0].eventIndex}`,
+				]),
+			}),
 		).toEqual(
 			new Map([
 				[
@@ -224,11 +217,9 @@ describe("pure tile motion contracts", () => {
 			]),
 		);
 		expect(
-			Effect.runSync(
-				readUnsettledTileInputSourceQuantitiesFx({
-					cues: cues.slice(1),
-				}),
-			),
+			readUnsettledTileInputSourceQuantitiesFn({
+				cues: cues.slice(1),
+			}),
 		).toEqual(
 			new Map([
 				[
@@ -238,14 +229,12 @@ describe("pure tile motion contracts", () => {
 			]),
 		);
 		expect(
-			Effect.runSync(
-				readUnsettledTileInputSourceQuantitiesFx({
-					cues: cues.slice(1),
-					revealedCueKeys: new Set([
-						`${cues[1].sequence}:${cues[1].eventIndex}`,
-					]),
-				}),
-			),
+			readUnsettledTileInputSourceQuantitiesFn({
+				cues: cues.slice(1),
+				revealedCueKeys: new Set([
+					`${cues[1].sequence}:${cues[1].eventIndex}`,
+				]),
+			}),
 		).toEqual(
 			new Map([
 				[
@@ -278,22 +267,20 @@ describe("pure tile motion contracts", () => {
 			targetLocation: board(2),
 		} satisfies TileMotionCue;
 
-		const launched = Effect.runSync(
-			updateTileMotionLanesFx({
-				action: {
-					cues: [
-						first,
-						second,
-						output,
-					],
-					type: "enqueue",
-				},
-				state: {
-					active: [],
-					pending: [],
-				},
-			}),
-		);
+		const launched = updateTileMotionLanesFn({
+			action: {
+				cues: [
+					first,
+					second,
+					output,
+				],
+				type: "enqueue",
+			},
+			state: {
+				active: [],
+				pending: [],
+			},
+		});
 		expect(launched).toEqual({
 			active: [
 				first,
@@ -304,15 +291,13 @@ describe("pure tile motion contracts", () => {
 			],
 		});
 
-		const afterFirstContact = Effect.runSync(
-			updateTileMotionLanesFx({
-				action: {
-					cue: first,
-					type: "complete",
-				},
-				state: launched,
-			}),
-		);
+		const afterFirstContact = updateTileMotionLanesFn({
+			action: {
+				cue: first,
+				type: "complete",
+			},
+			state: launched,
+		});
 		expect(afterFirstContact).toEqual({
 			active: [
 				second,
@@ -323,15 +308,13 @@ describe("pure tile motion contracts", () => {
 		});
 
 		expect(
-			Effect.runSync(
-				updateTileMotionLanesFx({
-					action: {
-						cue: second,
-						type: "complete",
-					},
-					state: afterFirstContact,
-				}),
-			),
+			updateTileMotionLanesFn({
+				action: {
+					cue: second,
+					type: "complete",
+				},
+				state: afterFirstContact,
+			}),
 		).toEqual({
 			active: [
 				output,
@@ -359,22 +342,20 @@ describe("pure tile motion contracts", () => {
 			targetActorId: "runtime:other-owner",
 		});
 
-		const state = Effect.runSync(
-			updateTileMotionLanesFx({
-				action: {
-					cues: [
-						blocker,
-						stack,
-						input,
-					],
-					type: "enqueue",
-				},
-				state: {
-					active: [],
-					pending: [],
-				},
-			}),
-		);
+		const state = updateTileMotionLanesFn({
+			action: {
+				cues: [
+					blocker,
+					stack,
+					input,
+				],
+				type: "enqueue",
+			},
+			state: {
+				active: [],
+				pending: [],
+			},
+		});
 
 		expect(state.active).toEqual([
 			blocker,

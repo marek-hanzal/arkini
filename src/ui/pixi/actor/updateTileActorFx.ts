@@ -6,7 +6,7 @@ import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import { readParticleLightSurfaceFx } from "~/ui/pixi/appearance/readParticleLightSurfaceFx";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import { readActorCursorFx } from "~/ui/pixi/actor/readActorCursorFx";
+import { readActorCursorFn } from "~/ui/pixi/actor/fn/readActorCursorFn";
 import {
 	visualCrossfadeDurationMs,
 	transitionActorVisualFx,
@@ -70,7 +70,7 @@ export const updateTileActorFx = Effect.fn("updateTileActorFx")(function* ({
 
 	actor.item = item;
 	if (!actor.dragging) {
-		actor.container.cursor = yield* readActorCursorFx({
+		actor.container.cursor = readActorCursorFn({
 			phase: "idle",
 			previewKind: null,
 			running: item.running,

@@ -1,4 +1,3 @@
-import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
@@ -11,9 +10,7 @@ import type { MotionRedirect } from "~/ui/pixi/motion/MotionTarget";
  * A surviving source keeps its runtime identity and therefore needs no redirect. Only a source
  * consumed by an engine-confirmed receiver transfers trailing motion to that receiver.
  */
-export const readTargetRedirectFx = Effect.fnUntraced(function* (
-	result: runTileDropAtom.Result,
-): Generator<never, MotionRedirect | null, never> {
+export const readTargetRedirectFn = (result: runTileDropAtom.Result): MotionRedirect | null => {
 	return match(result)
 		.with(
 			{
@@ -92,4 +89,4 @@ export const readTargetRedirectFx = Effect.fnUntraced(function* (
 			() => null,
 		)
 		.exhaustive();
-});
+};

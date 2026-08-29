@@ -1,28 +1,21 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { TileMotionCue } from "~/ui/pixi/motion/TileMotionCue";
-import { readQuantityPresentationFx } from "~/ui/pixi/motion/readQuantityPresentationFx";
+import { readQuantityPresentationFn } from "~/ui/pixi/motion/fn/readQuantityPresentationFn";
 
-import { inputCue, stackCue } from "./readQuantityPresentationFx.test/fixture";
+import { inputCue, stackCue } from "./readQuantityPresentationFn.test/fixture";
 
 const read = (
 	cues: ReadonlyArray<TileMotionCue>,
 	revealedInputCueKeys: ReadonlySet<string> = new Set(),
 ) =>
-	Effect.runSync(
-		readQuantityPresentationFx({
-			cues,
-			readTargetRoute: (actorId, location) => ({
-				actorId,
-				location,
-				redirected: false,
-			}),
-			revealedInputCueKeys,
-		}),
-	);
+	readQuantityPresentationFn({
+		cues,
+		resolvedTargetActorIdByCueKey: new Map(),
+		revealedInputCueKeys,
+	});
 
-describe("readQuantityPresentationFx", () => {
+describe("readQuantityPresentationFn", () => {
 	it("does not reveal an older stack through a later input epoch", () => {
 		expect(
 			read([

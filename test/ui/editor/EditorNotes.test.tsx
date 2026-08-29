@@ -6,12 +6,12 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("~/bridge/editor/useEditorProject", () => ({
+vi.mock("~/ui/editor/useEditorProject", () => ({
 	useEditorProject: () => ({
 		projectId: "project-one",
 	}),
 }));
-vi.mock("~/bridge/editor/note/EditorNotesCommandAtoms", async () => {
+vi.mock("~/ui/note/editor/EditorNotesCommandAtoms", async () => {
 	const { EditorNotesTestCommandAtoms } = await import(
 		"~test/ui/editor/EditorNotes.test/fixture"
 	);
@@ -30,8 +30,11 @@ vi.mock("~/ui/overlay/Tooltip", () => ({
 }));
 vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
 
-import { EditorNotes } from "~/ui/note/editor/EditorNotes";
+import { Route as EditorNotesRouteDefinition } from "~/@routes/editor/$projectId/notes";
 import { editorNotesTestState as state } from "~test/ui/editor/EditorNotes.test/fixture";
+
+const EditorNotes = EditorNotesRouteDefinition.options.component;
+if (EditorNotes === undefined) throw new Error("Editor Notes route component is missing.");
 
 (
 	globalThis as {

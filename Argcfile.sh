@@ -52,7 +52,7 @@ format_check() {
 
 dependency_check() {
 	depcruise \
-		src/engine src/editor src/bridge src/ui src/page src/@routes \
+		src/engine src/editor src/renderer src/ui src/@routes \
 		src/main.tsx src/createArkiniRouterFx.tsx src/_route.ts \
 		electron electron.vite.config.ts test \
 		--output-type err-long

@@ -1,26 +1,21 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { Effect } from "effect";
 
-import { releaseCurrentEditorBoardGameFx } from "~/bridge/editor/board/releaseCurrentEditorBoardGameFx";
-import { syncEditorBoardGameFx } from "~/bridge/editor/board/syncEditorBoardGameFx";
-import type { EditorProject } from "~/bridge/editor/EditorProject";
-import { readEditorProjectFx } from "~/bridge/editor/readEditorProjectFx";
-import { EditorProjectErrorPage } from "~/page/editor/EditorProjectErrorPage";
-import { EditorProjectShellPage } from "~/page/editor/EditorProjectShellPage";
+import { releaseCurrentEditorBoardGameFx } from "~/renderer/editor/board/releaseCurrentEditorBoardGameFx";
+import { syncEditorBoardGameFx } from "~/renderer/editor/board/syncEditorBoardGameFx";
+import type { EditorProject } from "~/editor/EditorProject";
+import { EditorProjectProvider } from "~/ui/editor/EditorProjectProvider";
+import { readEditorProjectFx } from "~/editor/project/fx/readEditorProjectFx";
+import { ButtonLink } from "~/ui/button/Button";
+import { EditorProjectReplacementBoundary } from "~/ui/editor/EditorProjectReplacementBoundary";
+import { EditorShell } from "~/ui/editor/EditorShell";
+import { EditorProjectResourceUrlProvider } from "~/ui/resource/editor/EditorResourceUrlProvider";
+import { EditorVersionRestoreAction } from "~/ui/version/editor/EditorVersionRestoreAction";
 
 const syncRoutedEditorBoardGameFx = Effect.fn("syncRoutedEditorBoardGameFx")(
 	(project: EditorProject | undefined) =>
 		project === undefined ? releaseCurrentEditorBoardGameFx : syncEditorBoardGameFx(project),
 );
-
-const EditorProjectRoute = () => {
-	const project = Route.useLoaderData();
-	return (
-		<EditorProjectShellPage project={project}>
-			<Outlet />
-		</EditorProjectShellPage>
-	);
-};
 
 /** Loads the canonical project before any editor tool mounts. */
 export const Route = createFileRoute("/editor/$projectId")({
@@ -67,6 +62,36 @@ export const Route = createFileRoute("/editor/$projectId")({
 			);
 	},
 	shouldReload: ({ cause }) => cause === "enter",
-	component: EditorProjectRoute,
-	errorComponent: EditorProjectErrorPage,
+	component: () => {
+		const project = Route.useLoaderData();
+		return (
+			<EditorProjectProvider loaded={project}>
+				<EditorVersionRestoreAction projectId={project.projectId} />
+				<EditorProjectReplacementBoundary>
+					<EditorProjectResourceUrlProvider>
+						<EditorShell>
+							<Outlet />
+						</EditorShell>
+					</EditorProjectResourceUrlProvider>
+				</EditorProjectReplacementBoundary>
+			</EditorProjectProvider>
+		);
+	},
+	errorComponent: ({ error }) => (
+		<main
+			className="grid h-dvh place-items-center bg-canvas p-[var(--ak-viewport-padding)] text-foreground"
+			data-ui="EditorProjectErrorPage"
+		>
+			<section className="w-full max-w-xl rounded-2xl border border-danger/40 bg-surface p-6 shadow-2xl">
+				<h1 className="text-2xl font-semibold">Editor project could not be opened</h1>
+				<p className="mt-3 break-words text-sm leading-6 text-danger">
+					{error instanceof Error ? error.message : String(error)}
+				</p>
+				<div className="mt-6 flex flex-wrap gap-3">
+					<ButtonLink to="/editor/welcome">Editor welcome</ButtonLink>
+					<ButtonLink to="/main-menu">Main menu</ButtonLink>
+				</div>
+			</section>
+		</main>
+	),
 });

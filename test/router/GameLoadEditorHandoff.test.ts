@@ -5,14 +5,14 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProject } from "~/bridge/editor/EditorProject";
-import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
-import { EditorBoardGameResourceOwnerAtom } from "~/bridge/editor/board/EditorBoardGameResource";
-import { createEditorBoardGameFx } from "~/bridge/editor/board/createEditorBoardGameFx";
-import { createEditorBoardGameResourceFx } from "~/bridge/editor/board/createEditorBoardGameResourceFx";
-import { publishEditorProjectFx } from "~/bridge/editor/publishEditorProjectFx";
-import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
-import { readCurrentGameEngineResourceFx } from "~/bridge/game/readCurrentGameEngineResourceFx";
+import type { EditorProject } from "~/editor/EditorProject";
+import { EditorProjectAtom } from "~/ui/editor/EditorProjectAtom";
+import { EditorBoardGameResourceOwnerAtom } from "~/renderer/editor/board/EditorBoardGameResourceOwnerAtom";
+import { createEditorBoardGameFx } from "~/renderer/editor/board/createEditorBoardGameFx";
+import { createEditorBoardGameResourceFx } from "~/renderer/editor/board/createEditorBoardGameResourceFx";
+import { publishEditorProjectFx } from "~/ui/editor/publishEditorProjectFx";
+import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
+import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import {
 	createGame,
@@ -76,9 +76,11 @@ describe("game load editor handoff", () => {
 		await vi.advanceTimersByTimeAsync(2_500);
 		await loading;
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack).toBe(
-			installedGame.arkpack,
-		);
+		expect(
+			rendererRuntime.runSync(
+				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+			)?.game.arkpack,
+		).toBe(installedGame.arkpack);
 
 		Effect.runSync(Deferred.succeed(writeFinished, undefined));
 		await delayedPublication;
@@ -109,7 +111,11 @@ describe("game load editor handoff", () => {
 		await Effect.runPromise(Deferred.await(releaseStarted));
 
 		expect(createGameFxMock).not.toHaveBeenCalled();
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
+		expect(
+			rendererRuntime.runSync(
+				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+			),
+		).toBeNull();
 
 		Effect.runSync(Deferred.succeed(releaseGate, undefined));
 		await vi.waitFor(() => expect(createGameFxMock).toHaveBeenCalledOnce());
@@ -117,9 +123,11 @@ describe("game load editor handoff", () => {
 		await loading;
 
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack).toBe(
-			game.arkpack,
-		);
+		expect(
+			rendererRuntime.runSync(
+				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+			)?.game.arkpack,
+		).toBe(game.arkpack);
 	});
 
 	it("refuses package creation after failed editor disposal and permits a clean retry", async () => {
@@ -142,7 +150,11 @@ describe("game load editor handoff", () => {
 		const container = await renderRouter(router);
 
 		expect(createGameFxMock).not.toHaveBeenCalled();
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
+		expect(
+			rendererRuntime.runSync(
+				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+			),
+		).toBeNull();
 		expect(container.querySelector('[data-ui="ActionErrorPage"]')).not.toBeNull();
 
 		await act(async () => {
@@ -164,8 +176,10 @@ describe("game load editor handoff", () => {
 
 		expect(releaseAttempts).toBe(2);
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack).toBe(
-			game.arkpack,
-		);
+		expect(
+			rendererRuntime.runSync(
+				GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+			)?.game.arkpack,
+		).toBe(game.arkpack);
 	});
 });

@@ -1,6 +1,6 @@
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { Effect } from "effect";
-
-import type { EditorItem, EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import type { EditorItemSectionDescriptor } from "~/ui/item/editor/EditorItemSections";
 
 const EditorItemSections = [
@@ -38,7 +38,7 @@ const EditorItemSections = [
 	},
 ] as const satisfies ReadonlyArray<EditorItemSectionDescriptor>;
 
-const ProductionItemTypes = new Set<EditorItemType>([
+const ProductionItemTypes = new Set<TypeSchema.Type>([
 	"blueprint",
 	"craft",
 	"deposit",
@@ -49,7 +49,7 @@ const ProductionItemTypes = new Set<EditorItemType>([
 
 /** Returns the explicit sections supported by one item discriminator. */
 export const readEditorItemSectionsFx = Effect.fn("readEditorItemSectionsFx")(
-	(item: Pick<EditorItem, "type">) =>
+	(item: Pick<ItemSchema.Type, "type">) =>
 		Effect.sync(
 			(): ReadonlyArray<EditorItemSectionDescriptor> =>
 				EditorItemSections.filter((section) => {

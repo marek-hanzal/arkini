@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
-import type { TileDelivery } from "~/bridge/tile/readTileDeliveriesFx";
+import type { TileDelivery } from "~/ui/pixi/delivery/readTileDeliveriesFx";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type {

@@ -2,9 +2,9 @@ import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { EditorNotesCommandAtoms } from "~/bridge/editor/note/EditorNotesCommandAtoms";
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { EditorNotesCommandAtoms } from "~/ui/note/editor/EditorNotesCommandAtoms";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { EditorNoteContentMaxLength, type EditorNoteSchema } from "~/editor/note/EditorNoteSchema";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 

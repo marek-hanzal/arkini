@@ -25,17 +25,16 @@ export const createFilesystemWindowPreferencesFx = Effect.fn("createFilesystemWi
 		const filesystemWrite = yield* createFilesystemWriteFx().pipe(
 			Effect.provideService(FileSystem.FileSystem, fileSystem),
 		);
-		const writeModeFx: WindowPreferences["writeModeFx"] = Effect.fn(
-			"FilesystemWindowPreferences.writeModeFx",
-		)((mode) =>
-			writeElectronPreferenceFx({
-				filesystemWrite,
-				lock: join(root, ".window-mode.lock"),
-				target: path,
-				value: mode,
-				operation: "persist the window mode preference",
-				serialize: (value) => JSON.stringify(WindowModeSchema.parse(value)),
-			}),
+		const writeModeFx = Effect.fn("FilesystemWindowPreferences.writeModeFx")(
+			(mode: WindowModeSchema.Type) =>
+				writeElectronPreferenceFx({
+					filesystemWrite,
+					lock: join(root, ".window-mode.lock"),
+					target: path,
+					value: mode,
+					operation: "persist the window mode preference",
+					serialize: (value) => JSON.stringify(WindowModeSchema.parse(value)),
+				}),
 		);
 
 		return {

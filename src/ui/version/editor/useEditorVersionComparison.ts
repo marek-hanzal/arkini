@@ -1,7 +1,8 @@
+import { Effect } from "effect";
 import { useCallback, useEffect, useState } from "react";
 
-import { readEditorProjectVersionDiffFx } from "~/bridge/editor/version/readEditorProjectVersionDiffFx";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type {
 	EditorProjectVersionDescriptor,
 	EditorProjectVersionDiff,
@@ -55,11 +56,13 @@ export const useEditorVersionComparison = ({
 		let mounted = true;
 		setPending(true);
 		void RendererRuntime.runPromise(
-			readEditorProjectVersionDiffFx({
-				projectId,
-				from: decodeReference(compareFrom),
-				to: decodeReference(compareTo),
-			}),
+			Effect.flatMap(EditorProjectRepository, (repository) =>
+				repository.diffVersionsFx({
+					projectId,
+					from: decodeReference(compareFrom),
+					to: decodeReference(compareTo),
+				}),
+			),
 		)
 			.then((next) => {
 				if (!mounted) return;

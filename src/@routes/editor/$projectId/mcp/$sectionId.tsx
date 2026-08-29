@@ -1,8 +1,8 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Effect, Option } from "effect";
 
-import { EditorMcpPage } from "~/page/editor/EditorMcpPage";
-import { parseEditorMcpSectionIdFx } from "~/page/editor/parseEditorMcpSectionIdFx";
+import { parseEditorMcpSectionIdFx } from "~/@routes/editor/$projectId/mcp/-parseEditorMcpSectionIdFx";
+import { EditorMcp } from "~/ui/editor-mcp/EditorMcp";
 import type { EditorMcpSectionId } from "~/ui/editor-mcp/EditorMcpSections";
 
 export const Route = createFileRoute("/editor/$projectId/mcp/$sectionId")({
@@ -20,10 +20,8 @@ export const Route = createFileRoute("/editor/$projectId/mcp/$sectionId")({
 			replace: true,
 		});
 	},
-	component: EditorMcpSectionRoute,
+	component: () => {
+		const { sectionId } = Route.useParams();
+		return <EditorMcp section={sectionId as EditorMcpSectionId} />;
+	},
 });
-
-function EditorMcpSectionRoute() {
-	const { sectionId } = Route.useParams();
-	return <EditorMcpPage section={sectionId as EditorMcpSectionId} />;
-}

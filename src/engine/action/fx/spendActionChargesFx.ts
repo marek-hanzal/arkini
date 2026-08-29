@@ -12,7 +12,6 @@ import { isolateGridStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateGr
 import { readItemRemainingChargesFx } from "~/engine/item/fx/readItemRemainingChargesFx";
 import { outputFx } from "~/engine/output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
-import type { OutputPlacementResultSchema } from "~/engine/placement/schema/OutputPlacementResultSchema";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
@@ -130,7 +129,7 @@ export const spendActionChargesFx = Effect.fn("spendActionChargesFx")(function* 
 		});
 	}
 
-	let placement: OutputPlacementResultSchema.Type = {
+	let placement: applyOutputPlacementFx.Result = {
 		drop: [],
 	};
 	if (item.item.charges?.output !== undefined) {

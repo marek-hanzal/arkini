@@ -4,8 +4,8 @@ import {
 	lifecycleDurationMs,
 	lifecycleReducedScale,
 } from "~/ui/pixi/animation/runActorLifecycleFx";
-import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { burstAckParticlesFx } from "~/ui/pixi/animation/burstAckParticlesFx";
 
 import {

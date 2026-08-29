@@ -1,4 +1,6 @@
-import type { EditorOutput } from "~/bridge/item/editor/EditorItemModel";
+import type { LucideIcon } from "lucide-react";
+
+import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorOutputControl } from "~/ui/item/editor/EditorOutputControl";
@@ -6,10 +8,10 @@ import { EditorOutputControl } from "~/ui/item/editor/EditorOutputControl";
 export interface EditorOptionalOutputControlProps {
 	readonly addLabel: string;
 	readonly emptyDescription: string;
-	readonly emptyIcon: string;
+	readonly emptyIcon: LucideIcon;
 	readonly emptyTitle: string;
-	readonly onChange: (output: EditorOutput | undefined) => void;
-	readonly value: EditorOutput | undefined;
+	readonly onChange: (output: OutputSchema.Type | undefined) => void;
+	readonly value: OutputSchema.Type | undefined;
 }
 
 /** Adds, edits or removes one optional canonical output through the shared output editor. */

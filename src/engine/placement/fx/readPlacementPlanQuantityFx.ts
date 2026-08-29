@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 
-import type { PlacementPlanSchema } from "~/engine/placement/schema/PlacementPlanSchema";
+import type { PlacementPlan } from "~/engine/placement/PlacementPlan";
 
 export namespace readPlacementPlanQuantityFx {
 	export interface Props {
-		plan: PlacementPlanSchema.Type;
+		plan: PlacementPlan;
 	}
 }
 

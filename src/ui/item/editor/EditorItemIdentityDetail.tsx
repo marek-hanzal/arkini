@@ -1,4 +1,4 @@
-import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import {
 	ItemInfoFact,
 	ItemInfoFacts,
@@ -7,7 +7,7 @@ import {
 } from "~/ui/item-detail/ItemInfoPresentation";
 
 /** Presents the authored identity and storage contract of one item. */
-export const EditorItemIdentityDetail = ({ item }: { readonly item: EditorItem }) => (
+export const EditorItemIdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => (
 	<div>
 		<section className="pb-5">
 			<p className="max-w-4xl text-pretty text-base leading-relaxed text-muted">

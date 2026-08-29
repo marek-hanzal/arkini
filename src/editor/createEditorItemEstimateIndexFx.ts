@@ -19,7 +19,8 @@ export const createEditorItemEstimateIndexFx = Effect.fn("createEditorItemEstima
 				for (const step of estimate.routeSteps)
 					demandByItemId.set(
 						step.factId,
-						(demandByItemId.get(step.factId) ?? 0) + step.quantity,
+						(demandByItemId.get(step.factId) ?? 0) +
+							step.quantity * step.occurrenceCount,
 					);
 			}
 

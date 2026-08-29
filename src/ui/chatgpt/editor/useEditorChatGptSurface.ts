@@ -1,11 +1,11 @@
 import { type RefObject, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { setChatGptSurfaceFx } from "~/bridge/chatgpt/setChatGptSurfaceFx";
+import { setChatGptSurfaceFx } from "~/ui/chatgpt/editor/setChatGptSurfaceFx";
 import {
 	type ChatGptViewState,
 	subscribeChatGptViewStateFx,
-} from "~/bridge/chatgpt/subscribeChatGptViewStateFx";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+} from "~/ui/chatgpt/editor/subscribeChatGptViewStateFx";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 
 export namespace useEditorChatGptSurface {
 	export interface Props {

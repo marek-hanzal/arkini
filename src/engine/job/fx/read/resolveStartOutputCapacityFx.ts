@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
-import type { LineRunPlanSchema } from "~/engine/line/schema/run/LineRunPlanSchema";
+import type { LineRun } from "~/engine/line/LineRun";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { readPendingOutputReservationFx } from "./readPendingOutputReservationFx";
@@ -14,7 +14,7 @@ export namespace resolveStartOutputCapacityFx {
 	export interface Props {
 		readonly lineId: IdSchema.Type;
 		readonly ownerItemId: IdSchema.Type;
-		readonly plan: LineRunPlanSchema.Type | undefined;
+		readonly plan: LineRun.Plan | undefined;
 		readonly runtime: RuntimeSchema.Type;
 	}
 

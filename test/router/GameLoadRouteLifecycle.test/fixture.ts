@@ -8,14 +8,12 @@ import { expect, vi } from "vitest";
 import { routeTree } from "~/_route";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 import type { ArkiniElectronApi } from "../../../electron/contract/ArkiniElectronApi";
-import {
-	EditorBoardGameResourceOwnerAtom,
-	type EditorBoardGameResource,
-} from "~/bridge/editor/board/EditorBoardGameResource";
-import type { Game } from "~/bridge/game/Game";
-import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
-import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
-import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
+import type { EditorBoardGameResource } from "~/renderer/editor/board/EditorBoardGameResource";
+import { EditorBoardGameResourceOwnerAtom } from "~/renderer/editor/board/EditorBoardGameResourceOwnerAtom";
+import type { Game } from "~/renderer/game/Game";
+import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
+import type { GameSaveStorage } from "~/engine/save/GameSaveStorage";
+import { testArkpackConfig } from "~test/support/arkpack/createTestArkpack";
 import { createTestRendererRuntime } from "~test/support/createTestRendererRuntime";
 import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import { testGameRead } from "~test/support/game/testGameRead";

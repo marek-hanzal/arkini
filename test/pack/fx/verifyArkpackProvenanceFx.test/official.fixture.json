@@ -1,0 +1,102 @@
+{
+	"payloadBase64": "ZGV0ZXJtaW5pc3RpYyBjb21wcmVzc2VkIGdhbWVwbGF5",
+	"proof": {
+		"mediaType": "application/vnd.dev.sigstore.bundle+json;version=0.2",
+		"verificationMaterial": {
+			"x509CertificateChain": {
+				"certificates": [
+					{
+						"rawBytes": "MIIC8TCCApigAwIBAgIEERggBDAKBggqhkjOPQQDAzArMREwDwYDVQQDEwhzaWdzdG9yZTEWMBQGA1UEChMNc2lnc3RvcmUubW9jazAeFw0yNjA4MjgyMTIxMzVaFw0yNjA4MjgyMTMxMzVaMAAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAR0L4LG/Jp59wATIr3/D8E1nZ+ieFT/N/9iejP7/UBwGs1sH1y1IkdeDsA+av3oaDNTSGYImvlKtsizfKVuzjhao4IB0zCCAc8wDgYDVR0PAQH/BAQDAgeAMBMGA1UdJQQMMAoGCCsGAQUFBwMDMGMGA1UdEQEB/wRZMFeGVWh0dHBzOi8vZ2l0aHViLmNvbS9tYXJlay1oYW56YWwvYXJraW5pLy5naXRodWIvd29ya2Zsb3dzL3JlbGVhc2UueW1sQHJlZnMvdGFncy92MC41LjAwHQYDVR0OBBYEFCBnz3uWOXjP0Zk0ZWNy4yIIKtoKMB8GA1UdIwQYMBaAFOXJ4B3MGvV/48s3oPDD7y36HlOtMDkGCisGAQQBg78wAQEEK2h0dHBzOi8vdG9rZW4uYWN0aW9ucy5naXRodWJ1c2VyY29udGVudC5jb20wOwYKKwYBBAGDvzABCAQtDCtodHRwczovL3Rva2VuLmFjdGlvbnMuZ2l0aHVidXNlcmNvbnRlbnQuY29tMIGKBgorBgEEAdZ5AgQCBHwEegB4AHYAM2Tqbol4tHkwlgVkKkHUatd5EzMMmzfGfV461QcuMx4AAAGgSj/hdwAABAMARzBFAiEA6kg3qMiJDc29V29Lbs/1zcwYZzQ2fxO/29RKX8svdzUCID2yvG+nF/1qrnWZmghJj8WvGnW/RUY859Z+XD5fACQRMAoGCCqGSM49BAMDA0cAMEQCIFvytJ48Kqr9fBVvVF3vKxPq4mNr1XvgSNWfyVfbNlLlAiBvcWULQrw28xIE+Fu5a64gJopL1SaQ5mvb2ijGh2tO+Q=="
+					}
+				]
+			},
+			"tlogEntries": [
+				{
+					"logIndex": "8728731",
+					"logId": {
+						"keyId": "+rSC92P9DbzmQHw1xZOYCuAxJuO34Tjm5wOtcQFm1Kg="
+					},
+					"kindVersion": {
+						"kind": "hashedrekord",
+						"version": "0.0.1"
+					},
+					"integratedTime": "1787952095",
+					"inclusionPromise": {
+						"signedEntryTimestamp": "MEQCIE8Kx+/dED0OH4UL9AhNfMYh9TYHMgOQgSX3usrlM528AiBQBJPXhCCxobBus5XkhbkS0qRA/QHKc6E1atANVac8xA=="
+					},
+					"inclusionProof": {
+						"rootHash": "izS0DQpHlIdX8pEz0kVUadNfowGXoe5gn5D5gsLl1jc=",
+						"treeSize": "1",
+						"checkpoint": {
+							"envelope": "rekor.arkini.test - 44223867576644\n1\nizS0DQpHlIdX8pEz0kVUadNfowGXoe5gn5D5gsLl1jc=\nTimestamp: 1787952095000000000\n\n— rekor.arkini.test +rSC9zBEAiBQRe67wolKieYEUCr6mvyLEQkSmLZ9icNzjAIzWwrCmgIgZQASfsGwokNVdNs42t8tTRlZcRks/sDHJmetWJ2/DMU=\n"
+						}
+					},
+					"canonicalizedBody": "eyJhcGlWZXJzaW9uIjoiMC4wLjEiLCJraW5kIjoiaGFzaGVkcmVrb3JkIiwic3BlYyI6eyJkYXRhIjp7Imhhc2giOnsiYWxnb3JpdGhtIjoic2hhMjU2IiwidmFsdWUiOiJhNjRmZjBhMDI0NTlkZjg5M2M1ZGVhYTMwMDhjODkxMTVhMDA3ZmY1MDNjNjU5OWU3Mjc4ZjUwYzgyNzNjNWQ0In19LCJzaWduYXR1cmUiOnsiY29udGVudCI6Ik1FUUNJRVM1aElJKzVpQWJTVEdMWnR0elZLdWFHSU5ZVHpUQ21wOWNlaXJHRFJLeEFpQldxTFliWHhiazQyYW1JV1NlZkhmbzlSdjJ2RGp6eUxSa29Ed1huQXJMWEE9PSIsInB1YmxpY0tleSI6eyJjb250ZW50IjoiTFMwdExTMUNSVWRKVGlCRFJWSlVTVVpKUTBGVVJTMHRMUzB0Q2sxSlNVTTRWRU5EUVhCcFowRjNTVUpCWjBsRlJWSm5aMEpFUVV0Q1oyZHhhR3RxVDFCUlVVUkJla0Z5VFZKRmQwUjNXVVJXVVZGRVJYZG9lbUZYWkhwa1J6bDVXbFJGVjAxQ1VVZEJNVlZGUTJoTlRtTXliRzVqTTFKMlkyMVZkV0pYT1dwaGVrRmxSbmN3ZVU1cVFUUk5hbWQ1VFZSSmVFMTZWbUZHZHpCNVRtcEJORTFxWjNsTlZFMTRUWHBXWVUxQlFYZFhWRUZVUW1kamNXaHJhazlRVVVsQ1FtZG5jV2hyYWs5UVVVMUNRbmRPUTBGQlVqQk1ORXhITDBwd05UbDNRVlJKY2pNdlJEaEZNVzVhSzJsbFJsUXZUaTg1YVdWcVVEY3ZWVUozUjNNeGMwZ3hlVEZKYTJSbFJITkJLMkYyTTI5aFJFNVVVMGRaU1cxMmJFdDBjMmw2Wmt0V2RYcHFhR0Z2TkVsQ01IcERRMEZqT0hkRVoxbEVWbEl3VUVGUlNDOUNRVkZFUVdkbFFVMUNUVWRCTVZWa1NsRlJUVTFCYjBkRFEzTkhRVkZWUmtKM1RVUk5SMDFIUVRGVlpFVlJSVUl2ZDFKYVRVWmxSMVpYYURCa1NFSjZUMms0ZGxveWJEQmhTRlpwVEcxT2RtSlRPWFJaV0Vwc1lYa3hiMWxYTlRaWlYzZDJXVmhLY21GWE5YQk1lVFZ1WVZoU2IyUlhTWFprTWpsNVlUSmFjMkl6WkhwTU0wcHNZa2RXYUdNeVZYVmxWekZ6VVVoS2JGcHVUWFprUjBadVkzazVNazFETkRGTWFrRjNTRkZaUkZaU01FOUNRbGxGUmtOQ2Jub3pkVmRQV0dwUU1GcHJNRnBYVG5rMGVVbEpTM1J2UzAxQ09FZEJNVlZrU1hkUldVMUNZVUZHVDFoS05FSXpUVWQyVmk4ME9ITXpiMUJFUkRkNU16WkliRTkwVFVSclIwTnBjMGRCVVZGQ1p6YzRkMEZSUlVWTE1tZ3daRWhDZWs5cE9IWmtSemx5V2xjMGRWbFhUakJoVnpsMVkzazFibUZZVW05a1Ywb3hZekpXZVZreU9YVmtSMVoxWkVNMWFtSXlNSGRQZDFsTFMzZFpRa0pCUjBSMmVrRkNRMEZSZEVSRGRHOWtTRkozWTNwdmRrd3pVblpoTWxaMVRHMUdhbVJIYkhaaWJrMTFXakpzTUdGSVZtbGtXRTVzWTIxT2RtSnVVbXhpYmxGMVdUSTVkRTFKUjB0Q1oyOXlRbWRGUlVGa1dqVkJaMUZEUWtoM1JXVm5RalJCU0ZsQlRUSlVjV0p2YkRSMFNHdDNiR2RXYTB0clNGVmhkR1ExUlhwTlRXMTZaa2RtVmpRMk1WRmpkVTE0TkVGQlFVZG5VMm92YUdSM1FVRkNRVTFCVW5wQ1JrRnBSVUUyYTJjemNVMXBTa1JqTWpsV01qbE1Zbk12TVhwamQxbGFlbEV5Wm5oUEx6STVVa3RZT0hOMlpIcFZRMGxFTW5sMlJ5dHVSaTh4Y1hKdVYxcHRaMmhLYWpoWGRrZHVWeTlTVlZrNE5UbGFLMWhFTldaQlExRlNUVUZ2UjBORGNVZFRUVFE1UWtGTlJFRXdZMEZOUlZGRFNVWjJlWFJLTkRoTGNYSTVaa0pXZGxaR00zWkxlRkJ4TkcxT2NqRllkbWRUVGxkbWVWWm1ZazVzVEd4QmFVSjJZMWRWVEZGeWR6STRlRWxGSzBaMU5XRTJOR2RLYjNCTU1WTmhVVFZ0ZG1JeWFXcEhhREowVHl0UlBUMEtMUzB0TFMxRlRrUWdRMFZTVkVsR1NVTkJWRVV0TFMwdExRbz0ifX19fQ=="
+				}
+			],
+			"timestampVerificationData": {}
+		},
+		"messageSignature": {
+			"messageDigest": {
+				"algorithm": "SHA2_256",
+				"digest": "pk/woCRZ34k8XeqjAIyJEVoAf/UDxlmecnj1DIJzxdQ="
+			},
+			"signature": "MEQCIES5hII+5iAbSTGLZttzVKuaGINYTzTCmp9ceirGDRKxAiBWqLYbXxbk42amIWSefHfo9Rv2vDjzyLRkoDwXnArLXA=="
+		}
+	},
+	"trustedRoot": {
+		"mediaType": "application/vnd.dev.sigstore.trustedroot+json;version=0.1",
+		"tlogs": [
+			{
+				"baseUrl": "https://rekor.arkini.test",
+				"hashAlgorithm": "SHA2_256",
+				"publicKey": {
+					"rawBytes": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEJ8B3e0v79ZaPzNyylo2lrDFt1mDLJSChz5esZzhsQWAT5EFd7qBOVBweflOb05nDMM0s4X1QiYWUGnoaEjnuFA==",
+					"keyDetails": "PKIX_ECDSA_P256_SHA_256",
+					"validFor": {
+						"start": "2026-08-28T21:21:34.607Z"
+					}
+				},
+				"logId": {
+					"keyId": "+rSC92P9DbzmQHw1xZOYCuAxJuO34Tjm5wOtcQFm1Kg="
+				}
+			}
+		],
+		"certificateAuthorities": [
+			{
+				"subject": {
+					"organization": "sigstore.mock",
+					"commonName": "sigstore"
+				},
+				"uri": "https://fulcio.arkini.test",
+				"certChain": {
+					"certificates": [
+						{
+							"rawBytes": "MIIBqDCCAU6gAwIBAgIBATAKBggqhkjOPQQDAzArMREwDwYDVQQDEwhzaWdzdG9yZTEWMBQGA1UEChMNc2lnc3RvcmUubW9jazAeFw0yNjA4MjgyMTIxMzVaFw0yNzA4MjgyMTIxMzVaMCsxETAPBgNVBAMTCHNpZ3N0b3JlMRYwFAYDVQQKEw1zaWdzdG9yZS5tb2NrMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAERp25p7E+vnL3y6GNDBAQuK+vK9XtuiTGl+cMHgSTmnsRrI7yzUK14v1pVxv+POHJRq6AOtH8LCvqB5AKBEqktqNjMGEwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAQYwHQYDVR0OBBYEFOXJ4B3MGvV/48s3oPDD7y36HlOtMB8GA1UdIwQYMBaAFOXJ4B3MGvV/48s3oPDD7y36HlOtMAoGCCqGSM49BAMDA0gAMEUCIQCXI7PsFrJsMlgfmabhaCsHWUX66O20sB/Kfl9mgLQDkgIgCBNpbPu9VXwwcnItCQFD/71i8snt4OYchN8c7N4uuJE="
+						}
+					]
+				},
+				"validFor": {
+					"start": "2026-08-28T21:21:34.607Z"
+				}
+			}
+		],
+		"ctlogs": [
+			{
+				"baseUrl": "https://ctlog.arkini.test",
+				"hashAlgorithm": "SHA2_256",
+				"publicKey": {
+					"rawBytes": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAERp25p7E+vnL3y6GNDBAQuK+vK9XtuiTGl+cMHgSTmnsRrI7yzUK14v1pVxv+POHJRq6AOtH8LCvqB5AKBEqktg==",
+					"keyDetails": "PKIX_ECDSA_P256_SHA_256",
+					"validFor": {
+						"start": "2026-08-28T21:21:34.607Z"
+					}
+				},
+				"logId": {
+					"keyId": "M2Tqbol4tHkwlgVkKkHUatd5EzMMmzfGfV461QcuMx4="
+				}
+			}
+		],
+		"timestampAuthorities": []
+	}
+}

@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
-import { indexGridLocationClaimsFx } from "~/engine/location/read/indexGridLocationClaimsFx";
-import { readGridLocationClaimsFx } from "~/engine/location/read/readGridLocationClaimsFx";
-import { readGridLocationKeyFx } from "~/engine/location/read/readGridLocationKeyFx";
+import { indexGridLocationClaimsFn } from "~/engine/location/fn/indexGridLocationClaimsFn";
+import { readGridLocationClaimsFn } from "~/engine/location/fn/readGridLocationClaimsFn";
+import { readGridLocationKeyFn } from "~/engine/location/fn/readGridLocationKeyFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -17,14 +17,14 @@ export namespace readEmptyLocationsFx {
 export const readEmptyLocationsFx = Effect.fn("readEmptyLocationsFx")(function* <
 	Location extends GridLocationSchema.Type,
 >({ locations, runtime }: readEmptyLocationsFx.Props<Location>) {
-	const claimsByLocation = yield* indexGridLocationClaimsFx(
-		yield* readGridLocationClaimsFx({
+	const claimsByLocation = indexGridLocationClaimsFn(
+		readGridLocationClaimsFn({
 			runtime,
 		}),
 	);
 	const empty: Location[] = [];
 	for (const location of locations) {
-		if (!claimsByLocation.has(yield* readGridLocationKeyFx(location))) empty.push(location);
+		if (!claimsByLocation.has(readGridLocationKeyFn(location))) empty.push(location);
 	}
 	return empty;
 });

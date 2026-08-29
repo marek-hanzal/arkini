@@ -137,7 +137,7 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 			Effect.provideService(Path.Path, pathService),
 		);
 	const writeJsonFx = (state: ProjectState, target: string, value: unknown) =>
-		filesystemWrite.writeFileFx({
+		filesystemWrite.replaceFileFx({
 			lock: pathService.join(state.paths.root, "editor.lock"),
 			target,
 			bytes: encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`),
@@ -492,36 +492,30 @@ export const createVersionOperationsFx = Effect.fn("createVersionOperationsFx")(
 							current: versionId,
 						});
 
-						yield* withProjectLockFx(
-							filesystemWrite,
-							current.state.paths.root,
-							Effect.gen(function* () {
-								yield* assertVersionDirectoryFx(current.state);
-								yield* providePlatform(
-									writeProjectFilesFx({
-										root: current.state.paths.root,
-										previous: {
-											arkpack: current.state.project.version,
-											marker: GameProjectManifestSchema.parse({
-												arkini: ArkiniAppVersion,
-												revision: current.state.project.revision,
-											}),
-											config: current.state.project.config,
-											resources: current.state.project.resources,
-										},
-										next: {
-											arkpack: nextProject.version,
-											marker,
-											config: nextProject.config,
-											resources: nextProject.resources,
-										},
-										previousScenarioNames: current.state.scenarios.map(
-											({ name }) => name,
-										),
-										scenarios: restoredScenarioFiles,
-										versionHead: nextHead,
+						yield* assertVersionDirectoryFx(current.state);
+						yield* providePlatform(
+							writeProjectFilesFx({
+								root: current.state.paths.root,
+								previous: {
+									arkpack: current.state.project.version,
+									marker: GameProjectManifestSchema.parse({
+										arkini: ArkiniAppVersion,
+										revision: current.state.project.revision,
 									}),
-								);
+									config: current.state.project.config,
+									resources: current.state.project.resources,
+								},
+								next: {
+									arkpack: nextProject.version,
+									marker,
+									config: nextProject.config,
+									resources: nextProject.resources,
+								},
+								previousScenarioNames: current.state.scenarios.map(
+									({ name }) => name,
+								),
+								scenarios: restoredScenarioFiles,
+								versionHead: nextHead,
 							}),
 						);
 						states.set(projectId, {

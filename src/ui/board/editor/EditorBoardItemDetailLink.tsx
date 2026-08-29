@@ -1,4 +1,6 @@
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { ArrowUpRight } from "lucide-react";
+
+import { useEditorProject } from "~/ui/editor/useEditorProject";
 import { ButtonLink } from "~/ui/button/Button";
 import type { ItemDetailHeaderIdentityRenderProps } from "~/ui/item-detail/ItemDetailHeader";
 
@@ -24,7 +26,7 @@ export const EditorBoardItemDetailLink = ({
 			data-ui="EditorBoardItemDetailLink"
 		>
 			{children}
-			<span className="icon-[lucide--arrow-up-right] size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />
+			<ArrowUpRight className="size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />
 		</ButtonLink>
 	);
 };

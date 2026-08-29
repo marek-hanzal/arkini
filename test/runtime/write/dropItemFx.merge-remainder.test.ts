@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 import {
 	occupiedLocation,
 	replaceMergeConfig,
@@ -45,7 +45,7 @@ describe("dropItemFx / merge replacement and remainder", () => {
 		);
 
 		expect(result).toMatchObject({
-			kind: DropItemResultKindEnumSchema.enum.Merge,
+			kind: DropItemResultKind.Merge,
 			effect: "replace",
 			resultCanonicalItemId: "mud",
 			source: {
@@ -98,7 +98,7 @@ describe("dropItemFx / merge replacement and remainder", () => {
 		);
 
 		expect(result.outcome).toMatchObject({
-			kind: DropItemResultKindEnumSchema.enum.Merge,
+			kind: DropItemResultKind.Merge,
 			effect: "replace",
 			source: {
 				itemId: "runtime:water",

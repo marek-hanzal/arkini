@@ -1,4 +1,4 @@
-import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { ItemArtwork } from "~/ui/item/ItemArtwork";
 import { useEditorResourceUrl } from "~/ui/resource/editor/useEditorResourceUrl";
 import { twMerge } from "tailwind-merge";
@@ -41,7 +41,7 @@ export const EditorItemSearchThumbnail = ({
 	item,
 	selected = false,
 }: {
-	readonly item: EditorItem | undefined;
+	readonly item: ItemSchema.Type | undefined;
 	readonly selected?: boolean;
 }) =>
 	item === undefined ? null : selected ? (

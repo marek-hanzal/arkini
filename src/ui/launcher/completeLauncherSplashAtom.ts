@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
-import { RendererAtomRuntime } from "~/bridge/reactivity/RendererAtomRegistry";
+import { RendererAtomRuntime } from "~/renderer/RendererAtomRegistry";
 import { LauncherSplashCompletedAtom } from "~/ui/launcher/LauncherSplashCompletedAtom";
 
 /** Marks the startup splash complete idempotently through the shared registry. */

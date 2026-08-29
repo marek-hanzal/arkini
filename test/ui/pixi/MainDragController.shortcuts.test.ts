@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import {
 	createItem,
 	flushMicrotasks,
@@ -169,8 +169,7 @@ describe("main drag controller: shortcuts", () => {
 		expect(mounted.releasePointerCapture).toHaveBeenCalledWith(1);
 		expect(mounted.removeDraggedItem).toHaveBeenCalledWith({
 			game: expect.anything(),
-			itemId: item.id,
-			revision: item.revision,
+			sourceItem: item,
 		});
 		expect(mounted.onDrop).not.toHaveBeenCalled();
 		expect(mounted.actor.dragging).toBe(false);

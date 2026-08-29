@@ -1,9 +1,10 @@
+import { PackageOpen, Plus } from "lucide-react";
+import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { useMemo } from "react";
 
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import type { EditorItemType } from "~/bridge/item/editor/EditorItemModel";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
 import { searchEditorItemsFx } from "~/editor/searchEditorItemsFx";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { PrimaryButtonLink } from "~/ui/button/Button";
 import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import { EditorItemListRow } from "~/ui/item/editor/EditorItemListRow";
@@ -16,8 +17,8 @@ export const EditorItemList = ({
 	onQueryChange,
 	query,
 }: {
-	readonly itemType?: EditorItemType;
-	readonly onItemTypeChange: (itemType: EditorItemType | undefined) => void;
+	readonly itemType?: TypeSchema.Type;
+	readonly onItemTypeChange: (itemType: TypeSchema.Type | undefined) => void;
 	readonly onQueryChange: (query: string) => void;
 	readonly query: string;
 }) => {
@@ -84,7 +85,7 @@ export const EditorItemList = ({
 						}}
 						className="h-12 min-h-0 shrink-0 gap-2 px-4 text-sm"
 					>
-						<span className="icon-[lucide--plus] size-4" />
+						<Plus className="size-4" />
 						New item
 					</PrimaryButtonLink>
 				)}
@@ -94,7 +95,7 @@ export const EditorItemList = ({
 					<Status
 						dataUi="EditorItemsEmpty"
 						description="Create the first item to start authoring this game."
-						icon="icon-[lucide--package-open]"
+						icon={PackageOpen}
 						title="No items yet"
 						action={
 							<PrimaryButtonLink
@@ -104,7 +105,7 @@ export const EditorItemList = ({
 								}}
 								className="gap-2"
 							>
-								<span className="icon-[lucide--plus] size-4" />
+								<Plus className="size-4" />
 								New item
 							</PrimaryButtonLink>
 						}

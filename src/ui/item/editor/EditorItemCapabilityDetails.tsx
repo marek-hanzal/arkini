@@ -1,5 +1,8 @@
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import type { EditorItem, EditorMerge } from "~/bridge/item/editor/EditorItemModel";
+import { BatteryCharging, Combine, type LucideIcon } from "lucide-react";
+
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
 import { PrimaryButtonLink } from "~/ui/button/Button";
 import {
 	DetailFact,
@@ -22,7 +25,7 @@ const DisabledCapabilityDetail = ({
 	readonly actionLabel: string;
 	readonly capability: EditorItemOptionalCapability;
 	readonly description: string;
-	readonly icon: string;
+	readonly icon: LucideIcon;
 	readonly itemUid: string;
 	readonly title: string;
 }) => {
@@ -53,13 +56,13 @@ const DisabledCapabilityDetail = ({
 };
 
 /** Presents the optional charge capability or its explicit disabled state. */
-export const EditorItemChargesDetail = ({ item }: { readonly item: EditorItem }) =>
+export const EditorItemChargesDetail = ({ item }: { readonly item: ItemSchema.Type }) =>
 	item.charges === undefined ? (
 		<DisabledCapabilityDetail
 			actionLabel="Enable charges"
 			capability="charges"
 			description="Charges give this item a finite number of uses. Spending the last charge depletes it and may emit a configured output."
-			icon="icon-[lucide--battery-charging]"
+			icon={BatteryCharging}
 			itemUid={item.uid}
 			title="Charges are disabled"
 		/>
@@ -80,7 +83,13 @@ export const EditorItemChargesDetail = ({ item }: { readonly item: EditorItem })
 		</DetailSection>
 	);
 
-const MergeDetail = ({ index, merge }: { readonly index: number; readonly merge: EditorMerge }) => (
+const MergeDetail = ({
+	index,
+	merge,
+}: {
+	readonly index: number;
+	readonly merge: MergeSchema.Type;
+}) => (
 	<article className="grid gap-4 border-b border-line pb-6 last:border-0 last:pb-0">
 		<h3 className="text-base font-semibold">Merge {index + 1}</h3>
 		<DetailFacts>
@@ -114,13 +123,13 @@ const MergeDetail = ({ index, merge }: { readonly index: number; readonly merge:
 );
 
 /** Presents authored merge interactions or their explicit disabled state. */
-export const EditorItemMergesDetail = ({ item }: { readonly item: EditorItem }) =>
+export const EditorItemMergesDetail = ({ item }: { readonly item: ItemSchema.Type }) =>
 	item.merge === undefined || item.merge.length === 0 ? (
 		<DisabledCapabilityDetail
 			actionLabel="Enable merges"
 			capability="merges"
 			description="Merges define what happens when this item is dropped onto a matching target, including source consumption, target changes and optional output."
-			icon="icon-[lucide--combine]"
+			icon={Combine}
 			itemUid={item.uid}
 			title="Merges are disabled"
 		/>

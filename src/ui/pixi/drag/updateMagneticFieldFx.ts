@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
 import { readAttractionActorIdFx } from "~/ui/pixi/magnet/readAttractionActorIdFx";

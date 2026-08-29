@@ -23,7 +23,7 @@ export const writeArkpackFileFx = Effect.fn("writeArkpackFileFx")(function* ({
 		Effect.provide(NodePath.layer),
 		Effect.provideService(FileSystem.FileSystem, fileSystem),
 	);
-	yield* filesystemWrite.writeFileFx({
+	yield* filesystemWrite.replaceFileFx({
 		lock: join(dirname(target), `.${basename(target)}.lock`),
 		target,
 		bytes,

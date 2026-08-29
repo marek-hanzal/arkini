@@ -2,8 +2,8 @@ import { Effect } from "effect";
 import { Application, Container } from "pixi.js";
 import { vi } from "vitest";
 
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type {
 	ActorAnimation,
@@ -45,15 +45,15 @@ const removalState = vi.hoisted(() => ({
 	remove: vi.fn(),
 }));
 
-vi.mock("~/bridge/cheat/removeDraggedCheatItemFx", () => ({
-	removeDraggedCheatItemFx: (props: unknown) =>
+vi.mock("~/ui/pixi/drag/removeCheatItemFx", () => ({
+	removeCheatItemFx: (props: unknown) =>
 		Effect.sync(() => {
 			removalState.remove(props);
 			return true;
 		}),
 }));
 
-vi.mock("~/bridge/tile/readTileDropPreviewFx", () => ({
+vi.mock("~/ui/pixi/drag/readTileDropPreviewFx", () => ({
 	readTileDropPreviewFx: ({ target }: { readonly target: runTileDropAtom.Command["target"] }) =>
 		Effect.sync(() => {
 			previewState.reads += 1;

@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { EditorMcpOverviewSchema } from "../../../electron/contract/editor/EditorMcpOverviewSchema";
 import { EditorMcpCommandAtom } from "~/ui/editor-mcp/EditorMcpCommandAtom";
 
-const bridge = vi.hoisted(
+const mcpState = vi.hoisted(
 	(): {
 		overview: EditorMcpOverviewSchema.Type;
 	} => ({
@@ -24,26 +24,26 @@ const bridge = vi.hoisted(
 	}),
 );
 
-vi.mock("~/bridge/editor-mcp/readEditorMcpOverviewFx", async () => {
+vi.mock("~/ui/editor-mcp/readEditorMcpOverviewFx", async () => {
 	const { Effect } = await import("effect");
 	return {
-		readEditorMcpOverviewFx: Effect.sync(() => bridge.overview),
+		readEditorMcpOverviewFx: Effect.sync(() => mcpState.overview),
 	};
 });
 
-vi.mock("~/bridge/editor-mcp/configureEditorMcpFx", async () => {
+vi.mock("~/ui/editor-mcp/configureEditorMcpFx", async () => {
 	const { Effect } = await import("effect");
 	return {
-		configureEditorMcpFx: () => Effect.sync(() => bridge.overview),
+		configureEditorMcpFx: () => Effect.sync(() => mcpState.overview),
 	};
 });
 
-vi.mock("~/bridge/editor-mcp/executeEditorMcpCommandFx", async () => {
+vi.mock("~/ui/editor-mcp/executeEditorMcpCommandFx", async () => {
 	const { Effect } = await import("effect");
 	return {
 		executeEditorMcpCommandFx: () =>
 			Effect.sync(() => ({
-				overview: bridge.overview,
+				overview: mcpState.overview,
 			})),
 	};
 });
@@ -89,8 +89,8 @@ describe("EditorMcpCommandAtom", () => {
 			}),
 		);
 
-		bridge.overview = {
-			...bridge.overview,
+		mcpState.overview = {
+			...mcpState.overview,
 			remote: {
 				type: "unavailable",
 				message: "The tunnel stopped.",

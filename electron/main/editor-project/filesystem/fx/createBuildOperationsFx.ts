@@ -146,41 +146,41 @@ export const createBuildOperationsFx = Effect.fn("createBuildOperationsFx")(func
 			Effect.gen(function* () {
 				const state = yield* readState(projectId);
 				yield* assertRevisionFx(state, expectedRevision, "build-project");
-				yield* providePlatform(
+				const build = yield* providePlatform(
 					withProjectLockFx(
 						filesystemWrite,
 						state.paths.root,
-						ensureProjectGitignoreFx(state.paths),
-					),
-				);
-				const assertCurrentFx = readProjectFilesFx(state.paths.root).pipe(
-					Effect.mapError(projectChangedBeforeBuild),
-					Effect.filterOrFail(
-						(files) =>
-							files.marker.revision === state.project.revision &&
-							files.arkpack === state.project.version &&
-							isDeepStrictEqual(files.config, state.project.config) &&
-							isDeepStrictEqual(files.resources, state.project.resources),
-						projectChangedBeforeBuild,
-					),
-					Effect.asVoid,
-				);
-				yield* providePlatform(assertCurrentFx);
-				const build = yield* providePlatform(
-					packDirectoryFx({
-						input: state.paths.root,
-						assertCurrentFx,
-					}).pipe(
-						Effect.mapError((cause) =>
-							cause instanceof GameValidationError
-								? new GameValidationError({
-										diagnostics: safeBuildDiagnostics(
-											state.paths.root,
-											cause.diagnostics,
-										),
-									})
-								: cause,
-						),
+						Effect.gen(function* () {
+							yield* ensureProjectGitignoreFx(state.paths);
+							const assertCurrentFx = readProjectFilesFx(state.paths.root).pipe(
+								Effect.mapError(projectChangedBeforeBuild),
+								Effect.filterOrFail(
+									(files) =>
+										files.marker.revision === state.project.revision &&
+										files.arkpack === state.project.version &&
+										isDeepStrictEqual(files.config, state.project.config) &&
+										isDeepStrictEqual(files.resources, state.project.resources),
+									projectChangedBeforeBuild,
+								),
+								Effect.asVoid,
+							);
+							yield* assertCurrentFx;
+							return yield* packDirectoryFx({
+								input: state.paths.root,
+								assertCurrentFx,
+							}).pipe(
+								Effect.mapError((cause) =>
+									cause instanceof GameValidationError
+										? new GameValidationError({
+												diagnostics: safeBuildDiagnostics(
+													state.paths.root,
+													cause.diagnostics,
+												),
+											})
+										: cause,
+								),
+							);
+						}),
 					),
 				);
 				if (build.packageId !== projectId)

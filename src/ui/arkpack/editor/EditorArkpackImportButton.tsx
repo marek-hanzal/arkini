@@ -1,3 +1,4 @@
+import { PackageOpen } from "lucide-react";
 import { useRef } from "react";
 
 import { Button } from "~/ui/button/Button";
@@ -38,7 +39,7 @@ export const EditorArkpackImportButton = ({
 				onClick={() => inputRef.current?.click()}
 				data-ui="EditorArkpackImportButton"
 			>
-				<span className="icon-[lucide--package-open] size-9 text-accent" />
+				<PackageOpen className="size-9 text-accent" />
 				<span className="text-lg">Import arkpack</span>
 				<span className="text-xs font-medium opacity-75">
 					Choose an existing .arkpack file

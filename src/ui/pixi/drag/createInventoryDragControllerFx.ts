@@ -2,17 +2,17 @@ import { Effect } from "effect";
 import type { FederatedPointerEvent } from "pixi.js";
 import { match, P } from "ts-pattern";
 
-import type { GameEngine } from "~/bridge/game/GameEngine";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
-import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
-import { isSameTileActorLocationFx } from "~/bridge/tile/isSameTileActorLocationFx";
+import type { GameEngine } from "~/renderer/game/GameEngine";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { isSameTileActorLocationFn } from "~/ui/pixi/actor/fn/isSameTileActorLocationFn";
 import {
 	readTileDropPreviewFx,
 	type readTileDropPreviewFx as ReadTileDropPreviewFx,
-} from "~/bridge/tile/readTileDropPreviewFx";
-import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
+} from "~/ui/pixi/drag/readTileDropPreviewFx";
+import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import { PointerDragThreshold } from "~/ui/drag/PointerDragThreshold";
 import type { InventoryActorStore } from "~/ui/pixi/actor/InventoryActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
@@ -81,7 +81,7 @@ const isExpectedActivationFailure = (cause: unknown) =>
  *
  * Left click activates, right click opens Item Detail, and only a threshold-crossing left gesture
  * becomes drag. Release re-reads the target occupant and sends exact canonical source facts
- * through the bridge.
+ * through the exact game capability.
  */
 export const createInventoryDragControllerFx = Effect.fn("createInventoryDragControllerFx")(
 	function* ({
@@ -137,19 +137,19 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 			const receiverActorId = match(result)
 				.with(
 					{
-						kind: DropItemResultKindEnumSchema.enum.Stack,
+						kind: DropItemResultKind.Stack,
 					},
 					({ target }) => target.itemId,
 				)
 				.with(
 					{
-						kind: DropItemResultKindEnumSchema.enum.StoreInput,
+						kind: DropItemResultKind.StoreInput,
 					},
 					({ owner }) => owner.itemId,
 				)
 				.with(
 					{
-						kind: DropItemResultKindEnumSchema.enum.StoreInventory,
+						kind: DropItemResultKind.StoreInventory,
 					},
 					({ inventory }) => inventory.itemId,
 				)
@@ -170,9 +170,9 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 				.with(
 					{
 						kind: P.union(
-							DropItemResultKindEnumSchema.enum.Stack,
-							DropItemResultKindEnumSchema.enum.StoreInput,
-							DropItemResultKindEnumSchema.enum.StoreInventory,
+							DropItemResultKind.Stack,
+							DropItemResultKind.StoreInput,
+							DropItemResultKind.StoreInventory,
 						),
 						source: {
 							current: P.nonNullable,
@@ -268,9 +268,7 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 				current === null ||
 				current !== drag.actor ||
 				current.container.destroyed ||
-				!RendererRuntime.runSync(
-					isSameTileActorLocationFx(current.item.location, drag.sourceItem.location),
-				)
+				!isSameTileActorLocationFn(current.item.location, drag.sourceItem.location)
 			) {
 				cancelInteraction();
 				return null;
@@ -434,8 +432,8 @@ export const createInventoryDragControllerFx = Effect.fn("createInventoryDragCon
 							RendererRuntime.runSync(application.frames.invalidateFx);
 						}
 						if (
-							result.kind !== DropItemResultKindEnumSchema.enum.Reject &&
-							result.kind !== DropItemResultKindEnumSchema.enum.Ignored
+							result.kind !== DropItemResultKind.Reject &&
+							result.kind !== DropItemResultKind.Ignored
 						) {
 							flashSurvivingSource(result);
 							flashReceiver(result);

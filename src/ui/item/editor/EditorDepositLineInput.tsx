@@ -1,8 +1,8 @@
-import type { EditorInput } from "~/bridge/item/editor/EditorItemModel";
+import type { InputSchema as LineInputSchema } from "~/engine/input/schema/InputSchema";
 import { EditorSelectorControl } from "~/ui/item/editor/EditorSelectorControl";
 
 type EditorDepositInput = Extract<
-	EditorInput,
+	LineInputSchema.Type,
 	{
 		readonly type: "deposit";
 	}

@@ -24,10 +24,9 @@ Read the smallest entry point needed for the task:
 ```text
 src/engine    framework-neutral gameplay, config, compiler, pack and domain operations
 src/editor    platform-neutral Editor domain
-src/bridge    renderer access to public engine/editor/Electron contracts
+src/renderer  concrete renderer-process runtime, lifecycle and transport capabilities
 src/ui        reusable React and Pixi presentation
-src/page      route-level visual composition
-src/@routes   TanStack Router registration and route lifecycle orchestration
+src/@routes   TanStack Router registration, lifecycle and route-specific composition
 electron      pure transport contract plus main/preload/platform ownership
 shared        immutable cross-process application metadata and hard limits only
 game/arkini   official portable game project

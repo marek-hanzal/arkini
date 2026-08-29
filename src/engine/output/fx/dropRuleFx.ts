@@ -13,6 +13,8 @@ export namespace dropRuleFx {
 		origin: GridLocationSchema.Type;
 		rule: RuleSchema.Type;
 	}
+
+	export type Result = dropRuleEnableFx.Result | dropRuleDisableFx.Result;
 }
 
 /**

@@ -97,7 +97,7 @@ describe("editor MCP graph tool text", () => {
 		);
 	});
 
-	it("formats complete, unreachable, and bounded item estimates", () => {
+	it("preserves estimate status, selected quantity, and quantity bounds", () => {
 		const project = createGraphProject();
 		const complete = Effect.runSync(readItemEstimateTextFx(project, "ingot", 1));
 		const unreachable = Effect.runSync(readItemEstimateTextFx(project, "unused", 1));
@@ -105,10 +105,9 @@ describe("editor MCP graph tool text", () => {
 			readItemEstimateTextFx(project, "ingot", editorItemEstimateMaximumQuantity + 1),
 		);
 
-		expect(complete).toContain("Status: complete\nOptimistic parallel duration: 1 s");
-		expect(complete).toContain("Enable prerequisites: acquired and included in time");
-		expect(complete).toContain("Selected route graph:\n  - ingot [Ingot; simple]");
-		expect(complete).not.toContain("Consumables:");
+		expect(complete).toContain("Status: complete");
+		expect(complete).toContain("Approximate action runs: 1");
+		expect(complete).toContain("- ingot [Ingot; simple] x 1 via");
 		expect(unreachable).toContain("Status: unreachable");
 		expect(bounded).toContain(`static estimate limit of ${editorItemEstimateMaximumQuantity}`);
 	});

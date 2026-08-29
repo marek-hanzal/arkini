@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { match, P } from "ts-pattern";
 
 import { StackItemsUnavailableError } from "~/engine/runtime/error/StackItemsUnavailableError";
-import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
+import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
 
 export namespace readDropItemStackRejectedReasonFx {
 	export interface Props {
@@ -20,7 +20,7 @@ export const readDropItemStackRejectedReasonFx = Effect.fn("readDropItemStackRej
 					StackItemsUnavailableError.Reason.StaleSourceLocation,
 					StackItemsUnavailableError.Reason.StaleSourceRevision,
 				),
-				() => DropItemRejectedReasonEnumSchema.enum.StaleSource,
+				() => DropItemRejectedReason.StaleSource,
 			)
 			.with(
 				P.union(
@@ -28,11 +28,11 @@ export const readDropItemStackRejectedReasonFx = Effect.fn("readDropItemStackRej
 					StackItemsUnavailableError.Reason.StaleTargetLocation,
 					StackItemsUnavailableError.Reason.StaleTargetRevision,
 				),
-				() => DropItemRejectedReasonEnumSchema.enum.StaleTarget,
+				() => DropItemRejectedReason.StaleTarget,
 			)
 			.with(
 				StackItemsUnavailableError.Reason.SourceNotOnGrid,
-				() => DropItemRejectedReasonEnumSchema.enum.InvalidSource,
+				() => DropItemRejectedReason.InvalidSource,
 			)
 			.with(
 				P.union(
@@ -43,11 +43,11 @@ export const readDropItemStackRejectedReasonFx = Effect.fn("readDropItemStackRej
 					StackItemsUnavailableError.Reason.TargetNotOnGrid,
 					StackItemsUnavailableError.Reason.TargetStateful,
 				),
-				() => DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+				() => DropItemRejectedReason.InvalidTarget,
 			)
 			.with(
 				StackItemsUnavailableError.Reason.TargetFull,
-				() => DropItemRejectedReasonEnumSchema.enum.Occupied,
+				() => DropItemRejectedReason.Occupied,
 			)
 			.exhaustive();
 	},

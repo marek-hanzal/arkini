@@ -1,5 +1,5 @@
-import type { EditorProjectOwnership } from "~/bridge/editor/EditorProjectCandidate";
-import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
+import type { EditorProjectOwnership } from "~/editor/EditorProjectCandidate";
+import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
 import { Button, DangerButton } from "~/ui/button/Button";
 
 export interface EditorProjectDeleteDialogProps {

@@ -1,9 +1,6 @@
-import { twMerge } from "tailwind-merge";
-
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 
 export interface EditorFormSectionDividerProps {
-	readonly className?: string;
 	readonly description?: string;
 	readonly title: string;
 	readonly variant?: "primary" | "secondary";
@@ -11,7 +8,6 @@ export interface EditorFormSectionDividerProps {
 
 /** Names the following form section while preserving its visual boundary. */
 export const EditorFormSectionDivider = ({
-	className,
 	description,
 	title,
 	variant = "primary",
@@ -19,11 +15,7 @@ export const EditorFormSectionDivider = ({
 	const primary = variant === "primary";
 	return (
 		<header
-			className={twMerge(
-				"flex min-w-0 items-center gap-3",
-				primary ? "my-[clamp(-1rem,-1.375cqmin,-0.25rem)] py-1" : "py-0.5",
-				className,
-			)}
+			className={`flex min-w-0 items-center gap-3 ${primary ? "my-[clamp(-1rem,-1.375cqmin,-0.25rem)] py-1" : "py-0.5"}`}
 			data-ui="EditorFormSectionDivider"
 			data-variant={variant}
 		>

@@ -1,5 +1,5 @@
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileMotionCue } from "~/ui/pixi/motion/TileMotionCue";
 
 export const cueLocation = {
 	position: {

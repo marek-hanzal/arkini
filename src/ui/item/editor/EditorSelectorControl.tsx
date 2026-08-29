@@ -1,9 +1,9 @@
-import type { EditorSelector } from "~/bridge/item/editor/EditorItemModel";
+import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
 import { EditorItemReferenceControl } from "~/ui/item/editor/EditorItemReferenceControl";
 
 export interface EditorSelectorControlProps {
-	readonly onChange: (selector: EditorSelector) => void;
-	readonly value: EditorSelector;
+	readonly onChange: (selector: SelectorSchema.Type) => void;
+	readonly value: SelectorSchema.Type;
 }
 
 /** Edits one explicit canonical item selector. */

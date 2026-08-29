@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import type { RuleEnableResultSchema } from "~/engine/output/schema/drop/rule/RuleEnableResultSchema";
 import type { EnableSchema } from "~/engine/output/schema/drop/rule/EnableSchema";
 import { whenFx } from "~/engine/when/fx/whenFx";
 
@@ -9,6 +8,11 @@ export namespace dropRuleEnableFx {
 	export interface Props {
 		origin: GridLocationSchema.Type;
 		rule: EnableSchema.Type;
+	}
+
+	export interface Result {
+		readonly active: boolean;
+		readonly type: "enable";
 	}
 }
 
@@ -35,5 +39,5 @@ export const dropRuleEnableFx = Effect.fn("dropRuleEnableFx")(function* ({
 	return {
 		active,
 		type: rule.type,
-	} satisfies RuleEnableResultSchema.Type;
+	} satisfies dropRuleEnableFx.Result;
 });

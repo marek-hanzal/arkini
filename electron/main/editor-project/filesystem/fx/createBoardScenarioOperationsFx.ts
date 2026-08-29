@@ -12,6 +12,7 @@ import {
 } from "~/editor/board/EditorBoardScenarioSchema";
 import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
 import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
+import { withProjectLockFx } from "./withProjectLockFx";
 
 const encoder = new TextEncoder();
 const encodeJson = (value: unknown) =>
@@ -175,20 +176,24 @@ export const createBoardScenarioOperationsFx = Effect.fn("createBoardScenarioOpe
 							),
 						});
 						const target = yield* state.paths.scenarioFileFx(name);
-						yield* filesystemWrite.writeFileFx({
-							lock: state.paths.lockFile,
-							target,
-							bytes: encodeJson(
-								EditorBoardScenarioFileSchema.parse({
-									name: written.name,
-									revision: written.projectRevision,
-									version: written.version,
-									save: Buffer.from(written.bytes).toString("base64"),
-									createdAtMs: written.createdAtMs,
-									updatedAtMs: written.updatedAtMs,
-								}),
-							),
-						});
+						yield* withProjectLockFx(
+							filesystemWrite,
+							state.paths.root,
+							filesystemWrite.replaceFileFx({
+								lock: state.paths.lockFile,
+								target,
+								bytes: encodeJson(
+									EditorBoardScenarioFileSchema.parse({
+										name: written.name,
+										revision: written.projectRevision,
+										version: written.version,
+										save: Buffer.from(written.bytes).toString("base64"),
+										createdAtMs: written.createdAtMs,
+										updatedAtMs: written.updatedAtMs,
+									}),
+								),
+							}),
+						);
 						publishScenarios(state, [
 							written,
 							...scenarios.filter((scenario) => scenario.name !== name),
@@ -211,14 +216,14 @@ export const createBoardScenarioOperationsFx = Effect.fn("createBoardScenarioOpe
 				Effect.gen(function* () {
 					const state = yield* readState(projectId);
 					const target = yield* state.paths.scenarioFileFx(name);
-					yield* filesystemWrite.writeFilesFx({
-						lock: state.paths.lockFile,
-						root: state.paths.root,
-						writes: [],
-						deletes: [
+					yield* withProjectLockFx(
+						filesystemWrite,
+						state.paths.root,
+						filesystemWrite.removeFileFx({
+							lock: state.paths.lockFile,
 							target,
-						],
-					});
+						}),
+					);
 					publishScenarios(
 						state,
 						state.scenarios.filter((scenario) => scenario.name !== name),

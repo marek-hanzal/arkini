@@ -4,10 +4,10 @@ import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { AppearanceAtom } from "~/bridge/appearance/AppearanceAtom";
-import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
-import { AppearanceThemeError } from "~/bridge/appearance/AppearanceThemeError";
-import { setAppearanceThemeAtom } from "~/bridge/appearance/setAppearanceThemeAtom";
+import { AppearanceAtom } from "~/ui/appearance/AppearanceAtom";
+import type { AppearanceThemeSchema } from "../../../electron/contract/appearance/AppearanceThemeSchema";
+import { AppearanceThemeError } from "~/ui/appearance/AppearanceThemeError";
+import { setAppearanceThemeAtom } from "~/ui/appearance/setAppearanceThemeAtom";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
 
@@ -34,7 +34,7 @@ const makeRegistry = () => {
 	return registry;
 };
 
-const installDesktopAppearance = (write: (theme: AppearanceTheme) => Promise<void>) => {
+const installDesktopAppearance = (write: (theme: AppearanceThemeSchema.Type) => Promise<void>) => {
 	Object.defineProperty(globalThis, "window", {
 		configurable: true,
 		value: {
@@ -47,7 +47,10 @@ const installDesktopAppearance = (write: (theme: AppearanceTheme) => Promise<voi
 	});
 };
 
-const runThemeCommand = (registry: AtomRegistry.AtomRegistry, theme: AppearanceTheme) => {
+const runThemeCommand = (
+	registry: AtomRegistry.AtomRegistry,
+	theme: AppearanceThemeSchema.Type,
+) => {
 	registry.set(setAppearanceThemeAtom, theme);
 	return Effect.runPromiseExit(
 		AtomRegistry.getResult(registry, setAppearanceThemeAtom, {
@@ -98,10 +101,10 @@ describe("setAppearanceThemeAtom", () => {
 	});
 
 	it("serializes writes so an older completion cannot overwrite a newer theme", async () => {
-		let persisted: AppearanceTheme = "dark";
-		const completions = new Map<AppearanceTheme, () => void>();
+		let persisted: AppearanceThemeSchema.Type = "dark";
+		const completions = new Map<AppearanceThemeSchema.Type, () => void>();
 		const write = vi.fn(
-			(theme: AppearanceTheme) =>
+			(theme: AppearanceThemeSchema.Type) =>
 				new Promise<void>((resolve) => {
 					completions.set(theme, () => {
 						persisted = theme;

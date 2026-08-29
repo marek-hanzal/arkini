@@ -1,7 +1,7 @@
 import type { PropsWithChildren, ReactNode } from "react";
 
-import { useGameEngine } from "~/bridge/game/useGameEngine";
-import { usePackageGameEngine } from "~/bridge/game/usePackageGameEngine";
+import { useGameEngine } from "~/ui/game/useGameEngine";
+import { usePackageGameEngine } from "~/ui/game/usePackageGameEngine";
 import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
 import { ItemDetailHigherOwnerGuard } from "~/ui/item-detail/ItemDetailHigherOwnerGuard";
@@ -103,7 +103,7 @@ const GameShellLayers = ({
  * Detail stays attached to the renderer scene, while Game Menu is the higher
  * interaction owner and dismisses Detail through ItemDetailHigherOwnerGuard.
  *
- * Gameplay remains outside this shell. Pixi surfaces present canonical bridge
+ * Gameplay remains outside this shell. Pixi surfaces present canonical game
  * projections and issue commands; neither React nor Pixi may infer committed
  * move/swap/stack outcomes. Tile input also stays immediate: ordinary click is
  * the primary action, while right click requests Item Detail without introducing

@@ -9,7 +9,7 @@ import { readItemDetailDepositAvailableChargesFx } from "~/engine/item-detail/re
 import { readItemDetailMaterialAutofillAvailabilityFx } from "~/engine/item-detail/read/readItemDetailMaterialAutofillAvailabilityFx";
 import { readItemDetailQuantityBoundsFx } from "~/engine/item-detail/read/readItemDetailQuantityBoundsFx";
 import { readItemDetailSelectorKeyFx } from "~/engine/item-detail/read/readItemDetailSelectorKeyFx";
-import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
+import type { InputRun } from "~/engine/input/InputRun";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import type { InputSchema } from "~/engine/input/schema/InputSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
@@ -20,7 +20,7 @@ export namespace readItemDetailInputsFx {
 		readonly configured: readonly InputSchema.Type[];
 		readonly lineId: IdSchema.Type;
 		readonly ownerItemId: IdSchema.Type;
-		readonly resolved?: readonly InputRunResolutionSchema.Type[];
+		readonly resolved?: readonly InputRun.Resolution[];
 		readonly runtime: RuntimeSchema.Type;
 	}
 }

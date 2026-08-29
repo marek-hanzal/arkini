@@ -3,9 +3,9 @@ import { Effect, Result } from "effect";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
+import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 
 import {
@@ -46,7 +46,7 @@ describe("readDropItemPreviewFx / preview", () => {
 		);
 
 		expect(result.preview).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.Move,
+			kind: DropItemResultKind.Move,
 		});
 		expect(result.runtime.items[0]?.location).toEqual(sourceLocation);
 	});
@@ -84,10 +84,10 @@ describe("readDropItemPreviewFx / preview", () => {
 			);
 
 		expect(preview(config)).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.Swap,
+			kind: DropItemResultKind.Swap,
 		});
 		expect(preview(mergeConfig)).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.Merge,
+			kind: DropItemResultKind.Merge,
 		});
 	});
 	it("rejects a stale source before advertising an empty-slot move", () => {
@@ -113,8 +113,8 @@ describe("readDropItemPreviewFx / preview", () => {
 		);
 
 		expect(preview).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.Reject,
-			reason: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+			kind: DropItemResultKind.Reject,
+			reason: DropItemRejectedReason.StaleSource,
 		});
 	});
 	it("advertises whole-item storage instead of swapping with the Inventory opener", () => {
@@ -149,7 +149,7 @@ describe("readDropItemPreviewFx / preview", () => {
 		);
 
 		expect(result).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.StoreInventory,
+			kind: DropItemResultKind.StoreInventory,
 		});
 	});
 	it("surfaces authored merge invariant failures instead of reporting a product rejection", () => {

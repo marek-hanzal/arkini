@@ -1,4 +1,4 @@
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { useAtom } from "@effect/atom-react";
 import { useCallback } from "react";
 

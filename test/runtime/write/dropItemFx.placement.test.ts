@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 
 import { emptyLocation, occupiedLocation, run, sourceLocation } from "./dropItemFx.test/fixture";
 
@@ -36,7 +36,7 @@ describe("dropItemFx / move storage and swap", () => {
 		);
 
 		expect(result.outcome).toMatchObject({
-			kind: DropItemResultKindEnumSchema.enum.Move,
+			kind: DropItemResultKind.Move,
 			itemId: "runtime:water",
 			previousLocation: sourceLocation,
 			location: emptyLocation,
@@ -91,7 +91,7 @@ describe("dropItemFx / move storage and swap", () => {
 		);
 
 		expect(result.outcome).toMatchObject({
-			kind: DropItemResultKindEnumSchema.enum.StoreInventory,
+			kind: DropItemResultKind.StoreInventory,
 			source: {
 				itemId: "runtime:water-source",
 				previousQuantity: 3,
@@ -149,7 +149,7 @@ describe("dropItemFx / move storage and swap", () => {
 		);
 
 		expect(result.outcome).toMatchObject({
-			kind: DropItemResultKindEnumSchema.enum.Swap,
+			kind: DropItemResultKind.Swap,
 			source: {
 				itemId: "runtime:water",
 				previousLocation: sourceLocation,

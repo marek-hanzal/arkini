@@ -1,13 +1,17 @@
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { DropSchema } from "~/engine/output/schema/DropSchema";
+import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import type { ReactNode } from "react";
-
-import type { EditorDrop, EditorItem, EditorOutput } from "~/bridge/item/editor/EditorItemModel";
-import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
+import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
 import { ItemLineOutputs } from "~/ui/item-detail/ItemLineOutputs";
 import { EditorItemDetailReference } from "~/ui/item/editor/EditorItemDetailReference";
 
-type EditorItemRegistry = Record<string, EditorItem>;
+type EditorItemRegistry = Record<string, ItemSchema.Type>;
 
-const projectDrop = (drop: EditorDrop, items: EditorItemRegistry): ItemDetailLines.OutputItem => ({
+const projectDrop = (
+	drop: DropSchema.Type,
+	items: EditorItemRegistry,
+): ItemDetailLines.OutputItem => ({
 	itemId: drop.itemId,
 	quantity: drop.quantity,
 	title: items[drop.itemId]?.title ?? drop.itemId,
@@ -15,7 +19,7 @@ const projectDrop = (drop: EditorDrop, items: EditorItemRegistry): ItemDetailLin
 });
 
 const projectOutput = (
-	output: EditorOutput | undefined,
+	output: OutputSchema.Type | undefined,
 	items: EditorItemRegistry,
 ): readonly ItemDetailLines.OutputSet[] =>
 	output?.set.map((set) => ({
@@ -66,7 +70,7 @@ export const EditorProductionLineOutputs = ({
 	projectId,
 }: {
 	readonly items: EditorItemRegistry;
-	readonly output: EditorOutput | undefined;
+	readonly output: OutputSchema.Type | undefined;
 	readonly projectId: string;
 }) => (
 	<ItemLineOutputs

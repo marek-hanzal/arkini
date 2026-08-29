@@ -4,19 +4,30 @@ import {
 	type ErrorComponentProps,
 	useRouter,
 } from "@tanstack/react-router";
+import { Effect } from "effect";
+import { z } from "zod";
 
-import { discardFailedGameEngineFx } from "~/bridge/game/discardFailedGameEngineFx";
-import { ActionPendingPage } from "~/page/action/ActionPendingPage";
-import { runActionRouteFx } from "~/page/action/runActionRouteFx";
+import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
+import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
 import { ActionErrorPage } from "~/ui/action/ActionErrorPage";
-import { FailedGameDiscardSearchSchema } from "~/ui/navigation/FailedGameDiscardSearchSchema";
+import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
+
+const FailedGameDiscardSearchSchema = z
+	.object({
+		packageId: z.string().min(1),
+	})
+	.strict();
 
 export const Route = createFileRoute("/action/discard-failed-game")({
 	validateSearch: FailedGameDiscardSearchSchema,
 	loaderDeps: ({ search }) => search,
 	loader: async ({ context, deps }) => {
 		await context.rendererRuntime.runPromise(
-			runActionRouteFx(discardFailedGameEngineFx(deps.packageId)),
+			runActionRouteFx(
+				GameEngineResourceFx.pipe(
+					Effect.flatMap((service) => service.discardFailedFx(deps.packageId)),
+				),
+			),
 		);
 		throw redirect({
 			to: "/main-menu",
@@ -25,21 +36,19 @@ export const Route = createFileRoute("/action/discard-failed-game")({
 	},
 	pendingMs: 0,
 	pendingMinMs: 2_500,
-	pendingComponent: () => <ActionPendingPage label="Leaving failed game…" />,
-	errorComponent: DiscardFailedGameErrorPage,
+	pendingComponent: () => <ActionLoadingScreen label="Leaving failed game…" />,
+	errorComponent: (props: ErrorComponentProps) => {
+		const router = useRouter();
+		return (
+			<ActionErrorPage
+				{...props}
+				description="Arkini could not discard the exact failed Game bootstrap state. No save was deleted and no replacement Game was removed."
+				reset={() => {
+					void router.invalidate().catch(() => undefined);
+				}}
+				resetLabel="Retry exit"
+				title="Game exit failed"
+			/>
+		);
+	},
 });
-
-function DiscardFailedGameErrorPage(props: ErrorComponentProps) {
-	const router = useRouter();
-	return (
-		<ActionErrorPage
-			{...props}
-			description="Arkini could not discard the exact failed Game bootstrap state. No save was deleted and no replacement Game was removed."
-			reset={() => {
-				void router.invalidate().catch(() => undefined);
-			}}
-			resetLabel="Retry exit"
-			title="Game exit failed"
-		/>
-	);
-}

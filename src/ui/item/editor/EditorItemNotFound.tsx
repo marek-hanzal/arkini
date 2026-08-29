@@ -1,4 +1,4 @@
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
 import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 
 /** Presents one missing canonical item route without duplicating navigation chrome. */

@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 
 import type { HideSchema } from "~/engine/line/schema/rule/HideSchema";
-import type { RuleHideResultSchema } from "~/engine/line/schema/rule/RuleHideResultSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import { whenFx } from "~/engine/when/fx/whenFx";
 
@@ -9,6 +8,12 @@ export namespace lineRuleHideFx {
 	export interface Props {
 		origin: BoardLocationSchema.Type;
 		rule: HideSchema.Type;
+	}
+
+	export interface Result {
+		readonly active: boolean;
+		readonly failedWhenIndex?: number;
+		readonly type: "hide";
 	}
 }
 
@@ -35,5 +40,5 @@ export const lineRuleHideFx = Effect.fn("lineRuleHideFx")(function* ({
 	return {
 		active,
 		type: rule.type,
-	} satisfies RuleHideResultSchema.Type;
+	} satisfies lineRuleHideFx.Result;
 });

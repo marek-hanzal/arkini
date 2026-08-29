@@ -1,15 +1,15 @@
-import { Effect } from "effect";
+import { Effect, type Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import { setDefaultLineFx } from "~/engine/line/write/setDefaultLineFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
 import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
-import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
-import { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
+import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -86,8 +86,8 @@ const inputBeforeStackConfig = GameConfigSchema.parse({
 	},
 });
 
-const run = <A, E, R>(
-	effect: Effect.Effect<A, E, R>,
+const run = <A, E>(
+	effect: Effect.Effect<A, E, Layer.Success<ReturnType<typeof GameLayerFx>>>,
 	config: GameConfigSchema.Type = purityTestConfig,
 ) =>
 	Effect.runSync(
@@ -95,7 +95,7 @@ const run = <A, E, R>(
 			useGameFx({
 				config,
 			}),
-		) as Effect.Effect<A, E, never>,
+		),
 	);
 
 const occupiedTarget = ({
@@ -159,10 +159,10 @@ describe("dropItemFx pure stack integration", () => {
 		);
 
 		expect(result.preview).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.Stack,
+			kind: DropItemResultKind.Stack,
 		});
 		expect(result.outcome).toMatchObject({
-			kind: DropItemResultKindEnumSchema.enum.Stack,
+			kind: DropItemResultKind.Stack,
 			transferredQuantity: 2,
 			source: {
 				itemId: "runtime:source",
@@ -189,7 +189,6 @@ describe("dropItemFx pure stack integration", () => {
 				},
 			},
 		});
-		expect(DropItemResultSchema.parse(result.outcome)).toEqual(result.outcome);
 		expect(result.runtime.items.reduce((total, item) => total + item.quantity, 0)).toBe(13);
 		expect(result.transition.events).toEqual([]);
 	});
@@ -228,7 +227,7 @@ describe("dropItemFx pure stack integration", () => {
 		);
 
 		expect(result.outcome).toMatchObject({
-			kind: DropItemResultKindEnumSchema.enum.Stack,
+			kind: DropItemResultKind.Stack,
 			transferredQuantity: 2,
 			source: {
 				itemId: "runtime:source",
@@ -295,12 +294,12 @@ describe("dropItemFx pure stack integration", () => {
 		);
 
 		expect(result.preview).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.Reject,
-			reason: DropItemRejectedReasonEnumSchema.enum.Occupied,
+			kind: DropItemResultKind.Reject,
+			reason: DropItemRejectedReason.Occupied,
 		});
 		expect(result.outcome).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.Reject,
-			reason: DropItemRejectedReasonEnumSchema.enum.Occupied,
+			kind: DropItemResultKind.Reject,
+			reason: DropItemRejectedReason.Occupied,
 			itemId: "runtime:source",
 			targetItemId: "runtime:target",
 		});
@@ -348,8 +347,8 @@ describe("dropItemFx pure stack integration", () => {
 		);
 
 		expect(result.preview).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.Reject,
-			reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+			kind: DropItemResultKind.Reject,
+			reason: DropItemRejectedReason.InvalidTarget,
 		});
 		expect(result.runtime.items.map((item) => item.location)).toEqual([
 			board(0),
@@ -418,10 +417,10 @@ describe("dropItemFx pure stack integration", () => {
 		);
 
 		expect(mergePreview).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.Merge,
+			kind: DropItemResultKind.Merge,
 		});
 		expect(inputPreview).toMatchObject({
-			kind: DropItemResultKindEnumSchema.enum.StoreInput,
+			kind: DropItemResultKind.StoreInput,
 			lineId: "line:producer:zero",
 			inputIndex: 0,
 			quantity: 1,

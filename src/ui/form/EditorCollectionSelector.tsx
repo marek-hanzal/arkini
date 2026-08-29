@@ -1,17 +1,13 @@
+import { Plus, Trash2 } from "lucide-react";
 import { useState, type ReactNode } from "react";
-import { twMerge } from "tailwind-merge";
 
 import { Button } from "~/ui/button/Button";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
 import { EditorSearchCombobox } from "~/ui/form/EditorSearchCombobox";
 
-export const editorCollectionActionClassName =
-	"size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised";
-
 export interface EditorCollectionSelectorProps {
 	readonly addLabel?: string;
 	readonly children: (activeIndex: number, selectIndex: (index: number) => void) => ReactNode;
-	readonly className?: string;
 	readonly count: number;
 	readonly dataUi?: string;
 	readonly itemLabel: (index: number) => string;
@@ -30,7 +26,6 @@ export interface EditorCollectionSelectorProps {
 export const EditorCollectionSelector = ({
 	addLabel = "Add item",
 	children,
-	className,
 	count,
 	dataUi = "EditorCollectionSelector",
 	itemLabel,
@@ -84,26 +79,26 @@ export const EditorCollectionSelector = ({
 				<div className="flex shrink-0 items-center gap-2">
 					{onAdd === undefined ? null : (
 						<Button
-							className={editorCollectionActionClassName}
+							className="size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised"
 							title={addLabel}
 							onClick={() => {
 								onAdd();
 								selectIndex(count);
 							}}
 						>
-							<span className="icon-[lucide--plus] size-5" />
+							<Plus className="size-5" />
 						</Button>
 					)}
 					{onRemove === undefined || activeIndex === undefined ? null : (
 						<Button
-							className={editorCollectionActionClassName}
+							className="size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised"
 							title={removeLabel}
 							onClick={() => {
 								onRemove(activeIndex);
 								selectIndex(Math.max(0, activeIndex - 1));
 							}}
 						>
-							<span className="icon-[lucide--trash-2] size-4" />
+							<Trash2 className="size-4" />
 						</Button>
 					)}
 				</div>
@@ -112,7 +107,7 @@ export const EditorCollectionSelector = ({
 	);
 	return (
 		<section
-			className={twMerge("grid min-w-0 gap-4", className)}
+			className="grid min-w-0 gap-4"
 			data-ui={dataUi}
 		>
 			{navigationCard ? <EditorFormCard>{navigation}</EditorFormCard> : navigation}

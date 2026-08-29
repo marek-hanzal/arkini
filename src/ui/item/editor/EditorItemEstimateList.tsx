@@ -1,4 +1,6 @@
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { TriangleAlert } from "lucide-react";
+
+import { useEditorProject } from "~/ui/editor/useEditorProject";
 import type { EditorItemEstimateSortSchema } from "~/editor/EditorItemEstimateSortSchema";
 import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import { EditorSelect, type EditorSelectOption } from "~/ui/form/EditorSelect";
@@ -98,7 +100,7 @@ export const EditorItemEstimateList = ({
 					<Status
 						dataUi="EditorItemEstimatesError"
 						description={state.message}
-						icon="icon-[lucide--triangle-alert]"
+						icon={TriangleAlert}
 						title="Estimate calculation failed"
 					/>
 				) : null}

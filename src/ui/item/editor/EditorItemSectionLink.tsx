@@ -1,5 +1,5 @@
+import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { ButtonLink } from "~/ui/button/Button";
-import type { EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import {
 	editorSectionTabActiveClassName,
 	editorSectionTabClassName,
@@ -22,7 +22,7 @@ export const EditorItemSectionLink = ({
 	section,
 }: {
 	readonly destination?: "detail" | "form";
-	readonly itemType?: EditorItemType;
+	readonly itemType?: TypeSchema.Type;
 	readonly itemUid: string;
 	readonly projectId: string;
 	readonly section: EditorItemSectionDescriptor;

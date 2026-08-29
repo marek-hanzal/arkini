@@ -2,8 +2,8 @@ import { useAtomMount, useAtomSet } from "@effect/atom-react";
 import type { Effect } from "effect";
 import { useEffect, useLayoutEffect, useRef } from "react";
 
-import { useGameEvents } from "~/bridge/event/useGameEvents";
-import { useGameEngine } from "~/bridge/game/useGameEngine";
+import { useGameEvents } from "~/ui/game/useGameEvents";
+import { useGameEngine } from "~/ui/game/useGameEngine";
 import { createGameAudioSynthFx } from "~/ui/audio/createGameAudioSynthFx";
 import { useGameAudioAtoms } from "~/ui/audio/useGameAudioAtoms";
 

@@ -28,29 +28,27 @@ export const createFilesystemAppearancePreferencesFx = Effect.fn(
 	);
 	const themePath = join(root, "appearance.theme.json");
 	const accentPath = join(root, "appearance.accent.json");
-	const writeThemeFx: AppearancePreferences["writeThemeFx"] = Effect.fn(
-		"FilesystemAppearancePreferences.writeThemeFx",
-	)((theme) =>
-		writeElectronPreferenceFx({
-			filesystemWrite,
-			lock: join(root, ".appearance-theme.lock"),
-			target: themePath,
-			value: theme,
-			operation: "persist the appearance preference",
-			serialize: (value) => JSON.stringify(AppearanceThemeSchema.parse(value)),
-		}),
+	const writeThemeFx = Effect.fn("FilesystemAppearancePreferences.writeThemeFx")(
+		(theme: AppearanceThemeSchema.Type) =>
+			writeElectronPreferenceFx({
+				filesystemWrite,
+				lock: join(root, ".appearance-theme.lock"),
+				target: themePath,
+				value: theme,
+				operation: "persist the appearance preference",
+				serialize: (value) => JSON.stringify(AppearanceThemeSchema.parse(value)),
+			}),
 	);
-	const writeAccentFx: AppearancePreferences["writeAccentFx"] = Effect.fn(
-		"FilesystemAppearancePreferences.writeAccentFx",
-	)((accent) =>
-		writeElectronPreferenceFx({
-			filesystemWrite,
-			lock: join(root, ".appearance-accent.lock"),
-			target: accentPath,
-			value: accent,
-			operation: "persist the appearance accent preference",
-			serialize: (value) => JSON.stringify(AppearanceAccentSchema.parse(value)),
-		}),
+	const writeAccentFx = Effect.fn("FilesystemAppearancePreferences.writeAccentFx")(
+		(accent: AppearanceAccentSchema.Type) =>
+			writeElectronPreferenceFx({
+				filesystemWrite,
+				lock: join(root, ".appearance-accent.lock"),
+				target: accentPath,
+				value: accent,
+				operation: "persist the appearance accent preference",
+				serialize: (value) => JSON.stringify(AppearanceAccentSchema.parse(value)),
+			}),
 	);
 	return {
 		readThemeFx: readElectronPreferenceFx({

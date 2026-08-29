@@ -1,7 +1,8 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { GameEventEnumSchema, type useGameEvents } from "~/bridge/event/useGameEvents";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import type { useGameEvents } from "~/ui/game/useGameEvents";
 
 export namespace readGameAudioCuesFx {
 	export type Kind =

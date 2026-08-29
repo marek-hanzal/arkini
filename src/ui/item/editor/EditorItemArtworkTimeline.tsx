@@ -1,4 +1,4 @@
-import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { EditorAssetDetailLink } from "~/ui/resource/editor/EditorAssetDetailLink";
 
@@ -6,7 +6,7 @@ const formatProgress = (progress: number) =>
 	`${Number.isInteger(progress) ? progress : progress.toFixed(1)}%`;
 
 interface EditorItemArtworkTimelineProps {
-	readonly asset: EditorItem["asset"];
+	readonly asset: ItemSchema.Type["asset"];
 	readonly linkAssets?: boolean;
 	readonly onSelectProgress?: (index: number) => void;
 	readonly selectedProgressIndex?: number;

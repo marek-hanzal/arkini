@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import type { TileActorFeedbackCue } from "~/bridge/tile/feedback/TileActorFeedbackCue";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { TileActorFeedbackCue } from "~/ui/pixi/feedback/TileActorFeedbackCue";
 import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
 
 export interface VisibleActor {

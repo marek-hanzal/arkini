@@ -7,7 +7,7 @@ import {
 	springValue,
 } from "motion";
 
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type {
 	AnimationControl,
 	AnimationDriver,

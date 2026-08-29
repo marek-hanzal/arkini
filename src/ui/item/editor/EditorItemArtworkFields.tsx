@@ -1,14 +1,13 @@
-import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
+import { GalleryHorizontalEnd, Layers2, Trash2 } from "lucide-react";
+
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { Button } from "~/ui/button/Button";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
-import {
-	editorCollectionActionClassName,
-	EditorCollectionSelector,
-} from "~/ui/form/EditorCollectionSelector";
+import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { withFieldGroup } from "~/ui/form/EditorForm";
 
-const defaultArtwork: EditorItem["asset"] = {
+const defaultArtwork: ItemSchema.Type["asset"] = {
 	default: [
 		"",
 	],
@@ -38,7 +37,7 @@ export const EditorItemArtworkFields = withFieldGroup({
 						<EditorCapabilityStatus
 							actionLabel="Enable composite artwork"
 							description="Composite artwork overlays a second asset on the base image, using the same two-layer presentation wherever this item is rendered."
-							icon="icon-[lucide--layers-2]"
+							icon={Layers2}
 							onEnable={() =>
 								group.setFieldValue("default", [
 									assets[0],
@@ -53,7 +52,7 @@ export const EditorItemArtworkFields = withFieldGroup({
 								{(field) => <field.AssetField label="Overlay asset" />}
 							</group.AppField>
 							<Button
-								className={editorCollectionActionClassName}
+								className="size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised"
 								title="Remove composite layer"
 								onClick={() =>
 									group.setFieldValue("default", [
@@ -61,7 +60,7 @@ export const EditorItemArtworkFields = withFieldGroup({
 									])
 								}
 							>
-								<span className="icon-[lucide--trash-2] size-4" />
+								<Trash2 className="size-4" />
 							</Button>
 						</div>
 					)
@@ -84,7 +83,7 @@ export const EditorItemArtworkFields = withFieldGroup({
 								<EditorCapabilityStatus
 									actionLabel="Enable progress artwork"
 									description="Progress artwork adds ordered visual states after the default composition so the item can change appearance as its runtime state advances."
-									icon="icon-[lucide--gallery-horizontal-end]"
+									icon={GalleryHorizontalEnd}
 									onEnable={() => sourcesField.pushValue("")}
 									title="Progress artwork is disabled"
 								/>

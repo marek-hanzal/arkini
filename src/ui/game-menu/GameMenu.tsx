@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { match } from "ts-pattern";
 
-import type { Game } from "~/bridge/game/Game";
+import type { Game } from "~/renderer/game/Game";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
 import type { GameMenuPhase } from "~/ui/game-menu/GameMenuControl";

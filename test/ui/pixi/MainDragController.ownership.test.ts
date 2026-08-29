@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
+import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { createDragActor } from "~test/ui/pixi/MainDragController.test/actors";
 import {

@@ -7,20 +7,21 @@ This is the canonical map of implemented ownership and lifecycle. It does not ca
 The renderer dependency DAG is:
 
 ```text
-src/@routes → { src/page, src/ui, src/bridge, public src/editor }
-src/page    → src/ui
-src/ui      → { src/bridge, public src/editor }
-src/bridge  → { public src/engine, public src/editor, electron/contract }
-src/editor  → public src/engine
+src/@routes → { src/ui, src/renderer, exact src/engine owners, src/editor, electron/contract }
+src/ui      → { src/renderer, exact src/engine owners, src/editor, electron/contract }
+src/renderer → { exact src/engine owners, src/editor, electron/contract }
+src/editor  → exact src/engine owners
 ```
 
-- `src/engine` is framework-neutral gameplay, config, compiler, validation, pack, and CLI domain code.
+- `src/engine` is framework-neutral gameplay, config, compiler, validation, pack, and CLI domain code. Consumers import exact Engine owners directly; there is no generic public/internal wall. Dependency Cruiser restricts only specifically enumerated mutable or raw authorities.
 - `src/editor` is the platform-neutral Editor domain.
-- `src/bridge` is the renderer lifecycle/transport connection to engine and the pure `electron/contract` seam. Platform-neutral public Editor operations and projections may be consumed directly where the executable dependency rules allow them.
-- `src/ui` owns reusable presentation and transient interaction; `src/page` composes screens; `src/@routes` owns registration, loaders, redirects, and route context.
-- `electron/main` owns physical desktop capabilities and composes public engine/editor domains. It never imports renderer code or engine internals. `electron/preload` is transport-only; engine/editor code never imports Electron.
+- `src/renderer` contains only concrete renderer-process runtime, lifecycle, concurrency, and transport capabilities. It is not a required gateway to Engine, Editor, or `electron/contract`; callers import the exact owner directly.
+- `src/ui` owns reusable presentation and transient interaction. `src/@routes` owns registration, loaders, redirects, route context, and route-specific composition; routes may share only explicitly ignored `-*` route-private helpers, never import another route module.
+- `electron/main` owns physical desktop capabilities and composes engine/editor owners directly. It never imports renderer code; concrete raw Engine authorities remain limited to their exact owners by Dependency Cruiser. `electron/preload` is transport-only; engine/editor code never imports Electron.
 
 [`.dependency-cruiser.cjs`](.dependency-cruiser.cjs) is the executable import-boundary authority. Do not duplicate those rules in tests or prose.
+
+Within an exact domain owner, `fn/` contains only total synchronous explicit-input data-to-data operations named `*Fn` and their operation-owned co-located Props, Result, or other type declarations. It never contains Effect programs or standalone/declaration-only concepts such as schemas, standalone types, Context/Layer/errors, capabilities, or constant-only modules, and never replaces domain ownership with a global shared layer. One Fn and its owned declarations remain one exported concept. Fn composes only Fn, while Fx may compose Fn or Fx, so value dependencies cannot reach into effects or stateful capabilities.
 
 Each physical process has one Effect execution root:
 
@@ -70,7 +71,7 @@ Subscribers own current-plus-tail observation. Runtime listeners ignore event-on
 
 ## Game and session ownership
 
-`GameSession` owns one canonical Runtime, Tick fibers, command/listener scopes, and save lifecycle. The bridge-level playable `Game` adds its completed config and resource URLs without mirroring Runtime. UI executes public Effects and reads the exact session snapshot through a non-owning `GameEngine` facade.
+`GameSession` owns one canonical Runtime, Tick fibers, command/listener scopes, and save lifecycle. The renderer-process playable `Game` adds its completed config and resource URLs without mirroring Runtime. UI executes exact Engine-owned Effects and reads the exact session snapshot through its concrete game capability.
 
 `RendererRuntime` contains one scoped installed-game resource service. Acquisition uses scoped leases: same-package callers share one provisional result, the explicit load action adopts that exact lease, and `/game/$packageId` exposes only the adopted matching package through route context. A different package must finalize the current resource before acquisition. React mount/unmount is never desired-game state.
 
@@ -84,7 +85,7 @@ Shutdown order for a session is: reject commands, stop Tick, close session scope
 
 ## Renderer ownership
 
-React owns routes, pages, forms, menus, modal state, command presentation, and disposable projections. Feature-owned Effect Atoms own asynchronous renderer commands when admission/result must survive React remounts; lifecycle operations belong to route loaders or process services, not component effects. React may never own gameplay snapshots, package/catalog truth, persistence truth, or Game lifecycle.
+React owns routes, route-specific screen composition, forms, menus, modal state, command presentation, and disposable projections. Feature-owned Effect Atoms own asynchronous renderer commands when admission/result must survive React remounts; lifecycle operations belong to route loaders or process services, not component effects. React may never own gameplay snapshots, package/catalog truth, persistence truth, or Game lifecycle.
 
 Pixi owns retained Board, Toolbar, and Inventory scene presentation: display objects, geometry, hit testing, z-order, pointer lifecycle, and demand rendering. Motion is the only interpolation clock. The engine still decides every action and drop outcome. Main and Inventory canvases have separate actor stores; their handoff carries presentation geometry only and cannot assert runtime identity continuity. See the local [`src/ui/pixi/README.md`](src/ui/pixi/README.md).
 
@@ -102,7 +103,7 @@ The Editor ChatGPT page is the one deliberate foreign surface. Electron owns a s
 
 ## Filesystem and persistence
 
-The Node-only `FilesystemWrite` capability is the shared mechanical boundary for Electron, Editor, CLI, saves, and Arkpack publication. Readers and writers use the same canonical per-target lock. Writes stage beside the target, sync staged file contents, publish simple phase markers, and recover interrupted owned operations before the next read/write. Recovery distinguishes absent, owned, and unowned paths; confirmed symlink, containment, or missing-artifact ambiguity fails closed. Domain owners still serialize, validate, and map their own errors.
+The Node-only `FilesystemWrite` capability is the shared mechanical boundary for Electron, Editor, CLI, saves, and Arkpack publication. Readers and writers use the same canonical per-owner lock. A single owned file is replaced through one exact sibling staging file: sync the staged contents, atomically rename over the target without a delete fallback, then clean only that staging path. The portable Editor current tree is the only multi-file transaction; its rollback journal preserves old-or-new tree semantics for ordinary commits and Version checkout. Tree recovery distinguishes absent, owned, and unowned paths; confirmed symlink, containment, target-type, or missing-artifact ambiguity fails closed. Domain owners still serialize, validate, and map their own errors.
 
 Electron user data is split by owner:
 
@@ -127,7 +128,7 @@ Forms own local unsaved sessions. Save validates and publishes the complete owni
 
 Build validates the current disk revision, compiles through the canonical project pipeline, and atomically publishes one Community Arkpack descriptor. Save As/Install reread exact bounded artifact bytes; renderer memory is not an artifact store. The optional embedded release proof never changes the inner gameplay `contentHash`. JSON export creates a new unique owned child, copies only portable allowlisted paths, validates it, and never replaces an existing destination.
 
-Versions are full immutable logical snapshots backed by content-addressed objects; `versions/head.json` publishes visibility last. Checkout replaces the current tree, scenarios, and head atomically while Notes remain outside Versions. Scenarios are explicit versioned State snapshots, never autosave. Estimate is disposable static authored dependency analysis with optimistic parallel critical-path timing, not simulation or an engine-valid witness; its domain/data source owns query, filter, sort, and selection before React renders results. Flow is likewise an authored graph projection, not gameplay truth.
+Versions are full immutable logical snapshots backed by content-addressed objects; `versions/head.json` publishes visibility last. Checkout replaces the current tree, scenarios, and head atomically while Notes remain outside Versions. Scenarios are explicit versioned State snapshots, never autosave. Estimate is a disposable approximation over the authored acquisition graph: it expands from authored starting facts, records the first locally ranked route when each fact becomes reachable using scalar action time with stable identity as the tie-break, divides demand by scalar expected yield, and times the materialized witness as an optimistic parallel critical path. Route admission proves one scalar output unit; larger propagated demand may return partial without retrying quantity-specific alternatives. Equivalent independent route occurrences are compressed with an explicit count. It diagnoses cycles or dead ends, but does not jointly account for shared outputs or finite-root consumption, does not simulate rules, capacity, placement, charges, or runtime execution, and is never an engine-valid witness. Its domain/data source owns query, filter, sort, and selection before React renders results. Flow is likewise an authored graph projection, not gameplay truth.
 
 ## Hosted validation and delivery
 

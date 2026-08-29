@@ -1,14 +1,17 @@
-import type { EditorRoll } from "~/bridge/item/editor/EditorItemModel";
+import { Info } from "lucide-react";
+
+import type { RollSchema } from "~/engine/roll/schema/RollSchema";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { EditorDropList } from "~/ui/item/editor/EditorDropList";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
-import { EditorQuantityControl } from "~/ui/item/editor/EditorQuantityControl";
+import { EditorQuantityFields } from "~/ui/item/editor/EditorQuantityControl";
 import { useEditorItemOptionLabel } from "~/ui/item/editor/useEditorItemOptionLabel";
+import { Tooltip } from "~/ui/overlay/Tooltip";
 
 type EditorWeightedRoll = Extract<
-	EditorRoll,
+	RollSchema.Type,
 	{
 		readonly type: "weight";
 	}
@@ -54,26 +57,48 @@ export const EditorWeightedRollControl = ({
 	onChange,
 	roll,
 }: {
-	readonly onChange: (roll: EditorRoll | undefined) => void;
+	readonly onChange: (roll: RollSchema.Type | undefined) => void;
 	readonly roll: EditorWeightedRoll;
 }) => {
 	const readItemLabel = useEditorItemOptionLabel();
 	return (
 		<div className="grid gap-4">
-			<EditorQuantityControl
-				label="Selections"
-				description={<WeightedSelectionsHelp />}
-				descriptionTooltipClassName="max-w-lg p-4 text-sm leading-6"
-				minimumDescription="Lowest number of independent candidate selections this roll may perform when it resolves."
-				maximumDescription="Highest number of independent candidate selections this roll may perform. The actual integer count is chosen from Minimum through Maximum, inclusive."
-				value={roll.quantity}
-				onChange={(quantity) =>
-					onChange({
-						...roll,
-						quantity,
-					})
-				}
-			/>
+			<div className="grid gap-3">
+				<div className="text-sm">
+					<span className="flex h-5 min-w-0 items-center gap-1 leading-5">
+						<span className="font-semibold text-foreground">Selections</span>
+						<Tooltip
+							content={<WeightedSelectionsHelp />}
+							contentClassName="max-w-lg p-4 text-sm leading-6"
+						>
+							<button
+								type="button"
+								data-ui="EditorInfoTooltip"
+								className="grid size-5 min-h-0 min-w-0 shrink-0 cursor-help place-items-center rounded-full border-0 bg-transparent p-0 text-muted hover:text-foreground"
+								onClick={(event) => {
+									event.preventDefault();
+									event.stopPropagation();
+								}}
+							>
+								<Info className="size-4" />
+							</button>
+						</Tooltip>
+					</span>
+				</div>
+				<div className="grid gap-3 sm:grid-cols-2">
+					<EditorQuantityFields
+						minimumDescription="Lowest number of independent candidate selections this roll may perform when it resolves."
+						maximumDescription="Highest number of independent candidate selections this roll may perform. The actual integer count is chosen from Minimum through Maximum, inclusive."
+						value={roll.quantity}
+						onChange={(quantity) =>
+							onChange({
+								...roll,
+								quantity,
+							})
+						}
+					/>
+				</div>
+			</div>
 			<EditorFormSectionDivider
 				description="Relative weighted alternatives considered by this roll."
 				title="Weighted candidates"

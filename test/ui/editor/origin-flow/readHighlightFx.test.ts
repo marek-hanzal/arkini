@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
+import type { EditorItemOriginFlow } from "~/editor/origin-flow/EditorItemOriginFlow";
 import type { OriginFlowDirection, Selection } from "~/ui/item/editor/origin-flow/Highlight";
 import { readHighlightFx } from "~/ui/item/editor/origin-flow/readHighlightFx";
 import { cyclicFlow, producerFlow } from "./readHighlightFx.test/fixture";

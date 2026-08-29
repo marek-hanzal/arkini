@@ -1,8 +1,8 @@
 import type { Container } from "pixi.js";
 import type { Effect } from "effect";
 
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import type { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { InventoryDropTarget } from "~/ui/pixi/scene/InventoryDropTarget";
 

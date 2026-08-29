@@ -44,53 +44,53 @@ vi.mock("@effect/atom-react", () => ({
 						: AsyncResult.initial(),
 }));
 
-vi.mock("~/bridge/arkpack/editor/buildEditorProjectCommandAtom", () => ({
+vi.mock("~/ui/arkpack/editor/buildEditorProjectCommandAtom", () => ({
 	buildEditorProjectCommandAtom: (projectId: string) => ({
 		kind: "build",
 		key: projectId,
 	}),
 }));
 
-vi.mock("~/bridge/arkpack/ArkpackCatalogAtom", () => ({
+vi.mock("~/ui/arkpack/ArkpackCatalogAtom", () => ({
 	ArkpackCatalogAtom: {
 		kind: "catalog",
 		key: "canonical",
 	},
 }));
 
-vi.mock("~/bridge/arkpack/editor/installBuiltEditorArkpackCommandAtom", () => ({
+vi.mock("~/ui/arkpack/editor/installBuiltEditorArkpackCommandAtom", () => ({
 	installBuiltEditorArkpackCommandAtom: (contentHash: string) => ({
 		kind: "install",
 		key: contentHash,
 	}),
 }));
 
-vi.mock("~/bridge/arkpack/editor/saveBuiltEditorArkpackCommandAtom", () => ({
+vi.mock("~/ui/arkpack/editor/saveBuiltEditorArkpackCommandAtom", () => ({
 	saveBuiltEditorArkpackCommandAtom: (contentHash: string) => ({
 		kind: "save",
 		key: contentHash,
 	}),
 }));
 
-vi.mock("~/bridge/editor/exportEditorJsonDirectoryCommandAtom", () => ({
+vi.mock("~/ui/editor/exportEditorJsonDirectoryCommandAtom", () => ({
 	exportEditorJsonDirectoryCommandAtom: (projectId: string) => ({
 		kind: "export",
 		key: projectId,
 	}),
 }));
 
-vi.mock("~/bridge/editor/openEditorExportDirectoryCommandAtom", () => ({
+vi.mock("~/ui/editor/openEditorExportDirectoryCommandAtom", () => ({
 	openEditorExportDirectoryCommandAtom: {
 		kind: "open-export",
 		key: "completed-export",
 	},
 }));
 
-vi.mock("~/bridge/editor/useEditorProject", () => ({
+vi.mock("~/ui/editor/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
-vi.mock("~/bridge/runtime/RendererRuntime", () => ({
+vi.mock("~/renderer/RendererRuntime", () => ({
 	RendererRuntime: {
 		runSync: Effect.runSync,
 	},
@@ -129,8 +129,11 @@ vi.mock("~/ui/button/Button", () => ({
 		),
 }));
 
-import { EditorBuild } from "~/ui/arkpack/editor/EditorBuild";
+import { Route as EditorBuildRouteDefinition } from "~/@routes/editor/$projectId/build";
 import { useEditorBuildController } from "~/ui/arkpack/editor/useEditorBuildController";
+
+const EditorBuild = EditorBuildRouteDefinition.options.component;
+if (EditorBuild === undefined) throw new Error("Editor Build route component is missing.");
 
 (
 	globalThis as {

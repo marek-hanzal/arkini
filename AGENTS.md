@@ -22,9 +22,12 @@ Arkini is an offline, data-driven economy game and Editor. Work as a senior engi
 
 ## Code grammar
 
-- Every exported named project operation is an Effect program named `*Fx` in a same-named file. This includes reads, queries, validation, planning, conversion, compilation, and UI adapters even when synchronous or one line. Inline a trivial expression or use a private synchronous helper inside its owning operation file.
+- A total synchronous value operation depending only on explicit arguments and immutable module constants is named `fooFn` in `fooFn.ts`. It returns neither Effect nor Promise and does not use `Effect.run*`, ambient or global state, clock, randomness, I/O, subscriptions, schedulers, live mutation, or stateful capabilities. Local temporary `Map` or `Set` values are valid computation details; diagnostics, `Option`, and discriminated results may remain data.
+- Every `fooFn.ts` lives under the exact domain owner's local `fn/` directory. That directory contains only total synchronous explicit-input data-to-data operations and their operation-owned co-located Props, Result, or other type declarations. Effect programs and standalone or declaration-only concepts—schemas, standalone types, Context/Layer/error/capability declarations, or constant-only modules—cannot enter it. Never create a global or shared `fn/` junk drawer.
+- An Effect operation is named `fooFx` in `fooFx.ts` when it owns typed failure, environment, time or randomness, I/O, async work, interruption, concurrency, scope or resources, live mutation, subscriptions, transactions, or stateful capabilities. `Effect<_, never, never>` is a review trigger, never an automatic conversion rule.
+- Composition is one-way: Fn may call Fn; Fx may call Fn or Fx; Fn never calls or runs Fx.
 - Framework declarations keep framework grammar: React components and `use*` hooks, Effect Atom declarations, Zod schemas, Effect Context/Layer/error declarations, types, namespaces, constants, and inline callbacks are not project operations. Existing plain-operation violations are cleanup debt, not precedent or a reason to widen unrelated work.
-- Prefer one exported concept per file. A concept has one domain owner; do not create catch-all barrels or `types.ts` piles.
+- Prefer one exported concept per file. Operation-owned Props, Result, and other type declarations are part of that operation concept and stay co-located with their exact owner; standalone concepts get their own domain-owned file. Do not create catch-all barrels or `types.ts` piles.
 - Reusable Arkini capabilities are readonly objects produced by explicit Effect factories. Do not add project-owned classes, constructor-injected repositories, managers, generic services, or adapters. Framework/external constructors remain valid.
 - All exact identifiers use the shared `IdSchema`. Business schemas are strict unless unknown keys are deliberate and export `FooSchema`, `type FooSchema = typeof FooSchema`, and `namespace FooSchema { type Type = z.infer<FooSchema> }`.
 - Effect services/Layers own real capabilities and lifecycles, not ordinary domain logic. Scoped fibers/resources belong to a Scope; production time/randomness use injected Effect services.
@@ -39,7 +42,7 @@ Tests are fast risk feedback, not a coverage project.
 
 - Every test protects one named Arkini regression: a high-risk behavior, invariant, failure boundary, or lifecycle contract. If that regression cannot be stated, do not add the test.
 - Test the authoritative lower layer. A higher-layer test must prove a distinct boundary risk such as admission, exact identity wiring, cancellation, stale-result suppression, destructive navigation, or settlement—not repeat engine/schema/selector facts through React DOM.
-- Prioritize engine transactions, Tick, jobs, output, placement, merge ownership, persistence, compiler, and Arkpack integrity/trust/load/signing; then bridge concurrency; UI presentation last.
+- Prioritize engine transactions, Tick, jobs, output, placement, merge ownership, persistence, compiler, and Arkpack integrity/trust/load/signing; then renderer-process concurrency; UI presentation last.
 - Do not test copy, CSS/token spelling, markup inventories, visual tuning, framework behavior, trivial passthroughs, schema mechanics, enum membership, defaults, or permutations without distinct risk.
 - Use the smallest representative synthetic fixture. Permanent tests must not depend on `game/arkini`, generated official snapshots, or platform packaging.
 - Keep scenarios readable. Around 250 lines is a review signal; move non-trivial fixtures beside `Foo.test.ts` under `Foo.test/`, without a global fixture DSL.
@@ -65,4 +68,4 @@ Validate focused → affected → broad as risk requires, using `argc`; report h
 
 ## Product boundaries
 
-The Game loads an Arkpack and runs the canonical gameplay engine. The Editor authors portable projects and provides Item editing, Assets, Board scenarios, Flow, Estimate, Versions, Notes, Build, and a project-scoped MCP server. Flow is the authored relation graph; Estimate is optimistic static dependency analysis, not runtime simulation.
+The Game loads an Arkpack and runs the canonical gameplay engine. The Editor authors portable projects and provides Item editing, Assets, Board scenarios, Flow, Estimate, Versions, Notes, Build, and a project-scoped MCP server. Flow is the authored relation graph; Estimate is optimistic static authored-dependency analysis using deterministic scalar expected-yield route choice and parallel critical-path timing, not runtime simulation.

@@ -7,8 +7,8 @@ import { StrictMode, Suspense, act, createElement, startTransition } from "react
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { useGameEvents } from "~/bridge/event/useGameEvents";
-import { GameEventEnumSchema } from "~/bridge/event/useGameEvents";
+import type { useGameEvents } from "~/ui/game/useGameEvents";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { createGameAudioSynthFx } from "~/ui/audio/createGameAudioSynthFx";
 
 const eventState = vi.hoisted(() => ({
@@ -18,11 +18,11 @@ const eventState = vi.hoisted(() => ({
 	listener: null as ((batch: useGameEvents.Batch) => void | PromiseLike<void>) | null,
 }));
 
-vi.mock("~/bridge/game/useGameEngine", () => ({
+vi.mock("~/ui/game/useGameEngine", () => ({
 	useGameEngine: () => eventState.game,
 }));
 
-vi.mock("~/bridge/event/useGameEvents", async (importOriginal) => ({
+vi.mock("~/ui/game/useGameEvents", async (importOriginal) => ({
 	...(await importOriginal()),
 	useGameEvents: (listener: (batch: useGameEvents.Batch) => void | PromiseLike<void>) => {
 		eventState.listener = listener;

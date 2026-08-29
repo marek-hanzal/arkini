@@ -18,7 +18,7 @@ import { PlayableGameShell } from "~/ui/shell/GameShell";
 	}
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
-vi.mock("~/bridge/game/useGameEngine", () => ({
+vi.mock("~/ui/game/useGameEngine", () => ({
 	useGameEngine: () => ({}),
 }));
 

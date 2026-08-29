@@ -3,8 +3,10 @@ import { match } from "ts-pattern";
 
 import { TypeSchema } from "~/engine/output/schema/drop/rule/TypeSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import type { DropResolutionSchema } from "~/engine/output/schema/DropResolutionSchema";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
+import type { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
+import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { rollQuantityFx } from "~/engine/quantity/fx/rollQuantityFx";
 
 import { dropRuleFx } from "./dropRuleFx";
@@ -13,6 +15,12 @@ export namespace dropFx {
 	export interface Props {
 		drop: DropSchema.Type;
 		origin: GridLocationSchema.Type;
+	}
+
+	export interface Result {
+		readonly itemId: IdSchema.Type;
+		readonly quantity: PositiveIntegerSchema.Type;
+		readonly placement: PlacementSchema.Type;
 	}
 }
 
@@ -65,5 +73,5 @@ export const dropFx = Effect.fn("dropFx")(function* ({ drop, origin }: dropFx.Pr
 		itemId: drop.itemId,
 		placement: drop.placement,
 		quantity,
-	} satisfies DropResolutionSchema.Type;
+	} satisfies dropFx.Result;
 });

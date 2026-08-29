@@ -8,7 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { packDirectoryFx } from "~/engine/pack/fx/packDirectoryFx";
 import { decodeArkpackEnvelopeFx } from "~/engine/pack/fx/decodeArkpackEnvelopeFx";
 import { encodeArkpackEnvelopeFx } from "~/engine/pack/fx/encodeArkpackEnvelopeFx";
-import { installTestPngDecoder } from "~test/bridge/arkpack/support/createTestPngBytes";
+import { installTestPngDecoder } from "~test/support/arkpack/createTestPngBytes";
 import { writeSigningGame } from "./arkpackSigningWorkflow.test/writeSigningGame";
 
 let root = "";

@@ -1,4 +1,7 @@
-import type { EditorActionInput, EditorActionRule } from "~/bridge/item/editor/EditorItemModel";
+import { CircleCheck, CircleX } from "lucide-react";
+
+import type { InputSchema as ActionInputSchema } from "~/engine/action/schema/InputSchema";
+import type { RuleSchema as ActionRuleSchema } from "~/engine/action/schema/RuleSchema";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { useEditorItemFormSession } from "~/ui/item/editor/EditorItemFormContext";
@@ -30,10 +33,10 @@ export const EditorSpaceActionSection = () => {
 					<form.AppField name="enable">
 						{(field) => (
 							<field.BoolToggle
-								checkedIcon="icon-[lucide--circle-check]"
+								checkedIcon={CircleCheck}
 								description="Enabled actions may activate before availability rules are applied."
 								label="Enabled"
-								uncheckedIcon="icon-[lucide--circle-x]"
+								uncheckedIcon={CircleX}
 							/>
 						)}
 					</form.AppField>
@@ -51,7 +54,7 @@ export const EditorSpaceActionSection = () => {
 							rules={rules}
 							target="action"
 							onChange={(next) =>
-								form.setFieldValue("rules", next as EditorActionRule[])
+								form.setFieldValue("rules", next as ActionRuleSchema.Type[])
 							}
 						/>
 					)}
@@ -68,7 +71,7 @@ export const EditorSpaceActionSection = () => {
 								form.setFieldValue(
 									"input",
 									next.filter(
-										(candidate): candidate is EditorActionInput =>
+										(candidate): candidate is ActionInputSchema.Type =>
 											candidate.type !== "materials",
 									),
 								)

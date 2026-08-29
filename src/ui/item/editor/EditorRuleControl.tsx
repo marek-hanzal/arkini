@@ -1,8 +1,6 @@
-import type {
-	EditorActionRule,
-	EditorDropRule,
-	EditorLineRule,
-} from "~/bridge/item/editor/EditorItemModel";
+import type { RuleSchema as ActionRuleSchema } from "~/engine/action/schema/RuleSchema";
+import type { RuleSchema as LineRuleSchema } from "~/engine/line/schema/rule/RuleSchema";
+import type { RuleSchema as DropRuleSchema } from "~/engine/output/schema/drop/rule/RuleSchema";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import {
 	EditorChoiceControl,
@@ -13,8 +11,8 @@ import {
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorWhenControl } from "~/ui/item/editor/EditorWhenControl";
 
-type EditorRule = EditorActionRule | EditorLineRule | EditorDropRule;
-type EditorRuleType = EditorLineRule["type"];
+type EditorRule = ActionRuleSchema.Type | LineRuleSchema.Type | DropRuleSchema.Type;
+type EditorRuleType = LineRuleSchema.Type["type"];
 export type EditorRuleTarget = "action" | "drop" | "line";
 
 const readRuleTypeDescription = (type: EditorRuleType, target: EditorRuleTarget) => {
@@ -49,7 +47,7 @@ export const EditorRuleControl = ({
 	ruleTypeDescription,
 }: {
 	readonly allowedTypes: ReadonlyArray<EditorRuleType>;
-	readonly createRule: (type: EditorRuleType) => EditorLineRule;
+	readonly createRule: (type: EditorRuleType) => LineRuleSchema.Type;
 	readonly onChange: (rule: EditorRule) => void;
 	readonly rule: EditorRule;
 	readonly ruleIndex: number;

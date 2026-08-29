@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 import { Container, Graphics, Rectangle } from "pixi.js";
 
-import type { GameEngine } from "~/bridge/game/GameEngine";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
-import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
-import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
+import type { GameEngine } from "~/renderer/game/GameEngine";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import type { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
 import { readScenePaletteFx } from "~/ui/pixi/appearance/readScenePaletteFx";
 import type { DropFeedback } from "~/ui/pixi/grid/DropFeedback";
 import { drawMaskFx } from "~/ui/pixi/grid/drawMaskFx";
@@ -104,8 +104,8 @@ export const createInventorySurfaceFx = Effect.fn("createInventorySurfaceFx")(fu
 			Effect.gen(function* () {
 				const accepted =
 					kind !== null &&
-					kind !== DropItemResultKindEnumSchema.enum.Reject &&
-					kind !== DropItemResultKindEnumSchema.enum.Ignored;
+					kind !== DropItemResultKind.Reject &&
+					kind !== DropItemResultKind.Ignored;
 				yield* dropFeedback.renderFx({
 					color: accepted ? palette.accent : palette.danger,
 					slot: target,

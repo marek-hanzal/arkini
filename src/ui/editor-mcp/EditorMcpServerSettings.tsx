@@ -1,6 +1,7 @@
+import { RefreshCw } from "lucide-react";
 import { match } from "ts-pattern";
 
-import type { EditorMcpOverview } from "~/bridge/editor-mcp/readEditorMcpOverviewFx";
+import type { EditorMcpOverview } from "~/ui/editor-mcp/readEditorMcpOverviewFx";
 import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
 import type { EditorMcpController } from "~/ui/editor-mcp/useEditorMcpController";
 import {
@@ -130,7 +131,7 @@ export const EditorMcpServerSettings = ({
 							disabled={controller.pending}
 							onClick={controller.resetAuth}
 						>
-							<span className="icon-[lucide--refresh-cw] size-4" />
+							<RefreshCw className="size-4" />
 							Refresh
 						</DangerButton>
 					</div>

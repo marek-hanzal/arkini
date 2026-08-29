@@ -1,13 +1,14 @@
-import { Effect } from "effect";
+import { Effect, type Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
 import { setDefaultLineFx } from "~/engine/line/write/setDefaultLineFx";
 import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -82,8 +83,8 @@ const authoredDefaultBlockedConfig = GameConfigSchema.parse({
 	},
 });
 
-const run = <A, E, R>(
-	effect: Effect.Effect<A, E, R>,
+const run = <A, E>(
+	effect: Effect.Effect<A, E, Layer.Success<ReturnType<typeof GameLayerFx>>>,
 	config: GameConfigSchema.Type = inputRuntimeTestConfig,
 ) =>
 	Effect.runSync(
@@ -91,7 +92,7 @@ const run = <A, E, R>(
 			useGameFx({
 				config,
 			}),
-		) as Effect.Effect<A, E, never>,
+		),
 	);
 
 const setupFx = ({ quantity }: { readonly quantity: number }) =>
@@ -224,12 +225,12 @@ describe("dropItemFx default-line input storage", () => {
 
 		expect(result.pureBefore).toBe(true);
 		expect(result.preview).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.StoreInput,
+			kind: DropItemResultKind.StoreInput,
 			lineId,
 			inputIndex: 0,
 			quantity: 1,
 		});
-		expect(result.outcome.kind).toBe(DropItemResultKindEnumSchema.enum.StoreInput);
+		expect(result.outcome.kind).toBe(DropItemResultKind.StoreInput);
 		expect(result.runtime.defaultLineByOwnerItemId).toEqual({});
 		expect(result.isolated).toMatchObject({
 			id: "runtime:workshop",
@@ -303,11 +304,11 @@ describe("dropItemFx default-line input storage", () => {
 			authoredDefaultBlockedConfig,
 		);
 
-		expect(result.preview.kind).toBe(DropItemResultKindEnumSchema.enum.StoreInput);
+		expect(result.preview.kind).toBe(DropItemResultKind.StoreInput);
 		expect(result.dropped._tag).toBe("Success");
 		if (result.dropped._tag === "Success") {
 			expect(result.dropped.success).toEqual({
-				kind: DropItemResultKindEnumSchema.enum.Reject,
+				kind: DropItemResultKind.Reject,
 				reason: "blocked",
 				itemId: "runtime:water",
 				targetItemId: "runtime:workshop",
@@ -339,13 +340,13 @@ describe("dropItemFx default-line input storage", () => {
 		);
 
 		expect(result.preview).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.StoreInput,
+			kind: DropItemResultKind.StoreInput,
 			lineId,
 			inputIndex: 0,
 			quantity: 2,
 		});
 		expect(result.outcome).toMatchObject({
-			kind: DropItemResultKindEnumSchema.enum.StoreInput,
+			kind: DropItemResultKind.StoreInput,
 			storedQuantity: 2,
 			lineId,
 			inputIndex: 0,
@@ -387,7 +388,7 @@ describe("dropItemFx default-line input storage", () => {
 		);
 
 		expect(result.outcome).toMatchObject({
-			kind: DropItemResultKindEnumSchema.enum.StoreInput,
+			kind: DropItemResultKind.StoreInput,
 			storedQuantity: 5,
 			source: {
 				itemId: "runtime:water",
@@ -447,13 +448,13 @@ describe("dropItemFx default-line input storage", () => {
 		);
 
 		expect(result.preview).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.StoreInput,
+			kind: DropItemResultKind.StoreInput,
 			lineId,
 			inputIndex: 0,
 			quantity: 3,
 		});
 		expect(result.outcome).toMatchObject({
-			kind: DropItemResultKindEnumSchema.enum.StoreInput,
+			kind: DropItemResultKind.StoreInput,
 			storedQuantity: 3,
 			source: {
 				previousQuantity: 7,
@@ -501,9 +502,9 @@ describe("dropItemFx default-line input storage", () => {
 		);
 
 		expect(result.preview).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.Swap,
+			kind: DropItemResultKind.Swap,
 		});
-		expect(result.outcome.kind).toBe(DropItemResultKindEnumSchema.enum.Swap);
+		expect(result.outcome.kind).toBe(DropItemResultKind.Swap);
 	});
 
 	it("falls back to swap when the selected input has no remaining capacity", () => {
@@ -541,7 +542,7 @@ describe("dropItemFx default-line input storage", () => {
 		);
 
 		expect(result).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.Swap,
+			kind: DropItemResultKind.Swap,
 		});
 	});
 
@@ -560,7 +561,7 @@ describe("dropItemFx default-line input storage", () => {
 		);
 
 		expect(result).toEqual({
-			kind: DropItemResultKindEnumSchema.enum.Merge,
+			kind: DropItemResultKind.Merge,
 		});
 	});
 });

@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 
-import { JobStatusEnumSchema } from "~/bridge/job/JobStatusEnumSchema";
-import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
+import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
+import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
 
 /** Builds the stable semantic Fuse corpus for the current visible product lines. */
 export const useItemLineSearchCandidates = (

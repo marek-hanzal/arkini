@@ -1,15 +1,14 @@
 import { Effect } from "effect";
 
-import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { readReservedJobOutputQuantityFx } from "~/engine/job/fx/read/readReservedJobOutputQuantityFx";
-import type { DropResultSchema } from "~/engine/output/schema/DropResultSchema";
+import type { dropFx } from "~/engine/output/fx/dropFx";
 import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace assertPlacementMaxCountFx {
 	export interface Props {
-		drop: DropResultSchema.Type;
+		drop: dropFx.Result;
 		item: ItemSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
@@ -44,7 +43,7 @@ export const assertPlacementMaxCountFx = Effect.fn("assertPlacementMaxCountFx")(
 			itemId: drop.itemId,
 			placement: drop.placement,
 			quantity: drop.quantity,
-			reason: PlacementFailureReasonEnumSchema.enum.ItemMaxCount,
+			reason: PlacementUnavailableError.Reason.ItemMaxCount,
 			remainingQuantity: excessQuantity,
 		}),
 	);

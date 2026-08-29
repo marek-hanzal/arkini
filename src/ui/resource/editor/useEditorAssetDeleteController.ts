@@ -2,9 +2,9 @@ import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
 
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { deleteEditorAssetCommandAtom } from "~/bridge/resource/editor/deleteEditorAssetCommandAtom";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { deleteEditorAssetCommandAtom } from "~/ui/resource/editor/deleteEditorAssetCommandAtom";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import {
 	readEditorAssetDeleteBlockersFx,
 	type EditorAssetDeleteBlocker,

@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
-import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
+import type { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
 
 export namespace readAttractionActorIdFx {
 	export interface Props {
@@ -20,17 +20,17 @@ export const readAttractionActorIdFx = Effect.fn("readAttractionActorIdFx")(
 			return match(previewKind)
 				.with(null, () => null)
 				.with(
-					DropItemResultKindEnumSchema.enum.Merge,
-					DropItemResultKindEnumSchema.enum.Stack,
-					DropItemResultKindEnumSchema.enum.StoreInput,
+					DropItemResultKind.Merge,
+					DropItemResultKind.Stack,
+					DropItemResultKind.StoreInput,
 					() => targetItem.id,
 				)
 				.with(
-					DropItemResultKindEnumSchema.enum.Ignored,
-					DropItemResultKindEnumSchema.enum.Move,
-					DropItemResultKindEnumSchema.enum.Reject,
-					DropItemResultKindEnumSchema.enum.StoreInventory,
-					DropItemResultKindEnumSchema.enum.Swap,
+					DropItemResultKind.Ignored,
+					DropItemResultKind.Move,
+					DropItemResultKind.Reject,
+					DropItemResultKind.StoreInventory,
+					DropItemResultKind.Swap,
 					() => null,
 				)
 				.exhaustive();

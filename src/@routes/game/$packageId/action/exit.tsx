@@ -1,17 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Effect } from "effect";
 
-import { closeGameEngineResourceFx } from "~/bridge/game/closeGameEngineResourceFx";
-import { ActionPendingPage } from "~/page/action/ActionPendingPage";
-import { runActionRouteFx } from "~/page/action/runActionRouteFx";
-
-const label = "Saving and exiting Arkini…";
-
-const GameExitCompletedPage = () => (
-	<ActionPendingPage
-		completed
-		label={label}
-	/>
-);
+import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
+import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
+import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
 
 /**
  * Terminal renderer side of the native controlled-close handshake. This route
@@ -23,7 +15,11 @@ const GameExitCompletedPage = () => (
 export const Route = createFileRoute("/game/$packageId/action/exit")({
 	loader: async ({ context }) => {
 		const result = await context.rendererRuntime.runPromise(
-			runActionRouteFx(closeGameEngineResourceFx(context.gameEngineResource)),
+			runActionRouteFx(
+				GameEngineResourceFx.pipe(
+					Effect.flatMap((service) => service.closeFx(context.gameEngineResource)),
+				),
+			),
 		);
 		if (result.type === "finalization-failed") {
 			console.error(
@@ -34,6 +30,11 @@ export const Route = createFileRoute("/game/$packageId/action/exit")({
 	},
 	pendingMs: 0,
 	pendingMinMs: 2_500,
-	pendingComponent: () => <ActionPendingPage label={label} />,
-	component: GameExitCompletedPage,
+	pendingComponent: () => <ActionLoadingScreen label="Saving and exiting Arkini…" />,
+	component: () => (
+		<ActionLoadingScreen
+			completed
+			label="Saving and exiting Arkini…"
+		/>
+	),
 });

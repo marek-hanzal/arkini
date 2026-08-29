@@ -1,3 +1,4 @@
+import { Info } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { EditorDurationHint } from "~/ui/form/EditorDurationHint";
@@ -12,20 +13,13 @@ import {
 export const EditorValueLabel = ({
 	description,
 	label,
-	tooltipClassName,
 }: {
 	readonly description?: ReactNode;
 	readonly label: string;
-	readonly tooltipClassName?: string;
 }) => (
 	<span className="flex h-5 min-w-0 items-center gap-1 leading-5">
 		<span className="font-semibold text-foreground">{label}</span>
-		{description === undefined ? null : (
-			<EditorInfoTooltip
-				content={description}
-				tooltipClassName={tooltipClassName}
-			/>
-		)}
+		{description === undefined ? null : <EditorInfoTooltip content={description} />}
 	</span>
 );
 
@@ -172,7 +166,7 @@ export const EditorChoiceControl = <Value extends string>({
 					>
 						{option.label}
 						{option.description === undefined ? null : (
-							<span className="icon-[lucide--info] size-3.5 opacity-70" />
+							<Info className="size-3.5 opacity-70" />
 						)}
 					</button>
 				);

@@ -1,9 +1,10 @@
-import type { EditorProject } from "~/bridge/editor/EditorProject";
-import type { EditorBoardGame } from "~/bridge/editor/board/EditorBoardGame";
+import { Plus, Save, Trash2 } from "lucide-react";
+
+import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorBoardGame } from "~/renderer/editor/board/EditorBoardGame";
 import { useEditorBoardScenarioToolbar } from "~/ui/board/editor/useEditorBoardScenarioToolbar";
 import { Button } from "~/ui/button/Button";
 import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
-import { editorCollectionActionClassName } from "~/ui/form/EditorCollectionSelector";
 import { EditorSearchCombobox } from "~/ui/form/EditorSearchCombobox";
 
 /** Presents the explicit named scenario selector without owning persistence rules. */
@@ -42,28 +43,28 @@ export const EditorBoardScenarioToolbar = ({
 			/>
 			<div className="flex items-center gap-1">
 				<Button
-					className={editorCollectionActionClassName}
+					className="size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised"
 					disabled={controller.pending}
 					title="New scenario slot"
 					onClick={controller.createDraft}
 				>
-					<span className="icon-[lucide--plus] size-5" />
+					<Plus className="size-5" />
 				</Button>
 				<Button
-					className={editorCollectionActionClassName}
+					className="size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised"
 					disabled={controller.draft || controller.pending}
 					title="Delete selected scenario"
 					onClick={() => void controller.deleteScenario()}
 				>
-					<span className="icon-[lucide--trash-2] size-4" />
+					<Trash2 className="size-4" />
 				</Button>
 				<Button
-					className={editorCollectionActionClassName}
+					className="size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised"
 					disabled={!controller.canSave}
 					title="Save current Board state"
 					onClick={() => void controller.saveScenario()}
 				>
-					<span className="icon-[lucide--save] size-4" />
+					<Save className="size-4" />
 				</Button>
 			</div>
 			<p className="truncate text-xs text-muted">{controller.message}</p>

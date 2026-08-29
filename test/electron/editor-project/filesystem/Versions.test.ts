@@ -57,7 +57,7 @@ describe("filesystem Editor project versions", () => {
 				const paths = yield* createProjectPathsFx(root);
 				const filesystemWrite = yield* createFilesystemWriteFx();
 				const writeJsonFx = (target: string, value: unknown) =>
-					filesystemWrite.writeFileFx({
+					filesystemWrite.replaceFileFx({
 						lock: join(root, "editor.lock"),
 						target,
 						bytes: encoder.encode(`${JSON.stringify(value, undefined, "\t")}\n`),

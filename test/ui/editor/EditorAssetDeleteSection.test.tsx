@@ -5,7 +5,7 @@ import { act, createElement, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProject } from "~/bridge/editor/EditorProject";
+import type { EditorProject } from "~/editor/EditorProject";
 
 const state = vi.hoisted(() => ({
 	navigate: vi.fn().mockResolvedValue(undefined),
@@ -28,11 +28,11 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 	};
 });
 
-vi.mock("~/bridge/editor/useEditorProject", () => ({
+vi.mock("~/ui/editor/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
-vi.mock("~/bridge/resource/editor/deleteEditorAssetCommandAtom", () => ({
+vi.mock("~/ui/resource/editor/deleteEditorAssetCommandAtom", () => ({
 	deleteEditorAssetCommandAtom: () => ({
 		id: "delete-editor-asset",
 	}),

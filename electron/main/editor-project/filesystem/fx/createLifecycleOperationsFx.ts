@@ -21,8 +21,8 @@ import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWrite
 import { readProjectFilesFx } from "./readProjectFilesFx";
 import { readSidecarsFx } from "./readSidecarsFx";
 import { readVersionHistoryFx } from "./readVersionHistoryFx";
-import { writeProjectFilesFx } from "./writeProjectFilesFx";
 import { withProjectLockFx } from "./withProjectLockFx";
+import { writeProjectFilesFx } from "./writeProjectFilesFx";
 
 export interface LifecycleOperations {
 	readonly createProjectFx: (

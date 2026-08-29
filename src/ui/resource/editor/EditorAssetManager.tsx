@@ -1,6 +1,6 @@
 import { memo } from "react";
 
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
 import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import {
 	selectableActiveClassName,

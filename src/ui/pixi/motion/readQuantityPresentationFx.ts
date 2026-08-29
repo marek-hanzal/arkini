@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
+import type { TileMotionCue } from "~/ui/pixi/motion/TileMotionCue";
 import type { QuantityPresentation } from "~/ui/pixi/motion/QuantityPresentation";
 import type { TargetRoute } from "~/ui/pixi/motion/MotionTarget";
 import { readUnsettledTileInputSourceQuantitiesFx } from "~/ui/tile/motion/readUnsettledTileInputSourceQuantitiesFx";

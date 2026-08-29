@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import type { FederatedPointerEvent } from "pixi.js";
 
-import type { GameEngine } from "~/bridge/game/GameEngine";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import type { GameEngine } from "~/renderer/game/GameEngine";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { PointerDragThreshold } from "~/ui/drag/PointerDragThreshold";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
@@ -54,7 +54,7 @@ export namespace createMainDragControllerFx {
  * Press-time identity anchors the gesture, while the release command rebases to the latest
  * canonical revision of that same actor at that same location. This lets an engine-committed
  * incoming stack update a held item without turning the eventual drop into a stale command.
- * Geometry drives presentation only; the bridge preview and command remain the authority for
+ * Geometry drives presentation only; the engine preview and command remain the authority for
  * every drop outcome. A submitted drop retains only its exact source actor and immediately
  * releases the scene-wide gesture slot.
  */

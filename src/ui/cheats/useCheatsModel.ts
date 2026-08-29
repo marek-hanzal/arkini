@@ -2,8 +2,8 @@ import { useAtom } from "@effect/atom-react";
 import type { Effect } from "effect";
 import { useCallback, useMemo } from "react";
 
-import type { PlayableGame } from "~/bridge/game/PlayableGame";
-import { useGameCheats } from "~/bridge/cheat/useGameCheats";
+import type { PlayableGame } from "~/renderer/game/PlayableGame";
+import { useGameCheats } from "~/ui/cheats/useGameCheats";
 import { updateGameCheatsAtom } from "~/ui/cheats/updateGameCheatsAtom";
 
 export namespace useCheatsModel {

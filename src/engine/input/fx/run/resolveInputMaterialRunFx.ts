@@ -2,8 +2,8 @@ import { Effect } from "effect";
 
 import { resolveActionChargeFx } from "~/engine/action/fx/resolveActionChargeFx";
 import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
+import type { InputRun } from "~/engine/input/InputRun";
 import type { MaterialSchema } from "~/engine/input/schema/MaterialSchema";
-import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
 import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -55,5 +55,5 @@ export const resolveInputMaterialRunFx = Effect.fn("resolveInputMaterialRunFx")(
 	return {
 		resolution,
 		plan,
-	} satisfies InputRunResolutionSchema.Type;
+	} satisfies InputRun.Resolution;
 });

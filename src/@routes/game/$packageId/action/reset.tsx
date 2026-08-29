@@ -1,17 +1,22 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { Effect } from "effect";
 
-import { resetGameEngineResourceFx } from "~/bridge/game/resetGameEngineResourceFx";
-import { ActionPendingPage } from "~/page/action/ActionPendingPage";
-import { runActionRouteFx } from "~/page/action/runActionRouteFx";
+import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
+import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
+import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
 
 export const Route = createFileRoute("/game/$packageId/action/reset")({
 	loader: async ({ context, params }) => {
 		try {
 			await context.rendererRuntime.runPromise(
 				runActionRouteFx(
-					resetGameEngineResourceFx({
-						resource: context.gameEngineResource,
-					}),
+					GameEngineResourceFx.pipe(
+						Effect.flatMap((service) =>
+							service.resetFx({
+								resource: context.gameEngineResource,
+							}),
+						),
+					),
 				),
 			);
 		} catch (cause) {
@@ -25,5 +30,5 @@ export const Route = createFileRoute("/game/$packageId/action/reset")({
 	},
 	pendingMs: 0,
 	pendingMinMs: 2_500,
-	pendingComponent: () => <ActionPendingPage label="Destroying current progress…" />,
+	pendingComponent: () => <ActionLoadingScreen label="Destroying current progress…" />,
 });

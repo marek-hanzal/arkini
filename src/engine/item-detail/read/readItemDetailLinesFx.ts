@@ -3,9 +3,9 @@ import { Effect, Option } from "effect";
 import type { ItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines";
 import { readBoardItemDetailLineFx } from "~/engine/item-detail/read/readBoardItemDetailLineFx";
 import { readStoredItemDetailLineFx } from "~/engine/item-detail/read/readStoredItemDetailLineFx";
-import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
+import { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
 import { readEffectiveDefaultLineFx } from "~/engine/line/read/readEffectiveDefaultLineFx";
-import { readLineOwnerLinesFx } from "~/engine/line/read/readLineOwnerLinesFx";
+import { readLineOwnerLinesFn } from "~/engine/line/fn/readLineOwnerLinesFn";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 /** Public operation-owned aliases for the stable Item Detail Lines contract. */
@@ -29,10 +29,10 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 }: ItemDetailLines.Props) {
 	const owner = runtime.items.find((candidate) => candidate.id === itemId);
 	if (owner === undefined) return unavailable;
-	const ownerItem = Option.getOrUndefined(yield* isLineOwnerItemFx(owner.item));
+	const ownerItem = Option.getOrUndefined(isLineOwnerItemFn(owner.item));
 	if (ownerItem === undefined) return unavailable;
 
-	const lines = yield* readLineOwnerLinesFx(ownerItem);
+	const lines = readLineOwnerLinesFn(ownerItem);
 	const defaultLineId = (yield* readEffectiveDefaultLineFx({
 		ownerItemId: owner.id,
 		ownerItem,

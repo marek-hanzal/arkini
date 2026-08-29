@@ -4,8 +4,8 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/engine/item/error/ItemNotFoundError";
 import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { LineNotFoundError } from "~/engine/line/error/LineNotFoundError";
-import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
-import { readLineOwnerLinesFx } from "~/engine/line/read/readLineOwnerLinesFx";
+import { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
+import { readLineOwnerLinesFn } from "~/engine/line/fn/readLineOwnerLinesFn";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -31,9 +31,8 @@ export const setDefaultLineFx = Effect.fn("setDefaultLineFx")(function* ({
 					}),
 				);
 			}
-			const ownerItem = Option.getOrUndefined(yield* isLineOwnerItemFx(owner.item));
-			const lines =
-				ownerItem === undefined ? undefined : yield* readLineOwnerLinesFx(ownerItem);
+			const ownerItem = Option.getOrUndefined(isLineOwnerItemFn(owner.item));
+			const lines = ownerItem === undefined ? undefined : readLineOwnerLinesFn(ownerItem);
 			if (lines?.some((line) => line.id === lineId) !== true) {
 				return yield* Effect.fail(
 					new LineNotFoundError({

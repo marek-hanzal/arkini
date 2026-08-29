@@ -9,7 +9,7 @@ import { readEditorAcquisitionAvailabilityRequirementsFn } from "~/editor/acquis
 import { readEditorAcquisitionOutputOccurrencesFx } from "~/editor/readEditorAcquisitionOutputOccurrencesFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import { readAuthoredItemLinesFx } from "~/engine/line/read/readAuthoredItemLinesFx";
+import { readAuthoredItemLinesFn } from "~/engine/line/fn/readAuthoredItemLinesFn";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
@@ -244,7 +244,7 @@ export const compileEditorAcquisitionLineRoutesFx = Effect.fn(
 )(function* (config: GameConfigSchema.Type) {
 	const routes: EditorAcquisitionRoute[] = [];
 	for (const item of Object.values(config.items))
-		for (const line of yield* readAuthoredItemLinesFx(item)) {
+		for (const line of readAuthoredItemLinesFn(item)) {
 			const descriptor = yield* readLineDescriptorFx(item, line);
 			if (descriptor !== undefined)
 				routes.push(...(yield* readLineRoutesFx(config, descriptor)));

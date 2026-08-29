@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import type { EditorProject } from "~/editor/EditorProject";
-import { forceDeleteEditorItemFx } from "~/editor/item/fx/forceDeleteEditorItemFx";
-import { readEditorItemDeleteBlockersFn } from "~/editor/item/fn/readEditorItemDeleteBlockersFn";
+import { forceDeleteEditorItemFx } from "~/item-authoring/domain/fx/forceDeleteEditorItemFx";
+import { readEditorItemDeleteBlockersFn } from "~/item-authoring/domain/fn/readEditorItemDeleteBlockersFn";
 
 export const readItemDeleteImpactFx = Effect.fn("readItemDeleteImpactFx")(function* (
 	project: EditorProject,

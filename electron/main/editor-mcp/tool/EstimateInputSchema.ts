@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { EditorItemEstimateSortSchema } from "~/editor/EditorItemEstimateSortSchema";
+import { EditorItemEstimateSortSchema } from "~/estimate/domain/EditorItemEstimateSortSchema";
 
 export const EstimateInputSchema = z
 	.object({

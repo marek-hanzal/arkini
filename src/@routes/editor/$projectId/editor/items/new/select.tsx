@@ -6,7 +6,7 @@ import { useMemo } from "react";
 import { useEditorProject } from "~/ui/editor/useEditorProject";
 import { ButtonLink } from "~/ui/button/Button";
 import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
-import { EditorItemTypePresentation } from "~/ui/item/editor/EditorItemTypePresentation";
+import { EditorItemTypePresentation } from "~/item-authoring/ui/EditorItemTypePresentation";
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/new/select")({
 	component: () => {

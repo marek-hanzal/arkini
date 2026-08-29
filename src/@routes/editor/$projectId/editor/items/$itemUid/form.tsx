@@ -1,7 +1,7 @@
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { createFileRoute, Outlet, useParams } from "@tanstack/react-router";
-import { EditorItemForm } from "~/ui/item/editor/EditorItemForm";
-import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
+import { EditorItemForm } from "~/item-authoring/ui/EditorItemForm";
+import type { EditorItemSectionId } from "~/item-authoring/ui/EditorItemSections";
 
 type EditorItemOptionalCapability = "charges" | "merges";
 

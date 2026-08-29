@@ -1,4 +1,4 @@
-import { Array, Effect } from "effect";
+import { Array, Order } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
@@ -8,7 +8,7 @@ import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemF
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
-export namespace readAvailableStackItemsFx {
+export namespace readAvailableStackItemsFn {
 	export interface Props {
 		itemId: IdSchema.Type;
 		locations: ReadonlyArray<GridLocationSchema.Type>;
@@ -16,15 +16,12 @@ export namespace readAvailableStackItemsFx {
 	}
 }
 
-/**
- * Reads every pure compatible non-full stack inside one explicit location set.
- * Runtime locale collation remains an ambient ordering dependency.
- */
-export const readAvailableStackItemsFx = Effect.fn("readAvailableStackItemsFx")(function* ({
+/** Reads every pure compatible non-full stack inside one explicit location set. */
+export const readAvailableStackItemsFn = ({
 	itemId,
 	locations,
 	runtime,
-}: readAvailableStackItemsFx.Props) {
+}: readAvailableStackItemsFn.Props) => {
 	const gridItems = Array.getSomes(runtime.items.map(isGridRuntimeItemFn));
 	const occupants = readGridLocationOccupantsFn({
 		items: gridItems,
@@ -44,7 +41,7 @@ export const readAvailableStackItemsFx = Effect.fn("readAvailableStackItemsFx")(
 			return (
 				left.location.position.y - right.location.position.y ||
 				left.location.position.x - right.location.position.x ||
-				left.id.localeCompare(right.id)
+				Order.String(left.id, right.id)
 			);
 		}) satisfies GridRuntimeItemSchema.Type[];
-});
+};

@@ -36,19 +36,19 @@ describe("orderStackItemsFn", () => {
 		]);
 	});
 
-	it("uses deterministic scan order when no origin applies", () => {
+	it("uses deterministic code-unit scan order when no origin applies", () => {
 		const result = orderStackItemsFn({
 			items: [
-				runtimeItem("runtime:third", 2),
+				runtimeItem("runtime:é", 1),
 				runtimeItem("runtime:first", 0),
-				runtimeItem("runtime:second", 1),
+				runtimeItem("runtime:z", 1),
 			],
 		});
 
 		expect(result.map((item) => item.id)).toEqual([
 			"runtime:first",
-			"runtime:second",
-			"runtime:third",
+			"runtime:z",
+			"runtime:é",
 		]);
 	});
 });

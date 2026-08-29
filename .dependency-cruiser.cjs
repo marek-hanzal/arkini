@@ -2,6 +2,10 @@ const activeCodePattern = "^(?:src|electron|shared|scripts)(?:/|$)";
 const activeCodeAndTestsPattern = "^(?:src|electron|shared|scripts|test)(?:/|$)";
 const productionCodePattern = "^(?:src|electron|shared)(?:/|$)";
 const applicationEntrypointPattern = "^src/(?:main|createArkiniRouterFx|_route)[.]tsx?$";
+const productDomainPattern = "^src/(?:item-authoring|flow|estimate)/domain(?:/|$)";
+const productPresentationPattern = "^src/(?:item-authoring|flow|estimate)/(?:ui|worker)(?:/|$)";
+const reusablePresentationPattern =
+	"^src/(?:ui(?:/|$)|(?:item-authoring|flow|estimate)/(?:ui|worker)(?:/|$))";
 
 /** @type {import('dependency-cruiser').IForbiddenRuleType[]} */
 const boundaryRules = [
@@ -14,7 +18,7 @@ const boundaryRules = [
 			path: "^src/engine(?:/|$)",
 		},
 		to: {
-			path: "^src/(?:renderer|ui|@routes)(?:/|$)",
+			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productPresentationPattern}`,
 		},
 	},
 	{
@@ -114,7 +118,19 @@ const boundaryRules = [
 			path: "^src/editor(?:/|$)",
 		},
 		to: {
-			path: "^src/(?:renderer|ui|@routes)(?:/|$)|^electron(?:/|$)|^node_modules/electron(?:/|$)",
+			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productPresentationPattern}|^electron(?:/|$)|^node_modules/electron(?:/|$)`,
+		},
+	},
+	{
+		name: "product-domain-no-presentation-imports",
+		comment:
+			"Item Authoring, Flow, and Estimate domain subtrees stay platform-neutral and never import product UI/workers, shared UI, renderer ownership, routes, or Electron.",
+		severity: "error",
+		from: {
+			path: productDomainPattern,
+		},
+		to: {
+			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productPresentationPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
 		},
 	},
 	{
@@ -126,16 +142,16 @@ const boundaryRules = [
 			path: "^src/renderer(?:/|$)",
 		},
 		to: {
-			path: "^src/(?:ui|@routes)(?:/|$)",
+			path: `^src/(?:ui|@routes)(?:/|$)|${productPresentationPattern}`,
 		},
 	},
 	{
-		name: "ui-no-route-imports",
+		name: "presentation-no-route-imports",
 		comment:
-			"Reusable UI imports exact Engine and Editor owners or concrete renderer-process capabilities directly, but never route registration or route-specific composition.",
+			"Shared and product-owned presentation imports exact domain/process owners directly, but never route registration or route-specific composition.",
 		severity: "error",
 		from: {
-			path: "^src/ui(?:/|$)",
+			path: reusablePresentationPattern,
 		},
 		to: {
 			path: "^src/@routes(?:/|$)",
@@ -243,7 +259,7 @@ const boundaryRules = [
 			path: "^electron/main(?:/|$)",
 		},
 		to: {
-			path: "^src/(?:renderer|ui|@routes)(?:/|$)",
+			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productPresentationPattern}`,
 		},
 	},
 	{
@@ -279,10 +295,10 @@ const boundaryRules = [
 	{
 		name: "domain-code-does-not-import-electron-contract",
 		comment:
-			"Framework-neutral Engine and Editor domains never depend on Electron transport contracts.",
+			"Framework-neutral Engine, shared Editor, and product domains never depend on Electron transport contracts.",
 		severity: "error",
 		from: {
-			path: "^src/(?:engine|editor)(?:/|$)",
+			path: `^src/(?:engine|editor)(?:/|$)|${productDomainPattern}`,
 		},
 		to: {
 			path: "^electron/contract(?:/|$)",

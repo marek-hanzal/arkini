@@ -1,7 +1,7 @@
 import { Order } from "effect";
 
 import type { EditorProject } from "~/editor/EditorProject";
-import { searchEditorItemsFn } from "~/editor/item/fn/searchEditorItemsFn";
+import { searchEditorItemsFn } from "~/item-authoring/domain/fn/searchEditorItemsFn";
 import type { ItemCollectionInput } from "../ItemCollectionInputSchema";
 
 const indentText = (value: string) =>

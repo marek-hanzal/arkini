@@ -1,8 +1,8 @@
 import type { EditorGameDiagnostic } from "~/editor/build/fn/readEditorBuildFailureFn";
 import type { EditorProject } from "~/editor/EditorProject";
 import type { EditorDiagnosticTarget } from "~/ui/arkpack/editor/EditorDiagnosticTarget";
-import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
-import { readEditorItemSectionForPathFn } from "~/ui/item/editor/fn/readEditorItemSectionForPathFn";
+import type { EditorItemSectionId } from "~/item-authoring/ui/EditorItemSections";
+import { readEditorItemSectionForPathFn } from "~/item-authoring/ui/fn/readEditorItemSectionForPathFn";
 import { readEditorProjectSectionForPathFn } from "~/ui/project/editor/fn/readEditorProjectSectionForPathFn";
 
 const readItemIdFromPath = (path: ReadonlyArray<PropertyKey>) =>

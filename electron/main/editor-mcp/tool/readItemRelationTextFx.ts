@@ -1,14 +1,14 @@
 import { Effect } from "effect";
 
 import type { EditorProject } from "~/editor/EditorProject";
-import { createEditorAcquisitionGraphFn } from "~/editor/acquisition/fn/createEditorAcquisitionGraphFn";
-import { readEditorItemOriginSourcesFn } from "~/editor/origin-flow/fn/readEditorItemOriginSourcesFn";
+import { createEditorAcquisitionGraphFn } from "~/flow/domain/fn/createEditorAcquisitionGraphFn";
+import { readEditorItemOriginSourcesFn } from "~/flow/domain/fn/readEditorItemOriginSourcesFn";
 import type {
 	EditorItemOriginOutputOccurrence,
 	EditorItemOriginRelationRole,
 	EditorItemOriginSource,
-} from "~/editor/EditorItemOriginSource";
-import { readEditorItemOriginRelationSubgraphFn } from "~/editor/origin-flow/fn/readEditorItemOriginRelationSubgraphFn";
+} from "~/flow/domain/EditorItemOriginSource";
+import { readEditorItemOriginRelationSubgraphFn } from "~/flow/domain/fn/readEditorItemOriginRelationSubgraphFn";
 
 const itemReference = (project: EditorProject, itemId: string) => {
 	const item = project.config.items[itemId];

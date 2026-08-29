@@ -5,7 +5,7 @@ import type { TileSwapMotionCue } from "~/ui/pixi/motion/TileMotionCue";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
-import { readSettleDurationMsFx } from "~/ui/pixi/drag/readSettleDurationMsFx";
+import { readSettleDurationMsFn } from "~/ui/pixi/drag/fn/readSettleDurationMsFn";
 import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
 import { createMagneticProjectorFx } from "~/ui/pixi/motion/createMagneticProjectorFx";
 import { createMotionPoseSamplerFx } from "~/ui/pixi/motion/createMotionPoseSamplerFx";
@@ -92,7 +92,7 @@ export const runSwapMotionFx = Effect.fn("runSwapMotionFx")(function* ({
 				y: leg.forceOrigin.y,
 			});
 		}
-		const durationMs = yield* readSettleDurationMsFx({
+		const durationMs = readSettleDurationMsFn({
 			fromX: leg.actor.container.x,
 			fromY: leg.actor.container.y,
 			tileSize: leg.target.size,

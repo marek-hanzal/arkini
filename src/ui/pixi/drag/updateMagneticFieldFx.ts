@@ -4,7 +4,7 @@ import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import type { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
-import { readAttractionActorIdFx } from "~/ui/pixi/magnet/readAttractionActorIdFx";
+import { readAttractionActorIdFn } from "~/ui/pixi/magnet/fn/readAttractionActorIdFn";
 
 export namespace updateMagneticFieldFx {
 	export interface Props {
@@ -33,7 +33,7 @@ export const updateMagneticFieldFx = Effect.fn("updateMagneticFieldFx")(function
 	sourceItem,
 	targetItem,
 }: updateMagneticFieldFx.Props) {
-	const attractedActorId = yield* readAttractionActorIdFx({
+	const attractedActorId = readAttractionActorIdFn({
 		previewKind,
 		targetItem,
 	});

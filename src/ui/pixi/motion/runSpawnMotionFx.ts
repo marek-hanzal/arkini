@@ -4,7 +4,7 @@ import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { TileSpawnMotionCue } from "~/ui/pixi/motion/TileMotionCue";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
-import { readTravelDurationMsFx } from "~/ui/pixi/animation/readTravelDurationMsFx";
+import { readTravelDurationMsFn } from "~/ui/pixi/animation/fn/readTravelDurationMsFn";
 import { startActorEnterFx } from "~/ui/pixi/animation/startActorEnterFx";
 import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
 import { createMagneticProjectorFx } from "~/ui/pixi/motion/createMagneticProjectorFx";
@@ -59,7 +59,7 @@ export const runSpawnMotionFx = Effect.fn("runSpawnMotionFx")(function* ({
 		animator,
 		delayMs,
 	});
-	const durationMs = yield* readTravelDurationMsFx({
+	const durationMs = readTravelDurationMsFn({
 		fromX: origin.x,
 		fromY: origin.y,
 		tileSize: target.size,

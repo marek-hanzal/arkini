@@ -8,7 +8,7 @@ import {
 	lifecycleDurationMs,
 	lifecycleReducedScale,
 } from "~/ui/pixi/animation/runActorLifecycleFx";
-import { readTravelDurationMsFx } from "~/ui/pixi/animation/readTravelDurationMsFx";
+import { readTravelDurationMsFn } from "~/ui/pixi/animation/fn/readTravelDurationMsFn";
 
 import {
 	createMotionHarness,
@@ -179,15 +179,13 @@ describe("motion delivery batch", () => {
 			throw new Error("Expected final live-target contact segment.");
 		}
 		expect(finalContact.durationMs).toBe(
-			Effect.runSync(
-				readTravelDurationMsFx({
-					fromX: 900,
-					fromY: 400,
-					tileSize: 120,
-					toX: 1_200,
-					toY: 600,
-				}),
-			),
+			readTravelDurationMsFn({
+				fromX: 900,
+				fromY: 400,
+				tileSize: 120,
+				toX: 1_200,
+				toY: 600,
+			}),
 		);
 		expect(samplePoseAnimation(finalContact, 1)).toEqual({
 			scale: 1.5,

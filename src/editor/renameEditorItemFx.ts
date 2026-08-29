@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticRecordEntityEnumSchema } from "~/engine/validation/schema/DiagnosticRecordEntityEnumSchema";
-import { validateConfigReferencesFx } from "~/engine/validation/rule/validateConfigReferencesFx";
+import { validateConfigReferencesFn } from "~/engine/validation/rule/fn/validateConfigReferencesFn";
 
 const replacePath = (
 	root: Record<string, unknown>,
@@ -51,7 +51,7 @@ export const renameEditorItemFx = Effect.fn("renameEditorItemFx")(function* ({
 		...config,
 		items,
 	};
-	const diagnostics = yield* validateConfigReferencesFx({
+	const diagnostics = validateConfigReferencesFn({
 		config: candidate,
 		provenance: {
 			items: {},

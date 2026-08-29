@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import { selectItemsFx } from "~/engine/selector/fx/selectItemsFx";
+import { selectItemsFn } from "~/engine/selector/fn/selectItemsFn";
 import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
 
 export namespace queryItemsFx {
@@ -16,7 +16,7 @@ export const queryItemsFx = Effect.fn("queryItemsFx")(function* ({
 	items,
 	selector,
 }: queryItemsFx.Props) {
-	const selected = yield* selectItemsFx({
+	const selected = selectItemsFn({
 		items: items.map((item) => item.item),
 		selector,
 	});

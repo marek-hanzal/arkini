@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { MergeRuleNotFoundError } from "~/engine/merge/error/MergeRuleNotFoundError";
 import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import { selectItemsFx } from "~/engine/selector/fx/selectItemsFx";
+import { selectItemsFn } from "~/engine/selector/fn/selectItemsFn";
 
 export namespace resolveMergeRuleFx {
 	export interface Props {
@@ -23,7 +23,7 @@ export const resolveMergeRuleFx = Effect.fn("resolveMergeRuleFx")(function* ({
 	target,
 }: resolveMergeRuleFx.Props) {
 	for (const [index, rule] of (source.item.merge ?? []).entries()) {
-		const matches = yield* selectItemsFx({
+		const matches = selectItemsFn({
 			items: [
 				target.item,
 			],

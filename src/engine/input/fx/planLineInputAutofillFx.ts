@@ -4,7 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readLineInputDeliveryClaimsFx } from "~/engine/delivery/read/readLineInputDeliveryClaimsFx";
 import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
 import { isLineInputAutofillSourceLocationFx } from "~/engine/input/read/isLineInputAutofillSourceLocationFx";
-import { readMaterialInputEligibilityFx } from "~/engine/input/read/readMaterialInputEligibilityFx";
+import { readMaterialInputEligibilityFn } from "~/engine/input/read/fn/readMaterialInputEligibilityFn";
 import type { MaterialSchema } from "~/engine/input/schema/MaterialSchema";
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
 import { readBoardItemLineFx } from "~/engine/line/fx/readBoardItemLineFx";
@@ -13,7 +13,7 @@ import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntim
 import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { selectItemsFx } from "~/engine/selector/fx/selectItemsFx";
+import { selectItemsFn } from "~/engine/selector/fn/selectItemsFn";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 
 export namespace planLineInputAutofillFx {
@@ -118,9 +118,9 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 		candidates.push(gridCandidate);
 	}
 	candidates.sort(compareCandidates(owner));
-	const eligibleCandidateItems = (yield* readMaterialInputEligibilityFx({
+	const eligibleCandidateItems = readMaterialInputEligibilityFn({
 		items: candidates.map((candidate) => candidate.item),
-	})).eligibleItems;
+	}).eligibleItems;
 	const remainingByItemId = new Map(
 		candidates.map((candidate) => [
 			candidate.id,
@@ -169,7 +169,7 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 			lineId,
 			runtime,
 		});
-		const matchingItems = yield* selectItemsFx({
+		const matchingItems = selectItemsFn({
 			items: eligibleCandidateItems,
 			selector: input.selector,
 		});

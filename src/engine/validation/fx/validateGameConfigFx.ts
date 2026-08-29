@@ -2,16 +2,16 @@ import { Effect } from "effect";
 
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { validateCanonicalIdsFx } from "../rule/validateCanonicalIdsFx";
-import { validateConfigReferencesFx } from "../rule/validateConfigReferencesFx";
-import { validateInputAcceptanceCyclesFx } from "../rule/validateInputAcceptanceCyclesFx";
-import { validateInputChargesFx } from "../rule/validateInputChargesFx";
-import { validateItemLineIdsFx } from "../rule/validateItemLineIdsFx";
-import { validateItemUidsFx } from "../rule/validateItemUidsFx";
-import { validateMaterialInputEligibilityFx } from "../rule/validateMaterialInputEligibilityFx";
-import { validateLimitedDepositsFx } from "../rule/validateLimitedDepositsFx";
-import { validateLineInputCapacityFx } from "../rule/validateLineInputCapacityFx";
-import { validateMergeViabilityFx } from "../rule/validateMergeViabilityFx";
+import { validateCanonicalIdsFn } from "../rule/fn/validateCanonicalIdsFn";
+import { validateConfigReferencesFn } from "../rule/fn/validateConfigReferencesFn";
+import { validateInputAcceptanceCyclesFn } from "../rule/fn/validateInputAcceptanceCyclesFn";
+import { validateInputChargesFn } from "../rule/fn/validateInputChargesFn";
+import { validateItemLineIdsFn } from "../rule/fn/validateItemLineIdsFn";
+import { validateItemUidsFn } from "../rule/fn/validateItemUidsFn";
+import { validateMaterialInputEligibilityFn } from "../rule/fn/validateMaterialInputEligibilityFn";
+import { validateLimitedDepositsFn } from "../rule/fn/validateLimitedDepositsFn";
+import { validateLineInputCapacityFn } from "../rule/fn/validateLineInputCapacityFn";
+import { validateMergeViabilityFn } from "../rule/fn/validateMergeViabilityFn";
 import { validateStartStateFx } from "../rule/validateStartStateFx";
 
 export namespace validateGameConfigFx {
@@ -26,52 +26,52 @@ export const validateGameConfigFx = Effect.fn("validateGameConfigFx")(function* 
 	config,
 	provenance,
 }: validateGameConfigFx.Props) {
-	const diagnostics = yield* Effect.all([
-		validateCanonicalIdsFx({
+	const diagnostics = [
+		validateCanonicalIdsFn({
 			config,
 			provenance,
 		}),
-		validateConfigReferencesFx({
+		validateConfigReferencesFn({
 			config,
 			provenance,
 		}),
-		validateInputAcceptanceCyclesFx({
+		validateInputAcceptanceCyclesFn({
 			config,
 			provenance,
 		}),
-		validateItemLineIdsFx({
+		validateItemLineIdsFn({
 			config,
 			provenance,
 		}),
-		validateItemUidsFx({
+		validateItemUidsFn({
 			config,
 			provenance,
 		}),
-		validateMaterialInputEligibilityFx({
+		validateMaterialInputEligibilityFn({
 			config,
 			provenance,
 		}),
-		validateLineInputCapacityFx({
+		validateLineInputCapacityFn({
 			config,
 			provenance,
 		}),
-		validateInputChargesFx({
+		validateInputChargesFn({
 			config,
 			provenance,
 		}),
-		validateMergeViabilityFx({
+		validateMergeViabilityFn({
 			config,
 			provenance,
 		}),
-		validateLimitedDepositsFx({
+		validateLimitedDepositsFn({
 			config,
 			provenance,
 		}),
-		validateStartStateFx({
+		yield* validateStartStateFx({
 			config,
 			provenance,
 		}),
-	]);
+	];
 
 	return diagnostics.flat();
 });

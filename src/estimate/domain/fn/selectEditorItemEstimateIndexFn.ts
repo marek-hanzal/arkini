@@ -6,7 +6,7 @@ import type {
 } from "~/estimate/domain/EditorItemEstimateIndex";
 import type { EditorItemEstimateSortSchema } from "~/estimate/domain/EditorItemEstimateSortSchema";
 import { searchEditorItemsFn } from "~/item-authoring/domain/fn/searchEditorItemsFn";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 const compareRuntime = (
 	left: number | undefined,

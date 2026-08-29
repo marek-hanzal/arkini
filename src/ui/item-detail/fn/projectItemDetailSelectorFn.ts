@@ -1,5 +1,5 @@
 import type { GameEngine } from "~/renderer/game/GameEngine";
-import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
+import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 
 export namespace projectItemDetailSelectorFn {
 	export interface Props {

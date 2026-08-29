@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { readReservedJobOutputQuantitiesFn } from "~/production-job/fn/readReservedJobOutputQuantitiesFn";
 import type { dropFx } from "~/production-output/fx/dropFx";
 import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";

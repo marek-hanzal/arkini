@@ -1,4 +1,4 @@
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import { EditorItemArtworkTimeline } from "~/item-authoring/ui/EditorItemArtworkTimeline";

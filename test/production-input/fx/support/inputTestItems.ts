@@ -1,4 +1,4 @@
-import { SimpleSchema } from "~/engine/item/schema/SimpleSchema";
+import { SimpleSchema } from "~/item-definition/schema/SimpleSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 
 const simpleItem = ({ id }: { id: string }) => {

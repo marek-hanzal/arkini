@@ -4,7 +4,7 @@ import type { GameDiagnosticsSchema } from "~/game-config/diagnostic/schema/Game
 import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticSeverityEnumSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
-import { TypeSchema as ItemTypeSchema } from "~/engine/item/schema/TypeSchema";
+import { TypeSchema as ItemTypeSchema } from "~/item-definition/schema/TypeSchema";
 
 import { readItemLineEntriesFn } from "../../fn/readItemLineEntriesFn";
 

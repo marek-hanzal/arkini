@@ -12,7 +12,7 @@ import type { LineInputClosedIssueSchema } from "~/production-line/schema/check/
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { matchesItemSelectorFn } from "~/engine/selector/fn/matchesItemSelectorFn";
+import { matchesItemSelectorFn } from "~/item-definition/fn/matchesItemSelectorFn";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 

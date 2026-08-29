@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { act, createElement, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";

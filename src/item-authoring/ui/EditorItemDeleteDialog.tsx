@@ -1,4 +1,4 @@
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { EditorProject } from "~/project-authoring/EditorProject";
 import type { forceDeleteEditorItemFx } from "~/item-authoring/domain/fx/forceDeleteEditorItemFx";
 import { Button, ButtonLink, DangerButton } from "~/ui/button/Button";

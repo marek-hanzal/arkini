@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { match, P } from "ts-pattern";
 
-import type { AssetSchema } from "~/engine/item/schema/AssetSchema";
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import type { AssetSchema } from "~/item-definition/schema/AssetSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { readRuntimeLineFillProgressFn } from "~/production-line/fn/readRuntimeLineFillProgressFn";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";

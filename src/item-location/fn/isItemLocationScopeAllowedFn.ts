@@ -1,8 +1,8 @@
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
+import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 
 interface ItemLocationScopeAllowedProps {
 	readonly item: ItemSchema.Type;

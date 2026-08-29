@@ -2,7 +2,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { ModeSchema } from "~/production-input/schema/ModeSchema";
-import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
+import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 
 /** Internal readiness and exact mutation plans for one configured line input. */
 export namespace InputRun {

@@ -4,7 +4,7 @@ import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import { createRevisionFx } from "~/engine/revision/fx/createRevisionFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { StateItemSchema } from "~/engine/state/schema/StateItemSchema";
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 export namespace fromStateItemFx {
 	export interface Props {

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { GameProjectItemSchemaReference } from "~/game-config/source/GameProjectReference";
 
 /** One canonical UID-owned item fragment in a portable game project. */

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { compileGameSourcesFx } from "~/game-config/compiler/fx/compileGameSourcesFx";
-import { DepositSchema } from "~/engine/item/schema/DepositSchema";
+import { DepositSchema } from "~/item-definition/schema/DepositSchema";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import {
 	createOutput,

@@ -1,7 +1,7 @@
 import { Array, Effect, Option, pipe, Random } from "effect";
 import { match } from "ts-pattern";
 
-import { rollQuantityFx } from "~/engine/quantity/fx/rollQuantityFx";
+import { rollQuantityFx } from "~/production-output/fx/rollQuantityFx";
 import type { ChanceSchema } from "~/production-output/roll/schema/ChanceSchema";
 import type { RollSchema } from "~/production-output/roll/schema/RollSchema";
 import type { RollResultSchema } from "~/production-output/roll/schema/RollResultSchema";
@@ -63,16 +63,14 @@ const resolveWeightedRollFx = Effect.fn("resolveWeightedRollFx")(function* ({
 	} satisfies RollResultSchema.Type;
 });
 
-export namespace rollFx {
-	export interface Props {
-		roll: RollSchema.Type;
-	}
+interface Props {
+	readonly roll: RollSchema.Type;
 }
 
 /**
  * Dispatches one roll to the specialized resolver selected by its type.
  */
-export const rollFx = Effect.fn("rollFx")(function* ({ roll }: rollFx.Props) {
+export const rollFx = Effect.fn("rollFx")(function* ({ roll }: Props) {
 	return yield* match(roll)
 		.with(
 			{

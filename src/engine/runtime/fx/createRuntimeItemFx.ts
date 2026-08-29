@@ -2,11 +2,11 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { LocationSchema } from "~/item-location/schema/LocationSchema";
 import { createRevisionFx } from "~/engine/revision/fx/createRevisionFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 export namespace createRuntimeItemFx {
 	export interface Props<Location extends LocationSchema.Type> {

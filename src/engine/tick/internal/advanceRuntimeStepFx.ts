@@ -14,7 +14,7 @@ import { resolveJobRunnableFx } from "~/production-job/fx/resolveJobRunnableFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { TickStepMs } from "~/engine/tick/TickStepMs";
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 interface RuntimeStepResult {

@@ -1,4 +1,4 @@
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { EditorItemSectionDescriptor } from "~/item-authoring/ui/EditorItemSections";
 import { readEditorItemSectionsFn } from "~/item-authoring/ui/fn/readEditorItemSectionsFn";
 

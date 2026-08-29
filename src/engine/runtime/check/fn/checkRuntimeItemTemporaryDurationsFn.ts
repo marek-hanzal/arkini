@@ -3,7 +3,7 @@ import type { ItemTemporaryDurationIssueSchema } from "~/engine/runtime/schema/c
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { ItemTemporaryDurationIssueReasonEnumSchema } from "~/engine/runtime/schema/check/ItemTemporaryDurationIssueReasonEnumSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 export namespace checkRuntimeItemTemporaryDurationsFn {
 	export interface Props {

@@ -9,7 +9,7 @@ import { outputFx } from "~/production-output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { makeTemporaryExpiryRandomFx } from "~/engine/item/temporary/random/makeTemporaryExpiryRandomFx";
 
 export namespace completeTemporaryItemExpiryTransitionFx {

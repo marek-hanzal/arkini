@@ -1,4 +1,4 @@
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { DetailSection } from "~/item-authoring/ui/EditorItemDetailDefinition";
 import { EditorItemArtworkTimeline } from "~/item-authoring/ui/EditorItemArtworkTimeline";
 import { EditorItemThumbnail } from "~/ui/item/EditorItemThumbnail";

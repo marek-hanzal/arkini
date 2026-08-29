@@ -29,6 +29,7 @@
 		"src/engine",
 		"src/game-start",
 		"src/game-event",
+		"src/item-definition",
 		"src/item-location",
 		"src/item-placement",
 		"src/item-merge",

@@ -9,7 +9,7 @@ import {
 	expectNamedJsonSchemaGraph,
 	isJsonSchemaRecord,
 } from "~test/schema/expectNamedJsonSchemaGraph";
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import {
 	cleanupMcpHarnesses,
 	connectMcpClient,

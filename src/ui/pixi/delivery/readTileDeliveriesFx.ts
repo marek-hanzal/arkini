@@ -5,7 +5,7 @@ import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { readTileActorBadgeCountFn } from "~/ui/pixi/actor/fn/readTileActorBadgeCountFn";
 import { readTileActorAssetSourceIdsFx } from "~/ui/pixi/actor/readTileActorAssetSourceIdsFx";
 import { readTileActorVisualFx } from "~/ui/pixi/actor/readTileActorVisualFx";
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { isDeliveryRuntimeItemFn } from "~/engine/runtime/read/fn/isDeliveryRuntimeItemFn";

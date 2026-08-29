@@ -8,12 +8,12 @@ import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { PositionSchema } from "~/item-location/schema/PositionSchema";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { orderGridLocationsFn } from "~/item-placement/fn/orderGridLocationsFn";
 import { readToolbarLocationsFn } from "~/item-placement/fn/readToolbarLocationsFn";
 import type { dropFx } from "~/production-output/fx/dropFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
+import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 import type { PlacementPlan } from "~/item-placement/PlacementPlan";
 
 import { readPlacementPlanQuantityFn } from "../fn/readPlacementPlanQuantityFn";

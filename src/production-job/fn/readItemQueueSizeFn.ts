@@ -1,8 +1,8 @@
 import { match, P } from "ts-pattern";
 
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 /** Reads the active-job queue capacity owned by one canonical line item. */
 export const readItemQueueSizeFn = ({ item }: { readonly item: ItemSchema.Type }) =>

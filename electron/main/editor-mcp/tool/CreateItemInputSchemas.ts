@@ -43,7 +43,6 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			id: "CreateSimpleItemInputSchema",
 			$id: "urn:arkini:schema:mcp:create-simple-item-input",
 			title: "Create simple item tool input",
 			description: "Authoring fields accepted when creating one simple item.",
@@ -68,7 +67,6 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			id: "CreateSpaceItemInputSchema",
 			$id: "urn:arkini:schema:mcp:create-space-item-input",
 			title: "Create space item tool input",
 			description: "Authoring fields accepted when creating one space item.",
@@ -95,7 +93,6 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			id: "CreateProducerItemInputSchema",
 			$id: "urn:arkini:schema:mcp:create-producer-item-input",
 			title: "Create producer item tool input",
 			description: "Authoring fields accepted when creating one producer item.",
@@ -118,7 +115,6 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			id: "CreateCraftItemInputSchema",
 			$id: "urn:arkini:schema:mcp:create-craft-item-input",
 			title: "Create craft item tool input",
 			description: "Authoring fields accepted when creating one craft item.",
@@ -143,7 +139,6 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			id: "CreateBlueprintItemInputSchema",
 			$id: "urn:arkini:schema:mcp:create-blueprint-item-input",
 			title: "Create blueprint item tool input",
 			description: "Authoring fields accepted when creating one blueprint item.",
@@ -166,7 +161,6 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			id: "CreateDepositItemInputSchema",
 			$id: "urn:arkini:schema:mcp:create-deposit-item-input",
 			title: "Create deposit item tool input",
 			description: "Authoring fields accepted when creating one deposit item.",
@@ -189,7 +183,6 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			id: "CreateStashItemInputSchema",
 			$id: "urn:arkini:schema:mcp:create-stash-item-input",
 			title: "Create stash item tool input",
 			description: "Authoring fields accepted when creating one stash item.",
@@ -210,7 +203,6 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			id: "CreateTemporaryItemInputSchema",
 			$id: "urn:arkini:schema:mcp:create-temporary-item-input",
 			title: "Create temporary item tool input",
 			description: "Authoring fields accepted when creating one temporary item.",
@@ -228,7 +220,6 @@ export const CreateItemInputSchemas = {
 		})
 		.strict()
 		.meta({
-			id: "CreateInventoryItemInputSchema",
 			$id: "urn:arkini:schema:mcp:create-inventory-item-input",
 			title: "Create inventory item tool input",
 			description: "Authoring fields accepted when creating one inventory item.",

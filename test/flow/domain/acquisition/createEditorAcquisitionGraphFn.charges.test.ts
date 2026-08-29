@@ -9,7 +9,7 @@ import type { StartSchema } from "~/game-start/StartSchema";
 import {
 	createMergeTestConfig,
 	guaranteedMergeOutput,
-} from "~test/merge/support/createMergeTestConfig";
+} from "~test/item-merge/support/createMergeTestConfig";
 import {
 	createLine,
 	createOutput,

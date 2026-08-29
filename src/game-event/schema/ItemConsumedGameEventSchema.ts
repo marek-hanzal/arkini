@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { InputLocationSchema } from "~/engine/location/schema/InputLocationSchema";
+import { InputLocationSchema } from "~/item-location/schema/InputLocationSchema";
 import { GameEventEnumSchema } from "./GameEventEnumSchema";
 
 /** One accepted input allocation changed one exact visible source identity. */

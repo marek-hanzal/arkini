@@ -3,8 +3,8 @@ import { z } from "zod";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { JobLocationSchema } from "~/engine/location/schema/JobLocationSchema";
-import { ReservedLocationSchema } from "~/engine/location/schema/ReservedLocationSchema";
+import { JobLocationSchema } from "~/item-location/schema/JobLocationSchema";
+import { ReservedLocationSchema } from "~/item-location/schema/ReservedLocationSchema";
 
 export const JobMaterialOrphanIssueSchema = z
 	.object({

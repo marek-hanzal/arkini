@@ -9,7 +9,7 @@ import { DepositSchema } from "~/engine/item/schema/DepositSchema";
 import { InventorySchema } from "~/engine/item/schema/InventorySchema";
 import { ProducerSchema } from "~/engine/item/schema/ProducerSchema";
 import { SimpleSchema } from "~/engine/item/schema/SimpleSchema";
-import { SpaceSchema } from "~/engine/item/schema/SpaceSchema";
+import { SpaceSchema } from "~/space-action/schema/SpaceSchema";
 import { StashSchema } from "~/engine/item/schema/StashSchema";
 import { TemporarySchema } from "~/engine/item/schema/TemporarySchema";
 import { StorageSchema } from "~/engine/scope/schema/StorageSchema";

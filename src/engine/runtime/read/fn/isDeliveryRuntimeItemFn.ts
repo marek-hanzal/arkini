@@ -1,6 +1,6 @@
 import { Option } from "effect";
 
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { DeliveryRuntimeItemSchema } from "~/engine/runtime/schema/DeliveryRuntimeItemSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 

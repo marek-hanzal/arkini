@@ -2,9 +2,9 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import { TypeSchema } from "~/production-output/schema/drop/rule/TypeSchema";
-import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
-import type { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
+import type { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { rollQuantityFx } from "~/engine/quantity/fx/rollQuantityFx";

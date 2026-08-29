@@ -9,7 +9,7 @@ import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { readLineInputAutofillCoverageFx } from "~/production-input/fx/readLineInputAutofillCoverageFx";
 import { resolveLineStartFx } from "~/production-job/fx/read/resolveLineStartFx";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { assertOutputCapacityFx } from "~/production-job/fx/assertOutputCapacityFx";
 import { assertLineEnqueueConditionsFx } from "~/production-job/fx/assertLineEnqueueConditionsFx";
 

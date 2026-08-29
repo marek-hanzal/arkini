@@ -5,7 +5,7 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { checkRuntimeLocationsFn } from "~/engine/runtime/check/fn/checkRuntimeLocationsFn";
-import { planDropScopePlacementFx } from "~/engine/placement/fx/planDropScopePlacementFx";
+import { planDropPlacementFx } from "~/item-placement/fx/planDropPlacementFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
@@ -537,15 +537,13 @@ describe("Toolbar engine", () => {
 					},
 					quantity: 10,
 				});
-				return yield* planDropScopePlacementFx({
+				return yield* planDropPlacementFx({
 					drop: {
 						itemId: "water",
 						placement: "drop",
 						quantity: 1,
 					},
-					item: config.items.water,
 					origin: board(0, 0),
-					quantity: 1,
 					runtime: yield* readRuntimeFx(),
 				});
 			}),

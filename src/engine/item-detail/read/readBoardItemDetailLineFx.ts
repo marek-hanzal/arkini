@@ -11,7 +11,7 @@ import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumS
 import type { LineRun } from "~/production-line/LineRun";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { TypeSchema } from "~/production-line/schema/rule/TypeSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { readBoardRuntimeItemByIdFx } from "~/engine/runtime/read/readBoardRuntimeItemByIdFx";
 

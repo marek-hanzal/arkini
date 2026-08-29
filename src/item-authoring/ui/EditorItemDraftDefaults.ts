@@ -1,5 +1,5 @@
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
-import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
+import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { QuerySchema } from "~/engine/query/schema/QuerySchema";

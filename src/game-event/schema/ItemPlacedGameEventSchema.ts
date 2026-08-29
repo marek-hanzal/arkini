@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import { InputLocationSchema } from "~/engine/location/schema/InputLocationSchema";
-import { InventoryLocationSchema } from "~/engine/location/schema/InventoryLocationSchema";
-import { ReservedLocationSchema } from "~/engine/location/schema/ReservedLocationSchema";
+import { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import { InputLocationSchema } from "~/item-location/schema/InputLocationSchema";
+import { InventoryLocationSchema } from "~/item-location/schema/InventoryLocationSchema";
+import { ReservedLocationSchema } from "~/item-location/schema/ReservedLocationSchema";
 import { GameEventEnumSchema } from "./GameEventEnumSchema";
 
 /** One existing exact runtime identity became visible at a canonical grid anchor. */

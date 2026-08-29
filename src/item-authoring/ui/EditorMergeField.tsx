@@ -1,6 +1,6 @@
 import { PackagePlus } from "lucide-react";
 
-import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
+import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorChoiceControl } from "~/ui/form/EditorValueControls";

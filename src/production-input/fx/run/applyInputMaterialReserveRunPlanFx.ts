@@ -4,14 +4,14 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { readInputRunItemFx } from "~/production-input/read/readInputRunItemFx";
 import type { InputRun } from "~/production-input/InputRun";
-import type { ReservedLocationSchema } from "~/engine/location/schema/ReservedLocationSchema";
+import type { ReservedLocationSchema } from "~/item-location/schema/ReservedLocationSchema";
 import { createRuntimeItemFx } from "~/engine/runtime/fx/createRuntimeItemFx";
 import { createRuntimeItemIdFx } from "~/engine/runtime/fx/createRuntimeItemIdFx";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
 import type { ReservedRuntimeItemSchema } from "~/engine/runtime/schema/ReservedRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 export namespace applyInputMaterialReserveRunPlanFx {
 	export interface Props {

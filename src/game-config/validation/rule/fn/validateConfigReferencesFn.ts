@@ -11,7 +11,7 @@ import type { GameDiagnosticSchema } from "~/game-config/diagnostic/schema/GameD
 import type { InputSchema } from "~/production-action/schema/InputSchema";
 import { TypeSchema as InputTypeSchema } from "~/production-input/schema/TypeSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
+import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { TypeSchema as RollTypeSchema } from "~/production-output/roll/schema/TypeSchema";

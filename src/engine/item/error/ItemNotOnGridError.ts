@@ -1,7 +1,7 @@
 import { Data } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { LocationSchema } from "~/engine/location/schema/LocationSchema";
+import type { LocationSchema } from "~/item-location/schema/LocationSchema";
 
 /**
  * A grid-only runtime operation targeted an item outside Board, Inventory, or Toolbar.

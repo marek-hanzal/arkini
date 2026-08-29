@@ -3,7 +3,7 @@ import { z } from "zod";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { InputLocationSchema } from "~/engine/location/schema/InputLocationSchema";
+import { InputLocationSchema } from "~/item-location/schema/InputLocationSchema";
 
 /**
  * One buffered material does not match the selector of its target input slot.

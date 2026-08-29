@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { isPassiveStorageLocationFn } from "~/engine/location/fn/isPassiveStorageLocationFn";
+import { isPassiveStorageLocationFn } from "~/item-location/fn/isPassiveStorageLocationFn";
 import { isInstantGameplayEnabledFx } from "~/engine/cheat/read/isInstantGameplayEnabledFx";
 import { settleItemDeliveryRuntimeFx } from "~/production-delivery/write/settleItemDeliveryRuntimeFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
@@ -15,7 +15,7 @@ import type { JobSchema } from "~/production-job/schema/JobSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { TickStepMs } from "~/engine/tick/TickStepMs";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 interface RuntimeStepResult {
 	readonly events: readonly GameEventSchema.Type[];

@@ -1,9 +1,9 @@
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import type { SourceActionSchema } from "~/engine/merge/schema/SourceActionSchema";
-import type { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import type { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
+import type { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 
 export const DropItemResultKind = {

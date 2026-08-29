@@ -1,7 +1,7 @@
 import { Data } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 
 /**
  * A runtime command targeted a location occupied by another live item.

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { DistanceSchema } from "~/engine/distance/schema/DistanceSchema";
+import { DistanceSchema } from "~/item-location/schema/DistanceSchema";
 
 import { ScopeSchema } from "./ScopeSchema";
 import { BaseSchema } from "./BaseSchema";

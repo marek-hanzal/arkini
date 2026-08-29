@@ -2,8 +2,8 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
-import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
-import { placeRuntimeItemFx } from "~/engine/placement/fx/placeRuntimeItemFx";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
+import { placeRuntimeItemFx } from "~/item-placement/fx/placeRuntimeItemFx";
 import type { ReservedRuntimeItemSchema } from "~/engine/runtime/schema/ReservedRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 

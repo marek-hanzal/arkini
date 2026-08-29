@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { DeliveryLocationSchema } from "~/engine/location/schema/DeliveryLocationSchema";
+import { DeliveryLocationSchema } from "~/item-location/schema/DeliveryLocationSchema";
 import { RuntimeItemSchema } from "./RuntimeItemSchema";
 
 /** One live runtime item whose complete stack is owned by a canonical delivery. */

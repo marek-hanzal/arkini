@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { JobLocationSchema } from "~/engine/location/schema/JobLocationSchema";
+import { JobLocationSchema } from "~/item-location/schema/JobLocationSchema";
 import { RuntimeItemSchema } from "./RuntimeItemSchema";
 
 /** One consumed material root currently committed to an active job. */

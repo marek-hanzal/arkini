@@ -6,7 +6,7 @@ import { runInventoryReleaseAtom } from "~/ui/pixi/command/runInventoryReleaseAt
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { runSpaceActivationAtom } from "~/ui/pixi/command/runSpaceActivationAtom";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import type { InventoryRuntime } from "~/ui/pixi/scene/InventoryRuntime";

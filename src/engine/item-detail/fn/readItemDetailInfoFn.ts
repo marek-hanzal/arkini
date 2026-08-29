@@ -2,10 +2,10 @@ import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import type { LocationSchema } from "~/engine/location/schema/LocationSchema";
+import type { LocationSchema } from "~/item-location/schema/LocationSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { StorageSchema } from "~/engine/scope/schema/StorageSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 export namespace readItemDetailInfoFn {
 	export interface Props {

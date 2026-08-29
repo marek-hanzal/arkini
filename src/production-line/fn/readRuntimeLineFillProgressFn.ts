@@ -3,7 +3,7 @@ import { match, P } from "ts-pattern";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace readRuntimeLineFillProgressFn {

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { applyPlacementPlanFx } from "~/engine/placement/fx/applyPlacementPlanFx";
+import { applyPlacementPlanFx } from "~/item-placement/fx/applyPlacementPlanFx";
 import type { InventoryStoragePlan } from "~/engine/runtime/fx/planInventoryStorageFx";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";

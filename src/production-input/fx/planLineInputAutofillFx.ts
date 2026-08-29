@@ -8,7 +8,7 @@ import { readMaterialInputEligibilityFn } from "~/production-input/read/fn/readM
 import type { MaterialSchema } from "~/production-input/schema/MaterialSchema";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { readBoardItemLineFx } from "~/production-line/fx/readBoardItemLineFx";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
 import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";

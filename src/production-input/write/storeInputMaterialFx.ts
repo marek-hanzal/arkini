@@ -15,9 +15,9 @@ import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { LineInputClosedError } from "~/production-line/error/LineInputClosedError";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
-import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
-import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
@@ -28,7 +28,7 @@ import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemF
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
-import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBoardOperationError";
+import { CrossSpaceBoardOperationError } from "~/item-location/error/CrossSpaceBoardOperationError";
 
 export namespace storeInputMaterialFx {
 	export interface Props {

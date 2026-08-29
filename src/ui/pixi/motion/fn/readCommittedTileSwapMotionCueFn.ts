@@ -1,5 +1,5 @@
-import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
-import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { GameTransition } from "~/renderer/game/session/GameSession";
 import type { TileSwapMotionCue } from "~/ui/pixi/motion/TileMotionCue";
 import { readGridRuntimeItemFn } from "~/ui/pixi/motion/fn/readGridRuntimeItemFn";

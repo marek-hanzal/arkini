@@ -1,4 +1,4 @@
-import { TargetEffectSchema } from "~/engine/merge/schema/TargetEffectSchema";
+import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 import { match } from "ts-pattern";
 import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticSeverityEnumSchema";

@@ -1,5 +1,5 @@
-import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 
 /** Identifies physical source scopes that one board line may draw from through autofill. */
 export const isLineInputAutofillSourceLocationFn = ({

@@ -6,15 +6,14 @@ import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
+import { orderGridLocationsFn } from "~/engine/placement/fn/orderGridLocationsFn";
+import { readBoardLocationsFn } from "~/engine/placement/fn/readBoardLocationsFn";
+import { readEmptyLocationsFn } from "~/engine/placement/fn/readEmptyLocationsFn";
+import { readInventoryLocationsFn } from "~/engine/placement/fn/readInventoryLocationsFn";
+import { readToolbarLocationsFn } from "~/engine/placement/fn/readToolbarLocationsFn";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
-
-import { orderGridLocationsFx } from "./orderGridLocationsFx";
-import { readEmptyLocationsFx } from "./readEmptyLocationsFx";
-import { readBoardLocationsFx } from "./readBoardLocationsFx";
-import { readInventoryLocationsFx } from "./readInventoryLocationsFx";
-import { readToolbarLocationsFx } from "./readToolbarLocationsFx";
 
 export namespace readRuntimeItemDropLocationFx {
 	export interface Props {
@@ -31,28 +30,28 @@ export const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocat
 	runtime,
 }: readRuntimeItemDropLocationFx.Props) {
 	const config = yield* GameConfigFx;
-	const board = yield* readBoardLocationsFx({
+	const board = readBoardLocationsFn({
 		size: config.meta.board,
 		space: origin.space,
 	});
-	const orderedBoard = yield* orderGridLocationsFx({
-		locations: yield* readEmptyLocationsFx({
+	const orderedBoard = orderGridLocationsFn({
+		locations: readEmptyLocationsFn({
 			locations: board,
 			runtime,
 		}),
 		origin: origin.position,
 	});
-	const inventory = yield* readInventoryLocationsFx({
+	const inventory = readInventoryLocationsFn({
 		size: config.meta.inventory,
 	});
-	const emptyInventory = yield* readEmptyLocationsFx({
+	const emptyInventory = readEmptyLocationsFn({
 		locations: inventory,
 		runtime,
 	});
-	const toolbar = yield* readToolbarLocationsFx({
+	const toolbar = readToolbarLocationsFn({
 		size: config.meta.toolbarSize ?? 0,
 	});
-	const emptyToolbar = yield* readEmptyLocationsFx({
+	const emptyToolbar = readEmptyLocationsFn({
 		locations: toolbar,
 		runtime,
 	});

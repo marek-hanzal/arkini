@@ -9,7 +9,7 @@ import type { InventoryLocationSchema } from "~/engine/location/schema/Inventory
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 import { placeRuntimeItemFx } from "~/engine/placement/fx/placeRuntimeItemFx";
-import { readBoardLocationsFx } from "~/engine/placement/fx/readBoardLocationsFx";
+import { readBoardLocationsFn } from "~/engine/placement/fn/readBoardLocationsFn";
 import { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
@@ -77,7 +77,7 @@ export const releaseInventoryItemFx = Effect.fn("releaseInventoryItemFx")(functi
 				locationScope: LocationScopeEnumSchema.enum.Board,
 			});
 			const config = yield* GameConfigFx;
-			const boardLocations = yield* readBoardLocationsFx({
+			const boardLocations = readBoardLocationsFn({
 				size: config.meta.board,
 				space: runtime.currentSpace,
 			});

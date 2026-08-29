@@ -4,11 +4,11 @@ import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveInteg
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
+import { orderGridLocationsFn } from "~/engine/placement/fn/orderGridLocationsFn";
+import { readBoardLocationsFn } from "~/engine/placement/fn/readBoardLocationsFn";
 import type { PlacementSchema } from "~/engine/placement/schema/PlacementSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { orderGridLocationsFx } from "./orderGridLocationsFx";
 import { planScopePlacementFx } from "./planScopePlacementFx";
-import { readBoardLocationsFx } from "./readBoardLocationsFx";
 import { resolveBoardPlacementOriginFx } from "./resolveBoardPlacementOriginFx";
 
 export namespace planBoardPlacementFx {
@@ -37,11 +37,11 @@ export const planBoardPlacementFx = Effect.fn("planBoardPlacementFx")(function* 
 		placement,
 		size: config.meta.board,
 	});
-	const boardLocations = yield* readBoardLocationsFx({
+	const boardLocations = readBoardLocationsFn({
 		size: config.meta.board,
 		space: origin.space,
 	});
-	const orderedBoardLocations = yield* orderGridLocationsFx({
+	const orderedBoardLocations = orderGridLocationsFn({
 		locations: boardLocations,
 		origin: placementOrigin.position,
 	});

@@ -4,8 +4,8 @@ import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveInteg
 import type { dropFx } from "~/engine/output/fx/dropFx";
 import { PlacementPlanInvalidError } from "~/engine/placement/error/PlacementPlanInvalidError";
 import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
+import { readPlacementPlanQuantityFn } from "~/engine/placement/fn/readPlacementPlanQuantityFn";
 import type { PlacementPlan } from "~/engine/placement/PlacementPlan";
-import { readPlacementPlanQuantityFx } from "./readPlacementPlanQuantityFx";
 
 export namespace assertPlacementPlanCompleteFx {
 	export interface Props {
@@ -25,7 +25,7 @@ export const assertPlacementPlanCompleteFx = Effect.fn("assertPlacementPlanCompl
 	quantity,
 	reason,
 }: assertPlacementPlanCompleteFx.Props) {
-	const placedQuantity = yield* readPlacementPlanQuantityFx({
+	const placedQuantity = readPlacementPlanQuantityFn({
 		plan,
 	});
 	if (placedQuantity === quantity) {

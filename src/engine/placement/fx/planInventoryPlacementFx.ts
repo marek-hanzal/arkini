@@ -5,10 +5,10 @@ import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import type { PositionSchema } from "~/engine/grid/schema/PositionSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import { orderGridLocationsFn } from "~/engine/placement/fn/orderGridLocationsFn";
+import { readInventoryLocationsFn } from "~/engine/placement/fn/readInventoryLocationsFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { orderGridLocationsFx } from "./orderGridLocationsFx";
 import { planScopePlacementFx } from "./planScopePlacementFx";
-import { readInventoryLocationsFx } from "./readInventoryLocationsFx";
 
 export namespace planInventoryPlacementFx {
 	export interface Props {
@@ -29,13 +29,13 @@ export const planInventoryPlacementFx = Effect.fn("planInventoryPlacementFx")(fu
 	runtime,
 }: planInventoryPlacementFx.Props) {
 	const config = yield* GameConfigFx;
-	const inventoryLocations = yield* readInventoryLocationsFx({
+	const inventoryLocations = readInventoryLocationsFn({
 		size: config.meta.inventory,
 	});
 	const orderedLocations =
 		origin === undefined
 			? inventoryLocations
-			: yield* orderGridLocationsFx({
+			: orderGridLocationsFn({
 					locations: inventoryLocations,
 					origin,
 				});

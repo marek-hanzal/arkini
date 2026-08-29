@@ -1,10 +1,10 @@
-import { Array, Effect, Option, pipe } from "effect";
+import { Array, Option, pipe } from "effect";
 
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { PlacementPlan } from "~/engine/placement/PlacementPlan";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 
-export namespace planStackPlacementFx {
+export namespace planStackPlacementFn {
 	export interface Props {
 		items: ReadonlyArray<RuntimeItemSchema.Type>;
 		quantity: PositiveIntegerSchema.Type;
@@ -14,10 +14,7 @@ export namespace planStackPlacementFx {
 /**
  * Plans quantity additions into compatible existing stacks without overflowing them.
  */
-export const planStackPlacementFx = Effect.fn("planStackPlacementFx")(function* ({
-	items,
-	quantity,
-}: planStackPlacementFx.Props) {
+export const planStackPlacementFn = ({ items, quantity }: planStackPlacementFn.Props) => {
 	const [, candidates] = Array.mapAccum(items, quantity, (remainingQuantity, item) => {
 		const availableQuantity = item.item.maxStackSize - item.quantity;
 		const placedQuantity = Math.min(remainingQuantity, availableQuantity);
@@ -34,4 +31,4 @@ export const planStackPlacementFx = Effect.fn("planStackPlacementFx")(function* 
 	});
 
 	return pipe(candidates, Array.getSomes);
-});
+};

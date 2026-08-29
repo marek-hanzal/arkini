@@ -1,7 +1,6 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { orderStackItemsFx } from "~/engine/placement/fx/orderStackItemsFx";
+import { orderStackItemsFn } from "~/engine/placement/fn/orderStackItemsFn";
 import { boardLocation, placementTestConfig } from "~test/placement/fx/support/placementTestConfig";
 
 const log = placementTestConfig.items.log;
@@ -16,21 +15,19 @@ const runtimeItem = (id: string, x: number) => {
 	};
 };
 
-describe("orderStackItemsFx", () => {
+describe("orderStackItemsFn", () => {
 	it("orders board stacks by origin distance and scan-order ties", () => {
-		const result = Effect.runSync(
-			orderStackItemsFx({
-				items: [
-					runtimeItem("runtime:far", 3),
-					runtimeItem("runtime:right", 2),
-					runtimeItem("runtime:left", 0),
-				],
-				origin: {
-					x: 1,
-					y: 0,
-				},
-			}),
-		);
+		const result = orderStackItemsFn({
+			items: [
+				runtimeItem("runtime:far", 3),
+				runtimeItem("runtime:right", 2),
+				runtimeItem("runtime:left", 0),
+			],
+			origin: {
+				x: 1,
+				y: 0,
+			},
+		});
 
 		expect(result.map((item) => item.id)).toEqual([
 			"runtime:left",
@@ -40,15 +37,13 @@ describe("orderStackItemsFx", () => {
 	});
 
 	it("uses deterministic scan order when no origin applies", () => {
-		const result = Effect.runSync(
-			orderStackItemsFx({
-				items: [
-					runtimeItem("runtime:third", 2),
-					runtimeItem("runtime:first", 0),
-					runtimeItem("runtime:second", 1),
-				],
-			}),
-		);
+		const result = orderStackItemsFn({
+			items: [
+				runtimeItem("runtime:third", 2),
+				runtimeItem("runtime:first", 0),
+				runtimeItem("runtime:second", 1),
+			],
+		});
 
 		expect(result.map((item) => item.id)).toEqual([
 			"runtime:first",

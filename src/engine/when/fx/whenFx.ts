@@ -3,13 +3,8 @@ import { match } from "ts-pattern";
 
 import { TypeSchema } from "~/engine/when/schema/TypeSchema";
 import { queryFx } from "~/engine/query/fx/queryFx";
-import { queryQuantityFx } from "~/engine/query/fx/queryQuantityFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
-
-import { whenCountFx } from "./whenCountFx";
-import { whenExistsFx } from "./whenExistsFx";
-import { whenRangeFx } from "./whenRangeFx";
 
 export namespace whenFx {
 	export interface Props {
@@ -26,19 +21,17 @@ export const whenFx = Effect.fn("whenFx")(function* ({ origin, when }: whenFx.Pr
 		origin,
 		query: when.query,
 	});
-	const quantity = yield* queryQuantityFx({
-		items,
-	});
+	const quantity = items.reduce((total, item) => {
+		return total + item.quantity;
+	}, 0);
 
-	return yield* match(when)
+	return match(when)
 		.with(
 			{
 				type: TypeSchema.enum.Exists,
 			},
 			() => {
-				return whenExistsFx({
-					quantity,
-				});
+				return quantity > 0;
 			},
 		)
 		.with(
@@ -46,10 +39,7 @@ export const whenFx = Effect.fn("whenFx")(function* ({ origin, when }: whenFx.Pr
 				type: TypeSchema.enum.Count,
 			},
 			({ count }) => {
-				return whenCountFx({
-					count,
-					quantity,
-				});
+				return quantity === count;
 			},
 		)
 		.with(
@@ -57,11 +47,7 @@ export const whenFx = Effect.fn("whenFx")(function* ({ origin, when }: whenFx.Pr
 				type: TypeSchema.enum.Range,
 			},
 			({ max, min }) => {
-				return whenRangeFx({
-					max,
-					min,
-					quantity,
-				});
+				return quantity >= min && quantity <= max;
 			},
 		)
 		.exhaustive();

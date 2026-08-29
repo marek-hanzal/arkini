@@ -1,9 +1,7 @@
-import { Effect } from "effect";
-
 import type { PositionSchema } from "~/engine/grid/schema/PositionSchema";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 
-export namespace orderStackItemsFx {
+export namespace orderStackItemsFn {
 	export interface Props {
 		items: ReadonlyArray<GridRuntimeItemSchema.Type>;
 		origin?: PositionSchema.Type;
@@ -13,10 +11,7 @@ export namespace orderStackItemsFx {
 /**
  * Orders stack candidates by origin distance or deterministic scan order.
  */
-export const orderStackItemsFx = Effect.fn("orderStackItemsFx")(function* ({
-	items,
-	origin,
-}: orderStackItemsFx.Props) {
+export const orderStackItemsFn = ({ items, origin }: orderStackItemsFn.Props) => {
 	return [
 		...items,
 	].sort((left, right) => {
@@ -37,4 +32,4 @@ export const orderStackItemsFx = Effect.fn("orderStackItemsFx")(function* ({
 
 		return leftDistance - rightDistance || scanOrder;
 	});
-});
+};

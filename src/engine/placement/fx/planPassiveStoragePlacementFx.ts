@@ -5,12 +5,12 @@ import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { dropFx } from "~/engine/output/fx/dropFx";
 import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
+import { mergePlacementPlansFn } from "~/engine/placement/fn/mergePlacementPlansFn";
+import { readPlacementPlanQuantityFn } from "~/engine/placement/fn/readPlacementPlanQuantityFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { assertPlacementPlanCompleteFx } from "./assertPlacementPlanCompleteFx";
-import { mergePlacementPlansFx } from "./mergePlacementPlansFx";
 import { planInventoryPlacementFx } from "./planInventoryPlacementFx";
 import { planToolbarPlacementFx } from "./planToolbarPlacementFx";
-import { readPlacementPlanQuantityFx } from "./readPlacementPlanQuantityFx";
 
 export namespace planPassiveStoragePlacementFx {
 	export interface Props {
@@ -53,7 +53,7 @@ export const planPassiveStoragePlacementFx = Effect.fn("planPassiveStoragePlacem
 					quantity,
 					runtime,
 				});
-	const firstQuantity = yield* readPlacementPlanQuantityFx({
+	const firstQuantity = readPlacementPlanQuantityFn({
 		plan: first,
 	});
 	const remainingQuantity = quantity - firstQuantity;
@@ -73,7 +73,7 @@ export const planPassiveStoragePlacementFx = Effect.fn("planPassiveStoragePlacem
 					quantity: remainingQuantity,
 					runtime,
 				});
-	const plan = yield* mergePlacementPlansFx({
+	const plan = mergePlacementPlansFn({
 		plans: [
 			first,
 			second,

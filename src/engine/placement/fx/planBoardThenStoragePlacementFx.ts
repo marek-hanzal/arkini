@@ -7,14 +7,14 @@ import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocation
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { dropFx } from "~/engine/output/fx/dropFx";
+import { mergePlacementPlansFn } from "~/engine/placement/fn/mergePlacementPlansFn";
+import { readPlacementPlanQuantityFn } from "~/engine/placement/fn/readPlacementPlanQuantityFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 import { assertPlacementPlanCompleteFx } from "./assertPlacementPlanCompleteFx";
-import { mergePlacementPlansFx } from "./mergePlacementPlansFx";
 import { planBoardPlacementFx } from "./planBoardPlacementFx";
 import { planInventoryPlacementFx } from "./planInventoryPlacementFx";
 import { planToolbarPlacementFx } from "./planToolbarPlacementFx";
-import { readPlacementPlanQuantityFx } from "./readPlacementPlanQuantityFx";
 
 export namespace planBoardThenStoragePlacementFx {
 	export interface Props {
@@ -47,7 +47,7 @@ export const planBoardThenStoragePlacementFx = Effect.fn("planBoardThenStoragePl
 			quantity,
 			runtime,
 		});
-		const boardQuantity = yield* readPlacementPlanQuantityFx({
+		const boardQuantity = readPlacementPlanQuantityFn({
 			plan: boardPlan,
 		});
 		const inventoryQuantity = quantity - boardQuantity;
@@ -59,12 +59,12 @@ export const planBoardThenStoragePlacementFx = Effect.fn("planBoardThenStoragePl
 			quantity: inventoryQuantity,
 			runtime,
 		});
-		const placedInventoryQuantity = yield* readPlacementPlanQuantityFx({
+		const placedInventoryQuantity = readPlacementPlanQuantityFn({
 			plan: inventoryPlan,
 		});
 		const toolbarQuantity = inventoryQuantity - placedInventoryQuantity;
 		if (toolbarQuantity === 0) {
-			return yield* mergePlacementPlansFx({
+			return mergePlacementPlansFn({
 				plans: [
 					boardPlan,
 					inventoryPlan,
@@ -74,7 +74,7 @@ export const planBoardThenStoragePlacementFx = Effect.fn("planBoardThenStoragePl
 
 		const config = yield* GameConfigFx;
 		if ((config.meta.toolbarSize ?? 0) === 0) {
-			const plan = yield* mergePlacementPlansFx({
+			const plan = mergePlacementPlansFn({
 				plans: [
 					boardPlan,
 					inventoryPlan,
@@ -94,7 +94,7 @@ export const planBoardThenStoragePlacementFx = Effect.fn("planBoardThenStoragePl
 			quantity: toolbarQuantity,
 			runtime,
 		});
-		const plan = yield* mergePlacementPlansFx({
+		const plan = mergePlacementPlansFn({
 			plans: [
 				boardPlan,
 				inventoryPlan,

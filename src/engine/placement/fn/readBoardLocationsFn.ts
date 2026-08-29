@@ -1,11 +1,9 @@
-import { Effect } from "effect";
-
 import type { SizeSchema } from "~/engine/grid/schema/SizeSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
-export namespace readBoardLocationsFx {
+export namespace readBoardLocationsFn {
 	export interface Props {
 		size: SizeSchema.Type;
 		space: NonNegativeIntegerSchema.Type;
@@ -13,10 +11,7 @@ export namespace readBoardLocationsFx {
 }
 
 /** Enumerates every concrete cell in one board space in row-major order. */
-export const readBoardLocationsFx = Effect.fn("readBoardLocationsFx")(function* ({
-	size,
-	space,
-}: readBoardLocationsFx.Props) {
+export const readBoardLocationsFn = ({ size, space }: readBoardLocationsFn.Props) => {
 	const locations: BoardLocationSchema.Type[] = [];
 
 	for (let y = 0; y < size.height; y += 1) {
@@ -33,4 +28,4 @@ export const readBoardLocationsFx = Effect.fn("readBoardLocationsFx")(function* 
 	}
 
 	return locations;
-});
+};

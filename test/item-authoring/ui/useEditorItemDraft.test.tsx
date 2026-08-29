@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import type { EditorProject } from "~/project-authoring/EditorProject";
 import { EditorProjectContext } from "~/authoring-session/useEditorProject";
 import { useEditorItemDraft } from "~/item-authoring/ui/useEditorItemDraft";
-import { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import {
 	editorTestConfig,
 	editorTestPayload,

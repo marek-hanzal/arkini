@@ -9,7 +9,7 @@ import type {
 	ItemDetailOutputSet,
 	ItemDetailQuantityBounds,
 } from "~/engine/item-detail/read/ItemDetailOutput";
-import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
+import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 
 /** Renderer-owned contract for one live Item Detail lines projection. */
 export namespace ItemDetailLines {

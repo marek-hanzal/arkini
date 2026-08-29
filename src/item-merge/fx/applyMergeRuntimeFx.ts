@@ -7,7 +7,7 @@ import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
 import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
 import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";

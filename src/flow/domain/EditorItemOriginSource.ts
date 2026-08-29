@@ -1,4 +1,4 @@
-import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
+import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 import type {
 	EditorAcquisitionRequirement,
 	EditorAcquisitionUnsupportedRequirement,

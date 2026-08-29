@@ -4,7 +4,7 @@ import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/Runti
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
-import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
+import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 
 /**
  * One live item occupies a grid forbidden by its canonical item definition.

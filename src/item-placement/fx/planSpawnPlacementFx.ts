@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { PlacementPlan } from "~/item-placement/PlacementPlan";
 import { createRuntimeItemFx } from "~/engine/runtime/fx/createRuntimeItemFx";

@@ -15,7 +15,7 @@ import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { TypeSchema as RollTypeSchema } from "~/production-output/roll/schema/TypeSchema";
-import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
+import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 import { readItemLineEntriesFn } from "../../fn/readItemLineEntriesFn";

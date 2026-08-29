@@ -2,8 +2,8 @@ import { Effect } from "effect";
 
 import type { EditorProjectRepositoryService } from "~/project-authoring/repository/EditorProjectRepository";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import { ItemSchema as CanonicalItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import { ItemSchema as CanonicalItemSchema } from "~/item-definition/schema/ItemSchema";
 
 /** Validates and persists one item through the canonical editor repository. */
 export const saveEditorItemWithRepositoryFx = Effect.fn("saveEditorItemWithRepositoryFx")(

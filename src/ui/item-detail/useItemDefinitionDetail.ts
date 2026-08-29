@@ -4,9 +4,9 @@ import { useCallback } from "react";
 import { useGameEngine } from "~/ui/game/useGameEngine";
 import { useRuntimeSelector } from "~/ui/game/useRuntimeSelector";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import type { StorageSchema } from "~/engine/scope/schema/StorageSchema";
+import type { StorageSchema } from "~/item-definition/schema/StorageSchema";
 
 export namespace useItemDefinitionDetail {
 	export type Projection =

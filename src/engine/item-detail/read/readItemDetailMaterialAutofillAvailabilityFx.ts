@@ -7,8 +7,8 @@ import { isMaterialInputEligibleFn } from "~/production-input/read/fn/isMaterial
 import { isLineInputAutofillSourceLocationFn } from "~/production-input/read/isLineInputAutofillSourceLocationFn";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { matchesItemSelectorFn } from "~/engine/selector/fn/matchesItemSelectorFn";
-import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
+import { matchesItemSelectorFn } from "~/item-definition/fn/matchesItemSelectorFn";
+import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 
 export namespace readItemDetailMaterialAutofillAvailabilityFx {
 	export interface Props {

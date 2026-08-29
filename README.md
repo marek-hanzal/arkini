@@ -25,6 +25,7 @@ Read the smallest entry point needed for the task:
 src/engine    remaining live gameplay runtime, session, Tick and platform-neutral support owners
 src/game-start  initial-state schemas, exact placement planning and atomic runtime start
 src/game-event  committed gameplay event schemas and exact downstream event projection
+src/item-definition  immutable authored Item schemas, query/selector vocabulary and total selection policy
 src/item-location  grid coordinates, distance, runtime locations, claims and cross-space identity
 src/item-placement  scope-aware stack, spawn, output and existing-item placement
 src/item-merge  directional merge contracts, admission and atomic source/target lifecycle

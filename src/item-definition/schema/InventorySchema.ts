@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
+import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 
 import { BaseSchema } from "./BaseSchema";
 import { TypeSchema } from "./TypeSchema";

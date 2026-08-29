@@ -4,7 +4,7 @@ import { z } from "zod";
 import type { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
 import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";

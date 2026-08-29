@@ -1,4 +1,4 @@
-import type { QuerySchema } from "~/engine/query/schema/QuerySchema";
+import type { QuerySchema } from "~/item-definition/query/schema/QuerySchema";
 import { EditorChoiceControl } from "~/ui/form/EditorValueControls";
 import { EditorSelectorControl } from "~/item-authoring/ui/EditorSelectorControl";
 

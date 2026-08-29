@@ -1,4 +1,4 @@
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { createId } from "@paralleldrive/cuid2";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";

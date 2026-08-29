@@ -11,7 +11,7 @@ import type {
 	ItemDetailQuantityBounds,
 } from "~/engine/item-detail/read/ItemDetailOutput";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
+import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 interface ItemDetailLineChargeCost {

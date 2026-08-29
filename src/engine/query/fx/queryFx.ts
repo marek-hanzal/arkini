@@ -3,17 +3,17 @@ import { match } from "ts-pattern";
 
 import { DistanceSchema } from "~/item-location/schema/DistanceSchema";
 import type { PositionSchema } from "~/item-location/schema/PositionSchema";
-import type { QuerySchema } from "~/engine/query/schema/QuerySchema";
+import type { QuerySchema } from "~/item-definition/query/schema/QuerySchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { BoardQueryOriginUnavailableError } from "~/engine/query/error/BoardQueryOriginUnavailableError";
-import { ScopeSchema } from "~/engine/query/schema/ScopeSchema";
+import { ScopeSchema } from "~/item-definition/query/schema/ScopeSchema";
 import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
 import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import { selectItemsFn } from "~/engine/selector/fn/selectItemsFn";
-import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
+import { selectItemsFn } from "~/item-definition/fn/selectItemsFn";
+import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 
 const queryItemsFn = ({
 	items,
@@ -50,15 +50,13 @@ const matchesDistanceFn = ({
 		.exhaustive();
 };
 
-export namespace queryFx {
-	export interface Props {
-		origin: GridLocationSchema.Type;
-		query: QuerySchema.Type;
-	}
+interface Props {
+	readonly origin: GridLocationSchema.Type;
+	readonly query: QuerySchema.Type;
 }
 
 /** Selects runtime items from one pinned snapshot according to authored query reach. */
-export const queryFx = Effect.fn("queryFx")(function* ({ origin, query }: queryFx.Props) {
+export const queryFx = Effect.fn("queryFx")(function* ({ origin, query }: Props) {
 	if (query.scope === ScopeSchema.enum.Board) {
 		if (origin.scope !== LocationScopeEnumSchema.enum.Board) {
 			return yield* Effect.fail(

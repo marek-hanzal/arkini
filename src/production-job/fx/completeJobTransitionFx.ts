@@ -1,7 +1,7 @@
 import { Array, Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { JobCompletionOwner } from "~/production-job/completion/JobCompletionContext";
 import { completeLineJobRuntimeFx } from "~/production-job/completion/fx/completeLineJobRuntimeFx";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";

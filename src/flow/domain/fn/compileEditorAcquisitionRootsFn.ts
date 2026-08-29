@@ -7,7 +7,7 @@ import type {
 import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 const readOutputDrops = (output: OutputSchema.Type | undefined) =>

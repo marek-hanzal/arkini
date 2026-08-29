@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import { selectItemsFn } from "~/engine/selector/fn/selectItemsFn";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import { selectItemsFn } from "~/item-definition/fn/selectItemsFn";
 
 const item = {
 	uid: "tree",

@@ -1,6 +1,6 @@
 import { GalleryHorizontalEnd, Layers2, Trash2 } from "lucide-react";
 
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { Button } from "~/ui/button/Button";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";

@@ -1,9 +1,10 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
+import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { LocationSchema } from "~/item-location/schema/LocationSchema";
 import { queryFx } from "~/engine/query/fx/queryFx";
-import type { QuerySchema } from "~/engine/query/schema/QuerySchema";
+import type { QuerySchema } from "~/item-definition/query/schema/QuerySchema";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -105,7 +106,7 @@ const runQuery = ({
 }: {
 	readonly query: QuerySchema.Type;
 	readonly runtime: RuntimeSchema.Type;
-	readonly queryOrigin?: queryFx.Props["origin"];
+	readonly queryOrigin?: GridLocationSchema.Type;
 }) =>
 	queryFx({
 		origin: queryOrigin,

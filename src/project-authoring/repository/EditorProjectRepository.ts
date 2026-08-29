@@ -8,7 +8,7 @@ import type {
 	EditorBoardScenarioDescriptorSchema,
 	EditorBoardScenarioSchema,
 } from "~/board-scenario/EditorBoardScenarioSchema";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";

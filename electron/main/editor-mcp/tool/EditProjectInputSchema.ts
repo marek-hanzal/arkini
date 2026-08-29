@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { MetaSchema } from "~/engine/meta/schema/MetaSchema";
+import { MetaSchema } from "~/game-config/MetaSchema";
 import { RolesSchema } from "~/game-config/resource/schema/RolesSchema";
 import { StartSchema } from "~/game-start/StartSchema";
 

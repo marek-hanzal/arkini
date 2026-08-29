@@ -2,8 +2,8 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
 import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
 import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";

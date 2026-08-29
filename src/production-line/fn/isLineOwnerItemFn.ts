@@ -1,7 +1,7 @@
 import { Option } from "effect";
 
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 
 export namespace isLineOwnerItemFn {
 	type DepositItem = Extract<

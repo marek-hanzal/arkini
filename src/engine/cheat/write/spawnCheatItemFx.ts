@@ -11,7 +11,7 @@ import { assertPlacementPlanCompleteFx } from "~/item-placement/fx/assertPlaceme
 import { planBoardPlacementFx } from "~/item-placement/fx/planBoardPlacementFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { StorageSchema } from "~/engine/scope/schema/StorageSchema";
+import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 

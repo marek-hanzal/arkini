@@ -5,7 +5,7 @@ import type { EditorProject } from "~/project-authoring/EditorProject";
 import type { EditorProjectRepositoryService } from "~/project-authoring/repository/EditorProjectRepository";
 import { createEditorItemDraftFn } from "~/item-authoring/domain/fn/createEditorItemDraftFn";
 import { saveEditorItemWithRepositoryFx } from "~/item-authoring/domain/fx/saveEditorItemWithRepositoryFx";
-import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { CreateItemInput } from "./CreateItemInputSchemas";
 import { notifyProjectChangedFx } from "./notifyProjectChangedFx";
 

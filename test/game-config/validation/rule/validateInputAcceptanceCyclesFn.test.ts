@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { compileGameSourcesFx } from "~/game-config/compiler/fx/compileGameSourcesFx";
 import { GameSourceFileSchema } from "~/game-config/source/schema/GameSourceFileSchema";
-import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
+import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 import {
 	createProducerItem,
 	createRootSource,

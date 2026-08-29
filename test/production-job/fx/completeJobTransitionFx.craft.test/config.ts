@@ -1,7 +1,7 @@
 import type { z } from "zod";
 
-import { CraftSchema } from "~/engine/item/schema/CraftSchema";
-import { SimpleSchema } from "~/engine/item/schema/SimpleSchema";
+import { CraftSchema } from "~/item-definition/schema/CraftSchema";
+import { SimpleSchema } from "~/item-definition/schema/SimpleSchema";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 

@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 import { SizeSchema } from "~/item-location/schema/SizeSchema";
+import { ToolbarSizeSchema } from "~/item-location/schema/ToolbarSizeSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { TitleSchema } from "~/engine/common/schema/TitleSchema";
-import { ToolbarSizeSchema } from "./ToolbarSizeSchema";
 
 /**
  * Core metadata that defines the game and the layouts available to the player.

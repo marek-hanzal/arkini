@@ -4,7 +4,7 @@ import { match } from "ts-pattern";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import type { SizeSchema } from "~/item-location/schema/SizeSchema";
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { orderGridLocationsFn } from "~/item-placement/fn/orderGridLocationsFn";

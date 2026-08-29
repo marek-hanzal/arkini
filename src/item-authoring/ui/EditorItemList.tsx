@@ -1,5 +1,5 @@
 import { PackageOpen, Plus } from "lucide-react";
-import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
+import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { useMemo } from "react";
 
 import { searchEditorItemsFn } from "~/item-authoring/domain/fn/searchEditorItemsFn";

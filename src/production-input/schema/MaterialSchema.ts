@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
-import { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
+import { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
+import { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 
 import { BaseSchema } from "./BaseSchema";
 import { TypeSchema } from "./TypeSchema";

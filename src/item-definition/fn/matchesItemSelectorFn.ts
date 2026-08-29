@@ -1,5 +1,5 @@
-import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 
 /** Tests one canonical item against the exhaustive selector grammar. */
 export const matchesItemSelectorFn = ({

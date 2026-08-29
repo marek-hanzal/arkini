@@ -54,6 +54,17 @@ const rejected = (reason: DropItemRejectedReason): readDropItemPreviewFx.Result 
 	reason,
 });
 
+const storeInputPreviewFn = ({
+	lineId,
+	inputIndex,
+	quantity,
+}: resolveLineInputStoreFn.Result): readDropItemPreviewFx.Result => ({
+	kind: DropItemResultKind.StoreInput,
+	lineId,
+	inputIndex,
+	quantity,
+});
+
 /** Reads the current authoritative semantic kind of one prospective item drop without mutating runtime. */
 export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	sourceItemId,
@@ -125,6 +136,9 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		) {
 			return rejected(DropItemRejectedReason.InvalidTarget);
 		}
+		if (target.inputStore !== undefined) {
+			return rejected(DropItemRejectedReason.Blocked);
+		}
 		return {
 			kind: DropItemResultKind.Move,
 		} satisfies readDropItemPreviewFx.Result;
@@ -165,6 +179,19 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	) {
 		return rejected(DropItemRejectedReason.InvalidTarget);
 	}
+	if (target.inputStore !== undefined) {
+		const inputStore = resolveLineInputStoreFn({
+			lineId: target.inputStore.lineId,
+			inputIndex: target.inputStore.inputIndex,
+			owner: targetItem,
+			requestedQuantity: target.inputStore.quantity,
+			runtime,
+			source,
+		});
+		return inputStore === undefined
+			? rejected(DropItemRejectedReason.Blocked)
+			: storeInputPreviewFn(inputStore);
+	}
 	if (targetItem.item.type === TypeSchema.enum.Inventory) {
 		if (
 			source.location.scope === LocationScopeEnumSchema.enum.Inventory ||
@@ -197,20 +224,12 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		}
 	}
 	const inputStore = resolveLineInputStoreFn({
-		lineId: target.inputStore?.lineId,
-		inputIndex: target.inputStore?.inputIndex,
 		owner: targetItem,
-		requestedQuantity: target.inputStore?.quantity,
 		runtime,
 		source,
 	});
 	if (inputStore !== undefined) {
-		return {
-			kind: DropItemResultKind.StoreInput,
-			lineId: inputStore.lineId,
-			inputIndex: inputStore.inputIndex,
-			quantity: inputStore.quantity,
-		} satisfies readDropItemPreviewFx.Result;
+		return storeInputPreviewFn(inputStore);
 	}
 	const stackResolution = readItemStackResolutionFn({
 		runtime,

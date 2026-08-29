@@ -31,7 +31,6 @@ export const ItemCollectionInputSchema = z
 	})
 	.strict()
 	.meta({
-		id: "ItemCollectionInputSchema",
 		$id: "urn:arkini:schema:mcp:item-collection-input",
 		title: "Item collection tool input",
 		description: "Pagination, filtering, and search for the item collection tool.",

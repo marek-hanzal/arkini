@@ -26,7 +26,6 @@ export const EstimateInputSchema = z
 	})
 	.strict()
 	.meta({
-		id: "EstimateInputSchema",
 		$id: "urn:arkini:schema:mcp:estimate-input",
 		title: "Estimate tool input",
 		description: "Pagination, filtering, search, and ordering for the global Estimate tool.",

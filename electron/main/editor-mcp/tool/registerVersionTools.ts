@@ -37,7 +37,6 @@ const referenceSchema = z
 	});
 
 const VersionStatusInputSchema = z.object({}).strict().meta({
-	id: "VersionStatusInputSchema",
 	$id: "urn:arkini:schema:mcp:version-status-input",
 	title: "Version status tool input",
 	description: "The version status tool accepts no arguments.",
@@ -50,7 +49,6 @@ const VersionListInputSchema = z
 	})
 	.strict()
 	.meta({
-		id: "VersionListInputSchema",
 		$id: "urn:arkini:schema:mcp:version-list-input",
 		title: "Version list tool input",
 		description: "Pagination for the saved project version list.",
@@ -63,7 +61,6 @@ const VersionDiffInputSchema = z
 	})
 	.strict()
 	.meta({
-		id: "VersionDiffInputSchema",
 		$id: "urn:arkini:schema:mcp:version-diff-input",
 		title: "Version diff tool input",
 		description: "The two saved-state references compared by the version diff tool.",
@@ -77,7 +74,6 @@ const VersionCommitInputSchema = z
 	})
 	.strict()
 	.meta({
-		id: "VersionCommitInputSchema",
 		$id: "urn:arkini:schema:mcp:version-commit-input",
 		title: "Version commit tool input",
 		description: "Metadata for a new explicit snapshot of the saved editor project.",
@@ -94,7 +90,6 @@ const VersionCheckoutInputSchema = z
 	})
 	.strict()
 	.meta({
-		id: "VersionCheckoutInputSchema",
 		$id: "urn:arkini:schema:mcp:version-checkout-input",
 		title: "Version checkout tool input",
 		description: "The saved version to restore and the required destructive confirmation.",
@@ -107,7 +102,6 @@ const VersionTagInputSchema = z
 	})
 	.strict()
 	.meta({
-		id: "VersionTagInputSchema",
 		$id: "urn:arkini:schema:mcp:version-tag-input",
 		title: "Version tag tool input",
 		description: "The saved version and optional replacement tag.",

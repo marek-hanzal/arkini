@@ -2,8 +2,8 @@ import { McpServer } from "@modelcontextprotocol/server";
 import { Effect } from "effect";
 import { z } from "zod";
 
-import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProjectRepositoryService } from "~/project-authoring/repository/EditorProjectRepository";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 import type {
 	EditorProjectVersionDescriptor,
 	EditorProjectVersionDiff,

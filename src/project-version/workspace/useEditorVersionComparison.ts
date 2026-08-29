@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { useCallback, useEffect, useState } from "react";
 
-import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
+import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type {
 	EditorProjectVersionDescriptor,

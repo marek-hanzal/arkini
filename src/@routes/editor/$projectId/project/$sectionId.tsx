@@ -1,14 +1,14 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import { EditorProjectAppearanceSection } from "~/ui/project/editor/EditorProjectAppearanceSection";
-import { EditorProjectBoardSection } from "~/ui/project/editor/EditorProjectBoardSection";
-import { EditorProjectGeneralSection } from "~/ui/project/editor/EditorProjectGeneralSection";
-import { EditorProjectInventorySection } from "~/ui/project/editor/EditorProjectInventorySection";
+import { EditorProjectAppearanceSection } from "~/project-authoring/configuration/EditorProjectAppearanceSection";
+import { EditorProjectBoardSection } from "~/project-authoring/configuration/EditorProjectBoardSection";
+import { EditorProjectGeneralSection } from "~/project-authoring/configuration/EditorProjectGeneralSection";
+import { EditorProjectInventorySection } from "~/project-authoring/configuration/EditorProjectInventorySection";
 import {
 	type EditorProjectSectionId,
 	EditorProjectSectionIds,
-} from "~/ui/project/editor/EditorProjectSections";
-import { EditorProjectToolbarSection } from "~/ui/project/editor/EditorProjectToolbarSection";
+} from "~/project-authoring/configuration/EditorProjectSections";
+import { EditorProjectToolbarSection } from "~/project-authoring/configuration/EditorProjectToolbarSection";
 
 interface EditorProjectSectionSearch {
 	readonly avatar?: number;

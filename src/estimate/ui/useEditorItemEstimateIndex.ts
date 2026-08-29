@@ -1,7 +1,7 @@
 import { useAtom } from "@effect/atom-react";
 import { useEffect, useMemo } from "react";
 
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 import { createEditorItemEstimateIndexFn } from "~/estimate/domain/fn/createEditorItemEstimateIndexFn";
 import type { EditorItemEstimateIndexRow } from "~/estimate/domain/EditorItemEstimateIndex";
 import type { EditorItemEstimateSortSchema } from "~/estimate/domain/EditorItemEstimateSortSchema";

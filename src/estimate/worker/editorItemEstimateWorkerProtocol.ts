@@ -1,4 +1,4 @@
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 import type { EditorItemEstimate } from "~/estimate/domain/EditorItemEstimate";
 
 export interface EditorItemEstimateWorkerRequest {

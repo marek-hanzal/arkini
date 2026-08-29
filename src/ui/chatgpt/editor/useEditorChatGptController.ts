@@ -4,13 +4,13 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { type RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChatGptAssetCandidateSchema } from "../../../../electron/contract/chatgpt/ChatGptSurfaceSchema";
 
-import { useEditorProject } from "~/ui/editor/useEditorProject";
-import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
+import { useEditorProject } from "~/authoring-session/useEditorProject";
+import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
 import { readEditorAssetResourceIdFn } from "~/editor/resource/fn/readEditorAssetResourceIdFn";
 import { validateEditorAssetFileFx } from "~/renderer/editor/resource/validateEditorAssetFileFx";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { saveEditorAssetFx } from "~/ui/resource/editor/saveEditorAssetFx";
-import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
+import { useEditorUnsavedChangesRegistration } from "~/authoring-session/useEditorUnsavedChangesRegistration";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorChatGptSurface } from "./useEditorChatGptSurface";
 

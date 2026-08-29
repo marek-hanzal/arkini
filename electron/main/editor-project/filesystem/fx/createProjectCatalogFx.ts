@@ -3,7 +3,7 @@ import { Effect } from "effect";
 
 import { EditorProjectCatalogEntrySchema } from "~/project-authoring/EditorProjectCatalogEntrySchema";
 import { EditorProjectCatalogSchema } from "~/project-authoring/EditorProjectCatalogSchema";
-import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
+import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
 import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";

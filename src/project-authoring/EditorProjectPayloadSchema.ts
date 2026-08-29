@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import type { EditorProjectCommit } from "~/editor/EditorProject";
-import { EditorProjectDescriptorSchema } from "~/editor/EditorProjectDescriptor";
+import type { EditorProjectCommit } from "~/project-authoring/EditorProject";
+import { EditorProjectDescriptorSchema } from "~/project-authoring/EditorProjectDescriptor";
 import { EditorProjectRecordSchema } from "~/project-authoring/EditorProjectRecordSchema";
 import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";

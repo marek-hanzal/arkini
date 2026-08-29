@@ -1,10 +1,10 @@
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 import { readGameDiagnosticPresentationFn } from "~/game-config/diagnostic/printer/fn/readGameDiagnosticPresentationFn";
 import type { GameDiagnosticSchema } from "~/game-config/diagnostic/schema/GameDiagnosticSchema";
 import type { EditorItemSectionId } from "~/item-authoring/ui/EditorItemSections";
 import { readEditorItemSectionForPathFn } from "~/item-authoring/ui/fn/readEditorItemSectionForPathFn";
-import type { EditorProjectSectionId } from "~/ui/project/editor/EditorProjectSections";
-import { readEditorProjectSectionForPathFn } from "~/ui/project/editor/fn/readEditorProjectSectionForPathFn";
+import type { EditorProjectSectionId } from "~/project-authoring/configuration/EditorProjectSections";
+import { readEditorProjectSectionForPathFn } from "~/project-authoring/configuration/fn/readEditorProjectSectionForPathFn";
 
 type EditorGameDiagnostic = GameDiagnosticSchema.Type;
 

@@ -15,13 +15,13 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { EditorUnsavedChangesOwnerAtom } from "~/renderer/editor/unsaved/EditorUnsavedChangesOwnerAtom";
-import { createEditorUnsavedChangesOwnerFx } from "~/renderer/editor/unsaved/createEditorUnsavedChangesOwnerFx";
+import { EditorUnsavedChangesOwnerAtom } from "~/authoring-session/EditorUnsavedChangesOwnerAtom";
+import { createEditorUnsavedChangesOwnerFx } from "~/authoring-session/createEditorUnsavedChangesOwnerFx";
 import { EditorShell } from "~/authoring-shell/EditorShell";
 import { useEditorActiveWorkspace } from "~/authoring-shell/useEditorActiveWorkspace";
-import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
+import { useEditorUnsavedChangesRegistration } from "~/authoring-session/useEditorUnsavedChangesRegistration";
 
-vi.mock("~/ui/editor/useEditorProject", () => ({
+vi.mock("~/authoring-session/useEditorProject", () => ({
 	useEditorProject: () => ({
 		projectId: "editor-test",
 		title: "Editor test",

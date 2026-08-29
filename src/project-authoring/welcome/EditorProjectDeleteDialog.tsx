@@ -1,8 +1,8 @@
 import type { EditorProjectOwnership } from "~/project-authoring/EditorProjectCandidate";
-import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
+import type { EditorProjectDescriptor } from "~/project-authoring/EditorProjectDescriptor";
 import { Button, DangerButton } from "~/ui/button/Button";
 
-export interface EditorProjectDeleteDialogProps {
+interface EditorProjectDeleteDialogProps {
 	readonly error?: unknown;
 	readonly ownership: EditorProjectOwnership;
 	readonly pending: boolean;

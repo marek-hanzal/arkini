@@ -2,7 +2,7 @@ import { FloatingPortal } from "@floating-ui/react";
 import { ChevronDown, Images, PackageOpen } from "lucide-react";
 
 import { Button, PrimaryButton } from "~/ui/button/Button";
-import { useEditorFloatingMenu } from "~/ui/editor/useEditorFloatingMenu";
+import { useEditorFloatingMenu } from "~/authoring-shell/navigation/useEditorFloatingMenu";
 
 export interface EditorAssetImportMenuProps {
 	readonly onImportArkpack: () => void;

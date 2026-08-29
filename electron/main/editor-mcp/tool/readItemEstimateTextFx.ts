@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 import { createEditorAcquisitionGraphFn } from "~/flow/domain/fn/createEditorAcquisitionGraphFn";
 import type {
 	EditorItemEstimate,

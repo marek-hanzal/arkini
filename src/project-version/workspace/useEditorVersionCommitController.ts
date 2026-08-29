@@ -2,9 +2,9 @@ import { useRouter, useSearch } from "@tanstack/react-router";
 import { Effect } from "effect";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
+import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
 import { readEditorProjectVersionHistoryFx } from "~/project-version/fx/readEditorProjectVersionHistoryFx";
-import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { useEditorProject } from "~/authoring-session/useEditorProject";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { EditorProjectVersionStatus } from "~/project-version/EditorProjectVersion";
 

@@ -1,8 +1,8 @@
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { Effect } from "effect";
 
-import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
-import { publishEditorProjectFx } from "~/ui/editor/publishEditorProjectFx";
+import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
+import { publishEditorProjectFx } from "~/authoring-session/publishEditorProjectFx";
 import { saveEditorItemWithRepositoryFx } from "~/item-authoring/domain/fx/saveEditorItemWithRepositoryFx";
 
 export namespace saveEditorItemFx {

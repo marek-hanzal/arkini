@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { analyzeEditorProjectCompatibilityFn } from "~/project-version/fn/analyzeEditorProjectCompatibilityFn";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { editorTestConfig } from "~test/editor/support/editorTestPayload";
+import { editorTestConfig } from "~test/project-authoring/support/editorTestPayload";
 import {
 	createLine,
 	createOutput,

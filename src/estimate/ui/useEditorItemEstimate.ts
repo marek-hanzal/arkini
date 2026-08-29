@@ -1,7 +1,7 @@
 import { useAtom } from "@effect/atom-react";
 import { useEffect, useMemo } from "react";
 
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 import type { EditorItemEstimate } from "~/estimate/domain/EditorItemEstimate";
 import {
 	EditorItemEstimateCacheAtom,

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { createEditorNotesCommandAtomsFx } from "~/project-note/workspace/createEditorNotesCommandAtomsFx";
-import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
+import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
 
 export const editorNotesTestState = {
 	createFailures: 0,

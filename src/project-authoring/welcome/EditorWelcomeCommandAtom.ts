@@ -2,15 +2,15 @@ import { Cause, Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { createFreshEditorProjectFx } from "~/project-authoring/createFreshEditorProjectFx";
-import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
+import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
 import {
 	type EditorProjectDescriptor,
 	EditorProjectDescriptorSchema,
-} from "~/editor/EditorProjectDescriptor";
-import { invokeEditorProjectTransportFx } from "~/renderer/editor/invokeEditorProjectTransportFx";
+} from "~/project-authoring/EditorProjectDescriptor";
+import { invokeEditorProjectTransportFx } from "~/project-authoring/repository/invokeEditorProjectTransportFx";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
-import { importEditorArkpackFileFx } from "~/renderer/editor/importEditorArkpackFileFx";
+import { importEditorArkpackFileFx } from "~/project-authoring/welcome/importEditorArkpackFileFx";
 
 export namespace EditorWelcomeCommandAtom {
 	export type Action =

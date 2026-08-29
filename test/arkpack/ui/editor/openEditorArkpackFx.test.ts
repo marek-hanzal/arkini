@@ -3,12 +3,12 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { loadArkpackFx } from "~/arkpack/renderer/loadArkpackFx";
 import { openEditorArkpackFx } from "~/arkpack/ui/editor/openEditorArkpackFx";
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
-} from "~/editor/EditorProjectRepository";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+} from "~/project-authoring/repository/EditorProjectRepository";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
 

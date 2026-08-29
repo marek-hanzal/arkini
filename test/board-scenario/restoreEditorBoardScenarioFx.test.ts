@@ -4,17 +4,17 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { describe, expect, it, vi } from "vitest";
 
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
-} from "~/editor/EditorProjectRepository";
+} from "~/project-authoring/repository/EditorProjectRepository";
 import type { EditorBoardGameResource } from "~/board-scenario/session/EditorBoardGameResource";
 import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/session/EditorBoardGameResourceOwnerAtom";
 import { restoreEditorBoardScenarioFx } from "~/board-scenario/session/restoreEditorBoardScenarioFx";
 import { encodeArkiniSaveFn } from "~/engine/save/fn/encodeArkiniSaveFn";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 const project: EditorProject = {

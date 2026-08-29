@@ -3,11 +3,11 @@
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProject } from "~/editor/EditorProject";
-import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
+import type { EditorProject } from "~/project-authoring/EditorProject";
+import type { EditorProjectRepositoryService } from "~/project-authoring/repository/EditorProjectRepository";
 import { installEditorMcpVersionCheckoutFx } from "~/authoring-mcp/installEditorMcpVersionCheckoutFx";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { createTestRendererRuntime } from "~test/support/createTestRendererRuntime";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 

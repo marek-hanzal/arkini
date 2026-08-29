@@ -1,7 +1,7 @@
 import { Image as ImageIcon } from "lucide-react";
 
-import { useEditorProject } from "~/ui/editor/useEditorProject";
-import type { EditorProject } from "~/editor/EditorProject";
+import { useEditorProject } from "~/authoring-session/useEditorProject";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 import { ButtonLink } from "~/ui/button/Button";
 import { useEditorResourceUrl } from "~/ui/resource/editor/useEditorResourceUrl";
 

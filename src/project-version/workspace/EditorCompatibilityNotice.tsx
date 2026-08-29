@@ -1,6 +1,6 @@
 import { GitCompareArrows } from "lucide-react";
 
-import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
+import type { EditorProjectDescriptor } from "~/project-authoring/EditorProjectDescriptor";
 import type { EditorProjectCompatibility } from "~/project-version/EditorProjectCompatibility";
 import { bumpArkpackVersionFn } from "~/project-version/fn/bumpArkpackVersionFn";
 

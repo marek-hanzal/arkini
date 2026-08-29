@@ -1,8 +1,8 @@
 import { dialog, type BrowserWindow } from "electron";
 import { Effect } from "effect";
 
-import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
-import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
+import type { EditorProjectDescriptor } from "~/project-authoring/EditorProjectDescriptor";
+import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
 import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnership";
 
 export namespace importEditorJsonDirectoryFx {

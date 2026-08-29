@@ -4,7 +4,7 @@ import type {
 	EditorProjectBuildContentSchema,
 	EditorProjectBuildSchema,
 } from "~/editor-build/domain/EditorProjectBuildSchema";
-import type { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
+import type { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
 
 export namespace EditorBuildRepository {
 	export interface BuildProps {

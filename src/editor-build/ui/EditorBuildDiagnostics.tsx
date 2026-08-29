@@ -1,4 +1,4 @@
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 import type { GameDiagnosticSchema } from "~/game-config/diagnostic/schema/GameDiagnosticSchema";
 import { printEditorGameDiagnosticFn } from "~/editor-build/ui/fn/printEditorGameDiagnosticFn";
 import { ButtonLink } from "~/ui/button/Button";

@@ -43,7 +43,10 @@ export interface GameSession {
 	readonly failStop: (source: GameSessionFatalSource, cause: unknown) => GameSessionFatalError;
 	/** Notifies once when this exact session first becomes fatally unusable. */
 	readonly subscribeFatalError: (listener: () => void) => () => void;
-	/** Executes one synchronous live read inside this Game's existing session runtime. */
+	/**
+	 * Executes one synchronous query inside this Game's existing session runtime.
+	 * Read and run are lifecycle modes, not type-level authority barriers.
+	 */
 	readonly read: <Result, Error, Requirements extends GameSessionServices>(
 		effect: Effect.Effect<Result, Error, Requirements>,
 	) => Exit.Exit<Result, Error | GameSessionNotRunningError>;

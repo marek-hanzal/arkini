@@ -98,7 +98,7 @@ describe("LauncherStartupAtom", () => {
 		registries.push(registry);
 		registry.set(ArkpackCatalogOwnerAtom, catalog);
 		let attempt = 0;
-		const failure = new Error("bridge unavailable");
+		const failure = new Error("catalog unavailable");
 		registry.set(LauncherStartupConfigAtom, {
 			heroUrl: "hero.png",
 			bootstrapFx: Effect.suspend(() => {

@@ -7,7 +7,7 @@ import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocation
 import type { InventoryLocationSchema } from "~/engine/location/schema/InventoryLocationSchema";
 import type { ToolbarLocationSchema } from "~/engine/location/schema/ToolbarLocationSchema";
 import { planSpawnPlacementFx } from "~/engine/placement/fx/planSpawnPlacementFx";
-import { readPlacementPlanQuantityFx } from "~/engine/placement/fx/readPlacementPlanQuantityFx";
+import { readPlacementPlanQuantityFn } from "~/engine/placement/fn/readPlacementPlanQuantityFn";
 import type { PlacementPlan } from "~/engine/placement/PlacementPlan";
 import { StartSlotUnavailableError } from "~/engine/start/error/StartSlotUnavailableError";
 
@@ -45,7 +45,7 @@ export const planStartExactGridStackFx = Effect.fn("planStartExactGridStackFx")(
 		spawn,
 		stack: [],
 	} satisfies PlacementPlan;
-	const placedQuantity = yield* readPlacementPlanQuantityFx({
+	const placedQuantity = readPlacementPlanQuantityFn({
 		plan,
 	});
 	if (placedQuantity !== quantity) {

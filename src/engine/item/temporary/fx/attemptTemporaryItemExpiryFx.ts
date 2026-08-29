@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
-import { isExpectedPlacementDeliveryBlockFx } from "~/engine/placement/read/isExpectedPlacementDeliveryBlockFx";
+import { isExpectedPlacementDeliveryBlockFn } from "~/engine/placement/read/fn/isExpectedPlacementDeliveryBlockFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 import { completeTemporaryItemExpiryTransitionFx } from "./completeTemporaryItemExpiryTransitionFx";
@@ -45,17 +45,13 @@ export const attemptTemporaryItemExpiryFx = Effect.fn("attemptTemporaryItemExpir
 				}) satisfies attemptTemporaryItemExpiryFx.Result,
 		),
 		Effect.catchTag("PlacementUnavailableError", (error) =>
-			isExpectedPlacementDeliveryBlockFx(error.reason).pipe(
-				Effect.flatMap((expected) =>
-					expected
-						? Effect.succeed({
-								type: "blocked",
-								error,
-								runtime,
-							} satisfies attemptTemporaryItemExpiryFx.Result)
-						: Effect.fail(error),
-				),
-			),
+			isExpectedPlacementDeliveryBlockFn(error.reason)
+				? Effect.succeed({
+						type: "blocked",
+						error,
+						runtime,
+					} satisfies attemptTemporaryItemExpiryFx.Result)
+				: Effect.fail(error),
 		),
 	);
 });

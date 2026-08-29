@@ -49,7 +49,7 @@ export const PixiBoardToolbarSurface = ({ onOpenInventory }: PixiBoardToolbarSur
 	const isInventoryShortcutKey = useInventoryShortcutKey();
 	const runtimeRef = useRef<MainRuntime | null>(null);
 	const interactionBlockedRef = useRef(false);
-	const interactionBlocked = gameMenu.isOpen || itemDetail.isOpen;
+	const interactionBlocked = gameMenu.phase !== "closed" || itemDetail.state.phase !== "closed";
 	interactionBlockedRef.current = interactionBlocked;
 	const controlsRef = useRef({
 		itemDetail,

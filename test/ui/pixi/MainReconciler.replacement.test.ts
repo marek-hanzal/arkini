@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
 import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";
-import { completeVisualTextureLoadFx } from "~/ui/pixi/actor/completeVisualTextureLoadFx";
+import { runVisualReadinessFx } from "~/ui/pixi/actor/runVisualReadinessFx";
 import {
 	boardLocation,
 	createActor,
@@ -62,8 +62,9 @@ describe("main reconciliation / replacement visuals", () => {
 		expect(harness.animations.some(({ channel }) => channel === "visual-mix")).toBe(false);
 
 		Effect.runSync(
-			completeVisualTextureLoadFx({
+			runVisualReadinessFx({
 				generation: incoming.textureGeneration,
+				kind: "complete",
 				visual: incoming,
 			}),
 		);
@@ -177,14 +178,16 @@ describe("main reconciliation / replacement visuals", () => {
 		]);
 
 		Effect.runSync(
-			completeVisualTextureLoadFx({
+			runVisualReadinessFx({
 				generation: pendingSecond.textureGeneration,
+				kind: "complete",
 				visual: pendingSecond,
 			}),
 		);
 		Effect.runSync(
-			completeVisualTextureLoadFx({
+			runVisualReadinessFx({
 				generation: pendingThird.textureGeneration,
+				kind: "complete",
 				visual: pendingThird,
 			}),
 		);
@@ -198,8 +201,9 @@ describe("main reconciliation / replacement visuals", () => {
 		expect(pendingThird.container.destroyed).toBe(true);
 
 		Effect.runSync(
-			completeVisualTextureLoadFx({
+			runVisualReadinessFx({
 				generation: pendingThird.textureGeneration - 1,
+				kind: "complete",
 				visual: pendingThird,
 			}),
 		);

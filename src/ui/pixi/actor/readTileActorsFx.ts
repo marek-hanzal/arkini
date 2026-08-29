@@ -1,18 +1,19 @@
 import { Array, Effect } from "effect";
+import { match, P } from "ts-pattern";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { JobSchema } from "~/engine/job/schema/JobSchema";
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { readTileActorBadgeCountFn } from "~/ui/pixi/actor/fn/readTileActorBadgeCountFn";
 import { readTileActorAssetSourceIdsFx } from "~/ui/pixi/actor/readTileActorAssetSourceIdsFx";
-import { readTileActorProgressRatioFn } from "~/ui/pixi/actor/fn/readTileActorProgressRatioFn";
-import { readTileActorQueueBadgeCountFn } from "~/ui/pixi/actor/fn/readTileActorQueueBadgeCountFn";
 import { readTileActorVisualFx } from "~/ui/pixi/actor/readTileActorVisualFx";
-import { readTileActorActivityEffectFn } from "~/ui/pixi/actor/fn/readTileActorActivityEffectFn";
 import { readRuntimeItemPrimaryActionFx } from "~/engine/item-detail/read/readRuntimeItemPrimaryActionFx";
 import { resolveActiveJobStatusFx } from "~/engine/job/fx/resolveActiveJobStatusFx";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
+import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace readTileActorsFx {
@@ -22,6 +23,87 @@ export namespace readTileActorsFx {
 		readonly surface: "inventory" | "main";
 	}
 }
+
+const readQueueBadgeCountFn = ({
+	ownerItemId,
+	runtime,
+}: {
+	readonly ownerItemId: string;
+	readonly runtime: RuntimeSchema.Type;
+}) => {
+	const count =
+		runtime.jobs.filter((job) => job.ownerItemId === ownerItemId).length +
+		runtime.jobQueue.filter((request) => request.ownerItemId === ownerItemId).length;
+	return count > 0 ? count : undefined;
+};
+
+const readActivityEffectFn = ({
+	itemType,
+	running,
+}: {
+	readonly itemType: TypeSchema.Type;
+	readonly running: boolean;
+}) =>
+	match(itemType)
+		.with(
+			P.union(
+				TypeSchema.enum.Blueprint,
+				TypeSchema.enum.Craft,
+				TypeSchema.enum.Deposit,
+				TypeSchema.enum.Producer,
+			),
+			() => running,
+		)
+		.with(
+			P.union(
+				TypeSchema.enum.Inventory,
+				TypeSchema.enum.Simple,
+				TypeSchema.enum.Space,
+				TypeSchema.enum.Stash,
+				TypeSchema.enum.Temporary,
+			),
+			() => false,
+		)
+		.exhaustive();
+
+const clampRatioFn = (ratio: number) => Math.max(0, Math.min(1, ratio));
+
+const readProgressRatioFn = ({
+	activeJob,
+	item,
+}: {
+	readonly activeJob?: JobSchema.Type;
+	readonly item: RuntimeItemSchema.Type;
+}) =>
+	match({
+		activeJob,
+		item,
+	})
+		.with(
+			{
+				activeJob: P.nonNullable,
+			},
+			({ activeJob: job }) =>
+				job.durationMs <= 0 ? 1 : clampRatioFn(1 - job.remainingMs / job.durationMs),
+		)
+		.with(
+			{
+				activeJob: P.nullish,
+				item: {
+					item: {
+						type: TypeSchema.enum.Temporary,
+					},
+				},
+			},
+			({ item: temporary }) =>
+				temporary.item.durationMs <= 0
+					? 0
+					: clampRatioFn(
+							(temporary.remainingDurationMs ?? temporary.item.durationMs) /
+								temporary.item.durationMs,
+						),
+		)
+		.otherwise(() => undefined);
 
 /** Projects only exact live grid identities visible to one Pixi scene. */
 export const readTileActorsFx = Effect.fnUntraced(function* ({
@@ -62,13 +144,13 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 				}),
 			});
 			const running = activeJobStatus === JobStatusEnumSchema.enum.Running;
-			const queueBadgeCount = readTileActorQueueBadgeCountFn({
+			const queueBadgeCount = readQueueBadgeCountFn({
 				ownerItemId: item.id,
 				runtime,
 			});
 			const badgeCount =
 				queueBadgeCount === undefined ? readTileActorBadgeCountFn(item) : queueBadgeCount;
-			const progressRatio = readTileActorProgressRatioFn({
+			const progressRatio = readProgressRatioFn({
 				activeJob,
 				item,
 			});
@@ -101,7 +183,7 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 					: {
 							progressRatio,
 						}),
-				activityEffect: readTileActorActivityEffectFn({
+				activityEffect: readActivityEffectFn({
 					itemType: item.item.type,
 					running,
 				}),

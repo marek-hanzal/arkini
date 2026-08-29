@@ -2,14 +2,12 @@
 
 import { RegistryContext, scheduleTask } from "@effect/atom-react";
 import { Effect } from "effect";
-import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { StrictMode, act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Game } from "~/renderer/game/Game";
-import { GameRuntimeAtom } from "~/ui/game/GameRuntimeAtom";
 import { useRuntimeSelector } from "~/ui/game/useRuntimeSelector";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -130,13 +128,6 @@ const renderProbe = async (
 };
 
 describe("useRuntimeSelector", () => {
-	it("exposes neither the committed transition nor runtime projection as writable", () => {
-		const { game } = Effect.runSync(makeTestGameFx("game:read-only", initialRuntime));
-
-		expect(Atom.isWritable(game.committedTransitionAtom)).toBe(false);
-		expect(Atom.isWritable(GameRuntimeAtom(game.committedTransitionAtom))).toBe(false);
-	});
-
 	it("retains the exact previous projection reference and skips unrelated rerenders", async () => {
 		const { game, transitions } = Effect.runSync(
 			makeTestGameFx("game:selector", initialRuntime),

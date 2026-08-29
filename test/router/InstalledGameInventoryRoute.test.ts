@@ -34,13 +34,15 @@ if (GameInventoryRoute === undefined)
 
 vi.mock("~/ui/game-menu/useGameMenuControl", () => ({
 	useGameMenuControl: () => ({
-		isOpen: pageState.menuOpen,
+		phase: pageState.menuOpen ? "open" : "closed",
 	}),
 }));
 
 vi.mock("~/ui/item-detail/useItemDetailControl", () => ({
 	useItemDetailControl: () => ({
-		isOpen: pageState.detailOpen,
+		state: {
+			phase: pageState.detailOpen ? "open" : "closed",
+		},
 	}),
 }));
 

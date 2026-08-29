@@ -19,8 +19,8 @@ export const PlayableInventory = ({ onClose }: { readonly onClose: () => void })
 			if (
 				(event.key !== "Escape" && !isInventoryShortcutKey(event)) ||
 				event.defaultPrevented ||
-				gameMenu.isOpen ||
-				itemDetail.isOpen
+				gameMenu.phase !== "closed" ||
+				itemDetail.state.phase !== "closed"
 			) {
 				return;
 			}
@@ -31,8 +31,8 @@ export const PlayableInventory = ({ onClose }: { readonly onClose: () => void })
 		window.addEventListener("keydown", onKeyDown, true);
 		return () => window.removeEventListener("keydown", onKeyDown, true);
 	}, [
-		gameMenu.isOpen,
-		itemDetail.isOpen,
+		gameMenu.phase,
+		itemDetail.state.phase,
 		returnToBoard,
 	]);
 

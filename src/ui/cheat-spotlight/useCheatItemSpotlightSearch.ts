@@ -1,13 +1,19 @@
+import { Exit } from "effect";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { useCheatItemCatalog } from "~/ui/cheat-spotlight/useCheatItemCatalog";
 import type { PlayableGame } from "~/renderer/game/PlayableGame";
+import { readCheatItemCatalogFx } from "~/engine/cheat/read/readCheatItemCatalogFx";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
 
 const maxVisibleResults = 10;
 
 export namespace useCheatItemSpotlightSearch {
-	export type Item = ReturnType<typeof useCheatItemCatalog>[number];
+	export interface Item {
+		readonly itemId: string;
+		readonly sourceResourceId: string;
+		readonly sourceUrl: string;
+		readonly title: string;
+	}
 
 	export interface Props {
 		readonly game: PlayableGame;
@@ -27,7 +33,16 @@ export namespace useCheatItemSpotlightSearch {
 export const useCheatItemSpotlightSearch = ({
 	game,
 }: useCheatItemSpotlightSearch.Props): useCheatItemSpotlightSearch.Output => {
-	const catalog = useCheatItemCatalog(game);
+	const catalog = useMemo(() => {
+		const exit = game.read(readCheatItemCatalogFx());
+		if (Exit.isFailure(exit)) throw exit.cause;
+		return exit.value.map((entry) => ({
+			...entry,
+			sourceUrl: game.getResourceUrl(entry.sourceResourceId),
+		}));
+	}, [
+		game,
+	]);
 	const [query, setQuery] = useState("");
 	const [selectedIndex, setSelectedIndex] = useState(0);
 	const searchCandidates = useMemo(

@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";
-import { completeVisualTextureLoadFx } from "~/ui/pixi/actor/completeVisualTextureLoadFx";
+import { runVisualReadinessFx } from "~/ui/pixi/actor/runVisualReadinessFx";
 import { createMainActorStoreFx } from "~/ui/pixi/actor/createMainActorStoreFx";
 import { destroyTileActorFx } from "~/ui/pixi/actor/destroyTileActorFx";
 
@@ -118,8 +118,9 @@ describe("tile actor destruction", () => {
 
 		Effect.runSync(destroyTileActorFx(actor));
 		Effect.runSync(
-			completeVisualTextureLoadFx({
+			runVisualReadinessFx({
 				generation: staleGeneration,
+				kind: "complete",
 				visual,
 			}),
 		);
@@ -173,8 +174,9 @@ describe("tile actor destruction", () => {
 		expect(actorContainer.eventMode).toBe("none");
 		Effect.runSync(store.closeFx);
 		Effect.runSync(
-			completeVisualTextureLoadFx({
+			runVisualReadinessFx({
 				generation: staleGeneration,
+				kind: "complete",
 				visual,
 			}),
 		);

@@ -3,9 +3,7 @@ import { Texture } from "pixi.js";
 
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";
-import { beginVisualTextureLoadFx } from "~/ui/pixi/actor/beginVisualTextureLoadFx";
-import { completeVisualTextureLoadFx } from "~/ui/pixi/actor/completeVisualTextureLoadFx";
-import { failVisualTextureLoadFx } from "~/ui/pixi/actor/failVisualTextureLoadFx";
+import { runVisualReadinessFx } from "~/ui/pixi/actor/runVisualReadinessFx";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
 
@@ -26,7 +24,12 @@ export namespace loadVisualTexturesFx {
 export const loadVisualTexturesFx = Effect.fn("loadVisualTexturesFx")(
 	({ frames, textures, visual }: loadVisualTexturesFx.Props) =>
 		Effect.sync(() => {
-			const generation = RendererRuntime.runSync(beginVisualTextureLoadFx(visual));
+			const generation = RendererRuntime.runSync(
+				runVisualReadinessFx({
+					kind: "begin",
+					visual,
+				}),
+			);
 			const sourceUrl = visual.item.sourceUrl;
 			const compositeUrl = visual.item.compositeUrl;
 			void Promise.all([
@@ -45,8 +48,9 @@ export const loadVisualTexturesFx = Effect.fn("loadVisualTexturesFx")(
 					visual.primary.texture = primary;
 					visual.composite.texture = composite;
 					RendererRuntime.runSync(
-						completeVisualTextureLoadFx({
+						runVisualReadinessFx({
 							generation,
+							kind: "complete",
 							visual,
 						}),
 					);
@@ -60,8 +64,9 @@ export const loadVisualTexturesFx = Effect.fn("loadVisualTexturesFx")(
 						return;
 					}
 					RendererRuntime.runSync(
-						failVisualTextureLoadFx({
+						runVisualReadinessFx({
 							generation,
+							kind: "fail",
 							visual,
 						}),
 					);

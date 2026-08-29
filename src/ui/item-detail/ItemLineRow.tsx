@@ -1,18 +1,19 @@
 import { ChevronRight, CircleAlert, Clock3, Info } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { forwardRef } from "react";
+import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { useEnqueueItemDetailLine } from "~/ui/item-detail/useEnqueueItemDetailLine";
+import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
+import { setDefaultLineFx } from "~/engine/line/write/setDefaultLineFx";
+import { unsetDefaultLineFx } from "~/engine/line/write/unsetDefaultLineFx";
+import { withdrawLineInputFx } from "~/engine/input/write/withdrawLineInputFx";
+import { withdrawLineInputsFx } from "~/engine/input/write/withdrawLineInputsFx";
 import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
-import { useSetDefaultItemDetailLine } from "~/ui/item-detail/useSetDefaultItemDetailLine";
-import { useUnsetDefaultItemDetailLine } from "~/ui/item-detail/useUnsetDefaultItemDetailLine";
-import { useWithdrawItemDetailLine } from "~/ui/item-detail/useWithdrawItemDetailLine";
 import { Button, PrimaryButton } from "~/ui/button/Button";
 import { itemDetailFadeMotion } from "~/ui/item-detail/ItemDetailMotion";
 import { ItemLineInputs, ItemLineUnavailableWithdrawals } from "~/ui/item-detail/ItemLineInputs";
 import { ItemLineOutputs } from "~/ui/item-detail/ItemLineOutputs";
-import { ItemLineRuntime } from "~/ui/item-detail/ItemLineRuntime";
 import {
 	ItemLineSummary,
 	type ItemLineSummaryIdentityRenderer,
@@ -20,6 +21,10 @@ import {
 import { ItemReferenceButton } from "~/ui/item-detail/ItemReferenceButton";
 import type { ItemDetailPendingAction } from "~/ui/item-detail/ItemDetailControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
+import { useItemDetailPendingCommand } from "~/ui/item-detail/useItemDetailPendingCommand";
+import { formatItemDurationFn } from "~/ui/item-detail/fn/formatItemDurationFn";
+import { readActiveJobRuntimeFn } from "~/ui/item-detail/fn/readActiveJobRuntimeFn";
+import { ItemRuntime } from "~/ui/item-detail/ItemRuntime";
 
 const ItemLineUnavailableReason = ({
 	reason,
@@ -164,21 +169,40 @@ export const ItemLineRow = forwardRef<
 		enqueue: pendingKey("enqueue"),
 		withdraw: pendingKey("withdraw"),
 	} as const;
-	const setDefaultLine = useSetDefaultItemDetailLine({
+	const setDefaultLine = useItemDetailPendingCommand({
+		action: "default",
+		failureMessage: "Default line could not be changed.",
 		pendingKey: pendingKeys.default,
 		pendingOwner: itemDetail,
+		run: (game, command: setDefaultLineFx.Props) => game.runFx(setDefaultLineFx(command)),
 	});
-	const enqueueLine = useEnqueueItemDetailLine({
+	const enqueueLine = useItemDetailPendingCommand({
+		action: "enqueue",
+		failureMessage: "Work could not be queued.",
 		pendingKey: pendingKeys.enqueue,
 		pendingOwner: itemDetail,
+		run: (game, command: enqueueLineFx.Props) => game.runFx(enqueueLineFx(command)),
 	});
-	const unsetDefaultLine = useUnsetDefaultItemDetailLine({
+	const unsetDefaultLine = useItemDetailPendingCommand({
+		action: "default",
+		failureMessage: "Default line could not be changed.",
 		pendingKey: pendingKeys.default,
 		pendingOwner: itemDetail,
+		run: (game, command: unsetDefaultLineFx.Props) => game.runFx(unsetDefaultLineFx(command)),
 	});
-	const withdrawLine = useWithdrawItemDetailLine({
+	const withdrawLine = useItemDetailPendingCommand({
+		action: "withdraw",
+		failureMessage: "Inputs could not be withdrawn.",
 		pendingKey: pendingKeys.withdraw,
 		pendingOwner: itemDetail,
+		run: (game, command: withdrawLineInputFx.Props | withdrawLineInputsFx.Props) =>
+			game
+				.runFx(
+					"inputIndex" in command
+						? withdrawLineInputFx(command)
+						: withdrawLineInputsFx(command),
+				)
+				.pipe(Effect.asVoid),
 	});
 	const pending = {
 		default: setDefaultLine.pending || unsetDefaultLine.pending,
@@ -239,6 +263,17 @@ export const ItemLineRow = forwardRef<
 								line.activeJob.durationMs,
 						),
 					);
+	const activeJob = line.activeJob;
+	const runtime =
+		activeJob === undefined
+			? {
+					value: formatItemDurationFn(line.effectiveRuntimeMs),
+					detail:
+						line.baseRuntimeMs === line.effectiveRuntimeMs
+							? "Per cycle"
+							: `Base ${formatItemDurationFn(line.baseRuntimeMs)}`,
+				}
+			: readActiveJobRuntimeFn(activeJob);
 
 	return (
 		<motion.article
@@ -373,7 +408,11 @@ export const ItemLineRow = forwardRef<
 								Enqueue
 							</PrimaryButton>
 						</div>
-						<ItemLineRuntime line={line} />
+						<ItemRuntime
+							dataUi="TileLineRuntime"
+							jobStatus={activeJob?.status ?? "idle"}
+							runtime={runtime}
+						/>
 					</div>
 				)}
 			</div>

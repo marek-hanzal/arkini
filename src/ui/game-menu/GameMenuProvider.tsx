@@ -134,13 +134,7 @@ export const GameMenuProvider = ({
 	const control = useMemo<GameMenuControl>(
 		() => ({
 			phase: state.phase,
-			isOpen: state.phase !== "closed",
 			activeAction: state.activeAction,
-			routePending:
-				state.activeAction === "settings" ||
-				state.activeAction === "cheats" ||
-				state.activeAction === "main-menu" ||
-				state.activeAction === "hard-reset",
 			open,
 			close,
 			toggle,

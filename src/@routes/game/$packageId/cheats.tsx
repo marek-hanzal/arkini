@@ -1,9 +1,10 @@
 import { createFileRoute, redirect, useNavigate, useRouter } from "@tanstack/react-router";
-import { Effect } from "effect";
+import { Deferred, Effect } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import { useCallback, useEffect, useRef } from "react";
 
-import { readCheatAvailabilitySnapshotFx } from "~/ui/cheat-availability/readCheatAvailabilitySnapshotFx";
-import { waitForCheatAvailabilityReadyFx } from "~/ui/cheat-availability/waitForCheatAvailabilityReadyFx";
+import { CheatAvailabilityAtom } from "~/ui/cheat-availability/CheatAvailabilityAtom";
+import { CheatAvailabilityReady } from "~/ui/cheat-availability/CheatAvailabilityReady";
 import { usePackageGameEngine } from "~/ui/game/usePackageGameEngine";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 import { Cheats } from "~/ui/cheats/Cheats";
@@ -12,8 +13,8 @@ import { PlayableGameRoute } from "~/ui/game/PlayableGameRoute";
 
 export const Route = createFileRoute("/game/$packageId/cheats")({
 	beforeLoad: async ({ context, params }) => {
-		await context.rendererRuntime.runPromise(waitForCheatAvailabilityReadyFx());
-		if (context.rendererRuntime.runSync(readCheatAvailabilitySnapshotFx())) return;
+		await context.rendererRuntime.runPromise(Deferred.await(CheatAvailabilityReady));
+		if (context.rendererRuntime.runSync(Atom.get(CheatAvailabilityAtom))) return;
 		throw redirect({
 			to: "/game/$packageId/board",
 			params,

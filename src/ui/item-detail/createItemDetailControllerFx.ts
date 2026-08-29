@@ -14,7 +14,7 @@ interface ExitCompletion {
 }
 
 export interface ItemDetailController {
-	readonly getSnapshot: () => ItemDetailController.Snapshot;
+	readonly getSnapshot: () => ItemDetailState;
 	readonly subscribe: (listener: () => void) => () => void;
 	readonly readOrigin: (origin: HTMLElement | null) => HTMLElement | null;
 	readonly readOutcomeScope: () => string | undefined;
@@ -26,19 +26,9 @@ export interface ItemDetailController {
 	readonly resetFx: Effect.Effect<void>;
 }
 
-export namespace ItemDetailController {
-	export interface Snapshot {
-		readonly state: ItemDetailState;
-	}
-}
-
 const closedState = {
 	phase: "closed",
 } as const satisfies ItemDetailState;
-
-const initialSnapshot = {
-	state: closedState,
-} as const satisfies ItemDetailController.Snapshot;
 
 const actionOutcomeScope = (state: ItemDetailState, outcomeEpoch: number) =>
 	match(state)
@@ -90,20 +80,14 @@ export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Gene
 	never
 > {
 	const listeners = new Set<() => void>();
-	let snapshot: ItemDetailController.Snapshot = initialSnapshot;
+	let state: ItemDetailState = closedState;
 	let nextGeneration = 0;
 	let outcomeEpoch = 0;
 	let exitCompletion: ExitCompletion | undefined;
 
-	const publish = (next: ItemDetailController.Snapshot) => {
-		snapshot = next;
+	const publish = (next: ItemDetailState) => {
+		state = next;
 		for (const listener of Array.from(listeners)) listener();
-	};
-
-	const publishState = (state: ItemDetailState) => {
-		publish({
-			state,
-		});
 	};
 
 	const resolveExitCompletionFx = Effect.fn("ItemDetailController.resolveExitCompletionFx")(
@@ -123,7 +107,7 @@ export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Gene
 
 	const enter = (target: ItemDetailTarget) => {
 		outcomeEpoch += 1;
-		publishState({
+		publish({
 			phase: "entering",
 			target,
 			generation: ++nextGeneration,
@@ -134,7 +118,7 @@ export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Gene
 	const openTargetFx = Effect.fn("ItemDetailController.openTargetFx")(
 		(target: ItemDetailTarget) =>
 			Effect.gen(function* () {
-				const current = snapshot.state;
+				const current = state;
 				if (current.phase === "closed") return enter(target);
 				// Resolve the superseded exit so its close waiter cannot hang.
 				if (current.phase === "exiting") {
@@ -143,7 +127,7 @@ export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Gene
 				}
 				if (sameTarget(current.target, target)) return true;
 				if (!sameActionOutcomeTarget(current.target, target)) outcomeEpoch += 1;
-				publishState({
+				publish({
 					...current,
 					target,
 				});
@@ -154,11 +138,11 @@ export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Gene
 	const closeFx = Effect.fn("ItemDetailController.closeFx")(
 		({ restoreFocus = true }: CloseItemDetailProps = {}) =>
 			Effect.gen(function* () {
-				const current = snapshot.state;
+				const current = state;
 				if (current.phase === "closed") return;
 				if (current.phase === "exiting") {
 					if (!restoreFocus && current.restoreFocus) {
-						publishState({
+						publish({
 							...current,
 							restoreFocus: false,
 						});
@@ -174,7 +158,7 @@ export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Gene
 					generation: current.generation,
 					deferred,
 				};
-				publishState({
+				publish({
 					phase: "exiting",
 					target: current.target,
 					generation: current.generation,
@@ -191,9 +175,9 @@ export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Gene
 	const completeEnterFx = Effect.fn("ItemDetailController.completeEnterFx")(
 		(generation: number) =>
 			Effect.sync(() => {
-				const current = snapshot.state;
+				const current = state;
 				if (current.phase !== "entering" || current.generation !== generation) return;
-				publishState({
+				publish({
 					phase: "open",
 					target: current.target,
 					generation,
@@ -203,23 +187,22 @@ export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Gene
 
 	const completeExitFx = Effect.fn("ItemDetailController.completeExitFx")((generation: number) =>
 		Effect.gen(function* () {
-			const current = snapshot.state;
+			const current = state;
 			if (current.phase !== "exiting" || current.generation !== generation) return;
-			publishState(closedState);
+			publish(closedState);
 			yield* resolveExitCompletionFx(generation);
 		}),
 	);
 
 	return {
-		getSnapshot: () => snapshot,
+		getSnapshot: () => state,
 		subscribe: (listener) => {
 			listeners.add(listener);
 			return () => listeners.delete(listener);
 		},
 		// References opened from inside Detail restore focus to the original scene actor.
-		readOrigin: (origin) =>
-			snapshot.state.phase === "closed" ? origin : snapshot.state.target.origin,
-		readOutcomeScope: () => actionOutcomeScope(snapshot.state, outcomeEpoch),
+		readOrigin: (origin) => (state.phase === "closed" ? origin : state.target.origin),
+		readOutcomeScope: () => actionOutcomeScope(state, outcomeEpoch),
 		openTargetFx,
 		closeAtom,
 		closeFx,
@@ -227,7 +210,7 @@ export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Gene
 		completeExitFx,
 		resetFx: Effect.gen(function* () {
 			yield* resolveExitCompletionFx();
-			snapshot = initialSnapshot;
+			state = closedState;
 			nextGeneration = 0;
 			outcomeEpoch = 0;
 		}),

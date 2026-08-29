@@ -2,7 +2,8 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
-import { projectItemDetailOutputItemFx } from "~/ui/item-detail/projectItemDetailOutputItemFx";
+import { readRuntimeItemDefaultAssetIdsFx } from "~/engine/item/read/readRuntimeItemDefaultAssetIdsFx";
+import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
 import type { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
 
 export namespace projectItemDetailOutputRollFx {
@@ -11,6 +12,40 @@ export namespace projectItemDetailOutputRollFx {
 		readonly roll: readItemDetailLinesFx.OutputRoll;
 	}
 }
+
+const projectOutputItemFx = Effect.fn("projectItemDetailOutputRollFx.projectItemFx")(function* ({
+	game,
+	item,
+}: {
+	readonly game: GameEngine;
+	readonly item: readItemDetailLinesFx.OutputItem;
+}) {
+	const configured = game.config.items[item.itemId];
+	if (configured === undefined) {
+		return {
+			itemId: item.itemId,
+			title: item.itemId,
+			quantity: item.quantity,
+			activeRuleHints: item.activeRuleHints,
+		} satisfies ItemDetailLines.OutputItem;
+	}
+	const sourceAssetIds = yield* readRuntimeItemDefaultAssetIdsFx({
+		item: configured,
+	});
+	return {
+		itemId: item.itemId,
+		title: configured.title,
+		quantity: item.quantity,
+		activeRuleHints: item.activeRuleHints,
+		sourceUrl: game.getResourceUrl(sourceAssetIds[0]),
+		...(sourceAssetIds[1] === undefined
+			? {}
+			: {
+					compositeUrl: game.getResourceUrl(sourceAssetIds[1]),
+				}),
+		definitionItemId: configured.id,
+	} satisfies ItemDetailLines.OutputItem;
+});
 
 /** Projects one engine-owned output roll while preserving its authored roll semantics. */
 export const projectItemDetailOutputRollFx = Effect.fn("projectItemDetailOutputRollFx")(function* ({
@@ -25,7 +60,7 @@ export const projectItemDetailOutputRollFx = Effect.fn("projectItemDetailOutputR
 			(guaranteed) =>
 				Effect.all(
 					guaranteed.item.map((item) =>
-						projectItemDetailOutputItemFx({
+						projectOutputItemFx({
 							game,
 							item,
 						}),
@@ -44,7 +79,7 @@ export const projectItemDetailOutputRollFx = Effect.fn("projectItemDetailOutputR
 			(chance) =>
 				Effect.all(
 					chance.item.map((item) =>
-						projectItemDetailOutputItemFx({
+						projectOutputItemFx({
 							game,
 							item,
 						}),
@@ -66,7 +101,7 @@ export const projectItemDetailOutputRollFx = Effect.fn("projectItemDetailOutputR
 					weight.option.map((option) =>
 						Effect.all(
 							option.item.map((item) =>
-								projectItemDetailOutputItemFx({
+								projectOutputItemFx({
 									game,
 									item,
 								}),

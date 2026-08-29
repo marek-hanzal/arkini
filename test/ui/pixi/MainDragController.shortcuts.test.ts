@@ -168,8 +168,8 @@ describe("main drag controller: shortcuts", () => {
 		expect(keyEvent.stopImmediatePropagation).toHaveBeenCalledOnce();
 		expect(mounted.releasePointerCapture).toHaveBeenCalledWith(1);
 		expect(mounted.removeDraggedItem).toHaveBeenCalledWith({
-			game: expect.anything(),
-			sourceItem: item,
+			itemId: item.id,
+			revision: item.revision,
 		});
 		expect(mounted.onDrop).not.toHaveBeenCalled();
 		expect(mounted.actor.dragging).toBe(false);

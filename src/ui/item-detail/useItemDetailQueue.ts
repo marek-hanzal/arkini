@@ -15,27 +15,14 @@ export namespace useItemDetailQueue {
 export const useItemDetailQueue = (itemId: IdSchema.Type): useItemDetailQueue.Projection => {
 	const game = useGameEngine();
 	const selector = useCallback(
-		(runtime: RuntimeSchema.Type): useItemDetailQueue.Projection => {
-			const queue = game.readOrThrow(
+		(runtime: RuntimeSchema.Type): useItemDetailQueue.Projection =>
+			game.readOrThrow(
 				projectItemDetailQueueFx({
 					game,
 					itemId,
 					runtime,
 				}),
-			);
-			if (queue.kind === "unavailable") {
-				return {
-					kind: "unavailable",
-				};
-			}
-			return {
-				kind: "available",
-				itemId: queue.itemId,
-				capacity: queue.capacity,
-				active: queue.active,
-				request: queue.request,
-			};
-		},
+			),
 		[
 			game,
 			itemId,

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { burstAckParticlesFx } from "~/ui/pixi/animation/burstAckParticlesFx";
+import { burstFeedbackParticlesFx } from "~/ui/pixi/animation/burstFeedbackParticlesFx";
 import { startActivityParticlesFx } from "~/ui/pixi/animation/startActivityParticlesFx";
 import { stopActivityParticlesFx } from "~/ui/pixi/animation/stopActivityParticlesFx";
 
@@ -83,7 +83,7 @@ describe("activity particles", () => {
 			activityEffect: false,
 		};
 		Effect.runSync(
-			burstAckParticlesFx({
+			burstFeedbackParticlesFx({
 				actor,
 				animator,
 				tint: 0x57d7b2,
@@ -120,7 +120,7 @@ describe("activity particles", () => {
 		const actor = createParticleActor();
 		const { animations, animator, cancellations } = createActivityParticleAnimator();
 		Effect.runSync(
-			burstAckParticlesFx({
+			burstFeedbackParticlesFx({
 				actor,
 				animator,
 				tint: 0x57d7b2,

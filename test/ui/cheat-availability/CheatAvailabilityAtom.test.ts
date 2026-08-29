@@ -3,15 +3,15 @@
 import { RegistryContext, scheduleTask } from "@effect/atom-react";
 import { Cause, Deferred, Effect, Exit, Option } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CheatAvailabilityAtom } from "~/ui/cheat-availability/CheatAvailabilityAtom";
+import { CheatAvailabilityReady } from "~/ui/cheat-availability/CheatAvailabilityReady";
 import { applyCheatAvailabilityFx } from "~/ui/cheat-availability/applyCheatAvailabilityFx";
-import { readCheatAvailabilitySnapshotFx } from "~/ui/cheat-availability/readCheatAvailabilitySnapshotFx";
 import { setCheatAvailabilityAtom } from "~/ui/cheat-availability/setCheatAvailabilityAtom";
-import { waitForCheatAvailabilityReadyFx } from "~/ui/cheat-availability/waitForCheatAvailabilityReadyFx";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 
 (
@@ -46,7 +46,7 @@ describe("Cheat availability Atom", () => {
 			published.push(available);
 		});
 		let ready = false;
-		const readiness = Effect.runPromise(waitForCheatAvailabilityReadyFx()).then(() => {
+		const readiness = Effect.runPromise(Deferred.await(CheatAvailabilityReady)).then(() => {
 			ready = true;
 		});
 
@@ -78,7 +78,7 @@ describe("Cheat availability Atom", () => {
 		);
 		expect(
 			Effect.runSync(
-				readCheatAvailabilitySnapshotFx().pipe(
+				Atom.get(CheatAvailabilityAtom).pipe(
 					Effect.provideService(AtomRegistry.AtomRegistry, registry),
 				),
 			),
@@ -132,7 +132,7 @@ describe("Cheat availability Atom", () => {
 		await vi.waitFor(() => expect(button?.textContent).toBe("true"));
 		expect(
 			Effect.runSync(
-				readCheatAvailabilitySnapshotFx().pipe(
+				Atom.get(CheatAvailabilityAtom).pipe(
 					Effect.provideService(AtomRegistry.AtomRegistry, registry),
 				),
 			),

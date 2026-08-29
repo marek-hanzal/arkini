@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import type { FederatedPointerEvent } from "pixi.js";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
+import { removeCheatItemFx as removeEngineCheatItemFx } from "~/engine/cheat/write/removeCheatItemFx";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { PointerDragThreshold } from "~/ui/drag/PointerDragThreshold";
@@ -9,7 +10,7 @@ import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readActorCursorFn } from "~/ui/pixi/actor/fn/readActorCursorFn";
 import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
-import { burstAckParticlesFx } from "~/ui/pixi/animation/burstAckParticlesFx";
+import { burstFeedbackParticlesFx } from "~/ui/pixi/animation/burstFeedbackParticlesFx";
 import type { ActiveDrag } from "~/ui/pixi/drag/ActiveDrag";
 import type { CursorGrabMotion } from "~/ui/pixi/drag/CursorGrabMotion";
 import type { MainDragController } from "~/ui/pixi/drag/MainDragController";
@@ -17,7 +18,6 @@ import { createDragPreviewFx } from "~/ui/pixi/drag/createDragPreviewFx";
 import { createPointerSamplerFx } from "~/ui/pixi/drag/createPointerSamplerFx";
 import { makePointerOffsetReaderFx } from "~/ui/pixi/drag/makePointerOffsetReaderFx";
 import { readInventoryShortcutFx } from "~/ui/pixi/drag/readInventoryShortcutFx";
-import { removeCheatItemFx } from "~/ui/pixi/drag/removeCheatItemFx";
 import { setDraggedActorPoseFx } from "~/ui/pixi/drag/setDraggedActorPoseFx";
 import { settleDraggedActorFx } from "~/ui/pixi/drag/settleDraggedActorFx";
 import { updateMagneticFieldFx } from "~/ui/pixi/drag/updateMagneticFieldFx";
@@ -47,6 +47,21 @@ export namespace createMainDragControllerFx {
 		readonly surface: MainSurface;
 	}
 }
+
+const removeCheatItemFx = Effect.fn("createMainDragControllerFx.removeCheatItemFx")(
+	({ game, sourceItem }: { readonly game: GameEngine; readonly sourceItem: TileActorItem }) =>
+		game
+			.runFx(
+				removeEngineCheatItemFx({
+					itemId: sourceItem.id,
+					revision: sourceItem.revision,
+				}),
+			)
+			.pipe(
+				Effect.as(true),
+				Effect.catch(() => Effect.succeed(false)),
+			),
+);
 
 /**
  * Owns one main-scene pointer gesture from press through activation or drop release.
@@ -376,7 +391,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			if (currentActor === undefined || currentActor.container.destroyed) return;
 			try {
 				RendererRuntime.runSync(
-					burstAckParticlesFx({
+					burstFeedbackParticlesFx({
 						actor: currentActor,
 						animator,
 						tint: readAckTint(),

@@ -15,7 +15,11 @@ export const ItemDetailHigherOwnerGuard = () => {
 	const closeItemDetail = useCloseItemDetail();
 
 	useEffect(() => {
-		if (gameMenu.phase === "closed" || gameMenu.phase === "exiting" || !itemDetail.isOpen) {
+		if (
+			gameMenu.phase === "closed" ||
+			gameMenu.phase === "exiting" ||
+			itemDetail.state.phase === "closed"
+		) {
 			return;
 		}
 		closeItemDetail({
@@ -24,7 +28,7 @@ export const ItemDetailHigherOwnerGuard = () => {
 	}, [
 		closeItemDetail,
 		gameMenu.phase,
-		itemDetail.isOpen,
+		itemDetail.state.phase,
 	]);
 
 	return null;

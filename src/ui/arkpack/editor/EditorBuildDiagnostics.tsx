@@ -1,8 +1,7 @@
-import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { EditorProject } from "~/editor/EditorProject";
 import type { EditorGameDiagnostic } from "~/editor/build/fn/readEditorBuildFailureFn";
 import { EditorDiagnosticLink } from "~/ui/arkpack/editor/EditorDiagnosticLink";
-import { printEditorGameDiagnosticFx } from "~/ui/arkpack/editor/printEditorGameDiagnosticFx";
+import { printEditorGameDiagnosticFn } from "~/ui/arkpack/editor/fn/printEditorGameDiagnosticFn";
 
 /** Renders structured build diagnostics without discarding their actionable editor context. */
 export const EditorBuildDiagnostics = ({
@@ -14,9 +13,7 @@ export const EditorBuildDiagnostics = ({
 }) => (
 	<ul className="mt-4 grid gap-3">
 		{diagnostics.map((diagnostic, index) => {
-			const printed = RendererRuntime.runSync(
-				printEditorGameDiagnosticFx(diagnostic, project),
-			);
+			const printed = printEditorGameDiagnosticFn(diagnostic, project);
 			return (
 				<li
 					key={`${diagnostic.code}-${diagnostic.source ?? "project"}-${diagnostic.path.join(".")}-${index}`}

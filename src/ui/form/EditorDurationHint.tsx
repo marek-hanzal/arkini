@@ -1,8 +1,7 @@
-import { RendererRuntime } from "~/renderer/RendererRuntime";
-import { formatEditorDurationFx } from "~/ui/form/formatEditorDurationFx";
+import { formatEditorDurationFn } from "~/ui/form/fn/formatEditorDurationFn";
 
 export const EditorDurationHint = ({ seconds }: { readonly seconds: number }) => {
-	const duration = RendererRuntime.runSync(formatEditorDurationFx(seconds));
+	const duration = formatEditorDurationFn(seconds);
 	if (duration === undefined) return null;
 	return (
 		<span

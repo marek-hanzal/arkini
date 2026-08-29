@@ -25,7 +25,7 @@ import { openEditorExportDirectoryCommandAtom } from "~/ui/editor/openEditorExpo
 import type { EditorProject } from "~/editor/EditorProject";
 import { useEditorProject } from "~/ui/editor/useEditorProject";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
-import { formatByteSizeFx } from "~/ui/arkpack/editor/formatByteSizeFx";
+import { formatByteSizeFn } from "~/ui/arkpack/editor/fn/formatByteSizeFn";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 
 const emptyDiagnostics: ReadonlyArray<EditorGameDiagnostic> = [];
@@ -196,7 +196,7 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 		.with(
 			P.nonNullable,
 			(currentArtifact) =>
-				`${readArkpackArtifactNameFn(currentArtifact.projectId)} · ${RendererRuntime.runSync(formatByteSizeFx(currentArtifact.size))} · v${project.version} · Arkini ${ArkiniAppVersion} · Community · ${currentArtifact.contentHash}`,
+				`${readArkpackArtifactNameFn(currentArtifact.projectId)} · ${formatByteSizeFn(currentArtifact.size)} · v${project.version} · Arkini ${ArkiniAppVersion} · Community · ${currentArtifact.contentHash}`,
 		)
 		.otherwise(() => undefined);
 	const installedPackageId =

@@ -6,7 +6,7 @@ import type {
 } from "~/editor/origin-flow/EditorItemOriginFlow";
 import { type EditorItemOriginSource } from "~/editor/EditorItemOriginSource";
 import { createEditorAcquisitionGraphFx } from "~/editor/createEditorAcquisitionGraphFx";
-import { readEditorItemOriginSourcesFn } from "~/editor/fn/readEditorItemOriginSourcesFn";
+import { readEditorItemOriginSourcesFn } from "~/editor/origin-flow/fn/readEditorItemOriginSourcesFn";
 import { reportEditorItemOriginFlowProgressFx } from "~/editor/origin-flow/fx/reportEditorItemOriginFlowProgressFx";
 import { yieldEditorItemOriginFlowFx } from "~/editor/origin-flow/fx/yieldEditorItemOriginFlowFx";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";

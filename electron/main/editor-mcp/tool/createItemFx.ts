@@ -3,7 +3,7 @@ import { Effect } from "effect";
 
 import type { EditorProject } from "~/editor/EditorProject";
 import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
-import { createEditorItemDraftFn } from "~/editor/fn/createEditorItemDraftFn";
+import { createEditorItemDraftFn } from "~/editor/item/fn/createEditorItemDraftFn";
 import { saveEditorItemWithRepositoryFx } from "~/editor/saveEditorItemWithRepositoryFx";
 import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { CreateItemInput } from "./CreateItemInputSchemas";

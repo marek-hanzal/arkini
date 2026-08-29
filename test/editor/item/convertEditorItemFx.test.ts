@@ -4,7 +4,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { convertEditorItemFx } from "~/editor/item/fx/convertEditorItemFx";
-import { createEditorItemDraftFn } from "~/editor/fn/createEditorItemDraftFn";
+import { createEditorItemDraftFn } from "~/editor/item/fn/createEditorItemDraftFn";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 
 const createItem = (type: (typeof TypeSchema.options)[number]): ItemSchema.Type => ({

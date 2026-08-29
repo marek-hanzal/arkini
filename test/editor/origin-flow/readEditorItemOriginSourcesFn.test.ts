@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { createEditorAcquisitionGraphFx } from "~/editor/createEditorAcquisitionGraphFx";
-import { readEditorItemOriginSourcesFn } from "~/editor/fn/readEditorItemOriginSourcesFn";
+import { readEditorItemOriginSourcesFn } from "~/editor/origin-flow/fn/readEditorItemOriginSourcesFn";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";

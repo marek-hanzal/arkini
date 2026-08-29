@@ -13,7 +13,7 @@ import {
 } from "~/ui/form/SelectableStateClassName";
 import { readEditorFieldErrorFn } from "~/ui/form/fn/readEditorFieldErrorFn";
 import { EditorItemAutocompleteField } from "~/ui/item/EditorItemAutocompleteField";
-import { EditorAssetAutocompleteField } from "~/ui/resource/editor/EditorAssetAutocompleteField";
+import { EditorAssetAutocompleteField } from "~/asset-authoring/ui/EditorAssetAutocompleteField";
 
 const EditorField = ({
 	children,

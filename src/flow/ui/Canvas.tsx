@@ -13,7 +13,7 @@ import { type NodeMetrics, readNodeMetricsFn } from "~/flow/ui/fn/readNodeMetric
 import { useCanvasPointer } from "~/flow/ui/useCanvasPointer";
 import { useProjection } from "~/flow/ui/useProjection";
 import { useNavigation } from "~/flow/ui/useNavigation";
-import { useEditorResourceUrls } from "~/ui/resource/editor/useEditorResourceUrl";
+import { useEditorResourceUrls } from "~/asset-authoring/ui/EditorResourceUrlSession";
 
 interface CanvasProps {
 	readonly backbones: ReadonlyMap<string, ReadonlyArray<LayoutPoint>>;

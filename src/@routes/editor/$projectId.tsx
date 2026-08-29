@@ -9,7 +9,7 @@ import { readEditorProjectFx } from "~/project-authoring/readEditorProjectFx";
 import { ButtonLink } from "~/ui/button/Button";
 import { EditorProjectReplacementBoundary } from "~/authoring-session/EditorProjectReplacementBoundary";
 import { EditorShell } from "~/authoring-shell/EditorShell";
-import { EditorProjectResourceUrlProvider } from "~/ui/resource/editor/EditorResourceUrlProvider";
+import { EditorProjectResourceUrlProvider } from "~/asset-authoring/ui/EditorResourceUrlSession";
 import { EditorVersionRestoreAction } from "~/project-version/workspace/EditorVersionRestoreAction";
 
 const syncRoutedEditorBoardGameFx = Effect.fn("syncRoutedEditorBoardGameFx")(

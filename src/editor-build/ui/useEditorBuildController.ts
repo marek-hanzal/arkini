@@ -23,7 +23,7 @@ import type { EditorProjectBuildSchema } from "~/editor-build/domain/EditorProje
 import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerAtom";
 import { useEditorProject } from "~/authoring-session/useEditorProject";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
-import { formatByteSizeFn } from "~/ui/resource/formatByteSizeFn";
+import { formatByteSizeFn } from "~/ui/formatByteSizeFn";
 import { installBuiltEditorArkpackFx } from "~/editor-build/renderer/installBuiltEditorArkpackFx";
 import { saveEditorBuildFx } from "~/editor-build/renderer/saveEditorBuildFx";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";

@@ -88,10 +88,11 @@ const routeLines = (
 	]);
 };
 
-const formatEstimate = (project: EditorProject, estimate: EditorItemEstimate) => {
-	const target = project.config.items[estimate.factId];
-	if (target === undefined)
-		throw new Error(`Item ${estimate.factId} does not exist in the open project.`);
+const formatEstimate = (
+	project: EditorProject,
+	target: EditorProject["config"]["items"][string],
+	estimate: EditorItemEstimate,
+) => {
 	const header = [
 		"Item estimate",
 		`Item ID: ${target.id}`,
@@ -154,6 +155,9 @@ export const readItemEstimateTextFx = Effect.fn("readItemEstimateTextFx")(functi
 	itemId: string,
 	quantity: number,
 ) {
+	const target = project.config.items[itemId];
+	if (target === undefined)
+		return yield* Effect.fail(new Error(`Item ${itemId} does not exist in the open project.`));
 	const graph = createEditorAcquisitionGraphFn(project.config);
 	const estimate = estimateEditorItemsFn({
 		graph,
@@ -164,5 +168,5 @@ export const readItemEstimateTextFx = Effect.fn("readItemEstimateTextFx")(functi
 			},
 		],
 	})[0]!;
-	return formatEstimate(project, estimate);
+	return formatEstimate(project, target, estimate);
 });

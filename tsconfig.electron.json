@@ -25,6 +25,7 @@
 	"include": [
 		"electron",
 		"src/game-start",
+		"src/game-event",
 		"src/production-action",
 		"src/production-condition",
 		"src/production-delivery",

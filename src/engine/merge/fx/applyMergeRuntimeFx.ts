@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
-import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
+import { readOutputPlacementItemEventsFx } from "~/game-event/readOutputPlacementItemEventsFx";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
 import { outputFx } from "~/production-output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";

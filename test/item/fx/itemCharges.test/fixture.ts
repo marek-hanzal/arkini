@@ -15,7 +15,7 @@ import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
 import { StateSchema } from "~/engine/state/schema/StateSchema";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { ItemChargesIssueReasonEnumSchema } from "~/engine/runtime/schema/check/ItemChargesIssueReasonEnumSchema";
 

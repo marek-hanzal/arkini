@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { useGameEvents } from "~/ui/game/useGameEvents";
 import { readGameAudioCuesFn } from "~/ui/audio/fn/readGameAudioCuesFn";
 

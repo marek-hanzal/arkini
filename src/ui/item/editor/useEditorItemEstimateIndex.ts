@@ -2,8 +2,8 @@ import { useAtom } from "@effect/atom-react";
 import { useEffect, useMemo } from "react";
 
 import type { EditorProject } from "~/editor/EditorProject";
+import { createEditorItemEstimateIndexFn } from "~/editor/estimator/fn/createEditorItemEstimateIndexFn";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
-import { createEditorItemEstimateIndexFx } from "~/editor/createEditorItemEstimateIndexFx";
 import type { EditorItemEstimateIndexRow } from "~/editor/EditorItemEstimateIndex";
 import type { EditorItemEstimateSortSchema } from "~/editor/EditorItemEstimateSortSchema";
 import { selectEditorItemEstimateIndexFx } from "~/editor/selectEditorItemEstimateIndexFx";
@@ -69,12 +69,10 @@ export const useEditorItemEstimateIndex = (
 		snapshot,
 	]);
 	const selection = useMemo(() => {
-		const entries = RendererRuntime.runSync(
-			createEditorItemEstimateIndexFx({
-				estimates: state.estimates,
-				itemIds: Object.keys(project.config.items),
-			}),
-		);
+		const entries = createEditorItemEstimateIndexFn({
+			estimates: state.estimates,
+			itemIds: Object.keys(project.config.items),
+		});
 		return {
 			maximumDemand: Math.max(0, ...entries.map(({ demand }) => demand)),
 			rows: RendererRuntime.runSync(

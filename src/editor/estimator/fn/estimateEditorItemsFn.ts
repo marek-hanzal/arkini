@@ -1,3 +1,5 @@
+import { Order } from "effect";
+
 import type {
 	EditorAcquisitionGraph,
 	EditorAcquisitionRequirement,
@@ -153,7 +155,7 @@ const createIndex = (graph: EditorAcquisitionGraph): EstimateIndex => {
 				right.output.expectedYield > epsilon
 					? (right.durationMs * right.runMultiplier) / right.output.expectedYield
 					: Number.POSITIVE_INFINITY;
-			return leftDuration - rightDuration || left.id.localeCompare(right.id);
+			return leftDuration - rightDuration || Order.String(left.id, right.id);
 		});
 	const roots = new Map(
 		graph.roots.map(({ factId, quantity }) => [
@@ -218,7 +220,7 @@ const groupRequirements = (
 	return [
 		...groups.values(),
 	]
-		.sort((left, right) => left.factId.localeCompare(right.factId))
+		.sort((left, right) => Order.String(left.factId, right.factId))
 		.map(({ distinctOneTime: _distinctOneTime, ...group }) => group);
 };
 
@@ -286,7 +288,7 @@ const createEstimateTopology = (
 			const selected = [
 				...clause,
 			]
-				.sort((left, right) => left.factId.localeCompare(right.factId))
+				.sort((left, right) => Order.String(left.factId, right.factId))
 				.map((requirement) => ({
 					dependencies: readDependencies(requirement),
 					requirement,
@@ -513,7 +515,7 @@ const readRequirementSummary = ({ nodes, occurrenceCountByNode }: EstimateNodeGr
 			...quantities,
 		]
 			.filter(([, amount]) => amount > epsilon)
-			.sort(([left], [right]) => left.localeCompare(right))
+			.sort(([left], [right]) => Order.String(left, right))
 			.map(([amountFactId, amount]) => ({
 				factId: amountFactId,
 				quantity: amount,
@@ -629,7 +631,7 @@ export const estimateEditorItemsFn = ({
 					? undefined
 					: [
 							...missingClause,
-						].sort((left, right) => left.factId.localeCompare(right.factId))[0]);
+						].sort((left, right) => Order.String(left.factId, right.factId))[0]);
 			if (missingRequirement === undefined)
 				return {
 					diagnostics: [

@@ -1,3 +1,5 @@
+import { Order } from "effect";
+
 import type {
 	EditorItemOriginEdge,
 	EditorItemOriginFlow,
@@ -64,11 +66,11 @@ export const readOutputHighlightFn = (
 	].sort(([leftId], [rightId]) => {
 		const left = nodeById.get(leftId);
 		const right = nodeById.get(rightId);
-		if (left === undefined || right === undefined) return leftId.localeCompare(rightId);
+		if (left === undefined || right === undefined) return Order.String(leftId, rightId);
 		return (
-			left.title.localeCompare(right.title) ||
-			left.itemId.localeCompare(right.itemId) ||
-			leftId.localeCompare(rightId)
+			Order.String(left.title, right.title) ||
+			Order.String(left.itemId, right.itemId) ||
+			Order.String(leftId, rightId)
 		);
 	});
 
@@ -129,7 +131,7 @@ export const readOutputHighlightFn = (
 
 		const directOperationIds = [
 			...new Set(directOutputEdges.map(({ operationId }) => operationId)),
-		].sort((left, right) => left.localeCompare(right));
+		].sort((left, right) => Order.String(left, right));
 		for (const edge of directOutputEdges) markEdge(edge);
 		const rootActiveItemIds = new Set([
 			startNode.id,

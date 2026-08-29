@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
-import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
+import { resolveInputMaterialFn } from "~/engine/input/fn/resolveInputMaterialFn";
 import type { MaterialSchema } from "~/engine/input/schema/MaterialSchema";
 import type { InputCapacityExceededIssueSchema } from "~/engine/input/schema/check/InputCapacityExceededIssueSchema";
 import type { InputLineMissingIssueSchema } from "~/engine/input/schema/check/InputLineMissingIssueSchema";
@@ -9,9 +9,9 @@ import type { InputOwnerMissingIssueSchema } from "~/engine/input/schema/check/I
 import type { InputSelectorMismatchIssueSchema } from "~/engine/input/schema/check/InputSelectorMismatchIssueSchema";
 import type { InputSlotInvalidIssueSchema } from "~/engine/input/schema/check/InputSlotInvalidIssueSchema";
 import type { InputLocationSchema } from "~/engine/location/schema/InputLocationSchema";
-import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
+import { isLineInputClosedFn } from "~/engine/line/fn/isLineInputClosedFn";
 import type { LineInputClosedIssueSchema } from "~/engine/line/schema/check/LineInputClosedIssueSchema";
-import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
+import { readItemLineFn } from "~/engine/line/fn/readItemLineFn";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { matchesItemSelectorFn } from "~/engine/selector/fn/matchesItemSelectorFn";
@@ -70,7 +70,7 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 			continue;
 		}
 
-		const line = yield* readItemLineFx({
+		const line = readItemLineFn({
 			item: owner.item,
 			lineId: location.lineId,
 		});
@@ -135,7 +135,7 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 		const storedQuantity = items.reduce((quantity, candidate) => {
 			return quantity + candidate.item.quantity;
 		}, 0);
-		const closed = yield* isLineInputClosedFx({
+		const closed = isLineInputClosedFn({
 			input: current.input,
 			ownerItemId: current.location.ownerItemId,
 			lineId: current.location.lineId,
@@ -150,7 +150,7 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 				type: RuntimeCheckIssueEnumSchema.enum.LineInputClosed,
 			});
 		}
-		const resolution = yield* resolveInputMaterialFx({
+		const resolution = resolveInputMaterialFn({
 			input: current.input,
 			storedQuantity,
 		});

@@ -1,13 +1,13 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { settleItemDeliveryFx } from "~/engine/delivery/write/settleItemDeliveryFx";
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { settleItemDeliveryFx } from "~test/support/delivery/settleItemDeliveryFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 import { existsWhen } from "~test/line/fx/support/lineTestRuntime";
 import { setInstantGameplayFx } from "~/engine/cheat/write/setInstantGameplayFx";

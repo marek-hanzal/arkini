@@ -1,7 +1,7 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { applyMergeRuntimeFx } from "~/engine/merge/fx/applyMergeRuntimeFx";
 import { queuedOwnedInputMergeFixture } from "~test/merge/write/mergeItemsFx.owned-queue.test/fixture";
 

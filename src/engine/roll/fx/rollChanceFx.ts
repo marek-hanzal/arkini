@@ -1,8 +1,7 @@
-import { Effect } from "effect";
+import { Effect, Random } from "effect";
 
 import type { ChanceSchema } from "~/engine/roll/schema/ChanceSchema";
 import type { RollResultSchema } from "~/engine/roll/schema/RollResultSchema";
-import { testChanceFx } from "./testChanceFx";
 
 export namespace rollChanceFx {
 	export interface Props {
@@ -14,9 +13,7 @@ export namespace rollChanceFx {
  * Selects the configured drops when the roll's probability check succeeds.
  */
 export const rollChanceFx = Effect.fn("rollChanceFx")(function* ({ roll }: rollChanceFx.Props) {
-	const passed = yield* testChanceFx({
-		chance: roll.chance,
-	});
+	const passed = (yield* Random.next) < roll.chance;
 
 	return {
 		drop: passed ? roll.drop : [],

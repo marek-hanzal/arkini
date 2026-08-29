@@ -6,7 +6,7 @@ import {
 	chargesConfig,
 	checkRuntimeFx,
 	expect,
-	fromRuntimeFx,
+	fromRuntimeFn,
 	fromStateFx,
 	it,
 	readRuntimeFx,
@@ -30,7 +30,7 @@ describe("item charges / persistence", () => {
 					lineId: "line:shrine:pray",
 				});
 				const runtime = yield* readRuntimeFx();
-				const state = yield* fromRuntimeFx({
+				const state = fromRuntimeFn({
 					runtime,
 				});
 				const restored = yield* fromStateFx({

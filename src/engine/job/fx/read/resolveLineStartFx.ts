@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readLineInputDeliveryClaimsFx } from "~/engine/delivery/read/readLineInputDeliveryClaimsFx";
+import { readLineInputDeliveryClaimsFn } from "~/engine/delivery/fn/readLineInputDeliveryClaimsFn";
 import { resolveJobQueueFx } from "~/engine/job/fx/read/resolveJobQueueFx";
 import type { JobQueueResolutionSchema } from "~/engine/job/schema/read/JobQueueResolutionSchema";
 import type { LineRun } from "~/engine/line/LineRun";
@@ -44,7 +44,7 @@ export const resolveLineStartFx = Effect.fn("resolveLineStartFx")(function* ({
 		runtime,
 		owner,
 	});
-	const deliveryClaims = yield* readLineInputDeliveryClaimsFx({
+	const deliveryClaims = readLineInputDeliveryClaimsFn({
 		ownerItemId,
 		lineId,
 		runtime,

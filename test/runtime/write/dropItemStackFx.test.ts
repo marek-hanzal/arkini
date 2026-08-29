@@ -1,17 +1,17 @@
 import { Effect, type Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import { setDefaultLineFx } from "~/engine/line/write/setDefaultLineFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
+import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
 import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { purityTestConfig } from "~test/line/support/purityTestConfig";
 
@@ -153,7 +153,7 @@ describe("dropItemFx pure stack integration", () => {
 					outcome,
 					preview,
 					runtime: yield* readRuntimeFx(),
-					transition: yield* readCommittedTransitionFx(),
+					transition: yield* (yield* CommittedTransitionsFx).read,
 				};
 			}),
 		);

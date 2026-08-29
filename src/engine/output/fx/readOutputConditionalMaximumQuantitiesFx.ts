@@ -2,7 +2,6 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readQuantityMaximumFx } from "~/engine/quantity/fx/readQuantityMaximumFx";
 import { TypeSchema } from "~/engine/roll/schema/TypeSchema";
 import type { RollSchema } from "~/engine/roll/schema/RollSchema";
 import type { OutputSchema } from "../schema/OutputSchema";
@@ -60,9 +59,7 @@ const readRollConditionalMaximumQuantitiesFx = Effect.fn("readRollConditionalMax
 				},
 				(roll) =>
 					Effect.gen(function* () {
-						const selectionCount = yield* readQuantityMaximumFx({
-							quantity: roll.quantity,
-						});
+						const selectionCount = roll.quantity.max;
 						const candidates = yield* Effect.all(
 							roll.drop.map(({ drop }) =>
 								readDropMaximumQuantitiesFx({

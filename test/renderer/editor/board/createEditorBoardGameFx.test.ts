@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { EditorProject } from "~/editor/EditorProject";
 import { createEditorBoardGameFx } from "~/renderer/editor/board/createEditorBoardGameFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 const project: EditorProject = {

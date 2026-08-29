@@ -1,13 +1,12 @@
-import { Effect } from "effect";
+import { Array, Effect } from "effect";
 
 import { resolveActionChargeFx } from "~/engine/action/fx/resolveActionChargeFx";
-import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
+import { resolveInputMaterialFn } from "~/engine/input/fn/resolveInputMaterialFn";
 import type { InputRun } from "~/engine/input/InputRun";
 import type { MaterialSchema } from "~/engine/input/schema/MaterialSchema";
 import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { planInputMaterialRunFx } from "./planInputMaterialRunFx";
 
 export namespace resolveInputMaterialRunFx {
 	export interface Props {
@@ -18,6 +17,48 @@ export namespace resolveInputMaterialRunFx {
 		runtime: RuntimeSchema.Type;
 	}
 }
+
+const planInputMaterialRunFn = ({
+	items,
+	resolution,
+	charges,
+}: {
+	readonly items: InputRuntimeItemSchema.Type[];
+	readonly resolution: InputRun.MaterialResolution;
+	readonly charges?: InputRun.ChargePlan;
+}) => {
+	if (!resolution.ready) return undefined;
+
+	const [remainingQuantity, allocation] = Array.mapAccum(
+		items,
+		resolution.runQuantity,
+		(remaining, item) => {
+			const quantity = Math.min(remaining, item.quantity);
+			return [
+				remaining - quantity,
+				quantity > 0
+					? {
+							itemId: item.id,
+							quantity,
+						}
+					: undefined,
+			] as const;
+		},
+	);
+	const [firstItem, ...remainingItems] = allocation.filter((item) => item !== undefined);
+	if (remainingQuantity > 0 || firstItem === undefined) return undefined;
+
+	return {
+		type: resolution.type,
+		mode: resolution.mode,
+		quantity: resolution.runQuantity,
+		charges,
+		item: [
+			firstItem,
+			...remainingItems,
+		],
+	} satisfies InputRun.MaterialPlan;
+};
 
 /**
  * Resolves one material input and prepares its exact allocation when ready.
@@ -32,7 +73,7 @@ export const resolveInputMaterialRunFx = Effect.fn("resolveInputMaterialRunFx")(
 	const storedQuantity = items.reduce((quantity, item) => {
 		return quantity + item.quantity;
 	}, 0);
-	const materialResolution = yield* resolveInputMaterialFx({
+	const materialResolution = resolveInputMaterialFn({
 		input,
 		storedQuantity,
 	});
@@ -46,7 +87,7 @@ export const resolveInputMaterialRunFx = Effect.fn("resolveInputMaterialRunFx")(
 		...materialResolution,
 		ready: materialResolution.ready && charges.ready,
 	};
-	const plan = yield* planInputMaterialRunFx({
+	const plan = planInputMaterialRunFn({
 		items,
 		resolution,
 		charges: charges.plan,

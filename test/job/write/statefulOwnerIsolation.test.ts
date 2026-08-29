@@ -3,10 +3,10 @@ import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
 
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 
 const config = GameConfigSchema.parse({
 	resources: {

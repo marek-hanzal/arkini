@@ -1,15 +1,13 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
-import { getItemAtFx } from "~/engine/runtime/read/getItemAtFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { getItemFx } from "~/engine/runtime/read/getItemFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
-import { setItemQuantityFx } from "~/engine/runtime/write/setItemQuantityFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { swapItemsFx } from "~/engine/runtime/write/swapItemsFx";
 
 const config = GameConfigSchema.parse({
@@ -88,7 +86,7 @@ const inventoryA = {
 };
 
 describe("runtime commands", () => {
-	it("owns every spatial and item-state mutation through dedicated atomic commands", () => {
+	it("owns spatial mutation through dedicated atomic commands", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const log = yield* spawnItemFx({
@@ -108,14 +106,9 @@ describe("runtime commands", () => {
 					location: boardB,
 					revision: log.revision,
 				});
-				const quantity = yield* setItemQuantityFx({
-					itemId: log.id,
-					quantity: 4,
-					revision: moved.item.revision,
-				});
 				const swapped = yield* swapItemsFx({
 					firstItemId: log.id,
-					firstItemRevision: quantity.revision,
+					firstItemRevision: moved.item.revision,
 					secondItemId: stone.id,
 					secondItemRevision: stone.revision,
 				});
@@ -127,7 +120,6 @@ describe("runtime commands", () => {
 
 				return {
 					moved,
-					quantity,
 					removed,
 					runtime,
 					swapped,
@@ -141,7 +133,6 @@ describe("runtime commands", () => {
 
 		expect(result.moved.previousLocation).toEqual(boardA);
 		expect(result.moved.item.location).toEqual(boardB);
-		expect(result.quantity.quantity).toBe(4);
 		expect(result.swapped.first.location).toEqual(inventoryA);
 		expect(result.swapped.second.location).toEqual(boardB);
 		expect(result.removed.id).toBe("runtime:stone");
@@ -226,8 +217,8 @@ describe("runtime commands", () => {
 				const log = yield* getItemFx({
 					itemId: "runtime:log",
 				});
-				const stone = yield* getItemAtFx({
-					location: boardB,
+				const stone = yield* getItemFx({
+					itemId: "runtime:stone",
 				});
 				const runtime = yield* readRuntimeFx();
 
@@ -380,65 +371,6 @@ describe("runtime commands", () => {
 				);
 			}),
 		).toHaveLength(1);
-	});
-
-	it("rejects concurrent absolute updates from one stale item revision", async () => {
-		const result = await Effect.runPromise(
-			Effect.gen(function* () {
-				const item = yield* spawnItemFx({
-					id: "runtime:log",
-					itemId: "log",
-					location: boardA,
-					quantity: 1,
-				});
-				const attempts = yield* Effect.all(
-					[
-						Effect.result(
-							setItemQuantityFx({
-								itemId: item.id,
-								quantity: 2,
-								revision: item.revision,
-							}),
-						),
-						Effect.result(
-							setItemQuantityFx({
-								itemId: item.id,
-								quantity: 3,
-								revision: item.revision,
-							}),
-						),
-					],
-					{
-						concurrency: "unbounded",
-					},
-				);
-				const runtime = yield* readRuntimeFx();
-
-				return {
-					attempts,
-					runtime,
-				};
-			}).pipe(
-				useGameFx({
-					config,
-				}),
-			),
-		);
-
-		expect(result.attempts.filter(Result.isSuccess)).toHaveLength(1);
-		expect(result.attempts.filter(Result.isFailure)).toHaveLength(1);
-		expect(result.runtime.items[0]?.quantity).toSatisfy((quantity: number) => {
-			return quantity === 2 || quantity === 3;
-		});
-		const conflict = result.attempts.find(Result.isFailure);
-		if (conflict === undefined || Result.isSuccess(conflict)) {
-			throw new Error("Expected one stale quantity revision conflict.");
-		}
-		expect(conflict.failure).toMatchObject({
-			_tag: "RevisionConflictError",
-			entityId: "runtime:log",
-			expectedRevision: expect.stringMatching(/^revision:/),
-		});
 	});
 
 	it("serializes concurrent removals of one item", async () => {

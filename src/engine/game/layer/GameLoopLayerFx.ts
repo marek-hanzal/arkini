@@ -1,7 +1,7 @@
 import { Cause, Duration, Effect, Fiber, Layer, Schedule } from "effect";
 
 import { GameLoopFx } from "~/engine/game/context/GameLoopFx";
-import { runTickRuntimeFx } from "~/engine/tick/fx/runTickRuntimeFx";
+import { TickFx } from "~/engine/tick/context/TickFx";
 import { TickStepMs } from "~/engine/tick/TickStepMs";
 
 export namespace GameLoopLayerFx {
@@ -22,7 +22,8 @@ export const GameLoopLayerFx = ({
 	intervalMs = TickStepMs,
 	onFatalError = () => undefined,
 }: GameLoopLayerFx.Props = {}) => {
-	const advance = runTickRuntimeFx().pipe(
+	const advance = TickFx.pipe(
+		Effect.flatMap(({ advanceRuntime }) => advanceRuntime),
 		Effect.onError((cause) =>
 			Cause.hasInterruptsOnly(cause) ? Effect.void : Effect.sync(() => onFatalError(cause)),
 		),

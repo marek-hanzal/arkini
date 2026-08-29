@@ -6,7 +6,7 @@ import type { MaterialSchema } from "~/engine/input/schema/MaterialSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import { readMaterialInputEligibilityFn } from "~/engine/input/read/fn/readMaterialInputEligibilityFn";
 import { selectItemsFn } from "~/engine/selector/fn/selectItemsFn";
-import { resolveInputMaterialFx } from "./resolveInputMaterialFx";
+import { resolveInputMaterialFn } from "~/engine/input/fn/resolveInputMaterialFn";
 
 export namespace planInputMaterialStoreFx {
 	export interface Props {
@@ -46,7 +46,7 @@ export const planInputMaterialStoreFx = Effect.fn("planInputMaterialStoreFx")(fu
 		return undefined;
 	}
 
-	const resolution = yield* resolveInputMaterialFx({
+	const resolution = resolveInputMaterialFn({
 		input,
 		storedQuantity,
 	});

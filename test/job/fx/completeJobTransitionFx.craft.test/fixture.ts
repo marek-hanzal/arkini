@@ -1,9 +1,9 @@
 import { Effect, type Layer } from "effect";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { craftCompletionConfig } from "~test/job/fx/completeJobTransitionFx.craft.test/config";
 
 type CraftItemId =

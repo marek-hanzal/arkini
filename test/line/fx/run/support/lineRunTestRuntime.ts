@@ -117,6 +117,20 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 							],
 							multiplier: 0.5,
 						},
+						{
+							type: "runtime:adjust",
+							when: [
+								existsWhen("adjuster"),
+							],
+							adjustMs: -400,
+						},
+						{
+							type: "runtime:adjust",
+							when: [
+								existsWhen("floor"),
+							],
+							adjustMs: -200,
+						},
 					],
 				},
 			],
@@ -138,6 +152,20 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 		booster: {
 			...baseItem({
 				id: "booster",
+				scope: "any",
+			}),
+			type: "simple",
+		},
+		adjuster: {
+			...baseItem({
+				id: "adjuster",
+				scope: "any",
+			}),
+			type: "simple",
+		},
+		floor: {
+			...baseItem({
+				id: "floor",
 				scope: "any",
 			}),
 			type: "simple",
@@ -173,7 +201,7 @@ const gridItem = ({
 	x,
 }: {
 	id: string;
-	itemId: "blocker" | "booster" | "permit";
+	itemId: "adjuster" | "blocker" | "booster" | "floor" | "permit";
 	x: number;
 }) => {
 	return {
@@ -207,13 +235,17 @@ const bufferedWater = ({ id, quantity }: { id: string; quantity: number }) => {
 };
 
 export const lineRunRuntime = ({
+	adjuster = false,
 	blocker = false,
 	booster = false,
+	floor = false,
 	permit = false,
 	water = [],
 }: {
+	adjuster?: boolean;
 	blocker?: boolean;
 	booster?: boolean;
+	floor?: boolean;
 	permit?: boolean;
 	water?: number[];
 }) => {
@@ -239,12 +271,30 @@ export const lineRunRuntime = ({
 			}),
 		);
 	}
+	if (adjuster) {
+		items.push(
+			gridItem({
+				id: "runtime:adjuster",
+				itemId: "adjuster",
+				x: 3,
+			}),
+		);
+	}
+	if (floor) {
+		items.push(
+			gridItem({
+				id: "runtime:floor",
+				itemId: "floor",
+				x: 4,
+			}),
+		);
+	}
 	if (blocker) {
 		items.push(
 			gridItem({
 				id: "runtime:blocker",
 				itemId: "blocker",
-				x: 3,
+				x: 0,
 			}),
 		);
 	}

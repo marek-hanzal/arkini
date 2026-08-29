@@ -3,11 +3,11 @@ import { describe, expect, it } from "vitest";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import { readTileDeliveriesFx } from "~/ui/pixi/delivery/readTileDeliveriesFx";
-import { settleItemDeliveryFx } from "~/engine/delivery/write/settleItemDeliveryFx";
-import { useGameFx } from "~/engine/game/fx/useGameFx";
-import { autofillLineInputsFx } from "~/engine/input/write/autofillLineInputsFx";
+import { settleItemDeliveryFx } from "~test/support/delivery/settleItemDeliveryFx";
+import { useGameFx } from "~test/support/game/useGameFx";
+import { autofillLineInputsFx } from "~test/support/input/autofillLineInputsFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import {
 	inputRuntimeTestConfig,
 	inputRuntimeToolbarTestConfig,

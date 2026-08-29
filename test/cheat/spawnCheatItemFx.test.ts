@@ -5,7 +5,7 @@ import { readCheatItemCatalogFx } from "~/engine/cheat/read/readCheatItemCatalog
 import { removeCheatItemFx } from "~/engine/cheat/write/removeCheatItemFx";
 import { setCheatEnabledFx } from "~/engine/cheat/write/setCheatEnabledFx";
 import { spawnCheatItemFx } from "~/engine/cheat/write/spawnCheatItemFx";
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 

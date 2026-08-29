@@ -3,7 +3,6 @@ import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readDropMaximumQuantitiesFx } from "~/engine/output/fx/readDropMaximumQuantitiesFx";
-import { readQuantityMaximumFx } from "~/engine/quantity/fx/readQuantityMaximumFx";
 import type { RollSchema } from "~/engine/roll/schema/RollSchema";
 import { TypeSchema } from "~/engine/roll/schema/TypeSchema";
 
@@ -44,9 +43,7 @@ export const readRollMaximumQuantitiesFx = Effect.fn("readRollMaximumQuantitiesF
 			},
 			(roll) =>
 				Effect.gen(function* () {
-					const selectionCount = yield* readQuantityMaximumFx({
-						quantity: roll.quantity,
-					});
+					const selectionCount = roll.quantity.max;
 					const quantities = new Map<IdSchema.Type, number>();
 
 					for (const candidate of roll.drop) {

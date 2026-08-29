@@ -6,7 +6,7 @@ import { InputMaterialNotFoundError } from "~/engine/input/error/InputMaterialNo
 import type { MaterialSchema } from "~/engine/input/schema/MaterialSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { LineNotFoundError } from "~/engine/line/error/LineNotFoundError";
-import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
+import { readItemLineFn } from "~/engine/line/fn/readItemLineFn";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 
 export namespace readItemMaterialInputFx {
@@ -27,7 +27,7 @@ export const readItemMaterialInputFx = Effect.fn("readItemMaterialInputFx")(func
 	lineId,
 	ownerItemId,
 }: readItemMaterialInputFx.Props) {
-	const line = yield* readItemLineFx({
+	const line = readItemLineFn({
 		item,
 		lineId,
 	});

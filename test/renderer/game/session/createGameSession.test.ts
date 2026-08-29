@@ -4,7 +4,7 @@ import { createTestGameSession } from "~test/support/game/createTestGameSession"
 import { Effect } from "effect";
 import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
 import type { Game } from "~/renderer/game/Game";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { createTickFailureTestConfig } from "~test/tick/support/createTickFailureTestConfig";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 

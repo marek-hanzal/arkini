@@ -1,13 +1,13 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { enqueueDefaultLineFx } from "~/engine/job/write/enqueueDefaultLineFx";
 import { fillDefaultLineQueueFx } from "~/engine/job/write/fillDefaultLineQueueFx";
 import { unsetDefaultLineFx } from "~/engine/line/write/unsetDefaultLineFx";
-import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
+import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 import { startLineFx } from "~test/job/support/startLineTestFx";
@@ -59,11 +59,11 @@ describe("fillDefaultLineQueueFx", () => {
 				const second = yield* enqueueDefaultLineFx({
 					ownerItemId,
 				});
-				const before = yield* readCommittedTransitionFx();
+				const before = yield* (yield* CommittedTransitionsFx).read;
 				const filled = yield* fillDefaultLineQueueFx({
 					ownerItemId,
 				});
-				const after = yield* readCommittedTransitionFx();
+				const after = yield* (yield* CommittedTransitionsFx).read;
 				return {
 					after,
 					before,
@@ -103,11 +103,11 @@ describe("fillDefaultLineQueueFx", () => {
 				const first = yield* fillDefaultLineQueueFx({
 					ownerItemId,
 				});
-				const before = yield* readCommittedTransitionFx();
+				const before = yield* (yield* CommittedTransitionsFx).read;
 				const second = yield* fillDefaultLineQueueFx({
 					ownerItemId,
 				});
-				const after = yield* readCommittedTransitionFx();
+				const after = yield* (yield* CommittedTransitionsFx).read;
 				return {
 					after,
 					before,
@@ -172,14 +172,14 @@ describe("fillDefaultLineQueueFx", () => {
 				yield* unsetDefaultLineFx({
 					ownerItemId,
 				});
-				const before = yield* readCommittedTransitionFx();
+				const before = yield* (yield* CommittedTransitionsFx).read;
 				const attempt = yield* Effect.result(
 					fillDefaultLineQueueFx({
 						ownerItemId,
 					}),
 				);
 				return {
-					after: yield* readCommittedTransitionFx(),
+					after: yield* (yield* CommittedTransitionsFx).read,
 					attempt,
 					before,
 				};

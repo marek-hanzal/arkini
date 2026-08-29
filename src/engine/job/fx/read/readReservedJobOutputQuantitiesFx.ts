@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
+import { readItemLineFn } from "~/engine/line/fn/readItemLineFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { readJobMaximumOutputQuantitiesFx } from "./readJobMaximumOutputQuantitiesFx";
 
@@ -24,7 +24,7 @@ export const readReservedJobOutputQuantitiesFx = Effect.fn("readReservedJobOutpu
 		for (const job of runtime.jobs) {
 			const owner = runtime.items.find((item) => item.id === job.ownerItemId);
 			if (owner === undefined) continue;
-			const line = yield* readItemLineFx({
+			const line = readItemLineFn({
 				item: owner.item,
 				lineId: job.lineId,
 			});

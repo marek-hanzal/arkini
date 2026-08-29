@@ -8,7 +8,7 @@ import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
 import { JobNotFoundError } from "~/engine/job/error/JobNotFoundError";
 import { JobNotReadyError } from "~/engine/job/error/JobNotReadyError";
 import { makeJobCompletionRandomFx } from "~/engine/job/random/makeJobCompletionRandomFx";
-import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
+import { readItemLineFn } from "~/engine/line/fn/readItemLineFn";
 import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
 import { isJobRuntimeItemFn } from "~/engine/runtime/read/fn/isJobRuntimeItemFn";
 import { isReservedRuntimeItemFn } from "~/engine/runtime/read/fn/isReservedRuntimeItemFn";
@@ -53,7 +53,7 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 				location: runtimeOwner.location,
 			}),
 		);
-	const line = yield* readItemLineFx({
+	const line = readItemLineFn({
 		item: owner.item,
 		lineId: job.lineId,
 	});

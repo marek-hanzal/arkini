@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Effect, Result } from "effect";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { DropItemResultKind } from "~/engine/runtime/DropItemResult";

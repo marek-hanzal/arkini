@@ -8,7 +8,7 @@ import {
 	inventory,
 	readRuntimeFx,
 	run,
-	setCurrentSpaceFx,
+	spawnAndActivate,
 	spawnItemFx,
 } from "./activateSpaceItemFx.test/fixture";
 
@@ -155,8 +155,10 @@ describe("Space item activation admission", () => {
 					quantity: 1,
 				});
 				const observed = yield* readRuntimeFx();
-				yield* setCurrentSpaceFx({
-					space: 1,
+				yield* spawnAndActivate({
+					id: "runtime:navigator",
+					itemId: "portal",
+					location: inventory(0),
 				});
 				const before = yield* readRuntimeFx();
 				const attempt = yield* Effect.result(
@@ -178,7 +180,7 @@ describe("Space item activation admission", () => {
 		if (Result.isFailure(result.attempt)) {
 			expect(result.attempt.failure).toMatchObject({
 				_tag: "CurrentSpaceConflictError",
-				actualSpace: 1,
+				actualSpace: 7,
 				expectedSpace: 0,
 			});
 		}

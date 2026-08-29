@@ -2,11 +2,11 @@ import { Effect, Option } from "effect";
 
 import type { DeliveryTargetIssueSchema } from "~/engine/delivery/schema/check/DeliveryTargetIssueSchema";
 import { DeliveryTargetIssueReasonEnumSchema } from "~/engine/delivery/schema/check/DeliveryTargetIssueReasonEnumSchema";
-import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
+import { resolveInputMaterialFn } from "~/engine/input/fn/resolveInputMaterialFn";
 import { isMaterialInputEligibleFn } from "~/engine/input/read/fn/isMaterialInputEligibleFn";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
-import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
-import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
+import { isLineInputClosedFn } from "~/engine/line/fn/isLineInputClosedFn";
+import { readItemLineFn } from "~/engine/line/fn/readItemLineFn";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { isDeliveryRuntimeItemFn } from "~/engine/runtime/read/fn/isDeliveryRuntimeItemFn";
 import type { DeliveryRuntimeItemSchema } from "~/engine/runtime/schema/DeliveryRuntimeItemSchema";
@@ -71,7 +71,7 @@ export const checkRuntimeDeliveriesFx = Effect.fn("checkRuntimeDeliveriesFx")(fu
 			issues.push(issue(DeliveryTargetIssueReasonEnumSchema.enum.OwnerNotOnBoard));
 			continue;
 		}
-		const line = yield* readItemLineFx({
+		const line = readItemLineFn({
 			item: owner.item,
 			lineId: target.lineId,
 		});
@@ -97,7 +97,7 @@ export const checkRuntimeDeliveriesFx = Effect.fn("checkRuntimeDeliveriesFx")(fu
 				continue;
 			}
 			if (
-				yield* isLineInputClosedFx({
+				isLineInputClosedFn({
 					input,
 					ownerItemId: owner.id,
 					lineId: line.id,
@@ -134,7 +134,7 @@ export const checkRuntimeDeliveriesFx = Effect.fn("checkRuntimeDeliveriesFx")(fu
 		});
 		const owner = runtime.items.find((candidate) => candidate.id === target.target.ownerItemId);
 		if (owner === undefined) continue;
-		const line = yield* readItemLineFx({
+		const line = readItemLineFn({
 			item: owner.item,
 			lineId: target.target.lineId,
 		});
@@ -150,7 +150,7 @@ export const checkRuntimeDeliveriesFx = Effect.fn("checkRuntimeDeliveriesFx")(fu
 				? total + candidate.quantity
 				: total;
 		}, 0);
-		const resolution = yield* resolveInputMaterialFx({
+		const resolution = resolveInputMaterialFn({
 			input,
 			storedQuantity,
 		});

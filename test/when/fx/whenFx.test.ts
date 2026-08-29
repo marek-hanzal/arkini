@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { useGameFx } from "~test/support/game/useGameFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { whenFx } from "~/engine/when/fx/whenFx";

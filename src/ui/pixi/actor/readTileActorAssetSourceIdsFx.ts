@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { match, P } from "ts-pattern";
 
-import { readRuntimeItemDefaultAssetIdsFx } from "~/engine/item/read/readRuntimeItemDefaultAssetIdsFx";
 import type { AssetSchema } from "~/engine/item/schema/AssetSchema";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { readRuntimeLineFillProgressFx } from "~/engine/line/read/readRuntimeLineFillProgressFx";
@@ -48,9 +47,7 @@ export const readTileActorAssetSourceIdsFx = Effect.fn("readTileActorAssetSource
 			() => null,
 		)
 		.exhaustive();
-	const defaultAssetIds = yield* readRuntimeItemDefaultAssetIdsFx({
-		item: item.item,
-	});
+	const defaultAssetIds = item.item.asset.default;
 	if (progressLine === null || item.item.asset.sources === undefined) {
 		return defaultAssetIds;
 	}

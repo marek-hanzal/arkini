@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { directionalMergeConfig } from "./mergeGameplayFlow.test/directionalMergeConfig";
 
 const mergeLiveItemsFx = (sourceItemId: string, targetItemId: string) =>
@@ -16,12 +16,12 @@ const mergeLiveItemsFx = (sourceItemId: string, targetItemId: string) =>
 			return yield* Effect.die(new Error("Expected live merge participants."));
 		}
 
-		return yield* mergeItemsFx({
+		return (yield* mergeItemsFx({
 			sourceItemId: source.id,
 			sourceRevision: source.revision,
 			targetItemId: target.id,
 			targetRevision: target.revision,
-		});
+		})).event;
 	});
 
 describe("directional merge gameplay", () => {

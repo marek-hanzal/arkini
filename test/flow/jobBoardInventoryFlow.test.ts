@@ -1,15 +1,15 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { TickFx } from "~/engine/tick/context/TickFx";
-import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 
 const props = {

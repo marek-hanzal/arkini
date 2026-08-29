@@ -2,15 +2,15 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
+import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { createJobTestConfig, prepareJobLineFx } from "../../job/support/jobTestConfig";
 
 const startProps = {
@@ -172,7 +172,7 @@ describe("removeItemFx owner lifecycle", () => {
 					itemId: owner.id,
 					revision: owner.revision,
 				});
-				const transition = yield* readCommittedTransitionFx();
+				const transition = yield* (yield* CommittedTransitionsFx).read;
 				const runtime = yield* readRuntimeFx();
 				return {
 					removed,

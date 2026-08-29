@@ -1,15 +1,16 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { readInputMaterialItemsFx } from "~/engine/input/read/readInputMaterialItemsFx";
-import { resolveInputMaterialSlotFx } from "~/engine/input/read/resolveInputMaterialSlotFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { queryFx } from "~/engine/query/fx/queryFx";
+import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { getItemFx } from "~/engine/runtime/read/getItemFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import {
 	inputRuntimeTestConfig,
 	sourceLocation,
@@ -71,6 +72,7 @@ describe("storeInputMaterialFx", () => {
 	it("moves a fully accepted stack into the exact input slot", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
+				const transitions = yield* CommittedTransitionsFx;
 				yield* spawnOwnerFx();
 				yield* spawnSourceFx({
 					quantity: 2,
@@ -94,6 +96,7 @@ describe("storeInputMaterialFx", () => {
 				});
 
 				return {
+					events: (yield* transitions.read).events,
 					item,
 					queried,
 					stored,
@@ -116,6 +119,20 @@ describe("storeInputMaterialFx", () => {
 		});
 		expect(result.stored.sourceItem).toBeUndefined();
 		expect(result.stored.storedItem.id).toBe("runtime:water");
+		expect(result.events).toEqual([
+			{
+				type: GameEventEnumSchema.enum.ItemInputStored,
+				sourceItemId: "runtime:water",
+				canonicalItemId: "water",
+				previousSourceLocation: sourceLocation(1),
+				previousQuantity: 2,
+				storedQuantity: 2,
+				resultingQuantity: 0,
+				ownerItemId: "runtime:workshop",
+				lineId: "line:workshop:build",
+				inputIndex: 0,
+			},
+		]);
 		expect(result.item.location).toEqual({
 			scope: "input",
 			ownerItemId: "runtime:workshop",
@@ -231,14 +248,14 @@ describe("storeInputMaterialFx", () => {
 					quantity: 3,
 					sourceItemId: "runtime:water:second",
 				});
-				const resolution = yield* resolveInputMaterialSlotFx({
+				const buffered = yield* readInputMaterialItemsFx({
 					ownerItemId: "runtime:workshop",
 					lineId: "line:workshop:build",
 					inputIndex: 0,
 				});
 
 				return {
-					resolution,
+					buffered,
 					second,
 				};
 			}).pipe(
@@ -250,12 +267,7 @@ describe("storeInputMaterialFx", () => {
 
 		expect(result.second.storedItem.quantity).toBe(1);
 		expect(result.second.sourceItem?.quantity).toBe(2);
-		expect(result.resolution).toMatchObject({
-			storedQuantity: 5,
-			availableCapacity: 0,
-			runQuantity: 3,
-			ready: true,
-		});
+		expect(result.buffered.reduce((quantity, item) => quantity + item.quantity, 0)).toBe(5);
 	});
 
 	it("rejects unavailable material without partially changing runtime", () => {

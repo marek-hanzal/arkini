@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { clearItemJobQueueFx } from "~/engine/job/write/clearItemJobQueueFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";

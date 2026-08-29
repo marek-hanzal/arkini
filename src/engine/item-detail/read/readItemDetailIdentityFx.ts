@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readRuntimeItemDefaultAssetIdsFx } from "~/engine/item/read/readRuntimeItemDefaultAssetIdsFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace readItemDetailIdentityFx {
@@ -42,8 +41,6 @@ export const readItemDetailIdentityFx = Effect.fn("readItemDetailIdentityFx")(fu
 		definitionId: item.item.id,
 		itemId: item.id,
 		title: item.item.title,
-		sourceResourceIds: yield* readRuntimeItemDefaultAssetIdsFx({
-			item: item.item,
-		}),
+		sourceResourceIds: item.item.asset.default,
 	} satisfies readItemDetailIdentityFx.Result;
 });

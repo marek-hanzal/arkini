@@ -1,20 +1,20 @@
 import { Effect, type Layer, Result } from "effect";
 import { describe, expect, it } from "vitest";
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import { startLineRuntimeFx } from "~/engine/job/fx/startLineRuntimeFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
-import { readLineRunFx } from "~/engine/line/fx/run/readLineRunFx";
+import { resolveLineRunFx } from "~/engine/line/fx/run/resolveLineRunFx";
 import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
+import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
+import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
 import { StateSchema } from "~/engine/state/schema/StateSchema";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
-import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { ItemChargesIssueReasonEnumSchema } from "~/engine/runtime/schema/check/ItemChargesIssueReasonEnumSchema";
@@ -30,11 +30,10 @@ export {
 	checkRuntimeFx,
 	describe,
 	expect,
-	fromRuntimeFx,
+	fromRuntimeFn,
 	fromStateFx,
 	it,
-	readCommittedTransitionFx,
-	readLineRunFx,
+	CommittedTransitionsFx,
 	readRuntimeFx,
 	runTickRuntimeByFx,
 	spawnItemFx,
@@ -44,6 +43,21 @@ export {
 };
 
 export type { RuntimeSchema };
+
+export const readLineRunFx = ({
+	lineId,
+	ownerItemId,
+}: {
+	readonly lineId: string;
+	readonly ownerItemId: string;
+}) =>
+	Effect.gen(function* () {
+		return yield* resolveLineRunFx({
+			lineId,
+			ownerItemId,
+			runtime: yield* readRuntimeFx(),
+		});
+	});
 
 export const value = (value: number) => ({
 	min: value,

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
 import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
@@ -9,10 +9,10 @@ import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
-import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
+import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 import { advanceRuntimeStepFx } from "~/engine/tick/internal/advanceRuntimeStepFx";
 import { createTemporaryLifetimeTestConfig } from "~test/item/temporary/support/createTemporaryLifetimeTestConfig";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
@@ -222,7 +222,7 @@ describe("temporary item lifetime", () => {
 					elapsedMs: 200,
 				});
 				const runtime = yield* readRuntimeFx();
-				const state = yield* fromRuntimeFx({
+				const state = fromRuntimeFn({
 					runtime,
 				});
 				const restored = yield* fromStateFx({

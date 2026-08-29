@@ -11,7 +11,9 @@ import { RuntimeStoreFx } from "~/engine/runtime/internal/RuntimeStoreFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { TickFx } from "~/engine/tick/context/TickFx";
-import { makeTickFx } from "~/engine/tick/internal/makeTickFx";
+import type { TickFxService } from "~/engine/tick/context/TickFx";
+import { advanceRuntimeElapsedFx } from "~/engine/tick/internal/advanceRuntimeElapsedFx";
+import { makeTickServiceFx } from "~/engine/tick/internal/makeTickServiceFx";
 
 export namespace GameCoreLayerFx {
 	export interface Props {
@@ -19,6 +21,17 @@ export namespace GameCoreLayerFx {
 		state?: StateSchema.Type;
 	}
 }
+
+const makeTickFx = Effect.fn("makeTickFx")(function* () {
+	const service = yield* makeTickServiceFx({
+		advanceRuntimeElapsed: advanceRuntimeElapsedFx,
+	});
+	return {
+		read: service.read,
+		advanceRuntime: service.advanceRuntime.pipe(Effect.asVoid),
+		advanceRuntimeBy: (elapsedMs) => service.advanceRuntimeBy(elapsedMs).pipe(Effect.asVoid),
+	} satisfies TickFxService;
+});
 
 /** Builds the stateful services owned by one loaded game without starting background work. */
 export const GameCoreLayerFx = ({ config, state }: GameCoreLayerFx.Props) => {

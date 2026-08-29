@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { LineInputEmptyError } from "~/engine/input/error/LineInputEmptyError";
-import { filterInputSlotItemsFx } from "~/engine/input/read/filterInputSlotItemsFx";
+import { filterInputSlotItemsFn } from "~/engine/input/fn/filterInputSlotItemsFn";
 import { readItemMaterialInputFx } from "~/engine/input/read/readItemMaterialInputFx";
 import { readBoardItemLineFx } from "~/engine/line/fx/readBoardItemLineFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
@@ -41,7 +41,7 @@ export const withdrawLineInputFx = Effect.fn("withdrawLineInputFx")(function* ({
 				lineId,
 				ownerItemId,
 			});
-			const bufferedItems = yield* filterInputSlotItemsFx({
+			const bufferedItems = filterInputSlotItemsFn({
 				inputIndex,
 				items: runtime.items,
 				lineId,

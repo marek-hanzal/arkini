@@ -1,12 +1,12 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import { getItemFx } from "~/engine/runtime/read/getItemFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { purityTestConfig } from "~test/line/support/purityTestConfig";
 
 const board = (x: number) => ({

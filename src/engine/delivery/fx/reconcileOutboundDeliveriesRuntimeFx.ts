@@ -2,11 +2,11 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readDeliveryTravelDurationMsFn } from "~/engine/delivery/fn/readDeliveryTravelDurationMsFn";
-import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
+import { resolveInputMaterialFn } from "~/engine/input/fn/resolveInputMaterialFn";
 import { isMaterialInputEligibleFn } from "~/engine/input/read/fn/isMaterialInputEligibleFn";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
-import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
-import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
+import { isLineInputClosedFn } from "~/engine/line/fn/isLineInputClosedFn";
+import { readItemLineFn } from "~/engine/line/fn/readItemLineFn";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
@@ -45,7 +45,7 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 		const line =
 			owner === undefined
 				? undefined
-				: yield* readItemLineFx({
+				: readItemLineFn({
 						item: owner.item,
 						lineId: target.lineId,
 					});
@@ -66,12 +66,12 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 						item: current.item,
 						selector: input.selector,
 					}) ||
-					(yield* isLineInputClosedFx({
+					isLineInputClosedFn({
 						input,
 						ownerItemId: owner.id,
 						lineId: line.id,
 						runtime: nextRuntime,
-					}))
+					})
 				) {
 					continue;
 				}
@@ -87,7 +87,7 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 							? total + candidate.quantity
 							: total;
 					}, 0);
-					const resolution = yield* resolveInputMaterialFx({
+					const resolution = resolveInputMaterialFn({
 						input,
 						storedQuantity,
 					});

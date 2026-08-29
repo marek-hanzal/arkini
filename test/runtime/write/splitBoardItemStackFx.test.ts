@@ -1,12 +1,12 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
-import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
+import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { splitBoardItemStackFx } from "~/engine/runtime/write/splitBoardItemStackFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { purityTestConfig } from "~test/line/support/purityTestConfig";
@@ -70,7 +70,7 @@ describe("splitBoardItemStackFx", () => {
 					return {
 						command,
 						runtime: yield* readRuntimeFx(),
-						transition: yield* readCommittedTransitionFx(),
+						transition: yield* (yield* CommittedTransitionsFx).read,
 					};
 				}).pipe(
 					useGameFx({
@@ -144,7 +144,7 @@ describe("splitBoardItemStackFx", () => {
 					command,
 					runtime: yield* readRuntimeFx(),
 					target,
-					transition: yield* readCommittedTransitionFx(),
+					transition: yield* (yield* CommittedTransitionsFx).read,
 				};
 			}).pipe(
 				useGameFx({

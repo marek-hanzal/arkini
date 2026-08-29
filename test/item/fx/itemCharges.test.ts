@@ -5,7 +5,7 @@ import {
 	board,
 	expect,
 	it,
-	readCommittedTransitionFx,
+	CommittedTransitionsFx,
 	readRuntimeFx,
 	run,
 	runTickRuntimeByFx,
@@ -27,7 +27,7 @@ describe("item charges / owner lifecycle", () => {
 					ownerItemId: well.id,
 					lineId: "line:self-well:water",
 				});
-				const firstStart = yield* readCommittedTransitionFx();
+				const firstStart = yield* (yield* CommittedTransitionsFx).read;
 				expect(
 					(yield* readRuntimeFx()).items.find((item) => item.id === well.id)
 						?.remainingCharges,
@@ -47,7 +47,7 @@ describe("item charges / owner lifecycle", () => {
 					elapsedMs: 200,
 				});
 				return {
-					finalCompletion: yield* readCommittedTransitionFx(),
+					finalCompletion: yield* (yield* CommittedTransitionsFx).read,
 					firstStart,
 					runtime: yield* readRuntimeFx(),
 					well,
@@ -87,7 +87,7 @@ describe("item charges / owner lifecycle", () => {
 					ownerItemId: shrine.id,
 					lineId: "line:shrine:pray",
 				});
-				const firstStart = yield* readCommittedTransitionFx();
+				const firstStart = yield* (yield* CommittedTransitionsFx).read;
 				let current = yield* readRuntimeFx();
 				expect(current.items.find((item) => item.id === shrine.id)?.remainingCharges).toBe(
 					1,
@@ -99,7 +99,7 @@ describe("item charges / owner lifecycle", () => {
 					ownerItemId: shrine.id,
 					lineId: "line:shrine:pray",
 				});
-				const finalStart = yield* readCommittedTransitionFx();
+				const finalStart = yield* (yield* CommittedTransitionsFx).read;
 				current = yield* readRuntimeFx();
 				expect(current.items.find((item) => item.id === shrine.id)?.remainingCharges).toBe(
 					0,
@@ -108,7 +108,7 @@ describe("item charges / owner lifecycle", () => {
 					elapsedMs: 200,
 				});
 				return {
-					finalCompletion: yield* readCommittedTransitionFx(),
+					finalCompletion: yield* (yield* CommittedTransitionsFx).read,
 					finalStart,
 					firstStart,
 					runtime: yield* readRuntimeFx(),

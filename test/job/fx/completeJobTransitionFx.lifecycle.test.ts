@@ -1,16 +1,16 @@
 import { Effect, type Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
-import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
 const output = {

@@ -7,11 +7,11 @@ import { reconcileOutboundDeliveriesRuntimeFx } from "~/engine/delivery/fx/recon
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { applyInputMaterialStorePlanFx } from "~/engine/input/fx/applyInputMaterialStorePlanFx";
 import { planInputMaterialStoreFx } from "~/engine/input/fx/planInputMaterialStoreFx";
-import { filterInputSlotItemsFx } from "~/engine/input/read/filterInputSlotItemsFx";
+import { filterInputSlotItemsFn } from "~/engine/input/fn/filterInputSlotItemsFn";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
-import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
-import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
+import { isLineInputClosedFn } from "~/engine/line/fn/isLineInputClosedFn";
+import { readItemLineFn } from "~/engine/line/fn/readItemLineFn";
 import { readGridLocationClaimsFn } from "~/engine/location/fn/readGridLocationClaimsFn";
 import { readGridLocationKeyFn } from "~/engine/location/fn/readGridLocationKeyFn";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
@@ -123,7 +123,7 @@ export const settleItemDeliveryRuntimeFx = Effect.fn("settleItemDeliveryRuntimeF
 		const line =
 			owner === undefined
 				? undefined
-				: yield* readItemLineFx({
+				: readItemLineFn({
 						item: owner.item,
 						lineId: target.lineId,
 					});
@@ -138,16 +138,16 @@ export const settleItemDeliveryRuntimeFx = Effect.fn("settleItemDeliveryRuntimeF
 				if (
 					input === undefined ||
 					input.type !== TypeSchema.enum.Materials ||
-					(yield* isLineInputClosedFx({
+					isLineInputClosedFn({
 						input,
 						ownerItemId: owner.id,
 						lineId: line.id,
 						runtime: inputRuntime,
-					}))
+					})
 				) {
 					continue;
 				}
-				const storedItems = yield* filterInputSlotItemsFx({
+				const storedItems = filterInputSlotItemsFn({
 					inputIndex: allocation.inputIndex,
 					items: inputRuntime.items,
 					lineId: line.id,

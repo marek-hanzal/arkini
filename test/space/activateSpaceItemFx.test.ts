@@ -1,7 +1,7 @@
 import { Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
+import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import {
 	Effect,
@@ -10,7 +10,6 @@ import {
 	inventory,
 	readRuntimeFx,
 	run,
-	setCurrentSpaceFx,
 	spawnAndActivate,
 	spawnItemFx,
 	toolbar,
@@ -39,19 +38,14 @@ describe("Space item activation", () => {
 						itemId: "portal",
 						location,
 					});
-					const state = yield* fromRuntimeFx({
+					const state = fromRuntimeFn({
 						runtime: activated.runtime,
 					});
 					const restored = yield* fromStateFx({
 						state,
 					});
-					if (location.scope === "board")
-						yield* setCurrentSpaceFx({
-							space: 0,
-						});
 					return {
 						...activated,
-						afterReturn: yield* readRuntimeFx(),
 						state,
 						restored,
 					};
@@ -64,8 +58,8 @@ describe("Space item activation", () => {
 			expect(result.restored.items[0]?.item.type).toBe("space");
 			expect(result.restored.items[0]?.location.scope).toBe(location.scope);
 			if (location.scope === "board") {
-				expect(result.afterReturn.currentSpace).toBe(0);
-				expect(result.afterReturn.items[0]?.location).toEqual(location);
+				expect(result.state.items[0]?.location).toEqual(location);
+				expect(result.restored.items[0]?.location).toEqual(location);
 			}
 		}
 	});

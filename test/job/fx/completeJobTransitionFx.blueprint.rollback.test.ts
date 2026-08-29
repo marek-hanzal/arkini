@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
+import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import {
 	runBlueprint,

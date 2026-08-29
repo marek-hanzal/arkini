@@ -9,7 +9,7 @@ import { createGameFx as createGameFromPackageFx } from "~/renderer/game/createG
 import { GameSaveBootstrapError } from "~/renderer/game/GameSaveBootstrapError";
 import { decodeArkiniSaveFx } from "~/engine/save/fx/decodeArkiniSaveFx";
 import type { GameSaveStorage } from "~/engine/save/GameSaveStorage";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { createTestArkpack, testArkpackConfig } from "~test/support/arkpack/createTestArkpack";
 import { installTestPngDecoder } from "~test/support/arkpack/createTestPngBytes";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";

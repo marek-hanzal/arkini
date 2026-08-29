@@ -2,8 +2,8 @@ import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { useGameFx } from "~test/support/game/useGameFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { dropFx } from "~/engine/output/fx/dropFx";
 
@@ -83,109 +83,6 @@ const sourceExistsWhen = {
 };
 
 describe("dropFx", () => {
-	it("resolves an allowed selected drop into one concrete placement result", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const origin = yield* createOriginFx();
-
-				return yield* dropFx({
-					drop: {
-						itemId: "item:log",
-						placement: "random",
-						quantity: {
-							min: 3,
-							max: 3,
-						},
-						rules: [],
-					},
-					origin: {
-						scope: "board",
-						space: 0,
-						position: origin.location.position,
-					},
-				});
-			}).pipe(
-				useGameFx({
-					config,
-				}),
-			),
-		);
-
-		expect(result).toEqual({
-			itemId: "item:log",
-			placement: "random",
-			quantity: 3,
-		});
-	});
-
-	it("discards a failed enable gate and an applicable disable veto", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const origin = yield* createOriginFx();
-				const enableRejected = yield* dropFx({
-					drop: {
-						itemId: "item:log",
-						placement: "drop",
-						quantity: {
-							min: 1,
-							max: 1,
-						},
-						rules: [
-							{
-								type: "enable",
-								when: [
-									missingPermitWhen,
-								],
-							},
-						],
-					},
-					origin: {
-						scope: "board",
-						space: 0,
-						position: origin.location.position,
-					},
-				});
-				const disableApplied = yield* dropFx({
-					drop: {
-						itemId: "item:stone",
-						placement: "drop",
-						quantity: {
-							min: 1,
-							max: 1,
-						},
-						rules: [
-							{
-								type: "disable",
-								when: [
-									sourceExistsWhen,
-								],
-							},
-						],
-					},
-					origin: {
-						scope: "board",
-						space: 0,
-						position: origin.location.position,
-					},
-				});
-
-				return {
-					disableApplied,
-					enableRejected,
-				};
-			}).pipe(
-				useGameFx({
-					config,
-				}),
-			),
-		);
-
-		expect(result).toEqual({
-			disableApplied: undefined,
-			enableRejected: undefined,
-		});
-	});
-
 	it("composes every enable gate with every disable veto", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {

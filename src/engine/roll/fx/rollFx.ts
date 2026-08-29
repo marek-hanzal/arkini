@@ -2,10 +2,10 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { RollSchema } from "~/engine/roll/schema/RollSchema";
+import type { RollResultSchema } from "~/engine/roll/schema/RollResultSchema";
 import { TypeSchema } from "~/engine/roll/schema/TypeSchema";
 
 import { rollChanceFx } from "./rollChanceFx";
-import { rollGuaranteedFx } from "./rollGuaranteedFx";
 import { rollWeightFx } from "./rollWeightFx";
 
 export namespace rollFx {
@@ -23,11 +23,10 @@ export const rollFx = Effect.fn("rollFx")(function* ({ roll }: rollFx.Props) {
 			{
 				type: TypeSchema.enum.Guaranteed,
 			},
-			(roll) => {
-				return rollGuaranteedFx({
-					roll,
-				});
-			},
+			(roll) =>
+				Effect.succeed({
+					drop: roll.drop,
+				} satisfies RollResultSchema.Type),
 		)
 		.with(
 			{

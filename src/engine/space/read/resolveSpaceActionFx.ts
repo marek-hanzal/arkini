@@ -1,8 +1,8 @@
 import { Effect, Option } from "effect";
 
-import { resolveActionEnableFx } from "~/engine/action/fx/resolveActionEnableFx";
+import { resolveActionEnableFn } from "~/engine/action/fn/resolveActionEnableFn";
 import { resolveActionInputFx } from "~/engine/action/fx/resolveActionInputFx";
-import { resolveActionRulesFx } from "~/engine/action/fx/resolveActionRulesFx";
+import { resolveActionRuleFx } from "~/engine/action/fx/resolveActionRuleFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { InputRun } from "~/engine/input/InputRun";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
@@ -49,11 +49,13 @@ export const resolveSpaceActionFx = Effect.fn("resolveSpaceActionFx")(function* 
 		);
 	}
 
-	const rules = yield* resolveActionRulesFx({
-		origin: owner.location,
-		rules: owner.item.rules,
-	});
-	const enabled = yield* resolveActionEnableFx({
+	const rules = yield* Effect.forEach(owner.item.rules, (rule) =>
+		resolveActionRuleFx({
+			origin: owner.location,
+			rule,
+		}),
+	);
+	const enabled = resolveActionEnableFn({
 		enable: owner.item.enable,
 		rules,
 	});

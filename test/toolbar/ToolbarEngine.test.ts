@@ -1,9 +1,8 @@
 import { Effect, type Layer } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
-import { readOwnerJobQueueFx } from "~/engine/job/read/readOwnerJobQueueFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
 import { checkRuntimeLocationsFn } from "~/engine/runtime/check/fn/checkRuntimeLocationsFn";
 import { planDropScopePlacementFx } from "~/engine/placement/fx/planDropScopePlacementFx";
@@ -12,17 +11,15 @@ import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreview
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { setCurrentSpaceFx } from "~/engine/space/write/setCurrentSpaceFx";
-import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
-import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
+import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 import { StateSchema } from "~/engine/state/schema/StateSchema";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
 import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
-import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
 const configInput = {
 	resources: {
@@ -574,7 +571,7 @@ describe("Toolbar engine", () => {
 					quantity: 3,
 				});
 				const state = StateSchema.parse(
-					yield* fromRuntimeFx({
+					fromRuntimeFn({
 						runtime: yield* readRuntimeFx(),
 					}),
 				);
@@ -664,9 +661,7 @@ describe("Toolbar engine", () => {
 				yield* runTickRuntimeByFx({
 					elapsedMs: 5_000,
 				});
-				const paused = yield* readOwnerJobQueueFx({
-					ownerItemId: owner.id,
-				});
+				const paused = yield* readRuntimeFx();
 				yield* moveItemFx({
 					itemId: stored.item.id,
 					revision: stored.item.revision,
@@ -686,19 +681,23 @@ describe("Toolbar engine", () => {
 			),
 		);
 
-		expect(result.paused).toEqual([
+		expect(result.paused.jobs).toEqual([
 			expect.objectContaining({
-				status: JobStatusEnumSchema.enum.Paused,
-				job: expect.objectContaining({
-					remainingMs: 600,
-				}),
+				remainingMs: 600,
 			}),
 		]);
 		expect(result.runtime.jobs).toEqual([]);
 	});
 
-	it("keeps toolbar contents global while the active Board space changes", () => {
-		const result = run(
+	it("keeps toolbar contents global when the active Board starts elsewhere", () => {
+		const spaceSevenConfig = GameConfigSchema.parse({
+			...configInput,
+			start: {
+				...configInput.start,
+				currentSpace: 7,
+			},
+		});
+		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const stored = yield* spawnItemFx({
 					id: "runtime:stored",
@@ -706,14 +705,15 @@ describe("Toolbar engine", () => {
 					location: toolbar(0),
 					quantity: 1,
 				});
-				yield* setCurrentSpaceFx({
-					space: 7,
-				});
 				return {
 					stored,
 					runtime: yield* readRuntimeFx(),
 				};
-			}),
+			}).pipe(
+				useGameFx({
+					config: spaceSevenConfig,
+				}),
+			),
 		);
 
 		expect(result.runtime.currentSpace).toBe(7);

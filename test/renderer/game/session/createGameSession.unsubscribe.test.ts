@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import { Deferred, Effect } from "effect";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 
 import { emitCompletedEventFx, waitFor } from "./createGameSession.test/fixture";
 

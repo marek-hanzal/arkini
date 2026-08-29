@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { LineNotFoundError } from "~/engine/line/error/LineNotFoundError";
-import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
+import { readItemLineFn } from "~/engine/line/fn/readItemLineFn";
 import { readBoardRuntimeItemByIdFx } from "~/engine/runtime/read/readBoardRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -20,7 +20,7 @@ export const readBoardItemLineFx = Effect.fn("readBoardItemLineFx")(function* ({
 		itemId: ownerItemId,
 		runtime,
 	});
-	const line = yield* readItemLineFx({
+	const line = readItemLineFn({
 		item: owner.item,
 		lineId,
 	});

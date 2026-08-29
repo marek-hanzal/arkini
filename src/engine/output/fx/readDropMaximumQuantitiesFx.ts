@@ -2,7 +2,6 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
-import { readQuantityMaximumFx } from "~/engine/quantity/fx/readQuantityMaximumFx";
 
 export namespace readDropMaximumQuantitiesFx {
 	export interface Props {
@@ -17,9 +16,7 @@ export const readDropMaximumQuantitiesFx = Effect.fn("readDropMaximumQuantitiesF
 	const quantities = new Map<IdSchema.Type, number>();
 
 	for (const candidate of drop) {
-		const quantity = yield* readQuantityMaximumFx({
-			quantity: candidate.quantity,
-		});
+		const quantity = candidate.quantity.max;
 		quantities.set(candidate.itemId, (quantities.get(candidate.itemId) ?? 0) + quantity);
 	}
 

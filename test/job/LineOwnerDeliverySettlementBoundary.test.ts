@@ -1,13 +1,13 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
-import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
+import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 import { TickStepMs } from "~/engine/tick/TickStepMs";
 
 const ownerKinds = [
@@ -169,7 +169,7 @@ describe("line-owner delivery settlement boundary", () => {
 					});
 					return {
 						finished: yield* readRuntimeFx(),
-						finishedTransition: yield* readCommittedTransitionFx(),
+						finishedTransition: yield* (yield* CommittedTransitionsFx).read,
 						ids,
 						request,
 						settled,

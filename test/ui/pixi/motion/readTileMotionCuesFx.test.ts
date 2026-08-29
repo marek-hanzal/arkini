@@ -5,7 +5,7 @@ import type { GameEngine } from "~/renderer/game/GameEngine";
 import { readCommittedTileSwapMotionCueFn } from "~/ui/pixi/motion/fn/readCommittedTileSwapMotionCueFn";
 import { readTileMotionCuesFx } from "~/ui/pixi/motion/readTileMotionCuesFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
 

@@ -100,7 +100,7 @@ describe("mergeItemsFx events", () => {
 				throw new Error("Expected merge participants.");
 			}
 
-			const event = await session.run(
+			const { event } = await session.run(
 				mergeItemsFx({
 					sourceItemId: source.id,
 					sourceRevision: source.revision,
@@ -194,7 +194,7 @@ describe("mergeItemsFx events", () => {
 				throw new Error("Expected merge participants.");
 			}
 
-			const event = await session.run(
+			const { event } = await session.run(
 				mergeItemsFx({
 					sourceItemId: source.id,
 					sourceRevision: source.revision,
@@ -297,7 +297,7 @@ describe("mergeItemsFx events", () => {
 				throw new Error("Expected merge participants.");
 			}
 
-			const event = await session.run(
+			const { event } = await session.run(
 				mergeItemsFx({
 					sourceItemId: source.id,
 					sourceRevision: source.revision,

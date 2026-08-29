@@ -5,7 +5,6 @@ import { useGameEngine } from "~/ui/game/useGameEngine";
 import { useRuntimeSelector } from "~/ui/game/useRuntimeSelector";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetailSourcesFx";
-import { readRuntimeItemDefaultAssetIdsFx } from "~/engine/item/read/readRuntimeItemDefaultAssetIdsFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace useItemDetailSources {
@@ -85,13 +84,7 @@ export const useItemDetailSources = (
 							ownerItemId: source.ownerItemId,
 							ownerDefinitionItemId: source.ownerDefinitionItemId,
 							title: configured.title,
-							sourceUrl: game.getResourceUrl(
-								game.readOrThrow(
-									readRuntimeItemDefaultAssetIdsFx({
-										item: owner.item,
-									}),
-								)[0],
-							),
+							sourceUrl: game.getResourceUrl(owner.item.asset.default[0]),
 							...(configured.asset.default[1] === undefined
 								? {}
 								: {

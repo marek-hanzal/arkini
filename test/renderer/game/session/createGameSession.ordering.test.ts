@@ -6,7 +6,7 @@ import { startLineFx } from "~test/job/support/startLineTestFx";
 import { Effect } from "effect";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
-import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 
 import { emitCompletedEventFx } from "./createGameSession.test/fixture";
 

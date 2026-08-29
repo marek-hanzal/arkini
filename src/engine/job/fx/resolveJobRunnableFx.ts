@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
 import { lineRulesFx } from "~/engine/line/fx/lineRulesFx";
 import { readBoardItemLineFx } from "~/engine/line/fx/readBoardItemLineFx";
-import { resolveLineEnableFx } from "~/engine/line/fx/run/resolveLineEnableFx";
+import { resolveLineEnableFn } from "~/engine/line/fn/resolveLineEnableFn";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -36,7 +36,7 @@ export const resolveJobRunnableFx = Effect.fn("resolveJobRunnableFx")(function* 
 			read: Effect.succeed(runtime),
 		}),
 	);
-	return yield* resolveLineEnableFx({
+	return resolveLineEnableFn({
 		line,
 		rules,
 	});

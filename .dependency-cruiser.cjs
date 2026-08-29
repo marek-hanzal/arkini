@@ -64,8 +64,7 @@ const boundaryRules = [
 		from: {
 			path: "^(?:src|electron)(?:/|$)",
 			pathNot: [
-				"^src/engine/game/layer/GameCoreLayerFx[.]ts$",
-				"^src/engine/tick/(?:internal/makeTickFx|fx/runTickRuntimeByFx|fx/runTickRuntimeFx)[.]ts$",
+				"^src/engine/game/layer/(?:GameCoreLayerFx|GameLoopLayerFx)[.]ts$",
 			],
 		},
 		to: {
@@ -81,7 +80,6 @@ const boundaryRules = [
 			path: "^(?:src|electron)(?:/|$)",
 			pathNot: [
 				"^src/engine/game/layer/GameCoreLayerFx[.]ts$",
-				"^src/engine/runtime/read/readCommittedTransitionFx[.]ts$",
 				"^src/engine/save/RuntimeSaveLayerFx[.]ts$",
 				"^src/renderer/game/session/(?:createGameSessionFx|createGameSessionTransitionSubscriptionsFx)[.]ts$",
 			],

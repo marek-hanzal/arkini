@@ -118,6 +118,37 @@ describe("resolveLineRunFx", () => {
 		expect(result.plan).toBeUndefined();
 	});
 
+	it("applies runtime adjustments after multipliers and clamps the result at zero", () => {
+		const adjusted = Effect.runSync(
+			resolveFx(
+				lineRunRuntime({
+					adjuster: true,
+					booster: true,
+					permit: true,
+					water: [
+						3,
+					],
+				}),
+			),
+		);
+		const clamped = Effect.runSync(
+			resolveFx(
+				lineRunRuntime({
+					adjuster: true,
+					booster: true,
+					floor: true,
+					permit: true,
+					water: [
+						3,
+					],
+				}),
+			),
+		);
+
+		expect(adjusted.runtimeMs).toBe(100);
+		expect(clamped.runtimeMs).toBe(0);
+	});
+
 	it("forces nested rule queries to use the explicit snapshot", () => {
 		const explicitRuntime = lineRunRuntime({
 			water: [

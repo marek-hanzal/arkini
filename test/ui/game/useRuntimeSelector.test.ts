@@ -9,7 +9,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Game } from "~/renderer/game/Game";
 import { useRuntimeSelector } from "~/ui/game/useRuntimeSelector";
-import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { useGameFx } from "~test/support/game/useGameFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { startFx } from "~/engine/start/write/startFx";
 import { testArkpackConfig } from "~test/support/arkpack/createTestArkpack";

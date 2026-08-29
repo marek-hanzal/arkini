@@ -4,9 +4,9 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { planInputMaterialStoreFx } from "~/engine/input/fx/planInputMaterialStoreFx";
-import { filterInputSlotItemsFx } from "~/engine/input/read/filterInputSlotItemsFx";
+import { filterInputSlotItemsFn } from "~/engine/input/fn/filterInputSlotItemsFn";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
-import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
+import { isLineInputClosedFn } from "~/engine/line/fn/isLineInputClosedFn";
 import { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
 import { readEffectiveDefaultLineFn } from "~/engine/line/fn/readEffectiveDefaultLineFn";
 import { readLineOwnerLinesFn } from "~/engine/line/fn/readLineOwnerLinesFn";
@@ -71,14 +71,14 @@ export const resolveLineInputStoreFx = Effect.fn("resolveLineInputStoreFx")(func
 	for (const [inputIndex, input] of line.input.entries()) {
 		if (requestedInputIndex !== undefined && inputIndex !== requestedInputIndex) continue;
 		if (input.type !== TypeSchema.enum.Materials) continue;
-		const closed = yield* isLineInputClosedFx({
+		const closed = isLineInputClosedFn({
 			input,
 			ownerItemId: boardOwner.id,
 			lineId,
 			runtime,
 		});
 		if (closed) continue;
-		const storedItems = yield* filterInputSlotItemsFx({
+		const storedItems = filterInputSlotItemsFn({
 			inputIndex,
 			items: runtime.items,
 			lineId,

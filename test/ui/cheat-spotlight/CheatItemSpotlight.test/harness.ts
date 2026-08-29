@@ -47,7 +47,7 @@ vi.mock("~/ui/game-menu/useGameMenuControl", () => ({
 		phase: "closed",
 	}),
 }));
-vi.mock("~/ui/item-detail/useItemDetailControl", () => ({
+vi.mock("~/item-detail-frame/useItemDetailControl", () => ({
 	useItemDetailControl: () => ({
 		state: {
 			phase: "closed",

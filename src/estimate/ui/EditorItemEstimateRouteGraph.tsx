@@ -1,7 +1,7 @@
 import type { EditorProject } from "~/project-authoring/EditorProject";
 import type { EditorItemEstimateRouteStep } from "~/estimate/domain/EditorItemEstimate";
 import { type ReactNode, useState } from "react";
-import { formatItemDurationFn } from "~/ui/item-detail/fn/formatItemDurationFn";
+import { formatDurationFn } from "~/ui/formatDurationFn";
 import {
 	selectableActiveClassName,
 	selectableInactiveClassName,
@@ -11,7 +11,7 @@ import { EditorItemDetailReference } from "~/item-authoring/ui/EditorItemDetailR
 const formatQuantity = (quantity: number) =>
 	Number.isInteger(quantity) ? String(quantity) : quantity.toFixed(2).replace(/\.00$/, "");
 
-const formatRuntime = (runtimeMs: number) => formatItemDurationFn(runtimeMs);
+const formatRuntime = (runtimeMs: number) => formatDurationFn(runtimeMs);
 
 type EditorItemEstimateSort = "quantity" | "time";
 

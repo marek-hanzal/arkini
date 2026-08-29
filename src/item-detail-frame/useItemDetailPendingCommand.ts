@@ -5,19 +5,17 @@ import { useGameEngine } from "~/ui/game/useGameEngine";
 import type {
 	ItemDetailPendingAction,
 	ItemDetailPendingActionOwner,
-} from "~/ui/item-detail/ItemDetailPendingActionOwner";
+} from "~/item-detail-frame/ItemDetailControl";
 
-export namespace useItemDetailPendingCommand {
-	export interface Options<Props, Result, Failure> {
-		readonly action: ItemDetailPendingAction;
-		readonly failureMessage: string;
-		readonly pendingKey: string;
-		readonly pendingOwner: ItemDetailPendingActionOwner;
-		readonly run: (
-			game: PlayableGame,
-			props: Props,
-		) => import("effect").Effect.Effect<Result, Failure>;
-	}
+interface UseItemDetailPendingCommandOptions<Props, Result, Failure> {
+	readonly action: ItemDetailPendingAction;
+	readonly failureMessage: string;
+	readonly pendingKey: string;
+	readonly pendingOwner: ItemDetailPendingActionOwner;
+	readonly run: (
+		game: PlayableGame,
+		props: Props,
+	) => import("effect").Effect.Effect<Result, Failure>;
 }
 
 /** Projects one exact command key from the provider-scoped Item Detail authority. */
@@ -27,7 +25,7 @@ export const useItemDetailPendingCommand = <Props, Result, Failure>({
 	pendingKey,
 	pendingOwner,
 	run: runCommand,
-}: useItemDetailPendingCommand.Options<Props, Result, Failure>) => {
+}: UseItemDetailPendingCommandOptions<Props, Result, Failure>) => {
 	const game = useGameEngine();
 	const run = useCallback(
 		(command: Props) =>

@@ -20,18 +20,18 @@ import { ItemDefinitionInfoTab } from "~/ui/item-detail/ItemDefinitionInfoTab";
 import {
 	ItemDetailHeader,
 	type ItemDetailHeaderIdentityRenderer,
-} from "~/ui/item-detail/ItemDetailHeader";
-import type { ItemDetailState, ItemDetailTarget } from "~/ui/item-detail/ItemDetailControl";
+} from "~/item-detail-frame/ItemDetailHeader";
+import type { ItemDetailState, ItemDetailTarget } from "~/item-detail-frame/ItemDetailControl";
 import { ItemInfoTab } from "~/ui/item-detail/ItemInfoTab";
 import { ItemLinesTab } from "~/ui/item-detail/ItemLinesTab";
 import type { ItemLineSummaryIdentityRenderer } from "~/ui/item-detail/ItemLineSummary";
 import { ItemQueueTab } from "~/ui/item-detail/ItemQueueTab";
 import { ItemSourcesTab } from "~/ui/item-detail/ItemSourcesTab";
-import { useCloseItemDetail } from "~/ui/item-detail/useCloseItemDetail";
-import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
+import { useCloseItemDetail } from "~/item-detail-frame/useCloseItemDetail";
+import { useItemDetailControl } from "~/item-detail-frame/useItemDetailControl";
 import { useItemDetailFocus } from "~/ui/item-detail/useItemDetailFocus";
 import { useItemDetailMotion } from "~/ui/item-detail/useItemDetailMotion";
-import { useRetainedItemDetailProjection } from "~/ui/item-detail/useRetainedItemDetailProjection";
+import { useRetainedItemDetailProjection } from "~/item-detail-frame/useRetainedItemDetailProjection";
 
 const transition = {
 	duration: 0.22,

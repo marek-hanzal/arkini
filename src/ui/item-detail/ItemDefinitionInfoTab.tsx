@@ -1,10 +1,6 @@
 import type { useItemDefinitionDetail } from "~/ui/item-detail/useItemDefinitionDetail";
-import {
-	ItemInfoFact,
-	ItemInfoFacts,
-	ItemStorageScopeLabel,
-	ItemTypeLabel,
-} from "~/ui/item-detail/ItemInfoPresentation";
+import { ItemStorageScopeLabel, ItemTypeLabel } from "~/item-definition/ItemDefinitionLabels";
+import { Fact, FactList } from "~/ui/fact/FactList";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
 
 /** Renders authored facts for a configured item reference without pretending a live stack exists. */
@@ -29,16 +25,16 @@ export const ItemDefinitionInfoTab = ({
 				</p>
 			</section>
 			<section className="border-t border-line pt-2">
-				<ItemInfoFacts>
-					<ItemInfoFact
+				<FactList>
+					<Fact
 						label="Type"
 						value={ItemTypeLabel[definition.itemType]}
 					/>
-					<ItemInfoFact
+					<Fact
 						label="Storage"
 						value={ItemStorageScopeLabel[definition.storageScope]}
 					/>
-					<ItemInfoFact
+					<Fact
 						label="Stack capacity"
 						value={
 							definition.maxStackSize === 1
@@ -46,11 +42,11 @@ export const ItemDefinitionInfoTab = ({
 								: `${definition.maxStackSize} items`
 						}
 					/>
-					<ItemInfoFact
+					<Fact
 						label="Owned"
 						value={`${definition.ownedQuantity}${definition.maxCount === undefined ? "" : ` / ${definition.maxCount}`}`}
 					/>
-					<ItemInfoFact
+					<Fact
 						label="Game limit"
 						value={
 							definition.maxCount === undefined
@@ -59,12 +55,12 @@ export const ItemDefinitionInfoTab = ({
 						}
 					/>
 					{definition.totalCharges === undefined ? null : (
-						<ItemInfoFact
+						<Fact
 							label="Charges per item"
 							value={`${definition.totalCharges}`}
 						/>
 					)}
-				</ItemInfoFacts>
+				</FactList>
 			</section>
 		</Scrollable>
 	);

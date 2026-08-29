@@ -9,10 +9,10 @@ import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { GameMenuControl } from "~/ui/game-menu/GameMenuControl";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
-import type { ItemDetailControl } from "~/ui/item-detail/ItemDetailControl";
-import { ItemDetailHigherOwnerGuard } from "~/ui/item-detail/ItemDetailHigherOwnerGuard";
-import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
-import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
+import type { ItemDetailControl } from "~/item-detail-frame/ItemDetailControl";
+import { ItemDetailHigherOwnerGuard } from "~/item-detail-frame/ItemDetailHigherOwnerGuard";
+import { ItemDetailProvider } from "~/item-detail-frame/ItemDetailProvider";
+import { useItemDetailControl } from "~/item-detail-frame/useItemDetailControl";
 
 (
 	globalThis as {

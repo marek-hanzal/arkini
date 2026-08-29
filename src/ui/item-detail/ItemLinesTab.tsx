@@ -6,7 +6,7 @@ import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
 import {
 	itemDetailFadeMotion,
 	itemDetailMotionTransition,
-} from "~/ui/item-detail/ItemDetailMotion";
+} from "~/item-detail-frame/ItemDetailMotion";
 import { ItemLineRow } from "~/ui/item-detail/ItemLineRow";
 import type { ItemLineSummaryIdentityRenderer } from "~/ui/item-detail/ItemLineSummary";
 import {

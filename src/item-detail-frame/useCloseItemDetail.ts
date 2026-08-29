@@ -2,8 +2,8 @@ import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { useAtom } from "@effect/atom-react";
 import { useCallback } from "react";
 
-import type { CloseItemDetailProps } from "~/ui/item-detail/ItemDetailControl";
-import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
+import type { CloseItemDetailProps } from "~/item-detail-frame/ItemDetailControl";
+import { useItemDetailControl } from "~/item-detail-frame/useItemDetailControl";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 
 /** Runs the controller-owned close command and surfaces lifecycle causes to the boundary. */

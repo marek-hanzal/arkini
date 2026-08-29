@@ -3,8 +3,8 @@
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
-import { createItemDetailControllerFx } from "~/ui/item-detail/createItemDetailControllerFx";
-import type { ItemDetailTarget } from "~/ui/item-detail/ItemDetailControl";
+import { createItemDetailControllerFx } from "~/item-detail-frame/createItemDetailControllerFx";
+import type { ItemDetailTarget } from "~/item-detail-frame/ItemDetailControl";
 
 const runtimeTarget = ({
 	itemId = "runtime:first",
@@ -25,7 +25,7 @@ const runtimeTarget = ({
 		origin,
 	}) satisfies ItemDetailTarget;
 
-describe("ItemDetailController", () => {
+describe("Item Detail frame controller", () => {
 	it("allocates a fresh command outcome scope for A to B to A target visits", () => {
 		const controller = Effect.runSync(createItemDetailControllerFx());
 		Effect.runSync(controller.openTargetFx(runtimeTarget()));

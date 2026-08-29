@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import { ItemDetailContext } from "~/ui/item-detail/ItemDetailContext";
+import { ItemDetailContext } from "~/item-detail-frame/ItemDetailContext";
 
 /** Reads the active Canvas-local Item Detail lifecycle. */
 export const useItemDetailControl = () => {

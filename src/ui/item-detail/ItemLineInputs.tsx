@@ -2,15 +2,16 @@ import { AnimatePresence, motion } from "motion/react";
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import type { ItemDetailReference } from "~/item-detail-frame/projectItemDetailReferenceFx";
 import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
 import { withdrawLineInputFx } from "~/production-input/write/withdrawLineInputFx";
 import { withdrawLineInputsFx } from "~/production-input/write/withdrawLineInputsFx";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { LinkButton } from "~/ui/button/LinkButton";
-import { itemDetailBadgeMotion, itemDetailFadeMotion } from "~/ui/item-detail/ItemDetailMotion";
-import { ItemReferenceButton } from "~/ui/item-detail/ItemReferenceButton";
-import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
-import { useItemDetailPendingCommand } from "~/ui/item-detail/useItemDetailPendingCommand";
+import { itemDetailBadgeMotion, itemDetailFadeMotion } from "~/item-detail-frame/ItemDetailMotion";
+import { ItemReferenceButton } from "~/item-detail-frame/ItemReferenceButton";
+import { useItemDetailControl } from "~/item-detail-frame/useItemDetailControl";
+import { useItemDetailPendingCommand } from "~/item-detail-frame/useItemDetailPendingCommand";
 
 export interface ItemLineInputsWithdrawAction {
 	readonly disabled: boolean;
@@ -161,7 +162,7 @@ const ItemLineInputTitle = ({
 	disabled,
 	label,
 }: {
-	readonly detail?: ItemDetailLines.DetailReference;
+	readonly detail?: ItemDetailReference;
 	readonly disabled: boolean;
 	readonly label: string;
 }) =>

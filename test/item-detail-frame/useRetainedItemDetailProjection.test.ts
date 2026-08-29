@@ -13,7 +13,7 @@ import {
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { useRetainedItemDetailProjection } from "~/ui/item-detail/useRetainedItemDetailProjection";
+import { useRetainedItemDetailProjection } from "~/item-detail-frame/useRetainedItemDetailProjection";
 
 (
 	globalThis as {
@@ -37,7 +37,7 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-describe("useRetainedItemDetailProjection", () => {
+describe("Item Detail retained projection", () => {
 	it("retains only committed projections when a concurrent render is abandoned", async () => {
 		let update: Dispatch<SetStateAction<ProjectionState>> | undefined;
 		const renderedAbandonedValue = vi.fn();

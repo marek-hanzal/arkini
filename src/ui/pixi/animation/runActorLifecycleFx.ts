@@ -6,7 +6,7 @@ import { whenVisualReadyFx } from "~/ui/pixi/actor/whenVisualReadyFx";
 import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 
 export const lifecycleDurationMs = 260;
-export const lifecycleReducedScale = 0.8;
+const lifecycleReducedScale = 0.8;
 
 interface LifecycleProps {
 	readonly actor: PixiTileActor;

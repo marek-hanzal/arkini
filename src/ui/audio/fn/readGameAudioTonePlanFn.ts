@@ -2,17 +2,13 @@ import { match } from "ts-pattern";
 
 import type { readGameAudioCuesFn } from "~/ui/audio/fn/readGameAudioCuesFn";
 
-export namespace readGameAudioTonePlanFn {
-	export interface Tone {
-		readonly waveform: OscillatorType;
-		readonly startFrequencyHz: number;
-		readonly endFrequencyHz: number;
-		readonly gain: number;
-		readonly offsetSeconds: number;
-		readonly durationSeconds: number;
-	}
-
-	export type Result = ReadonlyArray<Tone>;
+interface Tone {
+	readonly waveform: OscillatorType;
+	readonly startFrequencyHz: number;
+	readonly endFrequencyHz: number;
+	readonly gain: number;
+	readonly offsetSeconds: number;
+	readonly durationSeconds: number;
 }
 
 const tone = (
@@ -22,7 +18,7 @@ const tone = (
 	durationSeconds: number,
 	gain: number,
 	offsetSeconds = 0,
-): readGameAudioTonePlanFn.Tone => ({
+): Tone => ({
 	waveform,
 	startFrequencyHz,
 	endFrequencyHz,
@@ -32,9 +28,7 @@ const tone = (
 });
 
 /** Defines deterministic oscillator voices for one semantic game-audio cue. */
-export const readGameAudioTonePlanFn = (
-	cue: readGameAudioCuesFn.Result,
-): readGameAudioTonePlanFn.Result => {
+export const readGameAudioTonePlanFn = (cue: readGameAudioCuesFn.Result): ReadonlyArray<Tone> => {
 	const tones = match(cue.kind)
 		.with("space-change", () => [
 			tone("sine", 240, 360, 0.1, 0.1),

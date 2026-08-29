@@ -9,14 +9,13 @@ import type { ItemDetailHeaderIdentityRenderer } from "~/ui/item-detail/ItemDeta
 import type { ItemLineSummaryIdentityRenderer } from "~/ui/item-detail/ItemLineSummary";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
-import {
-	editorGameBoardViewTransitionName,
-	gameBoardViewTransitionName,
-} from "~/ui/navigation/gameBoardViewTransitionName";
 import { RouteBackdrop } from "~/ui/navigation/RouteBackdrop";
 import { PixiGameProvider } from "~/ui/pixi/PixiGameProvider";
 
 type GameShellRoutePresentation = "embedded" | "embedded-transition" | "fullscreen";
+
+const gameBoardViewTransitionName = "arkini-game-board";
+const editorGameBoardViewTransitionName = "arkini-editor-game-board";
 
 const GameSceneBackdrop = ({
 	routePresentation,

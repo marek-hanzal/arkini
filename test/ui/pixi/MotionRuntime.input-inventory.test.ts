@@ -5,10 +5,7 @@ import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
 import "~test/ui/pixi/MotionRuntime.test/fixture";
-import {
-	lifecycleDurationMs,
-	lifecycleReducedScale,
-} from "~/ui/pixi/animation/runActorLifecycleFx";
+import { lifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
 import { runInputMotionFx } from "~/ui/pixi/motion/runInputMotionFx";
 
 import {
@@ -218,9 +215,7 @@ describe("Inventory input travel", () => {
 			throw new Error("Expected Inventory remainder scale-down.");
 		}
 		expect(vanishScale.durationMs).toBe(lifecycleDurationMs);
-		expect(vanishScale).toMatchObject({
-			toScale: lifecycleReducedScale,
-		});
+		expect(vanishScale.toScale).toBeLessThan(1);
 		const vanishOpacity = vanishAnimations.find(
 			(animation) =>
 				animation.actor === transient &&

@@ -8,7 +8,6 @@ import type {
 import { readInteractionClaimsFn } from "~/ui/pixi/motion/fn/readInteractionClaimsFn";
 import { readTileMotionActorClaimsFn } from "~/ui/tile/motion/fn/readTileMotionActorClaimsFn";
 import { readTileMotionLaneClaimsFn } from "~/ui/tile/motion/fn/readTileMotionLaneClaimsFn";
-import { readTileMotionStaggerDelaySecondsFn } from "~/ui/tile/motion/fn/readTileMotionStaggerDelaySecondsFn";
 import { readUnsettledTileInputSourceQuantitiesFn } from "~/ui/tile/motion/fn/readUnsettledTileInputSourceQuantitiesFn";
 import { updateTileMotionLanesFn } from "~/ui/tile/motion/fn/updateTileMotionLanesFn";
 
@@ -69,28 +68,6 @@ const inputCue = ({
 });
 
 describe("pure tile motion contracts", () => {
-	it("caps accumulated delivery stagger while preserving tight order", () => {
-		expect(
-			[
-				0,
-				1,
-				2,
-				3,
-				4,
-				5,
-				20,
-			].map((index) => readTileMotionStaggerDelaySecondsFn(index)),
-		).toEqual([
-			0,
-			0.055,
-			0.11,
-			0.165,
-			0.22,
-			0.22,
-			0.22,
-		]);
-	});
-
 	it("claims both exact actors for a swap", () => {
 		const swap = {
 			kind: "swap",

@@ -33,8 +33,6 @@ import type { GameEngine } from "~/renderer/game/GameEngine";
 
 import { createMainReconcilerFx } from "~/ui/pixi/scene/createMainReconcilerFx";
 
-import { replacementCrossfadeDurationMs as productionReplacementCrossfadeDurationMs } from "~/ui/pixi/scene/runReplacementsFx";
-
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 
 import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
@@ -58,8 +56,6 @@ const createdVisualState = vi.hoisted(() => ({
 }));
 
 export const __fixture_createdVisualState = createdVisualState;
-
-export const replacementCrossfadeDurationMs = productionReplacementCrossfadeDurationMs;
 
 vi.mock("~/ui/pixi/actor/readTileActorsFx", () => ({
 	readTileActorsFx: ({ surface }: { readonly surface: "inventory" | "main" }) => ({

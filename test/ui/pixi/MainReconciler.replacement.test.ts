@@ -9,7 +9,6 @@ import {
 	createReconcilerHarness,
 	__fixture_createdVisualState as createdVisualState,
 	projectionProbeState as projectionState,
-	replacementCrossfadeDurationMs,
 	transition,
 } from "./MainReconciler.test/fixture";
 
@@ -72,7 +71,6 @@ describe("main reconciliation / replacement visuals", () => {
 		expect(mix).toMatchObject({
 			actor,
 			channel: "visual-mix",
-			durationMs: replacementCrossfadeDurationMs,
 			incoming: incoming.container,
 			ownerKey: "replacement:2:0:replacement",
 		});

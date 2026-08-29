@@ -9,8 +9,9 @@ import { useGameMenuActions } from "~/ui/game-menu/useGameMenuActions";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { useGameMenuFocus } from "~/ui/game-menu/useGameMenuFocus";
 import { useGameMenuMotion } from "~/ui/game-menu/useGameMenuMotion";
-import { gameMenuBackdropViewTransitionName } from "~/ui/navigation/gameMenuBackdropViewTransitionName";
-import { gameMenuDialogViewTransitionName } from "~/ui/navigation/gameMenuDialogViewTransitionName";
+
+const gameMenuBackdropViewTransitionName = "arkini-game-menu-backdrop";
+const gameMenuDialogViewTransitionName = "arkini-game-menu-dialog";
 
 const transition = {
 	duration: 0.5,

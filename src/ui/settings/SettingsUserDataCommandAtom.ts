@@ -1,11 +1,6 @@
 import { Effect } from "effect";
 
-import {
-	createSettingsDirectoryCommandAtomFx,
-	type SettingsDirectoryCommandState,
-} from "~/ui/settings/createSettingsDirectoryCommandAtomFx";
-
-export type SettingsUserDataCommandState = SettingsDirectoryCommandState;
+import { createSettingsDirectoryCommandAtomFx } from "~/ui/settings/createSettingsDirectoryCommandAtomFx";
 
 /** Owns one user-data-directory request and its interruption-safe settlement. */
 export const SettingsUserDataCommandAtom = Effect.runSync(

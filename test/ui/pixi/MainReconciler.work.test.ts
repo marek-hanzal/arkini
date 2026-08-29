@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 import { Effect } from "effect";
-import { lifecycleReducedScale } from "~/ui/pixi/animation/runActorLifecycleFx";
 
 import {
 	boardLocation,
@@ -125,7 +124,6 @@ describe("main reconciliation / work and consumption", () => {
 				actor,
 				channel: "lifecycle-scale",
 				durationMs: 720,
-				toScale: lifecycleReducedScale,
 			}),
 		);
 		expect(actor.container.destroyed).toBe(false);

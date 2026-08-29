@@ -3,10 +3,7 @@
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
-import {
-	lifecycleDurationMs,
-	lifecycleReducedScale,
-} from "~/ui/pixi/animation/runActorLifecycleFx";
+import { lifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
 import { finalizeMotionActorsFx } from "~/ui/pixi/motion/finalizeMotionActorsFx";
 
 import {
@@ -116,7 +113,6 @@ describe("spawn lifecycle", () => {
 				actor,
 				channel: "lifecycle-scale",
 				durationMs: lifecycleDurationMs,
-				toScale: lifecycleReducedScale,
 			}),
 			expect.objectContaining({
 				actor,

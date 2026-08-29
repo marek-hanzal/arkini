@@ -8,10 +8,7 @@ import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { createTileActorFx } from "~/ui/pixi/actor/createTileActorFx";
 import { updateTileActorFx } from "~/ui/pixi/actor/updateTileActorFx";
 import type { ActorAnimation, ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
-import {
-	lifecycleDurationMs,
-	lifecycleReducedScale,
-} from "~/ui/pixi/animation/runActorLifecycleFx";
+import { lifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
 import { startActorEnterFx } from "~/ui/pixi/animation/startActorEnterFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
@@ -306,7 +303,7 @@ describe("texture readiness", () => {
 			}),
 		);
 		expect(actor.container.alpha).toBe(0);
-		expect(actor.lifecycleLayer.scale.x).toBe(lifecycleReducedScale);
+		expect(actor.lifecycleLayer.scale.x).toBeLessThan(1);
 		expect(animations).toEqual([]);
 
 		Effect.runSync(

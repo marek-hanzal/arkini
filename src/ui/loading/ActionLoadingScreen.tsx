@@ -1,8 +1,8 @@
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
 import { useController } from "~/ui/loading/useController";
-import { actionProgressViewTransitionName } from "~/ui/navigation/actionProgressViewTransitionName";
 
 const pendingProgressTransitionMs = 220;
+const actionProgressViewTransitionName = "arkini-action-progress";
 
 export namespace ActionLoadingScreen {
 	export interface Props extends useController.Props {

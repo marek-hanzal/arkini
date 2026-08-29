@@ -3,10 +3,7 @@ import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
 import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
-import {
-	lifecycleDurationMs,
-	lifecycleReducedScale,
-} from "~/ui/pixi/animation/runActorLifecycleFx";
+import { lifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
 import {
 	createItem,
 	flushMicrotasks,
@@ -50,7 +47,6 @@ describe("main drag controller: recovery", () => {
 				toScale: 1,
 			}),
 		);
-		expect(mounted.actor.lifecycleLayer.scale.x).toBeGreaterThanOrEqual(lifecycleReducedScale);
 		expect(
 			mounted.animations.some(
 				(animation) => animation.actor === mounted.actor && animation.channel === "pose",

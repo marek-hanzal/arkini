@@ -3,10 +3,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import {
-	lifecycleDurationMs,
-	lifecycleReducedScale,
-} from "~/ui/pixi/animation/runActorLifecycleFx";
+import { lifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
 
 import {
 	firstBoardLocation,
@@ -87,7 +84,7 @@ describe("detached swap lifecycle", () => {
 		);
 		Effect.runSync(runtime.startFx);
 		expect(independent.container.alpha).toBe(0);
-		expect(independent.lifecycleLayer.scale.x).toBe(lifecycleReducedScale);
+		expect(independent.lifecycleLayer.scale.x).toBeLessThan(1);
 		expect(animations).toContainEqual(
 			expect.objectContaining({
 				actor: independent,

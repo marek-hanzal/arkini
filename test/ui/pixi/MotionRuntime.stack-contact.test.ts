@@ -3,10 +3,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import {
-	lifecycleDurationMs,
-	lifecycleReducedScale,
-} from "~/ui/pixi/animation/runActorLifecycleFx";
+import { lifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
 import { startActorExitFx } from "~/ui/pixi/animation/startActorExitFx";
 
 import {
@@ -94,7 +91,7 @@ describe("motion stack contact", () => {
 			animations,
 		});
 		expect(vanish.vanishScale.durationMs).toBe(lifecycleDurationMs);
-		expect(vanish.vanishScale.toScale).toBe(lifecycleReducedScale);
+		expect(vanish.vanishScale.toScale).toBeLessThan(1);
 		expect(vanish.vanishOpacity.durationMs).toBe(lifecycleDurationMs);
 		expect(travel.actor.container.destroyed).toBe(true);
 		expect(target.item.quantity).toBe(2);

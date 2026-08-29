@@ -1,8 +1,7 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { readRanksFn } from "~/ui/item/editor/origin-flow/fn/readRanksFn";
 import type { LayoutInput } from "~/ui/item/editor/origin-flow/Layout";
-import { readRanksFx } from "~/ui/item/editor/origin-flow/readRanksFx";
 
 const readRanks = (
 	nodeIds: ReadonlyArray<string>,
@@ -11,23 +10,21 @@ const readRanks = (
 		readonly target: string;
 	}>,
 ) =>
-	Effect.runSync(
-		readRanksFx(
-			{
-				edges: [],
-				nodes: nodeIds.map((id) => ({
-					height: 1,
-					id,
-					ports: [],
-					type: "simple",
-					width: 1,
-				})),
-			} satisfies LayoutInput,
-			directedPairs,
-		),
+	readRanksFn(
+		{
+			edges: [],
+			nodes: nodeIds.map((id) => ({
+				height: 1,
+				id,
+				ports: [],
+				type: "simple",
+				width: 1,
+			})),
+		} satisfies LayoutInput,
+		directedPairs,
 	);
 
-describe("readRanksFx", () => {
+describe("readRanksFn", () => {
 	it("collapses feedback cycles and keeps longest ranks independent of insertion order", () => {
 		const nodeIds = [
 			"cycle-b",

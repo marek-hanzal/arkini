@@ -1,18 +1,17 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { EditorItemOriginFlow } from "~/editor/origin-flow/EditorItemOriginFlow";
 import type { OriginFlowDirection, Selection } from "~/ui/item/editor/origin-flow/Highlight";
-import { readHighlightFx } from "~/ui/item/editor/origin-flow/readHighlightFx";
-import { cyclicFlow, producerFlow } from "./readHighlightFx.test/fixture";
+import { readHighlightFn } from "~/ui/item/editor/origin-flow/fn/readHighlightFn";
+import { cyclicFlow, producerFlow } from "./readHighlightFn.test/fixture";
 
 const readHighlight = (
 	flow: EditorItemOriginFlow,
 	selection: Selection,
 	direction: OriginFlowDirection = "output",
-) => Effect.runSync(readHighlightFx(flow, selection, direction));
+) => readHighlightFn(flow, selection, direction);
 
-describe("readHighlightFx", () => {
+describe("readHighlightFn", () => {
 	it("includes every producer branch and its mandatory prerequisites", () => {
 		const highlight = readHighlight(producerFlow, {
 			id: "item:target",

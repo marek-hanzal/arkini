@@ -1,16 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 
 import type { EditorItemOriginFlow } from "~/editor/origin-flow/EditorItemOriginFlow";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { readHighlightFn } from "~/ui/item/editor/origin-flow/fn/readHighlightFn";
+import { readMetroBackbonesFn } from "~/ui/item/editor/origin-flow/fn/readMetroBackbonesFn";
+import { readNavigationFn } from "~/ui/item/editor/origin-flow/fn/readNavigationFn";
+import { readRelationNavigationFn } from "~/ui/item/editor/origin-flow/fn/readRelationNavigationFn";
+import { readRootNavigationFn } from "~/ui/item/editor/origin-flow/fn/readRootNavigationFn";
+import { readRouteColorsFn } from "~/ui/item/editor/origin-flow/fn/readRouteColorsFn";
+import { readVisibleHighlightFn } from "~/ui/item/editor/origin-flow/fn/readVisibleHighlightFn";
 import type { LayoutNode, LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
 import type { OriginFlowDirection, Selection } from "~/ui/item/editor/origin-flow/Highlight";
-import { readHighlightFx } from "~/ui/item/editor/origin-flow/readHighlightFx";
-import { readMetroBackbonesFx } from "~/ui/item/editor/origin-flow/readMetroBackbonesFx";
-import { readNavigationFx } from "~/ui/item/editor/origin-flow/readNavigationFx";
-import { readRelationNavigationFx } from "~/ui/item/editor/origin-flow/readRelationNavigationFx";
-import { readRootNavigationFx } from "~/ui/item/editor/origin-flow/readRootNavigationFx";
-import { readRouteColorsFx } from "~/ui/item/editor/origin-flow/readRouteColorsFx";
-import { readVisibleHighlightFx } from "~/ui/item/editor/origin-flow/readVisibleHighlightFx";
 
 export const DefaultHighlightDepth = 1;
 
@@ -36,10 +35,7 @@ export const useProjection = ({
 }) => {
 	const [highlightDepth, setHighlightDepth] = useState<HighlightDepth>();
 	const completeHighlight = useMemo(
-		() =>
-			selection === undefined
-				? undefined
-				: RendererRuntime.runSync(readHighlightFx(flow, selection, direction)),
+		() => (selection === undefined ? undefined : readHighlightFn(flow, selection, direction)),
 		[
 			direction,
 			flow,
@@ -72,9 +68,7 @@ export const useProjection = ({
 			highlightDepthLimit === undefined ||
 			highlightDepthLimit >= maxHighlightLevel
 				? completeHighlight
-				: RendererRuntime.runSync(
-						readVisibleHighlightFx(completeHighlight, highlightDepthLimit),
-					),
+				: readVisibleHighlightFn(completeHighlight, highlightDepthLimit),
 		[
 			completeHighlight,
 			highlightDepthLimit,
@@ -83,7 +77,7 @@ export const useProjection = ({
 		],
 	);
 	const routeColors = useMemo(
-		() => RendererRuntime.runSync(readRouteColorsFx(flow, selection, highlight)),
+		() => readRouteColorsFn(flow, selection, highlight),
 		[
 			flow,
 			highlight,
@@ -93,11 +87,9 @@ export const useProjection = ({
 	const highlightedEdgeColors = routeColors.edges;
 	const metroBackbones = useMemo(
 		() =>
-			RendererRuntime.runSync(
-				readMetroBackbonesFx(backbones, [
-					...highlightedEdgeColors.keys(),
-				]),
-			),
+			readMetroBackbonesFn(backbones, [
+				...highlightedEdgeColors.keys(),
+			]),
 		[
 			backbones,
 			highlightedEdgeColors,
@@ -107,15 +99,7 @@ export const useProjection = ({
 	const navigationNodeIds = useMemo(
 		() =>
 			selection?.kind === "node"
-				? RendererRuntime.runSync(
-						readNavigationFx(
-							flow,
-							positions,
-							selection.id,
-							direction,
-							highlight?.edgeIds,
-						),
-					)
+				? readNavigationFn(flow, positions, selection.id, direction, highlight?.edgeIds)
 				: [],
 		[
 			direction,
@@ -128,13 +112,11 @@ export const useProjection = ({
 	const inputNavigationNodeIds = useMemo(
 		() =>
 			selection?.kind === "node"
-				? RendererRuntime.runSync(
-						readRelationNavigationFx({
-							flow,
-							selectedNodeId: selection.id,
-							selectedRole: "input",
-						}),
-					)
+				? readRelationNavigationFn({
+						flow,
+						selectedNodeId: selection.id,
+						selectedRole: "input",
+					})
 				: [],
 		[
 			flow,
@@ -144,13 +126,11 @@ export const useProjection = ({
 	const outputNavigationNodeIds = useMemo(
 		() =>
 			selection?.kind === "node"
-				? RendererRuntime.runSync(
-						readRelationNavigationFx({
-							flow,
-							selectedNodeId: selection.id,
-							selectedRole: "output",
-						}),
-					)
+				? readRelationNavigationFn({
+						flow,
+						selectedNodeId: selection.id,
+						selectedRole: "output",
+					})
 				: [],
 		[
 			flow,
@@ -160,7 +140,7 @@ export const useProjection = ({
 	const rootNavigationNodeIds = useMemo(
 		() =>
 			selection?.kind === "node" && completeHighlight !== undefined
-				? RendererRuntime.runSync(readRootNavigationFx(flow, completeHighlight))
+				? readRootNavigationFn(flow, completeHighlight)
 				: [],
 		[
 			completeHighlight,

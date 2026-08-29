@@ -1,14 +1,12 @@
-import { Effect } from "effect";
-
 import type { EditorItemOriginFlow } from "~/editor/origin-flow/EditorItemOriginFlow";
 import type {
 	OriginFlowDirection,
 	Highlight,
 	Selection,
 } from "~/ui/item/editor/origin-flow/Highlight";
-import { readHighlightLevelsFx } from "~/ui/item/editor/origin-flow/readHighlightLevelsFx";
-import { readOutputHighlightFx } from "~/ui/item/editor/origin-flow/readOutputHighlightFx";
-import { readInputHighlightFx } from "~/ui/item/editor/origin-flow/readInputHighlightFx";
+import { readHighlightLevelsFn } from "~/ui/item/editor/origin-flow/fn/readHighlightLevelsFn";
+import { readOutputHighlightFn } from "~/ui/item/editor/origin-flow/fn/readOutputHighlightFn";
+import { readInputHighlightFn } from "~/ui/item/editor/origin-flow/fn/readInputHighlightFn";
 
 const readEmptyHighlight = (): Highlight => ({
 	edgeIds: new Set(),
@@ -18,18 +16,18 @@ const readEmptyHighlight = (): Highlight => ({
 });
 
 /** Reads the complete directional graph selected by an item or connection. */
-export const readHighlightFx = Effect.fn("readHighlightFx")(function* (
+export const readHighlightFn = (
 	flow: EditorItemOriginFlow,
 	selection: Selection,
 	direction: OriginFlowDirection = "input",
-) {
-	const readNodeHighlightFx =
-		direction === "output" ? readOutputHighlightFx : readInputHighlightFx;
+) => {
+	const readNodeHighlightFn =
+		direction === "output" ? readOutputHighlightFn : readInputHighlightFn;
 	if (selection.kind === "node") {
 		const selectedNode = flow.nodes.find(({ id }) => id === selection.id);
 		if (selectedNode === undefined) return readEmptyHighlight();
-		const highlight = yield* readNodeHighlightFx(flow, selectedNode);
-		return yield* readHighlightLevelsFx(flow, highlight, selectedNode.id);
+		const highlight = readNodeHighlightFn(flow, selectedNode);
+		return readHighlightLevelsFn(flow, highlight, selectedNode.id);
 	}
 
 	const selectedEdge = flow.edges.find(({ id }) => id === selection.id);
@@ -48,8 +46,8 @@ export const readHighlightFx = Effect.fn("readHighlightFx")(function* (
 			]),
 			nodeLevels: new Map(),
 		};
-	const highlight = yield* readNodeHighlightFx(flow, startNode);
-	return yield* readHighlightLevelsFx(
+	const highlight = readNodeHighlightFn(flow, startNode);
+	return readHighlightLevelsFn(
 		flow,
 		{
 			edgeIds: new Set([
@@ -66,4 +64,4 @@ export const readHighlightFx = Effect.fn("readHighlightFx")(function* (
 		},
 		startNode.id,
 	);
-});
+};

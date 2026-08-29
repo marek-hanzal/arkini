@@ -1,11 +1,10 @@
 import { type RefObject, useCallback, useEffect, useRef, useState } from "react";
 
 import type { EditorItemOriginFlow } from "~/editor/origin-flow/EditorItemOriginFlow";
-import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { popVisitFn } from "~/ui/item/editor/origin-flow/fn/popVisitFn";
 import type { LayoutNode } from "~/ui/item/editor/origin-flow/Layout";
 import type { Viewport } from "~/ui/item/editor/origin-flow/createViewportFx";
 import type { OriginFlowDirection, Selection } from "~/ui/item/editor/origin-flow/Highlight";
-import { popVisitFx } from "~/ui/item/editor/origin-flow/popVisitFx";
 import {
 	type HighlightDepth,
 	DefaultHighlightDepth,
@@ -231,7 +230,7 @@ export const useNavigation = ({
 				return;
 			}
 			if (shortcut === "back") {
-				const back = RendererRuntime.runSync(popVisitFx(visitHistoryRef.current));
+				const back = popVisitFn(visitHistoryRef.current);
 				if (back.nodeId === undefined || !focusNode(back.nodeId)) return;
 				visitHistoryRef.current = back.history;
 				onSelectionChange({

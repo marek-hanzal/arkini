@@ -1,4 +1,3 @@
-import { Effect } from "effect";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 
 import { type EditorItemOriginFlow } from "~/editor/origin-flow/EditorItemOriginFlow";
@@ -19,12 +18,12 @@ import {
 import { ShortcutHelp } from "~/ui/item/editor/origin-flow/ShortcutHelp";
 import {
 	type ConnectedPorts,
-	readConnectedPortsFx,
-} from "~/ui/item/editor/origin-flow/readConnectedPortsFx";
+	readConnectedPortsFn,
+} from "~/ui/item/editor/origin-flow/fn/readConnectedPortsFn";
 import {
 	type NodeMetrics,
-	readNodeMetricsFx,
-} from "~/ui/item/editor/origin-flow/readNodeMetricsFx";
+	readNodeMetricsFn,
+} from "~/ui/item/editor/origin-flow/fn/readNodeMetricsFn";
 import { useCanvasPointer } from "~/ui/item/editor/origin-flow/useCanvasPointer";
 import { useProjection } from "~/ui/item/editor/origin-flow/useProjection";
 import { useNavigation } from "~/ui/item/editor/origin-flow/useNavigation";
@@ -92,7 +91,7 @@ export const Canvas = ({
 		],
 	);
 	const connectedPorts = useMemo(
-		() => RendererRuntime.runSync(readConnectedPortsFx(flow.edges)),
+		() => readConnectedPortsFn(flow.edges),
 		[
 			flow.edges,
 		],
@@ -100,17 +99,12 @@ export const Canvas = ({
 	const nodeMetrics = useMemo(
 		() =>
 			new Map(
-				RendererRuntime.runSync(
-					Effect.forEach(flow.nodes, (node) =>
-						Effect.map(
-							readNodeMetricsFx(node),
-							(metrics) =>
-								[
-									node.id,
-									metrics,
-								] as const,
-						),
-					),
+				flow.nodes.map(
+					(node) =>
+						[
+							node.id,
+							readNodeMetricsFn(node),
+						] as const,
 				),
 			),
 		[

@@ -5,7 +5,7 @@ import { match } from "ts-pattern";
 import type { AppearanceThemeSchema } from "../../../electron/contract/appearance/AppearanceThemeSchema";
 import { setAppearanceThemeAtom } from "~/ui/appearance/setAppearanceThemeAtom";
 import { setCheatAvailabilityAtom } from "~/ui/cheat-availability/setCheatAvailabilityAtom";
-import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
+import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import type { WindowModeSchema } from "../../../electron/contract/window/WindowModeSchema";
 import { setWindowModeAtom } from "~/renderer/window/setWindowModeAtom";
 

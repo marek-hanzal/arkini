@@ -6,7 +6,7 @@ import { EditorMcpCommandResultSchema } from "../../electron/contract/editor/Edi
 import { EditorMcpCommandSchema } from "../../electron/contract/editor/EditorMcpCommandSchema";
 import { EditorMcpConfigurationSchema } from "../../electron/contract/editor/EditorMcpConfigurationSchema";
 import { EditorMcpOverviewSchema } from "../../electron/contract/editor/EditorMcpOverviewSchema";
-import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
+import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 
 type EditorMcpCommand = EditorMcpCommandSchema.Type;
 type EditorMcpConfiguration = EditorMcpConfigurationSchema.Type;

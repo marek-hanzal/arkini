@@ -7,8 +7,8 @@ This is the canonical map of implemented ownership and lifecycle. It does not ca
 The product dependency map is:
 
 ```text
-src/@routes → { exact product owners, src/ui, src/renderer, exact gameplay owners, electron/contract }
-product presentation/workers → { exact product runtime/core owners, exact shared UI owners, exact gameplay owners, src/renderer, electron/contract }
+src/@routes → { exact product owners, src/application-diagnostics, src/ui, src/renderer, exact gameplay owners, electron/contract }
+product presentation/workers → { exact product runtime/core owners, src/application-diagnostics, exact shared UI owners, exact gameplay owners, src/renderer, electron/contract }
 authoring-shell → { authoring-session, exact authoring products, src/ui, src/renderer, electron/contract }
 authoring-session → { project-authoring repository runtime, Board session, src/renderer, electron/contract }
 src/arkpack/renderer → { src/arkpack/artifact, src/game-config, exact src/renderer owners, electron/contract }
@@ -26,7 +26,7 @@ src/game-start → { src/game-runtime, src/item-location, src/item-placement, ex
 src/asset-authoring/domain → { exact authored-config resource owners }
 committed transition producers → src/game-event
 src/game-event → { src/game-runtime Runtime item projection, exact spatial/Engine value schemas and placement results }
-src/item-detail-frame → { exact Item Detail reads and gameplay schemas, src/renderer, reusable src/ui }
+src/item-detail-frame → { exact Item Detail reads and gameplay schemas, src/application-diagnostics, src/renderer, reusable src/ui }
 src/item-location → { src/game-runtime, exact item/delivery schema owners }
 src/item-placement → { src/game-runtime, src/game-event, src/item-location, exact item/output/job owners }
 src/item-merge → { src/game-runtime, src/game-event, src/item-placement, src/item-location, exact item/output/job owners }
@@ -59,6 +59,7 @@ src/production-job/ui → { public Job status, src/item-detail-frame, reusable s
 - `src/item-authoring` owns authored Item forms, detail/list/delete policies, persistence commands, and Item-specific presentation. `src/flow` owns the canonical authored acquisition graph, global Flow projection, canvas, and layout worker. `src/estimate` owns static Estimate semantics, query/index projections, renderer cache, and estimate worker. Their `domain/` subtrees are platform-neutral and cannot import UI, renderer, routes, or Electron; their `ui/` and `worker/` subtrees own product-specific presentation and renderer execution boundaries.
 - `src/project-authoring` owns the portable project model and repository contract, project configuration, catalog/welcome workflows, Arkpack-to-project import, and portable source export. `src/board-scenario`, `src/project-version`, and `src/project-note` independently own revision-pinned Board scenarios, the immutable version graph and checkout policies, and ordered Notes outside Versions.
 - `src/authoring-session` owns the one mounted renderer project projection, publication, refresh/replacement ordering, and cross-product unsaved-change guard. `src/authoring-mcp` owns renderer-side MCP status, settings, and checkout presentation. `src/authoring-shell` owns only cross-product Editor shell and navigation composition.
+- `src/application-diagnostics` owns the independently shared renderer-side policies for exact typed Cause failure extraction, bounded diagnostic value normalization, best-effort record emission, and diagnostic-directory requests. Installed-game lifecycle, authoring, root UI, and application command boundaries import those exact policies directly. The root depends only on Effect and the pure Electron diagnostics contract; it owns no renderer lifecycle, runtime/session/resource acquisition, game-specific diagnostics, platform storage, or presentation.
 - `src/renderer` contains only concrete renderer-process runtime, lifecycle, concurrency, and transport capabilities. It is not a required gateway to Engine, Editor, or `electron/contract`; callers import the exact owner directly.
 - `src/ui` owns cross-product primitives and reusable presentation, including generic fact layout and compact duration formatting. Product-specific UI remains with its top-level product owner. `src/@routes` owns registration, loaders, redirects, route context, and route-specific composition; routes may share only explicitly ignored `-*` route-private helpers, never import another route module.
 - `electron/main` owns physical desktop capabilities and composes exact product-domain, Project Authoring repository-contract, production, and Engine owners directly. It never imports renderer or product-presentation code; concrete raw gameplay authorities remain limited to their exact owners by Dependency Cruiser. `electron/preload` is transport-only; production, Engine, and product-domain code never import Electron.

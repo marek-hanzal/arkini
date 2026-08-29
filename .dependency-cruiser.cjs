@@ -2,6 +2,7 @@ const activeCodePattern = "^(?:src|electron|shared|scripts)(?:/|$)";
 const activeCodeAndTestsPattern = "^(?:src|electron|shared|scripts|test)(?:/|$)";
 const productionCodePattern = "^(?:src|electron|shared)(?:/|$)";
 const applicationEntrypointPattern = "^src/(?:main|createArkiniRouterFx|_route)[.]tsx?$";
+const applicationDiagnosticsPattern = "^src/application-diagnostics(?:/|$)";
 const gameEventPattern = "^src/game-event(?:/|$)";
 const gameConfigPattern = "^src/game-config(?:/|$)";
 const gameRuntimePattern = "^src/game-runtime(?:/|$)";
@@ -32,6 +33,34 @@ const reusablePresentationPattern = `^src/ui(?:/|$)|${productPresentationPattern
 
 /** @type {import('dependency-cruiser').IForbiddenRuleType[]} */
 const boundaryRules = [
+	{
+		name: "application-diagnostics-is-independent-application-policy",
+		comment:
+			"Shared renderer-side diagnostic normalization and transport policy may depend only on Effect and the pure Electron diagnostics contract, never lifecycle, product, platform, or presentation owners.",
+		severity: "error",
+		from: {
+			path: applicationDiagnosticsPattern,
+		},
+		to: {
+			path: "^(?!src/application-diagnostics(?:/|$)|electron/contract/diagnostics/DiagnosticRecord[.]ts$|node_modules/effect(?:/|$))",
+		},
+	},
+	{
+		name: "application-diagnostics-has-concrete-consumers",
+		comment:
+			"Only installed-game, authoring, root UI, and application command boundaries consume the shared diagnostics policy.",
+		severity: "error",
+		from: {
+			path: activeCodePattern,
+			pathNot: [
+				applicationDiagnosticsPattern,
+				"^src/(?:@routes|authoring-mcp|item-detail-frame|project-authoring/welcome|renderer/game|ui)(?:/|$)",
+			],
+		},
+		to: {
+			path: applicationDiagnosticsPattern,
+		},
+	},
 	{
 		name: "engine-no-presentation-imports",
 		comment:

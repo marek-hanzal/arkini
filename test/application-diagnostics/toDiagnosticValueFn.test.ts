@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { toDiagnosticValueFn } from "~/renderer/diagnostics/fn/toDiagnosticValueFn";
+import { toDiagnosticValueFn } from "~/application-diagnostics/fn/toDiagnosticValueFn";
 
 describe("toDiagnosticValueFn", () => {
 	it("bounds a circular object with one traversal-owned seen set", () => {
@@ -12,6 +12,19 @@ describe("toDiagnosticValueFn", () => {
 		};
 		expect(toDiagnosticValueFn(circular)).toEqual(expected);
 		expect(toDiagnosticValueFn(circular)).toEqual(expected);
+	});
+
+	it("contains reflection failures from an unknown diagnostic value", () => {
+		const unreadable = new Proxy(
+			{},
+			{
+				ownKeys: () => {
+					throw new Error("reflection failed");
+				},
+			},
+		);
+
+		expect(toDiagnosticValueFn(unreadable)).toBe("[Unreadable: Error: reflection failed]");
 	});
 
 	it("preserves an Error cause as structured diagnostic context", () => {

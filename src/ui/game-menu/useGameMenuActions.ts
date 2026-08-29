@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 
 import type { Game } from "~/renderer/game/Game";
-import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
+import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import type { GameMenuAction, GameMenuPhase } from "~/ui/game-menu/GameMenuControl";
 import { gameMenuCommandAtom } from "~/ui/game-menu/gameMenuCommandAtom";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";

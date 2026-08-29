@@ -3,7 +3,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { useMemo } from "react";
 
 import type { PlayableGame } from "~/renderer/game/PlayableGame";
-import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
+import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import type { useGameEvents } from "~/ui/game/useGameEvents";
 import type { createGameAudioSynthFx } from "~/ui/audio/createGameAudioSynthFx";
 import { readGameAudioCuesFn } from "~/ui/audio/fn/readGameAudioCuesFn";

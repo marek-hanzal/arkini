@@ -1,10 +1,8 @@
-import { Effect } from "effect";
-
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { makeDropRejectedResultFn } from "~/engine/runtime/drop/fn/makeDropRejectedResultFn";
 import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
 
-export namespace makeDropActorRejectedResultFx {
+export namespace makeDropActorRejectedResultFn {
 	export interface Props {
 		readonly failedItemId: IdSchema.Type | undefined;
 		readonly failure: "invalid-location" | "stale";
@@ -14,12 +12,12 @@ export namespace makeDropActorRejectedResultFx {
 }
 
 /** Maps one optimistic source/target actor race into the canonical rejected-drop reason. */
-export const makeDropActorRejectedResultFx = Effect.fnUntraced(function* ({
+export const makeDropActorRejectedResultFn = ({
 	failedItemId,
 	failure,
 	sourceItemId,
 	targetItemId,
-}: makeDropActorRejectedResultFx.Props) {
+}: makeDropActorRejectedResultFn.Props) => {
 	const targetFailed = failedItemId === targetItemId;
 	return makeDropRejectedResultFn({
 		reason:
@@ -33,4 +31,4 @@ export const makeDropActorRejectedResultFx = Effect.fnUntraced(function* ({
 		sourceItemId,
 		targetItemId,
 	});
-});
+};

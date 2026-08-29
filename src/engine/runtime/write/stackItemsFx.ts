@@ -8,7 +8,7 @@ import { StackItemsUnavailableError } from "~/engine/runtime/error/StackItemsUna
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { readItemStackResolutionFx } from "~/engine/runtime/read/readItemStackResolutionFx";
+import { readItemStackResolutionFn } from "~/engine/runtime/read/fn/readItemStackResolutionFn";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -43,7 +43,7 @@ export const stackItemsFx = Effect.fn("stackItemsFx")(function* ({
 }: stackItemsFx.Props) {
 	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
-			const resolution = yield* readItemStackResolutionFx({
+			const resolution = readItemStackResolutionFn({
 				runtime,
 				sourceItemId,
 				sourceRevision,

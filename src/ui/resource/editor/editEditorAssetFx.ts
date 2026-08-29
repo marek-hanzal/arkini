@@ -5,7 +5,7 @@ import { publishEditorProjectFx } from "~/ui/editor/publishEditorProjectFx";
 import { validateEditorAssetFileFx } from "~/renderer/editor/resource/validateEditorAssetFileFx";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
-import { renameGameResourceFx } from "~/engine/resource/renameGameResourceFx";
+import { renameGameResourceFx } from "~/game-config/resource/renameGameResourceFx";
 
 export namespace editEditorAssetFx {
 	export interface Props {

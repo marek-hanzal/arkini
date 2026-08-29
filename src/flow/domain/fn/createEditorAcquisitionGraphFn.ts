@@ -5,7 +5,7 @@ import { compileEditorAcquisitionLineRoutesFn } from "~/flow/domain/fn/compileEd
 import { compileEditorAcquisitionMergeRoutesFn } from "~/flow/domain/fn/compileEditorAcquisitionMergeRoutesFn";
 import { compileEditorAcquisitionRootsFn } from "~/flow/domain/fn/compileEditorAcquisitionRootsFn";
 import { compileEditorAcquisitionTemporaryRoutesFn } from "~/flow/domain/fn/compileEditorAcquisitionTemporaryRoutesFn";
-import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 /** Composes canonical authored acquisition facts and routes in deterministic order. */
 export const createEditorAcquisitionGraphFn = (config: GameConfigSchema.Type) => {

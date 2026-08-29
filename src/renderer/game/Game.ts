@@ -1,4 +1,4 @@
-import type { ArkpackDescriptor } from "~/engine/pack/Arkpack";
+import type { ArkpackDescriptor } from "~/arkpack/ArkpackDescriptor";
 import type { PlayableGame } from "~/renderer/game/PlayableGame";
 import type { GameSaveStorage } from "~/engine/save/GameSaveStorage";
 

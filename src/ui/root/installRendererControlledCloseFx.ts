@@ -1,7 +1,7 @@
 import { Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { ArkpackCatalogOwnerAtom } from "~/renderer/arkpack/ArkpackCatalogOwnerAtom";
+import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerAtom";
 import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
 import { EditorUnsavedChanges } from "~/renderer/editor/unsaved/EditorUnsavedChanges";
 import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";

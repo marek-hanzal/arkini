@@ -2,7 +2,7 @@ import { Effect, SubscriptionRef } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { ArkiniDefaultPackageId } from "../../../shared/ArkiniAppMetadata";
 import type { WindowModeSchema } from "../../../electron/contract/window/WindowModeSchema";
-import { ArkpackCatalogOwnerAtom } from "~/renderer/arkpack/ArkpackCatalogOwnerAtom";
+import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerAtom";
 import { WindowModeAtom } from "~/renderer/window/WindowModeAtom";
 import { WindowModeReadyAtom } from "~/renderer/window/WindowModeReadyAtom";
 import { readAppearanceAccentFx } from "~/ui/appearance/readAppearanceAccentFx";

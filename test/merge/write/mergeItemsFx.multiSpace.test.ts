@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 

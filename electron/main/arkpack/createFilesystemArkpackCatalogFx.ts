@@ -4,7 +4,7 @@ import { dirname, join } from "node:path";
 import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { ArkpackLimits } from "../../../shared/ArkpackLimits";
 import type { ElectronMainError } from "../ElectronMainError";
-import { encodeGameProjectFileStem } from "~/engine/source/encodeGameProjectFileStem";
+import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
 import { listArkpackFilesFx } from "./listArkpackFilesFx";
 import { readArkpackFileFx } from "./readArkpackFileFx";
 import { withArkpackFileLockFx } from "./withArkpackFileLockFx";
@@ -119,10 +119,7 @@ export const createFilesystemArkpackCatalogFx = Effect.fn("createFilesystemArkpa
 				source === "user"
 					? withArkpackFileLockFx(
 							{
-								arkpackPath: join(
-									root,
-									`${encodeGameProjectFileStem(packageId)}.arkpack`,
-								),
+								arkpackPath: join(root, readArkpackArtifactNameFn(packageId)),
 								fileSystem,
 							},
 							(path) => readFx(dirname(path)),

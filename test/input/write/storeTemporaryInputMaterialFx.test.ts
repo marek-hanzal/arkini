@@ -5,7 +5,7 @@ import { createTestGameSession } from "~test/support/game/createTestGameSession"
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 
 const baseItem = (id: string) => ({
 	uid: id,

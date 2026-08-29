@@ -12,7 +12,7 @@ import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
 import { runTickRuntimeByFx } from "~test/support/tick/runTickRuntimeByFx";
 import { StateSchema } from "~/engine/state/schema/StateSchema";

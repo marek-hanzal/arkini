@@ -26,7 +26,7 @@ import { GameLoopFx } from "~/engine/game/context/GameLoopFx";
 import { GameSessionLayerFx } from "~/engine/game/layer/GameSessionLayerFx";
 import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import type { CommittedTransitionSchema } from "~/engine/runtime/schema/CommittedTransitionSchema";
-import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 
 export namespace createGameSessionFx {

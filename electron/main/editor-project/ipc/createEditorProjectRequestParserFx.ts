@@ -5,8 +5,8 @@ import type { EditorProjectRepository } from "~/editor/EditorProjectRepository";
 import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import type {
 	EditorProjectVersionCheckoutInput,

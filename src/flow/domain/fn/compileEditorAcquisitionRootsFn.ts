@@ -6,7 +6,7 @@ import type {
 } from "~/flow/domain/EditorAcquisitionGraph";
 import { readAuthoredItemLinesFn } from "~/engine/line/fn/readAuthoredItemLinesFn";
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
-import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
 

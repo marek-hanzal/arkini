@@ -12,7 +12,7 @@ import { useRuntimeSelector } from "~/ui/game/useRuntimeSelector";
 import { useGameFx } from "~test/support/game/useGameFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { startFx } from "~/engine/start/write/startFx";
-import { testArkpackConfig } from "~test/support/arkpack/createTestArkpack";
+import { testArkpackConfig } from "~test/arkpack/support/createTestArkpack";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 import {
 	type TestGameTransitionFields,

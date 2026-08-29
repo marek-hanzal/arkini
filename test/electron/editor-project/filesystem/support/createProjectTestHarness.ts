@@ -10,7 +10,7 @@ import {
 	type FilesystemEditorProjectRepository,
 } from "../../../../../electron/main/editor-project/filesystem/fx/createFilesystemEditorProjectRepositoryFx";
 import { writeProjectFilesFx } from "../../../../../electron/main/editor-project/filesystem/fx/writeProjectFilesFx";
-import { GameProjectManifestSchema } from "~/engine/source/schema/GameProjectManifestSchema";
+import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 /** Owns one temporary user-data catalog, its managed roots, and external test folders. */

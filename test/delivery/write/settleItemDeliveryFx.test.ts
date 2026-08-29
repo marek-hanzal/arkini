@@ -11,7 +11,7 @@ import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import {
 	inputRuntimeTestConfig,
 	sourceLocation,

@@ -4,7 +4,7 @@ import { createTestGameSession } from "~test/support/game/createTestGameSession"
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
 import { startFx } from "~/engine/start/write/startFx";
-import { testArkpackConfig } from "~test/support/arkpack/createTestArkpack";
+import { testArkpackConfig } from "~test/arkpack/support/createTestArkpack";
 
 describe("fromRuntimeFn", () => {
 	it("creates a detached complete state that constructs one fresh session", async () => {

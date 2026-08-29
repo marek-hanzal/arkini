@@ -6,14 +6,14 @@ import type {
 	CloseItemDetailProps,
 	ItemDetailState,
 	ItemDetailTarget,
-} from "~/ui/item-detail/ItemDetailControl";
+} from "~/item-detail-frame/ItemDetailControl";
 
 interface ExitCompletion {
 	readonly generation: number;
 	readonly deferred: Deferred.Deferred<void>;
 }
 
-export interface ItemDetailController {
+interface ItemDetailController {
 	readonly getSnapshot: () => ItemDetailState;
 	readonly subscribe: (listener: () => void) => () => void;
 	readonly readOrigin: (origin: HTMLElement | null) => HTMLElement | null;

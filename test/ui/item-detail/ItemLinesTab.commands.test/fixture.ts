@@ -6,7 +6,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, vi } from "vitest";
 
 import type { useItemDetailLines } from "~/ui/item-detail/useItemDetailLines";
-import type { ItemDetailPendingAction } from "~/ui/item-detail/ItemDetailControl";
+import type { ItemDetailPendingAction } from "~/item-detail-frame/ItemDetailControl";
 import { ItemLinesTab } from "~/ui/item-detail/ItemLinesTab";
 
 (
@@ -38,7 +38,7 @@ const game = vi.hoisted(() => ({
 
 vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
 
-vi.mock("~/ui/item-detail/useItemDetailControl", () => ({
+vi.mock("~/item-detail-frame/useItemDetailControl", () => ({
 	useItemDetailControl: () => control,
 }));
 

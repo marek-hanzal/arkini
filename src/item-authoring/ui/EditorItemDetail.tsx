@@ -9,7 +9,7 @@ import { EditorSectionPage } from "~/authoring-shell/navigation/EditorSectionPag
 import { EditorSectionTabs } from "~/authoring-shell/navigation/EditorSectionTabs";
 import { EditorRootCard } from "~/authoring-shell/navigation/EditorRootCard";
 import { useEditorEditShortcut } from "~/authoring-shell/navigation/useEditorEditShortcut";
-import { ItemTypeLabel } from "~/ui/item-detail/ItemInfoPresentation";
+import { ItemTypeLabel } from "~/item-definition/ItemDefinitionLabels";
 import { EditorItemNotFound } from "~/item-authoring/ui/EditorItemNotFound";
 import { EditorItemConvertMenu } from "~/item-authoring/ui/EditorItemConvertMenu";
 import { EditorItemSectionLink } from "~/item-authoring/ui/EditorItemSectionLink";

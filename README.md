@@ -25,6 +25,7 @@ Read the smallest entry point needed for the task:
 src/engine    remaining live gameplay runtime, session, Tick and platform-neutral support owners
 src/game-start  initial-state schemas, exact placement planning and atomic runtime start
 src/game-event  committed gameplay event schemas and exact downstream event projection
+src/item-detail-frame  Item Detail target lifecycle, command settlement, reference navigation and frame presentation
 src/item-definition  immutable authored Item schemas, query/selector vocabulary and total selection policy
 src/item-location  grid coordinates, distance, runtime locations, claims and cross-space identity
 src/item-placement  scope-aware stack, spawn, output and existing-item placement
@@ -35,7 +36,7 @@ src/production-condition  authored runtime condition evaluation
 src/production-input  line-input schemas, material planning and storage lifecycle
 src/production-line  production-line definitions, rules, reads and run planning
 src/production-output  output, drop and roll schemas plus resolution policy
-src/production-job  queue admission, active-job lifecycle, capacity and completion
+src/production-job  queue admission, active-job lifecycle, capacity, completion and active-job presentation
 src/production-delivery  outbound input delivery allocation, validation and settlement
 src/game-config  authored config, source, diagnostics, validation, resources and compiler
 src/arkpack   artifact bytes/provenance, renderer catalog/runtime and package UI

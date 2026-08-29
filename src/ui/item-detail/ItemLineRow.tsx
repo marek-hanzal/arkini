@@ -11,20 +11,20 @@ import { withdrawLineInputFx } from "~/production-input/write/withdrawLineInputF
 import { withdrawLineInputsFx } from "~/production-input/write/withdrawLineInputsFx";
 import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
 import { Button, PrimaryButton } from "~/ui/button/Button";
-import { itemDetailFadeMotion } from "~/ui/item-detail/ItemDetailMotion";
+import { itemDetailFadeMotion } from "~/item-detail-frame/ItemDetailMotion";
 import { ItemLineInputs, ItemLineUnavailableWithdrawals } from "~/ui/item-detail/ItemLineInputs";
 import { ItemLineOutputs } from "~/ui/item-detail/ItemLineOutputs";
 import {
 	ItemLineSummary,
 	type ItemLineSummaryIdentityRenderer,
 } from "~/ui/item-detail/ItemLineSummary";
-import { ItemReferenceButton } from "~/ui/item-detail/ItemReferenceButton";
-import type { ItemDetailPendingAction } from "~/ui/item-detail/ItemDetailControl";
-import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
-import { useItemDetailPendingCommand } from "~/ui/item-detail/useItemDetailPendingCommand";
-import { formatItemDurationFn } from "~/ui/item-detail/fn/formatItemDurationFn";
-import { readActiveJobRuntimeFn } from "~/ui/item-detail/fn/readActiveJobRuntimeFn";
-import { ItemRuntime } from "~/ui/item-detail/ItemRuntime";
+import { ItemReferenceButton } from "~/item-detail-frame/ItemReferenceButton";
+import type { ItemDetailPendingAction } from "~/item-detail-frame/ItemDetailControl";
+import { useItemDetailControl } from "~/item-detail-frame/useItemDetailControl";
+import { useItemDetailPendingCommand } from "~/item-detail-frame/useItemDetailPendingCommand";
+import { formatDurationFn } from "~/ui/formatDurationFn";
+import { ProductionJobRuntime } from "~/production-job/ui/ProductionJobRuntime";
+import { readActiveJobRuntimeFn } from "~/production-job/ui/readActiveJobRuntimeFn";
 
 const ItemLineUnavailableReason = ({
 	reason,
@@ -267,11 +267,11 @@ export const ItemLineRow = forwardRef<
 	const runtime =
 		activeJob === undefined
 			? {
-					value: formatItemDurationFn(line.effectiveRuntimeMs),
+					value: formatDurationFn(line.effectiveRuntimeMs),
 					detail:
 						line.baseRuntimeMs === line.effectiveRuntimeMs
 							? "Per cycle"
-							: `Base ${formatItemDurationFn(line.baseRuntimeMs)}`,
+							: `Base ${formatDurationFn(line.baseRuntimeMs)}`,
 				}
 			: readActiveJobRuntimeFn(activeJob);
 
@@ -408,7 +408,7 @@ export const ItemLineRow = forwardRef<
 								Enqueue
 							</PrimaryButton>
 						</div>
-						<ItemRuntime
+						<ProductionJobRuntime
 							dataUi="TileLineRuntime"
 							jobStatus={activeJob?.status ?? "idle"}
 							runtime={runtime}

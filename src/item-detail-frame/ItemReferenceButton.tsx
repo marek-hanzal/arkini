@@ -3,9 +3,9 @@ import { useState } from "react";
 
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { ItemIdentity } from "~/ui/item/ItemIdentity";
-import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
+import { useItemDetailControl } from "~/item-detail-frame/useItemDetailControl";
 
-export interface ItemReferenceButtonProps {
+interface ItemReferenceButtonProps {
 	readonly compositeUrl?: string;
 	readonly dataUi:
 		| "TileLineInputDetailLink"

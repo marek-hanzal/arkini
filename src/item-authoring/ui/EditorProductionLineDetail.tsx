@@ -2,7 +2,7 @@ import { ArrowUpRight, ChevronRight } from "lucide-react";
 
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { useEditorProject } from "~/authoring-session/useEditorProject";
-import { formatItemDurationFn } from "~/ui/item-detail/fn/formatItemDurationFn";
+import { formatDurationFn } from "~/ui/formatDurationFn";
 import { EditorProductionLineEditLink } from "~/item-authoring/ui/EditorProductionLineEditLink";
 import { EditorProductionLineInputs } from "~/item-authoring/ui/EditorProductionLineInputs";
 import { EditorProductionLineOutputs } from "~/item-authoring/ui/EditorProductionLineOutputs";
@@ -12,7 +12,7 @@ const EditorLineRuntime = ({ runtimeMs }: { readonly runtimeMs: number }) => (
 		<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">Runtime</p>
 		<div className="col-start-1 row-span-2 row-start-2 grid grid-rows-[1.5rem_1rem]">
 			<p className="self-center font-semibold tabular-nums text-foreground">
-				{formatItemDurationFn(runtimeMs)}
+				{formatDurationFn(runtimeMs)}
 			</p>
 			<p className="self-end text-xs tabular-nums text-muted">Per cycle</p>
 		</div>

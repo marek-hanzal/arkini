@@ -1,10 +1,6 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import {
-	ItemInfoFact,
-	ItemInfoFacts,
-	ItemStorageScopeLabel,
-	ItemTypeLabel,
-} from "~/ui/item-detail/ItemInfoPresentation";
+import { ItemStorageScopeLabel, ItemTypeLabel } from "~/item-definition/ItemDefinitionLabels";
+import { Fact, FactList } from "~/ui/fact/FactList";
 
 /** Presents the authored identity and storage contract of one item. */
 export const EditorItemIdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => (
@@ -15,34 +11,34 @@ export const EditorItemIdentityDetail = ({ item }: { readonly item: ItemSchema.T
 			</p>
 		</section>
 		<section className="border-t border-line pt-2">
-			<ItemInfoFacts>
-				<ItemInfoFact
+			<FactList>
+				<Fact
 					label="Type"
 					value={ItemTypeLabel[item.type]}
 				/>
-				<ItemInfoFact
+				<Fact
 					label="Storage"
 					value={ItemStorageScopeLabel[item.scope]}
 				/>
-				<ItemInfoFact
+				<Fact
 					label="Stack capacity"
 					value={item.maxStackSize === 1 ? "Single item" : `${item.maxStackSize} items`}
 				/>
-				<ItemInfoFact
+				<Fact
 					label="Game limit"
 					value={item.maxCount === undefined ? "No configured limit" : item.maxCount}
 				/>
-				<ItemInfoFact
+				<Fact
 					label="Item ID"
 					mono
 					value={item.id}
 				/>
-				<ItemInfoFact
+				<Fact
 					label="UID"
 					mono
 					value={item.uid}
 				/>
-			</ItemInfoFacts>
+			</FactList>
 		</section>
 	</div>
 );

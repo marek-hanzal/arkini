@@ -1,5 +1,5 @@
-/** Formats an authored millisecond duration for compact item presentation. */
-export const formatItemDurationFn = (milliseconds: number) => {
+/** Formats a millisecond duration for compact shared presentation. */
+export const formatDurationFn = (milliseconds: number) => {
 	if (milliseconds === 0) return "Immediate";
 	const seconds = milliseconds / 1_000;
 	if (seconds < 60) return Number.isInteger(seconds) ? `${seconds} s` : `${seconds.toFixed(1)} s`;

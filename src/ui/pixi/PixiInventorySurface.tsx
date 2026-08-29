@@ -8,7 +8,7 @@ import { runSpaceActivationAtom } from "~/ui/pixi/command/runSpaceActivationAtom
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
-import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
+import { useItemDetailControl } from "~/item-detail-frame/useItemDetailControl";
 import type { InventoryRuntime } from "~/ui/pixi/scene/InventoryRuntime";
 import { createInventoryRuntimeFx } from "~/ui/pixi/scene/createInventoryRuntimeFx";
 import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";

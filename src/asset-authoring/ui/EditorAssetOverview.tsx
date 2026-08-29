@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { ItemInfoFact, ItemInfoFacts } from "~/ui/item-detail/ItemInfoPresentation";
+import { Fact, FactList } from "~/ui/fact/FactList";
 import { useEditorAssetById } from "~/asset-authoring/ui/useEditorAssetById";
 import { useEditorResourceUrl } from "~/asset-authoring/ui/EditorResourceUrlSession";
 
@@ -35,13 +35,13 @@ export const EditorAssetOverview = ({ resourceId }: { readonly resourceId: strin
 					/>
 				)}
 			</div>
-			<ItemInfoFacts>
-				<ItemInfoFact
+			<FactList>
+				<Fact
 					label="Resource ID"
 					mono
 					value={resource.id}
 				/>
-				<ItemInfoFact
+				<Fact
 					label="Dimensions"
 					value={
 						currentDimensions === undefined
@@ -49,7 +49,7 @@ export const EditorAssetOverview = ({ resourceId }: { readonly resourceId: strin
 							: `${currentDimensions.width} × ${currentDimensions.height} px`
 					}
 				/>
-			</ItemInfoFacts>
+			</FactList>
 		</section>
 	);
 };

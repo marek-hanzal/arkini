@@ -1,21 +1,18 @@
 import { match } from "ts-pattern";
 
 import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
-import type { ItemRuntimeValue } from "~/ui/item-detail/ItemRuntime";
-import { formatItemDurationFn } from "~/ui/item-detail/fn/formatItemDurationFn";
+import { formatDurationFn } from "~/ui/formatDurationFn";
 
-export namespace readActiveJobRuntimeFn {
-	export interface Props {
-		readonly durationMs: number;
-		readonly remainingMs: number;
-		readonly status: JobStatusEnumSchema.Type;
-	}
+interface ActiveJobRuntime {
+	readonly durationMs: number;
+	readonly remainingMs: number;
+	readonly status: JobStatusEnumSchema.Type;
 }
 
 /** Projects one active job into the shared runtime presentation. */
-export const readActiveJobRuntimeFn = (job: readActiveJobRuntimeFn.Props): ItemRuntimeValue => {
-	const remaining = formatItemDurationFn(job.remainingMs);
-	const duration = formatItemDurationFn(job.durationMs);
+export const readActiveJobRuntimeFn = (job: ActiveJobRuntime) => {
+	const remaining = formatDurationFn(job.remainingMs);
+	const duration = formatDurationFn(job.durationMs);
 	return match(job.status)
 		.with(JobStatusEnumSchema.enum.Running, () => ({
 			value: remaining,

@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
-import { useCloseItemDetail } from "~/ui/item-detail/useCloseItemDetail";
-import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
+import { useCloseItemDetail } from "~/item-detail-frame/useCloseItemDetail";
+import { useItemDetailControl } from "~/item-detail-frame/useItemDetailControl";
 
 /**
  * Enforces the overlay ownership order without coupling it to gameplay command

@@ -15,6 +15,7 @@
 		"src/engine",
 		"src/game-start",
 		"src/game-event",
+		"src/item-detail-frame",
 		"src/item-definition",
 		"src/item-location",
 		"src/item-placement",

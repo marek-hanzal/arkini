@@ -1,12 +1,8 @@
 import { match } from "ts-pattern";
 
 import type { useItemDetailInfo } from "~/ui/item-detail/useItemDetailInfo";
-import {
-	ItemInfoFact,
-	ItemInfoFacts,
-	ItemStorageScopeLabel,
-	ItemTypeLabel,
-} from "~/ui/item-detail/ItemInfoPresentation";
+import { ItemStorageScopeLabel, ItemTypeLabel } from "~/item-definition/ItemDefinitionLabels";
+import { Fact, FactList } from "~/ui/fact/FactList";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
 
 const LocationInfoFact = ({
@@ -19,7 +15,7 @@ const LocationInfoFact = ({
 		}
 	>["location"];
 }) => (
-	<ItemInfoFact
+	<Fact
 		dataUi="TileInfoFact"
 		label="Location"
 		value={match(location)
@@ -96,50 +92,50 @@ export const ItemInfoTab = ({
 		</section>
 
 		<section className="border-t border-line pt-2">
-			<ItemInfoFacts>
-				<ItemInfoFact
+			<FactList>
+				<Fact
 					dataUi="TileInfoFact"
 					label="Type"
 					value={ItemTypeLabel[info.itemType]}
 				/>
 				{stale ? null : <LocationInfoFact location={info.location} />}
-				<ItemInfoFact
+				<Fact
 					dataUi="TileInfoFact"
 					label="Storage"
 					value={ItemStorageScopeLabel[info.storageScope]}
 				/>
 				{stale ? null : (
-					<ItemInfoFact
+					<Fact
 						dataUi="TileInfoFact"
 						label="Current stack"
 						value={`${info.quantity} ${info.quantity === 1 ? "item" : "items"}`}
 					/>
 				)}
-				<ItemInfoFact
+				<Fact
 					dataUi="TileInfoFact"
 					label="Stack capacity"
 					value={info.maxStackSize === 1 ? "Single item" : `${info.maxStackSize} items`}
 				/>
 				{stale ? null : (
-					<ItemInfoFact
+					<Fact
 						dataUi="TileInfoFact"
 						label="Owned"
 						value={`${info.ownedQuantity}${info.maxCount === undefined ? "" : ` / ${info.maxCount}`}`}
 					/>
 				)}
-				<ItemInfoFact
+				<Fact
 					dataUi="TileInfoFact"
 					label="Game limit"
 					value={info.maxCount === undefined ? "No configured limit" : `${info.maxCount}`}
 				/>
 				{stale || info.charges === undefined ? null : (
-					<ItemInfoFact
+					<Fact
 						dataUi="TileInfoFact"
 						label="Charges"
 						value={`${info.charges.remaining} / ${info.charges.total}`}
 					/>
 				)}
-			</ItemInfoFacts>
+			</FactList>
 		</section>
 	</Scrollable>
 );

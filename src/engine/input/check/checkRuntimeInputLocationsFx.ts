@@ -14,7 +14,7 @@ import type { LineInputClosedIssueSchema } from "~/engine/line/schema/check/Line
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { matchesItemSelectorFx } from "~/engine/selector/fx/matchesItemSelectorFx";
+import { matchesItemSelectorFn } from "~/engine/selector/fn/matchesItemSelectorFn";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
@@ -93,7 +93,7 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 			continue;
 		}
 
-		const matches = yield* matchesItemSelectorFx({
+		const matches = matchesItemSelectorFn({
 			item: item.item,
 			selector: input.selector,
 		});

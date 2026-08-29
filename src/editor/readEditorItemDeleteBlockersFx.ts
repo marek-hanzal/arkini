@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticRecordEntityEnumSchema } from "~/engine/validation/schema/DiagnosticRecordEntityEnumSchema";
-import { validateConfigReferencesFx } from "~/engine/validation/rule/validateConfigReferencesFx";
+import { validateConfigReferencesFn } from "~/engine/validation/rule/fn/validateConfigReferencesFn";
 
 export interface EditorItemDeleteBlocker {
 	readonly message: string;
@@ -24,7 +24,7 @@ export const readEditorItemDeleteBlockersFx = Effect.fn("readEditorItemDeleteBlo
 			...config.items,
 		};
 		delete items[itemId];
-		const diagnostics = yield* validateConfigReferencesFx({
+		const diagnostics = validateConfigReferencesFn({
 			config: {
 				...config,
 				items,

@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 
 import type { EditorItemOriginFlow } from "~/editor/origin-flow/EditorItemOriginFlow";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { readHighlightFn } from "~/ui/item/editor/origin-flow/fn/readHighlightFn";
-import { readMetroBackbonesFn } from "~/ui/item/editor/origin-flow/fn/readMetroBackbonesFn";
 import { readNavigationFn } from "~/ui/item/editor/origin-flow/fn/readNavigationFn";
 import { readRelationNavigationFn } from "~/ui/item/editor/origin-flow/fn/readRelationNavigationFn";
 import { readRootNavigationFn } from "~/ui/item/editor/origin-flow/fn/readRootNavigationFn";
@@ -10,6 +10,7 @@ import { readRouteColorsFn } from "~/ui/item/editor/origin-flow/fn/readRouteColo
 import { readVisibleHighlightFn } from "~/ui/item/editor/origin-flow/fn/readVisibleHighlightFn";
 import type { LayoutNode, LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
 import type { OriginFlowDirection, Selection } from "~/ui/item/editor/origin-flow/Highlight";
+import { readMetroBackbonesFx } from "~/ui/item/editor/origin-flow/readMetroBackbonesFx";
 
 export const DefaultHighlightDepth = 1;
 
@@ -87,9 +88,11 @@ export const useProjection = ({
 	const highlightedEdgeColors = routeColors.edges;
 	const metroBackbones = useMemo(
 		() =>
-			readMetroBackbonesFn(backbones, [
-				...highlightedEdgeColors.keys(),
-			]),
+			RendererRuntime.runSync(
+				readMetroBackbonesFx(backbones, [
+					...highlightedEdgeColors.keys(),
+				]),
+			),
 		[
 			backbones,
 			highlightedEdgeColors,

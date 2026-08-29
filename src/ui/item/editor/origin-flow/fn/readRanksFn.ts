@@ -1,11 +1,11 @@
-import { Graph } from "effect";
+import { Graph, Order } from "effect";
 
 import type { LayoutInput } from "~/ui/item/editor/origin-flow/Layout";
 import type { DirectedPair } from "~/ui/item/editor/origin-flow/Topology";
 
 /** Collapses feedback cycles and assigns a stable forward rank to each flow node. */
 export const readRanksFn = (flow: LayoutInput, directedPairs: ReadonlyArray<DirectedPair>) => {
-	const nodeIds = flow.nodes.map(({ id }) => id).sort((left, right) => left.localeCompare(right));
+	const nodeIds = flow.nodes.map(({ id }) => id).sort((left, right) => Order.String(left, right));
 	const graphNodeById = new Map<string, Graph.NodeIndex>();
 	const idByGraphNode = new Map<Graph.NodeIndex, string>();
 	const graph = Graph.directed<string, void>((mutable) => {
@@ -26,9 +26,9 @@ export const readRanksFn = (flow: LayoutInput, directedPairs: ReadonlyArray<Dire
 			nodes
 				.map((node) => idByGraphNode.get(node))
 				.filter((id): id is string => id !== undefined)
-				.sort((left, right) => left.localeCompare(right)),
+				.sort((left, right) => Order.String(left, right)),
 		)
-		.sort(([left = ""], [right = ""]) => left.localeCompare(right));
+		.sort(([left = ""], [right = ""]) => Order.String(left, right));
 	const componentById = new Map<string, string>();
 	for (const component of components) {
 		const componentId = component[0];

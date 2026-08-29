@@ -1,3 +1,5 @@
+import { Order } from "effect";
+
 import type { EditorItemOriginFlow } from "~/editor/origin-flow/EditorItemOriginFlow";
 import type { OriginFlowDirection } from "~/ui/item/editor/origin-flow/Highlight";
 
@@ -93,7 +95,7 @@ export const readNavigationFn = (
 			if (flowDifference !== 0) return flowDifference;
 			const distanceDifference = readDistance(current, left) - readDistance(current, right);
 			if (Math.abs(distanceDifference) > 1e-9) return distanceDifference;
-			return leftId.localeCompare(rightId);
+			return Order.String(leftId, rightId);
 		});
 		for (const targetId of targets) visit(targetId, nodeId);
 	};

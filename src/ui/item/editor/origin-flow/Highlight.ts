@@ -6,10 +6,7 @@ import type { EditorItemOriginEdge } from "~/editor/origin-flow/EditorItemOrigin
 export type OriginFlowDirection = "input" | "output";
 
 export const EdgeOrder = Order.make<EditorItemOriginEdge>((left, right) => {
-	const operationOrder = left.operationId.localeCompare(right.operationId);
-	if (operationOrder !== 0) return operationOrder < 0 ? -1 : 1;
-	const edgeOrder = left.id.localeCompare(right.id);
-	return edgeOrder === 0 ? 0 : edgeOrder < 0 ? -1 : 1;
+	return Order.String(left.operationId, right.operationId) || Order.String(left.id, right.id);
 });
 
 export type Selection =

@@ -1,3 +1,5 @@
+import { Order } from "effect";
+
 import type { EditorItemOriginFlow } from "~/editor/origin-flow/EditorItemOriginFlow";
 
 /** Reads stable item navigation for nodes that use the selected item in one operation role. */
@@ -40,9 +42,9 @@ export const readRelationNavigationFn = ({
 		const left = nodesById.get(leftId)!;
 		const right = nodesById.get(rightId)!;
 		return (
-			left.title.localeCompare(right.title) ||
-			left.itemId.localeCompare(right.itemId) ||
-			leftId.localeCompare(rightId)
+			Order.String(left.title, right.title) ||
+			Order.String(left.itemId, right.itemId) ||
+			Order.String(leftId, rightId)
 		);
 	});
 };

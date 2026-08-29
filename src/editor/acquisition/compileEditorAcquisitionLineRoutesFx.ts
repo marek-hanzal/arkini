@@ -5,7 +5,7 @@ import type {
 	EditorAcquisitionRequirement,
 	EditorAcquisitionRoute,
 } from "~/editor/EditorAcquisitionGraph";
-import { readEditorAcquisitionAvailabilityRequirementsFx } from "~/editor/readEditorAcquisitionAvailabilityRequirementsFx";
+import { readEditorAcquisitionAvailabilityRequirementsFn } from "~/editor/acquisition/fn/readEditorAcquisitionAvailabilityRequirementsFn";
 import { readEditorAcquisitionOutputOccurrencesFx } from "~/editor/readEditorAcquisitionOutputOccurrencesFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
@@ -128,7 +128,7 @@ const readLineDescriptorFx = Effect.fn("compileEditorAcquisitionLineRoutesFx.des
 			else continue;
 		}
 
-		const availability = yield* readEditorAcquisitionAvailabilityRequirementsFx({
+		const availability = readEditorAcquisitionAvailabilityRequirementsFn({
 			rules: line.rules,
 			source: "line-condition",
 		});

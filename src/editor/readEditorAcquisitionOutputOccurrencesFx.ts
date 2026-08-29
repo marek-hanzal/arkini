@@ -5,7 +5,7 @@ import type {
 	EditorAcquisitionRequirement,
 	EditorAcquisitionUnsupportedRequirement,
 } from "~/editor/EditorAcquisitionGraph";
-import { readEditorAcquisitionAvailabilityRequirementsFx } from "~/editor/readEditorAcquisitionAvailabilityRequirementsFx";
+import { readEditorAcquisitionAvailabilityRequirementsFn } from "~/editor/acquisition/fn/readEditorAcquisitionAvailabilityRequirementsFn";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 
@@ -58,13 +58,13 @@ export const readEditorAcquisitionOutputOccurrencesFx = Effect.fn(
 			}
 		> = [];
 		const groupByKey = new Map<string, string>();
-		const readDropFx = Effect.fn("readEditorAcquisitionOutputOccurrencesFx.drop")(function* (
+		const readDrop = (
 			drop: DropSchema.Type,
 			id: string,
 			annotation: EditorAcquisitionOutputAnnotation,
 			probability: number,
-		) {
-			const requirements = yield* readEditorAcquisitionAvailabilityRequirementsFx({
+		) => {
+			const requirements = readEditorAcquisitionAvailabilityRequirementsFn({
 				rules: drop.rules,
 				source: "output-condition",
 			});
@@ -79,7 +79,7 @@ export const readEditorAcquisitionOutputOccurrencesFx = Effect.fn(
 				id,
 				requirements,
 			});
-		});
+		};
 
 		const totalSetWeight = output.set.reduce((total, set) => total + set.weight, 0);
 		for (const [setIndex, set] of output.set.entries()) {
@@ -95,7 +95,7 @@ export const readEditorAcquisitionOutputOccurrencesFx = Effect.fn(
 					for (const [candidateIndex, candidate] of roll.drop.entries()) {
 						for (const [dropIndex, drop] of candidate.drop.entries()) {
 							const id = `set:${setIndex}:roll:${rollIndex}:candidate:${candidateIndex}:drop:${dropIndex}`;
-							yield* readDropFx(
+							readDrop(
 								drop,
 								id,
 								{
@@ -113,7 +113,7 @@ export const readEditorAcquisitionOutputOccurrencesFx = Effect.fn(
 				} else {
 					for (const [dropIndex, drop] of roll.drop.entries()) {
 						const id = `set:${setIndex}:roll:${rollIndex}:drop:${dropIndex}`;
-						yield* readDropFx(
+						readDrop(
 							drop,
 							id,
 							{

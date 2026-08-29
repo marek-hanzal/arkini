@@ -5,7 +5,7 @@ import type {
 	EditorItemEstimateIndexRow,
 } from "~/editor/EditorItemEstimateIndex";
 import type { EditorItemEstimateSortSchema } from "~/editor/EditorItemEstimateSortSchema";
-import { searchEditorItemsFx } from "~/editor/searchEditorItemsFx";
+import { searchEditorItemsFn } from "~/editor/item/fn/searchEditorItemsFn";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 
 const compareRuntime = (
@@ -33,14 +33,14 @@ export const selectEditorItemEstimateIndexFx = Effect.fn("selectEditorItemEstima
 		readonly query: string;
 		readonly sort: EditorItemEstimateSortSchema.Type;
 	}) =>
-		Effect.gen(function* () {
+		Effect.sync(() => {
 			const estimates = new Map(
 				entries.map((entry) => [
 					entry.itemId,
 					entry,
 				]),
 			);
-			return (yield* searchEditorItemsFx(items, query))
+			return searchEditorItemsFn(items, query)
 				.flatMap((item): ReadonlyArray<EditorItemEstimateIndexRow> => {
 					const estimate = estimates.get(item.id);
 					return estimate === undefined || (incomplete && estimate.status === "complete")

@@ -48,6 +48,27 @@ const source = ({
 });
 
 describe("editor item origin relations", () => {
+	it("orders non-ASCII relation IDs by stable code units", () => {
+		const relations = readEditorItemOriginRelationsFn({
+			...source({
+				id: "source:forge",
+				outputItemId: "ingot",
+				requirementItemId: "forge",
+			}),
+			requirementItemIds: [
+				"forge",
+				"ä-input",
+				"z-input",
+			],
+		});
+
+		expect(relations.map(({ fromItemId }) => fromItemId)).toEqual([
+			"z-input",
+			"ä-input",
+			"forge",
+		]);
+	});
+
 	it("uses the same external-input and owner-output edges as the editor flow", () => {
 		const forge: EditorItemOriginSource = {
 			...source({

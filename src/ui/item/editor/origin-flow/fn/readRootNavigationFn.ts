@@ -1,3 +1,5 @@
+import { Order } from "effect";
+
 import type { EditorItemOriginFlow } from "~/editor/origin-flow/EditorItemOriginFlow";
 import type { Highlight } from "~/ui/item/editor/origin-flow/Highlight";
 
@@ -44,8 +46,8 @@ export const readRootNavigationFn = (
 				Number((left?.starterScopes.length ?? 0) > 0);
 			if (starterDifference !== 0) return starterDifference;
 			return (
-				(left?.title ?? leftId).localeCompare(right?.title ?? rightId) ||
-				leftId.localeCompare(rightId)
+				Order.String(left?.title ?? leftId, right?.title ?? rightId) ||
+				Order.String(leftId, rightId)
 			);
 		});
 };

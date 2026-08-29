@@ -1,3 +1,5 @@
+import { Order } from "effect";
+
 import type { EditorItemOriginFlow } from "~/editor/origin-flow/EditorItemOriginFlow";
 import type { Highlight, Selection } from "~/ui/item/editor/origin-flow/Highlight";
 
@@ -48,7 +50,7 @@ export const readRouteColorsFn = (
 	const edgeIds = flow.edges
 		.map(({ id }) => id)
 		.filter((id) => highlightedIds.has(id))
-		.sort((left, right) => left.localeCompare(right));
+		.sort((left, right) => Order.String(left, right));
 	const offset = hashText(selection.id) % HighlightRouteColors.length;
 	const edges = new Map(
 		edgeIds.map(

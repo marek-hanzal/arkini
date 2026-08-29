@@ -25,6 +25,27 @@ const readRanks = (
 	);
 
 describe("readRanksFn", () => {
+	it("orders disconnected non-ASCII nodes by stable code units", () => {
+		expect([
+			...readRanks(
+				[
+					"ä-node",
+					"z-node",
+				],
+				[],
+			),
+		]).toEqual([
+			[
+				"z-node",
+				0,
+			],
+			[
+				"ä-node",
+				0,
+			],
+		]);
+	});
+
 	it("collapses feedback cycles and keeps longest ranks independent of insertion order", () => {
 		const nodeIds = [
 			"cycle-b",

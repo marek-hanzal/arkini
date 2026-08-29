@@ -1,3 +1,5 @@
+import { Order } from "effect";
+
 import type {
 	EditorItemOriginRelation,
 	EditorItemOriginRelationRole,
@@ -30,8 +32,8 @@ export const readEditorItemOriginRelationSubgraphFn = ({
 	for (const relations of relationsBySourceItem.values())
 		relations.sort(
 			(left, right) =>
-				left.source.id.localeCompare(right.source.id) ||
-				left.toItemId.localeCompare(right.toItemId) ||
+				Order.String(left.source.id, right.source.id) ||
+				Order.String(left.toItemId, right.toItemId) ||
 				(left.outputIndex ?? -1) - (right.outputIndex ?? -1),
 		);
 
@@ -95,9 +97,9 @@ export const readEditorItemOriginRelationSubgraphFn = ({
 		].sort(
 			(left, right) =>
 				left.level - right.level ||
-				left.source.id.localeCompare(right.source.id) ||
-				left.fromItemId.localeCompare(right.fromItemId) ||
-				left.toItemId.localeCompare(right.toItemId) ||
+				Order.String(left.source.id, right.source.id) ||
+				Order.String(left.fromItemId, right.fromItemId) ||
+				Order.String(left.toItemId, right.toItemId) ||
 				(left.outputIndex ?? -1) - (right.outputIndex ?? -1),
 		),
 	};

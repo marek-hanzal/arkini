@@ -25,6 +25,9 @@
 	"include": [
 		"electron",
 		"src/editor",
+		"src/item-authoring/domain",
+		"src/flow/domain",
+		"src/estimate/domain",
 		"electron.vite.config.ts"
 	]
 }

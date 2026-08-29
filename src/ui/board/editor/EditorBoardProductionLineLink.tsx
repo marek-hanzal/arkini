@@ -3,7 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 import { readAuthoredItemLinesFn } from "~/engine/line/fn/readAuthoredItemLinesFn";
 import { useEditorProject } from "~/ui/editor/useEditorProject";
 import type { ItemLineSummaryIdentityRenderProps } from "~/ui/item-detail/ItemLineSummary";
-import { EditorProductionLineEditLink } from "~/ui/item/editor/EditorProductionLineEditLink";
+import { EditorProductionLineEditLink } from "~/item-authoring/ui/EditorProductionLineEditLink";
 
 /** Links a shared gameplay line summary to that exact authored production line. */
 export const EditorBoardProductionLineLink = ({

@@ -1,7 +1,7 @@
 import type { EditorProject } from "~/editor/EditorProject";
-import { createEditorItemEstimateIndexFn } from "~/editor/estimator/fn/createEditorItemEstimateIndexFn";
-import { estimateEditorItemCatalogFn } from "~/editor/estimator/fn/estimateEditorItemCatalogFn";
-import { selectEditorItemEstimateIndexFn } from "~/editor/estimator/fn/selectEditorItemEstimateIndexFn";
+import { createEditorItemEstimateIndexFn } from "~/estimate/domain/fn/createEditorItemEstimateIndexFn";
+import { estimateEditorItemCatalogFn } from "~/estimate/domain/fn/estimateEditorItemCatalogFn";
+import { selectEditorItemEstimateIndexFn } from "~/estimate/domain/fn/selectEditorItemEstimateIndexFn";
 import type { EstimateInput } from "../EstimateInputSchema";
 
 const formatNumber = (value: number) =>

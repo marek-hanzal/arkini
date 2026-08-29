@@ -1,13 +1,13 @@
 import { Effect } from "effect";
 
 import type { EditorProject } from "~/editor/EditorProject";
-import { createEditorAcquisitionGraphFn } from "~/editor/acquisition/fn/createEditorAcquisitionGraphFn";
+import { createEditorAcquisitionGraphFn } from "~/flow/domain/fn/createEditorAcquisitionGraphFn";
 import type {
 	EditorItemEstimate,
 	EditorItemEstimateDiagnostic,
 	EditorItemEstimateRouteStep,
-} from "~/editor/estimator/EditorItemEstimate";
-import { estimateEditorItemsFn } from "~/editor/estimator/fn/estimateEditorItemsFn";
+} from "~/estimate/domain/EditorItemEstimate";
+import { estimateEditorItemsFn } from "~/estimate/domain/fn/estimateEditorItemsFn";
 
 const formatNumber = (value: number) =>
 	Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.00$/, "");

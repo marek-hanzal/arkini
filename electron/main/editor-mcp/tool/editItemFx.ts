@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { EditorProject } from "~/editor/EditorProject";
 import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
-import { saveEditorItemWithRepositoryFx } from "~/editor/saveEditorItemWithRepositoryFx";
+import { saveEditorItemWithRepositoryFx } from "~/item-authoring/domain/fx/saveEditorItemWithRepositoryFx";
 import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { EditItemInput } from "./EditItemInputSchemas";

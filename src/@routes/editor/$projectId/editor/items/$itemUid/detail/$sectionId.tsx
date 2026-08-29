@@ -1,22 +1,22 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import { EditorItemArtworkDetail } from "~/ui/item/editor/EditorItemArtworkDetail";
+import { EditorItemArtworkDetail } from "~/item-authoring/ui/EditorItemArtworkDetail";
 import {
 	EditorItemChargesDetail,
 	EditorItemMergesDetail,
-} from "~/ui/item/editor/EditorItemCapabilityDetails";
-import { EditorItemDeleteSection } from "~/ui/item/editor/EditorItemDeleteSection";
-import { EditorItemEstimateSection } from "~/ui/item/editor/EditorItemEstimateSection";
-import { EditorItemIdentityDetail } from "~/ui/item/editor/EditorItemIdentityDetail";
-import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
-import { EditorItemProductionDetail } from "~/ui/item/editor/EditorItemProductionDetail";
+} from "~/item-authoring/ui/EditorItemCapabilityDetails";
+import { EditorItemDeleteSection } from "~/item-authoring/ui/EditorItemDeleteSection";
+import { EditorItemEstimateSection } from "~/estimate/ui/EditorItemEstimateSection";
+import { EditorItemIdentityDetail } from "~/item-authoring/ui/EditorItemIdentityDetail";
+import { EditorItemNotFound } from "~/item-authoring/ui/EditorItemNotFound";
+import { EditorItemProductionDetail } from "~/item-authoring/ui/EditorItemProductionDetail";
 import {
 	type EditorItemSectionId,
 	EditorItemSectionIds,
-} from "~/ui/item/editor/EditorItemSections";
-import { EditorSpaceActionDetail } from "~/ui/item/editor/EditorSpaceActionDetail";
-import { readEditorItemSectionsFn } from "~/ui/item/editor/fn/readEditorItemSectionsFn";
-import { useEditorItemByUid } from "~/ui/item/editor/useEditorItemByUid";
+} from "~/item-authoring/ui/EditorItemSections";
+import { EditorSpaceActionDetail } from "~/item-authoring/ui/EditorSpaceActionDetail";
+import { readEditorItemSectionsFn } from "~/item-authoring/ui/fn/readEditorItemSectionsFn";
+import { useEditorItemByUid } from "~/item-authoring/ui/useEditorItemByUid";
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/detail/$sectionId")({
 	beforeLoad: ({ params }) => {

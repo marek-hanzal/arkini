@@ -1,17 +1,17 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import { EditorItemArtworkSection } from "~/ui/item/editor/EditorItemArtworkSection";
-import { EditorItemChargesSection } from "~/ui/item/editor/EditorItemChargesSection";
-import { useEditorItemFormSession } from "~/ui/item/editor/EditorItemFormContext";
-import { EditorItemIdentitySection } from "~/ui/item/editor/EditorItemIdentitySection";
-import { EditorItemMergesSection } from "~/ui/item/editor/EditorItemMergesSection";
-import { EditorItemProductionSection } from "~/ui/item/editor/EditorItemProductionSection";
+import { EditorItemArtworkSection } from "~/item-authoring/ui/EditorItemArtworkSection";
+import { EditorItemChargesSection } from "~/item-authoring/ui/EditorItemChargesSection";
+import { useEditorItemFormSession } from "~/item-authoring/ui/EditorItemFormContext";
+import { EditorItemIdentitySection } from "~/item-authoring/ui/EditorItemIdentitySection";
+import { EditorItemMergesSection } from "~/item-authoring/ui/EditorItemMergesSection";
+import { EditorItemProductionSection } from "~/item-authoring/ui/EditorItemProductionSection";
 import {
 	type EditorItemSectionId,
 	EditorItemSectionIds,
-} from "~/ui/item/editor/EditorItemSections";
-import { EditorSpaceActionSection } from "~/ui/item/editor/EditorSpaceActionSection";
-import { readEditorItemFormSectionsFn } from "~/ui/item/editor/fn/readEditorItemFormSectionsFn";
+} from "~/item-authoring/ui/EditorItemSections";
+import { EditorSpaceActionSection } from "~/item-authoring/ui/EditorSpaceActionSection";
+import { readEditorItemFormSectionsFn } from "~/item-authoring/ui/fn/readEditorItemFormSectionsFn";
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/form/$sectionId")({
 	beforeLoad: ({ params }) => {

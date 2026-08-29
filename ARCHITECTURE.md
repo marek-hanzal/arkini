@@ -4,22 +4,25 @@ This is the canonical map of implemented ownership and lifecycle. It does not ca
 
 ## Dependency and process boundaries
 
-The renderer dependency DAG is:
+The product dependency map is:
 
 ```text
-src/@routes → { src/ui, src/renderer, exact src/engine owners, src/editor, electron/contract }
-src/ui      → { src/renderer, exact src/engine owners, src/editor, electron/contract }
-src/renderer → { exact src/engine owners, src/editor, electron/contract }
-src/editor  → exact src/engine owners
+src/@routes → { product UI/workers, src/ui, src/renderer, product domains, exact src/engine owners, src/editor, electron/contract }
+product UI/workers → { product domains, exact product/shared UI owners, src/renderer, exact src/engine owners, src/editor, electron/contract }
+product domains → { upstream product domains, exact src/engine owners, src/editor }
+src/ui → { exact product UI/domain owners, src/renderer, exact src/engine owners, src/editor, electron/contract }
+src/renderer → { product domains, exact src/engine owners, src/editor, electron/contract }
+src/editor → exact src/engine owners
 ```
 
 - `src/engine` is framework-neutral gameplay, config, compiler, validation, pack, and CLI domain code. Consumers import exact Engine owners directly; there is no generic public/internal wall. Dependency Cruiser restricts only specifically enumerated mutable or raw authorities.
-- `src/editor` is the platform-neutral Editor domain.
+- `src/item-authoring` owns authored Item forms, detail/list/delete policies, persistence commands, and Item-specific presentation. `src/flow` owns the canonical authored acquisition graph, global Flow projection, canvas, and layout worker. `src/estimate` owns static Estimate semantics, query/index projections, renderer cache, and estimate worker. Their `domain/` subtrees are platform-neutral and cannot import UI, renderer, routes, or Electron; their `ui/` and `worker/` subtrees own product-specific presentation and renderer execution boundaries.
+- `src/editor` retains shared platform-neutral project, repository, build, and portable authoring capabilities; it does not own Item Authoring, Flow, or Estimate.
 - `src/renderer` contains only concrete renderer-process runtime, lifecycle, concurrency, and transport capabilities. It is not a required gateway to Engine, Editor, or `electron/contract`; callers import the exact owner directly.
-- `src/ui` owns reusable presentation and transient interaction. `src/@routes` owns registration, loaders, redirects, route context, and route-specific composition; routes may share only explicitly ignored `-*` route-private helpers, never import another route module.
-- `electron/main` owns physical desktop capabilities and composes engine/editor owners directly. It never imports renderer code; concrete raw Engine authorities remain limited to their exact owners by Dependency Cruiser. `electron/preload` is transport-only; engine/editor code never imports Electron.
+- `src/ui` owns cross-product primitives and reusable presentation. Product-specific UI remains with its top-level product owner. `src/@routes` owns registration, loaders, redirects, route context, and route-specific composition; routes may share only explicitly ignored `-*` route-private helpers, never import another route module.
+- `electron/main` owns physical desktop capabilities and composes product-domain, shared Editor, and Engine owners directly. It never imports renderer or product-presentation code; concrete raw Engine authorities remain limited to their exact owners by Dependency Cruiser. `electron/preload` is transport-only; Engine, shared Editor, and product-domain code never imports Electron.
 
-[`.dependency-cruiser.cjs`](.dependency-cruiser.cjs) is the executable import-boundary authority. `argc dc` cruises every active module root and standalone TypeScript config, so a new top-level source domain cannot sit outside the graph. Do not duplicate those rules in tests or prose.
+[`.dependency-cruiser.cjs`](.dependency-cruiser.cjs) is the executable import-boundary authority. `argc dc` cruises the complete `src`, `electron`, `shared`, `scripts`, and `test` roots plus standalone TypeScript configs, so every product root participates in cycle, resolution, dependency, and orphan checks. Do not duplicate those rules in tests or prose.
 
 Within an exact domain owner, total synchronous explicit-input data-to-data helpers are named `*Fn` and remain private beside their owner by default. The suffix is the immediate guarantee that the helper is total, non-throwing, and free of Effect, Promise, ambient state, time, randomness, I/O, mutation, or stateful capabilities; it does not require another public module. An owner-local `fn/` is reserved for independently shared pure policies, algorithms, or calculations with their own public contract and their operation-owned declarations. It never contains Effect programs or standalone/declaration-only concepts such as schemas, standalone types, Context/Layer/errors, capabilities, or constant-only modules, and never replaces domain ownership with a global shared layer. Fn composes only Fn, while Fx may compose Fn or Fx, so value dependencies cannot reach into effects or stateful capabilities.
 

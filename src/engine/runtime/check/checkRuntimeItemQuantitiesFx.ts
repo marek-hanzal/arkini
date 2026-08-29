@@ -3,8 +3,8 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
-import { isItemPureWithIndexFx } from "~/engine/item/fx/purity/isItemPureWithIndexFx";
-import { readItemPurityIndexFx } from "~/engine/item/fx/purity/readItemPurityIndexFx";
+import { isItemPureWithIndexFn } from "~/engine/item/fn/isItemPureWithIndexFn";
+import { readItemPurityIndexFn } from "~/engine/item/fn/readItemPurityIndexFn";
 import { readReservedJobOutputQuantitiesFx } from "~/engine/job/fx/read/readReservedJobOutputQuantitiesFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { ItemMaxCountIssueSchema } from "~/engine/runtime/schema/check/ItemMaxCountIssueSchema";
@@ -23,7 +23,7 @@ export const checkRuntimeItemQuantitiesFx = Effect.fn("checkRuntimeItemQuantitie
 }: checkRuntimeItemQuantitiesFx.Props) {
 	const stackIssues: ItemStackSizeIssueSchema.Type[] = [];
 	const maxCountIssues: ItemMaxCountIssueSchema.Type[] = [];
-	const purityIndex = yield* readItemPurityIndexFx(runtime);
+	const purityIndex = readItemPurityIndexFn(runtime);
 	const liveByCanonicalItemId = new Map<
 		IdSchema.Type,
 		{
@@ -33,11 +33,11 @@ export const checkRuntimeItemQuantitiesFx = Effect.fn("checkRuntimeItemQuantitie
 	>();
 
 	for (const item of runtime.items) {
-		const maxStackSize = (yield* isItemPureWithIndexFx({
+		const maxStackSize = isItemPureWithIndexFn({
 			index: purityIndex,
 			item,
 			runtime,
-		}))
+		})
 			? item.item.maxStackSize
 			: 1;
 		if (item.quantity > maxStackSize) {

@@ -5,7 +5,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
-import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
+import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import { assertOwnerIdleFx } from "~/engine/job/fx/assertOwnerIdleFx";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
@@ -72,7 +72,7 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 			runtime,
 		});
 	}
-	const pure = yield* isItemPureFx({
+	const pure = isItemPureFn({
 		item,
 		runtime,
 	});

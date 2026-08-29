@@ -2,7 +2,7 @@ import { Effect, Option } from "effect";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
-import { readTileActorBadgeCountFx } from "~/ui/pixi/actor/readTileActorBadgeCountFx";
+import { readTileActorBadgeCountFn } from "~/ui/pixi/actor/fn/readTileActorBadgeCountFn";
 import { readTileActorAssetSourceIdsFx } from "~/ui/pixi/actor/readTileActorAssetSourceIdsFx";
 import { readTileActorVisualFx } from "~/ui/pixi/actor/readTileActorVisualFx";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
@@ -103,7 +103,7 @@ export const readTileDeliveriesFx = Effect.fnUntraced(function* ({
 				runtime,
 			}),
 		});
-		const badgeCount = yield* readTileActorBadgeCountFx(current);
+		const badgeCount = readTileActorBadgeCountFn(current);
 		deliveries.push({
 			from,
 			generation: current.location.generation,

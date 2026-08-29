@@ -2,7 +2,7 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
-import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
+import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
@@ -143,12 +143,12 @@ describe("input state owner isolation", () => {
 				return {
 					stored,
 					owner,
-					ownerPure: yield* isItemPureFx({
+					ownerPure: isItemPureFn({
 						item: owner,
 						runtime,
 					}),
 					remainder,
-					remainderPure: yield* isItemPureFx({
+					remainderPure: isItemPureFn({
 						item: remainder,
 						runtime,
 					}),

@@ -1,7 +1,6 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readTileActorBadgeCountFx } from "~/ui/pixi/actor/readTileActorBadgeCountFx";
+import { readTileActorBadgeCountFn } from "~/ui/pixi/actor/fn/readTileActorBadgeCountFn";
 import { readTileActorProgressRatioFn } from "~/ui/pixi/actor/fn/readTileActorProgressRatioFn";
 import { readTileActorQueueBadgeCountFn } from "~/ui/pixi/actor/fn/readTileActorQueueBadgeCountFn";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
@@ -139,10 +138,10 @@ describe("tile actor overlay projection", () => {
 			remainingCharges: 4,
 		});
 
-		expect(Effect.runSync(readTileActorBadgeCountFx(single))).toBeUndefined();
-		expect(Effect.runSync(readTileActorBadgeCountFx(stack))).toBe(120);
-		expect(Effect.runSync(readTileActorBadgeCountFx(freshDeposit))).toBe(12);
-		expect(Effect.runSync(readTileActorBadgeCountFx(usedDeposit))).toBe(4);
+		expect(readTileActorBadgeCountFn(single)).toBeUndefined();
+		expect(readTileActorBadgeCountFn(stack)).toBe(120);
+		expect(readTileActorBadgeCountFn(freshDeposit)).toBe(12);
+		expect(readTileActorBadgeCountFn(usedDeposit)).toBe(4);
 	});
 
 	it("fills job progress forward and temporary lifetime backward", () => {

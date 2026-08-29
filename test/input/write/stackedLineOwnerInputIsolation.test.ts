@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
-import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
+import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
@@ -66,12 +66,12 @@ describe("stacked line owner input isolation", () => {
 
 				return {
 					isolatedOwner,
-					ownerPure: yield* isItemPureFx({
+					ownerPure: isItemPureFn({
 						item: isolatedOwner,
 						runtime,
 					}),
 					remainder,
-					remainderPure: yield* isItemPureFx({
+					remainderPure: isItemPureFn({
 						item: remainder,
 						runtime,
 					}),

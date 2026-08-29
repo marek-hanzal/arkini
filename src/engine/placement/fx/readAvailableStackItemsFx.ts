@@ -1,7 +1,7 @@
 import { Array, Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
+import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import { readGridLocationOccupantsFn } from "~/engine/location/fn/readGridLocationOccupantsFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
@@ -16,7 +16,10 @@ export namespace readAvailableStackItemsFx {
 	}
 }
 
-/** Reads every pure compatible non-full stack inside one explicit location set. */
+/**
+ * Reads every pure compatible non-full stack inside one explicit location set.
+ * Runtime locale collation remains an ambient ordering dependency.
+ */
 export const readAvailableStackItemsFx = Effect.fn("readAvailableStackItemsFx")(function* ({
 	itemId,
 	locations,
@@ -30,21 +33,13 @@ export const readAvailableStackItemsFx = Effect.fn("readAvailableStackItemsFx")(
 	const candidates = occupants
 		.flatMap((entry) => entry.items)
 		.filter((item) => item.item.id === itemId && item.quantity < item.item.maxStackSize);
-	const purity = yield* Effect.forEach(candidates, (item) =>
-		isItemPureFx({
-			item,
-			runtime,
-		}).pipe(
-			Effect.map((pure) => ({
+	return candidates
+		.filter((item) =>
+			isItemPureFn({
 				item,
-				pure,
-			})),
-		),
-	);
-
-	return purity
-		.filter(({ pure }) => pure)
-		.map(({ item }) => item)
+				runtime,
+			}),
+		)
 		.sort((left, right) => {
 			return (
 				left.location.position.y - right.location.position.y ||

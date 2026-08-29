@@ -1,11 +1,10 @@
-import { Effect } from "effect";
 import { match, P } from "ts-pattern";
 
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import type { ItemPurityIndex } from "./readItemPurityIndexFx";
+import type { ItemPurityIndex } from "./readItemPurityIndexFn";
 
 const readOwnedLines = (item: RuntimeItemSchema.Type): readonly LineSchema.Type[] =>
 	match(item.item)
@@ -36,7 +35,7 @@ const readOwnedLines = (item: RuntimeItemSchema.Type): readonly LineSchema.Type[
 		.otherwise(() => []);
 
 /** Reads item purity from one pre-indexed immutable runtime snapshot. */
-export const isItemPureWithIndexFx = Effect.fnUntraced(function* ({
+export const isItemPureWithIndexFn = ({
 	index,
 	item,
 	runtime,
@@ -44,7 +43,7 @@ export const isItemPureWithIndexFx = Effect.fnUntraced(function* ({
 	readonly index: ItemPurityIndex;
 	readonly item: RuntimeItemSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
-}) {
+}) => {
 	if (
 		item.remainingCharges !== undefined ||
 		item.remainingDurationMs !== undefined ||
@@ -61,4 +60,4 @@ export const isItemPureWithIndexFx = Effect.fnUntraced(function* ({
 			jobLineIds?.has(line.id) !== true &&
 			queueLineIds?.has(line.id) !== true,
 	);
-});
+};

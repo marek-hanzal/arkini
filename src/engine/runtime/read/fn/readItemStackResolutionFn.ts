@@ -1,7 +1,7 @@
-import { Effect, Option } from "effect";
+import { Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
+import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import { isSameGridLocationFn } from "~/engine/location/fn/isSameGridLocationFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
@@ -12,7 +12,7 @@ import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemF
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
-export namespace readItemStackResolutionFx {
+export namespace readItemStackResolutionFn {
 	export interface Props {
 		readonly runtime: RuntimeSchema.Type;
 		readonly sourceItemId: IdSchema.Type;
@@ -48,7 +48,7 @@ const blocked = (
 		StackItemsUnavailableError.Reason,
 		typeof StackItemsUnavailableError.Reason.DifferentCanonicalItem
 	>,
-): readItemStackResolutionFx.Result => ({
+): readItemStackResolutionFn.Result => ({
 	kind: "blocked",
 	reason,
 });
@@ -59,7 +59,7 @@ const blocked = (
  * The caller supplies an explicit immutable runtime snapshot so preview reads
  * and serialized writes can share this decision without sharing mutable state.
  */
-export const readItemStackResolutionFx = Effect.fn("readItemStackResolutionFx")(function* ({
+export const readItemStackResolutionFn = ({
 	runtime,
 	sourceItemId,
 	sourceRevision,
@@ -67,7 +67,7 @@ export const readItemStackResolutionFx = Effect.fn("readItemStackResolutionFx")(
 	targetItemId,
 	targetRevision,
 	targetLocation,
-}: readItemStackResolutionFx.Props) {
+}: readItemStackResolutionFn.Props) => {
 	if (sourceItemId === targetItemId) {
 		return blocked(StackItemsUnavailableError.Reason.SameItem);
 	}
@@ -134,17 +134,17 @@ export const readItemStackResolutionFx = Effect.fn("readItemStackResolutionFx")(
 		return {
 			kind: "unrelated",
 			reason: StackItemsUnavailableError.Reason.DifferentCanonicalItem,
-		} satisfies readItemStackResolutionFx.Result;
+		} satisfies readItemStackResolutionFn.Result;
 	}
 
-	const sourcePure = yield* isItemPureFx({
+	const sourcePure = isItemPureFn({
 		item: source,
 		runtime,
 	});
 	if (!sourcePure) {
 		return blocked(StackItemsUnavailableError.Reason.SourceStateful);
 	}
-	const targetPure = yield* isItemPureFx({
+	const targetPure = isItemPureFn({
 		item: target,
 		runtime,
 	});
@@ -165,5 +165,5 @@ export const readItemStackResolutionFx = Effect.fn("readItemStackResolutionFx")(
 			source.quantity,
 			availableQuantity,
 		) satisfies PositiveIntegerSchema.Type,
-	} satisfies readItemStackResolutionFx.Result;
-});
+	} satisfies readItemStackResolutionFn.Result;
+};

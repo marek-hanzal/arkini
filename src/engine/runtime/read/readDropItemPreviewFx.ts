@@ -14,7 +14,7 @@ import type { DropItemCommand } from "~/engine/runtime/DropItemCommand";
 import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
 import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import { readDropItemStackRejectedReasonFn } from "~/engine/runtime/read/fn/readDropItemStackRejectedReasonFn";
-import { readItemStackResolutionFx } from "~/engine/runtime/read/readItemStackResolutionFx";
+import { readItemStackResolutionFn } from "~/engine/runtime/read/fn/readItemStackResolutionFn";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { planInventoryStorageFx } from "~/engine/runtime/fx/planInventoryStorageFx";
 import { DropItemIgnoredReason } from "~/engine/runtime/DropItemResult";
@@ -212,7 +212,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 			quantity: inputStore.quantity,
 		} satisfies readDropItemPreviewFx.Result;
 	}
-	const stackResolution = yield* readItemStackResolutionFx({
+	const stackResolution = readItemStackResolutionFn({
 		runtime,
 		sourceItemId,
 		sourceRevision,

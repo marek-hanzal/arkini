@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
-import { makeDropActorRejectedResultFx } from "~/engine/runtime/drop/makeDropActorRejectedResultFx";
+import { makeDropActorRejectedResultFn } from "~/engine/runtime/drop/fn/makeDropActorRejectedResultFn";
 import { makeDropRejectedResultFn } from "~/engine/runtime/drop/fn/makeDropRejectedResultFn";
 import { DropItemIgnoredReason } from "~/engine/runtime/DropItemResult";
 import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
@@ -58,26 +58,32 @@ export const commitSwapDropFx = Effect.fn("commitSwapDropFx")(function* ({
 		),
 		Effect.catchTags({
 			ItemNotFoundError: (error) =>
-				makeDropActorRejectedResultFx({
-					failedItemId: error.itemId,
-					failure: "stale",
-					sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeDropActorRejectedResultFn({
+						failedItemId: error.itemId,
+						failure: "stale",
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			RevisionConflictError: (error) =>
-				makeDropActorRejectedResultFx({
-					failedItemId: error.entityId,
-					failure: "stale",
-					sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeDropActorRejectedResultFn({
+						failedItemId: error.entityId,
+						failure: "stale",
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			ItemNotOnGridError: (error) =>
-				makeDropActorRejectedResultFx({
-					failedItemId: error.itemId,
-					failure: "invalid-location",
-					sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeDropActorRejectedResultFn({
+						failedItemId: error.itemId,
+						failure: "invalid-location",
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			CrossSpaceBoardOperationError: () =>
 				Effect.succeed(
 					makeDropRejectedResultFn({

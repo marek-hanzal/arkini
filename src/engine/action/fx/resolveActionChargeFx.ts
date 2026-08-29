@@ -4,7 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { InputRun } from "~/engine/input/InputRun";
 import { ChargeSourceSchema } from "~/engine/input/schema/ChargeSourceSchema";
 import type { ChargeSchema } from "~/engine/input/schema/ChargeSchema";
-import { readItemRemainingChargesFx } from "~/engine/item/fx/readItemRemainingChargesFx";
+import { readItemRemainingChargesFn } from "~/engine/item/fn/readItemRemainingChargesFn";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -48,7 +48,7 @@ export const resolveActionChargeFx = Effect.fn("resolveActionChargeFx")(function
 		itemId,
 		runtime,
 	});
-	const remainingCharges = yield* readItemRemainingChargesFx(item);
+	const remainingCharges = readItemRemainingChargesFn(item);
 	const reservedCost = reservedCharges.get(itemId) ?? 0;
 	if (remainingCharges === undefined || remainingCharges - reservedCost < charges.cost) {
 		return {

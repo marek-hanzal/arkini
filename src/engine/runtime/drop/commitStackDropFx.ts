@@ -4,7 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { makeDropRejectedResultFn } from "~/engine/runtime/drop/fn/makeDropRejectedResultFn";
-import { projectDropTransferActorFx } from "~/engine/runtime/drop/projectDropTransferActorFx";
+import { projectDropTransferActorFn } from "~/engine/runtime/drop/fn/projectDropTransferActorFn";
 import { readDropItemStackRejectedReasonFn } from "~/engine/runtime/read/fn/readDropItemStackRejectedReasonFn";
 import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
 import type { DropItemResult } from "~/engine/runtime/DropItemResult";
@@ -41,34 +41,31 @@ export const commitStackDropFx = Effect.fn("commitStackDropFx")(function* ({
 		targetRevision,
 		targetLocation,
 	}).pipe(
-		Effect.flatMap((result) =>
-			projectDropTransferActorFx({
+		Effect.map((result): commitStackDropFx.Result => {
+			const source = projectDropTransferActorFn({
 				after: result.sourceAfter,
 				before: result.sourceBefore,
-			}).pipe(
-				Effect.map(
-					(source): commitStackDropFx.Result => ({
-						kind: DropItemResultKind.Stack,
-						transferredQuantity: result.transferredQuantity,
-						source,
-						target: {
-							itemId: result.targetBefore.id,
-							canonicalItemId: result.targetBefore.item.id,
-							previousRevision: result.targetBefore.revision,
-							previousLocation: result.targetBefore.location,
-							previousQuantity: result.targetBefore.quantity,
-							current: {
-								itemId: result.targetAfter.id,
-								canonicalItemId: result.targetAfter.item.id,
-								revision: result.targetAfter.revision,
-								location: result.targetAfter.location,
-								quantity: result.targetAfter.quantity,
-							},
-						},
-					}),
-				),
-			),
-		),
+			});
+			return {
+				kind: DropItemResultKind.Stack,
+				transferredQuantity: result.transferredQuantity,
+				source,
+				target: {
+					itemId: result.targetBefore.id,
+					canonicalItemId: result.targetBefore.item.id,
+					previousRevision: result.targetBefore.revision,
+					previousLocation: result.targetBefore.location,
+					previousQuantity: result.targetBefore.quantity,
+					current: {
+						itemId: result.targetAfter.id,
+						canonicalItemId: result.targetAfter.item.id,
+						revision: result.targetAfter.revision,
+						location: result.targetAfter.location,
+						quantity: result.targetAfter.quantity,
+					},
+				},
+			};
+		}),
 		Effect.catchTag("StackItemsUnavailableError", (error) =>
 			Effect.succeed(
 				makeDropRejectedResultFn({

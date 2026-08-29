@@ -2,7 +2,7 @@ import { Array, Effect } from "effect";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
-import { readTileActorBadgeCountFx } from "~/ui/pixi/actor/readTileActorBadgeCountFx";
+import { readTileActorBadgeCountFn } from "~/ui/pixi/actor/fn/readTileActorBadgeCountFn";
 import { readTileActorAssetSourceIdsFx } from "~/ui/pixi/actor/readTileActorAssetSourceIdsFx";
 import { readTileActorProgressRatioFn } from "~/ui/pixi/actor/fn/readTileActorProgressRatioFn";
 import { readTileActorQueueBadgeCountFn } from "~/ui/pixi/actor/fn/readTileActorQueueBadgeCountFn";
@@ -67,9 +67,7 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 				runtime,
 			});
 			const badgeCount =
-				queueBadgeCount === undefined
-					? yield* readTileActorBadgeCountFx(item)
-					: queueBadgeCount;
+				queueBadgeCount === undefined ? readTileActorBadgeCountFn(item) : queueBadgeCount;
 			const progressRatio = readTileActorProgressRatioFn({
 				activeJob,
 				item,

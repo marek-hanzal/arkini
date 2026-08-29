@@ -3,10 +3,10 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { commitMergeItemsFx } from "~/engine/merge/internal/commitMergeItemsFx";
-import { makeDropActorRejectedResultFx } from "~/engine/runtime/drop/makeDropActorRejectedResultFx";
+import { makeDropActorRejectedResultFn } from "~/engine/runtime/drop/fn/makeDropActorRejectedResultFn";
 import { makeDropRejectedResultFn } from "~/engine/runtime/drop/fn/makeDropRejectedResultFn";
 import { projectDropActorCurrentFn } from "~/engine/runtime/drop/fn/projectDropActorCurrentFn";
-import { projectDropTransferActorFx } from "~/engine/runtime/drop/projectDropTransferActorFx";
+import { projectDropTransferActorFn } from "~/engine/runtime/drop/fn/projectDropTransferActorFn";
 import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
 import type { DropItemResult } from "~/engine/runtime/DropItemResult";
 import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
@@ -43,45 +43,47 @@ export const commitMergeDropFx = Effect.fn("commitMergeDropFx")(function* ({
 		targetItemId,
 		targetRevision,
 	}).pipe(
-		Effect.flatMap((result) =>
-			Effect.gen(function* () {
-				const sourceCurrent = projectDropActorCurrentFn(result.sourceAfter);
-				const target = yield* projectDropTransferActorFx({
-					after: result.targetAfter,
-					before: result.targetBefore,
-				});
+		Effect.map((result): commitMergeDropFx.Result => {
+			const sourceCurrent = projectDropActorCurrentFn(result.sourceAfter);
+			const target = projectDropTransferActorFn({
+				after: result.targetAfter,
+				before: result.targetBefore,
+			});
 
-				return {
-					kind: DropItemResultKind.Merge,
-					action: result.event.action,
-					effect: result.event.effect,
-					resultCanonicalItemId: result.event.resultCanonicalItemId,
-					source: {
-						itemId: result.sourceBefore.id,
-						previousRevision: result.sourceBefore.revision,
-						previousLocation: result.sourceBefore.location,
-						previousQuantity: result.sourceBefore.quantity,
-						current: sourceCurrent,
-					},
-					target,
-				} satisfies commitMergeDropFx.Result;
-			}),
-		),
+			return {
+				kind: DropItemResultKind.Merge,
+				action: result.event.action,
+				effect: result.event.effect,
+				resultCanonicalItemId: result.event.resultCanonicalItemId,
+				source: {
+					itemId: result.sourceBefore.id,
+					previousRevision: result.sourceBefore.revision,
+					previousLocation: result.sourceBefore.location,
+					previousQuantity: result.sourceBefore.quantity,
+					current: sourceCurrent,
+				},
+				target,
+			};
+		}),
 		Effect.catchTags({
 			ItemNotFoundError: (error) =>
-				makeDropActorRejectedResultFx({
-					failedItemId: error.itemId,
-					failure: "stale",
-					sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeDropActorRejectedResultFn({
+						failedItemId: error.itemId,
+						failure: "stale",
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			RevisionConflictError: (error) =>
-				makeDropActorRejectedResultFx({
-					failedItemId: error.entityId,
-					failure: "stale",
-					sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeDropActorRejectedResultFn({
+						failedItemId: error.entityId,
+						failure: "stale",
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			ItemNotOnGridError: () =>
 				Effect.succeed(
 					makeDropRejectedResultFn({

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { setDefaultLineFx } from "~/engine/line/write/setDefaultLineFx";
-import { readItemStackResolutionFx } from "~/engine/runtime/read/readItemStackResolutionFx";
+import { readItemStackResolutionFn } from "~/engine/runtime/read/fn/readItemStackResolutionFn";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { stackItemsFx } from "~/engine/runtime/write/stackItemsFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
@@ -452,7 +452,7 @@ describe("stackItemsFx", () => {
 	});
 });
 
-describe("readItemStackResolutionFx", () => {
+describe("readItemStackResolutionFn", () => {
 	it("distinguishes unrelated items, missing grid ownership, and exact optimistic facts", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -478,24 +478,24 @@ describe("readItemStackResolutionFx", () => {
 					targetRevision: target.revision,
 					targetLocation: target.location,
 				};
-				const unrelated = yield* readItemStackResolutionFx(base);
-				const missingSource = yield* readItemStackResolutionFx({
+				const unrelated = readItemStackResolutionFn(base);
+				const missingSource = readItemStackResolutionFn({
 					...base,
 					sourceItemId: "runtime:missing",
 				});
-				const missingTarget = yield* readItemStackResolutionFx({
+				const missingTarget = readItemStackResolutionFn({
 					...base,
 					targetItemId: "runtime:missing",
 				});
-				const staleSourceRevision = yield* readItemStackResolutionFx({
+				const staleSourceRevision = readItemStackResolutionFn({
 					...base,
 					sourceRevision: "revision:stale",
 				});
-				const staleTargetRevision = yield* readItemStackResolutionFx({
+				const staleTargetRevision = readItemStackResolutionFn({
 					...base,
 					targetRevision: "revision:stale",
 				});
-				const staleSourceLocation = yield* readItemStackResolutionFx({
+				const staleSourceLocation = readItemStackResolutionFn({
 					...base,
 					sourceLocation: board(3),
 				});
@@ -516,11 +516,11 @@ describe("readItemStackResolutionFx", () => {
 						};
 					}),
 				} satisfies RuntimeSchema.Type;
-				const sourceNotOnGrid = yield* readItemStackResolutionFx({
+				const sourceNotOnGrid = readItemStackResolutionFn({
 					...base,
 					runtime: nonGridRuntime,
 				});
-				const targetNotOnGrid = yield* readItemStackResolutionFx({
+				const targetNotOnGrid = readItemStackResolutionFn({
 					...base,
 					runtime: {
 						...runtime,
@@ -540,7 +540,7 @@ describe("readItemStackResolutionFx", () => {
 						}),
 					} satisfies RuntimeSchema.Type,
 				});
-				const sameItem = yield* readItemStackResolutionFx({
+				const sameItem = readItemStackResolutionFn({
 					...base,
 					targetItemId: source.id,
 					targetRevision: source.revision,

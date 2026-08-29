@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { DepositSchema } from "~/engine/input/schema/DepositSchema";
-import { readItemRemainingChargesFx } from "~/engine/item/fx/readItemRemainingChargesFx";
+import { readItemRemainingChargesFn } from "~/engine/item/fn/readItemRemainingChargesFn";
 import { queryFx } from "~/engine/query/fx/queryFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { readBoardRuntimeItemByIdFx } from "~/engine/runtime/read/readBoardRuntimeItemByIdFx";
@@ -40,7 +40,7 @@ export const readItemDetailDepositAvailableChargesFx = Effect.fn(
 
 	let availableCharges = 0;
 	for (const candidate of candidates) {
-		const remainingCharges = yield* readItemRemainingChargesFx(candidate);
+		const remainingCharges = readItemRemainingChargesFn(candidate);
 		availableCharges += (remainingCharges ?? 0) * candidate.quantity;
 	}
 	return {

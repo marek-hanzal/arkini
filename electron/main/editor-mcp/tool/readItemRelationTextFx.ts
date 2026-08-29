@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { EditorProject } from "~/editor/EditorProject";
 import { createEditorAcquisitionGraphFx } from "~/editor/createEditorAcquisitionGraphFx";
-import { readEditorItemOriginSourcesFn } from "~/editor/fn/readEditorItemOriginSourcesFn";
+import { readEditorItemOriginSourcesFn } from "~/editor/origin-flow/fn/readEditorItemOriginSourcesFn";
 import type {
 	EditorItemOriginOutputOccurrence,
 	EditorItemOriginRelationRole,

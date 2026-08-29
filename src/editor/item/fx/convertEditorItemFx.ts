@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { createEditorItemDraftFn } from "~/editor/fn/createEditorItemDraftFn";
+import { createEditorItemDraftFn } from "~/editor/item/fn/createEditorItemDraftFn";
 import { readAuthoredItemLinesFx } from "~/engine/line/read/readAuthoredItemLinesFx";
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { TypeSchema } from "~/engine/item/schema/TypeSchema";

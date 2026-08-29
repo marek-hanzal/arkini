@@ -50,6 +50,7 @@ Use `argc --help` for the current command list. Common focused commands are:
 
 ```bash
 argc typecheck
+argc dc
 argc test [path ...]
 argc build
 argc platform-check
@@ -58,7 +59,7 @@ argc dev-control
 argc mcp-inspect
 ```
 
-`argc check` runs formatting, all TypeScript configurations, a production Electron build plus Community Arkpack packing and verification, dependency rules, copy/paste detection, and the permanent Vitest suite. `argc platform-check` is the narrower hosted macOS/Windows portability gate: it runs that production build and the real filesystem, Electron, pack, source, and schema-writer suites. Use focused tests during implementation; `platform-check` does not replace the complete closing gate.
+`argc dc` is the read-only dependency-topology gate over every active module root and standalone TypeScript config. `argc check` runs formatting, all TypeScript configurations, a production Electron build plus Community Arkpack packing and verification, that dependency gate, copy/paste detection, and the permanent Vitest suite. `argc platform-check` is the narrower hosted macOS/Windows portability gate: it runs that production build and the real filesystem, Electron, pack, source, and schema-writer suites. Use focused tests during implementation; `platform-check` does not replace the complete closing gate.
 
 Arkini is Electron-only: there is no web target or browser-storage fallback. Development uses the Vite renderer; packaged builds serve the same history-routed application from `arkini://app/`. Disposable build output lives below `.out/`; the official project owns its ignored `game/arkini/build/` artifacts.
 

@@ -1,3 +1,8 @@
+const activeCodePattern = "^(?:src|electron|shared|scripts)(?:/|$)";
+const activeCodeAndTestsPattern = "^(?:src|electron|shared|scripts|test)(?:/|$)";
+const productionCodePattern = "^(?:src|electron|shared)(?:/|$)";
+const applicationEntrypointPattern = "^src/(?:main|createArkiniRouterFx|_route)[.]tsx?$";
+
 /** @type {import('dependency-cruiser').IForbiddenRuleType[]} */
 const boundaryRules = [
 	{
@@ -9,7 +14,7 @@ const boundaryRules = [
 			path: "^src/engine(?:/|$)",
 		},
 		to: {
-			path: "^src/(?:renderer|ui|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
+			path: "^src/(?:renderer|ui|@routes)(?:/|$)",
 		},
 	},
 	{
@@ -109,7 +114,7 @@ const boundaryRules = [
 			path: "^src/editor(?:/|$)",
 		},
 		to: {
-			path: "^src/(?:renderer|ui|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$|^electron(?:/|$)|^node_modules/electron(?:/|$)",
+			path: "^src/(?:renderer|ui|@routes)(?:/|$)|^electron(?:/|$)|^node_modules/electron(?:/|$)",
 		},
 	},
 	{
@@ -121,7 +126,7 @@ const boundaryRules = [
 			path: "^src/renderer(?:/|$)",
 		},
 		to: {
-			path: "^src/(?:ui|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
+			path: "^src/(?:ui|@routes)(?:/|$)",
 		},
 	},
 	{
@@ -133,7 +138,25 @@ const boundaryRules = [
 			path: "^src/ui(?:/|$)",
 		},
 		to: {
-			path: "^src/@routes(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
+			path: "^src/@routes(?:/|$)",
+		},
+	},
+	{
+		name: "application-entrypoints-have-no-incoming-runtime-imports",
+		comment:
+			"Application entrypoints compose the renderer and generated routes; ordinary active code may reference their types but never their runtime implementations.",
+		severity: "error",
+		from: {
+			path: activeCodePattern,
+			pathNot: [
+				applicationEntrypointPattern,
+			],
+		},
+		to: {
+			path: applicationEntrypointPattern,
+			dependencyTypesNot: [
+				"type-only",
+			],
 		},
 	},
 	{
@@ -172,7 +195,7 @@ const boundaryRules = [
 			path: "^src/@routes(?:/|$)",
 		},
 		to: {
-			path: "^src/@routes(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
+			path: "^src/@routes(?:/|$)",
 			pathNot: [
 				"^src/@routes/-launcher/fn/resolveLauncherLeaveDestinationFn[.]ts$",
 				"^src/@routes/action/-GameLeaveDestinationSchema[.]ts$",
@@ -190,7 +213,7 @@ const boundaryRules = [
 			"Renderer-process code, UI, and routes may consume the pure Electron transport contract directly, but never Electron runtime adapters or the Electron package.",
 		severity: "error",
 		from: {
-			path: "^(?:src/(?:engine|editor|renderer|ui|@routes)|src/(?:main|router|_route)\\.tsx?)(?:/|$)",
+			path: "^src(?:/|$)",
 		},
 		to: {
 			path: "^(?:electron(?:/|$)|node_modules/electron(?:/|$))",
@@ -220,7 +243,7 @@ const boundaryRules = [
 			path: "^electron/main(?:/|$)",
 		},
 		to: {
-			path: "^src/(?:renderer|ui|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
+			path: "^src/(?:renderer|ui|@routes)(?:/|$)",
 		},
 	},
 	{
@@ -286,7 +309,7 @@ const boundaryRules = [
 			"Production and tooling code never import test support; tests may depend on active code, never the reverse.",
 		severity: "error",
 		from: {
-			path: "^(?:src/(?:engine|editor|renderer|ui|@routes)|src/(?:main|router|_route)\\.tsx?|electron)(?:/|$)",
+			path: activeCodePattern,
 		},
 		to: {
 			path: "^test(?:/|$)",
@@ -298,7 +321,7 @@ const boundaryRules = [
 			"The historical tree is a read-only oracle outside every active source root and may never be imported by production or tests.",
 		severity: "error",
 		from: {
-			path: "^(?:src/(?:engine|editor|renderer|ui|@routes)|src/(?:main|router|_route)\\.tsx?|electron|test)(?:/|$)",
+			path: activeCodeAndTestsPattern,
 		},
 		to: {
 			path: "^src/_archive(?:/|$)",
@@ -309,6 +332,26 @@ const boundaryRules = [
 /** @type {import('dependency-cruiser').IConfiguration} */
 module.exports = {
 	forbidden: [
+		{
+			name: "no-orphans",
+			comment:
+				"Active modules must participate in the dependency graph unless they are explicit execution or declaration roots.",
+			severity: "error",
+			from: {
+				orphan: true,
+				pathNot: [
+					applicationEntrypointPattern,
+					"^src/engine/cli/arkini[.]ts$",
+					"^electron/(?:main|preload)/index[.]ts$",
+					"^scripts/[^/]+[.]ts$",
+					"^test/setup[.]ts$",
+					"^(?:electron[.]vite|vitest)[.]config[.]ts$",
+					"[.]worker[.]tsx?$",
+					"[.]d[.](?:c|m)?ts$",
+				],
+			},
+			to: {},
+		},
 		{
 			name: "no-circular",
 			comment:
@@ -348,7 +391,7 @@ module.exports = {
 				"Active production source must not import devDependencies unless the import is type-only or test-only.",
 			severity: "error",
 			from: {
-				path: "^(?:src/(?:engine|editor|renderer|ui|@routes)|src/(?:main|router|_route)\\.tsx?|electron)(?:/|$)",
+				path: productionCodePattern,
 				pathNot: [
 					"[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$",
 				],
@@ -372,7 +415,7 @@ module.exports = {
 				"Production code must not import tests or fixtures. Tests may depend on production, never the reverse.",
 			severity: "error",
 			from: {
-				path: "^(?:src/(?:engine|editor|renderer|ui|@routes)|src/(?:main|router|_route)\\.tsx?|electron)(?:/|$)",
+				path: productionCodePattern,
 				pathNot: [
 					"[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$",
 				],

@@ -3,7 +3,7 @@ import { Effect } from "effect";
 
 import { makeExactGameAtomFamilyFx } from "~/ui/game/makeExactGameAtomFamilyFx";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
-import { releaseInventoryItemFx } from "~/engine/runtime/write/releaseInventoryItemFx";
+import { releaseInventoryItemFx } from "~/item-interaction/write/releaseInventoryItemFx";
 
 export namespace runInventoryReleaseAtom {
 	export type Command = releaseInventoryItemFx.Props;

@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
-import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
+import { moveRuntimeItemForTestFx } from "~test/support/item-interaction/moveRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { activateSpaceItemFx } from "~/space-action/write/activateSpaceItemFx";
@@ -109,7 +109,7 @@ const moveOwnerToSpaceFx = Effect.fn("moveOwnerToSpaceFx")(function* (space: num
 	let runtime = yield* readRuntimeFx();
 	let owner = runtime.items.find((item) => item.id === ownerItemId);
 	if (owner === undefined) throw new Error("Expected owner.");
-	yield* moveItemFx({
+	yield* moveRuntimeItemForTestFx({
 		itemId: owner.id,
 		revision: owner.revision,
 		location: {
@@ -142,7 +142,7 @@ const moveOwnerToSpaceFx = Effect.fn("moveOwnerToSpaceFx")(function* (space: num
 	runtime = yield* readRuntimeFx();
 	owner = runtime.items.find((item) => item.id === ownerItemId);
 	if (owner === undefined) throw new Error("Expected owner in inventory.");
-	yield* moveItemFx({
+	yield* moveRuntimeItemForTestFx({
 		itemId: owner.id,
 		revision: owner.revision,
 		location: {

@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
+import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
@@ -147,7 +147,7 @@ export const prepareFixedStepRuntimeFx = Effect.fn("prepareFixedStepRuntimeFx")(
 		ownerItemId: enabler.id,
 		lineId: "line:enabler:run",
 	});
-	yield* removeItemFx({
+	yield* removeRuntimeItemForTestFx({
 		itemId: permit.id,
 		revision: permit.revision,
 	});

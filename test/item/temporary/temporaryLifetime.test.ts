@@ -7,8 +7,8 @@ import { mergeItemsFx } from "~/item-merge/write/mergeItemsFx";
 import { checkRuntimeFx } from "~/game-runtime/check/checkRuntimeFx";
 import { fromStateFx } from "~/engine/state/fx/fromStateFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
-import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
-import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
+import { dropItemFx } from "~/item-interaction/write/dropItemFx";
+import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
@@ -352,7 +352,7 @@ describe("temporary item lifetime", () => {
 					const first = yield* readRuntimeFx();
 					if (blocked) {
 						for (const blocker of blockers.slice(1)) {
-							yield* removeItemFx({
+							yield* removeRuntimeItemForTestFx({
 								itemId: blocker.id,
 								revision: blocker.revision,
 							});

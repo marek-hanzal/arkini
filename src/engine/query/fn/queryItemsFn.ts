@@ -1,10 +1,8 @@
-import { Effect } from "effect";
-
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import { selectItemsFn } from "~/engine/selector/fn/selectItemsFn";
 import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
 
-export namespace queryItemsFx {
+export namespace queryItemsFn {
 	export interface Props {
 		items: ReadonlyArray<RuntimeItemSchema.Type>;
 		selector: SelectorSchema.Type;
@@ -12,10 +10,7 @@ export namespace queryItemsFx {
 }
 
 /** Selects matching runtime items from one already scoped collection. */
-export const queryItemsFx = Effect.fn("queryItemsFx")(function* ({
-	items,
-	selector,
-}: queryItemsFx.Props) {
+export const queryItemsFn = ({ items, selector }: queryItemsFn.Props) => {
 	const selected = selectItemsFn({
 		items: items.map((item) => item.item),
 		selector,
@@ -23,4 +18,4 @@ export const queryItemsFx = Effect.fn("queryItemsFx")(function* ({
 	const selectedItemIds = new Set(selected.map((item) => item.id));
 
 	return items.filter((item) => selectedItemIds.has(item.item.id));
-});
+};

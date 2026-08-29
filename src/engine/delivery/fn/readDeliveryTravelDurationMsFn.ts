@@ -1,10 +1,8 @@
-import { Effect } from "effect";
-
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { TickStepMs } from "~/engine/tick/TickStepMs";
 
-export namespace readDeliveryTravelDurationMsFx {
+export namespace readDeliveryTravelDurationMsFn {
 	export interface Props {
 		readonly from: GridLocationSchema.Type;
 		readonly to: GridLocationSchema.Type;
@@ -21,15 +19,12 @@ const isSameSurface = (from: GridLocationSchema.Type, to: GridLocationSchema.Typ
 		(to.scope === LocationScopeEnumSchema.enum.Board && from.space === to.space));
 
 /** Derives one deterministic engine-owned delivery duration from canonical grid facts. */
-export const readDeliveryTravelDurationMsFx = Effect.fn("readDeliveryTravelDurationMsFx")(
-	({ from, to }: readDeliveryTravelDurationMsFx.Props) =>
-		Effect.sync(() => {
-			if (!isSameSurface(from, to)) return crossSurfaceDurationMs;
-			const distance = Math.hypot(
-				to.position.x - from.position.x,
-				to.position.y - from.position.y,
-			);
-			const duration = Math.max(minimumSameSurfaceDurationMs, distance * millisecondsPerTile);
-			return Math.ceil(duration / TickStepMs) * TickStepMs;
-		}),
-);
+export const readDeliveryTravelDurationMsFn = ({
+	from,
+	to,
+}: readDeliveryTravelDurationMsFn.Props) => {
+	if (!isSameSurface(from, to)) return crossSurfaceDurationMs;
+	const distance = Math.hypot(to.position.x - from.position.x, to.position.y - from.position.y);
+	const duration = Math.max(minimumSameSurfaceDurationMs, distance * millisecondsPerTile);
+	return Math.ceil(duration / TickStepMs) * TickStepMs;
+};

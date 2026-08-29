@@ -18,7 +18,7 @@ import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailabili
 import { CheatItemSpawnContext } from "~/ui/cheat-spotlight/CheatItemSpawnContext";
 import { useCheatItemSpotlightSearch } from "~/ui/cheat-spotlight/useCheatItemSpotlightSearch";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
-import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
+import { useItemDetailControl } from "~/item-detail-frame/useItemDetailControl";
 
 const errorMessage = (error: unknown) =>
 	match(error)

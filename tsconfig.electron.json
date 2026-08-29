@@ -56,5 +56,8 @@
 		"src/flow/domain",
 		"src/estimate/domain",
 		"electron.vite.config.ts"
+	],
+	"exclude": [
+		"src/production-job/ui"
 	]
 }

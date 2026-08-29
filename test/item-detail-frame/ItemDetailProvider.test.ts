@@ -15,7 +15,7 @@ import {
 	runPendingAction,
 } from "./ItemDetailProvider.test/fixture";
 
-describe("ItemDetailProvider", () => {
+describe("Item Detail frame provider", () => {
 	it("rejects stale targets without changing the closed owner", async () => {
 		const { readControl } = await renderProvider();
 

@@ -1,4 +1,5 @@
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { ItemDetailReference } from "~/item-detail-frame/projectItemDetailReferenceFx";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { DistanceSchema } from "~/item-location/schema/DistanceSchema";
 import type { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
@@ -25,14 +26,6 @@ export namespace ItemDetailLines {
 		readonly label: string;
 	}
 
-	export interface DetailReference {
-		readonly itemId: string;
-		readonly title: string;
-		readonly sourceUrl: string;
-		readonly compositeUrl?: string;
-		readonly detailItemId?: string;
-	}
-
 	export type Input =
 		| {
 				readonly kind: "materials";
@@ -50,7 +43,7 @@ export namespace ItemDetailLines {
 				readonly ready: boolean;
 				readonly canWithdraw: boolean;
 				readonly charges?: ChargeCost;
-				readonly detail?: DetailReference;
+				readonly detail?: ItemDetailReference;
 		  }
 		| {
 				readonly kind: "deposit";
@@ -62,7 +55,7 @@ export namespace ItemDetailLines {
 				readonly targetTitles: readonly string[];
 				readonly ready: boolean;
 				readonly charges?: ChargeCost;
-				readonly detail?: DetailReference;
+				readonly detail?: ItemDetailReference;
 		  }
 		| {
 				readonly kind: "simple";
@@ -87,7 +80,7 @@ export namespace ItemDetailLines {
 	interface DisabledConditionContext {
 		readonly selector: Selector;
 		readonly locationLabel: string;
-		readonly detail?: DetailReference;
+		readonly detail?: ItemDetailReference;
 	}
 
 	export type DisabledCondition = DisabledConditionContext &
@@ -138,7 +131,7 @@ export namespace ItemDetailLines {
 				readonly kind: "deposit-target-missing";
 				readonly selector: Selector;
 				readonly distance: DistanceSchema.Type;
-				readonly detail?: DetailReference;
+				readonly detail?: ItemDetailReference;
 				readonly messageBeforeDetail?: string;
 				readonly messageAfterDetail?: string;
 				readonly message: string;

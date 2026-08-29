@@ -6,39 +6,37 @@ import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCaus
 import type {
 	ItemDetailPendingAction,
 	RunItemDetailPendingActionProps,
-} from "~/ui/item-detail/ItemDetailPendingActionOwner";
+} from "~/item-detail-frame/ItemDetailControl";
 
-export namespace createItemDetailCommandAtom {
-	export interface Dependencies {
-		readonly game: PlayableGame;
-		readonly readOutcomeScope: () => string | undefined;
-	}
-
-	export interface State {
-		readonly pendingActions: ReadonlyMap<
-			string,
-			{
-				readonly action: ItemDetailPendingAction;
-				readonly token: symbol;
-			}
-		>;
-		readonly actionErrors: ReadonlyMap<
-			string,
-			{
-				readonly message: string;
-				readonly outcomeScope: string | undefined;
-			}
-		>;
-		readonly fatalCause: Cause.Cause<unknown> | undefined;
-	}
-
-	export type Command =
-		| RunItemDetailPendingActionProps
-		| {
-				readonly kind: "scope-changed";
-				readonly outcomeScope: string | undefined;
-		  };
+interface ItemDetailCommandAtomDependencies {
+	readonly game: PlayableGame;
+	readonly readOutcomeScope: () => string | undefined;
 }
+
+interface ItemDetailCommandState {
+	readonly pendingActions: ReadonlyMap<
+		string,
+		{
+			readonly action: ItemDetailPendingAction;
+			readonly token: symbol;
+		}
+	>;
+	readonly actionErrors: ReadonlyMap<
+		string,
+		{
+			readonly message: string;
+			readonly outcomeScope: string | undefined;
+		}
+	>;
+	readonly fatalCause: Cause.Cause<unknown> | undefined;
+}
+
+type ItemDetailCommand =
+	| RunItemDetailPendingActionProps
+	| {
+			readonly kind: "scope-changed";
+			readonly outcomeScope: string | undefined;
+	  };
 
 type AdmittedCommand = RunItemDetailPendingActionProps & {
 	readonly outcomeScope: string | undefined;
@@ -49,7 +47,7 @@ const initialState = {
 	pendingActions: new Map(),
 	actionErrors: new Map(),
 	fatalCause: undefined,
-} as const satisfies createItemDetailCommandAtom.State;
+} as const satisfies ItemDetailCommandState;
 
 /**
  * Creates the one provider-scoped Item Detail command authority.
@@ -60,10 +58,8 @@ const initialState = {
 export const createItemDetailCommandAtom = ({
 	game,
 	readOutcomeScope,
-}: createItemDetailCommandAtom.Dependencies) => {
-	const stateAtom = Atom.make<createItemDetailCommandAtom.State>(initialState).pipe(
-		Atom.setIdleTTL(0),
-	);
+}: ItemDetailCommandAtomDependencies) => {
+	const stateAtom = Atom.make<ItemDetailCommandState>(initialState).pipe(Atom.setIdleTTL(0));
 	const runnerAtom = Atom.fn(
 		(command: AdmittedCommand) =>
 			Effect.yieldNow.pipe(
@@ -128,7 +124,7 @@ export const createItemDetailCommandAtom = ({
 			if (state.fatalCause !== undefined) throw state.fatalCause;
 			return state;
 		},
-		(context, command: createItemDetailCommandAtom.Command) => {
+		(context, command: ItemDetailCommand) => {
 			const state = context.get(stateAtom);
 			if ("kind" in command) {
 				const actionErrors =

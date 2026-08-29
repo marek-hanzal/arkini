@@ -9,12 +9,12 @@ import {
 	itemDetailBadgeMotion,
 	itemDetailFadeMotion,
 	itemDetailMotionTransition,
-} from "~/ui/item-detail/ItemDetailMotion";
-import { ItemRuntime } from "~/ui/item-detail/ItemRuntime";
-import { readActiveJobRuntimeFn } from "~/ui/item-detail/fn/readActiveJobRuntimeFn";
+} from "~/item-detail-frame/ItemDetailMotion";
+import { ProductionJobRuntime } from "~/production-job/ui/ProductionJobRuntime";
+import { readActiveJobRuntimeFn } from "~/production-job/ui/readActiveJobRuntimeFn";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
-import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
-import { useItemDetailPendingCommand } from "~/ui/item-detail/useItemDetailPendingCommand";
+import { useItemDetailControl } from "~/item-detail-frame/useItemDetailControl";
+import { useItemDetailPendingCommand } from "~/item-detail-frame/useItemDetailPendingCommand";
 
 const statusLabel = {
 	"awaiting-output": "Awaiting output",
@@ -172,7 +172,7 @@ const ActiveQueueSlot = ({
 									</AnimatePresence>
 								</div>
 							</div>
-							<ItemRuntime
+							<ProductionJobRuntime
 								dataUi="ItemQueueRuntime"
 								jobStatus={job.status}
 								runtime={readActiveJobRuntimeFn(job)}

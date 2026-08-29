@@ -6,6 +6,7 @@
 @import "./styles/platform.css";
 @import "./styles/editor-workspace.css";
 @import "./styles/shared-primitives.css";
+@import "./styles/fact.css";
 @import "./styles/scenes.css";
 @import "./styles/route-transitions.css";
 @import "./styles/item-detail.css";

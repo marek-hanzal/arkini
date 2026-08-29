@@ -10,7 +10,7 @@ import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import { runTileSplitAtom } from "~/ui/pixi/command/runTileSplitAtom";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
-import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
+import { useItemDetailControl } from "~/item-detail-frame/useItemDetailControl";
 import { useInventoryShortcutKey } from "~/ui/navigation/useInventoryShortcutKey";
 import type { MainRuntime } from "~/ui/pixi/scene/MainRuntime";
 import type { MainActivationIntent } from "~/ui/pixi/scene/MainActivationIntent";

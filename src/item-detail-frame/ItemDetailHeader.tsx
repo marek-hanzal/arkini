@@ -2,9 +2,9 @@ import { X } from "lucide-react";
 import type { ComponentType, ReactNode } from "react";
 
 import { ItemIdentity } from "~/ui/item/ItemIdentity";
-import { useCloseItemDetail } from "~/ui/item-detail/useCloseItemDetail";
+import { useCloseItemDetail } from "~/item-detail-frame/useCloseItemDetail";
 
-export interface ItemDetailHeaderIdentity {
+interface ItemDetailHeaderIdentity {
 	readonly definitionId: string;
 	readonly title: string;
 	readonly sourceUrl: string;

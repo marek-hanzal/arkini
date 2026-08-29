@@ -1,6 +1,6 @@
 import { useEditorProject } from "~/authoring-session/useEditorProject";
 import { formatByteSizeFn } from "~/ui/formatByteSizeFn";
-import { ItemInfoFact, ItemInfoFacts } from "~/ui/item-detail/ItemInfoPresentation";
+import { Fact, FactList } from "~/ui/fact/FactList";
 import { useEditorAssetById } from "~/asset-authoring/ui/useEditorAssetById";
 
 export const EditorAssetTechnical = ({ resourceId }: { readonly resourceId: string }) => {
@@ -8,29 +8,29 @@ export const EditorAssetTechnical = ({ resourceId }: { readonly resourceId: stri
 	const resource = useEditorAssetById(resourceId);
 	if (resource === undefined) return null;
 	return (
-		<ItemInfoFacts>
-			<ItemInfoFact
+		<FactList>
+			<Fact
 				label="Resource ID"
 				mono
 				value={resource.id}
 			/>
-			<ItemInfoFact
+			<Fact
 				label="MIME type"
 				mono
 				value={resource.mime}
 			/>
-			<ItemInfoFact
+			<Fact
 				label="Byte size"
 				value={formatByteSizeFn(resource.bytes.byteLength)}
 			/>
-			<ItemInfoFact
+			<Fact
 				label="Project revision"
 				value={String(project.revision)}
 			/>
-			<ItemInfoFact
+			<Fact
 				label="Package status"
 				value="Included in current project"
 			/>
-		</ItemInfoFacts>
+		</FactList>
 	);
 };

@@ -1,0 +1,10 @@
+/* A complete two-column fact row must not draw a separator below either cell. */
+.ak-fact-list > :nth-last-child(2):nth-child(odd) {
+	border-bottom-width: 0;
+}
+
+@media (max-width: 48rem) {
+	.ak-fact-list > :nth-last-child(2):nth-child(odd) {
+		border-bottom-width: 1px;
+	}
+}

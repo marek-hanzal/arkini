@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
 import type { ArkpackStorage } from "~/arkpack/renderer/ArkpackStorage";
 
 /** Creates an explicit in-memory Arkpack capability for tests only. */
@@ -32,7 +33,7 @@ export const createInMemoryArkpackStorageFx = Effect.fn("createInMemoryArkpackSt
 				Effect.sync(() => {
 					files.set(packageId, {
 						packageId,
-						filename: `${encodeURIComponent(packageId)}.arkpack`,
+						filename: readArkpackArtifactNameFn(packageId),
 						bytes: bytes.slice(0),
 						provenance: {
 							type: "community",

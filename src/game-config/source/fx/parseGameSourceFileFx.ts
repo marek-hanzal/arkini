@@ -7,6 +7,7 @@ import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersio
 import { DiagnosticCodeEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticCodeEnumSchema";
 import type { GameDiagnosticsSchema } from "~/game-config/diagnostic/schema/GameDiagnosticsSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config/diagnostic/schema/DiagnosticSeverityEnumSchema";
+import { encodeGameProjectFileStemFn } from "~/game-config/source/encodeGameProjectFileStemFn";
 import { gameSourceSchemaDiagnosticsFn } from "~/game-config/source/fn/gameSourceSchemaDiagnosticsFn";
 
 export namespace parseGameSourceFileFx {
@@ -76,7 +77,7 @@ export const parseGameSourceFileFx = Effect.fn("parseGameSourceFileFx")(
 				const value = parsed.data as ItemFileSchema.Type;
 				const item = value.item;
 				const segments = relative.split("/");
-				const expectedFilename = `${encodeURIComponent(item.uid).replaceAll(".", "%2E")}.json`;
+				const expectedFilename = `${encodeGameProjectFileStemFn(item.uid)}.json`;
 				const formatError =
 					segments.length !== 3 || segments[0] !== "items"
 						? "Expected items/<type>/<encoded uid>.json."

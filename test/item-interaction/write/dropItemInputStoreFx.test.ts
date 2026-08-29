@@ -411,16 +411,40 @@ describe("dropItemFx default-line input storage", () => {
 		).toBe(5);
 	});
 
-	it("honors an exact engine input request without consuming spare capacity", () => {
+	it("admits only a valid exact input request before a compatible authored merge", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const { owner, source } = yield* setupFx({
 					quantity: 7,
 				});
-				const target = {
-					...targetFor({
-						revision: owner.revision,
-					}),
+				const exactTarget = targetFor({
+					revision: owner.revision,
+				});
+				const command = {
+					sourceItemId: source.id,
+					sourceRevision: source.revision,
+					sourceLocation: sourceLocation(1),
+				};
+				const invalidTarget = {
+					...exactTarget,
+					inputStore: {
+						lineId,
+						inputIndex: 1,
+						quantity: 1,
+					},
+				};
+				const before = yield* readRuntimeFx();
+				const invalidPreview = yield* readDropItemPreviewFx({
+					...command,
+					target: invalidTarget,
+				});
+				const invalidOutcome = yield* dropItemFx({
+					...command,
+					target: invalidTarget,
+				});
+				const afterInvalid = yield* readRuntimeFx();
+				const validTarget = {
+					...exactTarget,
 					inputStore: {
 						lineId,
 						inputIndex: 0,
@@ -428,25 +452,37 @@ describe("dropItemFx default-line input storage", () => {
 					},
 				};
 				const preview = yield* readDropItemPreviewFx({
-					sourceItemId: source.id,
-					sourceRevision: source.revision,
-					sourceLocation: sourceLocation(1),
-					target,
+					...command,
+					target: validTarget,
 				});
 				const outcome = yield* dropItemFx({
-					sourceItemId: source.id,
-					sourceRevision: source.revision,
-					sourceLocation: sourceLocation(1),
-					target,
+					...command,
+					target: validTarget,
 				});
 				return {
+					afterInvalid,
+					before,
+					invalidOutcome,
+					invalidPreview,
 					outcome,
 					preview,
 					runtime: yield* readRuntimeFx(),
 				};
 			}),
+			mergeBeforeInputConfig,
 		);
 
+		expect(result.invalidPreview).toEqual({
+			kind: DropItemResultKind.Reject,
+			reason: "blocked",
+		});
+		expect(result.invalidOutcome).toEqual({
+			kind: DropItemResultKind.Reject,
+			reason: "blocked",
+			itemId: "runtime:water",
+			targetItemId: "runtime:workshop",
+		});
+		expect(result.afterInvalid).toEqual(result.before);
 		expect(result.preview).toEqual({
 			kind: DropItemResultKind.StoreInput,
 			lineId,

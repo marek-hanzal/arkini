@@ -88,7 +88,7 @@ describe("dropItemFx / stale and ignored identity", () => {
 			result.source,
 		]);
 	});
-	it("rejects a stale occupied target without swapping either actor", () => {
+	it("rejects a stale occupied target before exact input admission", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const source = yield* spawnItemFx({
@@ -110,6 +110,11 @@ describe("dropItemFx / stale and ignored identity", () => {
 					target: {
 						kind: "slot",
 						location: occupiedLocation,
+						inputStore: {
+							lineId: "line:missing",
+							inputIndex: 0,
+							quantity: 1,
+						},
 						occupant: {
 							itemId: target.id,
 							revision: "revision:stale",

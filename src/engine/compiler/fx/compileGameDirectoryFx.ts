@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { compileGameSourcesFx } from "./compileGameSourcesFx";
 import { readGameSourceFilesFx } from "./readGameSourceFilesFx";
 import { readResourceDescriptorsFx } from "~/engine/resource/fx/readResourceDescriptorsFx";
-import { validateGameResourcesFx } from "~/engine/validation/rule/validateGameResourcesFx";
+import { validateGameResourcesFn } from "~/engine/validation/rule/fn/validateGameResourcesFn";
 
 export namespace compileGameDirectoryFx {
 	export interface Props {
@@ -42,7 +42,7 @@ export const compileGameDirectoryFx = Effect.fn("compileGameDirectoryFx")(functi
 			json: sourceFiles.sources.length,
 		};
 	}
-	const resourceDiagnostics = yield* validateGameResourcesFx({
+	const resourceDiagnostics = validateGameResourcesFn({
 		config: compilation.config,
 		provenance: compilation.provenance,
 		resources,

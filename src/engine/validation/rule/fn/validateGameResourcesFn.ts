@@ -1,15 +1,13 @@
-import { Effect } from "effect";
-
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import type { ResourceDescriptorSchema } from "~/engine/resource/schema/ResourceDescriptorSchema";
-import { readGameResourceUsagesFx } from "~/engine/resource/readGameResourceUsagesFx";
+import { readGameResourceUsagesFn } from "~/engine/resource/fn/readGameResourceUsagesFn";
 import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 
 /** Validates exact config-to-PNG resource identity without naming conventions. */
-export const validateGameResourcesFx = Effect.fn("validateGameResourcesFx")(function* ({
+export const validateGameResourcesFn = ({
 	config,
 	provenance,
 	resources,
@@ -17,7 +15,7 @@ export const validateGameResourcesFx = Effect.fn("validateGameResourcesFx")(func
 	config: GameConfigSchema.Type;
 	provenance: GameSourceProvenanceSchema.Type;
 	resources: ReadonlyArray<ResourceDescriptorSchema.Type>;
-}) {
+}) => {
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 	const firstById = new Map<string, ResourceDescriptorSchema.Type>();
 	for (const resource of resources) {
@@ -43,7 +41,7 @@ export const validateGameResourcesFx = Effect.fn("validateGameResourcesFx")(func
 		});
 	}
 
-	const usages = yield* readGameResourceUsagesFx(config);
+	const usages = readGameResourceUsagesFn(config);
 	const referenced = new Set(usages.map(({ resourceId }) => resourceId));
 	for (const usage of usages) {
 		if (firstById.has(usage.resourceId)) continue;
@@ -73,4 +71,4 @@ export const validateGameResourcesFx = Effect.fn("validateGameResourcesFx")(func
 	}
 
 	return diagnostics;
-});
+};

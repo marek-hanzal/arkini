@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { readEditorProjectVersionHistoryFx } from "~/bridge/editor/version/readEditorProjectVersionHistoryFx";
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { readEditorProjectVersionHistoryFx } from "~/editor/version/fx/readEditorProjectVersionHistoryFx";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type {
 	EditorProjectVersionDescriptor,
 	EditorProjectVersionStatus,

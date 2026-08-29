@@ -1,4 +1,4 @@
-import type { useItemDefinitionDetail } from "~/bridge/item-detail/useItemDefinitionDetail";
+import type { useItemDefinitionDetail } from "~/ui/item-detail/useItemDefinitionDetail";
 import {
 	ItemInfoFact,
 	ItemInfoFacts,

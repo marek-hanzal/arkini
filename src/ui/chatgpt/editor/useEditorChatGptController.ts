@@ -2,13 +2,13 @@ import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { Exit } from "effect";
 import { type RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { subscribeChatGptAssetCandidateFx } from "~/bridge/chatgpt/subscribeChatGptAssetCandidateFx";
-import type { ChatGptViewState } from "~/bridge/chatgpt/subscribeChatGptViewStateFx";
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { readEditorAssetResourceIdFx } from "~/bridge/resource/editor/readEditorAssetResourceIdFx";
-import { saveEditorAssetCommandAtom } from "~/bridge/resource/editor/saveEditorAssetCommandAtom";
-import { validateEditorAssetFileFx } from "~/bridge/resource/editor/validateEditorAssetFileFx";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { subscribeChatGptAssetCandidateFx } from "~/ui/chatgpt/editor/subscribeChatGptAssetCandidateFx";
+import type { ChatGptViewState } from "~/ui/chatgpt/editor/subscribeChatGptViewStateFx";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { readEditorAssetResourceIdFn } from "~/editor/resource/fn/readEditorAssetResourceIdFn";
+import { saveEditorAssetCommandAtom } from "~/ui/resource/editor/saveEditorAssetCommandAtom";
+import { validateEditorAssetFileFx } from "~/renderer/editor/resource/validateEditorAssetFileFx";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorChatGptSurface } from "./useEditorChatGptSurface";
@@ -106,9 +106,7 @@ export const useEditorChatGptController = (): useEditorChatGptController.Output 
 				setCandidateError(undefined);
 				candidateErrorRef.current = undefined;
 				setCandidateValidating(true);
-				setResourceIdState(
-					RendererRuntime.runSync(readEditorAssetResourceIdFx(next.filename)),
-				);
+				setResourceIdState(readEditorAssetResourceIdFn(next.filename));
 				setReplacementApproval(undefined);
 				void RendererRuntime.runPromise(
 					validateEditorAssetFileFx(file, "chatgpt-preview"),

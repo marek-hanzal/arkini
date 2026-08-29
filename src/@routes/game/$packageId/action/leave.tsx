@@ -1,9 +1,10 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import { GameLeaveDestinationSchema } from "~/@routes/action/-GameLeaveDestinationSchema";
 import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
-import { releaseGameEngineResourceFx } from "~/bridge/game/releaseGameEngineResourceFx";
+import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
 import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
 
 export const Route = createFileRoute("/game/$packageId/action/leave")({
@@ -13,9 +14,13 @@ export const Route = createFileRoute("/game/$packageId/action/leave")({
 		try {
 			await context.rendererRuntime.runPromise(
 				runActionRouteFx(
-					releaseGameEngineResourceFx({
-						resource: context.gameEngineResource,
-					}),
+					GameEngineResourceFx.pipe(
+						Effect.flatMap((service) =>
+							service.releaseFx({
+								resource: context.gameEngineResource,
+							}),
+						),
+					),
 				),
 			);
 		} catch (cause) {

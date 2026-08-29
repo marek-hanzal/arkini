@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 
-import type { GameEngine } from "~/bridge/game/GameEngine";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { DropItemResultKind } from "~/bridge/tile/DropItemResultKind";
-import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
+import type { GameEngine } from "~/renderer/game/GameEngine";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
+import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readActorCursorFx } from "~/ui/pixi/actor/readActorCursorFx";

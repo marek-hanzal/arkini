@@ -1,5 +1,5 @@
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { formatByteSizeFx } from "~/ui/arkpack/editor/formatByteSizeFx";
 import { ItemInfoFact, ItemInfoFacts } from "~/ui/item-detail/ItemInfoPresentation";
 import { useEditorAssetById } from "~/ui/resource/editor/useEditorAssetById";

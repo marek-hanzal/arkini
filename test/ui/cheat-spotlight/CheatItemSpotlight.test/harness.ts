@@ -5,8 +5,8 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { vi } from "vitest";
 
-import { CheatAvailabilityAtom } from "~/bridge/cheat/CheatAvailabilityAtom";
-import type { Game } from "~/bridge/game/Game";
+import { CheatAvailabilityAtom } from "~/ui/cheat-availability/CheatAvailabilityAtom";
+import type { Game } from "~/renderer/game/Game";
 import { CheatItemSpotlight } from "~/ui/cheat-spotlight/CheatItemSpotlight";
 import { CheatItemSpawnProvider } from "~/ui/cheat-spotlight/CheatItemSpawnProvider";
 
@@ -26,14 +26,14 @@ const state = vi.hoisted(() => ({
 
 export const spotlightState = state;
 
-vi.mock("~/bridge/cheat/useGameCheats", () => ({
+vi.mock("~/ui/cheats/useGameCheats", () => ({
 	useGameCheats: () => ({
 		enabled: true,
 		everEnabled: true,
 		instantGameplay: false,
 	}),
 }));
-vi.mock("~/bridge/cheat/useCheatItemCatalog", () => ({
+vi.mock("~/ui/cheat-spotlight/useCheatItemCatalog", () => ({
 	useCheatItemCatalog: () => [
 		{
 			itemId: "item:alpha",

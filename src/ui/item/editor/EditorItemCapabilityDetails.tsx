@@ -1,7 +1,8 @@
 import { BatteryCharging, Combine, type LucideIcon } from "lucide-react";
 
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import type { EditorItem, EditorMerge } from "~/bridge/item/editor/EditorItemModel";
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
 import { PrimaryButtonLink } from "~/ui/button/Button";
 import {
 	DetailFact,
@@ -55,7 +56,7 @@ const DisabledCapabilityDetail = ({
 };
 
 /** Presents the optional charge capability or its explicit disabled state. */
-export const EditorItemChargesDetail = ({ item }: { readonly item: EditorItem }) =>
+export const EditorItemChargesDetail = ({ item }: { readonly item: ItemSchema.Type }) =>
 	item.charges === undefined ? (
 		<DisabledCapabilityDetail
 			actionLabel="Enable charges"
@@ -82,7 +83,13 @@ export const EditorItemChargesDetail = ({ item }: { readonly item: EditorItem })
 		</DetailSection>
 	);
 
-const MergeDetail = ({ index, merge }: { readonly index: number; readonly merge: EditorMerge }) => (
+const MergeDetail = ({
+	index,
+	merge,
+}: {
+	readonly index: number;
+	readonly merge: MergeSchema.Type;
+}) => (
 	<article className="grid gap-4 border-b border-line pb-6 last:border-0 last:pb-0">
 		<h3 className="text-base font-semibold">Merge {index + 1}</h3>
 		<DetailFacts>
@@ -116,7 +123,7 @@ const MergeDetail = ({ index, merge }: { readonly index: number; readonly merge:
 );
 
 /** Presents authored merge interactions or their explicit disabled state. */
-export const EditorItemMergesDetail = ({ item }: { readonly item: EditorItem }) =>
+export const EditorItemMergesDetail = ({ item }: { readonly item: ItemSchema.Type }) =>
 	item.merge === undefined || item.merge.length === 0 ? (
 		<DisabledCapabilityDetail
 			actionLabel="Enable merges"

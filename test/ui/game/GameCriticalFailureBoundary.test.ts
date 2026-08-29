@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
-import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
-import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
+import { CriticalGameLifecycleError } from "~/renderer/game/resource/CriticalGameLifecycleError";
+import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
 import { Component, type PropsWithChildren } from "react";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";

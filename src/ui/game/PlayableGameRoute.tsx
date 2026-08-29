@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import { useGameEngine } from "~/bridge/game/useGameEngine";
+import { useGameEngine } from "~/ui/game/useGameEngine";
 import { GameAudio } from "~/ui/audio/GameAudio";
 import { CheatItemSpawnProvider } from "~/ui/cheat-spotlight/CheatItemSpawnProvider";
 

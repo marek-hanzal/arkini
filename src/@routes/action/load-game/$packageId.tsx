@@ -2,24 +2,23 @@ import { createFileRoute, redirect, type ErrorComponentProps } from "@tanstack/r
 
 import { Cause, Effect, Exit, Option } from "effect";
 import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
-import { releaseCurrentEditorBoardGameFx } from "~/bridge/editor/board/releaseCurrentEditorBoardGameFx";
-import { acquireGameEngineLeaseFx } from "~/bridge/game/acquireGameEngineLeaseFx";
-import { adoptGameEngineLeaseFx } from "~/bridge/game/adoptGameEngineLeaseFx";
-import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
-import { readCurrentGameEngineResourceFx } from "~/bridge/game/readCurrentGameEngineResourceFx";
+import { releaseCurrentEditorBoardGameFx } from "~/renderer/editor/board/releaseCurrentEditorBoardGameFx";
+import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
+import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
 import { GameEngineErrorView } from "~/ui/game/GameEngineErrorView";
 import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
 
 const loadGameRouteFx = Effect.fn("loadGameRouteFx")((packageId: string) =>
 	Effect.scoped(
 		Effect.gen(function* () {
+			const resourceService = yield* GameEngineResourceFx;
 			yield* releaseCurrentEditorBoardGameFx;
 			const lease = yield* runActionRouteFx(
-				acquireGameEngineLeaseFx({
+				resourceService.acquireLeaseFx({
 					packageId,
 				}),
 			);
-			return yield* adoptGameEngineLeaseFx(lease);
+			return yield* resourceService.adoptLeaseFx(lease);
 		}),
 	),
 );
@@ -33,7 +32,9 @@ const loadGameRouteFx = Effect.fn("loadGameRouteFx")((packageId: string) =>
  */
 export const Route = createFileRoute("/action/load-game/$packageId")({
 	beforeLoad: ({ context, params }) => {
-		const resource = context.rendererRuntime.runSync(readCurrentGameEngineResourceFx());
+		const resource = context.rendererRuntime.runSync(
+			GameEngineResourceFx.pipe(Effect.flatMap((service) => service.currentFx)),
+		);
 		if (resource === null) return;
 		resource.assertUsable();
 		if (resource.game.arkpack.packageId === params.packageId) return;
@@ -57,9 +58,7 @@ export const Route = createFileRoute("/action/load-game/$packageId")({
 			},
 		);
 		if (Exit.isFailure(completed)) {
-			const failure = context.rendererRuntime.runSync(
-				readExactCauseFailureFx(completed.cause),
-			);
+			const failure = readExactCauseFailureFn(completed.cause);
 			if (Option.isSome(failure)) throw failure.value;
 			if (Cause.hasInterruptsOnly(completed.cause) && abortController.signal.aborted) {
 				throw (

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
+import type { EditorItemOriginFlow } from "~/editor/origin-flow/EditorItemOriginFlow";
 
 /** Reads stable item navigation for nodes that use the selected item in one operation role. */
 export const readRelationNavigationFx = Effect.fn("readRelationNavigationFx")(

@@ -2,10 +2,10 @@ import { useAtom, useAtomValue } from "@effect/atom-react";
 import type { Effect } from "effect";
 import { useCallback, useEffect } from "react";
 
-import { AppearanceAtom } from "~/bridge/appearance/AppearanceAtom";
-import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
-import type { WindowMode } from "~/bridge/window/WindowMode";
-import { WindowModeAtom } from "~/bridge/window/WindowModeAtom";
+import { AppearanceAtom } from "~/ui/appearance/AppearanceAtom";
+import type { AppearanceThemeSchema } from "../../../electron/contract/appearance/AppearanceThemeSchema";
+import type { WindowModeSchema } from "../../../electron/contract/window/WindowModeSchema";
+import { WindowModeAtom } from "~/renderer/window/WindowModeAtom";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 import { SettingsCommandAtom } from "~/ui/settings/SettingsCommandAtom";
 
@@ -49,13 +49,13 @@ export const useSettingsModel = ({
 		theme: appearance.theme,
 		windowMode,
 		goBack,
-		selectTheme: (theme: AppearanceTheme) => {
+		selectTheme: (theme: AppearanceThemeSchema.Type) => {
 			runCommand({
 				action: "theme",
 				theme,
 			});
 		},
-		selectWindowMode: (mode: WindowMode) => {
+		selectWindowMode: (mode: WindowModeSchema.Type) => {
 			runCommand({
 				action: "window-mode",
 				mode,

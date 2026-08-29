@@ -1,7 +1,8 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { Effect } from "effect";
 
 import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
-import { resetGameEngineResourceFx } from "~/bridge/game/resetGameEngineResourceFx";
+import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
 import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
 
 export const Route = createFileRoute("/game/$packageId/action/reset")({
@@ -9,9 +10,13 @@ export const Route = createFileRoute("/game/$packageId/action/reset")({
 		try {
 			await context.rendererRuntime.runPromise(
 				runActionRouteFx(
-					resetGameEngineResourceFx({
-						resource: context.gameEngineResource,
-					}),
+					GameEngineResourceFx.pipe(
+						Effect.flatMap((service) =>
+							service.resetFx({
+								resource: context.gameEngineResource,
+							}),
+						),
+					),
 				),
 			);
 		} catch (cause) {

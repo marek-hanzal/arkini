@@ -1,4 +1,4 @@
-import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { ButtonLink } from "~/ui/button/Button";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
@@ -10,7 +10,7 @@ export const EditorItemDetailReference = ({
 	sectionId = "identity",
 	stretched = false,
 }: {
-	readonly item: EditorItem;
+	readonly item: ItemSchema.Type;
 	readonly projectId: string;
 	readonly sectionId?: EditorItemSectionId;
 	readonly stretched?: boolean;

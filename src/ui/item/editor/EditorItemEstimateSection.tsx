@@ -1,7 +1,7 @@
 import { Calculator, Info, LoaderCircle, TriangleAlert } from "lucide-react";
 
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type {
 	EditorItemEstimate,
 	EditorItemEstimateDiagnostic,

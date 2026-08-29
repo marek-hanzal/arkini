@@ -2,8 +2,8 @@ import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useRouter } from "@tanstack/react-router";
 import { useCallback, useMemo } from "react";
 
-import { refreshEditorProjectCommandAtom } from "~/bridge/editor/refreshEditorProjectCommandAtom";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { refreshEditorProjectCommandAtom } from "~/ui/editor/refreshEditorProjectCommandAtom";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 
 const message = (error: unknown) => (error instanceof Error ? error.message : String(error));

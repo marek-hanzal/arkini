@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { Texture } from "pixi.js";
 
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";
 import { beginVisualTextureLoadFx } from "~/ui/pixi/actor/beginVisualTextureLoadFx";
 import { completeVisualTextureLoadFx } from "~/ui/pixi/actor/completeVisualTextureLoadFx";

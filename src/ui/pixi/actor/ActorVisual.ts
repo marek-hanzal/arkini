@@ -1,6 +1,6 @@
 import type { Container, Graphics, Sprite, Text, TextStyle } from "pixi.js";
 
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 
 export interface VisualReadyListener {
 	readonly onCancel?: () => void;

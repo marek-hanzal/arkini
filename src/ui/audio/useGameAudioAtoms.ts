@@ -2,9 +2,9 @@ import { Cause, Effect, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { useMemo } from "react";
 
-import type { PlayableGame } from "~/bridge/game/PlayableGame";
-import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
-import type { useGameEvents } from "~/bridge/event/useGameEvents";
+import type { PlayableGame } from "~/renderer/game/PlayableGame";
+import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
+import type { useGameEvents } from "~/ui/game/useGameEvents";
 import type { createGameAudioSynthFx } from "~/ui/audio/createGameAudioSynthFx";
 import { readGameAudioCuesFx } from "~/ui/audio/readGameAudioCuesFx";
 
@@ -18,6 +18,11 @@ export const useGameAudioAtoms = (
 	createSynthFx: useGameAudioAtoms.CreateSynthFx,
 ) =>
 	useMemo(() => {
+		const logGameAudioFailureFx = (message: string, cause: Cause.Cause<unknown>) =>
+			Effect.sync(() => {
+				const failure = readExactCauseFailureFn(cause);
+				console.error(message, Option.isSome(failure) ? failure.value : cause);
+			});
 		const synthAtom = Atom.make(
 			Effect.acquireRelease(
 				Effect.suspend(createSynthFx),
@@ -26,13 +31,9 @@ export const useGameAudioAtoms = (
 						Effect.catchCause((cause) =>
 							Cause.hasInterruptsOnly(cause)
 								? Effect.void
-								: readExactCauseFailureFx(cause).pipe(
-										Effect.map((failure) =>
-											console.error(
-												"Arkini game audio disposal failed; gameplay continues.",
-												Option.isSome(failure) ? failure.value : cause,
-											),
-										),
+								: logGameAudioFailureFx(
+										"Arkini game audio disposal failed; gameplay continues.",
+										cause,
 									),
 						),
 					),
@@ -51,13 +52,9 @@ export const useGameAudioAtoms = (
 					Effect.catchCause((cause) =>
 						Cause.hasInterruptsOnly(cause)
 							? Effect.void
-							: readExactCauseFailureFx(cause).pipe(
-									Effect.map((failure) =>
-										console.error(
-											"Arkini game audio unlock failed; gameplay continues.",
-											Option.isSome(failure) ? failure.value : cause,
-										),
-									),
+							: logGameAudioFailureFx(
+									"Arkini game audio unlock failed; gameplay continues.",
+									cause,
 								),
 					),
 				),
@@ -73,13 +70,9 @@ export const useGameAudioAtoms = (
 					Effect.catchCause((cause) =>
 						Cause.hasInterruptsOnly(cause)
 							? Effect.void
-							: readExactCauseFailureFx(cause).pipe(
-									Effect.map((failure) =>
-										console.error(
-											"Arkini game audio preparation failed; gameplay continues.",
-											Option.isSome(failure) ? failure.value : cause,
-										),
-									),
+							: logGameAudioFailureFx(
+									"Arkini game audio preparation failed; gameplay continues.",
+									cause,
 								),
 					),
 				),
@@ -97,13 +90,9 @@ export const useGameAudioAtoms = (
 					Effect.catchCause((cause) =>
 						Cause.hasInterruptsOnly(cause)
 							? Effect.void
-							: readExactCauseFailureFx(cause).pipe(
-									Effect.map((failure) =>
-										console.error(
-											"Arkini game audio batch failed; gameplay continues.",
-											Option.isSome(failure) ? failure.value : cause,
-										),
-									),
+							: logGameAudioFailureFx(
+									"Arkini game audio batch failed; gameplay continues.",
+									cause,
 								),
 					),
 				),

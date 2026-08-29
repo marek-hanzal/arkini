@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
 import { consumedFadeDurationMs } from "~/ui/pixi/animation/flashConsumedSourceFx";
-import type { GameEngine } from "~/bridge/game/GameEngine";
+import type { GameEngine } from "~/renderer/game/GameEngine";
 
 import {
 	createGame,

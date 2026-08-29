@@ -1,4 +1,4 @@
-import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { ButtonLink } from "~/ui/button/Button";
 import {
 	selectableActiveClassName,
@@ -13,9 +13,9 @@ export const EditorItemListRow = ({
 	onSelectType,
 	projectId,
 }: {
-	readonly activeType: EditorItem["type"] | undefined;
-	readonly item: EditorItem;
-	readonly onSelectType: (type: EditorItem["type"]) => void;
+	readonly activeType: ItemSchema.Type["type"] | undefined;
+	readonly item: ItemSchema.Type;
+	readonly onSelectType: (type: ItemSchema.Type["type"]) => void;
 	readonly projectId: string;
 }) => (
 	<article

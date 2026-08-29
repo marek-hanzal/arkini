@@ -1,7 +1,7 @@
 import { ChevronRight } from "lucide-react";
 
-import type { useItemDetailSources } from "~/bridge/item-detail/useItemDetailSources";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import type { useItemDetailSources } from "~/ui/item-detail/useItemDetailSources";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { ItemIdentity } from "~/ui/item/ItemIdentity";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";

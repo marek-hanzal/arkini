@@ -1,6 +1,6 @@
 import type { Container, FederatedPointerEvent, Graphics } from "pixi.js";
 
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import type { ActivityParticles } from "~/ui/pixi/actor/ActivityParticles";
 import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";
 

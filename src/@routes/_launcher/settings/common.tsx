@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
-import type { WindowMode } from "~/bridge/window/WindowMode";
+import type { AppearanceThemeSchema } from "../../../../electron/contract/appearance/AppearanceThemeSchema";
+import type { WindowModeSchema } from "../../../../electron/contract/window/WindowModeSchema";
 import { useModelContext } from "~/ui/settings/ModelContext";
 import { SettingsSegmentedChoice } from "~/ui/settings/SettingsSegmentedChoice";
 
 const ThemeOptions: ReadonlyArray<{
-	readonly value: AppearanceTheme;
+	readonly value: AppearanceThemeSchema.Type;
 	readonly label: string;
 }> = [
 	{
@@ -24,7 +24,7 @@ const ThemeOptions: ReadonlyArray<{
 ];
 
 const WindowModeOptions: ReadonlyArray<{
-	readonly value: WindowMode;
+	readonly value: WindowModeSchema.Type;
 	readonly label: string;
 }> = [
 	{

@@ -1,9 +1,9 @@
+import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { createId } from "@paralleldrive/cuid2";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { EditorItemTypes } from "~/bridge/item/editor/EditorItemModel";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
 import { ButtonLink } from "~/ui/button/Button";
 import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import { EditorItemTypePresentation } from "~/ui/item/editor/EditorItemTypePresentation";
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/new/select
 		const itemUids = useMemo(
 			() =>
 				Object.fromEntries(
-					EditorItemTypes.map((type) => [
+					TypeSchema.options.map((type) => [
 						type,
 						createId(),
 					]),
@@ -44,7 +44,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/new/select
 					</h1>
 				</header>
 				<div className="ak-list grid content-start gap-2 px-3 pt-3 pb-3 sm:grid-cols-2 xl:grid-cols-3">
-					{EditorItemTypes.map((type) => {
+					{TypeSchema.options.map((type) => {
 						const presentation = EditorItemTypePresentation[type];
 						const Icon = presentation.icon;
 						return (

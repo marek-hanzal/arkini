@@ -14,14 +14,14 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
-import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
-import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
-import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycleOwnerAtom";
-import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLifecycleFx";
+import type { ArkpackCatalog } from "~/renderer/arkpack/ArkpackCatalog";
+import { ArkpackCatalogOwnerAtom } from "~/renderer/arkpack/ArkpackCatalogOwnerAtom";
+import { RendererLifecycleOwnerAtom } from "~/renderer/lifecycle/RendererLifecycleOwnerAtom";
+import { createRendererLifecycleFx } from "~/renderer/lifecycle/createRendererLifecycleFx";
 import { Route as MainMenuRouteDefinition } from "~/@routes/_launcher/main-menu";
 import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";
 import { LauncherStartupConfigAtom } from "~/ui/launcher/LauncherStartupConfigAtom";
-import { EditorServiceStatusAtom } from "~/bridge/editor/EditorServiceStatusAtom";
+import { EditorServiceStatusAtom } from "~/ui/editor/EditorServiceStatusAtom";
 
 (
 	globalThis as {

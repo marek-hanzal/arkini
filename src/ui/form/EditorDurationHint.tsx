@@ -1,4 +1,4 @@
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { formatEditorDurationFx } from "~/ui/form/formatEditorDurationFx";
 
 export const EditorDurationHint = ({ seconds }: { readonly seconds: number }) => {

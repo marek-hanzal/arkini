@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { match } from "ts-pattern";
 
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { ItemDetailState } from "~/ui/item-detail/ItemDetailControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 

@@ -1,16 +1,17 @@
-import type { EditorOutput, EditorRoll } from "~/bridge/item/editor/EditorItemModel";
+import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import type { RollSchema } from "~/engine/roll/schema/RollSchema";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorRollSetControl } from "~/ui/item/editor/EditorRollSetControl";
 import { useEditorItemOptionLabel } from "~/ui/item/editor/useEditorItemOptionLabel";
 
-const readFirstRollItemId = (roll: EditorRoll): string | undefined =>
+const readFirstRollItemId = (roll: RollSchema.Type): string | undefined =>
 	roll.type === "weight" ? roll.drop[0]?.drop[0]?.itemId : roll.drop[0]?.itemId;
 
 export interface EditorOutputControlProps {
-	readonly onChange: (output: EditorOutput | undefined) => void;
-	readonly value: EditorOutput;
+	readonly onChange: (output: OutputSchema.Type | undefined) => void;
+	readonly value: OutputSchema.Type;
 }
 
 /** Edits weighted output sets through their concrete RollSet domain. */

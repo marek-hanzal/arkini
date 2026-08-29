@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
+import type { TileMotionCue } from "~/ui/pixi/motion/TileMotionCue";
 import { readQuantityPresentationFx } from "~/ui/pixi/motion/readQuantityPresentationFx";
 
 import { inputCue, stackCue } from "./readQuantityPresentationFx.test/fixture";

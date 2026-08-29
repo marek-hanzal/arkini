@@ -7,11 +7,11 @@ import { useEffect, useMemo } from "react";
 import {
 	type EditorItemOriginFlow,
 	type EditorItemOriginFlowProgress,
-} from "~/bridge/item/editor/EditorItemOriginFlow";
+} from "~/editor/origin-flow/EditorItemOriginFlow";
 import {
 	readEditorItemOriginFlowFx,
 	type EditorItemOriginFlowRequest,
-} from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+} from "~/editor/origin-flow/fx/readEditorItemOriginFlowFx";
 import type { LayoutNode, LayoutPoint } from "~/ui/item/editor/origin-flow/Layout";
 import { layoutInWorkerFx } from "~/ui/item/editor/origin-flow/layoutInWorkerFx";
 

@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { DropItemResultKind } from "~/bridge/tile/DropItemResultKind";
-import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
+import { DropItemResultKind } from "~/engine/runtime/DropItemResult";
+import type { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
 
 export namespace readAttractionActorIdFx {
 	export interface Props {

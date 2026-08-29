@@ -1,3 +1,5 @@
+import type { EditorSourceExportSchema } from "./EditorSourceExportSchema";
+
 /** Serializable editor transport contracts. Domain payloads stay unknown until each process validates them. */
 export namespace EditorProjectTransport {
 	export type Operation =
@@ -123,12 +125,7 @@ export namespace EditorProjectTransport {
 		readonly projectId: string;
 	}
 
-	export interface SourceExport {
-		readonly json: number;
-		readonly resources: number;
-		readonly revision: number;
-		readonly root: string;
-	}
+	export type SourceExport = EditorSourceExportSchema.Type;
 
 	export interface BoardScenarioDescriptor {
 		readonly projectId: string;

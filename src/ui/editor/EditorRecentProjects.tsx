@@ -3,8 +3,8 @@ import { ChevronRight, FolderKanban, FolderX, Trash2 } from "lucide-react";
 import type {
 	EditorProjectCandidate,
 	EditorProjectOwnership,
-} from "~/bridge/editor/EditorProjectCandidate";
-import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
+} from "~/editor/EditorProjectCandidate";
+import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
 import { Button, ButtonLink } from "~/ui/button/Button";
 
 const formatter = new Intl.DateTimeFormat(undefined, {

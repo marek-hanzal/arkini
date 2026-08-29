@@ -5,7 +5,7 @@ import { act, createElement, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, vi } from "vitest";
 
-import type { GameEngine } from "~/bridge/game/GameEngine";
+import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { GameMenuControl } from "~/ui/game-menu/GameMenuControl";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
@@ -20,7 +20,7 @@ import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 	}
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
-vi.mock("~/bridge/game/useGameEngine", () => ({
+vi.mock("~/ui/game/useGameEngine", () => ({
 	useGameEngine: () => ({
 		config: {
 			items: {},
@@ -28,7 +28,7 @@ vi.mock("~/bridge/game/useGameEngine", () => ({
 	}),
 }));
 
-vi.mock("~/bridge/item-detail/useResolveItemDetailTarget", () => ({
+vi.mock("~/ui/item-detail/useResolveItemDetailTarget", () => ({
 	useResolveItemDetailTarget:
 		() =>
 		({ itemId, requestedTab }: { itemId: string; requestedTab?: string }) =>
@@ -47,7 +47,7 @@ vi.mock("~/bridge/item-detail/useResolveItemDetailTarget", () => ({
 					},
 }));
 
-vi.mock("~/bridge/item-detail/useResolveItemDefinitionDetailTarget", () => ({
+vi.mock("~/ui/item-detail/useResolveItemDefinitionDetailTarget", () => ({
 	useResolveItemDefinitionDetailTarget: () => () => ({
 		kind: "unavailable",
 	}),

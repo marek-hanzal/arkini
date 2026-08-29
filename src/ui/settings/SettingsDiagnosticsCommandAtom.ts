@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { openDiagnosticDirectoryFx } from "~/bridge/diagnostics/openDiagnosticDirectoryFx";
+import { openDiagnosticDirectoryFx } from "~/renderer/diagnostics/openDiagnosticDirectoryFx";
 import {
 	createSettingsDirectoryCommandAtomFx,
 	type SettingsDirectoryCommandState,

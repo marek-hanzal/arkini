@@ -1,10 +1,10 @@
-import type { GameEngine } from "~/bridge/game/GameEngine";
+import type { GameEngine } from "~/renderer/game/GameEngine";
 
 import { afterEach, beforeEach, vi } from "vitest";
 
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 
@@ -351,13 +351,13 @@ vi.mock("~/ui/pixi/appearance/readScenePaletteFx", async () => {
 	};
 });
 
-vi.mock("~/bridge/tile/readTileActorsFx", () => ({
+vi.mock("~/ui/pixi/actor/readTileActorsFx", () => ({
 	readTileActorsFx: () => ({
 		type: "tile-actors",
 	}),
 }));
 
-vi.mock("~/bridge/tile/readTileDropPreviewFx", async () => {
+vi.mock("~/ui/pixi/drag/readTileDropPreviewFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
 		readTileDropPreviewFx: (props: unknown) =>

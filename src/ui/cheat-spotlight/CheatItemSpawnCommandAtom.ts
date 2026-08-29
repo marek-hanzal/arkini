@@ -1,10 +1,10 @@
 import { Cause, Effect, Exit } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { spawnCheatItemAtom } from "~/bridge/cheat/spawnCheatItemAtom";
-import type { PlayableGame } from "~/bridge/game/PlayableGame";
-import { makeExactGameAtomFamilyFx } from "~/bridge/game/makeExactGameAtomFamilyFx";
-import { settleRendererCommandFailureFx } from "~/bridge/game/settleRendererCommandFailureFx";
+import type { PlayableGame } from "~/renderer/game/PlayableGame";
+import { makeExactGameAtomFamilyFx } from "~/ui/game/makeExactGameAtomFamilyFx";
+import { settleRendererCommandFailureFx } from "~/ui/game/settleRendererCommandFailureFx";
+import { spawnCheatItemFx } from "~/engine/cheat/write/spawnCheatItemFx";
 
 export namespace CheatItemSpawnCommandAtom {
 	export type Command =
@@ -60,12 +60,19 @@ export const CheatItemSpawnCommandAtom = Effect.runSync(
 			Atom.setIdleTTL(0),
 		);
 		const runnerAtom = Atom.fn(
-			(command: AdmittedSpawnCommand, get) =>
+			(command: AdmittedSpawnCommand) =>
 				Effect.gen(function* () {
 					const exit = yield* Effect.exit(
-						get
-							.setResult(spawnCheatItemAtom(game), command.itemId)
-							.pipe(Effect.andThen(Effect.yieldNow)),
+						Effect.yieldNow.pipe(
+							Effect.andThen(
+								game.runFx(
+									spawnCheatItemFx({
+										itemId: command.itemId,
+									}),
+								),
+							),
+							Effect.andThen(Effect.yieldNow),
+						),
 					);
 					if (Exit.isFailure(exit)) {
 						return yield* settleRendererCommandFailureFx({

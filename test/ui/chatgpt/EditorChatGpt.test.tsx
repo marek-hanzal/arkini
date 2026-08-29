@@ -40,17 +40,17 @@ vi.mock("@effect/atom-react", () => ({
 	}),
 }));
 
-vi.mock("~/bridge/editor/useEditorProject", () => ({
+vi.mock("~/ui/editor/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
-vi.mock("~/bridge/resource/editor/saveEditorAssetCommandAtom", () => ({
+vi.mock("~/ui/resource/editor/saveEditorAssetCommandAtom", () => ({
 	saveEditorAssetCommandAtom: () => ({
 		id: "save-chatgpt-asset",
 	}),
 }));
 
-vi.mock("~/bridge/runtime/RendererRuntime", async () => {
+vi.mock("~/renderer/RendererRuntime", async () => {
 	const { Effect } = await import("effect");
 	return {
 		RendererRuntime: {

@@ -2,11 +2,11 @@ import { Cause, Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { match } from "ts-pattern";
 
-import type { Game } from "~/bridge/game/Game";
-import { makeExactGameAtomFamilyFx } from "~/bridge/game/makeExactGameAtomFamilyFx";
-import { readExactCauseFailureFx } from "~/bridge/game/readExactCauseFailureFx";
-import { requestApplicationCloseFx } from "~/bridge/lifecycle/requestApplicationCloseFx";
-import { RuntimeSaveFx } from "~/bridge/save/RuntimeSaveFx";
+import type { Game } from "~/renderer/game/Game";
+import { makeExactGameAtomFamilyFx } from "~/ui/game/makeExactGameAtomFamilyFx";
+import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
+import { readRendererLifecycleFx } from "~/renderer/lifecycle/readRendererLifecycleFx";
+import { RuntimeSaveFx } from "~/engine/save/RuntimeSaveFx";
 
 export type GameMenuCommand = "save" | "save-and-exit";
 
@@ -18,7 +18,11 @@ export const gameMenuCommandAtom = Effect.runSync(
 				.with("save", () =>
 					game.runFx(RuntimeSaveFx.pipe(Effect.flatMap((service) => service.flush))),
 				)
-				.with("save-and-exit", () => requestApplicationCloseFx())
+				.with("save-and-exit", () =>
+					readRendererLifecycleFx().pipe(
+						Effect.flatMap((lifecycle) => lifecycle.requestCloseFx),
+					),
+				)
 				.exhaustive();
 
 			return commandFx.pipe(
@@ -30,7 +34,7 @@ export const gameMenuCommandAtom = Effect.runSync(
 						}
 						if (
 							Exit.isFailure(exit) &&
-							Option.isNone(yield* readExactCauseFailureFx(exit.cause))
+							Option.isNone(readExactCauseFailureFn(exit.cause))
 						) {
 							game.failStop("ui", exit.cause);
 							return yield* Effect.failCause(exit.cause);

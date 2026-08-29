@@ -1,6 +1,6 @@
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { EditorProject } from "~/bridge/editor/EditorProject";
-import type { EditorGameDiagnostic } from "~/bridge/arkpack/editor/readEditorBuildFailureFx";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorGameDiagnostic } from "~/editor/build/fn/readEditorBuildFailureFn";
 import { EditorDiagnosticLink } from "~/ui/arkpack/editor/EditorDiagnosticLink";
 import { printEditorGameDiagnosticFx } from "~/ui/arkpack/editor/printEditorGameDiagnosticFx";
 

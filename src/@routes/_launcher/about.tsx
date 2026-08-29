@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { useAboutPortraitAssets } from "~/bridge/arkpack/useAboutPortraitAssets";
+import { useAboutPortraitAssets } from "~/ui/launcher/about/useAboutPortraitAssets";
 import { About } from "~/ui/launcher/About";
 import { AboutEasterEgg } from "~/ui/launcher/AboutEasterEgg";
 import { AboutJumpscare } from "~/ui/launcher/AboutJumpscare";

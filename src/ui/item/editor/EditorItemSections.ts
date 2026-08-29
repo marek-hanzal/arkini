@@ -1,4 +1,4 @@
-import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 
 export const EditorItemSectionIds = [
 	"identity",
@@ -15,8 +15,8 @@ export type EditorItemSectionId = (typeof EditorItemSectionIds)[number];
 
 export type EditorItemOptionalCapability = Extract<EditorItemSectionId, "charges" | "merges">;
 
-type EditorItemField = EditorItem extends infer Member
-	? Member extends EditorItem
+type EditorItemField = ItemSchema.Type extends infer Member
+	? Member extends ItemSchema.Type
 		? keyof Member
 		: never
 	: never;

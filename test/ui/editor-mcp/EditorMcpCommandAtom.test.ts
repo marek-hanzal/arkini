@@ -24,21 +24,21 @@ const bridge = vi.hoisted(
 	}),
 );
 
-vi.mock("~/bridge/editor-mcp/readEditorMcpOverviewFx", async () => {
+vi.mock("~/ui/editor-mcp/readEditorMcpOverviewFx", async () => {
 	const { Effect } = await import("effect");
 	return {
 		readEditorMcpOverviewFx: Effect.sync(() => bridge.overview),
 	};
 });
 
-vi.mock("~/bridge/editor-mcp/configureEditorMcpFx", async () => {
+vi.mock("~/ui/editor-mcp/configureEditorMcpFx", async () => {
 	const { Effect } = await import("effect");
 	return {
 		configureEditorMcpFx: () => Effect.sync(() => bridge.overview),
 	};
 });
 
-vi.mock("~/bridge/editor-mcp/executeEditorMcpCommandFx", async () => {
+vi.mock("~/ui/editor-mcp/executeEditorMcpCommandFx", async () => {
 	const { Effect } = await import("effect");
 	return {
 		executeEditorMcpCommandFx: () =>

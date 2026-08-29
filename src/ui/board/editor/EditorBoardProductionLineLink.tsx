@@ -1,8 +1,8 @@
 import { ArrowUpRight } from "lucide-react";
 
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { readEditorItemLinesFx } from "~/bridge/item/editor/readEditorItemLinesFx";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { readAuthoredItemLinesFx } from "~/engine/line/read/readAuthoredItemLinesFx";
 import type { ItemLineSummaryIdentityRenderProps } from "~/ui/item-detail/ItemLineSummary";
 import { EditorProductionLineEditLink } from "~/ui/item/editor/EditorProductionLineEditLink";
 
@@ -17,7 +17,7 @@ export const EditorBoardProductionLineLink = ({
 	const item = project.config.items[itemId];
 	if (
 		item === undefined ||
-		!RendererRuntime.runSync(readEditorItemLinesFx(item)).some((line) => line.id === lineId)
+		!RendererRuntime.runSync(readAuthoredItemLinesFx(item)).some((line) => line.id === lineId)
 	)
 		return children;
 	return (

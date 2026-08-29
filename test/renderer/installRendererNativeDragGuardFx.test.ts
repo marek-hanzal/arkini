@@ -3,7 +3,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { installRendererNativeDragGuardFx } from "~/installRendererNativeDragGuardFx";
+import { installRendererNativeDragGuardFx } from "~/renderer/installRendererNativeDragGuardFx";
 
 describe("installRendererNativeDragGuardFx", () => {
 	it("prevents native descendant drags until its process listener is removed", () => {

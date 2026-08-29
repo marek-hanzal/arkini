@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import { useEditorProject } from "~/ui/editor/useEditorProject";
 import { useFieldContext } from "~/ui/form/EditorFormContexts";
 import { readEditorFieldErrorFx } from "~/ui/form/readEditorFieldErrorFx";
 import { EditorSearchCombobox, type EditorSearchOption } from "~/ui/form/EditorSearchCombobox";

@@ -1,5 +1,5 @@
-import type { EditorProject } from "~/bridge/editor/EditorProject";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import type { EditorProject } from "~/editor/EditorProject";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import type { EditorItemEstimateRouteStep } from "~/editor/estimator/EditorItemEstimate";
 import { type ReactNode, useState } from "react";
 import { formatItemDurationFx } from "~/ui/item-detail/formatItemDurationFx";

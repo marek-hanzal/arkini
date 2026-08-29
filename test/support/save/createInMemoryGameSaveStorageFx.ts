@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
+import type { GameSaveStorage } from "~/engine/save/GameSaveStorage";
 
 /** Creates an explicit in-memory save capability for tests only. */
 export const createInMemoryGameSaveStorageFx = Effect.fn("createInMemoryGameSaveStorageFx")(() =>

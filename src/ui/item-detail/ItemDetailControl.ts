@@ -1,29 +1,29 @@
 import type { Effect } from "effect";
 import type * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { ItemDetailTab } from "~/bridge/item-detail/ItemDetailTab";
+import type { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
 import type {
 	ItemDetailPendingAction,
 	RunItemDetailPendingActionProps,
-} from "~/bridge/item-detail/ItemDetailPendingActionOwner";
+} from "~/ui/item-detail/ItemDetailPendingActionOwner";
 
 export type {
 	ItemDetailPendingAction,
 	RunItemDetailPendingActionProps,
-} from "~/bridge/item-detail/ItemDetailPendingActionOwner";
+} from "~/ui/item-detail/ItemDetailPendingActionOwner";
 
 export type ItemDetailTarget =
 	| {
 			readonly kind: "runtime";
 			readonly itemId: string;
-			readonly tab: ItemDetailTab;
+			readonly tab: ItemDetailTabEnumSchema.Type;
 			readonly linesSearchQuery?: string;
 			readonly origin: HTMLElement | null;
 	  }
 	| {
 			readonly kind: "definition";
 			readonly itemId: string;
-			readonly tab: Extract<ItemDetailTab, "info" | "sources">;
+			readonly tab: Extract<ItemDetailTabEnumSchema.Type, "info" | "sources">;
 			readonly origin: HTMLElement | null;
 	  };
 
@@ -54,20 +54,20 @@ export interface CloseItemDetailProps {
 
 export interface OpenItemDetailProps {
 	readonly itemId: string;
-	readonly tab?: ItemDetailTab;
+	readonly tab?: ItemDetailTabEnumSchema.Type;
 	readonly linesSearchQuery?: string;
 	readonly origin?: HTMLElement | null;
 }
 
 export interface OpenItemDefinitionDetailProps {
 	readonly itemId: string;
-	readonly tab?: Extract<ItemDetailTab, "info" | "sources">;
+	readonly tab?: Extract<ItemDetailTabEnumSchema.Type, "info" | "sources">;
 	readonly origin?: HTMLElement | null;
 }
 
 export interface SelectRetainedItemDetailTabProps {
 	readonly itemId: string;
-	readonly tab: ItemDetailTab;
+	readonly tab: ItemDetailTabEnumSchema.Type;
 }
 
 /** Canvas-local owner for one exact capability-tabbed Item Detail modal. */

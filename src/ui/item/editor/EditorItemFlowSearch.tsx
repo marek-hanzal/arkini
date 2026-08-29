@@ -1,12 +1,12 @@
 import { X } from "lucide-react";
 
-import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { type EditorSearchOption, EditorSearchCombobox } from "~/ui/form/EditorSearchCombobox";
 import { EditorItemSearchThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { Tooltip } from "~/ui/overlay/Tooltip";
 
 interface EditorItemFlowSearchProps {
-	readonly items: Readonly<Record<string, EditorItem>>;
+	readonly items: Readonly<Record<string, ItemSchema.Type>>;
 	readonly options: readonly EditorSearchOption[];
 	readonly value: string;
 	readonly onChange: (value: string) => void;

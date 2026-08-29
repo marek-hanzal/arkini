@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
-import type { WindowMode } from "~/bridge/window/WindowMode";
-import { WindowModeAtom } from "~/bridge/window/WindowModeAtom";
-import { WindowModeReadyAtom } from "~/bridge/window/WindowModeReadyAtom";
+import type { WindowModeSchema } from "../../../electron/contract/window/WindowModeSchema";
+import { WindowModeAtom } from "~/renderer/window/WindowModeAtom";
+import { WindowModeReadyAtom } from "~/renderer/window/WindowModeReadyAtom";
 
 /** Publishes persisted mode once without overwriting later native window events. */
 export const applyLauncherWindowModeHydrationFx = Effect.fn("applyLauncherWindowModeHydrationFx")(
-	(mode: WindowMode) =>
+	(mode: WindowModeSchema.Type) =>
 		Effect.uninterruptible(
 			Effect.gen(function* () {
 				if (yield* Atom.get(WindowModeReadyAtom)) return;

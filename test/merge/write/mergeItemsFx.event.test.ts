@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
+import { createTestGameSession } from "~test/support/game/createTestGameSession";
 
-import type { GameSession } from "~/bridge/game/GameSession";
+import type { GameSession } from "~/renderer/game/session/GameSession";
 import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
 import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";

@@ -1,11 +1,10 @@
+import type { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { createContext, useContext, type PropsWithChildren } from "react";
-
-import type { EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import type { EditorItemFormController } from "~/ui/item/editor/useEditorItemFormController";
 
 export type EditorItemFormSession = EditorItemFormController & {
 	readonly isNew: boolean;
-	readonly itemType?: EditorItemType;
+	readonly itemType?: TypeSchema.Type;
 	readonly productionLineId?: string;
 };
 

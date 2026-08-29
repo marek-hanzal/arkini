@@ -44,7 +44,7 @@ vi.mock("~/ui/game/PlayableGameRoute", async () => {
 		PlayableGameRoute: Fragment,
 	};
 });
-vi.mock("~/bridge/game/useGameEngine", () => ({
+vi.mock("~/ui/game/useGameEngine", () => ({
 	useGameEngine: () => ({
 		arkpack: {
 			packageId: "package:cheats",

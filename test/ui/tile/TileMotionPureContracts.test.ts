@@ -5,7 +5,7 @@ import type {
 	TileInputMotionCue,
 	TileMotionCue,
 	TileStackMotionCue,
-} from "~/bridge/tile/motion/TileMotionCue";
+} from "~/ui/pixi/motion/TileMotionCue";
 import { readInteractionClaimsFx } from "~/ui/pixi/motion/readInteractionClaimsFx";
 import { readTileMotionActorClaimsFx } from "~/ui/tile/motion/readTileMotionActorClaimsFx";
 import { readTileMotionLaneClaimsFx } from "~/ui/tile/motion/readTileMotionLaneClaimsFx";

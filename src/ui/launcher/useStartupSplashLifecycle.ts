@@ -4,9 +4,9 @@ import { Cause, Effect, Fiber } from "effect";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { match, P } from "ts-pattern";
 
-import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycleOwnerAtom";
-import { RendererLifecycleUnavailableError } from "~/bridge/lifecycle/RendererLifecycleUnavailableError";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { RendererLifecycleOwnerAtom } from "~/renderer/lifecycle/RendererLifecycleOwnerAtom";
+import { RendererLifecycleUnavailableError } from "~/renderer/lifecycle/RendererLifecycleUnavailableError";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { completeLauncherSplashAtom } from "~/ui/launcher/completeLauncherSplashAtom";
 import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";
 import { LauncherVisualReadyAtom } from "~/ui/launcher/LauncherVisualReadyAtom";

@@ -6,7 +6,7 @@ import type {
 	TileSpawnMotionCue,
 	TileStackMotionCue,
 	TileSwapMotionCue,
-} from "~/bridge/tile/motion/TileMotionCue";
+} from "~/ui/pixi/motion/TileMotionCue";
 import { updateTileMotionLanesFx } from "~/ui/tile/motion/updateTileMotionLanesFx";
 
 const location = (x: number) => ({

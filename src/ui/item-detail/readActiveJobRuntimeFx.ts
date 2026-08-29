@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { JobStatusEnumSchema } from "~/bridge/job/JobStatusEnumSchema";
+import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 import type { ItemRuntimeValue } from "~/ui/item-detail/ItemRuntime";
 import { formatItemDurationFx } from "~/ui/item-detail/formatItemDurationFx";
 

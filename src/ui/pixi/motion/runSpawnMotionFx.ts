@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { TileSpawnMotionCue } from "~/bridge/tile/motion/TileMotionCue";
+import { RendererRuntime } from "~/renderer/RendererRuntime";
+import type { TileSpawnMotionCue } from "~/ui/pixi/motion/TileMotionCue";
 import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
 import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
 import { readTravelDurationMsFx } from "~/ui/pixi/animation/readTravelDurationMsFx";

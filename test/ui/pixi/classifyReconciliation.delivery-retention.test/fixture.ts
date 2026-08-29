@@ -1,4 +1,4 @@
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 
 export const boardLocation = (x: number): TileActorItem["location"] => ({

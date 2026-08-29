@@ -1,7 +1,7 @@
 import { Effect, Exit } from "effect";
-import { loadArkpackFx } from "~/bridge/arkpack/loadArkpackFx";
-import { readHeroResourceFx } from "~/bridge/arkpack/readHeroResourceFx";
-import { readLastPackageIdFx } from "~/bridge/launcher/readLastPackageIdFx";
+import { loadArkpackFx } from "~/renderer/arkpack/loadArkpackFx";
+import { readHeroResourceFx } from "~/ui/launcher/readHeroResourceFx";
+import { readLastPackageIdFx } from "~/renderer/launcher/readLastPackageIdFx";
 import { preloadLauncherHeroFx } from "~/ui/launcher/preloadLauncherHeroFx";
 
 export namespace prepareLauncherHeroFx {

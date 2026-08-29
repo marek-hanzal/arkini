@@ -8,7 +8,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { useGameEvents } from "~/ui/game/useGameEvents";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { createGameAudioSynthFx } from "~/ui/audio/createGameAudioSynthFx";
 
 const eventState = vi.hoisted(() => ({

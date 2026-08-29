@@ -1,5 +1,5 @@
 import type { GameTransition } from "~/renderer/game/session/GameSession";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 
 export namespace readSpaceActionPresentationPhasesFn {
 	export type Phase =

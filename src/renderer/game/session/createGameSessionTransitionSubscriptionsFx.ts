@@ -1,6 +1,6 @@
 import { Cause, Deferred, Effect, Exit, Scope, Stream } from "effect";
 
-import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
+import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
 import {
 	CommittedTransitionsFx,
 	type CommittedTransitionsFxService,

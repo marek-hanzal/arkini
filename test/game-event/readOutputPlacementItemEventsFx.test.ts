@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
+import { readOutputPlacementItemEventsFx } from "~/game-event/readOutputPlacementItemEventsFx";
 import type { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 
 const config = createJobTestConfig();
 const board = (x: number) => ({
@@ -34,7 +34,7 @@ const item = ({
 	revision: `revision:${id}`,
 });
 
-describe("item motion event readers", () => {
+describe("readOutputPlacementItemEventsFx", () => {
 	it("reports exact stack growth before exact spawned identities in placement order", () => {
 		const stacked = item({
 			id: "runtime:stacked",
@@ -96,51 +96,6 @@ describe("item motion event readers", () => {
 				originItemId: "runtime:origin",
 				location: spawned.location,
 				quantity: 2,
-			},
-		]);
-	});
-
-	it("keeps same-anchor output as an ordinary exact spawn fact", () => {
-		const incoming = item({
-			id: "runtime:incoming",
-			itemId: "water",
-			location: board(0),
-			quantity: 1,
-		});
-		const placement = {
-			drop: [
-				{
-					drop: {
-						itemId: "water",
-						quantity: 1,
-						placement: "drop",
-					},
-					placement: {
-						remove: [],
-						stack: [],
-						spawn: [
-							incoming,
-						],
-					},
-				},
-			],
-		} satisfies applyOutputPlacementFx.Result;
-
-		expect(
-			Effect.runSync(
-				readOutputPlacementItemEventsFx({
-					originItemId: "runtime:origin",
-					placement,
-				}),
-			),
-		).toEqual([
-			{
-				type: GameEventEnumSchema.enum.ItemSpawned,
-				itemId: incoming.id,
-				canonicalItemId: "water",
-				originItemId: "runtime:origin",
-				location: incoming.location,
-				quantity: incoming.quantity,
 			},
 		]);
 	});

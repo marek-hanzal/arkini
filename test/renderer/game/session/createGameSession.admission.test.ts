@@ -3,7 +3,7 @@ import { createTestGameSession } from "~test/support/game/createTestGameSession"
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { Effect } from "effect";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 
 import { waitFor } from "./createGameSession.test/fixture";

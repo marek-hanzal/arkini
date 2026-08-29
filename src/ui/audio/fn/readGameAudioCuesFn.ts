@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { useGameEvents } from "~/ui/game/useGameEvents";
 
 export namespace readGameAudioCuesFn {

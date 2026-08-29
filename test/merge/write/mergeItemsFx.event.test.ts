@@ -3,14 +3,14 @@ import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
 
 import type { GameSession } from "~/renderer/game/session/GameSession";
-import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
+import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
 import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import {
 	createMergeTestConfig,
 	guaranteedMergeOutput,
 } from "~test/merge/support/createMergeTestConfig";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 
 const captureNextPublication = (session: GameSession) => {
 	let publish:

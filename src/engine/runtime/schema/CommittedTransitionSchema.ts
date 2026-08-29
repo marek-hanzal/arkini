@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
+import { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 /**

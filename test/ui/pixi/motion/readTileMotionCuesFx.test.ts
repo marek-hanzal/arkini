@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import { readCommittedTileSwapMotionCueFn } from "~/ui/pixi/motion/fn/readCommittedTileSwapMotionCueFn";
 import { readTileMotionCuesFx } from "~/ui/pixi/motion/readTileMotionCuesFx";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { startFx } from "~/game-start/startFx";

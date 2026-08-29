@@ -3,12 +3,12 @@ import { describe, expect, it } from "@effect/vitest";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
 
 import { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
-import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
+import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
 import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 
 describe("committed transition events", () => {
 	it.effect("replays the current transition and then every later commit", () =>

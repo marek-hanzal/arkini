@@ -3,7 +3,7 @@ import { createTestGameSession } from "~test/support/game/createTestGameSession"
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { Deferred, Effect } from "effect";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 
 describe("createGameSessionFx / planner disposal", () => {
 	it("disposes an in-flight planner without committing runtime or events", async () => {

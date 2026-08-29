@@ -1,9 +1,7 @@
-import { Effect } from "effect";
-
 import type { PositionSchema } from "~/engine/grid/schema/PositionSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 
-export namespace orderGridLocationsFx {
+export namespace orderGridLocationsFn {
 	export interface Props {
 		locations: ReadonlyArray<GridLocationSchema.Type>;
 		origin: PositionSchema.Type;
@@ -11,10 +9,7 @@ export namespace orderGridLocationsFx {
 }
 
 /** Orders concrete locations by Manhattan distance and deterministic scan order. */
-export const orderGridLocationsFx = Effect.fn("orderGridLocationsFx")(function* ({
-	locations,
-	origin,
-}: orderGridLocationsFx.Props) {
+export const orderGridLocationsFn = ({ locations, origin }: orderGridLocationsFn.Props) => {
 	return [
 		...locations,
 	].sort((left, right) => {
@@ -26,4 +21,4 @@ export const orderGridLocationsFx = Effect.fn("orderGridLocationsFx")(function* 
 
 		return leftDistance - rightDistance || scanOrder;
 	});
-});
+};

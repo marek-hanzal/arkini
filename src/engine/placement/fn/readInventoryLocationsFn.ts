@@ -1,19 +1,15 @@
-import { Effect } from "effect";
-
 import type { SizeSchema } from "~/engine/grid/schema/SizeSchema";
 import type { InventoryLocationSchema } from "~/engine/location/schema/InventoryLocationSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
-export namespace readInventoryLocationsFx {
+export namespace readInventoryLocationsFn {
 	export interface Props {
 		size: SizeSchema.Type;
 	}
 }
 
 /** Enumerates every universe-wide inventory slot in row-major order. */
-export const readInventoryLocationsFx = Effect.fn("readInventoryLocationsFx")(function* ({
-	size,
-}: readInventoryLocationsFx.Props) {
+export const readInventoryLocationsFn = ({ size }: readInventoryLocationsFn.Props) => {
 	const locations: InventoryLocationSchema.Type[] = [];
 
 	for (let y = 0; y < size.height; y += 1) {
@@ -29,4 +25,4 @@ export const readInventoryLocationsFx = Effect.fn("readInventoryLocationsFx")(fu
 	}
 
 	return locations;
-});
+};

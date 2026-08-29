@@ -1,31 +1,28 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { ItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines";
-import { readItemDetailInputsFx } from "~/engine/item-detail/read/readItemDetailInputsFx";
-import { readItemDetailOutputFx } from "~/engine/item-detail/read/readItemDetailOutputFx";
+import { readBoardRuntimeItemByIdFx } from "~/game-runtime/read/readBoardRuntimeItemByIdFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+import type { ItemDetailLines } from "~/item-line-detail/read/ItemDetailLines";
+import { readItemDetailInputsFx } from "~/item-line-detail/read/readItemDetailInputsFx";
+import { readItemDetailOutputFx } from "~/item-line-detail/read/readItemDetailOutputFx";
+import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { resolveActiveJobStatusFx } from "~/production-job/fx/resolveActiveJobStatusFx";
 import { resolveStartOutputCapacityFx } from "~/production-job/fx/read/resolveStartOutputCapacityFx";
 import { resolveLineStartFx } from "~/production-job/fx/read/resolveLineStartFx";
 import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
 import type { LineRun } from "~/production-line/LineRun";
+import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
+import { readEffectiveDefaultLineFn } from "~/production-line/fn/readEffectiveDefaultLineFn";
+import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { TypeSchema } from "~/production-line/schema/rule/TypeSchema";
-import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { readBoardRuntimeItemByIdFx } from "~/game-runtime/read/readBoardRuntimeItemByIdFx";
 
-export namespace readBoardItemDetailLineFx {
-	export interface Props {
-		readonly activeJob: RuntimeSchema.Type["jobs"][number] | undefined;
-		readonly defaultLineId: IdSchema.Type | undefined;
-		readonly line: LineSchema.Type;
-		readonly ownerItemId: IdSchema.Type;
-		readonly runtime: RuntimeSchema.Type;
-	}
-}
+const unavailable = {
+	kind: "unavailable",
+} as const satisfies ItemDetailLines.Result;
 
-const readLineDisabledCause = (
+const readLineDisabledCauseFn = (
 	line: LineSchema.Type,
 	resolution: LineRun.Resolution,
 ): Extract<
@@ -71,14 +68,19 @@ const readLineDisabledCause = (
 	};
 };
 
-/** Projects one live board line from canonical start, input, queue, and job truth. */
-export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(function* ({
+const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(function* ({
 	activeJob,
 	defaultLineId,
 	line,
 	ownerItemId,
 	runtime,
-}: readBoardItemDetailLineFx.Props) {
+}: {
+	readonly activeJob: RuntimeSchema.Type["jobs"][number] | undefined;
+	readonly defaultLineId: IdSchema.Type | undefined;
+	readonly line: LineSchema.Type;
+	readonly ownerItemId: IdSchema.Type;
+	readonly runtime: RuntimeSchema.Type;
+}) {
 	const start = yield* resolveLineStartFx({
 		lineId: line.id,
 		ownerItemId,
@@ -131,7 +133,7 @@ export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(
 				kind: "unavailable",
 				reason: {
 					kind: "line-disabled",
-					cause: readLineDisabledCause(line, resolution),
+					cause: readLineDisabledCauseFn(line, resolution),
 				},
 			}
 		: directOutputBlock !== undefined
@@ -213,4 +215,129 @@ export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(
 					},
 				}),
 	} satisfies ItemDetailLines.Line;
+});
+
+const readStoredItemDetailLineFx = Effect.fn("readStoredItemDetailLineFx")(function* ({
+	activeJob,
+	line,
+	ownerItemId,
+	runtime,
+	isDefault,
+}: {
+	readonly activeJob: RuntimeSchema.Type["jobs"][number] | undefined;
+	readonly line: LineSchema.Type;
+	readonly ownerItemId: IdSchema.Type;
+	readonly runtime: RuntimeSchema.Type;
+	readonly isDefault: boolean;
+}) {
+	return {
+		lineId: line.id,
+		title: line.title,
+		description: line.description,
+		baseRuntimeMs: line.runtimeMs,
+		effectiveRuntimeMs: line.runtimeMs,
+		availability: {
+			kind: "unavailable",
+			reason: {
+				kind: "owner-stored",
+			},
+		},
+		activeRuleHints: [],
+		isDefault,
+		queuedRequestCount: runtime.jobQueue.filter(
+			(request) => request.ownerItemId === ownerItemId && request.lineId === line.id,
+		).length,
+		actions: {
+			enqueue: {
+				enabled: false,
+			},
+			canWithdraw: false,
+		},
+		input: yield* readItemDetailInputsFx({
+			configured: line.input,
+			lineId: line.id,
+			ownerItemId,
+			runtime,
+		}),
+		output: yield* readItemDetailOutputFx({
+			line,
+		}),
+		...(activeJob === undefined
+			? {}
+			: {
+					activeJob: {
+						status: JobStatusEnumSchema.enum.Paused,
+						durationMs: activeJob.durationMs,
+						remainingMs: activeJob.remainingMs,
+					},
+				}),
+	} satisfies ItemDetailLines.Line;
+});
+
+/** Projects the visible read-only product lines of one exact live line owner. */
+export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function* ({
+	itemId,
+	runtime,
+}: ItemDetailLines.Props) {
+	const owner = runtime.items.find((candidate) => candidate.id === itemId);
+	if (owner === undefined) return unavailable;
+	const ownerItem = Option.getOrUndefined(isLineOwnerItemFn(owner.item));
+	if (ownerItem === undefined) return unavailable;
+
+	const lines = readLineOwnerLinesFn(ownerItem);
+	const defaultLineId = readEffectiveDefaultLineFn({
+		ownerItemId: owner.id,
+		ownerItem,
+		runtime,
+	})?.id;
+	const projected: ItemDetailLines.Line[] = [];
+
+	for (const line of lines) {
+		const activeJob = runtime.jobs.find(
+			(job) => job.ownerItemId === owner.id && job.lineId === line.id,
+		);
+		if (owner.location.scope !== LocationScopeEnumSchema.enum.Board) {
+			if (!line.show && activeJob === undefined) continue;
+			projected.push(
+				yield* readStoredItemDetailLineFx({
+					activeJob,
+					line,
+					ownerItemId: owner.id,
+					runtime,
+					isDefault: line.id === defaultLineId,
+				}),
+			);
+			continue;
+		}
+
+		const boardLine = yield* readBoardItemDetailLineFx({
+			activeJob,
+			defaultLineId,
+			line,
+			ownerItemId: owner.id,
+			runtime,
+		});
+		if (boardLine !== undefined) projected.push(boardLine);
+	}
+
+	const activeLineId = projected.find((line) => line.activeJob !== undefined)?.lineId;
+	const visibleLineIds = new Set(projected.map((line) => line.lineId));
+	const earliestQueuedLineId = runtime.jobQueue.find(
+		(request) => request.ownerItemId === owner.id,
+	)?.lineId;
+	const queuedLineId =
+		earliestQueuedLineId !== undefined && visibleLineIds.has(earliestQueuedLineId)
+			? earliestQueuedLineId
+			: undefined;
+	const focusLineId = activeLineId ?? queuedLineId;
+	return {
+		kind: "available",
+		itemId: owner.id,
+		...(focusLineId === undefined
+			? {}
+			: {
+					focusLineId,
+				}),
+		line: projected,
+	} satisfies ItemDetailLines.Result;
 });

@@ -5,7 +5,7 @@ import { checkRuntimeFx } from "~/game-runtime/check/checkRuntimeFx";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { autofillLineInputsFx } from "~test/support/input/autofillLineInputsFx";
 import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
-import { readItemDetailMaterialAutofillAvailabilityFx } from "~/engine/item-detail/read/readItemDetailMaterialAutofillAvailabilityFx";
+import { readItemDetailMaterialAutofillAvailabilityFx } from "~/item-line-detail/read/readItemDetailMaterialAutofillAvailabilityFx";
 import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";

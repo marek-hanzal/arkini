@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { ItemDetailReference } from "~/item-detail-frame/projectItemDetailReferenceFx";
-import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
+import type { ItemDetailLines } from "~/item-line-detail/ui/ItemDetailLines";
 import { withdrawLineInputFx } from "~/production-input/write/withdrawLineInputFx";
 import { withdrawLineInputsFx } from "~/production-input/write/withdrawLineInputsFx";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
@@ -13,7 +13,7 @@ import { ItemReferenceButton } from "~/item-detail-frame/ItemReferenceButton";
 import { useItemDetailControl } from "~/item-detail-frame/useItemDetailControl";
 import { useItemDetailPendingCommand } from "~/item-detail-frame/useItemDetailPendingCommand";
 
-export interface ItemLineInputsWithdrawAction {
+interface ItemLineInputsWithdrawAction {
 	readonly disabled: boolean;
 	readonly onClick: () => void;
 	readonly pending: boolean;
@@ -250,7 +250,9 @@ const inputSurfaceClassName = {
 	stored: "bg-[var(--ak-list-row-active-progress-surface)]",
 } as const;
 
-const readItemLineInputState = (input: ItemDetailLines.Input): keyof typeof inputSurfaceClassName =>
+const readItemLineInputStateFn = (
+	input: ItemDetailLines.Input,
+): keyof typeof inputSurfaceClassName =>
 	match(input)
 		.with(
 			{
@@ -295,7 +297,7 @@ const ItemLineInputRow = ({
 	readonly stale: boolean;
 	readonly suppressSurface: boolean;
 }) => {
-	const state = readItemLineInputState(input);
+	const state = readItemLineInputStateFn(input);
 	const surfaceClassName = suppressSurface ? "bg-transparent" : inputSurfaceClassName[state];
 	const rowClassName = `ak-line-input grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 gap-y-1 rounded-xl px-3 py-2 text-sm ${surfaceClassName}`;
 	return match(input)

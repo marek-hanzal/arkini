@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "motion/react";
 import type { ComponentType, ReactNode } from "react";
 
 import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
-import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
+import type { ItemDetailLines } from "~/item-line-detail/ui/ItemDetailLines";
 import { itemDetailBadgeMotion, itemDetailFadeMotion } from "~/item-detail-frame/ItemDetailMotion";
 
 export interface ItemLineSummaryIdentityRenderProps {

@@ -1,4 +1,4 @@
-import { Effect, Option } from "effect";
+import { Option } from "effect";
 
 import { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
 import { readLineOwnerLinesFn } from "~/engine/line/fn/readLineOwnerLinesFn";
@@ -7,16 +7,14 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { DefaultLineIssueReasonEnumSchema } from "~/engine/line/schema/check/DefaultLineIssueReasonEnumSchema";
 
-export namespace checkRuntimeDefaultLinesFx {
+export namespace checkRuntimeDefaultLinesFn {
 	export interface Props {
 		readonly runtime: RuntimeSchema.Type;
 	}
 }
 
 /** Reports stale or foreign default-line identities retained by one runtime snapshot. */
-export const checkRuntimeDefaultLinesFx = Effect.fn("checkRuntimeDefaultLinesFx")(function* ({
-	runtime,
-}: checkRuntimeDefaultLinesFx.Props) {
+export const checkRuntimeDefaultLinesFn = ({ runtime }: checkRuntimeDefaultLinesFn.Props) => {
 	const issues: DefaultLineIssueSchema.Type[] = [];
 	for (const [ownerItemId, lineId] of Object.entries(runtime.defaultLineByOwnerItemId)) {
 		const owner = runtime.items.find((item) => item.id === ownerItemId);
@@ -51,4 +49,4 @@ export const checkRuntimeDefaultLinesFx = Effect.fn("checkRuntimeDefaultLinesFx"
 		}
 	}
 	return issues;
-});
+};

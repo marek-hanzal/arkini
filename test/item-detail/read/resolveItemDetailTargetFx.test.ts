@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readItemDetailTabsFx } from "~/engine/item-detail/read/readItemDetailTabsFx";
+import { readItemDetailTabsFn } from "~/engine/item-detail/fn/readItemDetailTabsFn";
 import { resolveItemDetailTargetFx } from "~/engine/item-detail/read/resolveItemDetailTargetFx";
 import { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import { lineRunRuntime, lineRunTestConfig } from "~test/line/fx/run/support/lineRunTestRuntime";
@@ -48,14 +48,12 @@ describe("resolveItemDetailTargetFx", () => {
 				revision: `revision:${index}`,
 			});
 			expect(
-				Effect.runSync(
-					readItemDetailTabsFx({
-						target: {
-							kind: "runtime",
-							item: runtimeItem,
-						},
-					}),
-				),
+				readItemDetailTabsFn({
+					target: {
+						kind: "runtime",
+						item: runtimeItem,
+					},
+				}),
 			).toEqual([
 				"lines",
 				"queue",
@@ -67,29 +65,25 @@ describe("resolveItemDetailTargetFx", () => {
 	it("exposes one finite authoritative tab set and validates requested tabs", () => {
 		const runtime = lineRunRuntime({});
 		expect(
-			Effect.runSync(
-				readItemDetailTabsFx({
-					target: {
-						kind: "runtime",
-						item: runtime.items[0],
-					},
-				}),
-			),
+			readItemDetailTabsFn({
+				target: {
+					kind: "runtime",
+					item: runtime.items[0],
+				},
+			}),
 		).toEqual([
 			"lines",
 			"queue",
 			"info",
 		]);
 		expect(
-			Effect.runSync(
-				readItemDetailTabsFx({
-					target: {
-						kind: "runtime",
-						item: runtime.items[0],
-					},
-					sources: sourceProjection,
-				}),
-			),
+			readItemDetailTabsFn({
+				target: {
+					kind: "runtime",
+					item: runtime.items[0],
+				},
+				sources: sourceProjection,
+			}),
 		).toEqual([
 			"lines",
 			"queue",
@@ -149,28 +143,24 @@ describe("resolveItemDetailTargetFx", () => {
 			],
 		};
 		expect(
-			Effect.runSync(
-				readItemDetailTabsFx({
-					target: {
-						kind: "runtime",
-						item: ordinaryRuntime.items[0],
-					},
-					sources: sourceProjection,
-				}),
-			),
+			readItemDetailTabsFn({
+				target: {
+					kind: "runtime",
+					item: ordinaryRuntime.items[0],
+				},
+				sources: sourceProjection,
+			}),
 		).toEqual([
 			"sources",
 			"info",
 		]);
 		expect(
-			Effect.runSync(
-				readItemDetailTabsFx({
-					target: {
-						kind: "definition",
-					},
-					sources: sourceProjection,
-				}),
-			),
+			readItemDetailTabsFn({
+				target: {
+					kind: "definition",
+				},
+				sources: sourceProjection,
+			}),
 		).toEqual([
 			"sources",
 			"info",

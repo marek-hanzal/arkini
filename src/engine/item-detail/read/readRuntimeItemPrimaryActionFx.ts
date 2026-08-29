@@ -3,7 +3,7 @@ import { Effect, Option } from "effect";
 import { TypeSchema } from "~/engine/item/schema/TypeSchema";
 import { resolveJobQueueFx } from "~/engine/job/fx/read/resolveJobQueueFx";
 import { isLineOwnerItemFn } from "~/engine/line/fn/isLineOwnerItemFn";
-import { readEffectiveDefaultLineFx } from "~/engine/line/read/readEffectiveDefaultLineFx";
+import { readEffectiveDefaultLineFn } from "~/engine/line/fn/readEffectiveDefaultLineFn";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -55,7 +55,7 @@ export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryA
 				kind: "none" as const,
 			} satisfies readRuntimeItemPrimaryActionFx.Result;
 		}
-		const defaultLine = yield* readEffectiveDefaultLineFx({
+		const defaultLine = readEffectiveDefaultLineFn({
 			ownerItemId: item.id,
 			ownerItem: lineOwnerItem,
 			runtime,

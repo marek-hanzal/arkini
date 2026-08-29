@@ -1,12 +1,10 @@
-import { Effect } from "effect";
-
 import type {
 	EditorAcquisitionOperation,
 	EditorAcquisitionRequirement,
 	EditorAcquisitionRoute,
 } from "~/editor/EditorAcquisitionGraph";
 import { readEditorAcquisitionAvailabilityRequirementsFn } from "~/editor/acquisition/fn/readEditorAcquisitionAvailabilityRequirementsFn";
-import { readEditorAcquisitionOutputOccurrencesFx } from "~/editor/readEditorAcquisitionOutputOccurrencesFx";
+import { readEditorAcquisitionOutputOccurrencesFn } from "~/editor/acquisition/fn/readEditorAcquisitionOutputOccurrencesFn";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { readAuthoredItemLinesFn } from "~/engine/line/fn/readAuthoredItemLinesFn";
@@ -81,80 +79,75 @@ const readLineOperationInputs = (line: LineSchema.Type) =>
 		}
 	});
 
-const readLineDescriptorFx = Effect.fn("compileEditorAcquisitionLineRoutesFx.descriptor")(
-	function* (owner: ItemSchema.Type, line: LineSchema.Type) {
-		if (!line.enable && !line.rules.some(({ type }) => type === "enable")) return undefined;
-		const requirements: EditorAcquisitionRequirement[] = [
-			{
-				factId: owner.id,
+const readLineDescriptorFn = (owner: ItemSchema.Type, line: LineSchema.Type) => {
+	if (!line.enable && !line.rules.some(({ type }) => type === "enable")) return undefined;
+	const requirements: EditorAcquisitionRequirement[] = [
+		{
+			factId: owner.id,
+			quantity: 1,
+			source: "owner",
+			usage: "one-time",
+		},
+	];
+	const chargeCostsByItemId = new Map<string, ChargeCost[]>();
+	const addCharge = (itemId: string, cost: ChargeCost) => {
+		const costs = chargeCostsByItemId.get(itemId) ?? [];
+		costs.push(cost);
+		chargeCostsByItemId.set(itemId, costs);
+	};
+
+	for (const input of line.input) {
+		if (input.type === "materials")
+			requirements.push({
+				factId: input.selector.itemId,
+				quantity: input.quantity.min,
+				source: "material-input",
+				usage: input.mode === "consume" ? "consume" : "ongoing",
+			});
+		if (input.type === "deposit")
+			requirements.push({
+				factId: input.query.selector.itemId,
 				quantity: 1,
-				source: "owner",
+				source: "deposit-input",
 				usage: "one-time",
+			});
+		if (input.charges === undefined) continue;
+		if (input.charges.from === "self")
+			addCharge(owner.id, {
+				cost: input.charges.cost,
+				from: "self",
+			});
+		else if (input.type === "deposit")
+			addCharge(input.query.selector.itemId, {
+				cost: input.charges.cost,
+				from: "target",
+			});
+		else continue;
+	}
+
+	const availability = readEditorAcquisitionAvailabilityRequirementsFn({
+		rules: line.rules,
+		source: "line-condition",
+	});
+	return {
+		chargeCostsByItemId,
+		line,
+		operation: {
+			id: `source:${owner.id}:line:${line.id}`,
+			inputs: readLineOperationInputs(line),
+		},
+		owner,
+		requirements: combineRequirements(
+			{
+				allOf: requirements,
+				anyOf: [],
 			},
-		];
-		const chargeCostsByItemId = new Map<string, ChargeCost[]>();
-		const addCharge = (itemId: string, cost: ChargeCost) => {
-			const costs = chargeCostsByItemId.get(itemId) ?? [];
-			costs.push(cost);
-			chargeCostsByItemId.set(itemId, costs);
-		};
+			availability,
+		),
+	} satisfies LineDescriptor;
+};
 
-		for (const input of line.input) {
-			if (input.type === "materials")
-				requirements.push({
-					factId: input.selector.itemId,
-					quantity: input.quantity.min,
-					source: "material-input",
-					usage: input.mode === "consume" ? "consume" : "ongoing",
-				});
-			if (input.type === "deposit")
-				requirements.push({
-					factId: input.query.selector.itemId,
-					quantity: 1,
-					source: "deposit-input",
-					usage: "one-time",
-				});
-			if (input.charges === undefined) continue;
-			if (input.charges.from === "self")
-				addCharge(owner.id, {
-					cost: input.charges.cost,
-					from: "self",
-				});
-			else if (input.type === "deposit")
-				addCharge(input.query.selector.itemId, {
-					cost: input.charges.cost,
-					from: "target",
-				});
-			else continue;
-		}
-
-		const availability = readEditorAcquisitionAvailabilityRequirementsFn({
-			rules: line.rules,
-			source: "line-condition",
-		});
-		return {
-			chargeCostsByItemId,
-			line,
-			operation: {
-				id: `source:${owner.id}:line:${line.id}`,
-				inputs: readLineOperationInputs(line),
-			},
-			owner,
-			requirements: combineRequirements(
-				{
-					allOf: requirements,
-					anyOf: [],
-				},
-				availability,
-			),
-		} satisfies LineDescriptor;
-	},
-);
-
-const readLineRoutesFx = Effect.fn("compileEditorAcquisitionLineRoutesFx.routes")(function* (
-	config: GameConfigSchema.Type,
-	descriptor: LineDescriptor,
-) {
+const readLineRoutesFn = (config: GameConfigSchema.Type, descriptor: LineDescriptor) => {
 	const routes: EditorAcquisitionRoute[] = [];
 	const chargeUses: NonNullable<EditorAcquisitionRoute["chargeUses"]>[number][] = [];
 	for (const [chargedItemId, costs] of descriptor.chargeCostsByItemId) {
@@ -174,7 +167,7 @@ const readLineRoutesFx = Effect.fn("compileEditorAcquisitionLineRoutesFx.routes"
 				accounting === "single-payer-exact" ? Math.floor(charges.amount / spendPerRun) : 0,
 		});
 	}
-	const outputModel = yield* readEditorAcquisitionOutputOccurrencesFx(descriptor.line.output);
+	const outputModel = readEditorAcquisitionOutputOccurrencesFn(descriptor.line.output);
 	for (const occurrence of outputModel.occurrences)
 		routes.push({
 			...(chargeUses.length === 0
@@ -206,7 +199,7 @@ const readLineRoutesFx = Effect.fn("compileEditorAcquisitionLineRoutesFx.routes"
 		if (charges?.output === undefined || spendPerRun > charges.amount) continue;
 		if (charges.amount % spendPerRun !== 0) continue;
 		const runMultiplier = charges.amount / spendPerRun;
-		const chargeOutputModel = yield* readEditorAcquisitionOutputOccurrencesFx(charges.output);
+		const chargeOutputModel = readEditorAcquisitionOutputOccurrencesFn(charges.output);
 		for (const occurrence of chargeOutputModel.occurrences)
 			routes.push({
 				chargeUses: chargeUses.filter(({ payerFactId }) => payerFactId !== chargedItemId),
@@ -236,18 +229,15 @@ const readLineRoutesFx = Effect.fn("compileEditorAcquisitionLineRoutesFx.routes"
 			});
 	}
 	return routes;
-});
+};
 
 /** Compiles line-output and exact charge-depletion acquisition routes. */
-export const compileEditorAcquisitionLineRoutesFx = Effect.fn(
-	"compileEditorAcquisitionLineRoutesFx",
-)(function* (config: GameConfigSchema.Type) {
+export const compileEditorAcquisitionLineRoutesFn = (config: GameConfigSchema.Type) => {
 	const routes: EditorAcquisitionRoute[] = [];
 	for (const item of Object.values(config.items))
 		for (const line of readAuthoredItemLinesFn(item)) {
-			const descriptor = yield* readLineDescriptorFx(item, line);
-			if (descriptor !== undefined)
-				routes.push(...(yield* readLineRoutesFx(config, descriptor)));
+			const descriptor = readLineDescriptorFn(item, line);
+			if (descriptor !== undefined) routes.push(...readLineRoutesFn(config, descriptor));
 		}
 	return routes;
-});
+};

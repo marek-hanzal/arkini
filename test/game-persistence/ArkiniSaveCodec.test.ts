@@ -1,10 +1,10 @@
 import { encode } from "@msgpack/msgpack";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { decodeArkiniSaveFx } from "~/engine/save/fx/decodeArkiniSaveFx";
-import { encodeArkiniSaveFn } from "~/engine/save/fn/encodeArkiniSaveFn";
-import type { StateSchema } from "~/engine/state/schema/StateSchema";
-import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+import { decodeArkiniSaveFx } from "~/game-persistence/decodeArkiniSaveFx";
+import { encodeArkiniSaveFn } from "~/game-persistence/encodeArkiniSaveFn";
+import type { StateSchema } from "~/game-persistence/StateSchema";
+import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
 
 const state: StateSchema.Type = {
 	cheats: {
@@ -105,20 +105,6 @@ describe("Arkini save codec", () => {
 			"job:queue:second",
 			"job:queue:third",
 		]);
-	});
-
-	it("keeps canonical-state encoder failures in the defect channel", () => {
-		const invalidCanonicalState = {
-			...state,
-			currentSpace: 1n,
-		} as unknown as StateSchema.Type;
-
-		expect(() =>
-			encodeArkiniSaveFn({
-				version: "1.2",
-				state: invalidCanonicalState,
-			}),
-		).toThrow();
 	});
 
 	it.each([

@@ -5,7 +5,7 @@ import { access, mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { createFilesystemGameSaveFilesFx } from "../../electron/main/save/createFilesystemGameSaveFilesFx";
+import { createFilesystemGameSaveFilesFx } from "~/game-persistence/filesystem/createFilesystemGameSaveFilesFx";
 import { encodeGameProjectFileStemFn } from "~/game-config/source/encodeGameProjectFileStemFn";
 
 let root = "";
@@ -201,5 +201,20 @@ describe("createFilesystemGameSaveFilesFx", () => {
 				),
 			),
 		).resolves.toBeUndefined();
+		await expect(
+			Effect.runPromise(
+				repository.writeFx(
+					{
+						packageId: "",
+					},
+					new Uint8Array([
+						6,
+					]),
+				),
+			),
+		).rejects.toMatchObject({
+			_tag: "GameSaveFilesError",
+			operation: "Invalid Arkini save identity",
+		});
 	});
 });

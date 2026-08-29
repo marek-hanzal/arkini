@@ -3,8 +3,8 @@ import { Effect } from "effect";
 import type { EditorProject } from "~/project-authoring/EditorProject";
 import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
 import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
-import { encodeArkiniSaveFn } from "~/engine/save/fn/encodeArkiniSaveFn";
-import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
+import { encodeArkiniSaveFn } from "~/game-persistence/encodeArkiniSaveFn";
+import { fromRuntimeFn } from "~/game-persistence/fromRuntimeFn";
 
 export namespace saveEditorBoardScenarioFx {
 	export interface Props {

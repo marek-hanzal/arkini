@@ -4,7 +4,7 @@ import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeInte
 import { JobQueueRequestSchema } from "~/production-job/schema/JobQueueRequestSchema";
 import { JobSchema } from "~/production-job/schema/JobSchema";
 import { DefaultLineByOwnerItemIdSchema } from "~/production-line/schema/DefaultLineByOwnerItemIdSchema";
-import { StateItemSchema } from "./StateItemSchema";
+import { StateItemSchema } from "~/game-persistence/StateItemSchema";
 export const StateSchema = z
 	.object({
 		cheats: CheatStateSchema.describe("Persisted cheat switches for this exact Game save."),

@@ -3,13 +3,13 @@ import { TestClock } from "effect/testing";
 import { describe, expect, it } from "@effect/vitest";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
 
-import { RuntimeSaveFx } from "~/engine/save/RuntimeSaveFx";
-import { RuntimeSaveLayerFx } from "~/engine/save/RuntimeSaveLayerFx";
+import { RuntimeSaveFx } from "~/game-persistence/RuntimeSaveFx";
+import { RuntimeSaveLayerFx } from "~/game-persistence/RuntimeSaveLayerFx";
 import { GameRuntimeLayerFx } from "~/game-runtime/layer/GameRuntimeLayerFx";
 import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import type { StateSchema } from "~/engine/state/schema/StateSchema";
+import type { StateSchema } from "~/game-persistence/StateSchema";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 

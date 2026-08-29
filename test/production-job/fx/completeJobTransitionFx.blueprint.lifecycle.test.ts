@@ -1,9 +1,9 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { fromStateFx } from "~/engine/state/fx/fromStateFx";
+import { fromStateFx } from "~/game-persistence/fromStateFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
-import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";
+import { fromRuntimeFn } from "~/game-persistence/fromRuntimeFn";
 import { completeJobRuntimeForTestFx } from "~test/production-job/support/completeJobRuntimeForTestFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import {

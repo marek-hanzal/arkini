@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { readItemDetailIdentityFx } from "~/engine/item-detail/read/readItemDetailIdentityFx";
-import { readItemDetailInfoFx } from "~/engine/item-detail/read/readItemDetailInfoFx";
+import { readItemDetailInfoFn } from "~/engine/item-detail/fn/readItemDetailInfoFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { lineRunRuntime } from "~test/line/fx/run/support/lineRunTestRuntime";
 
@@ -59,12 +59,10 @@ describe("tile identity and Info projections", () => {
 			],
 		});
 		expect(
-			Effect.runSync(
-				readItemDetailInfoFx({
-					itemId: owner.id,
-					runtime,
-				}),
-			),
+			readItemDetailInfoFn({
+				itemId: owner.id,
+				runtime,
+			}),
 		).toEqual({
 			kind: "available",
 			itemId: owner.id,
@@ -99,12 +97,10 @@ describe("tile identity and Info projections", () => {
 			kind: "unavailable",
 		});
 		expect(
-			Effect.runSync(
-				readItemDetailInfoFx({
-					itemId: "runtime:missing",
-					runtime,
-				}),
-			),
+			readItemDetailInfoFn({
+				itemId: "runtime:missing",
+				runtime,
+			}),
 		).toEqual({
 			kind: "unavailable",
 		});

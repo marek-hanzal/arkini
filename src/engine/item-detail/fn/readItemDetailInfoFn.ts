@@ -1,4 +1,3 @@
-import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -8,7 +7,7 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { StorageSchema } from "~/engine/scope/schema/StorageSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
-export namespace readItemDetailInfoFx {
+export namespace readItemDetailInfoFn {
 	export interface Props {
 		readonly itemId: IdSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
@@ -62,9 +61,9 @@ export namespace readItemDetailInfoFx {
 
 const unavailable = {
 	kind: "unavailable",
-} as const satisfies readItemDetailInfoFx.Result;
+} as const satisfies readItemDetailInfoFn.Result;
 
-const readLocation = (location: LocationSchema.Type): readItemDetailInfoFx.Location =>
+const readLocation = (location: LocationSchema.Type): readItemDetailInfoFn.Location =>
 	match(location)
 		.with(
 			{
@@ -126,39 +125,39 @@ const readLocation = (location: LocationSchema.Type): readItemDetailInfoFx.Locat
 		.exhaustive();
 
 /** Projects the common authored and live facts rendered only by the Info capability. */
-export const readItemDetailInfoFx = Effect.fn("readItemDetailInfoFx")(
-	({ itemId, runtime }: readItemDetailInfoFx.Props) =>
-		Effect.sync((): readItemDetailInfoFx.Result => {
-			const item = runtime.items.find((candidate) => candidate.id === itemId);
-			if (item === undefined) return unavailable;
-			const totalCharges = item.item.charges?.amount;
-			return {
-				kind: "available",
-				itemId: item.id,
-				description: item.item.description,
-				itemType: item.item.type,
-				storageScope: item.item.scope,
-				location: readLocation(item.location),
-				quantity: item.quantity,
-				maxStackSize: item.item.maxStackSize,
-				ownedQuantity: runtime.items.reduce(
-					(total, candidate) =>
-						candidate.item.id === item.item.id ? total + candidate.quantity : total,
-					0,
-				),
-				...(item.item.maxCount === undefined
-					? {}
-					: {
-							maxCount: item.item.maxCount,
-						}),
-				...(totalCharges === undefined
-					? {}
-					: {
-							charges: {
-								remaining: item.remainingCharges ?? totalCharges,
-								total: totalCharges,
-							},
-						}),
-			};
-		}),
-);
+export const readItemDetailInfoFn = ({
+	itemId,
+	runtime,
+}: readItemDetailInfoFn.Props): readItemDetailInfoFn.Result => {
+	const item = runtime.items.find((candidate) => candidate.id === itemId);
+	if (item === undefined) return unavailable;
+	const totalCharges = item.item.charges?.amount;
+	return {
+		kind: "available",
+		itemId: item.id,
+		description: item.item.description,
+		itemType: item.item.type,
+		storageScope: item.item.scope,
+		location: readLocation(item.location),
+		quantity: item.quantity,
+		maxStackSize: item.item.maxStackSize,
+		ownedQuantity: runtime.items.reduce(
+			(total, candidate) =>
+				candidate.item.id === item.item.id ? total + candidate.quantity : total,
+			0,
+		),
+		...(item.item.maxCount === undefined
+			? {}
+			: {
+					maxCount: item.item.maxCount,
+				}),
+		...(totalCharges === undefined
+			? {}
+			: {
+					charges: {
+						remaining: item.remainingCharges ?? totalCharges,
+						total: totalCharges,
+					},
+				}),
+	};
+};

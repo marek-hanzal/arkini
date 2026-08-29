@@ -2,7 +2,6 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines";
-import { readItemDetailQuantityBoundsFx } from "~/engine/item-detail/read/readItemDetailQuantityBoundsFx";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import { dropRulesFx } from "~/engine/output/fx/dropRulesFx";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
@@ -24,7 +23,6 @@ export const readItemDetailOutputItemsFx = Effect.fn("readItemDetailOutputItemsF
 }) {
 	const grouped = new Map<IdSchema.Type, ItemDetailLines.OutputItem>();
 	for (const drop of drops) {
-		const bounds = yield* readItemDetailQuantityBoundsFx(drop.quantity);
 		const activeRuleHints =
 			ruleContext === undefined
 				? []
@@ -50,8 +48,8 @@ export const readItemDetailOutputItemsFx = Effect.fn("readItemDetailOutputItemsF
 		grouped.set(drop.itemId, {
 			itemId: drop.itemId,
 			quantity: {
-				min: (previous?.quantity.min ?? 0) + bounds.min,
-				max: (previous?.quantity.max ?? 0) + bounds.max,
+				min: (previous?.quantity.min ?? 0) + drop.quantity.min,
+				max: (previous?.quantity.max ?? 0) + drop.quantity.max,
 			},
 			activeRuleHints: [
 				...new Set([

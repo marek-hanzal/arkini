@@ -1,8 +1,7 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { readItemDetailTabsFn } from "~/engine/item-detail/fn/readItemDetailTabsFn";
-import { resolveItemDetailTargetFx } from "~/engine/item-detail/read/resolveItemDetailTargetFx";
+import { resolveItemDetailTargetFn } from "~/engine/item-detail/fn/resolveItemDetailTargetFn";
 import { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import { lineRunRuntime, lineRunTestConfig } from "~test/line/fx/run/support/lineRunTestRuntime";
 import { purityTestConfig } from "~test/line/support/purityTestConfig";
@@ -21,7 +20,7 @@ const sourceProjection = {
 	],
 } as const;
 
-describe("resolveItemDetailTargetFx", () => {
+describe("resolveItemDetailTargetFn", () => {
 	it("exposes Queue for every runtime line-owner variant", () => {
 		const lineOwners = [
 			lineRunTestConfig.items.workshop,
@@ -91,39 +90,33 @@ describe("resolveItemDetailTargetFx", () => {
 			"info",
 		]);
 		expect(
-			Effect.runSync(
-				resolveItemDetailTargetFx({
-					itemId: "runtime:workshop",
-					runtime,
-				}),
-			),
+			resolveItemDetailTargetFn({
+				itemId: "runtime:workshop",
+				runtime,
+			}),
 		).toMatchObject({
 			kind: "available",
 			itemId: "runtime:workshop",
 			tab: "lines",
 		});
 		expect(
-			Effect.runSync(
-				resolveItemDetailTargetFx({
-					itemId: "runtime:workshop",
-					requestedTab: "queue",
-					runtime,
-				}),
-			),
+			resolveItemDetailTargetFn({
+				itemId: "runtime:workshop",
+				requestedTab: "queue",
+				runtime,
+			}),
 		).toMatchObject({
 			kind: "available",
 			itemId: "runtime:workshop",
 			tab: "queue",
 		});
 		expect(
-			Effect.runSync(
-				resolveItemDetailTargetFx({
-					itemId: "runtime:workshop",
-					requestedTab: "sources",
-					runtime,
-					sources: sourceProjection,
-				}),
-			),
+			resolveItemDetailTargetFn({
+				itemId: "runtime:workshop",
+				requestedTab: "sources",
+				runtime,
+				sources: sourceProjection,
+			}),
 		).toMatchObject({
 			kind: "available",
 			itemId: "runtime:workshop",
@@ -166,13 +159,11 @@ describe("resolveItemDetailTargetFx", () => {
 			"info",
 		]);
 		expect(
-			Effect.runSync(
-				resolveItemDetailTargetFx({
-					itemId: "runtime:workshop",
-					runtime: ordinaryRuntime,
-					sources: sourceProjection,
-				}),
-			),
+			resolveItemDetailTargetFn({
+				itemId: "runtime:workshop",
+				runtime: ordinaryRuntime,
+				sources: sourceProjection,
+			}),
 		).toEqual({
 			kind: "available",
 			itemId: "runtime:workshop",
@@ -183,13 +174,11 @@ describe("resolveItemDetailTargetFx", () => {
 			],
 		});
 		expect(
-			Effect.runSync(
-				resolveItemDetailTargetFx({
-					itemId: "runtime:workshop",
-					requestedTab: "lines",
-					runtime: ordinaryRuntime,
-				}),
-			),
+			resolveItemDetailTargetFn({
+				itemId: "runtime:workshop",
+				requestedTab: "lines",
+				runtime: ordinaryRuntime,
+			}),
 		).toEqual({
 			kind: "available",
 			itemId: "runtime:workshop",
@@ -199,13 +188,11 @@ describe("resolveItemDetailTargetFx", () => {
 			],
 		});
 		expect(
-			Effect.runSync(
-				resolveItemDetailTargetFx({
-					itemId: "runtime:missing",
-					requestedTab: "info",
-					runtime,
-				}),
-			),
+			resolveItemDetailTargetFn({
+				itemId: "runtime:missing",
+				requestedTab: "info",
+				runtime,
+			}),
 		).toEqual({
 			kind: "unavailable",
 		});

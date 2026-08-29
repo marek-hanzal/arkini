@@ -1,14 +1,14 @@
 import { useCallback } from "react";
 
 import { useGameEngine } from "~/ui/game/useGameEngine";
+import { resolveItemDetailTargetFn } from "~/engine/item-detail/fn/resolveItemDetailTargetFn";
 import { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetailSourcesFx";
-import { resolveItemDetailTargetFx } from "~/engine/item-detail/read/resolveItemDetailTargetFx";
 
 /** Resolves one requested Item Detail target against the latest committed runtime. */
 export const useResolveItemDetailTarget = () => {
 	const game = useGameEngine();
 	return useCallback(
-		(props: Omit<resolveItemDetailTargetFx.Props, "runtime" | "sources">) => {
+		(props: Omit<resolveItemDetailTargetFn.Props, "runtime" | "sources">) => {
 			const runtime = game.getSnapshot();
 			const sources = game.readOrThrow(
 				readItemDetailSourcesFx({
@@ -19,13 +19,11 @@ export const useResolveItemDetailTarget = () => {
 					runtime,
 				}),
 			);
-			return game.readOrThrow(
-				resolveItemDetailTargetFx({
-					...props,
-					runtime,
-					sources,
-				}),
-			);
+			return resolveItemDetailTargetFn({
+				...props,
+				runtime,
+				sources,
+			});
 		},
 		[
 			game,

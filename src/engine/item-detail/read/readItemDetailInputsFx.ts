@@ -3,12 +3,10 @@ import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readLineInputDeliveryClaimsFx } from "~/engine/delivery/read/readLineInputDeliveryClaimsFx";
+import { readItemDetailChargeKeyFn } from "~/engine/item-detail/fn/readItemDetailChargeKeyFn";
 import type { ItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines";
-import { readItemDetailChargeKeyFx } from "~/engine/item-detail/read/readItemDetailChargeKeyFx";
 import { readItemDetailDepositAvailableChargesFx } from "~/engine/item-detail/read/readItemDetailDepositAvailableChargesFx";
 import { readItemDetailMaterialAutofillAvailabilityFx } from "~/engine/item-detail/read/readItemDetailMaterialAutofillAvailabilityFx";
-import { readItemDetailQuantityBoundsFx } from "~/engine/item-detail/read/readItemDetailQuantityBoundsFx";
-import { readItemDetailSelectorKeyFx } from "~/engine/item-detail/read/readItemDetailSelectorKeyFx";
 import type { InputRun } from "~/engine/input/InputRun";
 import { TypeSchema } from "~/engine/input/schema/TypeSchema";
 import type { InputSchema } from "~/engine/input/schema/InputSchema";
@@ -46,9 +44,7 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 				},
 				(materialInput) =>
 					Effect.gen(function* () {
-						const required = yield* readItemDetailQuantityBoundsFx(
-							materialInput.quantity,
-						);
+						const required = materialInput.quantity;
 						const storedItems = runtime.items.filter(
 							(item) =>
 								item.location.scope === LocationScopeEnumSchema.enum.Input &&
@@ -78,10 +74,8 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 								runtime,
 								selector: materialInput.selector,
 							});
-						const selectorKey = yield* readItemDetailSelectorKeyFx(
-							materialInput.selector,
-						);
-						const chargeKey = yield* readItemDetailChargeKeyFx(materialInput.charges);
+						const selectorKey = `item:${materialInput.selector.itemId}`;
+						const chargeKey = readItemDetailChargeKeyFn(materialInput.charges);
 						const key = `${inputIndex}:${selectorKey}:${materialInput.mode}:${chargeKey}`;
 						materials.set(key, {
 							kind: "materials",
@@ -116,10 +110,8 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 				},
 				(depositInput) =>
 					Effect.gen(function* () {
-						const selectorKey = yield* readItemDetailSelectorKeyFx(
-							depositInput.query.selector,
-						);
-						const chargeKey = yield* readItemDetailChargeKeyFx(depositInput.charges);
+						const selectorKey = `item:${depositInput.query.selector.itemId}`;
+						const chargeKey = readItemDetailChargeKeyFn(depositInput.charges);
 						const key = `${selectorKey}:${depositInput.query.distance}:${chargeKey}`;
 						const previous = deposits.get(key);
 						const availability =
@@ -157,7 +149,7 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 				(simpleInput) =>
 					Effect.gen(function* () {
 						if (simpleInput.charges === undefined) return;
-						const key = yield* readItemDetailChargeKeyFx(simpleInput.charges);
+						const key = readItemDetailChargeKeyFn(simpleInput.charges);
 						const previous = simple.get(key);
 						simple.set(key, {
 							kind: "simple",

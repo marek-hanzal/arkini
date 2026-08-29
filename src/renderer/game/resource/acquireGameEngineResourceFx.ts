@@ -4,7 +4,7 @@ import { CriticalGameLifecycleError } from "~/renderer/game/resource/CriticalGam
 import type { Game } from "~/renderer/game/Game";
 import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
 import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
-import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
+import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import { writeLastPackageIdFx } from "~/renderer/launcher/writeLastPackageIdFx";
 
 export namespace acquireGameEngineResourceFx {

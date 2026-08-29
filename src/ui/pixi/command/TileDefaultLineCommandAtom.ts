@@ -3,8 +3,8 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { makeExactGameAtomFamilyFx } from "~/ui/game/makeExactGameAtomFamilyFx";
 import { settleRendererCommandFailureFx } from "~/ui/game/settleRendererCommandFailureFx";
-import { toDiagnosticValueFn } from "~/renderer/diagnostics/fn/toDiagnosticValueFn";
-import { writeDiagnosticRecordFx } from "~/renderer/diagnostics/writeDiagnosticRecordFx";
+import { toDiagnosticValueFn } from "~/application-diagnostics/fn/toDiagnosticValueFn";
+import { writeDiagnosticRecordFx } from "~/application-diagnostics/writeDiagnosticRecordFx";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { enqueueDefaultLineFx } from "~/production-job/write/enqueueDefaultLineFx";
 import { fillDefaultLineQueueFx } from "~/production-job/write/fillDefaultLineQueueFx";

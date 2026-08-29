@@ -14,7 +14,7 @@ import type {
 	AcquisitionOwner,
 	GameEngineResourceServiceState,
 } from "~/renderer/game/resource/internal/GameEngineResourceServiceState";
-import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
+import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import type { GameSaveStorage } from "~/engine/save/GameSaveStorage";
 
 export namespace createGameEngineResourceServiceFx {

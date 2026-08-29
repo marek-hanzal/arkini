@@ -2,8 +2,8 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+import { readDeliveryTravelDurationMsFn } from "~/engine/delivery/fn/readDeliveryTravelDurationMsFn";
 import { reconcileOutboundDeliveriesRuntimeFx } from "~/engine/delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
-import { readDeliveryTravelDurationMsFx } from "~/engine/delivery/read/readDeliveryTravelDurationMsFx";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { applyInputMaterialStorePlanFx } from "~/engine/input/fx/applyInputMaterialStorePlanFx";
 import { planInputMaterialStoreFx } from "~/engine/input/fx/planInputMaterialStoreFx";
@@ -198,7 +198,7 @@ export const settleItemDeliveryRuntimeFx = Effect.fn("settleItemDeliveryRuntimeF
 						phase: "returning",
 						generation: current.location.generation + 1,
 						origin: current.location.origin,
-						remainingDurationMs: yield* readDeliveryTravelDurationMsFx({
+						remainingDurationMs: readDeliveryTravelDurationMsFn({
 							from: owner.location,
 							to: current.location.origin,
 						}),

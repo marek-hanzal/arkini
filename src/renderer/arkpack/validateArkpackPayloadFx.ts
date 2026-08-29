@@ -4,7 +4,7 @@ import { validatePngResourceFx } from "~/renderer/arkpack/validatePngResourceFx"
 import type { PayloadSchema } from "~/engine/pack/schema/PayloadSchema";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import { validateGameConfigFx } from "~/engine/validation/fx/validateGameConfigFx";
-import { validateGameResourcesFx } from "~/engine/validation/rule/validateGameResourcesFx";
+import { validateGameResourcesFn } from "~/engine/validation/rule/fn/validateGameResourcesFn";
 
 const createPackProvenance = (
 	gameId: string,
@@ -37,7 +37,7 @@ export const validateArkpackPayloadFx = Effect.fn("validateArkpackPayloadFx")(fu
 			config: payload.config,
 			provenance,
 		})),
-		...(yield* validateGameResourcesFx({
+		...validateGameResourcesFn({
 			config: payload.config,
 			provenance,
 			resources: payload.resources.map((resource) => ({
@@ -45,6 +45,6 @@ export const validateArkpackPayloadFx = Effect.fn("validateArkpackPayloadFx")(fu
 				mime: "image/png" as const,
 				path: `arkpack:${resource.id}`,
 			})),
-		})),
+		}),
 	];
 });

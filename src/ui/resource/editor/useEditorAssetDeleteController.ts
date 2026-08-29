@@ -6,9 +6,9 @@ import { useEditorProject } from "~/ui/editor/useEditorProject";
 import { deleteEditorAssetCommandAtom } from "~/ui/resource/editor/deleteEditorAssetCommandAtom";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import {
-	readEditorAssetDeleteBlockersFx,
+	readEditorAssetDeleteBlockersFn,
 	type EditorAssetDeleteBlocker,
-} from "~/editor/readEditorAssetDeleteBlockersFx";
+} from "~/editor/resource/fn/readEditorAssetDeleteBlockersFn";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 
 export namespace useEditorAssetDeleteController {
@@ -46,12 +46,10 @@ export const useEditorAssetDeleteController = ({
 	const [confirming, setConfirming] = useState(false);
 	const blockers = useMemo(
 		() =>
-			RendererRuntime.runSync(
-				readEditorAssetDeleteBlockersFx({
-					config: project.config,
-					resourceId,
-				}),
-			),
+			readEditorAssetDeleteBlockersFn({
+				config: project.config,
+				resourceId,
+			}),
 		[
 			project.config,
 			resourceId,

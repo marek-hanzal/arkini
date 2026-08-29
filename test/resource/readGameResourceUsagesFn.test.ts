@@ -1,12 +1,11 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readGameResourceUsagesFx } from "~/engine/resource/readGameResourceUsagesFx";
+import { readGameResourceUsagesFn } from "~/engine/resource/fn/readGameResourceUsagesFn";
 import { editorTestConfig } from "~test/editor/support/editorTestPayload";
 
-describe("readGameResourceUsagesFx", () => {
+describe("readGameResourceUsagesFn", () => {
 	it("projects project and item references with stable owner facts", () => {
-		expect(Effect.runSync(readGameResourceUsagesFx(editorTestConfig))).toEqual([
+		expect(readGameResourceUsagesFn(editorTestConfig)).toEqual([
 			{
 				resourceId: "hero",
 				owner: "project",

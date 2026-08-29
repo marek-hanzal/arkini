@@ -1,8 +1,7 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { validateGameResourcesFx } from "~/engine/validation/rule/validateGameResourcesFx";
+import { validateGameResourcesFn } from "~/engine/validation/rule/fn/validateGameResourcesFn";
 import { startTestConfig } from "~test/start/fx/support/startTestConfig";
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 
@@ -16,7 +15,7 @@ const provenance = {
 	),
 };
 
-describe("validateGameResourcesFx", () => {
+describe("validateGameResourcesFn", () => {
 	it("accepts exact filename resource IDs", () => {
 		const ids = new Set<string>([
 			startTestConfig.resources.hero,
@@ -25,19 +24,17 @@ describe("validateGameResourcesFx", () => {
 			item.asset.default.forEach((id) => ids.add(id));
 			item.asset.sources?.forEach((id) => ids.add(id));
 		}
-		const diagnostics = Effect.runSync(
-			validateGameResourcesFx({
-				config: startTestConfig,
-				provenance,
-				resources: [
-					...ids,
-				].map((id) => ({
-					id,
-					path: `${id}.png`,
-					mime: "image/png" as const,
-				})),
-			}),
-		);
+		const diagnostics = validateGameResourcesFn({
+			config: startTestConfig,
+			provenance,
+			resources: [
+				...ids,
+			].map((id) => ({
+				id,
+				path: `${id}.png`,
+				mime: "image/png" as const,
+			})),
+		});
 
 		expect(diagnostics).toEqual([]);
 	});
@@ -50,19 +47,17 @@ describe("validateGameResourcesFx", () => {
 				"avatar-02": "avatar-02",
 			},
 		});
-		const diagnostics = Effect.runSync(
-			validateGameResourcesFx({
-				config,
-				provenance,
-				resources: [
-					{
-						id: "hero",
-						path: "hero.png",
-						mime: "image/png" as const,
-					},
-				],
-			}),
-		);
+		const diagnostics = validateGameResourcesFn({
+			config,
+			provenance,
+			resources: [
+				{
+					id: "hero",
+					path: "hero.png",
+					mime: "image/png" as const,
+				},
+			],
+		});
 
 		expect(diagnostics).toContainEqual(
 			expect.objectContaining({
@@ -91,24 +86,22 @@ describe("validateGameResourcesFx", () => {
 	});
 
 	it("reports duplicate and missing exact resource IDs", () => {
-		const diagnostics = Effect.runSync(
-			validateGameResourcesFx({
-				config: startTestConfig,
-				provenance,
-				resources: [
-					{
-						id: "hero",
-						path: "a/hero.png",
-						mime: "image/png",
-					},
-					{
-						id: "hero",
-						path: "b/hero.png",
-						mime: "image/png",
-					},
-				],
-			}),
-		);
+		const diagnostics = validateGameResourcesFn({
+			config: startTestConfig,
+			provenance,
+			resources: [
+				{
+					id: "hero",
+					path: "a/hero.png",
+					mime: "image/png",
+				},
+				{
+					id: "hero",
+					path: "b/hero.png",
+					mime: "image/png",
+				},
+			],
+		});
 
 		expect(diagnostics).toEqual(
 			expect.arrayContaining([
@@ -144,13 +137,11 @@ describe("validateGameResourcesFx", () => {
 				},
 			},
 		});
-		const diagnostics = Effect.runSync(
-			validateGameResourcesFx({
-				config,
-				provenance,
-				resources: [],
-			}),
-		);
+		const diagnostics = validateGameResourcesFn({
+			config,
+			provenance,
+			resources: [],
+		});
 
 		expect(diagnostics).toEqual(
 			expect.arrayContaining([
@@ -265,32 +256,30 @@ describe("validateGameResourcesFx", () => {
 				}),
 			},
 		});
-		const diagnostics = Effect.runSync(
-			validateGameResourcesFx({
-				config,
-				provenance: {
-					...provenance,
-					items: Object.fromEntries(
-						Object.keys(config.items).map((id) => [
-							id,
-							`${id}.json`,
-						]),
-					),
-				},
-				resources: [
-					"hero",
-					"asset:tree",
-					"asset:log",
-					"asset:lens",
-					"asset:backpack",
-					"blueprint",
-				].map((id) => ({
-					id,
-					path: `${id}.png`,
-					mime: "image/png" as const,
-				})),
-			}),
-		);
+		const diagnostics = validateGameResourcesFn({
+			config,
+			provenance: {
+				...provenance,
+				items: Object.fromEntries(
+					Object.keys(config.items).map((id) => [
+						id,
+						`${id}.json`,
+					]),
+				),
+			},
+			resources: [
+				"hero",
+				"asset:tree",
+				"asset:log",
+				"asset:lens",
+				"asset:backpack",
+				"blueprint",
+			].map((id) => ({
+				id,
+				path: `${id}.png`,
+				mime: "image/png" as const,
+			})),
+		});
 
 		expect(diagnostics).toEqual([]);
 	});

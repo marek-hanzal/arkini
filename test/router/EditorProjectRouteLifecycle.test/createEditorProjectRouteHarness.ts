@@ -3,8 +3,8 @@ import { Deferred, Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { routeTree } from "~/_route";
-import type { EditorProject } from "~/editor/EditorProject";
-import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
+import type { EditorProject } from "~/project-authoring/EditorProject";
+import type { EditorProjectRepositoryService } from "~/project-authoring/repository/EditorProjectRepository";
 import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
 import type { EditorBoardGameResource } from "~/board-scenario/session/EditorBoardGameResource";
 import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/session/EditorBoardGameResourceOwnerAtom";
@@ -12,7 +12,7 @@ import { createEditorBoardGameFx } from "~/board-scenario/session/createEditorBo
 import { createEditorBoardGameResourceFx } from "~/board-scenario/session/createEditorBoardGameResourceFx";
 import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
 import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { createTestRendererRuntime } from "~test/support/createTestRendererRuntime";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 

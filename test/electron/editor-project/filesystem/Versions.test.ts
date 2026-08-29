@@ -20,7 +20,7 @@ import { EditorVersionDescriptorFileSchema } from "~/project-version/EditorVersi
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 import { ArkiniVersionIncompatibleError } from "~/engine/version/ArkiniVersionAdmission";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 let root: string;
 const encoder = new TextEncoder();

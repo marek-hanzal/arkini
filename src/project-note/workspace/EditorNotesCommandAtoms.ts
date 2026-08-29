@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
+import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
 import { createEditorNotesCommandAtomsFx } from "~/project-note/workspace/createEditorNotesCommandAtomsFx";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 

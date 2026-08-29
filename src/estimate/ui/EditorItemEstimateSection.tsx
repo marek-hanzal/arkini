@@ -1,6 +1,6 @@
 import { Calculator, Info, LoaderCircle, TriangleAlert } from "lucide-react";
 
-import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { useEditorProject } from "~/authoring-session/useEditorProject";
 import type {
 	EditorItemEstimate,
 	EditorItemEstimateDiagnostic,

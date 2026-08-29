@@ -14,10 +14,10 @@ import {
 } from "react";
 import { flushSync } from "react-dom";
 
-import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
+import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
 import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerAtom";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
-import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { useEditorProject } from "~/authoring-session/useEditorProject";
 import { Button, ButtonLink } from "~/ui/button/Button";
 import {
 	EditorWorkspaceRoutes,
@@ -26,8 +26,8 @@ import {
 } from "~/authoring-shell/useEditorActiveWorkspace";
 import { Tooltip } from "~/ui/overlay/Tooltip";
 import { EditorUnsavedChangesDialog } from "~/authoring-shell/EditorUnsavedChangesDialog";
-import { useEditorProjectRefreshController } from "~/authoring-shell/session/useEditorProjectRefreshController";
-import { useEditorUnsavedChangesOwner } from "~/ui/editor/useEditorUnsavedChangesRegistration";
+import { useEditorProjectRefreshController } from "~/authoring-session/useEditorProjectRefreshController";
+import { useEditorUnsavedChangesOwner } from "~/authoring-session/useEditorUnsavedChangesRegistration";
 import { useEditorWorkspaceShortcuts } from "~/authoring-shell/useEditorWorkspaceShortcuts";
 
 const tabClassName =

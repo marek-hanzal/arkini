@@ -1,8 +1,8 @@
 import { TriangleAlert } from "lucide-react";
 
-import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { useEditorProject } from "~/authoring-session/useEditorProject";
 import type { EditorItemEstimateSortSchema } from "~/estimate/domain/EditorItemEstimateSortSchema";
-import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
+import { EditorHistoryBackButton } from "~/authoring-shell/navigation/EditorHistoryBackButton";
 import { EditorSelect, type EditorSelectOption } from "~/ui/form/EditorSelect";
 import {
 	selectableActiveClassName,

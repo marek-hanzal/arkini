@@ -1,4 +1,4 @@
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 import type { EditorItemEstimateRouteStep } from "~/estimate/domain/EditorItemEstimate";
 import { type ReactNode, useState } from "react";
 import { formatItemDurationFn } from "~/ui/item-detail/fn/formatItemDurationFn";

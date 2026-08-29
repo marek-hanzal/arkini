@@ -1,5 +1,5 @@
-import type { EditorProject } from "~/editor/EditorProject";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import type { EditorProject } from "~/project-authoring/EditorProject";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 export const failedCreationProject: EditorProject = {
 	projectId: "failed-editor-board",

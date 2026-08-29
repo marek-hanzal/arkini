@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { EditorProjectDescriptorSchema } from "~/editor/EditorProjectDescriptor";
+import { EditorProjectDescriptorSchema } from "~/project-authoring/EditorProjectDescriptor";
 import { EditorProjectOwnershipSchema } from "~/project-authoring/EditorProjectOwnershipSchema";
 
 /** One fully admitted project or one cataloged directory blocked by complete validation. */

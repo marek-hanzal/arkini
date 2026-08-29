@@ -1,8 +1,8 @@
 import { Effect, Result } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { EditorProject } from "~/editor/EditorProject";
-import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
+import type { EditorProject } from "~/project-authoring/EditorProject";
+import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
 import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/session/EditorBoardGameResourceOwnerAtom";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";

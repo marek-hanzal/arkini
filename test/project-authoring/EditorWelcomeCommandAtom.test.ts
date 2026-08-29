@@ -30,7 +30,9 @@ vi.mock("@tanstack/react-router", async (importOriginal) => ({
 
 vi.mock("~/renderer/RendererRuntime", async () => {
 	const { Effect } = await import("effect");
-	const { EditorProjectRepository } = await import("~/editor/EditorProjectRepository");
+	const { EditorProjectRepository } = await import(
+		"~/project-authoring/repository/EditorProjectRepository"
+	);
 	const repository = {
 		deleteProjectFx: () => Effect.void,
 	};
@@ -61,7 +63,7 @@ vi.mock("~/project-authoring/createFreshEditorProjectFx", async () => {
 	};
 });
 
-vi.mock("~/renderer/editor/importEditorArkpackFileFx", async () => {
+vi.mock("~/project-authoring/welcome/importEditorArkpackFileFx", async () => {
 	const { Effect } = await import("effect");
 	return {
 		importEditorArkpackFileFx: ({ file }: { readonly file: File }) =>

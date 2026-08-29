@@ -1,6 +1,6 @@
 import type { Effect } from "effect";
 
-import type { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
+import type { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
 import type { EditorProjectCompatibilityDiffResult } from "~/project-version/EditorProjectCompatibility";
 
 /** Lightweight immutable node in one project's version tree. */

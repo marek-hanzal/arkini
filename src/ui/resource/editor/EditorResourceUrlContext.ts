@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 
 export interface EditorResourceUrlStore {
 	readonly read: (resourceId: string) => string | undefined;

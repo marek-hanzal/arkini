@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import {
 	EditorProjectRepositoryError,
 	type EditorProjectRepositoryOperation,
-} from "~/editor/EditorProjectRepositoryError";
+} from "~/project-authoring/repository/EditorProjectRepositoryError";
 
 let blocked = false;
 

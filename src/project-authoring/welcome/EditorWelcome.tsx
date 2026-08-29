@@ -4,7 +4,7 @@ import type {
 	EditorProjectCandidate,
 	EditorProjectOwnership,
 } from "~/project-authoring/EditorProjectCandidate";
-import type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";
+import type { EditorProjectDescriptor } from "~/project-authoring/EditorProjectDescriptor";
 import { useEffect, useState } from "react";
 import { EditorArkpackImportButton } from "~/arkpack/ui/editor/EditorArkpackImportButton";
 import { BackButton } from "~/ui/button/BackButton";

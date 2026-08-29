@@ -3,12 +3,12 @@ import { Effect, type Semaphore } from "effect";
 
 import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
 import type { ProjectState } from "../ProjectState";
-import type { EditorProject, EditorProjectCommit } from "~/editor/EditorProject";
-import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
+import type { EditorProject, EditorProjectCommit } from "~/project-authoring/EditorProject";
+import type { EditorProjectRepositoryService } from "~/project-authoring/repository/EditorProjectRepository";
 import {
 	EditorProjectRepositoryError,
 	type EditorProjectRepositoryOperation,
-} from "~/editor/EditorProjectRepositoryError";
+} from "~/project-authoring/repository/EditorProjectRepositoryError";
 import { forceDeleteEditorItemFx } from "~/item-authoring/domain/fx/forceDeleteEditorItemFx";
 import { readEditorAssetDeleteBlockersFn } from "~/editor/resource/fn/readEditorAssetDeleteBlockersFn";
 import { readEditorItemDeleteBlockersFn } from "~/item-authoring/domain/fn/readEditorItemDeleteBlockersFn";

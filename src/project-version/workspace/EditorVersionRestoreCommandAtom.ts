@@ -1,8 +1,8 @@
 import { Cause, Clock, Duration, Effect, Exit } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
-import { EditorUnsavedChanges } from "~/renderer/editor/unsaved/EditorUnsavedChanges";
+import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
+import { EditorUnsavedChanges } from "~/authoring-session/EditorUnsavedChanges";
 import { checkoutEditorProjectVersionFx } from "~/project-version/workspace/checkoutEditorProjectVersionFx";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 

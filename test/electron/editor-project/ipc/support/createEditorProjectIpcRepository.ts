@@ -3,7 +3,7 @@ import { vi } from "vitest";
 
 import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
 import type { OwnedEditorProjectRepository } from "../../../../../electron/main/editor-project/EditorProjectServiceOwnership";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 export const editorProjectIpcDescriptor = {
 	projectId: "project-one",

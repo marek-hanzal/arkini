@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
-import { publishEditorProjectFx } from "~/ui/editor/publishEditorProjectFx";
+import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
+import { publishEditorProjectFx } from "~/authoring-session/publishEditorProjectFx";
 import { validateEditorAssetFileFx } from "~/renderer/editor/resource/validateEditorAssetFileFx";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";

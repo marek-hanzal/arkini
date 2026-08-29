@@ -2,7 +2,7 @@ import { useSyncExternalStore } from "react";
 
 import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
 import { useDialogFocus } from "~/ui/focus/useDialogFocus";
-import { useEditorUnsavedChangesOwner } from "~/ui/editor/useEditorUnsavedChangesRegistration";
+import { useEditorUnsavedChangesOwner } from "~/authoring-session/useEditorUnsavedChangesRegistration";
 
 const EditorUnsavedChangesPrompt = ({
 	state,

@@ -6,7 +6,7 @@ import { BadgeCheck, Images, SearchX, type LucideIcon } from "lucide-react";
 import { type ChangeEventHandler, type RefObject, useCallback, useMemo, useRef } from "react";
 import { match, P } from "ts-pattern";
 
-import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
+import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { importEditorArkpackAssetsFx } from "~/ui/resource/editor/importEditorArkpackAssetsFx";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";

@@ -2,12 +2,12 @@ import { gzipSync } from "node:zlib";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { importEditorArkpackFileFx } from "~/renderer/editor/importEditorArkpackFileFx";
-import type { EditorProject } from "~/editor/EditorProject";
+import { importEditorArkpackFileFx } from "~/project-authoring/welcome/importEditorArkpackFileFx";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
-} from "~/editor/EditorProjectRepository";
+} from "~/project-authoring/repository/EditorProjectRepository";
 import { encodeFx } from "~/arkpack/artifact/fx/encodeFx";
 import { encodeArkpackEnvelopeFx } from "~/arkpack/artifact/fx/encodeArkpackEnvelopeFx";
 import type { PayloadSchema } from "~/arkpack/artifact/schema/PayloadSchema";
@@ -15,7 +15,7 @@ import {
 	createTestPngBytes,
 	installTestPngDecoder,
 } from "~test/arkpack/support/createTestPngBytes";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
 

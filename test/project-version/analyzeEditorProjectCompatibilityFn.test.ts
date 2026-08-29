@@ -4,7 +4,7 @@ import { analyzeEditorProjectCompatibilityFn } from "~/project-version/fn/analyz
 import type { EditorProjectCompatibility } from "~/project-version/EditorProjectCompatibility";
 import { TemporarySchema } from "~/engine/item/schema/TemporarySchema";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { editorTestConfig } from "~test/editor/support/editorTestPayload";
+import { editorTestConfig } from "~test/project-authoring/support/editorTestPayload";
 import {
 	createLine,
 	createProducerItem,

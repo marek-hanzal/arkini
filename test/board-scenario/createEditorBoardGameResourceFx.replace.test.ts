@@ -2,12 +2,12 @@ import { Effect, SubscriptionRef } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 import { vi } from "vitest";
 
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
 import { createEditorBoardGameResourceFx } from "~/board-scenario/session/createEditorBoardGameResourceFx";
 import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 const project: EditorProject = {
 	projectId: "editor-board",

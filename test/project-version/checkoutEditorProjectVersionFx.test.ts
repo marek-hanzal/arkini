@@ -3,17 +3,17 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { describe, expect, it, vi } from "vitest";
 
-import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
-import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
-import { EditorProjectAtom } from "~/ui/editor/EditorProjectAtom";
-import { EditorProjectReplacementEpochAtom } from "~/authoring-shell/session/EditorProjectReplacementEpochAtom";
-import { EditorUnsavedChanges } from "~/renderer/editor/unsaved/EditorUnsavedChanges";
+import type { EditorProjectRepositoryService } from "~/project-authoring/repository/EditorProjectRepository";
+import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
+import { EditorProjectAtom } from "~/authoring-session/EditorProjectAtom";
+import { EditorProjectReplacementEpochAtom } from "~/authoring-session/EditorProjectReplacementEpochAtom";
+import { EditorUnsavedChanges } from "~/authoring-session/EditorUnsavedChanges";
 import type { EditorBoardGameResource } from "~/board-scenario/session/EditorBoardGameResource";
 import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/session/EditorBoardGameResourceOwnerAtom";
 import { EditorProjectVersionCheckoutConfirmationRequired } from "~/project-version/workspace/EditorProjectVersionCheckoutConfirmationRequired";
 import { checkoutEditorProjectVersionFx } from "~/project-version/workspace/checkoutEditorProjectVersionFx";
-import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 
 const project = {

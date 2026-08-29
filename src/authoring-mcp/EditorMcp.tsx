@@ -1,13 +1,13 @@
 import { match } from "ts-pattern";
 
 import { ButtonLink } from "~/ui/button/Button";
-import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
+import { EditorSectionNavigation } from "~/authoring-shell/navigation/EditorSectionNavigation";
 import {
 	editorSectionTabActiveClassName,
 	editorSectionTabClassName,
 	EditorSectionTabs,
-} from "~/ui/editor/EditorSectionTabs";
-import { useEditorProject } from "~/ui/editor/useEditorProject";
+} from "~/authoring-shell/navigation/EditorSectionTabs";
+import { useEditorProject } from "~/authoring-session/useEditorProject";
 import { EditorMcpSections, type EditorMcpSectionId } from "./EditorMcpSections";
 import { EditorMcpServerSettings } from "./EditorMcpServerSettings";
 import { EditorMcpSettings } from "./EditorMcpSettings";

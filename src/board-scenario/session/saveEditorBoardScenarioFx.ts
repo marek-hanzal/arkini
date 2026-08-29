@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import type { EditorProject } from "~/editor/EditorProject";
-import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
+import type { EditorProject } from "~/project-authoring/EditorProject";
+import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
 import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
 import { encodeArkiniSaveFn } from "~/engine/save/fn/encodeArkiniSaveFn";
 import { fromRuntimeFn } from "~/engine/state/fn/fromRuntimeFn";

@@ -26,7 +26,14 @@ src/engine    framework-neutral live gameplay and its exact runtime operations
 src/game-config  authored config, source, diagnostics, validation, resources and compiler
 src/arkpack   artifact bytes/provenance, renderer catalog/runtime and package UI
 src/editor-build  Build contract, renderer admission and Build presentation
-src/editor    shared platform-neutral Editor project and repository capabilities
+src/project-authoring  portable project model, repository contract, configuration and catalog workflows
+src/board-scenario  revision-pinned Board scenario contracts, session lifecycle and controls
+src/project-version  immutable version graph, compatibility policies and checkout workspace
+src/project-note  ordered project Notes contracts and workspace
+src/authoring-mcp  renderer-side MCP status, settings and checkout presentation
+src/authoring-session  mounted project publication, refresh, replacement and unsaved-change authority
+src/authoring-shell  cross-product Editor shell and navigation composition
+src/editor/resource  residual Asset/Resource authoring policies pending their dedicated product slice
 src/item-authoring  authored Item domain and product UI
 src/flow      authored acquisition graph, global Flow and layout worker
 src/estimate  static Estimate domain, projections, cache and worker

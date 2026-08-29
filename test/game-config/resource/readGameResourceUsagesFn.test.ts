@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { readGameResourceUsagesFn } from "~/game-config/resource/fn/readGameResourceUsagesFn";
-import { editorTestConfig } from "~test/editor/support/editorTestPayload";
+import { editorTestConfig } from "~test/project-authoring/support/editorTestPayload";
 
 describe("readGameResourceUsagesFn", () => {
 	it("projects project and item references with stable owner facts", () => {

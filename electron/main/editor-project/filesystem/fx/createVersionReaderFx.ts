@@ -3,7 +3,7 @@ import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
 import type { ProjectState } from "../ProjectState";
-import type { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
+import type { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
 import type { EditorProjectVersionReference } from "~/project-version/EditorProjectVersion";
 import { EditorBoardScenarioFileSchema } from "~/board-scenario/EditorBoardScenarioFileSchema";
 import { hashVersionBytes } from "./VersionFingerprint";

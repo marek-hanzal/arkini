@@ -6,8 +6,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { EditorProjectTransport } from "../../electron/contract/editor/EditorProjectTransport";
 import { createElectronEditorProjectRepositoryFx } from "~/project-authoring/repository/createElectronEditorProjectRepositoryFx";
 import { blockEditorProjectWrites } from "~/project-authoring/repository/EditorProjectWriteAdmission";
-import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
 
 const success = <Value>(value: Value): EditorProjectTransport.Result<Value> => ({

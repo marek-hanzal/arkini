@@ -1,8 +1,8 @@
 import { createId } from "@paralleldrive/cuid2";
 import { Effect } from "effect";
 
-import type { EditorProject } from "~/editor/EditorProject";
-import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
+import type { EditorProject } from "~/project-authoring/EditorProject";
+import type { EditorProjectRepositoryService } from "~/project-authoring/repository/EditorProjectRepository";
 import { createEditorItemDraftFn } from "~/item-authoring/domain/fn/createEditorItemDraftFn";
 import { saveEditorItemWithRepositoryFx } from "~/item-authoring/domain/fx/saveEditorItemWithRepositoryFx";
 import type { TypeSchema } from "~/engine/item/schema/TypeSchema";

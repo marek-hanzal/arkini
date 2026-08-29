@@ -1,4 +1,4 @@
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 import type { EditorBoardScenarioSchema } from "~/board-scenario/EditorBoardScenarioSchema";
 import type { EditorProjectCatalogEntrySchema } from "~/project-authoring/EditorProjectCatalogEntrySchema";
 import type { EditorNoteSchema } from "~/project-note/EditorNoteSchema";

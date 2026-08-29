@@ -1,13 +1,13 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { EditorProjectRepository } from "~/editor/EditorProjectRepository";
-import { EditorProjectReplacementEpochAtom } from "~/authoring-shell/session/EditorProjectReplacementEpochAtom";
-import { EditorUnsavedChanges } from "~/renderer/editor/unsaved/EditorUnsavedChanges";
+import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
+import { EditorProjectReplacementEpochAtom } from "~/authoring-session/EditorProjectReplacementEpochAtom";
+import { EditorUnsavedChanges } from "~/authoring-session/EditorUnsavedChanges";
 import { blockEditorProjectWrites } from "~/project-authoring/repository/EditorProjectWriteAdmission";
 import { releaseCurrentEditorBoardGameFx } from "~/board-scenario/session/releaseCurrentEditorBoardGameFx";
 import { syncEditorBoardGameFx } from "~/board-scenario/session/syncEditorBoardGameFx";
-import { publishEditorProjectFx } from "~/ui/editor/publishEditorProjectFx";
+import { publishEditorProjectFx } from "~/authoring-session/publishEditorProjectFx";
 import { readEditorProjectFx } from "~/project-authoring/readEditorProjectFx";
 import { EditorProjectVersionCheckoutConfirmationRequired } from "~/project-version/workspace/EditorProjectVersionCheckoutConfirmationRequired";
 

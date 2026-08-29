@@ -3,7 +3,7 @@ import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { EditorNotesCommandAtoms } from "~/project-note/workspace/EditorNotesCommandAtoms";
-import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { useEditorProject } from "~/authoring-session/useEditorProject";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { EditorNoteContentMaxLength, type EditorNoteSchema } from "~/project-note/EditorNoteSchema";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";

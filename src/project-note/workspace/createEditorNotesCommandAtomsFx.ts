@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
+import type { EditorProjectRepositoryService } from "~/project-authoring/repository/EditorProjectRepository";
 import type { EditorNoteSchema } from "~/project-note/EditorNoteSchema";
 
 type NoteRepository = Pick<

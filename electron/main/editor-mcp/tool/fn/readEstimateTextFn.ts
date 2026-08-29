@@ -1,4 +1,4 @@
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 import { createEditorItemEstimateIndexFn } from "~/estimate/domain/fn/createEditorItemEstimateIndexFn";
 import { estimateEditorItemCatalogFn } from "~/estimate/domain/fn/estimateEditorItemCatalogFn";
 import { selectEditorItemEstimateIndexFn } from "~/estimate/domain/fn/selectEditorItemEstimateIndexFn";

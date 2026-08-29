@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { useEditorProject } from "~/authoring-session/useEditorProject";
 import type { EditorSearchOption } from "~/ui/form/EditorSearchCombobox";
 
 /** Builds one canonical-item Fuse corpus used by every item reference picker. */

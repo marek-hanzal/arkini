@@ -1,6 +1,6 @@
 import { Order } from "effect";
 
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 import { searchEditorItemsFn } from "~/item-authoring/domain/fn/searchEditorItemsFn";
 import type { ItemCollectionInput } from "../ItemCollectionInputSchema";
 

@@ -3,11 +3,11 @@ import { z } from "zod";
 
 import type { EditorProjectTransport } from "../../../electron/contract/editor/EditorProjectTransport";
 import { EditorProjectCandidateSchema } from "~/project-authoring/EditorProjectCandidate";
-import type { EditorProjectRepositoryService } from "~/editor/EditorProjectRepository";
+import type { EditorProjectRepositoryService } from "~/project-authoring/repository/EditorProjectRepository";
 import {
 	EditorProjectRepositoryError,
 	type EditorProjectRepositoryOperation,
-} from "~/editor/EditorProjectRepositoryError";
+} from "~/project-authoring/repository/EditorProjectRepositoryError";
 import {
 	EditorBoardScenarioDescriptorSchema,
 	EditorBoardScenarioSchema,
@@ -20,7 +20,7 @@ import {
 import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import { EditorNoteSchema } from "~/project-note/EditorNoteSchema";
-import { invokeEditorProjectTransportFx } from "~/renderer/editor/invokeEditorProjectTransportFx";
+import { invokeEditorProjectTransportFx } from "~/project-authoring/repository/invokeEditorProjectTransportFx";
 
 const versionReferenceSchema = z.discriminatedUnion("type", [
 	z

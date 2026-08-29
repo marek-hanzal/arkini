@@ -1,18 +1,18 @@
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 
-import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { useEditorProject } from "~/authoring-session/useEditorProject";
 import { EditorCompatibilityNotice } from "~/project-version/workspace/EditorCompatibilityNotice";
-import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
-import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
+import { EditorHistoryBackButton } from "~/authoring-shell/navigation/EditorHistoryBackButton";
+import { EditorSectionTabs } from "~/authoring-shell/navigation/EditorSectionTabs";
 import { EditorFormSectionPage } from "~/ui/form/EditorFormSectionPage";
-import { EditorProjectFormProvider } from "~/ui/project/editor/EditorProjectFormContext";
-import { EditorProjectSectionLink } from "~/ui/project/editor/EditorProjectSectionLink";
+import { EditorProjectFormProvider } from "~/project-authoring/configuration/EditorProjectFormContext";
+import { EditorProjectSectionLink } from "~/project-authoring/configuration/EditorProjectSectionLink";
 import {
 	EditorProjectSections,
 	type EditorProjectSectionId,
-} from "~/ui/project/editor/EditorProjectSections";
-import { useEditorProjectFormController } from "~/ui/project/editor/useEditorProjectFormController";
+} from "~/project-authoring/configuration/EditorProjectSections";
+import { useEditorProjectFormController } from "~/project-authoring/configuration/useEditorProjectFormController";
 
 export const Route = createFileRoute("/editor/$projectId/project")({
 	component: () => {

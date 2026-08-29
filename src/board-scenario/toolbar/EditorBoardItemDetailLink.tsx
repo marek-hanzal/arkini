@@ -1,6 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 
-import { useEditorProject } from "~/ui/editor/useEditorProject";
+import { useEditorProject } from "~/authoring-session/useEditorProject";
 import { ButtonLink } from "~/ui/button/Button";
 import type { ItemDetailHeaderIdentityRenderProps } from "~/ui/item-detail/ItemDetailHeader";
 

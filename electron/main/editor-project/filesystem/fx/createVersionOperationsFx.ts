@@ -5,8 +5,8 @@ import { Effect, type Semaphore } from "effect";
 
 import { ArkiniAppVersion } from "../../../../../shared/ArkiniAppMetadata";
 import type { ProjectState } from "../ProjectState";
-import type { EditorProject } from "~/editor/EditorProject";
-import { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
+import type { EditorProject } from "~/project-authoring/EditorProject";
+import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
 import type { EditorBoardScenarioSchema } from "~/board-scenario/EditorBoardScenarioSchema";
 import { EditorBoardScenarioFileSchema } from "~/board-scenario/EditorBoardScenarioFileSchema";
 import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";

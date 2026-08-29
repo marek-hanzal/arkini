@@ -12,7 +12,7 @@ import { EditorBoardScenarioSchema } from "~/board-scenario/EditorBoardScenarioS
 import { GameProjectGameSchemaReference } from "~/game-config/source/GameProjectReference";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 const writeSnapshotFx = (props: Omit<createVersionSnapshotFx.Props, "filesystemWrite">) =>
 	Effect.gen(function* () {

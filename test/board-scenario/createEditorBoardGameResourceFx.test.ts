@@ -2,13 +2,13 @@ import { Deferred, Effect, Fiber, SubscriptionRef } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 import { afterEach, vi } from "vitest";
 
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
 import { createEditorBoardGameFx } from "~/board-scenario/session/createEditorBoardGameFx";
 import { createEditorBoardGameResourceFx } from "~/board-scenario/session/createEditorBoardGameResourceFx";
 import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
 import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
-import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 const createProject = (revision: number): EditorProject => ({
 	projectId: "editor-board",

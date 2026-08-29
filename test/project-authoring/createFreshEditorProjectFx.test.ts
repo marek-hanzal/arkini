@@ -3,11 +3,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { validateArkpackPayloadFx } from "~/arkpack/renderer/validateArkpackPayloadFx";
 import { createFreshEditorProjectFx } from "~/project-authoring/createFreshEditorProjectFx";
-import type { EditorProject } from "~/editor/EditorProject";
+import type { EditorProject } from "~/project-authoring/EditorProject";
 import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
-} from "~/editor/EditorProjectRepository";
+} from "~/project-authoring/repository/EditorProjectRepository";
 import { installTestPngDecoder } from "~test/arkpack/support/createTestPngBytes";
 import { UnusedEditorProjectRepository } from "~test/support/UnusedEditorProjectRepository";
 

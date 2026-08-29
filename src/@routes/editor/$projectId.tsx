@@ -3,11 +3,11 @@ import { Effect } from "effect";
 
 import { releaseCurrentEditorBoardGameFx } from "~/board-scenario/session/releaseCurrentEditorBoardGameFx";
 import { syncEditorBoardGameFx } from "~/board-scenario/session/syncEditorBoardGameFx";
-import type { EditorProject } from "~/editor/EditorProject";
-import { EditorProjectProvider } from "~/authoring-shell/session/EditorProjectProvider";
+import type { EditorProject } from "~/project-authoring/EditorProject";
+import { EditorProjectProvider } from "~/authoring-session/EditorProjectProvider";
 import { readEditorProjectFx } from "~/project-authoring/readEditorProjectFx";
 import { ButtonLink } from "~/ui/button/Button";
-import { EditorProjectReplacementBoundary } from "~/authoring-shell/session/EditorProjectReplacementBoundary";
+import { EditorProjectReplacementBoundary } from "~/authoring-session/EditorProjectReplacementBoundary";
 import { EditorShell } from "~/authoring-shell/EditorShell";
 import { EditorProjectResourceUrlProvider } from "~/ui/resource/editor/EditorResourceUrlProvider";
 import { EditorVersionRestoreAction } from "~/project-version/workspace/EditorVersionRestoreAction";

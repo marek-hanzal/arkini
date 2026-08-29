@@ -5,7 +5,7 @@ import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx"
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { makeDropActorRejectedResultFx } from "~/engine/runtime/drop/makeDropActorRejectedResultFx";
-import { makeDropRejectedResultFx } from "~/engine/runtime/drop/makeDropRejectedResultFx";
+import { makeDropRejectedResultFn } from "~/engine/runtime/drop/fn/makeDropRejectedResultFn";
 import { projectDropTransferActorFx } from "~/engine/runtime/drop/projectDropTransferActorFx";
 import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
 import type { DropItemResult } from "~/engine/runtime/DropItemResult";
@@ -40,11 +40,13 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 	quantity,
 }: commitStoreInputDropFx.Props) {
 	const rejectBlockedFx = () =>
-		makeDropRejectedResultFx({
-			reason: DropItemRejectedReason.Blocked,
-			sourceItemId,
-			targetItemId,
-		});
+		Effect.succeed(
+			makeDropRejectedResultFn({
+				reason: DropItemRejectedReason.Blocked,
+				sourceItemId,
+				targetItemId,
+			}),
+		);
 	return yield* Effect.gen(function* () {
 		const stored = yield* storeInputMaterialFx({
 			ownerItemId: targetItemId,
@@ -105,11 +107,13 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 					targetItemId,
 				}),
 			CrossSpaceBoardOperationError: () =>
-				makeDropRejectedResultFx({
-					reason: DropItemRejectedReason.InvalidTarget,
-					sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeDropRejectedResultFn({
+						reason: DropItemRejectedReason.InvalidTarget,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 		}),
 		Effect.catchTags({
 			ItemStatefulError: rejectBlockedFx,

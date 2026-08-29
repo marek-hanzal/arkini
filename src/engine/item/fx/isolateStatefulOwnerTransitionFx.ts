@@ -4,7 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
 import { isolateGridStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateGridStatefulOwnerTransitionFx";
-import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
+import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -27,7 +27,7 @@ export const isolateStatefulOwnerTransitionFx = Effect.fn("isolateStatefulOwnerT
 			itemId: ownerItemId,
 			runtime,
 		});
-		if (Option.isNone(yield* isBoardRuntimeItemFx(runtimeOwner))) {
+		if (Option.isNone(isBoardRuntimeItemFn(runtimeOwner))) {
 			return yield* Effect.fail(
 				new ItemNotOnBoardError({
 					itemId: runtimeOwner.id,

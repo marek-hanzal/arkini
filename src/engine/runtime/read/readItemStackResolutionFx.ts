@@ -7,8 +7,8 @@ import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSc
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { StackItemsUnavailableError } from "~/engine/runtime/error/StackItemsUnavailableError";
-import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { isBoardRuntimeItemFn } from "~/engine/runtime/read/fn/isBoardRuntimeItemFn";
+import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -86,11 +86,11 @@ export const readItemStackResolutionFx = Effect.fn("readItemStackResolutionFx")(
 	if (runtimeTarget.revision !== targetRevision) {
 		return blocked(StackItemsUnavailableError.Reason.StaleTargetRevision);
 	}
-	const source = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeSource));
+	const source = Option.getOrUndefined(isGridRuntimeItemFn(runtimeSource));
 	if (source === undefined) {
 		return blocked(StackItemsUnavailableError.Reason.SourceNotOnGrid);
 	}
-	const target = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeTarget));
+	const target = Option.getOrUndefined(isGridRuntimeItemFn(runtimeTarget));
 	if (target === undefined) {
 		return blocked(StackItemsUnavailableError.Reason.TargetNotOnGrid);
 	}
@@ -111,8 +111,8 @@ export const readItemStackResolutionFx = Effect.fn("readItemStackResolutionFx")(
 		return blocked(StackItemsUnavailableError.Reason.StaleTargetLocation);
 	}
 
-	const boardSource = Option.getOrUndefined(yield* isBoardRuntimeItemFx(source));
-	const boardTarget = Option.getOrUndefined(yield* isBoardRuntimeItemFx(target));
+	const boardSource = Option.getOrUndefined(isBoardRuntimeItemFn(source));
+	const boardTarget = Option.getOrUndefined(isBoardRuntimeItemFn(target));
 	if (
 		boardSource !== undefined &&
 		boardTarget !== undefined &&

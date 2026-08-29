@@ -9,7 +9,7 @@ import { planLineInputAutofillFx } from "~/engine/input/fx/planLineInputAutofill
 import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace autofillLineInputsRuntimeFx {
@@ -83,13 +83,13 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 	for (const [sourceItemId, input] of allocationsBySourceItemId) {
 		const runtimeSource = deliveryRuntime.items.find((item) => item.id === sourceItemId);
 		if (runtimeSource === undefined) continue;
-		const source = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeSource));
+		const source = Option.getOrUndefined(isGridRuntimeItemFn(runtimeSource));
 		if (source === undefined) continue;
 		const runtimeOwner = deliveryRuntime.items.find((item) => item.id === ownerItemId);
 		const owner =
 			runtimeOwner === undefined
 				? undefined
-				: Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeOwner));
+				: Option.getOrUndefined(isGridRuntimeItemFn(runtimeOwner));
 		if (owner === undefined) continue;
 		const detached = yield* detachLineInputSourceFx({
 			runtime: deliveryRuntime,

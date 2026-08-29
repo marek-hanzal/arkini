@@ -5,7 +5,7 @@ import { useGameFx } from "~/engine/game/fx/useGameFx";
 import type { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import { readOwnerJobQueueFx } from "~/engine/job/read/readOwnerJobQueueFx";
 import { startLineFx } from "~test/job/support/startLineTestFx";
-import { checkRuntimeLocationsFx } from "~/engine/runtime/check/checkRuntimeLocationsFx";
+import { checkRuntimeLocationsFn } from "~/engine/runtime/check/fn/checkRuntimeLocationsFn";
 import { planDropScopePlacementFx } from "~/engine/placement/fx/planDropScopePlacementFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
@@ -618,12 +618,10 @@ describe("Toolbar engine", () => {
 				toolbarSize: 0,
 			},
 		});
-		const issues = Effect.runSync(
-			checkRuntimeLocationsFx({
-				config: disabledConfig,
-				runtime,
-			}),
-		);
+		const issues = checkRuntimeLocationsFn({
+			config: disabledConfig,
+			runtime,
+		});
 
 		expect(issues).toContainEqual({
 			type: RuntimeCheckIssueEnumSchema.enum.LocationOutOfBounds,

@@ -4,7 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 
 export namespace readOutputPlacementItemEventsFx {
 	export interface Props {
@@ -19,7 +19,7 @@ export const readOutputPlacementItemEventsFx = Effect.fn("readOutputPlacementIte
 		const events: GameEventSchema.Type[] = [];
 		for (const drop of placement.drop) {
 			for (const stack of drop.placement.stack) {
-				const stackedItem = Option.getOrUndefined(yield* isGridRuntimeItemFx(stack.item));
+				const stackedItem = Option.getOrUndefined(isGridRuntimeItemFn(stack.item));
 				if (stackedItem === undefined) {
 					return yield* Effect.die(
 						new Error(
@@ -38,7 +38,7 @@ export const readOutputPlacementItemEventsFx = Effect.fn("readOutputPlacementIte
 				});
 			}
 			for (const runtimeItem of drop.placement.spawn) {
-				const item = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeItem));
+				const item = Option.getOrUndefined(isGridRuntimeItemFn(runtimeItem));
 				if (item === undefined) {
 					return yield* Effect.die(
 						new Error(

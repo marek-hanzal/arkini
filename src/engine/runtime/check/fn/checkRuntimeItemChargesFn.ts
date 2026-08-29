@@ -1,20 +1,16 @@
-import { Effect } from "effect";
-
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { ItemChargesIssueSchema } from "~/engine/runtime/schema/check/ItemChargesIssueSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { ItemChargesIssueReasonEnumSchema } from "~/engine/runtime/schema/check/ItemChargesIssueReasonEnumSchema";
 
-export namespace checkRuntimeItemChargesFx {
+export namespace checkRuntimeItemChargesFn {
 	export interface Props {
 		runtime: RuntimeSchema.Type;
 	}
 }
 
 /** Reports every non-canonical live item charge state. */
-export const checkRuntimeItemChargesFx = Effect.fn("checkRuntimeItemChargesFx")(function* ({
-	runtime,
-}: checkRuntimeItemChargesFx.Props) {
+export const checkRuntimeItemChargesFn = ({ runtime }: checkRuntimeItemChargesFn.Props) => {
 	const issues: ItemChargesIssueSchema.Type[] = [];
 
 	for (const item of runtime.items) {
@@ -64,4 +60,4 @@ export const checkRuntimeItemChargesFx = Effect.fn("checkRuntimeItemChargesFx")(
 	}
 
 	return issues;
-});
+};

@@ -4,7 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
 import { readGridLocationOccupantsFn } from "~/engine/location/fn/readGridLocationOccupantsFn";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { isGridRuntimeItemFn } from "~/engine/runtime/read/fn/isGridRuntimeItemFn";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -22,7 +22,7 @@ export const readAvailableStackItemsFx = Effect.fn("readAvailableStackItemsFx")(
 	locations,
 	runtime,
 }: readAvailableStackItemsFx.Props) {
-	const gridItems = Array.getSomes(yield* Effect.forEach(runtime.items, isGridRuntimeItemFx));
+	const gridItems = Array.getSomes(runtime.items.map(isGridRuntimeItemFn));
 	const occupants = readGridLocationOccupantsFn({
 		items: gridItems,
 		locations,

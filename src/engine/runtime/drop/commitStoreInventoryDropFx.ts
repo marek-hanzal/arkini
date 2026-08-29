@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
-import { makeDropRejectedResultFx } from "~/engine/runtime/drop/makeDropRejectedResultFx";
+import { makeDropRejectedResultFn } from "~/engine/runtime/drop/fn/makeDropRejectedResultFn";
 import { projectDropTransferActorFx } from "~/engine/runtime/drop/projectDropTransferActorFx";
 import { DropItemRejectedReason } from "~/engine/runtime/DropItemResult";
 import type { DropItemResult } from "~/engine/runtime/DropItemResult";
@@ -46,59 +46,75 @@ export const commitStoreInventoryDropFx = Effect.fn("commitStoreInventoryDropFx"
 		),
 		Effect.catchTags({
 			ItemNotFoundError: (error) =>
-				makeDropRejectedResultFx({
-					reason:
-						error.itemId === props.inventoryItemId
-							? DropItemRejectedReason.StaleTarget
-							: DropItemRejectedReason.StaleSource,
-					sourceItemId: props.sourceItemId,
-					targetItemId: props.inventoryItemId,
-				}),
+				Effect.succeed(
+					makeDropRejectedResultFn({
+						reason:
+							error.itemId === props.inventoryItemId
+								? DropItemRejectedReason.StaleTarget
+								: DropItemRejectedReason.StaleSource,
+						sourceItemId: props.sourceItemId,
+						targetItemId: props.inventoryItemId,
+					}),
+				),
 			RevisionConflictError: (error) =>
-				makeDropRejectedResultFx({
-					reason:
-						error.entityId === props.inventoryItemId
-							? DropItemRejectedReason.StaleTarget
-							: DropItemRejectedReason.StaleSource,
-					sourceItemId: props.sourceItemId,
-					targetItemId: props.inventoryItemId,
-				}),
+				Effect.succeed(
+					makeDropRejectedResultFn({
+						reason:
+							error.entityId === props.inventoryItemId
+								? DropItemRejectedReason.StaleTarget
+								: DropItemRejectedReason.StaleSource,
+						sourceItemId: props.sourceItemId,
+						targetItemId: props.inventoryItemId,
+					}),
+				),
 			ItemLocationConflictError: () =>
-				makeDropRejectedResultFx({
-					reason: DropItemRejectedReason.StaleSource,
-					sourceItemId: props.sourceItemId,
-					targetItemId: props.inventoryItemId,
-				}),
+				Effect.succeed(
+					makeDropRejectedResultFn({
+						reason: DropItemRejectedReason.StaleSource,
+						sourceItemId: props.sourceItemId,
+						targetItemId: props.inventoryItemId,
+					}),
+				),
 			ItemNotOnGridError: () =>
-				makeDropRejectedResultFx({
-					reason: DropItemRejectedReason.InvalidSource,
-					sourceItemId: props.sourceItemId,
-					targetItemId: props.inventoryItemId,
-				}),
+				Effect.succeed(
+					makeDropRejectedResultFn({
+						reason: DropItemRejectedReason.InvalidSource,
+						sourceItemId: props.sourceItemId,
+						targetItemId: props.inventoryItemId,
+					}),
+				),
 			ItemInventoryStorageUnavailableError: () =>
-				makeDropRejectedResultFx({
-					reason: DropItemRejectedReason.InvalidTarget,
-					sourceItemId: props.sourceItemId,
-					targetItemId: props.inventoryItemId,
-				}),
+				Effect.succeed(
+					makeDropRejectedResultFn({
+						reason: DropItemRejectedReason.InvalidTarget,
+						sourceItemId: props.sourceItemId,
+						targetItemId: props.inventoryItemId,
+					}),
+				),
 			ItemInventoryTargetInvalidError: () =>
-				makeDropRejectedResultFx({
-					reason: DropItemRejectedReason.InvalidTarget,
-					sourceItemId: props.sourceItemId,
-					targetItemId: props.inventoryItemId,
-				}),
+				Effect.succeed(
+					makeDropRejectedResultFn({
+						reason: DropItemRejectedReason.InvalidTarget,
+						sourceItemId: props.sourceItemId,
+						targetItemId: props.inventoryItemId,
+					}),
+				),
 			ItemStatefulError: () =>
-				makeDropRejectedResultFx({
-					reason: DropItemRejectedReason.Blocked,
-					sourceItemId: props.sourceItemId,
-					targetItemId: props.inventoryItemId,
-				}),
+				Effect.succeed(
+					makeDropRejectedResultFn({
+						reason: DropItemRejectedReason.Blocked,
+						sourceItemId: props.sourceItemId,
+						targetItemId: props.inventoryItemId,
+					}),
+				),
 			PlacementUnavailableError: () =>
-				makeDropRejectedResultFx({
-					reason: DropItemRejectedReason.Blocked,
-					sourceItemId: props.sourceItemId,
-					targetItemId: props.inventoryItemId,
-				}),
+				Effect.succeed(
+					makeDropRejectedResultFn({
+						reason: DropItemRejectedReason.Blocked,
+						sourceItemId: props.sourceItemId,
+						targetItemId: props.inventoryItemId,
+					}),
+				),
 		}),
 	);
 });

@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 
 import {
-	projectDropActorCurrentFx,
+	projectDropActorCurrentFn,
 	type DropTransferActor,
-} from "~/engine/runtime/drop/projectDropActorCurrentFx";
+} from "~/engine/runtime/drop/fn/projectDropActorCurrentFn";
 
 /** Projects the shared before/after actor shape used by drop commit results. */
 export const projectDropTransferActorFx = Effect.fnUntraced(function* ({
@@ -19,6 +19,6 @@ export const projectDropTransferActorFx = Effect.fnUntraced(function* ({
 		previousRevision: before.revision,
 		previousLocation: before.location,
 		previousQuantity: before.quantity,
-		current: yield* projectDropActorCurrentFx(after),
+		current: projectDropActorCurrentFn(after),
 	};
 });

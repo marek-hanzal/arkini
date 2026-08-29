@@ -1,7 +1,6 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { analyzeEditorProjectCompatibilityFx } from "~/editor/version/analyzeEditorProjectCompatibilityFx";
+import { analyzeEditorProjectCompatibilityFn } from "~/editor/version/fn/analyzeEditorProjectCompatibilityFn";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { editorTestConfig } from "~test/editor/support/editorTestPayload";
 import {
@@ -11,7 +10,7 @@ import {
 } from "~test/validation/support/gameValidationTestSource";
 
 const analyze = (previous: GameConfigSchema.Type, next: GameConfigSchema.Type) =>
-	Effect.runSync(analyzeEditorProjectCompatibilityFx(previous, next));
+	analyzeEditorProjectCompatibilityFn(previous, next);
 
 const withProducer = () => {
 	const producer = createProducerItem({
@@ -34,7 +33,7 @@ const withProducer = () => {
 	});
 };
 
-describe("analyzeEditorProjectCompatibilityFx semantic diff", () => {
+describe("analyzeEditorProjectCompatibilityFn semantic diff", () => {
 	it("normalizes equivalent defaults and ignores record order", () => {
 		const previous = withProducer();
 		const next = GameConfigSchema.parse({

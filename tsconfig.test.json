@@ -43,6 +43,7 @@
 		"src/item-authoring",
 		"src/flow",
 		"src/estimate",
+		"src/application-diagnostics",
 		"src/renderer",
 		"src/ui",
 		"test",

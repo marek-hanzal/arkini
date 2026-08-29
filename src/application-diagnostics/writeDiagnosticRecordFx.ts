@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { DiagnosticRecord } from "../../../electron/contract/diagnostics/DiagnosticRecord";
+import type { DiagnosticRecord } from "../../electron/contract/diagnostics/DiagnosticRecord";
 
 let warnedAboutDiagnosticFailure = false;
 

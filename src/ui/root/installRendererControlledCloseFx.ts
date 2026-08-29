@@ -4,7 +4,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerAtom";
 import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
 import { EditorUnsavedChanges } from "~/authoring-session/EditorUnsavedChanges";
-import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
+import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
 import { waitForActionLoadingCompletionFrameFx } from "~/ui/loading/waitForActionLoadingCompletionFrameFx";

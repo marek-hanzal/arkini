@@ -3,9 +3,9 @@ import { Effect } from "effect";
 import { useEffect } from "react";
 
 import { readRendererLifecycleFx } from "~/renderer/lifecycle/readRendererLifecycleFx";
-import { openDiagnosticDirectoryFx } from "~/renderer/diagnostics/openDiagnosticDirectoryFx";
-import { toDiagnosticValueFn } from "~/renderer/diagnostics/fn/toDiagnosticValueFn";
-import { writeDiagnosticRecordFx } from "~/renderer/diagnostics/writeDiagnosticRecordFx";
+import { openDiagnosticDirectoryFx } from "~/application-diagnostics/openDiagnosticDirectoryFx";
+import { toDiagnosticValueFn } from "~/application-diagnostics/fn/toDiagnosticValueFn";
+import { writeDiagnosticRecordFx } from "~/application-diagnostics/writeDiagnosticRecordFx";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
 import { Button, DangerButton } from "~/ui/button/Button";
 import { Canvas } from "~/ui/canvas/Canvas";

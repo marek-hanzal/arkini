@@ -9,7 +9,7 @@ import {
 } from "~/project-authoring/EditorProjectDescriptor";
 import { invokeEditorProjectTransportFx } from "~/project-authoring/repository/invokeEditorProjectTransportFx";
 import { RendererRuntime } from "~/renderer/RendererRuntime";
-import { readExactCauseFailureFn } from "~/renderer/diagnostics/fn/readExactCauseFailureFn";
+import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import { importEditorArkpackFileFx } from "~/project-authoring/welcome/importEditorArkpackFileFx";
 
 export namespace EditorWelcomeCommandAtom {

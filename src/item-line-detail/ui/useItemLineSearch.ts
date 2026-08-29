@@ -1,11 +1,16 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { match } from "ts-pattern";
 
+import type { ItemDetailLines } from "~/item-line-detail/ui/ItemDetailLines";
 import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
-import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
+import { useFuseSearch } from "~/ui/search/useFuseSearch";
 
-/** Builds the stable semantic Fuse corpus for the current visible product lines. */
-export const useItemLineSearchCandidates = (
+type ItemLineAvailabilityFilter = "available" | "all";
+
+const isAvailableLineFn = (line: ItemDetailLines.Line) =>
+	line.availability.kind === "available" || line.activeJob !== undefined;
+
+const useItemLineSearchCandidates = (
 	lines: Extract<
 		ItemDetailLines.Projection,
 		{
@@ -14,7 +19,7 @@ export const useItemLineSearchCandidates = (
 	>,
 ) =>
 	useMemo(() => {
-		const chargeSearchTerms = (charges: ItemDetailLines.ChargeCost | undefined) =>
+		const readChargeSearchTermsFn = (charges: ItemDetailLines.ChargeCost | undefined) =>
 			charges === undefined
 				? []
 				: charges.from === "self"
@@ -30,7 +35,7 @@ export const useItemLineSearchCandidates = (
 							"target charge",
 							"deposit charge",
 						];
-		const inputSearchTerms = (input: ItemDetailLines.Input): readonly string[] =>
+		const readInputSearchTermsFn = (input: ItemDetailLines.Input): readonly string[] =>
 			match(input)
 				.with(
 					{
@@ -51,7 +56,7 @@ export const useItemLineSearchCandidates = (
 									materials.detail.itemId,
 									materials.detail.title,
 								]),
-						...chargeSearchTerms(materials.charges),
+						...readChargeSearchTermsFn(materials.charges),
 					],
 				)
 				.with(
@@ -73,7 +78,7 @@ export const useItemLineSearchCandidates = (
 									deposit.detail.itemId,
 									deposit.detail.title,
 								]),
-						...chargeSearchTerms(deposit.charges),
+						...readChargeSearchTermsFn(deposit.charges),
 					],
 				)
 				.with(
@@ -84,16 +89,16 @@ export const useItemLineSearchCandidates = (
 						"input",
 						"owner charge",
 						simple.ready ? "ready" : "missing inputs",
-						...chargeSearchTerms(simple.charges),
+						...readChargeSearchTermsFn(simple.charges),
 					],
 				)
 				.exhaustive();
-		const outputItemSearchTerms = (item: ItemDetailLines.OutputItem) => [
+		const readOutputItemSearchTermsFn = (item: ItemDetailLines.OutputItem) => [
 			"output",
 			item.itemId,
 			item.title,
 		];
-		const outputRollSearchTerms = (roll: ItemDetailLines.OutputRoll): readonly string[] =>
+		const readOutputRollSearchTermsFn = (roll: ItemDetailLines.OutputRoll): readonly string[] =>
 			match(roll)
 				.with(
 					{
@@ -101,7 +106,7 @@ export const useItemLineSearchCandidates = (
 					},
 					(guaranteed) => [
 						"guaranteed",
-						...guaranteed.item.flatMap(outputItemSearchTerms),
+						...guaranteed.item.flatMap(readOutputItemSearchTermsFn),
 					],
 				)
 				.with(
@@ -110,7 +115,7 @@ export const useItemLineSearchCandidates = (
 					},
 					(chance) => [
 						"chance",
-						...chance.item.flatMap(outputItemSearchTerms),
+						...chance.item.flatMap(readOutputItemSearchTermsFn),
 					],
 				)
 				.with(
@@ -121,12 +126,12 @@ export const useItemLineSearchCandidates = (
 						"weighted",
 						"selection",
 						...weight.option.flatMap((option) =>
-							option.item.flatMap(outputItemSearchTerms),
+							option.item.flatMap(readOutputItemSearchTermsFn),
 						),
 					],
 				)
 				.exhaustive();
-		const availabilityLabel = (availability: ItemDetailLines.Availability) =>
+		const readAvailabilityLabelFn = (availability: ItemDetailLines.Availability) =>
 			match(availability)
 				.with(
 					{
@@ -162,7 +167,7 @@ export const useItemLineSearchCandidates = (
 				line.lineId,
 				line.title,
 				line.description,
-				availabilityLabel(line.availability),
+				readAvailabilityLabelFn(line.availability),
 				...(line.actions.enqueue.enabled
 					? [
 							"enqueue",
@@ -190,10 +195,87 @@ export const useItemLineSearchCandidates = (
 								)
 								.exhaustive(),
 						]),
-				...line.input.flatMap(inputSearchTerms),
-				...line.output.flatMap((set) => set.roll.flatMap(outputRollSearchTerms)),
+				...line.input.flatMap(readInputSearchTermsFn),
+				...line.output.flatMap((set) => set.roll.flatMap(readOutputRollSearchTermsFn)),
 			],
 		}));
 	}, [
 		lines.line,
 	]);
+
+/** Owns local filtering and resolves semantic search identities in authored line order. */
+export const useItemLineSearch = (
+	lines: Extract<
+		ItemDetailLines.Projection,
+		{
+			readonly kind: "available";
+		}
+	>,
+	initialQuery = "",
+	ignoreAvailability = false,
+) => {
+	const [query, setQuery] = useState(initialQuery);
+	const availableLineCount = useMemo(
+		() => lines.line.filter(isAvailableLineFn).length,
+		[
+			lines.line,
+		],
+	);
+	const [availabilityFilter, setAvailabilityFilter] = useState<ItemLineAvailabilityFilter>(() =>
+		ignoreAvailability || initialQuery.trim() !== "" || availableLineCount === 0
+			? "all"
+			: "available",
+	);
+	useEffect(() => {
+		if (availabilityFilter !== "available" || availableLineCount !== 0) return;
+		setAvailabilityFilter("all");
+	}, [
+		availabilityFilter,
+		availableLineCount,
+	]);
+	const selectedLines = useMemo(
+		() =>
+			ignoreAvailability || availabilityFilter === "all"
+				? lines.line
+				: lines.line.filter(isAvailableLineFn),
+		[
+			availabilityFilter,
+			ignoreAvailability,
+			lines.line,
+		],
+	);
+	const selectedProjection = useMemo(
+		() => ({
+			...lines,
+			line: selectedLines,
+		}),
+		[
+			lines,
+			selectedLines,
+		],
+	);
+	const searchCandidates = useItemLineSearchCandidates(selectedProjection);
+	const matchingLineIds = useFuseSearch(searchCandidates, query);
+	const matchingLineIdSet = useMemo(
+		() => new Set(matchingLineIds),
+		[
+			matchingLineIds,
+		],
+	);
+	const filteredLines = useMemo(
+		() => selectedLines.filter((line) => matchingLineIdSet.has(line.lineId)),
+		[
+			matchingLineIdSet,
+			selectedLines,
+		],
+	);
+	return {
+		availabilityFilter,
+		availableLineCount,
+		setAvailabilityFilter,
+		query,
+		setQuery,
+		filteredLines,
+		normalizedQuery: query.trim(),
+	};
+};

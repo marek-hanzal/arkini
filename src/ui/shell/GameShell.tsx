@@ -6,7 +6,7 @@ import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
 import { ItemDetailHigherOwnerGuard } from "~/item-detail-frame/ItemDetailHigherOwnerGuard";
 import type { ItemDetailHeaderIdentityRenderer } from "~/item-detail-frame/ItemDetailHeader";
-import type { ItemLineSummaryIdentityRenderer } from "~/ui/item-detail/ItemLineSummary";
+import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/item-detail-frame/ItemDetailProvider";
 import { RouteBackdrop } from "~/ui/navigation/RouteBackdrop";

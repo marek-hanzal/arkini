@@ -1,20 +1,111 @@
 import { ListX, SearchX, type LucideIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import type { ReactNode } from "react";
+import { useCallback, useLayoutEffect, useRef, type ReactNode } from "react";
 
-import type { ItemDetailLines } from "~/ui/item-detail/ItemDetailLines";
+import type { ItemDetailLines } from "~/item-line-detail/ui/ItemDetailLines";
 import {
 	itemDetailFadeMotion,
 	itemDetailMotionTransition,
 } from "~/item-detail-frame/ItemDetailMotion";
-import { ItemLineRow } from "~/ui/item-detail/ItemLineRow";
-import type { ItemLineSummaryIdentityRenderer } from "~/ui/item-detail/ItemLineSummary";
-import {
-	type ItemLineAvailabilityFilter,
-	useItemLineSearch,
-} from "~/ui/item-detail/useItemLineSearch";
-import { useItemLinesAutoFocus } from "~/ui/item-detail/useItemLinesAutoFocus";
+import { ItemLineRow } from "~/item-line-detail/ui/ItemLineRow";
+import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
+import { useItemLineSearch } from "~/item-line-detail/ui/useItemLineSearch";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
+
+const autoFocusPadding = 12;
+const autoFocusLayoutAttempts = 24;
+
+const useItemLinesAutoFocus = ({
+	focusLineId,
+	focusLineVisible,
+	itemId,
+	stale,
+}: {
+	readonly focusLineId: string | undefined;
+	readonly focusLineVisible: boolean;
+	readonly itemId: string;
+	readonly stale: boolean;
+}) => {
+	const scrollContainerRef = useRef<HTMLDivElement>(null);
+	const rowByLineIdRef = useRef(new Map<string, HTMLElement>());
+	const focusIntentRef = useRef({
+		itemId,
+		lineId: focusLineId,
+		settled: false,
+		visible: focusLineVisible,
+	});
+	if (focusIntentRef.current.itemId !== itemId) {
+		focusIntentRef.current = {
+			itemId,
+			lineId: focusLineId,
+			settled: false,
+			visible: focusLineVisible,
+		};
+		rowByLineIdRef.current.clear();
+	}
+
+	useLayoutEffect(() => {
+		const intent = focusIntentRef.current;
+		if (intent.settled || intent.lineId === undefined || !intent.visible || stale) {
+			intent.settled = true;
+			return;
+		}
+		let attempts = 0;
+		let frame: number | undefined;
+		const attempt = () => {
+			if (focusIntentRef.current !== intent || intent.settled) return;
+			const container = scrollContainerRef.current;
+			const row = rowByLineIdRef.current.get(intent.lineId ?? "");
+			if (container !== null && row !== undefined) {
+				const containerRect = container.getBoundingClientRect();
+				const rowRect = row.getBoundingClientRect();
+				if (
+					containerRect.height > 0 &&
+					rowRect.height > 0 &&
+					containerRect.width > 0 &&
+					rowRect.width > 0
+				) {
+					if (rowRect.top < containerRect.top || rowRect.bottom > containerRect.bottom) {
+						const visibleTop = containerRect.top + autoFocusPadding;
+						const visibleBottom = containerRect.bottom - autoFocusPadding;
+						const delta =
+							rowRect.height > visibleBottom - visibleTop || rowRect.top < visibleTop
+								? rowRect.top - visibleTop
+								: rowRect.bottom - visibleBottom;
+						container.scrollTop = Math.max(0, container.scrollTop + delta);
+					}
+					intent.settled = true;
+					return;
+				}
+			}
+			attempts++;
+			if (attempts >= autoFocusLayoutAttempts) {
+				intent.settled = true;
+				return;
+			}
+			frame = requestAnimationFrame(attempt);
+		};
+		frame = requestAnimationFrame(attempt);
+		return () => {
+			if (frame !== undefined) cancelAnimationFrame(frame);
+		};
+	}, [
+		itemId,
+	]);
+
+	const registerRow = useCallback((lineId: string, row: HTMLElement | null) => {
+		if (row === null) {
+			rowByLineIdRef.current.delete(lineId);
+		} else {
+			rowByLineIdRef.current.set(lineId, row);
+		}
+	}, []);
+
+	return {
+		registerRow,
+		scrollContainerRef,
+	} as const;
+};
 
 const availabilityOptions = [
 	{
@@ -27,7 +118,7 @@ const availabilityOptions = [
 	},
 ] as const satisfies readonly {
 	readonly label: string;
-	readonly value: ItemLineAvailabilityFilter;
+	readonly value: "available" | "all";
 }[];
 
 const ItemLinesEmptyState = ({

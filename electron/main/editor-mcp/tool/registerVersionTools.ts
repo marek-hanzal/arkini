@@ -8,12 +8,12 @@ import type {
 	EditorProjectVersionDescriptor,
 	EditorProjectVersionDiff,
 	EditorProjectVersionReference,
-} from "~/editor/version/EditorProjectVersion";
+} from "~/project-version/EditorProjectVersion";
 import {
 	EditorProjectVersionBodySchema,
 	EditorProjectVersionSubjectSchema,
 	EditorProjectVersionTagSchema,
-} from "~/editor/version/EditorProjectVersionMetadataSchema";
+} from "~/project-version/EditorProjectVersionMetadataSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 
 type ToolResult = {

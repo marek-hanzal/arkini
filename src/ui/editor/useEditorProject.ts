@@ -1,6 +1,9 @@
-import { useContext } from "react";
+import { createContext, useContext } from "react";
 
-import { EditorProjectContext } from "~/ui/editor/EditorProjectContext";
+import type { EditorProject } from "~/editor/EditorProject";
+
+/** Carries the latest canonical repository snapshot through one mounted project route. */
+export const EditorProjectContext = createContext<EditorProject | undefined>(undefined);
 
 /** Reads the latest canonical editor project snapshot published by its repository owner. */
 export const useEditorProject = () => {

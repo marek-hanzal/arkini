@@ -13,7 +13,7 @@ import type {
 	EditorItemSectionId,
 } from "~/item-authoring/ui/EditorItemSections";
 import { readEditorItemFormSectionsFn } from "~/item-authoring/ui/fn/readEditorItemFormSectionsFn";
-import { EditorCompatibilityNotice } from "~/ui/editor/EditorCompatibilityNotice";
+import { EditorCompatibilityNotice } from "~/project-version/workspace/EditorCompatibilityNotice";
 import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import { useEditorItemFormController } from "~/item-authoring/ui/useEditorItemFormController";
 

@@ -1,6 +1,6 @@
 import type { EditorProject } from "~/editor/EditorProject";
 import type { EditorProjectFormSchema } from "~/ui/project/editor/EditorProjectFormSchema";
-import { analyzeEditorProjectCompatibilityFn } from "~/editor/version/fn/analyzeEditorProjectCompatibilityFn";
+import { analyzeEditorProjectCompatibilityFn } from "~/project-version/fn/analyzeEditorProjectCompatibilityFn";
 import { SizeSchema } from "~/engine/grid/schema/SizeSchema";
 import { ToolbarSizeSchema } from "~/engine/meta/schema/ToolbarSizeSchema";
 

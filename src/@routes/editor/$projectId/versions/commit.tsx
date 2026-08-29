@@ -4,7 +4,7 @@ import { CircleCheckBig } from "lucide-react";
 import { PrimaryButton } from "~/ui/button/Button";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
 import { Status } from "~/ui/status/Status";
-import { useEditorVersionCommitController } from "~/ui/version/editor/useEditorVersionCommitController";
+import { useEditorVersionCommitController } from "~/project-version/workspace/useEditorVersionCommitController";
 
 interface EditorVersionCommitSearch {
 	readonly returnTo?: string;

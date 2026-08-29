@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 
 import { useEditorProject } from "~/ui/editor/useEditorProject";
-import { EditorCompatibilityNotice } from "~/ui/editor/EditorCompatibilityNotice";
+import { EditorCompatibilityNotice } from "~/project-version/workspace/EditorCompatibilityNotice";
 import { EditorHistoryBackButton } from "~/ui/editor/EditorHistoryBackButton";
 import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
 import { EditorFormSectionPage } from "~/ui/form/EditorFormSectionPage";

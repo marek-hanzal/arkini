@@ -8,7 +8,16 @@ const productDomainPattern = "^src/(?:item-authoring|flow|estimate|editor-build)
 const productRendererPattern = "^src/(?:arkpack|editor-build)/renderer(?:/|$)";
 const productPresentationPattern =
 	"^src/(?:item-authoring|flow|estimate)/(?:ui|worker)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)";
-const reusablePresentationPattern = `^src/ui(?:/|$)|${productPresentationPattern}`;
+const authoringProductPattern =
+	"^src/(?:project-authoring|board-scenario|project-version|project-note|authoring-mcp|authoring-shell)(?:/|$)";
+const authoringProductCorePattern =
+	"^src/(?:board-scenario/(?!session(?:/|$)|toolbar(?:/|$))|project-version/(?!workspace(?:/|$))|project-note/(?!workspace(?:/|$))|project-authoring/(?!configuration(?:/|$)|repository(?:/|$)|welcome(?:/|$)))";
+const authoringProductRuntimePattern =
+	"^src/(?:board-scenario/session|project-authoring/repository)(?:/|$)";
+const authoringProductPresentationPattern =
+	"^src/(?:authoring-mcp|authoring-shell)(?:/|$)|^src/(?:board-scenario/toolbar|project-version/workspace|project-note/workspace|project-authoring/(?:configuration|welcome))(?:/|$)";
+const reusablePresentationPattern =
+	`^src/ui(?:/|$)|${productPresentationPattern}|${authoringProductPresentationPattern}`;
 
 /** @type {import('dependency-cruiser').IForbiddenRuleType[]} */
 const boundaryRules = [
@@ -21,7 +30,7 @@ const boundaryRules = [
 			path: "^src/engine(?:/|$)",
 		},
 		to: {
-			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}`,
+			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}`,
 		},
 	},
 	{
@@ -33,7 +42,7 @@ const boundaryRules = [
 			path: gameConfigPattern,
 		},
 		to: {
-			path: `^src/(?:arkpack|editor-build|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+			path: `^src/(?:arkpack|editor-build|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
 		},
 	},
 	{
@@ -69,7 +78,7 @@ const boundaryRules = [
 			path: arkpackArtifactPattern,
 		},
 		to: {
-			path: `^src/arkpack/(?:renderer|ui)(?:/|$)|^src/editor-build(?:/|$)|^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+			path: `^src/arkpack/(?:renderer|ui)(?:/|$)|^src/editor-build(?:/|$)|^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
 		},
 	},
 	{
@@ -181,7 +190,34 @@ const boundaryRules = [
 			path: productDomainPattern,
 		},
 		to: {
-			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductRuntimePattern}|${authoringProductPresentationPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+		},
+	},
+	{
+		name: "authoring-products-no-route-or-electron-runtime-imports",
+		comment:
+			"Project Authoring, Board Scenario, Project Version, Project Note, Authoring MCP, and Authoring Shell own renderer-safe product semantics; route registration and privileged Electron runtime stay outside them.",
+		severity: "error",
+		from: {
+			path: authoringProductPattern,
+		},
+		to: {
+			path: "^src/@routes(?:/|$)|^electron(?:/|$)|^node_modules/electron(?:/|$)",
+			pathNot: [
+				"^electron/contract(?:/|$)",
+			],
+		},
+	},
+	{
+		name: "authoring-product-core-no-presentation-imports",
+		comment:
+			"Portable authoring schemas, policies, and repository contracts remain framework-neutral even when their product root also owns an explicit workspace, session, toolbar, configuration, or welcome surface.",
+		severity: "error",
+		from: {
+			path: authoringProductCorePattern,
+		},
+		to: {
+			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productPresentationPattern}|${authoringProductRuntimePattern}|${authoringProductPresentationPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
 		},
 	},
 	{
@@ -193,7 +229,7 @@ const boundaryRules = [
 			path: `^src/renderer(?:/|$)|${productRendererPattern}`,
 		},
 		to: {
-			path: `^src/(?:ui|@routes)(?:/|$)|${productPresentationPattern}`,
+			path: `^src/(?:ui|@routes)(?:/|$)|${productPresentationPattern}|${authoringProductPresentationPattern}`,
 		},
 	},
 	{
@@ -310,7 +346,7 @@ const boundaryRules = [
 			path: "^electron/main(?:/|$)",
 		},
 		to: {
-			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}`,
+			path: `^src/(?:renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductRuntimePattern}|${authoringProductPresentationPattern}`,
 		},
 	},
 	{
@@ -349,7 +385,7 @@ const boundaryRules = [
 			"Framework-neutral Engine, authored Game configuration, Arkpack artifacts, shared Editor, and product domains never depend on Electron transport contracts.",
 		severity: "error",
 		from: {
-			path: `^src/(?:engine|editor)(?:/|$)|${gameConfigPattern}|${arkpackArtifactPattern}|${productDomainPattern}`,
+			path: `^src/(?:engine|editor)(?:/|$)|${gameConfigPattern}|${arkpackArtifactPattern}|${productDomainPattern}|${authoringProductCorePattern}`,
 		},
 		to: {
 			path: "^electron/contract(?:/|$)",

@@ -1,6 +1,6 @@
 import type { EditorProject } from "~/editor/EditorProject";
 import { EditorProjectFormBaseSchema } from "~/ui/project/editor/EditorProjectFormSchema";
-import { readEditorProjectStartItemIdsFn } from "~/editor/project/fn/readEditorProjectStartItemIdsFn";
+import { readEditorProjectStartItemIdsFn } from "~/project-authoring/fn/readEditorProjectStartItemIdsFn";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 /** Adds project-local resource and authored-start invariants to canonical field schemas. */

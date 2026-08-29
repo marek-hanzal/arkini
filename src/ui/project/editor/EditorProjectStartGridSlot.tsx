@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 import { type PointerEvent as ReactPointerEvent, type RefObject } from "react";
 
-import type { EditorProjectStartScope } from "~/editor/project/EditorProjectStartScope";
+import type { EditorProjectStartScope } from "~/project-authoring/EditorProjectStartScope";
 import { EditorItemThumbnail } from "~/ui/item/EditorItemThumbnail";
 import type {
 	EditorProjectStartGridCell,

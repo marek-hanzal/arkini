@@ -1,18 +1,18 @@
 import { Context, type Effect } from "effect";
 
 import type { EditorProject, EditorProjectCommit } from "~/editor/EditorProject";
-import type { EditorProjectCandidate } from "~/editor/EditorProjectCandidate";
+import type { EditorProjectCandidate } from "~/project-authoring/EditorProjectCandidate";
 import type { EditorProjectRepositoryError } from "~/editor/EditorProjectRepositoryError";
-import type { EditorNoteSchema } from "~/editor/note/EditorNoteSchema";
+import type { EditorNoteSchema } from "~/project-note/EditorNoteSchema";
 import type {
 	EditorBoardScenarioDescriptorSchema,
 	EditorBoardScenarioSchema,
-} from "~/editor/board/EditorBoardScenarioSchema";
+} from "~/board-scenario/EditorBoardScenarioSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
-import type { EditorProjectVersionRepositoryService } from "~/editor/version/EditorProjectVersion";
+import type { EditorProjectVersionRepositoryService } from "~/project-version/EditorProjectVersion";
 
 export namespace EditorProjectRepository {
 	export interface CreateProjectProps {

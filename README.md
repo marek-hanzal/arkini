@@ -47,7 +47,7 @@ src/tile-rendering  Pixi application/frame/texture lifecycle, native actors, vis
 src/tile-motion  retained tile-motion lanes, choreography, magnetic response and playback lifecycle
 src/tile-interaction  pointer gestures, drag/drop execution, gameplay command admission and cancellation
 src/item-definition  immutable authored Item schemas, query/selector vocabulary and total selection policy
-src/item-location  grid coordinates, distance, runtime locations, claims and cross-space identity
+src/item-location  grid coordinates, distance, runtime locations, claims and Board/grid location rejections
 src/item-placement  scope-aware stack, spawn, output and existing-item placement
 src/item-merge  directional merge contracts, admission and atomic source/target lifecycle
 src/space-action  authored Space items and atomic activation/navigation

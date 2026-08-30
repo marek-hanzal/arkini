@@ -8,6 +8,7 @@ const uiModulePattern = "^src/(?:ui|[^\\n]*/ui)(?:/|$)";
 const routeModulePattern = "^src/@routes(?:/|$)";
 const routeCompositionPattern = "^(?:src/@routes(?:/|$)|src/_route[.]ts$)";
 const electronContractPattern = "^electron/contract(?:/|$)";
+const electronPreloadPattern = "^electron/preload(?:/|$)";
 
 /**
  * Dependency rules state the forbidden import directly: `from` must not import `to`.
@@ -201,6 +202,22 @@ module.exports = {
 				path: "^(?:src|electron)(?:/|$)|^node_modules/electron(?:/|$)",
 				pathNot: [
 					electronContractPattern,
+				],
+			},
+		},
+		{
+			name: "electron-preload-is-transport-only",
+			comment:
+				"Electron preload may consume its own modules, the pure transport contract, and the Electron bridge API, but no application or backend implementation.",
+			severity: "error",
+			from: {
+				path: electronPreloadPattern,
+			},
+			to: {
+				path: activeCodePattern,
+				pathNot: [
+					electronContractPattern,
+					electronPreloadPattern,
 				],
 			},
 		},

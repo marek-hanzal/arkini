@@ -2,7 +2,7 @@ import type { Effect } from "effect";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import type { InventoryDropTarget } from "~/ui/pixi/scene/InventoryDropTarget";
 
 type GameTransition = ReturnType<GameEngine["getTransitionSnapshot"]>;

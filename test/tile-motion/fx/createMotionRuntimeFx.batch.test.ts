@@ -4,8 +4,8 @@ import { Effect } from "effect";
 import { Container } from "pixi.js";
 import { describe, expect, it } from "vitest";
 
-import { lifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
-import { readTravelDurationMsFn } from "~/ui/pixi/animation/fn/readTravelDurationMsFn";
+import { lifecycleDurationMs } from "~/tile-rendering/fx/runActorLifecycleFx";
+import { readTravelDurationMsFn } from "~/tile-rendering/fn/readTravelDurationMsFn";
 
 import {
 	createMotionHarness,

@@ -10,8 +10,8 @@ import {
 } from "pixi.js";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
+import type { ActorVisual } from "~/tile-rendering/type/ActorVisual";
 
 export const item = {
 	id: "runtime:log",

@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import type { PresentedPose } from "~/ui/pixi/animation/ActorAnimator";
-import { createRetargetablePoseSamplerFx } from "~/ui/pixi/animation/createRetargetablePoseSamplerFx";
+import type { PresentedPose } from "~/tile-rendering/service/ActorAnimator";
+import { createRetargetablePoseSamplerFx } from "~/tile-rendering/fx/createRetargetablePoseSamplerFx";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
 

@@ -3,7 +3,7 @@ import { type PropsWithChildren, useEffect, useMemo, useRef } from "react";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { PixiGameRuntimeContext } from "~/ui/pixi/PixiGameRuntimeContext";
 import { createGameInteractionControlFx } from "~/tile-interaction/fx/createGameInteractionControlFx";
-import { createTextureStoreFx } from "~/ui/pixi/runtime/createTextureStoreFx";
+import { createTextureStoreFx } from "~/tile-rendering/fx/createTextureStoreFx";
 
 /**
  * Owns route-local capabilities that must survive Board and Inventory scene alternation.

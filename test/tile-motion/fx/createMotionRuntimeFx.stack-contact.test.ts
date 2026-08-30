@@ -3,8 +3,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { lifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
-import { startActorExitFx } from "~/ui/pixi/animation/startActorExitFx";
+import { lifecycleDurationMs } from "~/tile-rendering/fx/runActorLifecycleFx";
+import { startActorExitFx } from "~/tile-rendering/fx/startActorExitFx";
 
 import {
 	createActor,

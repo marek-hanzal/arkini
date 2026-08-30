@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
 import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
-import { lifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
+import { lifecycleDurationMs } from "~/tile-rendering/fx/runActorLifecycleFx";
 
 import {
 	boardLocation,

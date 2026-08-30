@@ -2,13 +2,13 @@ import type { GameEngine } from "~/renderer/game/GameEngine";
 
 import { afterEach, beforeEach, vi } from "vitest";
 
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 
-import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
+import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 
-import { feedbackDurationMs } from "~/ui/pixi/animation/runActivityParticlesFx";
+import { feedbackDurationMs } from "~/tile-rendering/fx/runActivityParticlesFx";
 
 import { Effect } from "effect";
 
@@ -200,7 +200,7 @@ vi.mock("pixi.js", () => {
 	};
 });
 
-vi.mock("~/ui/pixi/runtime/createApplicationOwnerFx", async () => {
+vi.mock("~/tile-rendering/fx/createApplicationOwnerFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
 		createApplicationOwnerFx: ({ host }: { readonly host: HTMLElement }) =>
@@ -260,7 +260,7 @@ vi.mock("~/ui/pixi/runtime/createApplicationOwnerFx", async () => {
 	};
 });
 
-vi.mock("~/ui/pixi/actor/createParticleTexturesFx", async () => {
+vi.mock("~/tile-rendering/fx/createParticleTexturesFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
 		createParticleTexturesFx: () =>
@@ -271,7 +271,7 @@ vi.mock("~/ui/pixi/actor/createParticleTexturesFx", async () => {
 	};
 });
 
-vi.mock("~/ui/pixi/animation/createAnimationDriverFx", async () => {
+vi.mock("~/tile-rendering/fx/createAnimationDriverFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
 		createAnimationDriverFx: () =>
@@ -329,7 +329,7 @@ vi.mock("~/ui/pixi/animation/createAnimationDriverFx", async () => {
 	};
 });
 
-vi.mock("~/ui/pixi/appearance/readScenePaletteFx", async () => {
+vi.mock("~/tile-rendering/fx/readScenePaletteFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
 		readScenePaletteFx: () =>
@@ -376,7 +376,7 @@ vi.mock("~/tile-interaction/fx/readTileDropPreviewFx", async () => {
 	};
 });
 
-vi.mock("~/ui/pixi/actor/createTileActorFx", async () => {
+vi.mock("~/tile-rendering/fx/createTileActorFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
 		createTileActorFx: ({
@@ -449,7 +449,7 @@ vi.mock("~/ui/pixi/actor/createTileActorFx", async () => {
 	};
 });
 
-vi.mock("~/ui/pixi/actor/updateTileActorFx", async () => {
+vi.mock("~/tile-rendering/fx/updateTileActorFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
 		updateTileActorFx: ({

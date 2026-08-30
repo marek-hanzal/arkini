@@ -1,7 +1,7 @@
 import type { Effect } from "effect";
 
 import type { InventoryInteractionSurface } from "~/tile-interaction/type/InventoryInteractionSurface";
-import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
+import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 
 export interface InventoryActorPose {
 	readonly x: number;

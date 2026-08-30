@@ -33,6 +33,7 @@ src/item-line-detail  line-detail reads, board/stored projections, inputs/output
 src/item-detail  Item Detail dialog composition, remaining projections and Queue/Sources/Info presentation
 src/item-detail-frame  Item Detail target lifecycle, command settlement, reference navigation and frame presentation
 src/tile-presentation  semantic tile actors, feedback, replacements and committed motion projection
+src/tile-rendering  Pixi application/frame/texture lifecycle, native actors, visuals and animation capabilities
 src/tile-motion  retained tile-motion lanes, choreography, magnetic response and playback lifecycle
 src/tile-interaction  pointer gestures, drag/drop execution, gameplay command admission and cancellation
 src/item-definition  immutable authored Item schemas, query/selector vocabulary and total selection policy
@@ -68,7 +69,7 @@ src/launcher  renderer bootstrap, Hero lifecycle, shell/action surfaces and Abou
 src/application-diagnostics  shared renderer-side failure extraction, diagnostic normalization and transport policy
 src/application-runtime  renderer process composition, Atom bridge and native lifecycle
 src/renderer  installed Game, launcher preferences, window, resource-validation and transport capabilities
-src/ui        cross-product primitives plus retained React and Pixi implementation leaves
+src/ui        cross-product primitives plus retained React and concrete Pixi scene execution
 src/@routes   TanStack Router registration, lifecycle and route-specific composition
 electron      pure transport contract plus main/preload/platform ownership
 shared        immutable cross-process application metadata and hard limits only

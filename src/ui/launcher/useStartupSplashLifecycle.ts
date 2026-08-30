@@ -4,7 +4,7 @@ import { Cause, Effect, Fiber } from "effect";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { match, P } from "ts-pattern";
 
-import { RendererLifecycleOwnerAtom } from "~/application-runtime/fx/readRendererLifecycleFx";
+import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
 import { RendererLifecycleUnavailableError } from "~/application-runtime/fx/readRendererLifecycleFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { completeLauncherSplashAtom } from "~/ui/launcher/completeLauncherSplashAtom";

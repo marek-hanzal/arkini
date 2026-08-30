@@ -8,7 +8,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ArkpackCatalog } from "~/arkpack/renderer/ArkpackCatalog";
 import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerAtom";
 import { createRendererLifecycleFx } from "~/application-runtime/fx/createRendererLifecycleFx";
-import { RendererLifecycleOwnerAtom } from "~/application-runtime/fx/readRendererLifecycleFx";
+import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
 import { LauncherAppearanceReadyAtom } from "~/ui/launcher/LauncherAppearanceReadyAtom";
 import { LauncherHeroReadyAtom } from "~/ui/launcher/LauncherHeroReadyAtom";
 import { LauncherHeroUrlAtom } from "~/ui/launcher/LauncherHeroUrlAtom";

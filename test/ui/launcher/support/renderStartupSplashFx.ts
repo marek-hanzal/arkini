@@ -15,7 +15,7 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import type { ArkpackCatalog } from "~/arkpack/renderer/ArkpackCatalog";
 import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerAtom";
-import { RendererLifecycleOwnerAtom } from "~/application-runtime/fx/readRendererLifecycleFx";
+import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
 import { createRendererLifecycleFx } from "~/application-runtime/fx/createRendererLifecycleFx";
 import { Route as StartupRouteDefinition } from "~/@routes/index";
 import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";

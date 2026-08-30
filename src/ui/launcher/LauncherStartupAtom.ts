@@ -10,7 +10,7 @@ import { readAppearanceThemeFx } from "~/ui/appearance/readAppearanceThemeFx";
 import { AppearanceAtom } from "~/ui/appearance/AppearanceAtom";
 import { applyCheatAvailabilityFx } from "~/ui/cheat-availability/applyCheatAvailabilityFx";
 import { readCheatAvailabilityFx } from "~/ui/cheat-availability/readCheatAvailabilityFx";
-import { RendererLifecycleOwnerAtom } from "~/application-runtime/fx/readRendererLifecycleFx";
+import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
 import { RendererLifecycleUnavailableError } from "~/application-runtime/fx/readRendererLifecycleFx";
 import { readWindowModeFx } from "~/renderer/window/readWindowModeFx";
 import { RendererAtomRuntime } from "~/application-runtime/atom/RendererAtomRegistry";

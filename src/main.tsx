@@ -10,7 +10,7 @@ import { ArkiniWindowTitle } from "../shared/ArkiniAppMetadata";
 import { createArkpackCatalogFx } from "~/arkpack/renderer/createArkpackCatalogFx";
 import { createRendererLifecycleFx } from "~/application-runtime/fx/createRendererLifecycleFx";
 import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerAtom";
-import { RendererLifecycleOwnerAtom } from "~/application-runtime/fx/readRendererLifecycleFx";
+import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
 import { RendererAtomRegistry } from "~/application-runtime/atom/RendererAtomRegistry";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { refreshEditorServiceStatusFx } from "~/project-authoring/welcome/refreshEditorServiceStatusFx";

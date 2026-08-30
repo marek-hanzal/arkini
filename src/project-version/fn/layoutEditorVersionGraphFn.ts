@@ -1,6 +1,6 @@
 import type { EditorProjectVersionDescriptor } from "~/project-version/type/EditorProjectVersion";
 
-export interface EditorVersionGraphRow {
+interface EditorVersionGraphRow {
 	readonly activeLanes: ReadonlyArray<number>;
 	readonly lane: number;
 	readonly parentLane?: number;

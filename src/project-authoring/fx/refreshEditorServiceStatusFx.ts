@@ -4,7 +4,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import type { EditorProjectTransport } from "../../../electron/contract/editor/EditorProjectTransport";
 import { EditorServiceStatusAtom } from "~/project-authoring/atom/EditorServiceStatusAtom";
 
-export const EditorServiceReadinessTimeoutMs = 2_000;
+const EditorServiceReadinessTimeoutMs = 2_000;
 
 const readEditorServiceDidNotRespondFn = (): EditorProjectTransport.ServiceStatus => ({
 	type: "unavailable",

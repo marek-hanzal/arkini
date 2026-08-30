@@ -1,6 +1,6 @@
 import { Context } from "effect";
 
-export type EditorUnsavedChangesDecision = "cancel" | "discard" | "save";
+type EditorUnsavedChangesDecision = "cancel" | "discard" | "save";
 
 export interface EditorUnsavedChangesSession {
 	readonly discard: () => void;

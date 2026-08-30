@@ -12,7 +12,7 @@ import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItem
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { fromRuntimeFn } from "~/game-persistence/fromRuntimeFn";
-import { startFx } from "~/game-start/startFx";
+import { startFx } from "~/game-start/fx/startFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { DefaultLineIssueReasonEnumSchema } from "~/production-line/schema/check/DefaultLineIssueReasonEnumSchema";

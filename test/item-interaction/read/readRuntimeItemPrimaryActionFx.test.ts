@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { readRuntimeItemPrimaryActionFx } from "~/item-interaction/read/readRuntimeItemPrimaryActionFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { startFx } from "~/game-start/startFx";
+import { startFx } from "~/game-start/fx/startFx";
 
 const config = GameConfigSchema.parse({
 	resources: {

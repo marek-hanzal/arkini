@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { readOutputPlacementItemEventsFx } from "~/game-event/readOutputPlacementItemEventsFx";
+import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlacementItemEventsFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";

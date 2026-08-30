@@ -1,8 +1,8 @@
 import { Effect, Option, Random } from "effect";
 
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { ItemMergedGameEventSchema } from "~/game-event/schema/ItemMergedGameEventSchema";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { MergeSameItemError } from "~/item-merge/error/MergeSameItemError";
@@ -72,8 +72,15 @@ interface MergeItemsProps {
 	readonly targetRevision: RevisionSchema.Type;
 }
 
+type ItemMergedGameEvent = Extract<
+	GameEventSchema.Type,
+	{
+		readonly type: typeof GameEventEnumSchema.enum.ItemMerged;
+	}
+>;
+
 interface MergeItemsResult {
-	readonly event: ItemMergedGameEventSchema.Type;
+	readonly event: ItemMergedGameEvent;
 	readonly sourceBefore: GridRuntimeItemSchema.Type;
 	readonly targetBefore: GridRuntimeItemSchema.Type;
 	readonly sourceAfter?: GridRuntimeItemSchema.Type;
@@ -172,7 +179,7 @@ export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
 					resolved.rule.effect === TargetEffectSchema.enum.Replace
 						? resolved.rule.result
 						: undefined,
-			} satisfies ItemMergedGameEventSchema.Type;
+			} satisfies ItemMergedGameEvent;
 			const sourceAfter = nextRuntime.items.find(
 				(item): item is GridRuntimeItemSchema.Type =>
 					item.id === source.id &&

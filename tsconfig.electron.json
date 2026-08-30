@@ -45,8 +45,10 @@
 		"src/game-config",
 		"src/arkpack/type/ArkpackDescriptor.ts",
 		"src/arkpack/artifact",
-		"src/asset-authoring/domain",
-		"src/editor-build/domain",
+		"src/asset-authoring/fn",
+		"src/editor-build/fn",
+		"src/editor-build/schema",
+		"src/editor-build/service",
 		"src/project-authoring/error",
 		"src/project-authoring/fn",
 		"src/project-authoring/schema",
@@ -63,7 +65,9 @@
 		"src/item-authoring/fx/saveEditorItemWithRepositoryFx.ts",
 		"src/flow/fn",
 		"src/flow/type",
-		"src/estimate/domain",
+		"src/estimate/fn",
+		"src/estimate/schema",
+		"src/estimate/type",
 		"electron.vite.config.ts"
 	],
 	"exclude": [

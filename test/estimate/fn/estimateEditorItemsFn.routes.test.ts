@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { editorItemEstimateTestFixture } from "~test/estimate/domain/editorItemEstimateTestFixture";
+import { editorItemEstimateTestFixture } from "~test/estimate/fn/editorItemEstimateTestFixture";
 
 const { estimate, graph, requirement, route } = editorItemEstimateTestFixture;
 

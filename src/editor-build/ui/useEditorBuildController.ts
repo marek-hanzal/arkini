@@ -10,16 +10,16 @@ import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersio
 import {
 	type EditorBuildMajorUpdateConfirmation,
 	readEditorBuildInstallPlanFn,
-} from "~/editor-build/domain/fn/readEditorBuildInstallPlanFn";
+} from "~/editor-build/fn/readEditorBuildInstallPlanFn";
 import { ArkpackCatalogAtom } from "~/arkpack/ui/ArkpackCatalogAtom";
 import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 import {
 	EditorBuildRepository,
-	type EditorBuildRepository as EditorBuildRepositoryContract,
-} from "~/editor-build/domain/EditorBuildRepository";
-import type { EditorProjectBuildSchema } from "~/editor-build/domain/EditorProjectBuildSchema";
+	type EditorBuildRepositoryService,
+} from "~/editor-build/service/EditorBuildRepository";
+import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
 import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerAtom";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
@@ -31,6 +31,10 @@ import { GameValidationError } from "~/game-config/diagnostic/error/GameValidati
 import type { GameDiagnosticSchema } from "~/game-config/diagnostic/schema/GameDiagnosticSchema";
 
 type EditorGameDiagnostic = GameDiagnosticSchema.Type;
+type EditorBuildRequest = Omit<
+	Parameters<EditorBuildRepositoryService["buildProjectFx"]>[0],
+	"projectId"
+>;
 
 type EditorBuildFailure =
 	| {
@@ -81,7 +85,7 @@ const buildStatusLabels = {
 const EditorBuildCommandAtoms = RendererRuntime.runSync(
 	Effect.map(EditorBuildRepository, (repository) => ({
 		build: Atom.family((projectId: string) =>
-			Atom.fn((request: Omit<EditorBuildRepositoryContract.BuildProps, "projectId">) =>
+			Atom.fn((request: EditorBuildRequest) =>
 				repository.buildProjectFx({
 					...request,
 					projectId,
@@ -124,35 +128,33 @@ const EditorBuildCommandAtoms = RendererRuntime.runSync(
 	})),
 );
 
-export namespace useEditorBuildController {
-	export type Status = "building" | "not-built" | "stale" | "valid";
+type EditorBuildStatus = "building" | "not-built" | "stale" | "valid";
 
-	export interface Output {
-		readonly artifactSummary?: string;
-		readonly build: () => void;
-		readonly buildFailure?: EditorBuildFailure;
-		readonly buildPending: boolean;
-		readonly buildStatus: Status;
-		readonly buildStatusLabel: string;
-		readonly buildSummary: string;
-		readonly diagnostics: ReadonlyArray<EditorGameDiagnostic>;
-		readonly installArtifact: () => void;
-		readonly installAction: "install" | "update";
-		readonly installAvailable: boolean;
-		readonly installConfirmation?: EditorBuildMajorUpdateConfirmation;
-		readonly cancelInstall: () => void;
-		readonly confirmInstall: () => void;
-		readonly installError?: string;
-		readonly installPending: boolean;
-		readonly installedPackageId?: string;
-		readonly project: EditorProject;
-		readonly saveArtifact: () => void;
-		readonly saveError?: string;
-		readonly savePending: boolean;
-	}
+interface UseEditorBuildControllerOutput {
+	readonly artifactSummary?: string;
+	readonly build: () => void;
+	readonly buildFailure?: EditorBuildFailure;
+	readonly buildPending: boolean;
+	readonly buildStatus: EditorBuildStatus;
+	readonly buildStatusLabel: string;
+	readonly buildSummary: string;
+	readonly diagnostics: ReadonlyArray<EditorGameDiagnostic>;
+	readonly installArtifact: () => void;
+	readonly installAction: "install" | "update";
+	readonly installAvailable: boolean;
+	readonly installConfirmation?: EditorBuildMajorUpdateConfirmation;
+	readonly cancelInstall: () => void;
+	readonly confirmInstall: () => void;
+	readonly installError?: string;
+	readonly installPending: boolean;
+	readonly installedPackageId?: string;
+	readonly project: EditorProject;
+	readonly saveArtifact: () => void;
+	readonly saveError?: string;
+	readonly savePending: boolean;
 }
 
-export const useEditorBuildController = (): useEditorBuildController.Output => {
+export const useEditorBuildController = (): UseEditorBuildControllerOutput => {
 	const project = useEditorProject();
 	const buildAtom = EditorBuildCommandAtoms.build(project.projectId);
 	const buildResult = useAtomValue(buildAtom);

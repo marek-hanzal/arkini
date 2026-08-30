@@ -5,7 +5,7 @@ import type { useEditorChatGptController } from "~/chatgpt-asset-authoring/ui/us
 export const EditorChatGptAssetConfirmation = ({
 	controller,
 }: {
-	readonly controller: useEditorChatGptController.Output;
+	readonly controller: ReturnType<typeof useEditorChatGptController>;
 }) => {
 	const candidate = controller.candidate;
 	if (candidate === undefined || controller.previewUrl === undefined) return null;

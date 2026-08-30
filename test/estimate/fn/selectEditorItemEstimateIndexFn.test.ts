@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import type { EditorItemEstimateIndexEntry } from "~/estimate/domain/EditorItemEstimateIndex";
-import { selectEditorItemEstimateIndexFn } from "~/estimate/domain/fn/selectEditorItemEstimateIndexFn";
+import type { EditorItemEstimateIndexEntry } from "~/estimate/type/EditorItemEstimateIndex";
+import { selectEditorItemEstimateIndexFn } from "~/estimate/fn/selectEditorItemEstimateIndexFn";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 const item = (id: string, title: string) =>

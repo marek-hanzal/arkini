@@ -1,20 +1,18 @@
 import { Order } from "effect";
 
-import type { EditorItemEstimateIndexEntry } from "~/estimate/domain/EditorItemEstimateIndex";
-import type { EditorItemEstimate } from "~/estimate/domain/EditorItemEstimate";
+import type { EditorItemEstimateIndexEntry } from "~/estimate/type/EditorItemEstimateIndex";
+import type { EditorItemEstimate } from "~/estimate/type/EditorItemEstimate";
 
-export namespace createEditorItemEstimateIndexFn {
-	export interface Props {
-		readonly estimates: ReadonlyMap<string, EditorItemEstimate>;
-		readonly itemIds: ReadonlyArray<string>;
-	}
+interface CreateEditorItemEstimateIndexProps {
+	readonly estimates: ReadonlyMap<string, EditorItemEstimate>;
+	readonly itemIds: ReadonlyArray<string>;
 }
 
 /** Projects the cached full-catalog estimates into list timing and aggregate item demand. */
 export const createEditorItemEstimateIndexFn = ({
 	estimates,
 	itemIds,
-}: createEditorItemEstimateIndexFn.Props): ReadonlyArray<EditorItemEstimateIndexEntry> => {
+}: CreateEditorItemEstimateIndexProps): ReadonlyArray<EditorItemEstimateIndexEntry> => {
 	const demandByItemId = new Map<string, number>();
 	for (const estimate of estimates.values()) {
 		if (!estimate.obtainable) continue;

@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
-import type { EditorItemEstimateSortSchema } from "~/estimate/domain/EditorItemEstimateSortSchema";
+import type { EditorItemEstimateSortSchema } from "~/estimate/schema/EditorItemEstimateSortSchema";
 import { EditorItemEstimateList } from "~/estimate/ui/EditorItemEstimateList";
 
 interface EditorEstimateRouteSearch {

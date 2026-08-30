@@ -27,24 +27,22 @@ const subscribeChatGptViewStateFx = Effect.fn("subscribeChatGptViewStateFx")(
 		),
 );
 
-export namespace useEditorChatGptSurface {
-	export interface Props {
-		readonly projectId: string;
-		readonly visible: boolean;
-	}
+interface UseEditorChatGptSurfaceProps {
+	readonly projectId: string;
+	readonly visible: boolean;
+}
 
-	export interface Output {
-		readonly retry: () => void;
-		readonly surfaceRef: RefObject<HTMLDivElement | null>;
-		readonly viewState: ChatGptViewState;
-	}
+interface UseEditorChatGptSurfaceOutput {
+	readonly retry: () => void;
+	readonly surfaceRef: RefObject<HTMLDivElement | null>;
+	readonly viewState: ChatGptViewState;
 }
 
 /** Owns placement, state subscription, detach, and retry for the native browser surface. */
 export const useEditorChatGptSurface = ({
 	projectId,
 	visible,
-}: useEditorChatGptSurface.Props): useEditorChatGptSurface.Output => {
+}: UseEditorChatGptSurfaceProps): UseEditorChatGptSurfaceOutput => {
 	const surfaceRef = useRef<HTMLDivElement>(null);
 	const [viewState, setViewState] = useState<ChatGptViewState>({
 		type: "loading",

@@ -1,7 +1,7 @@
 import { Cause, Effect, Exit, Fiber, Option } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 
-import type { EditorItemEstimate } from "~/estimate/domain/EditorItemEstimate";
+import type { EditorItemEstimate } from "~/estimate/type/EditorItemEstimate";
 import type { EditorItemEstimateWorkerRequest } from "~/estimate/worker/editorItemEstimateWorkerProtocol";
 import { runEditorItemEstimateInWorkerFx } from "~/estimate/worker/runEditorItemEstimateInWorkerFx";
 

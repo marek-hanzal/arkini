@@ -1,4 +1,4 @@
-import { estimateEditorItemCatalogFn } from "~/estimate/domain/fn/estimateEditorItemCatalogFn";
+import { estimateEditorItemCatalogFn } from "~/estimate/fn/estimateEditorItemCatalogFn";
 import type {
 	EditorItemEstimateWorkerRequest,
 	EditorItemEstimateWorkerResponse,

@@ -36,6 +36,7 @@
 		"src/item-line-detail",
 		"src/item-detail-frame",
 		"src/tile-presentation",
+		"src/tile-motion",
 		"src/item-definition",
 		"src/item-location",
 		"src/item-placement",

@@ -18,7 +18,7 @@ import { GameProjectGameSchemaReference } from "~/game-config/source/GameProject
 import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
 import { EditorVersionDescriptorFileSchema } from "~/project-version/schema/EditorVersionDescriptorFileSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
+import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 import { ArkiniVersionIncompatibleError } from "~/engine/version/ArkiniVersionAdmission";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 

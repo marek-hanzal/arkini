@@ -9,7 +9,7 @@ import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
-import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
+import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 import { createVersionFingerprint, hashVersionBytes } from "./VersionFingerprint";
 
 const decoder = new TextDecoder("utf-8", {

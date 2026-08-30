@@ -328,7 +328,7 @@ test() {
 platform-check() {
 	build
 	run_tests \
-		test/engine/filesystem \
+		test/filesystem-write \
 		test/game-persistence/fx/createFilesystemGameSaveFilesFx.test.ts \
 		test/electron \
 		test/arkpack/artifact \

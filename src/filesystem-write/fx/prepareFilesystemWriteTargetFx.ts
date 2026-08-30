@@ -1,6 +1,6 @@
 import { Effect, FileSystem, Path } from "effect";
 
-import { FilesystemWriteError } from "./FilesystemWriteError";
+import { FilesystemWriteError } from "../error/FilesystemWriteError";
 import { isFilesystemPathSafeFx } from "./isFilesystemPathSafeFx";
 
 /** Resolves one contained target and creates canonical parents only for writes. */

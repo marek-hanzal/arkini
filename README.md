@@ -27,10 +27,11 @@ src/game-session  package-independent Runtime/Tick/save execution, subscriptions
 src/playable-game  live Game capability, resource URLs and presentation fail-stop resource wrapper
 src/installed-game  Arkpack/save bootstrap, diagnostics, package leases, finalization and recovery
 src/game-persistence  persisted State, hydration, save codecs, autosave and exact save transports
+src/filesystem-write  Node-only canonical locking, path safety and durable single-file write mechanics
 src/simulation-time  canonical fixed simulation quantum shared by time-aware gameplay owners
 src/game-tick  fixed-step budgeting, replay, job/delivery/temporary advancement and scoped loop
 src/item-interaction  optimistic drop reads, authoritative drop/write commands and ordinary click actions
-src/engine    remaining item/temporary/query, filesystem, revision/version and CLI support owners
+src/engine    remaining item/temporary/query, revision/version and CLI support owners
 src/game-start  initial-state schemas, exact placement planning and atomic runtime start
 src/game-event  committed gameplay event schemas and exact downstream event projection
 src/item-detail-read  shared Item Detail identity, target, tab, queue and source reads/projections

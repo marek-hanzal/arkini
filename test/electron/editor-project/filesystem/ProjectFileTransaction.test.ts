@@ -9,7 +9,7 @@ import { promisify } from "node:util";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { withProjectLockFx } from "../../../../electron/main/editor-project/filesystem/fx/withProjectLockFx";
-import { createFilesystemWriteFx } from "../../../../src/engine/filesystem/createFilesystemWriteFx";
+import { createFilesystemWriteFx } from "../../../../src/filesystem-write/fx/createFilesystemWriteFx";
 
 const runFile = promisify(execFile);
 const helper = join(import.meta.dirname, "ProjectFileTransaction.test", "crash.ts");

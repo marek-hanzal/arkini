@@ -8,7 +8,7 @@ import { EditorVersionDescriptorFileSchema } from "~/project-version/schema/Edit
 import { EditorVersionHeadFileSchema } from "~/project-version/schema/EditorVersionHeadFileSchema";
 import { EditorVersionManifestSchema } from "~/project-version/schema/EditorVersionManifestSchema";
 import { admitArkiniVersionFx } from "~/engine/version/ArkiniVersionAdmission";
-import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
+import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 import { readVersionSnapshotFx } from "./readVersionSnapshotFx";
 
 const readJsonFx = <Value>(target: string, parse: (candidate: unknown) => Value, message: string) =>

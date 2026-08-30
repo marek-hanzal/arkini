@@ -5,7 +5,7 @@ import { LastPackageIdSchema } from "../../contract/launcher/LastPackageIdSchema
 import type { ElectronMainError } from "../ElectronMainError";
 import { readElectronPreferenceFx } from "../preference/readElectronPreferenceFx";
 import { writeElectronPreferenceFx } from "../preference/writeElectronPreferenceFx";
-import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
+import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 
 /** Effect-native main-process capability for application-wide launcher preferences. */
 export interface LauncherPreferences {

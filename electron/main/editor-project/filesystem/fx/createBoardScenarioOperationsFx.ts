@@ -10,8 +10,8 @@ import {
 	EditorBoardScenarioNameSchema,
 	EditorBoardScenarioSchema,
 } from "~/board-scenario/schema/EditorBoardScenarioSchema";
-import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
-import { withFilesystemWriteRecovery } from "~/engine/filesystem/FilesystemWriteError";
+import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
+import { withFilesystemWriteRecovery } from "~/filesystem-write/error/FilesystemWriteError";
 import { withProjectLockFx } from "./withProjectLockFx";
 
 const encoder = new TextEncoder();

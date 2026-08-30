@@ -9,7 +9,7 @@ import type { EditorVersionManifestSchema } from "~/project-version/schema/Edito
 import type { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
-import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
+import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
 import { hashVersionBytes } from "./VersionFingerprint";
 import { assertProjectDirectoryFx } from "./assertProjectDirectoryFx";
 import { planVersionSnapshotFx } from "./planVersionSnapshotFx";

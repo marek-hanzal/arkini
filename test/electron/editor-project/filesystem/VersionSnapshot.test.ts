@@ -11,7 +11,7 @@ import { readVersionSnapshotFx } from "../../../../electron/main/editor-project/
 import { EditorBoardScenarioSchema } from "~/board-scenario/schema/EditorBoardScenarioSchema";
 import { GameProjectGameSchemaReference } from "~/game-config/source/GameProjectReference";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
+import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 const writeSnapshotFx = (props: Omit<createVersionSnapshotFx.Props, "filesystemWrite">) =>

@@ -24,6 +24,7 @@
 	},
 	"include": [
 		"electron",
+		"src/filesystem-write",
 		"src/game-tick",
 		"src/game-runtime",
 		"src/game-persistence",

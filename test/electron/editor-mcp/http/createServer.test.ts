@@ -8,7 +8,7 @@ import { createJobTestConfig } from "~test/production-job/support/jobTestConfig"
 import {
 	expectNamedJsonSchemaGraph,
 	isJsonSchemaRecord,
-} from "~test/schema/expectNamedJsonSchemaGraph";
+} from "~test/support/schema/expectNamedJsonSchemaGraph";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import {
 	cleanupMcpHarnesses,

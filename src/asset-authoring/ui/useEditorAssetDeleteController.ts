@@ -7,7 +7,7 @@ import { useCallback, useMemo, useState } from "react";
 import { deleteEditorAssetFx } from "~/asset-authoring/session/deleteEditorAssetFx";
 import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
 import { useEditorProject } from "~/authoring-session/useEditorProject";
-import { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import {
 	readEditorAssetDeleteBlockersFn,
 	type EditorAssetDeleteBlocker,

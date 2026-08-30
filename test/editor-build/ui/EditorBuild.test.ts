@@ -97,7 +97,7 @@ vi.mock("~/authoring-session/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
-vi.mock("~/application-runtime/RendererRuntime", () => ({
+vi.mock("~/application-runtime/service/RendererRuntime", () => ({
 	RendererRuntime: {
 		runSync: Effect.runSync,
 	},

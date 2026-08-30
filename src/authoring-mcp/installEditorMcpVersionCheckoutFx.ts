@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { z } from "zod";
 
 import { checkoutEditorProjectVersionFx } from "~/project-version/workspace/checkoutEditorProjectVersionFx";
-import { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 

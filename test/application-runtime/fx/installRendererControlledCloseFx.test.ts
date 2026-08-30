@@ -7,7 +7,7 @@ import type { EditorProjectRepositoryService } from "~/project-authoring/reposit
 import { CriticalGameLifecycleError } from "~/renderer/game/resource/CriticalGameLifecycleError";
 import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
-import { installRendererControlledCloseFx } from "~/application-runtime/lifecycle/installRendererControlledCloseFx";
+import { installRendererControlledCloseFx } from "~/application-runtime/fx/installRendererControlledCloseFx";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
 import {
 	adoptTestGameEngineResourceFx,

@@ -6,7 +6,7 @@ import { EditorProjectRepository } from "~/project-authoring/repository/EditorPr
 import { EditorUnsavedChanges } from "~/authoring-session/EditorUnsavedChanges";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
-import type { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import type { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 
 interface ExitRouter {
 	readonly navigate: (options: {

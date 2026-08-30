@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 
 import { type EditorItemOriginFlow } from "~/flow/domain/EditorItemOriginFlow";
-import { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { CanvasPalette } from "~/flow/ui/CanvasPalette";
 import { createCanvasPainterFx } from "~/flow/ui/createCanvasPainterFx";
 import { type Bounds, OriginFlowViewport, type Viewport } from "~/flow/ui/Viewport";

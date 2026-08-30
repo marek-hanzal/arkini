@@ -6,7 +6,7 @@ import {
 } from "../../../../electron/contract/chatgpt/ChatGptSurfaceSchema";
 import type { ChatGptSurfaceSchema } from "../../../../electron/contract/chatgpt/ChatGptSurfaceSchema";
 
-import { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 
 type ChatGptViewState = ChatGptViewStateSchemaType.Type;
 

@@ -6,7 +6,7 @@ import { useCallback, useMemo } from "react";
 
 import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
 import { EditorUnsavedChanges } from "~/authoring-session/EditorUnsavedChanges";
-import { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { refreshEditorProjectFx } from "~/authoring-session/refreshEditorProjectFx";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 

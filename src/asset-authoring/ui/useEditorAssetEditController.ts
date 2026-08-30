@@ -10,7 +10,7 @@ import { EditorProjectRepository } from "~/project-authoring/repository/EditorPr
 import { useEditorProject } from "~/authoring-session/useEditorProject";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
-import { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/useEditorUnsavedChangesRegistration";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorAssetById } from "~/asset-authoring/ui/useEditorAssetById";

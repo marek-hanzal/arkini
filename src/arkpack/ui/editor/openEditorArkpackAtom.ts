@@ -3,7 +3,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { openEditorArkpackFx } from "~/arkpack/ui/editor/openEditorArkpackFx";
 import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
-import { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 
 /** Keeps an admitted Editor open/import command alive through navigation. */
 export const openEditorArkpackAtom = RendererRuntime.runSync(

@@ -13,7 +13,7 @@ import type { EditorProject } from "~/project-authoring/EditorProject";
 import type { EditorProjectFormSchema } from "~/project-authoring/configuration/EditorProjectFormSchema";
 import { SizeSchema } from "~/item-location/schema/SizeSchema";
 import { ToolbarSizeSchema } from "~/item-location/schema/ToolbarSizeSchema";
-import { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { saveEditorProjectConfigFx } from "~/project-authoring/configuration/saveEditorProjectConfigFx";
 import { useAppForm } from "~/ui/form/EditorForm";
 import type { EditorProjectSectionId } from "~/project-authoring/configuration/EditorProjectSections";

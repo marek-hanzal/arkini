@@ -11,7 +11,7 @@ import { useItemDetailLines } from "~/item-line-detail/ui/useItemDetailLines";
 import { useItemDetailQueue } from "~/ui/item-detail/useItemDetailQueue";
 import { useItemDetailSources } from "~/ui/item-detail/useItemDetailSources";
 import { useItemDetailTabs } from "~/ui/item-detail/useItemDetailTabs";
-import { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { BadgeCount } from "~/ui/badge/BadgeCount";
 import {
 	selectableActiveClassName,

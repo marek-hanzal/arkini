@@ -7,7 +7,7 @@ import { useCallback, useRef } from "react";
 import { EditorSourceExportSchema } from "../../../electron/contract/editor/EditorSourceExportSchema";
 import type { EditorProjectTransport } from "../../../electron/contract/editor/EditorProjectTransport";
 import { invokeEditorProjectTransportFx } from "~/project-authoring/repository/invokeEditorProjectTransportFx";
-import { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { Button, PrimaryButton } from "~/ui/button/Button";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 

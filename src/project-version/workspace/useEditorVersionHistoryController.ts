@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { readEditorProjectVersionHistoryFx } from "~/project-version/fx/readEditorProjectVersionHistoryFx";
 import { useEditorProject } from "~/authoring-session/useEditorProject";
-import { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type {
 	EditorProjectVersionDescriptor,
 	EditorProjectVersionStatus,

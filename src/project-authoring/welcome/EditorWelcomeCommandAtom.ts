@@ -8,7 +8,7 @@ import {
 	EditorProjectDescriptorSchema,
 } from "~/project-authoring/EditorProjectDescriptor";
 import { invokeEditorProjectTransportFx } from "~/project-authoring/repository/invokeEditorProjectTransportFx";
-import { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import { importEditorArkpackFileFx } from "~/project-authoring/welcome/importEditorArkpackFileFx";
 

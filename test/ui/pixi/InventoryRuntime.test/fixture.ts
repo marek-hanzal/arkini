@@ -355,7 +355,7 @@ vi.mock("~/tile-presentation/fx/readTileActorsFx", () => ({
 	}),
 }));
 
-vi.mock("~/ui/pixi/drag/readTileDropPreviewFx", async () => {
+vi.mock("~/tile-interaction/fx/readTileDropPreviewFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
 		readTileDropPreviewFx: (props: unknown) =>

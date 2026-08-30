@@ -1,27 +1,16 @@
-import type { Container } from "pixi.js";
 import type { Effect } from "effect";
 
-import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
-import type { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
+import type { InventoryInteractionSurface } from "~/tile-interaction/type/InventoryInteractionSurface";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
-import type { InventoryDropTarget } from "~/ui/pixi/scene/InventoryDropTarget";
 
 export interface InventoryActorPose {
 	readonly x: number;
 	readonly y: number;
 }
 
-export interface InventorySurface {
-	readonly actorLayer: Container;
+export interface InventorySurface extends InventoryInteractionSurface {
 	readonly closeFx: Effect.Effect<void>;
-	readonly readActorPoseFx: (item: TileActorItem) => Effect.Effect<InventoryActorPose | null>;
-	readonly readActorSizeFx: Effect.Effect<number>;
-	readonly readDropTargetFx: (x: number, y: number) => Effect.Effect<InventoryDropTarget | null>;
 	readonly readPaletteFx: Effect.Effect<PixiScenePalette>;
 	readonly redrawFx: Effect.Effect<void>;
 	readonly refreshPaletteFx: Effect.Effect<void>;
-	readonly renderDropFeedbackFx: (
-		target: InventoryDropTarget | null,
-		kind: readTileDropPreviewFx.Result["kind"] | null,
-	) => Effect.Effect<void>;
 }

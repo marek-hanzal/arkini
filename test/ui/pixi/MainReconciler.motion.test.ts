@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
-import { settleDraggedActorFx } from "~/ui/pixi/drag/settleDraggedActorFx";
+import { settleDraggedActorFx } from "~/tile-interaction/fx/settleDraggedActorFx";
 
 import {
 	boardLocation,

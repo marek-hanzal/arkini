@@ -37,6 +37,7 @@
 		"src/item-detail-frame",
 		"src/tile-presentation",
 		"src/tile-motion",
+		"src/tile-interaction",
 		"src/item-definition",
 		"src/item-location",
 		"src/item-placement",

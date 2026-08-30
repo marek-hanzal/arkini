@@ -4,9 +4,9 @@ import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorChoiceControl } from "~/ui/form/EditorValueControls";
-import { EditorItemReferenceControl } from "~/item-authoring/ui/EditorItemReferenceControl";
-import { EditorOptionalOutputControl } from "~/item-authoring/ui/EditorOptionalOutputControl";
-import { EditorSelectorControl } from "~/item-authoring/ui/EditorSelectorControl";
+import { EditorOptionalOutputControl } from "~/production-line-authoring/ui/EditorOptionalOutputControl";
+import { EditorSelectorControl } from "~/production-line-authoring/ui/EditorSelectorControl";
+import { EditorItemReferenceControl } from "~/ui/item/EditorItemAutocompleteField";
 
 /** Edits the target, effects, replacement, and optional output of one merge definition. */
 export const EditorMergeField = ({

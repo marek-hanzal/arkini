@@ -19,7 +19,7 @@ import type {
 	EditorItemSectionId,
 } from "~/item-authoring/type/EditorItemSection";
 import { readEditorItemSectionForPathFn } from "~/item-authoring/fn/readEditorItemSectionForPathFn";
-import { EditorItemDraftDefaults } from "~/item-authoring/ui/EditorItemDraftDefaults";
+import { EditorItemMergeDraftDefault } from "~/item-authoring/ui/EditorItemMergeDraftDefault";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { analyzeEditorProjectCompatibilityFn } from "~/project-version/fn/analyzeEditorProjectCompatibilityFn";
@@ -113,7 +113,7 @@ export const useEditorItemFormController = ({
 			case "merges":
 				if (form.state.values.merge === undefined || form.state.values.merge.length === 0) {
 					form.setFieldValue("merge", [
-						structuredClone(EditorItemDraftDefaults.merge),
+						structuredClone(EditorItemMergeDraftDefault),
 					]);
 				}
 				break;

@@ -1,7 +1,7 @@
 import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 import { EditorItemReferenceControl } from "~/item-authoring/ui/EditorItemReferenceControl";
 
-export interface EditorSelectorControlProps {
+interface EditorSelectorControlProps {
 	readonly onChange: (selector: SelectorSchema.Type) => void;
 	readonly value: SelectorSchema.Type;
 }

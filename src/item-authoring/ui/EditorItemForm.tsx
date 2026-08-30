@@ -1,14 +1,33 @@
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import type { PropsWithChildren } from "react";
-import { useEditorItemDraft } from "~/item-authoring/ui/useEditorItemDraft";
-import { convertEditorItemFn } from "~/item-authoring/domain/fn/convertEditorItemFn";
+import { useMemo, type PropsWithChildren } from "react";
+import { createEditorItemDraftFn } from "~/item-authoring/fn/createEditorItemDraftFn";
+import { convertEditorItemFn } from "~/item-authoring/fn/convertEditorItemFn";
 import { EditorItemFormSession } from "~/item-authoring/ui/EditorItemFormSession";
 import { EditorItemNotFound } from "~/item-authoring/ui/EditorItemNotFound";
 import type {
 	EditorItemOptionalCapability,
 	EditorItemSectionId,
-} from "~/item-authoring/ui/EditorItemSections";
+} from "~/item-authoring/type/EditorItemSection";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { useEditorItemByUid } from "~/item-authoring/ui/useEditorItemByUid";
+
+const useEditorItemDraft = (type: TypeSchema.Type, uid: string): ItemSchema.Type => {
+	const project = useEditorProject();
+	return useMemo(
+		() =>
+			createEditorItemDraftFn({
+				resourceId: project.resources[0]?.id ?? "missing-asset",
+				type,
+				uid,
+			}),
+		[
+			project.resources,
+			type,
+			uid,
+		],
+	);
+};
 
 export namespace EditorItemForm {
 	export interface Props extends PropsWithChildren {

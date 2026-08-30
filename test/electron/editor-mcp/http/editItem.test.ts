@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
-import { createEditorItemDraftFn } from "~/item-authoring/domain/fn/createEditorItemDraftFn";
+import { createEditorItemDraftFn } from "~/item-authoring/fn/createEditorItemDraftFn";
 import {
 	cleanupMcpHarnesses,
 	connectMcpClient,

@@ -2,7 +2,7 @@ import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 import type { ReactNode } from "react";
 import { EditorNumberControl, EditorValueLabel } from "~/ui/form/EditorValueControls";
 
-export interface EditorQuantityControlProps {
+interface EditorQuantityControlProps {
 	readonly description?: ReactNode;
 	readonly label?: string;
 	readonly maximumDescription?: string;

@@ -8,7 +8,7 @@ import {
 	createProducerItem,
 	createSimpleItem,
 } from "~test/game-config/validation/support/gameValidationTestSource";
-import { renameEditorItemFx } from "~/item-authoring/domain/fx/renameEditorItemFx";
+import { renameEditorItemFx } from "~/item-authoring/fx/renameEditorItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 describe("renameEditorItemFx", () => {

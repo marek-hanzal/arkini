@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { readEditorItemDeleteBlockersFn } from "~/item-authoring/domain/fn/readEditorItemDeleteBlockersFn";
+import { readEditorItemDeleteBlockersFn } from "~/item-authoring/fn/readEditorItemDeleteBlockersFn";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { editorTestConfig } from "~test/project-authoring/support/editorTestPayload";
 

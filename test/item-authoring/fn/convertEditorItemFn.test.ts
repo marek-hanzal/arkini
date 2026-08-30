@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { convertEditorItemFn } from "~/item-authoring/domain/fn/convertEditorItemFn";
-import { createEditorItemDraftFn } from "~/item-authoring/domain/fn/createEditorItemDraftFn";
+import { convertEditorItemFn } from "~/item-authoring/fn/convertEditorItemFn";
+import { createEditorItemDraftFn } from "~/item-authoring/fn/createEditorItemDraftFn";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";

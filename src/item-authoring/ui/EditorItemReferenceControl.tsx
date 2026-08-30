@@ -2,7 +2,7 @@ import { EditorSearchCombobox } from "~/ui/form/EditorSearchCombobox";
 import { EditorItemSearchThumbnail } from "~/ui/item/EditorItemThumbnail";
 import { useEditorItemSearchOptions } from "~/ui/item/useEditorItemSearchOptions";
 
-export interface EditorItemReferenceControlProps {
+interface EditorItemReferenceControlProps {
 	readonly label: string;
 	readonly onChange: (itemId: string) => void;
 	readonly value: string;

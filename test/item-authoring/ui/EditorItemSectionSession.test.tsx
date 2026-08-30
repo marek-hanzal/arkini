@@ -35,7 +35,6 @@ vi.mock("~/authoring-shell/ui/EditorHistoryBackButton", () => ({
 
 const state = vi.hoisted(() => ({
 	canonical: undefined as unknown,
-	draft: undefined as unknown,
 	navigate: vi.fn().mockResolvedValue(undefined),
 	persisted: undefined as unknown,
 	saveItem: vi.fn(),
@@ -57,16 +56,13 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 		projectId: "editor-test",
 		revision: "revision-1",
 		version: "1.0",
+		resources: [],
 		config: (
 			state.canonical as {
 				config: unknown;
 			}
 		).config,
 	}),
-}));
-
-vi.mock("~/item-authoring/ui/useEditorItemDraft", () => ({
-	useEditorItemDraft: () => state.draft,
 }));
 
 vi.mock("~/item-authoring/ui/useEditorItemByUid", () => ({
@@ -84,7 +80,7 @@ vi.mock("~/ui/item/EditorItemAutocompleteField", () => ({
 }));
 import { EditorItemForm } from "~/item-authoring/ui/EditorItemForm";
 import { EditorItemIdentitySection } from "~/item-authoring/ui/EditorItemIdentitySection";
-import type { EditorItemSectionId } from "~/item-authoring/ui/EditorItemSections";
+import type { EditorItemSectionId } from "~/item-authoring/type/EditorItemSection";
 
 (
 	globalThis as {
@@ -138,7 +134,6 @@ beforeEach(() => {
 			},
 		},
 	};
-	state.draft = item;
 	state.persisted = item;
 	state.saveItem.mockResolvedValue(item);
 	state.unsavedSession = undefined;

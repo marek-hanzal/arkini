@@ -7,7 +7,7 @@ import { encodeGameProjectFileStemFn } from "~/game-config/source/encodeGameProj
 import { createEditorJsonExportDirectoryFx } from "./createEditorJsonExportDirectoryFx";
 import type { OwnedEditorProjectRepository } from "./EditorProjectServiceOwnership";
 import { withProjectLockFx } from "./filesystem/fx/withProjectLockFx";
-import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
+import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 
 export namespace exportEditorJsonDirectoryFx {
 	export interface Props {

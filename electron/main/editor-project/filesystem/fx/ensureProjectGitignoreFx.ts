@@ -1,6 +1,6 @@
 import { Effect, FileSystem } from "effect";
 
-import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
+import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 import type { ProjectPaths } from "../ProjectPaths";
 import { addGitignoreRulesFn } from "../fn/addGitignoreRulesFn";
 import { assertProjectFileFx } from "./assertProjectFileFx";

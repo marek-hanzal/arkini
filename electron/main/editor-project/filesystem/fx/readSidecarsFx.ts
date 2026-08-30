@@ -7,7 +7,7 @@ import { EditorBoardScenarioSchema } from "~/board-scenario/schema/EditorBoardSc
 import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
 import { EditorProjectNoteFileSchema } from "~/project-note/schema/EditorProjectNoteFileSchema";
 import { EditorNoteSchema } from "~/project-note/schema/EditorNoteSchema";
-import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
+import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 
 const decodeNoteFileStemFn = (stem: string) => {
 	// URI decoding rejects the lone-surrogate triplets emitted by the total writer.

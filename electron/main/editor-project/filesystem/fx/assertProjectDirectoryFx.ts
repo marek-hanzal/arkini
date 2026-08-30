@@ -1,6 +1,6 @@
 import { FileSystem } from "effect";
 import { Effect } from "effect";
-import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
+import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 
 /** Rejects a project-owned directory whose canonical path escapes through a symbolic link. */
 export const assertProjectDirectoryFx = Effect.fn("assertProjectDirectoryFx")(function* ({

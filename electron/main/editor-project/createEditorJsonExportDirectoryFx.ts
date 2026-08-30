@@ -2,7 +2,7 @@ import { Exit, FileSystem, Path } from "effect";
 import { Effect } from "effect";
 import { match, P } from "ts-pattern";
 
-import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafeFx";
+import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 import { readEditorJsonExportFx } from "./readEditorJsonExportFx";
 
 const isPortableEditorProjectFile = (path: Path.Path, relative: string) =>

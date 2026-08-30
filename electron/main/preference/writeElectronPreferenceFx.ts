@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
+import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
 import { ElectronMainError } from "../ElectronMainError";
 
 const encoder = new TextEncoder();

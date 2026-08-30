@@ -1,6 +1,6 @@
 import type { Effect, FileSystem, Path } from "effect";
 
-import type { FilesystemWriteError } from "./FilesystemWriteError";
+import type { FilesystemWriteError } from "../error/FilesystemWriteError";
 
 export interface FilesystemWrite {
 	readonly withLockFx: <Value, Failure, Requirements>(

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
+import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
 import { recoverProjectFileTransactionFx } from "./recoverProjectFileTransactionFx";
 
 /** Recovers and holds the shared current-tree lock for one portable Editor project. */

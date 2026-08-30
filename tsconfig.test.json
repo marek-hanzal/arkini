@@ -13,6 +13,7 @@
 	"include": [
 		"electron/contract",
 		"src/engine",
+		"src/filesystem-write",
 		"src/game-tick",
 		"src/game-runtime",
 		"src/game-session",

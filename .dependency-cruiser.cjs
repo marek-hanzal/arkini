@@ -9,6 +9,7 @@ const routeModulePattern = "^src/@routes(?:/|$)";
 const routeCompositionPattern = "^(?:src/@routes(?:/|$)|src/_route[.]ts$)";
 const electronContractPattern = "^electron/contract(?:/|$)";
 const electronPreloadPattern = "^electron/preload(?:/|$)";
+const filesystemWritePattern = "^src/filesystem-write(?:/|$)";
 
 /**
  * Dependency rules state the forbidden import directly: `from` must not import `to`.
@@ -114,6 +115,21 @@ module.exports = {
 			},
 			to: {
 				path: "^src/_archive(?:/|$)",
+			},
+		},
+		{
+			name: "filesystem-write-stays-mechanical",
+			comment:
+				"The shared Node-only write capability owns lock and durable single-file mechanics without importing its product consumers.",
+			severity: "error",
+			from: {
+				path: filesystemWritePattern,
+			},
+			to: {
+				path: "^(?:src|electron|shared)(?:/|$)",
+				pathNot: [
+					filesystemWritePattern,
+				],
 			},
 		},
 		{

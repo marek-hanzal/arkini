@@ -2,7 +2,7 @@ import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 import { sign } from "sigstore";
 
-import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
+import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 import { ArkpackSigningError } from "~/arkpack/artifact/error/ArkpackSigningError";
 import { decodeArkpackEnvelopeFx } from "./decodeArkpackEnvelopeFx";
 import { encodeArkpackEnvelopeFx } from "./encodeArkpackEnvelopeFx";

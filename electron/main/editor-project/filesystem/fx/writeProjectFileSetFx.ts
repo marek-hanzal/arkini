@@ -1,9 +1,9 @@
 import { Effect, Exit, FileSystem, Path } from "effect";
 
-import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
-import { FilesystemWriteError } from "~/engine/filesystem/FilesystemWriteError";
-import { prepareFilesystemWriteTargetFx } from "~/engine/filesystem/prepareFilesystemWriteTargetFx";
-import { writeSyncedFileFx } from "~/engine/filesystem/writeSyncedFileFx";
+import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
+import { FilesystemWriteError } from "~/filesystem-write/error/FilesystemWriteError";
+import { prepareFilesystemWriteTargetFx } from "~/filesystem-write/fx/prepareFilesystemWriteTargetFx";
+import { writeSyncedFileFx } from "~/filesystem-write/fx/writeSyncedFileFx";
 import { recoverProjectFileTransactionFx } from "./recoverProjectFileTransactionFx";
 import { withProjectLockFx } from "./withProjectLockFx";
 

@@ -4,7 +4,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { makeExactGameAtomFamilyFx } from "~/ui/game/makeExactGameAtomFamilyFx";
 import { settleRendererCommandFailureFx } from "~/ui/game/settleRendererCommandFailureFx";
 import { toDiagnosticValueFn } from "~/application-diagnostics/fn/toDiagnosticValueFn";
-import { writeDiagnosticRecordFx } from "~/application-diagnostics/writeDiagnosticRecordFx";
+import { writeDiagnosticRecordFx } from "~/application-diagnostics/fx/writeDiagnosticRecordFx";
 import { RendererRuntime } from "~/application-runtime/RendererRuntime";
 import { enqueueDefaultLineFx } from "~/production-job/write/enqueueDefaultLineFx";
 import { fillDefaultLineQueueFx } from "~/production-job/write/fillDefaultLineQueueFx";

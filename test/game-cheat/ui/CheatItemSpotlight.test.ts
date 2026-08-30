@@ -36,10 +36,14 @@ describe("CheatItemSpotlight", () => {
 		const { container } = await renderSpotlight({
 			onBeforeOpen,
 		});
+		const previousFocus = document.createElement("button");
+		document.body.append(previousFocus);
+		previousFocus.focus();
 
 		await toggleSpotlight();
 		expect(onBeforeOpen).toHaveBeenCalledOnce();
 		const input = readSearchInput(container);
+		expect(document.activeElement).toBe(input);
 		await act(async () => {
 			input.dispatchEvent(
 				new KeyboardEvent("keydown", {
@@ -79,6 +83,7 @@ describe("CheatItemSpotlight", () => {
 			);
 		});
 		expect(container.querySelector('[data-ui="CheatItemSpotlight"]')).toBeNull();
+		expect(document.activeElement).toBe(previousFocus);
 	});
 
 	it("admits every same-tick keyboard and pointer spawn action", async () => {

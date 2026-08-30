@@ -1,24 +1,15 @@
 import { useHotkey } from "@tanstack/react-hotkeys";
-import {
-	type KeyboardEvent,
-	type PointerEvent,
-	type RefObject,
-	use,
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
+import { Exit } from "effect";
+import { use, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { match, P } from "ts-pattern";
 
 import { useGameCheats } from "~/game-cheat/ui/useGameCheats";
 import type { PlayableGame } from "~/renderer/game/PlayableGame";
 import { useCheatAvailability } from "~/application-settings/ui/useCheatAvailability";
 import { CheatItemSpawnContext } from "~/game-cheat/context/CheatItemSpawnContext";
-import { useCheatItemSpotlightSearch } from "~/game-cheat/ui/useCheatItemSpotlightSearch";
 import { useGameMenuControl } from "~/game-menu/ui/GameMenuProvider";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
+import { readCheatItemCatalogFx } from "~/engine/cheat/read/readCheatItemCatalogFx";
 
 const errorMessage = (error: unknown) =>
 	match(error)
@@ -26,29 +17,24 @@ const errorMessage = (error: unknown) =>
 		.otherwise(String);
 
 export namespace useCheatItemSpotlightController {
+	export interface Item {
+		readonly itemId: string;
+		readonly sourceUrl: string;
+		readonly title: string;
+	}
+
 	export interface Props {
 		readonly alwaysAvailable?: boolean;
 		readonly game: PlayableGame;
 		readonly onBeforeOpen?: () => void;
 	}
 
-	export interface SelectItemProps {
-		readonly index: number;
-		readonly itemId: string;
-	}
-
 	export interface Output {
-		readonly inputRef: RefObject<HTMLInputElement | null>;
-		readonly onBackdropPointerDown: (event: PointerEvent<HTMLDivElement>) => void;
-		readonly onKeyDown: (event: KeyboardEvent<HTMLElement>) => void;
-		readonly onQueryChange: (query: string) => void;
+		readonly close: () => void;
+		readonly items: ReadonlyArray<Item>;
 		readonly open: boolean;
-		readonly query: string;
-		readonly requestSelected: () => void;
-		readonly results: ReturnType<typeof useCheatItemSpotlightSearch>["results"];
-		readonly selectItem: (props: SelectItemProps) => void;
-		readonly selectedIndex: number;
-		readonly setSelectedIndex: (index: number) => void;
+		readonly resetSpawnStatus: () => void;
+		readonly selectItem: (itemId: string) => void;
 		readonly spawnStatus: "error" | "idle" | "pending" | "success";
 		readonly spawnStatusMessage: string;
 	}
@@ -65,10 +51,17 @@ export const useCheatItemSpotlightController = ({
 	const itemDetail = useItemDetailControl();
 	const spawn = use(CheatItemSpawnContext);
 	if (spawn === null) throw new Error("CheatItemSpawnProvider is not mounted.");
-	const search = useCheatItemSpotlightSearch({
+	const items = useMemo(() => {
+		const exit = game.read(readCheatItemCatalogFx());
+		if (Exit.isFailure(exit)) throw exit.cause;
+		return exit.value.map(({ itemId, sourceResourceId, title }) => ({
+			itemId,
+			sourceUrl: game.getResourceUrl(sourceResourceId),
+			title,
+		}));
+	}, [
 		game,
-	});
-	const inputRef = useRef<HTMLInputElement>(null);
+	]);
 	const preserveSpawnOutcomeRef = useRef(false);
 	const [open, setOpen] = useState(false);
 	const blockedByHigherOwner = gameMenu.phase !== "closed" || itemDetail.state.phase !== "closed";
@@ -114,60 +107,21 @@ export const useCheatItemSpotlightController = ({
 				() => undefined,
 			)
 			.exhaustive();
-		search.reset();
 		setOpen(true);
 	}, [
 		available,
 		close,
 		onBeforeOpen,
 		open,
-		search.reset,
 		spawn.pending,
 		spawn.reset,
 	]);
-	const onQueryChange = useCallback(
-		(value: string) => {
-			search.changeQuery(value);
-			spawn.reset();
-		},
-		[
-			search.changeQuery,
-			spawn.reset,
-		],
-	);
-	const requestSelected = useCallback(() => {
-		if (search.selectedItemId !== undefined) spawn.request(search.selectedItemId);
-	}, [
-		search.selectedItemId,
-		spawn.request,
-	]);
 	const selectItem = useCallback(
-		({ index, itemId }: useCheatItemSpotlightController.SelectItemProps) => {
-			search.setSelectedIndex(index);
+		(itemId: string) => {
 			spawn.request(itemId);
 		},
 		[
-			search.setSelectedIndex,
 			spawn.request,
-		],
-	);
-	const onBackdropPointerDown = useCallback(
-		(event: PointerEvent<HTMLDivElement>) => {
-			if (event.currentTarget === event.target) close();
-		},
-		[
-			close,
-		],
-	);
-	const onKeyDown = useCallback(
-		(event: KeyboardEvent<HTMLElement>) => {
-			if (event.key !== "Escape") return;
-			event.preventDefault();
-			event.stopPropagation();
-			close();
-		},
-		[
-			close,
 		],
 	);
 
@@ -184,13 +138,6 @@ export const useCheatItemSpotlightController = ({
 		blockedByHigherOwner,
 		cheats.enabled,
 		close,
-		open,
-	]);
-
-	useEffect(() => {
-		if (!open) return;
-		queueMicrotask(() => inputRef.current?.focus());
-	}, [
 		open,
 	]);
 
@@ -224,31 +171,20 @@ export const useCheatItemSpotlightController = ({
 
 	return useMemo(
 		() => ({
-			inputRef,
-			onBackdropPointerDown,
-			onKeyDown,
-			onQueryChange,
+			close,
+			items,
 			open,
-			query: search.query,
-			requestSelected,
-			results: search.results,
+			resetSpawnStatus: spawn.reset,
 			selectItem,
-			selectedIndex: search.selectedIndex,
-			setSelectedIndex: search.setSelectedIndex,
 			spawnStatus,
 			spawnStatusMessage,
 		}),
 		[
-			onBackdropPointerDown,
-			onKeyDown,
-			onQueryChange,
+			close,
+			items,
 			open,
-			requestSelected,
-			search.query,
-			search.results,
-			search.selectedIndex,
-			search.setSelectedIndex,
 			selectItem,
+			spawn.reset,
 			spawnStatus,
 			spawnStatusMessage,
 		],

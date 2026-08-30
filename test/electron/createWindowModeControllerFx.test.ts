@@ -90,20 +90,42 @@ describe("createWindowModeControllerFx", () => {
 		]);
 	});
 
-	it("maximizes bordered mode and records native maximize changes", async () => {
+	it("settles explicit windowed modes without native maximize events", async () => {
 		const harness = createHarness("default");
-		let completed = false;
-		const request = Effect.runPromise(harness.controller.requestModeFx("bordered")).then(() => {
-			completed = true;
-		});
 
+		await Effect.runPromise(harness.controller.requestModeFx("bordered"));
 		expect(harness.maximize).toHaveBeenCalledOnce();
-		expect(completed).toBe(false);
-		harness.emit("maximize");
-		await request;
+		expect(harness.isMaximized()).toBe(true);
 		expect(harness.writes).toEqual([
 			"bordered",
 		]);
+		expect(harness.send).toHaveBeenLastCalledWith(
+			ArkiniElectronApi.channels.windowModeChanged,
+			"bordered",
+		);
+
+		await Effect.runPromise(harness.controller.requestModeFx("default"));
+		expect(harness.unmaximize).toHaveBeenCalledOnce();
+		expect(harness.isMaximized()).toBe(false);
+		expect(harness.writes).toEqual([
+			"bordered",
+			"default",
+		]);
+		expect(harness.send).toHaveBeenLastCalledWith(
+			ArkiniElectronApi.channels.windowModeChanged,
+			"default",
+		);
+	});
+
+	it("records passive native maximize changes", async () => {
+		const harness = createHarness("default");
+
+		harness.emit("maximize");
+		await vi.waitFor(() =>
+			expect(harness.writes).toEqual([
+				"bordered",
+			]),
+		);
 
 		harness.emit("unmaximize");
 		await vi.waitFor(() =>
@@ -111,6 +133,27 @@ describe("createWindowModeControllerFx", () => {
 				"bordered",
 				"default",
 			]),
+		);
+	});
+
+	it("keeps a newer explicit windowed mode after a stale native event", async () => {
+		const harness = createHarness("default");
+
+		await Effect.runPromise(harness.controller.requestModeFx("bordered"));
+		await Effect.runPromise(harness.controller.requestModeFx("default"));
+		harness.emitWithoutStateChange("maximize");
+		await vi.waitFor(() =>
+			expect(harness.writes).toEqual([
+				"bordered",
+				"default",
+				"default",
+			]),
+		);
+
+		expect(harness.isMaximized()).toBe(false);
+		expect(harness.send).toHaveBeenLastCalledWith(
+			ArkiniElectronApi.channels.windowModeChanged,
+			"default",
 		);
 	});
 

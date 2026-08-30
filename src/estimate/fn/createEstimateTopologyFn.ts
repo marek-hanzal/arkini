@@ -15,7 +15,6 @@ export interface EstimateTopology {
 	readonly componentByFact: ReadonlyMap<string, string>;
 	readonly factCount: number;
 	readonly factIds: ReadonlySet<string>;
-	readonly reachableFactIds: ReadonlySet<string>;
 	readonly requirementsByRoute: ReadonlyMap<EditorAcquisitionRoute, EstimateRouteRequirements>;
 	readonly roots: ReadonlyMap<string, number | "unbounded">;
 	readonly routesByFact: ReadonlyMap<string, ReadonlyArray<EditorAcquisitionRoute>>;
@@ -103,52 +102,6 @@ const readComponentsFn = ({
 	};
 };
 
-const routeHasPositiveYieldFn = (route: EditorAcquisitionRoute) =>
-	route.output.quantityDistribution.some(
-		({ probability, quantity }) => probability > 0 && quantity > 0,
-	);
-
-const readReachableFactIdsFn = ({
-	factCount,
-	requirementsByRoute,
-	roots,
-	routes,
-	unsupportedRoutes,
-}: {
-	readonly factCount: number;
-	readonly requirementsByRoute: ReadonlyMap<EditorAcquisitionRoute, EstimateRouteRequirements>;
-	readonly roots: ReadonlyMap<string, number | "unbounded">;
-	readonly routes: ReadonlyArray<EditorAcquisitionRoute>;
-	readonly unsupportedRoutes: ReadonlySet<EditorAcquisitionRoute>;
-}) => {
-	const reachable = new Set(roots.keys());
-	let pending = routes.filter(
-		(route) => !unsupportedRoutes.has(route) && routeHasPositiveYieldFn(route),
-	);
-	for (let iteration = 0; iteration < factCount; iteration += 1) {
-		let changed = false;
-		const nextPending: EditorAcquisitionRoute[] = [];
-		for (const route of pending) {
-			const requirements = requirementsByRoute.get(route);
-			if (
-				requirements === undefined ||
-				requirements.allOf.some(({ factId }) => !reachable.has(factId)) ||
-				requirements.anyOf.some(
-					(clause) => !clause.some(({ factId }) => reachable.has(factId)),
-				)
-			)
-				nextPending.push(route);
-			else if (!reachable.has(route.output.factId)) {
-				reachable.add(route.output.factId);
-				changed = true;
-			}
-		}
-		if (!changed) break;
-		pending = nextPending;
-	}
-	return reachable;
-};
-
 /** Indexes immutable acquisition topology and authored seed evidence for one Estimate batch. */
 export const createEstimateTopologyFn = (graph: EditorAcquisitionGraph): EstimateTopology => {
 	const factIds = new Set(graph.factIds);
@@ -202,13 +155,6 @@ export const createEstimateTopologyFn = (graph: EditorAcquisitionGraph): Estimat
 		componentByFact,
 		factCount: factIds.size,
 		factIds,
-		reachableFactIds: readReachableFactIdsFn({
-			factCount: factIds.size,
-			requirementsByRoute,
-			roots,
-			routes: graph.routes,
-			unsupportedRoutes,
-		}),
 		requirementsByRoute,
 		roots,
 		routesByFact,

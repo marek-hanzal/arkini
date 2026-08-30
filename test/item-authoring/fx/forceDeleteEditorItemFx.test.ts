@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { forceDeleteEditorItemFx } from "~/item-authoring/domain/fx/forceDeleteEditorItemFx";
+import { forceDeleteEditorItemFx } from "~/item-authoring/fx/forceDeleteEditorItemFx";
 import { editorTestConfig } from "~test/project-authoring/support/editorTestPayload";
 import {
 	createLine,

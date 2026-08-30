@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
-import { renameEditorItemFx } from "~/item-authoring/domain/fx/renameEditorItemFx";
+import { renameEditorItemFx } from "~/item-authoring/fx/renameEditorItemFx";
 import { notifyProjectChangedFx } from "./notifyProjectChangedFx";
 
 /** Renames an item through a revision-pinned whole-config commit. */

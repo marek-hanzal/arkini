@@ -1,6 +1,6 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
-import type { EditorItemSectionDescriptor } from "~/item-authoring/ui/EditorItemSections";
+import type { EditorItemSectionDescriptor } from "~/item-authoring/type/EditorItemSection";
 
 const EditorItemSections = [
 	{
@@ -46,11 +46,13 @@ const ProductionItemTypes: ReadonlySet<TypeSchema.Type> = new Set([
 	"temporary",
 ]);
 
-/** Returns the explicit sections supported by one item discriminator. */
+/** Returns the explicit sections supported by one item discriminator and surface. */
 export const readEditorItemSectionsFn = (
 	item: Pick<ItemSchema.Type, "type">,
+	mode: "detail" | "form" = "detail",
 ): ReadonlyArray<EditorItemSectionDescriptor> =>
 	EditorItemSections.filter((section) => {
+		if (mode === "form" && (section.id === "estimate" || section.id === "delete")) return false;
 		switch (section.id) {
 			case "production":
 				return ProductionItemTypes.has(item.type);

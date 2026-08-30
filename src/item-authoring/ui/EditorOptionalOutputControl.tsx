@@ -5,7 +5,7 @@ import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorItemDraftDefaults } from "~/item-authoring/ui/EditorItemDraftDefaults";
 import { EditorOutputControl } from "~/item-authoring/ui/EditorOutputControl";
 
-export interface EditorOptionalOutputControlProps {
+interface EditorOptionalOutputControlProps {
 	readonly addLabel: string;
 	readonly emptyDescription: string;
 	readonly emptyIcon: LucideIcon;

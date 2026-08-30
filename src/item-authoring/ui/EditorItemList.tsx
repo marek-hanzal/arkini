@@ -2,7 +2,7 @@ import { PackageOpen, Plus } from "lucide-react";
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { useMemo } from "react";
 
-import { searchEditorItemsFn } from "~/item-authoring/domain/fn/searchEditorItemsFn";
+import { searchEditorItemsFn } from "~/item-authoring/fn/searchEditorItemsFn";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { PrimaryButtonLink } from "~/ui/button/Button";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";

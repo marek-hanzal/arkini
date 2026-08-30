@@ -2,7 +2,7 @@ import { ArrowRight, ShieldAlert, ShieldCheck } from "lucide-react";
 
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import type { readEditorItemDeleteBlockersFn } from "~/item-authoring/domain/fn/readEditorItemDeleteBlockersFn";
+import type { readEditorItemDeleteBlockersFn } from "~/item-authoring/fn/readEditorItemDeleteBlockersFn";
 import { ButtonLink, DangerButton } from "~/ui/button/Button";
 import { EditorItemDeleteDialog } from "~/item-authoring/ui/EditorItemDeleteDialog";
 import { EditorItemThumbnail } from "~/ui/item/EditorItemThumbnail";

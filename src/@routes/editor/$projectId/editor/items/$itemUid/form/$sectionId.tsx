@@ -9,9 +9,9 @@ import { EditorItemProductionSection } from "~/item-authoring/ui/EditorItemProdu
 import {
 	type EditorItemSectionId,
 	EditorItemSectionIds,
-} from "~/item-authoring/ui/EditorItemSections";
+} from "~/item-authoring/type/EditorItemSection";
 import { EditorSpaceActionSection } from "~/item-authoring/ui/EditorSpaceActionSection";
-import { readEditorItemFormSectionsFn } from "~/item-authoring/ui/fn/readEditorItemFormSectionsFn";
+import { readEditorItemSectionsFn } from "~/item-authoring/fn/readEditorItemSectionsFn";
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/form/$sectionId")({
 	beforeLoad: ({ params }) => {
@@ -30,7 +30,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 		const { sectionId } = Route.useParams();
 		const section = sectionId as EditorItemSectionId;
 		const session = useEditorItemFormSession();
-		const available = readEditorItemFormSectionsFn(session.initialItem).some(
+		const available = readEditorItemSectionsFn(session.initialItem, "form").some(
 			(candidate) => candidate.id === section,
 		);
 		if (!available)

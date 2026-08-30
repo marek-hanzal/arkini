@@ -6,7 +6,7 @@ import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 
-export interface CreateEditorItemDraftFnProps {
+interface CreateEditorItemDraftFnProps {
 	readonly resourceId: string;
 	readonly type: TypeSchema.Type;
 	readonly uid: string;

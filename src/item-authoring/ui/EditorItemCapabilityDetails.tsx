@@ -11,7 +11,7 @@ import {
 } from "~/item-authoring/ui/EditorItemDetailDefinition";
 import { OutputDetail } from "~/item-authoring/ui/EditorItemOutputDetail";
 import { EditorSelectorDetail } from "~/item-authoring/ui/EditorSelectorDetail";
-import type { EditorItemOptionalCapability } from "~/item-authoring/ui/EditorItemSections";
+import type { EditorItemOptionalCapability } from "~/item-authoring/type/EditorItemSection";
 import { Status } from "~/ui/status/Status";
 
 const DisabledCapabilityDetail = ({

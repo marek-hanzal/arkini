@@ -42,13 +42,20 @@ const gameTickAllowedSourceDependencyPattern =
 const gameStartPattern = "^src/game-start(?:/|$)";
 const itemDetailFramePattern = "^src/item-detail-frame(?:/|$)";
 const itemDefinitionPattern = "^src/item-definition(?:/|$)";
+const itemAuthoringValuePattern = "^src/item-authoring/(?:fn|schema|type)(?:/|$)";
+const itemAuthoringEffectPattern = "^src/item-authoring/fx(?:/|$)";
+const itemAuthoringCorePattern = "^src/item-authoring/(?:fn|fx|schema|type)(?:/|$)";
+const itemAuthoringValueAllowedDependencyPattern =
+	"(?:item-authoring/(?:fn|schema|type)(?:/|$)|game-config/(?:diagnostic/schema/(?:DiagnosticCodeEnumSchema|DiagnosticRecordEntityEnumSchema)[.]ts$|schema/GameConfigSchema[.]ts$|validation/rule/fn/validateConfigReferencesFn[.]ts$)|item-definition/schema/(?:BaseSchema|ItemSchema|TypeSchema)[.]ts$|item-merge/schema/MergeSchema[.]ts$|production-action/schema/(?:InputSchema|RuleSchema)[.]ts$|production-input/schema/InputSchema[.]ts$|production-line/(?:fn/readAuthoredItemLinesFn[.]ts$|schema/LineSchema[.]ts$)|production-output/schema/OutputSchema[.]ts$)";
+const itemAuthoringEffectAllowedDependencyPattern =
+	"(?:item-authoring/(?:fn|fx|schema|type)(?:/|$)|authoring-session/fx/publishEditorProjectFx[.]ts$|engine/editor/error/EditorProjectError[.]ts$|game-config/(?:diagnostic/schema/(?:DiagnosticCodeEnumSchema|DiagnosticRecordEntityEnumSchema)[.]ts$|schema/GameConfigSchema[.]ts$|validation/rule/fn/validateConfigReferencesFn[.]ts$)|item-definition/schema/ItemSchema[.]ts$|project-authoring/service/EditorProjectRepository[.]ts$)";
 const arkpackArtifactPattern = "^src/arkpack/(?:type/ArkpackDescriptor[.]ts$|artifact(?:/|$))";
 const productionPipelinePattern =
 	"^src/(?:production-action|production-condition|production-delivery|production-input|production-job|production-line|production-output)(?:/|$)";
 const flowPattern = "^src/flow(?:/|$)";
 const flowLayoutPattern = "^src/flow-layout(?:/|$)";
 const flowCanvasPattern = "^src/flow-canvas(?:/|$)";
-const productDomainPattern = `^src/(?:asset-authoring|item-authoring|estimate|editor-build)/domain(?:/|$)|${flowPattern}`;
+const productDomainPattern = `^src/(?:asset-authoring|estimate|editor-build)/domain(?:/|$)|${flowPattern}`;
 const productRendererPattern =
 	"^src/(?:arkpack|editor-build)/renderer(?:/|$)|^src/asset-authoring/(?:session|validation)(?:/|$)";
 const productionJobPresentationPattern = "^src/production-job/ui(?:/|$)";
@@ -731,13 +738,37 @@ const boundaryRules = [
 	{
 		name: "product-domain-no-presentation-imports",
 		comment:
-			"Asset Authoring, Item Authoring, Flow core, Estimate, and Editor Build domain owners stay platform-neutral and never import product UI/workers, shared UI, renderer ownership, routes, or Electron.",
+			"Asset Authoring, Flow core, Estimate, and Editor Build domain owners stay platform-neutral and never import product UI/workers, shared UI, renderer ownership, routes, or Electron.",
 		severity: "error",
 		from: {
 			path: productDomainPattern,
 		},
 		to: {
 			path: `^src/(?:application-runtime|renderer|ui|@routes)(?:/|$)|${productRendererPattern}|${productPresentationPattern}|${authoringProductRuntimePattern}|${authoringProductPresentationPattern}|^electron(?:/|$)|^node_modules/(?:electron|react|react-dom|@tanstack/react-router)(?:/|$)`,
+		},
+	},
+	{
+		name: "item-authoring-values-have-exact-dependencies",
+		comment:
+			"Item Authoring functions, schemas, and types own explicit value policy and never depend on presentation, routes, Electron, renderer lifecycle, or unrelated product capabilities.",
+		severity: "error",
+		from: {
+			path: itemAuthoringValuePattern,
+		},
+		to: {
+			path: `^src/(?!${itemAuthoringValueAllowedDependencyPattern})|^(?:electron|shared|scripts)(?:/|$)|^node_modules/(?!fuse[.]js(?:/|$)|ts-pattern(?:/|$)|zod(?:/|$))`,
+		},
+	},
+	{
+		name: "item-authoring-effects-have-exact-dependencies",
+		comment:
+			"Item Authoring Effects own repository mutation and mounted-project publication through exact capabilities without importing UI, routes, Electron, or renderer composition.",
+		severity: "error",
+		from: {
+			path: itemAuthoringEffectPattern,
+		},
+		to: {
+			path: `^src/(?!${itemAuthoringEffectAllowedDependencyPattern})|^(?:electron|shared|scripts)(?:/|$)|^node_modules/(?!effect(?:/|$))`,
 		},
 	},
 	{
@@ -956,7 +987,7 @@ const boundaryRules = [
 			"Framework-neutral Engine, Game Event facts, authored Game configuration, Arkpack artifacts, and product domains never depend on Electron transport contracts.",
 		severity: "error",
 		from: {
-			path: `^src/(?:engine|editor)(?:/|$)|${gameRuntimePattern}|${gamePersistencePattern}|${gameStartPattern}|${gameEventPattern}|${itemDefinitionPattern}|${boardSpatialPattern}|${gameConfigPattern}|${arkpackArtifactPattern}|${productDomainPattern}|${authoringProductCorePattern}`,
+			path: `^src/(?:engine|editor)(?:/|$)|${gameRuntimePattern}|${gamePersistencePattern}|${gameStartPattern}|${gameEventPattern}|${itemDefinitionPattern}|${boardSpatialPattern}|${gameConfigPattern}|${arkpackArtifactPattern}|${itemAuthoringCorePattern}|${productDomainPattern}|${authoringProductCorePattern}`,
 		},
 		to: {
 			path: "^electron/contract(?:/|$)",

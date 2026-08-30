@@ -1,8 +1,7 @@
+import type { QuerySchema } from "~/item-definition/query/schema/QuerySchema";
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
-import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
-import type { QuerySchema } from "~/item-definition/query/schema/QuerySchema";
 import type { RollSchema } from "~/production-output/roll/schema/RollSchema";
 import type { SetSchema } from "~/production-output/roll/schema/SetSchema";
 import type { WeightedDropSchema } from "~/production-output/roll/schema/WeightedDropSchema";
@@ -75,8 +74,8 @@ const query = {
 	},
 } satisfies QuerySchema.Type;
 
-/** Presentation-only defaults cloned by local item forms when adding nested values. */
-export const EditorItemDraftDefaults = {
+/** Defaults cloned by production-line controls when adding nested contracts. */
+export const EditorProductionDraftDefaults = {
 	inputs: {
 		simple: {
 			type: "simple",
@@ -122,14 +121,6 @@ export const EditorItemDraftDefaults = {
 			SetSchema.Type,
 		],
 	} satisfies OutputSchema.Type,
-	merge: {
-		target: {
-			type: "item",
-			itemId: "",
-		},
-		action: "use",
-		effect: "keep",
-	} satisfies MergeSchema.Type,
 	when: {
 		type: "exists",
 		query,

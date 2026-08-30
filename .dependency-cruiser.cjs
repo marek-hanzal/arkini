@@ -49,10 +49,13 @@ const itemDefinitionPattern = "^src/item-definition(?:/|$)";
 const itemAuthoringValuePattern = "^src/item-authoring/(?:fn|schema|type)(?:/|$)";
 const itemAuthoringEffectPattern = "^src/item-authoring/fx(?:/|$)";
 const itemAuthoringCorePattern = "^src/item-authoring/(?:fn|fx|schema|type)(?:/|$)";
+const productionLineAuthoringPattern = "^src/production-line-authoring(?:/|$)";
 const itemAuthoringValueAllowedDependencyPattern =
 	"(?:item-authoring/(?:fn|schema|type)(?:/|$)|game-config/(?:diagnostic/schema/(?:DiagnosticCodeEnumSchema|DiagnosticRecordEntityEnumSchema)[.]ts$|schema/GameConfigSchema[.]ts$|validation/rule/fn/validateConfigReferencesFn[.]ts$)|item-definition/schema/(?:BaseSchema|ItemSchema|TypeSchema)[.]ts$|item-merge/schema/MergeSchema[.]ts$|production-action/schema/(?:InputSchema|RuleSchema)[.]ts$|production-input/schema/InputSchema[.]ts$|production-line/(?:fn/readAuthoredItemLinesFn[.]ts$|schema/LineSchema[.]ts$)|production-output/schema/OutputSchema[.]ts$)";
 const itemAuthoringEffectAllowedDependencyPattern =
 	"(?:item-authoring/(?:fn|fx|schema|type)(?:/|$)|authoring-session/fx/publishEditorProjectFx[.]ts$|engine/editor/error/EditorProjectError[.]ts$|game-config/(?:diagnostic/schema/(?:DiagnosticCodeEnumSchema|DiagnosticRecordEntityEnumSchema)[.]ts$|schema/GameConfigSchema[.]ts$|validation/rule/fn/validateConfigReferencesFn[.]ts$)|item-definition/schema/ItemSchema[.]ts$|project-authoring/service/EditorProjectRepository[.]ts$)";
+const productionLineAuthoringAllowedSourceDependencyPattern =
+	"(?:production-line-authoring(?:/|$)|authoring-session/ui/useEditorProject[.]ts$|item-definition/(?:query/schema/QuerySchema|schema/(?:QuantitySchema|SelectorSchema))[.]ts$|production-action/schema/RuleSchema[.]ts$|production-condition/schema/WhenSchema[.]ts$|production-input/schema/InputSchema[.]ts$|production-line/schema/(?:LineSchema|rule/RuleSchema)[.]ts$|production-output/(?:schema/(?:DropSchema|OutputSchema|drop/rule/RuleSchema)[.]ts$|roll/schema/(?:RollSchema|SetSchema|WeightedDropSchema)[.]ts$)|ui/(?:button/Button[.]tsx$|form/(?:EditorCapabilityStatus|EditorCollectionSelector|EditorForm|EditorFormCard|EditorFormSectionDivider|EditorValueControls)[.]tsx$|item/(?:EditorItemAutocompleteField|useEditorItemSearchOptions)[.]tsx?$|overlay/Tooltip[.]tsx$))";
 const arkpackArtifactPattern = "^src/arkpack/(?:type/ArkpackDescriptor[.]ts$|artifact(?:/|$))";
 const productionPipelinePattern =
 	"^src/(?:production-action|production-condition|production-delivery|production-input|production-job|production-line|production-output)(?:/|$)";
@@ -64,7 +67,7 @@ const productRendererPattern =
 	"^src/(?:arkpack|editor-build)/renderer(?:/|$)|^src/asset-authoring/(?:session|validation)(?:/|$)";
 const productionJobPresentationPattern = "^src/production-job/ui(?:/|$)";
 const boardSpatialPattern = "^src/(?:item-location|item-placement|item-merge|space-action)(?:/|$)";
-const productPresentationPattern = `^src/(?:asset-authoring|item-authoring|estimate)/(?:ui|worker)(?:/|$)|^src/(?:flow-layout|flow-canvas)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)|${itemDetailFramePattern}|${itemLineDetailPresentationPattern}|${tilePresentationPattern}|${tileMotionPattern}|${tileInteractionPattern}|${productionJobPresentationPattern}`;
+const productPresentationPattern = `^src/(?:asset-authoring|item-authoring|estimate)/(?:ui|worker)(?:/|$)|${productionLineAuthoringPattern}|^src/(?:flow-layout|flow-canvas)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)|${itemDetailFramePattern}|${itemLineDetailPresentationPattern}|${tilePresentationPattern}|${tileMotionPattern}|${tileInteractionPattern}|${productionJobPresentationPattern}`;
 const authoringProductPattern =
 	"^src/(?:project-authoring|board-scenario|project-version|project-note|authoring-mcp|authoring-session|authoring-shell)(?:/|$)";
 const authoringProductCorePattern =
@@ -288,7 +291,7 @@ const boundaryRules = [
 				"^src/ui/item-detail/ItemDetailModal[.]tsx$",
 				"^src/ui/shell/GameShell[.]tsx$",
 				"^src/board-scenario/toolbar/EditorBoardProductionLineLink[.]tsx$",
-				"^src/item-authoring/ui/EditorProductionLineOutputs[.]tsx$",
+				"^src/item-authoring/ui/EditorProductionLineDetail[.]tsx$",
 			],
 		},
 		to: {
@@ -803,6 +806,35 @@ const boundaryRules = [
 		},
 		to: {
 			path: `^src/(?!${itemAuthoringEffectAllowedDependencyPattern})|^(?:electron|shared|scripts)(?:/|$)|^node_modules/(?!effect(?:/|$))`,
+		},
+	},
+	{
+		name: "production-line-authoring-has-exact-presentation-dependencies",
+		comment:
+			"Production Line Authoring controls Line, Input, Rule, and Output contracts through exact schemas, the mounted authoring read, and reusable UI without importing Item Authoring, routes, runtime, renderer, or platform ownership.",
+		severity: "error",
+		from: {
+			path: productionLineAuthoringPattern,
+		},
+		to: {
+			path: `^src/(?!${productionLineAuthoringAllowedSourceDependencyPattern})|^(?:electron|shared|scripts)(?:/|$)|^node_modules/(?!lucide-react(?:/|$)|react(?:/|$)|ts-pattern(?:/|$))`,
+		},
+	},
+	{
+		name: "production-line-authoring-has-concrete-consumers",
+		comment:
+			"Only Item Authoring composition and the Board Scenario line link consume the controlled production-line authoring surface.",
+		severity: "error",
+		from: {
+			path: activeCodePattern,
+			pathNot: [
+				productionLineAuthoringPattern,
+				"^src/board-scenario/toolbar/EditorBoardProductionLineLink[.]tsx$",
+				"^src/item-authoring/ui/(?:EditorItemChargesSection|EditorItemProductionSection|EditorMergeField|EditorProductionLineDetail|EditorSpaceActionSection)[.]tsx$",
+			],
+		},
+		to: {
+			path: productionLineAuthoringPattern,
 		},
 	},
 	{

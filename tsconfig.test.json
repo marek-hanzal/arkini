@@ -35,6 +35,7 @@
 		"src/production-input",
 		"src/production-job",
 		"src/production-line",
+		"src/production-line-authoring",
 		"src/production-output",
 		"src/game-config",
 		"src/arkpack",

@@ -5,10 +5,10 @@ import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
-import { EditorItemDraftDefaults } from "~/item-authoring/ui/EditorItemDraftDefaults";
+import { EditorItemMergeDraftDefault } from "~/item-authoring/ui/EditorItemMergeDraftDefault";
 import { EditorMergeField } from "~/item-authoring/ui/EditorMergeField";
 import { useEditorItemFormSession } from "~/item-authoring/ui/EditorItemFormContext";
-import { useEditorItemOptionLabel } from "~/item-authoring/ui/useEditorItemOptionLabel";
+import { useEditorItemOptionLabel } from "~/ui/item/useEditorItemSearchOptions";
 
 const EditorMergeFields = ({
 	onChange,
@@ -36,7 +36,7 @@ const EditorMergeFields = ({
 						icon={Combine}
 						onEnable={() =>
 							onChange([
-								structuredClone(EditorItemDraftDefaults.merge),
+								structuredClone(EditorItemMergeDraftDefault),
 							])
 						}
 						title="Merges are disabled"
@@ -60,7 +60,7 @@ const EditorMergeFields = ({
 						onAdd={() =>
 							onChange([
 								...merges,
-								structuredClone(EditorItemDraftDefaults.merge),
+								structuredClone(EditorItemMergeDraftDefault),
 							])
 						}
 						onRemove={(index) => {

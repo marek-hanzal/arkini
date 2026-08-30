@@ -1,9 +1,9 @@
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
-import { EditorItemDraftDefaults } from "~/item-authoring/ui/EditorItemDraftDefaults";
-import { EditorLineInput } from "~/item-authoring/ui/EditorLineInput";
-import { useEditorItemOptionLabel } from "~/item-authoring/ui/useEditorItemOptionLabel";
+import { EditorLineInput } from "~/production-line-authoring/ui/EditorLineInput";
+import { EditorProductionDraftDefaults } from "~/production-line-authoring/ui/EditorProductionDraftDefaults";
+import { useEditorItemOptionLabel } from "~/ui/item/useEditorItemSearchOptions";
 
 interface EditorLineInputsControlProps {
 	readonly allowMaterials?: boolean;
@@ -52,7 +52,7 @@ export const EditorLineInputsControl = ({
 				onAdd={() =>
 					onChange([
 						...value,
-						structuredClone(EditorItemDraftDefaults.inputs.simple),
+						structuredClone(EditorProductionDraftDefaults.inputs.simple),
 					])
 				}
 				onRemove={

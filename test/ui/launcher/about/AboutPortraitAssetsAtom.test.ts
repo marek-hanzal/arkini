@@ -25,8 +25,9 @@ const payload = {
 	config: GameConfigSchema.parse({
 		resources: {
 			hero: "hero",
-			"avatar-01": "avatar:one",
-			"avatar-02": "avatar:two",
+			"avatar-01": "avatar:two",
+			"avatar-03": "avatar:missing",
+			"avatar-05": "avatar:one",
 		},
 		meta: {
 			id: "game:about-portraits",
@@ -103,7 +104,7 @@ afterEach(async () => {
 });
 
 describe("AboutPortraitAssetsAtom", () => {
-	it("loads canonical portraits and revokes every owned URL when its registry closes", async () => {
+	it("loads resolvable portraits in stable role order without placeholders and revokes every owned URL", async () => {
 		const registry = AtomRegistry.make({
 			defaultIdleTTL: 400,
 			scheduleTask,
@@ -111,8 +112,8 @@ describe("AboutPortraitAssetsAtom", () => {
 		registries.push(registry);
 		const createObjectUrl = vi
 			.spyOn(URL, "createObjectURL")
-			.mockReturnValueOnce("blob:portrait-one")
-			.mockReturnValueOnce("blob:portrait-two");
+			.mockReturnValueOnce("blob:avatar-01")
+			.mockReturnValueOnce("blob:avatar-05");
 		const revokeObjectUrl = vi.spyOn(URL, "revokeObjectURL");
 		const container = document.createElement("div");
 		document.body.append(container);
@@ -133,8 +134,8 @@ describe("AboutPortraitAssetsAtom", () => {
 		await vi.waitFor(() =>
 			expect(container.textContent).toBe(
 				JSON.stringify([
-					"blob:portrait-one",
-					"blob:portrait-two",
+					"blob:avatar-01",
+					"blob:avatar-05",
 				]),
 			),
 		);
@@ -143,18 +144,25 @@ describe("AboutPortraitAssetsAtom", () => {
 			ArkiniDefaultPackageId,
 		]);
 		expect(createObjectUrl).toHaveBeenCalledTimes(2);
-		expect(createObjectUrl.mock.calls[0]?.[0]).toBeInstanceOf(Blob);
-		expect(createObjectUrl.mock.calls[1]?.[0]).toBeInstanceOf(Blob);
+		const blobs = createObjectUrl.mock.calls.map(([source]) => {
+			expect(source).toBeInstanceOf(Blob);
+			if (!(source instanceof Blob)) throw new Error("Expected one portrait Blob.");
+			return source;
+		});
+		expect(blobs.map(({ type }) => type)).toEqual([
+			"image/webp",
+			"image/png",
+		]);
 		expect(revokeObjectUrl).not.toHaveBeenCalled();
 
 		registry.dispose();
 		await vi.waitFor(() => expect(revokeObjectUrl).toHaveBeenCalledTimes(2));
 		expect(revokeObjectUrl.mock.calls).toEqual([
 			[
-				"blob:portrait-one",
+				"blob:avatar-01",
 			],
 			[
-				"blob:portrait-two",
+				"blob:avatar-05",
 			],
 		]);
 	});

@@ -4,7 +4,7 @@ import { Effect } from "effect";
 import { releaseCurrentEditorBoardGameFx } from "~/board-scenario/session/releaseCurrentEditorBoardGameFx";
 import { syncEditorBoardGameFx } from "~/board-scenario/session/syncEditorBoardGameFx";
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import { EditorProjectProvider } from "~/authoring-session/ui/EditorProjectProvider";
+import { EditorProjectProvider } from "~/authoring-session/ui/useEditorProject";
 import { readEditorProjectFx } from "~/project-authoring/fx/readEditorProjectFx";
 import { ButtonLink } from "~/ui/button/Button";
 import { EditorProjectReplacementBoundary } from "~/authoring-session/ui/EditorProjectReplacementBoundary";

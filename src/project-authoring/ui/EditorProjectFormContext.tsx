@@ -1,6 +1,8 @@
 import { createContext, useContext, type PropsWithChildren } from "react";
 
-import type { EditorProjectFormController } from "~/project-authoring/ui/useEditorProjectFormController";
+import type { useEditorProjectFormController } from "~/project-authoring/ui/useEditorProjectFormController";
+
+type EditorProjectFormController = ReturnType<typeof useEditorProjectFormController>;
 
 const EditorProjectFormContext = createContext<EditorProjectFormController | undefined>(undefined);
 

@@ -9,7 +9,7 @@ import { validateEditorAssetFileFx } from "~/asset-authoring/validation/validate
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { IdSchema } from "~/game-config/schema/IdSchema";
-import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
+import { EditorProjectError } from "~/project-authoring/error/EditorProjectError";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";

@@ -4,7 +4,7 @@ import { EditorProjectRepository } from "~/project-authoring/service/EditorProje
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 import { validateEditorAssetFileFx } from "~/asset-authoring/validation/validateEditorAssetFileFx";
 import { IdSchema } from "~/game-config/schema/IdSchema";
-import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
+import { EditorProjectError } from "~/project-authoring/error/EditorProjectError";
 import { renameGameResourceFx } from "~/game-config/resource/renameGameResourceFx";
 
 interface EditEditorAssetProps {

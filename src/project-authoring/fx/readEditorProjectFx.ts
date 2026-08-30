@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
-import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
+import { EditorProjectError } from "~/project-authoring/error/EditorProjectError";
 
 export namespace readEditorProjectFx {
 	export interface Props {

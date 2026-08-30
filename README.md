@@ -58,7 +58,7 @@ src/production-delivery  outbound input delivery allocation, validation and sett
 src/game-config  authored value/config schemas, source, diagnostics, validation, resources and compiler
 src/arkpack   artifact bytes/provenance, renderer catalog/runtime and package UI
 src/editor-build  Build contract, renderer admission and Build presentation
-src/project-authoring  portable project model, repository contract, configuration and catalog workflows
+src/project-authoring  portable project model, project-operation failures, repository contract, configuration and catalog workflows
 src/board-scenario  revision-pinned Board scenario contracts, session lifecycle and controls
 src/project-version  immutable version graph, compatibility policies and checkout workspace
 src/project-note  ordered project Notes contracts and workspace

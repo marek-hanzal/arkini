@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
-import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
+import { EditorProjectError } from "~/project-authoring/error/EditorProjectError";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 export namespace saveEditorProjectConfigFx {

@@ -1,7 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import { useEffect, useRef } from "react";
 
-import { PixiInventorySurface } from "~/ui/pixi/PixiInventorySurface";
+import { PixiInventorySurface } from "~/game-scene/ui/PixiInventorySurface";
 
 /** Frames the standalone full-screen Inventory scene and its explicit Board return. */
 export const Inventory = ({ onClose }: { readonly onClose: () => void }) => {

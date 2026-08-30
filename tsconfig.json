@@ -36,6 +36,7 @@
 		"src/item-line-detail",
 		"src/item-detail",
 		"src/item-detail-frame",
+		"src/game-scene",
 		"src/tile-presentation",
 		"src/tile-rendering",
 		"src/tile-motion",

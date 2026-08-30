@@ -10,8 +10,8 @@ import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import { createMagneticProjectorFx } from "~/tile-motion/fx/createMagneticProjectorFx";
 import { createMotionPoseSamplerFx } from "~/tile-motion/fx/createMotionPoseSamplerFx";
 import { chaseTargetFx } from "~/tile-motion/fx/chaseTargetFx";
-import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
-import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
+import type { MainSurface } from "~/game-scene/service/MainSurface";
+import type { ActorPose } from "~/game-scene/type/ActorPose";
 
 export namespace runSpawnMotionFx {
 	export interface Props {

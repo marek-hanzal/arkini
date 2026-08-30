@@ -28,7 +28,7 @@ import type { QuantityPresentation } from "~/tile-motion/type/QuantityPresentati
 import type { MotionRedirect, TargetRoute } from "~/tile-motion/type/MotionTarget";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
-import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
+import type { MainSurface } from "~/game-scene/service/MainSurface";
 import { updateTileMotionLanesFn } from "~/tile-motion/fn/updateTileMotionLanesFn";
 
 export namespace createMotionRuntimeFx {

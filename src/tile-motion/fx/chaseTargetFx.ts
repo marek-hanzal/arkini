@@ -7,8 +7,8 @@ import type { ActorAnimator, PresentedPose } from "~/tile-rendering/service/Acto
 import type { AnimationCurve } from "~/tile-rendering/service/AnimationDriver";
 import { readTravelDurationMsFn } from "~/tile-rendering/fn/readTravelDurationMsFn";
 import { createMotionPoseSamplerFx } from "~/tile-motion/fx/createMotionPoseSamplerFx";
-import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
-import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
+import type { MainSurface } from "~/game-scene/service/MainSurface";
+import type { ActorPose } from "~/game-scene/type/ActorPose";
 
 export namespace chaseTargetFx {
 	export interface Props {

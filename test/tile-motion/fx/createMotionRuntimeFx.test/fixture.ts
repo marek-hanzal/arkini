@@ -28,8 +28,8 @@ import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import type { MagneticField, MagneticSample } from "~/tile-motion/service/MagneticField";
 import { createMotionRuntimeFx } from "~/tile-motion/fx/createMotionRuntimeFx";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
-import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
-import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
+import type { MainSurface } from "~/game-scene/service/MainSurface";
+import type { ActorPose } from "~/game-scene/type/ActorPose";
 
 vi.mock("~/tile-rendering/fx/createTileActorFx", async () => {
 	const { Effect: EffectModule } = await import("effect");

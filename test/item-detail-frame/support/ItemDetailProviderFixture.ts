@@ -6,11 +6,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, vi } from "vitest";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
-import type { GameMenuControl } from "~/ui/game-menu/GameMenuControl";
-import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
-import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import type { ItemDetailControl } from "~/item-detail-frame/type/ItemDetailControl";
-import { ItemDetailHigherOwnerGuard } from "~/item-detail-frame/ui/ItemDetailHigherOwnerGuard";
 import { ItemDetailProvider } from "~/item-detail-frame/ui/ItemDetailProvider";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 
@@ -106,18 +102,6 @@ const Probe = ({ onControl }: { readonly onControl: (control: ItemDetailControl)
 	return null;
 };
 
-const MenuProbe = ({ onControl }: { readonly onControl: (control: GameMenuControl) => void }) => {
-	const control = useGameMenuControl();
-	useEffect(
-		() => onControl(control),
-		[
-			control,
-			onControl,
-		],
-	);
-	return null;
-};
-
 export const renderProvider = async () => {
 	let control: ItemDetailControl | undefined;
 	const container = document.createElement("div");
@@ -145,49 +129,5 @@ export const renderProvider = async () => {
 			return control;
 		},
 		render,
-	};
-};
-
-export const renderGuardedProvider = async () => {
-	let itemDetail: ItemDetailControl | undefined;
-	let gameMenu: GameMenuControl | undefined;
-	const container = document.createElement("div");
-	document.body.append(container);
-	const root = createRoot(container);
-	roots.push(root);
-	await act(async () => {
-		root.render(
-			createElement(
-				GameMenuProvider,
-				null,
-				createElement(
-					ItemDetailProvider,
-					{
-						game: providerGame,
-					},
-					createElement(ItemDetailHigherOwnerGuard),
-					createElement(Probe, {
-						onControl: (next) => {
-							itemDetail = next;
-						},
-					}),
-					createElement(MenuProbe, {
-						onControl: (next) => {
-							gameMenu = next;
-						},
-					}),
-				),
-			),
-		);
-	});
-	return {
-		readGameMenu: () => {
-			if (gameMenu === undefined) throw new Error("Missing Game Menu control.");
-			return gameMenu;
-		},
-		readItemDetail: () => {
-			if (itemDetail === undefined) throw new Error("Missing Item Detail control.");
-			return itemDetail;
-		},
 	};
 };

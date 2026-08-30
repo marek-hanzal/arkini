@@ -17,7 +17,7 @@ import { SizeSchema } from "~/item-location/schema/SizeSchema";
 import { ToolbarSizeSchema } from "~/item-location/schema/ToolbarSizeSchema";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { saveEditorProjectConfigFx } from "~/project-authoring/fx/saveEditorProjectConfigFx";
-import { useAppForm } from "~/ui/form/EditorForm";
+import { useAppForm } from "~/authoring-form/ui/EditorForm";
 import type { EditorProjectSectionId } from "~/project-authoring/type/EditorProjectSections";
 import { readEditorProjectSectionForPathFn } from "~/project-authoring/fn/readEditorProjectSectionForPathFn";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";

@@ -3,7 +3,7 @@ import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorLineInput } from "~/production-line-authoring/ui/EditorLineInput";
 import { EditorProductionDraftDefaults } from "~/production-line-authoring/ui/EditorProductionDraftDefaults";
-import { useEditorItemOptionLabel } from "~/ui/item/useEditorItemSearchOptions";
+import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
 
 interface EditorLineInputsControlProps {
 	readonly allowMaterials?: boolean;

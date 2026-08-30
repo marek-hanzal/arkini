@@ -1,7 +1,7 @@
 import type { MouseEventHandler, PropsWithChildren, ReactNode } from "react";
 import { CursorClassName, type CursorSemantic } from "~/ui/cursor/CursorSemantic";
 import { LauncherHero } from "~/launcher/ui/LauncherHero";
-import { RouteBackdrop } from "~/ui/navigation/RouteBackdrop";
+import { RouteBackdrop } from "~/application-shell/ui/RouteBackdrop";
 
 const layoutClassNames = {
 	centered:

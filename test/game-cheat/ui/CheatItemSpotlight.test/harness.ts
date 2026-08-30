@@ -5,7 +5,7 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { vi } from "vitest";
 
-import { CheatAvailabilityAtom } from "~/ui/cheat-availability/CheatAvailabilityAtom";
+import { CheatAvailabilityAtom } from "~/application-settings/atom/CheatAvailabilityAtom";
 import type { Game } from "~/renderer/game/Game";
 import { CheatItemSpotlight } from "~/game-cheat/ui/CheatItemSpotlight";
 import { CheatItemSpawnProvider } from "~/game-cheat/ui/CheatItemSpawnProvider";

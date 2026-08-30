@@ -1,6 +1,6 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ButtonLink } from "~/ui/button/Button";
-import { EditorItemThumbnail } from "~/ui/item/EditorItemThumbnail";
+import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import type { EditorItemSectionId } from "~/item-authoring/type/EditorItemSection";
 
 /** Links one known item reference to its canonical identity detail. */

@@ -13,7 +13,7 @@ import {
 } from "~/item-authoring/schema/EditorItemFormSchema";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { saveEditorItemFx } from "~/item-authoring/fx/saveEditorItemFx";
-import { useAppForm } from "~/ui/form/EditorForm";
+import { useAppForm } from "~/authoring-form/ui/EditorForm";
 import type {
 	EditorItemOptionalCapability,
 	EditorItemSectionId,

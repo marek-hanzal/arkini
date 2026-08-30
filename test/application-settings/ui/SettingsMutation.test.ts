@@ -5,8 +5,8 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { describe, expect, it, vi } from "vitest";
 
-import { AppearanceAtom } from "~/ui/appearance/AppearanceAtom";
-import { CheatAvailabilityAtom } from "~/ui/cheat-availability/CheatAvailabilityAtom";
+import { AppearanceAtom } from "~/application-settings/atom/AppearanceAtom";
+import { CheatAvailabilityAtom } from "~/application-settings/atom/CheatAvailabilityAtom";
 import { WindowModeAtom } from "~/renderer/window/WindowModeAtom";
 import {
 	buttonByText,

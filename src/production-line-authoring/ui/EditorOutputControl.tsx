@@ -4,7 +4,7 @@ import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorProductionDraftDefaults } from "~/production-line-authoring/ui/EditorProductionDraftDefaults";
 import { EditorRollSetControl } from "~/production-line-authoring/ui/EditorRollSetControl";
-import { useEditorItemOptionLabel } from "~/ui/item/useEditorItemSearchOptions";
+import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
 
 const readFirstRollItemId = (roll: RollSchema.Type): string | undefined =>
 	roll.type === "weight" ? roll.drop[0]?.drop[0]?.itemId : roll.drop[0]?.itemId;

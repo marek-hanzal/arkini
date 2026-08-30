@@ -14,7 +14,7 @@ import { act, createElement, useSyncExternalStore } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { CheatAvailabilityAtom } from "~/ui/cheat-availability/CheatAvailabilityAtom";
+import { CheatAvailabilityAtom } from "~/application-settings/atom/CheatAvailabilityAtom";
 import type { Game } from "~/renderer/game/Game";
 import { createRendererLifecycleFx } from "~/application-runtime/fx/createRendererLifecycleFx";
 import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";

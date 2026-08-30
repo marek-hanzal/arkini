@@ -81,7 +81,7 @@ vi.mock("~/asset-authoring/ui/EditorAssetAutocompleteField", () => ({
 		createElement("span", null, label),
 }));
 
-vi.mock("~/ui/item/EditorItemAutocompleteField", () => ({
+vi.mock("~/authoring-form/ui/EditorItemAutocompleteField", () => ({
 	EditorItemAutocompleteField: ({ label }: { readonly label: string }) =>
 		createElement("span", null, label),
 }));

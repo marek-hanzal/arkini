@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { match } from "ts-pattern";
 
 import type { Game } from "~/renderer/game/Game";
-import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
+import { useCheatAvailability } from "~/application-settings/ui/useCheatAvailability";
 import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
 import type { GameMenuPhase } from "~/game-menu/type/GameMenuControl";
 import { useGameMenuActions } from "~/game-menu/ui/useGameMenuActions";

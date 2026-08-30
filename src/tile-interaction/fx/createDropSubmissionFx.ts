@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import type { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";

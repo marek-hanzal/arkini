@@ -1,7 +1,7 @@
 import type { Effect } from "effect";
 import type * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
+import type { ItemDetailTabEnumSchema } from "~/item-detail-read/schema/ItemDetailTabEnumSchema";
 
 export type ItemDetailPendingAction =
 	| "autofill"

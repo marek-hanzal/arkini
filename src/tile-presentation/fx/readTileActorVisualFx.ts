@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { TileActorVisual } from "~/tile-presentation/type/TileActorVisual";
 import type { AssetSchema } from "~/item-definition/schema/AssetSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";

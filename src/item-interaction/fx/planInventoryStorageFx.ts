@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
+import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
 import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import type { InventoryLocationSchema } from "~/item-location/schema/InventoryLocationSchema";

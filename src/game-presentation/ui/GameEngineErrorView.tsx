@@ -1,5 +1,5 @@
-import { CriticalGameLifecycleError } from "~/renderer/game/resource/CriticalGameLifecycleError";
-import { GameSaveBootstrapError } from "~/renderer/game/GameSaveBootstrapError";
+import { CriticalGameLifecycleError } from "~/playable-game/error/CriticalGameLifecycleError";
+import { GameSaveBootstrapError } from "~/installed-game/error/GameSaveBootstrapError";
 import { ActionErrorPage } from "~/launcher/ui/ActionErrorPage";
 import { DangerButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
 

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
+import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 /** Creates one empty runtime rooted in the configured explicit start space. */

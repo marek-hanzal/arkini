@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { Effect } from "effect";
 
-import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
+import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
 import { GameEngineProvider } from "~/game-presentation/ui/GameEngineProvider";
 import { GameCriticalFailureBoundary } from "~/game-presentation/ui/GameCriticalFailureBoundary";
 

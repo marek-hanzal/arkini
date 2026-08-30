@@ -1,10 +1,10 @@
 import { Cause, Effect, Exit } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { PlayableGame } from "~/renderer/game/PlayableGame";
+import type { PlayableGame } from "~/playable-game/type/PlayableGame";
 import { makeExactGameAtomFamilyFx } from "~/game-presentation/fx/makeExactGameAtomFamilyFx";
 import { settleRendererCommandFailureFx } from "~/game-presentation/fx/settleRendererCommandFailureFx";
-import { spawnCheatItemFx } from "~/engine/cheat/write/spawnCheatItemFx";
+import { spawnCheatItemFx } from "~/game-cheat/fx/spawnCheatItemFx";
 
 export namespace CheatItemSpawnCommandAtom {
 	export type Command =

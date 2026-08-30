@@ -5,7 +5,7 @@ import { act, createElement, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, vi } from "vitest";
 
-import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { ItemDetailControl } from "~/item-detail-frame/type/ItemDetailControl";
 import { ItemDetailProvider } from "~/item-detail-frame/ui/ItemDetailProvider";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
@@ -16,11 +16,11 @@ import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailContro
 	}
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
-vi.mock("~/engine/item-detail/read/readItemDetailSourcesFx", () => ({
+vi.mock("~/item-detail-read/fx/readItemDetailSourcesFx", () => ({
 	readItemDetailSourcesFx: (props: unknown) => props,
 }));
 
-vi.mock("~/engine/item-detail/fn/resolveItemDetailTargetFn", () => ({
+vi.mock("~/item-detail-read/fn/resolveItemDetailTargetFn", () => ({
 	resolveItemDetailTargetFn: ({
 		itemId,
 		requestedTab,

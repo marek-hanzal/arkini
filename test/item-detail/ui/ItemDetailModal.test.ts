@@ -43,7 +43,7 @@ vi.mock("~/game-presentation/ui/useRuntimeSelector", () => ({
 		}),
 }));
 
-vi.mock("~/engine/item-detail/read/readItemDetailIdentityFx", () => ({
+vi.mock("~/item-detail-read/fx/readItemDetailIdentityFx", () => ({
 	readItemDetailIdentityFx: () => ({
 		definitionId: "item",
 		itemId: "runtime:item",
@@ -55,19 +55,19 @@ vi.mock("~/engine/item-detail/read/readItemDetailIdentityFx", () => ({
 	}),
 }));
 
-vi.mock("~/engine/item-detail/fn/readItemDetailInfoFn", () => ({
+vi.mock("~/item-detail-read/fn/readItemDetailInfoFn", () => ({
 	readItemDetailInfoFn: () => ({
 		kind: "unavailable",
 	}),
 }));
 
-vi.mock("~/engine/item-detail/read/readItemDetailSourcesFx", () => ({
+vi.mock("~/item-detail-read/fx/readItemDetailSourcesFx", () => ({
 	readItemDetailSourcesFx: () => ({
 		kind: "unavailable",
 	}),
 }));
 
-vi.mock("~/engine/item-detail/fn/readItemDetailTabsFn", () => ({
+vi.mock("~/item-detail-read/fn/readItemDetailTabsFn", () => ({
 	readItemDetailTabsFn: () => state.tabs,
 }));
 

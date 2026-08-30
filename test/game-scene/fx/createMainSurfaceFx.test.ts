@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
-import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { createMainActorStoreFx } from "~/tile-rendering/fx/createMainActorStoreFx";
 import type { DropFeedback } from "~/game-scene/service/DropFeedback";

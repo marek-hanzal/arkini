@@ -3,8 +3,8 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { vi } from "vitest";
 
-import type { GameEngine } from "~/renderer/game/GameEngine";
-import type { GameTransition } from "~/renderer/game/session/GameSession";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
+import type { GameTransition } from "~/game-session/type/GameSession";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { PixiInventorySurface } from "~/game-scene/ui/PixiInventorySurface";
 

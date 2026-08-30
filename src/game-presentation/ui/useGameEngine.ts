@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import type { PackageGameEngine } from "~/renderer/game/GameEngine";
+import type { PackageGameEngine } from "~/installed-game/type/Game";
 import { GameEngineContext } from "~/game-presentation/context/GameEngineContext";
 
 /** Reads the exact Game Engine published by the active gameplay owner. */

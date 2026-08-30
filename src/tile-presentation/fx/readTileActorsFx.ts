@@ -1,7 +1,7 @@
 import { Array, Effect } from "effect";
 import { match, P } from "ts-pattern";
 
-import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";

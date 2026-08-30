@@ -4,12 +4,12 @@ import { use, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { match, P } from "ts-pattern";
 
 import { useGameCheats } from "~/game-cheat/ui/useGameCheats";
-import type { PlayableGame } from "~/renderer/game/PlayableGame";
+import type { PlayableGame } from "~/playable-game/type/PlayableGame";
 import { useCheatAvailability } from "~/application-settings/ui/useCheatAvailability";
 import { CheatItemSpawnContext } from "~/game-cheat/context/CheatItemSpawnContext";
 import { useGameMenuControl } from "~/game-menu/ui/GameMenuProvider";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
-import { readCheatItemCatalogFx } from "~/engine/cheat/read/readCheatItemCatalogFx";
+import { readCheatItemCatalogFx } from "~/game-cheat/fx/readCheatItemCatalogFx";
 
 const errorMessage = (error: unknown) =>
 	match(error)

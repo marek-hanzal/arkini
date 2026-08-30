@@ -5,7 +5,7 @@ import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerA
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import { EditorUnsavedChanges } from "~/authoring-session/service/EditorUnsavedChanges";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
-import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
+import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
 import type { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 
 interface ExitRouter {

@@ -3,7 +3,7 @@ import { Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { useMemo } from "react";
 
-import type { PlayableGame } from "~/renderer/game/PlayableGame";
+import type { PlayableGame } from "~/playable-game/type/PlayableGame";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 /** Selects a stable projection from the latest committed runtime snapshot. */

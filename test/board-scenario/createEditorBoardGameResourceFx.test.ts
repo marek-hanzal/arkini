@@ -6,8 +6,8 @@ import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
 import { createEditorBoardGameFx } from "~/board-scenario/session/createEditorBoardGameFx";
 import { createEditorBoardGameResourceFx } from "~/board-scenario/session/createEditorBoardGameResourceFx";
-import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
-import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
+import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
+import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 const createProject = (revision: number): EditorProject => ({

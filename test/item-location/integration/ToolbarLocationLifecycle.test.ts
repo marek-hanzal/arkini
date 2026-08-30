@@ -138,7 +138,8 @@ const run = <A, E>(effect: Effect.Effect<A, E, Layer.Success<ReturnType<typeof G
 		),
 	);
 
-describe("Toolbar engine", () => {
+/** Protects Item Location's global passive Toolbar invariant across every engine consumer. */
+describe("Toolbar location lifecycle", () => {
 	it("moves one live actor Board to Toolbar and back through the atomic drop command", () => {
 		const result = run(
 			Effect.gen(function* () {

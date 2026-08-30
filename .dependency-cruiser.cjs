@@ -10,6 +10,7 @@ const routeCompositionPattern = "^(?:src/@routes(?:/|$)|src/_route[.]ts$)";
 const electronContractPattern = "^electron/contract(?:/|$)";
 const electronPreloadPattern = "^electron/preload(?:/|$)";
 const filesystemWritePattern = "^src/filesystem-write(?:/|$)";
+const itemRevisionPattern = "^src/item-revision(?:/|$)";
 
 /**
  * Dependency rules state the forbidden import directly: `from` must not import `to`.
@@ -153,6 +154,37 @@ module.exports = {
 				path: "^(?:src|electron|shared)(?:/|$)",
 				pathNot: [
 					filesystemWritePattern,
+				],
+			},
+		},
+		{
+			name: "item-revision-stays-upstream",
+			comment:
+				"Item Revision owns opaque optimistic-concurrency tokens and stale-write rejection without importing its Runtime or command consumers.",
+			severity: "error",
+			from: {
+				path: itemRevisionPattern,
+			},
+			to: {
+				path: activeCodePattern,
+				pathNot: [
+					itemRevisionPattern,
+					"^src/game-config/schema/IdSchema[.]ts$",
+				],
+			},
+		},
+		{
+			name: "item-revision-uses-id-schema-as-type-only",
+			comment:
+				"Revision conflict payloads share exact entity identity as a type contract without coupling Item Revision to Game Config runtime values.",
+			severity: "error",
+			from: {
+				path: itemRevisionPattern,
+			},
+			to: {
+				path: "^src/game-config/schema/IdSchema[.]ts$",
+				dependencyTypesNot: [
+					"type-only",
 				],
 			},
 		},

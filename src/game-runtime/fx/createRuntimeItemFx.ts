@@ -4,7 +4,7 @@ import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { LocationSchema } from "~/item-location/schema/LocationSchema";
-import { createRevisionFx } from "~/engine/revision/fx/createRevisionFx";
+import { createRevisionFx } from "~/item-revision/fx/createRevisionFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 

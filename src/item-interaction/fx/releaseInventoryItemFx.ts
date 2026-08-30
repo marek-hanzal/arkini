@@ -11,8 +11,8 @@ import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnava
 import { placeRuntimeItemFx } from "~/item-placement/fx/placeRuntimeItemFx";
 import { readBoardLocationsFn } from "~/item-placement/fn/readBoardLocationsFn";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
-import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
-import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import { assertRevisionFx } from "~/item-revision/fx/assertRevisionFx";
+import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { ItemLocationConflictError } from "~/game-runtime/error/ItemLocationConflictError";
 import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";

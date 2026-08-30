@@ -4,7 +4,7 @@ import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveInteger
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
 import type { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
-import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 
 export const DropItemResultKind = {
 	Move: "move",

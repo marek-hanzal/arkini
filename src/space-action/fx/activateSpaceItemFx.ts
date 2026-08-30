@@ -13,7 +13,7 @@ import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import type { InputRun } from "~/production-input/type/InputRun";
-import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { ItemLocationConflictError } from "~/game-runtime/error/ItemLocationConflictError";
 import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 import { modifyRuntimeWithTransitionFx } from "~/game-runtime/internal/modifyRuntimeWithTransitionFx";

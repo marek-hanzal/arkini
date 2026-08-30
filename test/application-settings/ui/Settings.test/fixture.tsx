@@ -95,6 +95,22 @@ export const linkByText = (container: ParentNode, text: string) => {
 	return link;
 };
 
+export const settingsOptionByValue = (
+	container: ParentNode,
+	ownerDataUi: string,
+	value: string,
+) => {
+	const owner = Array.from(container.querySelectorAll<HTMLElement>("[data-ui]")).find(
+		(candidate) => candidate.dataset.ui === ownerDataUi,
+	);
+	const option = Array.from(
+		owner?.querySelectorAll<HTMLButtonElement>('[data-ui="SettingsSegmentedChoiceOption"]') ??
+			[],
+	).find((candidate) => candidate.dataset.uiValue === value);
+	if (option === undefined) throw new Error(`Expected ${ownerDataUi} option ${value}.`);
+	return option;
+};
+
 export const renderSettings = async (
 	initialEntries: ReadonlyArray<string>,
 	{

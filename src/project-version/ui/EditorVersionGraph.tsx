@@ -1,5 +1,6 @@
 import type { EditorProjectVersionStatus } from "~/project-version/type/EditorProjectVersion";
 import type { EditorVersionGraphLayout } from "~/project-version/fn/layoutEditorVersionGraphFn";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 const laneGap = 22;
 
@@ -107,10 +108,14 @@ export const EditorVersionGraph = ({
 		>
 			<button
 				type="button"
-				className={`flex min-h-16 w-full cursor-pointer items-center border-b border-line/60 px-2 text-left hover:bg-surface-raised ${selectedReference === "current" ? "bg-accent/10" : workingCopy.backgroundClassName}`}
-				data-selected={selectedReference === "current" ? true : undefined}
-				data-ui="EditorVersionWorkingCopy"
+				className={`flex min-h-16 w-full cursor-pointer items-center border-b border-line/60 px-2 text-left hover:bg-surface-raised data-[ui-selected=true]:bg-accent/10 ${workingCopy.backgroundClassName}`}
 				onClick={onSelectWorkingCopy}
+				{...readDataUiFn({
+					dataUi: "EditorVersionWorkingCopy",
+					state: {
+						selected: selectedReference === "current",
+					},
+				})}
 			>
 				<div
 					className="relative h-16 shrink-0"
@@ -144,9 +149,14 @@ export const EditorVersionGraph = ({
 				<button
 					key={row.version.versionId}
 					type="button"
-					className={`flex min-h-16 w-full cursor-pointer items-center border-b border-line/60 px-2 text-left hover:bg-surface-raised${selectedReference === row.version.versionId ? " bg-accent/10" : ""}`}
-					data-selected={selectedReference === row.version.versionId ? true : undefined}
+					className="flex min-h-16 w-full cursor-pointer items-center border-b border-line/60 px-2 text-left hover:bg-surface-raised data-[ui-selected=true]:bg-accent/10"
 					onClick={() => onSelect(row.version.versionId)}
+					{...readDataUiFn({
+						dataUi: "EditorVersionRow",
+						state: {
+							selected: selectedReference === row.version.versionId,
+						},
+					})}
 				>
 					<VersionRails
 						activeLanes={row.activeLanes}

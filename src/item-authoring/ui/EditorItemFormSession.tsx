@@ -138,7 +138,7 @@ export const EditorItemFormSession = ({
 					}
 					title={<h1 className="truncate text-xl font-semibold">{title}</h1>}
 					tabs={
-						<EditorSectionTabs label="Item sections">
+						<EditorSectionTabs>
 							{sections.map((candidate) => (
 								<EditorItemSectionLink
 									key={candidate.id}

@@ -46,10 +46,7 @@ const ItemLineOutputItem = ({
 				data-ui="TileLineOutputRuleHint"
 				key={`${hint}-${index}`}
 			>
-				<Info
-					className="mt-px size-3.5 shrink-0 text-secondary-foreground"
-					aria-hidden="true"
-				/>
+				<Info className="mt-px size-3.5 shrink-0 text-secondary-foreground" />
 				<span>{hint}</span>
 			</p>
 		))}

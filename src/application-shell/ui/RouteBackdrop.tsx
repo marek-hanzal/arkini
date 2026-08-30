@@ -9,7 +9,6 @@ interface RouteBackdropProps {
 export const RouteBackdrop = ({ className, dataUi }: RouteBackdropProps) => (
 	<div
 		className={className}
-		aria-hidden="true"
 		data-ui={dataUi}
 		style={{
 			viewTransitionName: launcherBackdropViewTransitionName,

@@ -43,7 +43,6 @@ export const Route = createFileRoute("/_launcher/about")({
 						/>
 					)
 				}
-				labelledBy="about-title"
 				overlay={
 					portraitUrls.length === 0 ? undefined : (
 						<AboutEasterEgg

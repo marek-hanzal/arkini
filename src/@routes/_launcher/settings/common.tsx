@@ -58,8 +58,6 @@ export const Route = createFileRoute("/_launcher/settings/common")({
 						options={WindowModeOptions}
 						selected={model.windowMode}
 						pending={model.blocked}
-						name="window-mode"
-						ariaLabel="Window mode"
 						dataUi="SettingsWindowModeOptions"
 						onChange={model.selectWindowMode}
 					/>
@@ -78,8 +76,6 @@ export const Route = createFileRoute("/_launcher/settings/common")({
 						options={ThemeOptions}
 						selected={model.theme}
 						pending={model.blocked}
-						name="appearance-theme"
-						ariaLabel="Theme"
 						dataUi="SettingsThemeOptions"
 						onChange={model.selectTheme}
 					/>

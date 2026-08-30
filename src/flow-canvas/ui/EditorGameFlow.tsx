@@ -6,10 +6,8 @@ import { Tooltip } from "~/ui/overlay/Tooltip";
 import { useEffect, useState } from "react";
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
-import {
-	selectableActiveClassName,
-	selectableInactiveClassName,
-} from "~/ui/form/SelectableStateClassName";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { selectableClassName } from "~/ui/form/SelectableStateClassName";
 import { OriginFlow } from "~/flow-canvas/ui/OriginFlow";
 import { useEditorItemSearchOptions } from "~/authoring-form/ui/useEditorItemSearchOptions";
 import type { OriginFlowDirection } from "~/flow-canvas/type/Highlight";
@@ -115,11 +113,7 @@ export const EditorGameFlow = ({
 							value={itemId}
 						/>
 					</div>
-					<div
-						aria-label="Flow direction"
-						className="inline-flex shrink-0 gap-1"
-						role="group"
-					>
+					<div className="inline-flex shrink-0 gap-1">
 						{(
 							[
 								"input",
@@ -127,11 +121,16 @@ export const EditorGameFlow = ({
 							] as const
 						).map((value) => (
 							<button
-								aria-pressed={direction === value}
-								className={`min-h-[var(--ak-control-min-height)] cursor-pointer rounded-lg border px-3 py-2 text-sm font-semibold ${direction === value ? selectableActiveClassName : selectableInactiveClassName}`}
+								className={`min-h-[var(--ak-control-min-height)] cursor-pointer rounded-lg border px-3 py-2 text-sm font-semibold ${selectableClassName}`}
 								key={value}
 								onClick={() => onDirectionChange(value)}
 								type="button"
+								{...readDataUiFn({
+									dataUi: "EditorGameFlowDirection",
+									state: {
+										selected: direction === value,
+									},
+								})}
 							>
 								{value === "input" ? "Input" : "Output"}
 							</button>

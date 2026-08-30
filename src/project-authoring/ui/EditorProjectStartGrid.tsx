@@ -176,7 +176,6 @@ export const EditorProjectStartGrid = ({
 								isDragSource={isDragSource}
 								isDragTarget={isDragTarget}
 								itemResourceIds={item?.asset.default}
-								itemTitle={item?.title}
 								key={key}
 								onDecrement={() =>
 									decrement({
@@ -224,7 +223,6 @@ export const EditorProjectStartGrid = ({
 									x,
 									y,
 								}}
-								scope={scope}
 								startDrag={startDrag}
 								suppressClickRef={suppressClickRef}
 							/>

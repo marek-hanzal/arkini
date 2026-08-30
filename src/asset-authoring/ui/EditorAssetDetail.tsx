@@ -7,7 +7,6 @@ import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackB
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import {
-	editorSectionTabActiveClassName,
 	editorSectionTabClassName,
 	EditorSectionTabs,
 } from "~/authoring-shell/ui/EditorSectionTabs";
@@ -51,14 +50,12 @@ const EditorAssetDetailTab = ({
 			exact: true,
 		}}
 		activeProps={{
-			"aria-selected": true,
-			className: editorSectionTabActiveClassName,
+			"data-ui-selected": true,
 		}}
 		inactiveProps={{
-			"aria-selected": false,
+			"data-ui-selected": false,
 		}}
 		className={editorSectionTabClassName}
-		role="tab"
 	>
 		{label}
 	</ButtonLink>
@@ -117,7 +114,7 @@ export const EditorAssetDetail = ({
 					}
 					title={<h1 className="truncate text-xl font-semibold">{resource.id}</h1>}
 					tabs={
-						<EditorSectionTabs label="Asset sections">
+						<EditorSectionTabs>
 							<EditorAssetDetailTab
 								filter={filter}
 								label="Overview"
@@ -166,10 +163,7 @@ export const EditorAssetDetail = ({
 							}}
 							className="min-h-0 gap-2 px-4 py-2 text-sm"
 						>
-							<Pencil
-								className="size-4"
-								aria-hidden="true"
-							/>
+							<Pencil className="size-4" />
 							Edit
 						</PrimaryButtonLink>
 					}

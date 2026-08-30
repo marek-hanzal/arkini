@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { CornerPortraitPeek } from "~/launcher/ui/CornerPortraitPeek";
 import { FallingPortrait } from "~/launcher/ui/FallingPortrait";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 const fallingPortraitPool = Array.from(
 	{
@@ -31,11 +32,14 @@ export const AboutEasterEgg = ({
 
 	return (
 		<div
-			aria-hidden="true"
 			className="pointer-events-none relative size-full overflow-hidden"
-			data-active={active ? "true" : "false"}
-			data-ui="AboutEasterEgg"
 			ref={containerRef}
+			{...readDataUiFn({
+				dataUi: "AboutEasterEgg",
+				state: {
+					active,
+				},
+			})}
 		>
 			{fallingPortraitPool.map(({ id, initialDelayMs }) => (
 				<FallingPortrait

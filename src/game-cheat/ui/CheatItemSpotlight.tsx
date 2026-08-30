@@ -1,12 +1,6 @@
 import { useCheatItemSpotlightController } from "~/game-cheat/ui/useCheatItemSpotlightController";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { ItemSpotlight } from "~/ui/search/ItemSpotlight";
-
-const statusClassName = {
-	error: "text-danger",
-	idle: "text-muted",
-	pending: "text-accent",
-	success: "text-muted",
-} satisfies Record<useCheatItemSpotlightController.Output["spawnStatus"], string>;
 
 interface CheatItemSpotlightProps extends useCheatItemSpotlightController.Props {}
 
@@ -19,12 +13,16 @@ export const CheatItemSpotlight = (props: CheatItemSpotlightProps) => {
 			dataUi="CheatItemSpotlight"
 			emptyMessage="No spawnable items."
 			footer={
-				<div
-					className="min-h-5 text-center text-sm"
-					data-status={controller.spawnStatus}
-					data-ui="CheatItemSpotlightStatus"
-				>
-					<p className={statusClassName[controller.spawnStatus]}>
+				<div className="min-h-5 text-center text-sm">
+					<p
+						className="text-muted data-[ui-status=error]:text-danger data-[ui-status=pending]:text-accent"
+						{...readDataUiFn({
+							dataUi: "CheatItemSpotlightStatus",
+							state: {
+								status: controller.spawnStatus,
+							},
+						})}
+					>
 						{controller.spawnStatusMessage}
 					</p>
 				</div>

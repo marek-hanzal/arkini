@@ -107,7 +107,7 @@ export const ArkpackCatalogList = ({
 									params={{
 										packageId: arkpack.packageId,
 									}}
-									aria-disabled={blocked}
+									disabled={blocked}
 									className="min-h-0 gap-1.5 px-3 py-2 text-xs shadow-none"
 									cursorIntent={blocked ? "progress" : undefined}
 								>

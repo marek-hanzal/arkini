@@ -14,10 +14,7 @@ export const Route = createFileRoute("/editor/welcome")({
 			},
 		),
 	component: () => (
-		<LauncherPageLayout
-			labelledBy="editor-welcome-title"
-			page="editor-welcome"
-		>
+		<LauncherPageLayout page="editor-welcome">
 			<EditorWelcome recentProjects={Route.useLoaderData()} />
 		</LauncherPageLayout>
 	),

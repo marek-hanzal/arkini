@@ -24,6 +24,7 @@ import {
 import { ItemReferenceButton } from "~/item-detail-frame/ui/ItemReferenceButton";
 import { useItemDetailPendingCommand } from "~/item-detail-frame/ui/useItemDetailPendingCommand";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { ProductionJobRuntime } from "~/production-job/ui/ProductionJobRuntime";
 import { readActiveJobRuntimeFn } from "~/production-job/ui/readActiveJobRuntimeFn";
 
@@ -96,10 +97,7 @@ const ItemLineUnavailableDependency = ({
 		/>
 		<span className="flex items-center gap-1.5">
 			{dependency.status}
-			<CircleAlert
-				className="size-4 shrink-0 text-warning"
-				aria-hidden="true"
-			/>
+			<CircleAlert className="size-4 shrink-0 text-warning" />
 		</span>
 	</div>
 );
@@ -113,10 +111,7 @@ const ItemLineUnavailableMessage = ({
 		className="mt-4 flex min-w-0 items-center gap-2 text-sm text-muted"
 		data-ui="TileLineUnavailableReason"
 	>
-		<CircleAlert
-			className="size-4 shrink-0 text-warning"
-			aria-hidden="true"
-		/>
+		<CircleAlert className="size-4 shrink-0 text-warning" />
 		<ItemLineUnavailableReason reason={reason} />
 	</div>
 );
@@ -132,10 +127,7 @@ const ItemLineRuleHints = ({ hints }: { readonly hints: readonly string[] }) =>
 					className="flex min-w-0 items-start gap-2"
 					key={`${hint}-${index}`}
 				>
-					<Info
-						className="mt-0.5 size-4 shrink-0 text-secondary-foreground"
-						aria-hidden="true"
-					/>
+					<Info className="mt-0.5 size-4 shrink-0 text-secondary-foreground" />
 					<span>{hint}</span>
 				</li>
 			))}
@@ -278,24 +270,26 @@ export const ItemLineRow = forwardRef<
 							: `Base ${formatDurationFn(line.baseRuntimeMs)}`,
 				}
 			: readActiveJobRuntimeFn(activeJob);
+	const lineState = stale
+		? "stale"
+		: line.activeJob !== undefined
+			? "active"
+			: queued
+				? "queued"
+				: "idle";
 
 	return (
 		<motion.article
 			ref={ref}
 			layout
-			className={`ak-list-row overflow-hidden rounded-xl border-b border-l-2 border-line px-3 py-5 pl-4 first:pt-3 last:border-b-0 last:pb-5 ${
-				stale
-					? "border-l-line/55"
-					: line.activeJob !== undefined
-						? "ak-list-row-active border-l-success"
-						: queued
-							? "border-l-warning bg-warning/[0.06]"
-							: "border-l-line/55"
-			}`}
-			data-ui="TileLine"
+			className="ak-list-row overflow-hidden rounded-xl border-b border-l-2 border-line border-l-line/55 px-3 py-5 pl-4 first:pt-3 last:border-b-0 last:pb-5 data-[ui-state=active]:border-l-success data-[ui-state=queued]:border-l-warning data-[ui-state=queued]:bg-warning/[0.06]"
 			data-line-id={line.lineId}
-			data-active={!stale && line.activeJob !== undefined ? "true" : "false"}
-			data-queued={queued ? "true" : "false"}
+			{...readDataUiFn({
+				dataUi: "TileLine",
+				state: {
+					state: lineState,
+				},
+			})}
 			{...itemDetailFadeMotion}
 		>
 			<AnimatePresence initial={false}>
@@ -313,7 +307,6 @@ export const ItemLineRow = forwardRef<
 							opacity: 0,
 						}}
 						transition={itemDetailFadeMotion.transition}
-						aria-hidden="true"
 						data-ui="TileLineProgress"
 					>
 						<div
@@ -344,10 +337,7 @@ export const ItemLineRow = forwardRef<
 								data-ui="TileLineQueuedMessage"
 								{...itemDetailFadeMotion}
 							>
-								<Clock3
-									className="size-4 shrink-0"
-									aria-hidden="true"
-								/>
+								<Clock3 className="size-4 shrink-0" />
 								Queued for automatic start when the required inputs become
 								available.
 							</motion.p>
@@ -396,7 +386,6 @@ export const ItemLineRow = forwardRef<
 								{line.isDefault ? "Unset default" : "Set default"}
 							</Button>
 							<PrimaryButton
-								aria-busy={pending.enqueue}
 								cursorIntent={pending.enqueue ? "progress" : undefined}
 								data-ui="TileLineEnqueueButton"
 								disabled={
@@ -425,7 +414,6 @@ export const ItemLineRow = forwardRef<
 					<motion.p
 						key={error}
 						className="relative z-[1] mt-3 text-sm text-danger"
-						role="status"
 						{...itemDetailFadeMotion}
 					>
 						{error}
@@ -467,7 +455,6 @@ export const ItemLineRow = forwardRef<
 						/>
 						<div
 							className="grid place-items-center text-muted"
-							aria-hidden="true"
 							data-ui="TileLineFlowChevron"
 						>
 							<ChevronRight className="size-5" />

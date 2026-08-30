@@ -63,7 +63,7 @@ export const EditorItemDetail = ({
 						</div>
 					}
 					tabs={
-						<EditorSectionTabs label="Item sections">
+						<EditorSectionTabs>
 							{sections.map((section) => (
 								<EditorItemSectionLink
 									destination="detail"

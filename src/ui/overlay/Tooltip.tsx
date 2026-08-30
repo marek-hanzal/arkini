@@ -6,10 +6,8 @@ import {
 	shift,
 	useDismiss,
 	useFloating,
-	useFocus,
 	useHover,
 	useInteractions,
-	useRole,
 	type Placement,
 } from "@floating-ui/react";
 import { cloneElement, type ReactElement, type ReactNode, useState } from "react";
@@ -51,16 +49,10 @@ export const Tooltip = ({
 	const hover = useHover(context, {
 		move: false,
 	});
-	const focus = useFocus(context);
 	const dismiss = useDismiss(context);
-	const role = useRole(context, {
-		role: "tooltip",
-	});
 	const { getFloatingProps, getReferenceProps } = useInteractions([
 		hover,
-		focus,
 		dismiss,
-		role,
 	]);
 
 	return (

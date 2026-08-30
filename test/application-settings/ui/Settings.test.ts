@@ -45,18 +45,20 @@ describe("Settings", () => {
 			"/settings",
 		]);
 
-		const radios = Array.from(container.querySelectorAll('input[name="appearance-theme"]'));
-		expect(radios).toHaveLength(3);
-		const light = radios.find(
-			(input) => input instanceof HTMLInputElement && input.value === "light",
+		const options = Array.from(
+			container.querySelectorAll<HTMLButtonElement>(
+				'[data-ui="SettingsThemeOptions"] [data-ui="SettingsSegmentedChoiceOption"]',
+			),
 		);
-		if (!(light instanceof HTMLInputElement)) throw new Error("Expected Light theme radio.");
+		expect(options).toHaveLength(3);
+		const light = options.find((option) => option.dataset.uiValue === "light");
+		if (light === undefined) throw new Error("Expected Light theme option.");
 		expect(document.documentElement.dataset.theme).toBe("dark");
 		await act(async () => light.click());
 		expect(document.documentElement.dataset.theme).toBe("light");
 		expect(write).toHaveBeenCalledOnce();
 		expect(write).toHaveBeenCalledWith("light");
-		const fieldset = container.querySelector("fieldset");
+		const fieldset = light.closest("fieldset");
 		expect(fieldset).toBeInstanceOf(HTMLFieldSetElement);
 		expect((fieldset as HTMLFieldSetElement).disabled).toBe(true);
 		await act(async () => deferred.resolve());

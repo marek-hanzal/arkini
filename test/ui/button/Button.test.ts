@@ -41,7 +41,7 @@ describe("Button primitives", () => {
 					createElement(
 						ButtonLink,
 						{
-							"aria-disabled": true,
+							disabled: true,
 							to: "/about",
 						},
 						"Disabled link",
@@ -91,8 +91,12 @@ describe("Button primitives", () => {
 			);
 		});
 
-		const disabledLink = container.querySelector<HTMLAnchorElement>('a[aria-disabled="true"]');
-		const enabledLink = container.querySelector<HTMLAnchorElement>("a:not([aria-disabled])");
+		const disabledLink = container.querySelector<HTMLAnchorElement>(
+			'a[data-ui-disabled="true"]',
+		);
+		const enabledLink = container.querySelector<HTMLAnchorElement>(
+			'a[data-ui-disabled="false"]',
+		);
 		const button = container.querySelector<HTMLButtonElement>("button");
 		expect(disabledLink?.href).toMatch(/\/about$/);
 		expect(enabledLink?.href).toMatch(/\/about$/);

@@ -29,7 +29,6 @@ export const LauncherHero = ({ compact = false, style }: LauncherHeroProps) => {
 		>
 			<div
 				className="launcher-hero__shadow pointer-events-none absolute inset-x-[8%] bottom-[-4%] h-[28%]"
-				aria-hidden="true"
 				data-ui="LauncherHeroShadow"
 				style={{
 					viewTransitionName: launcherHeroShadowViewTransitionName,

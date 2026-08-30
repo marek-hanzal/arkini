@@ -51,12 +51,7 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcomeProps) => {
 				data-ui="EditorWelcome"
 			>
 				<header className="flex items-center justify-between gap-3">
-					<h1
-						id="editor-welcome-title"
-						className="text-2xl font-semibold"
-					>
-						Editor
-					</h1>
+					<h1 className="text-2xl font-semibold">Editor</h1>
 					<LinkButton
 						disabled={actions.blocked}
 						cursorIntent={actions.refreshingProjects ? "progress" : undefined}

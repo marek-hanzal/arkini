@@ -8,8 +8,7 @@ import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
 import type { GameMenuPhase } from "~/game-menu/type/GameMenuControl";
 import { useGameMenuActions } from "~/game-menu/ui/useGameMenuActions";
 import { useGameMenuControl } from "~/game-menu/ui/GameMenuProvider";
-import { dialogFocusableSelector } from "~/ui/focus/dialogFocusableSelector";
-import { useDialogFocusContainment } from "~/ui/focus/useDialogFocusContainment";
+import { overlayFocusableSelector } from "~/ui/focus/overlayFocusableSelector";
 
 const gameMenuBackdropViewTransitionName = "arkini-game-menu-backdrop";
 const gameMenuDialogViewTransitionName = "arkini-game-menu-dialog";
@@ -38,20 +37,13 @@ const exitingDialog = {
 	filter: "blur(5px)",
 };
 
-const useGameMenuFocus = ({
-	phase,
-	blocked,
-}: {
-	readonly phase: Exclude<GameMenuPhase, "closed">;
-	readonly blocked: boolean;
-}) => {
-	const dialogRef = useRef<HTMLDivElement>(null);
+const useGameMenuFocus = ({ phase }: { readonly phase: Exclude<GameMenuPhase, "closed"> }) => {
+	const overlayRef = useRef<HTMLDivElement>(null);
 	const previousFocusRef = useRef<HTMLElement | null>(null);
 
 	useEffect(() => {
 		previousFocusRef.current =
 			document.activeElement instanceof HTMLElement ? document.activeElement : null;
-		dialogRef.current?.focus();
 		return () => {
 			const previousFocus = previousFocusRef.current;
 			if (previousFocus?.isConnected === true) {
@@ -64,19 +56,13 @@ const useGameMenuFocus = ({
 
 	useEffect(() => {
 		if (phase !== "open") return;
-		dialogRef.current?.querySelector<HTMLElement>(dialogFocusableSelector)?.focus();
+		overlayRef.current?.querySelector<HTMLElement>(overlayFocusableSelector)?.focus();
 	}, [
 		phase,
 	]);
 
-	const keepFocusInside = useDialogFocusContainment({
-		blockEscape: blocked,
-		dialogRef,
-	});
-
 	return {
-		dialogRef,
-		keepFocusInside,
+		overlayRef,
 	};
 };
 
@@ -138,7 +124,6 @@ const GameMenuDialog = ({
 	const actionCursorIntent = actions.pending ? "progress" : undefined;
 	const focus = useGameMenuFocus({
 		phase,
-		blocked: actions.pending || phase === "exiting",
 	});
 
 	return (
@@ -158,13 +143,9 @@ const GameMenuDialog = ({
 			transition={transition}
 		>
 			<motion.div
-				ref={focus.dialogRef}
-				role="dialog"
-				aria-modal="true"
-				aria-labelledby="game-menu-title"
+				ref={focus.overlayRef}
 				className="max-h-full w-full max-w-sm cursor-default overflow-y-auto rounded-2xl border border-line-strong bg-surface-raised p-[var(--ak-panel-padding)] text-foreground shadow-2xl outline-none"
 				data-ui="GameMenu"
-				tabIndex={-1}
 				style={{
 					viewTransitionName: gameMenuDialogViewTransitionName,
 				}}
@@ -177,14 +158,8 @@ const GameMenuDialog = ({
 				animate={actorMotion.dialog}
 				transition={transition}
 				onAnimationComplete={actorMotion.completeMotionPhase}
-				onKeyDown={focus.keepFocusInside}
 			>
-				<h2
-					id="game-menu-title"
-					className="mb-4 text-center text-lg font-semibold"
-				>
-					Game menu
-				</h2>
+				<h2 className="mb-4 text-center text-lg font-semibold">Game menu</h2>
 
 				<div className="grid gap-2">
 					<PrimaryButton
@@ -243,14 +218,8 @@ const GameMenuDialog = ({
 
 					<div className="my-2 border-t border-line" />
 
-					<section
-						className="rounded-xl border border-danger/35 bg-danger/5 p-3"
-						aria-labelledby="game-menu-developer-title"
-					>
-						<h3
-							id="game-menu-developer-title"
-							className="mb-2 text-xs font-bold uppercase tracking-widest text-danger"
-						>
+					<section className="rounded-xl border border-danger/35 bg-danger/5 p-3">
+						<h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-danger">
 							Developer
 						</h3>
 						{actions.confirmingDestroy ? (
@@ -293,7 +262,6 @@ const GameMenuDialog = ({
 
 				<div
 					className="mt-4 min-h-5 text-center text-sm text-muted"
-					aria-live="polite"
 					data-ui="GameMenuStatus"
 				>
 					{actions.status}

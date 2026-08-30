@@ -29,7 +29,7 @@ import { useCanvasPointer } from "~/flow-canvas/ui/useCanvasPointer";
 import { useProjection } from "~/flow-canvas/ui/useProjection";
 import { useNavigation } from "~/flow-canvas/ui/useNavigation";
 import { useEditorResourceUrls } from "~/asset-authoring/ui/EditorResourceUrlSession";
-import { useDialogFocus } from "~/ui/focus/useDialogFocus";
+import { useOverlayFocus } from "~/ui/focus/useOverlayFocus";
 import { ItemTypeLabel } from "~/item-definition/ui/ItemDefinitionLabels";
 
 interface ShortcutHelpProps {
@@ -87,38 +87,28 @@ const readShortcutRows = (direction: OriginFlowDirection) =>
 
 /** Explains the keyboard navigation available on the Game Flow canvas. */
 const ShortcutHelp = ({ direction, onClose }: ShortcutHelpProps) => {
-	const { dialogRef, keepFocusInside } = useDialogFocus({
+	const { onKeyDown, overlayRef } = useOverlayFocus({
 		onClose,
 	});
 	return (
 		<div
-			aria-labelledby="flow-shortcuts-title"
-			aria-modal="true"
 			className="absolute inset-0 z-20 grid place-items-center bg-black/20 p-6 backdrop-blur-[1px]"
 			data-ui="EditorOriginFlowShortcutHelp"
-			onKeyDown={keepFocusInside}
+			onKeyDown={onKeyDown}
 			onPointerDown={(event) => {
 				if (event.currentTarget === event.target) onClose();
 			}}
-			ref={dialogRef}
-			role="dialog"
-			tabIndex={-1}
+			ref={overlayRef}
 		>
 			<div className="w-full max-w-lg rounded-lg border border-line bg-surface-raised p-5 shadow-xl">
 				<div className="flex items-start justify-between gap-4">
 					<div>
-						<h2
-							className="text-lg font-semibold"
-							id="flow-shortcuts-title"
-						>
-							Flow shortcuts
-						</h2>
+						<h2 className="text-lg font-semibold">Flow shortcuts</h2>
 						<p className="mt-1 text-sm text-muted">
 							Shortcuts follow the currently selected item.
 						</p>
 					</div>
 					<button
-						aria-label="Close shortcuts"
 						className="grid size-8 shrink-0 place-items-center rounded-md border border-line text-muted hover:bg-surface hover:text-foreground"
 						onClick={onClose}
 						type="button"
@@ -580,7 +570,6 @@ export const Canvas = ({
 	return (
 		<>
 			<canvas
-				aria-label="Item flow"
 				className="block size-full touch-none cursor-grab text-foreground"
 				data-ui="EditorOriginFlowCanvas"
 				onPointerCancel={handlePointerCancel}

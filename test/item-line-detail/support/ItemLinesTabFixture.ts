@@ -196,8 +196,8 @@ export const renderLines = async (lines: AvailableProjection) => {
 };
 
 export const selectAllLines = async (container: HTMLElement) => {
-	const option = container.querySelector<HTMLInputElement>(
-		'input[name="item-lines-availability"][value="all"]',
+	const option = container.querySelector<HTMLButtonElement>(
+		'[data-ui="ItemLinesAvailabilityOption"][data-ui-value="all"]',
 	);
 	if (option === null) throw new Error("Missing all-lines filter.");
 	await act(async () => option.click());

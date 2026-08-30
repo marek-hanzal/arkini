@@ -35,7 +35,7 @@ describe("CheatItemSpotlight command lifecycle", () => {
 		expect(
 			container
 				.querySelector('[data-ui="CheatItemSpotlightStatus"]')
-				?.getAttribute("data-status"),
+				?.getAttribute("data-ui-status"),
 		).toBe("pending");
 
 		await toggleSpotlight();
@@ -46,7 +46,7 @@ describe("CheatItemSpotlight command lifecycle", () => {
 		expect(
 			container
 				.querySelector('[data-ui="CheatItemSpotlightStatus"]')
-				?.getAttribute("data-status"),
+				?.getAttribute("data-ui-status"),
 		).toBe("pending");
 		await changeSearchQuery(reopenedInput, "beta");
 		expect(reopenedInput.value).toBe("beta");
@@ -83,7 +83,7 @@ describe("CheatItemSpotlight command lifecycle", () => {
 		expect(
 			container
 				.querySelector('[data-ui="CheatItemSpotlightStatus"]')
-				?.getAttribute("data-status"),
+				?.getAttribute("data-ui-status"),
 		).toBe("success");
 
 		await toggleSpotlight();
@@ -91,7 +91,7 @@ describe("CheatItemSpotlight command lifecycle", () => {
 		expect(
 			container
 				.querySelector('[data-ui="CheatItemSpotlightStatus"]')
-				?.getAttribute("data-status"),
+				?.getAttribute("data-ui-status"),
 		).toBe("idle");
 	});
 

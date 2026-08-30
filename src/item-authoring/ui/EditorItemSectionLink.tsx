@@ -1,17 +1,13 @@
 import type { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import { ButtonLink } from "~/ui/button/Button";
-import {
-	editorSectionTabActiveClassName,
-	editorSectionTabClassName,
-} from "~/authoring-shell/ui/EditorSectionTabs";
+import { editorSectionTabClassName } from "~/authoring-shell/ui/EditorSectionTabs";
 import type { EditorItemSectionDescriptor } from "~/item-authoring/type/EditorItemSection";
 
 const activeProps = {
-	"aria-selected": true,
-	className: editorSectionTabActiveClassName,
+	"data-ui-selected": true,
 } as const;
 const inactiveProps = {
-	"aria-selected": false,
+	"data-ui-selected": false,
 } as const;
 
 export const EditorItemSectionLink = ({
@@ -48,7 +44,6 @@ export const EditorItemSectionLink = ({
 		activeProps={activeProps}
 		inactiveProps={inactiveProps}
 		className={editorSectionTabClassName}
-		role="tab"
 	>
 		{section.label}
 	</ButtonLink>

@@ -3,11 +3,9 @@ import { TriangleAlert } from "lucide-react";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { EditorItemEstimateSortSchema } from "~/estimate/schema/EditorItemEstimateSortSchema";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { EditorSelect, type EditorSelectOption } from "~/ui/form/EditorSelect";
-import {
-	selectableActiveClassName,
-	selectableInactiveClassName,
-} from "~/ui/form/SelectableStateClassName";
+import { selectableClassName } from "~/ui/form/SelectableStateClassName";
 import { EditorItemEstimateListRow } from "~/estimate/ui/EditorItemEstimateListRow";
 import { useEditorItemEstimateIndex } from "~/estimate/ui/useEditorItemEstimateIndex";
 import { Status } from "~/ui/status/Status";
@@ -53,7 +51,6 @@ export const EditorItemEstimateList = ({
 		<section
 			className="h-full min-h-0 overflow-y-auto overscroll-contain"
 			data-scroll-restoration-id="editor-estimate-list"
-			aria-label="Item estimates"
 			data-ui="EditorItemEstimateList"
 		>
 			<header className="ak-editor-page-header flex min-w-0 flex-wrap items-center gap-2 p-3">
@@ -68,15 +65,18 @@ export const EditorItemEstimateList = ({
 					value={query}
 					className="h-12 min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
 					placeholder="Search item title or ID…"
-					aria-label="Search item estimates"
 					onChange={(event) => onQueryChange(event.currentTarget.value)}
 				/>
 				<button
 					type="button"
-					className={`min-h-[var(--ak-control-min-height)] cursor-pointer rounded-lg border px-3 py-2 text-sm font-semibold ${incomplete ? selectableActiveClassName : selectableInactiveClassName}`}
-					data-selected={incomplete}
-					data-ui="EditorItemEstimateIncompleteFilter"
+					className={`min-h-[var(--ak-control-min-height)] cursor-pointer rounded-lg border px-3 py-2 text-sm font-semibold ${selectableClassName}`}
 					onClick={() => onIncompleteChange(!incomplete)}
+					{...readDataUiFn({
+						dataUi: "EditorItemEstimateIncompleteFilter",
+						state: {
+							selected: incomplete,
+						},
+					})}
 				>
 					Incomplete
 				</button>

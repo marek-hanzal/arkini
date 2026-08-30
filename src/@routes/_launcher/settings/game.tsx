@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { useModelContext } from "~/application-settings/ui/ModelContext";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 export const Route = createFileRoute("/_launcher/settings/game")({
 	component: () => {
@@ -8,8 +9,13 @@ export const Route = createFileRoute("/_launcher/settings/game")({
 		return (
 			<section data-ui="SettingsGame">
 				<label
-					className={`ak-list-row ak-list-row-interactive flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-line px-4 py-3 ${model.blocked ? "ak-list-row-pending cursor-progress" : ""}`}
-					data-ui="SettingsCheatAvailability"
+					className="ak-list-row ak-list-row-interactive flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-line px-4 py-3 data-[ui-pending=true]:cursor-progress"
+					{...readDataUiFn({
+						dataUi: "SettingsCheatAvailability",
+						state: {
+							pending: model.blocked,
+						},
+					})}
 				>
 					<span className="grid gap-1">
 						<span className="text-sm font-semibold text-foreground">Cheat tools</span>

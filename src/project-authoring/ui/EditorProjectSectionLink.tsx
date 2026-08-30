@@ -1,8 +1,5 @@
 import { ButtonLink } from "~/ui/button/Button";
-import {
-	editorSectionTabActiveClassName,
-	editorSectionTabClassName,
-} from "~/authoring-shell/ui/EditorSectionTabs";
+import { editorSectionTabClassName } from "~/authoring-shell/ui/EditorSectionTabs";
 import type { EditorProjectSectionDescriptor } from "~/project-authoring/type/EditorProjectSections";
 
 export const EditorProjectSectionLink = ({
@@ -22,7 +19,7 @@ export const EditorProjectSectionLink = ({
 			exact: true,
 		}}
 		activeProps={{
-			className: editorSectionTabActiveClassName,
+			"data-ui-selected": true,
 		}}
 		className={editorSectionTabClassName}
 	>

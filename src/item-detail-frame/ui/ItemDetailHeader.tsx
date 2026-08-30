@@ -48,7 +48,6 @@ export const ItemDetailHeader = ({
 			sourceUrl={identity.sourceUrl}
 			title={identity.title}
 			titleClassName="truncate text-lg font-semibold leading-tight"
-			titleId="item-detail-title"
 			titleTag="h2"
 		/>
 	);
@@ -67,15 +66,11 @@ export const ItemDetailHeader = ({
 			<button
 				type="button"
 				className="grid size-14 shrink-0 cursor-pointer place-items-center bg-transparent text-foreground transition-[color,transform] hover:scale-110 hover:text-accent disabled:cursor-not-allowed"
-				aria-label="Close item detail"
 				data-ui="ItemDetailCloseButton"
 				disabled={disabled}
 				onClick={() => closeItemDetail()}
 			>
-				<X
-					className="size-10"
-					aria-hidden="true"
-				/>
+				<X className="size-10" />
 			</button>
 		</header>
 	);

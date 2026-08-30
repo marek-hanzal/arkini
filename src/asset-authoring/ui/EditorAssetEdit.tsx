@@ -2,6 +2,7 @@ import { FileQuestion } from "lucide-react";
 import { type DragEvent, useLayoutEffect, useRef, useState } from "react";
 
 import { PrimaryButton } from "~/ui/button/Button";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
@@ -48,12 +49,12 @@ const EditorAssetImageDropZone = ({
 				ref={inputRef}
 				type="file"
 				accept="image/png,.png"
-				className="sr-only"
+				className="hidden"
 				onChange={(event) => select(event.currentTarget.files?.[0])}
 			/>
 			<button
 				type="button"
-				className={`grid min-h-48 w-full cursor-pointer place-items-center rounded-xl border border-dashed p-6 text-center ${dragging ? "border-accent bg-accent/10" : "border-line-strong bg-surface"}`}
+				className="grid min-h-48 w-full cursor-pointer place-items-center rounded-xl border border-dashed border-line-strong bg-surface p-6 text-center data-[ui-dragging=true]:border-accent data-[ui-dragging=true]:bg-accent/10"
 				onClick={() => inputRef.current?.click()}
 				onDragEnter={(event) => {
 					event.preventDefault();
@@ -65,7 +66,12 @@ const EditorAssetImageDropZone = ({
 				}}
 				onDragOver={(event) => event.preventDefault()}
 				onDrop={drop}
-				data-ui="EditorAssetImageDropZone"
+				{...readDataUiFn({
+					dataUi: "EditorAssetImageDropZone",
+					state: {
+						dragging,
+					},
+				})}
 			>
 				<span className="pointer-events-none grid w-full justify-items-center gap-3">
 					{previewUrl === undefined ? (

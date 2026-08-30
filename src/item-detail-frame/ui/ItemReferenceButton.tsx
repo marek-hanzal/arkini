@@ -38,7 +38,6 @@ export const ItemReferenceButton = ({
 			disabled={!canOpen}
 			data-ui={dataUi}
 			data-detail-available={canOpen ? "true" : "false"}
-			aria-label={canOpen ? `Open ${label} detail` : undefined}
 			animate={{
 				scale: hovered && canOpen ? 1.035 : 1,
 			}}

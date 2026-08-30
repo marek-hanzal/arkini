@@ -59,11 +59,11 @@ describe("EditorVersionGraph", () => {
 			'[data-ui="EditorVersionWorkingCopy"]',
 		);
 		expect(workingCopy).not.toBeNull();
-		expect(workingCopy?.dataset.selected).toBeUndefined();
+		expect(workingCopy?.dataset.uiSelected).toBe("false");
 
 		await act(async () => workingCopy?.click());
 
 		expect(onSelectWorkingCopy).toHaveBeenCalledOnce();
-		expect(workingCopy?.dataset.selected).toBe("true");
+		expect(workingCopy?.dataset.uiSelected).toBe("true");
 	});
 });

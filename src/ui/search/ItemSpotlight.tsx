@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { SpotlightSearchInput } from "~/ui/search/SpotlightSearchInput";
 import { useItemSpotlightController } from "~/ui/search/useItemSpotlightController";
 
@@ -55,9 +56,6 @@ export const ItemSpotlight = (props: ItemSpotlightProps) => {
 							<button
 								className="ak-spotlight-option grid grid-cols-[3rem_1fr] items-center gap-3 rounded-lg border px-3 py-2 text-left"
 								data-item-id={option.itemId}
-								data-selected={
-									index === controller.selectedIndex ? "true" : undefined
-								}
 								key={option.itemId}
 								onClick={() =>
 									controller.selectItem({
@@ -67,6 +65,12 @@ export const ItemSpotlight = (props: ItemSpotlightProps) => {
 								}
 								onMouseEnter={() => controller.setSelectedIndex(index)}
 								type="button"
+								{...readDataUiFn({
+									dataUi: "ItemSpotlightOption",
+									state: {
+										selected: index === controller.selectedIndex,
+									},
+								})}
 							>
 								{option.artwork}
 								<span className="min-w-0">

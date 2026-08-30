@@ -209,7 +209,7 @@ export const useEditorProjectFormController = ({
 			if (issue !== undefined) {
 				await onInvalidSection(readEditorProjectSectionForPathFn(issue.path));
 				const focusInvalidField = () =>
-					document.querySelector<HTMLElement>("[aria-invalid='true']")?.focus();
+					document.querySelector<HTMLElement>("[data-ui-invalid='true']")?.focus();
 				if (typeof requestAnimationFrame === "function") {
 					requestAnimationFrame(focusInvalidField);
 				} else {

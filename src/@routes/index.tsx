@@ -73,7 +73,6 @@ export const Route = createFileRoute("/")({
 					>
 						<div
 							className="min-h-14 text-center text-sm text-muted"
-							aria-live="polite"
 							data-ui="StartupSplashContent"
 							style={{
 								viewTransitionName: startupContentViewTransitionName,

@@ -15,7 +15,6 @@ interface ItemIdentityProps {
 	readonly sourceUrl: string;
 	readonly title: string;
 	readonly titleClassName?: string;
-	readonly titleId?: string;
 	readonly titleTag?: "h2" | "h3" | "span";
 }
 
@@ -33,7 +32,6 @@ export const ItemIdentity = ({
 	sourceUrl,
 	title,
 	titleClassName = "truncate font-medium text-foreground",
-	titleId,
 	titleTag: Title = "span",
 }: ItemIdentityProps) => {
 	const Text = Root === "span" ? "span" : "div";
@@ -51,12 +49,7 @@ export const ItemIdentity = ({
 				sourceUrl={sourceUrl}
 			/>
 			<Text className="min-w-0">
-				<Title
-					id={titleId}
-					className={titleClassName}
-				>
-					{title}
-				</Title>
+				<Title className={titleClassName}>{title}</Title>
 				{description}
 			</Text>
 		</Root>

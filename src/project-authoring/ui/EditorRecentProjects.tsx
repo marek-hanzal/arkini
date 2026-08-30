@@ -33,14 +33,10 @@ export const EditorRecentProjects = ({
 	return (
 		<section
 			className="grid gap-3 border-t border-line pt-5"
-			aria-labelledby="editor-recent-title"
 			data-ui="EditorRecentProjects"
 		>
 			<header className="flex items-center justify-between gap-3">
-				<h2
-					id="editor-recent-title"
-					className="text-sm font-semibold uppercase tracking-wider text-muted"
-				>
+				<h2 className="text-sm font-semibold uppercase tracking-wider text-muted">
 					Recent
 				</h2>
 				<span className="text-xs text-subtle">{projects.length}</span>
@@ -85,7 +81,7 @@ export const EditorRecentProjects = ({
 								params={{
 									projectId: candidate.project.projectId,
 								}}
-								aria-disabled={blocked}
+								disabled={blocked}
 								cursorIntent={blocked ? "progress" : undefined}
 								className="min-h-0 min-w-0 flex-1 justify-start gap-3 rounded-none border-0 bg-transparent px-4 py-3 text-left shadow-none hover:border-transparent hover:bg-transparent active:bg-transparent"
 							>
@@ -123,7 +119,7 @@ export const EditorRecentProjects = ({
 								params={{
 									projectId: candidate.project.projectId,
 								}}
-								aria-disabled={blocked}
+								disabled={blocked}
 								cursorIntent={blocked ? "progress" : undefined}
 								className="min-h-0 shrink-0 gap-3 rounded-none border-0 bg-transparent px-4 py-3 shadow-none hover:border-transparent hover:bg-transparent active:bg-transparent"
 							>

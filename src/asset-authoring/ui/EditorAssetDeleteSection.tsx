@@ -4,6 +4,7 @@ import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { EditorProjectAvatarKeys } from "~/project-authoring/schema/EditorProjectFormSchema";
 import type { EditorAssetDeleteBlocker } from "~/asset-authoring/fn/readEditorAssetDeleteBlockersFn";
 import { Button, ButtonLink, DangerButton } from "~/ui/button/Button";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorAssetDeleteController } from "~/asset-authoring/ui/useEditorAssetDeleteController";
 
@@ -50,7 +51,7 @@ const EditorAssetDeleteDialog = ({
 			<EditorAssetDeleteError error={error} />
 			<div className="mt-6 flex flex-wrap justify-end gap-2">
 				<ButtonLink
-					aria-disabled={pending}
+					disabled={pending}
 					data-ui="EditorAssetDeleteCreateVersion"
 					to="/editor/$projectId/versions/commit"
 					params={{
@@ -181,7 +182,13 @@ export const EditorAssetDeleteSection = ({
 			>
 				<div className="flex items-start gap-3">
 					<StateIcon
-						className={`mt-0.5 size-6 shrink-0 ${blocked ? "text-warning" : "text-success"}`}
+						className="mt-0.5 size-6 shrink-0 text-success data-[ui-blocked=true]:text-warning"
+						{...readDataUiFn({
+							dataUi: "EditorAssetDeleteStateIcon",
+							state: {
+								blocked,
+							},
+						})}
 					/>
 					<div>
 						<h2 className="text-lg font-semibold">

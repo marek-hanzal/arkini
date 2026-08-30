@@ -1,4 +1,4 @@
-export const dialogFocusableSelector = [
+export const overlayFocusableSelector = [
 	"button:not([disabled])",
 	"[href]",
 	"input:not([disabled])",

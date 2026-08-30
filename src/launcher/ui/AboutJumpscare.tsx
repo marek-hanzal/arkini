@@ -151,7 +151,6 @@ export const AboutJumpscare = ({
 
 	return (
 		<div
-			aria-hidden="true"
 			className="pointer-events-none relative size-full overflow-hidden"
 			data-ui="AboutJumpscare"
 			ref={containerRef}

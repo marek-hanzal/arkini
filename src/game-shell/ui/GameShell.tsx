@@ -57,7 +57,6 @@ const GameSceneBackdrop = ({
 		/>
 	) : (
 		<div
-			aria-hidden="true"
 			className="game-scene__backdrop pointer-events-none absolute inset-0 z-0"
 			data-ui="GameSceneBackdrop"
 		/>

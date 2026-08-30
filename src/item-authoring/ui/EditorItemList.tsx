@@ -48,7 +48,6 @@ export const EditorItemList = ({
 		<section
 			className="h-full min-h-0 overflow-y-auto overscroll-contain"
 			data-scroll-restoration-id="editor-item-list"
-			aria-label="Items"
 			data-ui="EditorItemList"
 		>
 			<header className="ak-editor-page-header flex min-w-0 flex-wrap items-center gap-2 p-3">
@@ -58,20 +57,17 @@ export const EditorItemList = ({
 					value={query}
 					className="h-12 min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
 					placeholder="Search item title, ID or type…"
-					aria-label="Search items"
 					onChange={(event) => onQueryChange(event.currentTarget.value)}
 				/>
 				{itemType === undefined ? null : (
 					<button
 						type="button"
 						className="inline-flex h-12 cursor-pointer items-center gap-2 rounded-full border border-line-strong bg-surface-raised px-3 text-[0.7rem] font-semibold uppercase tracking-wider text-foreground"
-						aria-label={`Clear ${itemType} item filter`}
 						data-ui="EditorItemTypeFilter"
-						aria-pressed="true"
 						onClick={() => onItemTypeChange(undefined)}
 					>
 						{itemType}
-						<span aria-hidden="true">×</span>
+						<span>×</span>
 					</button>
 				)}
 				{empty ? null : (

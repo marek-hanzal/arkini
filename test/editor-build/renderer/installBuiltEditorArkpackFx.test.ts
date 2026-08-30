@@ -5,8 +5,8 @@ import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 import type { ArkpackDescriptor } from "~/arkpack/type/ArkpackDescriptor";
 import { createArkpackCatalogFx } from "~/arkpack/renderer/createArkpackCatalogFx";
 import { installBuiltEditorArkpackFx } from "~/editor-build/renderer/installBuiltEditorArkpackFx";
-import { readEditorBuildInstallPlanFn } from "~/editor-build/domain/fn/readEditorBuildInstallPlanFn";
-import type { EditorProjectBuildSchema } from "~/editor-build/domain/EditorProjectBuildSchema";
+import { readEditorBuildInstallPlanFn } from "~/editor-build/fn/readEditorBuildInstallPlanFn";
+import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
 
 const artifact: EditorProjectBuildSchema.Type = {
 	projectId: "project:build",

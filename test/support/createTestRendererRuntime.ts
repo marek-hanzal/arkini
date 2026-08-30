@@ -9,7 +9,7 @@ import {
 import {
 	EditorBuildRepository,
 	type EditorBuildRepositoryService,
-} from "~/editor-build/domain/EditorBuildRepository";
+} from "~/editor-build/service/EditorBuildRepository";
 import {
 	EditorProjectRepositoryError,
 	type EditorProjectRepositoryOperation,

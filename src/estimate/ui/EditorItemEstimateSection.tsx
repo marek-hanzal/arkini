@@ -4,7 +4,7 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type {
 	EditorItemEstimate,
 	EditorItemEstimateDiagnostic,
-} from "~/estimate/domain/EditorItemEstimate";
+} from "~/estimate/type/EditorItemEstimate";
 import type { EditorAcquisitionLimitation } from "~/flow/type/EditorAcquisitionGraph";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { EditorItemEstimateRouteGraph } from "~/estimate/ui/EditorItemEstimateRouteGraph";

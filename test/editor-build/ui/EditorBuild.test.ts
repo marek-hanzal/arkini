@@ -52,7 +52,7 @@ vi.mock("effect/unstable/reactivity/Atom", async (importOriginal) => {
 	};
 });
 
-vi.mock("~/editor-build/domain/EditorBuildRepository", async () => {
+vi.mock("~/editor-build/service/EditorBuildRepository", async () => {
 	const { Effect } = await import("effect");
 	return {
 		EditorBuildRepository: Effect.succeed({}),
@@ -138,6 +138,7 @@ vi.mock("~/ui/button/Button", () => ({
 
 import { Route as EditorBuildRouteDefinition } from "~/@routes/editor/$projectId/build";
 import { useEditorBuildController } from "~/editor-build/ui/useEditorBuildController";
+import type { GameDiagnosticsSchema } from "~/game-config/diagnostic/schema/GameDiagnosticsSchema";
 import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 
 const EditorBuild = EditorBuildRouteDefinition.options.component;
@@ -150,7 +151,7 @@ if (EditorBuild === undefined) throw new Error("Editor Build route component is 
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
-let controller: useEditorBuildController.Output | undefined;
+let controller: ReturnType<typeof useEditorBuildController> | undefined;
 beforeEach(() => {
 	controller = undefined;
 	state.project = {
@@ -217,20 +218,80 @@ describe("EditorBuild", () => {
 	it("keeps structured validation diagnostics distinct from operational failures", async () => {
 		const diagnostics = [
 			{
-				code: "resource:missing" as const,
+				code: "input:capacity-unsupported" as const,
 				severity: "error" as const,
-				message: "Referenced resource item-water has no matching PNG file.",
+				message: "This input buffer is only supported by producer lines.",
 				path: [
 					"items",
-					"water",
-					"asset",
-					"default",
+					"producer:academy",
+					"lines",
+					0,
+					"inputs",
 					0,
 				],
-				source: "items/simple/water.json",
-				resourceId: "item-water",
+				ownerItemId: "producer:academy",
+				lineId: "line:academy:knowledge",
+				inputIndex: 0,
+				capacity: 2,
 			},
-		];
+			{
+				code: "resource:unused" as const,
+				severity: "warning" as const,
+				message: "The asset is not referenced by the project.",
+				path: [
+					"resources",
+					"unused-asset",
+				],
+				resourceId: "unused-asset",
+			},
+			{
+				code: "item:duplicate-uid" as const,
+				severity: "error" as const,
+				message: "Academy and Library share the same immutable UID.",
+				path: [
+					"items",
+					"producer:library",
+					"uid",
+				],
+				uid: "duplicate-uid",
+				itemIds: [
+					"producer:academy",
+					"producer:library",
+				],
+				paths: [
+					[
+						"items",
+						"producer:academy",
+						"uid",
+					],
+					[
+						"items",
+						"producer:library",
+						"uid",
+					],
+				],
+			},
+		] satisfies GameDiagnosticsSchema.Type;
+		state.project = {
+			...(state.project as Record<string, unknown>),
+			config: {
+				items: {
+					"producer:academy": {
+						uid: "academy-uid",
+						title: "Academy",
+					},
+					"producer:library": {
+						uid: "library-uid",
+						title: "Library",
+					},
+				},
+			},
+			resources: [
+				{
+					id: "unused-asset",
+				},
+			],
+		};
 		state.buildResult = AsyncResult.fail(
 			new EditorProjectRepositoryError({
 				operation: "build-project",
@@ -239,12 +300,30 @@ describe("EditorBuild", () => {
 			}),
 		);
 
-		await renderController();
+		const { container } = await renderBuild();
 
-		expect(controller?.buildFailure).toEqual({
-			type: "validation",
-			diagnostics,
-		});
+		expect(container.textContent).toContain("Project validation blocked the Arkpack build.");
+		expect(container.textContent).toContain("Unsupported input capacity");
+		expect(
+			container.querySelector(
+				'a[href="/editor/editor-test/editor/items/academy-uid/form/production"]',
+			),
+		).not.toBeNull();
+		expect(
+			container.querySelector(
+				'a[href="/editor/editor-test/assets/unused-asset/detail/overview"]',
+			),
+		).not.toBeNull();
+		expect(
+			container.querySelector(
+				'a[href="/editor/editor-test/editor/items/academy-uid/form/identity"]',
+			),
+		).not.toBeNull();
+		expect(
+			container.querySelector(
+				'a[href="/editor/editor-test/editor/items/library-uid/form/identity"]',
+			),
+		).not.toBeNull();
 	});
 
 	it("does not expose an unknown Build failure cause", async () => {

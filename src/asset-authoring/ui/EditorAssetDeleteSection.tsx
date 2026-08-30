@@ -2,7 +2,7 @@ import { ArrowRight, ShieldAlert, ShieldCheck } from "lucide-react";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { EditorProjectAvatarKeys } from "~/project-authoring/schema/EditorProjectFormSchema";
-import type { EditorAssetDeleteBlocker } from "~/asset-authoring/domain/fn/readEditorAssetDeleteBlockersFn";
+import type { EditorAssetDeleteBlocker } from "~/asset-authoring/fn/readEditorAssetDeleteBlockersFn";
 import { Button, ButtonLink, DangerButton } from "~/ui/button/Button";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorAssetDeleteController } from "~/asset-authoring/ui/useEditorAssetDeleteController";

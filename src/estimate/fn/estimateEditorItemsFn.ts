@@ -11,17 +11,15 @@ import type {
 	EditorItemEstimateDiagnostic,
 	EditorItemEstimateRequirementStep,
 	EditorItemEstimateRouteStep,
-} from "~/estimate/domain/EditorItemEstimate";
-import { editorItemEstimateMaximumQuantity } from "~/estimate/domain/EditorItemEstimateQuantitySchema";
+} from "~/estimate/type/EditorItemEstimate";
+import { editorItemEstimateMaximumQuantity } from "~/estimate/schema/EditorItemEstimateQuantitySchema";
 
-export namespace estimateEditorItemsFn {
-	export interface Props {
-		readonly graph: EditorAcquisitionGraph;
-		readonly requests: ReadonlyArray<{
-			readonly factId: string;
-			readonly quantity?: number;
-		}>;
-	}
+interface EstimateEditorItemsProps {
+	readonly graph: EditorAcquisitionGraph;
+	readonly requests: ReadonlyArray<{
+		readonly factId: string;
+		readonly quantity?: number;
+	}>;
 }
 
 interface RequirementGroup {
@@ -531,7 +529,7 @@ const readRequirementSummary = ({ nodes, occurrenceCountByNode }: EstimateNodeGr
 export const estimateEditorItemsFn = ({
 	graph,
 	requests,
-}: estimateEditorItemsFn.Props): ReadonlyArray<EditorItemEstimate> => {
+}: EstimateEditorItemsProps): ReadonlyArray<EditorItemEstimate> => {
 	if (requests.length === 0) return [];
 	const index = createIndex(graph);
 	return requests.map(({ factId, quantity = 1 }): EditorItemEstimate => {

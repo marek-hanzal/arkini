@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import type {
 	EditorItemEstimate,
 	EditorItemEstimateRouteStep,
-} from "~/estimate/domain/EditorItemEstimate";
-import { createEditorItemEstimateIndexFn } from "~/estimate/domain/fn/createEditorItemEstimateIndexFn";
+} from "~/estimate/type/EditorItemEstimate";
+import { createEditorItemEstimateIndexFn } from "~/estimate/fn/createEditorItemEstimateIndexFn";
 
 const step = (factId: string, quantity: number): EditorItemEstimateRouteStep => ({
 	actionRuns: quantity,

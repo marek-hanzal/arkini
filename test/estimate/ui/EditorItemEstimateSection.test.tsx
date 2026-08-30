@@ -4,7 +4,7 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorItemEstimate } from "~/estimate/domain/EditorItemEstimate";
+import type { EditorItemEstimate } from "~/estimate/type/EditorItemEstimate";
 
 const state = vi.hoisted(() => ({
 	estimate: undefined as unknown,

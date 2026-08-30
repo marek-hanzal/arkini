@@ -3,7 +3,7 @@ import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { describe, expect, it, vi } from "vitest";
 
-import { RendererAtomRegistry } from "~/application-runtime/RendererAtomRegistry";
+import { RendererAtomRegistry } from "~/application-runtime/atom/RendererAtomRegistry";
 
 describe("Renderer Atom lifecycle", () => {
 	it("schedules a scoped atom and finalizes it exactly once with its owning registry", async () => {

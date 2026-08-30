@@ -6,7 +6,7 @@ import type { ItemDetailReference } from "~/item-detail-frame/projectItemDetailR
 import type { ItemDetailLines } from "~/item-line-detail/ui/ItemDetailLines";
 import { withdrawLineInputFx } from "~/production-input/write/withdrawLineInputFx";
 import { withdrawLineInputsFx } from "~/production-input/write/withdrawLineInputsFx";
-import { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { LinkButton } from "~/ui/button/LinkButton";
 import { itemDetailBadgeMotion, itemDetailFadeMotion } from "~/item-detail-frame/ItemDetailMotion";
 import { ItemReferenceButton } from "~/item-detail-frame/ItemReferenceButton";

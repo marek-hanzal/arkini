@@ -22,7 +22,7 @@ import {
 import type { EditorProjectBuildSchema } from "~/editor-build/domain/EditorProjectBuildSchema";
 import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerAtom";
 import { useEditorProject } from "~/authoring-session/useEditorProject";
-import { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { formatByteSizeFn } from "~/ui/formatByteSizeFn";
 import { installBuiltEditorArkpackFx } from "~/editor-build/renderer/installBuiltEditorArkpackFx";
 import { saveEditorBuildFx } from "~/editor-build/renderer/saveEditorBuildFx";

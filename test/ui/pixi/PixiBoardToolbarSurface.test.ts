@@ -68,7 +68,7 @@ vi.mock("~/ui/game/useGameEngine", () => ({
 	useGameEngine: () => ({}),
 }));
 
-vi.mock("~/application-runtime/RendererRuntime", () => ({
+vi.mock("~/application-runtime/service/RendererRuntime", () => ({
 	RendererRuntime: {
 		runPromise: Effect.runPromise,
 		runSync: Effect.runSync,

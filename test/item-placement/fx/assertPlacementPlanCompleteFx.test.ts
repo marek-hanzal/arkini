@@ -2,7 +2,7 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { assertPlacementPlanCompleteFx } from "~/item-placement/fx/assertPlacementPlanCompleteFx";
-import type { PlacementPlan } from "~/item-placement/PlacementPlan";
+import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
 
 const drop = {
 	itemId: "item:test",

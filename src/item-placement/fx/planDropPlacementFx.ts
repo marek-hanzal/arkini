@@ -14,7 +14,7 @@ import { readToolbarLocationsFn } from "~/item-placement/fn/readToolbarLocations
 import type { dropFx } from "~/production-output/fx/dropFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { StorageSchema } from "~/item-definition/schema/StorageSchema";
-import type { PlacementPlan } from "~/item-placement/PlacementPlan";
+import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
 
 import { readPlacementPlanQuantityFn } from "../fn/readPlacementPlanQuantityFn";
 import { assertPlacementPlanCompleteFx } from "./assertPlacementPlanCompleteFx";

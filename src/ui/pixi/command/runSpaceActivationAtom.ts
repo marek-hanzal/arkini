@@ -3,8 +3,8 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { makeExactGameAtomFamilyFx } from "~/ui/game/makeExactGameAtomFamilyFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import type { activateSpaceItemFx } from "~/space-action/write/activateSpaceItemFx";
-import { activateSpaceItemWithTransitionFx } from "~/space-action/write/activateSpaceItemFx";
+import type { activateSpaceItemFx } from "~/space-action/fx/activateSpaceItemFx";
+import { activateSpaceItemWithTransitionFx } from "~/space-action/fx/activateSpaceItemFx";
 
 export namespace runSpaceActivationAtom {
 	export type Command = activateSpaceItemFx.Props;

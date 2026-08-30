@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { TileActorFeedbackCue } from "~/ui/pixi/feedback/TileActorFeedbackCue";
-import { DropItemResultKind } from "~/item-interaction/DropItemResult";
+import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import type { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
 import type {
 	DropPresentation,

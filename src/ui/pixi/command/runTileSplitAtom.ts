@@ -3,7 +3,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { makeExactGameAtomFamilyFx } from "~/ui/game/makeExactGameAtomFamilyFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { splitBoardItemStackFx } from "~/item-interaction/write/splitBoardItemStackFx";
+import { splitBoardItemStackFx } from "~/item-interaction/fx/splitBoardItemStackFx";
 
 export namespace runTileSplitAtom {
 	export type Command = splitBoardItemStackFx.Props;

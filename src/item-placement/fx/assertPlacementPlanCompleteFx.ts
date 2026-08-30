@@ -5,7 +5,7 @@ import type { dropFx } from "~/production-output/fx/dropFx";
 import { PlacementPlanInvalidError } from "~/item-placement/error/PlacementPlanInvalidError";
 import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import { readPlacementPlanQuantityFn } from "~/item-placement/fn/readPlacementPlanQuantityFn";
-import type { PlacementPlan } from "~/item-placement/PlacementPlan";
+import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
 
 interface AssertPlacementPlanCompleteProps {
 	readonly drop: dropFx.Result;

@@ -8,7 +8,7 @@ import type { TileActorItem } from "~/ui/pixi/actor/TileActorItem";
 import { readTileActorBadgeCountFn } from "~/ui/pixi/actor/fn/readTileActorBadgeCountFn";
 import { readTileActorAssetSourceIdsFx } from "~/ui/pixi/actor/readTileActorAssetSourceIdsFx";
 import { readTileActorVisualFx } from "~/ui/pixi/actor/readTileActorVisualFx";
-import { readRuntimeItemPrimaryActionFx } from "~/item-interaction/read/readRuntimeItemPrimaryActionFx";
+import { readRuntimeItemPrimaryActionFx } from "~/item-interaction/fx/readRuntimeItemPrimaryActionFx";
 import { resolveActiveJobStatusFx } from "~/production-job/fx/resolveActiveJobStatusFx";
 import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";

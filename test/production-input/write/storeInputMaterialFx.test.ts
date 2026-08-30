@@ -8,8 +8,8 @@ import { queryFx } from "~/engine/query/fx/queryFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { getItemFx } from "~test/support/runtime/getItemFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
-import { DropItemRejectedReason, DropItemResultKind } from "~/item-interaction/DropItemResult";
-import { dropItemFx } from "~/item-interaction/write/dropItemFx";
+import { DropItemRejectedReason, DropItemResultKind } from "~/item-interaction/type/DropItemResult";
+import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import {
 	inputRuntimeTestConfig,

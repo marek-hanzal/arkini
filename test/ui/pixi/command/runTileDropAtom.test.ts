@@ -5,8 +5,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Game } from "~/renderer/game/Game";
 import { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
-import { DropItemRejectedReason } from "~/item-interaction/DropItemResult";
-import { DropItemResultKind } from "~/item-interaction/DropItemResult";
+import { DropItemRejectedReason } from "~/item-interaction/type/DropItemResult";
+import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 
 const command: runTileDropAtom.Command = {
 	sourceItemId: "runtime:source",

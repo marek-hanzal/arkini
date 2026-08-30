@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 
-import { DropItemResultKind } from "~/item-interaction/DropItemResult";
+import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import type { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
 
 export namespace readActorCursorFn {

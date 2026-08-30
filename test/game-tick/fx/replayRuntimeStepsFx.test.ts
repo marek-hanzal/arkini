@@ -5,7 +5,7 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { moveRuntimeItemForTestFx } from "~test/support/item-interaction/moveRuntimeItemForTestFx";
+import { moveRuntimeItemForTestFx } from "~test/item-interaction/support/moveRuntimeItemForTestFx";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
 import { replayRuntimeStepsFx } from "~/game-tick/fx/replayRuntimeStepsFx";
 import { TickStepMs } from "~/game-tick/constant/TickStepMs";

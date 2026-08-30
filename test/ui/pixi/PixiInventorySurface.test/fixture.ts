@@ -91,14 +91,14 @@ vi.mock("~/application-runtime/service/RendererRuntime", () => ({
 	},
 }));
 
-vi.mock("~/item-interaction/write/releaseInventoryItemFx", () => ({
+vi.mock("~/item-interaction/fx/releaseInventoryItemFx", () => ({
 	releaseInventoryItemFx: (props: unknown) =>
 		Effect.sync(() => {
 			surfaceState.release(props);
 		}),
 }));
 
-vi.mock("~/space-action/write/activateSpaceItemFx", () => ({
+vi.mock("~/space-action/fx/activateSpaceItemFx", () => ({
 	activateSpaceItemWithTransitionFx: (props: unknown) =>
 		Effect.sync(() => {
 			surfaceState.activateSpace(props);

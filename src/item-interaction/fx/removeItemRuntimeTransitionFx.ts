@@ -8,7 +8,7 @@ import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { removeRuntimeItemFx } from "~/game-runtime/fx/removeRuntimeItemFx";
-import { readValidatedRuntimeItemFx } from "~/item-interaction/read/readValidatedRuntimeItemFx";
+import { readValidatedRuntimeItemFx } from "~/item-interaction/fx/readValidatedRuntimeItemFx";
 
 export namespace removeItemRuntimeTransitionFx {
 	export interface Props {

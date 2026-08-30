@@ -3,7 +3,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { makeExactGameAtomFamilyFx } from "~/ui/game/makeExactGameAtomFamilyFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { dropItemFx } from "~/item-interaction/write/dropItemFx";
+import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
 
 export namespace runTileDropAtom {
 	export type Command = dropItemFx.Props;

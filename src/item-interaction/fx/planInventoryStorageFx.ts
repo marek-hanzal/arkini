@@ -10,7 +10,7 @@ import { planInventoryPlacementFx } from "~/item-placement/fx/planInventoryPlace
 import { readEmptyLocationsFn } from "~/item-placement/fn/readEmptyLocationsFn";
 import { readInventoryLocationsFn } from "~/item-placement/fn/readInventoryLocationsFn";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
-import type { PlacementPlan } from "~/item-placement/PlacementPlan";
+import type { PlacementPlan } from "~/item-placement/type/PlacementPlan";
 import type { GridRuntimeItemSchema } from "~/game-runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 

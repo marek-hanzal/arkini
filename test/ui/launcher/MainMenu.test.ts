@@ -16,7 +16,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 import type { ArkpackCatalog } from "~/arkpack/renderer/ArkpackCatalog";
 import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerAtom";
-import { RendererLifecycleOwnerAtom } from "~/application-runtime/fx/readRendererLifecycleFx";
+import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
 import { createRendererLifecycleFx } from "~/application-runtime/fx/createRendererLifecycleFx";
 import { Route as MainMenuRouteDefinition } from "~/@routes/_launcher/main-menu";
 import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";

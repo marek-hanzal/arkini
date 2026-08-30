@@ -5,7 +5,7 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Game } from "~/renderer/game/Game";
-import { RendererLifecycleOwnerAtom } from "~/application-runtime/fx/readRendererLifecycleFx";
+import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
 import { createRendererLifecycleFx } from "~/application-runtime/fx/createRendererLifecycleFx";
 import { readRendererLifecycleFx } from "~/application-runtime/fx/readRendererLifecycleFx";
 import { gameMenuCommandAtom } from "~/ui/game-menu/gameMenuCommandAtom";

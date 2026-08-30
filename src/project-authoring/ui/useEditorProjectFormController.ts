@@ -246,5 +246,3 @@ export const useEditorProjectFormController = ({
 		save,
 	} as const;
 };
-
-export type EditorProjectFormController = ReturnType<typeof useEditorProjectFormController>;

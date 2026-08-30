@@ -8,9 +8,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
-import { EditorProjectProvider } from "~/authoring-session/ui/EditorProjectProvider";
 import { RendererAtomRegistry } from "~/application-runtime/atom/RendererAtomRegistry";
-import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { EditorProjectProvider, useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 (

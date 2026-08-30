@@ -11,7 +11,9 @@ import {
 } from "~/authoring-shell/ui/EditorSectionTabs";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorMcpSections, type EditorMcpSectionId } from "./EditorMcpSections";
-import { type EditorMcpController, useEditorMcpController } from "./useEditorMcpController";
+import { useEditorMcpController } from "./useEditorMcpController";
+
+type EditorMcpController = ReturnType<typeof useEditorMcpController>;
 
 const statusClassNames = {
 	muted: "text-sm text-muted",

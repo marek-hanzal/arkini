@@ -159,5 +159,3 @@ export const useEditorMcpController = () => {
 		],
 	);
 };
-
-export type EditorMcpController = ReturnType<typeof useEditorMcpController>;

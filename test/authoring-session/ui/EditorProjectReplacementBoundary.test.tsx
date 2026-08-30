@@ -1,16 +1,15 @@
 // @vitest-environment jsdom
 
-import { RegistryContext, scheduleTask, useAtomValue } from "@effect/atom-react";
+import { RegistryContext, scheduleTask } from "@effect/atom-react";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
-import { act, createElement, type PropsWithChildren, useState } from "react";
+import { act, createElement, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
-import { EditorProjectContext } from "~/authoring-session/ui/useEditorProject";
 import { EditorProjectReplacementEpochAtom } from "~/authoring-session/atom/EditorProjectReplacementEpochAtom";
-import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { EditorProjectProvider, useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorProjectReplacementBoundary } from "~/authoring-session/ui/EditorProjectReplacementBoundary";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
@@ -24,12 +23,28 @@ const roots: Array<ReturnType<typeof createRoot>> = [];
 const registries: AtomRegistry.AtomRegistry[] = [];
 const projectAtom = EditorProjectAtom("project");
 
+beforeEach(() => {
+	Object.defineProperty(window, "arkini", {
+		configurable: true,
+		value: {
+			editor: {
+				onProjectChanged: () => () => undefined,
+			},
+			editorMcp: {
+				clearProjectContext: () => Promise.resolve(),
+				setProjectContext: () => Promise.resolve(),
+			},
+		},
+	});
+});
+
 afterEach(async () => {
 	await act(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
 	for (const registry of registries.splice(0)) registry.dispose();
 	document.body.replaceChildren();
+	Reflect.deleteProperty(window, "arkini");
 });
 
 const createProject = (revision: number): EditorProject => ({
@@ -42,12 +57,6 @@ const createProject = (revision: number): EditorProject => ({
 	config: editorTestPayload.config,
 	resources: editorTestPayload.resources,
 });
-
-const ProjectContextOwner = ({ children }: PropsWithChildren) => {
-	const project = useAtomValue(projectAtom);
-	if (project === undefined) throw new Error("Test project is missing.");
-	return <EditorProjectContext value={project}>{children}</EditorProjectContext>;
-};
 
 describe("EditorProjectReplacementBoundary", () => {
 	it("remounts only after an explicit whole-project replacement", async () => {
@@ -77,8 +86,10 @@ describe("EditorProjectReplacementBoundary", () => {
 						value: registry,
 					},
 					createElement(
-						ProjectContextOwner,
-						null,
+						EditorProjectProvider,
+						{
+							loaded: createProject(1),
+						},
 						createElement(EditorProjectReplacementBoundary, null, createElement(Probe)),
 					),
 				),

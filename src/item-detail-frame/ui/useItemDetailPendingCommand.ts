@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 
 import type { PlayableGame } from "~/renderer/game/PlayableGame";
-import { useGameEngine } from "~/ui/game/useGameEngine";
+import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import type { ItemDetailPendingAction } from "~/item-detail-frame/type/ItemDetailControl";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 

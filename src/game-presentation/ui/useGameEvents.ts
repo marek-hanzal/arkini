@@ -1,0 +1,24 @@
+import { useEffect, useRef } from "react";
+
+import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
+import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
+
+export namespace useGameEvents {
+	export type Batch = GameEventBatchSchema.Type;
+}
+
+/** Subscribes one React presentation coordinator to committed transient event batches. */
+export const useGameEvents = (
+	listener: (batch: useGameEvents.Batch) => void | PromiseLike<void>,
+) => {
+	const game = useGameEngine();
+	const listenerRef = useRef(listener);
+	listenerRef.current = listener;
+
+	useEffect(
+		() => game.subscribeEvents((batch) => listenerRef.current(batch)),
+		[
+			game,
+		],
+	);
+};

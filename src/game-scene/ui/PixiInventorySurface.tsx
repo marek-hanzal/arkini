@@ -2,7 +2,7 @@ import { useAtomSet } from "@effect/atom-react";
 import type { Effect } from "effect";
 import { useCallback, useLayoutEffect, useRef } from "react";
 
-import { useGameEngine } from "~/ui/game/useGameEngine";
+import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { runInventoryReleaseAtom } from "~/tile-interaction/atom/runInventoryReleaseAtom";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { runSpaceActivationAtom } from "~/tile-interaction/atom/runSpaceActivationAtom";

@@ -24,7 +24,7 @@ const GameBoardRoute = GameBoardRouteDefinition.options.component;
 if (GameBoardRoute === undefined)
 	throw new Error("Installed Game Board route component is missing.");
 
-vi.mock("~/ui/game/PlayableBoard", async () => {
+vi.mock("~/game-shell/ui/PlayableBoard", async () => {
 	const { createElement: createReactElement } = await import("react");
 	return {
 		PlayableBoard: ({ onOpenInventory }: { readonly onOpenInventory: () => void }) =>

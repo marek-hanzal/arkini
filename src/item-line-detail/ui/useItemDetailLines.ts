@@ -1,10 +1,10 @@
 import { Equal } from "effect";
 import { useCallback } from "react";
 
-import { useGameEngine } from "~/ui/game/useGameEngine";
+import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import { projectItemDetailLinesFx } from "~/item-line-detail/fx/projectItemDetailLinesFx";
-import { useRuntimeSelector } from "~/ui/game/useRuntimeSelector";
+import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 

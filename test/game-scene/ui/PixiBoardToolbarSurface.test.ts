@@ -66,7 +66,7 @@ vi.mock("@effect/atom-react", () => ({
 				: boardState.runDrop,
 }));
 
-vi.mock("~/ui/game/useGameEngine", () => ({
+vi.mock("~/game-presentation/ui/useGameEngine", () => ({
 	useGameEngine: () => ({}),
 }));
 
@@ -93,7 +93,7 @@ vi.mock("~/tile-interaction/atom/runSpaceActivationAtom", () => ({
 	runSpaceActivationAtom: () => tileAtoms.space,
 }));
 
-vi.mock("~/ui/game-menu/useGameMenuControl", () => ({
+vi.mock("~/game-menu/ui/GameMenuProvider", () => ({
 	useGameMenuControl: () => ({
 		phase: "closed",
 	}),

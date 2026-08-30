@@ -20,8 +20,8 @@ import { flashMotionTargetFx } from "~/tile-motion/fx/flashMotionTargetFx";
 import { projectMotionItemFn } from "~/tile-motion/fn/projectMotionItemFn";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
-import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
-import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
+import type { MainSurface } from "~/game-scene/service/MainSurface";
+import type { ActorPose } from "~/game-scene/type/ActorPose";
 
 export namespace runInputMotionFx {
 	export interface Props {

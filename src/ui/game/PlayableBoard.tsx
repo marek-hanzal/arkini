@@ -3,8 +3,8 @@ import { useCallback } from "react";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { CheatItemSpotlight } from "~/ui/cheat-spotlight/CheatItemSpotlight";
 import { useGameEngine } from "~/ui/game/useGameEngine";
-import { PixiBoardToolbarSurface } from "~/ui/pixi/PixiBoardToolbarSurface";
-import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";
+import { PixiBoardToolbarSurface } from "~/game-scene/ui/PixiBoardToolbarSurface";
+import { usePixiGameRuntime } from "~/game-scene/ui/PixiGameRuntime";
 
 /** Shared Board + Toolbar gameplay leaf with its exact cheat presentation. */
 export const PlayableBoard = ({

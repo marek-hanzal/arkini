@@ -5,7 +5,7 @@ import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import { createMagneticFieldFx } from "~/tile-motion/fx/createMagneticFieldFx";
 import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import { createMagneticProjectorFx } from "~/tile-motion/fx/createMagneticProjectorFx";
-import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
+import type { MainSurface } from "~/game-scene/service/MainSurface";
 
 import { createMagneticActor, createSpringDriverProbe } from "./createMagneticFieldFx.test/fixture";
 

@@ -6,7 +6,7 @@ import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
-import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
+import type { MainSurface } from "~/game-scene/service/MainSurface";
 import type { QuantityPresentation } from "~/tile-motion/type/QuantityPresentation";
 import { projectMotionItemFn } from "~/tile-motion/fn/projectMotionItemFn";
 

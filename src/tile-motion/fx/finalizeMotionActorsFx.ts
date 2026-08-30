@@ -8,7 +8,7 @@ import { startActorExitFx } from "~/tile-rendering/fx/startActorExitFx";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
-import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
+import type { MainSurface } from "~/game-scene/service/MainSurface";
 
 export namespace finalizeMotionActorsFx {
 	export interface Props {

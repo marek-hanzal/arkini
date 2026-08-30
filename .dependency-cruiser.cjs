@@ -20,6 +20,7 @@ const tilePresentationPattern = "^src/tile-presentation(?:/|$)";
 const tileRenderingPattern = "^src/tile-rendering(?:/|$)";
 const tileMotionPattern = "^src/tile-motion(?:/|$)";
 const tileInteractionPattern = "^src/tile-interaction(?:/|$)";
+const gameScenePattern = "^src/game-scene(?:/|$)";
 const itemLineDetailReadPattern =
 	"^src/item-line-detail/(?:fx/(?:readItemDetailInputsFx|readItemDetailLinesFx|readItemDetailMaterialAutofillAvailabilityFx|readItemDetailOutputFx)[.]ts$|type/ItemDetailLines[.]ts$)";
 const itemLineDetailPresentationPattern =
@@ -37,12 +38,14 @@ const tilePresentationAllowedSourceDependencyPattern =
 const tileRenderingAllowedSourceDependencyPattern =
 	"(?:tile-rendering(?:/|$)|application-runtime/service/RendererRuntime[.]ts$|item-interaction/(?:fx/readDropItemPreviewFx|type/DropItemResult)[.]ts$|tile-presentation/type/TileActorItem[.]ts$)";
 const tileMotionAllowedSourceDependencyPattern =
-	"(?:tile-motion(?:/|$)|application-runtime/service/RendererRuntime[.]ts$|item-location/schema/LocationScopeEnumSchema[.]ts$|tile-presentation/type/(?:TileActorItem|TileMotionCue)[.]ts$|tile-rendering/(?:fn/readTravelDurationMsFn[.]ts$|fx/(?:burstFeedbackParticlesFx|createRetargetablePoseSamplerFx|createTextureStoreFx|createTileActorFx|destroyTileActorFx|restoreActorExitFx|startActorEnterFx|startActorExitFx|startRemainderFeedbackFx|updateTileActorFx)[.]ts$|service/(?:ActorAnimator|AnimationDriver|MainActorStore|PixiApplicationOwner)[.]ts$|type/(?:PixiScenePalette|PixiTileActor)[.]ts$)|ui/pixi/scene/(?:ActorPose|MainSurface)[.]ts$)";
+	"(?:tile-motion(?:/|$)|application-runtime/service/RendererRuntime[.]ts$|game-scene/(?:service/MainSurface|type/ActorPose)[.]ts$|item-location/schema/LocationScopeEnumSchema[.]ts$|tile-presentation/type/(?:TileActorItem|TileMotionCue)[.]ts$|tile-rendering/(?:fn/readTravelDurationMsFn[.]ts$|fx/(?:burstFeedbackParticlesFx|createRetargetablePoseSamplerFx|createTextureStoreFx|createTileActorFx|destroyTileActorFx|restoreActorExitFx|startActorEnterFx|startActorExitFx|startRemainderFeedbackFx|updateTileActorFx)[.]ts$|service/(?:ActorAnimator|AnimationDriver|MainActorStore|PixiApplicationOwner)[.]ts$|type/(?:PixiScenePalette|PixiTileActor)[.]ts$))";
 const tileInteractionAllowedSourceDependencyPattern =
-	"(?:tile-interaction(?:/|$)|application-diagnostics/(?:fn/toDiagnosticValueFn|fx/writeDiagnosticRecordFx)[.]ts$|application-runtime/service/RendererRuntime[.]ts$|engine/cheat/write/removeCheatItemFx[.]ts$|item-interaction/(?:fx/(?:dropItemFx|readDropItemPreviewFx|releaseInventoryItemFx|splitBoardItemStackFx)[.]ts$|type/DropItemResult[.]ts$)|item-location/schema/LocationScopeEnumSchema[.]ts$|production-job/write/(?:enqueueDefaultLineFx|fillDefaultLineQueueFx)[.]ts$|renderer/game/GameEngine[.]ts$|space-action/fx/activateSpaceItemFx[.]ts$|tile-motion/(?:fn/readSettleDurationMsFn[.]ts$|service/(?:MagneticField|MotionRuntime)[.]ts$|type/MotionTarget[.]ts$)|tile-presentation/type/(?:TileActorFeedbackCue|TileActorItem)[.]ts$|tile-rendering/(?:fn/(?:isSameTileActorLocationFn|readActorCursorFn)[.]ts$|fx/(?:animateRetargetablePoseFx|burstFeedbackParticlesFx|createRetargetablePoseSamplerFx|flashConsumedSourceFx|restoreActorExitFx|startActorExitFx)[.]ts$|service/(?:ActorAnimator|AnimationDriver|DemandFrameLoop|MainActorStore|PixiApplicationOwner)[.]ts$|type/PixiTileActor[.]ts$)|ui/(?:drag/PointerDragThreshold[.]ts$|game/(?:makeExactGameAtomFamilyFx|settleRendererCommandFailureFx)[.]ts$|pixi/(?:actor/InventoryActorStore[.]ts$|layout/SceneLayout[.]ts$)))";
-const tileMotionRetainedConsumerPattern = `${tileInteractionPattern}|^src/ui/pixi/(?:delivery/createDeliveryRuntimeFx|scene/(?:createMainReconcilerFx|createMainRuntimeFx))[.]ts$`;
+	"(?:tile-interaction(?:/|$)|application-diagnostics/(?:fn/toDiagnosticValueFn|fx/writeDiagnosticRecordFx)[.]ts$|application-runtime/service/RendererRuntime[.]ts$|engine/cheat/write/removeCheatItemFx[.]ts$|game-scene/(?:service/InventoryActorStore|type/SceneLayout)[.]ts$|item-interaction/(?:fx/(?:dropItemFx|readDropItemPreviewFx|releaseInventoryItemFx|splitBoardItemStackFx)[.]ts$|type/DropItemResult[.]ts$)|item-location/schema/LocationScopeEnumSchema[.]ts$|production-job/write/(?:enqueueDefaultLineFx|fillDefaultLineQueueFx)[.]ts$|renderer/game/GameEngine[.]ts$|space-action/fx/activateSpaceItemFx[.]ts$|tile-motion/(?:fn/readSettleDurationMsFn[.]ts$|service/(?:MagneticField|MotionRuntime)[.]ts$|type/MotionTarget[.]ts$)|tile-presentation/type/(?:TileActorFeedbackCue|TileActorItem)[.]ts$|tile-rendering/(?:fn/(?:isSameTileActorLocationFn|readActorCursorFn)[.]ts$|fx/(?:animateRetargetablePoseFx|burstFeedbackParticlesFx|createRetargetablePoseSamplerFx|flashConsumedSourceFx|restoreActorExitFx|startActorExitFx)[.]ts$|service/(?:ActorAnimator|AnimationDriver|DemandFrameLoop|MainActorStore|PixiApplicationOwner)[.]ts$|type/PixiTileActor[.]ts$)|ui/(?:drag/PointerDragThreshold[.]ts$|game/(?:makeExactGameAtomFamilyFx|settleRendererCommandFailureFx)[.]ts$))";
+const gameSceneAllowedSourceDependencyPattern =
+	"(?:game-scene(?:/|$)|application-runtime/service/RendererRuntime[.]ts$|game-event/schema/GameEventEnumSchema[.]ts$|game-runtime/(?:read/fn/isDeliveryRuntimeItemFn|schema/RuntimeSchema)[.]ts$|item-definition/schema/TypeSchema[.]ts$|item-detail-frame/ui/useItemDetailControl[.]ts$|item-interaction/type/DropItemResult[.]ts$|item-location/schema/(?:GridLocationSchema|LocationScopeEnumSchema)[.]ts$|renderer/game/(?:GameEngine|session/GameSession)[.]ts$|tile-interaction/(?:atom/(?:TileDefaultLineCommandAtom|runInventoryReleaseAtom|runSpaceActivationAtom|runTileDropAtom|runTileSplitAtom)[.]ts$|fx/(?:createCursorGrabMotionFx|createDropPresentationFx|createDropSubmissionFx|createGameInteractionControlFx|createInventoryDragControllerFx|createMainDragControllerFx|readTileDropPreviewFx)[.]ts$|type/(?:InventoryInteractionSurface|MainActivationIntent|MainInteractionSurface)[.]ts$)|tile-motion/(?:fn/(?:projectMotionItemFn|readSettleDurationMsFn)[.]ts$|fx/(?:chaseTargetFx|createLiveContactPoseReaderFx|createMagneticFieldFx|createMagneticProjectorFx|createMotionRuntimeFx|flashMotionTargetFx)[.]ts$|service/(?:MagneticField|MotionRuntime)[.]ts$)|tile-presentation/(?:fn/(?:readCommittedTileSwapMotionCueFn|readTileActorAssetSourceIdsFn|readTileActorBadgeCountFn|readTileActorFeedbackCuesFn)[.]ts$|fx/(?:readCommittedTileReplacementsFx|readTileActorVisualFx|readTileActorsFx|readTileMotionCuesFx)[.]ts$|type/(?:TileActorFeedbackCue|TileActorItem)[.]ts$)|tile-rendering/(?:fn/(?:isSameTileActorLocationFn|readCrowdAlphaFn)[.]ts$|fx/(?:animateRetargetablePoseFx|burstFeedbackParticlesFx|createActorAnimatorFx|createAnimationDriverFx|createApplicationOwnerFx|createMainActorStoreFx|createParticleTexturesFx|createTextureStoreFx|createTileActorFx|destroyTileActorFx|flashConsumedSourceFx|readScenePaletteFx|restoreActorExitFx|runActivityParticlesFx|runActorLifecycleFx|startActivityParticlesFx|startActorEnterFx|startActorExitFx|startRemainderFeedbackFx|stopActivityParticlesFx|transitionActorVisualFx|updateActorProgressFx|updateTileActorFx)[.]ts$|service/(?:ActorAnimator|AnimationDriver|MainActorStore|ParticleTextures|PixiApplicationOwner)[.]ts$|type/(?:PixiScenePalette|PixiTileActor)[.]ts$)|ui/(?:game-menu/useGameMenuControl|game/useGameEngine|navigation/useInventoryShortcutKey)[.]ts$)";
+const tileMotionRetainedConsumerPattern = `${tileInteractionPattern}|^src/game-scene/fx/(?:createDeliveryRuntimeFx|createMainReconcilerFx|createMainRuntimeFx)[.]ts$`;
 const tileInteractionRetainedConsumerPattern =
-	"^src/ui/pixi/(?:PixiBoardToolbarSurface[.]tsx$|PixiGameProvider[.]tsx$|PixiGameRuntimeContext[.]ts$|PixiInventorySurface[.]tsx$|delivery/createDeliveryRuntimeFx[.]ts$|scene/(?:InventorySurface|MainSurface|createInventoryRuntimeFx|createInventorySurfaceFx|createMainReconcilerFx|createMainRuntimeFx|createMainSurfaceFx)[.]ts$)";
+	"^src/game-scene/(?:fx/(?:createDeliveryRuntimeFx|createInventoryRuntimeFx|createInventorySurfaceFx|createMainReconcilerFx|createMainRuntimeFx|createMainSurfaceFx)[.]ts$|service/(?:InventorySurface|MainSurface)[.]ts$|ui/(?:PixiBoardToolbarSurface|PixiGameRuntime|PixiInventorySurface)[.]tsx$)";
 const gameRuntimeAllowedSourceDependencyPattern =
 	"(?:game-runtime(?:/|$)|game-config/schema/GameConfigSchema[.]ts$|engine/(?:cheat/schema/CheatStateSchema[.]ts$|common/schema/(?:IdSchema|NonNegativeIntegerSchema|PositiveIntegerSchema|TimeSchema)[.]ts$|game/context/GameConfigFx[.]ts$|item/(?:error/(?:ItemNotFoundError|ItemNotOnBoardError)[.]ts$|fn/(?:isItemPureWithIndexFn|readItemPurityIndexFn)[.]ts$|fx/resolveItemFx[.]ts$)|revision/(?:fx/createRevisionFx|schema/RevisionSchema)[.]ts$)|game-event/schema/GameEventSchema[.]ts$|item-definition/schema/(?:ItemSchema|StorageSchema|TypeSchema)[.]ts$|item-location/(?:fn/(?:indexGridLocationClaimsFn|isItemLocationScopeAllowedFn|readGridLocationClaimsFn)[.]ts$|schema/(?:BoardLocationSchema|DeliveryLocationSchema|GridLocationSchema|InputLocationSchema|JobLocationSchema|LocationSchema|LocationScopeEnumSchema|ReservedLocationSchema)[.]ts$)|production-delivery/(?:check/checkRuntimeDeliveriesFn|fx/reconcileOutboundDeliveriesRuntimeFx|schema/check/DeliveryTargetIssueSchema)[.]ts$|production-input/(?:check/checkRuntimeInputLocationsFn|fx/releaseOwnerInputsFx|schema/check/(?:InputCapacityExceededIssueSchema|InputLineMissingIssueSchema|InputOwnerMissingIssueSchema|InputSelectorMismatchIssueSchema|InputSlotInvalidIssueSchema))[.]ts$|production-job/(?:check/checkRuntimeJobsFn|error/JobOwnerBusyError|fn/readReservedJobOutputQuantitiesFn|schema/(?:JobQueueRequestSchema|JobSchema|DuplicateJobIdIssueSchema|JobConsumedMaterialStateIssueSchema|JobLineMissingIssueSchema|JobMaterialOrphanIssueSchema|JobOwnerMissingIssueSchema|JobOwnerMultipleActiveIssueSchema|JobOwnerNotOnGridIssueSchema|JobQueueExceededIssueSchema|JobTimeInvalidIssueSchema))[.]ts$|production-line/(?:fn/checkRuntimeDefaultLinesFn|schema/(?:DefaultLineByOwnerItemIdSchema|check/(?:DefaultLineIssueSchema|LineInputClosedIssueSchema)))[.]ts$)";
 const gamePersistenceAllowedSourceDependencyPattern =
@@ -78,7 +81,7 @@ const productRendererPattern =
 	"^src/(?:arkpack|editor-build)/renderer(?:/|$)|^src/asset-authoring/(?:session|validation)(?:/|$)";
 const productionJobPresentationPattern = "^src/production-job/ui(?:/|$)";
 const boardSpatialPattern = "^src/(?:item-location|item-placement|item-merge|space-action)(?:/|$)";
-const productPresentationPattern = `^src/(?:asset-authoring|item-authoring|estimate)/(?:ui|worker)(?:/|$)|${productionLineAuthoringPattern}|${launcherPattern}|^src/(?:flow-layout|flow-canvas)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)|${itemDetailPattern}|${itemDetailFramePattern}|${itemLineDetailPresentationPattern}|${tilePresentationPattern}|${tileRenderingPattern}|${tileMotionPattern}|${tileInteractionPattern}|${productionJobPresentationPattern}`;
+const productPresentationPattern = `^src/(?:asset-authoring|item-authoring|estimate)/(?:ui|worker)(?:/|$)|${productionLineAuthoringPattern}|${launcherPattern}|^src/(?:flow-layout|flow-canvas)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)|${itemDetailPattern}|${itemDetailFramePattern}|${itemLineDetailPresentationPattern}|${tilePresentationPattern}|${tileRenderingPattern}|${tileMotionPattern}|${tileInteractionPattern}|${gameScenePattern}|${productionJobPresentationPattern}`;
 const authoringProductPattern =
 	"^src/(?:project-authoring|board-scenario|project-version|project-note|authoring-mcp|authoring-session|authoring-shell)(?:/|$)";
 const authoringProductCorePattern =
@@ -362,7 +365,7 @@ const boundaryRules = [
 				tileRenderingPattern,
 				tileMotionPattern,
 				tileInteractionPattern,
-				"^src/ui/pixi(?:/|$)",
+				gameScenePattern,
 			],
 		},
 		to: {
@@ -392,7 +395,7 @@ const boundaryRules = [
 				tileRenderingPattern,
 				tileMotionPattern,
 				tileInteractionPattern,
-				"^src/ui/pixi(?:/|$)",
+				gameScenePattern,
 			],
 		},
 		to: {
@@ -453,6 +456,51 @@ const boundaryRules = [
 		},
 		to: {
 			path: tileInteractionPattern,
+		},
+	},
+	{
+		name: "game-scene-has-exact-dependencies",
+		comment:
+			"Concrete retained Game scenes compose only exact runtime facts, installed-Game controls, retained tile capabilities, and reusable Game UI leaves.",
+		severity: "error",
+		from: {
+			path: gameScenePattern,
+		},
+		to: {
+			path: `^src/(?!${gameSceneAllowedSourceDependencyPattern})|^(?:electron|shared|scripts)(?:/|$)|^node_modules/(?!@effect/atom-react(?:/|$)|effect(?:/|$)|pixi[.]js(?:/|$)|react(?:/|$)|ts-pattern(?:/|$))`,
+		},
+	},
+	{
+		name: "game-scene-has-concrete-composers-and-capability-consumers",
+		comment:
+			"Only the installed Game shell composes Game Scene; Tile Motion and Tile Interaction may import its exact capability leaves under their own stricter dependency rules.",
+		severity: "error",
+		from: {
+			path: activeCodePattern,
+			pathNot: [
+				gameScenePattern,
+				tileMotionPattern,
+				tileInteractionPattern,
+				"^src/ui/(?:game/PlayableBoard|inventory/Inventory|shell/GameShell)[.]tsx$",
+			],
+		},
+		to: {
+			path: gameScenePattern,
+		},
+	},
+	{
+		name: "game-scene-reverse-capability-imports-are-type-only",
+		comment:
+			"Tile Motion and Tile Interaction may describe exact scene capabilities but cannot execute or compose concrete Game Scene modules.",
+		severity: "error",
+		from: {
+			path: `(?:${tileMotionPattern}|${tileInteractionPattern})`,
+		},
+		to: {
+			path: gameScenePattern,
+			dependencyTypesNot: [
+				"type-only",
+			],
 		},
 	},
 	{
@@ -1035,7 +1083,7 @@ const boundaryRules = [
 			"Retained rendering owners consume Arkini animation capabilities; only the Tile Rendering animation driver may import Motion directly.",
 		severity: "error",
 		from: {
-			path: "^src/(?:tile-rendering|ui/pixi)(?:/|$)",
+			path: "^src/(?:game-scene|tile-rendering)(?:/|$)",
 			pathNot: [
 				"^src/tile-rendering/fx/createAnimationDriverFx[.]ts$",
 			],

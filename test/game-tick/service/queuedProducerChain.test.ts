@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { owners, runChain } from "./queuedProducerChain.test/fixture";
+import { owners, runChain } from "~test/game-tick/support/queuedProducerChainTestRuntime";
 
 describe("queued producer chain", () => {
 	it.each([

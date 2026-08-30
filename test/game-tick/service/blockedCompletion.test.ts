@@ -6,7 +6,6 @@ import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { TickFx } from "~/game-tick/service/TickFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import {
 	blockedCompletionOwnerId,
@@ -89,6 +88,8 @@ describe("blocked job completion", () => {
 		const config = createTickFailureTestConfig();
 		const result = Effect.runSync(
 			Effect.gen(function* () {
+				const output = config.items.inventoryOutput;
+				if (output === undefined) throw new Error("Expected failure output fixture.");
 				const owner = yield* spawnItemFx({
 					id: "runtime:invalid-output-forge",
 					itemId: "forge",
@@ -113,11 +114,21 @@ describe("blocked job completion", () => {
 						elapsedMs: 200,
 					}),
 				);
+				const afterFailure = yield* readRuntimeFx();
+				(config.items as Record<string, unknown>).inventoryOutput = output;
+				yield* runTickRuntimeByFx({
+					elapsedMs: 0,
+				});
+				const afterNoRetry = yield* readRuntimeFx();
+				yield* runTickRuntimeByFx({
+					elapsedMs: 100,
+				});
 				return {
-					after: yield* readRuntimeFx(),
+					afterFailure,
+					afterNoRetry,
 					attempt,
 					before,
-					tick: yield* (yield* TickFx).read,
+					recovered: yield* readRuntimeFx(),
 				};
 			}).pipe(
 				useGameFx({
@@ -132,7 +143,8 @@ describe("blocked job completion", () => {
 			_tag: "ItemNotFoundError",
 			itemId: "inventoryOutput",
 		});
-		expect(result.after).toEqual(result.before);
-		expect(result.tick.pendingElapsedMs).toBe(0);
+		expect(result.afterFailure).toEqual(result.before);
+		expect(result.afterNoRetry).toEqual(result.before);
+		expect(result.recovered.jobs[0]?.remainingMs).toBe(100);
 	});
 });

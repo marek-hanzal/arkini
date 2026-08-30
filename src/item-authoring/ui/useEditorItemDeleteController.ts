@@ -27,26 +27,28 @@ const deleteEditorItemCommandAtom = RendererRuntime.runSync(
 	),
 );
 
-interface UseEditorItemDeleteControllerProps {
-	readonly item: ItemSchema.Type;
-}
+export namespace useEditorItemDeleteController {
+	export interface Props {
+		readonly item: ItemSchema.Type;
+	}
 
-interface UseEditorItemDeleteControllerOutput {
-	readonly blockers: ReadonlyArray<readEditorItemDeleteBlockersFn.Blocker>;
-	readonly cancel: () => void;
-	readonly confirm: () => Promise<void>;
-	readonly confirming: "safe" | "force" | null;
-	readonly deleting: boolean;
-	readonly error: unknown;
-	readonly forceImpact: forceDeleteEditorItemFx.Impact;
-	readonly open: (force: boolean) => void;
-	readonly project: ReturnType<typeof useEditorProject>;
+	export interface Output {
+		readonly blockers: ReadonlyArray<readEditorItemDeleteBlockersFn.Blocker>;
+		readonly cancel: () => void;
+		readonly confirm: () => Promise<void>;
+		readonly confirming: "safe" | "force" | null;
+		readonly deleting: boolean;
+		readonly error: unknown;
+		readonly forceImpact: forceDeleteEditorItemFx.Impact;
+		readonly open: (force: boolean) => void;
+		readonly project: ReturnType<typeof useEditorProject>;
+	}
 }
 
 /** Owns item-delete eligibility, confirmation, persistence, and terminal navigation. */
 export const useEditorItemDeleteController = ({
 	item,
-}: UseEditorItemDeleteControllerProps): UseEditorItemDeleteControllerOutput => {
+}: useEditorItemDeleteController.Props): useEditorItemDeleteController.Output => {
 	const project = useEditorProject();
 	const navigate = useNavigate();
 	const historyBack = useEditorHistoryBack();

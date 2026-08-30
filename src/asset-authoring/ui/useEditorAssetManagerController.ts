@@ -12,7 +12,40 @@ import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorAssetLibrary } from "~/asset-authoring/ui/useEditorAssetLibrary";
 
-type EditorAssetFilter = "all" | "unused";
+export namespace useEditorAssetManagerController {
+	export type Filter = "all" | "unused";
+
+	export interface Props {
+		readonly filter: Filter;
+		readonly query: string;
+	}
+
+	export interface Output {
+		readonly arkpackInputRef: RefObject<HTMLInputElement | null>;
+		readonly catalogStatus?: {
+			readonly action?: "import";
+			readonly dataUi: string;
+			readonly description: string;
+			readonly icon: LucideIcon;
+			readonly title: string;
+		};
+		readonly filters: ReadonlyArray<{
+			readonly label: string;
+			readonly selected: boolean;
+			readonly value: Filter;
+		}>;
+		readonly importError?: string;
+		readonly filesInputRef: RefObject<HTMLInputElement | null>;
+		readonly importPending: boolean;
+		readonly importSuccess?: string;
+		readonly onArkpackChange: ChangeEventHandler<HTMLInputElement>;
+		readonly onFilesChange: ChangeEventHandler<HTMLInputElement>;
+		readonly openArkpackImport: () => void;
+		readonly openFilesImport: () => void;
+		readonly resources: ReturnType<typeof useEditorAssetLibrary>["resources"];
+		readonly showHeaderImport: boolean;
+	}
+}
 
 const filters = [
 	{
@@ -69,45 +102,10 @@ const importEditorAssetsCommandAtom = RendererRuntime.runSync(
 	),
 );
 
-interface UseEditorAssetManagerControllerProps {
-	readonly filter: EditorAssetFilter;
-	readonly query: string;
-}
-
-interface FilterOption {
-	readonly label: string;
-	readonly selected: boolean;
-	readonly value: EditorAssetFilter;
-}
-
-interface CatalogStatus {
-	readonly action?: "import";
-	readonly dataUi: string;
-	readonly description: string;
-	readonly icon: LucideIcon;
-	readonly title: string;
-}
-
-interface UseEditorAssetManagerControllerOutput {
-	readonly arkpackInputRef: RefObject<HTMLInputElement | null>;
-	readonly catalogStatus?: CatalogStatus;
-	readonly filters: ReadonlyArray<FilterOption>;
-	readonly importError?: string;
-	readonly filesInputRef: RefObject<HTMLInputElement | null>;
-	readonly importPending: boolean;
-	readonly importSuccess?: string;
-	readonly onArkpackChange: ChangeEventHandler<HTMLInputElement>;
-	readonly onFilesChange: ChangeEventHandler<HTMLInputElement>;
-	readonly openArkpackImport: () => void;
-	readonly openFilesImport: () => void;
-	readonly resources: ReturnType<typeof useEditorAssetLibrary>["resources"];
-	readonly showHeaderImport: boolean;
-}
-
 export const useEditorAssetManagerController = ({
 	filter,
 	query,
-}: UseEditorAssetManagerControllerProps): UseEditorAssetManagerControllerOutput => {
+}: useEditorAssetManagerController.Props): useEditorAssetManagerController.Output => {
 	const library = useEditorAssetLibrary({
 		filter,
 		query,

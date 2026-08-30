@@ -54,31 +54,33 @@ const editEditorAssetCommandAtom = RendererRuntime.runSync(
 	),
 );
 
-interface UseEditorAssetEditControllerProps {
-	readonly filter: "all" | "unused";
-	readonly query: string;
-	readonly resourceId: string;
-}
+export namespace useEditorAssetEditController {
+	export interface Props {
+		readonly filter: "all" | "unused";
+		readonly query: string;
+		readonly resourceId: string;
+	}
 
-interface UseEditorAssetEditControllerOutput {
-	readonly currentUrl?: string;
-	readonly dirty: boolean;
-	readonly error: unknown;
-	readonly file?: File;
-	readonly nextId: string;
-	readonly projectId: string;
-	readonly resourceFound: boolean;
-	readonly save: () => Promise<boolean>;
-	readonly saving: boolean;
-	readonly setFile: (file: File | undefined) => void;
-	readonly setNextId: (resourceId: string) => void;
+	export interface Output {
+		readonly currentUrl?: string;
+		readonly dirty: boolean;
+		readonly error: unknown;
+		readonly file?: File;
+		readonly nextId: string;
+		readonly projectId: string;
+		readonly resourceFound: boolean;
+		readonly save: () => Promise<boolean>;
+		readonly saving: boolean;
+		readonly setFile: (file: File | undefined) => void;
+		readonly setNextId: (resourceId: string) => void;
+	}
 }
 
 export const useEditorAssetEditController = ({
 	filter,
 	query,
 	resourceId,
-}: UseEditorAssetEditControllerProps): UseEditorAssetEditControllerOutput => {
+}: useEditorAssetEditController.Props): useEditorAssetEditController.Output => {
 	const project = useEditorProject();
 	const resource = useEditorAssetById(resourceId);
 	const currentUrl = useEditorResourceUrl(resourceId);

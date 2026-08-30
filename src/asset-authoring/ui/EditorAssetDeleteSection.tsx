@@ -158,11 +158,7 @@ const EditorAssetDeleteBlockerLink = ({
 	);
 };
 
-interface EditorAssetDeleteSectionProps {
-	readonly filter: "all" | "unused";
-	readonly query: string;
-	readonly resourceId: string;
-}
+interface EditorAssetDeleteSectionProps extends useEditorAssetDeleteController.Props {}
 
 /** Explains asset-delete eligibility and exposes the guarded destructive action. */
 export const EditorAssetDeleteSection = ({

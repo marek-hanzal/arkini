@@ -1,45 +1,18 @@
 import { createFormHook } from "@tanstack/react-form";
 import type { LucideIcon } from "lucide-react";
-import type { PropsWithChildren } from "react";
 
 import { EditorBooleanToggleBadge } from "~/ui/form/EditorBooleanToggleBadge";
-import { EditorDurationHint } from "~/ui/form/EditorDurationHint";
-import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import { fieldContext, formContext, useFieldContext } from "~/ui/form/EditorFormContexts";
-import { editorInputClassName } from "~/ui/form/EditorInputClassName";
 import {
-	selectableActiveClassName,
-	selectableInactiveClassName,
-} from "~/ui/form/SelectableStateClassName";
+	EditorChoiceControl,
+	EditorNumberControl,
+	EditorSecondsControl,
+	EditorTextAreaControl,
+	EditorTextControl,
+} from "~/ui/form/EditorValueControls";
 import { readEditorFieldErrorFn } from "~/ui/form/fn/readEditorFieldErrorFn";
 import { EditorItemAutocompleteField } from "~/authoring-form/ui/EditorItemAutocompleteField";
 import { EditorAssetAutocompleteField } from "~/asset-authoring/ui/EditorAssetAutocompleteField";
-
-const EditorField = ({
-	children,
-	description,
-	error,
-	fill = false,
-	label,
-}: PropsWithChildren<{
-	readonly description?: string;
-	readonly error?: string;
-	readonly fill?: boolean;
-	readonly label: string;
-}>) => (
-	<label
-		className={`grid min-w-0 gap-1.5 text-sm ${fill ? "h-full grid-rows-[auto_minmax(0,1fr)] content-stretch" : "content-start"}`}
-	>
-		<span className="flex min-w-0 items-center gap-1">
-			<span className="font-semibold text-foreground">{label}</span>
-			{description === undefined ? null : <EditorInfoTooltip content={description} />}
-		</span>
-		{children}
-		{error === undefined ? null : (
-			<span className="text-xs leading-5 text-danger">{error}</span>
-		)}
-	</label>
-);
 
 interface EditorTextFieldProps {
 	readonly autoComplete?: string;
@@ -59,24 +32,18 @@ const EditorTextField = ({
 	const field = useFieldContext<string>();
 	const error = readEditorFieldErrorFn(field.state.meta.errors);
 	return (
-		<EditorField
-			label={label}
+		<EditorTextControl
+			autoComplete={autoComplete}
 			description={description}
 			error={error}
-		>
-			<input
-				type="text"
-				name={field.name}
-				value={field.state.value}
-				autoComplete={autoComplete}
-				aria-invalid={error === undefined ? undefined : true}
-				className={editorInputClassName}
-				placeholder={placeholder}
-				readOnly={readOnly}
-				onBlur={field.handleBlur}
-				onChange={(event) => field.handleChange(event.currentTarget.value)}
-			/>
-		</EditorField>
+			label={label}
+			name={field.name}
+			onBlur={field.handleBlur}
+			onChange={field.handleChange}
+			placeholder={placeholder}
+			readOnly={readOnly}
+			value={field.state.value}
+		/>
 	);
 };
 
@@ -98,23 +65,18 @@ const EditorTextAreaField = ({
 	const field = useFieldContext<string>();
 	const error = readEditorFieldErrorFn(field.state.meta.errors);
 	return (
-		<EditorField
-			label={label}
+		<EditorTextAreaControl
 			description={description}
 			error={error}
 			fill={fill}
-		>
-			<textarea
-				name={field.name}
-				value={field.state.value}
-				aria-invalid={error === undefined ? undefined : true}
-				className={`${editorInputClassName} ${fill ? "h-full resize-none" : "resize-y"} leading-6`}
-				placeholder={placeholder}
-				rows={rows}
-				onBlur={field.handleBlur}
-				onChange={(event) => field.handleChange(event.currentTarget.value)}
-			/>
-		</EditorField>
+			label={label}
+			name={field.name}
+			onBlur={field.handleBlur}
+			onChange={field.handleChange}
+			placeholder={placeholder}
+			rows={rows}
+			value={field.state.value}
+		/>
 	);
 };
 
@@ -139,29 +101,20 @@ const EditorNumberField = ({
 	const error = readEditorFieldErrorFn(field.state.meta.errors);
 	const value = field.state.value;
 	return (
-		<EditorField
-			label={label}
+		<EditorNumberControl
 			description={description}
 			error={error}
-		>
-			<input
-				type="number"
-				name={field.name}
-				value={typeof value === "number" && Number.isNaN(value) ? "" : (value ?? "")}
-				aria-invalid={error === undefined ? undefined : true}
-				className={editorInputClassName}
-				max={max}
-				min={min}
-				step={step}
-				onBlur={field.handleBlur}
-				onChange={(event) => {
-					const input = event.currentTarget;
-					field.handleChange(
-						input.value === "" && optional ? undefined : input.valueAsNumber,
-					);
-				}}
-			/>
-		</EditorField>
+			label={label}
+			max={max}
+			min={min}
+			name={field.name}
+			onBlur={field.handleBlur}
+			onChange={(nextValue) =>
+				field.handleChange(optional && Number.isNaN(nextValue) ? undefined : nextValue)
+			}
+			step={step}
+			value={value ?? Number.NaN}
+		/>
 	);
 };
 
@@ -175,25 +128,16 @@ const EditorSecondsField = ({ description, label }: EditorSecondsFieldProps) => 
 	const error = readEditorFieldErrorFn(field.state.meta.errors);
 	const seconds = field.state.value / 1_000;
 	return (
-		<EditorField
-			label={label}
+		<EditorSecondsControl
 			description={description}
 			error={error}
-		>
-			<input
-				type="number"
-				name={field.name}
-				value={Number.isNaN(seconds) ? "" : seconds}
-				className={editorInputClassName}
-				min={0}
-				step={0.001}
-				onBlur={field.handleBlur}
-				onChange={(event) =>
-					field.handleChange(Math.round(event.currentTarget.valueAsNumber * 1_000))
-				}
-			/>
-			<EditorDurationHint seconds={seconds} />
-		</EditorField>
+			label={label}
+			min={0}
+			name={field.name}
+			onBlur={field.handleBlur}
+			onChange={(nextSeconds) => field.handleChange(Math.round(nextSeconds * 1_000))}
+			value={seconds}
+		/>
 	);
 };
 
@@ -210,38 +154,15 @@ const EditorChoiceField = ({ description, label, options }: EditorChoiceFieldPro
 	const field = useFieldContext<string>();
 	const error = readEditorFieldErrorFn(field.state.meta.errors);
 	return (
-		<fieldset
-			className="grid min-w-0 content-start gap-1.5 text-sm"
-			aria-invalid={error === undefined ? undefined : true}
-		>
-			<legend>
-				<span className="flex items-center gap-1">
-					<span className="font-semibold text-foreground">{label}</span>
-					{description === undefined ? null : <EditorInfoTooltip content={description} />}
-				</span>
-			</legend>
-			<div className="flex min-w-0 flex-wrap gap-2">
-				{options.map((option) => {
-					const selected = field.state.value === option.value;
-					return (
-						<button
-							key={option.value}
-							type="button"
-							className={`min-h-9 cursor-pointer rounded-lg border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
-								selected ? selectableActiveClassName : selectableInactiveClassName
-							}`}
-							aria-pressed={selected}
-							onClick={() => field.handleChange(option.value)}
-						>
-							{option.label}
-						</button>
-					);
-				})}
-			</div>
-			{error === undefined ? null : (
-				<span className="text-xs leading-5 text-danger">{error}</span>
-			)}
-		</fieldset>
+		<EditorChoiceControl
+			compact
+			description={description}
+			error={error}
+			label={label}
+			onChange={field.handleChange}
+			options={options}
+			value={field.state.value}
+		/>
 	);
 };
 

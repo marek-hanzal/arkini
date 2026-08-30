@@ -28,7 +28,7 @@ describe("Arkpack provenance CLI", () => {
 			process.execPath,
 			[
 				"node_modules/tsx/dist/cli.mjs",
-				"src/engine/cli/arkini.ts",
+				"src/arkini-cli/arkini.ts",
 				"arkpack",
 				"verify",
 				arkpackPath,
@@ -55,7 +55,7 @@ describe("CLI completion", () => {
 				process.execPath,
 				[
 					"node_modules/tsx/dist/cli.mjs",
-					"src/engine/cli/arkini.ts",
+					"src/arkini-cli/arkini.ts",
 					"--completions",
 					shell,
 				],

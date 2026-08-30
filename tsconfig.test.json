@@ -12,7 +12,7 @@
 	},
 	"include": [
 		"electron/contract",
-		"src/engine",
+		"src/arkini-cli",
 		"src/application-version",
 		"src/game-version",
 		"src/filesystem-write",

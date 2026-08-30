@@ -31,7 +31,7 @@ module.exports = {
 				orphan: true,
 				pathNot: [
 					applicationEntrypointPattern,
-					"^src/engine/cli/arkini[.]ts$",
+					"^src/arkini-cli/arkini[.]ts$",
 					"^electron/(?:main|preload)/index[.]ts$",
 					"^scripts/[^/]+[.]ts$",
 					"^test/setup[.]ts$",

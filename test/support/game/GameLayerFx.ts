@@ -1,9 +1,10 @@
 import { Effect, Layer } from "effect";
 
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
-import { fromStateFx } from "~/game-persistence/fromStateFx";
-import type { StateSchema } from "~/game-persistence/StateSchema";
-import { TickLayerFx } from "~/game-tick/TickLayerFx";
+import { TickTestClockLayer } from "~test/game-tick/support/runTickRuntimeByFx";
+import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
+import type { StateSchema } from "~/game-persistence/schema/StateSchema";
+import { TickLayerFx } from "~/game-tick/layer/TickLayerFx";
 import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { GameRuntimeLayerFx } from "~/game-runtime/layer/GameRuntimeLayerFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -22,8 +23,9 @@ export const GameLayerFx = ({ config, state }: GameLayerFx.Props) => {
 			config,
 			initialRuntime,
 		});
-		const tick = TickLayerFx.pipe(Layer.provide(runtime));
-		return Layer.merge(runtime, tick);
+		const clock = TickTestClockLayer;
+		const tick = TickLayerFx.pipe(Layer.provide(Layer.merge(runtime, clock)));
+		return Layer.mergeAll(runtime, tick, clock);
 	};
 
 	if (state === undefined) return makeGameLayer();

@@ -3,7 +3,7 @@ import { createTestGameSession } from "~test/support/game/createTestGameSession"
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { Deferred, Effect } from "effect";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
+import { advanceRuntimeElapsedFx } from "~/game-tick/fx/advanceRuntimeElapsedFx";
 
 import { emitCompletedEventFx } from "./createGameSession.test/fixture";
 
@@ -164,7 +164,7 @@ describe("createGameSessionFx / subscription visibility", () => {
 
 		try {
 			await session.run(
-				runTickRuntimeByFx({
+				advanceRuntimeElapsedFx({
 					elapsedMs: 100,
 				}),
 			);

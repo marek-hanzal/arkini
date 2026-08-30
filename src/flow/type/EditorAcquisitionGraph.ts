@@ -35,15 +35,32 @@ export interface EditorAcquisitionUnsupportedRequirement {
 	readonly source: "line-condition" | "output-condition";
 }
 
-interface EditorAcquisitionOperationInput {
+export interface EditorAcquisitionQuantityProbability {
+	readonly probability: number;
+	readonly quantity: number;
+}
+
+export interface EditorAcquisitionOperationInput {
 	readonly factId: string;
 	readonly quantity: QuantitySchema.Type;
+}
+
+export interface EditorAcquisitionOperationOutcome {
+	readonly probability: number;
+	readonly quantities: ReadonlyArray<{
+		readonly outputGroupId: string;
+		readonly quantity: number;
+	}>;
 }
 
 /** Lossless authored-operation metadata shared by its output-occurrence routes. */
 export interface EditorAcquisitionOperation {
 	readonly id: string;
 	readonly inputs: ReadonlyArray<EditorAcquisitionOperationInput>;
+	/** Explicitly prevents Estimate from treating an uncompiled distribution as zero yield. */
+	readonly outputCompilation?: "state-space-unsupported";
+	/** Joint distribution of all correlated outputs produced by one operation sample. */
+	readonly outputDistribution?: ReadonlyArray<EditorAcquisitionOperationOutcome>;
 }
 
 export type EditorAcquisitionRouteMetadata =
@@ -85,11 +102,12 @@ export interface EditorAcquisitionRoute {
 	readonly operation?: EditorAcquisitionOperation;
 	readonly output: {
 		readonly annotation: EditorAcquisitionOutputAnnotation;
-		/** Scalar expected quantity credited to this fact by one authored operation sample. */
-		readonly expectedYield: number;
 		readonly factId: string;
+		/** Correlated operation-output bucket credited by this occurrence route. */
+		readonly operationOutputGroupId?: string;
+		readonly quantityDistribution: ReadonlyArray<EditorAcquisitionQuantityProbability>;
 	};
-	/** Number of authored actions needed for one output sample. */
+	/** Number of authored actions needed for one output-distribution sample. */
 	readonly runMultiplier: number;
 	readonly requirements: {
 		readonly allOf: ReadonlyArray<EditorAcquisitionRequirement>;
@@ -98,7 +116,7 @@ export interface EditorAcquisitionRoute {
 	};
 }
 
-interface EditorAcquisitionRoot {
+export interface EditorAcquisitionRoot {
 	readonly factId: string;
 	readonly quantity: number | "unbounded";
 }

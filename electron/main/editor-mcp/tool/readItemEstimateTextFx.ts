@@ -9,32 +9,30 @@ import type {
 } from "~/estimate/type/EditorItemEstimate";
 import { estimateEditorItemsFn } from "~/estimate/fn/estimateEditorItemsFn";
 
-const formatNumber = (value: number) =>
+const formatNumberFn = (value: number) =>
 	Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.00$/, "");
 
-const itemReference = (project: EditorProject, itemId: string) => {
+const itemReferenceFn = (project: EditorProject, itemId: string) => {
 	const item = project.config.items[itemId];
 	return item === undefined ? `${itemId} [missing]` : `${item.id} [${item.title}; ${item.type}]`;
 };
 
-const diagnosticText = (diagnostic: EditorItemEstimateDiagnostic) => {
+const diagnosticTextFn = (diagnostic: EditorItemEstimateDiagnostic) => {
 	switch (diagnostic.kind) {
-		case "any-of-selection-limit-exceeded":
-			return `${diagnostic.routeId} exceeds the static any-of selection limit of ${diagnostic.maximumSelections} normalized demand states`;
-		case "retained-demand-not-stable":
-			return `${diagnostic.factId} did not stabilize reusable prerequisite demand within ${diagnostic.maximumIterations} witness passes`;
+		case "joint-output-accounting-unsupported":
+			return `${diagnostic.routeId} exceeds the bounded joint-output accounting state space`;
 		case "quantity-limit-exceeded":
-			return `${diagnostic.factId} x ${formatNumber(diagnostic.quantity)} exceeds the static estimate limit of ${diagnostic.maximumQuantity} (${diagnostic.source})`;
+			return `${diagnostic.factId} x ${formatNumberFn(diagnostic.quantity)} exceeds the static estimate limit of ${diagnostic.maximumQuantity} (${diagnostic.source})`;
 		case "cycle":
 			return `cycle on ${diagnostic.routeId}: ${diagnostic.factIds.join(" -> ")}`;
 		case "unreachable":
-			return `${diagnostic.factId} x ${formatNumber(diagnostic.quantity)} has no complete route${diagnostic.routeId === undefined ? "" : ` through ${diagnostic.routeId}`}`;
+			return `${diagnostic.factId} x ${formatNumberFn(diagnostic.quantity)} has no complete route${diagnostic.routeId === undefined ? "" : ` through ${diagnostic.routeId}`}`;
 		case "zero-yield":
 			return `${diagnostic.routeId} has zero yield for ${diagnostic.factId}`;
 	}
 };
 
-const amountLines = (
+const amountLinesFn = (
 	project: EditorProject,
 	title: string,
 	amounts: ReadonlyArray<{
@@ -48,11 +46,11 @@ const amountLines = (
 				`${title}:`,
 				...amounts.map(
 					({ factId, quantity }) =>
-						`  - ${itemReference(project, factId)} x ${formatNumber(quantity)}`,
+						`  - ${itemReferenceFn(project, factId)} x ${formatNumberFn(quantity)}`,
 				),
 			];
 
-const limitationText = (limitation: EditorItemEstimate["limitations"][number]) => {
+const limitationTextFn = (limitation: EditorItemEstimate["limitations"][number]) => {
 	switch (limitation) {
 		case "conditional-runtime-adjustments-ignored":
 			return "conditional runtime adjustments are ignored";
@@ -63,34 +61,34 @@ const limitationText = (limitation: EditorItemEstimate["limitations"][number]) =
 	}
 };
 
-const routeLines = (
+const routeLinesFn = (
 	project: EditorProject,
 	routeSteps: ReadonlyArray<EstimateRouteStep>,
 ): ReadonlyArray<string> => {
-	const routeByOccurrenceId = new Map(
+	const routeByFactId = new Map(
 		routeSteps.map((route) => [
-			route.occurrenceId,
+			route.factId,
 			route,
 		]),
 	);
 	return routeSteps.flatMap((route) => [
-		`  - ${itemReference(project, route.factId)} x ${formatNumber(route.quantity)}${route.occurrenceCount > 1 ? ` each across ${formatNumber(route.occurrenceCount)} equivalent occurrences` : ""} via ${route.routeId} (${route.durationMs / 1_000} s per occurrence)`,
+		`  - ${itemReferenceFn(project, route.factId)} x ${formatNumberFn(route.quantity)} via ${route.routeId} (${route.durationMs / 1_000} s)`,
 		...(route.rootQuantity > 0
 			? [
-					`    authored start contribution: ${formatNumber(route.rootQuantity)}`,
+					`    authored start contribution: ${formatNumberFn(route.rootQuantity)}`,
 				]
 			: []),
 		...route.requirements.map((requirement) => {
 			const acquisition =
-				requirement.acquisitionOccurrenceId === undefined
+				requirement.acquisitionFactId === undefined
 					? undefined
-					: routeByOccurrenceId.get(requirement.acquisitionOccurrenceId);
-			return `    ${requirement.usage}: ${itemReference(project, requirement.factId)} x ${formatNumber(requirement.quantity)} [${requirement.sources.join(", ")}]${acquisition === undefined ? "" : ` -> ${acquisition.routeId}`}`;
+					: routeByFactId.get(requirement.acquisitionFactId);
+			return `    ${requirement.usage}: ${itemReferenceFn(project, requirement.factId)} x ${formatNumberFn(requirement.quantity)} [${requirement.sources.join(", ")}]${acquisition === undefined ? "" : ` -> ${acquisition.routeId}`}`;
 		}),
 	]);
 };
 
-const formatEstimate = (
+const formatEstimateFn = (
 	project: EditorProject,
 	target: EditorProject["config"]["items"][string],
 	estimate: EditorItemEstimate,
@@ -99,23 +97,22 @@ const formatEstimate = (
 		"Item estimate",
 		`Item ID: ${target.id}`,
 		`Title: ${target.title}`,
-		`Quantity: ${formatNumber(estimate.quantity)}`,
-		"Method: approximate scalar authored dependency graph",
+		`Quantity: ${formatNumberFn(estimate.quantity)}`,
+		"Method: approximate bounded-distribution authored dependency graph",
 		"Timing: approximate optimistic parallel critical path",
 		"Start facts: authored board, inventory, and toolbar",
-		"Random output occurrences: demand divided by scalar expected yield",
-		"Route choice: complete scalar upstream cost with stable route identity ties",
-		"Quantity boundary: route choice is evaluated at each propagated scalar demand",
-		"Any-of boundary: bounded normalized demand states return partial before an incomparable alternative is discarded",
+		"Output accounting: bounded expected first-hitting time for individual and correlated joint outputs",
+		"Route choice: complete quantity-aware upstream critical-path cost with stable route identity ties",
+		"Demand: the larger of additive consumption and each route's simultaneous consumed-plus-reusable need",
 		"Enable prerequisites: acquired and included in time",
-		"Independent occurrences: shared outputs and finite roots are not jointly accounted",
-		"Ignored: rule truth and disabling conditions, scope and placement, charge capacity and renewal, finite resource capacity",
+		"Shared witness: finite authored roots and jointly selected co-product operations are credited once",
+		"Ignored: rule truth and disabling conditions, scope and placement, concrete item identity packing, renewable capacity",
 		"Limitations:",
 		...(estimate.limitations.length === 0
 			? [
 					"  - none",
 				]
-			: estimate.limitations.map((limitation) => `  - ${limitationText(limitation)}`)),
+			: estimate.limitations.map((limitation) => `  - ${limitationTextFn(limitation)}`)),
 	];
 	if (!estimate.obtainable)
 		return [
@@ -129,26 +126,26 @@ const formatEstimate = (
 				? [
 						"  - target has no acquisition route",
 					]
-				: estimate.diagnostics.map((diagnostic) => `  - ${diagnosticText(diagnostic)}`)),
+				: estimate.diagnostics.map((diagnostic) => `  - ${diagnosticTextFn(diagnostic)}`)),
 		].join("\n");
 	return [
 		...header,
 		"Status: complete",
 		`Approximate optimistic parallel duration: ${estimate.durationMs / 1_000} s`,
 		`Selected route: ${estimate.route.routeId}`,
-		`Approximate action runs: ${formatNumber(estimate.route.actionRuns)}`,
-		`Approximate output samples: ${formatNumber(estimate.route.outputRuns)}`,
-		...amountLines(project, "Consumed requirements", estimate.requirementSummary.consumed),
-		...amountLines(project, "One-time requirements", estimate.requirementSummary.oneTime),
-		...amountLines(project, "Ongoing requirements", estimate.requirementSummary.ongoing),
-		"Selected route occurrence groups:",
-		...routeLines(project, estimate.routeSteps),
+		`Approximate action runs: ${formatNumberFn(estimate.route.actionRuns)}`,
+		`Approximate output samples: ${formatNumberFn(estimate.route.outputRuns)}`,
+		...amountLinesFn(project, "Consumed requirements", estimate.requirementSummary.consumed),
+		...amountLinesFn(project, "One-time requirements", estimate.requirementSummary.oneTime),
+		...amountLinesFn(project, "Ongoing requirements", estimate.requirementSummary.ongoing),
+		"Selected fact DAG:",
+		...routeLinesFn(project, estimate.routeSteps),
 		"Rejected alternative diagnostics:",
 		...(estimate.diagnostics.length === 0
 			? [
 					"  - none",
 				]
-			: estimate.diagnostics.map((diagnostic) => `  - ${diagnosticText(diagnostic)}`)),
+			: estimate.diagnostics.map((diagnostic) => `  - ${diagnosticTextFn(diagnostic)}`)),
 	].join("\n");
 };
 
@@ -171,5 +168,5 @@ export const readItemEstimateTextFx = Effect.fn("readItemEstimateTextFx")(functi
 			},
 		],
 	})[0]!;
-	return formatEstimate(project, target, estimate);
+	return formatEstimateFn(project, target, estimate);
 });

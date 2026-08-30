@@ -13,13 +13,11 @@ vi.mock("~/estimate/worker/runEditorItemEstimateInWorkerFx", () => ({
 	runEditorItemEstimateInWorkerFx: runEditorItemEstimateInWorkerFxMock,
 }));
 
-const estimate = (factId: string): EditorItemEstimate => {
+const estimateFn = (factId: string): EditorItemEstimate => {
 	const route = {
 		actionRuns: 1,
 		durationMs: 1,
 		factId,
-		occurrenceCount: 1,
-		occurrenceId: `occurrence:${factId}`,
 		outputRuns: 1,
 		quantity: 1,
 		requirements: [],
@@ -83,8 +81,8 @@ describe("EditorItemEstimateCacheAtom", () => {
 			calls += 1;
 			return Effect.succeed({
 				estimates: [
-					estimate("alpha"),
-					estimate("bravo"),
+					estimateFn("alpha"),
+					estimateFn("bravo"),
 				],
 			});
 		});
@@ -118,7 +116,7 @@ describe("EditorItemEstimateCacheAtom", () => {
 				);
 			return Effect.succeed({
 				estimates: [
-					estimate("bravo"),
+					estimateFn("bravo"),
 				],
 			});
 		});
@@ -147,7 +145,7 @@ describe("EditorItemEstimateCacheAtom", () => {
 				? Effect.fail(new Error("estimate exploded"))
 				: Effect.succeed({
 						estimates: [
-							estimate("alpha"),
+							estimateFn("alpha"),
 						],
 					});
 		});

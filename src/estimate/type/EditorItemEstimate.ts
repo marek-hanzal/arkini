@@ -6,15 +6,9 @@ import type {
 
 export type EditorItemEstimateDiagnostic =
 	| {
-			readonly factId: string;
-			readonly kind: "any-of-selection-limit-exceeded";
-			readonly maximumSelections: number;
+			readonly kind: "joint-output-accounting-unsupported";
+			readonly reason: "state-space";
 			readonly routeId: string;
-	  }
-	| {
-			readonly factId: string;
-			readonly kind: "retained-demand-not-stable";
-			readonly maximumIterations: number;
 	  }
 	| {
 			readonly factId: string;
@@ -55,7 +49,7 @@ export interface ObtainableEditorItemEstimate extends EditorItemEstimateBase {
 	readonly obtainable: true;
 	readonly status: "complete";
 	readonly route: EstimateRouteStep;
-	/** Selected route occurrence groups in deterministic dependency order. */
+	/** Normalized selected-route DAG. Every acquired fact occurs exactly once. */
 	readonly routeSteps: ReadonlyArray<EstimateRouteStep>;
 }
 

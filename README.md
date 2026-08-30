@@ -70,7 +70,10 @@ src/item-authoring  authored Item value policy, repository/session Effects and p
 src/flow      canonical authored acquisition graph and origin projection
 src/flow-layout  Flow geometry, routing algorithms and worker lifecycle
 src/flow-canvas  global Flow projection, painter policy and product UI
-src/estimate  static Estimate domain, projections, cache and worker
+src/estimate-demand  concurrent consumed-and-reusable demand grouping policy
+src/estimate-witness  immutable selected-fact witness vocabulary
+src/estimate-projection  normalized Estimate DAG and optimistic critical-path projection
+src/estimate  bounded-distribution Estimate orchestration, topology, expected runs, cache and worker
 src/launcher  renderer bootstrap, Hero lifecycle, shell/action surfaces and About motion
 src/game-presentation  mounted-Game React context, selectors, events, command settlement and failures
 src/game-shell  Board, Inventory, gameplay resources and overlay composition

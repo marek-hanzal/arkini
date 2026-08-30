@@ -56,8 +56,6 @@ describe("EditorItemEstimateSection", () => {
 			actionRuns: 1,
 			durationMs: 1,
 			factId: "tool",
-			occurrenceCount: 1,
-			occurrenceId: "target",
 			outputRuns: 1,
 			quantity: 1,
 			requirements: [],

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 
 /** Acquires a synchronous live-actor contact reader for animation-frame target projection. */
 export const createLiveContactPoseReaderFx = Effect.fnUntraced(function* () {

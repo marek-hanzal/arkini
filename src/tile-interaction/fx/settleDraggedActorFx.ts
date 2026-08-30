@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import { readActorCursorFn } from "~/ui/pixi/actor/fn/readActorCursorFn";
-import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
-import { createRetargetablePoseSamplerFx } from "~/ui/pixi/animation/createRetargetablePoseSamplerFx";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
+import { readActorCursorFn } from "~/tile-rendering/fn/readActorCursorFn";
+import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
+import { createRetargetablePoseSamplerFx } from "~/tile-rendering/fx/createRetargetablePoseSamplerFx";
 import { readSettleDurationMsFn } from "~/tile-motion/fn/readSettleDurationMsFn";
 import type { MainInteractionSurface } from "~/tile-interaction/type/MainInteractionSurface";
 

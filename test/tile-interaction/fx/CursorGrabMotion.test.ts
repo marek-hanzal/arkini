@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { AnimationDriver, AnimationSpring } from "~/ui/pixi/animation/AnimationDriver";
-import type { ActorAnimator, PresentationWrite } from "~/ui/pixi/animation/ActorAnimator";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
+import type { AnimationDriver, AnimationSpring } from "~/tile-rendering/service/AnimationDriver";
+import type { ActorAnimator, PresentationWrite } from "~/tile-rendering/service/ActorAnimator";
 import { createCursorGrabMotionFx } from "~/tile-interaction/fx/createCursorGrabMotionFx";
 
 type SpringProps = Parameters<AnimationDriver["createSpringFx"]>[0];

@@ -1,15 +1,15 @@
 import { Effect } from "effect";
 
 import type { readCommittedTileReplacementsFx } from "~/tile-presentation/fx/readCommittedTileReplacementsFx";
-import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
+import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import {
 	visualCrossfadeDurationMs,
 	transitionActorVisualFx,
-} from "~/ui/pixi/actor/transitionActorVisualFx";
-import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
-import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
-import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
-import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
+} from "~/tile-rendering/fx/transitionActorVisualFx";
+import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
+import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
+import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
+import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 
 export namespace runReplacementsFx {

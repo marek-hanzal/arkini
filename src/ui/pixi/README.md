@@ -1,28 +1,30 @@
 # Pixi renderer map
 
-Pixi is Arkini's retained gameplay scene executor. `src/tile-presentation` owns semantic actor projections, `src/tile-motion` owns deterministic playback, and `src/tile-interaction` owns pointer gestures plus activation and drop execution against exact Pixi capabilities. The engine remains gameplay truth; React owns routes, pages, and menus, while `src/item-detail` owns Item Detail dialog composition. Start at `scene/createMainRuntimeFx.ts` for Board + Toolbar and `scene/createInventoryRuntimeFx.ts` for Inventory.
+Pixi is Arkini's retained gameplay scene executor. `src/tile-presentation` owns semantic actor projections, `src/tile-rendering` owns native actors and animation capabilities, `src/tile-motion` owns deterministic playback, and `src/tile-interaction` owns pointer gestures plus activation and drop execution against exact capabilities. The engine remains gameplay truth; React owns routes, pages, and menus, while `src/item-detail` owns Item Detail dialog composition. Start at `scene/createMainRuntimeFx.ts` for Board + Toolbar and `scene/createInventoryRuntimeFx.ts` for Inventory.
 
 ## Owners
 
 | Area | Owner |
 | --- | --- |
-| Canvas, resize, demand rendering | `runtime/createApplicationOwnerFx.ts` |
+| Canvas, resize, demand rendering | `src/tile-rendering/fx/createApplicationOwnerFx.ts` |
 | Semantic actors, feedback, replacements, motion intents | `src/tile-presentation/{type,fn,fx}` |
+| Native actors, visuals, readiness and particles | `src/tile-rendering/{type,service,fn,fx}` |
 | Surface geometry, layers, masks, feedback | `scene/*Surface*` and `layout/` |
-| Retained identity within one canvas | `actor/*ActorStore*` |
+| Main retained identity | `src/tile-rendering/service/MainActorStore.ts` |
+| Inventory retained identity and reconciliation | `actor/InventoryActorStore.ts` + `actor/createInventoryActorStoreFx.ts` |
 | Canonical reconciliation | `scene/createMainReconcilerFx.ts` |
 | Pointer gestures, activation and frozen release facts | `src/tile-interaction/{atom,fn,fx,type}` |
 | Drop submission/presentation | `src/tile-interaction/fx/createDrop*Fx.ts` |
 | Engine-delivery presentation | `delivery/` |
 | Cue lanes, choreography, magnetic response and handoffs | `src/tile-motion/{service,type,fn,fx}` |
-| Interpolation/springs | `animation/createAnimationDriverFx.ts` |
-| Typed actor-channel writes | `animation/createActorAnimatorFx.ts` |
+| Interpolation/springs | `src/tile-rendering/fx/createAnimationDriverFx.ts` |
+| Typed actor-channel writes | `src/tile-rendering/fx/createActorAnimatorFx.ts` |
 
 Main and Inventory actors are separate because display objects cannot cross canvases. Cross-canvas handoff carries consume-once origin geometry keyed by the releasing actor; the receiving scene still derives identity/outcome from committed engine facts.
 
 ## Flows
 
-- Committed transition: game projection and current presentation claims → reconciler plan → retained actor allocation/reconciliation → Tile Motion lanes/choreography → animation channels → demand-frame invalidation.
+- Committed transition: game projection and current presentation claims → reconciler plan → Tile Rendering actor allocation/reconciliation → Tile Motion lanes/choreography → rendering animation channels → demand-frame invalidation.
 - Pointer gesture: fresh engine preview → frozen source/target/release facts → one public atomic engine command → reconciliation with the latest committed transition.
 
 Delivery endpoints, generation, phase, and remaining time are engine state. Tick owns countdown and settlement even when no scene or geometry exists; Pixi may retarget, freeze, or hide presentation but never admits input or starts work.
@@ -50,7 +52,7 @@ Delivery endpoints, generation, phase, and remaining time are engine state. Tick
 | Change | Start at |
 | --- | --- |
 | Scene composition/teardown | `scene/create*RuntimeFx.ts` |
-| Actor identity/appearance | `src/tile-presentation` + `actor/` + main reconciler |
+| Actor identity/appearance | `src/tile-presentation` + `src/tile-rendering` + main reconciler |
 | Click/drag/drop | `src/tile-interaction` |
 | Spawn/swap/stack/replacement cue projection | `src/tile-presentation` |
 | Cue execution and playback lifecycle | `src/tile-motion` |
@@ -58,6 +60,6 @@ Delivery endpoints, generation, phase, and remaining time are engine state. Tick
 | Inventory handoff | `PixiInventorySurface.tsx` + main Inventory opener |
 | Geometry/hit testing | `scene/*Surface*`, `layout/`, `grid/` |
 | Magnetic response | `src/tile-motion` |
-| Frame/interpolation | `runtime/` + `animation/` |
+| Frame/interpolation | `src/tile-rendering` |
 
-Focused semantic projection tests live under `test/tile-presentation`; playback policy and lifecycle tests live under `test/tile-motion`; gesture and drop-execution tests live under `test/tile-interaction`; retained Pixi scene-integration tests live under `test/ui/pixi`.
+Focused semantic projection tests live under `test/tile-presentation`; native actor and animation capability tests live under `test/tile-rendering`; playback policy and lifecycle tests live under `test/tile-motion`; gesture and drop-execution tests live under `test/tile-interaction`; retained Pixi scene-integration tests live under `test/ui/pixi`.

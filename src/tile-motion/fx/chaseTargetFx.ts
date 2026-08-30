@@ -2,10 +2,10 @@ import { Effect } from "effect";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { ActorAnimator, PresentedPose } from "~/ui/pixi/animation/ActorAnimator";
-import type { AnimationCurve } from "~/ui/pixi/animation/AnimationDriver";
-import { readTravelDurationMsFn } from "~/ui/pixi/animation/fn/readTravelDurationMsFn";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
+import type { ActorAnimator, PresentedPose } from "~/tile-rendering/service/ActorAnimator";
+import type { AnimationCurve } from "~/tile-rendering/service/AnimationDriver";
+import { readTravelDurationMsFn } from "~/tile-rendering/fn/readTravelDurationMsFn";
 import { createMotionPoseSamplerFx } from "~/tile-motion/fx/createMotionPoseSamplerFx";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 import type { ActorPose } from "~/ui/pixi/scene/ActorPose";

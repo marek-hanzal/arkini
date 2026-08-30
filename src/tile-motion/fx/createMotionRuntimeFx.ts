@@ -7,13 +7,13 @@ import type {
 	TileSpawnMotionCue,
 	TileSwapMotionCue,
 } from "~/tile-presentation/type/TileMotionCue";
-import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import { destroyTileActorFx } from "~/ui/pixi/actor/destroyTileActorFx";
-import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
-import { restoreActorExitFx } from "~/ui/pixi/animation/restoreActorExitFx";
-import { startActorEnterFx } from "~/ui/pixi/animation/startActorEnterFx";
-import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
+import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
+import { destroyTileActorFx } from "~/tile-rendering/fx/destroyTileActorFx";
+import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
+import { restoreActorExitFx } from "~/tile-rendering/fx/restoreActorExitFx";
+import { startActorEnterFx } from "~/tile-rendering/fx/startActorEnterFx";
+import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import type {
 	InteractionClaim,
@@ -26,8 +26,8 @@ import { chaseTargetFx } from "~/tile-motion/fx/chaseTargetFx";
 import { syncMotionPresentationFx } from "~/tile-motion/fx/syncMotionPresentationFx";
 import type { QuantityPresentation } from "~/tile-motion/type/QuantityPresentation";
 import type { MotionRedirect, TargetRoute } from "~/tile-motion/type/MotionTarget";
-import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
-import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
+import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
+import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 import { updateTileMotionLanesFn } from "~/tile-motion/fn/updateTileMotionLanesFn";
 

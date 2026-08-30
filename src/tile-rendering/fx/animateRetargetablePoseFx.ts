@@ -1,0 +1,72 @@
+import { Effect } from "effect";
+
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
+import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
+import type { AnimationCurve } from "~/tile-rendering/service/AnimationDriver";
+import { createRetargetablePoseSamplerFx } from "~/tile-rendering/fx/createRetargetablePoseSamplerFx";
+import { readTravelDurationMsFn } from "~/tile-rendering/fn/readTravelDurationMsFn";
+
+interface TargetPose {
+	readonly x: number;
+	readonly y: number;
+}
+
+/** Settles one actor toward live surface geometry while allowing layout retargeting in flight. */
+export const animateRetargetablePoseFx = Effect.fn("animateRetargetablePoseFx")(function* ({
+	actor,
+	animator,
+	curve,
+	durationMs: requestedDurationMs,
+	onCancel,
+	onComplete,
+	ownerKey,
+	readSize,
+	readTarget,
+	target,
+}: {
+	readonly actor: PixiTileActor;
+	readonly animator: ActorAnimator;
+	readonly curve?: AnimationCurve;
+	readonly durationMs?: number;
+	readonly onCancel?: () => void;
+	readonly onComplete?: () => void;
+	readonly ownerKey?: string;
+	readonly readSize: () => number;
+	readonly readTarget: () => TargetPose | null;
+	readonly target: TargetPose;
+}) {
+	const durationMs =
+		requestedDurationMs ??
+		readTravelDurationMsFn({
+			fromX: actor.container.x,
+			fromY: actor.container.y,
+			tileSize: actor.size,
+			toX: target.x,
+			toY: target.y,
+		});
+	const readPose = yield* createRetargetablePoseSamplerFx({
+		from: {
+			scale: actor.container.scale.x,
+			x: actor.container.x,
+			y: actor.container.y,
+		},
+		readTarget: () => {
+			const latest = readTarget() ?? target;
+			return {
+				scale: readSize() / Math.max(1, actor.size),
+				x: latest.x,
+				y: latest.y,
+			};
+		},
+	});
+	yield* animator.animateFx({
+		actor,
+		channel: "pose",
+		curve,
+		durationMs,
+		onCancel,
+		onComplete,
+		ownerKey,
+		readPose,
+	});
+});

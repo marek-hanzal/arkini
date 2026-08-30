@@ -3,18 +3,18 @@ import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
 import type { TileDelivery } from "~/ui/pixi/delivery/readTileDeliveriesFx";
-import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
+import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import type {
 	ActorAnimation,
 	ActorAnimator,
 	PresentationWrite,
-} from "~/ui/pixi/animation/ActorAnimator";
+} from "~/tile-rendering/service/ActorAnimator";
 import { createDeliveryRuntimeFx } from "~/ui/pixi/delivery/createDeliveryRuntimeFx";
 import type { MainDragController } from "~/tile-interaction/fx/createMainDragControllerFx";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 
-vi.mock("~/ui/pixi/actor/updateTileActorFx", async () => {
+vi.mock("~/tile-rendering/fx/updateTileActorFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
 		updateTileActorFx: ({

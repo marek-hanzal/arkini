@@ -2,9 +2,9 @@ import { Effect } from "effect";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { AnimationDriver, AnimationSpring } from "~/ui/pixi/animation/AnimationDriver";
+import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
+import type { AnimationDriver, AnimationSpring } from "~/tile-rendering/service/AnimationDriver";
 import type {
 	MagneticField,
 	MagneticSample,

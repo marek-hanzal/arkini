@@ -2,24 +2,24 @@ import { beforeEach, vi } from "vitest";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 
-import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";
+import type { ActorVisual } from "~/tile-rendering/type/ActorVisual";
 
 import { Container, Graphics, Particle, ParticleContainer, Texture } from "pixi.js";
 
 import { Effect } from "effect";
 
-import { destroyTileActorFx } from "~/ui/pixi/actor/destroyTileActorFx";
+import { destroyTileActorFx } from "~/tile-rendering/fx/destroyTileActorFx";
 
-import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
+import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 
 import type {
 	ActorAnimation,
 	AnimationChannel,
 	ActorAnimator,
 	PresentationWrite,
-} from "~/ui/pixi/animation/ActorAnimator";
+} from "~/tile-rendering/service/ActorAnimator";
 
 import type { MainDragController } from "~/tile-interaction/fx/createMainDragControllerFx";
 
@@ -33,7 +33,7 @@ import type { GameEngine } from "~/renderer/game/GameEngine";
 
 import { createMainReconcilerFx } from "~/ui/pixi/scene/createMainReconcilerFx";
 
-import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
+import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 
 import type { MagneticField } from "~/tile-motion/service/MagneticField";
 
@@ -84,7 +84,7 @@ vi.mock("~/tile-presentation/fx/readTileMotionCuesFx", async () => {
 	};
 });
 
-vi.mock("~/ui/pixi/actor/createActorVisualFx", async () => {
+vi.mock("~/tile-rendering/fx/createActorVisualFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	const { Container: PixiContainer } = await import("pixi.js");
 	return {
@@ -113,14 +113,7 @@ vi.mock("~/ui/pixi/actor/createActorVisualFx", async () => {
 	};
 });
 
-vi.mock("~/ui/pixi/text/fitSingleLineTextFx", async () => {
-	const { Effect: EffectModule } = await import("effect");
-	return {
-		fitSingleLineTextFx: ({ text }: { readonly text: string }) => EffectModule.succeed(text),
-	};
-});
-
-vi.mock("~/ui/pixi/actor/updateTileActorFx", async () => {
+vi.mock("~/tile-rendering/fx/updateTileActorFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
 		updateTileActorFx: ({

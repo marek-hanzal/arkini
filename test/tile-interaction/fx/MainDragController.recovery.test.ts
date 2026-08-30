@@ -3,7 +3,7 @@ import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
 import type { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
-import { lifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
+import { lifecycleDurationMs } from "~/tile-rendering/fx/runActorLifecycleFx";
 import {
 	createItem,
 	flushMicrotasks,

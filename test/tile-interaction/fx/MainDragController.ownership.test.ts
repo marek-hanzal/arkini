@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import { createDragActor } from "~test/tile-interaction/fx/MainDragController.test/actors";
 import {
 	createItem,

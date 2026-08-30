@@ -4,12 +4,12 @@ import { vi } from "vitest";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
-import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
+import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type {
 	ActorAnimation,
 	ActorAnimator,
 	PresentationWrite,
-} from "~/ui/pixi/animation/ActorAnimator";
+} from "~/tile-rendering/service/ActorAnimator";
 import { createMainDragControllerFx } from "~/tile-interaction/fx/createMainDragControllerFx";
 import type { CursorGrabMotion } from "~/tile-interaction/fx/createCursorGrabMotionFx";
 import type { MainDragController } from "~/tile-interaction/fx/createMainDragControllerFx";
@@ -17,7 +17,7 @@ import { createDropPresentationFx } from "~/tile-interaction/fx/createDropPresen
 import { createDropSubmissionFx } from "~/tile-interaction/fx/createDropSubmissionFx";
 import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
-import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
+import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { MainInteractionSurface } from "~/tile-interaction/type/MainInteractionSurface";
 import {
 	createDragActor,

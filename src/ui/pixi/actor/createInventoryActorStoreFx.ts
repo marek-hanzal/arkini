@@ -9,21 +9,21 @@ import type {
 	InventoryReconciliation,
 	InventoryActorStore,
 } from "~/ui/pixi/actor/InventoryActorStore";
-import type { ParticleTextures } from "~/ui/pixi/actor/ParticleTextures";
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import { createTileActorFx } from "~/ui/pixi/actor/createTileActorFx";
-import { readCrowdAlphaFn } from "~/ui/pixi/actor/fn/readCrowdAlphaFn";
-import { destroyTileActorFx } from "~/ui/pixi/actor/destroyTileActorFx";
-import { updateTileActorFx } from "~/ui/pixi/actor/updateTileActorFx";
-import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
-import { animateRetargetablePoseFx } from "~/ui/pixi/animation/animateRetargetablePoseFx";
-import { startActivityParticlesFx } from "~/ui/pixi/animation/startActivityParticlesFx";
-import { stopActivityParticlesFx } from "~/ui/pixi/animation/stopActivityParticlesFx";
-import { restoreActorExitFx } from "~/ui/pixi/animation/restoreActorExitFx";
-import { startActorEnterFx } from "~/ui/pixi/animation/startActorEnterFx";
-import { startActorExitFx } from "~/ui/pixi/animation/startActorExitFx";
-import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
-import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
+import type { ParticleTextures } from "~/tile-rendering/service/ParticleTextures";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
+import { createTileActorFx } from "~/tile-rendering/fx/createTileActorFx";
+import { readCrowdAlphaFn } from "~/tile-rendering/fn/readCrowdAlphaFn";
+import { destroyTileActorFx } from "~/tile-rendering/fx/destroyTileActorFx";
+import { updateTileActorFx } from "~/tile-rendering/fx/updateTileActorFx";
+import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
+import { animateRetargetablePoseFx } from "~/tile-rendering/fx/animateRetargetablePoseFx";
+import { startActivityParticlesFx } from "~/tile-rendering/fx/startActivityParticlesFx";
+import { stopActivityParticlesFx } from "~/tile-rendering/fx/stopActivityParticlesFx";
+import { restoreActorExitFx } from "~/tile-rendering/fx/restoreActorExitFx";
+import { startActorEnterFx } from "~/tile-rendering/fx/startActorEnterFx";
+import { startActorExitFx } from "~/tile-rendering/fx/startActorExitFx";
+import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
+import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 import type { InventoryDropTarget } from "~/ui/pixi/scene/InventoryDropTarget";
 import type { InventorySurface } from "~/ui/pixi/scene/InventorySurface";
 

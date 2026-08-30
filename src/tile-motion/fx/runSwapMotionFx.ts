@@ -2,9 +2,9 @@ import { Effect } from "effect";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { TileSwapMotionCue } from "~/tile-presentation/type/TileMotionCue";
-import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
+import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
+import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import { readSettleDurationMsFn } from "~/tile-motion/fn/readSettleDurationMsFn";
 import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import { createMagneticProjectorFx } from "~/tile-motion/fx/createMagneticProjectorFx";

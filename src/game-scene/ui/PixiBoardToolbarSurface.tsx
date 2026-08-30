@@ -3,14 +3,14 @@ import type { Effect } from "effect";
 import { match } from "ts-pattern";
 import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
-import { useGameEngine } from "~/ui/game/useGameEngine";
+import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { runSpaceActivationAtom } from "~/tile-interaction/atom/runSpaceActivationAtom";
 import { TileDefaultLineCommandAtom } from "~/tile-interaction/atom/TileDefaultLineCommandAtom";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
 import { runTileSplitAtom } from "~/tile-interaction/atom/runTileSplitAtom";
-import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
+import { useGameMenuControl } from "~/game-menu/ui/GameMenuProvider";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import { useInventoryShortcutKey } from "~/ui/navigation/useInventoryShortcutKey";
 import type { MainActivationIntent } from "~/tile-interaction/type/MainActivationIntent";

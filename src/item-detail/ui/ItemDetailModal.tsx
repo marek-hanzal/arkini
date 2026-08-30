@@ -42,8 +42,8 @@ import {
 	selectableActiveClassName,
 	selectableInactiveClassName,
 } from "~/ui/form/SelectableStateClassName";
-import { useGameEngine } from "~/ui/game/useGameEngine";
-import { useRuntimeSelector } from "~/ui/game/useRuntimeSelector";
+import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
+import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
 
 import "./item-detail.css";
 

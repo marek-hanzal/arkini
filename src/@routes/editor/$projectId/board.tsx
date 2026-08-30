@@ -6,12 +6,12 @@ import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
 import { EditorBoardGameAtom } from "~/board-scenario/toolbar/EditorBoardGameAtom";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
-import { GameEngineProvider } from "~/ui/game/GameEngineProvider";
-import { PlayableGameRoute } from "~/ui/game/PlayableGameRoute";
+import { GameEngineProvider } from "~/game-presentation/ui/GameEngineProvider";
+import { PlayableGameRoute } from "~/game-shell/ui/PlayableGameRoute";
 import { EditorBoardItemDetailLink } from "~/board-scenario/toolbar/EditorBoardItemDetailLink";
 import { EditorBoardProductionLineLink } from "~/board-scenario/toolbar/EditorBoardProductionLineLink";
 import { EditorBoardScenarioToolbar } from "~/board-scenario/toolbar/EditorBoardScenarioToolbar";
-import { PlayableGameShell } from "~/ui/shell/GameShell";
+import { PlayableGameShell } from "~/game-shell/ui/GameShell";
 
 type EditorGameResource = GameEngineResource<EditorBoardGame>;
 

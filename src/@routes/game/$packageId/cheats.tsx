@@ -5,11 +5,11 @@ import { useCallback, useEffect, useRef } from "react";
 
 import { CheatAvailabilityAtom } from "~/ui/cheat-availability/CheatAvailabilityAtom";
 import { CheatAvailabilityReady } from "~/ui/cheat-availability/CheatAvailabilityReady";
-import { usePackageGameEngine } from "~/ui/game/usePackageGameEngine";
+import { usePackageGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
-import { Cheats } from "~/ui/cheats/Cheats";
-import { useCheatsModel } from "~/ui/cheats/useCheatsModel";
-import { PlayableGameRoute } from "~/ui/game/PlayableGameRoute";
+import { Cheats } from "~/game-cheat/ui/Cheats";
+import { useCheatsModel } from "~/game-cheat/ui/useCheatsModel";
+import { PlayableGameRoute } from "~/game-shell/ui/PlayableGameRoute";
 
 export const Route = createFileRoute("/game/$packageId/cheats")({
 	beforeLoad: async ({ context, params }) => {

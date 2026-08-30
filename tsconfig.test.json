@@ -20,6 +20,7 @@
 		"src/game-start",
 		"src/game-event",
 		"src/item-line-detail",
+		"src/item-detail",
 		"src/item-detail-frame",
 		"src/tile-presentation",
 		"src/tile-motion",

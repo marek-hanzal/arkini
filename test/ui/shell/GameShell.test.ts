@@ -39,7 +39,7 @@ vi.mock("~/ui/pixi/PixiGameProvider", () => ({
 	PixiGameProvider: ({ children }: { readonly children?: ReactNode }) => children,
 }));
 
-vi.mock("~/ui/item-detail/ItemDetailModal", () => ({
+vi.mock("~/item-detail/ui/ItemDetailModal", () => ({
 	ItemDetailModal: () => null,
 }));
 

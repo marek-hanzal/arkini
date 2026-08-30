@@ -9,7 +9,7 @@ import type { ItemDetailHeaderIdentityRenderer } from "~/item-detail-frame/ui/It
 import { useCloseItemDetail } from "~/item-detail-frame/ui/useCloseItemDetail";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
-import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
+import { ItemDetailModal } from "~/item-detail/ui/ItemDetailModal";
 import { ItemDetailProvider } from "~/item-detail-frame/ui/ItemDetailProvider";
 import { RouteBackdrop } from "~/ui/navigation/RouteBackdrop";
 import { PixiGameProvider } from "~/ui/pixi/PixiGameProvider";

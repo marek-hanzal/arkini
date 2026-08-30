@@ -30,6 +30,7 @@ src/engine    remaining session, query and platform-neutral support owners
 src/game-start  initial-state schemas, exact placement planning and atomic runtime start
 src/game-event  committed gameplay event schemas and exact downstream event projection
 src/item-line-detail  line-detail reads, board/stored projections, inputs/outputs/autofill and Item Lines presentation
+src/item-detail  Item Detail dialog composition, remaining projections and Queue/Sources/Info presentation
 src/item-detail-frame  Item Detail target lifecycle, command settlement, reference navigation and frame presentation
 src/tile-presentation  semantic tile actors, feedback, replacements and committed motion projection
 src/tile-motion  retained tile-motion lanes, choreography, magnetic response and playback lifecycle

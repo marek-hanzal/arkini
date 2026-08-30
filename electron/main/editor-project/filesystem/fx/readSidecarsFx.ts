@@ -12,7 +12,7 @@ import { isFilesystemPathSafeFx } from "~/engine/filesystem/isFilesystemPathSafe
 const decodeNoteFileStemFn = (stem: string) => {
 	// URI decoding rejects the lone-surrogate triplets emitted by the total writer.
 	const withLoneSurrogates = stem.replace(
-		/%ED%([AB][0-9A-F])%([89AB][0-9A-F])/giu,
+		/%ED%([AB][0-9A-F])%([89AB][0-9A-F])/gu,
 		(_match, secondByte: string, thirdByte: string) =>
 			String.fromCharCode(
 				0xd000 |
@@ -80,11 +80,6 @@ export const readSidecarsFx = Effect.fn("readSidecarsFx")(function* ({
 					return yield* Effect.fail(
 						new Error(`Editor note ${file} has an invalid filename.`),
 					);
-				const expected = yield* paths.noteFileFx(noteId);
-				if (path.resolve(file) !== expected)
-					return yield* Effect.fail(
-						new Error(`Editor note ${noteId} has an invalid filename.`),
-					);
 				const note = yield* Effect.try({
 					try: () => EditorProjectNoteFileSchema.parse(value),
 					catch: (cause) =>
@@ -92,6 +87,11 @@ export const readSidecarsFx = Effect.fn("readSidecarsFx")(function* ({
 							cause,
 						}),
 				});
+				const expected = yield* paths.noteFileFx(noteId);
+				if (path.resolve(file) !== expected)
+					return yield* Effect.fail(
+						new Error(`Editor note ${noteId} has an invalid filename.`),
+					);
 				return yield* Effect.try({
 					try: () =>
 						EditorNoteSchema.parse({

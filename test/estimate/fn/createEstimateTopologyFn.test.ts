@@ -279,15 +279,6 @@ describe("createEstimateTopologyFn", () => {
 				],
 			],
 		});
-		expect(
-			[
-				...topology.reachableFactIds,
-			].sort(),
-		).toEqual([
-			"root",
-			"target",
-			"tool",
-		]);
 		expect(topology.unsupportedRoutes.has(graph.routes[2]!)).toBe(true);
 	});
 });

@@ -117,6 +117,18 @@ module.exports = {
 			},
 		},
 		{
+			name: "tick-lifecycle-owners-stay-upstream",
+			comment:
+				"Production delivery/jobs and temporary-item lifecycle provide behavior to Game Tick and never import its clock, replay, or loop implementation.",
+			severity: "error",
+			from: {
+				path: "^src/(?:production-(?:delivery|job)|engine/item/temporary)(?:/|$)",
+			},
+			to: {
+				path: "^src/game-tick(?:/|$)",
+			},
+		},
+		{
 			name: "active-code-does-not-import-unpacked-game-resources",
 			comment:
 				"Application code consumes authored Game resources only through validated Arkpacks.",

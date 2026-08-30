@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { isInstantGameplayEnabledFx } from "~/engine/cheat/read/isInstantGameplayEnabledFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { advanceRuntimeElapsedFx } from "~/game-tick/fx/advanceRuntimeElapsedFx";
-import { TickStepMs } from "~/game-tick/constant/TickStepMs";
+import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 
 /** Maximum fixed simulation steps settled after one Instant gameplay mutation. */
 const InstantGameplayStepBudget = 64;
@@ -18,6 +18,6 @@ export const settleInstantGameplayFx = Effect.fn("settleInstantGameplayFx")(func
 	)
 		return;
 	yield* advanceRuntimeElapsedFx({
-		elapsedMs: TickStepMs * InstantGameplayStepBudget,
+		elapsedMs: SimulationStepMs * InstantGameplayStepBudget,
 	});
 });

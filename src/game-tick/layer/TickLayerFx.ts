@@ -2,7 +2,7 @@ import { Clock, Effect, Exit, Layer, SynchronizedRef } from "effect";
 
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { TickStepMs } from "~/game-tick/constant/TickStepMs";
+import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 import { advanceRuntimeElapsedFx } from "~/game-tick/fx/advanceRuntimeElapsedFx";
 import { TickFx } from "~/game-tick/service/TickFx";
 
@@ -34,7 +34,7 @@ const makeTickFx = Effect.fn("makeTickFx")(function* () {
 						state.pendingElapsedMs + Math.max(0, nowMs - state.observedAtMs),
 				};
 				const applicableElapsedMs =
-					next.pendingElapsedMs - (next.pendingElapsedMs % TickStepMs);
+					next.pendingElapsedMs - (next.pendingElapsedMs % SimulationStepMs);
 				if (applicableElapsedMs === 0) {
 					return [
 						Exit.succeed({

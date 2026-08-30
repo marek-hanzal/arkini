@@ -9,7 +9,7 @@ import { storeInputMaterialFx } from "~/production-input/write/storeInputMateria
 import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
-import { TickStepMs } from "~/game-tick/constant/TickStepMs";
+import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 import { advanceRuntimeElapsedFx } from "~/game-tick/fx/advanceRuntimeElapsedFx";
 
 const lineId = "line:forge:run";
@@ -139,7 +139,7 @@ describe("GameSession Instant gameplay admission", () => {
 
 			await session.run(
 				advanceRuntimeElapsedFx({
-					elapsedMs: TickStepMs,
+					elapsedMs: SimulationStepMs,
 				}),
 			);
 			expect(session.getSnapshot().jobs).toEqual([]);

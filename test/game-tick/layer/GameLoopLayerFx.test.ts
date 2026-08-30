@@ -12,7 +12,7 @@ import { GameRuntimeLayerFx } from "~/game-runtime/layer/GameRuntimeLayerFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { TickFx } from "~/game-tick/service/TickFx";
-import { TickStepMs } from "~/game-tick/constant/TickStepMs";
+import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 import { createTickFailureTestConfig } from "~test/game-tick/support/createTickFailureTestConfig";
 
 describe("GameLoopLayerFx", () => {
@@ -72,14 +72,14 @@ describe("GameLoopLayerFx", () => {
 			});
 			yield* Effect.yieldNow;
 
-			yield* TestClock.adjust(TickStepMs * 2 - 1);
+			yield* TestClock.adjust(SimulationStepMs * 2 - 1);
 			const beforeBoundary = yield* readRuntimeFx();
 			const transitionBeforeBoundary = yield* (yield* CommittedTransitionsFx).read;
 			yield* TestClock.adjust(1);
 			const atBoundary = yield* readRuntimeFx();
 			const transitionAtBoundary = yield* (yield* CommittedTransitionsFx).read;
 
-			expect(beforeBoundary.jobs[0]?.remainingMs).toBe(TickStepMs);
+			expect(beforeBoundary.jobs[0]?.remainingMs).toBe(SimulationStepMs);
 			expect(beforeBoundary.items.some((item) => item.item.id === "inventoryOutput")).toBe(
 				false,
 			);

@@ -6,7 +6,7 @@ import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { readTileDropPreviewFx } from "~/tile-interaction/fx/readTileDropPreviewFx";
-import { readScenePaletteFx } from "~/ui/pixi/appearance/readScenePaletteFx";
+import { readScenePaletteFx } from "~/tile-rendering/fx/readScenePaletteFx";
 import type { DropFeedback } from "~/ui/pixi/grid/DropFeedback";
 import { drawMaskFx } from "~/ui/pixi/grid/drawMaskFx";
 import { drawSurfaceFx } from "~/ui/pixi/grid/drawSurfaceFx";
@@ -14,7 +14,7 @@ import { readSlotFn } from "~/ui/pixi/grid/fn/readSlotFn";
 import { readInventoryLayoutFn } from "~/ui/pixi/layout/fn/readInventoryLayoutFn";
 import { readMainLayoutFn } from "~/ui/pixi/layout/fn/readMainLayoutFn";
 import type { InventoryLayout } from "~/ui/pixi/layout/SceneLayout";
-import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
+import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { InventoryDropTarget } from "~/ui/pixi/scene/InventoryDropTarget";
 import type { InventoryActorPose, InventorySurface } from "~/ui/pixi/scene/InventorySurface";
 

@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 
-import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
-import { updateTileActorFx } from "~/ui/pixi/actor/updateTileActorFx";
-import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
-import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
-import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
-import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
+import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
+import { updateTileActorFx } from "~/tile-rendering/fx/updateTileActorFx";
+import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
+import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
+import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
+import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 import type { QuantityPresentation } from "~/tile-motion/type/QuantityPresentation";
 import { projectMotionItemFn } from "~/tile-motion/fn/projectMotionItemFn";

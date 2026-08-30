@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { PresentedPose } from "~/ui/pixi/animation/ActorAnimator";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
+import type { PresentedPose } from "~/tile-rendering/service/ActorAnimator";
 import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 

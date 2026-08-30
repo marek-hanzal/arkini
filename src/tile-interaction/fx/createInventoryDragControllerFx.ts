@@ -7,7 +7,7 @@ import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { isSameTileActorLocationFn } from "~/ui/pixi/actor/fn/isSameTileActorLocationFn";
+import { isSameTileActorLocationFn } from "~/tile-rendering/fn/isSameTileActorLocationFn";
 import {
 	readTileDropPreviewFx,
 	type readTileDropPreviewFx as ReadTileDropPreviewFx,
@@ -15,17 +15,17 @@ import {
 import type { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
 import { PointerDragThreshold } from "~/ui/drag/PointerDragThreshold";
 import type { InventoryActorStore } from "~/ui/pixi/actor/InventoryActorStore";
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import { readActorCursorFn } from "~/ui/pixi/actor/fn/readActorCursorFn";
-import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
-import { animateRetargetablePoseFx } from "~/ui/pixi/animation/animateRetargetablePoseFx";
-import { flashConsumedSourceFx } from "~/ui/pixi/animation/flashConsumedSourceFx";
-import { burstFeedbackParticlesFx } from "~/ui/pixi/animation/burstFeedbackParticlesFx";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
+import { readActorCursorFn } from "~/tile-rendering/fn/readActorCursorFn";
+import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
+import { animateRetargetablePoseFx } from "~/tile-rendering/fx/animateRetargetablePoseFx";
+import { flashConsumedSourceFx } from "~/tile-rendering/fx/flashConsumedSourceFx";
+import { burstFeedbackParticlesFx } from "~/tile-rendering/fx/burstFeedbackParticlesFx";
 import { readPointerOffsetFn } from "~/tile-interaction/fn/readPointerOffsetFn";
 import { setDraggedActorPoseFx } from "~/tile-interaction/fx/setDraggedActorPoseFx";
-import { restoreActorExitFx } from "~/ui/pixi/animation/restoreActorExitFx";
-import { startActorExitFx } from "~/ui/pixi/animation/startActorExitFx";
-import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
+import { restoreActorExitFx } from "~/tile-rendering/fx/restoreActorExitFx";
+import { startActorExitFx } from "~/tile-rendering/fx/startActorExitFx";
+import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { InventoryInteractionSurface } from "~/tile-interaction/type/InventoryInteractionSurface";
 
 export interface InventoryDragController {

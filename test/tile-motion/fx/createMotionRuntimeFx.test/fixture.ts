@@ -15,23 +15,23 @@ import { vi } from "vitest";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { TileMotionCue } from "~/tile-presentation/type/TileMotionCue";
-import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";
+import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
+import type { ActorVisual } from "~/tile-rendering/type/ActorVisual";
 import type {
 	ActorAnimation,
 	AnimationChannel,
 	ActorAnimator,
 	PresentationWrite,
-} from "~/ui/pixi/animation/ActorAnimator";
-import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
+} from "~/tile-rendering/service/ActorAnimator";
+import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import type { MagneticField, MagneticSample } from "~/tile-motion/service/MagneticField";
 import { createMotionRuntimeFx } from "~/tile-motion/fx/createMotionRuntimeFx";
-import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
+import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
 
-vi.mock("~/ui/pixi/actor/createTileActorFx", async () => {
+vi.mock("~/tile-rendering/fx/createTileActorFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	const { Container: PixiContainer } = await import("pixi.js");
 	return {
@@ -106,7 +106,7 @@ vi.mock("~/ui/pixi/actor/createTileActorFx", async () => {
 	};
 });
 
-vi.mock("~/ui/pixi/actor/updateTileActorFx", async () => {
+vi.mock("~/tile-rendering/fx/updateTileActorFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
 		updateTileActorFx: ({

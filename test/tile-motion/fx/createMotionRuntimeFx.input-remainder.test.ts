@@ -3,7 +3,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readTravelDurationMsFn } from "~/ui/pixi/animation/fn/readTravelDurationMsFn";
+import { readTravelDurationMsFn } from "~/tile-rendering/fn/readTravelDurationMsFn";
 
 import {
 	createMotionHarness,

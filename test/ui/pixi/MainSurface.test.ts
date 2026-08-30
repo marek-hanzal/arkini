@@ -4,9 +4,9 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
-import { createMainActorStoreFx } from "~/ui/pixi/actor/createMainActorStoreFx";
+import { createMainActorStoreFx } from "~/tile-rendering/fx/createMainActorStoreFx";
 import type { DropFeedback } from "~/ui/pixi/grid/DropFeedback";
-import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
+import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import { createMainSurfaceFx } from "~/ui/pixi/scene/createMainSurfaceFx";
 
 interface FakeDisplayObject {

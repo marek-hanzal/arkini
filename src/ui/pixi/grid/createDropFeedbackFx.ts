@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { Container, Graphics } from "pixi.js";
 
-import type { AnimationControl, AnimationDriver } from "~/ui/pixi/animation/AnimationDriver";
+import type { AnimationControl, AnimationDriver } from "~/tile-rendering/service/AnimationDriver";
 import type { DropFeedback } from "~/ui/pixi/grid/DropFeedback";
 import { drawDropFeedbackFx } from "~/ui/pixi/grid/drawDropFeedbackFx";
 import type { SurfaceLayout } from "~/ui/pixi/layout/SceneLayout";

@@ -1,7 +1,7 @@
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
-import { isSameTileActorLocationFn } from "~/ui/pixi/actor/fn/isSameTileActorLocationFn";
-import { readCrowdAlphaFn } from "~/ui/pixi/actor/fn/readCrowdAlphaFn";
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
+import { isSameTileActorLocationFn } from "~/tile-rendering/fn/isSameTileActorLocationFn";
+import { readCrowdAlphaFn } from "~/tile-rendering/fn/readCrowdAlphaFn";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import type { ActorPose } from "~/ui/pixi/scene/ActorPose";
 
 interface ClassifyActorUpdateProps {

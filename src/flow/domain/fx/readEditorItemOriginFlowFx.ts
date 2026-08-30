@@ -8,7 +8,7 @@ import {
 import { reportEditorItemOriginFlowProgressFx } from "~/flow/domain/fx/reportEditorItemOriginFlowProgressFx";
 import { yieldEditorItemOriginFlowFx } from "~/flow/domain/fx/yieldEditorItemOriginFlowFx";
 import { materializeEditorItemOriginFlowFn } from "~/flow/domain/fn/materializeEditorItemOriginFlowFn";
-import type { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 export interface EditorItemOriginFlowRequest {
 	readonly config: GameConfigSchema.Type;

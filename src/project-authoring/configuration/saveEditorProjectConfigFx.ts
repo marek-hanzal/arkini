@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
 import { publishEditorProjectFx } from "~/authoring-session/publishEditorProjectFx";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 export namespace saveEditorProjectConfigFx {
 	export interface Props {

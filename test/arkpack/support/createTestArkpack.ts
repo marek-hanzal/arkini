@@ -3,7 +3,7 @@ import { Effect } from "effect";
 
 import { encodeFx } from "~/arkpack/artifact/fx/encodeFx";
 import { encodeArkpackEnvelopeFx } from "~/arkpack/artifact/fx/encodeArkpackEnvelopeFx";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import type { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
 import { createTestPngBytes } from "~test/arkpack/support/createTestPngBytes";

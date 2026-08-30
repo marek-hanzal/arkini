@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { analyzeEditorProjectCompatibilityFn } from "~/project-version/fn/analyzeEditorProjectCompatibilityFn";
 import type { EditorProjectCompatibility } from "~/project-version/EditorProjectCompatibility";
 import { TemporarySchema } from "~/item-definition/schema/TemporarySchema";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { editorTestConfig } from "~test/project-authoring/support/editorTestPayload";
 import {
 	createLine,

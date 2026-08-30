@@ -6,7 +6,7 @@ import { readCommittedTileSwapMotionCueFn } from "~/ui/pixi/motion/fn/readCommit
 import { readTileMotionCuesFx } from "~/ui/pixi/motion/readTileMotionCuesFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { useGameFx } from "~test/support/game/useGameFx";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { startFx } from "~/game-start/fx/startFx";
 
 const config = GameConfigSchema.parse({

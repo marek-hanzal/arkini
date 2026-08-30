@@ -11,7 +11,7 @@ import { resolveActiveJobStatusFx } from "~/production-job/fx/resolveActiveJobSt
 import { resolveStartOutputCapacityFx } from "~/production-job/fx/read/resolveStartOutputCapacityFx";
 import { resolveLineStartFx } from "~/production-job/fx/read/resolveLineStartFx";
 import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
-import type { LineRun } from "~/production-line/LineRun";
+import type { LineRun } from "~/production-line/type/LineRun";
 import { isLineOwnerItemFn } from "~/production-line/fn/isLineOwnerItemFn";
 import { readEffectiveDefaultLineFn } from "~/production-line/fn/readEffectiveDefaultLineFn";
 import { readLineOwnerLinesFn } from "~/production-line/fn/readLineOwnerLinesFn";

@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { OutputCapacityError } from "~/production-job/error/OutputCapacityError";
 import { resolveStartOutputCapacityFx } from "~/production-job/fx/read/resolveStartOutputCapacityFx";
-import type { LineRun } from "~/production-line/LineRun";
+import type { LineRun } from "~/production-line/type/LineRun";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace assertOutputCapacityFx {

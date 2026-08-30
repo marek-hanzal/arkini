@@ -5,7 +5,7 @@ import { ModeSchema } from "~/production-input/schema/ModeSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import { readItemRemainingChargesFn } from "~/engine/item/fn/readItemRemainingChargesFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import type { LineRun } from "~/production-line/LineRun";
+import type { LineRun } from "~/production-line/type/LineRun";
 import { readOutputMaximumQuantitiesFn } from "~/production-output/fn/readOutputMaximumQuantitiesFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { EditorBoardScenarioNameSchema } from "~/board-scenario/EditorBoardScenarioSchema";
+import { EditorBoardScenarioNameSchema } from "~/board-scenario/schema/EditorBoardScenarioSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 
 /** Portable authored Board scenario with its opaque save bytes encoded as JSON. */

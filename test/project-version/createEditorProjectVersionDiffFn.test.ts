@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { createEditorProjectVersionDiffFn } from "~/project-version/fn/createEditorProjectVersionDiffFn";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 const from = {

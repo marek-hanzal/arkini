@@ -3,7 +3,7 @@ import type { z } from "zod";
 import { CraftSchema } from "~/item-definition/schema/CraftSchema";
 import { SimpleSchema } from "~/item-definition/schema/SimpleSchema";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
-import { GameConfigSchema } from "~/game-config/GameConfigSchema";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 type OutputInput = z.input<typeof OutputSchema>;
 

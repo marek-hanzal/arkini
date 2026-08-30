@@ -3,10 +3,8 @@ import { AnimatePresence, motion } from "motion/react";
 
 import { itemDetailFadeMotion } from "~/item-detail-frame/ui/ItemDetailMotion";
 import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
-import {
-	ItemLineInputs,
-	ItemLineUnavailableWithdrawals,
-} from "~/item-line-detail/ui/ItemLineInputs";
+import { ItemLineInputs } from "~/item-line-detail/ui/ItemLineInputs";
+import { ItemLineUnavailableWithdrawals } from "~/item-line-detail/ui/ItemLineInputWithdrawal";
 import { ItemLineOutputs } from "~/item-line-detail/ui/ItemLineOutputs";
 
 /** Renders the input-to-output body and buffered-input recovery for one line. */

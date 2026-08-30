@@ -1,18 +1,38 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Download, PackageCheck, PackagePlus } from "lucide-react";
 
+import { ArkiniAppVersion } from "../../../../shared/ArkiniAppMetadata";
+import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
 import { EditorBuildDiagnostics } from "~/editor-build/ui/EditorBuildDiagnostics";
 import { EditorBuildMajorUpdateDialog } from "~/editor-build/ui/EditorBuildMajorUpdateDialog";
 import { useEditorBuildController } from "~/editor-build/ui/useEditorBuildController";
 import { Button, PrimaryButton } from "~/ui/button/Button";
+import { formatByteSizeFn } from "~/ui/fn/formatByteSizeFn";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorProjectExport } from "~/project-authoring/ui/EditorProjectExport";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+
+const buildStatusLabels = {
+	building: "Building",
+	"not-built": "Not built",
+	stale: "Stale",
+	valid: "Valid",
+} as const;
 
 export const Route = createFileRoute("/editor/$projectId/build")({
 	component: () => {
 		const controller = useEditorBuildController();
 		const InstallIcon = controller.installAction === "update" ? PackageCheck : PackagePlus;
+		const buildSummary =
+			controller.artifact !== undefined
+				? `Revision ${controller.artifact.revision} built with ${controller.artifact.diagnostics.length} non-blocking diagnostic${controller.artifact.diagnostics.length === 1 ? "" : "s"}.`
+				: controller.buildStatus === "stale"
+					? "The project changed after the last build. Build the current revision again."
+					: "Run a build to execute the complete game and resource validation.";
+		const artifactSummary =
+			controller.artifact === undefined
+				? undefined
+				: `${readArkpackArtifactNameFn(controller.artifact.projectId)} · ${formatByteSizeFn(controller.artifact.size)} · v${controller.project.version} · Arkini ${ArkiniAppVersion} · Community · ${controller.artifact.contentHash}`;
 
 		return (
 			<section
@@ -44,7 +64,7 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 					<div className="flex flex-wrap items-center justify-between gap-3">
 						<div>
 							<h2 className="text-lg font-semibold">Project validation</h2>
-							<p className="mt-1 text-sm text-muted">{controller.buildSummary}</p>
+							<p className="mt-1 text-sm text-muted">{buildSummary}</p>
 						</div>
 						<span
 							className="rounded-full bg-surface-raised px-3 py-1 text-xs font-semibold text-muted uppercase tracking-wider data-[ui-status=valid]:bg-success/15 data-[ui-status=valid]:text-success"
@@ -55,13 +75,16 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 								},
 							})}
 						>
-							{controller.buildStatusLabel}
+							{buildStatusLabels[controller.buildStatus]}
 						</span>
 					</div>
 					{controller.buildFailure?.type === "operational" ? (
 						<div className="mt-4 rounded-lg bg-danger/10 p-3 text-danger">
 							<h3 className="text-sm font-semibold">Build operation failed</h3>
-							<p className="mt-1 text-sm">{controller.buildFailure.detail}</p>
+							<p className="mt-1 text-sm">
+								{controller.buildFailure.detail ??
+									"The Editor project could not be built because of an unknown error."}
+							</p>
 						</div>
 					) : controller.buildFailure?.type === "validation" ? (
 						<p className="mt-4 text-sm font-medium text-danger">
@@ -84,12 +107,10 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 						Build
 					</PrimaryButton>
 				</article>
-				{controller.artifactSummary === undefined ? null : (
+				{artifactSummary === undefined ? null : (
 					<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">
 						<h2 className="text-lg font-semibold">Build output</h2>
-						<p className="mt-2 break-all text-sm text-muted">
-							{controller.artifactSummary}
-						</p>
+						<p className="mt-2 break-all text-sm text-muted">{artifactSummary}</p>
 						<div className="mt-4 flex flex-wrap gap-3">
 							<PrimaryButton
 								data-ui="EditorBuildInstall"

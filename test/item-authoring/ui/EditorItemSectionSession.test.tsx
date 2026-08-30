@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { act, createElement, type ButtonHTMLAttributes, type ReactNode } from "react";
+import { act, createElement, memo, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -37,6 +37,7 @@ const state = vi.hoisted(() => ({
 	canonical: undefined as unknown,
 	navigate: vi.fn().mockResolvedValue(undefined),
 	persisted: undefined as unknown,
+	project: undefined as unknown,
 	saveItem: vi.fn(),
 	unsavedSession: undefined as
 		| {
@@ -52,17 +53,7 @@ vi.mock("~/authoring-session/ui/useEditorUnsavedChangesRegistration", () => ({
 }));
 
 vi.mock("~/authoring-session/ui/useEditorProject", () => ({
-	useEditorProject: () => ({
-		projectId: "editor-test",
-		revision: "revision-1",
-		version: "1.0",
-		resources: [],
-		config: (
-			state.canonical as {
-				config: unknown;
-			}
-		).config,
-	}),
+	useEditorProject: () => state.project,
 }));
 
 vi.mock("~/item-authoring/ui/useEditorItemByUid", () => ({
@@ -79,6 +70,7 @@ vi.mock("~/authoring-form/ui/EditorItemAutocompleteField", () => ({
 		createElement("span", null, label),
 }));
 import { EditorItemForm } from "~/item-authoring/ui/EditorItemForm";
+import { useEditorItemFormSession } from "~/item-authoring/ui/EditorItemFormContext";
 import { EditorItemIdentitySection } from "~/item-authoring/ui/EditorItemIdentitySection";
 import type { EditorItemSectionId } from "~/item-authoring/type/EditorItemSection";
 
@@ -134,6 +126,17 @@ beforeEach(() => {
 			},
 		},
 	};
+	state.project = {
+		projectId: "editor-test",
+		revision: "revision-1",
+		version: "1.0",
+		resources: [],
+		config: (
+			state.canonical as {
+				config: unknown;
+			}
+		).config,
+	};
 	state.persisted = item;
 	state.saveItem.mockResolvedValue(item);
 	state.unsavedSession = undefined;
@@ -187,6 +190,21 @@ const changeInput = async (input: HTMLInputElement, value: string) => {
 };
 
 describe("item section form session", () => {
+	it("does not republish the form Context when parent inputs are unchanged", async () => {
+		let consumerRenders = 0;
+		const Probe = memo(() => {
+			useEditorItemFormSession();
+			consumerRenders += 1;
+			return null;
+		});
+		const probe = <Probe />;
+		const { renderSection } = await render(probe);
+
+		await renderSection(probe);
+
+		expect(consumerRenders).toBe(1);
+	});
+
 	it("keeps the unsaved-leave Save persistence-only while ordinary Save owns navigation", async () => {
 		const { container } = await render(<EditorItemIdentitySection />);
 		const title = container.querySelector<HTMLInputElement>('input[name="title"]');

@@ -35,7 +35,7 @@ Arkini is an offline, data-driven economy game and Editor. Work as a senior engi
 - Orchestrators read in domain order (`resolve → assert → plan → apply`) and own sequencing/transaction boundaries. Do not hide that order in generic pipelines or mutable mini state machines.
 - Expected rejection is typed failure. Defects remain defects unless isolated at the correct external boundary; preserve observable error precedence.
 - UI consumes semantic tokens and shared primitives (`src/ui/button`) instead of page-local copies. Use exhaustive matching for real state variants, focused ownership hooks for non-trivial lifecycle, and a stable `data-ui` marker on substantial DOM owners; Pixi does not create a DOM/ARIA gameplay mirror.
-- Enforce imports with Dependency Cruiser, types/schemas with TypeScript/Zod, behavior with focused tests, and maintenance grammar by review. Never add source-text or custom-AST policy tests for names, calls, copy, token spelling, or topology.
+- Enforce stable import directions and graph integrity with Dependency Cruiser, semantic ownership with the active contracts and review, types/schemas with TypeScript/Zod, and behavior with focused tests. Never add source-text or custom-AST policy tests for names, calls, copy, token spelling, or topology.
 
 ## Tests
 

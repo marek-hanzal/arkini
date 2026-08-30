@@ -1,8 +1,8 @@
 import { Cause, Effect, Exit } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { makeExactGameAtomFamilyFx } from "~/ui/game/makeExactGameAtomFamilyFx";
-import { settleRendererCommandFailureFx } from "~/ui/game/settleRendererCommandFailureFx";
+import { makeExactGameAtomFamilyFx } from "~/game-presentation/fx/makeExactGameAtomFamilyFx";
+import { settleRendererCommandFailureFx } from "~/game-presentation/fx/settleRendererCommandFailureFx";
 import { toDiagnosticValueFn } from "~/application-diagnostics/fn/toDiagnosticValueFn";
 import { writeDiagnosticRecordFx } from "~/application-diagnostics/fx/writeDiagnosticRecordFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";

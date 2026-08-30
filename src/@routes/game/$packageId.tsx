@@ -2,8 +2,8 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { Effect } from "effect";
 
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
-import { GameEngineProvider } from "~/ui/game/GameEngineProvider";
-import { GameCriticalFailureBoundary } from "~/ui/game/GameCriticalFailureBoundary";
+import { GameEngineProvider } from "~/game-presentation/ui/GameEngineProvider";
+import { GameCriticalFailureBoundary } from "~/game-presentation/ui/GameCriticalFailureBoundary";
 
 /**
  * Publishes one exact Game resource to all descendants and rejects stale package

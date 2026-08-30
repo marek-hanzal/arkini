@@ -80,7 +80,7 @@ const game = {
 	runFx: <Result, Error>(effect: Effect.Effect<Result, Error>) => effect,
 } as GameEngine;
 
-vi.mock("~/ui/game/useGameEngine", () => ({
+vi.mock("~/game-presentation/ui/useGameEngine", () => ({
 	useGameEngine: () => game,
 }));
 

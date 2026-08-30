@@ -1,14 +1,12 @@
 import { Info } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { EditorDurationHint } from "~/ui/form/EditorDurationHint";
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
 import { Tooltip } from "~/ui/overlay/Tooltip";
-import {
-	selectableActiveClassName,
-	selectableInactiveClassName,
-} from "~/ui/form/SelectableStateClassName";
+import { selectableClassName } from "~/ui/form/SelectableStateClassName";
 
 interface EditorValueControlProps {
 	readonly description?: ReactNode;
@@ -86,13 +84,18 @@ const EditorNumericControl = ({
 			type="number"
 			name={name}
 			value={Number.isNaN(value) ? "" : value}
-			aria-invalid={error === undefined ? undefined : true}
 			className={editorInputClassName}
 			max={max}
 			min={min}
 			step={step}
 			onBlur={onBlur}
 			onChange={(event) => onChange(event.currentTarget.valueAsNumber)}
+			{...readDataUiFn({
+				dataUi: "EditorNumericControlInput",
+				state: {
+					invalid: error !== undefined,
+				},
+			})}
 		/>
 		{children}
 	</EditorValueField>
@@ -126,12 +129,17 @@ export const EditorTextControl = ({
 			name={name}
 			value={value}
 			autoComplete={autoComplete}
-			aria-invalid={error === undefined ? undefined : true}
 			className={editorInputClassName}
 			placeholder={placeholder}
 			readOnly={readOnly}
 			onBlur={onBlur}
 			onChange={(event) => onChange(event.currentTarget.value)}
+			{...readDataUiFn({
+				dataUi: "EditorTextControlInput",
+				state: {
+					invalid: error !== undefined,
+				},
+			})}
 		/>
 	</EditorValueField>
 );
@@ -163,12 +171,17 @@ export const EditorTextAreaControl = ({
 		<textarea
 			name={name}
 			value={value}
-			aria-invalid={error === undefined ? undefined : true}
 			className={`${editorInputClassName} ${fill ? "h-full resize-none" : "resize-y"} leading-6`}
 			placeholder={placeholder}
 			rows={rows}
 			onBlur={onBlur}
 			onChange={(event) => onChange(event.currentTarget.value)}
+			{...readDataUiFn({
+				dataUi: "EditorTextAreaControlInput",
+				state: {
+					invalid: error !== undefined,
+				},
+			})}
 		/>
 	</EditorValueField>
 );
@@ -225,7 +238,12 @@ export const EditorChoiceControl = <Value extends string>({
 } & EditorValueControlProps) => (
 	<fieldset
 		className="grid min-w-0 content-start gap-1.5 text-sm"
-		aria-invalid={error === undefined ? undefined : true}
+		{...readDataUiFn({
+			dataUi: "EditorChoiceControl",
+			state: {
+				invalid: error !== undefined,
+			},
+		})}
 	>
 		<legend>
 			<EditorValueLabel
@@ -239,13 +257,14 @@ export const EditorChoiceControl = <Value extends string>({
 					<button
 						key={option.value}
 						type="button"
-						aria-pressed={option.value === value}
-						className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${compact ? "min-h-9" : "min-h-[var(--ak-control-min-height)]"} ${
-							option.value === value
-								? selectableActiveClassName
-								: selectableInactiveClassName
-						}`}
+						className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${compact ? "min-h-9" : "min-h-[var(--ak-control-min-height)]"} ${selectableClassName}`}
 						onClick={() => onChange(option.value)}
+						{...readDataUiFn({
+							dataUi: "EditorChoiceControlOption",
+							state: {
+								selected: option.value === value,
+							},
+						})}
 					>
 						{option.label}
 						{option.description === undefined ? null : (

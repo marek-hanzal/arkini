@@ -129,7 +129,7 @@ export const EditorItemDeleteDialog = ({
 			<EditorItemDeleteError error={error} />
 			<div className="mt-6 flex flex-wrap justify-end gap-2">
 				<ButtonLink
-					aria-disabled={pending}
+					disabled={pending}
 					data-ui="EditorItemDeleteCreateVersion"
 					to="/editor/$projectId/versions/commit"
 					params={{

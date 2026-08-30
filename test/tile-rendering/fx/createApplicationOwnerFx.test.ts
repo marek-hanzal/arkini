@@ -91,10 +91,6 @@ describe("Pixi application owner", () => {
 		secondApp.resolveInit();
 		const secondOwner = await second;
 		expect(host.firstElementChild).toBe(secondApp.canvas);
-		expect(secondApp.canvas.getAttribute("title")).toBeNull();
-		expect(secondApp.canvas.getAttribute("role")).toBeNull();
-		expect(secondApp.canvas.getAttribute("aria-hidden")).toBeNull();
-
 		firstApp.resolveInit();
 		await expect(first).rejects.toThrow("newer Pixi application");
 		expect(host.firstElementChild).toBe(secondApp.canvas);

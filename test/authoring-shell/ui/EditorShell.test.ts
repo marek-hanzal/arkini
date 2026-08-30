@@ -250,6 +250,6 @@ describe("EditorShell", () => {
 			"/editor/editor-test/editor/items/test/form/identity",
 		);
 		expect(container.querySelector('[data-ui="DirtyDraftProbe"]')).not.toBeNull();
-		expect(readLink(container, "project").getAttribute("data-transitioning")).toBeNull();
+		expect(readLink(container, "project").getAttribute("data-ui-transitioning")).toBe("false");
 	});
 });

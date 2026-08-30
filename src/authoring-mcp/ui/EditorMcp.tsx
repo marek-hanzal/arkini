@@ -5,7 +5,6 @@ import type { EditorMcpOverviewSchema } from "../../../electron/contract/editor/
 import { Button, ButtonLink, DangerButton, PrimaryButton } from "~/ui/button/Button";
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import {
-	editorSectionTabActiveClassName,
 	editorSectionTabClassName,
 	EditorSectionTabs,
 } from "~/authoring-shell/ui/EditorSectionTabs";
@@ -393,7 +392,7 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 				<EditorSectionNavigation
 					title={<h1 className="text-xl font-semibold">{title}</h1>}
 					tabs={
-						<EditorSectionTabs label="MCP sections">
+						<EditorSectionTabs>
 							{EditorMcpSections.map((candidate) => (
 								<ButtonLink
 									key={candidate.id}
@@ -406,7 +405,7 @@ export const EditorMcp = ({ section }: { readonly section: EditorMcpSectionId })
 										exact: true,
 									}}
 									activeProps={{
-										className: editorSectionTabActiveClassName,
+										"data-ui-selected": true,
 									}}
 									className={editorSectionTabClassName}
 								>

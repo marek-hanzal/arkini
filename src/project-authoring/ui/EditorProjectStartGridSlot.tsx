@@ -2,8 +2,8 @@ import { Plus } from "lucide-react";
 import { type PointerEvent as ReactPointerEvent, type RefObject } from "react";
 
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import type { EditorProjectStartScope } from "~/project-authoring/type/EditorProjectStartScope";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import type {
 	EditorProjectStartGridCell,
 	EditorProjectStartGridPosition,
@@ -16,14 +16,12 @@ export const EditorProjectStartGridSlot = ({
 	isDragSource,
 	isDragTarget,
 	itemResourceIds,
-	itemTitle,
 	onDecrement,
 	onDelete,
 	onIncrement,
 	onMove,
 	onOpen,
 	position,
-	scope,
 	startDrag,
 	suppressClickRef,
 }: {
@@ -32,14 +30,12 @@ export const EditorProjectStartGridSlot = ({
 	readonly isDragSource: boolean;
 	readonly isDragTarget: boolean;
 	readonly itemResourceIds: ItemSchema.Type["asset"]["default"] | undefined;
-	readonly itemTitle: string | undefined;
 	readonly onDecrement: () => void;
 	readonly onDelete: () => void;
 	readonly onIncrement: () => void;
 	readonly onMove: (offset: EditorProjectStartGridPosition) => void;
 	readonly onOpen: () => void;
 	readonly position: EditorProjectStartGridPosition;
-	readonly scope: EditorProjectStartScope;
 	readonly startDrag: (
 		event: ReactPointerEvent<HTMLButtonElement>,
 		source: EditorProjectStartGridCell,
@@ -47,15 +43,17 @@ export const EditorProjectStartGridSlot = ({
 	readonly suppressClickRef: RefObject<boolean>;
 }) => (
 	<button
-		aria-label={
-			cell === undefined
-				? `Empty ${scope} slot ${position.x + 1}, ${position.y + 1}`
-				: `${itemTitle ?? cell.itemId}, quantity ${cell.quantity}`
-		}
-		className={`relative grid size-[4.5rem] cursor-pointer place-items-center rounded-lg border bg-surface/70 text-subtle transition-[background-color,border-color,opacity,box-shadow] hover:border-line-strong hover:bg-surface-raised ${isDragTarget ? "border-accent ring-2 ring-accent/60 ring-offset-1 ring-offset-canvas" : "border-line"}${isDragSource ? " opacity-30" : ""}`}
+		className="relative grid size-[4.5rem] cursor-pointer place-items-center rounded-lg border border-line bg-surface/70 text-subtle transition-[background-color,border-color,opacity,box-shadow] hover:border-line-strong hover:bg-surface-raised data-[ui-drag-source=true]:opacity-30 data-[ui-drag-target=true]:border-accent data-[ui-drag-target=true]:ring-2 data-[ui-drag-target=true]:ring-accent/60 data-[ui-drag-target=true]:ring-offset-1 data-[ui-drag-target=true]:ring-offset-canvas"
 		data-start-grid-cell="true"
 		data-x={position.x}
 		data-y={position.y}
+		{...readDataUiFn({
+			dataUi: "EditorProjectStartGridSlot",
+			state: {
+				dragSource: isDragSource,
+				dragTarget: isDragTarget,
+			},
+		})}
 		onClick={(event) => {
 			if (suppressClickRef.current || event.altKey || event.metaKey) return;
 			if (cell === undefined) onOpen();

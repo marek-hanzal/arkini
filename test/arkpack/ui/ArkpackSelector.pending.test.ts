@@ -72,7 +72,7 @@ describe("ArkpackSelector pending actions", () => {
 
 		expect(removeFx).toHaveBeenCalledTimes(1);
 		expect(removeButton.disabled).toBe(true);
-		expect(playLink.getAttribute("aria-disabled")).toBe("true");
+		expect(playLink.getAttribute("data-ui-disabled")).toBe("true");
 		expect(fileInput.disabled).toBe(true);
 
 		await act(async () => {
@@ -107,7 +107,7 @@ describe("ArkpackSelector pending actions", () => {
 			await Promise.resolve();
 		});
 		expect(removeButton.disabled).toBe(false);
-		expect(playLink.getAttribute("aria-disabled")).toBe("false");
+		expect(playLink.getAttribute("data-ui-disabled")).toBe("false");
 		expect(fileInput.disabled).toBe(false);
 	});
 
@@ -182,7 +182,7 @@ describe("ArkpackSelector pending actions", () => {
 		});
 		expect(importFileFx).toHaveBeenCalledTimes(1);
 		expect(removeButton.disabled).toBe(true);
-		expect(playLink.getAttribute("aria-disabled")).toBe("true");
+		expect(playLink.getAttribute("data-ui-disabled")).toBe("true");
 		expect(fileInput.disabled).toBe(true);
 
 		await act(async () => {

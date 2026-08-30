@@ -16,7 +16,7 @@ export const EditorBoardItemDetailLink = ({
 	if (item === undefined) return children;
 	return (
 		<ButtonLink
-			aria-disabled={disabled}
+			disabled={disabled}
 			to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
 			params={{
 				projectId: project.projectId,

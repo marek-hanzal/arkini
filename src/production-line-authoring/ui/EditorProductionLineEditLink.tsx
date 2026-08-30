@@ -19,7 +19,7 @@ export const EditorProductionLineEditLink = ({
 	const project = useEditorProject();
 	return (
 		<ButtonLink
-			aria-disabled={disabled}
+			disabled={disabled}
 			to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
 			params={{
 				projectId: project.projectId,

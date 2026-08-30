@@ -137,6 +137,9 @@ describe("ItemDetailModal source ownership", () => {
 
 		await render();
 		expect(state.openItemDetail).not.toHaveBeenCalled();
+		expect(document.activeElement).toBe(
+			container.querySelector('[data-ui="ItemDetailTabs"] button[data-ui-selected="true"]'),
+		);
 
 		state.tabs = [
 			"info",

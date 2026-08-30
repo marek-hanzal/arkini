@@ -59,20 +59,12 @@ export const About = () => {
 			data-ui="About"
 		>
 			<div className="relative z-10 grid gap-4 text-center">
-				<h1
-					id="about-title"
-					className="text-2xl font-semibold"
-				>
-					About Arkini
-				</h1>
+				<h1 className="text-2xl font-semibold">About Arkini</h1>
 				<p className="leading-7 text-muted">
 					Arkini is a merge-economy game about building production chains, discovering
 					recipes and shaping a living board-sized world.
 				</p>
-				<section
-					className="border-t border-line pt-4 text-left"
-					aria-label="Project credits"
-				>
+				<section className="border-t border-line pt-4 text-left">
 					<p className="text-xs font-semibold uppercase tracking-[0.2em] text-subtle">
 						Project credits
 					</p>

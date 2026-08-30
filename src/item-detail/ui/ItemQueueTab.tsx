@@ -5,6 +5,7 @@ import type { Effect } from "effect";
 import { projectItemDetailQueueFx } from "~/item-detail/fx/projectItemDetailQueueFx";
 import { clearItemJobQueueFx } from "~/production-job/write/clearItemJobQueueFx";
 import { LinkButton } from "~/ui/button/LinkButton";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { ItemIdentity } from "~/ui/item/ItemIdentity";
 import {
 	itemDetailBadgeMotion,
@@ -95,10 +96,7 @@ const ActiveQueueSlot = ({
 						transition={itemDetailMotionTransition}
 					>
 						<h3 className="flex items-center gap-2 text-lg font-semibold leading-tight text-foreground">
-							<CircleOff
-								className="size-5 shrink-0 text-muted"
-								aria-hidden="true"
-							/>
+							<CircleOff className="size-5 shrink-0 text-muted" />
 							No active job
 						</h3>
 						<AnimatePresence
@@ -120,8 +118,12 @@ const ActiveQueueSlot = ({
 					<motion.article
 						key={job.jobId}
 						className="ak-list-row ak-list-row-active absolute inset-0 min-h-28 overflow-hidden rounded-xl border-b border-l-2 border-line border-l-success px-4 py-5"
-						data-ui="ItemQueueRow"
-						data-state="active"
+						{...readDataUiFn({
+							dataUi: "ItemQueueRow",
+							state: {
+								state: "active",
+							},
+						})}
 						initial={{
 							opacity: 0,
 							y: 6,
@@ -138,7 +140,6 @@ const ActiveQueueSlot = ({
 					>
 						<div
 							className="pointer-events-none absolute inset-y-0 right-0 left-0.5 overflow-hidden rounded-r-[inherit]"
-							aria-hidden="true"
 							data-ui="ItemQueueProgress"
 						>
 							<div
@@ -194,9 +195,13 @@ const QueueRequestRow = ({
 }) => (
 	<article
 		className="ak-list-row rounded-xl border-b border-l-2 border-line border-l-line/55 px-4 py-5"
-		data-ui="ItemQueueRow"
-		data-state="queued"
-		data-queue-status={request.status}
+		{...readDataUiFn({
+			dataUi: "ItemQueueRow",
+			state: {
+				queueStatus: request.status,
+				state: "queued",
+			},
+		})}
 	>
 		<div className="min-w-0">
 			<div className="flex flex-wrap items-center gap-2">
@@ -305,7 +310,6 @@ export const ItemQueueTab = ({
 					<motion.p
 						key={error}
 						className="mt-3 text-sm text-danger"
-						role="status"
 						{...itemDetailFadeMotion}
 					>
 						{error}
@@ -338,10 +342,7 @@ export const ItemQueueTab = ({
 								{...itemDetailFadeMotion}
 							>
 								<div className="grid justify-items-center gap-2">
-									<ListX
-										className="size-6 text-subtle"
-										aria-hidden="true"
-									/>
+									<ListX className="size-6 text-subtle" />
 									<p>Queue is empty</p>
 								</div>
 							</motion.div>

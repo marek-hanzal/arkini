@@ -3,6 +3,7 @@ import { ArrowRight, ShieldAlert, ShieldCheck } from "lucide-react";
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { readEditorItemDeleteBlockersFn } from "~/item-authoring/fn/readEditorItemDeleteBlockersFn";
 import { ButtonLink, DangerButton } from "~/ui/button/Button";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { EditorItemDeleteDialog } from "~/item-authoring/ui/EditorItemDeleteDialog";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorItemDeleteController } from "~/item-authoring/ui/useEditorItemDeleteController";
@@ -90,7 +91,13 @@ export const EditorItemDeleteSection = ({ item }: EditorItemDeleteSectionProps) 
 			>
 				<div className="flex items-start gap-3">
 					<StateIcon
-						className={`mt-0.5 size-6 shrink-0 ${blocked ? "text-warning" : "text-success"}`}
+						className="mt-0.5 size-6 shrink-0 text-success data-[ui-blocked=true]:text-warning"
+						{...readDataUiFn({
+							dataUi: "EditorItemDeleteStateIcon",
+							state: {
+								blocked,
+							},
+						})}
 					/>
 					<div>
 						<h2 className="text-lg font-semibold">

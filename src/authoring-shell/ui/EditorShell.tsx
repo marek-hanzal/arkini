@@ -25,15 +25,13 @@ import {
 	useEditorActiveWorkspace,
 } from "~/authoring-shell/ui/useEditorActiveWorkspace";
 import { Tooltip } from "~/ui/overlay/Tooltip";
-import { useDialogFocus } from "~/ui/focus/useDialogFocus";
+import { useOverlayFocus } from "~/ui/focus/useOverlayFocus";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { useEditorProjectRefreshController } from "~/authoring-session/ui/useEditorProjectRefreshController";
 import { useEditorUnsavedChangesOwner } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 
 const tabClassName =
 	"ak-editor-workspace-tab size-11 min-h-0 shrink-0 border-transparent bg-transparent p-0 shadow-none transition-none hover:bg-surface-raised";
-const activeTabProps = {
-	className: "border-accent bg-accent text-accent-contrast hover:bg-accent-hover",
-} as const;
 
 const waitForEditorProjectWritesCommandAtom = RendererRuntime.runSync(
 	Effect.map(EditorProjectRepository, (repository) =>
@@ -92,27 +90,18 @@ const EditorUnsavedChangesPrompt = ({
 	readonly state: ReturnType<ReturnType<typeof useEditorUnsavedChangesOwner>["getSnapshot"]>;
 }) => {
 	const owner = useEditorUnsavedChangesOwner();
-	const focus = useDialogFocus({
+	const focus = useOverlayFocus({
 		onClose: () => void owner.decide("cancel"),
 	});
 	return (
 		<div className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]">
 			<div
-				ref={focus.dialogRef}
-				role="dialog"
-				aria-modal="true"
-				aria-labelledby="editor-unsaved-title"
-				className="w-full max-w-md rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl outline-none"
+				ref={focus.overlayRef}
+				className="w-full max-w-md rounded-2xl border border-line-strong bg-surface-raised p-6 text-foreground shadow-2xl"
 				data-ui="EditorUnsavedChangesDialog"
-				tabIndex={-1}
-				onKeyDown={focus.keepFocusInside}
+				onKeyDown={focus.onKeyDown}
 			>
-				<h2
-					id="editor-unsaved-title"
-					className="text-lg font-semibold"
-				>
-					Unsaved changes
-				</h2>
+				<h2 className="text-lg font-semibold">Unsaved changes</h2>
 				<p className="mt-2 text-sm leading-6 text-muted">
 					{state.canSave
 						? "Save or discard this draft before leaving the editor surface."
@@ -232,16 +221,6 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 		unsavedChangesOwner,
 		waitForProjectWrites,
 	]);
-	const readTabProps = (workspace: EditorWorkspaceId) =>
-		activeWorkspace === workspace
-			? {
-					"aria-current": "page" as const,
-					className: `${tabClassName} ${activeTabProps.className}`,
-				}
-			: {
-					className: tabClassName,
-				};
-
 	return (
 		<div
 			className="grid h-dvh min-h-0 grid-cols-[auto_minmax(0,1fr)] overflow-hidden bg-surface text-foreground"
@@ -257,10 +236,7 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 					viewTransitionName: "arkini-editor-navigation",
 				}}
 			>
-				<nav
-					className="ak-editor-workspace-tabs flex min-h-0 flex-col items-center gap-1"
-					aria-label="Editor tools"
-				>
+				<nav className="ak-editor-workspace-tabs flex min-h-0 flex-col items-center gap-1">
 					{EditorWorkspaceRoutes.map((workspace) => {
 						if ("hiddenFromNavigation" in workspace) return null;
 						const { icon: Icon, id, label, shortcut, to } = workspace;
@@ -273,14 +249,15 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 									<ButtonLink
 										to={to}
 										params={params}
-										aria-label={label}
+										className={tabClassName}
 										data-workspace-id={id}
-										data-transitioning={
-											transitioningWorkspace === id
-												? "transitioning"
-												: undefined
-										}
-										{...readTabProps(id)}
+										{...readDataUiFn({
+											dataUi: "EditorWorkspaceTab",
+											state: {
+												current: activeWorkspace === id,
+												transitioning: transitioningWorkspace === id,
+											},
+										})}
 									>
 										<Icon className="size-5" />
 									</ButtonLink>
@@ -313,7 +290,6 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 					<Button
 						className="size-11 min-h-0 shrink-0 border-transparent bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised"
 						data-ui="EditorExit"
-						aria-label="Exit"
 						disabled={exitPending || refresh.pending}
 						cursorIntent={exitPending ? "progress" : undefined}
 						onClick={() => void closeAndExit()}

@@ -4,7 +4,6 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ButtonLink } from "~/ui/button/Button";
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import {
-	editorSectionTabActiveClassName,
 	editorSectionTabClassName,
 	EditorSectionTabs,
 } from "~/authoring-shell/ui/EditorSectionTabs";
@@ -31,7 +30,7 @@ export const Route = createFileRoute("/editor/$projectId/versions")({
 							</div>
 						}
 						tabs={
-							<EditorSectionTabs label="Version sections">
+							<EditorSectionTabs>
 								<ButtonLink
 									to="/editor/$projectId/versions/commit"
 									params={params}
@@ -39,7 +38,7 @@ export const Route = createFileRoute("/editor/$projectId/versions")({
 										exact: true,
 									}}
 									activeProps={{
-										className: editorSectionTabActiveClassName,
+										"data-ui-selected": true,
 									}}
 									className={editorSectionTabClassName}
 								>
@@ -52,7 +51,7 @@ export const Route = createFileRoute("/editor/$projectId/versions")({
 										exact: true,
 									}}
 									activeProps={{
-										className: editorSectionTabActiveClassName,
+										"data-ui-selected": true,
 									}}
 									className={editorSectionTabClassName}
 								>

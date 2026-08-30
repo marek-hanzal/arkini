@@ -33,7 +33,6 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 			<LauncherPageLayout page="main-menu">
 				<nav
 					className="grid w-full gap-4"
-					aria-label="Main menu"
 					data-ui="MainMenu"
 				>
 					{defaultPackageAvailable ? (

@@ -73,7 +73,7 @@ export const useCheatItemSpotlightController = ({
 	}, [
 		spawn.pending,
 	]);
-	const toggle = useCallback(() => {
+	const toggle = () => {
 		if (open) {
 			close();
 			return;
@@ -108,22 +108,10 @@ export const useCheatItemSpotlightController = ({
 			)
 			.exhaustive();
 		setOpen(true);
-	}, [
-		available,
-		close,
-		onBeforeOpen,
-		open,
-		spawn.pending,
-		spawn.reset,
-	]);
-	const selectItem = useCallback(
-		(itemId: string) => {
-			spawn.request(itemId);
-		},
-		[
-			spawn.request,
-		],
-	);
+	};
+	const selectItem = (itemId: string) => {
+		spawn.request(itemId);
+	};
 
 	useHotkey("Mod+P", toggle, {
 		enabled: admitted && cheats.enabled,
@@ -169,24 +157,13 @@ export const useCheatItemSpotlightController = ({
 		)
 		.exhaustive();
 
-	return useMemo(
-		() => ({
-			close,
-			items,
-			open,
-			resetSpawnStatus: spawn.reset,
-			selectItem,
-			spawnStatus,
-			spawnStatusMessage,
-		}),
-		[
-			close,
-			items,
-			open,
-			selectItem,
-			spawn.reset,
-			spawnStatus,
-			spawnStatusMessage,
-		],
-	);
+	return {
+		close,
+		items,
+		open,
+		resetSpawnStatus: spawn.reset,
+		selectItem,
+		spawnStatus,
+		spawnStatusMessage,
+	};
 };

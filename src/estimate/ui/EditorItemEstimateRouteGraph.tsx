@@ -2,10 +2,8 @@ import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { EditorItemEstimateRouteStep } from "~/estimate/type/EditorItemEstimate";
 import { type ReactNode, useState } from "react";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
-import {
-	selectableActiveClassName,
-	selectableInactiveClassName,
-} from "~/ui/form/SelectableStateClassName";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { selectableClassName } from "~/ui/form/SelectableStateClassName";
 import { EditorItemDetailReference } from "~/item-authoring/ui/EditorItemDetailReference";
 
 const formatQuantity = (quantity: number) =>
@@ -63,10 +61,16 @@ export const EditorItemEstimateRouteGraph = ({
 						] as const
 					).map((value) => (
 						<button
-							className={`cursor-pointer rounded-md border px-2.5 py-1 text-xs font-semibold ${sort === value ? selectableActiveClassName : selectableInactiveClassName}`}
+							className={`cursor-pointer rounded-md border px-2.5 py-1 text-xs font-semibold ${selectableClassName}`}
 							key={value}
 							onClick={() => setSort(value)}
 							type="button"
+							{...readDataUiFn({
+								dataUi: "EditorItemEstimateRouteSort",
+								state: {
+									selected: sort === value,
+								},
+							})}
 						>
 							{value === "time" ? "Time" : "Quantity"}
 						</button>
@@ -81,9 +85,14 @@ export const EditorItemEstimateRouteGraph = ({
 					const item = config.items[route.factId];
 					return (
 						<article
-							className={`ak-list-row flex min-h-16 min-w-0 items-center justify-between gap-4 rounded-xl p-3 text-sm ${item === undefined ? "" : "ak-list-row-interactive"}`}
-							data-ui="EditorItemEstimateRouteStep"
+							className="ak-list-row ak-list-row-interactive flex min-h-16 min-w-0 items-center justify-between gap-4 rounded-xl p-3 text-sm"
 							key={route.occurrenceId}
+							{...readDataUiFn({
+								dataUi: "EditorItemEstimateRouteStep",
+								state: {
+									enabled: item !== undefined,
+								},
+							})}
 						>
 							<div className="min-w-0 flex-1">
 								{item === undefined ? (

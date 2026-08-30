@@ -25,7 +25,6 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/new/select
 			<section
 				className="h-full min-h-0 overflow-y-auto overscroll-contain"
 				data-scroll-restoration-id="editor-item-type-picker"
-				aria-labelledby="editor-new-item-title"
 				data-ui="EditorItemTypePicker"
 			>
 				<header className="ak-editor-page-header flex min-w-0 flex-wrap items-center gap-3 p-3">
@@ -34,14 +33,8 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/new/select
 						params={{
 							projectId: project.projectId,
 						}}
-						aria-label="Back to items"
 					/>
-					<h1
-						id="editor-new-item-title"
-						className="text-xl font-semibold"
-					>
-						New item
-					</h1>
+					<h1 className="text-xl font-semibold">New item</h1>
 				</header>
 				<div className="ak-list grid content-start gap-2 px-3 pt-3 pb-3 sm:grid-cols-2 xl:grid-cols-3">
 					{TypeSchema.options.map((type) => {
@@ -62,10 +55,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/new/select
 								className="ak-list-row min-h-32 justify-start gap-4 rounded-xl p-4 text-left"
 								data-item-type={type}
 							>
-								<Icon
-									className="size-8 shrink-0 text-accent"
-									aria-hidden="true"
-								/>
+								<Icon className="size-8 shrink-0 text-accent" />
 								<span className="min-w-0">
 									<span className="block text-base font-semibold capitalize">
 										{type}

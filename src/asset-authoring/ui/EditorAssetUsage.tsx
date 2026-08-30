@@ -20,10 +20,7 @@ export const EditorAssetUsage = ({ resourceId }: { readonly resourceId: string }
 		);
 	}
 	return (
-		<section
-			className="ak-list grid gap-2"
-			aria-label="Asset usage"
-		>
+		<section className="ak-list grid gap-2">
 			{usages.map((usage) => {
 				const content = (
 					<>

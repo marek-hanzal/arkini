@@ -61,7 +61,7 @@ export const Route = createFileRoute("/editor/$projectId/project")({
 						save={controller.save}
 						saving={controller.isSaving}
 						tabs={
-							<EditorSectionTabs label="Project sections">
+							<EditorSectionTabs>
 								{EditorProjectSections.map((candidate) => (
 									<EditorProjectSectionLink
 										key={candidate.id}

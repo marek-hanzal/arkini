@@ -7,10 +7,8 @@ import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackB
 import { useEditorFloatingMenu } from "~/authoring-shell/ui/useEditorFloatingMenu";
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { Button, ButtonLink, PrimaryButton } from "~/ui/button/Button";
-import {
-	selectableActiveClassName,
-	selectableInactiveClassName,
-} from "~/ui/form/SelectableStateClassName";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { selectableClassName } from "~/ui/form/SelectableStateClassName";
 import { useEditorResourceUrl } from "~/asset-authoring/ui/EditorResourceUrlSession";
 import { useEditorAssetManagerController } from "~/asset-authoring/ui/useEditorAssetManagerController";
 import { Status } from "~/ui/status/Status";
@@ -135,10 +133,7 @@ const EditorAssetCard = ({
 		>
 			<span className="grid min-h-32 place-items-center overflow-hidden p-4">
 				{url === undefined ? (
-					<ImageIcon
-						className="size-8 text-subtle"
-						aria-hidden="true"
-					/>
+					<ImageIcon className="size-8 text-subtle" />
 				) : (
 					<img
 						src={url}
@@ -206,7 +201,7 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 					ref={controller.arkpackInputRef}
 					type="file"
 					accept=".arkpack"
-					className="sr-only"
+					className="hidden"
 					data-ui="EditorAssetArkpackInput"
 					disabled={controller.importPending}
 					onChange={controller.onArkpackChange}
@@ -216,7 +211,7 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 					type="file"
 					accept="image/png,.png"
 					multiple
-					className="sr-only"
+					className="hidden"
 					data-ui="EditorAssetImportInput"
 					disabled={controller.importPending}
 					onChange={controller.onFilesChange}
@@ -237,10 +232,15 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 						<button
 							key={option.value}
 							type="button"
-							className={`h-full min-h-0 cursor-pointer rounded-md border px-3 py-0 text-sm font-semibold ${option.selected ? selectableActiveClassName : selectableInactiveClassName}`}
+							className={`h-full min-h-0 cursor-pointer rounded-md border px-3 py-0 text-sm font-semibold ${selectableClassName}`}
 							data-filter={option.value}
-							data-selected={option.selected ? "true" : undefined}
 							onClick={() => props.onFilterChange(option.value)}
+							{...readDataUiFn({
+								dataUi: "EditorAssetFilter",
+								state: {
+									selected: option.selected,
+								},
+							})}
 						>
 							{option.label}
 						</button>

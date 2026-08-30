@@ -35,12 +35,9 @@ import { ItemInfoTab } from "~/item-detail/ui/ItemInfoTab";
 import { ItemQueueTab } from "~/item-detail/ui/ItemQueueTab";
 import { ItemSourcesTab } from "~/item-detail/ui/ItemSourcesTab";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { dialogFocusableSelector } from "~/ui/focus/dialogFocusableSelector";
-import { useDialogFocusContainment } from "~/ui/focus/useDialogFocusContainment";
-import {
-	selectableActiveClassName,
-	selectableInactiveClassName,
-} from "~/ui/form/SelectableStateClassName";
+import { overlayFocusableSelector } from "~/ui/focus/overlayFocusableSelector";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { selectableClassName } from "~/ui/form/SelectableStateClassName";
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
 
@@ -414,7 +411,7 @@ const useItemDetailFocus = ({
 	readonly restoreFocus: boolean;
 	readonly focusKey: string;
 }) => {
-	const dialogRef = useRef<HTMLDivElement>(null);
+	const overlayRef = useRef<HTMLDivElement>(null);
 	const originRef = useRef(origin);
 	const restoreFocusRef = useRef(restoreFocus);
 	useLayoutEffect(() => {
@@ -426,14 +423,18 @@ const useItemDetailFocus = ({
 	]);
 
 	useEffect(() => {
-		dialogRef.current?.focus();
+		const overlay = overlayRef.current;
+		const selectedTab = overlay?.querySelector<HTMLElement>(
+			'[data-ui="ItemDetailTabs"] button[data-ui-selected="true"]:not([disabled])',
+		);
+		(selectedTab ?? overlay?.querySelector<HTMLElement>(overlayFocusableSelector))?.focus();
 		return () => {
 			if (!restoreFocusRef.current) return;
 			const latestOrigin = originRef.current;
 			if (
 				latestOrigin !== null &&
 				latestOrigin.isConnected &&
-				latestOrigin.matches(dialogFocusableSelector) &&
+				latestOrigin.matches(overlayFocusableSelector) &&
 				!latestOrigin.hidden &&
 				latestOrigin.closest("[inert]") === null &&
 				latestOrigin.style.display !== "none" &&
@@ -449,23 +450,18 @@ const useItemDetailFocus = ({
 
 	useEffect(() => {
 		if (phase !== "open") return;
-		const dialog = dialogRef.current;
-		const selectedTab = dialog?.querySelector<HTMLElement>(
-			'[data-ui="ItemDetailTabs"] button[aria-selected="true"]:not([disabled])',
+		const overlay = overlayRef.current;
+		const selectedTab = overlay?.querySelector<HTMLElement>(
+			'[data-ui="ItemDetailTabs"] button[data-ui-selected="true"]:not([disabled])',
 		);
-		(selectedTab ?? dialog?.querySelector<HTMLElement>(dialogFocusableSelector))?.focus();
+		(selectedTab ?? overlay?.querySelector<HTMLElement>(overlayFocusableSelector))?.focus();
 	}, [
 		focusKey,
 		phase,
 	]);
 
-	const keepFocusInside = useDialogFocusContainment({
-		dialogRef,
-	});
-
 	return {
-		dialogRef,
-		keepFocusInside,
+		overlayRef,
 	};
 };
 
@@ -524,17 +520,21 @@ const ItemDetailTabs = ({
 	return (
 		<nav
 			className="flex min-w-0 gap-2 overflow-x-auto py-2"
-			aria-label="Item detail tabs"
 			data-ui="ItemDetailTabs"
 		>
 			{tabs.map((tab) => (
 				<button
 					key={tab}
 					type="button"
-					className={`inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium disabled:cursor-not-allowed ${tab === active ? selectableActiveClassName : selectableInactiveClassName}`}
-					aria-selected={tab === active}
+					className={`inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium disabled:cursor-not-allowed ${selectableClassName}`}
 					disabled={disabled}
 					data-tab={tab}
+					{...readDataUiFn({
+						dataUi: "ItemDetailTab",
+						state: {
+							selected: tab === active,
+						},
+					})}
 					onClick={() =>
 						RendererRuntime.runSync(
 							target.kind === "runtime"
@@ -593,8 +593,14 @@ const ItemInfoContent = ({
 	}
 	return (
 		<div
-			className={disabled ? "min-h-0 flex-1 opacity-70" : "min-h-0 flex-1"}
+			className="min-h-0 flex-1 data-[ui-disabled=true]:opacity-70"
 			inert={disabled}
+			{...readDataUiFn({
+				dataUi: "ItemInfoContent",
+				state: {
+					disabled,
+				},
+			})}
 		>
 			<ItemInfoTab
 				info={info}
@@ -888,12 +894,7 @@ const RuntimeItemDetailScene = ({
 				/>
 			) : (
 				<header className="flex items-center justify-between border-b border-line pb-3">
-					<h2
-						id="item-detail-title"
-						className="text-lg font-semibold"
-					>
-						Item unavailable
-					</h2>
+					<h2 className="text-lg font-semibold">Item unavailable</h2>
 					<button
 						type="button"
 						className="grid size-9 cursor-pointer place-items-center border border-line bg-surface text-lg text-muted"
@@ -982,12 +983,7 @@ const DefinitionItemDetailScene = ({
 	if (definition.kind === "unavailable") {
 		return (
 			<header className="flex items-center justify-between border-b border-line pb-3">
-				<h2
-					id="item-detail-title"
-					className="text-lg font-semibold"
-				>
-					Item unavailable
-				</h2>
+				<h2 className="text-lg font-semibold">Item unavailable</h2>
 				<button
 					type="button"
 					className="grid size-9 cursor-pointer place-items-center border border-line bg-surface text-lg text-muted"
@@ -1078,17 +1074,13 @@ const ItemDetailDialog = ({
 			}}
 		>
 			<motion.div
-				ref={focus.dialogRef}
-				role="dialog"
-				aria-modal="true"
-				aria-labelledby="item-detail-title"
-				className="flex h-[min(46rem,100%)] max-h-full w-full max-w-5xl cursor-default flex-col overflow-hidden rounded-2xl border border-line-strong bg-surface-raised p-[var(--ak-panel-padding)] text-foreground shadow-[0_2rem_5rem_color-mix(in_srgb,var(--ak-overlay)_58%,transparent),0_0_0_1px_color-mix(in_srgb,var(--ak-line-strong)_45%,transparent)] outline-none"
+				ref={focus.overlayRef}
+				className="flex h-[min(46rem,100%)] max-h-full w-full max-w-5xl cursor-default flex-col overflow-hidden rounded-2xl border border-line-strong bg-surface-raised p-[var(--ak-panel-padding)] text-foreground shadow-[0_2rem_5rem_color-mix(in_srgb,var(--ak-overlay)_58%,transparent),0_0_0_1px_color-mix(in_srgb,var(--ak-line-strong)_45%,transparent)]"
 				data-ui="ItemDetailModal"
 				data-tab={state.target.tab}
 				data-target-kind={state.target.kind}
 				data-runtime-id={state.target.kind === "runtime" ? state.target.itemId : undefined}
 				data-item-id={state.target.itemId}
-				tabIndex={-1}
 				initial={{
 					opacity: 0,
 					y: 10,
@@ -1096,7 +1088,6 @@ const ItemDetailDialog = ({
 				animate={motionState.dialog}
 				transition={transition}
 				onAnimationComplete={motionState.completeMotionPhase}
-				onKeyDown={focus.keepFocusInside}
 			>
 				{match(state.target)
 					.with(

@@ -55,8 +55,8 @@ describe("CheatItemSpotlight", () => {
 		});
 		await vi.waitFor(() =>
 			expect(
-				container.querySelector<HTMLButtonElement>('button[data-selected="true"]')?.dataset
-					.itemId,
+				container.querySelector<HTMLButtonElement>('button[data-ui-selected="true"]')
+					?.dataset.itemId,
 			).toBe("item:beta"),
 		);
 		await act(async () => {
@@ -71,7 +71,7 @@ describe("CheatItemSpotlight", () => {
 		expect(spotlightState.spawn).toHaveBeenCalledWith("item:beta");
 
 		const selectedOption = container.querySelector<HTMLButtonElement>(
-			'button[data-selected="true"]',
+			'button[data-ui-selected="true"]',
 		);
 		await act(async () => {
 			selectedOption?.dispatchEvent(
@@ -91,7 +91,7 @@ describe("CheatItemSpotlight", () => {
 		await toggleSpotlight();
 		const input = readSearchInput(container);
 		const selected = container.querySelector<HTMLButtonElement>(
-			'[data-ui="CheatItemSpotlightResults"] button[data-selected="true"]',
+			'[data-ui="CheatItemSpotlightResults"] button[data-ui-selected="true"]',
 		);
 		if (selected === null) throw new Error("Expected selected Spotlight result.");
 

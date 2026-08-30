@@ -14,6 +14,7 @@ import {
 	registries,
 	renderSettings,
 	roots,
+	settingsOptionByValue,
 } from "./Settings.test/fixture";
 
 describe("Settings mutation authority", () => {
@@ -38,17 +39,22 @@ describe("Settings mutation authority", () => {
 			'[data-ui="SettingsWindowModeOptions"]',
 		);
 		if (options === null) throw new Error("Expected Window mode control.");
-		const radios = Array.from(
-			options.querySelectorAll<HTMLInputElement>('input[name="window-mode"]'),
+		const choices = Array.from(
+			options.querySelectorAll<HTMLButtonElement>(
+				'[data-ui="SettingsSegmentedChoiceOption"]',
+			),
 		);
-		expect(radios.map((radio) => radio.value)).toEqual([
+		expect(choices.map((choice) => choice.dataset.uiValue)).toEqual([
 			"default",
 			"bordered",
 			"fullscreen",
 		]);
-		expect(radios[0]?.checked).toBe(true);
-		const fullscreen = radios.find((radio) => radio.value === "fullscreen");
-		if (fullscreen === undefined) throw new Error("Expected Fullscreen option.");
+		expect(choices[0]?.dataset.uiSelected).toBe("true");
+		const fullscreen = settingsOptionByValue(
+			container,
+			"SettingsWindowModeOptions",
+			"fullscreen",
+		);
 
 		await act(async () => fullscreen.click());
 
@@ -60,10 +66,7 @@ describe("Settings mutation authority", () => {
 		const { container, deferred, write, writeCheatAvailability } = await renderSettings([
 			"/settings",
 		]);
-		const light = Array.from(
-			container.querySelectorAll<HTMLInputElement>('input[name="appearance-theme"]'),
-		).find((input) => input.value === "light");
-		if (light === undefined) throw new Error("Expected Light theme control.");
+		const light = settingsOptionByValue(container, "SettingsThemeOptions", "light");
 
 		await act(async () => light.click());
 		expect(write).toHaveBeenCalledOnce();
@@ -87,11 +90,8 @@ describe("Settings mutation authority", () => {
 			"/main-menu",
 			"/settings",
 		]);
-		const light = Array.from(
-			container.querySelectorAll<HTMLInputElement>('input[name="appearance-theme"]'),
-		).find((input) => input.value === "light");
+		const light = settingsOptionByValue(container, "SettingsThemeOptions", "light");
 		const back = buttonByText(container, "Back");
-		if (light === undefined) throw new Error("Expected Light theme control.");
 
 		await act(async () => {
 			light.click();
@@ -111,10 +111,7 @@ describe("Settings mutation authority", () => {
 		const { container, deferred, writeCheatAvailability } = await renderSettings([
 			"/settings",
 		]);
-		const light = Array.from(
-			container.querySelectorAll<HTMLInputElement>('input[name="appearance-theme"]'),
-		).find((input) => input.value === "light");
-		if (light === undefined) throw new Error("Expected Light theme control.");
+		const light = settingsOptionByValue(container, "SettingsThemeOptions", "light");
 
 		await act(async () => light.click());
 		await act(async () => deferred.reject(new Error("theme write rejected")));
@@ -136,10 +133,7 @@ describe("Settings mutation authority", () => {
 				"/main-menu",
 				"/settings",
 			]);
-		const light = Array.from(
-			container.querySelectorAll<HTMLInputElement>('input[name="appearance-theme"]'),
-		).find((input) => input.value === "light");
-		if (light === undefined) throw new Error("Expected Light theme control.");
+		const light = settingsOptionByValue(container, "SettingsThemeOptions", "light");
 
 		await act(async () => light.click());
 		expect(write).toHaveBeenCalledOnce();
@@ -185,10 +179,7 @@ describe("Settings mutation authority", () => {
 		const { container, registry, root, write } = await renderSettings([
 			"/settings",
 		]);
-		const light = Array.from(
-			container.querySelectorAll<HTMLInputElement>('input[name="appearance-theme"]'),
-		).find((input) => input.value === "light");
-		if (light === undefined) throw new Error("Expected Light theme control.");
+		const light = settingsOptionByValue(container, "SettingsThemeOptions", "light");
 
 		await act(async () => light.click());
 		expect(write).toHaveBeenCalledOnce();

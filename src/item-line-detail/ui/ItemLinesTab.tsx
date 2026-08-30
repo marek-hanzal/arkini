@@ -10,6 +10,7 @@ import {
 import { ItemLineRow } from "~/item-line-detail/ui/ItemLineRow";
 import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
 import { useItemLineSearch } from "~/item-line-detail/ui/useItemLineSearch";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
 
 const autoFocusPadding = 12;
@@ -137,10 +138,7 @@ const ItemLinesEmptyState = ({
 			data-ui={dataUi}
 		>
 			<div className="grid max-w-sm justify-items-center gap-2">
-				<Icon
-					className="size-6 text-subtle"
-					aria-hidden="true"
-				/>
+				<Icon className="size-6 text-subtle" />
 				{children}
 			</div>
 		</div>
@@ -200,7 +198,6 @@ export const ItemLinesTab = ({
 						value={query}
 						className="w-full rounded-lg border border-line-strong bg-surface px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted"
 						placeholder="Search lines…"
-						aria-label="Search visible lines"
 						onChange={(event) => setQuery(event.currentTarget.value)}
 					/>
 				</motion.div>
@@ -212,49 +209,35 @@ export const ItemLinesTab = ({
 							className="shrink-0"
 							{...itemDetailFadeMotion}
 						>
-							<fieldset>
-								<legend className="sr-only">Line availability</legend>
-								<div
-									className="grid grid-cols-2 gap-1 rounded-lg border border-line bg-surface-raised/65 p-1"
-									role="radiogroup"
-									aria-label="Line availability"
-									data-ui="ItemLinesAvailabilityFilter"
-								>
-									{availabilityOptions.map((option) => {
-										const selected = availabilityFilter === option.value;
-										const optionDisabled =
-											option.value === "available" &&
-											availableLineCount === 0;
-										return (
-											<label
-												key={option.value}
-												className={`relative rounded-md px-3 py-1.5 text-center text-xs font-semibold transition-colors duration-200 ${
-													optionDisabled
-														? "cursor-not-allowed text-muted opacity-50"
-														: selected
-															? "bg-accent text-accent-contrast hover:bg-accent-hover"
-															: "cursor-pointer text-muted hover:bg-surface"
-												}`}
-												data-selected={selected ? "true" : "false"}
-												data-disabled={optionDisabled ? "true" : "false"}
-											>
-												<input
-													type="radio"
-													name="item-lines-availability"
-													value={option.value}
-													checked={selected}
-													disabled={optionDisabled}
-													className="sr-only"
-													onChange={() =>
-														setAvailabilityFilter(option.value)
-													}
-												/>
-												{option.label}
-											</label>
-										);
-									})}
-								</div>
-							</fieldset>
+							<div
+								className="grid grid-cols-2 gap-1 rounded-lg border border-line bg-surface-raised/65 p-1"
+								data-ui="ItemLinesAvailabilityFilter"
+							>
+								{availabilityOptions.map((option) => {
+									const selected = availabilityFilter === option.value;
+									const optionDisabled =
+										option.value === "available" && availableLineCount === 0;
+									return (
+										<button
+											key={option.value}
+											className="ak-segmented-option relative cursor-pointer rounded-md px-3 py-1.5 text-center text-xs font-semibold"
+											disabled={optionDisabled}
+											onClick={() => setAvailabilityFilter(option.value)}
+											type="button"
+											{...readDataUiFn({
+												dataUi: "ItemLinesAvailabilityOption",
+												state: {
+													disabled: optionDisabled,
+													selected,
+													value: option.value,
+												},
+											})}
+										>
+											{option.label}
+										</button>
+									);
+								})}
+							</div>
 						</motion.div>
 					)}
 				</AnimatePresence>

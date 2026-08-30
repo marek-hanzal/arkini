@@ -335,7 +335,7 @@ describe("GameMenu", () => {
 		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
 		const exitCompletion = motionTestRuntime.completions.length - 1;
 		await finishMotion(exitCompletion);
-		expect(container.querySelector('[role="dialog"]')).toBeNull();
+		expect(container.querySelector('[data-ui="GameMenu"]')).toBeNull();
 	});
 
 	it("reverses rapid Escape during enter without duplicate overlays", async () => {

@@ -4,6 +4,7 @@ import { Button } from "~/ui/button/Button";
 import type { useCheatsModel } from "~/game-cheat/ui/useCheatsModel";
 import type { updateGameCheatsAtom } from "~/game-cheat/atom/updateGameCheatsAtom";
 import { RouteBackdrop } from "~/application-shell/ui/RouteBackdrop";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 const actionLabel = (action: updateGameCheatsAtom.Command["action"]) => {
 	if (action === "instant-gameplay") return "Instant gameplay";
@@ -32,16 +33,10 @@ export const Cheats = ({
 			/>
 			<section
 				className="relative z-10 grid w-[34rem] max-w-full gap-6 rounded-2xl border border-line-strong bg-surface-raised p-[var(--ak-panel-padding)] shadow-2xl"
-				aria-labelledby="cheats-title"
 				data-ui="Cheats"
 			>
 				<header className="grid gap-2">
-					<h1
-						id="cheats-title"
-						className="text-xl font-semibold"
-					>
-						Cheats
-					</h1>
+					<h1 className="text-xl font-semibold">Cheats</h1>
 					<p className="text-sm leading-6 text-muted">
 						These options belong only to this saved game.
 					</p>
@@ -49,8 +44,13 @@ export const Cheats = ({
 
 				<div className="ak-list grid gap-2">
 					<label
-						className={`ak-list-row ak-list-row-interactive flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-line px-4 py-3 ${model.blocked ? "ak-list-row-pending cursor-progress" : ""}`}
-						data-ui="CheatsEnabledForGame"
+						className="ak-list-row ak-list-row-interactive flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-line px-4 py-3 data-[ui-pending=true]:cursor-progress"
+						{...readDataUiFn({
+							dataUi: "CheatsEnabledForGame",
+							state: {
+								pending: model.blocked,
+							},
+						})}
 					>
 						<span className="grid gap-1">
 							<span className="text-sm font-semibold">
@@ -70,8 +70,14 @@ export const Cheats = ({
 					</label>
 
 					<label
-						className={`ak-list-row flex items-center justify-between gap-4 rounded-lg border border-line px-4 py-3 ${!model.enabled ? "opacity-60" : "ak-list-row-interactive cursor-pointer"} ${model.blocked ? "ak-list-row-pending cursor-progress" : ""}`}
-						data-ui="CheatsInstantGameplay"
+						className="ak-list-row ak-list-row-interactive flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-line px-4 py-3 data-[ui-enabled=false]:cursor-default data-[ui-enabled=false]:opacity-60 data-[ui-pending=true]:cursor-progress"
+						{...readDataUiFn({
+							dataUi: "CheatsInstantGameplay",
+							state: {
+								enabled: model.enabled,
+								pending: model.blocked,
+							},
+						})}
 					>
 						<span className="grid gap-1">
 							<span className="text-sm font-semibold">Instant gameplay</span>
@@ -94,7 +100,6 @@ export const Cheats = ({
 
 				<div
 					className="min-h-5 text-center text-sm"
-					aria-live="polite"
 					data-ui="CheatsStatus"
 				>
 					{match(model.status)

@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 
 import type { EditorProjectStartScope } from "~/project-authoring/type/EditorProjectStartScope";
 import { readEditorProjectStartItemIdsFn } from "~/project-authoring/fn/readEditorProjectStartItemIdsFn";
@@ -43,16 +43,10 @@ export const useEditorProjectStartItemPickerController = ({
 			options,
 		],
 	);
-	const selectItem = useCallback(
-		(itemId: string) => {
-			onSelect(itemId);
-			onClose();
-		},
-		[
-			onClose,
-			onSelect,
-		],
-	);
+	const selectItem = (itemId: string) => {
+		onSelect(itemId);
+		onClose();
+	};
 
 	return {
 		items,

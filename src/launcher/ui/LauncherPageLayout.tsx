@@ -38,7 +38,6 @@ type LauncherPage = keyof typeof launcherPagePresentation;
 
 interface LauncherPageLayoutProps extends PropsWithChildren {
 	readonly foregroundOverlay?: ReactNode;
-	readonly labelledBy?: string;
 	readonly overlay?: ReactNode;
 	readonly page: LauncherPage;
 }
@@ -47,7 +46,6 @@ interface LauncherPageLayoutProps extends PropsWithChildren {
 export const LauncherPageLayout = ({
 	children,
 	foregroundOverlay,
-	labelledBy,
 	overlay,
 	page,
 }: LauncherPageLayoutProps) => {
@@ -61,11 +59,9 @@ export const LauncherPageLayout = ({
 			overlay={overlay}
 		>
 			<section
-				aria-labelledby={labelledBy}
 				className={`relative min-h-0 min-w-0 rounded-2xl text-foreground outline-none ${presentation.panel}`}
 				data-page={page}
 				data-ui="LauncherPagePanel"
-				tabIndex={-1}
 				style={{
 					viewTransitionName: presentation.viewTransitionName,
 				}}

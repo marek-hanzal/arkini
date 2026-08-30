@@ -78,10 +78,7 @@ const SourceRow = ({
 					titleClassName="truncate text-base font-semibold text-foreground"
 					titleTag="h3"
 				/>
-				<ChevronRight
-					className="size-5 shrink-0 text-muted transition-colors group-hover:text-accent"
-					aria-hidden="true"
-				/>
+				<ChevronRight className="size-5 shrink-0 text-muted transition-colors group-hover:text-accent" />
 			</button>
 		</article>
 	);

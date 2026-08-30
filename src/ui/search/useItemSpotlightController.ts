@@ -2,7 +2,6 @@ import {
 	type KeyboardEvent,
 	type ReactNode,
 	type RefObject,
-	useCallback,
 	useEffect,
 	useMemo,
 	useRef,
@@ -96,48 +95,29 @@ export const useItemSpotlightController = ({
 		optionsById,
 		resultLimit,
 	]);
-	const updateQuery = useCallback(
-		(value: string) => {
-			setQuery(value);
-			setSelectedIndex(0);
-			onQueryChange?.(value);
-		},
-		[
-			onQueryChange,
-		],
-	);
-	const selectItem = useCallback(
-		({ index, itemId }: useItemSpotlightController.SelectItemProps) => {
-			setSelectedIndex(index);
-			onSelectItem(itemId);
-		},
-		[
-			onSelectItem,
-		],
-	);
-	const requestSelected = useCallback(() => {
+	const updateQuery = (value: string) => {
+		setQuery(value);
+		setSelectedIndex(0);
+		onQueryChange?.(value);
+	};
+	const selectItem = ({ index, itemId }: useItemSpotlightController.SelectItemProps) => {
+		setSelectedIndex(index);
+		onSelectItem(itemId);
+	};
+	const requestSelected = () => {
 		const selected = results[selectedIndex];
 		if (selected === undefined) return;
 		selectItem({
 			index: selectedIndex,
 			itemId: selected.itemId,
 		});
-	}, [
-		results,
-		selectItem,
-		selectedIndex,
-	]);
-	const onKeyDown = useCallback(
-		(event: KeyboardEvent<HTMLDivElement>) => {
-			if (event.key !== "Escape") return;
-			event.preventDefault();
-			event.stopPropagation();
-			onClose();
-		},
-		[
-			onClose,
-		],
-	);
+	};
+	const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+		if (event.key !== "Escape") return;
+		event.preventDefault();
+		event.stopPropagation();
+		onClose();
+	};
 
 	useEffect(() => {
 		setSelectedIndex((current) => Math.min(current, Math.max(0, results.length - 1)));

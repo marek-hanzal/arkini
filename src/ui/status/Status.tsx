@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 interface StatusProps {
 	readonly action?: ReactNode;
@@ -24,15 +25,23 @@ export const Status = ({
 	const Icon = icon;
 	return (
 		<section
-			className={`grid min-h-48 place-items-center p-[var(--ak-panel-padding)] text-center ${
-				variant === "card" ? "rounded-2xl border border-line bg-surface/70" : ""
-			}`}
-			data-ui={dataUi}
+			className="grid min-h-48 place-items-center p-[var(--ak-panel-padding)] text-center data-[ui-variant=card]:rounded-2xl data-[ui-variant=card]:border data-[ui-variant=card]:border-line data-[ui-variant=card]:bg-surface/70"
+			{...readDataUiFn({
+				dataUi,
+				state: {
+					variant,
+				},
+			})}
 		>
 			<div className="grid max-w-md justify-items-center gap-3">
 				<Icon
-					className={`size-7 text-subtle${iconSpin ? " animate-spin" : ""}`}
-					aria-hidden="true"
+					className="size-7 text-subtle data-[ui-spin=true]:animate-spin"
+					{...readDataUiFn({
+						dataUi: "StatusIcon",
+						state: {
+							spin: iconSpin,
+						},
+					})}
 				/>
 				<div className="grid gap-1.5">
 					<h2 className="text-base font-semibold text-foreground">{title}</h2>

@@ -15,8 +15,8 @@ import type { CursorGrabMotion } from "~/ui/pixi/drag/CursorGrabMotion";
 import type { MainDragController } from "~/ui/pixi/drag/MainDragController";
 import { createDropPresentationFx } from "~/ui/pixi/drop/createDropPresentationFx";
 import { createDropSubmissionFx } from "~/ui/pixi/drop/createDropSubmissionFx";
-import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
-import type { MotionRuntime } from "~/ui/pixi/motion/MotionRuntime";
+import type { MagneticField } from "~/tile-motion/service/MagneticField";
+import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 import {

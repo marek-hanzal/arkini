@@ -23,7 +23,7 @@ import type {
 
 import type { MainDragController } from "~/ui/pixi/drag/MainDragController";
 
-import type { MotionRuntime } from "~/ui/pixi/motion/MotionRuntime";
+import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
 
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 
@@ -35,7 +35,7 @@ import { createMainReconcilerFx } from "~/ui/pixi/scene/createMainReconcilerFx";
 
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 
-import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
+import type { MagneticField } from "~/tile-motion/service/MagneticField";
 
 const projectionState = vi.hoisted(() => ({
 	cues: [] as unknown[],

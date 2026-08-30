@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { readTileDropPreviewFx } from "~/ui/pixi/drag/readTileDropPreviewFx";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";
+import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import { readAttractionActorIdFn } from "~/ui/pixi/magnet/fn/readAttractionActorIdFn";
 
 export namespace updateMagneticFieldFx {

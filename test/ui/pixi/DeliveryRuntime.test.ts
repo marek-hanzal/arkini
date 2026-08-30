@@ -33,7 +33,7 @@ vi.mock("~/ui/pixi/actor/updateTileActorFx", async () => {
 	};
 });
 
-vi.mock("~/ui/pixi/motion/flashMotionTargetFx", async () => {
+vi.mock("~/tile-motion/fx/flashMotionTargetFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
 		flashMotionTargetFx: () => EffectModule.void,

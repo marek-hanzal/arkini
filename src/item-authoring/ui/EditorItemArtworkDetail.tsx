@@ -1,7 +1,7 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { DetailSection } from "~/item-authoring/ui/EditorItemDetailDefinition";
 import { EditorItemArtworkTimeline } from "~/item-authoring/ui/EditorItemArtworkTimeline";
-import { EditorItemThumbnail } from "~/ui/item/EditorItemThumbnail";
+import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { EditorAssetDetailLink } from "~/asset-authoring/ui/EditorAssetDetailLink";
 
 /** Presents default and progress artwork in authored composition order. */

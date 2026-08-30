@@ -14,7 +14,7 @@ import {
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, vi } from "vitest";
-import { AppearanceAtom } from "~/ui/appearance/AppearanceAtom";
+import { AppearanceAtom } from "~/application-settings/atom/AppearanceAtom";
 import { WindowModeAtom } from "~/renderer/window/WindowModeAtom";
 import type { CompletionStatus } from "../../../../electron/contract/cli/CompletionStatus";
 import type { InstallationStatus } from "../../../../electron/contract/cli/InstallationStatus";
@@ -31,7 +31,7 @@ import {
 	adoptTestGameEngineResourceFx,
 	createTestRendererRuntime,
 } from "~test/support/createTestRendererRuntime";
-import { AppearanceDataset } from "~/ui/appearance/AppearanceDataset";
+import { AppearanceDataset } from "~/application-settings/ui/AppearanceDataset";
 
 const SettingsRoute = SettingsRouteDefinition.options.component;
 const CommonSection = CommonSettingsRouteDefinition.options.component;

@@ -4,7 +4,7 @@ import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { EditorProjectAvatarKeys } from "~/project-authoring/schema/EditorProjectFormSchema";
 import type { EditorAssetDeleteBlocker } from "~/asset-authoring/domain/fn/readEditorAssetDeleteBlockersFn";
 import { Button, ButtonLink, DangerButton } from "~/ui/button/Button";
-import { EditorItemThumbnail } from "~/ui/item/EditorItemThumbnail";
+import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorAssetDeleteController } from "~/asset-authoring/ui/useEditorAssetDeleteController";
 
 const EditorAssetDeleteError = ({ error }: { readonly error: unknown }) =>

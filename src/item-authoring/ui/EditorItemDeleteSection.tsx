@@ -5,7 +5,7 @@ import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { readEditorItemDeleteBlockersFn } from "~/item-authoring/fn/readEditorItemDeleteBlockersFn";
 import { ButtonLink, DangerButton } from "~/ui/button/Button";
 import { EditorItemDeleteDialog } from "~/item-authoring/ui/EditorItemDeleteDialog";
-import { EditorItemThumbnail } from "~/ui/item/EditorItemThumbnail";
+import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorItemDeleteController } from "~/item-authoring/ui/useEditorItemDeleteController";
 import { EditorProjectSections } from "~/project-authoring/type/EditorProjectSections";
 import { readEditorProjectSectionForPathFn } from "~/project-authoring/fn/readEditorProjectSectionForPathFn";

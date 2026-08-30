@@ -1,8 +1,9 @@
 import { useRef, useState, type RefObject } from "react";
 
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { EditorProjectStartScope } from "~/project-authoring/type/EditorProjectStartScope";
-import { EditorItemThumbnail } from "~/ui/item/EditorItemThumbnail";
-import { useEditorItemSearchOptions } from "~/ui/item/useEditorItemSearchOptions";
+import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
+import { useEditorItemSearchOptions } from "~/authoring-form/ui/useEditorItemSearchOptions";
 import { EditorProjectStartItemPicker } from "~/project-authoring/ui/EditorProjectStartItemPicker";
 import type {
 	EditorProjectStartGridCell,
@@ -46,7 +47,7 @@ const EditorProjectStartGridDragPreview = ({
 	readonly clientY: number;
 	readonly previewRef: RefObject<HTMLDivElement | null>;
 	readonly quantity: number;
-	readonly resourceIds: EditorItemThumbnail.Props["resourceIds"];
+	readonly resourceIds: ItemSchema.Type["asset"]["default"];
 }) => (
 	<div
 		className="pointer-events-none fixed top-0 left-0 z-[90] grid size-[4.5rem] place-items-center rounded-lg border border-accent bg-surface-raised/95 text-foreground shadow-2xl"

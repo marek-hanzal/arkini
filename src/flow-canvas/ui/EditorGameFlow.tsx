@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { type EditorSearchOption, EditorSearchCombobox } from "~/ui/form/EditorSearchCombobox";
-import { EditorItemSearchThumbnail } from "~/ui/item/EditorItemThumbnail";
+import { EditorItemSearchThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { Tooltip } from "~/ui/overlay/Tooltip";
 import { useEffect, useState } from "react";
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
@@ -11,7 +11,7 @@ import {
 	selectableInactiveClassName,
 } from "~/ui/form/SelectableStateClassName";
 import { OriginFlow } from "~/flow-canvas/ui/OriginFlow";
-import { useEditorItemSearchOptions } from "~/ui/item/useEditorItemSearchOptions";
+import { useEditorItemSearchOptions } from "~/authoring-form/ui/useEditorItemSearchOptions";
 import type { OriginFlowDirection } from "~/flow-canvas/type/Highlight";
 
 interface EditorItemFlowSearchProps {

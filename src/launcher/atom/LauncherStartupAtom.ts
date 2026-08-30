@@ -5,11 +5,11 @@ import type { WindowModeSchema } from "../../../electron/contract/window/WindowM
 import { ArkpackCatalogOwnerAtom } from "~/arkpack/renderer/ArkpackCatalogOwnerAtom";
 import { WindowModeAtom } from "~/renderer/window/WindowModeAtom";
 import { WindowModeReadyAtom } from "~/renderer/window/WindowModeReadyAtom";
-import { readAppearanceAccentFx } from "~/ui/appearance/readAppearanceAccentFx";
-import { readAppearanceThemeFx } from "~/ui/appearance/readAppearanceThemeFx";
-import { AppearanceAtom } from "~/ui/appearance/AppearanceAtom";
-import { applyCheatAvailabilityFx } from "~/ui/cheat-availability/applyCheatAvailabilityFx";
-import { readCheatAvailabilityFx } from "~/ui/cheat-availability/readCheatAvailabilityFx";
+import { readAppearanceAccentFx } from "~/application-settings/fx/readAppearanceAccentFx";
+import { readAppearanceThemeFx } from "~/application-settings/fx/readAppearanceThemeFx";
+import { AppearanceAtom } from "~/application-settings/atom/AppearanceAtom";
+import { applyCheatAvailabilityFx } from "~/application-settings/fx/applyCheatAvailabilityFx";
+import { readCheatAvailabilityFx } from "~/application-settings/fx/readCheatAvailabilityFx";
 import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
 import { RendererLifecycleUnavailableError } from "~/application-runtime/fx/readRendererLifecycleFx";
 import { readWindowModeFx } from "~/renderer/window/readWindowModeFx";

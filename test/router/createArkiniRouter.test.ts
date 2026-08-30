@@ -4,7 +4,7 @@ import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createArkiniRouterFx } from "~/createArkiniRouterFx";
 import { createTestRendererRuntime } from "~test/support/createTestRendererRuntime";
-import { resolveRouteViewTransitionTypesFx } from "~/ui/navigation/resolveRouteViewTransitionTypesFx";
+import { resolveRouteViewTransitionTypesFx } from "~/application-shell/fx/resolveRouteViewTransitionTypesFx";
 
 const originalStartViewTransition = document.startViewTransition;
 const originalCss = window.CSS;

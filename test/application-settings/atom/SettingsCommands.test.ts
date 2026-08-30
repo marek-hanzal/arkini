@@ -4,8 +4,8 @@ import { scheduleTask } from "@effect/atom-react";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { SettingsDiagnosticsCommandAtom } from "~/ui/settings/SettingsDiagnosticsCommandAtom";
-import { SettingsUserDataCommandAtom } from "~/ui/settings/SettingsUserDataCommandAtom";
+import { SettingsDiagnosticsCommandAtom } from "~/application-settings/atom/SettingsDiagnosticsCommandAtom";
+import { SettingsUserDataCommandAtom } from "~/application-settings/atom/SettingsUserDataCommandAtom";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
 

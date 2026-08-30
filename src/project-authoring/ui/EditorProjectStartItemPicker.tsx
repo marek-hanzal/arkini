@@ -3,8 +3,8 @@ import { useMemo, useRef, useState } from "react";
 import type { EditorProjectStartScope } from "~/project-authoring/type/EditorProjectStartScope";
 import { readEditorProjectStartItemIdsFn } from "~/project-authoring/fn/readEditorProjectStartItemIdsFn";
 import { useDialogFocus } from "~/ui/focus/useDialogFocus";
-import { EditorItemSearchThumbnail } from "~/ui/item/EditorItemThumbnail";
-import { useEditorItemSearchOptions } from "~/ui/item/useEditorItemSearchOptions";
+import { EditorItemSearchThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
+import { useEditorItemSearchOptions } from "~/authoring-form/ui/useEditorItemSearchOptions";
 import { SpotlightSearchInput } from "~/ui/search/SpotlightSearchInput";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
 

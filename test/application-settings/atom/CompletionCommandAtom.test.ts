@@ -4,7 +4,7 @@ import { scheduleTask } from "@effect/atom-react";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { CompletionCommandAtom } from "~/ui/settings/CompletionCommandAtom";
+import { CompletionCommandAtom } from "~/application-settings/atom/CompletionCommandAtom";
 
 let registry: AtomRegistry.AtomRegistry | undefined;
 

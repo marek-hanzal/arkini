@@ -8,7 +8,7 @@ import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
-import { withFieldGroup } from "~/ui/form/EditorForm";
+import { withFieldGroup } from "~/authoring-form/ui/EditorForm";
 import { EditorItemArtworkTimeline } from "~/item-authoring/ui/EditorItemArtworkTimeline";
 import { useEditorItemFormSession } from "~/item-authoring/ui/EditorItemFormContext";
 

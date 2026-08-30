@@ -2,7 +2,7 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { EditorItemEstimateIndexEntry } from "~/estimate/domain/EditorItemEstimateIndex";
 import { ButtonLink } from "~/ui/button/Button";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
-import { EditorItemThumbnail } from "~/ui/item/EditorItemThumbnail";
+import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 
 const runtimeLabel = (estimate: EditorItemEstimateIndexEntry) => {
 	if (estimate.status === "partial") return "Partial";

@@ -1,8 +1,9 @@
 import { Plus } from "lucide-react";
 import { type PointerEvent as ReactPointerEvent, type RefObject } from "react";
 
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { EditorProjectStartScope } from "~/project-authoring/type/EditorProjectStartScope";
-import { EditorItemThumbnail } from "~/ui/item/EditorItemThumbnail";
+import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import type {
 	EditorProjectStartGridCell,
 	EditorProjectStartGridPosition,
@@ -30,7 +31,7 @@ export const EditorProjectStartGridSlot = ({
 	readonly full: boolean;
 	readonly isDragSource: boolean;
 	readonly isDragTarget: boolean;
-	readonly itemResourceIds: EditorItemThumbnail.Props["resourceIds"] | undefined;
+	readonly itemResourceIds: ItemSchema.Type["asset"]["default"] | undefined;
 	readonly itemTitle: string | undefined;
 	readonly onDecrement: () => void;
 	readonly onDelete: () => void;

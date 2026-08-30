@@ -1,5 +1,5 @@
 import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
-import { EditorItemReferenceControl } from "~/ui/item/EditorItemAutocompleteField";
+import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutocompleteField";
 
 interface EditorSelectorControlProps {
 	readonly onChange: (selector: SelectorSchema.Type) => void;

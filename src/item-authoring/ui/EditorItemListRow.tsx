@@ -4,7 +4,7 @@ import {
 	selectableActiveClassName,
 	selectableInactiveClassName,
 } from "~/ui/form/SelectableStateClassName";
-import { EditorItemThumbnail } from "~/ui/item/EditorItemThumbnail";
+import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 
 /** Presents one saved item and owns its type-filter affordance. */
 export const EditorItemListRow = ({

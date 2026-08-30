@@ -6,7 +6,7 @@ import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorChoiceControl } from "~/ui/form/EditorValueControls";
 import { EditorOptionalOutputControl } from "~/production-line-authoring/ui/EditorOptionalOutputControl";
 import { EditorSelectorControl } from "~/production-line-authoring/ui/EditorSelectorControl";
-import { EditorItemReferenceControl } from "~/ui/item/EditorItemAutocompleteField";
+import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutocompleteField";
 
 /** Edits the target, effects, replacement, and optional output of one merge definition. */
 export const EditorMergeField = ({

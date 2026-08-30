@@ -15,13 +15,13 @@ import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererL
 import { LauncherStartupAtom } from "~/launcher/atom/LauncherStartupAtom";
 import { LauncherStartupConfigAtom } from "~/launcher/atom/LauncherStartupConfigAtom";
 
-vi.mock("~/ui/appearance/readAppearanceAccentFx", () => ({
+vi.mock("~/application-settings/fx/readAppearanceAccentFx", () => ({
 	readAppearanceAccentFx: () => Effect.succeed("rose"),
 }));
-vi.mock("~/ui/appearance/readAppearanceThemeFx", () => ({
+vi.mock("~/application-settings/fx/readAppearanceThemeFx", () => ({
 	readAppearanceThemeFx: () => Effect.succeed("dark"),
 }));
-vi.mock("~/ui/cheat-availability/readCheatAvailabilityFx", () => ({
+vi.mock("~/application-settings/fx/readCheatAvailabilityFx", () => ({
 	readCheatAvailabilityFx: () => Effect.succeed(false),
 }));
 vi.mock("~/renderer/window/readWindowModeFx", () => ({

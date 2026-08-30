@@ -58,7 +58,7 @@ vi.mock("~/game-presentation/ui/useGameEngine", () => {
 		usePackageGameEngine: useGameEngine,
 	};
 });
-vi.mock("~/ui/cheat-availability/useCheatAvailability", async () => {
+vi.mock("~/application-settings/ui/useCheatAvailability", async () => {
 	const { useSyncExternalStore } = await import("react");
 	return {
 		useCheatAvailability: () => {

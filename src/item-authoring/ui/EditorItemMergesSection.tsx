@@ -8,7 +8,7 @@ import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorItemMergeDraftDefault } from "~/item-authoring/ui/EditorItemMergeDraftDefault";
 import { EditorMergeField } from "~/item-authoring/ui/EditorMergeField";
 import { useEditorItemFormSession } from "~/item-authoring/ui/EditorItemFormContext";
-import { useEditorItemOptionLabel } from "~/ui/item/useEditorItemSearchOptions";
+import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
 
 const EditorMergeFields = ({
 	onChange,

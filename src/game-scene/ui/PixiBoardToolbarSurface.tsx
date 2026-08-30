@@ -12,7 +12,7 @@ import { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
 import { runTileSplitAtom } from "~/tile-interaction/atom/runTileSplitAtom";
 import { useGameMenuControl } from "~/game-menu/ui/GameMenuProvider";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
-import { useInventoryShortcutKey } from "~/ui/navigation/useInventoryShortcutKey";
+import { useInventoryShortcutKey } from "~/game-shell/ui/useInventoryShortcutKey";
 import type { MainActivationIntent } from "~/tile-interaction/type/MainActivationIntent";
 import { createMainRuntimeFx } from "~/game-scene/fx/createMainRuntimeFx";
 import { usePixiGameRuntime } from "~/game-scene/ui/PixiGameRuntime";

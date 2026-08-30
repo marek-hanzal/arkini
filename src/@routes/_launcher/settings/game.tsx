@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { useModelContext } from "~/ui/settings/ModelContext";
+import { useModelContext } from "~/application-settings/ui/ModelContext";
 
 export const Route = createFileRoute("/_launcher/settings/game")({
 	component: () => {

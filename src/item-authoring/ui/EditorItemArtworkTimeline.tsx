@@ -1,5 +1,5 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { EditorItemThumbnail } from "~/ui/item/EditorItemThumbnail";
+import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { EditorAssetDetailLink } from "~/asset-authoring/ui/EditorAssetDetailLink";
 
 const formatProgress = (progress: number) =>

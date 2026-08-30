@@ -10,15 +10,13 @@ export const useEditorUnsavedChangesOwner = () => {
 	return owner;
 };
 
-export namespace useEditorUnsavedChangesRegistration {
-	export interface Props extends EditorUnsavedChangesSession {
-		readonly id: string;
-	}
+interface EditorUnsavedChangesRegistrationProps extends EditorUnsavedChangesSession {
+	readonly id: string;
 }
 
 /** Registers one mounted editor form session with the process-owned leave contract. */
 export const useEditorUnsavedChangesRegistration = (
-	props: useEditorUnsavedChangesRegistration.Props,
+	props: EditorUnsavedChangesRegistrationProps,
 ) => {
 	const owner = useEditorUnsavedChangesOwner();
 	const sessionRef = useRef(props);

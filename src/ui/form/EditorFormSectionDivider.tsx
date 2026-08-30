@@ -1,6 +1,6 @@
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 
-export interface EditorFormSectionDividerProps {
+interface EditorFormSectionDividerProps {
 	readonly description?: string;
 	readonly title: string;
 	readonly variant?: "primary" | "secondary";

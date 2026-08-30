@@ -11,30 +11,28 @@ import {
 } from "~/project-note/schema/EditorNoteSchema";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 
-export namespace useEditorNotesController {
-	export interface Output {
-		readonly cancelEdit: () => void;
-		readonly canCreate: boolean;
-		readonly canSaveEdit: boolean;
-		readonly create: () => void;
-		readonly editContent: string;
-		readonly editingNoteId?: string;
-		readonly error?: unknown;
-		readonly loaded: boolean;
-		readonly loading: boolean;
-		readonly newContent: string;
-		readonly notes: ReadonlyArray<EditorNoteSchema.Type>;
-		readonly pending: boolean;
-		readonly remove: (noteId: string) => void;
-		readonly retry: () => void;
-		readonly saveEdit: () => void;
-		readonly setEditContent: (content: string) => void;
-		readonly setNewContent: (content: string) => void;
-		readonly startEdit: (note: EditorNoteSchema.Type) => void;
-	}
+interface EditorNotesControllerOutput {
+	readonly cancelEdit: () => void;
+	readonly canCreate: boolean;
+	readonly canSaveEdit: boolean;
+	readonly create: () => void;
+	readonly editContent: string;
+	readonly editingNoteId?: string;
+	readonly error?: unknown;
+	readonly loaded: boolean;
+	readonly loading: boolean;
+	readonly newContent: string;
+	readonly notes: ReadonlyArray<EditorNoteSchema.Type>;
+	readonly pending: boolean;
+	readonly remove: (noteId: string) => void;
+	readonly retry: () => void;
+	readonly saveEdit: () => void;
+	readonly setEditContent: (content: string) => void;
+	readonly setNewContent: (content: string) => void;
+	readonly startEdit: (note: EditorNoteSchema.Type) => void;
 }
 
-export const useEditorNotesController = (): useEditorNotesController.Output => {
+export const useEditorNotesController = (): EditorNotesControllerOutput => {
 	const project = useEditorProject();
 	const commandAtom = EditorNotesCommandAtoms.command(project.projectId);
 	const streamAtom = EditorNotesCommandAtoms.stream(project.projectId);

@@ -34,25 +34,23 @@ const refreshEditorProjectCommandAtom = RendererRuntime.runSync(
 	}),
 );
 
-export namespace useEditorProjectRefreshController {
-	export interface Props {
-		readonly blocked: boolean;
-		readonly projectId: string;
-	}
+interface EditorProjectRefreshControllerProps {
+	readonly blocked: boolean;
+	readonly projectId: string;
+}
 
-	export interface Output {
-		readonly disabled: boolean;
-		readonly pending: boolean;
-		readonly refresh: () => void;
-		readonly tooltip: string;
-	}
+interface EditorProjectRefreshControllerOutput {
+	readonly disabled: boolean;
+	readonly pending: boolean;
+	readonly refresh: () => void;
+	readonly tooltip: string;
 }
 
 /** Owns hard-refresh command state; EditorShell only binds its presentation. */
 export const useEditorProjectRefreshController = ({
 	blocked,
 	projectId,
-}: useEditorProjectRefreshController.Props): useEditorProjectRefreshController.Output => {
+}: EditorProjectRefreshControllerProps): EditorProjectRefreshControllerOutput => {
 	const router = useRouter();
 	const commandAtom = refreshEditorProjectCommandAtom(projectId);
 	const result = useAtomValue(commandAtom);

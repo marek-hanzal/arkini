@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { EditorMcpConfigurationSchema } from "../../../electron/contract/editor/EditorMcpConfigurationSchema";
 import { EditorMcpOverviewSchema } from "../../../electron/contract/editor/EditorMcpOverviewSchema";
 
-import { useClipboard } from "~/ui/clipboard/useClipboard";
 import { EditorMcpCommandAtom } from "~/authoring-mcp/atom/EditorMcpCommandAtom";
 
 const parseEditorMcpOverviewFn = (candidate: unknown) =>
@@ -11,6 +10,34 @@ const parseEditorMcpOverviewFn = (candidate: unknown) =>
 
 const parseEditorMcpConfigurationFn = (candidate: unknown) =>
 	EditorMcpConfigurationSchema.safeParse(candidate);
+
+const useClipboard = () => {
+	const [copied, setCopied] = useState<string>();
+	const [error, setError] = useState<string>();
+	const copy = useCallback(async (key: string, value: string) => {
+		setCopied(undefined);
+		setError(undefined);
+		try {
+			await window.arkini.clipboard.writeText(value);
+			setCopied(key);
+		} catch (cause) {
+			setError(cause instanceof Error ? cause.message : String(cause));
+		}
+	}, []);
+
+	return useMemo(
+		() => ({
+			copied,
+			error,
+			copy,
+		}),
+		[
+			copied,
+			error,
+			copy,
+		],
+	);
+};
 
 export const useEditorMcpController = () => {
 	const [state, dispatch] = useAtom(EditorMcpCommandAtom);

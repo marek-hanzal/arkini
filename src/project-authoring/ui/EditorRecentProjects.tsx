@@ -12,16 +12,14 @@ const formatter = new Intl.DateTimeFormat(undefined, {
 	timeStyle: "short",
 });
 
-export namespace EditorRecentProjects {
-	export interface Props {
-		readonly blocked: boolean;
-		readonly onDeleteProject: (
-			project: EditorProjectDescriptor,
-			ownership: EditorProjectOwnership,
-		) => void;
-		readonly onOpenProjectFolder: (root: string) => void;
-		readonly projects: ReadonlyArray<EditorProjectCandidate>;
-	}
+interface EditorRecentProjectsProps {
+	readonly blocked: boolean;
+	readonly onDeleteProject: (
+		project: EditorProjectDescriptor,
+		ownership: EditorProjectOwnership,
+	) => void;
+	readonly onOpenProjectFolder: (root: string) => void;
+	readonly projects: ReadonlyArray<EditorProjectCandidate>;
 }
 
 /** Renders canonical projects in repository-supplied recent order. */
@@ -30,7 +28,7 @@ export const EditorRecentProjects = ({
 	onDeleteProject,
 	onOpenProjectFolder,
 	projects,
-}: EditorRecentProjects.Props) => {
+}: EditorRecentProjectsProps) => {
 	if (projects.length === 0) return null;
 	return (
 		<section

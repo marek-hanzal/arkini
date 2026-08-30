@@ -35,7 +35,6 @@ import { ItemInfoTab } from "~/item-detail/ui/ItemInfoTab";
 import { ItemQueueTab } from "~/item-detail/ui/ItemQueueTab";
 import { ItemSourcesTab } from "~/item-detail/ui/ItemSourcesTab";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { BadgeCount } from "~/ui/badge/BadgeCount";
 import { dialogFocusableSelector } from "~/ui/focus/dialogFocusableSelector";
 import { useDialogFocusContainment } from "~/ui/focus/useDialogFocusContainment";
 import {
@@ -486,6 +485,23 @@ const tabLabel = {
 	queue: "Queue",
 	sources: "Sources",
 } as const satisfies Record<ItemDetailTabEnumSchema.Type, string>;
+
+const BadgeCount = ({
+	count,
+	dataUi,
+	label,
+}: {
+	readonly count: number;
+	readonly dataUi: string;
+	readonly label?: string;
+}) => (
+	<span
+		className="min-w-5 rounded-full bg-warning/20 px-1.5 py-0.5 text-center text-[0.6875rem] font-semibold tabular-nums text-foreground"
+		data-ui={dataUi}
+	>
+		{label === undefined ? count : `${label}${count > 1 ? ` ×${count}` : ""}`}
+	</span>
+);
 
 const ItemDetailTabs = ({
 	active,

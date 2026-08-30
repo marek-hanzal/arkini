@@ -6,7 +6,7 @@ import {
 	selectableInactiveClassName,
 } from "~/ui/form/SelectableStateClassName";
 
-export interface EditorBooleanToggleBadgeProps {
+interface EditorBooleanToggleBadgeProps {
 	readonly checked: boolean;
 	readonly checkedIcon: LucideIcon;
 	readonly description: string;

@@ -8,7 +8,7 @@ type LinkButtonCursorIntent = Extract<
 	"not-allowed" | "pointer" | "progress" | "wait"
 >;
 
-export interface LinkButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface LinkButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	readonly cursorIntent?: LinkButtonCursorIntent;
 }
 

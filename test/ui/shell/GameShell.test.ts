@@ -35,7 +35,7 @@ vi.mock("~/engine/item-detail/fn/resolveItemDetailTargetFn", () => ({
 	}),
 }));
 
-vi.mock("~/ui/pixi/PixiGameProvider", () => ({
+vi.mock("~/game-scene/ui/PixiGameRuntime", () => ({
 	PixiGameProvider: ({ children }: { readonly children?: ReactNode }) => children,
 }));
 

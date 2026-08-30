@@ -4,7 +4,7 @@ import type { Container } from "pixi.js";
 import type { dropItemFx } from "~/item-interaction/fx/dropItemFx";
 import type { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
-import type { SurfaceLayout } from "~/ui/pixi/layout/SceneLayout";
+import type { SurfaceLayout } from "~/game-scene/type/SceneLayout";
 
 interface MainInteractionDropTarget {
 	readonly kind: "slot";

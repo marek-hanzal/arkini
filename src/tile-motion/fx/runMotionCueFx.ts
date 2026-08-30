@@ -15,7 +15,7 @@ import { runStackMotionFx } from "~/tile-motion/fx/runStackMotionFx";
 import { runSwapMotionFx } from "~/tile-motion/fx/runSwapMotionFx";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
-import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
+import type { MainSurface } from "~/game-scene/service/MainSurface";
 import type { TargetRoute } from "~/tile-motion/type/MotionTarget";
 
 export namespace runMotionCueFx {

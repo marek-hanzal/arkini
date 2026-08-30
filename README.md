@@ -17,7 +17,7 @@ Read the smallest entry point needed for the task:
 | Implemented gameplay semantics | [`GAME.MD`](GAME.MD) |
 | Project layout, authoring, compiler, validation | [`CONFIG.md`](CONFIG.md) |
 | Compatibility, external formats, Arkpack provenance | [`VERSION.md`](VERSION.md) |
-| Pixi implementation navigation | [`src/ui/pixi/README.md`](src/ui/pixi/README.md) |
+| Retained gameplay scene navigation | [`src/game-scene/README.md`](src/game-scene/README.md) |
 
 ## Repository map
 
@@ -32,6 +32,7 @@ src/game-event  committed gameplay event schemas and exact downstream event proj
 src/item-line-detail  line-detail reads, board/stored projections, inputs/outputs/autofill and Item Lines presentation
 src/item-detail  Item Detail dialog composition, remaining projections and Queue/Sources/Info presentation
 src/item-detail-frame  Item Detail target lifecycle, command settlement, reference navigation and frame presentation
+src/game-scene  concrete Board, Toolbar and Inventory Pixi scene composition, reconciliation and delivery presentation
 src/tile-presentation  semantic tile actors, feedback, replacements and committed motion projection
 src/tile-rendering  Pixi application/frame/texture lifecycle, native actors, visuals and animation capabilities
 src/tile-motion  retained tile-motion lanes, choreography, magnetic response and playback lifecycle
@@ -69,7 +70,7 @@ src/launcher  renderer bootstrap, Hero lifecycle, shell/action surfaces and Abou
 src/application-diagnostics  shared renderer-side failure extraction, diagnostic normalization and transport policy
 src/application-runtime  renderer process composition, Atom bridge and native lifecycle
 src/renderer  installed Game, launcher preferences, window, resource-validation and transport capabilities
-src/ui        cross-product primitives plus retained React and concrete Pixi scene execution
+src/ui        cross-product primitives and remaining installed-Game shell composition
 src/@routes   TanStack Router registration, lifecycle and route-specific composition
 electron      pure transport contract plus main/preload/platform ownership
 shared        immutable cross-process application metadata and hard limits only

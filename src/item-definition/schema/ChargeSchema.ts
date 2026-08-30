@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+import { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 import { OutputSchema } from "~/production-output/schema/OutputSchema";
 
 /**

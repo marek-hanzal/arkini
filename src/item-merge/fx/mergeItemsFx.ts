@@ -2,7 +2,7 @@ import { Effect, Option, Random } from "effect";
 
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { MergeSameItemError } from "~/item-merge/error/MergeSameItemError";

@@ -1,10 +1,14 @@
 import { z } from "zod";
 
 import { DropSchema } from "~/production-output/schema/DropSchema";
-import { ChanceSchema as ProbabilitySchema } from "~/engine/common/schema/ChanceSchema";
 
 import { BaseSchema } from "./BaseSchema";
 import { TypeSchema } from "./TypeSchema";
+
+const ProbabilitySchema = z.number().min(0).max(1).meta({
+	id: "ChanceSchema",
+	description: "A probability from zero to one inclusive.",
+});
 
 /**
  * An output roll that will provide its output according to a probability.

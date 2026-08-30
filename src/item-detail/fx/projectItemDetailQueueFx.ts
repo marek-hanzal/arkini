@@ -5,7 +5,7 @@ import {
 	type ItemDetailReference,
 	projectItemDetailReferenceFx,
 } from "~/item-detail-frame/fx/projectItemDetailReferenceFx";
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { readItemDetailQueueFx } from "~/item-detail-read/fx/readItemDetailQueueFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 

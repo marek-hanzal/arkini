@@ -1,4 +1,4 @@
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 
 export namespace readDropMaximumQuantitiesFn {

@@ -2,7 +2,7 @@ import { Data, Effect, FileSystem } from "effect";
 import { join } from "node:path";
 import { createFilesystemWriteFx } from "~/engine/filesystem/createFilesystemWriteFx";
 import type { FilesystemWrite } from "~/engine/filesystem/FilesystemWrite";
-import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
 import { encodeGameProjectFileStemFn } from "~/game-config/source/encodeGameProjectFileStemFn";
 import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
 

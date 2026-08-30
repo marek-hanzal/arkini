@@ -5,7 +5,7 @@ import {
 	EditorProjectVersionSubjectSchema,
 	EditorProjectVersionTagSchema,
 } from "~/project-version/schema/EditorProjectVersionMetadataSchema";
-import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
 import { EditorObjectHashSchema } from "./EditorObjectHashSchema";

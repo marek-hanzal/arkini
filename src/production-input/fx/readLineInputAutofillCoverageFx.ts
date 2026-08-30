@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { planLineInputAutofillFx } from "~/production-input/fx/planLineInputAutofillFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 

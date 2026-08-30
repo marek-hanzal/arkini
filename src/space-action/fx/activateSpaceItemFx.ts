@@ -4,8 +4,8 @@ import { resolveActionEnableFn } from "~/production-action/fn/resolveActionEnabl
 import { resolveActionInputFx } from "~/production-action/fx/resolveActionInputFx";
 import { resolveActionRuleFx } from "~/production-action/fx/resolveActionRuleFx";
 import { settleActionChargesFx } from "~/production-action/fx/settleActionChargesFx";
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";

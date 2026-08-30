@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { RevisionConflictError } from "~/engine/revision/error/RevisionConflictError";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 

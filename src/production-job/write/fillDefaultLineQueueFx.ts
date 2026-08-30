@@ -1,6 +1,6 @@
 import { Effect, Result } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { enqueueLineRuntimeFx } from "~/production-job/fx/enqueueLineRuntimeFx";
 import { readDefaultLineQueueTargetFx } from "~/production-job/fx/read/readDefaultLineQueueTargetFx";

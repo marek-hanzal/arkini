@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import type { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
-import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";

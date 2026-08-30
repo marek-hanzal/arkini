@@ -11,7 +11,7 @@ import { InvalidInputChargesReasonEnumSchema } from "~/game-config/diagnostic/sc
 import { StorageSchema } from "~/item-definition/schema/StorageSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import type { InputSchema } from "~/production-input/schema/InputSchema";
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { DiagnosticPathSchema } from "~/game-config/diagnostic/schema/DiagnosticPathSchema";
 
 import { readItemLineEntriesFn } from "../../fn/readItemLineEntriesFn";

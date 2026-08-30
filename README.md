@@ -30,7 +30,7 @@ src/game-persistence  persisted State, hydration, save codecs, autosave and exac
 src/simulation-time  canonical fixed simulation quantum shared by time-aware gameplay owners
 src/game-tick  fixed-step budgeting, replay, job/delivery/temporary advancement and scoped loop
 src/item-interaction  optimistic drop reads, authoritative drop/write commands and ordinary click actions
-src/engine    remaining common values, item/temporary/query, filesystem, revision/version and CLI support owners
+src/engine    remaining item/temporary/query, filesystem, revision/version and CLI support owners
 src/game-start  initial-state schemas, exact placement planning and atomic runtime start
 src/game-event  committed gameplay event schemas and exact downstream event projection
 src/item-detail-read  shared Item Detail identity, target, tab, queue and source reads/projections
@@ -55,7 +55,7 @@ src/production-line-authoring  controlled Line, Input, Rule and Output editor UI
 src/production-output  output, drop and roll schemas plus resolution policy
 src/production-job  queue admission, active-job lifecycle, capacity, completion and active-job presentation
 src/production-delivery  outbound input delivery allocation, validation and settlement
-src/game-config  authored config, source, diagnostics, validation, resources and compiler
+src/game-config  authored value/config schemas, source, diagnostics, validation, resources and compiler
 src/arkpack   artifact bytes/provenance, renderer catalog/runtime and package UI
 src/editor-build  Build contract, renderer admission and Build presentation
 src/project-authoring  portable project model, repository contract, configuration and catalog workflows

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { resolveActionChargeFx } from "~/production-action/fx/resolveActionChargeFx";
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
 import { assertOutputCapacityFx } from "~/production-job/fx/assertOutputCapacityFx";

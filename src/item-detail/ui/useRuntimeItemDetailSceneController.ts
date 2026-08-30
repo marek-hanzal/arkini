@@ -2,7 +2,7 @@ import { Effect, Equal } from "effect";
 import { useCallback, useEffect } from "react";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { readItemDetailInfoFn } from "~/item-detail-read/fn/readItemDetailInfoFn";
 import { readItemDetailIdentityFx } from "~/item-detail-read/fx/readItemDetailIdentityFx";
 import type { ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailControl";

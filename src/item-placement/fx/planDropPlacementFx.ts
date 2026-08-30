@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
-import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";

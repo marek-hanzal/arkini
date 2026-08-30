@@ -1,7 +1,7 @@
 import { Data } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 import type { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 
 /** A placement planner produced more quantity than its resolved drop requested. */

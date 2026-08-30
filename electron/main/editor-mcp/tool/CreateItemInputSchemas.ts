@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import { TimeSchema } from "~/engine/common/schema/TimeSchema";
+import { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
+import { TimeSchema } from "~/game-config/schema/TimeSchema";
 import { AssetSchema } from "~/item-definition/schema/AssetSchema";
 import { BlueprintSchema } from "~/item-definition/schema/BlueprintSchema";
 import { CraftSchema } from "~/item-definition/schema/CraftSchema";

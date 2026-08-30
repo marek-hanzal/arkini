@@ -3,7 +3,7 @@ import { Effect } from "effect";
 
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import type { EditorProjectDescriptor } from "~/project-authoring/schema/EditorProjectDescriptorSchema";
-import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const placeholderHeroBytes = Uint8Array.from(

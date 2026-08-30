@@ -1,9 +1,9 @@
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { TimeSchema } from "~/engine/common/schema/TimeSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { TimeSchema } from "~/game-config/schema/TimeSchema";
 import type { DistanceSchema } from "~/item-location/schema/DistanceSchema";
 import type { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
 import type { ModeSchema } from "~/production-input/schema/ModeSchema";
-import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+import type { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
 import type { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";

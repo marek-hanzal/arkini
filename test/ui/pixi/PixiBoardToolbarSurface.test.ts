@@ -75,19 +75,19 @@ vi.mock("~/application-runtime/service/RendererRuntime", () => ({
 	},
 }));
 
-vi.mock("~/ui/pixi/command/TileDefaultLineCommandAtom", () => ({
+vi.mock("~/tile-interaction/atom/TileDefaultLineCommandAtom", () => ({
 	TileDefaultLineCommandAtom: () => ({}),
 }));
 
-vi.mock("~/ui/pixi/command/runTileDropAtom", () => ({
+vi.mock("~/tile-interaction/atom/runTileDropAtom", () => ({
 	runTileDropAtom: () => tileAtoms.drop,
 }));
 
-vi.mock("~/ui/pixi/command/runTileSplitAtom", () => ({
+vi.mock("~/tile-interaction/atom/runTileSplitAtom", () => ({
 	runTileSplitAtom: () => tileAtoms.split,
 }));
 
-vi.mock("~/ui/pixi/command/runSpaceActivationAtom", () => ({
+vi.mock("~/tile-interaction/atom/runSpaceActivationAtom", () => ({
 	runSpaceActivationAtom: () => tileAtoms.space,
 }));
 

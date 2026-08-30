@@ -21,13 +21,13 @@ import type {
 	PresentationWrite,
 } from "~/ui/pixi/animation/ActorAnimator";
 
-import type { MainDragController } from "~/ui/pixi/drag/MainDragController";
+import type { MainDragController } from "~/tile-interaction/fx/createMainDragControllerFx";
 
 import type { MotionRuntime } from "~/tile-motion/service/MotionRuntime";
 
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 
-import { createDropPresentationFx } from "~/ui/pixi/drop/createDropPresentationFx";
+import { createDropPresentationFx } from "~/tile-interaction/fx/createDropPresentationFx";
 
 import type { GameEngine } from "~/renderer/game/GameEngine";
 

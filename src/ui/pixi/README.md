@@ -1,6 +1,6 @@
 # Pixi renderer map
 
-Pixi is Arkini's retained gameplay scene executor. `src/tile-presentation` owns the semantic actor, feedback, replacement, and committed-motion projections; `src/tile-motion` owns deterministic playback policy and lifecycle over exact Pixi capabilities. The engine remains gameplay truth; React owns routes, pages, menus, and Item Detail. Start at `scene/createMainRuntimeFx.ts` for Board + Toolbar and `scene/createInventoryRuntimeFx.ts` for Inventory.
+Pixi is Arkini's retained gameplay scene executor. `src/tile-presentation` owns semantic actor projections, `src/tile-motion` owns deterministic playback, and `src/tile-interaction` owns pointer gestures plus activation and drop execution against exact Pixi capabilities. The engine remains gameplay truth; React owns routes, pages, menus, and Item Detail. Start at `scene/createMainRuntimeFx.ts` for Board + Toolbar and `scene/createInventoryRuntimeFx.ts` for Inventory.
 
 ## Owners
 
@@ -11,8 +11,8 @@ Pixi is Arkini's retained gameplay scene executor. `src/tile-presentation` owns 
 | Surface geometry, layers, masks, feedback | `scene/*Surface*` and `layout/` |
 | Retained identity within one canvas | `actor/*ActorStore*` |
 | Canonical reconciliation | `scene/createMainReconcilerFx.ts` |
-| Pointer gesture and frozen release facts | `drag/*DragController*` |
-| Drop submission/presentation | `drop/` |
+| Pointer gestures, activation and frozen release facts | `src/tile-interaction/{atom,fn,fx,type}` |
+| Drop submission/presentation | `src/tile-interaction/fx/createDrop*Fx.ts` |
 | Engine-delivery presentation | `delivery/` |
 | Cue lanes, choreography, magnetic response and handoffs | `src/tile-motion/{service,type,fn,fx}` |
 | Interpolation/springs | `animation/createAnimationDriverFx.ts` |
@@ -51,7 +51,7 @@ Delivery endpoints, generation, phase, and remaining time are engine state. Tick
 | --- | --- |
 | Scene composition/teardown | `scene/create*RuntimeFx.ts` |
 | Actor identity/appearance | `src/tile-presentation` + `actor/` + main reconciler |
-| Click/drag/drop | `drag/` + `drop/` |
+| Click/drag/drop | `src/tile-interaction` |
 | Spawn/swap/stack/replacement cue projection | `src/tile-presentation` |
 | Cue execution and playback lifecycle | `src/tile-motion` |
 | Autofill delivery | `delivery/`; canonical behavior is `production-delivery/` + Tick |
@@ -60,4 +60,4 @@ Delivery endpoints, generation, phase, and remaining time are engine state. Tick
 | Magnetic response | `src/tile-motion` |
 | Frame/interpolation | `runtime/` + `animation/` |
 
-Focused semantic projection tests live under `test/tile-presentation`; playback policy and lifecycle tests live under `test/tile-motion`; retained Pixi scene-integration tests live under `test/ui/pixi`.
+Focused semantic projection tests live under `test/tile-presentation`; playback policy and lifecycle tests live under `test/tile-motion`; gesture and drop-execution tests live under `test/tile-interaction`; retained Pixi scene-integration tests live under `test/ui/pixi`.

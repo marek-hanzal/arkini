@@ -2,7 +2,7 @@ import { type PropsWithChildren, useEffect, useMemo, useRef } from "react";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { PixiGameRuntimeContext } from "~/ui/pixi/PixiGameRuntimeContext";
-import { createGameInteractionControlFx } from "~/ui/pixi/runtime/createGameInteractionControlFx";
+import { createGameInteractionControlFx } from "~/tile-interaction/fx/createGameInteractionControlFx";
 import { createTextureStoreFx } from "~/ui/pixi/runtime/createTextureStoreFx";
 
 /**

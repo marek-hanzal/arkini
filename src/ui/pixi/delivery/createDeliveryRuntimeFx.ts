@@ -12,7 +12,7 @@ import { startActorExitFx } from "~/ui/pixi/animation/startActorExitFx";
 import { startRemainderFeedbackFx } from "~/ui/pixi/animation/startRemainderFeedbackFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { DeliveryRuntime } from "~/ui/pixi/delivery/DeliveryRuntime";
-import type { MainDragController } from "~/ui/pixi/drag/MainDragController";
+import type { MainDragController } from "~/tile-interaction/fx/createMainDragControllerFx";
 import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import { chaseTargetFx } from "~/tile-motion/fx/chaseTargetFx";
 import { createLiveContactPoseReaderFx } from "~/tile-motion/fx/createLiveContactPoseReaderFx";

@@ -2,12 +2,12 @@ import { useAtomSet } from "@effect/atom-react";
 import { useCallback, useLayoutEffect, useRef } from "react";
 
 import { useGameEngine } from "~/ui/game/useGameEngine";
-import { runInventoryReleaseAtom } from "~/ui/pixi/command/runInventoryReleaseAtom";
+import { runInventoryReleaseAtom } from "~/tile-interaction/atom/runInventoryReleaseAtom";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { runSpaceActivationAtom } from "~/ui/pixi/command/runSpaceActivationAtom";
+import { runSpaceActivationAtom } from "~/tile-interaction/atom/runSpaceActivationAtom";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { runTileDropAtom } from "~/ui/pixi/command/runTileDropAtom";
+import { runTileDropAtom } from "~/tile-interaction/atom/runTileDropAtom";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import type { InventoryRuntime } from "~/ui/pixi/scene/InventoryRuntime";
 import { createInventoryRuntimeFx } from "~/ui/pixi/scene/createInventoryRuntimeFx";

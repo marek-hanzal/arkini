@@ -12,7 +12,7 @@ import { planInputMaterialStoreFn } from "~/production-input/fn/planInputMateria
 import { filterInputSlotItemsFn } from "~/production-input/fn/filterInputSlotItemsFn";
 import { readItemMaterialInputFx } from "~/production-input/read/readItemMaterialInputFx";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
-import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
+import { isolateStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateStatefulOwnerTransitionFx";
 import { LineInputClosedError } from "~/production-line/error/LineInputClosedError";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";

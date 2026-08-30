@@ -35,6 +35,7 @@
 		"src/item-query",
 		"src/item-resolution",
 		"src/item-revision",
+		"src/item-state-isolation",
 		"src/game-start",
 		"src/game-event",
 		"src/item-definition",

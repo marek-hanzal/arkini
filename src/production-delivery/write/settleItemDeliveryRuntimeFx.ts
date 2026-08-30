@@ -9,7 +9,7 @@ import { applyInputMaterialStorePlanFx } from "~/production-input/fx/applyInputM
 import { planInputMaterialStoreFn } from "~/production-input/fn/planInputMaterialStoreFn";
 import { filterInputSlotItemsFn } from "~/production-input/fn/filterInputSlotItemsFn";
 import { TypeSchema } from "~/production-input/schema/TypeSchema";
-import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
+import { isolateStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateStatefulOwnerTransitionFx";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";

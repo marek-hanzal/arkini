@@ -12,7 +12,7 @@ import { assertOutputCapacityFx } from "~/production-job/fx/assertOutputCapacity
 import { createJobIdFx } from "~/production-job/fx/createJobIdFx";
 import { resolveLineStartFx } from "~/production-job/fx/read/resolveLineStartFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
-import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
+import { isolateStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateStatefulOwnerTransitionFx";
 import { LineRunUnavailableError } from "~/production-line/error/LineRunUnavailableError";
 import type { LineRun } from "~/production-line/type/LineRun";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";

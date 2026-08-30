@@ -2,7 +2,7 @@ import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 
 export type EditorAcquisitionRequirementUsage = "consume" | "one-time" | "ongoing";
 
-export type EditorAcquisitionOutputKind = "chance" | "guaranteed" | "replace" | "weighted";
+type EditorAcquisitionOutputKind = "chance" | "guaranteed" | "replace" | "weighted";
 
 export interface EditorAcquisitionOutputAnnotation {
 	readonly alternativeSet: boolean;
@@ -35,7 +35,7 @@ export interface EditorAcquisitionUnsupportedRequirement {
 	readonly source: "line-condition" | "output-condition";
 }
 
-export interface EditorAcquisitionOperationInput {
+interface EditorAcquisitionOperationInput {
 	readonly factId: string;
 	readonly quantity: QuantitySchema.Type;
 }
@@ -98,7 +98,7 @@ export interface EditorAcquisitionRoute {
 	};
 }
 
-export interface EditorAcquisitionRoot {
+interface EditorAcquisitionRoot {
 	readonly factId: string;
 	readonly quantity: number | "unbounded";
 }

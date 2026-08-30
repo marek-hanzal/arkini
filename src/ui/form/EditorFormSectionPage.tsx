@@ -2,8 +2,28 @@ import type { PropsWithChildren, ReactNode } from "react";
 
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
+import { PrimaryButton } from "~/ui/button/Button";
 import { EditorFormContent } from "~/ui/form/EditorFormContent";
-import { EditorFormSaveButton } from "~/ui/form/EditorFormSaveButton";
+
+const EditorFormSaveButton = ({
+	dirty,
+	saving,
+	save,
+}: {
+	readonly dirty: boolean;
+	readonly saving: boolean;
+	readonly save: () => Promise<boolean>;
+}) => (
+	<PrimaryButton
+		type="button"
+		className="min-h-0 px-4 py-2"
+		disabled={!dirty || saving}
+		cursorIntent={saving ? "progress" : undefined}
+		onClick={() => void save().catch(() => undefined)}
+	>
+		Save
+	</PrimaryButton>
+);
 
 /** Keeps routed form chrome mounted while only the active form section changes. */
 export const EditorFormSectionPage = ({

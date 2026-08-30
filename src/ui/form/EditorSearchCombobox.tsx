@@ -21,23 +21,21 @@ export interface EditorSearchOption {
 	readonly terms: readonly string[];
 }
 
-export namespace EditorSearchCombobox {
-	export interface Props {
-		readonly displaySelectedLabel?: boolean;
-		readonly label: string;
-		readonly labelVisible?: boolean;
-		readonly description?: string;
-		readonly emptyLabel: string;
-		readonly error?: string;
-		readonly options: readonly EditorSearchOption[];
-		readonly placeholder?: string;
-		readonly value: string;
-		readonly onBlur?: () => void;
-		readonly onChange: (value: string) => void;
-		readonly onInputChange?: (value: string) => void;
-		readonly renderPreview: (option: EditorSearchOption) => ReactNode;
-		readonly renderSelectedPreview?: (option: EditorSearchOption) => ReactNode;
-	}
+interface EditorSearchComboboxProps {
+	readonly displaySelectedLabel?: boolean;
+	readonly label: string;
+	readonly labelVisible?: boolean;
+	readonly description?: string;
+	readonly emptyLabel: string;
+	readonly error?: string;
+	readonly options: readonly EditorSearchOption[];
+	readonly placeholder?: string;
+	readonly value: string;
+	readonly onBlur?: () => void;
+	readonly onChange: (value: string) => void;
+	readonly onInputChange?: (value: string) => void;
+	readonly renderPreview: (option: EditorSearchOption) => ReactNode;
+	readonly renderSelectedPreview?: (option: EditorSearchOption) => ReactNode;
 }
 
 /** One keyboard-friendly Fuse-backed picker shared by item and asset form fields. */
@@ -56,7 +54,7 @@ export const EditorSearchCombobox = ({
 	renderPreview,
 	renderSelectedPreview,
 	value,
-}: EditorSearchCombobox.Props) => {
+}: EditorSearchComboboxProps) => {
 	const selectedOption = options.find((option) => option.id === value);
 	const selectedPreview =
 		selectedOption === undefined ? undefined : renderSelectedPreview?.(selectedOption);

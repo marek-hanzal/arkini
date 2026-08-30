@@ -5,13 +5,11 @@ import type { useArkpacks } from "~/arkpack/ui/useArkpacks";
 import { DangerButton, PrimaryButtonLink } from "~/ui/button/Button";
 import { LinkButton } from "~/ui/button/LinkButton";
 
-export namespace ArkpackCatalogList {
-	export interface Props {
-		readonly blocked?: boolean;
-		readonly state: useArkpacks.State;
-		readonly onOpenEditor: (packageId: string) => void;
-		readonly onRemove: (packageId: string) => void;
-	}
+interface ArkpackCatalogListProps {
+	readonly blocked?: boolean;
+	readonly state: useArkpacks.State;
+	readonly onOpenEditor: (packageId: string) => void;
+	readonly onRemove: (packageId: string) => void;
 }
 
 /** Exhaustively renders the current Arkpack catalog projection. */
@@ -20,7 +18,7 @@ export const ArkpackCatalogList = ({
 	state,
 	onOpenEditor,
 	onRemove,
-}: ArkpackCatalogList.Props) =>
+}: ArkpackCatalogListProps) =>
 	match(state)
 		.with(
 			{

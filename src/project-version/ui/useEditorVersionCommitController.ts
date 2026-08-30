@@ -10,24 +10,22 @@ import type { EditorProjectVersionStatus } from "~/project-version/type/EditorPr
 
 const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
-export namespace useEditorVersionCommitController {
-	export interface Output {
-		readonly body: string;
-		readonly canCommit: boolean;
-		readonly commit: () => void;
-		readonly error?: string;
-		readonly pending: boolean;
-		readonly projectId: string;
-		readonly setBody: (value: string) => void;
-		readonly setSubject: (value: string) => void;
-		readonly setTag: (value: string) => void;
-		readonly status?: EditorProjectVersionStatus;
-		readonly subject: string;
-		readonly tag: string;
-	}
+interface EditorVersionCommitControllerOutput {
+	readonly body: string;
+	readonly canCommit: boolean;
+	readonly commit: () => void;
+	readonly error?: string;
+	readonly pending: boolean;
+	readonly projectId: string;
+	readonly setBody: (value: string) => void;
+	readonly setSubject: (value: string) => void;
+	readonly setTag: (value: string) => void;
+	readonly status?: EditorProjectVersionStatus;
+	readonly subject: string;
+	readonly tag: string;
 }
 
-export const useEditorVersionCommitController = (): useEditorVersionCommitController.Output => {
+export const useEditorVersionCommitController = (): EditorVersionCommitControllerOutput => {
 	const project = useEditorProject();
 	const router = useRouter();
 	const { returnTo } = useSearch({

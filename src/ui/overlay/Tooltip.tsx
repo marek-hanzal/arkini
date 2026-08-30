@@ -15,7 +15,7 @@ import {
 import { cloneElement, type ReactElement, type ReactNode, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
-export interface TooltipProps {
+interface TooltipProps {
 	readonly children: ReactElement;
 	readonly content: ReactNode;
 	readonly contentClassName?: string;

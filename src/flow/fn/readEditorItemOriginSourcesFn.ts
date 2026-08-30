@@ -173,9 +173,13 @@ const readOutputs = (routes: ReadonlyArray<EditorAcquisitionRoute>) => {
 	});
 };
 
-const projectRoutes = (routes: ReadonlyArray<EditorAcquisitionRoute>): EditorItemOriginSource => {
+type EditorAcquisitionRouteGroup = [
+	EditorAcquisitionRoute,
+	...EditorAcquisitionRoute[],
+];
+
+const projectRoutes = (routes: EditorAcquisitionRouteGroup): EditorItemOriginSource => {
 	const route = routes[0];
-	if (route === undefined) throw new Error("Cannot project an empty acquisition operation.");
 	const ownerItemId = readOwnerItemId(route);
 	const runtimeMs = readRuntimeMs(route);
 	return {
@@ -198,12 +202,17 @@ const projectRoutes = (routes: ReadonlyArray<EditorAcquisitionRoute>): EditorIte
 
 /** Groups canonical output-occurrence routes into their authored item-origin operations. */
 export const readEditorItemOriginSourcesFn = (graph: EditorAcquisitionGraph) => {
-	const routesByOperationId = new Map<string, EditorAcquisitionRoute[]>();
+	const routesByOperationId = new Map<string, EditorAcquisitionRouteGroup>();
 	for (const route of graph.routes) {
 		const operationId = route.operation?.id ?? route.id;
-		const routes = routesByOperationId.get(operationId) ?? [];
+		const routes = routesByOperationId.get(operationId);
+		if (routes === undefined) {
+			routesByOperationId.set(operationId, [
+				route,
+			]);
+			continue;
+		}
 		routes.push(route);
-		routesByOperationId.set(operationId, routes);
 	}
 	return [
 		...routesByOperationId.values(),

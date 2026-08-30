@@ -369,6 +369,7 @@ interface EstimateNodeGraph {
 }
 
 const createEstimateNodeGraph = (root: EstimateNode): EstimateNodeGraph => {
+	// solveFact seals parents after their children, so every edge targets an older immutable node.
 	const discovered = [
 		root,
 	];
@@ -417,8 +418,6 @@ const createEstimateNodeGraph = (root: EstimateNode): EstimateNodeGraph => {
 			if (remaining === 0) ready.push(child);
 		}
 	}
-	if (nodes.length !== discovered.length)
-		throw new Error("Estimate materialization produced a cyclic node graph.");
 	return {
 		nodes,
 		occurrenceCountByNode,

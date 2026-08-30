@@ -7,6 +7,7 @@ import { useEditorBuildController } from "~/editor-build/ui/useEditorBuildContro
 import { Button, PrimaryButton } from "~/ui/button/Button";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorProjectExport } from "~/project-authoring/ui/EditorProjectExport";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 export const Route = createFileRoute("/editor/$projectId/build")({
 	component: () => {
@@ -46,7 +47,13 @@ export const Route = createFileRoute("/editor/$projectId/build")({
 							<p className="mt-1 text-sm text-muted">{controller.buildSummary}</p>
 						</div>
 						<span
-							className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider ${controller.buildStatus === "valid" ? "bg-success/15 text-success" : "bg-surface-raised text-muted"}`}
+							className="rounded-full bg-surface-raised px-3 py-1 text-xs font-semibold text-muted uppercase tracking-wider data-[ui-status=valid]:bg-success/15 data-[ui-status=valid]:text-success"
+							{...readDataUiFn({
+								dataUi: "EditorBuildStatus",
+								state: {
+									status: controller.buildStatus,
+								},
+							})}
 						>
 							{controller.buildStatusLabel}
 						</span>

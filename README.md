@@ -51,7 +51,7 @@ src/item-location  grid coordinates, distance, runtime locations, claims and Boa
 src/item-placement  scope-aware stack, spawn, output and existing-item placement
 src/item-merge  directional merge contracts, admission and atomic source/target lifecycle
 src/space-action  authored Space items and atomic activation/navigation
-src/production-action  immediate action admission, rules and charge settlement
+src/production-action  immediate action admission, rules, remaining-charge reads and settlement
 src/production-condition  authored runtime condition evaluation
 src/production-input  line-input schemas, material planning and storage lifecycle
 src/production-line  production-line definitions, rules, reads and run planning

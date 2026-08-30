@@ -16,7 +16,7 @@ export namespace readEditorAcquisitionAvailabilityRequirementsFn {
 	}
 }
 
-const readSatisfyQuantity = (when: WhenSchema.Type) => {
+const readSatisfyQuantityFn = (when: WhenSchema.Type) => {
 	switch (when.type) {
 		case "exists":
 			return 1;
@@ -27,7 +27,7 @@ const readSatisfyQuantity = (when: WhenSchema.Type) => {
 	}
 };
 
-const readFalsifyQuantity = (when: WhenSchema.Type) => {
+const readFalsifyQuantityFn = (when: WhenSchema.Type) => {
 	switch (when.type) {
 		case "exists":
 			return undefined;
@@ -38,7 +38,7 @@ const readFalsifyQuantity = (when: WhenSchema.Type) => {
 	}
 };
 
-const makeRequirement = (
+const makeRequirementFn = (
 	when: WhenSchema.Type,
 	quantity: number,
 	source: "line-condition" | "output-condition",
@@ -49,6 +49,18 @@ const makeRequirement = (
 	usage: "ongoing",
 });
 
+const addUnsupportedRequirementFn = (
+	unsupported: EditorAcquisitionUnsupportedRequirement[],
+	when: WhenSchema.Type,
+	reason: EditorAcquisitionUnsupportedRequirement["reason"],
+	source: "line-condition" | "output-condition",
+) =>
+	unsupported.push({
+		factId: when.query.selector.itemId,
+		reason,
+		source,
+	});
+
 /** Projects authored enable/disable conditions into positive static facts. */
 export const readEditorAcquisitionAvailabilityRequirementsFn = ({
 	rules,
@@ -57,23 +69,16 @@ export const readEditorAcquisitionAvailabilityRequirementsFn = ({
 	const allOf: EditorAcquisitionRequirement[] = [];
 	const anyOf: EditorAcquisitionRequirement[][] = [];
 	const unsupported: EditorAcquisitionUnsupportedRequirement[] = [];
-	const markUnsupported = (
-		when: WhenSchema.Type,
-		reason: EditorAcquisitionUnsupportedRequirement["reason"],
-	) =>
-		unsupported.push({
-			factId: when.query.selector.itemId,
-			reason,
-			source,
-		});
 	for (const rule of rules) {
 		if (rule.type === "enable") {
 			for (const when of rule.when) {
-				const quantity = readSatisfyQuantity(when);
+				const quantity = readSatisfyQuantityFn(when);
 				if (quantity !== undefined && quantity > 0)
-					allOf.push(makeRequirement(when, quantity, source));
-				if (when.type === "count") markUnsupported(when, "exact-count");
-				if (when.type === "range") markUnsupported(when, "upper-bound");
+					allOf.push(makeRequirementFn(when, quantity, source));
+				if (when.type === "count")
+					addUnsupportedRequirementFn(unsupported, when, "exact-count", source);
+				if (when.type === "range")
+					addUnsupportedRequirementFn(unsupported, when, "upper-bound", source);
 			}
 			continue;
 		}
@@ -81,13 +86,13 @@ export const readEditorAcquisitionAvailabilityRequirementsFn = ({
 		const alternatives: EditorAcquisitionRequirement[] = [];
 		let factFree = false;
 		for (const when of rule.when) {
-			const quantity = readFalsifyQuantity(when);
+			const quantity = readFalsifyQuantityFn(when);
 			if (quantity === undefined) {
-				markUnsupported(when, "negative-condition");
+				addUnsupportedRequirementFn(unsupported, when, "negative-condition", source);
 				factFree = true;
 				break;
 			}
-			alternatives.push(makeRequirement(when, quantity, source));
+			alternatives.push(makeRequirementFn(when, quantity, source));
 		}
 		if (!factFree && alternatives.length > 0) anyOf.push(alternatives);
 	}

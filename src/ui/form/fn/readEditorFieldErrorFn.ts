@@ -1,4 +1,4 @@
-const readErrorMessage = (error: unknown) => {
+const readErrorMessageFn = (error: unknown) => {
 	if (
 		typeof error === "object" &&
 		error !== null &&
@@ -12,4 +12,4 @@ const readErrorMessage = (error: unknown) => {
 
 /** Reads the first user-facing message published for one registered form field. */
 export const readEditorFieldErrorFn = (errors: readonly unknown[]) =>
-	errors.map(readErrorMessage).find((message) => message !== undefined);
+	errors.map(readErrorMessageFn).find((message) => message !== undefined);

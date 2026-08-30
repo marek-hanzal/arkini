@@ -47,112 +47,114 @@ const cuePriority: Record<readGameAudioCuesFn.Kind, number> = {
 	remove: 3,
 };
 
-const clampStrength = (strength: number) => Math.min(3, Math.max(1, strength));
+const clampStrengthFn = (strength: number) => Math.min(3, Math.max(1, strength));
 
-const strengthForQuantity = (quantity: number) =>
-	clampStrength(1 + Math.log2(Math.max(1, quantity)));
+const strengthForQuantityFn = (quantity: number) =>
+	clampStrengthFn(1 + Math.log2(Math.max(1, quantity)));
 
-const cue = (kind: readGameAudioCuesFn.Kind, strength: number): readGameAudioCuesFn.Result => ({
+const cueFn = (kind: readGameAudioCuesFn.Kind, strength: number): readGameAudioCuesFn.Result => ({
 	kind,
-	strength: clampStrength(strength),
+	strength: clampStrengthFn(strength),
 });
 
-const readGameAudioCue = (event: GameEvent): readGameAudioCuesFn.Result =>
+const readGameAudioCueFn = (event: GameEvent): readGameAudioCuesFn.Result =>
 	match(event)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.CurrentSpaceChanged,
 			},
-			() => cue("space-change", 1),
+			() => cueFn("space-change", 1),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.JobStarted,
 			},
-			() => cue("job-start", 1),
+			() => cueFn("job-start", 1),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.JobCompleted,
 			},
-			() => cue("job-complete", 2),
+			() => cueFn("job-complete", 2),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemMerged,
 			},
-			() => cue("merge", 2),
+			() => cueFn("merge", 2),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemExpired,
 			},
-			(event) => cue("expire", strengthForQuantity(event.quantity)),
+			(event) => cueFn("expire", strengthForQuantityFn(event.quantity)),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemSpawned,
 			},
-			(event) => cue("spawn", strengthForQuantity(event.quantity)),
+			(event) => cueFn("spawn", strengthForQuantityFn(event.quantity)),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemPlaced,
 			},
-			(event) => cue("place", strengthForQuantity(event.quantity)),
+			(event) => cueFn("place", strengthForQuantityFn(event.quantity)),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemStacked,
 			},
-			(event) => cue("stack", strengthForQuantity(event.quantity - event.previousQuantity)),
+			(event) =>
+				cueFn("stack", strengthForQuantityFn(event.quantity - event.previousQuantity)),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemSplit,
 			},
-			(event) => cue("split", strengthForQuantity(event.previousQuantity - event.quantity)),
+			(event) =>
+				cueFn("split", strengthForQuantityFn(event.previousQuantity - event.quantity)),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemConsumed,
 			},
-			(event) => cue("consume", strengthForQuantity(event.consumedQuantity)),
+			(event) => cueFn("consume", strengthForQuantityFn(event.consumedQuantity)),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemInputStored,
 			},
-			(event) => cue("store", strengthForQuantity(event.storedQuantity)),
+			(event) => cueFn("store", strengthForQuantityFn(event.storedQuantity)),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemChargeSpent,
 			},
-			(event) => cue("charge", event.previousCharges - event.resultingCharges),
+			(event) => cueFn("charge", event.previousCharges - event.resultingCharges),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemDepleted,
 			},
-			(event) => cue("deplete", strengthForQuantity(event.previousQuantity)),
+			(event) => cueFn("deplete", strengthForQuantityFn(event.previousQuantity)),
 		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemExplicitlyRemoved,
 			},
-			(event) => cue("remove", strengthForQuantity(event.quantity)),
+			(event) => cueFn("remove", strengthForQuantityFn(event.quantity)),
 		)
 		.exhaustive();
 
-const coalesceCues = (
+const coalesceCuesFn = (
 	events: ReadonlyArray<GameEvent>,
 ): ReadonlyArray<readGameAudioCuesFn.Result> => {
 	const cues: Array<readGameAudioCuesFn.Result> = [];
 	const indexByKind = new Map<readGameAudioCuesFn.Kind, number>();
 
 	for (const event of events) {
-		const next = readGameAudioCue(event);
+		const next = readGameAudioCueFn(event);
 		const existingIndex = indexByKind.get(next.kind);
 		if (existingIndex === undefined) {
 			indexByKind.set(next.kind, cues.length);
@@ -163,7 +165,7 @@ const coalesceCues = (
 		if (existing === undefined) continue;
 		cues[existingIndex] = {
 			...existing,
-			strength: clampStrength(Math.max(existing.strength, next.strength) + 0.25),
+			strength: clampStrengthFn(Math.max(existing.strength, next.strength) + 0.25),
 		};
 	}
 
@@ -174,7 +176,7 @@ const coalesceCues = (
 export const readGameAudioCuesFn = (
 	batch: GameEventBatchSchema.Type,
 ): ReadonlyArray<readGameAudioCuesFn.Result> => {
-	const cues = coalesceCues(batch.events);
+	const cues = coalesceCuesFn(batch.events);
 	if (cues.length <= maximumBatchCues) return cues;
 
 	const ranked = cues

@@ -10,14 +10,14 @@ import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
-const readOutputDrops = (output: OutputSchema.Type | undefined) =>
+const readOutputDropsFn = (output: OutputSchema.Type | undefined) =>
 	output?.set.flatMap((set) =>
 		set.roll.flatMap((roll) =>
 			roll.type === "weight" ? roll.drop.flatMap((candidate) => candidate.drop) : roll.drop,
 		),
 	) ?? [];
 
-const requiresAbsentFact = (when: WhenSchema.Type) => {
+const requiresAbsentFactFn = (when: WhenSchema.Type) => {
 	switch (when.type) {
 		case "exists":
 			return true;
@@ -43,7 +43,7 @@ const readLimitationsFn = (config: GameConfigSchema.Type) => {
 		for (const line of readAuthoredItemLinesFn(item)) {
 			if (
 				line.rules.some(
-					(rule) => rule.type === "disable" && rule.when.some(requiresAbsentFact),
+					(rule) => rule.type === "disable" && rule.when.some(requiresAbsentFactFn),
 				)
 			)
 				limitations.add("negative-availability-constraints-ignored");
@@ -61,10 +61,11 @@ const readLimitationsFn = (config: GameConfigSchema.Type) => {
 		}
 		if (
 			readItemOutputsFn(item).some((output) =>
-				readOutputDrops(output).some(({ rules }) => {
+				readOutputDropsFn(output).some(({ rules }) => {
 					if (
 						rules.some(
-							(rule) => rule.type === "disable" && rule.when.some(requiresAbsentFact),
+							(rule) =>
+								rule.type === "disable" && rule.when.some(requiresAbsentFactFn),
 						)
 					)
 						limitations.add("negative-availability-constraints-ignored");
@@ -79,19 +80,23 @@ const readLimitationsFn = (config: GameConfigSchema.Type) => {
 	].sort(Order.String);
 };
 
-const readStartQuantityByItemId = (config: GameConfigSchema.Type) => {
+const addStartQuantityFn = (quantities: Map<string, number>, itemId: string, quantity = 1) =>
+	quantities.set(itemId, (quantities.get(itemId) ?? 0) + quantity);
+
+const readStartQuantityByItemIdFn = (config: GameConfigSchema.Type) => {
 	const quantities = new Map<string, number>();
-	const add = (itemId: string, quantity = 1) =>
-		quantities.set(itemId, (quantities.get(itemId) ?? 0) + quantity);
-	for (const item of config.start.board) add(item.itemId, item.quantity);
-	for (const item of config.start.inventory) add(item.itemId, item.quantity);
-	for (const item of config.start.toolbar) add(item.itemId, item.quantity);
+	for (const item of config.start.board)
+		addStartQuantityFn(quantities, item.itemId, item.quantity);
+	for (const item of config.start.inventory)
+		addStartQuantityFn(quantities, item.itemId, item.quantity);
+	for (const item of config.start.toolbar)
+		addStartQuantityFn(quantities, item.itemId, item.quantity);
 	return quantities;
 };
 
 /** Compiles authored starting quantities and static-analysis limitations. */
 export const compileEditorAcquisitionRootsFn = (config: GameConfigSchema.Type) => {
-	const start = readStartQuantityByItemId(config);
+	const start = readStartQuantityByItemIdFn(config);
 	return {
 		limitations: readLimitationsFn(config),
 		roots: [

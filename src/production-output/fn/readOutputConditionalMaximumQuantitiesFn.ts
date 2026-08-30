@@ -7,7 +7,7 @@ import type { OutputSchema } from "../schema/OutputSchema";
 import { readDropMaximumQuantitiesFn } from "./readDropMaximumQuantitiesFn";
 import { readRollMaximumQuantitiesFn } from "~/production-output/roll/fn/readRollMaximumQuantitiesFn";
 
-const addQuantities = (
+const addQuantitiesFn = (
 	target: Map<IdSchema.Type, number>,
 	source: ReadonlyMap<IdSchema.Type, number>,
 ) => {
@@ -16,7 +16,7 @@ const addQuantities = (
 	}
 };
 
-const maximizeQuantities = (
+const maximizeQuantitiesFn = (
 	target: Map<IdSchema.Type, number>,
 	source: ReadonlyMap<IdSchema.Type, number>,
 ) => {
@@ -66,7 +66,7 @@ const readRollConditionalMaximumQuantitiesFn = ({
 
 				const perSelectionMaximum = new Map<IdSchema.Type, number>();
 				for (const candidate of candidates) {
-					maximizeQuantities(perSelectionMaximum, candidate);
+					maximizeQuantitiesFn(perSelectionMaximum, candidate);
 				}
 				const conditional = new Map<IdSchema.Type, number>();
 				for (const requiredCandidate of required) {
@@ -77,7 +77,7 @@ const readRollConditionalMaximumQuantitiesFn = ({
 							(branch.get(itemId) ?? 0) + quantity * (selectionCount - 1),
 						);
 					}
-					maximizeQuantities(conditional, branch);
+					maximizeQuantitiesFn(conditional, branch);
 				}
 				return conditional;
 			},
@@ -116,9 +116,9 @@ export const readOutputConditionalMaximumQuantitiesFn = ({
 			if (provider === undefined) continue;
 			const branch = new Map(provider);
 			for (const [rollIndex, quantities] of unconditional.entries()) {
-				if (rollIndex !== providerIndex) addQuantities(branch, quantities);
+				if (rollIndex !== providerIndex) addQuantitiesFn(branch, quantities);
 			}
-			maximizeQuantities(outputMaximum, branch);
+			maximizeQuantitiesFn(outputMaximum, branch);
 		}
 	}
 

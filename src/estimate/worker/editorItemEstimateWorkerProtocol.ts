@@ -1,5 +1,5 @@
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import type { EditorItemEstimate } from "~/estimate/domain/EditorItemEstimate";
+import type { EditorItemEstimate } from "~/estimate/type/EditorItemEstimate";
 
 export interface EditorItemEstimateWorkerRequest {
 	readonly config: EditorProject["config"];

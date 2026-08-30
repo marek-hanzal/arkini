@@ -6,7 +6,7 @@ import { ChatGptAssetCandidateSchema } from "../../../electron/contract/chatgpt/
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
-import { readEditorAssetResourceIdFn } from "~/asset-authoring/domain/fn/readEditorAssetResourceIdFn";
+import { readEditorAssetResourceIdFn } from "~/asset-authoring/fn/readEditorAssetResourceIdFn";
 import { saveEditorAssetFx } from "~/asset-authoring/session/saveEditorAssetFx";
 import { validateEditorAssetFileFx } from "~/asset-authoring/validation/validateEditorAssetFileFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
@@ -31,24 +31,22 @@ interface SaveEditorAssetCommandProps {
 	readonly resourceId: string;
 }
 
-export namespace useEditorChatGptController {
-	export interface Output {
-		readonly candidate?: AssetCandidate;
-		readonly candidateError?: unknown;
-		readonly candidateValidating: boolean;
-		readonly collision: boolean;
-		readonly discard: () => void;
-		readonly error?: unknown;
-		readonly previewUrl?: string;
-		readonly replacementApproved: boolean;
-		readonly resourceId: string;
-		readonly retry: () => void;
-		readonly save: () => Promise<boolean>;
-		readonly saving: boolean;
-		readonly setResourceId: (resourceId: string) => void;
-		readonly surfaceRef: RefObject<HTMLDivElement | null>;
-		readonly viewState: useEditorChatGptSurface.Output["viewState"];
-	}
+interface UseEditorChatGptControllerOutput {
+	readonly candidate?: AssetCandidate;
+	readonly candidateError?: unknown;
+	readonly candidateValidating: boolean;
+	readonly collision: boolean;
+	readonly discard: () => void;
+	readonly error?: unknown;
+	readonly previewUrl?: string;
+	readonly replacementApproved: boolean;
+	readonly resourceId: string;
+	readonly retry: () => void;
+	readonly save: () => Promise<boolean>;
+	readonly saving: boolean;
+	readonly setResourceId: (resourceId: string) => void;
+	readonly surfaceRef: RefObject<HTMLDivElement | null>;
+	readonly viewState: ReturnType<typeof useEditorChatGptSurface>["viewState"];
 }
 
 const toFileFn = (filename: string, bytes: Uint8Array) =>
@@ -85,7 +83,7 @@ const saveEditorAssetCommandAtom = RendererRuntime.runSync(
 );
 
 /** Owns the declarative native surface and one explicit downloaded-asset decision. */
-export const useEditorChatGptController = (): useEditorChatGptController.Output => {
+export const useEditorChatGptController = (): UseEditorChatGptControllerOutput => {
 	const project = useEditorProject();
 	const [candidate, setCandidate] = useState<AssetCandidate>();
 	const candidateRef = useRef(candidate);

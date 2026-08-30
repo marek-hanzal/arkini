@@ -4,7 +4,7 @@ import {
 	PngResourceLimits,
 	validatePngResourceFx,
 } from "~/renderer/resource/validatePngResourceFx";
-import { readEditorAssetResourceIdFn } from "~/asset-authoring/domain/fn/readEditorAssetResourceIdFn";
+import { readEditorAssetResourceIdFn } from "~/asset-authoring/fn/readEditorAssetResourceIdFn";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
 

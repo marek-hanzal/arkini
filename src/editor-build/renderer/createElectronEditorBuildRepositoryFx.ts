@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 
-import type { EditorBuildRepositoryService } from "~/editor-build/domain/EditorBuildRepository";
+import type { EditorBuildRepositoryService } from "~/editor-build/service/EditorBuildRepository";
 import {
 	EditorProjectBuildContentSchema,
 	EditorProjectBuildSchema,
-} from "~/editor-build/domain/EditorProjectBuildSchema";
+} from "~/editor-build/schema/EditorProjectBuildSchema";
 import { admitEditorProjectWriteFx } from "~/project-authoring/service/EditorProjectWriteAdmission";
 import { invokeEditorProjectTransportFx } from "~/project-authoring/fx/invokeEditorProjectTransportFx";
 

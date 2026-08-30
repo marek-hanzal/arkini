@@ -1,6 +1,6 @@
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
+import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 

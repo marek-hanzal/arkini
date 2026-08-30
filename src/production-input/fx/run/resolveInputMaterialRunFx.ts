@@ -5,7 +5,7 @@ import { resolveInputMaterialFn } from "~/production-input/fn/resolveInputMateri
 import type { InputRun } from "~/production-input/type/InputRun";
 import type { MaterialSchema } from "~/production-input/schema/MaterialSchema";
 import type { InputRuntimeItemSchema } from "~/game-runtime/schema/InputRuntimeItemSchema";
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace resolveInputMaterialRunFx {

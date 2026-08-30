@@ -1,6 +1,6 @@
 import { Data } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 
 /** One product line cannot currently start from the locked runtime snapshot. */
 export class LineRunUnavailableError extends Data.TaggedError("LineRunUnavailableError")<{

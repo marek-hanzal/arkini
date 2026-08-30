@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
-import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
 
 /** Multiple active jobs share one stable identity. */
 export const DuplicateJobIdIssueSchema = z

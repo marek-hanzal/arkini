@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
-import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { TimeSchema } from "~/engine/common/schema/TimeSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
+import { TimeSchema } from "~/game-config/schema/TimeSchema";
 export const JobTimeInvalidIssueSchema = z
 	.object({
 		type: RuntimeCheckIssueEnumSchema.extract([

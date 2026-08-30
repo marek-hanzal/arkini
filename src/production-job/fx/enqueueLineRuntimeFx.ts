@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 import { JobQueueFullError } from "~/production-job/error/JobQueueFullError";
 import { assertLineEnqueueConditionsFx } from "~/production-job/fx/assertLineEnqueueConditionsFx";
 import { createJobIdFx } from "~/production-job/fx/createJobIdFx";

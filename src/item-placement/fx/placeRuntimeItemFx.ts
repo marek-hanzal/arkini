@@ -2,7 +2,7 @@ import { Effect, Option } from "effect";
 import { match } from "ts-pattern";
 
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";

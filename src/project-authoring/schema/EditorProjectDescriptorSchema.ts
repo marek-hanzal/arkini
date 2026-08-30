@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 
 /** Stable repository-backed identity used by editor discovery and navigation. */

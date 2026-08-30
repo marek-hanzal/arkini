@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { MetaSchema } from "~/game-config/schema/MetaSchema";
 import { StartSchema } from "~/game-start/schema/StartSchema";

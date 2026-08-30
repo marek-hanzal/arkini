@@ -1,4 +1,4 @@
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";

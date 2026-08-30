@@ -1,6 +1,6 @@
 import { Array, Effect, Option, pipe } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { ItemNotFoundError } from "~/engine/item/error/ItemNotFoundError";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";

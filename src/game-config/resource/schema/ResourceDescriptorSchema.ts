@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { NonEmptyStringSchema } from "~/engine/common/schema/NonEmptyStringSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
+import { NonEmptyStringSchema } from "~/game-config/schema/NonEmptyStringSchema";
 
 export const ResourceDescriptorSchema = z
 	.object({

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { CheatStateSchema } from "~/game-runtime/schema/CheatStateSchema";
-import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+import { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
 import { JobQueueRequestSchema } from "~/production-job/schema/JobQueueRequestSchema";
 import { JobSchema } from "~/production-job/schema/JobSchema";
 import { DefaultLineByOwnerItemIdSchema } from "~/production-line/schema/DefaultLineByOwnerItemIdSchema";

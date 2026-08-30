@@ -1,6 +1,6 @@
 import { Data } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { LocationSchema } from "~/item-location/schema/LocationSchema";
 
 /** A board-spatial operation targeted an item outside the board. */

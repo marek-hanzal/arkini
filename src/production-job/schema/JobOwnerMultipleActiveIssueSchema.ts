@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
-import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
 
 /** One owner has more than one active runtime job. */
 export const JobOwnerMultipleActiveIssueSchema = z

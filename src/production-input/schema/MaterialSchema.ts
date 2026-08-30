@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+import { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
 import { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 import { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 

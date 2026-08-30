@@ -1,6 +1,6 @@
 import { Array, Data, Effect, Option, pipe } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { ItemNotFoundError } from "~/engine/item/error/ItemNotFoundError";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";

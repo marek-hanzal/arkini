@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
+import type { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
 import { InputMaterialNotFoundError } from "~/production-input/error/InputMaterialNotFoundError";
 import type { MaterialSchema } from "~/production-input/schema/MaterialSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";

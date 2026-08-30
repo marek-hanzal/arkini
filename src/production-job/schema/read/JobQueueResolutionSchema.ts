@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+import { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 import { JobQueueRequestSchema } from "~/production-job/schema/JobQueueRequestSchema";
 import { JobSchema } from "~/production-job/schema/JobSchema";
 export const JobQueueResolutionSchema = z

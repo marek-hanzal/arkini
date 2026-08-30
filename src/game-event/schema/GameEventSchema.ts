@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
+import { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
+import { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchema";
 import { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { InputLocationSchema } from "~/item-location/schema/InputLocationSchema";

@@ -1,6 +1,6 @@
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { ItemDetailReference } from "~/item-detail-frame/fx/projectItemDetailReferenceFx";
-import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+import type { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
 import type { DistanceSchema } from "~/item-location/schema/DistanceSchema";
 import type { ChargeSourceSchema } from "~/production-input/schema/ChargeSourceSchema";
 import type { ModeSchema } from "~/production-input/schema/ModeSchema";

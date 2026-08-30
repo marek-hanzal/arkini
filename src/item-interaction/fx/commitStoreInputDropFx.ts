@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";

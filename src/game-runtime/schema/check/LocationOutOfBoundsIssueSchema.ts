@@ -2,8 +2,8 @@ import { z } from "zod";
 
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
-import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
+import { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
 import { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 
 const GridBoundsSchema = z

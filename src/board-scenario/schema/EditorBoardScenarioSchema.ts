@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { TitleSchema } from "~/engine/common/schema/TitleSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
+import { TitleSchema } from "~/game-config/schema/TitleSchema";
 import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
 
 export const EditorBoardScenarioNameSchema = TitleSchema.max(80);

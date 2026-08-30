@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { readItemDetailSourcesFx } from "~/item-detail-read/fx/readItemDetailSourcesFx";
 import { isMaterialInputEligibleFn } from "~/production-input/read/fn/isMaterialInputEligibleFn";

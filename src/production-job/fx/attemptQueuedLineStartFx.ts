@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { ItemChargesUnavailableError } from "~/engine/item/error/ItemChargesUnavailableError";
 import type { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
 import type { OutputCapacityError } from "~/production-job/error/OutputCapacityError";

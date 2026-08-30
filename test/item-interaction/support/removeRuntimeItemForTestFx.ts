@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 import { removeItemRuntimeTransitionFx } from "~/item-interaction/fx/removeItemRuntimeTransitionFx";

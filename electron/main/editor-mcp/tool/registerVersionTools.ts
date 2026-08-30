@@ -14,7 +14,7 @@ import {
 	EditorProjectVersionSubjectSchema,
 	EditorProjectVersionTagSchema,
 } from "~/project-version/schema/EditorProjectVersionMetadataSchema";
-import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
 
 type ToolResult = {
 	readonly isError?: boolean;

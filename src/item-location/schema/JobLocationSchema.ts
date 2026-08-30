@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { IdSchema } from "~/game-config/schema/IdSchema";
 
 import { LocationScopeEnumSchema } from "./LocationScopeEnumSchema";
 /** One consumed material root committed to an active product-line job. */

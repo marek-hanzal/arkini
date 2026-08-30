@@ -2,7 +2,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { Effect } from "effect";
 
 import { makeExactGameAtomFamilyFx } from "~/ui/game/makeExactGameAtomFamilyFx";
-import { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { releaseInventoryItemFx } from "~/item-interaction/write/releaseInventoryItemFx";
 
 export namespace runInventoryReleaseAtom {

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
-import { RendererAtomRuntime } from "~/application-runtime/RendererAtomRegistry";
+import { RendererAtomRuntime } from "~/application-runtime/atom/RendererAtomRegistry";
 import { LauncherStartupConfigAtom } from "~/ui/launcher/LauncherStartupConfigAtom";
 import { prepareLauncherHeroFx } from "~/ui/launcher/prepareLauncherHeroFx";
 

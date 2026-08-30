@@ -51,7 +51,7 @@ vi.mock("~/project-authoring/repository/EditorProjectRepository", async () => {
 	};
 });
 
-vi.mock("~/application-runtime/RendererRuntime", async () => {
+vi.mock("~/application-runtime/service/RendererRuntime", async () => {
 	const { Effect } = await import("effect");
 	return {
 		RendererRuntime: {

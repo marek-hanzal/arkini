@@ -3,11 +3,9 @@ import { Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { createRendererLifecycleFx } from "~/application-runtime/lifecycle/createRendererLifecycleFx";
-import {
-	readRendererLifecycleFx,
-	RendererLifecycleOwnerAtom,
-} from "~/application-runtime/lifecycle/readRendererLifecycleFx";
+import { createRendererLifecycleFx } from "~/application-runtime/fx/createRendererLifecycleFx";
+import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
+import { readRendererLifecycleFx } from "~/application-runtime/fx/readRendererLifecycleFx";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
 

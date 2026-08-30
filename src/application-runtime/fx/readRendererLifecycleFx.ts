@@ -1,11 +1,6 @@
 import { Data, Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
-import type { RendererLifecycle } from "~/application-runtime/lifecycle/createRendererLifecycleFx";
-
-/** The renderer process owns exactly one composed Electron lifecycle capability. */
-export const RendererLifecycleOwnerAtom = Atom.make<RendererLifecycle | undefined>(undefined).pipe(
-	Atom.keepAlive,
-);
+import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
 
 /** Signals that renderer lifecycle composition did not run before a consumer started. */
 export class RendererLifecycleUnavailableError extends Data.TaggedError(

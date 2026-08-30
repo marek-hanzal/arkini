@@ -8,7 +8,7 @@ import { match, P } from "ts-pattern";
 
 import { importEditorAssetsFx } from "~/asset-authoring/session/importEditorAssetsFx";
 import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
-import { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorAssetLibrary } from "~/asset-authoring/ui/useEditorAssetLibrary";
 

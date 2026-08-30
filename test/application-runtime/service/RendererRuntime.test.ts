@@ -2,8 +2,8 @@ import { Effect, SubscriptionRef } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { afterAll, describe, expect, it } from "vitest";
 
-import { RendererAtomRegistry } from "~/application-runtime/RendererAtomRegistry";
-import { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import { RendererAtomRegistry } from "~/application-runtime/atom/RendererAtomRegistry";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { EditorUnsavedChangesOwnerAtom } from "~/authoring-session/EditorUnsavedChangesOwnerAtom";
 import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/session/EditorBoardGameResourceOwnerAtom";
 

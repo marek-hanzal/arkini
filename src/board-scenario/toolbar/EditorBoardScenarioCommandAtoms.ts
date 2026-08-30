@@ -4,7 +4,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
 import { restoreEditorBoardScenarioFx } from "~/board-scenario/session/restoreEditorBoardScenarioFx";
 import { saveEditorBoardScenarioFx } from "~/board-scenario/session/saveEditorBoardScenarioFx";
-import { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 
 export const EditorBoardScenarioCommandAtoms = RendererRuntime.runSync(
 	Effect.map(EditorProjectRepository, (repository) => ({

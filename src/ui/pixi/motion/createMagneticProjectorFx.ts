@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { RendererRuntime } from "~/application-runtime/RendererRuntime";
+import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { PresentedPose } from "~/ui/pixi/animation/ActorAnimator";
 import type { MagneticField } from "~/ui/pixi/magnet/MagneticField";

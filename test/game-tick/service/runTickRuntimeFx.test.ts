@@ -10,7 +10,6 @@ import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransiti
 import { removeRuntimeItemForTestFx } from "~test/support/item-interaction/removeRuntimeItemForTestFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { TickFx } from "~/game-tick/service/TickFx";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
@@ -96,6 +95,33 @@ const createLiveRuleConfig = () => {
 };
 
 describe("TickFx elapsed budget", () => {
+	it("accumulates wall time until the exact fixed-step boundary", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* prepareJobLineFx();
+				yield* startLineFx(props);
+				yield* runTickRuntimeByFx({
+					elapsedMs: 99,
+				});
+				const beforeBoundary = yield* readRuntimeFx();
+				yield* runTickRuntimeByFx({
+					elapsedMs: 1,
+				});
+				return {
+					atBoundary: yield* readRuntimeFx(),
+					beforeBoundary,
+				};
+			}).pipe(
+				useGameFx({
+					config: createJobTestConfig(),
+				}),
+			),
+		);
+
+		expect(result.beforeBoundary.jobs[0]?.remainingMs).toBe(1_000);
+		expect(result.atBoundary.jobs[0]?.remainingMs).toBe(900);
+	});
+
 	it("does not commit stable idle ticks and advances again after an external command", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -155,7 +181,6 @@ describe("TickFx elapsed budget", () => {
 					afterFirst,
 					afterSecond,
 					afterRemainder: yield* readRuntimeFx(),
-					state: yield* (yield* TickFx).read,
 				};
 			}).pipe(
 				useGameFx({
@@ -167,7 +192,6 @@ describe("TickFx elapsed budget", () => {
 		expect(result.afterFirst.jobs[0]?.remainingMs).toBe(500);
 		expect(result.afterSecond).toEqual(result.afterFirst);
 		expect(result.afterRemainder.jobs[0]?.remainingMs).toBe(400);
-		expect(result.state.pendingElapsedMs).toBe(0);
 	});
 
 	it("serializes concurrent elapsed impulses without losing time", async () => {
@@ -188,10 +212,7 @@ describe("TickFx elapsed budget", () => {
 						concurrency: "unbounded",
 					},
 				);
-				return {
-					runtime: yield* readRuntimeFx(),
-					state: yield* (yield* TickFx).read,
-				};
+				return yield* readRuntimeFx();
 			}).pipe(
 				useGameFx({
 					config: createJobTestConfig(),
@@ -199,8 +220,7 @@ describe("TickFx elapsed budget", () => {
 			),
 		);
 
-		expect(result.runtime.jobs[0]?.remainingMs).toBe(500);
-		expect(result.state.pendingElapsedMs).toBe(0);
+		expect(result.jobs[0]?.remainingMs).toBe(500);
 	});
 });
 

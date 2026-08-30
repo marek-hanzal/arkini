@@ -39,11 +39,6 @@ describe("GameLoopLayerFx", () => {
 					advanceRuntime: Deferred.succeed(advanceStarted, undefined).pipe(
 						Effect.andThen(Deferred.await(releaseAdvance)),
 					),
-					advanceRuntimeBy: () => Effect.void,
-					read: Effect.succeed({
-						observedAtMs: 0,
-						pendingElapsedMs: 0,
-					}),
 				}),
 				Effect.provide(
 					GameRuntimeLayerFx({

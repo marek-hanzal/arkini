@@ -4,11 +4,11 @@ import { useGameEngine } from "~/ui/game/useGameEngine";
 import { usePackageGameEngine } from "~/ui/game/usePackageGameEngine";
 import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
-import { ItemDetailHigherOwnerGuard } from "~/item-detail-frame/ItemDetailHigherOwnerGuard";
-import type { ItemDetailHeaderIdentityRenderer } from "~/item-detail-frame/ItemDetailHeader";
+import { ItemDetailHigherOwnerGuard } from "~/item-detail-frame/ui/ItemDetailHigherOwnerGuard";
+import type { ItemDetailHeaderIdentityRenderer } from "~/item-detail-frame/ui/ItemDetailHeader";
 import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
-import { ItemDetailProvider } from "~/item-detail-frame/ItemDetailProvider";
+import { ItemDetailProvider } from "~/item-detail-frame/ui/ItemDetailProvider";
 import { RouteBackdrop } from "~/ui/navigation/RouteBackdrop";
 import { PixiGameProvider } from "~/ui/pixi/PixiGameProvider";
 

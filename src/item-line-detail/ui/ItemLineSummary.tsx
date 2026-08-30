@@ -2,10 +2,13 @@ import { AnimatePresence, motion } from "motion/react";
 import type { ComponentType, ReactNode } from "react";
 
 import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
-import type { ItemDetailLines } from "~/item-line-detail/ui/ItemDetailLines";
-import { itemDetailBadgeMotion, itemDetailFadeMotion } from "~/item-detail-frame/ItemDetailMotion";
+import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
+import {
+	itemDetailBadgeMotion,
+	itemDetailFadeMotion,
+} from "~/item-detail-frame/ui/ItemDetailMotion";
 
-export interface ItemLineSummaryIdentityRenderProps {
+interface ItemLineSummaryIdentityRenderProps {
 	readonly children: ReactNode;
 	readonly disabled: boolean;
 	readonly itemId: string;
@@ -24,7 +27,7 @@ export const ItemLineSummary = ({
 }: {
 	readonly disabled?: boolean;
 	readonly itemId?: string;
-	readonly line: ItemDetailLines.Line;
+	readonly line: ItemDetailLinesProjection.Line;
 	readonly renderIdentity?: ItemLineSummaryIdentityRenderer;
 	readonly stale?: boolean;
 }) => {

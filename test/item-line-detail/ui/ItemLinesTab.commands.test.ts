@@ -9,7 +9,7 @@ import {
 	projection,
 	renderLines,
 	selectAllLines,
-} from "./ItemLinesTab.commands.test/fixture";
+} from "../support/ItemLinesTabFixture";
 
 describe("ItemLinesTab command boundary", () => {
 	it("wires save-backed default set and unset to the exact owner and line", async () => {

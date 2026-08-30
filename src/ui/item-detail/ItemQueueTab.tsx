@@ -9,12 +9,11 @@ import {
 	itemDetailBadgeMotion,
 	itemDetailFadeMotion,
 	itemDetailMotionTransition,
-} from "~/item-detail-frame/ItemDetailMotion";
+} from "~/item-detail-frame/ui/ItemDetailMotion";
 import { ProductionJobRuntime } from "~/production-job/ui/ProductionJobRuntime";
 import { readActiveJobRuntimeFn } from "~/production-job/ui/readActiveJobRuntimeFn";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
-import { useItemDetailControl } from "~/item-detail-frame/useItemDetailControl";
-import { useItemDetailPendingCommand } from "~/item-detail-frame/useItemDetailPendingCommand";
+import { useItemDetailPendingCommand } from "~/item-detail-frame/ui/useItemDetailPendingCommand";
 
 const statusLabel = {
 	"awaiting-output": "Awaiting output",
@@ -240,7 +239,6 @@ export const ItemQueueTab = ({
 	readonly disabled?: boolean;
 	readonly queue: QueueProjection;
 }) => {
-	const itemDetail = useItemDetailControl();
 	const pendingKey = JSON.stringify([
 		"queue",
 		queue.itemId,
@@ -249,7 +247,6 @@ export const ItemQueueTab = ({
 		action: "clear-queue",
 		failureMessage: "Queue could not be cleared.",
 		pendingKey,
-		pendingOwner: itemDetail,
 		run: (game, command: clearItemJobQueueFx.Props) => game.runFx(clearItemJobQueueFx(command)),
 	});
 	const pending = clearQueue.pending;

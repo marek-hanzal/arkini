@@ -5,8 +5,8 @@ import type { RuleSchema as ActionRuleSchema } from "~/production-action/schema/
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { useEditorItemFormSession } from "~/item-authoring/ui/EditorItemFormContext";
-import { EditorLineInputsControl } from "~/item-authoring/ui/EditorLineInputsControl";
-import { EditorRulesControl } from "~/item-authoring/ui/EditorRulesControl";
+import { EditorLineInputsControl } from "~/production-line-authoring/ui/EditorLineInputsControl";
+import { EditorRulesControl } from "~/production-line-authoring/ui/EditorRulesControl";
 
 /** Authors one immediate Space action through the shared input and availability controls. */
 export const EditorSpaceActionSection = () => {

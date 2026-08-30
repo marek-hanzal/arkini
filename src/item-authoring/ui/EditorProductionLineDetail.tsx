@@ -1,11 +1,90 @@
 import { ArrowUpRight, ChevronRight } from "lucide-react";
+import type { ReactNode } from "react";
 
+import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
+import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
+import { ItemLineOutputs } from "~/item-line-detail/ui/ItemLineOutputs";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
+import type { DropSchema } from "~/production-output/schema/DropSchema";
+import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
-import { EditorProductionLineEditLink } from "~/item-authoring/ui/EditorProductionLineEditLink";
+import { EditorProductionLineEditLink } from "~/production-line-authoring/ui/EditorProductionLineEditLink";
+import { EditorItemDetailReference } from "~/item-authoring/ui/EditorItemDetailReference";
 import { EditorProductionLineInputs } from "~/item-authoring/ui/EditorProductionLineInputs";
-import { EditorProductionLineOutputs } from "~/item-authoring/ui/EditorProductionLineOutputs";
+
+type EditorItemRegistry = Record<string, ItemSchema.Type>;
+
+const projectDrop = (
+	drop: DropSchema.Type,
+	items: EditorItemRegistry,
+): ItemDetailLinesProjection.OutputItem => ({
+	itemId: drop.itemId,
+	quantity: drop.quantity,
+	title: items[drop.itemId]?.title ?? drop.itemId,
+	activeRuleHints: [],
+});
+
+const projectOutput = (
+	output: OutputSchema.Type | undefined,
+	items: EditorItemRegistry,
+): readonly ItemDetailLinesProjection.OutputSet[] =>
+	output?.set.map((set) => ({
+		roll: set.roll.map((roll): ItemDetailLinesProjection.OutputRoll => {
+			if (roll.type === "weight")
+				return {
+					kind: "weight",
+					option: roll.drop.map((option) => ({
+						item: option.drop.map((drop) => projectDrop(drop, items)),
+						weight: option.weight,
+					})),
+					selections: roll.quantity,
+				};
+			return roll.type === "guaranteed"
+				? {
+						item: roll.drop.map((drop) => projectDrop(drop, items)),
+						kind: "guaranteed",
+					}
+				: {
+						chance: roll.chance,
+						item: roll.drop.map((drop) => projectDrop(drop, items)),
+						kind: "chance",
+					};
+		}),
+		weight: set.weight,
+	})) ?? [];
+
+const renderOutputItem = (
+	item: ItemDetailLinesProjection.OutputItem,
+	items: EditorItemRegistry,
+	projectId: string,
+): ReactNode => {
+	const definition = items[item.itemId];
+	return definition === undefined ? (
+		<span className="truncate font-medium text-foreground">{item.title}</span>
+	) : (
+		<EditorItemDetailReference
+			item={definition}
+			projectId={projectId}
+		/>
+	);
+};
+
+const EditorProductionLineOutputs = ({
+	items,
+	output,
+	projectId,
+}: {
+	readonly items: EditorItemRegistry;
+	readonly output: OutputSchema.Type | undefined;
+	readonly projectId: string;
+}) => (
+	<ItemLineOutputs
+		disabled={false}
+		output={projectOutput(output, items)}
+		renderItem={(item) => renderOutputItem(item, items, projectId)}
+	/>
+);
 
 const EditorLineRuntime = ({ runtimeMs }: { readonly runtimeMs: number }) => (
 	<div className="grid min-w-32 grid-rows-[1rem_1.5rem_1rem] text-right">

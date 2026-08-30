@@ -5,7 +5,7 @@ import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
 import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { useEditorItemFormSession } from "~/item-authoring/ui/EditorItemFormContext";
-import { EditorOptionalOutputControl } from "~/item-authoring/ui/EditorOptionalOutputControl";
+import { EditorOptionalOutputControl } from "~/production-line-authoring/ui/EditorOptionalOutputControl";
 import { Tooltip } from "~/ui/overlay/Tooltip";
 
 export const EditorItemChargesSection = () => {

@@ -4,7 +4,7 @@ import type {
 	EditorAcquisitionGraph,
 	EditorAcquisitionRequirement,
 	EditorAcquisitionRoute,
-} from "~/flow/domain/EditorAcquisitionGraph";
+} from "~/flow/type/EditorAcquisitionGraph";
 import type {
 	EditorItemEstimate,
 	EditorItemEstimateAmount,

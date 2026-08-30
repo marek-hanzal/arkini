@@ -1,6 +1,6 @@
 import { Order } from "effect";
 
-import { createEditorAcquisitionGraphFn } from "~/flow/domain/fn/createEditorAcquisitionGraphFn";
+import { createEditorAcquisitionGraphFn } from "~/flow/fn/createEditorAcquisitionGraphFn";
 import { estimateEditorItemsFn } from "~/estimate/domain/fn/estimateEditorItemsFn";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 

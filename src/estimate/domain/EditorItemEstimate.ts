@@ -3,7 +3,7 @@ import type {
 	EditorAcquisitionRequirement,
 	EditorAcquisitionRequirementUsage,
 	EditorAcquisitionRouteMetadata,
-} from "~/flow/domain/EditorAcquisitionGraph";
+} from "~/flow/type/EditorAcquisitionGraph";
 
 export interface EditorItemEstimateAmount {
 	readonly factId: string;

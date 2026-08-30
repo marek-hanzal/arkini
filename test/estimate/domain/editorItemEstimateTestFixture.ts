@@ -2,7 +2,7 @@ import type {
 	EditorAcquisitionGraph,
 	EditorAcquisitionRequirement,
 	EditorAcquisitionRoute,
-} from "~/flow/domain/EditorAcquisitionGraph";
+} from "~/flow/type/EditorAcquisitionGraph";
 import { estimateEditorItemsFn } from "~/estimate/domain/fn/estimateEditorItemsFn";
 
 const requirement = (

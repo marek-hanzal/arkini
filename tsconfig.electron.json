@@ -58,7 +58,8 @@
 		"src/project-version/type",
 		"src/project-note/schema",
 		"src/item-authoring/domain",
-		"src/flow/domain",
+		"src/flow/fn",
+		"src/flow/type",
 		"src/estimate/domain",
 		"electron.vite.config.ts"
 	],

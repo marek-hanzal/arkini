@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { EditorAcquisitionRequirement } from "~/flow/domain/EditorAcquisitionGraph";
+import type { EditorAcquisitionRequirement } from "~/flow/type/EditorAcquisitionGraph";
 import { editorItemEstimateTestFixture } from "~test/estimate/domain/editorItemEstimateTestFixture";
 
 const { estimate, graph, requirement, route } = editorItemEstimateTestFixture;

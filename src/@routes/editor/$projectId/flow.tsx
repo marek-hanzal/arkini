@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
-import { EditorGameFlow } from "~/flow/ui/EditorGameFlow";
-import type { OriginFlowDirection } from "~/flow/ui/Highlight";
+import { EditorGameFlow } from "~/flow-canvas/ui/EditorGameFlow";
+import type { OriginFlowDirection } from "~/flow-canvas/type/Highlight";
 
 interface EditorFlowRouteSearch {
 	readonly direction: OriginFlowDirection;

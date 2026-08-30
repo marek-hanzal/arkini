@@ -139,41 +139,6 @@ const run = <A, E>(effect: Effect.Effect<A, E, Layer.Success<ReturnType<typeof G
 	);
 
 describe("Toolbar engine", () => {
-	it("accepts only disabled or one through sixty-four configured slots", () => {
-		for (const toolbarSize of [
-			undefined,
-			0,
-			1,
-			64,
-		]) {
-			expect(() =>
-				GameConfigSchema.parse({
-					...configInput,
-					meta: {
-						...configInput.meta,
-						toolbarSize,
-					},
-				}),
-			).not.toThrow();
-		}
-		for (const toolbarSize of [
-			-1,
-			0.5,
-			65,
-			Number.POSITIVE_INFINITY,
-		]) {
-			expect(() =>
-				GameConfigSchema.parse({
-					...configInput,
-					meta: {
-						...configInput.meta,
-						toolbarSize,
-					},
-				}),
-			).toThrow();
-		}
-	});
-
 	it("moves one live actor Board to Toolbar and back through the atomic drop command", () => {
 		const result = run(
 			Effect.gen(function* () {

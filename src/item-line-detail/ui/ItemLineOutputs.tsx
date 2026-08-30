@@ -2,8 +2,8 @@ import { Info } from "lucide-react";
 import { match } from "ts-pattern";
 import type { ReactNode } from "react";
 
-import type { ItemDetailLines } from "~/item-line-detail/ui/ItemDetailLines";
-import { ItemReferenceButton } from "~/item-detail-frame/ItemReferenceButton";
+import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
+import { ItemReferenceButton } from "~/item-detail-frame/ui/ItemReferenceButton";
 
 const ItemLineOutputItem = ({
 	disabled,
@@ -11,8 +11,8 @@ const ItemLineOutputItem = ({
 	renderItem,
 }: {
 	readonly disabled: boolean;
-	readonly item: ItemDetailLines.OutputItem;
-	readonly renderItem?: (item: ItemDetailLines.OutputItem) => ReactNode;
+	readonly item: ItemDetailLinesProjection.OutputItem;
+	readonly renderItem?: (item: ItemDetailLinesProjection.OutputItem) => ReactNode;
 }) => (
 	<div
 		className="grid gap-1.5"
@@ -62,8 +62,8 @@ const ItemLineOutputItems = ({
 	renderItem,
 }: {
 	readonly disabled: boolean;
-	readonly items: readonly ItemDetailLines.OutputItem[];
-	readonly renderItem?: (item: ItemDetailLines.OutputItem) => ReactNode;
+	readonly items: readonly ItemDetailLinesProjection.OutputItem[];
+	readonly renderItem?: (item: ItemDetailLinesProjection.OutputItem) => ReactNode;
 }) => (
 	<div className="space-y-1.5">
 		{items.map((item) => (
@@ -83,8 +83,8 @@ const ItemLineOutputRoll = ({
 	renderItem,
 }: {
 	readonly disabled: boolean;
-	readonly roll: ItemDetailLines.OutputRoll;
-	readonly renderItem?: (item: ItemDetailLines.OutputItem) => ReactNode;
+	readonly roll: ItemDetailLinesProjection.OutputRoll;
+	readonly renderItem?: (item: ItemDetailLinesProjection.OutputItem) => ReactNode;
 }) =>
 	match(roll)
 		.with(
@@ -170,8 +170,8 @@ export const ItemLineOutputs = ({
 	renderItem,
 }: {
 	readonly disabled: boolean;
-	readonly output: readonly ItemDetailLines.OutputSet[];
-	readonly renderItem?: (item: ItemDetailLines.OutputItem) => ReactNode;
+	readonly output: readonly ItemDetailLinesProjection.OutputSet[];
+	readonly renderItem?: (item: ItemDetailLinesProjection.OutputItem) => ReactNode;
 }) => (
 	<section className="min-w-0">
 		<h4 className="border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">

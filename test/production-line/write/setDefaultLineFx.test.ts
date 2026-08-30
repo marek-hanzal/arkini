@@ -2,7 +2,7 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/game/useGameFx";
-import { readItemDetailLinesFx } from "~/item-line-detail/read/readItemDetailLinesFx";
+import { readItemDetailLinesFx } from "~/item-line-detail/fx/readItemDetailLinesFx";
 import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import { setDefaultLineFx } from "~/production-line/write/setDefaultLineFx";
 import { unsetDefaultLineFx } from "~/production-line/write/unsetDefaultLineFx";

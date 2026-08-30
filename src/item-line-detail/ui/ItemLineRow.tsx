@@ -9,9 +9,9 @@ import { setDefaultLineFx } from "~/production-line/write/setDefaultLineFx";
 import { unsetDefaultLineFx } from "~/production-line/write/unsetDefaultLineFx";
 import { withdrawLineInputFx } from "~/production-input/write/withdrawLineInputFx";
 import { withdrawLineInputsFx } from "~/production-input/write/withdrawLineInputsFx";
-import type { ItemDetailLines } from "~/item-line-detail/ui/ItemDetailLines";
+import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import { Button, PrimaryButton } from "~/ui/button/Button";
-import { itemDetailFadeMotion } from "~/item-detail-frame/ItemDetailMotion";
+import { itemDetailFadeMotion } from "~/item-detail-frame/ui/ItemDetailMotion";
 import {
 	ItemLineInputs,
 	ItemLineUnavailableWithdrawals,
@@ -21,9 +21,8 @@ import {
 	ItemLineSummary,
 	type ItemLineSummaryIdentityRenderer,
 } from "~/item-line-detail/ui/ItemLineSummary";
-import { ItemReferenceButton } from "~/item-detail-frame/ItemReferenceButton";
-import { useItemDetailControl } from "~/item-detail-frame/useItemDetailControl";
-import { useItemDetailPendingCommand } from "~/item-detail-frame/useItemDetailPendingCommand";
+import { ItemReferenceButton } from "~/item-detail-frame/ui/ItemReferenceButton";
+import { useItemDetailPendingCommand } from "~/item-detail-frame/ui/useItemDetailPendingCommand";
 import { formatDurationFn } from "~/ui/formatDurationFn";
 import { ProductionJobRuntime } from "~/production-job/ui/ProductionJobRuntime";
 import { readActiveJobRuntimeFn } from "~/production-job/ui/readActiveJobRuntimeFn";
@@ -31,7 +30,7 @@ import { readActiveJobRuntimeFn } from "~/production-job/ui/readActiveJobRuntime
 const ItemLineUnavailableReason = ({
 	reason,
 }: {
-	readonly reason: ItemDetailLines.DisabledReason;
+	readonly reason: ItemDetailLinesProjection.DisabledReason;
 }) => {
 	return match(reason)
 		.with(
@@ -63,7 +62,7 @@ const ItemLineUnavailableReason = ({
 		.exhaustive();
 };
 
-const readUnavailableDependencyFn = (reason: ItemDetailLines.DisabledReason) => {
+const readUnavailableDependencyFn = (reason: ItemDetailLinesProjection.DisabledReason) => {
 	if (reason.kind === "deposit-target-missing") {
 		return reason.detail === undefined
 			? undefined
@@ -108,7 +107,7 @@ const ItemLineUnavailableDependency = ({
 const ItemLineUnavailableMessage = ({
 	reason,
 }: {
-	readonly reason: ItemDetailLines.DisabledReason;
+	readonly reason: ItemDetailLinesProjection.DisabledReason;
 }) => (
 	<div
 		className="mt-4 flex min-w-0 items-center gap-2 text-sm text-muted"
@@ -149,7 +148,7 @@ export const ItemLineRow = forwardRef<
 	{
 		readonly definitionItemId?: string;
 		readonly disabled: boolean;
-		readonly line: ItemDetailLines.Line;
+		readonly line: ItemDetailLinesProjection.Line;
 		readonly ownerItemId: string;
 		readonly renderIdentity?: ItemLineSummaryIdentityRenderer;
 		readonly stale?: boolean;
@@ -158,7 +157,6 @@ export const ItemLineRow = forwardRef<
 	{ definitionItemId, disabled, line, ownerItemId, renderIdentity, stale = false },
 	ref,
 ) {
-	const itemDetail = useItemDetailControl();
 	const pendingKeys = {
 		default: JSON.stringify([
 			"line",
@@ -183,28 +181,24 @@ export const ItemLineRow = forwardRef<
 		action: "default",
 		failureMessage: "Default line could not be changed.",
 		pendingKey: pendingKeys.default,
-		pendingOwner: itemDetail,
 		run: (game, command: setDefaultLineFx.Props) => game.runFx(setDefaultLineFx(command)),
 	});
 	const enqueueLine = useItemDetailPendingCommand({
 		action: "enqueue",
 		failureMessage: "Work could not be queued.",
 		pendingKey: pendingKeys.enqueue,
-		pendingOwner: itemDetail,
 		run: (game, command: enqueueLineFx.Props) => game.runFx(enqueueLineFx(command)),
 	});
 	const unsetDefaultLine = useItemDetailPendingCommand({
 		action: "default",
 		failureMessage: "Default line could not be changed.",
 		pendingKey: pendingKeys.default,
-		pendingOwner: itemDetail,
 		run: (game, command: unsetDefaultLineFx.Props) => game.runFx(unsetDefaultLineFx(command)),
 	});
 	const withdrawLine = useItemDetailPendingCommand({
 		action: "withdraw",
 		failureMessage: "Inputs could not be withdrawn.",
 		pendingKey: pendingKeys.withdraw,
-		pendingOwner: itemDetail,
 		run: (game, command: withdrawLineInputFx.Props | withdrawLineInputsFx.Props) =>
 			game
 				.runFx(

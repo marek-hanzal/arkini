@@ -4,7 +4,7 @@ import type { GameEngine } from "~/renderer/game/GameEngine";
 import {
 	type ItemDetailReference,
 	projectItemDetailReferenceFx,
-} from "~/item-detail-frame/projectItemDetailReferenceFx";
+} from "~/item-detail-frame/fx/projectItemDetailReferenceFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readItemDetailQueueFx } from "~/engine/item-detail/read/readItemDetailQueueFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";

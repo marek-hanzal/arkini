@@ -1,25 +1,27 @@
 import { useEffect, useMemo, useState } from "react";
 import { match } from "ts-pattern";
 
-import type { ItemDetailLines } from "~/item-line-detail/ui/ItemDetailLines";
+import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import { JobStatusEnumSchema } from "~/production-job/schema/read/JobStatusEnumSchema";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
 
 type ItemLineAvailabilityFilter = "available" | "all";
 
-const isAvailableLineFn = (line: ItemDetailLines.Line) =>
+const isAvailableLineFn = (line: ItemDetailLinesProjection.Line) =>
 	line.availability.kind === "available" || line.activeJob !== undefined;
 
 const useItemLineSearchCandidates = (
 	lines: Extract<
-		ItemDetailLines.Projection,
+		ItemDetailLinesProjection.Projection,
 		{
 			readonly kind: "available";
 		}
 	>,
 ) =>
 	useMemo(() => {
-		const readChargeSearchTermsFn = (charges: ItemDetailLines.ChargeCost | undefined) =>
+		const readChargeSearchTermsFn = (
+			charges: ItemDetailLinesProjection.ChargeCost | undefined,
+		) =>
 			charges === undefined
 				? []
 				: charges.from === "self"
@@ -35,7 +37,9 @@ const useItemLineSearchCandidates = (
 							"target charge",
 							"deposit charge",
 						];
-		const readInputSearchTermsFn = (input: ItemDetailLines.Input): readonly string[] =>
+		const readInputSearchTermsFn = (
+			input: ItemDetailLinesProjection.Input,
+		): readonly string[] =>
 			match(input)
 				.with(
 					{
@@ -93,12 +97,14 @@ const useItemLineSearchCandidates = (
 					],
 				)
 				.exhaustive();
-		const readOutputItemSearchTermsFn = (item: ItemDetailLines.OutputItem) => [
+		const readOutputItemSearchTermsFn = (item: ItemDetailLinesProjection.OutputItem) => [
 			"output",
 			item.itemId,
 			item.title,
 		];
-		const readOutputRollSearchTermsFn = (roll: ItemDetailLines.OutputRoll): readonly string[] =>
+		const readOutputRollSearchTermsFn = (
+			roll: ItemDetailLinesProjection.OutputRoll,
+		): readonly string[] =>
 			match(roll)
 				.with(
 					{
@@ -131,7 +137,7 @@ const useItemLineSearchCandidates = (
 					],
 				)
 				.exhaustive();
-		const readAvailabilityLabelFn = (availability: ItemDetailLines.Availability) =>
+		const readAvailabilityLabelFn = (availability: ItemDetailLinesProjection.Availability) =>
 			match(availability)
 				.with(
 					{
@@ -206,7 +212,7 @@ const useItemLineSearchCandidates = (
 /** Owns local filtering and resolves semantic search identities in authored line order. */
 export const useItemLineSearch = (
 	lines: Extract<
-		ItemDetailLines.Projection,
+		ItemDetailLinesProjection.Projection,
 		{
 			readonly kind: "available";
 		}

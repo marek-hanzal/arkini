@@ -23,7 +23,7 @@ const state = vi.hoisted(() => ({
 
 vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
 
-vi.mock("~/item-detail-frame/useItemDetailControl", () => ({
+vi.mock("~/item-detail-frame/ui/useItemDetailControl", () => ({
 	useItemDetailControl: () => ({
 		openItemDetailFx: (props: unknown) => state.openItemDetail(props),
 		state: {
@@ -39,7 +39,7 @@ vi.mock("~/item-detail-frame/useItemDetailControl", () => ({
 	}),
 }));
 
-vi.mock("~/item-detail-frame/useCloseItemDetail", () => ({
+vi.mock("~/item-detail-frame/ui/useCloseItemDetail", () => ({
 	useCloseItemDetail: () => () => undefined,
 }));
 
@@ -106,7 +106,7 @@ vi.mock("~/ui/item-detail/useItemDefinitionDetail", () => ({
 	}),
 }));
 
-vi.mock("~/item-detail-frame/ItemDetailHeader", () => ({
+vi.mock("~/item-detail-frame/ui/ItemDetailHeader", () => ({
 	ItemDetailHeader: () => null,
 }));
 

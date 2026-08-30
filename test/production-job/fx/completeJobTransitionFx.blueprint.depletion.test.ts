@@ -1,7 +1,7 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readItemDetailLinesFx } from "~/item-line-detail/read/readItemDetailLinesFx";
+import { readItemDetailLinesFx } from "~/item-line-detail/fx/readItemDetailLinesFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";

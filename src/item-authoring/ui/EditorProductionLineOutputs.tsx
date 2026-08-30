@@ -2,7 +2,7 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { DropSchema } from "~/production-output/schema/DropSchema";
 import type { OutputSchema } from "~/production-output/schema/OutputSchema";
 import type { ReactNode } from "react";
-import type { ItemDetailLines } from "~/item-line-detail/ui/ItemDetailLines";
+import type { ItemDetailLinesProjection } from "~/item-line-detail/type/ItemDetailLinesProjection";
 import { ItemLineOutputs } from "~/item-line-detail/ui/ItemLineOutputs";
 import { EditorItemDetailReference } from "~/item-authoring/ui/EditorItemDetailReference";
 
@@ -11,7 +11,7 @@ type EditorItemRegistry = Record<string, ItemSchema.Type>;
 const projectDrop = (
 	drop: DropSchema.Type,
 	items: EditorItemRegistry,
-): ItemDetailLines.OutputItem => ({
+): ItemDetailLinesProjection.OutputItem => ({
 	itemId: drop.itemId,
 	quantity: drop.quantity,
 	title: items[drop.itemId]?.title ?? drop.itemId,
@@ -21,9 +21,9 @@ const projectDrop = (
 const projectOutput = (
 	output: OutputSchema.Type | undefined,
 	items: EditorItemRegistry,
-): readonly ItemDetailLines.OutputSet[] =>
+): readonly ItemDetailLinesProjection.OutputSet[] =>
 	output?.set.map((set) => ({
-		roll: set.roll.map((roll): ItemDetailLines.OutputRoll => {
+		roll: set.roll.map((roll): ItemDetailLinesProjection.OutputRoll => {
 			if (roll.type === "weight")
 				return {
 					kind: "weight",
@@ -48,7 +48,7 @@ const projectOutput = (
 	})) ?? [];
 
 const renderOutputItem = (
-	item: ItemDetailLines.OutputItem,
+	item: ItemDetailLinesProjection.OutputItem,
 	items: EditorItemRegistry,
 	projectId: string,
 ): ReactNode => {

@@ -3,7 +3,7 @@ import { Effect } from "effect";
 
 import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
-import { saveEditorItemWithRepositoryFx } from "~/item-authoring/domain/fx/saveEditorItemWithRepositoryFx";
+import { saveEditorItemWithRepositoryFx } from "~/item-authoring/fx/saveEditorItemWithRepositoryFx";
 
 export namespace saveEditorItemFx {
 	export interface Props {

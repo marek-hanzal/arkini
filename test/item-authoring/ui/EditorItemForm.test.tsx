@@ -5,7 +5,6 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
-import { useEditorItemDraft } from "~/item-authoring/ui/useEditorItemDraft";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import {
 	editorTestConfig,
@@ -19,6 +18,17 @@ const state = vi.hoisted(() => ({
 vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
+
+vi.mock("~/item-authoring/ui/useEditorItemByUid", () => ({
+	useEditorItemByUid: () => undefined,
+}));
+
+vi.mock("~/item-authoring/ui/EditorItemFormSession", () => ({
+	EditorItemFormSession: ({ initialItem }: { readonly initialItem: ItemSchema.Type }) =>
+		createElement("output", null, JSON.stringify(initialItem)),
+}));
+
+import { EditorItemForm } from "~/item-authoring/ui/EditorItemForm";
 
 (
 	globalThis as {
@@ -38,11 +48,6 @@ const project: EditorProject = {
 	resources: editorTestPayload.resources,
 };
 
-const DraftProbe = ({ uid }: { readonly uid: string }) => {
-	const draft = useEditorItemDraft("simple", uid);
-	return createElement("output", null, JSON.stringify(draft));
-};
-
 afterEach(async () => {
 	await act(async () => {
 		for (const root of roots.splice(0)) root.unmount();
@@ -50,8 +55,8 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-describe("useEditorItemDraft", () => {
-	it("binds the first project resource and preallocated UID into the local draft", async () => {
+describe("EditorItemForm", () => {
+	it("seeds a new form with the first project resource and preallocated UID", async () => {
 		const uid = "draft-simple";
 		state.project = project;
 		const container = document.createElement("div");
@@ -60,7 +65,8 @@ describe("useEditorItemDraft", () => {
 		roots.push(root);
 		await act(async () => {
 			root.render(
-				createElement(DraftProbe, {
+				createElement(EditorItemForm, {
+					itemType: "simple",
 					uid,
 				}),
 			);

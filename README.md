@@ -56,7 +56,7 @@ src/authoring-mcp  renderer-side MCP status, settings and checkout presentation
 src/authoring-session  mounted project publication, refresh, replacement and unsaved-change authority
 src/authoring-shell  cross-product Editor shell and navigation composition
 src/asset-authoring  Asset catalog, validation, import/edit/delete sessions and product presentation
-src/item-authoring  authored Item domain and product UI
+src/item-authoring  authored Item value policy, repository/session Effects and product UI
 src/flow      canonical authored acquisition graph and origin projection
 src/flow-layout  Flow geometry, routing algorithms and worker lifecycle
 src/flow-canvas  global Flow projection, painter policy and product UI

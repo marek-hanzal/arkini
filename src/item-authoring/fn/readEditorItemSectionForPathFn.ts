@@ -1,4 +1,4 @@
-import type { EditorItemSectionId } from "~/item-authoring/ui/EditorItemSections";
+import type { EditorItemSectionId } from "~/item-authoring/type/EditorItemSection";
 
 /** Maps one canonical item-schema path to its route-owned form section. */
 export const readEditorItemSectionForPathFn = (

@@ -5,7 +5,7 @@ import { EditorItemDraftDefaults } from "~/item-authoring/ui/EditorItemDraftDefa
 import { EditorLineInput } from "~/item-authoring/ui/EditorLineInput";
 import { useEditorItemOptionLabel } from "~/item-authoring/ui/useEditorItemOptionLabel";
 
-export interface EditorLineInputsControlProps {
+interface EditorLineInputsControlProps {
 	readonly allowMaterials?: boolean;
 	readonly emptyAllowed?: boolean;
 	readonly onChange: (inputs: LineInputSchema.Type[]) => void;

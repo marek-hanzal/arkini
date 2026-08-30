@@ -11,8 +11,8 @@ import { EditorItemSectionLink } from "~/item-authoring/ui/EditorItemSectionLink
 import type {
 	EditorItemOptionalCapability,
 	EditorItemSectionId,
-} from "~/item-authoring/ui/EditorItemSections";
-import { readEditorItemFormSectionsFn } from "~/item-authoring/ui/fn/readEditorItemFormSectionsFn";
+} from "~/item-authoring/type/EditorItemSection";
+import { readEditorItemSectionsFn } from "~/item-authoring/fn/readEditorItemSectionsFn";
 import { EditorCompatibilityNotice } from "~/project-version/ui/EditorCompatibilityNotice";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { useEditorItemFormController } from "~/item-authoring/ui/useEditorItemFormController";
@@ -88,7 +88,7 @@ export const EditorItemFormSession = ({
 			productionLineId,
 		],
 	);
-	const sections = readEditorItemFormSectionsFn(initialItem);
+	const sections = readEditorItemSectionsFn(initialItem, "form");
 	const params = {
 		projectId: project.projectId,
 		itemUid: initialItem.uid,

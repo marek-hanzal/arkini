@@ -13,8 +13,8 @@ import { ItemTypeLabel } from "~/item-definition/ui/ItemDefinitionLabels";
 import { EditorItemNotFound } from "~/item-authoring/ui/EditorItemNotFound";
 import { EditorItemConvertMenu } from "~/item-authoring/ui/EditorItemConvertMenu";
 import { EditorItemSectionLink } from "~/item-authoring/ui/EditorItemSectionLink";
-import type { EditorItemSectionId } from "~/item-authoring/ui/EditorItemSections";
-import { readEditorItemSectionsFn } from "~/item-authoring/ui/fn/readEditorItemSectionsFn";
+import type { EditorItemSectionId } from "~/item-authoring/type/EditorItemSection";
+import { readEditorItemSectionsFn } from "~/item-authoring/fn/readEditorItemSectionsFn";
 import { useEditorItemByUid } from "~/item-authoring/ui/useEditorItemByUid";
 
 /** Owns the stable item-detail header while routed sections replace only its body. */

@@ -1,10 +1,31 @@
 import { ChevronRight } from "lucide-react";
 
-import type { useItemDetailSources } from "~/ui/item-detail/useItemDetailSources";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
+import type { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetailSourcesFx";
 import { ItemIdentity } from "~/ui/item/ItemIdentity";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
+
+interface ItemDetailSource {
+	readonly ownerItemId: string;
+	readonly ownerDefinitionItemId: string;
+	readonly title: string;
+	readonly sourceUrl: string;
+	readonly compositeUrl?: string;
+	readonly space?: number;
+	readonly line: readonly {
+		readonly lineId: string;
+		readonly title: string;
+		readonly output: readonly readItemDetailSourcesFx.OutputFact[];
+	}[];
+}
+
+interface ItemDetailSources {
+	readonly itemId: string;
+	readonly kind: "available";
+	readonly targetTitle: string;
+	readonly source: readonly ItemDetailSource[];
+}
 
 const SourceRow = ({
 	disabled,
@@ -13,7 +34,7 @@ const SourceRow = ({
 	targetTitle,
 }: {
 	readonly disabled: boolean;
-	readonly source: useItemDetailSources.Source;
+	readonly source: ItemDetailSource;
 	readonly stale: boolean;
 	readonly targetTitle: string;
 }) => {
@@ -73,12 +94,7 @@ export const ItemSourcesTab = ({
 	stale = false,
 }: {
 	readonly disabled?: boolean;
-	readonly sources: Extract<
-		useItemDetailSources.Projection,
-		{
-			readonly kind: "available";
-		}
-	>;
+	readonly sources: ItemDetailSources;
 	readonly stale?: boolean;
 }) => (
 	<Scrollable

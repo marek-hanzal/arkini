@@ -14,6 +14,7 @@ const gameRuntimePattern = "^src/game-runtime(?:/|$)";
 const gamePersistencePattern = "^src/game-persistence(?:/|$)";
 const gameTickPattern = "^src/game-tick(?:/|$)";
 const itemInteractionPattern = "^src/item-interaction(?:/|$)";
+const itemDetailPattern = "^src/item-detail(?:/|$)";
 const itemLineDetailPattern = "^src/item-line-detail(?:/|$)";
 const tilePresentationPattern = "^src/tile-presentation(?:/|$)";
 const tileMotionPattern = "^src/tile-motion(?:/|$)";
@@ -28,6 +29,8 @@ const itemLineDetailReadAllowedSourceDependencyPattern =
 	"(?:item-line-detail/(?:fx/(?:readItemDetailInputsFx|readItemDetailLinesFx|readItemDetailMaterialAutofillAvailabilityFx|readItemDetailOutputFx)[.]ts$|type/ItemDetailLines[.]ts$)|engine/(?:common/schema/(?:IdSchema|NonNegativeIntegerSchema|TimeSchema)[.]ts$|game/context/GameConfigFx[.]ts$|item-detail/read/readItemDetailSourcesFx[.]ts$|item/fn/readItemRemainingChargesFn[.]ts$|query/fx/queryFx[.]ts$)|game-runtime/(?:context/RuntimeFx[.]ts$|read/readBoardRuntimeItemByIdFx[.]ts$|schema/RuntimeSchema[.]ts$)|item-definition/(?:fn/matchesItemSelectorFn[.]ts$|schema/SelectorSchema[.]ts$)|item-location/schema/(?:BoardLocationSchema|DistanceSchema|LocationScopeEnumSchema)[.]ts$|production-condition/schema/WhenSchema[.]ts$|production-delivery/fn/readLineInputDeliveryClaimsFn[.]ts$|production-input/(?:type/InputRun[.]ts$|read/(?:fn/isMaterialInputEligibleFn|isLineInputAutofillSourceLocationFn)[.]ts$|schema/(?:ChargeSourceSchema|DepositSchema|InputSchema|ModeSchema|TypeSchema)[.]ts$)|production-job/(?:fx/(?:resolveActiveJobStatusFx|read/(?:resolveLineStartFx|resolveStartOutputCapacityFx))[.]ts$|schema/read/JobStatusEnumSchema[.]ts$)|production-line/(?:type/LineRun[.]ts$|fn/(?:isLineOwnerItemFn|readEffectiveDefaultLineFn|readLineOwnerLinesFn)[.]ts$|schema/(?:LineSchema|rule/TypeSchema)[.]ts$)|production-output/(?:fx/dropRulesFx[.]ts$|roll/schema/(?:RollSchema|TypeSchema)[.]ts$|schema/DropSchema[.]ts$))";
 const itemLineDetailPresentationAllowedSourceDependencyPattern =
 	"(?:item-line-detail(?:/|$)|item-detail-frame(?:/|$)|application-runtime/service/RendererRuntime[.]ts$|engine/(?:common/schema/(?:IdSchema|NonNegativeIntegerSchema)[.]ts$|item/fx/resolveItemFx[.]ts$)|game-runtime/schema/RuntimeSchema[.]ts$|item-definition/schema/SelectorSchema[.]ts$|item-location/schema/DistanceSchema[.]ts$|production-condition/schema/(?:TypeSchema|WhenSchema)[.]ts$|production-input/(?:schema/(?:ChargeSourceSchema|ModeSchema)[.]ts$|write/(?:withdrawLineInputFx|withdrawLineInputsFx)[.]ts$)|production-job/(?:schema/read/JobStatusEnumSchema[.]ts$|ui/(?:ProductionJobRuntime[.]tsx|readActiveJobRuntimeFn[.]ts$)|write/enqueueLineFx[.]ts$)|production-line/write/(?:setDefaultLineFx|unsetDefaultLineFx)[.]ts$|renderer/game/GameEngine[.]ts$|ui/(?:button/(?:Button|LinkButton)[.]tsx$|fn/formatDurationFn[.]ts$|game/(?:useGameEngine|useRuntimeSelector)[.]ts$|scrollable/Scrollable[.]tsx$|search/useFuseSearch[.]ts$))";
+const itemDetailAllowedSourceDependencyPattern =
+	"(?:item-detail(?:/|$)|application-runtime/service/RendererRuntime[.]ts$|engine/(?:common/schema/IdSchema[.]ts$|item-detail/(?:fn/(?:readItemDetailInfoFn|readItemDetailTabsFn)[.]ts$|read/(?:readItemDetailIdentityFx|readItemDetailQueueFx|readItemDetailSourcesFx)[.]ts$|schema/ItemDetailTabEnumSchema[.]ts$))|game-runtime/schema/RuntimeSchema[.]ts$|item-definition/(?:schema/(?:StorageSchema|TypeSchema)[.]ts$|ui/ItemDefinitionLabels[.]ts$)|item-detail-frame/(?:fx/projectItemDetailReferenceFx[.]ts$|type/ItemDetailControl[.]ts$|ui/(?:ItemDetailHeader|ItemDetailMotion|useCloseItemDetail|useItemDetailControl|useItemDetailPendingCommand|useRetainedItemDetailProjection)[.]tsx?$)|item-line-detail/(?:type/ItemDetailLinesProjection[.]ts$|ui/(?:ItemLinesTab|ItemLineSummary|useItemDetailLines)[.]tsx?$)|production-job/(?:ui/(?:ProductionJobRuntime|readActiveJobRuntimeFn)[.]tsx?$|write/clearItemJobQueueFx[.]ts$)|renderer/game/GameEngine[.]ts$|ui/(?:badge/BadgeCount[.]tsx$|button/LinkButton[.]tsx$|fact/FactList[.]tsx$|focus/(?:dialogFocusableSelector|useDialogFocusContainment)[.]tsx?$|form/SelectableStateClassName[.]ts$|game/(?:useGameEngine|useRuntimeSelector)[.]tsx?$|item/ItemIdentity[.]tsx$|scrollable/Scrollable[.]tsx$))";
 const tilePresentationAllowedSourceDependencyPattern =
 	"(?:tile-presentation(?:/|$)|engine/item/fn/readItemRemainingChargesFn[.]ts$|game-event/schema/(?:GameEventEnumSchema|GameEventSchema)[.]ts$|game-runtime/(?:read/fn/isGridRuntimeItemFn[.]ts$|schema/(?:CommittedTransitionSchema|GridRuntimeItemSchema|RuntimeItemSchema|RuntimeSchema)[.]ts$)|item-definition/schema/(?:AssetSchema|ItemSchema|TypeSchema)[.]ts$|item-interaction/fx/(?:readRuntimeInventoryOpenerFx|readRuntimeItemPrimaryActionFx)[.]ts$|item-location/(?:fn/isSameGridLocationFn[.]ts$|schema/(?:GridLocationSchema|LocationScopeEnumSchema)[.]ts$)|item-merge/schema/(?:SourceActionSchema|TargetEffectSchema)[.]ts$|production-job/(?:fx/resolveActiveJobStatusFx[.]ts$|schema/(?:JobSchema|read/JobStatusEnumSchema)[.]ts$)|production-line/fn/readRuntimeLineFillProgressFn[.]ts$|renderer/game/GameEngine[.]ts$)";
 const tileMotionAllowedSourceDependencyPattern =
@@ -67,7 +70,7 @@ const productRendererPattern =
 	"^src/(?:arkpack|editor-build)/renderer(?:/|$)|^src/asset-authoring/(?:session|validation)(?:/|$)";
 const productionJobPresentationPattern = "^src/production-job/ui(?:/|$)";
 const boardSpatialPattern = "^src/(?:item-location|item-placement|item-merge|space-action)(?:/|$)";
-const productPresentationPattern = `^src/(?:asset-authoring|item-authoring|estimate)/(?:ui|worker)(?:/|$)|${productionLineAuthoringPattern}|^src/(?:flow-layout|flow-canvas)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)|${itemDetailFramePattern}|${itemLineDetailPresentationPattern}|${tilePresentationPattern}|${tileMotionPattern}|${tileInteractionPattern}|${productionJobPresentationPattern}`;
+const productPresentationPattern = `^src/(?:asset-authoring|item-authoring|estimate)/(?:ui|worker)(?:/|$)|${productionLineAuthoringPattern}|^src/(?:flow-layout|flow-canvas)(?:/|$)|^src/(?:arkpack|editor-build)/ui(?:/|$)|${itemDetailPattern}|${itemDetailFramePattern}|${itemLineDetailPresentationPattern}|${tilePresentationPattern}|${tileMotionPattern}|${tileInteractionPattern}|${productionJobPresentationPattern}`;
 const authoringProductPattern =
 	"^src/(?:project-authoring|board-scenario|project-version|project-note|authoring-mcp|authoring-session|authoring-shell)(?:/|$)";
 const authoringProductCorePattern =
@@ -288,7 +291,7 @@ const boundaryRules = [
 			path: activeCodePattern,
 			pathNot: [
 				itemLineDetailPattern,
-				"^src/ui/item-detail/ItemDetailModal[.]tsx$",
+				"^src/item-detail/ui/ItemDetailModal[.]tsx$",
 				"^src/ui/shell/GameShell[.]tsx$",
 				"^src/board-scenario/toolbar/EditorBoardProductionLineLink[.]tsx$",
 				"^src/item-authoring/ui/EditorProductionLineDetail[.]tsx$",
@@ -296,6 +299,34 @@ const boundaryRules = [
 		},
 		to: {
 			path: itemLineDetailPattern,
+		},
+	},
+	{
+		name: "item-detail-dialog-has-exact-presentation-dependencies",
+		comment:
+			"Item Detail dialog composition consumes only its exact frame, line, runtime-read, production-status, renderer and reusable UI leaves without routes, Electron, Pixi or gameplay authority.",
+		severity: "error",
+		from: {
+			path: itemDetailPattern,
+		},
+		to: {
+			path: `^src/(?!${itemDetailAllowedSourceDependencyPattern})|^(?:electron|shared|scripts)(?:/|$)|^node_modules/(?!effect(?:/|$)|lucide-react(?:/|$)|motion(?:/|$)|react(?:/|$)|ts-pattern(?:/|$))`,
+		},
+	},
+	{
+		name: "item-detail-dialog-has-one-production-composer",
+		comment:
+			"Only Game Shell composes the Item Detail dialog; Frame and Item Lines remain upstream exact owners rather than an umbrella dependency.",
+		severity: "error",
+		from: {
+			path: activeCodePattern,
+			pathNot: [
+				itemDetailPattern,
+				"^src/ui/shell/GameShell[.]tsx$",
+			],
+		},
+		to: {
+			path: itemDetailPattern,
 		},
 	},
 	{
@@ -550,7 +581,7 @@ const boundaryRules = [
 			path: itemDetailFramePattern,
 		},
 		to: {
-			path: "^src/(?:ui/item-detail|item-line-detail)(?:/|$)|^src/item-interaction/fx/(?:dropItemFx|releaseInventoryItemFx|splitBoardItemStackFx)[.]ts$|^src/(?:production-input|production-job|production-line)/write(?:/|$)",
+			path: "^src/(?:item-detail|item-line-detail)(?:/|$)|^src/item-interaction/fx/(?:dropItemFx|releaseInventoryItemFx|splitBoardItemStackFx)[.]ts$|^src/(?:production-input|production-job|production-line)/write(?:/|$)",
 		},
 	},
 	{

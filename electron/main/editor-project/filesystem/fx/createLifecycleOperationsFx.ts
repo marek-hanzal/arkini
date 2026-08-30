@@ -11,6 +11,7 @@ import type { EditorProjectCandidate } from "~/project-authoring/EditorProjectCa
 import type { EditorProjectDescriptor } from "~/project-authoring/EditorProjectDescriptor";
 import type { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
 import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
+import { encodeGameProjectFileStemFn } from "~/game-config/source/encodeGameProjectFileStemFn";
 import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProjectManifestSchema";
 import { EditorProjectCatalogEntrySchema } from "~/project-authoring/EditorProjectCatalogEntrySchema";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
@@ -74,6 +75,9 @@ const materializeDescriptor = ({
 
 const readValidationError = (cause: unknown) =>
 	cause instanceof Error ? cause.message : String(cause);
+
+const encodeManagedProjectDirectoryStemFn = (projectId: string) =>
+	encodeGameProjectFileStemFn(projectId).replaceAll("%2E", ".");
 
 const error = (
 	operation:
@@ -330,7 +334,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 						Effect.gen(function* () {
 							const root = path.join(
 								projectsRoot,
-								`${encodeURIComponent(projectId)}-${createId()}`,
+								`${encodeManagedProjectDirectoryStemFn(projectId)}-${createId()}`,
 							);
 							return yield* Effect.gen(function* () {
 								yield* fileSystem.makeDirectory(root, {

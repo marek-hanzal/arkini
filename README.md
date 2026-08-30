@@ -64,10 +64,11 @@ src/flow      canonical authored acquisition graph and origin projection
 src/flow-layout  Flow geometry, routing algorithms and worker lifecycle
 src/flow-canvas  global Flow projection, painter policy and product UI
 src/estimate  static Estimate domain, projections, cache and worker
+src/launcher  renderer bootstrap, Hero lifecycle, shell/action surfaces and About motion
 src/application-diagnostics  shared renderer-side failure extraction, diagnostic normalization and transport policy
 src/application-runtime  renderer process composition, Atom bridge and native lifecycle
-src/renderer  installed Game, launcher/window, resource-validation and transport capabilities
-src/ui        cross-product primitives plus retained React and Pixi scene execution
+src/renderer  installed Game, launcher preferences, window, resource-validation and transport capabilities
+src/ui        cross-product primitives plus retained React and Pixi implementation leaves
 src/@routes   TanStack Router registration, lifecycle and route-specific composition
 electron      pure transport contract plus main/preload/platform ownership
 shared        immutable cross-process application metadata and hard limits only

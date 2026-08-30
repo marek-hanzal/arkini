@@ -5,7 +5,7 @@ import { match } from "ts-pattern";
 import { GameLeaveDestinationSchema } from "~/@routes/action/-GameLeaveDestinationSchema";
 import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
-import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
+import { ActionLoadingScreen } from "~/launcher/ui/ActionLoadingScreen";
 
 export const Route = createFileRoute("/game/$packageId/action/leave")({
 	validateSearch: GameLeaveDestinationSchema,

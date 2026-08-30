@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { assertRuntimeFx } from "~/game-runtime/check/assertRuntimeFx";
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
-import { createRevisionFx } from "~/engine/revision/fx/createRevisionFx";
+import { createRevisionFx } from "~/item-revision/fx/createRevisionFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";

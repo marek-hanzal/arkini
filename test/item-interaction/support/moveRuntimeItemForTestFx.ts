@@ -1,7 +1,7 @@
 import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
-import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { isGridRuntimeItemFn } from "~/game-runtime/read/fn/isGridRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";

@@ -1,7 +1,7 @@
 import { Data } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
-import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 
 /**
  * A write command targeted an entity revision that is no longer current.

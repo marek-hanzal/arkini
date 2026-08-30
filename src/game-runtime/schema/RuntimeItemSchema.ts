@@ -5,7 +5,7 @@ import { PositiveIntegerSchema } from "~/game-config/schema/PositiveIntegerSchem
 import { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { LocationSchema } from "~/item-location/schema/LocationSchema";
-import { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { TimeSchema } from "~/game-config/schema/TimeSchema";
 
 /**

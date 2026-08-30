@@ -4,7 +4,7 @@ import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { assertOwnerIdleFx } from "~/production-job/fx/assertOwnerIdleFx";
-import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { removeRuntimeItemFx } from "~/game-runtime/fx/removeRuntimeItemFx";

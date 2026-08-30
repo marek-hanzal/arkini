@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
-import { RevisionConflictError } from "~/engine/revision/error/RevisionConflictError";
-import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import { RevisionConflictError } from "~/item-revision/error/RevisionConflictError";
+import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 
 export namespace assertRevisionFx {
 	export interface Props {

@@ -11,7 +11,7 @@ import { applyInputMaterialStorePlanFx } from "~/production-input/fx/applyInputM
 import { planInputMaterialStoreFn } from "~/production-input/fn/planInputMaterialStoreFn";
 import { filterInputSlotItemsFn } from "~/production-input/fn/filterInputSlotItemsFn";
 import { readItemMaterialInputFx } from "~/production-input/read/readItemMaterialInputFx";
-import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
+import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
 import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { LineInputClosedError } from "~/production-line/error/LineInputClosedError";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";

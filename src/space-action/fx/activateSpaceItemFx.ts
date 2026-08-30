@@ -8,7 +8,7 @@ import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
-import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
+import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
 import { TypeSchema } from "~/item-definition/schema/TypeSchema";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";

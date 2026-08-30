@@ -4,7 +4,7 @@ import type { IdSchema } from "~/game-config/schema/IdSchema";
 import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlacementItemEventsFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
-import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
+import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
 import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";

@@ -1,7 +1,7 @@
 import { Data, Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
-import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
+import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { GridLocationSchema } from "~/item-location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";

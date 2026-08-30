@@ -2,7 +2,7 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-config/schema/IdSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
-import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
+import { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardError";
 import { isolateGridStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateGridStatefulOwnerTransitionFx";
 import { isBoardRuntimeItemFn } from "~/game-runtime/read/fn/isBoardRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/read/readRuntimeItemByIdFx";

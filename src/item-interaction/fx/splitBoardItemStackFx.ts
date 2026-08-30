@@ -5,7 +5,7 @@ import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlacementItemEventsFx";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
-import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
+import { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardError";
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
 import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";

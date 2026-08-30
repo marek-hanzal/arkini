@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
+import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 
 /** Writes one pointer-owned actor pose through the canonical animator channel. */
 export const setDraggedActorPoseFx = Effect.fn("setDraggedActorPoseFx")(

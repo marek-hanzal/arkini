@@ -3,7 +3,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { lifecycleDurationMs } from "~/ui/pixi/animation/runActorLifecycleFx";
+import { lifecycleDurationMs } from "~/tile-rendering/fx/runActorLifecycleFx";
 
 import {
 	firstBoardLocation,

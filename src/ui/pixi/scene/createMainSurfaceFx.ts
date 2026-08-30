@@ -6,15 +6,15 @@ import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { readTileDropPreviewFx } from "~/tile-interaction/fx/readTileDropPreviewFx";
-import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
-import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
+import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
+import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import type { DropFeedback } from "~/ui/pixi/grid/DropFeedback";
 import { drawMaskFx } from "~/ui/pixi/grid/drawMaskFx";
 import { drawSurfaceFx } from "~/ui/pixi/grid/drawSurfaceFx";
 import { readSlotFn } from "~/ui/pixi/grid/fn/readSlotFn";
 import { readMainLayoutFn } from "~/ui/pixi/layout/fn/readMainLayoutFn";
 import type { MainLayout } from "~/ui/pixi/layout/SceneLayout";
-import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
+import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { MainSurface, TargetFacts } from "~/ui/pixi/scene/MainSurface";
 import type { PixiSceneDropTarget } from "~/ui/pixi/scene/PixiSceneDropTarget";
 

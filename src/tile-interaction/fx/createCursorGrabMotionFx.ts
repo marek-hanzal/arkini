@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { AnimationDriver, AnimationSpring } from "~/ui/pixi/animation/AnimationDriver";
-import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
+import type { AnimationDriver, AnimationSpring } from "~/tile-rendering/service/AnimationDriver";
+import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 
 export interface CursorGrabMotion {
 	readonly finishFx: (actor: PixiTileActor) => Effect.Effect<void>;

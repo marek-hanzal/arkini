@@ -1,5 +1,5 @@
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 
 export const boardLocation = (x: number): TileActorItem["location"] => ({
 	scope: "board",

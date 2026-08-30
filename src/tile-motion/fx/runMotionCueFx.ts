@@ -3,18 +3,18 @@ import { match, P } from "ts-pattern";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { TileMotionCue } from "~/tile-presentation/type/TileMotionCue";
-import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
-import { startActorEnterFx } from "~/ui/pixi/animation/startActorEnterFx";
-import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
+import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
+import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
+import { startActorEnterFx } from "~/tile-rendering/fx/startActorEnterFx";
+import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import { runInputMotionFx } from "~/tile-motion/fx/runInputMotionFx";
 import { runSpawnMotionFx } from "~/tile-motion/fx/runSpawnMotionFx";
 import { runStackMotionFx } from "~/tile-motion/fx/runStackMotionFx";
 import { runSwapMotionFx } from "~/tile-motion/fx/runSwapMotionFx";
-import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
-import type { TextureStore } from "~/ui/pixi/runtime/createTextureStoreFx";
+import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
+import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 import type { MainSurface } from "~/ui/pixi/scene/MainSurface";
 import type { TargetRoute } from "~/tile-motion/type/MotionTarget";
 

@@ -5,7 +5,7 @@ import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
 import { chaseTargetFx } from "~/tile-motion/fx/chaseTargetFx";
-import type { ActorAnimator } from "~/ui/pixi/animation/ActorAnimator";
+import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 
 import {
 	createSurface,

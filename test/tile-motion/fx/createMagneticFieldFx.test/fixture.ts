@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { vi } from "vitest";
 
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { AnimationDriver, AnimationSpring } from "~/ui/pixi/animation/AnimationDriver";
+import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
+import type { AnimationDriver, AnimationSpring } from "~/tile-rendering/service/AnimationDriver";
 
 export const createMagneticActor = (id: string, slotX: number) =>
 	({

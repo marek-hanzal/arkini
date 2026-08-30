@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
-import type { MainActorStore } from "~/ui/pixi/actor/MainActorStore";
+import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import { createMagneticFieldFx } from "~/tile-motion/fx/createMagneticFieldFx";
 import type { MagneticField } from "~/tile-motion/service/MagneticField";
 import { createMagneticProjectorFx } from "~/tile-motion/fx/createMagneticProjectorFx";

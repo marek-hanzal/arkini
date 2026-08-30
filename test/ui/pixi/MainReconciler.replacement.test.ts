@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
-import type { ActorVisual } from "~/ui/pixi/actor/ActorVisual";
-import { runVisualReadinessFx } from "~/ui/pixi/actor/runVisualReadinessFx";
+import type { ActorVisual } from "~/tile-rendering/type/ActorVisual";
+import { runVisualReadinessFx } from "~/tile-rendering/fx/runVisualReadinessFx";
 import {
 	boardLocation,
 	createActor,

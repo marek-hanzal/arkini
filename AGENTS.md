@@ -9,7 +9,8 @@ Arkini is an offline, data-driven economy game and Editor. Work as a senior engi
 - If code and an active contract disagree, stop and resolve the contradiction in the same change.
 - Repository commands live only in [`Argcfile.sh`](Argcfile.sh). Run them through local `argc` (`argc typecheck`, `argc test [paths...]`, `argc check`); never infer npm scripts from history.
 - Follow [`VERSION.md`](VERSION.md): readers gate on major only. Until the owner declares a stable baseline, add no migrations, legacy readers, obsolete-shape fixtures, or minor/patch-conditional paths unless explicitly requested.
-- Accessibility-only work is out of scope: no ARIA, focus presentation, keyboard-only behavior, accessibility tests, or accessibility review unless requested. Preserve incidental semantics. Gameplay motion is intentional; do not add reduced-motion branches.
+- Accessibility is not an Arkini concern. Do not add or preserve ARIA, screen-reader semantics, accessibility-only focus presentation, keyboard-only paths, tests, or review. Pointer, keyboard, and focus behavior is valid only when it is deliberate product UX, never for accessibility compliance.
+- Gameplay motion is intentional; do not add reduced-motion branches.
 - Comments explain ownership, invariants, temporal boundaries, or why a simpler-looking design is wrong. Do not narrate syntax or preserve dead history.
 
 ## Architecture defaults

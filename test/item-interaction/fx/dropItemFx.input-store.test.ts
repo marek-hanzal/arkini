@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/game/useGameFx";
 import type { GameLayerFx } from "~test/support/game/GameLayerFx";
 import { storeInputMaterialFx } from "~/production-input/write/storeInputMaterialFx";
-import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
+import { isItemPureFn } from "~/game-runtime/read/fn/isItemPureFn";
 import { setDefaultLineFx } from "~/production-line/write/setDefaultLineFx";
 import { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";

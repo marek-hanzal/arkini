@@ -6,8 +6,8 @@ import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlace
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import { ItemNotOnBoardError } from "~/item-location/error/ItemNotOnBoardError";
-import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
-import { isItemPureFn } from "~/engine/item/fn/isItemPureFn";
+import { ItemStatefulError } from "~/game-runtime/error/ItemStatefulError";
+import { isItemPureFn } from "~/game-runtime/read/fn/isItemPureFn";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";

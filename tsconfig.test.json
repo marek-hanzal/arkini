@@ -22,6 +22,7 @@
 		"src/game-persistence",
 		"src/item-interaction",
 		"src/item-query",
+		"src/item-resolution",
 		"src/game-start",
 		"src/game-event",
 		"src/item-line-detail",

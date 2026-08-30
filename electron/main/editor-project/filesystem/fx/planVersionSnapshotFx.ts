@@ -7,7 +7,7 @@ import { EditorVersionManifestSchema } from "~/project-version/schema/EditorVers
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 import { createVersionFingerprint, hashVersionBytes, hashVersionJson } from "./VersionFingerprint";
 
 const sortedRecord = (

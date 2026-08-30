@@ -7,9 +7,9 @@ import { TitleSchema } from "~/engine/common/schema/TitleSchema";
 import { SizeSchema } from "~/item-location/schema/SizeSchema";
 import { PositionSchema } from "~/item-location/schema/PositionSchema";
 import { ToolbarSizeSchema } from "~/item-location/schema/ToolbarSizeSchema";
-import { BoardItemSchema } from "~/game-start/BoardItemSchema";
-import { InventoryItemSchema } from "~/game-start/InventoryItemSchema";
-import { ToolbarItemSchema } from "~/game-start/ToolbarItemSchema";
+import { BoardItemSchema } from "~/game-start/schema/BoardItemSchema";
+import { InventoryItemSchema } from "~/game-start/schema/InventoryItemSchema";
+import { ToolbarItemSchema } from "~/game-start/schema/ToolbarItemSchema";
 
 export const EditorProjectAvatarKeys = [
 	"avatar-01",

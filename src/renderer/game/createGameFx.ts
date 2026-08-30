@@ -12,7 +12,7 @@ import type { GameSaveStorage } from "~/game-persistence/GameSaveStorage";
 import { encodeArkiniSaveFn } from "~/game-persistence/encodeArkiniSaveFn";
 import { decodeArkiniSaveFx } from "~/game-persistence/decodeArkiniSaveFx";
 import type { StateSchema } from "~/game-persistence/StateSchema";
-import { startFx } from "~/game-start/startFx";
+import { startFx } from "~/game-start/fx/startFx";
 import { readArkpackVersionFn } from "~/engine/version/fn/readArkpackVersionFn";
 
 export namespace createGameFx {

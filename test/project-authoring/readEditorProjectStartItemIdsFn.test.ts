@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { readEditorProjectStartItemIdsFn } from "~/project-authoring/fn/readEditorProjectStartItemIdsFn";
-import { startTestConfig } from "~test/game-start/startTestConfig";
+import { startTestConfig } from "~test/game-start/support/startTestConfig";
 
 describe("readEditorProjectStartItemIdsFn", () => {
 	it("projects the canonical storage-scope eligibility for each initial surface", () => {

@@ -7,7 +7,7 @@ import { readTileMotionCuesFx } from "~/ui/pixi/motion/readTileMotionCuesFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { startFx } from "~/game-start/startFx";
+import { startFx } from "~/game-start/fx/startFx";
 
 const config = GameConfigSchema.parse({
 	resources: {

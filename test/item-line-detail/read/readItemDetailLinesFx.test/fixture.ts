@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { startFx } from "~/game-start/startFx";
+import { startFx } from "~/game-start/fx/startFx";
 import { readItemDetailLinesFx } from "~/item-line-detail/read/readItemDetailLinesFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import {

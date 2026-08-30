@@ -2,7 +2,7 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-import { readOutputPlacementItemEventsFx } from "~/game-event/readOutputPlacementItemEventsFx";
+import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlacementItemEventsFx";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";

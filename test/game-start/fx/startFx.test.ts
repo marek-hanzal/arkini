@@ -5,8 +5,8 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import { startTestConfig } from "~test/game-start/startTestConfig";
-import { startFx } from "~/game-start/startFx";
+import { startTestConfig } from "~test/game-start/support/startTestConfig";
+import { startFx } from "~/game-start/fx/startFx";
 
 describe("startFx", () => {
 	it("atomically creates the configured board and inventory runtime", () => {

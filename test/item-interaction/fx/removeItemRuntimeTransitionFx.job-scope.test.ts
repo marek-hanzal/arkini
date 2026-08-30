@@ -1,8 +1,8 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { removeCheatItemFx } from "~/engine/cheat/write/removeCheatItemFx";
-import { setCheatEnabledFx } from "~/engine/cheat/write/setCheatEnabledFx";
+import { removeCheatItemFx } from "~/game-cheat/fx/removeCheatItemFx";
+import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
 import { useGameFx } from "~test/support/game/useGameFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";

@@ -5,7 +5,7 @@ import { describe, expect, it } from "@effect/vitest";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { GameLoopFx } from "~/game-tick/service/GameLoopFx";
 import { GameLoopLayerFx } from "~/game-tick/layer/GameLoopLayerFx";
-import { GameSessionLayerFx } from "~/engine/game/layer/GameSessionLayerFx";
+import { GameSessionLayerFx } from "~/game-session/layer/GameSessionLayerFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { GameRuntimeLayerFx } from "~/game-runtime/layer/GameRuntimeLayerFx";

@@ -1,7 +1,7 @@
 import { Effect, Option } from "effect";
 import { match } from "ts-pattern";
 
-import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { TileActorVisual } from "~/tile-presentation/type/TileActorVisual";
 import { readTileActorVisualFx } from "~/tile-presentation/fx/readTileActorVisualFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";

@@ -8,10 +8,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { routeTree } from "~/_route";
 import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
-import { CriticalGameLifecycleError } from "~/renderer/game/resource/CriticalGameLifecycleError";
-import type { Game } from "~/renderer/game/Game";
-import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
-import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
+import { CriticalGameLifecycleError } from "~/playable-game/error/CriticalGameLifecycleError";
+import type { Game } from "~/installed-game/type/Game";
+import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
+import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
 import { testArkpackConfig } from "~test/arkpack/support/createTestArkpack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import {

@@ -2,7 +2,7 @@ import { useAtom } from "@effect/atom-react";
 import type { Effect } from "effect";
 import { useCallback, useMemo } from "react";
 
-import type { PlayableGame } from "~/renderer/game/PlayableGame";
+import type { PlayableGame } from "~/playable-game/type/PlayableGame";
 import { useGameCheats } from "~/game-cheat/ui/useGameCheats";
 import { updateGameCheatsAtom } from "~/game-cheat/atom/updateGameCheatsAtom";
 

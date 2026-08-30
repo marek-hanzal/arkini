@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
-import { CriticalGameLifecycleError } from "~/renderer/game/resource/CriticalGameLifecycleError";
-import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
+import { CriticalGameLifecycleError } from "~/playable-game/error/CriticalGameLifecycleError";
+import type { InstalledGameEngineResource } from "~/installed-game/type/Game";
 import { Component, type PropsWithChildren } from "react";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const routeMocks = vi.hoisted(() => ({
 	pathname: "/game/package-critical/board",
-	resource: null as GameEngineResource | null,
+	resource: null as InstalledGameEngineResource | null,
 }));
 
 vi.mock("@tanstack/react-router", () => ({
@@ -18,11 +18,11 @@ vi.mock("@tanstack/react-router", () => ({
 			select,
 		}: {
 			readonly select: (context: {
-				readonly gameEngineResource: GameEngineResource;
-			}) => GameEngineResource;
+				readonly gameEngineResource: InstalledGameEngineResource;
+			}) => InstalledGameEngineResource;
 		}) =>
 			select({
-				gameEngineResource: routeMocks.resource as GameEngineResource,
+				gameEngineResource: routeMocks.resource as InstalledGameEngineResource,
 			}),
 	}),
 	useLocation: ({
@@ -89,7 +89,7 @@ describe("GameCriticalFailureBoundary", () => {
 		let failure: CriticalGameLifecycleError | null = null;
 		const listeners = new Set<() => void>();
 		routeMocks.resource = {
-			game: {} as GameEngineResource["game"],
+			game: {} as InstalledGameEngineResource["game"],
 			assertUsable: () => undefined,
 			getCriticalFailure: () => failure,
 			markCriticalFailure: (_operation, cause) => {
@@ -144,7 +144,7 @@ describe("GameCriticalFailureBoundary", () => {
 			cause: new Error("best-effort final save failed"),
 		});
 		routeMocks.resource = {
-			game: {} as GameEngineResource["game"],
+			game: {} as InstalledGameEngineResource["game"],
 			assertUsable: () => {
 				throw failure;
 			},

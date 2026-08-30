@@ -1,6 +1,6 @@
 import { Effect, Layer } from "effect";
 
-import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
+import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { TickTestClockLayer } from "~test/game-tick/support/runTickRuntimeByFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";

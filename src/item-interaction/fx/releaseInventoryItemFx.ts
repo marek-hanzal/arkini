@@ -1,7 +1,7 @@
 import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
+import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { isItemLocationScopeAllowedFn } from "~/item-location/fn/isItemLocationScopeAllowedFn";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";

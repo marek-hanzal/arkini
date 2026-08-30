@@ -1,6 +1,6 @@
 import { Cause, Effect, Option } from "effect";
 
-import type { PlayableGame } from "~/renderer/game/PlayableGame";
+import type { PlayableGame } from "~/playable-game/type/PlayableGame";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 
 /** Projects one renderer command failure while preserving interruption and fail-stop semantics. */

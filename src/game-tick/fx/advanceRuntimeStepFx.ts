@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { isPassiveStorageLocationFn } from "~/item-location/fn/isPassiveStorageLocationFn";
-import { isInstantGameplayEnabledFx } from "~/engine/cheat/read/isInstantGameplayEnabledFx";
+import { isInstantGameplayEnabledFn } from "~/game-runtime/read/fn/isInstantGameplayEnabledFn";
 import { settleItemDeliveryRuntimeFx } from "~/production-delivery/write/settleItemDeliveryRuntimeFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -40,7 +40,7 @@ const replaceJobFn = (runtime: RuntimeSchema.Type, job: JobSchema.Type): Runtime
 const advanceDeliveriesFx = Effect.fn("advanceDeliveriesFx")(function* (
 	runtime: RuntimeSchema.Type,
 ) {
-	const instantGameplay = yield* isInstantGameplayEnabledFx({
+	const instantGameplay = isInstantGameplayEnabledFn({
 		runtime,
 	});
 	const deliveryIds = runtime.items
@@ -160,7 +160,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 ) {
 	const boundaryStart = yield* dispatchIdleQueueHeadsFx(stepStart);
 	const deliveryStart = yield* advanceDeliveriesFx(boundaryStart.runtime);
-	const instantGameplay = yield* isInstantGameplayEnabledFx({
+	const instantGameplay = isInstantGameplayEnabledFn({
 		runtime: deliveryStart.runtime,
 	});
 	const jobs = sortJobsFn(deliveryStart.runtime.jobs);

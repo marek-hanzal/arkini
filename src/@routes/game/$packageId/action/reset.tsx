@@ -2,7 +2,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Effect } from "effect";
 
 import { runActionRouteFx } from "~/@routes/action/-runActionRouteFx";
-import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
+import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
 import { ActionLoadingScreen } from "~/launcher/ui/ActionLoadingScreen";
 
 export const Route = createFileRoute("/game/$packageId/action/reset")({

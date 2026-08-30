@@ -45,7 +45,7 @@ const removalState = vi.hoisted(() => ({
 	remove: vi.fn(),
 }));
 
-vi.mock("~/engine/cheat/write/removeCheatItemFx", () => ({
+vi.mock("~/game-cheat/fx/removeCheatItemFx", () => ({
 	removeCheatItemFx: (props: unknown) =>
 		Effect.sync(() => {
 			removalState.remove(props);

@@ -9,11 +9,11 @@ import {
 	useSyncExternalStore,
 } from "react";
 
-import type { GameEngine } from "~/renderer/game/GameEngine";
-import { resolveItemDetailTargetFn } from "~/engine/item-detail/fn/resolveItemDetailTargetFn";
-import { readItemDetailTabsFn } from "~/engine/item-detail/fn/readItemDetailTabsFn";
-import { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetailSourcesFx";
-import { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
+import { resolveItemDetailTargetFn } from "~/item-detail-read/fn/resolveItemDetailTargetFn";
+import { readItemDetailTabsFn } from "~/item-detail-read/fn/readItemDetailTabsFn";
+import { readItemDetailSourcesFx } from "~/item-detail-read/fx/readItemDetailSourcesFx";
+import { ItemDetailTabEnumSchema } from "~/item-detail-read/schema/ItemDetailTabEnumSchema";
 import type { RunItemDetailPendingActionProps } from "~/item-detail-frame/type/ItemDetailControl";
 import { createItemDetailCommandAtom } from "~/item-detail-frame/atom/createItemDetailCommandAtom";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";

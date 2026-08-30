@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
 import { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
 
 interface Props extends readDropItemPreviewFx.Props {

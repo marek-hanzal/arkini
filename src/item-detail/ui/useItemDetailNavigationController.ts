@@ -2,9 +2,9 @@ import { Equal } from "effect";
 import { type ComponentProps, useCallback } from "react";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readItemDetailTabsFn } from "~/engine/item-detail/fn/readItemDetailTabsFn";
-import { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetailSourcesFx";
-import type { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
+import { readItemDetailTabsFn } from "~/item-detail-read/fn/readItemDetailTabsFn";
+import { readItemDetailSourcesFx } from "~/item-detail-read/fx/readItemDetailSourcesFx";
+import type { ItemDetailTabEnumSchema } from "~/item-detail-read/schema/ItemDetailTabEnumSchema";
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";

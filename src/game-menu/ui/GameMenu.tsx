@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 
-import type { Game } from "~/renderer/game/Game";
+import type { Game } from "~/installed-game/type/Game";
 import { GameMenuDialog } from "~/game-menu/ui/GameMenuDialog";
 import { useGameMenuControl } from "~/game-menu/ui/GameMenuProvider";
 

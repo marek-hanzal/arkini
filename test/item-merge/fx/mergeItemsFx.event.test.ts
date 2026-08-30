@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/support/game/createTestGameSession";
 
-import type { GameSession } from "~/renderer/game/session/GameSession";
+import type { GameSession } from "~/game-session/type/GameSession";
 import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
 import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";

@@ -11,8 +11,8 @@ import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/session/Edito
 import { createEditorBoardGameFx } from "~/board-scenario/session/createEditorBoardGameFx";
 import { createEditorBoardGameResourceFx } from "~/board-scenario/session/createEditorBoardGameResourceFx";
 import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
-import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
-import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
+import { createGameEngineResourceFx } from "~/playable-game/fx/createGameEngineResourceFx";
+import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import {
 	createGame,

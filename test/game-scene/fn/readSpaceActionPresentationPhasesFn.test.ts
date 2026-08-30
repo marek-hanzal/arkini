@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { GameTransition } from "~/renderer/game/session/GameSession";
+import type { GameTransition } from "~/game-session/type/GameSession";
 import { readSpaceActionPresentationPhasesFn } from "~/game-scene/fn/readSpaceActionPresentationPhasesFn";
 import { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 

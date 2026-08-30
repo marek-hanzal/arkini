@@ -5,7 +5,7 @@ import { vi } from "vitest";
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
 import { createEditorBoardGameResourceFx } from "~/board-scenario/session/createEditorBoardGameResourceFx";
-import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
+import type { GameEngineResource } from "~/playable-game/type/GameEngineResource";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 

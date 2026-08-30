@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
 import { GameEngineContext } from "~/game-presentation/context/GameEngineContext";
 
 /** Publishes one exact playable session to shared gameplay presentation. */

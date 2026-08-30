@@ -7,8 +7,8 @@ import { act, createElement, use } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { Game } from "~/renderer/game/Game";
-import type { GameSession } from "~/renderer/game/session/GameSession";
+import type { Game } from "~/installed-game/type/Game";
+import type { GameSession } from "~/game-session/type/GameSession";
 import {
 	CheatItemSpawnContext,
 	type CheatItemSpawnControl,

@@ -7,7 +7,7 @@ import { StrictMode, act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { Game } from "~/renderer/game/Game";
+import type { Game } from "~/installed-game/type/Game";
 import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
 import { useGameFx } from "~test/support/game/useGameFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";

@@ -4,7 +4,7 @@ import { Cause, Exit, Option } from "effect";
 import { useEffect, useState } from "react";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 
-import type { Game } from "~/renderer/game/Game";
+import type { Game } from "~/installed-game/type/Game";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import type { GameMenuAction, GameMenuPhase } from "~/game-menu/type/GameMenuControl";
 import { gameMenuCommandAtom } from "~/game-menu/atom/gameMenuCommandAtom";

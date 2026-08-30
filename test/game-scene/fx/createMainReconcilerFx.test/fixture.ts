@@ -29,7 +29,7 @@ import type { MainSurface } from "~/game-scene/service/MainSurface";
 
 import { createDropPresentationFx } from "~/tile-interaction/fx/createDropPresentationFx";
 
-import type { GameEngine } from "~/renderer/game/GameEngine";
+import type { GameEngine } from "~/playable-game/type/GameEngine";
 
 import { createMainReconcilerFx } from "~/game-scene/fx/createMainReconcilerFx";
 

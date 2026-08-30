@@ -5,7 +5,7 @@ import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Route as EditorRoute } from "~/@routes/editor";
-import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
+import { GameEngineResourceFx } from "~/installed-game/service/GameEngineResourceFx";
 import {
 	createGame,
 	createGameFxMock,

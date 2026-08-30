@@ -3,8 +3,8 @@ import { useCallback, useEffect } from "react";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readItemDetailInfoFn } from "~/engine/item-detail/fn/readItemDetailInfoFn";
-import { readItemDetailIdentityFx } from "~/engine/item-detail/read/readItemDetailIdentityFx";
+import { readItemDetailInfoFn } from "~/item-detail-read/fn/readItemDetailInfoFn";
+import { readItemDetailIdentityFx } from "~/item-detail-read/fx/readItemDetailIdentityFx";
 import type { ItemDetailTarget } from "~/item-detail-frame/type/ItemDetailControl";
 import { useItemDetailControl } from "~/item-detail-frame/ui/useItemDetailControl";
 import { useRetainedItemDetailProjection } from "~/item-detail-frame/ui/useRetainedItemDetailProjection";

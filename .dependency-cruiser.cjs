@@ -7,6 +7,7 @@ const fxOperationPattern = "^src/[^\\n]*(?:/fx/|Fx[.]tsx?$)";
 const uiModulePattern = "^src/(?:ui|[^\\n]*/ui)(?:/|$)";
 const routeModulePattern = "^src/@routes(?:/|$)";
 const routeCompositionPattern = "^(?:src/@routes(?:/|$)|src/_route[.]ts$)";
+const electronContractPattern = "^electron/contract(?:/|$)";
 
 /**
  * Dependency rules state the forbidden import directly: `from` must not import `to`.
@@ -171,6 +172,21 @@ module.exports = {
 			},
 			to: {
 				path: routeModulePattern,
+			},
+		},
+		{
+			name: "renderer-code-only-imports-electron-contract",
+			comment:
+				"Renderer code consumes the pure Electron transport contract directly and never imports Electron process implementation or the Electron package.",
+			severity: "error",
+			from: {
+				path: "^src(?:/|$)",
+			},
+			to: {
+				path: "^(?:electron(?:/|$)|node_modules/electron(?:/|$))",
+				pathNot: [
+					electronContractPattern,
+				],
 			},
 		},
 	],

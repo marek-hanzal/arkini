@@ -37,11 +37,15 @@ const saveEditorItemCommandAtom = RendererRuntime.runSync(
 	),
 );
 
-interface UseEditorItemFormControllerProps {
-	readonly enableCapability?: EditorItemOptionalCapability;
-	readonly initialItem: ItemSchema.Type;
-	readonly onInvalidSection: (section: EditorItemSectionId) => void | Promise<void>;
-	readonly onSaved?: (item: ItemSchema.Type) => void | Promise<void>;
+export namespace useEditorItemFormController {
+	export interface Props {
+		readonly enableCapability?: EditorItemOptionalCapability;
+		readonly initialItem: ItemSchema.Type;
+		readonly onInvalidSection: (section: EditorItemSectionId) => void | Promise<void>;
+		readonly onSaved?: (item: ItemSchema.Type) => void | Promise<void>;
+	}
+
+	export type Output = ReturnType<typeof useEditorItemFormController>;
 }
 
 /** Owns the one local TanStack Form session shared by all item section leaves. */
@@ -50,7 +54,7 @@ export const useEditorItemFormController = ({
 	initialItem,
 	onInvalidSection,
 	onSaved,
-}: UseEditorItemFormControllerProps) => {
+}: useEditorItemFormController.Props) => {
 	const project = useEditorProject();
 	const canonicalItem = useMemo<EditorItemFormValues>(
 		() => ({
@@ -206,18 +210,32 @@ export const useEditorItemFormController = ({
 			),
 		save: saveDraft,
 	});
-	return {
-		canonicalItem,
-		compatibility,
-		error:
-			RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveItemResult)) ??
-			validationError,
-		isDirty: dirty,
-		isSaving: submitting,
-		form,
-		initialItem,
-		itemId,
-		project,
-		save,
-	} as const;
+	const error =
+		RendererRuntime.runSync(readSettledAsyncResultErrorFx(saveItemResult)) ?? validationError;
+	return useMemo(
+		() => ({
+			canonicalItem,
+			compatibility,
+			error,
+			isDirty: dirty,
+			isSaving: submitting,
+			form,
+			initialItem,
+			itemId,
+			project,
+			save,
+		}),
+		[
+			canonicalItem,
+			compatibility,
+			dirty,
+			error,
+			form,
+			initialItem,
+			itemId,
+			project,
+			save,
+			submitting,
+		],
+	);
 };

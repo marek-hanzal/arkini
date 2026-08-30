@@ -1,5 +1,13 @@
 import { FloatingPortal } from "@floating-ui/react";
-import { ChevronDown, Image as ImageIcon, Images, PackageOpen } from "lucide-react";
+import {
+	BadgeCheck,
+	ChevronDown,
+	Image as ImageIcon,
+	Images,
+	type LucideIcon,
+	PackageOpen,
+	SearchX,
+} from "lucide-react";
 import { memo } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -23,6 +31,49 @@ interface EditorAssetImportMenuProps {
 	readonly onImportFiles: () => void;
 	readonly pending: boolean;
 }
+
+const assetFilters = [
+	{
+		label: "All",
+		value: "all",
+	},
+	{
+		label: "Unused assets",
+		value: "unused",
+	},
+] as const satisfies ReadonlyArray<{
+	readonly label: string;
+	readonly value: useEditorAssetManagerController.Filter;
+}>;
+
+const assetCatalogStatuses = {
+	empty: {
+		dataUi: "EditorAssetsEmpty",
+		description: "Import assets from an arkpack or select PNG files to start the library.",
+		icon: Images,
+		title: "No assets yet",
+	},
+	"no-matches": {
+		dataUi: "EditorAssetsFilteredEmpty",
+		description: "No assets match the current search and usage filter.",
+		icon: SearchX,
+		title: "No matching assets",
+	},
+	"unused-empty": {
+		dataUi: "EditorAssetsFilteredEmpty",
+		description: "Every asset is referenced by the current project.",
+		icon: BadgeCheck,
+		title: "No unused assets",
+	},
+} as const satisfies Record<
+	useEditorAssetManagerController.CatalogState,
+	{
+		readonly dataUi: string;
+		readonly description: string;
+		readonly icon: LucideIcon;
+		readonly title: string;
+	}
+>;
 
 const EditorAssetImportMenu = ({
 	onImportArkpack,
@@ -176,6 +227,20 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 		filter: props.filter,
 		query: props.query,
 	});
+	const catalogStatus =
+		controller.catalogState === undefined
+			? undefined
+			: assetCatalogStatuses[controller.catalogState];
+	const importError =
+		controller.importError === undefined
+			? undefined
+			: controller.importError instanceof Error
+				? controller.importError.message
+				: String(controller.importError);
+	const importSuccess =
+		controller.importedCount === undefined
+			? undefined
+			: `Imported ${controller.importedCount} asset${controller.importedCount === 1 ? "" : "s"}.`;
 	const importButton = (
 		<EditorAssetImportMenu
 			onImportArkpack={controller.openArkpackImport}
@@ -228,7 +293,7 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 					className="inline-flex h-12 min-h-12 rounded-lg border border-line bg-surface p-1"
 					data-ui="EditorAssetFilters"
 				>
-					{controller.filters.map((option) => (
+					{assetFilters.map((option) => (
 						<button
 							key={option.value}
 							type="button"
@@ -238,7 +303,7 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 							{...readDataUiFn({
 								dataUi: "EditorAssetFilter",
 								state: {
-									selected: option.selected,
+									selected: option.value === props.filter,
 								},
 							})}
 						>
@@ -246,34 +311,32 @@ export const EditorAssetManager = (props: EditorAssetManagerProps) => {
 						</button>
 					))}
 				</div>
-				{controller.showHeaderImport ? importButton : null}
+				{controller.catalogState === "empty" ? null : importButton}
 			</header>
 			<div className="px-3 pt-3 pb-3">
-				{controller.importError === undefined ? null : (
+				{importError === undefined ? null : (
 					<p
 						className="mb-3 rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger"
 						data-ui="EditorAssetImportError"
 					>
-						{controller.importError}
+						{importError}
 					</p>
 				)}
-				{controller.importSuccess === undefined ? null : (
+				{importSuccess === undefined ? null : (
 					<p
 						className="mb-3 text-sm text-success"
 						data-ui="EditorAssetImportSuccess"
 					>
-						{controller.importSuccess}
+						{importSuccess}
 					</p>
 				)}
-				{controller.catalogStatus === undefined ? null : (
+				{catalogStatus === undefined ? null : (
 					<Status
-						dataUi={controller.catalogStatus.dataUi}
-						description={controller.catalogStatus.description}
-						icon={controller.catalogStatus.icon}
-						title={controller.catalogStatus.title}
-						action={
-							controller.catalogStatus.action === "import" ? importButton : undefined
-						}
+						dataUi={catalogStatus.dataUi}
+						description={catalogStatus.description}
+						icon={catalogStatus.icon}
+						title={catalogStatus.title}
+						action={controller.catalogState === "empty" ? importButton : undefined}
 					/>
 				)}
 				<EditorAssetGrid

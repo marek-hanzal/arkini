@@ -1,4 +1,5 @@
 import type { EditorBuildMajorUpdateConfirmation } from "~/editor-build/fn/readEditorBuildInstallPlanFn";
+import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
 import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { GameDiagnosticSchema } from "~/game-config/diagnostic/schema/GameDiagnosticSchema";
@@ -13,13 +14,11 @@ type EditorBuildStatus = "building" | "not-built" | "stale" | "valid";
 
 export namespace useEditorBuildController {
 	export interface Output {
-		readonly artifactSummary?: string;
+		readonly artifact?: EditorProjectBuildSchema.Type;
 		readonly build: () => void;
 		readonly buildFailure?: EditorBuildFailure;
 		readonly buildPending: boolean;
 		readonly buildStatus: EditorBuildStatus;
-		readonly buildStatusLabel: string;
-		readonly buildSummary: string;
 		readonly cancelInstall: () => void;
 		readonly confirmInstall: () => void;
 		readonly diagnostics: ReadonlyArray<GameDiagnosticSchema.Type>;
@@ -52,13 +51,11 @@ export const useEditorBuildController = (): useEditorBuildController.Output => {
 	});
 
 	return {
-		artifactSummary: artifactController.artifactSummary,
+		artifact: artifactController.artifact,
 		build: artifactController.build,
 		buildFailure: artifactController.buildFailure,
 		buildPending: artifactController.buildPending,
 		buildStatus: artifactController.buildStatus,
-		buildStatusLabel: artifactController.buildStatusLabel,
-		buildSummary: artifactController.buildSummary,
 		cancelInstall: installController.cancelInstall,
 		confirmInstall: installController.confirmInstall,
 		diagnostics: artifactController.diagnostics,

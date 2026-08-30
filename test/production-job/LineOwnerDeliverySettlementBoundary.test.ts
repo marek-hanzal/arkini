@@ -8,7 +8,7 @@ import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
-import { TickStepMs } from "~/game-tick/TickStepMs";
+import { TickStepMs } from "~/game-tick/constant/TickStepMs";
 
 const ownerKinds = [
 	"producer",

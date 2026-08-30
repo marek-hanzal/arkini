@@ -9,7 +9,7 @@ import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import type { StateSchema } from "~/game-persistence/StateSchema";
+import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/check/RuntimeCheckIssueEnumSchema";
 

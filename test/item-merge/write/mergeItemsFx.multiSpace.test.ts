@@ -5,7 +5,7 @@ import { useGameFx } from "~test/support/game/useGameFx";
 import { mergeItemsFx } from "~/item-merge/write/mergeItemsFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { GameConfigSchema } from "~/game-config/GameConfigSchema";
-import type { StateSchema } from "~/game-persistence/StateSchema";
+import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 
 const config = GameConfigSchema.parse({

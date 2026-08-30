@@ -7,11 +7,11 @@ import { createGameSessionFx } from "~/renderer/game/session/createGameSessionFx
 import { createGameResourceUrlsFx } from "~/renderer/game/createGameResourceUrlsFx";
 import { discardGameBootstrapFx } from "~/renderer/game/discardGameBootstrapFx";
 import { installGameDiagnosticsFx } from "~/renderer/game/diagnostics/installGameDiagnosticsFx";
-import { createElectronGameSaveStorageFx } from "~/game-persistence/electron/createElectronGameSaveStorageFx";
-import type { GameSaveStorage } from "~/game-persistence/GameSaveStorage";
-import { encodeArkiniSaveFn } from "~/game-persistence/encodeArkiniSaveFn";
-import { decodeArkiniSaveFx } from "~/game-persistence/decodeArkiniSaveFx";
-import type { StateSchema } from "~/game-persistence/StateSchema";
+import { createElectronGameSaveStorageFx } from "~/game-persistence/fx/createElectronGameSaveStorageFx";
+import type { GameSaveStorage } from "~/game-persistence/service/GameSaveStorage";
+import { encodeArkiniSaveFn } from "~/game-persistence/fn/encodeArkiniSaveFn";
+import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";
+import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { startFx } from "~/game-start/fx/startFx";
 import { readArkpackVersionFn } from "~/engine/version/fn/readArkpackVersionFn";
 

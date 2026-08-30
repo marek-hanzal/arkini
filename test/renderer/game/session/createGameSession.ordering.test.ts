@@ -6,7 +6,7 @@ import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { Effect } from "effect";
 import { modifyRuntimeFx } from "~/game-runtime/internal/modifyRuntimeFx";
 import { enqueueLineFx } from "~/production-job/write/enqueueLineFx";
-import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
+import { advanceRuntimeElapsedFx } from "~/game-tick/fx/advanceRuntimeElapsedFx";
 
 import { emitCompletedEventFx } from "./createGameSession.test/fixture";
 
@@ -216,7 +216,7 @@ describe("createGameSessionFx / callback ordering", () => {
 				}),
 			);
 			await session.run(
-				runTickRuntimeByFx({
+				advanceRuntimeElapsedFx({
 					elapsedMs: 2_000,
 				}),
 			);

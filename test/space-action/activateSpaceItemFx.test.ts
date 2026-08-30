@@ -1,8 +1,8 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { fromRuntimeFn } from "~/game-persistence/fromRuntimeFn";
-import { fromStateFx } from "~/game-persistence/fromStateFx";
+import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
+import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { readRuntimeFx } from "~/game-runtime/read/readRuntimeFx";
 import { activateSpaceItemFx } from "~/space-action/write/activateSpaceItemFx";
 import { spawnItemFx } from "~test/support/runtime/spawnItemFx";

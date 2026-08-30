@@ -1,4 +1,4 @@
-import type { StateSchema } from "~/game-persistence/StateSchema";
+import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 
 export const clearItemJobQueueConfig = createJobTestConfig(3);

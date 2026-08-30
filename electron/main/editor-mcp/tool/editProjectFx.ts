@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
-import type { EditorProject } from "~/project-authoring/EditorProject";
-import type { EditorProjectRepositoryService } from "~/project-authoring/repository/EditorProjectRepository";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
 import type { EditProjectInput } from "./EditProjectInputSchema";
 import { notifyProjectChangedFx } from "./notifyProjectChangedFx";
 

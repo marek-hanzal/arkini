@@ -3,9 +3,9 @@ import { createId } from "@paralleldrive/cuid2";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 
-import { useEditorProject } from "~/authoring-session/useEditorProject";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ButtonLink } from "~/ui/button/Button";
-import { EditorHistoryBackButton } from "~/authoring-shell/navigation/EditorHistoryBackButton";
+import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { EditorItemTypePresentation } from "~/item-authoring/ui/EditorItemTypePresentation";
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/new/select")({

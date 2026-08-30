@@ -3,8 +3,8 @@ import { Deferred, Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { routeTree } from "~/_route";
-import type { EditorProject } from "~/project-authoring/EditorProject";
-import type { EditorProjectRepositoryService } from "~/project-authoring/repository/EditorProjectRepository";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
 import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
 import type { EditorBoardGameResource } from "~/board-scenario/session/EditorBoardGameResource";
 import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/session/EditorBoardGameResourceOwnerAtom";

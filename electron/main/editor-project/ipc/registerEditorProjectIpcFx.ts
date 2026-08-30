@@ -4,7 +4,7 @@ import { Effect, Semaphore } from "effect";
 import { ArkiniElectronApi } from "../../../contract/ArkiniElectronApi";
 import { ElectronMainRuntime } from "../../ElectronMainRuntime";
 import type { TrustedRenderer } from "../../security/TrustedRenderer";
-import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
+import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 import type { EditorProjectServiceOwnership } from "../EditorProjectServiceOwnership";
 import { exportEditorJsonDirectoryFx } from "../exportEditorJsonDirectoryFx";
 import { importEditorJsonDirectoryFx } from "../importEditorJsonDirectoryFx";

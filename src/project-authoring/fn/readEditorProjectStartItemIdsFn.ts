@@ -1,4 +1,4 @@
-import type { EditorProjectStartScope } from "~/project-authoring/EditorProjectStartScope";
+import type { EditorProjectStartScope } from "~/project-authoring/type/EditorProjectStartScope";
 import { isItemLocationScopeAllowedFn } from "~/item-location/fn/isItemLocationScopeAllowedFn";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 

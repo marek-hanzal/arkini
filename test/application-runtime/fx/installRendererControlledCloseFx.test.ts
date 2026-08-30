@@ -3,7 +3,7 @@
 import { Deferred, Effect, Exit, Scope } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProjectRepositoryService } from "~/project-authoring/repository/EditorProjectRepository";
+import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
 import { CriticalGameLifecycleError } from "~/renderer/game/resource/CriticalGameLifecycleError";
 import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";

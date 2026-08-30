@@ -1,13 +1,13 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
-import { useEditorProject } from "~/authoring-session/useEditorProject";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ButtonLink } from "~/ui/button/Button";
-import { EditorSectionNavigation } from "~/authoring-shell/navigation/EditorSectionNavigation";
+import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import {
 	editorSectionTabActiveClassName,
 	editorSectionTabClassName,
 	EditorSectionTabs,
-} from "~/authoring-shell/navigation/EditorSectionTabs";
+} from "~/authoring-shell/ui/EditorSectionTabs";
 
 export const Route = createFileRoute("/editor/$projectId/versions")({
 	component: () => {

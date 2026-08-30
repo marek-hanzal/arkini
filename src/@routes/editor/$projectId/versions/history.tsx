@@ -2,16 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Save } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 
-import type { EditorProjectVersionDescriptor } from "~/project-version/EditorProjectVersion";
+import type { EditorProjectVersionDescriptor } from "~/project-version/type/EditorProjectVersion";
 import { Button, DangerButton } from "~/ui/button/Button";
 import { LinkButton } from "~/ui/button/LinkButton";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
 import { EditorSelect, type EditorSelectOption } from "~/ui/form/EditorSelect";
 import { Tooltip } from "~/ui/overlay/Tooltip";
-import { EditorVersionCheckoutDialog } from "~/project-version/workspace/EditorVersionCheckoutDialog";
-import { EditorVersionDiff } from "~/project-version/workspace/EditorVersionDiff";
-import { EditorVersionGraph } from "~/project-version/workspace/EditorVersionGraph";
-import { useEditorVersionHistoryController } from "~/project-version/workspace/useEditorVersionHistoryController";
+import { EditorVersionCheckoutDialog } from "~/project-version/ui/EditorVersionCheckoutDialog";
+import { EditorVersionDiff } from "~/project-version/ui/EditorVersionDiff";
+import { EditorVersionGraph } from "~/project-version/ui/EditorVersionGraph";
+import { useEditorVersionHistoryController } from "~/project-version/ui/useEditorVersionHistoryController";
 
 const EditorVersionReferenceSelect = ({
 	label,

@@ -5,8 +5,8 @@ import {
 	EditorProjectBuildContentSchema,
 	EditorProjectBuildSchema,
 } from "~/editor-build/domain/EditorProjectBuildSchema";
-import { admitEditorProjectWriteFx } from "~/project-authoring/repository/EditorProjectWriteAdmission";
-import { invokeEditorProjectTransportFx } from "~/project-authoring/repository/invokeEditorProjectTransportFx";
+import { admitEditorProjectWriteFx } from "~/project-authoring/service/EditorProjectWriteAdmission";
+import { invokeEditorProjectTransportFx } from "~/project-authoring/fx/invokeEditorProjectTransportFx";
 
 /** Creates the renderer proxy for exact revision-pinned Editor Build operations. */
 export const createElectronEditorBuildRepositoryFx = Effect.sync(

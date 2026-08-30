@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { ArkiniElectronApi } from "../../../contract/ArkiniElectronApi";
 import { ElectronMainRuntime } from "../../ElectronMainRuntime";
-import { EditorNoteContentSchema } from "~/project-note/EditorNoteSchema";
+import { EditorNoteContentSchema } from "~/project-note/schema/EditorNoteSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { TrustedRenderer } from "../../security/TrustedRenderer";
 import type { EditorProjectServiceOwnership } from "../EditorProjectServiceOwnership";

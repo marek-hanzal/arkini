@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { EditorProject } from "~/project-authoring/EditorProject";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { validateGameConfigFx } from "~/game-config/validation/fx/validateGameConfigFx";
 import { validateGameResourcesFn } from "~/game-config/validation/rule/fn/validateGameResourcesFn";
 

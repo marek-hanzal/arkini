@@ -2,7 +2,7 @@ import { Effect, SubscriptionRef } from "effect";
 import { describe, expect, it } from "@effect/vitest";
 import { vi } from "vitest";
 
-import type { EditorProject } from "~/project-authoring/EditorProject";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
 import { createEditorBoardGameResourceFx } from "~/board-scenario/session/createEditorBoardGameResourceFx";
 import type { GameEngineResource } from "~/renderer/game/resource/GameEngineResource";

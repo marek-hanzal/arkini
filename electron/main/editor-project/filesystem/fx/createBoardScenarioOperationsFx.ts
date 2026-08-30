@@ -3,8 +3,8 @@ import { Clock } from "effect";
 import { Effect, type Semaphore } from "effect";
 
 import type { ProjectState } from "../ProjectState";
-import type { EditorProjectRepositoryService } from "~/project-authoring/repository/EditorProjectRepository";
-import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
+import type { EditorProjectRepositoryService } from "~/project-authoring/service/EditorProjectRepository";
+import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoardScenarioFileSchema";
 import {
 	EditorBoardScenarioNameSchema,

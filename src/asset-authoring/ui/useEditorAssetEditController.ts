@@ -6,12 +6,12 @@ import { useCallback, useRef, useState } from "react";
 
 import { editEditorAssetFx } from "~/asset-authoring/session/editEditorAssetFx";
 import { validateEditorAssetFileFx } from "~/asset-authoring/validation/validateEditorAssetFileFx";
-import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
-import { useEditorProject } from "~/authoring-session/useEditorProject";
+import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { useEditorUnsavedChangesRegistration } from "~/authoring-session/useEditorUnsavedChangesRegistration";
+import { useEditorUnsavedChangesRegistration } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { useEditorAssetById } from "~/asset-authoring/ui/useEditorAssetById";
 import { useEditorResourceUrl } from "~/asset-authoring/ui/EditorResourceUrlSession";

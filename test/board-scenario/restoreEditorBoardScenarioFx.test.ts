@@ -4,11 +4,11 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { describe, expect, it, vi } from "vitest";
 
-import type { EditorProject } from "~/project-authoring/EditorProject";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
-} from "~/project-authoring/repository/EditorProjectRepository";
+} from "~/project-authoring/service/EditorProjectRepository";
 import type { EditorBoardGameResource } from "~/board-scenario/session/EditorBoardGameResource";
 import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/session/EditorBoardGameResourceOwnerAtom";
 import { restoreEditorBoardScenarioFx } from "~/board-scenario/session/restoreEditorBoardScenarioFx";

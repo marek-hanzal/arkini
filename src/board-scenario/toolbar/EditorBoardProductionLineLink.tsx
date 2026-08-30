@@ -2,7 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 import type { ComponentProps } from "react";
 
 import { readAuthoredItemLinesFn } from "~/production-line/fn/readAuthoredItemLinesFn";
-import { useEditorProject } from "~/authoring-session/useEditorProject";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { ItemLineSummaryIdentityRenderer } from "~/item-line-detail/ui/ItemLineSummary";
 import { EditorProductionLineEditLink } from "~/item-authoring/ui/EditorProductionLineEditLink";
 

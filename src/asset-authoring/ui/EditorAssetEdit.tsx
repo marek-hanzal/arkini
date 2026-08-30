@@ -2,9 +2,9 @@ import { FileQuestion } from "lucide-react";
 import { type DragEvent, useLayoutEffect, useRef, useState } from "react";
 
 import { PrimaryButton } from "~/ui/button/Button";
-import { EditorHistoryBackButton } from "~/authoring-shell/navigation/EditorHistoryBackButton";
-import { EditorSectionNavigation } from "~/authoring-shell/navigation/EditorSectionNavigation";
-import { EditorSectionPage } from "~/authoring-shell/navigation/EditorSectionPage";
+import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
+import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
+import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
 import { EditorFormContent } from "~/ui/form/EditorFormContent";
 import { useEditorAssetEditController } from "~/asset-authoring/ui/useEditorAssetEditController";

@@ -4,10 +4,10 @@ import {
 	type EditorArkpackFileInput,
 	readSelectedArkpackFileFx,
 } from "~/arkpack/renderer/readSelectedArkpackFileFx";
-import { publishEditorProjectFx } from "~/authoring-session/publishEditorProjectFx";
+import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
 import type { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
-import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
+import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import {
 	type EditorAssetFileInput,
 	validateEditorAssetFileFx,

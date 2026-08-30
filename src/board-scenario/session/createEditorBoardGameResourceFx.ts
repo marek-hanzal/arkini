@@ -1,6 +1,6 @@
 import { Cause, Effect, Exit, Semaphore, SubscriptionRef } from "effect";
 
-import type { EditorProject } from "~/project-authoring/EditorProject";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import type { EditorBoardGame } from "~/board-scenario/session/EditorBoardGame";
 import { type EditorBoardGameResource } from "~/board-scenario/session/EditorBoardGameResource";
 import { createEditorBoardGameFx } from "~/board-scenario/session/createEditorBoardGameFx";

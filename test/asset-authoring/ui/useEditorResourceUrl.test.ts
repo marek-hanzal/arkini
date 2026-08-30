@@ -15,7 +15,7 @@ const state = vi.hoisted(() => ({
 	resources: [] as ReadonlyArray<ResourceSchema.Type>,
 }));
 
-vi.mock("~/authoring-session/useEditorProject", () => ({
+vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 	useEditorProject: () => ({
 		resources: state.resources,
 	}),

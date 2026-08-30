@@ -1,4 +1,4 @@
-import { useEditorProject } from "~/authoring-session/useEditorProject";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { formatByteSizeFn } from "~/ui/fn/formatByteSizeFn";
 import { Fact, FactList } from "~/ui/fact/FactList";
 import { useEditorAssetById } from "~/asset-authoring/ui/useEditorAssetById";

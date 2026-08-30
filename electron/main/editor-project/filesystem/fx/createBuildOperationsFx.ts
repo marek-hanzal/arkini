@@ -10,7 +10,7 @@ import {
 	EditorProjectBuildContentSchema,
 	EditorProjectBuildSchema,
 } from "~/editor-build/domain/EditorProjectBuildSchema";
-import { EditorProjectRepositoryError } from "~/project-authoring/repository/EditorProjectRepositoryError";
+import { EditorProjectRepositoryError } from "~/project-authoring/error/EditorProjectRepositoryError";
 import { packDirectoryFx } from "~/arkpack/artifact/fx/packDirectoryFx";
 import { readArkpackContentHashFx } from "~/arkpack/artifact/fx/readArkpackContentHashFx";
 import { GameValidationError } from "~/game-config/diagnostic/error/GameValidationError";

@@ -1,4 +1,4 @@
-import type { EditorVersionHeadFileSchema } from "~/project-version/EditorVersionHeadFileSchema";
+import type { EditorVersionHeadFileSchema } from "~/project-version/schema/EditorVersionHeadFileSchema";
 import type { PublishedVersion } from "./PublishedVersion";
 
 /** Published version metadata captured only when a project opens or explicitly refreshes. */

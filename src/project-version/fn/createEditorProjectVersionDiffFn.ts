@@ -4,15 +4,15 @@ import type {
 	EditorProjectVersionItemDiff,
 	EditorProjectVersionReference,
 	EditorProjectVersionValueChange,
-} from "~/project-version/EditorProjectVersion";
+} from "~/project-version/type/EditorProjectVersion";
 import type {
 	EditorProjectCompatibilityContext,
 	EditorProjectCompatibilityDiffResult,
-} from "~/project-version/EditorProjectCompatibility";
+} from "~/project-version/type/EditorProjectCompatibility";
 import { analyzeEditorProjectCompatibilityFn } from "~/project-version/fn/analyzeEditorProjectCompatibilityFn";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
-export interface EditorProjectVersionDiffSnapshot {
+interface EditorProjectVersionDiffSnapshot {
 	readonly config: GameConfigSchema.Type;
 	readonly arkpackVersion: string;
 	readonly resources: ReadonlyMap<string, string>;
@@ -47,29 +47,12 @@ const materializeContext = (
 const readContextItemUid = (
 	before: GameConfigSchema.Type["items"],
 	after: GameConfigSchema.Type["items"],
-	beforeByUid: ReadonlyMap<string, GameConfigSchema.Type["items"][string]>,
-	afterByUid: ReadonlyMap<string, GameConfigSchema.Type["items"][string]>,
 	context: EditorProjectCompatibilityContext,
 	itemId: string,
 ) => {
-	if (context.operation === "remove") {
-		const uid = before[itemId]?.uid;
-		if (uid === undefined)
-			throw new Error(`Removed item ${itemId} is missing from the before snapshot.`);
-		return uid;
-	}
-	if (context.operation === "add") {
-		const uid = after[itemId]?.uid;
-		if (uid === undefined)
-			throw new Error(`Added item ${itemId} is missing from the after snapshot.`);
-		return uid;
-	}
-	const uid = after[itemId]?.uid;
-	if (uid === undefined)
-		throw new Error(`Changed item ${itemId} is missing from the after snapshot.`);
-	if (!beforeByUid.has(uid) || !afterByUid.has(uid))
-		throw new Error(`Changed item ${itemId} does not preserve its UID.`);
-	return uid;
+	if (context.operation === "remove") return before[itemId]?.uid ?? itemId;
+	if (context.operation === "add") return after[itemId]?.uid ?? itemId;
+	return after[itemId]?.uid ?? before[itemId]?.uid ?? itemId;
 };
 
 const readItemDiffs = (
@@ -93,7 +76,7 @@ const readItemDiffs = (
 	for (const context of contexts) {
 		if (context.path[0] !== "items" || typeof context.path[1] !== "string") continue;
 		const itemId = context.path[1];
-		const uid = readContextItemUid(before, after, beforeByUid, afterByUid, context, itemId);
+		const uid = readContextItemUid(before, after, context, itemId);
 		const values = changesByUid.get(uid) ?? [];
 		values.push(materializeContext(context, context.path.slice(2).join(".")));
 		changesByUid.set(uid, values);

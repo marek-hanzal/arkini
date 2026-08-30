@@ -1,4 +1,4 @@
-import type { EditorProject } from "~/project-authoring/EditorProject";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 export const failedCreationProject: EditorProject = {

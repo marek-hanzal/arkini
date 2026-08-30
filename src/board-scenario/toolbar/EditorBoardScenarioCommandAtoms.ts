@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { EditorProjectRepository } from "~/project-authoring/repository/EditorProjectRepository";
+import { EditorProjectRepository } from "~/project-authoring/service/EditorProjectRepository";
 import { restoreEditorBoardScenarioFx } from "~/board-scenario/session/restoreEditorBoardScenarioFx";
 import { saveEditorBoardScenarioFx } from "~/board-scenario/session/saveEditorBoardScenarioFx";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";

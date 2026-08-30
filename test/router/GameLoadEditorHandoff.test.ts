@@ -5,12 +5,12 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProject } from "~/project-authoring/EditorProject";
-import { EditorProjectAtom } from "~/authoring-session/EditorProjectAtom";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
+import { EditorProjectAtom } from "~/authoring-session/atom/EditorProjectAtom";
 import { EditorBoardGameResourceOwnerAtom } from "~/board-scenario/session/EditorBoardGameResourceOwnerAtom";
 import { createEditorBoardGameFx } from "~/board-scenario/session/createEditorBoardGameFx";
 import { createEditorBoardGameResourceFx } from "~/board-scenario/session/createEditorBoardGameResourceFx";
-import { publishEditorProjectFx } from "~/authoring-session/publishEditorProjectFx";
+import { publishEditorProjectFx } from "~/authoring-session/fx/publishEditorProjectFx";
 import { createGameEngineResourceFx } from "~/renderer/game/resource/createGameEngineResourceFx";
 import { GameEngineResourceFx } from "~/renderer/game/resource/GameEngineResourceFx";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";

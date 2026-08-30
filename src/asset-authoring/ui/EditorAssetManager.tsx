@@ -2,10 +2,10 @@ import { FloatingPortal } from "@floating-ui/react";
 import { ChevronDown, Image as ImageIcon, Images, PackageOpen } from "lucide-react";
 import { memo } from "react";
 
-import { useEditorProject } from "~/authoring-session/useEditorProject";
-import { EditorHistoryBackButton } from "~/authoring-shell/navigation/EditorHistoryBackButton";
-import { useEditorFloatingMenu } from "~/authoring-shell/navigation/useEditorFloatingMenu";
-import type { EditorProject } from "~/project-authoring/EditorProject";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
+import { useEditorFloatingMenu } from "~/authoring-shell/ui/useEditorFloatingMenu";
+import type { EditorProject } from "~/project-authoring/type/EditorProject";
 import { Button, ButtonLink, PrimaryButton } from "~/ui/button/Button";
 import {
 	selectableActiveClassName,

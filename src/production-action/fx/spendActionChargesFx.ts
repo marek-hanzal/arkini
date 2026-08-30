@@ -8,7 +8,7 @@ import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx";
 import { ItemChargesUnavailableError } from "~/production-action/error/ItemChargesUnavailableError";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
-import { isolateGridStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateGridStatefulOwnerTransitionFx";
+import { isolateGridStatefulOwnerTransitionFx } from "~/item-state-isolation/fx/isolateGridStatefulOwnerTransitionFx";
 import { readItemRemainingChargesFn } from "~/production-action/fn/readItemRemainingChargesFn";
 import { outputFx } from "~/production-output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";

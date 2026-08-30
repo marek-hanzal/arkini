@@ -273,6 +273,18 @@ module.exports = {
 			},
 		},
 		{
+			name: "item-state-isolation-stays-upstream-of-production",
+			comment:
+				"Shared stateful-owner stack isolation provides candidate transitions to production without importing its consumers.",
+			severity: "error",
+			from: {
+				path: "^src/item-state-isolation(?:/|$)",
+			},
+			to: {
+				path: "^src/production-(?:action|delivery|input|job|line)(?:/|$)",
+			},
+		},
+		{
 			name: "active-code-does-not-import-unpacked-game-resources",
 			comment:
 				"Application code consumes authored Game resources only through validated Arkpacks.",

@@ -8,7 +8,7 @@ import { EditorVersionManifestSchema } from "~/project-version/schema/EditorVers
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 import { createVersionFingerprint, hashVersionBytes } from "./VersionFingerprint";
 

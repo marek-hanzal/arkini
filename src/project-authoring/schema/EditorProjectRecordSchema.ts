@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { IdSchema } from "~/game-config/schema/IdSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 
 /** Canonical project row persisted without duplicated display metadata. */
 export const EditorProjectRecordSchema = z

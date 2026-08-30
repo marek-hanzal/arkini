@@ -8,7 +8,7 @@ import { EditorBoardScenarioFileSchema } from "~/board-scenario/schema/EditorBoa
 import type { EditorVersionManifestSchema } from "~/project-version/schema/EditorVersionManifestSchema";
 import type { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
 import { hashVersionBytes } from "./VersionFingerprint";
 import { assertProjectDirectoryFx } from "./assertProjectDirectoryFx";

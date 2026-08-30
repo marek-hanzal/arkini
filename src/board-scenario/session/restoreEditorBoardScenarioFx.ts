@@ -8,7 +8,7 @@ import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { decodeArkiniSaveFx } from "~/game-persistence/fx/decodeArkiniSaveFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
-import { readArkpackVersionFn } from "~/engine/version/fn/readArkpackVersionFn";
+import { readArkpackVersionFn } from "~/game-version/fn/readArkpackVersionFn";
 
 export namespace restoreEditorBoardScenarioFx {
 	export type Result =

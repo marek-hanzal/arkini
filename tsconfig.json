@@ -27,6 +27,8 @@
 	"include": [
 		"electron/contract",
 		"src/engine",
+		"src/application-version",
+		"src/game-version",
 		"src/filesystem-write",
 		"src/game-tick",
 		"src/game-runtime",

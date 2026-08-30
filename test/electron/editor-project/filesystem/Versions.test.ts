@@ -19,7 +19,7 @@ import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProje
 import { EditorVersionDescriptorFileSchema } from "~/project-version/schema/EditorVersionDescriptorFileSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
-import { ArkiniVersionIncompatibleError } from "~/engine/version/ArkiniVersionAdmission";
+import { ArkiniVersionIncompatibleError } from "~/application-version/error/ArkiniVersionIncompatibleError";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 
 let root: string;

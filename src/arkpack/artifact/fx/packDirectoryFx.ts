@@ -10,7 +10,7 @@ import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArti
 import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemWriteFx";
 import { isFilesystemPathSafeFx } from "~/filesystem-write/fx/isFilesystemPathSafeFx";
 import { assertGameConfigValidFx } from "~/game-config/compiler/fx/assertGameConfigValidFx";
-import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
+import { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
 import { encodeFx } from "./encodeFx";
 import { encodeArkpackEnvelopeFx } from "./encodeArkpackEnvelopeFx";
 import { readArkpackContentHashFx } from "./readArkpackContentHashFx";

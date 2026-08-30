@@ -8,7 +8,7 @@ import {
 	readEditorBuildInstallPlanFn,
 } from "~/editor-build/fn/readEditorBuildInstallPlanFn";
 import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
-import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { readSettledAsyncResultErrorFx } from "~/ui/reactivity/readSettledAsyncResultErrorFx";
 import { EditorBuildCommandAtoms } from "./EditorBuildCommandAtoms";

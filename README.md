@@ -28,11 +28,13 @@ src/playable-game  live Game capability, resource URLs and presentation fail-sto
 src/installed-game  Arkpack/save bootstrap, diagnostics, package leases, finalization and recovery
 src/game-persistence  persisted State, hydration, save codecs, autosave and exact save transports
 src/filesystem-write  Node-only canonical locking, path safety and durable single-file write mechanics
+src/application-version  Arkini writer provenance, major-only admission and incompatibility failure
+src/game-version  project-owned gameplay compatibility schema and major projection
 src/simulation-time  canonical fixed simulation quantum shared by time-aware gameplay owners
 src/game-tick  fixed-step budgeting, replay, job/delivery/temporary advancement and scoped loop
 src/item-interaction  optimistic drop reads, authoritative drop/write commands and ordinary click actions
 src/item-query  canonical Runtime Item query execution across authored reach, scope and distance
-src/engine    remaining item/temporary, revision/version and CLI support owners
+src/engine    remaining item/temporary, revision and CLI support owners
 src/game-start  initial-state schemas, exact placement planning and atomic runtime start
 src/game-event  committed gameplay event schemas and exact downstream event projection
 src/item-detail-read  shared Item Detail identity, target, tab, queue and source reads/projections

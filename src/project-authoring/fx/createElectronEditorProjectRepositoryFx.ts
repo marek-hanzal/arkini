@@ -17,8 +17,8 @@ import {
 	EditorProjectCommitPayloadSchema,
 	EditorProjectPayloadSchema,
 } from "~/project-authoring/schema/EditorProjectPayloadSchema";
-import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
-import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
+import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 import { EditorNoteSchema } from "~/project-note/schema/EditorNoteSchema";
 import { invokeEditorProjectTransportFx } from "~/project-authoring/fx/invokeEditorProjectTransportFx";
 

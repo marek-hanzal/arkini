@@ -6,7 +6,7 @@ import { readEditorBuildInstallPlanFn } from "~/editor-build/fn/readEditorBuildI
 import { readArkpackArtifactNameFn } from "~/arkpack/artifact/fn/readArkpackArtifactNameFn";
 import type { EditorBuildRepositoryService } from "~/editor-build/service/EditorBuildRepository";
 import type { EditorProjectBuildSchema } from "~/editor-build/schema/EditorProjectBuildSchema";
-import type { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import type { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 
 const matchesConfirmationFn = (
 	actual: EditorBuildMajorUpdateConfirmation,

@@ -1,7 +1,7 @@
 import { decode } from "@msgpack/msgpack";
 import { Data, Effect } from "effect";
 import { ArkiniSaveSchema } from "~/game-persistence/schema/ArkiniSaveSchema";
-import { admitArkiniVersionFx } from "~/engine/version/ArkiniVersionAdmission";
+import { admitArkiniVersionFx } from "~/application-version/fx/admitArkiniVersionFx";
 
 class ArkiniSaveDecodeError extends Data.TaggedError("ArkiniSaveDecodeError")<{
 	readonly cause: unknown;

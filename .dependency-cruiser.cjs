@@ -51,6 +51,30 @@ module.exports = {
 			},
 		},
 		{
+			name: "application-version-does-not-import-game-version",
+			comment:
+				"Application writer admission is independent from project-owned gameplay compatibility.",
+			severity: "error",
+			from: {
+				path: "^src/application-version(?:/|$)",
+			},
+			to: {
+				path: "^src/game-version(?:/|$)",
+			},
+		},
+		{
+			name: "game-version-does-not-import-application-version",
+			comment:
+				"Project-owned gameplay compatibility does not depend on Arkini application releases.",
+			severity: "error",
+			from: {
+				path: "^src/game-version(?:/|$)",
+			},
+			to: {
+				path: "^src/application-version(?:/|$)",
+			},
+		},
+		{
 			name: "not-to-unresolvable",
 			comment: "Every import resolves to a declared module.",
 			severity: "error",

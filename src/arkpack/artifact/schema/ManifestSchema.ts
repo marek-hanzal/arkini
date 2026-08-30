@@ -2,8 +2,8 @@ import { z } from "zod";
 
 import { NonNegativeIntegerSchema } from "~/game-config/schema/NonNegativeIntegerSchema";
 import { ManifestResourceSchema } from "./ManifestResourceSchema";
-import { ArkiniVersionSchema } from "~/engine/version/schema/ArkiniVersionSchema";
-import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import { ArkiniVersionSchema } from "~/application-version/schema/ArkiniVersionSchema";
+import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 
 export const ManifestSchema = z
 	.object({

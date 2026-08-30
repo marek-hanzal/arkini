@@ -16,7 +16,7 @@ import { GameProjectManifestSchema } from "~/game-config/source/schema/GameProje
 import { EditorProjectCatalogEntrySchema } from "~/project-authoring/schema/EditorProjectCatalogEntrySchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { ResourceSchema } from "~/game-config/resource/schema/ResourceSchema";
-import { ArkpackVersionSchema } from "~/engine/version/schema/ArkpackVersionSchema";
+import { ArkpackVersionSchema } from "~/game-version/schema/ArkpackVersionSchema";
 import type { FilesystemWrite } from "~/filesystem-write/service/FilesystemWrite";
 import { withFilesystemWriteRecovery } from "~/filesystem-write/error/FilesystemWriteError";
 import { readProjectFilesFx } from "./readProjectFilesFx";
